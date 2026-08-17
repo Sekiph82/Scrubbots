@@ -3,10 +3,11 @@
 This document defines conceptual module boundaries. It does not mandate a
 final class hierarchy. Prompt 01 established the project shell; Prompt 02
 implemented Level Data, Level Loader/Validator, and BoardState; Prompt 03
-added the official difficulty-band production validator on top of that
-core (see "LevelData vs. BoardState" and "Structural vs. production
-validation" below). Everything else in the module table is still future
-work.
+added the official difficulty-band production validator; Prompt 04 (M06)
+added `BoardRenderer` and the DIRTY/CLEAN visual prototype layer (see
+"LevelData vs. BoardState", "Structural vs. production validation", and
+"BoardRenderer and the DIRTY/CLEAN visual layer" below). Everything else in
+the module table is still future work.
 
 ## Guiding principles
 
@@ -32,7 +33,7 @@ work.
 | Target Selector | Decides **which** cell a dispatched Scrubbot will clean. | `scripts/gameplay/routing/` |
 | Routing System | Decides **how** a Scrubbot visually travels to its assigned target. | `scripts/gameplay/routing/` |
 | Scrubbot Agent | Lightweight runtime object representing one active Scrubbot in flight. | `scripts/gameplay/scrubbots/` |
-| Board Renderer | Draws current Board State efficiently (batched, not per-cell Nodes). | `scripts/gameplay/board/`, `scenes/gameplay/` |
+| Board Renderer | Draws current Board State efficiently (batched, not per-cell Nodes). Implemented in Prompt 04 (M06) — see below. | `scripts/gameplay/board/` |
 | Cleaning Feedback | Visual/audio response when a cell is cleaned; poolable, toggleable. | `scripts/gameplay/cells/`, later `scenes/components/` |
 | UI | HUD, slot UI, menus. | `scripts/ui/`, `scenes/ui/` |
 | Save System | Persists progress, streak, currency. Not implemented yet. | `scripts/data/` |
@@ -67,12 +68,12 @@ Slot dispatches a Scrubbot
 
 ## Performance approach
 
-- Board State (any level size, e.g. 1,600 or 2,500 cells) is stored as
+- Board State (any level size, e.g. 1,600 or 3,481 cells) is stored as
   flat/packed arrays, not one Node per cell. See `docs/05_TECH_DECISIONS.md`
   for the decision record (ADR-004, ADR-008).
-- Rendering draws the board from that data (e.g. a single custom-drawn
-  surface or batched draw calls / texture generated from state), not one
-  Sprite2D per cell.
+- Rendering draws the entire board as one `Image`/`ImageTexture` on a
+  single `TextureRect` (ADR-011) — not one Sprite2D/Node per cell, and not
+  per-frame immediate-mode draw calls per cell.
 - Scrubbots in flight are lightweight active objects, pooled where it makes
   sense, since the number of simultaneously active Scrubbots is small
   (bounded by slot count) even though the board itself is large.
@@ -120,6 +121,38 @@ Slot dispatches a Scrubbot
   `get_height()` like everything else and have no reason to know about
   difficulty bands at all.
 
+## BoardRenderer and the DIRTY/CLEAN visual layer (implemented in Prompt 04 / M06)
+
+- `BoardRenderer` (`scripts/gameplay/board/board_renderer.gd`, extends
+  `TextureRect`) — draws a `BoardState` as one `Image`/`ImageTexture` (one
+  texel per logical cell, nearest-neighbor filtered for crisp pixel-art
+  edges). Exactly one Node regardless of board size — see ADR-011. Reads
+  `BoardState`/palette; never mutates gameplay state, never chooses
+  targets, never dispatches. Public surface: `configure(board, palette,
+  available_size)`, `refresh_all()`, `update_cells(indices)`,
+  `set_dirty_preset(name)`, `get_cell_size()`, `get_board_pixel_size()`,
+  `get_cell_center_local(x, y)` / `get_cell_center_global(x, y)` (the
+  geometry seam a future `RoutingSystem` will target — no movement is
+  implemented against it yet).
+- Geometry: `cell_size = floor(min(available.x/width, available.y/height))`
+  — fits any width×height (including rectangular boards) inside a given
+  display rect without stretching or distorting aspect ratio, and without
+  fractional/drifting cell boundaries.
+- `PaletteColors` (`scripts/data/palette_colors.gd`) — the one conversion
+  path from `LevelData.palette` hex strings to Godot `Color`, used by
+  `BoardRenderer`. Malformed entries are reported, not silently ignored
+  (`PaletteParseResult`).
+- `DirtyCleanPresets` (`scripts/gameplay/board/dirty_clean_presets.gd`) —
+  centralized DIRTY color transform (HSV saturation *and* value reduction,
+  never saturation alone — see `docs/01_GAMEPLAY_SPEC.md`). CLEAN always
+  displays the unmodified source palette color. Three named presets
+  (`A`/`B`/`C`) exist for owner comparison; **none is approved yet** — this
+  is an open `[DESIGN GATE]`, tracked in `tasks.md` M10.
+- `scenes/debug/board_renderer_debug.tscn` +
+  `scripts/debug/board_renderer_debug.gd` — dev-only tool to compare every
+  official board-size boundary and all three DIRTY presets at native
+  gameplay scale, via dropdowns, no code changes needed. Not production UI.
+
 ## Cross-script referencing convention (ADR-009)
 
 Scripts under `scripts/data/` and `scripts/gameplay/board/` reference each
@@ -132,6 +165,8 @@ gameplay scripts that need to run correctly under `godot --headless`.
 
 ## What is explicitly NOT built yet
 
-Slot System, TargetSelector, RoutingSystem, Scrubbot Agent, Board Renderer,
-Cleaning Feedback, Save System are all future milestones (see
-`docs/04_ROADMAP.md`).
+Slot System, TargetSelector, RoutingSystem, Scrubbot Agent, Cleaning
+Feedback, Save System are all future milestones (see `docs/04_ROADMAP.md`).
+`BoardRenderer` is now implemented (Prompt 04/M06), but the *final* DIRTY
+visual language is not — that remains an open design gate (see above and
+`tasks.md` M10).

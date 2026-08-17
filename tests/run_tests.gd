@@ -15,6 +15,10 @@ const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const LevelValidationResult = preload("res://scripts/data/level_validation_result.gd")
 const DifficultyRules = preload("res://scripts/data/difficulty_rules.gd")
 const ProductionLevelValidator = preload("res://scripts/data/production_level_validator.gd")
+const PaletteColors = preload("res://scripts/data/palette_colors.gd")
+const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
+const DirtyCleanPresets = preload("res://scripts/gameplay/board/dirty_clean_presets.gd")
+const BoardDebugFixtures = preload("res://scripts/debug/board_debug_fixtures.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -30,6 +34,11 @@ func _initialize() -> void:
 	_run_max_board_tests()
 	_run_performance_sanity()
 	_run_performance_sanity_59x59()
+	_run_palette_colors_tests()
+	_run_dirty_clean_transform_tests()
+	_run_board_renderer_geometry_tests()
+	_run_board_renderer_pixel_tests()
+	_run_board_renderer_performance_sanity()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -42,6 +51,18 @@ func _check(condition: bool, description: String) -> void:
 
 func _check_eq(actual, expected, description: String) -> void:
 	_check(actual == expected, "%s (expected %s, got %s)" % [description, str(expected), str(actual)])
+
+## Renderer pixel readback goes through an 8-bit-per-channel Image, so exact
+## float equality (Color.is_equal_approx's ~1e-5 epsilon) is the wrong tool
+## for comparing a rendered pixel against an independently-computed float
+## Color — use this looser, quantization-aware comparison instead.
+func _colors_close(a: Color, b: Color, tolerance: float) -> bool:
+	return (
+		absf(a.r - b.r) <= tolerance and
+		absf(a.g - b.g) <= tolerance and
+		absf(a.b - b.b) <= tolerance and
+		absf(a.a - b.a) <= tolerance
+	)
 
 func _load_fixture(path: String) -> LevelData:
 	var result: LevelValidationResult = LevelLoader.load_from_path(path)
@@ -368,6 +389,153 @@ func _make_level(id: String, difficulty: String, width: int, height: int) -> Lev
 	var cells := PackedInt32Array()
 	cells.resize(width * height)
 	return LevelData.new(1, id, id, difficulty, width, height, palette, cells)
+
+## ---------------------------------------------------------- M06: renderer --
+
+func _run_palette_colors_tests() -> void:
+	var result = PaletteColors.parse(PackedStringArray(["#ff0000", "#00ff00"]))
+	_check(result.is_ok(), "well-formed palette parses without errors")
+	_check_eq(result.colors.size(), 2, "palette parse produces one Color per entry")
+	_check(result.colors[0].is_equal_approx(Color(1, 0, 0)), "palette entry 0 parses to red")
+	_check(result.colors[1].is_equal_approx(Color(0, 1, 0)), "palette entry 1 parses to green")
+
+	var bad_result = PaletteColors.parse(PackedStringArray(["not-a-color"]))
+	_check(not bad_result.is_ok(), "malformed palette entry reported as an error")
+	_check_eq(bad_result.colors.size(), 1, "malformed entry still produces a fallback color (doesn't abort parsing)")
+
+	_check(result.colors[0].is_equal_approx(PaletteColors.parse(PackedStringArray(["#ff0000"])).colors[0]), "palette parsing is deterministic")
+
+func _run_dirty_clean_transform_tests() -> void:
+	var base := Color.html("#ff0000") # pure red: s=1.0, v=1.0
+	var base_s := base.s
+	var base_v := base.v
+
+	var dirty_a := DirtyCleanPresets.apply_dirty(base, "A")
+	var dirty_b := DirtyCleanPresets.apply_dirty(base, "B")
+	var dirty_c := DirtyCleanPresets.apply_dirty(base, "C")
+
+	_check(not dirty_a.is_equal_approx(base), "DIRTY preset A differs from CLEAN (base) color")
+	_check(not dirty_b.is_equal_approx(base), "DIRTY preset B differs from CLEAN (base) color")
+	_check(not dirty_c.is_equal_approx(base), "DIRTY preset C differs from CLEAN (base) color")
+
+	_check(not dirty_a.is_equal_approx(dirty_b), "preset A differs from preset B (preset switching has an effect)")
+	_check(not dirty_b.is_equal_approx(dirty_c), "preset B differs from preset C")
+	_check(not dirty_a.is_equal_approx(dirty_c), "preset A differs from preset C")
+
+	for entry in [["A", dirty_a], ["B", dirty_b], ["C", dirty_c]]:
+		var name = entry[0]
+		var color: Color = entry[1]
+		_check(color.s < base_s, "preset %s reduces saturation relative to CLEAN" % name)
+		_check(color.v < base_v, "preset %s reduces value/brightness relative to CLEAN (not saturation alone)" % name)
+		_check(absf(color.h - base.h) < 0.001, "preset %s preserves hue (color family stays recognizable)" % name)
+
+	_check_eq(base.s, base_s, "applying DIRTY transforms does not mutate the original base Color")
+	_check_eq(base.v, base_v, "applying DIRTY transforms does not mutate the original base Color (value)")
+
+func _run_board_renderer_geometry_tests() -> void:
+	var sizes: Array[Vector2i] = [
+		Vector2i(20, 20), Vector2i(29, 29), Vector2i(20, 27),
+		Vector2i(30, 30), Vector2i(39, 39), Vector2i(34, 39),
+		Vector2i(40, 40), Vector2i(49, 49), Vector2i(48, 41),
+		Vector2i(50, 50), Vector2i(59, 59), Vector2i(53, 59),
+	]
+	var available := Vector2(1000, 1400)
+	for size: Vector2i in sizes:
+		var w := size.x
+		var h := size.y
+		var level = BoardDebugFixtures.make_level(w, h)
+		var board = BoardState.from_level_data(level)
+		var renderer = BoardRenderer.new()
+		renderer.configure(board, level.palette, available)
+
+		var expected_cell_size: float = max(floor(min(available.x / float(w), available.y / float(h))), 1.0)
+		_check_eq(renderer.get_cell_size(), expected_cell_size, "%dx%d cell_size matches fit-to-available formula" % [w, h])
+
+		var expected_pixel_size := Vector2(w * expected_cell_size, h * expected_cell_size)
+		_check(renderer.get_board_pixel_size().is_equal_approx(expected_pixel_size), "%dx%d board pixel size == width/height * cell_size" % [w, h])
+
+		var top_left := renderer.get_cell_center_local(0, 0)
+		var bottom_right := renderer.get_cell_center_local(w - 1, h - 1)
+		_check(top_left.x >= 0 and top_left.y >= 0, "%dx%d (0,0) cell center is inside board bounds (>= 0)" % [w, h])
+		_check(bottom_right.x <= expected_pixel_size.x and bottom_right.y <= expected_pixel_size.y, "%dx%d final-cell center does not overflow board bounds" % [w, h])
+
+		_check_eq(renderer.get_child_count(), 0, "%dx%d BoardRenderer has zero child Nodes (no per-cell architecture)" % [w, h])
+
+		renderer.free()
+
+func _run_board_renderer_pixel_tests() -> void:
+	# 2x1 board: both cells same palette color id, cell 0 CLEAN, cell 1 DIRTY.
+	var palette := PackedStringArray(["#3B82F6"])
+	var cells := PackedInt32Array([0, 0])
+	var level := LevelData.new(1, "renderer_pixel_test", "t", "TEST", 2, 1, palette, cells)
+	var board := BoardState.from_level_data(level)
+	board.set_cell_state(0, BoardState.CellState.CLEAN)
+	board.set_cell_state(1, BoardState.CellState.DIRTY)
+
+	var states_before: Array = [board.get_cell_state(0), board.get_cell_state(1)]
+
+	var renderer = BoardRenderer.new()
+	renderer.configure(board, palette, Vector2(200, 200))
+	renderer.set_dirty_preset("A")
+
+	var base_color := Color.html("#3B82F6")
+
+	# Renderer output is read back through an 8-bit-per-channel Image, so it
+	# necessarily differs slightly (quantization, ~1/255 per channel) from an
+	# independently-computed float Color — comparing to a precomputed exact
+	# value would be the brittle float-equality test the test strategy
+	# warns against (docs/06_TEST_STRATEGY.md). Test the meaningful contract
+	# instead: CLEAN matches the source color (within quantization), and
+	# DIRTY vs CLEAN differ with the right HSV relationship.
+	var clean_pixel := renderer.get_pixel_color(0, 0)
+	var dirty_pixel := renderer.get_pixel_color(1, 0)
+
+	_check(_colors_close(clean_pixel, base_color, 0.01), "CLEAN cell renders the original source palette color, unmodified (within 8-bit quantization)")
+	_check(not _colors_close(dirty_pixel, clean_pixel, 0.01), "DIRTY and CLEAN cells of the same source color render visibly differently")
+	_check(dirty_pixel.s < clean_pixel.s, "DIRTY pixel has lower saturation than CLEAN (readback matches the preset contract)")
+	_check(dirty_pixel.v < clean_pixel.v, "DIRTY pixel has lower value/brightness than CLEAN (not saturation alone)")
+	_check(absf(dirty_pixel.h - clean_pixel.h) < 0.01, "DIRTY pixel preserves CLEAN's hue (color family stays recognizable)")
+
+	# update_cells(): clean the dirty cell without a full refresh_all().
+	board.set_cell_state(1, BoardState.CellState.CLEAN)
+	renderer.update_cells([1])
+	_check(_colors_close(renderer.get_pixel_color(1, 0), base_color, 0.01), "update_cells() reflects a single cell's state change without a full rebuild")
+
+	var states_after: Array = [board.get_cell_state(0), board.get_cell_state(1)]
+	_check_eq(states_after, [BoardState.CellState.CLEAN, BoardState.CellState.CLEAN], "BoardState reflects the test's own mutation (sanity)")
+	_check(states_before[0] == BoardState.CellState.CLEAN, "BoardRenderer.configure()/refresh_all() did not mutate BoardState (cell 0 unchanged)")
+
+	renderer.free()
+
+func _run_board_renderer_performance_sanity() -> void:
+	var sizes: Array[Vector2i] = [Vector2i(40, 40), Vector2i(50, 50), Vector2i(59, 59), Vector2i(53, 59)]
+	for size: Vector2i in sizes:
+		var w := size.x
+		var h := size.y
+		var level = BoardDebugFixtures.make_level(w, h)
+		var board = BoardState.from_level_data(level)
+		var renderer = BoardRenderer.new()
+
+		var t0 := Time.get_ticks_usec()
+		renderer.configure(board, level.palette, Vector2(1080, 1080))
+		var t1 := Time.get_ticks_usec()
+
+		var iterations := 20
+		for i in iterations:
+			renderer.refresh_all()
+		var t2 := Time.get_ticks_usec()
+
+		for i in iterations:
+			renderer.update_cells([0, board.get_cell_count() - 1])
+		var t3 := Time.get_ticks_usec()
+
+		print("---- BoardRenderer performance sanity (%dx%d = %d cells) ----" % [w, h, w * h])
+		print("  configure() (setup + first full render): %.3f ms" % ((t1 - t0) / 1000.0))
+		print("  refresh_all() x%d: %.3f ms total, %.4f ms/call" % [iterations, (t2 - t1) / 1000.0, (t2 - t1) / 1000.0 / iterations])
+		print("  update_cells([2 cells]) x%d: %.3f ms total, %.4f ms/call" % [iterations, (t3 - t2) / 1000.0, (t3 - t2) / 1000.0 / iterations])
+
+		_check_eq(renderer.get_child_count(), 0, "%dx%d renderer still has zero children after repeated refresh/update" % [w, h])
+		renderer.free()
 
 func _print_summary() -> void:
 	print("")

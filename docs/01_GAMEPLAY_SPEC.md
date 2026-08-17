@@ -44,6 +44,35 @@ Status tags used below:
 > actual rule is the full difficulty-band table above, with a 59×59 maximum.
 > See ADR-010.
 
+## DIRTY vs. CLEAN readability `[LOCKED — core visual requirement, Prompt 04]`
+
+This is a gameplay-readability requirement, not aesthetic polish — logical
+cells get physically small on 50×50 and especially 59×59 boards, so the
+distinction must survive that.
+
+```text
+DIRTY vs CLEAN readability must be validated at native gameplay display
+size, especially on 50×50 and 59×59 boards.
+
+The distinction must remain immediately readable without relying on
+per-cell dirt textures, tiny icons, heavy grid lines, or zoomed-in
+inspection.
+
+DIRTY cells must preserve enough underlying hue for color recognition,
+while CLEAN cells must appear clearly more vivid and revealed.
+
+The distinction must use both saturation and brightness/value differences,
+not saturation alone.
+```
+
+CLEAN always displays the level's original palette color, unmodified. DIRTY
+is a visual transform of that same color (never a second, separately
+colored "dirt" layer stacked on top — see `docs/02_TECH_ARCHITECTURE.md`
+"BoardRenderer and the DIRTY/CLEAN visual layer" and
+`docs/05_TECH_DECISIONS.md` ADR-011). Three prototype presets exist for
+owner comparison (`DirtyCleanPresets` A/B/C); **none is approved as final**
+— see `tasks.md` M10, an open `[DESIGN GATE]`.
+
 ## Slots `[LOCKED]`
 
 - **5** slots are active during the primary gameplay presentation.
