@@ -46,14 +46,19 @@ specified yet — none should be invented. See `CLAUDE.md` rule 2.
 ## The variable-size logical board concept
 
 Every puzzle image is defined on a **logical grid whose width and height come
-from that level's data**, not from a fixed engine constant. `40×40` (1,600
-cells) is the standard/common size; `50×50` (2,500 cells) is required for
-Very Hard content. Cell count is always `width * height` — it is derived,
-never hard-coded. This is game data, not a screen-pixel measurement: a
-logical board of any supported size can be displayed at any physical size
-the device screen allows. See `docs/03_LEVEL_DATA_SPEC.md` for how this is
-represented and `docs/05_TECH_DECISIONS.md` (ADR-008) for why the engine is
-variable-size rather than fixed at 40×40.
+from that level's data**, not from a fixed engine constant. Official
+production difficulty bands (Prompt 03) tie board dimensions to difficulty:
+Easy 20–29×20–29, Medium 30–39×30–39, Hard 40–49×40–49, Very Hard
+50–59×50–59 — see `docs/01_GAMEPLAY_SPEC.md` for the full table. `40×40`
+and `50×50` are valid example sizes within the Hard and Very Hard bands
+respectively, not the only sizes the engine supports — the current maximum
+production requirement is 59×59 (3,481 cells). Cell count is always
+`width * height` — it is derived, never hard-coded. This is game data, not
+a screen-pixel measurement: a logical board of any supported size can be
+displayed at any physical size the device screen allows. See
+`docs/03_LEVEL_DATA_SPEC.md` for how this is represented and
+`docs/05_TECH_DECISIONS.md` (ADR-008, ADR-010) for why the engine is
+variable-size and how the official difficulty bands work.
 
 ## The 5-slot concept
 

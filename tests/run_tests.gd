@@ -1,6 +1,7 @@
 extends SceneTree
-## Headless test runner for the Prompt 02 variable-size board + level data
-## core. Run with:
+## Headless test runner for the variable-size board + level data core
+## (Prompt 02) and official difficulty-band production validation
+## (Prompt 03). Run with:
 ##   godot --headless --path . -s res://tests/run_tests.gd
 ## Exits 0 on all-pass, 1 on any failure. No third-party test framework —
 ## see docs/06_TEST_STRATEGY.md.
@@ -12,6 +13,8 @@ const LevelLoader = preload("res://scripts/data/level_loader.gd")
 const LevelValidator = preload("res://scripts/data/level_validator.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const LevelValidationResult = preload("res://scripts/data/level_validation_result.gd")
+const DifficultyRules = preload("res://scripts/data/difficulty_rules.gd")
+const ProductionLevelValidator = preload("res://scripts/data/production_level_validator.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -23,7 +26,10 @@ func _initialize() -> void:
 	_run_level_validation_tests()
 	_run_board_state_tests()
 	_run_independence_tests()
+	_run_production_difficulty_tests()
+	_run_max_board_tests()
 	_run_performance_sanity()
+	_run_performance_sanity_59x59()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -66,8 +72,14 @@ func _run_dimension_tests() -> void:
 		_check_eq(lvl3x2.height, 2, "3x2 fixture height")
 		_check_eq(lvl3x2.get_cell_count(), 6, "3x2 fixture cell_count (generic-size proof)")
 
+	var lvl59 := _load_fixture("res://data/levels/test_59x59.json")
+	if lvl59 != null:
+		_check_eq(lvl59.width, 59, "59x59 fixture width")
+		_check_eq(lvl59.height, 59, "59x59 fixture height")
+		_check_eq(lvl59.get_cell_count(), 3481, "59x59 fixture cell_count (current production maximum)")
+
 func _run_index_conversion_tests() -> void:
-	var sizes: Array[Vector2i] = [Vector2i(40, 40), Vector2i(50, 50), Vector2i(3, 2)]
+	var sizes: Array[Vector2i] = [Vector2i(40, 40), Vector2i(50, 50), Vector2i(3, 2), Vector2i(59, 59)]
 	for size: Vector2i in sizes:
 		var w: int = size.x
 		var h: int = size.y
@@ -178,6 +190,79 @@ func _run_independence_tests() -> void:
 	_check_eq(board_a.get_cell_state(0), BoardState.CellState.CLEAN, "board A mutated as expected")
 	_check_eq(board_b.get_cell_state(0), BoardState.CellState.DIRTY, "board B unaffected by board A mutation (no shared state)")
 
+## Production difficulty/dimension validation — DifficultyRules and
+## ProductionLevelValidator. Distinct from _run_level_validation_tests(),
+## which only tests generic structural validity (LevelValidator).
+func _run_production_difficulty_tests() -> void:
+	# --- Easy: 20..29 ---
+	_check(ProductionLevelValidator.validate(_make_level("easy_min", "EASY", 20, 20)).is_ok(), "Easy 20x20 (min) PASS -> cell_count %d" % 400)
+	_check(ProductionLevelValidator.validate(_make_level("easy_max", "EASY", 29, 29)).is_ok(), "Easy 29x29 (max) PASS -> cell_count %d" % 841)
+	_check(ProductionLevelValidator.validate(_make_level("easy_rect", "EASY", 20, 27)).is_ok(), "Easy 20x27 (rectangular) PASS -> cell_count %d" % 540)
+
+	# --- Medium: 30..39 ---
+	_check(ProductionLevelValidator.validate(_make_level("medium_min", "MEDIUM", 30, 30)).is_ok(), "Medium 30x30 (min) PASS -> cell_count %d" % 900)
+	_check(ProductionLevelValidator.validate(_make_level("medium_max", "MEDIUM", 39, 39)).is_ok(), "Medium 39x39 (max) PASS -> cell_count %d" % 1521)
+	_check(ProductionLevelValidator.validate(_make_level("medium_rect", "MEDIUM", 34, 39)).is_ok(), "Medium 34x39 (rectangular) PASS -> cell_count %d" % 1326)
+
+	# --- Hard: 40..49 ---
+	_check(ProductionLevelValidator.validate(_make_level("hard_min", "HARD", 40, 40)).is_ok(), "Hard 40x40 (min) PASS -> cell_count %d" % 1600)
+	_check(ProductionLevelValidator.validate(_make_level("hard_max", "HARD", 49, 49)).is_ok(), "Hard 49x49 (max) PASS -> cell_count %d" % 2401)
+	_check(ProductionLevelValidator.validate(_make_level("hard_rect", "HARD", 48, 41)).is_ok(), "Hard 48x41 (rectangular) PASS -> cell_count %d" % 1968)
+
+	# --- Very Hard: 50..59 ---
+	_check(ProductionLevelValidator.validate(_make_level("veryhard_min", "VERY_HARD", 50, 50)).is_ok(), "Very Hard 50x50 (min) PASS -> cell_count %d" % 2500)
+	_check(ProductionLevelValidator.validate(_make_level("veryhard_max", "VERY_HARD", 59, 59)).is_ok(), "Very Hard 59x59 (max, current maximum) PASS -> cell_count %d" % 3481)
+	_check(ProductionLevelValidator.validate(_make_level("veryhard_rect", "VERY_HARD", 53, 59)).is_ok(), "Very Hard 53x59 (rectangular) PASS -> cell_count %d" % 3127)
+
+	# --- Cross-band (upper) rejection ---
+	_check(not ProductionLevelValidator.validate(_make_level("easy_bad_upper", "EASY", 20, 30)).is_ok(), "Easy 20x30 rejected (height out of band)")
+	_check(not ProductionLevelValidator.validate(_make_level("medium_bad_upper", "MEDIUM", 39, 40)).is_ok(), "Medium 39x40 rejected (height out of band)")
+	_check(not ProductionLevelValidator.validate(_make_level("hard_bad_upper", "HARD", 49, 50)).is_ok(), "Hard 49x50 rejected (height out of band)")
+	_check(not ProductionLevelValidator.validate(_make_level("veryhard_bad_upper", "VERY_HARD", 49, 59)).is_ok(), "Very Hard 49x59 rejected (width out of band)")
+
+	# --- Cross-band (lower) rejection ---
+	_check(not ProductionLevelValidator.validate(_make_level("easy_bad_lower", "EASY", 19, 20)).is_ok(), "Easy 19x20 rejected (width below band)")
+	_check(not ProductionLevelValidator.validate(_make_level("medium_bad_lower", "MEDIUM", 29, 30)).is_ok(), "Medium 29x30 rejected (width below band)")
+	_check(not ProductionLevelValidator.validate(_make_level("hard_bad_lower", "HARD", 39, 40)).is_ok(), "Hard 39x40 rejected (width below band)")
+	_check(not ProductionLevelValidator.validate(_make_level("veryhard_bad_lower", "VERY_HARD", 49, 50)).is_ok(), "Very Hard 49x50 rejected (width below band)")
+
+	# --- Unknown production difficulty ---
+	var unknown_result = ProductionLevelValidator.validate(_make_level("mystery", "IMPOSSIBLE", 40, 40))
+	_check(not unknown_result.is_ok(), "unknown difficulty 'IMPOSSIBLE' rejected, not silently accepted as any known band")
+
+	# --- TEST vs. production distinction (core of this phase) ---
+	var test_level = _load_fixture("res://data/levels/test_3x2.json")
+	if test_level != null:
+		_check_eq(test_level.difficulty, "TEST", "3x2 fixture is difficulty TEST")
+		# Structurally valid and loads fine (generic engine proof)...
+		var board = BoardState.from_level_data(test_level)
+		_check_eq(board.get_cell_count(), 6, "3x2 TEST fixture still works structurally via BoardState")
+		# ...but is explicitly rejected as production content.
+		var prod_result = ProductionLevelValidator.validate(test_level)
+		_check(not prod_result.is_ok(), "3x2 TEST fixture rejected by ProductionLevelValidator (TEST is not production-legal)")
+		var same_dims_as_easy = _make_level("would_be_easy_if_test_werent_test", "EASY", 20, 20)
+		_check(ProductionLevelValidator.validate(same_dims_as_easy).is_ok(), "sanity: identical validator logic accepts a real EASY level (difficulty is the deciding factor, not some hidden dimension rule)")
+
+func _run_max_board_tests() -> void:
+	var level = _load_fixture("res://data/levels/test_59x59.json")
+	if level == null:
+		return
+	var board = BoardState.from_level_data(level)
+	_check_eq(board.get_width(), 59, "59x59 BoardState width")
+	_check_eq(board.get_height(), 59, "59x59 BoardState height")
+	_check_eq(board.get_cell_count(), 3481, "59x59 BoardState cell_count")
+
+	var corners: Array[Vector2i] = [Vector2i(0, 0), Vector2i(58, 0), Vector2i(0, 58), Vector2i(58, 58), Vector2i(29, 29)]
+	for corner: Vector2i in corners:
+		var index = board.get_cell_index(corner.x, corner.y)
+		_check(board.is_valid_index(index), "59x59 corner %s produces a valid index" % corner)
+		_check_eq(board.get_cell_position(index), corner, "59x59 corner %s round-trips through index" % corner)
+
+	var mutate_ok = board.set_cell_state(board.get_cell_index(29, 29), BoardState.CellState.CLEAN)
+	_check(mutate_ok, "59x59 center-cell mutation succeeds")
+	_check_eq(board.count_cells_by_state(BoardState.CellState.CLEAN), 1, "59x59 exactly one CLEAN cell after single mutation")
+	_check_eq(board.count_cells_by_state(BoardState.CellState.DIRTY), 3480, "59x59 remaining 3480 cells still DIRTY")
+
 func _run_performance_sanity() -> void:
 	var level := _load_fixture("res://data/levels/test_50x50.json")
 	if level == null:
@@ -222,16 +307,71 @@ func _run_performance_sanity() -> void:
 	print("  set_cell_state over all cells (bulk clean): %.3f ms" % ((t5 - t4) / 1000.0))
 	print("  (sum-of-color-ids sink value: %d — prevents dead-code elimination of the read loop)" % sum)
 
+## Extends performance sanity to the CURRENT production maximum (59x59 =
+## 3481 cells), per this phase's requirement. The 50x50 benchmark above is
+## kept as-is for regression continuity, not replaced.
+func _run_performance_sanity_59x59() -> void:
+	var level := _load_fixture("res://data/levels/test_59x59.json")
+	if level == null:
+		return
+	var iterations := 50
+
+	var t0 := Time.get_ticks_usec()
+	var board
+	for i in iterations:
+		board = BoardState.from_level_data(level)
+	var t1 := Time.get_ticks_usec()
+
+	var sum := 0
+	for i in iterations:
+		for c in board.get_cell_count():
+			sum += board.get_color_id(c)
+	var t2 := Time.get_ticks_usec()
+
+	var dirty_count := 0
+	for i in iterations:
+		dirty_count = board.count_cells_by_state(BoardState.CellState.DIRTY)
+	var t3 := Time.get_ticks_usec()
+
+	for i in board.get_cell_count():
+		var pos = board.get_cell_position(i)
+		board.get_cell_index(pos.x, pos.y)
+	var t4 := Time.get_ticks_usec()
+
+	for i in board.get_cell_count():
+		board.set_cell_state(i, BoardState.CellState.CLEAN)
+	var t5 := Time.get_ticks_usec()
+
+	_check_eq(board.get_cell_count(), 3481, "performance sanity operates on 59x59 (3481 cells, current maximum)")
+	_check_eq(dirty_count, 3481, "performance sanity read DIRTY count before mutation pass")
+	_check_eq(board.count_cells_by_state(BoardState.CellState.CLEAN), 3481, "bulk mutation cleaned all cells")
+
+	print("---- performance sanity (59x59 = 3481 cells, CURRENT MAXIMUM, %d iterations where applicable) ----" % iterations)
+	print("  construct BoardState.from_level_data x%d: %.3f ms total, %.4f ms/iter" % [iterations, (t1 - t0) / 1000.0, (t1 - t0) / 1000.0 / iterations])
+	print("  read all cells x%d passes: %.3f ms total, %.4f ms/pass" % [iterations, (t2 - t1) / 1000.0, (t2 - t1) / 1000.0 / iterations])
+	print("  count_cells_by_state x%d: %.3f ms total, %.4f ms/call" % [iterations, (t3 - t2) / 1000.0, (t3 - t2) / 1000.0 / iterations])
+	print("  coordinate<->index round trip over all cells: %.3f ms" % ((t4 - t3) / 1000.0))
+	print("  set_cell_state over all cells (bulk clean): %.3f ms" % ((t5 - t4) / 1000.0))
+	print("  (sum-of-color-ids sink value: %d — prevents dead-code elimination of the read loop)" % sum)
+
 func _make_blank_board(width: int, height: int):
-	var palette := PackedStringArray(["#000000", "#ffffff"])
+	var level = _make_level("blank_%dx%d" % [width, height], "TEST", width, height)
+	return BoardState.from_level_data(level)
+
+## Builds an in-memory LevelData directly (bypassing JSON) for testing
+## DifficultyRules/ProductionLevelValidator logic against many width/height/
+## difficulty combinations without needing one fixture file per combination.
+## Cell content is irrelevant to these tests, so cells are filled with a
+## single valid palette id.
+func _make_level(id: String, difficulty: String, width: int, height: int) -> LevelData:
+	var palette := PackedStringArray(["#000000"])
 	var cells := PackedInt32Array()
 	cells.resize(width * height)
-	var level := LevelData.new(1, "blank_%dx%d" % [width, height], "blank", "TEST", width, height, palette, cells)
-	return BoardState.from_level_data(level)
+	return LevelData.new(1, id, id, difficulty, width, height, palette, cells)
 
 func _print_summary() -> void:
 	print("")
-	print("==== SCRUBBOTS Prompt 02 test summary ====")
+	print("==== SCRUBBOTS test summary ====")
 	print("Total checks: %d" % _total)
 	print("Failures: %d" % _failures.size())
 	if _failures.is_empty():

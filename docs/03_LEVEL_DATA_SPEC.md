@@ -1,4 +1,4 @@
-# 03 — Level Data Specification (Version 1 — implemented in Prompt 02)
+# 03 — Level Data Specification (Version 1 — implemented in Prompt 02, production/test validation split added in Prompt 03)
 
 > **Correction note (Prompt 02):** The Prompt 01 draft of this document
 > proposed a fixed-40×40-flavored schema (`grid_width`/`grid_height` always
@@ -13,10 +13,14 @@
 
 - **Variable-size** logical grid: `width` and `height` are level-defined
   integers, each `> 0`. Cell count is always `width * height` — derived, not
-  a stored/authoritative field.
-- Currently exercised sizes: 40×40 (1,600 cells) and 50×50 (2,500 cells,
-  required for Very Hard content), plus small sizes (e.g. 3×2) in tests to
-  prove the format is genuinely generic.
+  a stored/authoritative field. Structural validity (this document) is
+  separate from *production* legality — see "Structural vs. production
+  validation" below and ADR-010 in `docs/05_TECH_DECISIONS.md`.
+- Currently exercised sizes span the full official production range —
+  40×40 (1,600 cells) and 50×50 (2,500 cells) are two example sizes, not the
+  only ones; the engine is exercised up to the current production maximum
+  of 59×59 (3,481 cells) — plus small non-production sizes (e.g. 3×2) in
+  tests to prove the format is genuinely generic.
 - A palette of colors referenced by compact numeric id (array index) — not
   repeated color strings per cell.
 - Per-cell color assignment via palette id.
@@ -55,11 +59,16 @@ BoardState" in `docs/02_TECH_ARCHITECTURE.md`.
   unsupported/missing version is a hard validation failure.
 - `id` — required, non-empty string, unique per level file.
 - `name` — required, non-empty string (display label).
-- `difficulty` — required, non-empty string. No fixed enum is enforced yet;
-  known labels in current use are `TEST`, `EASY`, `MEDIUM`, `HARD`,
-  `VERY_HARD` (see `docs/01_GAMEPLAY_SPEC.md` — progression thresholds are
-  still `[TO BE DESIGNED]`). A `VERY_HARD` level is not required to be
-  exactly 50×50, but 50×50 must be supported for it.
+- `difficulty` — required, non-empty string. **Structural validation**
+  (`LevelValidator`) does not constrain its value at all — any non-empty
+  string passes. **Production validation** (`ProductionLevelValidator`,
+  Prompt 03) does: it must be one of `EASY`, `MEDIUM`, `HARD`, `VERY_HARD`
+  (each with an official width/height band — see
+  `docs/01_GAMEPLAY_SPEC.md` and ADR-010) or the special value `TEST`, which
+  means "development/engine fixture" and is explicitly *rejected* by
+  production validation, never treated as any production difficulty. A
+  `VERY_HARD` level is not required to be exactly 50×50 — any width/height
+  in 50..59 is valid, up to the current maximum 59×59.
 - `width`, `height` — required, integers `> 0`. No relationship between them
   is assumed or required (a level is not required to be square).
 - `palette` — required, non-empty array of color strings. Palette ids are
@@ -84,6 +93,32 @@ Malformed/invalid level data never crashes the loader — it returns a result
 that clearly distinguishes success from a list of specific validation
 errors. See `scripts/data/level_validator.gd`.
 
+## Structural vs. production validation (Prompt 03)
+
+Two separate, deliberately non-overlapping questions:
+
+- **`LevelValidator`** — "is this Level Data V1 internally valid?" Generic,
+  dimension-agnostic, never difficulty-aware. The 3×2 fixture passes this
+  just as validly as a 59×59 level. This is what the error examples above
+  come from.
+- **`ProductionLevelValidator`** (new in Prompt 03,
+  `scripts/data/production_level_validator.gd`) — "is this
+  *structurally-valid* level legal as a real production SCRUBBOTS level?"
+  Only this validator knows about difficulty bands
+  (`scripts/data/difficulty_rules.gd`, the single source of truth for the
+  official ranges). It rejects `TEST` outright, rejects unknown difficulty
+  strings, and rejects width/height combinations outside the declared
+  difficulty's band, e.g.:
+
+  ```text
+  Level easy_bad_01: difficulty EASY requires width and height in range
+  20..29; received width=20 height=30.
+  ```
+
+A level must pass `LevelValidator` before `ProductionLevelValidator` is even
+meaningful to run against it — the production check assumes structurally
+valid input (a valid `LevelData`), not raw JSON.
+
 ## Minimal example (format proof, not a real level)
 
 ```jsonc
@@ -99,16 +134,27 @@ errors. See `scripts/data/level_validator.gd`.
 }
 ```
 
-## Fixtures shipped with Prompt 02
+## Fixtures (dev/test only — not production art)
 
-Located at `data/levels/` (dev/test fixtures, not production art — see
-`docs/06_TEST_STRATEGY.md`):
+Located at `data/levels/` (see `docs/06_TEST_STRATEGY.md`). **All current
+fixtures use `"difficulty": "TEST"`**, which is the authoritative signal
+that they are development fixtures, not production content — the `test_`
+filename prefix is a human naming convention only, not what the engine
+checks. `ProductionLevelValidator` rejects every one of them as production
+content by design (see above).
 
-- `test_40x40.json` — 40×40 (1,600 cells), simple quadrant pattern.
-- `test_50x50.json` — 50×50 (2,500 cells), simple striped pattern. Exists
-  specifically to prove the engine is not secretly hard-coded to 40×40.
 - `test_3x2.json` — 3×2 (6 cells), tiny generic-size/non-square fixture used
-  by automated tests.
+  by automated tests. Proves the engine is genuinely dimension-generic, not
+  secretly hard-coded to any "standard" size.
+- `test_40x40.json` — 40×40 (1,600 cells), simple quadrant pattern.
+- `test_50x50.json` — 50×50 (2,500 cells), simple striped pattern.
+  (Corrected in Prompt 03: previously mislabeled `"difficulty":
+  "VERY_HARD"`, which would have made it silently pass production
+  validation despite being a synthetic engine-proof pattern, not real art.)
+- `test_59x59.json` — 59×59 (3,481 cells, current production maximum),
+  checkerboard pattern. New in Prompt 03, to prove the full
+  JSON-load → `LevelData` → `BoardState` → performance pipeline at the real
+  maximum, not just via in-memory test objects.
 
 ## Explicitly deferred
 

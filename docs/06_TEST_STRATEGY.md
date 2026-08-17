@@ -2,9 +2,12 @@
 
 No third-party testing framework is used. Godot 4.7 supports headless
 execution (`--headless`), which is the backbone for command-line-runnable
-checks. Prompt 02 implements a small custom GDScript test runner
-(`tests/run_tests.gd`) invoked via headless Godot; most later categories
-below are still planned, not yet implemented.
+checks. Prompt 02 implemented a small custom GDScript test runner
+(`tests/run_tests.gd`, extended in Prompt 03) invoked via headless Godot;
+most later categories below are still planned, not yet implemented.
+
+**Current total: 131 checks, all passing** (73 from Prompt 02 + 58 added in
+Prompt 03).
 
 ## Implemented in Prompt 02 (`tests/run_tests.gd`)
 
@@ -18,6 +21,9 @@ Run via `tools/run_headless.ps1` or directly:
   `cell_count == 2500`.
 - A small 3×2 (non-square) fixture loads with `cell_count == 6`, proving the
   engine is generic and not special-cased for 40 or 50.
+- (Prompt 03) A 59×59 fixture loads; `width == 59`, `height == 59`,
+  `cell_count == 3481` — the current production maximum, exercised through
+  the real JSON-load pipeline, not just an in-memory object.
 
 ### Index conversion
 - `coordinate -> index -> coordinate` round-trips correctly for corner cells
@@ -58,6 +64,42 @@ Run via `tools/run_headless.ps1` or directly:
   No hard millisecond threshold is enforced (machine-dependent); the check
   is for catastrophic structural problems (crashes, pathological allocation
   patterns), not micro-optimization.
+- (Prompt 03) The same benchmark is repeated at 59×59 (3,481 cells, current
+  production maximum) — kept as a separate, additional benchmark rather
+  than replacing the 50×50 one, so both remain regression baselines.
+
+## Implemented in Prompt 03 (`tests/run_tests.gd`, extended)
+
+### Production difficulty/dimension validation
+- Every official band's minimum, maximum, and one rectangular example
+  PASS production validation: Easy (20×20, 29×29, 20×27), Medium (30×30,
+  39×39, 34×39), Hard (40×40, 49×49, 48×41), Very Hard (50×50, 59×59,
+  53×59 — 59×59 is the current maximum).
+- Cross-band rejection at both the upper and lower boundary for every
+  difficulty (e.g. Easy `20×30` and `19×20` both rejected).
+- An unknown/unrecognized difficulty string is rejected, not silently
+  accepted as any known band.
+- The 3×2 `TEST` fixture is proven to (a) still load and work structurally
+  through `BoardState` exactly as before, while (b) being explicitly
+  rejected by `ProductionLevelValidator` — the core structural-vs-
+  production distinction this phase introduces. A same-dimensions-but-
+  `EASY`-labeled level is checked to pass, confirming the *difficulty
+  field*, not some hidden dimension rule, is what `TEST` rejection hinges
+  on.
+- All of the above use `DifficultyRules`/`ProductionLevelValidator`
+  directly against in-memory `LevelData` objects (see
+  `docs/03_LEVEL_DATA_SPEC.md` "Structural vs. production validation") —
+  JSON-parsing correctness itself is already covered by the Prompt 02
+  `LevelValidator` tests above, so these tests don't need one fixture file
+  per dimension combination.
+
+### Maximum board (59×59 / 3,481 cells)
+- `BoardState.from_level_data` on the real `test_59x59.json` fixture
+  reports `width == 59`, `height == 59`, `cell_count == 3481`.
+- Coordinate/index round-trip verified at all four corners plus center.
+- A single-cell mutation at 59×59 is isolated correctly (exactly 1 CLEAN,
+  3,480 still DIRTY) — same mutation-isolation guarantee as smaller boards,
+  now proven at the real maximum.
 
 ## Planned, not yet implemented
 
@@ -93,7 +135,7 @@ Run via `tools/run_headless.ps1` or directly:
 ### Save data
 - Saved/loaded round-trip preserves streak count and currency exactly.
 
-## Explicitly out of scope for Prompt 02
+## Explicitly out of scope for Prompt 02 and Prompt 03
 
 Slot system, target selector, routing system, save system, and rendering do
 not exist yet — their tests remain planned only.

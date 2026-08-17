@@ -8,11 +8,18 @@ Canonical local project: `C:\Users\sekip\Desktop\ScrubBots`
 Canonical repository: `https://github.com/Sekiph82/Scrubbots`
 Primary branch: `main`
 
-Verified at time of writing (post-Prompt-02 planning pass):
-- HEAD commit: `5a4a2e6` ("feat: add variable-size board and level data core")
+Verified at time of writing (end of Phase M03):
+- HEAD commit: `03da4e8` at phase start ("docs: add post-prompt-02 Scrubbots
+  master plan") — see `docs/05_TECH_DECISIONS.md` and CHANGELOG for the
+  Phase M03 commit that follows it.
 - Working tree: clean, `main` up to date with `origin/main`
 - Godot: `4.7.1.stable.official.a13da4feb` (installed, `godot --version` confirmed)
-- Headless test suite (`tests/run_tests.gd`): **73/73 checks PASS**, exit code 0
+- Headless test suite (`tests/run_tests.gd`): **131/131 checks PASS**, exit
+  code 0 (73 from Prompt 02 + 58 added in Phase M03)
+- Official production difficulty bands (Easy/Medium/Hard/Very_Hard,
+  20..59, max 59×59 = 3,481 cells) implemented and enforced via
+  `DifficultyRules` + `ProductionLevelValidator`, kept separate from the
+  generic dimension-agnostic `LevelValidator`/`BoardState` core.
 
 ## Status tags
 
@@ -59,7 +66,8 @@ complete — record why instead of marking `[x]`.
 - No cache/build junk (`.godot/`, import cache, build output) is committed.
 - A focused, understandable commit exists.
 - Push to `origin/main` succeeds when possible (never force-pushed).
-- A Desktop handoff log is generated for the prompt.
+- The current phase's Desktop log (see "PHASE LOG WORKFLOW" below) is
+  updated to reflect the work.
 
 ---
 
@@ -88,9 +96,47 @@ Every future numbered implementation prompt must:
 18. Commit (focused, descriptive message).
 19. Push safely (`git push origin main`, never force).
 20. Never force-push.
-21. Create the Desktop handoff log:
-    `C:\Users\sekip\Desktop\SCRUBBOTS_PROMPT_XX_LOG.md` — **never committed**
-    to this repository.
+21. Update the current phase's Desktop log (see "PHASE LOG WORKFLOW" below)
+    — **never committed** to this repository.
+
+---
+
+## PHASE LOG WORKFLOW (supersedes the old per-prompt handoff-log convention)
+
+**One development phase = one continuous Desktop log file**, not one log
+per prompt. A "phase" is a milestone-level unit of work (e.g. `M03`, `M04`)
+that may span multiple Claude prompts/sessions.
+
+- Naming: `C:\Users\sekip\Desktop\SCRUBBOTS_PHASE_MXX_LOG.md` (e.g.
+  `SCRUBBOTS_PHASE_M03_LOG.md`). `MXX` matches the `tasks.md` milestone ID
+  the work belongs to.
+- **Create the log file at the START of the phase's first prompt**, before
+  any inspection or code changes — not at the end.
+- If the log file already exists for the current phase, **read it and keep
+  updating the same file** — never create a second log for the same phase
+  (no `_RETRY`, no `_B`, no `PROMPT_03B` variants). Every prompt working on
+  the same phase reuses the same file.
+- Update it after every meaningful checkpoint: environment/repo inspection,
+  baseline tests, architecture decisions, each implementation step,
+  fixtures added, test-suite changes, each significant failure/debugging
+  discovery, final tests, before commit, after commit, after push. The log
+  must let another agent resume work correctly even if the session stops
+  unexpectedly mid-phase.
+- Keep the chronological journal/history in the log even after issues are
+  fixed — do not erase past failures once resolved.
+- When the phase is genuinely complete, set `PHASE STATUS: COMPLETE` and
+  fill in the Final Phase Summary section — without deleting the earlier
+  chronological content.
+- Only start a **new** log file when moving to a genuinely new phase (e.g.
+  `M03` complete, `M04` begins).
+- The phase log is **never committed** to the Scrubbots Git repository — it
+  lives only on the Desktop.
+
+Prompts 01 and 02 predate this convention and used one-log-per-prompt
+(`SCRUBBOTS_PROMPT_01_LOG.md`, `SCRUBBOTS_PROMPT_02_LOG.md`) — those are
+historical and not retroactively merged. `SCRUBBOTS_MASTER_TASKS_LOG.md`
+(the master-plan prompt) also predates this convention. Starting with
+Phase M03, use the phase-log format above.
 
 ---
 
@@ -417,42 +463,45 @@ about 40×40 and 50×50; the official band system (8.3) is broader and must
 now be reflected in docs and enforced in code.
 
 **Documentation**
-- [ ] SB-M03-001 Search docs for old claim that 40×40 is "standard."
-- [ ] SB-M03-002 Search docs for claim 50×50 is the Very Hard requirement without a range.
-- [ ] SB-M03-003 Search for `2500` used as a maximum.
-- [ ] SB-M03-004 Update `CLAUDE.md`.
-- [ ] SB-M03-005 Update project brief.
-- [ ] SB-M03-006 Update gameplay specification.
-- [ ] SB-M03-007 Update technical architecture.
-- [ ] SB-M03-008 Update Level Data spec.
-- [ ] SB-M03-009 Update roadmap.
-- [ ] SB-M03-010 Update test strategy.
-- [ ] SB-M03-011 Add/amend ADR for official difficulty dimension bands.
+- [x] SB-M03-001 Search docs for old claim that 40×40 is "standard."
+- [x] SB-M03-002 Search docs for claim 50×50 is the Very Hard requirement without a range.
+- [x] SB-M03-003 Search for `2500` used as a maximum (none found; only an example error message and a factual 50×50 cell-count statement remain).
+- [x] SB-M03-004 Update `CLAUDE.md`.
+- [x] SB-M03-005 Update project brief.
+- [x] SB-M03-006 Update gameplay specification.
+- [x] SB-M03-007 Update technical architecture.
+- [x] SB-M03-008 Update Level Data spec.
+- [x] SB-M03-009 Update roadmap.
+- [x] SB-M03-010 Update test strategy.
+- [x] SB-M03-011 Add/amend ADR for official difficulty dimension bands (ADR-010).
 
 **Production difficulty representation**
-- [ ] SB-M03-012 Define canonical production difficulty IDs.
-- [ ] SB-M03-013 EASY = dimensions 20..29.
-- [ ] SB-M03-014 MEDIUM = dimensions 30..39.
-- [ ] SB-M03-015 HARD = dimensions 40..49.
-- [ ] SB-M03-016 VERY_HARD = dimensions 50..59.
-- [ ] SB-M03-017 Keep TEST/dev fixture concept separate.
-- [ ] SB-M03-018 Production catalog must never expose TEST.
+- [x] SB-M03-012 Define canonical production difficulty IDs (`DifficultyRules`, `scripts/data/difficulty_rules.gd`).
+- [x] SB-M03-013 EASY = dimensions 20..29.
+- [x] SB-M03-014 MEDIUM = dimensions 30..39.
+- [x] SB-M03-015 HARD = dimensions 40..49.
+- [x] SB-M03-016 VERY_HARD = dimensions 50..59.
+- [x] SB-M03-017 Keep TEST/dev fixture concept separate (`DifficultyRules.TEST_DIFFICULTY`).
+- [x] SB-M03-018 Production catalog must never expose TEST (enforced at the validator layer — `ProductionLevelValidator` rejects TEST outright, tested; no `LevelCatalog` exists yet, that's M30).
 
 **Validation**
-- [ ] SB-M03-019 Add production difficulty/dimension validation.
-- [ ] SB-M03-020 Accept Easy rectangular boards.
-- [ ] SB-M03-021 Accept Medium rectangular boards.
-- [ ] SB-M03-022 Accept Hard rectangular boards.
-- [ ] SB-M03-023 Accept Very Hard rectangular boards.
-- [ ] SB-M03-024 Reject cross-band Easy dimensions.
-- [ ] SB-M03-025 Reject cross-band Medium dimensions.
-- [ ] SB-M03-026 Reject cross-band Hard dimensions.
-- [ ] SB-M03-027 Reject cross-band Very Hard dimensions.
-- [ ] SB-M03-028 Produce explicit errors, e.g.:
+- [x] SB-M03-019 Add production difficulty/dimension validation (`ProductionLevelValidator`).
+- [x] SB-M03-020 Accept Easy rectangular boards (tested: 20×27).
+- [x] SB-M03-021 Accept Medium rectangular boards (tested: 34×39).
+- [x] SB-M03-022 Accept Hard rectangular boards (tested: 48×41).
+- [x] SB-M03-023 Accept Very Hard rectangular boards (tested: 53×59).
+- [x] SB-M03-024 Reject cross-band Easy dimensions (tested: 20×30 upper, 19×20 lower).
+- [x] SB-M03-025 Reject cross-band Medium dimensions (tested: 39×40 upper, 29×30 lower).
+- [x] SB-M03-026 Reject cross-band Hard dimensions (tested: 49×50 upper, 39×40 lower).
+- [x] SB-M03-027 Reject cross-band Very Hard dimensions (tested: 49×59 upper, 49×50 lower).
+- [x] SB-M03-028 Produce explicit errors, e.g.:
   ```text
   Level level_123: difficulty VERY_HARD requires width and height in
   range 50..59. Received width=49 height=59.
   ```
+  (actual implemented format matches this shape, e.g. `Level easy_bad_upper:
+  difficulty EASY requires width and height in range 20..29; received
+  width=20 height=30`.)
 
 ### M04 — Expanded Board Fixtures & Test Matrix
 
@@ -460,33 +509,33 @@ Do not replace existing Prompt 02 fixtures — add to them.
 
 - [x] SB-M04-001 3×2 generic non-square fixture exists.
 
-**Easy**
-- [ ] SB-M04-002 20×20. — [ ] SB-M04-003 29×29. — [ ] SB-M04-004 20×27.
+**Easy** — all tested via in-memory `LevelData` against `ProductionLevelValidator` (see M03).
+- [x] SB-M04-002 20×20. — [x] SB-M04-003 29×29. — [x] SB-M04-004 20×27.
 
 **Medium**
-- [ ] SB-M04-005 30×30. — [ ] SB-M04-006 39×39. — [ ] SB-M04-007 34×39.
+- [x] SB-M04-005 30×30. — [x] SB-M04-006 39×39. — [x] SB-M04-007 34×39.
 
 **Hard**
 - [x] SB-M04-008 40×40 generic fixture exists.
-- [ ] SB-M04-009 49×49. — [ ] SB-M04-010 48×41.
+- [x] SB-M04-009 49×49. — [x] SB-M04-010 48×41.
 
 **Very Hard**
 - [x] SB-M04-011 50×50 generic fixture exists.
-- [ ] SB-M04-012 59×59. — [ ] SB-M04-013 53×59.
+- [x] SB-M04-012 59×59 (real fixture `test_59x59.json` + in-memory production check). — [x] SB-M04-013 53×59.
 
-**Boundary rejection**
-- [ ] SB-M04-014 Easy 20×30 fails production validation.
-- [ ] SB-M04-015 Medium 39×40 fails.
-- [ ] SB-M04-016 Hard 49×50 fails.
-- [ ] SB-M04-017 Very Hard 49×59 fails.
+**Boundary rejection** — upper AND lower boundary tested for all four (prompt required at minimum the upper cases; lower cases added too).
+- [x] SB-M04-014 Easy 20×30 fails production validation (also: 19×20 lower bound).
+- [x] SB-M04-015 Medium 39×40 fails (also: 29×30 lower bound).
+- [x] SB-M04-016 Hard 49×50 fails (also: 39×40 lower bound).
+- [x] SB-M04-017 Very Hard 49×59 fails (also: 49×50 lower bound).
 
 **Maximum workload**
-- [ ] SB-M04-018 59×59 loads successfully.
-- [ ] SB-M04-019 `cell_count == 3481`.
-- [ ] SB-M04-020 Coordinate/index tests pass at 59×59.
-- [ ] SB-M04-021 State mutation tests pass at 59×59.
-- [ ] SB-M04-022 Performance sanity benchmark runs at 3,481 cells.
-- [ ] SB-M04-023 Record results without an arbitrary strict timing threshold.
+- [x] SB-M04-018 59×59 loads successfully (`test_59x59.json`, full JSON pipeline).
+- [x] SB-M04-019 `cell_count == 3481`.
+- [x] SB-M04-020 Coordinate/index tests pass at 59×59 (4 corners + center).
+- [x] SB-M04-021 State mutation tests pass at 59×59 (single-cell isolation: 1 CLEAN / 3480 DIRTY).
+- [x] SB-M04-022 Performance sanity benchmark runs at 3,481 cells (kept alongside the existing 50×50 benchmark, not replacing it).
+- [x] SB-M04-023 Record results without an arbitrary strict timing threshold (see `SCRUBBOTS_PHASE_M03_LOG.md` for actual measured numbers).
 
 ### M05 — Test Harness Maturity
 
@@ -1207,17 +1256,31 @@ PROMPT 21  Release Candidate Preparation
 
 ## NEXT IMMEDIATE MILESTONE
 
-**PROMPT 03 — Official Difficulty Bands + 59×59 Validation**
+**PROMPT 03 — Official Difficulty Bands + 59×59 Validation — COMPLETE.**
+See `C:\Users\sekip\Desktop\SCRUBBOTS_PHASE_M03_LOG.md` for full detail:
+`DifficultyRules` + `ProductionLevelValidator` implemented, official bands
+(Easy 20–29, Medium 30–39, Hard 40–49, Very Hard 50–59, max 59×59=3,481)
+enforced and tested, TEST-vs-production separation proven, docs/tasks.md
+updated, 131/131 tests passing.
 
-1. Preserve existing Prompt 02 LevelData/BoardState implementation.
-2. Update project docs from the old "40×40 standard / 50×50 Very Hard"
-   framing to the official ranges: EASY 20-29×20-29, MEDIUM 30-39×30-39,
-   HARD 40-49×40-49, VERY_HARD 50-59×50-59.
-3. Implement production difficulty/dimension validation.
-4. Preserve 3×2 as a TEST/dev-only generic fixture.
-5. Add minimum, maximum, and rectangular fixtures.
-6. Add 59×59 / 3,481-cell validation.
-7. Extend headless tests.
-8. Run maximum logical-core performance sanity checks.
-9. Do **not** implement BoardRenderer yet unless specifically instructed in
-   Prompt 03 — keep the prompt from growing unnecessarily large.
+**PROMPT 04 (next) — Board Renderer (M06)**
+
+1. Preserve everything from M00–M03 (LevelData, BoardState, DifficultyRules,
+   ProductionLevelValidator) — do not rebuild working systems.
+2. Define `BoardRenderer` responsibility, kept separate from `BoardState`
+   (rendering never decides game state).
+3. Evaluate and choose an efficient Godot 4.7 rendering technique (batched
+   draw calls / custom `_draw()` / texture generated from state) — record
+   the choice as an ADR, not just code.
+4. Render arbitrary width/height, including rectangular boards, at every
+   difficulty band's extremes — smallest Easy up to the 59×59 maximum.
+5. No per-cell Node architecture — confirm this explicitly for 59×59
+   (3,481 cells).
+6. Extend headless-runnable validation/benchmarks to cover rendering
+   construction cost at 59×59.
+7. Update docs/tasks.md; do not begin slots, Scrubbots, target selection,
+   or routing in this milestone (see `docs/04_ROADMAP.md` M3, `tasks.md`
+   M06).
+8. Start the phase log immediately as `SCRUBBOTS_PHASE_M04_LOG.md` (or the
+   correct milestone ID if scoped differently), per the Phase Log Workflow
+   above.

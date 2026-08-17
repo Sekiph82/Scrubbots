@@ -2,7 +2,7 @@
   "version": 1,
   "id": "test_50x50",
   "name": "50x50 Stripe Test",
-  "difficulty": "VERY_HARD",
+  "difficulty": "TEST",
   "width": 50,
   "height": 50,
   "palette": [

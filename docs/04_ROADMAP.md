@@ -4,6 +4,12 @@ Milestone-based sequence. Do not implement a later milestone while an
 earlier one is incomplete or unvalidated. Each milestone should be small
 enough to validate on its own.
 
+> **Note (Prompt 03):** `tasks.md` (project root) is now the authoritative,
+> finer-grained master task list (milestones `SB-M00`–`SB-M55`) and should
+> be read alongside this file. This roadmap's coarser `M0`–`M15` sequence
+> still describes the overall shape of the project; `tasks.md` is where
+> day-to-day milestone status and task-level detail actually live.
+
 - **M0 — Project foundation** *(this prompt)*: repo connected to GitHub,
   Godot 4.7 project shell, directory structure, docs, bootstrap scene,
   validation tooling.
@@ -12,9 +18,13 @@ enough to validate on its own.
   height, derived cell count) — not a fixed board size. Supports at least
   40×40 and 50×50 natively (see ADR-008 in `docs/05_TECH_DECISIONS.md`).
   No rendering yet.
-- **M2 — Level data loading** *(Prompt 02)*: LevelLoader + LevelValidator
-  read Version 1 level data (`docs/03_LEVEL_DATA_SPEC.md`) into LevelData,
-  which BoardState is then built from.
+- **M2 — Level data loading** *(Prompt 02, extended in Prompt 03)*:
+  LevelLoader + LevelValidator read Version 1 level data
+  (`docs/03_LEVEL_DATA_SPEC.md`) into LevelData, which BoardState is then
+  built from. Prompt 03 added the separate production-legality layer
+  (`DifficultyRules` + `ProductionLevelValidator`, ADR-010) — official
+  Easy/Medium/Hard/Very-Hard dimension bands, TEST-vs-production
+  separation, validated up to the current maximum 59×59 (3,481 cells).
 - **M3 — Board rendering**: efficient batched rendering of Board State to
   screen (no interactivity yet).
 - **M4 — Five-slot gameplay foundation**: Slot System data + basic UI
@@ -40,6 +50,9 @@ enough to validate on its own.
 - **M15 — Polish/release preparation**: final pass before any release
   candidate.
 
-Prompt 01 delivered **M0**. Prompt 02 delivers **M1 and M2** (variable-size
+Prompt 01 delivered **M0**. Prompt 02 delivered **M1 and M2** (variable-size
 board engine + level data core, validated with 40×40, 50×50, and a small
-generic-size fixture). Do not begin M3 work until a future prompt.
+generic-size fixture). Prompt 03 extended **M2** with official production
+difficulty bands and TEST/production separation, validated across the full
+20..59 range up to the current maximum 59×59. Do not begin M3 (board
+rendering) work until a future prompt.
