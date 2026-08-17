@@ -7,12 +7,23 @@ Status tags used below:
 - `[TO BE DESIGNED]` — intentionally undefined. Do not invent a final design;
   propose options instead when the milestone requires it.
 
-## Board `[LOCKED]`
+## Board `[LOCKED, corrected in Prompt 02 — see ADR-008]`
 
-- Logical grid: **40 × 40** cells = **1,600 cells** exactly.
+- Logical grid is **variable-size**: width and height are defined per level
+  in level data, and cell count is always `width * height` (derived, never a
+  fixed engine constant).
+- Currently supported/required sizes: **40 × 40** (1,600 cells, standard) and
+  **50 × 50** (2,500 cells, required for Very Hard content). The engine must
+  not assume either of these is the only size, and must not assume
+  `width == height` in general.
 - Grid is logical/data, independent of physical screen size or zoom.
 - Each cell has (at minimum): index, x, y, color id, cleaned/uncleaned state,
   available/unavailable state.
+
+> **Correction note (Prompt 02):** Prompt 01 incorrectly locked this section
+> to a fixed 40×40/1,600-cell board. That was a documentation error, not an
+> owner-specified rule change — the owner's actual requirement is a
+> variable-size board engine. See `docs/05_TECH_DECISIONS.md` ADR-008.
 
 ## Slots `[LOCKED]`
 

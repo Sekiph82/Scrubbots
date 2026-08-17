@@ -31,7 +31,9 @@ specified yet — none should be invented. See `CLAUDE.md` rule 2.
 
 ## High-level player experience
 
-1. Player opens a level and sees a grimy/obscured 40×40 pixel-art image.
+1. Player opens a level and sees a grimy/obscured pixel-art image on a
+   logical grid whose width and height are defined by that level (40×40 and
+   50×50 are both real, supported sizes — see below).
 2. Player sees 5 slots, each representing a color/robot type.
 3. Player selects/activates slots to dispatch Scrubbots.
 4. Scrubbots travel from their slot to matching cells and reveal them.
@@ -41,12 +43,17 @@ specified yet — none should be invented. See `CLAUDE.md` rule 2.
 7. Consecutive wins build a streak that pays out according to the locked
    reward mapping.
 
-## The 40×40 artwork concept
+## The variable-size logical board concept
 
-Every standard puzzle image is defined on a **logical 40×40 grid** — exactly
-1,600 logical cells. This is game data, not a screen-pixel measurement: the
-same 40×40 logical image can be displayed at any physical size the device
-screen allows. See `docs/03_LEVEL_DATA_SPEC.md` for how this is represented.
+Every puzzle image is defined on a **logical grid whose width and height come
+from that level's data**, not from a fixed engine constant. `40×40` (1,600
+cells) is the standard/common size; `50×50` (2,500 cells) is required for
+Very Hard content. Cell count is always `width * height` — it is derived,
+never hard-coded. This is game data, not a screen-pixel measurement: a
+logical board of any supported size can be displayed at any physical size
+the device screen allows. See `docs/03_LEVEL_DATA_SPEC.md` for how this is
+represented and `docs/05_TECH_DECISIONS.md` (ADR-008) for why the engine is
+variable-size rather than fixed at 40×40.
 
 ## The 5-slot concept
 

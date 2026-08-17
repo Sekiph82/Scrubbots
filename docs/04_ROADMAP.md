@@ -7,10 +7,14 @@ enough to validate on its own.
 - **M0 — Project foundation** *(this prompt)*: repo connected to GitHub,
   Godot 4.7 project shell, directory structure, docs, bootstrap scene,
   validation tooling.
-- **M1 — Logical 40×40 board**: data-oriented Board State representation
-  (no rendering yet).
-- **M2 — Level data loading**: Level Loader reads Version 1 level data
-  (`docs/03_LEVEL_DATA_SPEC.md`) into Board State.
+- **M1 — Variable-Size Logical Board Engine** *(Prompt 02)*: data-oriented
+  BoardState representation whose dimensions come from level data (width ×
+  height, derived cell count) — not a fixed board size. Supports at least
+  40×40 and 50×50 natively (see ADR-008 in `docs/05_TECH_DECISIONS.md`).
+  No rendering yet.
+- **M2 — Level data loading** *(Prompt 02)*: LevelLoader + LevelValidator
+  read Version 1 level data (`docs/03_LEVEL_DATA_SPEC.md`) into LevelData,
+  which BoardState is then built from.
 - **M3 — Board rendering**: efficient batched rendering of Board State to
   screen (no interactivity yet).
 - **M4 — Five-slot gameplay foundation**: Slot System data + basic UI
@@ -31,9 +35,11 @@ enough to validate on its own.
   implementation, currency.
 - **M13 — Mobile optimization**: profiling and tuning for real device
   performance targets (60 FPS).
-- **M14 — Content pipeline**: tooling to author/import real 40×40 artwork
-  into Version-N level data.
+- **M14 — Content pipeline**: tooling to author/import real artwork (any
+  supported board size) into Version-N level data.
 - **M15 — Polish/release preparation**: final pass before any release
   candidate.
 
-Prompt 01 delivers **M0 only**. Do not begin M1 work in this task.
+Prompt 01 delivered **M0**. Prompt 02 delivers **M1 and M2** (variable-size
+board engine + level data core, validated with 40×40, 50×50, and a small
+generic-size fixture). Do not begin M3 work until a future prompt.

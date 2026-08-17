@@ -1,8 +1,10 @@
 # 02 — Technical Architecture
 
 This document defines conceptual module boundaries. It does not mandate a
-final class hierarchy, and most modules below are **not implemented yet** —
-Prompt 01 only establishes the project shell they will live in.
+final class hierarchy. Prompt 01 established the project shell; Prompt 02
+implemented Level Data, Level Loader/Validator, and BoardState (see
+"What is implemented so far" below). Everything else in the module table is
+still future work.
 
 ## Guiding principles
 
@@ -20,7 +22,7 @@ Prompt 01 only establishes the project shell they will live in.
 | App/Game State | Top-level app flow: boot, menu, in-level, results. | `scripts/app/` |
 | Level Loader | Reads level data resources/files into runtime Board State. | `scripts/data/` |
 | Level Data | Serialized level definition (grid, palette, metadata). | `data/levels/` |
-| Board State | Runtime source of truth for all 1,600 cells' current state. | `scripts/gameplay/board/` |
+| Board State | Runtime source of truth for a level's cells' current state (cell count = width × height, level-defined). | `scripts/gameplay/board/` |
 | Pixel/Cell State | Per-cell data: index, x, y, color id, cleaned flag, availability. | `scripts/gameplay/cells/` |
 | Palette/Color IDs | Maps compact numeric color ids to actual colors. | `scripts/data/`, `data/palettes/` |
 | Slot System | Owns the 5 slots, their assigned color, and dispatch eligibility. | `scripts/gameplay/slots/` |
@@ -63,8 +65,9 @@ Slot dispatches a Scrubbot
 
 ## Performance approach
 
-- Board State for all 1,600 cells is stored as flat/packed arrays, not 1,600
-  Node instances. See `docs/05_TECH_DECISIONS.md` for the decision record.
+- Board State (any level size, e.g. 1,600 or 2,500 cells) is stored as
+  flat/packed arrays, not one Node per cell. See `docs/05_TECH_DECISIONS.md`
+  for the decision record (ADR-004, ADR-008).
 - Rendering draws the board from that data (e.g. a single custom-drawn
   surface or batched draw calls / texture generated from state), not one
   Sprite2D per cell.
@@ -72,9 +75,39 @@ Slot dispatches a Scrubbot
   sense, since the number of simultaneously active Scrubbots is small
   (bounded by slot count) even though the board itself is large.
 
+## LevelData vs. BoardState (implemented in Prompt 02)
+
+- `LevelData` (`scripts/data/level_data.gd`) — immutable parsed level
+  source: `version`, `id`, `display_name`, `difficulty`, `width`, `height`,
+  `palette`, `cells`. Says what a level **is**. Never mutated at runtime.
+- `LevelLoader` / `LevelValidator` (`scripts/data/`) — read a Version 1 JSON
+  level file and produce either a `LevelData` or a specific list of
+  validation errors (`LevelValidationResult`). See
+  `docs/03_LEVEL_DATA_SPEC.md`.
+- `BoardState` (`scripts/gameplay/board/board_state.gd`) — runtime cell
+  state (`DIRTY`/`CLEAN` per cell), built fresh from a `LevelData` via
+  `BoardState.from_level_data(level)`. Says what is **currently happening**
+  to that level. Two `BoardState` instances built from the same `LevelData`
+  never share mutable state.
+- Storage: flat `PackedInt32Array` (palette ids) and `PackedByteArray` (cell
+  states), sized to `width * height` — no per-cell Node/object, and no
+  assumption about board size anywhere in these classes (see ADR-008).
+- Indexing rule (centralized in `BoardState`, must not be re-derived
+  elsewhere): `index = y * width + x`; reverse `x = index % width`,
+  `y = index / width` (integer division).
+
+## Cross-script referencing convention (ADR-009)
+
+Scripts under `scripts/data/` and `scripts/gameplay/board/` reference each
+other via explicit `const Foo = preload("res://path/to/foo.gd")` rather than
+bare `class_name` lookups, and do not declare `class_name` themselves. See
+ADR-009 in `docs/05_TECH_DECISIONS.md` for why — headless Godot runs (no
+prior editor session) do not have a global script class cache, so bare
+`class_name` references fail to parse. Follow this same pattern for new
+gameplay scripts that need to run correctly under `godot --headless`.
+
 ## What is explicitly NOT built yet
 
-Board State, Level Loader, Slot System, TargetSelector, RoutingSystem,
-Scrubbot Agent, Board Renderer, Cleaning Feedback, Save System are all
-future milestones (see `docs/04_ROADMAP.md`). Prompt 01 delivers only the
-project shell, docs, and a bootstrap scene.
+Slot System, TargetSelector, RoutingSystem, Scrubbot Agent, Board Renderer,
+Cleaning Feedback, Save System are all future milestones (see
+`docs/04_ROADMAP.md`).

@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "test_3x2",
+  "name": "3x2 Generic Size Test",
+  "difficulty": "TEST",
+  "width": 3,
+  "height": 2,
+  "palette": [
+    "#00000000",
+    "#E5484D"
+  ],
+  "cells": [
+    1,
+    0,
+    1,
+    0,
+    1,
+    0
+  ]
+}
