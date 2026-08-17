@@ -43,9 +43,10 @@ color/robot slots. See `docs/00_PROJECT_BRIEF.md` for the full pitch and
     requirement absolutely demands it and the owner approves.
 12. Keep mobile performance in mind from the start. Target stable 60 FPS on
     reasonable mobile hardware.
-13. Never represent the 40×40 artwork (1,600 cells) as 1,600 heavyweight
-    Node objects. Use data-oriented storage (arrays/PackedArrays) and batched
-    rendering. See `docs/02_TECH_ARCHITECTURE.md`.
+13. Never represent board artwork (any size — 1,600 cells at 40×40, 2,500 at
+    50×50, etc.) as one heavyweight Node per cell. Use data-oriented storage
+    (arrays/PackedArrays) and batched rendering. See
+    `docs/02_TECH_ARCHITECTURE.md`.
 14. Keep **target selection** (deciding WHAT cell a Scrubbot cleans) and
     **routing** (deciding HOW it visually travels there) as separate systems.
     Never merge `TargetSelector` and `RoutingSystem` into one script.
@@ -69,10 +70,28 @@ color/robot slots. See `docs/00_PROJECT_BRIEF.md` for the full pitch and
     files you don't recognize, investigate before deleting or overwriting.
 25. Prefer reversible actions. Stash or rename before removing anything you
     are not certain is disposable.
+26. After completing each numbered SCRUBBOTS development prompt, create a
+    detailed Markdown handoff log at
+    `C:\Users\sekip\Desktop\SCRUBBOTS_PROMPT_XX_LOG.md` (XX = the prompt
+    number, zero-padded to match existing logs, e.g. `PROMPT_02`). This log
+    is written for another AI agent designing the *next* prompt with no
+    access to this conversation, so it must be self-contained: executive
+    summary, environment, starting state, what changed and why, files
+    created/modified, implementation details and key APIs, commands actually
+    run, test results (pass/fail/not-run, not just "should work"), git
+    result, known issues, deferred work, and a recommended next milestone.
+    **This log must never be committed to the Scrubbots Git repository** —
+    it lives only on the Desktop, outside this working directory.
 
 ## 3. Known-locked game parameters (do not silently alter)
 
-- Puzzle grid: **40 × 40** logical cells (1,600 total).
+- Puzzle grid: **variable-size**, defined per level (`width` × `height`,
+  cell count = `width * height`, always derived, never hard-coded). Standard
+  size is 40×40 (1,600 cells); Very Hard content requires 50×50 (2,500
+  cells) to work natively. Do not assume `width == height`, and do not
+  reintroduce a fixed board-size assumption anywhere in code or docs — this
+  corrects a Prompt 01 documentation error (see
+  `docs/05_TECH_DECISIONS.md` ADR-008).
 - Robot/color slots: **5**.
 - Win-streak reward mapping (consecutive wins → reward):
   `1→1, 2→5, 3→10, 4→25, 5+→100`.

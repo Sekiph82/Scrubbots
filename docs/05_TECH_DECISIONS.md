@@ -49,7 +49,9 @@ resolution-independent and lets the same level render at any device size.
 never by screen pixel. Rendering/UI code is responsible for the logical-to-
 screen mapping, not gameplay code.
 
-**Status**: Accepted (locked — see `docs/01_GAMEPLAY_SPEC.md`).
+**Status**: Superseded by ADR-008. "Fixed logical 40×40" was a documentation
+error, not an owner requirement — see ADR-008. The resolution-independence
+principle (cells addressed logically, never by screen pixel) still holds.
 
 ---
 
@@ -68,7 +70,9 @@ generated texture reflecting board state, rather than per-cell scene nodes.
 This shifts some complexity into the Board Renderer module in exchange for
 mobile performance headroom.
 
-**Status**: Accepted.
+**Status**: Accepted. Amended by ADR-008 — "1,600" here was written when the
+board was incorrectly assumed fixed-size; the data-oriented storage decision
+itself still holds for any board size (e.g. 2,500 cells at 50×50).
 
 ---
 
@@ -124,5 +128,65 @@ overwrite.
 **Consequences**: Local `main` tracks `origin/main` from the start; the
 placeholder README is preserved in history and then updated (not deleted-
 and-recreated) in the bootstrap commit.
+
+**Status**: Accepted.
+
+---
+
+### ADR-008: Variable-size logical board (correction of Prompt 01 error)
+
+**Decision**: Board dimensions are defined by level data (`width`, `height`
+fields), not by an engine constant. The engine supports at least 40×40 and
+50×50 layouts natively, does not hard-code cell counts, and does not assume
+`width == height`. Cell count is always derived as `width * height`.
+
+**Reason**: Prompt 01's documentation incorrectly locked the board to a
+fixed 40×40 / 1,600-cell size (see the correction notes in
+`docs/00_PROJECT_BRIEF.md` and `docs/01_GAMEPLAY_SPEC.md`). This was a
+documentation mistake, not an owner-directed rule change: the actual
+requirement is a variable-size board engine, and Very Hard content requires
+50×50 (2,500 cells) to work natively. A fixed-40×40 architecture would
+unnecessarily restrict future content and would have required a disruptive
+rewrite later.
+
+**Consequences**: All indexing, validation, rendering, targeting, routing,
+and tests must read width/height from board/level data rather than assuming
+a constant. `LevelData` and `BoardState` (introduced in Prompt 02) both
+carry explicit `width`/`height`; cell count is a computed property, never a
+separately-trusted stored field. `docs/01_GAMEPLAY_SPEC.md`,
+`docs/00_PROJECT_BRIEF.md`, `docs/02_TECH_ARCHITECTURE.md`,
+`docs/03_LEVEL_DATA_SPEC.md`, `docs/04_ROADMAP.md`, and `CLAUDE.md` were all
+corrected in Prompt 02 to reflect this. ADR-003's "fixed logical 40×40" is
+superseded by this decision. ADR-004's data-oriented storage decision is
+unaffected in principle — it now explicitly applies across board sizes
+rather than being described in terms of a fixed 1,600.
+
+**Status**: Accepted.
+
+---
+
+### ADR-009: Explicit preload() over bare class_name for cross-script refs
+
+**Decision**: Gameplay/data scripts (`scripts/data/`,
+`scripts/gameplay/board/`, and their tests) reference each other via
+`const Foo = preload("res://path/to/foo.gd")` and do not rely on bare
+`class_name` lookups or declare `class_name` themselves.
+
+**Reason**: Discovered empirically in Prompt 02 — this machine's Godot
+install has never had its project opened in the editor, so no global script
+class cache exists. Headless `godot --headless -s res://tests/run_tests.gd`
+runs fail to parse scripts that reference other classes by bare
+`class_name` (e.g. `LevelData`, `BoardState`) with errors like
+`Could not find type "LevelData" in the current scope`. Explicit `preload()`
+resolves the dependency directly from the file path and parses correctly
+regardless of whether the global class cache exists.
+
+**Consequences**: Slightly more boilerplate (one `const` line per
+dependency) in exchange for scripts and tests that reliably run headless
+from a clean checkout/CI machine with no prior editor session. New scripts
+in these areas should follow the same pattern. This does not preclude using
+`class_name` later once the project has a normal editor-authored workflow
+(e.g. for scenes wanting autocomplete) — it is a headless-robustness
+convention, not a permanent ban.
 
 **Status**: Accepted.

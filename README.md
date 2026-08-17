@@ -16,16 +16,20 @@ Canonical repository: https://github.com/Sekiph82/Scrubbots
 
 ## Opening the project
 
-1. Install Godot **4.7** (standard build).
+1. Install Godot **4.7.1** (standard build) — e.g.
+   `winget install --id GodotEngine.GodotEngine --exact`.
 2. Open Godot, choose "Import", select `project.godot` in this directory.
 
 ## Running it
 
 - From the editor: press Play (F5). It boots the scene at
-  `scenes/app/main.tscn`, a minimal bootstrap screen confirming the project
-  loads correctly.
-- From the command line (once a Godot 4.7 executable is available), see
-  `tools/run_headless.ps1` and `tools/verify_project.ps1`.
+  `scenes/app/main.tscn` — a bootstrap/debug screen confirming the project
+  loads and (as of Prompt 02) that the two board-size fixtures load
+  correctly.
+- From the command line: `godot --headless --path . --quit` (project boot
+  check) or `godot --headless --path . -s res://tests/run_tests.gd`
+  (automated test suite). See `tools/run_headless.ps1` and
+  `tools/verify_project.ps1`.
 
 ## Repository structure
 
@@ -54,13 +58,15 @@ modifying this project. Then:
 
 ## Current milestone
 
-**M0 — Project foundation** (see `docs/04_ROADMAP.md`). No gameplay is
-implemented yet — this is the project shell, docs, and a bootstrap scene
-only.
+**M1 + M2 — Variable-Size Logical Board Engine + Level Data Core** (see
+`docs/04_ROADMAP.md`). Board dimensions are level-defined (not a fixed
+40×40) — see `docs/05_TECH_DECISIONS.md` ADR-008. No rendering, slots, or
+Scrubbot logic yet.
 
 ## Status
 
-Foundation bootstrapped and connected to GitHub. Godot 4.7 executable was
-not found on this machine at bootstrap time — see the report for the
-in-session validation this implies and the next action needed to unblock
-command-line validation.
+Godot **4.7.1-stable** (official, standard build) installed via winget
+(`GodotEngine.GodotEngine`) and verified with `godot --version`. Level
+data (`scripts/data/`) and BoardState (`scripts/gameplay/board/`) implemented
+and covered by an automated headless test suite (`tests/run_tests.gd`),
+passing against 40×40, 50×50, and a small 3×2 generic-size fixture.

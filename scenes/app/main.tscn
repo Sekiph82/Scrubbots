@@ -47,3 +47,9 @@ unique_name_in_owner=true
 layout_mode=2
 horizontal_alignment=1
 text="Godot 4.7"
+
+[node name="BoardCoreLabel" type="Label" parent="VBoxContainer"]
+unique_name_in_owner=true
+layout_mode=2
+horizontal_alignment=1
+text="Board Core: pending"
