@@ -82,16 +82,44 @@ color/robot slots. See `docs/00_PROJECT_BRIEF.md` for the full pitch and
     result, known issues, deferred work, and a recommended next milestone.
     **This log must never be committed to the Scrubbots Git repository** —
     it lives only on the Desktop, outside this working directory.
+27. `tasks.md` (project root) is the master execution checklist for the
+    entire project. Read it at the start of every session, alongside this
+    file. Update it after every numbered implementation prompt.
+28. Never mark a `tasks.md` item `[x]` without actual validation evidence
+    (it ran, it passed, it was inspected) — code existing is not enough.
+29. Never delete unfinished `tasks.md` items to make progress look cleaner.
+    Leave them `[ ]` and, if abandoned, say so explicitly rather than
+    silently removing the line.
+30. Official production board difficulty/size bands (see `tasks.md` §8.3):
+    Easy 20–29×20–29, Medium 30–39×30–39, Hard 40–49×40–49, Very Hard
+    50–59×50–59. Maximum current production requirement is **59×59 = 3,481
+    cells**. Boards are not required to be square — width and height are
+    validated independently against the same band.
+31. `TEST`/dev fixtures (e.g. the 3×2 generic-size fixture) may exist
+    outside the production dimension bands and must never enter production
+    content or the production level catalog.
+32. Existing original SCRUBBOTS artwork, once it physically exists in this
+    project, is the canonical visual reference and outranks any generic
+    placeholder. Missing artwork must never be fabricated or presented as
+    an original — mark it `AWAITING OWNER ASSET` instead. External game
+    references (including Colony Flow) are conceptual inspiration only,
+    never a source to copy characters/art/levels/UI/code from.
+33. The ADR-009 explicit-`preload()` convention (over bare `class_name`) in
+    `scripts/data/` and `scripts/gameplay/board/` must be preserved unless a
+    future task deliberately revisits it and proves an alternative equally
+    reliable under headless Godot.
 
 ## 3. Known-locked game parameters (do not silently alter)
 
 - Puzzle grid: **variable-size**, defined per level (`width` × `height`,
-  cell count = `width * height`, always derived, never hard-coded). Standard
-  size is 40×40 (1,600 cells); Very Hard content requires 50×50 (2,500
-  cells) to work natively. Do not assume `width == height`, and do not
-  reintroduce a fixed board-size assumption anywhere in code or docs — this
-  corrects a Prompt 01 documentation error (see
-  `docs/05_TECH_DECISIONS.md` ADR-008).
+  cell count = `width * height`, always derived, never hard-coded). Official
+  production difficulty/size bands (see `tasks.md` §8.3 for the full table
+  and examples): Easy 20–29×20–29, Medium 30–39×30–39, Hard 40–49×40–49,
+  Very Hard 50–59×50–59 (max 59×59 = 3,481 cells). Boards need not be
+  square — width and height are validated independently. Do not reintroduce
+  a fixed board-size assumption anywhere in code or docs — this corrects a
+  Prompt 01 documentation error refined further in the post-Prompt-02
+  planning pass (see `docs/05_TECH_DECISIONS.md` ADR-008 and `tasks.md`).
 - Robot/color slots: **5**.
 - Win-streak reward mapping (consecutive wins → reward):
   `1→1, 2→5, 3→10, 4→25, 5+→100`.
