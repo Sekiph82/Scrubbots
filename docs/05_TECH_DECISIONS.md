@@ -190,3 +190,54 @@ in these areas should follow the same pattern. This does not preclude using
 convention, not a permanent ban.
 
 **Status**: Accepted.
+
+---
+
+### ADR-010: Official difficulty→board-dimension bands, structural vs. production validation
+
+**Decision**: Production board dimensions are defined by difficulty bands:
+
+```text
+Easy       20..29 × 20..29
+Medium     30..39 × 30..39
+Hard       40..49 × 40..49
+Very Hard  50..59 × 50..59
+```
+
+Width and height are checked independently against the same band, so
+rectangular boards are valid (e.g. Hard `48×41`) as long as both dimensions
+fall in range — `width == height` is never required. Test/development
+fixtures (identified by `difficulty == "TEST"`, e.g. the 3×2 generic-size
+fixture) may exist outside every production band and must never be treated
+as production content. Current maximum production requirement is
+**59×59 = 3,481 cells**. This is implemented as a separate
+`ProductionLevelValidator` (`scripts/data/production_level_validator.gd`)
+consuming a single source of truth for the band table,
+`DifficultyRules` (`scripts/data/difficulty_rules.gd`) — the existing
+generic `LevelValidator`/`LevelData`/`BoardState` core is **not** modified
+and remains fully dimension-agnostic.
+
+**Reason**: The game uses increasing logical artwork dimensions as part of
+its difficulty/content structure, while the underlying board engine must
+stay generic (ADR-008) — conflating "is this level data structurally valid"
+with "is this a legal production level" would either force the generic
+engine to reject legitimate test/engine-proof fixtures like the 3×2 board,
+or force production content rules to leak into code that has no business
+knowing about difficulty at all (e.g. a future `BoardRenderer` or
+`RoutingSystem`). Prompt 02's own correction (ADR-008) had already fixed
+the fixed-40×40 assumption but under-specified the actual requirement as
+"40×40 standard / 50×50 required for Very Hard" — this ADR records the full
+band table the project owner actually specified.
+
+**Consequences**: Production validation (level catalogs, content import
+tooling, future authoring tools) must call `ProductionLevelValidator`.
+Generic `BoardState`/`LevelValidator`/tests must **not** enforce these
+bands — doing so would break the 3×2 engine-proof fixture and reintroduce a
+disguised fixed-size assumption. Test fixtures under `data/levels/` use
+`"difficulty": "TEST"` explicitly (an existing mislabeling in
+`test_50x50.json`, which had claimed `"VERY_HARD"`, was corrected to `TEST`
+as part of this decision — see the Prompt 03 phase log). 59×59 becomes the
+current maximum benchmark workload for performance sanity checks going
+forward (`docs/06_TEST_STRATEGY.md`).
+
+**Status**: Accepted.

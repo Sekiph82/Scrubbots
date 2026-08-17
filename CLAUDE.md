@@ -70,18 +70,28 @@ color/robot slots. See `docs/00_PROJECT_BRIEF.md` for the full pitch and
     files you don't recognize, investigate before deleting or overwriting.
 25. Prefer reversible actions. Stash or rename before removing anything you
     are not certain is disposable.
-26. After completing each numbered SCRUBBOTS development prompt, create a
-    detailed Markdown handoff log at
-    `C:\Users\sekip\Desktop\SCRUBBOTS_PROMPT_XX_LOG.md` (XX = the prompt
-    number, zero-padded to match existing logs, e.g. `PROMPT_02`). This log
-    is written for another AI agent designing the *next* prompt with no
-    access to this conversation, so it must be self-contained: executive
-    summary, environment, starting state, what changed and why, files
-    created/modified, implementation details and key APIs, commands actually
-    run, test results (pass/fail/not-run, not just "should work"), git
-    result, known issues, deferred work, and a recommended next milestone.
-    **This log must never be committed to the Scrubbots Git repository** —
-    it lives only on the Desktop, outside this working directory.
+26. **Phase log workflow (supersedes the old per-prompt handoff log,
+    starting with Phase M03).** One development *phase* (a `tasks.md`
+    milestone such as `M03`, which may span multiple prompts/sessions) gets
+    **one continuous** Desktop log:
+    `C:\Users\sekip\Desktop\SCRUBBOTS_PHASE_MXX_LOG.md`. Create it at the
+    **start** of the phase's first prompt, before inspection or code
+    changes. If it already exists, read it and keep updating the *same*
+    file — never create a second log for the same phase (`_RETRY`, `_B`,
+    etc.). Update it after every meaningful checkpoint (inspection,
+    baseline tests, decisions, each implementation step, failures and how
+    they were fixed, final tests, before/after commit, after push) so
+    another agent can resume mid-phase if a session stops unexpectedly.
+    Keep past failures in the log even after they're fixed — don't erase
+    history. Only set `PHASE STATUS: COMPLETE` and write the Final Phase
+    Summary when the phase is genuinely done, without deleting the earlier
+    chronological journal. Start a new log only when moving to a new phase.
+    **Never commit any phase log to the Scrubbots Git repository** — it
+    lives only on the Desktop. (Prompts 01–02 and the master-plan prompt
+    used one-log-per-prompt; those historical logs —
+    `SCRUBBOTS_PROMPT_01_LOG.md`, `SCRUBBOTS_PROMPT_02_LOG.md`,
+    `SCRUBBOTS_MASTER_TASKS_LOG.md` — are not retroactively converted.) Full
+    detail: `tasks.md` "PHASE LOG WORKFLOW."
 27. `tasks.md` (project root) is the master execution checklist for the
     entire project. Read it at the start of every session, alongside this
     file. Update it after every numbered implementation prompt.

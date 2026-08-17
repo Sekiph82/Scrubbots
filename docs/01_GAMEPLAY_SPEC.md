@@ -7,15 +7,29 @@ Status tags used below:
 - `[TO BE DESIGNED]` — intentionally undefined. Do not invent a final design;
   propose options instead when the milestone requires it.
 
-## Board `[LOCKED, corrected in Prompt 02 — see ADR-008]`
+## Board `[LOCKED, corrected in Prompt 02 (ADR-008), refined in Prompt 03 (ADR-010)]`
 
 - Logical grid is **variable-size**: width and height are defined per level
   in level data, and cell count is always `width * height` (derived, never a
-  fixed engine constant).
-- Currently supported/required sizes: **40 × 40** (1,600 cells, standard) and
-  **50 × 50** (2,500 cells, required for Very Hard content). The engine must
-  not assume either of these is the only size, and must not assume
-  `width == height` in general.
+  fixed engine constant). The engine must not assume `width == height`.
+- **Official production difficulty/board-dimension bands** (width and height
+  each checked independently against the same band — rectangular boards are
+  valid):
+
+  | Difficulty | Width range | Height range | Min cells | Max cells |
+  |---|---|---|---|---|
+  | EASY | 20–29 | 20–29 | 400 | 841 |
+  | MEDIUM | 30–39 | 30–39 | 900 | 1521 |
+  | HARD | 40–49 | 40–49 | 1600 | 2401 |
+  | VERY_HARD | 50–59 | 50–59 | 2500 | **3481** |
+
+  `40×40` and `50×50` are valid *example* sizes (within Hard and Very Hard
+  respectively) — they are not the only supported sizes, and the current
+  production maximum is **59×59 = 3,481 cells**.
+- `TEST`/development fixtures (e.g. the 3×2 generic-size engine-proof
+  fixture) may exist outside every production band — they prove the
+  underlying board engine is genuinely dimension-generic and must never be
+  exposed as production content. See ADR-010.
 - Grid is logical/data, independent of physical screen size or zoom.
 - Each cell has (at minimum): index, x, y, color id, cleaned/uncleaned state,
   available/unavailable state.
@@ -24,6 +38,11 @@ Status tags used below:
 > to a fixed 40×40/1,600-cell board. That was a documentation error, not an
 > owner-specified rule change — the owner's actual requirement is a
 > variable-size board engine. See `docs/05_TECH_DECISIONS.md` ADR-008.
+>
+> **Refinement note (Prompt 03):** Prompt 02's own correction under-specified
+> the requirement as "40×40 standard / 50×50 required for Very Hard" — the
+> actual rule is the full difficulty-band table above, with a 59×59 maximum.
+> See ADR-010.
 
 ## Slots `[LOCKED]`
 

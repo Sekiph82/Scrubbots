@@ -45,8 +45,8 @@ tools/      PowerShell helper scripts for validation
 
 ## Documentation entry points
 
-Read `CLAUDE.md` first — it is the operating manual for anyone (human or AI)
-modifying this project. Then:
+Read `CLAUDE.md` and `tasks.md` first — the operating manual and the master
+task checklist for anyone (human or AI) modifying this project. Then:
 
 - `docs/00_PROJECT_BRIEF.md` — what the game is
 - `docs/01_GAMEPLAY_SPEC.md` — locked gameplay rules vs. open design areas
@@ -58,15 +58,21 @@ modifying this project. Then:
 
 ## Current milestone
 
-**M1 + M2 — Variable-Size Logical Board Engine + Level Data Core** (see
-`docs/04_ROADMAP.md`). Board dimensions are level-defined (not a fixed
-40×40) — see `docs/05_TECH_DECISIONS.md` ADR-008. No rendering, slots, or
-Scrubbot logic yet.
+**M1 + M2 — Variable-Size Logical Board Engine + Level Data Core, with
+official difficulty bands** (see `tasks.md` and `docs/04_ROADMAP.md`).
+Board dimensions are level-defined (not a fixed 40×40) — see
+`docs/05_TECH_DECISIONS.md` ADR-008. Production content is now
+difficulty-banded: Easy 20–29, Medium 30–39, Hard 40–49, Very Hard 50–59
+(max 59×59 = 3,481 cells) — see ADR-010. No rendering, slots, or Scrubbot
+logic yet.
 
 ## Status
 
 Godot **4.7.1-stable** (official, standard build) installed via winget
 (`GodotEngine.GodotEngine`) and verified with `godot --version`. Level
-data (`scripts/data/`) and BoardState (`scripts/gameplay/board/`) implemented
-and covered by an automated headless test suite (`tests/run_tests.gd`),
-passing against 40×40, 50×50, and a small 3×2 generic-size fixture.
+data (`scripts/data/`) and BoardState (`scripts/gameplay/board/`) implemented,
+plus a separate production difficulty/dimension validator
+(`DifficultyRules` + `ProductionLevelValidator`), covered by an automated
+headless test suite (`tests/run_tests.gd`, **131 checks, all passing**)
+against 3×2, 40×40, 50×50, and 59×59 (current production maximum)
+fixtures, plus the full 20..59 production band matrix.

@@ -2,9 +2,11 @@
 
 This document defines conceptual module boundaries. It does not mandate a
 final class hierarchy. Prompt 01 established the project shell; Prompt 02
-implemented Level Data, Level Loader/Validator, and BoardState (see
-"What is implemented so far" below). Everything else in the module table is
-still future work.
+implemented Level Data, Level Loader/Validator, and BoardState; Prompt 03
+added the official difficulty-band production validator on top of that
+core (see "LevelData vs. BoardState" and "Structural vs. production
+validation" below). Everything else in the module table is still future
+work.
 
 ## Guiding principles
 
@@ -95,6 +97,28 @@ Slot dispatches a Scrubbot
 - Indexing rule (centralized in `BoardState`, must not be re-derived
   elsewhere): `index = y * width + x`; reverse `x = index % width`,
   `y = index / width` (integer division).
+
+## Structural vs. production validation (implemented in Prompt 03)
+
+- `DifficultyRules` (`scripts/data/difficulty_rules.gd`) — single source of
+  truth for the official difficulty→dimension bands (Easy/Medium/Hard/
+  Very_Hard, each `{min, max}` applied to both width and height
+  independently) and the `TEST` non-production identifier. See
+  `docs/05_TECH_DECISIONS.md` ADR-010.
+- `ProductionLevelValidator` / `ProductionValidationResult`
+  (`scripts/data/`) — take an already-structurally-valid `LevelData` and
+  decide whether it is legal as *production* content: known production
+  difficulty (never `TEST`), width/height within that difficulty's band.
+  This is deliberately a **separate** class from `LevelValidator` — the
+  generic engine (`LevelData`, `LevelLoader`, `LevelValidator`,
+  `BoardState`) stays fully dimension-agnostic and never rejects a
+  structurally valid level (e.g. the 3×2 fixture) for being "too small" or
+  "not a real difficulty." Only code that specifically cares about
+  production legality calls `ProductionLevelValidator`.
+- Board dimensions are never a `TargetSelector`/`RoutingSystem`/renderer
+  concern either — those future systems read `BoardState.get_width()`/
+  `get_height()` like everything else and have no reason to know about
+  difficulty bands at all.
 
 ## Cross-script referencing convention (ADR-009)
 
