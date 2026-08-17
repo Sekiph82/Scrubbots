@@ -24,8 +24,11 @@ Canonical repository: https://github.com/Sekiph82/Scrubbots
 
 - From the editor: press Play (F5). It boots the scene at
   `scenes/app/main.tscn` — a bootstrap/debug screen confirming the project
-  loads and (as of Prompt 02) that the two board-size fixtures load
-  correctly.
+  loads and that board fixtures load correctly.
+- Renderer/DIRTY-CLEAN comparison tool (dev-only, not gameplay): open/run
+  `scenes/debug/board_renderer_debug.tscn` directly. Dropdowns switch board
+  size (every official difficulty band boundary plus rectangular examples),
+  DIRTY/CLEAN pattern, and preset A/B/C — no code changes needed.
 - From the command line: `godot --headless --path . --quit` (project boot
   check) or `godot --headless --path . -s res://tests/run_tests.gd`
   (automated test suite). See `tools/run_headless.ps1` and
@@ -58,21 +61,23 @@ task checklist for anyone (human or AI) modifying this project. Then:
 
 ## Current milestone
 
-**M1 + M2 — Variable-Size Logical Board Engine + Level Data Core, with
-official difficulty bands** (see `tasks.md` and `docs/04_ROADMAP.md`).
-Board dimensions are level-defined (not a fixed 40×40) — see
-`docs/05_TECH_DECISIONS.md` ADR-008. Production content is now
+**M1 + M2 + M3 (partial) — Variable-Size Board Engine, Level Data Core,
+official difficulty bands, and BoardRenderer** (see `tasks.md` and
+`docs/04_ROADMAP.md`). Board dimensions are level-defined (not a fixed
+40×40) — see `docs/05_TECH_DECISIONS.md` ADR-008. Production content is
 difficulty-banded: Easy 20–29, Medium 30–39, Hard 40–49, Very Hard 50–59
-(max 59×59 = 3,481 cells) — see ADR-010. No rendering, slots, or Scrubbot
-logic yet.
+(max 59×59 = 3,481 cells) — see ADR-010. The board now renders (single
+`Image`/`ImageTexture`, no per-cell Nodes — ADR-011) with a DIRTY/CLEAN
+visual prototype; **the final DIRTY visual style is an open design gate**,
+not yet owner-approved. No slots or Scrubbot logic yet.
 
 ## Status
 
 Godot **4.7.1-stable** (official, standard build) installed via winget
 (`GodotEngine.GodotEngine`) and verified with `godot --version`. Level
-data (`scripts/data/`) and BoardState (`scripts/gameplay/board/`) implemented,
-plus a separate production difficulty/dimension validator
-(`DifficultyRules` + `ProductionLevelValidator`), covered by an automated
-headless test suite (`tests/run_tests.gd`, **131 checks, all passing**)
-against 3×2, 40×40, 50×50, and 59×59 (current production maximum)
-fixtures, plus the full 20..59 production band matrix.
+data, BoardState, production difficulty validation
+(`DifficultyRules`/`ProductionLevelValidator`), and `BoardRenderer` (with
+`PaletteColors` and `DirtyCleanPresets`) are all implemented and covered by
+an automated headless test suite (`tests/run_tests.gd`, **227 checks, all
+passing**), including renderer geometry/pixel-output tests at every
+official band boundary and the 59×59 maximum.

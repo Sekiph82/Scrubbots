@@ -8,18 +8,22 @@ Canonical local project: `C:\Users\sekip\Desktop\ScrubBots`
 Canonical repository: `https://github.com/Sekiph82/Scrubbots`
 Primary branch: `main`
 
-Verified at time of writing (end of Phase M03):
-- HEAD commit: `03da4e8` at phase start ("docs: add post-prompt-02 Scrubbots
-  master plan") — see `docs/05_TECH_DECISIONS.md` and CHANGELOG for the
-  Phase M03 commit that follows it.
+Verified at time of writing (end of Phase M06):
+- HEAD commit at phase start: `89c7d43` ("feat: enforce Scrubbots
+  difficulty board ranges") — see `docs/05_TECH_DECISIONS.md` and
+  CHANGELOG for the Phase M06 commit that follows it.
 - Working tree: clean, `main` up to date with `origin/main`
 - Godot: `4.7.1.stable.official.a13da4feb` (installed, `godot --version` confirmed)
-- Headless test suite (`tests/run_tests.gd`): **131/131 checks PASS**, exit
-  code 0 (73 from Prompt 02 + 58 added in Phase M03)
+- Headless test suite (`tests/run_tests.gd`): **227/227 checks PASS**, exit
+  code 0 (73 Prompt 02 + 58 Phase M03 + 96 Phase M06)
 - Official production difficulty bands (Easy/Medium/Hard/Very_Hard,
   20..59, max 59×59 = 3,481 cells) implemented and enforced via
   `DifficultyRules` + `ProductionLevelValidator`, kept separate from the
   generic dimension-agnostic `LevelValidator`/`BoardState` core.
+- `BoardRenderer` implemented (single Image/ImageTexture, zero per-cell
+  Nodes at any board size — ADR-011) with a DIRTY/CLEAN visual prototype
+  (`DirtyCleanPresets` A/B/C). **Final DIRTY visual style is an open design
+  gate — not approved** (see M10).
 
 ## Status tags
 
@@ -558,25 +562,25 @@ runner — mark actual existing capabilities complete.
 First major missing technical system after the difficulty-envelope
 correction. Render `BoardState` efficiently, never one Node per cell.
 
-- [ ] SB-M06-001 Define BoardRenderer responsibility.
-- [ ] SB-M06-002 Keep BoardRenderer separate from BoardState.
-- [ ] SB-M06-003 Evaluate efficient Godot rendering options.
-- [ ] SB-M06-004 Choose technique based on measured simplicity/performance.
-- [ ] SB-M06-005 Record technique in ADR.
-- [ ] SB-M06-006 Render arbitrary width/height.
-- [ ] SB-M06-007 Support rectangular board aspect ratio.
-- [ ] SB-M06-008 Preserve logical pixel boundaries.
-- [ ] SB-M06-009 Disable unwanted texture filtering.
-- [ ] SB-M06-010 Render palette colors correctly.
-- [ ] SB-M06-011 Render 20×20. — [ ] SB-M06-012 Render 29×29.
-- [ ] SB-M06-013 Render 39×39. — [ ] SB-M06-014 Render 49×49.
-- [ ] SB-M06-015 Render 50×50. — [ ] SB-M06-016 Render 59×59.
-- [ ] SB-M06-017 Render representative rectangular boards.
-- [ ] SB-M06-018 Expose logical-cell center coordinate.
-- [ ] SB-M06-019 Support efficient individual-cell update.
-- [ ] SB-M06-020 Support full reset.
-- [ ] SB-M06-021 Benchmark 3,481-cell display.
-- [ ] SB-M06-022 Confirm no 3,481-cell Node tree exists.
+- [x] SB-M06-001 Define BoardRenderer responsibility (presentation-only, see docs/02_TECH_ARCHITECTURE.md).
+- [x] SB-M06-002 Keep BoardRenderer separate from BoardState (never mutates it — tested).
+- [x] SB-M06-003 Evaluate efficient Godot rendering options (3 candidates compared, see ADR-011 / phase log).
+- [x] SB-M06-004 Choose technique based on measured simplicity/performance (Image/ImageTexture).
+- [x] SB-M06-005 Record technique in ADR (ADR-011).
+- [x] SB-M06-006 Render arbitrary width/height.
+- [x] SB-M06-007 Support rectangular board aspect ratio (never stretched — tested at 20×27, 34×39, 48×41, 53×59).
+- [x] SB-M06-008 Preserve logical pixel boundaries (integer `floor()` cell_size, no drift).
+- [x] SB-M06-009 Disable unwanted texture filtering (`TEXTURE_FILTER_NEAREST`).
+- [x] SB-M06-010 Render palette colors correctly (via `PaletteColors`, tested).
+- [x] SB-M06-011 Render 20×20. — [x] SB-M06-012 Render 29×29.
+- [x] SB-M06-013 Render 39×39. — [x] SB-M06-014 Render 49×49.
+- [x] SB-M06-015 Render 50×50. — [x] SB-M06-016 Render 59×59.
+- [x] SB-M06-017 Render representative rectangular boards.
+- [x] SB-M06-018 Expose logical-cell center coordinate (`get_cell_center_local`/`get_cell_center_global` — geometry seam only, no movement implemented against it).
+- [x] SB-M06-019 Support efficient individual-cell update (`update_cells()`, tested).
+- [x] SB-M06-020 Support full reset (`refresh_all()`, tested).
+- [x] SB-M06-021 Benchmark 3,481-cell display (see `SCRUBBOTS_PHASE_M06_LOG.md` for actual numbers; CPU-side only — true GPU/on-screen FPS not measurable under `--headless`, stated explicitly rather than fabricated).
+- [x] SB-M06-022 Confirm no 3,481-cell Node tree exists (`get_child_count() == 0` asserted at 59×59 and every other tested size).
 
 ### M07 — Visual Reference Library `[VISUAL REFERENCE]`
 
@@ -639,17 +643,23 @@ An image must never be auto-changed to 20×20/40×40/50×50 for convenience.
 ### M10 — Dirty/Clean Visual Model `[DESIGN GATE]`
 
 Review original SCRUBBOTS visual references before locking final visuals.
+**Prompt 04 built the prototype infrastructure and three candidate presets
+— this milestone is NOT complete.** Final DIRTY visual approval remains an
+open `[DESIGN GATE]` regardless of how much tooling exists; do not mark it
+resolved until the project owner has actually compared presets A/B/C at
+native 50×50/59×59 scale via `scenes/debug/board_renderer_debug.tscn` and
+chosen one (or requested a new preset).
 
-- [ ] SB-M10-001 Define DIRTY appearance.
-- [ ] SB-M10-002 Define CLEAN appearance.
-- [ ] SB-M10-003 Define grime layer relationship to source artwork.
-- [ ] SB-M10-004 Implement visual mapping.
-- [ ] SB-M10-005 Ensure cleaning is immediately readable.
-- [ ] SB-M10-006 Preserve artwork recognition.
-- [ ] SB-M10-007 Test Easy density. — [ ] SB-M10-008 Test Medium density.
-- [ ] SB-M10-009 Test Hard density. — [ ] SB-M10-010 Test Very Hard density.
-- [ ] SB-M10-011 Test 59×59 readability.
-- [ ] SB-M10-012 Add development reveal/debug toggle.
+- [ ] SB-M10-001 Define (approve) DIRTY appearance — 3 candidate presets exist (`DirtyCleanPresets` A/B/C), none chosen.
+- [x] SB-M10-002 Define CLEAN appearance — locked: unmodified source palette color (`docs/01_GAMEPLAY_SPEC.md`).
+- [x] SB-M10-003 Define grime layer relationship to source artwork — locked: DIRTY is a transform of the same color, never a separate stacked layer (ADR-011).
+- [x] SB-M10-004 Implement visual mapping (`DirtyCleanPresets.apply_dirty`).
+- [ ] SB-M10-005 Ensure cleaning is immediately readable — debug tooling ready to test this; actual owner visual confirmation pending.
+- [ ] SB-M10-006 Preserve artwork recognition — same: tooling ready, owner confirmation pending.
+- [ ] SB-M10-007 Test Easy density. — [ ] SB-M10-008 Test Medium density. (debug tool supports both sizes; awaiting owner visual review)
+- [ ] SB-M10-009 Test Hard density. — [ ] SB-M10-010 Test Very Hard density. (debug tool supports both sizes; awaiting owner visual review)
+- [ ] SB-M10-011 Test 59×59 readability — the single most important check per this phase's own instructions; tooling ready, **awaiting owner review**.
+- [x] SB-M10-012 Add development reveal/debug toggle (`scenes/debug/board_renderer_debug.tscn` — size/pattern/preset dropdowns).
 
 ### M11 — Gameplay Session Core
 
@@ -1263,24 +1273,40 @@ See `C:\Users\sekip\Desktop\SCRUBBOTS_PHASE_M03_LOG.md` for full detail:
 enforced and tested, TEST-vs-production separation proven, docs/tasks.md
 updated, 131/131 tests passing.
 
-**PROMPT 04 (next) — Board Renderer (M06)**
+**PROMPT 04 — Board Renderer + DIRTY/CLEAN Prototype (M06) — COMPLETE.**
+See `C:\Users\sekip\Desktop\SCRUBBOTS_PHASE_M06_LOG.md` for full detail:
+`BoardRenderer` (single Image/ImageTexture, zero per-cell Nodes at any
+size, ADR-011) implemented and tested at every official band boundary plus
+rectangular boards up to 59×59/3,481 cells; `PaletteColors` and
+`DirtyCleanPresets` (3 presets, A/B/C) implemented; dev comparison tool
+(`scenes/debug/board_renderer_debug.tscn`) built for native-scale owner
+review; 227/227 tests passing. **DIRTY visual approval remains an open
+design gate** — presets exist, none is chosen (see M10 above).
 
-1. Preserve everything from M00–M03 (LevelData, BoardState, DifficultyRules,
-   ProductionLevelValidator) — do not rebuild working systems.
-2. Define `BoardRenderer` responsibility, kept separate from `BoardState`
-   (rendering never decides game state).
-3. Evaluate and choose an efficient Godot 4.7 rendering technique (batched
-   draw calls / custom `_draw()` / texture generated from state) — record
-   the choice as an ADR, not just code.
-4. Render arbitrary width/height, including rectangular boards, at every
-   difficulty band's extremes — smallest Easy up to the 59×59 maximum.
-5. No per-cell Node architecture — confirm this explicitly for 59×59
-   (3,481 cells).
-6. Extend headless-runnable validation/benchmarks to cover rendering
-   construction cost at 59×59.
-7. Update docs/tasks.md; do not begin slots, Scrubbots, target selection,
-   or routing in this milestone (see `docs/04_ROADMAP.md` M3, `tasks.md`
-   M06).
-8. Start the phase log immediately as `SCRUBBOTS_PHASE_M04_LOG.md` (or the
-   correct milestone ID if scoped differently), per the Phase Log Workflow
-   above.
+**PROMPT 05 (next) — Visual Reference Library / Existing Artwork Audit (M07)**
+
+1. Preserve everything from M00–M06 — do not rebuild working systems
+   (LevelData, BoardState, DifficultyRules, ProductionLevelValidator,
+   BoardRenderer, DirtyCleanPresets).
+2. Establish the reference directory structure from §9.6 (Visual Reference
+   System) — `assets/art/references/{gameplay,ui,scrubbots,pixel_method,
+   external_inspiration}/`, etc. — as directories only unless the owner
+   supplies real files this session.
+3. Ask the owner for / accept any real SCRUBBOTS artwork files if supplied
+   this session; inventory them with type/status metadata. Do **not**
+   fabricate, guess, or promote ambiguous Desktop images into this
+   inventory (see tasks.md Visual Reference System §9.5 and the M03/M06
+   phase logs' explicit note that unrelated Desktop images exist but are
+   not SCRUBBOTS assets).
+4. If no real artwork is supplied, explicitly mark every reference category
+   `AWAITING OWNER ASSET` — do not mark M07 complete on directory
+   structure alone.
+5. While reviewing artwork, this is also the natural point for the project
+   owner to actually **use** `scenes/debug/board_renderer_debug.tscn` to
+   pick a DIRTY preset (or request a new one) — closing out M10's design
+   gate is not required to start M07, but should happen before real art
+   is imported and rendered in M09/M21.
+6. Do not begin the pixel-art importer (M09), slots (M12), Scrubbots
+   (M18), target selection (M15), or routing (M16-M17) in this milestone.
+7. Start the phase log immediately as `SCRUBBOTS_PHASE_M07_LOG.md`, per the
+   Phase Log Workflow above.

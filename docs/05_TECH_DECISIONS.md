@@ -241,3 +241,42 @@ current maximum benchmark workload for performance sanity checks going
 forward (`docs/06_TEST_STRATEGY.md`).
 
 **Status**: Accepted.
+
+---
+
+### ADR-011: BoardRenderer uses one Image/ImageTexture, not per-cell Nodes or per-frame draw calls
+
+**Decision**: `BoardRenderer` (`scripts/gameplay/board/board_renderer.gd`)
+extends `TextureRect` and draws the entire board as a single `Image` (one
+pixel per logical cell) converted to one `ImageTexture`, displayed with
+`texture_filter = TEXTURE_FILTER_NEAREST`. Node count is exactly **one**
+regardless of board size (verified at every official band boundary and at
+the 59×59/3,481-cell maximum). Updates are `Image.set_pixel()` +
+`ImageTexture.update()` — no custom immediate-mode drawing, no per-cell
+scene objects.
+
+**Reason**: Three approaches were evaluated (full detail and expected-cost
+reasoning in `SCRUBBOTS_PHASE_M06_LOG.md`, Architecture Decisions):
+(1) one Node per cell — explicitly forbidden, this is exactly what ADR-004/
+ADR-008 already ruled out; (2) a single Node's custom `_draw()` re-issuing
+one `draw_rect()` per cell every redraw — single node, but reissues up to
+3,481 immediate-mode draw commands on every visual change; (3) one `Image`/
+`ImageTexture` per board, GPU-upscaled with nearest-neighbor filtering.
+Option 3 was chosen: it satisfies the constant-node-count requirement, the
+pixel-art crispness requirement (nearest-neighbor sampling gives sharp
+block edges with zero extra code), and composes directly with the
+project's existing `Control`-based UI (`scenes/app/main.tscn`).
+
+**Consequences**: A full redraw costs one `Image.set_pixel()` per cell
+(O(cells), max 3,481) plus one texture upload; a partial update
+(`update_cells()`) still triggers one full texture upload regardless of how
+few cells changed, since Godot 4's `Texture2D` has no partial/sub-rect
+update API — acceptable at this resolution (measured: ~0.007ms per
+`update_cells()` call regardless of board size, dominated by the fixed
+upload cost, not cell count — see phase log Performance Measurements). This
+strategy would need revisiting if the logical grid ever grew far beyond the
+current 59×59 maximum. `BoardRenderer` remains presentation-only: it reads
+`BoardState`/palette data and never mutates gameplay state (see
+docs/02_TECH_ARCHITECTURE.md).
+
+**Status**: Accepted.

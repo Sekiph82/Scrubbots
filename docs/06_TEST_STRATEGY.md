@@ -3,11 +3,23 @@
 No third-party testing framework is used. Godot 4.7 supports headless
 execution (`--headless`), which is the backbone for command-line-runnable
 checks. Prompt 02 implemented a small custom GDScript test runner
-(`tests/run_tests.gd`, extended in Prompt 03) invoked via headless Godot;
-most later categories below are still planned, not yet implemented.
+(`tests/run_tests.gd`, extended in Prompt 03 and Prompt 04) invoked via
+headless Godot; most later categories below are still planned, not yet
+implemented.
 
-**Current total: 131 checks, all passing** (73 from Prompt 02 + 58 added in
-Prompt 03).
+**Current total: 227 checks, all passing** (73 from Prompt 02 + 58 added in
+Prompt 03 + 96 added in Prompt 04).
+
+**Testing renderer output — a lesson from Prompt 04:** `BoardRenderer`
+reads pixels back through an `Image` with `Image.FORMAT_RGBA8` (8 bits per
+channel). Comparing a rendered pixel against an independently-computed
+float `Color` with `Color.is_equal_approx()` (epsilon ~1e-5) will spuriously
+fail due to ~1/255 quantization — this is expected engine behavior, not a
+bug. Use a quantization-tolerant comparison (`_colors_close()` in
+`tests/run_tests.gd`, ±0.01/channel) for renderer-output-vs-source-color
+checks, and prefer meaningful-property assertions (hue preserved,
+saturation/value reduced) over exact-value matching for DIRTY-vs-CLEAN
+comparisons — see "Visual transform test principles" below.
 
 ## Implemented in Prompt 02 (`tests/run_tests.gd`)
 
@@ -101,6 +113,53 @@ Run via `tools/run_headless.ps1` or directly:
   3,480 still DIRTY) — same mutation-isolation guarantee as smaller boards,
   now proven at the real maximum.
 
+## Implemented in Prompt 04 (`tests/run_tests.gd`, extended)
+
+### Palette color parsing
+- Well-formed hex palette entries parse to the expected `Color` values.
+- A malformed entry is reported as an error but doesn't abort parsing of
+  the rest of the palette (a visible fallback color is used for it).
+- Parsing the same palette twice is deterministic.
+
+### DIRTY/CLEAN transform contract
+- All three presets (A/B/C) produce a color different from CLEAN.
+- All three presets differ from each other (preset switching has an
+  effect).
+- Every preset reduces both saturation *and* value/brightness relative to
+  CLEAN (never saturation alone — the core readability requirement) while
+  preserving hue (color family stays recognizable).
+- Applying a DIRTY transform never mutates the original (CLEAN) `Color`.
+
+### BoardRenderer geometry
+- Every official band boundary (20×20, 29×29, 30×30, 39×39, 40×40, 49×49,
+  50×50, 59×59) plus representative rectangular boards (20×27, 34×39,
+  48×41, 53×59) configure without error.
+- Computed `cell_size` matches the fit-to-available-rect formula exactly.
+- Computed board pixel size equals `width/height * cell_size`.
+- The first cell's center is within bounds (`>= 0`); the final row/column's
+  cell center does not overflow the computed board pixel size.
+- `BoardRenderer.get_child_count() == 0` at every tested size, including
+  59×59 — the constant-node-count guarantee, automated.
+
+### BoardRenderer pixel output
+- A CLEAN cell's rendered pixel matches its source palette color (within
+  8-bit quantization tolerance — see the note above this section).
+- A DIRTY cell's rendered pixel visibly differs from an identically-colored
+  CLEAN cell, with lower saturation, lower value, and preserved hue —
+  verified by reading back actual rendered pixels, not by comparing to an
+  independently precomputed float value.
+- `update_cells()` correctly reflects a single changed cell without a full
+  `refresh_all()`.
+- `BoardState` cell states are unchanged after `configure()`/`refresh_all()`
+  — the renderer never mutates gameplay truth.
+
+### BoardRenderer performance sanity (not a pass/fail gate)
+- `configure()`, `refresh_all()`, and `update_cells()` are timed at 40×40,
+  50×50, 59×59, and 53×59 (rectangular Very Hard). No hard millisecond
+  threshold — see `SCRUBBOTS_PHASE_M06_LOG.md` for actual measured numbers
+  and the explicit statement that true GPU/on-screen frame-rate could not
+  be measured under `--headless` (no display surface to composite to).
+
 ## Planned, not yet implemented
 
 ### Project boot
@@ -135,7 +194,8 @@ Run via `tools/run_headless.ps1` or directly:
 ### Save data
 - Saved/loaded round-trip preserves streak count and currency exactly.
 
-## Explicitly out of scope for Prompt 02 and Prompt 03
+## Explicitly out of scope for Prompt 02, Prompt 03, and Prompt 04
 
-Slot system, target selector, routing system, save system, and rendering do
-not exist yet — their tests remain planned only.
+Slot system, target selector, routing system, save system do not exist
+yet — their tests remain planned only. Rendering now exists
+(`BoardRenderer`) but Scrubbot movement/visual effects on top of it do not.

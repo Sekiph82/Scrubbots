@@ -2,6 +2,42 @@
 
 ## Unreleased
 
+### Added — BoardRenderer + DIRTY/CLEAN visual prototype (Prompt 04)
+
+- New `BoardRenderer` (`scripts/gameplay/board/board_renderer.gd`, extends
+  `TextureRect`): draws any `BoardState` as one `Image`/`ImageTexture` (one
+  texel per logical cell, nearest-neighbor filtered) — exactly one Node
+  regardless of board size, verified at every official difficulty band
+  boundary and at the 59×59/3,481-cell maximum. See ADR-011.
+- New `PaletteColors`/`PaletteParseResult` (`scripts/data/`) — the single,
+  validated hex-string → `Color` conversion path.
+- New `DirtyCleanPresets` (`scripts/gameplay/board/`) — centralized DIRTY
+  visual transform (HSV saturation *and* value reduction, never saturation
+  alone) with three named prototype presets (A/B/C). CLEAN always displays
+  the unmodified source palette color. **None of the three presets is
+  approved as final** — this is an explicit open design gate (`tasks.md`
+  M10), not resolved by this phase.
+- New dev-only comparison tool
+  (`scenes/debug/board_renderer_debug.tscn` +
+  `scripts/debug/board_renderer_debug.gd`): dropdowns to switch board size
+  (every band boundary + rectangular examples), DIRTY/CLEAN pattern, and
+  preset A/B/C at native gameplay scale, without code changes. Not
+  production UI.
+- New `BoardDebugFixtures` (`scripts/debug/`) — deterministic multi-hue
+  in-memory level/board/state-pattern generator shared by the debug tool
+  and tests.
+- Extended `tests/run_tests.gd` from 131 to **227 checks**: palette
+  parsing, DIRTY/CLEAN transform contract, renderer geometry across every
+  band boundary + rectangular boards, renderer pixel output (including a
+  constant-node-count assertion at every size), and renderer performance
+  sanity at 40×40/50×50/59×59/53×59. Along the way, fixed a genuinely
+  brittle test (exact-float pixel comparison broke on expected 8-bit
+  `Image` quantization) — see `docs/06_TEST_STRATEGY.md` and the Prompt 04
+  phase log for the full failure/fix record.
+- Updated `CLAUDE.md`, `tasks.md`, and `docs/01`, `02`, `04`, `05`, `06` to
+  describe the renderer architecture and the new locked DIRTY/CLEAN
+  readability requirement.
+
 ### Added — Official difficulty bands + production/test validation (Prompt 03)
 
 - Refined the Prompt 02 board-size framing ("40×40 standard / 50×50

@@ -118,6 +118,21 @@ color/robot slots. See `docs/00_PROJECT_BRIEF.md` for the full pitch and
     `scripts/data/` and `scripts/gameplay/board/` must be preserved unless a
     future task deliberately revisits it and proves an alternative equally
     reliable under headless Godot.
+34. `BoardRenderer` (`scripts/gameplay/board/board_renderer.gd`) draws the
+    board as one `Image`/`ImageTexture` per board (ADR-011) — never one
+    Node per cell, never per-cell draw calls. DIRTY vs. CLEAN readability
+    must use both saturation and value/brightness differences, never
+    saturation alone (see `docs/01_GAMEPLAY_SPEC.md`). CLEAN is always the
+    unmodified source palette color. The three `DirtyCleanPresets` (A/B/C)
+    are prototypes — treat the final DIRTY visual style as an unresolved
+    `[DESIGN GATE]` (`tasks.md` M10) until the owner has actually compared
+    them via `scenes/debug/board_renderer_debug.tscn` and chosen one.
+35. Renderer output is read back through an 8-bit `Image`
+    (`Image.FORMAT_RGBA8`) — comparing rendered pixels to an
+    independently-computed float `Color` with `is_equal_approx()` will
+    spuriously fail from quantization. Use a tolerant comparison (see
+    `_colors_close()` in `tests/run_tests.gd`) or test meaningful HSV
+    properties instead, per `docs/06_TEST_STRATEGY.md`.
 
 ## 3. Known-locked game parameters (do not silently alter)
 
