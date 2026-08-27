@@ -21,6 +21,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | AL-010 | Import/export path safety | Source and derived-output paths can alias even when filenames look different syntactically. | Canonicalize path identity before writes; reject source↔destination and destination↔destination aliases. An overwrite flag must never authorize source destruction. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md |
 | AL-011 | Negative-test specificity | A negative test must isolate the failure mode it claims to verify. | For format gates, use a valid unsupported-format file; an unreadable text/corrupt file proves readability failure, not unsupported-format rejection. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md |
 | AL-012 | Multi-artifact overwrite safety | Safe overwrite behavior must apply to every generated artifact, not only the primary output. | Test Level JSON, preview, metadata, caches/sidecars individually for existing-file behavior and cross-artifact collisions. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md |
+| AL-013 | Filesystem identity normalization | Cosmetic path normalization is not enough for destructive-write safety. Dot segments and relative-vs-absolute equivalents can identify the same physical file. | Before alias comparison, resolve one explicit base, simplify `.`/`..`, normalize separators and platform case rules, then test equivalent syntactic paths directly. Fail closed when identity cannot be safely established. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md |
 
 ## Audit history
 
@@ -28,7 +29,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | --- | --- | --- | --- |
 | META-C001 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | `AUDITED_PASS` | Coordination evidence chain established. |
 | M07-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 added AL-008 metadata provenance and AL-009 validation traceability; V02 confirmed both corrections and added no new learning. |
-| M09-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md | `CHANGES_REQUIRED` | Added AL-010 path alias/source immutability, AL-011 negative-test specificity, and AL-012 multi-artifact overwrite safety. |
+| M09-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md | `CHANGES_REQUIRED` | V01 added AL-010..012. V02 confirmed PNG/preflight/reconstruction corrections but added AL-013 because dot-segment/relative path identity remains insufficiently normalized. |
 
 ## Claude usage rule
 
