@@ -42,14 +42,14 @@ This file is the single H!veAI-facing materialized project status and latest-ses
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-27T11:09:00+03:00 |
+| Timestamp | 2026-08-27T11:34:26+03:00 |
 | Actor | CHATGPT |
 | Cycle | `META-C001` |
 | Session type | Repository audit + coordination-system setup |
 | Cycle status | AUDITED_PASS |
 | Milestone/task impact | META only; no `tasks.md` gameplay checkbox changed |
-| Summary | Added a repository-native ChatGPT↔Claude communication protocol: versioned ChatGPT prompts/audits, append-only Claude implementation logs, a session index, templates, and mandatory per-session dashboard synchronization while preserving the existing local Desktop phase log. |
-| Primary evidence | `coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md` |
+| Summary | Added and merged the repository-native ChatGPT↔Claude communication protocol: versioned ChatGPT prompts/audits, append-only Claude implementation logs, session index, templates, and mandatory per-session dashboard synchronization while preserving the local Desktop phase log and existing H!veAI single-dashboard-watch architecture. |
+| Primary evidence | PR #2 merged to `main` as `734ccfe`; `coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md` |
 | Next expected actor | OWNER / CHATGPT for the next scoped cycle; CLAUDE after a versioned implementation prompt is issued |
 
 ## Current work
@@ -59,7 +59,7 @@ This file is the single H!veAI-facing materialized project status and latest-ses
 | M07 | Visual Reference Library | NOT_STARTED | HUMAN (owner supplies assets) | `tasks.md` M07 |
 | M10 | DIRTY/CLEAN Visual Approval | DESIGN_GATE | HUMAN (owner picks preset) | `tasks.md` M10, `scenes/debug/board_renderer_debug.tscn` |
 | M05 | Test Harness Maturity | PARTIAL | CLAUDE | `tasks.md` M05 |
-| META-C001 | GitHub coordination protocol | AUDITED_PASS | CHATGPT | `coordination/SESSION_INDEX.md` |
+| META-C001 | GitHub coordination protocol | AUDITED_PASS | CHATGPT | PR #2, `coordination/SESSION_INDEX.md` |
 
 ## Blockers and waiting
 
@@ -70,7 +70,7 @@ This file is the single H!veAI-facing materialized project status and latest-ses
 
 | Cycle | Milestone | Status | Last actor | Summary | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| `META-C001` | META | AUDITED_PASS | CHATGPT | Established GitHub prompt→implementation→audit communication and single-dashboard session synchronization. | `coordination/SESSION_INDEX.md`, `coordination/sessions/META-C001/` |
+| `META-C001` | META | AUDITED_PASS | CHATGPT | Established GitHub prompt→implementation→audit communication and single-dashboard session synchronization. | PR #2 merged as `734ccfe`; `coordination/SESSION_INDEX.md` |
 
 ## Coordination source map
 
@@ -146,7 +146,7 @@ If the audit requires corrections, keep the same cycle, add `CHATGPT_PROMPT_V02.
 
 | Date | Event |
 | --- | --- |
-| 2026-08-27 | META-C001: repository-native ChatGPT↔Claude coordination ledger and dashboard synchronization protocol established. |
+| 2026-08-27 | META-C001 merged: repository-native ChatGPT↔Claude coordination ledger and dashboard synchronization protocol — PR #2 / `734ccfe`. |
 | 2026-08-27 | H!veAI single-dashboard tracking + Akilta attribution added on `main` (`d7a7019`). |
 | 2026-08-18 | M06 complete: BoardRenderer, DirtyCleanPresets A/B/C, 227/227 tests — `abd9ceb`. |
 | 2026-08-17 | M03/M04 complete: official difficulty ranges through 59×59 and 131/131 tests — `89c7d43`. |

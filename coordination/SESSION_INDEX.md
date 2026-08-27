@@ -10,7 +10,7 @@ Canonical task truth remains in `tasks.md`. This file indexes ChatGPT/Claude com
 
 | Cycle | Milestone | Started | Last update | Status | ChatGPT prompt | Claude log | ChatGPT audit | Task refs | Repository evidence | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | AUDITED_PASS | [`CHATGPT_PROMPT_V01.md`](sessions/META-C001/CHATGPT_PROMPT_V01.md) | N/A (ChatGPT performed process-only repository setup) | [`CHATGPT_AUDIT_V01.md`](sessions/META-C001/CHATGPT_AUDIT_V01.md) | None; no gameplay task status changed | PR #2 (`hiveai/coordination-ledger-v1`) | Installed the versioned ChatGPT↔Claude communication bus, session index, templates, and single-dashboard synchronization rules. |
+| META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | AUDITED_PASS | [`CHATGPT_PROMPT_V01.md`](sessions/META-C001/CHATGPT_PROMPT_V01.md) | N/A (ChatGPT performed process-only repository setup) | [`CHATGPT_AUDIT_V01.md`](sessions/META-C001/CHATGPT_AUDIT_V01.md) | None; no gameplay task status changed | PR #2 merged to `main` as `734ccfe` | Installed the versioned ChatGPT↔Claude communication bus, session index, templates, and single-dashboard synchronization rules. |
 
 ## Rules
 
