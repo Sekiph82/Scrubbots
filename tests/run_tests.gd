@@ -19,6 +19,7 @@ const PaletteColors = preload("res://scripts/data/palette_colors.gd")
 const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
 const DirtyCleanPresets = preload("res://scripts/gameplay/board/dirty_clean_presets.gd")
 const BoardDebugFixtures = preload("res://scripts/debug/board_debug_fixtures.gd")
+const LevelImporter = preload("res://scripts/tools/level_importer.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -39,6 +40,7 @@ func _initialize() -> void:
 	_run_board_renderer_geometry_tests()
 	_run_board_renderer_pixel_tests()
 	_run_board_renderer_performance_sanity()
+	_run_importer_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -536,6 +538,270 @@ func _run_board_renderer_performance_sanity() -> void:
 
 		_check_eq(renderer.get_child_count(), 0, "%dx%d renderer still has zero children after repeated refresh/update" % [w, h])
 		renderer.free()
+
+func _run_importer_tests() -> void:
+	var test_dir := "user://test_importer/"
+	DirAccess.make_dir_recursive_absolute(test_dir)
+
+	# --- helper: save a test PNG to disk ---
+	var _save_png := func(img: Image, name: String) -> String:
+		var path := test_dir + name
+		img.save_png(path)
+		return path
+
+	# ---- 1. 3x2 non-square with transparency + 3 opaque colors (4 total) ----
+	var img_3x2 := Image.create(3, 2, false, Image.FORMAT_RGBA8)
+	# Row 0: red, green, transparent
+	# Row 1: blue, red, green  (repeated colors in separated positions)
+	var c_red := Color(0.9, 0.2, 0.1, 1.0)
+	var c_green := Color(0.1, 0.8, 0.2, 1.0)
+	var c_trans := Color(0, 0, 0, 0)
+	var c_blue := Color(0.1, 0.2, 0.9, 1.0)
+	img_3x2.set_pixel(0, 0, c_red)
+	img_3x2.set_pixel(1, 0, c_green)
+	img_3x2.set_pixel(2, 0, c_trans)
+	img_3x2.set_pixel(0, 1, c_blue)
+	img_3x2.set_pixel(1, 1, c_red)
+	img_3x2.set_pixel(2, 1, c_green)
+	var path_3x2: String = _save_png.call(img_3x2, "test_3x2.png")
+
+	var req_3x2 := LevelImporter.ImportRequest.new(
+		path_3x2, "imp_3x2", "Importer 3x2", "TEST",
+		test_dir + "imp_3x2.json",
+		test_dir + "imp_3x2_preview.png",
+		test_dir + "imp_3x2_meta.json"
+	)
+	var res_3x2 := LevelImporter.run_import(req_3x2)
+	_check(res_3x2.is_ok(), "3x2 import succeeds")
+	_check_eq(res_3x2.level_data.width, 3, "3x2 import width")
+	_check_eq(res_3x2.level_data.height, 2, "3x2 import height")
+	_check_eq(res_3x2.level_data.get_cell_count(), 6, "3x2 import cell count")
+	_check_eq(res_3x2.level_data.difficulty, "TEST", "3x2 import difficulty")
+
+	# Palette order must be first-seen: red(0), green(1), transparent(2), blue(3)
+	_check_eq(res_3x2.level_data.palette.size(), 4, "3x2 palette count")
+	# Cell [0,0]=red=0, [1,0]=green=1, [2,0]=trans=2, [0,1]=blue=3, [1,1]=red=0, [2,1]=green=1
+	_check_eq(res_3x2.level_data.cells[0], 0, "3x2 cell[0,0] = palette 0 (red, first-seen)")
+	_check_eq(res_3x2.level_data.cells[1], 1, "3x2 cell[1,0] = palette 1 (green)")
+	_check_eq(res_3x2.level_data.cells[2], 2, "3x2 cell[2,0] = palette 2 (transparent)")
+	_check_eq(res_3x2.level_data.cells[3], 3, "3x2 cell[0,1] = palette 3 (blue)")
+	_check_eq(res_3x2.level_data.cells[4], 0, "3x2 cell[1,1] = palette 0 (red reuse)")
+	_check_eq(res_3x2.level_data.cells[5], 1, "3x2 cell[2,1] = palette 1 (green reuse)")
+
+	# Verify output files written
+	_check(res_3x2.output_written, "3x2 output JSON written")
+	_check(res_3x2.preview_written, "3x2 preview PNG written")
+	_check(res_3x2.metadata_written, "3x2 metadata JSON written")
+	_check(FileAccess.file_exists(req_3x2.output_path), "3x2 output file exists")
+	_check(FileAccess.file_exists(req_3x2.preview_path), "3x2 preview file exists")
+
+	# Verify structural validation of generated level data
+	var load_result := LevelLoader.load_from_path(req_3x2.output_path)
+	_check(load_result.is_ok(), "3x2 generated JSON passes LevelValidator")
+
+	# ---- 2. Pixel-perfect reconstruction (3x2) ----
+	var recon_3x2 := LevelImporter.reconstruct_image(res_3x2.level_data)
+	_check(recon_3x2 != null, "3x2 reconstruction succeeds")
+	if recon_3x2 != null:
+		_check_eq(recon_3x2.get_width(), 3, "3x2 reconstruction width")
+		_check_eq(recon_3x2.get_height(), 2, "3x2 reconstruction height")
+		_check_eq(recon_3x2.get_format(), Image.FORMAT_RGBA8, "3x2 reconstruction format")
+		# Reload source from disk to compare raw bytes
+		var src_reload := Image.new()
+		src_reload.load(path_3x2)
+		if src_reload.get_format() != Image.FORMAT_RGBA8:
+			src_reload.convert(Image.FORMAT_RGBA8)
+		_check_eq(recon_3x2.get_data(), src_reload.get_data(), "3x2 reconstruction raw RGBA8 bytes match source")
+
+	# ---- 3. Deterministic rerun (same input = same output) ----
+	var req_3x2_rerun := LevelImporter.ImportRequest.new(
+		path_3x2, "imp_3x2", "Importer 3x2", "TEST",
+		test_dir + "imp_3x2.json", "", "", false
+	)
+	var res_3x2_rerun := LevelImporter.run_import(req_3x2_rerun)
+	_check(res_3x2_rerun.is_ok(), "3x2 rerun import succeeds")
+	_check(res_3x2_rerun.output_unchanged, "3x2 rerun detects UNCHANGED (no meaningless diff)")
+
+	# ---- 4. Rectangular production-band (20x27 EASY) ----
+	var img_20x27 := LevelImporter.generate_test_png(20, 27, 5, true, false)
+	var path_20x27: String = _save_png.call(img_20x27, "test_20x27.png")
+	var req_20x27 := LevelImporter.ImportRequest.new(
+		path_20x27, "imp_20x27", "Importer 20x27", "EASY",
+		test_dir + "imp_20x27.json", test_dir + "imp_20x27_preview.png"
+	)
+	var res_20x27 := LevelImporter.run_import(req_20x27)
+	_check(res_20x27.is_ok(), "20x27 EASY import succeeds")
+	_check_eq(res_20x27.level_data.width, 20, "20x27 import width exact")
+	_check_eq(res_20x27.level_data.height, 27, "20x27 import height exact")
+	_check_eq(res_20x27.level_data.difficulty, "EASY", "20x27 import difficulty")
+	# Production validation
+	var prod_20x27 := ProductionLevelValidator.validate(res_20x27.level_data)
+	_check(prod_20x27.is_ok(), "20x27 EASY passes production validator")
+	# Structural validation
+	var load_20x27 := LevelLoader.load_from_path(req_20x27.output_path)
+	_check(load_20x27.is_ok(), "20x27 generated JSON passes LevelValidator")
+
+	# Reconstruction round-trip
+	var recon_20x27 := LevelImporter.reconstruct_image(res_20x27.level_data)
+	_check(recon_20x27 != null, "20x27 reconstruction succeeds")
+	if recon_20x27 != null:
+		var src_20x27 := Image.new()
+		src_20x27.load(path_20x27)
+		if src_20x27.get_format() != Image.FORMAT_RGBA8:
+			src_20x27.convert(Image.FORMAT_RGBA8)
+		_check_eq(recon_20x27.get_data(), src_20x27.get_data(), "20x27 reconstruction raw RGBA8 bytes match")
+
+	# Deterministic rerun
+	var req_20x27_rerun := LevelImporter.ImportRequest.new(
+		path_20x27, "imp_20x27", "Importer 20x27", "EASY",
+		test_dir + "imp_20x27.json", "", "", false
+	)
+	var res_20x27_rerun := LevelImporter.run_import(req_20x27_rerun)
+	_check(res_20x27_rerun.is_ok(), "20x27 rerun succeeds")
+	_check(res_20x27_rerun.output_unchanged, "20x27 rerun UNCHANGED")
+
+	# ---- 5. 59x59 maximum (VERY_HARD) ----
+	var img_59x59 := LevelImporter.generate_test_png(59, 59, 8, true, false)
+	var path_59x59: String = _save_png.call(img_59x59, "test_59x59.png")
+	var req_59x59 := LevelImporter.ImportRequest.new(
+		path_59x59, "imp_59x59", "Importer 59x59", "VERY_HARD",
+		test_dir + "imp_59x59.json"
+	)
+	var res_59x59 := LevelImporter.run_import(req_59x59)
+	_check(res_59x59.is_ok(), "59x59 VERY_HARD import succeeds")
+	_check_eq(res_59x59.level_data.width, 59, "59x59 import width")
+	_check_eq(res_59x59.level_data.height, 59, "59x59 import height")
+	_check_eq(res_59x59.level_data.get_cell_count(), 3481, "59x59 cell count")
+	var prod_59x59 := ProductionLevelValidator.validate(res_59x59.level_data)
+	_check(prod_59x59.is_ok(), "59x59 passes production validator")
+
+	# Reconstruction
+	var recon_59x59 := LevelImporter.reconstruct_image(res_59x59.level_data)
+	_check(recon_59x59 != null, "59x59 reconstruction succeeds")
+	if recon_59x59 != null:
+		var src_59x59 := Image.new()
+		src_59x59.load(path_59x59)
+		if src_59x59.get_format() != Image.FORMAT_RGBA8:
+			src_59x59.convert(Image.FORMAT_RGBA8)
+		_check_eq(recon_59x59.get_data(), src_59x59.get_data(), "59x59 reconstruction raw RGBA8 bytes match")
+
+	# ---- 6. Semi-transparent alpha pixel round-trip ----
+	var img_alpha := Image.create(2, 2, false, Image.FORMAT_RGBA8)
+	img_alpha.set_pixel(0, 0, Color(1.0, 0.0, 0.0, 1.0))
+	img_alpha.set_pixel(1, 0, Color(0.0, 1.0, 0.0, 0.0))
+	img_alpha.set_pixel(0, 1, Color(0.0, 0.0, 1.0, 0.5))
+	img_alpha.set_pixel(1, 1, Color(1.0, 1.0, 0.0, 1.0))
+	var path_alpha: String = _save_png.call(img_alpha, "test_alpha.png")
+	var req_alpha := LevelImporter.ImportRequest.new(
+		path_alpha, "imp_alpha", "Alpha Test", "TEST",
+		test_dir + "imp_alpha.json"
+	)
+	var res_alpha := LevelImporter.run_import(req_alpha)
+	_check(res_alpha.is_ok(), "alpha import succeeds")
+	var recon_alpha := LevelImporter.reconstruct_image(res_alpha.level_data)
+	if recon_alpha != null:
+		var src_alpha := Image.new()
+		src_alpha.load(path_alpha)
+		if src_alpha.get_format() != Image.FORMAT_RGBA8:
+			src_alpha.convert(Image.FORMAT_RGBA8)
+		_check_eq(recon_alpha.get_data(), src_alpha.get_data(), "alpha pixels round-trip exactly (including semi-transparent)")
+
+	# ---- 7. Performance sanity at 59x59 ----
+	var t0 := Time.get_ticks_usec()
+	var _perf_res := LevelImporter.run_import(LevelImporter.ImportRequest.new(
+		path_59x59, "perf_59x59", "Perf 59x59", "VERY_HARD",
+		test_dir + "perf_59x59.json", "", "", true
+	))
+	var t1 := Time.get_ticks_usec()
+	var recon_t0 := Time.get_ticks_usec()
+	var _perf_recon := LevelImporter.reconstruct_image(_perf_res.level_data)
+	var recon_t1 := Time.get_ticks_usec()
+	print("---- LevelImporter performance sanity (59x59 = 3481 cells) ----")
+	print("  full import (load+extract+validate+write): %.3f ms" % ((t1 - t0) / 1000.0))
+	print("  reconstruction: %.3f ms" % ((recon_t1 - recon_t0) / 1000.0))
+
+	# ---- NEGATIVE TESTS ----
+
+	# Missing input file
+	var req_missing := LevelImporter.ImportRequest.new(
+		"user://nonexistent.png", "bad", "Bad", "TEST", test_dir + "bad.json"
+	)
+	var res_missing := LevelImporter.run_import(req_missing)
+	_check(not res_missing.is_ok(), "missing file import fails")
+	_check(res_missing.errors[0].find("Could not load") >= 0, "missing file error is actionable")
+
+	# Unsupported extension (try loading a JSON as image)
+	var dummy_path := test_dir + "dummy.txt"
+	var df := FileAccess.open(dummy_path, FileAccess.WRITE)
+	if df: df.store_string("not an image"); df.close()
+	var req_bad_ext := LevelImporter.ImportRequest.new(
+		dummy_path, "bad_ext", "Bad Ext", "TEST", test_dir + "bad_ext.json"
+	)
+	var res_bad_ext := LevelImporter.run_import(req_bad_ext)
+	_check(not res_bad_ext.is_ok(), "non-image file import fails")
+
+	# Empty level ID
+	var req_no_id := LevelImporter.ImportRequest.new(
+		path_3x2, "", "Name", "TEST", test_dir + "no_id.json"
+	)
+	_check(not LevelImporter.run_import(req_no_id).is_ok(), "empty level_id rejected")
+
+	# Empty display name
+	var req_no_name := LevelImporter.ImportRequest.new(
+		path_3x2, "id", "", "TEST", test_dir + "no_name.json"
+	)
+	_check(not LevelImporter.run_import(req_no_name).is_ok(), "empty display_name rejected")
+
+	# Unknown difficulty
+	var req_bad_diff := LevelImporter.ImportRequest.new(
+		path_3x2, "id", "Name", "EXTREME", test_dir + "bad_diff.json"
+	)
+	_check(not LevelImporter.run_import(req_bad_diff).is_ok(), "unknown difficulty rejected")
+
+	# TEST rejected by production validator
+	var test_level = res_3x2.level_data
+	var prod_test := ProductionLevelValidator.validate(test_level)
+	_check(not prod_test.is_ok(), "TEST level rejected by production validator")
+
+	# Production dimensions outside requested band (3x2 with EASY)
+	var req_wrong_band := LevelImporter.ImportRequest.new(
+		path_3x2, "wrong", "Wrong", "EASY", test_dir + "wrong_band.json"
+	)
+	_check(not LevelImporter.run_import(req_wrong_band).is_ok(), "3x2 with EASY rejected (outside band)")
+
+	# Auto-difficulty tests
+	_check_eq(LevelImporter.auto_difficulty(20, 29), "EASY", "auto_difficulty 20x29 = EASY")
+	_check_eq(LevelImporter.auto_difficulty(35, 35), "MEDIUM", "auto_difficulty 35x35 = MEDIUM")
+	_check_eq(LevelImporter.auto_difficulty(59, 50), "VERY_HARD", "auto_difficulty 59x50 = VERY_HARD")
+	_check_eq(LevelImporter.auto_difficulty(3, 2), "", "auto_difficulty 3x2 = empty (out of band)")
+	_check_eq(LevelImporter.auto_difficulty(19, 20), "", "auto_difficulty 19x20 = empty (cross-band)")
+
+	# Overwrite safety: existing file, overwrite=false, content differs
+	var clash_path := test_dir + "clash.json"
+	var cf := FileAccess.open(clash_path, FileAccess.WRITE)
+	if cf: cf.store_string("different content"); cf.close()
+	var req_clash := LevelImporter.ImportRequest.new(
+		path_3x2, "clash", "Clash", "TEST", clash_path, "", "", false
+	)
+	_check(not LevelImporter.run_import(req_clash).is_ok(), "overwrite safety rejects collision")
+
+	# Overwrite=true works
+	var req_overwrite := LevelImporter.ImportRequest.new(
+		path_3x2, "clash", "Clash", "TEST", clash_path, "", "", true
+	)
+	_check(LevelImporter.run_import(req_overwrite).is_ok(), "overwrite=true succeeds on collision")
+
+	# ---- cleanup test dir ----
+	var dir := DirAccess.open(test_dir)
+	if dir:
+		dir.list_dir_begin()
+		var fname := dir.get_next()
+		while not fname.is_empty():
+			if not dir.current_is_dir():
+				dir.remove(fname)
+			fname = dir.get_next()
+		dir.list_dir_end()
+		DirAccess.remove_absolute(test_dir)
 
 func _print_summary() -> void:
 	print("")
