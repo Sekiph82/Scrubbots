@@ -39,7 +39,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
   - Active authority.
   - Claude must implement/test/log only and return `AWAITING_AUDIT`.
 - V02 correction implementation (Session 2): Claude closed F-M09-001..004, added 34 safety checks (320 total), updated docs/CHANGELOG/tasks.
-- Correction commit: (pending — this update)
+- Correction commit: https://github.com/Sekiph82/Scrubbots/commit/84eebef
 - Cycle state: `AWAITING_AUDIT` for ChatGPT audit V02.
 - Deferred until this cycle passes: SB-M09-018 batch import, SB-M09-019 batch validation, SB-M09-020 duplicate-ID protection.
 - M08 remains owner-asset-dependent and open.
