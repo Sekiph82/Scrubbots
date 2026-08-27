@@ -20,7 +20,7 @@ taskRefs:
   - SB-M07-017
 activePromptUrl: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V03.md
 implementationLogUrl: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md
-auditedCommit: pending
+auditedCommit: 1c23eba
 ---
 
 # SCRUBBOTS - Claude Self-Audit — M07-C001 V01
@@ -168,7 +168,7 @@ ChatGPT will independently audit these claims.
 - This self-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_SELF_AUDIT_V01.md
 - Session index: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/SESSION_INDEX.md
 - Dashboard: https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/PROJECT_DASHBOARD.md
-- Relevant commit: pending (to be updated after push)
+- Relevant commit: `1c23eba` — https://github.com/Sekiph82/Scrubbots/commit/1c23eba
 
 ## Self-audit conclusion
 
