@@ -24,7 +24,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | Cycle | ChatGPT audit | Final/current state | Reusable learning |
 | --- | --- | --- | --- |
 | META-C001 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | `AUDITED_PASS` | Coordination evidence chain established. |
-| M07-C001 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md | `CHANGES_REQUIRED` | Added AL-008 metadata provenance and AL-009 validation traceability. |
+| M07-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 added AL-008 metadata provenance and AL-009 validation traceability; V02 confirmed both corrections and added no new learning. |
 
 ## Claude usage rule
 
