@@ -1,42 +1,93 @@
----
+# SCRUBBOTS — H!veAI Project Dashboard
+
+<!--
 hiveaiDashboardSchema: hiveai-project-dashboard/v1
-projectKey: scrubbots
-repository: Sekiph82/Scrubbots
-branchPolicy: main
 dashboardMode: source-map
-refreshPolicy: watcher-driven source invalidation; no generated status commits
----
-
-# H!veAI Project Dashboard Manifest
-
-This file is a pointer map for H!veAI. It is not a task ledger and must not duplicate task checkboxes.
+trackingMode: single-dashboard-watch
+refreshPolicy: project-agent-maintained; H!veAI watches only .hiveai/PROJECT_DASHBOARD.md
+-->
 
 ## Project identity
 
-Project: Scrubbots
-Repository: `Sekiph82/Scrubbots`
-Default branch: `main`
+| Field | Value |
+| --- | --- |
+| Project | SCRUBBOTS |
+| Repository | `https://github.com/Sekiph82/Scrubbots` |
+| Branch | `main` |
+| Engine | Godot 4.7.1-stable (GDScript) |
+| Platform target | Mobile (Android first, iOS later) |
+| Attribution | Developed by Akilta |
 
-## Source authorities
+## H!veAI live status
 
-Canonical task source: `tasks.md`
-Handoff source: none verified
-Roadmap source: task/phase planning currently lives inside `tasks.md`
-Progress/history source: `CHANGELOG.md`
-Architecture source: none verified at repository root
-Decision source: none verified
-Agent instruction source: `CLAUDE.md`
-Security source: none verified
-Build/test metadata: `project.godot`, `tests/`, project scripts and tools
+| Field | Value |
+| --- | --- |
+| Project status | ACTIVE |
+| Health | HEALTHY |
+| Current milestone | M07 — Visual Reference Library (next to start; M00–M06 complete) |
+| Current task | NONE (between implementation prompts) |
+| Current task ID | NONE |
+| Current workflow state | WAITING — owner artwork needed to begin M07 |
+| Progress | 6/55 milestones complete (M00–M06); 227/227 headless tests passing |
+| Required actor | HUMAN |
+| Next action | Owner supplies original SCRUBBOTS artwork files for M07 ingestion, and reviews DIRTY/CLEAN presets A/B/C via `scenes/debug/board_renderer_debug.tscn` to close M10 design gate |
+| Waiting on | Owner-supplied artwork assets (all categories AWAITING OWNER ASSET) and DIRTY preset approval (M10 design gate) |
+| Last meaningful update | 2026-08-18T00:12:34+03:00 |
 
-## Authority notes
+## Current work
 
-Keep the existing lowercase `tasks.md` filename. Filename casing is project truth and should not be changed merely for style.
+| ID | Item | Status | Owner/actor | Evidence/source |
+| --- | --- | --- | --- | --- |
+| M07 | Visual Reference Library | NOT_STARTED | HUMAN (owner supplies assets) | `tasks.md` M07 |
+| M10 | DIRTY/CLEAN Visual Approval | DESIGN_GATE | HUMAN (owner picks preset) | `tasks.md` M10, `scenes/debug/board_renderer_debug.tscn` |
+| M05 | Test Harness Maturity | PARTIAL | CLAUDE | `tasks.md` M05 (SB-M05-006..010 open) |
 
-`tasks.md` is the canonical task ledger. `CHANGELOG.md` is historical execution evidence and must not override task state.
+## Blockers and waiting
 
-If a dedicated handoff or architecture ledger is added later, this manifest should be updated to point to it rather than duplicating its contents here.
+- **M07 blocked on owner artwork**: all visual reference categories are `AWAITING OWNER ASSET` — no original SCRUBBOTS artwork exists in the repository yet.
+- **M10 design gate**: three DIRTY/CLEAN presets (A/B/C) are built and ready for comparison at native scale, but the owner has not yet chosen one. This must be resolved before real artwork is rendered in production (M09/M21).
 
-## Refresh model
+## Milestone summary
 
-H!veAI should derive live state from Registry/Git/watcher evidence plus the canonical sources above. This manifest should remain pointer-only and should not be rewritten as a generated status snapshot.
+| Milestone | Name | Status |
+| --- | --- | --- |
+| M00 | Foundation & Environment | COMPLETE |
+| M01 | Variable-Size Level Data Core | COMPLETE |
+| M02 | BoardState Core | COMPLETE |
+| M03 | Official Difficulty Bands + 59×59 | COMPLETE |
+| M04 | Expanded Board Fixtures & Test Matrix | COMPLETE |
+| M05 | Test Harness Maturity | PARTIAL (5/10 items) |
+| M06 | Board Renderer | COMPLETE |
+| M07 | Visual Reference Library | NOT_STARTED |
+| M08–M55 | Remaining milestones | NOT_STARTED |
+
+## Quality and verification
+
+- **Test suite**: `tests/run_tests.gd` — **227/227 checks PASS**, exit code 0.
+- **Command**: `godot --headless --path . -s res://tests/run_tests.gd`
+- **Coverage**: level data parsing, validation (valid + invalid), BoardState operations, coordinate round-trips, difficulty band enforcement (all 4 bands + boundary rejection), BoardRenderer geometry + pixel output at every band boundary + rectangular boards + 59×59 max, palette parsing, DIRTY/CLEAN transform contract, performance sanity benchmarks.
+- **Last verified**: Phase M06 completion (commit `abd9ceb`).
+- **No build pipeline yet** — Godot export templates not configured (M54).
+
+## Recent meaningful activity
+
+| Date | Event |
+| --- | --- |
+| 2026-08-18 | M06 complete: BoardRenderer (single Image/ImageTexture, zero per-cell Nodes), DirtyCleanPresets A/B/C, debug comparison tool, 227/227 tests — commit `abd9ceb` |
+| 2026-08-17 | M03/M04 complete: DifficultyRules, ProductionLevelValidator, official bands enforced (Easy 20–29 → Very Hard 50–59, max 59×59=3,481), 131/131 tests — commit `89c7d43` |
+| 2026-08-17 | Master task plan established — commit `03da4e8` |
+| 2026-08-16 | M01/M02 complete: LevelData, LevelLoader, LevelValidator, BoardState, 73/73 tests — commit `5a4a2e6` |
+| 2026-08-16 | M00 complete: project bootstrap, Godot 4.7.1, docs, directory structure — commit `58caeab` |
+
+## Provenance
+
+- Task authority: `tasks.md`
+- Agent governance: `CLAUDE.md`
+- Roadmap context: `docs/04_ROADMAP.md`
+- Architecture: `docs/02_TECH_ARCHITECTURE.md`
+- Technical decisions: `docs/05_TECH_DECISIONS.md`
+- Gameplay spec: `docs/01_GAMEPLAY_SPEC.md`
+- Test strategy: `docs/06_TEST_STRATEGY.md`
+- Historical evidence: `CHANGELOG.md`
+
+H!veAI actively watches only .hiveai/PROJECT_DASHBOARD.md for project-status changes; the sources above are internal project evidence/provenance and are not independent live-watch targets.

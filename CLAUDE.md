@@ -167,7 +167,13 @@ RoutingSystem    -> decides HOW a Scrubbot visually travels there
 These stay separate scripts/modules so routing can be replaced later without
 touching level data, slot logic, cell state, scoring, or rendering.
 
-## 5. Working style
+## 5. H!veAI dashboard contract
+
+36. Before ending a run that materially changes project state, refresh
+    `.hiveai/PROJECT_DASHBOARD.md` so it remains the single H!veAI-facing
+    status contract.
+
+## 6. Working style
 
 - Inspect before modifying. Never assume file contents or environment state.
 - Small, verifiable steps over large speculative rewrites.
