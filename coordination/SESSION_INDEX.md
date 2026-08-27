@@ -19,8 +19,18 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-08-27 | `PLANNED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md (expected) | PENDING | SB-M09-001..017 | Build deterministic exact-pixel PNG -> Level Data V1 importer core using TEST-generated fixtures only. M08 remains open because no candidate owner artwork exists. Batch work SB-M09-018..020 is deferred. |
 | M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | SB-M07-001..017 | ChatGPT audit V02 independently verified both V01 corrections. Coordination cycle closed as AUDITED_PASS. M07 milestone remains PARTIAL only because SB-M07-008..014 require owner-supplied visual assets. |
 | META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | Established repository-native coordination and H!veAI synchronization. |
+
+## M09-C001 issuance
+
+- Active prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V01.md
+- Pre-published audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V01.md
+- Prior independent audit baseline: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md
+- Scope: SB-M09-001..017 only.
+- Deferred: SB-M09-018 batch import, SB-M09-019 batch validation, SB-M09-020 catalog-wide duplicate-ID protection.
+- M08 status: remains open/owner-asset-dependent; no production-art audit may be claimed in M09-C001.
 
 ## M07-C001 history
 
