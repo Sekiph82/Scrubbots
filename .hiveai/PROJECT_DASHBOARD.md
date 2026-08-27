@@ -26,13 +26,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | HEALTHY - correction pass required by independent audit |
+| Health | HEALTHY - V02 corrections complete, awaiting audit V02 |
 | Current implementation frontier | M09 - Pixel Art to Level Data Pipeline |
-| Current task | M09-C001 - importer safety correction pass V02 |
+| Current task | M09-C001 - V02 correction pass complete |
 | Current task ID | `M09-C001` |
-| Current workflow state | `CHANGES_REQUIRED` - ChatGPT audit V01 found four importer safety/negative-test gaps; correction Prompt V02 issued |
-| Required actor | CLAUDE |
-| Next project action | Claude reads ChatGPT audit V01 + criteria V02 + Prompt V02, fixes F-M09-001..004, appends implementation/test evidence, returns `AWAITING_AUDIT`, and stops. |
+| Current workflow state | `AWAITING_AUDIT` - Claude closed all four audit V01 findings (F-M09-001..004), 320/320 tests pass |
+| Required actor | CHATGPT |
+| Next project action | ChatGPT audit V02 against criteria V02. If AUDITED_PASS, M09-C002 can begin (batch import). |
 | Waiting on | M08 production-art audit and remaining M07 asset inventory tasks still require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -40,25 +40,25 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-27T23:47:00+03:00 |
-| Actor | CHATGPT |
+| Timestamp | 2026-08-28T01:30:00+03:00 |
+| Actor | CLAUDE |
 | Cycle | `M09-C001` |
-| Session type | Independent audit V01 + correction prompt issuance |
-| Cycle status | `CHANGES_REQUIRED` |
-| Milestone/task impact | SB-M09-001..016 remain provisionally implemented. Audit found SB-M09-017 overstated until format/path/reconstruction safety is corrected. SB-M09-018..020 remain open. M08 remains open. |
-| Summary | Independent code/diff/test review confirmed deterministic palette/row-major/Level Data V1 architecture, but found four gaps: source/artifact path aliasing can overwrite files; preview/metadata do not honor safe overwrite semantics; PNG-only support is not explicitly gated; malformed reconstruction can index a short cell array unsafely. V02 correction prompt and criteria published. |
+| Session type | V02 correction implementation (Session 2) |
+| Cycle status | `AWAITING_AUDIT` |
+| Milestone/task impact | SB-M09-001..017 validated with corrected V02 evidence (320/320 tests). SB-M09-018..020 remain open (M09-C002). M08 remains open. |
+| Summary | Closed all four audit V01 findings: F-M09-001 path aliasing/source immutability, F-M09-002 multi-artifact overwrite preflight, F-M09-003 PNG-only format gate, F-M09-004 reconstruction safety. Applied AL-009..012. Added 34 new safety checks (320 total). Updated docs/CHANGELOG/tasks. |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V02.md |
 | Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V02.md |
 | Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md |
 | Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md |
 | Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
-| Next expected actor | CLAUDE |
+| Next expected actor | CHATGPT |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M09-C001 | Exact-pixel importer core + safety corrections | `CHANGES_REQUIRED` | CLAUDE then CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md |
+| M09-C001 | Exact-pixel importer core + safety corrections | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md |
 | M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art; Claude audits after scoped prompt | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M07 | Visual Reference Library | PARTIAL - infrastructure audited; owner assets still missing | HUMAN for asset-specific tasks | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M10 | DIRTY/CLEAN Visual Approval | `OWNER_REQUIRED` | HUMAN | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
@@ -132,7 +132,7 @@ Canonical audit sources:
 
 | Cycle | Milestone | Status | Last actor | Summary | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| `M09-C001` | M09 | `CHANGES_REQUIRED` | CHATGPT | Audit V01 found four importer safety/test gaps; V02 correction prompt issued. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md |
+| `M09-C001` | M09 | `AWAITING_AUDIT` | CLAUDE | V02 correction pass complete. F-M09-001..004 closed, 320/320 tests, ready for ChatGPT audit V02. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md |
 | `M07-C001` | M07 | `AUDITED_PASS` | CHATGPT | Audit V02 closed both V01 findings. M07 infrastructure cycle complete; owner asset tasks remain open. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md |
 | `META-C001` | META | `AUDITED_PASS` | CHATGPT | Established repository-native ChatGPT/Claude coordination and H!veAI synchronization. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md |
 
@@ -181,7 +181,7 @@ Never duplicate the full `tasks.md` checklist here.
 | M06 | Board Renderer | COMPLETE |
 | M07 | Visual Reference Library | PARTIAL - infrastructure audited, asset tasks awaiting owner |
 | M08 | Level Art Technical Audit | BLOCKED_ON_OWNER_ASSET |
-| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - M09-C001 correction pass required |
+| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - M09-C001 AWAITING_AUDIT |
 | M10-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 
 ## Dashboard integrity rules

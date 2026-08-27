@@ -19,7 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-08-27 | `CHANGES_REQUIRED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md | SB-M09-001..017 | Audit V01 found path-alias/source-overwrite risk, inconsistent preview/metadata overwrite safety, missing explicit PNG-only gate, and malformed-reconstruction safety gap. V02 issued; M09-C002 remains blocked until correction audit passes. |
+| M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-08-28 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md | SB-M09-001..017 | V02 correction pass complete. All four audit V01 findings (F-M09-001..004) closed. 320/320 tests pass. Ready for ChatGPT audit V02. |
 | M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | SB-M07-001..017 | ChatGPT audit V02 independently verified both V01 corrections. Coordination cycle closed as AUDITED_PASS. M07 milestone remains PARTIAL only because SB-M07-008..014 require owner-supplied visual assets. |
 | META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | Established repository-native coordination and H!veAI synchronization. |
 
@@ -38,6 +38,9 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - V02 correction prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V02.md
   - Active authority.
   - Claude must implement/test/log only and return `AWAITING_AUDIT`.
+- V02 correction implementation (Session 2): Claude closed F-M09-001..004, added 34 safety checks (320 total), updated docs/CHANGELOG/tasks.
+- Correction commit: (pending — this update)
+- Cycle state: `AWAITING_AUDIT` for ChatGPT audit V02.
 - Deferred until this cycle passes: SB-M09-018 batch import, SB-M09-019 batch validation, SB-M09-020 duplicate-ID protection.
 - M08 remains owner-asset-dependent and open.
 

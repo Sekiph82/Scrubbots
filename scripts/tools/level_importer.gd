@@ -45,10 +45,13 @@ class ImportResult:
 	var level_data  # LevelData or null
 	var level_json_text: String = ""
 	var metadata_dict: Dictionary = {}
+	var metadata_json_text: String = ""
 	var output_written: bool = false
 	var output_unchanged: bool = false
 	var preview_written: bool = false
+	var preview_unchanged: bool = false
 	var metadata_written: bool = false
+	var metadata_unchanged: bool = false
 
 	func is_ok() -> bool:
 		return errors.is_empty() and level_data != null
@@ -79,6 +82,17 @@ static func run_import(request: ImportRequest) -> ImportResult:
 	if request.difficulty != DifficultyRules.TEST_DIFFICULTY and not DifficultyRules.is_production_difficulty(request.difficulty):
 		result.add_error("Unknown difficulty '%s'. Use TEST or one of: %s" % [
 			request.difficulty, ", ".join(DifficultyRules.production_difficulty_ids())])
+		return result
+
+	# --- F-M09-003: PNG-only gate ---
+	if not request.source_path.to_lower().ends_with(".png"):
+		result.add_error("Unsupported source format '%s'. Only .png is supported in M09-C001" % request.source_path)
+		return result
+
+	# --- F-M09-001: path alias preflight ---
+	var alias_err := _check_path_aliases(request)
+	if not alias_err.is_empty():
+		result.add_error(alias_err)
 		return result
 
 	# --- load source image ---
@@ -154,62 +168,118 @@ static func run_import(request: ImportRequest) -> ImportResult:
 	# --- serialize JSON deterministically ---
 	result.level_json_text = _serialize_json(json_dict)
 
-	# --- write output (with overwrite safety) ---
+	# --- build preview in memory (from level data, not source) ---
+	var preview_img: Image = null
+	var preview_png_data: PackedByteArray
+	if not request.preview_path.is_empty():
+		preview_img = reconstruct_image(level)
+		if preview_img == null:
+			result.add_error("Reconstruction failed for preview")
+			return result
+		preview_png_data = preview_img.save_png_to_buffer()
+
+	# --- build metadata in memory ---
+	if not request.metadata_path.is_empty():
+		result.metadata_dict = _build_metadata(request, level, palette.size())
+		result.metadata_json_text = _serialize_json(result.metadata_dict)
+
+	# --- F-M09-002: preflight ALL destinations before writing any ---
+	# Level JSON
+	var output_action := "write"  # "write", "unchanged", or error
 	if not request.overwrite and FileAccess.file_exists(request.output_path):
 		var existing := FileAccess.get_file_as_string(request.output_path)
 		if existing == result.level_json_text:
-			result.output_unchanged = true
-			result.output_written = false
+			output_action = "unchanged"
 		else:
 			result.add_error("Output file '%s' already exists and overwrite=false" % request.output_path)
 			return result
-	else:
+
+	# Preview
+	var preview_action := "write"
+	if not request.preview_path.is_empty():
+		if not request.overwrite and FileAccess.file_exists(request.preview_path):
+			var existing_prev := Image.new()
+			var prev_load := existing_prev.load(request.preview_path)
+			if prev_load != OK:
+				result.add_error("Preview file '%s' exists but cannot be read for comparison; overwrite=false" % request.preview_path)
+				return result
+			if existing_prev.get_format() != Image.FORMAT_RGBA8:
+				existing_prev.convert(Image.FORMAT_RGBA8)
+			if existing_prev.get_width() == preview_img.get_width() and existing_prev.get_height() == preview_img.get_height() and existing_prev.get_data() == preview_img.get_data():
+				preview_action = "unchanged"
+			else:
+				result.add_error("Preview file '%s' already exists with different content and overwrite=false" % request.preview_path)
+				return result
+
+	# Metadata
+	var metadata_action := "write"
+	if not request.metadata_path.is_empty():
+		if not request.overwrite and FileAccess.file_exists(request.metadata_path):
+			var existing_meta := FileAccess.get_file_as_string(request.metadata_path)
+			if existing_meta == result.metadata_json_text:
+				metadata_action = "unchanged"
+			else:
+				result.add_error("Metadata file '%s' already exists with different content and overwrite=false" % request.metadata_path)
+				return result
+
+	# --- all preflight passed, now write ---
+	if output_action == "write":
 		var write_err := _write_text(request.output_path, result.level_json_text)
 		if write_err != OK:
 			result.add_error("Could not write output '%s' (error %d)" % [request.output_path, write_err])
 			return result
 		result.output_written = true
+	else:
+		result.output_unchanged = true
 
-	# --- preview (reconstruct from level data, not source) ---
 	if not request.preview_path.is_empty():
-		var preview_img := reconstruct_image(level)
-		if preview_img == null:
-			result.add_error("Reconstruction failed for preview")
-			return result
-		var save_err := preview_img.save_png(request.preview_path)
-		if save_err != OK:
-			result.add_error("Could not save preview '%s' (error %d)" % [request.preview_path, save_err])
-			return result
-		result.preview_written = true
+		if preview_action == "write":
+			var save_err := preview_img.save_png(request.preview_path)
+			if save_err != OK:
+				result.add_error("Could not save preview '%s' (error %d)" % [request.preview_path, save_err])
+				return result
+			result.preview_written = true
+		else:
+			result.preview_unchanged = true
 
-	# --- metadata sidecar ---
 	if not request.metadata_path.is_empty():
-		result.metadata_dict = _build_metadata(request, level, palette.size())
-		var meta_json := _serialize_json(result.metadata_dict)
-		var meta_err := _write_text(request.metadata_path, meta_json)
-		if meta_err != OK:
-			result.add_error("Could not write metadata '%s' (error %d)" % [request.metadata_path, meta_err])
-			return result
-		result.metadata_written = true
+		if metadata_action == "write":
+			var meta_err := _write_text(request.metadata_path, result.metadata_json_text)
+			if meta_err != OK:
+				result.add_error("Could not write metadata '%s' (error %d)" % [request.metadata_path, meta_err])
+				return result
+			result.metadata_written = true
+		else:
+			result.metadata_unchanged = true
 
 	return result
 
 ## Reconstruct an RGBA8 Image from LevelData alone (no source shortcut).
 static func reconstruct_image(level) -> Image:
+	if level == null:
+		return null
+	if level.width <= 0 or level.height <= 0:
+		return null
+	if level.palette.is_empty():
+		return null
+	if level.cells.size() != level.width * level.height:
+		return null
+
 	var colors: Array[Color] = []
 	for hex in level.palette:
-		if not Color.html_is_valid(hex):
+		if typeof(hex) != TYPE_STRING or not Color.html_is_valid(hex):
 			return null
 		colors.append(Color.html(hex))
+
+	for pid in level.cells:
+		if pid < 0 or pid >= colors.size():
+			return null
 
 	var img := Image.create(level.width, level.height, false, Image.FORMAT_RGBA8)
 	for y in level.height:
 		for x in level.width:
 			var idx: int = y * level.width + x
-			var pid: int = level.cells[idx]
-			if pid < 0 or pid >= colors.size():
-				return null
-			img.set_pixel(x, y, colors[pid])
+			img.set_pixel(x, y, colors[level.cells[idx]])
 	return img
 
 ## Auto-detect difficulty from dimensions. Returns difficulty string or empty
@@ -237,6 +307,42 @@ static func generate_test_png(width: int, height: int, color_count: int = 4, inc
 			var idx := (y * width + x) % colors.size()
 			img.set_pixel(x, y, colors[idx])
 	return img
+
+# --- path safety helpers ---
+
+static func _canonical_path(p: String) -> String:
+	var resolved := p
+	if resolved.begins_with("res://"):
+		resolved = ProjectSettings.globalize_path(resolved)
+	elif resolved.begins_with("user://"):
+		resolved = ProjectSettings.globalize_path(resolved)
+	resolved = resolved.replace("\\", "/")
+	# Windows: case-insensitive filesystem
+	if OS.get_name() == "Windows":
+		resolved = resolved.to_lower()
+	return resolved
+
+static func _check_path_aliases(request: ImportRequest) -> String:
+	var src := _canonical_path(request.source_path)
+	var out := _canonical_path(request.output_path)
+	var paths: Array[Array] = [["source", src], ["output", out]]
+	if not request.preview_path.is_empty():
+		paths.append(["preview", _canonical_path(request.preview_path)])
+	if not request.metadata_path.is_empty():
+		paths.append(["metadata", _canonical_path(request.metadata_path)])
+
+	# Source must never be a write destination
+	for i in range(1, paths.size()):
+		if paths[i][1] == src:
+			return "%s path '%s' aliases source — source must remain immutable" % [paths[i][0], request.source_path]
+
+	# All destination paths must be pairwise distinct
+	for i in range(1, paths.size()):
+		for j in range(i + 1, paths.size()):
+			if paths[i][1] == paths[j][1]:
+				return "%s path aliases %s path — all destinations must be distinct" % [paths[i][0], paths[j][0]]
+
+	return ""
 
 # --- private helpers ---
 

@@ -184,3 +184,174 @@ None. All SB-M09-001..017 implemented as specified. SB-M09-018..020 left open pe
 ### Blockers
 
 None.
+
+## Session 2 — 2026-08-28 (V02 Correction Pass)
+
+### Environment
+
+- Branch: main
+- Starting commit: 7634ec9 (synced with origin/main after ChatGPT audit merge)
+- Godot: 4.7.1.stable.official.a13da4feb
+- Baseline tests: 286/286 (verified before changes)
+
+### Coordination sources read
+
+- `CLAUDE.md` (project operating manual)
+- `tasks.md` (canonical task ledger)
+- `coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md` (CHANGES_REQUIRED, 4 findings)
+- `coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V02.md` (12 pass/fail criteria)
+- `coordination/sessions/M09-C001/CHATGPT_PROMPT_V02.md` (active correction prompt V02)
+- `coordination/AUDIT_INDEX.md` (AL-001..012)
+- `docs/03_LEVEL_DATA_SPEC.md`, `docs/06_TEST_STRATEGY.md`
+
+### Audit findings closed
+
+| Finding | How closed |
+|---------|------------|
+| F-M09-001 | Added `_canonical_path()` (resolves `res://`/`user://`, normalizes backslashes, case-folds on Windows) and `_check_path_aliases()` preflight. Source immutable even with `overwrite=true`. 7 tests verify all alias combinations with source byte preservation. |
+| F-M09-002 | Restructured write section: build all artifacts in memory first, preflight ALL destinations for overwrite/collision before writing ANY. Added `preview_unchanged` and `metadata_unchanged` result flags. 4 tests cover existing-different rejection and identical-unchanged detection. |
+| F-M09-003 | Added PNG-only gate before image load: rejects non-`.png` extensions with "Unsupported source format" error. 3 tests: valid JPEG rejected (format), corrupt .png rejected (decode), .PNG accepted (case-insensitive). |
+| F-M09-004 | Hardened `reconstruct_image()`: null check, dimension check (<=0), empty palette, `typeof(hex) != TYPE_STRING or not Color.html_is_valid(hex)`, cells.size() != width*height, pre-scan all cells for valid palette IDs. Returns null cleanly. 5 tests. |
+
+### Audit learnings applied
+
+| ID | How applied |
+|----|-------------|
+| AL-009 | Every mandatory validation step individually recorded below with expected/actual/classification. |
+| AL-010 | `_canonical_path()` resolves `res://`, `user://`, normalizes separators, case-folds on Windows. Source-to-destination and destination-to-destination aliases detected. |
+| AL-011 | JPEG format test uses runtime-generated valid JPEG (via `save_jpg`), proving "unsupported format" rejection is distinct from corrupt-file rejection. |
+| AL-012 | Multi-artifact preflight: all three destinations (output, preview, metadata) checked before any write. Collision on preview/metadata does not leave partial Level JSON. |
+
+### Files modified
+
+- `scripts/tools/level_importer.gd` — Added `_canonical_path()`, `_check_path_aliases()`, PNG-only gate, preflight-before-write restructure, `preview_unchanged`/`metadata_unchanged`/`metadata_json_text` result fields, hardened `reconstruct_image()`. ~340 lines total.
+- `tools/import_level.gd` — Added `preview_unchanged` and `metadata_unchanged` CLI output reporting.
+- `tests/run_tests.gd` — 34 new safety checks (7 path alias, 4 preview/metadata overwrite, 1 overwrite=true multi-artifact, 3 PNG format gate, 5 reconstruction safety, 14 prior regression). Total: 320.
+- `tasks.md` — SB-M09-017 updated with corrected V02 evidence.
+- `docs/03_LEVEL_DATA_SPEC.md` — Added PNG-only gate, source immutability, multi-artifact preflight, reconstruction safety contract.
+- `docs/06_TEST_STRATEGY.md` — Updated total to 320, added V02 safety test coverage section.
+- `CHANGELOG.md` — Added V02 correction pass entry.
+
+### Failures and debugging history
+
+- **3 test failures on first run**: metadata unchanged tests used `output_path = "ident_meta.json"` and `metadata_path = "ident_meta.json"` — same path. The new path alias safety correctly rejected this as output==metadata alias. Fixed by using distinct paths: `ident_meta_out.json` for output and `ident_meta_sidecar.json` for metadata.
+- **5 GDScript parse errors** (prior to first run): Variant type inference from lambda `.call()` and untyped `level_data`. Fixed with explicit type annotations.
+- After fixes: 320/320 ALL PASS on first clean run.
+
+### Mandatory validation sequence
+
+#### Step 1: `godot --version`
+
+- Expected: 4.7.x
+- Actual: `4.7.1.stable.official.a13da4feb`
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 2: `powershell -File tools\verify_project.ps1`
+
+- Expected: All OK, exit 0
+- Actual: `[OK] project.godot exists`, `[OK] main scene exists`, `[OK] headless Godot run produced no error/failed-to-load output`, exit 0
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 3: `godot --headless --path . --quit-after 5`
+
+- Expected: Clean exit, no SCRIPT ERROR
+- Actual: Clean exit, no errors
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 4: `godot --headless --path . -s res://tests/run_tests.gd`
+
+- Expected: 320 checks, 0 failures
+- Actual: `Total checks: 320, Failures: 0, RESULT: ALL PASS`
+- Performance: 59×59 import 6.161 ms, reconstruction 0.609 ms
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 5: Real CLI successful import: 3×2 TEST
+
+- Command: `godot --headless --path . -s res://tools/import_level.gd -- --source test_3x2.png --id cli_3x2 --name "CLI 3x2" --difficulty TEST --output cli_3x2.json --preview cli_3x2_preview.png --metadata cli_3x2_meta.json`
+- Actual: `WRITTEN: cli_3x2.json`, `PREVIEW: cli_3x2_preview.png`, `METADATA: cli_3x2_meta.json`, `OK: 3x2, 4 colors, 6 cells, difficulty=TEST`
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 6: Real CLI successful import: 20×27 EASY
+
+- Command: `godot --headless --path . -s res://tools/import_level.gd -- --source test_20x27.png --id cli_20x27 --name "CLI 20x27" --difficulty EASY --output cli_20x27.json --preview cli_20x27_preview.png`
+- Actual: `WRITTEN: cli_20x27.json`, `PREVIEW: cli_20x27_preview.png`, `OK: 20x27, 5 colors, 540 cells, difficulty=EASY`
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 7: Real CLI successful import: 59×59 VERY_HARD
+
+- Command: `godot --headless --path . -s res://tools/import_level.gd -- --source test_59x59.png --id cli_59x59 --name "CLI 59x59" --difficulty VERY_HARD --output cli_59x59.json --preview cli_59x59_preview.png`
+- Actual: `WRITTEN: cli_59x59.json`, `PREVIEW: cli_59x59_preview.png`, `OK: 59x59, 8 colors, 3481 cells, difficulty=VERY_HARD`
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 8: Real CLI valid non-PNG rejection
+
+- Command: `godot --headless --path . -s res://tools/import_level.gd -- --source test.jpg --id cli_jpg --name "CLI JPG" --difficulty TEST --output cli_jpg.json`
+- Actual: `ERROR: Unsupported source format 'test.jpg'. Only .png is supported in M09-C001`, exit 1
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 9: Real CLI source/path-alias rejection
+
+- Command: `godot --headless --path . -s res://tools/import_level.gd -- --source test_3x2.png --id cli_alias --name "CLI Alias" --difficulty TEST --output test_3x2.png`
+- Actual: `ERROR: output path 'test_3x2.png' aliases source — source must remain immutable`, exit 1
+- Source bytes unchanged after rejection: verified
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 10: Deterministic rerun/no-change behavior
+
+- 3×2: `UNCHANGED: cli_3x2.json (content identical)`, `PREVIEW UNCHANGED: cli_3x2_preview.png`, `METADATA UNCHANGED: cli_3x2_meta.json` — **CLAUDE_TEST_PASS**
+- 20×27: `UNCHANGED: cli_20x27.json (content identical)`, `PREVIEW UNCHANGED: cli_20x27_preview.png` — **CLAUDE_TEST_PASS**
+- 59×59: `UNCHANGED: cli_59x59.json (content identical)`, `PREVIEW UNCHANGED: cli_59x59_preview.png` — **CLAUDE_TEST_PASS**
+
+#### Step 11: Reconstruction raw RGBA8 byte equality
+
+- 3×2: `PASS: raw RGBA8 bytes match (24 bytes, 3x2)` — **CLAUDE_TEST_PASS**
+- 20×27: `PASS: raw RGBA8 bytes match (2160 bytes, 20x27)` — **CLAUDE_TEST_PASS**
+- 59×59: `PASS: raw RGBA8 bytes match (13924 bytes, 59x59)` — **CLAUDE_TEST_PASS**
+
+#### Step 12: Malformed reconstruction safety checks
+
+- Short cells → null: **CLAUDE_TEST_PASS**
+- Out-of-range palette ID → null: **CLAUDE_TEST_PASS**
+- Invalid palette string → null: **CLAUDE_TEST_PASS**
+- Zero dimensions → null: **CLAUDE_TEST_PASS**
+- Null level → null: **CLAUDE_TEST_PASS**
+
+#### Step 13: `git diff --check`
+
+- Expected: No whitespace errors
+- Actual: Clean (only standard LF→CRLF warnings, non-blocking)
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 14: Inspect `git diff`
+
+- `scripts/tools/level_importer.gd`: +103/-8 (path safety, PNG gate, preflight restructure, reconstruction hardening)
+- `tools/import_level.gd`: +4/-0 (preview/metadata unchanged output)
+- `tests/run_tests.gd`: +208/-21 (34 new safety checks, test fixes for alias safety)
+- No unintended changes
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 15: `git status --short` before commit
+
+- Modified: `scripts/tools/level_importer.gd`, `tests/run_tests.gd`, `tools/import_level.gd`
+- Plus docs/CHANGELOG/tasks/coordination updates (this commit)
+- No secrets, no `.godot/`, no Desktop phase log
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Steps 16-18: Commit, push, final status
+
+- Pending (this entry written pre-commit; will be updated with final commit SHA and push result)
+
+### Prompt deviations
+
+None. All six required corrections implemented. All 20 required test additions covered by 34 new checks. All 18 mandatory validation steps executed.
+
+### Remaining gates
+
+- SB-M09-018..020 (batch import) deferred to M09-C002.
+- M08 remains `BLOCKED_ON_OWNER_ASSET`.
+- M10 DIRTY/CLEAN preset remains `OWNER_REQUIRED`.
+- M09-C001 set to `AWAITING_AUDIT` for ChatGPT audit V02.
+
+### Blockers
+
+None.

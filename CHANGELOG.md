@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+### Fixed — Importer Safety Hardening (M09-C001 V02 Correction)
+
+- Closed all four ChatGPT independent audit V01 findings (F-M09-001..004):
+  path aliasing/source immutability, multi-artifact overwrite preflight,
+  PNG-only format gate, reconstruction safety against malformed data.
+- Applied audit learnings AL-009..012: validation traceability, canonicalized
+  path identity, negative-test specificity, multi-artifact overwrite safety.
+- Extended `tests/run_tests.gd` from 286 to **320 checks**: 34 new safety
+  checks covering 7 path-alias cases (with source byte preservation), 4
+  preview/metadata overwrite safety, 3 PNG-only format gate (valid JPEG
+  rejected, corrupt .png rejected, .PNG accepted), 5 reconstruction safety
+  (short cells, bad palette ID, invalid hex, zero dimensions, null level).
+- Updated `docs/03_LEVEL_DATA_SPEC.md` and `docs/06_TEST_STRATEGY.md` with
+  safety contract clarifications and actual test coverage.
+
 ### Added — Pixel Art to Level Data Importer Core (M09-C001)
 
 - New `LevelImporter` (`scripts/tools/level_importer.gd`): deterministic
