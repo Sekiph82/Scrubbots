@@ -30,12 +30,12 @@ This file is the single H!veAI-facing materialized project status and latest-ses
 | Current implementation frontier | M07 - Visual Reference Library |
 | Current task | M07-C001 - Visual Reference Library foundation + asset availability audit |
 | Current task ID | `M07-C001` |
-| Current workflow state | PLANNED - V03 active; awaiting Claude implementation + self-audit |
+| Current workflow state | AWAITING_AUDIT - Claude implementation + self-audit complete; awaiting ChatGPT independent audit |
 | Last established code baseline | Phase M06: 227/227 headless checks PASS at `abd9ceb` |
 | Verification rule | Future Claude-run results are provisional self-evidence until ChatGPT independent audit |
 | Open design gate | M10 DIRTY/CLEAN final preset selection |
-| Required actor | CLAUDE |
-| Next project action | Claude reads V03 + audit criteria + audit policy/index, applies prior audit learnings, implements M07 scope, writes implementation log and self-audit, then hands back as `AWAITING_AUDIT` |
+| Required actor | CHATGPT |
+| Next project action | ChatGPT reads implementation log + self-audit V01 against audit criteria V01, performs independent audit, publishes CHATGPT_AUDIT_V01.md |
 | Waiting on | Owner-approved artwork remains required for asset-specific M07 inventory tasks; infrastructure work can proceed |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -43,28 +43,26 @@ This file is the single H!veAI-facing materialized project status and latest-ses
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-27T12:04:00+03:00 |
-| Actor | CHATGPT |
+| Timestamp | 2026-08-27T10:30:00+03:00 |
+| Actor | CLAUDE |
 | Cycle | `M07-C001` |
-| Session type | Prompt revision + audit-criteria publication |
-| Cycle status | PLANNED |
-| Milestone/task impact | No task checkbox changed; verification protocol strengthened before Claude implementation |
-| Summary | Published M07-C001 V03 and explicit pre-implementation audit criteria. Claude must treat its own tests as provisional, read prior audit learnings, create a requirement-level self-audit, compare current results against prior audited baselines, and hand work to ChatGPT for independent PASS/FAIL judgment. |
+| Session type | Implementation + self-audit |
+| Cycle status | AWAITING_AUDIT |
+| Milestone/task impact | 10 M07 infrastructure tasks marked [x] with validation evidence (SB-M07-001..007, 015..017). 7 asset tasks remain [ ] AWAITING OWNER ASSET (SB-M07-008..014). No other milestones changed. |
+| Summary | Implemented M07 Visual Reference Library infrastructure: directory structure, human-readable reference guide, machine-readable inventory (9 entries, 7 MISSING with null paths, 1 TEXT_ONLY, 1 PRESENT), tasks.md updated. Applied AL-005/006/007. Regression: 227/227 PASS (unchanged). Self-audit V01 covers 14 requirement checks, all SELF_PASS. No fabrication, no scope creep, no M10 gate violation. |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V03.md |
 | Audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
-| Audit policy | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md |
-| Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
-| Expected Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md |
-| Expected Claude self-audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_SELF_AUDIT_V01.md |
+| Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md |
+| Claude self-audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_SELF_AUDIT_V01.md |
 | Expected ChatGPT independent audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md |
-| Next expected actor | CLAUDE |
+| Next expected actor | CHATGPT |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M07-C001 | Visual Reference Library foundation + asset availability audit | PLANNED | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V03.md |
-| M07 | Visual Reference Library | NOT_STARTED / awaiting implementation evidence | CLAUDE + HUMAN for asset-specific tasks | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
+| M07-C001 | Visual Reference Library foundation + asset availability audit | AWAITING_AUDIT | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_SELF_AUDIT_V01.md |
+| M07 | Visual Reference Library | PARTIAL — infrastructure done, assets AWAITING OWNER | CHATGPT (audit) + HUMAN (assets) | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M10 | DIRTY/CLEAN Visual Approval | OWNER_REQUIRED | HUMAN | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M05 | Test Harness Maturity | PARTIAL | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -90,7 +88,7 @@ Claude must read the audit index before each material implementation/self-audit 
 
 | Cycle | Milestone | Status | Last actor | Summary | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| `M07-C001` | M07 | PLANNED | CHATGPT | V03 active; audit criteria published; awaiting Claude implementation/self-audit. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/SESSION_INDEX.md |
+| `M07-C001` | M07 | AWAITING_AUDIT | CLAUDE | Implementation + self-audit V01 complete. 10/17 tasks provisionally validated. 227/227 regression PASS. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/SESSION_INDEX.md |
 | `META-C001` | META | AUDITED_PASS | CHATGPT | Established repository-native ChatGPT<->Claude coordination and H!veAI synchronization. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md |
 
 ## Coordination source map
@@ -144,7 +142,7 @@ Never duplicate the full `tasks.md` checklist here.
 | M04 | Expanded Board Fixtures & Test Matrix | COMPLETE |
 | M05 | Test Harness Maturity | PARTIAL |
 | M06 | Board Renderer | COMPLETE |
-| M07 | Visual Reference Library | NOT_STARTED / M07-C001 V03 issued |
+| M07 | Visual Reference Library | PARTIAL — infrastructure complete, assets awaiting owner |
 | M08-M55 | Remaining milestones | NOT_STARTED |
 
 ## Quality baseline

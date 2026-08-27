@@ -584,23 +584,23 @@ correction. Render `BoardState` efficiently, never one Node per cell.
 
 ### M07 — Visual Reference Library `[VISUAL REFERENCE]`
 
-- [ ] SB-M07-001 Establish reference directory structure (9.6).
-- [ ] SB-M07-002 Create visual-reference README/guide.
-- [ ] SB-M07-003 Separate original SCRUBBOTS art from external inspiration.
-- [ ] SB-M07-004 Define canonical asset naming.
-- [ ] SB-M07-005 Define asset type metadata.
-- [ ] SB-M07-006 Define owner-approved status.
-- [ ] SB-M07-007 Preserve source file originals.
-- [ ] SB-M07-008 Inventory Scrubbot character visuals supplied by owner. **AWAITING OWNER ASSET.**
-- [ ] SB-M07-009 Inventory gameplay-screen references supplied by owner. **AWAITING OWNER ASSET.**
-- [ ] SB-M07-010 Inventory five-slot visual references. **AWAITING OWNER ASSET.**
-- [ ] SB-M07-011 Inventory level images. **AWAITING OWNER ASSET.**
-- [ ] SB-M07-012 Inventory underwater level artwork if supplied. **AWAITING OWNER ASSET.**
-- [ ] SB-M07-013 Inventory other original theme artwork. **AWAITING OWNER ASSET.**
-- [ ] SB-M07-014 Inventory pixel-construction reference screenshots. **AWAITING OWNER ASSET.**
-- [ ] SB-M07-015 Inventory external movement references separately.
-- [ ] SB-M07-016 Flag previously discussed but unavailable assets as `AWAITING OWNER ASSET` (done above, pending real files).
-- [ ] SB-M07-017 Never regenerate missing references and label them originals.
+- [x] SB-M07-001 Establish reference directory structure (9.6). Validated: directory tree created per §9.6, verified via `find assets/art -type d`.
+- [x] SB-M07-002 Create visual-reference README/guide. Validated: `assets/art/references/README.md` created with authority hierarchy, source classes, approval semantics, naming, preservation, intake, M08 boundary, M10 gate.
+- [x] SB-M07-003 Separate original SCRUBBOTS art from external inspiration. Validated: directory structure and inventory.json separate `OWNER_ORIGINAL`/`OWNER_REFERENCE` from `EXTERNAL_INSPIRATION`; Colony Flow recorded as text-only provenance.
+- [x] SB-M07-004 Define canonical asset naming. Validated: naming rules defined in README.md (lowercase, underscores, cross-platform safe, original filenames preserved).
+- [x] SB-M07-005 Define asset type metadata. Validated: inventory.json schema with id, category, sourceClass, approvalStatus, availabilityStatus, repositoryPath, originalFilename, intendedUse, width, height, candidateDifficulty, notes.
+- [x] SB-M07-006 Define owner-approved status. Validated: four approval states (APPROVED, SUPPLIED_NOT_APPROVED, AWAITING_OWNER_ASSET, UNVERIFIED) defined in README.md and used in inventory.json.
+- [x] SB-M07-007 Preserve source file originals. Validated: immutable-source-original policy defined in README.md; derived outputs must be separate files.
+- [ ] SB-M07-008 Inventory Scrubbot character visuals supplied by owner. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
+- [ ] SB-M07-009 Inventory gameplay-screen references supplied by owner. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
+- [ ] SB-M07-010 Inventory five-slot visual references. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
+- [ ] SB-M07-011 Inventory level images. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
+- [ ] SB-M07-012 Inventory underwater level artwork if supplied. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
+- [ ] SB-M07-013 Inventory other original theme artwork. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
+- [ ] SB-M07-014 Inventory pixel-construction reference screenshots. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
+- [x] SB-M07-015 Inventory external movement references separately. Validated: Colony Flow recorded as TEXT_ONLY `EXTERNAL_INSPIRATION` entry in inventory.json with non-copying provenance note.
+- [x] SB-M07-016 Flag previously discussed but unavailable assets as `AWAITING OWNER ASSET`. Validated: all 7 missing categories (SB-M07-008..014) flagged AWAITING_OWNER_ASSET in both tasks.md and inventory.json.
+- [x] SB-M07-017 Never regenerate missing references and label them originals. Validated: prohibition documented in README.md; no fabricated assets created.
 
 ### M08 — Level Art Technical Audit `[CONTENT] [VISUAL REFERENCE]`
 
