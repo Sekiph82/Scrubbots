@@ -183,3 +183,54 @@ touching level data, slot logic, cell state, scoring, or rendering.
 - Only stop and ask when proceeding would risk destroying user work,
   exposing secrets, adding a paid dependency, or making an irreversible
   choice that contradicts the spec docs.
+
+## 7. GitHub coordination protocol
+
+The repository now has a versioned ChatGPT↔Claude communication layer under
+`coordination/`. This **adds** durable GitHub handoff evidence; it does not
+replace `tasks.md` or the local Desktop phase log.
+
+37. Before any material implementation session, read in this order after
+    reading this file: `tasks.md`, `.hiveai/PROJECT_DASHBOARD.md`,
+    `coordination/README.md`, `coordination/SESSION_INDEX.md`, then every
+    prompt/audit/owner-note artifact in the active coordination cycle in
+    version order, followed by the relevant `docs/` sources.
+38. Every scoped ChatGPT→Claude handoff has one stable coordination cycle ID
+    such as `M07-C001`. Do not create a new cycle merely because Claude Code
+    or chat restarted. Continue the same cycle until it reaches
+    `AUDITED_PASS`, `BLOCKED`, `SUPERSEDED`, or an explicitly defined end.
+39. ChatGPT prompt files (`CHATGPT_PROMPT_VNN.md`) and ChatGPT audit files
+    (`CHATGPT_AUDIT_VNN.md`) are evidence artifacts. Claude must **never
+    rewrite them** to make later implementation appear compliant. If an
+    audit requires changes, wait for/read the next prompt version in the
+    same cycle.
+40. For every cycle with Claude implementation work, create or append to
+    `coordination/sessions/<CYCLE_ID>/CLAUDE_IMPLEMENTATION_LOG.md`. Keep it
+    append-only across multiple Claude sessions. Record starting/ending
+    commits, files, commands/tests, failures and fixes, performance evidence,
+    prompt deviations, task/doc changes, push/PR state, blockers, and the
+    handoff state. Do not erase failure history after fixing it.
+41. The GitHub implementation log and Desktop phase log are both required
+    and serve different purposes: the Desktop phase log is the detailed,
+    crash-safe local phase journal; the GitHub implementation log is durable
+    communication evidence for ChatGPT/H!veAI/owner review. Never commit the
+    Desktop phase log.
+42. Before ending any **material** Claude session, update both
+    `coordination/SESSION_INDEX.md` and `.hiveai/PROJECT_DASHBOARD.md`.
+    Dashboard updates must include timestamp, actor, cycle ID/status,
+    milestone/task refs, concise summary, evidence, blocker/waiting state,
+    and next expected actor/action. `tasks.md` remains the only canonical
+    task ledger; never duplicate its checkbox list in the dashboard.
+43. When implementation is ready for review, set the cycle state to
+    `AWAITING_AUDIT`. Do not mark a cycle `AUDITED_PASS` yourself; that state
+    is reserved for the ChatGPT audit step unless the owner explicitly
+    changes the protocol.
+44. Never commit secrets or sensitive environment values to coordination
+    artifacts. Prompts/logs/audits may reference secret **names** or masked
+    evidence when needed, never secret values.
+45. Use templates under `coordination/templates/` when creating new prompt,
+    audit, or implementation-log artifacts. If the template and a newer
+    explicit owner instruction conflict, the owner instruction wins and the
+    deviation should be recorded.
+
+Full protocol: `coordination/README.md`.
