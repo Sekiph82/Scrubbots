@@ -27,41 +27,59 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | --- | --- |
 | Project status | ACTIVE |
 | Health | HEALTHY |
-| Current implementation frontier | M07 - Visual Reference Library |
-| Current task | M07-C001 closed; owner visual assets required for remaining M07 asset tasks |
-| Current task ID | NONE |
-| Current workflow state | `AUDITED_PASS` - M07-C001 coordination cycle closed by ChatGPT audit V02 |
-| Required actor | HUMAN |
-| Next project action | Owner supplies original/approved SCRUBBOTS visual assets for SB-M07-008..014. A new scoped ChatGPT prompt/cycle should be issued before further Claude implementation. |
-| Waiting on | Owner-approved artwork remains required for SB-M07-008..014; M10 final DIRTY/CLEAN preset remains owner-controlled. |
+| Current implementation frontier | M09 - Pixel Art to Level Data Pipeline |
+| Current task | M09-C001 - deterministic exact-pixel PNG importer core |
+| Current task ID | `M09-C001` |
+| Current workflow state | `PLANNED` - ChatGPT prompt V01 and audit criteria V01 published; Claude has not started |
+| Required actor | CLAUDE |
+| Next project action | Claude safely syncs `origin/main`, reads M09-C001 prompt V01, audit criteria V01, M07 audit V02, and AUDIT_INDEX, then implements/tests/logs the importer core and returns `AWAITING_AUDIT`. |
+| Waiting on | M08 production-art audit and remaining M07 asset inventory tasks still require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
 ## Latest session summary
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-27T16:40:00+03:00 |
+| Timestamp | 2026-08-27T17:05:00+03:00 |
 | Actor | CHATGPT |
-| Cycle | `M07-C001` |
-| Session type | Independent audit V02 |
-| Cycle status | `AUDITED_PASS` |
-| Milestone/task impact | No task checkbox changes. SB-M07-001..007 and 015..017 remain complete; SB-M07-008..014 remain open `AWAITING OWNER ASSET`. M07 remains PARTIAL. |
-| Summary | Independently reviewed the V04 correction diff, corrected inventory metadata, Claude Session 2 implementation log, Session Index, and coordination scope. F-M07-001 and F-M07-002 are closed. Correction diff touched only inventory metadata plus coordination/log files. Godot runtime results remain Claude-run evidence, but no gameplay/test code changed in the correction. Cycle M07-C001 is AUDITED_PASS. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md |
-| Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md |
+| Cycle | `M09-C001` |
+| Session type | Prompt issuance + pre-published audit criteria |
+| Cycle status | `PLANNED` |
+| Milestone/task impact | No task checkbox changes. M09-C001 targets SB-M09-001..017 using TEST-generated PNG fixtures. SB-M09-018..020 are deferred. M08 remains open because no candidate production artwork exists. |
+| Summary | Issued the next actionable tooling cycle without pretending M08 can run without owner art. M09-C001 will build an exact-pixel deterministic PNG -> Level Data V1 importer, reconstruction/pixel round-trip, preview generation, deterministic rerun behavior, negative tests, and 59x59 coverage. Claude implements/tests/logs only; ChatGPT will audit after handoff. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V01.md |
+| Audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
+| Prior independent audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md |
+| Expected Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md |
 | Audit policy | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md |
 | Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
-| Next expected actor | HUMAN |
+| Next expected actor | CLAUDE |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M07-C001 | Visual Reference Library foundation + audit corrections | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md |
+| M09-C001 | Exact-pixel importer core | `PLANNED` | CLAUDE then CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V01.md |
+| M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art; Claude audits after scoped prompt | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M07 | Visual Reference Library | PARTIAL - infrastructure audited; owner assets still missing | HUMAN for asset-specific tasks | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M10 | DIRTY/CLEAN Visual Approval | `OWNER_REQUIRED` | HUMAN | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M05 | Test Harness Maturity | PARTIAL | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
+
+## M09-C001 scope contract
+
+- Source inputs in this cycle are deterministic TEST-generated PNG fixtures only.
+- One source RGBA pixel equals one logical cell.
+- No resize, resample, interpolation, crop, pad, square coercion, palette reduction, or source overwrite.
+- Palette order is deterministic first-seen row-major order.
+- Cells use canonical `index = y * width + x`.
+- Output is existing Level Data V1, not a new schema.
+- Reconstruction must match raw RGBA8 source bytes exactly.
+- TEST vs production difficulty remains explicit and uses existing validators/rules.
+- Batch import/validation and catalog-wide duplicate-ID protection are deferred to M09-C002.
+- M08 remains open; no real-art audit/import claim is allowed.
+
+Audit criteria:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V01.md
 
 ## Audit model
 
@@ -85,22 +103,21 @@ Canonical audit sources:
 - Claude implementation-log template: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/templates/CLAUDE_IMPLEMENTATION_LOG_TEMPLATE.md
 - ChatGPT audit template: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/templates/CHATGPT_AUDIT_TEMPLATE.md
 
-## M07 audit closure
+## Active audit learnings relevant to M09-C001
 
-| Finding | Audit V01 | Audit V02 |
-| --- | --- | --- |
-| `F-M07-001` unsupported Akilta `originalFilename` | `CHANGES_REQUIRED` | `AUDITED_PASS` - corrected to `null` |
-| `F-M07-002` missing validation traceability | `CHANGES_REQUIRED` | `AUDITED_PASS` - full V04 sequence individually logged |
-
-Reusable learnings remain active:
-
-- `AL-008` metadata provenance: unknown metadata stays null/unverified without owner/repository evidence.
-- `AL-009` validation traceability: every required command is logged individually; aggregate green counts do not substitute for omitted checks.
+- `AL-001`: preserve headless-safe explicit preload discipline where relevant.
+- `AL-003`: headless CPU timing is not GPU/FPS evidence.
+- `AL-004`: rectangular and maximum-size checks catch hidden fixed-size assumptions.
+- `AL-005`: file existence is not task completion evidence.
+- `AL-006`: missing owner art cannot be fabricated.
+- `AL-008`: unknown metadata stays null/unverified without evidence.
+- `AL-009`: every required validation command/check is individually traceable in Claude's implementation log.
 
 ## Recent coordination cycles
 
 | Cycle | Milestone | Status | Last actor | Summary | Evidence |
 | --- | --- | --- | --- | --- | --- |
+| `M09-C001` | M09 | `PLANNED` | CHATGPT | Importer core prompt + audit criteria issued. Claude is next. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V01.md |
 | `M07-C001` | M07 | `AUDITED_PASS` | CHATGPT | Audit V02 closed both V01 findings. M07 infrastructure cycle complete; owner asset tasks remain open. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md |
 | `META-C001` | META | `AUDITED_PASS` | CHATGPT | Established repository-native ChatGPT/Claude coordination and H!veAI synchronization. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md |
 
@@ -124,6 +141,7 @@ H!veAI actively watches only this dashboard. ChatGPT/Claude materialize relevant
 | Architecture | https://github.com/Sekiph82/Scrubbots/blob/main/docs/02_TECH_ARCHITECTURE.md |
 | Technical decisions | https://github.com/Sekiph82/Scrubbots/blob/main/docs/05_TECH_DECISIONS.md |
 | Gameplay specification | https://github.com/Sekiph82/Scrubbots/blob/main/docs/01_GAMEPLAY_SPEC.md |
+| Level Data V1 | https://github.com/Sekiph82/Scrubbots/blob/main/docs/03_LEVEL_DATA_SPEC.md |
 | Test strategy | https://github.com/Sekiph82/Scrubbots/blob/main/docs/06_TEST_STRATEGY.md |
 
 ## Single-dashboard synchronization contract
@@ -155,13 +173,15 @@ Never duplicate the full `tasks.md` checklist here.
 | M05 | Test Harness Maturity | PARTIAL |
 | M06 | Board Renderer | COMPLETE |
 | M07 | Visual Reference Library | PARTIAL - infrastructure audited, asset tasks awaiting owner |
-| M08-M55 | Remaining milestones | NOT_STARTED |
+| M08 | Level Art Technical Audit | BLOCKED_ON_OWNER_ASSET |
+| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS via M09-C001 tooling cycle |
+| M10-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 
 ## Quality baseline
 
-- Last established gameplay code milestone before M07: Phase M06, 227/227 checks PASS at `abd9ceb`.
-- Claude reported 227/227 during the M07 V04 correction pass. ChatGPT did not independently execute the local Godot binary and therefore records that runtime result as Claude-run evidence, not independent execution proof.
-- ChatGPT independently verified that the V04 correction diff does not modify gameplay or test code and that the two audit findings concern metadata and validation traceability only.
+- Last established gameplay code milestone before M09: Phase M06, 227/227 checks PASS at `abd9ceb`.
+- M07-C001 is `AUDITED_PASS`; its final correction did not modify gameplay/test code.
+- Claude must run the full M09-C001 validation sequence and report the actual new regression count. ChatGPT will independently inspect repository/test evidence after handoff.
 
 ## Dashboard integrity rules
 
