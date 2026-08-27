@@ -2,6 +2,16 @@
 
 ## Unreleased
 
+### Added — GitHub coordination bus + H!veAI session tracking (META-C001)
+
+- Added `coordination/README.md` as the durable ChatGPT↔Claude communication protocol while keeping `tasks.md` as the sole canonical task ledger.
+- Added `coordination/SESSION_INDEX.md` to index stable coordination cycles such as `M07-C001` without duplicating task checkboxes.
+- Added versioned templates for ChatGPT implementation prompts and audits plus an append-only Claude implementation log template under `coordination/templates/`.
+- Added the first process-only coordination record under `coordination/sessions/META-C001/`, capturing the repository audit and setup instruction that established this system.
+- Upgraded `.hiveai/PROJECT_DASHBOARD.md` from a pointer-only manifest into a source map plus agent-maintained latest-session summary. H!veAI now tracks the dashboard, session index, versioned ChatGPT prompt/audit artifacts, Claude implementation logs, `tasks.md`, and changelog evidence without treating coordination summaries as task truth.
+- Extended `CLAUDE.md` so every material Claude session reads the active coordination cycle, appends GitHub implementation evidence, keeps the existing local Desktop phase log, updates the session index/dashboard, and hands implementation back as `AWAITING_AUDIT` for ChatGPT review.
+- ChatGPT prompt/audit versions are immutable evidence after publication; Claude implementation logs are append-only within a cycle. Audit corrections stay in the same cycle through a new prompt version rather than creating duplicate task truth.
+
 ### Added — BoardRenderer + DIRTY/CLEAN visual prototype (Prompt 04)
 
 - New `BoardRenderer` (`scripts/gameplay/board/board_renderer.gd`, extends
