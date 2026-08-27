@@ -337,9 +337,23 @@ None.
 - No secrets, no `.godot/`, no Desktop phase log
 - Classification: **CLAUDE_TEST_PASS**
 
-#### Steps 16-18: Commit, push, final status
+#### Step 16: Commit
 
-- Pending (this entry written pre-commit; will be updated with final commit SHA and push result)
+- Commit: `84eebef` — `fix: close audit V01 findings — importer safety hardening (M09-C001 V02)`
+- 10 files changed, 565 insertions, 48 deletions
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 17: Push
+
+- Command: `git push origin main`
+- Result: `7634ec9..84eebef  main -> main`
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 18: Final status
+
+- Final commit: https://github.com/Sekiph82/Scrubbots/commit/84eebef
+- `git status --short` after push: clean working tree (only untracked: scratchpad temp, docs/logs/)
+- Classification: **CLAUDE_TEST_PASS**
 
 ### Prompt deviations
 
