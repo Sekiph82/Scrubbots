@@ -26,89 +26,111 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | HEALTHY - V02 corrections complete, awaiting audit V02 |
+| Health | HEALTHY - narrow importer path-safety correction required |
 | Current implementation frontier | M09 - Pixel Art to Level Data Pipeline |
-| Current task | M09-C001 - V02 correction pass complete |
+| Current task | M09-C001 - filesystem identity correction V03 |
 | Current task ID | `M09-C001` |
-| Current workflow state | `AWAITING_AUDIT` - Claude closed all four audit V01 findings (F-M09-001..004), 320/320 tests pass |
-| Required actor | CHATGPT |
-| Next project action | ChatGPT audit V02 against criteria V02. If AUDITED_PASS, M09-C002 can begin (batch import). |
-| Waiting on | M08 production-art audit and remaining M07 asset inventory tasks still require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
+| Current workflow state | `CHANGES_REQUIRED` - ChatGPT audit V02 published; Prompt V03 issued |
+| Required actor | CLAUDE |
+| Next project action | Claude reads Audit V02 + Criteria V03 + Prompt V03, fixes equivalent-path identity normalization, appends tests/evidence to the existing implementation log, updates dashboard/index, and returns `AWAITING_AUDIT`. |
+| Waiting on | M08 production-art audit and remaining M07 visual inventory tasks require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
 ## Latest session summary
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-28T01:30:00+03:00 |
-| Actor | CLAUDE |
+| Timestamp | 2026-08-28T00:02:00+03:00 |
+| Actor | CHATGPT |
 | Cycle | `M09-C001` |
-| Session type | V02 correction implementation (Session 2) |
-| Cycle status | `AWAITING_AUDIT` |
-| Milestone/task impact | SB-M09-001..017 validated with corrected V02 evidence (320/320 tests). SB-M09-018..020 remain open (M09-C002). M08 remains open. |
-| Summary | Closed all four audit V01 findings: F-M09-001 path aliasing/source immutability, F-M09-002 multi-artifact overwrite preflight, F-M09-003 PNG-only format gate, F-M09-004 reconstruction safety. Applied AL-009..012. Added 34 new safety checks (320 total). Updated docs/CHANGELOG/tasks. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V02.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V02.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md |
+| Session type | Independent audit V02 + correction issuance |
+| Cycle status | `CHANGES_REQUIRED` |
+| Milestone/task impact | SB-M09-001..016 remain substantively implemented. SB-M09-017 is not independently closed until equivalent filesystem-path aliases are safely normalized and retested. SB-M09-018..020 remain open. M08 remains open. |
+| Summary | Audit V02 independently reviewed V02 importer safety corrections. PNG-only gate, multi-artifact preflight/unchanged behavior, and malformed reconstruction safety are accepted. Remaining finding F-M09-005: `_canonical_path()` does not simplify `.`/`..` or fully resolve relative-vs-absolute identity, so syntactically different paths may still target the same file and bypass source/artifact alias checks. Prompt V03 and Criteria V03 issued. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V03.md |
+| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md |
 | Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md |
 | Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
-| Next expected actor | CHATGPT |
+| Next expected actor | CLAUDE |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M09-C001 | Exact-pixel importer core + safety corrections | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md |
-| M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art; Claude audits after scoped prompt | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
+| M09-C001 | Exact-pixel importer core + path safety | `CHANGES_REQUIRED` | CLAUDE then CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md |
+| M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M07 | Visual Reference Library | PARTIAL - infrastructure audited; owner assets still missing | HUMAN for asset-specific tasks | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M10 | DIRTY/CLEAN Visual Approval | `OWNER_REQUIRED` | HUMAN | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M05 | Test Harness Maturity | PARTIAL | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
-## M09-C001 independent audit V01
+## M09-C001 audit status
 
-Decision: `CHANGES_REQUIRED`
+### Audit V01
 
-Audit:
 https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md
 
-Correction prompt:
-https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V02.md
+Found four issues:
 
-Correction criteria:
-https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V02.md
+- F-M09-001 source/artifact aliasing;
+- F-M09-002 multi-artifact overwrite safety;
+- F-M09-003 PNG-only format enforcement;
+- F-M09-004 malformed reconstruction safety.
 
-| Finding | Severity | Correction required |
-| --- | --- | --- |
-| F-M09-001 | HIGH | Canonicalize path identity and reject source↔destination / destination↔destination aliases before any write; source must remain immutable even with overwrite=true. |
-| F-M09-002 | HIGH | Apply safe overwrite/preflight semantics to Level JSON, preview, and metadata, not only primary output. |
-| F-M09-003 | MEDIUM | Enforce PNG-only input in reusable importer core and distinguish valid unsupported format from corrupt PNG. |
-| F-M09-004 | MEDIUM | Harden reconstruction against short cells, invalid palette IDs/strings, and invalid dimensions without runtime indexing errors. |
+### Audit V02
 
-Reusable learnings added:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md
 
-- `AL-010`: path alias/source immutability;
-- `AL-011`: negative-test specificity;
-- `AL-012`: multi-artifact overwrite safety.
+Decision: `CHANGES_REQUIRED`.
 
-## M09-C001 behavior that audit confirmed
+V02 independently accepts:
 
-The following remain valid and must not regress during V02:
+- F-M09-002 closed;
+- F-M09-003 closed;
+- F-M09-004 closed;
+- direct/exact-string parts of F-M09-001 improved.
 
-- exact source dimensions for normal PNG import;
+Remaining finding:
+
+- `F-M09-005` - path identity is not fully canonicalized. `.` / `..` and relative-vs-absolute equivalent paths can still compare as different strings while targeting the same filesystem object.
+
+Active correction:
+
+- Prompt V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md
+- Criteria V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V03.md
+
+## Active audit learnings relevant now
+
+- `AL-009`: validation traceability;
+- `AL-010`: import/export path alias and source immutability;
+- `AL-012`: multi-artifact overwrite safety;
+- `AL-013`: filesystem identity normalization, including dot segments and relative-vs-absolute equivalents.
+
+Full index:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
+
+## Behavior already accepted and protected from regression
+
+- exact PNG source dimensions;
 - one RGBA8 source pixel = one logical cell;
-- no resize/resample/crop/pad path;
+- no resize/resample/interpolation/crop/pad;
 - deterministic first-seen row-major palette;
-- canonical `index = y * width + x` cells;
-- existing Level Data V1 schema only;
+- canonical `index = y * width + x`;
+- Level Data V1 output only;
 - DifficultyRules / ProductionLevelValidator authority;
-- TEST vs production split;
-- metadata sidecar remains separate;
-- reconstruction uses generated Level Data, not source shortcut;
-- 3x2, rectangular production-band, 59x59, transparency and repeated-color test coverage;
-- explicit preload discipline;
+- TEST vs production separation;
+- separate source metadata sidecar;
+- reconstruction from generated Level Data, not source shortcut;
+- alpha round-trip;
+- rectangular 20x27 coverage;
+- 59x59 maximum coverage;
+- explicit PNG gate and valid-JPEG rejection;
+- corrupt-PNG distinction;
+- all-artifact overwrite preflight and unchanged detection;
+- malformed reconstruction guards;
 - no owner artwork fabricated or committed.
 
-Claude reported 286/286 tests passing on the initial implementation. ChatGPT did not execute the local Godot binary, so that runtime total remains Claude-run evidence rather than independent execution proof.
+Claude reported 320/320 tests after V02. ChatGPT did not execute the local Godot binary, so that total remains Claude-run implementation evidence rather than independent runtime execution proof.
 
 ## Audit model
 
@@ -117,28 +139,18 @@ Claude reported 286/286 tests passing on the initial implementation. ChatGPT did
 3. Claude does not create audit/self-audit files or assign audit verdicts.
 4. ChatGPT independently audits repository state after handoff.
 5. Only ChatGPT publishes `CHATGPT_AUDIT_VNN.md` and assigns `AUDITED_PASS` / `AUDITED_FAIL`.
-6. Audit corrections stay in the same cycle using a new prompt version.
-7. Claude reads prior ChatGPT audits plus `AUDIT_INDEX.md` and applies those findings to implementation/testing.
-
-Canonical audit sources:
-
-- Policy: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
-- Learning index: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
-- ChatGPT prompt template: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/templates/CHATGPT_PROMPT_TEMPLATE.md
-- Claude implementation-log template: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/templates/CLAUDE_IMPLEMENTATION_LOG_TEMPLATE.md
-- ChatGPT audit template: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/templates/CHATGPT_AUDIT_TEMPLATE.md
+6. Audit corrections remain in the same cycle via new prompt versions.
+7. Claude reads prior ChatGPT audits plus `AUDIT_INDEX.md` and uses those findings to strengthen implementation/testing.
 
 ## Recent coordination cycles
 
 | Cycle | Milestone | Status | Last actor | Summary | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| `M09-C001` | M09 | `AWAITING_AUDIT` | CLAUDE | V02 correction pass complete. F-M09-001..004 closed, 320/320 tests, ready for ChatGPT audit V02. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md |
-| `M07-C001` | M07 | `AUDITED_PASS` | CHATGPT | Audit V02 closed both V01 findings. M07 infrastructure cycle complete; owner asset tasks remain open. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md |
-| `META-C001` | META | `AUDITED_PASS` | CHATGPT | Established repository-native ChatGPT/Claude coordination and H!veAI synchronization. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md |
+| `M09-C001` | M09 | `CHANGES_REQUIRED` | CHATGPT | Audit V02 accepted most V02 fixes but found remaining equivalent-filesystem-path bypass. V03 issued. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md |
+| `M07-C001` | M07 | `AUDITED_PASS` | CHATGPT | Reference-library infrastructure audited; owner asset tasks remain open. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md |
+| `META-C001` | META | `AUDITED_PASS` | CHATGPT | Repository-native ChatGPT/Claude coordination + H!veAI synchronization established. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md |
 
 ## Coordination source map
-
-H!veAI actively watches only this dashboard. ChatGPT/Claude materialize relevant GitHub source state into it after every material session.
 
 | Purpose | Canonical GitHub source |
 | --- | --- |
@@ -159,30 +171,22 @@ H!veAI actively watches only this dashboard. ChatGPT/Claude materialize relevant
 | Level Data V1 | https://github.com/Sekiph82/Scrubbots/blob/main/docs/03_LEVEL_DATA_SPEC.md |
 | Test strategy | https://github.com/Sekiph82/Scrubbots/blob/main/docs/06_TEST_STRATEGY.md |
 
-## Single-dashboard synchronization contract
-
-After every material ChatGPT or Claude session, update this dashboard with timestamp/actor, cycle/status, active prompt/audit/log URLs, concise work summary, blocker/waiting state, next actor/action, and actual task/project state only when canonical truth changed.
-
-Also update:
-https://github.com/Sekiph82/Scrubbots/blob/main/coordination/SESSION_INDEX.md
-
-Never duplicate the full `tasks.md` checklist here.
-
 ## Milestone summary
 
 | Milestone | Name | Status |
 | --- | --- | --- |
 | M00 | Foundation & Environment | COMPLETE |
 | M01 | Variable-Size Level Data Core | COMPLETE |
-| M02 | BoardState Core | COMPLETE |
+| M02 | BoardState Core | COMPLETE except intentionally deferred RESERVED work |
 | M03 | Official Difficulty Bands + 59x59 | COMPLETE |
 | M04 | Expanded Board Fixtures & Test Matrix | COMPLETE |
 | M05 | Test Harness Maturity | PARTIAL |
 | M06 | Board Renderer | COMPLETE |
-| M07 | Visual Reference Library | PARTIAL - infrastructure audited, asset tasks awaiting owner |
+| M07 | Visual Reference Library | PARTIAL - owner assets pending |
 | M08 | Level Art Technical Audit | BLOCKED_ON_OWNER_ASSET |
-| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - M09-C001 AWAITING_AUDIT |
-| M10-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
+| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - M09-C001 correction V03 |
+| M10 | Dirty/Clean Visual Model | OWNER_REQUIRED gate remains open |
+| M11-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 
 ## Dashboard integrity rules
 
