@@ -17,10 +17,10 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 ## Cycles
 
-| Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Claude self-audit | ChatGPT audit | Task refs | Repository evidence | Summary |
+| Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Audit criteria | Claude implementation log | Claude self-audit | ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | PLANNED | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md (to be created by Claude) | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_SELF_AUDIT_V01.md (expected) | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md (expected after implementation) | SB-M07-001..017 | V02 supersedes V01 before Claude implementation | Establish visual-reference infrastructure and asset-availability audit under the new dual-audit policy. Claude must self-audit provisionally; ChatGPT independently audits afterward. |
-| META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | AUDITED_PASS | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | PR #2 merged to `main` as `734ccfe` | Installed the versioned ChatGPT<->Claude communication bus and H!veAI synchronization rules. |
+| M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | PLANNED | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md (to be created by Claude) | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_SELF_AUDIT_V01.md (expected) | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md (expected after implementation) | SB-M07-001..017 | Visual-reference infrastructure + availability audit under audit-driven verification. Claude self-tests are provisional; ChatGPT independently audits against published criteria. |
+| META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | AUDITED_PASS | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | N/A | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | Established repository-native coordination and H!veAI synchronization. |
 
 ## M07-C001 prompt history
 
@@ -28,19 +28,22 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
   - Historical evidence only.
   - Superseded before Claude implementation.
 - V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V02.md
+  - Added absolute GitHub URL references.
+  - Superseded before Claude implementation.
+- V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V03.md
   - Active implementation authority.
-  - Adds canonical GitHub URL references and the dual-audit/self-audit model.
+  - Adds audit-driven verification, prior-audit learning application, and mandatory Claude self-audit.
 
 ## Rules
 
 - Append new cycles; do not delete historical rows.
 - Update an existing row when the same cycle advances state.
 - Do not create a new cycle solely because a chat/session restarted.
-- Prompt, self-audit, and ChatGPT audit links must use absolute GitHub URLs.
-- Published ChatGPT prompt/audit versions are immutable evidence.
+- Use absolute GitHub URLs for prompt, audit criteria, implementation log, self-audit, ChatGPT audit, index, dashboard, and repository evidence.
+- Published ChatGPT prompt/audit/audit-criteria versions are immutable evidence.
 - Claude uses one append-only `CLAUDE_IMPLEMENTATION_LOG.md` per cycle.
 - Claude creates a new immutable `CLAUDE_SELF_AUDIT_VNN.md` for each implementation pass handed to ChatGPT.
 - Claude self-test results are provisional (`SELF_PASS`/`SELF_FAIL` etc.), never `AUDITED_PASS`.
-- `AUDITED_PASS` is assigned only by ChatGPT independent audit.
-- `Repository evidence` must contain commit/PR/path evidence, never secret values.
+- Only ChatGPT independent audit may assign `AUDITED_PASS`/`AUDITED_FAIL`.
+- Claude must read `AUDIT_INDEX.md` and relevant prior ChatGPT audits before planning verification, then state how those findings changed the test plan.
 - Every material ChatGPT or Claude session updates `.hiveai/PROJECT_DASHBOARD.md` because H!veAI actively watches only that materialized dashboard file.
