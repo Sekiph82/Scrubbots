@@ -19,7 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md | SB-M07-001..017 | V04 corrections applied: F-M07-001 (Akilta originalFilename→null) and F-M07-002 (full validation sequence logged individually). 227/227 regression PASS. All 13 inventory checks PASS. Ready for ChatGPT audit V02. |
+| M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | SB-M07-001..017 | ChatGPT audit V02 independently verified both V01 corrections. Coordination cycle closed as AUDITED_PASS. M07 milestone remains PARTIAL only because SB-M07-008..014 require owner-supplied visual assets. |
 | META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | Established repository-native coordination and H!veAI synchronization. |
 
 ## M07-C001 history
@@ -42,8 +42,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
   - Findings: `F-M07-001`, `F-M07-002`.
   - Added audit learnings: `AL-008`, `AL-009`.
 - V04: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md
-  - Active correction prompt.
-  - Claude must implement/test/log only, then return `AWAITING_AUDIT`.
+  - Correction prompt for V01 findings.
+  - Claude implemented/tested/logged only and returned `AWAITING_AUDIT`.
+- Correction commit: https://github.com/Sekiph82/Scrubbots/commit/c66eaf561d5357ea971ab44e3be0cb7a2b6062f2
+- Log backfill commit: https://github.com/Sekiph82/Scrubbots/commit/302bcb8edc4e3342dca19e99df689122b93555c7
+- ChatGPT independent audit V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md
+  - Decision: `AUDITED_PASS`.
+  - F-M07-001 and F-M07-002 independently verified as closed.
+  - No new reusable learning; AL-008 and AL-009 remain active.
 
 ## Rules
 
