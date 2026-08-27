@@ -26,13 +26,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | HEALTHY - correction pass required by audit |
+| Health | HEALTHY |
 | Current implementation frontier | M07 - Visual Reference Library |
-| Current task | M07-C001 - audit correction pass |
+| Current task | M07-C001 - V04 corrections applied, awaiting audit V02 |
 | Current task ID | `M07-C001` |
-| Current workflow state | `CHANGES_REQUIRED` - ChatGPT audit V01 published; V04 correction prompt issued |
-| Required actor | CLAUDE |
-| Next project action | Claude safely syncs `origin/main`, reads ChatGPT audit V01 and Prompt V04, fixes F-M07-001/F-M07-002, appends implementation/test evidence to the existing log, and returns `AWAITING_AUDIT`. |
+| Current workflow state | `AWAITING_AUDIT` - V04 corrections complete; awaiting ChatGPT audit V02 |
+| Required actor | CHATGPT |
+| Next project action | ChatGPT reads corrected inventory.json and updated implementation log (Session 2), performs independent audit V02. |
 | Waiting on | Owner-approved artwork remains required for SB-M07-008..014; M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -40,25 +40,25 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-27T16:03:00+03:00 |
-| Actor | CHATGPT |
+| Timestamp | 2026-08-27T17:00:00+03:00 |
+| Actor | CLAUDE |
 | Cycle | `M07-C001` |
-| Session type | Independent audit V01 + coordination protocol correction |
-| Cycle status | `CHANGES_REQUIRED` |
-| Milestone/task impact | M07 infrastructure task states remain unchanged: SB-M07-001..007 and 015..017 complete; SB-M07-008..014 remain `AWAITING OWNER ASSET`. M10 remains owner-required. |
-| Summary | ChatGPT independently reviewed the M07 GitHub diff, repository asset tree, reference guide, inventory, task truth, and Claude implementation log. The core M07 structure is correct, but audit V01 found two corrections: unsupported Akilta `originalFilename` metadata and missing explicit log evidence for two required validation checks. The workflow was also corrected so Claude implements/tests/logs only; ChatGPT alone performs audits. |
+| Session type | V04 correction pass |
+| Cycle status | `AWAITING_AUDIT` |
+| Milestone/task impact | No task checkbox changes. F-M07-001 fixed (Akilta `originalFilename` → `null`). F-M07-002 fixed (full 7-command validation sequence individually logged). |
+| Summary | Applied V04 corrections for audit V01 findings. Set unsupported `akilta_wordmark.originalFilename` to `null` per AL-008. Ran and individually logged all 7 prompt-mandated validation commands per AL-009, including previously omitted headless startup smoke and final `git status --short`. 227/227 regression PASS. 13/13 inventory checks PASS. |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md |
 | Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md |
 | Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md |
 | Audit policy | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md |
 | Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
-| Next expected actor | CLAUDE |
+| Next expected actor | CHATGPT |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M07-C001 | Visual Reference Library foundation + audit corrections | `CHANGES_REQUIRED` | CLAUDE then CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md |
+| M07-C001 | Visual Reference Library foundation + audit corrections | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md |
 | M07 | Visual Reference Library | PARTIAL - infrastructure implemented; owner assets still missing | HUMAN for asset-specific tasks | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M10 | DIRTY/CLEAN Visual Approval | `OWNER_REQUIRED` | HUMAN | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M05 | Test Harness Maturity | PARTIAL | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
@@ -101,7 +101,7 @@ Reusable learnings added by ChatGPT audit V01:
 
 | Cycle | Milestone | Status | Last actor | Summary | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| `M07-C001` | M07 | `CHANGES_REQUIRED` | CHATGPT | Independent audit V01 found two correctable issues; Prompt V04 issued. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md |
+| `M07-C001` | M07 | `AWAITING_AUDIT` | CLAUDE | V04 corrections applied (F-M07-001 + F-M07-002). Full validation logged. Awaiting ChatGPT audit V02. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md |
 | `META-C001` | META | `AUDITED_PASS` | CHATGPT | Established repository-native ChatGPT/Claude coordination and H!veAI synchronization. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md |
 
 ## Coordination source map
