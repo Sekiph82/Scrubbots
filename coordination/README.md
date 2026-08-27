@@ -1,158 +1,156 @@
 # SCRUBBOTS Coordination Protocol
 
-This directory is the versioned communication bus between ChatGPT, Claude Code, the repository, and the H!veAI Project Dashboard.
+This directory is the durable GitHub communication layer between ChatGPT, Claude Code, the repository, and the H!veAI Project Dashboard.
 
 ## Authority model
 
-- `tasks.md` is the only canonical task ledger. Coordination files may reference task IDs, but must not create a competing backlog.
+- `tasks.md` is the only canonical task ledger.
 - `CLAUDE.md` is the agent operating manual.
-- `.hiveai/PROJECT_DASHBOARD.md` is the single H!veAI-facing materialized status and latest-session summary surface.
-- `coordination/SESSION_INDEX.md` is the append-only index of communication cycles.
+- `.hiveai/PROJECT_DASHBOARD.md` is the single H!veAI-facing materialized status surface.
+- `coordination/SESSION_INDEX.md` indexes work cycles.
+- `coordination/AUDIT_INDEX.md` is ChatGPT-owned reusable audit memory.
 - `CHANGELOG.md` is project history, not task truth.
-- Desktop phase logs remain the detailed, crash-safe Claude work journal. GitHub coordination logs do not replace them.
+- Desktop phase logs remain local crash-safe Claude journals and are never committed.
 
 ## Canonical GitHub URL rule
 
-All ChatGPT-to-Claude handoff artifacts must use absolute GitHub file URLs as the canonical references for repository files.
+Use absolute GitHub URLs as the canonical references in prompts, audits, Claude logs, session summaries, and handoffs.
 
 Canonical base:
 
 `https://github.com/Sekiph82/Scrubbots/blob/main/`
 
-Examples:
-
-- CLAUDE.md: https://github.com/Sekiph82/Scrubbots/blob/main/CLAUDE.md
-- tasks.md: https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md
-- H!veAI dashboard: https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/PROJECT_DASHBOARD.md
-- coordination protocol: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/README.md
-- session index: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/SESSION_INDEX.md
-
-Repository-relative paths may be included as secondary convenience references, especially for files Claude must create or edit locally, but a prompt/audit/log must not rely on an unexplained local path as the only identifier for a GitHub-tracked artifact.
-
-For a file that does not exist yet, such as a Claude implementation log before its first commit, use its expected stable GitHub URL plus the repository-relative target path.
-
-Local-only Desktop phase logs remain local paths because they are intentionally never committed.
+Repository-relative paths may be included as secondary convenience references for local edits. Local-only Desktop phase logs remain local paths.
 
 ## Coordination cycle
 
-A coordination cycle is the smallest complete ChatGPT -> Claude -> ChatGPT handoff loop for one scoped unit of work.
+A cycle is one scoped ChatGPT -> Claude -> ChatGPT implementation/review loop.
 
-Use IDs in this form:
+Examples:
 
 - `M07-C001`, `M07-C002`, ... for milestone work.
-- `META-C001`, `META-C002`, ... for repository/process-only work that does not belong to a gameplay milestone.
+- `META-C001`, ... for repository/process-only work.
 
-A cycle may span multiple ChatGPT or Claude sessions. Do not create a new cycle merely because a session restarted.
+A chat/session restart does not create a new cycle. Continue the existing cycle until `AUDITED_PASS`, `BLOCKED`, `SUPERSEDED`, or an explicit end.
 
-## Cycle files
+## Cycle artifacts
 
-Store each cycle under:
+Store cycle artifacts under:
 
 `coordination/sessions/<CYCLE_ID>/`
 
-Allowed artifacts:
+Canonical artifact ownership:
 
-- `CHATGPT_PROMPT_V01.md`, `CHATGPT_PROMPT_V02.md`, ...: exact implementation instructions issued to Claude. Once a prompt version has been acted on, do not rewrite it. Create the next version instead.
-- `CLAUDE_IMPLEMENTATION_LOG.md`: Claude-owned, append-only implementation record for the cycle. Multiple Claude sessions append to the same file.
-- `CHATGPT_AUDIT_V01.md`, `CHATGPT_AUDIT_V02.md`, ...: ChatGPT review of repository evidence after Claude work. Published audit versions are immutable except for clearly marked factual corrections.
-- `OWNER_NOTES.md`: optional owner decisions or clarifications that must survive chat context loss.
+- `CHATGPT_PROMPT_VNN.md` - **ChatGPT-owned** implementation instructions.
+- `CHATGPT_AUDIT_CRITERIA_VNN.md` - optional **ChatGPT-owned** pre-implementation audit criteria.
+- `CLAUDE_IMPLEMENTATION_LOG.md` - **Claude-owned**, append-only implementation/test log.
+- `CHATGPT_AUDIT_VNN.md` - **ChatGPT-owned** independent audit after Claude work.
+- `OWNER_NOTES.md` - optional durable owner clarifications.
 
-Every prompt, audit, and Claude implementation log should include absolute GitHub URLs for the active prompt, relevant audits, implementation log, session index, dashboard, and any other required repository source.
+### No Claude self-audit
 
-Do not store secrets, credentials, tokens, private keys, local absolute secret-file contents, or sensitive environment values in coordination artifacts.
+Claude does **not** create audit files or self-audit files.
 
-## Status lifecycle
+Historical `CLAUDE_SELF_AUDIT_*` files created before the owner corrected the workflow remain historical only. Do not create new ones and do not treat them as independent proof.
 
-Use one of these cycle states:
+## Normal cycle flow
 
-- `PLANNED`: ChatGPT prompt exists; Claude has not started.
-- `CLAUDE_IN_PROGRESS`: Claude is implementing.
-- `AWAITING_AUDIT`: Claude finished a pass and recorded evidence; ChatGPT audit is next.
-- `CHANGES_REQUIRED`: audit found required corrections; same cycle continues.
-- `AUDITED_PASS`: ChatGPT verified the cycle against prompt/task/repository evidence.
-- `BLOCKED`: progress requires owner/external input.
-- `SUPERSEDED`: a later cycle intentionally replaces this cycle. Never delete the historical record.
+1. **ChatGPT inspects current GitHub state.**
+2. **ChatGPT publishes the active prompt** and, where useful, audit criteria.
+3. The prompt explicitly links relevant prior ChatGPT audits and `AUDIT_INDEX.md` learnings.
+4. **Claude safely syncs local `main`.**
+5. **Claude implements**, runs the tests/checks required by the prompt, and appends results to `CLAUDE_IMPLEMENTATION_LOG.md`.
+6. Claude uses prior ChatGPT audit findings to strengthen the current test plan, but records that comparison only in the implementation log.
+7. Claude updates `tasks.md` only with validated truth, then updates `SESSION_INDEX.md` and `.hiveai/PROJECT_DASHBOARD.md`.
+8. Claude hands the cycle back as `AWAITING_AUDIT` or `BLOCKED`.
+9. **ChatGPT independently audits actual GitHub state** and publishes `CHATGPT_AUDIT_VNN.md`.
+10. If clean, ChatGPT sets `AUDITED_PASS`.
+11. If corrections are required, ChatGPT sets `CHANGES_REQUIRED` and publishes the next prompt version in the **same cycle**, linking the audit.
 
 ## ChatGPT responsibilities
 
-At the start of a material project session:
+Before issuing work:
 
-1. Read the canonical GitHub versions of `tasks.md`, `CLAUDE.md`, `.hiveai/PROJECT_DASHBOARD.md`, this protocol, and `coordination/SESSION_INDEX.md`.
-2. Inspect the repository/commit state rather than trusting old chat memory.
-3. Reuse the current cycle if the same scoped work is continuing; otherwise allocate the next cycle ID.
-4. When issuing Claude work, save the exact prompt as the next `CHATGPT_PROMPT_VNN.md` before or together with the handoff.
-5. Make repository source references explicit with absolute GitHub URLs.
-6. After Claude work, inspect the implementation log plus actual Git diff/commits/tests and write `CHATGPT_AUDIT_VNN.md`.
-7. If changes are required, keep the same cycle and issue a new prompt version that cites the audit by GitHub URL.
-8. Update `coordination/SESSION_INDEX.md` and the Latest Session Summary in `.hiveai/PROJECT_DASHBOARD.md` after every material ChatGPT session.
+1. Read canonical GitHub task/governance/dashboard/coordination sources.
+2. Inspect current commits/diffs rather than relying on chat memory.
+3. Read relevant previous ChatGPT audit(s) and `AUDIT_INDEX.md`.
+4. Save the full implementation instruction as a versioned `CHATGPT_PROMPT_VNN.md`.
+5. Include absolute GitHub URLs for all mandatory sources.
+6. State relevant prior audit findings that Claude must incorporate into implementation/testing.
 
-A ChatGPT audit must be evidence-based. Do not mark PASS from Claude prose alone when repository/test evidence can be checked.
+After Claude work:
 
-## Claude Code responsibilities
+1. Read `CLAUDE_IMPLEMENTATION_LOG.md`.
+2. Inspect actual GitHub commits/diffs/files/task state.
+3. Independently cross-check tests/evidence where accessible.
+4. Do not accept Claude prose or green test totals as automatic proof.
+5. Publish `CHATGPT_AUDIT_VNN.md` with requirement-level PASS/FAIL and exact corrections.
+6. Update `AUDIT_INDEX.md` when a reusable lesson is discovered.
+7. Update `SESSION_INDEX.md` and the H!veAI dashboard.
 
-Before modifying code:
+## Claude responsibilities
 
-1. Open/read the canonical GitHub URLs supplied by the active launcher/prompt.
-2. Safely synchronize the local repository with the referenced GitHub state without destroying local owner work.
-3. Identify the active cycle and read every active/superseding `CHATGPT_PROMPT_VNN.md`, `CHATGPT_AUDIT_VNN.md`, and owner note in version order.
-4. Update/create `CLAUDE_IMPLEMENTATION_LOG.md` and mark the cycle `CLAUDE_IN_PROGRESS` in the session index/dashboard before substantial work when practical.
-5. Continue the existing Desktop phase log required by `CLAUDE.md`; do not replace it with the GitHub log.
+Before implementation:
 
-Before ending a material Claude session:
+1. Read the active ChatGPT prompt from its GitHub URL.
+2. Read the prior ChatGPT audit URLs explicitly listed in that prompt.
+3. Read https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md and apply relevant `AL-XXX` learnings.
+4. Safely synchronize the local repository without destroying owner work.
+5. Continue the correct local Desktop phase log.
+6. Create/append only the cycle's `CLAUDE_IMPLEMENTATION_LOG.md` for durable GitHub evidence.
 
-1. Append exact implementation evidence to `CLAUDE_IMPLEMENTATION_LOG.md`: starting commit, files changed, architecture decisions, commands/tests, failures/fixes, performance evidence, prompt deviations, task/doc updates, commit/push result, unresolved items.
-2. Include absolute GitHub URLs for the prompt(s), audit(s), implementation log, session index, dashboard, and relevant repository evidence.
-3. Keep failure history. Do not rewrite the log to pretend failed approaches never happened.
-4. Update `tasks.md` only when task truth actually changed and validation evidence supports it.
-5. Update `coordination/SESSION_INDEX.md` to `AWAITING_AUDIT`, `BLOCKED`, or the accurate state.
-6. Update `.hiveai/PROJECT_DASHBOARD.md` Latest Session Summary and recent-cycle row.
-7. Commit coordination artifacts with the implementation when safe, or in an immediately following focused documentation commit. Never commit secrets.
+During implementation/testing:
 
-Claude must not edit a published ChatGPT prompt or audit to make implementation look compliant.
+- run the prompt-required checks;
+- record exact command/check, expected result, explicit failure condition, actual result, and failures/fixes;
+- include negative/boundary/regression checks when prior audits or system risk require them;
+- explicitly note how prior ChatGPT audit findings changed the test plan;
+- treat Claude-run green tests as implementer evidence, not an audit verdict;
+- never use `AUDITED_PASS` or `AUDITED_FAIL`.
+
+Before ending:
+
+1. Append the implementation/test evidence to `CLAUDE_IMPLEMENTATION_LOG.md`.
+2. Update `tasks.md` only when validated truth changed.
+3. Update `coordination/SESSION_INDEX.md`.
+4. Update `.hiveai/PROJECT_DASHBOARD.md`.
+5. Commit/push safely.
+6. Set `AWAITING_AUDIT` when ready for ChatGPT review, or `BLOCKED` when truly blocked.
+7. Stop. Do not perform an audit.
+
+Claude must never create or modify `CHATGPT_AUDIT_VNN.md`.
+
+## Audit policy
+
+Canonical policy:
+
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
+
+Key rule: **Claude tests; ChatGPT audits.**
 
 ## H!veAI single-dashboard contract
 
-The repository intentionally uses **single-dashboard-watch** mode.
-
 H!veAI actively watches only:
 
-- https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/PROJECT_DASHBOARD.md
+https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/PROJECT_DASHBOARD.md
 
-The following are source evidence that ChatGPT/Claude must read and materialize into the dashboard after every material session:
+ChatGPT and Claude materialize the latest relevant state into that file after every material session.
+
+Source evidence includes:
 
 - https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md
 - https://github.com/Sekiph82/Scrubbots/blob/main/coordination/SESSION_INDEX.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - cycle-specific ChatGPT prompt URLs
-- cycle-specific ChatGPT audit URLs
 - cycle-specific Claude implementation-log URLs
-- cycle-specific owner-note URLs when present
-- https://github.com/Sekiph82/Scrubbots/blob/main/CHANGELOG.md
+- cycle-specific ChatGPT audit URLs
+- owner-note URLs when present
 
-This keeps the watcher simple while preserving full GitHub evidence. The dashboard is the materialized summary, not a competing ledger.
-
-## Dashboard synchronization rule
-
-Every material ChatGPT or Claude session must refresh `.hiveai/PROJECT_DASHBOARD.md` with:
-
-- session timestamp;
-- actor (`CHATGPT`, `CLAUDE`, `OWNER`, or `SYSTEM`);
-- cycle ID;
-- cycle status;
-- milestone/task refs;
-- concise work summary;
-- evidence/commit links or repository URLs;
-- blocker/waiting state;
-- next expected actor/action.
-
-Also update `coordination/SESSION_INDEX.md` in the same session.
-
-The dashboard may summarize task state but must never duplicate or silently override `tasks.md` checkboxes.
+The dashboard summarizes these sources; it does not replace them or duplicate task checkboxes.
 
 ## Relationship to Desktop phase logs
 
-The two log systems serve different purposes:
+Both remain required for Claude implementation work:
 
-- `C:\Users\sekip\Desktop\SCRUBBOTS_PHASE_MXX_LOG.md`: continuous, detailed Claude phase journal, local-only, never committed.
-- `https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/<CYCLE_ID>/CLAUDE_IMPLEMENTATION_LOG.md`: durable GitHub communication evidence for ChatGPT/H!veAI/owner review.
-
-Both are required for Claude implementation work unless the owner explicitly changes the workflow.
+- `C:\Users\sekip\Desktop\SCRUBBOTS_PHASE_MXX_LOG.md` - detailed local phase journal, never committed.
+- `https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/<CYCLE_ID>/CLAUDE_IMPLEMENTATION_LOG.md` - durable GitHub implementation/test handoff evidence.
