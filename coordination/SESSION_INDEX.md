@@ -19,18 +19,27 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-08-27 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | PENDING | SB-M09-001..017 | Importer core implemented, 286/286 tests pass, pixel-perfect reconstruction verified at 3×2/20×27/59×59, deterministic rerun UNCHANGED, CLI working. SB-M09-018..020 deferred to M09-C002. M08 still open. |
+| M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-08-27 | `CHANGES_REQUIRED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md | SB-M09-001..017 | Audit V01 found path-alias/source-overwrite risk, inconsistent preview/metadata overwrite safety, missing explicit PNG-only gate, and malformed-reconstruction safety gap. V02 issued; M09-C002 remains blocked until correction audit passes. |
 | M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | SB-M07-001..017 | ChatGPT audit V02 independently verified both V01 corrections. Coordination cycle closed as AUDITED_PASS. M07 milestone remains PARTIAL only because SB-M07-008..014 require owner-supplied visual assets. |
 | META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | Established repository-native coordination and H!veAI synchronization. |
 
-## M09-C001 issuance
+## M09-C001 history
 
-- Active prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V01.md
-- Pre-published audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V01.md
-- Prior independent audit baseline: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md
-- Scope: SB-M09-001..017 only.
-- Deferred: SB-M09-018 batch import, SB-M09-019 batch validation, SB-M09-020 catalog-wide duplicate-ID protection.
-- M08 status: remains open/owner-asset-dependent; no production-art audit may be claimed in M09-C001.
+- V01 prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V01.md
+  - Initial importer-core implementation scope, SB-M09-001..017.
+- Audit criteria V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V01.md
+- Initial implementation commit: https://github.com/Sekiph82/Scrubbots/commit/7acd0e65ede18f33553eedcec82fabf2125291d1
+- Initial implementation-log backfill head: https://github.com/Sekiph82/Scrubbots/commit/49178d412276137a39da993bfafe47262dc10c97
+- ChatGPT independent audit V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md
+  - Decision: `CHANGES_REQUIRED`.
+  - Findings: F-M09-001 source/artifact aliasing, F-M09-002 multi-artifact overwrite policy, F-M09-003 PNG-only gate, F-M09-004 malformed reconstruction safety.
+  - Added AL-010, AL-011, AL-012.
+- Audit criteria V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V02.md
+- V02 correction prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V02.md
+  - Active authority.
+  - Claude must implement/test/log only and return `AWAITING_AUDIT`.
+- Deferred until this cycle passes: SB-M09-018 batch import, SB-M09-019 batch validation, SB-M09-020 duplicate-ID protection.
+- M08 remains owner-asset-dependent and open.
 
 ## M07-C001 history
 
