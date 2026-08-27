@@ -1,157 +1,180 @@
 # SCRUBBOTS Audit Policy
 
-This file defines how implementation claims, tests, self-audits, and independent ChatGPT audits are interpreted across SCRUBBOTS coordination cycles.
-
 Canonical repository: https://github.com/Sekiph82/Scrubbots
 
-## Core principle
+This policy defines the separation between Claude implementation/testing and ChatGPT independent auditing.
 
-An implementer's own test result is useful evidence, but it is not independent proof of the implementer's own work.
+## Core ownership rule
 
-Claude must therefore treat its own successful tests as **provisional evidence**, not as final audit truth. ChatGPT performs the independent audit step after Claude implementation and self-audit.
+Claude is the implementer and test runner.
 
-A cycle may not reach `AUDITED_PASS` merely because Claude reports that tests passed.
+ChatGPT is the auditor.
+
+Claude must **not** create audit files, self-audit files, audit verdicts, or `AUDITED_*` statuses.
+
+Claude's job is to:
+
+1. implement the active ChatGPT prompt;
+2. run the required tests/checks while implementing;
+3. record exact commands, expected outcomes, failure conditions, actual results, failures/fixes, and relevant comparison notes in `CLAUDE_IMPLEMENTATION_LOG.md`;
+4. update task/dashboard/session state truthfully;
+5. hand the cycle back as `AWAITING_AUDIT`.
+
+ChatGPT then independently reviews the repository and publishes `CHATGPT_AUDIT_VNN.md`.
 
 ## Evidence levels
 
-### E0 - Claim / assumption
+### E0 - Claim or assumption
 
 Examples:
 
-- code exists;
-- Claude says a requirement is implemented;
-- a file appears to have the expected name;
-- a test is expected to pass but was not run.
+- a file exists;
+- Claude says a feature is done;
+- a test was expected to pass but was not run.
 
-E0 is never enough for PASS.
+E0 cannot establish an audit PASS.
 
-### E1 - Implementer-run check
+### E1 - Claude-run implementation test
 
-Claude ran a command/test and recorded the result.
+Claude actually ran a command/check and recorded the result in the implementation log.
 
-This is useful but remains provisional because the same actor wrote the implementation and executed the check.
+This is useful implementation evidence, but it is not independent audit proof.
 
-Use status `SELF_PASS`, `SELF_FAIL`, or `NOT_RUN` in Claude self-audits.
+Use implementation-log labels such as:
 
-### E2 - Reproducible implementer evidence
+- `CLAUDE_TEST_PASS`
+- `CLAUDE_TEST_FAIL`
+- `NOT_RUN`
+- `BLOCKED`
+- `OWNER_REQUIRED`
 
-Claude records enough detail for reproduction:
+These labels describe Claude's test execution only. They are not audit verdicts.
 
-- exact command;
-- exact commit/tree state;
-- relevant output/result;
-- expected behavior;
-- failure criteria;
-- affected requirement/task IDs.
+### E2 - Reproducible Claude evidence
 
-E2 is strong provisional evidence, but is still not independent proof.
+Claude records enough detail for ChatGPT to evaluate or reproduce the check:
 
-### E3 - Independent ChatGPT audit evidence
+- exact command/check;
+- commit/tree state;
+- expected outcome;
+- explicit failure condition;
+- actual result;
+- affected requirement/task;
+- relevant GitHub evidence URL.
 
-ChatGPT independently inspects repository state and, where tooling permits, reruns or cross-checks the relevant tests/commands/evidence.
+E2 is strong implementer evidence, but remains non-independent.
 
-Only ChatGPT audit files may assign `AUDITED_PASS` or `AUDITED_FAIL` to implementation requirements.
+### E3 - ChatGPT independent audit evidence
 
-If a result cannot be independently rerun, ChatGPT must label it `NOT_INDEPENDENTLY_VERIFIED` rather than silently treating Claude's result as independent proof.
+ChatGPT inspects actual GitHub state, diffs, files, tasks, logs, tests, and reproducible evidence. Where accessible, ChatGPT independently reruns or cross-checks relevant checks.
 
-### E4 - Owner / design-gate approval
+Only ChatGPT audit files may assign:
 
-Some requirements are intentionally human-controlled, such as final visual design choices. Automated or AI audit cannot close these gates.
+- `AUDITED_PASS`
+- `AUDITED_FAIL`
+- `NOT_INDEPENDENTLY_VERIFIED`
+- `BLOCKED`
+- `OWNER_REQUIRED`
 
-Use `OWNER_REQUIRED` until the owner explicitly approves.
+### E4 - Owner approval
 
-## Pass/fail vocabulary
+Human-controlled product/design gates remain `OWNER_REQUIRED` until the owner explicitly decides them.
 
-Claude self-audit uses:
+AI implementation or testing cannot close an owner gate.
 
-- `SELF_PASS`: Claude executed sufficient checks and found the requirement satisfied. Provisional only.
-- `SELF_FAIL`: Claude found a requirement violated or a required check failed.
-- `NOT_RUN`: required/desired verification was not executed.
-- `NOT_APPLICABLE`: requirement genuinely does not apply to this scope.
-- `BLOCKED`: verification or implementation cannot proceed without external/owner input.
-- `OWNER_REQUIRED`: only the owner can close the requirement/design gate.
+## Claude verification responsibilities
 
-ChatGPT audit uses:
+Before implementation/testing, Claude must read:
 
-- `AUDITED_PASS`: independently verified to the level appropriate for the requirement.
-- `AUDITED_FAIL`: independent audit found the requirement unsatisfied.
-- `NOT_INDEPENDENTLY_VERIFIED`: Claude evidence exists but ChatGPT could not independently establish the claim.
-- `BLOCKED`: audit cannot complete because required external evidence/input is missing.
-- `OWNER_REQUIRED`: human design/product approval remains open.
+- the active ChatGPT prompt;
+- every prior `CHATGPT_AUDIT_VNN.md` that the prompt identifies as relevant;
+- https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
+- any cycle-specific `CHATGPT_AUDIT_CRITERIA_VNN.md` published by ChatGPT.
 
-Do not use plain `PASS` where actor/verification level would be ambiguous.
+Claude must use prior audit findings as a **test-planning input**. This means:
 
-## Claude self-audit requirements
+- previously found failure modes should get explicit regression checks;
+- previously missed boundary/negative cases should be added where relevant;
+- previously invalid tolerances/assumptions must not be repeated;
+- audit learnings (`AL-XXX`) relevant to the touched system must be cited in the implementation log;
+- when a prior audit changed what counts as success/failure, Claude must update its test expectations accordingly.
 
-Before handing a cycle to ChatGPT, Claude must create a versioned self-audit:
+All of this stays inside the implementation log. Claude does not create a second audit document.
 
-`coordination/sessions/<CYCLE_ID>/CLAUDE_SELF_AUDIT_VNN.md`
+## Claude implementation log requirements
+
+Each material implementation pass must append to:
+
+`coordination/sessions/<CYCLE_ID>/CLAUDE_IMPLEMENTATION_LOG.md`
 
 Canonical URL pattern:
 
-`https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/<CYCLE_ID>/CLAUDE_SELF_AUDIT_VNN.md`
+`https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/<CYCLE_ID>/CLAUDE_IMPLEMENTATION_LOG.md`
 
-Each self-audit must:
+The log must record:
 
-1. Identify the active ChatGPT prompt version(s) by absolute GitHub URL.
-2. Read `coordination/AUDIT_INDEX.md` before planning tests.
-3. Read all prior `CHATGPT_AUDIT_VNN.md` files in the same cycle.
-4. Read older ChatGPT audits identified by `AUDIT_INDEX.md` as relevant to systems touched in the current cycle.
-5. Extract reusable prior findings, failure modes, tolerances, and test expectations.
-6. Build a requirement-by-requirement test matrix before declaring completion.
-7. Define the expected outcome and explicit failure condition for every material test.
-8. Run more than the happy path when risk warrants it: boundary, negative, malformed, regression, scale, state-transition, and scope/integrity checks as applicable.
-9. Classify its own results only with the Claude self-audit vocabulary above.
-10. Treat successful implementer-run tests as provisional evidence, not final proof.
-11. Compare current results to prior audited baselines and explain regressions, deltas, or changed expectations.
-12. Record any test that could produce a false positive and how that risk was mitigated.
-13. Record untested assumptions explicitly.
-14. Link the implementation log, session index, dashboard, commits, and relevant files using absolute GitHub URLs.
-15. Set the cycle to `AWAITING_AUDIT` only when the self-audit is complete enough for independent review.
+- active prompt URL;
+- prior ChatGPT audit URLs read;
+- relevant `AL-XXX` learnings applied;
+- implementation changes;
+- tests/checks run;
+- expected outcome and explicit failure condition for material checks;
+- actual result;
+- negative/boundary/regression coverage when relevant;
+- false-positive risks noticed;
+- failures and fixes;
+- performance evidence only when actually measured;
+- task/doc changes;
+- commit/push evidence;
+- blockers/unverified assumptions.
 
-Claude must never create or modify `CHATGPT_AUDIT_VNN.md` files.
+A prompt-mandated validation command must be individually recorded. An aggregate green test count does not substitute for an omitted required command.
 
-## ChatGPT audit requirements
+## ChatGPT audit responsibilities
 
-After Claude work, ChatGPT creates:
+After Claude hands a cycle back as `AWAITING_AUDIT`, ChatGPT creates:
 
 `coordination/sessions/<CYCLE_ID>/CHATGPT_AUDIT_VNN.md`
 
 Each ChatGPT audit must:
 
-1. Read the active prompt(s), Claude implementation log, Claude self-audit, task truth, audit policy, audit index, and actual repository state.
-2. Treat Claude's test claims as provisional until independently cross-checked.
-3. Compare required behavior with actual code/files/diffs/commits.
-4. Independently rerun relevant tests when available through accessible tooling.
-5. Where rerun is unavailable, use repository/test-code/output evidence but mark limits honestly.
-6. Check for false-positive test design, missing negative tests, over-broad mocks, stale fixtures, incorrect tolerances, and claims that exceed measured evidence.
-7. Check scope boundaries and locked project rules, not only whether tests are green.
-8. Classify every material requirement with the ChatGPT audit vocabulary.
-9. Record findings and exact corrective actions when status is `CHANGES_REQUIRED`.
-10. Update `coordination/AUDIT_INDEX.md` when the audit discovers a reusable testing rule, recurring failure mode, new tolerance, or important verification lesson.
-11. Update `coordination/SESSION_INDEX.md` and `.hiveai/PROJECT_DASHBOARD.md` after the audit.
+1. read the active prompt and any inherited prompt scope;
+2. read the Claude implementation log;
+3. inspect actual GitHub commits/diffs/files/tasks;
+4. compare implementation against prompt requirements and locked project rules;
+5. treat Claude-run tests as implementation evidence, not independent proof;
+6. independently rerun/cross-check checks where accessible;
+7. explicitly state when a claimed result was not independently rerun;
+8. inspect test quality and false-positive risk where relevant;
+9. publish exact findings and corrections when status is `CHANGES_REQUIRED`;
+10. update `AUDIT_INDEX.md` with reusable findings;
+11. update `SESSION_INDEX.md` and the H!veAI dashboard.
 
 ## Continuous audit learning
 
-`coordination/AUDIT_INDEX.md` is ChatGPT-owned audit memory for the repository.
+`coordination/AUDIT_INDEX.md` is ChatGPT-owned repository audit memory.
 
-Claude must read it before every material implementation/self-audit session and explicitly state which audit learnings were applied.
+The feedback loop is:
 
-ChatGPT updates it after audits when a finding should affect future testing. This creates a feedback loop:
+`ChatGPT audit finding -> AUDIT_INDEX learning -> next ChatGPT prompt -> Claude implementation/test plan -> Claude implementation log -> next ChatGPT audit`
 
-`prior audited finding -> AUDIT_INDEX learning -> next prompt/self-audit test plan -> Claude provisional evidence -> ChatGPT independent audit -> refined learning`
+Claude reads and applies the learnings. ChatGPT owns and updates the audit conclusions.
 
-The objective is not to make tests larger for their own sake. The objective is to make future verification more discriminating and less likely to repeat known false positives.
+## Historical Claude self-audit files
+
+`CLAUDE_SELF_AUDIT_*` files created before this policy correction are historical artifacts only.
+
+They are not required inputs for future work and are not independent audit evidence.
+
+Do not create new Claude self-audit files.
 
 ## Existing high-value verification lessons
 
-These are already-established project truths and should be treated as baseline audit learnings until superseded by a later audited decision:
-
-1. Headless Godot reliability matters. Core/data cross-script references preserve the explicit `preload()` convention unless a deliberate task proves an alternative under headless execution.
-2. Renderer pixel readback uses 8-bit `Image.FORMAT_RGBA8`; exact float equality can create false failures. Use meaningful/tolerant comparisons and test the intended color properties.
-3. Headless execution cannot be presented as measured on-screen GPU/FPS evidence. Do not fabricate frame-rate claims from CPU/headless timing.
-4. Variable-size and rectangular-board behavior must be tested. A passing square fixture is not proof of generic sizing.
-5. Current maximum production envelope is 59x59 = 3,481 logical cells; scale-sensitive systems must include the maximum where relevant.
-6. A file or feature existing is not enough to complete a `tasks.md` item; validation evidence is required.
-7. Missing owner artwork must remain `AWAITING OWNER ASSET`; fabricated substitutes cannot satisfy visual-reference inventory requirements.
-8. M10 DIRTY/CLEAN final visual choice remains an owner design gate; AI tests cannot close it.
+1. Preserve explicit `preload()` behavior for the headless-sensitive core unless a deliberate task proves a replacement.
+2. Renderer RGBA8 readback requires tolerant/property-based color checks rather than brittle exact float equality.
+3. Headless CPU timing is not rendered GPU/FPS evidence.
+4. Variable-size systems require rectangular and relevant maximum-size coverage, not square-only tests.
+5. Production maximum is currently 59x59 = 3,481 logical cells.
+6. File existence alone is not task-completion evidence.
+7. Missing owner artwork remains `AWAITING OWNER ASSET`; never fabricate substitutes.
+8. M10 DIRTY/CLEAN final visual choice remains owner-controlled.
