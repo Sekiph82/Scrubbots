@@ -193,3 +193,95 @@ Confirm before ending:
 - [x] GitHub-tracked evidence uses absolute GitHub URLs.
 - [x] No ChatGPT prompt/audit files were rewritten.
 - [x] No secrets were committed.
+
+---
+
+## Claude Session 2 — 2026-08-27 (V04 correction pass)
+
+### Session status
+
+`COMPLETED` — corrections applied, awaiting ChatGPT audit V02.
+
+### Repository start state
+
+- Branch: `main`
+- Starting commit: `785228b` — https://github.com/Sekiph82/Scrubbots/commit/785228b
+- Working tree: clean (untracked: `docs/logs/`, temp scratchpad artifact)
+- Synced with `origin/main` via `git pull --ff-only` (11 new ChatGPT commits)
+
+### Prior audit and learnings applied
+
+- ChatGPT audit V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md
+- Active prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md
+- Audit index: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
+
+| Finding/learning | How it changed this pass |
+| --- | --- |
+| F-M07-001 (unsupported Akilta `originalFilename`) | Set `akilta_wordmark.originalFilename` from `"akilta-wordmark-a1.svg"` to `null` in `inventory.json`. |
+| F-M07-002 (missing validation traceability) | Ran and individually logged all 7 prompt-mandated validation commands below, including `godot --headless --path . --quit-after 5` and final `git status --short` which were omitted in Session 1. |
+| AL-008 (metadata provenance) | Applied: no metadata inferred without repository/owner evidence. The `originalFilename` was the only field affected. |
+| AL-009 (validation traceability) | Applied: every required command logged individually with expected outcome, failure condition, actual result, and classification. |
+
+### File changed
+
+- `assets/art/references/inventory.json`: line `"originalFilename": "akilta-wordmark-a1.svg"` → `"originalFilename": null` for `akilta_wordmark` entry. No other inventory changes.
+
+### Validation sequence (V04 §Mandatory validation sequence)
+
+| # | Command/check | Expected | Fail condition | Actual | Classification |
+| --- | --- | --- | --- | --- | --- |
+| 1 | `godot --version` | Godot 4.7.x project-compatible | Unavailable or materially inconsistent | `4.7.1.stable.official.a13da4feb` | CLAUDE_TEST_PASS |
+| 2 | `powershell -File tools\verify_project.ps1` | Exit 0, all OK | Any verification failure or non-zero exit | Exit 0, all [OK] (project.godot, main scene, main.gd, headless run) | CLAUDE_TEST_PASS |
+| 3 | `godot --headless --path . --quit-after 5` | Clean startup, no fatal errors | Fatal parse/runtime/startup error or non-zero exit | Clean output, exit 0 | CLAUDE_TEST_PASS |
+| 4 | `godot --headless --path . -s res://tests/run_tests.gd` | Full regression pass | Any failure or non-zero exit | 227/227 PASS, exit 0 | CLAUDE_TEST_PASS |
+| 5 | Inventory JSON validation (python3) | All 13 sub-checks pass (see below) | Any sub-check fails | All 13 PASS | CLAUDE_TEST_PASS |
+| 6 | `git diff --check` | Clean | Whitespace/error output | Clean (exit 0, LF→CRLF warnings only) | CLAUDE_TEST_PASS |
+| 7 | `git status --short` (pre-commit) | Only inventory.json modified; no prohibited files | Desktop log, .godot/, secrets, images staged | `M assets/art/references/inventory.json` + 2 expected untracked | CLAUDE_TEST_PASS |
+
+#### Inventory JSON sub-checks (step 5 detail)
+
+| Sub-check | Result |
+| --- | --- |
+| JSON parses successfully | PASS |
+| Exactly 9 entries | PASS |
+| Asset IDs unique | PASS |
+| Exactly 7 MISSING | PASS |
+| All MISSING `repositoryPath == null` | PASS |
+| All MISSING `width == null` | PASS |
+| All MISSING `height == null` | PASS |
+| All MISSING `candidateDifficulty == null` | PASS |
+| `akilta_wordmark.sourceClass == "PROJECT_BRANDING"` | PASS |
+| `akilta_wordmark.repositoryPath == "assets/brand/akilta-wordmark.svg"` | PASS |
+| `akilta_wordmark.originalFilename == null` | PASS |
+| Colony Flow `TEXT_ONLY` | PASS |
+| Colony Flow `EXTERNAL_INSPIRATION` | PASS |
+
+### Failures and debugging history
+
+None. F-M07-001 fix was a single-field change; no errors encountered.
+
+### Git evidence
+
+- Ending commit: (to be filled after commit)
+- Push result: (to be filled after push)
+
+### Remaining / blocked
+
+- SB-M07-008 through SB-M07-014: AWAITING OWNER ASSET.
+- M10 DIRTY/CLEAN: OWNER_REQUIRED.
+
+### Handoff state
+
+Cycle set to `AWAITING_AUDIT`.
+
+Confirm before ending:
+
+- [x] This implementation log appended (not rewritten).
+- [x] No Claude self-audit file created.
+- [x] No ChatGPT audit/prompt files modified.
+- [x] Audit V01 and AUDIT_INDEX read; F-M07-001, F-M07-002, AL-008, AL-009 applied.
+- [x] Every V04-mandated validation command individually logged.
+- [x] `coordination/SESSION_INDEX.md` updated.
+- [x] `.hiveai/PROJECT_DASHBOARD.md` updated.
+- [x] Desktop phase log updated.
+- [x] No secrets committed.
