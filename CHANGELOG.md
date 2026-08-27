@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+### Added — Pixel Art to Level Data Importer Core (M09-C001)
+
+- New `LevelImporter` (`scripts/tools/level_importer.gd`): deterministic
+  exact-pixel PNG → Level Data V1 converter. One source pixel = one cell,
+  no resize/resample/interpolation. Palette ordered by first-seen during
+  row-major scan. `#RRGGBBAA` hex preserves alpha exactly. Output passes
+  structural and production validation. Reconstruction from Level Data
+  alone is pixel-perfect (raw RGBA8 byte match verified at 3×2, 20×27,
+  59×59). Deterministic rerun detects UNCHANGED, no meaningless file writes.
+- New CLI entrypoint (`tools/import_level.gd`): headless Godot script for
+  command-line imports with `--source`, `--id`, `--name`, `--difficulty`,
+  `--output`, `--preview`, `--metadata`, `--overwrite` arguments.
+- New test fixture generator (`tools/generate_test_fixtures.gd`) and
+  reconstruction verifier (`tools/verify_reconstruction.gd`) for CLI-level
+  validation.
+- Optional JSON metadata sidecar records importer version, source path,
+  dimensions, palette count, difficulty, output ID — never mutates Level
+  Data V1.
+- `auto_difficulty()` convenience: returns production difficulty when
+  dimensions fall in exactly one band, empty string otherwise.
+- Extended `tests/run_tests.gd` from 227 to **286 checks**: 59 new importer
+  checks covering 3×2 non-square/transparency, 20×27 rectangular EASY,
+  59×59 VERY_HARD maximum, semi-transparent alpha round-trip, deterministic
+  rerun, overwrite safety, and 11 negative/error tests.
+- Updated `docs/03_LEVEL_DATA_SPEC.md`, `docs/06_TEST_STRATEGY.md`,
+  `CHANGELOG.md`, `tasks.md`. M09 tasks SB-M09-001..017 marked complete.
+  SB-M09-018..020 (batch import) deferred to M09-C002.
+
 ### Added — Visual Reference Library infrastructure (M07-C001)
 
 - Established visual reference directory structure per `tasks.md` §9.6:

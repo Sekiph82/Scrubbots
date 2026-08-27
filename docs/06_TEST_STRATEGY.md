@@ -7,8 +7,8 @@ checks. Prompt 02 implemented a small custom GDScript test runner
 headless Godot; most later categories below are still planned, not yet
 implemented.
 
-**Current total: 227 checks, all passing** (73 from Prompt 02 + 58 added in
-Prompt 03 + 96 added in Prompt 04).
+**Current total: 286 checks, all passing** (73 from Prompt 02 + 58 added in
+Prompt 03 + 96 added in Prompt 04 + 59 added in M09-C001).
 
 **Testing renderer output — a lesson from Prompt 04:** `BoardRenderer`
 reads pixels back through an `Image` with `Image.FORMAT_RGBA8` (8 bits per
@@ -159,6 +159,35 @@ Run via `tools/run_headless.ps1` or directly:
   threshold — see `SCRUBBOTS_PHASE_M06_LOG.md` for actual measured numbers
   and the explicit statement that true GPU/on-screen frame-rate could not
   be measured under `--headless` (no display surface to composite to).
+
+## Implemented in M09-C001 (`tests/run_tests.gd`, extended)
+
+### LevelImporter core (59 checks)
+- **3×2 non-square TEST import**: correct dimensions, cell count, difficulty,
+  palette count (4), first-seen palette ordering (differs from sorted RGB),
+  cell-to-palette mapping for all 6 cells including repeated colors in
+  separated positions, output/preview/metadata files written.
+- **Pixel-perfect reconstruction (3×2)**: raw RGBA8 byte comparison between
+  source PNG and reconstruction from Level Data (palette+cells only, no
+  source-image shortcut). Verifies width, height, format, exact byte match.
+- **Deterministic rerun (3×2)**: identical import request on existing output
+  detects UNCHANGED, no file rewrite.
+- **Rectangular production-band (20×27 EASY)**: dimensions exact, difficulty
+  preserved, passes ProductionLevelValidator and LevelValidator, raw RGBA8
+  reconstruction byte match, deterministic rerun UNCHANGED.
+- **Maximum size (59×59 VERY_HARD)**: 3,481 cells, passes production validator,
+  raw RGBA8 reconstruction byte match (13,924 bytes).
+- **Semi-transparent alpha round-trip (2×2)**: includes alpha=0, alpha=255,
+  and alpha≈128; raw RGBA8 bytes match source exactly.
+- **Performance sanity (59×59)**: import+validate+write and reconstruction
+  timed (CPU only — no GPU/FPS claims per AL-003). Printed, no hard threshold.
+- **Negative tests**: missing file, non-image file, empty level_id, empty
+  display_name, unknown difficulty, TEST rejected by production validator,
+  3×2 with EASY rejected (outside band), auto_difficulty correct for
+  EASY/MEDIUM/VERY_HARD and empty for out-of-band/cross-band, overwrite
+  safety (collision rejected, overwrite=true succeeds).
+- All tests use runtime-generated deterministic fixtures — no committed
+  artwork.
 
 ## Planned, not yet implemented
 

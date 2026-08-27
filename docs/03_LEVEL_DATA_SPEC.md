@@ -156,6 +156,36 @@ content by design (see above).
   JSON-load → `LevelData` → `BoardState` → performance pipeline at the real
   maximum, not just via in-memory test objects.
 
+## Importer (M09-C001)
+
+`scripts/tools/level_importer.gd` converts a source PNG into Level Data V1
+JSON deterministically:
+
+- **Exact-pixel contract**: one source RGBA pixel = one logical cell. No
+  resize, resample, interpolation, crop, pad, or forced dimensions.
+- **Deterministic palette**: first-seen color during canonical row-major scan
+  (`y=0..h-1, x=0..w-1`). Color representation: `#RRGGBBAA` uppercase hex
+  (preserves alpha exactly, accepted by existing palette parsing).
+- **Canonical cell order**: `index = y * width + x` (matches
+  BoardState/LevelData).
+- **Difficulty**: uses `DifficultyRules` as authority. TEST imports allow
+  arbitrary positive dimensions. Production imports validate dimensions
+  against the declared difficulty band. `auto_difficulty()` returns the
+  unique matching production band or empty string if ambiguous.
+- **Metadata sidecar**: separate JSON file recording importer version, source
+  path, dimensions, palette count, difficulty, output level ID — never
+  mutates Level Data V1.
+- **Reconstruction**: `reconstruct_image()` rebuilds RGBA8 `Image` from
+  Level Data palette+cells alone (never touches the source image). Pixel-
+  perfect raw-byte match verified at 3×2, 20×27, and 59×59.
+- **No meaningless diffs**: identical output content → UNCHANGED (no file
+  write). Overwrite safety: collision rejected unless `overwrite=true`.
+
+CLI entrypoint: `tools/import_level.gd` (headless Godot script).
+Test fixture generator: `tools/generate_test_fixtures.gd`.
+
+Batch import (`SB-M09-018..020`) deferred to M09-C002.
+
 ## Explicitly deferred
 
 - Per-cell runtime-state overrides / special cells (locked cells, bonus

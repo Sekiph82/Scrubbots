@@ -621,24 +621,24 @@ An image must never be auto-changed to 20×20/40×40/50×50 for convenience.
 
 ### M09 — Pixel Art → Level Data Pipeline `[CONTENT]`
 
-- [ ] SB-M09-001 Create importer tool.
-- [ ] SB-M09-002 Read source pixels exactly.
-- [ ] SB-M09-003 Determine width. — [ ] SB-M09-004 Determine height.
-- [ ] SB-M09-005 Determine/validate difficulty.
-- [ ] SB-M09-006 Extract unique palette.
-- [ ] SB-M09-007 Produce stable palette ordering.
-- [ ] SB-M09-008 Convert pixels to palette IDs.
-- [ ] SB-M09-009 Flatten using canonical row-major mapping (`index = y*width+x`).
-- [ ] SB-M09-010 Produce Level Data V1.
-- [ ] SB-M09-011 Store source-asset metadata where useful.
-- [ ] SB-M09-012 Deterministic output.
-- [ ] SB-M09-013 Re-running importer produces no meaningless diff.
-- [ ] SB-M09-014 Reconstruct image from generated data.
-- [ ] SB-M09-015 Pixel-compare reconstruction.
-- [ ] SB-M09-016 Generate preview.
-- [ ] SB-M09-017 Reject unsupported/broken art with useful reason.
-- [ ] SB-M09-018 Batch import. — [ ] SB-M09-019 Batch validation.
-- [ ] SB-M09-020 Duplicate level ID protection.
+- [x] SB-M09-001 Create importer tool. — `scripts/tools/level_importer.gd` (core) + `tools/import_level.gd` (CLI). Validated: 286/286 tests, CLI 3x2/20x27/59x59 pass.
+- [x] SB-M09-002 Read source pixels exactly. — PNG loaded as RGBA8, no resize/resample/interpolation. Reconstruction raw-byte match proves lossless.
+- [x] SB-M09-003 Determine width. — [x] SB-M09-004 Determine height. — Taken from source Image dimensions. Rectangular boards first-class (20x27 tested).
+- [x] SB-M09-005 Determine/validate difficulty. — Uses DifficultyRules. TEST/production split enforced. auto_difficulty() convenience. Unknown rejected. Band mismatch rejected.
+- [x] SB-M09-006 Extract unique palette. — First-seen row-major scan. `#RRGGBBAA` uppercase hex preserving alpha.
+- [x] SB-M09-007 Produce stable palette ordering. — Deterministic first-seen via dictionary keyed on hex string + ordered palette array. Rerun produces identical order.
+- [x] SB-M09-008 Convert pixels to palette IDs. — Each pixel mapped to palette index via color→ID dictionary.
+- [x] SB-M09-009 Flatten using canonical row-major mapping (`index = y*width+x`). — Shares formula with BoardState/LevelData.
+- [x] SB-M09-010 Produce Level Data V1. — Output passes LevelValidator. Production-band outputs pass ProductionLevelValidator.
+- [x] SB-M09-011 Store source-asset metadata where useful. — Separate JSON sidecar (not in Level Data V1). Records importer version, source path, dimensions, palette count, difficulty, output ID/path.
+- [x] SB-M09-012 Deterministic output. — JSON.stringify with tab indent + newline. Same input = identical text.
+- [x] SB-M09-013 Re-running importer produces no meaningless diff. — UNCHANGED detection: existing identical content → no file write. Automated + CLI verified.
+- [x] SB-M09-014 Reconstruct image from generated data. — `reconstruct_image()` uses palette+cells only, never source image.
+- [x] SB-M09-015 Pixel-compare reconstruction. — Raw RGBA8 byte comparison: 3x2 (24B), 20x27 (2160B), 59x59 (13924B) all match source. Semi-transparent alpha round-trips.
+- [x] SB-M09-016 Generate preview. — Preview PNG from reconstruction, not source. Not resized or smoothed.
+- [x] SB-M09-017 Reject unsupported/broken art with useful reason. — Missing file, bad format, empty ID/name, unknown difficulty, band mismatch, overwrite collision — all tested with actionable error messages.
+- [ ] SB-M09-018 Batch import. — [ ] SB-M09-019 Batch validation. — Deferred to M09-C002.
+- [ ] SB-M09-020 Duplicate level ID protection. — Deferred to M09-C002.
 
 ### M10 — Dirty/Clean Visual Model `[DESIGN GATE]`
 
