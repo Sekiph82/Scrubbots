@@ -158,9 +158,24 @@ milestone: M09
 - No unintended changes
 - Classification: **CLAUDE_TEST_PASS**
 
-#### Steps 13–15: Commit, push, final status
+#### Step 13: Commit
 
-- To be recorded after commit and push below.
+- Commit: `7acd0e6` — `feat: add deterministic exact-pixel PNG to Level Data V1 importer (M09-C001)`
+- 12 files changed, 1011 insertions, 37 deletions
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 14: Push
+
+- Command: `git push origin main`
+- Result: `18ed207..7acd0e6  main -> main`
+- Classification: **CLAUDE_TEST_PASS**
+
+#### Step 15: Final status
+
+- Final commit: https://github.com/Sekiph82/Scrubbots/commit/7acd0e6
+- `git status --short` after push: clean working tree (only untracked: scratchpad temp, docs/logs/)
+- Log backfill commit required for SHA recording (this update)
+- Classification: **CLAUDE_TEST_PASS**
 
 ### Prompt deviations
 
