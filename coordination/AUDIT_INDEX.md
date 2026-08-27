@@ -18,6 +18,9 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | AL-007 | DIRTY/CLEAN visual gate | AI implementation/tests cannot choose final visual treatment. | Preserve M10 as `OWNER_REQUIRED`; test infrastructure/readability only. | M06/M10 design gate |
 | AL-008 | Metadata provenance | Unknown metadata must not be inferred merely because a related file exists. | Original filename, dimensions, difficulty, approval, provenance, and similar fields require repository/owner evidence; otherwise keep them null/unverified. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md |
 | AL-009 | Validation traceability | A green aggregate test total does not prove that every prompt-required validation step ran. | Record every prompt-mandated command/check individually in `CLAUDE_IMPLEMENTATION_LOG.md`, including smoke/status checks and failures. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md |
+| AL-010 | Import/export path safety | Source and derived-output paths can alias even when filenames look different syntactically. | Canonicalize path identity before writes; reject source↔destination and destination↔destination aliases. An overwrite flag must never authorize source destruction. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md |
+| AL-011 | Negative-test specificity | A negative test must isolate the failure mode it claims to verify. | For format gates, use a valid unsupported-format file; an unreadable text/corrupt file proves readability failure, not unsupported-format rejection. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md |
+| AL-012 | Multi-artifact overwrite safety | Safe overwrite behavior must apply to every generated artifact, not only the primary output. | Test Level JSON, preview, metadata, caches/sidecars individually for existing-file behavior and cross-artifact collisions. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md |
 
 ## Audit history
 
@@ -25,6 +28,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | --- | --- | --- | --- |
 | META-C001 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | `AUDITED_PASS` | Coordination evidence chain established. |
 | M07-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 added AL-008 metadata provenance and AL-009 validation traceability; V02 confirmed both corrections and added no new learning. |
+| M09-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md | `CHANGES_REQUIRED` | Added AL-010 path alias/source immutability, AL-011 negative-test specificity, and AL-012 multi-artifact overwrite safety. |
 
 ## Claude usage rule
 
