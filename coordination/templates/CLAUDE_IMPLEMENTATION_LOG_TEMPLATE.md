@@ -1,5 +1,5 @@
 ---
-coordinationSchema: scrubbots-coordination/v1
+coordinationSchema: scrubbots-coordination/v3
 artifactType: claude-implementation-log
 cycleId: <MXX-CNNN>
 createdAt: <ISO-8601>
@@ -13,24 +13,21 @@ currentCommit: <sha-or-uncommitted>
 
 # SCRUBBOTS - Claude Implementation Log
 
-This file is append-only within one coordination cycle. Multiple Claude Code sessions working on the same cycle append new session entries here. Do not delete prior failures, commands, or decisions after they are resolved.
+This file is Claude's append-only implementation and test record for one coordination cycle.
 
-Claude's own tests are provisional implementer evidence. Final independent audit status is assigned only by ChatGPT according to:
+Claude does not audit itself. Final audit decisions are published only by ChatGPT.
+
+Audit policy:
 https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 
-Before planning verification, read:
-
-- Audit policy: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
-- Audit index: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
-- Active ChatGPT prompt(s): <absolute GitHub URLs>
-- Prior ChatGPT audit(s) relevant to this cycle/system: <absolute GitHub URLs>
-
-The local Desktop phase log required by `CLAUDE.md` remains mandatory and more detailed. This GitHub log is the durable handoff/evidence layer for ChatGPT, H!veAI, and the owner.
+Audit learning index:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 ## Inputs read
 
-- ChatGPT prompts: <absolute GitHub URLs>
-- ChatGPT audits: <absolute GitHub URLs or none>
+- Active ChatGPT prompt: <absolute GitHub URL>
+- Prior ChatGPT audit(s): <absolute GitHub URLs or none>
+- Audit criteria, if supplied: <absolute GitHub URL or none>
 - Audit learnings applied: <AL-XXX IDs>
 - Owner notes: <absolute GitHub URLs or none>
 - tasks.md: https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md
@@ -42,22 +39,22 @@ The local Desktop phase log required by `CLAUDE.md` remains mandatory and more d
 
 ### Session status
 
-`IN_PROGRESS`, `COMPLETED_PASS`, `BLOCKED`, or `FAILED`.
+`IN_PROGRESS`, `IMPLEMENTATION_COMPLETE`, `BLOCKED`, or `FAILED`.
 
 ### Repository start state
 
 - Branch:
 - Starting commit + GitHub URL:
 - Working tree:
-- Baseline tests:
+- Baseline checks run:
 
-### Audit-informed test plan
+### Prior audit feedback applied
 
-Before implementation or completion testing, state which prior audit learnings/findings changed the plan.
+Record exactly how relevant prior ChatGPT findings and `AL-XXX` learnings changed implementation or testing.
 
-| Audit learning/finding | Test/implementation change applied |
+| Audit/finding/learning | Change applied in this pass |
 | --- | --- |
-| AL-XXX / audit URL | ... |
+| `<audit URL / finding ID / AL-XXX>` | ... |
 
 ### Work performed
 
@@ -73,39 +70,39 @@ Describe actual implementation, not intent.
 
 ### Architecture / decisions
 
-Record decisions made during implementation and where durable decisions were documented.
+Record implementation decisions and where durable project decisions were documented.
 
-### Commands and provisional tests
+### Tests and checks run by Claude
 
-For each material test, include expected result and explicit failure criteria.
+Claude-run checks are implementation evidence only. They are not audit verdicts.
 
-| Command/test | Expected | Fail condition | Actual | Classification |
+For every prompt-mandated command/check, record a separate row.
+
+| Command/check | Expected | Explicit fail condition | Actual | Result |
 | --- | --- | --- | --- | --- |
-| ... | ... | ... | ... | SELF_PASS / SELF_FAIL / NOT_RUN / BLOCKED |
+| ... | ... | ... | ... | `CLAUDE_TEST_PASS` / `CLAUDE_TEST_FAIL` / `NOT_RUN` / `BLOCKED` / `OWNER_REQUIRED` |
 
-Do not label Claude-run checks `AUDITED_PASS`.
+### Negative / boundary / regression coverage
 
-### Negative/boundary/regression coverage
+Record the extra checks selected because of current risk or prior ChatGPT audit findings.
 
-Record non-happy-path checks selected because of current risk and prior audit learnings.
+### False-positive risks / unverified assumptions
+
+Record ways the current checks could pass without proving the intended behavior, plus any remaining unverified assumption. Do not hide them behind an aggregate green count.
 
 ### Failures and debugging history
 
-Record failed approaches, errors, root cause, and fix. Do not erase this section after success.
-
-### False-positive risks noticed
-
-Record any way current tests might pass without proving intended behavior and how the self-audit will challenge that risk.
+Keep failures, root causes, and fixes. Do not erase them after success.
 
 ### Performance evidence
 
-Record measured evidence when relevant. Never claim measurements that were not run. Never treat headless CPU timing as on-screen GPU/FPS evidence.
+Record only measurements actually taken. Never present headless CPU timing as on-screen GPU/FPS evidence.
 
 ### Prompt deviations
 
-State any requirement not implemented exactly, why, and whether owner/ChatGPT follow-up is needed. Use `None` when there were no deviations.
+State any requirement not implemented exactly and why. Use `None` when there were no deviations.
 
-### Task/documentation updates
+### Task / documentation updates
 
 - `tasks.md` items changed:
 - Docs/ADR/changelog changed:
@@ -117,35 +114,31 @@ State any requirement not implemented exactly, why, and whether owner/ChatGPT fo
 - Push result:
 - PR if used:
 
-### Self-audit
-
-Before handing work back, create a new immutable:
-
-`coordination/sessions/<CYCLE_ID>/CLAUDE_SELF_AUDIT_VNN.md`
-
-using:
-https://github.com/Sekiph82/Scrubbots/blob/main/coordination/templates/CLAUDE_SELF_AUDIT_TEMPLATE.md
-
-Self-audit URL:
-<absolute GitHub URL>
-
 ### Remaining / blocked
 
 - ...
 
 ### Handoff state
 
-Set the cycle to `AWAITING_AUDIT` only after the self-audit is ready for ChatGPT independent review, or `BLOCKED` when external/owner input is required.
+When implementation/testing evidence is ready for ChatGPT review:
+
+- update `coordination/SESSION_INDEX.md`;
+- update `.hiveai/PROJECT_DASHBOARD.md`;
+- set the cycle to `AWAITING_AUDIT`;
+- stop.
+
+Do not create any audit or self-audit file.
 
 Confirm before ending:
 
 - [ ] Desktop phase log updated.
 - [ ] This implementation log appended.
-- [ ] Claude self-audit created for this implementation pass.
-- [ ] Audit policy and index read.
-- [ ] Relevant prior ChatGPT audits read and applied.
+- [ ] Active ChatGPT prompt read.
+- [ ] Relevant prior ChatGPT audits and `AUDIT_INDEX.md` read/applied.
+- [ ] Every prompt-mandated validation command is individually recorded.
 - [ ] `coordination/SESSION_INDEX.md` updated.
-- [ ] `.hiveai/PROJECT_DASHBOARD.md` Latest Session Summary updated.
-- [ ] GitHub-tracked evidence uses absolute GitHub URLs.
+- [ ] `.hiveai/PROJECT_DASHBOARD.md` updated.
+- [ ] GitHub evidence uses absolute GitHub URLs.
 - [ ] No ChatGPT prompt/audit files were rewritten.
+- [ ] No Claude self-audit file was created.
 - [ ] No secrets were committed.
