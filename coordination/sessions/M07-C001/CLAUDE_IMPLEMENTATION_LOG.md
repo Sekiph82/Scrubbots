@@ -262,8 +262,8 @@ None. F-M07-001 fix was a single-field change; no errors encountered.
 
 ### Git evidence
 
-- Ending commit: (to be filled after commit)
-- Push result: (to be filled after push)
+- Ending commit: `c66eaf5` — https://github.com/Sekiph82/Scrubbots/commit/c66eaf5
+- Push result: `785228b..c66eaf5 main -> main` (success)
 
 ### Remaining / blocked
 
