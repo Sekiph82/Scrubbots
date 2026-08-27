@@ -6,7 +6,7 @@ This directory is the versioned communication bus between ChatGPT, Claude Code, 
 
 - `tasks.md` is the only canonical task ledger. Coordination files may reference task IDs, but must not create a competing backlog.
 - `CLAUDE.md` is the agent operating manual.
-- `.hiveai/PROJECT_DASHBOARD.md` is the H!veAI-facing status and latest-session summary surface.
+- `.hiveai/PROJECT_DASHBOARD.md` is the single H!veAI-facing materialized status and latest-session summary surface.
 - `coordination/SESSION_INDEX.md` is the append-only index of communication cycles.
 - `CHANGELOG.md` is project history, not task truth.
 - Desktop phase logs remain the detailed, crash-safe Claude work journal. GitHub coordination logs do not replace them.
@@ -83,19 +83,25 @@ Before ending a material Claude session:
 
 Claude must not edit a published ChatGPT prompt or audit to make implementation look compliant.
 
-## H!veAI watcher contract
+## H!veAI single-dashboard contract
 
-H!veAI should track these sources:
+The repository intentionally uses **single-dashboard-watch** mode.
+
+H!veAI actively watches only:
 
 - `.hiveai/PROJECT_DASHBOARD.md`
+
+The following are source evidence that ChatGPT/Claude must read and materialize into the dashboard after every material session:
+
 - `tasks.md`
 - `coordination/SESSION_INDEX.md`
 - `coordination/sessions/**/CHATGPT_PROMPT_V*.md`
 - `coordination/sessions/**/CHATGPT_AUDIT_V*.md`
 - `coordination/sessions/**/CLAUDE_IMPLEMENTATION_LOG.md`
+- `coordination/sessions/**/OWNER_NOTES.md`
 - `CHANGELOG.md`
 
-The dashboard may summarize these sources, but task checkboxes remain authoritative only in `tasks.md`.
+This keeps the watcher simple while preserving full GitHub evidence. The dashboard is the materialized summary, not a competing ledger.
 
 ## Dashboard synchronization rule
 
@@ -111,7 +117,9 @@ Every material ChatGPT or Claude session must refresh `.hiveai/PROJECT_DASHBOARD
 - blocker/waiting state;
 - next expected actor/action.
 
-The dashboard is a summary surface, not a second task ledger. Detailed history lives in the cycle files and `SESSION_INDEX.md`.
+Also update `coordination/SESSION_INDEX.md` in the same session.
+
+The dashboard may summarize task state but must never duplicate or silently override `tasks.md` checkboxes.
 
 ## Relationship to Desktop phase logs
 

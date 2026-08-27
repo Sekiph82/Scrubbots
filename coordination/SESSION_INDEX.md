@@ -10,7 +10,7 @@ Canonical task truth remains in `tasks.md`. This file indexes ChatGPT/Claude com
 
 | Cycle | Milestone | Started | Last update | Status | ChatGPT prompt | Claude log | ChatGPT audit | Task refs | Repository evidence | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | AUDITED_PASS | [`CHATGPT_PROMPT_V01.md`](sessions/META-C001/CHATGPT_PROMPT_V01.md) | N/A (ChatGPT performed process-only repository setup) | [`CHATGPT_AUDIT_V01.md`](sessions/META-C001/CHATGPT_AUDIT_V01.md) | None; no gameplay task status changed | Coordination-system setup PR/commit recorded in dashboard after merge | Installed the versioned ChatGPT↔Claude communication bus, session index, H!veAI watcher contract, templates, and dashboard synchronization rules. |
+| META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | AUDITED_PASS | [`CHATGPT_PROMPT_V01.md`](sessions/META-C001/CHATGPT_PROMPT_V01.md) | N/A (ChatGPT performed process-only repository setup) | [`CHATGPT_AUDIT_V01.md`](sessions/META-C001/CHATGPT_AUDIT_V01.md) | None; no gameplay task status changed | PR #2 (`hiveai/coordination-ledger-v1`) | Installed the versioned ChatGPT↔Claude communication bus, session index, templates, and single-dashboard synchronization rules. |
 
 ## Rules
 
@@ -20,4 +20,4 @@ Canonical task truth remains in `tasks.md`. This file indexes ChatGPT/Claude com
 - Prompt and audit links must point to immutable versioned artifacts.
 - Claude uses one append-only `CLAUDE_IMPLEMENTATION_LOG.md` per cycle.
 - `Repository evidence` should contain commit/PR/path evidence, never secret values.
-- Every material ChatGPT or Claude session also updates `.hiveai/PROJECT_DASHBOARD.md`.
+- Every material ChatGPT or Claude session also updates `.hiveai/PROJECT_DASHBOARD.md` because H!veAI actively watches only that materialized dashboard file.

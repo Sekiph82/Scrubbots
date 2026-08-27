@@ -81,3 +81,13 @@ data, BoardState, production difficulty validation
 an automated headless test suite (`tests/run_tests.gd`, **227 checks, all
 passing**), including renderer geometry/pixel-output tests at every
 official band boundary and the 59×59 maximum.
+
+---
+
+<p align="center">
+  <a href="https://www.akilta.com/" title="Developed by Akilta">
+    <img src="assets/brand/akilta-wordmark.svg" alt="Akilta" height="24" style="vertical-align: middle;" />
+    <br />
+    <sub>Developed by Akilta</sub>
+  </a>
+</p>

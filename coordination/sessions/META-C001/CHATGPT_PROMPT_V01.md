@@ -8,7 +8,7 @@ actor: CHATGPT
 status: RECORDED
 milestone: META
 taskRefs: []
-baselineCommit: c384e14fb3cbc4c3201e683a88988f8e48868fc8
+baselineCommit: d7a701941cdfb7f6f326673be8516087bb1a981a
 ---
 
 # META-C001 — GitHub Coordination System Setup
@@ -20,9 +20,10 @@ Re-inspect `Sekiph82/Scrubbots` and establish a repository-native tracking and c
 1. ChatGPT stores the implementation prompts it gives Claude.
 2. ChatGPT stores evidence-based audits after Claude work.
 3. Claude stores a durable GitHub implementation log for code written from those prompts/audits.
-4. The H!veAI Project Dashboard tracks these coordination artifacts.
+4. The H!veAI Project Dashboard reflects these coordination artifacts.
 5. After every material ChatGPT or Claude session, a concise session summary is refreshed in the Project Dashboard.
 6. Existing `tasks.md` task truth and the existing local Desktop phase-log workflow must remain coherent rather than being replaced by competing ledgers.
+7. The existing `single-dashboard-watch` H!veAI model and Akilta attribution on `main` must be preserved.
 
 ## Execution mode
 
@@ -35,9 +36,10 @@ This is a process-only META cycle. ChatGPT is implementing the repository docume
 - Add templates for ChatGPT prompts, ChatGPT audits, and Claude implementation logs.
 - Add this setup cycle as the first indexed coordination record.
 - Update `CLAUDE.md` so Claude participates in the protocol while keeping the existing Desktop phase log.
-- Upgrade `.hiveai/PROJECT_DASHBOARD.md` from a pointer-only manifest into a source map plus agent-maintained latest-session summary without duplicating `tasks.md` task checkboxes.
+- Extend `.hiveai/PROJECT_DASHBOARD.md` so ChatGPT/Claude materialize the latest coordination summary into the single H!veAI-watched dashboard after each material session.
+- Keep `tasks.md` as the only canonical task ledger.
 - Document the system in `CHANGELOG.md`.
-- Use a focused branch/PR and preserve main until reviewed/merged.
+- Use a focused branch/PR and preserve unrelated `main` changes.
 
 ## Non-goals
 
