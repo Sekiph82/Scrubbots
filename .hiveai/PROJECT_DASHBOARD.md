@@ -1,4 +1,4 @@
-# SCRUBBOTS — H!veAI Project Dashboard
+# SCRUBBOTS - H!veAI Project Dashboard
 
 <!--
 hiveaiDashboardSchema: hiveai-project-dashboard/v1
@@ -27,50 +27,52 @@ This file is the single H!veAI-facing materialized project status and latest-ses
 | --- | --- |
 | Project status | ACTIVE |
 | Health | HEALTHY |
-| Current implementation frontier | M07 — Visual Reference Library / owner asset ingestion |
-| Current task | NONE (between implementation prompts) |
-| Current task ID | NONE |
-| Current workflow state | WAITING — owner artwork needed to begin M07 |
+| Current implementation frontier | M07 - Visual Reference Library / owner asset ingestion |
+| Current task | M07-C001 - Visual Reference Library foundation + asset availability audit |
+| Current task ID | `M07-C001` |
+| Current workflow state | PLANNED - ChatGPT prompt issued; awaiting Claude implementation |
 | Automated evidence | 227/227 headless checks PASS at Phase M06 completion (`abd9ceb`) |
 | Open design gate | M10 DIRTY/CLEAN final preset selection (A/B/C prototypes exist) |
-| Required actor | HUMAN / CHATGPT before next Claude implementation cycle |
-| Next project action | Owner supplies/identifies original SCRUBBOTS artwork for M07 and reviews DIRTY/CLEAN presets when ready |
-| Waiting on | Owner-approved artwork assets and DIRTY preset approval |
+| Required actor | CLAUDE |
+| Next project action | Claude safely syncs `origin/main`, reads `coordination/sessions/M07-C001/CHATGPT_PROMPT_V01.md`, establishes the visual reference library foundation, audits actual repository asset availability, and records implementation evidence. |
+| Waiting on | Owner-approved artwork is still required to complete asset-specific M07 inventory tasks, but M07-C001 infrastructure/audit work can proceed now. |
 | Canonical task truth | `tasks.md` |
 
 ## Latest session summary
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-08-27T11:34:26+03:00 |
+| Timestamp | 2026-08-27T11:42:00+03:00 |
 | Actor | CHATGPT |
-| Cycle | `META-C001` |
-| Session type | Repository audit + coordination-system setup |
-| Cycle status | AUDITED_PASS |
-| Milestone/task impact | META only; no `tasks.md` gameplay checkbox changed |
-| Summary | Added and merged the repository-native ChatGPT↔Claude communication protocol: versioned ChatGPT prompts/audits, append-only Claude implementation logs, session index, templates, and mandatory per-session dashboard synchronization while preserving the local Desktop phase log and existing H!veAI single-dashboard-watch architecture. |
-| Primary evidence | PR #2 merged to `main` as `734ccfe`; `coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md` |
-| Next expected actor | OWNER / CHATGPT for the next scoped cycle; CLAUDE after a versioned implementation prompt is issued |
+| Cycle | `M07-C001` |
+| Session type | Implementation prompt issuance |
+| Cycle status | PLANNED |
+| Milestone/task impact | M07 work authorized; no `tasks.md` checkbox changed by prompt issuance |
+| Summary | Issued the first normal coordination-cycle implementation prompt for M07. Claude is instructed to build the visual reference library foundation, inspect only verified repository assets, define naming/metadata/approval/source-preservation rules, keep missing owner artwork explicitly awaiting asset, preserve the M10 DIRTY/CLEAN design gate, and maintain both the Desktop phase log and GitHub implementation log. |
+| Primary evidence | `coordination/sessions/M07-C001/CHATGPT_PROMPT_V01.md` issued on `main` in `c20380f`; cycle registered in `coordination/SESSION_INDEX.md` |
+| Next expected actor | CLAUDE |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M07 | Visual Reference Library | NOT_STARTED | HUMAN (owner supplies assets) | `tasks.md` M07 |
+| M07-C001 | Visual Reference Library foundation + asset availability audit | PLANNED | CLAUDE | `coordination/sessions/M07-C001/CHATGPT_PROMPT_V01.md` |
+| M07 | Visual Reference Library | NOT_STARTED / awaiting implementation evidence | CLAUDE + HUMAN for asset-specific tasks | `tasks.md` M07 |
 | M10 | DIRTY/CLEAN Visual Approval | DESIGN_GATE | HUMAN (owner picks preset) | `tasks.md` M10, `scenes/debug/board_renderer_debug.tscn` |
 | M05 | Test Harness Maturity | PARTIAL | CLAUDE | `tasks.md` M05 |
 | META-C001 | GitHub coordination protocol | AUDITED_PASS | CHATGPT | PR #2, `coordination/SESSION_INDEX.md` |
 
 ## Blockers and waiting
 
-- **M07 blocked on owner artwork**: original SCRUBBOTS visual assets are not yet verified inside the repository.
+- **M07 asset-specific tasks still depend on owner artwork**: original SCRUBBOTS visual assets are not yet verified inside the repository. M07-C001 may still complete its infrastructure and availability-audit objective without fabricating assets.
 - **M10 design gate**: DIRTY/CLEAN presets A/B/C are implemented but final selection remains owner-controlled.
 
 ## Recent coordination cycles
 
 | Cycle | Milestone | Status | Last actor | Summary | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| `META-C001` | META | AUDITED_PASS | CHATGPT | Established GitHub prompt→implementation→audit communication and single-dashboard session synchronization. | PR #2 merged as `734ccfe`; `coordination/SESSION_INDEX.md` |
+| `M07-C001` | M07 | PLANNED | CHATGPT | Issued visual reference library foundation and asset-availability audit prompt; awaiting Claude implementation. | `coordination/sessions/M07-C001/CHATGPT_PROMPT_V01.md`, `coordination/SESSION_INDEX.md` |
+| `META-C001` | META | AUDITED_PASS | CHATGPT | Established GitHub prompt->implementation->audit communication and single-dashboard session synchronization. | PR #2 merged as `734ccfe`; `coordination/SESSION_INDEX.md` |
 
 ## Coordination source map
 
@@ -113,11 +115,11 @@ Normal implementation loop:
 
 `ChatGPT prompt -> Claude implementation/log -> ChatGPT audit -> PASS or revised prompt in the same cycle`
 
-Example artifacts:
+Current cycle artifacts:
 
 - `coordination/sessions/M07-C001/CHATGPT_PROMPT_V01.md`
-- `coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md`
-- `coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md`
+- `coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md` - to be created/appended by Claude
+- `coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md` - to be created after Claude implementation review
 
 If the audit requires corrections, keep the same cycle, add `CHATGPT_PROMPT_V02.md`, and let Claude append another session entry to the same implementation log.
 
@@ -128,29 +130,30 @@ If the audit requires corrections, keep the same cycle, add `CHATGPT_PROMPT_V02.
 | M00 | Foundation & Environment | COMPLETE |
 | M01 | Variable-Size Level Data Core | COMPLETE |
 | M02 | BoardState Core | COMPLETE |
-| M03 | Official Difficulty Bands + 59×59 | COMPLETE |
+| M03 | Official Difficulty Bands + 59x59 | COMPLETE |
 | M04 | Expanded Board Fixtures & Test Matrix | COMPLETE |
 | M05 | Test Harness Maturity | PARTIAL |
 | M06 | Board Renderer | COMPLETE |
-| M07 | Visual Reference Library | NOT_STARTED |
-| M08–M55 | Remaining milestones | NOT_STARTED |
+| M07 | Visual Reference Library | NOT_STARTED / M07-C001 prompt issued |
+| M08-M55 | Remaining milestones | NOT_STARTED |
 
 ## Quality and verification
 
-- **Test suite**: `tests/run_tests.gd` — **227/227 checks PASS**, exit code 0 at Phase M06 completion.
+- **Test suite**: `tests/run_tests.gd` - **227/227 checks PASS**, exit code 0 at Phase M06 completion.
 - **Command**: `godot --headless --path . -s res://tests/run_tests.gd`
 - **Last verified code milestone**: Phase M06 (`abd9ceb`).
-- Coordination/process-only sessions do not claim gameplay test reruns unless they actually occurred.
+- Prompt issuance does not claim a fresh gameplay test rerun. Claude must run and record the actual regression result during M07-C001.
 
 ## Recent meaningful activity
 
 | Date | Event |
 | --- | --- |
-| 2026-08-27 | META-C001 merged: repository-native ChatGPT↔Claude coordination ledger and dashboard synchronization protocol — PR #2 / `734ccfe`. |
+| 2026-08-27 | M07-C001 issued: Visual Reference Library foundation + asset availability audit prompt - `coordination/sessions/M07-C001/CHATGPT_PROMPT_V01.md`. |
+| 2026-08-27 | META-C001 merged: repository-native ChatGPT<->Claude coordination ledger and dashboard synchronization protocol - PR #2 / `734ccfe`. |
 | 2026-08-27 | H!veAI single-dashboard tracking + Akilta attribution added on `main` (`d7a7019`). |
-| 2026-08-18 | M06 complete: BoardRenderer, DirtyCleanPresets A/B/C, 227/227 tests — `abd9ceb`. |
-| 2026-08-17 | M03/M04 complete: official difficulty ranges through 59×59 and 131/131 tests — `89c7d43`. |
-| 2026-08-17 | Master task plan established — `03da4e8`. |
+| 2026-08-18 | M06 complete: BoardRenderer, DirtyCleanPresets A/B/C, 227/227 tests - `abd9ceb`. |
+| 2026-08-17 | M03/M04 complete: official difficulty ranges through 59x59 and 131/131 tests - `89c7d43`. |
+| 2026-08-17 | Master task plan established - `03da4e8`. |
 
 ## Dashboard integrity rules
 
