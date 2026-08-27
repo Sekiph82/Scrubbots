@@ -11,7 +11,7 @@ taskRefs: []
 baselineCommit: <sha>
 ---
 
-# SCRUBBOTS — ChatGPT Prompt
+# SCRUBBOTS - ChatGPT Prompt
 
 ## Objective
 
@@ -19,25 +19,41 @@ State exactly what Claude must accomplish in this cycle.
 
 ## Repository baseline
 
-- Repository: `Sekiph82/Scrubbots`
+- Repository: https://github.com/Sekiph82/Scrubbots
 - Branch: `main` unless explicitly stated otherwise
-- Starting commit: `<sha>`
+- Starting/baseline commit: `<sha>`
 - Current milestone/task refs: `<ids>`
-- Relevant prior cycle/audit: `<links or none>`
+- Relevant prior cycle/audit: `<absolute GitHub URLs or none>`
 
-## Authoritative sources to read first
+## Canonical GitHub sources to read first
 
-- `CLAUDE.md`
-- `tasks.md`
-- `.hiveai/PROJECT_DASHBOARD.md`
-- `coordination/README.md`
-- `coordination/SESSION_INDEX.md`
-- relevant `docs/`
-- every earlier prompt/audit/owner note in this cycle
+Use absolute GitHub URLs as the primary identifiers for repository sources.
+
+At minimum include:
+
+- https://github.com/Sekiph82/Scrubbots/blob/main/CLAUDE.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/PROJECT_DASHBOARD.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/coordination/README.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/coordination/SESSION_INDEX.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
+- the active prompt URL
+- every prior ChatGPT audit URL relevant to the cycle/system
+- every owner-note URL relevant to the cycle
+- relevant project docs by absolute GitHub URL
+
+Repository-relative paths may be included only as secondary convenience references.
+
+## Prior audit learnings to apply
+
+List relevant `AL-XXX` entries from `coordination/AUDIT_INDEX.md` and any specific prior `CHATGPT_AUDIT_VNN.md` findings Claude must incorporate into implementation/testing.
+
+Claude must treat these findings as part of the current verification baseline and explicitly state in its self-audit how they changed the test plan.
 
 ## Locked constraints
 
-List only constraints relevant to this scope. Reference existing authority instead of duplicating the whole project spec.
+List only constraints relevant to this scope. Reference existing authority instead of duplicating the entire project spec.
 
 ## In scope
 
@@ -53,16 +69,31 @@ List only constraints relevant to this scope. Reference existing authority inste
 
 ## Validation requirements
 
-Record exact commands/tests/evidence required before completion.
+For every material requirement define:
+
+- expected behavior;
+- explicit failure condition;
+- test/check method;
+- required negative/boundary/regression checks where applicable.
+
+Claude's own tests are provisional implementer evidence, not independent proof.
+
+Before handing work back, Claude must create a versioned self-audit using:
+
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/templates/CLAUDE_SELF_AUDIT_TEMPLATE.md
+
+The self-audit must compare current behavior against relevant prior ChatGPT audit findings and `AUDIT_INDEX` learnings.
 
 ## Logging and communication requirements
 
-- Continue the correct Desktop phase log.
-- Create/update `coordination/sessions/<CYCLE_ID>/CLAUDE_IMPLEMENTATION_LOG.md` as append-only evidence.
+- Continue the correct local Desktop phase log.
+- Create/update the cycle's append-only Claude implementation log.
+- Create a new immutable `CLAUDE_SELF_AUDIT_VNN.md` for each implementation pass handed to ChatGPT.
 - Update `tasks.md` only when validated task truth changes.
 - Update `coordination/SESSION_INDEX.md`.
 - Update `.hiveai/PROJECT_DASHBOARD.md` Latest Session Summary before ending the session.
-- Never edit this prompt file after acting on it. If instructions require revision, wait for `CHATGPT_PROMPT_V02.md` or later.
+- Use absolute GitHub URLs for GitHub-tracked prompt/audit/log/index/dashboard evidence.
+- Never edit a published ChatGPT prompt or ChatGPT audit.
 
 ## Stop conditions
 
@@ -70,4 +101,4 @@ State what Claude must not begin in this cycle.
 
 ## Expected Claude final response
 
-Require a concise summary containing cycle ID, implementation status, test results, commit/push evidence, log path, blockers, and readiness for ChatGPT audit.
+Require a concise summary containing cycle ID, implementation state, provisional test results, self-audit URL, implementation-log URL, commit/push evidence, blockers, and readiness for independent ChatGPT audit.
