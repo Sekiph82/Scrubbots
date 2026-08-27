@@ -2,6 +2,34 @@
 
 ## Unreleased
 
+### Added — Visual Reference Library infrastructure (M07-C001)
+
+- Established visual reference directory structure per `tasks.md` §9.6:
+  `assets/art/references/{gameplay,ui,scrubbots,pixel_method,
+  external_inspiration}/`, `assets/art/characters/scrubbots/`,
+  `assets/art/levels/source/{easy,medium,hard,very_hard}/`,
+  `assets/art/levels/previews/`.
+- Created human-readable visual reference guide
+  (`assets/art/references/README.md`): visual authority hierarchy, source
+  classes, approval/availability semantics, canonical naming, immutable
+  source-original preservation policy, intake process, external-inspiration
+  limits, M08 technical-audit boundary, M10 DIRTY/CLEAN design-gate
+  continuity.
+- Created machine-readable inventory (`assets/art/references/inventory.json`,
+  `scrubbots-visual-inventory/v1`): every expected visual category recorded
+  with stable ID, source class, approval/availability status, and null paths
+  for missing assets. Akilta branding classified as `PROJECT_BRANDING`,
+  explicitly not SCRUBBOTS gameplay art.
+- All 7 expected owner-asset categories (Scrubbot characters, gameplay
+  screens, five-slot references, level artwork, underwater theme, other
+  themes, pixel-construction references) recorded as
+  `AWAITING_OWNER_ASSET` — no fabricated or guessed assets.
+- Colony Flow external inspiration recorded as text-only provenance entry
+  with explicit non-copying policy.
+- M07 infrastructure tasks SB-M07-001..007, 015..017 validated and marked
+  complete. Asset-specific tasks SB-M07-008..014 remain open pending
+  owner-supplied files.
+
 ### Added — GitHub coordination bus + H!veAI session tracking (META-C001)
 
 - Added `coordination/README.md` as the durable ChatGPT↔Claude communication protocol while keeping `tasks.md` as the sole canonical task ledger.
