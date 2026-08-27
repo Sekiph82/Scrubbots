@@ -791,6 +791,182 @@ func _run_importer_tests() -> void:
 	)
 	_check(LevelImporter.run_import(req_overwrite).is_ok(), "overwrite=true succeeds on collision")
 
+	# ---- F-M09-001: PATH ALIAS SAFETY ----
+	var src_bytes_before := FileAccess.get_file_as_bytes(path_3x2)
+
+	# output == source, overwrite=false
+	var req_alias_1 := LevelImporter.ImportRequest.new(
+		path_3x2, "alias1", "Alias", "TEST", path_3x2, "", "", false
+	)
+	_check(not LevelImporter.run_import(req_alias_1).is_ok(), "output==source overwrite=false rejected")
+	_check_eq(FileAccess.get_file_as_bytes(path_3x2), src_bytes_before, "source unchanged after output alias attempt (ow=false)")
+
+	# output == source, overwrite=true (source must STILL be immutable)
+	var req_alias_2 := LevelImporter.ImportRequest.new(
+		path_3x2, "alias2", "Alias", "TEST", path_3x2, "", "", true
+	)
+	_check(not LevelImporter.run_import(req_alias_2).is_ok(), "output==source overwrite=true rejected (source immutable)")
+	_check_eq(FileAccess.get_file_as_bytes(path_3x2), src_bytes_before, "source unchanged after output alias attempt (ow=true)")
+
+	# preview == source
+	var req_alias_3 := LevelImporter.ImportRequest.new(
+		path_3x2, "alias3", "Alias", "TEST", test_dir + "alias3.json", path_3x2, "", false
+	)
+	_check(not LevelImporter.run_import(req_alias_3).is_ok(), "preview==source rejected")
+	_check_eq(FileAccess.get_file_as_bytes(path_3x2), src_bytes_before, "source unchanged after preview alias")
+
+	# metadata == source
+	var req_alias_4 := LevelImporter.ImportRequest.new(
+		path_3x2, "alias4", "Alias", "TEST", test_dir + "alias4.json", "", path_3x2, false
+	)
+	_check(not LevelImporter.run_import(req_alias_4).is_ok(), "metadata==source rejected")
+	_check_eq(FileAccess.get_file_as_bytes(path_3x2), src_bytes_before, "source unchanged after metadata alias")
+
+	# output == preview
+	var shared_path := test_dir + "shared_out_prev.json"
+	var req_alias_5 := LevelImporter.ImportRequest.new(
+		path_3x2, "alias5", "Alias", "TEST", shared_path, shared_path, "", false
+	)
+	_check(not LevelImporter.run_import(req_alias_5).is_ok(), "output==preview rejected")
+
+	# output == metadata
+	var req_alias_6 := LevelImporter.ImportRequest.new(
+		path_3x2, "alias6", "Alias", "TEST", shared_path, "", shared_path, false
+	)
+	_check(not LevelImporter.run_import(req_alias_6).is_ok(), "output==metadata rejected")
+
+	# preview == metadata
+	var req_alias_7 := LevelImporter.ImportRequest.new(
+		path_3x2, "alias7", "Alias", "TEST", test_dir + "alias7.json", shared_path, shared_path, false
+	)
+	_check(not LevelImporter.run_import(req_alias_7).is_ok(), "preview==metadata rejected")
+
+	# ---- F-M09-002: PREVIEW/METADATA OVERWRITE SAFETY ----
+	# existing different preview, overwrite=false
+	var diff_prev_path := test_dir + "diff_preview.png"
+	var diff_prev_img := Image.create(1, 1, false, Image.FORMAT_RGBA8)
+	diff_prev_img.set_pixel(0, 0, Color.WHITE)
+	diff_prev_img.save_png(diff_prev_path)
+	var req_prev_clash := LevelImporter.ImportRequest.new(
+		path_3x2, "prev_clash", "PrevClash", "TEST",
+		test_dir + "prev_clash.json", diff_prev_path, "", false
+	)
+	_check(not LevelImporter.run_import(req_prev_clash).is_ok(), "existing different preview, overwrite=false rejected")
+	# Level JSON should NOT have been written (preflight catches preview first)
+	_check(not FileAccess.file_exists(test_dir + "prev_clash.json"), "Level JSON not written when preview preflight fails")
+
+	# existing different metadata, overwrite=false
+	var diff_meta_path := test_dir + "diff_meta.json"
+	var dmf := FileAccess.open(diff_meta_path, FileAccess.WRITE)
+	if dmf: dmf.store_string("{\"different\": true}"); dmf.close()
+	var req_meta_clash := LevelImporter.ImportRequest.new(
+		path_3x2, "meta_clash", "MetaClash", "TEST",
+		test_dir + "meta_clash.json", "", diff_meta_path, false
+	)
+	_check(not LevelImporter.run_import(req_meta_clash).is_ok(), "existing different metadata, overwrite=false rejected")
+	_check(not FileAccess.file_exists(test_dir + "meta_clash.json"), "Level JSON not written when metadata preflight fails")
+
+	# existing identical preview → unchanged
+	var ident_prev_path := test_dir + "ident_preview.png"
+	var ident_req_1 := LevelImporter.ImportRequest.new(
+		path_3x2, "ident_prev", "IdentPrev", "TEST",
+		test_dir + "ident_prev.json", ident_prev_path, "", true
+	)
+	var ident_res_1 := LevelImporter.run_import(ident_req_1)
+	_check(ident_res_1.is_ok(), "initial import for identical-preview test")
+	var ident_req_2 := LevelImporter.ImportRequest.new(
+		path_3x2, "ident_prev", "IdentPrev", "TEST",
+		test_dir + "ident_prev.json", ident_prev_path, "", false
+	)
+	var ident_res_2 := LevelImporter.run_import(ident_req_2)
+	_check(ident_res_2.is_ok(), "identical preview rerun succeeds")
+	_check(ident_res_2.preview_unchanged, "identical preview detected as unchanged")
+	_check(ident_res_2.output_unchanged, "identical output detected as unchanged on same rerun")
+
+	# existing identical metadata → unchanged
+	var ident_meta_path := test_dir + "ident_meta_sidecar.json"
+	var ident_req_3 := LevelImporter.ImportRequest.new(
+		path_3x2, "ident_meta", "IdentMeta", "TEST",
+		test_dir + "ident_meta_out.json", "", ident_meta_path, true
+	)
+	var ident_res_3 := LevelImporter.run_import(ident_req_3)
+	_check(ident_res_3.is_ok(), "initial import for identical-metadata test")
+	var ident_req_4 := LevelImporter.ImportRequest.new(
+		path_3x2, "ident_meta", "IdentMeta", "TEST",
+		test_dir + "ident_meta_out.json", "", ident_meta_path, false
+	)
+	var ident_res_4 := LevelImporter.run_import(ident_req_4)
+	_check(ident_res_4.is_ok(), "identical metadata rerun succeeds")
+	_check(ident_res_4.metadata_unchanged, "identical metadata detected as unchanged")
+
+	# overwrite=true replaces distinct derived artifacts
+	var ow_prev_path := test_dir + "ow_preview.png"
+	var ow_img := Image.create(1, 1, false, Image.FORMAT_RGBA8)
+	ow_img.set_pixel(0, 0, Color.BLACK)
+	ow_img.save_png(ow_prev_path)
+	var req_ow_all := LevelImporter.ImportRequest.new(
+		path_3x2, "ow_all", "OwAll", "TEST",
+		test_dir + "ow_all.json", ow_prev_path, test_dir + "ow_meta.json", true
+	)
+	var res_ow_all := LevelImporter.run_import(req_ow_all)
+	_check(res_ow_all.is_ok(), "overwrite=true replaces all derived artifacts")
+	_check(res_ow_all.preview_written, "overwrite=true preview written")
+
+	# ---- F-M09-003: PNG-ONLY FORMAT GATE ----
+	# Valid JPEG (runtime-generated) rejected as unsupported format
+	var jpeg_path := test_dir + "test_img.jpg"
+	var jpeg_img := Image.create(2, 2, false, Image.FORMAT_RGBA8)
+	jpeg_img.set_pixel(0, 0, Color.RED)
+	jpeg_img.set_pixel(1, 0, Color.GREEN)
+	jpeg_img.set_pixel(0, 1, Color.BLUE)
+	jpeg_img.set_pixel(1, 1, Color.WHITE)
+	jpeg_img.save_jpg(jpeg_path)
+	var req_jpeg := LevelImporter.ImportRequest.new(
+		jpeg_path, "jpeg_test", "JPEG Test", "TEST", test_dir + "jpeg.json"
+	)
+	var res_jpeg := LevelImporter.run_import(req_jpeg)
+	_check(not res_jpeg.is_ok(), "valid JPEG rejected (unsupported format)")
+	_check(res_jpeg.errors[0].find("Unsupported source format") >= 0, "JPEG error is unsupported-format, not corrupt")
+
+	# Corrupt .png content
+	var corrupt_png_path := test_dir + "corrupt.png"
+	var cpf := FileAccess.open(corrupt_png_path, FileAccess.WRITE)
+	if cpf: cpf.store_string("not a valid PNG file"); cpf.close()
+	var req_corrupt := LevelImporter.ImportRequest.new(
+		corrupt_png_path, "corrupt_test", "Corrupt", "TEST", test_dir + "corrupt.json"
+	)
+	var res_corrupt := LevelImporter.run_import(req_corrupt)
+	_check(not res_corrupt.is_ok(), "corrupt .png rejected")
+	_check(res_corrupt.errors[0].find("Could not load") >= 0, "corrupt .png error is load failure, not format")
+
+	# .PNG case variant accepted
+	var png_upper_path := test_dir + "TEST_UPPER.PNG"
+	img_3x2.save_png(png_upper_path)
+	var req_upper := LevelImporter.ImportRequest.new(
+		png_upper_path, "upper_png", "Upper PNG", "TEST", test_dir + "upper.json"
+	)
+	_check(LevelImporter.run_import(req_upper).is_ok(), ".PNG uppercase extension accepted")
+
+	# ---- F-M09-004: RECONSTRUCTION SAFETY ----
+	# Short cells
+	var bad_level_short := LevelData.new(1, "bad", "Bad", "TEST", 3, 2, PackedStringArray(["#FF0000FF"]), PackedInt32Array([0, 0]))
+	_check(LevelImporter.reconstruct_image(bad_level_short) == null, "reconstruction rejects short cells without crash")
+
+	# Out-of-range palette ID
+	var bad_level_pid := LevelData.new(1, "bad", "Bad", "TEST", 2, 1, PackedStringArray(["#FF0000FF"]), PackedInt32Array([0, 5]))
+	_check(LevelImporter.reconstruct_image(bad_level_pid) == null, "reconstruction rejects out-of-range palette ID")
+
+	# Invalid palette string
+	var bad_level_hex := LevelData.new(1, "bad", "Bad", "TEST", 1, 1, PackedStringArray(["not_a_color"]), PackedInt32Array([0]))
+	_check(LevelImporter.reconstruct_image(bad_level_hex) == null, "reconstruction rejects invalid palette string")
+
+	# Zero dimensions
+	var bad_level_dim := LevelData.new(1, "bad", "Bad", "TEST", 0, 1, PackedStringArray(["#FF0000FF"]), PackedInt32Array([]))
+	_check(LevelImporter.reconstruct_image(bad_level_dim) == null, "reconstruction rejects zero width")
+
+	# Null level
+	_check(LevelImporter.reconstruct_image(null) == null, "reconstruction rejects null level")
+
 	# ---- cleanup test dir ----
 	var dir := DirAccess.open(test_dir)
 	if dir:

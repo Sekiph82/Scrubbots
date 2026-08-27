@@ -180,6 +180,23 @@ JSON deterministically:
   perfect raw-byte match verified at 3×2, 20×27, and 59×59.
 - **No meaningless diffs**: identical output content → UNCHANGED (no file
   write). Overwrite safety: collision rejected unless `overwrite=true`.
+- **PNG-only gate**: only `.png` source files accepted (case-insensitive).
+  Valid non-PNG images (JPEG, BMP, etc.) are rejected with an actionable
+  "unsupported source format" error before any import processing. Corrupt
+  `.png` files fail separately as unreadable input.
+- **Source immutability**: the source PNG is never a valid write destination.
+  Path aliasing (output/preview/metadata pointing at the source) is rejected
+  even when `overwrite=true`. All destination paths must be pairwise distinct.
+  Path comparison uses canonicalized paths (resolves `res://`, `user://`,
+  backslash normalization, case-insensitive on Windows).
+- **Multi-artifact preflight**: all requested destinations (Level JSON,
+  preview PNG, metadata sidecar) are checked for overwrite collisions
+  *before* any file is written. A collision on preview or metadata does not
+  leave a partial Level JSON behind.
+- **Reconstruction safety**: `reconstruct_image()` validates all
+  preconditions (null level, zero/negative dimensions, empty palette, invalid
+  palette hex strings, cell count mismatch, out-of-range palette IDs) and
+  returns `null` cleanly — no runtime array-indexing errors on malformed data.
 
 CLI entrypoint: `tools/import_level.gd` (headless Godot script).
 Test fixture generator: `tools/generate_test_fixtures.gd`.

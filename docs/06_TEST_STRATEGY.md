@@ -7,8 +7,9 @@ checks. Prompt 02 implemented a small custom GDScript test runner
 headless Godot; most later categories below are still planned, not yet
 implemented.
 
-**Current total: 286 checks, all passing** (73 from Prompt 02 + 58 added in
-Prompt 03 + 96 added in Prompt 04 + 59 added in M09-C001).
+**Current total: 320 checks, all passing** (73 from Prompt 02 + 58 added in
+Prompt 03 + 96 added in Prompt 04 + 59 added in M09-C001 + 34 safety checks
+added in M09-C001 V02 correction).
 
 **Testing renderer output — a lesson from Prompt 04:** `BoardRenderer`
 reads pixels back through an `Image` with `Image.FORMAT_RGBA8` (8 bits per
@@ -188,6 +189,30 @@ Run via `tools/run_headless.ps1` or directly:
   safety (collision rejected, overwrite=true succeeds).
 - All tests use runtime-generated deterministic fixtures — no committed
   artwork.
+
+### LevelImporter safety hardening (34 checks, M09-C001 V02 correction)
+
+- **Path alias safety (7 checks)**: output==source rejected (overwrite=false
+  and overwrite=true — source immutable even with overwrite), preview==source
+  rejected, metadata==source rejected, output==preview rejected,
+  output==metadata rejected, preview==metadata rejected. Source byte
+  preservation verified after each destructive alias attempt.
+- **Preview/metadata overwrite safety (4 checks)**: existing different preview
+  with overwrite=false rejected *before* Level JSON is written; existing
+  different metadata rejected similarly; identical existing preview detected
+  as UNCHANGED (no rewrite); identical existing metadata UNCHANGED.
+- **Overwrite=true multi-artifact (1 check)**: all three artifacts (Level
+  JSON, preview, metadata) replaced when overwrite=true.
+- **PNG-only format gate (3 checks)**: valid JPEG image (generated at runtime
+  via `save_jpg`) with `.jpg` extension rejected with "Unsupported source
+  format" (AL-011: isolates format rejection from corrupt-file rejection);
+  corrupt `.png` (random bytes) rejected with "Could not load"; uppercase
+  `.PNG` variant accepted.
+- **Reconstruction safety (5 checks)**: short cell array → null, out-of-range
+  palette ID → null, invalid palette hex string → null, zero-dimension level
+  → null, null level → null. All return cleanly without runtime errors.
+- **Prior regression (14 checks)**: all 14 existing overwrite/negative tests
+  from initial M09-C001 remain green.
 
 ## Planned, not yet implemented
 

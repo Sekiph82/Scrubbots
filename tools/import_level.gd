@@ -35,9 +35,13 @@ func _initialize() -> void:
 		print("UNCHANGED: %s (content identical)" % request.output_path)
 	elif result.output_written:
 		print("WRITTEN: %s" % request.output_path)
-	if result.preview_written:
+	if result.preview_unchanged:
+		print("PREVIEW UNCHANGED: %s" % request.preview_path)
+	elif result.preview_written:
 		print("PREVIEW: %s" % request.preview_path)
-	if result.metadata_written:
+	if result.metadata_unchanged:
+		print("METADATA UNCHANGED: %s" % request.metadata_path)
+	elif result.metadata_written:
 		print("METADATA: %s" % request.metadata_path)
 	print("OK: %dx%d, %d colors, %d cells, difficulty=%s" % [
 		result.level_data.width, result.level_data.height,
