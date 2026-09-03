@@ -11,7 +11,7 @@ taskRefs:
   - SB-M09-019
   - SB-M09-020
 startingCommit: 9d4480162df7c49f60ed0aeec1b1588999e0d23a
-currentCommit: uncommitted
+currentCommit: 28d642067745887556446f2570a63367a2df3770
 ---
 
 # SCRUBBOTS - Claude Implementation Log (M09-C002)
@@ -195,9 +195,10 @@ None. All three target tasks (`SB-M09-018/019/020`) implemented; all required ba
 
 ### Git evidence
 
-- Ending commit + GitHub URL: recorded in a follow-up backfill entry after commit/push (see below).
+- Ending commit: `28d6420` — https://github.com/Sekiph82/Scrubbots/commit/28d6420
 - Commit message: `feat: add M09-C002 batch import, validation, and duplicate-ID protection`
-- Push result: recorded after push (see below).
+- Push result: `git push origin main` → `9d44801..28d6420  main -> main` (no force)
+- Final `git status --short`: clean working tree (only pre-existing untracked: scratchpad temp, `docs/logs/` — unrelated to this session)
 - PR: none used (direct push to `main`, per project convention).
 
 ### Remaining / blocked
