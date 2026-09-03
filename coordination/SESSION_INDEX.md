@@ -19,7 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M09-C002 | M09 - Batch Import / Validation / Duplicate IDs | 2026-09-03 | 2026-09-03 | `CHANGES_REQUIRED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V01.md | SB-M09-018..020 | Audit V01 found deterministic preflight and catalog-integrity gaps. V02 correction is active. |
+| M09-C002 | M09 - Batch Import / Validation / Duplicate IDs | 2026-09-03 | 2026-09-03 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V01.md | SB-M09-018..020 | V02 correction pass complete: closed all five audit V01 findings (F-M09B-001..005) — destination-parent preflight, catalog-root fail-closed, bidirectional catalog ownership, catalog health invalidates validation, optional manifest schema types. 426/426 tests pass (32 new). Ready for ChatGPT audit V02. |
 | M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-09-03 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md | SB-M09-001..017 | Exact-pixel importer core and safety hardening independently audited pass. |
 | M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | SB-M07-001..017 | Reference-library infrastructure audited; owner asset tasks remain open. |
 | META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | Repository-native ChatGPT/Claude coordination and H!veAI synchronization established. |
@@ -45,12 +45,15 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
   - `F-M09B-005` optional manifest field types are not explicitly schema-validated.
 - Added learnings: `AL-014`, `AL-015`, `AL-016`.
 
-### Active correction
+### V02 correction implementation
 
 - Prompt V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V02.md
 - Criteria V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V02.md
-- Required actor: `CLAUDE`
-- Claude implements/tests/logs only, then returns cycle to `AWAITING_AUDIT`.
+- Closed F-M09B-001 (destination-parent preflight), F-M09B-002 (catalog-root fail-closed), F-M09B-003 (bidirectional catalog ID/path ownership), F-M09B-004 (catalog health invalidates overall validation), F-M09B-005 (optional manifest field type validation).
+- `LevelImporter._canonical_path()` split into `_resolve_path()` (real, case-preserved, for actual FileAccess/DirAccess calls) + `_canonical_path()` (adds Windows case-fold, comparison only) — behavior-preserving.
+- 32 new tests (426/426 total); all required real-CLI cases independently verified (missing parent, missing/non-directory catalog root, malformed catalog health, existing catalog duplicate, different-ID-same-path takeover with byte-preservation proof, same-ID-same-path re-import, invalid optional type with no crash).
+- See `CLAUDE_IMPLEMENTATION_LOG.md` Session 2 for full evidence.
+- Cycle state: `AWAITING_AUDIT` for ChatGPT audit V02.
 
 ## Previous completed audit baselines
 

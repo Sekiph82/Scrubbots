@@ -7,30 +7,42 @@ extends RefCounted
 ## exact-pixel conversion, palette/cell semantics, difficulty legality,
 ## reconstruction, path-alias detection, overwrite/unchanged preflight).
 ## This file adds only what a single item cannot know on its own: manifest
-## parsing, whole-batch preflight-before-any-write ordering, cross-item path
-## safety, and catalog duplicate-ID scanning.
+## parsing/schema validation, whole-batch preflight-before-any-write ordering
+## (including destination-parent-directory and catalog-root/health checks),
+## cross-item path safety, and bidirectional catalog duplicate-ID/ownership
+## scanning.
 ##
 ## Manifest schema (deterministic JSON):
 ##   { "items": [ { "source": "...", "id": "...", "name": "...",
 ##                  "difficulty": "...", "output": "...",
-##                  "preview": "..." (optional), "metadata": "..." (optional),
-##                  "overwrite": false (optional) }, ... ] }
+##                  "preview": "..." (optional string),
+##                  "metadata": "..." (optional string),
+##                  "overwrite": false (optional bool) }, ... ] }
 ## `items` must be a non-empty array; item order is preserved throughout
 ## (batch processing order, report order) — no other ordering is used.
+## Optional fields, when present, must match their declared type — a wrong
+## JSON type (e.g. `"overwrite": "yes"`) is an item schema error, never a
+## runtime type fault (M09-C002 V02 correction, F-M09B-005 / AL-016).
 ##
 ## Prepare/validate-then-commit architecture:
 ##   1. Every item is preflighted via LevelImporter.run_import(dry_run=true)
 ##      (this alone runs every M09-C001 validation/safety check, including
-##      per-item path aliasing) plus batch-only checks: duplicate IDs within
-##      the manifest, duplicate/aliased destinations across items, a source
-##      in one item aliasing a destination in another, and duplicate/
-##      malformed IDs found while scanning the existing catalog directory.
+##      per-item path aliasing) plus batch-only checks: manifest schema,
+##      destination-parent-directory existence (V02 correction, F-M09B-001 /
+##      AL-014), duplicate IDs within the manifest, duplicate/aliased
+##      destinations across items, a source in one item aliasing a
+##      destination in another, and a single fail-closed scan of the
+##      existing catalog directory for malformed entries, duplicate declared
+##      IDs, and bidirectional ID<->canonical-path ownership (V02 correction,
+##      F-M09B-002/003/004 / AL-015).
 ##   2. Final artifacts for the WHOLE batch are written only if every item
 ##      and every batch-only check passed preflight. A failing later item
 ##      prevents any earlier item's final artifacts from being committed.
 ##   3. Validation-only mode simply stops after step 1 — every check still
-##      runs, nothing is ever written (dry_run=true never reaches a physical
-##      write call in LevelImporter.run_import()).
+##      runs, nothing is ever written or created (no directories, no files):
+##      dry_run=true never reaches a physical write call in
+##      LevelImporter.run_import(), and destination-parent/catalog-root
+##      checks are read-only existence checks, never auto-create.
 ##
 ## Non-transactional limitation: preflight is a full logical check against
 ## catalog state as observed at batch start. The commit pass then re-invokes
@@ -38,8 +50,10 @@ extends RefCounted
 ## passed but a rare OS-level write failure occurs partway through the
 ## commit pass (disk full, permissions changed mid-run, etc.), items already
 ## written before that point remain written — there is no filesystem
-## transaction/rollback. This is a real, documented limitation, not a
-## claimed guarantee.
+## transaction/rollback. `BatchResult.committed` is true only when every
+## requested commit write actually completed successfully; a partial
+## post-preflight OS failure is visible via `committed == false` plus
+## per-item written/error detail, not hidden behind a blanket success flag.
 
 const LevelImporter = preload("res://scripts/tools/level_importer.gd")
 const LevelLoader = preload("res://scripts/data/level_loader.gd")
@@ -54,7 +68,7 @@ class BatchItemResult:
 	var output: String = ""
 	var request = null  # LevelImporter.ImportRequest, or null if never built
 	var import_result = null  # LevelImporter.ImportResult, or null if never run
-	var batch_errors: Array[String] = []  # duplicate-ID / cross-item path findings
+	var batch_errors: Array[String] = []  # schema/duplicate-ID/path/catalog-ownership findings
 
 	func all_errors() -> Array[String]:
 		var out: Array[String] = []
@@ -70,13 +84,28 @@ class BatchItemResult:
 class BatchResult:
 	var manifest_errors: Array[String] = []
 	var items: Array = []  # BatchItemResult, manifest order
+	var catalog_root_valid: bool = true
+	var catalog_root_error: String = ""
 	var catalog_malformed: Array[Dictionary] = []      # {path, errors}
 	var catalog_duplicate_ids: Array[Dictionary] = []  # {id, paths}
 	var validation_only: bool = true
+	## True only once every requested commit write actually completed
+	## successfully. False (not merely "unset") if a commit pass ran but a
+	## rare post-preflight OS failure hit any item — never a misleading
+	## blanket "success" flag for a partial commit.
 	var committed: bool = false
 
+	## Catalog root/health failures and manifest-level errors invalidate the
+	## whole batch even if no current item happens to touch the affected ID
+	## (M09-C002 V02 correction, F-M09B-002/003/004 / AL-015).
 	func is_ok() -> bool:
 		if not manifest_errors.is_empty():
+			return false
+		if not catalog_root_valid:
+			return false
+		if not catalog_malformed.is_empty():
+			return false
+		if not catalog_duplicate_ids.is_empty():
 			return false
 		for item in items:
 			if not item.is_ok():
@@ -135,15 +164,18 @@ class BatchResult:
 			"written_count": written_count(),
 			"unchanged_count": unchanged_count(),
 			"manifest_errors": manifest_errors,
+			"catalog_root_valid": catalog_root_valid,
+			"catalog_root_error": catalog_root_error,
 			"catalog_malformed": catalog_malformed,
 			"catalog_duplicate_ids": catalog_duplicate_ids,
 			"items": items_report,
 		}
 
-## Run one batch: parse manifest, scan catalog_root once, preflight the
-## whole batch, then (if commit==true and preflight passed) write every
-## item's final artifacts. If commit==false this is validation-only and
-## nothing is ever written.
+## Run one batch: parse manifest, validate the catalog root and scan it once,
+## preflight the whole batch (schema, destination parents, duplicate IDs,
+## cross-item path safety, catalog ownership/health), then (if commit==true
+## and preflight passed) write every item's final artifacts. If commit==false
+## this is validation-only and nothing is ever written or created.
 static func run_batch(manifest_path: String, catalog_root: String, commit: bool) -> BatchResult:
 	var result := BatchResult.new()
 	result.validation_only = not commit
@@ -175,6 +207,9 @@ static func run_batch(manifest_path: String, catalog_root: String, commit: bool)
 		return result
 
 	# ---- 2. build one BatchItemResult + ImportRequest per manifest item, in order ----
+	# F-M09B-005 / AL-016: optional field types are validated BEFORE any typed
+	# use — a wrong JSON type never reaches a typed assignment or import
+	# execution, it becomes an actionable item schema error.
 	for i in raw_items.size():
 		var raw = raw_items[i]
 		var item := BatchItemResult.new()
@@ -193,6 +228,17 @@ static func run_batch(manifest_path: String, catalog_root: String, commit: bool)
 			item.batch_errors.append("Item %d missing required field(s): %s" % [i, ", ".join(missing)])
 			continue
 
+		var type_errors: Array[String] = []
+		if raw.has("preview") and typeof(raw["preview"]) != TYPE_STRING:
+			type_errors.append("'preview' must be a string")
+		if raw.has("metadata") and typeof(raw["metadata"]) != TYPE_STRING:
+			type_errors.append("'metadata' must be a string")
+		if raw.has("overwrite") and typeof(raw["overwrite"]) != TYPE_BOOL:
+			type_errors.append("'overwrite' must be a boolean")
+		if not type_errors.is_empty():
+			item.batch_errors.append("Item %d has invalid optional field type(s): %s" % [i, ", ".join(type_errors)])
+			continue
+
 		item.id = raw["id"]
 		item.source = raw["source"]
 		item.output = raw["output"]
@@ -204,7 +250,29 @@ static func run_batch(manifest_path: String, catalog_root: String, commit: bool)
 			item.output, preview, metadata, overwrite, true  # dry_run=true for preflight
 		)
 
-	# ---- 3. duplicate ID within batch ----
+	# ---- 3. destination-parent-directory preflight ----
+	# F-M09B-001 / AL-014: a missing/non-directory destination parent is a
+	# predictable filesystem precondition, not a rare OS race — it must be
+	# caught here, before any item writes, not discovered mid-commit.
+	# Read-only existence check: never creates directories (validation-only
+	# and commit preflight behave identically here).
+	for item in result.items:
+		if item.request == null:
+			continue
+		var req = item.request
+		var dest_roles: Array = [["output", req.output_path], ["preview", req.preview_path], ["metadata", req.metadata_path]]
+		for entry in dest_roles:
+			var role: String = entry[0]
+			var path: String = entry[1]
+			if path.is_empty():
+				continue
+			var resolved: String = LevelImporter._resolve_path(path)
+			var parent: String = resolved.get_base_dir()
+			if not parent.is_empty() and not DirAccess.dir_exists_absolute(parent):
+				item.batch_errors.append(
+					"%s parent directory does not exist: '%s' (resolved '%s')" % [role, path, parent])
+
+	# ---- 4. duplicate ID within batch ----
 	var id_to_indices := {}
 	for item in result.items:
 		if item.request == null:
@@ -221,10 +289,25 @@ static func run_batch(manifest_path: String, catalog_root: String, commit: bool)
 				result.items[idx].batch_errors.append(
 					"Duplicate id '%s' within batch (items %s)" % [id, str(idxs)])
 
-	# ---- 4. catalog scan (once per run, not per item) ----
+	# ---- 5. catalog root validation (fail closed) ----
+	# F-M09B-002 / AL-015: a missing/unopenable/non-directory catalog root
+	# must never be silently treated as an empty, trustworthy catalog.
+	var resolved_catalog_root: String = LevelImporter._resolve_path(catalog_root)
+	if catalog_root.is_empty() or not DirAccess.dir_exists_absolute(resolved_catalog_root):
+		result.catalog_root_valid = false
+		result.catalog_root_error = "Catalog root '%s' does not exist or is not a directory" % catalog_root
+	elif DirAccess.open(resolved_catalog_root) == null:
+		result.catalog_root_valid = false
+		result.catalog_root_error = "Catalog root '%s' could not be opened (error %d)" % [catalog_root, DirAccess.get_open_error()]
+
+	# ---- 6. catalog scan (once per run, not per item) — only if the root itself validated ----
+	# Builds BOTH ownership directions (F-M09B-003 / AL-015):
+	#   id_to_catalog_paths:  declared id -> [canonical catalog file paths]
+	#   catalog_path_index:   canonical catalog path -> {status, id, path}
 	var id_to_catalog_paths := {}
-	var dir := DirAccess.open(catalog_root)
-	if dir != null:
+	var catalog_path_index := {}
+	if result.catalog_root_valid:
+		var dir := DirAccess.open(resolved_catalog_root)
 		var json_files: Array[String] = []
 		dir.list_dir_begin()
 		var fname := dir.get_next()
@@ -235,12 +318,15 @@ static func run_batch(manifest_path: String, catalog_root: String, commit: bool)
 		dir.list_dir_end()
 		json_files.sort()
 		for jf in json_files:
-			var full_path: String = catalog_root.path_join(jf)
+			var full_path: String = resolved_catalog_root.path_join(jf)
+			var canon: String = LevelImporter._canonical_path(full_path)
 			var load_res := LevelLoader.load_from_path(full_path)
 			if not load_res.is_ok():
 				result.catalog_malformed.append({"path": full_path, "errors": load_res.errors})
+				catalog_path_index[canon] = {"status": "malformed", "id": "", "path": full_path}
 				continue
 			var lvl_id: String = load_res.level_data.id
+			catalog_path_index[canon] = {"status": "valid", "id": lvl_id, "path": full_path}
 			if not id_to_catalog_paths.has(lvl_id):
 				id_to_catalog_paths[lvl_id] = []
 			id_to_catalog_paths[lvl_id].append(full_path)
@@ -253,27 +339,40 @@ static func run_batch(manifest_path: String, catalog_root: String, commit: bool)
 			paths.sort()
 			result.catalog_duplicate_ids.append({"id": id, "paths": paths})
 
-	# ---- 5. duplicate ID against catalog / same-entry re-import semantics ----
+	# ---- 7. duplicate ID against catalog / bidirectional ownership / same-entry re-import ----
 	for item in result.items:
 		if item.request == null:
 			continue
-		if not id_to_catalog_paths.has(item.id):
-			continue
-		var existing_paths: Array = id_to_catalog_paths[item.id]
-		if existing_paths.size() > 1:
-			item.batch_errors.append(
-				"id '%s' is ambiguous in the existing catalog (%d files declare it — see catalog duplicate report)" % [item.id, existing_paths.size()])
-			continue
-		var existing_path: String = existing_paths[0]
-		var canon_existing := LevelImporter._canonical_path(existing_path)
-		var canon_requested := LevelImporter._canonical_path(item.output)
-		if canon_existing != canon_requested:
-			item.batch_errors.append(
-				"id '%s' already belongs to a different catalog file '%s' (requested output '%s') — a different file cannot claim an existing level id; overwrite does not authorize this" % [item.id, existing_path, item.output])
-		# else: same physical catalog entry — allowed re-import, governed by
-		# LevelImporter's own overwrite/unchanged preflight in step 7.
+		var canon_requested: String = LevelImporter._canonical_path(item.output)
 
-	# ---- 6. cross-item path safety (destination-destination, source-destination) ----
+		# (a) id -> path: requested id already belongs to a different catalog file.
+		if id_to_catalog_paths.has(item.id):
+			var existing_paths: Array = id_to_catalog_paths[item.id]
+			if existing_paths.size() > 1:
+				item.batch_errors.append(
+					"id '%s' is ambiguous in the existing catalog (%d files declare it — see catalog duplicate report)" % [item.id, existing_paths.size()])
+			else:
+				var existing_path: String = existing_paths[0]
+				var canon_existing := LevelImporter._canonical_path(existing_path)
+				if canon_existing != canon_requested:
+					item.batch_errors.append(
+						"id '%s' already belongs to a different catalog file '%s' (requested output '%s') — a different file cannot claim an existing level id; overwrite does not authorize this" % [item.id, existing_path, item.output])
+
+		# (b) path -> id: requested output aliases an existing catalog file
+		# (F-M09B-003/004). Malformed catalog identity fails closed —
+		# ownership cannot be safely established, so overwrite is refused.
+		if catalog_path_index.has(canon_requested):
+			var entry: Dictionary = catalog_path_index[canon_requested]
+			if entry["status"] == "malformed":
+				item.batch_errors.append(
+					"output '%s' aliases an existing catalog file '%s' whose identity cannot be established (malformed Level Data) — rejected, ownership cannot be safely resolved even with overwrite=true" % [item.output, entry["path"]])
+			elif entry["id"] != item.id:
+				item.batch_errors.append(
+					"output '%s' aliases existing catalog file '%s' which declares a different id '%s' — a different id cannot claim an existing catalog file, even with overwrite=true" % [item.output, entry["path"], entry["id"]])
+			# else: entry["id"] == item.id — legitimate same-entry re-import,
+			# governed by LevelImporter's own overwrite/unchanged preflight.
+
+	# ---- 8. cross-item path safety (destination-destination, source-destination) ----
 	# ponytail: O(n^2) pairwise compare — fine for realistic manifest sizes;
 	# switch to a canonical-path hash index if batches ever grow very large.
 	var entries: Array = []
@@ -309,15 +408,16 @@ static func run_batch(manifest_path: String, catalog_root: String, commit: bool)
 				if d["index"] != s["index"]:
 					result.items[d["index"]].batch_errors.append(msg)
 
-	# ---- 7. per-item preflight (reuses the audited single importer, dry_run=true) ----
+	# ---- 9. per-item preflight (reuses the audited single importer, dry_run=true) ----
 	for item in result.items:
 		if item.request == null:
 			continue
 		item.import_result = LevelImporter.run_import(item.request)
 
-	# ---- 8. commit pass: only if requested AND the whole batch preflighted clean ----
+	# ---- 10. commit pass: only if requested AND the whole batch preflighted clean ----
 	var preflight_ok := result.is_ok()
 	if commit and preflight_ok:
+		var all_committed_ok := true
 		for item in result.items:
 			if item.request == null:
 				continue
@@ -327,6 +427,8 @@ static func run_batch(manifest_path: String, catalog_root: String, commit: bool)
 				r.output_path, r.preview_path, r.metadata_path, r.overwrite, false
 			)
 			item.import_result = LevelImporter.run_import(commit_req)
-		result.committed = true
+			if not item.import_result.is_ok():
+				all_committed_ok = false
+		result.committed = all_committed_ok
 
 	return result
