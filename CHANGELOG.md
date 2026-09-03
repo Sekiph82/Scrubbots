@@ -2,6 +2,24 @@
 
 ## Unreleased
 
+### Fixed — Filesystem Identity Normalization (M09-C001 V03 Correction)
+
+- Closed ChatGPT independent audit V02 finding F-M09-005: `_canonical_path()`
+  compared cosmetically-normalized strings only, so a `.`/`..` dot-segment or
+  a relative-vs-absolute equivalent of the same physical file could bypass
+  the source-immutability/cross-artifact alias preflight (`AL-013`).
+- `_canonical_path()` now resolves bare relative paths against `res://` (the
+  project root — empirically confirmed as the actual resolution base used by
+  `Image.load()`/`FileAccess.open()` for unprefixed CLI paths, not the OS
+  process working directory) and applies `String.simplify_path()` to collapse
+  `.`/`..` segments before every alias comparison. Symbolic-link identity
+  remains explicitly out of scope (lexical normalization only, no `realpath`).
+- Extended `tests/run_tests.gd` from 320 to **332 checks**: 12 new targeted
+  equivalent-path tests (`./` source alias, `subdir/../` source alias,
+  absolute-vs-`user://` source alias, destination-to-destination dot-segment
+  alias, `overwrite=true` on an equivalent source alias still rejected, and a
+  genuinely distinct dot-segment path still succeeding).
+
 ### Fixed — Importer Safety Hardening (M09-C001 V02 Correction)
 
 - Closed all four ChatGPT independent audit V01 findings (F-M09-001..004):

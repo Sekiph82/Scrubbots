@@ -310,13 +310,23 @@ static func generate_test_png(width: int, height: int, color_count: int = 4, inc
 
 # --- path safety helpers ---
 
+## F-M09-005 fix: canonicalize to one comparable filesystem identity, not a
+## cosmetically-normalized string. Base for unprefixed relative paths is
+## res:// (project root) — confirmed empirically (not the OS process CWD):
+## Image.load()/FileAccess.open() resolve a bare relative arg (as passed by
+## tools/import_level.gd's CLI args) against res://, regardless of the
+## shell's working directory at launch. Dot segments are simplified via
+## String.simplify_path() (lexical only — this does not resolve symlinks;
+## symbolic-link identity is out of scope for this correction).
 static func _canonical_path(p: String) -> String:
-	var resolved := p
-	if resolved.begins_with("res://"):
+	if p.is_empty():
+		return ""
+	var resolved := p.replace("\\", "/")
+	if resolved.begins_with("res://") or resolved.begins_with("user://"):
 		resolved = ProjectSettings.globalize_path(resolved)
-	elif resolved.begins_with("user://"):
-		resolved = ProjectSettings.globalize_path(resolved)
-	resolved = resolved.replace("\\", "/")
+	elif not resolved.is_absolute_path():
+		resolved = ProjectSettings.globalize_path("res://" + resolved)
+	resolved = resolved.simplify_path()
 	# Windows: case-insensitive filesystem
 	if OS.get_name() == "Windows":
 		resolved = resolved.to_lower()

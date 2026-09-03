@@ -841,6 +841,61 @@ func _run_importer_tests() -> void:
 	)
 	_check(not LevelImporter.run_import(req_alias_7).is_ok(), "preview==metadata rejected")
 
+	# ---- F-M09-005: FILESYSTEM IDENTITY NORMALIZATION (equivalent-path aliases) ----
+	# AL-013: cosmetic string normalization is not enough — dot segments and
+	# relative-vs-absolute equivalents must resolve to the same identity.
+
+	# 1. source vs "./" equivalent output path, overwrite=false
+	var dotslash_alias_path: String = test_dir + "./test_3x2.png"
+	var req_dotslash := LevelImporter.ImportRequest.new(
+		path_3x2, "dotslash", "DotSlash", "TEST", dotslash_alias_path, "", "", false
+	)
+	_check(not LevelImporter.run_import(req_dotslash).is_ok(), "output=='./' equivalent of source rejected")
+	_check_eq(FileAccess.get_file_as_bytes(path_3x2), src_bytes_before, "source unchanged after './' equivalent alias attempt")
+
+	# 2. source vs "subdir/../" equivalent output path, overwrite=false
+	var dotdot_alias_path: String = test_dir + "subdir/../test_3x2.png"
+	var req_dotdot := LevelImporter.ImportRequest.new(
+		path_3x2, "dotdot", "DotDot", "TEST", dotdot_alias_path, "", "", false
+	)
+	_check(not LevelImporter.run_import(req_dotdot).is_ok(), "output=='subdir/../' equivalent of source rejected")
+	_check_eq(FileAccess.get_file_as_bytes(path_3x2), src_bytes_before, "source unchanged after 'subdir/../' equivalent alias attempt")
+
+	# 3. equivalent relative-vs-absolute identity: absolute globalized form of the
+	#    user:// source path used as output_path (no scheme, is_absolute_path()==true)
+	var abs_path_3x2: String = ProjectSettings.globalize_path(path_3x2)
+	var req_abs_alias := LevelImporter.ImportRequest.new(
+		path_3x2, "absalias", "AbsAlias", "TEST", abs_path_3x2, "", "", false
+	)
+	_check(not LevelImporter.run_import(req_abs_alias).is_ok(), "absolute-form output alias of user:// source rejected")
+	_check_eq(FileAccess.get_file_as_bytes(path_3x2), src_bytes_before, "source unchanged after absolute-form alias attempt")
+
+	# 4. destination-to-destination alias via different dot-segment syntax
+	var d2d_out: String = test_dir + "d2d_out.json"
+	var d2d_preview_alias: String = test_dir + "subdir/../d2d_out.json"
+	var req_d2d := LevelImporter.ImportRequest.new(
+		path_3x2, "d2d", "D2D", "TEST", d2d_out, d2d_preview_alias, "", false
+	)
+	_check(not LevelImporter.run_import(req_d2d).is_ok(), "output vs preview dot-segment-equivalent destination alias rejected")
+	_check(not FileAccess.file_exists(d2d_out), "no destination write occurred for dot-segment destination alias")
+
+	# 5. overwrite=true on an equivalent source alias must still be rejected
+	var req_dotslash_ow := LevelImporter.ImportRequest.new(
+		path_3x2, "dotslash_ow", "DotSlashOw", "TEST", dotslash_alias_path, "", "", true
+	)
+	_check(not LevelImporter.run_import(req_dotslash_ow).is_ok(), "overwrite=true on './' equivalent source alias still rejected")
+	_check_eq(FileAccess.get_file_as_bytes(path_3x2), src_bytes_before, "source unchanged after overwrite=true equivalent alias attempt")
+
+	# 6. legitimate pair of distinct normalized paths still succeeds (guard is
+	#    not simply rejecting every path containing a dot segment)
+	var legit_distinct_alias: String = test_dir + "subdir/../legit_distinct.json"
+	var legit_distinct_simplified: String = test_dir + "legit_distinct.json"
+	var req_legit := LevelImporter.ImportRequest.new(
+		path_3x2, "legit_distinct", "LegitDistinct", "TEST", legit_distinct_alias, "", "", false
+	)
+	_check(LevelImporter.run_import(req_legit).is_ok(), "distinct dot-segment output path (not aliasing anything) still succeeds")
+	_check(FileAccess.file_exists(legit_distinct_simplified), "distinct dot-segment output written at its simplified location")
+
 	# ---- F-M09-002: PREVIEW/METADATA OVERWRITE SAFETY ----
 	# existing different preview, overwrite=false
 	var diff_prev_path := test_dir + "diff_preview.png"

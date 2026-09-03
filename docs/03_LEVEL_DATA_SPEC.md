@@ -187,8 +187,13 @@ JSON deterministically:
 - **Source immutability**: the source PNG is never a valid write destination.
   Path aliasing (output/preview/metadata pointing at the source) is rejected
   even when `overwrite=true`. All destination paths must be pairwise distinct.
-  Path comparison uses canonicalized paths (resolves `res://`, `user://`,
-  backslash normalization, case-insensitive on Windows).
+  Path comparison uses one canonical filesystem identity per path: `res://`/
+  `user://` resolution, bare relative paths resolved against `res://` (the
+  actual base `Image.load()`/`FileAccess.open()` use for unprefixed CLI
+  paths — not the OS process working directory), `.`/`..` segment
+  simplification (`String.simplify_path()`), backslash normalization, and
+  case-insensitive comparison on Windows. Symbolic-link identity is out of
+  scope (lexical normalization only).
 - **Multi-artifact preflight**: all requested destinations (Level JSON,
   preview PNG, metadata sidecar) are checked for overwrite collisions
   *before* any file is written. A collision on preview or metadata does not
