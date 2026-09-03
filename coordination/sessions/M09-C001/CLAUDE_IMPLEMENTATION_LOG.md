@@ -591,6 +591,14 @@ passing inside the 332/332 total.
 - M10 DIRTY/CLEAN preset remains `OWNER_REQUIRED`.
 - M09-C001 set to `AWAITING_AUDIT` for ChatGPT audit V03.
 
+### Commit / push evidence
+
+- Commit: `d9400e7` — `fix: close audit V02 finding F-M09-005 — filesystem identity normalization (M09-C001 V03)`
+- 9 files changed, 345 insertions, 28 deletions
+- Push: `git push origin main` → `08b99ed..d9400e7  main -> main` (no force)
+- Final `git status --short`: clean working tree (only untracked: scratchpad temp, `docs/logs/` — pre-existing, unrelated to this session)
+- Classification: **CLAUDE_TEST_PASS**
+
 ### Blockers
 
 None.
