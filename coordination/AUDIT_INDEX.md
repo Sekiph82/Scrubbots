@@ -29,7 +29,8 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | --- | --- | --- | --- |
 | META-C001 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | `AUDITED_PASS` | Coordination evidence chain established. |
 | M07-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 added AL-008 metadata provenance and AL-009 validation traceability; V02 confirmed both corrections and added no new learning. |
-| M09-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md | `CHANGES_REQUIRED` | V01 added AL-010..012. V02 confirmed PNG/preflight/reconstruction corrections but added AL-013 because dot-segment/relative path identity remains insufficiently normalized. |
+| M09-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md; V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md | `AUDITED_PASS` | V01 added AL-010..012. V02 added AL-013. V03 independently verified filesystem-identity correction and closed M09-C001 with no new reusable learning. |
+| M09-C002 | PENDING | `PLANNED` | Batch import/validation + duplicate-ID protection cycle issued; audit pending. |
 
 ## Claude usage rule
 
