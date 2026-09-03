@@ -19,7 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-08-28 | `CHANGES_REQUIRED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md | SB-M09-001..017 | Audit V02 confirms PNG gate, multi-artifact preflight and reconstruction safety, but finds filesystem identity normalization incomplete for `.`/`..` and relative-vs-absolute equivalent paths. V03 issued for the remaining path-safety correction. |
+| M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-09-03 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md | SB-M09-001..017 | V03 correction pass complete: closed F-M09-005 (filesystem identity normalization / AL-013) via `.`/`..` simplification and an empirically-verified relative-path base. 332/332 tests pass. Ready for ChatGPT audit V03. |
 | M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | SB-M07-001..017 | Reference-library infrastructure audited. M07 milestone remains partial only because owner-supplied visual assets are still missing. |
 | META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | Established repository-native coordination and H!veAI synchronization. |
 
@@ -47,6 +47,8 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
   - Active authority.
   - Narrow correction for F-M09-005 only.
 - Audit criteria V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V03.md
+- V03 correction implementation (Session 3): closed F-M09-005 — `_canonical_path()` resolves bare relative paths against `res://` (empirically confirmed, not OS CWD) and applies `String.simplify_path()` before alias comparison. 12 new targeted equivalent-path tests (332/332 total). Full mandatory-validation checklist run individually per prompt V03. See `CLAUDE_IMPLEMENTATION_LOG.md` Session 3.
+- Cycle state: `AWAITING_AUDIT` for ChatGPT audit V03.
 - Deferred throughout this cycle: SB-M09-018 batch import, SB-M09-019 batch validation, SB-M09-020 duplicate-ID protection.
 - M08 remains owner-asset-dependent and open.
 
