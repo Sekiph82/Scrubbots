@@ -19,9 +19,19 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-09-03 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md | SB-M09-001..017 | V03 correction pass complete: closed F-M09-005 (filesystem identity normalization / AL-013) via `.`/`..` simplification and an empirically-verified relative-path base. 332/332 tests pass. Ready for ChatGPT audit V03. |
+| M09-C002 | M09 - Batch Import / Validation / Duplicate IDs | 2026-09-03 | 2026-09-03 | `PLANNED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md | PENDING | SB-M09-018..020 | Batch layer issued after M09-C001 AUDITED_PASS. Scope: manifest-driven batch import, validation-only mode, whole-batch preflight, catalog duplicate-ID protection, deterministic reporting. |
+| M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-09-03 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md | SB-M09-001..017 | Final audit V03 independently closed F-M09-005. Exact-pixel single importer, safety hardening and filesystem-identity normalization are audited pass. |
 | M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | SB-M07-001..017 | Reference-library infrastructure audited. M07 milestone remains partial only because owner-supplied visual assets are still missing. |
-| META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | Established repository-native coordination and H!veAI synchronization. |
+| META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | Established repository-native ChatGPT/Claude coordination and H!veAI synchronization. |
+
+## M09-C002 issuance
+
+- Active prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V01.md
+- Pre-published audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V01.md
+- Required prior audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md
+- Scope: `SB-M09-018`, `SB-M09-019`, `SB-M09-020` only.
+- M08 remains owner-asset-dependent and open.
+- M10 remains owner-controlled.
 
 ## M09-C001 history
 
@@ -41,16 +51,17 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Audit V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md
   - `CHANGES_REQUIRED`.
   - F-M09-002, F-M09-003 and F-M09-004 independently closed.
-  - F-M09-001 remains partially open as new finding F-M09-005: dot-segment / relative path identity can still bypass string-based canonical comparison.
+  - F-M09-001 remained partially open as F-M09-005: dot-segment / relative path identity bypass.
   - Added AL-013 filesystem identity normalization.
 - Prompt V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md
-  - Active authority.
-  - Narrow correction for F-M09-005 only.
 - Audit criteria V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_CRITERIA_V03.md
-- V03 correction implementation (Session 3): closed F-M09-005 — `_canonical_path()` resolves bare relative paths against `res://` (empirically confirmed, not OS CWD) and applies `String.simplify_path()` before alias comparison. 12 new targeted equivalent-path tests (332/332 total). Full mandatory-validation checklist run individually per prompt V03. See `CLAUDE_IMPLEMENTATION_LOG.md` Session 3.
-- Cycle state: `AWAITING_AUDIT` for ChatGPT audit V03.
-- Deferred throughout this cycle: SB-M09-018 batch import, SB-M09-019 batch validation, SB-M09-020 duplicate-ID protection.
-- M08 remains owner-asset-dependent and open.
+- V03 correction implementation commit: https://github.com/Sekiph82/Scrubbots/commit/d9400e7512c5f221794a026c876b79095c990422
+- V03 implementation-log backfill head: https://github.com/Sekiph82/Scrubbots/commit/333bac8a4fefd2aafe6c2279b3093c304f6f47fd
+- Audit V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md
+  - `AUDITED_PASS`.
+  - F-M09-005 independently closed via explicit relative-base resolution + `String.simplify_path()` and targeted equivalent-path tests.
+  - M09-C001 closed; no new reusable learning beyond AL-013.
+- Deferred to M09-C002: SB-M09-018 batch import, SB-M09-019 batch validation, SB-M09-020 duplicate-ID protection.
 
 ## M07-C001 history
 
