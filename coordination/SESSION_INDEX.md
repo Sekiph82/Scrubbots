@@ -19,7 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M09-C002 | M09 - Batch Import / Validation / Duplicate IDs | 2026-09-03 | 2026-09-03 | `PLANNED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md | PENDING | SB-M09-018..020 | Batch layer issued after M09-C001 AUDITED_PASS. Scope: manifest-driven batch import, validation-only mode, whole-batch preflight, catalog duplicate-ID protection, deterministic reporting. |
+| M09-C002 | M09 - Batch Import / Validation / Duplicate IDs | 2026-09-03 | 2026-09-03 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md | PENDING | SB-M09-018..020 | Implementation complete: `LevelBatchImporter` + CLI reuse the audited M09-C001 importer per item; whole-batch preflight-then-commit; duplicate-ID (within-batch/against-catalog/existing-catalog) and cross-item path safety enforced. 394/394 tests pass (62 new); 21-step mandatory CLI/regression validation complete. Ready for ChatGPT audit V01. |
 | M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-09-03 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md | SB-M09-001..017 | Final audit V03 independently closed F-M09-005. Exact-pixel single importer, safety hardening and filesystem-identity normalization are audited pass. |
 | M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | SB-M07-001..017 | Reference-library infrastructure audited. M07 milestone remains partial only because owner-supplied visual assets are still missing. |
 | META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | Established repository-native ChatGPT/Claude coordination and H!veAI synchronization. |
@@ -32,6 +32,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Scope: `SB-M09-018`, `SB-M09-019`, `SB-M09-020` only.
 - M08 remains owner-asset-dependent and open.
 - M10 remains owner-controlled.
+
+## M09-C002 implementation (Session 1)
+
+- `scripts/tools/level_batch_importer.gd` (new) + `tools/import_level_batch.gd` (new CLI); `scripts/tools/level_importer.gd` gained an additive `dry_run` param reused for batch preflight (zero regression to existing call sites).
+- Whole-batch prepare(dry_run)/validate-then-commit architecture; duplicate-ID (within-batch, against-catalog, existing-catalog-duplicates) and cross-item source/destination path safety via the same `LevelImporter._canonical_path()` identity used by the audited single importer.
+- 394/394 tests pass (62 new, all 332 prior checks unchanged). All 21 prompt-mandated validation steps run individually and recorded, including real CLI runs proving validation-only writes nothing, commit writes, unchanged rerun, duplicate-ID/path-alias rejection with no writes, failing-later-item preflight, and catalog duplicate/malformed detection.
+- See `CLAUDE_IMPLEMENTATION_LOG.md` Session 1 for full evidence.
+- Cycle state: `AWAITING_AUDIT` for ChatGPT audit V01.
 
 ## M09-C001 history
 

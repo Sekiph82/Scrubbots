@@ -24,11 +24,16 @@ class ImportRequest:
 	var preview_path: String
 	var metadata_path: String
 	var overwrite: bool
+	## M09-C002: when true, run every validation/preflight step but skip the
+	## physical write calls. Lets the batch layer (LevelBatchImporter) reuse
+	## this exact single-item logic for whole-batch preflight without a
+	## second parallel validation implementation.
+	var dry_run: bool
 
 	func _init(
 		p_source: String, p_id: String, p_name: String, p_difficulty: String,
 		p_output: String, p_preview: String = "", p_metadata: String = "",
-		p_overwrite: bool = false
+		p_overwrite: bool = false, p_dry_run: bool = false
 	) -> void:
 		source_path = p_source
 		level_id = p_id
@@ -38,6 +43,7 @@ class ImportRequest:
 		preview_path = p_preview
 		metadata_path = p_metadata
 		overwrite = p_overwrite
+		dry_run = p_dry_run
 
 ## Import result — success/failure plus generated data.
 class ImportResult:
@@ -48,10 +54,13 @@ class ImportResult:
 	var metadata_json_text: String = ""
 	var output_written: bool = false
 	var output_unchanged: bool = false
+	var output_would_write: bool = false
 	var preview_written: bool = false
 	var preview_unchanged: bool = false
+	var preview_would_write: bool = false
 	var metadata_written: bool = false
 	var metadata_unchanged: bool = false
+	var metadata_would_write: bool = false
 
 	func is_ok() -> bool:
 		return errors.is_empty() and level_data != null
@@ -222,33 +231,39 @@ static func run_import(request: ImportRequest) -> ImportResult:
 				result.add_error("Metadata file '%s' already exists with different content and overwrite=false" % request.metadata_path)
 				return result
 
-	# --- all preflight passed, now write ---
+	# --- all preflight passed, now write (unless dry_run: M09-C002 batch preflight) ---
 	if output_action == "write":
-		var write_err := _write_text(request.output_path, result.level_json_text)
-		if write_err != OK:
-			result.add_error("Could not write output '%s' (error %d)" % [request.output_path, write_err])
-			return result
-		result.output_written = true
+		result.output_would_write = true
+		if not request.dry_run:
+			var write_err := _write_text(request.output_path, result.level_json_text)
+			if write_err != OK:
+				result.add_error("Could not write output '%s' (error %d)" % [request.output_path, write_err])
+				return result
+			result.output_written = true
 	else:
 		result.output_unchanged = true
 
 	if not request.preview_path.is_empty():
 		if preview_action == "write":
-			var save_err := preview_img.save_png(request.preview_path)
-			if save_err != OK:
-				result.add_error("Could not save preview '%s' (error %d)" % [request.preview_path, save_err])
-				return result
-			result.preview_written = true
+			result.preview_would_write = true
+			if not request.dry_run:
+				var save_err := preview_img.save_png(request.preview_path)
+				if save_err != OK:
+					result.add_error("Could not save preview '%s' (error %d)" % [request.preview_path, save_err])
+					return result
+				result.preview_written = true
 		else:
 			result.preview_unchanged = true
 
 	if not request.metadata_path.is_empty():
 		if metadata_action == "write":
-			var meta_err := _write_text(request.metadata_path, result.metadata_json_text)
-			if meta_err != OK:
-				result.add_error("Could not write metadata '%s' (error %d)" % [request.metadata_path, meta_err])
-				return result
-			result.metadata_written = true
+			result.metadata_would_write = true
+			if not request.dry_run:
+				var meta_err := _write_text(request.metadata_path, result.metadata_json_text)
+				if meta_err != OK:
+					result.add_error("Could not write metadata '%s' (error %d)" % [request.metadata_path, meta_err])
+					return result
+				result.metadata_written = true
 		else:
 			result.metadata_unchanged = true
 

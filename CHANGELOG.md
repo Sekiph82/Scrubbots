@@ -2,6 +2,50 @@
 
 ## Unreleased
 
+### Added — Batch Import, Batch Validation, Duplicate-ID Protection (M09-C002)
+
+- New `LevelBatchImporter` (`scripts/tools/level_batch_importer.gd`):
+  manifest-driven batch layer reusing the M09-C001-audited `LevelImporter`
+  unchanged for every per-item concern. Adds only manifest parsing,
+  whole-batch preflight-before-any-write ordering, cross-item path-alias
+  detection, and catalog duplicate-ID scanning (`SB-M09-018..020`).
+- `LevelImporter.ImportRequest` gained an additive `dry_run` field
+  (default `false`, zero regression risk) so the batch layer's preflight
+  pass reuses the exact single-item validation logic without a second
+  parallel implementation. `ImportResult` gained matching `*_would_write`
+  fields.
+- Deterministic JSON manifest schema (`{"items": [...]}`, same fields as a
+  single import request); item order is preserved as batch processing and
+  report order.
+- Prepare/validate-then-commit architecture: every item and every batch-only
+  check (duplicate IDs, cross-item destination/source aliasing, catalog
+  scan) is preflighted via `dry_run=true` before any commit pass runs;
+  validation-only mode never reaches a physical write; commit mode only
+  writes if the whole batch preflighted clean, so a failing later item
+  cannot leave an earlier item's artifacts committed.
+- Duplicate-ID protection: rejects duplicate IDs within one manifest,
+  rejects a requested ID that already belongs to a different existing
+  catalog file (independent of `overwrite`), allows re-importing the same
+  logical level at its own canonical catalog path, and reports (rather than
+  silently ignores) existing catalog files that already declare a duplicate
+  ID or are malformed/structurally invalid.
+- New CLI entrypoint (`tools/import_level_batch.gd`): `--manifest`,
+  `--catalog`, optional `--commit`; prints a deterministic JSON batch report
+  plus a one-line summary; non-zero exit on any batch failure.
+- Documented non-transactional limitation: no filesystem rollback across a
+  commit pass; a rare OS-level write failure partway through leaves
+  already-written earlier items written.
+- Extended `tests/run_tests.gd` from 332 to **394 checks**: 62 new batch
+  checks covering the happy path (3-item batch incl. 20×27 and 59×59,
+  validation-only writes nothing, commit writes, unchanged rerun,
+  reconstruction equality), duplicate-ID safety (within-batch, against
+  catalog, existing catalog duplicates, same-entry re-import, overwrite
+  cannot steal an ID), cross-item path safety (equivalent-path destination
+  alias, preview/output collision, source-aliases-another-item's-destination,
+  failing-later-item preflight), and invalid input/catalog (malformed/empty
+  manifest, missing field, valid non-PNG, corrupt PNG, malformed catalog
+  JSON, structurally invalid catalog entry).
+
 ### Fixed — Filesystem Identity Normalization (M09-C001 V03 Correction)
 
 - Closed ChatGPT independent audit V02 finding F-M09-005: `_canonical_path()`
