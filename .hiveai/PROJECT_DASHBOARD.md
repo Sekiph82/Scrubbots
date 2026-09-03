@@ -26,13 +26,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | HEALTHY |
+| Health | HEALTHY - M09-C002 implementation complete, awaiting audit V01 |
 | Current implementation frontier | M09 - Pixel Art to Level Data Pipeline |
 | Current task | M09-C002 - Batch Import / Batch Validation / Duplicate-ID Protection |
 | Current task ID | `M09-C002` |
-| Current workflow state | `PLANNED` - ChatGPT closed M09-C001 as AUDITED_PASS and issued M09-C002 prompt V01 |
-| Required actor | CLAUDE |
-| Next project action | Claude reads the M09-C002 prompt, audit criteria, M09-C001 final audit and active audit learnings, then implements/tests/logs SB-M09-018..020 only. |
+| Current workflow state | `AWAITING_AUDIT` - Claude implemented SB-M09-018..020, 394/394 tests pass |
+| Required actor | CHATGPT |
+| Next project action | ChatGPT independent audit V01 against criteria V01. If AUDITED_PASS, M09 milestone is complete pending M08/M10 owner-asset gates. |
 | Waiting on | M08 production-art audit and remaining M07 visual inventory tasks still require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -40,25 +40,25 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-09-03T11:38:00+03:00 |
-| Actor | CHATGPT |
-| Cycle | `M09-C001` -> `M09-C002` |
-| Session type | Independent audit V03 + next-cycle issuance |
-| Cycle status | `M09-C001 AUDITED_PASS`; `M09-C002 PLANNED` |
-| Milestone/task impact | SB-M09-001..017 are independently accepted at coordination level. SB-M09-018..020 remain open and are the only M09-C002 task targets. M08 remains open. |
-| Summary | ChatGPT independently verified V03 filesystem-identity normalization: bare relative paths resolve to the documented res:// base, dot segments are simplified, equivalent source/destination aliases are rejected, overwrite cannot authorize source destruction, and targeted tests exercise the exact bypass found in audit V02. No new audit learning was required. M09-C002 is now issued for manifest-driven batch import, validation-only preflight, catalog duplicate-ID protection and deterministic reporting. |
+| Timestamp | 2026-09-03T12:00:00+03:00 |
+| Actor | CLAUDE |
+| Cycle | `M09-C002` |
+| Session type | Batch import / validation / duplicate-ID implementation (Session 1) |
+| Cycle status | `AWAITING_AUDIT` |
+| Milestone/task impact | SB-M09-018, SB-M09-019, SB-M09-020 closed with validation evidence. M08 remains open. |
+| Summary | Implemented `LevelBatchImporter` (manifest-driven batch layer reusing the audited M09-C001 `LevelImporter` per item via an additive `dry_run` flag) + CLI `tools/import_level_batch.gd`. Whole-batch prepare/validate-then-commit: duplicate IDs (within-batch, against-catalog, existing-catalog-duplicates) and cross-item source/destination path aliasing all rejected before any write, using the same canonical path-identity helper M09-C001 already established. 394/394 tests pass (62 new). All 21 prompt-mandated validation steps run individually, including real CLI proof that validation-only writes nothing, commit writes, unchanged rerun holds, every negative case writes nothing and exits non-zero, and a failing later item does not let an earlier valid item commit. |
 | M09-C001 final audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md |
 | M09-C002 active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V01.md |
 | M09-C002 audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V01.md |
 | M09-C002 Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
 | Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
-| Next expected actor | CLAUDE |
+| Next expected actor | CHATGPT |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M09-C002 | Batch import / validation / duplicate-ID tooling | `PLANNED` | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V01.md |
+| M09-C002 | Batch import / validation / duplicate-ID tooling | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
 | M09-C001 | Exact-pixel single importer + safety hardening | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md |
 | M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M07 | Visual Reference Library | PARTIAL - infrastructure audited; owner assets still missing | HUMAN for asset-specific tasks | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
@@ -117,6 +117,10 @@ Core expectations:
 - no fake owner art;
 - no M08, M10, M11 or later work.
 
+Implementation status: complete, `AWAITING_AUDIT`. See
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md
+for full evidence.
+
 ## Audit model
 
 1. ChatGPT publishes implementation prompts and audit criteria.
@@ -145,7 +149,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Status | Last actor | Summary | Evidence |
 | --- | --- | --- | --- | --- | --- |
-| `M09-C002` | M09 | `PLANNED` | CHATGPT | Batch import/validation + duplicate-ID prompt and audit criteria issued. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V01.md |
+| `M09-C002` | M09 | `AWAITING_AUDIT` | CLAUDE | Batch import/validation/duplicate-ID protection implemented (SB-M09-018..020). 394/394 tests pass. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
 | `M09-C001` | M09 | `AUDITED_PASS` | CHATGPT | Audit V03 closed filesystem-identity finding and accepted SB-M09-001..017. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md |
 | `M07-C001` | M07 | `AUDITED_PASS` | CHATGPT | Reference-library infrastructure audited; owner asset tasks remain open. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md |
 | `META-C001` | META | `AUDITED_PASS` | CHATGPT | Repository-native ChatGPT/Claude coordination + H!veAI synchronization established. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md |
@@ -184,7 +188,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 | M06 | Board Renderer | COMPLETE |
 | M07 | Visual Reference Library | PARTIAL - owner assets still missing |
 | M08 | Level Art Technical Audit | BLOCKED_ON_OWNER_ASSET |
-| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - C001 audited, C002 planned |
+| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - C001 AUDITED_PASS, C002 AWAITING_AUDIT |
 | M10 | Dirty/Clean Visual Model | OWNER_REQUIRED / PARTIAL infrastructure |
 | M11-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 

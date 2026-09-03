@@ -20,6 +20,7 @@ const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
 const DirtyCleanPresets = preload("res://scripts/gameplay/board/dirty_clean_presets.gd")
 const BoardDebugFixtures = preload("res://scripts/debug/board_debug_fixtures.gd")
 const LevelImporter = preload("res://scripts/tools/level_importer.gd")
+const LevelBatchImporter = preload("res://scripts/tools/level_batch_importer.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -41,6 +42,7 @@ func _initialize() -> void:
 	_run_board_renderer_pixel_tests()
 	_run_board_renderer_performance_sanity()
 	_run_importer_tests()
+	_run_batch_importer_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -1033,6 +1035,336 @@ func _run_importer_tests() -> void:
 			fname = dir.get_next()
 		dir.list_dir_end()
 		DirAccess.remove_absolute(test_dir)
+
+func _remove_dir_recursive(path: String) -> void:
+	var dir := DirAccess.open(path)
+	if dir == null:
+		return
+	dir.list_dir_begin()
+	var fname := dir.get_next()
+	while not fname.is_empty():
+		if fname != "." and fname != "..":
+			var full: String = path.path_join(fname)
+			if dir.current_is_dir():
+				_remove_dir_recursive(full)
+			else:
+				dir.remove(fname)
+		fname = dir.get_next()
+	dir.list_dir_end()
+	DirAccess.remove_absolute(path)
+
+func _run_batch_importer_tests() -> void:
+	var root := "user://test_batch_importer/"
+	DirAccess.make_dir_recursive_absolute(root)
+
+	var _write_text_file := func(path: String, text: String) -> void:
+		var f := FileAccess.open(path, FileAccess.WRITE)
+		f.store_string(text)
+		f.close()
+
+	var _write_json := func(path: String, dict: Dictionary) -> void:
+		var f := FileAccess.open(path, FileAccess.WRITE)
+		f.store_string(JSON.stringify(dict, "\t"))
+		f.close()
+
+	var _write_manifest := func(path: String, items: Array) -> void:
+		var f := FileAccess.open(path, FileAccess.WRITE)
+		f.store_string(JSON.stringify({"items": items}))
+		f.close()
+
+	var _make_level_dict := func(id: String) -> Dictionary:
+		return {
+			"version": 1, "id": id, "name": id, "difficulty": "TEST",
+			"width": 1, "height": 1, "palette": ["#FF0000FF"], "cells": [0],
+		}
+
+	var _verify_reconstruction := func(output_path: String, source_img: Image) -> bool:
+		var load_res := LevelLoader.load_from_path(output_path)
+		if not load_res.is_ok():
+			return false
+		var recon: Image = LevelImporter.reconstruct_image(load_res.level_data)
+		if recon == null:
+			return false
+		if recon.get_width() != source_img.get_width() or recon.get_height() != source_img.get_height():
+			return false
+		return recon.get_data() == source_img.get_data()
+
+	# ---- deterministic TEST-generated source PNGs (no owner art) ----
+	var tiny_img: Image = LevelImporter.generate_test_png(3, 2, 4, true, false)
+	tiny_img.save_png(root + "tiny.png")
+	var rect_img: Image = LevelImporter.generate_test_png(20, 27, 6, true, false)
+	rect_img.save_png(root + "rect.png")
+	var max_img: Image = LevelImporter.generate_test_png(59, 59, 8, true, true)
+	max_img.save_png(root + "max.png")
+
+	# LevelImporter (like FileAccess.open()) does not auto-create parent
+	# directories — same contract as the single-item importer. Pre-create
+	# every output directory these tests target.
+	for sub in ["out_happy", "out_dup", "out_alias", "out_cross", "out_later",
+			"out_malformed", "out_empty", "out_missing", "out_jpeg", "out_corrupt", "out_perf"]:
+		DirAccess.make_dir_recursive_absolute(root + sub + "/")
+
+	# ==== HAPPY PATH ====
+	var out_happy := root + "out_happy/"
+	var manifest_happy_items := [
+		{"source": root + "tiny.png", "id": "batch_tiny", "name": "Batch Tiny", "difficulty": "TEST", "output": out_happy + "batch_tiny.json"},
+		{"source": root + "rect.png", "id": "batch_rect", "name": "Batch Rect", "difficulty": "EASY", "output": out_happy + "batch_rect.json"},
+		{"source": root + "max.png", "id": "batch_max", "name": "Batch Max", "difficulty": "VERY_HARD", "output": out_happy + "batch_max.json"},
+	]
+	var manifest_happy_path := root + "manifest_happy.json"
+	_write_manifest.call(manifest_happy_path, manifest_happy_items)
+
+	# 2. validation-only succeeds, writes nothing
+	var res_val := LevelBatchImporter.run_batch(manifest_happy_path, out_happy, false)
+	_check(res_val.is_ok(), "batch happy-path validation-only succeeds")
+	_check_eq(res_val.written_count(), 0, "validation-only written_count is 0")
+	_check(not FileAccess.file_exists(out_happy + "batch_tiny.json"), "validation-only creates no final output (tiny)")
+	_check(not FileAccess.file_exists(out_happy + "batch_rect.json"), "validation-only creates no final output (rect)")
+	_check(not FileAccess.file_exists(out_happy + "batch_max.json"), "validation-only creates no final output (max)")
+
+	# 3. commit mode imports all items correctly
+	var res_commit := LevelBatchImporter.run_batch(manifest_happy_path, out_happy, true)
+	_check(res_commit.is_ok(), "batch happy-path commit succeeds")
+	_check(res_commit.committed, "commit flag set true")
+	_check_eq(res_commit.written_count(), 3, "commit writes all 3 items")
+	_check(FileAccess.file_exists(out_happy + "batch_tiny.json"), "tiny output written")
+	_check(FileAccess.file_exists(out_happy + "batch_rect.json"), "rect output written")
+	_check(FileAccess.file_exists(out_happy + "batch_max.json"), "max output written")
+
+	# 4 + 9. re-running unchanged batch reports unchanged/no meaningless writes;
+	# same logical ID at same canonical catalog output is allowed re-import,
+	# not a "different file" conflict (AC-M09B-009).
+	var res_rerun := LevelBatchImporter.run_batch(manifest_happy_path, out_happy, true)
+	_check(res_rerun.is_ok(), "batch rerun unchanged still ok (same-entry re-import semantics)")
+	_check_eq(res_rerun.unchanged_count(), 3, "rerun reports all 3 unchanged")
+	_check_eq(res_rerun.written_count(), 0, "rerun writes nothing new")
+	for item in res_rerun.items:
+		_check(item.batch_errors.is_empty(), "rerun item '%s' has no batch-level conflict errors" % item.id)
+
+	# 5. per-item reconstructed raw RGBA8 equality
+	_check(_verify_reconstruction.call(out_happy + "batch_tiny.json", tiny_img), "batch tiny reconstruction raw-byte match")
+	_check(_verify_reconstruction.call(out_happy + "batch_rect.json", rect_img), "batch rect (20x27) reconstruction raw-byte match")
+	_check(_verify_reconstruction.call(out_happy + "batch_max.json", max_img), "batch max (59x59) reconstruction raw-byte match")
+
+	# ==== DUPLICATE ID SAFETY ====
+
+	# 6. duplicate ID inside one manifest fails before writes
+	var out_dup := root + "out_dup/"
+	var manifest_dup_items := [
+		{"source": root + "tiny.png", "id": "dupe", "name": "D1", "difficulty": "TEST", "output": out_dup + "d1.json"},
+		{"source": root + "rect.png", "id": "dupe", "name": "D2", "difficulty": "EASY", "output": out_dup + "d2.json"},
+	]
+	var manifest_dup_path := root + "manifest_dup.json"
+	_write_manifest.call(manifest_dup_path, manifest_dup_items)
+	var res_dup := LevelBatchImporter.run_batch(manifest_dup_path, out_dup, true)
+	_check(not res_dup.is_ok(), "duplicate id within manifest rejected")
+	_check(not res_dup.committed, "duplicate id within manifest: nothing committed")
+	_check(not FileAccess.file_exists(out_dup + "d1.json"), "duplicate-id item 0 not written")
+	_check(not FileAccess.file_exists(out_dup + "d2.json"), "duplicate-id item 1 not written")
+	_check(res_dup.items[0].all_errors()[0].find("Duplicate id") >= 0, "duplicate-id error names the duplicate specifically")
+
+	# 7. duplicate ID against a different existing catalog file fails before writes
+	var cat_diff := root + "catalog_diff/"
+	DirAccess.make_dir_recursive_absolute(cat_diff)
+	_write_json.call(cat_diff + "existing.json", _make_level_dict.call("taken_id"))
+	var manifest_steal_items := [
+		{"source": root + "tiny.png", "id": "taken_id", "name": "Steal", "difficulty": "TEST", "output": cat_diff + "steal_out.json"},
+	]
+	var manifest_steal_path := root + "manifest_steal.json"
+	_write_manifest.call(manifest_steal_path, manifest_steal_items)
+	var res_steal := LevelBatchImporter.run_batch(manifest_steal_path, cat_diff, true)
+	_check(not res_steal.is_ok(), "duplicate id against different existing catalog file rejected")
+	_check(not FileAccess.file_exists(cat_diff + "steal_out.json"), "id-theft attempt writes nothing")
+	_check(res_steal.items[0].all_errors()[0].find("already belongs to a different catalog file") >= 0, "id-theft error names the conflict specifically")
+
+	# 8. existing catalog containing two files with the same declared ID is detected/reported
+	var cat_ambig := root + "catalog_ambiguous/"
+	DirAccess.make_dir_recursive_absolute(cat_ambig)
+	_write_json.call(cat_ambig + "first.json", _make_level_dict.call("ambiguous_id"))
+	_write_json.call(cat_ambig + "second.json", _make_level_dict.call("ambiguous_id"))
+	var manifest_scan_items := [
+		{"source": root + "tiny.png", "id": "unrelated_scan_id", "name": "Scan", "difficulty": "TEST", "output": cat_ambig + "scan_out.json"},
+	]
+	var manifest_scan_path := root + "manifest_scan.json"
+	_write_manifest.call(manifest_scan_path, manifest_scan_items)
+	var res_scan := LevelBatchImporter.run_batch(manifest_scan_path, cat_ambig, false)
+	_check_eq(res_scan.catalog_duplicate_ids.size(), 1, "existing catalog duplicate detected")
+	if res_scan.catalog_duplicate_ids.size() == 1:
+		_check_eq(res_scan.catalog_duplicate_ids[0]["id"], "ambiguous_id", "catalog duplicate reports the correct id")
+		_check_eq(res_scan.catalog_duplicate_ids[0]["paths"].size(), 2, "catalog duplicate reports both paths")
+
+	# 10. overwrite=true does not permit a different file to steal an existing ID
+	var manifest_steal_ow_items := [
+		{"source": root + "tiny.png", "id": "taken_id", "name": "Steal2", "difficulty": "TEST", "output": cat_diff + "steal_out2.json", "overwrite": true},
+	]
+	var manifest_steal_ow_path := root + "manifest_steal_ow.json"
+	_write_manifest.call(manifest_steal_ow_path, manifest_steal_ow_items)
+	var res_steal_ow := LevelBatchImporter.run_batch(manifest_steal_ow_path, cat_diff, true)
+	_check(not res_steal_ow.is_ok(), "overwrite=true still cannot steal an existing id from a different catalog file")
+	_check(not FileAccess.file_exists(cat_diff + "steal_out2.json"), "overwrite id-theft attempt writes nothing")
+
+	# ==== PATH/OUTPUT SAFETY ====
+
+	# 11. two batch items targeting canonically equivalent output paths fail before writes
+	var out_alias := root + "out_alias/"
+	var manifest_alias_items := [
+		{"source": root + "tiny.png", "id": "alias_a", "name": "AliasA", "difficulty": "TEST", "output": out_alias + "shared.json"},
+		{"source": root + "rect.png", "id": "alias_b", "name": "AliasB", "difficulty": "EASY", "output": out_alias + "subdir/../shared.json"},
+	]
+	var manifest_alias_path := root + "manifest_alias.json"
+	_write_manifest.call(manifest_alias_path, manifest_alias_items)
+	var res_alias := LevelBatchImporter.run_batch(manifest_alias_path, out_alias, true)
+	_check(not res_alias.is_ok(), "cross-item equivalent-path (subdir/../) output alias rejected")
+	_check(not FileAccess.file_exists(out_alias + "shared.json"), "cross-item output alias writes nothing")
+
+	# 12. cross-item preview/metadata/output collisions are detected, not only within one request
+	var out_cross := root + "out_cross/"
+	var manifest_cross_items := [
+		{"source": root + "tiny.png", "id": "cross_a", "name": "CrossA", "difficulty": "TEST", "output": out_cross + "a_out.json", "preview": out_cross + "shared_prev.png"},
+		{"source": root + "rect.png", "id": "cross_b", "name": "CrossB", "difficulty": "EASY", "output": out_cross + "shared_prev.png"},
+	]
+	var manifest_cross_path := root + "manifest_cross.json"
+	_write_manifest.call(manifest_cross_path, manifest_cross_items)
+	var res_cross := LevelBatchImporter.run_batch(manifest_cross_path, out_cross, true)
+	_check(not res_cross.is_ok(), "cross-item preview-vs-output collision rejected")
+	_check(not FileAccess.file_exists(out_cross + "a_out.json"), "cross-item collision writes nothing (item a)")
+	_check(not FileAccess.file_exists(out_cross + "shared_prev.png"), "cross-item collision writes nothing (shared path)")
+
+	# 13. a source path from one item cannot alias a write destination from another item
+	var out_srcalias := root + "out_srcalias/"
+	DirAccess.make_dir_recursive_absolute(out_srcalias)
+	var shared_source_path := out_srcalias + "shared_file.png"
+	tiny_img.save_png(shared_source_path)
+	var shared_source_bytes_before := FileAccess.get_file_as_bytes(shared_source_path)
+	var manifest_srcalias_items := [
+		{"source": shared_source_path, "id": "srcalias_a", "name": "SrcAliasA", "difficulty": "TEST", "output": out_srcalias + "a_out.json"},
+		{"source": root + "rect.png", "id": "srcalias_b", "name": "SrcAliasB", "difficulty": "EASY", "output": shared_source_path},
+	]
+	var manifest_srcalias_path := root + "manifest_srcalias.json"
+	_write_manifest.call(manifest_srcalias_path, manifest_srcalias_items)
+	var res_srcalias := LevelBatchImporter.run_batch(manifest_srcalias_path, out_srcalias, true)
+	_check(not res_srcalias.is_ok(), "item source aliasing another item's destination rejected")
+	_check_eq(FileAccess.get_file_as_bytes(shared_source_path), shared_source_bytes_before, "aliased source file bytes unchanged")
+
+	# 14. with a failing later item, earlier final artifacts are not written during preflight
+	var out_later := root + "out_later/"
+	var manifest_later_items := [
+		{"source": root + "tiny.png", "id": "later_ok", "name": "LaterOK", "difficulty": "TEST", "output": out_later + "ok_out.json"},
+		{"source": root + "nonexistent_source.png", "id": "later_bad", "name": "LaterBad", "difficulty": "TEST", "output": out_later + "bad_out.json"},
+	]
+	var manifest_later_path := root + "manifest_later.json"
+	_write_manifest.call(manifest_later_path, manifest_later_items)
+	var res_later := LevelBatchImporter.run_batch(manifest_later_path, out_later, true)
+	_check(not res_later.is_ok(), "batch with a failing later item is not ok")
+	_check(not FileAccess.file_exists(out_later + "ok_out.json"), "earlier valid item not committed when a later item fails preflight")
+	_check(res_later.items[0].is_ok(), "earlier item individually preflights clean (isolates which item actually failed)")
+	_check(not res_later.items[1].is_ok(), "later item is correctly identified as the failing one")
+
+	# ==== INVALID INPUT / CATALOG ====
+
+	# 15. malformed manifest
+	var manifest_malformed_path := root + "manifest_malformed.json"
+	_write_text_file.call(manifest_malformed_path, "{ not valid json ][")
+	var res_malformed := LevelBatchImporter.run_batch(manifest_malformed_path, root + "out_malformed/", false)
+	_check(not res_malformed.is_ok(), "malformed manifest JSON rejected")
+	_check(res_malformed.manifest_errors.size() > 0, "malformed manifest produces manifest_errors")
+	if res_malformed.manifest_errors.size() > 0:
+		_check(res_malformed.manifest_errors[0].find("malformed JSON") >= 0, "malformed manifest error names JSON parse failure specifically")
+
+	# 16. empty manifest
+	var manifest_empty_path := root + "manifest_empty.json"
+	_write_manifest.call(manifest_empty_path, [])
+	var res_empty := LevelBatchImporter.run_batch(manifest_empty_path, root + "out_empty/", false)
+	_check(not res_empty.is_ok(), "empty manifest rejected")
+	_check(res_empty.manifest_errors.size() > 0, "empty manifest produces manifest_errors")
+	if res_empty.manifest_errors.size() > 0:
+		_check(res_empty.manifest_errors[0].find("empty") >= 0, "empty manifest error names the empty items array specifically")
+
+	# 17. missing required item field
+	var manifest_missing_items := [
+		{"source": root + "tiny.png", "id": "missing_field", "name": "Missing", "output": root + "out_missing/mf.json"},
+	]
+	var manifest_missing_path := root + "manifest_missing.json"
+	_write_manifest.call(manifest_missing_path, manifest_missing_items)
+	var res_missing := LevelBatchImporter.run_batch(manifest_missing_path, root + "out_missing/", false)
+	_check(not res_missing.is_ok(), "missing required item field rejected")
+	_check(res_missing.items[0].all_errors()[0].find("difficulty") >= 0, "missing-field error names the specific missing field")
+
+	# 18. valid non-PNG source (JPEG) — reuses single-import PNG-only gate
+	var out_jpeg := root + "out_jpeg/"
+	var jpeg_path := root + "batch_test.jpg"
+	var jpeg_img: Image = LevelImporter.generate_test_png(2, 2, 4, false, false)
+	jpeg_img.save_jpg(jpeg_path)
+	var manifest_jpeg_items := [
+		{"source": jpeg_path, "id": "jpeg_item", "name": "Jpeg", "difficulty": "TEST", "output": out_jpeg + "jpeg_out.json"},
+	]
+	var manifest_jpeg_path := root + "manifest_jpeg.json"
+	_write_manifest.call(manifest_jpeg_path, manifest_jpeg_items)
+	var res_jpeg_batch := LevelBatchImporter.run_batch(manifest_jpeg_path, out_jpeg, false)
+	_check(not res_jpeg_batch.is_ok(), "valid non-PNG (JPEG) source rejected via reused single-import PNG gate")
+	_check(res_jpeg_batch.items[0].all_errors()[0].find("Unsupported source format") >= 0, "JPEG rejection names unsupported-format, distinct from corruption")
+
+	# 19. corrupt PNG
+	var corrupt_png_path := root + "batch_corrupt.png"
+	_write_text_file.call(corrupt_png_path, "not a valid PNG file")
+	var manifest_corrupt_items := [
+		{"source": corrupt_png_path, "id": "corrupt_item", "name": "Corrupt", "difficulty": "TEST", "output": root + "out_corrupt/c_out.json"},
+	]
+	var manifest_corrupt_path := root + "manifest_corrupt.json"
+	_write_manifest.call(manifest_corrupt_path, manifest_corrupt_items)
+	var res_corrupt_batch := LevelBatchImporter.run_batch(manifest_corrupt_path, root + "out_corrupt/", false)
+	_check(not res_corrupt_batch.is_ok(), "corrupt PNG source rejected")
+	_check(res_corrupt_batch.items[0].all_errors()[0].find("Could not load") >= 0, "corrupt PNG error is load failure, distinct from format rejection")
+
+	# 20. malformed catalog Level Data JSON (JSON parse failure)
+	var cat_malformed_json := root + "catalog_malformed_json/"
+	DirAccess.make_dir_recursive_absolute(cat_malformed_json)
+	_write_text_file.call(cat_malformed_json + "broken.json", "{ this is not valid json ]")
+	var manifest_scan2_items := [
+		{"source": root + "tiny.png", "id": "scan2_id", "name": "Scan2", "difficulty": "TEST", "output": cat_malformed_json + "scan2_out.json"},
+	]
+	var manifest_scan2_path := root + "manifest_scan2.json"
+	_write_manifest.call(manifest_scan2_path, manifest_scan2_items)
+	var res_scan2 := LevelBatchImporter.run_batch(manifest_scan2_path, cat_malformed_json, false)
+	_check_eq(res_scan2.catalog_malformed.size(), 1, "malformed catalog JSON reported, not silently ignored")
+	if res_scan2.catalog_malformed.size() == 1:
+		_check(res_scan2.catalog_malformed[0]["errors"][0].find("malformed JSON") >= 0, "malformed catalog JSON error names JSON parse failure specifically")
+
+	# 21. structurally invalid catalog Level Data (valid JSON, missing required fields) —
+	# must be distinguishable from #20's JSON-parse failure (AL-011 specificity)
+	var cat_struct_invalid := root + "catalog_struct_invalid/"
+	DirAccess.make_dir_recursive_absolute(cat_struct_invalid)
+	_write_json.call(cat_struct_invalid + "incomplete.json", {"version": 1, "id": "incomplete_id"})
+	var manifest_scan3_items := [
+		{"source": root + "tiny.png", "id": "scan3_id", "name": "Scan3", "difficulty": "TEST", "output": cat_struct_invalid + "scan3_out.json"},
+	]
+	var manifest_scan3_path := root + "manifest_scan3.json"
+	_write_manifest.call(manifest_scan3_path, manifest_scan3_items)
+	var res_scan3 := LevelBatchImporter.run_batch(manifest_scan3_path, cat_struct_invalid, false)
+	_check_eq(res_scan3.catalog_malformed.size(), 1, "structurally invalid catalog Level Data reported")
+	if res_scan3.catalog_malformed.size() == 1:
+		var struct_errors: Array = res_scan3.catalog_malformed[0]["errors"]
+		_check(struct_errors.size() > 0, "structural-invalidity produces specific field errors")
+		_check(struct_errors[0].find("malformed JSON") < 0, "structural-invalidity error is distinct from JSON-parse-failure (AL-011)")
+
+	# ---- performance sanity (batch of 3 including 59x59, informational only) ----
+	var perf_out := root + "out_perf/"
+	var perf_items := [
+		{"source": root + "tiny.png", "id": "perf_tiny", "name": "PerfTiny", "difficulty": "TEST", "output": perf_out + "perf_tiny.json"},
+		{"source": root + "rect.png", "id": "perf_rect", "name": "PerfRect", "difficulty": "EASY", "output": perf_out + "perf_rect.json"},
+		{"source": root + "max.png", "id": "perf_max", "name": "PerfMax", "difficulty": "VERY_HARD", "output": perf_out + "perf_max.json"},
+	]
+	var perf_manifest_path := root + "manifest_perf.json"
+	_write_manifest.call(perf_manifest_path, perf_items)
+	var perf_t0 := Time.get_ticks_usec()
+	var res_perf := LevelBatchImporter.run_batch(perf_manifest_path, perf_out, true)
+	var perf_t1 := Time.get_ticks_usec()
+	print("---- LevelBatchImporter performance sanity (3 items incl. 59x59) ----")
+	print("  commit batch (preflight + write): %.3f ms" % ((perf_t1 - perf_t0) / 1000.0))
+	_check(res_perf.is_ok(), "performance-sanity batch commit succeeds")
+
+	# ---- cleanup ----
+	_remove_dir_recursive(root)
 
 func _print_summary() -> void:
 	print("")

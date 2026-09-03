@@ -7,10 +7,10 @@ checks. Prompt 02 implemented a small custom GDScript test runner
 headless Godot; most later categories below are still planned, not yet
 implemented.
 
-**Current total: 332 checks, all passing** (73 from Prompt 02 + 58 added in
+**Current total: 394 checks, all passing** (73 from Prompt 02 + 58 added in
 Prompt 03 + 96 added in Prompt 04 + 59 added in M09-C001 + 34 safety checks
 added in M09-C001 V02 correction + 12 filesystem-identity checks added in
-M09-C001 V03 correction).
+M09-C001 V03 correction + 62 batch-importer checks added in M09-C002).
 
 **Testing renderer output — a lesson from Prompt 04:** `BoardRenderer`
 reads pixels back through an `Image` with `Image.FORMAT_RGBA8` (8 bits per

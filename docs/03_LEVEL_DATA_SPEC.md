@@ -206,7 +206,117 @@ JSON deterministically:
 CLI entrypoint: `tools/import_level.gd` (headless Godot script).
 Test fixture generator: `tools/generate_test_fixtures.gd`.
 
-Batch import (`SB-M09-018..020`) deferred to M09-C002.
+### Batch import, validation, and duplicate-ID protection (M09-C002)
+
+`scripts/tools/level_batch_importer.gd` (`LevelBatchImporter`) adds a
+manifest-driven batch layer over the single-item importer above. It reuses
+`LevelImporter` unchanged for every per-item concern (PNG gate, exact-pixel
+conversion, palette/cell semantics, difficulty legality, reconstruction,
+path-alias detection, overwrite/unchanged preflight) — this layer adds only
+what a single item cannot know on its own.
+
+**Manifest schema** (deterministic JSON):
+
+```json
+{
+  "items": [
+    {
+      "source": "path/to/source.png",
+      "id": "level_id",
+      "name": "Display Name",
+      "difficulty": "TEST | EASY | MEDIUM | HARD | VERY_HARD",
+      "output": "path/to/output.json",
+      "preview": "path/to/preview.png",
+      "metadata": "path/to/metadata.json",
+      "overwrite": false
+    }
+  ]
+}
+```
+
+`items` must be a non-empty array. `source`, `id`, `name`, `difficulty`, and
+`output` are required per item; `preview`, `metadata`, and `overwrite` are
+optional (same defaults as the single importer). Item order is preserved
+throughout — batch processing order and report order both follow manifest
+order; no other ordering is used.
+
+Relative item paths resolve exactly like the single importer's `res://`
+project-root base (see the source-immutability entry above) — there is no
+second, conflicting path-identity model. `LevelBatchImporter`, like
+`FileAccess.open()`/`LevelImporter`, does **not** auto-create missing output
+directories; callers (and this project's tests/CLI usage) must ensure
+destination directories already exist.
+
+**Prepare/validate-then-commit architecture:**
+
+1. Every well-formed item is preflighted via
+   `LevelImporter.run_import(dry_run=true)` — this alone runs every
+   M09-C001 validation/safety check, including that item's own path
+   aliasing. On top of that, batch-only checks run once per batch: duplicate
+   IDs within the manifest, duplicate/aliased destinations across items (a
+   source in one item aliasing a destination in another included), and a
+   single scan of `catalog_root` for existing-ID collisions and malformed
+   entries.
+2. **Validation-only mode** stops after step 1. Every check still runs;
+   nothing is ever written, because `dry_run=true` never reaches a physical
+   write call inside `LevelImporter.run_import()`.
+3. **Commit mode** performs step 1, and only if the *entire* batch
+   preflights clean does it re-invoke `LevelImporter.run_import()` per item
+   (in manifest order) with `dry_run=false` to write final artifacts. If any
+   item or any batch-only check fails preflight, no item's final artifacts
+   are committed — a failing later item prevents an earlier, individually
+   valid item from being written.
+
+**Duplicate level-ID protection** (`SB-M09-020`):
+
+- Two manifest items declaring the same `id` are rejected before any write.
+- The catalog directory is scanned once per batch run (flat, non-recursive,
+  `*.json` files) through the existing `LevelLoader`/`LevelValidator`
+  pipeline — filenames are never trusted as ID authority.
+- Two existing catalog files declaring the same `id` are reported (both
+  paths) as `catalog_duplicate_ids`, whether or not the current batch
+  touches that ID.
+- A malformed or structurally invalid existing catalog file is reported as
+  `catalog_malformed` (path + specific errors) rather than silently
+  skipped — a JSON-parse failure and a structurally-invalid-but-parseable
+  Level Data file are reported distinctly.
+- A requested `id` that already belongs to a *different* existing catalog
+  file (by canonical path identity, not string equality) is rejected —
+  `overwrite=true` does not authorize reassigning an existing level ID to a
+  different file.
+- A requested `id` at the *same* canonical catalog output path as its
+  existing entry is treated as re-importing that same logical level, not a
+  conflict — ordinary `LevelImporter` overwrite/unchanged rules then decide
+  whether anything actually changes.
+- TEST fixtures and production levels participate in the same ID-uniqueness
+  space within whatever catalog root is explicitly being validated; TEST is
+  never silently excluded by filename convention.
+
+**Cross-item path safety:** every item's `source`/`output`/`preview`/
+`metadata` path is canonicalized (same identity rules as the single
+importer) and compared pairwise across the *entire* batch — not just within
+one item — so two items can never write the same physical destination, and
+one item's source can never be aliased as another item's write destination.
+
+**Non-transactional limitation:** preflight validates against catalog state
+observed at batch start, then the commit pass re-invokes the audited single
+importer per item in manifest order. There is no filesystem
+transaction/rollback. If preflight passes but a rare OS-level write failure
+occurs partway through the commit pass (disk full, permissions changed
+mid-run, etc.), items already written before that point remain written —
+this is a real, documented limitation, not a claimed guarantee.
+
+CLI entrypoint: `tools/import_level_batch.gd` — validation-only by default,
+add `--commit` to write:
+
+```
+godot --headless --path . -s res://tools/import_level_batch.gd -- \
+  --manifest <manifest.json> --catalog <catalog_dir> [--commit]
+```
+
+Prints a deterministic JSON report (`LevelBatchImporter.BatchResult.to_report()`)
+plus a one-line summary; exit code is non-zero whenever the batch is not
+fully OK.
 
 ## Explicitly deferred
 
