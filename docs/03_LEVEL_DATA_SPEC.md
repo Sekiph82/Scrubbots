@@ -193,7 +193,12 @@ JSON deterministically:
   paths — not the OS process working directory), `.`/`..` segment
   simplification (`String.simplify_path()`), backslash normalization, and
   case-insensitive comparison on Windows. Symbolic-link identity is out of
-  scope (lexical normalization only).
+  scope (lexical normalization only). Internally this is two layered
+  helpers: `_resolve_path()` produces a real, case-preserved path usable for
+  actual `FileAccess`/`DirAccess` calls (used by M09-C002 batch destination-
+  parent and catalog-root checks); `_canonical_path()` adds the Windows
+  case-fold on top, strictly for identity *comparison* — its lowercased
+  output is never fed back into a real filesystem call.
 - **Multi-artifact preflight**: all requested destinations (Level JSON,
   preview PNG, metadata sidecar) are checked for overwrite collisions
   *before* any file is written. A collision on preview or metadata does not
@@ -236,7 +241,11 @@ what a single item cannot know on its own.
 
 `items` must be a non-empty array. `source`, `id`, `name`, `difficulty`, and
 `output` are required per item; `preview`, `metadata`, and `overwrite` are
-optional (same defaults as the single importer). Item order is preserved
+optional (same defaults as the single importer). Optional fields, when
+present, must match their declared type — `preview`/`metadata` must be
+strings, `overwrite` must be a boolean. A wrong JSON type (e.g.
+`"overwrite": "yes"`) is an actionable item schema error, never a runtime
+type fault (M09-C002 V02 correction, `F-M09B-005`). Item order is preserved
 throughout — batch processing order and report order both follow manifest
 order; no other ordering is used.
 
@@ -245,49 +254,81 @@ project-root base (see the source-immutability entry above) — there is no
 second, conflicting path-identity model. `LevelBatchImporter`, like
 `FileAccess.open()`/`LevelImporter`, does **not** auto-create missing output
 directories; callers (and this project's tests/CLI usage) must ensure
-destination directories already exist.
+destination directories already exist. Unlike the single importer's own
+preflight, the batch layer additionally *validates* every destination
+parent directory before commit (see below) — it still never creates one.
 
 **Prepare/validate-then-commit architecture:**
 
 1. Every well-formed item is preflighted via
    `LevelImporter.run_import(dry_run=true)` — this alone runs every
    M09-C001 validation/safety check, including that item's own path
-   aliasing. On top of that, batch-only checks run once per batch: duplicate
-   IDs within the manifest, duplicate/aliased destinations across items (a
-   source in one item aliasing a destination in another included), and a
-   single scan of `catalog_root` for existing-ID collisions and malformed
-   entries.
+   aliasing. On top of that, batch-only checks run once per batch: manifest
+   schema (required fields and optional field types), destination-parent-
+   directory existence for every requested output/preview/metadata path,
+   duplicate IDs within the manifest, duplicate/aliased destinations across
+   items (a source in one item aliasing a destination in another included),
+   catalog-root validity, and a single scan of `catalog_root` for
+   malformed/duplicate entries and bidirectional ID/path ownership.
 2. **Validation-only mode** stops after step 1. Every check still runs;
-   nothing is ever written, because `dry_run=true` never reaches a physical
-   write call inside `LevelImporter.run_import()`.
+   nothing is ever written or created — no directories, no files — because
+   `dry_run=true` never reaches a physical write call inside
+   `LevelImporter.run_import()`, and every batch-only check (destination
+   parent, catalog root) is a read-only existence check.
 3. **Commit mode** performs step 1, and only if the *entire* batch
    preflights clean does it re-invoke `LevelImporter.run_import()` per item
    (in manifest order) with `dry_run=false` to write final artifacts. If any
    item or any batch-only check fails preflight, no item's final artifacts
    are committed — a failing later item prevents an earlier, individually
-   valid item from being written.
+   valid item from being written. `BatchResult.committed` is `true` only
+   once every requested commit write actually completed successfully; a
+   rare post-preflight OS write failure on any item leaves it `false`
+   instead of presenting a misleading blanket success flag.
 
-**Duplicate level-ID protection** (`SB-M09-020`):
+**Destination-parent-directory preflight** (M09-C002 V02 correction,
+`F-M09B-001`): a missing or non-directory parent for any requested
+output/preview/metadata path is a *predictable* logical validation failure,
+not a rare OS race — it is detected for every item before any item in the
+batch is committed, exactly like every other preflight check. This check
+never creates the missing directory in either mode.
+
+**Catalog root validity** (M09-C002 V02 correction, `F-M09B-002`): a
+missing, unopenable, or non-directory `catalog_root` fails the whole batch
+with an actionable `catalog_root_error` (`BatchResult.catalog_root_valid ==
+false`) — it is never silently treated as an empty, trustworthy catalog.
+
+**Duplicate level-ID protection and catalog ownership** (`SB-M09-020`):
 
 - Two manifest items declaring the same `id` are rejected before any write.
 - The catalog directory is scanned once per batch run (flat, non-recursive,
   `*.json` files) through the existing `LevelLoader`/`LevelValidator`
-  pipeline — filenames are never trusted as ID authority.
+  pipeline — filenames are never trusted as ID authority. The scan builds
+  **both** ownership directions: declared ID → canonical catalog path(s),
+  and canonical catalog path → declared ID/entry status (M09-C002 V02
+  correction, `F-M09B-003`).
 - Two existing catalog files declaring the same `id` are reported (both
-  paths) as `catalog_duplicate_ids`, whether or not the current batch
-  touches that ID.
-- A malformed or structurally invalid existing catalog file is reported as
-  `catalog_malformed` (path + specific errors) rather than silently
-  skipped — a JSON-parse failure and a structurally-invalid-but-parseable
-  Level Data file are reported distinctly.
+  paths) as `catalog_duplicate_ids`. A malformed or structurally invalid
+  existing catalog file is reported as `catalog_malformed` (path + specific
+  errors) — a JSON-parse failure and a structurally-invalid-but-parseable
+  Level Data file are reported distinctly. **Either kind of existing catalog
+  corruption fails the whole batch's validation result** — not merely an
+  informational report — whether or not the current batch touches the
+  affected ID (M09-C002 V02 correction, `F-M09B-004`; corrupt catalog files
+  are never deleted, rewritten, or auto-repaired).
 - A requested `id` that already belongs to a *different* existing catalog
   file (by canonical path identity, not string equality) is rejected —
   `overwrite=true` does not authorize reassigning an existing level ID to a
   different file.
+- A requested `output` that aliases an *existing* catalog file declaring a
+  **different** `id` is rejected, even with `overwrite=true` — this is the
+  reverse direction of the check above (a different ID cannot steal an
+  existing catalog path). If the aliased existing file is itself malformed,
+  the request is rejected too: ownership cannot be safely established, so
+  the batch fails closed rather than allowing an overwrite of unknown state.
 - A requested `id` at the *same* canonical catalog output path as its
-  existing entry is treated as re-importing that same logical level, not a
-  conflict — ordinary `LevelImporter` overwrite/unchanged rules then decide
-  whether anything actually changes.
+  existing (valid) entry is treated as re-importing that same logical
+  level, not a conflict — ordinary `LevelImporter` overwrite/unchanged rules
+  then decide whether anything actually changes.
 - TEST fixtures and production levels participate in the same ID-uniqueness
   space within whatever catalog root is explicitly being validated; TEST is
   never silently excluded by filename convention.

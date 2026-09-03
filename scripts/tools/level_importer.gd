@@ -325,7 +325,7 @@ static func generate_test_png(width: int, height: int, color_count: int = 4, inc
 
 # --- path safety helpers ---
 
-## F-M09-005 fix: canonicalize to one comparable filesystem identity, not a
+## F-M09-005 fix: resolve to one real, usable filesystem path — not a
 ## cosmetically-normalized string. Base for unprefixed relative paths is
 ## res:// (project root) — confirmed empirically (not the OS process CWD):
 ## Image.load()/FileAccess.open() resolve a bare relative arg (as passed by
@@ -333,7 +333,13 @@ static func generate_test_png(width: int, height: int, color_count: int = 4, inc
 ## shell's working directory at launch. Dot segments are simplified via
 ## String.simplify_path() (lexical only — this does not resolve symlinks;
 ## symbolic-link identity is out of scope for this correction).
-static func _canonical_path(p: String) -> String:
+##
+## Case is deliberately preserved here — this is a real path usable for
+## actual FileAccess/DirAccess calls (M09-C002 destination-parent/catalog-
+## root preflight), not just a comparison key. Use _canonical_path() below
+## for identity comparison; never feed its lowercased-on-Windows output back
+## into a real filesystem call, or a case-sensitive filesystem would break.
+static func _resolve_path(p: String) -> String:
 	if p.is_empty():
 		return ""
 	var resolved := p.replace("\\", "/")
@@ -341,8 +347,15 @@ static func _canonical_path(p: String) -> String:
 		resolved = ProjectSettings.globalize_path(resolved)
 	elif not resolved.is_absolute_path():
 		resolved = ProjectSettings.globalize_path("res://" + resolved)
-	resolved = resolved.simplify_path()
-	# Windows: case-insensitive filesystem
+	return resolved.simplify_path()
+
+## Comparable filesystem identity for alias/ownership checks — _resolve_path()
+## plus Windows case-folding. Never pass this into a real FileAccess/DirAccess
+## call; use _resolve_path() for that.
+static func _canonical_path(p: String) -> String:
+	if p.is_empty():
+		return ""
+	var resolved := _resolve_path(p)
 	if OS.get_name() == "Windows":
 		resolved = resolved.to_lower()
 	return resolved

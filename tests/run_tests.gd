@@ -1347,6 +1347,152 @@ func _run_batch_importer_tests() -> void:
 		_check(struct_errors.size() > 0, "structural-invalidity produces specific field errors")
 		_check(struct_errors[0].find("malformed JSON") < 0, "structural-invalidity error is distinct from JSON-parse-failure (AL-011)")
 
+	# ==== V02 CORRECTION: CATALOG HEALTH INVALIDATES OVERALL VALIDATION (F-M09B-004) ====
+	# Existing catalog corruption unrelated to the requested item must still
+	# fail the WHOLE batch's is_ok(), not remain merely informational.
+	_check(not res_scan.is_ok(), "existing catalog duplicate ID (unrelated to requested item) makes overall validation fail")
+	_check(not res_scan2.is_ok(), "malformed catalog JSON (unrelated to requested item) makes overall validation fail")
+	_check(not res_scan3.is_ok(), "structurally invalid catalog entry (unrelated to requested item) makes overall validation fail")
+
+	# ==== V02 CORRECTION: DESTINATION-PARENT-DIRECTORY PREFLIGHT (F-M09B-001) ====
+	var out_parent_ok := root + "out_parent_ok/"
+	DirAccess.make_dir_recursive_absolute(out_parent_ok)
+
+	# 1. later item has a missing Level JSON parent; earlier item has a valid parent
+	var manifest_parent1_items := [
+		{"source": root + "tiny.png", "id": "parent1_ok", "name": "Parent1OK", "difficulty": "TEST", "output": out_parent_ok + "ok.json"},
+		{"source": root + "rect.png", "id": "parent1_bad", "name": "Parent1Bad", "difficulty": "EASY", "output": root + "out_parent_missing_output/nope.json"},
+	]
+	var manifest_parent1_path := root + "manifest_parent1.json"
+	_write_manifest.call(manifest_parent1_path, manifest_parent1_items)
+	var res_parent1 := LevelBatchImporter.run_batch(manifest_parent1_path, out_parent_ok, true)
+	_check(not res_parent1.is_ok(), "missing Level JSON parent directory blocks whole batch")
+	_check(not FileAccess.file_exists(out_parent_ok + "ok.json"), "earlier item with a valid parent is not written when a later item's parent is missing")
+	_check(res_parent1.items[1].all_errors().size() > 0, "the item with the missing parent reports a specific error")
+
+	# 2. missing preview parent blocks whole batch before writes
+	var manifest_parent2_items := [
+		{"source": root + "tiny.png", "id": "parent2_ok", "name": "Parent2OK", "difficulty": "TEST", "output": out_parent_ok + "p2ok.json"},
+		{"source": root + "rect.png", "id": "parent2_bad", "name": "Parent2Bad", "difficulty": "EASY", "output": out_parent_ok + "p2bad.json", "preview": root + "out_parent_missing_preview/p.png"},
+	]
+	var manifest_parent2_path := root + "manifest_parent2.json"
+	_write_manifest.call(manifest_parent2_path, manifest_parent2_items)
+	var res_parent2 := LevelBatchImporter.run_batch(manifest_parent2_path, out_parent_ok, true)
+	_check(not res_parent2.is_ok(), "missing preview parent directory blocks whole batch")
+	_check(not FileAccess.file_exists(out_parent_ok + "p2ok.json"), "earlier item not written when a later item's preview parent is missing")
+
+	# 3. missing metadata parent blocks whole batch before writes
+	var manifest_parent3_items := [
+		{"source": root + "tiny.png", "id": "parent3_ok", "name": "Parent3OK", "difficulty": "TEST", "output": out_parent_ok + "p3ok.json"},
+		{"source": root + "rect.png", "id": "parent3_bad", "name": "Parent3Bad", "difficulty": "EASY", "output": out_parent_ok + "p3bad.json", "metadata": root + "out_parent_missing_metadata/m.json"},
+	]
+	var manifest_parent3_path := root + "manifest_parent3.json"
+	_write_manifest.call(manifest_parent3_path, manifest_parent3_items)
+	var res_parent3 := LevelBatchImporter.run_batch(manifest_parent3_path, out_parent_ok, true)
+	_check(not res_parent3.is_ok(), "missing metadata parent directory blocks whole batch")
+	_check(not FileAccess.file_exists(out_parent_ok + "p3ok.json"), "earlier item not written when a later item's metadata parent is missing")
+
+	# 4. validation-only missing-parent case creates neither directory nor final file
+	var res_parent4 := LevelBatchImporter.run_batch(manifest_parent1_path, out_parent_ok, false)
+	_check(not res_parent4.is_ok(), "validation-only also reports missing-parent failure")
+	_check(not DirAccess.dir_exists_absolute(root + "out_parent_missing_output"), "validation-only does not create the missing parent directory")
+	_check(not FileAccess.file_exists(out_parent_ok + "ok.json"), "validation-only writes nothing even for the item with a valid parent")
+
+	# ==== V02 CORRECTION: CATALOG ROOT FAIL-CLOSED (F-M09B-002) ====
+	var manifest_catroot_items := [
+		{"source": root + "tiny.png", "id": "catroot_item", "name": "CatRoot", "difficulty": "TEST", "output": out_parent_ok + "catroot_out.json"},
+	]
+	var manifest_catroot_path := root + "manifest_catroot.json"
+	_write_manifest.call(manifest_catroot_path, manifest_catroot_items)
+
+	# 5. missing catalog root
+	var missing_catalog_root := root + "does_not_exist_catalog/"
+	var res_missing_root := LevelBatchImporter.run_batch(manifest_catroot_path, missing_catalog_root, false)
+	_check(not res_missing_root.is_ok(), "missing catalog root fails the whole batch")
+	_check(not res_missing_root.catalog_root_valid, "missing catalog root reported as invalid")
+	_check(res_missing_root.catalog_root_error.length() > 0, "missing catalog root produces an actionable error message")
+
+	# 6. catalog root that is a file, not a directory
+	var file_as_catalog_root := root + "file_as_catalog_root.txt"
+	_write_text_file.call(file_as_catalog_root, "not a directory")
+	var res_file_root := LevelBatchImporter.run_batch(manifest_catroot_path, file_as_catalog_root, false)
+	_check(not res_file_root.is_ok(), "non-directory catalog root fails the whole batch")
+	_check(not res_file_root.catalog_root_valid, "non-directory catalog root reported as invalid")
+
+	# ==== V02 CORRECTION: BIDIRECTIONAL CATALOG PATH OWNERSHIP (F-M09B-003) ====
+	var cat_ownership := root + "catalog_ownership/"
+	DirAccess.make_dir_recursive_absolute(cat_ownership)
+	_write_json.call(cat_ownership + "old_entry.json", _make_level_dict.call("old_id"))
+	var old_entry_bytes_before := FileAccess.get_file_as_bytes(cat_ownership + "old_entry.json")
+
+	# 10. different id targeting the SAME existing catalog path, overwrite=true -> rejected
+	var manifest_takeover_items := [
+		{"source": root + "tiny.png", "id": "new_id", "name": "Takeover", "difficulty": "TEST", "output": cat_ownership + "old_entry.json", "overwrite": true},
+	]
+	var manifest_takeover_path := root + "manifest_takeover.json"
+	_write_manifest.call(manifest_takeover_path, manifest_takeover_items)
+	var res_takeover := LevelBatchImporter.run_batch(manifest_takeover_path, cat_ownership, true)
+	_check(not res_takeover.is_ok(), "different id cannot take over an existing catalog path even with overwrite=true")
+	_check_eq(FileAccess.get_file_as_bytes(cat_ownership + "old_entry.json"), old_entry_bytes_before, "existing catalog file bytes unchanged after takeover attempt")
+
+	# 11. same file + same declared id + same canonical output -> normal unchanged/overwrite semantics apply
+	var manifest_sameentry_items := [
+		{"source": root + "tiny.png", "id": "old_id", "name": "SameEntry", "difficulty": "TEST", "output": cat_ownership + "old_entry.json", "overwrite": true},
+	]
+	var manifest_sameentry_path := root + "manifest_sameentry.json"
+	_write_manifest.call(manifest_sameentry_path, manifest_sameentry_items)
+	var res_sameentry := LevelBatchImporter.run_batch(manifest_sameentry_path, cat_ownership, true)
+	_check(res_sameentry.is_ok(), "same id at its own existing canonical catalog path is not treated as ownership theft")
+
+	# 12. requested output aliases a MALFORMED catalog file -> fail closed
+	_write_text_file.call(cat_ownership + "broken_entry.json", "{ not valid json ]")
+	var broken_entry_bytes_before := FileAccess.get_file_as_bytes(cat_ownership + "broken_entry.json")
+	var manifest_malformed_takeover_items := [
+		{"source": root + "tiny.png", "id": "whatever_id", "name": "MalformedTakeover", "difficulty": "TEST", "output": cat_ownership + "broken_entry.json", "overwrite": true},
+	]
+	var manifest_malformed_takeover_path := root + "manifest_malformed_takeover.json"
+	_write_manifest.call(manifest_malformed_takeover_path, manifest_malformed_takeover_items)
+	var res_malformed_takeover := LevelBatchImporter.run_batch(manifest_malformed_takeover_path, cat_ownership, true)
+	_check(not res_malformed_takeover.is_ok(), "output aliasing a malformed catalog file fails closed")
+	_check_eq(FileAccess.get_file_as_bytes(cat_ownership + "broken_entry.json"), broken_entry_bytes_before, "malformed catalog file bytes unchanged after takeover attempt")
+
+	# ==== V02 CORRECTION: MANIFEST OPTIONAL FIELD TYPE VALIDATION (F-M09B-005) ====
+	var out_schema := root + "out_schema/"
+	DirAccess.make_dir_recursive_absolute(out_schema)
+
+	# 13. preview: 42 -> clean schema error
+	var manifest_bad_preview_items := [
+		{"source": root + "tiny.png", "id": "bad_preview", "name": "BadPreview", "difficulty": "TEST", "output": out_schema + "bp_out.json", "preview": 42},
+	]
+	var manifest_bad_preview_path := root + "manifest_bad_preview.json"
+	_write_manifest.call(manifest_bad_preview_path, manifest_bad_preview_items)
+	var res_bad_preview := LevelBatchImporter.run_batch(manifest_bad_preview_path, out_schema, true)
+	_check(not res_bad_preview.is_ok(), "preview: 42 rejected as a schema error")
+	_check(res_bad_preview.items[0].all_errors()[0].find("preview") >= 0, "preview type error names the field specifically")
+	_check(not FileAccess.file_exists(out_schema + "bp_out.json"), "preview type error writes nothing")
+
+	# 14. metadata: {} -> clean schema error
+	var manifest_bad_metadata_items := [
+		{"source": root + "tiny.png", "id": "bad_metadata", "name": "BadMetadata", "difficulty": "TEST", "output": out_schema + "bm_out.json", "metadata": {}},
+	]
+	var manifest_bad_metadata_path := root + "manifest_bad_metadata.json"
+	_write_manifest.call(manifest_bad_metadata_path, manifest_bad_metadata_items)
+	var res_bad_metadata := LevelBatchImporter.run_batch(manifest_bad_metadata_path, out_schema, true)
+	_check(not res_bad_metadata.is_ok(), "metadata: {} rejected as a schema error")
+	_check(res_bad_metadata.items[0].all_errors()[0].find("metadata") >= 0, "metadata type error names the field specifically")
+	_check(not FileAccess.file_exists(out_schema + "bm_out.json"), "metadata type error writes nothing")
+
+	# 15. overwrite: "yes" -> clean schema error
+	var manifest_bad_overwrite_items := [
+		{"source": root + "tiny.png", "id": "bad_overwrite", "name": "BadOverwrite", "difficulty": "TEST", "output": out_schema + "bo_out.json", "overwrite": "yes"},
+	]
+	var manifest_bad_overwrite_path := root + "manifest_bad_overwrite.json"
+	_write_manifest.call(manifest_bad_overwrite_path, manifest_bad_overwrite_items)
+	var res_bad_overwrite := LevelBatchImporter.run_batch(manifest_bad_overwrite_path, out_schema, true)
+	_check(not res_bad_overwrite.is_ok(), "overwrite: 'yes' rejected as a schema error")
+	_check(res_bad_overwrite.items[0].all_errors()[0].find("overwrite") >= 0, "overwrite type error names the field specifically")
+	_check(not FileAccess.file_exists(out_schema + "bo_out.json"), "overwrite type error writes nothing")
+
 	# ---- performance sanity (batch of 3 including 59x59, informational only) ----
 	var perf_out := root + "out_perf/"
 	var perf_items := [

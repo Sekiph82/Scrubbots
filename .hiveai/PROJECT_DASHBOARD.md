@@ -26,13 +26,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | NEEDS_CORRECTION - M09-C002 audit V01 found preflight/catalog integrity gaps |
+| Health | HEALTHY - M09-C002 V02 correction complete, awaiting audit V02 |
 | Current implementation frontier | M09 - Pixel Art to Level Data Pipeline |
-| Current task | M09-C002 - Batch Import / Validation / Duplicate-ID Protection correction V02 |
+| Current task | M09-C002 - Batch Import / Validation / Duplicate-ID Protection correction V02 complete |
 | Current task ID | `M09-C002` |
-| Current workflow state | `CHANGES_REQUIRED` |
-| Required actor | CLAUDE |
-| Next project action | Implement and validate CHATGPT_PROMPT_V02.md, append evidence to the existing Claude implementation log, return to AWAITING_AUDIT. |
+| Current workflow state | `AWAITING_AUDIT` - Claude closed all five audit V01 findings (F-M09B-001..005), 426/426 tests pass |
+| Required actor | CHATGPT |
+| Next project action | ChatGPT independent audit V02 against criteria V02. If AUDITED_PASS, M09 milestone is complete pending M08/M10 owner-asset gates. |
 | Waiting on | M08 production-art audit and remaining M07 visual inventory tasks require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -40,24 +40,24 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-09-03 |
-| Actor | CHATGPT |
+| Timestamp | 2026-09-03T13:00:00+03:00 |
+| Actor | CLAUDE |
 | Cycle | `M09-C002` |
-| Session type | Independent audit V01 + correction prompt issuance |
-| Cycle status | `CHANGES_REQUIRED` |
-| Summary | Independent inspection accepted the general manifest-driven batch architecture but found five validation/safety gaps: predictable missing destination parents are not preflighted; invalid catalog root fails open; catalog path ownership can be stolen by a different ID with overwrite=true; malformed/duplicate catalog health does not invalidate overall validation; optional manifest fields are not explicitly type-validated. V02 correction prompt and criteria were published. |
+| Session type | V02 correction implementation (Session 2) |
+| Cycle status | `AWAITING_AUDIT` |
+| Summary | Closed all five audit V01 findings: F-M09B-001 destination-parent preflight (missing/non-directory parents now block the whole batch before commit), F-M09B-002 catalog-root fail-closed, F-M09B-003 bidirectional catalog ID/path ownership (overwrite=true can no longer let a different ID steal an existing catalog path, and aliasing a malformed catalog entry fails closed), F-M09B-004 catalog malformed/duplicate state now invalidates overall validation instead of being merely informational, F-M09B-005 optional manifest field types (`preview`/`metadata`/`overwrite`) explicitly validated before typed use. Applied AL-014..016. Added 32 new tests (426 total). Real CLI verification for every negative case, including MD5 byte-preservation proof for the catalog-takeover rejection. |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V02.md |
 | Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V02.md |
 | Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V01.md |
 | Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
 | Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
-| Next expected actor | CLAUDE |
+| Next expected actor | CHATGPT |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M09-C002 | Batch import / validation / duplicate-ID tooling | `CHANGES_REQUIRED` | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V01.md |
+| M09-C002 | Batch import / validation / duplicate-ID tooling | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
 | M09-C001 | Exact-pixel single importer + safety hardening | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md |
 | M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M07 | Visual Reference Library | PARTIAL - infrastructure audited; owner assets still missing | HUMAN | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
@@ -85,7 +85,7 @@ New reusable audit learnings:
 - `AL-015` - fail-closed catalog root/health and bidirectional path/ID ownership;
 - `AL-016` - optional manifest schema type safety.
 
-## Active correction V02
+## V02 correction (complete, awaiting audit)
 
 Prompt:
 https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V02.md
@@ -93,7 +93,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/C
 Audit criteria:
 https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V02.md
 
-Correction scope is M09-C002 only. Claude must preserve the accepted V01 behavior and the audited M09-C001 single-import invariants while closing all five findings.
+Correction scope was M09-C002 only. All five findings closed while preserving accepted V01 behavior and the audited M09-C001 single-import invariants — see `CLAUDE_IMPLEMENTATION_LOG.md` Session 2 for full evidence. `AWAITING_AUDIT` for ChatGPT audit V02.
 
 ## Accepted behavior from M09-C002 V01 that must not regress
 
@@ -109,7 +109,7 @@ Correction scope is M09-C002 only. Claude must preserve the accepted V01 behavio
 - no owner artwork fabricated/ingested;
 - M08/M10/gameplay scope untouched.
 
-Claude reported `394/394` checks on V01. ChatGPT did not execute the local Godot binary; the runtime total remains Claude-run implementation evidence. The independent audit verdict is based on repository code/diff/test-design inspection and is `CHANGES_REQUIRED`.
+Claude reported `426/426` checks after V02 (394 V01 baseline + 32 new). ChatGPT has not yet independently executed the local Godot binary against V02, so that total remains Claude-run implementation evidence rather than independent runtime execution proof.
 
 ## Audit model
 
@@ -144,7 +144,7 @@ Claude reported `394/394` checks on V01. ChatGPT did not execute the local Godot
 | M06 | Board Renderer | COMPLETE |
 | M07 | Visual Reference Library | PARTIAL - owner assets still missing |
 | M08 | Level Art Technical Audit | BLOCKED_ON_OWNER_ASSET |
-| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - C001 AUDITED_PASS, C002 CHANGES_REQUIRED |
+| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - C001 AUDITED_PASS, C002 AWAITING_AUDIT (V02) |
 | M10 | Dirty/Clean Visual Model | OWNER_REQUIRED / PARTIAL infrastructure |
 | M11-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 

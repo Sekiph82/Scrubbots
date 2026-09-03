@@ -2,6 +2,48 @@
 
 ## Unreleased
 
+### Fixed — Batch Safety and Catalog Integrity (M09-C002 V02 Correction)
+
+- Closed all five ChatGPT independent audit V01 findings (`F-M09B-001..005`):
+  - **F-M09B-001** predictable missing destination parent directories are
+    now preflighted for every requested output/preview/metadata path before
+    any item in the batch is committed, instead of only being discovered
+    mid-commit.
+  - **F-M09B-002** a missing/unopenable/non-directory `catalog_root` now
+    fails the whole batch closed (`catalog_root_valid == false` +
+    actionable `catalog_root_error`) instead of being silently treated as
+    an empty catalog.
+  - **F-M09B-003** the catalog scan now builds *both* ownership directions
+    (declared ID → canonical path, and canonical path → declared ID/entry
+    status), so a different ID can no longer claim an existing catalog
+    path with `overwrite=true`; aliasing a malformed existing catalog file
+    also fails closed.
+  - **F-M09B-004** existing catalog malformed entries and duplicate
+    declared IDs now invalidate the whole batch's `is_ok()`, not merely
+    appear in an informational report.
+  - **F-M09B-005** optional manifest fields (`preview`, `metadata`,
+    `overwrite`) are now explicitly type-validated before typed use — a
+    wrong JSON type produces an actionable item schema error, never a
+    runtime type fault.
+- `scripts/tools/level_importer.gd`: split `_canonical_path()` into
+  `_resolve_path()` (a real, case-preserved path for actual
+  `FileAccess`/`DirAccess` calls) and `_canonical_path()` (adds the Windows
+  case-fold, strictly for identity comparison) — behavior-preserving
+  refactor enabling the new batch-layer filesystem preflight checks without
+  ever feeding a lowercased comparison string back into a real I/O call.
+- `BatchResult.committed` now means "every requested commit write actually
+  completed successfully" rather than merely "a commit pass ran" — a rare
+  post-preflight OS write failure on any item is reflected honestly instead
+  of behind a blanket success flag.
+- Extended `tests/run_tests.gd` from 394 to **426 checks**: 32 new targeted
+  correction checks (missing Level JSON/preview/metadata destination
+  parents, validation-only creates neither directory nor file, missing and
+  non-directory catalog roots, unrelated existing catalog corruption/
+  duplicates invalidating overall validation, different-ID-same-path
+  takeover rejection with byte-preservation proof, same-ID-same-path
+  re-import still succeeding, aliasing a malformed catalog file failing
+  closed, and all three optional-field wrong-type cases).
+
 ### Added — Batch Import, Batch Validation, Duplicate-ID Protection (M09-C002)
 
 - New `LevelBatchImporter` (`scripts/tools/level_batch_importer.gd`):
