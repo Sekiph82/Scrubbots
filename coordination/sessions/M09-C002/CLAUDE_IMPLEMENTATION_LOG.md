@@ -11,7 +11,7 @@ taskRefs:
   - SB-M09-019
   - SB-M09-020
 startingCommit: 9d4480162df7c49f60ed0aeec1b1588999e0d23a
-currentCommit: uncommitted
+currentCommit: c81ddf125e4d2bfc604e63024009266aad5a42d6
 ---
 
 # SCRUBBOTS - Claude Implementation Log (M09-C002)
@@ -385,9 +385,10 @@ None. All five findings (`F-M09B-001..005`) corrected per their "Required correc
 
 ### Git evidence
 
-- Ending commit + GitHub URL: recorded in a follow-up backfill entry after commit/push (see below).
+- Ending commit: `c81ddf1` — https://github.com/Sekiph82/Scrubbots/commit/c81ddf1
 - Commit message: `fix: close M09-C002 audit V01 findings — batch safety and catalog integrity (V02)`
-- Push result: recorded after push (see below).
+- Push result: `git push origin main` → `98c9bb8..c81ddf1  main -> main` (no force)
+- Final `git status --short`: clean working tree (only pre-existing untracked: scratchpad temp, `docs/logs/` — unrelated to this session)
 - PR: none used (direct push to `main`, per project convention).
 
 ### Remaining / blocked
