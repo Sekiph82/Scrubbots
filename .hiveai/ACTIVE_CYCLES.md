@@ -5,7 +5,7 @@ PROJECT_DASHBOARD.md.
 
 | Track | Active cycle | Version | Status | Active prompt | Expected Claude log | Latest audit | Next actor |
 | --- | --- | ---: | --- | --- | --- | --- | --- |
-| Main game | M11-C001 | V04 | PLANNED | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V02.md | CLAUDE |
+| Main game | M11-C001 | V04 | AWAITING_AUDIT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V02.md | CHATGPT |
 | Level Factory | LF00-C001 | V01 | PLANNED | PENDING | PENDING | PENDING | CHATGPT |
 | Content Pipeline | CP00-C001 | V01 | PLANNED | PENDING | PENDING | PENDING | CHATGPT |
 
