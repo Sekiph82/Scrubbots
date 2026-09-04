@@ -224,3 +224,16 @@ Non-goals remain locked:
 - Owner-controlled design gates remain `OWNER_REQUIRED` until explicit owner action.
 - Historical prompt/audit versions are immutable evidence.
 - Never publish secrets or sensitive environment values.
+
+
+## Parallel sidecar projects
+
+| Project | Root | Status | Canonical tasks | Coordination |
+| --- | --- | --- | --- | --- |
+| SCRUBBOTS Level Factory | \`level_factory/\` | PLANNED / architecture registered | \`SB-LF00-001..\` in root \`tasks.md\` | \`level_factory/coordination/SESSION_INDEX.md\` |
+| SCRUBBOTS Content Pipeline | \`content_pipeline/\` | PLANNED / architecture registered | \`SB-CP00-001..\` in root \`tasks.md\` | \`content_pipeline/coordination/SESSION_INDEX.md\` |
+
+Both sidecars use the same GitHub-native ChatGPT↔Claude evidence chain as the
+main game. Root \`tasks.md\` remains the only task ledger and this root H!veAI
+dashboard remains the materialized status surface. Sidecar work must not
+silently supersede the active main-game audit cycle.

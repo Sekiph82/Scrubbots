@@ -280,3 +280,77 @@ current 59×59 maximum. `BoardRenderer` remains presentation-only: it reads
 docs/02_TECH_ARCHITECTURE.md).
 
 **Status**: Accepted.
+
+
+---
+
+### ADR-012: Level Factory is a separate nested Godot project
+
+**Decision**: The SCRUBBOTS Level Factory lives at \`level_factory/\` with
+its own \`project.godot\`, docs, tests and coordination subtree. It is not a
+module loaded by the mobile game's root Godot project.
+
+**Reason**: Generation, solver search, difficulty analysis, bulk candidate
+production and human authoring are development workloads with very different
+dependencies/performance/security concerns from the shipping mobile game.
+
+**Consequences**: Integration is one-way through declarative data contracts.
+The game never preloads Factory scripts. Existing M09 importer/validation
+remains the audited compatibility gate for art-first Level Data output.
+
+**Status**: Accepted.
+
+---
+
+### ADR-013: Level Factory is constraint-based and reproducible
+
+**Decision**: Production candidate generation is seed/config reproducible and
+constraint-driven. Blind random filling is not considered sufficient
+production generation. Solver/difficulty adapters may only use gameplay
+semantics that have been explicitly defined by the project.
+
+**Reason**: Reproducible candidates are debuggable; constraint/solver-backed
+generation can reject invalid or unsolved candidates instead of producing an
+opaque stream of random boards.
+
+**Consequences**: Candidate provenance includes seed/config/generator version.
+Historical Colony Flow-derived assumptions remain experimental until mapped
+to canonical SCRUBBOTS rules.
+
+**Status**: Accepted, with solver semantics gated by future gameplay rules.
+
+---
+
+### ADR-014: Remote content is declarative data, never executable game code
+
+**Decision**: The Content Pipeline may distribute Level Data, pack/manifest
+metadata, previews and other explicitly supported declarative content. It
+must not distribute or activate GDScript, native libraries, bytecode,
+plugins, evaluable expressions or other executable gameplay code.
+
+**Reason**: Keeps app-code changes in store-delivered builds, reduces remote
+attack surface, and preserves a clear review/security boundary.
+
+**Consequences**: Remote payload schemas are allow-listed and validated.
+Runtime downloads install under \`user://\`; publishing secrets never ship
+inside the app. Current store policies must be re-verified before launch.
+
+**Status**: Accepted.
+
+---
+
+### ADR-015: Staging-first, versioned Content Pipeline
+
+**Decision**: Remote level publication follows validate → package/hash →
+upload → staging manifest → real remote verification → explicit production
+promotion. Rollback/disable/scheduling create auditable versioned state
+changes instead of silently rewriting history.
+
+**Reason**: Weekly high-volume level publishing needs a safe operational
+control plane with last-known-good recovery and reproducible evidence.
+
+**Consequences**: \`.scrubpack\` and manifest formats are versioned; hashes
+are verified before activation; production promotion is explicit; provider
+choice remains behind an adapter until selected.
+
+**Status**: Accepted.
