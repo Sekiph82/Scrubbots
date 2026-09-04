@@ -16,11 +16,11 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | --- | --- |
 | Active cycle | M11-C001 |
 | Active version | V04 |
-| State | PLANNED |
-| Next actor | CLAUDE |
+| State | AWAITING_AUDIT |
+| Next actor | CHATGPT |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V04.md |
-| Expected Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V04.md |
-| Purpose | Backfill CLAUDE_LOG_V01/V02/V03, create CLAUDE_LOG_V04, normalize H!ve tracking. No gameplay changes. |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V04.md |
+| Purpose | V04 normalization complete. CLAUDE_LOG_V01/V02/V03 backfilled, V04 created, H!ve tracking updated. Renderer correction (548/548) already implemented in V02/V03. |
 
 ### Current progress from tasks.md
 
@@ -51,13 +51,13 @@ Tracking sources:
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | OK — M11-C001 V02/V03 correction implemented; AWAITING_AUDIT for ChatGPT V03 |
+| Health | OK — M11-C001 V04 normalization complete; AWAITING_AUDIT for ChatGPT |
 | Current implementation frontier | M11 - Gameplay Session Core |
-| Current task | M11-C001 - V02/V03 Renderer Proof Correction |
+| Current task | M11-C001 - V04 Versioned Log Normalization |
 | Current task ID | `M11-C001` |
-| Current workflow state | `AWAITING_AUDIT` — F-M11-001 closed by implementation: M11-23/24 strengthened with direct pixel readback; 548/548 ALL PASS |
+| Current workflow state | `AWAITING_AUDIT` — V04 normalization done. Renderer correction (V02/V03) already implemented with 548/548 ALL PASS. Versioned logs V01-V04 created. |
 | Required actor | CHATGPT |
-| Next project action | ChatGPT performs independent audit V03 of the new commit on origin/main. If AUDITED_PASS, M11 is complete. |
+| Next project action | ChatGPT performs independent audit V04 covering both the renderer correction and the log normalization. |
 | Waiting on | M08 production-art audit and remaining M07 visual inventory tasks require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -68,13 +68,13 @@ Tracking sources:
 | Timestamp | 2026-09-04 |
 | Actor | CLAUDE |
 | Cycle | `M11-C001` |
-| Session type | V02/V03 correction implementation (F-M11-001) |
+| Session type | V04 versioned log normalization |
 | Cycle status | `AWAITING_AUDIT` |
-| Summary | Strengthened M11-23/24 renderer regression tests with direct pixel readback per AL-018. M11-23 proves renderer pixel output tracks session-owned BoardState via DIRTY→CLEAN mutation. M11-24 proves renderer follows NEW BoardState after reset by deliberately diverging old/new boards and verifying pixel matches new board. No production code changed. 548/548 ALL PASS (542 prior + 6 new). |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V03.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V03.md |
+| Summary | Normalized M11-C001 to coordination/v4. Backfilled CLAUDE_LOG_V01/V02/V03 from real legacy evidence. Created CLAUDE_LOG_V04. Updated H!ve tracking (ACTIVE_CYCLES, ARTIFACT_MAP, PROGRESS_SNAPSHOT). Progress recalculated: 174/848 ecosystem (20.52%), 174/624 main (27.88%). No gameplay/test/renderer changes. Legacy CLAUDE_IMPLEMENTATION_LOG.md preserved. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V04.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V04.md |
 | Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V02.md |
-| Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_IMPLEMENTATION_LOG.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V04.md |
 | Next expected actor | CHATGPT |
 
 ## Current work
