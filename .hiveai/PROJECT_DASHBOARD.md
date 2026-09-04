@@ -26,13 +26,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | HEALTHY - M09-C002 V02 correction complete, awaiting audit V02 |
+| Health | ATTENTION - M09-C002 audit V02 found one remaining deterministic destination-type preflight gap |
 | Current implementation frontier | M09 - Pixel Art to Level Data Pipeline |
-| Current task | M09-C002 - Batch Import / Validation / Duplicate-ID Protection correction V02 complete |
+| Current task | M09-C002 - Destination-Type Preflight Correction V03 |
 | Current task ID | `M09-C002` |
-| Current workflow state | `AWAITING_AUDIT` - Claude closed all five audit V01 findings (F-M09B-001..005), 426/426 tests pass |
-| Required actor | CHATGPT |
-| Next project action | ChatGPT independent audit V02 against criteria V02. If AUDITED_PASS, M09 milestone is complete pending M08/M10 owner-asset gates. |
+| Current workflow state | `CHANGES_REQUIRED` - Audit V02 accepted F-M09B-001..005 but found F-M09B-006 (existing directory can still be used as a final destination until commit-time failure) |
+| Required actor | CLAUDE |
+| Next project action | Claude implements V03 destination-object-type preflight, runs targeted/full validation, updates implementation log, and returns M09-C002 to AWAITING_AUDIT. |
 | Waiting on | M08 production-art audit and remaining M07 visual inventory tasks require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -40,24 +40,24 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-09-03T13:00:00+03:00 |
-| Actor | CLAUDE |
+| Timestamp | 2026-09-04T08:54:00+03:00 |
+| Actor | CHATGPT |
 | Cycle | `M09-C002` |
-| Session type | V02 correction implementation (Session 2) |
-| Cycle status | `AWAITING_AUDIT` |
-| Summary | Closed all five audit V01 findings: F-M09B-001 destination-parent preflight (missing/non-directory parents now block the whole batch before commit), F-M09B-002 catalog-root fail-closed, F-M09B-003 bidirectional catalog ID/path ownership (overwrite=true can no longer let a different ID steal an existing catalog path, and aliasing a malformed catalog entry fails closed), F-M09B-004 catalog malformed/duplicate state now invalidates overall validation instead of being merely informational, F-M09B-005 optional manifest field types (`preview`/`metadata`/`overwrite`) explicitly validated before typed use. Applied AL-014..016. Added 32 new tests (426 total). Real CLI verification for every negative case, including MD5 byte-preservation proof for the catalog-takeover rejection. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V02.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V02.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V01.md |
+| Session type | Independent audit V02 + V03 correction issuance |
+| Cycle status | `CHANGES_REQUIRED` |
+| Summary | Independently inspected implementation head `a95ca5bff646e9e8f2a1382303be2df14d847ace`. Accepted V01 corrections for destination-parent preflight, fail-closed catalog root/health, bidirectional catalog ownership, and optional manifest schema types. Found new HIGH issue F-M09B-006: parent-only preflight does not reject a final destination path that is itself an existing directory, so a later deterministic commit failure can leave earlier artifacts written. Issued V03 and added AL-017. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V03.md |
+| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V02.md |
 | Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
 | Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
-| Next expected actor | CHATGPT |
+| Next expected actor | CLAUDE |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M09-C002 | Batch import / validation / duplicate-ID tooling | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
+| M09-C002 | Batch import / validation / duplicate-ID tooling | `CHANGES_REQUIRED` | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
 | M09-C001 | Exact-pixel single importer + safety hardening | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md |
 | M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M07 | Visual Reference Library | PARTIAL - infrastructure audited; owner assets still missing | HUMAN | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
@@ -111,6 +111,27 @@ Correction scope was M09-C002 only. All five findings closed while preserving ac
 
 Claude reported `426/426` checks after V02 (394 V01 baseline + 32 new). ChatGPT has not yet independently executed the local Godot binary against V02, so that total remains Claude-run implementation evidence rather than independent runtime execution proof.
 
+## M09-C002 independent audit V02
+
+Audit:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V02.md
+
+Decision: `CHANGES_REQUIRED`.
+
+V02 independently accepted F-M09B-001..005 as closed. New finding:
+
+- `F-M09B-006` HIGH - parent-only destination preflight does not reject an existing directory as the final output/preview/metadata target. This deterministic target-type failure can still occur after an earlier item commits.
+
+Correction prompt:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md
+
+Correction criteria:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V03.md
+
+Reusable learning added:
+
+- `AL-017`: validate the final destination object's incompatible type, not only its parent.
+
 ## Audit model
 
 1. ChatGPT publishes implementation prompts and audit criteria.
@@ -144,7 +165,7 @@ Claude reported `426/426` checks after V02 (394 V01 baseline + 32 new). ChatGPT 
 | M06 | Board Renderer | COMPLETE |
 | M07 | Visual Reference Library | PARTIAL - owner assets still missing |
 | M08 | Level Art Technical Audit | BLOCKED_ON_OWNER_ASSET |
-| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - C001 AUDITED_PASS, C002 AWAITING_AUDIT (V02) |
+| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - C001 AUDITED_PASS, C002 CHANGES_REQUIRED (V03 issued) |
 | M10 | Dirty/Clean Visual Model | OWNER_REQUIRED / PARTIAL infrastructure |
 | M11-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 
