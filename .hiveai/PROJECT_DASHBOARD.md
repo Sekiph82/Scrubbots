@@ -28,11 +28,11 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Project status | ACTIVE |
 | Health | ATTENTION - M11-C001 audit V01 found one renderer-regression proof gap; narrow V02 correction issued |
 | Current implementation frontier | M11 - Gameplay Session Core |
-| Current task | M11-C001 - Renderer Regression Proof Correction V02 |
+| Current task | M11-C001 - Renderer Proof Execution Recovery V03 |
 | Current task ID | `M11-C001` |
-| Current workflow state | `CHANGES_REQUIRED` - core implementation accepted, but F-M11-001 requires direct real-renderer BoardState/reset proof |
+| Current workflow state | `CHANGES_REQUIRED` - Audit V02 found no new correction implementation on GitHub; F-M11-001 remains open and Prompt V03 is active |
 | Required actor | CLAUDE |
-| Next project action | Claude reads M11-C001 audit V01 + prompt/criteria V02, adds direct renderer binding/reset regression proof, runs full validation, appends to the same implementation log, returns AWAITING_AUDIT, and stops. |
+| Next project action | Claude reads M11-C001 audits V01/V02 plus Prompt/Criteria V03, actually implements the renderer proof correction, appends a new session to the same log, pushes a new commit to origin/main, returns AWAITING_AUDIT, and stops. |
 | Waiting on | M08 production-art audit and remaining M07 visual inventory tasks require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -40,15 +40,15 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-09-04T19:26:00+03:00 |
+| Timestamp | 2026-09-04T22:01:00+03:00 |
 | Actor | CHATGPT |
 | Cycle | `M11-C001` |
-| Session type | Independent audit V01 + correction V02 issuance |
+| Session type | Independent audit V02 / missing-implementation recovery |
 | Cycle status | `CHANGES_REQUIRED` |
-| Summary | M11 production architecture/lifecycle accepted by independent inspection. New finding F-M11-001: renderer tests M11-23/M11-24 only assert proxy session/geometry state and do not prove the real BoardRenderer follows the session-owned BoardState after load/reset. V02 requires behavior-level renderer pixel proof and full regression. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V02.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V02.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V01.md |
+| Summary | GitHub contained no V02 Claude implementation after the prior correction handoff. main remained b86e25f, the implementation log had no appended correction session, and there was no new M11 branch/commit. Audit V02 records BLOCKED_NO_NEW_IMPLEMENTATION; F-M11-001 remains open. Prompt V03 explicitly requires implementation, validation, append-only log evidence and safe push. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V03.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V03.md |
+| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V02.md |
 | Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_IMPLEMENTATION_LOG.md |
 | Next expected actor | CLAUDE |
 
@@ -237,6 +237,18 @@ Decision: `CHANGES_REQUIRED`.
 - Active correction prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V02.md
 - Active criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V02.md
 - M12, LF00 and CP00 remain unstarted until this narrow correction is audited.
+
+## M11-C001 independent audit V02
+
+Audit:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V02.md
+
+Decision: `BLOCKED_NO_NEW_IMPLEMENTATION`.
+
+No V02 correction commit/log append was visible on GitHub. F-M11-001 remains open. Active recovery:
+
+- Prompt V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V03.md
+- Criteria V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V03.md
 
 ## Parallel sidecar projects
 
