@@ -41,3 +41,39 @@ wait for canonical gameplay decisions where needed.
 8. Never create audit/self-audit files and never assign audit verdicts.
 
 ChatGPT alone creates \`CHATGPT_AUDIT_VNN.md\` and correction prompt versions.
+
+
+## Coordination v4 owner override — version-matched Claude logs [LOCKED]
+
+This section supersedes older references in this file to a single
+`CLAUDE_IMPLEMENTATION_LOG.md` per cycle.
+
+For every material ChatGPT prompt version:
+
+```text
+CHATGPT_PROMPT_VNN.md
+CHATGPT_AUDIT_CRITERIA_VNN.md
+CLAUDE_LOG_VNN.md
+CHATGPT_AUDIT_VNN.md
+```
+
+The prompt version and Claude log version must match exactly. Work performed
+under VNN is recorded in `CLAUDE_LOG_VNN.md` in the same cycle directory.
+If V02 and V03 are intentionally delivered/executed together, Claude still
+creates both logs and identifies shared commits/tests explicitly.
+
+Historical `CLAUDE_IMPLEMENTATION_LOG.md` files are legacy evidence only.
+Do not delete them, but do not use that naming pattern for new prompt work.
+
+Before ending a material session, update these derived H!veAI sources:
+
+- `.hiveai/ACTIVE_CYCLES.md`
+- `.hiveai/ARTIFACT_MAP.md`
+- `.hiveai/PROGRESS_SNAPSHOT.md`
+
+Then materialize the latest state into
+`.hiveai/PROJECT_DASHBOARD.md`. H!veAI actively watches only the dashboard.
+`tasks.md` remains the only canonical task ledger.
+
+Canonical policy:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/VERSIONED_LOG_POLICY.md
