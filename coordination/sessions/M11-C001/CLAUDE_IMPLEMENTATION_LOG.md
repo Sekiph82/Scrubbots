@@ -90,3 +90,97 @@ Append-only across sessions.
 - 542/542 ALL PASS (447 prior + 95 new M11)
 - Cycle state: `AWAITING_AUDIT`
 - Next actor: CHATGPT
+
+---
+
+## Session 2 — V02/V03 Correction (F-M11-001) — 2026-09-04
+
+### Starting state
+
+- Repository HEAD: `c055da1` (origin/main, after pulling audit/prompt/criteria files)
+- Working tree: clean
+- Active prompt: `coordination/sessions/M11-C001/CHATGPT_PROMPT_V03.md` (execution recovery)
+- Active criteria: `coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V03.md`
+- Prior audits read: V01 (`CHATGPT_AUDIT_V01.md`), V02 (`CHATGPT_AUDIT_V02.md`)
+- Finding: `F-M11-001` — M11-23/M11-24 use proxy assertions; they do not directly observe the renderer's BoardState source
+
+### Audit learnings applied
+
+- **AL-002** (tolerant color comparison): All new pixel assertions use `_colors_close()` with 0.01 tolerance, consistent with existing renderer tests
+- **AL-005** (task completion requires behavioral evidence): SB-M11-005 and SB-M11-012 restored to complete only after 548/548 ALL PASS with direct pixel readback
+- **AL-009** (log every validation step individually): See mandatory validation section below
+- **AL-018** (direct regression observability): This is the finding being corrected — tests now directly observe renderer pixel output, not proxy session state
+
+### Implementation
+
+#### Modified files
+
+- `tests/run_tests.gd` — strengthened M11-23 and M11-24 with direct pixel readback proofs
+
+#### M11-23 strengthening (initial renderer binding proof)
+
+Old test checked only `cell_size > 0` and `board_pixel_size > 0` — proves configuration occurred but not which BoardState drives pixels.
+
+New test:
+1. Independently computes expected DIRTY color from palette + DirtyCleanPresets
+2. Reads pixel (0,0) via `renderer.get_pixel_color()` — verifies DIRTY color
+3. Mutates session-owned BoardState: `set_cell_state(0, CLEAN)`
+4. Calls `renderer.update_cells([0])`
+5. Reads pixel (0,0) again — verifies CLEAN palette color
+6. Asserts DIRTY and CLEAN pixels differ
+
+This proves the renderer reads from the session-owned BoardState — if it used a different board, mutating the session's board would not change the pixel.
+
+#### M11-24 strengthening (reset fresh-board renderer proof)
+
+Old test checked `session.get_state() == READY` and `session.get_board_state().get_cell_state(0) == DIRTY` — proves the session owns a fresh board but never observes the renderer after reset.
+
+New test:
+1. Captures `old_board` before reset
+2. Resets session — gets `new_board`
+3. Asserts `old_board != new_board` (different objects)
+4. Asserts `new_board.get_cell_state(0) == DIRTY`
+5. Deliberately diverges: sets `old_board.set_cell_state(0, CLEAN)`
+6. Calls `renderer.update_cells([0])` — renderer should read from new_board
+7. Reads pixel (0,0) — asserts it matches DIRTY color (new board), NOT CLEAN (old board)
+
+#### Why test would fail without reset-time renderer rebinding
+
+If `_configure_renderer()` were removed from `reset()` in `gameplay_session.gd`:
+- After reset, `_board_state` points to a new all-DIRTY BoardState
+- But the renderer's internal `_board` still references the old BoardState
+- `old_board24.set_cell_state(0, CLEAN)` makes the old board cell 0 CLEAN
+- `renderer.update_cells([0])` reads from `_board` (old board) → cell 0 is CLEAN
+- Pixel would show CLEAN palette color, not DIRTY
+- `_check(_colors_close(px24, dirty24, 0.01), ...)` would **FAIL** (pixel is CLEAN, not DIRTY)
+- `_check(not _colors_close(px24, base23, 0.01), ...)` would also **FAIL** (pixel IS the CLEAN color)
+
+Both assertions specifically distinguish old vs. new BoardState through observable renderer behavior per AL-018.
+
+#### No production API added
+
+All renderer observation uses existing public methods: `get_pixel_color()`, `update_cells()`, `get_cell_size()`, `get_board_pixel_size()`. No production getter, private-state escape hatch, or test-only API was added.
+
+### Mandatory validation
+
+| # | Check | Expected | Actual | Classification |
+|---|-------|----------|--------|---------------|
+| 1 | `godot --version` | 4.7.x | 4.7.1.stable.official.a13da4feb | CLAUDE_TEST_PASS |
+| 2 | `powershell -ExecutionPolicy Bypass -File tools/verify_project.ps1` | Pass | Pass (project structure valid, headless run clean) | CLAUDE_TEST_PASS |
+| 3 | `godot --headless --path . --quit-after 5` | Clean exit | Clean exit, no script errors | CLAUDE_TEST_PASS |
+| 4 | Targeted M11-23: pixel at (0,0) shows DIRTY before mutation, CLEAN after mutating session-owned BoardState | DIRTY→CLEAN pixel change | PASS (3 new pixel assertions green) | CLAUDE_TEST_PASS |
+| 5 | Targeted M11-24: pixel follows NEW BoardState after reset, not stale old one | Pixel = DIRTY (new board), not CLEAN (old board) | PASS (old != new, pixel matches DIRTY, not CLEAN) | CLAUDE_TEST_PASS |
+| 6 | Stale-old-board failure explanation | Test must fail if renderer stays on old board | Documented above: removing `_configure_renderer()` from reset would make pixel show CLEAN (old board cell 0), failing both assertions | CLAUDE_TEST_PASS |
+| 7 | Full `tests/run_tests.gd` suite | 548/548 ALL PASS (542 prior + 6 new) | 548/548 ALL PASS | CLAUDE_TEST_PASS |
+| 8 | No test-only production API added | No new production getters | Confirmed: only existing public API used | CLAUDE_TEST_PASS |
+| 9 | No M12/LF00/CP00/M10 owner decision | No implementation files or preset selection | Confirmed: only tests/run_tests.gd changed | CLAUDE_TEST_PASS |
+| 10 | `git diff --check` | No whitespace errors | Clean (CRLF info only, no errors) | CLAUDE_TEST_PASS |
+| 11 | Scope inspection (`git diff --stat`) | Only M11 test changes | `tests/run_tests.gd \| 28 ++++++++++++++++++++++------` (1 file, 22 ins, 6 del) | CLAUDE_TEST_PASS |
+| 12 | `git status --short` before commit | Modified files listed | `M tests/run_tests.gd` + untracked scratchpad/docs/logs | CLAUDE_TEST_PASS |
+| 13 | Focused M11-C001 V02 commit | Commit succeeds | `ff43314` — 5 files, 132 ins, 22 del | CLAUDE_TEST_PASS |
+| 14 | Safe push to origin/main | Push without force | *pending* |
+| 15 | Final status + pushed commit SHA | Clean tree + SHA | *pending* |
+
+### Ending state
+
+*Updated after push below.*

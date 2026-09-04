@@ -26,13 +26,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | ATTENTION - M11-C001 audit V01 found one renderer-regression proof gap; narrow V02 correction issued |
+| Health | OK — M11-C001 V02/V03 correction implemented; AWAITING_AUDIT for ChatGPT V03 |
 | Current implementation frontier | M11 - Gameplay Session Core |
-| Current task | M11-C001 - Renderer Proof Execution Recovery V03 |
+| Current task | M11-C001 - V02/V03 Renderer Proof Correction |
 | Current task ID | `M11-C001` |
-| Current workflow state | `CHANGES_REQUIRED` - Audit V02 found no new correction implementation on GitHub; F-M11-001 remains open and Prompt V03 is active |
-| Required actor | CLAUDE |
-| Next project action | Claude reads M11-C001 audits V01/V02 plus Prompt/Criteria V03, actually implements the renderer proof correction, appends a new session to the same log, pushes a new commit to origin/main, returns AWAITING_AUDIT, and stops. |
+| Current workflow state | `AWAITING_AUDIT` — F-M11-001 closed by implementation: M11-23/24 strengthened with direct pixel readback; 548/548 ALL PASS |
+| Required actor | CHATGPT |
+| Next project action | ChatGPT performs independent audit V03 of the new commit on origin/main. If AUDITED_PASS, M11 is complete. |
 | Waiting on | M08 production-art audit and remaining M07 visual inventory tasks require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -40,23 +40,23 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-09-04T22:01:00+03:00 |
-| Actor | CHATGPT |
+| Timestamp | 2026-09-04 |
+| Actor | CLAUDE |
 | Cycle | `M11-C001` |
-| Session type | Independent audit V02 / missing-implementation recovery |
-| Cycle status | `CHANGES_REQUIRED` |
-| Summary | GitHub contained no V02 Claude implementation after the prior correction handoff. main remained b86e25f, the implementation log had no appended correction session, and there was no new M11 branch/commit. Audit V02 records BLOCKED_NO_NEW_IMPLEMENTATION; F-M11-001 remains open. Prompt V03 explicitly requires implementation, validation, append-only log evidence and safe push. |
+| Session type | V02/V03 correction implementation (F-M11-001) |
+| Cycle status | `AWAITING_AUDIT` |
+| Summary | Strengthened M11-23/24 renderer regression tests with direct pixel readback per AL-018. M11-23 proves renderer pixel output tracks session-owned BoardState via DIRTY→CLEAN mutation. M11-24 proves renderer follows NEW BoardState after reset by deliberately diverging old/new boards and verifying pixel matches new board. No production code changed. 548/548 ALL PASS (542 prior + 6 new). |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V03.md |
 | Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V03.md |
 | Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V02.md |
 | Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_IMPLEMENTATION_LOG.md |
-| Next expected actor | CLAUDE |
+| Next expected actor | CHATGPT |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M11-C001 | Gameplay Session Core | `CHANGES_REQUIRED` | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V01.md |
+| M11-C001 | Gameplay Session Core | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_IMPLEMENTATION_LOG.md |
 | M09-C002 | Batch import / validation / duplicate-ID tooling | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V03.md |
 | M09-C001 | Exact-pixel single importer + safety hardening | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md |
 | M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
@@ -212,7 +212,7 @@ Non-goals remain locked:
 | M08 | Level Art Technical Audit | BLOCKED_ON_OWNER_ASSET |
 | M09 | Pixel Art to Level Data Pipeline | COMPLETE |
 | M10 | Dirty/Clean Visual Model | OWNER_REQUIRED / PARTIAL infrastructure |
-| M11 | Gameplay Session Core | AWAITING_AUDIT - M11-C001 implemented, 542/542 ALL PASS |
+| M11 | Gameplay Session Core | AWAITING_AUDIT - M11-C001 V02/V03 correction implemented, 548/548 ALL PASS |
 | M12-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 
 ## Dashboard integrity rules
