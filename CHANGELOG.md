@@ -2,6 +2,26 @@
 
 ## Unreleased
 
+### Added — Gameplay Session Core (M11-C001)
+
+- `GameplaySession` (`scripts/gameplay/session/gameplay_session.gd`) —
+  headless-testable `RefCounted` lifecycle owner with explicit state machine:
+  UNINITIALIZED → READY → ACTIVE ↔ PAUSED → COMPLETED. Reset from any
+  non-UNINITIALIZED state recreates `BoardState` from immutable `LevelData`.
+- `load_level(path)` uses existing `LevelLoader`, creates fresh `BoardState`,
+  enters READY. Failed load preserves any previously valid session
+  (failed-load atomicity).
+- `complete()` is explicit external lifecycle transition only — no
+  auto-complete from dirty-cell count. Win/lose rules remain undesigned.
+- Optional `bind_renderer()` presentation seam — configures `BoardRenderer`
+  through its existing `configure()` contract without making renderer
+  gameplay truth.
+- 95 new headless checks covering initialization, loading, BoardState
+  isolation, lifecycle transitions, reset contract, completion robustness,
+  renderer seam, and scope integrity (542 total).
+- `docs/02_TECH_ARCHITECTURE.md`: added Gameplay Session Core section.
+- `docs/06_TEST_STRATEGY.md`: updated total to 542.
+
 ### Fixed — Destination-Type Preflight (M09-C002 V03 Correction)
 
 - Closed ChatGPT independent audit V02 finding `F-M09B-006` (`AL-017`):

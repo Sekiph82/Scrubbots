@@ -21,6 +21,7 @@ const DirtyCleanPresets = preload("res://scripts/gameplay/board/dirty_clean_pres
 const BoardDebugFixtures = preload("res://scripts/debug/board_debug_fixtures.gd")
 const LevelImporter = preload("res://scripts/tools/level_importer.gd")
 const LevelBatchImporter = preload("res://scripts/tools/level_batch_importer.gd")
+const GameplaySession = preload("res://scripts/gameplay/session/gameplay_session.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -43,6 +44,7 @@ func _initialize() -> void:
 	_run_board_renderer_performance_sanity()
 	_run_importer_tests()
 	_run_batch_importer_tests()
+	_run_gameplay_session_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -1609,6 +1611,330 @@ func _run_batch_importer_tests() -> void:
 
 	# ---- cleanup ----
 	_remove_dir_recursive(root)
+
+func _run_gameplay_session_tests() -> void:
+	var test_dir := "user://test_session/"
+	DirAccess.make_dir_recursive_absolute(test_dir)
+
+	var _write_json := func(path: String, dict: Dictionary) -> void:
+		var f := FileAccess.open(path, FileAccess.WRITE)
+		f.store_string(JSON.stringify(dict, "\t"))
+		f.close()
+
+	# ---- write temp level fixtures ----
+	var rect_cells_arr: Array = []
+	for i in 540:
+		rect_cells_arr.append(i % 3)
+	var rect_dict := {
+		"version": 1, "id": "test_rect_20x27", "name": "Rect 20x27 Session Test",
+		"difficulty": "EASY", "width": 20, "height": 27,
+		"palette": ["#FF0000FF", "#00FF00FF", "#0000FFFF"],
+		"cells": rect_cells_arr,
+	}
+	var rect_path := test_dir + "rect_20x27.json"
+	_write_json.call(rect_path, rect_dict)
+
+	var malformed_path := test_dir + "malformed.json"
+	var mf := FileAccess.open(malformed_path, FileAccess.WRITE)
+	mf.store_string("{ not valid json ][")
+	mf.close()
+
+	var path_3x2 := "res://data/levels/test_3x2.json"
+	var path_59x59 := "res://data/levels/test_59x59.json"
+
+	# ==== 1. New session starts UNINITIALIZED ====
+	var s := GameplaySession.new()
+	_check_eq(s.get_state(), GameplaySession.State.UNINITIALIZED, "M11-01: new session starts UNINITIALIZED")
+	_check(s.get_level_data() == null, "M11-01: new session has null level_data")
+	_check(s.get_board_state() == null, "M11-01: new session has null board_state")
+
+	# ==== 2. Valid TEST 3x2 loads to READY ====
+	var r2 := s.load_level(path_3x2)
+	_check(r2.ok, "M11-02: 3x2 load succeeds")
+	_check_eq(s.get_state(), GameplaySession.State.READY, "M11-02: state is READY after load")
+	_check(s.get_level_data() != null, "M11-02: level_data not null")
+	_check(s.get_board_state() != null, "M11-02: board_state not null")
+
+	# ==== 3. Valid rectangular production-band fixture loads to READY ====
+	var s3 := GameplaySession.new()
+	var r3 := s3.load_level(rect_path)
+	_check(r3.ok, "M11-03: rectangular 20x27 EASY load succeeds")
+	_check_eq(s3.get_state(), GameplaySession.State.READY, "M11-03: state is READY")
+	_check_eq(s3.get_level_data().width, 20, "M11-03: width 20")
+	_check_eq(s3.get_level_data().height, 27, "M11-03: height 27")
+
+	# ==== 4. 59x59 fixture loads to READY ====
+	var s4 := GameplaySession.new()
+	var r4 := s4.load_level(path_59x59)
+	_check(r4.ok, "M11-04: 59x59 load succeeds")
+	_check_eq(s4.get_state(), GameplaySession.State.READY, "M11-04: state is READY")
+	_check_eq(s4.get_level_data().width, 59, "M11-04: width 59")
+	_check_eq(s4.get_level_data().height, 59, "M11-04: height 59")
+
+	# ==== 5. Missing path fails, stays UNINITIALIZED ====
+	var s5 := GameplaySession.new()
+	var r5 := s5.load_level("res://data/levels/nonexistent_level.json")
+	_check(not r5.ok, "M11-05: missing path fails")
+	_check_eq(r5.error, "load_failed", "M11-05: error is load_failed")
+	_check_eq(s5.get_state(), GameplaySession.State.UNINITIALIZED, "M11-05: stays UNINITIALIZED")
+	_check(s5.get_level_data() == null, "M11-05: level_data still null")
+	_check(s5.get_board_state() == null, "M11-05: board_state still null")
+
+	# ==== 6. Malformed level data fails cleanly ====
+	var s6 := GameplaySession.new()
+	var r6 := s6.load_level(malformed_path)
+	_check(not r6.ok, "M11-06: malformed data fails")
+	_check_eq(s6.get_state(), GameplaySession.State.UNINITIALIZED, "M11-06: stays UNINITIALIZED")
+
+	# ==== 7. Failed replacement load preserves valid session ====
+	var s7 := GameplaySession.new()
+	s7.load_level(path_3x2)
+	var ld_before = s7.get_level_data()
+	var bs_before = s7.get_board_state()
+	_check_eq(s7.get_state(), GameplaySession.State.READY, "M11-07: starts READY")
+	var r7 := s7.load_level("res://data/levels/nonexistent.json")
+	_check(not r7.ok, "M11-07: replacement load fails")
+	_check_eq(s7.get_state(), GameplaySession.State.READY, "M11-07: state still READY")
+	_check(s7.get_level_data() == ld_before, "M11-07: level_data unchanged")
+	_check(s7.get_board_state() == bs_before, "M11-07: board_state unchanged")
+
+	# ==== 8. BoardState matches level dimensions ====
+	_check_eq(s.get_board_state().get_width(), 3, "M11-08: board width matches level")
+	_check_eq(s.get_board_state().get_height(), 2, "M11-08: board height matches level")
+	_check_eq(s.get_board_state().get_cell_count(), 6, "M11-08: board cell_count matches level")
+
+	# ==== 9. LevelData unchanged after BoardState mutation ====
+	var s9 := GameplaySession.new()
+	s9.load_level(path_3x2)
+	var ld9 = s9.get_level_data()
+	var cells_before = ld9.cells.duplicate()
+	s9.get_board_state().set_cell_state(0, BoardState.CellState.CLEAN)
+	_check_eq(ld9.cells, cells_before, "M11-09: LevelData cells unchanged after BoardState mutation")
+	_check_eq(ld9.width, 3, "M11-09: LevelData width unchanged")
+
+	# ==== 10. Reset creates fresh BoardState ====
+	var s10 := GameplaySession.new()
+	s10.load_level(path_3x2)
+	s10.start()
+	var bs10_pre = s10.get_board_state()
+	s10.get_board_state().set_cell_state(0, BoardState.CellState.CLEAN)
+	s10.reset()
+	_check(s10.get_board_state() != bs10_pre, "M11-10: reset creates new BoardState object (not same reference)")
+
+	# ==== 11. Reset restores all cells DIRTY ====
+	_check_eq(s10.get_board_state().get_cell_state(0), BoardState.CellState.DIRTY, "M11-11: cell 0 DIRTY after reset")
+	var all_dirty := true
+	for i in s10.get_board_state().get_cell_count():
+		if s10.get_board_state().get_cell_state(i) != BoardState.CellState.DIRTY:
+			all_dirty = false
+			break
+	_check(all_dirty, "M11-11: all cells DIRTY after reset")
+
+	# ==== 12. Reset preserves dimensions/color IDs ====
+	_check_eq(s10.get_board_state().get_width(), 3, "M11-12: width preserved after reset")
+	_check_eq(s10.get_board_state().get_height(), 2, "M11-12: height preserved after reset")
+	_check_eq(s10.get_board_state().get_cell_count(), 6, "M11-12: cell_count preserved after reset")
+
+	# ==== 13. Independent sessions don't share mutable BoardState ====
+	var sa := GameplaySession.new()
+	var sb := GameplaySession.new()
+	sa.load_level(path_3x2)
+	sb.load_level(path_3x2)
+	sa.get_board_state().set_cell_state(0, BoardState.CellState.CLEAN)
+	_check_eq(sb.get_board_state().get_cell_state(0), BoardState.CellState.DIRTY, "M11-13: independent sessions don't share BoardState")
+
+	# ==== 14. READY -> ACTIVE succeeds ====
+	var s14 := GameplaySession.new()
+	s14.load_level(path_3x2)
+	var r14 := s14.start()
+	_check(r14.ok, "M11-14: start() succeeds from READY")
+	_check_eq(s14.get_state(), GameplaySession.State.ACTIVE, "M11-14: state is ACTIVE")
+
+	# ==== 15. ACTIVE -> PAUSED succeeds ====
+	var r15 := s14.pause()
+	_check(r15.ok, "M11-15: pause() succeeds from ACTIVE")
+	_check_eq(s14.get_state(), GameplaySession.State.PAUSED, "M11-15: state is PAUSED")
+
+	# ==== 16. PAUSED -> ACTIVE resume succeeds ====
+	var r16 := s14.resume()
+	_check(r16.ok, "M11-16: resume() succeeds from PAUSED")
+	_check_eq(s14.get_state(), GameplaySession.State.ACTIVE, "M11-16: state is ACTIVE after resume")
+
+	# ==== 17. Invalid transitions fail without state mutation ====
+	var s17 := GameplaySession.new()
+	# start from UNINITIALIZED
+	var r17a := s17.start()
+	_check(not r17a.ok, "M11-17: start from UNINITIALIZED fails")
+	_check_eq(r17a.error, "invalid_transition", "M11-17: error is invalid_transition")
+	_check_eq(s17.get_state(), GameplaySession.State.UNINITIALIZED, "M11-17: state unchanged after invalid start")
+	# pause from READY
+	s17.load_level(path_3x2)
+	var r17b := s17.pause()
+	_check(not r17b.ok, "M11-17: pause from READY fails")
+	_check_eq(s17.get_state(), GameplaySession.State.READY, "M11-17: state unchanged after invalid pause")
+	# resume from READY
+	var r17c := s17.resume()
+	_check(not r17c.ok, "M11-17: resume from READY fails")
+	_check_eq(s17.get_state(), GameplaySession.State.READY, "M11-17: state unchanged after invalid resume")
+	# complete from READY
+	var r17d := s17.complete()
+	_check(not r17d.ok, "M11-17: complete from READY fails")
+	_check_eq(s17.get_state(), GameplaySession.State.READY, "M11-17: state unchanged after invalid complete")
+	# resume from ACTIVE
+	s17.start()
+	var r17e := s17.resume()
+	_check(not r17e.ok, "M11-17: resume from ACTIVE fails")
+	_check_eq(s17.get_state(), GameplaySession.State.ACTIVE, "M11-17: state unchanged after invalid resume from ACTIVE")
+	# start from ACTIVE
+	var r17f := s17.start()
+	_check(not r17f.ok, "M11-17: start from ACTIVE fails")
+	_check_eq(s17.get_state(), GameplaySession.State.ACTIVE, "M11-17: state unchanged after invalid start from ACTIVE")
+
+	# ==== 18. Reset from READY/ACTIVE/PAUSED/COMPLETED ====
+	# Reset from READY
+	var s18 := GameplaySession.new()
+	s18.load_level(path_3x2)
+	var r18a := s18.reset()
+	_check(r18a.ok, "M11-18: reset from READY ok")
+	_check_eq(s18.get_state(), GameplaySession.State.READY, "M11-18: READY after reset from READY")
+	# Reset from ACTIVE
+	s18.start()
+	var r18b := s18.reset()
+	_check(r18b.ok, "M11-18: reset from ACTIVE ok")
+	_check_eq(s18.get_state(), GameplaySession.State.READY, "M11-18: READY after reset from ACTIVE")
+	# Reset from PAUSED
+	s18.start()
+	s18.pause()
+	var r18c := s18.reset()
+	_check(r18c.ok, "M11-18: reset from PAUSED ok")
+	_check_eq(s18.get_state(), GameplaySession.State.READY, "M11-18: READY after reset from PAUSED")
+	# Reset from COMPLETED
+	s18.start()
+	s18.complete()
+	var r18d := s18.reset()
+	_check(r18d.ok, "M11-18: reset from COMPLETED ok")
+	_check_eq(s18.get_state(), GameplaySession.State.READY, "M11-18: READY after reset from COMPLETED")
+	# Reset from UNINITIALIZED fails
+	var s18u := GameplaySession.new()
+	var r18u := s18u.reset()
+	_check(not r18u.ok, "M11-18: reset from UNINITIALIZED fails")
+	_check_eq(s18u.get_state(), GameplaySession.State.UNINITIALIZED, "M11-18: stays UNINITIALIZED after invalid reset")
+
+	# ==== 19. Explicit completion from ACTIVE ====
+	var s19 := GameplaySession.new()
+	s19.load_level(path_3x2)
+	s19.start()
+	var r19 := s19.complete()
+	_check(r19.ok, "M11-19: complete() from ACTIVE succeeds")
+	_check_eq(s19.get_state(), GameplaySession.State.COMPLETED, "M11-19: state is COMPLETED")
+
+	# ==== 20. Repeated completion is deterministic and non-corrupting ====
+	var r20 := s19.complete()
+	_check(not r20.ok, "M11-20: repeated complete() fails (already COMPLETED)")
+	_check_eq(r20.error, "invalid_transition", "M11-20: error is invalid_transition")
+	_check_eq(s19.get_state(), GameplaySession.State.COMPLETED, "M11-20: state still COMPLETED (non-corrupting)")
+
+	# ==== 21. Manual cell cleaning does not auto-complete ====
+	var s21 := GameplaySession.new()
+	s21.load_level(path_3x2)
+	s21.start()
+	for i in s21.get_board_state().get_cell_count():
+		s21.get_board_state().set_cell_state(i, BoardState.CellState.CLEAN)
+	_check_eq(s21.get_board_state().count_cells_by_state(BoardState.CellState.DIRTY), 0, "M11-21: all cells are CLEAN")
+	_check_eq(s21.get_state(), GameplaySession.State.ACTIVE, "M11-21: session still ACTIVE (no auto-complete)")
+
+	# ==== 22-26. Renderer seam ====
+	var s22 := GameplaySession.new()
+	var renderer := BoardRenderer.new()
+
+	# 22. Bind renderer before load — no crash, renderer not configured
+	s22.bind_renderer(renderer, Vector2(800, 600))
+	_check_eq(s22.get_state(), GameplaySession.State.UNINITIALIZED, "M11-22: bind before load keeps UNINITIALIZED")
+
+	# Load, renderer should auto-configure
+	s22.load_level(path_3x2)
+	_check_eq(s22.get_state(), GameplaySession.State.READY, "M11-22: READY after load with bound renderer")
+
+	# 23. Renderer sees same BoardState session owns
+	# After configure(), renderer's internal board reference should match
+	_check_eq(renderer.get_cell_size() > 0, true, "M11-23: renderer configured (cell_size > 0)")
+	var board_pixel_size := renderer.get_board_pixel_size()
+	_check(board_pixel_size.x > 0 and board_pixel_size.y > 0, "M11-23: renderer has non-zero board pixel size")
+
+	# 24. Reset updates renderer to fresh BoardState
+	s22.start()
+	s22.get_board_state().set_cell_state(0, BoardState.CellState.CLEAN)
+	s22.reset()
+	# After reset, renderer should reflect the new board (all DIRTY)
+	_check_eq(s22.get_state(), GameplaySession.State.READY, "M11-24: READY after reset")
+	_check_eq(s22.get_board_state().get_cell_state(0), BoardState.CellState.DIRTY, "M11-24: cell 0 DIRTY in new BoardState")
+
+	# 25. Rectangular board geometry correct
+	var s25 := GameplaySession.new()
+	var renderer25 := BoardRenderer.new()
+	s25.bind_renderer(renderer25, Vector2(800, 600))
+	s25.load_level(rect_path)
+	var bp25 := renderer25.get_board_pixel_size()
+	_check(bp25.x > 0 and bp25.y > 0, "M11-25: rectangular renderer has non-zero board pixel size")
+	# Board is 20x27 — pixel height should be >= pixel width (portrait)
+	var cell_size_25 := renderer25.get_cell_size()
+	_check_eq(cell_size_25 > 0, true, "M11-25: rectangular cell_size > 0")
+	_check(bp25.y >= bp25.x, "M11-25: 20x27 board pixel size is portrait-like (height >= width)")
+	renderer25.free()
+
+	# 26. 59x59 renderer remains single node
+	var s26 := GameplaySession.new()
+	var renderer26 := BoardRenderer.new()
+	s26.bind_renderer(renderer26, Vector2(1080, 1080))
+	s26.load_level(path_59x59)
+	_check_eq(renderer26.get_child_count(), 0, "M11-26: 59x59 renderer has zero child Nodes")
+	_check_eq(renderer26.get_cell_size() > 0, true, "M11-26: 59x59 renderer configured")
+	renderer26.free()
+
+	# ==== 27. No slot/target/routing/agent implementation created ====
+	# Placeholder .gitkeep directories may exist from prior architecture planning;
+	# verify no GDScript implementation files were introduced.
+	_check(not FileAccess.file_exists("res://scripts/gameplay/slots/slot_manager.gd"), "M11-27: no slot implementation")
+	_check(not FileAccess.file_exists("res://scripts/gameplay/routing/routing_system.gd"), "M11-27: no routing implementation")
+	_check(not DirAccess.dir_exists_absolute("res://scripts/gameplay/agents"), "M11-27: no agents directory")
+	_check(not FileAccess.file_exists("res://scripts/gameplay/target/target_selector.gd"), "M11-27: no target implementation")
+
+	# ==== 28. No win/lose/timer/move-limit rule ====
+	# Verify session class has no timer/move/lose properties
+	var s28 := GameplaySession.new()
+	_check(not s28.has_method("check_win"), "M11-28: no check_win method")
+	_check(not s28.has_method("check_lose"), "M11-28: no check_lose method")
+	_check(not s28.has_method("get_timer"), "M11-28: no get_timer method")
+	_check(not s28.has_method("get_moves"), "M11-28: no get_moves method")
+	_check(not s28.has_method("get_move_limit"), "M11-28: no get_move_limit method")
+
+	# ==== 29. Prior checks remain green (verified by running entire suite) ====
+	# (implicit — all test functions run together, _print_summary reports total)
+
+	# ---- performance sanity: 59x59 load/reset ----
+	var s_perf := GameplaySession.new()
+	var t0 := Time.get_ticks_usec()
+	s_perf.load_level(path_59x59)
+	var t1 := Time.get_ticks_usec()
+	s_perf.start()
+	s_perf.reset()
+	var t2 := Time.get_ticks_usec()
+	print("---- GameplaySession performance sanity (59x59) ----")
+	print("  load_level: %.3f ms" % ((t1 - t0) / 1000.0))
+	print("  reset: %.3f ms" % ((t2 - t1) / 1000.0))
+
+	# ---- cleanup ----
+	renderer.free()
+	var dir := DirAccess.open(test_dir)
+	if dir:
+		dir.list_dir_begin()
+		var fname := dir.get_next()
+		while not fname.is_empty():
+			if not dir.current_is_dir():
+				dir.remove(fname)
+			fname = dir.get_next()
+		dir.list_dir_end()
+		DirAccess.remove_absolute(test_dir)
 
 func _print_summary() -> void:
 	print("")

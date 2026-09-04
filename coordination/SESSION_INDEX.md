@@ -19,7 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M11-C001 | M11 - Gameplay Session Core | 2026-09-04 | 2026-09-04 | `PLANNED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V01.md | PENDING | PENDING | SB-M11-001..012 | Implement headless gameplay lifecycle/session truth, LevelData/BoardState composition and renderer binding without inventing win/lose, slots, routing or M10 owner decisions. |
+| M11-C001 | M11 - Gameplay Session Core | 2026-09-04 | 2026-09-04 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_IMPLEMENTATION_LOG.md | PENDING | SB-M11-001..012 | GameplaySession RefCounted core: explicit lifecycle (UNINITIALIZED/READY/ACTIVE/PAUSED/COMPLETED), LevelData/BoardState composition, failed-load atomicity, optional renderer binding, no auto-complete. 95 new checks, 542/542 ALL PASS. |
 | M09-C002 | M09 - Batch Import / Validation / Duplicate IDs | 2026-09-03 | 2026-09-04 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V03.md | SB-M09-018..020 | Final audit V03 closed F-M09B-006. Batch import/validation/duplicate-ID tooling is independently accepted; M09 is complete. |
 | M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-09-03 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md | SB-M09-001..017 | Exact-pixel importer core and safety hardening independently audited pass. |
 | M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | SB-M07-001..017 | Reference-library infrastructure audited; owner asset tasks remain open. |
@@ -92,7 +92,8 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Scope: SB-M11-001..012 only.
 - Completion remains an explicit lifecycle transition only; win/lose rules are not invented.
 - M08 remains blocked on owner artwork and M10 remains owner-controlled.
-- Cycle state: `PLANNED`; next actor CLAUDE.
+- Implementation log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_IMPLEMENTATION_LOG.md
+- Cycle state: `AWAITING_AUDIT`; next actor CHATGPT.
 
 ## Previous completed audit baselines
 
