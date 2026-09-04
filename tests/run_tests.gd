@@ -1101,7 +1101,8 @@ func _run_batch_importer_tests() -> void:
 	# directories — same contract as the single-item importer. Pre-create
 	# every output directory these tests target.
 	for sub in ["out_happy", "out_dup", "out_alias", "out_cross", "out_later",
-			"out_malformed", "out_empty", "out_missing", "out_jpeg", "out_corrupt", "out_perf"]:
+			"out_malformed", "out_empty", "out_missing", "out_jpeg", "out_corrupt", "out_perf",
+			"out_dirtype"]:
 		DirAccess.make_dir_recursive_absolute(root + sub + "/")
 
 	# ==== HAPPY PATH ====
@@ -1492,6 +1493,103 @@ func _run_batch_importer_tests() -> void:
 	_check(not res_bad_overwrite.is_ok(), "overwrite: 'yes' rejected as a schema error")
 	_check(res_bad_overwrite.items[0].all_errors()[0].find("overwrite") >= 0, "overwrite type error names the field specifically")
 	_check(not FileAccess.file_exists(out_schema + "bo_out.json"), "overwrite type error writes nothing")
+
+	# ==== V03 CORRECTION: DESTINATION-TYPE PREFLIGHT (F-M09B-006 / AL-017) ====
+	# An existing directory at the final destination path (not just the parent)
+	# must be rejected before any commit write. All tests use valid parents,
+	# valid catalog, valid manifest — the directory-type itself is the reason.
+	var out_dirtype := root + "out_dirtype/"
+
+	# Create directories AT the destination paths (simulating "someone named
+	# a directory the same as the intended output file").
+	DirAccess.make_dir_recursive_absolute(out_dirtype + "level_as_dir.json")
+	DirAccess.make_dir_recursive_absolute(out_dirtype + "preview_as_dir.png")
+	DirAccess.make_dir_recursive_absolute(out_dirtype + "meta_as_dir.json")
+
+	# 1. Later item output is an existing directory — batch fails, earlier item unwritten
+	var manifest_dt1_items := [
+		{"source": root + "tiny.png", "id": "dt1_ok", "name": "DT1OK", "difficulty": "TEST", "output": out_dirtype + "dt1_ok.json"},
+		{"source": root + "rect.png", "id": "dt1_bad", "name": "DT1Bad", "difficulty": "EASY", "output": out_dirtype + "level_as_dir.json"},
+	]
+	var manifest_dt1_path := root + "manifest_dt1.json"
+	_write_manifest.call(manifest_dt1_path, manifest_dt1_items)
+	var res_dt1 := LevelBatchImporter.run_batch(manifest_dt1_path, out_dirtype, true)
+	_check(not res_dt1.is_ok(), "output destination that is an existing directory blocks whole batch")
+	_check(not FileAccess.file_exists(out_dirtype + "dt1_ok.json"), "earlier valid item remains unwritten when later item output is a directory")
+	var dt1_err: Array[String] = res_dt1.items[1].all_errors()
+	_check(dt1_err.size() > 0 and dt1_err[0].find("existing directory") >= 0, "error message identifies output destination type")
+
+	# 2. Preview path is an existing directory — batch fails before any write
+	var manifest_dt2_items := [
+		{"source": root + "tiny.png", "id": "dt2_prev", "name": "DT2Prev", "difficulty": "TEST", "output": out_dirtype + "dt2_prev.json", "preview": out_dirtype + "preview_as_dir.png"},
+	]
+	var manifest_dt2_path := root + "manifest_dt2.json"
+	_write_manifest.call(manifest_dt2_path, manifest_dt2_items)
+	var res_dt2 := LevelBatchImporter.run_batch(manifest_dt2_path, out_dirtype, true)
+	_check(not res_dt2.is_ok(), "preview destination that is an existing directory blocks batch")
+	_check(not FileAccess.file_exists(out_dirtype + "dt2_prev.json"), "no file written when preview is a directory")
+
+	# 3. Metadata path is an existing directory — batch fails before any write
+	var manifest_dt3_items := [
+		{"source": root + "tiny.png", "id": "dt3_meta", "name": "DT3Meta", "difficulty": "TEST", "output": out_dirtype + "dt3_meta.json", "metadata": out_dirtype + "meta_as_dir.json"},
+	]
+	var manifest_dt3_path := root + "manifest_dt3.json"
+	_write_manifest.call(manifest_dt3_path, manifest_dt3_items)
+	var res_dt3 := LevelBatchImporter.run_batch(manifest_dt3_path, out_dirtype, true)
+	_check(not res_dt3.is_ok(), "metadata destination that is an existing directory blocks batch")
+	_check(not FileAccess.file_exists(out_dirtype + "dt3_meta.json"), "no file written when metadata is a directory")
+
+	# 4. Validation-only with a directory destination — fails, creates/removes nothing
+	var pre_dt4_dir_exists := DirAccess.dir_exists_absolute(out_dirtype + "level_as_dir.json")
+	var res_dt4 := LevelBatchImporter.run_batch(manifest_dt1_path, out_dirtype, false)
+	_check(not res_dt4.is_ok(), "validation-only also rejects directory destination")
+	_check(DirAccess.dir_exists_absolute(out_dirtype + "level_as_dir.json") == pre_dt4_dir_exists, "validation-only does not remove or modify the existing directory")
+	_check(not FileAccess.file_exists(out_dirtype + "dt1_ok.json"), "validation-only writes nothing")
+
+	# 5. overwrite=true still rejects existing directory as output
+	var manifest_dt5_items := [
+		{"source": root + "tiny.png", "id": "dt5_ow", "name": "DT5OW", "difficulty": "TEST", "output": out_dirtype + "level_as_dir.json", "overwrite": true},
+	]
+	var manifest_dt5_path := root + "manifest_dt5.json"
+	_write_manifest.call(manifest_dt5_path, manifest_dt5_items)
+	var res_dt5 := LevelBatchImporter.run_batch(manifest_dt5_path, out_dirtype, true)
+	_check(not res_dt5.is_ok(), "overwrite=true cannot turn a directory into a file target")
+
+	# 6. Existing regular Level JSON file — unchanged/overwrite semantics still work
+	# Use a clean catalog directory (no directory-named-as-json entries that
+	# would make the catalog scan report malformed entries).
+	var out_dirtype_clean := root + "out_dirtype_clean/"
+	DirAccess.make_dir_recursive_absolute(out_dirtype_clean)
+	var manifest_dt6_items := [
+		{"source": root + "tiny.png", "id": "dt6_reg", "name": "DT6Reg", "difficulty": "TEST", "output": out_dirtype_clean + "dt6_regular.json"},
+	]
+	var manifest_dt6_path := root + "manifest_dt6.json"
+	_write_manifest.call(manifest_dt6_path, manifest_dt6_items)
+	var res_dt6_first := LevelBatchImporter.run_batch(manifest_dt6_path, out_dirtype_clean, true)
+	_check(res_dt6_first.is_ok(), "first commit of a regular-file output succeeds")
+	_check(res_dt6_first.items[0].import_result.output_written, "regular file written on first import")
+	var res_dt6_rerun := LevelBatchImporter.run_batch(manifest_dt6_path, out_dirtype_clean, true)
+	_check(res_dt6_rerun.is_ok(), "rerun of identical regular-file import succeeds")
+	_check(res_dt6_rerun.items[0].import_result.output_unchanged, "regular file detected as unchanged on rerun")
+
+	# 7. Existing regular preview/metadata — audited unchanged/overwrite behavior preserved
+	# Write preview/metadata to a subdirectory so the catalog scan (flat)
+	# does not pick up the metadata sidecar as a malformed level entry.
+	var dt7_sidecar_dir := out_dirtype_clean + "sidecar/"
+	DirAccess.make_dir_recursive_absolute(dt7_sidecar_dir)
+	var manifest_dt7_items := [
+		{"source": root + "tiny.png", "id": "dt7_art", "name": "DT7Art", "difficulty": "TEST", "output": out_dirtype_clean + "dt7_art.json", "preview": dt7_sidecar_dir + "dt7_art_preview.png", "metadata": dt7_sidecar_dir + "dt7_art_meta.json"},
+	]
+	var manifest_dt7_path := root + "manifest_dt7.json"
+	_write_manifest.call(manifest_dt7_path, manifest_dt7_items)
+	var res_dt7_first := LevelBatchImporter.run_batch(manifest_dt7_path, out_dirtype_clean, true)
+	_check(res_dt7_first.is_ok(), "first commit with regular preview+metadata succeeds")
+	_check(res_dt7_first.items[0].import_result.preview_written, "regular preview written on first import")
+	_check(res_dt7_first.items[0].import_result.metadata_written, "regular metadata written on first import")
+	var res_dt7_rerun := LevelBatchImporter.run_batch(manifest_dt7_path, out_dirtype_clean, true)
+	_check(res_dt7_rerun.is_ok(), "rerun of regular preview+metadata import succeeds")
+	_check(res_dt7_rerun.items[0].import_result.preview_unchanged, "regular preview detected as unchanged on rerun")
+	_check(res_dt7_rerun.items[0].import_result.metadata_unchanged, "regular metadata detected as unchanged on rerun")
 
 	# ---- performance sanity (batch of 3 including 59x59, informational only) ----
 	var perf_out := root + "out_perf/"

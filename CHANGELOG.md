@@ -2,6 +2,19 @@
 
 ## Unreleased
 
+### Fixed — Destination-Type Preflight (M09-C002 V03 Correction)
+
+- Closed ChatGPT independent audit V02 finding `F-M09B-006` (`AL-017`):
+  the batch destination preflight now rejects existing directories at
+  output/preview/metadata final paths before any commit write, not only
+  missing/non-directory parent directories. `overwrite=true` cannot bypass
+  directory-type safety.
+- `scripts/tools/level_batch_importer.gd`: `elif
+  DirAccess.dir_exists_absolute(resolved)` added to step 3 of `run_batch()`,
+  using the same `LevelImporter._resolve_path()` resolver. Read-only in
+  both validation-only and commit modes.
+- `tests/run_tests.gd`: 21 new destination-type checks (447 total).
+
 ### Fixed — Batch Safety and Catalog Integrity (M09-C002 V02 Correction)
 
 - Closed all five ChatGPT independent audit V01 findings (`F-M09B-001..005`):

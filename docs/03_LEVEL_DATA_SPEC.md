@@ -292,6 +292,15 @@ not a rare OS race — it is detected for every item before any item in the
 batch is committed, exactly like every other preflight check. This check
 never creates the missing directory in either mode.
 
+**Destination-type preflight** (M09-C002 V03 correction, `F-M09B-006` /
+`AL-017`): if any requested output/preview/metadata final destination path
+resolves to an *existing directory*, the item is rejected with an actionable
+error before any item in the batch writes. This is equally predictable as a
+missing parent and is detected via the same `LevelImporter._resolve_path()`
+resolver. `overwrite=true` cannot bypass this safety — overwrite semantics
+apply only to regular files, never to replacing a directory with a file.
+Validation-only mode performs this check read-only (no creation/removal).
+
 **Catalog root validity** (M09-C002 V02 correction, `F-M09B-002`): a
 missing, unopenable, or non-directory `catalog_root` fails the whole batch
 with an actionable `catalog_root_error` (`BatchResult.catalog_root_valid ==

@@ -226,7 +226,7 @@ Confirm before ending:
 - [x] GitHub evidence uses absolute GitHub URLs.
 - [x] No ChatGPT prompt/audit files were rewritten.
 - [x] No Claude self-audit file was created.
-- [x] No secrets were committed.
+- [x] No secrets were committed. (Session 1)
 
 ---
 
@@ -413,6 +413,121 @@ Confirm before ending:
 - [x] `coordination/SESSION_INDEX.md` updated.
 - [x] `.hiveai/PROJECT_DASHBOARD.md` updated.
 - [x] GitHub evidence uses absolute GitHub URLs.
+- [x] No ChatGPT prompt/audit files were rewritten.
+- [x] No Claude self-audit file was created.
+- [x] No secrets were committed. (Session 2)
+
+---
+
+## Claude Session 3 — 2026-09-04 (V03 Correction — F-M09B-006 / AL-017)
+
+### Session status
+
+`IMPLEMENTATION_COMPLETE`
+
+### Repository start state
+
+- Branch: `main`
+- Starting commit: `a95ca5b` (`docs: backfill M09-C002 V02 correction commit SHA and push evidence`)
+- Prompt version: V03 (`CHATGPT_PROMPT_V03.md`)
+- Audit trigger: `CHATGPT_AUDIT_V02.md` — decision CHANGES_REQUIRED, F-M09B-006
+
+### Sources read
+
+- `CHATGPT_AUDIT_V02.md` — F-M09B-006 (existing directory at final destination not preflighted)
+- `CHATGPT_AUDIT_CRITERIA_V03.md` — 12 pass/fail criteria (AC-M09B3-001..012)
+- `CHATGPT_PROMPT_V03.md` — narrow scope: close only F-M09B-006
+- `AUDIT_INDEX.md` — AL-009 through AL-017
+
+### Audit learnings applied
+
+| Learning | Applied |
+| --- | --- |
+| AL-009 | Preflight pass ≠ proof of writability — no general writability claims |
+| AL-010 | Catalog ownership bidirectional — preserved |
+| AL-011 | Malformed catalog fails closed — preserved |
+| AL-012 | Optional field types validated — preserved |
+| AL-013 | Duplicate IDs caught before commit — preserved |
+| AL-014 | Missing destination parent preflighted — preserved |
+| AL-015 | Resolver vs. canonical normalizer separation — `_resolve_path()` for destination-type check |
+| AL-016 | Negative tests isolate specific failure — directory-type tests use valid parents, valid catalog, no duplicate IDs |
+| AL-017 | **NEW** — destination object type preflighted alongside parent type |
+
+### Implementation
+
+**`scripts/tools/level_batch_importer.gd`** — 3-line addition in step 3:
+
+```gdscript
+elif DirAccess.dir_exists_absolute(resolved):
+    item.batch_errors.append(
+        "%s destination is an existing directory, not a file: '%s'" % [role, path])
+```
+
+Applied to output, preview, metadata via existing destination-role loop. Uses `LevelImporter._resolve_path()`. Read-only in both modes.
+
+**`tests/run_tests.gd`** — 21 new checks across 7 test scenarios:
+
+1. Later-item output is existing directory → batch fails, earlier item unwritten (4 checks)
+2. Preview is existing directory → batch fails (2 checks)
+3. Metadata is existing directory → batch fails (2 checks)
+4. Validation-only with directory destination → fails, no mutation (3 checks)
+5. overwrite=true still rejects directory → fails (1 check)
+6. Existing regular file → unchanged semantics preserved (4 checks)
+7. Existing regular preview/metadata → unchanged semantics preserved (5 checks)
+
+### Errors encountered and fixed
+
+1. **GDScript parse error**: `Cannot infer the type of "dt1_err"` — fixed with explicit type `Array[String]`
+2. **Test failure** (1/447): "rerun of regular preview+metadata import succeeds" — metadata sidecar polluted catalog root causing malformed-entry detection. Fixed by using clean catalog directory and writing sidecars to subdirectory.
+
+### Mandatory CLI validation
+
+| # | Step | Expected | Fail condition | Actual | Result |
+|---|------|----------|----------------|--------|--------|
+| 1 | `godot --version` | 4.7.x | Wrong version | `4.7.1.stable.official.a13da4feb` | PASS |
+| 2 | `verify_project.ps1` | All OK, exit 0 | Any check fails | All OK, exit 0 | PASS |
+| 3 | `godot --headless --quit-after 5` | Clean exit | Parse/load errors | Clean exit, no errors | PASS |
+| 4 | Full test suite | 447/447, ALL PASS | Any failure | 447/447 ALL PASS | PASS |
+| 5 | Output-is-directory rejection | Batch fails, earlier item unwritten | Earlier item writes | Test PASS | PASS |
+| 6 | Preview-is-directory rejection | Batch fails before write | Any write occurs | Test PASS | PASS |
+| 7 | Metadata-is-directory rejection | Batch fails before write | Any write occurs | Test PASS | PASS |
+| 8 | Validation-only directory-target | Fails, no mutation | Creates/removes anything | Test PASS | PASS |
+| 9 | overwrite=true directory-target | Fails | Overwrite bypasses type safety | Test PASS | PASS |
+| 10 | Regular-file unchanged behavior | Rerun succeeds, unchanged | Rerun fails or re-writes | Test PASS | PASS |
+| 11 | V02 regression suite | All 426 prior checks within 447 total | Any prior check regresses | All PASS | PASS |
+| 12 | No fabricated artwork | No changes in assets/data | Any artwork created | `git diff --name-only -- assets/ data/levels/` empty | PASS |
+| 13 | `git diff --check` | No whitespace errors | Trailing whitespace | Clean (CRLF warnings only) | PASS |
+| 14 | Final diff scope | 2 code files only | Off-scope or binary | 2 files: importer + tests | PASS |
+| 15 | `git status --short` | Expected files only | Unexpected staged | 2 modified + unrelated untracked | PASS |
+| 16 | Commit | Precise V03 message | — | PENDING |
+| 17 | Push | Fast-forward, no force | Rejected/forced | PENDING |
+| 18 | Final status | Clean | Uncommitted changes | PENDING |
+
+### Files modified
+
+- `scripts/tools/level_batch_importer.gd` — destination-type preflight
+- `tests/run_tests.gd` — 21 new destination-type checks
+- `docs/03_LEVEL_DATA_SPEC.md` — destination-type preflight section added
+- `docs/06_TEST_STRATEGY.md` — check count 426→447
+- `tasks.md` — SB-M09-018/019 marked `[x]` with V03 evidence
+- `coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md` — Session 3
+- `coordination/SESSION_INDEX.md` — updated (AWAITING_AUDIT)
+- `.hiveai/PROJECT_DASHBOARD.md` — updated (AWAITING_AUDIT)
+
+### Deviations from prompt
+
+None.
+
+### Coordination checklist (Session 3)
+
+- [x] Desktop phase log updated.
+- [x] This implementation log appended.
+- [x] Active ChatGPT prompt V03 read.
+- [x] Active audit V02 and criteria V03 read.
+- [x] Relevant prior audits and `AUDIT_INDEX.md` read/applied.
+- [x] Every prompt-mandated validation command individually recorded.
+- [x] `coordination/SESSION_INDEX.md` updated.
+- [x] `.hiveai/PROJECT_DASHBOARD.md` updated.
 - [x] No ChatGPT prompt/audit files were rewritten.
 - [x] No Claude self-audit file was created.
 - [x] No secrets were committed.

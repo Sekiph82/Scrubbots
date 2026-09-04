@@ -19,7 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M09-C002 | M09 - Batch Import / Validation / Duplicate IDs | 2026-09-03 | 2026-09-04 | `CHANGES_REQUIRED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V02.md | SB-M09-018..020 | Audit V02 accepted all five V01 corrections but found F-M09B-006: an existing directory used as output/preview/metadata is not rejected by preflight, so a later deterministic commit failure can leave earlier artifacts written. V03 correction issued; next actor CLAUDE. |
+| M09-C002 | M09 - Batch Import / Validation / Duplicate IDs | 2026-09-03 | 2026-09-04 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V02.md | SB-M09-018..020 | V03 correction closes F-M09B-006: destination-type preflight now rejects existing directories at output/preview/metadata paths before any commit write. 447/447 tests pass. Next actor: CHATGPT (audit V03). |
 | M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-09-03 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md | SB-M09-001..017 | Exact-pixel importer core and safety hardening independently audited pass. |
 | M07-C001 | M07 - Visual Reference Library | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M07-C001/CHATGPT_AUDIT_V02.md | SB-M07-001..017 | Reference-library infrastructure audited; owner asset tasks remain open. |
 | META-C001 | META / coordination infrastructure | 2026-08-27 | 2026-08-27 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_PROMPT_V01.md | N/A | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C001/CHATGPT_AUDIT_V01.md | None | Repository-native ChatGPT/Claude coordination and H!veAI synchronization established. |
@@ -53,7 +53,26 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - `LevelImporter._canonical_path()` split into `_resolve_path()` (real, case-preserved, for actual FileAccess/DirAccess calls) + `_canonical_path()` (adds Windows case-fold, comparison only) — behavior-preserving.
 - 32 new tests (426/426 total); all required real-CLI cases independently verified (missing parent, missing/non-directory catalog root, malformed catalog health, existing catalog duplicate, different-ID-same-path takeover with byte-preservation proof, same-ID-same-path re-import, invalid optional type with no crash).
 - See `CLAUDE_IMPLEMENTATION_LOG.md` Session 2 for full evidence.
-- Cycle state after implementation: `AWAITING_AUDIT` for ChatGPT audit V02.\n\n### ChatGPT independent audit V02\n\n- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V02.md\n- Decision: `CHANGES_REQUIRED`.\n- V01 findings F-M09B-001..005 were independently accepted as closed.\n- New finding: `F-M09B-006` existing directory as a final destination can bypass parent-only preflight and fail deterministically during commit, allowing an earlier item to remain written.\n- Added learning: `AL-017` destination object-type preflight.\n- Active correction prompt V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md\n- Active criteria V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V03.md\n- Current state: `CHANGES_REQUIRED`; next actor CLAUDE.
+- Cycle state after implementation: `AWAITING_AUDIT` for ChatGPT audit V02.
+
+### ChatGPT independent audit V02
+
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V02.md
+- Decision: `CHANGES_REQUIRED`.
+- V01 findings F-M09B-001..005 were independently accepted as closed.
+- New finding: `F-M09B-006` existing directory as a final destination can bypass parent-only preflight and fail deterministically during commit, allowing an earlier item to remain written.
+- Added learning: `AL-017` destination object-type preflight.
+- Active correction prompt V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md
+- Active criteria V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V03.md
+
+### V03 correction implementation
+
+- Prompt V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md
+- Criteria V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V03.md
+- Closed F-M09B-006 (destination-type preflight): `elif DirAccess.dir_exists_absolute(resolved)` added to batch destination preflight step 3, rejecting existing directories at output/preview/metadata final paths before any commit write. Uses same `LevelImporter._resolve_path()` resolver. Read-only in both modes.
+- 21 new tests (447/447 total); 7 targeted scenarios covering all three destination roles, validation-only, overwrite=true, regular-file preservation.
+- See `CLAUDE_IMPLEMENTATION_LOG.md` Session 3 for full evidence.
+- Cycle state after implementation: `AWAITING_AUDIT` for ChatGPT audit V03.
 
 ## Previous completed audit baselines
 
