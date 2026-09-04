@@ -26,13 +26,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | HEALTHY - M11-C001 implemented, 542/542 ALL PASS, awaiting ChatGPT audit |
+| Health | ATTENTION - M11-C001 audit V01 found one renderer-regression proof gap; narrow V02 correction issued |
 | Current implementation frontier | M11 - Gameplay Session Core |
-| Current task | M11-C001 - Gameplay Session Core |
+| Current task | M11-C001 - Renderer Regression Proof Correction V02 |
 | Current task ID | `M11-C001` |
-| Current workflow state | `AWAITING_AUDIT` - Claude implementation complete, pushed to origin/main |
-| Required actor | CHATGPT |
-| Next project action | ChatGPT independently audits M11-C001 implementation at repository HEAD against audit criteria V01. |
+| Current workflow state | `CHANGES_REQUIRED` - core implementation accepted, but F-M11-001 requires direct real-renderer BoardState/reset proof |
+| Required actor | CLAUDE |
+| Next project action | Claude reads M11-C001 audit V01 + prompt/criteria V02, adds direct renderer binding/reset regression proof, runs full validation, appends to the same implementation log, returns AWAITING_AUDIT, and stops. |
 | Waiting on | M08 production-art audit and remaining M07 visual inventory tasks require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -40,23 +40,23 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-09-04 |
-| Actor | CLAUDE |
+| Timestamp | 2026-09-04T19:26:00+03:00 |
+| Actor | CHATGPT |
 | Cycle | `M11-C001` |
-| Session type | M11-C001 implementation |
-| Cycle status | `AWAITING_AUDIT` |
-| Summary | Implemented GameplaySession RefCounted core with explicit lifecycle (UNINITIALIZED/READY/ACTIVE/PAUSED/COMPLETED), LevelData/BoardState composition, failed-load atomicity, optional renderer binding, and no auto-complete. 95 new headless checks added (542/542 ALL PASS). No M10 preset selected, no M12+ work, no owner artwork fabricated. SB-M11-001..012 marked complete with behavioral evidence. |
-| M11-C001 active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V01.md |
-| M11-C001 audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
-| M11-C001 Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_IMPLEMENTATION_LOG.md |
-| Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
-| Next expected actor | CHATGPT |
+| Session type | Independent audit V01 + correction V02 issuance |
+| Cycle status | `CHANGES_REQUIRED` |
+| Summary | M11 production architecture/lifecycle accepted by independent inspection. New finding F-M11-001: renderer tests M11-23/M11-24 only assert proxy session/geometry state and do not prove the real BoardRenderer follows the session-owned BoardState after load/reset. V02 requires behavior-level renderer pixel proof and full regression. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V02.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V02.md |
+| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V01.md |
+| Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_IMPLEMENTATION_LOG.md |
+| Next expected actor | CLAUDE |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M11-C001 | Gameplay Session Core | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_IMPLEMENTATION_LOG.md |
+| M11-C001 | Gameplay Session Core | `CHANGES_REQUIRED` | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V01.md |
 | M09-C002 | Batch import / validation / duplicate-ID tooling | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V03.md |
 | M09-C001 | Exact-pixel single importer + safety hardening | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md |
 | M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
@@ -225,6 +225,18 @@ Non-goals remain locked:
 - Historical prompt/audit versions are immutable evidence.
 - Never publish secrets or sensitive environment values.
 
+
+## M11-C001 independent audit V01
+
+Audit:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V01.md
+
+Decision: `CHANGES_REQUIRED`.
+
+- `F-M11-001` MEDIUM: production renderer-binding code is correct on inspection, but M11-23 and M11-24 do not directly observe whether the real BoardRenderer uses the session-owned/fresh BoardState. A regression removing reset-time renderer reconfiguration could pass those tests.
+- Active correction prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V02.md
+- Active criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V02.md
+- M12, LF00 and CP00 remain unstarted until this narrow correction is audited.
 
 ## Parallel sidecar projects
 
