@@ -1855,19 +1855,35 @@ func _run_gameplay_session_tests() -> void:
 	s22.load_level(path_3x2)
 	_check_eq(s22.get_state(), GameplaySession.State.READY, "M11-22: READY after load with bound renderer")
 
-	# 23. Renderer sees same BoardState session owns
-	# After configure(), renderer's internal board reference should match
+	# 23. Renderer pixel output follows session-owned BoardState (F-M11-001)
 	_check_eq(renderer.get_cell_size() > 0, true, "M11-23: renderer configured (cell_size > 0)")
 	var board_pixel_size := renderer.get_board_pixel_size()
 	_check(board_pixel_size.x > 0 and board_pixel_size.y > 0, "M11-23: renderer has non-zero board pixel size")
-
-	# 24. Reset updates renderer to fresh BoardState
-	s22.start()
+	var ld23 = s22.get_level_data()
+	var base23 := Color.html(ld23.palette[s22.get_board_state().get_color_id(0)])
+	var dirty23 := DirtyCleanPresets.apply_dirty(base23, DirtyCleanPresets.DEFAULT_PRESET_NAME)
+	var px23_before := renderer.get_pixel_color(0, 0)
+	_check(_colors_close(px23_before, dirty23, 0.01), "M11-23: pixel (0,0) shows DIRTY color before mutation")
 	s22.get_board_state().set_cell_state(0, BoardState.CellState.CLEAN)
+	renderer.update_cells([0])
+	var px23_after := renderer.get_pixel_color(0, 0)
+	_check(_colors_close(px23_after, base23, 0.01), "M11-23: pixel (0,0) shows CLEAN palette color after mutation via session BoardState")
+	_check(not _colors_close(px23_before, px23_after, 0.01), "M11-23: DIRTY and CLEAN pixels differ — renderer reads session-owned BoardState")
+
+	# 24. Reset: renderer follows NEW BoardState, not stale old one (F-M11-001)
+	s22.start()
+	var old_board24 = s22.get_board_state()
 	s22.reset()
-	# After reset, renderer should reflect the new board (all DIRTY)
+	var new_board24 = s22.get_board_state()
 	_check_eq(s22.get_state(), GameplaySession.State.READY, "M11-24: READY after reset")
-	_check_eq(s22.get_board_state().get_cell_state(0), BoardState.CellState.DIRTY, "M11-24: cell 0 DIRTY in new BoardState")
+	_check(old_board24 != new_board24, "M11-24: reset created a different BoardState object")
+	_check_eq(new_board24.get_cell_state(0), BoardState.CellState.DIRTY, "M11-24: new board cell 0 is DIRTY")
+	old_board24.set_cell_state(0, BoardState.CellState.CLEAN)
+	renderer.update_cells([0])
+	var px24 := renderer.get_pixel_color(0, 0)
+	var dirty24 := DirtyCleanPresets.apply_dirty(base23, DirtyCleanPresets.DEFAULT_PRESET_NAME)
+	_check(_colors_close(px24, dirty24, 0.01), "M11-24: pixel follows NEW BoardState (DIRTY), not stale old (CLEAN)")
+	_check(not _colors_close(px24, base23, 0.01), "M11-24: pixel is NOT the CLEAN color from stale old BoardState")
 
 	# 25. Rectangular board geometry correct
 	var s25 := GameplaySession.new()
