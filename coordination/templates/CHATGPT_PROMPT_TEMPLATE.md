@@ -113,3 +113,13 @@ Keep the chat response concise. Require only:
 - short Claude-run test summary;
 - blocker(s), if any;
 - `READY FOR CHATGPT AUDIT` when appropriate.
+
+
+## Coordination v4 prompt requirement
+
+Every new prompt must declare the exact expected Claude evidence filename:
+
+`expectedClaudeLog: CLAUDE_LOG_VNN.md`
+
+where VNN matches the prompt version. Claude must not use
+CLAUDE_IMPLEMENTATION_LOG.md for new work.

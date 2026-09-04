@@ -10,6 +10,31 @@ coordinationSchema: scrubbots-coordination/v3
 
 This file is the single H!veAI-facing materialized project status surface. It is not a second task ledger. Task checkboxes and milestone truth remain canonical only in `tasks.md`.
 
+## Coordination v4 active status
+
+| Field | Value |
+| --- | --- |
+| Active cycle | M11-C001 |
+| Active version | V04 |
+| State | PLANNED |
+| Next actor | CLAUDE |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V04.md |
+| Expected Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V04.md |
+| Purpose | Backfill CLAUDE_LOG_V01/V02/V03, create CLAUDE_LOG_V04, normalize H!ve tracking. No gameplay changes. |
+
+### Current progress from tasks.md
+
+- Ecosystem: **174 / 848 = 20.52%**
+- Main game: **174 / 624 = 27.88%**
+- Level Factory: **0 / 112 = 0.00%**
+- Content Pipeline: **0 / 112 = 0.00%**
+
+Tracking sources:
+
+- https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/ACTIVE_CYCLES.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/ARTIFACT_MAP.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/PROGRESS_SNAPSHOT.md
+
 ## Project identity
 
 | Field | Value |
