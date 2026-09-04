@@ -26,13 +26,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | ATTENTION - M09-C002 audit V02 found one remaining deterministic destination-type preflight gap |
+| Health | ON_TRACK - V03 correction closes F-M09B-006; 447/447 tests pass; awaiting ChatGPT audit V03 |
 | Current implementation frontier | M09 - Pixel Art to Level Data Pipeline |
-| Current task | M09-C002 - Destination-Type Preflight Correction V03 |
+| Current task | M09-C002 - Awaiting ChatGPT Audit V03 |
 | Current task ID | `M09-C002` |
-| Current workflow state | `CHANGES_REQUIRED` - Audit V02 accepted F-M09B-001..005 but found F-M09B-006 (existing directory can still be used as a final destination until commit-time failure) |
-| Required actor | CLAUDE |
-| Next project action | Claude implements V03 destination-object-type preflight, runs targeted/full validation, updates implementation log, and returns M09-C002 to AWAITING_AUDIT. |
+| Current workflow state | `AWAITING_AUDIT` - V03 destination-type preflight correction implemented and validated; all prior behavior preserved |
+| Required actor | CHATGPT |
+| Next project action | ChatGPT independently audits V03 correction against criteria V03 (AC-M09B3-001..012). |
 | Waiting on | M08 production-art audit and remaining M07 visual inventory tasks require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -40,24 +40,24 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-09-04T08:54:00+03:00 |
-| Actor | CHATGPT |
+| Timestamp | 2026-09-04 |
+| Actor | CLAUDE |
 | Cycle | `M09-C002` |
-| Session type | Independent audit V02 + V03 correction issuance |
-| Cycle status | `CHANGES_REQUIRED` |
-| Summary | Independently inspected implementation head `a95ca5bff646e9e8f2a1382303be2df14d847ace`. Accepted V01 corrections for destination-parent preflight, fail-closed catalog root/health, bidirectional catalog ownership, and optional manifest schema types. Found new HIGH issue F-M09B-006: parent-only preflight does not reject a final destination path that is itself an existing directory, so a later deterministic commit failure can leave earlier artifacts written. Issued V03 and added AL-017. |
+| Session type | V03 correction implementation (F-M09B-006 / AL-017) |
+| Cycle status | `AWAITING_AUDIT` |
+| Summary | Implemented destination-type preflight: `elif DirAccess.dir_exists_absolute(resolved)` rejects existing directories at output/preview/metadata final paths before any commit write. 21 new targeted tests (7 scenarios). 447/447 ALL PASS. All V02 and V01 behavior preserved. SB-M09-018/019 marked complete with V03 evidence. |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md |
 | Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V03.md |
 | Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V02.md |
 | Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
 | Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
-| Next expected actor | CLAUDE |
+| Next expected actor | CHATGPT |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M09-C002 | Batch import / validation / duplicate-ID tooling | `CHANGES_REQUIRED` | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
+| M09-C002 | Batch import / validation / duplicate-ID tooling | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
 | M09-C001 | Exact-pixel single importer + safety hardening | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md |
 | M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M07 | Visual Reference Library | PARTIAL - infrastructure audited; owner assets still missing | HUMAN | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
@@ -110,6 +110,16 @@ Correction scope was M09-C002 only. All five findings closed while preserving ac
 - M08/M10/gameplay scope untouched.
 
 Claude reported `426/426` checks after V02 (394 V01 baseline + 32 new). ChatGPT has not yet independently executed the local Godot binary against V02, so that total remains Claude-run implementation evidence rather than independent runtime execution proof.
+
+## V03 correction (complete, awaiting audit)
+
+Prompt:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md
+
+Criteria:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V03.md
+
+Closed F-M09B-006: destination-type preflight now rejects existing directories at output/preview/metadata final paths before any commit write. Uses same `LevelImporter._resolve_path()` resolver. Read-only in both modes. `overwrite=true` cannot bypass directory-type safety. 21 new tests (447/447 total). See `CLAUDE_IMPLEMENTATION_LOG.md` Session 3. `AWAITING_AUDIT` for ChatGPT audit V03.
 
 ## M09-C002 independent audit V02
 
@@ -165,7 +175,7 @@ Reusable learning added:
 | M06 | Board Renderer | COMPLETE |
 | M07 | Visual Reference Library | PARTIAL - owner assets still missing |
 | M08 | Level Art Technical Audit | BLOCKED_ON_OWNER_ASSET |
-| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - C001 AUDITED_PASS, C002 CHANGES_REQUIRED (V03 issued) |
+| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - C001 AUDITED_PASS, C002 AWAITING_AUDIT (V03 correction complete) |
 | M10 | Dirty/Clean Visual Model | OWNER_REQUIRED / PARTIAL infrastructure |
 | M11-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 

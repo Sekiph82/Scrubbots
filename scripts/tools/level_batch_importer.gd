@@ -250,12 +250,14 @@ static func run_batch(manifest_path: String, catalog_root: String, commit: bool)
 			item.output, preview, metadata, overwrite, true  # dry_run=true for preflight
 		)
 
-	# ---- 3. destination-parent-directory preflight ----
+	# ---- 3. destination-parent and destination-type preflight ----
 	# F-M09B-001 / AL-014: a missing/non-directory destination parent is a
 	# predictable filesystem precondition, not a rare OS race — it must be
 	# caught here, before any item writes, not discovered mid-commit.
-	# Read-only existence check: never creates directories (validation-only
-	# and commit preflight behave identically here).
+	# F-M09B-006 / AL-017: the final destination itself being an existing
+	# directory is equally predictable and must be rejected before commit.
+	# Read-only existence checks: never creates/removes/modifies anything
+	# (validation-only and commit preflight behave identically here).
 	for item in result.items:
 		if item.request == null:
 			continue
@@ -271,6 +273,9 @@ static func run_batch(manifest_path: String, catalog_root: String, commit: bool)
 			if not parent.is_empty() and not DirAccess.dir_exists_absolute(parent):
 				item.batch_errors.append(
 					"%s parent directory does not exist: '%s' (resolved '%s')" % [role, path, parent])
+			elif DirAccess.dir_exists_absolute(resolved):
+				item.batch_errors.append(
+					"%s destination is an existing directory, not a file: '%s'" % [role, path])
 
 	# ---- 4. duplicate ID within batch ----
 	var id_to_indices := {}
