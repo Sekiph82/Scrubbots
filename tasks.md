@@ -664,14 +664,14 @@ chosen one (or requested a new preset).
 
 ### M11 — Gameplay Session Core
 
-- [ ] SB-M11-001 Define session states.
-- [ ] SB-M11-002 Initialize level. — [ ] SB-M11-003 Load LevelData.
-- [ ] SB-M11-004 Create BoardState. — [ ] SB-M11-005 Connect renderer.
-- [ ] SB-M11-006 Define ready state. — [ ] SB-M11-007 Define active state.
-- [ ] SB-M11-008 Define pause. — [ ] SB-M11-009 Define reset.
-- [ ] SB-M11-010 Define completion transition.
-- [ ] SB-M11-011 Keep UI separate from gameplay truth.
-- [ ] SB-M11-012 Headless lifecycle tests where possible.
+- [x] SB-M11-001 Define session states. (UNINITIALIZED/READY/ACTIVE/PAUSED/COMPLETED enum in gameplay_session.gd; 542/542 ALL PASS)
+- [x] SB-M11-002 Initialize level. — [x] SB-M11-003 Load LevelData. (load_level uses LevelLoader, creates BoardState, enters READY; failed-load atomicity verified)
+- [x] SB-M11-004 Create BoardState. — [x] SB-M11-005 Connect renderer. (BoardState.from_level_data on load; optional bind_renderer through existing configure contract)
+- [x] SB-M11-006 Define ready state. — [x] SB-M11-007 Define active state. (READY->ACTIVE via start(); invalid transitions rejected without state mutation)
+- [x] SB-M11-008 Define pause. — [x] SB-M11-009 Define reset. (ACTIVE<->PAUSED; reset recreates BoardState from immutable LevelData, all cells DIRTY, returns to READY)
+- [x] SB-M11-010 Define completion transition. (explicit complete() from ACTIVE only; no auto-complete from dirty-cell count; repeated completion deterministic)
+- [x] SB-M11-011 Keep UI separate from gameplay truth. (RefCounted core, no UI/Control dependency, no HUD/menu logic; renderer is optional presentation binding)
+- [x] SB-M11-012 Headless lifecycle tests where possible. (95 new checks: load/fail/replace/BoardState/lifecycle/reset/completion/renderer/scope; 542/542 ALL PASS)
 
 ### M12 — Five-Slot Logic
 

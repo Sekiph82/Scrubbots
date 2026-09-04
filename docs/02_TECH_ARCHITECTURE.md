@@ -153,6 +153,31 @@ Slot dispatches a Scrubbot
   official board-size boundary and all three DIRTY presets at native
   gameplay scale, via dropdowns, no code changes needed. Not production UI.
 
+## Gameplay Session Core (implemented in M11)
+
+- `GameplaySession` (`scripts/gameplay/session/gameplay_session.gd`, extends
+  `RefCounted`) — headless-testable lifecycle owner. Holds the immutable
+  `LevelData` reference and the current `BoardState` instance. Does not
+  depend on UI, renderer, slots, routing, or scene hierarchy.
+- Lifecycle states: `UNINITIALIZED → READY → ACTIVE ↔ PAUSED → COMPLETED`.
+  Reset from any non-UNINITIALIZED state returns to `READY` with a fresh
+  `BoardState`. All transitions are explicit method calls; invalid
+  transitions return an actionable error without mutating state.
+- `load_level(path)` — uses existing `LevelLoader`; on success creates a
+  fresh `BoardState` via `BoardState.from_level_data()` and enters `READY`.
+  A failed load preserves any previously valid session (failed-load
+  atomicity). Replacement semantics: a new level replaces the prior
+  session only after full validation and fresh `BoardState` creation succeed.
+- `complete()` — explicit external lifecycle transition only. No automatic
+  win/lose/timer/move detection. The eventual win-condition system will
+  call this method.
+- `bind_renderer(renderer, available_size)` — optional presentation
+  binding. Configures a `BoardRenderer` through its existing
+  `configure(board, palette, size)` contract. Renderer is refreshed on
+  load and reset. Renderer does not own lifecycle, does not load levels,
+  and does not decide completion.
+- Uses the explicit `preload()` convention (ADR-009).
+
 ## Cross-script referencing convention (ADR-009)
 
 Scripts under `scripts/data/` and `scripts/gameplay/board/` reference each
@@ -169,4 +194,6 @@ Slot System, TargetSelector, RoutingSystem, Scrubbot Agent, Cleaning
 Feedback, Save System are all future milestones (see `docs/04_ROADMAP.md`).
 `BoardRenderer` is now implemented (Prompt 04/M06), but the *final* DIRTY
 visual language is not — that remains an open design gate (see above and
-`tasks.md` M10).
+`tasks.md` M10). Win/lose conditions and completion rules are not yet
+designed — `GameplaySession.complete()` (M11) is an explicit external
+transition placeholder that a future win-condition system will call.
