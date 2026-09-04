@@ -20,3 +20,18 @@ Thumbs.db
 # Editor
 .vscode/
 .idea/
+
+
+# Nested Level Factory generated/editor state
+level_factory/.godot/
+level_factory/.import/
+level_factory/generated/
+level_factory/candidates/
+level_factory/cache/
+level_factory/output/
+content_pipeline/.cache/
+content_pipeline/output/
+content_pipeline/staging_output/
+content_pipeline/production_output/
+content_pipeline/secrets/
+*.scrubpack

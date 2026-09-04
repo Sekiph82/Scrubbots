@@ -1,3 +1,13 @@
+
+## 2026-09-04 — Level Platform architecture registered
+
+- Added SCRUBBOTS Level Factory as an isolated nested Godot sidecar project.
+- Added SCRUBBOTS Content Pipeline as a separate publisher/control-plane.
+- Added canonical LF00–LF10 and CP00–CP09 task namespaces to root \`tasks.md\`.
+- Locked one-way Factory→data→game integration and declarative-remote-content-only policy.
+- Registered seed/reproducibility, constraint-based generation, solver/difficulty design gates, human-in-loop review, batch production, .scrubpack/manifest, staging/production, offline cache, rollback, disable and scheduling roadmap.
+- Registered GitHub-native ChatGPT↔Claude coordination for both sidecars: versioned prompts/criteria, one append-only Claude implementation log per cycle, independent ChatGPT audit, correction prompts in the same cycle.
+
 # Changelog
 
 ## Unreleased

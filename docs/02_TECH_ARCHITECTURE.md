@@ -197,3 +197,41 @@ visual language is not — that remains an open design gate (see above and
 `tasks.md` M10). Win/lose conditions and completion rules are not yet
 designed — `GameplaySession.complete()` (M11) is an explicit external
 transition placeholder that a future win-condition system will call.
+
+
+## Level Platform sidecars
+
+### Level Factory
+
+\`level_factory/\` is a second Godot project inside the repository, with its
+own \`project.godot\`. It is an offline authoring/analysis application, not a
+runtime gameplay module.
+
+Boundary:
+
+\`\`\`text
+LEVEL FACTORY
+  generate / import / solve / analyze / QA
+        |
+        | declarative Level Data / previews / reports
+        v
+M09/M30/M47/M48 production contracts
+        |
+        v
+SCRUBBOTS MOBILE GAME
+\`\`\`
+
+The root game may consume exported Level Data but must never preload Factory
+GDScript. Factory editor scenes may depend on Factory core; solver/generator
+core should remain headless-testable and scene-independent.
+
+### Content Pipeline
+
+\`content_pipeline/\` packages accepted content, creates versioned manifests,
+publishes first to staging, verifies remote objects, promotes to production,
+and supports rollback/disable/scheduling.
+
+Shipping runtime eventually receives only the minimal remote-content client
+needed to fetch declarative content over HTTPS, verify it, cache it under
+\`user://\`, and expose verified levels to the existing catalog/loader seam.
+Publisher credentials and Factory code never ship in the app.

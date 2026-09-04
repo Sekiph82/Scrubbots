@@ -1311,3 +1311,355 @@ design gate** — presets exist, none is chosen (see M10 above).
    (M18), target selection (M15), or routing (M16-M17) in this milestone.
 7. Start the phase log immediately as `SCRUBBOTS_PHASE_M07_LOG.md`, per the
    Phase Log Workflow above.
+
+---
+
+## PARALLEL SIDECAR PROJECTS — SCRUBBOTS LEVEL PLATFORM
+
+These tasks are canonical SCRUBBOTS tasks, but they belong to two sidecar
+systems that are intentionally isolated from the mobile game's runtime
+project:
+
+- \`SB-LFxx-xxx\`: **SCRUBBOTS Level Factory / Level Generator**, a separate
+  Godot project rooted at \`level_factory/project.godot\`.
+- \`SB-CPxx-xxx\`: **SCRUBBOTS Content Pipeline**, a separate publishing and
+  remote-content control plane rooted at \`content_pipeline/\`.
+
+The repository-root \`tasks.md\` remains the only canonical task ledger.
+The sidecar projects may have their own README/governance/coordination files,
+but they must not create competing task ledgers.
+
+### Locked sidecar boundaries
+
+- The mobile game never preloads/imports \`level_factory/\` scripts.
+- The Level Factory exports declarative Level Data / production artifacts
+  through documented contracts.
+- Existing M09 importer/batch tooling remains the audited pixel-perfect
+  Level Data V1 compatibility gate; do not rewrite it just because the
+  Factory exists.
+- The Content Pipeline distributes declarative level/content data only.
+  Never distribute GDScript, native libraries, bytecode, plugins, or other
+  executable gameplay code as remote content.
+- Runtime remote content is installed under \`user://\`, never written into
+  \`res://\`.
+- Staging precedes production. Publication must be versioned, integrity
+  checked, reversible, and auditable.
+- Existing M30/M47/M48 remain the main-game catalog, production scale-up,
+  and level-QA milestones. Sidecar systems feed those milestones instead of
+  duplicating runtime ownership.
+- Historical Colony Flow-inspired generator ideas that depend on unresolved
+  SCRUBBOTS mechanics stay experimental/design-gated until the corresponding
+  gameplay rules are owner-approved.
+- Canonical production boards remain Easy 20–29, Medium 30–39, Hard 40–49,
+  Very Hard 50–59 per dimension, rectangular allowed, max 59×59 = 3,481.
+  Never revive legacy 16×16/18×18/fixed-40×40/Extra-Hard/2,500-max rules.
+
+### GitHub-native ChatGPT ↔ Claude coordination for both sidecars [LOCKED]
+
+Every implementation cycle uses repository evidence as the communication
+channel:
+
+1. ChatGPT writes the versioned \`CHATGPT_PROMPT_VNN.md\` and
+   \`CHATGPT_AUDIT_CRITERIA_VNN.md\` in the relevant sidecar cycle folder.
+2. Claude safely syncs \`origin/main\`, reads those GitHub files, implements
+   only the active prompt, runs the required validation, and appends evidence
+   to the same cycle's single \`CLAUDE_IMPLEMENTATION_LOG.md\`.
+3. Claude updates canonical \`tasks.md\`, the relevant sidecar
+   \`coordination/SESSION_INDEX.md\`, and root
+   \`.hiveai/PROJECT_DASHBOARD.md\`, pushes safely, sets the cycle to
+   \`AWAITING_AUDIT\`, and stops.
+4. Claude never creates an audit/self-audit file and never assigns
+   \`AUDITED_PASS\`/\`AUDITED_FAIL\`.
+5. ChatGPT reads the implementation log, actual commits/diff/code/tests from
+   GitHub, independently audits them, and writes \`CHATGPT_AUDIT_VNN.md\`.
+6. If correction is required, ChatGPT issues the next prompt version in the
+   same cycle. Only after an independent pass may the cycle close.
+7. Root H!veAI dashboard materializes the current state of the main game and
+   both sidecar projects; it does not replace \`tasks.md\`.
+
+### LF00 — Level Factory Project Bootstrap & Isolation [SIDECAR PROJECT]
+
+- [ ] SB-LF00-001 Establish \`level_factory/\` as an independently openable Godot 4.7.1 project with its own \`project.godot\`.
+- [ ] SB-LF00-002 Maintain Factory-specific README, CLAUDE governance, docs, scenes/scripts/tests/output boundaries.
+- [ ] SB-LF00-003 Enforce one-way integration: Factory exports data; main game never preloads Factory scripts.
+- [ ] SB-LF00-004 Keep Factory logic headless-testable and data-oriented; prefer RefCounted/plain data outside editor presentation.
+- [ ] SB-LF00-005 Define Factory verification commands separately from root-game verification commands.
+- [ ] SB-LF00-006 Define generated/candidate/cache/secret folders and source-control exclusions.
+- [ ] SB-LF00-007 Establish Factory GitHub coordination/session-index structure while root tasks.md remains the only task ledger.
+- [ ] SB-LF00-008 Prove a clean checkout can boot the nested Factory headlessly without loading the mobile game project.
+
+### LF01 — Deterministic Generation Configuration & Seeds
+
+- [ ] SB-LF01-001 Define deterministic LevelGenerationConfig.
+- [ ] SB-LF01-002 Store/replay a seed for every generated candidate.
+- [ ] SB-LF01-003 Prove same config + seed produces byte-identical candidate data.
+- [ ] SB-LF01-004 Prove distinct seeds can produce distinct candidates while preserving locked rules.
+- [ ] SB-LF01-005 Support explicit/automatic width-height selection under canonical difficulty bands.
+- [ ] SB-LF01-006 Support rectangular production boards; never assume width == height.
+- [ ] SB-LF01-007 Exercise 59×59 generation/validation where cost scales with board size.
+- [ ] SB-LF01-008 Record seed/config/generator-version provenance.
+- [ ] SB-LF01-009 Separate TEST/development candidates from production candidates.
+- [ ] SB-LF01-010 Reject legacy board/difficulty assumptions.
+
+### LF02 — Constraint-Based Candidate Generator
+
+- [ ] SB-LF02-001 Implement a constraint-based candidate architecture, not blind random board filling.
+- [ ] SB-LF02-002 Support reverse construction from a valid solution/puzzle structure when gameplay semantics permit.
+- [ ] SB-LF02-003 Support explicit PUZZLE_FIRST generation mode.
+- [ ] SB-LF02-004 Support explicit ART_FIRST mode consuming owner-supplied pixel art/masks.
+- [ ] SB-LF02-005 Implement reusable shape primitives such as blob/ring/corridor/pocket/island/snake/branch/chamber/spiral without declaring them difficulty rules.
+- [ ] SB-LF02-006 Implement connected color-region representation/generation.
+- [ ] SB-LF02-007 Preserve one logical artwork square = one logical board cell in art-first flows.
+- [ ] SB-LF02-008 Never fabricate missing owner artwork or label generated art as owner-original.
+- [ ] SB-LF02-009 Keep dependency-graph semantics behind an experimental/design-gated adapter until SCRUBBOTS dependency rules exist.
+- [ ] SB-LF02-010 Keep slot/stack quantity/order generation behind an experimental/design-gated adapter until M12+ rules exist.
+- [ ] SB-LF02-011 Record candidate provenance: mode, seed, shapes/masks, constraints, generator version.
+- [ ] SB-LF02-012 Add deterministic unit/property tests for generator primitives and invalid configs.
+
+### LF03 — Puzzle Simulation, Solver & State Search [DESIGN-GATED SEMANTICS]
+
+- [ ] SB-LF03-001 Create a pure/headless puzzle simulation boundary independent of rendering/Scrubbot animation.
+- [ ] SB-LF03-002 Define a compact solver-state representation.
+- [ ] SB-LF03-003 Define a legal-move-provider interface so solver code does not invent unresolved gameplay.
+- [ ] SB-LF03-004 Implement deterministic baseline DFS when legal-move semantics are available.
+- [ ] SB-LF03-005 Add visited-state memoization and deterministic state hashing.
+- [ ] SB-LF03-006 Record solution path, states visited, dead ends, depth, branching and solve-time diagnostics.
+- [ ] SB-LF03-007 Add correctness-preserving pruning/move ordering only with tests.
+- [ ] SB-LF03-008 Add bounded solution counting / solution-entropy analysis without requiring unique solution.
+- [ ] SB-LF03-009 Keep reachability/flood-fill behind a gameplay-semantic adapter; never import Colony Flow reachability as SCRUBBOTS law.
+- [ ] SB-LF03-010 Reproduce solver bugs by candidate ID + seed + config + generator version.
+- [ ] SB-LF03-011 Define search budgets/timeouts and explicit UNSOLVED/INCONCLUSIVE distinctions.
+- [ ] SB-LF03-012 Add solver regression fixtures including rectangular and 59×59-relevant cases where practical.
+
+### LF04 — Difficulty Intelligence & Metrics
+
+- [ ] SB-LF04-001 Define LevelMetrics as versioned analysis output.
+- [ ] SB-LF04-002 Record solution depth/move count when meaningful.
+- [ ] SB-LF04-003 Record states visited/dead ends/branching/forced-move metrics when meaningful.
+- [ ] SB-LF04-004 Add dependency-depth metric only after dependency semantics are canonical.
+- [ ] SB-LF04-005 Add slot-pressure metric only after slot semantics are canonical.
+- [ ] SB-LF04-006 Add bait/false-move metrics only after safe/deadlock semantics are canonical.
+- [ ] SB-LF04-007 Add color-switch/remaining-state volatility metrics when they prove useful.
+- [ ] SB-LF04-008 Compute a provisional difficulty score from versioned coefficients, never hard-code unreviewed historical coefficients as truth.
+- [ ] SB-LF04-009 Map predicted difficulty to current EASY/MEDIUM/HARD/VERY_HARD labels without replacing locked dimension validation.
+- [ ] SB-LF04-010 Keep metric provenance so score-version changes are traceable.
+- [ ] SB-LF04-011 Design future calibration against real player telemetry without requiring telemetry for V1.
+- [ ] SB-LF04-012 Test that difficulty analysis cannot silently change gameplay state or exported source art.
+
+### LF05 — Factory Validation & Level QA
+
+- [ ] SB-LF05-001 Compose structural Level Data V1 validation with production difficulty validation.
+- [ ] SB-LF05-002 Reuse the audited M09 exact-pixel reconstruction/round-trip contract for art-first exports.
+- [ ] SB-LF05-003 Validate dimensions, palette, cells, alpha/transparency and duplicate IDs before production acceptance.
+- [ ] SB-LF05-004 Reject unsolved candidates when the solver verdict is authoritative.
+- [ ] SB-LF05-005 Distinguish solver INCONCLUSIVE from proven UNSOLVABLE.
+- [ ] SB-LF05-006 Produce actionable per-candidate rejection reasons.
+- [ ] SB-LF05-007 Generate a machine-readable QA report per accepted/rejected batch.
+- [ ] SB-LF05-008 Preserve every owner source image byte-for-byte.
+- [ ] SB-LF05-009 Add visual-review gates for recognizability/readability rather than claiming AI-only visual approval.
+- [ ] SB-LF05-010 Feed accepted artifacts into existing M30/M47/M48 contracts rather than bypassing them.
+
+### LF06 — Human-in-the-Loop Godot Factory Editor
+
+- [ ] SB-LF06-001 Build an @tool/editor-facing Level Factory workspace in the nested Godot project.
+- [ ] SB-LF06-002 Provide target difficulty, dimensions, seed, generation mode and candidate controls.
+- [ ] SB-LF06-003 Provide Generate / Solve / Validate / Analyze / Reproduce actions.
+- [ ] SB-LF06-004 Provide board/art preview with crisp logical-pixel rendering.
+- [ ] SB-LF06-005 Display solution/solver/difficulty/QA metrics with provenance.
+- [ ] SB-LF06-006 Allow owner/designer paint/erase/color edits where appropriate.
+- [ ] SB-LF06-007 Allow approved puzzle-configuration edits without exposing unresolved mechanics as final.
+- [ ] SB-LF06-008 Provide REVALIDATE after manual changes.
+- [ ] SB-LF06-009 Never auto-promote generated candidate to production without explicit acceptance.
+- [ ] SB-LF06-010 Keep editor presentation separate from generator/solver truth.
+- [ ] SB-LF06-011 Support opening/reproducing a candidate by seed/config.
+- [ ] SB-LF06-012 Add editor smoke tests and headless core tests.
+
+### LF07 — Mutation & Automatic Difficulty Targeting [V2]
+
+- [ ] SB-LF07-001 Define mutation interface and immutable candidate lineage.
+- [ ] SB-LF07-002 Add safe hardening mutations only for canonical mechanics.
+- [ ] SB-LF07-003 Add safe easing mutations only for canonical mechanics.
+- [ ] SB-LF07-004 Re-solve and revalidate after every mutation.
+- [ ] SB-LF07-005 Preserve seed/parent/mutation provenance.
+- [ ] SB-LF07-006 Target a difficulty metric range without changing locked board-band legality.
+- [ ] SB-LF07-007 Bound mutation attempts and reject non-converging candidates.
+- [ ] SB-LF07-008 Compare mutate-vs-regenerate efficiency.
+- [ ] SB-LF07-009 Never mutate owner source artwork silently.
+- [ ] SB-LF07-010 Add deterministic mutation regression tests.
+
+### LF08 — Batch Factory & Weekly Production
+
+- [ ] SB-LF08-001 Generate requested accepted counts by difficulty, e.g. 20/35/30/15 = 100.
+- [ ] SB-LF08-002 Separate candidate-generated count from accepted count.
+- [ ] SB-LF08-003 Keep rejection reasons/statistics per batch.
+- [ ] SB-LF08-004 Support deterministic/resumable batch jobs.
+- [ ] SB-LF08-005 Prevent duplicate IDs/seeds/production artifacts according to canonical ownership rules.
+- [ ] SB-LF08-006 Produce accepted Level Data, previews, metadata and QA reports as one batch result.
+- [ ] SB-LF08-007 Support owner review/approval queue before publication.
+- [ ] SB-LF08-008 Export a production-ready handoff to the Content Pipeline.
+- [ ] SB-LF08-009 Stress high rejection rates without corrupting accepted artifacts.
+- [ ] SB-LF08-010 Prove batch reruns do not create meaningless diffs.
+
+### LF09 — Advanced Generation Research [V3 / EXPERIMENTAL]
+
+- [ ] SB-LF09-001 Prototype evolutionary/genetic candidate selection behind an experimental flag.
+- [ ] SB-LF09-002 Define versioned fitness metrics without treating provisional metrics as truth.
+- [ ] SB-LF09-003 Prototype procedural art masks without replacing owner-approved art direction.
+- [ ] SB-LF09-004 Prototype telemetry-calibrated difficulty only after owner-approved analytics/data policy exists.
+- [ ] SB-LF09-005 Keep live/runtime level generation disabled unless explicitly approved later.
+- [ ] SB-LF09-006 Preserve reproducibility and lineage across generations.
+- [ ] SB-LF09-007 Compare advanced generation against V1/V2 quality and compute cost.
+- [ ] SB-LF09-008 Promote no experimental feature to production without a separate audited decision.
+
+### LF10 — Campaign/Sequencing Adapter [DESIGN GATE]
+
+- [ ] SB-LF10-001 Define a CampaignBuilder interface without choosing progression rules.
+- [ ] SB-LF10-002 Consume owner-approved progression/difficulty rhythm only after M32 rules exist.
+- [ ] SB-LF10-003 Select from accepted production levels without modifying level data.
+- [ ] SB-LF10-004 Prevent duplicate/unavailable/disabled level selection.
+- [ ] SB-LF10-005 Preserve deterministic campaign-build provenance.
+- [ ] SB-LF10-006 Rebuild campaign ordering without regenerating levels.
+- [ ] SB-LF10-007 Support future events/featured-level selection as data, not code.
+- [ ] SB-LF10-008 Add campaign validation once progression is defined.
+
+### CP00 — Content Pipeline Architecture & Security [SIDECAR PROJECT]
+
+- [ ] SB-CP00-001 Establish \`content_pipeline/\` as a separate publisher/control-plane project.
+- [ ] SB-CP00-002 Define APP CODE vs REMOTE CONTENT boundary.
+- [ ] SB-CP00-003 Lock remote content to declarative data; forbid executable code/plugins/scripts/native libraries.
+- [ ] SB-CP00-004 Define staging and production as separate environments.
+- [ ] SB-CP00-005 Define versioned, auditable publish/promotion/rollback state.
+- [ ] SB-CP00-006 Define secret handling so credentials/tokens never enter Git.
+- [ ] SB-CP00-007 Define publisher dry-run/validation-only behavior before remote mutation.
+- [ ] SB-CP00-008 Define provider abstraction; Cloudflare R2/CDN is preferred candidate, not silently vendor-locked before explicit infrastructure validation.
+- [ ] SB-CP00-009 Establish Content Pipeline GitHub coordination/session-index structure using the locked ChatGPT↔Claude workflow.
+- [ ] SB-CP00-010 Document mobile/store-policy boundary and require current policy re-verification before release.
+
+### CP01 — .scrubpack Format & Packager
+
+- [ ] SB-CP01-001 Define versioned .scrubpack container specification.
+- [ ] SB-CP01-002 Package multiple declarative levels without executable content.
+- [ ] SB-CP01-003 Record pack ID/version/created time/level range or explicit level list.
+- [ ] SB-CP01-004 Include per-pack SHA-256 integrity metadata.
+- [ ] SB-CP01-005 Define deterministic pack ordering/serialization.
+- [ ] SB-CP01-006 Prevent duplicate level IDs within a pack.
+- [ ] SB-CP01-007 Validate every included level before packaging.
+- [ ] SB-CP01-008 Support unpack/inspect tooling for QA.
+- [ ] SB-CP01-009 Prove identical inputs create deterministic pack bytes where the chosen container permits it.
+- [ ] SB-CP01-010 Reject unsupported schema/content versions safely.
+
+### CP02 — Remote Manifest & Content Versioning
+
+- [ ] SB-CP02-001 Define versioned manifest.json schema.
+- [ ] SB-CP02-002 Include schema_version and monotonic content_version.
+- [ ] SB-CP02-003 Include minimum_game_version compatibility rule.
+- [ ] SB-CP02-004 List packs with IDs, locations and hashes.
+- [ ] SB-CP02-005 Track latest/available level metadata without assuming contiguous IDs when unnecessary.
+- [ ] SB-CP02-006 Support disabled_levels.
+- [ ] SB-CP02-007 Support scheduled activation windows as declarative content metadata.
+- [ ] SB-CP02-008 Reject duplicate pack IDs/level ownership conflicts.
+- [ ] SB-CP02-009 Validate manifest references before publish.
+- [ ] SB-CP02-010 Keep prior manifests/version history for audit/rollback.
+- [ ] SB-CP02-011 Define compatibility behavior for app versions too old/new for a content schema.
+- [ ] SB-CP02-012 Add manifest parser/schema tests.
+
+### CP03 — Publisher, Staging & Production Promotion
+
+- [ ] SB-CP03-001 Implement publisher validation-only mode.
+- [ ] SB-CP03-002 Serialize accepted Factory output into packs.
+- [ ] SB-CP03-003 Calculate hashes and build candidate manifest.
+- [ ] SB-CP03-004 Upload packs before exposing them in an active manifest.
+- [ ] SB-CP03-005 Verify remote object integrity after upload.
+- [ ] SB-CP03-006 Publish to STAGING first.
+- [ ] SB-CP03-007 Verify staging manifest/packs through real download.
+- [ ] SB-CP03-008 Require explicit promotion from staging to production.
+- [ ] SB-CP03-009 Promote by publishing a new versioned production manifest.
+- [ ] SB-CP03-010 Never silently overwrite a live version without an auditable version transition.
+- [ ] SB-CP03-011 Provide a one-command/one-button publish workflow only after all underlying stages are individually testable.
+- [ ] SB-CP03-012 Produce a publish report containing inputs, hashes, versions, remote verification and final URLs/keys.
+
+### CP04 — Godot Remote Content Runtime
+
+- [ ] SB-CP04-001 Implement RemoteContentManager in the main Godot game only when runtime integration milestone is opened.
+- [ ] SB-CP04-002 Fetch production manifest over HTTPS.
+- [ ] SB-CP04-003 Compare remote/local content versions deterministically.
+- [ ] SB-CP04-004 Determine missing/required packs without redownloading valid cached packs.
+- [ ] SB-CP04-005 Download packs to \`user://content/\`, never \`res://\`.
+- [ ] SB-CP04-006 Verify SHA-256 before activation.
+- [ ] SB-CP04-007 Validate pack/schema/level data before activation.
+- [ ] SB-CP04-008 Activate only fully verified content atomically enough to preserve last-known-good content.
+- [ ] SB-CP04-009 Expose remote levels to LevelCatalog/LevelLoader through a narrow data interface.
+- [ ] SB-CP04-010 Keep generator/publisher code completely out of the shipping runtime.
+- [ ] SB-CP04-011 Add Android INTERNET permission only when remote content runtime is actually enabled.
+- [ ] SB-CP04-012 Handle timeout/network/server/HTTP/parse/hash failures without blocking offline play.
+- [ ] SB-CP04-013 Test app-version/content-version compatibility.
+- [ ] SB-CP04-014 Test no executable artifact is accepted as remote content.
+
+### CP05 — Offline Cache & Last-Known-Good Recovery
+
+- [ ] SB-CP05-001 Define local content registry under \`user://\`.
+- [ ] SB-CP05-002 Preserve last-known-good manifest and installed pack set.
+- [ ] SB-CP05-003 Boot/play from cached content when offline.
+- [ ] SB-CP05-004 Fall back safely when manifest fetch fails.
+- [ ] SB-CP05-005 Reject corrupt/incomplete downloads without replacing good cached content.
+- [ ] SB-CP05-006 Support interrupted-download recovery/cleanup.
+- [ ] SB-CP05-007 Define cache size/retention policy.
+- [ ] SB-CP05-008 Keep builtin app levels playable independently of remote content.
+- [ ] SB-CP05-009 Test first launch with no network.
+- [ ] SB-CP05-010 Test upgrade with partial/corrupt remote cache.
+- [ ] SB-CP05-011 Test downgrade/compatibility behavior explicitly.
+- [ ] SB-CP05-012 Never delete the only known-good playable content set before replacement validates.
+
+### CP06 — Rollback, Disable & Scheduling
+
+- [ ] SB-CP06-001 Define rollback as a new auditable content version, not an invisible history rewrite.
+- [ ] SB-CP06-002 Roll back production to a known-good pack/manifest set.
+- [ ] SB-CP06-003 Support disabling individual level IDs without withdrawing an entire healthy pack.
+- [ ] SB-CP06-004 Ensure disabled levels are skipped safely by catalog/progression consumers.
+- [ ] SB-CP06-005 Support scheduled future pack/level activation.
+- [ ] SB-CP06-006 Define timezone/time-source behavior for schedules.
+- [ ] SB-CP06-007 Prevent a schedule from activating incompatible/unverified content.
+- [ ] SB-CP06-008 Support cancel/edit of future schedules with audit history.
+- [ ] SB-CP06-009 Test rollback after a bad live release.
+- [ ] SB-CP06-010 Test single-level disable in a healthy pack.
+- [ ] SB-CP06-011 Test multiple weekly packs prepared in one production session.
+- [ ] SB-CP06-012 Preserve reproducible publish/rollback reports.
+
+### CP07 — Storage/CDN Provider Integration
+
+- [ ] SB-CP07-001 Evaluate Cloudflare R2/CDN against Firebase Storage, S3/CloudFront, Supabase Storage, Backblaze B2 or other approved candidates.
+- [ ] SB-CP07-002 Select provider with owner approval based on cost, HTTPS/CDN, auth, versioning, tooling and operations.
+- [ ] SB-CP07-003 Implement provider adapter without leaking credentials into project data.
+- [ ] SB-CP07-004 Separate staging and production buckets/prefixes/accounts where appropriate.
+- [ ] SB-CP07-005 Configure immutable/versioned object naming where practical.
+- [ ] SB-CP07-006 Verify upload/download/hash round trip.
+- [ ] SB-CP07-007 Define cache-control/CDN invalidation strategy without relying on purge for correctness.
+- [ ] SB-CP07-008 Document backup/export/migration path away from the chosen provider.
+- [ ] SB-CP07-009 Test least-privilege publishing credentials.
+- [ ] SB-CP07-010 Keep provider-specific code outside gameplay/content data schemas.
+
+### CP08 — Content Operations, QA & Observability
+
+- [ ] SB-CP08-001 Produce weekly batch summary: generated/rejected/accepted/published counts.
+- [ ] SB-CP08-002 Record staging and production content versions.
+- [ ] SB-CP08-003 Record pack hashes and remote verification.
+- [ ] SB-CP08-004 Record disabled/scheduled/rolled-back content changes.
+- [ ] SB-CP08-005 Build a content-health check that validates manifest and referenced packs.
+- [ ] SB-CP08-006 Define safe operational alerts/errors without collecting unnecessary player data.
+- [ ] SB-CP08-007 Add reproducible content incident runbook.
+- [ ] SB-CP08-008 Test clean-machine publish dry run.
+- [ ] SB-CP08-009 Test disaster recovery from backed-up manifests/packs.
+- [ ] SB-CP08-010 Keep publication logs free of secrets.
+
+### CP09 — Store Policy, Security & Release Gate
+
+- [ ] SB-CP09-001 Re-verify current Google Play remote-content/code policy before production launch.
+- [ ] SB-CP09-002 Re-verify Apple App Store requirements before iOS remote-content launch.
+- [ ] SB-CP09-003 Prove remote payloads are declarative content only.
+- [ ] SB-CP09-004 Prevent content data from embedding/evaluating executable expressions/scripts.
+- [ ] SB-CP09-005 Validate TLS/HTTPS-only endpoints.
+- [ ] SB-CP09-006 Threat-model manifest/pack tampering and rollback attacks.
+- [ ] SB-CP09-007 Define signing/authenticity upgrade if hash-only integrity is insufficient.
+- [ ] SB-CP09-008 Verify no publishing secret ships inside the mobile app.
+- [ ] SB-CP09-009 Document privacy impact if future telemetry calibration is enabled.
+- [ ] SB-CP09-010 Require independent audit before enabling production remote-content delivery.

@@ -61,3 +61,19 @@ difficulty bands and TEST/production separation, validated across the full
 (BoardRenderer + DIRTY/CLEAN prototype infrastructure) — the final DIRTY
 visual preset remains an open design gate. Do not begin M4 (five-slot
 gameplay foundation) work until a future prompt.
+
+
+## Parallel roadmap — SCRUBBOTS Level Platform
+
+The mobile-game M00–M55 sequence remains intact. In parallel, two sidecar
+roadmaps exist under canonical root \`tasks.md\`:
+
+- LF00–LF10: Level Factory / Generator, solver, difficulty intelligence,
+  human editor, batch production, mutation and advanced research.
+- CP00–CP09: Content Pipeline, pack/manifest format, staging/production,
+  remote runtime, offline cache, rollback/disable/scheduling, provider
+  integration and release/security gate.
+
+These tracks may progress only when their dependencies are satisfied. In
+particular, solver/legal-move/difficulty semantics must not be invented ahead
+of the gameplay milestones that define them.

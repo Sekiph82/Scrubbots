@@ -91,3 +91,19 @@ official band boundary and the 59×59 maximum.
     <sub>Developed by Akilta</sub>
   </a>
 </p>
+
+
+## Sidecar projects
+
+The repository also contains two intentionally separate development projects:
+
+- \`level_factory/\` — **SCRUBBOTS Level Factory**, an independently openable
+  Godot 4.7.1 project for offline deterministic generation, solver/difficulty
+  intelligence, human review and batch QA.
+- \`content_pipeline/\` — **SCRUBBOTS Content Pipeline**, an offline
+  publisher/control plane for \`.scrubpack\`, manifest, staging, production,
+  rollback, disable and scheduled remote level delivery.
+
+They are not gameplay modules. The root mobile game consumes only documented
+declarative data contracts. See \`tasks.md\`,
+\`level_factory/README.md\`, and \`content_pipeline/README.md\`.

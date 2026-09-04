@@ -234,3 +234,36 @@ replace `tasks.md` or the local Desktop phase log.
     deviation should be recorded.
 
 Full protocol: `coordination/README.md`.
+
+
+## Nested sidecar projects: Level Factory and Content Pipeline
+
+This repository contains two deliberately isolated sidecar systems:
+
+- \`level_factory/\`: independently openable Godot project for offline level
+  generation, solving, difficulty analysis, human review and QA.
+- \`content_pipeline/\`: offline publisher/control-plane for pack/manifest,
+  staging, production, rollback, disable and scheduling workflows.
+
+Root \`tasks.md\` is the only canonical task ledger. Sidecars use
+\`SB-LFxx-xxx\` and \`SB-CPxx-xxx\` task IDs.
+
+The main game must never preload/import \`level_factory/\` scripts. Shipping
+runtime never includes Factory/Publisher implementation. Remote content is
+declarative data only.
+
+### GitHub coordination rule for sidecars
+
+Sidecar work uses the same evidence chain as the main project, but each
+sidecar has its own \`coordination/\` subtree:
+
+1. ChatGPT authors versioned \`CHATGPT_PROMPT_VNN.md\` and
+   \`CHATGPT_AUDIT_CRITERIA_VNN.md\`.
+2. Claude reads them from GitHub, implements/tests only, and appends to the
+   cycle's single \`CLAUDE_IMPLEMENTATION_LOG.md\`.
+3. Claude updates root \`tasks.md\`, the sidecar session index and root
+   H!veAI dashboard, pushes safely, returns \`AWAITING_AUDIT\`, and stops.
+4. Claude does not create audit/self-audit files or assign audit verdicts.
+5. ChatGPT reads GitHub log + real diff/code/tests, publishes
+   \`CHATGPT_AUDIT_VNN.md\`, and either closes the cycle or issues the next
+   prompt version in the same cycle.
