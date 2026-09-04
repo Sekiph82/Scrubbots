@@ -178,3 +178,19 @@ Do not create new Claude self-audit files.
 6. File existence alone is not task-completion evidence.
 7. Missing owner artwork remains `AWAITING OWNER ASSET`; never fabricate substitutes.
 8. M10 DIRTY/CLEAN final visual choice remains owner-controlled.
+
+
+## Coordination v4 evidence matching [LOCKED]
+
+The active prompt version determines the expected Claude evidence file:
+
+`CHATGPT_PROMPT_VNN.md -> CLAUDE_LOG_VNN.md`.
+
+ChatGPT must verify that exact log exists and corresponds to that prompt before
+assigning an independent audit verdict. Claude-run tests remain E1/E2 evidence.
+
+Historical combined `CLAUDE_IMPLEMENTATION_LOG.md` files remain legacy
+evidence only.
+
+H!veAI derived tracking files are ACTIVE_CYCLES.md, ARTIFACT_MAP.md, and
+PROGRESS_SNAPSHOT.md under `.hiveai/`; they do not replace `tasks.md`.
