@@ -26,13 +26,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | ON_TRACK - V03 correction closes F-M09B-006; 447/447 tests pass; awaiting ChatGPT audit V03 |
-| Current implementation frontier | M09 - Pixel Art to Level Data Pipeline |
-| Current task | M09-C002 - Awaiting ChatGPT Audit V03 |
-| Current task ID | `M09-C002` |
-| Current workflow state | `AWAITING_AUDIT` - V03 destination-type preflight correction implemented and validated; all prior behavior preserved |
-| Required actor | CHATGPT |
-| Next project action | ChatGPT independently audits V03 correction against criteria V03 (AC-M09B3-001..012). |
+| Health | HEALTHY - M09 independently complete; M11-C001 prompt issued |
+| Current implementation frontier | M11 - Gameplay Session Core |
+| Current task | M11-C001 - Gameplay Session Core |
+| Current task ID | `M11-C001` |
+| Current workflow state | `PLANNED` - ChatGPT prompt V01 and audit criteria V01 issued; awaiting Claude implementation |
+| Required actor | CLAUDE |
+| Next project action | Claude safely syncs origin/main, reads M11-C001 prompt/criteria and final M09 audit, implements the session core, logs named validation evidence, and stops at AWAITING_AUDIT. |
 | Waiting on | M08 production-art audit and remaining M07 visual inventory tasks require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -40,24 +40,25 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-09-04 |
-| Actor | CLAUDE |
-| Cycle | `M09-C002` |
-| Session type | V03 correction implementation (F-M09B-006 / AL-017) |
-| Cycle status | `AWAITING_AUDIT` |
-| Summary | Implemented destination-type preflight: `elif DirAccess.dir_exists_absolute(resolved)` rejects existing directories at output/preview/metadata final paths before any commit write. 21 new targeted tests (7 scenarios). 447/447 ALL PASS. All V02 and V01 behavior preserved. SB-M09-018/019 marked complete with V03 evidence. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_CRITERIA_V03.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V02.md |
-| Claude implementation log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
+| Timestamp | 2026-09-04T10:37:00+03:00 |
+| Actor | CHATGPT |
+| Cycle | `M11-C001` |
+| Session type | M09-C002 final independent audit V03 + M11-C001 prompt issuance |
+| Cycle status | `PLANNED` |
+| Summary | M09-C002 V03 independently accepted. F-M09B-006 is closed: final output/preview/metadata destinations that are existing directories are rejected before commit, regular-file semantics remain intact, and M09 is COMPLETE. Opened M11-C001 for a headless-testable gameplay session lifecycle that composes LevelLoader, BoardState and BoardRenderer while preserving undefined win/lose and future slot/routing design gates. |
+| M09-C002 final audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V03.md |
+| M11-C001 active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V01.md |
+| M11-C001 audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
+| M11-C001 Claude log | PENDING |
 | Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
-| Next expected actor | CHATGPT |
+| Next expected actor | CLAUDE |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M09-C002 | Batch import / validation / duplicate-ID tooling | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md |
+| M11-C001 | Gameplay Session Core | `PLANNED` | CLAUDE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V01.md |
+| M09-C002 | Batch import / validation / duplicate-ID tooling | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V03.md |
 | M09-C001 | Exact-pixel single importer + safety hardening | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md |
 | M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | M07 | Visual Reference Library | PARTIAL - infrastructure audited; owner assets still missing | HUMAN | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
@@ -142,6 +143,41 @@ Reusable learning added:
 
 - `AL-017`: validate the final destination object's incompatible type, not only its parent.
 
+## M09-C002 final audit V03
+
+Audit:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V03.md
+
+Decision: `AUDITED_PASS`.
+
+F-M09B-006 is closed. M09 tasks SB-M09-001..020 are complete. Claude reported 447/447 checks; ChatGPT independently inspected the code/diff/test design and did not relabel the local runtime total as independently executed.
+
+M09 milestone: COMPLETE.
+
+## M11-C001 contract
+
+Active prompt:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V01.md
+
+Audit criteria:
+https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V01.md
+
+Scope:
+
+- session lifecycle states and transition truth;
+- LevelLoader -> immutable LevelData -> fresh BoardState composition;
+- READY/ACTIVE/PAUSED/reset/explicit COMPLETED lifecycle;
+- optional BoardRenderer binding while presentation remains non-authoritative;
+- headless lifecycle, failure-atomicity, rectangular and 59x59 tests.
+
+Non-goals remain locked:
+
+- no automatic win condition;
+- no lose condition, timer or move limit;
+- no M12 slots;
+- no target selection/routing/Scrubbot agents;
+- no M10 final visual preset selection.
+
 ## Audit model
 
 1. ChatGPT publishes implementation prompts and audit criteria.
@@ -175,9 +211,10 @@ Reusable learning added:
 | M06 | Board Renderer | COMPLETE |
 | M07 | Visual Reference Library | PARTIAL - owner assets still missing |
 | M08 | Level Art Technical Audit | BLOCKED_ON_OWNER_ASSET |
-| M09 | Pixel Art to Level Data Pipeline | IN_PROGRESS - C001 AUDITED_PASS, C002 AWAITING_AUDIT (V03 correction complete) |
+| M09 | Pixel Art to Level Data Pipeline | COMPLETE |
 | M10 | Dirty/Clean Visual Model | OWNER_REQUIRED / PARTIAL infrastructure |
-| M11-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
+| M11 | Gameplay Session Core | PLANNED - M11-C001 prompt issued |
+| M12-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 
 ## Dashboard integrity rules
 
