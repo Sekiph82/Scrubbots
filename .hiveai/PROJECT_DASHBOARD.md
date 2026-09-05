@@ -14,14 +14,14 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Active cycle | META-C002 |
-| Active version | V05 |
+| Active cycle | META-C003 |
+| Active version | V01 |
 | State | AWAITING_AUDIT |
 | Next actor | CHATGPT |
-| Branch | feature/master-ui-magnific-pipeline (PR #3) |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V05.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V05.md |
-| Purpose | META-C002 V05: Applied AL-025 — pre-commit evidence in Git-tracked log, post-push receipt in PR #3 comment. Evidence/coordination only — all prior accepted baseline preserved. 196/943 = 20.78%. |
+| Branch | main (PR #3 merged) |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md |
+| Purpose | META-C003 V01: PR #3 merged into main via normal merge commit. Pre- and post-merge 657/657 ALL PASS. Canonical main truth 196/943 = 20.78%. Post-merge receipt posted. |
 
 ### Also active (on main)
 
@@ -32,7 +32,7 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | State | AUDITED_PASS |
 | Next actor | COMPLETE |
 
-### Current progress from tasks.md (feature/master-ui-magnific-pipeline branch)
+### Current progress from tasks.md (main, after PR #3 merge)
 
 - Ecosystem: **196 / 943 = 20.78%**
 - Main game + SB-UI (M00-M55): **196 / 719 = 27.26%**
@@ -43,9 +43,9 @@ Counts derived from unique canonical SB task IDs on checkbox lines.
 
 Tracking sources:
 
-- https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/.hiveai/ACTIVE_CYCLES.md
-- https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/.hiveai/ARTIFACT_MAP.md
-- https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/.hiveai/PROGRESS_SNAPSHOT.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/ACTIVE_CYCLES.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/ARTIFACT_MAP.md
+- https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/PROGRESS_SNAPSHOT.md
 
 ## M12-C001 final independent audit V02
 
@@ -93,21 +93,21 @@ Tracking sources:
 - Progress unchanged: **196 / 943 = 20.78%**.
 - PR #3 remains draft/unmerged.
 
-## Active merge cycle
+## META-C003 merge cycle
 
 | Field | Value |
 | --- | --- |
 | Cycle | META-C003 |
 | Version | V01 |
-| State | PLANNED |
-| Next actor | CLAUDE |
-| Source | feature/master-ui-magnific-pipeline / PR #3 |
-| Target | main |
-| Prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md |
-| Criteria | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C003/CHATGPT_AUDIT_CRITERIA_V01.md |
-| Expected log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C003/CLAUDE_LOG_V01.md |
+| State | AWAITING_AUDIT |
+| Next actor | CHATGPT |
+| Merge commit | `bb5de4b88fcaef7a72109ff3cdeb2d6c77588106` |
+| Merged PR | PR #3 (MERGED) |
+| Prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md |
+| Criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_CRITERIA_V01.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md |
 | Gate | META-C002 V05 AUDITED_PASS |
-| Purpose | Controlled merge commit + canonical main reconciliation. No M13. |
+| Purpose | Controlled merge commit + canonical main reconciliation. 657/657 ALL PASS. No M13. |
 
 ## META-C002 final independent audit V05
 
@@ -125,7 +125,7 @@ Tracking sources:
 | --- | --- |
 | Project | SCRUBBOTS |
 | Repository | https://github.com/Sekiph82/Scrubbots |
-| Branch | `feature/master-ui-magnific-pipeline` (PR #3) |
+| Branch | `main` (PR #3 merged) |
 | Engine | Godot 4.7.1-stable (GDScript) |
 | Platform target | Mobile (Android first, iOS later) |
 | Attribution | Developed by Akilta |
@@ -135,15 +135,15 @@ Tracking sources:
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | OK — META-C002 V05 AL-025 post-push receipt evidence complete, AWAITING_AUDIT |
-| Current implementation frontier | META-C002 - Master UI + Magnific pipeline integration |
-| Current task | META-C002 V05 non-self-referential merge evidence |
-| Current task ID | `META-C002` |
-| Current workflow state | `AWAITING_AUDIT` — V05 applied AL-025 (pre-commit evidence in log, post-push receipt in PR comment). All prior accepted baseline preserved. |
+| Health | OK — PR #3 merged into main, META-C003 AWAITING_AUDIT |
+| Current implementation frontier | META-C003 - PR #3 merge & canonical main reconciliation |
+| Current task | META-C003 V01 post-merge reconciliation |
+| Current task ID | `META-C003` |
+| Current workflow state | `AWAITING_AUDIT` — PR #3 merged via normal merge commit. 657/657 ALL PASS pre- and post-merge. 196/943 canonical main truth. Post-merge receipt posted. |
 | Required actor | CHATGPT |
-| Next project action | ChatGPT performs independent audit V05. |
+| Next project action | ChatGPT performs independent audit META-C003 V01. |
 | Waiting on | Scrubby master reference: OWNER_REQUIRED. M08 production-art audit and M10 DIRTY/CLEAN preset remain owner-controlled. |
-| Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/tasks.md |
+| Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
 ## Latest session summary
 
@@ -151,15 +151,15 @@ Tracking sources:
 | --- | --- |
 | Timestamp | 2026-09-05 |
 | Actor | CLAUDE |
-| Cycle | `META-C002` |
-| Session type | META-C002 V05 non-self-referential merge evidence (AL-025) |
+| Cycle | `META-C003` |
+| Session type | META-C003 V01 PR #3 merge & canonical main reconciliation |
 | Cycle status | `AWAITING_AUDIT` |
-| Summary | Applied AL-025: pre-commit evidence (branch SHAs, git status, task counts, PR state, untracked classification) recorded in Git-tracked CLAUDE_LOG_V05.md. Post-push receipt (final commit SHA, remote head equality proof) posted as PR #3 comment. One focused commit, no self-referential SHA loop. No implementation/task/inventory changes. 196/943. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V05.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_CRITERIA_V05.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V04.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V05.md |
-| Next expected actor | CHATGPT (audit V05) |
+| Summary | PR #3 merged into main via normal merge commit `bb5de4b88fcaef7a72109ff3cdeb2d6c77588106`. Pre-merge 657/657 ALL PASS on feature. Post-merge 657/657 ALL PASS on main. 943/196/747 canonical task truth. 95 UI migration IDs, 51 references, Scrubby OWNER_REQUIRED. No M13/LF00/CP00/Magnific generation. Feature branch preserved. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_CRITERIA_V01.md |
+| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C002/CHATGPT_AUDIT_V05.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md |
+| Next expected actor | CHATGPT (audit META-C003 V01) |
 
 ## Milestone summary
 

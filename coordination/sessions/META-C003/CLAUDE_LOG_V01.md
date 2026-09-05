@@ -195,15 +195,124 @@ No tasks/inventory/manifest/UI implementation changes.
 
 ## Phase B — merge PR #3
 
-(Recorded after merge)
+### Pre-merge log commit
+
+```
+6302ca375a5faf3efb757e2f9f7b8f82743debae
+```
+
+Pushed to feature branch. CLAUDE_LOG_V01.md visible on GitHub at this head.
+
+### PR readiness
+
+PR #3 marked ready for review via `gh pr ready 3`.
+Re-queried: `{"isDraft": false, "mergeable": "MERGEABLE", "mergedAt": null, "state": "OPEN"}`
+
+### Pre-merge main SHA
+
+```
+2eb4f95af728dec51c8b9430255ff1a88bc3bc5f
+```
+
+### Feature head merged
+
+```
+6302ca375a5faf3efb757e2f9f7b8f82743debae
+```
+
+### Merge execution
+
+```
+$ gh pr merge 3 --merge --delete-branch=false
+```
+
+Normal merge commit. Not squash, not rebase, not force. Feature branch preserved.
+
+### GitHub merge commit SHA
+
+```
+bb5de4b88fcaef7a72109ff3cdeb2d6c77588106
+```
+
+### Merge parents
+
+```
+parent 2eb4f95af728dec51c8b9430255ff1a88bc3bc5f  (main)
+parent 6302ca375a5faf3efb757e2f9f7b8f82743debae  (feature)
+```
+
+### PR merged state
+
+```json
+{"isDraft": false, "mergedAt": "2026-09-05T12:51:42Z", "state": "MERGED"}
+```
 
 ## Phase C — canonical main verification
 
-(Recorded after merge)
+### Main merge head
+
+```
+bb5de4b88fcaef7a72109ff3cdeb2d6c77588106
+```
+
+Merge contains feature head `6302ca3...` as second parent. PASS.
+
+### Godot version
+
+```
+4.7.1.stable.official.a13da4feb
+```
+
+### Root project verification
+
+```
+[OK] project.godot exists
+[OK] main scene exists
+[OK] main.gd exists
+[OK] headless Godot run — no errors
+Exit code: 0
+```
+
+### Root headless boot
+
+Clean exit. No errors.
+
+### Full merged-main Godot regression suite
+
+```
+Total checks: 657
+Failures: 0
+RESULT: ALL PASS
+```
+
+### Task truth on merged main
+
+- 943 unique canonical SB IDs
+- 196 completed
+- 747 remaining
+- 95 migrated UI/Magnific IDs (relative to pre-merge main)
+- 0 pre-merge completed tasks regressed
+
+### Visual truth on merged main
+
+- 51 inbox image files = 51 inventory records
+- 6 canonical references recorded (gameplay/Home/popup)
+- SHA/dimension/provenance inventory structurally valid
+- Scrubby master remains OWNER_REQUIRED
+
+### Additional verifications
+
+- M08 production-art tasks all `[ ]` — no overclaim
+- M12 remains AUDITED_PASS (11/11 complete)
+- No broad/final Magnific output (0 files)
+- No Higgsfield dependency (`disallowed_dependencies: ["higgsfield"]`)
+- No M13/LF00/CP00 implementation
 
 ## Phase D — canonical main reconciliation
 
-(Recorded after reconciliation commit)
+All coordination files updated to reflect merged-main truth.
+Post-merge reconciliation commit and final SHA recorded in external receipt
+per AL-025.
 
 ## Cycle state
 
