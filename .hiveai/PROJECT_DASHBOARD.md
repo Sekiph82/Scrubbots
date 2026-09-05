@@ -130,6 +130,21 @@ Tracking sources:
 - Next main-game milestone: **M13 Eligible Target Index**
 - M13 is not started yet.
 
+## Active main-game cycle
+
+| Field | Value |
+| --- | --- |
+| Cycle | M13-C001 |
+| Milestone | M13 - Eligible Target Index |
+| Version | V01 |
+| State | PLANNED |
+| Next actor | CLAUDE |
+| Prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V01.md |
+| Audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
+| Expected Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V01.md |
+| Scope | Eligible DIRTY target index/cache only; no TargetSelector or M14 reservation ownership |
+| First action | Safely sync local main with origin/main while preserving owner work |
+
 ## Project identity
 
 | Field | Value |
