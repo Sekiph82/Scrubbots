@@ -38,4 +38,4 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/C
 
 | Version | ChatGPT prompt | Audit criteria | Claude log | ChatGPT audit | State |
 | --- | --- | --- | --- | --- | --- |
-| V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md | PENDING | AWAITING_AUDIT |
+| V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_V01.md | AUDITED_PASS |
