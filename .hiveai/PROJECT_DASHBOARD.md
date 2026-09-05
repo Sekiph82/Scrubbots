@@ -15,13 +15,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Active cycle | META-C002 |
-| Active version | V02 |
+| Active version | V03 |
 | State | AWAITING_AUDIT |
 | Next actor | CHATGPT |
 | Branch | feature/master-ui-magnific-pipeline (PR #3) |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V02.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V02.md |
-| Purpose | META-C002 V02: Closed F-META-001..004. Per-file inventory (51 files, SHA-256, dimensions, classification). Canonical gameplay/Home/popup refs recorded. Manifest truth corrected. 11 tasks closed with evidence. Progress: 196/943 = 20.78%. 657/657 ALL PASS. Scrubby master OWNER_REQUIRED. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V03.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V03.md |
+| Purpose | META-C002 V03: Closed F-META-005 (validation 29–41 recorded individually with evidence) and F-META-006 (PR #3 body refreshed to current branch truth). V02 accepted baseline preserved. 196/943 = 20.78%. 657/657 ALL PASS. |
 
 ### Also active (on main)
 
@@ -85,13 +85,13 @@ Tracking sources:
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | OK — META-C002 V02 corrections complete, AWAITING_AUDIT |
+| Health | OK — META-C002 V03 merge-readiness corrections complete, AWAITING_AUDIT |
 | Current implementation frontier | META-C002 - Master UI + Magnific pipeline integration |
-| Current task | META-C002 V02 correction |
+| Current task | META-C002 V03 merge-readiness correction |
 | Current task ID | `META-C002` |
-| Current workflow state | `AWAITING_AUDIT` — V02 closed F-META-001..004. Per-file inventory, manifest truth, task reconciliation, progress recount complete. 657/657 ALL PASS. |
+| Current workflow state | `AWAITING_AUDIT` — V03 closed F-META-005 (validation traceability) and F-META-006 (PR body truth). V02 accepted baseline preserved. |
 | Required actor | CHATGPT |
-| Next project action | ChatGPT performs independent audit V02. |
+| Next project action | ChatGPT performs independent audit V03. |
 | Waiting on | Scrubby master reference: OWNER_REQUIRED. M08 production-art audit and M10 DIRTY/CLEAN preset remain owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/tasks.md |
 
@@ -102,14 +102,14 @@ Tracking sources:
 | Timestamp | 2026-09-05 |
 | Actor | CLAUDE |
 | Cycle | `META-C002` |
-| Session type | META-C002 V02 correction (merge main + close F-META-001..004) |
+| Session type | META-C002 V03 merge-readiness correction (F-META-005 + F-META-006) |
 | Cycle status | `AWAITING_AUDIT` |
-| Summary | Merged origin/main (M12-C001 AUDITED_PASS). Closed F-META-001..004: built per-file inventory (51 files, SHA-256, dimensions, classification), corrected manifest/reference truth, reconciled tasks.md (11 tasks closed), recounted progress (196/943 = 20.78%). 657/657 ALL PASS. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V02.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_CRITERIA_V02.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V01.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V02.md |
-| Next expected actor | CHATGPT (audit V02) |
+| Summary | Closed F-META-005: validation items 29–41 recorded individually with actual evidence in CLAUDE_LOG_V03. Closed F-META-006: PR #3 body replaced with current branch truth (95-task migration, 51 refs inventoried, 196/943 progress, Scrubby OWNER_REQUIRED, no Magnific generation). V02 accepted baseline preserved unchanged. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V03.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_CRITERIA_V03.md |
+| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V02.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V03.md |
+| Next expected actor | CHATGPT (audit V03) |
 
 ## Milestone summary
 
