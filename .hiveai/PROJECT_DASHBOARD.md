@@ -177,6 +177,23 @@ Tracking sources:
 - M14: **NOT_STARTED**
 - Owner requested manual-play/manual-QA before the next implementation cycle.
 
+## Active owner-locked gameplay rule migration
+
+| Field | Value |
+| --- | --- |
+| Cycle | META-C004 |
+| Version | V01 |
+| State | PLANNED |
+| Next actor | CLAUDE |
+| Branch | main |
+| Prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V01.md |
+| Criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_CRITERIA_V01.md |
+| Expected log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V01.md |
+| Baseline | M13-C001 AUDITED_PASS, 206/943 |
+| Owner rule | ACTIVE source-color pixels -> CLEARED transparent holes; background visible |
+| Reachability | matching color is not sufficient; blocked ACTIVE cells are not targetable |
+| Gate | M14 remains NOT_STARTED until META-C004 audit and new manual QA |
+
 ## Project identity
 
 | Field | Value |
