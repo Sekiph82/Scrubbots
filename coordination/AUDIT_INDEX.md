@@ -41,6 +41,8 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 
 | AL-025 | Self-referential Git evidence | A Git-tracked evidence file cannot stably contain the SHA of the final commit that contains that same file; writing the SHA changes the commit. | Keep pre-commit evidence in CLAUDE_LOG_VNN. Put exact post-push final SHA/remote-head/status in a non-Git-mutating GitHub receipt, then independently verify it. | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V04.md |
 
+| AL-026 | Local owner-work preservation | A pre-existing tracked modification/deletion is owner/local work until proven otherwise; restoring it from origin merely to get a clean tree can erase owner intent. | Record and preserve pre-existing tracked/untracked changes; never git-restore/reset them for cleanliness. If they block safe sync/work, fail closed as BLOCKED. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V01.md |
+
 ## Audit history
 
 | Cycle | ChatGPT audit | Final/current state | Reusable learning |
@@ -57,6 +59,8 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | META-C002 | V01: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V02.md; V03: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V03.md; V04: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V04.md; V05: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V05.md | `AUDITED_PASS` | Final V05 verified AL-025 external receipt; PR #3 authorized for controlled merge cycle META-C003. |
 
 | META-C003 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_V01.md | `AUDITED_PASS` | Controlled merge + canonical-main reconciliation accepted; AL-025 receipt pattern validated for merge cycles. |
+
+| M13-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V01.md | `CHANGES_REQUIRED` | Added AL-026; accepted 001/002/004/005, reopened 003 and 006..010 for V02. |
 
 ## Claude usage rule
 

@@ -377,3 +377,16 @@ commit that contains itself.
 The versioned log records pre-commit evidence. After push, when exact final
 SHA evidence is required, use the prompt-specified external GitHub receipt
 (PR comment for PR cycles) and do not create another commit after the receipt.
+
+
+## Preserve pre-existing tracked local work [LOCKED]
+
+A pre-existing tracked modification or deletion in the owner's working tree is
+owner/local work until explicitly proven otherwise.
+
+Do not use `git restore`, checkout-from-origin, reset, clean, or equivalent
+commands merely to make the tree clean before a task.
+
+Record and preserve such changes. Do not stage them unless the active prompt
+explicitly owns them. If they prevent safe synchronization or implementation,
+fail closed as `BLOCKED` rather than overwriting owner intent.
