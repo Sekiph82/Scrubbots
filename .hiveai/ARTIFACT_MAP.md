@@ -2,6 +2,13 @@
 
 Derived artifact map. Not task truth.
 
+## META-C002
+
+| Version | ChatGPT prompt | Audit criteria | Claude log | ChatGPT audit | State |
+| --- | --- | --- | --- | --- | --- |
+| V01 | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V01.md | PENDING | AWAITING_AUDIT |
+
+
 ## M11-C001
 
 | Version | ChatGPT prompt | Audit criteria | Claude log | ChatGPT audit | State |
