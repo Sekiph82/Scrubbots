@@ -58,6 +58,18 @@ Tracking sources:
 | Logging rule | GitHub-only; no Desktop phase/handoff log |
 | Result | SlotState + SlotSystem implemented, 667/667 ALL PASS |
 
+## M12-C001 independent audit V01
+
+- Status: **CHANGES_REQUIRED**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V01.md
+- Finding: **F-M12-001** — `get_slot()` leaks mutable internally owned SlotState,
+  allowing callers to bypass palette validation via direct `set_palette_id()`.
+- Active correction prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V02.md
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V02.md
+- Reopened: SB-M12-003, 005, 009, 010, 011.
+- Current ecosystem progress: **180 / 848 = 21.23%**.
+- Main-game progress: **180 / 624 = 28.85%**.
+
 ## Project identity
 
 | Field | Value |

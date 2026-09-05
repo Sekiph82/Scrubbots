@@ -30,6 +30,8 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 
 | AL-019 | Coordination evidence mapping | Prompt-scoped implementation evidence must be version-addressable. | Require `CHATGPT_PROMPT_VNN.md -> CLAUDE_LOG_VNN.md`; verify the matching GitHub log before auditing a prompt version. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V04.md |
 
+| AL-020 | Encapsulation / validated state ownership | Validation at a manager/system boundary is ineffective if public query APIs leak mutable references to internally owned state. | Test the bypass path directly; callers must not be able to mutate validated internal truth outside the owning system's validated mutation path. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V01.md |
+
 ## Audit history
 
 | Cycle | ChatGPT audit | Final/current state | Reusable learning |
@@ -40,6 +42,8 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | M09-C002 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V02.md; V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V03.md | `AUDITED_PASS` | V01 added AL-014..016; V02 added AL-017; V03 independently verified destination-object-type preflight and closed M09-C002. |
 
 | M11-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V02.md; V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V03.md; V04: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V04.md | `AUDITED_PASS` | V03 closed F-M11-001 with direct renderer observability. V04 normalized versioned evidence and added AL-019. |
+
+| M12-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V01.md | `CHANGES_REQUIRED` | Added AL-020: mutable internal SlotState leakage bypasses SlotSystem palette validation. |
 
 ## Claude usage rule
 

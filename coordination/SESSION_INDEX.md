@@ -19,7 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M12-C001 | M12 - Five-Slot Logic | 2026-09-05 | 2026-09-05 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V01.md | PENDING | SB-M12-001..011 | SlotState + SlotSystem implemented. 5-slot invariant, palette validation, availability/activity independence. 667/667 ALL PASS (548 prior + 119 new). Next actor CHATGPT. |
+| M12-C001 | M12 - Five-Slot Logic | 2026-09-05 | 2026-09-05 | `CHANGES_REQUIRED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V01.md | SB-M12-001..011 | Audit V01 found F-M12-001: get_slot() leaks mutable internal SlotState and bypasses palette validation. Narrow V02 encapsulation correction active; next actor CLAUDE. |
 | M11-C001 | M11 - Gameplay Session Core | 2026-09-04 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V04.md | SB-M11-001..012 | M11 final pass. V03 independently closed renderer regression gap; V04 versioned logs/H!ve mapping audited clean. |
 | M09-C002 | M09 - Batch Import / Validation / Duplicate IDs | 2026-09-03 | 2026-09-04 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V03.md | SB-M09-018..020 | Final audit V03 closed F-M09B-006. Batch import/validation/duplicate-ID tooling is independently accepted; M09 is complete. |
 | M09-C001 | M09 - Pixel Art to Level Data Importer Core | 2026-08-27 | 2026-09-03 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md | SB-M09-001..017 | Exact-pixel importer core and safety hardening independently audited pass. |
@@ -157,3 +157,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Scope: SB-M12-001..011 only.
 - First action: safe local repository synchronization with origin/main.
 - Durable evidence: GitHub only; no Desktop phase/handoff log.
+
+
+### M12-C001 ChatGPT independent audit V01
+
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V01.md
+- Decision: `CHANGES_REQUIRED`.
+- Finding F-M12-001: `get_slot()` leaks internally owned mutable SlotState,
+  allowing `set_palette_id()` to bypass SlotSystem validation.
+- Reopened SB-M12-003/005/009/010/011.
+- Active correction prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V02.md
+- Expected log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V02.md
