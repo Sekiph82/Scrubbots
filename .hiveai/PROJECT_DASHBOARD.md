@@ -145,6 +145,19 @@ Tracking sources:
 | Scope | Eligible DIRTY target index/cache only; no TargetSelector or M14 reservation ownership |
 | Result | SB-M13-001..010 closed. 729/729 ALL PASS (72 new M13 checks). 206/943 = 21.85%. |
 
+## M13-C001 independent audit V01
+
+- Status: **CHANGES_REQUIRED**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V01.md
+- Accepted complete: **SB-M13-001, 002, 004, 005**
+- Open V02: **SB-M13-003, 006, 007, 008, 009, 010**
+- F-M13-001: strengthen no-rescan spy to observe all relevant BoardState traversal APIs.
+- F-M13-002: 006..010 were early due to ChatGPT V01 scope error; preserve provisional work, formally validate in V02.
+- F-M13-003: preserve pre-existing tracked owner/local changes; never git-restore them just to clean the tree.
+- Current canonical progress: **200 / 943 = 21.21%**
+- Active V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V02.md
+- Expected log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V02.md
+
 ## Project identity
 
 | Field | Value |
