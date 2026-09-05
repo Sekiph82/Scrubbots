@@ -68,7 +68,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 
 | M13-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 added AL-026 and reopened scan observability/remaining formal scope; V02 closes findings and completes M13. |
 
-| META-C004 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md | `CHANGES_REQUIRED` | Core ACTIVE/CLEARED migration accepted; V02 required for M48, Project Brief semantic residue, and real AL-025 receipt. Added AL-029/030. |
+| META-C004 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 accepted core migration and added AL-029/030; V02 closes M48/Project Brief/receipt findings. ACTIVE/CLEARED final canonical truth. |
 
 ## Claude usage rule
 
