@@ -234,11 +234,20 @@ PR #3 remains draft and unmerged. PASS.
 
 This log-finalization commit records the evidence commit SHA and all push verification evidence. The finalization commit SHA is the final remote head after the finalization push.
 
-Finalization commit SHA: PENDING (recorded after commit)
+Finalization commit SHA: `9cdc708eaa118dc7e2cfbf51fdeba492518bb388`
+
+### Summary of both V04 SHAs
+
+| Commit | Full SHA | Role |
+| --- | --- | --- |
+| V04 evidence commit | `e46803bf31f30a9c84f44338352341a55fddf47c` | Main V04 work: CLAUDE_LOG_V04 + coordination updates |
+| V04 log-finalization commit | `9cdc708eaa118dc7e2cfbf51fdeba492518bb388` | Appends concrete post-commit/push evidence to log |
+
+The log-finalization commit is the final remote head after the final push.
 
 ### Final push and remote head
 
-PENDING (recorded after finalization push)
+PENDING (recorded after final push — see below)
 
 ---
 
