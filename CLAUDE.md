@@ -367,3 +367,13 @@ pipeline. For UI/visual work, also read `docs/MASTER_UI_SYSTEM.md`,
     explicitly promoted.
 55. `ASSET_GENERATION_MANIFEST.json` is the machine-readable generation queue.
     Do not generate assets whose status/reference prerequisites are not met.
+
+
+## Non-self-referential final SHA rule [LOCKED]
+
+Do not repeatedly commit a Claude log merely to make it contain the SHA of the
+commit that contains itself.
+
+The versioned log records pre-commit evidence. After push, when exact final
+SHA evidence is required, use the prompt-specified external GitHub receipt
+(PR comment for PR cycles) and do not create another commit after the receipt.

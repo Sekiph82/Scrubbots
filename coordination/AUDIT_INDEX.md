@@ -39,6 +39,8 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 
 | AL-024 | Commit/push provenance | Saying “commit pushed” without the actual full commit SHA and final remote-head SHA is insufficient when a prompt explicitly requires version-addressable Git evidence. | Record concrete SHAs only after they exist; if log finalization creates another commit, record the chain and final remote head. | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V03.md |
 
+| AL-025 | Self-referential Git evidence | A Git-tracked evidence file cannot stably contain the SHA of the final commit that contains that same file; writing the SHA changes the commit. | Keep pre-commit evidence in CLAUDE_LOG_VNN. Put exact post-push final SHA/remote-head/status in a non-Git-mutating GitHub receipt, then independently verify it. | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V04.md |
+
 ## Audit history
 
 | Cycle | ChatGPT audit | Final/current state | Reusable learning |
@@ -52,7 +54,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 
 | M12-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 added AL-020; V02 verified encapsulation correction and closed M12. |
 
-| META-C002 | V01: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V02.md; V03: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V03.md | `CHANGES_REQUIRED` | V03 closed PR-body truth but added AL-024 for exact commit/push provenance. |
+| META-C002 | V01: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V02.md; V03: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V03.md; V04: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V04.md | `CHANGES_REQUIRED` | V04 exposed self-referential SHA protocol defect; AL-025 replaces it with external post-push receipt evidence. |
 
 ## Claude usage rule
 

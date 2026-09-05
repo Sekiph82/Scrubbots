@@ -81,6 +81,18 @@ Tracking sources:
 - Progress unchanged: **196 / 943 = 20.78%**.
 - PR #3 remains draft/unmerged.
 
+## META-C002 independent audit V04
+
+- Status: **CHANGES_REQUIRED**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V04.md
+- V04 implementation/task/inventory/UI baseline: **PASS**
+- Remaining issue: self-referential final-SHA logging rule is impossible by construction.
+- New rule AL-025: final post-push SHA/status goes in a non-Git-mutating PR receipt.
+- Active V05: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V05.md
+- Expected log: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V05.md
+- Progress unchanged: **196 / 943 = 20.78%**.
+- PR #3 remains draft/unmerged.
+
 ## Project identity
 
 | Field | Value |
