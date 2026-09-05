@@ -40,3 +40,11 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - V02 changes are wording/evidence corrections only and must not change task
   completion count.
 - M10-005..011 remain OPEN for owner manual QA.
+
+### META-C004 V02 correction (AWAITING_AUDIT)
+
+- M48 QA wording migrated (ACTIVE/CLEARED + blocked-reachability), Project
+  Brief "obscured" → visible/ACTIVE, AL-025 external commit-comment receipt.
+- No task IDs added/changed; no production code/test change. Recomputed from
+  tasks.md: **207 / 943** unchanged (main+UI 207/719, LF 0/112, CP 0/112).
+- M10-005..011, M02-017, M14/M15/M16/M17 implementation gates remain open.
