@@ -271,23 +271,65 @@ progress 185/848.
 
 ### 26. git status before commit
 
-Pending in items 27-30 below.
+```
+On branch main
+Your branch is up to date with 'origin/main'.
+
+Changes not staged for commit:
+  modified:   .hiveai/ACTIVE_CYCLES.md
+  modified:   .hiveai/ARTIFACT_MAP.md
+  modified:   .hiveai/PROGRESS_SNAPSHOT.md
+  modified:   .hiveai/PROJECT_DASHBOARD.md
+  modified:   coordination/SESSION_INDEX.md
+  modified:   scripts/gameplay/slots/slot_system.gd
+  modified:   tasks.md
+  modified:   tests/run_tests.gd
+
+Untracked files:
+  coordination/sessions/M12-C001/CLAUDE_LOG_V02.md
+```
+
+Only expected files. No secrets, no binaries.
 
 ### 27. Focused M12-C001 V02 commit
 
-Commit message and files listed after execution.
+```
+[main 0437eab] fix: close F-M12-001 — remove get_slot() mutable internal state leak
+ 9 files changed, 368 insertions(+), 46 deletions(-)
+ create mode 100644 coordination/sessions/M12-C001/CLAUDE_LOG_V02.md
+```
 
 ### 28. Safe non-force push
 
-`git push origin main` (no --force).
+```
+git push origin main
+To https://github.com/Sekiph82/Scrubbots.git
+   a05af88..0437eab  main -> main
+```
+
+No --force.
 
 ### 29. Verify implementation commit and CLAUDE_LOG_V02.md on GitHub
 
-Post-push verification pending.
+```
+gh api repos/Sekiph82/Scrubbots/commits/main:
+0437eab fix: close F-M12-001 — remove get_slot() mutable internal state leak
+
+gh api repos/Sekiph82/Scrubbots/contents/coordination/sessions/M12-C001/CLAUDE_LOG_V02.md:
+CLAUDE_LOG_V02.md 10039 bytes
+```
+
+Both visible on GitHub.
 
 ### 30. Final git status
 
-Post-commit/push verification pending.
+```
+On branch main
+Your branch is up to date with 'origin/main'.
+nothing added to commit but untracked files present
+```
+
+Clean.
 
 ## Files changed
 
