@@ -172,41 +172,73 @@ $ git diff --check
 
 ### V04 evidence commit
 
-SHA: `PENDING_FIRST_COMMIT`
+SHA: `e46803bf31f30a9c84f44338352341a55fddf47c`
 
-### Log-finalization commit (if needed)
+### Log-finalization commit
 
-SHA: `PENDING_FINALIZATION`
+SHA: recorded below after this append + amend cycle.
 
-### Push evidence
+Note: per prompt §Important logging mechanics, a finalization commit is created
+to record the evidence commit SHA and push verification in this log. Both SHAs
+are recorded. The finalization commit SHA is the final remote head.
 
-```
-PENDING_PUSH
-```
-
-### Final remote head SHA
+### Evidence commit push
 
 ```
-PENDING_REMOTE_HEAD
+$ git push origin feature/master-ui-magnific-pipeline
+To https://github.com/Sekiph82/Scrubbots.git
+   391391e..e46803b  feature/master-ui-magnific-pipeline -> feature/master-ui-magnific-pipeline
 ```
 
-### Remote head equals final commit SHA
+Safe non-force push. No `--force`, no rewrite.
 
-PENDING_VERIFICATION
-
-### CLAUDE_LOG_V04.md GitHub visibility
-
-PENDING_VERIFICATION
-
-### Final `git status --short`
+### Remote head after evidence push
 
 ```
-PENDING_FINAL_STATUS
+$ git rev-parse origin/feature/master-ui-magnific-pipeline
+e46803bf31f30a9c84f44338352341a55fddf47c
 ```
 
-### PR #3 post-push state
+Remote head equals evidence commit SHA. PASS.
 
-PENDING_VERIFICATION
+### CLAUDE_LOG_V04.md GitHub visibility after evidence push
+
+```
+$ gh api repos/Sekiph82/Scrubbots/contents/coordination/sessions/META-C002/CLAUDE_LOG_V04.md?ref=feature/master-ui-magnific-pipeline --jq '.name, .size, .sha'
+CLAUDE_LOG_V04.md
+6337
+c282c0293d6b9d2dbc897f592cdab5882e23e9e0
+```
+
+Visible on GitHub at evidence commit head. PASS.
+
+### git status --short after evidence push
+
+```
+ M coordination/sessions/META-C002/CLAUDE_LOG_V04.md
+?? "C\357\200\272UserssekipAppDataLocalTempclaudeC--Users-sekip-Desktop-ScrubBotsf45fd403-ec4d-419b-ae29-35486246c34cscratchpadb64.txt"
+?? docs/logs/
+```
+
+Only modified file is this log (local append of post-commit evidence). Untracked paths unchanged from pre-V04 state.
+
+### PR #3 post-evidence-push state
+
+```json
+{"draft": true, "mergedAt": null}
+```
+
+PR #3 remains draft and unmerged. PASS.
+
+### Finalization commit
+
+This log-finalization commit records the evidence commit SHA and all push verification evidence. The finalization commit SHA is the final remote head after the finalization push.
+
+Finalization commit SHA: PENDING (recorded after commit)
+
+### Final push and remote head
+
+PENDING (recorded after finalization push)
 
 ---
 
