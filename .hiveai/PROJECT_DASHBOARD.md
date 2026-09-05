@@ -14,18 +14,18 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Active cycle | M11-C001 |
-| Active version | V04 |
+| Active cycle | M12-C001 |
+| Active version | V01 |
 | State | AWAITING_AUDIT |
 | Next actor | CHATGPT |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V04.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V04.md |
-| Purpose | V04 normalization complete. CLAUDE_LOG_V01/V02/V03 backfilled, V04 created, H!ve tracking updated. Renderer correction (548/548) already implemented in V02/V03. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V01.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V01.md |
+| Purpose | M12 Five-Slot Logic: SlotState + SlotSystem implemented. 5-slot invariant, palette validation, availability/activity independence. 667/667 ALL PASS. |
 
 ### Current progress from tasks.md
 
-- Ecosystem: **174 / 848 = 20.52%**
-- Main game: **174 / 624 = 27.88%**
+- Ecosystem: **185 / 848 = 21.82%**
+- Main game: **185 / 624 = 29.65%**
 - Level Factory: **0 / 112 = 0.00%**
 - Content Pipeline: **0 / 112 = 0.00%**
 
@@ -50,13 +50,13 @@ Tracking sources:
 | Cycle | M12-C001 |
 | Milestone | M12 - Five-Slot Logic |
 | Version | V01 |
-| State | PLANNED |
-| Next actor | CLAUDE |
+| State | AWAITING_AUDIT |
+| Next actor | CHATGPT |
 | Prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V01.md |
 | Audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
-| Expected Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V01.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V01.md |
 | Logging rule | GitHub-only; no Desktop phase/handoff log |
-| First action | Safely sync local repository with origin/main while preserving owner work |
+| Result | SlotState + SlotSystem implemented, 667/667 ALL PASS |
 
 ## Project identity
 
@@ -74,13 +74,13 @@ Tracking sources:
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | OK — M11-C001 V04 normalization complete; AWAITING_AUDIT for ChatGPT |
-| Current implementation frontier | M11 - Gameplay Session Core |
-| Current task | M11-C001 - V04 Versioned Log Normalization |
-| Current task ID | `M11-C001` |
-| Current workflow state | `AWAITING_AUDIT` — V04 normalization done. Renderer correction (V02/V03) already implemented with 548/548 ALL PASS. Versioned logs V01-V04 created. |
+| Health | OK — M12-C001 implementation complete; AWAITING_AUDIT for ChatGPT |
+| Current implementation frontier | M12 - Five-Slot Logic |
+| Current task | M12-C001 - Five-Slot Logic V01 |
+| Current task ID | `M12-C001` |
+| Current workflow state | `AWAITING_AUDIT` — SlotState + SlotSystem implemented. 5-slot invariant, palette validation, availability/activity independence, 119 new tests. 667/667 ALL PASS. |
 | Required actor | CHATGPT |
-| Next project action | ChatGPT performs independent audit V04 covering both the renderer correction and the log normalization. |
+| Next project action | ChatGPT performs independent audit V01 on five-slot data/model implementation. |
 | Waiting on | M08 production-art audit and remaining M07 visual inventory tasks require owner-supplied SCRUBBOTS artwork. M10 final DIRTY/CLEAN preset remains owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -88,23 +88,24 @@ Tracking sources:
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-09-04 |
+| Timestamp | 2026-09-05 |
 | Actor | CLAUDE |
-| Cycle | `M11-C001` |
-| Session type | V04 versioned log normalization |
+| Cycle | `M12-C001` |
+| Session type | M12 Five-Slot Logic implementation |
 | Cycle status | `AWAITING_AUDIT` |
-| Summary | Normalized M11-C001 to coordination/v4. Backfilled CLAUDE_LOG_V01/V02/V03 from real legacy evidence. Created CLAUDE_LOG_V04. Updated H!ve tracking (ACTIVE_CYCLES, ARTIFACT_MAP, PROGRESS_SNAPSHOT). Progress recalculated: 174/848 ecosystem (20.52%), 174/624 main (27.88%). No gameplay/test/renderer changes. Legacy CLAUDE_IMPLEMENTATION_LOG.md preserved. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V04.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V04.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V02.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V04.md |
+| Summary | Implemented SlotState + SlotSystem (RefCounted, AL-001 preload, 5-slot invariant). Palette validation against explicit boundary, duplicate IDs allowed. Availability/activity independent per-slot. 119 new test checks covering all 18 required categories. 667/667 ALL PASS. No GameplaySession/renderer/board changes. M10 gate preserved. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V01.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
+| Latest ChatGPT audit | PENDING |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V01.md |
 | Next expected actor | CHATGPT |
 
 ## Current work
 
 | ID | Item | Status | Owner/actor | Evidence/source |
 | --- | --- | --- | --- | --- |
-| M11-C001 | Gameplay Session Core | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_IMPLEMENTATION_LOG.md |
+| M12-C001 | Five-Slot Logic | `AWAITING_AUDIT` | CHATGPT | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V01.md |
+| M11-C001 | Gameplay Session Core | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V04.md |
 | M09-C002 | Batch import / validation / duplicate-ID tooling | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V03.md |
 | M09-C001 | Exact-pixel single importer + safety hardening | `AUDITED_PASS` | COMPLETE | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md |
 | M08 | Level Art Technical Audit | `BLOCKED_ON_OWNER_ASSET` | HUMAN supplies production art | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
@@ -260,8 +261,9 @@ Non-goals remain locked:
 | M08 | Level Art Technical Audit | BLOCKED_ON_OWNER_ASSET |
 | M09 | Pixel Art to Level Data Pipeline | COMPLETE |
 | M10 | Dirty/Clean Visual Model | OWNER_REQUIRED / PARTIAL infrastructure |
-| M11 | Gameplay Session Core | AWAITING_AUDIT - M11-C001 V02/V03 correction implemented, 548/548 ALL PASS |
-| M12-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
+| M11 | Gameplay Session Core | AUDITED_PASS - 12/12 tasks, 548/548 ALL PASS |
+| M12 | Five-Slot Logic | AWAITING_AUDIT - 11/11 tasks, 667/667 ALL PASS |
+| M13-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 
 ## Dashboard integrity rules
 
