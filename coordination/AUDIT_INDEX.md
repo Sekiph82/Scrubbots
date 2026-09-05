@@ -35,6 +35,8 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | AL-021 | Derived progress counting | Task progress must be computed from unique canonical SB task IDs, not approximate task-line counts or stale branch baselines. | Compare canonical ID sets across branches before migration/merge; report branch-specific totals when a feature branch adds tasks. | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V01.md |
 | AL-022 | Visual reference intake truth | Copying owner references into the repo is not enough if machine-readable inventory/availability still says the categories are missing. | After intake, persist per-file provenance/hash/dimensions/classification and reconcile category availability, manifest state and tasks.md without promoting reference/external art to production-original status. | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V01.md |
 
+| AL-023 | PR summary truth | A truthful follow-up PR comment does not fully cure a materially stale PR body when the body still describes completed migration/intake work as pending. | Before merge, refresh the PR body to current implementation, validation, blockers and progress truth. | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V02.md |
+
 ## Audit history
 
 | Cycle | ChatGPT audit | Final/current state | Reusable learning |
@@ -48,7 +50,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 
 | M12-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 added AL-020; V02 verified encapsulation correction and closed M12. |
 
-| META-C002 | V01: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V01.md | `CHANGES_REQUIRED` | Added AL-021/022 for branch-aware task counting and durable visual-intake truth. |
+| META-C002 | V01: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V02.md | `CHANGES_REQUIRED` | V01 added AL-021/022; V02 accepted substantive truth fixes and added AL-023 for PR-body truth. |
 
 ## Claude usage rule
 
