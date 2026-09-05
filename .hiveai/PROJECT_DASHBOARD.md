@@ -167,6 +167,16 @@ Tracking sources:
 - 44 new V02 checks; full suite **773 / 773 ALL PASS**. SB-M13-001..010 closed.
 - Canonical progress restored: **206 / 943 = 21.85%**. Next actor CHATGPT.
 
+## M13-C001 final independent audit V02
+
+- Status: **AUDITED_PASS**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V02.md
+- M13: **10 / 10 complete**
+- Canonical progress: **206 / 943 = 21.85%**
+- Main game + UI: **206 / 719 = 28.65%**
+- M14: **NOT_STARTED**
+- Owner requested manual-play/manual-QA before the next implementation cycle.
+
 ## Project identity
 
 | Field | Value |
