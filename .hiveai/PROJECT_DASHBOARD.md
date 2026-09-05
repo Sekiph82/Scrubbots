@@ -15,13 +15,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Active cycle | M13-C001 |
-| Active version | V01 |
+| Active version | V02 |
 | State | AWAITING_AUDIT |
 | Next actor | CHATGPT |
 | Branch | main |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V01.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V01.md |
-| Purpose | M13-C001 V01: Eligible Target Index implemented (color-grouped DIRTY-cell query/cache over BoardState). SB-M13-001..010 closed. 729/729 ALL PASS (72 new M13 checks). Canonical main 206/943 = 21.85%. No TargetSelector/RoutingSystem/reservation ownership. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V02.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V02.md |
+| Purpose | M13-C001 V02: completed reopened SB-M13-003/006..010 + revalidated 001/002/004/005. F-M13-001 scan observability strengthened (all 4 BoardState traversal APIs, zero steady-state delta). 773/773 ALL PASS. SB-M13-001..010 closed. 206/943 = 21.85%. |
 
 ### Also active (on main)
 
@@ -136,14 +136,14 @@ Tracking sources:
 | --- | --- |
 | Cycle | M13-C001 |
 | Milestone | M13 - Eligible Target Index |
-| Version | V01 |
+| Version | V02 |
 | State | AWAITING_AUDIT |
 | Next actor | CHATGPT |
-| Prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V01.md |
-| Audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V01.md |
+| Prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V02.md |
+| Audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V02.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V02.md |
 | Scope | Eligible DIRTY target index/cache only; no TargetSelector or M14 reservation ownership |
-| Result | SB-M13-001..010 closed. 729/729 ALL PASS (72 new M13 checks). 206/943 = 21.85%. |
+| Result | V02: F-M13-001 fixed (all-traversal-API zero-delta proof) + 006..010 formally validated. SB-M13-001..010 closed. 773/773 ALL PASS. 206/943 = 21.85%. |
 
 ## M13-C001 independent audit V01
 
@@ -154,9 +154,18 @@ Tracking sources:
 - F-M13-001: strengthen no-rescan spy to observe all relevant BoardState traversal APIs.
 - F-M13-002: 006..010 were early due to ChatGPT V01 scope error; preserve provisional work, formally validate in V02.
 - F-M13-003: preserve pre-existing tracked owner/local changes; never git-restore them just to clean the tree.
-- Current canonical progress: **200 / 943 = 21.21%**
+- Canonical progress at audit V01 (six tasks reopened): **200 / 943 = 21.21%**
 - Active V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V02.md
 - Expected log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V02.md
+
+## M13-C001 V02 implementation (AWAITING_AUDIT)
+
+- F-M13-001 fixed: scan spy now counts all four BoardState traversal APIs (`get_cell_count`, `is_valid_index`, `get_color_id`, `get_cell_state`); steady-state `get_eligible`/`has_work`/`count_eligible` add zero traversal reads; sensitivity check proves a full-board color loop moves the counter.
+- F-M13-003/AL-026 honored: no pre-existing tracked owner change existed; nothing restored/reset/overwritten/staged.
+- SB-M13-006..010 formally validated (exclusion robustness, no-work matrix, incremental + rebuild exhaustion, last-target lifecycle, 3,481-cell exclusion non-mutation).
+- Production `eligible_target_index.gd` unchanged; accepted V01 code reused.
+- 44 new V02 checks; full suite **773 / 773 ALL PASS**. SB-M13-001..010 closed.
+- Canonical progress restored: **206 / 943 = 21.85%**. Next actor CHATGPT.
 
 ## Project identity
 
@@ -174,13 +183,13 @@ Tracking sources:
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | OK — M13-C001 implemented, AWAITING_AUDIT |
+| Health | OK — M13-C001 V02 implemented, AWAITING_AUDIT |
 | Current implementation frontier | M13-C001 - Eligible Target Index |
-| Current task | M13-C001 V01 eligible target index implementation |
+| Current task | M13-C001 V02 audit-correction + remaining M13 completion |
 | Current task ID | `M13-C001` |
-| Current workflow state | `AWAITING_AUDIT` — Eligible Target Index implemented. 729/729 ALL PASS (72 new M13 checks incl. 59x59/3,481-cell correctness + spy-verified no-per-query-rescan + CPU/index benchmark). SB-M13-001..010 closed. 206/943 canonical main truth. |
+| Current workflow state | `AWAITING_AUDIT` — V02: F-M13-001 scan observability strengthened (all 4 BoardState traversal APIs, zero steady-state delta + sensitivity check); SB-M13-006..010 formally validated; 001/002/004/005 revalidated. 773/773 ALL PASS (44 new V02 checks). SB-M13-001..010 closed. 206/943 canonical main truth. |
 | Required actor | CHATGPT |
-| Next project action | ChatGPT performs independent audit M13-C001 V01. |
+| Next project action | ChatGPT performs independent audit M13-C001 V02. |
 | Waiting on | Scrubby master reference: OWNER_REQUIRED. M08 production-art audit and M10 DIRTY/CLEAN preset remain owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -191,14 +200,14 @@ Tracking sources:
 | Timestamp | 2026-09-05 |
 | Actor | CLAUDE |
 | Cycle | `M13-C001` |
-| Session type | M13-C001 V01 Eligible Target Index implementation |
+| Session type | M13-C001 V02 audit-correction + remaining M13 completion |
 | Cycle status | `AWAITING_AUDIT` |
-| Summary | Implemented `scripts/gameplay/routing/eligible_target_index.gd` — color-grouped DIRTY-cell query/cache over one BoardState. Eligibility = valid+DIRTY+color+not-caller-excluded. Reservation seam is per-query caller-supplied exclusion only; no RESERVED state, no reservation ownership (M14/M02-017 stay open). No TargetSelector/RoutingSystem/dispatch/agent. 72 new M13 checks; full suite 729/729 ALL PASS (baseline 657/657). Benchmark: indexed query ~0.0005 ms vs naive full-scan ~4.7 ms (CPU/index only). SB-M13-001..010 closed. 206/943 = 21.85%. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V01.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_V01.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V01.md |
-| Next expected actor | CHATGPT (audit META-C003 V01) |
+| Summary | V02 completes reopened SB-M13-003/006..010 and revalidates 001/002/004/005. F-M13-001 fixed: `board_state_scan_spy.gd` counts all four BoardState traversal APIs; steady-state get_eligible/has_work/count_eligible add zero traversal reads (present/absent/excluded) with a sensitivity check that a full-board color loop moves the counter. SB-M13-006..010 formally validated (exclusion robustness, no-work matrix, incremental + rebuild exhaustion, last-target lifecycle, 3,481-cell exclusion non-mutation, detached get_color_ids). Production `eligible_target_index.gd` unchanged (V01 code reused). AL-026 honored: no owner change restored/reset/staged. 44 new checks; full suite 773/773 ALL PASS. SB-M13-001..010 closed. 206/943 = 21.85%. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V02.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V02.md |
+| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V01.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V02.md |
+| Next expected actor | CHATGPT (audit M13-C001 V02) |
 
 ## Milestone summary
 
@@ -213,7 +222,7 @@ Tracking sources:
 | M10 | Dirty/Clean Visual Model | OWNER_REQUIRED / PARTIAL infrastructure |
 | M11 | Gameplay Session Core | AUDITED_PASS - 12/12 tasks, 548/548 ALL PASS |
 | M12 | Five-Slot Logic | AUDITED_PASS - 11/11 tasks, 657/657 ALL PASS |
-| M13 | Eligible Target Index | AWAITING_AUDIT - 10/10 tasks, 729/729 ALL PASS |
+| M13 | Eligible Target Index | AWAITING_AUDIT - 10/10 tasks (V02), 773/773 ALL PASS |
 | M14-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 
 ## Dashboard integrity rules

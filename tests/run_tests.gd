@@ -2340,22 +2340,164 @@ func _run_eligible_target_index_tests() -> void:
 	_check_eq(rect_idx.get_eligible(0), [0, 2, 4, 6, 8, 10, 12, 14], "M13-22 rectangular even indices color 0")
 	_check_eq(rect_idx.get_eligible(1), [1, 3, 5, 7, 9, 11, 13], "M13-22 rectangular odd indices color 1")
 
-	# --- T23: steady-state query does not full-scan the board ---
-	# Observability: replace board with a spy that counts get_cell_state calls,
-	# rebuild once, then run repeated queries and prove no per-query rescan.
+	# --- T23 (F-M13-001 corrected): steady-state queries touch ZERO BoardState
+	# traversal APIs. Spy counts get_cell_count / is_valid_index / get_color_id /
+	# get_cell_state; build may scan, but repeated get_eligible/has_work/
+	# count_eligible must add zero traversal reads across ALL those APIs — so a
+	# future `for i in board.get_cell_count(): board.get_color_id(i)` regression
+	# is caught even if it never calls get_cell_state().
 	var spy = load("res://tests/support/board_state_scan_spy.gd").new()
 	spy.setup([0, 1, 0, 1, 0, 2], 3, 2)
 	var idx5 = EligibleTargetIndex.create()
-	idx5.bind(spy) # build scans once
-	var after_build: int = spy.scan_count
-	_check(after_build >= 6, "M13-23 build performed a full scan (>= cell count)")
-	for _q in 100:
-		idx5.get_eligible(0)
-		idx5.has_work(1)
-	_check_eq(spy.scan_count, after_build, "M13-23 100 steady-state queries added zero board scans")
+	idx5.bind(spy) # build performs the one allowed scan
+	var build_reads: int = spy.traversal_reads()
+	_check(spy.count_get_cell_state >= 6, "M13-23 build scanned cell states (>= cell count)")
+	_check(build_reads >= 6, "M13-23 build registered board traversal reads")
 
-	# --- T24 covered by full regression suite result (see summary) ---
+	# item 16: repeated get_eligible adds zero traversal
+	spy.reset_counters()
+	for _q in 200:
+		idx5.get_eligible(0)
+	_check_eq(spy.traversal_reads(), 0, "M13-23 200x get_eligible added zero BoardState traversal reads")
+
+	# item 17: repeated has_work adds zero traversal
+	spy.reset_counters()
+	for _q in 200:
+		idx5.has_work(1)
+	_check_eq(spy.traversal_reads(), 0, "M13-23 200x has_work added zero BoardState traversal reads")
+
+	# item 18: repeated count_eligible adds zero traversal
+	spy.reset_counters()
+	for _q in 200:
+		idx5.count_eligible(0)
+	_check_eq(spy.traversal_reads(), 0, "M13-23 200x count_eligible added zero BoardState traversal reads")
+
+	# item 19: absent-color query adds zero traversal
+	spy.reset_counters()
+	for _q in 200:
+		idx5.get_eligible(99)
+		idx5.has_work(99)
+		idx5.count_eligible(99)
+	_check_eq(spy.traversal_reads(), 0, "M13-23 absent-color queries added zero BoardState traversal reads")
+
+	# item 20: exclusion-filtered query adds zero traversal
+	spy.reset_counters()
+	for _q in 200:
+		idx5.get_eligible(0, [0, 4])
+		idx5.has_work(0, [0, 2, 4])
+		idx5.count_eligible(0, [2])
+	_check_eq(spy.traversal_reads(), 0, "M13-23 exclusion-filtered queries added zero BoardState traversal reads")
+
+	# item 21: per-API breakdown proves no single traversal API moved
+	_check_eq(spy.count_get_cell_count, 0, "M13-23 zero get_cell_count during steady-state queries")
+	_check_eq(spy.count_is_valid_index, 0, "M13-23 zero is_valid_index during steady-state queries")
+	_check_eq(spy.count_get_color_id, 0, "M13-23 zero get_color_id during steady-state queries (catches color-loop regression)")
+	_check_eq(spy.count_get_cell_state, 0, "M13-23 zero get_cell_state during steady-state queries")
+
+	# item 21 sensitivity: a naive color-loop query WOULD move the counter,
+	# proving the observability is not vacuous.
+	spy.reset_counters()
+	var naive_hits := 0
+	for i in spy.get_cell_count():
+		if spy.get_color_id(i) == 0 and spy.get_cell_state(i) == BoardState.CellState.DIRTY:
+			naive_hits += 1
+	_check(spy.traversal_reads() > 0, "M13-23 sensitivity: a full-board color loop DOES move the traversal counter")
+	_check_eq(naive_hits, 3, "M13-23 sensitivity: naive loop found the 3 color-0 DIRTY cells")
+
+	_run_m13_v02_formal_validation()
 	print("  M13 EligibleTargetIndex tests complete")
+
+## M13-C001 V02 formal validation of reopened SB-M13-006..010, filling the
+## coverage gaps the V02 prompt/criteria enumerate beyond the V01 tests above.
+func _run_m13_v02_formal_validation() -> void:
+	var DIRTY := BoardState.CellState.DIRTY
+	var CLEAN := BoardState.CellState.CLEAN
+
+	# --- SB-M13-006 reservation/exclusion robustness ---
+	# 3x2: color 0 -> [0,2,4], color 1 -> [1,3], color 2 -> [5]
+	var b = _make_colored_board(3, 2, [0, 1, 0, 1, 0, 2])
+	var ix = EligibleTargetIndex.create()
+	ix.bind(b)
+	# duplicate excluded indices
+	_check_eq(ix.get_eligible(0, [2, 2, 2]), [0, 4], "M13V2-006 duplicate exclusion index handled once")
+	# invalid negative / out-of-range exclusions have no effect
+	_check_eq(ix.get_eligible(0, [-1, 999, -50]), [0, 2, 4], "M13V2-006 invalid exclusion indices ignored")
+	# mix of valid + invalid
+	_check_eq(ix.get_eligible(0, [-1, 2, 999]), [0, 4], "M13V2-006 mixed valid/invalid exclusion filters only valid")
+	# cross-color exclusion cannot corrupt requested color
+	_check_eq(ix.get_eligible(0, [1, 3, 5]), [0, 2, 4], "M13V2-006 excluding other colors' indices leaves color 0 intact")
+	_check_eq(ix.get_eligible(1, [0, 4]), [1, 3], "M13V2-006 excluding color-0 indices leaves color 1 intact")
+	# exclusion query does not mutate cache
+	var snap = ix.get_eligible(0)
+	ix.get_eligible(0, [0, 2, 4])
+	ix.has_work(0, [0, 2, 4])
+	ix.count_eligible(0, [0])
+	_check_eq(ix.get_eligible(0), snap, "M13V2-006 exclusion queries did not mutate cached bucket")
+	# Dictionary-like caller set supported (keys are indices)
+	_check_eq(ix.get_eligible(0, {2: true, 4: true}), [0], "M13V2-006 Dictionary exclusion set supported")
+	_check_eq(ix.has_work(0, {0: true, 2: true, 4: true}), false, "M13V2-006 Dictionary exclusion of all targets -> no work")
+	# confirm no persistent reservation state: BoardState enum unchanged, no leak
+	_check(not ("RESERVED" in BoardState.CellState), "M13V2-006 BoardState.CellState has no RESERVED")
+	_check(not ix.has_method("reserve"), "M13V2-006 index has no reserve() ownership method")
+	_check(not ix.has_method("release"), "M13V2-006 index has no release() method")
+
+	# --- SB-M13-007 no-work query full matrix ---
+	_check_eq(ix.has_work(0), true, "M13V2-007 present color has work")
+	_check_eq(ix.has_work(99), false, "M13V2-007 absent color has no work")
+	_check_eq(ix.has_work(0, [0, 2, 4]), false, "M13V2-007 all-excluded -> no work")
+	_check_eq(ix.has_work(0, [0, 2]), true, "M13V2-007 partial exclusion still has work")
+	var unbound = EligibleTargetIndex.create()
+	_check_eq(unbound.has_work(0), false, "M13V2-007 unbound index reports no work")
+	_check_eq(unbound.count_eligible(0), 0, "M13V2-007 unbound count is zero")
+
+	# --- SB-M13-008 exhausted color: incremental sync AND full rebuild paths ---
+	# incremental: clean color 2's only cell
+	b.set_cell_state(5, CLEAN)
+	ix.sync_cell(5)
+	_check_eq(ix.has_work(2), false, "M13V2-008 incremental: exhausted color no work")
+	_check_eq(ix.get_eligible(2), [], "M13V2-008 incremental: exhausted color empty")
+	_check(not ix.get_color_ids().has(2), "M13V2-008 incremental: exhausted color key absent")
+	# full rebuild path: clean all of color 1 in BoardState WITHOUT per-cell sync
+	b.set_cell_state(1, CLEAN)
+	b.set_cell_state(3, CLEAN)
+	ix.rebuild()
+	_check_eq(ix.has_work(1), false, "M13V2-008 rebuild: exhausted color 1 no work")
+	_check_eq(ix.get_eligible(1), [], "M13V2-008 rebuild: exhausted color 1 empty")
+	_check(not ix.get_color_ids().has(1), "M13V2-008 rebuild: exhausted color 1 key absent")
+	_check_eq(ix.get_eligible(0), [0, 2, 4], "M13V2-008 rebuild: surviving color 0 intact and matches board truth")
+
+	# --- SB-M13-009 last-target lifecycle ---
+	var lb = _make_colored_board(2, 1, [3, 4])
+	var lix = EligibleTargetIndex.create()
+	lix.bind(lb)
+	_check_eq(lix.get_eligible(3), [0], "M13V2-009 exactly one candidate for color 3")
+	_check_eq(lix.has_work(3), true, "M13V2-009 last target has work")
+	_check_eq(lix.has_work(3, [0]), false, "M13V2-009 excluding only target -> no work")
+	_check_eq(lix.has_work(3, []), true, "M13V2-009 dropping exclusion re-exposes target")
+	lb.set_cell_state(0, CLEAN)
+	lix.sync_cell(0)
+	_check_eq(lix.has_work(3), false, "M13V2-009 clean last target + sync -> no work")
+	_check_eq(lix.get_eligible(3), [], "M13V2-009 candidate list empty after last target cleaned")
+
+	# --- SB-M13-010 3,481-cell exclusion filter at scale + non-mutation ---
+	var big_cells := PackedInt32Array()
+	big_cells.resize(3481)
+	for i in 3481:
+		big_cells[i] = i % 5
+	var bb = _make_colored_board(59, 59, Array(big_cells))
+	var bix = EligibleTargetIndex.create()
+	bix.bind(bb)
+	var color0_full: Array = bix.get_eligible(0)
+	# exclude the first 10 color-0 indices
+	var excl := color0_full.slice(0, 10)
+	var filtered: Array = bix.get_eligible(0, excl)
+	_check_eq(filtered.size(), color0_full.size() - 10, "M13V2-010 scale exclusion removes exactly the excluded candidates")
+	_check_eq(bix.get_eligible(0), color0_full, "M13V2-010 scale exclusion did not mutate cached membership")
+
+	# --- detached get_color_ids result cannot mutate internal truth ---
+	var keys = bix.get_color_ids()
+	keys.clear()
+	_check_eq(bix.get_color_ids().size(), 5, "M13V2 detached get_color_ids: mutating result does not clear internal keys")
 
 ## 3481-cell build/rebuild + repeated-query benchmark. CPU/index evidence only
 ## (AL-003) — no FPS/GPU claim, no hardware-specific pass/fail threshold. The

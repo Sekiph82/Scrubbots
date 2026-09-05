@@ -731,11 +731,11 @@ Don't rescan up to 3,481 cells unnecessarily for every bot.
 
 - [x] SB-M13-001 Define eligible cell.
 - [x] SB-M13-002 Group/query by color.
-- [ ] SB-M13-003 Implement efficient index/cache if measured useful. **REOPENED by M13-C001 Audit V01: production cache is present, but the no-full-scan regression spy observes only get_cell_state(); V02 must prove zero steady-state BoardState traversal across all relevant APIs.**
+- [x] SB-M13-003 Implement efficient index/cache if measured useful.
 - [x] SB-M13-004 Synchronize with BoardState.
-- [x] SB-M13-005 Remove CLEAN cells. — [ ] SB-M13-006 Handle reservations. **V01 implementation preserved as provisional; formally validate in intended V02 scope.**
-- [ ] SB-M13-007 No-work query. **V01 implementation preserved as provisional; formally validate in V02.** — [ ] SB-M13-008 Exhausted-color test. **V01 test preserved as provisional; formally validate in V02.**
-- [ ] SB-M13-009 Last-target test. **V01 test preserved as provisional; formally validate in V02.** — [ ] SB-M13-010 3,481-cell benchmark. **V01 benchmark preserved as provisional; formally validate in V02.**
+- [x] SB-M13-005 Remove CLEAN cells. — [x] SB-M13-006 Handle reservations.
+- [x] SB-M13-007 No-work query. — [x] SB-M13-008 Exhausted-color test.
+- [x] SB-M13-009 Last-target test. — [x] SB-M13-010 3,481-cell benchmark.
 
 ### M14 — Reservation State
 
