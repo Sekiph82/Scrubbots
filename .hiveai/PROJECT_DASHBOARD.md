@@ -16,12 +16,12 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | --- | --- |
 | Active cycle | META-C002 |
 | Active version | V02 |
-| State | CHANGES_REQUIRED |
-| Next actor | CLAUDE |
+| State | AWAITING_AUDIT |
+| Next actor | CHATGPT |
 | Branch | feature/master-ui-magnific-pipeline (PR #3) |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V02.md |
 | Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V02.md |
-| Purpose | META-C002 V02: Correction cycle — machine-readable inventory, per-file hashes/dimensions/classification, canonical ref records, manifest truth, task truth, progress recount from 943-task branch truth. |
+| Purpose | META-C002 V02: Closed F-META-001..004. Per-file inventory (51 files, SHA-256, dimensions, classification). Canonical gameplay/Home/popup refs recorded. Manifest truth corrected. 11 tasks closed with evidence. Progress: 196/943 = 20.78%. 657/657 ALL PASS. Scrubby master OWNER_REQUIRED. |
 
 ### Also active (on main)
 
@@ -34,7 +34,12 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 ### Current progress from tasks.md (feature/master-ui-magnific-pipeline branch)
 
-Progress will be recalculated from canonical SB task IDs during V02 correction.
+- Ecosystem: **196 / 943 = 20.78%**
+- Main game + SB-UI (M00-M55): **196 / 719 = 27.26%**
+- Level Factory: **0 / 112 = 0.00%**
+- Content Pipeline: **0 / 112 = 0.00%**
+
+Counts derived from unique canonical SB task IDs on checkbox lines.
 
 Tracking sources:
 
@@ -67,13 +72,13 @@ Tracking sources:
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | OK — META-C002 V02 correction in progress |
+| Health | OK — META-C002 V02 corrections complete, AWAITING_AUDIT |
 | Current implementation frontier | META-C002 - Master UI + Magnific pipeline integration |
 | Current task | META-C002 V02 correction |
 | Current task ID | `META-C002` |
-| Current workflow state | `CHANGES_REQUIRED` — V02 corrects F-META-001..004 from audit V01 |
-| Required actor | CLAUDE |
-| Next project action | Claude implements V02 corrections, then AWAITING_AUDIT for ChatGPT. |
+| Current workflow state | `AWAITING_AUDIT` — V02 closed F-META-001..004. Per-file inventory, manifest truth, task reconciliation, progress recount complete. 657/657 ALL PASS. |
+| Required actor | CHATGPT |
+| Next project action | ChatGPT performs independent audit V02. |
 | Waiting on | Scrubby master reference: OWNER_REQUIRED. M08 production-art audit and M10 DIRTY/CLEAN preset remain owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/tasks.md |
 
@@ -84,14 +89,14 @@ Tracking sources:
 | Timestamp | 2026-09-05 |
 | Actor | CLAUDE |
 | Cycle | `META-C002` |
-| Session type | META-C002 V02 correction (merge main + implement audit findings) |
-| Cycle status | `CHANGES_REQUIRED` |
-| Summary | Merged origin/main (M12-C001 AUDITED_PASS). Starting V02 corrections per CHATGPT_PROMPT_V02.md. |
+| Session type | META-C002 V02 correction (merge main + close F-META-001..004) |
+| Cycle status | `AWAITING_AUDIT` |
+| Summary | Merged origin/main (M12-C001 AUDITED_PASS). Closed F-META-001..004: built per-file inventory (51 files, SHA-256, dimensions, classification), corrected manifest/reference truth, reconciled tasks.md (11 tasks closed), recounted progress (196/943 = 20.78%). 657/657 ALL PASS. |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V02.md |
 | Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_CRITERIA_V02.md |
 | Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V01.md |
 | Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V02.md |
-| Next expected actor | CLAUDE (implementing V02 corrections) |
+| Next expected actor | CHATGPT (audit V02) |
 
 ## Milestone summary
 

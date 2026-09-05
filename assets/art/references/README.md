@@ -161,11 +161,36 @@ assets/art/
 └── effects/                   <- owner effects art
 ```
 
-## Current availability (as of M07-C001)
+## Current availability (updated META-C002 V02)
 
-All expected SCRUBBOTS visual reference categories are
-**AWAITING OWNER ASSET**. See `inventory.json` for the full manifest.
+51 owner-supplied visual references are available in
+`_owner_inbox/` (imported from the owner's Desktop source). See
+`inventory.json` for per-file SHA-256, dimensions, category, provenance
+and canonical state.
 
-The only visual file in `assets/` is `assets/brand/akilta-wordmark.svg`,
-which is project/company attribution branding — not SCRUBBOTS gameplay or
-reference artwork.
+### Categories now available
+
+- **Gameplay screen**: canonical selected (`Game Screens/deneme 3 OK.png`)
+- **Home screen**: canonical selected (`Game Screens/main screen.png`)
+- **Popup/level-intro**: canonical selected (level intro, life, help popups)
+- **Scrubbot characters**: 16 collection cards + master collection reference
+- **Pixel-construction method**: 2 pixel art full-view references
+- **Logo/app icon**: 4 variants (square icons, wide horizontal logos)
+- **Level design sheets**: 4 composition documentation sheets
+- **External level screenshots**: 18 reference screenshots (NOT production source)
+- **External inspiration**: 1 Colony Flow-style screenshot (inspiration only)
+
+### Still awaiting
+
+- **Scrubby master reference**: `OWNER_REQUIRED` — two strong candidates
+  identified, owner must select canonical for Magnific generation
+- **Production level source art**: M08 audit blocked on owner-supplied
+  original pixel-art level files (external screenshots are references only)
+- **M10 DIRTY/CLEAN preset**: owner design gate
+
+### Historical note (M07-C001)
+
+Prior to META-C002, all visual reference categories were
+`AWAITING OWNER ASSET`. The M07-C001 aggregate inventory entries are
+preserved in `inventory.json` under `historical_aggregate_entries` with
+superseded availability status.

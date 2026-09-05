@@ -617,13 +617,13 @@ correction. Render `BoardState` efficiently, never one Node per cell.
 - [x] SB-M07-005 Define asset type metadata. Validated: inventory.json schema with id, category, sourceClass, approvalStatus, availabilityStatus, repositoryPath, originalFilename, intendedUse, width, height, candidateDifficulty, notes.
 - [x] SB-M07-006 Define owner-approved status. Validated: four approval states (APPROVED, SUPPLIED_NOT_APPROVED, AWAITING_OWNER_ASSET, UNVERIFIED) defined in README.md and used in inventory.json.
 - [x] SB-M07-007 Preserve source file originals. Validated: immutable-source-original policy defined in README.md; derived outputs must be separate files.
-- [ ] SB-M07-008 Inventory Scrubbot character visuals supplied by owner. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
-- [ ] SB-M07-009 Inventory gameplay-screen references supplied by owner. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
-- [ ] SB-M07-010 Inventory five-slot visual references. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
-- [ ] SB-M07-011 Inventory level images. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
-- [ ] SB-M07-012 Inventory underwater level artwork if supplied. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
-- [ ] SB-M07-013 Inventory other original theme artwork. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
-- [ ] SB-M07-014 Inventory pixel-construction reference screenshots. **AWAITING OWNER ASSET.** Recorded as MISSING in inventory.json.
+- [x] SB-M07-008 Inventory Scrubbot character visuals supplied by owner. 16 collection cards + master collection reference imported and inventoried with SHA-256/dimensions in inventory.json. Production character art requires separate M08 audit.
+- [x] SB-M07-009 Inventory gameplay-screen references supplied by owner. Canonical gameplay reference selected: `Game Screens/deneme 3 OK.png`. Inventoried with SHA-256/dimensions.
+- [x] SB-M07-010 Inventory five-slot visual references. Five-slot layout visible in canonical gameplay reference (deneme 3 OK.png). Inventoried with SHA-256/dimensions.
+- [ ] SB-M07-011 Inventory level images. External level screenshots available as references in Levels/ subfolder. NOT production SCRUBBOTS level source art. M08 production-art audit still blocked on owner-supplied original level art.
+- [ ] SB-M07-012 Inventory underwater level artwork if supplied. Pixel construction reference shows underwater Scrubby scene (pixel art tam gorunum.jpeg) but this is a reference screenshot, not production level source.
+- [ ] SB-M07-013 Inventory other original theme artwork. No original themed level artwork supplied. External references exist but are not production source.
+- [x] SB-M07-014 Inventory pixel-construction reference screenshots. 2 pixel construction references imported and inventoried: pixel art tam gorunum.jpeg (key 30x30 reference) and pixel art tam gorunum 2.jpeg.
 - [x] SB-M07-015 Inventory external movement references separately. Validated: Colony Flow recorded as TEXT_ONLY `EXTERNAL_INSPIRATION` entry in inventory.json with non-copying provenance note.
 - [x] SB-M07-016 Flag previously discussed but unavailable assets as `AWAITING OWNER ASSET`. Validated: all 7 missing categories (SB-M07-008..014) flagged AWAITING_OWNER_ASSET in both tasks.md and inventory.json.
 - [x] SB-M07-017 Never regenerate missing references and label them originals. Validated: prohibition documented in README.md; no fabricated assets created.
@@ -633,15 +633,15 @@ correction. Render `BoardState` efficiently, never one Node per cell.
 - [ ] SB-UI-002 Treat `ASSET_GENERATION_MANIFEST.json` as the machine-readable generation/provenance queue.
 - [ ] SB-UI-003 Keep Magnific MCP as the only approved AI image provider unless the owner explicitly changes it.
 - [ ] SB-UI-004 Do not add Higgsfield as a project dependency.
-- [ ] SB-UI-005 Import owner visual references from `C:\Users\sekip\Desktop\ScrubBots Gorselleri` using `tools/import_desktop_visual_refs.ps1`.
-- [ ] SB-UI-006 Preserve Desktop originals untouched and imported reference copies byte-for-byte; inventory/classify references before production promotion.
-- [ ] SB-UI-007 Classify owner references at minimum into Scrubby/characters, gameplay UI, Home UI, popup/level-intro, logo/icon, pixel-construction, level-art and outdated/conflicting references.
-- [ ] SB-UI-008 Select and record the canonical Scrubby master reference before generating new Scrubby poses/portraits.
-- [ ] SB-UI-009 Select and record the canonical gameplay-screen art-direction reference.
-- [ ] SB-UI-010 Select and record the canonical Home-screen art-direction reference.
-- [ ] SB-UI-011 Select and record canonical popup/level-intro references.
-- [ ] SB-UI-012 Identify conflicting/outdated references and keep them clearly non-canonical rather than deleting historical owner work.
-- [ ] SB-UI-013 Validate manifest reference paths/IDs after canonical references are selected; do not begin broad Magnific production against placeholder reference IDs.
+- [x] SB-UI-005 Import owner visual references from `C:\Users\sekip\Desktop\ScrubBots Gorselleri` using `tools/import_desktop_visual_refs.ps1`. 51 files imported with subdirectory structure preserved.
+- [x] SB-UI-006 Preserve Desktop originals untouched and imported reference copies byte-for-byte; inventory/classify references before production promotion. 51/51 source-vs-repo SHA-256 match verified. Per-file inventory in inventory.json.
+- [x] SB-UI-007 Classify owner references at minimum into Scrubby/characters, gameplay UI, Home UI, popup/level-intro, logo/icon, pixel-construction, level-art and outdated/conflicting references. All 51 files classified with category, sourceClass, provenanceClass in inventory.json.
+- [ ] SB-UI-008 Select and record the canonical Scrubby master reference before generating new Scrubby poses/portraits. `OWNER_REQUIRED` — two candidates identified (main screen.png central Scrubby, meet the scrubbots.jpeg portraits). Owner must select.
+- [x] SB-UI-009 Select and record the canonical gameplay-screen art-direction reference. Selected: `Game Screens/deneme 3 OK.png`. Recorded in inventory.json and ASSET_GENERATION_MANIFEST.json.
+- [x] SB-UI-010 Select and record the canonical Home-screen art-direction reference. Selected: `Game Screens/main screen.png`. Recorded in inventory.json and ASSET_GENERATION_MANIFEST.json.
+- [x] SB-UI-011 Select and record canonical popup/level-intro references. Selected: level ekran acilisi.png (level intro), life screens.png (life), need a hand.png (help). Recorded in inventory.json and ASSET_GENERATION_MANIFEST.json.
+- [x] SB-UI-012 Identify conflicting/outdated references and keep them clearly non-canonical rather than deleting historical owner work. Playing Motors marked EXTERNAL_INSPIRATION, level designs 016 marked chatgpt_generated, cleaning crew duplicates preserved and marked, superseded main screen 001 preserved.
+- [ ] SB-UI-013 Validate manifest reference paths/IDs after canonical references are selected; do not begin broad Magnific production against placeholder reference IDs. Manifest canonical refs recorded but Scrubby master OWNER_REQUIRED blocks full validation.
 
 ### M08 — Level Art Technical Audit `[CONTENT] [VISUAL REFERENCE]`
 
