@@ -28,6 +28,8 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 
 | AL-018 | Regression-test observability | A test must directly observe the subsystem/property it claims to verify. Proxy assertions on adjacent state can stay green after the target behavior regresses. | Design negative/regression tests so removing or breaking the target behavior makes the test fail; for presentation bindings, observe real renderer output or another authoritative behavior rather than only session state/geometry. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V01.md |
 
+| AL-019 | Coordination evidence mapping | Prompt-scoped implementation evidence must be version-addressable. | Require `CHATGPT_PROMPT_VNN.md -> CLAUDE_LOG_VNN.md`; verify the matching GitHub log before auditing a prompt version. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V04.md |
+
 ## Audit history
 
 | Cycle | ChatGPT audit | Final/current state | Reusable learning |
@@ -37,7 +39,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | M09-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V02.md; V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C001/CHATGPT_AUDIT_V03.md | `AUDITED_PASS` | V01 added AL-010..012; V02 added AL-013; V03 closed filesystem-identity correction. |
 | M09-C002 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V02.md; V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V03.md | `AUDITED_PASS` | V01 added AL-014..016; V02 added AL-017; V03 independently verified destination-object-type preflight and closed M09-C002. |
 
-| M11-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V02.md | `CHANGES_REQUIRED` | V01 added AL-018 for direct regression observability. V02 was BLOCKED_NO_NEW_IMPLEMENTATION because no correction commit/log append existed; F-M11-001 remains open. |
+| M11-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V02.md; V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V03.md; V04: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V04.md | `AUDITED_PASS` | V03 closed F-M11-001 with direct renderer observability. V04 normalized versioned evidence and added AL-019. |
 
 ## Claude usage rule
 
@@ -46,7 +48,7 @@ Before implementing/testing a new prompt, Claude must:
 1. read the prior ChatGPT audit URL(s) explicitly listed by the active prompt;
 2. read this index;
 3. identify relevant `AL-XXX` items;
-4. record in `CLAUDE_IMPLEMENTATION_LOG.md` how those findings changed implementation or testing;
+4. record in the matching `CLAUDE_LOG_VNN.md` how those findings changed implementation or testing;
 5. run and log the checks required by the active prompt;
 6. stop at `AWAITING_AUDIT` when ready for ChatGPT review.
 

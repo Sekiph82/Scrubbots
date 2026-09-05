@@ -194,3 +194,16 @@ Maintain:
 
 H!veAI still actively watches only:
 https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/PROJECT_DASHBOARD.md
+
+
+## GitHub-only logging from M12-C001 [LOCKED]
+
+The historical Desktop phase-log workflow is retired for all new work.
+
+Every new prompt must begin by ordering Claude to safely synchronize the local
+repository with `origin/main` while preserving owner work.
+
+After synchronization, Claude reads the GitHub prompt/audit/governance sources
+and records all durable evidence only in `CLAUDE_LOG_VNN.md`.
+
+Do not create or update Desktop phase logs for M12-C001 or later cycles.
