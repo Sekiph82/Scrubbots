@@ -12,7 +12,7 @@ if (-not (Test-Path -LiteralPath $Source)) {
 New-Item -ItemType Directory -Force -Path $Destination | Out-Null
 
 $allowed = @('.png', '.jpg', '.jpeg', '.webp')
-$files = Get-ChildItem -LiteralPath $Source -File | Where-Object {
+$files = Get-ChildItem -LiteralPath $Source -Recurse -File | Where-Object {
     $allowed -contains $_.Extension.ToLowerInvariant()
 }
 
@@ -25,13 +25,19 @@ $copied = 0
 $skipped = 0
 
 foreach ($file in $files) {
-    $target = Join-Path $Destination $file.Name
+    $relativePath = $file.FullName.Substring($Source.Length).TrimStart('\', '/')
+    $target = Join-Path $Destination $relativePath
+    $targetDir = Split-Path $target -Parent
+
+    if (-not (Test-Path -LiteralPath $targetDir)) {
+        New-Item -ItemType Directory -Force -Path $targetDir | Out-Null
+    }
 
     if (Test-Path -LiteralPath $target) {
         $sourceHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $file.FullName).Hash
         $targetHash = (Get-FileHash -Algorithm SHA256 -LiteralPath $target).Hash
         if ($sourceHash -eq $targetHash) {
-            Write-Host "UNCHANGED: $($file.Name)"
+            Write-Host "UNCHANGED: $relativePath"
             $skipped++
             continue
         }
@@ -40,7 +46,7 @@ foreach ($file in $files) {
     }
 
     Copy-Item -LiteralPath $file.FullName -Destination $target
-    Write-Host "COPIED: $($file.Name)"
+    Write-Host "COPIED: $relativePath"
     $copied++
 }
 
