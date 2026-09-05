@@ -23,10 +23,10 @@ func get_slot_count() -> int:
 func is_configured() -> bool:
 	return _configured
 
-func get_slot(slot_id: int):
+func get_slot_id(slot_id: int) -> int:
 	if slot_id < 0 or slot_id >= SLOT_COUNT:
-		return null
-	return _slots[slot_id]
+		return -1
+	return _slots[slot_id].get_id()
 
 ## Configure all five slots with palette IDs. Requires exactly five entries.
 ## Each palette ID must be >= 0 and < palette_size.
