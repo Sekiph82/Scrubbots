@@ -21,14 +21,17 @@ extends TextureRect
 ## queries for a future routing system to target.
 
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
-const DirtyCleanPresets = preload("res://scripts/gameplay/board/dirty_clean_presets.gd")
 const PaletteColors = preload("res://scripts/data/palette_colors.gd")
+
+## Color drawn for a CLEARED cell: fully transparent, so the gameplay
+## background behind the board shows through the cleared hole (ADR-019,
+## owner decision META-C004). Never a black/gray/palette substitute.
+const CLEARED_COLOR := Color(0, 0, 0, 0)
 
 var _board: BoardState
 var _palette_colors: Array[Color] = []
 var _cell_size: float = 1.0
 var _image: Image
-var _active_preset: String = DirtyCleanPresets.DEFAULT_PRESET_NAME
 
 ## available_size: the display rect (in this Control's parent's local
 ## space) that the board should fit inside. Palette is a LevelData.palette
@@ -43,14 +46,6 @@ func configure(board: BoardState, palette: PackedStringArray, available_size: Ve
 		push_warning("BoardRenderer: palette parse errors: %s" % str(parse_result.errors))
 	_recompute_geometry(available_size)
 	refresh_all()
-
-func set_dirty_preset(preset_name: String) -> void:
-	_active_preset = preset_name
-	if _board != null:
-		refresh_all()
-
-func get_dirty_preset() -> String:
-	return _active_preset
 
 func _recompute_geometry(available_size: Vector2) -> void:
 	var w: int = _board.get_width()
@@ -110,10 +105,11 @@ func update_cells(indices: Array) -> void:
 func get_pixel_color(x: int, y: int) -> Color:
 	return _image.get_pixel(x, y)
 
+## ACTIVE  -> the exact source palette color, opaque (subject only to the
+##            renderer's existing 8-bit RGBA quantization).
+## CLEARED -> fully transparent, so the background shows through.
 func _color_for_cell(index: int) -> Color:
+	if _board.get_cell_state(index) == BoardState.CellState.CLEARED:
+		return CLEARED_COLOR
 	var color_id: int = _board.get_color_id(index)
-	var base_color: Color = _palette_colors[color_id]
-	var state: int = _board.get_cell_state(index)
-	if state == BoardState.CellState.CLEAN:
-		return base_color
-	return DirtyCleanPresets.apply_dirty(base_color, _active_preset)
+	return _palette_colors[color_id]

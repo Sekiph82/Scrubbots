@@ -1,10 +1,15 @@
 extends Control
-## Development-only visual comparison tool for BoardRenderer and the
-## DIRTY/CLEAN presets. NOT production UI — see docs/04_ROADMAP.md M3 for
-## where the real gameplay screen belongs. Lets the project owner compare
-## Preset A/B/C at native gameplay scale on every difficulty band's
-## boundary sizes plus representative rectangular boards, without any code
-## changes (dropdowns only). See tasks.md M06/M10.
+## Development-only visual comparison tool for BoardRenderer under the
+## ACTIVE/CLEARED board model (ADR-019, owner decision META-C004). NOT
+## production UI — see docs/04_ROADMAP.md for where the real gameplay screen
+## belongs. Lets the project owner verify, at native gameplay scale on every
+## difficulty band's boundary sizes plus representative rectangular boards,
+## that ACTIVE cells render their source palette color and CLEARED cells
+## render transparent so the debug background shows through — without any
+## code changes (dropdowns only). See tasks.md M10.
+##
+## A solid, clearly-visible debug background sits BEHIND the board precisely
+## so alpha-0 CLEARED cells reveal that background rather than looking black.
 ##
 ## UI is built procedurally in _ready() rather than hand-authored in the
 ## .tscn, since this session has no interactive editor available to
@@ -14,8 +19,11 @@ extends Control
 const LevelData = preload("res://scripts/data/level_data.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
-const DirtyCleanPresets = preload("res://scripts/gameplay/board/dirty_clean_presets.gd")
 const BoardDebugFixtures = preload("res://scripts/debug/board_debug_fixtures.gd")
+
+## Bright, unmistakable debug background so transparent CLEARED cells are
+## obviously showing THIS colour through, not a black renderer artifact.
+const DEBUG_BACKGROUND_COLOR := Color(0.9, 0.2, 0.8) # magenta-ish, not in fixture palette
 
 const SIZE_OPTIONS := [
 	{"label": "20x20 (Easy min)", "w": 20, "h": 20},
@@ -33,17 +41,17 @@ const SIZE_OPTIONS := [
 ]
 
 const PATTERN_OPTIONS := [
-	{"label": "All DIRTY", "value": BoardDebugFixtures.StatePattern.ALL_DIRTY},
-	{"label": "All CLEAN", "value": BoardDebugFixtures.StatePattern.ALL_CLEAN},
-	{"label": "Half DIRTY / half CLEAN", "value": BoardDebugFixtures.StatePattern.HALF_SPLIT},
-	{"label": "Checker DIRTY/CLEAN", "value": BoardDebugFixtures.StatePattern.CHECKER},
+	{"label": "All ACTIVE", "value": BoardDebugFixtures.StatePattern.ALL_ACTIVE},
+	{"label": "All CLEARED (fully transparent)", "value": BoardDebugFixtures.StatePattern.ALL_CLEARED},
+	{"label": "Half ACTIVE / half CLEARED", "value": BoardDebugFixtures.StatePattern.HALF_SPLIT},
+	{"label": "Checker ACTIVE/CLEARED", "value": BoardDebugFixtures.StatePattern.CHECKER},
 ]
 
 var _size_option: OptionButton
 var _pattern_option: OptionButton
-var _preset_option: OptionButton
 var _info_label: Label
 var _board_area: Control
+var _board_bg: ColorRect # visible background behind the board
 var _renderer: Control # BoardRenderer instance (extends TextureRect)
 
 func _ready() -> void:
@@ -73,12 +81,6 @@ func _build_ui() -> void:
 	_pattern_option.item_selected.connect(func(_i): _refresh())
 	controls_row.add_child(_pattern_option)
 
-	_preset_option = OptionButton.new()
-	for preset_name in DirtyCleanPresets.preset_names():
-		_preset_option.add_item("Preset %s — %s" % [preset_name, DirtyCleanPresets.get_preset(preset_name).label])
-	_preset_option.item_selected.connect(func(_i): _refresh())
-	controls_row.add_child(_preset_option)
-
 	_info_label = Label.new()
 	root_vbox.add_child(_info_label)
 
@@ -88,6 +90,12 @@ func _build_ui() -> void:
 	_board_area.resized.connect(_refresh)
 	root_vbox.add_child(_board_area)
 
+	# Debug background sits behind the board; CLEARED (alpha-0) cells reveal it.
+	_board_bg = ColorRect.new()
+	_board_bg.color = DEBUG_BACKGROUND_COLOR
+	_board_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_board_area.add_child(_board_bg)
+
 	_renderer = BoardRenderer.new()
 	_board_area.add_child(_renderer)
 
@@ -96,21 +104,25 @@ func _refresh() -> void:
 		return
 	var size_entry: Dictionary = SIZE_OPTIONS[_size_option.selected]
 	var pattern_entry: Dictionary = PATTERN_OPTIONS[_pattern_option.selected]
-	var preset_name: String = DirtyCleanPresets.preset_names()[_preset_option.selected]
 
 	var level: LevelData = BoardDebugFixtures.make_level(size_entry.w, size_entry.h)
 	var board: BoardState = BoardState.from_level_data(level)
 	BoardDebugFixtures.apply_pattern(board, pattern_entry.value)
 
 	_renderer.configure(board, level.palette, _board_area.size)
-	_renderer.set_dirty_preset(preset_name)
-	_renderer.position = (_board_area.size - _renderer.get_board_pixel_size()) / 2.0
+	var board_pixels: Vector2 = _renderer.get_board_pixel_size()
+	var origin: Vector2 = (_board_area.size - board_pixels) / 2.0
+	_renderer.position = origin
+	# Background covers exactly the board rect so cleared holes read as this
+	# colour, not as the window/clear colour.
+	_board_bg.position = origin
+	_board_bg.size = board_pixels
 
 	_info_label.text = (
-		"%dx%d (%d cells) — cell_size=%.2fpx — board_pixels=%s — preset=%s — pattern=%s — renderer child count=%d"
+		"%dx%d (%d cells) — cell_size=%.2fpx — board_pixels=%s — pattern=%s — renderer child count=%d"
 		% [
 			size_entry.w, size_entry.h, size_entry.w * size_entry.h,
-			_renderer.get_cell_size(), str(_renderer.get_board_pixel_size()),
-			preset_name, pattern_entry.label, _renderer.get_child_count(),
+			_renderer.get_cell_size(), str(board_pixels),
+			pattern_entry.label, _renderer.get_child_count(),
 		]
 	)

@@ -5,9 +5,9 @@ extends RefCounted
 ##
 ## Deterministic, in-memory (no JSON file needed) level/board generation for
 ## renderer development and testing. Uses a small multi-hue palette
-## (red/green/blue/yellow/magenta) specifically so DIRTY/CLEAN color-family
-## recognizability can be visually judged across distinct hues — this is a
-## TEST/DEV fixture generator, never production art (see
+## (red/green/blue/yellow/magenta) specifically so ACTIVE source colors and
+## transparent CLEARED holes can be visually judged across distinct hues —
+## this is a TEST/DEV fixture generator, never production art (see
 ## docs/03_LEVEL_DATA_SPEC.md "Fixtures").
 
 const LevelData = preload("res://scripts/data/level_data.gd")
@@ -19,8 +19,8 @@ const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const PALETTE := ["#E5484D", "#3B82F6", "#22C55E", "#F5C518", "#A855F7"]
 
 enum StatePattern {
-	ALL_DIRTY,
-	ALL_CLEAN,
+	ALL_ACTIVE,
+	ALL_CLEARED,
 	HALF_SPLIT,
 	CHECKER,
 }
@@ -42,24 +42,25 @@ static func make_level(width: int, height: int, level_id: String = "") -> LevelD
 static func make_board(width: int, height: int) -> BoardState:
 	return BoardState.from_level_data(make_level(width, height))
 
-## Applies a deterministic DIRTY/CLEAN pattern to an already-built
-## BoardState, in place.
+## Applies a deterministic ACTIVE/CLEARED pattern to an already-built
+## BoardState, in place. CLEARED cells render transparent (background shows
+## through); ACTIVE cells render their source palette color.
 static func apply_pattern(board: BoardState, pattern: int) -> void:
 	var w: int = board.get_width()
 	var h: int = board.get_height()
 	for y in h:
 		for x in w:
 			var index: int = board.get_cell_index(x, y)
-			var clean: bool
+			var cleared: bool
 			match pattern:
-				StatePattern.ALL_DIRTY:
-					clean = false
-				StatePattern.ALL_CLEAN:
-					clean = true
+				StatePattern.ALL_ACTIVE:
+					cleared = false
+				StatePattern.ALL_CLEARED:
+					cleared = true
 				StatePattern.HALF_SPLIT:
-					clean = x >= w / 2
+					cleared = x >= w / 2
 				StatePattern.CHECKER:
-					clean = (x + y) % 2 == 0
+					cleared = (x + y) % 2 == 0
 				_:
-					clean = false
-			board.set_cell_state(index, BoardState.CellState.CLEAN if clean else BoardState.CellState.DIRTY)
+					cleared = false
+			board.set_cell_state(index, BoardState.CellState.CLEARED if cleared else BoardState.CellState.ACTIVE)

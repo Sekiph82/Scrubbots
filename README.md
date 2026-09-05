@@ -1,7 +1,11 @@
 # SCRUBBOTS
 
 Mobile puzzle game: dispatch tiny cleaning robots ("Scrubbots") from a
-limited set of color slots to reveal pixel-art images hidden under grime.
+limited set of color slots to progressively clear away a visible pixel-art
+image. Cells start ACTIVE (their source palette color); a cleaned cell
+becomes CLEARED (transparent), exposing the gameplay background through the
+hole. No grime layer, no hidden artwork — see `docs/05_TECH_DECISIONS.md`
+ADR-019.
 
 ## Technology
 
@@ -25,10 +29,12 @@ Canonical repository: https://github.com/Sekiph82/Scrubbots
 - From the editor: press Play (F5). It boots the scene at
   `scenes/app/main.tscn` — a bootstrap/debug screen confirming the project
   loads and that board fixtures load correctly.
-- Renderer/DIRTY-CLEAN comparison tool (dev-only, not gameplay): open/run
+- Renderer ACTIVE/CLEARED comparison tool (dev-only, not gameplay): open/run
   `scenes/debug/board_renderer_debug.tscn` directly. Dropdowns switch board
-  size (every official difficulty band boundary plus rectangular examples),
-  DIRTY/CLEAN pattern, and preset A/B/C — no code changes needed.
+  size (every official difficulty band boundary plus rectangular examples)
+  and ACTIVE/CLEARED pattern (All ACTIVE, All CLEARED, Half, Checker) — no
+  code changes needed. A visible debug background sits behind the board so
+  transparent CLEARED cells are obvious.
 - From the command line: `godot --headless --path . --quit` (project boot
   check) or `godot --headless --path . -s res://tests/run_tests.gd`
   (automated test suite). See `tools/run_headless.ps1` and
@@ -67,20 +73,22 @@ official difficulty bands, and BoardRenderer** (see `tasks.md` and
 40×40) — see `docs/05_TECH_DECISIONS.md` ADR-008. Production content is
 difficulty-banded: Easy 20–29, Medium 30–39, Hard 40–49, Very Hard 50–59
 (max 59×59 = 3,481 cells) — see ADR-010. The board now renders (single
-`Image`/`ImageTexture`, no per-cell Nodes — ADR-011) with a DIRTY/CLEAN
-visual prototype; **the final DIRTY visual style is an open design gate**,
-not yet owner-approved. No slots or Scrubbot logic yet.
+`Image`/`ImageTexture`, no per-cell Nodes — ADR-011) with the owner-locked
+ACTIVE/CLEARED model (ADR-019): ACTIVE cells draw their source palette color,
+CLEARED cells draw fully transparent. Owner manual QA of the transparent model
+is still pending (tasks.md SB-M10-005..011). No slots or Scrubbot logic yet.
 
 ## Status
 
 Godot **4.7.1-stable** (official, standard build) installed via winget
 (`GodotEngine.GodotEngine`) and verified with `godot --version`. Level
 data, BoardState, production difficulty validation
-(`DifficultyRules`/`ProductionLevelValidator`), and `BoardRenderer` (with
-`PaletteColors` and `DirtyCleanPresets`) are all implemented and covered by
-an automated headless test suite (`tests/run_tests.gd`, **227 checks, all
-passing**), including renderer geometry/pixel-output tests at every
-official band boundary and the 59×59 maximum.
+(`DifficultyRules`/`ProductionLevelValidator`), `BoardRenderer` (with
+`PaletteColors`, ACTIVE/CLEARED model) and the `ColorCandidateIndex`
+(`scripts/gameplay/targeting/`) are all implemented and covered by an
+automated headless test suite (`tests/run_tests.gd`, all passing), including
+renderer ACTIVE-source-color / CLEARED-transparency tests at every official
+band boundary and the 59×59 maximum.
 
 ---
 

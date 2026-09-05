@@ -49,7 +49,12 @@ pixel-exact art-first conversion.
 
 Solver search owns algorithms, not gameplay design. Legal moves come from a
 versioned simulation/legal-move adapter whose semantics are tied to canonical
-SCRUBBOTS gameplay milestones.
+SCRUBBOTS gameplay milestones. Those semantics are now the ACTIVE/CLEARED
+model (ADR-019): cells start ACTIVE and block access; a legal move clears one
+reachable matching-color ACTIVE cell to CLEARED (open space); a fully enclosed
+matching-color ACTIVE cell is not targetable until access is opened (AL-028).
+The adapter is the single shared source of these rules — the solver must not
+re-invent them.
 
 ## Difficulty boundary
 

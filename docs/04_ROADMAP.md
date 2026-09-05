@@ -27,9 +27,9 @@ enough to validate on its own.
   separation, validated up to the current maximum 59×59 (3,481 cells).
 - **M3 — Board rendering** *(Prompt 04 / tasks.md M06)*: efficient
   single-Node (`Image`/`ImageTexture`) rendering of Board State to screen —
-  no interactivity yet. Includes the first DIRTY/CLEAN visual prototype
-  (three presets, none approved as final — see ADR-011,
-  `docs/01_GAMEPLAY_SPEC.md`, `tasks.md` M10).
+  no interactivity yet. Now uses the owner-locked ACTIVE/CLEARED model
+  (ACTIVE = source palette color/opaque, CLEARED = transparent) — see
+  ADR-011/ADR-019, `docs/01_GAMEPLAY_SPEC.md`, `tasks.md` M10.
 - **M4 — Five-slot gameplay foundation**: Slot System data + basic UI
   representation of 5 slots (no dispatch logic yet).
 - **M5 — Scrubbot spawning and dispatch**: Scrubbot Dispatcher enforces
@@ -38,8 +38,9 @@ enough to validate on its own.
   simplest viable strategy).
 - **M7 — Routing/path movement prototype**: first `RoutingSystem`
   implementation, kept swappable per `docs/02_TECH_ARCHITECTURE.md`.
-- **M8 — Cleaning/reveal loop**: Scrubbot reaches target, cell cleans,
-  Scrubbot disappears — full loop wired end to end.
+- **M8 — Clearing loop**: Scrubbot reaches its reachable target, the cell
+  becomes CLEARED (transparent, background shows through), Scrubbot
+  disappears — full loop wired end to end.
 - **M9 — Win/lose state**: define and implement actual win/lose condition
   (currently `[TO BE DESIGNED]` in `docs/01_GAMEPLAY_SPEC.md`).
 - **M10 — Effects and juice**: pooled/toggleable cleaning feedback effects.
@@ -58,9 +59,9 @@ board engine + level data core, validated with 40×40, 50×50, and a small
 generic-size fixture). Prompt 03 extended **M2** with official production
 difficulty bands and TEST/production separation, validated across the full
 20..59 range up to the current maximum 59×59. Prompt 04 delivered **M3**
-(BoardRenderer + DIRTY/CLEAN prototype infrastructure) — the final DIRTY
-visual preset remains an open design gate. Do not begin M4 (five-slot
-gameplay foundation) work until a future prompt.
+(BoardRenderer); META-C004 locked its ACTIVE/CLEARED model (ADR-019) —
+owner manual QA of the transparent model is still pending. Do not begin M4
+(five-slot gameplay foundation) work until a future prompt.
 
 
 ## Parallel roadmap — SCRUBBOTS Level Platform

@@ -27,7 +27,7 @@
 - Level metadata: `id`, `name`, `difficulty`.
 - Explicit format `version` for forward compatibility.
 
-Per-cell *runtime* state (dirty/clean) is intentionally **not** part of level
+Per-cell *runtime* state (ACTIVE/CLEARED) is intentionally **not** part of level
 data — it belongs to `BoardState`, which is runtime-only and derived fresh
 from `LevelData` each time a board is constructed. See "LevelData vs.
 BoardState" in `docs/02_TECH_ARCHITECTURE.md`.
@@ -378,7 +378,7 @@ fully OK.
 - Level pack / chapter grouping metadata.
 - Compression for shipped level data, if ever needed.
 - An explicit initial per-cell state array (all cells currently start
-  `DIRTY` unconditionally when a `BoardState` is built from `LevelData`).
+  `ACTIVE` unconditionally when a `BoardState` is built from `LevelData`).
 
 Do not build large production levels from this spec yet — Prompt 02's
 fixtures exist to validate the engine, not to ship content.

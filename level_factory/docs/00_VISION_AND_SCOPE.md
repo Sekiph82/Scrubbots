@@ -81,6 +81,20 @@ The solver does **not** invent SCRUBBOTS mechanics. Legal moves, reachability,
 deadlocks and completion semantics come from versioned gameplay adapters only
 after those rules are canonical.
 
+Now-canonical gameplay law the solver/generator must consume via a shared
+adapter (owner decision META-C004, ADR-019 / AL-027 / AL-028 — never a
+re-invented Colony Flow rule):
+
+- Board cells start **ACTIVE** (present, source palette color, opaque, color
+  candidate, block access).
+- A legal cleaning move clears **one ACTIVE matching-color target**, turning it
+  **CLEARED** (transparent, no longer a candidate, opens access space).
+- CLEARED cells and background/outside-board space are **open**; non-target
+  ACTIVE cells **block** access/traversal.
+- A matching-color ACTIVE cell that is fully enclosed/blocked is **not
+  currently targetable** until prior clears create legal access — matching
+  color alone is not sufficient.
+
 ## Difficulty intelligence
 
 Potential metrics include:

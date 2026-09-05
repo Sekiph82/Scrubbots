@@ -7,13 +7,12 @@ checks. Prompt 02 implemented a small custom GDScript test runner
 headless Godot; most later categories below are still planned, not yet
 implemented.
 
-**Current total: 542 checks, all passing** (73 from Prompt 02 + 58 added in
-Prompt 03 + 96 added in Prompt 04 + 59 added in M09-C001 + 34 safety checks
-added in M09-C001 V02 correction + 12 filesystem-identity checks added in
-M09-C001 V03 correction + 62 batch-importer checks added in M09-C002 V01 +
-32 batch-safety/catalog-integrity checks added in M09-C002 V02 correction +
-21 destination-type preflight checks added in M09-C002 V03 correction +
-95 gameplay session lifecycle checks added in M11-C001).
+**Current total: 774 checks, all passing** (Prompt 02–04, M09-C001/C002,
+M11-C001 gameplay session lifecycle, M12-C001 slot system, M13-C001
+`ColorCandidateIndex`, and META-C004's ACTIVE/CLEARED renderer migration).
+The exact figure is recomputed from `tests/run_tests.gd`'s summary output,
+never hardcoded from memory; the total may change as obsolete tests (e.g. the
+removed A/B/C dirty-preset transform tests) are replaced with new-model tests.
 
 **Testing renderer output — a lesson from Prompt 04:** `BoardRenderer`
 reads pixels back through an `Image` with `Image.FORMAT_RGBA8` (8 bits per
@@ -22,9 +21,10 @@ float `Color` with `Color.is_equal_approx()` (epsilon ~1e-5) will spuriously
 fail due to ~1/255 quantization — this is expected engine behavior, not a
 bug. Use a quantization-tolerant comparison (`_colors_close()` in
 `tests/run_tests.gd`, ±0.01/channel) for renderer-output-vs-source-color
-checks, and prefer meaningful-property assertions (hue preserved,
-saturation/value reduced) over exact-value matching for DIRTY-vs-CLEAN
-comparisons — see "Visual transform test principles" below.
+checks. Under the ACTIVE/CLEARED model (ADR-019), the meaningful renderer
+properties are: an ACTIVE cell reads back its source palette color and is
+opaque (alpha ≈ 1); a CLEARED cell reads back alpha ≈ 0 and is not a
+black/gray/palette substitute — observed via `get_pixel_color()`.
 
 ## Implemented in Prompt 02 (`tests/run_tests.gd`)
 
@@ -65,8 +65,8 @@ Run via `tools/run_headless.ps1` or directly:
   `docs/03_LEVEL_DATA_SPEC.md`.
 
 ### BoardState mutation
-- New `BoardState` initializes all cells to `DIRTY`.
-- `DIRTY -> CLEAN` mutation works and is observable via `get_cell_state`.
+- New `BoardState` initializes all cells to `ACTIVE`.
+- `ACTIVE -> CLEARED` mutation works and is observable via `get_cell_state`.
 - Mutating an invalid index fails safely (no crash, reported failure).
 - Cleaning one cell does not affect neighboring cells.
 - `count_cells_by_state` returns correct counts.
@@ -114,8 +114,8 @@ Run via `tools/run_headless.ps1` or directly:
 - `BoardState.from_level_data` on the real `test_59x59.json` fixture
   reports `width == 59`, `height == 59`, `cell_count == 3481`.
 - Coordinate/index round-trip verified at all four corners plus center.
-- A single-cell mutation at 59×59 is isolated correctly (exactly 1 CLEAN,
-  3,480 still DIRTY) — same mutation-isolation guarantee as smaller boards,
+- A single-cell mutation at 59×59 is isolated correctly (exactly 1 CLEARED,
+  3,480 still ACTIVE) — same mutation-isolation guarantee as smaller boards,
   now proven at the real maximum.
 
 ## Implemented in Prompt 04 (`tests/run_tests.gd`, extended)
@@ -126,14 +126,16 @@ Run via `tools/run_headless.ps1` or directly:
   the rest of the palette (a visible fallback color is used for it).
 - Parsing the same palette twice is deterministic.
 
-### DIRTY/CLEAN transform contract
-- All three presets (A/B/C) produce a color different from CLEAN.
-- All three presets differ from each other (preset switching has an
-  effect).
-- Every preset reduces both saturation *and* value/brightness relative to
-  CLEAN (never saturation alone — the core readability requirement) while
-  preserving hue (color family stays recognizable).
-- Applying a DIRTY transform never mutates the original (CLEAN) `Color`.
+### ACTIVE/CLEARED renderer color contract (ADR-019)
+- Each ACTIVE cell renders its exact source palette color, opaque
+  (alpha ≈ 1), within 8-bit quantization tolerance.
+- A CLEARED cell renders fully transparent (alpha ≈ 0).
+- A CLEARED pixel is not substituted with opaque black, opaque gray, or the
+  opaque source palette color.
+- Clearing one cell is isolated: neighbors stay ACTIVE and opaque.
+- (The removed A/B/C dirty-preset transform tests were intentionally deleted;
+  this contract replaces them — a lower aggregate count from that deletion is
+  not a regression.)
 
 ### BoardRenderer geometry
 - Every official band boundary (20×20, 29×29, 30×30, 39×39, 40×40, 49×49,
@@ -147,14 +149,15 @@ Run via `tools/run_headless.ps1` or directly:
   59×59 — the constant-node-count guarantee, automated.
 
 ### BoardRenderer pixel output
-- A CLEAN cell's rendered pixel matches its source palette color (within
-  8-bit quantization tolerance — see the note above this section).
-- A DIRTY cell's rendered pixel visibly differs from an identically-colored
-  CLEAN cell, with lower saturation, lower value, and preserved hue —
-  verified by reading back actual rendered pixels, not by comparing to an
-  independently precomputed float value.
-- `update_cells()` correctly reflects a single changed cell without a full
-  `refresh_all()`.
+- An ACTIVE cell's rendered pixel matches its source palette color and is
+  opaque (within 8-bit quantization tolerance — see the note above).
+- After `ACTIVE -> CLEARED`, the cell's rendered pixel is transparent
+  (alpha ≈ 0) and differs from the ACTIVE source color — verified by reading
+  back actual rendered pixels.
+- `update_cells()` correctly reflects a single changed cell (ACTIVE→CLEARED
+  transparency) without a full `refresh_all()`.
+- After a session reset the renderer follows the fresh all-ACTIVE `BoardState`,
+  not a stale cleared old one (F-M11-001).
 - `BoardState` cell states are unchanged after `configure()`/`refresh_all()`
   — the renderer never mutates gameplay truth.
 
@@ -230,11 +233,23 @@ Run via `tools/run_headless.ps1` or directly:
 - A slot's assigned color id is always a valid palette id for the current
   level.
 
-### Target eligibility / dispatch
-- A Scrubbot is never dispatched from a slot when `TargetSelector` reports
-  no valid target for that slot's color.
-- `TargetSelector` never returns a target cell that is already cleaned or
-  otherwise unavailable.
+### Color candidates (M13, implemented) vs. reachability/dispatch (future)
+- **ColorCandidateIndex (implemented):** raw candidate contract is
+  `valid + ACTIVE + matching color + caller exclusion`; CLEARED cells are
+  removed; cached color queries add zero BoardState traversal reads (spy over
+  `get_cell_count`/`is_valid_index`/`get_color_id`/`get_cell_state`, with a
+  sensitivity proof); no-candidate / exhausted-color / last-candidate; 59×59
+  correctness and CPU/index benchmark. It does **not** prove reachability.
+- **Terminology regression (implemented):** current production code exposes
+  `ColorCandidateIndex`/`get_candidates`, not `EligibleTargetIndex`/
+  `get_eligible` — raw color membership is never labeled final eligibility.
+- **Reachability/dispatch (future, M15+):** a Scrubbot is never dispatched
+  unless a target is ACTIVE + matching + valid + unreserved + **reachable**.
+  `TargetSelector` never returns a CLEARED, invalid, reserved, or
+  blocked/unreachable target. **Required regression:** a fully enclosed
+  matching-color ACTIVE cell must not cause dispatch and must not be treated
+  as a targetable final target (routing is not implemented in this cycle, so
+  this is a locked future-test requirement, not yet an executable test).
 
 ### Routing result validity
 - A `RoutingSystem` result always terminates at the target cell assigned by
@@ -243,7 +258,8 @@ Run via `tools/run_headless.ps1` or directly:
   `width`/`height` for that level (not a hard-coded 40×40 assumption).
 
 ### Cleanup / win / reward
-- Reaching a target cell transitions it to cleaned exactly once.
+- Reaching a target cell transitions it `ACTIVE -> CLEARED` exactly once
+  (renderer then draws it transparent; candidate index drops it).
 - Win detection matches whatever win condition is finalized in M9.
 - Win-streak reward mapping matches the locked table exactly:
   `1->1, 2->5, 3->10, 4->25, 5+->100` (regression test against the known-

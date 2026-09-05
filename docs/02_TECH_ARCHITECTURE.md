@@ -4,10 +4,11 @@ This document defines conceptual module boundaries. It does not mandate a
 final class hierarchy. Prompt 01 established the project shell; Prompt 02
 implemented Level Data, Level Loader/Validator, and BoardState; Prompt 03
 added the official difficulty-band production validator; Prompt 04 (M06)
-added `BoardRenderer` and the DIRTY/CLEAN visual prototype layer (see
-"LevelData vs. BoardState", "Structural vs. production validation", and
-"BoardRenderer and the DIRTY/CLEAN visual layer" below). Everything else in
-the module table is still future work.
+added `BoardRenderer`; META-C004 replaced the DIRTY/CLEAN prototype with the
+owner-locked ACTIVE/CLEARED model (see "LevelData vs. BoardState",
+"Structural vs. production validation", and "BoardRenderer and the
+ACTIVE/CLEARED visual model" below; ADR-019). Everything else in the module
+table is still future work.
 
 ## Guiding principles
 
@@ -29,11 +30,13 @@ the module table is still future work.
 | Level Loader | Reads level data resources/files into runtime Board State. | `scripts/data/` |
 | Level Data | Serialized level definition (grid, palette, metadata). | `data/levels/` |
 | Board State | Runtime source of truth for a level's cells' current state (cell count = width × height, level-defined). | `scripts/gameplay/board/` |
-| Pixel/Cell State | Per-cell data: index, x, y, color id, cleaned flag, availability. | `scripts/gameplay/cells/` |
+| Pixel/Cell State | Per-cell data: index, x, y, color id, lifecycle state (ACTIVE/CLEARED). | `scripts/gameplay/cells/` |
 | Palette/Color IDs | Maps compact numeric color ids to actual colors. | `scripts/data/`, `data/palettes/` |
 | Slot System | Owns the 5 slots, their assigned color, and dispatch eligibility. | `scripts/gameplay/slots/` |
-| Scrubbot Dispatcher | Decides when a slot may release a Scrubbot (work must exist). | `scripts/gameplay/slots/` |
-| Target Selector | Decides **which** cell a dispatched Scrubbot will clean. | `scripts/gameplay/routing/` |
+| Scrubbot Dispatcher | Decides when a slot may release a Scrubbot (a reachable target must exist). | `scripts/gameplay/slots/` |
+| Color Candidate Index | Groups raw ACTIVE matching-color candidates by color (cached; M13). Does NOT prove reachability. | `scripts/gameplay/targeting/` |
+| Reachability/Access truth | Filters candidates that are currently blocked/unreachable under access semantics (future; M15/M16). | `scripts/gameplay/targeting/` or a narrow query seam |
+| Target Selector | Decides **which** reachable/targetable candidate a dispatched Scrubbot will clean. | `scripts/gameplay/targeting/` |
 | Routing System | Decides **how** a Scrubbot visually travels to its assigned target. | `scripts/gameplay/routing/` |
 | Scrubbot Agent | Lightweight runtime object representing one active Scrubbot in flight. | `scripts/gameplay/scrubbots/` |
 | Board Renderer | Draws current Board State efficiently (batched, not per-cell Nodes). Implemented in Prompt 04 (M06) — see below. | `scripts/gameplay/board/` |
@@ -43,32 +46,43 @@ the module table is still future work.
 | Save System | Persists progress, streak, currency. Not implemented yet. | `scripts/data/` |
 | Debug/Instrumentation | Dev-only overlays, logging, inspection tools. | `scripts/debug/`, `scenes/debug/` |
 
-## TargetSelector vs. RoutingSystem — the critical seam
+## Candidate → reachability → TargetSelector → RoutingSystem — the critical seam
 
 ```
-Slot dispatches a Scrubbot
+ColorCandidateIndex  --- raw ACTIVE matching-color candidates (M13) --->
         |
         v
-  TargetSelector  --- decides WHAT cell to clean ---> target cell index
+Reachability/access  --- filters blocked/unreachable candidates --->
         |
         v
-  RoutingSystem   --- decides HOW to visually get there ---> path/movement
+  TargetSelector     --- chooses WHAT target among reachable candidates --->
         |
         v
-  Scrubbot Agent moves along the path, then triggers cell cleanup
+  RoutingSystem      --- decides HOW to travel to the selected target --->
+        |
+        v
+  Scrubbot Agent moves along the path, then clears the target cell (CLEARED)
 ```
 
-- `TargetSelector` only ever answers "given current Board State and this
-  Scrubbot's color, which cell should it go clean?" It has no opinion about
-  movement, animation, or timing.
-- `RoutingSystem` only ever answers "given a start point and a target cell,
-  what path/motion should the Scrubbot follow?" It has no opinion about
-  which cell was chosen or why.
-- This split means the routing/pathing algorithm (a significant future
-  design task) can be swapped or upgraded without touching level data, slot
-  logic, cell state, scoring, or rendering. Do not merge these into one
-  script, and do not let `RoutingSystem` reach into Board State to pick
-  targets itself.
+- `ColorCandidateIndex` (M13, implemented) answers only "which currently
+  ACTIVE cells match this color?" as **raw color candidates**. It does **not**
+  prove reachability, choose a target, generate a route, or own reservations
+  (AL-028).
+- **Reachability/access truth** (future) filters candidates that are
+  currently blocked/unreachable: non-target ACTIVE cells block access, CLEARED
+  and background space is open. A fully enclosed matching-color ACTIVE cell is
+  not targetable.
+- `TargetSelector` (M15, future) chooses which *reachable/targetable*
+  candidate a Scrubbot cleans. It has no opinion about movement/animation and
+  **never generates routes**.
+- `RoutingSystem` (M16+, future) answers "given a start point and the already
+  selected target, what path/motion should the Scrubbot follow?" It has no
+  opinion about which cell was chosen and **must never silently retarget** if
+  the assigned target has no route — no route is a failure, not a re-pick.
+- This split means the routing/pathing algorithm can be swapped or upgraded
+  without touching level data, slot logic, cell state, scoring, or rendering.
+  Do not merge `TargetSelector` and `RoutingSystem` into one script, and do
+  not let `RoutingSystem` reach into Board State to pick targets itself.
 
 ## Performance approach
 
@@ -94,7 +108,8 @@ Slot dispatches a Scrubbot
   validation errors (`LevelValidationResult`). See
   `docs/03_LEVEL_DATA_SPEC.md`.
 - `BoardState` (`scripts/gameplay/board/board_state.gd`) — runtime cell
-  state (`DIRTY`/`CLEAN` per cell), built fresh from a `LevelData` via
+  state (`ACTIVE`/`CLEARED` per cell; all cells start ACTIVE), built fresh
+  from a `LevelData` via
   `BoardState.from_level_data(level)`. Says what is **currently happening**
   to that level. Two `BoardState` instances built from the same `LevelData`
   never share mutable state.
@@ -127,7 +142,7 @@ Slot dispatches a Scrubbot
   `get_height()` like everything else and have no reason to know about
   difficulty bands at all.
 
-## BoardRenderer and the DIRTY/CLEAN visual layer (implemented in Prompt 04 / M06)
+## BoardRenderer and the ACTIVE/CLEARED visual model (M06 renderer; ACTIVE/CLEARED locked in META-C004 / ADR-019)
 
 - `BoardRenderer` (`scripts/gameplay/board/board_renderer.gd`, extends
   `TextureRect`) — draws a `BoardState` as one `Image`/`ImageTexture` (one
@@ -136,10 +151,15 @@ Slot dispatches a Scrubbot
   `BoardState`/palette; never mutates gameplay state, never chooses
   targets, never dispatches. Public surface: `configure(board, palette,
   available_size)`, `refresh_all()`, `update_cells(indices)`,
-  `set_dirty_preset(name)`, `get_cell_size()`, `get_board_pixel_size()`,
+  `get_cell_size()`, `get_board_pixel_size()`, `get_pixel_color(x, y)`,
   `get_cell_center_local(x, y)` / `get_cell_center_global(x, y)` (the
   geometry seam a future `RoutingSystem` will target — no movement is
   implemented against it yet).
+- **Color law (ADR-019):** an ACTIVE cell renders its exact source palette
+  color, opaque (subject only to 8-bit RGBA quantization); a CLEARED cell
+  renders `Color(0,0,0,0)` — fully transparent — so the gameplay background
+  behind the board shows through. Never a black/gray/palette substitute for
+  CLEARED. There is no dirty transform and no preset.
 - Geometry: `cell_size = floor(min(available.x/width, available.y/height))`
   — fits any width×height (including rectangular boards) inside a given
   display rect without stretching or distorting aspect ratio, and without
@@ -148,16 +168,27 @@ Slot dispatches a Scrubbot
   path from `LevelData.palette` hex strings to Godot `Color`, used by
   `BoardRenderer`. Malformed entries are reported, not silently ignored
   (`PaletteParseResult`).
-- `DirtyCleanPresets` (`scripts/gameplay/board/dirty_clean_presets.gd`) —
-  centralized DIRTY color transform (HSV saturation *and* value reduction,
-  never saturation alone — see `docs/01_GAMEPLAY_SPEC.md`). CLEAN always
-  displays the unmodified source palette color. Three named presets
-  (`A`/`B`/`C`) exist for owner comparison; **none is approved yet** — this
-  is an open `[DESIGN GATE]`, tracked in `tasks.md` M10.
 - `scenes/debug/board_renderer_debug.tscn` +
   `scripts/debug/board_renderer_debug.gd` — dev-only tool to compare every
-  official board-size boundary and all three DIRTY presets at native
-  gameplay scale, via dropdowns, no code changes needed. Not production UI.
+  official board-size boundary against ACTIVE/CLEARED patterns (All ACTIVE,
+  All CLEARED, Half, Checker) at native gameplay scale, via dropdowns, no
+  code changes needed. A visible debug background sits behind the board so
+  transparent CLEARED cells reveal it. Not production UI.
+
+## ColorCandidateIndex (M13, `scripts/gameplay/targeting/`)
+
+- `ColorCandidateIndex` (`scripts/gameplay/targeting/color_candidate_index.gd`,
+  extends `RefCounted`) — the color-grouped query/cache layer that answers a
+  single narrow question: which currently ACTIVE cells match a given color, as
+  **raw color candidates**. Contract: `valid + ACTIVE + matching color + not
+  caller-excluded`. API: `create()`, `bind(board)`, `rebind(board)`,
+  `rebuild()`, `sync_cell(index)`, `get_candidates(color, excluded=[])`,
+  `has_candidates(...)`, `count_candidates(...)`, `get_color_ids()`.
+- It groups by color into cached buckets (row-major, deterministic), removes
+  CLEARED cells, and supports a caller-supplied exclusion/reservation set —
+  but it does **not** decide reachability, choose a final target, generate a
+  route, or own reservations (M14/M15/M16 remain separate). A matching-color
+  candidate is not automatically reachable (AL-028).
 
 ## Gameplay Session Core (implemented in M11)
 
@@ -236,11 +267,13 @@ gameplay scripts that need to run correctly under `godot --headless`.
 
 ## What is explicitly NOT built yet
 
-Slot System is implemented at its current M12 data-model boundary; target
-eligibility, reservation, TargetSelector, RoutingSystem, Scrubbot Agent,
-Cleaning Feedback and Save System remain future milestones (see
-`docs/04_ROADMAP.md` / `tasks.md`). `BoardRenderer` is implemented, but the
-*final* DIRTY visual language remains an open design gate. The Master UI
+Slot System is implemented at its current M12 data-model boundary; the M13
+`ColorCandidateIndex` supplies raw color candidates only. Reachability/access
+truth, reservation (M14), TargetSelector (M15), RoutingSystem (M16+), Scrubbot
+Agent, Cleaning Feedback and Save System remain future milestones (see
+`docs/04_ROADMAP.md` / `tasks.md`). `BoardRenderer` is implemented with the
+owner-locked ACTIVE/CLEARED model (ADR-019); owner manual QA of the
+transparent model is still pending (`tasks.md` SB-M10-005..011). The Master UI
 foundation now defines responsive architecture and primitives, but production
 Gameplay/Home/Popup screens are still milestone work and must not be marked
 complete until implemented and validated.
