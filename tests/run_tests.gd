@@ -22,6 +22,8 @@ const BoardDebugFixtures = preload("res://scripts/debug/board_debug_fixtures.gd"
 const LevelImporter = preload("res://scripts/tools/level_importer.gd")
 const LevelBatchImporter = preload("res://scripts/tools/level_batch_importer.gd")
 const GameplaySession = preload("res://scripts/gameplay/session/gameplay_session.gd")
+const SlotState = preload("res://scripts/gameplay/slots/slot_state.gd")
+const SlotSystem = preload("res://scripts/gameplay/slots/slot_system.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -45,6 +47,7 @@ func _initialize() -> void:
 	_run_importer_tests()
 	_run_batch_importer_tests()
 	_run_gameplay_session_tests()
+	_run_slot_system_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -1951,6 +1954,167 @@ func _run_gameplay_session_tests() -> void:
 			fname = dir.get_next()
 		dir.list_dir_end()
 		DirAccess.remove_absolute(test_dir)
+
+func _run_slot_system_tests() -> void:
+	print("---- M12: SlotSystem / SlotState tests ----")
+
+	# M12-01: construct exactly five slots
+	var sys := SlotSystem.new()
+	_check_eq(sys.get_slot_count(), 5, "M12-01 slot count is 5")
+	_check(sys is RefCounted, "M12-01 SlotSystem is RefCounted")
+	_check(not sys.has_method("get_parent"), "M12-01 SlotSystem has no Node ancestry")
+
+	# M12-02: deterministic stable slot IDs 0..4
+	for i in 5:
+		var slot = sys.get_slot(i)
+		_check(slot != null, "M12-02 slot %d exists" % i)
+		_check_eq(slot.get_id(), i, "M12-02 slot %d has ID %d" % [i, i])
+		_check(slot is RefCounted, "M12-02 slot %d is RefCounted" % i)
+		_check(not slot.has_method("get_parent"), "M12-02 slot %d has no Node ancestry" % i)
+
+	# M12-03: valid palette assignment for all five
+	var r := sys.configure([0, 1, 2, 3, 4], 8)
+	_check(r.ok, "M12-03 valid palette config succeeds")
+	_check(sys.is_configured(), "M12-03 system reports configured")
+	for i in 5:
+		_check_eq(sys.get_slot_palette_id(i), i, "M12-03 slot %d palette_id=%d" % [i, i])
+
+	# Identity stability after configure
+	for i in 5:
+		_check_eq(sys.get_slot(i).get_id(), i, "M12-04 slot %d ID stable after config" % i)
+
+	# M12-04: duplicate valid palette IDs with small palette
+	var sys2 := SlotSystem.new()
+	var r2 := sys2.configure([0, 0, 1, 1, 0], 2)
+	_check(r2.ok, "M12-04 duplicate palette IDs accepted")
+	_check_eq(sys2.get_slot_palette_id(0), 0, "M12-04 slot 0 palette=0")
+	_check_eq(sys2.get_slot_palette_id(1), 0, "M12-04 slot 1 palette=0")
+	_check_eq(sys2.get_slot_palette_id(2), 1, "M12-04 slot 2 palette=1")
+	_check_eq(sys2.get_slot_palette_id(3), 1, "M12-04 slot 3 palette=1")
+	_check_eq(sys2.get_slot_palette_id(4), 0, "M12-04 slot 4 palette=0")
+	# palette-based lookup
+	var by0 := sys2.get_slots_by_palette_id(0)
+	_check_eq(by0.size(), 3, "M12-04 palette 0 has 3 slots")
+	var by1 := sys2.get_slots_by_palette_id(1)
+	_check_eq(by1.size(), 2, "M12-04 palette 1 has 2 slots")
+
+	# M12-05: availability query/change on one slot, others unchanged
+	var sys3 := SlotSystem.new()
+	sys3.configure([0, 1, 2, 3, 4], 5)
+	for i in 5:
+		_check(sys3.is_slot_available(i), "M12-05 slot %d default available" % i)
+	sys3.set_slot_available(2, false)
+	_check(not sys3.is_slot_available(2), "M12-05 slot 2 now unavailable")
+	for i in [0, 1, 3, 4]:
+		_check(sys3.is_slot_available(i), "M12-05 slot %d still available" % i)
+	sys3.set_slot_available(2, true)
+	_check(sys3.is_slot_available(2), "M12-05 slot 2 restored available")
+
+	# M12-06: activity query/change on one slot, others unchanged
+	for i in 5:
+		_check(not sys3.is_slot_active(i), "M12-06 slot %d default inactive" % i)
+	sys3.set_slot_active(1, true)
+	_check(sys3.is_slot_active(1), "M12-06 slot 1 now active")
+	for i in [0, 2, 3, 4]:
+		_check(not sys3.is_slot_active(i), "M12-06 slot %d still inactive" % i)
+	sys3.set_slot_active(1, false)
+	_check(not sys3.is_slot_active(1), "M12-06 slot 1 restored inactive")
+
+	# M12-07: availability and activity are independent
+	sys3.set_slot_available(0, false)
+	sys3.set_slot_active(0, true)
+	_check(not sys3.is_slot_available(0), "M12-07 slot 0 unavailable")
+	_check(sys3.is_slot_active(0), "M12-07 slot 0 active despite unavailable")
+	sys3.set_slot_active(0, false)
+	sys3.set_slot_available(0, true)
+	_check(sys3.is_slot_available(0), "M12-07 slot 0 available restored")
+	_check(not sys3.is_slot_active(0), "M12-07 slot 0 inactive restored")
+
+	# M12-08: wrong number of palette assignments rejected
+	var sys4 := SlotSystem.new()
+	var r4 := sys4.configure([0, 1, 2, 3], 5)
+	_check(not r4.ok, "M12-08 four assignments rejected")
+	_check_eq(r4.error, "wrong_count", "M12-08 error is wrong_count")
+	var r4b := sys4.configure([0, 1, 2, 3, 4, 5], 8)
+	_check(not r4b.ok, "M12-08 six assignments rejected")
+	var r4c := sys4.configure([], 5)
+	_check(not r4c.ok, "M12-08 empty assignments rejected")
+
+	# M12-09: negative palette ID rejected
+	var sys5 := SlotSystem.new()
+	var r5 := sys5.configure([0, 1, -1, 3, 4], 5)
+	_check(not r5.ok, "M12-09 negative palette ID rejected")
+	_check_eq(r5.error, "invalid_palette_id", "M12-09 error is invalid_palette_id")
+
+	# M12-10: palette ID >= palette_size rejected
+	var sys6 := SlotSystem.new()
+	var r6 := sys6.configure([0, 1, 2, 3, 5], 5)
+	_check(not r6.ok, "M12-10 palette ID=5 with size=5 rejected")
+	_check_eq(r6.error, "palette_id_out_of_range", "M12-10 error is palette_id_out_of_range")
+	var r6b := sys6.configure([0, 1, 2, 3, 99], 5)
+	_check(not r6b.ok, "M12-10 palette ID=99 rejected")
+
+	# M12-11: negative slot ID rejected
+	var rn := sys.set_slot_available(-1, false)
+	_check(not rn.ok, "M12-11 negative slot ID availability rejected")
+	var rn2 := sys.set_slot_active(-1, true)
+	_check(not rn2.ok, "M12-11 negative slot ID activity rejected")
+	_check(sys.get_slot(-1) == null, "M12-11 get_slot(-1) returns null")
+	_check_eq(sys.get_slot_palette_id(-1), -1, "M12-11 get_slot_palette_id(-1) returns -1")
+
+	# M12-12: slot ID >= 5 rejected
+	var ro := sys.set_slot_available(5, false)
+	_check(not ro.ok, "M12-12 slot ID=5 availability rejected")
+	var ro2 := sys.set_slot_active(5, true)
+	_check(not ro2.ok, "M12-12 slot ID=5 activity rejected")
+	_check(sys.get_slot(5) == null, "M12-12 get_slot(5) returns null")
+	_check_eq(sys.get_slot_palette_id(5), -1, "M12-12 get_slot_palette_id(5) returns -1")
+	var ro3 := sys.set_slot_available(100, false)
+	_check(not ro3.ok, "M12-12 slot ID=100 rejected")
+
+	# M12-13: failed reconfiguration preserves prior valid state
+	var sys7 := SlotSystem.new()
+	sys7.configure([0, 1, 2, 3, 4], 8)
+	# verify baseline
+	for i in 5:
+		_check_eq(sys7.get_slot_palette_id(i), i, "M12-13 baseline slot %d palette=%d" % [i, i])
+	# attempt invalid reconfig
+	var r7 := sys7.configure([0, 1, 2, -1, 4], 8)
+	_check(not r7.ok, "M12-13 invalid reconfig fails")
+	_check(sys7.is_configured(), "M12-13 still configured after failed reconfig")
+	for i in 5:
+		_check_eq(sys7.get_slot_palette_id(i), i, "M12-13 slot %d preserved after failed reconfig" % i)
+	# attempt wrong count reconfig
+	var r7b := sys7.configure([0, 1, 2], 8)
+	_check(not r7b.ok, "M12-13 wrong count reconfig fails")
+	for i in 5:
+		_check_eq(sys7.get_slot_palette_id(i), i, "M12-13 slot %d preserved after wrong count" % i)
+
+	# M12-14: invalid mutation preserves prior state
+	sys7.set_slot_available(2, false)
+	sys7.set_slot_active(3, true)
+	var rm := sys7.set_slot_available(-1, true)
+	_check(not rm.ok, "M12-14 invalid mutation rejected")
+	_check(not sys7.is_slot_available(2), "M12-14 slot 2 still unavailable after invalid mutation")
+	_check(sys7.is_slot_active(3), "M12-14 slot 3 still active after invalid mutation")
+
+	# M12-15: query API does not permit structural count mutation
+	_check_eq(sys7.get_slot_count(), 5, "M12-15 count is 5 after all operations")
+	# no add/remove methods exist — structural invariant holds by API design
+
+	# M12-16: model uses no UI/scene hierarchy
+	_check(not sys7.has_method("get_parent"), "M12-16 SlotSystem has no Node ancestry")
+	for i in 5:
+		_check(not sys7.get_slot(i).has_method("get_parent"), "M12-16 slot %d has no Node ancestry" % i)
+
+	# M12-17: no dispatch/target/routing/agent behavior
+	# verified by API inspection: SlotSystem has no dispatch/target/route methods
+	_check(not sys7.has_method("dispatch"), "M12-17 no dispatch method")
+	_check(not sys7.has_method("select_target"), "M12-17 no select_target method")
+	_check(not sys7.has_method("route"), "M12-17 no route method")
+	_check(not sys7.has_method("spawn_agent"), "M12-17 no spawn_agent method")
+
+	print("  M12 slot system tests complete")
 
 func _print_summary() -> void:
 	print("")

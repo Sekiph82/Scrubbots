@@ -675,12 +675,12 @@ chosen one (or requested a new preset).
 
 ### M12 — Five-Slot Logic
 
-- [ ] SB-M12-001 Create SlotState. — [ ] SB-M12-002 Create SlotSystem.
-- [ ] SB-M12-003 Configure five gameplay slots.
-- [ ] SB-M12-004 Slot identity. — [ ] SB-M12-005 Slot palette/color.
-- [ ] SB-M12-006 Slot availability. — [ ] SB-M12-007 Slot activity state.
-- [ ] SB-M12-008 Keep model separate from UI. — [ ] SB-M12-009 Query API.
-- [ ] SB-M12-010 Five-slot tests. — [ ] SB-M12-011 Invalid slot tests.
+- [x] SB-M12-001 Create SlotState. Validated: `scripts/gameplay/slots/slot_state.gd`, RefCounted, AL-001 preload, holds identity/palette/availability/activity. — [x] SB-M12-002 Create SlotSystem. Validated: `scripts/gameplay/slots/slot_system.gd`, RefCounted, AL-001 preload, owns exactly 5 SlotState instances.
+- [x] SB-M12-003 Configure five gameplay slots. Validated: `configure()` accepts exactly 5 palette IDs, validates against palette_size, rejects wrong count/negative/out-of-range; 667/667 ALL PASS.
+- [x] SB-M12-004 Slot identity. Validated: deterministic IDs 0..4, stable across configure/state changes. — [x] SB-M12-005 Slot palette/color. Validated: palette assignment per slot, duplicate IDs accepted, palette-based lookup.
+- [x] SB-M12-006 Slot availability. Validated: per-slot available/unavailable, independent of other slots and activity. — [x] SB-M12-007 Slot activity state. Validated: per-slot active/inactive, independent of other slots and availability.
+- [x] SB-M12-008 Keep model separate from UI. Validated: both classes are RefCounted, no Node ancestry, no scene dependency. — [x] SB-M12-009 Query API. Validated: get_slot_count, get_slot, get_slot_palette_id, is_slot_available, is_slot_active, get_slots_by_palette_id; no structural mutation exposed.
+- [x] SB-M12-010 Five-slot tests. Validated: 119 new checks covering construction, identity, palette, availability, activity, independence, query API. — [x] SB-M12-011 Invalid slot tests. Validated: wrong count, negative palette ID, out-of-range palette ID, negative slot ID, slot ID >= 5, failed reconfig preserves state, invalid mutation preserves state.
 
 Remaining slot mechanics are `[DESIGN GATE]`.
 
