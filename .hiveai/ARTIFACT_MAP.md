@@ -13,3 +13,10 @@ Derived artifact map. Not task truth.
 
 Legacy combined evidence is preserved:
 https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_IMPLEMENTATION_LOG.md
+
+
+## M12-C001
+
+| Version | ChatGPT prompt | Audit criteria | Claude log | ChatGPT audit | State |
+| --- | --- | --- | --- | --- | --- |
+| V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V01.md | PENDING | PLANNED |
