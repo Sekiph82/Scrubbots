@@ -676,11 +676,11 @@ chosen one (or requested a new preset).
 ### M12 — Five-Slot Logic
 
 - [x] SB-M12-001 Create SlotState. Validated: `scripts/gameplay/slots/slot_state.gd`, RefCounted, AL-001 preload, holds identity/palette/availability/activity. — [x] SB-M12-002 Create SlotSystem. Validated: `scripts/gameplay/slots/slot_system.gd`, RefCounted, AL-001 preload, owns exactly 5 SlotState instances.
-- [ ] SB-M12-003 Configure five gameplay slots. **CHANGES_REQUIRED by M12-C001 Audit V01: validated configure path exists, but internal SlotState leakage lets callers bypass palette validation.**
-- [x] SB-M12-004 Slot identity. Validated: deterministic IDs 0..4, stable across configure/state changes. — [ ] SB-M12-005 Slot palette/color. **CHANGES_REQUIRED: externally leaked mutable SlotState can set an unvalidated palette ID.**
+- [x] SB-M12-003 Configure five gameplay slots. Validated: palette-only-via-configure invariant enforced. get_slot() removed; no mutable internal SlotState leakage. 657/657 ALL PASS.
+- [x] SB-M12-004 Slot identity. Validated: deterministic IDs 0..4, stable across configure/state changes. — [x] SB-M12-005 Slot palette/color. Validated: palette only changeable through validated configure(). get_slot() removed; scalar getters only.
 - [x] SB-M12-006 Slot availability. Validated: per-slot available/unavailable, independent of other slots and activity. — [x] SB-M12-007 Slot activity state. Validated: per-slot active/inactive, independent of other slots and availability.
-- [x] SB-M12-008 Keep model separate from UI. Validated: both classes are RefCounted, no Node ancestry, no scene dependency. — [ ] SB-M12-009 Query API. **CHANGES_REQUIRED: get_slot() returns mutable internally owned SlotState and is not a read-only query boundary.**
-- [ ] SB-M12-010 Five-slot tests. **CHANGES_REQUIRED: add direct mutable-reference bypass regression.** — [ ] SB-M12-011 Invalid slot tests. **CHANGES_REQUIRED: prove invalid palette state cannot be injected through public query access.**
+- [x] SB-M12-008 Keep model separate from UI. Validated: both classes are RefCounted, no Node ancestry, no scene dependency. — [x] SB-M12-009 Query API. Validated: all public queries return scalars (int/bool). No mutable internal reference exposed. get_slot() removed.
+- [x] SB-M12-010 Five-slot tests. Validated: M12-18 bypass regression proves get_slot() absent, all queries return scalars, palette 999 rejected. — [x] SB-M12-011 Invalid slot tests. Validated: invalid slot IDs return -1/false, no mutable object leak possible. 657/657 ALL PASS.
 
 Remaining slot mechanics are `[DESIGN GATE]`.
 

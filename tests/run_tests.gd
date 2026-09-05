@@ -1964,13 +1964,9 @@ func _run_slot_system_tests() -> void:
 	_check(sys is RefCounted, "M12-01 SlotSystem is RefCounted")
 	_check(not sys.has_method("get_parent"), "M12-01 SlotSystem has no Node ancestry")
 
-	# M12-02: deterministic stable slot IDs 0..4
+	# M12-02: deterministic stable slot IDs 0..4 (scalar query, no internal leak)
 	for i in 5:
-		var slot = sys.get_slot(i)
-		_check(slot != null, "M12-02 slot %d exists" % i)
-		_check_eq(slot.get_id(), i, "M12-02 slot %d has ID %d" % [i, i])
-		_check(slot is RefCounted, "M12-02 slot %d is RefCounted" % i)
-		_check(not slot.has_method("get_parent"), "M12-02 slot %d has no Node ancestry" % i)
+		_check_eq(sys.get_slot_id(i), i, "M12-02 slot %d has ID %d" % [i, i])
 
 	# M12-03: valid palette assignment for all five
 	var r := sys.configure([0, 1, 2, 3, 4], 8)
@@ -1981,7 +1977,7 @@ func _run_slot_system_tests() -> void:
 
 	# Identity stability after configure
 	for i in 5:
-		_check_eq(sys.get_slot(i).get_id(), i, "M12-04 slot %d ID stable after config" % i)
+		_check_eq(sys.get_slot_id(i), i, "M12-04 slot %d ID stable after config" % i)
 
 	# M12-04: duplicate valid palette IDs with small palette
 	var sys2 := SlotSystem.new()
@@ -2059,7 +2055,7 @@ func _run_slot_system_tests() -> void:
 	_check(not rn.ok, "M12-11 negative slot ID availability rejected")
 	var rn2 := sys.set_slot_active(-1, true)
 	_check(not rn2.ok, "M12-11 negative slot ID activity rejected")
-	_check(sys.get_slot(-1) == null, "M12-11 get_slot(-1) returns null")
+	_check_eq(sys.get_slot_id(-1), -1, "M12-11 get_slot_id(-1) returns -1")
 	_check_eq(sys.get_slot_palette_id(-1), -1, "M12-11 get_slot_palette_id(-1) returns -1")
 
 	# M12-12: slot ID >= 5 rejected
@@ -2067,7 +2063,7 @@ func _run_slot_system_tests() -> void:
 	_check(not ro.ok, "M12-12 slot ID=5 availability rejected")
 	var ro2 := sys.set_slot_active(5, true)
 	_check(not ro2.ok, "M12-12 slot ID=5 activity rejected")
-	_check(sys.get_slot(5) == null, "M12-12 get_slot(5) returns null")
+	_check_eq(sys.get_slot_id(5), -1, "M12-12 get_slot_id(5) returns -1")
 	_check_eq(sys.get_slot_palette_id(5), -1, "M12-12 get_slot_palette_id(5) returns -1")
 	var ro3 := sys.set_slot_available(100, false)
 	_check(not ro3.ok, "M12-12 slot ID=100 rejected")
@@ -2104,8 +2100,6 @@ func _run_slot_system_tests() -> void:
 
 	# M12-16: model uses no UI/scene hierarchy
 	_check(not sys7.has_method("get_parent"), "M12-16 SlotSystem has no Node ancestry")
-	for i in 5:
-		_check(not sys7.get_slot(i).has_method("get_parent"), "M12-16 slot %d has no Node ancestry" % i)
 
 	# M12-17: no dispatch/target/routing/agent behavior
 	# verified by API inspection: SlotSystem has no dispatch/target/route methods
@@ -2113,6 +2107,28 @@ func _run_slot_system_tests() -> void:
 	_check(not sys7.has_method("select_target"), "M12-17 no select_target method")
 	_check(not sys7.has_method("route"), "M12-17 no route method")
 	_check(not sys7.has_method("spawn_agent"), "M12-17 no spawn_agent method")
+
+	# M12-18: F-M12-001 bypass regression — get_slot() must not exist (AL-020)
+	_check(not sys.has_method("get_slot"), "M12-18 get_slot removed from public API")
+	# All public query methods return scalars, not mutable internal objects
+	var query_result_id = sys.get_slot_id(0)
+	_check(query_result_id is int, "M12-18 get_slot_id returns scalar int")
+	var query_result_pid = sys.get_slot_palette_id(0)
+	_check(query_result_pid is int, "M12-18 get_slot_palette_id returns scalar int")
+	var query_result_avail = sys.is_slot_available(0)
+	_check(query_result_avail is bool, "M12-18 is_slot_available returns scalar bool")
+	var query_result_active = sys.is_slot_active(0)
+	_check(query_result_active is bool, "M12-18 is_slot_active returns scalar bool")
+	# Verify no public method returns an object with set_palette_id
+	_check(not (query_result_id is Object), "M12-18 ID query is not Object")
+	_check(not (query_result_pid is Object), "M12-18 palette query is not Object")
+	# Palette can only change through validated configure()
+	sys.configure([0, 1, 2, 3, 4], 8)
+	_check_eq(sys.get_slot_palette_id(0), 0, "M12-18 palette 0 via configure")
+	# No way to write palette_id=999 without going through configure validation
+	var bypass_attempt := sys.configure([999, 1, 2, 3, 4], 8)
+	_check(not bypass_attempt.ok, "M12-18 palette 999 rejected by configure")
+	_check_eq(sys.get_slot_palette_id(0), 0, "M12-18 palette 0 unchanged after rejected bypass")
 
 	print("  M12 slot system tests complete")
 
