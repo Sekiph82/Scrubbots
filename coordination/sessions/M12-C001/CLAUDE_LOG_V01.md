@@ -99,9 +99,9 @@ No gameplay session, board state, board renderer, level loader, or level data fi
 | 29 | Update PROJECT_DASHBOARD | M12-C001 materialized | Updated | CLAUDE_TEST_PASS |
 | 30 | git status --short before commit | Known changes only | 7M + 3 new, no unexpected files | CLAUDE_TEST_PASS |
 | 31 | Focused M12-C001 commit | Single commit | `218d91a` — 10 files, 465 ins, 39 del | CLAUDE_TEST_PASS |
-| 32 | Safe non-force push | No force | *see below* |
-| 33 | CLAUDE_LOG_V01.md and impl commit visible on GitHub | HTTP 200 | *see below* |
-| 34 | Final git status --short | Clean tree | *see below* |
+| 32 | Safe non-force push | No force | `3ef677c..170df57 main -> main` | CLAUDE_TEST_PASS |
+| 33 | CLAUDE_LOG_V01.md and impl commit visible on GitHub | HTTP 200 | CLAUDE_LOG_V01.md=200, slot_system.gd=200, slot_state.gd=200 | CLAUDE_TEST_PASS |
+| 34 | Final git status --short | Clean tree | Clean (only untracked: scratchpad, docs/logs/) | CLAUDE_TEST_PASS |
 
 ## Failures and fixes
 
@@ -126,7 +126,7 @@ No gameplay session, board state, board renderer, level loader, or level data fi
 ## Commit and push evidence
 
 - Commit: `218d91a` (10 files, 465 ins, 39 del)
-- Push: *updated after push*
+- Push: `3ef677c..170df57 main -> main` (non-force, 2 commits: `218d91a` + `170df57`)
 
 ## Handoff
 
