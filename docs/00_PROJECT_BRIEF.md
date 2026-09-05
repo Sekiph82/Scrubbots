@@ -3,9 +3,13 @@
 ## What SCRUBBOTS is
 
 SCRUBBOTS is an original mobile puzzle game. Each level is a piece of
-pixel-art hidden under a layer of grime. The player dispatches tiny cleaning
-robots — **Scrubbots** — from a limited set of color slots to scrub away the
-grime and reveal the artwork underneath, one logical pixel at a time.
+pixel-art whose cells start **ACTIVE** — visible at their original source
+palette color. The player dispatches tiny cleaning robots — **Scrubbots** —
+from a limited set of color slots to clear away the visible pixel artwork one
+logical pixel at a time. A cleared cell becomes **CLEARED**: fully transparent,
+so the gameplay background shows through the hole it leaves. There is no
+grime layer and no hidden second artwork — the visible artwork itself is what
+is progressively cleared away (see `docs/05_TECH_DECISIONS.md` ADR-019).
 
 This is a from-scratch SCRUBBOTS implementation: own architecture, own
 visuals, own terminology, own rules. No code, assets, characters, UI, levels,
@@ -31,13 +35,16 @@ specified yet — none should be invented. See `CLAUDE.md` rule 2.
 
 ## High-level player experience
 
-1. Player opens a level and sees a grimy/obscured pixel-art image on a
-   logical grid whose width and height are defined by that level (40×40 and
-   50×50 are both real, supported sizes — see below).
+1. Player opens a level and sees a pixel-art image — all cells ACTIVE at
+   their source palette color — on a logical grid whose width and height are
+   defined by that level (40×40 and 50×50 are both real, supported sizes —
+   see below).
 2. Player sees 5 slots, each representing a color/robot type.
 3. Player selects/activates slots to dispatch Scrubbots.
-4. Scrubbots travel from their slot to matching cells and reveal them.
-5. As cells clear, the underlying pixel-art image emerges.
+4. Scrubbots travel from their slot to a reachable matching-color ACTIVE cell
+   and clear it (the cell becomes CLEARED — transparent).
+5. As cells become CLEARED, transparent holes open across the artwork and the
+   gameplay background shows through.
 6. The level is won when the board reaches its win condition (exact
    condition detail: see `docs/01_GAMEPLAY_SPEC.md`).
 7. Consecutive wins build a streak that pays out according to the locked

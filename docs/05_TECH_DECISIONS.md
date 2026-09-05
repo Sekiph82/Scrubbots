@@ -414,3 +414,53 @@ sessions while preserving source originals.
 and promoted. Magnific may not overwrite owner-source references.
 
 **Status**: Owner-approved.
+
+
+---
+
+### ADR-019: ACTIVE/CLEARED board lifecycle replaces the DIRTY/CLEAN grime/reveal model
+
+**Decision** (owner, 2026-09-05, cycle META-C004): the gameplay-semantic
+DIRTY/CLEAN visual model is replaced entirely by an ACTIVE/CLEARED cell
+lifecycle:
+
+- Every logical artwork pixel starts **ACTIVE**: present, shown at its
+  **original source palette color, opaque**, a color-matching candidate, and
+  it occupies/blocks board space for access/path semantics.
+- A successfully cleaned cell becomes **CLEARED**: rendered at **alpha 0**
+  (fully transparent) so the gameplay background shows through, no longer a
+  color candidate, and it becomes open/free space for access/path semantics.
+- `BoardState.CellState` is `ACTIVE = 0`, `CLEARED = 1` (numeric order
+  preserved so existing packed-byte storage stays valid).
+- `BoardRenderer` draws ACTIVE = exact source color/opaque, CLEARED =
+  `Color(0,0,0,0)`. No black/gray/palette substitute for CLEARED.
+
+There is **no** DIRTY state, no CLEAN-colored transform state, no grime
+transform, no A/B/C dirty preset, and no hidden second artwork layer being
+revealed. The visible pixel artwork itself is progressively cleared away.
+
+**Candidate ≠ reachable target (AL-028):** a matching-color ACTIVE cell is
+only a *raw color candidate*. It is not a valid final target unless it is
+also currently reachable under board-access semantics: non-target ACTIVE
+cells block access, CLEARED/background space is open, and a fully enclosed
+matching-color ACTIVE cell is not targetable until prior clears open access.
+The M13 `ColorCandidateIndex` (`scripts/gameplay/targeting/`) proves color
+membership only; reachability filtering, `TargetSelector` (M15) and
+`RoutingSystem` (M16+) remain separate systems (see ADR-005). `TargetSelector`
+never generates routes; `RoutingSystem` never silently retargets.
+
+**Reason**: the owner replaced the prototype visual model with a concrete,
+testable transparency rule that also defines board-access semantics for
+future routing. Directly observable renderer alpha is a stronger test target
+than a subjective dirty-preset comparison.
+
+**Consequences**: `scripts/gameplay/board/dirty_clean_presets.gd` is removed;
+the M13 index moved from `scripts/gameplay/routing/eligible_target_index.gd`
+(`EligibleTargetIndex`) to `scripts/gameplay/targeting/color_candidate_index.gd`
+(`ColorCandidateIndex`) with candidate-specific API. ADR-011's one-Image/
+ImageTexture renderer architecture is unchanged. The historical DIRTY/CLEAN
+design-gate reasoning (audit learning AL-007, prior phase/M10 notes) is
+preserved as history and marked superseded, not erased. Owner manual QA of the
+new transparent model (`tasks.md` SB-M10-005..011) remains open.
+
+**Status**: Owner-locked.

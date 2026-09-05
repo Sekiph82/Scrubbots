@@ -14,16 +14,18 @@ Verified at time of writing (end of Phase M06):
   CHANGELOG for the Phase M06 commit that follows it.
 - Working tree: clean, `main` up to date with `origin/main`
 - Godot: `4.7.1.stable.official.a13da4feb` (installed, `godot --version` confirmed)
-- Headless test suite (`tests/run_tests.gd`): **227/227 checks PASS**, exit
-  code 0 (73 Prompt 02 + 58 Phase M03 + 96 Phase M06)
+- Headless test suite (`tests/run_tests.gd`): **774/774 checks PASS**, exit
+  code 0 (grown through M09/M11/M12/M13 and the META-C004 ACTIVE/CLEARED
+  renderer migration; recomputed from the suite summary, not hardcoded)
 - Official production difficulty bands (Easy/Medium/Hard/Very_Hard,
   20..59, max 59×59 = 3,481 cells) implemented and enforced via
   `DifficultyRules` + `ProductionLevelValidator`, kept separate from the
   generic dimension-agnostic `LevelValidator`/`BoardState` core.
 - `BoardRenderer` implemented (single Image/ImageTexture, zero per-cell
-  Nodes at any board size — ADR-011) with a DIRTY/CLEAN visual prototype
-  (`DirtyCleanPresets` A/B/C). **Final DIRTY visual style is an open design
-  gate — not approved** (see M10).
+  Nodes at any board size — ADR-011) with the owner-locked ACTIVE/CLEARED
+  model (ADR-019): ACTIVE = source palette color/opaque, CLEARED =
+  transparent (background shows through). **Owner manual QA of the
+  transparent model is still open** (SB-M10-005..011).
 
 ## Status tags
 
@@ -195,9 +197,9 @@ each has one dimension outside its band.
 
 `59×59 = 3,481` cells. All systems whose cost scales with board size must
 eventually be tested against this workload: LevelData validation,
-BoardState, BoardRenderer, cell eligibility, target selection,
-routing-related board queries, cleaning updates, save/load of level state
-if used, and production content validation.
+BoardState, BoardRenderer, color candidate index, reachability/access,
+target selection, routing-related board queries, clearing updates, save/load
+of level state if used, and production content validation.
 
 ### 8.6 — Test/dev fixtures vs. production levels `[LOCKED TECHNICAL RULE]`
 
@@ -224,10 +226,12 @@ production game currently requires exactly five visible active slots.
 ### 8.9 — Scrubbot behavior `[LOCKED]`
 
 - Scrubbots leave slots one at a time.
-- A Scrubbot does not leave if there is no valid cleaning job.
-- A Scrubbot has a valid target *before* being dispatched.
+- A Scrubbot does not leave unless a reachable/targetable matching target
+  exists (a blocked/unreachable matching-color ACTIVE cell is not enough).
+- A Scrubbot has a valid, reachable target *before* being dispatched.
 - It visually moves from slot to target.
-- On arrival it cleans/reveals the target logical pixel.
+- On arrival the target logical pixel becomes CLEARED (transparent; the
+  gameplay background shows through).
 - It then disappears/finishes.
 - It does not collect or carry pixel color.
 - It does not return to the slot; no return route is needed.
@@ -405,7 +409,7 @@ Exact slot refill/replacement behavior; how a player activates a slot;
 whether slots hold quantities; hidden/upcoming slot queue; exact number of
 colors by difficulty; palette-size rules; exact target-selection heuristic;
 exact route geometry; route crossing rules; route collision behavior; exact
-dirty/clean visual presentation; exact win condition; exact lose condition;
+win condition; exact lose condition;
 timer; move limits; lives; blockers; boosters; hints; progression
 structure; currency meaning; economy; shop; monetization; ads; IAP; energy
 system; analytics; achievements; leaderboard; social features; cloud save;
@@ -471,8 +475,8 @@ Complete from Prompt 02, re-verified.
 - [x] SB-M02-001 BoardState exists (`scripts/gameplay/board/board_state.gd`).
 - [x] SB-M02-002 Runtime state separate from LevelData (BoardState built via `from_level_data`, never mutates source).
 - [x] SB-M02-003 Source color data copied safely (`_color_ids = level.cells.duplicate()`).
-- [x] SB-M02-004 DIRTY state implemented.
-- [x] SB-M02-005 CLEAN state implemented.
+- [x] SB-M02-004 ACTIVE state implemented (`CellState.ACTIVE = 0`; fresh board all-ACTIVE).
+- [x] SB-M02-005 CLEARED state implemented (`CellState.CLEARED = 1`).
 - [x] SB-M02-006 Coordinate validation exists (`is_valid_coordinate`).
 - [x] SB-M02-007 Index validation exists (`is_valid_index`).
 - [x] SB-M02-008 Coordinate→index exists (`get_cell_index`).
@@ -563,7 +567,7 @@ Do not replace existing Prompt 02 fixtures — add to them.
 - [x] SB-M04-018 59×59 loads successfully (`test_59x59.json`, full JSON pipeline).
 - [x] SB-M04-019 `cell_count == 3481`.
 - [x] SB-M04-020 Coordinate/index tests pass at 59×59 (4 corners + center).
-- [x] SB-M04-021 State mutation tests pass at 59×59 (single-cell isolation: 1 CLEAN / 3480 DIRTY).
+- [x] SB-M04-021 State mutation tests pass at 59×59 (single-cell isolation: 1 CLEARED / 3480 ACTIVE).
 - [x] SB-M04-022 Performance sanity benchmark runs at 3,481 cells (kept alongside the existing 50×50 benchmark, not replacing it).
 - [x] SB-M04-023 Record results without an arbitrary strict timing threshold (see `SCRUBBOTS_PHASE_M03_LOG.md` for actual measured numbers).
 
@@ -682,35 +686,35 @@ An image must never be auto-changed to 20×20/40×40/50×50 for convenience.
 - [x] SB-M09-019 Batch validation. — Whole-batch preflight (every item `dry_run=true` + schema/destination-parent/destination-type/duplicate-ID/cross-item-path/catalog-ownership/catalog-health checks) runs before any commit write; a failing later item blocks earlier items from being committed (CLI-verified, including missing-destination-parent and destination-is-directory cases). Malformed/empty manifest, missing required fields, and wrong optional-field types rejected with actionable per-item errors and no crash. V03 correction (audit V02 F-M09B-006 / AL-017): destination-object type (existing directory at final path) is now part of preflight for output, preview, and metadata roles — validation-only mode remains fully read-only and creates/removes nothing. 447/447 tests pass.
 - [x] SB-M09-020 Duplicate level ID protection. — ChatGPT audit V02 independently accepted the V02 catalog-root/health and bidirectional ID/path ownership corrections; F-M09B-006 does not reopen duplicate-ID semantics.  Rejects duplicate IDs within one manifest and IDs already owned by a different existing catalog file (independent of `overwrite`, CLI-verified); allows re-import at the same canonical catalog path (CLI-verified: legitimate overwrite still succeeds); catalog scan reports existing duplicate IDs (both paths) and malformed/structurally-invalid catalog entries rather than ignoring them. V02 correction (audit V01 F-M09B-003): catalog scan now builds bidirectional ownership (declared ID → path *and* canonical path → declared ID) — a different ID can no longer take over an existing catalog path with `overwrite=true` (CLI-verified with byte-preservation proof), and aliasing a malformed existing catalog file fails closed. TEST and production levels share one ID-uniqueness space per catalog root.
 
-### M10 — Dirty/Clean Visual Model `[DESIGN GATE]`
+### M10 — ACTIVE/CLEARED Board Visual Model `[OWNER DECISION LOCKED]` `[MANUAL QA OPEN]`
 
-Review original SCRUBBOTS visual references before locking final visuals.
-**Prompt 04 built the prototype infrastructure and three candidate presets
-— this milestone is NOT complete.** Final DIRTY visual approval remains an
-open `[DESIGN GATE]` regardless of how much tooling exists; do not mark it
-resolved until the project owner has actually compared presets A/B/C at
-native 50×50/59×59 scale via `scenes/debug/board_renderer_debug.tscn` and
-chosen one (or requested a new preset).
+Owner decision (2026-09-05, META-C004; ADR-019) resolves the visual model:
+**ACTIVE = the original source palette color, opaque; CLEARED = fully
+transparent (alpha 0) so the gameplay background shows through.** There is no
+grime/hidden-artwork layer and no A/B/C dirty preset. The implementation and
+its automated renderer tests are complete; what remains OPEN is the owner's
+manual visual QA of the NEW transparent model at native scale via
+`scenes/debug/board_renderer_debug.tscn` (SB-M10-005..011 below).
 
-- [ ] SB-M10-001 Define (approve) DIRTY appearance — 3 candidate presets exist (`DirtyCleanPresets` A/B/C), none chosen.
-- [x] SB-M10-002 Define CLEAN appearance — locked: unmodified source palette color (`docs/01_GAMEPLAY_SPEC.md`).
-- [x] SB-M10-003 Define grime layer relationship to source artwork — locked: DIRTY is a transform of the same color, never a separate stacked layer (ADR-011).
-- [x] SB-M10-004 Implement visual mapping (`DirtyCleanPresets.apply_dirty`).
-- [ ] SB-M10-005 Ensure cleaning is immediately readable — debug tooling ready to test this; actual owner visual confirmation pending.
-- [ ] SB-M10-006 Preserve artwork recognition — same: tooling ready, owner confirmation pending.
-- [ ] SB-M10-007 Test Easy density. — [ ] SB-M10-008 Test Medium density. (debug tool supports both sizes; awaiting owner visual review)
-- [ ] SB-M10-009 Test Hard density. — [ ] SB-M10-010 Test Very Hard density. (debug tool supports both sizes; awaiting owner visual review)
-- [ ] SB-M10-011 Test 59×59 readability — the single most important check per this phase's own instructions; tooling ready, **awaiting owner review**.
-- [x] SB-M10-012 Add development reveal/debug toggle (`scenes/debug/board_renderer_debug.tscn` — size/pattern/preset dropdowns).
+- [x] SB-M10-001 Define (approve) ACTIVE appearance — owner locked: original source palette color, opaque (ADR-019).
+- [x] SB-M10-002 Define CLEARED appearance — locked: fully transparent (alpha 0), background shows through (`docs/01_GAMEPLAY_SPEC.md`; was: CLEAN unmodified source color).
+- [x] SB-M10-003 Define artwork-clearing relationship to source artwork — locked: the visible source pixel is cleared to transparent; there is no separate grime/hidden layer (ADR-019).
+- [x] SB-M10-004 Implement visual mapping (`BoardRenderer._color_for_cell`: ACTIVE=source color/opaque, CLEARED=`Color(0,0,0,0)`) — implemented and tested in META-C004.
+- [ ] SB-M10-005 Owner-confirm clearing is immediately readable (transparent CLEARED vs opaque ACTIVE) — debug tooling ready; owner visual confirmation pending.
+- [ ] SB-M10-006 Owner-confirm ACTIVE artwork recognition — tooling ready, owner confirmation pending.
+- [ ] SB-M10-007 Owner test Easy density. — [ ] SB-M10-008 Owner test Medium density. (debug tool supports both sizes; awaiting owner visual review)
+- [ ] SB-M10-009 Owner test Hard density. — [ ] SB-M10-010 Owner test Very Hard density. (debug tool supports both sizes; awaiting owner visual review)
+- [ ] SB-M10-011 Owner test 59×59 transparent-model readability — the single most important manual check; tooling ready, **awaiting owner review**.
+- [x] SB-M10-012 Development debug tool (`scenes/debug/board_renderer_debug.tscn` — size + ACTIVE/CLEARED-pattern dropdowns, visible background behind board) migrated to the new model and proven to headless-boot in META-C004.
 
 ### M11 — Gameplay Session Core
 
 - [x] SB-M11-001 Define session states. (UNINITIALIZED/READY/ACTIVE/PAUSED/COMPLETED enum in gameplay_session.gd; 542/542 ALL PASS)
 - [x] SB-M11-002 Initialize level. — [x] SB-M11-003 Load LevelData. (load_level uses LevelLoader, creates BoardState, enters READY; failed-load atomicity verified)
-- [x] SB-M11-004 Create BoardState. — [x] SB-M11-005 Connect renderer. (V02 correction: M11-23 now proves pixel output follows session-owned BoardState via DIRTY→CLEAN mutation readback; M11-24 proves renderer follows NEW BoardState after reset, not stale old; 548/548 ALL PASS)
+- [x] SB-M11-004 Create BoardState. — [x] SB-M11-005 Connect renderer. (M11-23 proves pixel output follows session-owned BoardState via ACTIVE→CLEARED opaque→transparent readback; M11-24 proves renderer follows NEW BoardState after reset, not stale old. META-C004 re-verified under the ACTIVE/CLEARED model.)
 - [x] SB-M11-006 Define ready state. — [x] SB-M11-007 Define active state. (READY->ACTIVE via start(); invalid transitions rejected without state mutation)
-- [x] SB-M11-008 Define pause. — [x] SB-M11-009 Define reset. (ACTIVE<->PAUSED; reset recreates BoardState from immutable LevelData, all cells DIRTY, returns to READY)
-- [x] SB-M11-010 Define completion transition. (explicit complete() from ACTIVE only; no auto-complete from dirty-cell count; repeated completion deterministic)
+- [x] SB-M11-008 Define pause. — [x] SB-M11-009 Define reset. (session ACTIVE<->PAUSED; reset recreates BoardState from immutable LevelData, all cells ACTIVE, returns to READY)
+- [x] SB-M11-010 Define completion transition. (explicit complete() from session-ACTIVE only; no auto-complete from cleared-cell count; repeated completion deterministic)
 - [x] SB-M11-011 Keep UI separate from gameplay truth. (RefCounted core, no UI/Control dependency, no HUD/menu logic; renderer is optional presentation binding)
 - [x] SB-M11-012 Headless lifecycle tests where possible. (V02 correction closes F-M11-001: M11-23/24 strengthened with direct pixel readback proving renderer follows session-owned/fresh BoardState; test would fail if reset-time _configure_renderer() were removed; 548/548 ALL PASS)
 
@@ -725,17 +729,21 @@ chosen one (or requested a new preset).
 
 Remaining slot mechanics are `[DESIGN GATE]`.
 
-### M13 — Eligible Target Index `[PERFORMANCE]`
+### M13 — Color Candidate Index `[PERFORMANCE]`
 
-Don't rescan up to 3,481 cells unnecessarily for every bot.
+Don't rescan up to 3,481 cells unnecessarily for every bot. This index
+supplies **raw ACTIVE matching-color candidates only** — it does NOT prove
+reachability (a matching-color ACTIVE cell may be blocked; AL-028).
+Renamed/migrated to `scripts/gameplay/targeting/color_candidate_index.gd`
+(`ColorCandidateIndex`) in META-C004; re-verified 774/774 ALL PASS.
 
-- [x] SB-M13-001 Define eligible cell.
+- [x] SB-M13-001 Define color candidate (valid + ACTIVE + matching color + caller exclusion).
 - [x] SB-M13-002 Group/query by color.
 - [x] SB-M13-003 Implement efficient index/cache if measured useful.
 - [x] SB-M13-004 Synchronize with BoardState.
-- [x] SB-M13-005 Remove CLEAN cells. — [x] SB-M13-006 Handle reservations.
-- [x] SB-M13-007 No-work query. — [x] SB-M13-008 Exhausted-color test.
-- [x] SB-M13-009 Last-target test. — [x] SB-M13-010 3,481-cell benchmark.
+- [x] SB-M13-005 Remove CLEARED cells from the index. — [x] SB-M13-006 Handle caller-supplied reservation/exclusion seam only (no owned reservation state).
+- [x] SB-M13-007 No-candidate query. — [x] SB-M13-008 Exhausted-color test.
+- [x] SB-M13-009 Last-candidate test. — [x] SB-M13-010 3,481-cell benchmark.
 
 ### M14 — Reservation State
 
@@ -752,11 +760,16 @@ when target assignment requires it.
 
 ### M15 — TargetSelector
 
+Chooses WHAT target among **reachable/targetable** candidates. Consumes raw
+candidates from `ColorCandidateIndex` plus a narrow reachability/access truth;
+it must never generate a route. A matching-color ACTIVE cell that is
+blocked/unreachable is not a valid target (AL-028).
+
 - [ ] SB-M15-001 Create TargetSelector.
 - [ ] SB-M15-002 Keep BoardState access narrow.
 - [ ] SB-M15-003 Baseline deterministic strategy.
 - [ ] SB-M15-004 Match Scrubbot color.
-- [ ] SB-M15-005 Never target CLEAN. — [ ] SB-M15-006 Never target invalid.
+- [ ] SB-M15-005 Never target CLEARED. — [ ] SB-M15-006 Never target invalid or blocked/unreachable ACTIVE cells (consume a narrow reachability/access truth; a fully enclosed matching-color ACTIVE cell must not be selected and must not cause dispatch — required regression, AL-028).
 - [ ] SB-M15-007 Respect reservations.
 - [ ] SB-M15-008 Return no-target cleanly.
 - [ ] SB-M15-009 No route generation inside selector (8.10).
@@ -766,14 +779,20 @@ when target assignment requires it.
 
 ### M16 — RoutingSystem Interface
 
+Access semantics (locked, AL-028; exact topology/path style is still design
+work): non-target ACTIVE cells are **blockers**; CLEARED cells and
+gameplay-background/outside-board space are **open**; a route ends at the
+already-assigned ACTIVE target. No route → **failure**, never a silent
+retarget (that decision belongs to TargetSelector, not RoutingSystem).
+
 - [ ] SB-M16-001 Define RoutingSystem contract.
 - [ ] SB-M16-002 Define route input. — [ ] SB-M16-003 Define route output.
 - [ ] SB-M16-004 Define coordinate space.
-- [ ] SB-M16-005 Slot origin. — [ ] SB-M16-006 Cell destination.
+- [ ] SB-M16-005 Slot origin. — [ ] SB-M16-006 Cell destination (the assigned ACTIVE target).
 - [ ] SB-M16-007 Keep independent from TargetSelector (8.10).
 - [ ] SB-M16-008 Swappable implementations.
 - [ ] SB-M16-009 Debug route visualization.
-- [ ] SB-M16-010 Route validity checks. — [ ] SB-M16-011 Failure behavior.
+- [ ] SB-M16-010 Route validity checks: non-target ACTIVE cells block, CLEARED/background is open, route ends at the assigned target. — [ ] SB-M16-011 Failure behavior: no route is a failure returned to the caller, never a silent retarget.
 
 ### M17 — Routing Prototype Lab
 
@@ -790,6 +809,11 @@ working solution — prototype multiple options.
 - [ ] SB-M17-011 Test 5 bots. — [ ] SB-M17-012 Test 10 bots. — [ ] SB-M17-013 Test 25 bots.
 - [ ] SB-M17-014 Stress-test higher density.
 - [ ] SB-M17-015 Test 59×59. — [ ] SB-M17-016 Test rectangular Very Hard board.
+
+Required cases under the access rule (AL-028): a **blocked interior** target
+(fully enclosed matching-color ACTIVE cell) yields no route (never a silent
+retarget), and a **newly-opened-after-clear** case where prior CLEARED cells
+create legal access to a previously blocked target.
 
 `[DESIGN GATE]` — owner selects final movement language.
 
@@ -808,9 +832,9 @@ working solution — prototype multiple options.
 ### M19 — Scrubbot Dispatcher
 
 - [ ] SB-M19-001 Receive slot request.
-- [ ] SB-M19-002 Check work before spawn.
+- [ ] SB-M19-002 Check work before spawn — "work" means a reachable/targetable target exists, not merely a raw color candidate.
 - [ ] SB-M19-003 Ask TargetSelector.
-- [ ] SB-M19-004 Refuse spawn without target.
+- [ ] SB-M19-004 Refuse spawn without a reachable target (no reachable target → no spawn).
 - [ ] SB-M19-005 Reserve target.
 - [ ] SB-M19-006 Spawn exactly one bot per dispatch.
 - [ ] SB-M19-007 Enforce one-by-one flow.
@@ -819,12 +843,13 @@ working solution — prototype multiple options.
 - [ ] SB-M19-010 Handle rapid input.
 - [ ] SB-M19-011 Concurrent slot tests. — [ ] SB-M19-012 Reset during dispatch.
 
-### M20 — Complete Cleaning Vertical Slice
+### M20 — Complete Clearing Vertical Slice
 
-Required flow: slot activation → work validation → target selection →
-target reservation → Scrubbot spawn → route generation → visual travel →
-arrival → CLEAN state → renderer update → eligibility update → reservation
-clear → Scrubbot disappears.
+Required flow: slot activation → work validation (reachable target exists) →
+target selection → target reservation → Scrubbot spawn → route generation →
+visual travel → arrival → target becomes CLEARED (renderer draws it
+transparent, background shows through) → candidate/access truth update →
+reservation clear → Scrubbot disappears (no return, no color carry).
 
 - [ ] SB-M20-001 Wire complete sequence.
 - [ ] SB-M20-002 No target means no bot. — [ ] SB-M20-003 No return behavior.
@@ -849,14 +874,14 @@ art**, not a synthetic checkerboard. Blocked until such art exists locally
 - [ ] SB-M21-006 Render in gameplay.
 - [ ] SB-M21-007 Populate five slots.
 - [ ] SB-M21-008 Dispatch Scrubbots.
-- [ ] SB-M21-009 Clean actual artwork pixels.
+- [ ] SB-M21-009 Clear actual artwork pixels (ACTIVE→CLEARED; visible artwork is cleared to transparent, background shows through).
 - [ ] SB-M21-010 Run full level.
 - [ ] SB-M21-011 Profile performance.
 - [ ] SB-M21-012 Capture reference gameplay output.
 
 **First real-art vertical slice additions (from UI_TASKS_APPENDIX migration)**
 - [ ] SB-UI-014 Run at least one gameplay vertical slice using owner-approved real pixel/level artwork rather than treating a Magnific illustration as logical level data.
-- [ ] SB-UI-015 Prove the logical board renderer, DIRTY/CLEAN treatment and responsive board presentation remain data-driven and independent of full-screen concept art.
+- [ ] SB-UI-015 Prove the logical board renderer, ACTIVE/CLEARED treatment (opaque source color vs transparent cleared cells showing the background) and responsive board presentation remain data-driven and independent of full-screen concept art.
 - [ ] SB-UI-016 Record which visual gaps genuinely require Magnific generation before opening production gameplay UI generation.
 
 ### M22 — Production Slot UI `[VISUAL REFERENCE]`
@@ -1090,7 +1115,7 @@ behavior if needed. Keep tutorial logic separate from core gameplay.
 
 - [ ] SB-M40-001 Debug overlay. — [ ] SB-M40-002 Level ID.
 - [ ] SB-M40-003 Difficulty. — [ ] SB-M40-004 Dimensions.
-- [ ] SB-M40-005 Cell count. — [ ] SB-M40-006 Dirty count. — [ ] SB-M40-007 Clean count.
+- [ ] SB-M40-005 Cell count. — [ ] SB-M40-006 ACTIVE count. — [ ] SB-M40-007 CLEARED count.
 - [ ] SB-M40-008 Reserved count if implemented. — [ ] SB-M40-009 Active bots.
 - [ ] SB-M40-010 FPS. — [ ] SB-M40-011 Frame time.
 - [ ] SB-M40-012 Target markers. — [ ] SB-M40-013 Route visualization.
@@ -1103,7 +1128,7 @@ behavior if needed. Keep tutorial logic separate from core gameplay.
 Maximum board target: 59×59 = 3,481.
 
 - [ ] SB-M41-001 Level parsing. — [ ] SB-M41-002 BoardState. — [ ] SB-M41-003 Renderer.
-- [ ] SB-M41-004 Eligibility. — [ ] SB-M41-005 TargetSelector. — [ ] SB-M41-006 Routing.
+- [ ] SB-M41-004 Color candidate index + reachability/access. — [ ] SB-M41-005 TargetSelector. — [ ] SB-M41-006 Routing.
 - [ ] SB-M41-007 Scrubbot agents. — [ ] SB-M41-008 Effects.
 - [ ] SB-M41-009 Memory baseline. — [ ] SB-M41-010 59×59 memory.
 - [ ] SB-M41-011 Per-frame allocation detection.
@@ -1202,8 +1227,8 @@ Every production level:
 ### M49 — Regression Suite `[QA]`
 
 - [ ] SB-M49-001 Difficulty-range tests. — [ ] SB-M49-002 Level parser tests.
-- [ ] SB-M49-003 BoardState tests. — [ ] SB-M49-004 Renderer tests.
-- [ ] SB-M49-005 Slot tests. — [ ] SB-M49-006 Eligibility tests.
+- [ ] SB-M49-003 BoardState tests (ACTIVE/CLEARED). — [ ] SB-M49-004 Renderer tests (ACTIVE source-color/opaque; CLEARED transparent-cell behavior).
+- [ ] SB-M49-005 Slot tests. — [ ] SB-M49-006 Color-candidate + reachability/access tests (incl. blocked matching-color ACTIVE target must not dispatch).
 - [ ] SB-M49-007 Reservation tests. — [ ] SB-M49-008 TargetSelector tests.
 - [ ] SB-M49-009 Routing tests. — [ ] SB-M49-010 Dispatcher tests.
 - [ ] SB-M49-011 Completion tests. — [ ] SB-M49-012 Save tests.
@@ -1318,7 +1343,7 @@ GAMEPLAY SESSION
 ↓
 FIVE SLOTS
 ↓
-TARGET ELIGIBILITY
+COLOR CANDIDATES + REACHABILITY
 ↓
 RESERVATION
 ↓
@@ -1356,8 +1381,8 @@ screen, a store, or a currency UI. It is:
 ONE REAL OWNER-APPROVED SCRUBBOTS LEVEL IMAGE
 + A VALID EASY/MEDIUM/HARD/VERY-HARD BOARD SIZE
 + FIVE FUNCTIONAL SLOTS
-+ CORRECT TARGET ELIGIBILITY
-+ NO-WORK-NO-SPAWN
++ CORRECT COLOR CANDIDATES + REACHABLE TARGET SELECTION
++ NO-REACHABLE-TARGET-NO-SPAWN
 + SCRUBBOTS LEAVING ONE BY ONE
 + VALID TARGET RESERVATION
 + SCRUBBOTS MOVING VISIBLY ACROSS THE ARTWORK
@@ -1390,10 +1415,10 @@ PROMPT 05  Visual Reference Library + Existing SCRUBBOTS Asset
 PROMPT 06  Pixel-Art Importer + Level Conversion + Pixel-Perfect
            Round Trip Validation
 PROMPT 07  Gameplay Session Core + Five-Slot Data Model
-PROMPT 08  Target Eligibility + Reservation + TargetSelector
+PROMPT 08  Color Candidates + Reachability + Reservation + TargetSelector
 PROMPT 09  RoutingSystem + Multiple Routing Prototypes
 PROMPT 10  ScrubbotAgent + Dispatcher
-PROMPT 11  Complete Cleaning Vertical Slice
+PROMPT 11  Complete Clearing Vertical Slice
 PROMPT 12  First Real SCRUBBOTS Artwork Playable Level
 PROMPT 13  Production Slot UI + Gameplay Layout + Touch Controls
 PROMPT 14  Win/Lose Completion Rules + Results Flow
@@ -1427,6 +1452,14 @@ rectangular boards up to 59×59/3,481 cells; `PaletteColors` and
 (`scenes/debug/board_renderer_debug.tscn`) built for native-scale owner
 review; 227/227 tests passing. **DIRTY visual approval remains an open
 design gate** — presets exist, none is chosen (see M10 above).
+
+> **SUPERSEDED (META-C004, 2026-09-05, ADR-019):** the DIRTY/CLEAN prototype
+> and `DirtyCleanPresets` A/B/C described above were replaced by the
+> owner-locked ACTIVE/CLEARED model. `dirty_clean_presets.gd` was removed and
+> the renderer now draws ACTIVE = source color/opaque, CLEARED = transparent.
+> The paragraph above is preserved as historical record of Prompt 04 only;
+> current truth is M10 (renamed) and ADR-019. Owner manual QA of the new
+> transparent model remains open (SB-M10-005..011).
 
 **PROMPT 05 (next) — Visual Reference Library / Existing Artwork Audit (M07)**
 

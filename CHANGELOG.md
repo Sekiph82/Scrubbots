@@ -1,4 +1,45 @@
 
+## 2026-09-05 — Gameplay rule migration: ACTIVE/CLEARED replaces DIRTY/CLEAN (META-C004)
+
+Owner-decided gameplay-rule migration (ADR-019 / AL-027 / AL-028). This is an
+append-only record; earlier DIRTY/CLEAN prototype history below is preserved.
+
+- **Board lifecycle** replaced: `BoardState.CellState` is now `ACTIVE = 0` /
+  `CLEARED = 1` (was `DIRTY`/`CLEAN`). Fresh/reset boards are all-ACTIVE.
+- **Renderer** `BoardRenderer` now draws ACTIVE = exact source palette color
+  (opaque) and CLEARED = `Color(0,0,0,0)` (transparent, background shows
+  through). No black/gray/palette substitute for CLEARED.
+- **Removed** `scripts/gameplay/board/dirty_clean_presets.gd` and the A/B/C
+  dirty-preset model, `set_dirty_preset`/`get_dirty_preset`, and all DIRTY
+  transform code. No compatibility alias.
+- **Moved/renamed** the M13 index:
+  `scripts/gameplay/routing/eligible_target_index.gd` (`EligibleTargetIndex`)
+  → `scripts/gameplay/targeting/color_candidate_index.gd`
+  (`ColorCandidateIndex`), with candidate-specific API (`get_candidates`,
+  `has_candidates`, `count_candidates`). It supplies raw ACTIVE matching-color
+  candidates only and does **not** prove reachability.
+- **Locked rule (AL-028):** a matching-color ACTIVE cell is only a raw
+  candidate; a valid final target must also be reachable (non-target ACTIVE
+  cells block access; CLEARED/background is open). A fully enclosed
+  matching-color ACTIVE cell must not cause dispatch. WHAT/HOW seam preserved:
+  ColorCandidateIndex → reachability/access → TargetSelector → RoutingSystem.
+- **Debug tool** `board_renderer_debug` migrated to ACTIVE/CLEARED patterns
+  (All ACTIVE / All CLEARED / Half / Checker) with a visible background behind
+  the board so transparent CLEARED cells reveal it. A/B/C preset dropdown
+  removed.
+- **Docs/tasks** migrated (README, CLAUDE.md, docs/00–06, ADR-019 appended,
+  tasks.md M02/M10/M11/M13/M15/M16/M17/M18–M20/M21/M40/M41/M49, Level Factory
+  solver/architecture). Content Pipeline inspected — declarative-only, no
+  edit required. Historical coordination artifacts and CHANGELOG history left
+  unchanged.
+- **Tests**: A/B/C dirty-preset transform tests removed and replaced with
+  ACTIVE-source-color/opaque and CLEARED-alpha-0 renderer proofs; M13
+  coverage moved to `ColorCandidateIndex` (traversal-spy no-rescan guarantee
+  preserved) plus a terminology regression (no `EligibleTargetIndex`/
+  `get_eligible` in current production). Full suite: 774/774 ALL PASS.
+- Owner manual QA of the new transparent model (SB-M10-005..011) and all
+  M14/M15/M16/M17 implementation gates remain open.
+
 ## 2026-09-04 — Level Platform architecture registered
 
 - Added SCRUBBOTS Level Factory as an isolated nested Godot sidecar project.

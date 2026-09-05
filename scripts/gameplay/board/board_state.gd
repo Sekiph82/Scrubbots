@@ -23,9 +23,18 @@ extends RefCounted
 ## scripts/data/level_validator.gd for why.
 const LevelData = preload("res://scripts/data/level_data.gd")
 
+## Cell lifecycle (ADR-019, owner decision META-C004):
+##   ACTIVE  — artwork pixel still present: shown at its original source
+##             palette color, opaque, a color-matching candidate, and it
+##             occupies/blocks board space for access/path semantics.
+##   CLEARED — successfully cleaned: rendered transparent (alpha 0) so the
+##             gameplay background shows through, no longer a color candidate,
+##             and it becomes open/free space for access/path semantics.
+## There is no DIRTY/CLEAN/grime/reveal model. Numeric order preserved so
+## existing packed-byte storage stays valid: ACTIVE = 0, CLEARED = 1.
 enum CellState {
-	DIRTY = 0,
-	CLEAN = 1,
+	ACTIVE = 0,
+	CLEARED = 1,
 }
 
 var _width: int
@@ -33,7 +42,7 @@ var _height: int
 ## Palette id per cell, flat row-major. Copied from LevelData at construction
 ## time so runtime BoardState never mutates the source LevelData.
 var _color_ids: PackedInt32Array
-## Current CellState per cell, flat row-major. All cells start DIRTY.
+## Current CellState per cell, flat row-major. All cells start ACTIVE.
 var _cell_states: PackedByteArray
 
 ## Returns RefCounted (not a self-typed return) because self-referential
@@ -48,7 +57,7 @@ static func from_level_data(level: LevelData) -> RefCounted:
 	var count: int = level.get_cell_count()
 	board._cell_states = PackedByteArray()
 	board._cell_states.resize(count)
-	board._cell_states.fill(CellState.DIRTY)
+	board._cell_states.fill(CellState.ACTIVE)
 	return board
 
 func get_width() -> int:

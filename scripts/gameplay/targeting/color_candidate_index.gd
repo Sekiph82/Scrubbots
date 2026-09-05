@@ -1,24 +1,29 @@
 extends RefCounted
-## EligibleTargetIndex — preload this script
-## (res://scripts/gameplay/routing/eligible_target_index.gd) rather than
+## ColorCandidateIndex — preload this script
+## (res://scripts/gameplay/targeting/color_candidate_index.gd) rather than
 ## relying on global class_name lookup (AL-001).
 ##
-## M13 — Eligible Target Index `[PERFORMANCE]`. The color-grouped query/cache
-## layer that answers ONE question:
+## M13 — Color Candidate Index `[PERFORMANCE]`. The color-grouped query/cache
+## layer that answers ONE narrow question:
 ##
-##   Which currently eligible DIRTY cells exist for a given palette/color?
+##   Which currently ACTIVE cells match a given palette/color — as RAW color
+##   candidates?
 ##
-## Eligibility (M13 definition, docs/02_TECH_ARCHITECTURE.md / M13-C001 prompt):
-##   valid index AND DIRTY AND matching color AND not caller-excluded/reserved.
-## No route/reachability/blocker rule is part of eligibility.
+## Candidate contract (docs/02_TECH_ARCHITECTURE.md / META-C004 owner rule):
+##   valid index AND ACTIVE AND matching color AND not caller-excluded/reserved.
 ##
-## This class is TARGETING DATA ONLY. It is NOT:
+## A raw color candidate is NOT a reachable/targetable final target. A matching
+## ACTIVE cell can still be fully enclosed by other ACTIVE cells with no legal
+## access path (AL-028). Reachability is a SEPARATE downstream concern; this
+## index proves color membership only and never claims reachability.
+##
+## This class is CANDIDATE DATA ONLY. It is NOT:
+##   - Reachability/access truth — it does not filter blocked/unreachable cells;
 ##   - TargetSelector (M15) — it does not choose WHICH cell a bot cleans;
 ##   - RoutingSystem (M16+) — it does not decide HOW a bot travels;
 ##   - Reservation state (M14) — it does not own/store/atomically manage
 ##     reservations. Callers pass a reserved/excluded index set per query;
 ##     nothing about it is retained.
-## The "routing/" folder name does not authorize any of the above.
 ##
 ## Indexing is owned by BoardState (index = y*width + x). This class never
 ## re-derives that formula; it uses BoardState's index/color/state APIs.
@@ -33,17 +38,17 @@ const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 
 ## Bound board (RefCounted BoardState) or null when unbound.
 var _board = null
-## color_id (int) -> Array[int] of DIRTY cell indices, kept sorted ascending.
-## Only colors with at least one DIRTY cell have an entry.
+## color_id (int) -> Array[int] of ACTIVE cell indices, kept sorted ascending.
+## Only colors with at least one ACTIVE cell have an entry.
 var _buckets: Dictionary = {}
 var _bound: bool = false
 
 ## Matches the from_level_data() convention: returns the real instance, typed
 ## as RefCounted because self-referential static typing is unreliable headless.
 static func create() -> RefCounted:
-	return load("res://scripts/gameplay/routing/eligible_target_index.gd").new()
+	return load("res://scripts/gameplay/targeting/color_candidate_index.gd").new()
 
-## Bind to a BoardState and build the color index from its current DIRTY cells.
+## Bind to a BoardState and build the color index from its current ACTIVE cells.
 ## Returns false (and stays unbound) for a null board.
 func bind(board) -> bool:
 	if board == null:
@@ -69,9 +74,9 @@ func rebuild() -> bool:
 	_rebuild_internal()
 	return true
 
-## Synchronize one cell after a BoardState mutation. DIRTY -> present in its
-## color bucket exactly once; CLEAN -> absent. Returns false for unbound use or
-## an invalid index, without corrupting existing buckets.
+## Synchronize one cell after a BoardState mutation. ACTIVE -> present in its
+## color bucket exactly once; CLEARED -> absent. Returns false for unbound use
+## or an invalid index, without corrupting existing buckets.
 func sync_cell(index: int) -> bool:
 	if not _bound or _board == null:
 		return false
@@ -79,17 +84,18 @@ func sync_cell(index: int) -> bool:
 		return false
 	var color_id: int = _board.get_color_id(index)
 	var state: int = _board.get_cell_state(index)
-	if state == BoardState.CellState.DIRTY:
+	if state == BoardState.CellState.ACTIVE:
 		_bucket_add(color_id, index)
 	else:
 		_bucket_remove(color_id, index)
 	return true
 
-## Detached, row-major-ordered list of eligible DIRTY indices for a color,
+## Detached, row-major-ordered list of raw ACTIVE color candidates for a color,
 ## minus any caller-supplied reserved/excluded indices. Returns a fresh Array
 ## every call — mutating it cannot affect cached truth. Empty when unbound,
-## when the color has no DIRTY cells, or when all are excluded.
-func get_eligible(color_id: int, excluded = []) -> Array:
+## when the color has no ACTIVE cells, or when all are excluded. These are RAW
+## color candidates, NOT proven reachable/targetable final targets.
+func get_candidates(color_id: int, excluded = []) -> Array:
 	if not _bound:
 		return []
 	if not _buckets.has(color_id):
@@ -104,9 +110,10 @@ func get_eligible(color_id: int, excluded = []) -> Array:
 			result.append(idx)
 	return result
 
-## Cheap has-work check for a color without materializing the full list.
+## Cheap has-candidate check for a color without materializing the full list.
 ## Honors the same caller-supplied reserved/excluded set. False when unbound.
-func has_work(color_id: int, excluded = []) -> bool:
+## True only means a raw color candidate exists — never that one is reachable.
+func has_candidates(color_id: int, excluded = []) -> bool:
 	if not _bound:
 		return false
 	if not _buckets.has(color_id):
@@ -122,14 +129,16 @@ func has_work(color_id: int, excluded = []) -> bool:
 			return true
 	return false
 
-## Count of eligible DIRTY cells for a color (excluded set honored). 0 unbound.
-func count_eligible(color_id: int, excluded = []) -> int:
-	return get_eligible(color_id, excluded).size()
+## Count of raw ACTIVE color candidates for a color (excluded set honored).
+## 0 when unbound.
+func count_candidates(color_id: int, excluded = []) -> int:
+	return get_candidates(color_id, excluded).size()
 
 func is_bound() -> bool:
 	return _bound
 
-## Color ids that currently have at least one DIRTY cell (unordered). Detached.
+## Color ids that currently have at least one ACTIVE candidate (unordered).
+## Detached.
 func get_color_ids() -> Array:
 	if not _bound:
 		return []
@@ -142,7 +151,7 @@ func _rebuild_internal() -> void:
 	var count: int = _board.get_cell_count()
 	# Ascending index iteration keeps every bucket row-major without sorting.
 	for i in count:
-		if _board.get_cell_state(i) == BoardState.CellState.DIRTY:
+		if _board.get_cell_state(i) == BoardState.CellState.ACTIVE:
 			var color_id: int = _board.get_color_id(i)
 			if not _buckets.has(color_id):
 				_buckets[color_id] = []

@@ -16,8 +16,12 @@ extends RefCounted
 ##   READY|ACTIVE|PAUSED|COMPLETED -> READY (reset)
 ##
 ## Completion is an explicit external transition only — no automatic
-## win/lose/timer/move/dirty-count detection. The eventual win-condition
+## win/lose/timer/move/cleared-count detection. The eventual win-condition
 ## system will call complete() when appropriate.
+##
+## NOTE: State.ACTIVE below is a SESSION-LIFECYCLE state (the level is being
+## played) and is unrelated to BoardState.CellState.ACTIVE (an artwork pixel
+## still present). They are deliberately distinct concepts.
 
 const LevelLoader = preload("res://scripts/data/level_loader.gd")
 const LevelData = preload("res://scripts/data/level_data.gd")
@@ -88,7 +92,7 @@ func complete() -> Dictionary:
 	_state = State.COMPLETED
 	return _ok()
 
-## Reset: recreate BoardState from immutable LevelData. All cells DIRTY,
+## Reset: recreate BoardState from immutable LevelData. All cells ACTIVE,
 ## dimensions/palette preserved. Returns to READY.
 func reset() -> Dictionary:
 	if _state == State.UNINITIALIZED:

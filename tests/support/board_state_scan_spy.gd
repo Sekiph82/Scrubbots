@@ -1,6 +1,6 @@
 extends RefCounted
 ## Test-only spy exposing the subset of the BoardState API that
-## EligibleTargetIndex consumes, while counting EVERY read an implementation
+## ColorCandidateIndex consumes, while counting EVERY read an implementation
 ## could use to traverse the board.
 ##
 ## Used by M13 to prove (AL-018) that steady-state color queries read prebuilt
@@ -32,7 +32,7 @@ func setup(color_ids: Array, width: int, height: int) -> void:
 	_color_ids = PackedInt32Array(color_ids)
 	_states = PackedByteArray()
 	_states.resize(color_ids.size())
-	_states.fill(BoardState.CellState.DIRTY)
+	_states.fill(BoardState.CellState.ACTIVE)
 
 ## Aggregate of every BoardState read an index could use to walk the board.
 func traversal_reads() -> int:

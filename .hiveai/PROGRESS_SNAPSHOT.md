@@ -1,17 +1,18 @@
 # H!veAI Progress Snapshot
 
-Derived from canonical tasks.md on main after M13-C001 V02.
+Derived from canonical tasks.md on main after META-C004.
 Counts use unique canonical SB task IDs on checkbox lines. Not a task ledger.
 
 | Scope | Completed | Total | Remaining | Completion |
 | --- | ---: | ---: | ---: | ---: |
-| SCRUBBOTS ecosystem | 206 | 943 | 737 | 21.85% |
-| Main mobile game + SB-UI | 206 | 719 | 513 | 28.65% |
+| SCRUBBOTS ecosystem | 207 | 943 | 736 | 21.95% |
+| Main mobile game + SB-UI | 207 | 719 | 512 | 28.79% |
 | Level Factory LF00-LF10 | 0 | 112 | 112 | 0.00% |
 | Content Pipeline CP00-CP08 | 0 | 112 | 112 | 0.00% |
 
-M13-C001 V02 closed SB-M13-001..010 (all 10). Canonical total 943 excludes the
-`SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
+META-C004 closed SB-M10-001 (owner approved ACTIVE appearance); no task IDs
+added. Recomputed from tasks.md: 943 total (SB-M13-001..010 + SB-M10-001..004,012
+etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 
 ### Correction history
 
@@ -20,9 +21,13 @@ M13-C001 V02 closed SB-M13-001..010 (all 10). Canonical total 943 excludes the
 - M13-C001 V02: scan-observability + formal validation passed; all 10 closed -> 206/943 = 21.85%.
 
 
-### META-C004 migration pending
+### META-C004 migration implemented (AWAITING_AUDIT)
 
-- Baseline remains 206/943 until Claude migrates canonical tasks/code and ChatGPT audits it.
-- Owner has superseded gameplay-semantic DIRTY/CLEAN with ACTIVE/CLEARED.
-- If no new task IDs are added and only SB-M10-001 newly closes from owner approval, expected post-migration count is 207/943; canonical tasks.md must be recomputed rather than assumed.
-- M10-005..011 remain manual-QA gates for the NEW transparent model.
+- Migration done: DIRTY/CLEAN → ACTIVE/CLEARED across code/docs/tasks. Only
+  SB-M10-001 newly closed; no task IDs added. Recomputed: **207/943** (verified,
+  matches the prompt's expected value).
+- `dirty_clean_presets.gd` removed; M13 index renamed to
+  `ColorCandidateIndex` under `scripts/gameplay/targeting/`.
+- Full suite 774/774 ALL PASS.
+- M10-005..011 remain owner manual-QA gates for the NEW transparent model;
+  M02-017 and all M14/M15/M16/M17 implementation gates remain open.

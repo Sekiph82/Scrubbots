@@ -6,9 +6,12 @@ anything.
 
 ## 0. What SCRUBBOTS is
 
-SCRUBBOTS is an original mobile puzzle game: pixel-art images are revealed by
-tiny cleaning robots ("Scrubbots") dispatched from a limited set of
-color/robot slots. See `docs/00_PROJECT_BRIEF.md` for the full pitch and
+SCRUBBOTS is an original mobile puzzle game: a visible pixel-art image is
+progressively cleared away by tiny cleaning robots ("Scrubbots") dispatched
+from a limited set of color/robot slots. Cells start ACTIVE (source palette
+color); a cleaned cell becomes CLEARED (transparent, background shows
+through). See `docs/05_TECH_DECISIONS.md` ADR-019,
+`docs/00_PROJECT_BRIEF.md` for the full pitch and
 `docs/01_GAMEPLAY_SPEC.md` for locked gameplay rules.
 
 ## 1. Required reading order
@@ -120,13 +123,14 @@ color/robot slots. See `docs/00_PROJECT_BRIEF.md` for the full pitch and
     reliable under headless Godot.
 34. `BoardRenderer` (`scripts/gameplay/board/board_renderer.gd`) draws the
     board as one `Image`/`ImageTexture` per board (ADR-011) — never one
-    Node per cell, never per-cell draw calls. DIRTY vs. CLEAN readability
-    must use both saturation and value/brightness differences, never
-    saturation alone (see `docs/01_GAMEPLAY_SPEC.md`). CLEAN is always the
-    unmodified source palette color. The three `DirtyCleanPresets` (A/B/C)
-    are prototypes — treat the final DIRTY visual style as an unresolved
-    `[DESIGN GATE]` (`tasks.md` M10) until the owner has actually compared
-    them via `scenes/debug/board_renderer_debug.tscn` and chosen one.
+    Node per cell, never per-cell draw calls. Under the owner-locked
+    ACTIVE/CLEARED model (ADR-019, `docs/01_GAMEPLAY_SPEC.md`): an ACTIVE
+    cell renders its exact original source palette color, opaque; a CLEARED
+    cell renders fully transparent (`Color(0,0,0,0)`) so the gameplay
+    background shows through — never a black/gray/palette substitute. There
+    is no DIRTY/CLEAN/grime transform and no A/B/C preset. Owner manual QA of
+    the transparent model (`tasks.md` SB-M10-005..011) via
+    `scenes/debug/board_renderer_debug.tscn` remains an open gate.
 35. Renderer output is read back through an 8-bit `Image`
     (`Image.FORMAT_RGBA8`) — comparing rendered pixels to an
     independently-computed float `Color` with `is_equal_approx()` will
@@ -148,9 +152,17 @@ color/robot slots. See `docs/00_PROJECT_BRIEF.md` for the full pitch and
 - Robot/color slots: **5**.
 - Win-streak reward mapping (consecutive wins → reward):
   `1→1, 2→5, 3→10, 4→25, 5+→100`.
-- Scrubbots: leave their slot one at a time, only when valid work exists for
-  them; travel to a target cell; clean/reveal it; then disappear. They do not
-  carry color and do not return to origin.
+- Cell lifecycle: cells start **ACTIVE** (source palette color, opaque,
+  color candidate, blocks access); a cleaned cell becomes **CLEARED**
+  (transparent alpha 0, background shows through, no longer a candidate,
+  opens access). No DIRTY/CLEAN/grime/reveal model (ADR-019).
+- Color candidate ≠ reachable target: a matching-color ACTIVE cell is only a
+  raw candidate; it is a valid final target only if also reachable
+  (non-target ACTIVE cells block access, CLEARED/background is open). A fully
+  enclosed matching-color ACTIVE cell must not cause dispatch (AL-028).
+- Scrubbots: leave their slot one at a time, only when a reachable matching
+  target exists; travel to that target cell; clear it (ACTIVE→CLEARED); then
+  disappear. They do not carry color and do not return to origin.
 
 Full detail: `docs/01_GAMEPLAY_SPEC.md`.
 
@@ -160,8 +172,10 @@ See `docs/02_TECH_ARCHITECTURE.md` for the full module list. The one boundary
 that must never be violated without owner sign-off:
 
 ```
-TargetSelector   -> decides WHAT cell to clean
-RoutingSystem    -> decides HOW a Scrubbot visually travels there
+ColorCandidateIndex -> raw ACTIVE matching-color candidates (M13; no reachability)
+Reachability/access -> filters blocked/unreachable candidates (future)
+TargetSelector      -> decides WHAT target among reachable candidates
+RoutingSystem       -> decides HOW a Scrubbot visually travels there
 ```
 
 These stay separate scripts/modules so routing can be replaced later without
