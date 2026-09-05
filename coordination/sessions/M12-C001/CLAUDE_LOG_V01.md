@@ -8,7 +8,7 @@ status: AWAITING_AUDIT
 promptUrl: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V01.md
 criteriaUrl: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_CRITERIA_V01.md
 startingCommit: 3ef677c
-currentCommit: PENDING
+currentCommit: 218d91a
 ---
 
 # SCRUBBOTS - M12-C001 Claude Log V01
@@ -97,8 +97,8 @@ No gameplay session, board state, board renderer, level loader, or level data fi
 | 27 | Update SESSION_INDEX | M12-C001 row added | Updated | CLAUDE_TEST_PASS |
 | 28 | Update H!ve ACTIVE_CYCLES / ARTIFACT_MAP / PROGRESS_SNAPSHOT | All current | Updated | CLAUDE_TEST_PASS |
 | 29 | Update PROJECT_DASHBOARD | M12-C001 materialized | Updated | CLAUDE_TEST_PASS |
-| 30 | git status --short before commit | Known changes only | *see below* |
-| 31 | Focused M12-C001 commit | Single commit | *see below* |
+| 30 | git status --short before commit | Known changes only | 7M + 3 new, no unexpected files | CLAUDE_TEST_PASS |
+| 31 | Focused M12-C001 commit | Single commit | `218d91a` — 10 files, 465 ins, 39 del | CLAUDE_TEST_PASS |
 | 32 | Safe non-force push | No force | *see below* |
 | 33 | CLAUDE_LOG_V01.md and impl commit visible on GitHub | HTTP 200 | *see below* |
 | 34 | Final git status --short | Clean tree | *see below* |
@@ -125,7 +125,8 @@ No gameplay session, board state, board renderer, level loader, or level data fi
 
 ## Commit and push evidence
 
-*Updated after commit/push.*
+- Commit: `218d91a` (10 files, 465 ins, 39 del)
+- Push: *updated after push*
 
 ## Handoff
 
