@@ -19,7 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| META-C002 | META - Master UI + Magnific Integration | 2026-09-05 | 2026-09-05 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V01.md | N/A | SB-UI-001..032, SB-M22..M45 additions | Owner visual ref intake (51 files), 95 tasks migrated from UI_TASKS_APPENDIX, global visual production policy, UI foundation validated. 657/657 ALL PASS. No Magnific generation. Next actor CHATGPT. |
+| META-C002 | META - Master UI + Magnific integration | 2026-09-05 | 2026-09-05 | `CHANGES_REQUIRED` | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V01.md | META/UI | V01 migration accepted structurally; correction required for machine-readable visual inventory, manifest/reference truth, task truth and 943-task progress. Next actor CLAUDE. |
 | M12-C001 | M12 - Five-Slot Logic | 2026-09-05 | 2026-09-05 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V01.md | SB-M12-001..011 | V02 closes F-M12-001: removed get_slot(), added get_slot_id() scalar getter, M12-18 bypass regression. 657/657 ALL PASS. Next actor CHATGPT. |
 | M11-C001 | M11 - Gameplay Session Core | 2026-09-04 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V04.md | SB-M11-001..012 | M11 final pass. V03 independently closed renderer regression gap; V04 versioned logs/H!ve mapping audited clean. |
 | M09-C002 | M09 - Batch Import / Validation / Duplicate IDs | 2026-09-03 | 2026-09-04 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_PROMPT_V03.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CLAUDE_IMPLEMENTATION_LOG.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M09-C002/CHATGPT_AUDIT_V03.md | SB-M09-018..020 | Final audit V03 closed F-M09B-006. Batch import/validation/duplicate-ID tooling is independently accepted; M09 is complete. |
@@ -171,3 +171,15 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V02.md
 - V02 correction: Removed `get_slot()` (the leak point). Added `get_slot_id()` scalar getter. M12-18 bypass regression test proves `get_slot()` absent and all queries return scalars. 657/657 ALL PASS.
 - Cycle state: `AWAITING_AUDIT`; next actor CHATGPT.
+
+
+### META-C002 ChatGPT independent audit V01
+
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V01.md
+- Decision: `CHANGES_REQUIRED`.
+- Accepted: no main task loss; exactly 95 UI tasks added; no broad Magnific generation.
+- F-META-001: machine-readable inventory/README still claim supplied categories are missing.
+- F-META-002: V01/H!ve progress miscount; actual pre-correction branch truth is 185/943 = 19.62%.
+- F-META-003: tasks.md not reconciled with completed intake/canonical-selection work.
+- F-META-004: manifest still says reference intake pending and lacks durable canonical gameplay/Home/popup paths.
+- Active correction: CHATGPT_PROMPT_V02.md / CLAUDE_LOG_V02.md.
