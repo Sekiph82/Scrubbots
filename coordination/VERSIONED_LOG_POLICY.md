@@ -69,3 +69,22 @@ For M12-C001 and every later prompt:
 - no Desktop phase log or other external handoff log;
 - all durable evidence lives in GitHub `CLAUDE_LOG_VNN.md`;
 - this applies to the main game, Level Factory, and Content Pipeline.
+
+
+## Non-self-referential post-push evidence [LOCKED]
+
+A Git-tracked `CLAUDE_LOG_VNN.md` must never be required to contain the SHA
+of the final commit that contains that same log. Such a requirement is
+self-referential and creates an endless commit-finalization loop.
+
+Rule:
+
+1. CLAUDE_LOG_VNN records all evidence knowable before the focused commit.
+2. Create and push the focused commit.
+3. Do not edit the Git-tracked log merely to insert that commit's final SHA.
+4. When exact post-push SHA/status evidence is required, use a non-Git-mutating
+   GitHub receipt. For PR cycles, post one clearly titled PR comment containing
+   final commit SHA, remote-head SHA, equality proof, final status, and PR
+   state.
+5. ChatGPT independently verifies the receipt against actual GitHub remote
+   state.

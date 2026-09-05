@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "project": "SCRUBBOTS",
+  "generator_policy": {
+    "primary_provider": "magnific",
+    "allowed_ai_image_providers": ["magnific"],
+    "disallowed_dependencies": ["higgsfield"],
+    "rule": "Do not regenerate owner-approved assets unless explicitly requested. AI full-screen mockups are art-direction references, not production UI."
+  },
+  "owner_reference_source": {
+    "local_windows_path": "C:\\Users\\sekip\\Desktop\\ScrubBots Gorselleri",
+    "repository_inbox": "assets/art/references/_owner_inbox/",
+    "status": "INTAKE_COMPLETE",
+    "intake_file_count": 51,
+    "intake_verified": "2026-09-05",
+    "source_repo_hash_match": "51/51",
+    "preserve_originals": true
+  },
+  "canonical_references": {
+    "gameplay": {
+      "repository_path": "assets/art/references/_owner_inbox/Game Screens/deneme 3 OK.png",
+      "status": "CANONICAL_SELECTED"
+    },
+    "home_screen": {
+      "repository_path": "assets/art/references/_owner_inbox/Game Screens/main screen.png",
+      "status": "CANONICAL_SELECTED"
+    },
+    "popup_level_intro": {
+      "repository_path": "assets/art/references/_owner_inbox/Game Screens/level ekran acilisi.png",
+      "status": "CANONICAL_SELECTED"
+    },
+    "popup_life": {
+      "repository_path": "assets/art/references/_owner_inbox/Additionals/life screens.png",
+      "status": "CANONICAL_SELECTED"
+    },
+    "popup_help": {
+      "repository_path": "assets/art/references/_owner_inbox/Additionals/need a hand.png",
+      "status": "CANONICAL_SELECTED"
+    },
+    "scrubby_master": {
+      "status": "OWNER_REQUIRED",
+      "candidate_paths": [
+        "assets/art/references/_owner_inbox/Game Screens/main screen.png",
+        "assets/art/references/_owner_inbox/Collection Cards/meet the scrubbots.jpeg"
+      ]
+    }
+  },
+  "output_roots": {
+    "raw_generated": "assets/ui/generated/",
+    "production_final": "assets/ui/final/",
+    "owner_references": "assets/art/references/"
+  },
+  "default_generation_suffix": "single isolated mobile-game UI component, transparent background, front-facing, centered, no environment, no text, no watermark, clean silhouette, high resolution, consistent SCRUBBOTS glossy cartoon-3D style",
+  "assets": [
+    {
+      "id": "scrubby_master_reference",
+      "category": "character",
+      "provider": "magnific",
+      "required": true,
+      "status": "OWNER_SELECTION_REQUIRED",
+      "reference_policy": "Select from owner desktop references before generating anything new.",
+      "prompt": "Canonical Scrubby character reference sheet preserving the owner-approved white and teal cleaning robot design, leaf sprout on head, glossy black face display, cyan expressive eyes, friendly compact proportions, clean turnaround/reference presentation",
+      "transparent": true,
+      "target_path": "assets/ui/characters/scrubby_master.png",
+      "godot_usage": "Character presentation source; not gameplay truth"
+    },
+    {
+      "id": "scrubby_gameplay_pose",
+      "category": "character",
+      "provider": "magnific",
+      "required": true,
+      "status": "BLOCKED_BY_SCRUBBY_MASTER_APPROVAL",
+      "references": ["scrubby_master_reference"],
+      "prompt": "Scrubby standing with a compact cleaning brush/mop, cheerful helpful expression, three-quarter front view, readable at mobile gameplay size",
+      "transparent": true,
+      "target_path": "assets/ui/characters/scrubby_gameplay.png",
+      "godot_usage": "Gameplay decorative character beside color-selection panel"
+    },
+    {
+      "id": "scrubby_portrait",
+      "category": "character",
+      "provider": "magnific",
+      "required": true,
+      "status": "BLOCKED_BY_SCRUBBY_MASTER_APPROVAL",
+      "references": ["scrubby_master_reference"],
+      "prompt": "Close friendly portrait of Scrubby for player profile card, head and upper torso, leaf sprout visible, strong silhouette at small size",
+      "transparent": true,
+      "target_path": "assets/ui/characters/scrubby_portrait.png",
+      "godot_usage": "PlayerProfileChip"
+    },
+    {
+      "id": "booster_extra_slot",
+      "category": "booster_icon",
+      "provider": "magnific",
+      "required": true,
+      "status": "READY_FOR_GENERATION_AFTER_STYLE_APPROVAL",
+      "prompt": "SCRUBBOTS booster icon representing one extra slot, compact tray/card slot with a bright green plus, toy-like glossy 3D icon",
+      "transparent": true,
+      "target_path": "assets/ui/boosters/extra_slot.png",
+      "godot_usage": "BoosterButton icon only; quantity badge is native Godot UI"
+    },
+    {
+      "id": "booster_shuffle",
+      "category": "booster_icon",
+      "provider": "magnific",
+      "required": true,
+      "status": "READY_FOR_GENERATION_AFTER_STYLE_APPROVAL",
+      "prompt": "SCRUBBOTS booster icon for shuffle/reorder, two playful crossing curved arrows in cyan and magenta, glossy toy-like 3D icon",
+      "transparent": true,
+      "target_path": "assets/ui/boosters/shuffle.png",
+      "godot_usage": "BoosterButton icon only"
+    },
+    {
+      "id": "booster_pickup",
+      "category": "booster_icon",
+      "provider": "magnific",
+      "required": true,
+      "status": "READY_FOR_GENERATION_AFTER_STYLE_APPROVAL",
+      "prompt": "SCRUBBOTS pickup booster icon, friendly mechanical grabber/claw with cyan arms and magenta center, glossy mobile-game 3D icon",
+      "transparent": true,
+      "target_path": "assets/ui/boosters/pickup.png",
+      "godot_usage": "BoosterButton icon only"
+    },
+    {
+      "id": "booster_flower",
+      "category": "booster_icon",
+      "provider": "magnific",
+      "required": true,
+      "status": "READY_FOR_GENERATION_AFTER_STYLE_APPROVAL",
+      "prompt": "SCRUBBOTS flower booster icon, rounded blue petals with magenta/cyan center, polished toy-like 3D mobile-game icon",
+      "transparent": true,
+      "target_path": "assets/ui/boosters/flower.png",
+      "godot_usage": "BoosterButton icon only"
+    },
+    {
+      "id": "reward_chest_small",
+      "category": "reward",
+      "provider": "magnific",
+      "required": false,
+      "status": "PLANNED",
+      "prompt": "Small SCRUBBOTS reward chest, blue/teal hard-shell cleaning-tech crate with a gold star latch, cheerful polished casual-game style",
+      "transparent": true,
+      "target_path": "assets/ui/rewards/chest_small.png",
+      "godot_usage": "Reward tracks/popups"
+    },
+    {
+      "id": "gift_box",
+      "category": "reward",
+      "provider": "magnific",
+      "required": false,
+      "status": "PLANNED",
+      "prompt": "SCRUBBOTS gift box, green and blue modular box with colorful ribbon, glossy casual-game reward icon",
+      "transparent": true,
+      "target_path": "assets/ui/rewards/gift_box.png",
+      "godot_usage": "Gift/reward UI"
+    },
+    {
+      "id": "difficulty_hard_emblem",
+      "category": "difficulty",
+      "provider": "magnific",
+      "required": false,
+      "status": "PLANNED",
+      "prompt": "Hard difficulty emblem for SCRUBBOTS, compact purple neon badge with a playful tough cleaning-tech motif, no text",
+      "transparent": true,
+      "target_path": "assets/ui/difficulty/hard_emblem.png",
+      "godot_usage": "Hard level intro; label text remains native Godot text"
+    },
+    {
+      "id": "difficulty_very_hard_emblem",
+      "category": "difficulty",
+      "provider": "magnific",
+      "required": false,
+      "status": "PLANNED",
+      "prompt": "Very Hard difficulty emblem for SCRUBBOTS, stronger magenta-purple neon cleaning-tech badge, distinct from Hard, no text",
+      "transparent": true,
+      "target_path": "assets/ui/difficulty/very_hard_emblem.png",
+      "godot_usage": "Very Hard level intro; label text remains native Godot text"
+    },
+    {
+      "id": "cleaning_props_gameplay",
+      "category": "decorative",
+      "provider": "magnific",
+      "required": false,
+      "status": "PLANNED",
+      "prompt": "Compact decorative cleaning props for SCRUBBOTS gameplay edge: bubble bucket, flexible teal hose and yellow wet-floor caution sign, isolated composition readable on portrait mobile screen",
+      "transparent": true,
+      "target_path": "assets/ui/decorative/cleaning_props_gameplay.png",
+      "godot_usage": "Decorative right-side gameplay element; may shrink before gameplay controls shrink"
+    }
+  ],
+  "native_godot_components_not_to_generate": [
+    "plain scalable panel bodies",
+    "button interaction containers",
+    "progress bars",
+    "slot frames",
+    "color tiles",
+    "currency counters",
+    "notification containers",
+    "popup dim layers",
+    "responsive layout frames",
+    "normal UI text and quantities"
+  ]
+}

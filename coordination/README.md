@@ -207,3 +207,12 @@ After synchronization, Claude reads the GitHub prompt/audit/governance sources
 and records all durable evidence only in `CLAUDE_LOG_VNN.md`.
 
 Do not create or update Desktop phase logs for M12-C001 or later cycles.
+
+
+## Post-push receipt rule
+
+Final commit SHA evidence must not be made self-referential inside the same
+Git-tracked Claude log. For PR cycles, exact post-push commit/head/status
+evidence may be recorded in a clearly titled PR comment, then independently
+verified by ChatGPT. No new commit may be created merely to write that SHA
+back into the log.

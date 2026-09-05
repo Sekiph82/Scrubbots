@@ -21,18 +21,23 @@ introduced later if a concrete, strong need appears — none currently exists.
 
 ### ADR-002: Mobile-first, portrait-first
 
-**Decision**: Design resolution baseline 1080×1920 portrait, using Godot's
-`canvas_items` stretch mode with `keep` aspect.
+**Decision**: Design resolution baseline **1080×2160 portrait**, using Godot's
+`canvas_items` stretch mode with `expand` aspect. UI is safe-area aware and
+container/anchor driven.
 
 **Reason**: SCRUBBOTS is a mobile puzzle game; portrait is the expected
-default orientation for this genre.
+default orientation. The owner requires the gameplay board to occupy a very
+large share of modern tall iPhone/Android screens, so the earlier provisional
+1080×1920 + `keep` value is superseded.
 
-**Consequences**: UI and board layout should be designed/tested primarily in
-portrait. The 1080×1920 baseline is provisional and easy to change (it is a
-display setting, not gameplay logic) — do not hardcode gameplay math against
-it.
+**Consequences**: UI and board layout are designed/tested primarily in
+portrait without hard-coding gameplay math against display resolution.
+Required responsive validation includes 1080×2160, 1170×2532, 1290×2796,
+1080×2400 and 1440×3200, with shorter phone/tablet portrait coverage before
+release. Decorative regions yield space before essential gameplay controls.
 
-**Status**: Accepted, provisional value.
+**Status**: Accepted; supersedes the previous provisional 1080×1920/keep
+value.
 
 ---
 
@@ -286,8 +291,8 @@ docs/02_TECH_ARCHITECTURE.md).
 
 ### ADR-012: Level Factory is a separate nested Godot project
 
-**Decision**: The SCRUBBOTS Level Factory lives at \`level_factory/\` with
-its own \`project.godot\`, docs, tests and coordination subtree. It is not a
+**Decision**: The SCRUBBOTS Level Factory lives at `level_factory/` with
+its own `project.godot`, docs, tests and coordination subtree. It is not a
 module loaded by the mobile game's root Godot project.
 
 **Reason**: Generation, solver search, difficulty analysis, bulk candidate
@@ -332,7 +337,7 @@ plugins, evaluable expressions or other executable gameplay code.
 attack surface, and preserves a clear review/security boundary.
 
 **Consequences**: Remote payload schemas are allow-listed and validated.
-Runtime downloads install under \`user://\`; publishing secrets never ship
+Runtime downloads install under `user://`; publishing secrets never ship
 inside the app. Current store policies must be re-verified before launch.
 
 **Status**: Accepted.
@@ -349,8 +354,63 @@ changes instead of silently rewriting history.
 **Reason**: Weekly high-volume level publishing needs a safe operational
 control plane with last-known-good recovery and reproducible evidence.
 
-**Consequences**: \`.scrubpack\` and manifest formats are versioned; hashes
+**Consequences**: `.scrubpack` and manifest formats are versioned; hashes
 are verified before activation; production promotion is explicit; provider
 choice remains behind an adapter until selected.
 
 **Status**: Accepted.
+
+---
+
+### ADR-016: Production UI is native responsive Godot composition
+
+**Decision**: Full-screen AI/mockup images are art-direction references only.
+Production screens are assembled from reusable Godot `Control` scenes,
+containers, Themes/StyleBoxes and selectively generated decorative textures.
+
+**Reason**: SCRUBBOTS must fit varied iPhone/Android portrait ratios, safe
+areas, localization and dynamic counters without image regeneration.
+
+**Consequences**: Text, quantities, progress, slots, color tiles, popup bodies
+and interactive states stay live. `docs/MASTER_UI_SYSTEM.md` is the detailed
+component/layout contract. The existing `BoardRenderer` remains intact.
+
+**Status**: Owner-approved.
+
+---
+
+### ADR-017: Magnific-only Master UI image generation pipeline
+
+**Decision**: Magnific MCP is the sole approved AI image-generation provider
+for the Master UI Asset Kit unless the owner explicitly changes this rule.
+Higgsfield is not a project dependency. Owner-supplied references outrank
+Magnific output.
+
+**Reason**: The owner already has usable Magnific credits and wants to avoid
+an additional paid image service. Magnific covers required generation,
+reference, background-removal, resize/upscale and related workflows.
+
+**Consequences**: `ASSET_GENERATION_MANIFEST.json` is the machine-readable
+queue. Magnific is used mainly for Scrubby/robot character art, booster icons,
+rewards, difficulty emblems and decorative assets. Native Godot UI is
+preferred for scalable structural elements. Raw generated assets are kept
+separate from explicitly approved production finals.
+
+**Status**: Owner-approved.
+
+---
+
+### ADR-018: Owner Desktop visual-reference intake is copy-only
+
+**Decision**: `C:\Users\sekip\Desktop\ScrubBots Gorselleri` is an owner-
+confirmed SCRUBBOTS reference source. Intake copies files into
+`assets/art/references/_owner_inbox/` and never moves/deletes Desktop source
+files.
+
+**Reason**: Prior approved/concept work must be visible to future Claude Code
+sessions while preserving source originals.
+
+**Consequences**: Inbox files are references until inventoried, classified
+and promoted. Magnific may not overwrite owner-source references.
+
+**Status**: Owner-approved.

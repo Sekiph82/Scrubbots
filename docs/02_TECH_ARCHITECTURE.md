@@ -17,6 +17,9 @@ the module table is still future work.
 - Level data separate from scene/script code.
 - **Target selection** and **routing** are separate modules — this is the
   single most important seam in the codebase (see below).
+- Production UI is responsive Godot composition, not flattened screen art.
+- Owner-approved/reference art guides visual direction; generated art never
+  replaces gameplay truth or responsive layout logic.
 
 ## Conceptual modules
 
@@ -35,7 +38,8 @@ the module table is still future work.
 | Scrubbot Agent | Lightweight runtime object representing one active Scrubbot in flight. | `scripts/gameplay/scrubbots/` |
 | Board Renderer | Draws current Board State efficiently (batched, not per-cell Nodes). Implemented in Prompt 04 (M06) — see below. | `scripts/gameplay/board/` |
 | Cleaning Feedback | Visual/audio response when a cell is cleaned; poolable, toggleable. | `scripts/gameplay/cells/`, later `scenes/components/` |
-| UI | HUD, slot UI, menus. | `scripts/ui/`, `scenes/ui/` |
+| UI | HUD, slot UI, menus, safe areas, responsive composition, reusable controls. | `scripts/ui/`, `scenes/components/ui/`, later screen scenes |
+| Visual Asset Pipeline | Owner-reference intake, Magnific-only generated illustration assets, raw/final separation. | `assets/art/references/`, `assets/ui/`, `ASSET_GENERATION_MANIFEST.json` |
 | Save System | Persists progress, streak, currency. Not implemented yet. | `scripts/data/` |
 | Debug/Instrumentation | Dev-only overlays, logging, inspection tools. | `scripts/debug/`, `scenes/debug/` |
 
@@ -77,6 +81,8 @@ Slot dispatches a Scrubbot
 - Scrubbots in flight are lightweight active objects, pooled where it makes
   sense, since the number of simultaneously active Scrubbots is small
   (bounded by slot count) even though the board itself is large.
+- Responsive UI may resize/reposition the `BoardRenderer` container but may
+  not change its data-oriented rendering architecture.
 
 ## LevelData vs. BoardState (implemented in Prompt 02)
 
@@ -178,6 +184,46 @@ Slot dispatches a Scrubbot
   and does not decide completion.
 - Uses the explicit `preload()` convention (ADR-009).
 
+## Master UI System (owner-approved foundation)
+
+Canonical specification: `docs/MASTER_UI_SYSTEM.md`.
+
+### Display/root contract
+
+- baseline reference viewport: 1080×2160 portrait;
+- stretch: `canvas_items` + `expand`;
+- reusable safe-area root: `scenes/components/ui/common/safe_area_root.tscn`;
+- centralized tokens: `scripts/ui/ui_tokens.gd`;
+- breakpoint helper: `scripts/ui/responsive_layout.gd`;
+- required phone-class viewport matrix is defined in `MASTER_UI_SYSTEM.md`.
+
+### Gameplay layout priority
+
+The board is the primary visual region and grows before decorative regions.
+The color-selection panel keeps a protected usable width. In the approved
+composition: Goal/Moves is removed; Scrubby sits low left of the selection
+region with speech above; cleaning props stay to the right; boosters form a
+compact horizontal lower row; pause sits left of the bottom/ad region and
+settings right of it.
+
+### Production component rule
+
+UI interaction/state uses live Godot controls, themes and containers. Normal
+labels, quantities, slots, progress bars, popup bodies and counters are not
+baked into AI images. Full-screen concept renders are art direction only.
+
+### Visual generation boundary
+
+`ASSET_GENERATION_MANIFEST.json` is the generation queue. Magnific MCP is the
+only owner-approved AI image provider for this UI pipeline unless explicitly
+changed. Generated files are presentation assets only and never carry
+canonical game state.
+
+Owner reference intake starts from the confirmed local source:
+`C:\Users\sekip\Desktop\ScrubBots Gorselleri` using
+`tools/import_desktop_visual_refs.ps1`; originals are copied/preserved and
+classified before production promotion.
+
 ## Cross-script referencing convention (ADR-009)
 
 Scripts under `scripts/data/` and `scripts/gameplay/board/` reference each
@@ -190,26 +236,27 @@ gameplay scripts that need to run correctly under `godot --headless`.
 
 ## What is explicitly NOT built yet
 
-Slot System, TargetSelector, RoutingSystem, Scrubbot Agent, Cleaning
-Feedback, Save System are all future milestones (see `docs/04_ROADMAP.md`).
-`BoardRenderer` is now implemented (Prompt 04/M06), but the *final* DIRTY
-visual language is not — that remains an open design gate (see above and
-`tasks.md` M10). Win/lose conditions and completion rules are not yet
-designed — `GameplaySession.complete()` (M11) is an explicit external
-transition placeholder that a future win-condition system will call.
+Slot System is implemented at its current M12 data-model boundary; target
+eligibility, reservation, TargetSelector, RoutingSystem, Scrubbot Agent,
+Cleaning Feedback and Save System remain future milestones (see
+`docs/04_ROADMAP.md` / `tasks.md`). `BoardRenderer` is implemented, but the
+*final* DIRTY visual language remains an open design gate. The Master UI
+foundation now defines responsive architecture and primitives, but production
+Gameplay/Home/Popup screens are still milestone work and must not be marked
+complete until implemented and validated.
 
 
 ## Level Platform sidecars
 
 ### Level Factory
 
-\`level_factory/\` is a second Godot project inside the repository, with its
-own \`project.godot\`. It is an offline authoring/analysis application, not a
+`level_factory/` is a second Godot project inside the repository, with its
+own `project.godot`. It is an offline authoring/analysis application, not a
 runtime gameplay module.
 
 Boundary:
 
-\`\`\`text
+```text
 LEVEL FACTORY
   generate / import / solve / analyze / QA
         |
@@ -219,7 +266,7 @@ M09/M30/M47/M48 production contracts
         |
         v
 SCRUBBOTS MOBILE GAME
-\`\`\`
+```
 
 The root game may consume exported Level Data but must never preload Factory
 GDScript. Factory editor scenes may depend on Factory core; solver/generator
@@ -227,11 +274,11 @@ core should remain headless-testable and scene-independent.
 
 ### Content Pipeline
 
-\`content_pipeline/\` packages accepted content, creates versioned manifests,
+`content_pipeline/` packages accepted content, creates versioned manifests,
 publishes first to staging, verifies remote objects, promotes to production,
 and supports rollback/disable/scheduling.
 
 Shipping runtime eventually receives only the minimal remote-content client
 needed to fetch declarative content over HTTPS, verify it, cache it under
-\`user://\`, and expose verified levels to the existing catalog/loader seam.
+`user://`, and expose verified levels to the existing catalog/loader seam.
 Publisher credentials and Factory code never ship in the app.
