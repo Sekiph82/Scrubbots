@@ -303,3 +303,23 @@ Then materialize the latest state into
 
 Canonical policy:
 https://github.com/Sekiph82/Scrubbots/blob/main/coordination/VERSIONED_LOG_POLICY.md
+
+
+## GitHub-only logging owner override [LOCKED, effective M12-C001]
+
+This owner instruction supersedes every earlier Desktop/local phase-log rule
+in this file.
+
+Starting with M12-C001 and for every later main-game, Level Factory, and
+Content Pipeline prompt:
+
+1. The **first action** is to safely synchronize the local repository with
+   `origin/main` while preserving all owner work.
+2. Do not create, update, or rely on Desktop phase logs or any other local
+   handoff log outside the repository.
+3. All durable implementation/test/coordination evidence goes to GitHub in the
+   active cycle's version-matched `CLAUDE_LOG_VNN.md`.
+4. Local temporary files needed by tools are not evidence and must not be
+   presented as handoff records.
+5. Never use destructive sync operations (`reset --hard`, `clean -fd`,
+   force push) without explicit owner permission.

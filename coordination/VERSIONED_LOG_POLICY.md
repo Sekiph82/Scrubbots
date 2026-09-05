@@ -57,3 +57,15 @@ H!veAI actively watches only .hiveai/PROJECT_DASHBOARD.md.
 
 ChatGPT recalculates progress from tasks.md for every owner-facing audit/new
 prompt handoff and reports both ecosystem and per-track completion.
+
+
+## GitHub-only evidence override [effective M12-C001]
+
+The previous Desktop-phase-log statement is historical only.
+
+For M12-C001 and every later prompt:
+
+- first action: safe local ↔ origin/main synchronization preserving owner work;
+- no Desktop phase log or other external handoff log;
+- all durable evidence lives in GitHub `CLAUDE_LOG_VNN.md`;
+- this applies to the main game, Level Factory, and Content Pipeline.

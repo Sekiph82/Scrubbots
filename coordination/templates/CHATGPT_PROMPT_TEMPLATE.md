@@ -13,6 +13,19 @@ baselineCommit: <sha>
 
 # SCRUBBOTS - ChatGPT Prompt
 
+## FIRST ACTION — synchronize before all other work
+
+Before reading implementation sources or changing files, safely synchronize
+the local repository with `origin/main` while preserving all owner work.
+
+Do not use destructive Git operations. Inspect and preserve local owner
+changes before integrating remote changes.
+
+Do not create or update Desktop phase logs or any other local handoff log.
+All durable evidence must be written only to the matching GitHub
+`CLAUDE_LOG_VNN.md`.
+
+
 ## Objective
 
 State exactly what Claude must implement in this cycle/pass.
@@ -46,7 +59,7 @@ Repository-relative paths may be included only as secondary local-edit reference
 
 List the exact prior audit URL(s), finding IDs, and relevant `AL-XXX` learnings.
 
-Claude must use these as implementation/test-planning input and record in `CLAUDE_IMPLEMENTATION_LOG.md` how each relevant finding changed the current checks.
+Claude must use these as implementation/test-planning input and record in `CLAUDE_LOG_VNN.md` how each relevant finding changed the current checks.
 
 Claude must not create an audit or self-audit document.
 
@@ -81,8 +94,7 @@ Every prompt-mandated validation command must appear individually in the impleme
 
 ## Logging and communication requirements
 
-- Continue the correct local Desktop phase log.
-- Create/update only the cycle's append-only `CLAUDE_IMPLEMENTATION_LOG.md` as Claude's GitHub work record.
+- - Create/update only the cycle's append-only `CLAUDE_LOG_VNN.md` as Claude's GitHub work record.
 - Record active prompt URL, prior audit URLs, applied `AL-XXX` learnings, changes, tests, failures/fixes, task/doc changes, and commit/push evidence.
 - Update `tasks.md` only when validated task truth changes.
 - Update `coordination/SESSION_INDEX.md`.
@@ -122,4 +134,4 @@ Every new prompt must declare the exact expected Claude evidence filename:
 `expectedClaudeLog: CLAUDE_LOG_VNN.md`
 
 where VNN matches the prompt version. Claude must not use
-CLAUDE_IMPLEMENTATION_LOG.md for new work.
+CLAUDE_LOG_VNN.md for new work.
