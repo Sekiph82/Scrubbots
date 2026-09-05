@@ -43,6 +43,21 @@ Tracking sources:
 - M11: **12 / 12 tasks complete**
 - Next main-game milestone: **M12 Five-Slot Logic**
 
+## Active main-game cycle
+
+| Field | Value |
+| --- | --- |
+| Cycle | M12-C001 |
+| Milestone | M12 - Five-Slot Logic |
+| Version | V01 |
+| State | PLANNED |
+| Next actor | CLAUDE |
+| Prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V01.md |
+| Audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
+| Expected Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V01.md |
+| Logging rule | GitHub-only; no Desktop phase/handoff log |
+| First action | Safely sync local repository with origin/main while preserving owner work |
+
 ## Project identity
 
 | Field | Value |
