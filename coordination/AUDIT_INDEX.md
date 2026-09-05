@@ -43,7 +43,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 
 | M11-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V02.md; V03: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V03.md; V04: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V04.md | `AUDITED_PASS` | V03 closed F-M11-001 with direct renderer observability. V04 normalized versioned evidence and added AL-019. |
 
-| M12-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V01.md | `CHANGES_REQUIRED` | Added AL-020: mutable internal SlotState leakage bypasses SlotSystem palette validation. |
+| M12-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 added AL-020; V02 verified encapsulation correction and closed M12. |
 
 ## Claude usage rule
 
