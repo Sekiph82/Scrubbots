@@ -46,6 +46,9 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | AL-027 | ACTIVE/CLEARED owner rule | The owner replaced the DIRTY/CLEAN/grime/reveal model: artwork cells start ACTIVE at original palette color; successful cleaning makes them CLEARED alpha-0 so gameplay background shows through. | Current canonical code/docs/tasks must use ACTIVE/CLEARED; no DirtyCleanPresets/A-B-C layer. Historical logs stay unchanged. | META-C004 owner decision, 2026-09-05 |
 | AL-028 | Color candidate != reachable target | A matching-color ACTIVE cell can still be blocked by surrounding ACTIVE cells. Raw color membership must not be called final eligibility. | M13 indexes raw color candidates only. Final dispatch requires valid + ACTIVE + matching + unreserved + reachable. ACTIVE non-target cells block access; CLEARED/background space opens it. Preserve TargetSelector/RoutingSystem separation. | META-C004 owner decision, 2026-09-05 |
 
+| AL-029 | Semantic migration completeness | Identifier-only grep can miss contradictory conceptual language and required future task sections. | For gameplay-rule migrations, scan both identifiers and semantic synonyms, and explicitly reconcile every prompt-named task section. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md |
+| AL-030 | Evidence reference existence | A log statement such as "receipt below" is not evidence if the referenced artifact is absent. | Independently verify every claimed receipt/comment/file exists. Post-push exact SHA evidence belongs in a real non-Git-mutating receipt per AL-025. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md |
+
 ## Audit history
 
 | Cycle | ChatGPT audit | Final/current state | Reusable learning |
@@ -64,6 +67,8 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | META-C003 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_V01.md | `AUDITED_PASS` | Controlled merge + canonical-main reconciliation accepted; AL-025 receipt pattern validated for merge cycles. |
 
 | M13-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 added AL-026 and reopened scan observability/remaining formal scope; V02 closes findings and completes M13. |
+
+| META-C004 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md | `CHANGES_REQUIRED` | Core ACTIVE/CLEARED migration accepted; V02 required for M48, Project Brief semantic residue, and real AL-025 receipt. Added AL-029/030. |
 
 ## Claude usage rule
 

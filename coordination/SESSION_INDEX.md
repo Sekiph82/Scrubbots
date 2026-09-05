@@ -19,7 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| META-C004 | META - Gameplay Rule Migration ACTIVE/CLEARED + Reachable Targets | 2026-09-05 | 2026-09-05 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V01.md | PENDING | M02/M10/M11/M13/M15-M20/M21/M40/M41/M49 + LF | Owner-locked migration DIRTY/CLEAN reveal → ACTIVE/CLEARED transparent clearing; raw color candidate != reachable target. `dirty_clean_presets.gd` removed; M13 → `ColorCandidateIndex` (targeting/). 774/774 ALL PASS. SB-M10-001 closed → 207/943. M02-017/M14/M15/M16/M17 open. Next actor CHATGPT. |
+| META-C004 | META - Gameplay Rule Migration ACTIVE/CLEARED + Reachable Targets | 2026-09-05 | 2026-09-05 | `CHANGES_REQUIRED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md | M02/M10/M11/M13 + future gameplay contracts | Core ACTIVE/CLEARED migration accepted. V02 only fixes M48 QA wording, stale Project Brief 'obscured' language, and missing AL-025 post-push receipt. Progress stays 207/943. Next actor CLAUDE. |
 | M13-C001 | M13 - Eligible Target Index | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V02.md | SB-M13-001..010 | V02 closes scan-observability gap and formally validates 006..010. M13 final AUDITED_PASS. 206/943. M14 not opened; owner requested manual QA first. |
 | META-C003 | META - PR #3 Merge & Canonical Main Reconciliation | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_V01.md | META/PR3 | PR #3 normal merge + canonical main reconciliation independently accepted. 196/943; next M13. |
 | META-C002 | META - Master UI + Magnific integration | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V05.md | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V05.md | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V05.md | META/UI | Final V05 audit pass. 95-task migration, 51-reference inventory, manifest/task/H!ve truth and AL-025 receipt evidence accepted. PR #3 authorized for controlled META-C003 merge cycle. |
@@ -315,3 +315,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - AL-026 honored: pre-existing tracked owner change `project.godot` preserved, never staged/restored.
 - SB-M10-001 closed (owner-approved ACTIVE appearance); no task IDs added; recomputed 207/943 = 21.95%. M10-005..011 owner manual-QA gates and M02-017/M14/M15/M16/M17 implementation gates remain open.
 - Cycle state: `AWAITING_AUDIT`; next actor CHATGPT.
+
+
+### META-C004 ChatGPT independent audit V01
+
+- Decision: `CHANGES_REQUIRED`.
+- Core implementation accepted: ACTIVE/CLEARED, transparent CLEARED renderer,
+  ColorCandidateIndex, M13 cache migration, future reachability seams.
+- F-META4-001: M48 QA contract was not explicitly migrated.
+- F-META4-002: Project Brief still says "obscured pixel-art image".
+- F-META4-003: CLAUDE_LOG_V01 claims a post-push receipt that does not exist.
+- V02 is docs/tasks/evidence only; progress remains 207/943.

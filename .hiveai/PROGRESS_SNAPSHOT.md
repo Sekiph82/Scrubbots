@@ -31,3 +31,12 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Full suite 774/774 ALL PASS.
 - M10-005..011 remain owner manual-QA gates for the NEW transparent model;
   M02-017 and all M14/M15/M16/M17 implementation gates remain open.
+
+
+### META-C004 Audit V01
+
+- Core migration accepted.
+- Canonical task truth remains **207 / 943**.
+- V02 changes are wording/evidence corrections only and must not change task
+  completion count.
+- M10-005..011 remain OPEN for owner manual QA.

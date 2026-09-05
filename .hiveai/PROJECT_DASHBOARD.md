@@ -15,12 +15,12 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Active cycle | META-C004 |
-| Active version | V01 |
-| State | AWAITING_AUDIT |
-| Next actor | CHATGPT |
+| Active version | V02 |
+| State | CHANGES_REQUIRED |
+| Next actor | CLAUDE |
 | Branch | main |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V01.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V01.md |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V02.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V02.md |
 | Purpose | META-C004: gameplay-rule migration DIRTY/CLEAN → ACTIVE/CLEARED (ADR-019). BoardState ACTIVE/CLEARED; renderer ACTIVE=source-color-opaque / CLEARED=alpha-0-transparent; removed `dirty_clean_presets.gd`; M13 index renamed to `ColorCandidateIndex` under `scripts/gameplay/targeting/`; docs/tasks/LF migrated; CP inspected (no edit). 774/774 ALL PASS. SB-M10-001 closed. 207/943 = 21.95%. |
 
 ### Also active (on main)
@@ -194,6 +194,19 @@ Tracking sources:
 | Reachability | matching color is not sufficient; blocked ACTIVE cells are not targetable |
 | Result | Migrated code/docs/tasks/LF; removed `dirty_clean_presets.gd`; renamed M13 index to `ColorCandidateIndex` (`scripts/gameplay/targeting/`). 774/774 ALL PASS. SB-M10-001 closed → 207/943. M10-005..011, M02-017, M14/M15/M16/M17 remain open. |
 | Gate | M14 remains NOT_STARTED until META-C004 audit and new manual QA |
+
+## META-C004 independent audit V01
+
+- Status: **CHANGES_REQUIRED**
+- Core ACTIVE/CLEARED implementation: **ACCEPTED**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md
+- V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V02.md
+- F-META4-001: M48 canonical QA semantics incomplete.
+- F-META4-002: Project Brief retains stale "obscured pixel-art image" wording.
+- F-META4-003: claimed V01 post-push receipt is absent.
+- Progress remains **207 / 943 = 21.95%**.
+- M10-005..011 remain owner manual-QA gates.
+- M14 remains **NOT_STARTED**.
 
 ## Project identity
 
