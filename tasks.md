@@ -729,13 +729,13 @@ Remaining slot mechanics are `[DESIGN GATE]`.
 
 Don't rescan up to 3,481 cells unnecessarily for every bot.
 
-- [ ] SB-M13-001 Define eligible cell.
-- [ ] SB-M13-002 Group/query by color.
-- [ ] SB-M13-003 Implement efficient index/cache if measured useful.
-- [ ] SB-M13-004 Synchronize with BoardState.
-- [ ] SB-M13-005 Remove CLEAN cells. — [ ] SB-M13-006 Handle reservations.
-- [ ] SB-M13-007 No-work query. — [ ] SB-M13-008 Exhausted-color test.
-- [ ] SB-M13-009 Last-target test. — [ ] SB-M13-010 3,481-cell benchmark.
+- [x] SB-M13-001 Define eligible cell.
+- [x] SB-M13-002 Group/query by color.
+- [x] SB-M13-003 Implement efficient index/cache if measured useful.
+- [x] SB-M13-004 Synchronize with BoardState.
+- [x] SB-M13-005 Remove CLEAN cells. — [x] SB-M13-006 Handle reservations.
+- [x] SB-M13-007 No-work query. — [x] SB-M13-008 Exhausted-color test.
+- [x] SB-M13-009 Last-target test. — [x] SB-M13-010 3,481-cell benchmark.
 
 ### M14 — Reservation State
 
