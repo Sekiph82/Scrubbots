@@ -240,32 +240,32 @@ Full protocol: `coordination/README.md`.
 
 This repository contains two deliberately isolated sidecar systems:
 
-- \`level_factory/\`: independently openable Godot project for offline level
+- `level_factory/`: independently openable Godot project for offline level
   generation, solving, difficulty analysis, human review and QA.
-- \`content_pipeline/\`: offline publisher/control-plane for pack/manifest,
+- `content_pipeline/`: offline publisher/control-plane for pack/manifest,
   staging, production, rollback, disable and scheduling workflows.
 
-Root \`tasks.md\` is the only canonical task ledger. Sidecars use
-\`SB-LFxx-xxx\` and \`SB-CPxx-xxx\` task IDs.
+Root `tasks.md` is the only canonical task ledger. Sidecars use
+`SB-LFxx-xxx` and `SB-CPxx-xxx` task IDs.
 
-The main game must never preload/import \`level_factory/\` scripts. Shipping
+The main game must never preload/import `level_factory/` scripts. Shipping
 runtime never includes Factory/Publisher implementation. Remote content is
 declarative data only.
 
 ### GitHub coordination rule for sidecars
 
 Sidecar work uses the same evidence chain as the main project, but each
-sidecar has its own \`coordination/\` subtree:
+sidecar has its own `coordination/` subtree:
 
-1. ChatGPT authors versioned \`CHATGPT_PROMPT_VNN.md\` and
-   \`CHATGPT_AUDIT_CRITERIA_VNN.md\`.
+1. ChatGPT authors versioned `CHATGPT_PROMPT_VNN.md` and
+   `CHATGPT_AUDIT_CRITERIA_VNN.md`.
 2. Claude reads them from GitHub, implements/tests only, and appends to the
-   cycle's single \`CLAUDE_IMPLEMENTATION_LOG.md\`.
-3. Claude updates root \`tasks.md\`, the sidecar session index and root
-   H!veAI dashboard, pushes safely, returns \`AWAITING_AUDIT\`, and stops.
+   cycle's single `CLAUDE_IMPLEMENTATION_LOG.md`.
+3. Claude updates root `tasks.md`, the sidecar session index and root
+   H!veAI dashboard, pushes safely, returns `AWAITING_AUDIT`, and stops.
 4. Claude does not create audit/self-audit files or assign audit verdicts.
 5. ChatGPT reads GitHub log + real diff/code/tests, publishes
-   \`CHATGPT_AUDIT_VNN.md\`, and either closes the cycle or issues the next
+   `CHATGPT_AUDIT_VNN.md`, and either closes the cycle or issues the next
    prompt version in the same cycle.
 
 
@@ -323,3 +323,57 @@ Content Pipeline prompt:
    presented as handoff records.
 5. Never use destructive sync operations (`reset --hard`, `clean -fd`,
    force push) without explicit owner permission.
+
+
+## Master UI / visual generation owner override [LOCKED, 2026-09-05]
+
+The owner has approved the SCRUBBOTS Master UI architecture and visual asset
+pipeline. For UI/visual work, also read `docs/MASTER_UI_SYSTEM.md`,
+`docs/07_UI_ASSET_PIPELINE_DECISIONS.md`, and
+`ASSET_GENERATION_MANIFEST.json` before changing presentation code or art.
+
+46. Production UI must be composed from responsive Godot `Control` scenes and
+    containers. Full-screen AI/mockup images are art-direction references,
+    not shippable interactive UI.
+47. The reference portrait design viewport is **1080×2160**, using
+    `canvas_items` stretch with `expand` aspect. UI remains resolution-
+    independent and safe-area aware.
+48. The gameplay board is the dominant visual region. Preserve the existing
+    single-`Image`/`ImageTexture` `BoardRenderer`; never replace it with one
+    node/control per logical cell.
+49. Five visible slots and the color-selection panel must remain usable across
+    target phone sizes. Decorative character/prop art yields space before
+    gameplay controls do.
+50. The approved gameplay composition removes the Goal/Moves panel, places
+    Scrubby low at the left of the color-selection region with the speech
+    bubble above Scrubby, keeps cleaning props on the right, places boosters
+    in a compact horizontal row below, pause left of the bottom/ad row, and
+    settings right of it.
+51. **Magnific MCP is the only approved AI image-generation provider for the
+    Master UI Asset Kit unless the owner explicitly changes this rule.** Do
+    not add Higgsfield as a required dependency or subscription.
+52. Prefer Godot-native styles/components for panels, buttons, text,
+    progress bars, slots, color tiles, counters, popup bodies and layout.
+    Use Magnific primarily for character, booster, reward, difficulty and
+    decorative illustration assets.
+53. Never silently regenerate or overwrite an owner-approved asset. Raw
+    generated files and approved production-final assets must remain
+    separate.
+54. The owner-confirmed local visual-reference source is
+    `C:\Users\sekip\Desktop\ScrubBots Gorselleri`. Use
+    `tools/import_desktop_visual_refs.ps1` locally to copy these references
+    into `assets/art/references/_owner_inbox/`; never move/delete the Desktop
+    originals. Inbox files are references until inventoried/classified and
+    explicitly promoted.
+55. `ASSET_GENERATION_MANIFEST.json` is the machine-readable generation queue.
+    Do not generate assets whose status/reference prerequisites are not met.
+
+
+## Non-self-referential final SHA rule [LOCKED]
+
+Do not repeatedly commit a Claude log merely to make it contain the SHA of the
+commit that contains itself.
+
+The versioned log records pre-commit evidence. After push, when exact final
+SHA evidence is required, use the prompt-specified external GitHub receipt
+(PR comment for PR cycles) and do not create another commit after the receipt.
