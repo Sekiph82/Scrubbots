@@ -1,9 +1,9 @@
 # H!veAI Progress Snapshot
 
-Derived from canonical tasks.md on feature/master-ui-magnific-pipeline.
+Derived from canonical tasks.md on main (after PR #3 merge).
 Counts use unique canonical SB task IDs on checkbox lines. Not a task ledger.
 
-## After META-C002 V02 corrections
+## After META-C003 V01 merge
 
 | Scope | Completed | Total | Remaining | Completion |
 | --- | ---: | ---: | ---: | ---: |
@@ -12,12 +12,13 @@ Counts use unique canonical SB task IDs on checkbox lines. Not a task ledger.
 | Level Factory LF00-LF10 | 0 | 112 | 112 | 0.00% |
 | Content Pipeline CP00-CP08 | 0 | 112 | 112 | 0.00% |
 
-V02 closed 11 tasks (4 M07 inventory + 7 SB-UI reference tasks) with durable
-per-file SHA-256/dimension/classification evidence.
+PR #3 merged into main. 95 UI/Magnific tasks added, 51 references inventoried.
+Canonical main progress now matches former feature-branch truth.
 
 ### Correction history
 
 - V01 reported 166/778 (incorrect — wrong total, stale baseline)
 - Audit V01 found pre-correction truth: 185/943 = 19.62%
 - V02 after 11 closures: 196/943 = 20.78%
-- Current main before PR #3 merge: 185/848 = 21.82%
+- Pre-merge main: 185/848 = 21.82%
+- Post-merge main: 196/943 = 20.78% (95 tasks added from feature branch)
