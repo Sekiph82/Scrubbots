@@ -18,3 +18,11 @@ M13-C001 V02 closed SB-M13-001..010 (all 10). Canonical total 943 excludes the
 - M13-C001 V01: closed SB-M13-001..010 -> 206/943.
 - M13-C001 Audit V01: reopened SB-M13-003, 006..010 -> 200/943 = 21.21%.
 - M13-C001 V02: scan-observability + formal validation passed; all 10 closed -> 206/943 = 21.85%.
+
+
+### META-C004 migration pending
+
+- Baseline remains 206/943 until Claude migrates canonical tasks/code and ChatGPT audits it.
+- Owner has superseded gameplay-semantic DIRTY/CLEAN with ACTIVE/CLEARED.
+- If no new task IDs are added and only SB-M10-001 newly closes from owner approval, expected post-migration count is 207/943; canonical tasks.md must be recomputed rather than assumed.
+- M10-005..011 remain manual-QA gates for the NEW transparent model.

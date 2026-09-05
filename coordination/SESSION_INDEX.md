@@ -19,6 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| META-C004 | META - Gameplay Rule Migration ACTIVE/CLEARED + Reachable Targets | 2026-09-05 | 2026-09-05 | `PLANNED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V01.md | PENDING | M02/M10/M11/M13 + future gameplay contracts | Owner-locked migration from DIRTY/CLEAN reveal model to ACTIVE/CLEARED transparent clearing model; raw color candidate != reachable target. M14 remains NOT_STARTED. Next actor CLAUDE. |
 | M13-C001 | M13 - Eligible Target Index | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V02.md | SB-M13-001..010 | V02 closes scan-observability gap and formally validates 006..010. M13 final AUDITED_PASS. 206/943. M14 not opened; owner requested manual QA first. |
 | META-C003 | META - PR #3 Merge & Canonical Main Reconciliation | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_V01.md | META/PR3 | PR #3 normal merge + canonical main reconciliation independently accepted. 196/943; next M13. |
 | META-C002 | META - Master UI + Magnific integration | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V05.md | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V05.md | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V05.md | META/UI | Final V05 audit pass. 95-task migration, 51-reference inventory, manifest/task/H!ve truth and AL-025 receipt evidence accepted. PR #3 authorized for controlled META-C003 merge cycle. |
@@ -291,3 +292,13 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - M13 final: 10/10 tasks complete.
 - Progress: 206/943 = 21.85%.
 - M14 intentionally not opened yet; owner requested manual testing first.
+
+
+### META-C004 owner gameplay-rule revision
+
+- Owner decision: visible artwork pixels start ACTIVE and opaque at source palette color.
+- Clearing converts target to CLEARED alpha-0 so gameplay background shows through.
+- No gameplay DIRTY/CLEAN color transform, grime layer or A/B/C presets.
+- Matching color alone is insufficient: blocked/unreachable ACTIVE cells are not final targets.
+- M13 is to become ColorCandidateIndex, not final eligibility/reachability.
+- M14 remains NOT_STARTED until migration audit + new manual QA.
