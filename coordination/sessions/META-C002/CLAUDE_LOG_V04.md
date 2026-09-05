@@ -243,11 +243,18 @@ Finalization commit SHA: `9cdc708eaa118dc7e2cfbf51fdeba492518bb388`
 | V04 evidence commit | `e46803bf31f30a9c84f44338352341a55fddf47c` | Main V04 work: CLAUDE_LOG_V04 + coordination updates |
 | V04 log-finalization commit | `9cdc708eaa118dc7e2cfbf51fdeba492518bb388` | Appends concrete post-commit/push evidence to log |
 
-The log-finalization commit is the final remote head after the final push.
+A second finalization commit (`91201ed1202e819265ed24d6c79e9b43f628c746`) records the SHA table. A final commit records this update and the final push evidence.
 
-### Final push and remote head
+### All V04 commits
 
-PENDING (recorded after final push — see below)
+| # | Full SHA | Role |
+| --- | --- | --- |
+| 1 | `e46803bf31f30a9c84f44338352341a55fddf47c` | V04 evidence + coordination |
+| 2 | `9cdc708eaa118dc7e2cfbf51fdeba492518bb388` | Log finalization 1: evidence push verification |
+| 3 | `91201ed1202e819265ed24d6c79e9b43f628c746` | Log finalization 2: SHA table |
+| 4 | (this commit) | Final: records all SHAs + final push evidence |
+
+The final commit (4) is the final remote head after push.
 
 ---
 
