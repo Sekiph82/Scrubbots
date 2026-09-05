@@ -10,8 +10,40 @@
   "owner_reference_source": {
     "local_windows_path": "C:\\Users\\sekip\\Desktop\\ScrubBots Gorselleri",
     "repository_inbox": "assets/art/references/_owner_inbox/",
-    "status": "OWNER_CONFIRMED_REFERENCE_SOURCE",
+    "status": "INTAKE_COMPLETE",
+    "intake_file_count": 51,
+    "intake_verified": "2026-09-05",
+    "source_repo_hash_match": "51/51",
     "preserve_originals": true
+  },
+  "canonical_references": {
+    "gameplay": {
+      "repository_path": "assets/art/references/_owner_inbox/Game Screens/deneme 3 OK.png",
+      "status": "CANONICAL_SELECTED"
+    },
+    "home_screen": {
+      "repository_path": "assets/art/references/_owner_inbox/Game Screens/main screen.png",
+      "status": "CANONICAL_SELECTED"
+    },
+    "popup_level_intro": {
+      "repository_path": "assets/art/references/_owner_inbox/Game Screens/level ekran acilisi.png",
+      "status": "CANONICAL_SELECTED"
+    },
+    "popup_life": {
+      "repository_path": "assets/art/references/_owner_inbox/Additionals/life screens.png",
+      "status": "CANONICAL_SELECTED"
+    },
+    "popup_help": {
+      "repository_path": "assets/art/references/_owner_inbox/Additionals/need a hand.png",
+      "status": "CANONICAL_SELECTED"
+    },
+    "scrubby_master": {
+      "status": "OWNER_REQUIRED",
+      "candidate_paths": [
+        "assets/art/references/_owner_inbox/Game Screens/main screen.png",
+        "assets/art/references/_owner_inbox/Collection Cards/meet the scrubbots.jpeg"
+      ]
+    }
   },
   "output_roots": {
     "raw_generated": "assets/ui/generated/",
@@ -25,7 +57,7 @@
       "category": "character",
       "provider": "magnific",
       "required": true,
-      "status": "AWAITING_REFERENCE_INTAKE_AND_OWNER_SELECTION",
+      "status": "OWNER_SELECTION_REQUIRED",
       "reference_policy": "Select from owner desktop references before generating anything new.",
       "prompt": "Canonical Scrubby character reference sheet preserving the owner-approved white and teal cleaning robot design, leaf sprout on head, glossy black face display, cyan expressive eyes, friendly compact proportions, clean turnaround/reference presentation",
       "transparent": true,
