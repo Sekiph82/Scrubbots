@@ -1218,9 +1218,9 @@ Mark actual iOS compilation `[DEFERRED]` until macOS/Xcode is available.
 Every production level:
 - [ ] SB-M48-001 Legal dimensions. — [ ] SB-M48-002 Correct difficulty.
 - [ ] SB-M48-003 Valid palette. — [ ] SB-M48-004 Correct cell count.
-- [ ] SB-M48-005 No invalid palette IDs. — [ ] SB-M48-006 Recognizable artwork.
-- [ ] SB-M48-007 No unintended interpolation. — [ ] SB-M48-008 Correct transparency.
-- [ ] SB-M48-009 Solvable. — [ ] SB-M48-010 No routing pathology.
+- [ ] SB-M48-005 No invalid palette IDs. — [ ] SB-M48-006 Recognizable ACTIVE source artwork (cells shown at their original source palette color, opaque, from level start; ADR-019).
+- [ ] SB-M48-007 No unintended interpolation. — [ ] SB-M48-008 Correct CLEARED transparency — cleared cells render alpha 0 and the gameplay background is visible through them (not a black/gray/palette substitute).
+- [ ] SB-M48-009 Solvable under canonical ACTIVE-blocker / CLEARED-open reachability semantics (non-target ACTIVE cells block access; CLEARED/background is open). — [ ] SB-M48-010 No routing pathology under those semantics; a fully enclosed matching-color ACTIVE cell must remain untargetable (no dispatch) until prior clears open legal access (AL-028).
 - [ ] SB-M48-011 Good performance. — [ ] SB-M48-012 Correct preview.
 - [ ] SB-M48-013 Unique ID.
 

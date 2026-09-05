@@ -16,12 +16,12 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | --- | --- |
 | Active cycle | META-C004 |
 | Active version | V02 |
-| State | CHANGES_REQUIRED |
-| Next actor | CLAUDE |
+| State | AWAITING_AUDIT |
+| Next actor | CHATGPT |
 | Branch | main |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V02.md |
 | Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V02.md |
-| Purpose | META-C004: gameplay-rule migration DIRTY/CLEAN → ACTIVE/CLEARED (ADR-019). BoardState ACTIVE/CLEARED; renderer ACTIVE=source-color-opaque / CLEARED=alpha-0-transparent; removed `dirty_clean_presets.gd`; M13 index renamed to `ColorCandidateIndex` under `scripts/gameplay/targeting/`; docs/tasks/LF migrated; CP inspected (no edit). 774/774 ALL PASS. SB-M10-001 closed. 207/943 = 21.95%. |
+| Purpose | META-C004 V02 narrow correction on the accepted V01 ACTIVE/CLEARED migration: M48 QA wording now encodes CLEARED transparency + blocked matching-color reachability/solvability (no task-ID change); Project Brief "obscured" → visible/ACTIVE; AL-025 external commit-comment receipt on the V02 commit. No production gameplay code/test change. Progress unchanged 207/943 = 21.95%. |
 
 ### Also active (on main)
 
@@ -224,13 +224,13 @@ Tracking sources:
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | OK — META-C004 implemented, AWAITING_AUDIT |
-| Current implementation frontier | META-C004 - ACTIVE/CLEARED gameplay-rule migration |
-| Current task | META-C004 DIRTY/CLEAN → ACTIVE/CLEARED migration |
+| Health | OK — META-C004 V02 corrections implemented, AWAITING_AUDIT |
+| Current implementation frontier | META-C004 V02 - narrow canonical-truth/evidence correction |
+| Current task | META-C004 V02: M48 QA wording + Project Brief "obscured" + AL-025 receipt |
 | Current task ID | `META-C004` |
-| Current workflow state | `AWAITING_AUDIT` — BoardState ACTIVE/CLEARED; renderer ACTIVE=source-opaque / CLEARED=alpha-0; `dirty_clean_presets.gd` removed; M13 index → `ColorCandidateIndex` (`scripts/gameplay/targeting/`); docs/tasks/LF migrated; CP inspected (no edit); ADR-019 appended; CHANGELOG appended. 774/774 ALL PASS. SB-M10-001 closed → 207/943 canonical main truth. |
+| Current workflow state | `AWAITING_AUDIT` — V02 (docs/tasks/evidence only, no production code/test change): M48 tasks.md reworded for CLEARED transparency + blocked matching-color reachability/solvability (13 IDs preserved); Project Brief "obscured pixel-art image" → "visible … ACTIVE at original source palette colors"; expanded conceptual semantic scan clean; AL-025 external commit-comment receipt on the V02 commit. Accepted V01 baseline intact: BoardState ACTIVE/CLEARED, CLEARED alpha-0 renderer, `ColorCandidateIndex` (targeting/), `dirty_clean_presets.gd` absent, 774/774. Progress unchanged 207/943. |
 | Required actor | CHATGPT |
-| Next project action | ChatGPT performs independent audit META-C004 V01. |
+| Next project action | ChatGPT performs independent audit META-C004 V02. |
 | Waiting on | Scrubby master reference: OWNER_REQUIRED. M10-005..011 owner manual QA of the NEW transparent model. M02-017/M14/M15/M16/M17 implementation gates open. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -241,14 +241,14 @@ Tracking sources:
 | Timestamp | 2026-09-05 |
 | Actor | CLAUDE |
 | Cycle | `META-C004` |
-| Session type | Gameplay-rule migration DIRTY/CLEAN → ACTIVE/CLEARED |
+| Session type | META-C004 V02 narrow canonical-truth/evidence correction |
 | Cycle status | `AWAITING_AUDIT` |
-| Summary | Migrated the whole current canonical surface from the DIRTY/CLEAN grime/reveal prototype to the owner-locked ACTIVE/CLEARED model (ADR-019). BoardState `CellState` = ACTIVE(0)/CLEARED(1), fresh/reset all-ACTIVE. BoardRenderer draws ACTIVE=exact source palette color/opaque, CLEARED=`Color(0,0,0,0)` transparent (background shows through) — proven by pixel-alpha readback. Removed `scripts/gameplay/board/dirty_clean_presets.gd` (no alias). Moved `eligible_target_index.gd`→`scripts/gameplay/targeting/color_candidate_index.gd` (`ColorCandidateIndex`, candidate API; raw color candidates only, no reachability — AL-028). Debug tool migrated to ACTIVE/CLEARED patterns + visible background; A/B/C dropdown removed. Migrated README, CLAUDE.md, docs/00–06 (ADR-019 appended, ADR-011 unchanged), tasks.md (M02/M10/M11/M13/M15/M16/M17/M18–M20/M21/M40/M41/M49), Level Factory solver/architecture docs; Content Pipeline inspected — declarative-only, no edit. CHANGELOG append-only migration entry. AL-026 honored: pre-existing tracked owner change `project.godot` preserved, never staged/restored. Full suite 774/774 ALL PASS. SB-M10-001 closed (owner-approved ACTIVE appearance); no task IDs added; recomputed 207/943 = 21.95%. M10-005..011 owner manual-QA gates and M02-017/M14/M15/M16/M17 implementation gates remain open. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V01.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_CRITERIA_V01.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V02.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V01.md |
-| Next expected actor | CHATGPT (audit META-C004 V01) |
+| Summary | V02 correction of the three audit-V01 findings, docs/tasks/evidence only — no production gameplay code or test change (`git diff --stat -- scripts tests` empty). F-META4-001: M48 in tasks.md reworded so SB-M48-006 = recognizable ACTIVE source artwork, 008 = CLEARED alpha-0 transparency/background visibility, 009 = solvable under ACTIVE-blocker/CLEARED-open reachability, 010 = no routing pathology + enclosed matching-color ACTIVE cell untargetable until access opens (AL-028); all 13 M48 IDs preserved. F-META4-002: `docs/00_PROJECT_BRIEF.md` "obscured pixel-art image" → "visible pixel-art image whose cells start ACTIVE at their original source palette colors", cleared→transparent background. Expanded conceptual semantic scan (obscured/hidden artwork/under grime/etc.): only valid negative/supersession statements + ordinary English remain. F-META4-003: AL-025 followed — pre-commit evidence in CLAUDE_LOG_V02; exact final SHA in a single external GitHub commit comment `## META-C004 V02 POST-PUSH RECEIPT`; no commit after the receipt. Accepted V01 baseline intact (BoardState ACTIVE/CLEARED, CLEARED alpha-0 renderer, ColorCandidateIndex, presets absent, 774/774). Progress unchanged 207/943 = 21.95%. M10-005..011, M02-017, M14/M15/M16/M17 remain open. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V02.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_CRITERIA_V02.md |
+| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V02.md |
+| Next expected actor | CHATGPT (audit META-C004 V02) |
 
 ## Milestone summary
 

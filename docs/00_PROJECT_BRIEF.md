@@ -19,9 +19,11 @@ as a feel reference, never as a source to copy from.
 
 ## Mobile puzzle-game objective
 
-Each level presents the player with an obscured pixel-art image and a small
-number of active color slots. The player's job is to clear the board by
-routing the right Scrubbots to the right cells, working within the
+Each level presents the player with a visible pixel-art image whose cells
+start ACTIVE at their original source palette colors, plus a small number of
+active color slots. The player's job is to clear the board by routing the
+right Scrubbots to the right cells — each cleared cell becomes CLEARED
+(transparent), exposing the gameplay background — working within the
 constraints of how many slots and Scrubbots are available at once. The
 puzzle tension comes from managing limited dispatch resources, not from
 twitch reflexes — this is a puzzle game, not an action game.
