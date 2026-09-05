@@ -19,7 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| M13-C001 | M13 - Eligible Target Index | 2026-09-05 | 2026-09-05 | `PLANNED` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V01.md | PENDING | SB-M13-001..010 | Color-grouped eligible DIRTY target index/cache. Reservation-aware external exclusion only; M14 owns reservation state. Next actor CLAUDE. |
+| M13-C001 | M13 - Eligible Target Index | 2026-09-05 | 2026-09-05 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V01.md | PENDING | SB-M13-001..010 | Color-grouped eligible DIRTY target index/cache implemented. 729/729 ALL PASS (72 new M13 checks). SB-M13-001..010 closed. 206/943. Next actor CHATGPT. |
 | META-C003 | META - PR #3 Merge & Canonical Main Reconciliation | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_V01.md | META/PR3 | PR #3 normal merge + canonical main reconciliation independently accepted. 196/943; next M13. |
 | META-C002 | META - Master UI + Magnific integration | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V05.md | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V05.md | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V05.md | META/UI | Final V05 audit pass. 95-task migration, 51-reference inventory, manifest/task/H!ve truth and AL-025 receipt evidence accepted. PR #3 authorized for controlled META-C003 merge cycle. |
 | M12-C001 | M12 - Five-Slot Logic | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V02.md | SB-M12-001..011 | F-M12-001 closed; scalar-only SlotSystem query boundary. M12 final AUDITED_PASS. |
@@ -252,3 +252,12 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Reservation handling is caller-supplied exclusion only; M14 ownership/state stays unimplemented.
 - First action: safe local main ↔ origin/main synchronization.
 - Durable evidence: GitHub only.
+
+### M13-C001 V01 implementation
+
+- Implemented `scripts/gameplay/routing/eligible_target_index.gd` — color-grouped DIRTY-cell query/cache over one BoardState; eligibility = valid+DIRTY+color+not-caller-excluded.
+- Reservation seam is a per-query caller-supplied `excluded` set only; no `RESERVED` state, no reservation ownership. M02-017 and M14 remain open.
+- No TargetSelector / RoutingSystem / dispatch / Scrubbot agent implemented.
+- 72 new M13 checks (behavioral + 59x59/3,481-cell correctness + spy-verified no-per-query-rescan + CPU/index benchmark). Full suite `729/729 ALL PASS` (baseline was 657/657).
+- SB-M13-001..010 closed with evidence. Canonical progress 206/943 = 21.85%.
+- Cycle state: `AWAITING_AUDIT`; next actor CHATGPT.

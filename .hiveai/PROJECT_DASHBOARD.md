@@ -14,28 +14,28 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Active cycle | META-C003 |
+| Active cycle | M13-C001 |
 | Active version | V01 |
 | State | AWAITING_AUDIT |
 | Next actor | CHATGPT |
-| Branch | main (PR #3 merged) |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md |
-| Purpose | META-C003 V01: PR #3 merged into main via normal merge commit. Pre- and post-merge 657/657 ALL PASS. Canonical main truth 196/943 = 20.78%. Post-merge receipt posted. |
+| Branch | main |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V01.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V01.md |
+| Purpose | M13-C001 V01: Eligible Target Index implemented (color-grouped DIRTY-cell query/cache over BoardState). SB-M13-001..010 closed. 729/729 ALL PASS (72 new M13 checks). Canonical main 206/943 = 21.85%. No TargetSelector/RoutingSystem/reservation ownership. |
 
 ### Also active (on main)
 
 | Field | Value |
 | --- | --- |
-| Active cycle | M12-C001 |
-| Active version | V02 |
+| Active cycle | META-C003 |
+| Active version | V01 |
 | State | AUDITED_PASS |
 | Next actor | COMPLETE |
 
-### Current progress from tasks.md (main, after PR #3 merge)
+### Current progress from tasks.md (main, after M13-C001)
 
-- Ecosystem: **196 / 943 = 20.78%**
-- Main game + SB-UI (M00-M55): **196 / 719 = 27.26%**
+- Ecosystem: **206 / 943 = 21.85%**
+- Main game + SB-UI (M00-M55): **206 / 719 = 28.65%**
 - Level Factory: **0 / 112 = 0.00%**
 - Content Pipeline: **0 / 112 = 0.00%**
 
@@ -137,13 +137,13 @@ Tracking sources:
 | Cycle | M13-C001 |
 | Milestone | M13 - Eligible Target Index |
 | Version | V01 |
-| State | PLANNED |
-| Next actor | CLAUDE |
+| State | AWAITING_AUDIT |
+| Next actor | CHATGPT |
 | Prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V01.md |
 | Audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
-| Expected Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V01.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V01.md |
 | Scope | Eligible DIRTY target index/cache only; no TargetSelector or M14 reservation ownership |
-| First action | Safely sync local main with origin/main while preserving owner work |
+| Result | SB-M13-001..010 closed. 729/729 ALL PASS (72 new M13 checks). 206/943 = 21.85%. |
 
 ## Project identity
 
@@ -161,13 +161,13 @@ Tracking sources:
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | OK — PR #3 merged into main, META-C003 AWAITING_AUDIT |
-| Current implementation frontier | META-C003 - PR #3 merge & canonical main reconciliation |
-| Current task | META-C003 V01 post-merge reconciliation |
-| Current task ID | `META-C003` |
-| Current workflow state | `AWAITING_AUDIT` — PR #3 merged via normal merge commit. 657/657 ALL PASS pre- and post-merge. 196/943 canonical main truth. Post-merge receipt posted. |
+| Health | OK — M13-C001 implemented, AWAITING_AUDIT |
+| Current implementation frontier | M13-C001 - Eligible Target Index |
+| Current task | M13-C001 V01 eligible target index implementation |
+| Current task ID | `M13-C001` |
+| Current workflow state | `AWAITING_AUDIT` — Eligible Target Index implemented. 729/729 ALL PASS (72 new M13 checks incl. 59x59/3,481-cell correctness + spy-verified no-per-query-rescan + CPU/index benchmark). SB-M13-001..010 closed. 206/943 canonical main truth. |
 | Required actor | CHATGPT |
-| Next project action | ChatGPT performs independent audit META-C003 V01. |
+| Next project action | ChatGPT performs independent audit M13-C001 V01. |
 | Waiting on | Scrubby master reference: OWNER_REQUIRED. M08 production-art audit and M10 DIRTY/CLEAN preset remain owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -177,14 +177,14 @@ Tracking sources:
 | --- | --- |
 | Timestamp | 2026-09-05 |
 | Actor | CLAUDE |
-| Cycle | `META-C003` |
-| Session type | META-C003 V01 PR #3 merge & canonical main reconciliation |
+| Cycle | `M13-C001` |
+| Session type | M13-C001 V01 Eligible Target Index implementation |
 | Cycle status | `AWAITING_AUDIT` |
-| Summary | PR #3 merged into main via normal merge commit `bb5de4b88fcaef7a72109ff3cdeb2d6c77588106`. Pre-merge 657/657 ALL PASS on feature. Post-merge 657/657 ALL PASS on main. 943/196/747 canonical task truth. 95 UI migration IDs, 51 references, Scrubby OWNER_REQUIRED. No M13/LF00/CP00/Magnific generation. Feature branch preserved. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_CRITERIA_V01.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C002/CHATGPT_AUDIT_V05.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md |
+| Summary | Implemented `scripts/gameplay/routing/eligible_target_index.gd` — color-grouped DIRTY-cell query/cache over one BoardState. Eligibility = valid+DIRTY+color+not-caller-excluded. Reservation seam is per-query caller-supplied exclusion only; no RESERVED state, no reservation ownership (M14/M02-017 stay open). No TargetSelector/RoutingSystem/dispatch/agent. 72 new M13 checks; full suite 729/729 ALL PASS (baseline 657/657). Benchmark: indexed query ~0.0005 ms vs naive full-scan ~4.7 ms (CPU/index only). SB-M13-001..010 closed. 206/943 = 21.85%. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V01.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
+| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_V01.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V01.md |
 | Next expected actor | CHATGPT (audit META-C003 V01) |
 
 ## Milestone summary
@@ -200,7 +200,8 @@ Tracking sources:
 | M10 | Dirty/Clean Visual Model | OWNER_REQUIRED / PARTIAL infrastructure |
 | M11 | Gameplay Session Core | AUDITED_PASS - 12/12 tasks, 548/548 ALL PASS |
 | M12 | Five-Slot Logic | AUDITED_PASS - 11/11 tasks, 657/657 ALL PASS |
-| M13-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
+| M13 | Eligible Target Index | AWAITING_AUDIT - 10/10 tasks, 729/729 ALL PASS |
+| M14-M55 | Remaining milestones | NOT_STARTED / gated as defined in tasks.md |
 
 ## Dashboard integrity rules
 
@@ -226,10 +227,10 @@ Tracking sources:
 
 | Purpose | Canonical GitHub source |
 | --- | --- |
-| Task ledger | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/tasks.md |
-| Agent governance | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/CLAUDE.md |
+| Task ledger | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
+| Agent governance | https://github.com/Sekiph82/Scrubbots/blob/main/CLAUDE.md |
 | Coordination protocol | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/README.md |
-| Session index | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/SESSION_INDEX.md |
+| Session index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/SESSION_INDEX.md |
 | Audit policy | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md |
 | Audit learning index | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md |
 

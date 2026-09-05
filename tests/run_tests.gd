@@ -24,6 +24,7 @@ const LevelBatchImporter = preload("res://scripts/tools/level_batch_importer.gd"
 const GameplaySession = preload("res://scripts/gameplay/session/gameplay_session.gd")
 const SlotState = preload("res://scripts/gameplay/slots/slot_state.gd")
 const SlotSystem = preload("res://scripts/gameplay/slots/slot_system.gd")
+const EligibleTargetIndex = preload("res://scripts/gameplay/routing/eligible_target_index.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -48,6 +49,8 @@ func _initialize() -> void:
 	_run_batch_importer_tests()
 	_run_gameplay_session_tests()
 	_run_slot_system_tests()
+	_run_eligible_target_index_tests()
+	_run_eligible_target_index_benchmark()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -2131,6 +2134,279 @@ func _run_slot_system_tests() -> void:
 	_check_eq(sys.get_slot_palette_id(0), 0, "M12-18 palette 0 unchanged after rejected bypass")
 
 	print("  M12 slot system tests complete")
+
+## ------------------------------------------------- M13: eligible index --
+
+## Builds a BoardState with an explicit color layout (bypassing JSON) so M13
+## tests can control exactly which colors sit at which indices.
+func _make_colored_board(width: int, height: int, color_ids: Array):
+	var palette := PackedStringArray()
+	var max_color := 0
+	for c in color_ids:
+		if c > max_color:
+			max_color = c
+	for i in (max_color + 1):
+		palette.append("#000000")
+	var cells := PackedInt32Array(color_ids)
+	var level := LevelData.new(1, "m13", "m13", "TEST", width, height, palette, cells)
+	return BoardState.from_level_data(level)
+
+func _run_eligible_target_index_tests() -> void:
+	print("---- M13: EligibleTargetIndex tests ----")
+	var DIRTY := BoardState.CellState.DIRTY
+	var CLEAN := BoardState.CellState.CLEAN
+
+	# Layout (3x2, row-major indices):
+	#   0:c0  1:c1  2:c0
+	#   3:c1  4:c0  5:c2
+	# color 0 -> [0,2,4], color 1 -> [1,3], color 2 -> [5]
+	var layout := [0, 1, 0, 1, 0, 2]
+
+	# --- T1: unbound index returns safe empty/no-work ---
+	var idx0 = EligibleTargetIndex.create()
+	_check_eq(idx0.is_bound(), false, "M13-01 fresh index is unbound")
+	_check_eq(idx0.get_eligible(0), [], "M13-01 unbound get_eligible returns empty")
+	_check_eq(idx0.has_work(0), false, "M13-01 unbound has_work is false")
+	_check_eq(idx0.bind(null), false, "M13-01 bind(null) rejected")
+	_check_eq(idx0.is_bound(), false, "M13-01 still unbound after bind(null)")
+
+	# --- T2: initial build groups all DIRTY cells by color ---
+	var board = _make_colored_board(3, 2, layout)
+	var idx = EligibleTargetIndex.create()
+	_check(idx.bind(board), "M13-02 bind to board succeeds")
+	_check(idx.is_bound(), "M13-02 index bound after bind")
+	_check_eq(idx.get_eligible(0), [0, 2, 4], "M13-02 color 0 grouped as [0,2,4]")
+	_check_eq(idx.get_eligible(1), [1, 3], "M13-02 color 1 grouped as [1,3]")
+	_check_eq(idx.get_eligible(2), [5], "M13-02 color 2 grouped as [5]")
+
+	# --- T3: queries return only the requested color ---
+	for i in idx.get_eligible(0):
+		_check_eq(board.get_color_id(i), 0, "M13-03 every color-0 result has color 0")
+	for i in idx.get_eligible(1):
+		_check_eq(board.get_color_id(i), 1, "M13-03 every color-1 result has color 1")
+
+	# --- T4: results contain only valid indices ---
+	for i in idx.get_eligible(0):
+		_check(board.is_valid_index(i), "M13-04 color-0 result index %d valid" % i)
+
+	# --- T5: CLEAN cell + sync removes it ---
+	board.set_cell_state(2, CLEAN)
+	_check(idx.sync_cell(2), "M13-05 sync of cleaned cell succeeds")
+	_check_eq(idx.get_eligible(0), [0, 4], "M13-05 cleaned cell 2 removed from color 0")
+
+	# --- T6: DIRTY restoration + sync adds it back once (no duplicate) ---
+	board.set_cell_state(2, DIRTY)
+	_check(idx.sync_cell(2), "M13-06 sync of re-dirtied cell succeeds")
+	_check_eq(idx.get_eligible(0), [0, 2, 4], "M13-06 re-dirtied cell 2 restored in row-major order")
+	# double-sync must not duplicate
+	idx.sync_cell(2)
+	_check_eq(idx.get_eligible(0), [0, 2, 4], "M13-06 repeated sync does not duplicate index")
+
+	# --- T7: mutating one color does not corrupt another bucket ---
+	board.set_cell_state(1, CLEAN)
+	idx.sync_cell(1)
+	_check_eq(idx.get_eligible(1), [3], "M13-07 color 1 loses cell 1")
+	_check_eq(idx.get_eligible(0), [0, 2, 4], "M13-07 color 0 bucket unaffected")
+	_check_eq(idx.get_eligible(2), [5], "M13-07 color 2 bucket unaffected")
+	# restore for later tests
+	board.set_cell_state(1, DIRTY)
+	idx.sync_cell(1)
+
+	# --- T8: invalid sync index fails without corrupting state ---
+	_check_eq(idx.sync_cell(-1), false, "M13-08 sync(-1) rejected")
+	_check_eq(idx.sync_cell(999), false, "M13-08 sync(out-of-range) rejected")
+	_check_eq(idx.get_eligible(0), [0, 2, 4], "M13-08 buckets intact after invalid sync")
+	_check_eq(idx.get_eligible(1), [1, 3], "M13-08 color 1 intact after invalid sync")
+
+	# --- T9: full rebuild after multiple changes matches board truth ---
+	board.set_cell_state(0, CLEAN)
+	board.set_cell_state(5, CLEAN)
+	_check(idx.rebuild(), "M13-09 rebuild succeeds")
+	_check_eq(idx.get_eligible(0), [2, 4], "M13-09 rebuild reflects cleaned cell 0")
+	_check_eq(idx.get_eligible(2), [], "M13-09 rebuild reflects exhausted color 2")
+	# color 2 exhausted -> not even a key
+	_check(not idx.get_color_ids().has(2), "M13-09 exhausted color 2 has no bucket key")
+
+	# --- T10: rebind to fresh board discards stale candidates ---
+	var fresh = _make_colored_board(2, 1, [7, 7]) # indices 0,1 both color 7
+	_check(idx.rebind(fresh), "M13-10 rebind to fresh board succeeds")
+	_check_eq(idx.get_eligible(0), [], "M13-10 stale color 0 gone after rebind")
+	_check_eq(idx.get_eligible(7), [0, 1], "M13-10 fresh board color 7 present")
+	_check_eq(idx.get_color_ids().size(), 1, "M13-10 only fresh board colors present")
+
+	# --- T11 & T12: no-work query present vs exhausted ---
+	var board2 = _make_colored_board(3, 2, layout)
+	var idx2 = EligibleTargetIndex.create()
+	idx2.bind(board2)
+	_check_eq(idx2.has_work(0), true, "M13-11 has_work true when color 0 has eligible cells")
+	_check_eq(idx2.has_work(2), true, "M13-11 has_work true when color 2 has one cell")
+	_check_eq(idx2.has_work(99), false, "M13-12 has_work false for a color with no cells")
+	# exhaust color 2
+	board2.set_cell_state(5, CLEAN)
+	idx2.sync_cell(5)
+	_check_eq(idx2.has_work(2), false, "M13-12 has_work false after color 2 exhausted")
+	_check_eq(idx2.get_eligible(2), [], "M13-12 get_eligible empty after exhaustion")
+
+	# --- T13 & T14: last-target then clean -> no-work ---
+	# color 2 already exhausted; use a single-cell color to test last-target
+	var board3 = _make_colored_board(2, 1, [3, 4])
+	var idx3 = EligibleTargetIndex.create()
+	idx3.bind(board3)
+	_check_eq(idx3.get_eligible(3), [0], "M13-13 last-target color 3 returns exactly one candidate")
+	_check_eq(idx3.has_work(3), true, "M13-13 has_work true for last target")
+	board3.set_cell_state(0, CLEAN)
+	idx3.sync_cell(0)
+	_check_eq(idx3.has_work(3), false, "M13-14 cleaning last target produces no-work")
+	_check_eq(idx3.get_eligible(3), [], "M13-14 last target gone from eligible")
+
+	# --- T15: caller-supplied reserved/excluded target is omitted ---
+	_check_eq(idx2.get_eligible(0, [2]), [0, 4], "M13-15 excluded index 2 omitted from color 0")
+	_check_eq(idx2.get_eligible(0, [0, 4]), [2], "M13-15 multiple exclusions honored")
+
+	# --- T16: reserving/excluding the only target -> no-work ---
+	_check_eq(idx3.has_work(4, [1]), false, "M13-16 excluding only color-4 target yields no-work")
+	_check_eq(idx3.get_eligible(4, [1]), [], "M13-16 excluded only target yields empty")
+
+	# --- T17: removing exclusion re-exposes DIRTY target w/o stored state ---
+	_check_eq(idx3.get_eligible(4, []), [1], "M13-17 without exclusion the DIRTY target is visible again")
+	_check_eq(idx3.has_work(4), true, "M13-17 has_work true again once exclusion dropped")
+
+	# --- T18: reservation filter does not mutate cached membership ---
+	var before = idx2.get_eligible(0)
+	idx2.get_eligible(0, [0, 2, 4]) # fully-excluded query
+	idx2.has_work(0, [0, 2, 4])
+	_check_eq(idx2.get_eligible(0), before, "M13-18 exclusion query left internal bucket unchanged")
+
+	# --- T19: returned collection cannot mutate internal truth ---
+	var leaked = idx2.get_eligible(0)
+	leaked.append(99999)
+	leaked.clear()
+	_check_eq(idx2.get_eligible(0), [0, 2, 4], "M13-19 mutating returned array does not affect index")
+
+	# --- T20: deterministic ordering stable across remove/re-add/rebuild ---
+	var board4 = _make_colored_board(3, 3, [0, 0, 0, 0, 0, 0, 0, 0, 0]) # all color 0
+	var idx4 = EligibleTargetIndex.create()
+	idx4.bind(board4)
+	_check_eq(idx4.get_eligible(0), [0, 1, 2, 3, 4, 5, 6, 7, 8], "M13-20 initial row-major order")
+	board4.set_cell_state(4, CLEAN); idx4.sync_cell(4)
+	board4.set_cell_state(4, DIRTY); idx4.sync_cell(4)
+	_check_eq(idx4.get_eligible(0), [0, 1, 2, 3, 4, 5, 6, 7, 8], "M13-20 order stable after remove+re-add")
+	idx4.rebuild()
+	_check_eq(idx4.get_eligible(0), [0, 1, 2, 3, 4, 5, 6, 7, 8], "M13-20 order stable after rebuild")
+
+	# --- T21: 59x59 / 3481-cell correctness ---
+	var big_cells := PackedInt32Array()
+	big_cells.resize(3481)
+	for i in 3481:
+		big_cells[i] = i % 5 # 5 palette colors, deterministic spread
+	var big_board = _make_colored_board(59, 59, Array(big_cells))
+	var big_idx = EligibleTargetIndex.create()
+	big_idx.bind(big_board)
+	# independent recount from board truth
+	var expected_counts := {0: 0, 1: 0, 2: 0, 3: 0, 4: 0}
+	for i in 3481:
+		expected_counts[i % 5] += 1
+	var total_indexed := 0
+	for c in 5:
+		var got: int = big_idx.get_eligible(c).size()
+		_check_eq(got, expected_counts[c], "M13-21 59x59 color %d count matches board truth" % c)
+		total_indexed += got
+	_check_eq(total_indexed, 3481, "M13-21 59x59 all 3481 DIRTY cells indexed exactly once")
+	# each bucket strictly ascending (row-major determinism at scale)
+	var asc_ok := true
+	for c in 5:
+		var b: Array = big_idx.get_eligible(c)
+		for k in range(1, b.size()):
+			if b[k] <= b[k - 1]:
+				asc_ok = false
+				break
+	_check(asc_ok, "M13-21 59x59 every bucket strictly ascending (deterministic)")
+	# clean one whole color via sync, verify has_work flips
+	for i in 3481:
+		if i % 5 == 3:
+			big_board.set_cell_state(i, CLEAN)
+			big_idx.sync_cell(i)
+	_check_eq(big_idx.has_work(3), false, "M13-21 59x59 color 3 no-work after full clean via sync")
+	_check_eq(big_idx.has_work(0), true, "M13-21 59x59 other colors still have work")
+
+	# --- T22: rectangular-board correctness (5x3) ---
+	# indices row-major; color = 0 on even index, 1 on odd
+	var rect_cells := []
+	for i in 15:
+		rect_cells.append(i % 2)
+	var rect_board = _make_colored_board(5, 3, rect_cells)
+	var rect_idx = EligibleTargetIndex.create()
+	rect_idx.bind(rect_board)
+	_check_eq(rect_idx.get_eligible(0), [0, 2, 4, 6, 8, 10, 12, 14], "M13-22 rectangular even indices color 0")
+	_check_eq(rect_idx.get_eligible(1), [1, 3, 5, 7, 9, 11, 13], "M13-22 rectangular odd indices color 1")
+
+	# --- T23: steady-state query does not full-scan the board ---
+	# Observability: replace board with a spy that counts get_cell_state calls,
+	# rebuild once, then run repeated queries and prove no per-query rescan.
+	var spy = load("res://tests/support/board_state_scan_spy.gd").new()
+	spy.setup([0, 1, 0, 1, 0, 2], 3, 2)
+	var idx5 = EligibleTargetIndex.create()
+	idx5.bind(spy) # build scans once
+	var after_build: int = spy.scan_count
+	_check(after_build >= 6, "M13-23 build performed a full scan (>= cell count)")
+	for _q in 100:
+		idx5.get_eligible(0)
+		idx5.has_work(1)
+	_check_eq(spy.scan_count, after_build, "M13-23 100 steady-state queries added zero board scans")
+
+	# --- T24 covered by full regression suite result (see summary) ---
+	print("  M13 EligibleTargetIndex tests complete")
+
+## 3481-cell build/rebuild + repeated-query benchmark. CPU/index evidence only
+## (AL-003) — no FPS/GPU claim, no hardware-specific pass/fail threshold. The
+## behavioral gate is M13-21/M13-23 above; these numbers are informational.
+func _run_eligible_target_index_benchmark() -> void:
+	var cells := PackedInt32Array()
+	cells.resize(3481)
+	for i in 3481:
+		cells[i] = i % 5
+	var board = _make_colored_board(59, 59, Array(cells))
+
+	var build_iters := 50
+	var t0 := Time.get_ticks_usec()
+	var idx
+	for i in build_iters:
+		idx = EligibleTargetIndex.create()
+		idx.bind(board)
+	var t1 := Time.get_ticks_usec()
+
+	var rebuild_iters := 50
+	for i in rebuild_iters:
+		idx.rebuild()
+	var t2 := Time.get_ticks_usec()
+
+	# Repeated steady-state color queries — the case the index exists to speed up.
+	var query_iters := 5000
+	var sink := 0
+	for i in query_iters:
+		sink += idx.get_eligible(i % 5).size()
+	var t3 := Time.get_ticks_usec()
+
+	# Naive full-scan baseline (benchmark harness only, NOT production code):
+	# what a per-query full board rescan would cost for the same queries.
+	var naive_sink := 0
+	for i in query_iters:
+		var color := i % 5
+		var c := 0
+		for j in board.get_cell_count():
+			if board.get_cell_state(j) == BoardState.CellState.DIRTY and board.get_color_id(j) == color:
+				c += 1
+		naive_sink += c
+	var t4 := Time.get_ticks_usec()
+
+	print("---- M13 EligibleTargetIndex benchmark (59x59 = 3481 cells) ----")
+	print("  bind/build x%d: %.3f ms total, %.4f ms/build" % [build_iters, (t1 - t0) / 1000.0, (t1 - t0) / 1000.0 / build_iters])
+	print("  rebuild x%d: %.3f ms total, %.4f ms/rebuild" % [rebuild_iters, (t2 - t1) / 1000.0, (t2 - t1) / 1000.0 / rebuild_iters])
+	print("  indexed get_eligible x%d: %.3f ms total, %.5f ms/query" % [query_iters, (t3 - t2) / 1000.0, (t3 - t2) / 1000.0 / query_iters])
+	print("  naive full-scan baseline x%d: %.3f ms total, %.5f ms/query" % [query_iters, (t4 - t3) / 1000.0, (t4 - t3) / 1000.0 / query_iters])
+	print("  (CPU/index timing only — not an FPS/GPU claim; informational, no hardware threshold)")
+	print("  (query sink=%d naive sink=%d — must match, prevents dead-code elimination)" % [sink, naive_sink])
+	_check_eq(sink, naive_sink, "M13 benchmark indexed and naive query results agree (correctness under load)")
 
 func _print_summary() -> void:
 	print("")
