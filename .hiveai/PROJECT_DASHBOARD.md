@@ -93,6 +93,32 @@ Tracking sources:
 - Progress unchanged: **196 / 943 = 20.78%**.
 - PR #3 remains draft/unmerged.
 
+## Active merge cycle
+
+| Field | Value |
+| --- | --- |
+| Cycle | META-C003 |
+| Version | V01 |
+| State | PLANNED |
+| Next actor | CLAUDE |
+| Source | feature/master-ui-magnific-pipeline / PR #3 |
+| Target | main |
+| Prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md |
+| Criteria | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C003/CHATGPT_AUDIT_CRITERIA_V01.md |
+| Expected log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C003/CLAUDE_LOG_V01.md |
+| Gate | META-C002 V05 AUDITED_PASS |
+| Purpose | Controlled merge commit + canonical main reconciliation. No M13. |
+
+## META-C002 final independent audit V05
+
+- Status: **AUDITED_PASS**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V05.md
+- PR #3 feature truth accepted: **196 / 943 = 20.78%**
+- 95-task migration and 51-reference inventory accepted.
+- Scrubby master remains **OWNER_REQUIRED**.
+- Next: META-C003 controlled merge/reconciliation.
+- M13 remains **NOT_STARTED**.
+
 ## Project identity
 
 | Field | Value |
