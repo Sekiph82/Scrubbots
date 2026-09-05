@@ -15,13 +15,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | Field | Value |
 | --- | --- |
 | Active cycle | META-C002 |
-| Active version | V04 |
+| Active version | V05 |
 | State | AWAITING_AUDIT |
 | Next actor | CHATGPT |
 | Branch | feature/master-ui-magnific-pipeline (PR #3) |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V04.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V04.md |
-| Purpose | META-C002 V04: Closed F-META-007 (exact commit SHAs, remote-head verification, full git status, untracked path classification). Evidence-only — all prior accepted baseline preserved. 196/943 = 20.78%. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V05.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V05.md |
+| Purpose | META-C002 V05: Applied AL-025 — pre-commit evidence in Git-tracked log, post-push receipt in PR #3 comment. Evidence/coordination only — all prior accepted baseline preserved. 196/943 = 20.78%. |
 
 ### Also active (on main)
 
@@ -109,13 +109,13 @@ Tracking sources:
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | OK — META-C002 V04 exact-evidence finalization complete, AWAITING_AUDIT |
+| Health | OK — META-C002 V05 AL-025 post-push receipt evidence complete, AWAITING_AUDIT |
 | Current implementation frontier | META-C002 - Master UI + Magnific pipeline integration |
-| Current task | META-C002 V04 exact-evidence finalization |
+| Current task | META-C002 V05 non-self-referential merge evidence |
 | Current task ID | `META-C002` |
-| Current workflow state | `AWAITING_AUDIT` — V04 closed F-META-007 (exact commit/remote-head/working-tree evidence). All prior accepted baseline preserved. |
+| Current workflow state | `AWAITING_AUDIT` — V05 applied AL-025 (pre-commit evidence in log, post-push receipt in PR comment). All prior accepted baseline preserved. |
 | Required actor | CHATGPT |
-| Next project action | ChatGPT performs independent audit V04. |
+| Next project action | ChatGPT performs independent audit V05. |
 | Waiting on | Scrubby master reference: OWNER_REQUIRED. M08 production-art audit and M10 DIRTY/CLEAN preset remain owner-controlled. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/tasks.md |
 
@@ -126,14 +126,14 @@ Tracking sources:
 | Timestamp | 2026-09-05 |
 | Actor | CLAUDE |
 | Cycle | `META-C002` |
-| Session type | META-C002 V04 exact-evidence finalization (F-META-007) |
+| Session type | META-C002 V05 non-self-referential merge evidence (AL-025) |
 | Cycle status | `AWAITING_AUDIT` |
-| Summary | Closed F-META-007: exact V03 commit SHA `2d4fea6cc757c70e348ef7da7444fc99fb8b2e28`, exact pre-V04 remote head, full `git status --short` output, every untracked path classified (scratch temp + owner historical logs). No implementation/task/inventory changes. All prior accepted baseline preserved. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V04.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_CRITERIA_V04.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V03.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V04.md |
-| Next expected actor | CHATGPT (audit V04) |
+| Summary | Applied AL-025: pre-commit evidence (branch SHAs, git status, task counts, PR state, untracked classification) recorded in Git-tracked CLAUDE_LOG_V05.md. Post-push receipt (final commit SHA, remote head equality proof) posted as PR #3 comment. One focused commit, no self-referential SHA loop. No implementation/task/inventory changes. 196/943. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_PROMPT_V05.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_CRITERIA_V05.md |
+| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CHATGPT_AUDIT_V04.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/feature/master-ui-magnific-pipeline/coordination/sessions/META-C002/CLAUDE_LOG_V05.md |
+| Next expected actor | CHATGPT (audit V05) |
 
 ## Milestone summary
 
