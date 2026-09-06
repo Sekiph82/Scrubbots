@@ -156,3 +156,12 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - No task checkbox changed. Canonical progress remains **207 / 943 = 21.95%**.
 - SB-M10-005..011 remain owner manual visual-QA gates.
 - M14 remains NOT_STARTED.
+
+
+### M10-C001 V07 issuance
+
+- Owner manual QA exposed a Godot 4.7.1 runtime API error: `OptionButton.get_item_disabled()` does not exist.
+- Required correction: use `OptionButton.is_item_disabled(idx)` and add a runtime smoke that executes the deferred Real Artwork fixture-change path.
+- V06 technical/palette work remains accepted; V07 is a narrow runtime correction before owner visual QA can continue.
+- No task checkbox change. Progress remains **207 / 943 = 21.95%**.
+- M14 remains NOT_STARTED.
