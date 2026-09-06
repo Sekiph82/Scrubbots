@@ -66,3 +66,11 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
   VERY_HARD 10–12.
 - CLEARED transparency/background/grid overlays are excluded.
 - No task IDs or checkboxes changed; canonical progress remains **207 / 943**.
+
+
+### M10-C001 issuance — BoardRenderer real-artwork manual-QA fixtures
+
+- ChatGPT issued V01 to extend the existing BoardRenderer debug tool with Real Artwork 007/010/013 plus Synthetic Stripes.
+- This is debug/manual-QA tooling only; no SB task checkbox changed.
+- Canonical progress therefore remains **207 / 943 = 21.95%** (main+UI 207/719, LF 0/112, CP 0/112).
+- SB-M10-005..011 remain OPEN for owner manual visual QA; M14 remains NOT_STARTED.
