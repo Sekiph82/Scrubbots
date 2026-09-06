@@ -552,3 +552,15 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Progress: **214/943 = 22.69%**.
 - Main + SB-UI: **214/719 = 29.76%**.
 - M14 remains NOT_STARTED until the next milestone transition is intentionally opened.
+
+
+## M14-C001 V01 issuance — Reservation State
+
+- Milestone transition: **M14 opened** after M10 owner QA completion and audited M11-M13 foundations.
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_PROMPT_V01.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_AUDIT_CRITERIA_V01.md
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CLAUDE_LOG_V01.md
+- Architecture direction: separate ReservationState; BoardState.CellState remains ACTIVE/CLEARED only.
+- Scope: SB-M14-001..009 plus formal resolution of deferred SB-M02-017.
+- State: ISSUED; next actor CLAUDE.
+- Owner workflow note: start this milestone in a new Claude chat.
