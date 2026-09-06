@@ -667,3 +667,16 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 
 - Progress at M17 owner gate: **262/943 = 27.78%** overall; **262/719 = 36.44%** main + SB-UI. SB-M17-010 remains open.
+
+
+## M17 owner movement-language decision
+
+- Decision: **OWNER_SELECTS_ORGANIZED**
+- Owner decision: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/OWNER_MOVEMENT_DECISION_V01.md
+- Production direction: Organized/curved movement language over a deterministic Grid-aware planner backbone.
+- Direct rejected as production movement language.
+- Conservative production shaping requested: reduce aggressive diagonal shortcuts; keep curves controlled/readable.
+- M17 design gate resolved; SB-M17-010 closed as superseded by owner-reviewed selection.
+- Next cycle: M17-C002 production routing promotion.
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_PROMPT_V01.md
+- Next actor: CLAUDE.
