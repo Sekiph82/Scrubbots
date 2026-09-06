@@ -1,3 +1,5 @@
+- Progress after M15: **236/943 = 25.03%** overall; **236/719 = 32.82%** main + SB-UI; LF **0/112**; CP **0/112**.
+
 ### M15-C001 V01 final audit
 
 - Decision: **AUDITED_PASS / COMPLETE**
