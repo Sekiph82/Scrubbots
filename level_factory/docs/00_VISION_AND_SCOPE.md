@@ -95,6 +95,19 @@ re-invented Colony Flow rule):
   currently targetable** until prior clears create legal access — matching
   color alone is not sufficient.
 
+## Global palette contract
+
+All production Factory outputs use only root-game palette C01..C15 from
+`data/palettes/scrubbots_palette_v1.json`.
+
+Distinct canonical logical colors actually used:
+EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12.
+
+CLEARED transparency, gameplay background and presentation grid/borders are
+not logical artwork colors. Art-first arbitrary source colors must be
+deterministically mapped/rejected against C01..C15 and reported; they never
+become new game colors.
+
 ## Difficulty intelligence
 
 Potential metrics include:

@@ -57,3 +57,12 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Main + SB-UI: **207 / 719 = 28.79%**.
 - M10-005..011 remain OPEN for owner manual visual QA.
 - M14 remains NOT_STARTED.
+
+
+### Global palette owner lock — 2026-09-06
+
+- C01..C15 are the only legal production logical artwork colors.
+- Distinct used-color bands: EASY 3–5, MEDIUM 6–7, HARD 8–9,
+  VERY_HARD 10–12.
+- CLEARED transparency/background/grid overlays are excluded.
+- No task IDs or checkboxes changed; canonical progress remains **207 / 943**.

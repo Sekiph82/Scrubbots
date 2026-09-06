@@ -3,8 +3,12 @@
   "project": "SCRUBBOTS",
   "generator_policy": {
     "primary_provider": "magnific",
-    "allowed_ai_image_providers": ["magnific"],
-    "disallowed_dependencies": ["higgsfield"],
+    "allowed_ai_image_providers": [
+      "magnific"
+    ],
+    "disallowed_dependencies": [
+      "higgsfield"
+    ],
     "rule": "Do not regenerate owner-approved assets unless explicitly requested. AI full-screen mockups are art-direction references, not production UI."
   },
   "owner_reference_source": {
@@ -70,7 +74,9 @@
       "provider": "magnific",
       "required": true,
       "status": "BLOCKED_BY_SCRUBBY_MASTER_APPROVAL",
-      "references": ["scrubby_master_reference"],
+      "references": [
+        "scrubby_master_reference"
+      ],
       "prompt": "Scrubby standing with a compact cleaning brush/mop, cheerful helpful expression, three-quarter front view, readable at mobile gameplay size",
       "transparent": true,
       "target_path": "assets/ui/characters/scrubby_gameplay.png",
@@ -82,7 +88,9 @@
       "provider": "magnific",
       "required": true,
       "status": "BLOCKED_BY_SCRUBBY_MASTER_APPROVAL",
-      "references": ["scrubby_master_reference"],
+      "references": [
+        "scrubby_master_reference"
+      ],
       "prompt": "Close friendly portrait of Scrubby for player profile card, head and upper torso, leaf sprout visible, strong silhouette at small size",
       "transparent": true,
       "target_path": "assets/ui/characters/scrubby_portrait.png",
@@ -199,5 +207,51 @@
     "popup dim layers",
     "responsive layout frames",
     "normal UI text and quantities"
-  ]
+  ],
+  "pixel_art_palette_contract": {
+    "status": "OWNER_LOCKED",
+    "version": 1,
+    "source": "data/palettes/scrubbots_palette_v1.json",
+    "rulesDoc": "docs/08_PIXEL_ART_PALETTE_RULES.md",
+    "allowedColorIds": [
+      "C01",
+      "C02",
+      "C03",
+      "C04",
+      "C05",
+      "C06",
+      "C07",
+      "C08",
+      "C09",
+      "C10",
+      "C11",
+      "C12",
+      "C13",
+      "C14",
+      "C15"
+    ],
+    "offPaletteLogicalColors": "FORBIDDEN",
+    "difficultyDistinctUsedColorBands": {
+      "EASY": [
+        3,
+        5
+      ],
+      "MEDIUM": [
+        6,
+        7
+      ],
+      "HARD": [
+        8,
+        9
+      ],
+      "VERY_HARD": [
+        10,
+        12
+      ]
+    },
+    "clearedTransparencyIsPaletteColor": false,
+    "backgroundIsPaletteColor": false,
+    "presentationGridOrBorderIsPaletteColor": false,
+    "aiPixelArtRule": "Any AI-generated production pixel artwork must quantize/use only the locked C01..C15 palette; no silent new colors."
+  }
 }

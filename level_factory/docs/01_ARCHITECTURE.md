@@ -61,3 +61,17 @@ re-invent them.
 Board-size bands remain production legality, not proof of puzzle difficulty.
 Difficulty intelligence may add metrics, but metric coefficients stay
 versioned/provisional until calibrated and owner-approved.
+
+
+## Palette boundary
+
+The root game's owner-locked C01..C15 global palette is authoritative.
+Factory production output may use only a used subset in ascending global C-ID
+order.
+
+Distinct used-color bands:
+EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12.
+
+CLEARED transparency/background/presentation grid overlays are excluded from
+the count. Art-first mapping from arbitrary source colors must be deterministic
+and auditable; never silently create C16+ or retain off-palette RGB values.

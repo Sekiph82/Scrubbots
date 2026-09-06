@@ -44,6 +44,24 @@ Status tags used below:
 > actual rule is the full difficulty-band table above, with a 59×59 maximum.
 > See ADR-010.
 
+## Global production pixel-art palette `[LOCKED — owner decision 2026-09-06]`
+
+Only C01..C15 from `data/palettes/scrubbots_palette_v1.json` are legal
+production logical artwork colors. See
+`docs/08_PIXEL_ART_PALETTE_RULES.md` for the exact HEX/RGB table.
+
+Distinct canonical logical colors actually used by production artwork:
+
+| Difficulty | Distinct used colors |
+| --- | ---: |
+| EASY | **3–5** |
+| MEDIUM | **6–7** |
+| HARD | **8–9** |
+| VERY_HARD | **10–12** |
+
+CLEARED transparency is runtime state and not a sixteenth color. Gameplay
+background and presentation-only square-grid/border overlays also do not count.
+
 ## ACTIVE / CLEARED cell lifecycle `[LOCKED — owner decision 2026-09-05, META-C004; ADR-019]`
 
 Every logical artwork pixel begins **ACTIVE** and can become **CLEARED**.
