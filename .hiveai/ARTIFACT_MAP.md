@@ -71,6 +71,8 @@ Canonical implementation fixture JSONs:
 - https://github.com/Sekiph82/Scrubbots/blob/main/data/debug/board_renderer_fixtures/level_010.json
 - https://github.com/Sekiph82/Scrubbots/blob/main/data/debug/board_renderer_fixtures/level_013.json
 
+| V05 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V05.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V05.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V05.md | PENDING | ISSUED |
+
 Owner fixture data: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/OWNER_FIXTURE_DATA_V01.md
 
 
