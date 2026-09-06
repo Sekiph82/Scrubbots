@@ -210,3 +210,16 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Current progress remains **214 / 943 = 22.69%** until audit.
 - Main game + SB-UI remains **214 / 719 = 29.76%** until audit.
 - Expected full-pass progress: **224 / 943** and **224 / 719**.
+
+
+### M14-C001 V01 final audit
+
+- `AUDITED_PASS`.
+- ReservationState accepted as a separate ephemeral assignment layer; BoardState remains ACTIVE/CLEARED only.
+- ADR-022 accepted.
+- SB-M02-017 and SB-M14-001..009 are CLOSED.
+- Implementer evidence: **1098/1098 ALL PASS** with 59×59 reservation sanity/performance coverage.
+- Canonical progress: **224 / 943 = 23.75%**.
+- Main game + SB-UI: **224 / 719 = 31.15%**.
+- Level Factory remains **0 / 112**; Content Pipeline remains **0 / 112**.
+- Next main-game milestone: **M15 TargetSelector**, still NOT_STARTED until intentionally opened.
