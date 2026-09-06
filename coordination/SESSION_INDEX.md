@@ -498,3 +498,13 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Evidence: **990/990 ALL PASS**, clean debug-scene headless boot, V05 implementation compare inspected.
 - No task checkbox changed; progress remains **207/943 = 21.95%**.
 - V06 remains active because the owner subsequently added C16 Pure Black #000000 to the canonical palette.
+
+
+## M10-C001 V06 final independent audit
+
+- Status: **AUDITED_PASS**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_V06.md
+- Accepted: palette v2 with C01..C16 / C16 Pure Black #000000, preserved BG01 separation, retained V05 variable-canvas embedding and coordination ownership split.
+- Evidence: **1008/1008 ALL PASS**, clean debug-scene headless boot, implementation diff independently inspected.
+- No task checkbox changed; progress remains **207/943 = 21.95%**.
+- SB-M10-005..011 remain owner visual-QA gates. M14 remains NOT_STARTED.
