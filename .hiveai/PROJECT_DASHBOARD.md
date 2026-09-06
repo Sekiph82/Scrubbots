@@ -1,3 +1,13 @@
+### M18-C001 V01 milestone opening
+
+- State: **ISSUED**
+- New milestone: **M18 Scrubbot Agent**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_PROMPT_V01.md
+- Agent consumes an already-valid route and handles movement/arrival/despawn only.
+- M19 Dispatcher and M20 vertical slice remain unopened.
+- Current progress: **263/943 = 27.89%**.
+- Next actor: CLAUDE.
+
 ### M17-C002 final audit
 
 - Decision: **AUDITED_PASS / COMPLETE**
