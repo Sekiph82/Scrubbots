@@ -636,3 +636,6 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - ChatGPT independently inspected implementation diff/source/tests; Godot was not independently rerun in the audit environment and that limitation is disclosed in the audit.
 - SB-M16-001..011: **CLOSED**.
 - Next milestone: **M17 Routing Prototype Lab**, not yet opened.
+
+
+- Progress after M16: **247/943 = 26.19%** overall; **247/719 = 34.35%** main + SB-UI; LF 0/112; CP 0/112.
