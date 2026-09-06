@@ -25,7 +25,7 @@ Verified at time of writing (end of Phase M06):
   Nodes at any board size — ADR-011) with the owner-locked ACTIVE/CLEARED
   model (ADR-019): ACTIVE = source palette color/opaque, CLEARED =
   transparent (background shows through). **Owner manual QA of the
-  transparent model is still open** (SB-M10-005..011).
+  transparent model is complete** (SB-M10-005..011 owner-approved on 2026-09-06).
 
 ## Status tags
 
@@ -737,19 +737,18 @@ Owner decision (2026-09-05, META-C004; ADR-019) resolves the visual model:
 **ACTIVE = the original source palette color, opaque; CLEARED = fully
 transparent (alpha 0) so the gameplay background shows through.** There is no
 grime/hidden-artwork layer and no A/B/C dirty preset. The implementation and
-its automated renderer tests are complete; what remains OPEN is the owner's
-manual visual QA of the NEW transparent model at native scale via
-`scenes/debug/board_renderer_debug.tscn` (SB-M10-005..011 below).
+its automated renderer tests are complete; the owner's manual visual QA of the NEW transparent model at native scale via
+`scenes/debug/board_renderer_debug.tscn` is complete (SB-M10-005..011 below).
 
 - [x] SB-M10-001 Define (approve) ACTIVE appearance — owner locked: original source palette color, opaque (ADR-019).
 - [x] SB-M10-002 Define CLEARED appearance — locked: fully transparent (alpha 0), background shows through (`docs/01_GAMEPLAY_SPEC.md`; was: CLEAN unmodified source color).
 - [x] SB-M10-003 Define artwork-clearing relationship to source artwork — locked: the visible source pixel is cleared to transparent; there is no separate grime/hidden layer (ADR-019).
 - [x] SB-M10-004 Implement visual mapping (`BoardRenderer._color_for_cell`: ACTIVE=source color/opaque, CLEARED=`Color(0,0,0,0)`) — implemented and tested in META-C004.
-- [ ] SB-M10-005 Owner-confirm clearing is immediately readable (transparent CLEARED vs opaque ACTIVE) — debug tooling ready; owner visual confirmation pending.
-- [ ] SB-M10-006 Owner-confirm ACTIVE artwork recognition — tooling ready, owner confirmation pending.
-- [ ] SB-M10-007 Owner test Easy density. — [ ] SB-M10-008 Owner test Medium density. (debug tool supports both sizes; awaiting owner visual review)
-- [ ] SB-M10-009 Owner test Hard density. — [ ] SB-M10-010 Owner test Very Hard density. (debug tool supports both sizes; awaiting owner visual review)
-- [ ] SB-M10-011 Owner test 59×59 transparent-model readability — the single most important manual check; tooling ready, **awaiting owner review**.
+- [x] SB-M10-005 Owner-confirm clearing is immediately readable (transparent CLEARED vs opaque ACTIVE) — owner visual QA PASS 2026-09-06.
+- [x] SB-M10-006 Owner-confirm ACTIVE artwork recognition — owner visual QA PASS 2026-09-06.
+- [x] SB-M10-007 Owner test Easy density. — [x] SB-M10-008 Owner test Medium density. (owner visual QA PASS 2026-09-06)
+- [x] SB-M10-009 Owner test Hard density. — [x] SB-M10-010 Owner test Very Hard density. (owner visual QA PASS 2026-09-06)
+- [x] SB-M10-011 Owner test 59×59 transparent-model readability — owner visual QA PASS 2026-09-06.
 - [x] SB-M10-012 Development debug tool (`scenes/debug/board_renderer_debug.tscn` — size + ACTIVE/CLEARED-pattern dropdowns, visible background behind board) migrated to the new model and proven to headless-boot in META-C004.
 
 ### M11 — Gameplay Session Core
@@ -1504,7 +1503,7 @@ design gate** — presets exist, none is chosen (see M10 above).
 > the renderer now draws ACTIVE = source color/opaque, CLEARED = transparent.
 > The paragraph above is preserved as historical record of Prompt 04 only;
 > current truth is M10 (renamed) and ADR-019. Owner manual QA of the new
-> transparent model remains open (SB-M10-005..011).
+> transparent model is complete (SB-M10-005..011, owner PASS 2026-09-06).
 
 **PROMPT 05 (next) — Visual Reference Library / Existing Artwork Audit (M07)**
 
