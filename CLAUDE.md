@@ -113,7 +113,7 @@ through). See `docs/05_TECH_DECISIONS.md` ADR-019,
     content or the production level catalog.
 31A. **Global production pixel-art palette [OWNER-LOCKED 2026-09-06, expanded to 16 colors]:**
     production logical artwork cells may use only C01..C16 from
-    `data/palettes/scrubbots_palette_v1.json` /
+    `data/palettes/scrubbots_palette_v2.json` /
     `docs/08_PIXEL_ART_PALETTE_RULES.md`. Never invent, add, substitute or
     silently retain any sixteenth logical artwork color.
 31B. **Production distinct-color bands [OWNER-LOCKED]:** EASY 3–5,
@@ -167,7 +167,7 @@ through). See `docs/05_TECH_DECISIONS.md` ADR-019,
   Prompt 01 documentation error refined further in the post-Prompt-02
   planning pass (see `docs/05_TECH_DECISIONS.md` ADR-008 and `tasks.md`).
 - Global production pixel-art palette: **C01..C16 only** from
-  `data/palettes/scrubbots_palette_v1.json`. Difficulty distinct-used-color
+  `data/palettes/scrubbots_palette_v2.json`. Difficulty distinct-used-color
   bands: EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12. CLEARED
   transparency is runtime state and is not a palette color.
 - Robot/color slots: **5**.
