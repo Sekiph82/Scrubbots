@@ -385,3 +385,12 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
   - https://github.com/Sekiph82/Scrubbots/blob/main/data/debug/board_renderer_fixtures/level_013.json
 - Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V02.md
 - State: `ISSUED`; next actor CLAUDE.
+
+
+### META-C005 issuance — canonical visual contract propagation to Level Factory
+
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_PROMPT_V01.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_AUDIT_CRITERIA_V01.md
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CLAUDE_LOG_V01.md
+- Scope: docs/data governance only. Persist C01..C15, difficulty color-count bands, BG01 #202533, ACTIVE/CLEARED semantics and flat-square/no-bead pixel-art generation rules into Level Factory governance and a machine-readable descriptor. Do not implement LF generator code.
+- Cycle state: `ISSUED`; next actor CLAUDE.
