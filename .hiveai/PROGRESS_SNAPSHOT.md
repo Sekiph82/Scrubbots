@@ -144,3 +144,15 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Implementer evidence: **990/990 ALL PASS** and clean headless debug-scene boot.
 - No task checkbox changed. Canonical progress remains **207 / 943 = 21.95%**.
 - V06 remains the active next step because the owner subsequently expanded the canonical palette to C01..C16 with C16 Pure Black #000000.
+
+
+### M10-C001 V06 final audit
+
+- `AUDITED_PASS`.
+- Canonical palette v2 accepted with **C01..C16** and **C16 Pure Black #000000**.
+- C01..C15 remain unchanged; BG01 stays `#202533` and outside the logical palette.
+- Variable-canvas Real Artwork behavior remains accepted and regression-tested.
+- Implementer evidence: **1008/1008 ALL PASS** and clean headless debug-scene boot.
+- No task checkbox changed. Canonical progress remains **207 / 943 = 21.95%**.
+- SB-M10-005..011 remain owner manual visual-QA gates.
+- M14 remains NOT_STARTED.
