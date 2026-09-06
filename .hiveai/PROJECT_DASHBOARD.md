@@ -1,3 +1,5 @@
+- Progress after M16: **247/943 = 26.19%** overall; **247/719 = 34.35%** main + SB-UI; LF **0/112**; CP **0/112**.
+
 ### M16-C001 V01 final audit
 
 - Decision: **AUDITED_PASS / COMPLETE**
