@@ -1,3 +1,14 @@
+### M14-C001 V01 final audit
+
+- Decision: **AUDITED_PASS / COMPLETE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_AUDIT_V01.md
+- ReservationState accepted as a separate ephemeral assignment layer. BoardState stays ACTIVE/CLEARED only.
+- ADR-022 accepted; SB-M02-017 and SB-M14-001..009 are closed.
+- Implementer evidence: **1098/1098 ALL PASS** plus 59×59 reservation sanity/performance coverage.
+- Progress: **224/943 = 23.75%**.
+- Main game + SB-UI: **224/719 = 31.15%**.
+- Next main-game milestone: **M15 TargetSelector** (NOT_STARTED).
+
 ### M14-C001 V01 milestone opening
 
 - State: **ISSUED**
