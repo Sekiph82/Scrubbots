@@ -131,7 +131,7 @@ ACTIVE-vs-CLEARED must stay readable at native gameplay display size,
 especially on 50×50 and 59×59 boards: an ACTIVE cell shows its opaque source
 color, a CLEARED cell shows the background through a transparent hole. Owner
 manual QA of the transparent model at every band + rectangular + narrow/tall
-window is an open gate (`tasks.md` SB-M10-005..011).
+window (`tasks.md` SB-M10-005..011) is complete.
 
 ## Slots `[LOCKED]`
 

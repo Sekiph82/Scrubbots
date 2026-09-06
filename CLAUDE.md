@@ -147,7 +147,7 @@ through). See `docs/05_TECH_DECISIONS.md` ADR-019,
     background shows through — never a black/gray/palette substitute. There
     is no DIRTY/CLEAN/grime transform and no A/B/C preset. Owner manual QA of
     the transparent model (`tasks.md` SB-M10-005..011) via
-    `scenes/debug/board_renderer_debug.tscn` remains an open gate.
+    `scenes/debug/board_renderer_debug.tscn` is complete.
 35. Renderer output is read back through an 8-bit `Image`
     (`Image.FORMAT_RGBA8`) — comparing rendered pixels to an
     independently-computed float `Color` with `is_equal_approx()` will

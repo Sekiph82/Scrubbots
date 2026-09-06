@@ -532,3 +532,67 @@ ACTIVE->CLEARED state readable without inventing another gameplay color.
   this ADR only locks the gameplay board background.
 
 **Status**: Owner-locked.
+
+### ADR-022: Reservation is a separate ephemeral assignment layer, not a cell state
+
+**Decision** (M14): target reservation lives in a dedicated
+`ReservationState` module
+(`scripts/gameplay/targeting/reservation_state.gd`), **separate from
+BoardState**. `BoardState.CellState` remains exactly `ACTIVE`/`CLEARED`
+(ADR-019); **no `RESERVED` cell state is added**. This formally resolves the
+deferred gate SB-M02-017 ("add RESERVED only when reservation architecture is
+designed") — the architecture is now designed, and the answer is that RESERVED
+does not belong in the cell lifecycle.
+
+Reservation is **temporary target-assignment metadata**, not artwork/access
+state. A reservation binds a target cell index to a single future in-flight
+dispatch/agent assignment, identified by a deterministic integer `owner_id`
+(`>= 0`). The owner token is NOT a color id, slot id, or cell id — it stands
+for one future assignment supplied by the later dispatcher/agent layer.
+
+**Rules enforced by the layer**:
+
+- One target index has at most one owner.
+- One `owner_id` holds at most one target at a time.
+- `reserve()` is synchronous check-and-set: validation, conflict check and
+  insertion happen in one uninterrupted call with no `await`/deferred gap, so
+  competing calls for the same target are serialized and exactly one wins.
+- A reservation is legal only for a currently valid ACTIVE cell of the bound
+  board; invalid index, CLEARED target, invalid owner, already-reserved
+  target, or an owner already holding a target all fail without mutation.
+- `release()`/`resolve_arrival()` are ownership-safe: only the current owner
+  may remove a reservation, and it is removed exactly once.
+- `resolve_arrival()` clears only the reservation — it does **not** mutate the
+  BoardState cell. Board mutation (ACTIVE->CLEARED) on successful cleaning
+  stays a later orchestration responsibility.
+- `reset()` clears all reservations but keeps the board binding; `rebind()`
+  clears all reservations from the prior board.
+
+**Reason**: reservation is transient coordination truth with a lifetime tied
+to an in-flight assignment, not to the artwork. Folding it into `CellState`
+would (1) overload the physical lifecycle enum with scheduling concerns, (2)
+break the packed-byte cell storage invariant's clean two-state meaning, and
+(3) entangle the renderer (which must only ever see ACTIVE/CLEARED) with
+assignment bookkeeping. A separate O(1) map-backed layer keeps each concern
+independently testable and replaceable.
+
+**Integration seam**: `ColorCandidateIndex` (M13) stays reservation-agnostic —
+it owns no reservation state and never reads `ReservationState`. Callers pass
+`ReservationState.get_reserved_indices()` (a detached, ascending copy) as the
+excluded set into `ColorCandidateIndex.get_candidates()/has_candidates()`. The
+future `TargetSelector` (M15) will *consume* reservation exclusions but will
+not own them; the future dispatcher/agent (M18/M19) is the caller that
+supplies unique owner tokens. This preserves the
+ColorCandidateIndex -> reachability -> TargetSelector -> RoutingSystem
+separation (ADR-005, ADR-020).
+
+**Consequences**:
+
+- Reservation lookup/reserve/release are O(1) average (dictionary-backed); no
+  full-board scan runs on a normal reservation query. Verified at 59×59 =
+  3481 cells.
+- `get_reserved_indices()` returns a fresh detached `PackedInt32Array` in
+  ascending order every call; no mutable internal collection leaks.
+- The renderer and slot mechanics are untouched by M14.
+
+**Status**: Accepted (M14).
