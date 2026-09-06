@@ -114,3 +114,12 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - No generator implementation and no SB checkbox change.
 - Canonical progress remains **207 / 943 = 21.95%**.
 - Owner subsequently changed coordination ownership: ChatGPT, not Claude, owns H!veAI tracker/dashboard updates after audit. Governance wording will be normalized in the next implementation prompt.
+
+
+### M10-C001 V05 issuance
+
+- V05 supersedes the unimplemented V03/V04 prompts.
+- Scope: Real Artwork variable-canvas placement + coordination ownership normalization.
+- No SB checkbox change. Canonical progress remains **207 / 943 = 21.95%**.
+- SB-M10-005..011 remain owner manual-QA gates; M14 remains NOT_STARTED.
+- META-C005 remains AUDITED_PASS.
