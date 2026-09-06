@@ -296,3 +296,17 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
   - Main remaining: **472**
   - Level Factory: **0 / 112 = 0%**
   - Content Pipeline: **0 / 112 = 0%**
+
+
+### M17-C001 V01 issuance
+
+- New main-game milestone opened: **M17 Routing Prototype Lab**.
+- Owner should use a **new Claude chat**.
+- Three experimental routes required: Direct, Grid-aware, Organized/curved.
+- M17 compares distance, crossings, congestion, CPU cost, determinism, 5/10/25/stress, 59×59, rectangular Very Hard, blocked-interior and newly-opened-after-clear cases.
+- A debug comparison lab must be handed to the owner.
+- **Owner movement-language design gate remains mandatory.**
+- Current progress remains **247 / 943 = 26.19%** until audit.
+- Main game + SB-UI remains **247 / 719 = 34.35%**.
+- Maximum checkbox progress if all 16 M17 task IDs close: **263 / 943 = 27.89%**, main + SB-UI **263 / 719 = 36.58%**.
+- M18 must not open until the owner design gate is resolved.
