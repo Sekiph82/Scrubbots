@@ -27,7 +27,7 @@ Before Factory candidates can be accepted as production content, validation
 (LF05) and export must enforce the full Canonical Visual Contract, not just the
 palette:
 
-- C01..C16 logical colors only (root `data/palettes/scrubbots_palette_v1.json`;
+- C01..C16 logical colors only (root `data/palettes/scrubbots_palette_v2.json`;
   Factory descriptor `level_factory/data/canonical_visual_contract_v1.json`).
 - Distinct-used-color bands: Easy 3–5, Medium 6–7, Hard 8–9, Very Hard 10–12.
 - BG01 `#202533` is the fixed background — outside C01..C16, not a logical color, never
