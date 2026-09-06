@@ -9,7 +9,7 @@ extends Control
 ##     ACTIVE/CLEARED pattern; conspicuous magenta transparency-test background.
 ##   - Real Artwork - Level 007/010/013: owner-authorized debug fixtures loaded
 ##     directly from data/debug/board_renderer_fixtures/*.json (fixed logical
-##     dimensions, canonical C01..C15 subset colors, VOID mask). Background is
+##     dimensions, canonical C01..C16 subset colors, VOID mask). Background is
 ##     BG01 Midnight Slate #202533; the ACTIVE/CLEARED pattern applies only to
 ##     artwork cells, VOID stays background.
 ##

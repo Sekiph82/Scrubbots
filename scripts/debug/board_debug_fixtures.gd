@@ -11,19 +11,20 @@ extends RefCounted
 ##   2. Real Artwork — owner-authorized debug fixtures loaded DIRECTLY from
 ##      `data/debug/board_renderer_fixtures/level_0NN.json` (M10-C001), which
 ##      reference the owner-locked global palette
-##      `data/palettes/scrubbots_palette_v1.json` (C01..C15). These are
-##      TEST/debug/manual-QA fixtures only — never production catalog content
-##      (see docs/03_LEVEL_DATA_SPEC.md "Fixtures" and docs/08_PIXEL_ART_PALETTE_RULES.md).
+##      `data/palettes/scrubbots_palette_v2.json` (C01..C16; C16 Pure Black
+##      #000000 added in M10-C001 V06). These are TEST/debug/manual-QA fixtures
+##      only — never production catalog content (see docs/03_LEVEL_DATA_SPEC.md
+##      "Fixtures" and docs/08_PIXEL_ART_PALETTE_RULES.md).
 
 const LevelData = preload("res://scripts/data/level_data.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 
 ## Synthetic-Stripes placeholder hues — deliberately NOT the owner-locked
-## production palette (that now lives in data/palettes/scrubbots_palette_v1.json
+## production palette (that now lives in data/palettes/scrubbots_palette_v2.json
 ## and is used by the Real Artwork fixtures below).
 const PALETTE := ["#E5484D", "#3B82F6", "#22C55E", "#F5C518", "#A855F7"]
 
-const GLOBAL_PALETTE_PATH := "res://data/palettes/scrubbots_palette_v1.json"
+const GLOBAL_PALETTE_PATH := "res://data/palettes/scrubbots_palette_v2.json"
 
 enum StatePattern {
 	ALL_ACTIVE,
@@ -74,8 +75,9 @@ static func apply_pattern(board: BoardState, pattern: int) -> void:
 
 # ------------------------------------------------- Real Artwork fixtures --
 
-## Maps a C-ID numeric suffix (1..15) to its owner-locked hex, from
-## scrubbots_palette_v1.json. Returns {} on load/parse failure.
+## Maps a C-ID numeric suffix (1..16) to its owner-locked hex, from
+## scrubbots_palette_v2.json (C16 Pure Black #000000). Returns {} on
+## load/parse failure.
 static func load_global_palette_hex_by_suffix() -> Dictionary:
 	var out: Dictionary = {}
 	if not FileAccess.file_exists(GLOBAL_PALETTE_PATH):
