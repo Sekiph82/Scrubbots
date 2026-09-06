@@ -47,6 +47,8 @@ const RoutingLabScenarios = preload("res://scripts/gameplay/routing/prototypes/r
 # M17-C002 — owner-selected PRODUCTION routing (Organized/curved + grid backbone).
 const ProductionAccessQuery = preload("res://scripts/gameplay/routing/production_access_query.gd")
 const ProductionRoutingSystem = preload("res://scripts/gameplay/routing/production_routing_system.gd")
+# M18 — lightweight Scrubbot agent (consumes a finished route; no selection/routing).
+const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -99,6 +101,10 @@ func _initialize() -> void:
 	_run_m17_lab_scene_smoke()
 	# M17-C002 — production routing promotion.
 	_run_m17c002_production_routing_tests()
+	# M18 — lightweight Scrubbot agent.
+	_run_m18_agent_tests()
+	_run_m18_agent_stress_tests()
+	_run_m18_agent_debug_scene_smoke()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -2313,7 +2319,11 @@ func _run_gameplay_session_tests() -> void:
 	# M16 legitimately introduces the RoutingSystem CONTRACT (interface only, no
 	# M17 path algorithm). Assert the contract file now exists rather than absent.
 	_check(FileAccess.file_exists("res://scripts/gameplay/routing/routing_system.gd"), "M16-C001: RoutingSystem contract now exists (supersedes M11-27 routing guard)")
-	_check(not DirAccess.dir_exists_absolute("res://scripts/gameplay/agents"), "M11-27: no agents directory")
+	# M18-C001 supersedes the original M11-era "no agents directory" guard: M18
+	# legitimately introduces the lightweight ScrubbotAgent (movement only — it
+	# consumes a finished route, selects/reserves/routes nothing). Assert the
+	# agent file now exists rather than absent.
+	_check(FileAccess.file_exists("res://scripts/gameplay/agents/scrubbot_agent.gd"), "M18-C001: ScrubbotAgent now exists (supersedes M11-27 agent guard)")
 	_check(not FileAccess.file_exists("res://scripts/gameplay/target/target_selector.gd"), "M11-27: no target implementation")
 
 	# ==== 28. No win/lose/timer/move-limit rule ====
@@ -4064,3 +4074,274 @@ func _run_m17c002_production_routing_tests() -> void:
 		if res.success and RouteValidator.validate_route(req, res, b8, a8) == RouteResult.FailureReason.NONE:
 			s8_ok += 1
 	_check_eq(s8_ok, reqs8.size(), "all rectangular VH production routes validate")
+
+# ============================================================= M18 agent =====
+# Lightweight ScrubbotAgent: consumes a finished production route, walks it in
+# board-local coordinates, emits completion exactly once, mutates nothing.
+
+## Build a real (request, production route, board) for scenario request `i`.
+func _m18_route(scenario: Dictionary, i: int) -> Dictionary:
+	var board = scenario["board"]
+	var access = ProductionAccessQuery.new(board)
+	var reqs: Array = RoutingLabScenarios.build_requests(board, scenario["targets"], scenario["origins"])
+	var req = reqs[i]
+	var route = ProductionRoutingSystem.new().compute_route(req, board, access)
+	return {"board": board, "access": access, "req": req, "route": route}
+
+func _m18_run_to_arrival(agent) -> void:
+	# Big deterministic delta; distance-based movement snaps exactly at the end.
+	for _i in range(64):
+		if not agent.is_moving():
+			break
+		agent.advance(1.0)
+
+## Assign into a throwaway agent and free it — proves a rejection without
+## leaking an unparented Node.
+func _m18_reject(a_owner: int, a_color: int, request, result) -> bool:
+	var ag = ScrubbotAgent.new()
+	var ok: bool = ag.assign(a_owner, a_color, request, result)
+	ag.free()
+	return not ok
+
+func _run_m18_agent_tests() -> void:
+	print("---- M18: lightweight Scrubbot agent ----")
+	var s2 := RoutingLabScenarios.make_s2()
+	var ctx := _m18_route(s2, 0)
+	var board = ctx["board"]
+	var req = ctx["req"]
+	var route = ctx["route"]
+	_check(route.success, "precondition: S2 produces a successful production route")
+	var pts: PackedVector2Array = route.get_points()
+	_check(pts.size() >= 2, "precondition: route has >=2 points")
+
+	# --- assignment validation (fail closed) ------------------------------
+	var a = ScrubbotAgent.new()
+	_check(a.assign(0, 3, req, route, 6.0), "valid assignment succeeds")
+	_check_eq(a.get_state(), ScrubbotAgent.State.MOVING, "valid assignment -> MOVING")
+
+	_check(_m18_reject(-1, 3, req, route), "invalid owner rejected")
+	_check(_m18_reject(0, -1, req, route), "invalid color rejected")
+
+	var bad_target = RouteRequest.new()
+	bad_target.target_index = -1
+	bad_target.start_position = req.start_position
+	bad_target.target_position = req.target_position
+	_check(_m18_reject(0, 3, bad_target, route), "invalid target rejected")
+
+	var failed = RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, req.target_index)
+	_check(_m18_reject(0, 3, req, failed), "failed RouteResult rejected")
+
+	var mismatch = RouteResult.success_route(req.target_index + 777, pts)
+	_check(_m18_reject(0, 3, req, mismatch), "route target mismatch rejected")
+
+	var moved_pts := pts.duplicate()
+	moved_pts[0] = moved_pts[0] + Vector2(5.0, 5.0)
+	var spawn_bad = RouteResult.success_route(req.target_index, moved_pts)
+	_check(_m18_reject(0, 3, req, spawn_bad), "spawn origin mismatch rejected")
+
+	# --- assigned data retained ------------------------------------------
+	_check_eq(a.color_id, 3, "assigned color retained")
+	_check_eq(a.target_index, req.target_index, "assigned target retained")
+	_check_eq(a.spawn_origin, req.start_position, "assigned spawn origin retained")
+	var detached := a.get_route_points()
+	detached[0] = Vector2(999.0, 999.0) # mutate the copy...
+	_check(a.get_route_points()[0].is_equal_approx(pts[0]), "detached assigned route retained safely (copy mutation does not leak)")
+
+	# --- movement ---------------------------------------------------------
+	_check(a.get_local_position().is_equal_approx(pts[0]), "movement begins at spawn origin")
+	a.advance(0.01)
+	_check(a.get_progress() > 0.0 and a.get_progress() < 1.0, "small delta advances correctly")
+
+	# Zero delta does not move.
+	var before_zero := a.get_local_position()
+	var prog_zero := a.get_progress()
+	a.advance(0.0)
+	_check(a.get_local_position().is_equal_approx(before_zero), "zero delta does not move")
+	_check_eq(a.get_progress(), prog_zero, "zero delta leaves progress unchanged")
+
+	# Large delta traverses multiple segments == many small deltas (distance
+	# based, not per-frame point skipping).
+	var big = ScrubbotAgent.new()
+	big.assign(0, 3, req, route, 6.0)
+	var small = ScrubbotAgent.new()
+	small.assign(0, 3, req, route, 6.0)
+	big.advance(0.5)
+	for _k in range(50):
+		small.advance(0.01) # 50 * 0.01 = 0.5 total
+	_check(big.get_local_position().is_equal_approx(small.get_local_position()), "large delta traverses multiple segments correctly (== summed small deltas)")
+
+	# --- arrival ----------------------------------------------------------
+	var hits: Array = []
+	a.agent_completed.connect(func(o, t, c): hits.append([o, t, c]))
+	_m18_run_to_arrival(a)
+	_check(a.has_arrived(), "agent reaches ARRIVED")
+	_check(a.get_local_position().is_equal_approx(pts[pts.size() - 1]), "route endpoint is reached exactly")
+	# Advance again past the end — must not re-emit or move.
+	var end_pos := a.get_local_position()
+	a.advance(10.0)
+	_check(a.get_local_position().is_equal_approx(end_pos), "no return movement after arrival")
+	_check_eq(hits.size(), 1, "arrival emitted exactly once")
+	if hits.size() == 1:
+		_check(hits[0][0] == 0 and hits[0][1] == req.target_index and hits[0][2] == 3, "completion identity is correct (owner/target/color)")
+
+	# --- no BoardState / ReservationState mutation ------------------------
+	var s2b := RoutingLabScenarios.make_s2()
+	var ctxb := _m18_route(s2b, 0)
+	var boardb = ctxb["board"]
+	var before_states := _snapshot_cell_states(boardb)
+	var reservations = ReservationState.new()
+	reservations.bind(boardb)
+	reservations.reserve(ctxb["req"].target_index, 0)
+	var a2 = ScrubbotAgent.new()
+	a2.assign(0, 3, ctxb["req"], ctxb["route"], 6.0)
+	_m18_run_to_arrival(a2)
+	_check(a2.has_arrived(), "precondition: agent arrived for mutation check")
+	_check(_cell_states_equal(boardb, before_states), "BoardState not mutated by agent")
+	_check_eq(reservations.get_owner(ctxb["req"].target_index), 0, "ReservationState not mutated by agent")
+
+	# --- no resource-carry / no return / no routing-or-selection API ------
+	_check(not a.has_method("get_carried_color"), "no resource-carry state/API (get_carried_color)")
+	_check(not a.has_method("get_payload"), "no resource-carry state/API (get_payload)")
+	_check(not a.has_method("deliver"), "no slot-delivery API (deliver)")
+	_check(not a.has_method("return_to_slot"), "no return-to-slot API")
+	_check(not a.has_method("compute_route"), "no route computation call (no compute_route)")
+	_check(not a.has_method("select_and_reserve"), "no TargetSelector call (no select_and_reserve)")
+	_check(not a.has_method("select_target"), "no TargetSelector call (no select_target)")
+	_check(not a.has_method("dispatch") and not a.has_method("dispatch_next"), "no Dispatcher implementation on agent")
+
+	# --- cancel / reset ---------------------------------------------------
+	var c = ScrubbotAgent.new()
+	c.assign(0, 3, req, route, 6.0)
+	c.advance(0.05)
+	var cancel_pos := c.get_local_position()
+	c.cancel()
+	_check(c.is_cancelled(), "cancel sets CANCELLED state")
+	c.advance(10.0)
+	_check(c.get_local_position().is_equal_approx(cancel_pos), "cancel before arrival stops movement")
+
+	var c2 = ScrubbotAgent.new()
+	var c2hits: Array = []
+	c2.agent_completed.connect(func(_o, _t, _cc): c2hits.append(1))
+	c2.assign(0, 3, req, route, 6.0)
+	c2.cancel()
+	c2.advance(10.0) # would have arrived if still moving
+	_check_eq(c2hits.size(), 0, "cancel prevents later completion")
+	_check(not c2.has_arrived(), "cancelled agent never reports ARRIVED")
+
+	c2.cancel(); c2.cancel() # repeated cancel is safe
+	_check(c2.is_cancelled() and c2hits.size() == 0, "repeated cancel is safe")
+
+	# --- no orphan nodes --------------------------------------------------
+	_check_eq(c.get_child_count(), 0, "cancelled agent owns no child nodes")
+	c.free()
+	var done = ScrubbotAgent.new()
+	done.assign(0, 3, req, route, 6.0)
+	_m18_run_to_arrival(done)
+	_check_eq(done.get_child_count(), 0, "completed agent owns no child nodes")
+	done.free()
+	a.free(); a2.free(); big.free(); small.free(); c2.free()
+
+	# --- determinism ------------------------------------------------------
+	var d1 = ScrubbotAgent.new(); d1.assign(0, 3, req, route, 6.0)
+	var d2 = ScrubbotAgent.new(); d2.assign(0, 3, req, route, 6.0)
+	var identical := true
+	for _s in range(30):
+		d1.advance(0.03); d2.advance(0.03)
+		if not d1.get_local_position().is_equal_approx(d2.get_local_position()):
+			identical = false
+	_check(identical, "deterministic repeated movement for same route/delta sequence")
+	d1.free(); d2.free()
+
+	# --- 59x59 + rectangular Very Hard route compatibility ----------------
+	var s7 := RoutingLabScenarios.make_s7(9)
+	var ctx7 := _m18_route(s7, 0)
+	_check(ctx7["route"].success, "precondition: 59x59 production route succeeds")
+	var a7 = ScrubbotAgent.new()
+	_check(a7.assign(0, 5, ctx7["req"], ctx7["route"], 8.0), "agent accepts 59x59 route (coordinate compatibility)")
+	_m18_run_to_arrival(a7)
+	_check(a7.has_arrived() and a7.get_local_position().is_equal_approx(ctx7["route"].get_points()[ctx7["route"].point_count() - 1]), "59x59 route reaches exact endpoint")
+	a7.free()
+
+	var s8 := RoutingLabScenarios.make_s8(9)
+	var ctx8 := _m18_route(s8, 0)
+	_check(ctx8["route"].success, "precondition: rectangular VH (53x59) route succeeds")
+	var a8 = ScrubbotAgent.new()
+	_check(a8.assign(0, 5, ctx8["req"], ctx8["route"], 8.0), "agent accepts rectangular Very Hard route")
+	_m18_run_to_arrival(a8)
+	_check(a8.has_arrived(), "rectangular Very Hard route completes")
+	a8.free()
+
+## Concurrent multi-agent CPU/lifecycle stress. Precomputed valid routes; no
+## Dispatcher. Measures CPU/node behaviour only — NO FPS/GPU claim from headless.
+func _run_m18_agent_stress_tests() -> void:
+	print("---- M18: agent concurrency stress (CPU/node only; no FPS/GPU claim) ----")
+	for count in [5, 10, 25, 40]:
+		var scenario: Dictionary = RoutingLabScenarios.make_s6(count) if count > 25 else RoutingLabScenarios.make_s5(count)
+		var board = scenario["board"]
+		var access = ProductionAccessQuery.new(board)
+		var reqs: Array = RoutingLabScenarios.build_requests(board, scenario["targets"], scenario["origins"])
+		var agents: Array = []
+		var routes_ok := 0
+		var completions: Array = [] # lambdas capture primitives by value; Array is by-ref.
+		var t0 := Time.get_ticks_usec()
+		for req in reqs:
+			var route = ProductionRoutingSystem.new().compute_route(req, board, access)
+			if not route.success:
+				continue
+			routes_ok += 1
+			var ag = ScrubbotAgent.new()
+			ag.agent_completed.connect(func(_o, _t, _c): completions.append(1))
+			ag.assign(0, 4, req, route, 8.0)
+			root.add_child(ag)
+			agents.append(ag)
+		# Drive all agents concurrently with a shared delta.
+		for _step in range(80):
+			var still := false
+			for ag in agents:
+				if ag.is_moving():
+					ag.advance(1.0)
+					still = true
+			if not still:
+				break
+		var elapsed_ms := float(Time.get_ticks_usec() - t0) / 1000.0
+		var arrived := 0
+		var orphan_free := true
+		for ag in agents:
+			if ag.has_arrived():
+				arrived += 1
+			if ag.get_child_count() != 0:
+				orphan_free = false
+		var label := "%d-agent" % count if count <= 25 else "stress %d-agent (>25)" % count
+		_check(routes_ok == reqs.size(), "%s: all routes precomputed successfully (%d)" % [label, routes_ok])
+		_check_eq(arrived, agents.size(), "%s concurrent movement all arrive" % label)
+		_check_eq(completions.size(), agents.size(), "%s: completion signal fired once per agent" % label)
+		_check(orphan_free, "%s: no agent owns child/orphan nodes" % label)
+		print("     M18 stress %s: %d agents, route+move CPU=%.1f ms (headless CPU only, no FPS/GPU claim)" % [label, agents.size(), elapsed_ms])
+		for ag in agents:
+			ag.free()
+	# Pooling decision, recorded as required by the prompt.
+	print("     M18 pooling: NOT justified yet — agent is a childless Node2D with")
+	print("     no per-frame allocation; up to 40 concurrent create/assign/run/free")
+	print("     showed no materially problematic lifecycle cost. Defer pooling to")
+	print("     real Dispatcher (M19) profiling. (SB-M18-015)")
+
+func _run_m18_agent_debug_scene_smoke() -> void:
+	print("---- M18: agent debug scene smoke ----")
+	var scene = load("res://scenes/debug/scrubbot_agent_debug.tscn")
+	_check(scene != null, "agent debug scene resource loads")
+	if scene == null:
+		return
+	var inst = scene.instantiate()
+	_check(inst != null, "agent debug scene instantiates")
+	root.add_child(inst)
+	if inst.agent == null:
+		inst.build()
+	_check(inst.agent != null, "debug scene builds one agent")
+	_check(inst.agent.is_moving(), "debug scene agent starts MOVING on a real route")
+	for _i in range(64):
+		if not inst.agent.is_moving():
+			break
+		inst.agent.advance(1.0)
+	_check(inst.agent.has_arrived(), "debug scene agent completes its route")
+	_check(inst.completed, "debug scene received the completion signal")
+	inst.free()

@@ -793,3 +793,53 @@ the M17 lab/prototypes/comparison remain intact as diagnostic evidence.
   rectangular Very Hard 53×59.
 
 **Status**: Accepted (M17-C002).
+
+### ADR-026: ScrubbotAgent — movement-only consumer of a finished route
+
+**Context**: M18 needed the visible Scrubbot mover. The temptation is to let the
+agent "do the whole action" (pick a target, clear the cell, score, return). That
+would collapse the M15/M16 boundaries (ADR-024) into one node and make routing,
+selection and scoring impossible to replace independently.
+
+**Decision**: `scripts/gameplay/agents/scrubbot_agent.gd` is a lightweight
+`Node2D` that owns exactly one in-flight movement and nothing else. It CONSUMES
+an already-valid successful `RouteResult` plus the `RouteRequest` that produced
+it, validates the assignment fails-closed (owner/color/target valid, route
+successful, `route.target_index == request.target_index`, ≥2 points, first point
+== spawn origin, last point == target endpoint), then walks the route. It does
+NOT select, reserve, compute routes, mutate `BoardState`, release
+`ReservationState`, score, carry any color/resource/payload, return to slot, or
+dispatch. Assigned color is identity/presentation metadata only.
+
+- **Movement is route-distance based, not per-frame point skipping**: cumulative
+  travelled distance is resolved against precomputed segment lengths, so any
+  delta (including one spanning several segments, and a huge catch-up delta)
+  lands correctly and the endpoint is snapped exactly. Driven by `_process` when
+  MOVING and by an explicit `advance(delta)` for deterministic headless tests.
+- **Board-local movement, presentation in the container**: the agent moves in
+  board-local cell units and sets its own board-local `position`; a scaled parent
+  container maps units → pixels. No screen pixels are ever baked into movement.
+- **Completion**: a single `agent_completed(owner_id, target_index, color_id)`
+  signal fires exactly once at arrival; M19/M20 orchestration owns clearing the
+  cell, releasing the reservation and scoring.
+- **Lifecycle / no orphans**: the agent owns no child/tween/timer nodes, so
+  freeing it in any state (moving, cancelled, completed) leaves nothing orphaned.
+  `cancel()` stops movement idempotently and prevents any later completion.
+- **Pooling deferred (SB-M18-015)**: not introduced. Up to 40 concurrent
+  create/assign/run/free agents showed no materially problematic lifecycle cost
+  under headless CPU timing (no FPS/GPU claim). Revisit only if real Dispatcher
+  (M19) profiling shows allocation is a problem.
+
+**Reason**: keeps ADR-024's HOW-vs-WHAT separation intact and lets routing,
+selection, scoring and (later) dispatch/pooling change without touching the
+mover. M18 consumes a finished route and does not care how it was computed
+(ADR-025 stays intact).
+
+**Consequences**:
+
+- New `scripts/gameplay/agents/` module; a throwaway
+  `scenes/debug/scrubbot_agent_debug.tscn` visual harness (NOT final M27 art).
+- Dispatcher (M19), spawning cadence, and vertical-slice wiring (M20) remain out
+  of scope.
+
+**Status**: Accepted (M18-C001).
