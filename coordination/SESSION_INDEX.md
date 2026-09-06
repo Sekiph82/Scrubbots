@@ -652,3 +652,15 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Required semantics: blocked interior = no route; newly-opened-after-clear can make same target routable.
 - State: ISSUED; next actor CLAUDE.
 - Owner design gate: final movement language must be selected by owner before M18.
+
+
+## M17-C001 V01 technical audit
+
+- Technical verdict: **AUDITED_PASS**
+- Milestone state: **OWNER_DESIGN_GATE_OPEN**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CHATGPT_AUDIT_V01.md
+- Comparison: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/ROUTING_COMPARISON_V01.md
+- Owner review: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CHATGPT_OWNER_REVIEW_V01.md
+- Closed: SB-M17-001..009, SB-M17-011..016.
+- Open: SB-M17-010, blocked by missing authoritative original movement reference.
+- Next actor: OWNER. M18 remains unopened.
