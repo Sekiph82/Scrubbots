@@ -680,3 +680,6 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Next cycle: M17-C002 production routing promotion.
 - Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_PROMPT_V01.md
 - Next actor: CLAUDE.
+
+
+- Progress after M17 owner decision: **263/943 = 27.89%** overall; **263/719 = 36.58%** main + SB-UI.
