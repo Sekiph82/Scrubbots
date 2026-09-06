@@ -576,3 +576,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Progress: **224/943 = 23.75%**.
 - Main + SB-UI: **224/719 = 31.15%**.
 - Next main-game milestone: **M15 TargetSelector**, not yet opened.
+
+
+## M14-C001 strict re-audit
+
+- Strict audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_STRICT_REAUDIT_V01.md
+- Policy basis: `coordination/AUDIT_POLICY.md`, `coordination/AUDIT_INDEX.md`, `coordination/README.md`.
+- Verdict remains **AUDITED_PASS**.
+- Independent E3 work: actual diff/source/ADR/test-quality/scope/progress cross-check.
+- Godot suite was not independently rerun because the audit environment has no Godot executable; Claude's 1098/1098 result remains E2 evidence and is explicitly labeled as such.
+- Strict audit found no M14 correction requirement.
+- Audit-memory maintenance: AL-031 superseded; AL-033 added for palette v2 / C01..C16.
