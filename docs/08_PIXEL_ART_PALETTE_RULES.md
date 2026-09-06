@@ -3,7 +3,7 @@
 Status: **OWNER-LOCKED — 2026-09-06**
 
 Machine-readable source of truth:
-`data/palettes/scrubbots_palette_v1.json`
+`data/palettes/scrubbots_palette_v2.json`
 
 No production SCRUBBOTS logical pixel may use a color outside this table
 unless the owner explicitly changes the rule and versions the palette.
