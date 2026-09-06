@@ -518,3 +518,13 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Owner-observed error: `Invalid call. Nonexistent function 'get_item_disabled' in base 'OptionButton'.`
 - Required API: `is_item_disabled(idx)`.
 - State: ISSUED; next actor CLAUDE.
+
+
+## M10-C001 V07 final independent audit
+
+- Status: **AUDITED_PASS**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_V07.md
+- Accepted: OptionButton API correction + runtime fixture-change regression smoke.
+- Evidence: **1023/1023 ALL PASS**, real 60-frame headless debug-scene runtime smoke, implementation diff independently inspected.
+- Progress unchanged: **207/943 = 21.95%**.
+- SB-M10-005..011 remain owner visual-QA gates. M14 remains NOT_STARTED.
