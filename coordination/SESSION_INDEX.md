@@ -599,3 +599,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Scope: SB-M15-001..012 only.
 - State: ISSUED; next actor CLAUDE.
 - Owner workflow note: start a fresh Claude chat for M15.
+
+
+## M15-C001 V01 final independent audit
+
+- Status: **AUDITED_PASS / COMPLETE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CHATGPT_AUDIT_V01.md
+- Accepted: TargetSelector, deterministic ascending strategy, injected reachability/access seam, atomic select-and-reserve, reservation respect, no-target behavior, simultaneous-assignment handling, rectangular + 59×59 coverage.
+- Claude evidence: **1155/1155 ALL PASS**.
+- ChatGPT independently inspected implementation diff/source/tests; Godot was not independently rerun in the audit environment and that limitation is disclosed in the audit.
+- SB-M15-001..012: **CLOSED**.
+- Next main-game milestone: **M16 RoutingSystem Interface**, not yet opened.
