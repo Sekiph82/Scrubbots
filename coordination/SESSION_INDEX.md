@@ -476,3 +476,15 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Scope A: immutable source artwork matrices placed centered in any selected valid debug canvas using VOID padding; 007 must fully render at both 30x30 and 59x59.
 - Scope B: normalize governance so Claude does not update H!veAI/PROJECT_DASHBOARD/SESSION_INDEX; ChatGPT owns tracker closure after audit.
 - State: ISSUED; next actor CLAUDE.
+
+
+### M10-C001 V06 issuance — variable canvas + C16 + coordination ownership
+
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V06.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V06.md
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V06.md
+- V06 supersedes unimplemented V05.
+- Palette: current canonical source is `data/palettes/scrubbots_palette_v2.json` with C01..C16; C16 Pure Black #000000. Palette v1 remains historical.
+- Variable canvas: source artwork matrices remain immutable and are centered in any selected valid debug canvas using VOID padding.
+- Coordination: Claude does not update H!veAI/PROJECT_DASHBOARD/SESSION_INDEX; ChatGPT does so after audit.
+- State: ISSUED; next actor CLAUDE.
