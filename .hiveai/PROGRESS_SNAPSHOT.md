@@ -134,3 +134,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - V06 also carries the pending Real Artwork variable-canvas correction and coordination-ownership normalization.
 - No SB checkbox change. Canonical progress remains **207 / 943 = 21.95%**.
 - M14 remains NOT_STARTED.
+
+
+### M10-C001 V05 final audit
+
+- `AUDITED_PASS`.
+- Variable Real Artwork canvas embedding accepted: immutable source matrices centered with VOID padding inside any valid selected debug canvas; no crop/scale/resample.
+- Coordination ownership normalization accepted: Claude stops at implementation/test/log/push/AWAITING_AUDIT; ChatGPT owns SESSION_INDEX + H!veAI tracker/dashboard updates after audit.
+- Implementer evidence: **990/990 ALL PASS** and clean headless debug-scene boot.
+- No task checkbox changed. Canonical progress remains **207 / 943 = 21.95%**.
+- V06 remains the active next step because the owner subsequently expanded the canonical palette to C01..C16 with C16 Pure Black #000000.
