@@ -3,7 +3,7 @@
 Status: **OWNER-LOCKED — 2026-09-06**
 
 Machine-readable source of truth:
-`data/palettes/scrubbots_palette_v1.json`
+`data/palettes/scrubbots_palette_v2.json`
 
 No production SCRUBBOTS logical pixel may use a color outside this table
 unless the owner explicitly changes the rule and versions the palette.
@@ -25,6 +25,7 @@ unless the owner explicitly changes the rule and versions the palette.
 | C13 | Light Gray | `#B8C2CC` | 184, 194, 204 |
 | C14 | Charcoal | `#3D4652` | 61, 70, 82 |
 | C15 | Pure White | `#FFFFFF` | 255, 255, 255 |
+| C16 | Pure Black | `#000000` | 0, 0, 0 |
 
 ## Production distinct-color bands
 
@@ -42,22 +43,22 @@ These are hard production-content bands, not approximate guidance.
 
 ## Locked semantics
 
-- Every ACTIVE logical cell uses exactly one of C01..C15.
-- No sixteenth production logical color may be introduced silently.
-- A production level's local LevelData palette is a subset of C01..C15,
+- Every ACTIVE logical cell uses exactly one of C01..C16.
+- No seventeenth production logical color may be introduced silently.
+- A production level's local LevelData palette is a subset of C01..C16,
   contains only canonical colors actually used by its logical cells, and is
   ordered by ascending global C-ID.
 - `#RRGGBBFF` is serialization-equivalent to the corresponding canonical
   opaque `#RRGGBB`. Other artwork alpha values are not production logical
   colors.
 - **CLEARED transparency is runtime state, not a palette color.**
-  It is alpha 0 and is not C16.
+  It is alpha 0 and is not a palette color.
 - Gameplay background is not a level palette color.
 - Visible square-cell boundaries/grid/border presentation may exist, but it is
   presentation-only and does not add logical cell colors or count toward the
   level's color total.
 - External/reference artwork may have arbitrary source colors, but any
-  production conversion must explicitly map/reject them against C01..C15.
+  production conversion must explicitly map/reject them against C01..C16.
   Never silently expand the SCRUBBOTS palette.
 - AI-generated production pixel artwork must use this same palette contract.
 
@@ -67,7 +68,7 @@ The canonical data shape remains:
 
 ```text
 width × height logical grid
-+ local palette subset of global C01..C15
++ local palette subset of global C01..C16
 + row-major color-ID array (index = y * width + x)
 ```
 
@@ -94,8 +95,8 @@ The gameplay surface behind the logical pixel artwork is owner-locked:
 Locked behavior:
 
 - BG01 is the production gameplay background exposed through CLEARED alpha-0 cells.
-- BG01 is **not** C16 and is not part of the 15-color logical pixel-art palette.
+- BG01 is not part of C01..C16 and is not a logical pixel-art palette color.
 - BG01 never counts toward a level's distinct-color total.
-- ACTIVE logical cells still use only C01..C15.
+- ACTIVE logical cells still use only C01..C16.
 - Do not substitute BG01 into LevelData cell color IDs.
 - Debug backgrounds may use conspicuous colors (for example magenta) solely to prove transparency; those debug colors are not production palette/background colors.

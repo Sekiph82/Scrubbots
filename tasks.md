@@ -217,15 +217,15 @@ One logical artwork square = one logical pixel = one board cell. Logical
 cells are game data, never physical display pixels, and are never
 represented as thousands of heavyweight Godot Nodes (see ADR-004, ADR-008).
 
-### 8.7A — Global 15-color pixel-art palette `[LOCKED OWNER DECISION]`
+### 8.7A — Global 16-color pixel-art palette `[LOCKED OWNER DECISION]`
 
 Canonical machine-readable palette:
-`data/palettes/scrubbots_palette_v1.json`
+`data/palettes/scrubbots_palette_v2.json`
 
 Canonical human-readable rule:
 `docs/08_PIXEL_ART_PALETTE_RULES.md`
 
-Production logical artwork cells may use **only C01..C15**. No other logical
+Production logical artwork cells may use **only C01..C16**. No other logical
 pixel color is legal without an explicit owner rule change and palette version
 change. CLEARED alpha-0 transparency, gameplay background and
 presentation-only grid/border overlays are not logical artwork colors and do
@@ -242,7 +242,7 @@ not add palette IDs.
 
 These are hard production-content bands. Count colors actually referenced by
 logical cells, not an inflated palette array. Production local LevelData
-palettes are used subsets of C01..C15 in ascending global C-ID order.
+palettes are used subsets of C01..C16 in ascending global C-ID order.
 
 ### 8.8 — Five slots `[LOCKED]`
 
@@ -302,7 +302,7 @@ stylistic reasons.
 
 - BG01 **Midnight Slate** = `#202533` / RGB(32,37,51).
 - CLEARED alpha-0 cells reveal BG01 underneath.
-- BG01 is not part of C01..C15, is not C16, is never a logical LevelData cell
+- BG01 is not part of C01..C16 and is never a logical LevelData cell
   color, and never counts toward difficulty distinct-color totals.
 - Debug-only transparency backgrounds may differ for visibility.
 
@@ -365,7 +365,7 @@ Previously supplied game screenshots may be used only as reference for
 *pixel construction method*, where explicitly approved — never for
 characters, compositions, object placement, or level art. External-reference
 colors must never redefine the SCRUBBOTS palette. The exact production palette
-is owner-locked in §8.7A / `data/palettes/scrubbots_palette_v1.json`.
+is owner-locked in §8.7A / `data/palettes/scrubbots_palette_v2.json`.
 The goal is understanding how a readable image is built from a limited
 logical grid. SCRUBBOTS level artwork remains original.
 
@@ -453,7 +453,7 @@ system; analytics; achievements; leaderboard; social features; cloud save;
 tutorial wording; audio direction.
 
 **Not design gates**: board-size bands are locked in §8.3; the global
-C01..C15 palette and difficulty distinct-color bands are locked in §8.7A/B.
+C01..C16 palette and difficulty distinct-color bands are locked in §8.7A/B.
 
 ---
 
@@ -696,7 +696,7 @@ Per candidate production pixel-art level (none exist locally yet):
 - [ ] SB-M08-009 Confirm width in legal range.
 - [ ] SB-M08-010 Confirm height in legal range.
 - [ ] SB-M08-011 Preserve original. — [ ] SB-M08-012 Never silently resize.
-- [ ] SB-M08-013 Explicitly map/reject candidate source colors against locked C01..C15; never silently reduce/remap, never invent C16+, and record deterministic mapping/rejection evidence. — [ ] SB-M08-014 Produce audit report.
+- [ ] SB-M08-013 Explicitly map/reject candidate source colors against locked C01..C16; never silently reduce/remap, never invent C17+, and record deterministic mapping/rejection evidence. — [ ] SB-M08-014 Produce audit report.
 
 Examples: `27×24 -> Easy`, `35×38 -> Medium`, `43×46 -> Hard`, `53×59 -> Very Hard`.
 An image must never be auto-changed to 20×20/40×40/50×50 for convenience.
@@ -725,7 +725,7 @@ An image must never be auto-changed to 20×20/40×40/50×50 for convenience.
 
 **M09 palette-lock note (owner decision 2026-09-06):** M09's completed
 exact-source-pixel importer remains valid historical/generic tooling evidence,
-but it predates the locked global C01..C15 production palette. An arbitrary
+but it predates the locked global C01..C16 production palette. An arbitrary
 raw M09 import is not production-legal merely because it round-trips exactly.
 Production acceptance must additionally satisfy §8.7A/B through the open
 art-audit / Level Factory / Level QA gates. Historical M09 task completion is
@@ -1262,7 +1262,7 @@ Mark actual iOS compilation `[DEFERRED]` until macOS/Xcode is available.
 
 Every production level:
 - [ ] SB-M48-001 Legal dimensions. — [ ] SB-M48-002 Correct difficulty.
-- [ ] SB-M48-003 Valid locked palette: every used logical color is C01..C15 only; local palette contains only used canonical colors in ascending C-ID order; distinct used-color count matches difficulty (Easy 3–5 / Medium 6–7 / Hard 8–9 / Very Hard 10–12). — [ ] SB-M48-004 Correct cell count.
+- [ ] SB-M48-003 Valid locked palette: every used logical color is C01..C16 only; local palette contains only used canonical colors in ascending C-ID order; distinct used-color count matches difficulty (Easy 3–5 / Medium 6–7 / Hard 8–9 / Very Hard 10–12). — [ ] SB-M48-004 Correct cell count.
 - [ ] SB-M48-005 No invalid palette IDs. — [ ] SB-M48-006 Recognizable ACTIVE source artwork (cells shown at their original source palette color, opaque, from level start; ADR-019).
 - [ ] SB-M48-007 No unintended interpolation. — [ ] SB-M48-008 Correct CLEARED transparency — cleared cells render alpha 0 and the gameplay background is visible through them (not a black/gray/palette substitute).
 - [ ] SB-M48-009 Solvable under canonical ACTIVE-blocker / CLEARED-open reachability semantics (non-target ACTIVE cells block access; CLEARED/background is open). — [ ] SB-M48-010 No routing pathology under those semantics; a fully enclosed matching-color ACTIVE cell must remain untargetable (no dispatch) until prior clears open legal access (AL-028).
@@ -1672,7 +1672,7 @@ channel:
 
 - [ ] SB-LF05-001 Compose structural Level Data V1 validation with production difficulty validation.
 - [ ] SB-LF05-002 Reuse the audited M09 exact-pixel reconstruction/round-trip contract for art-first exports.
-- [ ] SB-LF05-003 Validate dimensions, locked C01..C15 membership/order, difficulty distinct-color bands (3–5 / 6–7 / 8–9 / 10–12), cells, ACTIVE opacity/CLEARED runtime transparency and duplicate IDs before production acceptance.
+- [ ] SB-LF05-003 Validate dimensions, locked C01..C16 membership/order, difficulty distinct-color bands (3–5 / 6–7 / 8–9 / 10–12), cells, ACTIVE opacity/CLEARED runtime transparency and duplicate IDs before production acceptance.
 - [ ] SB-LF05-004 Reject unsolved candidates when the solver verdict is authoritative.
 - [ ] SB-LF05-005 Distinguish solver INCONCLUSIVE from proven UNSOLVABLE.
 - [ ] SB-LF05-006 Produce actionable per-candidate rejection reasons.
