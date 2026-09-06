@@ -525,7 +525,7 @@ Complete from Prompt 02, re-verified.
 - [x] SB-M02-014 Instance independence tested (two BoardStates from same LevelData don't share state).
 - [x] SB-M02-015 LevelData immutability behavior tested.
 - [x] SB-M02-016 No one-Node-per-cell architecture exists (flat `PackedInt32Array`/`PackedByteArray`).
-- [ ] SB-M02-017 Add RESERVED only when reservation architecture is designed (see M14).
+- [x] SB-M02-017 Add RESERVED only when reservation architecture is designed (see M14). — resolved by ADR-022: reservation is a separate assignment layer; BoardState remains ACTIVE/CLEARED only.
 
 ### M03 — Official Difficulty Bands + 59×59 Envelope
 
@@ -794,13 +794,13 @@ Renamed/migrated to `scripts/gameplay/targeting/color_candidate_index.gd`
 RESERVED was intentionally deferred in Prompt 02 (see M02-017). Add only
 when target assignment requires it.
 
-- [ ] SB-M14-001 Define reservation ownership.
-- [ ] SB-M14-002 Decide whether RESERVED belongs in `BoardState.CellState` or separate data.
-- [ ] SB-M14-003 Record decision (ADR).
-- [ ] SB-M14-004 Reserve target atomically.
-- [ ] SB-M14-005 Prevent double reservation.
-- [ ] SB-M14-006 Release on dispatch failure. — [ ] SB-M14-007 Release on reset.
-- [ ] SB-M14-008 Resolve arrival. — [ ] SB-M14-009 Concurrency tests.
+- [x] SB-M14-001 Define reservation ownership.
+- [x] SB-M14-002 Decide whether RESERVED belongs in `BoardState.CellState` or separate data.
+- [x] SB-M14-003 Record decision (ADR).
+- [x] SB-M14-004 Reserve target atomically.
+- [x] SB-M14-005 Prevent double reservation.
+- [x] SB-M14-006 Release on dispatch failure. — [x] SB-M14-007 Release on reset.
+- [x] SB-M14-008 Resolve arrival. — [x] SB-M14-009 Concurrency tests.
 
 ### M15 — TargetSelector
 
