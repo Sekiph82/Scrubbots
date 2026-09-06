@@ -101,3 +101,6 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 
 
 | M16-C001 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V01.md | `AUDITED_PASS` | V01 verified board-local routing contract, detached route results, injected segment-access observability, swappability, explicit no-retarget failure behavior, and no M17 algorithm leakage. |
+
+
+| M17-C001 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CHATGPT_AUDIT_V01.md | `AUDITED_PASS / OWNER_DESIGN_GATE_OPEN` | V01 verified three experimental routing prototypes, semantic regressions, comparison metrics and debug lab. SB-M17-010 remains open because the original movement reference is missing; M18 blocked pending owner selection. |
