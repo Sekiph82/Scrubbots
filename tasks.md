@@ -302,7 +302,7 @@ stylistic reasons.
 
 - BG01 **Midnight Slate** = `#202533` / RGB(32,37,51).
 - CLEARED alpha-0 cells reveal BG01 underneath.
-- BG01 is not part of C01..C16, is not part of C01..C16, is never a logical LevelData cell
+- BG01 is not part of C01..C16 and is never a logical LevelData cell
   color, and never counts toward difficulty distinct-color totals.
 - Debug-only transparency backgrounds may differ for visibility.
 
