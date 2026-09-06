@@ -223,3 +223,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Main game + SB-UI: **224 / 719 = 31.15%**.
 - Level Factory remains **0 / 112**; Content Pipeline remains **0 / 112**.
 - Next main-game milestone: **M15 TargetSelector**, still NOT_STARTED until intentionally opened.
+
+
+### M14-C001 strict re-audit
+
+- Re-audited under `coordination/AUDIT_POLICY.md` with explicit E0/E1/E2/E3/E4 handling.
+- Final verdict remains **AUDITED_PASS**.
+- Implementation diff, ReservationState source, ADR-022, negative-test specificity, mutable-state leakage test, candidate-index exclusion seam and 59×59 complexity were independently cross-checked.
+- Godot executable was unavailable in the ChatGPT audit environment; `1098/1098` was therefore **not independently rerun** and remains E2 implementer evidence. This limitation is explicitly disclosed in the strict re-audit.
+- Progress independently recomputed from unique SB task IDs: **224/943 = 23.75%** overall; **224/719 = 31.15%** main + SB-UI; LF 0/112; CP 0/112.
+- Audit memory corrected: historical AL-031 marked superseded; AL-033 records current C01..C16 palette v2.
