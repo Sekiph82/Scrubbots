@@ -1,3 +1,15 @@
+### M15-C001 V01 milestone opening
+
+- State: **ISSUED**
+- New milestone: **M15 TargetSelector**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CHATGPT_PROMPT_V01.md
+- TargetSelector chooses WHAT target only; routing remains M16+.
+- Uses raw color candidates + ReservationState + injected reachability/access truth.
+- Deterministic baseline: first reachable ascending candidate, atomically reserved before return.
+- Current progress: **224/943 = 23.75%**; main + SB-UI **224/719 = 31.15%**.
+- Next actor: CLAUDE.
+- Owner should start a fresh Claude chat for this milestone.
+
 ### M14-C001 strict re-audit
 
 - Decision remains **AUDITED_PASS / COMPLETE**.
