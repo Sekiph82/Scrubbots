@@ -1,3 +1,15 @@
+### M17 owner movement-language decision
+
+- **OWNER_SELECTS_ORGANIZED**
+- Production movement language: **Organized/curved**
+- Planner backbone: **Grid-aware deterministic**
+- Direct: debug/baseline only
+- Production shaping should be more conservative than the M17 experimental default: fewer aggressive diagonals, controlled/readable curves.
+- M17 design gate is resolved and all 16 M17 task IDs are complete.
+- M17-C002 is ISSUED to promote the selected routing direction into production code before M18.
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_PROMPT_V01.md
+- Next actor: CLAUDE.
+
 - Progress at M17 owner gate: **262/943 = 27.78%** overall; **262/719 = 36.44%** main + SB-UI. SB-M17-010 remains open.
 
 ### M17-C001 owner design gate
