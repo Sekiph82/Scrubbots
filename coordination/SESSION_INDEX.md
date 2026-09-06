@@ -539,3 +539,16 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Equivalent 1080×2160 QA region ≈ x=16, y=213, w=1028, h=1147.
 - Production max remains 59×59; 75×75 idea abandoned.
 - State: ISSUED; next actor CLAUDE.
+
+
+## M10-C001 V08 final independent audit + owner QA
+
+- Status: **AUDITED_PASS / COMPLETE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_V08.md
+- Accepted: canonical gameplay QA region from the owner reference, preserved variable-canvas artwork embedding, palette/VOID/rendering contracts.
+- Automated evidence: **1031/1031 ALL PASS** plus clean runtime smoke.
+- Owner evidence: supplied screenshots and explicit confirmation that all manual views are OK.
+- SB-M10-005..011: **CLOSED**.
+- Progress: **214/943 = 22.69%**.
+- Main + SB-UI: **214/719 = 29.76%**.
+- M14 remains NOT_STARTED until the next milestone transition is intentionally opened.
