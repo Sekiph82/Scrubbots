@@ -44,6 +44,9 @@ const GridRoutePrototype = preload("res://scripts/gameplay/routing/prototypes/gr
 const OrganizedRoutePrototype = preload("res://scripts/gameplay/routing/prototypes/organized_route_prototype.gd")
 const RouteMetrics = preload("res://scripts/gameplay/routing/prototypes/route_metrics.gd")
 const RoutingLabScenarios = preload("res://scripts/gameplay/routing/prototypes/routing_lab_scenarios.gd")
+# M17-C002 — owner-selected PRODUCTION routing (Organized/curved + grid backbone).
+const ProductionAccessQuery = preload("res://scripts/gameplay/routing/production_access_query.gd")
+const ProductionRoutingSystem = preload("res://scripts/gameplay/routing/production_routing_system.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -94,6 +97,8 @@ func _initialize() -> void:
 	_run_m17_metrics_tests()
 	_run_m17_scale_tests()
 	_run_m17_lab_scene_smoke()
+	# M17-C002 — production routing promotion.
+	_run_m17c002_production_routing_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -3941,3 +3946,121 @@ func _run_m17_lab_scene_smoke() -> void:
 	inst._rebuild()
 	_check(inst._info_label.text.find("requests=10") >= 0, "lab bot-count selector yields 10 requests for S5")
 	inst.queue_free()
+
+# ======================================================= M17-C002 production ==
+# Owner-selected production routing (OWNER_MOVEMENT_DECISION_V01): Organized/
+# curved movement language on a deterministic grid-aware backbone. Direct stays
+# debug/prototype only. Production defaults are more conservative than the M17
+# experimental Organized prototype. Production lives outside prototypes/.
+
+func _m17c002_max_seg(p: PackedVector2Array) -> float:
+	var m := 0.0
+	for i in range(p.size() - 1):
+		m = maxf(m, p[i].distance_to(p[i + 1]))
+	return m
+
+func _run_m17c002_production_routing_tests() -> void:
+	print("---- M17-C002: production routing (organized/curved + grid) ----")
+	# Production derives from a valid grid route (S2 detour), validates, and is
+	# organized/curved (more than a single straight segment).
+	var s2 := RoutingLabScenarios.make_s2()
+	var b2 = s2["board"]
+	var a2 = ProductionAccessQuery.new(b2)
+	var q2 = RoutingLabScenarios.build_requests(b2, s2["targets"], s2["origins"])[0]
+	var prod = ProductionRoutingSystem.new()
+	var r2 = prod.compute_route(q2, b2, a2)
+	_check(r2.success, "production routes the S2 detour (derives from valid grid path)")
+	var pts2: PackedVector2Array = r2.get_points()
+	_check(pts2.size() > 2, "production route is organized/curved, not a single straight segment")
+	_check(_m17_all_segments_open(pts2, a2, q2.target_index), "production: every emitted segment passes access truth (no invalid shortcut)")
+	_check_eq(RouteValidator.validate_route(q2, r2, b2, a2), RouteResult.FailureReason.NONE, "production route validates end-to-end")
+	_check_eq(r2.target_index, q2.target_index, "production keeps the assigned target identity")
+
+	# Contract signature + no selection/reservation API.
+	_check(prod.has_method("compute_route"), "production exposes compute_route (M16 signature)")
+	_check(not prod.has_method("select_and_reserve"), "production has NO target-selection method")
+
+	# No BoardState / ReservationState mutation.
+	var before := _snapshot_cell_states(b2)
+	var reservations = ReservationState.new()
+	reservations.bind(b2)
+	_check(reservations.reserve(q2.target_index, 0), "precondition: target reserved for owner 0")
+	prod.compute_route(q2, b2, a2)
+	_check(_cell_states_equal(b2, before), "production does not mutate BoardState")
+	_check_eq(reservations.get_owner(q2.target_index), 0, "production does not touch ReservationState ownership")
+
+	# Determinism.
+	var r2b = ProductionRoutingSystem.new().compute_route(q2, b2, a2)
+	_check(RouteMetrics.points_equal(pts2, r2b.get_points()), "production is deterministic (identical points on repeat)")
+
+	# Blocked interior target -> no route, no retarget.
+	var s3 := RoutingLabScenarios.make_s3()
+	var b3 = s3["board"]
+	var a3 = ProductionAccessQuery.new(b3)
+	var q3 = RoutingLabScenarios.build_requests(b3, s3["targets"], s3["origins"])[0]
+	var r3 = ProductionRoutingSystem.new().compute_route(q3, b3, a3)
+	_check(not r3.success, "production returns no route for a fully enclosed target")
+	_check_eq(r3.failure_reason, RouteResult.FailureReason.NO_ROUTE, "enclosed target -> NO_ROUTE")
+	_check_eq(r3.target_index, q3.target_index, "enclosed failure keeps the SAME target (no retarget)")
+
+	# Newly-opened-after-clear -> same target routes.
+	var s4 := RoutingLabScenarios.make_s4()
+	var b4 = s4["board"]
+	var q4 = RoutingLabScenarios.build_requests(b4, s4["targets"], s4["origins"])[0]
+	var before4 = ProductionRoutingSystem.new().compute_route(q4, b4, ProductionAccessQuery.new(b4))
+	_check(not before4.success, "S4 precondition: enclosed target has no route")
+	for ci in s4["clear_after"]:
+		b4.set_cell_state(int(ci), BoardState.CellState.CLEARED)
+	var a4 = ProductionAccessQuery.new(b4)
+	var after4 = ProductionRoutingSystem.new().compute_route(q4, b4, a4)
+	_check(after4.success, "S4: same target routes once prerequisite cells are CLEARED")
+	_check_eq(after4.target_index, q4.target_index, "S4: target identity unchanged after opening")
+	_check_eq(RouteValidator.validate_route(q4, after4, b4, a4), RouteResult.FailureReason.NONE, "S4 opened production route validates")
+
+	# Production defaults are more conservative than the experimental Organized
+	# prototype defaults: on 59x59 it keeps more of the orthogonal path (more
+	# points, >= distance) and avoids long board-spanning diagonals (smaller max
+	# segment). Direct evidence, not a claim.
+	var s7 := RoutingLabScenarios.make_s7(25)
+	var b7 = s7["board"]
+	var a7 = ProductionAccessQuery.new(b7)
+	var reqs7 = RoutingLabScenarios.build_requests(b7, s7["targets"], s7["origins"])
+	var prod_pts := 0; var exp_pts := 0
+	var prod_dist := 0.0; var exp_dist := 0.0
+	var prod_max := 0.0; var exp_max := 0.0
+	var prod_succ := 0; var prod_valid := 0
+	var org_exp = OrganizedRoutePrototype.new()
+	for req in reqs7:
+		var rp = ProductionRoutingSystem.new().compute_route(req, b7, a7)
+		var re = org_exp.compute_route(req, b7, a7)
+		if rp.success:
+			prod_succ += 1
+			var pp: PackedVector2Array = rp.get_points()
+			prod_pts += pp.size(); prod_dist += RouteMetrics.route_distance(pp); prod_max = maxf(prod_max, _m17c002_max_seg(pp))
+			if RouteValidator.validate_route(req, rp, b7, a7) == RouteResult.FailureReason.NONE:
+				prod_valid += 1
+		if re.success:
+			var ep: PackedVector2Array = re.get_points()
+			exp_pts += ep.size(); exp_dist += RouteMetrics.route_distance(ep); exp_max = maxf(exp_max, _m17c002_max_seg(ep))
+	_check(prod_succ == reqs7.size(), "production solves all 59x59 routes (success=%d)" % prod_succ)
+	_check_eq(prod_valid, prod_succ, "every production 59x59 route passes the shared RouteValidator")
+	_check(prod_pts > exp_pts, "production keeps MORE points than experimental (less aggressive: %d > %d)" % [prod_pts, exp_pts])
+	_check(prod_dist >= exp_dist, "production distance >= experimental (keeps orthogonal path: %.1f >= %.1f)" % [prod_dist, exp_dist])
+	_check(prod_max < exp_max, "production avoids long diagonals (max seg %.1f < experimental %.1f)" % [prod_max, exp_max])
+	# Production default config is more conservative than the experimental default.
+	_check(prod.max_shortcut_span < 2147483647, "production shortcut span is bounded")
+	_check(prod.corner_radius < org_exp.corner_radius, "production corner_radius (%.2f) < experimental (%.2f)" % [prod.corner_radius, org_exp.corner_radius])
+
+	# Rectangular Very Hard coverage (53x59).
+	var s8 := RoutingLabScenarios.make_s8(25)
+	var b8 = s8["board"]
+	var a8 = ProductionAccessQuery.new(b8)
+	var reqs8 = RoutingLabScenarios.build_requests(b8, s8["targets"], s8["origins"])
+	_check_eq(b8.get_width(), 53, "rectangular VH width 53")
+	_check_eq(b8.get_height(), 59, "rectangular VH height 59")
+	var s8_ok := 0
+	for req in reqs8:
+		var res = ProductionRoutingSystem.new().compute_route(req, b8, a8)
+		if res.success and RouteValidator.validate_route(req, res, b8, a8) == RouteResult.FailureReason.NONE:
+			s8_ok += 1
+	_check_eq(s8_ok, reqs8.size(), "all rectangular VH production routes validate")
