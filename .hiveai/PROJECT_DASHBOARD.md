@@ -1,3 +1,14 @@
+### M10-C001 V08 gameplay QA region
+
+- State: **ISSUED**
+- Owner supplied the real phone composition and marked the intended board/gameplay region.
+- Debug QA now must use that normalized region instead of the full residual portrait area.
+- Reference: 887×1774 screen; gameplay region x=13, y=175, w=844, h=942. At 1080×2160 this is approximately x=16, y=213, w=1028, h=1147.
+- Production logical board maximum remains 59×59.
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V08.md
+- Progress unchanged: **207/943 = 21.95%**.
+- Next actor: CLAUDE.
+
 ### M10-C001 V07 ChatGPT final audit
 
 - Decision: **AUDITED_PASS**
