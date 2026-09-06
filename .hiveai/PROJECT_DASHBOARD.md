@@ -1,3 +1,14 @@
+### M17-C001 owner design gate
+
+- Technical audit: **AUDITED_PASS**
+- Current state: **OWNER_DESIGN_GATE_OPEN**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CHATGPT_AUDIT_V01.md
+- Comparison: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/ROUTING_COMPARISON_V01.md
+- Owner review: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CHATGPT_OWNER_REVIEW_V01.md
+- 15/16 M17 task IDs are closed; SB-M17-010 remains open due missing authoritative movement reference.
+- Next actor: **OWNER**.
+- M18 is blocked until the owner selects Direct, Grid-aware, Organized/curved, or requests a hybrid/revision.
+
 ### M17-C001 V01 milestone opening
 
 - State: **ISSUED**
