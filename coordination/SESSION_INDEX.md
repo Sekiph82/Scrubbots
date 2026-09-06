@@ -587,3 +587,15 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Godot suite was not independently rerun because the audit environment has no Godot executable; Claude's 1098/1098 result remains E2 evidence and is explicitly labeled as such.
 - Strict audit found no M14 correction requirement.
 - Audit-memory maintenance: AL-031 superseded; AL-033 added for palette v2 / C01..C16.
+
+
+## M15-C001 V01 issuance — TargetSelector
+
+- Milestone: **M15 TargetSelector OPENED**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CHATGPT_PROMPT_V01.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CHATGPT_AUDIT_CRITERIA_V01.md
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CLAUDE_LOG_V01.md
+- Architecture: deterministic target choice + atomic ReservationState reserve; injected access truth; no routing/pathfinding.
+- Scope: SB-M15-001..012 only.
+- State: ISSUED; next actor CLAUDE.
+- Owner workflow note: start a fresh Claude chat for M15.
