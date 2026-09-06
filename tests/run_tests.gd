@@ -718,11 +718,11 @@ func _run_debug_scene_fixture_change_smoke() -> void:
 	# _initialize() (no processed frame). Build the UI deterministically if it
 	# has not run yet — this still exercises the real _build_ui/_on_fixture_changed
 	# code, just driven explicitly.
-	if inst._board_area == null:
+	if inst._qa_region == null:
 		inst._build_ui()
-	# Give the board area a real size so _refresh() runs the full embed/render
-	# path rather than early-returning.
-	inst._board_area.size = Vector2(1000, 1000)
+	# Give the root the 1080×2160 reference viewport so _refresh() derives the
+	# canonical QA region and runs the full embed/render path.
+	inst.size = Vector2(1080, 2160)
 
 	# Real Artwork fixture indices in FIXTURE_OPTIONS: 1=007, 2=010, 3=013.
 	# Selecting + driving _on_fixture_changed() executes the exact API path that
@@ -743,10 +743,26 @@ func _run_debug_scene_fixture_change_smoke() -> void:
 	_check(inst._info_label.text.find("source=27x24") >= 0, "V07 smoke: 007 renders source 27x24 (30x30 canvas) without error")
 	_check(inst._info_label.text.find("canvas=30x30") >= 0, "V07 smoke: 007 canvas is 30x30")
 	_check(inst._renderer.get_child_count() == 0, "V07 smoke: no per-cell Nodes at 30x30")
+	# V08: board fits inside the canonical QA region (available_size = QA size),
+	# centered, board pixels never exceeding the QA rect.
+	var qa: Rect2 = inst.qa_region_rect(Vector2(1080, 2160))
+	# Canonical rect at the 1080×2160 reference resolves to ≈ x=16,y=213,w=1028,h=1147.
+	_check(absf(qa.position.x - 16) <= 1.0, "V08: QA x ≈ 16 at 1080x2160 (got %.0f)" % qa.position.x)
+	_check(absf(qa.position.y - 213) <= 1.0, "V08: QA y ≈ 213 at 1080x2160 (got %.0f)" % qa.position.y)
+	_check(absf(qa.size.x - 1028) <= 1.0, "V08: QA w ≈ 1028 at 1080x2160 (got %.0f)" % qa.size.x)
+	_check(absf(qa.size.y - 1147) <= 1.0, "V08: QA h ≈ 1147 at 1080x2160 (got %.0f)" % qa.size.y)
+	# Region derives from owner normalized ratios (13/887,175/1774,844/887,942/1774);
+	# the resolved rect above proves those ratios.
+	_check(absf(inst._qa_region.size.x - qa.size.x) <= 1.0 and absf(inst._qa_region.size.y - qa.size.y) <= 1.0, "V08 smoke: QA region sized to canonical rect")
+	var bpx: Vector2 = inst._renderer.get_board_pixel_size()
+	_check(bpx.x <= inst._qa_region.size.x + 0.5 and bpx.y <= inst._qa_region.size.y + 0.5, "V08 smoke: 30x30 board fits inside QA region")
 	inst._size_option.select(10) # 59x59
 	inst._refresh()
 	_check(inst._info_label.text.find("canvas=59x59") >= 0, "V07 smoke: 007 canvas is 59x59")
+	_check(inst._info_label.text.find("QA=1028x1147") >= 0, "V08 smoke: info reports canonical QA region 1028x1147")
 	_check(inst._renderer.get_child_count() == 0, "V07 smoke: no per-cell Nodes at 59x59")
+	var bpx59: Vector2 = inst._renderer.get_board_pixel_size()
+	_check(bpx59.x <= inst._qa_region.size.x + 0.5 and bpx59.y <= inst._qa_region.size.y + 0.5, "V08 smoke: 59x59 board fits inside QA region")
 
 	# Switching to a taller fixture recomputes validity (013 source 28x31 needs
 	# height >= 31, so 30x30 becomes invalid).

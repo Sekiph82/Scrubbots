@@ -62,12 +62,42 @@ const PATTERN_OPTIONS := [
 	{"label": "Checker ACTIVE/CLEARED", "value": BoardDebugFixtures.StatePattern.CHECKER},
 ]
 
+## Canonical gameplay QA region (M10-C001 V08), from the owner-supplied
+## 887×1774 phone-screen reference with the gameplay/board region marked at
+## x=13, y=175, w=844, h=942. Stored as normalized ratios so the same relative
+## region stays stable at any debug viewport size (e.g. the 1080×2160 reference
+## resolves to ≈ x=16, y=213, w=1028, h=1147). This is a PRESENTATION-only QA
+## rectangle — it is NOT a logical board size and never changes the 59×59
+## production maximum or DifficultyRules.
+const QA_REF_W := 887.0
+const QA_REF_H := 1774.0
+const QA_REGION_X := 13.0
+const QA_REGION_Y := 175.0
+const QA_REGION_W := 844.0
+const QA_REGION_H := 942.0
+const QA_LEFT_RATIO := QA_REGION_X / QA_REF_W    # ≈ 0.014656
+const QA_TOP_RATIO := QA_REGION_Y / QA_REF_H     # ≈ 0.098647
+const QA_WIDTH_RATIO := QA_REGION_W / QA_REF_W   # ≈ 0.951522
+const QA_HEIGHT_RATIO := QA_REGION_H / QA_REF_H  # ≈ 0.530947
+
+## Pure geometry: the canonical gameplay QA rectangle for a given debug
+## viewport, derived from the owner-approved normalized ratios. Testable
+## without instantiating the scene.
+static func qa_region_rect(viewport: Vector2) -> Rect2:
+	return Rect2(
+		roundf(QA_LEFT_RATIO * viewport.x),
+		roundf(QA_TOP_RATIO * viewport.y),
+		roundf(QA_WIDTH_RATIO * viewport.x),
+		roundf(QA_HEIGHT_RATIO * viewport.y)
+	)
+
 var _fixture_option: OptionButton
 var _size_option: OptionButton
 var _pattern_option: OptionButton
 var _info_label: Label
-var _board_area: Control
-var _board_bg: ColorRect # visible background behind the board
+var _qa_region: Control # canonical gameplay QA rectangle (V08); board fits inside this
+var _qa_frame: ColorRect # faint fill marking the QA region for owner visual QA
+var _board_bg: ColorRect # visible background behind the board (BG01 / synthetic)
 var _renderer: Control # BoardRenderer instance (extends TextureRect)
 var _grid: Control # BoardGridOverlay
 ## Immutable source fixture (from load_real_fixture) for the selected Real
@@ -78,6 +108,7 @@ var _current_source: Dictionary = {}
 func _ready() -> void:
 	anchor_right = 1.0
 	anchor_bottom = 1.0
+	resized.connect(_refresh)
 	_build_ui()
 	call_deferred("_on_fixture_changed")
 
@@ -111,23 +142,33 @@ func _build_ui() -> void:
 	_info_label = Label.new()
 	root_vbox.add_child(_info_label)
 
-	_board_area = Control.new()
-	_board_area.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_board_area.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	_board_area.resized.connect(_refresh)
-	root_vbox.add_child(_board_area)
+	# Canonical gameplay QA region (V08): a dedicated presentation rectangle
+	# derived from the owner reference, NOT the full residual portrait area.
+	# Added as a direct child of the root (positioned by ratios in _refresh);
+	# the controls VBox above draws on top of its top strip.
+	_qa_region = Control.new()
+	_qa_region.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	add_child(_qa_region)
+
+	# Faint frame so the owner can see the QA region during manual QA.
+	_qa_frame = ColorRect.new()
+	_qa_frame.color = Color(1, 1, 1, 0.05)
+	_qa_frame.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_qa_frame.anchor_right = 1.0
+	_qa_frame.anchor_bottom = 1.0
+	_qa_region.add_child(_qa_frame)
 
 	# Background sits behind the board; CLEARED (alpha-0) and VOID cells reveal it.
 	_board_bg = ColorRect.new()
 	_board_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_board_area.add_child(_board_bg)
+	_qa_region.add_child(_board_bg)
 
 	_renderer = BoardRenderer.new()
-	_board_area.add_child(_renderer)
+	_qa_region.add_child(_renderer)
 
 	# Batched square-cell separation overlay (one Node, drawn above the board).
 	_grid = BoardGridOverlay.new()
-	_board_area.add_child(_grid)
+	_qa_region.add_child(_grid)
 
 ## True only when SIZE_OPTIONS[idx] can fully contain the given source matrix
 ## (canvas must be >= source in both dimensions; too small would crop).
@@ -165,7 +206,13 @@ func _on_fixture_changed() -> void:
 	_refresh()
 
 func _refresh() -> void:
-	if _board_area.size.x <= 0 or _board_area.size.y <= 0:
+	if _qa_region == null or size.x <= 0 or size.y <= 0:
+		return
+	# Position/size the canonical gameplay QA region from the current viewport.
+	var qa: Rect2 = qa_region_rect(size)
+	_qa_region.position = qa.position
+	_qa_region.size = qa.size
+	if qa.size.x <= 0 or qa.size.y <= 0:
 		return
 	var fixture: Dictionary = FIXTURE_OPTIONS[_fixture_option.selected]
 	var pattern_entry: Dictionary = PATTERN_OPTIONS[_pattern_option.selected]
@@ -224,9 +271,12 @@ func _refresh() -> void:
 			int(syn_entry.w), int(syn_entry.h), int(syn_entry.w) * int(syn_entry.h),
 		]
 
-	_renderer.configure(board, level.palette, _board_area.size)
+	# BoardRenderer fits the selected logical board inside the canonical QA
+	# region (available_size = QA region size), not the full portrait residual.
+	_renderer.configure(board, level.palette, _qa_region.size)
 	var board_pixels: Vector2 = _renderer.get_board_pixel_size()
-	var origin: Vector2 = (_board_area.size - board_pixels) / 2.0
+	# Center the board pixel rect inside the QA region (coords local to it).
+	var origin: Vector2 = (_qa_region.size - board_pixels) / 2.0
 	_renderer.position = origin
 	# Background + grid overlay cover exactly the board rect.
 	_board_bg.position = origin
@@ -238,9 +288,10 @@ func _refresh() -> void:
 	_grid.configure(_renderer.get_cell_size(), board.get_width(), board.get_height(), line_color)
 
 	_info_label.text = (
-		"%s — cell_size=%.2fpx — board_pixels=%s — pattern=%s — renderer child count=%d"
+		"%s — QA=%dx%d — board_px=%s — cell=%.2fpx — pattern=%s — renderer child count=%d"
 		% [
-			info_prefix, _renderer.get_cell_size(), str(board_pixels),
+			info_prefix, int(_qa_region.size.x), int(_qa_region.size.y),
+			str(board_pixels), _renderer.get_cell_size(),
 			pattern_entry.label, _renderer.get_child_count(),
 		]
 	)
