@@ -356,3 +356,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
   - Main remaining: **456**
   - Level Factory: **0 / 112**
   - Content Pipeline: **0 / 112**
+
+
+### M17-C002 final audit
+
+- Production routing promotion: **AUDITED_PASS**.
+- Owner-selected Organized/curved movement language is now production routing over a deterministic Grid-aware backbone.
+- Direct remains debug/baseline only.
+- ADR-025 accepted.
+- Claude evidence: **1412/1412 ALL PASS**; ChatGPT independently inspected source/diff/tests but did not independently rerun Godot.
+- M18 Scrubbot Agent may open.
