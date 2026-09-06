@@ -190,6 +190,36 @@ Reachability/access  --- filters blocked/unreachable candidates --->
   route, or own reservations (M14/M15/M16 remain separate). A matching-color
   candidate is not automatically reachable (AL-028).
 
+## ReservationState (M14, `scripts/gameplay/targeting/`)
+
+- `ReservationState` (`scripts/gameplay/targeting/reservation_state.gd`,
+  extends `RefCounted`) — the **separate ephemeral assignment layer** (ADR-022).
+  It owns temporary target-assignment metadata only: which future in-flight
+  dispatch/agent assignment currently owns a given target cell. It is NOT a
+  cell state — `BoardState.CellState` stays exactly ACTIVE/CLEARED (ADR-019);
+  there is no RESERVED cell state (this resolves SB-M02-017).
+- Ownership token is a deterministic integer `owner_id >= 0` standing for one
+  future assignment — not a color/slot/cell id. Invariants: one target has at
+  most one owner; one owner holds at most one target.
+- API: `create()`, `bind(board)`, `rebind(board)`, `reserve(target, owner)`,
+  `is_reserved(target)`, `get_owner(target)`, `get_target_for_owner(owner)`,
+  `release(target, owner)`, `release_for_owner(owner)`, `resolve_arrival(target,
+  owner)`, `reset()`, `get_reserved_indices()`, `get_reservation_count()`,
+  `is_bound()`.
+- `reserve()` is synchronous check-and-set (no await/deferred gap), so competing
+  calls for one target serialize and exactly one wins. It rejects (without
+  mutation) unbound use, invalid index, non-ACTIVE target, invalid owner,
+  already-reserved target, and an owner that already holds a target.
+- `release()`/`resolve_arrival()` are ownership-safe and remove a reservation
+  exactly once. `resolve_arrival()` clears only the reservation — it never
+  mutates the BoardState cell; ACTIVE->CLEARED on cleaning stays a later
+  orchestration responsibility.
+- Integration seam: `ColorCandidateIndex` stays reservation-agnostic. Callers
+  pass `get_reserved_indices()` (detached, ascending `PackedInt32Array`) as the
+  excluded set into `get_candidates()/has_candidates()`. Reserve/lookup/release
+  are O(1) average (dictionary-backed); no full-board scan on a normal query
+  (verified at 59×59 = 3481 cells).
+
 ## Gameplay Session Core (implemented in M11)
 
 - `GameplaySession` (`scripts/gameplay/session/gameplay_session.gd`, extends

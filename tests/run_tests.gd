@@ -24,6 +24,7 @@ const GameplaySession = preload("res://scripts/gameplay/session/gameplay_session
 const SlotState = preload("res://scripts/gameplay/slots/slot_state.gd")
 const SlotSystem = preload("res://scripts/gameplay/slots/slot_system.gd")
 const ColorCandidateIndex = preload("res://scripts/gameplay/targeting/color_candidate_index.gd")
+const ReservationState = preload("res://scripts/gameplay/targeting/reservation_state.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -53,6 +54,9 @@ func _initialize() -> void:
 	_run_slot_system_tests()
 	_run_color_candidate_index_tests()
 	_run_color_candidate_index_benchmark()
+	_run_reservation_state_tests()
+	_run_reservation_state_integration_tests()
+	_run_reservation_state_performance()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -2895,6 +2899,199 @@ func _run_color_candidate_index_benchmark() -> void:
 	print("  (CPU/index timing only — not an FPS/GPU claim; informational, no hardware threshold)")
 	print("  (query sink=%d naive sink=%d — must match, prevents dead-code elimination)" % [sink, naive_sink])
 	_check_eq(sink, naive_sink, "M13 benchmark indexed and naive query results agree (correctness under load)")
+
+func _run_reservation_state_tests() -> void:
+	print("---- M14: ReservationState tests ----")
+	var ACTIVE := BoardState.CellState.ACTIVE
+	var CLEARED := BoardState.CellState.CLEARED
+
+	# --- create/unbound rejection (criteria 2,3) ---
+	var r0 = ReservationState.create()
+	_check_eq(r0.is_bound(), false, "M14-01 fresh ReservationState is unbound")
+	_check_eq(r0.reserve(0, 0), false, "M14-02 reserve while unbound fails")
+	_check_eq(r0.bind(null), false, "M14-02 bind(null) rejected")
+	_check_eq(r0.is_bound(), false, "M14-02 still unbound after bind(null)")
+
+	# Board: 3x2, all color 0, all ACTIVE (indices 0..5).
+	var board = _make_colored_board(3, 2, [0, 0, 0, 0, 0, 0])
+	var r = ReservationState.create()
+	_check(r.bind(board), "M14-03 bind to board succeeds")
+	_check(r.is_bound(), "M14-03 bound after bind")
+
+	# --- valid ACTIVE reserve succeeds ---
+	_check(r.reserve(2, 100), "M14-04 valid ACTIVE reserve succeeds")
+	_check_eq(r.is_reserved(2), true, "M14-04 target 2 now reserved")
+	_check_eq(r.get_owner(2), 100, "M14-04 owner of target 2 is 100")
+	_check_eq(r.get_target_for_owner(100), 2, "M14-04 owner 100 holds target 2")
+	_check_eq(r.get_reservation_count(), 1, "M14-04 reservation count is 1")
+
+	# --- invalid index / CLEARED / invalid owner ---
+	_check_eq(r.reserve(-1, 101), false, "M14-05 invalid index (-1) reserve fails")
+	_check_eq(r.reserve(999, 101), false, "M14-05 out-of-range index reserve fails")
+	board.set_cell_state(4, CLEARED)
+	_check_eq(r.reserve(4, 101), false, "M14-06 CLEARED target reserve fails")
+	board.set_cell_state(4, ACTIVE) # restore
+	_check_eq(r.reserve(3, -1), false, "M14-07 invalid owner (-1) reserve fails")
+	_check_eq(r.get_reservation_count(), 1, "M14-07 no bad reserve mutated state")
+
+	# --- double reservation by different owner fails ---
+	_check_eq(r.reserve(2, 200), false, "M14-08 target 2 double-reserve (other owner) fails")
+	_check_eq(r.get_owner(2), 100, "M14-08 target 2 still owned by 100")
+	# --- same owner duplicate reserve of same target fails ---
+	_check_eq(r.reserve(2, 100), false, "M14-09 same owner duplicate reserve of same target fails")
+	# --- same owner cannot reserve a second target ---
+	_check_eq(r.reserve(3, 100), false, "M14-10 owner 100 cannot hold a second target")
+	_check_eq(r.is_reserved(3), false, "M14-10 target 3 stayed unreserved")
+
+	# --- independent owners reserve different targets ---
+	_check(r.reserve(0, 300), "M14-11 owner 300 reserves target 0")
+	_check(r.reserve(5, 400), "M14-11 owner 400 reserves target 5")
+	_check_eq(r.get_reservation_count(), 3, "M14-11 three independent reservations")
+
+	# --- is_reserved / get_owner / owner->target truth (criteria) ---
+	_check_eq(r.is_reserved(1), false, "M14-12 unreserved target 1 -> false")
+	_check_eq(r.get_owner(1), -1, "M14-12 unreserved target owner -> -1")
+	_check_eq(r.get_target_for_owner(999), -1, "M14-13 unknown owner target -> -1")
+
+	# --- wrong-owner release fails, correct release succeeds ---
+	_check_eq(r.release(0, 999), false, "M14-14 wrong-owner release fails")
+	_check_eq(r.is_reserved(0), true, "M14-14 target 0 unchanged after wrong-owner release")
+	_check(r.release(0, 300), "M14-15 correct owner release succeeds")
+	_check_eq(r.is_reserved(0), false, "M14-15 target 0 released")
+	_check_eq(r.get_target_for_owner(300), -1, "M14-15 owner 300 holds nothing after release")
+
+	# --- released target reservable again ---
+	_check(r.reserve(0, 301), "M14-16 released target 0 reservable again")
+	_check_eq(r.get_owner(0), 301, "M14-16 target 0 now owned by 301")
+
+	# --- simulated dispatch-failure lifecycle ---
+	# reserve -> (dispatch fails) -> release -> reservable again
+	_check(r.reserve(1, 500), "M14-17 reserve target 1 for owner 500")
+	_check(r.release(1, 500), "M14-17 dispatch failed -> release target 1")
+	_check_eq(r.is_reserved(1), false, "M14-17 target 1 free after dispatch-failure release")
+	_check(r.reserve(1, 501), "M14-17 target 1 reservable again after failure")
+	r.release(1, 501) # tidy
+
+	# --- reset clears all, keeps binding ---
+	r.reset()
+	_check_eq(r.get_reservation_count(), 0, "M14-18 reset clears all reservations")
+	_check(r.is_bound(), "M14-18 reset keeps board binding")
+	_check_eq(r.get_reserved_indices().size(), 0, "M14-18 no reserved indices after reset")
+
+	# --- rebind clears old-board reservations ---
+	r.reserve(2, 600)
+	var fresh = _make_colored_board(2, 1, [0, 0])
+	_check(r.rebind(fresh), "M14-19 rebind to fresh board succeeds")
+	_check_eq(r.get_reservation_count(), 0, "M14-19 rebind cleared old-board reservations")
+	_check_eq(r.is_reserved(2), false, "M14-19 stale reservation gone after rebind")
+
+	# --- arrival resolution succeeds once; wrong owner / second fail; no board mutation ---
+	var board2 = _make_colored_board(3, 1, [0, 0, 0])
+	var r2 = ReservationState.create()
+	r2.bind(board2)
+	_check(r2.reserve(1, 700), "M14-20 reserve target 1 for owner 700")
+	_check_eq(r2.resolve_arrival(1, 701), false, "M14-21 wrong-owner arrival resolution fails")
+	_check_eq(r2.is_reserved(1), true, "M14-21 target 1 still reserved after wrong-owner arrival")
+	var state_before: int = board2.get_cell_state(1)
+	_check(r2.resolve_arrival(1, 700), "M14-20 correct arrival resolution succeeds once")
+	_check_eq(board2.get_cell_state(1), state_before, "M14-23 resolve_arrival did NOT mutate BoardState cell")
+	_check_eq(board2.get_cell_state(1), ACTIVE, "M14-23 target 1 cell still ACTIVE after arrival")
+	_check_eq(r2.is_reserved(1), false, "M14-20 reservation removed after arrival")
+	_check_eq(r2.resolve_arrival(1, 700), false, "M14-22 second arrival resolution fails")
+
+	# --- detached reserved-index output cannot mutate internal state ---
+	var r3 = ReservationState.create()
+	r3.bind(_make_colored_board(3, 1, [0, 0, 0]))
+	r3.reserve(2, 800)
+	r3.reserve(0, 801)
+	var snapshot: PackedInt32Array = r3.get_reserved_indices()
+	# --- deterministic ascending order ---
+	_check_eq(snapshot, PackedInt32Array([0, 2]), "M14-25 reserved indices deterministic ascending")
+	snapshot.append(99) # mutate the returned copy
+	snapshot.remove_at(0)
+	_check_eq(r3.get_reserved_indices(), PackedInt32Array([0, 2]), "M14-24 mutating returned indices does not affect internal state")
+	_check_eq(r3.get_reservation_count(), 2, "M14-24 internal reservation count intact")
+
+	# --- no BoardState.CellState.RESERVED exists (criterion 29) ---
+	_check(not ("RESERVED" in BoardState.CellState.keys()), "M14-29 no BoardState.CellState.RESERVED")
+	_check_eq(BoardState.CellState.keys(), ["ACTIVE", "CLEARED"], "M14-29 CellState remains exactly ACTIVE/CLEARED")
+
+	# --- concurrency / simultaneous-assignment: many owners race one target ---
+	var board3 = _make_colored_board(3, 1, [0, 0, 0])
+	var r4 = ReservationState.create()
+	r4.bind(board3)
+	var wins := 0
+	for owner in range(1000, 1050):
+		if r4.reserve(1, owner):
+			wins += 1
+	_check_eq(wins, 1, "M14-28 exactly one owner wins a contested target")
+	_check_eq(r4.get_reservation_count(), 1, "M14-28 exactly one reservation exists after the race")
+
+	print("  M14 ReservationState tests complete")
+
+func _run_reservation_state_integration_tests() -> void:
+	print("---- M14: ReservationState <-> ColorCandidateIndex integration ----")
+	# Board 3x2, all color 7, all ACTIVE. Candidates for color 7 = [0..5].
+	var board = _make_colored_board(3, 2, [7, 7, 7, 7, 7, 7])
+	var idx = ColorCandidateIndex.create()
+	idx.bind(board)
+	var res = ReservationState.create()
+	res.bind(board)
+
+	_check_eq(idx.get_candidates(7), [0, 1, 2, 3, 4, 5], "M14-int candidate baseline is full board")
+
+	# Reserve two targets; candidate index must exclude them ONLY via caller exclusion.
+	res.reserve(2, 900)
+	res.reserve(4, 901)
+	var reserved: PackedInt32Array = res.get_reserved_indices()
+	_check_eq(reserved, PackedInt32Array([2, 4]), "M14-26 reserved indices [2,4] ascending")
+	_check_eq(idx.get_candidates(7, reserved), [0, 1, 3, 5], "M14-26 reserved cells excluded via caller exclusion")
+	_check_eq(idx.has_candidates(7, reserved), true, "M14-26 has_candidates true with some free cells")
+
+	# M13 stays reservation-agnostic: WITHOUT passing exclusions the reserved
+	# cells are still returned (index owns no reservation state).
+	_check_eq(idx.get_candidates(7), [0, 1, 2, 3, 4, 5], "M14-28b ColorCandidateIndex owns no reservation state")
+
+	# Release makes the ACTIVE candidate visible again.
+	res.release(2, 900)
+	_check_eq(idx.get_candidates(7, res.get_reserved_indices()), [0, 1, 2, 3, 5], "M14-27 released cell 2 visible again")
+
+	print("  M14 integration tests complete")
+
+func _run_reservation_state_performance() -> void:
+	# 59x59 = 3481 cells, all ACTIVE. Reserve/query/release must not full-scan.
+	var cells := PackedInt32Array()
+	cells.resize(3481)
+	for i in 3481:
+		cells[i] = 0
+	var board = _make_colored_board(59, 59, Array(cells))
+	var res = ReservationState.create()
+	res.bind(board)
+
+	var reserve_count := 500
+	var t0 := Time.get_ticks_usec()
+	for i in reserve_count:
+		res.reserve(i, i) # target index i, owner id i
+	var t1 := Time.get_ticks_usec()
+	_check_eq(res.get_reservation_count(), reserve_count, "M14-31 all 500 reservations stored on 3481-cell board")
+
+	var query_iters := 5000
+	var hits := 0
+	for i in query_iters:
+		if res.is_reserved(i % 3481):
+			hits += 1
+	var t2 := Time.get_ticks_usec()
+
+	for i in reserve_count:
+		res.release(i, i)
+	var t3 := Time.get_ticks_usec()
+	_check_eq(res.get_reservation_count(), 0, "M14-31 all reservations released on 3481-cell board")
+
+	print("---- M14 ReservationState performance (59x59 = 3481 cells) ----")
+	print("  reserve x%d: %.3f ms total, %.5f ms/reserve" % [reserve_count, (t1 - t0) / 1000.0, (t1 - t0) / 1000.0 / reserve_count])
+	print("  is_reserved x%d: %.3f ms total, %.6f ms/query" % [query_iters, (t2 - t1) / 1000.0, (t2 - t1) / 1000.0 / query_iters])
+	print("  release x%d: %.3f ms total, %.5f ms/release" % [reserve_count, (t3 - t2) / 1000.0, (t3 - t2) / 1000.0 / reserve_count])
+	print("  (O(1) dict ops; no per-call full-board scan — CPU timing only, no FPS/GPU claim)")
 
 func _print_summary() -> void:
 	print("")
