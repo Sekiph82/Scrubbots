@@ -14,15 +14,15 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Active cycle | META-C005 |
-| Active version | V01 |
+| Active cycle | M10-C001 |
+| Active version | V05 |
 | State | AWAITING_AUDIT |
 | Next actor | CHATGPT |
 | Branch | main |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_PROMPT_V01.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CLAUDE_LOG_V01.md |
-| Purpose | META-C005 (docs/data governance only): propagate the already owner-locked SCRUBBOTS visual contract into Level Factory governance — `level_factory/CLAUDE.md`, `README.md`, `docs/00`/`01`/`02` now carry an authoritative Canonical Visual Contract (C01..C15 only; difficulty distinct-used-color bands EASY 3–5 / MEDIUM 6–7 / HARD 8–9 / VERY_HARD 10–12; BG01 #202533 non-logical background; ACTIVE opaque / CLEARED alpha-0; flat solid square cells with visible separation, no gloss/bevel/shadow/3D-bead/interpolation). New machine-readable descriptor `level_factory/data/canonical_visual_contract_v1.json` references the root palette (single authority) and stores only locked non-palette metadata. No generator code; root palette/docs-08 unchanged. |
-| Result | Docs/data governance only — no `level_factory/scripts/` code added, no locked palette/BG01/board-size/difficulty rule changed, no SB checkbox change. Canonical progress unchanged **207/943 = 21.95%** (main+UI 207/719, LF 0/112, CP 0/112). M10-C001 V02 remains AUDITED_PASS; SB-M10-005..011 owner manual-QA gates and M14/M15/M16/M17 remain OPEN. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V05.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V05.md |
+| Purpose | M10-C001 V05 is the active implementation prompt. It supersedes unimplemented V03/V04 and combines two owner corrections: (A) Real Artwork source matrices stay immutable and are centered with VOID padding inside any selected valid debug canvas, so e.g. Level 007 must render fully at both 30x30 and 59x59; (B) normalize governance so Claude stops after implementation/tests/CLAUDE_LOG/push/AWAITING_AUDIT while ChatGPT alone owns SESSION_INDEX + H!veAI tracker/dashboard updates after audit. META-C005 V01 is independently AUDITED_PASS. |
+| Result | Awaiting Claude implementation of V05. Canonical progress remains 207/943 = 21.95%; SB-M10-005..011 remain owner manual-QA gates; M14 remains NOT_STARTED. |
 
 ### M10-C001 ChatGPT issuance
 
@@ -32,6 +32,16 @@ This file is the single H!veAI-facing materialized project status surface. It is
 - Scope is debug/manual-QA tooling only. SB-M10-005..011 remain owner review gates and M14 remains NOT_STARTED.
 - V02 implemented by Claude (JSON-backed fixtures, grid overlay, +108 tests, 882/882 ALL PASS); state AWAITING_AUDIT.
 - Next actor: CHATGPT (independent audit M10-C001 V02).
+
+### M10-C001 V05 ChatGPT issuance
+
+- V05 supersedes unimplemented V03/V04.
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V05.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V05.md
+- Scope A: variable valid debug canvas with centered VOID padding; no source resampling/cropping.
+- Scope B: governance normalization so ChatGPT owns tracker/dashboard/SESSION_INDEX updates after audit.
+- Progress unchanged.
+- Next actor: CLAUDE.
 
 ### META-C005 ChatGPT final audit V01
 
@@ -147,7 +157,7 @@ Tracking sources:
 | Criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_CRITERIA_V01.md |
 | Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md |
 | Gate | META-C002 V05 AUDITED_PASS |
-| Purpose | Controlled merge commit + canonical main reconciliation. 657/657 ALL PASS. No M13. |
+| Purpose | M10-C001 V05 is the active implementation prompt. It supersedes unimplemented V03/V04 and combines two owner corrections: (A) Real Artwork source matrices stay immutable and are centered with VOID padding inside any selected valid debug canvas, so e.g. Level 007 must render fully at both 30x30 and 59x59; (B) normalize governance so Claude stops after implementation/tests/CLAUDE_LOG/push/AWAITING_AUDIT while ChatGPT alone owns SESSION_INDEX + H!veAI tracker/dashboard updates after audit. META-C005 V01 is independently AUDITED_PASS. |
 
 ## META-C002 final independent audit V05
 
@@ -183,7 +193,7 @@ Tracking sources:
 | Audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V02.md |
 | Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V02.md |
 | Scope | Eligible DIRTY target index/cache only; no TargetSelector or M14 reservation ownership |
-| Result | V02: F-M13-001 fixed (all-traversal-API zero-delta proof) + 006..010 formally validated. SB-M13-001..010 closed. 773/773 ALL PASS. 206/943 = 21.85%. |
+| Result | Awaiting Claude implementation of V05. Canonical progress remains 207/943 = 21.95%; SB-M10-005..011 remain owner manual-QA gates; M14 remains NOT_STARTED. |
 
 ## M13-C001 independent audit V01
 
@@ -232,7 +242,7 @@ Tracking sources:
 | Baseline | M13-C001 AUDITED_PASS, 206/943 |
 | Owner rule | ACTIVE source-color pixels -> CLEARED transparent holes; background visible |
 | Reachability | matching color is not sufficient; blocked ACTIVE cells are not targetable |
-| Result | Migrated code/docs/tasks/LF; removed `dirty_clean_presets.gd`; renamed M13 index to `ColorCandidateIndex` (`scripts/gameplay/targeting/`). 774/774 ALL PASS. SB-M10-001 closed → 207/943. M10-005..011, M02-017, M14/M15/M16/M17 remain open. |
+| Result | Awaiting Claude implementation of V05. Canonical progress remains 207/943 = 21.95%; SB-M10-005..011 remain owner manual-QA gates; M14 remains NOT_STARTED. |
 | Gate | M14 remains NOT_STARTED until META-C004 audit and new manual QA |
 
 ## META-C004 independent audit V01
@@ -368,7 +378,7 @@ Tracking sources:
 
 ## Coordination source map
 
-| Purpose | Canonical GitHub source |
+| Purpose | M10-C001 V05 is the active implementation prompt. It supersedes unimplemented V03/V04 and combines two owner corrections: (A) Real Artwork source matrices stay immutable and are centered with VOID padding inside any selected valid debug canvas, so e.g. Level 007 must render fully at both 30x30 and 59x59; (B) normalize governance so Claude stops after implementation/tests/CLAUDE_LOG/push/AWAITING_AUDIT while ChatGPT alone owns SESSION_INDEX + H!veAI tracker/dashboard updates after audit. META-C005 V01 is independently AUDITED_PASS. |
 | --- | --- |
 | Task ledger | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | Agent governance | https://github.com/Sekiph82/Scrubbots/blob/main/CLAUDE.md |
