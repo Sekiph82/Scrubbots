@@ -25,6 +25,9 @@ const SlotState = preload("res://scripts/gameplay/slots/slot_state.gd")
 const SlotSystem = preload("res://scripts/gameplay/slots/slot_system.gd")
 const ColorCandidateIndex = preload("res://scripts/gameplay/targeting/color_candidate_index.gd")
 const ReservationState = preload("res://scripts/gameplay/targeting/reservation_state.gd")
+const TargetSelector = preload("res://scripts/gameplay/targeting/target_selector.gd")
+const AccessQueryDouble = preload("res://tests/support/access_query_double.gd")
+const CandidateIndexDouble = preload("res://tests/support/candidate_index_double.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -57,6 +60,9 @@ func _initialize() -> void:
 	_run_reservation_state_tests()
 	_run_reservation_state_integration_tests()
 	_run_reservation_state_performance()
+	_run_target_selector_tests()
+	_run_target_selector_simultaneous_tests()
+	_run_target_selector_benchmark()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -3092,6 +3098,291 @@ func _run_reservation_state_performance() -> void:
 	print("  is_reserved x%d: %.3f ms total, %.6f ms/query" % [query_iters, (t2 - t1) / 1000.0, (t2 - t1) / 1000.0 / query_iters])
 	print("  release x%d: %.3f ms total, %.5f ms/release" % [reserve_count, (t3 - t2) / 1000.0, (t3 - t2) / 1000.0 / reserve_count])
 	print("  (O(1) dict ops; no per-call full-board scan — CPU timing only, no FPS/GPU claim)")
+
+func _run_target_selector_tests() -> void:
+	print("---- M15: TargetSelector tests ----")
+	var ACTIVE := BoardState.CellState.ACTIVE
+	var CLEARED := BoardState.CellState.CLEARED
+	var COLOR := 5
+
+	# --- create/bind (test 1; crit 6,7) ---
+	var ts0 = TargetSelector.create()
+	_check_eq(ts0.is_bound(), false, "M15-01 fresh TargetSelector is unbound")
+	var b0 = _make_colored_board(3, 3, [COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR])
+	var ci0 = ColorCandidateIndex.create(); ci0.bind(b0)
+	var rs0 = ReservationState.create(); rs0.bind(b0)
+	# --- bind rejects null deps (test 2) ---
+	_check_eq(ts0.bind(null, ci0, rs0), false, "M15-02 bind(null board) rejected")
+	_check_eq(ts0.bind(b0, null, rs0), false, "M15-02 bind(null candidate index) rejected")
+	_check_eq(ts0.bind(b0, ci0, null), false, "M15-02 bind(null reservation state) rejected")
+	_check_eq(ts0.is_bound(), false, "M15-02 still unbound after failed binds")
+	# --- unbound select returns -1 (test 3) ---
+	var aq0 = AccessQueryDouble.new(); aq0.default_targetable = true
+	_check_eq(ts0.select_and_reserve(COLOR, 100, aq0), -1, "M15-03 unbound select returns -1")
+
+	# Bound selector on a full 3x3 color-5 board, all targetable.
+	var ts = TargetSelector.create()
+	_check(ts.bind(b0, ci0, rs0), "M15-01 bind with all deps succeeds")
+	_check(ts.is_bound(), "M15-01 bound after bind")
+	var aq = AccessQueryDouble.new(); aq.default_targetable = true
+
+	# --- fail closed on missing access query (test 16; crit 12) ---
+	_check_eq(ts.select_and_reserve(COLOR, 100, null), -1, "M15-16 null access_query fails closed")
+	_check_eq(ts.select_and_reserve(COLOR, 100, RefCounted.new()), -1, "M15-16 access_query without is_targetable() fails closed")
+	_check_eq(rs0.get_reservation_count(), 0, "M15-16 fail-closed created no reservation")
+
+	# --- invalid owner / color (tests 4,5) ---
+	_check_eq(ts.select_and_reserve(COLOR, -1, aq), -1, "M15-05 invalid owner (-1) returns -1")
+	_check_eq(ts.select_and_reserve(-1, 100, aq), -1, "M15-04 invalid color (-1) returns -1")
+	_check_eq(rs0.get_reservation_count(), 0, "M15-21 invalid call created no reservation")
+
+	# --- deterministic first ascending target + reservation created (tests 6,12; crit 15,26) ---
+	var board_before := _snapshot_cell_states(b0)
+	var sel = ts.select_and_reserve(COLOR, 100, aq)
+	_check_eq(sel, 0, "M15-06 deterministic first ascending candidate (index 0) selected")
+	_check_eq(rs0.is_reserved(0), true, "M15-12 reservation actually created for selected target")
+	_check_eq(rs0.get_owner(0), 100, "M15-12 selected target owned by requesting owner")
+	# --- selector did not mutate BoardState (test 22; crit 33) ---
+	_check(_cell_states_equal(b0, board_before), "M15-22 selection did not mutate BoardState cells")
+
+	# --- repeated identical state -> identical index (test 25) ---
+	var b_det = _make_colored_board(3, 1, [COLOR, COLOR, COLOR])
+	var ci_det = ColorCandidateIndex.create(); ci_det.bind(b_det)
+	var rs_det = ReservationState.create(); rs_det.bind(b_det)
+	var ts_det = TargetSelector.create(); ts_det.bind(b_det, ci_det, rs_det)
+	var aq_det = AccessQueryDouble.new(); aq_det.default_targetable = true
+	var first = ts_det.select_and_reserve(COLOR, 1, aq_det)
+	rs_det.release_for_owner(1)
+	var again = ts_det.select_and_reserve(COLOR, 1, aq_det)
+	_check_eq(first, again, "M15-25 identical state produces identical selected index")
+	_check_eq(first, 0, "M15-25 identical selection is deterministic first candidate")
+
+	# --- owner already holding a target returns -1 (test 13; crit 27) ---
+	_check_eq(ts.select_and_reserve(COLOR, 100, aq), -1, "M15-13 owner already holding target gets -1")
+
+	# --- reserved candidate skipped (test 11; crit 19) ---
+	var sel2 = ts.select_and_reserve(COLOR, 101, aq)
+	_check_eq(sel2, 1, "M15-11 reserved target 0 skipped; next owner gets target 1")
+
+	# --- after releasing selected reservation, same deterministic target for new owner (test 26) ---
+	rs0.release_for_owner(100) # frees target 0
+	var sel3 = ts.select_and_reserve(COLOR, 102, aq)
+	_check_eq(sel3, 0, "M15-26 released target 0 re-selected deterministically for new owner")
+
+	# --- access-query false candidate skipped; first blocked + later reachable selects later (tests 17,18; crit 20,22) ---
+	var b_blk = _make_colored_board(4, 1, [COLOR, COLOR, COLOR, COLOR])
+	var ci_blk = ColorCandidateIndex.create(); ci_blk.bind(b_blk)
+	var rs_blk = ReservationState.create(); rs_blk.bind(b_blk)
+	var ts_blk = TargetSelector.create(); ts_blk.bind(b_blk, ci_blk, rs_blk)
+	var aq_blk = AccessQueryDouble.new()
+	aq_blk.default_targetable = false
+	aq_blk.set_targetable(0, false) # blocked
+	aq_blk.set_targetable(1, false) # blocked
+	aq_blk.set_targetable(2, true)  # reachable
+	aq_blk.set_targetable(3, true)
+	var sel_blk = ts_blk.select_and_reserve(COLOR, 200, aq_blk)
+	_check_eq(sel_blk, 2, "M15-18 first blocked candidates skipped; first reachable (2) selected")
+	# AL-018 direct observability: selector actually consulted access truth in order.
+	_check_eq(aq_blk.was_queried(0), true, "M15-18 access query consulted for blocked index 0 (AL-018)")
+	_check_eq(aq_blk.was_queried(1), true, "M15-18 access query consulted for blocked index 1 (AL-018)")
+	_check_eq(aq_blk.was_queried(2), true, "M15-18 access query consulted for selected index 2 (AL-018)")
+	_check_eq(aq_blk.was_queried(3), false, "M15-32 access query NOT called past the selected candidate (bounded iteration)")
+
+	# --- all blocked returns -1 + fully-enclosed AL-028 regression (tests 19,20; crit 21,23) ---
+	var b_enc = _make_colored_board(3, 3, [COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR])
+	var ci_enc = ColorCandidateIndex.create(); ci_enc.bind(b_enc)
+	var rs_enc = ReservationState.create(); rs_enc.bind(b_enc)
+	var ts_enc = TargetSelector.create(); ts_enc.bind(b_enc, ci_enc, rs_enc)
+	# Access truth reports EVERY matching-color ACTIVE cell blocked/unreachable —
+	# the M15 stand-in for a fully enclosed candidate with no legal access (AL-028).
+	var aq_enc = AccessQueryDouble.new(); aq_enc.default_targetable = false
+	_check_eq(ts_enc.select_and_reserve(COLOR, 300, aq_enc), -1, "M15-20 fully-enclosed/all-blocked matching color yields no target (AL-028)")
+	_check_eq(rs_enc.get_reservation_count(), 0, "M15-19 all-blocked selection created no reservation")
+	_check(aq_enc.total_queries() >= 1, "M15-20 access truth was actually consulted before giving up (AL-018)")
+
+	# --- no candidates returns -1 (test 15; crit 24) ---
+	var b_nc = _make_colored_board(2, 1, [COLOR, COLOR])
+	var ci_nc = ColorCandidateIndex.create(); ci_nc.bind(b_nc)
+	var rs_nc = ReservationState.create(); rs_nc.bind(b_nc)
+	var ts_nc = TargetSelector.create(); ts_nc.bind(b_nc, ci_nc, rs_nc)
+	var aq_nc = AccessQueryDouble.new(); aq_nc.default_targetable = true
+	_check_eq(ts_nc.select_and_reserve(999, 400, aq_nc), -1, "M15-15 color with no candidates returns -1")
+
+	# --- all candidates reserved returns -1 (test 14) ---
+	var b_all = _make_colored_board(2, 1, [COLOR, COLOR])
+	var ci_all = ColorCandidateIndex.create(); ci_all.bind(b_all)
+	var rs_all = ReservationState.create(); rs_all.bind(b_all)
+	rs_all.reserve(0, 900); rs_all.reserve(1, 901) # every candidate reserved
+	var ts_all = TargetSelector.create(); ts_all.bind(b_all, ci_all, rs_all)
+	var aq_all = AccessQueryDouble.new(); aq_all.default_targetable = true
+	_check_eq(ts_all.select_and_reserve(COLOR, 902, aq_all), -1, "M15-14 all candidates reserved returns -1")
+
+	# --- stale-candidate defence: wrong-color / CLEARED / invalid never selected (tests 8,9,10; crit 17,18) ---
+	# Use a candidate-index DOUBLE to inject raw candidates the real index would
+	# never emit, proving TargetSelector's narrow BoardState final-validation.
+	var b_stale = _make_colored_board(3, 1, [COLOR, 7, COLOR]) # idx1 is color 7
+	b_stale.set_cell_state(2, CLEARED)                          # idx2 CLEARED
+	var rs_stale = ReservationState.create(); rs_stale.bind(b_stale)
+	var cd = CandidateIndexDouble.new()
+	# Inject: wrong-color idx1, CLEARED idx2, invalid idx99, then the only valid idx0.
+	cd.set_candidates(COLOR, [1, 2, 99, 0])
+	var ts_stale = TargetSelector.create(); ts_stale.bind(b_stale, cd, rs_stale)
+	var aq_stale = AccessQueryDouble.new(); aq_stale.default_targetable = true
+	var sel_stale = ts_stale.select_and_reserve(COLOR, 500, aq_stale)
+	_check_eq(sel_stale, 0, "M15-08/09/10 stale wrong-color/CLEARED/invalid skipped; valid idx0 selected")
+	_check_eq(aq_stale.was_queried(1), false, "M15-08 wrong-color candidate rejected before access query")
+	_check_eq(aq_stale.was_queried(2), false, "M15-09 CLEARED candidate rejected before access query")
+	_check_eq(aq_stale.was_queried(99), false, "M15-10 invalid candidate rejected before access query")
+
+	# --- selector does not mutate ColorCandidateIndex internal truth (test 23; crit 34) ---
+	var b_nm = _make_colored_board(3, 1, [COLOR, COLOR, COLOR])
+	var ci_nm = ColorCandidateIndex.create(); ci_nm.bind(b_nm)
+	var rs_nm = ReservationState.create(); rs_nm.bind(b_nm)
+	var ts_nm = TargetSelector.create(); ts_nm.bind(b_nm, ci_nm, rs_nm)
+	var cand_before: Array = ci_nm.get_candidates(COLOR)
+	var aq_nm = AccessQueryDouble.new(); aq_nm.default_targetable = true
+	ts_nm.select_and_reserve(COLOR, 600, aq_nm)
+	_check_eq(ci_nm.get_candidates(COLOR), cand_before, "M15-23 selection did not mutate ColorCandidateIndex candidate truth")
+
+	# --- rectangular board (w != h), row-major ascending selection (test 30; crit 38) ---
+	# 5x2: index = y*5 + x. Only some cells are color 5 so ordering across rows matters.
+	var b_rect = _make_colored_board(5, 2, [0, COLOR, 0, 0, 0,   0, 0, COLOR, 0, COLOR])
+	var ci_rect = ColorCandidateIndex.create(); ci_rect.bind(b_rect)
+	var rs_rect = ReservationState.create(); rs_rect.bind(b_rect)
+	var ts_rect = TargetSelector.create(); ts_rect.bind(b_rect, ci_rect, rs_rect)
+	var aq_rect = AccessQueryDouble.new(); aq_rect.default_targetable = true
+	# color-5 cells at row-major indices 1, 7, 9 -> ascending selection order.
+	_check_eq(ts_rect.select_and_reserve(COLOR, 700, aq_rect), 1, "M15-30 rectangular board: first color-5 candidate (index 1) selected")
+	_check_eq(ts_rect.select_and_reserve(COLOR, 701, aq_rect), 7, "M15-30 rectangular board: second candidate (index 7, next row) selected")
+	_check_eq(ts_rect.select_and_reserve(COLOR, 702, aq_rect), 9, "M15-30 rectangular board: third candidate (index 9) selected")
+
+	# --- selector implements no route-generation API (test 24; crit 13,14) ---
+	var route_methods := ["generate_route", "route", "find_path", "compute_path", "astar", "get_route", "build_route", "path_to"]
+	var no_routing := true
+	for m in route_methods:
+		if ts.has_method(m):
+			no_routing = false
+	_check(no_routing, "M15-24 TargetSelector exposes no route-generation/pathfinding API")
+
+	print("  M15 TargetSelector tests complete")
+
+func _run_target_selector_simultaneous_tests() -> void:
+	print("---- M15: TargetSelector simultaneous-assignment tests ----")
+	var COLOR := 5
+
+	# --- competing owners for ONE reachable target: exactly one wins (test 27; crit 29) ---
+	var b1 = _make_colored_board(1, 1, [COLOR])
+	var ci1 = ColorCandidateIndex.create(); ci1.bind(b1)
+	var rs1 = ReservationState.create(); rs1.bind(b1)
+	var ts1 = TargetSelector.create(); ts1.bind(b1, ci1, rs1)
+	var aq1 = AccessQueryDouble.new(); aq1.default_targetable = true
+	var wins := 0
+	for owner in range(1, 20):
+		if ts1.select_and_reserve(COLOR, owner, aq1) != -1:
+			wins += 1
+	_check_eq(wins, 1, "M15-27 exactly one owner wins a single contested target")
+	_check_eq(rs1.get_reservation_count(), 1, "M15-27 exactly one reservation exists after the contest")
+
+	# --- multiple candidates: assignments unique and deterministic by call order (test 28; crit 30) ---
+	var b2 = _make_colored_board(3, 1, [COLOR, COLOR, COLOR])
+	var ci2 = ColorCandidateIndex.create(); ci2.bind(b2)
+	var rs2 = ReservationState.create(); rs2.bind(b2)
+	var ts2 = TargetSelector.create(); ts2.bind(b2, ci2, rs2)
+	var aq2 = AccessQueryDouble.new(); aq2.default_targetable = true
+	var a = ts2.select_and_reserve(COLOR, 10, aq2)
+	var b = ts2.select_and_reserve(COLOR, 11, aq2)
+	var c = ts2.select_and_reserve(COLOR, 12, aq2)
+	_check_eq(a, 0, "M15-28 first caller gets ascending target 0")
+	_check_eq(b, 1, "M15-28 second caller gets target 1")
+	_check_eq(c, 2, "M15-28 third caller gets target 2")
+	var uniq := {}
+	uniq[a] = true; uniq[b] = true; uniq[c] = true
+	_check_eq(uniq.size(), 3, "M15-28 concurrent assignments are unique")
+	_check_eq(ts2.select_and_reserve(COLOR, 13, aq2), -1, "M15-28 fourth caller (no free target) gets -1")
+
+	# --- first reserve loses to a competing synchronous assignment; owner continues (test 29; crit 31) ---
+	var b3 = _make_colored_board(3, 1, [COLOR, COLOR, COLOR])
+	var ci3 = ColorCandidateIndex.create(); ci3.bind(b3)
+	var rs3 = ReservationState.create(); rs3.bind(b3)
+	var ts3 = TargetSelector.create(); ts3.bind(b3, ci3, rs3)
+	var aq3 = AccessQueryDouble.new(); aq3.default_targetable = true
+	# Simulate a competing owner grabbing target 0 in the window between the
+	# selector's targetable-check and its reserve() attempt: reserve 0 for owner
+	# 999 as a side effect of the FIRST access query.
+	var grabbed := [false]
+	aq3.on_query = func(index):
+		if not grabbed[0]:
+			rs3.reserve(0, 999)
+			grabbed[0] = true
+	var sel3 = ts3.select_and_reserve(COLOR, 10, aq3)
+	_check_eq(sel3, 1, "M15-29 lost target 0 to a competing assignment; continued to next valid candidate 1")
+	_check_eq(rs3.get_owner(0), 999, "M15-29 competing owner holds the contested target 0")
+	_check_eq(rs3.get_owner(1), 10, "M15-29 unassigned owner ended up owning the next candidate 1")
+
+	print("  M15 TargetSelector simultaneous-assignment tests complete")
+
+func _run_target_selector_benchmark() -> void:
+	# 59x59 = 3481 cells, all color 0, all ACTIVE (test 30 rectangular below; test 31).
+	var cells := PackedInt32Array(); cells.resize(3481)
+	for i in 3481:
+		cells[i] = 0
+	var board = _make_colored_board(59, 59, Array(cells))
+	var ci = ColorCandidateIndex.create(); ci.bind(board)
+	var rs = ReservationState.create(); rs.bind(board)
+	var ts = TargetSelector.create(); ts.bind(board, ci, rs)
+
+	var candidate_count: int = ci.count_candidates(0)
+	_check_eq(candidate_count, 3481, "M15-31 candidate count for tested color on 59x59 board")
+
+	# --- bounded-iteration proof: block a prefix, confirm access queries == prefix+1, NOT full board ---
+	var blocked_prefix := 100
+	var aq_iter = AccessQueryDouble.new(); aq_iter.default_targetable = true
+	for i in blocked_prefix:
+		aq_iter.set_targetable(i, false)
+	var sel_iter = ts.select_and_reserve(0, 1, aq_iter)
+	_check_eq(sel_iter, blocked_prefix, "M15-32 selection skipped %d blocked candidates, chose first reachable" % blocked_prefix)
+	_check_eq(aq_iter.total_queries(), blocked_prefix + 1, "M15-40 access queries == blocked prefix + 1 (no full 3481-cell scan)")
+	_check(aq_iter.total_queries() < 3481, "M15-40 steady-state selection iterates candidates, not whole board")
+	rs.release_for_owner(1)
+
+	# --- repeated first-candidate sample: CPU timing (no FPS/GPU claim) ---
+	var aq_fast = AccessQueryDouble.new(); aq_fast.default_targetable = true
+	var sample := 500
+	var total_queries := 0
+	var t0 := Time.get_ticks_usec()
+	for i in sample:
+		var owner: int = 10000 + i
+		ts.select_and_reserve(0, owner, aq_fast)
+		rs.release_for_owner(owner)
+	var t1 := Time.get_ticks_usec()
+	# Each first-candidate select on an all-targetable board issues exactly one
+	# access query (returns the lowest free target immediately) -> no full scan.
+	total_queries = aq_fast.total_queries()
+	_check_eq(total_queries, sample, "M15-32 first-candidate selection issues exactly one access query per call")
+
+	print("---- M15 TargetSelector performance (59x59 = 3481 cells) ----")
+	print("  candidate count for tested color: %d" % candidate_count)
+	print("  bounded-iteration select (100 blocked prefix): %d access-query calls (chose index %d)" % [blocked_prefix + 1, sel_iter])
+	print("  select_and_reserve x%d (first-candidate): %.3f ms total, %.5f ms/select" % [sample, (t1 - t0) / 1000.0, (t1 - t0) / 1000.0 / sample])
+	print("  access-query calls over sample: %d (== %d selects, one per call — no per-call full-board scan)" % [total_queries, sample])
+	print("  (CPU/selection timing only — not an FPS/GPU claim; iterates color candidates, never all 3481 cells)")
+
+func _snapshot_cell_states(board) -> PackedByteArray:
+	var out := PackedByteArray()
+	var n: int = board.get_cell_count()
+	out.resize(n)
+	for i in n:
+		out[i] = board.get_cell_state(i)
+	return out
+
+func _cell_states_equal(board, snapshot: PackedByteArray) -> bool:
+	var n: int = board.get_cell_count()
+	if snapshot.size() != n:
+		return false
+	for i in n:
+		if board.get_cell_state(i) != snapshot[i]:
+			return false
+	return true
 
 func _print_summary() -> void:
 	print("")
