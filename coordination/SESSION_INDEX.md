@@ -613,3 +613,15 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 
 - Progress after M15: **236/943 = 25.03%** overall; **236/719 = 32.82%** main + SB-UI; LF 0/112; CP 0/112.
+
+
+## M16-C001 V01 issuance — RoutingSystem Interface
+
+- Milestone: **M16 RoutingSystem Interface OPENED**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_PROMPT_V01.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_CRITERIA_V01.md
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CLAUDE_LOG_V01.md
+- Architecture: board-local cell-coordinate route contract, caller-supplied slot origin, assigned ACTIVE target center, explicit RouteResult success/failure, injected segment-access validation, never silent retarget.
+- Scope: SB-M16-001..011 only. M17 routing algorithm research remains unopened.
+- State: ISSUED; next actor CLAUDE.
+- Owner workflow note: start a fresh Claude chat for M16.
