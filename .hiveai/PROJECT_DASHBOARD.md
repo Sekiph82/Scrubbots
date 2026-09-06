@@ -1,3 +1,15 @@
+### M10-C001 V08 final audit and owner QA closure
+
+- Decision: **AUDITED_PASS / COMPLETE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_V08.md
+- Owner manual QA passed for SB-M10-005..011 using the real debug fixtures and multiple canvas/state combinations, including 59×59.
+- Canonical gameplay QA region from the owner phone-screen reference is accepted.
+- **M10 owner manual-QA gates are closed.**
+- Progress: **214/943 = 22.69%**.
+- Main game + SB-UI: **214/719 = 29.76%**.
+- M14 remains NOT_STARTED.
+- Next milestone transition must be explicitly opened.
+
 ### M10-C001 V08 gameplay QA region
 
 - State: **ISSUED**
