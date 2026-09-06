@@ -734,3 +734,62 @@ ReservationState and cannot retarget.
   53×59; segment queries are directly observed in tests (AL-018).
 
 **Status**: Accepted (M16).
+
+### ADR-025: Production routing — owner-selected Organized/curved on a grid-aware backbone
+
+**Context**: M17 built three EXPERIMENTAL routing prototypes (Direct, Grid-aware,
+Organized/curved) behind the M16 `RoutingSystem` contract (ADR-024) and a
+Routing Prototype Lab for neutral comparison (M17-C001). The final movement
+language was an explicit **owner design gate**; Claude was forbidden from
+selecting a winner. The owner reviewed the lab and resolved the gate
+(`coordination/sessions/M17-C001/OWNER_MOVEMENT_DECISION_V01.md`,
+2026-09-07): **OWNER_SELECTS_ORGANIZED**.
+
+**Decision** (M17-C002): promote the owner-selected direction from experimental
+prototype scope into PRODUCTION routing code under
+`scripts/gameplay/routing/` (outside `prototypes/`):
+
+- **`ProductionRoutingSystem`** (`production_routing_system.gd`, subclasses
+  `RoutingSystem`): a deterministic **grid-aware planner** (4-neighbour
+  board-local cell-centre lattice, fixed neighbour order up/right/down/left,
+  deterministic nearest-first capped exterior perimeter bridge for outside-board
+  slot origins) establishes valid reachability and an orthogonal path; a
+  validity-preserving **organized/curved post-process** (collinear reduction →
+  bounded shortcut → controlled quadratic-bezier corner rounding) is the movement
+  language. Every emitted segment is re-checked through injected access truth and
+  the shared `RouteValidator`; any invalid shortcut/curve falls back to the last
+  valid section. It never selects/retargets and never mutates
+  BoardState/ReservationState.
+- **`ProductionAccessQuery`** (`production_access_query.gd`): the canonical
+  production access truth (non-target ACTIVE blocks; CLEARED/outside-board open;
+  assigned ACTIVE target enterable only as the final endpoint).
+- **Direct** straight routing is **rejected for production** and retained only as
+  a debug/baseline comparison tool in `prototypes/`.
+- **Conservative production defaults** (owner tuning preference — reduce
+  aggressive diagonal shortcuts, keep curves controlled/readable): bounded
+  `max_shortcut_span = 2` (vs the experimental prototype's unbounded greedy
+  shortcut) and `corner_radius = 0.25` (vs 0.35). Verified more conservative than
+  the experimental Organized default on 59×59 (more points kept, ≥ distance,
+  strictly smaller max segment — no board-spanning diagonals). Route validity is
+  never sacrificed for aesthetics.
+
+**Reason**: this is the direction the owner selected after visual review; it
+keeps grid-aware full reachability while giving the organized/curved movement
+language that is SCRUBBOTS' core visual identity, with conservative defaults so
+dense scenes stay readable. Production is independent of experimental scope so
+the M17 lab/prototypes/comparison remain intact as diagnostic evidence.
+
+**Consequences**:
+
+- M16 (ADR-024) contract, `RouteRequest`/`RouteResult`/`RouteValidator` are
+  unchanged; production is a swappable subclass.
+- The M17 experimental prototypes, lab scene, metrics, scenarios and
+  `ROUTING_COMPARISON_V01.md` are retained (not production, not deleted).
+- Collision radius, multi-bot congestion optimisation, ScrubbotAgent, Dispatcher,
+  spawning, movement playback and arrival remain out of scope (M18+). No crossing/
+  congestion optimisation beyond conservative route-shape defaults before
+  profiling.
+- Verified deterministic and RouteValidator-clean up to 59×59 (max) and
+  rectangular Very Hard 53×59.
+
+**Status**: Accepted (M17-C002).

@@ -121,9 +121,16 @@ B G R Y P
 G R Y B P
 ```
 
-The exact neighborhood topology, collision radius, route shape and movement
-language remain `[TO BE DESIGNED]` (M16/M17). This section only locks the
-semantic law, not the pathing algorithm.
+The neighborhood topology, route shape and movement language are now
+**owner-selected (M17)**: the production movement language is **Organized/curved
+on a deterministic grid-aware backbone** (OWNER_MOVEMENT_DECISION_V01, ADR-025).
+A deterministic 4-neighbour grid planner establishes valid reachability + an
+orthogonal path; a validity-preserving organized/curved post-process (bounded
+shortcuts + controlled corner rounding) is the visual movement language. Direct
+straight routing is **rejected** for production and kept only as a debug/baseline
+comparison tool. Collision radius remains `[TO BE DESIGNED]` (M18+). This section
+locks the semantic law; the production routing implementation is
+`scripts/gameplay/routing/production_routing_system.gd`.
 
 `TargetSelector` (M15, implemented) enforces this law at assignment time: it
 consumes reachability/access truth as a narrow **injected** query
@@ -179,9 +186,19 @@ window (`tasks.md` SB-M10-005..011) is complete.
   query (`is_segment_traversable(from, to, target_index)`). No route is a
   first-class failure — routing **never** silently retargets and never calls
   TargetSelector.
-- The actual routing/pathing **algorithm** and final movement language remain
-  `[TO BE DESIGNED]` (M17). M16 establishes the interface/seam only; it ships no
-  AStar/BFS/DFS/curve/collision logic.
+- The production routing **algorithm** and movement language are
+  owner-selected (M17-C002, ADR-025): `ProductionRoutingSystem`
+  (`scripts/gameplay/routing/production_routing_system.gd`) subclasses the M16
+  `RoutingSystem` contract with a deterministic grid-aware backbone plus a
+  validity-preserving organized/curved post-process (conservative bounded
+  shortcut + controlled corner rounding). `ProductionAccessQuery`
+  (`scripts/gameplay/routing/production_access_query.gd`) is the canonical
+  production access truth (ACTIVE blocks, CLEARED/outside open, target only as
+  final endpoint). Direct straight routing is debug/baseline only. The M17
+  experimental prototypes and the Routing Prototype Lab
+  (`scripts/gameplay/routing/prototypes/`, `scenes/debug/`) are retained for
+  diagnostics/comparison, not production. Collision radius stays
+  `[TO BE DESIGNED]` (M18+).
 
 ## Win / lose condition `[TO BE DESIGNED]`
 
