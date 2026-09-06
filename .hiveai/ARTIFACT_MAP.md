@@ -77,6 +77,8 @@ Canonical implementation fixture JSONs:
 
 | V07 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V07.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V07.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V07.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_V07.md | AUDITED_PASS |
 
+| V08 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V08.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V08.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V08.md | PENDING | ISSUED |
+
 Owner fixture data: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/OWNER_FIXTURE_DATA_V01.md
 
 
