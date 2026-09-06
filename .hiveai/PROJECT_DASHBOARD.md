@@ -1,3 +1,12 @@
+### M17-C002 final audit
+
+- Decision: **AUDITED_PASS / COMPLETE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_AUDIT_V01.md
+- Production routing is now Organized/curved over Grid-aware deterministic backbone.
+- Direct remains debug-only.
+- ADR-025 accepted.
+- M18 Scrubbot Agent may open.
+
 - Progress after M17 owner decision: **263/943 = 27.89%** overall; **263/719 = 36.58%** main + SB-UI.
 
 ### M17 owner movement-language decision
