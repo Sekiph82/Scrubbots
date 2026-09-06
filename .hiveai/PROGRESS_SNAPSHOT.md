@@ -344,3 +344,15 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Missing original movement reference no longer blocks the gate; SB-M17-010 is closed as superseded by the owner-reviewed decision.
 - M17 task ledger is now **16/16 complete**.
 - M17-C002 is ISSUED to promote the selected movement language from experimental prototype code into production routing code before M18 opens.
+
+
+### M17 final task recompute
+
+- M17 task ledger: **16 / 16 complete**.
+- Canonical progress:
+  - Overall: **263 / 943 = 27.89%**
+  - Remaining: **680**
+  - Main game + SB-UI: **263 / 719 = 36.58%**
+  - Main remaining: **456**
+  - Level Factory: **0 / 112**
+  - Content Pipeline: **0 / 112**
