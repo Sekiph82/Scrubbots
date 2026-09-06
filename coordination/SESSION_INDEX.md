@@ -372,3 +372,16 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Owner-requested 010 recolor: source greens -> C06/C07/C08 blue family.
 - These are TEST/debug/manual-QA fixtures; no production catalog promotion and no M10-005..011 owner checkbox closure.
 - Cycle state: `ISSUED`; next actor CLAUDE.
+
+
+### M10-C001 V02 issuance — JSON-backed fixture implementation
+
+- V02 supersedes V01 before implementation.
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V02.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V02.md
+- Canonical debug fixture JSONs:
+  - https://github.com/Sekiph82/Scrubbots/blob/main/data/debug/board_renderer_fixtures/level_007.json
+  - https://github.com/Sekiph82/Scrubbots/blob/main/data/debug/board_renderer_fixtures/level_010.json
+  - https://github.com/Sekiph82/Scrubbots/blob/main/data/debug/board_renderer_fixtures/level_013.json
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V02.md
+- State: `ISSUED`; next actor CLAUDE.
