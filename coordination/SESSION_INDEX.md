@@ -693,3 +693,13 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Claude evidence: **1412/1412 ALL PASS**.
 - Godot not independently rerun by ChatGPT; source/test quality independently inspected.
 - M18 may now open.
+
+
+## M18-C001 V01 issuance — Scrubbot Agent
+
+- Milestone: **M18 OPENED**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_PROMPT_V01.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_AUDIT_CRITERIA_V01.md
+- Scope: lightweight agent movement over an already-assigned production route; no Dispatcher/vertical-slice wiring.
+- State: ISSUED; next actor CLAUDE.
+- Owner workflow note: use a fresh Claude chat for this new milestone.
