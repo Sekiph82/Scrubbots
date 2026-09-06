@@ -199,3 +199,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Main game + SB-UI is now **214 / 719 = 29.76%**.
 - Level Factory remains **0 / 112**; Content Pipeline remains **0 / 112**.
 - M14 remains NOT_STARTED pending an intentional milestone transition.
+
+
+### M14-C001 V01 issuance
+
+- New main-game milestone intentionally opened: **M14 Reservation State**.
+- Owner should use a **new Claude chat** for this milestone to reduce context/token carryover.
+- Architecture direction: reservation is separate ephemeral assignment data; BoardState remains ACTIVE/CLEARED only.
+- Eligible closure after independent audit: SB-M02-017 + SB-M14-001..009.
+- Current progress remains **214 / 943 = 22.69%** until audit.
+- Main game + SB-UI remains **214 / 719 = 29.76%** until audit.
+- Expected full-pass progress: **224 / 943** and **224 / 719**.
