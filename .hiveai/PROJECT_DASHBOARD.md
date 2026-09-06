@@ -1,3 +1,13 @@
+### M16-C001 V01 final audit
+
+- Decision: **AUDITED_PASS / COMPLETE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V01.md
+- RoutingSystem interface accepted: board-local route contract, explicit success/failure, no silent retarget, swappable implementations, injected access validation, debug-only visualization.
+- SB-M16-001..011 closed.
+- Claude evidence: **1266/1266 ALL PASS**.
+- ChatGPT independently inspected actual implementation/test code; Godot was not independently rerun in the audit environment.
+- Next milestone: **M17 Routing Prototype Lab** (NOT_STARTED).
+
 ### M16-C001 V01 milestone opening
 
 - State: **ISSUED**
