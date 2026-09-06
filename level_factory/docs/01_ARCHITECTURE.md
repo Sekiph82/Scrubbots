@@ -66,7 +66,7 @@ versioned/provisional until calibrated and owner-approved.
 ## Canonical Visual Contract (palette boundary) [OWNER-LOCKED, META-C005]
 
 Authoritative sources: `docs/08_PIXEL_ART_PALETTE_RULES.md` +
-`data/palettes/scrubbots_palette_v1.json` (root), with Factory-facing
+`data/palettes/scrubbots_palette_v2.json` (root), with Factory-facing
 machine-readable non-palette metadata in
 `level_factory/data/canonical_visual_contract_v1.json`. The descriptor
 references the root palette and is never an independent palette authority; the
