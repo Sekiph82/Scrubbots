@@ -33,6 +33,15 @@ This file is the single H!veAI-facing materialized project status surface. It is
 - V02 implemented by Claude (JSON-backed fixtures, grid overlay, +108 tests, 882/882 ALL PASS); state AWAITING_AUDIT.
 - Next actor: CHATGPT (independent audit M10-C001 V02).
 
+### META-C005 ChatGPT final audit V01
+
+- Decision: **AUDITED_PASS**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_AUDIT_V01.md
+- Accepted: Level Factory / future pixel-art governance now consumes the owner-locked C01..C15 palette authority, exact difficulty used-color bands, BG01 #202533, ACTIVE/CLEARED semantics, and flat square-cell/no-bead/no-interpolation rules.
+- Machine-readable descriptor accepted at `level_factory/data/canonical_visual_contract_v1.json`; root palette remains the single palette authority.
+- No generator implementation and no task checkbox change. Progress remains **207/943 = 21.95%**.
+- Owner workflow change after implementation: ChatGPT owns H!veAI tracker/dashboard updates after audit. Governance wording will be normalized in the next implementation prompt.
+
 ### M10-C001 ChatGPT final audit V02
 
 - Decision: **AUDITED_PASS**
