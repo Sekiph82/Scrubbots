@@ -72,14 +72,14 @@ machine-readable non-palette metadata in
 references the root palette and is never an independent palette authority; the
 root palette JSON wins on any conflict.
 
-- **Palette:** root game's owner-locked **C01..C15** is authoritative. Factory
+- **Palette:** root game's owner-locked **C01..C16** is authoritative. Factory
   production output uses only a used subset in ascending global C-ID order. No
   C16, no off-palette RGB.
 - **Distinct used-color bands (hard legality):** EASY 3–5, MEDIUM 6–7,
   HARD 8–9, VERY_HARD 10–12 — distinct canonical logical cell colors actually
   used by artwork cells.
 - **BG01 Midnight Slate `#202533` / RGB(32,37,51):** production gameplay
-  background, visible through CLEARED alpha-0 cells; not C16, not a logical
+  background, visible through CLEARED alpha-0 cells; outside C01..C16, not a logical
   color, never a LevelData cell color, excluded from the color count.
 - **ACTIVE/CLEARED:** ACTIVE = opaque canonical source color; CLEARED = alpha 0
   (BG01 shows through).
@@ -90,6 +90,6 @@ root palette JSON wins on any conflict.
   the count.
 
 Art-first mapping from arbitrary source colors must be deterministic and
-auditable; never silently create C16+ or retain off-palette RGB values, never
+auditable; never silently create C17+ or retain off-palette RGB values, never
 treat BG01 as a palette color, and never count grid/border overlays toward
 difficulty.
