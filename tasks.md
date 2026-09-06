@@ -220,7 +220,7 @@ represented as thousands of heavyweight Godot Nodes (see ADR-004, ADR-008).
 ### 8.7A — Global 16-color pixel-art palette `[LOCKED OWNER DECISION]`
 
 Canonical machine-readable palette:
-`data/palettes/scrubbots_palette_v1.json`
+`data/palettes/scrubbots_palette_v2.json`
 
 Canonical human-readable rule:
 `docs/08_PIXEL_ART_PALETTE_RULES.md`
@@ -365,7 +365,7 @@ Previously supplied game screenshots may be used only as reference for
 *pixel construction method*, where explicitly approved — never for
 characters, compositions, object placement, or level art. External-reference
 colors must never redefine the SCRUBBOTS palette. The exact production palette
-is owner-locked in §8.7A / `data/palettes/scrubbots_palette_v1.json`.
+is owner-locked in §8.7A / `data/palettes/scrubbots_palette_v2.json`.
 The goal is understanding how a readable image is built from a limited
 logical grid. SCRUBBOTS level artwork remains original.
 
