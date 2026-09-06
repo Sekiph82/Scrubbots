@@ -233,3 +233,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Godot executable was unavailable in the ChatGPT audit environment; `1098/1098` was therefore **not independently rerun** and remains E2 implementer evidence. This limitation is explicitly disclosed in the strict re-audit.
 - Progress independently recomputed from unique SB task IDs: **224/943 = 23.75%** overall; **224/719 = 31.15%** main + SB-UI; LF 0/112; CP 0/112.
 - Audit memory corrected: historical AL-031 marked superseded; AL-033 records current C01..C16 palette v2.
+
+
+### M15-C001 V01 issuance
+
+- New main-game milestone intentionally opened: **M15 TargetSelector**.
+- Owner should use a **new Claude chat** for this milestone.
+- TargetSelector chooses WHAT target, consumes ColorCandidateIndex + ReservationState + injected reachability/access truth, and must never generate a route.
+- Deterministic baseline: first targetable ascending candidate, atomically reserved before return.
+- Current progress remains **224 / 943 = 23.75%** until audit.
+- Main game + SB-UI remains **224 / 719 = 31.15%**.
+- Full-pass target after 12 closures: **236 / 943 = 25.03%** and **236 / 719 = 32.82%**.
