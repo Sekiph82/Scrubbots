@@ -43,6 +43,7 @@ func _initialize() -> void:
 	_run_board_renderer_active_cleared_tests()
 	_run_board_renderer_real_fixture_tests()
 	_run_board_renderer_canvas_embed_tests()
+	_run_debug_scene_fixture_change_smoke()
 	_run_board_renderer_geometry_tests()
 	_run_board_renderer_pixel_tests()
 	_run_board_renderer_performance_sanity()
@@ -698,6 +699,69 @@ func _run_board_renderer_canvas_embed_tests() -> void:
 			renderer.free()
 
 	print("  M10-C001 V05 variable-canvas embedding tests complete")
+
+## M10-C001 V07: runtime smoke that actually instantiates the debug scene and
+## EXECUTES the Real Artwork fixture-change path (`_on_fixture_changed()`),
+## including the Size-validity logic that previously called the nonexistent
+## `OptionButton.get_item_disabled()` and crashed at runtime under Godot 4.7.1.
+## Scene parsing alone did not catch it; this drives the deferred logic.
+func _run_debug_scene_fixture_change_smoke() -> void:
+	print("---- M10-C001 V07: debug-scene fixture-change runtime smoke ----")
+	var scene = load("res://scenes/debug/board_renderer_debug.tscn")
+	_check(scene != null, "V07 smoke: debug scene resource loads")
+	if scene == null:
+		return
+	var inst = scene.instantiate() # _ready() runs _build_ui() on add_child
+	_check(inst != null, "V07 smoke: debug scene instantiates")
+	root.add_child(inst)
+	# In a headless `-s` SceneTree, _ready() may not fire synchronously during
+	# _initialize() (no processed frame). Build the UI deterministically if it
+	# has not run yet — this still exercises the real _build_ui/_on_fixture_changed
+	# code, just driven explicitly.
+	if inst._board_area == null:
+		inst._build_ui()
+	# Give the board area a real size so _refresh() runs the full embed/render
+	# path rather than early-returning.
+	inst._board_area.size = Vector2(1000, 1000)
+
+	# Real Artwork fixture indices in FIXTURE_OPTIONS: 1=007, 2=010, 3=013.
+	# Selecting + driving _on_fixture_changed() executes the exact API path that
+	# threw 'Nonexistent function get_item_disabled' before this fix.
+	inst._fixture_option.select(1) # Level 007 (source 27x24)
+	inst._on_fixture_changed()
+	# Size-validity logic ran without a runtime error and a valid size is active.
+	_check(inst._size_option.selected >= 0, "V07 smoke: 007 fixture-change selected a valid size")
+	_check(not inst._size_option.is_item_disabled(inst._size_option.selected), "V07 smoke: selected size is enabled (contains source)")
+	# 007 source 27x24: 20x20 (idx0) too small -> disabled; 30x30 (idx3) and
+	# 59x59 (idx10) valid.
+	_check(inst._size_option.is_item_disabled(0), "V07 smoke: 20x20 disabled for 007 (too small)")
+	_check(not inst._size_option.is_item_disabled(3), "V07 smoke: 30x30 valid for 007")
+	_check(not inst._size_option.is_item_disabled(10), "V07 smoke: 59x59 valid for 007")
+	# Drive the two owner-checked canvases explicitly through the change path.
+	inst._size_option.select(3) # 30x30
+	inst._refresh()
+	_check(inst._info_label.text.find("source=27x24") >= 0, "V07 smoke: 007 renders source 27x24 (30x30 canvas) without error")
+	_check(inst._info_label.text.find("canvas=30x30") >= 0, "V07 smoke: 007 canvas is 30x30")
+	_check(inst._renderer.get_child_count() == 0, "V07 smoke: no per-cell Nodes at 30x30")
+	inst._size_option.select(10) # 59x59
+	inst._refresh()
+	_check(inst._info_label.text.find("canvas=59x59") >= 0, "V07 smoke: 007 canvas is 59x59")
+	_check(inst._renderer.get_child_count() == 0, "V07 smoke: no per-cell Nodes at 59x59")
+
+	# Switching to a taller fixture recomputes validity (013 source 28x31 needs
+	# height >= 31, so 30x30 becomes invalid).
+	inst._fixture_option.select(3) # Level 013 (source 28x31)
+	inst._on_fixture_changed()
+	_check(inst._size_option.is_item_disabled(3), "V07 smoke: 30x30 disabled for 013 (height 31 > 30)")
+	_check(not inst._size_option.is_item_disabled(inst._size_option.selected), "V07 smoke: 013 snapped to a valid size")
+
+	# Synthetic Stripes re-enables all sizes.
+	inst._fixture_option.select(0)
+	inst._on_fixture_changed()
+	_check(not inst._size_option.is_item_disabled(0), "V07 smoke: Synthetic Stripes re-enables 20x20")
+
+	inst.free()
+	print("  M10-C001 V07 fixture-change runtime smoke complete")
 
 ## Counts artwork cells (void_mask==0) grouped by mapped C-ID string, using the
 ## level's subset-index color ids.
