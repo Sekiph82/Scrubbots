@@ -169,8 +169,19 @@ window (`tasks.md` SB-M10-005..011) is complete.
   **routing** (the path/movement it takes to get there) are separate
   concerns and must remain separable in code. See
   `docs/02_TECH_ARCHITECTURE.md`.
-- The actual routing/pathing algorithm is `[TO BE DESIGNED]` in a later task.
-  The current milestone only establishes the seam between the two systems.
+- `RoutingSystem` (M16, implemented — CONTRACT only, ADR-024) defines HOW a
+  routing implementation answers "give me a route to this already-assigned,
+  already-reserved target," in a resolution-independent board-local cell
+  coordinate space (board top-left `(0,0)`, one cell = 1×1 units, cell center
+  `(x+0.5,y+0.5)`; slot origins may lie outside the board). A route starts at
+  the slot origin, ends at the assigned target cell center, keeps the same
+  target, and is validated segment-by-segment through an **injected** access
+  query (`is_segment_traversable(from, to, target_index)`). No route is a
+  first-class failure — routing **never** silently retargets and never calls
+  TargetSelector.
+- The actual routing/pathing **algorithm** and final movement language remain
+  `[TO BE DESIGNED]` (M17). M16 establishes the interface/seam only; it ships no
+  AStar/BFS/DFS/curve/collision logic.
 
 ## Win / lose condition `[TO BE DESIGNED]`
 

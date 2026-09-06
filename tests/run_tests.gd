@@ -28,6 +28,15 @@ const ReservationState = preload("res://scripts/gameplay/targeting/reservation_s
 const TargetSelector = preload("res://scripts/gameplay/targeting/target_selector.gd")
 const AccessQueryDouble = preload("res://tests/support/access_query_double.gd")
 const CandidateIndexDouble = preload("res://tests/support/candidate_index_double.gd")
+# M16 — RoutingSystem interface / route contract.
+const RouteRequest = preload("res://scripts/gameplay/routing/route_request.gd")
+const RouteResult = preload("res://scripts/gameplay/routing/route_result.gd")
+const RouteValidator = preload("res://scripts/gameplay/routing/route_validator.gd")
+const RoutingSystem = preload("res://scripts/gameplay/routing/routing_system.gd")
+const RouteDebugOverlay = preload("res://scripts/debug/route_debug_overlay.gd")
+const RouteAccessQueryDouble = preload("res://tests/support/route_access_query_double.gd")
+const RouteFakeStraight = preload("res://tests/support/route_fake_straight.gd")
+const RouteFakeRelay = preload("res://tests/support/route_fake_relay.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -63,6 +72,13 @@ func _initialize() -> void:
 	_run_target_selector_tests()
 	_run_target_selector_simultaneous_tests()
 	_run_target_selector_benchmark()
+	_run_route_request_tests()
+	_run_route_result_tests()
+	_run_route_validator_tests()
+	_run_routing_system_swappability_tests()
+	_run_routing_no_retarget_tests()
+	_run_route_debug_overlay_tests()
+	_run_route_coordinate_scale_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -2273,7 +2289,10 @@ func _run_gameplay_session_tests() -> void:
 	# Placeholder .gitkeep directories may exist from prior architecture planning;
 	# verify no GDScript implementation files were introduced.
 	_check(not FileAccess.file_exists("res://scripts/gameplay/slots/slot_manager.gd"), "M11-27: no slot implementation")
-	_check(not FileAccess.file_exists("res://scripts/gameplay/routing/routing_system.gd"), "M11-27: no routing implementation")
+	# M16-C001 supersedes the original M11-era "no routing implementation" guard:
+	# M16 legitimately introduces the RoutingSystem CONTRACT (interface only, no
+	# M17 path algorithm). Assert the contract file now exists rather than absent.
+	_check(FileAccess.file_exists("res://scripts/gameplay/routing/routing_system.gd"), "M16-C001: RoutingSystem contract now exists (supersedes M11-27 routing guard)")
 	_check(not DirAccess.dir_exists_absolute("res://scripts/gameplay/agents"), "M11-27: no agents directory")
 	_check(not FileAccess.file_exists("res://scripts/gameplay/target/target_selector.gd"), "M11-27: no target implementation")
 
@@ -3395,3 +3414,284 @@ func _print_summary() -> void:
 		print("RESULT: FAIL")
 		for f in _failures:
 			print("  - FAIL: %s" % f)
+
+## ---------------------------------------------------------- M16: routing --
+## M16 defines the RoutingSystem CONTRACT (HOW to travel to an already-assigned
+## target) — not the M17 path algorithm. These tests prove the input/output
+## contracts, board-local coordinate space, injected access seam with direct
+## segment observability (AL-018), swappability, no-retarget law, and the
+## generic debug visualizer. No AStar/BFS/DFS/curve/collision logic exists here.
+
+## Canonical cell center via BoardState index/position math (test-side helper).
+func _center_of(board, index: int) -> Vector2:
+	var pos: Vector2i = board.get_cell_position(index)
+	return Vector2(float(pos.x) + 0.5, float(pos.y) + 0.5)
+
+func _run_route_request_tests() -> void:
+	var board = _make_blank_board(6, 4) # rectangular
+	# Slot origin OUTSIDE the board on every side; request must preserve it exactly.
+	var origins := {
+		"left": Vector2(-3.0, 2.5),
+		"right": Vector2(9.0, 1.5),
+		"above": Vector2(3.0, -2.0),
+		"below": Vector2(2.5, 7.0),
+	}
+	var tgt = board.get_cell_index(4, 2)
+	for name in origins:
+		var req = RouteRequest.for_target(board, origins[name], tgt)
+		_check(req != null, "RouteRequest.for_target builds for slot origin %s" % name)
+		_check(req.start_position.is_equal_approx(origins[name]), "slot origin %s preserved exactly (may lie outside board)" % name)
+		_check_eq(req.target_index, tgt, "request keeps assigned target_index (origin %s)" % name)
+		_check(req.target_position.is_equal_approx(_center_of(board, tgt)), "target_position is canonical cell center (origin %s)" % name)
+		_check_eq(req.board_width, 6, "request board_width from BoardState (origin %s)" % name)
+		_check_eq(req.board_height, 4, "request board_height from BoardState (origin %s)" % name)
+
+	# Invalid target index -> null (fail closed).
+	_check(RouteRequest.for_target(board, Vector2.ZERO, -1) == null, "for_target(-1) rejected (invalid target index)")
+	_check(RouteRequest.for_target(board, Vector2.ZERO, 24) == null, "for_target(cell_count) rejected (invalid target index)")
+
+	# Canonical center via BoardState index/position math (not re-derived here).
+	_check(RouteRequest.center_of_index(board, board.get_cell_index(0, 0)).is_equal_approx(Vector2(0.5, 0.5)), "center of (0,0) == (0.5,0.5)")
+	_check(RouteRequest.center_of_index(board, board.get_cell_index(5, 3)).is_equal_approx(Vector2(5.5, 3.5)), "center of (5,3) == (5.5,3.5) on 6x4 rect board")
+	# One logical cell is 1x1 units: adjacent cell centers differ by exactly 1.0.
+	var c_a := RouteRequest.center_of_index(board, board.get_cell_index(1, 1))
+	var c_b := RouteRequest.center_of_index(board, board.get_cell_index(2, 1))
+	_check(is_equal_approx(c_b.x - c_a.x, 1.0), "one logical cell == 1.0 coordinate unit (adjacent centers differ by 1.0)")
+
+func _run_route_result_tests() -> void:
+	var pts := PackedVector2Array([Vector2(-2.0, 0.5), Vector2(4.5, 2.5)])
+	var r = RouteResult.success_route(11, pts)
+	_check(r.success, "success_route.success == true")
+	_check_eq(r.target_index, 11, "success_route keeps target_index")
+	_check_eq(r.point_count(), 2, "success_route point_count == 2")
+	_check(r.get_points()[0].is_equal_approx(Vector2(-2.0, 0.5)), "success first point preserved")
+	_check(r.get_points()[1].is_equal_approx(Vector2(4.5, 2.5)), "success last point preserved")
+	_check_eq(r.failure_reason, RouteResult.FailureReason.NONE, "success failure_reason == NONE")
+
+	# Detachment: mutating the caller's array after construction must not leak in.
+	pts.append(Vector2(99, 99))
+	_check_eq(r.point_count(), 2, "internal points detached from caller's source array (copy-in)")
+	# get_points() returns a detached copy each call.
+	var got = r.get_points()
+	got.append(Vector2(88, 88))
+	_check_eq(r.point_count(), 2, "get_points() returns a detached copy (copy-out)")
+
+	# Failure result structure.
+	var f = RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, 7)
+	_check(not f.success, "failure.success == false")
+	_check_eq(f.point_count(), 0, "failure points empty")
+	_check_eq(f.target_index, 7, "failure retains originally requested target")
+	_check_eq(f.failure_reason, RouteResult.FailureReason.NO_ROUTE, "failure reason is explicit/stable")
+
+func _run_route_validator_tests() -> void:
+	var board = _make_blank_board(5, 5)
+	var tgt = board.get_cell_index(3, 2)
+	var start := Vector2(-1.0, 2.5)
+	var req = RouteRequest.for_target(board, start, tgt)
+
+	# validate_request: happy path + each rejection.
+	_check_eq(RouteValidator.validate_request(req, board), RouteResult.FailureReason.NONE, "validate_request: valid request -> NONE")
+	_check_eq(RouteValidator.validate_request(null, board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: null request rejected")
+
+	var bad_idx = RouteRequest.for_target(board, start, tgt)
+	bad_idx.target_index = 999
+	_check_eq(RouteValidator.validate_request(bad_idx, board), RouteResult.FailureReason.INVALID_TARGET, "validate_request: out-of-range target -> INVALID_TARGET")
+
+	# CLEARED target rejected.
+	var cleared_board = _make_blank_board(5, 5)
+	var creq = RouteRequest.for_target(cleared_board, start, tgt)
+	cleared_board.set_cell_state(tgt, BoardState.CellState.CLEARED)
+	_check_eq(RouteValidator.validate_request(creq, cleared_board), RouteResult.FailureReason.TARGET_NOT_ACTIVE, "validate_request: CLEARED target -> TARGET_NOT_ACTIVE")
+
+	# target_position drift rejected.
+	var drift = RouteRequest.for_target(board, start, tgt)
+	drift.target_position = Vector2(0.5, 0.5)
+	_check_eq(RouteValidator.validate_request(drift, board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: wrong target_position -> INVALID_REQUEST")
+
+	# Board dim mismatch rejected.
+	var dim = RouteRequest.for_target(board, start, tgt)
+	dim.board_width = 4
+	_check_eq(RouteValidator.validate_request(dim, board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: board dim mismatch -> INVALID_REQUEST")
+
+	# --- validate_route with injected access truth + direct observability ---
+	var straight = RouteFakeStraight.new()
+	var result = straight.compute_route(req, board, null)
+	var access = RouteAccessQueryDouble.new()
+	access.open_polyline(result.get_points()) # open the exact segments this route uses
+	_check_eq(RouteValidator.validate_route(req, result, board, access), RouteResult.FailureReason.NONE, "validate_route: open segments -> valid route")
+	# AL-018: assert the ACTUAL segment-query sequence, not just the boolean.
+	_check_eq(access.total_queries(), 1, "validate_route queried exactly the 1 segment of a 2-point route")
+	_check(access.query_log[0]["from"].is_equal_approx(req.start_position), "segment query from == slot origin")
+	_check(access.query_log[0]["to"].is_equal_approx(req.target_position), "segment query to == assigned target center")
+	_check_eq(access.query_log[0]["target_index"], req.target_index, "segment query carries the assigned target_index (no retarget)")
+	_check(access.query_log[0]["verdict"], "segment query verdict observed true for open segment")
+
+	# Missing access query fails closed.
+	_check_eq(RouteValidator.validate_route(req, result, board, null), RouteResult.FailureReason.MISSING_ACCESS_QUERY, "validate_route: missing access query -> MISSING_ACCESS_QUERY (fail closed)")
+
+	# Blocked segment invalidates route (non-target ACTIVE blocker semantic).
+	var blocked = RouteAccessQueryDouble.new()
+	blocked.block_segment(result.get_points()[0], result.get_points()[1])
+	_check_eq(RouteValidator.validate_route(req, result, board, blocked), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: blocked segment -> INVALID_ROUTE")
+
+	# Multi-segment: middle blocked invalid; all-open valid (CLEARED/open semantic).
+	var relay = RouteFakeRelay.new()
+	var rresult = relay.compute_route(req, board, null)
+	var rpts = rresult.get_points()
+	var mid_open = RouteAccessQueryDouble.new()
+	mid_open.open_polyline(rpts)
+	_check_eq(RouteValidator.validate_route(req, rresult, board, mid_open), RouteResult.FailureReason.NONE, "validate_route: 3-point route all-open -> valid")
+	_check_eq(mid_open.total_queries(), 2, "validate_route queried both segments of a 3-point route")
+	var mid_block = RouteAccessQueryDouble.new()
+	mid_block.open_segment(rpts[0], rpts[1])
+	mid_block.block_segment(rpts[1], rpts[2]) # final approach blocked
+	_check_eq(RouteValidator.validate_route(req, rresult, board, mid_block), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: one blocked segment among many -> INVALID_ROUTE")
+
+	# Wrong result target invalidates route.
+	var wrong_tgt = RouteResult.success_route(tgt + 1, result.get_points())
+	var acc2 = RouteAccessQueryDouble.new(); acc2.open_polyline(result.get_points())
+	_check_eq(RouteValidator.validate_route(req, wrong_tgt, board, acc2), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: result target != request target -> INVALID_ROUTE")
+
+	# Wrong start point invalidates route.
+	var bad_start = RouteResult.success_route(tgt, PackedVector2Array([Vector2(0.0, 0.0), req.target_position]))
+	var acc3 = RouteAccessQueryDouble.new(); acc3.open_polyline(bad_start.get_points())
+	_check_eq(RouteValidator.validate_route(req, bad_start, board, acc3), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: start != slot origin -> INVALID_ROUTE")
+
+	# Wrong end point invalidates route.
+	var bad_end = RouteResult.success_route(tgt, PackedVector2Array([req.start_position, Vector2(0.5, 0.5)]))
+	var acc4 = RouteAccessQueryDouble.new(); acc4.open_polyline(bad_end.get_points())
+	_check_eq(RouteValidator.validate_route(req, bad_end, board, acc4), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: end != assigned target center -> INVALID_ROUTE")
+
+	# Too few points invalid.
+	var one_pt = RouteResult.success_route(tgt, PackedVector2Array([req.start_position]))
+	var acc5 = RouteAccessQueryDouble.new()
+	_check_eq(RouteValidator.validate_route(req, one_pt, board, acc5), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: < 2 points -> INVALID_ROUTE")
+
+func _run_routing_system_swappability_tests() -> void:
+	var board = _make_blank_board(8, 6)
+	var tgt = board.get_cell_index(5, 3)
+	var req = RouteRequest.for_target(board, Vector2(-2.0, 3.5), tgt)
+
+	# Base implementation invents NO route: clean NOT_IMPLEMENTED failure.
+	var base = RoutingSystem.new()
+	var base_res = base.compute_route(req, board, null)
+	_check(not base_res.success, "base RoutingSystem fails cleanly (no invented route)")
+	_check_eq(base_res.failure_reason, RouteResult.FailureReason.NOT_IMPLEMENTED, "base RoutingSystem -> NOT_IMPLEMENTED")
+	_check_eq(base_res.point_count(), 0, "base RoutingSystem failure has empty points")
+	_check_eq(base_res.target_index, tgt, "base RoutingSystem failure retains assigned target")
+
+	# Two distinct fakes satisfy the SAME compute_route contract.
+	var straight = RouteFakeStraight.new()
+	var relay = RouteFakeRelay.new()
+	var sres = straight.compute_route(req, board, null)
+	var rres = relay.compute_route(req, board, null)
+	var acc_s = RouteAccessQueryDouble.new(); acc_s.open_polyline(sres.get_points())
+	var acc_r = RouteAccessQueryDouble.new(); acc_r.open_polyline(rres.get_points())
+	_check_eq(RouteValidator.validate_route(req, sres, board, acc_s), RouteResult.FailureReason.NONE, "fake straight satisfies routing contract")
+	_check_eq(RouteValidator.validate_route(req, rres, board, acc_r), RouteResult.FailureReason.NONE, "fake relay satisfies routing contract")
+	_check_eq(sres.point_count(), 2, "straight fake yields 2-point route")
+	_check_eq(rres.point_count(), 3, "relay fake yields 3-point route")
+	# Route target is always the already-assigned target for every implementation.
+	_check_eq(sres.target_index, tgt, "straight fake keeps assigned target")
+	_check_eq(rres.target_index, tgt, "relay fake keeps assigned target")
+
+	# Swapping implementation requires NO TargetSelector change: routing objects
+	# have no selection API and never reference TargetSelector/ReservationState.
+	for impl in [base, straight, relay]:
+		_check(impl.has_method("compute_route"), "routing impl exposes compute_route")
+		_check(not impl.has_method("select_and_reserve"), "routing impl has NO target-selection method (WHAT stays in TargetSelector)")
+		_check(not impl.has_method("reserve"), "routing impl has NO reservation method")
+	# TargetSelector class is untouched and still independently functional.
+	var sel = TargetSelector.create()
+	_check(sel.has_method("select_and_reserve"), "TargetSelector unchanged: still owns select_and_reserve")
+	_check(not sel.has_method("compute_route"), "TargetSelector does not gain routing responsibility")
+
+	# No global singleton coupling: independent instances.
+	_check(RoutingSystem.new() != RoutingSystem.new(), "RoutingSystem is not a shared singleton (distinct instances)")
+
+func _run_routing_no_retarget_tests() -> void:
+	var board = _make_blank_board(7, 7)
+	var tgt = board.get_cell_index(4, 4)
+	var req = RouteRequest.for_target(board, Vector2(-1.0, 4.5), tgt)
+
+	# A route failure for target X never becomes "pick target Y".
+	var base = RoutingSystem.new()
+	var before := _snapshot_cell_states(board)
+	var res = base.compute_route(req, board, null)
+	_check_eq(res.target_index, tgt, "no-route result keeps original target (never retargets)")
+	_check_eq(res.point_count(), 0, "no-route result has no route points")
+	_check(_cell_states_equal(board, before), "compute_route (failure) does not mutate BoardState")
+
+	# Fakes also never mutate BoardState.
+	var s_before := _snapshot_cell_states(board)
+	RouteFakeStraight.new().compute_route(req, board, null)
+	RouteFakeRelay.new().compute_route(req, board, null)
+	_check(_cell_states_equal(board, s_before), "fake routing compute_route does not mutate BoardState")
+
+	# A live ReservationState the routing system has no handle to stays untouched.
+	var reservations = ReservationState.new()
+	reservations.bind(board)
+	_check(reservations.reserve(tgt, 0), "precondition: target reserved for owner 0")
+	base.compute_route(req, board, null)
+	RouteFakeStraight.new().compute_route(req, board, null)
+	_check_eq(reservations.get_owner(tgt), 0, "routing never reserves/releases/retargets an existing reservation")
+	_check_eq(reservations.get_target_for_owner(0), tgt, "owner 0 still holds exactly its original target after routing")
+
+func _run_route_debug_overlay_tests() -> void:
+	var board = _make_blank_board(6, 6)
+	var tgt = board.get_cell_index(2, 4)
+	var req = RouteRequest.for_target(board, Vector2(-1.5, 4.5), tgt)
+	var success = RouteFakeRelay.new().compute_route(req, board, null)
+
+	# Pure draw-model for a successful route (no live draw context needed).
+	var m := RouteDebugOverlay.build_draw_model(success)
+	_check(m["success"], "debug model: success route -> success true")
+	_check_eq((m["polyline"] as PackedVector2Array).size(), 3, "debug model: polyline mirrors route points")
+	_check((m["start"] as Vector2).is_equal_approx(req.start_position), "debug model: start marker == slot origin")
+	_check((m["end"] as Vector2).is_equal_approx(req.target_position), "debug model: end marker == assigned target center")
+	_check_eq(m["target_index"], tgt, "debug model: carries assigned target_index")
+
+	# Failure / no-route state represented cleanly.
+	var fail = RoutingSystem.new().compute_route(req, board, null)
+	var fm := RouteDebugOverlay.build_draw_model(fail)
+	_check(not fm["success"], "debug model: failure -> success false")
+	_check_eq(fm["failure_reason"], RouteResult.FailureReason.NOT_IMPLEMENTED, "debug model: failure reason surfaced for display")
+	_check_eq((fm["polyline"] as PackedVector2Array).size(), 0, "debug model: failure has no polyline")
+	# Null result also renders as a clean no-route state.
+	var nm := RouteDebugOverlay.build_draw_model(null)
+	_check(not nm["success"], "debug model: null result -> success false (no crash)")
+
+	# The visualizer consumes RouteResult only and neither computes nor mutates.
+	var before := _snapshot_cell_states(board)
+	var overlay = RouteDebugOverlay.new()
+	root.add_child(overlay) # runtime instantiation smoke (no .tscn needed)
+	overlay.set_route(success)
+	_check(overlay.get_draw_model()["success"], "overlay runtime smoke: accepts a valid successful route")
+	overlay.set_route(fail)
+	_check(not overlay.get_draw_model()["success"], "overlay runtime smoke: represents failure state")
+	_check(not overlay.has_method("compute_route"), "overlay does not compute routes")
+	_check(_cell_states_equal(board, before), "overlay does not mutate BoardState")
+	overlay.free()
+
+func _run_route_coordinate_scale_tests() -> void:
+	# 59x59 (current production maximum) coordinate contract.
+	var big = _make_blank_board(59, 59)
+	var corner = big.get_cell_index(58, 58)
+	_check(RouteRequest.center_of_index(big, corner).is_equal_approx(Vector2(58.5, 58.5)), "59x59 far corner center == (58.5,58.5)")
+	var breq = RouteRequest.for_target(big, Vector2(-5.0, 58.5), corner)
+	var bres = RouteFakeStraight.new().compute_route(breq, big, null)
+	var bacc = RouteAccessQueryDouble.new(); bacc.open_polyline(bres.get_points())
+	_check_eq(RouteValidator.validate_route(breq, bres, big, bacc), RouteResult.FailureReason.NONE, "59x59 full route validates end-to-end")
+	# Coordinates are board-local cell units, NOT screen pixels (never 1080x2160).
+	_check(bres.get_points()[1].x < 60.0 and bres.get_points()[1].y < 60.0, "59x59 route endpoint is in cell units (< board+1), not pixels")
+
+	# Very Hard rectangular size (53x59) coordinate contract.
+	var rect = _make_blank_board(53, 59)
+	var rtgt = rect.get_cell_index(52, 58)
+	_check(RouteRequest.center_of_index(rect, rtgt).is_equal_approx(Vector2(52.5, 58.5)), "53x59 far corner center == (52.5,58.5)")
+	var rreq = RouteRequest.for_target(rect, Vector2(60.0, 30.0), rtgt) # origin outside right
+	_check_eq(rreq.board_width, 53, "53x59 request board_width")
+	_check_eq(rreq.board_height, 59, "53x59 request board_height")
+	var rres = RouteFakeRelay.new().compute_route(rreq, rect, null)
+	var racc = RouteAccessQueryDouble.new(); racc.open_polyline(rres.get_points())
+	_check_eq(RouteValidator.validate_route(rreq, rres, rect, racc), RouteResult.FailureReason.NONE, "53x59 rectangular full route validates end-to-end")
