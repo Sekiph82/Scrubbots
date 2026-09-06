@@ -123,3 +123,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - No SB checkbox change. Canonical progress remains **207 / 943 = 21.95%**.
 - SB-M10-005..011 remain owner manual-QA gates; M14 remains NOT_STARTED.
 - META-C005 remains AUDITED_PASS.
+
+
+### M10-C001 V06 issuance
+
+- V06 supersedes unimplemented V05.
+- Owner expanded canonical logical palette to **16 colors** with **C16 Pure Black #000000**.
+- Canonical current palette is `data/palettes/scrubbots_palette_v2.json`; v1 is historical.
+- Difficulty used-color bands remain unchanged.
+- V06 also carries the pending Real Artwork variable-canvas correction and coordination-ownership normalization.
+- No SB checkbox change. Canonical progress remains **207 / 943 = 21.95%**.
+- M14 remains NOT_STARTED.
