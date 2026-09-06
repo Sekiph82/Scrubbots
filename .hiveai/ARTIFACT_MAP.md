@@ -72,3 +72,10 @@ Canonical implementation fixture JSONs:
 - https://github.com/Sekiph82/Scrubbots/blob/main/data/debug/board_renderer_fixtures/level_013.json
 
 Owner fixture data: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/OWNER_FIXTURE_DATA_V01.md
+
+
+## META-C005
+
+| Version | ChatGPT prompt | Audit criteria | Claude log | ChatGPT audit | State |
+| --- | --- | --- | --- | --- | --- |
+| V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CLAUDE_LOG_V01.md | PENDING | ISSUED |

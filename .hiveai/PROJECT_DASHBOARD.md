@@ -33,6 +33,16 @@ This file is the single H!veAI-facing materialized project status surface. It is
 - V02 implemented by Claude (JSON-backed fixtures, grid overlay, +108 tests, 882/882 ALL PASS); state AWAITING_AUDIT.
 - Next actor: CHATGPT (independent audit M10-C001 V02).
 
+### META-C005 ChatGPT issuance
+
+- Purpose: propagate the already owner-locked visual contract into Level Factory / future pixel-art generator governance.
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_PROMPT_V01.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_AUDIT_CRITERIA_V01.md
+- Rules to persist: C01..C15 only; EASY 3–5 / MEDIUM 6–7 / HARD 8–9 / VERY_HARD 10–12; BG01 #202533; ACTIVE opaque / CLEARED alpha-0; flat square cells with visible separation and no plastic/gloss/bevel/shadow/3D styling.
+- Docs/data governance only; do not start Level Factory generator code.
+- Progress unchanged.
+- Next actor: CLAUDE.
+
 ### Also active (on main)
 
 | Field | Value |
