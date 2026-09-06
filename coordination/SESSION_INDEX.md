@@ -19,6 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| META-C005 | META - Canonical Visual Contract Propagation to Level Factory | 2026-09-06 | 2026-09-06 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CLAUDE_LOG_V01.md | PENDING | LF docs/data governance (no SB checkbox change) | Propagated owner-locked visual contract (C01..C15, difficulty color bands, BG01 #202533, ACTIVE/CLEARED, flat square cells no gloss/bevel/3D) into level_factory CLAUDE/README/docs + new machine-readable descriptor referencing the root palette. No generator code, no locked-value change. 207/943 unchanged. Next actor CHATGPT. |
 | M10-C001 | M10 - BoardRenderer Real-Artwork Debug/Manual-QA Fixtures | 2026-09-06 | 2026-09-06 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_V02.md | M10 (debug tooling; no checkbox change) | Independent audit passed. JSON-backed Real Artwork 007/010/013, BG01, VOID mask and flat batched grid overlay accepted. 207/943 unchanged. Next actor OWNER manual visual QA. |
 | META-C004 | META - Gameplay Rule Migration ACTIVE/CLEARED + Reachable Targets | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V02.md | M02/M10/M11/M13/M48 + future gameplay contracts | ACTIVE/CLEARED migration final AUDITED_PASS. V02 closes M48, Project Brief semantic residue and AL-025 receipt. 207/943. Owner manual QA required before M14. |
 | M13-C001 | M13 - Eligible Target Index | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V02.md | SB-M13-001..010 | V02 closes scan-observability gap and formally validates 006..010. M13 final AUDITED_PASS. 206/943. M14 not opened; owner requested manual QA first. |
@@ -420,6 +421,28 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CLAUDE_LOG_V01.md
 - Scope: docs/data governance only. Persist C01..C15, difficulty color-count bands, BG01 #202533, ACTIVE/CLEARED semantics and flat-square/no-bead pixel-art generation rules into Level Factory governance and a machine-readable descriptor. Do not implement LF generator code.
 - Cycle state: `ISSUED`; next actor CLAUDE.
+
+### META-C005 V01 implementation
+
+- Added `level_factory/data/canonical_visual_contract_v1.json` — references the
+  root palette (`data/palettes/scrubbots_palette_v1.json`) and stores only
+  locked non-palette metadata (BG01 id/hex/rgb, difficulty distinct-used-color
+  bands, ACTIVE/CLEARED semantics, flat-cell render flags, generator guards).
+  Not a second palette authority; root wins on conflict.
+- `level_factory/CLAUDE.md`: new MUST-READ "Canonical visual contract" section
+  binding every generate/mutate/validate/preview/export session.
+- `level_factory/README.md`: ART_FIRST/PUZZLE_FIRST modes + a Canonical visual
+  contract section (C01..C15, hard bands, BG01 non-logical background, flat
+  square cells).
+- `level_factory/docs/00_VISION_AND_SCOPE.md` and `01_ARCHITECTURE.md`: an
+  authoritative "Canonical Visual Contract" section (palette, bands, BG01
+  table, ACTIVE/CLEARED, flat-cell/no-bead/no-interpolation, grid-not-a-color).
+- `level_factory/docs/02_ROADMAP.md`: LF02 generation + LF05 validation now
+  explicitly consume/enforce the contract as hard legality.
+- Root palette JSON + `docs/08` unchanged; no `level_factory/scripts/`
+  generator code added (still `.gitkeep`); no SB checkbox change; 207/943
+  unchanged. `project.godot` owner change preserved, not staged.
+- Cycle state: `AWAITING_AUDIT`; next actor CHATGPT.
 
 
 ## M10-C001 final independent audit V02

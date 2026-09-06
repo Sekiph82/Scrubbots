@@ -24,6 +24,39 @@ Do not invent dependency, stack, deadlock, reachability, slot-pressure,
 win/solution or progression semantics. Implement adapters/interfaces and
 wait for canonical gameplay decisions where needed.
 
+## Canonical visual contract [MUST READ before any artwork work]
+
+Before generating, mutating, validating, previewing or exporting any pixel
+artwork — in either ART_FIRST or PUZZLE_FIRST mode — every Level Factory /
+pixel-art-generation session MUST read and obey the owner-locked root visual
+contract (META-C005):
+
+- Root palette rules: `docs/08_PIXEL_ART_PALETTE_RULES.md`
+- Root palette (single authority): `data/palettes/scrubbots_palette_v1.json`
+- Factory descriptor (references the root, never redefines it):
+  `level_factory/data/canonical_visual_contract_v1.json`
+
+Locked rules the Factory must enforce, never weaken:
+
+- Logical artwork colors are **C01..C15 only** (root palette). No C16, no
+  off-palette RGB.
+- Difficulty distinct-used-color bands are hard legality:
+  EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12. Count only distinct
+  canonical logical cell colors actually used by artwork cells.
+- `BG01 Midnight Slate #202533 = RGB(32,37,51)` is the production gameplay
+  background: visible through CLEARED alpha-0 cells, **not** C16, **not** a
+  logical artwork color, never a LevelData cell color, and never counted
+  toward distinct-used-color totals.
+- ACTIVE = opaque canonical source color; CLEARED = alpha 0 with BG01 showing
+  through.
+- Every logical square is a real gameplay cell rendered as one flat solid
+  canonical color with visible square-cell separation — **no** gloss,
+  highlight, bevel, drop shadow, 3D/plastic-bead appearance or interpolation.
+  Grid/border separation is presentation-only and creates no logical color.
+
+If the descriptor ever conflicts with the root palette JSON, the root palette
+JSON wins. Do not create a second independent palette table that can drift.
+
 ## GitHub coordination
 
 1. Safely sync \`origin/main\`.
