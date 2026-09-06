@@ -1,3 +1,14 @@
+### M14-C001 V01 milestone opening
+
+- State: **ISSUED**
+- New milestone: **M14 Reservation State**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_PROMPT_V01.md
+- Architecture direction: reservation stays separate from BoardState; BoardState remains ACTIVE/CLEARED only.
+- Scope: SB-M14-001..009 + deferred SB-M02-017.
+- Current progress: **214/943 = 22.69%**.
+- Next actor: CLAUDE.
+- Owner should start a fresh Claude chat for this milestone.
+
 ### M10-C001 V08 final audit and owner QA closure
 
 - Decision: **AUDITED_PASS / COMPLETE**
@@ -85,15 +96,15 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Active cycle | M10-C001 |
-| Active version | V06 |
+| Active cycle | M14-C001 |
+| Active version | V01 |
 | State | ISSUED |
 | Next actor | CLAUDE |
 | Branch | main |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V06.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V06.md |
-| Purpose | M10-C001 V06 combines the pending Real Artwork variable-canvas correction, the owner-locked palette expansion to C01..C16 with C16 Pure Black #000000 using canonical palette v2, and coordination ownership normalization so ChatGPT alone updates trackers/dashboard/session index after audit. |
-| Result | Awaiting Claude implementation. Canonical progress remains 207/943 = 21.95%. SB-M10-005..011 remain owner manual-QA gates; M14 remains NOT_STARTED. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_PROMPT_V01.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CLAUDE_LOG_V01.md |
+| Purpose | M14-C001 V01 opens Reservation State: separate ephemeral target-assignment ownership, atomic reservation, release/reset/arrival resolution, no BoardState RESERVED state, no M15+ implementation. |
+| Result | Awaiting Claude implementation. Progress remains 214/943 = 22.69% until audit. |
 
 ### M10-C001 ChatGPT issuance
 
@@ -148,8 +159,8 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Active cycle | M10-C001 |
-| Active version | V06 |
+| Active cycle | M14-C001 |
+| Active version | V01 |
 | State | ISSUED |
 | Next actor | CLAUDE |
 
@@ -226,9 +237,9 @@ Tracking sources:
 | Merged PR | PR #3 (MERGED) |
 | Prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md |
 | Criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_CRITERIA_V01.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V06.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CLAUDE_LOG_V01.md |
 | Gate | META-C002 V05 AUDITED_PASS |
-| Purpose | M10-C001 V06 combines the pending Real Artwork variable-canvas correction, the owner-locked palette expansion to C01..C16 with C16 Pure Black #000000 using canonical palette v2, and coordination ownership normalization so ChatGPT alone updates trackers/dashboard/session index after audit. |
+| Purpose | M14-C001 V01 opens Reservation State: separate ephemeral target-assignment ownership, atomic reservation, release/reset/arrival resolution, no BoardState RESERVED state, no M15+ implementation. |
 
 ## META-C002 final independent audit V05
 
@@ -262,9 +273,9 @@ Tracking sources:
 | Next actor | CLAUDE |
 | Prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V02.md |
 | Audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V02.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V06.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CLAUDE_LOG_V01.md |
 | Scope | Eligible DIRTY target index/cache only; no TargetSelector or M14 reservation ownership |
-| Result | Awaiting Claude implementation. Canonical progress remains 207/943 = 21.95%. SB-M10-005..011 remain owner manual-QA gates; M14 remains NOT_STARTED. |
+| Result | Awaiting Claude implementation. Progress remains 214/943 = 22.69% until audit. |
 
 ## M13-C001 independent audit V01
 
@@ -309,11 +320,11 @@ Tracking sources:
 | Branch | main |
 | Prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V01.md |
 | Criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_CRITERIA_V01.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V06.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CLAUDE_LOG_V01.md |
 | Baseline | M13-C001 AUDITED_PASS, 206/943 |
 | Owner rule | ACTIVE source-color pixels -> CLEARED transparent holes; background visible |
 | Reachability | matching color is not sufficient; blocked ACTIVE cells are not targetable |
-| Result | Awaiting Claude implementation. Canonical progress remains 207/943 = 21.95%. SB-M10-005..011 remain owner manual-QA gates; M14 remains NOT_STARTED. |
+| Result | Awaiting Claude implementation. Progress remains 214/943 = 22.69% until audit. |
 | Gate | M14 remains NOT_STARTED until META-C004 audit and new manual QA |
 
 ## META-C004 independent audit V01
@@ -405,10 +416,10 @@ Tracking sources:
 | Session type | META-C005 V01 canonical visual contract propagation (docs/data governance) |
 | Cycle status | `AWAITING_AUDIT` |
 | Summary | Propagated the already owner-locked SCRUBBOTS visual contract into Level Factory governance — no generator code, no locked-value change, no SB checkbox change. New `level_factory/data/canonical_visual_contract_v1.json` references the root palette (`data/palettes/scrubbots_palette_v1.json`, single authority) and stores only locked non-palette metadata (BG01 id/hex/rgb, difficulty distinct-used-color bands, ACTIVE/CLEARED semantics, flat-cell render flags, generator guards). Added a MUST-READ Canonical Visual Contract section to `level_factory/CLAUDE.md`; updated `README.md` modes; added authoritative Canonical Visual Contract sections to `docs/00_VISION_AND_SCOPE.md` and `01_ARCHITECTURE.md`; made `docs/02_ROADMAP.md` LF02 generation + LF05 validation enforce the contract. Verified: root palette + `docs/08` byte-unchanged; BG01 exactly #202533/RGB(32,37,51) and explicitly not C16/not-logical/excluded-from-count; difficulty bands EASY 3–5/MEDIUM 6–7/HARD 8–9/VERY_HARD 10–12 intact; descriptor JSON valid and non-authoritative; `level_factory/scripts/` still only `.gitkeep`. `git diff --check` clean; `project.godot` owner change preserved and not staged. Progress unchanged 207/943 = 21.95%. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V06.md |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_PROMPT_V01.md |
 | Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_AUDIT_CRITERIA_V01.md |
 | Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_V02.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V06.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CLAUDE_LOG_V01.md |
 | Next expected actor | CHATGPT (audit META-C005 V01) |
 
 ## Milestone summary
@@ -449,7 +460,7 @@ Tracking sources:
 
 ## Coordination source map
 
-| Purpose | M10-C001 V06 combines the pending Real Artwork variable-canvas correction, the owner-locked palette expansion to C01..C16 with C16 Pure Black #000000 using canonical palette v2, and coordination ownership normalization so ChatGPT alone updates trackers/dashboard/session index after audit. |
+| Purpose | M14-C001 V01 opens Reservation State: separate ephemeral target-assignment ownership, atomic reservation, release/reset/arrival resolution, no BoardState RESERVED state, no M15+ implementation. |
 | --- | --- |
 | Task ledger | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 | Agent governance | https://github.com/Sekiph82/Scrubbots/blob/main/CLAUDE.md |
