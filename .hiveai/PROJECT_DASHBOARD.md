@@ -1,3 +1,5 @@
+- Progress at M17 owner gate: **262/943 = 27.78%** overall; **262/719 = 36.44%** main + SB-UI. SB-M17-010 remains open.
+
 ### M17-C001 owner design gate
 
 - Technical audit: **AUDITED_PASS**
