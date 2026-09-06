@@ -1,3 +1,13 @@
+### M15-C001 V01 final audit
+
+- Decision: **AUDITED_PASS / COMPLETE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CHATGPT_AUDIT_V01.md
+- TargetSelector accepted: deterministic target choice + injected access truth + atomic ReservationState ownership; routing remains M16+.
+- SB-M15-001..012 closed.
+- Claude evidence: **1155/1155 ALL PASS**.
+- ChatGPT independently inspected the actual implementation and test code; Godot was not independently rerun in the audit environment.
+- Next main-game milestone: **M16 RoutingSystem Interface** (NOT_STARTED).
+
 ### M15-C001 V01 milestone opening
 
 - State: **ISSUED**
