@@ -655,3 +655,82 @@ absence of proof of reachability is treated as unreachable.
   AL-020); it mutates only `ReservationState` via its public `reserve()`.
 
 **Status**: Accepted (M15).
+
+### ADR-024: RoutingSystem interface — board-local route contract with injected access seam
+
+**Context**: M16 opens the routing layer. TargetSelector (ADR-023) already
+decides WHAT target a Scrubbot assignment gets and reserves it atomically.
+M16 must define HOW a routing implementation answers "give me a route to that
+already-assigned target" — but the real path algorithm and movement language
+(4-neighbour vs 8-neighbour vs curves vs pixel collision vs AStar vs navmesh)
+are deliberately deferred to M17. So M16 is a CONTRACT/interface milestone, not
+a pathfinder. It also must be resolution-independent: routes cannot bake in
+1080×2160, BoardRenderer pixel sizes, safe areas, or UI layout, because those
+change per device and per milestone.
+
+**Decision**: A small swappable routing contract plus detached data types under
+`scripts/gameplay/routing/` (all `extends RefCounted`, explicit `preload`,
+AL-001):
+
+- **Board-local cell coordinate space** (resolution-independent): board
+  top-left = `Vector2(0,0)`; one logical cell = 1.0×1.0 units; cell `(x,y)`
+  spans `[x,x+1]×[y,y+1]`; cell center = `Vector2(x+0.5, y+0.5)`; the board
+  rectangle spans `[0,board_width]×[0,board_height]`. This is NOT screen pixels
+  and NOT global Canvas coordinates. Presentation maps these to pixels later
+  using live BoardRenderer geometry. Cell index↔position math stays centralized
+  in `BoardState`; routing never re-derives row-major indexing.
+- **`RouteRequest`** (`route_request.gd`): exactly one already-assigned target —
+  `start_position` (slot origin, board-local, **may lie outside the board**),
+  `target_index`, `target_position` (canonical target cell center), plus
+  `board_width`/`board_height`. It carries NO alternate/color candidate list, NO
+  random fallback, NO target-selection or reservation-mutation callback, so a
+  routing implementation structurally cannot retarget. `for_target(board, …)`
+  derives the center and dimensions from BoardState so the caller cannot supply
+  a mismatched center; BoardState itself is passed as a method argument, never
+  stored in route data (AL-020).
+- **`RouteResult`** (`route_result.gd`): detached, immutable-by-convention —
+  `success`, `target_index`, board-local `points` (PackedVector2Array), stable
+  `failure_reason` StringName. Success ⇒ `success==true`, target matches the
+  request, `points.size() >= 2`, first point == slot origin, last point ==
+  assigned target center, every segment accepted by access truth. Failure ⇒
+  `success==false`, empty points, original target retained, explicit reason.
+  Points are copied in and handed back detached so callers cannot mutate routing
+  truth. "No route" is first-class failure, never an exception.
+- **`RoutingSystem`** (`routing_system.gd`): swappable base contract
+  `compute_route(request, board, access_query) -> RouteResult`. It is NOT a
+  global singleton, so implementations swap per caller with no TargetSelector
+  change. The base implementation invents no route — it returns a clean
+  `NOT_IMPLEMENTED` failure. M16 ships no production algorithm.
+- **Injected access/validity seam**: route validity consumes an authoritative
+  duck-typed `access_query.is_segment_traversable(from, to, target_index) ->
+  bool`, encoding the locked law (non-target ACTIVE cells block; CLEARED /
+  background / outside-board free space is open; the assigned ACTIVE target may
+  be the final endpoint). M16 does not decide HOW that truth is computed or what
+  topology it uses — that is M17. Missing access truth fails closed.
+- **`RouteValidator`** (`route_validator.gd`): stateless static checks for
+  request structure and for a claimed route (target identity, ≥2 points, exact
+  endpoints, and every consecutive segment through injected access truth).
+- **Debug visualization** (`scripts/debug/route_debug_overlay.gd`): generic,
+  debug-only, consumes a RouteResult ONLY (polyline + start/end markers on
+  success; failure/no-route text otherwise) via a pure, directly-testable
+  `build_draw_model()`. It never computes a route, never retargets, never
+  mutates BoardState, and is not production gameplay UI.
+
+**Reason**: a tiny board-local value contract keeps routing independent of phone
+resolution and of the WHAT/HOW boundary (CLAUDE.md hard rule 14). Injecting the
+access seam lets M17 supply real topology without touching route data, slot
+logic, cell state, scoring, or rendering. The critical law is encoded
+structurally: *route failure for target X is not permission to pick target Y* —
+RoutingSystem has no handle to TargetSelector / ColorCandidateIndex /
+ReservationState and cannot retarget.
+
+**Consequences**:
+
+- M17 owns the final routing algorithm and movement language; it subclasses
+  `RoutingSystem` and supplies/consumes the real access-truth implementation.
+- No AStar/BFS/DFS/direct/curved/collision-radius/congestion logic exists in
+  M16; only tests/debug fixtures emit small fake routes to prove the interface.
+- Coordinate contract verified up to 59×59 (max) and Very Hard rectangular
+  53×59; segment queries are directly observed in tests (AL-018).
+
+**Status**: Accepted (M16).

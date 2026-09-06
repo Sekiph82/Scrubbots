@@ -78,10 +78,22 @@ Reachability/access  --- filters blocked/unreachable candidates --->
   truth is supplied by the caller as a narrow injected `access_query`
   (`is_targetable(index) -> bool`); the selector fails closed when it is missing
   (ADR-023).
-- `RoutingSystem` (M16+, future) answers "given a start point and the already
-  selected target, what path/motion should the Scrubbot follow?" It has no
-  opinion about which cell was chosen and **must never silently retarget** if
-  the assigned target has no route — no route is a failure, not a re-pick.
+- `RoutingSystem` (M16, implemented — CONTRACT only, ADR-024) answers "given a
+  start point and the already selected target, what path should the Scrubbot
+  follow?" via a swappable `compute_route(request, board, access_query) ->
+  RouteResult`. Route data lives in a resolution-independent **board-local cell
+  coordinate space** (top-left `(0,0)`, one cell = 1×1 units, cell center
+  `(x+0.5,y+0.5)`; slot origins may lie outside the board — no screen pixels,
+  never 1080×2160 baked in). A route starts at the slot origin, ends at the
+  assigned target cell center, keeps the same `target_index`, and is validated
+  segment-by-segment through an **injected** `access_query`
+  (`is_segment_traversable(from, to, target_index) -> bool`). It has no opinion
+  about which cell was chosen, holds no handle to TargetSelector /
+  ColorCandidateIndex / ReservationState, and **must never silently retarget** —
+  no route is a first-class failure, not a re-pick. The actual path algorithm
+  and movement language remain M17; M16 ships the interface + data types +
+  validator + generic debug visualizer only (files under
+  `scripts/gameplay/routing/`, debug overlay under `scripts/debug/`).
 - This split means the routing/pathing algorithm can be swapped or upgraded
   without touching level data, slot logic, cell state, scoring, or rendering.
   Do not merge `TargetSelector` and `RoutingSystem` into one script, and do
