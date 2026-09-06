@@ -809,17 +809,17 @@ candidates from `ColorCandidateIndex` plus a narrow reachability/access truth;
 it must never generate a route. A matching-color ACTIVE cell that is
 blocked/unreachable is not a valid target (AL-028).
 
-- [ ] SB-M15-001 Create TargetSelector.
-- [ ] SB-M15-002 Keep BoardState access narrow.
-- [ ] SB-M15-003 Baseline deterministic strategy.
-- [ ] SB-M15-004 Match Scrubbot color.
-- [ ] SB-M15-005 Never target CLEARED. — [ ] SB-M15-006 Never target invalid or blocked/unreachable ACTIVE cells (consume a narrow reachability/access truth; a fully enclosed matching-color ACTIVE cell must not be selected and must not cause dispatch — required regression, AL-028).
-- [ ] SB-M15-007 Respect reservations.
-- [ ] SB-M15-008 Return no-target cleanly.
-- [ ] SB-M15-009 No route generation inside selector (8.10).
-- [ ] SB-M15-010 Determinism tests.
-- [ ] SB-M15-011 Simultaneous assignment tests.
-- [ ] SB-M15-012 3,481-cell benchmark.
+- [x] SB-M15-001 Create TargetSelector.
+- [x] SB-M15-002 Keep BoardState access narrow.
+- [x] SB-M15-003 Baseline deterministic strategy.
+- [x] SB-M15-004 Match Scrubbot color.
+- [x] SB-M15-005 Never target CLEARED. — [x] SB-M15-006 Never target invalid or blocked/unreachable ACTIVE cells (consume a narrow reachability/access truth; a fully enclosed matching-color ACTIVE cell must not be selected and must not cause dispatch — required regression, AL-028).
+- [x] SB-M15-007 Respect reservations.
+- [x] SB-M15-008 Return no-target cleanly.
+- [x] SB-M15-009 No route generation inside selector (8.10).
+- [x] SB-M15-010 Determinism tests.
+- [x] SB-M15-011 Simultaneous assignment tests.
+- [x] SB-M15-012 3,481-cell benchmark.
 
 ### M16 — RoutingSystem Interface
 
