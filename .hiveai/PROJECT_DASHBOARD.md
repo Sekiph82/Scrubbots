@@ -1,3 +1,15 @@
+### M16-C001 V01 milestone opening
+
+- State: **ISSUED**
+- New milestone: **M16 RoutingSystem Interface**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_PROMPT_V01.md
+- Defines HOW-routing contract only for an already-assigned target; TargetSelector remains WHAT-target owner.
+- Board-local cell coordinates, caller slot origin, assigned target-center destination, swappable implementations, explicit failure/no-retarget contract, and debug route visualization.
+- M17 owns the actual routing prototypes/final movement-language research.
+- Current progress: **236/943 = 25.03%**; main + SB-UI **236/719 = 32.82%**.
+- Next actor: CLAUDE.
+- Owner should start a fresh Claude chat for this milestone.
+
 - Progress after M15: **236/943 = 25.03%** overall; **236/719 = 32.82%** main + SB-UI; LF **0/112**; CP **0/112**.
 
 ### M15-C001 V01 final audit
