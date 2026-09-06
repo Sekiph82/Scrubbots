@@ -25,6 +25,7 @@ unless the owner explicitly changes the rule and versions the palette.
 | C13 | Light Gray | `#B8C2CC` | 184, 194, 204 |
 | C14 | Charcoal | `#3D4652` | 61, 70, 82 |
 | C15 | Pure White | `#FFFFFF` | 255, 255, 255 |
+| C16 | Pure Black | `#000000` | 0, 0, 0 |
 
 ## Production distinct-color bands
 
@@ -43,7 +44,7 @@ These are hard production-content bands, not approximate guidance.
 ## Locked semantics
 
 - Every ACTIVE logical cell uses exactly one of C01..C16.
-- No sixteenth production logical color may be introduced silently.
+- No seventeenth production logical color may be introduced silently.
 - A production level's local LevelData palette is a subset of C01..C16,
   contains only canonical colors actually used by its logical cells, and is
   ordered by ascending global C-ID.
