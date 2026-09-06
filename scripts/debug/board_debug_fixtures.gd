@@ -171,11 +171,92 @@ static func load_real_fixture(path: String) -> Dictionary:
 		"display_name": display_name,
 		"width": width,
 		"height": height,
+		# Explicit source-matrix dimensions. These are the IMMUTABLE source
+		# artwork bounding matrix, NOT a canvas size. Use
+		# embed_real_fixture_in_canvas() to place this source into a debug canvas.
+		"source_width": width,
+		"source_height": height,
+		"palette": palette,
 		"background_hex": str(bg.get("hex", "#202533")),
 		"palette_subset_ids": subset_ids,
 		"color_counts": parsed.get("color_counts", {}),
 		"void_count": int(parsed.get("void_count", 0)),
 		"artwork_cell_count": int(parsed.get("artwork_cell_count", 0)),
+	}
+
+## Debug-only embedding: place an UNCHANGED source fixture (from
+## load_real_fixture) centered inside a larger debug canvas using VOID padding
+## only. The source matrix is never scaled, resampled, stretched, cropped,
+## repainted or regenerated — every source square stays exactly one logical
+## cell; source VOID stays VOID; all padding around it is debug VOID.
+##
+## Valid only when canvas_w >= source_width and canvas_h >= source_height.
+## Center offset = floor((canvas - source) / 2).
+##
+## Returns a Dictionary:
+##   ok, error,
+##   level (LevelData at canvas size), void_mask (PackedByteArray, 1 = VOID),
+##   fixture_id, display_name,
+##   source_width, source_height, canvas_width, canvas_height,
+##   offset_x, offset_y,
+##   background_hex, palette_subset_ids, color_counts,
+##   artwork_cell_count (== source), void_count (canvas cells - artwork).
+static func embed_real_fixture_in_canvas(source: Dictionary, canvas_w: int, canvas_h: int) -> Dictionary:
+	var fail := func(msg: String) -> Dictionary: return {"ok": false, "error": msg}
+	if source == null or not source.get("ok", false):
+		return fail.call("invalid source fixture")
+	var sw: int = int(source.source_width)
+	var sh: int = int(source.source_height)
+	if canvas_w < sw or canvas_h < sh:
+		return fail.call("canvas %dx%d too small for source %dx%d" % [canvas_w, canvas_h, sw, sh])
+
+	var offset_x: int = int(floor((canvas_w - sw) / 2.0))
+	var offset_y: int = int(floor((canvas_h - sh) / 2.0))
+
+	var src_level = source.level
+	var src_void: PackedByteArray = source.void_mask
+	var palette: PackedStringArray = source.palette
+
+	var cells := PackedInt32Array()
+	cells.resize(canvas_w * canvas_h)
+	var void_mask := PackedByteArray()
+	void_mask.resize(canvas_w * canvas_h)
+	# Whole canvas starts as debug VOID (placeholder color id 0).
+	void_mask.fill(1)
+	# Copy the unchanged source matrix into the centered window.
+	for sy in sh:
+		for sx in sw:
+			var s_i := sy * sw + sx
+			var d_i := (offset_y + sy) * canvas_w + (offset_x + sx)
+			if src_void[s_i] == 1:
+				# source VOID stays VOID
+				continue
+			void_mask[d_i] = 0
+			cells[d_i] = src_level.cells[s_i]
+
+	var artwork := int(source.artwork_cell_count)
+	var level := LevelData.new(
+		1, str(source.fixture_id) + "_canvas_%dx%d" % [canvas_w, canvas_h],
+		str(source.display_name), "TEST", canvas_w, canvas_h, palette, cells
+	)
+	return {
+		"ok": true,
+		"error": "",
+		"level": level,
+		"void_mask": void_mask,
+		"fixture_id": source.fixture_id,
+		"display_name": source.display_name,
+		"source_width": sw,
+		"source_height": sh,
+		"canvas_width": canvas_w,
+		"canvas_height": canvas_h,
+		"offset_x": offset_x,
+		"offset_y": offset_y,
+		"background_hex": source.background_hex,
+		"palette_subset_ids": source.palette_subset_ids,
+		"color_counts": source.color_counts,
+		"artwork_cell_count": artwork,
+		"void_count": canvas_w * canvas_h - artwork,
 	}
 
 ## Applies an ACTIVE/CLEARED pattern only to artwork cells; VOID cells

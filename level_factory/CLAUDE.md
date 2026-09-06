@@ -67,8 +67,9 @@ JSON wins. Do not create a second independent palette table that can drift.
 3. Implement/test/log only.
 4. Maintain exactly one append-only
    \`CLAUDE_IMPLEMENTATION_LOG.md\` per cycle.
-5. Update root \`tasks.md\`, Factory \`coordination/SESSION_INDEX.md\` and
-   root \`.hiveai/PROJECT_DASHBOARD.md\` with validated truth.
+5. **[M10-C001 V05]** Write only the version-matched \`CLAUDE_LOG_VNN.md\`.
+   Do NOT update root \`tasks.md\`, \`coordination/SESSION_INDEX.md\`, or any
+   \`.hiveai/\` tracker/dashboard file — ChatGPT owns those after its audit.
 6. Push safely to \`origin/main\`; never force.
 7. Return \`AWAITING_AUDIT\` and stop.
 8. Never create audit/self-audit files and never assign audit verdicts.
@@ -98,15 +99,18 @@ creates both logs and identifies shared commits/tests explicitly.
 Historical `CLAUDE_IMPLEMENTATION_LOG.md` files are legacy evidence only.
 Do not delete them, but do not use that naming pattern for new prompt work.
 
-Before ending a material session, update these derived H!veAI sources:
-
-- `.hiveai/ACTIVE_CYCLES.md`
-- `.hiveai/ARTIFACT_MAP.md`
-- `.hiveai/PROGRESS_SNAPSHOT.md`
-
-Then materialize the latest state into
-`.hiveai/PROJECT_DASHBOARD.md`. H!veAI actively watches only the dashboard.
+**Coordination ownership [LOCKED, M10-C001 V05]:** Claude does NOT update the
+derived H!veAI sources (`.hiveai/ACTIVE_CYCLES.md`, `.hiveai/ARTIFACT_MAP.md`,
+`.hiveai/PROGRESS_SNAPSHOT.md`), `.hiveai/PROJECT_DASHBOARD.md`, or
+`coordination/SESSION_INDEX.md`. ChatGPT owns those after its independent
+audit. Claude's cycle ends at `CLAUDE_LOG_VNN.md` + safe commit/push +
+`AWAITING_AUDIT` + stop. H!veAI actively watches only the dashboard.
 `tasks.md` remains the only canonical task ledger.
+
+```text
+Claude:  implement + test + CLAUDE_LOG_VNN.md + safe commit/push + AWAITING_AUDIT + stop.
+ChatGPT: independent audit + CHATGPT_AUDIT_VNN.md + SESSION_INDEX / H!veAI tracker / PROJECT_DASHBOARD updates.
+```
 
 Canonical policy:
 https://github.com/Sekiph82/Scrubbots/blob/main/coordination/VERSIONED_LOG_POLICY.md

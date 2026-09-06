@@ -61,7 +61,7 @@ Historical `CLAUDE_SELF_AUDIT_*` files created before the owner corrected the wo
 4. **Claude safely syncs local `main`.**
 5. **Claude implements**, runs the tests/checks required by the prompt, and appends results to `CLAUDE_IMPLEMENTATION_LOG.md`.
 6. Claude uses prior ChatGPT audit findings to strengthen the current test plan, but records that comparison only in the implementation log.
-7. Claude updates `tasks.md` only with validated truth, then updates `SESSION_INDEX.md` and `.hiveai/PROJECT_DASHBOARD.md`.
+7. Claude writes only the version-matched `CLAUDE_LOG_VNN.md` and commits/pushes. **[M10-C001 V05]** Claude does NOT update `tasks.md`, `SESSION_INDEX.md`, or any `.hiveai/` tracker/dashboard file — ChatGPT owns those after its audit.
 8. Claude hands the cycle back as `AWAITING_AUDIT` or `BLOCKED`.
 9. **ChatGPT independently audits actual GitHub state** and publishes `CHATGPT_AUDIT_VNN.md`.
 10. If clean, ChatGPT sets `AUDITED_PASS`.
@@ -108,15 +108,22 @@ During implementation/testing:
 - treat Claude-run green tests as implementer evidence, not an audit verdict;
 - never use `AUDITED_PASS` or `AUDITED_FAIL`.
 
-Before ending:
+Before ending **[coordination ownership normalized, M10-C001 V05]**:
 
-1. Append the implementation/test evidence to `CLAUDE_IMPLEMENTATION_LOG.md`.
-2. Update `tasks.md` only when validated truth changed.
-3. Update `coordination/SESSION_INDEX.md`.
-4. Update `.hiveai/PROJECT_DASHBOARD.md`.
-5. Commit/push safely.
-6. Set `AWAITING_AUDIT` when ready for ChatGPT review, or `BLOCKED` when truly blocked.
-7. Stop. Do not perform an audit.
+1. Append the implementation/test evidence to the version-matched `CLAUDE_LOG_VNN.md`.
+2. Commit/push safely.
+3. Set `AWAITING_AUDIT` when ready for ChatGPT review, or `BLOCKED` when truly blocked.
+4. Stop. Do not perform an audit.
+
+Claude does NOT update `tasks.md`, `coordination/SESSION_INDEX.md`, or any
+`.hiveai/` tracker/dashboard file. ChatGPT owns SESSION_INDEX, the H!veAI
+trackers and `PROJECT_DASHBOARD.md` after its independent audit. Ownership
+split:
+
+```text
+Claude:  implement + test + CLAUDE_LOG_VNN.md + safe commit/push + AWAITING_AUDIT + stop.
+ChatGPT: independent audit + CHATGPT_AUDIT_VNN.md + SESSION_INDEX / H!veAI tracker / PROJECT_DASHBOARD updates.
+```
 
 Claude must never create or modify `CHATGPT_AUDIT_VNN.md`.
 
@@ -134,7 +141,8 @@ H!veAI actively watches only:
 
 https://github.com/Sekiph82/Scrubbots/blob/main/.hiveai/PROJECT_DASHBOARD.md
 
-ChatGPT and Claude materialize the latest relevant state into that file after every material session.
+**[M10-C001 V05]** ChatGPT materializes the latest relevant state into that
+file after its independent audit. Claude does not update the dashboard.
 
 Source evidence includes:
 

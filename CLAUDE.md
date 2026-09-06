@@ -204,9 +204,11 @@ touching level data, slot logic, cell state, scoring, or rendering.
 
 ## 5. H!veAI dashboard contract
 
-36. Before ending a run that materially changes project state, refresh
-    `.hiveai/PROJECT_DASHBOARD.md` so it remains the single H!veAI-facing
-    status contract.
+36. `.hiveai/PROJECT_DASHBOARD.md` is the single H!veAI-facing status
+    contract. **[SUPERSEDED — see the Coordination-ownership override at the
+    end of this file, M10-C001 V05.]** Claude does **not** update this
+    dashboard or any H!veAI tracker file; ChatGPT owns those after its
+    independent audit. Claude may read the dashboard for context.
 
 ## 6. Working style
 
@@ -250,12 +252,14 @@ replace `tasks.md` or the local Desktop phase log.
     crash-safe local phase journal; the GitHub implementation log is durable
     communication evidence for ChatGPT/H!veAI/owner review. Never commit the
     Desktop phase log.
-42. Before ending any **material** Claude session, update both
-    `coordination/SESSION_INDEX.md` and `.hiveai/PROJECT_DASHBOARD.md`.
-    Dashboard updates must include timestamp, actor, cycle ID/status,
-    milestone/task refs, concise summary, evidence, blocker/waiting state,
-    and next expected actor/action. `tasks.md` remains the only canonical
-    task ledger; never duplicate its checkbox list in the dashboard.
+42. **[SUPERSEDED by the Coordination-ownership override at the end of this
+    file, M10-C001 V05.]** Claude no longer updates
+    `coordination/SESSION_INDEX.md` or `.hiveai/PROJECT_DASHBOARD.md`.
+    ChatGPT owns SESSION_INDEX, the H!veAI trackers and the dashboard after
+    its independent audit; those updates carry timestamp, actor, cycle
+    ID/status, milestone/task refs, summary, evidence, blocker/waiting state
+    and next expected actor. `tasks.md` remains the only canonical task
+    ledger and is still never duplicated in the dashboard.
 43. When implementation is ready for review, set the cycle state to
     `AWAITING_AUDIT`. Do not mark a cycle `AUDITED_PASS` yourself; that state
     is reserved for the ChatGPT audit step unless the owner explicitly
@@ -296,8 +300,10 @@ sidecar has its own `coordination/` subtree:
    `CHATGPT_AUDIT_CRITERIA_VNN.md`.
 2. Claude reads them from GitHub, implements/tests only, and appends to the
    cycle's single `CLAUDE_IMPLEMENTATION_LOG.md`.
-3. Claude updates root `tasks.md`, the sidecar session index and root
-   H!veAI dashboard, pushes safely, returns `AWAITING_AUDIT`, and stops.
+3. Claude implements/tests, writes the version-matched `CLAUDE_LOG_VNN.md`,
+   pushes safely, returns `AWAITING_AUDIT`, and stops. **[M10-C001 V05]**
+   Claude does **not** update `tasks.md`, the sidecar `SESSION_INDEX.md`, or
+   any H!veAI tracker/dashboard file — ChatGPT owns those after its audit.
 4. Claude does not create audit/self-audit files or assign audit verdicts.
 5. ChatGPT reads GitHub log + real diff/code/tests, publishes
    `CHATGPT_AUDIT_VNN.md`, and either closes the cycle or issues the next
@@ -326,15 +332,12 @@ creates both logs and identifies shared commits/tests explicitly.
 Historical `CLAUDE_IMPLEMENTATION_LOG.md` files are legacy evidence only.
 Do not delete them, but do not use that naming pattern for new prompt work.
 
-Before ending a material session, update these derived H!veAI sources:
-
-- `.hiveai/ACTIVE_CYCLES.md`
-- `.hiveai/ARTIFACT_MAP.md`
-- `.hiveai/PROGRESS_SNAPSHOT.md`
-
-Then materialize the latest state into
-`.hiveai/PROJECT_DASHBOARD.md`. H!veAI actively watches only the dashboard.
-`tasks.md` remains the only canonical task ledger.
+**[SUPERSEDED by the Coordination-ownership override at the end of this file,
+M10-C001 V05.]** Claude does **not** update the derived H!veAI sources
+(`.hiveai/ACTIVE_CYCLES.md`, `.hiveai/ARTIFACT_MAP.md`,
+`.hiveai/PROGRESS_SNAPSHOT.md`) or materialize `.hiveai/PROJECT_DASHBOARD.md`.
+ChatGPT owns those after its independent audit. H!veAI actively watches only
+the dashboard. `tasks.md` remains the only canonical task ledger.
 
 Canonical policy:
 https://github.com/Sekiph82/Scrubbots/blob/main/coordination/VERSIONED_LOG_POLICY.md
@@ -425,3 +428,30 @@ commands merely to make the tree clean before a task.
 Record and preserve such changes. Do not stage them unless the active prompt
 explicitly owns them. If they prevent safe synchronization or implementation,
 fail closed as `BLOCKED` rather than overwriting owner intent.
+
+
+## Coordination ownership normalization [LOCKED, effective M10-C001 V05]
+
+This owner instruction supersedes every earlier instruction in this file that
+told Claude to update H!veAI tracker files, the project dashboard, or the
+session index.
+
+```text
+Claude:  implement + test + write CLAUDE_LOG_VNN.md + safe commit/push
+         + hand off as AWAITING_AUDIT + stop.
+ChatGPT: independent audit + CHATGPT_AUDIT_VNN.md + all SESSION_INDEX /
+         H!veAI tracker / PROJECT_DASHBOARD updates + tracker closure.
+```
+
+Claude must **not** create or modify, as part of an implementation cycle:
+
+- `.hiveai/ACTIVE_CYCLES.md`
+- `.hiveai/ARTIFACT_MAP.md`
+- `.hiveai/PROGRESS_SNAPSHOT.md`
+- `.hiveai/PROJECT_DASHBOARD.md`
+- `coordination/SESSION_INDEX.md`
+- any `CHATGPT_AUDIT_VNN.md` or audit verdict
+
+Claude may **read** any of these for context. ChatGPT performs all of those
+updates after its independent audit. Unrelated governance rules above remain
+in force.

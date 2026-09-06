@@ -50,15 +50,18 @@ creates both logs and identifies shared commits/tests explicitly.
 Historical `CLAUDE_IMPLEMENTATION_LOG.md` files are legacy evidence only.
 Do not delete them, but do not use that naming pattern for new prompt work.
 
-Before ending a material session, update these derived H!veAI sources:
-
-- `.hiveai/ACTIVE_CYCLES.md`
-- `.hiveai/ARTIFACT_MAP.md`
-- `.hiveai/PROGRESS_SNAPSHOT.md`
-
-Then materialize the latest state into
-`.hiveai/PROJECT_DASHBOARD.md`. H!veAI actively watches only the dashboard.
+**Coordination ownership [LOCKED, M10-C001 V05]:** Claude does NOT update the
+derived H!veAI sources (`.hiveai/ACTIVE_CYCLES.md`, `.hiveai/ARTIFACT_MAP.md`,
+`.hiveai/PROGRESS_SNAPSHOT.md`), `.hiveai/PROJECT_DASHBOARD.md`, or
+`coordination/SESSION_INDEX.md`. ChatGPT owns those after its independent
+audit. Claude's cycle ends at `CLAUDE_LOG_VNN.md` + safe commit/push +
+`AWAITING_AUDIT` + stop. H!veAI actively watches only the dashboard.
 `tasks.md` remains the only canonical task ledger.
+
+```text
+Claude:  implement + test + CLAUDE_LOG_VNN.md + safe commit/push + AWAITING_AUDIT + stop.
+ChatGPT: independent audit + CHATGPT_AUDIT_VNN.md + SESSION_INDEX / H!veAI tracker / PROJECT_DASHBOARD updates.
+```
 
 Canonical policy:
 https://github.com/Sekiph82/Scrubbots/blob/main/coordination/VERSIONED_LOG_POLICY.md

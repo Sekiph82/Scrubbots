@@ -53,6 +53,12 @@ Derived tracking sources:
 
 H!veAI actively watches only .hiveai/PROJECT_DASHBOARD.md.
 
+**Ownership [LOCKED, M10-C001 V05]:** ChatGPT — not Claude — updates these
+derived tracking sources, `.hiveai/PROJECT_DASHBOARD.md`, and
+`coordination/SESSION_INDEX.md`, after its independent audit. Claude's cycle
+ends at `CLAUDE_LOG_VNN.md` + safe commit/push + `AWAITING_AUDIT` + stop. Claude
+may read these files for context but does not modify them.
+
 ## Progress reporting
 
 ChatGPT recalculates progress from tasks.md for every owner-facing audit/new
