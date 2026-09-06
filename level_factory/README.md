@@ -50,7 +50,7 @@ configuration + seed.
 ## Canonical visual contract (owner-locked, META-C005)
 
 Every Factory mode and phase obeys the root owner-locked visual contract
-(`docs/08_PIXEL_ART_PALETTE_RULES.md` + `data/palettes/scrubbots_palette_v1.json`;
+(`docs/08_PIXEL_ART_PALETTE_RULES.md` + `data/palettes/scrubbots_palette_v2.json`;
 Factory descriptor `level_factory/data/canonical_visual_contract_v1.json`):
 
 - **Logical artwork colors are C01..C16 only** — no C17, no off-palette RGB.
