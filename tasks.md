@@ -849,7 +849,7 @@ working solution — prototype multiple options.
 - [x] SB-M17-004 Compare visual clarity. — [x] SB-M17-005 Compare path crossings.
 - [x] SB-M17-006 Compare congestion. — [x] SB-M17-007 Compare CPU cost.
 - [x] SB-M17-008 Compare route distance. — [x] SB-M17-009 Compare determinism.
-- [ ] SB-M17-010 Compare against original SCRUBBOTS visual direction.
+- [x] SB-M17-010 Compare against original SCRUBBOTS visual direction. — superseded for this gate by owner-reviewed Organized/curved selection because no authoritative original movement reference exists.
 - [x] SB-M17-011 Test 5 bots. — [x] SB-M17-012 Test 10 bots. — [x] SB-M17-013 Test 25 bots.
 - [x] SB-M17-014 Stress-test higher density.
 - [x] SB-M17-015 Test 59×59. — [x] SB-M17-016 Test rectangular Very Hard board.
