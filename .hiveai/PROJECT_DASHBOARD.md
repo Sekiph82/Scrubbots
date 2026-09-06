@@ -1,3 +1,5 @@
+- Progress after M17 owner decision: **263/943 = 27.89%** overall; **263/719 = 36.58%** main + SB-UI.
+
 ### M17 owner movement-language decision
 
 - **OWNER_SELECTS_ORGANIZED**
