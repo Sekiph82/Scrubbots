@@ -1,3 +1,12 @@
+### M10-C001 V05 ChatGPT final audit
+
+- Decision: **AUDITED_PASS**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_V05.md
+- Accepted: immutable source artwork matrices centered with VOID padding inside any selected valid debug canvas; no crop/scale/resample; coordination ownership split normalized so ChatGPT owns tracker/dashboard/session updates after audit.
+- Implementer evidence: **990/990 ALL PASS** and clean debug-scene headless boot.
+- V06 remains active for the later owner palette expansion to C01..C16 with C16 Pure Black #000000.
+- Progress unchanged: **207/943 = 21.95%**.
+
 ### M10-C001 V06 ChatGPT issuance
 
 - V06 supersedes unimplemented V05.
