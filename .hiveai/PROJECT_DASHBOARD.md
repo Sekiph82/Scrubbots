@@ -1,3 +1,16 @@
+### M17-C001 V01 milestone opening
+
+- State: **ISSUED**
+- New milestone: **M17 Routing Prototype Lab**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CHATGPT_PROMPT_V01.md
+- Builds and compares three experimental routing languages behind M16: Direct, Grid-aware, Organized/curved.
+- No prototype may be promoted to production yet.
+- Owner will review the debug Routing Prototype Lab and choose the final movement language.
+- M18 is blocked until that owner design gate is resolved.
+- Current progress: **247/943 = 26.19%**; main + SB-UI **247/719 = 34.35%**.
+- Next actor: CLAUDE.
+- Owner should start a fresh Claude chat for M17.
+
 - Progress after M16: **247/943 = 26.19%** overall; **247/719 = 34.35%** main + SB-UI; LF **0/112**; CP **0/112**.
 
 ### M16-C001 V01 final audit
