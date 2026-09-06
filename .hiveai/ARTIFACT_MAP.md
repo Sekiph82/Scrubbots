@@ -93,4 +93,4 @@ Owner fixture data: https://github.com/Sekiph82/Scrubbots/blob/main/coordination
 
 | Version | Prompt | Audit criteria | Claude log | ChatGPT audit | State |
 | --- | --- | --- | --- | --- | --- |
-| V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CLAUDE_LOG_V01.md | PENDING | ISSUED |
+| V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CLAUDE_LOG_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_AUDIT_V01.md | AUDITED_PASS |
