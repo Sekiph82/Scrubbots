@@ -31,6 +31,16 @@ This file is the single H!veAI-facing materialized project status surface. It is
 - Scope is debug/manual-QA tooling only. SB-M10-005..011 remain owner review gates and M14 remains NOT_STARTED.
 - Next actor: CLAUDE.
 
+### META-C005 ChatGPT issuance
+
+- Purpose: propagate the already owner-locked visual contract into Level Factory / future pixel-art generator governance.
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_PROMPT_V01.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_AUDIT_CRITERIA_V01.md
+- Rules to persist: C01..C15 only; EASY 3–5 / MEDIUM 6–7 / HARD 8–9 / VERY_HARD 10–12; BG01 #202533; ACTIVE opaque / CLEARED alpha-0; flat square cells with visible separation and no plastic/gloss/bevel/shadow/3D styling.
+- Docs/data governance only; do not start Level Factory generator code.
+- Progress unchanged.
+- Next actor: CLAUDE.
+
 ### Also active (on main)
 
 | Field | Value |
