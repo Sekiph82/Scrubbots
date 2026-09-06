@@ -16,13 +16,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | --- | --- |
 | Active cycle | META-C005 |
 | Active version | V01 |
-| State | ISSUED |
-| Next actor | CLAUDE |
+| State | AWAITING_AUDIT |
+| Next actor | CHATGPT |
 | Branch | main |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_PROMPT_V01.md |
 | Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CLAUDE_LOG_V01.md |
-| Purpose | META-C005 is the active pending cycle: propagate the already owner-locked SCRUBBOTS visual contract into Level Factory / future pixel-art generator governance and a machine-readable descriptor, without starting generator implementation. M10-C001 V02 has independently AUDITED_PASS: JSON-backed Real Artwork 007/010/013 debug fixtures, BG01, debug-only VOID masking and batched flat-cell grid overlay accepted. Canonical progress remains 207/943 = 21.95%. |
-| Result | M10-C001 V02: **AUDITED_PASS**. Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_V02.md. SB-M10-005..011 remain owner manual visual-QA gates; M14 remains NOT_STARTED. META-C005 has no Claude log yet and remains ISSUED. |
+| Purpose | META-C005 (docs/data governance only): propagate the already owner-locked SCRUBBOTS visual contract into Level Factory governance — `level_factory/CLAUDE.md`, `README.md`, `docs/00`/`01`/`02` now carry an authoritative Canonical Visual Contract (C01..C15 only; difficulty distinct-used-color bands EASY 3–5 / MEDIUM 6–7 / HARD 8–9 / VERY_HARD 10–12; BG01 #202533 non-logical background; ACTIVE opaque / CLEARED alpha-0; flat solid square cells with visible separation, no gloss/bevel/shadow/3D-bead/interpolation). New machine-readable descriptor `level_factory/data/canonical_visual_contract_v1.json` references the root palette (single authority) and stores only locked non-palette metadata. No generator code; root palette/docs-08 unchanged. |
+| Result | Docs/data governance only — no `level_factory/scripts/` code added, no locked palette/BG01/board-size/difficulty rule changed, no SB checkbox change. Canonical progress unchanged **207/943 = 21.95%** (main+UI 207/719, LF 0/112, CP 0/112). M10-C001 V02 remains AUDITED_PASS; SB-M10-005..011 owner manual-QA gates and M14/M15/M16/M17 remain OPEN. |
 
 ### M10-C001 ChatGPT issuance
 
@@ -51,7 +51,8 @@ This file is the single H!veAI-facing materialized project status surface. It is
 - Rules to persist: C01..C15 only; EASY 3–5 / MEDIUM 6–7 / HARD 8–9 / VERY_HARD 10–12; BG01 #202533; ACTIVE opaque / CLEARED alpha-0; flat square cells with visible separation and no plastic/gloss/bevel/shadow/3D styling.
 - Docs/data governance only; do not start Level Factory generator code.
 - Progress unchanged.
-- Next actor: CLAUDE.
+- V01 implemented by Claude: LF CLAUDE/README/docs00/01/02 carry the Canonical Visual Contract + new `level_factory/data/canonical_visual_contract_v1.json` (references root palette). No generator code, no locked-value change. 207/943 unchanged.
+- State: AWAITING_AUDIT; next actor: CHATGPT.
 
 ### Also active (on main)
 
@@ -294,13 +295,13 @@ Tracking sources:
 | Field | Value |
 | --- | --- |
 | Project status | ACTIVE |
-| Health | OK — META-C004 V02 corrections implemented, AWAITING_AUDIT |
-| Current implementation frontier | META-C004 V02 - narrow canonical-truth/evidence correction |
-| Current task | META-C004 V02: M48 QA wording + Project Brief "obscured" + AL-025 receipt |
-| Current task ID | `META-C004` |
-| Current workflow state | `AWAITING_AUDIT` — V02 (docs/tasks/evidence only, no production code/test change): M48 tasks.md reworded for CLEARED transparency + blocked matching-color reachability/solvability (13 IDs preserved); Project Brief "obscured pixel-art image" → "visible … ACTIVE at original source palette colors"; expanded conceptual semantic scan clean; AL-025 external commit-comment receipt on the V02 commit. Accepted V01 baseline intact: BoardState ACTIVE/CLEARED, CLEARED alpha-0 renderer, `ColorCandidateIndex` (targeting/), `dirty_clean_presets.gd` absent, 774/774. Progress unchanged 207/943. |
+| Health | OK — META-C005 V01 visual-contract propagation implemented, AWAITING_AUDIT |
+| Current implementation frontier | META-C005 V01 - canonical visual contract propagation to Level Factory |
+| Current task | META-C005 V01: persist owner-locked visual contract into LF governance + machine-readable descriptor |
+| Current task ID | `META-C005` |
+| Current workflow state | `AWAITING_AUDIT` — docs/data governance only, no generator code, no locked-value change. Propagated C01..C15-only + difficulty distinct-used-color bands (EASY 3–5 / MEDIUM 6–7 / HARD 8–9 / VERY_HARD 10–12) + BG01 #202533 (non-logical, not C16) + ACTIVE opaque / CLEARED alpha-0 + flat square cells (no gloss/bevel/shadow/3D-bead/interpolation) into `level_factory/CLAUDE.md`, `README.md`, `docs/00`/`01`/`02`, plus new `level_factory/data/canonical_visual_contract_v1.json` referencing the root palette (single authority). Root palette + docs/08 byte-unchanged; `level_factory/scripts/` still only `.gitkeep`. Progress unchanged 207/943. |
 | Required actor | CHATGPT |
-| Next project action | ChatGPT performs independent audit META-C004 V02. |
+| Next project action | ChatGPT performs independent audit META-C005 V01. |
 | Waiting on | Scrubby master reference: OWNER_REQUIRED. M10-005..011 owner manual QA of the NEW transparent model. M02-017/M14/M15/M16/M17 implementation gates open. |
 | Canonical task truth | https://github.com/Sekiph82/Scrubbots/blob/main/tasks.md |
 
@@ -308,17 +309,17 @@ Tracking sources:
 
 | Field | Value |
 | --- | --- |
-| Timestamp | 2026-09-05 |
+| Timestamp | 2026-09-06 |
 | Actor | CLAUDE |
-| Cycle | `META-C004` |
-| Session type | META-C004 V02 narrow canonical-truth/evidence correction |
+| Cycle | `META-C005` |
+| Session type | META-C005 V01 canonical visual contract propagation (docs/data governance) |
 | Cycle status | `AWAITING_AUDIT` |
-| Summary | V02 correction of the three audit-V01 findings, docs/tasks/evidence only — no production gameplay code or test change (`git diff --stat -- scripts tests` empty). F-META4-001: M48 in tasks.md reworded so SB-M48-006 = recognizable ACTIVE source artwork, 008 = CLEARED alpha-0 transparency/background visibility, 009 = solvable under ACTIVE-blocker/CLEARED-open reachability, 010 = no routing pathology + enclosed matching-color ACTIVE cell untargetable until access opens (AL-028); all 13 M48 IDs preserved. F-META4-002: `docs/00_PROJECT_BRIEF.md` "obscured pixel-art image" → "visible pixel-art image whose cells start ACTIVE at their original source palette colors", cleared→transparent background. Expanded conceptual semantic scan (obscured/hidden artwork/under grime/etc.): only valid negative/supersession statements + ordinary English remain. F-META4-003: AL-025 followed — pre-commit evidence in CLAUDE_LOG_V02; exact final SHA in a single external GitHub commit comment `## META-C004 V02 POST-PUSH RECEIPT`; no commit after the receipt. Accepted V01 baseline intact (BoardState ACTIVE/CLEARED, CLEARED alpha-0 renderer, ColorCandidateIndex, presets absent, 774/774). Progress unchanged 207/943 = 21.95%. M10-005..011, M02-017, M14/M15/M16/M17 remain open. |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V02.md |
-| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_CRITERIA_V02.md |
-| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V02.md |
-| Next expected actor | CHATGPT (audit META-C004 V02) |
+| Summary | Propagated the already owner-locked SCRUBBOTS visual contract into Level Factory governance — no generator code, no locked-value change, no SB checkbox change. New `level_factory/data/canonical_visual_contract_v1.json` references the root palette (`data/palettes/scrubbots_palette_v1.json`, single authority) and stores only locked non-palette metadata (BG01 id/hex/rgb, difficulty distinct-used-color bands, ACTIVE/CLEARED semantics, flat-cell render flags, generator guards). Added a MUST-READ Canonical Visual Contract section to `level_factory/CLAUDE.md`; updated `README.md` modes; added authoritative Canonical Visual Contract sections to `docs/00_VISION_AND_SCOPE.md` and `01_ARCHITECTURE.md`; made `docs/02_ROADMAP.md` LF02 generation + LF05 validation enforce the contract. Verified: root palette + `docs/08` byte-unchanged; BG01 exactly #202533/RGB(32,37,51) and explicitly not C16/not-logical/excluded-from-count; difficulty bands EASY 3–5/MEDIUM 6–7/HARD 8–9/VERY_HARD 10–12 intact; descriptor JSON valid and non-authoritative; `level_factory/scripts/` still only `.gitkeep`. `git diff --check` clean; `project.godot` owner change preserved and not staged. Progress unchanged 207/943 = 21.95%. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_PROMPT_V01.md |
+| Active audit criteria | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CHATGPT_AUDIT_CRITERIA_V01.md |
+| Latest ChatGPT audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_V02.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C005/CLAUDE_LOG_V01.md |
+| Next expected actor | CHATGPT (audit META-C005 V01) |
 
 ## Milestone summary
 

@@ -95,18 +95,46 @@ re-invented Colony Flow rule):
   currently targetable** until prior clears create legal access — matching
   color alone is not sufficient.
 
-## Global palette contract
+## Canonical Visual Contract [OWNER-LOCKED, META-C005]
 
-All production Factory outputs use only root-game palette C01..C15 from
-`data/palettes/scrubbots_palette_v1.json`.
+This is the single authoritative visual contract every Factory generation,
+mutation, validation, preview and export step must obey. Sources of truth:
+`docs/08_PIXEL_ART_PALETTE_RULES.md` + `data/palettes/scrubbots_palette_v1.json`
+(root, authoritative), mirrored as machine-readable non-palette metadata in
+`level_factory/data/canonical_visual_contract_v1.json` (references the root;
+never a second palette authority — root wins on any conflict).
 
-Distinct canonical logical colors actually used:
+**Palette (source of truth):** production Factory outputs use only root-game
+palette **C01..C15** from `data/palettes/scrubbots_palette_v1.json`. No C16, no
+off-palette logical artwork RGB. A level's local palette is an ascending-C-ID
+subset of the colors actually used.
+
+**Difficulty distinct-used-color bands (hard legality):** count only distinct
+canonical logical cell colors actually used by artwork cells —
 EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12.
 
-CLEARED transparency, gameplay background and presentation grid/borders are
-not logical artwork colors. Art-first arbitrary source colors must be
-deterministically mapped/rejected against C01..C15 and reported; they never
-become new game colors.
+**Gameplay background BG01:**
+
+| ID | Name | HEX | RGB | Logical color? |
+| --- | --- | --- | --- | --- |
+| BG01 | Midnight Slate | `#202533` | 32, 37, 51 | **No** |
+
+BG01 is the production surface behind the artwork, visible through CLEARED
+alpha-0 cells. BG01 is **not** C16, **not** a logical artwork color, never a
+LevelData cell color, and never counts toward distinct-used-color totals.
+
+**Cell state semantics:** ACTIVE = original canonical source color, opaque;
+CLEARED = fully transparent (alpha 0) with BG01 showing through.
+
+**Cell rendering / generation rules:** every logical square is a real gameplay
+cell rendered as **one flat solid canonical palette color** with visible
+square-cell separation — **no** gloss, highlight, bevel, drop shadow, 3D
+bulge/embossing, plastic-bead appearance, or interpolation. Visible cell
+boundaries/grid are presentation-only and create no logical color and never
+count toward difficulty totals.
+
+Art-first arbitrary source colors must be deterministically mapped/rejected
+against C01..C15 and reported; they never become new game colors.
 
 ## Difficulty intelligence
 

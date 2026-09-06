@@ -85,6 +85,15 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
   M02-017, M14/M15/M16/M17 remain OPEN.
 
 
+### META-C005 V01 implementation (AWAITING_AUDIT)
+
+- Propagated the owner-locked visual contract into Level Factory governance
+  (CLAUDE/README/docs 00/01/02) + new `level_factory/data/canonical_visual_contract_v1.json`
+  referencing the root palette. Docs/data governance only; no generator code,
+  no locked-value change, no SB checkbox change.
+- Recomputed from tasks.md: **207 / 943** unchanged (main+UI 207/719, LF 0/112,
+  CP 0/112). SB-M10-005..011, M02-017, M14/M15/M16/M17 remain OPEN.
+
 ### M10-C001 final audit V02
 
 - `AUDITED_PASS`.
