@@ -83,3 +83,15 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
   tasks.md: **207 / 943** unchanged (main+UI 207/719, LF 0/112, CP 0/112).
 - Full suite 882/882 ALL PASS (+108 fixture checks). SB-M10-005..011,
   M02-017, M14/M15/M16/M17 remain OPEN.
+
+
+### M10-C001 final audit V02
+
+- `AUDITED_PASS`.
+- JSON-backed Real Artwork 007/010/013 debug fixtures, BG01, debug-only VOID mask and batched square-cell overlay independently accepted.
+- Full implementer suite evidence: **882/882 ALL PASS**; audit found no production gameplay-scope widening.
+- No task checkbox changed; canonical progress remains **207 / 943 = 21.95%**.
+- Main + SB-UI remains **207 / 719 = 28.79%**; LF **0/112**; CP **0/112**.
+- SB-M10-005..011 remain OPEN for owner manual visual QA.
+- M14 remains NOT_STARTED.
+- META-C005 remains separately ISSUED.
