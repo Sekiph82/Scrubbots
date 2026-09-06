@@ -3,7 +3,7 @@
   "version": 1,
   "ownerLocked": true,
   "lockedAt": "2026-09-06",
-  "description": "Only legal logical cell colors for SCRUBBOTS production pixel artwork. Canonical set: C01..C16.",
+  "description": "Only legal logical cell colors for SCRUBBOTS production pixel artwork.",
   "colors": [
     {
       "id": "C01",
@@ -169,17 +169,6 @@
         255,
         255
       ]
-    },
-    {
-      "id": "C16",
-      "index": 15,
-      "name": "Pure Black",
-      "hex": "#000000",
-      "rgb": [
-        0,
-        0,
-        0
-      ]
     }
   ],
   "productionRules": {
@@ -189,7 +178,7 @@
     "clearedIsPaletteColor": false,
     "backgroundIsPaletteColor": false,
     "presentationGridOrBorderIsPaletteColor": false,
-    "localLevelPalette": "Subset of C01..C16 containing only canonical colors actually used by logical cells, ordered by ascending C-ID.",
+    "localLevelPalette": "Subset of C01..C15 containing only canonical colors actually used by logical cells, ordered by ascending C-ID.",
     "colorCountDefinition": "Distinct canonical logical cell colors actually referenced by artwork cells. Excludes CLEARED transparency, gameplay background, and presentation grid/border overlays.",
     "difficultyColorCountBands": {
       "EASY": {
