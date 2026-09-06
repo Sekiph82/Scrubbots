@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://b7m18agentdbg01"]
+
+[ext_resource type="Script" path="res://scripts/debug/scrubbot_agent_debug.gd" id="1_agentdbg"]
+
+[node name="ScrubbotAgentDebug" type="Node2D"]
+script=ExtResource("1_agentdbg")
