@@ -8,7 +8,7 @@
   "matrix_slots": 648,
   "artwork_cell_count": 542,
   "void_count": 106,
-  "global_palette_source": "res://data/palettes/scrubbots_palette_v1.json",
+  "global_palette_source": "res://data/palettes/scrubbots_palette_v2.json",
   "palette_subset_ids": [
     "C04",
     "C10",

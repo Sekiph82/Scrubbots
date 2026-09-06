@@ -459,12 +459,26 @@ func _run_board_renderer_active_cleared_tests() -> void:
 ## from data/debug/board_renderer_fixtures/*.json (no OCR/regeneration) and
 ## validated against their own declared metadata; VOID stays background under
 ## every state pattern; ACTIVE/CLEARED semantics hold; palette subsets are
-## legal ascending C01..C15. These are TEST/debug/manual-QA fixtures only.
+## legal ascending C01..C16. These are TEST/debug/manual-QA fixtures only.
 func _run_board_renderer_real_fixture_tests() -> void:
 	print("---- M10-C001: Real Artwork debug fixtures ----")
 	var suffix_hex := BoardDebugFixtures.load_global_palette_hex_by_suffix()
-	_check(suffix_hex.size() == 15, "global palette exposes 15 C-IDs (got %d)" % suffix_hex.size())
+	# M10-C001 V06: canonical palette is now v2 = 16 colors (C16 Pure Black).
+	_check(suffix_hex.size() == 16, "global palette v2 exposes 16 C-IDs (got %d)" % suffix_hex.size())
 	_check(str(suffix_hex.get(6, "")).to_lower() == "#42c7d9", "C06 maps to Cyan #42C7D9 (Level 010 blue recolor source)")
+	_check(str(suffix_hex.get(16, "")).to_lower() == "#000000", "C16 is Pure Black #000000 (V06 owner-locked addition)")
+	_check(not suffix_hex.has(17), "no C17 in canonical palette (16-color legality)")
+
+	# C01..C15 values are unchanged from historical palette v1 (v2 only appends C16).
+	var v1 = JSON.parse_string(FileAccess.get_file_as_string("res://data/palettes/scrubbots_palette_v1.json"))
+	var v1_hex := {}
+	if typeof(v1) == TYPE_DICTIONARY and v1.has("colors"):
+		for c in v1.colors:
+			v1_hex[str(c.get("id", ""))] = str(c.get("hex", "")).to_lower()
+	_check(v1_hex.size() == 15, "historical palette v1 preserved with 15 colors (got %d)" % v1_hex.size())
+	for n in range(1, 16):
+		var cid := "C%02d" % n
+		_check(v1_hex.get(cid, "") == str(suffix_hex.get(n, "")).to_lower(), "%s unchanged between palette v1 and v2" % cid)
 
 	var fixtures := [
 		"res://data/debug/board_renderer_fixtures/level_007.json",
@@ -488,7 +502,7 @@ func _run_board_renderer_real_fixture_tests() -> void:
 		_check_eq(level.get_cell_count(), w * h, "%s cell count == w*h" % path)
 		_check_eq(loaded.void_mask.size(), w * h, "%s void_mask sized to grid" % path)
 
-		# Palette subset: ascending, legal C01..C15, matches JSON subset.
+		# Palette subset: ascending, legal C01..C16, matches JSON subset.
 		var subset_ids: Array = loaded.palette_subset_ids
 		var ascending := true
 		for k in range(1, subset_ids.size()):
@@ -497,7 +511,7 @@ func _run_board_renderer_real_fixture_tests() -> void:
 		_check(ascending, "%s palette subset is ascending C-ID" % path)
 		for id_str in subset_ids:
 			var suffix := int(String(id_str).substr(1))
-			_check(suffix >= 1 and suffix <= 15, "%s subset id %s is legal C01..C15" % [path, id_str])
+			_check(suffix >= 1 and suffix <= 16, "%s subset id %s is legal C01..C16" % [path, id_str])
 		_check_eq(level.palette.size(), subset_ids.size(), "%s LevelData palette size == subset size" % path)
 
 		# VOID count and artwork count vs JSON.
