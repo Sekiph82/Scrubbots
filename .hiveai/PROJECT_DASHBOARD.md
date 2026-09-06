@@ -1,3 +1,12 @@
+### M10-C001 V07 owner-QA runtime correction
+
+- State: **ISSUED**
+- Owner manual QA exposed a runtime error in `board_renderer_debug.gd`: Godot 4.7.1 `OptionButton` has `is_item_disabled(idx)`, not `get_item_disabled(idx)`.
+- V07 is a narrow correction plus runtime regression smoke. V06 palette/C16 and variable-canvas work remain otherwise accepted.
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V07.md
+- Progress unchanged: **207/943 = 21.95%**.
+- Next actor: CLAUDE.
+
 ### M10-C001 V06 ChatGPT final audit
 
 - Decision: **AUDITED_PASS**
