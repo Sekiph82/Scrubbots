@@ -465,3 +465,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - No generator code added; no task checkbox changed.
 - Canonical progress unchanged: **207/943 = 21.95%**.
 - New owner workflow rule after issuance: ChatGPT owns H!veAI tracker/dashboard updates after audit. Repository governance wording will be normalized in the next implementation cycle.
+
+
+### M10-C001 V05 issuance — variable canvas + coordination ownership
+
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V05.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V05.md
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V05.md
+- V05 supersedes unimplemented V03/V04.
+- Scope A: immutable source artwork matrices placed centered in any selected valid debug canvas using VOID padding; 007 must fully render at both 30x30 and 59x59.
+- Scope B: normalize governance so Claude does not update H!veAI/PROJECT_DASHBOARD/SESSION_INDEX; ChatGPT owns tracker closure after audit.
+- State: ISSUED; next actor CLAUDE.
