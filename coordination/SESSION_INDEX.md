@@ -360,3 +360,15 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Progress: 207/943 = 21.95%.
 - M10-005..011 remain owner manual-QA gates.
 - M14 remains NOT_STARTED until owner manual QA.
+
+
+### M10-C001 issuance — real artwork BoardRenderer manual-QA fixtures
+
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V01.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V01.md
+- Owner fixture data: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/OWNER_FIXTURE_DATA_V01.md
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V01.md
+- Scope: extend `scenes/debug/board_renderer_debug.tscn` / script-driven debug UI with Synthetic Stripes + Real Artwork 007/010/013, canonical C01..C15 mappings, BG01, flat-cell visual treatment and debug-only VOID masking.
+- Owner-requested 010 recolor: source greens -> C06/C07/C08 blue family.
+- These are TEST/debug/manual-QA fixtures; no production catalog promotion and no M10-005..011 owner checkbox closure.
+- Cycle state: `ISSUED`; next actor CLAUDE.
