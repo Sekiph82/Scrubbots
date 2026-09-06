@@ -254,3 +254,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Claude evidence: **1155/1155 ALL PASS**; ChatGPT independently inspected diff/source/test quality but could not independently rerun Godot in the audit environment.
 - Progress after closure is recomputed from unique SB task IDs in `tasks.md`.
 - Next main-game milestone: **M16 RoutingSystem Interface**, still NOT_STARTED until intentionally opened.
+
+
+### M15 progress recompute
+
+- Canonical progress recomputed from unique SB task IDs after M15 closure:
+  - Overall: **236 / 943 = 25.03%**
+  - Remaining: **707**
+  - Main game + SB-UI: **236 / 719 = 32.82%**
+  - Main remaining: **483**
+  - Level Factory: **0 / 112 = 0%**
+  - Content Pipeline: **0 / 112 = 0%**
