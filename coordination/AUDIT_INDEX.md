@@ -95,3 +95,6 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 - Historical Claude self-audit artifacts, if any, are not audit sources and are not listed here as proof.
 
 | M14-C001 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_AUDIT_V01.md; strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_STRICT_REAUDIT_V01.md | `AUDITED_PASS` | Strict re-audit applied E0-E4 policy explicitly, independently inspected implementation/test quality, disclosed that Godot could not be rerun in the audit environment, and superseded stale AL-031 with AL-033. |
+
+
+| M15-C001 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CHATGPT_AUDIT_V01.md | `AUDITED_PASS` | V01 verified deterministic select-and-reserve, injected reachability/access observability, stale-candidate defense, synchronous contention handling, and strict E1/E2/E3 evidence separation. |
