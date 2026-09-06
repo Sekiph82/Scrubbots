@@ -333,3 +333,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
   - Main remaining: **457**
   - Level Factory: **0 / 112**
   - Content Pipeline: **0 / 112**
+
+
+### M17 owner decision resolved
+
+- Owner selected **Organized/curved** as final movement language.
+- **Grid-aware deterministic** routing remains the path-planning backbone.
+- Direct is rejected for production and retained only as debug/baseline.
+- Owner also approved a more conservative production shaping direction: fewer aggressive diagonal shortcuts and more controlled/readable curves.
+- Missing original movement reference no longer blocks the gate; SB-M17-010 is closed as superseded by the owner-reviewed decision.
+- M17 task ledger is now **16/16 complete**.
+- M17-C002 is ISSUED to promote the selected movement language from experimental prototype code into production routing code before M18 opens.
