@@ -244,3 +244,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Current progress remains **224 / 943 = 23.75%** until audit.
 - Main game + SB-UI remains **224 / 719 = 31.15%**.
 - Full-pass target after 12 closures: **236 / 943 = 25.03%** and **236 / 719 = 32.82%**.
+
+
+### M15-C001 V01 final audit
+
+- `AUDITED_PASS` under canonical AUDIT_POLICY.
+- TargetSelector accepted: deterministic WHAT-target selection, injected access truth, atomic ReservationState reserve, no routing/pathfinding.
+- SB-M15-001..012 are CLOSED.
+- Claude evidence: **1155/1155 ALL PASS**; ChatGPT independently inspected diff/source/test quality but could not independently rerun Godot in the audit environment.
+- Progress after closure is recomputed from unique SB task IDs in `tasks.md`.
+- Next main-game milestone: **M16 RoutingSystem Interface**, still NOT_STARTED until intentionally opened.
