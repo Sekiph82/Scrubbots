@@ -297,6 +297,15 @@ deliberately revisits ADR-009 and proves an alternative equally reliable
 via headless tests. Do not casually convert back to bare `class_name` for
 stylistic reasons.
 
+
+### Production gameplay background `[LOCKED]`
+
+- BG01 **Midnight Slate** = `#202533` / RGB(32,37,51).
+- CLEARED alpha-0 cells reveal BG01 underneath.
+- BG01 is not part of C01..C15, is not C16, is never a logical LevelData cell
+  color, and never counts toward difficulty distinct-color totals.
+- Debug-only transparency backgrounds may differ for visibility.
+
 ---
 
 ## VISUAL REFERENCE SYSTEM

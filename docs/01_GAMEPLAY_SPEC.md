@@ -87,6 +87,11 @@ history is preserved, not erased).
 - is no longer a color candidate;
 - becomes open/free space for access/path semantics.
 
+The production gameplay background revealed through CLEARED cells is **BG01
+Midnight Slate `#202533` / RGB(32,37,51)**. BG01 is presentation/background
+state, not a logical pixel-art palette color, not C16, and is excluded from
+difficulty color counts.
+
 There is no gameplay-semantic DIRTY state, no CLEAN-colored transform state,
 no grime transform, no A/B/C dirty preset, and no hidden second artwork layer.
 The visible pixel artwork itself is what is progressively cleared away.
