@@ -310,3 +310,15 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Main game + SB-UI remains **247 / 719 = 34.35%**.
 - Maximum checkbox progress if all 16 M17 task IDs close: **263 / 943 = 27.89%**, main + SB-UI **263 / 719 = 36.58%**.
 - M18 must not open until the owner design gate is resolved.
+
+
+### M17-C001 V01 technical audit
+
+- Technical verdict: **AUDITED_PASS**.
+- Milestone state: **OWNER_DESIGN_GATE_OPEN**.
+- Direct, Grid-aware and Organized/curved prototypes accepted as experimental comparison implementations.
+- `ROUTING_COMPARISON_V01.md` accepted as the neutral owner-comparison artifact.
+- SB-M17-001..009 and SB-M17-011..016 are CLOSED.
+- **SB-M17-010 remains OPEN** because no authoritative original SCRUBBOTS movement reference was found.
+- Owner review artifact: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CHATGPT_OWNER_REVIEW_V01.md
+- M18 remains blocked until owner movement-language selection.
