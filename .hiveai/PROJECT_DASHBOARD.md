@@ -14,14 +14,22 @@ This file is the single H!veAI-facing materialized project status surface. It is
 
 | Field | Value |
 | --- | --- |
-| Active cycle | META-C004 |
-| Active version | V02 |
-| State | AUDITED_PASS |
-| Next actor | OWNER |
+| Active cycle | M10-C001 |
+| Active version | V01 |
+| State | ISSUED |
+| Next actor | CLAUDE |
 | Branch | main |
-| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V02.md |
-| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V02.md |
-| Purpose | META-C004 V02 narrow correction on the accepted V01 ACTIVE/CLEARED migration: M48 QA wording now encodes CLEARED transparency + blocked matching-color reachability/solvability (no task-ID change); Project Brief "obscured" → visible/ACTIVE; AL-025 external commit-comment receipt on the V02 commit. No production gameplay code/test change. Progress unchanged 207/943 = 21.95%. |
+| Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V01.md |
+| Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V01.md |
+| Purpose | Extend the existing Godot 4.7.1 BoardRenderer debug/manual-QA tool with Fixture options Synthetic Stripes + owner-authorized Real Artwork 007/010/013. Exact logical-grid data is pinned in OWNER_FIXTURE_DATA_V01.md; 010 greens are recolored to C06/C07/C08 blues; real artwork uses canonical C01..C15 subsets, BG01 #202533, visible flat square-cell boundaries, and debug-only VOID masking. No production catalog promotion and no owner M10-005..011 checkbox closure. Progress unchanged 207/943 = 21.95%. |
+
+### M10-C001 ChatGPT issuance
+
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V01.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V01.md
+- Owner fixture data: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/OWNER_FIXTURE_DATA_V01.md
+- Scope is debug/manual-QA tooling only. SB-M10-005..011 remain owner review gates and M14 remains NOT_STARTED.
+- Next actor: CLAUDE.
 
 ### Also active (on main)
 
