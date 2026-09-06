@@ -99,13 +99,13 @@ re-invented Colony Flow rule):
 
 This is the single authoritative visual contract every Factory generation,
 mutation, validation, preview and export step must obey. Sources of truth:
-`docs/08_PIXEL_ART_PALETTE_RULES.md` + `data/palettes/scrubbots_palette_v1.json`
+`docs/08_PIXEL_ART_PALETTE_RULES.md` + `data/palettes/scrubbots_palette_v2.json`
 (root, authoritative), mirrored as machine-readable non-palette metadata in
 `level_factory/data/canonical_visual_contract_v1.json` (references the root;
 never a second palette authority — root wins on any conflict).
 
 **Palette (source of truth):** production Factory outputs use only root-game
-palette **C01..C16** from `data/palettes/scrubbots_palette_v1.json`. No C17, no
+palette **C01..C16** from `data/palettes/scrubbots_palette_v2.json`. No C17, no
 off-palette logical artwork RGB. A level's local palette is an ascending-C-ID
 subset of the colors actually used.
 
