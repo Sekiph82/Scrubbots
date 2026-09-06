@@ -38,7 +38,7 @@ contract (META-C005):
 
 Locked rules the Factory must enforce, never weaken:
 
-- Logical artwork colors are **C01..C15 only** (root palette). No C16, no
+- Logical artwork colors are **C01..C16 only** (root palette). No C17, no
   off-palette RGB.
 - Difficulty distinct-used-color bands are hard legality:
   EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12. Count only distinct
