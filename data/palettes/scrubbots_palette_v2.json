@@ -1,0 +1,227 @@
+{
+  "schema": "scrubbots-global-palette/v2",
+  "version": 2,
+  "ownerLocked": true,
+  "lockedAt": "2026-09-06",
+  "description": "Canonical owner-locked 16-color logical cell palette for SCRUBBOTS production pixel artwork.",
+  "colors": [
+    {
+      "id": "C01",
+      "index": 0,
+      "name": "Coral Red",
+      "hex": "#E94B4B",
+      "rgb": [
+        233,
+        75,
+        75
+      ]
+    },
+    {
+      "id": "C02",
+      "index": 1,
+      "name": "Tangerine Orange",
+      "hex": "#F28C3C",
+      "rgb": [
+        242,
+        140,
+        60
+      ]
+    },
+    {
+      "id": "C03",
+      "index": 2,
+      "name": "Sunny Yellow",
+      "hex": "#F2C94C",
+      "rgb": [
+        242,
+        201,
+        76
+      ]
+    },
+    {
+      "id": "C04",
+      "index": 3,
+      "name": "Leaf Green",
+      "hex": "#55B85A",
+      "rgb": [
+        85,
+        184,
+        90
+      ]
+    },
+    {
+      "id": "C05",
+      "index": 4,
+      "name": "Mint Green",
+      "hex": "#63D6A3",
+      "rgb": [
+        99,
+        214,
+        163
+      ]
+    },
+    {
+      "id": "C06",
+      "index": 5,
+      "name": "Cyan",
+      "hex": "#42C7D9",
+      "rgb": [
+        66,
+        199,
+        217
+      ]
+    },
+    {
+      "id": "C07",
+      "index": 6,
+      "name": "Ocean Blue",
+      "hex": "#3E7EDB",
+      "rgb": [
+        62,
+        126,
+        219
+      ]
+    },
+    {
+      "id": "C08",
+      "index": 7,
+      "name": "Deep Blue",
+      "hex": "#3451A3",
+      "rgb": [
+        52,
+        81,
+        163
+      ]
+    },
+    {
+      "id": "C09",
+      "index": 8,
+      "name": "Purple",
+      "hex": "#845EC2",
+      "rgb": [
+        132,
+        94,
+        194
+      ]
+    },
+    {
+      "id": "C10",
+      "index": 9,
+      "name": "Candy Pink",
+      "hex": "#E66FA5",
+      "rgb": [
+        230,
+        111,
+        165
+      ]
+    },
+    {
+      "id": "C11",
+      "index": 10,
+      "name": "Earth Brown",
+      "hex": "#956447",
+      "rgb": [
+        149,
+        100,
+        71
+      ]
+    },
+    {
+      "id": "C12",
+      "index": 11,
+      "name": "Sand / Cream",
+      "hex": "#E8CFA0",
+      "rgb": [
+        232,
+        207,
+        160
+      ]
+    },
+    {
+      "id": "C13",
+      "index": 12,
+      "name": "Light Gray",
+      "hex": "#B8C2CC",
+      "rgb": [
+        184,
+        194,
+        204
+      ]
+    },
+    {
+      "id": "C14",
+      "index": 13,
+      "name": "Charcoal",
+      "hex": "#3D4652",
+      "rgb": [
+        61,
+        70,
+        82
+      ]
+    },
+    {
+      "id": "C15",
+      "index": 14,
+      "name": "Pure White",
+      "hex": "#FFFFFF",
+      "rgb": [
+        255,
+        255,
+        255
+      ]
+    },
+    {
+      "id": "C16",
+      "index": 15,
+      "name": "Pure Black",
+      "hex": "#000000",
+      "rgb": [
+        0,
+        0,
+        0
+      ]
+    }
+  ],
+  "productionRules": {
+    "offPaletteLogicalCellColors": "FORBIDDEN",
+    "activeCellAlpha": 255,
+    "clearedRuntimeAlpha": 0,
+    "clearedIsPaletteColor": false,
+    "backgroundIsPaletteColor": false,
+    "presentationGridOrBorderIsPaletteColor": false,
+    "localLevelPalette": "Subset of C01..C16 containing only canonical colors actually used by logical cells, ordered by ascending C-ID.",
+    "colorCountDefinition": "Distinct canonical logical cell colors actually referenced by artwork cells. Excludes CLEARED transparency, gameplay background, and presentation grid/border overlays.",
+    "difficultyColorCountBands": {
+      "EASY": {
+        "min": 3,
+        "max": 5
+      },
+      "MEDIUM": {
+        "min": 6,
+        "max": 7
+      },
+      "HARD": {
+        "min": 8,
+        "max": 9
+      },
+      "VERY_HARD": {
+        "min": 10,
+        "max": 12
+      }
+    }
+  },
+  "gameplayBackground": {
+    "id": "BG01",
+    "name": "Midnight Slate",
+    "hex": "#202533",
+    "rgb": [
+      32,
+      37,
+      51
+    ],
+    "role": "Production gameplay background visible through CLEARED alpha-0 cells.",
+    "pixelArtPaletteColor": false,
+    "countsTowardLevelColorTotal": false,
+    "ownerLocked": true
+  }
+}
