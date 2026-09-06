@@ -37,6 +37,13 @@ const RouteDebugOverlay = preload("res://scripts/debug/route_debug_overlay.gd")
 const RouteAccessQueryDouble = preload("res://tests/support/route_access_query_double.gd")
 const RouteFakeStraight = preload("res://tests/support/route_fake_straight.gd")
 const RouteFakeRelay = preload("res://tests/support/route_fake_relay.gd")
+# M17 — EXPERIMENTAL routing prototype lab.
+const PrototypeAccessQuery = preload("res://scripts/gameplay/routing/prototypes/prototype_access_query.gd")
+const DirectRoutePrototype = preload("res://scripts/gameplay/routing/prototypes/direct_route_prototype.gd")
+const GridRoutePrototype = preload("res://scripts/gameplay/routing/prototypes/grid_route_prototype.gd")
+const OrganizedRoutePrototype = preload("res://scripts/gameplay/routing/prototypes/organized_route_prototype.gd")
+const RouteMetrics = preload("res://scripts/gameplay/routing/prototypes/route_metrics.gd")
+const RoutingLabScenarios = preload("res://scripts/gameplay/routing/prototypes/routing_lab_scenarios.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -79,6 +86,14 @@ func _initialize() -> void:
 	_run_routing_no_retarget_tests()
 	_run_route_debug_overlay_tests()
 	_run_route_coordinate_scale_tests()
+	# M17 — routing prototype lab.
+	_run_m17_prototype_contract_tests()
+	_run_m17_direct_tests()
+	_run_m17_grid_tests()
+	_run_m17_organized_tests()
+	_run_m17_metrics_tests()
+	_run_m17_scale_tests()
+	_run_m17_lab_scene_smoke()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -3695,3 +3710,234 @@ func _run_route_coordinate_scale_tests() -> void:
 	var rres = RouteFakeRelay.new().compute_route(rreq, rect, null)
 	var racc = RouteAccessQueryDouble.new(); racc.open_polyline(rres.get_points())
 	_check_eq(RouteValidator.validate_route(rreq, rres, rect, racc), RouteResult.FailureReason.NONE, "53x59 rectangular full route validates end-to-end")
+
+# ============================================================ M17 routing lab ==
+# EXPERIMENTAL prototype/comparison tests. These do NOT select a production
+# routing algorithm — the owner movement-language design gate stays open. Every
+# successful prototype route is re-checked through the shared M16 RouteValidator.
+
+func _m17_all_segments_open(pts: PackedVector2Array, access, target_index: int) -> bool:
+	for i in range(pts.size() - 1):
+		if not access.is_segment_traversable(pts[i], pts[i + 1], target_index):
+			return false
+	return true
+
+func _run_m17_prototype_contract_tests() -> void:
+	print("---- M17: prototype contract (behind M16) ----")
+	var sc := RoutingLabScenarios.make_s1()
+	var board = sc["board"]
+	var targets: Array = sc["targets"]
+	var origins: Array = sc["origins"]
+	var reqs: Array = RoutingLabScenarios.build_requests(board, targets, origins)
+	_check(reqs.size() >= 1, "S1 yields at least one request")
+	var protos := [DirectRoutePrototype.new(), GridRoutePrototype.new(), OrganizedRoutePrototype.new()]
+	var names := ["direct", "grid", "organized"]
+	for pi in range(protos.size()):
+		var proto = protos[pi]
+		var nm: String = names[pi]
+		_check(proto.has_method("compute_route"), "%s exposes compute_route (M16 signature)" % nm)
+		_check(not proto.has_method("select_and_reserve"), "%s has NO target-selection method" % nm)
+		_check(not proto.has_method("reserve"), "%s has NO reservation method" % nm)
+		var access = PrototypeAccessQuery.new(board)
+		var before := _snapshot_cell_states(board)
+		var reservations = ReservationState.new()
+		reservations.bind(board)
+		var t0: int = reqs[0].target_index
+		_check(reservations.reserve(t0, 0), "%s precondition: target reserved for owner 0" % nm)
+		var res = proto.compute_route(reqs[0], board, access)
+		_check(res.success, "%s routes the S1 target" % nm)
+		_check_eq(res.target_index, t0, "%s keeps the assigned target identity" % nm)
+		_check(_cell_states_equal(board, before), "%s does not mutate BoardState (no cell cleared)" % nm)
+		_check_eq(reservations.get_owner(t0), 0, "%s does not touch ReservationState ownership" % nm)
+		if res.success:
+			_check_eq(RouteValidator.validate_route(reqs[0], res, board, access), RouteResult.FailureReason.NONE, "%s success passes shared RouteValidator" % nm)
+
+func _run_m17_direct_tests() -> void:
+	print("---- M17: direct baseline ----")
+	var board = RoutingLabScenarios.make_open_board(10, 7)
+	var idx = board.get_cell_index(8, 3)
+	board.set_cell_state(idx, BoardState.CellState.ACTIVE)
+	var access = PrototypeAccessQuery.new(board)
+	var req = RouteRequest.for_target(board, Vector2(-2.0, 3.5), idx)
+	var res = DirectRoutePrototype.new().compute_route(req, board, access)
+	_check(res.success, "direct succeeds on an open straight segment")
+	_check_eq(res.point_count(), 2, "direct route is a single 2-point segment (minimal)")
+	_check_eq(RouteValidator.validate_route(req, res, board, access), RouteResult.FailureReason.NONE, "direct open route validates")
+
+	var s2 := RoutingLabScenarios.make_s2()
+	var b2 = s2["board"]
+	var a2 = PrototypeAccessQuery.new(b2)
+	var q2 = RoutingLabScenarios.build_requests(b2, s2["targets"], s2["origins"])[0]
+	var r2 = DirectRoutePrototype.new().compute_route(q2, b2, a2)
+	_check(not r2.success, "direct fails cleanly when its straight segment is blocked")
+	_check_eq(r2.failure_reason, RouteResult.FailureReason.NO_ROUTE, "direct blocked -> NO_ROUTE (specific reason)")
+	_check_eq(r2.point_count(), 0, "direct failure has empty route points")
+	_check_eq(r2.target_index, q2.target_index, "direct failure retains the assigned target (no retarget)")
+
+func _run_m17_grid_tests() -> void:
+	print("---- M17: grid-aware prototype ----")
+	var s2 := RoutingLabScenarios.make_s2()
+	var b2 = s2["board"]
+	var a2 = PrototypeAccessQuery.new(b2)
+	var q2 = RoutingLabScenarios.build_requests(b2, s2["targets"], s2["origins"])[0]
+	var grid = GridRoutePrototype.new()
+	var r2 = grid.compute_route(q2, b2, a2)
+	_check(r2.success, "grid finds a detour where the straight segment is blocked")
+	var pts2: PackedVector2Array = r2.get_points()
+	_check(pts2[0].is_equal_approx(q2.start_position), "grid route starts at the exterior slot origin")
+	_check(pts2[pts2.size() - 1].is_equal_approx(q2.target_position), "grid route ends at the assigned target center (final endpoint only)")
+	_check(_m17_all_segments_open(pts2, a2, q2.target_index), "every grid segment is accepted by access truth (blockers avoided)")
+	_check_eq(RouteValidator.validate_route(q2, r2, b2, a2), RouteResult.FailureReason.NONE, "grid detour validates end-to-end")
+	var r2b = GridRoutePrototype.new().compute_route(q2, b2, a2)
+	_check(RouteMetrics.points_equal(pts2, r2b.get_points()), "grid is deterministic (identical points on repeat)")
+
+	var s3 := RoutingLabScenarios.make_s3()
+	var b3 = s3["board"]
+	var a3 = PrototypeAccessQuery.new(b3)
+	var q3 = RoutingLabScenarios.build_requests(b3, s3["targets"], s3["origins"])[0]
+	var r3 = GridRoutePrototype.new().compute_route(q3, b3, a3)
+	_check(not r3.success, "grid returns no route for a fully enclosed target")
+	_check_eq(r3.failure_reason, RouteResult.FailureReason.NO_ROUTE, "enclosed target -> NO_ROUTE")
+	_check_eq(r3.target_index, q3.target_index, "enclosed failure keeps the SAME target (no silent retarget)")
+
+	var s4 := RoutingLabScenarios.make_s4()
+	var b4 = s4["board"]
+	var q4 = RoutingLabScenarios.build_requests(b4, s4["targets"], s4["origins"])[0]
+	var before4 = GridRoutePrototype.new().compute_route(q4, b4, PrototypeAccessQuery.new(b4))
+	_check(not before4.success, "S4 precondition: enclosed target has no route")
+	for ci in s4["clear_after"]:
+		b4.set_cell_state(int(ci), BoardState.CellState.CLEARED)
+	var a4 = PrototypeAccessQuery.new(b4)
+	var after4 = GridRoutePrototype.new().compute_route(q4, b4, a4)
+	_check(after4.success, "S4: same target routes once prerequisite cells are CLEARED")
+	_check_eq(after4.target_index, q4.target_index, "S4: target identity unchanged after opening")
+	_check_eq(RouteValidator.validate_route(q4, after4, b4, a4), RouteResult.FailureReason.NONE, "S4 opened route validates")
+
+func _run_m17_organized_tests() -> void:
+	print("---- M17: organized/curved prototype ----")
+	var s2 := RoutingLabScenarios.make_s2()
+	var b2 = s2["board"]
+	var a2 = PrototypeAccessQuery.new(b2)
+	var q2 = RoutingLabScenarios.build_requests(b2, s2["targets"], s2["origins"])[0]
+	var org = OrganizedRoutePrototype.new()
+	var res = org.compute_route(q2, b2, a2)
+	_check(res.success, "organized produces a route from a valid grid-aware source path")
+	var pts: PackedVector2Array = res.get_points()
+	_check(_m17_all_segments_open(pts, a2, q2.target_index), "organized: every emitted segment is accepted by access truth (no crossing a blocker)")
+	_check_eq(RouteValidator.validate_route(q2, res, b2, a2), RouteResult.FailureReason.NONE, "organized route validates end-to-end")
+	_check(pts.size() > 2, "organized kept a valid detour instead of an invalid straight shortcut (fallback held)")
+	var res_b = OrganizedRoutePrototype.new().compute_route(q2, b2, a2)
+	_check(RouteMetrics.points_equal(pts, res_b.get_points()), "organized is deterministic (identical points on repeat)")
+	var s3 := RoutingLabScenarios.make_s3()
+	var b3 = s3["board"]
+	var a3 = PrototypeAccessQuery.new(b3)
+	var q3 = RoutingLabScenarios.build_requests(b3, s3["targets"], s3["origins"])[0]
+	var r3 = OrganizedRoutePrototype.new().compute_route(q3, b3, a3)
+	_check(not r3.success, "organized returns no route for an enclosed target (no invented path)")
+	_check_eq(r3.target_index, q3.target_index, "organized enclosed failure keeps the same target")
+
+func _run_m17_metrics_tests() -> void:
+	print("---- M17: comparison metrics ----")
+	var poly := PackedVector2Array([Vector2(0, 0), Vector2(3, 0), Vector2(3, 4)])
+	_check(is_equal_approx(RouteMetrics.route_distance(poly), 7.0), "route_distance sums segment lengths (3+4=7)")
+	var stats := RouteMetrics.distance_stats([poly, PackedVector2Array([Vector2(0, 0), Vector2(1, 0)])])
+	_check_eq(stats["count"], 2, "distance_stats counts routes")
+	_check(is_equal_approx(stats["total"], 8.0), "distance_stats total = 7+1 = 8")
+	_check(is_equal_approx(stats["mean"], 4.0), "distance_stats mean = 4")
+	_check(is_equal_approx(stats["median"], 4.0), "distance_stats median of {1,7} = 4")
+
+	var xa := PackedVector2Array([Vector2(0, 0), Vector2(4, 4)])
+	var xb := PackedVector2Array([Vector2(0, 4), Vector2(4, 0)])
+	_check_eq(RouteMetrics.crossing_count([xa, xb]), 1, "two X routes -> 1 proper crossing")
+	var pa := PackedVector2Array([Vector2(0, 0), Vector2(4, 0)])
+	var pb := PackedVector2Array([Vector2(0, 1), Vector2(4, 1)])
+	_check_eq(RouteMetrics.crossing_count([pa, pb]), 0, "parallel routes -> 0 crossings")
+	var sa := PackedVector2Array([Vector2(0, 0), Vector2(4, 1)])
+	var sb := PackedVector2Array([Vector2(0, 0), Vector2(4, -1)])
+	_check_eq(RouteMetrics.crossing_count([sa, sb]), 0, "shared start endpoint is NOT a crossing")
+
+	var ca := PackedVector2Array([Vector2(0.5, 0.5), Vector2(3.5, 0.5)])
+	var cb := PackedVector2Array([Vector2(0.5, 0.5), Vector2(3.5, 0.5)])
+	var cong := RouteMetrics.congestion([ca, cb])
+	_check_eq(cong["max_overlap"], 2, "congestion max_overlap = 2 when two routes share a corridor")
+	_check(cong["total_repeated"] >= 1, "congestion total_repeated > 0 for a shared corridor")
+	_check(cong["occupied_buckets"] >= 1, "congestion reports occupied buckets")
+
+	var board = RoutingLabScenarios.make_open_board(8, 6)
+	var ti = board.get_cell_index(6, 3); board.set_cell_state(ti, BoardState.CellState.ACTIVE)
+	var acc = PrototypeAccessQuery.new(board)
+	var rq = [RouteRequest.for_target(board, Vector2(-2.0, 3.5), ti)]
+	var cpu := RouteMetrics.cpu_benchmark(DirectRoutePrototype.new(), rq, board, acc, 2)
+	_check(cpu.has("total_us") and cpu.has("mean_us"), "cpu_benchmark reports CPU microseconds")
+	_check(not cpu.has("fps") and not cpu.has("gpu"), "cpu_benchmark makes NO FPS/GPU claim")
+	_check_eq(cpu["success"], 1, "cpu_benchmark separates successful route count")
+
+	var setA := [PackedVector2Array([Vector2(0, 0), Vector2(1, 1)])]
+	var setB := [PackedVector2Array([Vector2(0, 0), Vector2(1, 2)])]
+	_check(RouteMetrics.route_sets_identical(setA, setA)["identical"], "determinism: identical sets compare identical")
+	_check(not RouteMetrics.route_sets_identical(setA, setB)["identical"], "determinism: a changed route is detected")
+
+func _run_m17_scale_tests() -> void:
+	print("---- M17: multi-route scale (5/10/25/stress/59x59/rect) ----")
+	var cases := [
+		{"sc": RoutingLabScenarios.make_s5(5), "n": 5, "w": 30, "h": 30},
+		{"sc": RoutingLabScenarios.make_s5(10), "n": 10, "w": 30, "h": 30},
+		{"sc": RoutingLabScenarios.make_s5(25), "n": 25, "w": 30, "h": 30},
+		{"sc": RoutingLabScenarios.make_s6(50), "n": 50, "w": 40, "h": 40},
+		{"sc": RoutingLabScenarios.make_s7(25), "n": 25, "w": 59, "h": 59},
+		{"sc": RoutingLabScenarios.make_s8(25), "n": 25, "w": 53, "h": 59},
+	]
+	for case in cases:
+		var sc: Dictionary = case["sc"]
+		var board = sc["board"]
+		_check_eq(board.get_width(), case["w"], "%s board width %d" % [sc["id"], case["w"]])
+		_check_eq(board.get_height(), case["h"], "%s board height %d" % [sc["id"], case["h"]])
+		var access = PrototypeAccessQuery.new(board)
+		var reqs: Array = RoutingLabScenarios.build_requests(board, sc["targets"], sc["origins"])
+		_check(reqs.size() == case["n"], "%s builds %d requests" % [sc["id"], case["n"]])
+		var grid = GridRoutePrototype.new()
+		var success := 0
+		var valid := 0
+		for req in reqs:
+			var res = grid.compute_route(req, board, access)
+			if res.success:
+				success += 1
+				if RouteValidator.validate_route(req, res, board, access) == RouteResult.FailureReason.NONE:
+					valid += 1
+		_check(success > 0, "%s: grid produces successful routes (success=%d)" % [sc["id"], success])
+		_check_eq(valid, success, "%s: every grid success passes the shared RouteValidator" % sc["id"])
+
+func _run_m17_lab_scene_smoke() -> void:
+	print("---- M17: routing prototype lab scene smoke ----")
+	var scene = load("res://scenes/debug/routing_prototype_lab.tscn")
+	_check(scene != null, "lab scene resource loads")
+	if scene == null:
+		return
+	var inst = scene.instantiate()
+	_check(inst != null, "lab scene instantiates")
+	root.add_child(inst)
+	if inst._info_label == null:
+		inst._build_ui()
+	_check(not inst.has_method("select_and_reserve"), "lab has NO target-selection method")
+
+	inst._scenario_option.select(0)
+	for si in range(3):
+		inst._strategy_option.select(si)
+		inst._rebuild()
+		var txt: String = inst._info_label.text
+		_check(txt.find(inst.STRATEGY_NAMES[si]) >= 0, "lab shows strategy '%s' after switch" % inst.STRATEGY_NAMES[si])
+		_check(txt.find("success=") >= 0, "lab metric panel reports success counts for '%s'" % inst.STRATEGY_NAMES[si])
+		_check(txt.find("CPU") >= 0 and txt.find("no FPS/GPU") >= 0, "lab CPU metric makes no FPS/GPU claim for '%s'" % inst.STRATEGY_NAMES[si])
+		_check(txt.find("DETERMINISM: identical=true") >= 0, "lab reports deterministic routes for '%s'" % inst.STRATEGY_NAMES[si])
+
+	inst._scenario_option.select(2)
+	inst._strategy_option.select(1)
+	inst._rebuild()
+	_check(inst._info_label.text.find("no_route=1") >= 0, "lab surfaces the enclosed no-route case (no_route=1)")
+
+	inst._scenario_option.select(4)
+	inst._botcount_option.select(2)
+	inst._strategy_option.select(1)
+	inst._rebuild()
+	_check(inst._info_label.text.find("requests=10") >= 0, "lab bot-count selector yields 10 requests for S5")
+	inst.queue_free()
