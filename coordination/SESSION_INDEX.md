@@ -528,3 +528,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Evidence: **1023/1023 ALL PASS**, real 60-frame headless debug-scene runtime smoke, implementation diff independently inspected.
 - Progress unchanged: **207/943 = 21.95%**.
 - SB-M10-005..011 remain owner visual-QA gates. M14 remains NOT_STARTED.
+
+
+### M10-C001 V08 issuance — canonical gameplay QA region
+
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V08.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V08.md
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V08.md
+- Owner reference: 887×1774 phone screen, gameplay region x=13, y=175, w=844, h=942.
+- Equivalent 1080×2160 QA region ≈ x=16, y=213, w=1028, h=1147.
+- Production max remains 59×59; 75×75 idea abandoned.
+- State: ISSUED; next actor CLAUDE.
