@@ -155,7 +155,7 @@ func _on_fixture_changed() -> void:
 					first_valid = i
 			# If the current selection can't contain the source, move to the
 			# smallest valid canvas rather than cropping.
-			if _size_option.selected < 0 or _size_option.get_item_disabled(_size_option.selected):
+			if _size_option.selected < 0 or _size_option.is_item_disabled(_size_option.selected):
 				if first_valid >= 0:
 					_size_option.select(first_valid)
 	else:
