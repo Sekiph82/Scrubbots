@@ -625,3 +625,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Scope: SB-M16-001..011 only. M17 routing algorithm research remains unopened.
 - State: ISSUED; next actor CLAUDE.
 - Owner workflow note: start a fresh Claude chat for M16.
+
+
+## M16-C001 V01 final independent audit
+
+- Status: **AUDITED_PASS / COMPLETE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V01.md
+- Accepted: RouteRequest/RouteResult, board-local coordinate space, caller slot origin, assigned target-center destination, swappable RoutingSystem contract, injected segment-access validation, no-retarget failure behavior, debug route overlay.
+- Claude evidence: **1266/1266 ALL PASS**.
+- ChatGPT independently inspected implementation diff/source/tests; Godot was not independently rerun in the audit environment and that limitation is disclosed in the audit.
+- SB-M16-001..011: **CLOSED**.
+- Next milestone: **M17 Routing Prototype Lab**, not yet opened.
