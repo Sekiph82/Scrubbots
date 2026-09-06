@@ -508,3 +508,13 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Evidence: **1008/1008 ALL PASS**, clean debug-scene headless boot, implementation diff independently inspected.
 - No task checkbox changed; progress remains **207/943 = 21.95%**.
 - SB-M10-005..011 remain owner visual-QA gates. M14 remains NOT_STARTED.
+
+
+### M10-C001 V07 issuance — owner manual-QA OptionButton runtime fix
+
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V07.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V07.md
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V07.md
+- Owner-observed error: `Invalid call. Nonexistent function 'get_item_disabled' in base 'OptionButton'.`
+- Required API: `is_item_disabled(idx)`.
+- State: ISSUED; next actor CLAUDE.
