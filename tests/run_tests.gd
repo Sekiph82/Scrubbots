@@ -42,6 +42,7 @@ func _initialize() -> void:
 	_run_palette_colors_tests()
 	_run_board_renderer_active_cleared_tests()
 	_run_board_renderer_real_fixture_tests()
+	_run_board_renderer_canvas_embed_tests()
 	_run_board_renderer_geometry_tests()
 	_run_board_renderer_pixel_tests()
 	_run_board_renderer_performance_sanity()
@@ -571,6 +572,130 @@ func _run_board_renderer_real_fixture_tests() -> void:
 			_check(l010.palette_subset_ids.has(cid), "Level 010 subset includes blue-family %s" % cid)
 		_check(not l010.palette_subset_ids.has("C04"), "Level 010 no longer uses green C04 (recolored to blues)")
 	print("  M10-C001 real-artwork fixture tests complete")
+
+## M10-C001 V05: Real Artwork source matrices are IMMUTABLE bounding matrices,
+## embedded (centered, VOID-padded) into a selected debug canvas. The source is
+## never scaled/cropped/resampled: artwork count and color mapping are
+## invariant across every valid canvas; too-small canvases are rejected, not
+## cropped; source + padding VOID never become ACTIVE.
+func _run_board_renderer_canvas_embed_tests() -> void:
+	print("---- M10-C001 V05: Real Artwork variable-canvas embedding ----")
+
+	# fixture path -> [source_w, source_h, artwork, [ [canvas_w, canvas_h, off_x, off_y], ... ] ]
+	var cases := {
+		"res://data/debug/board_renderer_fixtures/level_007.json":
+			[27, 24, 542, [[30, 30, 1, 3], [59, 59, 16, 17]]],
+		"res://data/debug/board_renderer_fixtures/level_010.json":
+			[49, 50, 2450, [[50, 50, 0, 0], [59, 59, 5, 4]]],
+		"res://data/debug/board_renderer_fixtures/level_013.json":
+			[28, 31, 375, [[39, 39, 5, 4], [59, 59, 15, 14]]],
+	}
+
+	for path in cases:
+		var spec: Array = cases[path]
+		var sw: int = spec[0]
+		var sh: int = spec[1]
+		var artwork: int = spec[2]
+		var canvases: Array = spec[3]
+
+		# Source JSON matrix is unchanged (re-parsed independently).
+		var raw = JSON.parse_string(FileAccess.get_file_as_string(path))
+		_check_eq(int(raw.width), sw, "%s source width unchanged" % path)
+		_check_eq(int(raw.height), sh, "%s source height unchanged" % path)
+
+		var source: Dictionary = BoardDebugFixtures.load_real_fixture(path)
+		_check(source.ok, "%s source loads" % path)
+		_check_eq(int(source.source_width), sw, "%s source_width" % path)
+		_check_eq(int(source.source_height), sh, "%s source_height" % path)
+		_check_eq(int(source.artwork_cell_count), artwork, "%s source artwork count" % path)
+
+		# Baseline per-color counts at source size, mapped C-ID -> count.
+		var subset: Array = source.palette_subset_ids
+		var base_counts := _count_artwork_by_cid(source.level, source.void_mask, subset)
+
+		# Too-small canvas is rejected (never crops).
+		var too_small: Dictionary = BoardDebugFixtures.embed_real_fixture_in_canvas(source, sw - 1, sh)
+		_check(not too_small.ok, "%s canvas narrower than source is rejected (no crop)" % path)
+		var too_small2: Dictionary = BoardDebugFixtures.embed_real_fixture_in_canvas(source, sw, sh - 1)
+		_check(not too_small2.ok, "%s canvas shorter than source is rejected (no crop)" % path)
+
+		for cv in canvases:
+			var cw: int = cv[0]
+			var ch: int = cv[1]
+			var ox: int = cv[2]
+			var oy: int = cv[3]
+			var emb: Dictionary = BoardDebugFixtures.embed_real_fixture_in_canvas(source, cw, ch)
+			_check(emb.ok, "%s embeds into %dx%d" % [path, cw, ch])
+			if not emb.ok:
+				continue
+			_check_eq(emb.level.width, cw, "%s canvas width %d" % [path, cw])
+			_check_eq(emb.level.height, ch, "%s canvas height %d" % [path, ch])
+			_check_eq(int(emb.offset_x), ox, "%s offset_x at %dx%d" % [path, cw, ch])
+			_check_eq(int(emb.offset_y), oy, "%s offset_y at %dx%d" % [path, cw, ch])
+			# Artwork count invariant; debug VOID = canvas cells - artwork.
+			var void_ct := 0
+			for m in emb.void_mask:
+				if m == 1:
+					void_ct += 1
+			_check_eq(cw * ch - void_ct, artwork, "%s artwork count invariant at %dx%d" % [path, cw, ch])
+			_check_eq(void_ct, cw * ch - artwork, "%s debug VOID count at %dx%d" % [path, cw, ch])
+
+			# Per-color mapping invariant across canvas sizes.
+			var emb_counts := _count_artwork_by_cid(emb.level, emb.void_mask, subset)
+			_check_eq(emb_counts, base_counts, "%s per-color counts invariant at %dx%d" % [path, cw, ch])
+
+			# ALL_ACTIVE activates exactly the artwork cells; VOID never active.
+			var board = BoardState.from_level_data(emb.level)
+			BoardDebugFixtures.apply_pattern_masked(board, BoardDebugFixtures.StatePattern.ALL_ACTIVE, emb.void_mask)
+			var active_ct := 0
+			var void_active := 0
+			for i in board.get_cell_count():
+				var st: int = board.get_cell_state(i)
+				if emb.void_mask[i] == 1:
+					if st == BoardState.CellState.ACTIVE:
+						void_active += 1
+				elif st == BoardState.CellState.ACTIVE:
+					active_ct += 1
+			_check_eq(active_ct, artwork, "%s ALL_ACTIVE activates only artwork at %dx%d" % [path, cw, ch])
+			_check_eq(void_active, 0, "%s ALL_ACTIVE never activates VOID at %dx%d" % [path, cw, ch])
+
+			# CHECKER never activates any VOID (source or padding).
+			BoardDebugFixtures.apply_pattern_masked(board, BoardDebugFixtures.StatePattern.CHECKER, emb.void_mask)
+			var checker_void_active := 0
+			for i in board.get_cell_count():
+				if emb.void_mask[i] == 1 and board.get_cell_state(i) == BoardState.CellState.ACTIVE:
+					checker_void_active += 1
+			_check_eq(checker_void_active, 0, "%s CHECKER never activates VOID at %dx%d" % [path, cw, ch])
+
+			# ALL_CLEARED activates none.
+			BoardDebugFixtures.apply_pattern_masked(board, BoardDebugFixtures.StatePattern.ALL_CLEARED, emb.void_mask)
+			var any_active := false
+			for i in board.get_cell_count():
+				if board.get_cell_state(i) == BoardState.CellState.ACTIVE:
+					any_active = true
+					break
+			_check(not any_active, "%s ALL_CLEARED activates none at %dx%d" % [path, cw, ch])
+
+			# BG01 + no per-cell Nodes.
+			_check(emb.background_hex.to_lower() == "#202533", "%s BG01 #202533 at %dx%d" % [path, cw, ch])
+			var renderer = BoardRenderer.new()
+			renderer.configure(board, emb.level.palette, Vector2(1080, 1080))
+			_check_eq(renderer.get_child_count(), 0, "%s zero child Nodes at %dx%d" % [path, cw, ch])
+			renderer.free()
+
+	print("  M10-C001 V05 variable-canvas embedding tests complete")
+
+## Counts artwork cells (void_mask==0) grouped by mapped C-ID string, using the
+## level's subset-index color ids.
+func _count_artwork_by_cid(level, void_mask, subset: Array) -> Dictionary:
+	var out: Dictionary = {}
+	var board = BoardState.from_level_data(level)
+	for i in level.get_cell_count():
+		if void_mask[i] == 1:
+			continue
+		var cid: String = String(subset[board.get_color_id(i)])
+		out[cid] = int(out.get(cid, 0)) + 1
+	return out
 
 func _run_board_renderer_geometry_tests() -> void:
 	var sizes: Array[Vector2i] = [

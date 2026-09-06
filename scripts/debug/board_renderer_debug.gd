@@ -70,12 +70,16 @@ var _board_area: Control
 var _board_bg: ColorRect # visible background behind the board
 var _renderer: Control # BoardRenderer instance (extends TextureRect)
 var _grid: Control # BoardGridOverlay
+## Immutable source fixture (from load_real_fixture) for the selected Real
+## Artwork option, or {} for Synthetic Stripes. The source matrix is never
+## mutated; it is embedded into the selected canvas per _refresh().
+var _current_source: Dictionary = {}
 
 func _ready() -> void:
 	anchor_right = 1.0
 	anchor_bottom = 1.0
 	_build_ui()
-	call_deferred("_refresh")
+	call_deferred("_on_fixture_changed")
 
 func _build_ui() -> void:
 	var root_vbox := VBoxContainer.new()
@@ -89,7 +93,7 @@ func _build_ui() -> void:
 	_fixture_option = OptionButton.new()
 	for entry in FIXTURE_OPTIONS:
 		_fixture_option.add_item(entry.label)
-	_fixture_option.item_selected.connect(func(_i): _refresh())
+	_fixture_option.item_selected.connect(func(_i): _on_fixture_changed())
 	controls_row.add_child(_fixture_option)
 
 	_size_option = OptionButton.new()
@@ -125,43 +129,99 @@ func _build_ui() -> void:
 	_grid = BoardGridOverlay.new()
 	_board_area.add_child(_grid)
 
+## True only when SIZE_OPTIONS[idx] can fully contain the given source matrix
+## (canvas must be >= source in both dimensions; too small would crop).
+func _size_fits(idx: int, source_w: int, source_h: int) -> bool:
+	var e: Dictionary = SIZE_OPTIONS[idx]
+	return int(e.w) >= source_w and int(e.h) >= source_h
+
+## Reload the selected fixture's immutable source, mark which Size options can
+## contain it (disabling too-small ones so they can never crop), snap the Size
+## selection to a valid option, then refresh. Synthetic Stripes re-enables all
+## sizes and keeps its existing behavior.
+func _on_fixture_changed() -> void:
+	var fixture: Dictionary = FIXTURE_OPTIONS[_fixture_option.selected]
+	if fixture.kind == "real":
+		var source: Dictionary = BoardDebugFixtures.load_real_fixture(fixture.path)
+		_current_source = source
+		if source.ok:
+			var sw: int = int(source.source_width)
+			var sh: int = int(source.source_height)
+			var first_valid := -1
+			for i in SIZE_OPTIONS.size():
+				var fits := _size_fits(i, sw, sh)
+				_size_option.set_item_disabled(i, not fits)
+				if fits and first_valid < 0:
+					first_valid = i
+			# If the current selection can't contain the source, move to the
+			# smallest valid canvas rather than cropping.
+			if _size_option.selected < 0 or _size_option.get_item_disabled(_size_option.selected):
+				if first_valid >= 0:
+					_size_option.select(first_valid)
+	else:
+		_current_source = {}
+		for i in SIZE_OPTIONS.size():
+			_size_option.set_item_disabled(i, false)
+	_refresh()
+
 func _refresh() -> void:
 	if _board_area.size.x <= 0 or _board_area.size.y <= 0:
 		return
 	var fixture: Dictionary = FIXTURE_OPTIONS[_fixture_option.selected]
 	var pattern_entry: Dictionary = PATTERN_OPTIONS[_pattern_option.selected]
-
-	# Size dropdown only applies to Synthetic Stripes; Real Artwork uses the
-	# fixed JSON dimensions and must not be resized/resampled.
 	var is_real: bool = fixture.kind == "real"
-	_size_option.disabled = is_real
+	# Size dropdown stays usable for both; Real Artwork just disables the
+	# too-small options (handled in _on_fixture_changed).
+	_size_option.disabled = false
 
 	var level: LevelData
 	var board: BoardState
 	var info_prefix: String
 
 	if is_real:
-		var loaded: Dictionary = BoardDebugFixtures.load_real_fixture(fixture.path)
-		if not loaded.ok:
-			_info_label.text = "FIXTURE LOAD ERROR: %s" % loaded.error
+		var source: Dictionary = _current_source
+		if source == null or not source.get("ok", false):
+			_info_label.text = "FIXTURE LOAD ERROR: %s" % (source.get("error", "no source") if source else "no source")
 			return
-		level = loaded.level
+		var sw: int = int(source.source_width)
+		var sh: int = int(source.source_height)
+		# Guard: never crop. If the selected canvas is too small, snap to the
+		# smallest option that fully contains the source.
+		var sel: int = _size_option.selected
+		if sel < 0 or not _size_fits(sel, sw, sh):
+			sel = -1
+			for i in SIZE_OPTIONS.size():
+				if _size_fits(i, sw, sh):
+					sel = i
+					break
+			if sel < 0:
+				_info_label.text = "%s — no canvas size can contain source %dx%d without cropping" % [source.display_name, sw, sh]
+				return
+			_size_option.select(sel)
+		var size_entry: Dictionary = SIZE_OPTIONS[sel]
+		var embedded: Dictionary = BoardDebugFixtures.embed_real_fixture_in_canvas(source, int(size_entry.w), int(size_entry.h))
+		if not embedded.ok:
+			_info_label.text = "EMBED ERROR: %s" % embedded.error
+			return
+		level = embedded.level
 		board = BoardState.from_level_data(level)
-		BoardDebugFixtures.apply_pattern_masked(board, pattern_entry.value, loaded.void_mask)
+		BoardDebugFixtures.apply_pattern_masked(board, pattern_entry.value, embedded.void_mask)
 		_board_bg.color = REAL_BACKGROUND_COLOR
-		info_prefix = "%s — %dx%d (%d artwork + %d VOID) — subset=%s — BG01=%s" % [
-			loaded.display_name, loaded.width, loaded.height,
-			loaded.artwork_cell_count, loaded.void_count,
-			str(loaded.palette_subset_ids), loaded.background_hex,
+		info_prefix = "%s — source=%dx%d — canvas=%dx%d — offset=(%d,%d) — artwork=%d — void=%d — subset=%s — BG01=%s" % [
+			embedded.display_name, embedded.source_width, embedded.source_height,
+			embedded.canvas_width, embedded.canvas_height,
+			embedded.offset_x, embedded.offset_y,
+			embedded.artwork_cell_count, embedded.void_count,
+			str(embedded.palette_subset_ids), embedded.background_hex,
 		]
 	else:
-		var size_entry: Dictionary = SIZE_OPTIONS[_size_option.selected]
-		level = BoardDebugFixtures.make_level(size_entry.w, size_entry.h)
+		var syn_entry: Dictionary = SIZE_OPTIONS[_size_option.selected]
+		level = BoardDebugFixtures.make_level(int(syn_entry.w), int(syn_entry.h))
 		board = BoardState.from_level_data(level)
 		BoardDebugFixtures.apply_pattern(board, pattern_entry.value)
 		_board_bg.color = SYNTHETIC_BACKGROUND_COLOR
 		info_prefix = "Synthetic Stripes — %dx%d (%d cells)" % [
-			size_entry.w, size_entry.h, size_entry.w * size_entry.h,
+			int(syn_entry.w), int(syn_entry.h), int(syn_entry.w) * int(syn_entry.h),
 		]
 
 	_renderer.configure(board, level.palette, _board_area.size)
