@@ -1,4 +1,20 @@
 
+## 2026-09-06 — Global 15-color production palette locked
+
+Owner locked production logical pixel artwork to C01..C15 exactly (ADR-020).
+
+- Added machine-readable `data/palettes/scrubbots_palette_v1.json`.
+- Added `docs/08_PIXEL_ART_PALETTE_RULES.md`.
+- Difficulty distinct-used-color bands: Easy 3–5, Medium 6–7, Hard 8–9,
+  Very Hard 10–12.
+- CLEARED alpha-0 transparency is runtime state, not a palette color.
+- Gameplay background and presentation grid/border overlays do not count.
+- External/reference/AI artwork cannot introduce new production colors.
+- Existing M09 importer history is preserved; arbitrary exact-source imports
+  require later palette mapping/production QA before shipping.
+- No task checkbox state changed.
+
+
 ## 2026-09-05 — Gameplay rule migration: ACTIVE/CLEARED replaces DIRTY/CLEAN (META-C004)
 
 Owner-decided gameplay-rule migration (ADR-019 / AL-027 / AL-028). This is an

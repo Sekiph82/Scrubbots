@@ -217,6 +217,33 @@ One logical artwork square = one logical pixel = one board cell. Logical
 cells are game data, never physical display pixels, and are never
 represented as thousands of heavyweight Godot Nodes (see ADR-004, ADR-008).
 
+### 8.7A — Global 15-color pixel-art palette `[LOCKED OWNER DECISION]`
+
+Canonical machine-readable palette:
+`data/palettes/scrubbots_palette_v1.json`
+
+Canonical human-readable rule:
+`docs/08_PIXEL_ART_PALETTE_RULES.md`
+
+Production logical artwork cells may use **only C01..C15**. No other logical
+pixel color is legal without an explicit owner rule change and palette version
+change. CLEARED alpha-0 transparency, gameplay background and
+presentation-only grid/border overlays are not logical artwork colors and do
+not add palette IDs.
+
+### 8.7B — Production distinct-color bands `[LOCKED OWNER DECISION]`
+
+| Difficulty | Distinct canonical logical cell colors actually used |
+| --- | ---: |
+| EASY | **3–5** |
+| MEDIUM | **6–7** |
+| HARD | **8–9** |
+| VERY_HARD | **10–12** |
+
+These are hard production-content bands. Count colors actually referenced by
+logical cells, not an inflated palette array. Production local LevelData
+palettes are used subsets of C01..C15 in ascending global C-ID order.
+
 ### 8.8 — Five slots `[LOCKED]`
 
 Primary gameplay presentation: **5 slots**. Player-visible gameplay uses
@@ -327,7 +354,9 @@ exact animations, routing visuals, or source code.
 
 Previously supplied game screenshots may be used only as reference for
 *pixel construction method*, where explicitly approved — never for
-characters, compositions, object placement, level art, or exact palettes.
+characters, compositions, object placement, or level art. External-reference
+colors must never redefine the SCRUBBOTS palette. The exact production palette
+is owner-locked in §8.7A / `data/palettes/scrubbots_palette_v1.json`.
 The goal is understanding how a readable image is built from a limited
 logical grid. SCRUBBOTS level artwork remains original.
 
@@ -406,8 +435,7 @@ assets/
 Unresolved. Do not silently invent final decisions for these:
 
 Exact slot refill/replacement behavior; how a player activates a slot;
-whether slots hold quantities; hidden/upcoming slot queue; exact number of
-colors by difficulty; palette-size rules; exact target-selection heuristic;
+whether slots hold quantities; hidden/upcoming slot queue; exact target-selection heuristic;
 exact route geometry; route crossing rules; route collision behavior; exact
 win condition; exact lose condition;
 timer; move limits; lives; blockers; boosters; hints; progression
@@ -415,8 +443,8 @@ structure; currency meaning; economy; shop; monetization; ads; IAP; energy
 system; analytics; achievements; leaderboard; social features; cloud save;
 tutorial wording; audio direction.
 
-**Not design gates** (these are locked, see 8.3): Easy 20–29×20–29, Medium
-30–39×30–39, Hard 40–49×40–49, Very Hard 50–59×50–59.
+**Not design gates**: board-size bands are locked in §8.3; the global
+C01..C15 palette and difficulty distinct-color bands are locked in §8.7A/B.
 
 ---
 
@@ -659,7 +687,7 @@ Per candidate production pixel-art level (none exist locally yet):
 - [ ] SB-M08-009 Confirm width in legal range.
 - [ ] SB-M08-010 Confirm height in legal range.
 - [ ] SB-M08-011 Preserve original. — [ ] SB-M08-012 Never silently resize.
-- [ ] SB-M08-013 Never silently reduce palette. — [ ] SB-M08-014 Produce audit report.
+- [ ] SB-M08-013 Explicitly map/reject candidate source colors against locked C01..C15; never silently reduce/remap, never invent C16+, and record deterministic mapping/rejection evidence. — [ ] SB-M08-014 Produce audit report.
 
 Examples: `27×24 -> Easy`, `35×38 -> Medium`, `43×46 -> Hard`, `53×59 -> Very Hard`.
 An image must never be auto-changed to 20×20/40×40/50×50 for convenience.
@@ -685,6 +713,14 @@ An image must never be auto-changed to 20×20/40×40/50×50 for convenience.
 - [x] SB-M09-018 Batch import. — M09-C002: `LevelBatchImporter.run_batch()` (`scripts/tools/level_batch_importer.gd`) + CLI `tools/import_level_batch.gd`. Manifest-driven, reuses audited `LevelImporter` per item (`dry_run` param), preserves manifest order. Validation-only and commit (`--commit`) modes both real-CLI-verified with a multi-item batch (3×2 TEST, 20×27 EASY): validation-only writes nothing, commit writes, rerun reports unchanged. V02 correction (audit V01 F-M09B-001/002): destination-parent-directory and catalog-root existence are now part of preflight, not discovered mid-commit. V03 correction (audit V02 F-M09B-006 / AL-017): final destination path itself is now preflighted — existing directories at output/preview/metadata destinations are rejected before any commit write. Overwrite cannot bypass directory-type safety. Applies to all three destination roles via the same `LevelImporter._resolve_path()` resolver. 447/447 tests pass (21 new V03 checks on top of the 426 V02 baseline).
 - [x] SB-M09-019 Batch validation. — Whole-batch preflight (every item `dry_run=true` + schema/destination-parent/destination-type/duplicate-ID/cross-item-path/catalog-ownership/catalog-health checks) runs before any commit write; a failing later item blocks earlier items from being committed (CLI-verified, including missing-destination-parent and destination-is-directory cases). Malformed/empty manifest, missing required fields, and wrong optional-field types rejected with actionable per-item errors and no crash. V03 correction (audit V02 F-M09B-006 / AL-017): destination-object type (existing directory at final path) is now part of preflight for output, preview, and metadata roles — validation-only mode remains fully read-only and creates/removes nothing. 447/447 tests pass.
 - [x] SB-M09-020 Duplicate level ID protection. — ChatGPT audit V02 independently accepted the V02 catalog-root/health and bidirectional ID/path ownership corrections; F-M09B-006 does not reopen duplicate-ID semantics.  Rejects duplicate IDs within one manifest and IDs already owned by a different existing catalog file (independent of `overwrite`, CLI-verified); allows re-import at the same canonical catalog path (CLI-verified: legitimate overwrite still succeeds); catalog scan reports existing duplicate IDs (both paths) and malformed/structurally-invalid catalog entries rather than ignoring them. V02 correction (audit V01 F-M09B-003): catalog scan now builds bidirectional ownership (declared ID → path *and* canonical path → declared ID) — a different ID can no longer take over an existing catalog path with `overwrite=true` (CLI-verified with byte-preservation proof), and aliasing a malformed existing catalog file fails closed. TEST and production levels share one ID-uniqueness space per catalog root.
+
+**M09 palette-lock note (owner decision 2026-09-06):** M09's completed
+exact-source-pixel importer remains valid historical/generic tooling evidence,
+but it predates the locked global C01..C15 production palette. An arbitrary
+raw M09 import is not production-legal merely because it round-trips exactly.
+Production acceptance must additionally satisfy §8.7A/B through the open
+art-audit / Level Factory / Level QA gates. Historical M09 task completion is
+not rewritten.
 
 ### M10 — ACTIVE/CLEARED Board Visual Model `[OWNER DECISION LOCKED]` `[MANUAL QA OPEN]`
 
@@ -1217,7 +1253,7 @@ Mark actual iOS compilation `[DEFERRED]` until macOS/Xcode is available.
 
 Every production level:
 - [ ] SB-M48-001 Legal dimensions. — [ ] SB-M48-002 Correct difficulty.
-- [ ] SB-M48-003 Valid palette. — [ ] SB-M48-004 Correct cell count.
+- [ ] SB-M48-003 Valid locked palette: every used logical color is C01..C15 only; local palette contains only used canonical colors in ascending C-ID order; distinct used-color count matches difficulty (Easy 3–5 / Medium 6–7 / Hard 8–9 / Very Hard 10–12). — [ ] SB-M48-004 Correct cell count.
 - [ ] SB-M48-005 No invalid palette IDs. — [ ] SB-M48-006 Recognizable ACTIVE source artwork (cells shown at their original source palette color, opaque, from level start; ADR-019).
 - [ ] SB-M48-007 No unintended interpolation. — [ ] SB-M48-008 Correct CLEARED transparency — cleared cells render alpha 0 and the gameplay background is visible through them (not a black/gray/palette substitute).
 - [ ] SB-M48-009 Solvable under canonical ACTIVE-blocker / CLEARED-open reachability semantics (non-target ACTIVE cells block access; CLEARED/background is open). — [ ] SB-M48-010 No routing pathology under those semantics; a fully enclosed matching-color ACTIVE cell must remain untargetable (no dispatch) until prior clears open legal access (AL-028).
@@ -1627,7 +1663,7 @@ channel:
 
 - [ ] SB-LF05-001 Compose structural Level Data V1 validation with production difficulty validation.
 - [ ] SB-LF05-002 Reuse the audited M09 exact-pixel reconstruction/round-trip contract for art-first exports.
-- [ ] SB-LF05-003 Validate dimensions, palette, cells, alpha/transparency and duplicate IDs before production acceptance.
+- [ ] SB-LF05-003 Validate dimensions, locked C01..C15 membership/order, difficulty distinct-color bands (3–5 / 6–7 / 8–9 / 10–12), cells, ACTIVE opacity/CLEARED runtime transparency and duplicate IDs before production acceptance.
 - [ ] SB-LF05-004 Reject unsolved candidates when the solver verdict is authoritative.
 - [ ] SB-LF05-005 Distinguish solver INCONCLUSIVE from proven UNSOLVABLE.
 - [ ] SB-LF05-006 Produce actionable per-candidate rejection reasons.

@@ -221,6 +221,21 @@ Tracking sources:
 - M14: **NOT_STARTED**
 - Next actor: **OWNER**, manual BoardRenderer QA.
 
+## Owner-locked global pixel-art palette
+
+- Canonical palette: `data/palettes/scrubbots_palette_v1.json`
+- Rule doc: `docs/08_PIXEL_ART_PALETTE_RULES.md`
+- Allowed production logical artwork colors: **C01..C15 only**
+- EASY: **3–5** distinct used colors
+- MEDIUM: **6–7**
+- HARD: **8–9**
+- VERY_HARD: **10–12**
+- CLEARED transparency is runtime state, not a palette color.
+- Background and presentation grid/border overlays do not count.
+- Existing M09 importer predates this lock; production legality requires the
+  open mapping/QA/Factory gates.
+- Canonical task truth unchanged: **207 / 943**.
+
 ## Project identity
 
 | Field | Value |

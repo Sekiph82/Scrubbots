@@ -49,6 +49,9 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | AL-029 | Semantic migration completeness | Identifier-only grep can miss contradictory conceptual language and required future task sections. | For gameplay-rule migrations, scan both identifiers and semantic synonyms, and explicitly reconcile every prompt-named task section. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md |
 | AL-030 | Evidence reference existence | A log statement such as "receipt below" is not evidence if the referenced artifact is absent. | Independently verify every claimed receipt/comment/file exists. Post-push exact SHA evidence belongs in a real non-Git-mutating receipt per AL-025. | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md |
 
+| AL-031 | Global pixel-art palette owner lock | On 2026-09-06 the owner fixed the production logical color vocabulary to C01..C15 exactly. | Treat `data/palettes/scrubbots_palette_v1.json`, `docs/08_PIXEL_ART_PALETTE_RULES.md`, and ADR-020 as canonical. No source/reference/AI output may introduce C16+ without explicit owner version change. CLEARED/background/grid overlays are not logical colors. | Owner decision 2026-09-06 |
+| AL-032 | Difficulty distinct-color bands | Production levels use EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12 distinct canonical logical cell colors actually used. | Count cell-referenced canonical colors, not palette array length. Exclude CLEARED transparency, gameplay background and presentation grid/border overlays. | Owner decision 2026-09-06 |
+
 ## Audit history
 
 | Cycle | ChatGPT audit | Final/current state | Reusable learning |

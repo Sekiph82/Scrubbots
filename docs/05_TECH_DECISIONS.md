@@ -464,3 +464,41 @@ preserved as history and marked superseded, not erased. Owner manual QA of the
 new transparent model (`tasks.md` SB-M10-005..011) remains open.
 
 **Status**: Owner-locked.
+
+
+---
+
+### ADR-020: Global 15-color production pixel-art palette and difficulty color bands
+
+**Decision**: Production logical pixel artwork uses one owner-locked global
+palette, C01..C15 exactly, defined in
+`data/palettes/scrubbots_palette_v1.json` and
+`docs/08_PIXEL_ART_PALETTE_RULES.md`.
+
+Distinct canonical logical colors actually used by cells must be:
+
+```text
+EASY       3..5
+MEDIUM     6..7
+HARD       8..9
+VERY_HARD  10..12
+```
+
+CLEARED alpha-0 transparency is runtime state, not a palette color. Gameplay
+background and presentation-only cell-grid/border overlays also do not count.
+
+**Reason**: A fixed color vocabulary gives SCRUBBOTS a stable visual identity,
+keeps slot/Scrubbot color matching deterministic, prevents references or AI
+generation from quietly expanding the color space, and gives Level Factory a
+hard content contract. The non-overlapping difficulty bands increase visual
+complexity predictably while Very Hard's 10–12 cap avoids excessive color
+noise even though the global library contains 15 available colors.
+
+**Consequences**: External/reference/AI source colors must be explicitly
+mapped or rejected. A production local palette is a used subset of C01..C15
+in ascending global C-ID order. The older M09 exact-source importer remains
+valid generic tooling but does not by itself make arbitrary palettes
+production-legal. Production art audit, Factory validation and M48 QA must
+enforce this decision before shipping.
+
+**Status**: Accepted — owner locked 2026-09-06.

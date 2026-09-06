@@ -27,6 +27,29 @@
 - Level metadata: `id`, `name`, `difficulty`.
 - Explicit format `version` for forward compatibility.
 
+## Locked production palette contract — owner decision 2026-09-06
+
+Production logical artwork is constrained to C01..C15 in
+`data/palettes/scrubbots_palette_v1.json` /
+`docs/08_PIXEL_ART_PALETTE_RULES.md`.
+
+A production level's local `palette` is a compact subset containing only
+canonical colors actually referenced by its logical cells, ordered by
+ascending global C-ID. `#RRGGBBFF` is serialization-equivalent to the
+canonical opaque `#RRGGBB`.
+
+Required distinct used-color count:
+EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12.
+
+CLEARED alpha-0 transparency is runtime state, not a palette entry. Gameplay
+background and presentation-only grid/border overlays are also excluded from
+the logical artwork color count.
+
+The existing M09 importer predates this lock. Its exact-source round-trip
+behavior remains historical/generic tooling truth, but arbitrary imported
+palettes are not automatically production legal. Open content-audit / Factory /
+M48 QA gates must map/reject and validate before shipping.
+
 Per-cell *runtime* state (ACTIVE/CLEARED) is intentionally **not** part of level
 data — it belongs to `BoardState`, which is runtime-only and derived fresh
 from `LevelData` each time a board is constructed. See "LevelData vs.
@@ -71,9 +94,11 @@ BoardState" in `docs/02_TECH_ARCHITECTURE.md`.
   in 50..59 is valid, up to the current maximum 59×59.
 - `width`, `height` — required, integers `> 0`. No relationship between them
   is assumed or required (a level is not required to be square).
-- `palette` — required, non-empty array of color strings. Palette ids are
-  implicit (array index), not separately declared. `palette[0]` is not
-  reserved/special by convention here; any cell may reference any valid id.
+- `palette` — structurally, a required non-empty array of color strings.
+  Palette ids are implicit local array indexes. Production adds the owner-
+  locked contract above: used subset of C01..C15 only, ascending global C-ID
+  order, no unused/off-palette entries, and the difficulty's distinct-used-
+  color band.
 - `cells` — required array of integers. **Must** have exactly
   `width * height` entries. Every entry must be a valid index into
   `palette` (`0 <= id < palette.size()`).
