@@ -1,29 +1,44 @@
 extends Control
-## Development-only visual comparison tool for BoardRenderer under the
-## ACTIVE/CLEARED board model (ADR-019, owner decision META-C004). NOT
+## Development-only visual comparison / manual-QA tool for BoardRenderer under
+## the ACTIVE/CLEARED board model (ADR-019, owner decision META-C004). NOT
 ## production UI — see docs/04_ROADMAP.md for where the real gameplay screen
-## belongs. Lets the project owner verify, at native gameplay scale on every
-## difficulty band's boundary sizes plus representative rectangular boards,
-## that ACTIVE cells render their source palette color and CLEARED cells
-## render transparent so the debug background shows through — without any
-## code changes (dropdowns only). See tasks.md M10.
+## belongs.
 ##
-## A solid, clearly-visible debug background sits BEHIND the board precisely
-## so alpha-0 CLEARED cells reveal that background rather than looking black.
+## Two fixture sources (M10-C001):
+##   - Synthetic Stripes: procedural placeholder palette, size dropdown +
+##     ACTIVE/CLEARED pattern; conspicuous magenta transparency-test background.
+##   - Real Artwork - Level 007/010/013: owner-authorized debug fixtures loaded
+##     directly from data/debug/board_renderer_fixtures/*.json (fixed logical
+##     dimensions, canonical C01..C15 subset colors, VOID mask). Background is
+##     BG01 Midnight Slate #202533; the ACTIVE/CLEARED pattern applies only to
+##     artwork cells, VOID stays background.
 ##
-## UI is built procedurally in _ready() rather than hand-authored in the
-## .tscn, since this session has no interactive editor available to
-## visually verify a complex hand-written scene tree; procedural
-## construction is verifiable by headless boot instead.
+## The board is drawn by the single-Image/ImageTexture BoardRenderer (ADR-011);
+## square-cell separation is a batched grid overlay (one Control, no per-cell
+## Nodes). ACTIVE = flat source palette color, opaque; CLEARED = transparent
+## (background shows through). No gloss/bevel/shadow/interpolation.
+##
+## UI is built procedurally in _ready() (verifiable by headless boot) rather
+## than hand-authored in the .tscn.
 
 const LevelData = preload("res://scripts/data/level_data.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
 const BoardDebugFixtures = preload("res://scripts/debug/board_debug_fixtures.gd")
+const BoardGridOverlay = preload("res://scripts/debug/board_grid_overlay.gd")
 
-## Bright, unmistakable debug background so transparent CLEARED cells are
-## obviously showing THIS colour through, not a black renderer artifact.
-const DEBUG_BACKGROUND_COLOR := Color(0.9, 0.2, 0.8) # magenta-ish, not in fixture palette
+## Synthetic-Stripes transparency-test background (deliberately garish so
+## alpha-0 CLEARED cells obviously reveal THIS colour, not a black artifact).
+const SYNTHETIC_BACKGROUND_COLOR := Color(0.9, 0.2, 0.8)
+## Real Artwork background — BG01 Midnight Slate #202533 (owner-locked).
+const REAL_BACKGROUND_COLOR := Color("#202533")
+
+const FIXTURE_OPTIONS := [
+	{"label": "Synthetic Stripes", "kind": "synthetic"},
+	{"label": "Real Artwork - Level 007", "kind": "real", "path": "res://data/debug/board_renderer_fixtures/level_007.json"},
+	{"label": "Real Artwork - Level 010", "kind": "real", "path": "res://data/debug/board_renderer_fixtures/level_010.json"},
+	{"label": "Real Artwork - Level 013", "kind": "real", "path": "res://data/debug/board_renderer_fixtures/level_013.json"},
+]
 
 const SIZE_OPTIONS := [
 	{"label": "20x20 (Easy min)", "w": 20, "h": 20},
@@ -47,12 +62,14 @@ const PATTERN_OPTIONS := [
 	{"label": "Checker ACTIVE/CLEARED", "value": BoardDebugFixtures.StatePattern.CHECKER},
 ]
 
+var _fixture_option: OptionButton
 var _size_option: OptionButton
 var _pattern_option: OptionButton
 var _info_label: Label
 var _board_area: Control
 var _board_bg: ColorRect # visible background behind the board
 var _renderer: Control # BoardRenderer instance (extends TextureRect)
+var _grid: Control # BoardGridOverlay
 
 func _ready() -> void:
 	anchor_right = 1.0
@@ -68,6 +85,12 @@ func _build_ui() -> void:
 
 	var controls_row := HBoxContainer.new()
 	root_vbox.add_child(controls_row)
+
+	_fixture_option = OptionButton.new()
+	for entry in FIXTURE_OPTIONS:
+		_fixture_option.add_item(entry.label)
+	_fixture_option.item_selected.connect(func(_i): _refresh())
+	controls_row.add_child(_fixture_option)
 
 	_size_option = OptionButton.new()
 	for entry in SIZE_OPTIONS:
@@ -90,39 +113,74 @@ func _build_ui() -> void:
 	_board_area.resized.connect(_refresh)
 	root_vbox.add_child(_board_area)
 
-	# Debug background sits behind the board; CLEARED (alpha-0) cells reveal it.
+	# Background sits behind the board; CLEARED (alpha-0) and VOID cells reveal it.
 	_board_bg = ColorRect.new()
-	_board_bg.color = DEBUG_BACKGROUND_COLOR
 	_board_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_board_area.add_child(_board_bg)
 
 	_renderer = BoardRenderer.new()
 	_board_area.add_child(_renderer)
 
+	# Batched square-cell separation overlay (one Node, drawn above the board).
+	_grid = BoardGridOverlay.new()
+	_board_area.add_child(_grid)
+
 func _refresh() -> void:
 	if _board_area.size.x <= 0 or _board_area.size.y <= 0:
 		return
-	var size_entry: Dictionary = SIZE_OPTIONS[_size_option.selected]
+	var fixture: Dictionary = FIXTURE_OPTIONS[_fixture_option.selected]
 	var pattern_entry: Dictionary = PATTERN_OPTIONS[_pattern_option.selected]
 
-	var level: LevelData = BoardDebugFixtures.make_level(size_entry.w, size_entry.h)
-	var board: BoardState = BoardState.from_level_data(level)
-	BoardDebugFixtures.apply_pattern(board, pattern_entry.value)
+	# Size dropdown only applies to Synthetic Stripes; Real Artwork uses the
+	# fixed JSON dimensions and must not be resized/resampled.
+	var is_real: bool = fixture.kind == "real"
+	_size_option.disabled = is_real
+
+	var level: LevelData
+	var board: BoardState
+	var info_prefix: String
+
+	if is_real:
+		var loaded: Dictionary = BoardDebugFixtures.load_real_fixture(fixture.path)
+		if not loaded.ok:
+			_info_label.text = "FIXTURE LOAD ERROR: %s" % loaded.error
+			return
+		level = loaded.level
+		board = BoardState.from_level_data(level)
+		BoardDebugFixtures.apply_pattern_masked(board, pattern_entry.value, loaded.void_mask)
+		_board_bg.color = REAL_BACKGROUND_COLOR
+		info_prefix = "%s — %dx%d (%d artwork + %d VOID) — subset=%s — BG01=%s" % [
+			loaded.display_name, loaded.width, loaded.height,
+			loaded.artwork_cell_count, loaded.void_count,
+			str(loaded.palette_subset_ids), loaded.background_hex,
+		]
+	else:
+		var size_entry: Dictionary = SIZE_OPTIONS[_size_option.selected]
+		level = BoardDebugFixtures.make_level(size_entry.w, size_entry.h)
+		board = BoardState.from_level_data(level)
+		BoardDebugFixtures.apply_pattern(board, pattern_entry.value)
+		_board_bg.color = SYNTHETIC_BACKGROUND_COLOR
+		info_prefix = "Synthetic Stripes — %dx%d (%d cells)" % [
+			size_entry.w, size_entry.h, size_entry.w * size_entry.h,
+		]
 
 	_renderer.configure(board, level.palette, _board_area.size)
 	var board_pixels: Vector2 = _renderer.get_board_pixel_size()
 	var origin: Vector2 = (_board_area.size - board_pixels) / 2.0
 	_renderer.position = origin
-	# Background covers exactly the board rect so cleared holes read as this
-	# colour, not as the window/clear colour.
+	# Background + grid overlay cover exactly the board rect.
 	_board_bg.position = origin
 	_board_bg.size = board_pixels
+	_grid.position = origin
+	_grid.size = board_pixels
+	# On BG01 use a light separation line; on the garish synthetic bg use dark.
+	var line_color := Color(1, 1, 1, 0.18) if is_real else Color(0, 0, 0, 0.30)
+	_grid.configure(_renderer.get_cell_size(), board.get_width(), board.get_height(), line_color)
 
 	_info_label.text = (
-		"%dx%d (%d cells) — cell_size=%.2fpx — board_pixels=%s — pattern=%s — renderer child count=%d"
+		"%s — cell_size=%.2fpx — board_pixels=%s — pattern=%s — renderer child count=%d"
 		% [
-			size_entry.w, size_entry.h, size_entry.w * size_entry.h,
-			_renderer.get_cell_size(), str(board_pixels),
+			info_prefix, _renderer.get_cell_size(), str(board_pixels),
 			pattern_entry.label, _renderer.get_child_count(),
 		]
 	)

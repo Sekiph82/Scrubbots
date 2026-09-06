@@ -16,12 +16,13 @@ This file is the single H!veAI-facing materialized project status surface. It is
 | --- | --- |
 | Active cycle | M10-C001 |
 | Active version | V02 |
-| State | ISSUED |
-| Next actor | CLAUDE |
+| State | AWAITING_AUDIT |
+| Next actor | CHATGPT |
 | Branch | main |
 | Active prompt | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V02.md |
 | Claude log | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V02.md |
-| Purpose | Extend the existing Godot 4.7.1 BoardRenderer debug/manual-QA tool with Fixture options Synthetic Stripes + owner-authorized Real Artwork 007/010/013. Exact fixture data is now stored directly as JSON under data/debug/board_renderer_fixtures; 010 greens are recolored to C06/C07/C08 blues; real artwork uses canonical C01..C15 subsets, BG01 #202533, visible flat square-cell boundaries, and debug-only VOID masking. No production catalog promotion and no owner M10-005..011 checkbox closure. Progress unchanged 207/943 = 21.95%. |
+| Purpose | Extended the Godot 4.7.1 BoardRenderer debug/manual-QA tool with a Fixture dropdown: Synthetic Stripes + owner-authorized Real Artwork 007/010/013 loaded DIRECTLY from data/debug/board_renderer_fixtures/*.json. Real artwork uses canonical C01..C15 subsets, BG01 #202533, flat square cells with a batched grid overlay (no per-cell Nodes), debug-only VOID masking; 010 greens preserved as C06/C07/C08 blues per JSON. New `board_grid_overlay.gd`; fixture loader + masked pattern in `board_debug_fixtures.gd`; +108 tests. No production gameplay code or tasks.md change. |
+| Result | `godot 4.7.1`; full suite **882/882 ALL PASS**; debug scene headless-boots clean. Debug/manual-QA tooling only — no catalog promotion, no M47/M48 closure, SB-M10-005..011 stay OPEN for owner visual QA, M14/M15/M16/M17 untouched. Progress unchanged **207/943 = 21.95%**. |
 
 ### M10-C001 ChatGPT issuance
 
@@ -29,7 +30,8 @@ This file is the single H!veAI-facing materialized project status surface. It is
 - Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_AUDIT_CRITERIA_V01.md
 - Owner fixture data: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/OWNER_FIXTURE_DATA_V01.md
 - Scope is debug/manual-QA tooling only. SB-M10-005..011 remain owner review gates and M14 remains NOT_STARTED.
-- Next actor: CLAUDE.
+- V02 implemented by Claude (JSON-backed fixtures, grid overlay, +108 tests, 882/882 ALL PASS); state AWAITING_AUDIT.
+- Next actor: CHATGPT (independent audit M10-C001 V02).
 
 ### Also active (on main)
 

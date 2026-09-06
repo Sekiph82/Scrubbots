@@ -19,6 +19,7 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 | Cycle | Milestone | Started | Last update | Status | Active ChatGPT prompt | Claude implementation log | Latest ChatGPT audit | Task refs | Summary |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| M10-C001 | M10 - BoardRenderer Real-Artwork Debug/Manual-QA Fixtures | 2026-09-06 | 2026-09-06 | `AWAITING_AUDIT` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V02.md | PENDING | M10 (debug tooling; no checkbox change) | Fixture dropdown + JSON-backed Real Artwork 007/010/013 in the BoardRenderer debug tool; flat cells + batched grid overlay, BG01, VOID mask, 010 blue recolor. 882/882 ALL PASS. Debug-only; 207/943 unchanged. Next actor CHATGPT. |
 | META-C004 | META - Gameplay Rule Migration ACTIVE/CLEARED + Reachable Targets | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V02.md | M02/M10/M11/M13/M48 + future gameplay contracts | ACTIVE/CLEARED migration final AUDITED_PASS. V02 closes M48, Project Brief semantic residue and AL-025 receipt. 207/943. Owner manual QA required before M14. |
 | M13-C001 | M13 - Eligible Target Index | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V02.md | SB-M13-001..010 | V02 closes scan-observability gap and formally validates 006..010. M13 final AUDITED_PASS. 206/943. M14 not opened; owner requested manual QA first. |
 | META-C003 | META - PR #3 Merge & Canonical Main Reconciliation | 2026-09-05 | 2026-09-05 | `AUDITED_PASS` | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CLAUDE_LOG_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C003/CHATGPT_AUDIT_V01.md | META/PR3 | PR #3 normal merge + canonical main reconciliation independently accepted. 196/943; next M13. |
@@ -385,3 +386,29 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
   - https://github.com/Sekiph82/Scrubbots/blob/main/data/debug/board_renderer_fixtures/level_013.json
 - Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M10-C001/CLAUDE_LOG_V02.md
 - State: `ISSUED`; next actor CLAUDE.
+
+### M10-C001 V02 implementation
+
+- Extended `scripts/debug/board_renderer_debug.gd` with a **Fixture** dropdown
+  (Synthetic Stripes + Real Artwork - Level 007/010/013). Real Artwork loads
+  directly from `data/debug/board_renderer_fixtures/level_0NN.json` (no OCR/
+  regeneration), fixed JSON dims (size dropdown disabled), BG01 `#202533`
+  background, ACTIVE/CLEARED pattern applied only to artwork cells.
+- Added to `scripts/debug/board_debug_fixtures.gd`: `load_real_fixture()` (JSON
+  → TEST LevelData + VOID mask against the owner-locked global palette),
+  `load_global_palette_hex_by_suffix()`, `apply_pattern_masked()`; fixed the
+  stale "no real palette exists" comment.
+- New `scripts/debug/board_grid_overlay.gd`: one batched Control drawing square
+  cell-boundary lines (no per-cell Nodes); flat fill, no gloss/bevel/shadow.
+- `tests/run_tests.gd`: `_run_board_renderer_real_fixture_tests()` validates
+  each fixture against an independent JSON re-parse (dims, array length, VOID
+  count, artwork count, per-color counts, ascending legal C01..C15 subset,
+  BG01, VOID-never-active under patterns, ALL_ACTIVE/ALL_CLEARED semantics,
+  zero renderer child Nodes, Level 010 C06/C07/C08 blue recolor).
+- No production gameplay code changed; `tasks.md` unchanged. Full suite
+  **882/882 ALL PASS**; debug scene headless-boots clean.
+- Debug/manual-QA tooling only: no production catalog promotion, no difficulty
+  rule change, no M47/M48 closure. SB-M10-005..011 remain OPEN (owner manual
+  visual QA); M02-017 and M14/M15/M16/M17 remain OPEN. Progress unchanged
+  207/943 = 21.95%.
+- State: `AWAITING_AUDIT`; next actor CHATGPT.
