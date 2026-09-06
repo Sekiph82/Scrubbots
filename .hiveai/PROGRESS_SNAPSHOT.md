@@ -276,3 +276,12 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Current progress remains **236 / 943 = 25.03%** until audit.
 - Main game + SB-UI remains **236 / 719 = 32.82%**.
 - Full-pass target after 11 closures: **247 / 943 = 26.19%** and **247 / 719 = 34.35%**.
+
+
+### M16-C001 V01 final audit
+
+- `AUDITED_PASS` under canonical AUDIT_POLICY.
+- RoutingSystem interface accepted: board-local route coordinates, RouteRequest/RouteResult, caller slot origin, assigned ACTIVE target center, swappable routing contract, injected segment-access validation, explicit failure/no-retarget behavior, debug-only route visualization.
+- SB-M16-001..011 are CLOSED.
+- Claude evidence: **1266/1266 ALL PASS**; ChatGPT independently inspected diff/source/test quality but could not independently rerun Godot in the audit environment.
+- Next milestone: **M17 Routing Prototype Lab**, still NOT_STARTED until intentionally opened.
