@@ -683,3 +683,13 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 
 - Progress after M17 owner decision: **263/943 = 27.89%** overall; **263/719 = 36.58%** main + SB-UI.
+
+
+## M17-C002 final independent audit
+
+- Status: **AUDITED_PASS / COMPLETE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_AUDIT_V01.md
+- Accepted: production Organized/curved routing + deterministic Grid-aware backbone, conservative production shaping, ADR-025.
+- Claude evidence: **1412/1412 ALL PASS**.
+- Godot not independently rerun by ChatGPT; source/test quality independently inspected.
+- M18 may now open.
