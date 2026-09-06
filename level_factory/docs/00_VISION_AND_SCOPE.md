@@ -105,7 +105,7 @@ mutation, validation, preview and export step must obey. Sources of truth:
 never a second palette authority — root wins on any conflict).
 
 **Palette (source of truth):** production Factory outputs use only root-game
-palette **C01..C15** from `data/palettes/scrubbots_palette_v1.json`. No C16, no
+palette **C01..C16** from `data/palettes/scrubbots_palette_v1.json`. No C17, no
 off-palette logical artwork RGB. A level's local palette is an ascending-C-ID
 subset of the colors actually used.
 
@@ -134,7 +134,7 @@ boundaries/grid are presentation-only and create no logical color and never
 count toward difficulty totals.
 
 Art-first arbitrary source colors must be deterministically mapped/rejected
-against C01..C15 and reported; they never become new game colors.
+against C01..C16 and reported; they never become new game colors.
 
 ## Difficulty intelligence
 
