@@ -5,51 +5,62 @@
   "lockedAt": "2026-09-06",
   "cycle": "META-C005",
   "description": "Machine-readable Level Factory visual-contract descriptor. Propagates the already owner-locked SCRUBBOTS visual contract (root docs/08_PIXEL_ART_PALETTE_RULES.md + data/palettes/scrubbots_palette_v1.json) into Level Factory governance. This descriptor is NOT a second palette authority.",
-
   "paletteAuthority": {
-    "note": "The root palette JSON is the single source of truth for C01..C15. This descriptor never redefines those colors; if any duplication ever conflicts, the root palette wins.",
+    "note": "The root palette JSON is the single source of truth for C01..C16. This descriptor never redefines those colors; if any duplication ever conflicts, the root palette wins.",
     "rootPaletteRepoPath": "data/palettes/scrubbots_palette_v1.json",
     "rootPaletteRelativeFromThisFile": "../../data/palettes/scrubbots_palette_v1.json",
     "rootPaletteRulesDoc": "docs/08_PIXEL_ART_PALETTE_RULES.md",
-    "legalLogicalColorIds": "C01..C15 only",
-    "colorCount": 15,
+    "legalLogicalColorIds": "C01..C16 only",
+    "colorCount": 16,
     "forbidden": [
-      "any C16 or higher",
+      "any C17 or higher",
       "any off-palette logical artwork RGB value",
       "silently expanding the SCRUBBOTS palette"
     ]
   },
-
   "difficultyDistinctUsedColorBands": {
     "note": "Count only distinct canonical logical cell colors actually used by artwork cells. Hard production legality, not a heuristic score.",
-    "EASY": {"min": 3, "max": 5},
-    "MEDIUM": {"min": 6, "max": 7},
-    "HARD": {"min": 8, "max": 9},
-    "VERY_HARD": {"min": 10, "max": 12},
+    "EASY": {
+      "min": 3,
+      "max": 5
+    },
+    "MEDIUM": {
+      "min": 6,
+      "max": 7
+    },
+    "HARD": {
+      "min": 8,
+      "max": 9
+    },
+    "VERY_HARD": {
+      "min": 10,
+      "max": 12
+    },
     "excludedFromCount": [
       "CLEARED transparency",
       "gameplay background BG01",
       "presentation-only grid/cell borders"
     ]
   },
-
   "gameplayBackground": {
     "id": "BG01",
     "name": "Midnight Slate",
     "hex": "#202533",
-    "rgb": [32, 37, 51],
+    "rgb": [
+      32,
+      37,
+      51
+    ],
     "isLogicalArtworkColor": false,
-    "isC16": false,
     "countsTowardDistinctUsedColors": false,
-    "semantics": "Production gameplay surface behind the artwork; visible through CLEARED alpha-0 cells. Never appears as a LevelData cell color."
+    "semantics": "Production gameplay surface behind the artwork; visible through CLEARED alpha-0 cells. Never appears as a LevelData cell color.",
+    "note": "BG01 is outside C01..C16; it is not a logical artwork color."
   },
-
   "cellStateSemantics": {
-    "ACTIVE": "Original canonical source color (one of C01..C15), opaque.",
+    "ACTIVE": "Original canonical source color (one of C01..C16), opaque.",
     "CLEARED": "Fully transparent, alpha 0; BG01 shows through.",
     "note": "Runtime lifecycle only; CLEARED is not a palette color (ADR-019)."
   },
-
   "cellRenderContract": {
     "everySquareIsARealGameplayCell": true,
     "visible_square_cell_boundaries": true,
@@ -63,7 +74,6 @@
     "interpolation": false,
     "note": "Visible cell separation is presentation-only and does not create logical colors or count toward difficulty totals. Cell interiors are one flat solid canonical palette color."
   },
-
   "generatorGuards": {
     "note": "Future Level Factory generator/validator/exporter code MUST enforce these; documentation guards until code exists. No generator implementation is created by META-C005.",
     "rejectOffPaletteLogicalColor": true,
@@ -71,11 +81,17 @@
     "rejectGridOrBorderCountingTowardDifficulty": true,
     "enforceDifficultyDistinctUsedColorBands": true,
     "localPaletteMustBeAscendingCId": true,
-    "localPaletteMustBeSubsetOfC01ToC15": true
+    "localPaletteMustBeSubsetOfC01ToC16": true
   },
-
   "appliesTo": {
-    "modes": ["ART_FIRST", "PUZZLE_FIRST"],
-    "phases": ["LF02 candidate generation", "LF05 validation/QA", "export"]
+    "modes": [
+      "ART_FIRST",
+      "PUZZLE_FIRST"
+    ],
+    "phases": [
+      "LF02 candidate generation",
+      "LF05 validation/QA",
+      "export"
+    ]
   }
 }
