@@ -176,3 +176,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - No task checkbox changed. Canonical progress remains **207 / 943 = 21.95%**.
 - SB-M10-005..011 remain owner manual visual-QA gates.
 - M14 remains NOT_STARTED.
+
+
+### M10-C001 V08 issuance
+
+- Owner replaced the abandoned 75×75-stage idea with a canonical gameplay QA region derived from the supplied 887×1774 phone composition.
+- Gameplay region reference: x=13, y=175, w=844, h=942, equivalent to approximately x=16, y=213, w=1028, h=1147 at 1080×2160.
+- Production logical maximum remains **59×59**.
+- V08 changes debug/manual-QA presentation only; source artwork matrices, palette, difficulty bands and gameplay rules remain unchanged.
+- No SB checkbox change. Progress remains **207 / 943 = 21.95%**.
+- M14 remains NOT_STARTED.
