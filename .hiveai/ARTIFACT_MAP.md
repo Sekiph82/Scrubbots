@@ -120,3 +120,12 @@ Strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/se
 
 Owner review: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CHATGPT_OWNER_REVIEW_V01.md
 Comparison: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/ROUTING_COMPARISON_V01.md
+
+Owner movement decision: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/OWNER_MOVEMENT_DECISION_V01.md
+
+
+## M17-C002 — Routing Production Promotion
+
+| Version | Prompt | Audit criteria | Claude log | ChatGPT audit | State |
+| --- | --- | --- | --- | --- | --- |
+| V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CLAUDE_LOG_V01.md | PENDING | ISSUED |
