@@ -322,3 +322,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - **SB-M17-010 remains OPEN** because no authoritative original SCRUBBOTS movement reference was found.
 - Owner review artifact: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CHATGPT_OWNER_REVIEW_V01.md
 - M18 remains blocked until owner movement-language selection.
+
+
+### M17 progress recompute
+
+- Canonical progress after closing 15 audited M17 task IDs and leaving SB-M17-010 open:
+  - Overall: **262 / 943 = 27.78%**
+  - Remaining: **681**
+  - Main game + SB-UI: **262 / 719 = 36.44%**
+  - Main remaining: **457**
+  - Level Factory: **0 / 112**
+  - Content Pipeline: **0 / 112**
