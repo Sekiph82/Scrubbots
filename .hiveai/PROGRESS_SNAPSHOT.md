@@ -186,3 +186,16 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - V08 changes debug/manual-QA presentation only; source artwork matrices, palette, difficulty bands and gameplay rules remain unchanged.
 - No SB checkbox change. Progress remains **207 / 943 = 21.95%**.
 - M14 remains NOT_STARTED.
+
+
+### M10-C001 V08 final audit + owner QA closure
+
+- `AUDITED_PASS`.
+- Canonical gameplay QA region accepted from the owner screen reference.
+- Owner manually validated ACTIVE, CLEARED, HALF and CHECKER presentation across the supplied real-artwork fixtures and multiple board sizes, including 59×59.
+- **SB-M10-005..011 are now CLOSED / OWNER_QA_PASS.**
+- 7 task checkboxes closed.
+- Canonical progress is now **214 / 943 = 22.69%**.
+- Main game + SB-UI is now **214 / 719 = 29.76%**.
+- Level Factory remains **0 / 112**; Content Pipeline remains **0 / 112**.
+- M14 remains NOT_STARTED pending an intentional milestone transition.
