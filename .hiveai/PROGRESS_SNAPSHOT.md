@@ -366,3 +366,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - ADR-025 accepted.
 - Claude evidence: **1412/1412 ALL PASS**; ChatGPT independently inspected source/diff/tests but did not independently rerun Godot.
 - M18 Scrubbot Agent may open.
+
+
+### M18-C001 V01 issuance
+
+- M17 production routing is audited complete.
+- New milestone opened: **M18 Scrubbot Agent**.
+- Agent scope: assignment data, route movement, arrival/completion, despawn, cancel/reset, no return, no resource carrying.
+- M19 Dispatcher and M20 vertical slice remain unopened.
+- Current progress remains **263 / 943 = 27.89%** until M18 audit.
+- Full-pass target after 15 closures: **278 / 943 = 29.48%**, main + SB-UI **278 / 719 = 38.66%**.
