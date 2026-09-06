@@ -111,8 +111,8 @@ through). See `docs/05_TECH_DECISIONS.md` ADR-019,
 31. `TEST`/dev fixtures (e.g. the 3×2 generic-size fixture) may exist
     outside the production dimension bands and must never enter production
     content or the production level catalog.
-31A. **Global production pixel-art palette [OWNER-LOCKED 2026-09-06]:**
-    production logical artwork cells may use only C01..C15 from
+31A. **Global production pixel-art palette [OWNER-LOCKED 2026-09-06, expanded to 16 colors]:**
+    production logical artwork cells may use only C01..C16 from
     `data/palettes/scrubbots_palette_v1.json` /
     `docs/08_PIXEL_ART_PALETTE_RULES.md`. Never invent, add, substitute or
     silently retain any sixteenth logical artwork color.
@@ -122,7 +122,7 @@ through). See `docs/05_TECH_DECISIONS.md` ADR-019,
     presentation grid/border overlays do not count.
 31B. **Production gameplay background [OWNER-LOCKED 2026-09-06]:**
     BG01 Midnight Slate = `#202533` / RGB(32,37,51). This is the gameplay
-    surface visible through CLEARED alpha-0 cells. BG01 is not C16, is not a
+    surface visible through CLEARED alpha-0 cells. BG01 is not part of C01..C16, is not a
     logical pixel-art palette color, never appears as a LevelData cell color,
     and never counts toward difficulty color totals. Debug-only transparency
     backgrounds may differ, but production gameplay uses BG01 unless the owner
@@ -166,7 +166,7 @@ through). See `docs/05_TECH_DECISIONS.md` ADR-019,
   a fixed board-size assumption anywhere in code or docs — this corrects a
   Prompt 01 documentation error refined further in the post-Prompt-02
   planning pass (see `docs/05_TECH_DECISIONS.md` ADR-008 and `tasks.md`).
-- Global production pixel-art palette: **C01..C15 only** from
+- Global production pixel-art palette: **C01..C16 only** from
   `data/palettes/scrubbots_palette_v1.json`. Difficulty distinct-used-color
   bands: EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12. CLEARED
   transparency is runtime state and is not a palette color.
