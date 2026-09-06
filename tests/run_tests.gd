@@ -41,6 +41,7 @@ func _initialize() -> void:
 	_run_performance_sanity_59x59()
 	_run_palette_colors_tests()
 	_run_board_renderer_active_cleared_tests()
+	_run_board_renderer_real_fixture_tests()
 	_run_board_renderer_geometry_tests()
 	_run_board_renderer_pixel_tests()
 	_run_board_renderer_performance_sanity()
@@ -452,6 +453,124 @@ func _run_board_renderer_active_cleared_tests() -> void:
 	_check(absf(renderer.get_pixel_color(1, 0).a - 1.0) <= 0.01, "neighbor cell 1 still opaque")
 
 	renderer.free()
+
+## M10-C001: owner-authorized Real Artwork debug fixtures are loaded DIRECTLY
+## from data/debug/board_renderer_fixtures/*.json (no OCR/regeneration) and
+## validated against their own declared metadata; VOID stays background under
+## every state pattern; ACTIVE/CLEARED semantics hold; palette subsets are
+## legal ascending C01..C15. These are TEST/debug/manual-QA fixtures only.
+func _run_board_renderer_real_fixture_tests() -> void:
+	print("---- M10-C001: Real Artwork debug fixtures ----")
+	var suffix_hex := BoardDebugFixtures.load_global_palette_hex_by_suffix()
+	_check(suffix_hex.size() == 15, "global palette exposes 15 C-IDs (got %d)" % suffix_hex.size())
+	_check(str(suffix_hex.get(6, "")).to_lower() == "#42c7d9", "C06 maps to Cyan #42C7D9 (Level 010 blue recolor source)")
+
+	var fixtures := [
+		"res://data/debug/board_renderer_fixtures/level_007.json",
+		"res://data/debug/board_renderer_fixtures/level_010.json",
+		"res://data/debug/board_renderer_fixtures/level_013.json",
+	]
+	for path in fixtures:
+		# Independently re-parse the JSON so the test compares the loader's
+		# LevelData/mask against the raw file, not against itself.
+		var raw = JSON.parse_string(FileAccess.get_file_as_string(path))
+		_check(typeof(raw) == TYPE_DICTIONARY, "%s parses as JSON object" % path)
+		var loaded: Dictionary = BoardDebugFixtures.load_real_fixture(path)
+		_check(loaded.ok, "%s loads: %s" % [path, loaded.get("error", "")])
+		if not loaded.ok:
+			continue
+		var level = loaded.level
+		var w: int = int(raw.width)
+		var h: int = int(raw.height)
+		_check_eq(level.width, w, "%s width matches JSON" % path)
+		_check_eq(level.height, h, "%s height matches JSON" % path)
+		_check_eq(level.get_cell_count(), w * h, "%s cell count == w*h" % path)
+		_check_eq(loaded.void_mask.size(), w * h, "%s void_mask sized to grid" % path)
+
+		# Palette subset: ascending, legal C01..C15, matches JSON subset.
+		var subset_ids: Array = loaded.palette_subset_ids
+		var ascending := true
+		for k in range(1, subset_ids.size()):
+			if String(subset_ids[k]) <= String(subset_ids[k - 1]):
+				ascending = false
+		_check(ascending, "%s palette subset is ascending C-ID" % path)
+		for id_str in subset_ids:
+			var suffix := int(String(id_str).substr(1))
+			_check(suffix >= 1 and suffix <= 15, "%s subset id %s is legal C01..C15" % [path, id_str])
+		_check_eq(level.palette.size(), subset_ids.size(), "%s LevelData palette size == subset size" % path)
+
+		# VOID count and artwork count vs JSON.
+		var void_cells := 0
+		for m in loaded.void_mask:
+			if m == 1:
+				void_cells += 1
+		_check_eq(void_cells, int(raw.void_count), "%s VOID count matches JSON" % path)
+		_check_eq(w * h - void_cells, int(raw.artwork_cell_count), "%s artwork cell count matches JSON" % path)
+
+		# Per-color counts: recount artwork cells by mapped subset color and
+		# compare to JSON color_counts (keyed by C-ID).
+		var counts_by_cid: Dictionary = {}
+		var board_pre = BoardState.from_level_data(level)
+		for i in level.get_cell_count():
+			if loaded.void_mask[i] == 1:
+				continue
+			var cid: String = String(subset_ids[board_pre.get_color_id(i)])
+			counts_by_cid[cid] = int(counts_by_cid.get(cid, 0)) + 1
+		var json_counts: Dictionary = raw.color_counts
+		_check_eq(counts_by_cid.size(), json_counts.size(), "%s number of used colors matches JSON" % path)
+		for cid in json_counts:
+			_check_eq(int(counts_by_cid.get(cid, -1)), int(json_counts[cid]), "%s count for %s matches JSON" % [path, cid])
+
+		# BG01 is #202533 and is NOT a logical cell palette color.
+		_check(loaded.background_hex.to_lower() == "#202533", "%s background is BG01 #202533" % path)
+		for hex in level.palette:
+			_check(String(hex).to_lower() != "#202533", "%s BG01 is never inserted into the logical palette" % path)
+
+		# ALL ACTIVE: every artwork cell ACTIVE, every VOID cell CLEARED.
+		var board = BoardState.from_level_data(level)
+		BoardDebugFixtures.apply_pattern_masked(board, BoardDebugFixtures.StatePattern.ALL_ACTIVE, loaded.void_mask)
+		var active_ct := 0
+		var void_active := 0
+		for i in board.get_cell_count():
+			var st: int = board.get_cell_state(i)
+			if loaded.void_mask[i] == 1:
+				if st == BoardState.CellState.ACTIVE:
+					void_active += 1
+			elif st == BoardState.CellState.ACTIVE:
+				active_ct += 1
+		_check_eq(active_ct, int(raw.artwork_cell_count), "%s ALL_ACTIVE activates exactly the artwork cells" % path)
+		_check_eq(void_active, 0, "%s ALL_ACTIVE never activates a VOID cell" % path)
+
+		# ALL CLEARED: no cell ACTIVE (artwork transparent, VOID still background).
+		BoardDebugFixtures.apply_pattern_masked(board, BoardDebugFixtures.StatePattern.ALL_CLEARED, loaded.void_mask)
+		var any_active := false
+		for i in board.get_cell_count():
+			if board.get_cell_state(i) == BoardState.CellState.ACTIVE:
+				any_active = true
+				break
+		_check(not any_active, "%s ALL_CLEARED leaves no ACTIVE cell" % path)
+
+		# CHECKER: VOID cells must STILL never become ACTIVE.
+		BoardDebugFixtures.apply_pattern_masked(board, BoardDebugFixtures.StatePattern.CHECKER, loaded.void_mask)
+		var checker_void_active := 0
+		for i in board.get_cell_count():
+			if loaded.void_mask[i] == 1 and board.get_cell_state(i) == BoardState.CellState.ACTIVE:
+				checker_void_active += 1
+		_check_eq(checker_void_active, 0, "%s VOID never colored under CHECKER pattern" % path)
+
+		# Renderer draws it with zero child Nodes (no per-cell architecture).
+		var renderer = BoardRenderer.new()
+		renderer.configure(board, level.palette, Vector2(1080, 1080))
+		_check_eq(renderer.get_child_count(), 0, "%s BoardRenderer has zero child Nodes" % path)
+		renderer.free()
+
+	# Level 010 specifically preserves the owner blue-family recolor.
+	var l010: Dictionary = BoardDebugFixtures.load_real_fixture("res://data/debug/board_renderer_fixtures/level_010.json")
+	if l010.ok:
+		for cid in ["C06", "C07", "C08"]:
+			_check(l010.palette_subset_ids.has(cid), "Level 010 subset includes blue-family %s" % cid)
+		_check(not l010.palette_subset_ids.has("C04"), "Level 010 no longer uses green C04 (recolored to blues)")
+	print("  M10-C001 real-artwork fixture tests complete")
 
 func _run_board_renderer_geometry_tests() -> void:
 	var sizes: Array[Vector2i] = [
