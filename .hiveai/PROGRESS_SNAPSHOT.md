@@ -165,3 +165,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - V06 technical/palette work remains accepted; V07 is a narrow runtime correction before owner visual QA can continue.
 - No task checkbox change. Progress remains **207 / 943 = 21.95%**.
 - M14 remains NOT_STARTED.
+
+
+### M10-C001 V07 final audit
+
+- `AUDITED_PASS`.
+- Owner-reported Godot runtime crash fixed: `OptionButton.is_item_disabled(idx)` now used correctly.
+- Runtime regression smoke now executes the actual Real Artwork fixture-change path.
+- Implementer evidence: **1023/1023 ALL PASS** plus a 60-frame headless debug-scene runtime smoke.
+- No task checkbox changed. Canonical progress remains **207 / 943 = 21.95%**.
+- SB-M10-005..011 remain owner manual visual-QA gates.
+- M14 remains NOT_STARTED.
