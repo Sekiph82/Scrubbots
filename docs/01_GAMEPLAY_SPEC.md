@@ -125,6 +125,13 @@ The exact neighborhood topology, collision radius, route shape and movement
 language remain `[TO BE DESIGNED]` (M16/M17). This section only locks the
 semantic law, not the pathing algorithm.
 
+`TargetSelector` (M15, implemented) enforces this law at assignment time: it
+consumes reachability/access truth as a narrow **injected** query
+(`is_targetable(index)`), selects only a valid + ACTIVE + matching + unreserved
++ *targetable* candidate, and reserves it atomically. It fails closed (assigns
+nothing) when no access truth is supplied, so a blocked/enclosed candidate is
+never dispatched (ADR-023). Who computes that access truth stays M16/M17.
+
 ### Small-board readability
 
 ACTIVE-vs-CLEARED must stay readable at native gameplay display size,

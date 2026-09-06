@@ -72,9 +72,12 @@ Reachability/access  --- filters blocked/unreachable candidates --->
   currently blocked/unreachable: non-target ACTIVE cells block access, CLEARED
   and background space is open. A fully enclosed matching-color ACTIVE cell is
   not targetable.
-- `TargetSelector` (M15, future) chooses which *reachable/targetable*
-  candidate a Scrubbot cleans. It has no opinion about movement/animation and
-  **never generates routes**.
+- `TargetSelector` (M15, implemented) chooses which *reachable/targetable*
+  candidate a Scrubbot cleans and atomically reserves it in one call. It has no
+  opinion about movement/animation and **never generates routes**. Reachability
+  truth is supplied by the caller as a narrow injected `access_query`
+  (`is_targetable(index) -> bool`); the selector fails closed when it is missing
+  (ADR-023).
 - `RoutingSystem` (M16+, future) answers "given a start point and the already
   selected target, what path/motion should the Scrubbot follow?" It has no
   opinion about which cell was chosen and **must never silently retarget** if
@@ -219,6 +222,37 @@ Reachability/access  --- filters blocked/unreachable candidates --->
   excluded set into `get_candidates()/has_candidates()`. Reserve/lookup/release
   are O(1) average (dictionary-backed); no full-board scan on a normal query
   (verified at 59×59 = 3481 cells).
+
+## TargetSelector (M15, `scripts/gameplay/targeting/`)
+
+- `TargetSelector` (`scripts/gameplay/targeting/target_selector.gd`, extends
+  `RefCounted`) — decides **WHAT** target a Scrubbot assignment gets and reserves
+  it. It never decides **HOW** to travel there (that is RoutingSystem, M16+); the
+  two must stay separate scripts (CLAUDE.md rule 14, ADR-023).
+- API: `create()`, `bind(board, candidate_index, reservation_state) -> bool`
+  (rejects any null dependency), `is_bound()`,
+  `select_and_reserve(color_id, owner_id, access_query) -> int`.
+- Dependencies are narrow: `BoardState` for final truth checks only
+  (`is_valid_index` / `get_cell_state` / `get_color_id`), `ColorCandidateIndex`
+  for raw ascending candidates, `ReservationState` for atomic ownership, and a
+  caller-supplied `access_query` for reachability/access truth. It never scans
+  the whole board, mutates any dependency's internals, re-derives index math, or
+  owns the ACTIVE/CLEARED lifecycle.
+- Selection + reservation are **one synchronous operation** to remove the
+  race-prone `choose() … reserve()` gap (ADR-023). Strategy is the simplest
+  deterministic one: **first targetable candidate in ascending row-major
+  order**. For each candidate it requires: valid index, ACTIVE, matching color,
+  not already reserved, `access_query.is_targetable(index)` true, then an atomic
+  `ReservationState.reserve()`. If a reserve loses to a competing synchronous
+  assignment, it continues to the next candidate for the still-unassigned owner.
+- Returns the reserved target index on success, `-1` on any no-target /
+  invalid-call / failed-assignment condition. It **fails closed** (returns -1)
+  when `access_query` is null or lacks `is_targetable()`, so a raw color
+  candidate is never assumed reachable (AL-028). A blocked/unreachable
+  matching-color ACTIVE cell is never selected.
+- Steady-state selection iterates only the requested color's candidate bucket,
+  never all cells (verified at 59×59 = 3481 cells; access-query calls bounded by
+  candidate iteration, not board size).
 
 ## Gameplay Session Core (implemented in M11)
 

@@ -596,3 +596,62 @@ separation (ADR-005, ADR-020).
 - The renderer and slot mechanics are untouched by M14.
 
 **Status**: Accepted (M14).
+
+### ADR-023: TargetSelector selects-and-reserves in one call over an injected access seam
+
+**Context**: M15 must choose WHICH reachable candidate a Scrubbot assignment
+gets. Two forces shape the design. (1) M16/M17 routing topology is still TO BE
+DESIGNED, so the selector cannot depend on a real reachability/pathing
+subsystem yet, but it also must not assume every raw color candidate is
+reachable — a matching ACTIVE cell can be fully enclosed with no legal access
+(AL-028). (2) M14 established atomic reservation ownership; exposing a
+`target = choose()` … `reserve(target)` caller sequence would reintroduce a
+race window between selection and ownership even on the synchronous main
+thread.
+
+**Decision**: `TargetSelector`
+(`scripts/gameplay/targeting/target_selector.gd`, extends `RefCounted`) binds
+three narrow dependencies — `BoardState` (final truth checks only),
+`ColorCandidateIndex` (raw ascending candidates), `ReservationState` (atomic
+ownership) — and exposes one primary path:
+`select_and_reserve(color_id, owner_id, access_query) -> int`.
+
+- **Injected access seam**: reachability truth is a per-call duck-typed
+  `access_query` with `is_targetable(index) -> bool`. The selector never
+  computes route geometry, runs AStar, inspects route points, or invents
+  neighborhood topology — it *consumes* authoritative access truth. When
+  `access_query` is null or lacks `is_targetable()`, the selector **fails
+  closed** and returns -1. This lets M16+ supply a real reachability query
+  later without changing the selector.
+- **One atomic operation**: selection and `ReservationState.reserve()` happen
+  inside the same synchronous call, removing the choose-then-reserve race.
+- **Deterministic strategy**: first targetable candidate in ascending
+  row-major candidate order — no random pick, no distance/route-length
+  scoring, no fallback route logic. Per candidate: valid index → ACTIVE →
+  matching color → unreserved → `access_query.is_targetable()` → atomic
+  reserve. If a reserve loses to a competing synchronous assignment, iteration
+  continues for the still-unassigned owner.
+- **Narrow BoardState use**: final validation only, so stale/corrupt upstream
+  candidate data can never yield an invalid, CLEARED, or wrong-color target.
+  The selector never scans the whole board, duplicates board arrays, mutates
+  any dependency, or owns the ACTIVE/CLEARED lifecycle.
+
+**Reason**: keeping the reachability contract to a tiny injected query
+preserves the ColorCandidateIndex → reachability → TargetSelector →
+RoutingSystem separation (ADR-005, ADR-020, ADR-022) while unblocking M15
+before routing exists. Fusing select+reserve keeps the M14 atomicity guarantee
+end-to-end. Fail-closed-on-missing-query encodes AL-028 as a safety default:
+absence of proof of reachability is treated as unreachable.
+
+**Consequences**:
+
+- Steady-state selection iterates only the requested color's candidate bucket;
+  access-query calls are bounded by candidate iteration, not board size
+  (verified at 59×59 = 3481 cells). Selection issues exactly one access query
+  per call when the first candidate is targetable.
+- `TargetSelector` exposes no route-generation/pathfinding API; M16
+  RoutingSystem stays a separate, later module.
+- The selector owns no mutable collection it hands out (no state leakage,
+  AL-020); it mutates only `ReservationState` via its public `reserve()`.
+
+**Status**: Accepted (M15).
