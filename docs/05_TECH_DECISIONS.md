@@ -502,3 +502,33 @@ production-legal. Production art audit, Factory validation and M48 QA must
 enforce this decision before shipping.
 
 **Status**: Accepted — owner locked 2026-09-06.
+
+
+---
+
+### ADR-021: Production gameplay background is BG01 Midnight Slate
+
+**Decision** (owner-locked 2026-09-06): the production gameplay surface behind
+the board is **BG01 Midnight Slate**, exactly `#202533` / RGB(32,37,51).
+
+BG01 is deliberately separate from the locked C01..C15 production logical
+pixel-art palette. It is not C16, never appears as a logical cell color in
+LevelData, and never counts toward a level's difficulty color total.
+
+**Reason**: CLEARED cells are alpha-0 holes. A dedicated non-palette background
+keeps those holes visually distinct from ACTIVE C14 Charcoal/C08 Deep Blue
+cells, gives the bright 15-color palette strong contrast, and makes the
+ACTIVE->CLEARED state readable without inventing another gameplay color.
+
+**Consequences**:
+
+- BoardRenderer continues to output alpha 0 for CLEARED cells; the containing
+  gameplay surface supplies BG01 underneath.
+- Production gameplay uses BG01 unless the owner explicitly versions this
+  rule.
+- Debug/transparency-test scenes may intentionally use conspicuous non-production
+  backgrounds such as magenta; those debug colors are not palette additions.
+- UI/decorative colors outside logical pixel art remain governed by UI rules;
+  this ADR only locks the gameplay board background.
+
+**Status**: Owner-locked.

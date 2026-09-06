@@ -81,3 +81,21 @@ source pixels exactly. Its historical round-trip guarantees remain valid, but
 an arbitrary raw import is **not automatically production-legal** under this
 new palette contract. Production mapping/validation belongs in the open
 content-audit / Level Factory / M48 QA gates before shipping.
+
+
+## Production gameplay background
+
+The gameplay surface behind the logical pixel artwork is owner-locked:
+
+| ID | Name | HEX | RGB | Counts as pixel-art color? |
+| --- | --- | --- | --- | --- |
+| BG01 | Midnight Slate | `#202533` | 32, 37, 51 | **No** |
+
+Locked behavior:
+
+- BG01 is the production gameplay background exposed through CLEARED alpha-0 cells.
+- BG01 is **not** C16 and is not part of the 15-color logical pixel-art palette.
+- BG01 never counts toward a level's distinct-color total.
+- ACTIVE logical cells still use only C01..C15.
+- Do not substitute BG01 into LevelData cell color IDs.
+- Debug backgrounds may use conspicuous colors (for example magenta) solely to prove transparency; those debug colors are not production palette/background colors.

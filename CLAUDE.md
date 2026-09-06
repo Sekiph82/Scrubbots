@@ -120,6 +120,14 @@ through). See `docs/05_TECH_DECISIONS.md` ADR-019,
     MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12 distinct logical cell colors
     actually used. CLEARED transparency, gameplay background and
     presentation grid/border overlays do not count.
+31B. **Production gameplay background [OWNER-LOCKED 2026-09-06]:**
+    BG01 Midnight Slate = `#202533` / RGB(32,37,51). This is the gameplay
+    surface visible through CLEARED alpha-0 cells. BG01 is not C16, is not a
+    logical pixel-art palette color, never appears as a LevelData cell color,
+    and never counts toward difficulty color totals. Debug-only transparency
+    backgrounds may differ, but production gameplay uses BG01 unless the owner
+    explicitly versions this rule.
+
 32. Existing original SCRUBBOTS artwork, once it physically exists in this
     project, is the canonical visual reference and outranks any generic
     placeholder. Missing artwork must never be fabricated or presented as

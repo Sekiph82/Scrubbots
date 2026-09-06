@@ -198,5 +198,19 @@
         "max": 12
       }
     }
+  },
+  "gameplayBackground": {
+    "id": "BG01",
+    "name": "Midnight Slate",
+    "hex": "#202533",
+    "rgb": [
+      32,
+      37,
+      51
+    ],
+    "role": "Production gameplay background visible through CLEARED alpha-0 cells.",
+    "pixelArtPaletteColor": false,
+    "countsTowardLevelColorTotal": false,
+    "ownerLocked": true
   }
 }

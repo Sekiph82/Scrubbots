@@ -236,6 +236,18 @@ Tracking sources:
   open mapping/QA/Factory gates.
 - Canonical task truth unchanged: **207 / 943**.
 
+## Owner-locked palette/background contract
+
+- Production logical pixel art: **C01..C15 only**.
+- Production gameplay background: **BG01 Midnight Slate `#202533` / RGB(32,37,51)**.
+- BG01 is not a level color and does not count toward difficulty color totals.
+- CLEARED alpha-0 cells reveal BG01 in production.
+- Difficulty distinct-used-color bands remain:
+  - EASY 3–5
+  - MEDIUM 6–7
+  - HARD 8–9
+  - VERY_HARD 10–12
+
 ## Project identity
 
 | Field | Value |
