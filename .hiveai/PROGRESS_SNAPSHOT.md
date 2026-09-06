@@ -265,3 +265,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
   - Main remaining: **483**
   - Level Factory: **0 / 112 = 0%**
   - Content Pipeline: **0 / 112 = 0%**
+
+
+### M16-C001 V01 issuance
+
+- New main-game milestone intentionally opened: **M16 RoutingSystem Interface**.
+- Owner should use a **new Claude chat** for this milestone.
+- M16 defines route input/output, board-local coordinate space, slot origin, assigned target destination, swappable RoutingSystem contract, route validation, explicit failure/no-retarget behavior, and debug-only route visualization.
+- Final routing algorithm/movement language remains M17.
+- Current progress remains **236 / 943 = 25.03%** until audit.
+- Main game + SB-UI remains **236 / 719 = 32.82%**.
+- Full-pass target after 11 closures: **247 / 943 = 26.19%** and **247 / 719 = 34.35%**.
