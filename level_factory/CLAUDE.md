@@ -32,7 +32,7 @@ pixel-art-generation session MUST read and obey the owner-locked root visual
 contract (META-C005):
 
 - Root palette rules: `docs/08_PIXEL_ART_PALETTE_RULES.md`
-- Root palette (single authority): `data/palettes/scrubbots_palette_v1.json`
+- Root palette (single authority): `data/palettes/scrubbots_palette_v2.json`
 - Factory descriptor (references the root, never redefines it):
   `level_factory/data/canonical_visual_contract_v1.json`
 
