@@ -285,3 +285,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - SB-M16-001..011 are CLOSED.
 - Claude evidence: **1266/1266 ALL PASS**; ChatGPT independently inspected diff/source/test quality but could not independently rerun Godot in the audit environment.
 - Next milestone: **M17 Routing Prototype Lab**, still NOT_STARTED until intentionally opened.
+
+
+### M16 progress recompute
+
+- Canonical progress recomputed from unique SB task IDs after M16 closure:
+  - Overall: **247 / 943 = 26.19%**
+  - Remaining: **696**
+  - Main game + SB-UI: **247 / 719 = 34.35%**
+  - Main remaining: **472**
+  - Level Factory: **0 / 112 = 0%**
+  - Content Pipeline: **0 / 112 = 0%**
