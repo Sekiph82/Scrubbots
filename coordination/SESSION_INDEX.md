@@ -664,3 +664,6 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Closed: SB-M17-001..009, SB-M17-011..016.
 - Open: SB-M17-010, blocked by missing authoritative original movement reference.
 - Next actor: OWNER. M18 remains unopened.
+
+
+- Progress at M17 owner gate: **262/943 = 27.78%** overall; **262/719 = 36.44%** main + SB-UI. SB-M17-010 remains open.
