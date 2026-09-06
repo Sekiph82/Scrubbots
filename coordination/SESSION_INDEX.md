@@ -639,3 +639,16 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 
 - Progress after M16: **247/943 = 26.19%** overall; **247/719 = 34.35%** main + SB-UI; LF 0/112; CP 0/112.
+
+
+## M17-C001 V01 issuance — Routing Prototype Lab
+
+- Milestone: **M17 OPENED**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CHATGPT_PROMPT_V01.md
+- Audit criteria: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CHATGPT_AUDIT_CRITERIA_V01.md
+- Expected Claude log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C001/CLAUDE_LOG_V01.md
+- Prototype scope: Direct + Grid-aware + Organized/curved, all behind M16 contract.
+- Required comparison: visual clarity, crossings, congestion, CPU, distance, determinism, 5/10/25/stress, 59×59, rectangular Very Hard.
+- Required semantics: blocked interior = no route; newly-opened-after-clear can make same target routable.
+- State: ISSUED; next actor CLAUDE.
+- Owner design gate: final movement language must be selected by owner before M18.
