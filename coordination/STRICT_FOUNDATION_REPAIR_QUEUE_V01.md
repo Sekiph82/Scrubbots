@@ -1,6 +1,6 @@
 # Strict Foundation Repair Queue V01
 
-Status: **OPEN**
+Status: **ACTIVE**
 
 This queue records strict-v2 findings from the M10-M14 re-audit without blocking the currently sequenced M15 -> M16 -> M17 routing-contract repair chain where the finding is not a direct M16 dependency.
 
@@ -32,3 +32,8 @@ The existing routing-contract strict repair sequence may continue:
 M15 -> M16 -> M17.
 
 However, M11-M14 strict findings and the BoardState validation gap must be resolved before M19 is finally strict-audited and before M20 vertical-slice truth is accepted.
+
+
+## Full-surface transition
+
+The locked full attack-surface rule now governs foundation repairs. M11 received a full subsystem sweep and frozen finding set before correction. READY: `coordination/sessions/M11-C001/CHATGPT_PROMPT_V05.md`. M12-M14 remain blocked until each receives its own full-surface sweep and the preceding repair passes.
