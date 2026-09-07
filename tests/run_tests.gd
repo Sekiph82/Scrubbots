@@ -2825,6 +2825,127 @@ func _run_slot_system_tests() -> void:
 	live.append(99)
 	_check_eq(sysV.get_slots_by_palette_id(0), [0, 1, 4], "M12-21 mutating returned Array does not affect next query")
 
+	# M12-22 (V04 §2): each nested malformed configure entry fails atomically on
+	# a fresh system — is_configured() false, every palette scalar stays -1.
+	var nested_bad := [null, 1.0, "1", true, Vector2(1, 1), RefCounted.new()]
+	for bad_entry in nested_bad:
+		var sysN := SlotSystem.new()
+		var rN = sysN.configure([0, 1, bad_entry, 3, 4], 8)
+		_check(not rN.ok, "M12-22 nested entry %s rejected" % str(bad_entry))
+		_check(not sysN.is_configured(), "M12-22 unconfigured after nested %s" % str(bad_entry))
+		for i in 5:
+			_check_eq(sysN.get_slot_palette_id(i), -1, "M12-22 slot %d still -1 after nested %s" % [i, str(bad_entry)])
+	# malformed nested entry AFTER a valid config with non-default markers
+	var sysNC := SlotSystem.new()
+	sysNC.configure([0, 1, 2, 3, 4], 8)
+	sysNC.set_slot_available(1, false)
+	sysNC.set_slot_active(2, true)
+	var rNC = sysNC.configure([0, 1, "x", 3, 4], 8)
+	_check(not rNC.ok, "M12-22 malformed reconfigure rejected")
+	_check(sysNC.is_configured(), "M12-22 stays configured after malformed reconfigure")
+	for i in 5:
+		_check_eq(sysNC.get_slot_palette_id(i), i, "M12-22 palette %d preserved after malformed reconfigure" % i)
+	_check(not sysNC.is_slot_available(1), "M12-22 availability preserved after malformed reconfigure")
+	_check(sysNC.is_slot_active(2), "M12-22 activity preserved after malformed reconfigure")
+
+	# M12-23 (V04 §3): palette_size 0 and -1 fail atomically on fresh system.
+	for bad_size in [0, -1]:
+		var sysP := SlotSystem.new()
+		var rP := sysP.configure([0, 1, 2, 3, 4], bad_size)
+		_check(not rP.ok, "M12-23 palette_size %d rejected" % bad_size)
+		_check(not sysP.is_configured(), "M12-23 unconfigured after palette_size %d" % bad_size)
+		for i in 5:
+			_check_eq(sysP.get_slot_palette_id(i), -1, "M12-23 slot %d still -1 after palette_size %d" % [i, bad_size])
+
+	# M12-24 (V04 §4): failed reconfigure preserves palette + availability +
+	# activity + collection-query truth (wrong-count AND malformed-entry).
+	var sysR := SlotSystem.new()
+	sysR.configure([0, 0, 1, 1, 0], 2)
+	sysR.set_slot_available(3, false)
+	sysR.set_slot_active(4, true)
+	var snap_pal := []
+	var snap_avail := []
+	var snap_act := []
+	for i in 5:
+		snap_pal.append(sysR.get_slot_palette_id(i))
+		snap_avail.append(sysR.is_slot_available(i))
+		snap_act.append(sysR.is_slot_active(i))
+	for rr in [sysR.configure([0, 1], 2), sysR.configure([0, 0, "x", 1, 0], 2)]:
+		_check(not rr.ok, "M12-24 failed reconfigure rejected")
+		_check(sysR.is_configured(), "M12-24 stays configured")
+		for i in 5:
+			_check_eq(sysR.get_slot_palette_id(i), snap_pal[i], "M12-24 palette %d preserved" % i)
+			_check_eq(sysR.is_slot_available(i), snap_avail[i], "M12-24 availability %d preserved" % i)
+			_check_eq(sysR.is_slot_active(i), snap_act[i], "M12-24 activity %d preserved" % i)
+		_check_eq(sysR.get_slots_by_palette_id(0), [0, 1, 4], "M12-24 query 0 preserved")
+		_check_eq(sysR.get_slots_by_palette_id(1), [2, 3], "M12-24 query 1 preserved")
+
+	# M12-25 (V04 §5): successful reconfigure updates palettes but preserves
+	# availability/activity and stable IDs.
+	var sysSR := SlotSystem.new()
+	sysSR.configure([0, 1, 2, 3, 4], 8)
+	sysSR.set_slot_available(0, false)
+	sysSR.set_slot_active(1, true)
+	var rSR := sysSR.configure([4, 3, 2, 1, 0], 8)
+	_check(rSR.ok, "M12-25 second valid configure succeeds")
+	_check(sysSR.is_configured(), "M12-25 stays configured")
+	for i in 5:
+		_check_eq(sysSR.get_slot_palette_id(i), 4 - i, "M12-25 palette %d updated" % i)
+		_check_eq(sysSR.get_slot_id(i), i, "M12-25 slot ID %d stable" % i)
+	_check(not sysSR.is_slot_available(0), "M12-25 availability preserved across valid reconfigure")
+	_check(sysSR.is_slot_active(1), "M12-25 activity preserved across valid reconfigure")
+
+	# M12-26 (V04 §6): caller Array alias isolation.
+	var sysA := SlotSystem.new()
+	var ids := [0, 1, 2, 3, 4]
+	sysA.configure(ids, 8)
+	ids[0] = 99
+	ids.clear()
+	ids.append(-7)
+	for i in 5:
+		_check_eq(sysA.get_slot_palette_id(i), i, "M12-26 palette %d unaffected by caller Array mutation" % i)
+	_check_eq(sysA.get_slots_by_palette_id(2), [2], "M12-26 query truth unaffected by caller Array mutation")
+	_check(sysA.is_configured(), "M12-26 stays configured")
+
+	# M12-27 (V04 §7): standalone SlotState mutation cannot alter SlotSystem.
+	var sysI := SlotSystem.new()
+	sysI.configure([0, 1, 2, 3, 4], 8)
+	var lone := SlotState.new(0)
+	lone.set_palette_id(999)
+	lone.set_available(false)
+	lone.set_active(true)
+	for i in 5:
+		_check_eq(sysI.get_slot_palette_id(i), i, "M12-27 palette %d unaffected by standalone SlotState" % i)
+		_check_eq(sysI.get_slot_id(i), i, "M12-27 ID %d unaffected by standalone SlotState" % i)
+		_check(sysI.is_slot_available(i), "M12-27 availability %d unaffected by standalone SlotState" % i)
+		_check(not sysI.is_slot_active(i), "M12-27 activity %d unaffected by standalone SlotState" % i)
+	_check_eq(sysI.get_slots_by_palette_id(0), [0], "M12-27 query truth unaffected by standalone SlotState")
+	_check(not sysI.has_method("get_slot"), "M12-27 get_slot absent")
+
+	# M12-28 (V04 §8): complete malformed-query set on configured system with
+	# non-default markers mutates nothing.
+	var sysM := SlotSystem.new()
+	sysM.configure([0, 1, 2, 3, 4], 8)
+	sysM.set_slot_available(2, false)
+	sysM.set_slot_active(3, true)
+	var m_pal := []
+	var m_avail := []
+	var m_act := []
+	for i in 5:
+		m_pal.append(sysM.get_slot_palette_id(i))
+		m_avail.append(sysM.is_slot_available(i))
+		m_act.append(sysM.is_slot_active(i))
+	var m_flag := sysM.is_configured()
+	var invalid_queries := [null, 1.0, "1", true, Vector2(1, 1), RefCounted.new(), [], {}, -1]
+	for q in invalid_queries:
+		var qr = sysM.get_slots_by_palette_id(q)
+		_check(qr is Array and qr.is_empty(), "M12-28 invalid query %s -> []" % str(q))
+	_check_eq(sysM.is_configured(), m_flag, "M12-28 configured flag preserved")
+	for i in 5:
+		_check_eq(sysM.get_slot_palette_id(i), m_pal[i], "M12-28 palette %d preserved" % i)
+		_check_eq(sysM.is_slot_available(i), m_avail[i], "M12-28 availability %d preserved" % i)
+		_check_eq(sysM.is_slot_active(i), m_act[i], "M12-28 activity %d preserved" % i)
+
 	print("  M12 slot system tests complete")
 
 ## ------------------------------------------------- M13: color candidate index --
