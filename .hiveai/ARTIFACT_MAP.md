@@ -182,4 +182,6 @@ Strict repair sequence: https://github.com/Sekiph82/Scrubbots/blob/main/coordina
 - Active M16 prompt: coordination/sessions/M16-C001/CHATGPT_PROMPT_V02.md
 - Active M16 criteria: coordination/sessions/M16-C001/CHATGPT_AUDIT_CRITERIA_V02.md
 
-| V04 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V04.md | PENDING | ISSUED / DEPENDENCY_CLOSURE |
+| V04 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V04.md | CHANGES_REQUIRED / F001 remains open |
+
+| V05 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V05.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V05.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V05.md | PENDING | ISSUED / DOMAIN_CLOSURE |
