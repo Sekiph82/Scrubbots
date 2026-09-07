@@ -36,7 +36,7 @@ However, M11-M14 strict findings and the BoardState validation gap must be resol
 
 ## Full-surface transition
 
-The locked full attack-surface rule governs foundation repairs. M11 is final-closed after its frozen full-surface correction + V06 adversarial validation. M12 is final-closed after its frozen correction and V04 validation pass. M13 has now received a fresh full subsystem sweep; its finding set is frozen to F-M13-STRICT-001..003 and `coordination/sessions/M13-C001/CHATGPT_PROMPT_V04.md` is READY. M14 remains blocked until M13 passes and then receives its own full-surface sweep.
+The locked full attack-surface rule governs foundation repairs. M11 is final-closed after its frozen full-surface correction + V06 adversarial validation. M12 is final-closed after its frozen correction and V04 validation pass. M13 has now received a fresh full subsystem sweep; its finding set is frozen to F-M13-STRICT-001..003 and `coordination/sessions/M13-C001/CHATGPT_PROMPT_V05.md` is READY. M14 remains blocked until M13 passes and then receives its own full-surface sweep.
 
 
 ## M11 V05 audit transition
@@ -50,7 +50,8 @@ The locked full attack-surface rule governs foundation repairs. M11 is final-clo
 - M12 V03: **CHANGES_REQUIRED / production source accepted; validation gaps**.
 - M12 V04: **AUDITED_PASS / FINAL_CLOSED**.
 - M13 V03: **CHANGES_REQUIRED / FROZEN_SET_REMAINS_OPEN**.
-- M13 V04: **READY**.
+- M13 V04: **CHANGES_REQUIRED / FROZEN_SET_REMAINS_OPEN**.
+- M13 V05: **READY**.
 - M14: **BLOCKED_BY_PRECEDING_FOUNDATION_REPAIR**.
 
 
@@ -95,5 +96,15 @@ The locked full attack-surface rule governs foundation repairs. M11 is final-clo
 - F-M13-STRICT-002/003 source accepted.
 - F-M13-STRICT-001 remains open: bind(null) stale state, live sync dependency return drift, return-contract test gaps, and lifecycle-risk Object acceptance.
 - M13 V04: **READY**.
+- M14: **BLOCKED_BY_PRECEDING_FOUNDATION_REPAIR**.
+- FOUNDATION-STRICT-001 remains separate/open.
+
+
+## M13 V04 audit transition
+
+- V04 implementation commit: `227fd9a1e3fd050ddffb424fa0e6d088cc5bbd1b`.
+- V04 audit: **CHANGES_REQUIRED / FROZEN_SET_REMAINS_OPEN**.
+- F-M13-STRICT-001 remains open for indexed-domain contradiction handling and >3481 dependency count rejection.
+- M13 V05: **READY**.
 - M14: **BLOCKED_BY_PRECEDING_FOUNDATION_REPAIR**.
 - FOUNDATION-STRICT-001 remains separate/open.
