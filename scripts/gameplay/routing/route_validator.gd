@@ -33,14 +33,17 @@ const POINT_EPS := 0.0001
 static func is_finite_vector(v: Vector2) -> bool:
 	return is_finite(v.x) and is_finite(v.y)
 
-## Narrow M16 BoardState method surface required before any board call. A non-null
-## object missing ANY of these is malformed and must fail closed BEFORE the first
-## method call (AL-040: non-null is not enough at a duck-typed dependency
-## boundary). has_method never throws, so this guard cannot itself fault. The
+## Narrow M16 BoardState method surface required before any board call. Any input
+## that is not an object, or an object missing ANY of these methods, is malformed
+## and must fail closed BEFORE the first method call (AL-040/AL-041: non-null is
+## not enough — a scalar Variant like int/String/Vector2 has no has_method and
+## would fault). The TYPE_OBJECT check runs first and short-circuits, so
+## has_method is never called on a non-object. This guard cannot itself fault. The
 ## board is only queried, never stored/exposed.
 static func _board_has_api(board) -> bool:
-	return board != null \
-		and board.has_method("get_width") \
+	if typeof(board) != TYPE_OBJECT:
+		return false
+	return board.has_method("get_width") \
 		and board.has_method("get_height") \
 		and board.has_method("is_valid_index") \
 		and board.has_method("get_cell_state") \
@@ -86,7 +89,13 @@ static func validate_route(request, result, board, access_query) -> StringName:
 	var req_reason: StringName = validate_request(request, board)
 	if req_reason != RouteResult.FailureReason.NONE:
 		return req_reason
-	if result == null or not result.success:
+	# Result boundary (AL-040/AL-041) BEFORE reading .success/.failure_reason/
+	# .target_index or get_points(): a scalar/RefCounted/null result fails closed to
+	# INVALID_ROUTE with a false `is RouteResult`, which never throws. This runs
+	# before the access loop, so a malformed result makes ZERO access calls.
+	if not (result is RouteResult):
+		return RouteResult.FailureReason.INVALID_ROUTE
+	if not result.success:
 		return RouteResult.FailureReason.INVALID_ROUTE
 	# A claimed-success route must not carry a contradictory failure reason
 	# (e.g. success == true with failure_reason == NO_ROUTE). Internal metadata
@@ -111,7 +120,11 @@ static func validate_route(request, result, board, access_query) -> StringName:
 		if not is_finite_vector(p):
 			return RouteResult.FailureReason.INVALID_ROUTE
 	# Access truth is mandatory — no route may be trusted without it (fail closed).
-	if access_query == null or not access_query.has_method("is_segment_traversable"):
+	# A non-object access_query (null or a scalar Variant) has no has_method and
+	# would fault, so the TYPE_OBJECT check runs first and short-circuits: has_method
+	# is never called on a non-object. A real object lacking the method also fails
+	# closed to the single stable MISSING_ACCESS_QUERY reason (AL-040/AL-041).
+	if typeof(access_query) != TYPE_OBJECT or not access_query.has_method("is_segment_traversable"):
 		return RouteResult.FailureReason.MISSING_ACCESS_QUERY
 	# Every consecutive segment must be accepted by authoritative access truth.
 	# The verdict must be an ACTUAL bool: a query returning int/string/null fails
