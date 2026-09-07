@@ -386,3 +386,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Claude evidence: **1483/1483 ALL PASS**; ChatGPT independently inspected diff/source/tests but did not independently rerun Godot.
 - Pooling remains deferred because profiling did not justify it.
 - M19 Scrubbot Dispatcher may open.
+
+
+### M18 progress recompute
+
+- Canonical progress after M18 closure:
+  - Overall: **278 / 943 = 29.48%**
+  - Remaining: **665**
+  - Main game + SB-UI: **278 / 719 = 38.66%**
+  - Main remaining: **441**
+  - Level Factory: **0 / 112**
+  - Content Pipeline: **0 / 112**
