@@ -863,15 +863,15 @@ create legal access to a previously blocked target.
 
 ### M18 — Scrubbot Agent
 
-- [x] SB-M18-001 Lightweight agent core.
+- [ ] SB-M18-001 Lightweight agent core.
 - [x] SB-M18-002 Assigned color. — [x] SB-M18-003 Assigned target.
 - [x] SB-M18-004 Assigned route. — [x] SB-M18-005 Spawn origin.
-- [x] SB-M18-006 Route movement. — [x] SB-M18-007 Arrival detection.
+- [ ] SB-M18-006 Route movement. — [x] SB-M18-007 Arrival detection.
 - [x] SB-M18-008 Completion event. — [x] SB-M18-009 Despawn.
 - [x] SB-M18-010 No return-to-slot. — [x] SB-M18-011 No resource carrying.
 - [x] SB-M18-012 Reset cancellation. — [x] SB-M18-013 No orphan nodes.
-- [x] SB-M18-014 Performance stress test.
-- [x] SB-M18-015 Pool only if profiling justifies it.
+- [ ] SB-M18-014 Performance stress test.
+- [ ] SB-M18-015 Pool only if profiling justifies it.
 
 ### M19 — Scrubbot Dispatcher
 
