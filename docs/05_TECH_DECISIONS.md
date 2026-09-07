@@ -817,7 +817,37 @@ the M17 lab/prototypes/comparison remain intact as diagnostic evidence.
 - Verified deterministic and RouteValidator-clean up to 59×59 (max) and
   rectangular Very Hard 53×59.
 
-**Status**: Accepted (M17-C002).
+**V03 hardening** (M17-C002 V03, frozen finding set F-M17-STRICT-001..009):
+
+- **Exact segment truth replaces sampling.** `ProductionAccessQuery` no longer
+  uses fixed-step point sampling for correctness; it walks a deterministic
+  supercover DDA enumerating every cell a segment geometrically crosses, and at
+  an exact lattice-corner crossing it also requires both diagonal squeeze cells
+  to be enterable — so a diagonal cannot be cut between two blockers and a short
+  chord cannot slip between samples.
+- **No correctness-affecting entry cap.** The exterior bridge seeds ALL valid
+  perimeter entries (nearest-first only as a deterministic path preference), plus
+  direct final arrival to a perimeter target — a later perimeter entry may be the
+  only route.
+- **Fail-closed access + board coherence.** `ProductionAccessQuery` recognises
+  only a real `BoardState`; unbound/invalid never throws (BLOCKED/false), rejects
+  non-finite endpoints and invalid target indices, exposes read-only
+  `is_bound_to(board)` (exact identity, no board-reference leak).
+  `ProductionRoutingSystem` requires a real `RouteRequest` before reading fields,
+  an object-shaped access exposing the complete seam
+  (`is_segment_traversable`/`classify_cell`/`cell_of_point`/`is_bound_to`) with
+  validated return types, and `is_bound_to(board) == true` — a same-size
+  DIFFERENT board fails closed.
+- **Every planning edge obeys segment access truth** (not inferred from cell
+  class), and the post-process is **self-validating**: each stage keeps the last
+  route that passes the shared `RouteValidator`, and the returned success is
+  `RouteValidator`-clean inside `compute_route`. Invalid tuning
+  (non-finite/negative `corner_radius`, non-positive `corner_samples`/
+  `max_shortcut_span`) degrades to a sharp/valid route and never produces
+  non-finite success points; valid owner defaults (span 2, radius 0.25, samples
+  3) are unchanged.
+
+**Status**: Accepted (M17-C002); hardened V03.
 
 ### ADR-026: ScrubbotAgent — movement-only consumer of a finished route
 
