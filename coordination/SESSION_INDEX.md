@@ -765,3 +765,17 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 
 - Progress with strict upstream reopens: **266/943 = 28.21%** overall; **266/719 = 37.00%** main + SB-UI.
+
+
+## 2026-09-07 — Strict-v2 transition after M15-C001 V02 audit
+
+- M10-C001 strict re-audit V01: AUDITED_PASS.
+- M11-C001 strict re-audit V01: CHANGES_REQUIRED.
+- M12-C001 strict re-audit V01: CHANGES_REQUIRED.
+- M13-C001 strict re-audit V01: CHANGES_REQUIRED.
+- M14-C001 strict re-audit V02: CHANGES_REQUIRED.
+- M15-C001 V02 independent audit: AUDITED_PASS at implementation head 4b3433731ffc7698aa0aafae3f8a822430a9cbc3.
+- Strict routing repair sequence: M16-C001 V02 is now READY; M17-C002 V02 remains BLOCKED_BY_M16.
+- Separate foundation repair queue: coordination/STRICT_FOUNDATION_REPAIR_QUEUE_V01.md.
+- Canonical task progress after strict task truth update: 257/943 = 27.25%; main+UI 257/719 = 35.74%.
+- Next implementation actor: CLAUDE for M16-C001 V02 only, then AWAITING_AUDIT and STOP.
