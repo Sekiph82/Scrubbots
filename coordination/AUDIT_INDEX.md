@@ -154,3 +154,8 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 | AL-052 | Non-null contract object shape | Numeric/content validation is insufficient when an untyped contract entry accepts arbitrary non-null objects; field/method access can fault before validation. | Validate exact type or narrow required API shape before dereferencing request/board objects. Add partial-API doubles so rejection is proven before the missing call. | M16-C001 strict V02 audit, 2026-09-07 |
 
 | M16-C001 V02 independent audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V02.md | `CHANGES_REQUIRED` | V02 closed NaN/INF, route-point, result-coherence and non-bool-access findings, but strict audit found malformed non-null request/board shape still faults before fail-closed validation. |
+
+
+| AL-053 | Arbitrary Variant boundary closure | RefCounted junk-object tests do not prove an untyped GDScript boundary is safe for scalar/non-object Variants. | For public untyped entry points, adversarially test int/string/vector/object/null classes before any field access or has_method call; prove every unsupported Variant fails closed. | M16-C001 V03 audit, 2026-09-07 |
+
+| M16-C001 V03 independent audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V03.md | `CHANGES_REQUIRED` | Object-shaped malformed request/board handling passed, but scalar board/result/access-query Variants were still not proven fail-closed before dereference/has_method. |
