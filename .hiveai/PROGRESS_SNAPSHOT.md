@@ -456,3 +456,16 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Main remaining: **453**
 - Level Factory: **0 / 112**
 - Content Pipeline: **0 / 112**
+
+
+## 2026-09-07 strict-v2 snapshot
+
+- Ecosystem: **257 / 943 = 27.25%**
+- Remaining: **686**
+- Main game + SB-UI: **257 / 719 = 35.74%**
+- Level Factory: **0 / 112**
+- Content Pipeline: **0 / 112**
+- M10: strict PASS.
+- M11/M12/M13/M14: strict findings reopened selected tasks.
+- M15-C001 V02: AUDITED_PASS; selected strict tasks re-closed.
+- M16-C001 V02: READY.
