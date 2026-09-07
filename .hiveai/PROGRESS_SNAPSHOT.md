@@ -619,3 +619,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Overall: **278 / 943 = 29.48%**
 - Main game + SB-UI: **278 / 719 = 38.66%**
 - Entire foundation queue is now closed; M19 is next strict frontier.
+
+
+### M19 full-surface V02 ready
+
+- Upstream and foundation gates: **CLOSED**.
+- M19 V01 implementation preserved.
+- Current full-surface frozen findings: F-M19-STRICT-001/002/003/004.
+- M19-C001 V02: **READY**.
+- Overall: **278 / 943 = 29.48%**
+- Main game + SB-UI: **278 / 719 = 38.66%**
+- M19 tasks remain open pending strict closure.
