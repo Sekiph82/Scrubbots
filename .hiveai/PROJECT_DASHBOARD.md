@@ -1,14 +1,13 @@
-### M13 final closure / M14 frozen V02
+### M14 final closure / BoardState foundation gate
 
-- M17-C002 V03: **AUDITED_PASS / final closed**
 - M11: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
 - M12: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
-- M13-C001 V05: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
-- READY now: **M14-C001 V02**
-- M14 full-surface frozen findings: **F-M14-STRICT-001/002**
-- FOUNDATION-STRICT-001 remains separate after M14.
-- M19 remains audit-blocked until M14 + FOUNDATION-STRICT-001 close.
-- Progress: **274/943 = 29.06%** overall; **274/719 = 38.11%** main + UI.
+- M13: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
+- M14-C001 V02: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
+- READY now: **FOUNDATION-C001 V01**
+- FOUNDATION-STRICT-001 is validation-first: no production fix unless Godot proves a real noncanonical-state defect.
+- M19 remains audit-blocked until FOUNDATION-STRICT-001 closes.
+- Progress: **278/943 = 29.48%** overall; **278/719 = 38.66%** main + UI.
 
 ### M16 final pass / M17 frozen V03
 
@@ -874,3 +873,22 @@ Tracking sources:
 | ChatGPT independent Godot rerun | unavailable |
 | Canonical progress | 274/943 = 29.06% |
 | Main + UI | 274/719 = 38.11% |
+
+
+## 2026-09-07 — M14 final / BoardState current frontier
+
+| Field | Value |
+| --- | --- |
+| M14 | AUDITED_PASS / STRICT_V2_FINAL_CLOSURE |
+| M14 audit | coordination/sessions/M14-C001/CHATGPT_AUDIT_V02.md |
+| Current foundation gate | FOUNDATION-C001 V01 |
+| State | VALIDATION_FIRST / READY |
+| Next actor | CLAUDE |
+| Finding | FOUNDATION-STRICT-001 |
+| Active prompt | coordination/sessions/FOUNDATION-C001/CHATGPT_PROMPT_V01.md |
+| Active criteria | coordination/sessions/FOUNDATION-C001/CHATGPT_AUDIT_CRITERIA_V01.md |
+| Expected log | coordination/sessions/FOUNDATION-C001/CLAUDE_LOG_V01.md |
+| M19 | audit-blocked until foundation gate closes |
+| ChatGPT independent Godot rerun | unavailable |
+| Canonical progress | 278/943 = 29.48% |
+| Main + UI | 278/719 = 38.66% |
