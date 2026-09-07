@@ -1,3 +1,13 @@
+### M16 V03 strict audit result
+
+- Verdict: **CHANGES_REQUIRED**
+- V03 fixed malformed object-shaped request/board boundaries.
+- New gap: scalar/non-object Variant board/result/access-query inputs are not fully fail-closed.
+- READY now: **M16-C001 V04**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_PROMPT_V04.md
+- M17 remains blocked.
+- Progress: **257/943 = 27.25%**.
+
 ### M16 V02 strict audit result
 
 - Verdict: **CHANGES_REQUIRED**
