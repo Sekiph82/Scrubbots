@@ -1,6 +1,6 @@
 # Strict Foundation Repair Queue V01
 
-Status: **ACTIVE**
+Status: **CLOSED**
 
 This queue records strict-v2 findings from the M10-M14 re-audit without blocking the currently sequenced M15 -> M16 -> M17 routing-contract repair chain where the finding is not a direct M16 dependency.
 
@@ -14,17 +14,17 @@ This queue records strict-v2 findings from the M10-M14 re-audit without blocking
 
 ## FOUNDATION-STRICT-001 — BoardState HIGH-RISK VALIDATION GAP
 
-Current BoardState.set_cell_state(index, state: CellState) validates index but does not explicitly reject a non-canonical integer state before writing the PackedByteArray.
+FOUNDATION-C001 runtime evidence confirmed the defect: enum-typed parameters accepted noncanonical integers and BoardState stored them. The minimal explicit canonical guard is now implemented and audited.
 
-Because Godot is unavailable in the ChatGPT audit environment, whether the enum annotation itself prevents runtime injection of values such as 2/-1/255 is not independently executable here.
+Claude pre-fix Godot evidence showed 2/-1/255/3/99 were accepted; -1 wrapped to 255 in PackedByteArray. Post-fix 2584/2584 root checks pass.
 
-Before M19 receives a final strict audit, add a direct Godot adversarial test:
+Permanent adversarial coverage now directly tests:
 - valid index + state 2;
 - valid index + state -1;
 - valid index + state 255;
 - expected: false/no mutation for every non-ACTIVE/non-CLEARED value.
 
-If Godot accepts such values today, promote this from validation gap to a concrete M02 BoardState defect and repair it before vertical-slice work.
+The gap was promoted to a concrete M02/SB-M02-012 defect, minimally repaired, temporarily audit-reopened, and final re-closed.
 
 ## Ordering rule
 
@@ -53,7 +53,7 @@ The locked full attack-surface rule governs foundation repairs. M11 is final-clo
 - M13 V04: **CHANGES_REQUIRED / FROZEN_SET_REMAINS_OPEN**.
 - M13 V05: **AUDITED_PASS / FINAL_CLOSED**.
 - M14 V02: **AUDITED_PASS / FINAL_CLOSED**.
-- FOUNDATION-C001 V01: **READY**.
+- FOUNDATION-C001 V01: **AUDITED_PASS / FINAL_CLOSED**.
 
 
 ## M11 V06 final / M12 full-surface transition
@@ -126,8 +126,19 @@ The locked full attack-surface rule governs foundation repairs. M11 is final-clo
 
 - M14-C001 V02: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
 - M14 re-closed: SB-M14-001/004/007/009.
-- FOUNDATION-STRICT-001 remains the only open foundation gate.
+- FOUNDATION-STRICT-001 is CLOSED.
 - FOUNDATION-C001 V01 is **READY** and validation-first.
 - If current Godot already rejects noncanonical states, no production fix is allowed.
 - If any 2/-1/255/3/99 injection is accepted/mutates/faults, promote to concrete M02/SB-M02-012 defect and minimally harden BoardState.
 - M19 remains blocked until this gate closes.
+
+
+## FOUNDATION-C001 final closure
+
+- Implementation: `a059b85c7d97df2ba2f8b467b5d72b06d94a5be8`.
+- Audit: **AUDITED_PASS / FOUNDATION-STRICT-001 CLOSED**.
+- Pre-fix: 2/-1/255/3/99 all accepted and mutated valid-index state.
+- Post-fix: explicit ACTIVE/CLEARED guard before write; 2584/2584 ALL PASS.
+- SB-M02-012 temporary audit reopen/re-close recorded.
+- Entire M10-M14 + BoardState foundation queue is CLOSED.
+- M19 may now enter its own strict full-surface audit path.
