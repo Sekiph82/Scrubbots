@@ -1,3 +1,12 @@
+### M18-C001 final audit
+
+- Decision: **AUDITED_PASS / COMPLETE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_AUDIT_V01.md
+- ScrubbotAgent accepted: lightweight route movement, exact arrival, once-only completion, cancel/reset, no return/carrying.
+- SB-M18-001..015 closed.
+- Claude evidence: **1483/1483 ALL PASS**.
+- M19 Scrubbot Dispatcher may open.
+
 ### M18-C001 V01 milestone opening
 
 - State: **ISSUED**
