@@ -1,4 +1,4 @@
-# SCRUBBOTS Global Pixel-Art Palette V1
+# SCRUBBOTS Global Pixel-Art Palette V2
 
 Status: **OWNER-LOCKED — 2026-09-06**
 
