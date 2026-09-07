@@ -406,3 +406,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - M20 clearing/orchestration remains unopened.
 - Current progress remains **278 / 943 = 29.48%** until audit.
 - Full-pass target after 12 closures: **290 / 943 = 30.75%**, main + SB-UI **290 / 719 = 40.33%**.
+
+
+### Strict audit standard v2 + M18 re-audit
+
+- Audit governance upgraded and locked on 2026-09-07.
+- Critical milestones now require two-stage closure: implementation audit + ChatGPT-authored adversarial validation, unless ChatGPT independently executes equivalent runtime behavior.
+- M18 strict re-audit result: **CHANGES_REQUIRED**.
+- Reopened: SB-M18-001, SB-M18-006, SB-M18-014, SB-M18-015.
+- Findings: lifecycle re-entry allowed; multi-segment delta test lacked direct boundary proof; performance timer mixed route generation with agent lifecycle and therefore could not justify pooling evidence.
+- M18-C001 V02 issued.
+- M19 is paused until M18 V02 final strict audit passes.
