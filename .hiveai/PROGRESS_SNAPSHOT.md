@@ -376,3 +376,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - M19 Dispatcher and M20 vertical slice remain unopened.
 - Current progress remains **263 / 943 = 27.89%** until M18 audit.
 - Full-pass target after 15 closures: **278 / 943 = 29.48%**, main + SB-UI **278 / 719 = 38.66%**.
+
+
+### M18-C001 final audit
+
+- **AUDITED_PASS** under canonical AUDIT_POLICY.
+- ScrubbotAgent accepted: lightweight board-local route consumer, deterministic movement, exact arrival, completion signal, cancel/reset, no return, no carrying, no BoardState/ReservationState mutation.
+- SB-M18-001..015 are CLOSED.
+- Claude evidence: **1483/1483 ALL PASS**; ChatGPT independently inspected diff/source/tests but did not independently rerun Godot.
+- Pooling remains deferred because profiling did not justify it.
+- M19 Scrubbot Dispatcher may open.
