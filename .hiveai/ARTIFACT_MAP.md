@@ -101,6 +101,7 @@ Strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/se
 | Version | Prompt | Audit criteria | Claude log | ChatGPT audit | State |
 | --- | --- | --- | --- | --- | --- |
 | V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CLAUDE_LOG_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_AUDIT_V01.md | AUDITED_PASS |
+| V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_AUDIT_CRITERIA_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CLAUDE_LOG_V02.md | PENDING | ISSUED / FROZEN_FULL_SURFACE |
 
 
 ## M15-C001 — TargetSelector
@@ -184,4 +185,4 @@ Strict repair sequence: https://github.com/Sekiph82/Scrubbots/blob/main/coordina
 
 | V04 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V04.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V04.md | CHANGES_REQUIRED / F001 remains open |
 
-| V05 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V05.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V05.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V05.md | PENDING | ISSUED / DOMAIN_CLOSURE |
+| V05 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_PROMPT_V05.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_CRITERIA_V05.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CLAUDE_LOG_V05.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V05.md | AUDITED_PASS_STRICT_V2 |
