@@ -562,3 +562,15 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Remaining: **671**
 - Main game + SB-UI: **272 / 719 = 37.83%**
 - Main remaining: **447**
+
+
+### M13 V03 audit / V04 ready
+
+- V03 implementation: `50f1f6c2b9d5f2bab082de2a8ada0c6d548cb4a6`.
+- V03 audit: **CHANGES_REQUIRED / FROZEN_SET_REMAINS_OPEN**.
+- F-M13-STRICT-001 remains open; F-M13-STRICT-002/003 source accepted.
+- M13-C001 V04: **READY**.
+- Overall: **272 / 943 = 28.84%**
+- Remaining: **671**
+- Main game + SB-UI: **272 / 719 = 37.83%**
+- Main remaining: **447**
