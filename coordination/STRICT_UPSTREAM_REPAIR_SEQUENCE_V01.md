@@ -1,6 +1,6 @@
 # Strict Upstream Repair Sequence V01
 
-Status: **ACTIVE**
+Status: **CLOSED**
 
 Purpose: repair the strict-v2 upstream chain before M19 is audited.
 
@@ -84,3 +84,15 @@ M16-C001 V05 passed final frozen full-surface audit. Before enabling M17 correct
 ## M17 V03 final transition
 
 M17-C002 V03 passed final frozen full-surface audit. The routing-contract repair chain M15->M16->M17 is complete. M19 remains blocked by the separate strict foundation repair queue. M11-C001 V05 is now the next READY repair.
+
+
+## Final closure / M19 handoff
+
+- M15: final strict closed.
+- M16: final strict closed.
+- M17: final strict closed.
+- M18: final strict closed.
+- Separate M11-M14 foundation queue: CLOSED.
+- FOUNDATION-STRICT-001: CLOSED.
+- M19 is no longer upstream-blocked.
+- Current M19 state is governed by its own full-surface re-audit V02 and frozen F-M19-STRICT-001..004 correction prompt.
