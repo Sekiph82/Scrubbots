@@ -181,3 +181,5 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 | M12-C001 full-surface re-audit V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_FULL_SURFACE_REAUDIT_V02.md | `CHANGES_REQUIRED / FINDING_SET_FROZEN` | Frozen F-M12-STRICT-001 sentinel/unconfigured query and F-M12-STRICT-002 arbitrary Variant palette-query boundary; AL-048/AL-053 apply. |
 
 | FOUNDATION-STRICT-001 | coordination/STRICT_FOUNDATION_REPAIR_QUEUE_V01.md | `HIGH-RISK VALIDATION GAP` | BoardState.set_cell_state must adversarially reject non-canonical states 2/-1/255 with false + no mutation; promote to concrete M02 defect if Godot accepts them. |
+
+| M12-C001 V03 independent audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V03.md | `CHANGES_REQUIRED / VALIDATION_HARDENING_REQUIRED` | F-M12-STRICT-001/002 production implementation source-accepted; V03 missed direct configure/state/aliasing sensitivity criteria, so V04 validation-only closure pass issued. |
