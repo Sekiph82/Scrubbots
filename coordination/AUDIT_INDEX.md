@@ -159,3 +159,8 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 | AL-053 | Arbitrary Variant boundary closure | RefCounted junk-object tests do not prove an untyped GDScript boundary is safe for scalar/non-object Variants. | For public untyped entry points, adversarially test int/string/vector/object/null classes before any field access or has_method call; prove every unsupported Variant fails closed. | M16-C001 V03 audit, 2026-09-07 |
 
 | M16-C001 V03 independent audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V03.md | `CHANGES_REQUIRED` | Object-shaped malformed request/board handling passed, but scalar board/result/access-query Variants were still not proven fail-closed before dereference/has_method. |
+
+
+| AL-054 | Serial finding drift | Issuing a correction prompt after only the first discovered defect can create repeated versions while leaving the wider subsystem surface unaudited. | Before the next correction prompt, sweep the entire subsystem/public API plus immediate consumers, freeze the complete finding set, then issue one comprehensive correction prompt. Post-fix audit must repeat the full matrix, not only the last diff. | M16 full attack-surface audit, 2026-09-07 |
+
+| M16-C001 V04 full attack-surface audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V04.md | `CHANGES_REQUIRED / FINDING_SET_FROZEN` | V04 scalar validator hardening passed, but full subsystem sweep found three remaining M16-owned defects: duck-typed BoardState return contract, unsafe RouteRequest factories, and unsafe base RoutingSystem request dereference. Frozen into one V05 correction. |
