@@ -42,15 +42,27 @@ var _board = null
 ## Only colors with at least one ACTIVE cell have an entry.
 var _buckets: Dictionary = {}
 var _bound: bool = false
+## Immutable cell count of the successfully indexed board domain, captured from
+## the SAME transactional scan that produced _buckets (V05 §1). Lets sync_cell
+## distinguish a caller index that was never inside the indexed domain (healthy
+## false) from a live dependency contradicting the indexed domain (drift ->
+## neutralize). 0 when unbound. Never re-read from a second get_cell_count().
+var _count: int = 0
+
+## Production board domain ceiling: 59 * 59 = 3,481 cells (tasks.md §8.3). A
+## dependency reporting a larger count is rejected BEFORE any per-cell traversal
+## (V05 §3). Structural guard, not a timing threshold.
+const _MAX_CELL_COUNT := 3481
 
 ## Matches the from_level_data() convention: returns the real instance, typed
 ## as RefCounted because self-referential static typing is unreliable headless.
 static func create() -> RefCounted:
 	return load("res://scripts/gameplay/targeting/color_candidate_index.gd").new()
 
-## Narrow duck-typed BoardState surface M13 consumes. A dependency must be an
-## Object exposing ALL of these before we call any of them (F-M13-STRICT-001).
-## Duck-typed, not `is BoardState`, so a compatible test double/spy still binds.
+## Narrow duck-typed BoardState surface M13 consumes. A dependency must be a
+## RefCounted exposing ALL of these before we call any of them (F-M13-STRICT-001,
+## V04 §2). Duck-typed, not `is BoardState`, so a compatible RefCounted test
+## double/spy still binds; a Node with the same methods does not.
 const _REQUIRED_BOARD_API := ["get_cell_count", "is_valid_index", "get_cell_state", "get_color_id"]
 
 ## Bind to a BoardState and build the color index from its current ACTIVE cells.
@@ -68,12 +80,14 @@ func bind(board) -> bool:
 	if not _has_board_api(board):
 		_neutralize()
 		return false
-	var built = _scan(board)
-	if built == null:
+	var scanned = _scan(board)
+	if scanned == null:
 		_neutralize()
 		return false
+	# Commit board + buckets + validated domain count atomically.
 	_board = board
-	_buckets = built
+	_buckets = scanned.buckets
+	_count = scanned.count
 	_bound = true
 	return true
 
@@ -90,11 +104,13 @@ func rebind(board) -> bool:
 func rebuild() -> bool:
 	if not _bound or _board == null:
 		return false
-	var built = _scan(_board)
-	if built == null:
+	var scanned = _scan(_board)
+	if scanned == null:
 		_neutralize()
 		return false
-	_buckets = built
+	# Atomically refresh buckets AND domain count from the same scan snapshot.
+	_buckets = scanned.buckets
+	_count = scanned.count
 	return true
 
 ## Synchronize one cell after a BoardState mutation. ACTIVE -> present in its
@@ -106,14 +122,19 @@ func rebuild() -> bool:
 func sync_cell(index: int) -> bool:
 	if not _bound or _board == null:
 		return false
-	# A HEALTHY out-of-range index is a plain false with the cache intact — not
-	# dependency corruption. A MALFORMED dependency return (wrong type / unknown
-	# state / bad color) neutralizes the cache (F-M13-STRICT-002, V04 §4).
+	# A caller index that was NEVER inside the successfully-indexed domain is a
+	# healthy false with the cache intact — not dependency corruption (V05 §2).
+	if index < 0 or index >= _count:
+		return false
+	# The index IS inside the indexed domain, so the live dependency must still
+	# confirm it. A non-bool return (malformed) or a false (dependency now
+	# contradicts the indexed domain) is drift -> neutralize (V05 §2).
 	var valid = _board.is_valid_index(index)
 	if typeof(valid) != TYPE_BOOL:
 		_neutralize()
 		return false
 	if not valid:
+		_neutralize()
 		return false
 	var state = _board.get_cell_state(index)
 	if typeof(state) != TYPE_INT:
@@ -231,21 +252,25 @@ func _neutralize() -> void:
 	_board = null
 	_buckets = {}
 	_bound = false
+	_count = 0
 
-## Transactional build. Scans the board into a LOCAL buckets Dictionary and
-## returns it only if every scanned index yields canonical truth:
-##   - get_cell_count is a non-negative int;
+## Transactional build. Scans the board into LOCAL state and returns a snapshot
+## {count, buckets} only if every scanned index yields canonical truth:
+##   - get_cell_count is an int in [0, _MAX_CELL_COUNT];
 ##   - each index is valid per dependency truth;
 ##   - each cell state is exactly ACTIVE or CLEARED (unknown -> fail);
 ##   - each ACTIVE cell's color id is an int >= 0.
 ## Returns null on any malformed value, so the caller never commits partial
-## buckets or faults on a bad return type. Ascending iteration keeps buckets
-## row-major without sorting.
+## buckets or faults on a bad return type. The returned count belongs to the
+## SAME snapshot as the buckets — the caller commits both atomically and never
+## re-reads a second get_cell_count() (V05 §1). Ascending iteration keeps
+## buckets row-major without sorting.
 func _scan(board):
 	# Zero count is intentional and harmless: an empty board binds with no
-	# buckets (no candidates). A negative or non-int count is malformed -> null.
+	# buckets. A non-int, negative, or over-max count is rejected BEFORE any
+	# per-cell traversal (V05 §3).
 	var count = board.get_cell_count()
-	if typeof(count) != TYPE_INT or count < 0:
+	if typeof(count) != TYPE_INT or count < 0 or count > _MAX_CELL_COUNT:
 		return null
 	var buckets: Dictionary = {}
 	for i in count:
@@ -264,7 +289,7 @@ func _scan(board):
 			buckets[color_id].append(i)
 		elif state != BoardState.CellState.CLEARED:
 			return null # unknown/noncanonical state -> fail closed, no partial commit
-	return buckets
+	return {"count": count, "buckets": buckets}
 
 ## Supported caller-exclusion containers: Array, PackedInt32Array, Dictionary
 ## (keys as excluded indices). Everything else fails closed. null is handled by

@@ -27,6 +27,14 @@ var state_nonint_at: int = -1           # get_cell_state -> float at this index
 var cleared_at: int = -1                # get_cell_state -> CLEARED at this index
 var color_nonint_at: int = -1           # get_color_id -> String at this index
 var color_neg_at: int = -1              # get_color_id -> negative int
+# Per-cell traversal call counters, so a test can prove an over-max count is
+# rejected BEFORE any per-cell traversal (V05 §3). get_cell_count is not counted.
+var count_is_valid_index: int = 0
+var count_get_cell_state: int = 0
+var count_get_color_id: int = 0
+
+func per_cell_traversal_calls() -> int:
+	return count_is_valid_index + count_get_cell_state + count_get_color_id
 
 func get_cell_count():
 	if count_type_wrong:
@@ -36,6 +44,7 @@ func get_cell_count():
 	return count
 
 func is_valid_index(index):
+	count_is_valid_index += 1
 	if index == invalid_index_nonbool_at:
 		return "yes"
 	if index == invalid_index_false_at:
@@ -43,6 +52,7 @@ func is_valid_index(index):
 	return index >= 0 and index < count
 
 func get_cell_state(index):
+	count_get_cell_state += 1
 	if state_type_wrong:
 		return 3.14
 	if index == state_nonint_at:
@@ -54,6 +64,7 @@ func get_cell_state(index):
 	return BoardState.CellState.ACTIVE
 
 func get_color_id(index):
+	count_get_color_id += 1
 	if color_type_wrong:
 		return "red"
 	if index == color_nonint_at:

@@ -3221,7 +3221,83 @@ func _run_color_candidate_index_tests() -> void:
 	_run_m13_v02_formal_validation()
 	_run_m13_v03_strict_validation()
 	_run_m13_v04_strict_validation()
+	_run_m13_v05_strict_validation()
 	print("  M13 ColorCandidateIndex tests complete")
+
+## M13-C001 V05 final dependency-domain closure: indexed domain metadata,
+## corrected healthy-invalid vs contradictory-drift sync, production max-count
+## guard (3,481), transactional rebuild domain metadata. Criteria V05.
+func _run_m13_v05_strict_validation() -> void:
+	# --- §1/§2 indexed domain metadata + corrected sync semantics ---
+	var dbl := M13MalformedBoardDouble.new() # count 4, 4 ACTIVE color 0
+	var ix := ColorCandidateIndex.create()
+	_check(ix.bind(dbl), "M13V5-001 bind valid count-4 board")
+	_check_eq(ix.get_candidates(0), [0, 1, 2, 3], "M13V5-001 exact indexed truth")
+	# healthy caller invalid indices (outside domain): false, binding intact
+	for bad in [-1, 4, 999]:
+		_check_eq(ix.sync_cell(bad), false, "M13V5-002 healthy out-of-domain sync(%d) false" % bad)
+	_check(ix.is_bound(), "M13V5-002 healthy invalid index leaves binding valid")
+	_check_eq(ix.get_candidates(0), [0, 1, 2, 3], "M13V5-002 cache unchanged after healthy invalid")
+	# contradictory live dependency: in-domain index 2, live is_valid_index false
+	dbl.invalid_index_false_at = 2
+	_check_eq(ix.sync_cell(2), false, "M13V5-002 contradictory in-domain sync(2) false")
+	_check_eq(ix.is_bound(), false, "M13V5-002 contradictory drift neutralizes")
+	_check_eq(ix.get_candidates(0), [], "M13V5-002 get_candidates [] after drift")
+	_check_eq(ix.has_candidates(0), false, "M13V5-002 has_candidates false after drift")
+	_check_eq(ix.count_candidates(0), 0, "M13V5-002 count 0 after drift")
+	_check_eq(ix.get_color_ids(), [], "M13V5-002 no color ids after drift")
+	_check_eq(ix.is_bound_to(dbl), false, "M13V5-002 is_bound_to(old) false after drift")
+	# recovery
+	dbl.invalid_index_false_at = -1
+	_check(ix.bind(dbl), "M13V5-002 later valid bind recovers")
+	_check_eq(ix.get_candidates(0), [0, 1, 2, 3], "M13V5-002 recovered exact truth")
+	# non-bool is_valid_index drift still neutralizes
+	var ndbl := M13MalformedBoardDouble.new()
+	var nix := ColorCandidateIndex.create()
+	nix.bind(ndbl)
+	ndbl.invalid_index_nonbool_at = 2
+	_check_eq(nix.sync_cell(2), false, "M13V5-002 non-bool is_valid_index drift sync false")
+	_check_eq(nix.is_bound(), false, "M13V5-002 non-bool is_valid_index drift neutralizes")
+
+	# --- §3 production max-count guard (structural, before per-cell traversal) ---
+	var at_max := M13MalformedBoardDouble.new(); at_max.count = 3481; at_max.color = 2
+	var amx := ColorCandidateIndex.create()
+	_check(amx.bind(at_max), "M13V5-003 count 3481 accepted (canonical)")
+	_check_eq(amx.count_candidates(2), 3481, "M13V5-003 count 3481 all ACTIVE indexed")
+	for over in [3482, 1000000, 2000000000]:
+		var od := M13MalformedBoardDouble.new(); od.count = over
+		var ox := ColorCandidateIndex.create()
+		_check_eq(ox.bind(od), false, "M13V5-003 count %d rejected" % over)
+		_check_eq(ox.is_bound(), false, "M13V5-003 count %d unbound" % over)
+		_check_eq(ox.get_candidates(0), [], "M13V5-003 count %d no buckets" % over)
+		# rejection happened before ANY per-cell traversal
+		_check_eq(od.per_cell_traversal_calls(), 0, "M13V5-003 count %d: no per-cell traversal before reject" % over)
+
+	# --- §4 transactional rebuild domain metadata ---
+	var boardA = _make_colored_board(3, 2, [0, 1, 0, 1, 0, 2]) # count 6, color0->[0,2,4]
+	var rix := ColorCandidateIndex.create()
+	rix.bind(boardA)
+	_check_eq(rix.get_candidates(0), [0, 2, 4], "M13V5-004 board A baseline")
+	# rebuild same canonical domain preserves count/buckets
+	_check(rix.rebuild(), "M13V5-004 rebuild same domain succeeds")
+	_check_eq(rix.get_candidates(0), [0, 2, 4], "M13V5-004 rebuild preserves truth")
+	# domain metadata refreshed: index 5 in domain (count 6) syncs fine
+	_check(rix.sync_cell(5), "M13V5-004 in-domain sync(5) valid after rebuild")
+	# valid rebind to board B (different count) updates domain + buckets atomically
+	var boardB = _make_colored_board(2, 1, [7, 7]) # count 2
+	_check(rix.rebind(boardB), "M13V5-004 rebind A->B")
+	_check_eq(rix.get_candidates(7), [0, 1], "M13V5-004 board B truth installed")
+	# index 5 now OUTSIDE new domain (count 2) -> healthy false, binding intact
+	_check_eq(rix.sync_cell(5), false, "M13V5-004 old-domain index 5 now out-of-domain -> healthy false")
+	_check(rix.is_bound(), "M13V5-004 out-of-domain sync left binding intact after rebind")
+	# failed rebuild leaves no stale/partial cache; neutralization resets metadata
+	var fdbl := M13MalformedBoardDouble.new()
+	var fix := ColorCandidateIndex.create()
+	fix.bind(fdbl)
+	fdbl.unknown_state_at = 1; fdbl.unknown_state_value = 77
+	_check_eq(fix.rebuild(), false, "M13V5-004 rebuild with unknown state fails")
+	_check_eq(fix.is_bound(), false, "M13V5-004 failed rebuild neutralized (metadata reset)")
+	_check_eq(fix.sync_cell(0), false, "M13V5-004 sync after neutralize false (count reset)")
 
 ## M13-C001 V04 strict dependency closure: bind(null) stale-escape fix,
 ## RefCounted-only dependency lifecycle, complete transactional build return
@@ -3301,16 +3377,17 @@ func _run_m13_v04_strict_validation() -> void:
 	_check_eq(cngvx.is_bound(), false, "M13V4-003 transactional: unbound after color-negative at index 2")
 
 	# --- §4 sync_cell live dependency return drift ---
-	# healthy invalid index: sync false, cache intact
+	# healthy caller invalid index (OUTSIDE indexed domain 0..3): false, intact.
 	var hdbl := M13MalformedBoardDouble.new()
 	var hix := ColorCandidateIndex.create()
 	_check(hix.bind(hdbl), "M13V4-004 bind valid before healthy-invalid sync")
-	hdbl.invalid_index_false_at = 2
-	_check_eq(hix.sync_cell(2), false, "M13V4-004 healthy invalid index sync -> false")
+	for bad in [-1, 4, 999]:
+		_check_eq(hix.sync_cell(bad), false, "M13V4-004 healthy out-of-domain sync(%d) -> false" % bad)
 	_check(hix.is_bound(), "M13V4-004 healthy invalid index leaves binding intact")
 	_check_eq(hix.get_candidates(0), [0, 1, 2, 3], "M13V4-004 healthy invalid index leaves cache intact")
-	# malformed live returns each neutralize
+	# malformed / contradictory live returns each neutralize
 	var drift_cases := [
+		["index_false_in_domain", func(d): d.invalid_index_false_at = 2],
 		["nonbool_index", func(d): d.invalid_index_nonbool_at = 2],
 		["nonint_state", func(d): d.state_nonint_at = 2],
 		["active_color_nonint", func(d): d.color_nonint_at = 2],
