@@ -35,6 +35,7 @@ const RouteValidator = preload("res://scripts/gameplay/routing/route_validator.g
 const RoutingSystem = preload("res://scripts/gameplay/routing/routing_system.gd")
 const RouteDebugOverlay = preload("res://scripts/debug/route_debug_overlay.gd")
 const RouteAccessQueryDouble = preload("res://tests/support/route_access_query_double.gd")
+const RouteNonBoolAccessQueryDouble = preload("res://tests/support/route_nonbool_access_double.gd")
 const RouteFakeStraight = preload("res://tests/support/route_fake_straight.gd")
 const RouteFakeRelay = preload("res://tests/support/route_fake_relay.gd")
 # M17 — EXPERIMENTAL routing prototype lab.
@@ -3703,6 +3704,59 @@ func _run_route_validator_tests() -> void:
 	var one_pt = RouteResult.success_route(tgt, PackedVector2Array([req.start_position]))
 	var acc5 = RouteAccessQueryDouble.new()
 	_check_eq(RouteValidator.validate_route(req, one_pt, board, acc5), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: < 2 points -> INVALID_ROUTE")
+
+	# === Strict V02: non-finite request coordinates rejected before geometry/access ===
+	var nan_start = RouteRequest.for_target(board, Vector2(NAN, 2.5), tgt)
+	_check_eq(RouteValidator.validate_request(nan_start, board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: NaN start rejected")
+	var pinf_start = RouteRequest.for_target(board, Vector2(INF, 2.5), tgt)
+	_check_eq(RouteValidator.validate_request(pinf_start, board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: +INF start rejected")
+	var ninf_start = RouteRequest.for_target(board, Vector2(-INF, 2.5), tgt)
+	_check_eq(RouteValidator.validate_request(ninf_start, board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: -INF start rejected")
+	var nf_target = RouteRequest.for_target(board, start, tgt)
+	nf_target.target_position = Vector2(INF, INF)
+	_check_eq(RouteValidator.validate_request(nf_target, board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: non-finite target_position rejected")
+	# A malformed request fails through validate_route BEFORE any access query.
+	var early_acc = RouteAccessQueryDouble.new(); early_acc.default_traversable = true
+	var early_route = RouteResult.success_route(tgt, PackedVector2Array([Vector2(NAN, 2.5), req.target_position]))
+	_check_eq(RouteValidator.validate_route(nan_start, early_route, board, early_acc), RouteResult.FailureReason.INVALID_REQUEST, "validate_route: non-finite request -> INVALID_REQUEST")
+	_check_eq(early_acc.total_queries(), 0, "validate_route: malformed request makes zero access calls")
+
+	# === Strict V02: non-finite intermediate route points rejected, zero access calls ===
+	# default_traversable = true so, absent the finite guard, access WOULD approve —
+	# proving INVALID_ROUTE + zero queries comes from the structural check, not access.
+	var nan_mid = RouteResult.success_route(tgt, PackedVector2Array([req.start_position, Vector2(NAN, NAN), req.target_position]))
+	var nan_mid_acc = RouteAccessQueryDouble.new(); nan_mid_acc.default_traversable = true
+	_check_eq(RouteValidator.validate_route(req, nan_mid, board, nan_mid_acc), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: NaN intermediate point -> INVALID_ROUTE")
+	_check_eq(nan_mid_acc.total_queries(), 0, "validate_route: NaN-point route makes zero access calls")
+	var inf_mid = RouteResult.success_route(tgt, PackedVector2Array([req.start_position, Vector2(INF, 3.5), req.target_position]))
+	var inf_mid_acc = RouteAccessQueryDouble.new(); inf_mid_acc.default_traversable = true
+	_check_eq(RouteValidator.validate_route(req, inf_mid, board, inf_mid_acc), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: INF intermediate point -> INVALID_ROUTE")
+	_check_eq(inf_mid_acc.total_queries(), 0, "validate_route: INF-point route makes zero access calls")
+
+	# === Strict V02: success/failure metadata coherence ===
+	var contradictory = RouteResult.success_route(tgt, result.get_points())
+	contradictory.failure_reason = RouteResult.FailureReason.NO_ROUTE
+	var contra_acc = RouteAccessQueryDouble.new(); contra_acc.open_polyline(result.get_points())
+	_check_eq(RouteValidator.validate_route(req, contradictory, board, contra_acc), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: success + NO_ROUTE contradiction -> INVALID_ROUTE")
+
+	# Canonical failure structural validation + each contradiction rejected.
+	var good_fail = RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, tgt)
+	_check_eq(RouteValidator.validate_failure_result(req, good_fail), RouteResult.FailureReason.NONE, "validate_failure_result: canonical failure -> NONE")
+	var fail_none = RouteResult.failure(RouteResult.FailureReason.NONE, tgt)
+	_check_eq(RouteValidator.validate_failure_result(req, fail_none), RouteResult.FailureReason.INVALID_ROUTE, "validate_failure_result: failure + NONE rejected")
+	var fail_pts = RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, tgt)
+	fail_pts._points = PackedVector2Array([req.start_position, req.target_position])
+	_check_eq(RouteValidator.validate_failure_result(req, fail_pts), RouteResult.FailureReason.INVALID_ROUTE, "validate_failure_result: failure with points rejected")
+	var fail_wrong = RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, tgt + 1)
+	_check_eq(RouteValidator.validate_failure_result(req, fail_wrong), RouteResult.FailureReason.INVALID_ROUTE, "validate_failure_result: failure with wrong target rejected")
+	_check_eq(RouteValidator.validate_failure_result(req, result), RouteResult.FailureReason.INVALID_ROUTE, "validate_failure_result: a success result is not a valid failure")
+
+	# === Strict V02: non-bool access verdict fails closed (no truthiness approval) ===
+	for bad_val in [1, "yes", null]:
+		var nb = RouteNonBoolAccessQueryDouble.new()
+		nb.verdict_value = bad_val
+		_check_eq(RouteValidator.validate_route(req, result, board, nb), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: non-bool access verdict (%s) fails closed" % str(bad_val))
+		_check(nb.call_count >= 1, "validate_route: non-bool verdict (%s) was actually consulted then rejected" % str(bad_val))
 
 func _run_routing_system_swappability_tests() -> void:
 	var board = _make_blank_board(8, 6)
