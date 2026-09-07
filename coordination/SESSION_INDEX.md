@@ -752,3 +752,13 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Blocker note: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_BLOCKER_NOTE_V01.md
 - Preserve M19 work; do not audit/close it yet.
 - Next actor: CLAUDE on M18-C001 V02.
+
+
+## Strict upstream repair sequence — M15/M16/M17
+
+- Sequence controller: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/STRICT_UPSTREAM_REPAIR_SEQUENCE_V01.md
+- M18-C001 V02 strict final audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_AUDIT_V02.md — **AUDITED_PASS**.
+- M15 strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CHATGPT_STRICT_REAUDIT_V02.md — **CHANGES_REQUIRED**, V02 READY.
+- M16 strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_STRICT_REAUDIT_V02.md — **CHANGES_REQUIRED**, blocked by M15.
+- M17 production strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_STRICT_REAUDIT_V02.md — **CHANGES_REQUIRED**, blocked by M16.
+- M19 remains IMPLEMENTED_BUT_AUDIT_BLOCKED until the corrected upstream chain is audited.
