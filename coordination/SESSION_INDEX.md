@@ -779,3 +779,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Separate foundation repair queue: coordination/STRICT_FOUNDATION_REPAIR_QUEUE_V01.md.
 - Canonical task progress after strict task truth update: 257/943 = 27.25%; main+UI 257/719 = 35.74%.
 - Next implementation actor: CLAUDE for M16-C001 V02 only, then AWAITING_AUDIT and STOP.
+
+
+## M16-C001 V02 independent audit
+
+- Verdict: **CHANGES_REQUIRED**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V02.md
+- Accepted/closed findings: non-finite request coordinates, non-finite route points, success/failure metadata coherence, non-bool access verdict.
+- New strict finding F-M16-STRICT-004: malformed non-null request/board objects can still raise runtime faults before fail-closed validation.
+- V03 prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_PROMPT_V03.md
+- M17 remains blocked.
+- Progress unchanged at **257/943 = 27.25%**.
