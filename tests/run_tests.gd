@@ -2363,85 +2363,149 @@ func _run_gameplay_session_tests() -> void:
 	_check(not s28.has_method("get_moves"), "M11-28: no get_moves method")
 	_check(not s28.has_method("get_move_limit"), "M11-28: no get_move_limit method")
 
-	# ==== 29. Detached LevelData source ownership (F-M11-STRICT-001) ====
-	# Hostile mutation of a snapshot (scalars, palette, cells, in-place packed
-	# array edits) must not alter the session's internal source truth. After a
-	# reset, the fresh BoardState and a new snapshot must match the ORIGINAL.
+	# ==== 29. Detached LevelData source truth, incl. post-reset (V06 §1) ====
+	# Save EVERY original field; hostile-mutate a snapshot (scalars, replaced
+	# packed arrays, in-place packed-array edits); reset; verify fresh BoardState
+	# AND a NEW post-reset snapshot both still match the ORIGINAL in every field.
 	var s29 := GameplaySession.new()
 	s29.load_level(rect_path)
-	var snap29 = s29.get_level_data()
-	var orig_w: int = snap29.width
-	var orig_h: int = snap29.height
-	var orig_cells: PackedInt32Array = snap29.cells.duplicate()
-	var orig_palette: PackedStringArray = snap29.palette.duplicate()
-	# 1) fresh snapshot is a different object than a second snapshot
-	_check(s29.get_level_data() != snap29, "M11-29: each get_level_data returns a distinct detached object")
-	# 2) hostile scalar/palette/cells mutation of the snapshot
-	snap29.width = 999
-	snap29.height = 999
-	snap29.id = "HACKED"
-	snap29.palette = PackedStringArray(["#DEADBEEF"])
-	snap29.cells = PackedInt32Array([7, 7, 7])
-	# 3) in-place packed-array mutation of the snapshot's arrays
+	var o29 = s29.get_level_data()
+	var o29_version: int = o29.version
+	var o29_id: String = o29.id
+	var o29_name: String = o29.display_name
+	var o29_diff: String = o29.difficulty
+	var o29_w: int = o29.width
+	var o29_h: int = o29.height
+	var o29_palette: PackedStringArray = o29.palette.duplicate()
+	var o29_cells: PackedInt32Array = o29.cells.duplicate()
+	# each snapshot is a distinct detached object
+	_check(s29.get_level_data() != o29, "M11-29: each get_level_data returns a distinct detached object")
+	# hostile scalar + packed-array REPLACEMENT on one snapshot
+	o29.version = -7
+	o29.id = "HACKED"
+	o29.display_name = "HACKED"
+	o29.difficulty = "HACKED"
+	o29.width = 999
+	o29.height = 999
+	o29.palette = PackedStringArray(["#DEADBEEF"])
+	o29.cells = PackedInt32Array([7, 7, 7])
+	# hostile in-place packed-array mutation on a second snapshot
 	var snap29b = s29.get_level_data()
 	if snap29b.cells.size() > 0:
 		snap29b.cells[0] = 42
 	if snap29b.palette.size() > 0:
 		snap29b.palette[0] = "#00000000"
-	# 4) internal source is untouched: a new snapshot still matches original
-	var snap29c = s29.get_level_data()
-	_check_eq(snap29c.width, orig_w, "M11-29: source width survives hostile snapshot mutation")
-	_check_eq(snap29c.height, orig_h, "M11-29: source height survives hostile snapshot mutation")
-	_check_eq(snap29c.cells, orig_cells, "M11-29: source cells survive hostile snapshot mutation")
-	_check_eq(snap29c.palette, orig_palette, "M11-29: source palette survives hostile snapshot mutation")
-	# 5+6) reset rebuilds BoardState from untouched source
+	# reset rebuilds BoardState from untouched internal source
 	s29.reset()
-	_check_eq(s29.get_board_state().get_width(), orig_w, "M11-29: reset board width matches original source")
-	_check_eq(s29.get_board_state().get_height(), orig_h, "M11-29: reset board height matches original source")
+	_check_eq(s29.get_board_state().get_width(), o29_w, "M11-29: reset board width matches original source")
+	_check_eq(s29.get_board_state().get_height(), o29_h, "M11-29: reset board height matches original source")
 	var reset_ok29 := true
-	for i in orig_cells.size():
-		if s29.get_board_state().get_color_id(i) != orig_cells[i]:
+	for i in o29_cells.size():
+		if s29.get_board_state().get_color_id(i) != o29_cells[i]:
 			reset_ok29 = false
 			break
 	_check(reset_ok29, "M11-29: reset board color ids match original source")
+	# NEW post-reset snapshot still matches EVERY original field
+	var p29 = s29.get_level_data()
+	_check_eq(p29.version, o29_version, "M11-29: post-reset snapshot version matches original")
+	_check_eq(p29.id, o29_id, "M11-29: post-reset snapshot id matches original")
+	_check_eq(p29.display_name, o29_name, "M11-29: post-reset snapshot display_name matches original")
+	_check_eq(p29.difficulty, o29_diff, "M11-29: post-reset snapshot difficulty matches original")
+	_check_eq(p29.width, o29_w, "M11-29: post-reset snapshot width matches original")
+	_check_eq(p29.height, o29_h, "M11-29: post-reset snapshot height matches original")
+	_check_eq(p29.palette, o29_palette, "M11-29: post-reset snapshot palette matches original")
+	_check_eq(p29.cells, o29_cells, "M11-29: post-reset snapshot cells matches original")
 
-	# ==== 30. Malformed renderer binding is fail-closed (F-M11-STRICT-002) ====
+	# ==== 29b. Failed replacement preserves every field + BoardState identity ====
+	var s29f := GameplaySession.new()
+	s29f.load_level(rect_path)
+	var f29 = s29f.get_level_data()
+	var f29_version: int = f29.version
+	var f29_id: String = f29.id
+	var f29_name: String = f29.display_name
+	var f29_diff: String = f29.difficulty
+	var f29_w: int = f29.width
+	var f29_h: int = f29.height
+	var f29_palette: PackedStringArray = f29.palette.duplicate()
+	var f29_cells: PackedInt32Array = f29.cells.duplicate()
+	var bs29_before = s29f.get_board_state()
+	bs29_before.set_cell_state(0, BoardState.CellState.CLEARED)  # runtime state marker
+	var rf29 := s29f.load_level("res://data/levels/nonexistent.json")
+	_check(not rf29.ok, "M11-29b: failed replacement load reports failure")
+	var g29 = s29f.get_level_data()
+	_check_eq(g29.version, f29_version, "M11-29b: version preserved after failed replacement")
+	_check_eq(g29.id, f29_id, "M11-29b: id preserved after failed replacement")
+	_check_eq(g29.display_name, f29_name, "M11-29b: display_name preserved after failed replacement")
+	_check_eq(g29.difficulty, f29_diff, "M11-29b: difficulty preserved after failed replacement")
+	_check_eq(g29.width, f29_w, "M11-29b: width preserved after failed replacement")
+	_check_eq(g29.height, f29_h, "M11-29b: height preserved after failed replacement")
+	_check_eq(g29.palette, f29_palette, "M11-29b: palette preserved after failed replacement")
+	_check_eq(g29.cells, f29_cells, "M11-29b: cells preserved after failed replacement")
+	_check(s29f.get_board_state() == bs29_before, "M11-29b: BoardState object identity preserved after failed replacement")
+	_check_eq(s29f.get_board_state().get_cell_state(0), BoardState.CellState.CLEARED, "M11-29b: BoardState runtime state preserved after failed replacement")
+
+	# ==== 30. Malformed renderer replacement sensitivity (V06 §2/§3) ====
+	# Positive path uses a real counting BoardRenderer subclass spy.
 	var s30 := GameplaySession.new()
 	s30.load_level(path_3x2)
-	var good_renderer := BoardRenderer.new()
-	_check(s30.bind_renderer(good_renderer, Vector2(800, 600)) == true, "M11-30: real BoardRenderer binds")
-	# Each malformed replacement must be rejected AND leave the good binding intact.
+	var spy30 := PaletteSpyRenderer.new()
+	_check(s30.bind_renderer(spy30, Vector2(800, 600)) == true, "M11-30: real counting spy binds")
+	_check_eq(spy30.configure_calls, 1, "M11-30: spy configured exactly once on bind")
+	_check(spy30.last_board != null, "M11-30: spy recorded last_board")
+	_check(spy30.last_palette != null, "M11-30: spy recorded last_palette")
+	_check_eq(spy30.last_size, Vector2(800, 600), "M11-30: spy recorded last_size")
+	var pre30: int = spy30.configure_calls
+	# malformed replacements — all rejected, none touch the valid binding
 	_check(s30.bind_renderer(123, Vector2(800, 600)) == false, "M11-30: int renderer rejected")
 	_check(s30.bind_renderer("renderer", Vector2(800, 600)) == false, "M11-30: String renderer rejected")
 	_check(s30.bind_renderer(Vector2(1, 1), Vector2(800, 600)) == false, "M11-30: Vector2 renderer rejected")
 	_check(s30.bind_renderer(RefCounted.new(), Vector2(800, 600)) == false, "M11-30: RefCounted junk renderer rejected")
-	var fake := FakeRenderer.new()
-	_check(s30.bind_renderer(fake, Vector2(800, 600)) == false, "M11-30: partial fake configure object rejected")
-	_check(fake.configure_calls == 0, "M11-30: fake renderer.configure never called")
-	# Good binding still drives presentation: reset reconfigures the real one.
+	var fake30 := FakeRenderer.new()
+	_check(s30.bind_renderer(fake30, Vector2(800, 600)) == false, "M11-30: partial fake configure object rejected")
+	_check_eq(fake30.configure_calls, 0, "M11-30: partial fake configure never called")
+	_check_eq(spy30.configure_calls, pre30, "M11-30: valid binding untouched by malformed replacements (no extra configure)")
+	# reset -> ORIGINAL valid binding survived: configure increments exactly once
 	s30.reset()
-	_check(good_renderer.get_cell_size() > 0, "M11-30: valid binding preserved after malformed rejections")
-	# Explicit null unbind returns true.
+	_check_eq(spy30.configure_calls, pre30 + 1, "M11-30: prior valid binding survived (reset increments spy exactly once)")
+	# null unbind then reset -> spy NOT reconfigured
+	var post_unbind30: int = spy30.configure_calls
 	_check(s30.bind_renderer(null) == true, "M11-30: null explicitly unbinds")
-	good_renderer.free()
+	s30.reset()
+	_check_eq(spy30.configure_calls, post_unbind30, "M11-30: after null unbind, reset does not reconfigure the old spy")
+	spy30.free()
+	fake30 = null
 
-	# ==== 31. Renderer size boundary is fail-closed (F-M11-STRICT-003) ====
+	# ==== 31. Invalid renderer-size direct observability (V06 §4) ====
+	# Counting spy proves configure_calls does NOT change for any invalid size,
+	# on BOTH axes. No is_inside_tree() evidence.
 	var s31 := GameplaySession.new()
 	s31.load_level(path_3x2)
-	var r31 := BoardRenderer.new()
-	_check(s31.bind_renderer(r31, Vector2(NAN, 100)) == false, "M11-31: NaN size rejected")
-	_check(s31.bind_renderer(r31, Vector2(INF, 100)) == false, "M11-31: +INF size rejected")
-	_check(s31.bind_renderer(r31, Vector2(-INF, 100)) == false, "M11-31: -INF size rejected")
-	_check(s31.bind_renderer(r31, Vector2(0, 0)) == false, "M11-31: zero size rejected")
-	_check(s31.bind_renderer(r31, Vector2(-10, -10)) == false, "M11-31: negative size rejected")
-	_check(r31.get_cell_size() <= 0 or not r31.is_inside_tree(), "M11-31: no invalid geometry reached renderer (never configured)")
-	# A valid size still binds after the rejections.
-	_check(s31.bind_renderer(r31, Vector2(640, 480)) == true, "M11-31: valid size binds after rejections")
-	_check(r31.get_cell_size() > 0, "M11-31: valid geometry produced only from valid size")
-	r31.free()
+	var spy31 := PaletteSpyRenderer.new()
+	var invalid_sizes := [
+		Vector2(NAN, 100), Vector2(100, NAN),
+		Vector2(INF, 100), Vector2(100, INF),
+		Vector2(-INF, 100), Vector2(100, -INF),
+		Vector2(0, 100), Vector2(100, 0),
+		Vector2(-10, 100), Vector2(100, -10),
+	]
+	for sz in invalid_sizes:
+		_check(s31.bind_renderer(spy31, sz) == false, "M11-31: invalid size %s rejected" % str(sz))
+	_check_eq(spy31.configure_calls, 0, "M11-31: no invalid size ever reached renderer.configure")
+	# preservation: bind valid size A, then attempt invalid-size bind of ANOTHER
+	# real renderer; the replacement must never configure, and A must survive.
+	_check(s31.bind_renderer(spy31, Vector2(640, 480)) == true, "M11-31: valid size A binds")
+	_check_eq(spy31.configure_calls, 1, "M11-31: spy A configured once on valid bind")
+	var a_count31: int = spy31.configure_calls
+	var spy31b := PaletteSpyRenderer.new()
+	_check(s31.bind_renderer(spy31b, Vector2(NAN, NAN)) == false, "M11-31: invalid-size replacement renderer rejected")
+	_check_eq(spy31b.configure_calls, 0, "M11-31: invalid-size replacement renderer never configured")
+	s31.reset()
+	_check_eq(spy31.configure_calls, a_count31 + 1, "M11-31: original renderer A survived (reset increments it)")
+	_check_eq(spy31.last_size, Vector2(640, 480), "M11-31: original renderer A last_size remains size A")
+	spy31.free()
+	spy31b.free()
 
-	# ==== 32. Freed/stale bound renderer lifecycle (F-M11-STRICT-004) ====
-	# bind -> load -> free renderer -> reset succeeds headlessly, fresh BoardState.
+	# ==== 32. Freed renderer lifecycle + fresh-renderer reuse (V06 §5) ====
 	var s32 := GameplaySession.new()
 	var r32 := BoardRenderer.new()
 	s32.bind_renderer(r32, Vector2(800, 600))
@@ -2452,6 +2516,14 @@ func _run_gameplay_session_tests() -> void:
 	_check(r32reset.ok, "M11-32: reset succeeds after bound renderer freed")
 	_check_eq(s32.get_state(), GameplaySession.State.READY, "M11-32: READY after reset with freed renderer")
 	_check(s32.get_board_state() != bs32_pre, "M11-32: reset produced fresh BoardState after freed renderer")
+	# after stale renderer dropped, bind a fresh real counting renderer + reset
+	var spy32 := PaletteSpyRenderer.new()
+	_check(s32.bind_renderer(spy32, Vector2(800, 600)) == true, "M11-32: fresh renderer binds after stale drop")
+	_check_eq(spy32.configure_calls, 1, "M11-32: fresh renderer configured on bind (session still valid)")
+	s32.reset()
+	_check_eq(spy32.configure_calls, 2, "M11-32: fresh renderer reconfigured on reset")
+	_check_eq(s32.get_state(), GameplaySession.State.READY, "M11-32: session READY after fresh renderer reset")
+	spy32.free()
 	# bind -> free renderer -> replacement load succeeds.
 	var s32b := GameplaySession.new()
 	var r32b := BoardRenderer.new()
@@ -2461,19 +2533,35 @@ func _run_gameplay_session_tests() -> void:
 	_check(r32bload.ok, "M11-32: valid level load succeeds after bound renderer freed")
 	_check_eq(s32b.get_state(), GameplaySession.State.READY, "M11-32: READY after load with freed renderer")
 
-	# ==== 33. Presentation cannot alias source palette (F-M11-STRICT-005) ====
+	# ==== 33. Palette isolation across configure/rebind/reset (V06 §6) ====
 	var s33 := GameplaySession.new()
-	var r33 := PaletteSpyRenderer.new()
-	s33.bind_renderer(r33, Vector2(800, 600))
 	s33.load_level(rect_path)
 	var src_palette33: PackedStringArray = s33.get_level_data().palette.duplicate()
-	# Renderer received a detached palette copy on configure; mutating it must
-	# not affect the session source.
-	if r33.last_palette != null and r33.last_palette.size() > 0:
-		r33.last_palette[0] = "#00000000"
-	s33.reset()  # reconfigure
-	_check_eq(s33.get_level_data().palette, src_palette33, "M11-33: source palette unchanged after renderer mutates its copy + reset")
-	r33.free()
+	# bind real spy A -> receives detached palette
+	var spyA33 := PaletteSpyRenderer.new()
+	s33.bind_renderer(spyA33, Vector2(800, 600))
+	_check(spyA33.last_palette != null and spyA33.last_palette == src_palette33, "M11-33: spy A initial configure receives original-valued detached palette")
+	# mutate spy A retained palette in-place -> source unchanged
+	if spyA33.last_palette.size() > 0:
+		spyA33.last_palette[0] = "#00000000"
+	_check_eq(s33.get_level_data().palette, src_palette33, "M11-33: mutating spy A palette does not change source")
+	# rebind to spy B -> source still original
+	var spyB33 := PaletteSpyRenderer.new()
+	s33.bind_renderer(spyB33, Vector2(800, 600))
+	_check_eq(s33.get_level_data().palette, src_palette33, "M11-33: rebind to spy B does not change source")
+	_check(spyB33.last_palette == src_palette33, "M11-33: spy B receives original-valued detached palette on rebind")
+	# mutate spy B retained palette in-place, then reset
+	if spyB33.last_palette.size() > 0:
+		spyB33.last_palette[0] = "#11111111"
+	var b_calls33: int = spyB33.configure_calls
+	s33.reset()
+	_check_eq(s33.get_level_data().palette, src_palette33, "M11-33: source palette unchanged after spy B mutation + reset")
+	_check_eq(spyB33.configure_calls, b_calls33 + 1, "M11-33: spy B reconfigured on reset")
+	_check(spyB33.last_palette == src_palette33, "M11-33: spy B reconfigure receives fresh original-valued palette")
+	# never a LevelData object handed to renderer
+	_check(not (spyB33.last_board is LevelData), "M11-33: renderer last_board is BoardState, never a LevelData object")
+	spyA33.free()
+	spyB33.free()
 
 	# ==== 29. Prior checks remain green (verified by running entire suite) ====
 	# (implicit — all test functions run together, _print_summary reports total)
