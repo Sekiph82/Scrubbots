@@ -762,3 +762,6 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - M16 strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_STRICT_REAUDIT_V02.md — **CHANGES_REQUIRED**, blocked by M15.
 - M17 production strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_STRICT_REAUDIT_V02.md — **CHANGES_REQUIRED**, blocked by M16.
 - M19 remains IMPLEMENTED_BUT_AUDIT_BLOCKED until the corrected upstream chain is audited.
+
+
+- Progress with strict upstream reopens: **266/943 = 28.21%** overall; **266/719 = 37.00%** main + SB-UI.
