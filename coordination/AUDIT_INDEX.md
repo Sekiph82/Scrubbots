@@ -117,3 +117,6 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 
 
 | M18-C001 strict-v2 re-audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_STRICT_REAUDIT_V02.md | `CHANGES_REQUIRED` | Raised audit standard found three issues missed by V01: assign re-entry can replace an active/completed/cancelled agent assignment; large-delta test did not prove a segment boundary was crossed; performance timing mixed route generation with agent lifecycle and could not support pooling evidence. |
+
+
+| AL-039 | Upstream gate ordering | Downstream implementation can arrive after an upstream milestone is reopened, especially when an already-issued prompt was still running. | Preserve the downstream commit/log, but mark it IMPLEMENTED_BUT_AUDIT_BLOCKED. Do not audit/close downstream tasks until the upstream correction passes; then re-sync and rerun downstream against the corrected dependency before auditing it. | M18 strict-v2 reopen / M19-C001 V01, 2026-09-07 |
