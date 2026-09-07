@@ -714,3 +714,6 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - ChatGPT independently inspected implementation/test code; Godot was not independently rerun.
 - SB-M18-001..015: **CLOSED**.
 - M19 may now open.
+
+
+- Progress after M18: **278/943 = 29.48%** overall; **278/719 = 38.66%** main + SB-UI.
