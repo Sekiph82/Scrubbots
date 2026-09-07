@@ -1,3 +1,12 @@
+### M16 V02 strict audit result
+
+- Verdict: **CHANGES_REQUIRED**
+- V02 fixed its named defects, but strict audit found a new malformed non-null request/board boundary defect.
+- READY now: **M16-C001 V03**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_PROMPT_V03.md
+- M17 remains blocked.
+- Progress: **257/943 = 27.25%**.
+
 - Progress with strict upstream reopens: **266/943 = 28.21%** overall; **266/719 = 37.00%** main + SB-UI.
 
 ### Strict upstream repair queue
