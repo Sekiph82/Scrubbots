@@ -183,3 +183,6 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 | FOUNDATION-STRICT-001 | coordination/STRICT_FOUNDATION_REPAIR_QUEUE_V01.md | `HIGH-RISK VALIDATION GAP` | BoardState.set_cell_state must adversarially reject non-canonical states 2/-1/255 with false + no mutation; promote to concrete M02 defect if Godot accepts them. |
 
 | M12-C001 V03 independent audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V03.md | `CHANGES_REQUIRED / VALIDATION_HARDENING_REQUIRED` | F-M12-STRICT-001/002 production implementation source-accepted; V03 missed direct configure/state/aliasing sensitivity criteria, so V04 validation-only closure pass issued. |
+
+| M12-C001 V04 strict final audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_AUDIT_V04.md | `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE` | Auditor-authored V04 validation pass closed frozen F-M12-STRICT-001/002; production source unchanged from V03. |
+| M13-C001 full-surface re-audit V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_FULL_SURFACE_REAUDIT_V02.md | `CHANGES_REQUIRED / FINDING_SET_FROZEN` | Frozen F-M13-STRICT-001 dependency boundary, F-M13-STRICT-002 unknown-state handling across sync/rebuild, and F-M13-STRICT-003 exclusion Variant boundary. |
