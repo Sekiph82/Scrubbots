@@ -149,3 +149,8 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 | M13-C001 strict-v2 re-audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_STRICT_REAUDIT_V01.md | CHANGES_REQUIRED | Malformed BoardState bind acceptance plus unknown-state-to-CLEARED fallthrough. |
 | M14-C001 strict-v2 re-audit V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M14-C001/CHATGPT_STRICT_REAUDIT_V02.md | CHANGES_REQUIRED | Malformed BoardState bind acceptance plus destructive repeated bind clearing live reservations. |
 | M15-C001 V02 strict final audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CHATGPT_AUDIT_V02.md | AUDITED_PASS | F-M15-STRICT-001/002/003 closed by fail-closed dependency contracts, exact BoardState coherence and same-owner contention re-check. |
+
+
+| AL-052 | Non-null contract object shape | Numeric/content validation is insufficient when an untyped contract entry accepts arbitrary non-null objects; field/method access can fault before validation. | Validate exact type or narrow required API shape before dereferencing request/board objects. Add partial-API doubles so rejection is proven before the missing call. | M16-C001 strict V02 audit, 2026-09-07 |
+
+| M16-C001 V02 independent audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V02.md | `CHANGES_REQUIRED` | V02 closed NaN/INF, route-point, result-coherence and non-bool-access findings, but strict audit found malformed non-null request/board shape still faults before fail-closed validation. |
