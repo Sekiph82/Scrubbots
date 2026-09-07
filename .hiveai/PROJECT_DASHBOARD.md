@@ -1,8 +1,9 @@
-### M17 final pass / M11 frozen V05
+### M11 V05 audit / V06 validation frontier
 
 - M17-C002 V03: **AUDITED_PASS / final closed**
-- READY now: **M11-C001 V05**
-- M11 V05 is based on a full attack-surface sweep with a frozen finding set.
+- M11-C001 V05: **CHANGES_REQUIRED / VALIDATION_HARDENING_REQUIRED**
+- READY now: **M11-C001 V06**
+- V05 production source is accepted; V06 strengthens direct-observability/sensitivity tests for the same frozen finding set.
 - M12-M14 remain foundation-blocked in sequence.
 - M19 remains audit-blocked until foundation repairs close.
 - Progress: **265/943 = 28.10%** overall; **265/719 = 36.86%** main + UI.
@@ -716,3 +717,25 @@ Tracking sources:
 | Canonical progress | 257/943 = 27.25% |
 | Main + UI | 257/719 = 35.74% |
 | Godot independent rerun by ChatGPT | unavailable; Claude runtime evidence remains E1/E2 |
+
+
+## 2026-09-07 — M11 V05 audit / V06 current strict frontier
+
+| Field | Value |
+| --- | --- |
+| Current foundation repair | M11-C001 V06 |
+| State | CHANGES_REQUIRED / VALIDATION_HARDENING / READY |
+| Next actor | CLAUDE |
+| V05 implementation | `bcd4ac50df30df95fb11b87dd111ff865029cb10` |
+| Claude runtime | 1835 / 1835 ALL PASS (E1/E2) |
+| ChatGPT independent Godot rerun | unavailable |
+| V05 audit | coordination/sessions/M11-C001/CHATGPT_AUDIT_V05.md |
+| Active prompt | coordination/sessions/M11-C001/CHATGPT_PROMPT_V06.md |
+| Active criteria | coordination/sessions/M11-C001/CHATGPT_AUDIT_CRITERIA_V06.md |
+| Expected log | coordination/sessions/M11-C001/CLAUDE_LOG_V06.md |
+| Production finding set | unchanged: F-M11-STRICT-001..005 |
+| Remaining issue class | validation sensitivity / direct observability only; no new material production bug found |
+| M12-M14 | blocked in foundation sequence |
+| M19 | audit-blocked until foundation queue closes |
+| Canonical progress | 265/943 = 28.10% |
+| Main + UI | 265/719 = 36.86% |
