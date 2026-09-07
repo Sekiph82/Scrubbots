@@ -1,3 +1,11 @@
+### Strict audit v2 / M18 re-audit
+
+- Audit standard upgraded: critical milestones require a ChatGPT-authored adversarial validation pass before final closure when ChatGPT cannot independently run the runtime.
+- M18 strict re-audit: **CHANGES_REQUIRED**.
+- Reopened tasks: SB-M18-001, 006, 014, 015.
+- V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_PROMPT_V02.md
+- M19 is **PAUSED** until M18 V02 passes.
+
 ### M19-C001 V01 milestone opening
 
 - State: **ISSUED**
