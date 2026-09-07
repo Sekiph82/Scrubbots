@@ -703,3 +703,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Scope: lightweight agent movement over an already-assigned production route; no Dispatcher/vertical-slice wiring.
 - State: ISSUED; next actor CLAUDE.
 - Owner workflow note: use a fresh Claude chat for this new milestone.
+
+
+## M18-C001 final independent audit
+
+- Status: **AUDITED_PASS / COMPLETE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_AUDIT_V01.md
+- Accepted: lightweight ScrubbotAgent, board-local route movement, once-only completion, reset/cancel, despawn seam, no return/carrying, 5/10/25/40-agent stress.
+- Claude evidence: **1483/1483 ALL PASS**.
+- ChatGPT independently inspected implementation/test code; Godot was not independently rerun.
+- SB-M18-001..015: **CLOSED**.
+- M19 may now open.
