@@ -790,3 +790,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - V03 prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_PROMPT_V03.md
 - M17 remains blocked.
 - Progress unchanged at **257/943 = 27.25%**.
+
+
+## M16-C001 V03 independent audit
+
+- Verdict: **CHANGES_REQUIRED**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V03.md
+- V03 successfully closed malformed object-shaped request/board boundaries.
+- New F-M16-STRICT-005: scalar/non-object Variant inputs remain unsafe/unproven for board/result/access-query boundaries.
+- V04 prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_PROMPT_V04.md
+- M17 remains blocked.
+- Progress unchanged at **257/943 = 27.25%**.
