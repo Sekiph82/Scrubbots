@@ -654,7 +654,32 @@ absence of proof of reachability is treated as unreachable.
 - The selector owns no mutable collection it hands out (no state leakage,
   AL-020); it mutates only `ReservationState` via its public `reserve()`.
 
-**Status**: Accepted (M15).
+**Strict-v2 amendment (M15-C001 V02, F-M15-STRICT-001/002/003):**
+
+- **Fail-closed bind (AL: STRICT-001)**: `bind()` validates that each non-null
+  dependency implements the narrow API M15 actually calls (board:
+  `is_valid_index`/`get_cell_state`/`get_color_id`; candidate: `get_candidates`/
+  `is_bound_to`; reservation: `reserve`/`get_target_for_owner`/
+  `get_reserved_indices`/`is_reserved`/`is_bound_to`). A malformed non-null
+  dependency is rejected at the boundary; any failed bind clears all refs and
+  leaves the selector UNBOUND, so stale dependencies can never be reused.
+- **Same-BoardState coherence (STRICT-002)**: `ColorCandidateIndex` and
+  `ReservationState` expose a read-only exact-identity seam `is_bound_to(board)`
+  (reference identity, not equal dimensions/content; no mutable board reference
+  is ever exposed). `bind()` requires both siblings to be bound to the SAME
+  board instance, and `select_and_reserve()` re-checks this on EVERY call, so a
+  sibling rebound to a different board after bind fails closed (no candidate
+  work, no reservation) instead of validating target index N against the wrong
+  board.
+- **Same-owner contention re-check (STRICT-003)**: after any lost `reserve()`,
+  the selector re-checks `get_target_for_owner(owner_id)`. If an access-query
+  side effect assigned the SAME owner another target between access approval and
+  the reserve attempt, selection stops immediately with a clean no-new-target —
+  it does not query later candidates or create a second reservation.
+  Different-owner contention (requester still unassigned) still continues to the
+  next candidate as before.
+
+**Status**: Accepted (M15); amended under Strict Audit Standard v2 (M15-C001 V02).
 
 ### ADR-024: RoutingSystem interface — board-local route contract with injected access seam
 

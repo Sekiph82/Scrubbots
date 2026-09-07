@@ -88,6 +88,7 @@ func _initialize() -> void:
 	_run_reservation_state_performance()
 	_run_target_selector_tests()
 	_run_target_selector_simultaneous_tests()
+	_run_target_selector_strict_v02_tests()
 	_run_target_selector_benchmark()
 	_run_route_request_tests()
 	_run_route_result_tests()
@@ -3284,6 +3285,7 @@ func _run_target_selector_tests() -> void:
 	b_stale.set_cell_state(2, CLEARED)                          # idx2 CLEARED
 	var rs_stale = ReservationState.create(); rs_stale.bind(b_stale)
 	var cd = CandidateIndexDouble.new()
+	cd.bind(b_stale) # strict-v2: pass the selector's board-coherence gate.
 	# Inject: wrong-color idx1, CLEARED idx2, invalid idx99, then the only valid idx0.
 	cd.set_candidates(COLOR, [1, 2, 99, 0])
 	var ts_stale = TargetSelector.create(); ts_stale.bind(b_stale, cd, rs_stale)
@@ -3380,6 +3382,100 @@ func _run_target_selector_simultaneous_tests() -> void:
 	_check_eq(rs3.get_owner(1), 10, "M15-29 unassigned owner ended up owning the next candidate 1")
 
 	print("  M15 TargetSelector simultaneous-assignment tests complete")
+
+func _run_target_selector_strict_v02_tests() -> void:
+	# Strict Audit Standard v2 corrections for M15 (F-M15-STRICT-001/002/003).
+	print("---- M15 strict-v2: fail-closed bind, board coherence, same-owner contention ----")
+	var COLOR := 5
+
+	# ============ F-M15-STRICT-001: malformed non-null dependency fail-closed ==
+	var b = _make_colored_board(3, 1, [COLOR, COLOR, COLOR])
+	var ci = ColorCandidateIndex.create(); ci.bind(b)
+	var rs = ReservationState.create(); rs.bind(b)
+
+	# A non-null object lacking the narrow required API must be rejected at bind.
+	var junk = RefCounted.new() # implements none of the required methods.
+	var ts_bad = TargetSelector.create()
+	_check_eq(ts_bad.bind(junk, ci, rs), false, "STRICT-001: malformed non-null BoardState rejected")
+	_check_eq(ts_bad.is_bound(), false, "STRICT-001: selector stays unbound after malformed board")
+	_check_eq(ts_bad.bind(b, junk, rs), false, "STRICT-001: malformed non-null candidate index rejected")
+	_check_eq(ts_bad.bind(b, ci, junk), false, "STRICT-001: malformed non-null reservation state rejected")
+	# No runtime call escaped: a fully-unbound selector selects nothing safely.
+	var aq_bad = AccessQueryDouble.new(); aq_bad.default_targetable = true
+	_check_eq(ts_bad.select_and_reserve(COLOR, 1, aq_bad), -1, "STRICT-001: unbound selector selects nothing (no escaped call)")
+
+	# Failed bind after a VALID bind must neutralize the prior refs (stale-unusable).
+	var ts_stale = TargetSelector.create()
+	_check(ts_stale.bind(b, ci, rs), "STRICT-001: precondition valid bind succeeds")
+	_check(ts_stale.select_and_reserve(COLOR, 2, aq_bad) != -1, "STRICT-001: precondition valid selection works")
+	_check_eq(ts_stale.bind(junk, ci, rs), false, "STRICT-001: subsequent malformed bind fails")
+	_check_eq(ts_stale.is_bound(), false, "STRICT-001: failed re-bind clears bound state")
+	_check_eq(ts_stale.select_and_reserve(COLOR, 3, aq_bad), -1, "STRICT-001: stale prior refs are not reusable after failed bind")
+
+	# ============ F-M15-STRICT-002: same-BoardState coherence ==================
+	# Two DIFFERENT boards with identical dimensions/content.
+	var bA = _make_colored_board(3, 1, [COLOR, COLOR, COLOR])
+	var bB = _make_colored_board(3, 1, [COLOR, COLOR, COLOR])
+	_check(bA != bB, "STRICT-002: two same-size boards are distinct instances")
+
+	# is_bound_to is exact identity, returns bool, exposes no board reference.
+	var ciA = ColorCandidateIndex.create(); ciA.bind(bA)
+	var rsA = ReservationState.create(); rsA.bind(bA)
+	_check(ciA.is_bound_to(bA), "STRICT-002: candidate is_bound_to true for its own board")
+	_check(not ciA.is_bound_to(bB), "STRICT-002: candidate is_bound_to false for a same-size other board")
+	_check(rsA.is_bound_to(bA) and not rsA.is_bound_to(bB), "STRICT-002: reservation is_bound_to is exact identity")
+	_check_eq(typeof(ciA.is_bound_to(bA)), TYPE_BOOL, "STRICT-002: coherence API returns a bool")
+	_check(not ciA.has_method("get_board"), "STRICT-002: candidate exposes no mutable board getter")
+	_check(not rsA.has_method("get_board"), "STRICT-002: reservation exposes no mutable board getter")
+
+	# Mismatched deps at bind time fail closed.
+	var ciB = ColorCandidateIndex.create(); ciB.bind(bB)
+	var rsB = ReservationState.create(); rsB.bind(bB)
+	var ts_mm = TargetSelector.create()
+	_check_eq(ts_mm.bind(bA, ciB, rsA), false, "STRICT-002: candidate bound to a different same-size board fails bind")
+	_check_eq(ts_mm.bind(bA, ciA, rsB), false, "STRICT-002: reservation bound to a different same-size board fails bind")
+
+	# Post-bind candidate rebind -> selection fails closed (re-checked per call).
+	var ci_r = ColorCandidateIndex.create(); ci_r.bind(bA)
+	var rs_r = ReservationState.create(); rs_r.bind(bA)
+	var ts_r = TargetSelector.create()
+	_check(ts_r.bind(bA, ci_r, rs_r), "STRICT-002: valid bind on board A")
+	_check(ts_r.select_and_reserve(COLOR, 20, aq_bad) != -1, "STRICT-002: selection works while coherent")
+	ci_r.rebind(bB) # sibling rebound to a different board after selector bind.
+	_check_eq(ts_r.select_and_reserve(COLOR, 21, aq_bad), -1, "STRICT-002: candidate rebind to board B makes selection fail closed")
+
+	# Post-bind reservation rebind -> selection fails closed.
+	var ci_r2 = ColorCandidateIndex.create(); ci_r2.bind(bA)
+	var rs_r2 = ReservationState.create(); rs_r2.bind(bA)
+	var ts_r2 = TargetSelector.create()
+	_check(ts_r2.bind(bA, ci_r2, rs_r2), "STRICT-002: second valid bind on board A")
+	rs_r2.rebind(bB)
+	_check_eq(ts_r2.select_and_reserve(COLOR, 22, aq_bad), -1, "STRICT-002: reservation rebind to board B makes selection fail closed")
+
+	# ============ F-M15-STRICT-003: SAME-owner contention re-check ============
+	var bc = _make_colored_board(3, 1, [COLOR, COLOR, COLOR])
+	var cic = ColorCandidateIndex.create(); cic.bind(bc)
+	var rsc = ReservationState.create(); rsc.bind(bc)
+	var tsc = TargetSelector.create(); tsc.bind(bc, cic, rsc)
+	var aqc = AccessQueryDouble.new(); aqc.default_targetable = true
+	var OWNER := 42
+	# Side effect on the FIRST access query: the SAME owner synchronously acquires
+	# ANOTHER valid target (index 1) before the selector's reserve(0) executes.
+	var fired := [false]
+	aqc.on_query = func(index):
+		if not fired[0]:
+			rsc.reserve(1, OWNER) # same owner grabs a different valid target.
+			fired[0] = true
+	var selc = tsc.select_and_reserve(COLOR, OWNER, aqc)
+	_check_eq(selc, -1, "STRICT-003: reserve(0) loses because owner already assigned -> clean no-new-target")
+	_check(aqc.was_queried(0), "STRICT-003: first candidate was access-queried")
+	_check(not aqc.was_queried(1), "STRICT-003: later candidate 1 is NOT queried after owner becomes assigned")
+	_check(not aqc.was_queried(2), "STRICT-003: later candidate 2 is NOT queried")
+	_check_eq(rsc.get_target_for_owner(OWNER), 1, "STRICT-003: only the side-effect reservation (target 1) is owned by X")
+	_check_eq(rsc.get_reservation_count(), 1, "STRICT-003: selector created NO additional reservation")
+	_check_eq(rsc.get_owner(0), -1, "STRICT-003: contested target 0 remains unreserved")
+
+	print("  M15 strict-v2 tests complete")
 
 func _run_target_selector_benchmark() -> void:
 	# 59x59 = 3481 cells, all color 0, all ACTIVE (test 30 rectangular below; test 31).
