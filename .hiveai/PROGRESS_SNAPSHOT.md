@@ -489,3 +489,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - M16-C001 V04 is READY.
 - M17 remains blocked.
 - Progress unchanged: **257 / 943 = 27.25%** overall; **257 / 719 = 35.74%** main+UI.
+
+
+### M16-C001 V04 full-surface audit
+
+- Verdict: **CHANGES_REQUIRED / FINDING_SET_FROZEN**.
+- V04 scalar validator boundary fix accepted.
+- Frozen remaining M16 set: F-M16-STRICT-006/007/008.
+- M16-C001 V05 is READY as one comprehensive correction.
+- M17 remains blocked.
+- Progress unchanged: **257 / 943 = 27.25%** overall; **257 / 719 = 35.74%** main+UI.
