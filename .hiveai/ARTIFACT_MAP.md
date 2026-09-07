@@ -163,3 +163,16 @@ Strict repair sequence: https://github.com/Sekiph82/Scrubbots/blob/main/coordina
 | V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_CRITERIA_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CLAUDE_LOG_V02.md | PENDING | BLOCKED_BY_M15 |
 
 | V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_AUDIT_CRITERIA_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CLAUDE_LOG_V02.md | PENDING | BLOCKED_BY_M16 |
+
+
+## 2026-09-07 strict-v2 artifacts
+
+- M10 strict: coordination/sessions/M10-C001/CHATGPT_STRICT_REAUDIT_V01.md
+- M11 strict: coordination/sessions/M11-C001/CHATGPT_STRICT_REAUDIT_V01.md
+- M12 strict: coordination/sessions/M12-C001/CHATGPT_STRICT_REAUDIT_V01.md
+- M13 strict: coordination/sessions/M13-C001/CHATGPT_STRICT_REAUDIT_V01.md
+- M14 strict: coordination/sessions/M14-C001/CHATGPT_STRICT_REAUDIT_V02.md
+- M15 final V02 audit: coordination/sessions/M15-C001/CHATGPT_AUDIT_V02.md
+- Foundation queue: coordination/STRICT_FOUNDATION_REPAIR_QUEUE_V01.md
+- Active M16 prompt: coordination/sessions/M16-C001/CHATGPT_PROMPT_V02.md
+- Active M16 criteria: coordination/sessions/M16-C001/CHATGPT_AUDIT_CRITERIA_V02.md
