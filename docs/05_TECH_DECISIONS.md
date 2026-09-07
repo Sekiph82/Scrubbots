@@ -843,3 +843,51 @@ mover. M18 consumes a finished route and does not care how it was computed
   of scope.
 
 **Status**: Accepted (M18-C001).
+
+### ADR-027: ScrubbotDispatcher — orchestration-only, routing-backed reachability, monotonic owner ids
+
+**Context**: M19 needs one place that turns a slot/color request into at most one
+in-flight ScrubbotAgent, wiring the already-separate systems (TargetSelector
+ADR-023, RoutingSystem ADR-024/025, ReservationState ADR-022, ScrubbotAgent
+ADR-026) without collapsing any boundary. Three durable decisions had to be
+made.
+
+**Decision**:
+
+- `scripts/gameplay/dispatch/scrubbot_dispatcher.gd` (a `Node`) is
+  ORCHESTRATION ONLY. It selects nothing (TargetSelector), computes no route
+  geometry (RoutingSystem), stores no reservation (ReservationState), carries no
+  color as a resource. Canonical flow: `select_and_reserve` → build
+  `RouteRequest` → `compute_route` → on route failure release the reservation and
+  spawn nothing (no retarget) → on success instantiate exactly one agent and
+  `assign()` → on assign failure release + free + spawn nothing. One request
+  yields at most one agent (locked one-by-one flow).
+- Reachability truth for selection is the SAME production routing that will move
+  the bot: `scripts/gameplay/dispatch/production_target_access.gd` implements the
+  TargetSelector `is_targetable()` seam by asking `ProductionRoutingSystem` for a
+  route from the slot origin. This avoids a second, independently-drifting
+  reachability BFS — if routing can reach it, it is targetable. The winning
+  target's route is memoized so the dispatcher reuses it (one routing
+  computation per successful dispatch, not two).
+- Owner/assignment ids are a dedicated monotonic counter (never a color/slot/
+  target id) that is NEVER restarted, not even on reset, so a delayed/stale
+  agent completion can never collide with a fresh assignment.
+- M19 observes agent completion for lifecycle bookkeeping only. It does NOT clear
+  BoardState, release a successful reservation, or score — the arrived agent and
+  its held reservation are preserved so M20 can resolve arrival. `reset()`
+  cancels/frees every active agent, releases dispatcher-owned reservations, and
+  clears bookkeeping without mutating BoardState or restarting the id counter.
+
+**Reason**: preserves every existing boundary (ADR-022/023/024/025/026) while
+giving M20 a single, testable seam to wire arrival → clear → candidate sync →
+reservation resolution. Using routing as the sole reachability oracle keeps
+"targetable" and "routable" from disagreeing.
+
+**Consequences**:
+
+- New `scripts/gameplay/dispatch/` module: `scrubbot_dispatcher.gd`,
+  `dispatch_result.gd`, `production_target_access.gd`.
+- Cell clearing, arrival resolution, and scoring remain M20.
+- No pooling added; rapid-dispatch profiling (headless CPU) did not justify it.
+
+**Status**: Accepted (M19-C001).
