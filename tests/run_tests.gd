@@ -38,6 +38,7 @@ const RouteAccessQueryDouble = preload("res://tests/support/route_access_query_d
 const RouteNonBoolAccessQueryDouble = preload("res://tests/support/route_nonbool_access_double.gd")
 const PartialBoardDouble = preload("res://tests/support/partial_board_double.gd")
 const WrongReturnBoardDouble = preload("res://tests/support/wrong_return_board_double.gd")
+const M13MalformedBoardDouble = preload("res://tests/support/m13_malformed_board_double.gd")
 const RouteFakeStraight = preload("res://tests/support/route_fake_straight.gd")
 const RouteFakeRelay = preload("res://tests/support/route_fake_relay.gd")
 const FakeRenderer = preload("res://tests/support/fake_renderer.gd")
@@ -3218,7 +3219,149 @@ func _run_color_candidate_index_tests() -> void:
 	_check_eq(naive_hits, 3, "M13-23 sensitivity: naive loop found the 3 color-0 ACTIVE cells")
 
 	_run_m13_v02_formal_validation()
+	_run_m13_v03_strict_validation()
 	print("  M13 ColorCandidateIndex tests complete")
+
+## M13-C001 V03 frozen strict closure: F-M13-STRICT-001 (dependency boundary +
+## transactional build), F-M13-STRICT-002 (unknown cell state), F-M13-STRICT-003
+## (excluded/reserved Variant seam). Criteria V03 items 1-82.
+func _run_m13_v03_strict_validation() -> void:
+	var CLEARED := BoardState.CellState.CLEARED
+
+	# --- Dependency boundary: unsupported Variants rejected before any call ---
+	# (criteria 1-5, 9, 10) — int/String/Vector2/RefCounted/partial-API board.
+	var bad_boards := [7, "board", Vector2(1, 1), RefCounted.new(), PartialBoardDouble.new()]
+	for bad in bad_boards:
+		var ix := ColorCandidateIndex.create()
+		_check_eq(ix.bind(bad), false, "M13V3-001 malformed board %s bind rejected" % str(typeof(bad)))
+		_check_eq(ix.is_bound(), false, "M13V3-001 unbound after malformed board %s" % str(typeof(bad)))
+		_check_eq(ix.get_candidates(0), [], "M13V3-001 no candidates after malformed board %s" % str(typeof(bad)))
+		_check_eq(ix.has_candidates(0), false, "M13V3-001 has_candidates false after malformed %s" % str(typeof(bad)))
+		_check_eq(ix.count_candidates(0), 0, "M13V3-001 count 0 after malformed %s" % str(typeof(bad)))
+		_check_eq(ix.get_color_ids(), [], "M13V3-001 no color ids after malformed %s" % str(typeof(bad)))
+
+	# --- Wrong-return-type dependency truth rejected during build (6,7,8,20) ---
+	var wc := M13MalformedBoardDouble.new(); wc.count_type_wrong = true
+	_check_eq(ColorCandidateIndex.create().bind(wc), false, "M13V3-001 wrong get_cell_count return rejected")
+	var ws := M13MalformedBoardDouble.new(); ws.state_type_wrong = true
+	_check_eq(ColorCandidateIndex.create().bind(ws), false, "M13V3-001 wrong get_cell_state return rejected")
+	var wk := M13MalformedBoardDouble.new(); wk.color_type_wrong = true
+	_check_eq(ColorCandidateIndex.create().bind(wk), false, "M13V3-001 wrong get_color_id return rejected")
+
+	# --- A valid compatible double still binds and builds exact truth (11,21) ---
+	var good := M13MalformedBoardDouble.new() # 4 ACTIVE cells, color 0
+	var gix := ColorCandidateIndex.create()
+	_check(gix.bind(good), "M13V3-001 valid compatible double binds")
+	_check_eq(gix.get_candidates(0), [0, 1, 2, 3], "M13V3-001 valid double builds exact ACTIVE truth")
+
+	# --- Malformed bind after valid state neutralizes; later valid recovers (12,13) ---
+	var recov := ColorCandidateIndex.create()
+	var vboard = _make_colored_board(3, 2, [0, 1, 0, 1, 0, 2])
+	recov.bind(vboard)
+	_check_eq(recov.get_candidates(0), [0, 2, 4], "M13V3-001 baseline valid bind before malformed")
+	_check_eq(recov.bind(12345), false, "M13V3-001 malformed bind after valid returns false")
+	_check_eq(recov.is_bound(), false, "M13V3-001 malformed bind after valid neutralized to unbound")
+	_check_eq(recov.get_candidates(0), [], "M13V3-001 no stale candidates after malformed bind")
+	_check(recov.bind(vboard), "M13V3-001 later valid bind recovers")
+	_check_eq(recov.get_candidates(0), [0, 2, 4], "M13V3-001 recovered truth exact")
+
+	# --- rebind semantics (14,15,16,17) ---
+	var rb := ColorCandidateIndex.create()
+	var boardA = _make_colored_board(2, 1, [5, 5])
+	var boardB = _make_colored_board(2, 1, [7, 7])
+	rb.bind(boardA)
+	_check_eq(rb.get_candidates(5), [0, 1], "M13V3-001 rebind baseline board A")
+	_check(rb.rebind(boardB), "M13V3-001 rebind A->B succeeds")
+	_check_eq(rb.get_candidates(5), [], "M13V3-001 rebind dropped board A truth")
+	_check_eq(rb.get_candidates(7), [0, 1], "M13V3-001 rebind installed board B truth")
+	_check_eq(rb.rebind(null), false, "M13V3-001 rebind(null) rejected")
+	_check_eq(rb.is_bound(), false, "M13V3-001 rebind(null) left unbound")
+	_check_eq(rb.rebind("x"), false, "M13V3-001 malformed rebind rejected")
+	_check_eq(rb.is_bound(), false, "M13V3-001 malformed rebind left unbound")
+	_check(rb.rebind(boardB), "M13V3-001 valid rebind recovers after failed rebind")
+
+	# --- Unknown cell state via sync_cell fails closed, not as CLEARED (22-28) ---
+	for unknown in [2, -1, 255, 99]:
+		var udbl := M13MalformedBoardDouble.new() # 4 ACTIVE color 0
+		var uix := ColorCandidateIndex.create()
+		_check(uix.bind(udbl), "M13V3-002 bind valid before unknown-state sync (%d)" % unknown)
+		_check_eq(uix.get_candidates(0), [0, 1, 2, 3], "M13V3-002 pre-sync truth (%d)" % unknown)
+		udbl.unknown_state_at = 2
+		udbl.unknown_state_value = unknown
+		_check_eq(uix.sync_cell(2), false, "M13V3-002 sync unknown state %d returns false" % unknown)
+		# fail-closed policy: cache invalidated, not "cell silently CLEARED"
+		_check_eq(uix.is_bound(), false, "M13V3-002 unknown-state sync neutralized cache (%d)" % unknown)
+		_check_eq(uix.get_candidates(0), [], "M13V3-002 fail-closed query after unknown state %d" % unknown)
+
+	# --- Unknown state during initial build fails, no partial buckets (29) ---
+	var ubuild := M13MalformedBoardDouble.new()
+	ubuild.unknown_state_at = 1
+	ubuild.unknown_state_value = 42
+	var ubix := ColorCandidateIndex.create()
+	_check_eq(ubix.bind(ubuild), false, "M13V3-002 initial build with unknown state fails")
+	_check_eq(ubix.is_bound(), false, "M13V3-002 unknown-state build left unbound")
+	_check_eq(ubix.get_candidates(0), [], "M13V3-002 no partial buckets after unknown-state build")
+
+	# --- Unknown state during rebuild fails, no partial commit; recovery (30,31,32) ---
+	var rdbl := M13MalformedBoardDouble.new() # valid
+	var rix := ColorCandidateIndex.create()
+	_check(rix.bind(rdbl), "M13V3-002 rebuild-path: valid bind first")
+	rdbl.unknown_state_at = 3
+	rdbl.unknown_state_value = 7
+	_check_eq(rix.rebuild(), false, "M13V3-002 rebuild with unknown state returns false")
+	_check_eq(rix.is_bound(), false, "M13V3-002 failed rebuild neutralized (no partial rebuilt truth)")
+	rdbl.unknown_state_at = -1 # restore canonical truth
+	_check(rix.bind(rdbl), "M13V3-002 recovery after canonical restoration")
+	_check_eq(rix.get_candidates(0), [0, 1, 2, 3], "M13V3-002 recovered exact truth")
+
+	# --- Exclusion container boundary (33-43) ---
+	var eb = _make_colored_board(3, 2, [0, 1, 0, 1, 0, 2]) # color 0 -> [0,2,4]
+	var eix := ColorCandidateIndex.create()
+	eix.bind(eb)
+	# supported containers with equivalent int sets agree (33,34,35,56)
+	var via_array: Array = eix.get_candidates(0, [2, 4])
+	var via_packed: Array = eix.get_candidates(0, PackedInt32Array([2, 4]))
+	var via_dict: Array = eix.get_candidates(0, {2: true, 4: "ignored"})
+	_check_eq(via_array, [0], "M13V3-003 Array exclusion -> [0]")
+	_check_eq(via_packed, [0], "M13V3-003 PackedInt32Array exclusion -> [0]")
+	_check_eq(via_dict, [0], "M13V3-003 Dictionary-key exclusion -> [0] (values ignored)")
+	# null = intentional no-exclusion contract (36)
+	_check_eq(eix.get_candidates(0, null), [0, 2, 4], "M13V3-003 null exclusion = no exclusion")
+	_check_eq(eix.has_candidates(0, null), true, "M13V3-003 null exclusion has work")
+	# unsupported containers fail closed, cache untouched (37-43)
+	var snap: Array = eix.get_candidates(0)
+	for badc in [7, 3.5, "24", true, Vector2(2, 4), RefCounted.new()]:
+		_check_eq(eix.get_candidates(0, badc), [], "M13V3-003 unsupported container %s -> []" % str(typeof(badc)))
+		_check_eq(eix.has_candidates(0, badc), false, "M13V3-003 unsupported container %s has false" % str(typeof(badc)))
+		_check_eq(eix.count_candidates(0, badc), 0, "M13V3-003 unsupported container %s count 0" % str(typeof(badc)))
+	_check_eq(eix.get_candidates(0), snap, "M13V3-003 unsupported containers did not mutate cache")
+
+	# --- Exclusion entry boundary (44-55,57) ---
+	_check_eq(eix.get_candidates(0, [2]), [0, 4], "M13V3-003 valid int exclusion works")
+	_check_eq(eix.get_candidates(0, [2, 2, 2]), [0, 4], "M13V3-003 duplicate int harmless")
+	_check_eq(eix.get_candidates(0, [-1]), [0, 2, 4], "M13V3-003 negative int no effect")
+	_check_eq(eix.get_candidates(0, [999]), [0, 2, 4], "M13V3-003 out-of-range int no effect")
+	_check_eq(eix.get_candidates(0, [2.0]), [0, 2, 4], "M13V3-003 float 2.0 does NOT exclude int 2")
+	_check_eq(eix.get_candidates(0, ["2"]), [0, 2, 4], "M13V3-003 String '2' does NOT exclude int 2")
+	_check_eq(eix.get_candidates(0, [true]), [0, 2, 4], "M13V3-003 bool entry no effect")
+	_check_eq(eix.get_candidates(0, [Vector2(2, 0)]), [0, 2, 4], "M13V3-003 Vector2 entry no effect")
+	_check_eq(eix.get_candidates(0, [RefCounted.new()]), [0, 2, 4], "M13V3-003 RefCounted entry no effect")
+	_check_eq(eix.get_candidates(0, [[2]]), [0, 2, 4], "M13V3-003 nested Array entry no effect")
+	_check_eq(eix.get_candidates(0, [{2: true}]), [0, 2, 4], "M13V3-003 nested Dictionary entry no effect")
+	# mixed valid + junk entries: only the valid int excludes
+	_check_eq(eix.get_candidates(0, [2.0, 2, "4", -1]), [0, 4], "M13V3-003 mixed entries: only int 2 excludes")
+	# shared semantics across the three query APIs (57)
+	_check_eq(eix.has_candidates(0, [0, 2, 4]), false, "M13V3-003 has_candidates all-excluded false")
+	_check_eq(eix.count_candidates(0, [2, 4]), 1, "M13V3-003 count_candidates matches get_candidates")
+
+	# --- Immediate consumer: ReservationState PackedInt32Array path (77,78) ---
+	var rs = ReservationState.create()
+	rs.bind(eb)
+	rs.reserve(2, 100)
+	rs.reserve(4, 101)
+	var reserved: PackedInt32Array = rs.get_reserved_indices()
+	_check(reserved is PackedInt32Array, "M13V3 consumer: reserved set is PackedInt32Array")
+	_check_eq(eix.get_candidates(0, reserved), [0], "M13V3 consumer: real ReservationState exclusion yields correct raw candidates")
 
 ## M13-C001 V02 formal validation of reopened SB-M13-006..010, filling the
 ## coverage gaps the V02 prompt/criteria enumerate beyond the V01 tests above.
