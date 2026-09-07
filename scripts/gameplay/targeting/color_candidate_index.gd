@@ -59,7 +59,11 @@ const _REQUIRED_BOARD_API := ["get_cell_count", "is_valid_index", "get_cell_stat
 ## transactional build. A malformed bind after valid state neutralizes the prior
 ## binding so no stale/malformed dependency remains usable (F-M13-STRICT-001).
 func bind(board) -> bool:
+	# One consistent fail-closed policy for EVERY bind failure — null included —
+	# so null can never be the single failure that preserves stale state
+	# (F-M13-STRICT-001). Fresh bind(null) stays safe (neutralize is idempotent).
 	if board == null:
+		_neutralize()
 		return false
 	if not _has_board_api(board):
 		_neutralize()
@@ -102,20 +106,30 @@ func rebuild() -> bool:
 func sync_cell(index: int) -> bool:
 	if not _bound or _board == null:
 		return false
-	if not _board.is_valid_index(index):
+	# A HEALTHY out-of-range index is a plain false with the cache intact — not
+	# dependency corruption. A MALFORMED dependency return (wrong type / unknown
+	# state / bad color) neutralizes the cache (F-M13-STRICT-002, V04 §4).
+	var valid = _board.is_valid_index(index)
+	if typeof(valid) != TYPE_BOOL:
+		_neutralize()
+		return false
+	if not valid:
 		return false
 	var state = _board.get_cell_state(index)
 	if typeof(state) != TYPE_INT:
+		_neutralize()
 		return false
 	if state == BoardState.CellState.ACTIVE:
 		var color_id = _board.get_color_id(index)
 		if typeof(color_id) != TYPE_INT or color_id < 0:
+			_neutralize()
 			return false
 		_bucket_add(color_id, index)
 		return true
 	if state == BoardState.CellState.CLEARED:
 		var color_id = _board.get_color_id(index)
 		if typeof(color_id) != TYPE_INT or color_id < 0:
+			_neutralize()
 			return false
 		_bucket_remove(color_id, index)
 		return true
@@ -197,10 +211,14 @@ func get_color_ids() -> Array:
 
 # ------------------------------------------------------------- internals --
 
-## True only for an Object exposing the whole narrow board API. Guards against
-## faulting when a non-Object Variant (int/String/Vector2) is passed as a board.
+## True only for a RefCounted exposing the whole narrow board API. RefCounted-
+## only is the accepted M13 dependency lifecycle category (V04 §2): canonical
+## BoardState and the compatible M13 spies/doubles are all RefCounted, so no
+## externally-freed Node dependency can enter M13. A non-RefCounted Variant
+## (int/String/Vector2/Node) or a RefCounted missing any narrow method is
+## rejected before any method call.
 func _has_board_api(board) -> bool:
-	if not (board is Object):
+	if not (board is RefCounted):
 		return false
 	for m in _REQUIRED_BOARD_API:
 		if not board.has_method(m):
@@ -224,6 +242,8 @@ func _neutralize() -> void:
 ## buckets or faults on a bad return type. Ascending iteration keeps buckets
 ## row-major without sorting.
 func _scan(board):
+	# Zero count is intentional and harmless: an empty board binds with no
+	# buckets (no candidates). A negative or non-int count is malformed -> null.
 	var count = board.get_cell_count()
 	if typeof(count) != TYPE_INT or count < 0:
 		return null

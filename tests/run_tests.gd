@@ -3220,7 +3220,118 @@ func _run_color_candidate_index_tests() -> void:
 
 	_run_m13_v02_formal_validation()
 	_run_m13_v03_strict_validation()
+	_run_m13_v04_strict_validation()
 	print("  M13 ColorCandidateIndex tests complete")
+
+## M13-C001 V04 strict dependency closure: bind(null) stale-escape fix,
+## RefCounted-only dependency lifecycle, complete transactional build return
+## adversaries, and sync_cell live-drift neutralization. Criteria V04.
+func _run_m13_v04_strict_validation() -> void:
+	var boardA = _make_colored_board(3, 2, [0, 1, 0, 1, 0, 2]) # color 0 -> [0,2,4]
+	var boardB = _make_colored_board(2, 1, [7, 7])
+
+	# --- §1 bind(null) fail-closed policy (no stale-binding escape) ---
+	var nix := ColorCandidateIndex.create()
+	_check(nix.bind(boardA), "M13V4-001 bind valid board A")
+	_check_eq(nix.get_candidates(0), [0, 2, 4], "M13V4-001 exact truth before bind(null)")
+	_check_eq(nix.bind(null), false, "M13V4-001 bind(null) after valid returns false")
+	_check_eq(nix.is_bound(), false, "M13V4-001 bind(null) neutralized to unbound")
+	_check_eq(nix.get_candidates(0), [], "M13V4-001 no stale candidates after bind(null)")
+	_check_eq(nix.has_candidates(0), false, "M13V4-001 has_candidates false after bind(null)")
+	_check_eq(nix.count_candidates(0), 0, "M13V4-001 count 0 after bind(null)")
+	_check_eq(nix.get_color_ids(), [], "M13V4-001 no color ids after bind(null)")
+	_check_eq(nix.is_bound_to(boardA), false, "M13V4-001 is_bound_to(A) false after bind(null)")
+	_check(nix.bind(boardB), "M13V4-001 later valid bind recovers")
+	_check_eq(nix.get_candidates(7), [0, 1], "M13V4-001 recovered exact truth")
+	# fresh bind(null) still safe
+	var fnix := ColorCandidateIndex.create()
+	_check_eq(fnix.bind(null), false, "M13V4-001 fresh bind(null) false")
+	_check_eq(fnix.is_bound(), false, "M13V4-001 fresh bind(null) stays unbound")
+
+	# --- §2 RefCounted-only dependency lifecycle ---
+	# real BoardState accepted
+	_check(ColorCandidateIndex.create().bind(boardA), "M13V4-002 real BoardState accepted")
+	# traversal spy (RefCounted) accepted
+	var spy = load("res://tests/support/board_state_scan_spy.gd").new()
+	spy.setup([0, 1, 0], 3, 1)
+	_check(ColorCandidateIndex.create().bind(spy), "M13V4-002 RefCounted traversal spy accepted")
+	# malformed RefCounted double accepted only when canonical
+	_check(ColorCandidateIndex.create().bind(M13MalformedBoardDouble.new()), "M13V4-002 canonical RefCounted double accepted")
+	# plain RefCounted without API rejected
+	_check_eq(ColorCandidateIndex.create().bind(RefCounted.new()), false, "M13V4-002 plain RefCounted rejected")
+	# Node without API rejected; method-compatible Node rejected
+	var bare_node := Node.new()
+	_check_eq(ColorCandidateIndex.create().bind(bare_node), false, "M13V4-002 bare Node rejected")
+	bare_node.free()
+	var compat_node = load("res://tests/support/m13_board_node_double.gd").new()
+	_check_eq(ColorCandidateIndex.create().bind(compat_node), false, "M13V4-002 method-compatible Node rejected (not RefCounted)")
+	compat_node.free()
+
+	# --- §3 transactional build return-contract adversaries ---
+	# get_cell_count negative
+	var cneg := M13MalformedBoardDouble.new(); cneg.count_negative = true
+	_check_eq(ColorCandidateIndex.create().bind(cneg), false, "M13V4-003 negative get_cell_count rejected")
+	# zero count is intentional/harmless: binds empty
+	var czero := M13MalformedBoardDouble.new(); czero.count = 0
+	var czix := ColorCandidateIndex.create()
+	_check(czix.bind(czero), "M13V4-003 zero count binds (intentional empty board)")
+	_check_eq(czix.get_candidates(0), [], "M13V4-003 zero-count board has no candidates")
+	# is_valid_index non-bool at an in-range index AFTER valid indices 0,1
+	var ivnb := M13MalformedBoardDouble.new(); ivnb.invalid_index_nonbool_at = 2
+	var ivnbx := ColorCandidateIndex.create()
+	_check_eq(ivnbx.bind(ivnb), false, "M13V4-003 non-bool is_valid_index return rejected")
+	_check_eq(ivnbx.is_bound(), false, "M13V4-003 unbound (no partial commit) after non-bool is_valid_index")
+	_check_eq(ivnbx.get_candidates(0), [], "M13V4-003 no partial buckets after non-bool is_valid_index")
+	# is_valid_index false at in-range index -> build fails
+	var ivf := M13MalformedBoardDouble.new(); ivf.invalid_index_false_at = 2
+	_check_eq(ColorCandidateIndex.create().bind(ivf), false, "M13V4-003 is_valid_index false in-range rejected")
+	# get_cell_state non-int at index 2 (after valid 0,1)
+	var snint := M13MalformedBoardDouble.new(); snint.state_nonint_at = 2
+	_check_eq(ColorCandidateIndex.create().bind(snint), false, "M13V4-003 non-int get_cell_state rejected")
+	# unknown int state at index 2
+	var sunk := M13MalformedBoardDouble.new(); sunk.unknown_state_at = 2; sunk.unknown_state_value = 255
+	_check_eq(ColorCandidateIndex.create().bind(sunk), false, "M13V4-003 unknown get_cell_state rejected")
+	# ACTIVE get_color_id non-int at index 2
+	var cnint := M13MalformedBoardDouble.new(); cnint.color_nonint_at = 2
+	_check_eq(ColorCandidateIndex.create().bind(cnint), false, "M13V4-003 non-int get_color_id rejected")
+	# ACTIVE get_color_id negative at index 2
+	var cngv := M13MalformedBoardDouble.new(); cngv.color_neg_at = 2
+	var cngvx := ColorCandidateIndex.create()
+	_check_eq(cngvx.bind(cngv), false, "M13V4-003 negative get_color_id rejected")
+	_check_eq(cngvx.is_bound(), false, "M13V4-003 transactional: unbound after color-negative at index 2")
+
+	# --- §4 sync_cell live dependency return drift ---
+	# healthy invalid index: sync false, cache intact
+	var hdbl := M13MalformedBoardDouble.new()
+	var hix := ColorCandidateIndex.create()
+	_check(hix.bind(hdbl), "M13V4-004 bind valid before healthy-invalid sync")
+	hdbl.invalid_index_false_at = 2
+	_check_eq(hix.sync_cell(2), false, "M13V4-004 healthy invalid index sync -> false")
+	_check(hix.is_bound(), "M13V4-004 healthy invalid index leaves binding intact")
+	_check_eq(hix.get_candidates(0), [0, 1, 2, 3], "M13V4-004 healthy invalid index leaves cache intact")
+	# malformed live returns each neutralize
+	var drift_cases := [
+		["nonbool_index", func(d): d.invalid_index_nonbool_at = 2],
+		["nonint_state", func(d): d.state_nonint_at = 2],
+		["active_color_nonint", func(d): d.color_nonint_at = 2],
+		["active_color_neg", func(d): d.color_neg_at = 2],
+		["cleared_color_nonint", func(d): d.cleared_at = 2; d.color_nonint_at = 2],
+		["cleared_color_neg", func(d): d.cleared_at = 2; d.color_neg_at = 2],
+	]
+	for case in drift_cases:
+		var label: String = case[0]
+		var mutator: Callable = case[1]
+		var ddbl := M13MalformedBoardDouble.new()
+		var dix := ColorCandidateIndex.create()
+		_check(dix.bind(ddbl), "M13V4-004 %s: valid bind first" % label)
+		mutator.call(ddbl)
+		_check_eq(dix.sync_cell(2), false, "M13V4-004 %s: malformed sync -> false" % label)
+		_check_eq(dix.is_bound(), false, "M13V4-004 %s: malformed sync neutralizes" % label)
+		_check_eq(dix.get_candidates(0), [], "M13V4-004 %s: no stale candidate truth" % label)
+	# restore canonical truth -> later valid bind recovers
+	var rec := ColorCandidateIndex.create()
+	_check(rec.bind(M13MalformedBoardDouble.new()), "M13V4-004 recovery via later valid bind")
+	_check_eq(rec.get_candidates(0), [0, 1, 2, 3], "M13V4-004 recovered exact truth")
 
 ## M13-C001 V03 frozen strict closure: F-M13-STRICT-001 (dependency boundary +
 ## transactional build), F-M13-STRICT-002 (unknown cell state), F-M13-STRICT-003
