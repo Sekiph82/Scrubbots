@@ -397,3 +397,12 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
   - Main remaining: **441**
   - Level Factory: **0 / 112**
   - Content Pipeline: **0 / 112**
+
+
+### M19-C001 V01 issuance
+
+- New milestone opened: **M19 Scrubbot Dispatcher**.
+- Scope: slot/color request -> reachable target selection/reservation -> production route -> exactly one ScrubbotAgent, with clean rollback on route/assign failure.
+- M20 clearing/orchestration remains unopened.
+- Current progress remains **278 / 943 = 29.48%** until audit.
+- Full-pass target after 12 closures: **290 / 943 = 30.75%**, main + SB-UI **290 / 719 = 40.33%**.
