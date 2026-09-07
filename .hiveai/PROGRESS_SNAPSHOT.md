@@ -469,3 +469,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - M11/M12/M13/M14: strict findings reopened selected tasks.
 - M15-C001 V02: AUDITED_PASS; selected strict tasks re-closed.
 - M16-C001 V02: READY.
+
+
+### M16-C001 V02 strict audit
+
+- Verdict: **CHANGES_REQUIRED**.
+- Original V02 findings are resolved.
+- New F-M16-STRICT-004 keeps SB-M16-002/003/010/011 open.
+- M16-C001 V03 is READY.
+- M17 remains blocked.
+- Progress unchanged: **257 / 943 = 27.25%** overall; **257 / 719 = 35.74%** main+UI.
