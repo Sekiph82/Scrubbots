@@ -753,27 +753,33 @@ its automated renderer tests are complete; the owner's manual visual QA of the N
 
 ### M11 — Gameplay Session Core
 
+Strict-v2 re-audit: SB-M11-003/005/009/012 reopened; see `coordination/sessions/M11-C001/CHATGPT_STRICT_REAUDIT_V01.md`.
+
 - [x] SB-M11-001 Define session states. (UNINITIALIZED/READY/ACTIVE/PAUSED/COMPLETED enum in gameplay_session.gd; 542/542 ALL PASS)
-- [x] SB-M11-002 Initialize level. — [x] SB-M11-003 Load LevelData. (load_level uses LevelLoader, creates BoardState, enters READY; failed-load atomicity verified)
-- [x] SB-M11-004 Create BoardState. — [x] SB-M11-005 Connect renderer. (M11-23 proves pixel output follows session-owned BoardState via ACTIVE→CLEARED opaque→transparent readback; M11-24 proves renderer follows NEW BoardState after reset, not stale old. META-C004 re-verified under the ACTIVE/CLEARED model.)
+- [x] SB-M11-002 Initialize level. — [ ] SB-M11-003 Load LevelData. (load_level uses LevelLoader, creates BoardState, enters READY; failed-load atomicity verified)
+- [x] SB-M11-004 Create BoardState. — [ ] SB-M11-005 Connect renderer. (M11-23 proves pixel output follows session-owned BoardState via ACTIVE→CLEARED opaque→transparent readback; M11-24 proves renderer follows NEW BoardState after reset, not stale old. META-C004 re-verified under the ACTIVE/CLEARED model.)
 - [x] SB-M11-006 Define ready state. — [x] SB-M11-007 Define active state. (READY->ACTIVE via start(); invalid transitions rejected without state mutation)
-- [x] SB-M11-008 Define pause. — [x] SB-M11-009 Define reset. (session ACTIVE<->PAUSED; reset recreates BoardState from immutable LevelData, all cells ACTIVE, returns to READY)
+- [x] SB-M11-008 Define pause. — [ ] SB-M11-009 Define reset. (session ACTIVE<->PAUSED; reset recreates BoardState from immutable LevelData, all cells ACTIVE, returns to READY)
 - [x] SB-M11-010 Define completion transition. (explicit complete() from session-ACTIVE only; no auto-complete from cleared-cell count; repeated completion deterministic)
 - [x] SB-M11-011 Keep UI separate from gameplay truth. (RefCounted core, no UI/Control dependency, no HUD/menu logic; renderer is optional presentation binding)
-- [x] SB-M11-012 Headless lifecycle tests where possible. (V02 correction closes F-M11-001: M11-23/24 strengthened with direct pixel readback proving renderer follows session-owned/fresh BoardState; test would fail if reset-time _configure_renderer() were removed; 548/548 ALL PASS)
+- [ ] SB-M11-012 Headless lifecycle tests where possible. (V02 correction closes F-M11-001: M11-23/24 strengthened with direct pixel readback proving renderer follows session-owned/fresh BoardState; test would fail if reset-time _configure_renderer() were removed; 548/548 ALL PASS)
 
 ### M12 — Five-Slot Logic
 
+Strict-v2 re-audit: SB-M12-005/009/011 reopened; see `coordination/sessions/M12-C001/CHATGPT_STRICT_REAUDIT_V01.md`.
+
 - [x] SB-M12-001 Create SlotState. Validated: `scripts/gameplay/slots/slot_state.gd`, RefCounted, AL-001 preload, holds identity/palette/availability/activity. — [x] SB-M12-002 Create SlotSystem. Validated: `scripts/gameplay/slots/slot_system.gd`, RefCounted, AL-001 preload, owns exactly 5 SlotState instances.
 - [x] SB-M12-003 Configure five gameplay slots. Validated: palette-only-via-configure invariant enforced. get_slot() removed; no mutable internal SlotState leakage. 657/657 ALL PASS.
-- [x] SB-M12-004 Slot identity. Validated: deterministic IDs 0..4, stable across configure/state changes. — [x] SB-M12-005 Slot palette/color. Validated: palette only changeable through validated configure(). get_slot() removed; scalar getters only.
+- [x] SB-M12-004 Slot identity. Validated: deterministic IDs 0..4, stable across configure/state changes. — [ ] SB-M12-005 Slot palette/color. Validated: palette only changeable through validated configure(). get_slot() removed; scalar getters only.
 - [x] SB-M12-006 Slot availability. Validated: per-slot available/unavailable, independent of other slots and activity. — [x] SB-M12-007 Slot activity state. Validated: per-slot active/inactive, independent of other slots and availability.
-- [x] SB-M12-008 Keep model separate from UI. Validated: both classes are RefCounted, no Node ancestry, no scene dependency. — [x] SB-M12-009 Query API. Validated: all public queries return scalars (int/bool). No mutable internal reference exposed. get_slot() removed.
-- [x] SB-M12-010 Five-slot tests. Validated: M12-18 bypass regression proves get_slot() absent, all queries return scalars, palette 999 rejected. — [x] SB-M12-011 Invalid slot tests. Validated: invalid slot IDs return -1/false, no mutable object leak possible. 657/657 ALL PASS.
+- [x] SB-M12-008 Keep model separate from UI. Validated: both classes are RefCounted, no Node ancestry, no scene dependency. — [ ] SB-M12-009 Query API. Validated: all public queries return scalars (int/bool). No mutable internal reference exposed. get_slot() removed.
+- [x] SB-M12-010 Five-slot tests. Validated: M12-18 bypass regression proves get_slot() absent, all queries return scalars, palette 999 rejected. — [ ] SB-M12-011 Invalid slot tests. Validated: invalid slot IDs return -1/false, no mutable object leak possible. 657/657 ALL PASS.
 
 Remaining slot mechanics are `[DESIGN GATE]`.
 
 ### M13 — Color Candidate Index `[PERFORMANCE]`
+
+Strict-v2 re-audit: SB-M13-001/004 reopened; see `coordination/sessions/M13-C001/CHATGPT_STRICT_REAUDIT_V01.md`.
 
 Don't rescan up to 3,481 cells unnecessarily for every bot. This index
 supplies **raw ACTIVE matching-color candidates only** — it does NOT prove
@@ -781,44 +787,48 @@ reachability (a matching-color ACTIVE cell may be blocked; AL-028).
 Renamed/migrated to `scripts/gameplay/targeting/color_candidate_index.gd`
 (`ColorCandidateIndex`) in META-C004; re-verified 774/774 ALL PASS.
 
-- [x] SB-M13-001 Define color candidate (valid + ACTIVE + matching color + caller exclusion).
+- [ ] SB-M13-001 Define color candidate (valid + ACTIVE + matching color + caller exclusion).
 - [x] SB-M13-002 Group/query by color.
 - [x] SB-M13-003 Implement efficient index/cache if measured useful.
-- [x] SB-M13-004 Synchronize with BoardState.
+- [ ] SB-M13-004 Synchronize with BoardState.
 - [x] SB-M13-005 Remove CLEARED cells from the index. — [x] SB-M13-006 Handle caller-supplied reservation/exclusion seam only (no owned reservation state).
 - [x] SB-M13-007 No-candidate query. — [x] SB-M13-008 Exhausted-color test.
 - [x] SB-M13-009 Last-candidate test. — [x] SB-M13-010 3,481-cell benchmark.
 
 ### M14 — Reservation State
 
+Strict-v2 re-audit V02: SB-M14-001/004/007/009 reopened; see `coordination/sessions/M14-C001/CHATGPT_STRICT_REAUDIT_V02.md`.
+
 RESERVED was intentionally deferred in Prompt 02 (see M02-017). Add only
 when target assignment requires it.
 
-- [x] SB-M14-001 Define reservation ownership.
+- [ ] SB-M14-001 Define reservation ownership.
 - [x] SB-M14-002 Decide whether RESERVED belongs in `BoardState.CellState` or separate data.
 - [x] SB-M14-003 Record decision (ADR).
-- [x] SB-M14-004 Reserve target atomically.
+- [ ] SB-M14-004 Reserve target atomically.
 - [x] SB-M14-005 Prevent double reservation.
-- [x] SB-M14-006 Release on dispatch failure. — [x] SB-M14-007 Release on reset.
-- [x] SB-M14-008 Resolve arrival. — [x] SB-M14-009 Concurrency tests.
+- [x] SB-M14-006 Release on dispatch failure. — [ ] SB-M14-007 Release on reset.
+- [x] SB-M14-008 Resolve arrival. — [ ] SB-M14-009 Concurrency tests.
 
 ### M15 — TargetSelector
+
+M15-C001 V02 strict correction independently audited PASS; SB-M15-001/007/008/011 re-closed. See `coordination/sessions/M15-C001/CHATGPT_AUDIT_V02.md`.
 
 Chooses WHAT target among **reachable/targetable** candidates. Consumes raw
 candidates from `ColorCandidateIndex` plus a narrow reachability/access truth;
 it must never generate a route. A matching-color ACTIVE cell that is
 blocked/unreachable is not a valid target (AL-028).
 
-- [ ] SB-M15-001 Create TargetSelector.
+- [x] SB-M15-001 Create TargetSelector.
 - [x] SB-M15-002 Keep BoardState access narrow.
 - [x] SB-M15-003 Baseline deterministic strategy.
 - [x] SB-M15-004 Match Scrubbot color.
 - [x] SB-M15-005 Never target CLEARED. — [x] SB-M15-006 Never target invalid or blocked/unreachable ACTIVE cells (consume a narrow reachability/access truth; a fully enclosed matching-color ACTIVE cell must not be selected and must not cause dispatch — required regression, AL-028).
-- [ ] SB-M15-007 Respect reservations.
-- [ ] SB-M15-008 Return no-target cleanly.
+- [x] SB-M15-007 Respect reservations.
+- [x] SB-M15-008 Return no-target cleanly.
 - [x] SB-M15-009 No route generation inside selector (8.10).
 - [x] SB-M15-010 Determinism tests.
-- [ ] SB-M15-011 Simultaneous assignment tests.
+- [x] SB-M15-011 Simultaneous assignment tests.
 - [x] SB-M15-012 3,481-cell benchmark.
 
 ### M16 — RoutingSystem Interface
