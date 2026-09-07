@@ -143,3 +143,7 @@ Owner movement decision: https://github.com/Sekiph82/Scrubbots/blob/main/coordin
 | Version | Prompt | Audit criteria | Claude log | ChatGPT audit | State |
 | --- | --- | --- | --- | --- | --- |
 | V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CLAUDE_LOG_V01.md | PENDING | ISSUED |
+
+| V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_AUDIT_CRITERIA_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CLAUDE_LOG_V02.md | PENDING | CHANGES_REQUIRED |
+
+M18 strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_STRICT_REAUDIT_V02.md
