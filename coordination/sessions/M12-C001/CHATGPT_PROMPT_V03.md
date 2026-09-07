@@ -21,6 +21,73 @@ Fix ONLY frozen:
 - F-M12-STRICT-001
 - F-M12-STRICT-002
 
+## Mandatory carry-forward from the earlier M12 strict re-audit
+
+The original M12 strict finding MUST remain explicitly covered. Do not let the
+broader V03 attack-surface work dilute or replace it.
+
+The pre-fix defect is:
+
+```gdscript
+var _palette_id: int = -1
+```
+
+combined with collection lookup that compares the requested palette directly
+against every slot. On the unfixed implementation, a fresh/unconfigured system
+can therefore make:
+
+```gdscript
+get_slots_by_palette_id(-1)
+```
+
+behave as if the invalid sentinel were a real color and return all five slot
+identities.
+
+Canonical requirement:
+
+```text
+UNCONFIGURED or INVALID COLOR
+            ↓
+           []
+```
+
+Never:
+
+```text
+INVALID -1 SENTINEL
+        ↓
+[0, 1, 2, 3, 4]
+```
+
+The direct regression sequence for F-M12-STRICT-001 is mandatory:
+
+1. create a fresh SlotSystem;
+2. prove is_configured() == false;
+3. before configure:
+   - get_slots_by_palette_id(-1) == [];
+   - get_slots_by_palette_id(0) == [];
+4. query at least two additional invalid/negative palette ids (for example -2
+   and -999) and prove [];
+5. perform a FAILED FIRST configure;
+6. prove is_configured() is still false;
+7. prove every scalar slot palette remains the -1 unconfigured sentinel;
+8. after that failed first configure:
+   - get_slots_by_palette_id(-1) == [];
+   - get_slots_by_palette_id(0) == [];
+9. successfully configure duplicate valid colors, for example
+   [0, 0, 1, 1, 0];
+10. prove duplicate valid palette support:
+    - palette 0 -> exactly [0, 1, 4];
+    - palette 1 -> exactly [2, 3];
+11. query a non-present/high palette id such as 999 and prove [];
+12. attempt a FAILED REconfigure;
+13. prove the prior valid duplicate palette truth and query results are
+    unchanged.
+
+At least one test must be sensitivity-safe against the current pre-fix defect:
+it must fail if unconfigured `-1` is still allowed to materialize the five
+sentinel slots.
+
 Do not implement M13+ gameplay behavior.
 
 ## 1. Fail-closed palette collection query
@@ -36,10 +103,17 @@ Canonical query contract:
 Required:
 - before configure, get_slots_by_palette_id(-1) == [];
 - before configure, get_slots_by_palette_id(0) == [];
-- every negative integer returns [];
+- -2 and another clearly negative integer also return [];
 - after failed first configure, sentinel/valid collection queries remain [];
-- after successful configure, valid integer queries work normally;
-- after failed reconfigure, prior valid query truth remains unchanged.
+- after failed first configure, every scalar slot palette is still -1;
+- after successful duplicate configuration, exact valid query identities and
+  deterministic order are proven;
+- a non-present/high integer palette query returns [];
+- after failed reconfigure, prior valid duplicate palette query truth remains
+  unchanged.
+
+These checks are the explicit carry-forward of CHATGPT_STRICT_REAUDIT_V01 and
+are mandatory even though V03 also closes the broader Variant boundary finding.
 
 ## 2. Arbitrary Variant query boundary
 
