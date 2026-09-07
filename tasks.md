@@ -756,13 +756,13 @@ its automated renderer tests are complete; the owner's manual visual QA of the N
 Strict-v2 re-audit: SB-M11-003/005/009/012 reopened; see `coordination/sessions/M11-C001/CHATGPT_STRICT_REAUDIT_V01.md`.
 
 - [x] SB-M11-001 Define session states. (UNINITIALIZED/READY/ACTIVE/PAUSED/COMPLETED enum in gameplay_session.gd; 542/542 ALL PASS)
-- [x] SB-M11-002 Initialize level. — [ ] SB-M11-003 Load LevelData. (load_level uses LevelLoader, creates BoardState, enters READY; failed-load atomicity verified)
-- [x] SB-M11-004 Create BoardState. — [ ] SB-M11-005 Connect renderer. (M11-23 proves pixel output follows session-owned BoardState via ACTIVE→CLEARED opaque→transparent readback; M11-24 proves renderer follows NEW BoardState after reset, not stale old. META-C004 re-verified under the ACTIVE/CLEARED model.)
+- [x] SB-M11-002 Initialize level. — [x] SB-M11-003 Load LevelData. (load_level uses LevelLoader, creates BoardState, enters READY; failed-load atomicity verified)
+- [x] SB-M11-004 Create BoardState. — [x] SB-M11-005 Connect renderer. (M11-23 proves pixel output follows session-owned BoardState via ACTIVE→CLEARED opaque→transparent readback; M11-24 proves renderer follows NEW BoardState after reset, not stale old. META-C004 re-verified under the ACTIVE/CLEARED model.)
 - [x] SB-M11-006 Define ready state. — [x] SB-M11-007 Define active state. (READY->ACTIVE via start(); invalid transitions rejected without state mutation)
-- [x] SB-M11-008 Define pause. — [ ] SB-M11-009 Define reset. (session ACTIVE<->PAUSED; reset recreates BoardState from immutable LevelData, all cells ACTIVE, returns to READY)
+- [x] SB-M11-008 Define pause. — [x] SB-M11-009 Define reset. (session ACTIVE<->PAUSED; reset recreates BoardState from immutable LevelData, all cells ACTIVE, returns to READY)
 - [x] SB-M11-010 Define completion transition. (explicit complete() from session-ACTIVE only; no auto-complete from cleared-cell count; repeated completion deterministic)
 - [x] SB-M11-011 Keep UI separate from gameplay truth. (RefCounted core, no UI/Control dependency, no HUD/menu logic; renderer is optional presentation binding)
-- [ ] SB-M11-012 Headless lifecycle tests where possible. (V02 correction closes F-M11-001: M11-23/24 strengthened with direct pixel readback proving renderer follows session-owned/fresh BoardState; test would fail if reset-time _configure_renderer() were removed; 548/548 ALL PASS)
+- [x] SB-M11-012 Headless lifecycle tests where possible. (V02 correction closes F-M11-001: M11-23/24 strengthened with direct pixel readback proving renderer follows session-owned/fresh BoardState; test would fail if reset-time _configure_renderer() were removed; 548/548 ALL PASS)
 
 ### M12 — Five-Slot Logic
 
