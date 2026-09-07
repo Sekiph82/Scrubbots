@@ -814,3 +814,15 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - New locked audit policy requires a full attack-surface sweep before correction prompts on critical subsystems.
 - M17 remains blocked.
 - Progress unchanged at **257/943 = 27.25%**.
+
+
+## M16-C001 V05 final audit / M17-C002 V03 ready
+
+- M16 V05 verdict: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
+- M16 audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V05.md
+- Re-closed SB-M16-002/003/010/011.
+- M17 old V02 correction prompt is **SUPERSEDED** and must not be executed.
+- M17 full-surface frozen re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_FULL_SURFACE_REAUDIT_V03.md
+- M17 V03 prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_PROMPT_V03.md
+- M17 V03 state: **READY**
+- Progress: **261/943 = 27.68%** overall; **261/719 = 36.30%** main + UI.
