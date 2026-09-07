@@ -10,7 +10,7 @@ This queue records strict-v2 findings from the M10-M14 re-audit without blocking
 - M11: AUDITED_PASS / STRICT_V2_FINAL_CLOSURE.
 - M12: AUDITED_PASS / STRICT_V2_FINAL_CLOSURE.
 - M13: AUDITED_PASS / STRICT_V2_FINAL_CLOSURE.
-- M14: CHANGES_REQUIRED / FINDING_SET_FROZEN. SB-M14-001/004/007/009 remain open.
+- M14: AUDITED_PASS / STRICT_V2_FINAL_CLOSURE.
 
 ## FOUNDATION-STRICT-001 — BoardState HIGH-RISK VALIDATION GAP
 
@@ -36,7 +36,7 @@ However, M11-M14 strict findings and the BoardState validation gap must be resol
 
 ## Full-surface transition
 
-The locked full attack-surface rule governs foundation repairs. M11 is final-closed after its frozen full-surface correction + V06 adversarial validation. M12 is final-closed after its frozen correction and V04 validation pass. M13 is final-closed after V05. M14 has now received its own full subsystem sweep; its finding set is frozen to F-M14-STRICT-001/002 and `coordination/sessions/M14-C001/CHATGPT_PROMPT_V02.md` is READY. FOUNDATION-STRICT-001 remains the final separate foundation gate after M14.
+The locked full attack-surface rule governs foundation repairs. M11 is final-closed after its frozen full-surface correction + V06 adversarial validation. M12 is final-closed after its frozen correction and V04 validation pass. M13 and M14 are final-closed. FOUNDATION-STRICT-001 is now the final separate foundation gate. `coordination/sessions/FOUNDATION-C001/CHATGPT_PROMPT_V01.md` is READY as a validation-first runtime pass.
 
 
 ## M11 V05 audit transition
@@ -52,7 +52,8 @@ The locked full attack-surface rule governs foundation repairs. M11 is final-clo
 - M13 V03: **CHANGES_REQUIRED / FROZEN_SET_REMAINS_OPEN**.
 - M13 V04: **CHANGES_REQUIRED / FROZEN_SET_REMAINS_OPEN**.
 - M13 V05: **AUDITED_PASS / FINAL_CLOSED**.
-- M14 V02: **READY**.
+- M14 V02: **AUDITED_PASS / FINAL_CLOSED**.
+- FOUNDATION-C001 V01: **READY**.
 
 
 ## M11 V06 final / M12 full-surface transition
@@ -119,3 +120,14 @@ The locked full attack-surface rule governs foundation repairs. M11 is final-clo
 - M14-C001 V02: **READY**.
 - FOUNDATION-STRICT-001 remains separate/open after M14.
 - M19 remains blocked until M14 + FOUNDATION-STRICT-001 close.
+
+
+## M14 V02 final / FOUNDATION-C001 transition
+
+- M14-C001 V02: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
+- M14 re-closed: SB-M14-001/004/007/009.
+- FOUNDATION-STRICT-001 remains the only open foundation gate.
+- FOUNDATION-C001 V01 is **READY** and validation-first.
+- If current Godot already rejects noncanonical states, no production fix is allowed.
+- If any 2/-1/255/3/99 injection is accepted/mutates/faults, promote to concrete M02/SB-M02-012 defect and minimally harden BoardState.
+- M19 remains blocked until this gate closes.
