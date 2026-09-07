@@ -417,3 +417,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Findings: lifecycle re-entry allowed; multi-segment delta test lacked direct boundary proof; performance timer mixed route generation with agent lifecycle and therefore could not justify pooling evidence.
 - M18-C001 V02 issued.
 - M19 is paused until M18 V02 final strict audit passes.
+
+
+### Strict M18 progress recompute
+
+- Overall: **274 / 943 = 29.06%**
+- Remaining: **669**
+- Main game + SB-UI: **274 / 719 = 38.11%**
+- Main remaining: **445**
+- Level Factory: **0 / 112**
+- Content Pipeline: **0 / 112**
