@@ -311,3 +311,46 @@ Where owner judgement is required, status remains `OWNER_REQUIRED` until explici
 ### Future audit default
 
 All audits issued after 2026-09-07 use this strict v2 standard automatically, even if an older cycle prompt did not repeat these rules.
+
+
+## Full attack-surface sweep before correction prompts [LOCKED — 2026-09-07]
+
+This rule is mandatory for critical/stateful subsystems.
+
+ChatGPT MUST NOT issue a correction prompt immediately after finding the first
+material defect.
+
+Before publishing the next correction prompt, ChatGPT must first perform a
+subsystem-level closure sweep and freeze the finding set.
+
+The sweep must cover, where applicable:
+- every public entry point in the subsystem;
+- every public parameter and its valid/invalid domain;
+- null;
+- correct object/type;
+- malformed object;
+- partial-API object;
+- scalar/non-object Variant classes for untyped GDScript boundaries;
+- NaN / +INF / -INF for numeric/vector inputs;
+- boundary/min/max-size values;
+- stale/mismatched dependency state;
+- mutation after creation/bind;
+- repeated call/re-entry;
+- cancellation/reset/rollback;
+- duplicate ownership/contention;
+- detached/mutable-reference bypass;
+- malformed output/result metadata;
+- immediate upstream/downstream consumer assumptions.
+
+After the sweep, ChatGPT must write a frozen finding set in the audit file before
+issuing the correction prompt.
+
+A later correction version may be issued only when:
+1. a genuinely new runtime fact was unavailable during the frozen sweep; or
+2. the correction itself introduces a new defect that could not reasonably have
+   been observed in the pre-correction source.
+
+Finding-by-finding "whack-a-mole" correction prompts are prohibited.
+
+For critical subsystem closure, the post-correction audit must rerun the same
+attack-surface matrix conceptually, not merely verify the last diff.
