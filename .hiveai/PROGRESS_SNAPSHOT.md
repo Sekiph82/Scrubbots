@@ -446,3 +446,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - M17 production strict re-audit: **CHANGES_REQUIRED**; reopened SB-M17-002, 003, 015, 016.
 - Repair order is locked: M15 -> audit -> M16 -> audit -> M17 -> audit -> M19 re-sync/retest.
 - M19 implementation is preserved but remains audit-blocked.
+
+
+### Strict upstream progress recompute
+
+- Overall: **266 / 943 = 28.21%**
+- Remaining: **677**
+- Main game + SB-UI: **266 / 719 = 37.00%**
+- Main remaining: **453**
+- Level Factory: **0 / 112**
+- Content Pipeline: **0 / 112**
