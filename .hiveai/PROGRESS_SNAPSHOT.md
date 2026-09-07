@@ -427,3 +427,11 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Main remaining: **445**
 - Level Factory: **0 / 112**
 - Content Pipeline: **0 / 112**
+
+
+### M19 provisional implementation behind M18 gate
+
+- M19 V01 implementation exists at `3fe57d51bf2ae33c23623d93154d79e21c145768`.
+- Claude reported **1564/1564 ALL PASS** on that dependency state and correctly warned that M18 had since been reopened by strict audit.
+- M19 is **not audited and no M19 tasks are closed**.
+- Preserve the implementation; complete M18-C001 V02 first, then re-sync/rerun M19 against corrected M18 before M19 strict audit.
