@@ -36,6 +36,7 @@ const RoutingSystem = preload("res://scripts/gameplay/routing/routing_system.gd"
 const RouteDebugOverlay = preload("res://scripts/debug/route_debug_overlay.gd")
 const RouteAccessQueryDouble = preload("res://tests/support/route_access_query_double.gd")
 const RouteNonBoolAccessQueryDouble = preload("res://tests/support/route_nonbool_access_double.gd")
+const PartialBoardDouble = preload("res://tests/support/partial_board_double.gd")
 const RouteFakeStraight = preload("res://tests/support/route_fake_straight.gd")
 const RouteFakeRelay = preload("res://tests/support/route_fake_relay.gd")
 # M17 — EXPERIMENTAL routing prototype lab.
@@ -3757,6 +3758,34 @@ func _run_route_validator_tests() -> void:
 		nb.verdict_value = bad_val
 		_check_eq(RouteValidator.validate_route(req, result, board, nb), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: non-bool access verdict (%s) fails closed" % str(bad_val))
 		_check(nb.call_count >= 1, "validate_route: non-bool verdict (%s) was actually consulted then rejected" % str(bad_val))
+
+	# === Strict V03: malformed non-null request/board boundary fails closed (AL-040) ===
+	# non-null junk must fail closed to a stable reason with NO runtime fault and
+	# NO field/method deref past the guard.
+	var junk_req = RefCounted.new()
+	_check_eq(RouteValidator.validate_request(junk_req, board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: RefCounted junk request fails closed")
+	var junk_board = RefCounted.new()
+	_check_eq(RouteValidator.validate_request(req, junk_board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: RefCounted junk board fails closed")
+	var partial_board = PartialBoardDouble.new()
+	_check_eq(RouteValidator.validate_request(req, partial_board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: partial-API board fails closed before missing-method call")
+
+	# Through validate_route: junk request / junk board / partial board ->
+	# stable INVALID_REQUEST and ZERO access calls (guard precedes the access loop).
+	var jr_acc = RouteAccessQueryDouble.new(); jr_acc.default_traversable = true
+	_check_eq(RouteValidator.validate_route(junk_req, result, board, jr_acc), RouteResult.FailureReason.INVALID_REQUEST, "validate_route: junk request -> INVALID_REQUEST")
+	_check_eq(jr_acc.total_queries(), 0, "validate_route: junk request makes zero access calls")
+	var jb_acc = RouteAccessQueryDouble.new(); jb_acc.default_traversable = true
+	_check_eq(RouteValidator.validate_route(req, result, junk_board, jb_acc), RouteResult.FailureReason.INVALID_REQUEST, "validate_route: junk board -> INVALID_REQUEST")
+	_check_eq(jb_acc.total_queries(), 0, "validate_route: junk board makes zero access calls")
+	var pb_acc = RouteAccessQueryDouble.new(); pb_acc.default_traversable = true
+	_check_eq(RouteValidator.validate_route(req, result, partial_board, pb_acc), RouteResult.FailureReason.INVALID_REQUEST, "validate_route: partial-API board -> INVALID_REQUEST")
+	_check_eq(pb_acc.total_queries(), 0, "validate_route: partial-API board makes zero access calls")
+
+	# validate_failure_result must not dereference a malformed non-null request.
+	var canon_fail = RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, tgt)
+	_check_eq(RouteValidator.validate_failure_result(junk_req, canon_fail), RouteResult.FailureReason.INVALID_ROUTE, "validate_failure_result: malformed non-null request fails closed (no deref)")
+	# Null request keeps its documented semantics (a canonical failure is still NONE).
+	_check_eq(RouteValidator.validate_failure_result(null, canon_fail), RouteResult.FailureReason.NONE, "validate_failure_result: null request retains documented semantics")
 
 func _run_routing_system_swappability_tests() -> void:
 	var board = _make_blank_board(8, 6)
