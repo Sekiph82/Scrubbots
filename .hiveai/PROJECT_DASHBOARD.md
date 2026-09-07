@@ -1,3 +1,11 @@
+### M16 final pass / M17 frozen V03
+
+- M16-C001 V05: **AUDITED_PASS / final closed**
+- READY now: **M17-C002 V03**
+- M17 V02 is superseded. Use V03 only.
+- V03 is based on a full attack-surface sweep with a frozen finding set.
+- Progress: **261/943 = 27.68%** overall; **261/719 = 36.30%** main + UI.
+
 ### M16 frozen full-surface closure
 
 - V04 verdict: **CHANGES_REQUIRED / FINDING_SET_FROZEN**
