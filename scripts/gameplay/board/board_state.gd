@@ -99,9 +99,15 @@ func get_cell_state(index: int) -> int:
 		return -1
 	return _cell_states[index]
 
-## Returns false (and makes no change) for an out-of-range index.
+## Returns false (and makes no change) for an out-of-range index or a
+## noncanonical state. GDScript does not runtime-check enum-typed params, so a
+## caller can pass any int; the state domain is EXACTLY ACTIVE=0/CLEARED=1
+## (FOUNDATION-C001) and anything else must be rejected before the write so
+## _cell_states never stores a noncanonical byte.
 func set_cell_state(index: int, state: CellState) -> bool:
 	if not is_valid_index(index):
+		return false
+	if state != CellState.ACTIVE and state != CellState.CLEARED:
 		return false
 	_cell_states[index] = state
 	return true

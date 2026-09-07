@@ -75,6 +75,7 @@ func _initialize() -> void:
 	_run_invalid_coordinate_tests()
 	_run_level_validation_tests()
 	_run_board_state_tests()
+	_run_board_state_canonical_validation_tests()
 	_run_independence_tests()
 	_run_production_difficulty_tests()
 	_run_max_board_tests()
@@ -292,6 +293,47 @@ func _run_board_state_tests() -> void:
 	var invalid_mutate = board.set_cell_state(-1, BoardState.CellState.CLEARED)
 	_check_eq(invalid_mutate, false, "invalid mutation fails safely")
 	_check_eq(board.count_cells_by_state(BoardState.CellState.CLEARED), 1, "failed mutation does not change counts")
+
+## FOUNDATION-C001 — canonical CellState validation. The state domain is
+## EXACTLY ACTIVE=0/CLEARED=1; a valid-index set_cell_state() with any other
+## integer (enum params are not runtime-checked in GDScript) must return
+## false, mutate nothing, keep counts stable, and never let get_cell_state
+## expose a noncanonical stored value. Proves the guard on a small
+## rectangular board and the 59x59 canonical maximum.
+func _run_board_state_canonical_validation_tests() -> void:
+	var active = BoardState.CellState.ACTIVE
+	var cleared = BoardState.CellState.CLEARED
+	for dims in [Vector2i(5, 4), Vector2i(59, 59)]:
+		var board = _make_blank_board(dims.x, dims.y)
+		var count = board.get_cell_count()
+		var target = board.get_cell_index(dims.x / 2, dims.y / 2)
+		var neighbor = board.get_cell_index(0, 0)
+		var label = "%dx%d" % [dims.x, dims.y]
+		_check_eq(board.count_cells_by_state(active), count, "%s fresh board all ACTIVE" % label)
+		for bad in [2, -1, 255, 3, 99]:
+			var ret = board.set_cell_state(target, bad)
+			_check_eq(ret, false, "%s set_cell_state(valid, %d) returns false" % [label, bad])
+			_check_eq(board.get_cell_state(target), active, "%s target unchanged (ACTIVE) after noncanonical %d" % [label, bad])
+			_check_eq(board.get_cell_state(neighbor), active, "%s sibling unchanged after noncanonical %d" % [label, bad])
+			_check_eq(board.count_cells_by_state(active), count, "%s ACTIVE count preserved after noncanonical %d" % [label, bad])
+			_check_eq(board.count_cells_by_state(cleared), 0, "%s CLEARED count preserved after noncanonical %d" % [label, bad])
+			var st = board.get_cell_state(target)
+			_check(st == active or st == cleared, "%s get_cell_state exposes only ACTIVE/CLEARED after noncanonical %d" % [label, bad])
+		# Valid-state regression: canonical transitions still succeed.
+		_check_eq(board.set_cell_state(target, cleared), true, "%s ACTIVE->CLEARED succeeds" % label)
+		_check_eq(board.get_cell_state(target), cleared, "%s target reads CLEARED" % label)
+		_check_eq(board.set_cell_state(target, active), true, "%s CLEARED->ACTIVE succeeds" % label)
+		_check_eq(board.get_cell_state(target), active, "%s target reads ACTIVE" % label)
+		# Repeated identical canonical assignment stays stable.
+		board.set_cell_state(target, cleared)
+		board.set_cell_state(target, cleared)
+		_check_eq(board.get_cell_state(target), cleared, "%s repeated CLEARED assignment stable" % label)
+		board.set_cell_state(target, active)
+		# Invalid index still rejected safely.
+		_check_eq(board.set_cell_state(-1, cleared), false, "%s invalid index -1 returns false" % label)
+		_check_eq(board.set_cell_state(count, cleared), false, "%s invalid index == count returns false" % label)
+		# Count invariant: every cell is exactly ACTIVE or CLEARED.
+		_check_eq(board.count_cells_by_state(active) + board.count_cells_by_state(cleared), count, "%s ACTIVE+CLEARED == cell count" % label)
 
 func _run_independence_tests() -> void:
 	var level := _load_fixture("res://data/levels/test_40x40.json")
