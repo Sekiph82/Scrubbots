@@ -1,3 +1,11 @@
+### M19 implementation received but audit-blocked
+
+- M19 V01 implementation commit exists: `3fe57d51bf2ae33c23623d93154d79e21c145768`.
+- Claude correctly flagged the coordination conflict after M18 was reopened.
+- M19 work is preserved but **not audited / not closed**.
+- M18-C001 V02 strict correction remains the next required work.
+- After M18 passes, M19 must be re-synced and rerun against corrected M18 before its own strict-v2 audit.
+
 - Progress after strict M18 reopen: **274/943 = 29.06%** overall; **274/719 = 38.11%** main + SB-UI.
 
 ### Strict audit v2 / M18 re-audit
