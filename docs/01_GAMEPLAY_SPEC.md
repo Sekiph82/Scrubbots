@@ -46,8 +46,9 @@ Status tags used below:
 
 ## Global production pixel-art palette `[LOCKED — owner decision 2026-09-06]`
 
-Only C01..C15 from `data/palettes/scrubbots_palette_v1.json` are legal
-production logical artwork colors. See
+Only C01..C16 from `data/palettes/scrubbots_palette_v2.json` are legal
+production logical artwork colors. C16 is Pure Black `#000000` and is a normal
+logical artwork color. See
 `docs/08_PIXEL_ART_PALETTE_RULES.md` for the exact HEX/RGB table.
 
 Distinct canonical logical colors actually used by production artwork:
@@ -59,7 +60,7 @@ Distinct canonical logical colors actually used by production artwork:
 | HARD | **8–9** |
 | VERY_HARD | **10–12** |
 
-CLEARED transparency is runtime state and not a sixteenth color. Gameplay
+CLEARED transparency is runtime state and is not a logical palette color. Gameplay
 background and presentation-only square-grid/border overlays also do not count.
 
 ## ACTIVE / CLEARED cell lifecycle `[LOCKED — owner decision 2026-09-05, META-C004; ADR-019]`
