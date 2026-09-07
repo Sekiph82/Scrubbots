@@ -787,10 +787,10 @@ reachability (a matching-color ACTIVE cell may be blocked; AL-028).
 Renamed/migrated to `scripts/gameplay/targeting/color_candidate_index.gd`
 (`ColorCandidateIndex`) in META-C004; re-verified 774/774 ALL PASS.
 
-- [ ] SB-M13-001 Define color candidate (valid + ACTIVE + matching color + caller exclusion).
+- [x] SB-M13-001 Define color candidate (valid + ACTIVE + matching color + caller exclusion).
 - [x] SB-M13-002 Group/query by color.
 - [x] SB-M13-003 Implement efficient index/cache if measured useful.
-- [ ] SB-M13-004 Synchronize with BoardState.
+- [x] SB-M13-004 Synchronize with BoardState.
 - [x] SB-M13-005 Remove CLEARED cells from the index. — [x] SB-M13-006 Handle caller-supplied reservation/exclusion seam only (no owned reservation state).
 - [x] SB-M13-007 No-candidate query. — [x] SB-M13-008 Exhausted-color test.
 - [x] SB-M13-009 Last-candidate test. — [x] SB-M13-010 3,481-cell benchmark.
