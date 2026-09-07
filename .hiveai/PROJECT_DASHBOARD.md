@@ -1,3 +1,12 @@
+### Strict upstream repair queue
+
+- M18 V02: **AUDITED_PASS / strict-v2 final closed**.
+- READY now: **M15-C001 V02**.
+- Next after audit: M16-C001 V02.
+- Next after audit: M17-C002 V02.
+- M19 implementation preserved, but blocked until all upstream repairs strict-pass.
+- Sequence: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/STRICT_UPSTREAM_REPAIR_SEQUENCE_V01.md
+
 ### M19 implementation received but audit-blocked
 
 - M19 V01 implementation commit exists: `3fe57d51bf2ae33c23623d93154d79e21c145768`.
