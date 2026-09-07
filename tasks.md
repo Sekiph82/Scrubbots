@@ -520,7 +520,7 @@ Complete from Prompt 02, re-verified.
 - [x] SB-M02-009 Index→coordinate exists (`get_cell_position`).
 - [x] SB-M02-010 Cell color lookup exists (`get_color_id`).
 - [x] SB-M02-011 Cell state lookup exists (`get_cell_state`).
-- [x] SB-M02-012 State mutation exists (`set_cell_state`).
+- [ ] SB-M02-012 State mutation exists (`set_cell_state`).
 - [x] SB-M02-013 State counting exists (`count_cells_by_state`).
 - [x] SB-M02-014 Instance independence tested (two BoardStates from same LevelData don't share state).
 - [x] SB-M02-015 LevelData immutability behavior tested.
