@@ -5,8 +5,8 @@ Counts use unique canonical SB task IDs on checkbox lines. Not a task ledger.
 
 | Scope | Completed | Total | Remaining | Completion |
 | --- | ---: | ---: | ---: | ---: |
-| SCRUBBOTS ecosystem | 207 | 943 | 736 | 21.95% |
-| Main mobile game + SB-UI | 207 | 719 | 512 | 28.79% |
+| SCRUBBOTS ecosystem | 274 | 943 | 669 | 29.06% |
+| Main mobile game + SB-UI | 274 | 719 | 445 | 38.11% |
 | Level Factory LF00-LF10 | 0 | 112 | 112 | 0.00% |
 | Content Pipeline CP00-CP08 | 0 | 112 | 112 | 0.00% |
 
@@ -585,3 +585,15 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Remaining: **671**
 - Main game + SB-UI: **272 / 719 = 37.83%**
 - Main remaining: **447**
+
+
+### M13 final closed / M14 V02 ready
+
+- M13-C001 V05: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
+- Re-closed SB-M13-001/004.
+- M14 full-surface finding set: F-M14-STRICT-001/002.
+- M14-C001 V02: **READY**.
+- Overall: **274 / 943 = 29.06%**
+- Remaining: **669**
+- Main game + SB-UI: **274 / 719 = 38.11%**
+- Main remaining: **445**
