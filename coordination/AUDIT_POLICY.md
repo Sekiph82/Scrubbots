@@ -194,3 +194,120 @@ evidence only.
 
 H!veAI derived tracking files are ACTIVE_CYCLES.md, ARTIFACT_MAP.md, and
 PROGRESS_SNAPSHOT.md under `.hiveai/`; they do not replace `tasks.md`.
+
+
+## Strict audit standard v2 [LOCKED — 2026-09-07]
+
+This section supersedes any weaker interpretation of the earlier audit workflow.
+
+### What AUDITED_PASS means
+
+`AUDITED_PASS` means only:
+
+> No material defect was found under the required audit procedure and evidence available for this cycle.
+
+It never means “bug-free”, “production-perfect”, or “independently runtime-proven” unless the audit explicitly says so.
+
+### Correlated implementation/test risk
+
+Claude writes implementation code and usually writes/runs its own tests. Therefore Claude-authored green tests can share the same wrong assumption as the implementation.
+
+For critical systems, ChatGPT MUST NOT close a milestone merely because:
+- Claude's full suite is green;
+- Claude's new tests are green;
+- static source inspection finds no obvious issue.
+
+ChatGPT must design adversarial checks independently from Claude's test plan.
+
+### Critical gameplay / stateful milestone rule
+
+The following are **critical** by default:
+- targeting / reservation / routing;
+- agents / dispatch / orchestration / vertical slices;
+- save/load/state transitions;
+- win/lose/economy logic;
+- remote content, publishing, rollback and security;
+- destructive filesystem operations;
+- any milestone whose bug can duplicate, lose, corrupt or silently mutate canonical state.
+
+A critical milestone requires a **two-stage audit closure**:
+
+1. **Implementation audit**
+   - inspect prompt/log/commit/diff/source/tests;
+   - identify false-positive risk and missing edge cases;
+   - design independent adversarial scenarios.
+
+2. **Adversarial validation pass**
+   - ChatGPT publishes the adversarial scenarios/tests in the same cycle as the next versioned prompt/criteria, even when no implementation defect is yet proven;
+   - Claude implements only the requested corrections/tests, runs them, logs results, and stops at `AWAITING_AUDIT`;
+   - ChatGPT audits that validation pass before final task closure.
+
+Exception: stage 2 may be skipped only when ChatGPT can independently execute the relevant runtime behavior itself and records that E3 runtime evidence directly.
+
+### Minimum adversarial audit content
+
+For a critical cycle ChatGPT must independently probe applicable classes of failure, including at least:
+- invalid / malformed input;
+- boundary and max-size input;
+- repeated call / re-entry;
+- duplicate request / duplicate ownership;
+- stale state;
+- partial failure after earlier state mutation;
+- rollback;
+- reset/cancel during active work;
+- completion called twice;
+- lifecycle reuse after completion/cancel;
+- aliasing / mutable-reference bypass;
+- order-of-operations changes;
+- race-like synchronous contention where relevant.
+
+The audit file must state which classes are applicable and which were actually checked.
+
+### Direct observability / sensitivity
+
+For each material behavior, a test must observe that behavior directly.
+
+A test is insufficient when an unrelated earlier failure can make it green.
+
+For high-risk invariants, the audit should prefer a sensitivity/mutation check:
+- if the protected behavior were removed or bypassed, the test would fail for the intended reason.
+
+### Performance evidence isolation
+
+Performance evidence must isolate the subsystem/property being claimed.
+
+Examples:
+- agent lifecycle cost must not be inferred from a timer that also includes route generation;
+- renderer FPS must not be inferred from headless CPU timings;
+- pooling decisions must use allocation/lifecycle evidence rather than unrelated upstream work.
+
+Mixed timings may be reported as end-to-end diagnostics, but they cannot establish a subsystem-specific performance claim.
+
+### Runtime evidence when ChatGPT cannot execute Godot
+
+If ChatGPT cannot independently run Godot:
+- Claude runtime results stay E1/E2;
+- ChatGPT must disclose the limitation;
+- critical milestone closure requires the auditor-authored adversarial validation pass described above;
+- static E3 inspection plus Claude-authored tests alone are insufficient for final closure.
+
+### Task closure discipline
+
+ChatGPT closes tasks individually.
+
+If a strict audit finds a defect or insufficient proof:
+- reopen only the affected task IDs;
+- keep proven unrelated tasks closed;
+- keep the same cycle;
+- issue the next prompt version;
+- do not advance dependent milestones until the correction/validation audit passes.
+
+### Owner-controlled visual/game-feel gates
+
+Automated correctness does not close subjective visual/game-feel gates.
+
+Where owner judgement is required, status remains `OWNER_REQUIRED` until explicit owner approval.
+
+### Future audit default
+
+All audits issued after 2026-09-07 use this strict v2 standard automatically, even if an older cycle prompt did not repeat these rules.
