@@ -1,3 +1,13 @@
+### M19-C001 V01 milestone opening
+
+- State: **ISSUED**
+- New milestone: **M19 Scrubbot Dispatcher**
+- Prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_PROMPT_V01.md
+- Dispatcher orchestrates reachable selection/reservation, production routing and exactly one ScrubbotAgent per successful request.
+- M20 clearing remains unopened.
+- Current progress: **278/943 = 29.48%**.
+- Next actor: CLAUDE.
+
 - Progress after M18: **278/943 = 29.48%** overall; **278/719 = 38.66%** main + SB-UI.
 
 ### M18-C001 final audit
