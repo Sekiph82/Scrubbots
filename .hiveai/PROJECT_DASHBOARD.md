@@ -1,3 +1,5 @@
+- Progress with strict upstream reopens: **266/943 = 28.21%** overall; **266/719 = 37.00%** main + SB-UI.
+
 ### Strict upstream repair queue
 
 - M18 V02: **AUDITED_PASS / strict-v2 final closed**.
