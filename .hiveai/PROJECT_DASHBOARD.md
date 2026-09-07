@@ -1,3 +1,5 @@
+- Progress after M18: **278/943 = 29.48%** overall; **278/719 = 38.66%** main + SB-UI.
+
 ### M18-C001 final audit
 
 - Decision: **AUDITED_PASS / COMPLETE**
