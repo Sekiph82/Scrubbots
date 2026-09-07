@@ -8,8 +8,8 @@ This queue records strict-v2 findings from the M10-M14 re-audit without blocking
 
 - M10: AUDITED_PASS. No M10 task reopened.
 - M11: AUDITED_PASS / STRICT_V2_FINAL_CLOSURE.
-- M12: CHANGES_REQUIRED / FINDING_SET_FROZEN. SB-M12-005/009/011 remain open.
-- M13: CHANGES_REQUIRED. Reopen SB-M13-001/004.
+- M12: AUDITED_PASS / STRICT_V2_FINAL_CLOSURE.
+- M13: CHANGES_REQUIRED / FINDING_SET_FROZEN. SB-M13-001/004 remain open.
 - M14: CHANGES_REQUIRED. Reopen SB-M14-001/004/007/009.
 
 ## FOUNDATION-STRICT-001 — BoardState HIGH-RISK VALIDATION GAP
@@ -36,7 +36,7 @@ However, M11-M14 strict findings and the BoardState validation gap must be resol
 
 ## Full-surface transition
 
-The locked full attack-surface rule governs foundation repairs. M11 is final-closed after its frozen full-surface correction + V06 adversarial validation. M12 has now received its own full subsystem sweep; its finding set is frozen to F-M12-STRICT-001/002 and `coordination/sessions/M12-C001/CHATGPT_PROMPT_V04.md` is READY as a validation-only closure pass. M13-M14 remain blocked until the preceding repair passes and each receives its own full-surface sweep.
+The locked full attack-surface rule governs foundation repairs. M11 is final-closed after its frozen full-surface correction + V06 adversarial validation. M12 is final-closed after its frozen correction and V04 validation pass. M13 has now received a fresh full subsystem sweep; its finding set is frozen to F-M13-STRICT-001..003 and `coordination/sessions/M13-C001/CHATGPT_PROMPT_V03.md` is READY. M14 remains blocked until M13 passes and then receives its own full-surface sweep.
 
 
 ## M11 V05 audit transition
@@ -48,8 +48,9 @@ The locked full attack-surface rule governs foundation repairs. M11 is final-clo
 - Remaining: sensitivity-safe direct tests for post-reset snapshot truth, preserved renderer binding/invalid-size configure blocking, renderer rebind palette isolation, and lifecycle reuse.
 - M11 V06: **AUDITED_PASS / FINAL_CLOSED**.
 - M12 V03: **CHANGES_REQUIRED / production source accepted; validation gaps**.
-- M12 V04: **READY**.
-- M13/M14: **BLOCKED_BY_PRECEDING_FOUNDATION_REPAIR**.
+- M12 V04: **AUDITED_PASS / FINAL_CLOSED**.
+- M13 V03: **READY**.
+- M14: **BLOCKED_BY_PRECEDING_FOUNDATION_REPAIR**.
 
 
 ## M11 V06 final / M12 full-surface transition
@@ -59,7 +60,7 @@ The locked full attack-surface rule governs foundation repairs. M11 is final-clo
 - M12 full-surface sweep completed before correction prompt.
 - M12 frozen findings: F-M12-STRICT-001/002.
 - M12-C001 V03: **CHANGES_REQUIRED / VALIDATION_HARDENING_REQUIRED**.
-- M12-C001 V04: **READY**.
+- M12-C001 V04: **AUDITED_PASS / FINAL_CLOSED**.
 - M13/M14 remain blocked.
 - M19 remains audit-blocked until the entire foundation queue and BoardState validation gap close.
 
@@ -72,3 +73,15 @@ The locked full attack-surface rule governs foundation repairs. M11 is final-clo
 - Remaining: direct runtime proof for nested malformed configure entries, palette_size <= 0, reconfigure state preservation, caller Array alias isolation, standalone SlotState isolation, and complete malformed-query no-mutation state.
 - M12 V04: **READY**.
 - M13/M14: **BLOCKED_BY_PRECEDING_FOUNDATION_REPAIR**.
+
+
+## M12 V04 final / M13 full-surface transition
+
+- M12-C001 V04: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
+- M12 re-closed: SB-M12-005/009/011.
+- M13 full-surface sweep completed before correction prompt.
+- M13 frozen findings: F-M13-STRICT-001/002/003.
+- M13-C001 V03: **READY**.
+- M14 remains blocked.
+- FOUNDATION-STRICT-001 remains open and separate.
+- M19 remains audit-blocked until foundation queue + BoardState validation gap close.
