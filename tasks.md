@@ -833,6 +833,8 @@ blocked/unreachable is not a valid target (AL-028).
 
 ### M16 — RoutingSystem Interface
 
+M16-C001 V05 strict full-surface audit PASS; SB-M16-002/003/010/011 re-closed. See `coordination/sessions/M16-C001/CHATGPT_AUDIT_V05.md`.
+
 Access semantics (locked, AL-028; exact topology/path style is still design
 work): non-target ACTIVE cells are **blockers**; CLEARED cells and
 gameplay-background/outside-board space are **open**; a route ends at the
@@ -840,13 +842,13 @@ already-assigned ACTIVE target. No route → **failure**, never a silent
 retarget (that decision belongs to TargetSelector, not RoutingSystem).
 
 - [x] SB-M16-001 Define RoutingSystem contract.
-- [ ] SB-M16-002 Define route input. — [ ] SB-M16-003 Define route output.
+- [x] SB-M16-002 Define route input. — [x] SB-M16-003 Define route output.
 - [x] SB-M16-004 Define coordinate space.
 - [x] SB-M16-005 Slot origin. — [x] SB-M16-006 Cell destination (the assigned ACTIVE target).
 - [x] SB-M16-007 Keep independent from TargetSelector (8.10).
 - [x] SB-M16-008 Swappable implementations.
 - [x] SB-M16-009 Debug route visualization.
-- [ ] SB-M16-010 Route validity checks: non-target ACTIVE cells block, CLEARED/background is open, route ends at the assigned target. — [ ] SB-M16-011 Failure behavior: no route is a failure returned to the caller, never a silent retarget.
+- [x] SB-M16-010 Route validity checks: non-target ACTIVE cells block, CLEARED/background is open, route ends at the assigned target. — [x] SB-M16-011 Failure behavior: no route is a failure returned to the caller, never a silent retarget.
 
 ### M17 — Routing Prototype Lab
 
