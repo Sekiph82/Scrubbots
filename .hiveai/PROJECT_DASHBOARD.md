@@ -1,3 +1,12 @@
+### M17 final pass / M11 frozen V05
+
+- M17-C002 V03: **AUDITED_PASS / final closed**
+- READY now: **M11-C001 V05**
+- M11 V05 is based on a full attack-surface sweep with a frozen finding set.
+- M12-M14 remain foundation-blocked in sequence.
+- M19 remains audit-blocked until foundation repairs close.
+- Progress: **265/943 = 28.10%** overall; **265/719 = 36.86%** main + UI.
+
 ### M16 final pass / M17 frozen V03
 
 - M16-C001 V05: **AUDITED_PASS / final closed**
