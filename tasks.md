@@ -852,19 +852,22 @@ retarget (that decision belongs to TargetSelector, not RoutingSystem).
 
 ### M17 — Routing Prototype Lab
 
+M17-C002 V03 strict full-surface audit PASS; SB-M17-002/003/015/016 re-closed. See `coordination/sessions/M17-C002/CHATGPT_AUDIT_V03.md`.
+
+
 One of the most important SCRUBBOTS milestones. Do not lock the first
 working solution — prototype multiple options.
 
 - [x] SB-M17-001 Direct route baseline.
-- [ ] SB-M17-002 Grid-aware route prototype.
-- [ ] SB-M17-003 Organized polyline/curved prototype.
+- [x] SB-M17-002 Grid-aware route prototype.
+- [x] SB-M17-003 Organized polyline/curved prototype.
 - [x] SB-M17-004 Compare visual clarity. — [x] SB-M17-005 Compare path crossings.
 - [x] SB-M17-006 Compare congestion. — [x] SB-M17-007 Compare CPU cost.
 - [x] SB-M17-008 Compare route distance. — [x] SB-M17-009 Compare determinism.
 - [x] SB-M17-010 Compare against original SCRUBBOTS visual direction. — superseded for this gate by owner-reviewed Organized/curved selection because no authoritative original movement reference exists.
 - [x] SB-M17-011 Test 5 bots. — [x] SB-M17-012 Test 10 bots. — [x] SB-M17-013 Test 25 bots.
 - [x] SB-M17-014 Stress-test higher density.
-- [ ] SB-M17-015 Test 59×59. — [ ] SB-M17-016 Test rectangular Very Hard board.
+- [x] SB-M17-015 Test 59×59. — [x] SB-M17-016 Test rectangular Very Hard board.
 
 Required cases under the access rule (AL-028): a **blocked interior** target
 (fully enclosed matching-color ACTIVE cell) yields no route (never a silent
