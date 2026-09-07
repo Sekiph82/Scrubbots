@@ -3787,6 +3787,26 @@ func _run_route_validator_tests() -> void:
 	# Null request keeps its documented semantics (a canonical failure is still NONE).
 	_check_eq(RouteValidator.validate_failure_result(null, canon_fail), RouteResult.FailureReason.NONE, "validate_failure_result: null request retains documented semantics")
 
+	# === Strict V04: arbitrary Variant SCALAR inputs fail closed (AL-041) ===
+	# Board scalars: int / String / Vector2. No has_method is attempted on a
+	# non-object; access double would approve (default_traversable) if reached.
+	for bad_board in [7, "board", Vector2.ZERO]:
+		_check_eq(RouteValidator.validate_request(req, bad_board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: scalar board (%s) fails closed" % str(bad_board))
+		var bb_acc = RouteAccessQueryDouble.new(); bb_acc.default_traversable = true
+		_check_eq(RouteValidator.validate_route(req, result, bad_board, bb_acc), RouteResult.FailureReason.INVALID_REQUEST, "validate_route: scalar board (%s) -> INVALID_REQUEST" % str(bad_board))
+		_check_eq(bb_acc.total_queries(), 0, "validate_route: scalar board (%s) makes zero access calls" % str(bad_board))
+
+	# Result: RefCounted junk + int / String / Vector2, guarded before .success.
+	for bad_result in [RefCounted.new(), 7, "route", Vector2.ZERO]:
+		var br_acc = RouteAccessQueryDouble.new(); br_acc.default_traversable = true
+		_check_eq(RouteValidator.validate_route(req, bad_result, board, br_acc), RouteResult.FailureReason.INVALID_ROUTE, "validate_route: malformed result (%s) fails closed" % str(bad_result))
+		_check_eq(br_acc.total_queries(), 0, "validate_route: malformed result (%s) makes zero access calls" % str(bad_result))
+
+	# Access-query: int / String / Vector2 + a RefCounted lacking the method.
+	# No has_method on a non-object; single stable MISSING_ACCESS_QUERY; no segment call.
+	for bad_acc in [7, "access", Vector2.ZERO, RefCounted.new()]:
+		_check_eq(RouteValidator.validate_route(req, result, board, bad_acc), RouteResult.FailureReason.MISSING_ACCESS_QUERY, "validate_route: malformed access_query (%s) -> MISSING_ACCESS_QUERY" % str(bad_acc))
+
 func _run_routing_system_swappability_tests() -> void:
 	var board = _make_blank_board(8, 6)
 	var tgt = board.get_cell_index(5, 3)
