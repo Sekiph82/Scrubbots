@@ -37,6 +37,7 @@ const RouteDebugOverlay = preload("res://scripts/debug/route_debug_overlay.gd")
 const RouteAccessQueryDouble = preload("res://tests/support/route_access_query_double.gd")
 const RouteNonBoolAccessQueryDouble = preload("res://tests/support/route_nonbool_access_double.gd")
 const PartialBoardDouble = preload("res://tests/support/partial_board_double.gd")
+const WrongReturnBoardDouble = preload("res://tests/support/wrong_return_board_double.gd")
 const RouteFakeStraight = preload("res://tests/support/route_fake_straight.gd")
 const RouteFakeRelay = preload("res://tests/support/route_fake_relay.gd")
 # M17 — EXPERIMENTAL routing prototype lab.
@@ -3597,6 +3598,27 @@ func _run_route_request_tests() -> void:
 	var c_b := RouteRequest.center_of_index(board, board.get_cell_index(2, 1))
 	_check(is_equal_approx(c_b.x - c_a.x, 1.0), "one logical cell == 1.0 coordinate unit (adjacent centers differ by 1.0)")
 
+	# === Strict V05: exact BoardState identity at the public RouteRequest board
+	# boundary (F-M16-STRICT-006/007). center_of_index -> (-INF,-INF), for_target
+	# -> null for every malformed board, with NO runtime fault. ===
+	var wrong_board = WrongReturnBoardDouble.new() # full method shape, wrong return types
+	var partial = PartialBoardDouble.new()
+	var bad_boards := [null, 7, "board", Vector2.ZERO, RefCounted.new(), partial, wrong_board]
+	for bb in bad_boards:
+		var c := RouteRequest.center_of_index(bb, 0)
+		_check(c.x == -INF and c.y == -INF, "center_of_index(malformed board %s) -> (-INF,-INF)" % str(typeof(bb)))
+		_check(RouteRequest.for_target(bb, Vector2.ZERO, 0) == null, "for_target(malformed board %s) -> null" % str(typeof(bb)))
+
+	# for_target rejects non-finite slot origins (canonical factory never emits a
+	# structurally-invalid request).
+	_check(RouteRequest.for_target(board, Vector2(NAN, 2.5), tgt) == null, "for_target: NaN start -> null")
+	_check(RouteRequest.for_target(board, Vector2(INF, 2.5), tgt) == null, "for_target: +INF start -> null")
+	_check(RouteRequest.for_target(board, Vector2(-INF, 2.5), tgt) == null, "for_target: -INF start -> null")
+
+	# Request stores no BoardState reference (detached value object, AL-020).
+	var ref_check = RouteRequest.for_target(board, Vector2(-1.0, 1.5), tgt)
+	_check(not ("board" in ref_check), "RouteRequest stores no BoardState reference")
+
 func _run_route_result_tests() -> void:
 	var pts := PackedVector2Array([Vector2(-2.0, 0.5), Vector2(4.5, 2.5)])
 	var r = RouteResult.success_route(11, pts)
@@ -3787,14 +3809,16 @@ func _run_route_validator_tests() -> void:
 	# Null request keeps its documented semantics (a canonical failure is still NONE).
 	_check_eq(RouteValidator.validate_failure_result(null, canon_fail), RouteResult.FailureReason.NONE, "validate_failure_result: null request retains documented semantics")
 
-	# === Strict V04: arbitrary Variant SCALAR inputs fail closed (AL-041) ===
-	# Board scalars: int / String / Vector2. No has_method is attempted on a
-	# non-object; access double would approve (default_traversable) if reached.
-	for bad_board in [7, "board", Vector2.ZERO]:
-		_check_eq(RouteValidator.validate_request(req, bad_board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: scalar board (%s) fails closed" % str(bad_board))
+	# === Strict V04/V05: arbitrary Variant inputs fail closed (AL-041/AL-042) ===
+	# Access double uses default_traversable so it would approve if ever reached;
+	# asserting the fail-closed reason + zero queries proves the guard replaces it.
+	# V05: exact BoardState identity — scalars, junk, partial, AND a full-shape
+	# wrong-return double all fail closed at the validator board boundary.
+	for bad_board in [7, "board", Vector2.ZERO, RefCounted.new(), PartialBoardDouble.new(), WrongReturnBoardDouble.new()]:
+		_check_eq(RouteValidator.validate_request(req, bad_board), RouteResult.FailureReason.INVALID_REQUEST, "validate_request: malformed board (%s) fails closed" % str(typeof(bad_board)))
 		var bb_acc = RouteAccessQueryDouble.new(); bb_acc.default_traversable = true
-		_check_eq(RouteValidator.validate_route(req, result, bad_board, bb_acc), RouteResult.FailureReason.INVALID_REQUEST, "validate_route: scalar board (%s) -> INVALID_REQUEST" % str(bad_board))
-		_check_eq(bb_acc.total_queries(), 0, "validate_route: scalar board (%s) makes zero access calls" % str(bad_board))
+		_check_eq(RouteValidator.validate_route(req, result, bad_board, bb_acc), RouteResult.FailureReason.INVALID_REQUEST, "validate_route: malformed board (%s) -> INVALID_REQUEST" % str(typeof(bad_board)))
+		_check_eq(bb_acc.total_queries(), 0, "validate_route: malformed board (%s) makes zero access calls" % str(typeof(bad_board)))
 
 	# Result: RefCounted junk + int / String / Vector2, guarded before .success.
 	for bad_result in [RefCounted.new(), 7, "route", Vector2.ZERO]:
@@ -3819,6 +3843,17 @@ func _run_routing_system_swappability_tests() -> void:
 	_check_eq(base_res.failure_reason, RouteResult.FailureReason.NOT_IMPLEMENTED, "base RoutingSystem -> NOT_IMPLEMENTED")
 	_check_eq(base_res.point_count(), 0, "base RoutingSystem failure has empty points")
 	_check_eq(base_res.target_index, tgt, "base RoutingSystem failure retains assigned target")
+
+	# === Strict V05: base compute_route fails cleanly for ARBITRARY request
+	# Variants (F-M16-STRICT-008). target_index read only from a real RouteRequest;
+	# malformed -> stable NOT_IMPLEMENTED with target -1, no runtime fault. ===
+	for bad_req in [null, 7, "req", Vector2.ZERO, RefCounted.new()]:
+		var mr = base.compute_route(bad_req, board, null)
+		_check(not mr.success, "base compute_route(malformed %s) fails cleanly" % str(typeof(bad_req)))
+		_check_eq(mr.failure_reason, RouteResult.FailureReason.NOT_IMPLEMENTED, "base compute_route(malformed %s) -> NOT_IMPLEMENTED" % str(typeof(bad_req)))
+		_check_eq(mr.target_index, -1, "base compute_route(malformed %s) -> target -1 (no deref)" % str(typeof(bad_req)))
+	# A real RouteRequest still retains its assigned target.
+	_check_eq(base.compute_route(req, board, null).target_index, tgt, "base compute_route(real request) retains target_index")
 
 	# Two distinct fakes satisfy the SAME compute_route contract.
 	var straight = RouteFakeStraight.new()

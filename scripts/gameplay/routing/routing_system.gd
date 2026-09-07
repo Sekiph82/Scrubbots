@@ -27,9 +27,15 @@ extends RefCounted
 ## (and test fakes) subclass it.
 
 const RouteResult = preload("res://scripts/gameplay/routing/route_result.gd")
+const RouteRequest = preload("res://scripts/gameplay/routing/route_request.gd")
 
 ## Base/default behaviour: no algorithm, so no route. Fails cleanly with the
 ## originally requested target retained. Subclasses override this.
+##
+## target_index is read ONLY from a real RouteRequest (F-M16-STRICT-008): `x is
+## RouteRequest` is false for null, scalar Variants (int/String/Vector2) and junk
+## objects and never throws, so an arbitrary request Variant yields a stable
+## NOT_IMPLEMENTED failure with target -1 rather than a runtime fault.
 func compute_route(request, _board, _access_query) -> RefCounted:
-	var idx: int = request.target_index if request != null else -1
+	var idx: int = request.target_index if (request is RouteRequest) else -1
 	return RouteResult.failure(RouteResult.FailureReason.NOT_IMPLEMENTED, idx)
