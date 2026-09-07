@@ -108,6 +108,8 @@ func _initialize() -> void:
 	_run_m17c002_production_routing_tests()
 	# M18 — lightweight Scrubbot agent.
 	_run_m18_agent_tests()
+	_run_m18_agent_lifecycle_reentry_tests()
+	_run_m18_multisegment_movement_tests()
 	_run_m18_agent_stress_tests()
 	_run_m18_agent_debug_scene_smoke()
 	# M19 — dispatcher orchestration.
@@ -4282,28 +4284,187 @@ func _run_m18_agent_tests() -> void:
 
 ## Concurrent multi-agent CPU/lifecycle stress. Precomputed valid routes; no
 ## Dispatcher. Measures CPU/node behaviour only — NO FPS/GPU claim from headless.
+func _run_m18_agent_lifecycle_reentry_tests() -> void:
+	# F-M18-STRICT-001 / AL-037: ScrubbotAgent is single-use. assign() succeeds
+	# ONLY from UNASSIGNED; re-entry while MOVING/ARRIVED/CANCELLED must fail
+	# closed and preserve all state, and agent reuse can never emit a second
+	# completion. Uses a SECOND independently-valid route so rejection is proven
+	# to come from re-entry, not from malformed data.
+	print("---- M18: single-use lifecycle re-entry (adversarial) ----")
+	var ctxA := _m18_route(RoutingLabScenarios.make_s1(), 0)
+	var ctxB := _m18_route(RoutingLabScenarios.make_s1(), 1)
+	_check(ctxA["route"].success and ctxB["route"].success, "precondition: two independent valid routes exist")
+
+	# Prove route B is valid on a FRESH agent — so later rejections are pure re-entry.
+	var probe = ScrubbotAgent.new()
+	_check(probe.assign(1, 4, ctxB["req"], ctxB["route"], 6.0), "the second route assigns on a fresh UNASSIGNED agent (independently valid)")
+	probe.free()
+
+	# 1) valid first assign from UNASSIGNED.
+	var comp: Array = []
+	var a = ScrubbotAgent.new()
+	a.agent_completed.connect(func(_o, _t, _c): comp.append(1))
+	_check(a.assign(0, 3, ctxA["req"], ctxA["route"], 6.0), "valid first assign succeeds (from UNASSIGNED)")
+	_check_eq(a.get_state(), ScrubbotAgent.State.MOVING, "first assign -> MOVING")
+	a.advance(0.01) # some progress, still MOVING.
+
+	# Snapshot every field the re-entry must preserve.
+	var s_owner: int = a.owner_id
+	var s_color: int = a.color_id
+	var s_target: int = a.target_index
+	var s_spawn: Vector2 = a.spawn_origin
+	var s_tpos: Vector2 = a.target_position
+	var s_pts: PackedVector2Array = a.get_route_points()
+	var s_prog: float = a.get_progress()
+	var s_pos: Vector2 = a.get_local_position()
+
+	# 2) valid second assign while MOVING fails.
+	_check(not a.assign(1, 4, ctxB["req"], ctxB["route"], 9.0), "valid second assign while MOVING fails (single-use)")
+	# 3) MOVING re-entry failure preserves ALL identity/route/progress/position.
+	_check_eq(a.get_state(), ScrubbotAgent.State.MOVING, "MOVING re-entry: state preserved")
+	_check_eq(a.owner_id, s_owner, "MOVING re-entry: owner_id preserved")
+	_check_eq(a.color_id, s_color, "MOVING re-entry: color_id preserved")
+	_check_eq(a.target_index, s_target, "MOVING re-entry: target_index preserved")
+	_check(a.spawn_origin.is_equal_approx(s_spawn), "MOVING re-entry: spawn_origin preserved")
+	_check(a.target_position.is_equal_approx(s_tpos), "MOVING re-entry: target_position preserved")
+	_check(_m18_points_equal(a.get_route_points(), s_pts), "MOVING re-entry: route points preserved")
+	_check(absf(a.get_progress() - s_prog) < 1e-6, "MOVING re-entry: movement progress preserved")
+	_check(a.get_local_position().is_equal_approx(s_pos), "MOVING re-entry: current position preserved")
+	_check_eq(comp.size(), 0, "MOVING re-entry: no completion emitted")
+
+	# Drive to arrival: exactly one completion.
+	_m18_run_to_arrival(a)
+	_check(a.has_arrived(), "agent reaches ARRIVED")
+	_check_eq(comp.size(), 1, "exactly one completion on arrival")
+	var end_pos: Vector2 = a.get_local_position()
+
+	# 4) valid second assign after ARRIVED fails; 5) ARRIVED truth preserved.
+	_check(not a.assign(1, 4, ctxB["req"], ctxB["route"], 9.0), "valid second assign after ARRIVED fails")
+	_check(a.has_arrived(), "ARRIVED re-entry: still ARRIVED")
+	_check(a.get_local_position().is_equal_approx(end_pos), "ARRIVED re-entry: endpoint position unchanged")
+	_check_eq(comp.size(), 1, "ARRIVED re-entry: completion count still 1")
+	# 9) reuse cannot create a second completion, even with more advancing.
+	a.advance(100.0)
+	_check_eq(comp.size(), 1, "agent reuse cannot emit a second completion event")
+	a.free()
+
+	# 6) valid second assign after CANCELLED fails; 7) CANCELLED truth preserved.
+	var b = ScrubbotAgent.new()
+	b.assign(0, 3, ctxA["req"], ctxA["route"], 6.0)
+	b.advance(0.05)
+	b.cancel()
+	var b_pos: Vector2 = b.get_local_position()
+	_check(b.is_cancelled(), "cancel of a MOVING agent -> CANCELLED")
+	_check(not b.assign(1, 4, ctxB["req"], ctxB["route"], 9.0), "valid second assign after CANCELLED fails")
+	_check(b.is_cancelled(), "CANCELLED re-entry: still CANCELLED")
+	_check(b.get_local_position().is_equal_approx(b_pos), "CANCELLED re-entry: position unchanged")
+	_check_eq(b.owner_id, 0, "CANCELLED re-entry: owner identity unchanged")
+	_check_eq(b.color_id, 3, "CANCELLED re-entry: color identity unchanged")
+	b.free()
+
+	# 8) cancel after ARRIVED is a no-op (does NOT downgrade ARRIVED).
+	var d = ScrubbotAgent.new()
+	var dcomp: Array = []
+	d.agent_completed.connect(func(_o, _t, _c): dcomp.append(1))
+	d.assign(0, 3, ctxA["req"], ctxA["route"], 6.0)
+	_m18_run_to_arrival(d)
+	_check(d.has_arrived(), "precondition: d ARRIVED")
+	d.cancel()
+	_check(d.has_arrived(), "cancel after ARRIVED does NOT downgrade ARRIVED")
+	_check(not d.is_cancelled(), "ARRIVED agent is not marked CANCELLED by cancel()")
+	_check_eq(dcomp.size(), 1, "cancel after ARRIVED does not alter completion truth")
+	d.free()
+
+func _run_m18_multisegment_movement_tests() -> void:
+	# F-M18-STRICT-002 / AL-038: prove distance-based movement crosses MULTIPLE
+	# segment boundaries in ONE advance. Handcrafted route (0,0)->(1,0)->(1,1)->
+	# (3,1): seg lengths 1,1,2 (total 4). A single advance of travelled 2.5 must
+	# land on the THIRD segment at exactly (1.5,1). This assertion FAILS if the
+	# implementation only advances within one segment per call.
+	print("---- M18: observable multi-segment movement (handcrafted route) ----")
+	var req = RouteRequest.new()
+	req.target_index = 0
+	req.start_position = Vector2(0, 0)
+	req.target_position = Vector2(3, 1)
+	var pts := PackedVector2Array([Vector2(0, 0), Vector2(1, 0), Vector2(1, 1), Vector2(3, 1)])
+	var route = RouteResult.success_route(0, pts)
+	_check_eq(pts.size(), 4, "handcrafted route has 4 points / 3 segments (>=3)")
+	_check(is_equal_approx(pts[0].distance_to(pts[1]), 1.0), "segment 0 length == 1")
+	_check(is_equal_approx(pts[1].distance_to(pts[2]), 1.0), "segment 1 length == 1")
+	_check(is_equal_approx(pts[2].distance_to(pts[3]), 2.0), "segment 2 length == 2 (total 4)")
+
+	var comp: Array = []
+	var a = ScrubbotAgent.new()
+	a.agent_completed.connect(func(_o, _t, _c): comp.append(1))
+	_check(a.assign(0, 2, req, route, 1.0), "handcrafted multi-segment route assigns (speed 1.0)")
+
+	# One advance -> travelled 2.5: crosses boundary@1.0 (end seg0) AND boundary@2.0
+	# (end seg1), lands 0.5 into seg2. Does NOT reach the endpoint (total 4).
+	a.advance(2.5)
+	_check(a.is_moving(), "still MOVING after a delta that crosses two boundaries (not finished)")
+	_check(a.get_local_position().is_equal_approx(Vector2(1.5, 1.0)), "exact position on the THIRD segment (1.5,1) — multi-segment traversal proven")
+	_check(absf(a.get_progress() - 0.625) < 1e-5, "exact progress 2.5/4 == 0.625")
+	_check_eq(comp.size(), 0, "no completion before reaching the endpoint")
+
+	# Huge delta crosses ALL remaining route and exact-snaps the endpoint once.
+	a.advance(100.0)
+	_check(a.has_arrived(), "huge delta reaches ARRIVED")
+	_check(a.get_local_position().is_equal_approx(Vector2(3, 1)), "huge delta exact-snaps to endpoint (3,1)")
+	_check_eq(comp.size(), 1, "completion emits exactly once on the huge-delta finish")
+	a.advance(100.0)
+	_check_eq(comp.size(), 1, "no second completion after arrival")
+	a.free()
+
+## Element-wise point-array equality (is_equal_approx per point) for the
+## re-entry preservation checks.
+func _m18_points_equal(p: PackedVector2Array, q: PackedVector2Array) -> bool:
+	if p.size() != q.size():
+		return false
+	for i in range(p.size()):
+		if not p[i].is_equal_approx(q[i]):
+			return false
+	return true
+
 func _run_m18_agent_stress_tests() -> void:
-	print("---- M18: agent concurrency stress (CPU/node only; no FPS/GPU claim) ----")
+	# F-M18-STRICT-003 / AL-036: isolate AGENT-LIFECYCLE cost. Every route is
+	# precomputed AND verified successful BEFORE the timer starts; the timed
+	# region contains only allocation + signal hookup + assign + deterministic
+	# movement-to-completion + free. Route generation is timed separately and
+	# labelled. Headless CPU/node behaviour only — no FPS/GPU/mobile-frame claim.
+	print("---- M18: agent lifecycle isolation stress (CPU/node only; no FPS/GPU claim) ----")
 	for count in [5, 10, 25, 40]:
 		var scenario: Dictionary = RoutingLabScenarios.make_s6(count) if count > 25 else RoutingLabScenarios.make_s5(count)
 		var board = scenario["board"]
 		var access = ProductionAccessQuery.new(board)
 		var reqs: Array = RoutingLabScenarios.build_requests(board, scenario["targets"], scenario["origins"])
-		var agents: Array = []
-		var routes_ok := 0
-		var completions: Array = [] # lambdas capture primitives by value; Array is by-ref.
-		var t0 := Time.get_ticks_usec()
+		var label := "%d-agent" % count if count <= 25 else "stress %d-agent (>25)" % count
+
+		# --- route generation: OUTSIDE the lifecycle timer -------------------
+		var routes: Array = []
+		var t_routes := Time.get_ticks_usec()
 		for req in reqs:
-			var route = ProductionRoutingSystem.new().compute_route(req, board, access)
-			if not route.success:
-				continue
-			routes_ok += 1
-			var ag = ScrubbotAgent.new()
-			ag.agent_completed.connect(func(_o, _t, _c): completions.append(1))
-			ag.assign(0, 4, req, route, 8.0)
+			routes.append(ProductionRoutingSystem.new().compute_route(req, board, access))
+		var route_ms := float(Time.get_ticks_usec() - t_routes) / 1000.0
+		var routes_ok := 0
+		for route in routes:
+			if route.success:
+				routes_ok += 1
+		# Gate: only start lifecycle timing once ALL routes are known-good.
+		_check_eq(routes_ok, reqs.size(), "%s: all routes precomputed AND verified successful before timing (%d)" % [label, routes_ok])
+		if routes_ok != reqs.size():
+			continue
+
+		# --- timed region: agent lifecycle ONLY (routes already ready) -------
+		var completions: Array = [] # lambdas capture primitives by value; Array is by-ref.
+		var agents: Array = []
+		var t0 := Time.get_ticks_usec()
+		for i in range(reqs.size()):
+			var ag = ScrubbotAgent.new()               # allocation
+			ag.agent_completed.connect(func(_o, _t, _c): completions.append(1)) # signal hookup
+			ag.assign(0, 4, reqs[i], routes[i], 8.0)   # assign
 			root.add_child(ag)
 			agents.append(ag)
-		# Drive all agents concurrently with a shared delta.
+		# Deterministic movement to completion (shared delta, concurrent).
 		for _step in range(80):
 			var still := false
 			for ag in agents:
@@ -4312,7 +4473,6 @@ func _run_m18_agent_stress_tests() -> void:
 					still = true
 			if not still:
 				break
-		var elapsed_ms := float(Time.get_ticks_usec() - t0) / 1000.0
 		var arrived := 0
 		var orphan_free := true
 		for ag in agents:
@@ -4320,19 +4480,21 @@ func _run_m18_agent_stress_tests() -> void:
 				arrived += 1
 			if ag.get_child_count() != 0:
 				orphan_free = false
-		var label := "%d-agent" % count if count <= 25 else "stress %d-agent (>25)" % count
-		_check(routes_ok == reqs.size(), "%s: all routes precomputed successfully (%d)" % [label, routes_ok])
-		_check_eq(arrived, agents.size(), "%s concurrent movement all arrive" % label)
+		for ag in agents:                              # free/cleanup
+			ag.free()
+		var lifecycle_ms := float(Time.get_ticks_usec() - t0) / 1000.0
+
+		_check_eq(arrived, agents.size(), "%s: all agents reach ARRIVED via deterministic movement" % label)
 		_check_eq(completions.size(), agents.size(), "%s: completion signal fired once per agent" % label)
 		_check(orphan_free, "%s: no agent owns child/orphan nodes" % label)
-		print("     M18 stress %s: %d agents, route+move CPU=%.1f ms (headless CPU only, no FPS/GPU claim)" % [label, agents.size(), elapsed_ms])
-		for ag in agents:
-			ag.free()
-	# Pooling decision, recorded as required by the prompt.
-	print("     M18 pooling: NOT justified yet — agent is a childless Node2D with")
-	print("     no per-frame allocation; up to 40 concurrent create/assign/run/free")
-	print("     showed no materially problematic lifecycle cost. Defer pooling to")
-	print("     real Dispatcher (M19) profiling. (SB-M18-015)")
+		print("     M18 lifecycle-ISOLATED %s: %d agents, alloc+assign+move+free CPU=%.2f ms | route-gen (separate)=%.2f ms (headless CPU only, no FPS/GPU claim)" % [label, agents.size(), lifecycle_ms, route_ms])
+	# Pooling decision — wording limited to what this headless lifecycle test shows.
+	print("     M18 pooling: NOT added. Isolated headless agent-lifecycle timing")
+	print("     (alloc+assign+move+free, routes precomputed) shows no justification")
+	print("     for pooling under THIS test. The agent is a childless Node2D with no")
+	print("     per-frame allocation. This is headless CPU/node evidence only — not")
+	print("     an FPS/GPU/mobile-frame result. Pooling stays deferred to real")
+	print("     profiling if future evidence justifies it. (SB-M18-014/015, AL-036)")
 
 func _run_m18_agent_debug_scene_smoke() -> void:
 	print("---- M18: agent debug scene smoke ----")
