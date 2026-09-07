@@ -179,3 +179,5 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 
 | M11-C001 V06 strict final audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V06.md | `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE` | Auditor-authored sensitivity pass closed frozen F-M11-STRICT-001..005; production source unchanged from V05. |
 | M12-C001 full-surface re-audit V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M12-C001/CHATGPT_FULL_SURFACE_REAUDIT_V02.md | `CHANGES_REQUIRED / FINDING_SET_FROZEN` | Frozen F-M12-STRICT-001 sentinel/unconfigured query and F-M12-STRICT-002 arbitrary Variant palette-query boundary; AL-048/AL-053 apply. |
+
+| FOUNDATION-STRICT-001 | coordination/STRICT_FOUNDATION_REPAIR_QUEUE_V01.md | `HIGH-RISK VALIDATION GAP` | BoardState.set_cell_state must adversarially reject non-canonical states 2/-1/255 with false + no mutation; promote to concrete M02 defect if Godot accepts them. |
