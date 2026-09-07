@@ -809,16 +809,16 @@ candidates from `ColorCandidateIndex` plus a narrow reachability/access truth;
 it must never generate a route. A matching-color ACTIVE cell that is
 blocked/unreachable is not a valid target (AL-028).
 
-- [x] SB-M15-001 Create TargetSelector.
+- [ ] SB-M15-001 Create TargetSelector.
 - [x] SB-M15-002 Keep BoardState access narrow.
 - [x] SB-M15-003 Baseline deterministic strategy.
 - [x] SB-M15-004 Match Scrubbot color.
 - [x] SB-M15-005 Never target CLEARED. — [x] SB-M15-006 Never target invalid or blocked/unreachable ACTIVE cells (consume a narrow reachability/access truth; a fully enclosed matching-color ACTIVE cell must not be selected and must not cause dispatch — required regression, AL-028).
-- [x] SB-M15-007 Respect reservations.
-- [x] SB-M15-008 Return no-target cleanly.
+- [ ] SB-M15-007 Respect reservations.
+- [ ] SB-M15-008 Return no-target cleanly.
 - [x] SB-M15-009 No route generation inside selector (8.10).
 - [x] SB-M15-010 Determinism tests.
-- [x] SB-M15-011 Simultaneous assignment tests.
+- [ ] SB-M15-011 Simultaneous assignment tests.
 - [x] SB-M15-012 3,481-cell benchmark.
 
 ### M16 — RoutingSystem Interface
@@ -830,13 +830,13 @@ already-assigned ACTIVE target. No route → **failure**, never a silent
 retarget (that decision belongs to TargetSelector, not RoutingSystem).
 
 - [x] SB-M16-001 Define RoutingSystem contract.
-- [x] SB-M16-002 Define route input. — [x] SB-M16-003 Define route output.
+- [ ] SB-M16-002 Define route input. — [ ] SB-M16-003 Define route output.
 - [x] SB-M16-004 Define coordinate space.
 - [x] SB-M16-005 Slot origin. — [x] SB-M16-006 Cell destination (the assigned ACTIVE target).
 - [x] SB-M16-007 Keep independent from TargetSelector (8.10).
 - [x] SB-M16-008 Swappable implementations.
 - [x] SB-M16-009 Debug route visualization.
-- [x] SB-M16-010 Route validity checks: non-target ACTIVE cells block, CLEARED/background is open, route ends at the assigned target. — [x] SB-M16-011 Failure behavior: no route is a failure returned to the caller, never a silent retarget.
+- [ ] SB-M16-010 Route validity checks: non-target ACTIVE cells block, CLEARED/background is open, route ends at the assigned target. — [ ] SB-M16-011 Failure behavior: no route is a failure returned to the caller, never a silent retarget.
 
 ### M17 — Routing Prototype Lab
 
@@ -844,15 +844,15 @@ One of the most important SCRUBBOTS milestones. Do not lock the first
 working solution — prototype multiple options.
 
 - [x] SB-M17-001 Direct route baseline.
-- [x] SB-M17-002 Grid-aware route prototype.
-- [x] SB-M17-003 Organized polyline/curved prototype.
+- [ ] SB-M17-002 Grid-aware route prototype.
+- [ ] SB-M17-003 Organized polyline/curved prototype.
 - [x] SB-M17-004 Compare visual clarity. — [x] SB-M17-005 Compare path crossings.
 - [x] SB-M17-006 Compare congestion. — [x] SB-M17-007 Compare CPU cost.
 - [x] SB-M17-008 Compare route distance. — [x] SB-M17-009 Compare determinism.
 - [x] SB-M17-010 Compare against original SCRUBBOTS visual direction. — superseded for this gate by owner-reviewed Organized/curved selection because no authoritative original movement reference exists.
 - [x] SB-M17-011 Test 5 bots. — [x] SB-M17-012 Test 10 bots. — [x] SB-M17-013 Test 25 bots.
 - [x] SB-M17-014 Stress-test higher density.
-- [x] SB-M17-015 Test 59×59. — [x] SB-M17-016 Test rectangular Very Hard board.
+- [ ] SB-M17-015 Test 59×59. — [ ] SB-M17-016 Test rectangular Very Hard board.
 
 Required cases under the access rule (AL-028): a **blocked interior** target
 (fully enclosed matching-color ACTIVE cell) yields no route (never a silent
@@ -863,15 +863,15 @@ create legal access to a previously blocked target.
 
 ### M18 — Scrubbot Agent
 
-- [ ] SB-M18-001 Lightweight agent core.
+- [x] SB-M18-001 Lightweight agent core.
 - [x] SB-M18-002 Assigned color. — [x] SB-M18-003 Assigned target.
 - [x] SB-M18-004 Assigned route. — [x] SB-M18-005 Spawn origin.
-- [ ] SB-M18-006 Route movement. — [x] SB-M18-007 Arrival detection.
+- [x] SB-M18-006 Route movement. — [x] SB-M18-007 Arrival detection.
 - [x] SB-M18-008 Completion event. — [x] SB-M18-009 Despawn.
 - [x] SB-M18-010 No return-to-slot. — [x] SB-M18-011 No resource carrying.
 - [x] SB-M18-012 Reset cancellation. — [x] SB-M18-013 No orphan nodes.
-- [ ] SB-M18-014 Performance stress test.
-- [ ] SB-M18-015 Pool only if profiling justifies it.
+- [x] SB-M18-014 Performance stress test.
+- [x] SB-M18-015 Pool only if profiling justifies it.
 
 ### M19 — Scrubbot Dispatcher
 
