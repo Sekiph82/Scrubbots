@@ -7,7 +7,7 @@ Purpose: repair the strict-v2 upstream chain before M19 is audited.
 Canonical order:
 
 1. M15-C001 V02 — AUDITED_PASS
-2. M16-C001 V03 — READY
+2. M16-C001 V04 — READY
 3. M17-C002 V02
 4. M19 re-sync/retest, then its own strict audit flow
 
@@ -39,9 +39,11 @@ stage becomes READY.
   - re-audit: coordination/sessions/M15-C001/CHATGPT_STRICT_REAUDIT_V02.md
 - M16-C001 V02 — **CHANGES_REQUIRED**
   - audit: coordination/sessions/M16-C001/CHATGPT_AUDIT_V02.md
-- M16-C001 V03 — **READY**
-  - prompt: coordination/sessions/M16-C001/CHATGPT_PROMPT_V03.md
-  - criteria: coordination/sessions/M16-C001/CHATGPT_AUDIT_CRITERIA_V03.md
+- M16-C001 V03 — **CHANGES_REQUIRED**
+  - audit: coordination/sessions/M16-C001/CHATGPT_AUDIT_V03.md
+- M16-C001 V04 — **READY**
+  - prompt: coordination/sessions/M16-C001/CHATGPT_PROMPT_V04.md
+  - criteria: coordination/sessions/M16-C001/CHATGPT_AUDIT_CRITERIA_V04.md
 - M17-C002 V02 — **BLOCKED_BY_M16**
   - prompt: coordination/sessions/M17-C002/CHATGPT_PROMPT_V02.md
   - re-audit: coordination/sessions/M17-C002/CHATGPT_STRICT_REAUDIT_V02.md
@@ -58,3 +60,8 @@ M15-C001 V02 passed independent ChatGPT audit at implementation head `4b3433731f
 ## M16 V02 audit transition
 
 M16-C001 V02 closed the original finite-coordinate/result-coherence/non-bool findings but strict-v2 independent audit found F-M16-STRICT-004: malformed non-null request/board dependencies can still fault before fail-closed validation. M16-C001 V03 is READY. M17 remains blocked.
+
+
+## M16 V03 audit transition
+
+V03 closed malformed object-shaped request/board cases, but strict audit found remaining arbitrary-Variant boundary gaps for scalar board/result/access-query inputs. M16-C001 V04 is READY. M17 remains blocked.
