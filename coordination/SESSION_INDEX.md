@@ -741,3 +741,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 
 
 - Progress after strict M18 reopen: **274/943 = 29.06%** overall; **274/719 = 38.11%** main + SB-UI.
+
+
+## M19-C001 implemented but audit-blocked
+
+- Claude implementation commit: `3fe57d51bf2ae33c23623d93154d79e21c145768`
+- Matching log: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CLAUDE_LOG_V01.md
+- Claude correctly flagged that the later strict-v2 governance commits reopened M18 and paused M19.
+- Canonical state: **IMPLEMENTED_BUT_AUDIT_BLOCKED**.
+- Blocker note: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_BLOCKER_NOTE_V01.md
+- Preserve M19 work; do not audit/close it yet.
+- Next actor: CLAUDE on M18-C001 V02.
