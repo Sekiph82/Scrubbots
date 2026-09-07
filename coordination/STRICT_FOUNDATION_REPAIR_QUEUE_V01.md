@@ -36,7 +36,7 @@ However, M11-M14 strict findings and the BoardState validation gap must be resol
 
 ## Full-surface transition
 
-The locked full attack-surface rule governs foundation repairs. M11 is final-closed after its frozen full-surface correction + V06 adversarial validation. M12 has now received its own full subsystem sweep; its finding set is frozen to F-M12-STRICT-001/002 and `coordination/sessions/M12-C001/CHATGPT_PROMPT_V03.md` is READY. M13-M14 remain blocked until the preceding repair passes and each receives its own full-surface sweep.
+The locked full attack-surface rule governs foundation repairs. M11 is final-closed after its frozen full-surface correction + V06 adversarial validation. M12 has now received its own full subsystem sweep; its finding set is frozen to F-M12-STRICT-001/002 and `coordination/sessions/M12-C001/CHATGPT_PROMPT_V04.md` is READY as a validation-only closure pass. M13-M14 remain blocked until the preceding repair passes and each receives its own full-surface sweep.
 
 
 ## M11 V05 audit transition
@@ -47,7 +47,8 @@ The locked full attack-surface rule governs foundation repairs. M11 is final-clo
 - Runtime: Claude reports 1835/1835 ALL PASS; ChatGPT Godot rerun unavailable.
 - Remaining: sensitivity-safe direct tests for post-reset snapshot truth, preserved renderer binding/invalid-size configure blocking, renderer rebind palette isolation, and lifecycle reuse.
 - M11 V06: **AUDITED_PASS / FINAL_CLOSED**.
-- M12 V03: **READY**.
+- M12 V03: **CHANGES_REQUIRED / production source accepted; validation gaps**.
+- M12 V04: **READY**.
 - M13/M14: **BLOCKED_BY_PRECEDING_FOUNDATION_REPAIR**.
 
 
@@ -57,6 +58,17 @@ The locked full attack-surface rule governs foundation repairs. M11 is final-clo
 - M11 re-closed: SB-M11-003/005/009/012.
 - M12 full-surface sweep completed before correction prompt.
 - M12 frozen findings: F-M12-STRICT-001/002.
-- M12-C001 V03: **READY**.
+- M12-C001 V03: **CHANGES_REQUIRED / VALIDATION_HARDENING_REQUIRED**.
+- M12-C001 V04: **READY**.
 - M13/M14 remain blocked.
 - M19 remains audit-blocked until the entire foundation queue and BoardState validation gap close.
+
+
+## M12 V03 audit transition
+
+- V03 implementation commit: `42396cc413021dc3e94fe8e0eeef7f4986c1d56b`.
+- V03 audit: **CHANGES_REQUIRED / VALIDATION_HARDENING_REQUIRED**.
+- Production F-M12-STRICT-001/002 source accepted.
+- Remaining: direct runtime proof for nested malformed configure entries, palette_size <= 0, reconfigure state preservation, caller Array alias isolation, standalone SlotState isolation, and complete malformed-query no-mutation state.
+- M12 V04: **READY**.
+- M13/M14: **BLOCKED_BY_PRECEDING_FOUNDATION_REPAIR**.
