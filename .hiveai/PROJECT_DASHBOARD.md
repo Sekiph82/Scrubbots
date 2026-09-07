@@ -1,3 +1,12 @@
+### M16 frozen full-surface closure
+
+- V04 verdict: **CHANGES_REQUIRED / FINDING_SET_FROZEN**
+- READY now: **M16-C001 V05**
+- V05 consolidates the complete frozen M16 finding set after a full subsystem sweep.
+- Audit policy now requires full-surface sweep before correction prompts for critical subsystems.
+- M17 remains blocked.
+- Progress: **257/943 = 27.25%**.
+
 ### M16 V03 strict audit result
 
 - Verdict: **CHANGES_REQUIRED**
