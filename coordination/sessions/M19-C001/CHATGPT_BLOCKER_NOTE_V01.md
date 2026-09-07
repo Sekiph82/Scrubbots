@@ -1,6 +1,6 @@
 # M19-C001 — Upstream Gate Blocker Note V01
 
-Status: **IMPLEMENTED_BUT_AUDIT_BLOCKED**
+Status: **SUPERSEDED — UPSTREAM GATES CLEARED**
 
 M19-C001 V01 implementation commit:
 `3fe57d51bf2ae33c23623d93154d79e21c145768`
@@ -36,3 +36,23 @@ without modifying governance files.
 The current M19 `1564/1564 ALL PASS` result is preserved as implementer
 evidence for the pre-correction dependency state. It is not final evidence
 against the future corrected M18 base.
+
+
+## Supersession
+
+All blocker conditions described above are now closed:
+- M15 strict-final-closed;
+- M16 strict-final-closed;
+- M17 strict-final-closed;
+- M18 strict-final-closed;
+- M11-M14 foundation repairs final-closed;
+- FOUNDATION-STRICT-001 closed by FOUNDATION-C001 V01.
+
+The preserved M19 V01 implementation has now received a fresh current-source full attack-surface sweep.
+
+Canonical next artifacts:
+- coordination/sessions/M19-C001/CHATGPT_FULL_SURFACE_REAUDIT_V02.md
+- coordination/sessions/M19-C001/CHATGPT_PROMPT_V02.md
+- coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V02.md
+
+Current M19 state: **CHANGES_REQUIRED / FINDING_SET_FROZEN / V02 READY**.
