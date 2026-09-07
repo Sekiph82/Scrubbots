@@ -738,3 +738,6 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Main findings: valid lifecycle re-entry is currently possible; multi-segment large-delta evidence is not directly observable; agent performance timing includes routing and cannot support subsystem/pooling conclusions.
 - M19-C001 is paused until M18 strict closure.
 - Next actor: CLAUDE.
+
+
+- Progress after strict M18 reopen: **274/943 = 29.06%** overall; **274/719 = 38.11%** main + SB-UI.
