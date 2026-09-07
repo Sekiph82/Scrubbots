@@ -1,12 +1,14 @@
-### M11 final closure / M12 frozen V03
+### M13 final closure / M14 frozen V02
 
 - M17-C002 V03: **AUDITED_PASS / final closed**
-- M11-C001 V06: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
-- READY now: **M13-C001 V05**
-- M12 received a full attack-surface sweep; frozen findings are F-M12-STRICT-001/002.
-- M12 is strict-final-closed. M13 V03 is the active frozen foundation repair; M14 remains blocked.
-- M19 remains audit-blocked until foundation repairs close.
-- Progress: **272/943 = 28.84%** overall; **272/719 = 37.83%** main + UI.
+- M11: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
+- M12: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
+- M13-C001 V05: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
+- READY now: **M14-C001 V02**
+- M14 full-surface frozen findings: **F-M14-STRICT-001/002**
+- FOUNDATION-STRICT-001 remains separate after M14.
+- M19 remains audit-blocked until M14 + FOUNDATION-STRICT-001 close.
+- Progress: **274/943 = 29.06%** overall; **274/719 = 38.11%** main + UI.
 
 ### M16 final pass / M17 frozen V03
 
@@ -851,3 +853,24 @@ Tracking sources:
 | FOUNDATION-STRICT-001 | separate/open |
 | Canonical progress | 272/943 = 28.84% |
 | Main + UI | 272/719 = 37.83% |
+
+
+## 2026-09-07 — M13 final / M14 current strict frontier
+
+| Field | Value |
+| --- | --- |
+| M13 | AUDITED_PASS / STRICT_V2_FINAL_CLOSURE |
+| M13 audit | coordination/sessions/M13-C001/CHATGPT_AUDIT_V05.md |
+| Current foundation repair | M14-C001 V02 |
+| State | CHANGES_REQUIRED / FINDING_SET_FROZEN / READY |
+| Next actor | CLAUDE |
+| M14 full-surface re-audit | coordination/sessions/M14-C001/CHATGPT_FULL_SURFACE_REAUDIT_V03.md |
+| Frozen findings | F-M14-STRICT-001/002 |
+| Active prompt | coordination/sessions/M14-C001/CHATGPT_PROMPT_V02.md |
+| Active criteria | coordination/sessions/M14-C001/CHATGPT_AUDIT_CRITERIA_V02.md |
+| Expected log | coordination/sessions/M14-C001/CLAUDE_LOG_V02.md |
+| FOUNDATION-STRICT-001 | OPEN / next separate foundation gate after M14 |
+| M19 | audit-blocked until M14 + FOUNDATION-STRICT-001 close |
+| ChatGPT independent Godot rerun | unavailable |
+| Canonical progress | 274/943 = 29.06% |
+| Main + UI | 274/719 = 38.11% |
