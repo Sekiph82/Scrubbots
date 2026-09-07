@@ -11,9 +11,20 @@ extends RefCounted
 
 ## color_id (int) -> Array[int] raw candidate indices in the order to return.
 var by_color: Dictionary = {}
+## Board this double claims coherence with (strict-v2 F-M15-STRICT-002). The
+## double mirrors ColorCandidateIndex's is_bound_to() identity seam so it can pass
+## TargetSelector.bind()'s coherence gate.
+var _board = null
 
 func set_candidates(color_id: int, indices: Array) -> void:
 	by_color[color_id] = indices.duplicate()
+
+func bind(board) -> void:
+	_board = board
+
+## Exact-identity coherence check, mirroring ColorCandidateIndex.is_bound_to().
+func is_bound_to(board) -> bool:
+	return _board != null and _board == board
 
 func get_candidates(color_id: int, excluded = []) -> Array:
 	var base: Array = by_color.get(color_id, [])

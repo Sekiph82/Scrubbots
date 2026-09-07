@@ -49,17 +49,45 @@ var _bound: bool = false
 static func create() -> RefCounted:
 	return load("res://scripts/gameplay/targeting/target_selector.gd").new()
 
-## Bind the three narrow dependencies. Returns false (and stays unbound) if any
-## is null. The access_query is NOT bound here — it is passed per call, because
-## reachability truth is call-time state supplied by the caller.
+## Narrow required API surfaces (strict-v2, F-M15-STRICT-001): bind validates that
+## each non-null dependency actually implements the methods M15 uses, so a
+## malformed double fails closed at the boundary instead of erroring mid-select.
+const _BOARD_API := ["is_valid_index", "get_cell_state", "get_color_id"]
+const _CANDIDATE_API := ["get_candidates", "is_bound_to"]
+const _RESERVATION_API := ["reserve", "get_target_for_owner", "get_reserved_indices", "is_reserved", "is_bound_to"]
+
+## Bind the three narrow dependencies. Fails closed (returns false, stays UNBOUND,
+## clears any prior refs) when a dependency is null, is a non-null object missing
+## the narrow required API (F-M15-STRICT-001), or when the candidate index /
+## reservation state are not bound to the SAME BoardState instance passed here
+## (F-M15-STRICT-002). The access_query is NOT bound here — it is passed per call,
+## because reachability truth is call-time state supplied by the caller.
 func bind(board, candidate_index, reservation_state) -> bool:
-	if board == null or candidate_index == null or reservation_state == null:
-		_bound = false
+	if board == null or candidate_index == null or reservation_state == null \
+			or not _has_methods(board, _BOARD_API) \
+			or not _has_methods(candidate_index, _CANDIDATE_API) \
+			or not _has_methods(reservation_state, _RESERVATION_API) \
+			or not candidate_index.is_bound_to(board) \
+			or not reservation_state.is_bound_to(board):
+		# Any failure neutralizes prior state so stale deps cannot be reused.
+		_clear_binding()
 		return false
 	_board = board
 	_candidate_index = candidate_index
 	_reservations = reservation_state
 	_bound = true
+	return true
+
+func _clear_binding() -> void:
+	_board = null
+	_candidate_index = null
+	_reservations = null
+	_bound = false
+
+static func _has_methods(obj, names) -> bool:
+	for n in names:
+		if not obj.has_method(n):
+			return false
 	return true
 
 func is_bound() -> bool:
@@ -81,6 +109,11 @@ func is_bound() -> bool:
 ## No exception, no dispatch, no route request, no board mutation.
 func select_and_reserve(color_id: int, owner_id: int, access_query) -> int:
 	if not _bound or _board == null or _candidate_index == null or _reservations == null:
+		return -1
+	# strict-v2 (F-M15-STRICT-002): re-check dependency board coherence on EVERY
+	# call — a sibling dependency may have been rebound to a different board after
+	# selector bind. A mismatch fails closed with no candidate work, no reservation.
+	if not _candidate_index.is_bound_to(_board) or not _reservations.is_bound_to(_board):
 		return -1
 	# Fail closed: never assume reachability without an authoritative query.
 	if access_query == null or not access_query.has_method("is_targetable"):
@@ -117,5 +150,13 @@ func select_and_reserve(color_id: int, owner_id: int, access_query) -> int:
 		# the owner still holds nothing, so continue to the next candidate.
 		if _reservations.reserve(idx, owner_id):
 			return idx
+		# strict-v2 (F-M15-STRICT-003): the reserve lost. Re-check THIS owner —
+		# an access-query side effect may have assigned owner_id another target
+		# between access approval and here. If the owner is now assigned, stop
+		# immediately: do not query later candidates and do not create another
+		# reservation. (Different-owner contention leaves owner_id unassigned, so
+		# it falls through and continues to the next candidate, as before.)
+		if _reservations.get_target_for_owner(owner_id) != -1:
+			return -1
 
 	return -1

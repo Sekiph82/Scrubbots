@@ -73,6 +73,14 @@ func rebind(board) -> bool:
 func is_bound() -> bool:
 	return _bound
 
+## Exact-identity board coherence check (strict-v2, F-M15-STRICT-002). Returns
+## true only when this layer is bound to the SAME BoardState INSTANCE (reference
+## identity — not merely equal dimensions/content), false when unbound. It never
+## exposes the internal board reference; a caller can only ask "are you bound to
+## THIS board?", never obtain the board.
+func is_bound_to(board) -> bool:
+	return _bound and _board != null and _board == board
+
 ## Atomic check-and-set reservation. Returns false WITHOUT mutation when:
 ##   - unbound;
 ##   - target index invalid;
