@@ -1,3 +1,5 @@
+- Progress after strict M18 reopen: **274/943 = 29.06%** overall; **274/719 = 38.11%** main + SB-UI.
+
 ### Strict audit v2 / M18 re-audit
 
 - Audit standard upgraded: critical milestones require a ChatGPT-authored adversarial validation pass before final closure when ChatGPT cannot independently run the runtime.
