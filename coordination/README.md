@@ -224,3 +224,29 @@ Git-tracked Claude log. For PR cycles, exact post-push commit/head/status
 evidence may be recorded in a clearly titled PR comment, then independently
 verified by ChatGPT. No new commit may be created merely to write that SHA
 back into the log.
+
+
+## Strict audit closure [LOCKED]
+
+Effective 2026-09-07, the canonical `AUDIT_POLICY.md` strict-v2 standard applies.
+
+For critical gameplay/stateful cycles, a first implementation audit is not enough
+for final closure unless ChatGPT can independently execute the relevant runtime
+behavior itself.
+
+Normal critical flow:
+
+```text
+V01 implementation
+-> ChatGPT implementation audit + independently designed adversarial cases
+-> V02 adversarial validation/correction in the SAME cycle
+-> ChatGPT final audit
+-> task closure / next milestone
+```
+
+Claude-authored green tests remain implementer evidence. The V02 adversarial
+cases are authored by ChatGPT specifically to reduce correlated
+implementation+test assumptions.
+
+Dependent milestones stay blocked while an upstream strict re-audit/correction
+is open.
