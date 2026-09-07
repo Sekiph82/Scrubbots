@@ -12,7 +12,7 @@ This queue records strict-v2 findings from the M10-M14 re-audit without blocking
 - M13: CHANGES_REQUIRED. Reopen SB-M13-001/004.
 - M14: CHANGES_REQUIRED. Reopen SB-M14-001/004/007/009.
 
-## Cross-cutting BoardState validation finding
+## FOUNDATION-STRICT-001 — BoardState HIGH-RISK VALIDATION GAP
 
 Current BoardState.set_cell_state(index, state: CellState) validates index but does not explicitly reject a non-canonical integer state before writing the PackedByteArray.
 
