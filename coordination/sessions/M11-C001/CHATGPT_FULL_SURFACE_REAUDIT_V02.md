@@ -131,4 +131,4 @@ Affected tasks remain:
 - SB-M11-012
 
 Next:
-`coordination/sessions/M11-C001/CHATGPT_PROMPT_V02.md`
+`coordination/sessions/M11-C001/CHATGPT_PROMPT_V03.md`
