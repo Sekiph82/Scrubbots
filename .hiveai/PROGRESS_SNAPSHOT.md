@@ -435,3 +435,14 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Claude reported **1564/1564 ALL PASS** on that dependency state and correctly warned that M18 had since been reopened by strict audit.
 - M19 is **not audited and no M19 tasks are closed**.
 - Preserve the implementation; complete M18-C001 V02 first, then re-sync/rerun M19 against corrected M18 before M19 strict audit.
+
+
+### Strict upstream repair chain M15-M18
+
+- M18-C001 V02: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
+- Re-closed: SB-M18-001, 006, 014, 015.
+- M15 strict re-audit: **CHANGES_REQUIRED**; reopened SB-M15-001, 007, 008, 011.
+- M16 strict re-audit: **CHANGES_REQUIRED**; reopened SB-M16-002, 003, 010, 011.
+- M17 production strict re-audit: **CHANGES_REQUIRED**; reopened SB-M17-002, 003, 015, 016.
+- Repair order is locked: M15 -> audit -> M16 -> audit -> M17 -> audit -> M19 re-sync/retest.
+- M19 implementation is preserved but remains audit-blocked.
