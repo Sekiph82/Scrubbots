@@ -550,3 +550,15 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Remaining: **674**
 - Main game + SB-UI: **269 / 719 = 37.41%**
 - Main remaining: **450**
+
+
+### M12 final closed / M13 V03 ready
+
+- M12-C001 V04: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
+- Re-closed SB-M12-005/009/011.
+- M13 full-surface finding set: F-M13-STRICT-001/002/003.
+- M13-C001 V03: **READY**.
+- Overall: **272 / 943 = 28.84%**
+- Remaining: **671**
+- Main game + SB-UI: **272 / 719 = 37.83%**
+- Main remaining: **447**
