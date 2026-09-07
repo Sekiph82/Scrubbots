@@ -654,3 +654,20 @@ Tracking sources:
 | --- | --- | --- | --- | --- |
 | SCRUBBOTS Level Factory | `level_factory/` | PLANNED / architecture registered | `SB-LF00-001..` in root `tasks.md` | `level_factory/coordination/SESSION_INDEX.md` |
 | SCRUBBOTS Content Pipeline | `content_pipeline/` | PLANNED / architecture registered | `SB-CP00-001..` in root `tasks.md` | `content_pipeline/coordination/SESSION_INDEX.md` |
+
+
+## 2026-09-07 — Current strict-v2 frontier
+
+| Field | Value |
+| --- | --- |
+| Current strict routing repair | M16-C001 V02 |
+| State | READY |
+| Next actor | CLAUDE |
+| Gate satisfied | M15-C001 V02 AUDITED_PASS |
+| Active prompt | coordination/sessions/M16-C001/CHATGPT_PROMPT_V02.md |
+| Active criteria | coordination/sessions/M16-C001/CHATGPT_AUDIT_CRITERIA_V02.md |
+| M17 repair | BLOCKED_BY_M16 |
+| Foundation repair queue | OPEN: M11/M12/M13/M14 |
+| Canonical progress | 257/943 = 27.25% |
+| Main + UI | 257/719 = 35.74% |
+| Godot independent rerun by ChatGPT | unavailable; Claude runtime evidence remains E1/E2 |
