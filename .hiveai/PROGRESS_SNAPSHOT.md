@@ -518,9 +518,21 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - M17-C002 V03: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
 - Re-closed SB-M17-002/003/015/016.
 - Routing repair chain M15/M16/M17 complete.
-- M11-C001 V05 audit: **CHANGES_REQUIRED / validation hardening**; production source accepted, strict sensitivity gaps remain.
-- M11-C001 V06 validation-only closure pass is READY.
-- Overall: **265 / 943 = 28.10%**
-- Remaining: **678**
-- Main game + SB-UI: **265 / 719 = 36.86%**
-- Main remaining: **454**
+- M11-C001 V06: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
+- M12-C001 full-surface findings frozen to F-M12-STRICT-001/002; V03 is READY.
+- Overall: **269 / 943 = 28.53%**
+- Remaining: **674**
+- Main game + SB-UI: **269 / 719 = 37.41%**
+- Main remaining: **450**
+
+
+### M11 final closed / M12 V03 ready
+
+- M11-C001 V06: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
+- Re-closed SB-M11-003/005/009/012.
+- M12 full-surface finding set: F-M12-STRICT-001/002.
+- M12-C001 V03: **READY**.
+- Overall: **269 / 943 = 28.53%**
+- Remaining: **674**
+- Main game + SB-UI: **269 / 719 = 37.41%**
+- Main remaining: **450**
