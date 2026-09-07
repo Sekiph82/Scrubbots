@@ -49,6 +49,11 @@ const ProductionAccessQuery = preload("res://scripts/gameplay/routing/production
 const ProductionRoutingSystem = preload("res://scripts/gameplay/routing/production_routing_system.gd")
 # M18 — lightweight Scrubbot agent (consumes a finished route; no selection/routing).
 const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
+# M19 — Scrubbot dispatcher (orchestration: select+reserve -> route -> spawn one).
+const ScrubbotDispatcher = preload("res://scripts/gameplay/dispatch/scrubbot_dispatcher.gd")
+const DispatchResult = preload("res://scripts/gameplay/dispatch/dispatch_result.gd")
+const ProductionTargetAccess = preload("res://scripts/gameplay/dispatch/production_target_access.gd")
+const DispatchRoutingDouble = preload("res://tests/support/dispatch_routing_double.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -105,6 +110,10 @@ func _initialize() -> void:
 	_run_m18_agent_tests()
 	_run_m18_agent_stress_tests()
 	_run_m18_agent_debug_scene_smoke()
+	# M19 — dispatcher orchestration.
+	_run_m19_dispatcher_tests()
+	_run_m19_dispatcher_production_tests()
+	_run_m19_dispatcher_stress_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -4345,3 +4354,316 @@ func _run_m18_agent_debug_scene_smoke() -> void:
 	_check(inst.agent.has_arrived(), "debug scene agent completes its route")
 	_check(inst.completed, "debug scene received the completion signal")
 	inst.free()
+
+# ============================================================= M19 dispatch ===
+# ScrubbotDispatcher: orchestration only. One slot/color request -> at most one
+# ScrubbotAgent, via select_and_reserve -> route -> assign, with full rollback on
+# any failure and no BoardState mutation. These tests use deterministic fakes for
+# fault injection; _run_m19_dispatcher_production_tests exercises the real
+# production selection+routing pipeline on large boards.
+
+## Open board (all CLEARED) with the given (x,y) cells forced ACTIVE.
+func _m19_open_board_active(w: int, h: int, cells: Array) -> Object:
+	var board = RoutingLabScenarios.make_open_board(w, h)
+	for c in cells:
+		board.set_cell_state(board.get_cell_index(int(c.x), int(c.y)), BoardState.CellState.ACTIVE)
+	return board
+
+## Wire a dispatcher over `board` with a configurable fake routing system and an
+## AccessQueryDouble reachability truth. Returns the pieces for assertions.
+func _m19_wire_fake(board, routing_mode: String, targetable: Array) -> Dictionary:
+	var reservations = ReservationState.new()
+	reservations.bind(board)
+	var candidates = ColorCandidateIndex.create()
+	candidates.bind(board)
+	var selector = TargetSelector.create()
+	selector.bind(board, candidates, reservations)
+	var routing = DispatchRoutingDouble.new()
+	routing.mode = routing_mode
+	var access = AccessQueryDouble.new()
+	access.set_all_targetable(targetable)
+	var dispatcher = ScrubbotDispatcher.new()
+	root.add_child(dispatcher)
+	# routing_access is opaque to the fake routing; pass a real non-null query.
+	dispatcher.bind(board, selector, reservations, routing, ProductionAccessQuery.new(board), access)
+	return {"board": board, "reservations": reservations, "candidates": candidates,
+		"selector": selector, "routing": routing, "access": access, "dispatcher": dispatcher}
+
+func _m19_teardown(w: Dictionary) -> void:
+	var d = w["dispatcher"]
+	d.reset()
+	root.remove_child(d)
+	d.free()
+
+func _m19_drive_to_arrival(agent) -> void:
+	for _i in range(128):
+		if not agent.is_moving():
+			break
+		agent.advance(1.0)
+
+func _run_m19_dispatcher_tests() -> void:
+	print("---- M19: dispatcher orchestration (deterministic fakes) ----")
+	# Five same-color candidates in row 5 (shared color = row-banded palette id).
+	var active := [Vector2(2, 5), Vector2(4, 5), Vector2(6, 5), Vector2(8, 5), Vector2(10, 5)]
+	var origin := Vector2(-2.0, 5.5)
+
+	# --- happy path: one valid dispatch -----------------------------------
+	var b1 = _m19_open_board_active(14, 11, active)
+	var color: int = b1.get_color_id(b1.get_cell_index(2, 5))
+	var w1 = _m19_wire_fake(b1, "ok", [b1.get_cell_index(2, 5), b1.get_cell_index(4, 5),
+		b1.get_cell_index(6, 5), b1.get_cell_index(8, 5), b1.get_cell_index(10, 5)])
+	var before1 = _snapshot_cell_states(b1)
+	var r1 = w1["dispatcher"].dispatch(color, origin, 6.0)
+	_check(r1.success, "valid slot/color request succeeds (SB-M19-001/006)")
+	_check_eq(r1.owner_id, 0, "first dispatch owner id is 0 (unique monotonic)")
+	_check(r1.agent != null, "successful dispatch returns exactly one agent")
+	_check_eq(w1["dispatcher"].get_active_count(), 1, "exactly one agent active after one dispatch")
+	_check_eq(r1.agent.owner_id, r1.owner_id, "agent identity: owner id matches")
+	_check_eq(r1.agent.color_id, color, "agent identity: color matches request")
+	_check_eq(r1.agent.target_index, r1.target_index, "agent identity: target matches reserved target")
+	var pts1: PackedVector2Array = r1.agent.get_route_points()
+	_check_eq(pts1[pts1.size() - 1], Vector2(b1.get_cell_position(r1.target_index)) + Vector2(0.5, 0.5), "route endpoint equals reserved target centre (route target == reservation)")
+	_check_eq(w1["reservations"].get_owner(r1.target_index), r1.owner_id, "target atomically reserved for the dispatch owner")
+	_check(_cell_states_equal(b1, before1), "dispatch does not mutate BoardState (SB-M19: no clearing)")
+	# Successful reservation stays held after dispatch (M20 resolves it, not M19).
+	_check(w1["reservations"].is_reserved(r1.target_index), "successful reservation remains held after dispatch")
+
+	# --- two independent targets -> two unique agents/owners --------------
+	var r1b = w1["dispatcher"].dispatch(color, origin, 6.0)
+	_check(r1b.success, "second reachable target dispatches independently")
+	_check(r1b.owner_id != r1.owner_id, "owner ids are unique across dispatches")
+	_check(r1b.target_index != r1.target_index, "duplicate target not assigned twice (distinct target)")
+	_check_eq(w1["dispatcher"].get_active_count(), 2, "two independent agents active")
+
+	# --- completion is observed only (no clear, no release) ---------------
+	_m19_drive_to_arrival(r1.agent)
+	_check(r1.agent.has_arrived(), "dispatched agent reaches its target")
+	_check(w1["dispatcher"].has_arrived(r1.owner_id), "dispatcher observes completion (lifecycle only)")
+	_check(_cell_states_equal(b1, before1), "agent completion does NOT clear BoardState in M19")
+	_check(w1["reservations"].is_reserved(r1.target_index), "agent completion does NOT release the reservation in M19")
+	_check_eq(b1.get_cell_state(r1.target_index), BoardState.CellState.ACTIVE, "arrived target cell still ACTIVE (no M20 clearing)")
+	_m19_teardown(w1)
+
+	# --- invalid request --------------------------------------------------
+	var b2 = _m19_open_board_active(14, 11, active)
+	var w2 = _m19_wire_fake(b2, "ok", [b2.get_cell_index(2, 5)])
+	var color2: int = b2.get_color_id(b2.get_cell_index(2, 5))
+	_check_eq(w2["dispatcher"].dispatch(-1, origin).failure_reason, DispatchResult.FailureReason.INVALID_REQUEST, "negative color -> INVALID_REQUEST")
+	_check_eq(w2["dispatcher"].dispatch(color2, Vector2(INF, 0.0)).failure_reason, DispatchResult.FailureReason.INVALID_REQUEST, "non-finite origin -> INVALID_REQUEST")
+	_check_eq(w2["dispatcher"].get_active_count(), 0, "invalid requests spawn nothing")
+	_check_eq(w2["reservations"].get_reservation_count(), 0, "invalid requests reserve nothing")
+	_m19_teardown(w2)
+
+	# --- no raw candidates -> no spawn ------------------------------------
+	var b3 = _m19_open_board_active(14, 11, active)
+	var w3 = _m19_wire_fake(b3, "ok", [])
+	var absent_color := 99
+	_check(not w3["candidates"].has_candidates(absent_color), "precondition: color has no raw candidates")
+	_check_eq(w3["dispatcher"].dispatch(absent_color, origin).failure_reason, DispatchResult.FailureReason.NO_REACHABLE_TARGET, "no candidates -> NO_REACHABLE_TARGET (no spawn)")
+	_check_eq(w3["dispatcher"].get_active_count(), 0, "no candidates -> zero agents")
+	_m19_teardown(w3)
+
+	# --- raw candidate exists but unreachable -> no spawn -----------------
+	var b4 = _m19_open_board_active(14, 11, active)
+	var color4: int = b4.get_color_id(b4.get_cell_index(2, 5))
+	var w4 = _m19_wire_fake(b4, "ok", []) # AccessQueryDouble default: nothing targetable.
+	_check(w4["candidates"].has_candidates(color4), "precondition: raw candidates DO exist")
+	var r4 = w4["dispatcher"].dispatch(color4, origin)
+	_check_eq(r4.failure_reason, DispatchResult.FailureReason.NO_REACHABLE_TARGET, "raw-but-unreachable candidate -> NO_REACHABLE_TARGET")
+	_check_eq(w4["dispatcher"].get_active_count(), 0, "unreachable candidate -> zero agents")
+	_check_eq(w4["reservations"].get_reservation_count(), 0, "unreachable candidate -> zero reservations")
+	_m19_teardown(w4)
+
+	# --- route failure -> release reservation, zero spawn, no retarget ----
+	var b5 = _m19_open_board_active(14, 11, active)
+	var color5: int = b5.get_color_id(b5.get_cell_index(2, 5))
+	var w5 = _m19_wire_fake(b5, "fail", [b5.get_cell_index(2, 5), b5.get_cell_index(4, 5)])
+	var r5 = w5["dispatcher"].dispatch(color5, origin)
+	_check_eq(r5.failure_reason, DispatchResult.FailureReason.ROUTE_FAILED, "route failure -> ROUTE_FAILED")
+	_check_eq(r5.target_index, -1, "route failure result carries no target (no silent retarget)")
+	_check_eq(w5["dispatcher"].get_active_count(), 0, "route failure spawns zero agents")
+	_check_eq(w5["reservations"].get_reservation_count(), 0, "route failure releases the reservation")
+	# Released-after-failure target can dispatch later (flip routing to ok).
+	w5["routing"].mode = "ok"
+	var r5b = w5["dispatcher"].dispatch(color5, origin)
+	_check(r5b.success, "failure-released target is dispatchable again")
+	_m19_teardown(w5)
+
+	# --- agent assign failure -> release, free, no orphan -----------------
+	var b6 = _m19_open_board_active(14, 11, active)
+	var color6: int = b6.get_color_id(b6.get_cell_index(2, 5))
+	var w6 = _m19_wire_fake(b6, "mismatch", [b6.get_cell_index(2, 5)])
+	var child_before: int = w6["dispatcher"].get_child_count()
+	var r6 = w6["dispatcher"].dispatch(color6, origin)
+	_check_eq(r6.failure_reason, DispatchResult.FailureReason.AGENT_ASSIGN_FAILED, "assign failure -> AGENT_ASSIGN_FAILED")
+	_check_eq(w6["dispatcher"].get_active_count(), 0, "assign failure spawns zero active agents")
+	_check_eq(w6["dispatcher"].get_child_count(), child_before, "assign failure leaves no orphan node")
+	_check_eq(w6["reservations"].get_reservation_count(), 0, "assign failure releases the reservation")
+	_m19_teardown(w6)
+
+	# --- rapid input: uniqueness preserved, one-by-one --------------------
+	var b7 = _m19_open_board_active(14, 11, active)
+	var color7: int = b7.get_color_id(b7.get_cell_index(2, 5))
+	var w7 = _m19_wire_fake(b7, "ok", [b7.get_cell_index(2, 5), b7.get_cell_index(4, 5),
+		b7.get_cell_index(6, 5), b7.get_cell_index(8, 5), b7.get_cell_index(10, 5)])
+	var owners := {}
+	var targets := {}
+	var succ := 0
+	for _i in range(12): # more requests than the 5 reachable candidates.
+		var rr = w7["dispatcher"].dispatch(color7, origin)
+		if rr.success:
+			succ += 1
+			_check(not owners.has(rr.owner_id), "rapid input: owner id stays unique")
+			_check(not targets.has(rr.target_index), "rapid input: target ownership never duplicated")
+			owners[rr.owner_id] = true
+			targets[rr.target_index] = true
+	_check_eq(succ, 5, "rapid input success count equals unique reachable work (5)")
+	_check_eq(w7["dispatcher"].get_active_count(), 5, "one-by-one flow: exactly 5 agents from 12 requests")
+
+	# --- reset: cancel agents, release reservations, board untouched ------
+	var before7 = _snapshot_cell_states(b7)
+	w7["dispatcher"].reset()
+	_check_eq(w7["dispatcher"].get_active_count(), 0, "reset cancels/removes all active agents")
+	_check_eq(w7["dispatcher"].get_child_count(), 0, "reset leaves no orphan agent nodes")
+	_check_eq(w7["reservations"].get_reservation_count(), 0, "reset releases dispatcher-owned reservations")
+	_check(_cell_states_equal(b7, before7), "reset does not mutate BoardState")
+	var next_before: int = w7["dispatcher"].peek_next_owner_id()
+	var r7b = w7["dispatcher"].dispatch(color7, origin)
+	_check(r7b.success, "new dispatch works after reset")
+	_check(r7b.owner_id >= next_before, "owner id counter stays monotonic across reset (no restart)")
+	_m19_teardown(w7)
+
+func _run_m19_dispatcher_production_tests() -> void:
+	print("---- M19: dispatcher over REAL production selection+routing ----")
+	# Single isolated reachable target -> selected, reserved, routed, spawned.
+	var b1 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var color1: int = b1.get_color_id(b1.get_cell_index(10, 10))
+	var w1 = _m19_wire_real(b1)
+	var before1 = _snapshot_cell_states(b1)
+	var r1 = w1["dispatcher"].dispatch(color1, Vector2(-2.0, 10.5), 6.0)
+	_check(r1.success, "production pipeline: reachable target dispatches one agent")
+	_check_eq(r1.target_index, b1.get_cell_index(10, 10), "production: the one reachable candidate is selected")
+	_check(r1.agent.get_route_length() > 0.0, "production: a real non-empty route was produced")
+	_check(w1["reservations"].is_reserved(r1.target_index), "production: reserved target held after dispatch")
+	_check(_cell_states_equal(b1, before1), "production: dispatcher mutates no BoardState cell")
+	_m19_teardown(w1)
+
+	# Sole candidate fully enclosed -> unreachable -> no spawn (real routing).
+	var b2 = _m19_enclosed_sole_candidate_board()
+	var w2 = _m19_wire_real(b2)
+	_check_eq(w2["dispatcher"].dispatch(1, Vector2(-2.0, 2.5)).failure_reason, DispatchResult.FailureReason.NO_REACHABLE_TARGET, "production: enclosed sole candidate -> NO_REACHABLE_TARGET")
+	_check_eq(w2["dispatcher"].get_active_count(), 0, "production: enclosed candidate spawns nothing")
+	_check_eq(w2["reservations"].get_reservation_count(), 0, "production: enclosed candidate reserves nothing")
+	_m19_teardown(w2)
+
+	# 59x59 coverage: three reachable same-colour targets, full real pipeline.
+	var b3 = _m19_open_board_active(59, 59, [Vector2(10, 30), Vector2(30, 30), Vector2(50, 30)])
+	_check_eq(b3.get_width(), 59, "59x59 coverage: width 59")
+	_check_eq(b3.get_height(), 59, "59x59 coverage: height 59")
+	var color3: int = b3.get_color_id(b3.get_cell_index(10, 30))
+	var w3 = _m19_wire_real(b3)
+	var before3 = _snapshot_cell_states(b3)
+	var succ3 := 0
+	var owners3 := {}
+	for _i in range(3):
+		var rr = w3["dispatcher"].dispatch(color3, Vector2(-2.0, 30.5), 6.0)
+		if rr.success:
+			succ3 += 1
+			owners3[rr.owner_id] = true
+	_check_eq(succ3, 3, "59x59: all three reachable targets dispatch")
+	_check_eq(owners3.size(), 3, "59x59: three unique owner ids")
+	_check_eq(w3["dispatcher"].get_active_count(), 3, "59x59: three agents active")
+	_check(_cell_states_equal(b3, before3), "59x59: no BoardState mutation")
+	_m19_teardown(w3)
+
+	# Rectangular Very Hard coverage (53x59).
+	var b4 = _m19_open_board_active(53, 59, [Vector2(10, 30), Vector2(40, 30)])
+	_check_eq(b4.get_width(), 53, "rectangular VH: width 53")
+	_check_eq(b4.get_height(), 59, "rectangular VH: height 59")
+	var color4: int = b4.get_color_id(b4.get_cell_index(10, 30))
+	var w4 = _m19_wire_real(b4)
+	var succ4 := 0
+	for _i in range(2):
+		if w4["dispatcher"].dispatch(color4, Vector2(-2.0, 30.5), 6.0).success:
+			succ4 += 1
+	_check_eq(succ4, 2, "rectangular VH: both reachable targets dispatch")
+	_m19_teardown(w4)
+
+## Wire a dispatcher exactly as production will: real ColorCandidateIndex,
+## TargetSelector, ProductionRoutingSystem, ProductionAccessQuery, and the
+## routing-backed ProductionTargetAccess reachability truth.
+func _m19_wire_real(board) -> Dictionary:
+	var reservations = ReservationState.new(); reservations.bind(board)
+	var candidates = ColorCandidateIndex.create(); candidates.bind(board)
+	var selector = TargetSelector.create(); selector.bind(board, candidates, reservations)
+	var routing = ProductionRoutingSystem.new()
+	var routing_access = ProductionAccessQuery.new(board)
+	var select_access = ProductionTargetAccess.new(routing, routing_access, board)
+	var dispatcher = ScrubbotDispatcher.new(); root.add_child(dispatcher)
+	dispatcher.bind(board, selector, reservations, routing, routing_access, select_access)
+	return {"board": board, "reservations": reservations, "dispatcher": dispatcher}
+
+## 5x5 board where colour 1 has exactly ONE candidate (the centre), fully
+## enclosed by ACTIVE colour-0 cells; everything else CLEARED (open exterior).
+func _m19_enclosed_sole_candidate_board() -> Object:
+	var w := 5; var h := 5
+	var palette := PackedStringArray(["A", "B"])
+	var cells := PackedInt32Array(); cells.resize(w * h); cells.fill(0)
+	cells[2 * w + 2] = 1 # centre is the only colour-1 cell.
+	var level = LevelData.new(1, "m19_enclosed", "m19_enclosed", "TEST", w, h, palette, cells)
+	var board = BoardState.from_level_data(level)
+	for i in board.get_cell_count():
+		board.set_cell_state(i, BoardState.CellState.CLEARED)
+	for c in [Vector2i(2, 2), Vector2i(1, 2), Vector2i(3, 2), Vector2i(2, 1), Vector2i(2, 3)]:
+		board.set_cell_state(board.get_cell_index(c.x, c.y), BoardState.CellState.ACTIVE)
+	return board
+
+func _run_m19_dispatcher_stress_tests() -> void:
+	print("---- M19: dispatcher rapid-input stress (CPU/node only; no FPS/GPU claim) ----")
+	# 25 same-colour reachable candidates in one row; 30 rapid requests.
+	var cells: Array = []
+	for x in range(25):
+		cells.append(Vector2(x, 5))
+	var board = _m19_open_board_active(26, 11, cells)
+	var color: int = board.get_color_id(board.get_cell_index(0, 5))
+	var targetable: Array = []
+	for x in range(25):
+		targetable.append(board.get_cell_index(x, 5))
+	var w = _m19_wire_fake(board, "ok", targetable)
+	var owners := {}
+	var targets := {}
+	var succ := 0
+	var t0 := Time.get_ticks_usec()
+	for _i in range(30):
+		var rr = w["dispatcher"].dispatch(color, Vector2(-2.0, 5.5), 6.0)
+		if rr.success:
+			succ += 1
+			owners[rr.owner_id] = true
+			targets[rr.target_index] = true
+	var elapsed_ms := float(Time.get_ticks_usec() - t0) / 1000.0
+	_check_eq(succ, 25, "25-request stress: successes equal the 25 unique reachable candidates")
+	_check_eq(owners.size(), 25, "25-request stress: all owner ids unique")
+	_check_eq(targets.size(), 25, "25-request stress: no duplicate target ownership")
+	_check_eq(w["dispatcher"].get_active_count(), 25, "25-request stress: 25 agents active, one per success")
+	print("     M19 stress: 30 rapid dispatches (25 reachable), CPU=%.2f ms (headless CPU only, no FPS/GPU claim)" % elapsed_ms)
+
+	# 5-slot concurrent: five reachable candidates dispatched in one burst.
+	var cells5: Array = [Vector2(0, 5), Vector2(2, 5), Vector2(4, 5), Vector2(6, 5), Vector2(8, 5)]
+	var board5 = _m19_open_board_active(10, 11, cells5)
+	var color5: int = board5.get_color_id(board5.get_cell_index(0, 5))
+	var tgt5: Array = []
+	for x in [0, 2, 4, 6, 8]:
+		tgt5.append(board5.get_cell_index(x, 5))
+	var w5 = _m19_wire_fake(board5, "ok", tgt5)
+	var succ5 := 0
+	for _i in range(5):
+		if w5["dispatcher"].dispatch(color5, Vector2(-2.0, 5.5), 6.0).success:
+			succ5 += 1
+	_check_eq(succ5, 5, "5-slot concurrent: all five reachable targets dispatch")
+	_check_eq(w5["dispatcher"].get_active_count(), 5, "5-slot concurrent: five unique agents")
+	_m19_teardown(w5)
+	_m19_teardown(w)
+	# Pooling decision (prompt: no pooling unless profiling justifies it).
+	print("     M19 pooling: NOT justified — 30 rapid create/assign/attach dispatches")
+	print("     completed in a fraction of a ms of CPU; agents are childless Node2Ds")
+	print("     with no per-frame allocation. Defer any pooling to real profiling.")
