@@ -94,3 +94,27 @@ Rule:
    state.
 5. ChatGPT independently verifies the receipt against actual GitHub remote
    state.
+
+
+## Strict-v2 adversarial validation versions
+
+For critical milestones, a later prompt version may be validation-heavy rather
+than feature-heavy.
+
+Example:
+
+```text
+CHATGPT_PROMPT_V01.md          implementation
+CLAUDE_LOG_V01.md
+CHATGPT_AUDIT_V01.md          implementation audit
+
+CHATGPT_PROMPT_V02.md          ChatGPT-authored adversarial validation/correction
+CLAUDE_LOG_V02.md
+CHATGPT_AUDIT_V02.md           final strict closure audit
+```
+
+This is the expected pattern under `AUDIT_POLICY.md` strict v2.
+
+A V02 validation prompt does not imply V01 was useless or broadly defective. It
+means critical stateful behavior is being challenged with auditor-authored cases
+before final closure.
