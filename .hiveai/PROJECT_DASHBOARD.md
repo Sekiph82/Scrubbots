@@ -1,12 +1,12 @@
-### M14 final closure / BoardState foundation gate
+### Foundation queue closed / M19 strict frontier
 
 - M11: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
 - M12: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
 - M13: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
-- M14-C001 V02: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
-- READY now: **FOUNDATION-C001 V01**
-- FOUNDATION-STRICT-001 is validation-first: no production fix unless Godot proves a real noncanonical-state defect.
-- M19 remains audit-blocked until FOUNDATION-STRICT-001 closes.
+- M14: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
+- FOUNDATION-C001 V01: **AUDITED_PASS / FOUNDATION-STRICT-001 CLOSED**
+- BoardState noncanonical-state defect confirmed and repaired.
+- M19 is now the next strict audit frontier.
 - Progress: **278/943 = 29.48%** overall; **278/719 = 38.66%** main + UI.
 
 ### M16 final pass / M17 frozen V03
