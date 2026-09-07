@@ -5,8 +5,8 @@ Counts use unique canonical SB task IDs on checkbox lines. Not a task ledger.
 
 | Scope | Completed | Total | Remaining | Completion |
 | --- | ---: | ---: | ---: | ---: |
-| SCRUBBOTS ecosystem | 274 | 943 | 669 | 29.06% |
-| Main mobile game + SB-UI | 274 | 719 | 445 | 38.11% |
+| SCRUBBOTS ecosystem | 278 | 943 | 665 | 29.48% |
+| Main mobile game + SB-UI | 278 | 719 | 441 | 38.66% |
 | Level Factory LF00-LF10 | 0 | 112 | 112 | 0.00% |
 | Content Pipeline CP00-CP08 | 0 | 112 | 112 | 0.00% |
 
@@ -597,3 +597,15 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Remaining: **669**
 - Main game + SB-UI: **274 / 719 = 38.11%**
 - Main remaining: **445**
+
+
+### M14 final closed / foundation validation ready
+
+- M14-C001 V02: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
+- Re-closed SB-M14-001/004/007/009.
+- FOUNDATION-C001 V01: **READY**.
+- No checkbox is reopened for FOUNDATION-STRICT-001 unless runtime first proves a real M02 defect.
+- Overall: **278 / 943 = 29.48%**
+- Remaining: **665**
+- Main game + SB-UI: **278 / 719 = 38.66%**
+- Main remaining: **441**
