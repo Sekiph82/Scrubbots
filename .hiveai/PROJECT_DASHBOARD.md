@@ -1,12 +1,12 @@
-### Foundation queue closed / M19 strict frontier
+### M19 frozen full-surface V02
 
-- M11: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
-- M12: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
-- M13: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
-- M14: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
-- FOUNDATION-C001 V01: **AUDITED_PASS / FOUNDATION-STRICT-001 CLOSED**
-- BoardState noncanonical-state defect confirmed and repaired.
-- M19 is now the next strict audit frontier.
+- Upstream strict repair chain: **CLOSED**
+- M11-M14 foundation queue: **CLOSED**
+- FOUNDATION-STRICT-001: **CLOSED**
+- Current frontier: **M19-C001 V02**
+- State: **CHANGES_REQUIRED / FINDING_SET_FROZEN / READY**
+- Frozen findings: **F-M19-STRICT-001..004**
+- Next actor: **CLAUDE**
 - Progress: **278/943 = 29.48%** overall; **278/719 = 38.66%** main + UI.
 
 ### M16 final pass / M17 frozen V03
