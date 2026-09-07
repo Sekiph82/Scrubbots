@@ -76,7 +76,19 @@ func is_slot_active(slot_id: int) -> bool:
 		return false
 	return _slots[slot_id].is_active()
 
-func get_slots_by_palette_id(palette_id: int) -> Array:
+## Fail-closed collection query (F-M12-STRICT-001 / F-M12-STRICT-002).
+## palette_id is an untyped Variant seam: unsupported types (null, float,
+## String, bool, Vector2, Object, Array, Dictionary, ...) must return a fresh
+## empty Array without faulting or coercion, and never mutate state. Only a
+## real int >= 0 on a configured system can materialize slots, so the
+## unconfigured -1 sentinel can never yield the five sentinel slots.
+func get_slots_by_palette_id(palette_id: Variant) -> Array:
+	if not _configured:
+		return []
+	# Strict type gate: bool is TYPE_BOOL (not int) in Godot 4, so `is int`
+	# already excludes it; no float/String coercion.
+	if typeof(palette_id) != TYPE_INT or palette_id < 0:
+		return []
 	var result := []
 	for slot in _slots:
 		if slot.get_palette_id() == palette_id:

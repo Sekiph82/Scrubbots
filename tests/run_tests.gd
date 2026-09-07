@@ -2766,6 +2766,65 @@ func _run_slot_system_tests() -> void:
 	_check(not bypass_attempt.ok, "M12-18 palette 999 rejected by configure")
 	_check_eq(sys.get_slot_palette_id(0), 0, "M12-18 palette 0 unchanged after rejected bypass")
 
+	# M12-19: F-M12-STRICT-001 — fail-closed sentinel/configured collection query.
+	# Mandatory frozen regression sequence.
+	var sysS := SlotSystem.new()
+	# 2. unconfigured
+	_check(not sysS.is_configured(), "M12-19 fresh system unconfigured")
+	# 3. sensitivity-safe: -1 sentinel must NOT materialize the five slots
+	_check_eq(sysS.get_slots_by_palette_id(-1), [], "M12-19 unconfigured query(-1) == [] (pre-fix defect guard)")
+	_check_eq(sysS.get_slots_by_palette_id(0), [], "M12-19 unconfigured query(0) == []")
+	# 4. more negative ids
+	_check_eq(sysS.get_slots_by_palette_id(-2), [], "M12-19 unconfigured query(-2) == []")
+	_check_eq(sysS.get_slots_by_palette_id(-999), [], "M12-19 unconfigured query(-999) == []")
+	# 5-7. failed FIRST configure
+	var rSf := sysS.configure([0, 1, -1, 3, 4], 8)
+	_check(not rSf.ok, "M12-19 failed first configure rejected")
+	_check(not sysS.is_configured(), "M12-19 still unconfigured after failed first configure")
+	for i in 5:
+		_check_eq(sysS.get_slot_palette_id(i), -1, "M12-19 slot %d still -1 sentinel after failed first configure" % i)
+	# 8. queries still fail-closed after failed first configure
+	_check_eq(sysS.get_slots_by_palette_id(-1), [], "M12-19 query(-1) == [] after failed first configure")
+	_check_eq(sysS.get_slots_by_palette_id(0), [], "M12-19 query(0) == [] after failed first configure")
+	# 9-10. successful duplicate configure
+	var rSg := sysS.configure([0, 0, 1, 1, 0], 2)
+	_check(rSg.ok, "M12-19 duplicate-valid configure succeeds")
+	_check_eq(sysS.get_slots_by_palette_id(0), [0, 1, 4], "M12-19 palette 0 -> [0,1,4]")
+	_check_eq(sysS.get_slots_by_palette_id(1), [2, 3], "M12-19 palette 1 -> [2,3]")
+	# 11. non-present high id
+	_check_eq(sysS.get_slots_by_palette_id(999), [], "M12-19 query(999) == []")
+	# 12-13. failed REconfigure preserves prior truth
+	var rSr := sysS.configure([0, 0, 1, 1], 2)
+	_check(not rSr.ok, "M12-19 failed reconfigure rejected")
+	_check_eq(sysS.get_slots_by_palette_id(0), [0, 1, 4], "M12-19 palette 0 -> [0,1,4] preserved after failed reconfigure")
+	_check_eq(sysS.get_slots_by_palette_id(1), [2, 3], "M12-19 palette 1 -> [2,3] preserved after failed reconfigure")
+
+	# M12-20: F-M12-STRICT-002 — arbitrary Variant boundary fails closed.
+	# Configured system so a non-empty result is possible for a valid int.
+	var sysV := SlotSystem.new()
+	sysV.configure([0, 0, 1, 1, 0], 2)
+	var bad_inputs := [
+		null, 0.0, 1.0, "0", "hello", false, true,
+		Vector2(1, 2), RefCounted.new(), [], {},
+	]
+	for bad in bad_inputs:
+		var res = sysV.get_slots_by_palette_id(bad)
+		_check(res is Array and res.is_empty(), "M12-20 unsupported input %s -> []" % str(bad))
+	# float 0.0/1.0 must NOT coerce-match integer 0/1
+	_check_eq(sysV.get_slots_by_palette_id(0.0), [], "M12-20 float 0.0 != int 0")
+	_check_eq(sysV.get_slots_by_palette_id(1.0), [], "M12-20 float 1.0 != int 1")
+	# valid int 0 still works — proves the gate isn't over-broad
+	_check_eq(sysV.get_slots_by_palette_id(0), [0, 1, 4], "M12-20 valid int 0 still resolves")
+	# invalid queries never mutated state
+	_check(sysV.is_configured(), "M12-20 config intact after bad queries")
+	_check_eq(sysV.get_slot_palette_id(0), 0, "M12-20 slot 0 palette intact after bad queries")
+
+	# M12-21: returned Array is detached — mutation cannot alter future truth.
+	var live := sysV.get_slots_by_palette_id(0)
+	live.clear()
+	live.append(99)
+	_check_eq(sysV.get_slots_by_palette_id(0), [0, 1, 4], "M12-21 mutating returned Array does not affect next query")
+
 	print("  M12 slot system tests complete")
 
 ## ------------------------------------------------- M13: color candidate index --
