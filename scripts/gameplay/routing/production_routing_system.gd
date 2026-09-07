@@ -1,30 +1,35 @@
 extends "res://scripts/gameplay/routing/routing_system.gd"
-## ProductionRoutingSystem — the owner-selected PRODUCTION routing (M17-C002,
+## ProductionRoutingSystem — owner-selected PRODUCTION routing (M17-C002,
 ## OWNER_MOVEMENT_DECISION_V01 "OWNER_SELECTS_ORGANIZED"). Preload it (AL-001).
 ## Subclasses the M16 RoutingSystem contract (ADR-024): answers HOW for the
 ## already-assigned target only. Never selects WHAT, never retargets, never calls
 ## TargetSelector, never mutates BoardState or ReservationState.
 ##
 ## Owner-selected architecture (ADR-025):
-##   backbone  = deterministic grid-aware planner (establishes valid
-##               reachability + a valid orthogonal path);
-##   language  = organized/curved post-process on that valid path (movement
-##               language), which NEVER invents reachability — every emitted
-##               segment is re-checked through the injected access truth, and any
-##               shortcut/curve that fails falls back to the last valid section.
+##   backbone  = deterministic grid-aware planner (valid reachability + orthogonal
+##               path). COMPLETE exterior reachability — no correctness-affecting
+##               entry cap (M17-C002 V03 F-M17-STRICT-001) — plus direct final
+##               arrival to a perimeter target (F-M17-STRICT-008).
+##   language  = organized/curved post-process (bounded shortcut + controlled
+##               corner rounding). Conservative production defaults.
 ##
-## This lives in PRODUCTION scope (outside prototypes/). It does not import the
-## experimental M17 prototype scripts; those remain only for the diagnostic lab.
+## Hardened boundary (V03 F-M17-STRICT-003..007,009):
+##   - the request must be a real RouteRequest before any field is read;
+##   - the access_query must be an object exposing the COMPLETE seam
+##     (is_segment_traversable, classify_cell, cell_of_point, is_bound_to) and
+##     return the correct types; every returned verdict is validated before trust;
+##   - the access must be exact-bound to the same board (is_bound_to);
+##   - EVERY used planning edge is confirmed traversable by segment access truth
+##     (not inferred from cell class alone);
+##   - the post-process is self-validating: each stage keeps the last route that
+##     passes the shared RouteValidator, and the returned success is
+##     RouteValidator-clean INSIDE compute_route — never a success the external
+##     validator would reject;
+##   - invalid tuning (non-finite/negative) degrades safely, never producing
+##     non-finite success points.
 ##
-## Conservative production defaults (owner tuning preference): bounded local
-## shortcuts (not board-spanning diagonals) and a smaller corner radius than the
-## experimental Organized prototype, so dense scenes read as controlled bends
-## rather than a chaotic diagonal web. Route validity is never sacrificed for
-## aesthetics.
-##
-## The injected access_query must expose classify_cell/cell_of_point (the cell
-## topology seam) plus the M16 is_segment_traversable — ProductionAccessQuery
-## satisfies this. RouteValidator independently re-checks every emitted segment.
+## Production is independent of the experimental M17 prototypes (kept only for the
+## diagnostic lab). Direct straight routing is debug-only, never production.
 
 const RouteValidator = preload("res://scripts/gameplay/routing/route_validator.gd")
 const ProductionAccessQuery = preload("res://scripts/gameplay/routing/production_access_query.gd")
@@ -34,54 +39,123 @@ const NEIGHBORS: Array[Vector2i] = [
 	Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)
 ]
 
-## Cap on exterior entry cells (nearest-first). Bounds bridge-scan cost.
-const MAX_ENTRIES := 12
-
 const _COLLINEAR_EPS := 0.0001
 
 ## --- Conservative production movement-language defaults (ADR-025) ---
-## Maximum vertices a shortcut may skip ahead. Bounded so shortcuts smooth local
-## zig-zags without collapsing the path into long board-spanning diagonals.
-## (The experimental Organized prototype used an UNBOUNDED greedy shortcut.)
 var max_shortcut_span: int = 2
-## Corner cut length in cell units (clamped to half of each adjacent segment).
-## Smaller than the experimental prototype's 0.35 for controlled, readable curves.
 var corner_radius: float = 0.25
-## Interior samples per rounded corner.
 var corner_samples: int = 3
-## Rounding is part of the selected movement language; on by default.
 var enable_rounding: bool = true
 
 func compute_route(request, board, access_query) -> RefCounted:
-	if request == null:
+	# F-006: require a real RouteRequest BEFORE reading any field (a scalar/junk
+	# Variant must not fault). RouteValidator reads request fields, so guard first.
+	if not (request is RouteRequest):
 		return RouteResult.failure(RouteResult.FailureReason.INVALID_REQUEST, -1)
 	var idx: int = request.target_index
+
 	var req_reason: StringName = RouteValidator.validate_request(request, board)
 	if req_reason != RouteResult.FailureReason.NONE:
 		return RouteResult.failure(req_reason, idx)
-	if access_query == null or not access_query.has_method("is_segment_traversable") \
-			or not access_query.has_method("classify_cell"):
+
+	# F-004/F-005/F-006: object-shaped access + complete seam + correct return
+	# types + exact board coherence, all before any route work.
+	if not _access_seam_valid(access_query, board, idx):
 		return RouteResult.failure(RouteResult.FailureReason.MISSING_ACCESS_QUERY, idx)
 
-	# Backbone: deterministic grid-aware reachability/path.
+	# Backbone: complete deterministic grid-aware reachability/path.
 	var cell_path: Array = _bfs_cell_path(request, board, access_query)
+	var target_center: Vector2 = RouteRequest.center_of_index(board, idx)
 	if cell_path.is_empty():
+		# F-008: direct final arrival to a (e.g. perimeter) target when the
+		# straight exterior segment is itself valid and no cell path exists.
+		if _seg_true(access_query, request.start_position, target_center, idx):
+			cell_path = [board.get_cell_position(idx)]
+		else:
+			return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
+
+	var raw := PackedVector2Array()
+	raw.append(request.start_position)
+	for c in cell_path:
+		raw.append(Vector2(float(c.x) + 0.5, float(c.y) + 0.5))
+
+	# F-003: the raw backbone route must itself be RouteValidator-clean.
+	if not _whole_route_valid(request, raw, board, access_query):
 		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
 
-	var pts := PackedVector2Array()
-	pts.append(request.start_position)
-	for c in cell_path:
-		pts.append(Vector2(float(c.x) + 0.5, float(c.y) + 0.5))
-
-	# Movement language: organized/curved post-process (validity-preserving).
-	pts = _remove_collinear(pts)
-	pts = _bounded_shortcut(pts, access_query, idx)
+	# Self-validating organized/curved post-process. Each stage advances only to a
+	# candidate that passes WHOLE-route validation; otherwise it keeps the prior
+	# valid route (F-003/§6). Invalid tuning degrades safely (F-009/§7).
+	var best: PackedVector2Array = raw
+	var c1 := _remove_collinear(best)
+	if _whole_route_valid(request, c1, board, access_query):
+		best = c1
+	var c2 := _bounded_shortcut(best, access_query, idx)
+	if _whole_route_valid(request, c2, board, access_query):
+		best = c2
 	if enable_rounding:
-		pts = _round_corners(pts, access_query, idx)
-	return RouteResult.success_route(idx, pts)
+		var c3 := _round_corners(best, access_query, idx)
+		if _whole_route_valid(request, c3, board, access_query):
+			best = c3
+
+	return RouteResult.success_route(idx, best)
+
+# ------------------------------------------------------- seam / validation --
+
+## Object-shaped access exposing the full seam with correct return types, and
+## exact-bound to `board`. Any deviation -> fail closed (false).
+func _access_seam_valid(access_query, board, idx: int) -> bool:
+	if typeof(access_query) != TYPE_OBJECT:
+		return false
+	for m in ["is_segment_traversable", "classify_cell", "cell_of_point", "is_bound_to"]:
+		if not access_query.has_method(m):
+			return false
+	# Exact board coherence (F-005): reject same-size different board / unbound.
+	var bound = access_query.is_bound_to(board)
+	if typeof(bound) != TYPE_BOOL or not bound:
+		return false
+	# Return-type probes (F-004): classify_cell -> canonical int, cell_of_point ->
+	# Vector2i, is_segment_traversable -> bool.
+	var c0 = access_query.classify_cell(0, 0, idx)
+	if typeof(c0) != TYPE_INT:
+		return false
+	if not (c0 == ProductionAccessQuery.CellClass.OPEN \
+			or c0 == ProductionAccessQuery.CellClass.BLOCKED \
+			or c0 == ProductionAccessQuery.CellClass.TARGET):
+		return false
+	if typeof(access_query.cell_of_point(Vector2(0.5, 0.5))) != TYPE_VECTOR2I:
+		return false
+	if typeof(access_query.is_segment_traversable(Vector2(-9, -9), Vector2(-9, -9), idx)) != TYPE_BOOL:
+		return false
+	return true
+
+## classify verdict, validated. Bad type/value -> BLOCKED (fail closed).
+func _classify(access_query, cx: int, cy: int, idx: int) -> int:
+	var c = access_query.classify_cell(cx, cy, idx)
+	if typeof(c) != TYPE_INT:
+		return ProductionAccessQuery.CellClass.BLOCKED
+	if c == ProductionAccessQuery.CellClass.OPEN or c == ProductionAccessQuery.CellClass.TARGET:
+		return c
+	return ProductionAccessQuery.CellClass.BLOCKED
+
+## segment verdict, validated. True ONLY on an actual bool true.
+func _seg_true(access_query, a: Vector2, b: Vector2, idx: int) -> bool:
+	var v = access_query.is_segment_traversable(a, b, idx)
+	return typeof(v) == TYPE_BOOL and v
+
+## Whole-route validation through the shared M16 RouteValidator.
+func _whole_route_valid(request, points: PackedVector2Array, board, access_query) -> bool:
+	if points.size() < 2:
+		return false
+	var candidate = RouteResult.success_route(request.target_index, points)
+	return RouteValidator.validate_route(request, candidate, board, access_query) == RouteResult.FailureReason.NONE
 
 # ------------------------------------------------------- grid-aware backbone --
 
+## Complete deterministic multi-source BFS. Exterior entries = ALL perimeter OPEN
+## cells with a valid start->centre bridge (nearest-first order for deterministic
+## path preference; NO correctness-affecting cap), plus the start's own cell if
+## inside and open. Every enqueued edge is confirmed by segment access truth.
 func _bfs_cell_path(request, board, access_query) -> Array:
 	var w: int = board.get_width()
 	var h: int = board.get_height()
@@ -89,31 +163,28 @@ func _bfs_cell_path(request, board, access_query) -> Array:
 	var target_cell: Vector2i = board.get_cell_position(idx)
 	var target_center := Vector2(float(target_cell.x) + 0.5, float(target_cell.y) + 0.5)
 
-	var classify := func(cx: int, cy: int) -> int:
-		return access_query.classify_cell(cx, cy, idx)
-
 	var parent: Dictionary = {}
 	var visited: Dictionary = {}
 	var queue: Array[Vector2i] = []
 	var START := Vector2i(-2147483647, -2147483647)
 
-	var start_cell: Vector2i = access_query.cell_of_point(request.start_position)
+	var start_cell: Vector2i = _start_cell(request, access_query)
 	var _try_entry := func(cx: int, cy: int) -> void:
 		var cell := Vector2i(cx, cy)
 		if visited.has(cell):
 			return
-		if classify.call(cx, cy) != ProductionAccessQuery.CellClass.OPEN:
+		if _classify(access_query, cx, cy, idx) != ProductionAccessQuery.CellClass.OPEN:
 			return
 		var center := Vector2(float(cx) + 0.5, float(cy) + 0.5)
-		if not access_query.is_segment_traversable(request.start_position, center, idx):
+		if not _seg_true(access_query, request.start_position, center, idx):
 			return
 		visited[cell] = true
 		parent[cell] = START
 		queue.append(cell)
 
-	if _inside(start_cell, w, h) and classify.call(start_cell.x, start_cell.y) == ProductionAccessQuery.CellClass.OPEN:
+	if _inside(start_cell, w, h) and _classify(access_query, start_cell.x, start_cell.y, idx) == ProductionAccessQuery.CellClass.OPEN:
 		_try_entry.call(start_cell.x, start_cell.y)
-	# Nearest-first, capped exterior perimeter bridge (deterministic).
+	# ALL perimeter cells, nearest-first (deterministic), NO cap.
 	var perim: Array = []
 	for y in h:
 		for x in w:
@@ -125,8 +196,6 @@ func _bfs_cell_path(request, board, access_query) -> Array:
 			return a["d"] < b["d"]
 		return (a["c"].y * w + a["c"].x) < (b["c"].y * w + b["c"].x))
 	for entry in perim:
-		if queue.size() >= MAX_ENTRIES:
-			break
 		var c: Vector2i = entry["c"]
 		_try_entry.call(c.x, c.y)
 
@@ -137,22 +206,33 @@ func _bfs_cell_path(request, board, access_query) -> Array:
 	while head < queue.size():
 		var cur: Vector2i = queue[head]
 		head += 1
+		var cur_center := Vector2(float(cur.x) + 0.5, float(cur.y) + 0.5)
+		# Arrival: target reachable as the final step (segment access confirmed).
 		for d in NEIGHBORS:
-			if cur + d == target_cell:
-				var cur_center := Vector2(float(cur.x) + 0.5, float(cur.y) + 0.5)
-				if access_query.is_segment_traversable(cur_center, target_center, idx):
-					parent[target_cell] = cur
-					return _reconstruct(parent, target_cell, START)
+			if cur + d == target_cell and _seg_true(access_query, cur_center, target_center, idx):
+				parent[target_cell] = cur
+				return _reconstruct(parent, target_cell, START)
 		for d in NEIGHBORS:
 			var n := cur + d
 			if not _inside(n, w, h) or visited.has(n):
 				continue
-			if classify.call(n.x, n.y) != ProductionAccessQuery.CellClass.OPEN:
+			if _classify(access_query, n.x, n.y, idx) != ProductionAccessQuery.CellClass.OPEN:
+				continue
+			# F-M17-STRICT-003/§5: the edge itself must obey segment access truth,
+			# not merely the destination cell class.
+			var n_center := Vector2(float(n.x) + 0.5, float(n.y) + 0.5)
+			if not _seg_true(access_query, cur_center, n_center, idx):
 				continue
 			visited[n] = true
 			parent[n] = cur
 			queue.append(n)
 	return []
+
+func _start_cell(request, access_query) -> Vector2i:
+	var p = access_query.cell_of_point(request.start_position)
+	if typeof(p) == TYPE_VECTOR2I:
+		return p
+	return Vector2i(int(floor(request.start_position.x)), int(floor(request.start_position.y)))
 
 func _inside(c: Vector2i, w: int, h: int) -> bool:
 	return c.x >= 0 and c.y >= 0 and c.x < w and c.y < h
@@ -181,40 +261,45 @@ func _remove_collinear(points: PackedVector2Array) -> PackedVector2Array:
 	out.append(points[points.size() - 1])
 	return out
 
-## Conservative shortcut: from each point, jump to the farthest valid point
-## within a BOUNDED span (max_shortcut_span vertices ahead). Bounding the span is
-## what keeps production readable — it removes local zig-zags without producing
-## long board-spanning diagonals. Invalid jumps are skipped (progress guaranteed).
+## Bounded shortcut span (sanitized). span <= 1 -> no shortcut (F-009).
+func _safe_span() -> int:
+	return max_shortcut_span if max_shortcut_span > 1 else 1
+
 func _bounded_shortcut(points: PackedVector2Array, access_query, idx: int) -> PackedVector2Array:
-	if points.size() <= 2 or max_shortcut_span <= 1:
+	var span: int = _safe_span()
+	if points.size() <= 2 or span <= 1:
 		return points
 	var out := PackedVector2Array([points[0]])
 	var i: int = 0
 	var last: int = points.size() - 1
 	while i < last:
 		var next: int = i + 1
-		var limit: int = mini(last, i + max_shortcut_span)
+		var limit: int = mini(last, i + span)
 		for j in range(limit, i + 1, -1):
-			if access_query.is_segment_traversable(points[i], points[j], idx):
+			if _seg_true(access_query, points[i], points[j], idx):
 				next = j
 				break
 		out.append(points[next])
 		i = next
 	return out
 
-## Replace sharp interior corners with quadratic-bezier arcs bulging toward the
-## corner. Arc interior segments are validated; a corner falls back to sharp if
-## any arc segment is rejected. Endpoints are never moved. Connecting segments are
-## sub-segments of already-valid path segments, so they stay valid.
+## Corner radius / samples sanitized: non-finite/negative radius or samples < 1
+## -> keep the sharp corner (never generate non-finite points) (F-009).
+func _safe_radius() -> float:
+	if is_finite(corner_radius) and corner_radius > 0.0:
+		return corner_radius
+	return 0.0
+
 func _round_corners(points: PackedVector2Array, access_query, idx: int) -> PackedVector2Array:
-	if points.size() <= 2 or corner_samples < 1:
+	var radius: float = _safe_radius()
+	if points.size() <= 2 or corner_samples < 1 or radius <= 0.0:
 		return points
 	var out := PackedVector2Array([points[0]])
 	for i in range(1, points.size() - 1):
 		var a: Vector2 = points[i - 1]
 		var v: Vector2 = points[i]
 		var b: Vector2 = points[i + 1]
-		var cut: float = minf(corner_radius, minf(a.distance_to(v) * 0.5, v.distance_to(b) * 0.5))
+		var cut: float = minf(radius, minf(a.distance_to(v) * 0.5, v.distance_to(b) * 0.5))
 		if cut <= _COLLINEAR_EPS:
 			out.append(v)
 			continue
@@ -228,7 +313,7 @@ func _round_corners(points: PackedVector2Array, access_query, idx: int) -> Packe
 		arc.append(p2)
 		var arc_ok: bool = true
 		for s in range(arc.size() - 1):
-			if not access_query.is_segment_traversable(arc[s], arc[s + 1], idx):
+			if not _seg_true(access_query, arc[s], arc[s + 1], idx):
 				arc_ok = false
 				break
 		if arc_ok:

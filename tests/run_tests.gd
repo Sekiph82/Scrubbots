@@ -50,6 +50,9 @@ const RoutingLabScenarios = preload("res://scripts/gameplay/routing/prototypes/r
 # M17-C002 — owner-selected PRODUCTION routing (Organized/curved + grid backbone).
 const ProductionAccessQuery = preload("res://scripts/gameplay/routing/production_access_query.gd")
 const ProductionRoutingSystem = preload("res://scripts/gameplay/routing/production_routing_system.gd")
+const RouteAccessWrongReturn = preload("res://tests/support/route_access_wrong_return.gd")
+const RouteAccessMissingMethod = preload("res://tests/support/route_access_missing_method.gd")
+const RouteAccessEdgeBlock = preload("res://tests/support/route_access_edge_block.gd")
 # M18 — lightweight Scrubbot agent (consumes a finished route; no selection/routing).
 const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 # M19 — Scrubbot dispatcher (orchestration: select+reserve -> route -> spawn one).
@@ -110,6 +113,8 @@ func _initialize() -> void:
 	_run_m17_lab_scene_smoke()
 	# M17-C002 — production routing promotion.
 	_run_m17c002_production_routing_tests()
+	# M17-C002 V03 — frozen full-surface hardening.
+	_run_m17c002_v03_hardening_tests()
 	# M18 — lightweight Scrubbot agent.
 	_run_m18_agent_tests()
 	_run_m18_agent_lifecycle_reentry_tests()
@@ -4208,9 +4213,13 @@ func _run_m17_lab_scene_smoke() -> void:
 # debug/prototype only. Production defaults are more conservative than the M17
 # experimental Organized prototype. Production lives outside prototypes/.
 
+## Longest INTERIOR movement segment (skips the first point -> board-entry
+## exterior bridge, which is a shared resolution-independent slot->board segment).
+## The conservative-shortcut comparison is about interior path shape, not the
+## common exterior bridge.
 func _m17c002_max_seg(p: PackedVector2Array) -> float:
 	var m := 0.0
-	for i in range(p.size() - 1):
+	for i in range(1, p.size() - 1):
 		m = maxf(m, p[i].distance_to(p[i + 1]))
 	return m
 
@@ -4301,7 +4310,7 @@ func _run_m17c002_production_routing_tests() -> void:
 	_check_eq(prod_valid, prod_succ, "every production 59x59 route passes the shared RouteValidator")
 	_check(prod_pts > exp_pts, "production keeps MORE points than experimental (less aggressive: %d > %d)" % [prod_pts, exp_pts])
 	_check(prod_dist >= exp_dist, "production distance >= experimental (keeps orthogonal path: %.1f >= %.1f)" % [prod_dist, exp_dist])
-	_check(prod_max < exp_max, "production avoids long diagonals (max seg %.1f < experimental %.1f)" % [prod_max, exp_max])
+	_check(prod_max < exp_max, "production avoids long interior diagonals (interior max seg %.1f < experimental %.1f)" % [prod_max, exp_max])
 	# Production default config is more conservative than the experimental default.
 	_check(prod.max_shortcut_span < 2147483647, "production shortcut span is bounded")
 	_check(prod.corner_radius < org_exp.corner_radius, "production corner_radius (%.2f) < experimental (%.2f)" % [prod.corner_radius, org_exp.corner_radius])
@@ -5063,3 +5072,174 @@ func _run_m19_dispatcher_stress_tests() -> void:
 	print("     M19 pooling: NOT justified — 30 rapid create/assign/attach dispatches")
 	print("     completed in a fraction of a ms of CPU; agents are childless Node2Ds")
 	print("     with no per-frame allocation. Defer any pooling to real profiling.")
+
+# ================================================== M17-C002 V03 hardening ==
+# Frozen full-surface finding set F-M17-STRICT-001..009. Fail-closed access,
+# exact supercover traversal, complete exterior reachability, hardened public
+# boundary, per-edge access truth, self-validating fallback, tuning robustness.
+
+func _v03_all_finite(pts: PackedVector2Array) -> bool:
+	for p in pts:
+		if not p.is_finite():
+			return false
+	return true
+
+func _v03_open_board(w: int, h: int):
+	return RoutingLabScenarios.make_open_board(w, h)
+
+func _run_m17c002_v03_hardening_tests() -> void:
+	print("---- M17-C002 V03: full-surface hardening ----")
+
+	# --- F-007: ProductionAccessQuery fail-closed + is_bound_to ---
+	var board = _v03_open_board(25, 25)
+	var tgt = board.get_cell_index(20, 23)
+	board.set_cell_state(tgt, BoardState.CellState.ACTIVE)
+	var acc = ProductionAccessQuery.new(board)
+	_check(acc.is_bound_to(board), "is_bound_to true for the exact bound board")
+	_check(not acc.is_bound_to(_v03_open_board(25, 25)), "is_bound_to false for a same-size DIFFERENT board")
+	_check(not acc.is_bound_to(null), "is_bound_to false for null")
+	_check(not acc.is_bound_to(123), "is_bound_to false for a scalar")
+	var unbound = ProductionAccessQuery.new(123)
+	_check(not unbound.is_bound_to(board), "unbound instance is_bound_to false")
+	_check_eq(unbound.classify_cell(0, 0, 0), ProductionAccessQuery.CellClass.BLOCKED, "unbound classify_cell -> BLOCKED (fail closed)")
+	_check(not unbound.is_segment_traversable(Vector2(0.5, 0.5), Vector2(1.5, 0.5), 0), "unbound is_segment_traversable -> false")
+	_check_eq(unbound.cell_of_point(Vector2(NAN, 0.0)), ProductionAccessQuery.OUTSIDE_SENTINEL, "cell_of_point(non-finite) -> documented sentinel")
+	_check(not acc.has_method("get_board"), "no mutable board reference is exposed")
+	_check(not acc.is_segment_traversable(Vector2(NAN, 0.5), Vector2(20.5, 23.5), tgt), "NaN from endpoint -> false")
+	_check(not acc.is_segment_traversable(Vector2(0.5, 0.5), Vector2(INF, 23.5), tgt), "INF to endpoint -> false")
+	_check(not acc.is_segment_traversable(Vector2(0.5, 0.5), Vector2(1.5, 0.5), 999999), "invalid target index -> false")
+
+	# --- F-002: exact supercover traversal (not sampling) ---
+	var blk = board.get_cell_index(7, 7)
+	board.set_cell_state(blk, BoardState.CellState.ACTIVE)
+	var acc_blk = ProductionAccessQuery.new(board)
+	_check(not acc_blk.is_segment_traversable(Vector2(0.5, 0.5), Vector2(20.5, 23.5), tgt), "short chord grazing ACTIVE (7,7) -> false (exact, not sampled)")
+	board.set_cell_state(blk, BoardState.CellState.CLEARED)
+	var acc_clr = ProductionAccessQuery.new(board)
+	_check(acc_clr.is_segment_traversable(Vector2(0.5, 0.5), Vector2(20.5, 23.5), tgt), "same chord with (7,7) CLEARED -> true")
+
+	var cb = _v03_open_board(5, 5)
+	var ct = cb.get_cell_index(4, 4); cb.set_cell_state(ct, BoardState.CellState.ACTIVE)
+	cb.set_cell_state(cb.get_cell_index(2, 1), BoardState.CellState.ACTIVE)
+	cb.set_cell_state(cb.get_cell_index(1, 2), BoardState.CellState.ACTIVE)
+	var acc_c = ProductionAccessQuery.new(cb)
+	_check(not acc_c.is_segment_traversable(Vector2(1.5, 1.5), Vector2(2.5, 2.5), ct), "exact diagonal corner between blockers -> false")
+	_check(acc_c.is_segment_traversable(Vector2(0.5, 0.5), Vector2(3.5, 0.5), ct), "axis-aligned CLEARED corridor -> true")
+	_check(acc_c.is_segment_traversable(Vector2(-3, -3), Vector2(-1, -1), ct), "outside-board segment -> true")
+	var ctc = RouteRequest.center_of_index(cb, ct)
+	_check(acc_c.is_segment_traversable(Vector2(-2, 4.5), ctc, ct), "outside -> target center final arrival -> true")
+	_check(not acc_c.is_segment_traversable(ctc, Vector2(4.5, 0.5), ct), "target used as non-final transit -> false")
+
+	# --- F-001: complete exterior reachability, >12-entry later-only route ---
+	var f = BoardDebugFixtures.make_board(6, 26) # all ACTIVE
+	for i in range(12):
+		var y = 1 + 2 * i
+		f.set_cell_state(f.get_cell_index(0, y), BoardState.CellState.CLEARED)
+		f.set_cell_state(f.get_cell_index(1, y), BoardState.CellState.CLEARED)
+	f.set_cell_state(f.get_cell_index(0, 25), BoardState.CellState.CLEARED)
+	f.set_cell_state(f.get_cell_index(1, 25), BoardState.CellState.CLEARED)
+	var ftgt = f.get_cell_index(2, 25) # ACTIVE far-finger target
+	var fa = ProductionAccessQuery.new(f)
+	var freq = RouteRequest.for_target(f, Vector2(-50, 12.5), ftgt)
+	var fres = ProductionRoutingSystem.new().compute_route(freq, f, fa)
+	_check(fres.success, "no correctness-affecting entry cap: 13th (far) entry route found")
+	_check_eq(fres.target_index, ftgt, ">12-entry route keeps the same target")
+	if fres.success:
+		var maxy := 0.0
+		for p in fres.get_points():
+			maxy = maxf(maxy, p.y)
+		_check(maxy >= 25.0, "route uses the far (later-only) entry near y=25")
+		_check_eq(RouteValidator.validate_route(freq, fres, f, fa), RouteResult.FailureReason.NONE, "far-entry route validates")
+
+	# --- F-008: direct outside-to-perimeter target ---
+	var pb = BoardDebugFixtures.make_board(5, 5) # all ACTIVE
+	var ptgt = pb.get_cell_index(0, 2) # left-perimeter ACTIVE target; everything else ACTIVE
+	var pa = ProductionAccessQuery.new(pb)
+	var preq = RouteRequest.for_target(pb, Vector2(-2, 2.5), ptgt)
+	var pres = ProductionRoutingSystem.new().compute_route(preq, pb, pa)
+	_check(pres.success, "direct outside-to-perimeter target succeeds")
+	_check_eq(pres.target_index, ptgt, "perimeter target identity retained")
+	if pres.success:
+		_check_eq(RouteValidator.validate_route(preq, pres, pb, pa), RouteResult.FailureReason.NONE, "perimeter-target route validates")
+	var other = pb.get_cell_index(4, 2)
+	_check(not pa.is_segment_traversable(Vector2(-2, 2.5), Vector2(4.5, 2.5), other), "perimeter target not opened as transit for an unrelated route")
+
+	# --- F-006: hardened public request/access boundary ---
+	var vb = _v03_open_board(8, 6)
+	var vt = vb.get_cell_index(6, 3); vb.set_cell_state(vt, BoardState.CellState.ACTIVE)
+	var va = ProductionAccessQuery.new(vb)
+	var good_req = RouteRequest.for_target(vb, Vector2(-2, 3.5), vt)
+	var prod = ProductionRoutingSystem.new()
+	var r_null = prod.compute_route(null, vb, va)
+	_check(not r_null.success and r_null.target_index == -1, "null request -> stable failure, target -1")
+	var r_scalar = prod.compute_route(42, vb, va)
+	_check(not r_scalar.success and r_scalar.target_index == -1, "scalar request -> stable failure, target -1")
+	var r_junk = prod.compute_route({"not": "a request"}, vb, va)
+	_check(not r_junk.success and r_junk.target_index == -1, "junk (Dictionary) request -> stable failure, target -1")
+	var r_sacc = prod.compute_route(good_req, vb, 5)
+	_check(not r_sacc.success, "scalar access -> stable failure")
+	_check_eq(r_sacc.failure_reason, RouteResult.FailureReason.MISSING_ACCESS_QUERY, "scalar access -> MISSING_ACCESS_QUERY")
+	_check_eq(r_sacc.target_index, vt, "scalar-access failure keeps the assigned target")
+	var r_miss = prod.compute_route(good_req, vb, RouteAccessMissingMethod.new())
+	_check_eq(r_miss.failure_reason, RouteResult.FailureReason.MISSING_ACCESS_QUERY, "access missing a seam method -> MISSING_ACCESS_QUERY")
+	var r_wrong = prod.compute_route(good_req, vb, RouteAccessWrongReturn.new())
+	_check_eq(r_wrong.failure_reason, RouteResult.FailureReason.MISSING_ACCESS_QUERY, "full-shape wrong-return access -> MISSING_ACCESS_QUERY")
+	var diff_board_acc = ProductionAccessQuery.new(_v03_open_board(8, 6))
+	var r_coh = prod.compute_route(good_req, vb, diff_board_acc)
+	_check_eq(r_coh.failure_reason, RouteResult.FailureReason.MISSING_ACCESS_QUERY, "same-size DIFFERENT-board access rejected (coherence)")
+
+	# --- F-003/§5: every used planner edge obeys segment access ---
+	# Alternate exists -> route around the blocked edge.
+	var eb = _v03_open_board(7, 7)
+	var et = eb.get_cell_index(5, 3); eb.set_cell_state(et, BoardState.CellState.ACTIVE)
+	var edge_acc = RouteAccessEdgeBlock.new(eb, Vector2(3.5, 3.5), Vector2(4.5, 3.5))
+	var ereq = RouteRequest.for_target(eb, Vector2(-2, 3.5), et)
+	var eres = ProductionRoutingSystem.new().compute_route(ereq, eb, edge_acc)
+	_check(eres.success, "planner routes around a single blocked edge when an alternate exists")
+	if eres.success:
+		# Validate against the SAME edge-blocking truth: route must not use that edge.
+		_check_eq(RouteValidator.validate_route(ereq, eres, eb, edge_acc), RouteResult.FailureReason.NONE, "around-route valid under the edge-blocking access")
+
+	# No alternate -> NO_ROUTE (blocked edge is the only connection).
+	var lb = BoardDebugFixtures.make_board(3, 3) # all ACTIVE
+	lb.set_cell_state(lb.get_cell_index(0, 1), BoardState.CellState.CLEARED)
+	lb.set_cell_state(lb.get_cell_index(1, 1), BoardState.CellState.CLEARED)
+	var lt = lb.get_cell_index(1, 2) # ACTIVE target
+	var ledge = RouteAccessEdgeBlock.new(lb, Vector2(0.5, 1.5), Vector2(1.5, 1.5))
+	var lreq = RouteRequest.for_target(lb, Vector2(-2, 1.5), lt)
+	var lres = ProductionRoutingSystem.new().compute_route(lreq, lb, ledge)
+	_check(not lres.success, "NO_ROUTE when the only connecting edge is blocked")
+	_check_eq(lres.failure_reason, RouteResult.FailureReason.NO_ROUTE, "sole-connection blocked -> NO_ROUTE")
+	_check_eq(lres.target_index, lt, "sole-connection failure keeps the same target")
+	_check(ledge.blocked_edge_queried, "planner consulted segment access on the sole connecting edge (not inferred from cell class)")
+
+	# --- F-003/§6: final success is internally RouteValidator-clean ---
+	var s2 := RoutingLabScenarios.make_s2()
+	var b2 = s2["board"]
+	var a2 = ProductionAccessQuery.new(b2)
+	var q2 = RoutingLabScenarios.build_requests(b2, s2["targets"], s2["origins"])[0]
+	var r2 = ProductionRoutingSystem.new().compute_route(q2, b2, a2)
+	_check(r2.success, "S2 production route succeeds")
+	if r2.success:
+		_check_eq(RouteValidator.validate_route(q2, r2, b2, a2), RouteResult.FailureReason.NONE, "returned success is externally RouteValidator-clean")
+		_check(_v03_all_finite(r2.get_points()), "success route points are all finite")
+
+	# --- F-009: invalid tuning must not poison routing ---
+	_check_eq(prod.max_shortcut_span, 2, "default max_shortcut_span == 2 (unchanged)")
+	_check(is_equal_approx(prod.corner_radius, 0.25), "default corner_radius == 0.25 (unchanged)")
+	_check_eq(prod.corner_samples, 3, "default corner_samples == 3 (unchanged)")
+	for bad in [NAN, INF, -INF, -1.0]:
+		var pr = ProductionRoutingSystem.new()
+		pr.corner_radius = bad
+		var rr = pr.compute_route(q2, b2, a2)
+		_check(rr.success, "non-finite/negative corner_radius (%s) still routes safely" % str(bad))
+		if rr.success:
+			_check(_v03_all_finite(rr.get_points()), "corner_radius %s -> no non-finite success points" % str(bad))
+			_check_eq(RouteValidator.validate_route(q2, rr, b2, a2), RouteResult.FailureReason.NONE, "corner_radius %s route validates" % str(bad))
+	for bs in [0, -3]:
+		var ps = ProductionRoutingSystem.new(); ps.corner_samples = bs
+		var rs = ps.compute_route(q2, b2, a2)
+		_check(rs.success and _v03_all_finite(rs.get_points()), "corner_samples %d safe" % bs)
+		var pm = ProductionRoutingSystem.new(); pm.max_shortcut_span = bs
+		var rm2 = pm.compute_route(q2, b2, a2)
+		_check(rm2.success and _v03_all_finite(rm2.get_points()), "max_shortcut_span %d safe" % bs)
