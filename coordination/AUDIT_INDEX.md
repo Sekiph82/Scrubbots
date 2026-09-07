@@ -172,3 +172,7 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 
 | M16-C001 V05 final full-surface audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V05.md | `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE` | Frozen M16 findings F-006/007/008 closed; full post-fix matrix found no new M16-owned material defect. |
 | M17-C002 full-surface re-audit V03 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_FULL_SURFACE_REAUDIT_V03.md | `CHANGES_REQUIRED / FINDING_SET_FROZEN` | Supersedes the unexecuted V02 correction basis; frozen set now covers reachability cap, exact grid truth, self-validation, seam typing/coherence, public boundaries, access-object safety, perimeter-target arrival and tuning robustness. |
+
+
+| M17-C002 V03 final full-surface audit | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_AUDIT_V03.md | `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE` | Frozen F-M17-STRICT-001..009 closed; exact supercover, complete exterior reachability, self-validation, typed/coherent access seam, perimeter target handling and tuning robustness all accepted. |
+| M11-C001 full-surface re-audit V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_FULL_SURFACE_REAUDIT_V02.md | `CHANGES_REQUIRED / FINDING_SET_FROZEN` | Frozen set covers immutable LevelData ownership, renderer contract, invalid size, freed renderer lifecycle and palette alias isolation. |
