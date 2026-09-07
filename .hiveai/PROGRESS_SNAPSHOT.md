@@ -499,3 +499,15 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - M16-C001 V05 is READY as one comprehensive correction.
 - M17 remains blocked.
 - Progress unchanged: **257 / 943 = 27.25%** overall; **257 / 719 = 35.74%** main+UI.
+
+
+### M16 final closed / M17 full-surface ready
+
+- M16-C001 V05: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
+- Re-closed SB-M16-002/003/010/011.
+- M17 old V02 prompt superseded before execution.
+- M17-C002 V03 frozen full-surface correction is READY.
+- Overall: **261 / 943 = 27.68%**
+- Remaining: **682**
+- Main game + SB-UI: **261 / 719 = 36.30%**
+- Main remaining: **458**
