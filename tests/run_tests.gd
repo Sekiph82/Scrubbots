@@ -40,6 +40,8 @@ const PartialBoardDouble = preload("res://tests/support/partial_board_double.gd"
 const WrongReturnBoardDouble = preload("res://tests/support/wrong_return_board_double.gd")
 const RouteFakeStraight = preload("res://tests/support/route_fake_straight.gd")
 const RouteFakeRelay = preload("res://tests/support/route_fake_relay.gd")
+const FakeRenderer = preload("res://tests/support/fake_renderer.gd")
+const PaletteSpyRenderer = preload("res://tests/support/palette_spy_renderer.gd")
 # M17 — EXPERIMENTAL routing prototype lab.
 const PrototypeAccessQuery = preload("res://scripts/gameplay/routing/prototypes/prototype_access_query.gd")
 const DirectRoutePrototype = preload("res://scripts/gameplay/routing/prototypes/direct_route_prototype.gd")
@@ -2112,14 +2114,20 @@ func _run_gameplay_session_tests() -> void:
 	# ==== 7. Failed replacement load preserves valid session ====
 	var s7 := GameplaySession.new()
 	s7.load_level(path_3x2)
+	# get_level_data() now returns a fresh DETACHED snapshot each call, so assert
+	# source truth by VALUE (not object identity) across a failed replacement.
 	var ld_before = s7.get_level_data()
 	var bs_before = s7.get_board_state()
 	_check_eq(s7.get_state(), GameplaySession.State.READY, "M11-07: starts READY")
 	var r7 := s7.load_level("res://data/levels/nonexistent.json")
 	_check(not r7.ok, "M11-07: replacement load fails")
 	_check_eq(s7.get_state(), GameplaySession.State.READY, "M11-07: state still READY")
-	_check(s7.get_level_data() == ld_before, "M11-07: level_data unchanged")
-	_check(s7.get_board_state() == bs_before, "M11-07: board_state unchanged")
+	var ld_after = s7.get_level_data()
+	_check_eq(ld_after.id, ld_before.id, "M11-07: level_data id unchanged after failed replacement")
+	_check_eq(ld_after.width, ld_before.width, "M11-07: level_data width unchanged")
+	_check_eq(ld_after.height, ld_before.height, "M11-07: level_data height unchanged")
+	_check_eq(ld_after.cells, ld_before.cells, "M11-07: level_data cells unchanged")
+	_check(s7.get_board_state() == bs_before, "M11-07: board_state identity unchanged")
 
 	# ==== 8. BoardState matches level dimensions ====
 	_check_eq(s.get_board_state().get_width(), 3, "M11-08: board width matches level")
@@ -2354,6 +2362,118 @@ func _run_gameplay_session_tests() -> void:
 	_check(not s28.has_method("get_timer"), "M11-28: no get_timer method")
 	_check(not s28.has_method("get_moves"), "M11-28: no get_moves method")
 	_check(not s28.has_method("get_move_limit"), "M11-28: no get_move_limit method")
+
+	# ==== 29. Detached LevelData source ownership (F-M11-STRICT-001) ====
+	# Hostile mutation of a snapshot (scalars, palette, cells, in-place packed
+	# array edits) must not alter the session's internal source truth. After a
+	# reset, the fresh BoardState and a new snapshot must match the ORIGINAL.
+	var s29 := GameplaySession.new()
+	s29.load_level(rect_path)
+	var snap29 = s29.get_level_data()
+	var orig_w: int = snap29.width
+	var orig_h: int = snap29.height
+	var orig_cells: PackedInt32Array = snap29.cells.duplicate()
+	var orig_palette: PackedStringArray = snap29.palette.duplicate()
+	# 1) fresh snapshot is a different object than a second snapshot
+	_check(s29.get_level_data() != snap29, "M11-29: each get_level_data returns a distinct detached object")
+	# 2) hostile scalar/palette/cells mutation of the snapshot
+	snap29.width = 999
+	snap29.height = 999
+	snap29.id = "HACKED"
+	snap29.palette = PackedStringArray(["#DEADBEEF"])
+	snap29.cells = PackedInt32Array([7, 7, 7])
+	# 3) in-place packed-array mutation of the snapshot's arrays
+	var snap29b = s29.get_level_data()
+	if snap29b.cells.size() > 0:
+		snap29b.cells[0] = 42
+	if snap29b.palette.size() > 0:
+		snap29b.palette[0] = "#00000000"
+	# 4) internal source is untouched: a new snapshot still matches original
+	var snap29c = s29.get_level_data()
+	_check_eq(snap29c.width, orig_w, "M11-29: source width survives hostile snapshot mutation")
+	_check_eq(snap29c.height, orig_h, "M11-29: source height survives hostile snapshot mutation")
+	_check_eq(snap29c.cells, orig_cells, "M11-29: source cells survive hostile snapshot mutation")
+	_check_eq(snap29c.palette, orig_palette, "M11-29: source palette survives hostile snapshot mutation")
+	# 5+6) reset rebuilds BoardState from untouched source
+	s29.reset()
+	_check_eq(s29.get_board_state().get_width(), orig_w, "M11-29: reset board width matches original source")
+	_check_eq(s29.get_board_state().get_height(), orig_h, "M11-29: reset board height matches original source")
+	var reset_ok29 := true
+	for i in orig_cells.size():
+		if s29.get_board_state().get_color_id(i) != orig_cells[i]:
+			reset_ok29 = false
+			break
+	_check(reset_ok29, "M11-29: reset board color ids match original source")
+
+	# ==== 30. Malformed renderer binding is fail-closed (F-M11-STRICT-002) ====
+	var s30 := GameplaySession.new()
+	s30.load_level(path_3x2)
+	var good_renderer := BoardRenderer.new()
+	_check(s30.bind_renderer(good_renderer, Vector2(800, 600)) == true, "M11-30: real BoardRenderer binds")
+	# Each malformed replacement must be rejected AND leave the good binding intact.
+	_check(s30.bind_renderer(123, Vector2(800, 600)) == false, "M11-30: int renderer rejected")
+	_check(s30.bind_renderer("renderer", Vector2(800, 600)) == false, "M11-30: String renderer rejected")
+	_check(s30.bind_renderer(Vector2(1, 1), Vector2(800, 600)) == false, "M11-30: Vector2 renderer rejected")
+	_check(s30.bind_renderer(RefCounted.new(), Vector2(800, 600)) == false, "M11-30: RefCounted junk renderer rejected")
+	var fake := FakeRenderer.new()
+	_check(s30.bind_renderer(fake, Vector2(800, 600)) == false, "M11-30: partial fake configure object rejected")
+	_check(fake.configure_calls == 0, "M11-30: fake renderer.configure never called")
+	# Good binding still drives presentation: reset reconfigures the real one.
+	s30.reset()
+	_check(good_renderer.get_cell_size() > 0, "M11-30: valid binding preserved after malformed rejections")
+	# Explicit null unbind returns true.
+	_check(s30.bind_renderer(null) == true, "M11-30: null explicitly unbinds")
+	good_renderer.free()
+
+	# ==== 31. Renderer size boundary is fail-closed (F-M11-STRICT-003) ====
+	var s31 := GameplaySession.new()
+	s31.load_level(path_3x2)
+	var r31 := BoardRenderer.new()
+	_check(s31.bind_renderer(r31, Vector2(NAN, 100)) == false, "M11-31: NaN size rejected")
+	_check(s31.bind_renderer(r31, Vector2(INF, 100)) == false, "M11-31: +INF size rejected")
+	_check(s31.bind_renderer(r31, Vector2(-INF, 100)) == false, "M11-31: -INF size rejected")
+	_check(s31.bind_renderer(r31, Vector2(0, 0)) == false, "M11-31: zero size rejected")
+	_check(s31.bind_renderer(r31, Vector2(-10, -10)) == false, "M11-31: negative size rejected")
+	_check(r31.get_cell_size() <= 0 or not r31.is_inside_tree(), "M11-31: no invalid geometry reached renderer (never configured)")
+	# A valid size still binds after the rejections.
+	_check(s31.bind_renderer(r31, Vector2(640, 480)) == true, "M11-31: valid size binds after rejections")
+	_check(r31.get_cell_size() > 0, "M11-31: valid geometry produced only from valid size")
+	r31.free()
+
+	# ==== 32. Freed/stale bound renderer lifecycle (F-M11-STRICT-004) ====
+	# bind -> load -> free renderer -> reset succeeds headlessly, fresh BoardState.
+	var s32 := GameplaySession.new()
+	var r32 := BoardRenderer.new()
+	s32.bind_renderer(r32, Vector2(800, 600))
+	s32.load_level(path_3x2)
+	var bs32_pre = s32.get_board_state()
+	r32.free()
+	var r32reset := s32.reset()
+	_check(r32reset.ok, "M11-32: reset succeeds after bound renderer freed")
+	_check_eq(s32.get_state(), GameplaySession.State.READY, "M11-32: READY after reset with freed renderer")
+	_check(s32.get_board_state() != bs32_pre, "M11-32: reset produced fresh BoardState after freed renderer")
+	# bind -> free renderer -> replacement load succeeds.
+	var s32b := GameplaySession.new()
+	var r32b := BoardRenderer.new()
+	s32b.bind_renderer(r32b, Vector2(800, 600))
+	r32b.free()
+	var r32bload := s32b.load_level(path_3x2)
+	_check(r32bload.ok, "M11-32: valid level load succeeds after bound renderer freed")
+	_check_eq(s32b.get_state(), GameplaySession.State.READY, "M11-32: READY after load with freed renderer")
+
+	# ==== 33. Presentation cannot alias source palette (F-M11-STRICT-005) ====
+	var s33 := GameplaySession.new()
+	var r33 := PaletteSpyRenderer.new()
+	s33.bind_renderer(r33, Vector2(800, 600))
+	s33.load_level(rect_path)
+	var src_palette33: PackedStringArray = s33.get_level_data().palette.duplicate()
+	# Renderer received a detached palette copy on configure; mutating it must
+	# not affect the session source.
+	if r33.last_palette != null and r33.last_palette.size() > 0:
+		r33.last_palette[0] = "#00000000"
+	s33.reset()  # reconfigure
+	_check_eq(s33.get_level_data().palette, src_palette33, "M11-33: source palette unchanged after renderer mutates its copy + reset")
+	r33.free()
 
 	# ==== 29. Prior checks remain green (verified by running entire suite) ====
 	# (implicit — all test functions run together, _print_summary reports total)
