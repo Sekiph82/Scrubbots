@@ -727,3 +727,14 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - Scope: dispatcher orchestration only; M20 cell-clear vertical slice remains unopened.
 - State: ISSUED; next actor CLAUDE.
 - Owner workflow note: use a fresh Claude chat for this new milestone.
+
+
+## M18 strict re-audit under Audit Standard v2
+
+- Decision: **CHANGES_REQUIRED**
+- Strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_STRICT_REAUDIT_V02.md
+- Active correction/validation: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_PROMPT_V02.md
+- Reopened: SB-M18-001, 006, 014, 015.
+- Main findings: valid lifecycle re-entry is currently possible; multi-segment large-delta evidence is not directly observable; agent performance timing includes routing and cannot support subsystem/pooling conclusions.
+- M19-C001 is paused until M18 strict closure.
+- Next actor: CLAUDE.
