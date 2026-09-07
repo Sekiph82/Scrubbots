@@ -2,7 +2,7 @@
 
 - M17-C002 V03: **AUDITED_PASS / final closed**
 - M11-C001 V06: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
-- READY now: **M12-C001 V03**
+- READY now: **M12-C001 V04**
 - M12 received a full attack-surface sweep; frozen findings are F-M12-STRICT-001/002.
 - M13-M14 remain foundation-blocked in sequence.
 - M19 remains audit-blocked until foundation repairs close.
@@ -747,16 +747,38 @@ Tracking sources:
 | --- | --- |
 | M11 | AUDITED_PASS / STRICT_V2_FINAL_CLOSURE |
 | M11 audit | coordination/sessions/M11-C001/CHATGPT_AUDIT_V06.md |
-| Current foundation repair | M12-C001 V03 |
+| Current foundation repair | M12-C001 V04 |
 | State | CHANGES_REQUIRED / FINDING_SET_FROZEN / READY |
 | Next actor | CLAUDE |
 | M12 full-surface re-audit | coordination/sessions/M12-C001/CHATGPT_FULL_SURFACE_REAUDIT_V02.md |
 | Frozen findings | F-M12-STRICT-001/002 |
-| Active prompt | coordination/sessions/M12-C001/CHATGPT_PROMPT_V03.md |
-| Active criteria | coordination/sessions/M12-C001/CHATGPT_AUDIT_CRITERIA_V03.md |
-| Expected log | coordination/sessions/M12-C001/CLAUDE_LOG_V03.md |
+| Active prompt | coordination/sessions/M12-C001/CHATGPT_PROMPT_V04.md |
+| Active criteria | coordination/sessions/M12-C001/CHATGPT_AUDIT_CRITERIA_V04.md |
+| Expected log | coordination/sessions/M12-C001/CLAUDE_LOG_V04.md |
 | M13-M14 | blocked in foundation sequence |
 | M19 | audit-blocked until foundation queue closes |
 | ChatGPT independent Godot rerun | unavailable |
+| Canonical progress | 269/943 = 28.53% |
+| Main + UI | 269/719 = 37.41% |
+
+
+## 2026-09-07 — M12 V03 audit / V04 current strict frontier
+
+| Field | Value |
+| --- | --- |
+| Current foundation repair | M12-C001 V04 |
+| State | CHANGES_REQUIRED / VALIDATION_HARDENING / READY |
+| Next actor | CLAUDE |
+| V03 implementation | `42396cc413021dc3e94fe8e0eeef7f4986c1d56b` |
+| Claude runtime | 1914 / 1914 ALL PASS (E1/E2) |
+| ChatGPT independent Godot rerun | unavailable |
+| V03 audit | coordination/sessions/M12-C001/CHATGPT_AUDIT_V03.md |
+| Active prompt | coordination/sessions/M12-C001/CHATGPT_PROMPT_V04.md |
+| Active criteria | coordination/sessions/M12-C001/CHATGPT_AUDIT_CRITERIA_V04.md |
+| Expected log | coordination/sessions/M12-C001/CLAUDE_LOG_V04.md |
+| Production findings | unchanged: F-M12-STRICT-001/002 |
+| Remaining issue class | validation sensitivity / direct observability only |
+| M13-M14 | blocked in foundation sequence |
+| M19 | audit-blocked until foundation queue + FOUNDATION-STRICT-001 close |
 | Canonical progress | 269/943 = 28.53% |
 | Main + UI | 269/719 = 37.41% |
