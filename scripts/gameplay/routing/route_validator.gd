@@ -33,12 +33,29 @@ const POINT_EPS := 0.0001
 static func is_finite_vector(v: Vector2) -> bool:
 	return is_finite(v.x) and is_finite(v.y)
 
+## Narrow M16 BoardState method surface required before any board call. A non-null
+## object missing ANY of these is malformed and must fail closed BEFORE the first
+## method call (AL-040: non-null is not enough at a duck-typed dependency
+## boundary). has_method never throws, so this guard cannot itself fault. The
+## board is only queried, never stored/exposed.
+static func _board_has_api(board) -> bool:
+	return board != null \
+		and board.has_method("get_width") \
+		and board.has_method("get_height") \
+		and board.has_method("is_valid_index") \
+		and board.has_method("get_cell_state") \
+		and board.has_method("get_cell_position")
+
 ## Validate the request against live BoardState. Returns FailureReason.NONE when
 ## structurally valid, else the specific stable reason.
 static func validate_request(request, board) -> StringName:
-	if request == null:
+	# Boundary guards (AL-040) BEFORE reading any request field / calling any board
+	# method: a non-null but malformed request or board fails closed to
+	# INVALID_REQUEST without a runtime fault. `x is RouteRequest` is false for
+	# null and for arbitrary junk objects, and never throws.
+	if not (request is RouteRequest):
 		return RouteResult.FailureReason.INVALID_REQUEST
-	if board == null:
+	if not _board_has_api(board):
 		return RouteResult.FailureReason.INVALID_REQUEST
 	# Non-finite coordinates are rejected BEFORE any access/routing geometry call
 	# (center_of_index / is_valid_index below) so NaN/INF can never enter math.
@@ -112,7 +129,9 @@ static func validate_route(request, result, board, access_query) -> StringName:
 ## proves failure metadata cannot be internally contradictory, without widening
 ## RouteResult's mutable internals.
 static func validate_failure_result(request, result) -> StringName:
-	if result == null:
+	# A malformed/null result cannot be a coherent failure (AL-040: never
+	# dereference a non-RouteResult). `x is RouteResult` is false for null/junk.
+	if not (result is RouteResult):
 		return RouteResult.FailureReason.INVALID_ROUTE
 	# A success result is not a failure result.
 	if result.success:
@@ -123,7 +142,13 @@ static func validate_failure_result(request, result) -> StringName:
 	# A failure carries no route points.
 	if result.point_count() != 0:
 		return RouteResult.FailureReason.INVALID_ROUTE
-	# A failure retains the originally requested target (no retarget).
-	if request != null and result.target_index != request.target_index:
-		return RouteResult.FailureReason.INVALID_ROUTE
+	# Request handling at the boundary (AL-040): a null request keeps its
+	# documented semantics (no target comparison). A non-null request that is NOT
+	# a real RouteRequest is malformed and fails closed — its target_index is never
+	# dereferenced. A real RouteRequest must have its target retained (no retarget).
+	if request != null:
+		if not (request is RouteRequest):
+			return RouteResult.FailureReason.INVALID_ROUTE
+		if result.target_index != request.target_index:
+			return RouteResult.FailureReason.INVALID_ROUTE
 	return RouteResult.FailureReason.NONE
