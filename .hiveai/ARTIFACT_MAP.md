@@ -144,8 +144,22 @@ Owner movement decision: https://github.com/Sekiph82/Scrubbots/blob/main/coordin
 | --- | --- | --- | --- | --- | --- |
 | V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CLAUDE_LOG_V01.md | BLOCKED_BY_M18_STRICT_V02 | IMPLEMENTED_BLOCKED |
 
-| V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_AUDIT_CRITERIA_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CLAUDE_LOG_V02.md | PENDING | CHANGES_REQUIRED |
+| V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_AUDIT_CRITERIA_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_AUDIT_V02.md | AUDITED_PASS_STRICT_V2 |
 
 M18 strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_STRICT_REAUDIT_V02.md
 
 M19 blocker note: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_BLOCKER_NOTE_V01.md
+
+M15 strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CHATGPT_STRICT_REAUDIT_V02.md
+
+M16 strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_STRICT_REAUDIT_V02.md
+
+M17 production strict re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_STRICT_REAUDIT_V02.md
+
+Strict repair sequence: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/STRICT_UPSTREAM_REPAIR_SEQUENCE_V01.md
+
+| V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CHATGPT_AUDIT_CRITERIA_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M15-C001/CLAUDE_LOG_V02.md | PENDING | CHANGES_REQUIRED |
+
+| V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_CRITERIA_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CLAUDE_LOG_V02.md | PENDING | BLOCKED_BY_M15 |
+
+| V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_AUDIT_CRITERIA_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CLAUDE_LOG_V02.md | PENDING | BLOCKED_BY_M16 |
