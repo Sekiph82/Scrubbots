@@ -609,3 +609,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Remaining: **665**
 - Main game + SB-UI: **278 / 719 = 38.66%**
 - Main remaining: **441**
+
+
+### BoardState foundation gate closed
+
+- FOUNDATION-C001 V01: **AUDITED_PASS / CLOSED**.
+- FOUNDATION-STRICT-001 confirmed concrete M02 defect and repaired.
+- SB-M02-012 temporary reopen/re-close recorded; net progress unchanged.
+- Overall: **278 / 943 = 29.48%**
+- Main game + SB-UI: **278 / 719 = 38.66%**
+- Entire foundation queue is now closed; M19 is next strict frontier.
