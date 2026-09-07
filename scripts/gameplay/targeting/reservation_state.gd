@@ -35,9 +35,17 @@ extends RefCounted
 ## Explicit preload rather than global class_name lookup — AL-001.
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 
+## Production board-domain ceiling: 59x59 = 3481 cells (tasks.md §8.3). A bind
+## whose get_cell_count() exceeds this is rejected WITHOUT any per-cell scan.
+const MAX_CELL_COUNT := 3481
+
 ## Bound board (RefCounted BoardState) or null when unbound.
 var _board = null
 var _bound: bool = false
+## Immutable bound-domain metadata: the board's get_cell_count() captured once
+## at successful bind. Used only to reject out-of-domain targets BEFORE any
+## per-index board call (F-M14-STRICT-001). 0 when unbound. Never a full scan.
+var _cell_count: int = 0
 ## target_index (int) -> owner_id (int). One entry per active reservation.
 var _target_to_owner: Dictionary = {}
 ## owner_id (int) -> target_index (int). Inverse of _target_to_owner; enforces
@@ -50,25 +58,29 @@ static func create() -> RefCounted:
 	return load("res://scripts/gameplay/targeting/reservation_state.gd").new()
 
 ## Bind to a BoardState so reservations can be validated against live cell
-## truth. Starts with no reservations. Returns false (stays unbound) for null.
+## truth. Ordinary bind is INITIALIZATION-ONLY and UNBOUND-only
+## (F-M14-STRICT-002): any bind() call while already bound returns false and
+## makes zero destructive changes — board identity, bound status, reservation
+## count and both ownership maps are all preserved. Use rebind() to
+## deliberately replace the board, or reset() to clear reservations in place.
+## A first bind fails closed (stays unbound, no domain claimed) unless the
+## dependency is a canonical board (F-M14-STRICT-001).
 func bind(board) -> bool:
-	if board == null:
+	if _bound:
 		return false
-	_board = board
-	_bound = true
-	_target_to_owner.clear()
-	_owner_to_target.clear()
-	return true
+	return _try_bind(board)
 
-## Discard any prior board AND all reservations, then bind to a fresh board.
-## Prevents stale reservations from an old board leaking into the new one.
-## Returns false and leaves the layer cleared+unbound if the new board is null.
+## Explicit destructive board replacement. Drops any prior board AND all
+## reservations FIRST, then attempts to bind the new board. On a malformed/null
+## board the layer is left safely cleared+unbound (recoverable by a later valid
+## bind/rebind); on success the new board's domain replaces the old one.
 func rebind(board) -> bool:
 	_board = null
 	_bound = false
+	_cell_count = 0
 	_target_to_owner.clear()
 	_owner_to_target.clear()
-	return bind(board)
+	return _try_bind(board)
 
 func is_bound() -> bool:
 	return _bound
@@ -94,9 +106,19 @@ func reserve(target_index: int, owner_id: int) -> bool:
 		return false
 	if owner_id < 0:
 		return false
-	if not _board.is_valid_index(target_index):
+	# Out-of-domain target is rejected against the stored bind-time count BEFORE
+	# any per-index board call (F-M14-STRICT-001). Guarantees is_valid_index /
+	# get_cell_state are never invoked for a target outside [0, count).
+	if target_index < 0 or target_index >= _cell_count:
 		return false
-	if _board.get_cell_state(target_index) != BoardState.CellState.ACTIVE:
+	# Live dependency truth must be well-typed; a malformed/contradictory return
+	# fails closed WITHOUT erasing existing reservation ownership (M14 owns live
+	# assignment metadata, unlike M13's derived cache).
+	var valid = _board.is_valid_index(target_index)
+	if typeof(valid) != TYPE_BOOL or valid != true:
+		return false
+	var state = _board.get_cell_state(target_index)
+	if typeof(state) != TYPE_INT or state != BoardState.CellState.ACTIVE:
 		return false
 	# Target already owned (also rejects a same-owner duplicate reserve).
 	if _target_to_owner.has(target_index):
@@ -165,6 +187,39 @@ func get_reserved_indices() -> PackedInt32Array:
 	return out
 
 # ------------------------------------------------------------- internals --
+
+## Validate + install a board as the bound dependency, taking a one-shot domain
+## snapshot. On success sets _board/_bound/_cell_count and clears the maps; on
+## ANY validation failure returns false having mutated nothing. Shared by the
+## unbound-only bind() and the destructive rebind().
+func _try_bind(board) -> bool:
+	if not _is_canonical_board(board):
+		return false
+	# Bind-time domain snapshot: one read, strictly typed, within production
+	# bounds. Oversized/malformed counts are rejected here — no per-cell scan.
+	var count = board.get_cell_count()
+	if typeof(count) != TYPE_INT:
+		return false
+	if count < 0 or count > MAX_CELL_COUNT:
+		return false
+	_board = board
+	_bound = true
+	_cell_count = count
+	_target_to_owner.clear()
+	_owner_to_target.clear()
+	return true
+
+## Fail-closed dependency category check (AL-040): a non-null Variant is not
+## enough. The canonical BoardState is RefCounted, so a method-compatible Node
+## (externally freeable lifecycle) is rejected on category alone, and every
+## scalar/non-object Variant fails the RefCounted test before any has_method
+## call. Requires the complete narrow M14 board API.
+func _is_canonical_board(board) -> bool:
+	if not (board is RefCounted):
+		return false
+	return board.has_method("get_cell_count") \
+		and board.has_method("is_valid_index") \
+		and board.has_method("get_cell_state")
 
 ## Shared ownership-checked removal for release()/resolve_arrival(). Removes
 ## the reservation only when target_index is currently reserved by exactly

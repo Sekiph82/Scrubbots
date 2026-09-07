@@ -39,6 +39,8 @@ const RouteNonBoolAccessQueryDouble = preload("res://tests/support/route_nonbool
 const PartialBoardDouble = preload("res://tests/support/partial_board_double.gd")
 const WrongReturnBoardDouble = preload("res://tests/support/wrong_return_board_double.gd")
 const M13MalformedBoardDouble = preload("res://tests/support/m13_malformed_board_double.gd")
+const M14PartialBoardDouble = preload("res://tests/support/m14_partial_board_double.gd")
+const M14CountingBoardDouble = preload("res://tests/support/m14_counting_board_double.gd")
 const RouteFakeStraight = preload("res://tests/support/route_fake_straight.gd")
 const RouteFakeRelay = preload("res://tests/support/route_fake_relay.gd")
 const FakeRenderer = preload("res://tests/support/fake_renderer.gd")
@@ -93,6 +95,7 @@ func _initialize() -> void:
 	_run_color_candidate_index_tests()
 	_run_color_candidate_index_benchmark()
 	_run_reservation_state_tests()
+	_run_reservation_state_strict_tests()
 	_run_reservation_state_integration_tests()
 	_run_reservation_state_performance()
 	_run_target_selector_tests()
@@ -3633,7 +3636,7 @@ func _run_m13_v02_formal_validation() -> void:
 	bix.bind(bb)
 	var color0_full: Array = bix.get_candidates(0)
 	# exclude the first 10 color-0 indices
-	var excl := color0_full.slice(0, 10)
+	var excl = color0_full.slice(0, 10)
 	var filtered: Array = bix.get_candidates(0, excl)
 	_check_eq(filtered.size(), color0_full.size() - 10, "M13V2-010 scale exclusion removes exactly the excluded candidates")
 	_check_eq(bix.get_candidates(0), color0_full, "M13V2-010 scale exclusion did not mutate cached membership")
@@ -3822,6 +3825,240 @@ func _run_reservation_state_tests() -> void:
 	_check_eq(r4.get_reservation_count(), 1, "M14-28 exactly one reservation exists after the race")
 
 	print("  M14 ReservationState tests complete")
+
+## Strict full-attack-surface coverage for the frozen M14 finding set
+## (F-M14-STRICT-001 fail-closed dependency + reserve-time live truth;
+## F-M14-STRICT-002 unbound-only ordinary bind). Uses counting/partial/Node
+## doubles so oversize/malformed rejection is proven WITHOUT a board scan.
+func _run_reservation_state_strict_tests() -> void:
+	print("---- M14: ReservationState STRICT (F-M14-STRICT-001/002) ----")
+	var ACTIVE := BoardState.CellState.ACTIVE
+	var CLEARED := BoardState.CellState.CLEARED
+
+	# ===== §1 dependency category: fail closed, no has_method on scalars =====
+	var dep := ReservationState.create()
+	_check_eq(dep.bind(4), false, "M14-S1 bind(int scalar) rejected")
+	_check_eq(dep.is_bound(), false, "M14-S1 unbound after int bind")
+	_check_eq(dep.bind("board"), false, "M14-S1 bind(String) rejected")
+	_check_eq(dep.bind(Vector2(1, 2)), false, "M14-S1 bind(Vector2) rejected")
+	_check_eq(dep.bind({}), false, "M14-S1 bind(Dictionary) rejected")
+	_check_eq(dep.bind([]), false, "M14-S1 bind(Array) rejected")
+	_check_eq(dep.bind(RefCounted.new()), false, "M14-S1 bind(plain RefCounted, no API) rejected")
+	_check_eq(dep.bind(M14PartialBoardDouble.new()), false, "M14-S1 bind(partial-API RefCounted) rejected")
+	var node_plain := Node.new()
+	_check_eq(dep.bind(node_plain), false, "M14-S1 bind(Node without API) rejected")
+	node_plain.free()
+	var node_api = load("res://tests/support/m13_board_node_double.gd").new()
+	_check_eq(dep.bind(node_api), false, "M14-S1 bind(method-compatible Node) rejected on category")
+	node_api.free()
+	_check_eq(dep.is_bound(), false, "M14-S1 still unbound after every rejected dependency")
+	_check_eq(dep.get_reservation_count(), 0, "M14-S1 no reservations after failed binds")
+	_check_eq(dep.is_bound_to(_make_colored_board(2, 1, [0, 0])), false, "M14-S1 no board identity claimed")
+
+	# ===== §1 bind-time count snapshot (counting double, no scan) =====
+	var cnt := M14CountingBoardDouble.new()
+	cnt.cell_count = "4" # wrong type
+	var rc := ReservationState.create()
+	_check_eq(rc.bind(cnt), false, "M14-S1 count String -> bind fails")
+	cnt.cell_count = -1
+	_check_eq(rc.bind(cnt), false, "M14-S1 count -1 -> bind fails")
+	cnt.cell_count = 3482
+	cnt.reset_counters()
+	_check_eq(rc.bind(cnt), false, "M14-S1 count 3482 (>ceiling) -> bind fails")
+	_check_eq(cnt.per_index_calls(), 0, "M14-S1 oversize rejected WITHOUT is_valid_index/get_cell_state")
+	cnt.cell_count = 1000000
+	_check_eq(rc.bind(cnt), false, "M14-S1 count 1,000,000 -> bind fails")
+	cnt.cell_count = 999999999
+	_check_eq(rc.bind(cnt), false, "M14-S1 very large count -> bind fails")
+	# allowed bounds
+	var rc0 := ReservationState.create()
+	var cnt0 := M14CountingBoardDouble.new(); cnt0.cell_count = 0
+	_check(rc0.bind(cnt0), "M14-S1 count 0 -> bind allowed")
+	_check_eq(rc0.reserve(0, 1), false, "M14-S1 count 0 -> no target reservable")
+	var rcMax := ReservationState.create()
+	var cntMax := M14CountingBoardDouble.new(); cntMax.cell_count = 3481
+	_check(rcMax.bind(cntMax), "M14-S1 count 3481 (ceiling) -> bind allowed")
+
+	# ===== §2 ordinary bind is UNBOUND-only, preserves live ownership =====
+	var boardA = _make_colored_board(3, 2, [0, 0, 0, 0, 0, 0])
+	var boardB = _make_colored_board(3, 2, [0, 0, 0, 0, 0, 0])
+	var rb := ReservationState.create()
+	_check(rb.bind(boardA), "M14-S2 initial bind to A succeeds")
+	_check(rb.reserve(1, 10), "M14-S2 reserve target1/owner10")
+	_check(rb.reserve(4, 20), "M14-S2 reserve target4/owner20")
+	var base_indices = rb.get_reserved_indices()
+	var node_reentry := Node.new()
+	var reentry := [
+		["same A", boardA], ["different B", boardB], ["null", null],
+		["int", 7], ["partial", M14PartialBoardDouble.new()],
+		["compat Node", node_reentry],
+	]
+	for pair in reentry:
+		var label: String = pair[0]
+		_check_eq(rb.bind(pair[1]), false, "M14-S2 re-bind(%s) returns false" % label)
+		_check_eq(rb.is_bound(), true, "M14-S2 still bound after re-bind(%s)" % label)
+		_check_eq(rb.is_bound_to(boardA), true, "M14-S2 still bound to A after re-bind(%s)" % label)
+		_check_eq(rb.is_bound_to(boardB), false, "M14-S2 not bound to B after re-bind(%s)" % label)
+		_check_eq(rb.get_reservation_count(), 2, "M14-S2 count unchanged after re-bind(%s)" % label)
+		_check_eq(rb.get_owner(1), 10, "M14-S2 target1 owner intact after re-bind(%s)" % label)
+		_check_eq(rb.get_owner(4), 20, "M14-S2 target4 owner intact after re-bind(%s)" % label)
+		_check_eq(rb.get_target_for_owner(10), 1, "M14-S2 owner10 target intact after re-bind(%s)" % label)
+		_check_eq(rb.get_target_for_owner(20), 4, "M14-S2 owner20 target intact after re-bind(%s)" % label)
+		_check_eq(rb.get_reserved_indices(), base_indices, "M14-S2 reserved indices intact after re-bind(%s)" % label)
+	node_reentry.free()
+
+	# ===== §3 explicit destructive rebind =====
+	# valid board B: clears A reservations, installs B, reserves work.
+	_check(rb.rebind(boardB), "M14-S3 rebind(B) succeeds")
+	_check_eq(rb.get_reservation_count(), 0, "M14-S3 A reservations cleared on rebind(B)")
+	_check_eq(rb.is_bound_to(boardB), true, "M14-S3 bound to B only")
+	_check_eq(rb.is_bound_to(boardA), false, "M14-S3 no longer bound to A")
+	_check_eq(rb.get_target_for_owner(10), -1, "M14-S3 old owner ownership absent")
+	_check(rb.reserve(2, 30), "M14-S3 valid reserve on B works")
+	# same board: may intentionally clear, stays bound.
+	_check(rb.rebind(boardB), "M14-S3 rebind(same B) succeeds")
+	_check_eq(rb.get_reservation_count(), 0, "M14-S3 rebind(same) cleared reservations")
+	_check_eq(rb.is_bound_to(boardB), true, "M14-S3 rebind(same) stays bound to B")
+	# null: clears, unbound, recoverable.
+	rb.reserve(0, 40)
+	_check_eq(rb.rebind(null), false, "M14-S3 rebind(null) returns false")
+	_check_eq(rb.is_bound(), false, "M14-S3 rebind(null) leaves unbound")
+	_check_eq(rb.get_reservation_count(), 0, "M14-S3 rebind(null) cleared reservations")
+	_check_eq(rb.is_bound_to(boardB), false, "M14-S3 rebind(null) no board identity")
+	_check_eq(rb.reserve(0, 41), false, "M14-S3 domain reset: reserve fails while unbound")
+	_check(rb.bind(boardA), "M14-S3 recover via valid bind after rebind(null)")
+	# malformed rebind: clears, unbound, no malformed stored, recoverable.
+	rb.reserve(3, 50)
+	var big := M14CountingBoardDouble.new(); big.cell_count = 3482
+	_check_eq(rb.rebind(big), false, "M14-S3 rebind(oversize) returns false")
+	_check_eq(rb.is_bound(), false, "M14-S3 rebind(oversize) leaves unbound")
+	_check_eq(rb.rebind(7), false, "M14-S3 rebind(scalar) returns false")
+	_check_eq(rb.rebind(M14PartialBoardDouble.new()), false, "M14-S3 rebind(partial) returns false")
+	_check_eq(rb.get_reservation_count(), 0, "M14-S3 malformed rebind cleared reservations")
+	_check(rb.rebind(boardB), "M14-S3 recover via valid rebind after malformed rebind")
+
+	# ===== §4 reserve() live return contract (counting double) =====
+	var lr := ReservationState.create()
+	var lb := M14CountingBoardDouble.new(); lb.cell_count = 6
+	_check(lr.bind(lb), "M14-S4 bind counting board (count 6)")
+	_check(lr.reserve(0, 1), "M14-S4 valid in-domain ACTIVE reserve succeeds")
+	# out-of-domain: no per-index board call, existing reservation intact.
+	lb.reset_counters()
+	_check_eq(lr.reserve(-1, 2), false, "M14-S4 target -1 rejected")
+	_check_eq(lr.reserve(6, 2), false, "M14-S4 target == count rejected")
+	_check_eq(lr.reserve(9999, 2), false, "M14-S4 target >> count rejected")
+	_check_eq(lb.per_index_calls(), 0, "M14-S4 out-of-domain targets never call is_valid_index/get_cell_state")
+	_check_eq(lr.get_reservation_count(), 1, "M14-S4 existing reservation intact after invalid targets")
+	# is_valid_index return typing (in-domain target 2)
+	lb.valid_mode = "false"
+	_check_eq(lr.reserve(2, 2), false, "M14-S4 in-domain is_valid_index=false -> reserve false")
+	_check_eq(lr.get_reservation_count(), 1, "M14-S4 ownership unchanged on is_valid_index false")
+	lb.valid_mode = "nonbool"
+	_check_eq(lr.reserve(2, 2), false, "M14-S4 is_valid_index non-bool -> reserve false")
+	_check_eq(lr.get_reservation_count(), 1, "M14-S4 ownership unchanged on non-bool is_valid_index")
+	lb.valid_mode = "normal"
+	# get_cell_state values (in-domain, valid index)
+	var bad_states := {"CLEARED": CLEARED, "2": 2, "-1": -1, "255": 255, "99": 99,
+		"float": 3.14, "String": "active", "Object": RefCounted.new()}
+	for name in bad_states:
+		lb.state_overrides = {2: bad_states[name]}
+		_check_eq(lr.reserve(2, 2), false, "M14-S4 get_cell_state=%s -> reserve false" % name)
+		_check_eq(lr.get_reservation_count(), 1, "M14-S4 ownership unchanged on state=%s" % name)
+		_check_eq(lr.get_owner(0), 1, "M14-S4 pre-existing owner intact on state=%s" % name)
+	lb.state_overrides = {}
+	_check(lr.reserve(2, 2), "M14-S4 ACTIVE target reservable once returns healthy")
+
+	# ===== §5 mirrored-map invariants through every mutation API =====
+	var mm := ReservationState.create()
+	mm.bind(_make_colored_board(4, 1, [0, 0, 0, 0]))
+	_check(mm.reserve(0, 1), "M14-S5 reserve inserts both directions")
+	_check_eq(mm.get_owner(0), 1, "M14-S5 target->owner set")
+	_check_eq(mm.get_target_for_owner(1), 0, "M14-S5 owner->target set")
+	_check_eq(mm.reserve(0, 2), false, "M14-S5 duplicate target other owner fails")
+	_check_eq(mm.reserve(0, 1), false, "M14-S5 duplicate target same owner fails")
+	_check_eq(mm.reserve(1, 1), false, "M14-S5 same owner second target fails")
+	_check(mm.reserve(1, 2), "M14-S5 independent owners independent targets")
+	_check_eq(mm.get_reservation_count(), 2, "M14-S5 maps consistent after failures")
+	# release
+	_check_eq(mm.release(0, 999), false, "M14-S5 wrong-owner release no mutation")
+	_check_eq(mm.get_owner(0), 1, "M14-S5 target0 unchanged after wrong release")
+	_check(mm.release(0, 1), "M14-S5 correct release removes both directions")
+	_check_eq(mm.get_owner(0), -1, "M14-S5 target0 owner cleared")
+	_check_eq(mm.get_target_for_owner(1), -1, "M14-S5 owner1 target cleared")
+	_check(mm.reserve(0, 3), "M14-S5 released target reusable")
+	_check_eq(mm.release(0, 1), false, "M14-S5 repeated/stale release fails")
+	# release_for_owner
+	_check_eq(mm.release_for_owner(777), false, "M14-S5 release_for_owner unknown owner false")
+	var before_sib = mm.get_target_for_owner(2)
+	_check(mm.release_for_owner(3), "M14-S5 release_for_owner removes its target")
+	_check_eq(mm.get_owner(0), -1, "M14-S5 release_for_owner cleared target->owner")
+	_check_eq(mm.get_target_for_owner(3), -1, "M14-S5 release_for_owner cleared owner->target")
+	_check_eq(mm.get_target_for_owner(2), before_sib, "M14-S5 sibling reservation unchanged")
+	_check_eq(mm.release_for_owner(3), false, "M14-S5 repeated release_for_owner false")
+	_check(mm.reserve(0, 4), "M14-S5 target/owner reusable after release_for_owner")
+	# resolve_arrival
+	_check_eq(mm.resolve_arrival(0, 999), false, "M14-S5 resolve wrong owner false")
+	_check_eq(mm.get_owner(0), 4, "M14-S5 no mutation on wrong-owner resolve")
+	var b_arr = mm._board.get_cell_state(0)
+	_check(mm.resolve_arrival(0, 4), "M14-S5 resolve correct owner removes once")
+	_check_eq(mm._board.get_cell_state(0), b_arr, "M14-S5 resolve did not mutate BoardState cell")
+	_check_eq(mm.resolve_arrival(0, 4), false, "M14-S5 second resolve false")
+	# reset
+	mm.reserve(2, 5)
+	mm.reset()
+	_check_eq(mm.get_reservation_count(), 0, "M14-S5 reset clears every reservation")
+	_check(mm.is_bound(), "M14-S5 reset keeps board binding/domain")
+	mm.reset()
+	_check_eq(mm.get_reservation_count(), 0, "M14-S5 second reset harmless")
+	_check(mm.reserve(3, 6), "M14-S5 reserve works after reset")
+
+	# ===== §6 query / encapsulation regression =====
+	var q := ReservationState.create()
+	q.bind(_make_colored_board(3, 1, [0, 0, 0]))
+	q.reserve(2, 1); q.reserve(0, 2)
+	_check_eq(q.is_reserved(-5), false, "M14-S6 is_reserved negative false")
+	_check_eq(q.is_reserved(99999), false, "M14-S6 is_reserved large false")
+	_check_eq(q.get_owner(-5), -1, "M14-S6 get_owner negative -1")
+	_check_eq(q.get_owner(99999), -1, "M14-S6 get_owner large -1")
+	_check_eq(q.get_owner(1), -1, "M14-S6 get_owner unreserved -1")
+	_check_eq(q.get_target_for_owner(-5), -1, "M14-S6 get_target_for_owner negative -1")
+	_check_eq(q.get_target_for_owner(4242), -1, "M14-S6 get_target_for_owner unknown -1")
+	_check_eq(q.get_reservation_count(), 2, "M14-S6 exact count after mixed ops")
+	_check_eq(q.get_reserved_indices(), PackedInt32Array([0, 2]), "M14-S6 reserved indices ascending")
+	var snap = q.get_reserved_indices()
+	snap.append(1); snap.remove_at(0)
+	_check_eq(q.get_reserved_indices(), PackedInt32Array([0, 2]), "M14-S6 snapshot detached from internal maps")
+	_check(not q.has_method("get_board"), "M14-S6 no board getter exposed")
+
+	# ===== §7 M13 (ColorCandidateIndex) immediate-consumer regression =====
+	var cb = _make_colored_board(3, 2, [7, 7, 7, 7, 7, 7])
+	var ci := ColorCandidateIndex.create(); ci.bind(cb)
+	var rs := ReservationState.create(); rs.bind(cb)
+	rs.reserve(2, 1); rs.reserve(4, 2)
+	var excl = rs.get_reserved_indices()
+	_check(excl is PackedInt32Array, "M14-S7 get_reserved_indices is PackedInt32Array")
+	_check_eq(ci.get_candidates(7, excl), [0, 1, 3, 5], "M14-S7 reserved raw candidates excluded")
+	rs.release_for_owner(1)
+	_check_eq(ci.get_candidates(7, rs.get_reserved_indices()), [0, 1, 2, 3, 5], "M14-S7 release_for_owner restores candidate visibility")
+
+	# ===== §8 real 59x59 (3481) + no-scan structural evidence =====
+	var big_cells := PackedInt32Array(); big_cells.resize(3481); big_cells.fill(0)
+	var big_board = _make_colored_board(59, 59, Array(big_cells))
+	var rbig := ReservationState.create()
+	_check(rbig.bind(big_board), "M14-S8 bind real 3481-cell board")
+	_check(rbig.reserve(3480, 1), "M14-S8 reserve last index works")
+	_check(rbig.release(3480, 1), "M14-S8 release works")
+	# structural no-scan: one reserve touches exactly one target's board reads.
+	var sc := M14CountingBoardDouble.new(); sc.cell_count = 3481
+	var rsc := ReservationState.create(); rsc.bind(sc)
+	sc.reset_counters()
+	_check(rsc.reserve(1000, 1), "M14-S8 reserve on counting 3481 board")
+	_check_eq(sc.per_index_calls(), 2, "M14-S8 reserve touches ONE target (is_valid_index+get_cell_state), no scan")
+	sc.reset_counters()
+	rsc.is_reserved(1000); rsc.get_owner(1000); rsc.get_reserved_indices(); rsc.release(1000, 1)
+	_check_eq(sc.per_index_calls(), 0, "M14-S8 query/release make zero board reads")
+
+	print("  M14 ReservationState STRICT tests complete")
 
 func _run_reservation_state_integration_tests() -> void:
 	print("---- M14: ReservationState <-> ColorCandidateIndex integration ----")
