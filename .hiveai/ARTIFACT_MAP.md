@@ -148,7 +148,8 @@ Owner movement decision: https://github.com/Sekiph82/Scrubbots/blob/main/coordin
 
 | Version | Prompt | Audit criteria | Claude log | ChatGPT audit | State |
 | --- | --- | --- | --- | --- | --- |
-| V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CLAUDE_LOG_V01.md | BLOCKED_BY_M18_STRICT_V02 | IMPLEMENTED_BLOCKED |
+| V01 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_PROMPT_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V01.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CLAUDE_LOG_V01.md | SUPERSEDED_BY_CURRENT_FULL_SURFACE | PRESERVED_IMPLEMENTATION |
+| V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M19-C001/CLAUDE_LOG_V02.md | PENDING | ISSUED / FROZEN_FULL_SURFACE |
 
 | V02 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_PROMPT_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_AUDIT_CRITERIA_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CLAUDE_LOG_V02.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M18-C001/CHATGPT_AUDIT_V02.md | AUDITED_PASS_STRICT_V2 |
 
