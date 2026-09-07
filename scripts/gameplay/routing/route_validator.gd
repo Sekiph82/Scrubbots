@@ -33,32 +33,20 @@ const POINT_EPS := 0.0001
 static func is_finite_vector(v: Vector2) -> bool:
 	return is_finite(v.x) and is_finite(v.y)
 
-## Narrow M16 BoardState method surface required before any board call. Any input
-## that is not an object, or an object missing ANY of these methods, is malformed
-## and must fail closed BEFORE the first method call (AL-040/AL-041: non-null is
-## not enough — a scalar Variant like int/String/Vector2 has no has_method and
-## would fault). The TYPE_OBJECT check runs first and short-circuits, so
-## has_method is never called on a non-object. This guard cannot itself fault. The
-## board is only queried, never stored/exposed.
-static func _board_has_api(board) -> bool:
-	if typeof(board) != TYPE_OBJECT:
-		return false
-	return board.has_method("get_width") \
-		and board.has_method("get_height") \
-		and board.has_method("is_valid_index") \
-		and board.has_method("get_cell_state") \
-		and board.has_method("get_cell_position")
-
 ## Validate the request against live BoardState. Returns FailureReason.NONE when
 ## structurally valid, else the specific stable reason.
 static func validate_request(request, board) -> StringName:
-	# Boundary guards (AL-040) BEFORE reading any request field / calling any board
-	# method: a non-null but malformed request or board fails closed to
-	# INVALID_REQUEST without a runtime fault. `x is RouteRequest` is false for
-	# null and for arbitrary junk objects, and never throws.
+	# Boundary guards (AL-040/AL-041/AL-042) BEFORE reading any request field /
+	# calling any board method: a malformed request or board fails closed to
+	# INVALID_REQUEST without a runtime fault. `x is RouteRequest` / `x is
+	# BoardState` are false for null, scalar Variants (int/String/Vector2), junk
+	# objects, and full-shape/wrong-return doubles, and never throw. Exact
+	# BoardState identity (not a duck-typed method surface) also removes
+	# return-value ambiguity so downstream typed calls / center_of_index cannot
+	# fault (F-M16-STRICT-006). The board is only queried, never stored/exposed.
 	if not (request is RouteRequest):
 		return RouteResult.FailureReason.INVALID_REQUEST
-	if not _board_has_api(board):
+	if not (board is BoardState):
 		return RouteResult.FailureReason.INVALID_REQUEST
 	# Non-finite coordinates are rejected BEFORE any access/routing geometry call
 	# (center_of_index / is_valid_index below) so NaN/INF can never enter math.

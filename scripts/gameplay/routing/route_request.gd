@@ -25,6 +25,8 @@ extends RefCounted
 ## method argument to for_target()/RoutingSystem/validator instead, so route data
 ## stays a detached value object (AL-020).
 
+const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
+
 ## Slot origin, board-local cell coordinates. May be outside the board rectangle.
 var start_position: Vector2 = Vector2.ZERO
 ## The already-assigned target's flat row-major index.
@@ -39,7 +41,11 @@ var board_height: int = 0
 ## Returns Vector2(-inf, -inf) for an out-of-range index so callers/validators
 ## can detect the failure rather than get a plausible-but-wrong center.
 static func center_of_index(board, index: int) -> Vector2:
-	if board == null:
+	# Exact BoardState identity (F-M16-STRICT-006/007): false for null, scalar
+	# Variants, junk objects and full-shape/wrong-return doubles, and never throws.
+	# So a malformed board yields the documented (-INF,-INF) sentinel instead of a
+	# runtime fault at this public entry point.
+	if not (board is BoardState):
 		return Vector2(-INF, -INF)
 	var pos: Vector2i = board.get_cell_position(index)
 	if pos.x < 0:
@@ -51,7 +57,15 @@ static func center_of_index(board, index: int) -> Vector2:
 ## center. Returns null for an out-of-range target index (fail closed — the
 ## caller must have a real assigned target).
 static func for_target(board, a_start_position: Vector2, a_target_index: int) -> RefCounted:
-	if board == null or not board.is_valid_index(a_target_index):
+	# Canonical factory must not emit a structurally-invalid request
+	# (F-M16-STRICT-007). Fail closed to null for: a non-BoardState board (exact
+	# identity, never throws); a non-finite slot origin; an invalid target index.
+	# Valid finite origins OUTSIDE the board rectangle are preserved.
+	if not (board is BoardState):
+		return null
+	if not is_finite(a_start_position.x) or not is_finite(a_start_position.y):
+		return null
+	if not board.is_valid_index(a_target_index):
 		return null
 	var r = load("res://scripts/gameplay/routing/route_request.gd").new()
 	r.start_position = a_start_position
