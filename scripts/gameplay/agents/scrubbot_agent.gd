@@ -76,9 +76,21 @@ const _MATCH_EPS := 0.001
 
 ## Assign one in-flight movement. `request` is the RouteRequest that produced
 ## `route_result` (it carries the assigned target_index, spawn origin and
-## target endpoint the route must match). Fails closed (returns false, stays
-## UNASSIGNED) on any invalid input — an agent never partially assigns.
+## target endpoint the route must match). Fails closed (returns false) on any
+## invalid input — an agent never partially assigns.
+##
+## SINGLE-USE (F-M18-STRICT-001 / AL-037): assign() succeeds ONLY from the
+## UNASSIGNED state. A second assign attempt while MOVING, ARRIVED or CANCELLED
+## returns false and mutates nothing — every field of the existing assignment
+## (identity, route, progress, position, completion-emitted truth) is preserved,
+## so agent reuse can never produce a second completion. One agent owns exactly
+## one in-flight movement for its whole life; the dispatcher instantiates a new
+## agent per dispatch (M19).
 func assign(a_owner_id: int, a_color_id: int, request, route_result, a_speed: float = DEFAULT_SPEED) -> bool:
+	# Single-use gate: reject re-entry from any non-UNASSIGNED state, before
+	# touching any field, so existing state/identity/progress stay intact.
+	if _state != State.UNASSIGNED:
+		return false
 	if a_owner_id < 0:
 		return false
 	# color_id is an index into the level palette (0-based); identity only.
@@ -171,11 +183,14 @@ func _position_at(dist: float) -> Vector2:
 
 # ----------------------------------------------------------------- cancel ----
 
-## Cancel/reset. Movement stops immediately; no arrival/completion signal will
-## fire afterwards; the agent can then be freed safely. Idempotent — calling it
-## repeatedly (or after completion) is safe and never re-emits anything.
+## Cancel/reset. Terminal-safe (F-M18-STRICT-001):
+##   - MOVING (or UNASSIGNED) -> CANCELLED, movement stops, no completion fires;
+##   - repeated cancel -> no-op;
+##   - cancel after ARRIVED is a NO-OP: it does NOT downgrade ARRIVED and never
+##     alters completion truth (the route already completed once).
+## The agent can then be freed safely; cancel never re-emits anything.
 func cancel() -> void:
-	if _state == State.CANCELLED:
+	if _state == State.CANCELLED or _state == State.ARRIVED:
 		return
 	_state = State.CANCELLED
 	queue_redraw()

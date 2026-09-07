@@ -825,10 +825,23 @@ dispatch. Assigned color is identity/presentation metadata only.
 - **Lifecycle / no orphans**: the agent owns no child/tween/timer nodes, so
   freeing it in any state (moving, cancelled, completed) leaves nothing orphaned.
   `cancel()` stops movement idempotently and prevents any later completion.
-- **Pooling deferred (SB-M18-015)**: not introduced. Up to 40 concurrent
-  create/assign/run/free agents showed no materially problematic lifecycle cost
-  under headless CPU timing (no FPS/GPU claim). Revisit only if real Dispatcher
-  (M19) profiling shows allocation is a problem.
+- **Single-use lifecycle (strict-v2, F-M18-STRICT-001 / AL-037)**: an agent owns
+  exactly one movement for its entire life. `assign()` succeeds ONLY from
+  `UNASSIGNED`; any re-entry while `MOVING`, `ARRIVED` or `CANCELLED` fails closed
+  and mutates nothing (identity, route, progress, position and completion-emitted
+  truth are all preserved), so agent reuse can never emit a second completion.
+  The dispatcher (M19) therefore instantiates a fresh agent per dispatch rather
+  than recycling one. `cancel()` is terminal-safe: `MOVING`→`CANCELLED`, repeated
+  cancel is a no-op, and cancel after `ARRIVED` is a no-op that never downgrades
+  `ARRIVED` or alters completion truth.
+- **Pooling deferred (SB-M18-014/015, strict-v2 F-M18-STRICT-003 / AL-036)**: not
+  introduced. Under ISOLATED headless agent-lifecycle timing (routes precomputed
+  and verified BEFORE the timer; timed region = alloc + signal hookup + assign +
+  deterministic movement-to-completion + free), 5/10/25/40 agents cost ~0.25–1.1 ms
+  of agent-lifecycle CPU — route generation (measured separately, tens–hundreds of
+  ms) is NOT agent cost. This is headless CPU/node evidence only, not an
+  FPS/GPU/mobile-frame result, and shows no pooling justification under this test.
+  Revisit only if future profiling justifies it.
 
 **Reason**: keeps ADR-024's HOW-vs-WHAT separation intact and lets routing,
 selection, scoring and (later) dispatch/pooling change without touching the
@@ -842,7 +855,9 @@ mover. M18 consumes a finished route and does not care how it was computed
 - Dispatcher (M19), spawning cadence, and vertical-slice wiring (M20) remain out
   of scope.
 
-**Status**: Accepted (M18-C001).
+**Status**: Accepted (M18-C001); amended under Strict Audit Standard v2
+(M18-C001 V02) with the single-use lifecycle and performance-isolation
+clarifications above.
 
 ### ADR-027: ScrubbotDispatcher — orchestration-only, routing-backed reachability, monotonic owner ids
 
