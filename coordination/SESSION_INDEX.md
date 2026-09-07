@@ -826,3 +826,15 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - M17 V03 prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_PROMPT_V03.md
 - M17 V03 state: **READY**
 - Progress: **261/943 = 27.68%** overall; **261/719 = 36.30%** main + UI.
+
+
+## M17-C002 V03 final / M11-C001 V05 ready
+
+- M17 verdict: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M17-C002/CHATGPT_AUDIT_V03.md
+- Re-closed SB-M17-002/003/015/016.
+- Routing repair chain M15 -> M16 -> M17 is complete.
+- M19 remains blocked by strict foundation repairs.
+- M11 full-surface frozen re-audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_FULL_SURFACE_REAUDIT_V02.md
+- M11 correction READY: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V05.md
+- Progress: **265/943 = 28.10%** overall; **265/719 = 36.86%** main + UI.
