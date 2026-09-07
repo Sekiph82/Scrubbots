@@ -28,4 +28,4 @@ Derived tracking file. Not task truth. H!veAI actively watches only PROJECT_DASH
 - FOUNDATION REPAIR QUEUE OPEN: M11/M12/M13/M14 strict findings; must close before final M19 strict audit/M20 acceptance.
 - Next actor: CLAUDE.
 
-| Gameplay Session Core | M11-C001 | V05 | CHANGES_REQUIRED / FROZEN_SET / READY | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V05.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V05.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_FULL_SURFACE_REAUDIT_V02.md | CLAUDE |
+| Gameplay Session Core | M11-C001 | V06 | CHANGES_REQUIRED / VALIDATION_HARDENING / READY | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_PROMPT_V06.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CLAUDE_LOG_V06.md | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M11-C001/CHATGPT_AUDIT_V05.md | CLAUDE |
