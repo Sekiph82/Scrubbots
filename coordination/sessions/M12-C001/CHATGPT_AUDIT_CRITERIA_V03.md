@@ -23,7 +23,7 @@
 18. invalid query never mutates slot/system truth.
 
 ## Valid query semantics / isolation
-18. duplicate valid palette IDs remain legal;
+19. duplicate valid palette IDs remain legal;
 20. valid integer query returns exact matching slot IDs;
 21. valid query order is deterministic ascending slot id;
 22. returned query Array is detached;
