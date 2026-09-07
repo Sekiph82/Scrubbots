@@ -511,3 +511,15 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - Remaining: **682**
 - Main game + SB-UI: **261 / 719 = 36.30%**
 - Main remaining: **458**
+
+
+### M17 final closed / M11 foundation ready
+
+- M17-C002 V03: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**.
+- Re-closed SB-M17-002/003/015/016.
+- Routing repair chain M15/M16/M17 complete.
+- M11-C001 V05 frozen full-surface foundation correction is READY.
+- Overall: **265 / 943 = 28.10%**
+- Remaining: **678**
+- Main game + SB-UI: **265 / 719 = 36.86%**
+- Main remaining: **454**
