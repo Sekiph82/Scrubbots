@@ -479,3 +479,13 @@ etc. complete), excluding the `SB-LFxx-xxx`/`SB-CPxx-xxx` prose placeholders.
 - M16-C001 V03 is READY.
 - M17 remains blocked.
 - Progress unchanged: **257 / 943 = 27.25%** overall; **257 / 719 = 35.74%** main+UI.
+
+
+### M16-C001 V03 strict audit
+
+- Verdict: **CHANGES_REQUIRED**.
+- V03 object-shaped malformed request/board cases accepted.
+- New F-M16-STRICT-005 keeps SB-M16-002/003/010/011 open.
+- M16-C001 V04 is READY.
+- M17 remains blocked.
+- Progress unchanged: **257 / 943 = 27.25%** overall; **257 / 719 = 35.74%** main+UI.
