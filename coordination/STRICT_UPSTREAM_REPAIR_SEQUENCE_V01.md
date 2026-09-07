@@ -8,7 +8,7 @@ Canonical order:
 
 1. M15-C001 V02 — AUDITED_PASS
 2. M16-C001 V05 — AUDITED_PASS
-3. M17-C002 V03 — READY
+3. M17-C002 V03 — AUDITED_PASS
 4. M19 re-sync/retest, then its own strict audit flow
 
 M18-C001 V02 is already strict-audited PASS and is not a repair stage.
@@ -47,7 +47,7 @@ stage becomes READY.
   - audit: coordination/sessions/M16-C001/CHATGPT_AUDIT_V05.md
 - M17-C002 V02 — **SUPERSEDED_BY_V03**
   - old prompt: coordination/sessions/M17-C002/CHATGPT_PROMPT_V02.md
-- M17-C002 V03 — **READY**
+- M17-C002 V03 — **AUDITED_PASS**
   - full-surface re-audit: coordination/sessions/M17-C002/CHATGPT_FULL_SURFACE_REAUDIT_V03.md
   - prompt: coordination/sessions/M17-C002/CHATGPT_PROMPT_V03.md
   - criteria: coordination/sessions/M17-C002/CHATGPT_AUDIT_CRITERIA_V03.md
@@ -79,3 +79,8 @@ V04 closed its scalar validator-input findings. ChatGPT then performed the owner
 ## M16 V05 final + M17 full-surface transition
 
 M16-C001 V05 passed final frozen full-surface audit. Before enabling M17 correction, ChatGPT applied the new locked full attack-surface rule to M17, superseded the older unexecuted V02 prompt, froze the complete M17 finding set, and issued M17-C002 V03 as READY.
+
+
+## M17 V03 final transition
+
+M17-C002 V03 passed final frozen full-surface audit. The routing-contract repair chain M15->M16->M17 is complete. M19 remains blocked by the separate strict foundation repair queue. M11-C001 V05 is now the next READY repair.
