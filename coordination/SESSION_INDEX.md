@@ -801,3 +801,16 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_INDEX.md
 - V04 prompt: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_PROMPT_V04.md
 - M17 remains blocked.
 - Progress unchanged at **257/943 = 27.25%**.
+
+
+## M16-C001 V04 full attack-surface audit
+
+- Verdict: **CHANGES_REQUIRED / FINDING_SET_FROZEN**
+- Audit: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_AUDIT_V04.md
+- V04 requested scalar-boundary fixes are accepted.
+- Full M16 subsystem sweep found and froze F-M16-STRICT-006/007/008.
+- One consolidated V05 correction is READY:
+  https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M16-C001/CHATGPT_PROMPT_V05.md
+- New locked audit policy requires a full attack-surface sweep before correction prompts on critical subsystems.
+- M17 remains blocked.
+- Progress unchanged at **257/943 = 27.25%**.
