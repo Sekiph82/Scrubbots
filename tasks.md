@@ -1,5 +1,13 @@
 # SCRUBBOTS — MASTER TASK PLAN
 
+> **H!veAI notice (GitHub-first v3):** H!veAI live *operational* state is now
+> maintained in `.hiveai/TASKS.md`. This root `tasks.md` remains the detailed
+> project roadmap/history. When a future task changes real project state, both
+> may need updates: root `tasks.md` for detailed task evidence, and
+> `.hiveai/TASKS.md` for H!veAI operational state. If they disagree about
+> *current* project state, `.hiveai/TASKS.md` is the H!veAI authority. Do not
+> maintain a duplicate machine-readable current-state block in this file.
+
 Permanent master execution roadmap for the SCRUBBOTS project. This file is
 authoritative alongside `CLAUDE.md`. Read both at the start of every
 session. Update this file after every numbered implementation prompt.

@@ -1,10 +1,25 @@
-# H!veAI mandatory control-plane adapter
+# H!veAI GitHub-first adapter (v3)
 
-Before doing project work, read `.hiveai/RULES.md`, `.hiveai/PROJECT.json`, and the v3 machine block in `.hiveai/TASKS.md`. The tracked GitHub branch is current-state authority; local folders are execution workspaces.
+- GitHub `origin/main` is the H!veAI project-state authority.
+- Read `.hiveai/RULES.md` before project work.
+- Read `.hiveai/TASKS.md` for the current project state (milestone, sprint,
+  task, workflow state, required actor, next action, blockers, progress).
+- Do not maintain a competing current-task, next-action, milestone, or
+  progress tracker inside `CLAUDE.md`.
+- If project state changes, update `.hiveai/TASKS.md` and append one
+  `hiveai-event/v1` row to `.hiveai/EVENTS.jsonl`.
+- Commit and push the updated tracking state before reporting successful
+  completion. If push fails, report `GITHUB_TRACKING_NOT_SYNCED`.
 
-After every meaningful task/workflow/audit/session state change, update the v3 TASKS block and append-only EVENTS.jsonl, then commit and push the tracked branch before claiming completion.
-
-Do not create a competing task ledger. Provider-specific behavior must not change H!veAI state semantics.
+**SUPERSEDES** every earlier instruction in this file that named
+`.hiveai/STATE.json`, `.hiveai/HANDOFF.md`, `.hiveai/PROJECT_DASHBOARD.md`,
+`.hiveai/ACTIVE_CYCLES.md`, `.hiveai/ARTIFACT_MAP.md`,
+`.hiveai/PROGRESS_SNAPSHOT.md`, or `coordination/SESSION_INDEX.md` as live
+H!veAI authority, or that required synchronizing STATE.json/HANDOFF.md. Those
+files are historical evidence only. The canonical H!veAI file set is
+`.hiveai/PROJECT.json`, `.hiveai/TASKS.md`, `.hiveai/RULES.md`,
+`.hiveai/EVENTS.jsonl`. The ChatGPT/Claude independent-audit governance below
+remains fully in force.
 
 
 ---
