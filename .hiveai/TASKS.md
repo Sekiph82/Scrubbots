@@ -6,9 +6,9 @@
   "currentSprint": "M19-C001 V03 — strict-v2 orchestrator closure second stage",
   "currentTaskId": "M19-C001-V03",
   "currentTaskTitle": "Close remaining M19 strict-v2 orchestration gaps under frozen F-M19-STRICT-001..003",
-  "workflowState": "CHANGES_REQUIRED",
+  "workflowState": "IN_PROGRESS",
   "requiredActor": "CLAUDE",
-  "nextAction": "Implement coordination/sessions/M19-C001/CHATGPT_PROMPT_V03.md; validate against CHATGPT_AUDIT_CRITERIA_V03.md; write CLAUDE_LOG_V03.md; follow H!veAI IN_PROGRESS -> AWAITING_AUDIT lifecycle and push to origin/main.",
+  "nextAction": "Execute M19-C001 V03 second-stage strict-v2 closure (F-M19-STRICT-001..003) and validation per CHATGPT_PROMPT_V03.md / CHATGPT_AUDIT_CRITERIA_V03.md; write CLAUDE_LOG_V03.md; then hand off AWAITING_AUDIT.",
   "blockers": [],
   "progress": {
     "scopeType": "main+ui",
@@ -19,8 +19,8 @@
   },
   "lastCompletedTaskId": "FOUNDATION-C001-V01",
   "lastCompletedTaskTitle": "BoardState.set_cell_state canonical ACTIVE/CLEARED guard (FOUNDATION-STRICT-001 closed)",
-  "updatedAt": "2026-09-09T20:50:18Z",
-  "updatedBy": "CHATGPT"
+  "updatedAt": "2026-09-09T20:59:08Z",
+  "updatedBy": "CLAUDE"
 }
 HIVEAI_TRACKER_V3_END -->
 
@@ -31,13 +31,14 @@ HIVEAI_TRACKER_V3_END -->
 - Current milestone: **M19 — Scrubbot dispatcher orchestration**
 - Current sprint: **M19-C001 V03 — strict-v2 orchestrator closure second stage**
 - Current task: **M19-C001-V03 — Close remaining M19 strict-v2 orchestration gaps under frozen F-M19-STRICT-001..003**
-- Workflow: **CHANGES_REQUIRED**
+- Workflow: **IN_PROGRESS**
 - Required actor: **CLAUDE**
-- Next action: Implement
-  `coordination/sessions/M19-C001/CHATGPT_PROMPT_V03.md`, validate against
-  `coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V03.md`, write
-  `coordination/sessions/M19-C001/CLAUDE_LOG_V03.md`, follow the canonical
-  H!veAI `IN_PROGRESS -> AWAITING_AUDIT` lifecycle, and push to `origin/main`.
+- Next action: Execute the M19-C001 V03 second-stage strict-v2 closure
+  (F-M19-STRICT-001..003) and validation per
+  `coordination/sessions/M19-C001/CHATGPT_PROMPT_V03.md` /
+  `CHATGPT_AUDIT_CRITERIA_V03.md`, write
+  `coordination/sessions/M19-C001/CLAUDE_LOG_V03.md`, then hand off
+  `AWAITING_AUDIT`.
 - Blockers: none.
 - Audit status: V02 independent audit returned **CHANGES_REQUIRED /
   STRICT_V2_SECOND_STAGE_REQUIRED**. F-M19-STRICT-004 is source-accepted/closed;
