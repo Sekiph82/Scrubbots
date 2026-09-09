@@ -18,6 +18,18 @@ var _blocked: Dictionary = {}
 ## Explicitly opened segments keyed by canonical segment key -> true.
 var _open: Dictionary = {}
 var default_traversable: bool = false
+## Optional exact-identity board binding, so this double can also stand in as a
+## dispatcher routing_access (which requires is_bound_to). null = unbound.
+var bound_board = null
+
+## Bind this double to a board for exact-identity coherence checks.
+func bind_board(board) -> void:
+	bound_board = board
+
+## Exact-identity coherence (dispatcher routing_access seam). False when unbound
+## or when a different board instance is supplied.
+func is_bound_to(board) -> bool:
+	return bound_board != null and board == bound_board
 
 static func _key(a: Vector2, b: Vector2) -> String:
 	return "%.4f,%.4f->%.4f,%.4f" % [a.x, a.y, b.x, b.y]

@@ -21,6 +21,12 @@ class FailureReason:
 	const ROUTE_FAILED := &"ROUTE_FAILED"
 	const AGENT_ASSIGN_FAILED := &"AGENT_ASSIGN_FAILED"
 	const RESETTING := &"RESETTING"
+	## Live bundle-coherence drift: a sibling dependency was rebound to a
+	## different board/bundle after dispatcher bind (F-M19-STRICT-001).
+	const COHERENCE_FAILED := &"COHERENCE_FAILED"
+	## Recursive dispatch attempted from inside an in-flight dispatch
+	## (F-M19-STRICT-003). Stable failure, no reservation/agent.
+	const REENTRANT := &"REENTRANT"
 
 var success: bool = false
 var owner_id: int = -1

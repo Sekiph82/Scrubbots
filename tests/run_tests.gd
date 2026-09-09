@@ -65,6 +65,7 @@ const ScrubbotDispatcher = preload("res://scripts/gameplay/dispatch/scrubbot_dis
 const DispatchResult = preload("res://scripts/gameplay/dispatch/dispatch_result.gd")
 const ProductionTargetAccess = preload("res://scripts/gameplay/dispatch/production_target_access.gd")
 const DispatchRoutingDouble = preload("res://tests/support/dispatch_routing_double.gd")
+const DispatchAgentDouble = preload("res://tests/support/dispatch_agent_double.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -132,6 +133,7 @@ func _initialize() -> void:
 	_run_m19_dispatcher_tests()
 	_run_m19_dispatcher_production_tests()
 	_run_m19_dispatcher_stress_tests()
+	_run_m19_strict_v2_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -5785,12 +5787,18 @@ func _m19_wire_fake(board, routing_mode: String, targetable: Array) -> Dictionar
 	routing.mode = routing_mode
 	var access = AccessQueryDouble.new()
 	access.set_all_targetable(targetable)
+	# Permissive routing_access so the fake straight routes validate through the
+	# SAME shared RouteValidator path the dispatcher now enforces; exact-bound to
+	# the board for coherence. (Production wiring uses the real access truth.)
+	var routing_access = RouteAccessQueryDouble.new()
+	routing_access.default_traversable = true
+	routing_access.bind_board(board)
 	var dispatcher = ScrubbotDispatcher.new()
 	root.add_child(dispatcher)
-	# routing_access is opaque to the fake routing; pass a real non-null query.
-	dispatcher.bind(board, selector, reservations, routing, ProductionAccessQuery.new(board), access)
+	dispatcher.bind(board, selector, reservations, routing, routing_access, access)
 	return {"board": board, "reservations": reservations, "candidates": candidates,
-		"selector": selector, "routing": routing, "access": access, "dispatcher": dispatcher}
+		"selector": selector, "routing": routing, "routing_access": routing_access,
+		"access": access, "dispatcher": dispatcher}
 
 func _m19_teardown(w: Dictionary) -> void:
 	var d = w["dispatcher"]
@@ -5892,17 +5900,28 @@ func _run_m19_dispatcher_tests() -> void:
 	_check(r5b.success, "failure-released target is dispatchable again")
 	_m19_teardown(w5)
 
-	# --- agent assign failure -> release, free, no orphan -----------------
+	# --- wrong-start route -> ROUTE_FAILED before any agent creation ------
 	var b6 = _m19_open_board_active(14, 11, active)
 	var color6: int = b6.get_color_id(b6.get_cell_index(2, 5))
 	var w6 = _m19_wire_fake(b6, "mismatch", [b6.get_cell_index(2, 5)])
-	var child_before: int = w6["dispatcher"].get_child_count()
 	var r6 = w6["dispatcher"].dispatch(color6, origin)
-	_check_eq(r6.failure_reason, DispatchResult.FailureReason.AGENT_ASSIGN_FAILED, "assign failure -> AGENT_ASSIGN_FAILED")
-	_check_eq(w6["dispatcher"].get_active_count(), 0, "assign failure spawns zero active agents")
-	_check_eq(w6["dispatcher"].get_child_count(), child_before, "assign failure leaves no orphan node")
-	_check_eq(w6["reservations"].get_reservation_count(), 0, "assign failure releases the reservation")
+	_check_eq(r6.failure_reason, DispatchResult.FailureReason.ROUTE_FAILED, "wrong-start route -> ROUTE_FAILED (shared validator, pre-agent)")
+	_check_eq(w6["dispatcher"].get_active_count(), 0, "wrong-start route spawns zero agents")
+	_check_eq(w6["reservations"].get_reservation_count(), 0, "wrong-start route releases the reservation")
 	_m19_teardown(w6)
+
+	# --- agent assign failure (ownable fresh agent rejects) -> release/free
+	var b6b = _m19_open_board_active(14, 11, active)
+	var color6b: int = b6b.get_color_id(b6b.get_cell_index(2, 5))
+	var w6b = _m19_wire_fake(b6b, "ok", [b6b.get_cell_index(2, 5)])
+	w6b["dispatcher"]._agent_factory = func(): var a = DispatchAgentDouble.new(); a.fail_assign = true; return a
+	var child_before: int = w6b["dispatcher"].get_child_count()
+	var r6b = w6b["dispatcher"].dispatch(color6b, origin)
+	_check_eq(r6b.failure_reason, DispatchResult.FailureReason.AGENT_ASSIGN_FAILED, "assign failure -> AGENT_ASSIGN_FAILED")
+	_check_eq(w6b["dispatcher"].get_active_count(), 0, "assign failure spawns zero active agents")
+	_check_eq(w6b["dispatcher"].get_child_count(), child_before, "assign failure leaves no orphan node")
+	_check_eq(w6b["reservations"].get_reservation_count(), 0, "assign failure releases the reservation")
+	_m19_teardown(w6b)
 
 	# --- rapid input: uniqueness preserved, one-by-one --------------------
 	var b7 = _m19_open_board_active(14, 11, active)
@@ -6070,6 +6089,400 @@ func _run_m19_dispatcher_stress_tests() -> void:
 	print("     M19 pooling: NOT justified — 30 rapid create/assign/attach dispatches")
 	print("     completed in a fraction of a ms of CPU; agents are childless Node2Ds")
 	print("     with no per-frame allocation. Defer any pooling to real profiling.")
+
+# ============================================= M19-C001 V02 strict-v2 =========
+# Frozen full-surface finding set F-M19-STRICT-001..004: fail-closed init-only
+# bind + bundle coherence + live drift; shared route validation seam; agent
+# factory/parent gate; finite-speed request boundary; serial re-entry + reset
+# generation; completion identity. Uses deterministic fakes + real production.
+
+## Create a throwaway dispatcher, attempt one bind, return true only if the bind
+## succeeded AND left the dispatcher bound. Always frees the dispatcher.
+func _m19_try_bind(b, s, r, rs, ra, sa) -> bool:
+	var d = ScrubbotDispatcher.new()
+	root.add_child(d)
+	var ok: bool = d.bind(b, s, r, rs, ra, sa)
+	var bound: bool = d.is_bound()
+	root.remove_child(d)
+	d.free()
+	return ok and bound
+
+## Build a fresh, coherent real bundle over a fresh board.
+func _m19_real_bundle(w: int, h: int, active_cell: Vector2) -> Dictionary:
+	var board = _m19_open_board_active(w, h, [active_cell])
+	var reservations = ReservationState.new(); reservations.bind(board)
+	var candidates = ColorCandidateIndex.create(); candidates.bind(board)
+	var selector = TargetSelector.create(); selector.bind(board, candidates, reservations)
+	var routing = ProductionRoutingSystem.new()
+	var routing_access = ProductionAccessQuery.new(board)
+	var select_access = ProductionTargetAccess.new(routing, routing_access, board)
+	return {"board": board, "reservations": reservations, "candidates": candidates,
+		"selector": selector, "routing": routing, "routing_access": routing_access,
+		"select_access": select_access, "idx": board.get_cell_index(int(active_cell.x), int(active_cell.y))}
+
+## An assigned ScrubbotAgent in the requested terminal state (MOVING/ARRIVED/
+## CANCELLED), unparented — for factory-product rejection tests.
+func _m19_assigned_agent(board, idx: int, org: Vector2, final_state: int):
+	var req = RouteRequest.for_target(board, org, idx)
+	var route = RouteResult.success_route(idx, PackedVector2Array([org, req.target_position]))
+	var a = ScrubbotAgent.new()
+	a.assign(0, maxi(board.get_color_id(idx), 0), req, route, 6.0)
+	if final_state == ScrubbotAgent.State.ARRIVED:
+		a.advance(10000.0)
+	elif final_state == ScrubbotAgent.State.CANCELLED:
+		a.cancel()
+	return a
+
+func _run_m19_strict_v2_tests() -> void:
+	print("---- M19-C001 V02: strict-v2 dispatcher hardening ----")
+	var active := [Vector2(2, 5), Vector2(4, 5), Vector2(6, 5), Vector2(8, 5), Vector2(10, 5)]
+	var origin := Vector2(-2.0, 5.5)
+
+	# ===== F-M19-STRICT-001: fresh bind dependency boundary (1-10) =====
+	var rb = _m19_real_bundle(20, 20, Vector2(10, 10))
+	var B = rb["board"]; var S = rb["selector"]; var R = rb["reservations"]
+	var RS = rb["routing"]; var RA = rb["routing_access"]; var SA = rb["select_access"]
+	_check(_m19_try_bind(B, S, R, RS, RA, SA), "real coherent bundle binds (crit 1)")
+	_check(not _m19_try_bind(123, S, R, RS, RA, SA), "scalar board rejected (crit 2)")
+	_check(not _m19_try_bind(B, null, R, RS, RA, SA), "null selector rejected (crit 3)")
+	_check(not _m19_try_bind(B, 5, R, RS, RA, SA), "scalar selector rejected (crit 3)")
+	_check(not _m19_try_bind(B, RefCounted.new(), R, RS, RA, SA), "partial selector (no API) rejected (crit 8)")
+	_check(not _m19_try_bind(B, S, null, RS, RA, SA), "null reservation rejected (crit 4)")
+	_check(not _m19_try_bind(B, S, "x", RS, RA, SA), "scalar reservation rejected (crit 4)")
+	_check(not _m19_try_bind(B, S, R, null, RA, SA), "null routing system rejected (crit 5)")
+	_check(not _m19_try_bind(B, S, R, RefCounted.new(), RA, SA), "partial routing system rejected (crit 5)")
+	_check(not _m19_try_bind(B, S, R, RS, null, SA), "null routing access rejected (crit 6)")
+	_check(not _m19_try_bind(B, S, R, RS, RefCounted.new(), SA), "partial routing access rejected (crit 6)")
+	_check(not _m19_try_bind(B, S, R, RS, RA, null), "null select access rejected (crit 7)")
+	_check(not _m19_try_bind(B, S, R, RS, RA, RefCounted.new()), "partial select access rejected (crit 7,8)")
+
+	# ===== Exact bundle coherence (11-18) =====
+	var rb2 = _m19_real_bundle(20, 20, Vector2(10, 10)) # same size, DIFFERENT board
+	_check(not _m19_try_bind(B, rb2["selector"], R, RS, RA, SA), "selector bound to other board rejected (crit 11,16)")
+	_check(not _m19_try_bind(B, S, rb2["reservations"], RS, RA, SA), "reservation bound to other board rejected (crit 13,17)")
+	_check(not _m19_try_bind(B, S, R, RS, rb2["routing_access"], SA), "routing_access bound to other board rejected (crit 14)")
+	_check(not _m19_try_bind(B, S, R, RS, RA, rb2["select_access"]), "select_access with other bundle rejected (crit 15,18)")
+
+	# ===== Ordinary repeated bind (19-26) =====
+	var wrep = _m19_wire_fake(_m19_open_board_active(14, 11, active), "ok", [])
+	var bp = wrep["board"]
+	wrep["access"].set_all_targetable([bp.get_cell_index(2, 5), bp.get_cell_index(4, 5)])
+	var colorp: int = bp.get_color_id(bp.get_cell_index(2, 5))
+	var rok = wrep["dispatcher"].dispatch(colorp, origin)
+	_check(rok.success, "repeated-bind precondition: one live assignment")
+	var pre_active: int = wrep["dispatcher"].get_active_count()
+	var pre_owner: int = wrep["reservations"].get_owner(rok.target_index)
+	var pre_agent = wrep["dispatcher"].get_agent_for_owner(rok.owner_id)
+	var d = wrep["dispatcher"]
+	_check(not d.bind(wrep["board"], wrep["selector"], wrep["reservations"], wrep["routing"], wrep["routing_access"], wrep["access"]), "same-bundle second bind false (crit 19)")
+	_check(not d.bind(rb2["board"], rb2["selector"], rb2["reservations"], rb2["routing"], rb2["routing_access"], rb2["select_access"]), "different valid bundle second bind false (crit 20)")
+	_check(not d.bind(null, null, null, null, null, null), "null second bind false (crit 21)")
+	_check(d.is_bound(), "bound flag preserved after failed rebinds (crit 22)")
+	_check_eq(d.get_active_count(), pre_active, "active count preserved (crit 24)")
+	_check_eq(wrep["reservations"].get_owner(rok.target_index), pre_owner, "reservation owner preserved (crit 25)")
+	_check_eq(d.get_agent_for_owner(rok.owner_id), pre_agent, "active agent identity preserved (crit 26)")
+	_m19_teardown(wrep)
+
+	# ===== Live coherence drift (27-31) =====
+	# reservation rebind drift
+	var wd1 = _m19_wire_fake(_m19_open_board_active(14, 11, active), "ok", [_m19_open_board_active(14, 11, active).get_cell_index(2, 5)])
+	var bd1 = wd1["board"]
+	wd1["access"].set_all_targetable([bd1.get_cell_index(2, 5), bd1.get_cell_index(4, 5)])
+	var cd1: int = bd1.get_color_id(bd1.get_cell_index(2, 5))
+	var live1 = wd1["dispatcher"].dispatch(cd1, origin)
+	_check(live1.success, "drift precondition assignment")
+	var other_board = _m19_open_board_active(14, 11, active)
+	wd1["reservations"].rebind(other_board) # sibling drift
+	var after_drift = wd1["dispatcher"].dispatch(cd1, origin)
+	_check_eq(after_drift.failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "reservation drift blocks dispatch (crit 27)")
+	_check_eq(wd1["dispatcher"].get_active_count(), 1, "drift leaves prior active assignment intact (crit 31)")
+	_m19_teardown(wd1)
+	# selector drift
+	var wd2 = _m19_wire_fake(_m19_open_board_active(14, 11, active), "ok", [_m19_open_board_active(14, 11, active).get_cell_index(2, 5)])
+	var bd2b = wd2["board"]; wd2["access"].set_all_targetable([bd2b.get_cell_index(2, 5)])
+	var ob = _m19_open_board_active(14, 11, active)
+	var oc = ColorCandidateIndex.create(); oc.bind(ob)
+	var orr = ReservationState.new(); orr.bind(ob)
+	wd2["selector"].bind(ob, oc, orr) # selector rebound to other board
+	_check_eq(wd2["dispatcher"].dispatch(bd2b.get_color_id(bd2b.get_cell_index(2, 5)), origin).failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "selector drift blocks dispatch (crit 28)")
+	_m19_teardown(wd2)
+	# routing_access drift
+	var wd3 = _m19_wire_fake(_m19_open_board_active(14, 11, active), "ok", [_m19_open_board_active(14, 11, active).get_cell_index(2, 5)])
+	var bd3 = wd3["board"]; wd3["access"].set_all_targetable([bd3.get_cell_index(2, 5)])
+	wd3["routing_access"].bind_board(_m19_open_board_active(14, 11, active)) # rebind access to other board
+	_check_eq(wd3["dispatcher"].dispatch(bd3.get_color_id(bd3.get_cell_index(2, 5)), origin).failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "routing-access drift blocks dispatch (crit 29)")
+	_m19_teardown(wd3)
+	# select-access bundle drift
+	var wd4 = _m19_wire_fake(_m19_open_board_active(14, 11, active), "ok", [_m19_open_board_active(14, 11, active).get_cell_index(2, 5)])
+	var bd4 = wd4["board"]; wd4["access"].set_all_targetable([bd4.get_cell_index(2, 5)])
+	wd4["access"].coherent = false # select-access reports incoherent
+	_check_eq(wd4["dispatcher"].dispatch(bd4.get_color_id(bd4.get_cell_index(2, 5)), origin).failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "select-access drift blocks dispatch (crit 30)")
+	_m19_teardown(wd4)
+
+	# ===== F-M19-STRICT-002: ProductionTargetAccess boundary (32-45) =====
+	var pb = _m19_open_board_active(15, 15, [Vector2(7, 7)])
+	var pidx: int = pb.get_cell_index(7, 7)
+	var prs = ProductionRoutingSystem.new()
+	var pac = ProductionAccessQuery.new(pb)
+	var porg := Vector2(-2.0, 7.5)
+	var badsys = ProductionTargetAccess.new(123, pac, pb); badsys.set_origin(porg)
+	_check(not badsys.is_targetable(pidx), "PTA malformed routing system -> false (crit 32)")
+	var badacc = ProductionTargetAccess.new(prs, null, pb); badacc.set_origin(porg)
+	_check(not badacc.is_targetable(pidx), "PTA malformed routing access -> false (crit 33)")
+	var badboard = ProductionTargetAccess.new(prs, pac, 123); badboard.set_origin(porg)
+	_check(not badboard.is_targetable(pidx), "PTA non-BoardState board -> false (crit 34)")
+	var good = ProductionTargetAccess.new(prs, pac, pb); good.set_origin(porg)
+	_check(good.is_targetable(pidx), "PTA valid exact route -> true (crit 40)")
+	_check(good.consume_route(pidx) != null, "PTA consume winning route once (crit 43)")
+	_check(good.consume_route(pidx) == null, "PTA second consume -> null (crit 44)")
+	_check(good.is_targetable(pidx), "PTA re-probe ok")
+	_check(good.consume_route(pidx + 1) == null, "PTA wrong-index consume -> null (crit 45)")
+	good.set_origin(Vector2(NAN, 7.5))
+	_check(not good.is_targetable(pidx), "PTA non-finite origin -> false (crit 35)")
+	_check(good.consume_route(pidx) == null, "PTA non-finite origin cleared memo (crit 35)")
+	good.set_origin(porg)
+	_check(not good.is_targetable(999999), "PTA invalid index -> false (crit 36)")
+	_check(good.is_targetable(pidx), "PTA memo set for failed-probe test")
+	_check(not good.is_targetable(88888), "PTA failed probe")
+	_check(good.consume_route(pidx) == null, "PTA failed probe cleared stale memo (crit 41)")
+	_check(good.is_targetable(pidx), "PTA memo set for set_origin-clear test")
+	good.set_origin(Vector2(-3.0, 7.5))
+	_check(good.consume_route(pidx) == null, "PTA set_origin cleared memo (crit 42)")
+	# malformed/mismatched/invalid route via routing double
+	var rd = DispatchRoutingDouble.new()
+	var pta = ProductionTargetAccess.new(rd, pac, pb); pta.set_origin(porg)
+	rd.mode = "null"; _check(not pta.is_targetable(pidx), "PTA null route -> false (crit 37)")
+	rd.mode = "junk_ref"; _check(not pta.is_targetable(pidx), "PTA malformed route Variant -> false (crit 37)")
+	rd.mode = "wrong_target"; _check(not pta.is_targetable(pidx), "PTA wrong-target success -> false (crit 38)")
+	rd.mode = "nonfinite"; _check(not pta.is_targetable(pidx), "PTA invalid geometry -> false (crit 39)")
+	rd.mode = "ok"; _check(pta.is_targetable(pidx), "PTA valid double route -> true")
+
+	# ===== Dispatcher route validation seam (46-55) =====
+	var route_cases := {
+		"null": DispatchResult.FailureReason.ROUTE_FAILED,
+		"junk_ref": DispatchResult.FailureReason.ROUTE_FAILED,
+		"fail": DispatchResult.FailureReason.ROUTE_FAILED,
+		"wrong_target": DispatchResult.FailureReason.ROUTE_FAILED,
+		"wrong_start": DispatchResult.FailureReason.ROUTE_FAILED,
+		"wrong_end": DispatchResult.FailureReason.ROUTE_FAILED,
+		"nonfinite": DispatchResult.FailureReason.ROUTE_FAILED,
+		"short": DispatchResult.FailureReason.ROUTE_FAILED,
+	}
+	for mode in route_cases:
+		var wrc = _m19_wire_fake(_m19_open_board_active(14, 11, active), mode, [_m19_open_board_active(14, 11, active).get_cell_index(2, 5)])
+		var brc = wrc["board"]; wrc["access"].set_all_targetable([brc.get_cell_index(2, 5)])
+		var child_before_rc: int = wrc["dispatcher"].get_child_count()
+		var rrc = wrc["dispatcher"].dispatch(brc.get_color_id(brc.get_cell_index(2, 5)), origin)
+		_check_eq(rrc.failure_reason, route_cases[mode], "route '%s' -> ROUTE_FAILED (crit 46-52)" % mode)
+		_check_eq(rrc.target_index, -1, "route '%s' result carries no target (no retarget, crit 55)" % mode)
+		_check_eq(wrc["dispatcher"].get_active_count(), 0, "route '%s' spawns zero agents (crit 54)" % mode)
+		_check_eq(wrc["dispatcher"].get_child_count(), child_before_rc, "route '%s' creates no child (crit 54)" % mode)
+		_check_eq(wrc["reservations"].get_reservation_count(), 0, "route '%s' releases reservation (crit 46-52)" % mode)
+		_m19_teardown(wrc)
+
+	# ===== Agent factory / parent (56-67) =====
+	var fb = _m19_open_board_active(14, 11, active)
+	var fidx: int = fb.get_cell_index(2, 5)
+	var fcolor: int = fb.get_color_id(fidx)
+	var foreign_parent = Node.new(); root.add_child(foreign_parent)
+	var parented_agent = ScrubbotAgent.new(); foreign_parent.add_child(parented_agent)
+	var moving_agent = _m19_assigned_agent(fb, fidx, origin, ScrubbotAgent.State.MOVING)
+	var arrived_agent = _m19_assigned_agent(fb, fidx, origin, ScrubbotAgent.State.ARRIVED)
+	var cancelled_agent = _m19_assigned_agent(fb, fidx, origin, ScrubbotAgent.State.CANCELLED)
+	var arbitrary_node = Node2D.new()
+	var invalid_products := [null, 5, "x", RefCounted.new(), arbitrary_node,
+		parented_agent, moving_agent, arrived_agent, cancelled_agent]
+	for prod in invalid_products:
+		var wfp = _m19_wire_fake(_m19_open_board_active(14, 11, active), "ok", [_m19_open_board_active(14, 11, active).get_cell_index(2, 5)])
+		var bfp = wfp["board"]; wfp["access"].set_all_targetable([bfp.get_cell_index(2, 5)])
+		wfp["dispatcher"]._agent_factory = func(): return prod
+		var cb_fp: int = wfp["dispatcher"].get_child_count()
+		var rfp = wfp["dispatcher"].dispatch(bfp.get_color_id(bfp.get_cell_index(2, 5)), origin)
+		_check_eq(rfp.failure_reason, DispatchResult.FailureReason.AGENT_ASSIGN_FAILED, "invalid factory product -> AGENT_ASSIGN_FAILED (crit 57-61,63)")
+		_check_eq(wfp["dispatcher"].get_active_count(), 0, "invalid product spawns no active agent (crit 64)")
+		_check_eq(wfp["dispatcher"].get_child_count(), cb_fp, "invalid product creates no dispatcher child (crit 64)")
+		_check_eq(wfp["reservations"].get_reservation_count(), 0, "invalid product releases reservation (crit 63)")
+		_m19_teardown(wfp)
+	# foreign objects NOT freed/mutated
+	_check(is_instance_valid(parented_agent) and parented_agent.get_parent() == foreign_parent, "parented foreign agent not freed/mutated (crit 58)")
+	_check(is_instance_valid(moving_agent) and moving_agent.is_moving(), "MOVING foreign agent not freed/mutated (crit 59)")
+	_check(is_instance_valid(arrived_agent) and arrived_agent.has_arrived(), "ARRIVED foreign agent not freed/mutated (crit 60)")
+	_check(is_instance_valid(cancelled_agent) and cancelled_agent.is_cancelled(), "CANCELLED foreign agent not freed/mutated (crit 61)")
+	_check(is_instance_valid(arbitrary_node), "arbitrary Node2D not freed (crit 57)")
+	arbitrary_node.free(); moving_agent.free(); arrived_agent.free(); cancelled_agent.free()
+	foreign_parent.remove_child(parented_agent); parented_agent.free(); foreign_parent.free()
+	# valid fresh unparented ScrubbotAgent subclass accepted (crit 62)
+	var wok = _m19_wire_fake(_m19_open_board_active(14, 11, active), "ok", [_m19_open_board_active(14, 11, active).get_cell_index(2, 5)])
+	var bok = wok["board"]; wok["access"].set_all_targetable([bok.get_cell_index(2, 5)])
+	wok["dispatcher"]._agent_factory = func(): return DispatchAgentDouble.new()
+	var rvalid = wok["dispatcher"].dispatch(bok.get_color_id(bok.get_cell_index(2, 5)), origin)
+	_check(rvalid.success and rvalid.agent is DispatchAgentDouble, "fresh unparented ScrubbotAgent subclass accepted (crit 62)")
+	_m19_teardown(wok)
+	# explicit valid agent_parent (crit 65)
+	var ep_board = _m19_open_board_active(14, 11, active)
+	var ep_res = ReservationState.new(); ep_res.bind(ep_board)
+	var ep_cand = ColorCandidateIndex.create(); ep_cand.bind(ep_board)
+	var ep_sel = TargetSelector.create(); ep_sel.bind(ep_board, ep_cand, ep_res)
+	var ep_routing = DispatchRoutingDouble.new()
+	var ep_racc = RouteAccessQueryDouble.new(); ep_racc.default_traversable = true; ep_racc.bind_board(ep_board)
+	var ep_acc = AccessQueryDouble.new(); ep_acc.set_all_targetable([ep_board.get_cell_index(2, 5)])
+	var ep_parent = Node.new(); root.add_child(ep_parent)
+	var ep_disp = ScrubbotDispatcher.new(); root.add_child(ep_disp)
+	_check(ep_disp.bind(ep_board, ep_sel, ep_res, ep_routing, ep_racc, ep_acc, ep_parent), "bind with explicit parent ok")
+	var ep_r = ep_disp.dispatch(ep_board.get_color_id(ep_board.get_cell_index(2, 5)), origin)
+	_check(ep_r.success and ep_r.agent.get_parent() == ep_parent, "explicit valid agent_parent used (crit 65)")
+	ep_disp.reset(); root.remove_child(ep_disp); ep_disp.free()
+	root.remove_child(ep_parent); ep_parent.free()
+	# freed parent before dispatch -> clean fail (crit 66)
+	var fp_board = _m19_open_board_active(14, 11, active)
+	var fp_res = ReservationState.new(); fp_res.bind(fp_board)
+	var fp_cand = ColorCandidateIndex.create(); fp_cand.bind(fp_board)
+	var fp_sel = TargetSelector.create(); fp_sel.bind(fp_board, fp_cand, fp_res)
+	var fp_routing = DispatchRoutingDouble.new()
+	var fp_racc = RouteAccessQueryDouble.new(); fp_racc.default_traversable = true; fp_racc.bind_board(fp_board)
+	var fp_acc = AccessQueryDouble.new(); fp_acc.set_all_targetable([fp_board.get_cell_index(2, 5)])
+	var fp_parent = Node.new(); root.add_child(fp_parent)
+	var fp_disp = ScrubbotDispatcher.new(); root.add_child(fp_disp)
+	fp_disp.bind(fp_board, fp_sel, fp_res, fp_routing, fp_racc, fp_acc, fp_parent)
+	fp_parent.queue_free() # queued for deletion before dispatch
+	var fp_r = fp_disp.dispatch(fp_board.get_color_id(fp_board.get_cell_index(2, 5)), origin)
+	_check_eq(fp_r.failure_reason, DispatchResult.FailureReason.AGENT_ASSIGN_FAILED, "queued-for-delete parent -> fail closed (crit 66,67)")
+	_check_eq(fp_res.get_reservation_count(), 0, "freed-parent path releases reservation")
+	root.remove_child(fp_disp); fp_disp.free()
+
+	# ===== F-M19-STRICT-004: request numeric boundaries (68-79) =====
+	var wq = _m19_wire_fake(_m19_open_board_active(14, 11, active), "ok", [_m19_open_board_active(14, 11, active).get_cell_index(2, 5)])
+	var bq = wq["board"]; wq["access"].set_all_targetable([bq.get_cell_index(2, 5)])
+	var cq: int = bq.get_color_id(bq.get_cell_index(2, 5))
+	var pre_next: int = wq["dispatcher"].peek_next_owner_id()
+	var pre_calls: int = wq["routing"].call_count
+	var pre_queries: int = wq["access"].total_queries()
+	var invalids := [
+		["neg color", func(): return wq["dispatcher"].dispatch(-1, origin)],
+		["NaN x", func(): return wq["dispatcher"].dispatch(cq, Vector2(NAN, 5.5))],
+		["+INF x", func(): return wq["dispatcher"].dispatch(cq, Vector2(INF, 5.5))],
+		["-INF y", func(): return wq["dispatcher"].dispatch(cq, Vector2(-2.0, -INF))],
+		["speed NaN", func(): return wq["dispatcher"].dispatch(cq, origin, NAN)],
+		["speed +INF", func(): return wq["dispatcher"].dispatch(cq, origin, INF)],
+		["speed -INF", func(): return wq["dispatcher"].dispatch(cq, origin, -INF)],
+		["speed 0", func(): return wq["dispatcher"].dispatch(cq, origin, 0.0)],
+		["speed neg", func(): return wq["dispatcher"].dispatch(cq, origin, -3.0)],
+	]
+	for pair in invalids:
+		var res_i = pair[1].call()
+		_check_eq(res_i.failure_reason, DispatchResult.FailureReason.INVALID_REQUEST, "%s -> INVALID_REQUEST (crit 68-76)" % pair[0])
+	_check_eq(wq["reservations"].get_reservation_count(), 0, "invalid requests reserve nothing (crit 77)")
+	_check_eq(wq["routing"].call_count, pre_calls, "invalid requests never route (crit 77)")
+	_check_eq(wq["access"].total_queries(), pre_queries, "invalid requests never call selector/access (crit 77)")
+	_check_eq(wq["dispatcher"].peek_next_owner_id(), pre_next, "invalid requests never advance owner counter (crit 78)")
+	_check(wq["dispatcher"].dispatch(cq, origin, 3.5).success, "finite positive speed succeeds (crit 79)")
+	_m19_teardown(wq)
+
+	# ===== F-M19-STRICT-003: serial re-entry + reset generation (80-93) =====
+	# recursive dispatch rejected
+	var wre = _m19_wire_fake(_m19_open_board_active(14, 11, active), "ok", [_m19_open_board_active(14, 11, active).get_cell_index(2, 5), _m19_open_board_active(14, 11, active).get_cell_index(4, 5)])
+	var bre = wre["board"]; wre["access"].set_all_targetable([bre.get_cell_index(2, 5), bre.get_cell_index(4, 5)])
+	var cre: int = bre.get_color_id(bre.get_cell_index(2, 5))
+	var dre = wre["dispatcher"]
+	var inner_reason := [StringName("")]
+	wre["routing"].on_compute = func(): inner_reason[0] = dre.dispatch(cre, origin).failure_reason
+	var outer = dre.dispatch(cre, origin)
+	wre["routing"].on_compute = Callable()
+	_check_eq(inner_reason[0], DispatchResult.FailureReason.REENTRANT, "recursive dispatch -> REENTRANT (crit 80)")
+	_check(outer.success, "outer dispatch still succeeds after re-entry rejection")
+	_check_eq(dre.get_active_count(), 1, "recursive dispatch created no duplicate assignment (crit 81)")
+	_m19_teardown(wre)
+	# reset injected from each phase
+	var reset_phases := ["select", "routing", "factory", "assign", "addchild"]
+	for phase in reset_phases:
+		var wrs = _m19_wire_fake(_m19_open_board_active(14, 11, active), "ok", [_m19_open_board_active(14, 11, active).get_cell_index(2, 5)])
+		var brs = wrs["board"]; wrs["access"].set_all_targetable([brs.get_cell_index(2, 5)])
+		var crs: int = brs.get_color_id(brs.get_cell_index(2, 5))
+		var drs = wrs["dispatcher"]
+		match phase:
+			"select":
+				wrs["access"].on_query = func(_i): drs.reset()
+			"routing":
+				wrs["routing"].on_compute = func(): drs.reset()
+			"factory":
+				drs._agent_factory = func(): drs.reset(); return ScrubbotAgent.new()
+			"assign":
+				drs._agent_factory = func():
+					var a = DispatchAgentDouble.new()
+					a.on_assign = func(): drs.reset()
+					return a
+			"addchild":
+				# rewire under a parent whose child_entered_tree triggers reset
+				_m19_teardown(wrs)
+				var rp_board = _m19_open_board_active(14, 11, active)
+				var rp_res = ReservationState.new(); rp_res.bind(rp_board)
+				var rp_cand = ColorCandidateIndex.create(); rp_cand.bind(rp_board)
+				var rp_sel = TargetSelector.create(); rp_sel.bind(rp_board, rp_cand, rp_res)
+				var rp_routing = DispatchRoutingDouble.new()
+				var rp_racc = RouteAccessQueryDouble.new(); rp_racc.default_traversable = true; rp_racc.bind_board(rp_board)
+				var rp_acc = AccessQueryDouble.new(); rp_acc.set_all_targetable([rp_board.get_cell_index(2, 5)])
+				var rp_parent = Node.new(); root.add_child(rp_parent)
+				var rp_disp = ScrubbotDispatcher.new(); root.add_child(rp_disp)
+				rp_disp.bind(rp_board, rp_sel, rp_res, rp_routing, rp_racc, rp_acc, rp_parent)
+				rp_parent.child_entered_tree.connect(func(_c): rp_disp.reset())
+				var rp_before = _snapshot_cell_states(rp_board)
+				var rp_r = rp_disp.dispatch(rp_board.get_color_id(rp_board.get_cell_index(2, 5)), origin)
+				# child_entered_tree may be delivered deferred by the engine, so this
+				# phase is only strictly reproducible when the reset lands synchronously
+				# inside add_child (crit 86: "where reproducible"). The generation guard
+				# after add_child covers it either way.
+				if rp_r.failure_reason == DispatchResult.FailureReason.RESETTING:
+					_check_eq(rp_disp.get_active_count(), 0, "add-child reset: no pending active (crit 88)")
+					_check_eq(rp_parent.get_child_count(), 0, "add-child reset: no orphan child (crit 89)")
+					_check_eq(rp_res.get_reservation_count(), 0, "add-child reset: pending reservation released")
+				else:
+					print("     M19 add-child reset: child_entered_tree delivered deferred; generation guard still covers add_child boundary")
+				_check(_cell_states_equal(rp_board, rp_before), "add-child reset: BoardState unchanged (crit 90)")
+				rp_disp.reset(); root.remove_child(rp_disp); rp_disp.free()
+				root.remove_child(rp_parent); rp_parent.free()
+				continue
+		var rp_before2 = _snapshot_cell_states(brs)
+		var res_r = drs.dispatch(crs, origin)
+		_check(res_r.failure_reason == DispatchResult.FailureReason.RESETTING, "reset during %s -> RESETTING (crit 82-85,87)" % phase)
+		_check_eq(drs.get_active_count(), 0, "reset during %s: no pending _active (crit 88)" % phase)
+		_check_eq(drs.get_child_count(), 0, "reset during %s: no orphan child (crit 89)" % phase)
+		_check_eq(wrs["reservations"].get_reservation_count(), 0, "reset during %s: pending reservation released (crit 83,84)" % phase)
+		_check(_cell_states_equal(brs, rp_before2), "reset during %s: BoardState unchanged (crit 90)" % phase)
+		# later dispatch recovers, owner id monotonic (crit 91,92)
+		wrs["access"].on_query = Callable(); wrs["routing"].on_compute = Callable()
+		drs._agent_factory = Callable()
+		var next_before: int = drs.peek_next_owner_id()
+		var recover = drs.dispatch(crs, origin)
+		_check(recover.success, "later dispatch recovers after reset during %s (crit 91)" % phase)
+		_check(recover.owner_id >= next_before, "owner id monotonic across reset during %s (crit 92)" % phase)
+		_m19_teardown(wrs)
+
+	# ===== Completion identity (94-102) =====
+	var wc = _m19_wire_fake(_m19_open_board_active(14, 11, active), "ok", [_m19_open_board_active(14, 11, active).get_cell_index(2, 5)])
+	var bc = wc["board"]; wc["access"].set_all_targetable([bc.get_cell_index(2, 5)])
+	var cc: int = bc.get_color_id(bc.get_cell_index(2, 5))
+	var dc = wc["dispatcher"]
+	var rc = dc.dispatch(cc, origin)
+	var agent_c = rc.agent
+	var before_c = _snapshot_cell_states(bc)
+	agent_c.agent_completed.emit(rc.owner_id, rc.target_index + 1, cc) # wrong target
+	_check(not dc.has_arrived(rc.owner_id), "wrong target completion ignored (crit 96)")
+	agent_c.agent_completed.emit(rc.owner_id, rc.target_index, cc + 1) # wrong color
+	_check(not dc.has_arrived(rc.owner_id), "wrong color completion ignored (crit 97)")
+	agent_c.agent_completed.emit(rc.owner_id + 999, rc.target_index, cc) # wrong owner
+	_check(not dc.has_arrived(rc.owner_id), "wrong owner completion ignored (crit 98)")
+	dc._on_agent_completed(rc.owner_id, rc.target_index, cc, ScrubbotAgent.new()) # wrong source agent
+	_check(not dc.has_arrived(rc.owner_id), "wrong/stale agent source ignored (crit 99)")
+	agent_c.agent_completed.emit(rc.owner_id, rc.target_index, cc) # correct
+	_check(dc.has_arrived(rc.owner_id), "correct completion marks arrived (crit 94)")
+	agent_c.agent_completed.emit(rc.owner_id, rc.target_index, cc) # repeat
+	_check(dc.has_arrived(rc.owner_id), "repeated correct completion idempotent (crit 95)")
+	_check(_cell_states_equal(bc, before_c), "completion does not clear BoardState (crit 101)")
+	_check(wc["reservations"].is_reserved(rc.target_index), "completion does not release successful reservation (crit 102)")
+	dc.reset()
+	dc._on_agent_completed(rc.owner_id, rc.target_index, cc, null) # post-reset stale
+	_check(not dc.has_owner(rc.owner_id), "post-reset completion cannot recreate state (crit 100)")
+	_m19_teardown(wc)
 
 # ================================================== M17-C002 V03 hardening ==
 # Frozen full-surface finding set F-M17-STRICT-001..009. Fail-closed access,

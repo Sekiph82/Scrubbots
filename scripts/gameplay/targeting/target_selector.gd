@@ -93,6 +93,18 @@ static func _has_methods(obj, names) -> bool:
 func is_bound() -> bool:
 	return _bound
 
+## Read-only exact-identity coherence check (strict-v2, F-M19-STRICT-001). Returns
+## true only when this selector is bound to the SAME BoardState INSTANCE and the
+## SAME ReservationState INSTANCE the caller supplies (reference identity, not
+## equal dimensions/content), false when unbound. It lets a dispatcher prove the
+## selector shares its exact board+reservation bundle, so the selector can never
+## reserve through a different-board ReservationState than the one the dispatcher
+## later releases through (AL-062). It changes NO selection semantics and never
+## exposes the internal references.
+func is_bound_to(board, reservation_state) -> bool:
+	return _bound and _board != null and _board == board \
+		and _reservations != null and _reservations == reservation_state
+
 ## Choose the first targetable candidate in ascending row-major candidate order
 ## and atomically reserve it for owner_id, all inside this one synchronous call.
 ##

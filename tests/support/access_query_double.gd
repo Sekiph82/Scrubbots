@@ -21,8 +21,17 @@ var query_log: Array = []
 ## index (int) -> number of times queried.
 var query_counts: Dictionary = {}
 ## Optional side effect invoked with the queried index before the verdict is
-## returned. Used to simulate a race (e.g. reserve the target for another owner).
+## returned. Used to simulate a race (e.g. reserve the target for another owner),
+## or to inject dispatcher.reset() during selection (F-M19-STRICT-003).
 var on_query: Callable = Callable()
+## Optional M19 select-access bundle-coherence verdict. Defaults true so this
+## double is a valid dispatcher select_access; set false to simulate live
+## select-access bundle drift (F-M19-STRICT-001).
+var coherent: bool = true
+
+## Read-only M19 select-access coherence query (dispatcher checks it when present).
+func is_coherent_with(_board, _routing_system, _routing_access) -> bool:
+	return coherent
 
 func set_targetable(index: int, ok: bool) -> void:
 	_targetable[index] = ok
