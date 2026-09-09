@@ -3,12 +3,12 @@
   "schema": "hiveai-task-tracker/v3",
   "projectKey": "scrubbots",
   "currentMilestone": "M19 — Scrubbot dispatcher orchestration",
-  "currentSprint": "M19-C001 V02 — frozen full-surface dispatcher closure",
-  "currentTaskId": "M19-C001-V02",
-  "currentTaskTitle": "Implement frozen M19 strict-v2 dispatcher hardening (F-M19-STRICT-001..004)",
-  "workflowState": "AWAITING_AUDIT",
-  "requiredActor": "CHATGPT",
-  "nextAction": "Independently audit coordination/sessions/M19-C001/CLAUDE_LOG_V02.md and the exact pushed implementation against coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V02.md.",
+  "currentSprint": "M19-C001 V03 — strict-v2 orchestrator closure second stage",
+  "currentTaskId": "M19-C001-V03",
+  "currentTaskTitle": "Close remaining M19 strict-v2 orchestration gaps under frozen F-M19-STRICT-001..003",
+  "workflowState": "CHANGES_REQUIRED",
+  "requiredActor": "CLAUDE",
+  "nextAction": "Implement coordination/sessions/M19-C001/CHATGPT_PROMPT_V03.md; validate against CHATGPT_AUDIT_CRITERIA_V03.md; write CLAUDE_LOG_V03.md; follow H!veAI IN_PROGRESS -> AWAITING_AUDIT lifecycle and push to origin/main.",
   "blockers": [],
   "progress": {
     "scopeType": "main+ui",
@@ -19,8 +19,8 @@
   },
   "lastCompletedTaskId": "FOUNDATION-C001-V01",
   "lastCompletedTaskTitle": "BoardState.set_cell_state canonical ACTIVE/CLEARED guard (FOUNDATION-STRICT-001 closed)",
-  "updatedAt": "2026-09-09T20:44:21Z",
-  "updatedBy": "CLAUDE"
+  "updatedAt": "2026-09-09T20:50:18Z",
+  "updatedBy": "CHATGPT"
 }
 HIVEAI_TRACKER_V3_END -->
 
@@ -29,18 +29,19 @@ HIVEAI_TRACKER_V3_END -->
 ## Current
 
 - Current milestone: **M19 — Scrubbot dispatcher orchestration**
-- Current sprint: **M19-C001 V02 — frozen full-surface dispatcher closure**
-- Current task: **M19-C001-V02 — Implement frozen M19 strict-v2 dispatcher hardening (F-M19-STRICT-001..004)**
-- Workflow: **AWAITING_AUDIT**
-- Required actor: **CHATGPT**
-- Next action: Independently audit
-  `coordination/sessions/M19-C001/CLAUDE_LOG_V02.md` and the exact pushed
-  implementation against `coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V02.md`.
+- Current sprint: **M19-C001 V03 — strict-v2 orchestrator closure second stage**
+- Current task: **M19-C001-V03 — Close remaining M19 strict-v2 orchestration gaps under frozen F-M19-STRICT-001..003**
+- Workflow: **CHANGES_REQUIRED**
+- Required actor: **CLAUDE**
+- Next action: Implement
+  `coordination/sessions/M19-C001/CHATGPT_PROMPT_V03.md`, validate against
+  `coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V03.md`, write
+  `coordination/sessions/M19-C001/CLAUDE_LOG_V03.md`, follow the canonical
+  H!veAI `IN_PROGRESS -> AWAITING_AUDIT` lifecycle, and push to `origin/main`.
 - Blockers: none.
-- Implementation status: M19-C001 V02 frozen strict-v2 dispatcher hardening
-  (F-M19-STRICT-001..004) implemented and validated (full headless suite
-  2780/2780 ALL PASS on Godot 4.7.1). **Finished, awaiting independent ChatGPT
-  audit — not complete.** Claude cannot independently close SB-M19-001..012.
+- Audit status: V02 independent audit returned **CHANGES_REQUIRED /
+  STRICT_V2_SECOND_STAGE_REQUIRED**. F-M19-STRICT-004 is source-accepted/closed;
+  remaining closure work stays inside F-M19-STRICT-001..003.
 
 ## Milestones
 
@@ -57,14 +58,14 @@ HIVEAI_TRACKER_V3_END -->
 
 ## Active / Waiting
 
-- [~] **M19-C001-V02** — dispatcher strict-v2 hardening implemented, AWAITING
-  AUDIT (CHATGPT): bind/coherence fail-closed (F-001), route/access/agent-factory
-  validation (F-002), reentrant reset + pending-lifecycle (F-003), non-finite
-  speed rejection (F-004). Full suite 2780/2780 pass. Awaiting independent audit.
+- [~] **M19-C001-V03** — required actor CLAUDE. Second-stage closure for:
+  mandatory select-access coherence and RefCounted bundle categories (F-001),
+  cached-route/factory/assign-result trust seams (F-002), and guard/generation/
+  mid-dispatch drift closure (F-003). F-004 remains regression-only.
 
 ## Planned
 
-- [ ] M19-C001-V02 independent audit (CHATGPT) → `CHATGPT_AUDIT_V02.md`.
+- [ ] M19-C001-V03 independent audit (CHATGPT) -> `CHATGPT_AUDIT_V03.md`.
 - [ ] M20 — arrival resolution: BoardState ACTIVE→CLEARED on arrival, reservation
   resolution, scoring, slot progression, follow-up dispatch.
 
