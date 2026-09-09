@@ -2,9 +2,47 @@
 
 Status: **ISSUED — FINDING SET FROZEN**
 
+H!veAI tracking contract: **GitHub-first v3**.
+
 Implement ONLY the frozen M19 strict-v2 set.
 
-Read:
+## H!veAI v3 precedence
+
+For operational project state, the live authority is:
+- GitHub `origin/main`;
+- `.hiveai/PROJECT.json`;
+- `.hiveai/RULES.md`;
+- `.hiveai/TASKS.md`;
+- `.hiveai/EVENTS.jsonl`.
+
+The H!veAI v3 adapter at the top of `CLAUDE.md` and `.hiveai/RULES.md`
+SUPERSEDE historical tracker-ownership instructions that said Claude must not
+modify `.hiveai/*` or that legacy dashboard/index files are live authority.
+
+This DOES NOT supersede independent audit separation:
+- Claude implements/tests and may move the live workflow only to
+  `AWAITING_AUDIT`;
+- Claude MUST NOT mark independently audited work `COMPLETE` or
+  `READY_FOR_NEXT_TASK`;
+- ChatGPT performs the independent audit and owns acceptance/final closure.
+
+Legacy files such as:
+- `.hiveai/PROJECT_DASHBOARD.md`;
+- `.hiveai/ACTIVE_CYCLES.md`;
+- `.hiveai/ARTIFACT_MAP.md`;
+- `.hiveai/PROGRESS_SNAPSHOT.md`;
+- `coordination/SESSION_INDEX.md`
+
+are historical evidence only and MUST NOT be maintained as competing live
+trackers.
+
+Read FIRST, before implementation:
+- `.hiveai/RULES.md`;
+- `.hiveai/TASKS.md`;
+- `.hiveai/PROJECT.json`;
+- `CLAUDE.md`.
+
+Then read:
 - coordination/AUDIT_POLICY.md
 - coordination/AUDIT_INDEX.md
 - coordination/VERSIONED_LOG_POLICY.md
@@ -19,6 +57,40 @@ Read:
 
 Expected log:
 `coordination/sessions/M19-C001/CLAUDE_LOG_V02.md`
+
+## First action — safe sync + H!veAI lifecycle start
+
+1. Safely synchronize the local repository with `origin/main` while preserving
+   pre-existing owner work.
+2. Re-read `.hiveai/TASKS.md` FROM THE SYNCED `origin/main` state.
+3. Verify the canonical live task is still:
+   - `currentTaskId = M19-C001-V02`;
+   - `requiredActor = CLAUDE`;
+   - workflow state authorizes implementation (currently `CHANGES_REQUIRED`);
+   - no blocker says another actor owns the task.
+4. If the authoritative tracker has moved to another task/actor, DO NOT overwrite
+   it. Fail closed and report `HIVEAI_STATE_CONFLICT`.
+5. Before editing production code, transition the canonical tracker to:
+   - `workflowState: IN_PROGRESS`;
+   - `requiredActor: CLAUDE`;
+   - `currentTaskId/currentMilestone/currentSprint` unchanged;
+   - `nextAction` = execute this V02 frozen correction and validation;
+   - progress unchanged at **278 / 719 = 38.66% main+UI**;
+   - `updatedAt` = current UTC ISO8601;
+   - `updatedBy` = `CLAUDE`.
+6. Update BOTH the machine-readable comment block and human-readable Current /
+   Active sections of `.hiveai/TASKS.md` so they agree.
+7. Append exactly one canonical lifecycle row to `.hiveai/EVENTS.jsonl` for
+   this transition. Use the v3 schema:
+   ```json
+   {"schema":"hiveai-event/v1","id":"<uuid>","projectKey":"scrubbots","type":"WORKFLOW_CHANGED","actor":"CLAUDE","timestamp":"<UTC ISO8601>","taskId":"M19-C001-V02","from":"CHANGES_REQUIRED","to":"IN_PROGRESS","workflowState":"IN_PROGRESS","summary":"Started M19-C001 V02 frozen strict-v2 dispatcher hardening."}
+   ```
+   If the synced starting state differs, record the ACTUAL from-state rather
+   than fabricating `CHANGES_REQUIRED`.
+8. Commit and push this start-state tracker transition to `origin/main` before
+   substantial implementation work, so GitHub remains the live authority.
+9. If that push fails, do not claim H!veAI is synchronized. Report
+   `GITHUB_TRACKING_NOT_SYNCED`.
 
 Fix ONLY:
 - F-M19-STRICT-001
@@ -288,38 +360,118 @@ Do NOT:
 
 Successful arrived assignment remains held for M20 integration.
 
-## Governance
+## Governance and H!veAI v3 handoff
 
-Claude MUST NOT modify:
-- tasks.md
-- .hiveai/*
-- coordination/SESSION_INDEX.md
-- coordination/AUDIT_INDEX.md
-- strict queue/sequence controllers
-- any CHATGPT_* artifact
+### Claude MUST NOT modify
 
-Allowed production scope:
-- scripts/gameplay/dispatch/*
-- a minimal read-only coherence method in TargetSelector if necessary
-- test support
-- docs only for durable M19 contract clarification
+Independent-audit / canonical-law surfaces:
+- root `tasks.md` audit checkboxes or completion truth;
+- `coordination/AUDIT_INDEX.md`;
+- strict queue/sequence controllers;
+- any `CHATGPT_*` artifact;
+- any ChatGPT audit verdict.
+
+Legacy live-tracker replacements:
+- `.hiveai/PROJECT_DASHBOARD.md`;
+- `.hiveai/ACTIVE_CYCLES.md`;
+- `.hiveai/ARTIFACT_MAP.md`;
+- `.hiveai/PROGRESS_SNAPSHOT.md`;
+- `coordination/SESSION_INDEX.md`.
+
+Those files are historical evidence only under H!veAI v3 and must not be
+refreshed as current state.
+
+### Claude MUST update
+
+Canonical live tracking when lifecycle state changes:
+- `.hiveai/TASKS.md`;
+- `.hiveai/EVENTS.jsonl`.
+
+Read-only H!veAI contract files:
+- `.hiveai/PROJECT.json`;
+- `.hiveai/RULES.md`.
+
+Do not edit those unless this prompt explicitly says the tracking contract
+itself is being migrated. It is not.
+
+### Allowed production scope
+
+- `scripts/gameplay/dispatch/*`;
+- a minimal read-only coherence method in TargetSelector if necessary;
+- test support;
+- docs only for durable M19 contract clarification.
 
 Do not modify BoardState, ReservationState, routing algorithms or ScrubbotAgent
 core behavior unless a direct V02 test proves an unavoidable frozen-scope defect.
 If such an upstream change is required, STOP and record the blocker instead of
 silently widening scope.
 
+## Validation
+
 Run and record separately:
-- godot --version
-- full root headless suite
-- git diff --check
+- `godot --version`;
+- full root headless suite;
+- `git diff --check`.
 
 Write:
 `coordination/sessions/M19-C001/CLAUDE_LOG_V02.md`
 
-Commit/push safely.
+The log must include:
+- synced starting commit;
+- H!veAI starting state read from `.hiveai/TASKS.md`;
+- start transition/push evidence for `IN_PROGRESS`;
+- exact changed production/test files;
+- frozen finding-by-finding implementation summary;
+- exact Godot version;
+- exact full-suite total/pass/fail result;
+- exact `git diff --check` result;
+- any failed attempts and fixes;
+- final H!veAI handoff state;
+- no self-audit verdict.
 
-Return exactly:
+## Final successful handoff — REQUIRED H!veAI transition
+
+After implementation/tests are complete but BEFORE reporting success:
+
+1. Update `.hiveai/TASKS.md` to:
+   - `workflowState: AWAITING_AUDIT`;
+   - `requiredActor: CHATGPT`;
+   - `currentTaskId: M19-C001-V02`;
+   - current milestone/sprint remain M19/M19-C001 V02;
+   - `nextAction` = independently audit
+     `coordination/sessions/M19-C001/CLAUDE_LOG_V02.md` and the exact pushed
+     implementation against `CHATGPT_AUDIT_CRITERIA_V02.md`;
+   - blockers = [];
+   - progress remains **278 / 719 = 38.66% main+UI** because Claude cannot
+     independently close SB-M19-001..012;
+   - `lastCompletedTaskId` remains the last independently accepted task
+     (currently `FOUNDATION-C001-V01`);
+   - `updatedAt` current UTC ISO8601;
+   - `updatedBy: CLAUDE`.
+2. Update the human-readable Current / Active / Planned sections to agree:
+   implementation is finished, **awaiting independent ChatGPT audit**, not
+   complete.
+3. Append one lifecycle event:
+   ```json
+   {"schema":"hiveai-event/v1","id":"<uuid>","projectKey":"scrubbots","type":"WORKFLOW_CHANGED","actor":"CLAUDE","timestamp":"<UTC ISO8601>","taskId":"M19-C001-V02","from":"IN_PROGRESS","to":"AWAITING_AUDIT","workflowState":"AWAITING_AUDIT","summary":"M19-C001 V02 implementation and validation pushed; awaiting independent ChatGPT audit."}
+   ```
+4. Commit intended implementation, tests, `CLAUDE_LOG_V02.md`,
+   `.hiveai/TASKS.md`, and `.hiveai/EVENTS.jsonl`.
+5. Push to `origin/main`.
+6. Verify the remote main head contains the intended implementation + log +
+   canonical tracker handoff.
+7. Do NOT edit the Git-tracked log merely to insert the SHA of the commit that
+   contains that same log.
+8. Do NOT set H!veAI to `COMPLETE` or `READY_FOR_NEXT_TASK`.
+
+On the normal successful path, return exactly:
 `AWAITING_AUDIT`
+
+If final tracker push fails, return:
+`GITHUB_TRACKING_NOT_SYNCED`
+
+If a genuine frozen-scope blocker prevents implementation, set H!veAI to
+`BLOCKED` with a truthful blocker + lifecycle event, push it, and return:
+`BLOCKED`
 
 Then STOP.
