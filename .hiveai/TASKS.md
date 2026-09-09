@@ -6,9 +6,9 @@
   "currentSprint": "M19-C001 V02 — frozen full-surface dispatcher closure",
   "currentTaskId": "M19-C001-V02",
   "currentTaskTitle": "Implement frozen M19 strict-v2 dispatcher hardening (F-M19-STRICT-001..004)",
-  "workflowState": "CHANGES_REQUIRED",
+  "workflowState": "IN_PROGRESS",
   "requiredActor": "CLAUDE",
-  "nextAction": "Implement F-M19-STRICT-001..004 per coordination/sessions/M19-C001/CHATGPT_PROMPT_V02.md; write CLAUDE_LOG_V02.md; run headless suite; safe commit/push; hand off AWAITING_AUDIT.",
+  "nextAction": "Execute M19-C001 V02 frozen strict-v2 dispatcher correction (F-M19-STRICT-001..004) and validation, then hand off AWAITING_AUDIT.",
   "blockers": [],
   "progress": {
     "scopeType": "main+ui",
@@ -19,7 +19,7 @@
   },
   "lastCompletedTaskId": "FOUNDATION-C001-V01",
   "lastCompletedTaskTitle": "BoardState.set_cell_state canonical ACTIVE/CLEARED guard (FOUNDATION-STRICT-001 closed)",
-  "updatedAt": "2026-09-09T20:08:55Z",
+  "updatedAt": "2026-09-09T20:23:46Z",
   "updatedBy": "CLAUDE"
 }
 HIVEAI_TRACKER_V3_END -->
@@ -31,9 +31,10 @@ HIVEAI_TRACKER_V3_END -->
 - Current milestone: **M19 — Scrubbot dispatcher orchestration**
 - Current sprint: **M19-C001 V02 — frozen full-surface dispatcher closure**
 - Current task: **M19-C001-V02 — Implement frozen M19 strict-v2 dispatcher hardening (F-M19-STRICT-001..004)**
-- Workflow: **CHANGES_REQUIRED**
+- Workflow: **IN_PROGRESS**
 - Required actor: **CLAUDE**
-- Next action: Implement F-M19-STRICT-001..004 per
+- Next action: Execute the M19-C001 V02 frozen strict-v2 dispatcher correction
+  (F-M19-STRICT-001..004) and validation per
   `coordination/sessions/M19-C001/CHATGPT_PROMPT_V02.md`, write
   `coordination/sessions/M19-C001/CLAUDE_LOG_V02.md`, run the headless suite,
   safe commit/push, then hand off `AWAITING_AUDIT`.
@@ -54,10 +55,10 @@ HIVEAI_TRACKER_V3_END -->
 
 ## Active / Waiting
 
-- [~] **M19-C001-V02** — dispatcher strict-v2 hardening: bind/coherence
-  fail-closed (F-001), route/access/agent-factory validation (F-002),
-  reentrant reset + pending-lifecycle (F-003), non-finite speed rejection
-  (F-004). Required actor: CLAUDE → then AWAITING_AUDIT (CHATGPT).
+- [~] **M19-C001-V02** — dispatcher strict-v2 hardening IN PROGRESS (CLAUDE):
+  bind/coherence fail-closed (F-001), route/access/agent-factory validation
+  (F-002), reentrant reset + pending-lifecycle (F-003), non-finite speed
+  rejection (F-004). Next: hand off AWAITING_AUDIT (CHATGPT).
 
 ## Planned
 
