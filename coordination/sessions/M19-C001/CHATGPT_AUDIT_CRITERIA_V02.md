@@ -144,7 +144,7 @@
 121. rectangular Very Hard coverage;
 122. M15-M18 strict regressions remain green.
 
-## Architecture / governance
+## Architecture / governance / H!veAI v3
 123. no M20 BoardState clearing;
 124. no successful-arrival reservation resolution;
 125. no scoring/progression;
@@ -153,15 +153,37 @@
 128. no pooling introduced without evidence;
 129. full Godot 4.7.1 root suite passes;
 130. git diff --check clean;
-131. tasks/H!veAI/index/controller governance untouched;
-132. matching CLAUDE_LOG_V02 exists;
-133. Claude does not self-audit;
-134. ChatGPT records independent Godot rerun availability.
+131. root tasks.md audit completion truth is untouched by Claude;
+132. coordination/AUDIT_INDEX.md, strict controllers and all CHATGPT_* artifacts are untouched by Claude;
+133. legacy .hiveai dashboard/cycle/artifact/progress files and coordination/SESSION_INDEX.md are not maintained as live trackers;
+134. .hiveai/PROJECT.json and .hiveai/RULES.md remain unchanged;
+135. synced canonical .hiveai/TASKS.md authorized M19-C001-V02 for actor CLAUDE before implementation;
+136. Claude records a valid CHANGES_REQUIRED/current-authorized-state -> IN_PROGRESS lifecycle transition in .hiveai/TASKS.md;
+137. matching hiveai-event/v1 start event is appended to .hiveai/EVENTS.jsonl;
+138. start-state H!veAI transition is pushed to origin/main before substantial implementation;
+139. final .hiveai/TASKS.md state is AWAITING_AUDIT;
+140. final requiredActor is CHATGPT;
+141. final currentTaskId/currentMilestone/currentSprint remain M19-C001-V02 / M19;
+142. final nextAction points to independent ChatGPT audit of CLAUDE_LOG_V02 + V02 criteria;
+143. final blockers are empty on successful handoff;
+144. final main+UI progress remains 278/719 = 38.66% before independent audit;
+145. lastCompletedTaskId is not advanced by Claude;
+146. final updatedAt/updatedBy are current UTC / CLAUDE;
+147. matching IN_PROGRESS -> AWAITING_AUDIT hiveai-event/v1 row is appended;
+148. H!veAI event rows use projectKey scrubbots, actor CLAUDE, taskId M19-C001-V02 and truthful from/to states;
+149. intended implementation + CLAUDE_LOG_V02 + .hiveai/TASKS.md + .hiveai/EVENTS.jsonl are pushed to origin/main;
+150. Claude does not claim COMPLETE or READY_FOR_NEXT_TASK;
+151. matching CLAUDE_LOG_V02 exists and records H!veAI start/final handoff evidence;
+152. Claude does not self-audit;
+153. if tracker push fails, handoff is GITHUB_TRACKING_NOT_SYNCED rather than a false success claim;
+154. if a genuine blocker occurs, canonical H!veAI state/event is BLOCKED rather than fabricated AWAITING_AUDIT;
+155. ChatGPT records independent Godot rerun availability.
 
-If all pass, because M19 is critical/stateful and ChatGPT cannot independently
-run Godot, ChatGPT should normally issue an auditor-authored validation-only V03
-before final closure unless V02 itself contains the full adversarial matrix with
-direct sensitivity sufficient to serve as that stage.
+If all implementation criteria pass, because M19 is critical/stateful and
+ChatGPT cannot independently run Godot, ChatGPT should normally issue an
+auditor-authored validation-only V03 before final closure unless V02 itself
+contains the full adversarial matrix with direct sensitivity sufficient to serve
+as that stage.
 
 Final-close candidates:
 - SB-M19-001..012
