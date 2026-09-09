@@ -6,9 +6,9 @@
   "currentSprint": "M19-C001 V03 — strict-v2 orchestrator closure second stage",
   "currentTaskId": "M19-C001-V03",
   "currentTaskTitle": "Close remaining M19 strict-v2 orchestration gaps under frozen F-M19-STRICT-001..003",
-  "workflowState": "IN_PROGRESS",
-  "requiredActor": "CLAUDE",
-  "nextAction": "Execute M19-C001 V03 second-stage strict-v2 closure (F-M19-STRICT-001..003) and validation per CHATGPT_PROMPT_V03.md / CHATGPT_AUDIT_CRITERIA_V03.md; write CLAUDE_LOG_V03.md; then hand off AWAITING_AUDIT.",
+  "workflowState": "AWAITING_AUDIT",
+  "requiredActor": "CHATGPT",
+  "nextAction": "Independently audit coordination/sessions/M19-C001/CLAUDE_LOG_V03.md and the exact pushed implementation against coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V03.md.",
   "blockers": [],
   "progress": {
     "scopeType": "main+ui",
@@ -19,7 +19,7 @@
   },
   "lastCompletedTaskId": "FOUNDATION-C001-V01",
   "lastCompletedTaskTitle": "BoardState.set_cell_state canonical ACTIVE/CLEARED guard (FOUNDATION-STRICT-001 closed)",
-  "updatedAt": "2026-09-09T20:59:08Z",
+  "updatedAt": "2026-09-09T21:11:00Z",
   "updatedBy": "CLAUDE"
 }
 HIVEAI_TRACKER_V3_END -->
@@ -31,18 +31,17 @@ HIVEAI_TRACKER_V3_END -->
 - Current milestone: **M19 — Scrubbot dispatcher orchestration**
 - Current sprint: **M19-C001 V03 — strict-v2 orchestrator closure second stage**
 - Current task: **M19-C001-V03 — Close remaining M19 strict-v2 orchestration gaps under frozen F-M19-STRICT-001..003**
-- Workflow: **IN_PROGRESS**
-- Required actor: **CLAUDE**
-- Next action: Execute the M19-C001 V03 second-stage strict-v2 closure
-  (F-M19-STRICT-001..003) and validation per
-  `coordination/sessions/M19-C001/CHATGPT_PROMPT_V03.md` /
-  `CHATGPT_AUDIT_CRITERIA_V03.md`, write
-  `coordination/sessions/M19-C001/CLAUDE_LOG_V03.md`, then hand off
-  `AWAITING_AUDIT`.
+- Workflow: **AWAITING_AUDIT**
+- Required actor: **CHATGPT**
+- Next action: Independently audit
+  `coordination/sessions/M19-C001/CLAUDE_LOG_V03.md` and the exact pushed
+  implementation against `coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V03.md`.
 - Blockers: none.
-- Audit status: V02 independent audit returned **CHANGES_REQUIRED /
-  STRICT_V2_SECOND_STAGE_REQUIRED**. F-M19-STRICT-004 is source-accepted/closed;
-  remaining closure work stays inside F-M19-STRICT-001..003.
+- Implementation status: M19-C001 V03 second-stage strict-v2 closure
+  (F-M19-STRICT-001.A/B/C, 002.A/B/C, 003.A/B/C) implemented and validated (full
+  headless suite **2892/2892 ALL PASS** on Godot 4.7.1, zero script/parse errors).
+  **Finished, awaiting independent ChatGPT audit — not complete.** F-M19-STRICT-004
+  remains closed. Claude cannot independently close SB-M19-001..012.
 
 ## Milestones
 
@@ -59,10 +58,11 @@ HIVEAI_TRACKER_V3_END -->
 
 ## Active / Waiting
 
-- [~] **M19-C001-V03** — required actor CLAUDE. Second-stage closure for:
-  mandatory select-access coherence and RefCounted bundle categories (F-001),
-  cached-route/factory/assign-result trust seams (F-002), and guard/generation/
-  mid-dispatch drift closure (F-003). F-004 remains regression-only.
+- [~] **M19-C001-V03** — implemented, AWAITING AUDIT (CHATGPT). Second-stage
+  closure delivered: mandatory select-access coherence + RefCounted bundle
+  categories (F-001), missing-vs-invalid cached route / explicit-factory drift /
+  assign postconditions (F-002), guard-before-coherence + per-boundary generation
+  checks + mid-dispatch drift (F-003). F-004 regression-only. Suite 2892/2892 pass.
 
 ## Planned
 

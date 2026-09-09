@@ -28,18 +28,32 @@ extends Node
 ## (RoutingSystem), owns reservation storage (ReservationState), or carries a
 ## cell color as a resource — those remain their own modules.
 ##
-## strict-v2 (F-M19-STRICT-001..004): bind is initialization-only and fail
-## closed — every collaborator is category/API/bundle-coherence validated BEFORE
-## any ref is committed, so a scalar/junk/partial dependency or a split-brain
-## bundle (a selector/reservation/access bound to a DIFFERENT board) can never be
-## stored. Bundle coherence is re-checked live before every dispatch, so a
-## sibling rebound after bind fails closed before any new reservation. External
-## route/access/agent-factory results are validated through ONE shared path
-## (RouteValidator + a fresh-unparented-ScrubbotAgent gate) before an agent is
-## created or attached. A dispatch-in-progress guard rejects recursive dispatch,
-## and a reset generation token cancels a pending assignment if reset() is
-## injected from any external callback. Completion is validated against immutable
-## per-assignment identity (owner/target/color/agent).
+## strict-v2 (F-M19-STRICT-001..004; V02 + V03 second-stage closure):
+##   - bind is initialization-only and fail-closed. Every injected collaborator
+##     is category-narrowed to the production lifecycle (RefCounted + narrow API;
+##     only agent_parent is a Node) and proven bundle-coherent (all bound to the
+##     SAME board / reservation / routing / access identities) BEFORE any ref is
+##     committed. select_access MUST expose is_targetable AND is_coherent_with —
+##     coherence is mandatory, never an absence-based exemption.
+##   - the serial re-entry guard is armed and the reset generation captured
+##     BEFORE the first live collaborator callback (the live coherence probe), so
+##     recursion/reset injected from ANY coherence seam is covered.
+##   - the reset generation is re-checked immediately after EVERY external
+##     boundary (live coherence, set_origin, select_and_reserve, consume_route,
+##     compute_route, factory, assign, add_child); once it moves, no new
+##     downstream phase begins, the pending reservation is released and any
+##     dispatcher-owned fresh agent is freed.
+##   - exact bundle coherence is re-checked between phases, so a sibling that
+##     drifts inside an injected callback aborts the pending dispatch before it
+##     commits, without disturbing prior committed assignments.
+##   - a NON-NULL cached route that fails shared validation is a route-seam
+##     failure (release + ROUTE_FAILED, NO fresh compute); only a null memo
+##     permits fresh routing.
+##   - an explicit agent_factory that becomes invalid after bind fails closed
+##     (no silent default-agent substitution).
+##   - after assign() returns true the agent's postconditions (valid, unparented,
+##     MOVING, exact owner/color/target) are validated before attach.
+##   - completion is validated against immutable owner/target/color/agent identity.
 ##
 ## Owner/assignment IDs are unique and monotonically increasing for the
 ## dispatcher's whole lifetime. They are a dedicated token, never a color_id,
@@ -58,12 +72,13 @@ const DEFAULT_SPEED := 6.0
 
 ## Narrow required API surfaces validated at bind (F-M19-STRICT-001). A dependency
 ## missing any listed method is a partial/junk dependency and fails closed before
-## any escaped call reaches it.
+## any escaped call reaches it. select_access requires is_coherent_with — bundle
+## coherence is mandatory, not optional (V03 F-M19-STRICT-001.A).
 const _SELECTOR_API := ["select_and_reserve", "is_bound_to"]
 const _RESERVATION_API := ["reserve", "release", "release_for_owner", "get_target_for_owner", "get_owner", "is_bound_to"]
 const _ROUTING_API := ["compute_route"]
 const _ROUTING_ACCESS_API := ["is_segment_traversable", "is_bound_to"]
-const _SELECT_ACCESS_API := ["is_targetable"]
+const _SELECT_ACCESS_API := ["is_targetable", "is_coherent_with"]
 
 # --- injected collaborators (all null until bind()) --------------------------
 var _board = null
@@ -74,12 +89,17 @@ var _routing_access = null      ## segment-traversable access truth for routing.
 var _select_access = null       ## is_targetable() reachability truth for selection.
 var _agent_parent: Node = null  ## node the spawned agents are attached under.
 var _agent_factory: Callable = Callable() ## optional () -> Node2D agent factory.
+## Whether an explicit factory Callable was intentionally supplied at bind. Lets
+## _make_agent distinguish "no factory configured" from "explicit factory whose
+## target was freed after bind" (V03 F-M19-STRICT-002.B).
+var _explicit_factory: bool = false
 
 var _bound: bool = false
 var _resetting: bool = false
-## Serial re-entry guard: at most one dispatch() body executes at a time. A
-## recursive dispatch from an injected callback returns REENTRANT and creates no
-## reservation/agent (F-M19-STRICT-003).
+## Serial re-entry guard: at most one dispatch() body executes at a time. Armed
+## BEFORE the first live collaborator callback so recursion from any coherence
+## seam is covered (V03 F-M19-STRICT-003.A). A recursive dispatch returns
+## REENTRANT and creates no reservation/agent/owner-id.
 var _in_dispatch: bool = false
 ## Monotonic reset generation. reset() increments it; a dispatch captures it at
 ## start and, after every external-callback boundary, aborts (releasing the
@@ -96,27 +116,29 @@ var _next_owner_id: int = 0
 var _active: Dictionary = {}
 
 ## Bind the separate systems (initialization-only, F-M19-STRICT-001). Every
-## required collaborator is category/API validated and proven bundle-coherent
-## (all bound to the SAME board / reservation / routing / access identities)
-## BEFORE any ref is committed. Any failure returns false and leaves the
-## dispatcher fully unbound with no refs and no active assignments. bind() while
-## already bound returns false and changes nothing (no destructive rebind in
-## M19 — construct a new dispatcher to replace the whole bundle).
+## required collaborator is category-narrowed (RefCounted + narrow API; only
+## agent_parent may be a Node) and proven bundle-coherent BEFORE any ref is
+## committed. Any failure returns false and leaves the dispatcher fully unbound.
+## bind() while already bound returns false and changes nothing (no destructive
+## rebind in M19 — construct a new dispatcher to replace the whole bundle).
 func bind(board, selector, reservations, routing_system, routing_access, select_access,
 		agent_parent: Node = null, agent_factory: Callable = Callable()) -> bool:
 	if _bound:
 		return false
 	if not (board is BoardState):
 		return false
+	# All injected collaborators are the production RefCounted lifecycle category
+	# (V03 F-M19-STRICT-001.B): a method-compatible externally-freeable Node is
+	# rejected, so it can never become a stale callable inside the bundle.
 	if not _is_ref_with(selector, _SELECTOR_API):
 		return false
 	if not _is_ref_with(reservations, _RESERVATION_API):
 		return false
-	if not _is_object_with(routing_system, _ROUTING_API):
+	if not _is_ref_with(routing_system, _ROUTING_API):
 		return false
-	if not _is_object_with(routing_access, _ROUTING_ACCESS_API):
+	if not _is_ref_with(routing_access, _ROUTING_ACCESS_API):
 		return false
-	if not _is_object_with(select_access, _SELECT_ACCESS_API):
+	if not _is_ref_with(select_access, _SELECT_ACCESS_API):
 		return false
 	if agent_parent != null and not _is_live_node(agent_parent):
 		return false
@@ -133,6 +155,7 @@ func bind(board, selector, reservations, routing_system, routing_access, select_
 	_select_access = select_access
 	_agent_parent = agent_parent if agent_parent != null else self
 	_agent_factory = agent_factory
+	_explicit_factory = agent_factory.is_valid()
 	_bound = true
 	return true
 
@@ -152,63 +175,86 @@ func dispatch(color_id: int, start_position: Vector2, speed: float = DEFAULT_SPE
 	# closed with no side effect (F-M19-STRICT-003).
 	if _in_dispatch:
 		return DispatchResult.failure(DispatchResult.FailureReason.REENTRANT)
-	# Numeric request boundaries BEFORE any side effect (F-M19-STRICT-004): reject
-	# negative color, non-finite origin, and non-finite / non-positive speed. NaN
-	# fails `is_finite`, so it can never slip past a bare `speed <= 0` comparison.
+	# Pure numeric request boundaries BEFORE any collaborator callback
+	# (F-M19-STRICT-004): reject negative color, non-finite origin, and non-finite
+	# / non-positive speed. NaN fails is_finite, so it never slips past `<= 0`.
 	if color_id < 0 or not _is_finite_vec(start_position) or not is_finite(speed) or speed <= 0.0:
 		return DispatchResult.failure(DispatchResult.FailureReason.INVALID_REQUEST)
-	# Live bundle-coherence drift: a sibling may have been rebound after bind. Fail
-	# closed BEFORE any reservation/route (F-M19-STRICT-001).
-	if not _bundle_coherent(_board, _selector, _reservations, _routing_system, _routing_access, _select_access):
-		return DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED)
 
+	# V03 F-M19-STRICT-003.A: arm the serial guard and capture the reset
+	# generation BEFORE the first live collaborator callback (the coherence probe
+	# below is the first external boundary and can inject recursion/reset).
 	_in_dispatch = true
 	var my_gen: int = _generation
+
+	# Live bundle-coherence drift: a sibling may have been rebound after bind.
+	var coherent: bool = _bundle_coherent(_board, _selector, _reservations, _routing_system, _routing_access, _select_access)
+	if _reset_since(my_gen):
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+	if not coherent:
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
 
 	# Point the reachability truth at this slot origin (production adapter memoizes
 	# the winning route; fixed test doubles simply ignore this hook).
 	if _select_access.has_method("set_origin"):
 		_select_access.set_origin(start_position)
+		if _reset_since(my_gen):
+			return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
 
 	# WHAT + atomic reservation, in one call, using reachability truth. A raw
 	# color candidate that is unreachable is never selected (AL-028).
 	var owner_id: int = _next_owner_id
 	var target: int = _selector.select_and_reserve(color_id, owner_id, _select_access)
-	# select_access.is_targetable may have injected reset(). If so, release any
-	# reservation that got acquired for this pending owner and abort.
 	if _reset_since(my_gen):
 		if target >= 0:
 			_reservations.release(target, owner_id)
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
 	if target < 0:
-		# No reachable target: no reservation, no route, no agent. The candidate
-		# id was never actually reserved, so it is not consumed.
+		# No reachable target: no reservation, no route, no agent.
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.NO_REACHABLE_TARGET))
 	# The target is now reserved for owner_id — commit the id (never reused).
 	_next_owner_id += 1
+	# V03 F-M19-STRICT-001.C/003.C: a sibling may have drifted inside the selection
+	# callback. Re-check exact bundle coherence before any further side effect.
+	if not _bundle_coherent(_board, _selector, _reservations, _routing_system, _routing_access, _select_access):
+		_reservations.release(target, owner_id)
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
 
-	# HOW, for that ONE reserved target only. Build the dispatcher's own request;
-	# reuse the reachability probe's route when the adapter memoized it.
+	# HOW, for that ONE reserved target only. Build the dispatcher's own request.
 	var request = RouteRequest.for_target(_board, start_position, target)
 	if request == null:
 		# Defensive: target validated by the selector, so this should not happen.
 		_reservations.release(target, owner_id)
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.ROUTE_FAILED))
 
+	# V03 F-M19-STRICT-002.A: distinguish a MISSING cached route (null -> fresh
+	# compute is legitimate) from a PRESENT-but-invalid cached route (a route-seam
+	# failure that must NOT silently fall back to a fresh compute).
 	var route = null
+	var had_cache: bool = false
 	if _select_access.has_method("consume_route"):
 		route = _select_access.consume_route(target)
-	if not _route_ok(route, request, target):
+		if _reset_since(my_gen):
+			_reservations.release(target, owner_id)
+			return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+		had_cache = route != null
+	if had_cache:
+		if not _route_ok(route, request, target):
+			_reservations.release(target, owner_id)
+			return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.ROUTE_FAILED))
+	else:
 		route = _routing_system.compute_route(request, _board, _routing_access)
-	# compute_route may have injected reset().
-	if _reset_since(my_gen):
+		if _reset_since(my_gen):
+			_reservations.release(target, owner_id)
+			return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+		if not _route_ok(route, request, target):
+			# Route failure -> release reservation, spawn nothing, NO retarget.
+			_reservations.release(target, owner_id)
+			return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.ROUTE_FAILED))
+	# Re-check bundle coherence after the routing boundary (drift detection).
+	if not _bundle_coherent(_board, _selector, _reservations, _routing_system, _routing_access, _select_access):
 		_reservations.release(target, owner_id)
-		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
-	if not _route_ok(route, request, target):
-		# Route failure -> release reservation, spawn nothing, NO retarget. Both a
-		# cached and a freshly-computed route pass the SAME validation path.
-		_reservations.release(target, owner_id)
-		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.ROUTE_FAILED))
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
 
 	# Exactly one agent. The factory product must be a fresh, unparented, still
 	# UNASSIGNED ScrubbotAgent/subclass before the dispatcher will own it.
@@ -219,20 +265,36 @@ func dispatch(color_id: int, start_position: Vector2, speed: float = DEFAULT_SPE
 			agent.free()
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
 	if not _dispatcher_ownable(agent):
-		# Invalid/foreign factory product: release the reservation, create no
-		# child, and NEVER free/mutate a foreign parented/reused object.
+		# Invalid/foreign factory product (incl. an invalidated explicit factory):
+		# release the reservation, create no child, and NEVER free/mutate a
+		# foreign parented/reused object.
 		_reservations.release(target, owner_id)
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.AGENT_ASSIGN_FAILED))
+	# Re-check bundle coherence after the factory boundary (drift detection).
+	if not _bundle_coherent(_board, _selector, _reservations, _routing_system, _routing_access, _select_access):
+		_reservations.release(target, owner_id)
+		agent.free()
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
 
 	if not agent.assign(owner_id, color_id, request, route, speed):
 		_reservations.release(target, owner_id)
 		agent.free() # our own fresh agent; never leave an orphan node.
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.AGENT_ASSIGN_FAILED))
-	# agent.assign is a controllable seam for subclasses; it may inject reset().
 	if _reset_since(my_gen):
 		_reservations.release(target, owner_id)
 		agent.free()
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+	# V03 F-M19-STRICT-002.C: a lying subclass can return true from assign() while
+	# remaining UNASSIGNED or recording the wrong identity. Validate postconditions.
+	if not _agent_assigned_ok(agent, owner_id, color_id, target):
+		_reservations.release(target, owner_id)
+		agent.free()
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.AGENT_ASSIGN_FAILED))
+	# Re-check bundle coherence after the assign boundary (drift detection).
+	if not _bundle_coherent(_board, _selector, _reservations, _routing_system, _routing_access, _select_access):
+		_reservations.release(target, owner_id)
+		agent.free()
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
 
 	# Parent must still be attachable at attach time (freed/queued-for-delete
 	# parent -> clean rollback, no orphan).
@@ -345,6 +407,11 @@ func peek_next_owner_id() -> int:
 # ------------------------------------------------------------- internals -----
 
 func _make_agent():
+	# An explicit factory that was configured at bind but is now invalid (its
+	# target freed / Callable invalidated) fails closed — NO silent default-agent
+	# substitution (V03 F-M19-STRICT-002.B).
+	if _explicit_factory and not _agent_factory.is_valid():
+		return null
 	if _agent_factory.is_valid():
 		return _agent_factory.call()
 	return ScrubbotAgent.new()
@@ -364,6 +431,25 @@ func _dispatcher_ownable(agent) -> bool:
 		return false
 	return true
 
+## Postconditions after agent.assign() returns true, before attach
+## (V03 F-M19-STRICT-002.C): a truthful assign leaves the exact fresh agent
+## MOVING, unparented, and recording this dispatch's owner/color/target. A lying
+## subclass that returns true without truly assigning is rejected.
+func _agent_assigned_ok(agent, owner_id: int, color_id: int, target: int) -> bool:
+	if not is_instance_valid(agent):
+		return false
+	if agent.get_parent() != null:
+		return false
+	if agent.get_state() != ScrubbotAgent.State.MOVING:
+		return false
+	if agent.owner_id != owner_id:
+		return false
+	if agent.color_id != color_id:
+		return false
+	if agent.target_index != target:
+		return false
+	return true
+
 ## Shared route validation path for BOTH a cached and a freshly-computed route
 ## (F-M19-STRICT-002): a real RouteResult, for the exact reserved target, that is
 ## RouteValidator-clean for the exact request/board/routing-access. A null,
@@ -378,6 +464,8 @@ func _route_ok(route, request, target: int) -> bool:
 
 ## Bundle coherence proof (bind AND live): every collaborator belongs to the SAME
 ## board / reservation / routing / access identities (F-M19-STRICT-001, AL-062).
+## select_access coherence is MANDATORY (V03 F-M19-STRICT-001.A) — its presence is
+## guaranteed by the bind API check, so it is always queried, never skipped.
 func _bundle_coherent(board, selector, reservations, routing_system, routing_access, select_access) -> bool:
 	var sel_ok = selector.is_bound_to(board, reservations)
 	if typeof(sel_ok) != TYPE_BOOL or not sel_ok:
@@ -388,26 +476,14 @@ func _bundle_coherent(board, selector, reservations, routing_system, routing_acc
 	var acc_ok = routing_access.is_bound_to(board)
 	if typeof(acc_ok) != TYPE_BOOL or not acc_ok:
 		return false
-	# select_access coherence is verified only when it exposes the read-only
-	# identity query (the production ProductionTargetAccess does); a fixed
-	# reachability double without one cannot drift a board/routing bundle.
-	if select_access.has_method("is_coherent_with"):
-		var sa_ok = select_access.is_coherent_with(board, routing_system, routing_access)
-		if typeof(sa_ok) != TYPE_BOOL or not sa_ok:
-			return false
+	var sa_ok = select_access.is_coherent_with(board, routing_system, routing_access)
+	if typeof(sa_ok) != TYPE_BOOL or not sa_ok:
+		return false
 	return true
 
 static func _is_ref_with(obj, api: Array) -> bool:
 	if not (obj is RefCounted):
 		return false
-	return _has_all_methods(obj, api)
-
-static func _is_object_with(obj, api: Array) -> bool:
-	if typeof(obj) != TYPE_OBJECT:
-		return false
-	return _has_all_methods(obj, api)
-
-static func _has_all_methods(obj, api: Array) -> bool:
 	for m in api:
 		if not obj.has_method(m):
 			return false
