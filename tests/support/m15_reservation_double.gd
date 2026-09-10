@@ -25,7 +25,20 @@ var get_owner_force = null
 var do_store: bool = true            ## false -> reserve returns success but stores nothing
 var store_target_override: int = _NONE  ## store this target index instead of idx
 var store_owner_override: int = _NONE   ## store idx under this owner instead of owner_id
-var on_reserve: Callable = Callable()   ## side effect run inside reserve() (drift injection)
+
+## get_target_for_owner malformed return applied ONLY after a reserve has run, so
+## the initial owner check still passes and the malformed value hits the
+## post-reserve ownership proof instead (V02 criteria 81/82).
+var target_for_owner_force_after_reserve = null
+var _did_reserve: bool = false
+
+## Boundary side-effect hooks (drift/re-entry injection). Each fires inside the
+## matching method before it returns. Tests guard with their own fired-once flag.
+var on_is_bound_to: Callable = Callable()      ## fires in is_bound_to()
+var on_owner_query: Callable = Callable()      ## fires in get_target_for_owner()
+var on_reserved_snapshot: Callable = Callable()## fires in get_reserved_indices()
+var on_is_reserved: Callable = Callable()      ## fires in is_reserved()
+var on_reserve: Callable = Callable()          ## fires in reserve()
 
 func bind(board) -> bool:
 	_board = board
@@ -38,9 +51,13 @@ func rebind(board) -> bool:
 	return true
 
 func is_bound_to(board) -> bool:
+	if on_is_bound_to.is_valid():
+		on_is_bound_to.call()
 	return _board != null and _board == board
 
 func get_reserved_indices():
+	if on_reserved_snapshot.is_valid():
+		on_reserved_snapshot.call()
 	if reserved_indices_force != null:
 		return reserved_indices_force
 	var keys: Array = _t2o.keys()
@@ -55,6 +72,8 @@ func get_candidates(_c, _e):
 	return []  # never used as candidate index; present only if duck-typed
 
 func is_reserved(target_index: int):
+	if on_is_reserved.is_valid():
+		on_is_reserved.call()
 	if is_reserved_force != null:
 		return is_reserved_force
 	return _t2o.has(target_index)
@@ -65,11 +84,16 @@ func get_owner(target_index: int):
 	return _t2o.get(target_index, -1)
 
 func get_target_for_owner(owner_id: int):
+	if on_owner_query.is_valid():
+		on_owner_query.call()
 	if target_for_owner_force != null:
 		return target_for_owner_force
+	if _did_reserve and target_for_owner_force_after_reserve != null:
+		return target_for_owner_force_after_reserve
 	return _o2t.get(owner_id, -1)
 
 func reserve(target_index: int, owner_id: int):
+	_did_reserve = true
 	if on_reserve.is_valid():
 		on_reserve.call(target_index, owner_id)
 	if do_store:

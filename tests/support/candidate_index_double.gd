@@ -20,6 +20,12 @@ var _board = null
 ## malformed non-Array candidate container for the strict-v2 boundary tests).
 var candidates_force = null
 
+## Boundary side-effect hooks (drift/re-entry injection) for the V02 direct
+## coverage. Each fires inside the matching method before it returns; tests guard
+## with their own fired-once flag.
+var on_is_bound_to: Callable = Callable()      ## fires in is_bound_to()
+var on_get_candidates: Callable = Callable()   ## fires in get_candidates()
+
 func set_candidates(color_id: int, indices: Array) -> void:
 	by_color[color_id] = indices.duplicate()
 
@@ -28,9 +34,13 @@ func bind(board) -> void:
 
 ## Exact-identity coherence check, mirroring ColorCandidateIndex.is_bound_to().
 func is_bound_to(board) -> bool:
+	if on_is_bound_to.is_valid():
+		on_is_bound_to.call()
 	return _board != null and _board == board
 
 func get_candidates(color_id: int, excluded = []):
+	if on_get_candidates.is_valid():
+		on_get_candidates.call()
 	if candidates_force != null:
 		return candidates_force
 	var base: Array = by_color.get(color_id, [])

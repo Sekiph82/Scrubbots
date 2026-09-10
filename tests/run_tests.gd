@@ -114,6 +114,7 @@ func _initialize() -> void:
 	_run_target_selector_simultaneous_tests()
 	_run_target_selector_strict_v02_tests()
 	_run_target_selector_strict_v03_tests()
+	_run_target_selector_strict_v04_tests()
 	_run_target_selector_benchmark()
 	_run_route_request_tests()
 	_run_route_result_tests()
@@ -4685,6 +4686,269 @@ func _run_target_selector_strict_v03_tests() -> void:
 	_check_eq(rr_rsA.get_reservation_count(), 0, "STRICT-005: no reservation created in the drifted bundle")
 
 	print("  M15 strict-v2 2nd-stage tests complete")
+
+func _run_target_selector_strict_v04_tests() -> void:
+	# M15-C002 V02 closure: guard ordering, recursion/bind re-entry, coherence
+	# after every boundary (incl. is_reserved==true), malformed-reserve-after-
+	# mutation rollback, get_owner-independent rollback, same-owner no-later-query.
+	print("---- M15 strict-v2 (V02): transaction guard + drift + exact rollback (F-004/005) ----")
+
+	# ===== §1/§3 initial-coherence bind re-entry: nested bind cannot move bundle =
+	# Candidate is_bound_to() callback attempts a nested bind during INITIAL coherence.
+	var bA = _make_colored_board(2, 1, [5, 5])
+	var ciA = CandidateIndexDouble.new(); ciA.bind(bA); ciA.set_candidates(5, [0, 1])
+	var rsA = ReservationState.create(); rsA.bind(bA)
+	var ts = TargetSelector.create(); ts.bind(bA, ciA, rsA)
+	var bB = _make_colored_board(1, 1, [5])
+	var ciB = CandidateIndexDouble.new(); ciB.bind(bB); ciB.set_candidates(5, [0])
+	var rsB = ReservationState.create(); rsB.bind(bB)
+	var nb_ci := [true, false] # [pending, observed_return]
+	ciA.on_is_bound_to = func():
+		if nb_ci[0]:
+			nb_ci[0] = false
+			nb_ci[1] = ts.bind(bB, ciB, rsB)
+	var aq = AccessQueryDouble.new(); aq.default_targetable = true
+	ts.select_and_reserve(5, 1, aq)
+	_check_eq(nb_ci[1], false, "V02: nested bind from initial candidate coherence returns false")
+	_check(ts.is_bound_to(bA, rsA), "V02: selector stays on bundle A after candidate-coherence nested bind")
+	_check_eq(rsB.get_reservation_count(), 0, "V02: no reservation created in bundle B (candidate re-entry)")
+	ciA.on_is_bound_to = Callable()
+	_check(ts.select_and_reserve(5, 2, aq) != -1, "V02: later clean selection works after candidate re-entry")
+
+	# Reservation is_bound_to() callback attempts a nested bind during INITIAL coherence.
+	var r_bA = _make_colored_board(1, 1, [5])
+	var r_ciA = ColorCandidateIndex.create(); r_ciA.bind(r_bA)
+	var r_rsA = M15ReservationDouble.new(); r_rsA.bind(r_bA)
+	var r_ts = TargetSelector.create(); r_ts.bind(r_bA, r_ciA, r_rsA)
+	var r_bB = _make_colored_board(1, 1, [5])
+	var r_ciB = ColorCandidateIndex.create(); r_ciB.bind(r_bB)
+	var r_rsB = M15ReservationDouble.new(); r_rsB.bind(r_bB)
+	var nb_rs := [true, false]
+	r_rsA.on_is_bound_to = func():
+		if nb_rs[0]:
+			nb_rs[0] = false
+			nb_rs[1] = r_ts.bind(r_bB, r_ciB, r_rsB)
+	_check_eq(r_ts.select_and_reserve(5, 1, aq), 0, "V02: reservation-coherence re-entry: outer op still deterministic")
+	_check_eq(nb_rs[1], false, "V02: nested bind from initial reservation coherence returns false")
+	_check(r_ts.is_bound_to(r_bA, r_rsA), "V02: selector stays on bundle A after reservation-coherence nested bind")
+	_check_eq(r_rsB.get_reservation_count(), 0, "V02: no reservation created in bundle B (reservation re-entry)")
+
+	# ===== §1 initial coherence failure clears guard (no stuck-busy) ============
+	var sb_b = _make_colored_board(1, 1, [5])
+	var sb_ci = ColorCandidateIndex.create(); sb_ci.bind(sb_b)
+	var sb_rs = ReservationState.create(); sb_rs.bind(sb_b)
+	var sb_ts = TargetSelector.create(); sb_ts.bind(sb_b, sb_ci, sb_rs)
+	var sb_b2 = _make_colored_board(1, 1, [5])
+	sb_ci.rebind(sb_b2) # drift candidate before select -> initial coherence fails
+	_check_eq(sb_ts.select_and_reserve(5, 1, aq), -1, "V02: initial-coherence failure returns -1")
+	sb_ci.rebind(sb_b) # restore coherence
+	_check(sb_ts.select_and_reserve(5, 1, aq) != -1, "V02: selector not stuck busy after initial-coherence failure")
+
+	# ===== §2 recursive select_and_reserve blocked =============================
+	# From targetability callback (same-owner and different-owner), candidate-query
+	# callback, and reservation-query callback.
+	var rc_b = _make_colored_board(2, 1, [5, 5])
+	var rc_ci = ColorCandidateIndex.create(); rc_ci.bind(rc_b)
+	var rc_rs = ReservationState.create(); rc_rs.bind(rc_b)
+	var rc_ts = TargetSelector.create(); rc_ts.bind(rc_b, rc_ci, rc_rs)
+	var rc_aq = AccessQueryDouble.new(); rc_aq.default_targetable = true
+	var rc_nested := [99, 99] # [same-owner result, diff-owner result]
+	var rc_fired := [false]
+	rc_aq.on_query = func(_i):
+		if not rc_fired[0]:
+			rc_fired[0] = true
+			rc_nested[0] = rc_ts.select_and_reserve(5, 1, rc_aq)  # same owner recursion
+			rc_nested[1] = rc_ts.select_and_reserve(5, 2, rc_aq)  # different owner recursion
+	var rc_out = rc_ts.select_and_reserve(5, 1, rc_aq)
+	_check_eq(rc_nested[0], -1, "V02: recursive same-owner select returns -1")
+	_check_eq(rc_nested[1], -1, "V02: recursive different-owner select returns -1")
+	_check_eq(rc_out, 0, "V02: outer selection completes deterministically on target 0")
+	_check_eq(rc_rs.get_reservation_count(), 1, "V02: recursion created no extra reservation")
+	_check(rc_ts.select_and_reserve(5, 3, rc_aq) != -1, "V02: later non-reentrant call recovers")
+
+	# Recursion from candidate-query callback.
+	var rcq_b = _make_colored_board(1, 1, [5])
+	var rcq_ci = CandidateIndexDouble.new(); rcq_ci.bind(rcq_b); rcq_ci.set_candidates(5, [0])
+	var rcq_rs = ReservationState.create(); rcq_rs.bind(rcq_b)
+	var rcq_ts = TargetSelector.create(); rcq_ts.bind(rcq_b, rcq_ci, rcq_rs)
+	var rcq_nested := [99]
+	var rcq_fired := [false]
+	rcq_ci.on_get_candidates = func():
+		if not rcq_fired[0]:
+			rcq_fired[0] = true
+			rcq_nested[0] = rcq_ts.select_and_reserve(5, 2, aq)
+	rcq_ts.select_and_reserve(5, 1, aq)
+	_check_eq(rcq_nested[0], -1, "V02: recursive select from candidate-query callback returns -1")
+
+	# Recursion from reservation-query (owner query) callback.
+	var rrq_b = _make_colored_board(1, 1, [5])
+	var rrq_ci = ColorCandidateIndex.create(); rrq_ci.bind(rrq_b)
+	var rrq_rs = M15ReservationDouble.new(); rrq_rs.bind(rrq_b)
+	var rrq_ts = TargetSelector.create(); rrq_ts.bind(rrq_b, rrq_ci, rrq_rs)
+	var rrq_nested := [99]
+	var rrq_fired := [false]
+	rrq_rs.on_owner_query = func():
+		if not rrq_fired[0]:
+			rrq_fired[0] = true
+			rrq_nested[0] = rrq_ts.select_and_reserve(5, 2, aq)
+	rrq_ts.select_and_reserve(5, 1, aq)
+	_check_eq(rrq_nested[0], -1, "V02: recursive select from reservation-query callback returns -1")
+
+	# ===== §3 bind-in-progress guard: nested bind during outer bind ============
+	var bi_bA = _make_colored_board(1, 1, [5])
+	var bi_ciA = CandidateIndexDouble.new(); bi_ciA.bind(bi_bA); bi_ciA.set_candidates(5, [0])
+	var bi_rsA = ReservationState.create(); bi_rsA.bind(bi_bA)
+	var bi_bB = _make_colored_board(1, 1, [5])
+	var bi_ciB = CandidateIndexDouble.new(); bi_ciB.bind(bi_bB); bi_ciB.set_candidates(5, [0])
+	var bi_rsB = ReservationState.create(); bi_rsB.bind(bi_bB)
+	var bi_ts = TargetSelector.create()
+	var bi_inner := [true, false] # [pending, observed]
+	bi_ciA.on_is_bound_to = func():
+		if bi_inner[0]:
+			bi_inner[0] = false
+			bi_inner[1] = bi_ts.bind(bi_bB, bi_ciB, bi_rsB) # nested bind during outer bind
+	var bi_outer = bi_ts.bind(bi_bA, bi_ciA, bi_rsA)
+	bi_ciA.on_is_bound_to = Callable()
+	_check(bi_outer, "V02: outer bind commits")
+	_check_eq(bi_inner[1], false, "V02: nested bind during outer bind returns false")
+	_check(bi_ts.is_bound_to(bi_bA, bi_rsA), "V02: outer bind committed the requested bundle A only")
+	_check(bi_ts.select_and_reserve(5, 1, aq) != -1, "V02: selector usable after bind re-entry")
+
+	# ===== §4 coherence after is_reserved == true ==============================
+	var ir_bA = _make_colored_board(2, 1, [5, 5])
+	var ir_ciA = CandidateIndexDouble.new(); ir_ciA.bind(ir_bA); ir_ciA.set_candidates(5, [0, 1])
+	var ir_rsA = M15ReservationDouble.new(); ir_rsA.bind(ir_bA)
+	var ir_bB = _make_colored_board(2, 1, [5, 5])
+	var ir_ts = TargetSelector.create(); ir_ts.bind(ir_bA, ir_ciA, ir_rsA)
+	ir_rsA.is_reserved_force = true # every candidate reports reserved
+	var ir_calls := [0]
+	ir_rsA.on_is_reserved = func():
+		ir_calls[0] += 1
+		if ir_calls[0] == 1:
+			ir_ciA.bind(ir_bB) # drift during is_reserved==true on candidate 0
+	_check_eq(ir_ts.select_and_reserve(5, 1, aq), -1, "V02: is_reserved-true drift returns -1")
+	_check_eq(ir_calls[0], 1, "V02: is_reserved-true drift stops before querying the next candidate")
+
+	# ===== §4 direct drift: candidate-query / reserved-snapshot / owner-query ===
+	# candidate-query drift stops before reservation.
+	var dq_b = _make_colored_board(1, 1, [5])
+	var dq_ci = CandidateIndexDouble.new(); dq_ci.bind(dq_b); dq_ci.set_candidates(5, [0])
+	var dq_rs = ReservationState.create(); dq_rs.bind(dq_b)
+	var dq_b2 = _make_colored_board(1, 1, [5])
+	var dq_ts = TargetSelector.create(); dq_ts.bind(dq_b, dq_ci, dq_rs)
+	var dq_fired := [false]
+	dq_ci.on_get_candidates = func():
+		if not dq_fired[0]:
+			dq_fired[0] = true
+			dq_ci.bind(dq_b2)
+	_check_eq(dq_ts.select_and_reserve(5, 1, aq), -1, "V02: candidate-query drift -> -1 before reservation")
+	_check_eq(dq_rs.get_reservation_count(), 0, "V02: candidate-query drift created no reservation")
+
+	# reserved-snapshot drift stops before candidate query.
+	var ds_b = _make_colored_board(1, 1, [5])
+	var ds_ci = CandidateIndexDouble.new(); ds_ci.bind(ds_b); ds_ci.set_candidates(5, [0])
+	var ds_rs = M15ReservationDouble.new(); ds_rs.bind(ds_b)
+	var ds_b2 = _make_colored_board(1, 1, [5])
+	var ds_ts = TargetSelector.create(); ds_ts.bind(ds_b, ds_ci, ds_rs)
+	var ds_fired := [false]
+	var ds_ci_candidates_called := [false]
+	ds_ci.on_get_candidates = func(): ds_ci_candidates_called[0] = true
+	ds_rs.on_reserved_snapshot = func():
+		if not ds_fired[0]:
+			ds_fired[0] = true
+			ds_ci.bind(ds_b2) # drift during reserved snapshot
+	_check_eq(ds_ts.select_and_reserve(5, 1, aq), -1, "V02: reserved-snapshot drift -> -1")
+	_check_eq(ds_ci_candidates_called[0], false, "V02: reserved-snapshot drift stops before candidate query")
+
+	# owner-query drift stops before later work.
+	var do_b = _make_colored_board(1, 1, [5])
+	var do_ci = CandidateIndexDouble.new(); do_ci.bind(do_b); do_ci.set_candidates(5, [0])
+	var do_rs = M15ReservationDouble.new(); do_rs.bind(do_b)
+	var do_b2 = _make_colored_board(1, 1, [5])
+	var do_ts = TargetSelector.create(); do_ts.bind(do_b, do_ci, do_rs)
+	var do_fired := [false]
+	do_rs.on_owner_query = func():
+		if not do_fired[0]:
+			do_fired[0] = true
+			do_ci.bind(do_b2) # drift during owner query
+	_check_eq(do_ts.select_and_reserve(5, 1, aq), -1, "V02: owner-query drift -> -1 before later work")
+
+	# ===== §5 malformed reserve return AFTER mutation rolls back exact pair =====
+	var mr_b = _make_colored_board(1, 1, [5])
+	var mr_ci = CandidateIndexDouble.new(); mr_ci.bind(mr_b); mr_ci.set_candidates(5, [0])
+	var mr_rsd = M15ReservationDouble.new(); mr_rsd.bind(mr_b)
+	mr_rsd.reserve(5, 777) # unrelated pre-existing reservation (target 5, owner 777)
+	mr_rsd.reserve_force = 1 # subsequent reserve stores exact pair then returns int 1
+	var mr_ts = TargetSelector.create(); mr_ts.bind(mr_b, mr_ci, mr_rsd)
+	var mr_aq = AccessQueryDouble.new(); mr_aq.default_targetable = true
+	_check_eq(mr_ts.select_and_reserve(5, 1, mr_aq), -1, "V02: reserve stores then returns int 1 -> -1")
+	_check_eq(mr_rsd.get_owner(0), -1, "V02: exact requested pair (0,1) rolled back after malformed reserve")
+	_check_eq(mr_rsd.get_owner(5), 777, "V02: unrelated reservation preserved through malformed-reserve rollback")
+
+	# ===== §6 rollback must not depend on the failed ownership query ============
+	# exact pair stored + malformed get_owner -> -1 and exact pair removed.
+	var go_rsd = M15ReservationDouble.new(); go_rsd.do_store = true; go_rsd.get_owner_force = "z"
+	var go_w = _m15_selector_with(go_rsd)
+	_check_eq(go_w.ts.select_and_reserve(5, 1, go_w.aq), -1, "V02: exact pair + malformed get_owner -> -1")
+	_check_eq(go_rsd.get_reservation_count(), 0, "V02: exact pair removed despite malformed get_owner")
+
+	# exact pair stored + malformed get_target_for_owner at proof time -> -1 and removed.
+	var gt_rsd = M15ReservationDouble.new(); gt_rsd.do_store = true
+	gt_rsd.target_for_owner_force_after_reserve = "q" # malformed only after reserve
+	var gt_w = _m15_selector_with(gt_rsd)
+	_check_eq(gt_w.ts.select_and_reserve(5, 1, gt_w.aq), -1, "V02: exact pair + malformed get_target_for_owner -> -1")
+	_check_eq(gt_rsd.get_reservation_count(), 0, "V02: exact pair removed despite malformed get_target_for_owner")
+
+	# target actually owned by another owner is preserved (rollback is exact-pair).
+	var oo_rsd = M15ReservationDouble.new(); oo_rsd.do_store = true; oo_rsd.store_owner_override = 999
+	var oo_w = _m15_selector_with(oo_rsd)
+	_check_eq(oo_w.ts.select_and_reserve(5, 1, oo_w.aq), -1, "V02: reserve stored under other owner -> -1")
+	_check_eq(oo_rsd.get_owner(0), 999, "V02: other owner's reservation preserved (no broad release)")
+
+	# ===== §7 same-owner side effect + false / non-bool targetability ===========
+	# targetability false: owner assigned by side effect -> -1, no later query, kept.
+	var so_b = _make_colored_board(3, 1, [5, 5, 5])
+	var so_ci = ColorCandidateIndex.create(); so_ci.bind(so_b)
+	var so_rs = ReservationState.create(); so_rs.bind(so_b)
+	var so_ts = TargetSelector.create(); so_ts.bind(so_b, so_ci, so_rs)
+	var so_aq = AccessQueryDouble.new(); so_aq.default_targetable = false
+	var so_fired := [false]
+	so_aq.on_query = func(_i):
+		if not so_fired[0]:
+			so_fired[0] = true
+			so_rs.reserve(2, 42) # same owner grabs later candidate 2
+	_check_eq(so_ts.select_and_reserve(5, 42, so_aq), -1, "V02: same-owner side effect + false targetability -> -1")
+	_check(not so_aq.was_queried(1), "V02: no later candidate targetability query after owner assigned (false verdict)")
+	_check_eq(so_rs.get_target_for_owner(42), 2, "V02: external same-owner reservation preserved (false verdict)")
+
+	# targetability non-bool verdict: same law.
+	var sn_b = _make_colored_board(3, 1, [5, 5, 5])
+	var sn_ci = ColorCandidateIndex.create(); sn_ci.bind(sn_b)
+	var sn_rs = ReservationState.create(); sn_rs.bind(sn_b)
+	var sn_ts = TargetSelector.create(); sn_ts.bind(sn_b, sn_ci, sn_rs)
+	var sn_aq = M15VariantAccess.new(); sn_aq.verdict = 1 # non-bool truthy
+	var sn_fired := [false]
+	sn_aq.on_query = func(_i):
+		if not sn_fired[0]:
+			sn_fired[0] = true
+			sn_rs.reserve(2, 42)
+	_check_eq(sn_ts.select_and_reserve(5, 42, sn_aq), -1, "V02: same-owner side effect + non-bool targetability -> -1")
+	_check_eq(sn_rs.get_target_for_owner(42), 2, "V02: external same-owner reservation preserved (non-bool verdict)")
+
+	# malformed owner query right after targetability -> fail closed.
+	var mo_b = _make_colored_board(1, 1, [5])
+	var mo_ci = CandidateIndexDouble.new(); mo_ci.bind(mo_b); mo_ci.set_candidates(5, [0])
+	var mo_rs = M15ReservationDouble.new(); mo_rs.bind(mo_b)
+	var mo_ts = TargetSelector.create(); mo_ts.bind(mo_b, mo_ci, mo_rs)
+	var mo_aq = AccessQueryDouble.new(); mo_aq.default_targetable = true
+	var mo_calls := [0]
+	mo_rs.on_owner_query = func():
+		mo_calls[0] += 1
+		if mo_calls[0] == 2: # first is the initial owner check; second is post-targetability
+			mo_rs.target_for_owner_force = "bad"
+	_check_eq(mo_ts.select_and_reserve(5, 1, mo_aq), -1, "V02: malformed owner query after targetability fails closed")
+
+	print("  M15 strict-v2 V02 tests complete")
 
 func _run_target_selector_benchmark() -> void:
 	# 59x59 = 3481 cells, all color 0, all ACTIVE (test 30 rectangular below; test 31).
