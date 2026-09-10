@@ -481,3 +481,10 @@ Claude must **not** create or modify, as part of an implementation cycle:
 Claude may **read** any of these for context. ChatGPT performs all of those
 updates after its independent audit. Unrelated governance rules above remain
 in force.
+
+## H!veAI GitHub tracking
+
+- The repository root TASKS.md is the only current project-status tracker.
+- Keep the Project Status fields and task rows current when work changes state.
+- Commit and push TASKS.md with the implementation evidence that it describes.
+- Do not create or revive .hiveai PROJECT/RULES/TASKS/STATE/HANDOFF/EVENTS files as a competing tracker.

@@ -1,19 +1,3 @@
-# ScrubBots — Canonical GitHub Task State
-
-This root TASKS.md is the only authoritative project-status tracker consumed by H!veAI. GitHub repository metadata and the latest commit are the remaining project-truth inputs. Hidden .hiveai control-plane files are historical only and are not read for current project state.
-
-## Project Status
-
-- Current Milestone: M19
-- Current Sprint: M19-C001 V05
-- Current Task: M19-C001-V05 — Close the remaining M19 callback-order and direct-observability gaps after V04
-- Current Task Status: AWAITING_AUDIT
-- Next Task/Action: Independently audit M19-C001 V05 against the project audit criteria and publish the audit.
-- Required Actor: CHATGPT
-- Tracking Repository: Sekiph82/Scrubbots
-- Tracking Branch: main
-
-## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
 
 > **H!veAI notice (GitHub-first v3):** H!veAI live *operational* state is now
@@ -1923,5 +1907,3 @@ channel:
 - [ ] SB-CP09-008 Verify no publishing secret ships inside the mobile app.
 - [ ] SB-CP09-009 Document privacy impact if future telemetry calibration is enabled.
 - [ ] SB-CP09-010 Require independent audit before enabling production remote-content delivery.
-
-
