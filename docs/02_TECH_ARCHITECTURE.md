@@ -98,6 +98,29 @@ Reachability/access  --- filters blocked/unreachable candidates --->
   without touching level data, slot logic, cell state, scoring, or rendering.
   Do not merge `TargetSelector` and `RoutingSystem` into one script, and do
   not let `RoutingSystem` reach into Board State to pick targets itself.
+- `ScrubbotDispatcher` (M19, implemented) is the assignment/agent
+  orchestration: one slot/color request → select+reserve → route → spawn
+  exactly one `ScrubbotAgent`, keeping the reservation held. It observes
+  agent completion for identity but performs **no** BoardState mutation,
+  reservation resolution, or scoring. On an authenticated arrival it emits the
+  narrow `assignment_arrived(owner, target, color, agent)` bridge and exposes
+  `is_bound_to`, `is_arrival_pending`, and `finalize_arrival` for M20.
+- `CompleteClearingLoop` (M20, implemented — `scripts/gameplay/clearing/`)
+  owns the **cross-module arrival clear transaction** and nothing else. It
+  turns one slot activation into one M19 dispatch request (`activate_slot`),
+  and listens **only** to the dispatcher's authenticated `assignment_arrived`
+  signal (never a raw agent signal) as its clearing authority. On one healthy
+  arrival it re-validates the full pre-arrival tuple, then commits the locked
+  order: `BoardState.set_cell_state(target, CLEARED)` →
+  `ColorCandidateIndex.sync_cell(target)` →
+  `ReservationState.resolve_arrival(target, owner)` → optional single-cell
+  `BoardRenderer.update_cells([target])` → `ScrubbotDispatcher.finalize_arrival`.
+  A candidate-sync or reservation-resolve failure rolls BoardState back to
+  ACTIVE and restores candidate truth (reservation + dispatcher assignment
+  stay held) — never a half-clear. Access truth updates by reading BoardState
+  live: `ProductionAccessQuery` receives no explicit mutation call. The loop
+  introduces **no** win/lose/scoring/session-completion policy and no slot
+  cooldown/queue/consumption policy (those are later milestones).
 
 ## Performance approach
 

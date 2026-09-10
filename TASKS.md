@@ -7,13 +7,13 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Current Milestone: M20
 - Current Sprint: M20-C001 V01 — Complete Clearing Vertical Slice
 - Current Task: M20-C001-V01 — implement frozen complete-clearing orchestration contract
-- Current Task Status: IN_PROGRESS
-- Next Task/Action: implement prompt, run full validation matrix, write CLAUDE_LOG_V01.md, hand off AWAITING_AUDIT to ChatGPT
-- Required Actor: CLAUDE
+- Current Task Status: AWAITING_AUDIT
+- Next Task/Action: ChatGPT independently audits coordination/sessions/M20-C001/CLAUDE_LOG_V01.md against CHATGPT_AUDIT_CRITERIA_V01.md (real diff/code/tests), publishes CHATGPT_AUDIT_V01.md, and either closes the cycle or issues the next prompt version.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
-- Note: M19-C001 V06 AUDITED_PASS / STRICT_V2_FINAL_CLOSURE. Final audit: coordination/sessions/M19-C001/CHATGPT_AUDIT_V06.md. V06 validation commit 77d5359c4482a816e3d2e2ca7481ec1fdb7ed8af; 3273/3273 Godot 4.7.1; V05 dispatcher production blob unchanged at 0d1a6b1f6e9a6f1788ceb2078473c87bec8986e3.
+- Note: M20-C001 V01 implementation complete, AWAITING_AUDIT. CompleteClearingLoop orchestrator + M19 arrival bridge + minimal BoardRenderer coherence seam; evidence in coordination/sessions/M20-C001/CLAUDE_LOG_V01.md. Full headless suite 3386/3386 PASS on Godot 4.7.1.stable (up from the 3273 M19 V06 baseline; +113 M20 checks). No SB-M20 row marked complete — audit closure belongs to ChatGPT. M19-C001 V06 remained AUDITED_PASS / STRICT_V2_FINAL_CLOSURE (audit: coordination/sessions/M19-C001/CHATGPT_AUDIT_V06.md).
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
