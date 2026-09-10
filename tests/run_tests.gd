@@ -28,6 +28,9 @@ const ReservationState = preload("res://scripts/gameplay/targeting/reservation_s
 const TargetSelector = preload("res://scripts/gameplay/targeting/target_selector.gd")
 const AccessQueryDouble = preload("res://tests/support/access_query_double.gd")
 const CandidateIndexDouble = preload("res://tests/support/candidate_index_double.gd")
+const M15ReservationDouble = preload("res://tests/support/m15_reservation_double.gd")
+const M15VariantAccess = preload("res://tests/support/m15_variant_access.gd")
+const M15NodeAccess = preload("res://tests/support/m15_node_access.gd")
 # M16 — RoutingSystem interface / route contract.
 const RouteRequest = preload("res://scripts/gameplay/routing/route_request.gd")
 const RouteResult = preload("res://scripts/gameplay/routing/route_result.gd")
@@ -110,6 +113,7 @@ func _initialize() -> void:
 	_run_target_selector_tests()
 	_run_target_selector_simultaneous_tests()
 	_run_target_selector_strict_v02_tests()
+	_run_target_selector_strict_v03_tests()
 	_run_target_selector_benchmark()
 	_run_route_request_tests()
 	_run_route_result_tests()
@@ -4492,6 +4496,195 @@ func _run_target_selector_strict_v02_tests() -> void:
 	_check_eq(rsc.get_owner(0), -1, "STRICT-003: contested target 0 remains unreserved")
 
 	print("  M15 strict-v2 tests complete")
+
+## Builds a bound selector whose reservation dependency is the configurable
+## M15ReservationDouble and whose candidate index is a CandidateIndexDouble
+## exposing exactly index 0 for colour 5 on a 1x1 ACTIVE board.
+func _m15_selector_with(rsd) -> Dictionary:
+	var b = _make_colored_board(1, 1, [5])
+	var ci = CandidateIndexDouble.new(); ci.bind(b); ci.set_candidates(5, [0])
+	rsd.bind(b)
+	var ts = TargetSelector.create()
+	var ok = ts.bind(b, ci, rsd)
+	var aq = AccessQueryDouble.new(); aq.default_targetable = true
+	return {"b": b, "ci": ci, "ts": ts, "aq": aq, "bound": ok}
+
+func _run_target_selector_strict_v03_tests() -> void:
+	# Strict Audit Standard v2 SECOND STAGE for M15 (F-M15-STRICT-004/005):
+	# dependency/Variant-return fail-closed boundary + selection-operation
+	# snapshot/rebind safety. Pre-fix these classes faulted, accepted non-bool
+	# reachability, or reserved across a drifted bundle (M15-C002 DEFECT CONFIRMED).
+	print("---- M15 strict-v2 (2nd stage): Variant-return boundary + operation drift (F-004/005) ----")
+	var COLOR := 5
+
+	# ============ F-M15-STRICT-004: bind dependency categories ================
+	var bb = _make_colored_board(1, 1, [COLOR])
+	var bci = ColorCandidateIndex.create(); bci.bind(bb)
+	var brs = ReservationState.create(); brs.bind(bb)
+	# Real BoardState accepted; RefCounted-but-not-BoardState rejected as board.
+	var ts_ok = TargetSelector.create()
+	_check(ts_ok.bind(bb, bci, brs), "STRICT-004: real BoardState + full-API deps bind")
+	_check_eq(ts_ok.bind(RefCounted.new(), bci, brs), false, "STRICT-004: non-BoardState RefCounted board rejected")
+	# Method-compatible Node board rejected on category.
+	var node_board = M15NodeAccess.new() # a Node; not the board API but proves Node rejection path
+	_check_eq(ts_ok.bind(node_board, bci, brs), false, "STRICT-004: Node board rejected")
+	node_board.free()
+	# candidate/reservation must be RefCounted with the FULL required API.
+	_check_eq(TargetSelector.create().bind(bb, RefCounted.new(), brs), false, "STRICT-004: candidate missing API rejected")
+	_check_eq(TargetSelector.create().bind(bb, bci, RefCounted.new()), false, "STRICT-004: reservation missing API rejected")
+
+	# ============ F-M15-STRICT-004: access_query Variant boundary =============
+	var ab = _make_colored_board(1, 1, [COLOR])
+	var aci = ColorCandidateIndex.create(); aci.bind(ab)
+	var ars = ReservationState.create(); ars.bind(ab)
+	var ats = TargetSelector.create(); ats.bind(ab, aci, ars)
+	_check_eq(ats.select_and_reserve(COLOR, 1, null), -1, "STRICT-004: null access -> -1")
+	_check_eq(ats.select_and_reserve(COLOR, 1, 5), -1, "STRICT-004: int access -> -1 (no fault)")
+	_check_eq(ats.select_and_reserve(COLOR, 1, 1.5), -1, "STRICT-004: float access -> -1")
+	_check_eq(ats.select_and_reserve(COLOR, 1, "x"), -1, "STRICT-004: String access -> -1")
+	_check_eq(ats.select_and_reserve(COLOR, 1, true), -1, "STRICT-004: bool access -> -1")
+	_check_eq(ats.select_and_reserve(COLOR, 1, Vector2.ZERO), -1, "STRICT-004: Vector2 access -> -1")
+	_check_eq(ats.select_and_reserve(COLOR, 1, []), -1, "STRICT-004: Array access -> -1")
+	_check_eq(ats.select_and_reserve(COLOR, 1, {}), -1, "STRICT-004: Dictionary access -> -1")
+	_check_eq(ats.select_and_reserve(COLOR, 1, RefCounted.new()), -1, "STRICT-004: RefCounted missing is_targetable -> -1")
+	var node_access = M15NodeAccess.new()
+	_check_eq(ats.select_and_reserve(COLOR, 1, node_access), -1, "STRICT-004: method-compatible Node access rejected")
+	node_access.free()
+	_check_eq(ars.get_reservation_count(), 0, "STRICT-004: no access-variant created a reservation")
+	var aq_ok = AccessQueryDouble.new(); aq_ok.default_targetable = true
+	_check(ats.select_and_reserve(COLOR, 1, aq_ok) != -1, "STRICT-004: valid RefCounted access accepted")
+
+	# ============ F-M15-STRICT-004: targetability verdict type ================
+	var vb = _make_colored_board(1, 1, [COLOR])
+	var vci = ColorCandidateIndex.create(); vci.bind(vb)
+	var vrs = ReservationState.create(); vrs.bind(vb)
+	var vts = TargetSelector.create(); vts.bind(vb, vci, vrs)
+	var va = M15VariantAccess.new()
+	for bad in [null, 1, 1.0, "x", Vector2.ZERO, RefCounted.new(), [], {}]:
+		va.verdict = bad
+		_check_eq(vts.select_and_reserve(COLOR, 1, va), -1, "STRICT-004: non-bool is_targetable verdict does not approve")
+	_check_eq(vrs.get_reservation_count(), 0, "STRICT-004: malformed targetability created no reservation")
+	va.verdict = false
+	_check_eq(vts.select_and_reserve(COLOR, 1, va), -1, "STRICT-004: bool false skips candidate")
+	va.verdict = true
+	_check_eq(vts.select_and_reserve(COLOR, 1, va), 0, "STRICT-004: actual bool true permits candidate")
+
+	# ============ F-M15-STRICT-004: dynamic reservation return contracts ======
+	# Happy path through the full-API double proves ownership before returning.
+	var rsd_ok = M15ReservationDouble.new()
+	var w_ok = _m15_selector_with(rsd_ok)
+	_check(w_ok.bound, "STRICT-004: selector binds a full-API RefCounted reservation double")
+	_check_eq(w_ok.ts.select_and_reserve(5, 1, w_ok.aq), 0, "STRICT-004: well-formed double selects + proves ownership")
+	_check_eq(rsd_ok.get_reservation_count(), 1, "STRICT-004: happy path stored exactly one reservation")
+
+	# Non-int get_target_for_owner fails closed at the owner check.
+	var rsd_a = M15ReservationDouble.new(); rsd_a.target_for_owner_force = "x"
+	var w_a = _m15_selector_with(rsd_a)
+	_check_eq(w_a.ts.select_and_reserve(5, 1, w_a.aq), -1, "STRICT-004: non-int get_target_for_owner -> -1")
+
+	# Non-Packed get_reserved_indices fails closed.
+	var rsd_b = M15ReservationDouble.new(); rsd_b.reserved_indices_force = [] # Array, not PackedInt32Array
+	var w_b = _m15_selector_with(rsd_b)
+	_check_eq(w_b.ts.select_and_reserve(5, 1, w_b.aq), -1, "STRICT-004: malformed reserved snapshot -> -1")
+
+	# Malformed candidate container fails closed.
+	var rsd_c = M15ReservationDouble.new()
+	var b_c = _make_colored_board(1, 1, [5])
+	var ci_c = CandidateIndexDouble.new(); ci_c.bind(b_c); ci_c.candidates_force = {}
+	rsd_c.bind(b_c)
+	var ts_c = TargetSelector.create(); ts_c.bind(b_c, ci_c, rsd_c)
+	var aq_c = AccessQueryDouble.new(); aq_c.default_targetable = true
+	_check_eq(ts_c.select_and_reserve(5, 1, aq_c), -1, "STRICT-004: non-Array candidate container -> -1")
+
+	# Non-int candidate entries skipped, first int selected.
+	var b_e = _make_colored_board(1, 1, [5])
+	var ci_e = CandidateIndexDouble.new(); ci_e.bind(b_e); ci_e.set_candidates(5, [null, 1.5, "x", Vector2.ZERO, [], {}, 0])
+	var rs_e = ReservationState.create(); rs_e.bind(b_e)
+	var ts_e = TargetSelector.create(); ts_e.bind(b_e, ci_e, rs_e)
+	var aq_e = AccessQueryDouble.new(); aq_e.default_targetable = true
+	_check_eq(ts_e.select_and_reserve(5, 1, aq_e), 0, "STRICT-004: non-int candidate entries skipped, int 0 selected")
+
+	# Non-bool is_reserved fails closed.
+	var rsd_ir = M15ReservationDouble.new(); rsd_ir.is_reserved_force = 1
+	var w_ir = _m15_selector_with(rsd_ir)
+	_check_eq(w_ir.ts.select_and_reserve(5, 1, w_ir.aq), -1, "STRICT-004: non-bool is_reserved -> -1")
+
+	# Non-bool reserve result cannot count as success.
+	var rsd_rv = M15ReservationDouble.new(); rsd_rv.reserve_force = 1; rsd_rv.do_store = false
+	var w_rv = _m15_selector_with(rsd_rv)
+	_check_eq(w_rv.ts.select_and_reserve(5, 1, w_rv.aq), -1, "STRICT-004: non-bool reserve result not success")
+	_check_eq(rsd_rv.get_reservation_count(), 0, "STRICT-004: non-bool reserve created no reservation")
+
+	# ============ F-M15-STRICT-005: post-reserve ownership proof ==============
+	# reserve() true but stores nothing -> -1.
+	var rsd_ns = M15ReservationDouble.new(); rsd_ns.do_store = false
+	var w_ns = _m15_selector_with(rsd_ns)
+	_check_eq(w_ns.ts.select_and_reserve(5, 1, w_ns.aq), -1, "STRICT-005: reserve true but stored nothing -> -1")
+
+	# reserve() true but owner maps to another target -> -1.
+	var rsd_ot = M15ReservationDouble.new(); rsd_ot.store_target_override = 7
+	var w_ot = _m15_selector_with(rsd_ot)
+	_check_eq(w_ot.ts.select_and_reserve(5, 1, w_ot.aq), -1, "STRICT-005: reserve true but owner->other target -> -1")
+
+	# reserve() true but target owned by a different owner -> -1, and that other
+	# owner's entry is NOT removed by rollback.
+	var rsd_oo = M15ReservationDouble.new(); rsd_oo.store_owner_override = 999
+	var w_oo = _m15_selector_with(rsd_oo)
+	_check_eq(w_oo.ts.select_and_reserve(5, 1, w_oo.aq), -1, "STRICT-005: reserve true but target->other owner -> -1")
+	_check_eq(rsd_oo.get_owner(0), 999, "STRICT-005: rollback did not remove the unrelated owner's reservation")
+
+	# Malformed get_owner ownership proof -> -1.
+	var rsd_go = M15ReservationDouble.new(); rsd_go.get_owner_force = "z"
+	var w_go = _m15_selector_with(rsd_go)
+	_check_eq(w_go.ts.select_and_reserve(5, 1, w_go.aq), -1, "STRICT-005: malformed get_owner ownership proof -> -1")
+
+	# ============ F-M15-STRICT-005: operation drift / rollback ================
+	# Drift DURING reserve (candidate index rebinds as a reserve side effect):
+	# selector rolls back only its own exact reservation and returns -1.
+	var bA = _make_colored_board(1, 1, [5])
+	var bB = _make_colored_board(1, 1, [5])
+	var ciA = CandidateIndexDouble.new(); ciA.bind(bA); ciA.set_candidates(5, [0])
+	var rsd_drift = M15ReservationDouble.new(); rsd_drift.bind(bA)
+	var ts_drift = TargetSelector.create(); ts_drift.bind(bA, ciA, rsd_drift)
+	var aq_drift = AccessQueryDouble.new(); aq_drift.default_targetable = true
+	rsd_drift.on_reserve = func(_t, _o): ciA.bind(bB) # candidate drifts to board B mid-reserve
+	_check_eq(ts_drift.select_and_reserve(5, 1, aq_drift), -1, "STRICT-005: drift during reserve -> -1")
+	_check_eq(rsd_drift.get_reservation_count(), 0, "STRICT-005: selector rolled back its own reservation on post-reserve drift")
+
+	# Selector.bind re-entry from targetability callback cannot move the bundle.
+	var rb_bA = _make_colored_board(1, 1, [5])
+	var rb_ciA = ColorCandidateIndex.create(); rb_ciA.bind(rb_bA)
+	var rb_rsA = ReservationState.create(); rb_rsA.bind(rb_bA)
+	var rb_ts = TargetSelector.create(); rb_ts.bind(rb_bA, rb_ciA, rb_rsA)
+	var rb_bB = _make_colored_board(1, 1, [5])
+	var rb_ciB = ColorCandidateIndex.create(); rb_ciB.bind(rb_bB)
+	var rb_rsB = ReservationState.create(); rb_rsB.bind(rb_bB)
+	var rb_aq = AccessQueryDouble.new(); rb_aq.default_targetable = true
+	var rb_fired := [false]
+	rb_aq.on_query = func(_i):
+		if not rb_fired[0]:
+			rb_ts.bind(rb_bB, rb_ciB, rb_rsB) # nested re-bind blocked during selection
+			rb_fired[0] = true
+	rb_ts.select_and_reserve(5, 1, rb_aq)
+	_check(rb_ts.is_bound_to(rb_bA, rb_rsA), "STRICT-005: nested bind did not move selector off bundle A")
+	_check_eq(rb_rsB.get_reservation_count(), 0, "STRICT-005: nested bind created no reservation in bundle B")
+
+	# ReservationState rebind during targetability callback -> drift -> -1.
+	var rr_bA = _make_colored_board(1, 1, [5])
+	var rr_ciA = ColorCandidateIndex.create(); rr_ciA.bind(rr_bA)
+	var rr_rsA = ReservationState.create(); rr_rsA.bind(rr_bA)
+	var rr_ts = TargetSelector.create(); rr_ts.bind(rr_bA, rr_ciA, rr_rsA)
+	var rr_bB = _make_colored_board(1, 1, [5])
+	var rr_aq = AccessQueryDouble.new(); rr_aq.default_targetable = true
+	var rr_fired := [false]
+	rr_aq.on_query = func(_i):
+		if not rr_fired[0]:
+			rr_rsA.rebind(rr_bB) # A's reservation drifts to board B mid-select
+			rr_fired[0] = true
+	_check_eq(rr_ts.select_and_reserve(5, 1, rr_aq), -1, "STRICT-005: reservation rebind mid-select fails closed")
+	_check_eq(rr_rsA.get_reservation_count(), 0, "STRICT-005: no reservation created in the drifted bundle")
+
+	print("  M15 strict-v2 2nd-stage tests complete")
 
 func _run_target_selector_benchmark() -> void:
 	# 59x59 = 3481 cells, all color 0, all ACTIVE (test 30 rectangular below; test 31).
