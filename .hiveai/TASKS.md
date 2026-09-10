@@ -6,9 +6,9 @@
   "currentSprint": "M15-C002 V03 — final transactional closure",
   "currentTaskId": "M15-C002-V03",
   "currentTaskTitle": "Close select-during-bind and post-callback transactional proof gaps in F-M15-STRICT-004/005",
-  "workflowState": "IN_PROGRESS",
-  "requiredActor": "CLAUDE",
-  "nextAction": "Implementing coordination/sessions/M15-C002/CHATGPT_PROMPT_V03.md (remaining F-M15-STRICT-004/005: 005.H/.I/.J); validating against CHATGPT_AUDIT_CRITERIA_V03.md; writing CLAUDE_LOG_V03.md; IN_PROGRESS pushed before any production/test edit; will hand off AWAITING_AUDIT to CHATGPT and push to origin/main.",
+  "workflowState": "AWAITING_AUDIT",
+  "requiredActor": "CHATGPT",
+  "nextAction": "Independently audit M15-C002 V03 against CHATGPT_AUDIT_CRITERIA_V03.md (impl scripts/gameplay/targeting/target_selector.gd; evidence coordination/sessions/M15-C002/CLAUDE_LOG_V03.md; full root suite 3024/3024 green on Godot 4.7.1). Publish CHATGPT_AUDIT_V03.md; on pass, close M15-C002 and issue the frozen M19-C001 V04 remainder.",
   "blockers": [],
   "progress": {
     "scopeType": "main+ui",
@@ -19,7 +19,7 @@
   },
   "lastCompletedTaskId": "FOUNDATION-C001-V01",
   "lastCompletedTaskTitle": "BoardState.set_cell_state canonical ACTIVE/CLEARED guard (FOUNDATION-STRICT-001 closed)",
-  "updatedAt": "2026-09-10T10:42:23Z",
+  "updatedAt": "2026-09-10T10:55:00Z",
   "updatedBy": "CLAUDE"
 }
 HIVEAI_TRACKER_V3_END -->
@@ -31,14 +31,15 @@ HIVEAI_TRACKER_V3_END -->
 - Current milestone: **M15 — TargetSelector upstream repair for M19**
 - Current sprint: **M15-C002 V03 — final transactional closure**
 - Current task: **M15-C002-V03 — Close select-during-bind and post-callback transactional proof gaps in F-M15-STRICT-004/005**
-- Workflow: **IN_PROGRESS**
-- Required actor: **CLAUDE**
-- Next action: Claude is implementing
-  `coordination/sessions/M15-C002/CHATGPT_PROMPT_V03.md` (005.H/.I/.J),
-  validating against `coordination/sessions/M15-C002/CHATGPT_AUDIT_CRITERIA_V03.md`,
-  writing `coordination/sessions/M15-C002/CLAUDE_LOG_V03.md`. IN_PROGRESS pushed
-  before any production/test edit (V02 ordering nonconformance not repeated);
-  will hand off `AWAITING_AUDIT` to CHATGPT and push to `origin/main`.
+- Workflow: **AWAITING_AUDIT**
+- Required actor: **CHATGPT**
+- Next action: ChatGPT independently audits M15-C002 V03 against
+  `coordination/sessions/M15-C002/CHATGPT_AUDIT_CRITERIA_V03.md`. Implementation
+  in `scripts/gameplay/targeting/target_selector.gd`; evidence in
+  `coordination/sessions/M15-C002/CLAUDE_LOG_V03.md`; full root suite
+  **3024/3024** green on Godot **4.7.1** (IN_PROGRESS pushed before any edit,
+  correcting the V02 ordering nonconformance). On pass, close M15-C002 and issue
+  the frozen M19-C001 V04 remainder.
 - Blockers: none for the current M15 task.
 - Audit status: M15-C002 V02 independent audit returned **CHANGES_REQUIRED / SAME_FROZEN_SET / V03_REQUIRED**. V01/V02 hardening is preserved. V03 closes only the remaining select-during-bind, post-targetability owner-query drift, and post-reserve proof-callback ordering/coherence gaps.
 - Process note: V02 durable GitHub commit order was correct, but Claude disclosed that local production/test edits were written before the IN_PROGRESS start transition was pushed. V03 must not repeat that H!veAI ordering nonconformance.
@@ -54,7 +55,7 @@ HIVEAI_TRACKER_V3_END -->
 
 ## Active / Waiting
 
-- [~] **M15-C002-V03** — IN_PROGRESS, actor CLAUDE. Same frozen F-M15-STRICT-004/005 set. Required closure: reject selection during bind transaction (005.H); re-check coherence after the post-targetability owner query (005.I); validate and coherence-check each post-reserve ownership proof callback before the next callback/success, exact rollback on any post-reserve proof failure (005.J). Implementation under way in `scripts/gameplay/targeting/target_selector.gd`; no audit verdict claimed by Claude.
+- [~] **M15-C002-V03** — AWAITING_AUDIT, actor CHATGPT. Same frozen F-M15-STRICT-004/005 set. Closure implemented in `scripts/gameplay/targeting/target_selector.gd`: reject selection during bind transaction (005.H); coherence re-check after the post-targetability owner query (005.I); post-reserve ownership proof bracketed one callback at a time with per-step TYPE_INT + coherence + exact rollback (005.J). Adversarial coverage `_run_target_selector_strict_v05_tests` (incl. removed-coherence sensitivity proof); full root suite 3024/3024 green. No audit verdict claimed by Claude.
 - [~] **M19-C001-V03** — implementation preserved; independent audit completed with CHANGES_REQUIRED. Waiting on M15-C002 V03, then M19 V04 remainder closure.
 
 ## Planned
