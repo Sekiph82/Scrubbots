@@ -21,6 +21,10 @@ var default_traversable: bool = false
 ## Optional exact-identity board binding, so this double can also stand in as a
 ## dispatcher routing_access (which requires is_bound_to). null = unbound.
 var bound_board = null
+## Optional side effect fired inside is_segment_traversable (NOT is_bound_to), so
+## a test can inject reset from a RouteValidator access pass to prove the
+## dispatcher checks generation immediately after _route_ok (F-M19-STRICT-003.D).
+var on_query: Callable = Callable()
 
 ## Bind this double to a board for exact-identity coherence checks.
 func bind_board(board) -> void:
@@ -48,6 +52,8 @@ func open_polyline(points: PackedVector2Array) -> void:
 		open_segment(points[i], points[i + 1])
 
 func is_segment_traversable(from_position: Vector2, to_position: Vector2, target_index: int) -> bool:
+	if on_query.is_valid():
+		on_query.call()
 	var k := _key(from_position, to_position)
 	var verdict: bool
 	if _blocked.has(k):
