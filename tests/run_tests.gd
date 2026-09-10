@@ -115,6 +115,7 @@ func _initialize() -> void:
 	_run_target_selector_strict_v02_tests()
 	_run_target_selector_strict_v03_tests()
 	_run_target_selector_strict_v04_tests()
+	_run_target_selector_strict_v05_tests()
 	_run_target_selector_benchmark()
 	_run_route_request_tests()
 	_run_route_result_tests()
@@ -4949,6 +4950,188 @@ func _run_target_selector_strict_v04_tests() -> void:
 	_check_eq(mo_ts.select_and_reserve(5, 1, mo_aq), -1, "V02: malformed owner query after targetability fails closed")
 
 	print("  M15 strict-v2 V02 tests complete")
+
+func _run_target_selector_strict_v05_tests() -> void:
+	# M15-C002 V03 final transactional closure:
+	#   005.H select-during-bind; 005.I post-targetability owner-query boundary;
+	#   005.J post-reserve proof bracketed one callback at a time.
+	print("---- M15 strict-v2 (V03): select-during-bind + proof bracketing (F-004/005) ----")
+
+	# ===== §1 / 005.H: selection rejected during a bind transaction ============
+	# Candidate bind-time coherence callback injects a nested selection.
+	var hA = _make_colored_board(2, 1, [5, 5])
+	var hciA = ColorCandidateIndex.create(); hciA.bind(hA)
+	var hrsA = ReservationState.create(); hrsA.bind(hA)
+	var hts = TargetSelector.create(); hts.bind(hA, hciA, hrsA)
+	var hB = _make_colored_board(2, 1, [5, 5])
+	var hciB = CandidateIndexDouble.new(); hciB.bind(hB); hciB.set_candidates(5, [0, 1])
+	var hrsB = ReservationState.create(); hrsB.bind(hB)
+	var h_nsel := [99]
+	var h_nq = AccessQueryDouble.new(); h_nq.default_targetable = true
+	var h_fired := [false]
+	hciB.on_is_bound_to = func():
+		if not h_fired[0]:
+			h_fired[0] = true
+			h_nsel[0] = hts.select_and_reserve(5, 7, h_nq) # nested select during outer bind
+	var h_outer = hts.bind(hB, hciB, hrsB)
+	hciB.on_is_bound_to = Callable()
+	_check_eq(h_nsel[0], -1, "005.H: nested selection during candidate bind-time coherence returns -1")
+	_check_eq(h_nq.total_queries(), 0, "005.H: nested selection made zero targetability query")
+	_check_eq(hrsA.get_reservation_count(), 0, "005.H: no orphan reservation in old bundle A (candidate)")
+	_check_eq(hrsB.get_reservation_count(), 0, "005.H: no reservation in bundle B during bind (candidate)")
+	_check(h_outer, "005.H: outer candidate-callback bind to B commits")
+	_check(hts.is_bound_to(hB, hrsB), "005.H: selector ends coherent with bundle B (candidate)")
+	_check(hts.select_and_reserve(5, 8, h_nq) != -1, "005.H: later selection on B succeeds (candidate)")
+
+	# Reservation bind-time coherence callback injects a nested selection.
+	var h2A = _make_colored_board(2, 1, [5, 5])
+	var h2ciA = ColorCandidateIndex.create(); h2ciA.bind(h2A)
+	var h2rsA = ReservationState.create(); h2rsA.bind(h2A)
+	var h2ts = TargetSelector.create(); h2ts.bind(h2A, h2ciA, h2rsA)
+	var h2B = _make_colored_board(2, 1, [5, 5])
+	var h2ciB = ColorCandidateIndex.create(); h2ciB.bind(h2B)
+	var h2rsB = M15ReservationDouble.new(); h2rsB.bind(h2B)
+	var h2_nsel := [99]
+	var h2_nq = AccessQueryDouble.new(); h2_nq.default_targetable = true
+	var h2_fired := [false]
+	h2rsB.on_is_bound_to = func():
+		if not h2_fired[0]:
+			h2_fired[0] = true
+			h2_nsel[0] = h2ts.select_and_reserve(5, 7, h2_nq)
+	var h2_outer = h2ts.bind(h2B, h2ciB, h2rsB)
+	h2rsB.on_is_bound_to = Callable()
+	_check_eq(h2_nsel[0], -1, "005.H: nested selection during reservation bind-time coherence returns -1")
+	_check_eq(h2rsA.get_reservation_count(), 0, "005.H: no orphan reservation in old bundle A (reservation)")
+	_check_eq(h2rsB.get_reservation_count(), 0, "005.H: no reservation in bundle B during bind (reservation)")
+	_check(h2_outer, "005.H: outer reservation-callback bind to B commits")
+	_check(h2ts.is_bound_to(h2B, h2rsB), "005.H: selector ends coherent with bundle B (reservation)")
+	_check(h2ts.select_and_reserve(5, 8, h2_nq) != -1, "005.H: later selection on B succeeds (reservation)")
+
+	# ===== §2 / 005.I: post-targetability owner-query is a full boundary =======
+	# true verdict + candidate drift inside the post-targetability owner query.
+	var ic_b = _make_colored_board(1, 1, [5]); var ic_b2 = _make_colored_board(1, 1, [5])
+	var ic_ci = CandidateIndexDouble.new(); ic_ci.bind(ic_b); ic_ci.set_candidates(5, [0])
+	var ic_rs = M15ReservationDouble.new(); ic_rs.bind(ic_b)
+	var ic_ts = TargetSelector.create(); ic_ts.bind(ic_b, ic_ci, ic_rs)
+	var ic_aq = AccessQueryDouble.new(); ic_aq.default_targetable = true
+	ic_rs.on_owner_query = func():
+		if ic_rs.owner_query_calls == 2: ic_ci.bind(ic_b2) # drift only post-targetability
+	_check_eq(ic_ts.select_and_reserve(5, 1, ic_aq), -1, "005.I: candidate drift in post-targetability owner query -> -1")
+	_check_eq(ic_rs.reserve_calls, 0, "005.I: no reserve after candidate owner-query drift")
+	_check_eq(ic_rs.get_reservation_count(), 0, "005.I: no reservation after candidate owner-query drift")
+
+	# true verdict + ReservationState drift inside the post-targetability owner query.
+	var ir_b = _make_colored_board(1, 1, [5]); var ir_b2 = _make_colored_board(1, 1, [5])
+	var ir_ci = ColorCandidateIndex.create(); ir_ci.bind(ir_b)
+	var ir_rs = M15ReservationDouble.new(); ir_rs.bind(ir_b)
+	var ir_ts = TargetSelector.create(); ir_ts.bind(ir_b, ir_ci, ir_rs)
+	var ir_aq = AccessQueryDouble.new(); ir_aq.default_targetable = true
+	ir_rs.on_owner_query = func():
+		if ir_rs.owner_query_calls == 2: ir_rs.rebind(ir_b2) # reservation drifts post-targetability
+	_check_eq(ir_ts.select_and_reserve(5, 1, ir_aq), -1, "005.I: reservation drift in post-targetability owner query -> -1")
+	_check_eq(ir_rs.reserve_calls, 0, "005.I: no reserve after reservation owner-query drift")
+
+	# false verdict + owner-query drift: stops before later candidate targetability.
+	var if_b = _make_colored_board(2, 1, [5, 5]); var if_b2 = _make_colored_board(2, 1, [5, 5])
+	var if_ci = CandidateIndexDouble.new(); if_ci.bind(if_b); if_ci.set_candidates(5, [0, 1])
+	var if_rs = M15ReservationDouble.new(); if_rs.bind(if_b)
+	var if_ts = TargetSelector.create(); if_ts.bind(if_b, if_ci, if_rs)
+	var if_aq = AccessQueryDouble.new(); if_aq.default_targetable = false # false verdict
+	if_rs.on_owner_query = func():
+		if if_rs.owner_query_calls == 2: if_ci.bind(if_b2)
+	_check_eq(if_ts.select_and_reserve(5, 1, if_aq), -1, "005.I: false-verdict owner-query drift -> -1")
+	_check(not if_aq.was_queried(1), "005.I: no later candidate targetability query after owner-query drift")
+
+	# non-bool verdict + owner-query drift.
+	var inb_b = _make_colored_board(1, 1, [5]); var inb_b2 = _make_colored_board(1, 1, [5])
+	var inb_ci = CandidateIndexDouble.new(); inb_ci.bind(inb_b); inb_ci.set_candidates(5, [0])
+	var inb_rs = M15ReservationDouble.new(); inb_rs.bind(inb_b)
+	var inb_ts = TargetSelector.create(); inb_ts.bind(inb_b, inb_ci, inb_rs)
+	var inb_aq = M15VariantAccess.new(); inb_aq.verdict = 1 # non-bool
+	inb_rs.on_owner_query = func():
+		if inb_rs.owner_query_calls == 2: inb_ci.bind(inb_b2)
+	_check_eq(inb_ts.select_and_reserve(5, 1, inb_aq), -1, "005.I: non-bool-verdict owner-query drift -> -1")
+	_check_eq(inb_rs.reserve_calls, 0, "005.I: no reserve after non-bool owner-query drift")
+
+	# ===== §3 / 005.J: post-reserve proof bracketed one callback at a time =====
+	# Baseline: ordered happy path — get_owner called once, after reserve.
+	var jb_rsd = M15ReservationDouble.new()
+	var jb_w = _m15_selector_with(jb_rsd)
+	_check_eq(jb_w.ts.select_and_reserve(5, 1, jb_w.aq), 0, "005.J: ordered happy path returns target 0")
+	_check_eq(jb_rsd.reserve_calls, 1, "005.J: happy path reserved once")
+	_check_eq(jb_rsd.get_owner_calls, 1, "005.J: get_owner proof called exactly once after reserve")
+
+	# get_owner callback drifts candidate while returning the correct owner.
+	var jg_b = _make_colored_board(1, 1, [5]); var jg_b2 = _make_colored_board(1, 1, [5])
+	var jg_ci = CandidateIndexDouble.new(); jg_ci.bind(jg_b); jg_ci.set_candidates(5, [0])
+	var jg_rs = M15ReservationDouble.new(); jg_rs.bind(jg_b)
+	jg_rs.reserve(9, 777) # unrelated reservation
+	var jg_ts = TargetSelector.create(); jg_ts.bind(jg_b, jg_ci, jg_rs)
+	var jg_aq = AccessQueryDouble.new(); jg_aq.default_targetable = true
+	var jg_fired := [false]
+	jg_rs.on_get_owner = func():
+		if not jg_fired[0]:
+			jg_fired[0] = true
+			jg_ci.bind(jg_b2) # drift candidate during get_owner proof
+	var jg_owner_q_before: int = jg_rs.owner_query_calls
+	_check_eq(jg_ts.select_and_reserve(5, 1, jg_aq), -1, "005.J: get_owner candidate drift -> -1")
+	_check_eq(jg_rs.owner_query_calls, jg_owner_q_before + 2, "005.J: target-proof NOT called after get_owner drift (only initial + post-targetability owner queries ran)")
+	_check_eq(jg_rs.get_reservation_count(), 1, "005.J: exact pair rolled back, unrelated reservation preserved (get_owner candidate drift)")
+	_check_eq(jg_rs.get_owner(9), 777, "005.J: unrelated (9,777) reservation intact")
+
+	# get_owner callback drifts ReservationState while returning correct owner.
+	var jgr_b = _make_colored_board(1, 1, [5]); var jgr_b2 = _make_colored_board(1, 1, [5])
+	var jgr_ci = ColorCandidateIndex.create(); jgr_ci.bind(jgr_b)
+	var jgr_rs = M15ReservationDouble.new(); jgr_rs.bind(jgr_b)
+	var jgr_ts = TargetSelector.create(); jgr_ts.bind(jgr_b, jgr_ci, jgr_rs)
+	var jgr_fired := [false]
+	jgr_rs.on_get_owner = func():
+		if not jgr_fired[0]:
+			jgr_fired[0] = true
+			jgr_rs.rebind(jgr_b2) # reservation drifts during get_owner proof
+	var jgr_aq = AccessQueryDouble.new(); jgr_aq.default_targetable = true
+	_check_eq(jgr_ts.select_and_reserve(5, 1, jgr_aq), -1, "005.J: get_owner ReservationState drift -> -1")
+	_check_eq(jgr_rs.get_reservation_count(), 0, "005.J: no replacement/orphan reservation after get_owner reservation drift")
+
+	# target-proof callback drifts candidate while returning correct target.
+	var jt_b = _make_colored_board(1, 1, [5]); var jt_b2 = _make_colored_board(1, 1, [5])
+	var jt_ci = CandidateIndexDouble.new(); jt_ci.bind(jt_b); jt_ci.set_candidates(5, [0])
+	var jt_rs = M15ReservationDouble.new(); jt_rs.bind(jt_b)
+	jt_rs.reserve(9, 777) # unrelated reservation
+	var jt_ts = TargetSelector.create(); jt_ts.bind(jt_b, jt_ci, jt_rs)
+	var jt_aq = AccessQueryDouble.new(); jt_aq.default_targetable = true
+	jt_rs.on_owner_query = func():
+		if jt_rs.owner_query_calls == 3: jt_ci.bind(jt_b2) # drift on the target-proof query
+	_check_eq(jt_ts.select_and_reserve(5, 1, jt_aq), -1, "005.J: target-proof candidate drift -> -1")
+	_check_eq(jt_rs.get_reservation_count(), 1, "005.J: exact pair rolled back, unrelated preserved (target-proof candidate drift)")
+	_check_eq(jt_rs.get_owner(9), 777, "005.J: unrelated (9,777) intact after target-proof drift")
+
+	# target-proof callback drifts ReservationState while returning correct target.
+	var jtr_b = _make_colored_board(1, 1, [5]); var jtr_b2 = _make_colored_board(1, 1, [5])
+	var jtr_ci = ColorCandidateIndex.create(); jtr_ci.bind(jtr_b)
+	var jtr_rs = M15ReservationDouble.new(); jtr_rs.bind(jtr_b)
+	var jtr_ts = TargetSelector.create(); jtr_ts.bind(jtr_b, jtr_ci, jtr_rs)
+	var jtr_aq = AccessQueryDouble.new(); jtr_aq.default_targetable = true
+	jtr_rs.on_owner_query = func():
+		if jtr_rs.owner_query_calls == 3: jtr_rs.rebind(jtr_b2)
+	_check_eq(jtr_ts.select_and_reserve(5, 1, jtr_aq), -1, "005.J: target-proof ReservationState drift -> -1")
+	_check_eq(jtr_rs.get_reservation_count(), 0, "005.J: no orphan after target-proof reservation drift")
+
+	# malformed get_owner: target-proof callback NOT invoked after known failure.
+	var jm_b = _make_colored_board(1, 1, [5])
+	var jm_ci = CandidateIndexDouble.new(); jm_ci.bind(jm_b); jm_ci.set_candidates(5, [0])
+	var jm_rs = M15ReservationDouble.new(); jm_rs.bind(jm_b)
+	jm_rs.reserve(9, 777) # unrelated reservation
+	jm_rs.get_owner_force = "z" # malformed proof
+	var jm_ts = TargetSelector.create(); jm_ts.bind(jm_b, jm_ci, jm_rs)
+	var jm_aq = AccessQueryDouble.new(); jm_aq.default_targetable = true
+	var jm_q_before: int = jm_rs.owner_query_calls
+	_check_eq(jm_ts.select_and_reserve(5, 1, jm_aq), -1, "005.J: malformed get_owner -> -1")
+	_check_eq(jm_rs.owner_query_calls, jm_q_before + 2, "005.J: target-proof query NOT invoked after malformed get_owner (only initial + post-targetability)")
+	_check_eq(jm_rs.get_reservation_count(), 1, "005.J: exact pair rolled back, unrelated preserved (malformed get_owner)")
+	_check_eq(jm_rs.get_owner_calls, 1, "005.J: get_owner proof invoked exactly once")
+
+	print("  M15 strict-v2 V03 tests complete")
 
 func _run_target_selector_benchmark() -> void:
 	# 59x59 = 3481 cells, all color 0, all ACTIVE (test 30 rectangular below; test 31).

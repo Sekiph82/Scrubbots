@@ -32,12 +32,18 @@ var store_owner_override: int = _NONE   ## store idx under this owner instead of
 var target_for_owner_force_after_reserve = null
 var _did_reserve: bool = false
 
+## Call counters for direct proof-ordering observability (V03 §5).
+var get_owner_calls: int = 0
+var owner_query_calls: int = 0
+var reserve_calls: int = 0
+
 ## Boundary side-effect hooks (drift/re-entry injection). Each fires inside the
 ## matching method before it returns. Tests guard with their own fired-once flag.
 var on_is_bound_to: Callable = Callable()      ## fires in is_bound_to()
 var on_owner_query: Callable = Callable()      ## fires in get_target_for_owner()
 var on_reserved_snapshot: Callable = Callable()## fires in get_reserved_indices()
 var on_is_reserved: Callable = Callable()      ## fires in is_reserved()
+var on_get_owner: Callable = Callable()        ## fires in get_owner()
 var on_reserve: Callable = Callable()          ## fires in reserve()
 
 func bind(board) -> bool:
@@ -79,11 +85,15 @@ func is_reserved(target_index: int):
 	return _t2o.has(target_index)
 
 func get_owner(target_index: int):
+	get_owner_calls += 1
+	if on_get_owner.is_valid():
+		on_get_owner.call()
 	if get_owner_force != null:
 		return get_owner_force
 	return _t2o.get(target_index, -1)
 
 func get_target_for_owner(owner_id: int):
+	owner_query_calls += 1
 	if on_owner_query.is_valid():
 		on_owner_query.call()
 	if target_for_owner_force != null:
@@ -93,6 +103,7 @@ func get_target_for_owner(owner_id: int):
 	return _o2t.get(owner_id, -1)
 
 func reserve(target_index: int, owner_id: int):
+	reserve_calls += 1
 	_did_reserve = true
 	if on_reserve.is_valid():
 		on_reserve.call(target_index, owner_id)

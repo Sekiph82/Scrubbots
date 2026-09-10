@@ -173,10 +173,15 @@ func is_bound_to(board, reservation_state) -> bool:
 ## captured at entry. Any drift/rebind detected after a collaborator boundary
 ## fails the operation closed (-1) and never reserves through a foreign bundle.
 func select_and_reserve(color_id: int, owner_id: int, access_query) -> int:
-	# Reject recursive/re-entrant selection immediately, BEFORE any collaborator
-	# callback and with zero mutation. A nested select_and_reserve() injected from
-	# a targetability/candidate/reservation callback returns -1 (F-M15-STRICT-005.B).
-	if _in_selection:
+	# Reject re-entrant selection immediately, BEFORE any collaborator callback and
+	# with zero mutation:
+	#   - during an active selection: a nested select_and_reserve() injected from a
+	#     targetability/candidate/reservation callback returns -1 (F-M15-STRICT-005.B);
+	#   - during a bind transaction: a nested select injected from a bind-time
+	#     candidate/reservation is_bound_to() callback returns -1 so it can never run
+	#     against the OLD bundle and leave an orphan reservation while the outer
+	#     bind is mid-commit (F-M15-STRICT-005.H).
+	if _in_selection or _in_bind:
 		return -1
 	if not _bound or _board == null or _candidate_index == null or _reservations == null:
 		return -1
@@ -292,14 +297,19 @@ func _select_core(color_id: int, owner_id: int, access_query, board, ci, rs, gen
 		var verdict = access_query.is_targetable(idx)
 		if not _op_coherent(board, ci, rs, gen):
 			return -1
-		# The targetability callback may have independently assigned owner_id a
-		# target (same-owner side effect) REGARDLESS of the verdict value. Once the
-		# owner holds a target, stop immediately: preserve that external reservation
-		# and query no later candidate (historical contention law,
-		# F-M15-STRICT-005.F). Validate the owner query is an actual int first.
+		# The post-targetability owner query is itself a full external collaborator
+		# boundary (F-M15-STRICT-005.I): the callback may have independently assigned
+		# owner_id a target (same-owner side effect, F-M15-STRICT-005.F) AND/OR drifted
+		# candidate/reservation state while returning a normal int. So: call it,
+		# validate TYPE_INT, THEN re-check operation coherence, and only then branch on
+		# owner assignment / verdict. Detected drift stops here — no reserve, no later
+		# candidate targetability query.
 		var owned_after = rs.get_target_for_owner(owner_id)
 		if typeof(owned_after) != TYPE_INT:
 			return -1
+		if not _op_coherent(board, ci, rs, gen):
+			return -1
+		# Owner already holds a target -> stop, preserving that external reservation.
 		if owned_after != -1:
 			return -1
 		# Verdict accepted ONLY on actual bool-true; otherwise skip this candidate.
@@ -316,17 +326,38 @@ func _select_core(color_id: int, owner_id: int, access_query, board, ci, rs, gen
 			_rollback_own(rs, idx, owner_id)
 			return -1
 		if ok:
-			# reserve succeeded. Prove nothing drifted during reserve and that the
-			# store is exact atomic ownership before returning (F-M15-STRICT-005).
-			# ANY post-reserve coherence/proof failure rolls back the exact requested
-			# pair directly (never gated on the possibly-malformed ownership query).
+			# reserve succeeded. Prove exact atomic ownership before returning, with
+			# each ownership-proof callback transactionally bracketed one at a time
+			# (F-M15-STRICT-005.J): after reserve and after EACH proof callback, verify
+			# coherence; validate each return type immediately; on any malformed return
+			# or detected drift, exact-pair rollback and return -1 WITHOUT invoking the
+			# next proof callback.
+			#
+			# Step 1: coherence after reserve.
 			if not _op_coherent(board, ci, rs, gen):
 				_rollback_own(rs, idx, owner_id)
 				return -1
+			# Step 2: get_owner proof callback; validate TYPE_INT immediately.
 			var owner_of = rs.get_owner(idx)
+			if typeof(owner_of) != TYPE_INT:
+				# Known failure: roll back and return WITHOUT the target-proof callback.
+				_rollback_own(rs, idx, owner_id)
+				return -1
+			# Step 3: coherence after the get_owner callback (before target proof).
+			if not _op_coherent(board, ci, rs, gen):
+				_rollback_own(rs, idx, owner_id)
+				return -1
+			# Step 4: get_target_for_owner proof callback; validate TYPE_INT immediately.
 			var target_of = rs.get_target_for_owner(owner_id)
-			if typeof(owner_of) != TYPE_INT or typeof(target_of) != TYPE_INT \
-					or owner_of != owner_id or target_of != idx:
+			if typeof(target_of) != TYPE_INT:
+				_rollback_own(rs, idx, owner_id)
+				return -1
+			# Step 5: coherence after the target-proof callback (before success).
+			if not _op_coherent(board, ci, rs, gen):
+				_rollback_own(rs, idx, owner_id)
+				return -1
+			# Step 6: exact owner/target identity, only after both typed + coherent.
+			if owner_of != owner_id or target_of != idx:
 				_rollback_own(rs, idx, owner_id)
 				return -1
 			return idx
