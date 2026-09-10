@@ -6,9 +6,9 @@
   "currentSprint": "M15-C002 V02 — transactional closure and adversarial validation",
   "currentTaskId": "M15-C002-V02",
   "currentTaskTitle": "Close remaining F-M15-STRICT-004/005 transaction, re-entry and rollback gaps",
-  "workflowState": "CHANGES_REQUIRED",
+  "workflowState": "IN_PROGRESS",
   "requiredActor": "CLAUDE",
-  "nextAction": "Implement coordination/sessions/M15-C002/CHATGPT_PROMPT_V02.md; validate against CHATGPT_AUDIT_CRITERIA_V02.md; write CLAUDE_LOG_V02.md; follow H!veAI IN_PROGRESS -> AWAITING_AUDIT lifecycle and push to origin/main.",
+  "nextAction": "Implementing coordination/sessions/M15-C002/CHATGPT_PROMPT_V02.md (remaining F-M15-STRICT-004/005); validating against CHATGPT_AUDIT_CRITERIA_V02.md; writing CLAUDE_LOG_V02.md; will hand off AWAITING_AUDIT to CHATGPT and push to origin/main.",
   "blockers": [],
   "progress": {
     "scopeType": "main+ui",
@@ -19,8 +19,8 @@
   },
   "lastCompletedTaskId": "FOUNDATION-C001-V01",
   "lastCompletedTaskTitle": "BoardState.set_cell_state canonical ACTIVE/CLEARED guard (FOUNDATION-STRICT-001 closed)",
-  "updatedAt": "2026-09-10T09:05:17Z",
-  "updatedBy": "CHATGPT"
+  "updatedAt": "2026-09-10T09:47:01Z",
+  "updatedBy": "CLAUDE"
 }
 HIVEAI_TRACKER_V3_END -->
 
@@ -31,13 +31,13 @@ HIVEAI_TRACKER_V3_END -->
 - Current milestone: **M15 — TargetSelector upstream repair for M19**
 - Current sprint: **M15-C002 V02 — transactional closure and adversarial validation**
 - Current task: **M15-C002-V02 — Close remaining F-M15-STRICT-004/005 transaction, re-entry and rollback gaps**
-- Workflow: **CHANGES_REQUIRED**
+- Workflow: **IN_PROGRESS**
 - Required actor: **CLAUDE**
-- Next action: Implement
-  `coordination/sessions/M15-C002/CHATGPT_PROMPT_V02.md`, validate against
-  `coordination/sessions/M15-C002/CHATGPT_AUDIT_CRITERIA_V02.md`, write
-  `coordination/sessions/M15-C002/CLAUDE_LOG_V02.md`, follow the canonical
-  H!veAI `IN_PROGRESS -> AWAITING_AUDIT` lifecycle, and push to `origin/main`.
+- Next action: Claude is implementing
+  `coordination/sessions/M15-C002/CHATGPT_PROMPT_V02.md`, validating against
+  `coordination/sessions/M15-C002/CHATGPT_AUDIT_CRITERIA_V02.md`, writing
+  `coordination/sessions/M15-C002/CLAUDE_LOG_V02.md`, and will hand off
+  `AWAITING_AUDIT` to CHATGPT and push to `origin/main`.
 - Blockers: none for the current M15 task.
 - Audit status: M15-C002 V01 independent audit returned **CHANGES_REQUIRED / SAME_FROZEN_SET / V02_REQUIRED**. V01 hardening is preserved; V02 closes the remaining transaction-guard, recursive-selection, per-boundary coherence and exact rollback gaps.
 - M19 status: **waiting**. M19-C001 V03 implementation remains preserved. Do not issue/execute M19 V04 until M15-C002 independently passes.
@@ -52,7 +52,7 @@ HIVEAI_TRACKER_V3_END -->
 
 ## Active / Waiting
 
-- [~] **M15-C002-V02** — CHANGES_REQUIRED, actor CLAUDE. Same frozen F-M15-STRICT-004/005 set. Required closure includes guard-before-first-coherence, recursive-select rejection, bind transaction re-entry protection, coherence after every collaborator boundary, mutation-before-malformed-return rollback, malformed ownership-proof cleanup, and same-owner no-later-query preservation.
+- [~] **M15-C002-V02** — IN_PROGRESS, actor CLAUDE. Same frozen F-M15-STRICT-004/005 set. Required closure includes guard-before-first-coherence, recursive-select rejection, bind transaction re-entry protection, coherence after every collaborator boundary, mutation-before-malformed-return rollback, malformed ownership-proof cleanup, and same-owner no-later-query preservation. Implementation under way in `scripts/gameplay/targeting/target_selector.gd`; no audit verdict claimed by Claude.
 - [~] **M19-C001-V03** — implementation preserved; independent audit completed with CHANGES_REQUIRED. Waiting on M15-C002 V02, then M19 V04 remainder closure.
 
 ## Planned
