@@ -43,6 +43,14 @@ var _board = null
 var _candidate_index = null
 var _reservations = null
 var _bound: bool = false
+## Monotonic bind generation. Incremented on every successful bind so an active
+## select operation can prove the selector was not rebound underneath it
+## (F-M15-STRICT-005 snapshot token).
+var _bind_generation: int = 0
+## True only while select_and_reserve() is running. Guards bind() against
+## re-entrant callbacks that would otherwise move the selector to a foreign
+## bundle mid-selection (F-M15-STRICT-005).
+var _in_selection: bool = false
 
 ## Matches the sibling-module convention: returns the real instance, typed as
 ## RefCounted because self-referential static typing is unreliable headless.
@@ -52,23 +60,37 @@ static func create() -> RefCounted:
 ## Narrow required API surfaces (strict-v2, F-M15-STRICT-001): bind validates that
 ## each non-null dependency actually implements the methods M15 uses, so a
 ## malformed double fails closed at the boundary instead of erroring mid-select.
-const _BOARD_API := ["is_valid_index", "get_cell_state", "get_color_id"]
 const _CANDIDATE_API := ["get_candidates", "is_bound_to"]
-const _RESERVATION_API := ["reserve", "get_target_for_owner", "get_reserved_indices", "is_reserved", "is_bound_to"]
+## Full reservation API M15 depends on, incl. release/get_owner used by the
+## post-reserve ownership proof and exact-entry rollback (F-M15-STRICT-004/005).
+const _RESERVATION_API := ["reserve", "release", "get_target_for_owner", "get_owner", "get_reserved_indices", "is_reserved", "is_bound_to"]
 
 ## Bind the three narrow dependencies. Fails closed (returns false, stays UNBOUND,
-## clears any prior refs) when a dependency is null, is a non-null object missing
-## the narrow required API (F-M15-STRICT-001), or when the candidate index /
-## reservation state are not bound to the SAME BoardState instance passed here
-## (F-M15-STRICT-002). The access_query is NOT bound here — it is passed per call,
-## because reachability truth is call-time state supplied by the caller.
+## clears any prior refs) when:
+##   - the board is not a real BoardState (F-M15-STRICT-004: category, not just
+##     method-name compatibility — a method-compatible Node is rejected);
+##   - the candidate index / reservation state are not RefCounted objects
+##     exposing the full narrow required API;
+##   - the candidate index / reservation state are not exact-bound to the SAME
+##     BoardState instance passed here, proven by an ACTUAL bool-true is_bound_to
+##     (F-M15-STRICT-002/004: a non-bool true-ish value does not pass).
+## The access_query is NOT bound here — it is passed per call, because
+## reachability truth is call-time state supplied by the caller.
+##
+## While a select_and_reserve() operation is active, bind() fails closed WITHOUT
+## touching the active operation's binding (F-M15-STRICT-005): a re-entrant bind
+## from an access/candidate/reservation callback cannot move the selector to a
+## different bundle.
 func bind(board, candidate_index, reservation_state) -> bool:
-	if board == null or candidate_index == null or reservation_state == null \
-			or not _has_methods(board, _BOARD_API) \
-			or not _has_methods(candidate_index, _CANDIDATE_API) \
-			or not _has_methods(reservation_state, _RESERVATION_API) \
-			or not candidate_index.is_bound_to(board) \
-			or not reservation_state.is_bound_to(board):
+	# Re-entrant bind during an active selection is refused and preserves the
+	# original operation binding untouched (no _clear_binding, no field change).
+	if _in_selection:
+		return false
+	if not (board is BoardState) \
+			or not (candidate_index is RefCounted) or not _has_methods(candidate_index, _CANDIDATE_API) \
+			or not (reservation_state is RefCounted) or not _has_methods(reservation_state, _RESERVATION_API) \
+			or not _bool_true(candidate_index.is_bound_to(board)) \
+			or not _bool_true(reservation_state.is_bound_to(board)):
 		# Any failure neutralizes prior state so stale deps cannot be reused.
 		_clear_binding()
 		return false
@@ -76,6 +98,7 @@ func bind(board, candidate_index, reservation_state) -> bool:
 	_candidate_index = candidate_index
 	_reservations = reservation_state
 	_bound = true
+	_bind_generation += 1
 	return true
 
 func _clear_binding() -> void:
@@ -89,6 +112,11 @@ static func _has_methods(obj, names) -> bool:
 		if not obj.has_method(n):
 			return false
 	return true
+
+## Strict truthiness: only an ACTUAL TYPE_BOOL true passes. A non-bool true-ish
+## value (int 1, "x", an object, …) never counts as approval (F-M15-STRICT-004).
+static func _bool_true(v) -> bool:
+	return typeof(v) == TYPE_BOOL and v == true
 
 func is_bound() -> bool:
 	return _bound
@@ -119,56 +147,143 @@ func is_bound_to(board, reservation_state) -> bool:
 ##   - every reservation attempt lost to a competing synchronous assignment.
 ##
 ## No exception, no dispatch, no route request, no board mutation.
+##
+## strict-v2 second stage (F-M15-STRICT-004/005): every dynamic collaborator
+## return is validated before typed use, the injected access_query is category-
+## and verdict-checked, and the whole operation runs against an immutable
+## snapshot of (board, candidate index, reservation state, bind generation)
+## captured at entry. Any drift/rebind detected after a collaborator boundary
+## fails the operation closed (-1) and never reserves through a foreign bundle.
 func select_and_reserve(color_id: int, owner_id: int, access_query) -> int:
 	if not _bound or _board == null or _candidate_index == null or _reservations == null:
 		return -1
-	# strict-v2 (F-M15-STRICT-002): re-check dependency board coherence on EVERY
-	# call — a sibling dependency may have been rebound to a different board after
-	# selector bind. A mismatch fails closed with no candidate work, no reservation.
-	if not _candidate_index.is_bound_to(_board) or not _reservations.is_bound_to(_board):
-		return -1
-	# Fail closed: never assume reachability without an authoritative query.
-	if access_query == null or not access_query.has_method("is_targetable"):
+	# access_query boundary (F-M15-STRICT-004): must be a RefCounted exposing
+	# is_targetable. `is RefCounted` short-circuits BEFORE any has_method call, so
+	# a scalar/String/Vector2/Array/Dictionary never reaches has_method and a
+	# method-compatible Node is rejected on category.
+	if not (access_query is RefCounted) or not access_query.has_method("is_targetable"):
 		return -1
 	if owner_id < 0:
 		return -1
 	if color_id < 0:
 		return -1
-	# One target per owner: an owner already holding a reservation gets nothing.
-	if _reservations.get_target_for_owner(owner_id) != -1:
+	# Immutable operation snapshot (F-M15-STRICT-005).
+	var board = _board
+	var ci = _candidate_index
+	var rs = _reservations
+	var gen := _bind_generation
+	# Initial coherence probe: original deps still exact-bound to original board,
+	# proven by actual bool-true (also the per-call F-M15-STRICT-002 re-check).
+	if not _op_coherent(board, ci, rs, gen):
+		return -1
+	# Guard the whole operation so any re-entrant bind() from a callback fails
+	# closed and cannot move the selector to another bundle.
+	_in_selection = true
+	var result := _select_core(color_id, owner_id, access_query, board, ci, rs, gen)
+	_in_selection = false
+	return result
+
+## True only when the ORIGINAL operation snapshot is still intact: the bind
+## generation is unchanged, the selector still holds exactly the snapshot deps,
+## and both deps still return ACTUAL bool-true is_bound_to for the snapshot board.
+func _op_coherent(board, ci, rs, gen) -> bool:
+	if gen != _bind_generation or not _bound:
+		return false
+	if _board != board or _candidate_index != ci or _reservations != rs:
+		return false
+	if not _bool_true(ci.is_bound_to(board)):
+		return false
+	if not _bool_true(rs.is_bound_to(board)):
+		return false
+	return true
+
+## Release only THIS operation's exact (idx, owner) reservation entry, if it
+## exists — never an unrelated/competing reservation (F-M15-STRICT-005 rollback).
+func _rollback_own(rs, idx: int, owner_id: int) -> void:
+	var o = rs.get_owner(idx)
+	if typeof(o) == TYPE_INT and o == owner_id:
+		rs.release(idx, owner_id)
+
+func _select_core(color_id: int, owner_id: int, access_query, board, ci, rs, gen) -> int:
+	# One target per owner. get_target_for_owner MUST be an int; malformed fails
+	# closed with no reservation (F-M15-STRICT-004).
+	var owned = rs.get_target_for_owner(owner_id)
+	if typeof(owned) != TYPE_INT:
+		return -1
+	if owned != -1:
+		return -1
+	if not _op_coherent(board, ci, rs, gen):
 		return -1
 
-	# Raw ascending candidates minus already-reserved targets. ColorCandidateIndex
-	# returns a detached, row-major-ordered copy; we never mutate its truth.
-	var excluded: PackedInt32Array = _reservations.get_reserved_indices()
-	var candidates: Array = _candidate_index.get_candidates(color_id, excluded)
+	# Reserved snapshot MUST be a PackedInt32Array; candidate list MUST be an Array.
+	var excluded = rs.get_reserved_indices()
+	if typeof(excluded) != TYPE_PACKED_INT32_ARRAY:
+		return -1
+	if not _op_coherent(board, ci, rs, gen):
+		return -1
+	var candidates = ci.get_candidates(color_id, excluded)
+	if typeof(candidates) != TYPE_ARRAY:
+		return -1
+	if not _op_coherent(board, ci, rs, gen):
+		return -1
 
-	for idx in candidates:
-		# Narrow final validation against live BoardState truth (guards stale
-		# upstream candidate data — AL-028 / prompt step order).
-		if not _board.is_valid_index(idx):
+	for entry in candidates:
+		# Each candidate entry MUST be an int before any BoardState call; other
+		# entry types are skipped fail-closed, never faulted on.
+		if typeof(entry) != TYPE_INT:
 			continue
-		if _board.get_cell_state(idx) != BoardState.CellState.ACTIVE:
+		var idx: int = entry
+		# Narrow final validation against live BoardState truth (AL-028).
+		if not board.is_valid_index(idx):
 			continue
-		if _board.get_color_id(idx) != color_id:
+		if board.get_cell_state(idx) != BoardState.CellState.ACTIVE:
 			continue
-		if _reservations.is_reserved(idx):
+		if board.get_color_id(idx) != color_id:
 			continue
-		# Authoritative reachability/access truth — blocked cells are skipped.
-		if not access_query.is_targetable(idx):
+		# is_reserved MUST be a bool; a malformed verdict aborts fail-closed.
+		var reserved = rs.is_reserved(idx)
+		if typeof(reserved) != TYPE_BOOL:
+			return -1
+		if reserved:
 			continue
-		# Atomic ownership gate. If it loses to a competing synchronous
-		# assignment that grabbed this target between the checks above and here,
-		# the owner still holds nothing, so continue to the next candidate.
-		if _reservations.reserve(idx, owner_id):
+		if not _op_coherent(board, ci, rs, gen):
+			return -1
+		# Authoritative reachability/access truth. The verdict is accepted ONLY on
+		# actual bool-true; the callback can run arbitrary side effects, so re-check
+		# operation coherence immediately after it (the primary drift seam).
+		var verdict = access_query.is_targetable(idx)
+		if not _op_coherent(board, ci, rs, gen):
+			return -1
+		if not _bool_true(verdict):
+			continue
+		# Atomic ownership gate. reserve MUST return a bool; only actual true is a
+		# success. A non-bool return is never treated as success.
+		var ok = rs.reserve(idx, owner_id)
+		if typeof(ok) != TYPE_BOOL:
+			return -1
+		if ok:
+			# reserve succeeded. Prove nothing drifted during reserve and that the
+			# store is exact atomic ownership before returning (F-M15-STRICT-005).
+			if not _op_coherent(board, ci, rs, gen):
+				_rollback_own(rs, idx, owner_id)
+				return -1
+			var owner_of = rs.get_owner(idx)
+			var target_of = rs.get_target_for_owner(owner_id)
+			if typeof(owner_of) != TYPE_INT or typeof(target_of) != TYPE_INT \
+					or owner_of != owner_id or target_of != idx:
+				_rollback_own(rs, idx, owner_id)
+				return -1
 			return idx
-		# strict-v2 (F-M15-STRICT-003): the reserve lost. Re-check THIS owner —
-		# an access-query side effect may have assigned owner_id another target
-		# between access approval and here. If the owner is now assigned, stop
-		# immediately: do not query later candidates and do not create another
-		# reservation. (Different-owner contention leaves owner_id unassigned, so
-		# it falls through and continues to the next candidate, as before.)
-		if _reservations.get_target_for_owner(owner_id) != -1:
+		# reserve returned actual false: the reserve lost. Re-check THIS owner —
+		# a same-owner access-query side effect may have assigned owner_id another
+		# target. If so, stop immediately (no later candidates, no new reservation).
+		# Different-owner contention leaves owner_id unassigned and continues.
+		var owned2 = rs.get_target_for_owner(owner_id)
+		if typeof(owned2) != TYPE_INT:
+			return -1
+		if owned2 != -1:
+			return -1
+		if not _op_coherent(board, ci, rs, gen):
 			return -1
 
 	return -1

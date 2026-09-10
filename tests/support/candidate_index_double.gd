@@ -16,6 +16,10 @@ var by_color: Dictionary = {}
 ## TargetSelector.bind()'s coherence gate.
 var _board = null
 
+## When non-null, get_candidates returns this verbatim (used to inject a
+## malformed non-Array candidate container for the strict-v2 boundary tests).
+var candidates_force = null
+
 func set_candidates(color_id: int, indices: Array) -> void:
 	by_color[color_id] = indices.duplicate()
 
@@ -26,7 +30,9 @@ func bind(board) -> void:
 func is_bound_to(board) -> bool:
 	return _board != null and _board == board
 
-func get_candidates(color_id: int, excluded = []) -> Array:
+func get_candidates(color_id: int, excluded = []):
+	if candidates_force != null:
+		return candidates_force
 	var base: Array = by_color.get(color_id, [])
 	if excluded == null or excluded.is_empty():
 		return base.duplicate()
