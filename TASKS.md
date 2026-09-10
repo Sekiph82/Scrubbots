@@ -5,11 +5,11 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M20
-- Current Sprint: M20-C001 PREP — Complete Clearing Vertical Slice strict-v2 full-surface audit/prompt issuance
-- Current Task: M20-C001-PREP — ChatGPT inspects the current M20 integration surface and freezes the implementation/audit contract before Claude implementation
-- Current Task Status: READY_FOR_NEXT_TASK
-- Next Task/Action: ChatGPT independently inspects the current M20 integration surface, performs the full attack-surface sweep required by coordination/AUDIT_POLICY.md, then issues the canonical M20-C001 V01 prompt and audit criteria. Claude must not implement M20 before that prompt exists.
-- Required Actor: CHATGPT
+- Current Sprint: M20-C001 V01 — Complete Clearing Vertical Slice
+- Current Task: M20-C001-V01 — implement frozen complete-clearing orchestration contract
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: implement prompt, run full validation matrix, write CLAUDE_LOG_V01.md, hand off AWAITING_AUDIT to ChatGPT
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
