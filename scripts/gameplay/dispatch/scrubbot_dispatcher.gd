@@ -248,11 +248,23 @@ func dispatch(color_id: int, start_position: Vector2, speed: float = DEFAULT_SPE
 	# a nonnegative value is NOT proof of a real reservation. Prove exact ownership
 	# in the dispatcher's OWN ReservationState before committing the owner id.
 	var owner_id: int = _next_owner_id
-	# This pending owner id must hold nothing before we call the selector.
+	# Pending-owner baseline is itself an external callback boundary
+	# (V05 F-M19-STRICT-001.G/003.H): capture untyped, then generation FIRST,
+	# TYPE_INT, exact bundle coherence, generation again, and finally require the
+	# value be exactly -1 — only then may the selector phase begin. A baseline
+	# callback that resets -> RESETTING; that drifts the bundle (or returns a
+	# non-int / non-`-1`) -> COHERENCE_FAILED, with the selector NEVER called.
 	var pre_owned = _reservations.get_target_for_owner(owner_id)
 	if _reset_since(my_gen):
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
-	if typeof(pre_owned) != TYPE_INT or pre_owned != -1:
+	if typeof(pre_owned) != TYPE_INT:
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
+	var coh_base: bool = _bundle_coherent(_board, _selector, _reservations, _routing_system, _routing_access, _select_access)
+	if _reset_since(my_gen):
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+	if not coh_base:
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
+	if pre_owned != -1:
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
 	# Capture the raw Variant return — never assign it to a typed int before check.
 	var sel_ret = _selector.select_and_reserve(color_id, owner_id, _select_access)
@@ -275,10 +287,27 @@ func dispatch(color_id: int, start_position: Vector2, speed: float = DEFAULT_SPE
 		_reservations.release_for_owner(owner_id)
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
 	if target == -1:
-		# Canonical no-target — ONLY if the selector created no owner reservation
-		# side effect. A -1 that secretly reserved owner_id is a contract violation.
+		# The canonical -1 owner-side-effect query is a full external callback
+		# boundary (V05 F-M19-STRICT-003.G): generation FIRST, TYPE_INT, exact bundle
+		# coherence, generation again, and only then interpret the ownership value.
+		# reset -> RESETTING; drift/malformed -> COHERENCE_FAILED; a non-`-1` owner
+		# target is a selector contract violation. All non-canonical paths clean this
+		# pending owner and never route/spawn.
 		var owned_after = _reservations.get_target_for_owner(owner_id)
-		if typeof(owned_after) != TYPE_INT or owned_after != -1:
+		if _reset_since(my_gen):
+			_reservations.release_for_owner(owner_id)
+			return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+		if typeof(owned_after) != TYPE_INT:
+			_reservations.release_for_owner(owner_id)
+			return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
+		var coh_m1: bool = _bundle_coherent(_board, _selector, _reservations, _routing_system, _routing_access, _select_access)
+		if _reset_since(my_gen):
+			_reservations.release_for_owner(owner_id)
+			return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+		if not coh_m1:
+			_reservations.release_for_owner(owner_id)
+			return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
+		if owned_after != -1:
 			_reservations.release_for_owner(owner_id)
 			return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.NO_REACHABLE_TARGET))
@@ -381,20 +410,23 @@ func dispatch(color_id: int, start_position: Vector2, speed: float = DEFAULT_SPE
 	var agent = _make_agent()
 	if _reset_since(my_gen):
 		_reservations.release(target, owner_id)
-		if _dispatcher_ownable(agent):
-			agent.free()
+		_dispose_fresh(agent)
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
-	if not _dispatcher_ownable(agent):
+	# _dispatcher_ownable() runs the subclass-overridable get_state(); store the
+	# verdict and let generation WIN before interpreting it (V05 F-M19-STRICT-003.I):
+	# a get_state() that resets and returns a non-UNASSIGNED state must yield
+	# RESETTING, not AGENT_ASSIGN_FAILED.
+	var ownable: bool = _dispatcher_ownable(agent)
+	if _reset_since(my_gen):
+		_reservations.release(target, owner_id)
+		_dispose_fresh(agent)
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+	if not ownable:
 		# Invalid/foreign factory product (incl. an invalidated explicit factory):
 		# release the reservation, create no child, and NEVER free/mutate a
 		# foreign parented/reused object.
 		_reservations.release(target, owner_id)
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.AGENT_ASSIGN_FAILED))
-	# _dispatcher_ownable ran subclass get_state() — a reset could have fired there.
-	if _reset_since(my_gen):
-		_reservations.release(target, owner_id)
-		agent.free()
-		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
 	# Post-factory coherence boundary — generation wins.
 	var coh_fac: bool = _bundle_coherent(_board, _selector, _reservations, _routing_system, _routing_access, _select_access)
 	if _reset_since(my_gen):
@@ -419,15 +451,19 @@ func dispatch(color_id: int, start_position: Vector2, speed: float = DEFAULT_SPE
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.AGENT_ASSIGN_FAILED))
 	# V03 F-M19-STRICT-002.C: a lying subclass can return true from assign() while
 	# remaining UNASSIGNED or recording the wrong identity. Validate postconditions.
-	if not _agent_assigned_ok(agent, owner_id, color_id, target):
-		_reservations.release(target, owner_id)
-		agent.free()
-		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.AGENT_ASSIGN_FAILED))
-	# _agent_assigned_ok ran subclass state access — a reset could have fired there.
+	# _agent_assigned_ok() runs the subclass-overridable get_state(); store the
+	# verdict and let generation WIN before interpreting it (V05 F-M19-STRICT-003.I):
+	# a get_state() that resets and makes the verdict false must yield RESETTING,
+	# not AGENT_ASSIGN_FAILED.
+	var assigned_ok: bool = _agent_assigned_ok(agent, owner_id, color_id, target)
 	if _reset_since(my_gen):
 		_reservations.release(target, owner_id)
 		agent.free()
 		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+	if not assigned_ok:
+		_reservations.release(target, owner_id)
+		agent.free()
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.AGENT_ASSIGN_FAILED))
 	# Post-assign coherence boundary — generation wins.
 	var coh_assign: bool = _bundle_coherent(_board, _selector, _reservations, _routing_system, _routing_access, _select_access)
 	if _reset_since(my_gen):
@@ -487,6 +523,14 @@ func _end_dispatch(result: RefCounted) -> RefCounted:
 
 func _reset_since(my_gen: int) -> bool:
 	return _generation != my_gen
+
+## Dispose a fresh, dispatcher-owned pre-attach factory product on a reset abort
+## detected AROUND the ownability probe (V05 F-M19-STRICT-003.I). Frees only a
+## valid, unparented ScrubbotAgent (our fresh product — even one whose overridden
+## get_state() lies), and never a foreign parented/reused object.
+func _dispose_fresh(agent) -> void:
+	if agent is ScrubbotAgent and is_instance_valid(agent) and agent.get_parent() == null:
+		agent.free()
 
 ## Safely detach (if parented) and free a dispatcher-owned agent, tolerating a
 ## _ready callback that already freed or reparented it (F-M19-STRICT-001.F).

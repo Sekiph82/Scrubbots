@@ -81,6 +81,8 @@ const M19ResetCancelAgent = preload("res://tests/support/m19_reset_cancel_agent.
 const M19NonBoolAssignAgent = preload("res://tests/support/m19_nonbool_assign_agent.gd")
 const M19CoherenceResetAccess = preload("res://tests/support/m19_coherence_reset_access.gd")
 const M19ProbeAgent = preload("res://tests/support/m19_probe_agent.gd")
+const M19ReservationProofDouble = preload("res://tests/support/m19_reservation_proof_double.gd")
+const M19ResetStateAgent = preload("res://tests/support/m19_reset_state_agent.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -154,6 +156,7 @@ func _initialize() -> void:
 	_run_m19_strict_v2_tests()
 	_run_m19_strict_v3_tests()
 	_run_m19_v04_tests()
+	_run_m19_v05_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -7764,7 +7767,7 @@ func _run_m19_v04_tests() -> void:
 	# post-selection coherence reset.
 	var acc_ps = M19CoherenceResetAccess.new(); acc_ps.default_targetable = true; acc_ps.cached_route = null
 	var wps = _m19_wire_cache(acc_ps); acc_ps.dispatcher = wps["dispatcher"]
-	acc_ps.coherence_calls = 0; acc_ps.reset_at_call = 2 # count from dispatch entry, not bind
+	acc_ps.coherence_calls = 0; acc_ps.reset_at_call = 3 # ords: 1 initial, 2 baseline, 3 post-selection
 	var col_ps: int = wps["board"].get_color_id(wps["board"].get_cell_index(2, 5))
 	var rps = wps["dispatcher"].dispatch(col_ps, origin)
 	acc_ps.reset_at_call = -1
@@ -7817,7 +7820,7 @@ func _run_m19_v04_tests() -> void:
 	var wpr = _m19_wire_cache(acc_pr); acc_pr.dispatcher = wpr["dispatcher"]
 	var fcalls_pr := [0]
 	wpr["dispatcher"]._agent_factory = func(): fcalls_pr[0] += 1; return ScrubbotAgent.new()
-	acc_pr.coherence_calls = 0; acc_pr.reset_at_call = 5
+	acc_pr.coherence_calls = 0; acc_pr.reset_at_call = 6
 	var rpr = wpr["dispatcher"].dispatch(wpr["board"].get_color_id(wpr["board"].get_cell_index(2, 5)), origin)
 	acc_pr.reset_at_call = -1
 	_check_eq(rpr.failure_reason, DispatchResult.FailureReason.RESETTING, "003.D: reset in post-routing coherence -> RESETTING")
@@ -7831,7 +7834,7 @@ func _run_m19_v04_tests() -> void:
 	var wpf = _m19_wire_cache(acc_pf); acc_pf.dispatcher = wpf["dispatcher"]
 	var acalls_pf := [0]
 	wpf["dispatcher"]._agent_factory = func(): var a = M19ProbeAgent.new(); a.assign_calls = acalls_pf; return a
-	acc_pf.coherence_calls = 0; acc_pf.reset_at_call = 6
+	acc_pf.coherence_calls = 0; acc_pf.reset_at_call = 7
 	var rpf = wpf["dispatcher"].dispatch(wpf["board"].get_color_id(wpf["board"].get_cell_index(2, 5)), origin)
 	acc_pf.reset_at_call = -1
 	_check_eq(rpf.failure_reason, DispatchResult.FailureReason.RESETTING, "003.D: reset in post-factory coherence -> RESETTING")
@@ -7846,7 +7849,7 @@ func _run_m19_v04_tests() -> void:
 	var acalls_pa := [0]
 	wpa["dispatcher"]._agent_factory = func(): var a = M19ProbeAgent.new(); a.assign_calls = acalls_pa; return a
 	var pa_children: int = wpa["dispatcher"].get_child_count()
-	acc_pa.coherence_calls = 0; acc_pa.reset_at_call = 7
+	acc_pa.coherence_calls = 0; acc_pa.reset_at_call = 8
 	var rpa = wpa["dispatcher"].dispatch(wpa["board"].get_color_id(wpa["board"].get_cell_index(2, 5)), origin)
 	acc_pa.reset_at_call = -1
 	_check_eq(rpa.failure_reason, DispatchResult.FailureReason.RESETTING, "003.D: reset in post-assign coherence -> RESETTING")
@@ -7933,3 +7936,218 @@ func _run_m19_v04_tests() -> void:
 	_m19_teardown(pc)
 
 	print("  M19 V04 tests complete")
+
+# ================================= M19-C001 V05 transaction boundary closure ===
+# F-M19-STRICT-001.G, 003.G/.H/.I + malformed ownership-proof + real M15 integration.
+
+## Wire a dispatcher whose selector is an M19SelectorReturnDouble and whose
+## reservation layer is an M19ReservationProofDouble (both coherent), for the
+## pending-owner baseline / canonical-`-1` / ownership-proof boundary tests.
+func _v05_wire_proof(sel, rsd) -> Dictionary:
+	var board = _m19_open_board_active(14, 11, [Vector2(2, 5), Vector2(4, 5)])
+	var routing = DispatchRoutingDouble.new()
+	var routing_access = RouteAccessQueryDouble.new()
+	routing_access.default_traversable = true; routing_access.bind_board(board)
+	var access = AccessQueryDouble.new()
+	access.set_all_targetable([board.get_cell_index(2, 5), board.get_cell_index(4, 5)])
+	rsd.bind(board)
+	sel.reservations = rsd
+	var disp = ScrubbotDispatcher.new(); root.add_child(disp)
+	var bound: bool = disp.bind(board, sel, rsd, routing, routing_access, access)
+	return {"board": board, "rsd": rsd, "sel": sel, "routing": routing,
+		"routing_access": routing_access, "dispatcher": disp, "bound": bound,
+		"idx": board.get_cell_index(2, 5), "idx2": board.get_cell_index(4, 5)}
+
+func _run_m19_v05_tests() -> void:
+	print("---- M19-C001 V05: transaction boundary closure ----")
+	var origin := Vector2(-2.0, 5.5)
+	var COLOR := 0 # open boards use color 0 for ACTIVE cells
+
+	# ===== §1 F-M19-STRICT-001.G/003.H: pending-owner baseline bracketing =======
+	# malformed baseline -> COHERENCE_FAILED, selector never called.
+	var sd_a = M19SelectorReturnDouble.new(); sd_a.ret = 0
+	var rp_a = M19ReservationProofDouble.new(); rp_a.tfo_force_at = 1; rp_a.tfo_force = 1.5
+	var wa = _v05_wire_proof(sd_a, rp_a)
+	var before_a: int = wa["dispatcher"].peek_next_owner_id()
+	var ra = wa["dispatcher"].dispatch(COLOR, origin)
+	_check_eq(ra.failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "001.G: malformed pending-owner baseline -> COHERENCE_FAILED")
+	_check_eq(sd_a.select_calls, 0, "001.G: selector NOT called after malformed baseline")
+	_check_eq(wa["dispatcher"].peek_next_owner_id(), before_a, "001.G: owner id not advanced (malformed baseline)")
+	_check_eq(wa["routing"].call_count, 0, "001.G: no routing after malformed baseline")
+	_m19_teardown(wa)
+
+	# baseline actual int other than -1 -> COHERENCE_FAILED.
+	var sd_n = M19SelectorReturnDouble.new(); sd_n.ret = 0
+	var rp_n = M19ReservationProofDouble.new(); rp_n.reserve(7, 0) # owner id 0 already holds a target
+	var wn = _v05_wire_proof(sd_n, rp_n)
+	_check_eq(wn["dispatcher"].dispatch(COLOR, origin).failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "001.G: baseline non--1 owner target -> COHERENCE_FAILED")
+	_check_eq(sd_n.select_calls, 0, "001.G: selector NOT called when baseline owner already assigned")
+	_m19_teardown(wn)
+
+	# reset during baseline -> RESETTING, selector not called.
+	var sd_r = M19SelectorReturnDouble.new(); sd_r.ret = 0
+	var rp_r = M19ReservationProofDouble.new()
+	var wr = _v05_wire_proof(sd_r, rp_r)
+	rp_r.on_owner_query = func(n):
+		if n == 1: wr["dispatcher"].reset()
+	_check_eq(wr["dispatcher"].dispatch(COLOR, origin).failure_reason, DispatchResult.FailureReason.RESETTING, "003.H: reset during baseline -> RESETTING")
+	_check_eq(sd_r.select_calls, 0, "003.H: selector NOT called after baseline reset")
+	rp_r.on_owner_query = Callable()
+	_m19_teardown(wr)
+
+	# ReservationState/bundle drift during baseline -> COHERENCE_FAILED, no selector.
+	var sd_d = M19SelectorReturnDouble.new(); sd_d.ret = 0
+	var rp_d = M19ReservationProofDouble.new()
+	var wd = _v05_wire_proof(sd_d, rp_d)
+	var other_d = _m19_open_board_active(14, 11, [Vector2(2, 5)])
+	rp_d.on_owner_query = func(n):
+		if n == 1: wd["routing_access"].bind_board(other_d) # drift bundle during baseline
+	_check_eq(wd["dispatcher"].dispatch(COLOR, origin).failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "003.H: bundle drift during baseline -> COHERENCE_FAILED")
+	_check_eq(sd_d.select_calls, 0, "003.H: selector NOT called after baseline drift")
+	rp_d.on_owner_query = Callable()
+	_m19_teardown(wd)
+
+	# ===== §2 F-M19-STRICT-003.G: canonical -1 owner-side-effect bracketing =====
+	# canonical -1 control -> NO_REACHABLE_TARGET.
+	var sd_m1 = M19SelectorReturnDouble.new(); sd_m1.ret = -1
+	var wm1 = _v05_wire_proof(sd_m1, M19ReservationProofDouble.new())
+	var before_m1: int = wm1["dispatcher"].peek_next_owner_id()
+	_check_eq(wm1["dispatcher"].dispatch(COLOR, origin).failure_reason, DispatchResult.FailureReason.NO_REACHABLE_TARGET, "003.G: canonical -1 -> NO_REACHABLE_TARGET")
+	_check_eq(wm1["dispatcher"].peek_next_owner_id(), before_m1, "003.G: owner id not advanced on canonical -1")
+	_m19_teardown(wm1)
+
+	# reset during post--1 owner query -> RESETTING.
+	var sd_m1r = M19SelectorReturnDouble.new(); sd_m1r.ret = -1
+	var rp_m1r = M19ReservationProofDouble.new()
+	var wm1r = _v05_wire_proof(sd_m1r, rp_m1r)
+	rp_m1r.on_owner_query = func(n):
+		if n == 2: wm1r["dispatcher"].reset() # call 1 baseline, call 2 post--1
+	_check_eq(wm1r["dispatcher"].dispatch(COLOR, origin).failure_reason, DispatchResult.FailureReason.RESETTING, "003.G: reset during post--1 owner query -> RESETTING")
+	rp_m1r.on_owner_query = Callable()
+	_m19_teardown(wm1r)
+
+	# drift during post--1 owner query -> COHERENCE_FAILED.
+	var sd_m1d = M19SelectorReturnDouble.new(); sd_m1d.ret = -1
+	var rp_m1d = M19ReservationProofDouble.new()
+	var wm1d = _v05_wire_proof(sd_m1d, rp_m1d)
+	var other_m1d = _m19_open_board_active(14, 11, [Vector2(2, 5)])
+	rp_m1d.on_owner_query = func(n):
+		if n == 2: wm1d["routing_access"].bind_board(other_m1d)
+	_check_eq(wm1d["dispatcher"].dispatch(COLOR, origin).failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "003.G: drift during post--1 owner query -> COHERENCE_FAILED")
+	rp_m1d.on_owner_query = Callable()
+	_m19_teardown(wm1d)
+
+	# malformed post--1 owner query -> COHERENCE_FAILED.
+	var sd_m1m = M19SelectorReturnDouble.new(); sd_m1m.ret = -1
+	var rp_m1m = M19ReservationProofDouble.new(); rp_m1m.tfo_force_at = 2; rp_m1m.tfo_force = "x"
+	var wm1m = _v05_wire_proof(sd_m1m, rp_m1m)
+	_check_eq(wm1m["dispatcher"].dispatch(COLOR, origin).failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "003.G: malformed post--1 owner query -> COHERENCE_FAILED")
+	_m19_teardown(wm1m)
+
+	# -1 but selector secretly reserved owner -> COHERENCE_FAILED + narrow cleanup.
+	var sd_sec = M19SelectorReturnDouble.new(); sd_sec.ret = -1; sd_sec.effect = "owner"
+	var rp_sec = M19ReservationProofDouble.new(); rp_sec.reserve(99, 777) # unrelated
+	var wsec = _v05_wire_proof(sd_sec, rp_sec); sd_sec.effect_target = wsec["idx"]
+	_check_eq(wsec["dispatcher"].dispatch(COLOR, origin).failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "003.G: -1 with secret reservation -> COHERENCE_FAILED")
+	_check_eq(rp_sec.get_reservation_count(), 1, "003.G: secret owner reservation cleaned (only unrelated remains)")
+	_check_eq(rp_sec.get_owner(99), 777, "003.G: unrelated reservation preserved")
+	_m19_teardown(wsec)
+
+	# ===== §4 malformed positive ownership proof ================================
+	# malformed get_target_for_owner proof (call 2) -> COHERENCE_FAILED + cleanup.
+	var sd_tp = M19SelectorReturnDouble.new(); sd_tp.effect = "owner"
+	var rp_tp = M19ReservationProofDouble.new(); rp_tp.reserve(99, 777)
+	rp_tp.tfo_force_at = 2; rp_tp.tfo_force = 1.5
+	var wtp = _v05_wire_proof(sd_tp, rp_tp); sd_tp.ret = wtp["idx"]; sd_tp.effect_target = wtp["idx"]
+	var before_tp: int = wtp["dispatcher"].peek_next_owner_id()
+	_check_eq(wtp["dispatcher"].dispatch(COLOR, origin).failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "002.F: malformed get_target_for_owner proof -> COHERENCE_FAILED")
+	_check_eq(wtp["routing"].call_count, 0, "002.F: no routing after malformed target proof")
+	_check_eq(wtp["dispatcher"].peek_next_owner_id(), before_tp, "002.F: owner id not advanced (malformed target proof)")
+	_check_eq(rp_tp.get_reservation_count(), 1, "002.F: pending reservation cleaned, unrelated preserved (target proof)")
+	_check_eq(rp_tp.get_owner(99), 777, "002.F: unrelated reservation intact (target proof)")
+	_m19_teardown(wtp)
+
+	# malformed get_owner proof (call 1) -> COHERENCE_FAILED + cleanup.
+	var sd_gp = M19SelectorReturnDouble.new(); sd_gp.effect = "owner"
+	var rp_gp = M19ReservationProofDouble.new(); rp_gp.reserve(99, 777)
+	rp_gp.owner_force_at = 1; rp_gp.owner_force = "z"
+	var wgp = _v05_wire_proof(sd_gp, rp_gp); sd_gp.ret = wgp["idx"]; sd_gp.effect_target = wgp["idx"]
+	_check_eq(wgp["dispatcher"].dispatch(COLOR, origin).failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "002.F: malformed get_owner proof -> COHERENCE_FAILED")
+	_check_eq(wgp["routing"].call_count, 0, "002.F: no routing after malformed owner proof")
+	_check_eq(rp_gp.get_reservation_count(), 1, "002.F: pending reservation cleaned, unrelated preserved (owner proof)")
+	_m19_teardown(wgp)
+
+	# ===== §3 F-M19-STRICT-003.I: generation beats ownability/postcondition =====
+	# _dispatcher_ownable: get_state resets + reports non-UNASSIGNED -> RESETTING.
+	var ob_board = _m19_open_board_active(14, 11, [Vector2(2, 5)])
+	var wob = _m19_wire_fake(ob_board, "ok", [ob_board.get_cell_index(2, 5)])
+	var wob_disp = wob["dispatcher"]
+	wob_disp._agent_factory = func():
+		var a = M19ResetStateAgent.new()
+		a.dispatcher = wob_disp
+		a.reset_on_call = 1
+		a.override_state = ScrubbotAgent.State.MOVING
+		return a
+	var ob_col: int = ob_board.get_color_id(ob_board.get_cell_index(2, 5))
+	var ob_before: int = wob_disp.peek_next_owner_id()
+	var rob = wob_disp.dispatch(ob_col, origin)
+	_check_eq(rob.failure_reason, DispatchResult.FailureReason.RESETTING, "003.I: reset in _dispatcher_ownable get_state -> RESETTING (not AGENT_ASSIGN_FAILED)")
+	_check_eq(wob_disp.get_active_count(), 0, "003.I: no active after ownability reset")
+	_check_eq(wob["reservations"].get_reservation_count(), 0, "003.I: reservation released after ownability reset")
+	wob_disp._agent_factory = func(): return ScrubbotAgent.new()
+	var rob2 = wob_disp.dispatch(ob_col, origin)
+	_check(rob2.success, "003.I: later dispatch recovers after ownability reset")
+	_check(rob2.owner_id >= ob_before, "003.I: owner ids monotonic across ownability reset")
+	_m19_teardown(wob)
+
+	# _agent_assigned_ok: get_state resets + makes verdict false -> RESETTING.
+	var pcb = _m19_open_board_active(14, 11, [Vector2(2, 5)])
+	var wpc = _m19_wire_fake(pcb, "ok", [pcb.get_cell_index(2, 5)])
+	var wpc_disp = wpc["dispatcher"]
+	wpc_disp._agent_factory = func():
+		var a = M19ResetStateAgent.new()
+		a.dispatcher = wpc_disp
+		a.reset_on_call = 2
+		a.override_state = ScrubbotAgent.State.CANCELLED
+		return a
+	var pc_col2: int = pcb.get_color_id(pcb.get_cell_index(2, 5))
+	var pc_children: int = wpc_disp.get_child_count()
+	var rpc = wpc_disp.dispatch(pc_col2, origin)
+	_check_eq(rpc.failure_reason, DispatchResult.FailureReason.RESETTING, "003.I: reset in _agent_assigned_ok get_state -> RESETTING (not AGENT_ASSIGN_FAILED)")
+	_check_eq(wpc_disp.get_child_count(), pc_children, "003.I: add_child not reached after postcondition reset")
+	_check_eq(wpc_disp.get_active_count(), 0, "003.I: no active after postcondition reset")
+	_check_eq(wpc["reservations"].get_reservation_count(), 0, "003.I: reservation released after postcondition reset")
+	wpc_disp._agent_factory = func(): return ScrubbotAgent.new()
+	_check(wpc_disp.dispatch(pc_col2, origin).success, "003.I: later dispatch recovers after postcondition reset")
+	_m19_teardown(wpc)
+
+	# ===== §5 real M15-C002 V03 integration adversary ===========================
+	var mi_board = _m19_open_board_active(14, 11, [Vector2(2, 5), Vector2(4, 5)])
+	var mi = _m19_wire_fake(mi_board, "ok", [mi_board.get_cell_index(2, 5), mi_board.get_cell_index(4, 5)])
+	var mi_sel = mi["selector"] # real TargetSelector from M15-C002 V03
+	var mi_bB = _m19_open_board_active(14, 11, [Vector2(2, 5)])
+	var mi_ciB = ColorCandidateIndex.create(); mi_ciB.bind(mi_bB)
+	var mi_rsB = ReservationState.create(); mi_rsB.bind(mi_bB)
+	var mi_fired := [false]
+	mi["access"].on_query = func(_i):
+		if not mi_fired[0]:
+			mi_fired[0] = true
+			mi_sel.bind(mi_bB, mi_ciB, mi_rsB) # rebind attempt DURING selection
+	var mi_col: int = mi_board.get_color_id(mi_board.get_cell_index(2, 5))
+	var mi_r = mi["dispatcher"].dispatch(mi_col, origin)
+	mi["access"].on_query = Callable()
+	# M15 final law: bind during an active selection returns false; the selector
+	# stays on bundle A and completes there. No foreign reservation in B, no
+	# split-brain dispatcher commit.
+	_check(mi_sel.is_bound_to(mi_board, mi["reservations"]), "M15-int: real selector stayed bound to bundle A after rebind attempt")
+	_check_eq(mi_rsB.get_reservation_count(), 0, "M15-int: no foreign reservation orphaned in bundle B")
+	if mi_r.success:
+		_check(mi["reservations"].get_owner(mi_r.target_index) == mi_r.owner_id, "M15-int: dispatcher committed exact ownership in bundle A only")
+	else:
+		_check_eq(mi["reservations"].get_reservation_count(), 0, "M15-int: non-success left no dispatcher reservation")
+	var mi_r2 = mi["dispatcher"].dispatch(mi_col, origin)
+	_check(mi_r2.success or mi_r2.failure_reason == DispatchResult.FailureReason.NO_REACHABLE_TARGET, "M15-int: later coherent dispatch usable")
+	mi_ciB = null; mi_rsB = null
+	_m19_teardown(mi)
+
+	print("  M19 V05 tests complete")
