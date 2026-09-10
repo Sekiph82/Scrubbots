@@ -6,9 +6,9 @@
   "currentSprint": "M19-C001 V04 — frozen dispatcher transaction remainder",
   "currentTaskId": "M19-C001-V04",
   "currentTaskTitle": "Close the frozen M19 dispatcher bind, selector-proof, reset-generation and final-commit remainder",
-  "workflowState": "IN_PROGRESS",
-  "requiredActor": "CLAUDE",
-  "nextAction": "Implementing coordination/sessions/M19-C001/CHATGPT_PROMPT_V04.md (frozen dispatcher remainder F-M19-STRICT-001.D/.E/.F, 002.D/.E, 003.D/.E/.F); validating against CHATGPT_AUDIT_CRITERIA_V04.md; writing CLAUDE_LOG_V04.md; will hand off AWAITING_AUDIT to CHATGPT and push to origin/main.",
+  "workflowState": "AWAITING_AUDIT",
+  "requiredActor": "CHATGPT",
+  "nextAction": "Independently audit M19-C001 V04 against CHATGPT_AUDIT_CRITERIA_V04.md (impl scripts/gameplay/dispatch/scrubbot_dispatcher.gd; evidence coordination/sessions/M19-C001/CLAUDE_LOG_V04.md; full root suite 3163/3163 green on Godot 4.7.1). Publish CHATGPT_AUDIT_V04.md; per audit policy a narrow auditor-authored validation-only M19 V05 may precede final closure of SB-M19-001..012.",
   "blockers": [],
   "progress": {
     "scopeType": "main+ui",
@@ -19,7 +19,7 @@
   },
   "lastCompletedTaskId": "M15-C002-V03",
   "lastCompletedTaskTitle": "TargetSelector strict-v2 Variant/re-entry/transactional closure for M19 upstream gate",
-  "updatedAt": "2026-09-10T11:16:43Z",
+  "updatedAt": "2026-09-10T11:35:55Z",
   "updatedBy": "CLAUDE"
 }
 HIVEAI_TRACKER_V3_END -->
@@ -31,14 +31,15 @@ HIVEAI_TRACKER_V3_END -->
 - Current milestone: **M19 — Scrubbot dispatcher orchestration**
 - Current sprint: **M19-C001 V04 — frozen dispatcher transaction remainder**
 - Current task: **M19-C001-V04 — Close the frozen M19 dispatcher bind, selector-proof, reset-generation and final-commit remainder**
-- Workflow: **IN_PROGRESS**
-- Required actor: **CLAUDE**
-- Next action: Claude is implementing
-  `coordination/sessions/M19-C001/CHATGPT_PROMPT_V04.md` (frozen dispatcher
-  remainder), validating against
-  `coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V04.md`, writing
-  `coordination/sessions/M19-C001/CLAUDE_LOG_V04.md`, then handing off
-  `AWAITING_AUDIT` to CHATGPT and pushing to `origin/main`.
+- Workflow: **AWAITING_AUDIT**
+- Required actor: **CHATGPT**
+- Next action: ChatGPT independently audits M19-C001 V04 against
+  `coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V04.md`. Implementation
+  in `scripts/gameplay/dispatch/scrubbot_dispatcher.gd`; evidence in
+  `coordination/sessions/M19-C001/CLAUDE_LOG_V04.md`; full root suite
+  **3163/3163** green on Godot **4.7.1** (IN_PROGRESS pushed before the
+  implementation commit). Per audit policy a narrow validation-only M19 V05 may
+  precede final closure of SB-M19-001..012.
 - Blockers: none.
 - M15 status: **M15-C002 V03 AUDITED_PASS / STRICT_V2_FINAL_CLOSURE / UPSTREAM_GATE_CLOSED**. Final audit: `coordination/sessions/M15-C002/CHATGPT_AUDIT_V03.md`.
 - M19 status: V02/V03 implementation is preserved. V04 now executes only the remainder frozen by `coordination/sessions/M19-C001/CHATGPT_AUDIT_V03.md`.
@@ -53,7 +54,7 @@ HIVEAI_TRACKER_V3_END -->
 
 ## Active / Waiting
 
-- [~] **M19-C001-V04** — IN_PROGRESS, actor CLAUDE. Implementing the frozen M19 dispatcher remainder only (bind transaction guard + reset-during-bind, selector Variant + exact reservation ownership proof, generation checks after every callback boundary, reset re-entry safety, assign actual-bool gate, final add-child transaction). M15 is upstream-final and untouched. No audit verdict claimed by Claude.
+- [~] **M19-C001-V04** — AWAITING_AUDIT, actor CHATGPT. Frozen M19 dispatcher remainder implemented in `scripts/gameplay/dispatch/scrubbot_dispatcher.gd`: bind transaction guard + reset-during-bind (001.D), selector Variant + exact reservation ownership proof (001.E/002.D), generation checks after every callback boundary (003.D), reset re-entry safety (003.E), assign actual-bool gate (002.E), final add-child transaction (001.F/003.F). Adversarial coverage `_run_m19_v04_tests`; full root suite 3163/3163 green. M15 upstream-final and untouched; M20 boundary preserved. No audit verdict claimed by Claude.
 
 ## Planned
 
