@@ -1,26 +1,14 @@
-# H!veAI GitHub-first adapter (v3)
+# H!veAI GitHub tracking [OWNER-LOCKED — 2026-09-10]
 
-- GitHub `origin/main` is the H!veAI project-state authority.
-- Read `.hiveai/RULES.md` before project work.
-- Read `.hiveai/TASKS.md` for the current project state (milestone, sprint,
-  task, workflow state, required actor, next action, blockers, progress).
-- Do not maintain a competing current-task, next-action, milestone, or
-  progress tracker inside `CLAUDE.md`.
-- If project state changes, update `.hiveai/TASKS.md` and append one
-  `hiveai-event/v1` row to `.hiveai/EVENTS.jsonl`.
-- Commit and push the updated tracking state before reporting successful
-  completion. If push fails, report `GITHUB_TRACKING_NOT_SYNCED`.
+- GitHub `origin/main` is repository/project-state authority.
+- Repository-root `TASKS.md` is the **only live H!veAI project-status tracker**.
+- Read root `TASKS.md` first for current milestone, sprint, task, workflow status, required actor, next action and progress.
+- Update root `TASKS.md` only when the active prompt authorizes a truthful lifecycle handoff; commit/push that state with the evidence it describes.
+- Never create or revive `.hiveai/*` as live control-plane state. Archived former tracker files under `docs/migration/legacy-task-trackers/` are historical only.
+- Coordination prompt/log/audit files are evidence, not current-state trackers.
+- Claude never self-audits or marks audit-owned completion; ChatGPT remains the independent auditor.
 
-**SUPERSEDES** every earlier instruction in this file that named
-`.hiveai/STATE.json`, `.hiveai/HANDOFF.md`, `.hiveai/PROJECT_DASHBOARD.md`,
-`.hiveai/ACTIVE_CYCLES.md`, `.hiveai/ARTIFACT_MAP.md`,
-`.hiveai/PROGRESS_SNAPSHOT.md`, or `coordination/SESSION_INDEX.md` as live
-H!veAI authority, or that required synchronizing STATE.json/HANDOFF.md. Those
-files are historical evidence only. The canonical H!veAI file set is
-`.hiveai/PROJECT.json`, `.hiveai/TASKS.md`, `.hiveai/RULES.md`,
-`.hiveai/EVENTS.jsonl`. The ChatGPT/Claude independent-audit governance below
-remains fully in force.
-
+**This owner-locked block supersedes any historical tracker/dashboard/session-index wording below.**
 
 ---
 
@@ -100,7 +88,7 @@ through). See `docs/05_TECH_DECISIONS.md` ADR-019,
 25. Prefer reversible actions. Stash or rename before removing anything you
     are not certain is disposable.
 26. **Phase log workflow (supersedes the old per-prompt handoff log,
-    starting with Phase M03).** One development *phase* (a `tasks.md`
+    starting with Phase M03).** One development *phase* (a `TASKS.md`
     milestone such as `M03`, which may span multiple prompts/sessions) gets
     **one continuous** Desktop log:
     `C:\Users\sekip\Desktop\SCRUBBOTS_PHASE_MXX_LOG.md`. Create it at the
@@ -120,16 +108,16 @@ through). See `docs/05_TECH_DECISIONS.md` ADR-019,
     used one-log-per-prompt; those historical logs —
     `SCRUBBOTS_PROMPT_01_LOG.md`, `SCRUBBOTS_PROMPT_02_LOG.md`,
     `SCRUBBOTS_MASTER_TASKS_LOG.md` — are not retroactively converted.) Full
-    detail: `tasks.md` "PHASE LOG WORKFLOW."
-27. `tasks.md` (project root) is the master execution checklist for the
+    detail: `TASKS.md` "PHASE LOG WORKFLOW."
+27. `TASKS.md` (project root) is the master execution checklist for the
     entire project. Read it at the start of every session, alongside this
     file. Update it after every numbered implementation prompt.
-28. Never mark a `tasks.md` item `[x]` without actual validation evidence
+28. Never mark a `TASKS.md` item `[x]` without actual validation evidence
     (it ran, it passed, it was inspected) — code existing is not enough.
-29. Never delete unfinished `tasks.md` items to make progress look cleaner.
+29. Never delete unfinished `TASKS.md` items to make progress look cleaner.
     Leave them `[ ]` and, if abandoned, say so explicitly rather than
     silently removing the line.
-30. Official production board difficulty/size bands (see `tasks.md` §8.3):
+30. Official production board difficulty/size bands (see `TASKS.md` §8.3):
     Easy 20–29×20–29, Medium 30–39×30–39, Hard 40–49×40–49, Very Hard
     50–59×50–59. Maximum current production requirement is **59×59 = 3,481
     cells**. Boards are not required to be square — width and height are
@@ -172,7 +160,7 @@ through). See `docs/05_TECH_DECISIONS.md` ADR-019,
     cell renders fully transparent (`Color(0,0,0,0)`) so the gameplay
     background shows through — never a black/gray/palette substitute. There
     is no DIRTY/CLEAN/grime transform and no A/B/C preset. Owner manual QA of
-    the transparent model (`tasks.md` SB-M10-005..011) via
+    the transparent model (`TASKS.md` SB-M10-005..011) via
     `scenes/debug/board_renderer_debug.tscn` is complete.
 35. Renderer output is read back through an 8-bit `Image`
     (`Image.FORMAT_RGBA8`) — comparing rendered pixels to an
@@ -185,13 +173,13 @@ through). See `docs/05_TECH_DECISIONS.md` ADR-019,
 
 - Puzzle grid: **variable-size**, defined per level (`width` × `height`,
   cell count = `width * height`, always derived, never hard-coded). Official
-  production difficulty/size bands (see `tasks.md` §8.3 for the full table
+  production difficulty/size bands (see `TASKS.md` §8.3 for the full table
   and examples): Easy 20–29×20–29, Medium 30–39×30–39, Hard 40–49×40–49,
   Very Hard 50–59×50–59 (max 59×59 = 3,481 cells). Boards need not be
   square — width and height are validated independently. Do not reintroduce
   a fixed board-size assumption anywhere in code or docs — this corrects a
   Prompt 01 documentation error refined further in the post-Prompt-02
-  planning pass (see `docs/05_TECH_DECISIONS.md` ADR-008 and `tasks.md`).
+  planning pass (see `docs/05_TECH_DECISIONS.md` ADR-008 and `TASKS.md`).
 - Global production pixel-art palette: **C01..C16 only** from
   `data/palettes/scrubbots_palette_v2.json`. Difficulty distinct-used-color
   bands: EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12. CLEARED
@@ -228,13 +216,9 @@ RoutingSystem       -> decides HOW a Scrubbot visually travels there
 These stay separate scripts/modules so routing can be replaced later without
 touching level data, slot logic, cell state, scoring, or rendering.
 
-## 5. H!veAI dashboard contract
+## 5. H!veAI tracking contract
 
-36. `.hiveai/PROJECT_DASHBOARD.md` is the single H!veAI-facing status
-    contract. **[SUPERSEDED — see the Coordination-ownership override at the
-    end of this file, M10-C001 V05.]** Claude does **not** update this
-    dashboard or any H!veAI tracker file; ChatGPT owns those after its
-    independent audit. Claude may read the dashboard for context.
+36. Repository-root `TASKS.md` is the single live H!veAI project-status contract. Former `.hiveai` trackers/dashboards and `coordination/SESSION_INDEX.md` are historical evidence only and must not be maintained as parallel current state. The top `Project Status` block in `TASKS.md` controls current task/actor/progress.
 
 ## 6. Working style
 
@@ -251,11 +235,11 @@ touching level data, slot logic, cell state, scoring, or rendering.
 
 The repository now has a versioned ChatGPT↔Claude communication layer under
 `coordination/`. This **adds** durable GitHub handoff evidence; it does not
-replace `tasks.md` or the local Desktop phase log.
+replace `TASKS.md` or the local Desktop phase log.
 
 37. Before any material implementation session, read in this order after
-    reading this file: `tasks.md`, `.hiveai/PROJECT_DASHBOARD.md`,
-    `coordination/README.md`, `coordination/SESSION_INDEX.md`, then every
+    reading this file: root `TASKS.md`, `coordination/README.md`,
+    `coordination/AUDIT_POLICY.md`, `coordination/AUDIT_INDEX.md`, then every
     prompt/audit/owner-note artifact in the active coordination cycle in
     version order, followed by the relevant `docs/` sources.
 38. Every scoped ChatGPT→Claude handoff has one stable coordination cycle ID
@@ -284,7 +268,7 @@ replace `tasks.md` or the local Desktop phase log.
     ChatGPT owns SESSION_INDEX, the H!veAI trackers and the dashboard after
     its independent audit; those updates carry timestamp, actor, cycle
     ID/status, milestone/task refs, summary, evidence, blocker/waiting state
-    and next expected actor. `tasks.md` remains the only canonical task
+    and next expected actor. `TASKS.md` remains the only canonical task
     ledger and is still never duplicated in the dashboard.
 43. When implementation is ready for review, set the cycle state to
     `AWAITING_AUDIT`. Do not mark a cycle `AUDITED_PASS` yourself; that state
@@ -310,7 +294,7 @@ This repository contains two deliberately isolated sidecar systems:
 - `content_pipeline/`: offline publisher/control-plane for pack/manifest,
   staging, production, rollback, disable and scheduling workflows.
 
-Root `tasks.md` is the only canonical task ledger. Sidecars use
+Root `TASKS.md` is the only canonical task ledger. Sidecars use
 `SB-LFxx-xxx` and `SB-CPxx-xxx` task IDs.
 
 The main game must never preload/import `level_factory/` scripts. Shipping
@@ -328,7 +312,7 @@ sidecar has its own `coordination/` subtree:
    cycle's single `CLAUDE_IMPLEMENTATION_LOG.md`.
 3. Claude implements/tests, writes the version-matched `CLAUDE_LOG_VNN.md`,
    pushes safely, returns `AWAITING_AUDIT`, and stops. **[M10-C001 V05]**
-   Claude does **not** update `tasks.md`, the sidecar `SESSION_INDEX.md`, or
+   Claude does **not** update `TASKS.md`, the sidecar `SESSION_INDEX.md`, or
    any H!veAI tracker/dashboard file — ChatGPT owns those after its audit.
 4. Claude does not create audit/self-audit files or assign audit verdicts.
 5. ChatGPT reads GitHub log + real diff/code/tests, publishes
@@ -363,7 +347,7 @@ M10-C001 V05.]** Claude does **not** update the derived H!veAI sources
 (`.hiveai/ACTIVE_CYCLES.md`, `.hiveai/ARTIFACT_MAP.md`,
 `.hiveai/PROGRESS_SNAPSHOT.md`) or materialize `.hiveai/PROJECT_DASHBOARD.md`.
 ChatGPT owns those after its independent audit. H!veAI actively watches only
-the dashboard. `tasks.md` remains the only canonical task ledger.
+the dashboard. `TASKS.md` remains the only canonical task ledger.
 
 Canonical policy:
 https://github.com/Sekiph82/Scrubbots/blob/main/coordination/VERSIONED_LOG_POLICY.md
@@ -484,7 +468,7 @@ in force.
 
 ## H!veAI GitHub tracking
 
-- The repository root TASKS.md is the only current project-status tracker.
-- Keep the Project Status fields and task rows current when work changes state.
-- Commit and push TASKS.md with the implementation evidence that it describes.
-- Do not create or revive .hiveai PROJECT/RULES/TASKS/STATE/HANDOFF/EVENTS files as a competing tracker.
+- Root `TASKS.md` is the only current project-status tracker.
+- Keep its `Project Status` truthful when the active prompt authorizes a lifecycle transition.
+- Do not create or revive `.hiveai/*` tracker files, dashboards, maps or event logs as live state.
+- Archived tracker material under `docs/migration/legacy-task-trackers/` is read-only historical evidence.

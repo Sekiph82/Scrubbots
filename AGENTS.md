@@ -1,25 +1,13 @@
-# H!veAI GitHub-first adapter (v3)
+# ScrubBots Agent Instructions
 
-- GitHub `origin/main` is the H!veAI project-state authority.
-- Read `.hiveai/RULES.md` before project work.
-- Read `.hiveai/TASKS.md` for the current project state.
-- Do not maintain a competing current-task, next-action, milestone, or
-  progress tracker in this file, coordination files, or dashboards.
-- If project state changes, update `.hiveai/TASKS.md` and append one
-  `hiveai-event/v1` row to `.hiveai/EVENTS.jsonl`, then commit and push to
-  `origin/main` before reporting completion. If push fails, report
-  `GITHUB_TRACKING_NOT_SYNCED`.
+## H!veAI GitHub tracking [OWNER-LOCKED — 2026-09-10]
 
-Canonical H!veAI file set: `.hiveai/PROJECT.json`, `.hiveai/TASKS.md`,
-`.hiveai/RULES.md`, `.hiveai/EVENTS.jsonl`. Legacy `STATE.json`,
-`HANDOFF.md`, and `PROJECT_DASHBOARD.md` are historical evidence only.
-Provider-specific behavior must not change H!veAI state semantics.
-
-# Project-specific Codex instructions
-
-## H!veAI GitHub tracking
-
-- The repository root TASKS.md is the only current project-status tracker.
-- Keep the Project Status fields and task rows current when work changes state.
-- Commit and push TASKS.md with the implementation evidence that it describes.
-- Do not create or revive .hiveai PROJECT/RULES/TASKS/STATE/HANDOFF/EVENTS files as a competing tracker.
+- GitHub `origin/main` is repository/project-state authority.
+- Repository-root `TASKS.md` is the **only live project-status tracker** consumed by H!veAI.
+- Read root `TASKS.md` before project work and obey its top `Project Status` block.
+- When an active ChatGPT prompt authorizes a lifecycle transition, update root `TASKS.md` and push it in the evidence chain that describes that state.
+- Former `.hiveai/PROJECT.json`, `.hiveai/RULES.md`, `.hiveai/TASKS.md`, `.hiveai/EVENTS.jsonl`, dashboards, cycle maps and snapshots are retired as live control-plane state. Archived copies under `docs/migration/legacy-task-trackers/` are historical evidence only.
+- Do **not** create, revive, synchronize, or maintain any competing `.hiveai` tracker.
+- Coordination prompts/logs/audits are evidence artifacts, not competing current-state trackers.
+- Independent audit separation remains locked: Claude implements/tests and may hand off `AWAITING_AUDIT`; only ChatGPT audit may assign `AUDITED_*` and close audit-owned task truth.
+- Provider-specific behavior must not change these tracking semantics.
