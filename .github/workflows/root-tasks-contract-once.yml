@@ -1,0 +1,378 @@
+name: Root TASKS single-tracker reconciliation
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/root-tasks-contract-once.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  reconcile:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Reconcile root TASKS contract and M19 closure
+        shell: bash
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+
+          def read(path):
+              return Path(path).read_text(encoding='utf-8')
+
+          def write(path, text):
+              Path(path).write_text(text, encoding='utf-8', newline='\n')
+
+          # -----------------------------------------------------------------
+          # Root TASKS.md: sole live tracker + M19 final closure materialization.
+          # -----------------------------------------------------------------
+          p = Path('TASKS.md')
+          t = read(p)
+
+          status = '''## Project Status
+
+          - Current Milestone: M20
+          - Current Sprint: M20-C001 PREP — Complete Clearing Vertical Slice strict-v2 full-surface audit/prompt issuance
+          - Current Task: M20-C001-PREP — ChatGPT inspects the current M20 integration surface and freezes the implementation/audit contract before Claude implementation
+          - Current Task Status: READY_FOR_NEXT_TASK
+          - Next Task/Action: ChatGPT independently inspects the current M20 integration surface, performs the full attack-surface sweep required by coordination/AUDIT_POLICY.md, then issues the canonical M20-C001 V01 prompt and audit criteria. Claude must not implement M20 before that prompt exists.
+          - Required Actor: CHATGPT
+          - Tracking Repository: Sekiph82/Scrubbots
+          - Tracking Branch: main
+          - Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
+          - Note: M19-C001 V06 AUDITED_PASS / STRICT_V2_FINAL_CLOSURE. Final audit: coordination/sessions/M19-C001/CHATGPT_AUDIT_V06.md. V06 validation commit 77d5359c4482a816e3d2e2ca7481ec1fdb7ed8af; 3273/3273 Godot 4.7.1; V05 dispatcher production blob unchanged at 0d1a6b1f6e9a6f1788ceb2078473c87bec8986e3.
+
+          ## Tasks
+          '''
+          t, n = re.subn(r'## Project Status\n.*?\n## Tasks\n', status, t, count=1, flags=re.S)
+          assert n == 1, 'Project Status block not uniquely replaced'
+
+          old_notice = '''> **H!veAI notice (GitHub-first v3):** H!veAI live *operational* state is now
+          > maintained in `.hiveai/TASKS.md`. This root `tasks.md` remains the detailed
+          > project roadmap/history. When a future task changes real project state, both
+          > may need updates: root `tasks.md` for detailed task evidence, and
+          > `.hiveai/TASKS.md` for H!veAI operational state. If they disagree about
+          > *current* project state, `.hiveai/TASKS.md` is the H!veAI authority. Do not
+          > maintain a duplicate machine-readable current-state block in this file.
+          '''
+          new_notice = '''> **H!veAI tracking [OWNER-LOCKED]:** repository-root `TASKS.md` is the one and only live project-status tracker. The top `Project Status` block controls the current milestone, sprint, task, actor, next action, blockers/status, and progress. Former `.hiveai` control-plane files are archived under `docs/migration/legacy-task-trackers/` and are historical evidence only. Never recreate or synchronize a competing live tracker.
+          '''
+          assert old_notice in t, 'stale embedded H!veAI notice not found'
+          t = t.replace(old_notice, new_notice, 1)
+
+          # Root filename is now uppercase and canonical.
+          t = t.replace('`tasks.md`', '`TASKS.md`')
+
+          for i in range(1, 13):
+              task_id = f'SB-M19-{i:03d}'
+              old = f'- [ ] {task_id}'
+              new = f'- [x] {task_id}'
+              assert t.count(old) == 1, f'{task_id} expected exactly once open'
+              t = t.replace(old, new, 1)
+
+          heading = '### M19 — Scrubbot Dispatcher\n'
+          closure_note = ('\n**Strict-v2 final closure:** M19-C001 V06 `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE`. '
+                          'Final audit: `coordination/sessions/M19-C001/CHATGPT_AUDIT_V06.md`. '
+                          'Validation-only commit `77d5359`; `3273/3273` on Godot 4.7.1; '
+                          'V05 dispatcher production blob unchanged.\n')
+          assert heading in t, 'M19 heading missing'
+          if closure_note.strip() not in t:
+              t = t.replace(heading, heading + closure_note, 1)
+
+          # M20 stays fully open.
+          for m in re.finditer(r'- \[([ xX])\] (SB-M20-\d+)', t):
+              assert m.group(1) == ' ', f'{m.group(2)} must remain open'
+
+          write(p, t)
+
+          # -----------------------------------------------------------------
+          # AGENTS.md: one unambiguous tracker rule.
+          # -----------------------------------------------------------------
+          agents = '''# ScrubBots Agent Instructions
+
+          ## H!veAI GitHub tracking [OWNER-LOCKED — 2026-09-10]
+
+          - GitHub `origin/main` is project-state authority.
+          - Repository-root `TASKS.md` is the **only** live project-status tracker consumed by H!veAI.
+          - Read root `TASKS.md` before project work and obey its `Project Status` block.
+          - When authorized work changes lifecycle state, update root `TASKS.md` in the same evidence chain and push it to `origin/main`.
+          - Former `.hiveai/PROJECT.json`, `.hiveai/RULES.md`, `.hiveai/TASKS.md`, `.hiveai/EVENTS.jsonl`, dashboards, cycle maps and snapshots are retired as live control-plane state. Their archived copies under `docs/migration/legacy-task-trackers/` are historical evidence only.
+          - Do **not** create, revive, synchronize, or maintain any competing `.hiveai` tracker.
+          - Coordination prompts/logs/audits are evidence artifacts, not competing current-state trackers.
+          - Independent audit separation remains locked: Claude implements/tests and may hand off `AWAITING_AUDIT`; only ChatGPT audit may assign `AUDITED_*` and close audit-owned task truth.
+          - Provider-specific behavior must not change these tracking semantics.
+          '''
+          write('AGENTS.md', agents)
+
+          # -----------------------------------------------------------------
+          # CLAUDE.md: remove stale .hiveai adapter and stale dashboard contract.
+          # Preserve gameplay/engineering rules.
+          # -----------------------------------------------------------------
+          c = read('CLAUDE.md')
+          top = '''# H!veAI GitHub tracking [OWNER-LOCKED — 2026-09-10]
+
+          - GitHub `origin/main` is project-state authority.
+          - Repository-root `TASKS.md` is the **only** live H!veAI project-status tracker.
+          - Read root `TASKS.md` first for current milestone, sprint, task, workflow state, required actor, next action and progress.
+          - Update root `TASKS.md` when the active prompt authorizes a lifecycle handoff; commit/push that state with the evidence it describes.
+          - Never create or revive `.hiveai/*` as live control-plane state. Archived former tracker files under `docs/migration/legacy-task-trackers/` are historical only.
+          - Coordination prompt/log/audit files are evidence, not current-state trackers.
+          - Claude never self-audits or marks audit-owned completion; ChatGPT remains the independent auditor.
+
+          **This owner-locked block supersedes every historical tracker/dashboard/session-index instruction below if any stale wording remains.**
+
+          ---
+
+          # SCRUBBOTS — Project Operating Manual for AI Agents
+          '''
+          c, n = re.subn(r'^# H!veAI GitHub-first adapter \(v3\).*?---\n\n# SCRUBBOTS — Project Operating Manual for AI Agents\n', top, c, count=1, flags=re.S)
+          assert n == 1, 'CLAUDE top adapter block not replaced'
+          c = c.replace('`tasks.md`', '`TASKS.md`')
+
+          section5 = '''## 5. H!veAI tracking contract
+
+          36. Repository-root `TASKS.md` is the single live H!veAI project-status contract. Former `.hiveai` trackers/dashboards and `coordination/SESSION_INDEX.md` are historical evidence only and must not be maintained as parallel current state. The top `Project Status` block in `TASKS.md` controls current task/actor/progress.
+
+          ## 6. Working style
+          '''
+          c, n = re.subn(r'## 5\. H!veAI dashboard contract\n.*?## 6\. Working style\n', section5, c, count=1, flags=re.S)
+          assert n == 1, 'CLAUDE section 5 not replaced'
+
+          old37 = '''37. Before any material implementation session, read in this order after
+              reading this file: `TASKS.md`, `.hiveai/PROJECT_DASHBOARD.md`,
+              `coordination/README.md`, `coordination/SESSION_INDEX.md`, then every
+              prompt/audit/owner-note artifact in the active coordination cycle in
+              version order, followed by the relevant `docs/` sources.'''
+          new37 = '''37. Before any material implementation session, read in this order after
+              reading this file: root `TASKS.md`, `coordination/README.md`,
+              `coordination/AUDIT_POLICY.md`, `coordination/AUDIT_INDEX.md`, then every
+              prompt/audit/owner-note artifact in the active coordination cycle in
+              version order, followed by the relevant `docs/` sources.'''
+          if old37 in c:
+              c = c.replace(old37, new37, 1)
+
+          # Normalize any late duplicate root-tracking block and explicitly retire legacy surfaces.
+          c = re.sub(r'## H!veAI GitHub tracking\n\n(?:- .*\n)+',
+                     '''## H!veAI GitHub tracking\n\n- Root `TASKS.md` is the only current project-status tracker.\n- Keep its `Project Status` fields truthful when the active prompt authorizes a lifecycle transition.\n- Do not create or revive `.hiveai/*` tracker files, dashboards, maps or event logs as live state.\n- Archived tracker material under `docs/migration/legacy-task-trackers/` is read-only historical evidence.\n''',
+                     c)
+          write('CLAUDE.md', c)
+
+          # -----------------------------------------------------------------
+          # Coordination protocol: rewrite stale dashboard-era authority model.
+          # -----------------------------------------------------------------
+          coord = '''# SCRUBBOTS Coordination Protocol
+
+          ## Authority model [OWNER-LOCKED — 2026-09-10]
+
+          - GitHub `origin/main` is repository truth.
+          - Root `TASKS.md` is the **only live project-status tracker** and the only H!veAI current-state surface.
+          - `CLAUDE.md` and `AGENTS.md` are agent operating/governance manuals, not status trackers.
+          - `coordination/AUDIT_POLICY.md` is the audit constitution.
+          - `coordination/AUDIT_INDEX.md` is ChatGPT-owned reusable audit memory.
+          - `coordination/sessions/<CYCLE_ID>/` contains versioned evidence artifacts.
+          - Former `.hiveai/*`, dashboards, ACTIVE_CYCLES, ARTIFACT_MAP, PROGRESS_SNAPSHOT and `coordination/SESSION_INDEX.md` are historical only. Do not maintain them as live state.
+
+          ## Versioned cycle bundle
+
+          Each implementation/audit version uses:
+
+          ```text
+          CHATGPT_PROMPT_VNN.md
+          CHATGPT_AUDIT_CRITERIA_VNN.md
+          CLAUDE_LOG_VNN.md
+          CHATGPT_AUDIT_VNN.md
+          ```
+
+          ChatGPT owns the `CHATGPT_*` artifacts. Claude owns only the matching `CLAUDE_LOG_VNN.md`. Claude never creates an audit verdict or edits a ChatGPT audit artifact.
+
+          ## Normal cycle flow
+
+          1. ChatGPT reads root `TASKS.md`, current source, prior audits and `AUDIT_INDEX.md`.
+          2. ChatGPT performs the required full attack-surface sweep for critical work, freezes findings, and publishes the prompt/criteria.
+          3. Claude safely syncs `origin/main`, confirms root `TASKS.md` authorizes Claude, then implements/tests.
+          4. When the prompt requires lifecycle tracking, Claude updates root `TASKS.md` to `IN_PROGRESS` before material edits, commits/pushes it, and later hands off as `AWAITING_AUDIT` with the matching log/evidence.
+          5. Claude stops. It does not self-audit and does not mark audit-owned task rows complete.
+          6. ChatGPT independently audits actual GitHub state. If corrections are required, ChatGPT updates root `TASKS.md` to the next `CHANGES_REQUIRED` task/version and publishes the next prompt. If clean, ChatGPT writes the final audit, closes the approved root task rows, updates progress/current frontier in root `TASKS.md`, and advances only after closure.
+
+          ## Tracker rule
+
+          There is no second live tracker. Do not mirror current task, actor, progress or next action into `.hiveai/*`, dashboards, session indexes or coordination summary files. Historical files may retain old wording as evidence when they live under an explicit archive/history path, but current governance files must point to root `TASKS.md`.
+
+          ## Evidence
+
+          Claude-run runtime checks are E1/E2 implementer evidence. ChatGPT source/diff/test inspection is E3 audit evidence. Owner-controlled product/design approval is E4. Only ChatGPT audit files may assign `AUDITED_PASS`, `AUDITED_FAIL`, `NOT_INDEPENDENTLY_VERIFIED`, `BLOCKED`, or `OWNER_REQUIRED` as audit verdicts.
+
+          ## Strict-v2 closure
+
+          `coordination/AUDIT_POLICY.md` governs all audits. Critical/stateful systems normally require implementation audit plus auditor-authored adversarial validation when ChatGPT cannot independently execute Godot. Full attack-surface sweep, direct observability, sensitivity, rollback/re-entry/malformed-input coverage and task-by-task closure remain mandatory.
+
+          ## GitHub URLs
+
+          Canonical repository: `https://github.com/Sekiph82/Scrubbots`
+          Canonical root tracker: `https://github.com/Sekiph82/Scrubbots/blob/main/TASKS.md`
+          '''
+          write('coordination/README.md', coord)
+
+          # -----------------------------------------------------------------
+          # Versioned log policy: retain evidence rules, remove derived trackers.
+          # -----------------------------------------------------------------
+          vlp = '''# SCRUBBOTS Versioned Claude Log Policy
+
+          Status: LOCKED
+          Coordination schema: scrubbots-coordination/v4
+
+          ## Canonical bundle
+
+          Every ChatGPT implementation prompt version has exactly one matching Claude GitHub evidence file in the same cycle directory:
+
+          ```text
+          CHATGPT_PROMPT_VNN.md
+          CHATGPT_AUDIT_CRITERIA_VNN.md
+          CLAUDE_LOG_VNN.md
+          CHATGPT_AUDIT_VNN.md
+          ```
+
+          Prompt/log version matching is mandatory.
+
+          ## Ownership
+
+          - ChatGPT owns `CHATGPT_PROMPT_VNN.md`, `CHATGPT_AUDIT_CRITERIA_VNN.md`, and `CHATGPT_AUDIT_VNN.md`.
+          - Claude owns `CLAUDE_LOG_VNN.md` only.
+          - Claude never creates/edits ChatGPT artifacts or assigns an audit verdict.
+          - ChatGPT never fabricates Claude logs.
+
+          ## Root TASKS tracking [OWNER-LOCKED — 2026-09-10]
+
+          Root `TASKS.md` is the only live project-status tracker and H!veAI current-state surface. Former `.hiveai/*`, dashboard, cycle-map, progress-snapshot and session-index trackers are retired and historical only. Do not create or synchronize a competing tracker.
+
+          Claude may update root `TASKS.md` only as authorized by the active prompt for truthful lifecycle handoff (`IN_PROGRESS`, `AWAITING_AUDIT`, or truthful `BLOCKED`). Claude must not mark independent-audit completion or close audit-owned task rows. ChatGPT performs independent audit closure, task-row closure, progress update and next-frontier update in root `TASKS.md`.
+
+          ## Claude log requirements
+
+          The matching `CLAUDE_LOG_VNN.md` records prompt/criteria/prior-audit references, starting commit, changed files, exact validation commands/results, failures/fixes, scope/governance checks, commit/push evidence, blockers and final handoff state. Aggregate green counts do not substitute for individually mandated checks.
+
+          ## GitHub-only evidence
+
+          For M12-C001 and later work, durable handoff evidence lives in GitHub. Historical Desktop logs may remain historical but are not a required live coordination surface.
+
+          ## Non-self-referential final SHA rule
+
+          A Git-tracked Claude log must not be edited merely to insert the SHA of the commit containing that same log. ChatGPT verifies final remote state directly; where a non-mutating receipt is required, use a GitHub-side receipt rather than creating an endless self-reference commit loop.
+
+          ## Strict-v2 adversarial validation
+
+          Critical milestones may use later validation-heavy prompt versions. A clean implementation version followed by an auditor-authored validation-only version is expected and does not imply the earlier implementation was useless. Final closure remains ChatGPT-owned under `coordination/AUDIT_POLICY.md`.
+
+          ## Progress reporting
+
+          Progress is recalculated from the canonical root `TASKS.md`. Do not source progress from archived `.hiveai` files or deprecated dashboards.
+          '''
+          write('coordination/VERSIONED_LOG_POLICY.md', vlp)
+
+          # -----------------------------------------------------------------
+          # Audit policy: keep strict-v2 body, patch only tracking ownership drift.
+          # -----------------------------------------------------------------
+          ap = read('coordination/AUDIT_POLICY.md')
+          anchor = 'Canonical repository: https://github.com/Sekiph82/Scrubbots\n'
+          override = '''\n## Tracking authority override [OWNER-LOCKED — 2026-09-10]\n\nRoot `TASKS.md` is the only live project-status tracker and H!veAI current-state surface. All former `.hiveai/*` trackers/dashboards and `coordination/SESSION_INDEX.md` are retired as live authority and may exist only as historical evidence. Any older tracking sentence below is superseded by this section. Claude may perform prompt-authorized lifecycle handoffs in root `TASKS.md`; ChatGPT owns independent audit verdicts, audit task closure, final progress updates and next-frontier advancement.\n'''
+          assert anchor in ap
+          if '## Tracking authority override [OWNER-LOCKED — 2026-09-10]' not in ap:
+              ap = ap.replace(anchor, anchor + override, 1)
+          ap = ap.replace('update task/dashboard/session state truthfully;', 'update root `TASKS.md` lifecycle state truthfully when the active prompt authorizes it;')
+          ap = ap.replace('update `SESSION_INDEX.md` and the H!veAI dashboard.', 'update root `TASKS.md` with the independent audit result, approved task closure, progress, and next frontier.')
+          ap = ap.replace('H!veAI derived tracking files are ACTIVE_CYCLES.md, ARTIFACT_MAP.md, and\nPROGRESS_SNAPSHOT.md under `.hiveai/`; they do not replace `tasks.md`.', 'Root `TASKS.md` is the sole live H!veAI/project-status tracker. Former `.hiveai` derived trackers and dashboards are retired historical evidence only.')
+          ap = ap.replace('`tasks.md`', '`TASKS.md`')
+          write('coordination/AUDIT_POLICY.md', ap)
+
+          # -----------------------------------------------------------------
+          # Archive README makes the historical-only status unmistakable.
+          # -----------------------------------------------------------------
+          archive = '''# Legacy H!veAI tracker archive
+
+          Repository: `Sekiph82/Scrubbots`  
+          Branch: `main`
+
+          These files are **historical evidence only**. They are snapshots of the retired `.hiveai` control-plane/tracker system and must never be read, updated, synchronized, copied back, or recreated as current project state.
+
+          The one and only live project-status tracker is repository-root:
+
+          `TASKS.md`
+
+          Current milestone, sprint, task, workflow state, actor, next action and progress come from the `Project Status` block at the top of root `TASKS.md`.
+          '''
+          write('docs/migration/legacy-task-trackers/README.md', archive)
+
+          # -----------------------------------------------------------------
+          # M19 closure instruction: expand/record the owner-directed contract cleanup.
+          # -----------------------------------------------------------------
+          closure = '''# M19-C001 — Owner-Directed Final Closure Materialization
+
+          Authority: `coordination/sessions/M19-C001/CHATGPT_AUDIT_V06.md`  
+          Audit verdict: **AUDITED_PASS / STRICT_V2_FINAL_CLOSURE**
+
+          Status: **OWNER-DIRECTED CONTRACT EXPANSION — root TASKS.md is the sole live tracker**
+
+          This is not an implementation cycle and not another audit. The owner explicitly requires the repository-root `TASKS.md` to be the single live H!veAI/project-status tracker.
+
+          The final closure therefore includes governance reconciliation, not merely checkbox edits:
+
+          1. root `TASKS.md`: close SB-M19-001..012, set progress to 290/719 = 40.33% main+ui and 290/943 = 30.75% overall, record lastCompletedTaskId M19-C001-V06, and move current frontier to M20-C001-PREP / READY_FOR_NEXT_TASK / actor CHATGPT;
+          2. root `TASKS.md`: replace the embedded stale `.hiveai/TASKS.md` authority notice;
+          3. `AGENTS.md` and `CLAUDE.md`: remove live `.hiveai` authority instructions and point current-state reads/writes only to root `TASKS.md`;
+          4. `coordination/README.md`, `coordination/AUDIT_POLICY.md`, and `coordination/VERSIONED_LOG_POLICY.md`: remove dashboard/session-index/derived-tracker current-state ownership and make root `TASKS.md` the sole live tracker while preserving independent audit separation;
+          5. `docs/migration/legacy-task-trackers/README.md`: explicitly mark all archived tracker files historical/read-only;
+          6. never recreate `.hiveai/*` as a competing tracker;
+          7. do not modify gameplay production or tests as part of this administrative closure.
+
+          M19 production remains locked to the accepted V05 dispatcher blob `0d1a6b1f6e9a6f1788ceb2078473c87bec8986e3`; V06 validation evidence remains commit `77d5359c4482a816e3d2e2ca7481ec1fdb7ed8af` with 3273/3273 Godot 4.7.1 checks.
+
+          Once these repository governance/tracker changes are present on `origin/main`, this materialization instruction is satisfied. Do not begin M20 implementation until ChatGPT performs the M20 full attack-surface sweep and publishes the canonical M20-C001 V01 prompt/criteria.
+          '''
+          write('coordination/sessions/M19-C001/CHATGPT_TRACKER_CLOSURE_V06.md', closure)
+
+          # ---------------------------------------------------------------
+          # Assertions.
+          # ---------------------------------------------------------------
+          t = read('TASKS.md')
+          assert all(f'- [x] SB-M19-{i:03d}' in t for i in range(1, 13))
+          assert '290 / 719 = 40.33%' in t and '290 / 943 = 30.75%' in t
+          assert 'Current Milestone: M20' in t and 'Current Task Status: READY_FOR_NEXT_TASK' in t
+          assert 'Required Actor: CHATGPT' in t
+          assert '.hiveai/TASKS.md` is the H!veAI authority' not in t
+
+          for path in ['AGENTS.md','coordination/README.md','coordination/VERSIONED_LOG_POLICY.md','docs/migration/legacy-task-trackers/README.md']:
+              txt = read(path)
+              assert 'root `TASKS.md`' in txt or 'Root `TASKS.md`' in txt or '`TASKS.md`' in txt
+
+          assert 'Read `.hiveai/TASKS.md`' not in read('AGENTS.md')
+          assert 'Read `.hiveai/TASKS.md`' not in read('CLAUDE.md')
+          assert 'H!veAI actively watches only .hiveai/PROJECT_DASHBOARD.md' not in read('coordination/VERSIONED_LOG_POLICY.md')
+
+          print('Root TASKS single-tracker reconciliation validated.')
+          PY
+
+      - name: Verify diff is governance/tracker only
+        shell: bash
+        run: |
+          git diff --check
+          git status --short
+          if git diff --name-only | grep -E '^scripts/|^tests/'; then
+            echo 'ERROR: gameplay/test file changed' >&2
+            exit 1
+          fi
+
+      - name: Commit and push reconciliation
+        shell: bash
+        run: |
+          git config user.name 'ScrubBots Governance Bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add TASKS.md AGENTS.md CLAUDE.md coordination/README.md coordination/AUDIT_POLICY.md coordination/VERSIONED_LOG_POLICY.md coordination/sessions/M19-C001/CHATGPT_TRACKER_CLOSURE_V06.md docs/migration/legacy-task-trackers/README.md
+          git commit -m 'governance: make root TASKS sole tracker and close M19'
+          git push origin HEAD:main
