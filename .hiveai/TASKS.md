@@ -2,13 +2,13 @@
 {
   "schema": "hiveai-task-tracker/v3",
   "projectKey": "scrubbots",
-  "currentMilestone": "M15 — TargetSelector upstream repair for M19",
-  "currentSprint": "M15-C002 V03 — final transactional closure",
-  "currentTaskId": "M15-C002-V03",
-  "currentTaskTitle": "Close select-during-bind and post-callback transactional proof gaps in F-M15-STRICT-004/005",
-  "workflowState": "AWAITING_AUDIT",
-  "requiredActor": "CHATGPT",
-  "nextAction": "Independently audit M15-C002 V03 against CHATGPT_AUDIT_CRITERIA_V03.md (impl scripts/gameplay/targeting/target_selector.gd; evidence coordination/sessions/M15-C002/CLAUDE_LOG_V03.md; full root suite 3024/3024 green on Godot 4.7.1). Publish CHATGPT_AUDIT_V03.md; on pass, close M15-C002 and issue the frozen M19-C001 V04 remainder.",
+  "currentMilestone": "M19 — Scrubbot dispatcher orchestration",
+  "currentSprint": "M19-C001 V04 — frozen dispatcher transaction remainder",
+  "currentTaskId": "M19-C001-V04",
+  "currentTaskTitle": "Close the frozen M19 dispatcher bind, selector-proof, reset-generation and final-commit remainder",
+  "workflowState": "CHANGES_REQUIRED",
+  "requiredActor": "CLAUDE",
+  "nextAction": "Implement coordination/sessions/M19-C001/CHATGPT_PROMPT_V04.md; validate against CHATGPT_AUDIT_CRITERIA_V04.md; write CLAUDE_LOG_V04.md; follow H!veAI GitHub-first v3 lifecycle and hand off AWAITING_AUDIT.",
   "blockers": [],
   "progress": {
     "scopeType": "main+ui",
@@ -17,10 +17,10 @@
     "total": 719,
     "percent": 38.66
   },
-  "lastCompletedTaskId": "FOUNDATION-C001-V01",
-  "lastCompletedTaskTitle": "BoardState.set_cell_state canonical ACTIVE/CLEARED guard (FOUNDATION-STRICT-001 closed)",
-  "updatedAt": "2026-09-10T10:55:00Z",
-  "updatedBy": "CLAUDE"
+  "lastCompletedTaskId": "M15-C002-V03",
+  "lastCompletedTaskTitle": "TargetSelector strict-v2 Variant/re-entry/transactional closure for M19 upstream gate",
+  "updatedAt": "2026-09-10T11:04:09Z",
+  "updatedBy": "CHATGPT"
 }
 HIVEAI_TRACKER_V3_END -->
 
@@ -28,52 +28,49 @@ HIVEAI_TRACKER_V3_END -->
 
 ## Current
 
-- Current milestone: **M15 — TargetSelector upstream repair for M19**
-- Current sprint: **M15-C002 V03 — final transactional closure**
-- Current task: **M15-C002-V03 — Close select-during-bind and post-callback transactional proof gaps in F-M15-STRICT-004/005**
-- Workflow: **AWAITING_AUDIT**
-- Required actor: **CHATGPT**
-- Next action: ChatGPT independently audits M15-C002 V03 against
-  `coordination/sessions/M15-C002/CHATGPT_AUDIT_CRITERIA_V03.md`. Implementation
-  in `scripts/gameplay/targeting/target_selector.gd`; evidence in
-  `coordination/sessions/M15-C002/CLAUDE_LOG_V03.md`; full root suite
-  **3024/3024** green on Godot **4.7.1** (IN_PROGRESS pushed before any edit,
-  correcting the V02 ordering nonconformance). On pass, close M15-C002 and issue
-  the frozen M19-C001 V04 remainder.
-- Blockers: none for the current M15 task.
-- Audit status: M15-C002 V02 independent audit returned **CHANGES_REQUIRED / SAME_FROZEN_SET / V03_REQUIRED**. V01/V02 hardening is preserved. V03 closes only the remaining select-during-bind, post-targetability owner-query drift, and post-reserve proof-callback ordering/coherence gaps.
-- Process note: V02 durable GitHub commit order was correct, but Claude disclosed that local production/test edits were written before the IN_PROGRESS start transition was pushed. V03 must not repeat that H!veAI ordering nonconformance.
-- M19 status: **waiting**. M19-C001 V03 implementation remains preserved. Do not issue/execute M19 V04 until M15-C002 independently passes.
+- Current milestone: **M19 — Scrubbot dispatcher orchestration**
+- Current sprint: **M19-C001 V04 — frozen dispatcher transaction remainder**
+- Current task: **M19-C001-V04 — Close the frozen M19 dispatcher bind, selector-proof, reset-generation and final-commit remainder**
+- Workflow: **CHANGES_REQUIRED**
+- Required actor: **CLAUDE**
+- Next action: Implement
+  `coordination/sessions/M19-C001/CHATGPT_PROMPT_V04.md`, validate against
+  `coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V04.md`, write
+  `coordination/sessions/M19-C001/CLAUDE_LOG_V04.md`, follow the H!veAI
+  `IN_PROGRESS -> AWAITING_AUDIT` lifecycle, and push to `origin/main`.
+- Blockers: none.
+- M15 status: **M15-C002 V03 AUDITED_PASS / STRICT_V2_FINAL_CLOSURE / UPSTREAM_GATE_CLOSED**. Final audit: `coordination/sessions/M15-C002/CHATGPT_AUDIT_V03.md`.
+- M19 status: V02/V03 implementation is preserved. V04 now executes only the remainder frozen by `coordination/sessions/M19-C001/CHATGPT_AUDIT_V03.md`.
 
 ## Milestones
 
 - **M02–M14 and FOUNDATION-C001** — audited/closed.
-- **M15 — TargetSelector:** historical M15-C001 remains accepted. M15-C002 V01/V02 materially hardened the newly exposed boundary/lifecycle classes; **M15-C002 V03 is the current final transactional closure gate** for the same frozen F-M15-STRICT-004/005 set.
+- **M15 — TargetSelector:** M15-C001 and M15-C002 are independently audited/closed. F-M15-STRICT-004/005 are closed.
 - **M16–M18** — audited/closed and preserved.
-- **M19 — dispatcher orchestration:** V03 implementation is preserved; M19 has a frozen remainder and waits on M15-C002. After M15-C002 independently closes, ChatGPT will issue M19-C001 V04.
+- **M19 — dispatcher orchestration:** **M19-C001 V04 is current**. Frozen remainder covers bind transaction re-entry/reset, selector return + exact reservation proof, immediate reset-generation checks across callback-bearing phases, reset re-entry safety, assign return type, and final add-child coherence before active commit.
 - **M20+** — arrival resolution / clearing / scoring / slot progression remains planned and out of scope.
 
 ## Active / Waiting
 
-- [~] **M15-C002-V03** — AWAITING_AUDIT, actor CHATGPT. Same frozen F-M15-STRICT-004/005 set. Closure implemented in `scripts/gameplay/targeting/target_selector.gd`: reject selection during bind transaction (005.H); coherence re-check after the post-targetability owner query (005.I); post-reserve ownership proof bracketed one callback at a time with per-step TYPE_INT + coherence + exact rollback (005.J). Adversarial coverage `_run_target_selector_strict_v05_tests` (incl. removed-coherence sensitivity proof); full root suite 3024/3024 green. No audit verdict claimed by Claude.
-- [~] **M19-C001-V03** — implementation preserved; independent audit completed with CHANGES_REQUIRED. Waiting on M15-C002 V03, then M19 V04 remainder closure.
+- [~] **M19-C001-V04** — CHANGES_REQUIRED, actor CLAUDE. Implement the frozen M19 dispatcher remainder only. M15 is now upstream-final and must not be modified in this cycle.
 
 ## Planned
 
-- [ ] M15-C002-V03 implementation + independent audit.
-- [ ] M19-C001 V04 frozen remainder closure after M15-C002 passes.
+- [ ] M19-C001 V04 implementation + independent audit.
+- [ ] If V04 production correction is clean, auditor-authored validation-only M19 V05 before final task closure, unless independent runtime becomes available.
 - [ ] M20 — arrival resolution: BoardState ACTIVE→CLEARED on arrival, reservation resolution, scoring, slot progression, follow-up dispatch.
 
 ## Completed
 
 - [x] **FOUNDATION-C001 V01** — `AUDITED_PASS / FOUNDATION-STRICT-001 CLOSED` (impl `a059b85`). Canonical ACTIVE/CLEARED guard on `BoardState.set_cell_state`.
-- [x] Historical M11–M14, M15-C001, M16–M18 strict closures remain accepted except for the currently open M15-C002 finding set described above.
+- [x] **M15-C002 V03** — `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE / UPSTREAM_GATE_CLOSED` (impl `9f41866`). TargetSelector dependency/Variant/re-entry/transactional boundary hardening complete; full Claude root run 3024/3024 green.
+- [x] Historical M11–M14, M15-C001, M16–M18 strict closures remain accepted.
 
 ## Progress
 
 - Main + UI scope: **278 / 719 = 38.66%**.
 - Overall (incl. sidecars): **278 / 943 = 29.48%**.
-- No progress increment is recorded for M15-C002 or M19 until independent audit closes the relevant task truth.
+- M15-C002 was a strict overlay over historically checked M15 task rows, so its final closure does not increment progress. M19 task rows remain open until M19 final independent closure.
 
 ## History / migration notes
 
