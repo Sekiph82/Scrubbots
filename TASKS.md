@@ -5,13 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M19
-- Current Sprint: M19-C001 V05
-- Current Task: M19-C001-V05 — Close the remaining M19 callback-order and direct-observability gaps after V04
-- Current Task Status: AWAITING_AUDIT
-- Next Task/Action: Independently audit M19-C001 V05 against the project audit criteria and publish the audit.
-- Required Actor: CHATGPT
+- Current Sprint: M19-C001 V06 — auditor-authored validation-only final gate
+- Current Task: M19-C001-V06 — Run the auditor-authored validation-only final gate over the V05 dispatcher production blob (no committed production change)
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: Claude executes coordination/sessions/M19-C001/CHATGPT_PROMPT_V06.md validation-only (zero production commit), then hands off AWAITING_AUDIT for ChatGPT final M19 audit / SB-M19-001..012 closure.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
+- Progress: 278 / 719 = 38.66% (main+ui); lastCompletedTaskId M15-C002-V03. Held until independent V06 audit.
+- Note: V05 SOURCE_CORRECTION_ACCEPTED (coordination/sessions/M19-C001/CHATGPT_AUDIT_V05.md); V06 opened by ChatGPT. This status block was reconciled from a stale V05 snapshot left by the root-TASKS tracking-contract migration — the pre-migration .hiveai/TASKS.md already recorded M19-C001-V06 / CHANGES_REQUIRED / CLAUDE.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
