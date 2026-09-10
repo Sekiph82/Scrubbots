@@ -6,9 +6,9 @@
   "currentSprint": "M15-C002 V01 — selection boundary and operation-lifecycle repair",
   "currentTaskId": "M15-C002-V01",
   "currentTaskTitle": "Close TargetSelector dynamic boundary and selection-operation drift (F-M15-STRICT-004/005)",
-  "workflowState": "CHANGES_REQUIRED",
+  "workflowState": "IN_PROGRESS",
   "requiredActor": "CLAUDE",
-  "nextAction": "Implement coordination/sessions/M15-C002/CHATGPT_PROMPT_V01.md; validate against CHATGPT_AUDIT_CRITERIA_V01.md; write CLAUDE_LOG_V01.md; follow H!veAI IN_PROGRESS -> AWAITING_AUDIT lifecycle and push to origin/main.",
+  "nextAction": "Implementing coordination/sessions/M15-C002/CHATGPT_PROMPT_V01.md (F-M15-STRICT-004/005); validating against CHATGPT_AUDIT_CRITERIA_V01.md; writing CLAUDE_LOG_V01.md; will hand off AWAITING_AUDIT to CHATGPT and push to origin/main.",
   "blockers": [],
   "progress": {
     "scopeType": "main+ui",
@@ -19,8 +19,8 @@
   },
   "lastCompletedTaskId": "FOUNDATION-C001-V01",
   "lastCompletedTaskTitle": "BoardState.set_cell_state canonical ACTIVE/CLEARED guard (FOUNDATION-STRICT-001 closed)",
-  "updatedAt": "2026-09-10T06:06:35Z",
-  "updatedBy": "CHATGPT"
+  "updatedAt": "2026-09-10T07:55:42Z",
+  "updatedBy": "CLAUDE"
 }
 HIVEAI_TRACKER_V3_END -->
 
@@ -31,13 +31,13 @@ HIVEAI_TRACKER_V3_END -->
 - Current milestone: **M15 — TargetSelector upstream repair for M19**
 - Current sprint: **M15-C002 V01 — selection boundary and operation-lifecycle repair**
 - Current task: **M15-C002-V01 — Close TargetSelector dynamic boundary and selection-operation drift (F-M15-STRICT-004/005)**
-- Workflow: **CHANGES_REQUIRED**
+- Workflow: **IN_PROGRESS**
 - Required actor: **CLAUDE**
-- Next action: Implement
-  `coordination/sessions/M15-C002/CHATGPT_PROMPT_V01.md`, validate against
-  `coordination/sessions/M15-C002/CHATGPT_AUDIT_CRITERIA_V01.md`, write
-  `coordination/sessions/M15-C002/CLAUDE_LOG_V01.md`, follow the canonical
-  H!veAI `IN_PROGRESS -> AWAITING_AUDIT` lifecycle, and push to `origin/main`.
+- Next action: Claude is implementing
+  `coordination/sessions/M15-C002/CHATGPT_PROMPT_V01.md`, validating against
+  `coordination/sessions/M15-C002/CHATGPT_AUDIT_CRITERIA_V01.md`, writing
+  `coordination/sessions/M15-C002/CLAUDE_LOG_V01.md`, and will hand off
+  `AWAITING_AUDIT` to CHATGPT and push to `origin/main`.
 - Blockers: none for the current M15 task.
 - Audit status: M19-C001 V03 implementation is preserved, but independent audit
   returned **CHANGES_REQUIRED / UPSTREAM_M15_GATE + M19_REMAINDER_FROZEN**.
@@ -59,9 +59,11 @@ HIVEAI_TRACKER_V3_END -->
 
 ## Active / Waiting
 
-- [~] **M15-C002-V01** — CHANGES_REQUIRED, actor CLAUDE. Frozen findings:
+- [~] **M15-C002-V01** — IN_PROGRESS, actor CLAUDE. Frozen findings:
   F-M15-STRICT-004 (dependency/Variant-return fail-closed boundary) and
-  F-M15-STRICT-005 (selection-operation snapshot/rebind safety).
+  F-M15-STRICT-005 (selection-operation snapshot/rebind safety). Implementation
+  under way in `scripts/gameplay/targeting/target_selector.gd`; no audit verdict
+  is claimed by Claude.
 - [~] **M19-C001-V03** — implementation preserved; independent audit completed
   with CHANGES_REQUIRED. Waiting on M15-C002, then M19 V04 remainder closure.
 
