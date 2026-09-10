@@ -7,9 +7,9 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Current Milestone: M19
 - Current Sprint: M19-C001 V06 — auditor-authored validation-only final gate
 - Current Task: M19-C001-V06 — Run the auditor-authored validation-only final gate over the V05 dispatcher production blob (no committed production change)
-- Current Task Status: IN_PROGRESS
-- Next Task/Action: Claude executes coordination/sessions/M19-C001/CHATGPT_PROMPT_V06.md validation-only (zero production commit), then hands off AWAITING_AUDIT for ChatGPT final M19 audit / SB-M19-001..012 closure.
-- Required Actor: CLAUDE
+- Current Task Status: AWAITING_AUDIT
+- Next Task/Action: ChatGPT independently audits M19-C001 V06 (validation-only) against coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V06.md; evidence coordination/sessions/M19-C001/CLAUDE_LOG_V06.md; full root suite 3273/3273 green on Godot 4.7.1; V05 dispatcher blob unchanged (0d1a6b1f). On PASS, close SB-M19-001..012.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 278 / 719 = 38.66% (main+ui); lastCompletedTaskId M15-C002-V03. Held until independent V06 audit.
