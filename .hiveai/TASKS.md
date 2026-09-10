@@ -6,9 +6,9 @@
   "currentSprint": "M19-C001 V05 — transaction boundary closure",
   "currentTaskId": "M19-C001-V05",
   "currentTaskTitle": "Close the remaining M19 callback-order and direct-observability gaps after V04",
-  "workflowState": "IN_PROGRESS",
-  "requiredActor": "CLAUDE",
-  "nextAction": "Implementing coordination/sessions/M19-C001/CHATGPT_PROMPT_V05.md (V04 remainder: pending-owner baseline bracket 001.G/003.H, canonical -1 side-effect bracket 003.G, generation precedence over ownability/postcondition 003.I, malformed ownership-proof + real M15-C002 integration evidence); validating against CHATGPT_AUDIT_CRITERIA_V05.md; writing CLAUDE_LOG_V05.md; IN_PROGRESS pushed before any production/test edit; will hand off AWAITING_AUDIT to CHATGPT.",
+  "workflowState": "AWAITING_AUDIT",
+  "requiredActor": "CHATGPT",
+  "nextAction": "Independently audit M19-C001 V05 against CHATGPT_AUDIT_CRITERIA_V05.md (impl scripts/gameplay/dispatch/scrubbot_dispatcher.gd; evidence coordination/sessions/M19-C001/CLAUDE_LOG_V05.md; full root suite 3203/3203 green on Godot 4.7.1, IN_PROGRESS pushed+verified before any edit). Publish CHATGPT_AUDIT_V05.md; per audit policy issue a narrow validation-only V06 before final closure of SB-M19-001..012.",
   "blockers": [],
   "progress": {
     "scopeType": "main+ui",
@@ -19,7 +19,7 @@
   },
   "lastCompletedTaskId": "M15-C002-V03",
   "lastCompletedTaskTitle": "TargetSelector strict-v2 Variant/re-entry/transactional closure for M19 upstream gate",
-  "updatedAt": "2026-09-10T13:32:27Z",
+  "updatedAt": "2026-09-10T13:45:41Z",
   "updatedBy": "CLAUDE"
 }
 HIVEAI_TRACKER_V3_END -->
@@ -31,14 +31,15 @@ HIVEAI_TRACKER_V3_END -->
 - Current milestone: **M19 — Scrubbot dispatcher orchestration**
 - Current sprint: **M19-C001 V05 — transaction boundary closure**
 - Current task: **M19-C001-V05 — Close the remaining M19 callback-order and direct-observability gaps after V04**
-- Workflow: **IN_PROGRESS**
-- Required actor: **CLAUDE**
-- Next action: Claude is implementing
-  `coordination/sessions/M19-C001/CHATGPT_PROMPT_V05.md`, validating against
-  `coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V05.md`, writing
-  `coordination/sessions/M19-C001/CLAUDE_LOG_V05.md`. IN_PROGRESS pushed and
-  verified on remote main BEFORE any local V05 production/test edit; will hand off
-  `AWAITING_AUDIT` to CHATGPT.
+- Workflow: **AWAITING_AUDIT**
+- Required actor: **CHATGPT**
+- Next action: ChatGPT independently audits M19-C001 V05 against
+  `coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V05.md`. Implementation in
+  `scripts/gameplay/dispatch/scrubbot_dispatcher.gd`; evidence in
+  `coordination/sessions/M19-C001/CLAUDE_LOG_V05.md`; full root suite **3203/3203**
+  green on Godot **4.7.1**; IN_PROGRESS pushed+verified before any edit (V04
+  ordering nonconformance corrected). Per audit policy a narrow validation-only V06
+  precedes final closure of SB-M19-001..012.
 - Blockers: none.
 - M15 status: **M15-C002 V03 AUDITED_PASS / STRICT_V2_FINAL_CLOSURE / UPSTREAM_GATE_CLOSED**.
 - M19 status: V02/V03/V04 accepted hardening is preserved. V04 independent audit returned **CHANGES_REQUIRED / SAME_FROZEN_SET / V05_REQUIRED**. Remaining work is limited to the callback-order/direct-observability remainder recorded in `coordination/sessions/M19-C001/CHATGPT_AUDIT_V04.md`.
@@ -54,7 +55,7 @@ HIVEAI_TRACKER_V3_END -->
 
 ## Active / Waiting
 
-- [~] **M19-C001-V05** — IN_PROGRESS, actor CLAUDE. Closing: pending-owner baseline/post-`-1` callback bracketing (001.G/003.G/003.H); reset-generation precedence over ownability/postcondition verdicts (003.I); malformed ownership-proof direct coverage; real M15-C002 rebind integration. All accepted V04 behavior preserved. IN_PROGRESS pushed before any edit. No audit verdict claimed by Claude.
+- [~] **M19-C001-V05** — AWAITING_AUDIT, actor CHATGPT. Closed in `scripts/gameplay/dispatch/scrubbot_dispatcher.gd`: pending-owner baseline/post-`-1` callback bracketing (001.G/003.G/003.H); reset-generation precedence over ownability/postcondition verdicts (003.I); malformed ownership-proof + real M15-C002 rebind integration evidence. Adversarial coverage `_run_m19_v05_tests` (sensitivity-proven via two recorded/restored mutations); full root suite 3203/3203 green. All accepted V04 behavior preserved. IN_PROGRESS pushed+verified before any edit. No audit verdict claimed by Claude.
 
 ## Planned
 
