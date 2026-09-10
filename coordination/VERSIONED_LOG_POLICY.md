@@ -3,10 +3,9 @@
 Status: LOCKED
 Coordination schema: scrubbots-coordination/v4
 
-## Canonical rule
+## Canonical bundle
 
-Every ChatGPT implementation prompt version has exactly one matching Claude
-GitHub evidence file in the same cycle directory:
+Every ChatGPT prompt version has one matching Claude evidence file in the same cycle:
 
 ```text
 CHATGPT_PROMPT_VNN.md
@@ -19,102 +18,33 @@ Prompt/log version matching is mandatory.
 
 ## Ownership
 
-- ChatGPT owns CHATGPT_PROMPT_VNN.md.
-- ChatGPT owns CHATGPT_AUDIT_CRITERIA_VNN.md.
-- Claude owns CLAUDE_LOG_VNN.md.
-- ChatGPT owns CHATGPT_AUDIT_VNN.md.
-- Claude never creates or edits CHATGPT_* files.
+- ChatGPT owns `CHATGPT_PROMPT_VNN.md`, `CHATGPT_AUDIT_CRITERIA_VNN.md`, and `CHATGPT_AUDIT_VNN.md`.
+- Claude owns `CLAUDE_LOG_VNN.md` only.
+- Claude never creates/edits ChatGPT artifacts or assigns an audit verdict.
 - ChatGPT never fabricates Claude logs.
 
-## Claude log rules
+## Root TASKS tracking [OWNER-LOCKED — 2026-09-10]
 
-1. Create CLAUDE_LOG_VNN.md when material work begins under
-   CHATGPT_PROMPT_VNN.md.
-2. Put it beside the prompt in the same cycle folder.
-3. Record the exact prompt URL, criteria URL, prior audits, AL learnings,
-   starting commit, changed files, all required validation steps, failures,
-   fixes, task/docs/coordination changes, commits, push result, final
-   GitHub-visible SHA, and handoff state.
-4. Multiple local sessions under one prompt append to the same CLAUDE_LOG_VNN.
-5. Never hide VNN work inside another version's log.
-6. If multiple prompt versions are deliberately executed together, create
-   every matching log and clearly identify shared evidence.
-7. Preserve historical CLAUDE_IMPLEMENTATION_LOG.md files as legacy evidence.
-8. Desktop SCRUBBOTS_PHASE_MXX_LOG.md remains a separate local crash-safe log
-   and is never committed.
+Root `TASKS.md` is the only live project-status tracker and H!veAI current-state surface. Former `.hiveai/*`, dashboard, cycle-map, progress-snapshot and session-index trackers are retired historical evidence. Do not create or synchronize a competing tracker.
 
-## H!veAI
+Claude may update root `TASKS.md` only as authorized by the active prompt for truthful lifecycle handoff (`IN_PROGRESS`, `AWAITING_AUDIT`, or truthful `BLOCKED`). Claude must not mark independent-audit completion or close audit-owned task rows. ChatGPT performs independent audit closure, task-row closure, progress update and next-frontier update in root `TASKS.md`.
 
-Derived tracking sources:
+## Claude log requirements
 
-- .hiveai/ACTIVE_CYCLES.md
-- .hiveai/ARTIFACT_MAP.md
-- .hiveai/PROGRESS_SNAPSHOT.md
+`CLAUDE_LOG_VNN.md` records prompt/criteria/prior-audit references, starting commit, changed files, exact validation commands/results, failures/fixes, scope/governance checks, commit/push evidence, blockers and final handoff. Aggregate green totals never substitute for individually mandated checks.
 
-H!veAI actively watches only .hiveai/PROJECT_DASHBOARD.md.
+## GitHub-only evidence
 
-**Ownership [LOCKED, M10-C001 V05]:** ChatGPT — not Claude — updates these
-derived tracking sources, `.hiveai/PROJECT_DASHBOARD.md`, and
-`coordination/SESSION_INDEX.md`, after its independent audit. Claude's cycle
-ends at `CLAUDE_LOG_VNN.md` + safe commit/push + `AWAITING_AUDIT` + stop. Claude
-may read these files for context but does not modify them.
+For M12-C001 and later work, durable handoff evidence lives in GitHub. Historical Desktop logs are not a required live coordination surface.
+
+## Non-self-referential final SHA rule
+
+A Git-tracked Claude log must not be edited merely to insert the SHA of the commit containing that same log. ChatGPT verifies final remote state directly.
+
+## Strict-v2 adversarial validation
+
+Critical milestones may use later validation-heavy prompt versions. Final closure remains ChatGPT-owned under `coordination/AUDIT_POLICY.md`.
 
 ## Progress reporting
 
-ChatGPT recalculates progress from tasks.md for every owner-facing audit/new
-prompt handoff and reports both ecosystem and per-track completion.
-
-
-## GitHub-only evidence override [effective M12-C001]
-
-The previous Desktop-phase-log statement is historical only.
-
-For M12-C001 and every later prompt:
-
-- first action: safe local ↔ origin/main synchronization preserving owner work;
-- no Desktop phase log or other external handoff log;
-- all durable evidence lives in GitHub `CLAUDE_LOG_VNN.md`;
-- this applies to the main game, Level Factory, and Content Pipeline.
-
-
-## Non-self-referential post-push evidence [LOCKED]
-
-A Git-tracked `CLAUDE_LOG_VNN.md` must never be required to contain the SHA
-of the final commit that contains that same log. Such a requirement is
-self-referential and creates an endless commit-finalization loop.
-
-Rule:
-
-1. CLAUDE_LOG_VNN records all evidence knowable before the focused commit.
-2. Create and push the focused commit.
-3. Do not edit the Git-tracked log merely to insert that commit's final SHA.
-4. When exact post-push SHA/status evidence is required, use a non-Git-mutating
-   GitHub receipt. For PR cycles, post one clearly titled PR comment containing
-   final commit SHA, remote-head SHA, equality proof, final status, and PR
-   state.
-5. ChatGPT independently verifies the receipt against actual GitHub remote
-   state.
-
-
-## Strict-v2 adversarial validation versions
-
-For critical milestones, a later prompt version may be validation-heavy rather
-than feature-heavy.
-
-Example:
-
-```text
-CHATGPT_PROMPT_V01.md          implementation
-CLAUDE_LOG_V01.md
-CHATGPT_AUDIT_V01.md          implementation audit
-
-CHATGPT_PROMPT_V02.md          ChatGPT-authored adversarial validation/correction
-CLAUDE_LOG_V02.md
-CHATGPT_AUDIT_V02.md           final strict closure audit
-```
-
-This is the expected pattern under `AUDIT_POLICY.md` strict v2.
-
-A V02 validation prompt does not imply V01 was useless or broadly defective. It
-means critical stateful behavior is being challenged with auditor-authored cases
-before final closure.
+Progress is recalculated from canonical root `TASKS.md`, never from archived `.hiveai` files or deprecated dashboards.

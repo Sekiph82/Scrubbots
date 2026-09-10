@@ -2,6 +2,10 @@
 
 Canonical repository: https://github.com/Sekiph82/Scrubbots
 
+## Tracking authority override [OWNER-LOCKED — 2026-09-10]
+
+Root `TASKS.md` is the only live project-status tracker and H!veAI current-state surface. Former `.hiveai/*` trackers/dashboards and `coordination/SESSION_INDEX.md` are retired as live authority and may exist only as historical evidence. Any older tracking sentence below is superseded by this section. Claude may perform prompt-authorized lifecycle handoffs in root `TASKS.md`; ChatGPT owns independent audit verdicts, audit task closure, final progress updates and next-frontier advancement.
+
 This policy defines the separation between Claude implementation/testing and ChatGPT independent auditing.
 
 ## Core ownership rule
@@ -17,7 +21,7 @@ Claude's job is to:
 1. implement the active ChatGPT prompt;
 2. run the required tests/checks while implementing;
 3. record exact commands, expected outcomes, failure conditions, actual results, failures/fixes, and relevant comparison notes in `CLAUDE_IMPLEMENTATION_LOG.md`;
-4. update task/dashboard/session state truthfully;
+4. update root `TASKS.md` lifecycle state truthfully when the active prompt authorizes it;
 5. hand the cycle back as `AWAITING_AUDIT`.
 
 ChatGPT then independently reviews the repository and publishes `CHATGPT_AUDIT_VNN.md`.
@@ -148,7 +152,7 @@ Each ChatGPT audit must:
 8. inspect test quality and false-positive risk where relevant;
 9. publish exact findings and corrections when status is `CHANGES_REQUIRED`;
 10. update `AUDIT_INDEX.md` with reusable findings;
-11. update `SESSION_INDEX.md` and the H!veAI dashboard.
+11. update root `TASKS.md` with the independent audit result, approved task closure, progress, and next frontier.
 
 ## Continuous audit learning
 
@@ -192,8 +196,7 @@ assigning an independent audit verdict. Claude-run tests remain E1/E2 evidence.
 Historical combined `CLAUDE_IMPLEMENTATION_LOG.md` files remain legacy
 evidence only.
 
-H!veAI derived tracking files are ACTIVE_CYCLES.md, ARTIFACT_MAP.md, and
-PROGRESS_SNAPSHOT.md under `.hiveai/`; they do not replace `tasks.md`.
+Root `TASKS.md` is the sole live H!veAI/project-status tracker. Former `.hiveai` derived trackers and dashboards are retired historical evidence only.
 
 
 ## Strict audit standard v2 [LOCKED — 2026-09-07]

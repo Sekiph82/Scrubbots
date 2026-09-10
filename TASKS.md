@@ -4,27 +4,21 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M19
-- Current Sprint: M19-C001 V06 — auditor-authored validation-only final gate
-- Current Task: M19-C001-V06 — Run the auditor-authored validation-only final gate over the V05 dispatcher production blob (no committed production change)
-- Current Task Status: AWAITING_AUDIT
-- Next Task/Action: ChatGPT independently audits M19-C001 V06 (validation-only) against coordination/sessions/M19-C001/CHATGPT_AUDIT_CRITERIA_V06.md; evidence coordination/sessions/M19-C001/CLAUDE_LOG_V06.md; full root suite 3273/3273 green on Godot 4.7.1; V05 dispatcher blob unchanged (0d1a6b1f). On PASS, close SB-M19-001..012.
+- Current Milestone: M20
+- Current Sprint: M20-C001 PREP — Complete Clearing Vertical Slice strict-v2 full-surface audit/prompt issuance
+- Current Task: M20-C001-PREP — ChatGPT inspects the current M20 integration surface and freezes the implementation/audit contract before Claude implementation
+- Current Task Status: READY_FOR_NEXT_TASK
+- Next Task/Action: ChatGPT independently inspects the current M20 integration surface, performs the full attack-surface sweep required by coordination/AUDIT_POLICY.md, then issues the canonical M20-C001 V01 prompt and audit criteria. Claude must not implement M20 before that prompt exists.
 - Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 278 / 719 = 38.66% (main+ui); lastCompletedTaskId M15-C002-V03. Held until independent V06 audit.
-- Note: V05 SOURCE_CORRECTION_ACCEPTED (coordination/sessions/M19-C001/CHATGPT_AUDIT_V05.md); V06 opened by ChatGPT. This status block was reconciled from a stale V05 snapshot left by the root-TASKS tracking-contract migration — the pre-migration .hiveai/TASKS.md already recorded M19-C001-V06 / CHANGES_REQUIRED / CLAUDE.
+- Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
+- Note: M19-C001 V06 AUDITED_PASS / STRICT_V2_FINAL_CLOSURE. Final audit: coordination/sessions/M19-C001/CHATGPT_AUDIT_V06.md. V06 validation commit 77d5359c4482a816e3d2e2ca7481ec1fdb7ed8af; 3273/3273 Godot 4.7.1; V05 dispatcher production blob unchanged at 0d1a6b1f6e9a6f1788ceb2078473c87bec8986e3.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
 
-> **H!veAI notice (GitHub-first v3):** H!veAI live *operational* state is now
-> maintained in `.hiveai/TASKS.md`. This root `tasks.md` remains the detailed
-> project roadmap/history. When a future task changes real project state, both
-> may need updates: root `tasks.md` for detailed task evidence, and
-> `.hiveai/TASKS.md` for H!veAI operational state. If they disagree about
-> *current* project state, `.hiveai/TASKS.md` is the H!veAI authority. Do not
-> maintain a duplicate machine-readable current-state block in this file.
+> **H!veAI tracking [OWNER-LOCKED — 2026-09-10]:** repository-root `TASKS.md` is the one and only live project-status tracker. The top `Project Status` block controls current milestone, sprint, task, actor, next action, workflow status, and progress. Former `.hiveai` control-plane files are archived under `docs/migration/legacy-task-trackers/` and are historical evidence only. Never recreate or synchronize a competing live tracker.
 
 Permanent master execution roadmap for the SCRUBBOTS project. This file is
 authoritative alongside `CLAUDE.md`. Read both at the start of every
@@ -93,7 +87,7 @@ complete — record why instead of marking `[x]`.
 - The 59×59 (3,481-cell) maximum production workload is considered wherever
   cost scales with board size.
 - Documentation reflects the actual implementation, not an aspirational one.
-- `tasks.md` is updated to reflect true status.
+- `TASKS.md` is updated to reflect true status.
 - `git diff` is reviewed before commit.
 - No cache/build junk (`.godot/`, import cache, build output) is committed.
 - A focused, understandable commit exists.
@@ -108,7 +102,7 @@ complete — record why instead of marking `[x]`.
 Every future numbered implementation prompt must:
 
 1. Read `CLAUDE.md`.
-2. Read `tasks.md` (this file).
+2. Read `TASKS.md` (this file).
 3. Read relevant `docs/` files for the system being touched.
 4. Inspect `git status` / branch / remote.
 5. Confirm which milestone is actually current (don't assume from memory).
@@ -123,7 +117,7 @@ Every future numbered implementation prompt must:
 13. Fix regressions.
 14. Run relevant performance sanity tests.
 15. Update `docs/`.
-16. Update `tasks.md`.
+16. Update `TASKS.md`.
 17. Review `git diff`.
 18. Commit (focused, descriptive message).
 19. Push safely (`git push origin main`, never force).
@@ -140,7 +134,7 @@ per prompt. A "phase" is a milestone-level unit of work (e.g. `M03`, `M04`)
 that may span multiple Claude prompts/sessions.
 
 - Naming: `C:\Users\sekip\Desktop\SCRUBBOTS_PHASE_MXX_LOG.md` (e.g.
-  `SCRUBBOTS_PHASE_M03_LOG.md`). `MXX` matches the `tasks.md` milestone ID
+  `SCRUBBOTS_PHASE_M03_LOG.md`). `MXX` matches the `TASKS.md` milestone ID
   the work belongs to.
 - **Create the log file at the START of the phase's first prompt**, before
   any inspection or code changes — not at the end.
@@ -916,17 +910,19 @@ create legal access to a previously blocked target.
 
 ### M19 — Scrubbot Dispatcher
 
-- [ ] SB-M19-001 Receive slot request.
-- [ ] SB-M19-002 Check work before spawn — "work" means a reachable/targetable target exists, not merely a raw color candidate.
-- [ ] SB-M19-003 Ask TargetSelector.
-- [ ] SB-M19-004 Refuse spawn without a reachable target (no reachable target → no spawn).
-- [ ] SB-M19-005 Reserve target.
-- [ ] SB-M19-006 Spawn exactly one bot per dispatch.
-- [ ] SB-M19-007 Enforce one-by-one flow.
-- [ ] SB-M19-008 Prevent duplicate assignments.
-- [ ] SB-M19-009 Handle dispatch failure.
-- [ ] SB-M19-010 Handle rapid input.
-- [ ] SB-M19-011 Concurrent slot tests. — [ ] SB-M19-012 Reset during dispatch.
+**Strict-v2 final closure:** M19-C001 V06 `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE`. Final audit: `coordination/sessions/M19-C001/CHATGPT_AUDIT_V06.md`. Validation-only commit `77d5359`; `3273/3273` on Godot 4.7.1; V05 dispatcher production blob unchanged.
+
+- [x] SB-M19-001 Receive slot request.
+- [x] SB-M19-002 Check work before spawn — "work" means a reachable/targetable target exists, not merely a raw color candidate.
+- [x] SB-M19-003 Ask TargetSelector.
+- [x] SB-M19-004 Refuse spawn without a reachable target (no reachable target → no spawn).
+- [x] SB-M19-005 Reserve target.
+- [x] SB-M19-006 Spawn exactly one bot per dispatch.
+- [x] SB-M19-007 Enforce one-by-one flow.
+- [x] SB-M19-008 Prevent duplicate assignments.
+- [x] SB-M19-009 Handle dispatch failure.
+- [x] SB-M19-010 Handle rapid input.
+- [x] SB-M19-011 Concurrent slot tests. — [x] SB-M19-012 Reset during dispatch.
 
 ### M20 — Complete Clearing Vertical Slice
 
