@@ -58,6 +58,15 @@ func _recompute_geometry(available_size: Vector2) -> void:
 	stretch_mode = TextureRect.STRETCH_SCALE
 	texture_filter = TEXTURE_FILTER_NEAREST
 
+## Read-only exact-identity coherence query (M20-C001 §2). True only when this
+## renderer is configured against the SAME BoardState instance the caller
+## supplies (reference identity, not equal dimensions/content), false before
+## configure() or for a different board. Lets the M20 clearing loop prove an
+## optional bound renderer still tracks the same board before a single-cell
+## repaint. Presentation-only; exposes no board reference and changes nothing.
+func is_bound_to(board) -> bool:
+	return _board != null and _board == board
+
 func get_cell_size() -> float:
 	return _cell_size
 

@@ -83,6 +83,11 @@ const M19CoherenceResetAccess = preload("res://tests/support/m19_coherence_reset
 const M19ProbeAgent = preload("res://tests/support/m19_probe_agent.gd")
 const M19ReservationProofDouble = preload("res://tests/support/m19_reservation_proof_double.gd")
 const M19ResetStateAgent = preload("res://tests/support/m19_reset_state_agent.gd")
+# M20 — complete clearing vertical slice (clearing-loop orchestrator).
+const CompleteClearingLoop = preload("res://scripts/gameplay/clearing/complete_clearing_loop.gd")
+const BoardDebugFixturesM20 = preload("res://scripts/debug/board_debug_fixtures.gd")
+const M20FailingCandidate = preload("res://tests/support/m20_failing_candidate.gd")
+const M20FailingReservation = preload("res://tests/support/m20_failing_reservation.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -158,6 +163,14 @@ func _initialize() -> void:
 	_run_m19_v04_tests()
 	_run_m19_v05_tests()
 	_run_m19_v06_auditor_validation_tests()
+	# M20 — complete clearing vertical slice.
+	_run_m20_bind_contract_tests()
+	_run_m20_activation_tests()
+	_run_m20_clear_transaction_tests()
+	_run_m20_scenario_matrix_tests()
+	_run_m20_reachability_open_tests()
+	_run_m20_desync_adversary_tests()
+	_run_m20_reset_lifecycle_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -8430,3 +8443,433 @@ func _run_m19_v06_auditor_validation_tests() -> void:
 	_m19_teardown(mi)
 
 	print("  M19 V06 auditor-validation tests complete")
+
+# =============================================== M20-C001 V01 complete clearing =
+# Complete Clearing Vertical Slice: the CompleteClearingLoop orchestrator turns
+# one slot activation into one M19 dispatch, and one authenticated arrival into a
+# synchronized cross-module clear transaction (BoardState -> candidate index ->
+# reservation -> renderer -> dispatcher finalize). Uses REAL production selection/
+# routing/access for the scale/reachability/clearing spine; narrow doubles only
+# where a forced rollback is required. See coordination/sessions/M20-C001.
+
+## Build a full production clearing bundle over `board`. Optional candidate /
+## reservation overrides (real subclasses) exercise rollback; use_renderer adds a
+## live BoardRenderer exact-bound to the same board.
+func _m20_full(board, cand_override = null, res_override = null, use_renderer := false) -> Dictionary:
+	var reservations = res_override if res_override != null else ReservationState.new()
+	reservations.bind(board)
+	var candidates = cand_override if cand_override != null else ColorCandidateIndex.create()
+	candidates.bind(board)
+	var selector = TargetSelector.create(); selector.bind(board, candidates, reservations)
+	var routing = ProductionRoutingSystem.new()
+	var routing_access = ProductionAccessQuery.new(board)
+	var select_access = ProductionTargetAccess.new(routing, routing_access, board)
+	var dispatcher = ScrubbotDispatcher.new(); root.add_child(dispatcher)
+	dispatcher.bind(board, selector, reservations, routing, routing_access, select_access)
+	var renderer = null
+	if use_renderer:
+		renderer = BoardRenderer.new(); root.add_child(renderer)
+		renderer.configure(board, PackedStringArray(BoardDebugFixturesM20.PALETTE), Vector2(300, 300))
+	return {"board": board, "reservations": reservations, "candidates": candidates,
+		"selector": selector, "routing": routing, "routing_access": routing_access,
+		"select_access": select_access, "dispatcher": dispatcher, "renderer": renderer}
+
+func _m20_teardown(w: Dictionary) -> void:
+	var d = w["dispatcher"]
+	d.reset()
+	root.remove_child(d)
+	d.free()
+	if w.get("renderer") != null and is_instance_valid(w["renderer"]):
+		root.remove_child(w["renderer"])
+		w["renderer"].free()
+
+## SlotSystem configured with the given per-slot palette ids (size 5).
+func _m20_slots(palette_ids: Array) -> SlotSystem:
+	var s = SlotSystem.new()
+	s.configure(palette_ids, 256)
+	return s
+
+## Bind a CompleteClearingLoop over an existing bundle + slots (+ optional
+## renderer). Returns the loop.
+func _m20_loop(w: Dictionary, slots) -> Object:
+	var loop = CompleteClearingLoop.new()
+	loop.bind(w["board"], slots, w["candidates"], w["reservations"], w["dispatcher"], w.get("renderer"))
+	return loop
+
+## Run one full activate -> arrival -> clear cycle through the loop. Returns the
+## DispatchResult. When the dispatch succeeds, drives the agent to arrival, which
+## synchronously fires the authenticated arrival signal and the clear transaction.
+func _m20_activate_and_arrive(loop, slot_id: int, origin: Vector2):
+	var res = loop.activate_slot(slot_id, origin, 6.0)
+	if res.success:
+		_m19_drive_to_arrival(res.agent)
+	return res
+
+func _run_m20_bind_contract_tests() -> void:
+	print("---- M20-C001 V01: clearing-loop bind contract (section 2) ----")
+	var board = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var color: int = board.get_color_id(board.get_cell_index(10, 10))
+	var w = _m20_full(board)
+	var slots = _m20_slots([color, color, color, color, color])
+
+	var loop = CompleteClearingLoop.new()
+	_check(loop.bind(board, slots, w["candidates"], w["reservations"], w["dispatcher"]), "bind: coherent real bundle binds")
+	_check(loop.is_bound(), "bind: loop reports bound")
+	_check(loop.is_coherent(), "bind: bound loop is coherent")
+	_check(not loop.bind(board, slots, w["candidates"], w["reservations"], w["dispatcher"]), "bind: second bind refused")
+	_check(loop.is_bound(), "bind: still bound after refused second bind")
+
+	var loop2 = CompleteClearingLoop.new()
+	var raw_slots = SlotSystem.new()
+	_check(not loop2.bind(board, raw_slots, w["candidates"], w["reservations"], w["dispatcher"]), "bind: unconfigured slots rejected")
+	_check(not CompleteClearingLoop.new().bind(123, slots, w["candidates"], w["reservations"], w["dispatcher"]), "bind: scalar board rejected")
+	var other = _m19_open_board_active(20, 20, [Vector2(5, 5)])
+	var stray_ci = ColorCandidateIndex.create(); stray_ci.bind(other)
+	_check(not CompleteClearingLoop.new().bind(board, slots, stray_ci, w["reservations"], w["dispatcher"]), "bind: foreign-board candidate index rejected")
+	var stray_rs = ReservationState.new(); stray_rs.bind(other)
+	_check(not CompleteClearingLoop.new().bind(board, slots, w["candidates"], stray_rs, w["dispatcher"]), "bind: foreign-board reservation rejected")
+	var wrong_r = BoardRenderer.new(); root.add_child(wrong_r)
+	wrong_r.configure(other, PackedStringArray(BoardDebugFixturesM20.PALETTE), Vector2(120, 120))
+	_check(not CompleteClearingLoop.new().bind(board, slots, w["candidates"], w["reservations"], w["dispatcher"], wrong_r), "bind: wrong-board renderer rejected")
+	root.remove_child(wrong_r); wrong_r.free()
+
+	var r_pre = w["dispatcher"].dispatch(color, Vector2(-2.0, 10.5), 6.0)
+	_check(r_pre.success and w["dispatcher"].get_active_count() == 1, "bind: pre-seeded one in-flight assignment")
+	_check(not CompleteClearingLoop.new().bind(board, slots, w["candidates"], w["reservations"], w["dispatcher"]), "bind: dispatcher active!=0 rejected")
+	w["dispatcher"].reset()
+
+	loop = null
+	_m20_teardown(w)
+
+func _run_m20_activation_tests() -> void:
+	print("---- M20-C001 V01: slot activation delegation (section 4) ----")
+	var board = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var color: int = board.get_color_id(board.get_cell_index(10, 10))
+	var w = _m20_full(board)
+	var slots = _m20_slots([color, color, color, color, color])
+	var loop = _m20_loop(w, slots)
+
+	_check(not loop.activate_slot(-1, Vector2(-2.0, 10.5)).success, "activate: slot -1 rejected")
+	_check(not loop.activate_slot(5, Vector2(-2.0, 10.5)).success, "activate: slot 5 rejected")
+	_check(not loop.activate_slot(1.5, Vector2(-2.0, 10.5)).success, "activate: non-int slot rejected")
+	_check(not loop.activate_slot(0, Vector2(INF, 10.5)).success, "activate: non-finite origin rejected")
+	_check(not loop.activate_slot(0, Vector2(-2.0, 10.5), 0.0).success, "activate: zero speed rejected")
+	_check_eq(w["dispatcher"].get_active_count(), 0, "activate: no agent from any rejected activation")
+	_check_eq(w["reservations"].get_reservation_count(), 0, "activate: no reservation from any rejected activation")
+
+	slots.set_slot_available(0, false)
+	_check(not loop.activate_slot(0, Vector2(-2.0, 10.5)).success, "activate: unavailable slot rejected")
+	slots.set_slot_available(0, true)
+
+	var before = _snapshot_cell_states(board)
+	var res = loop.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
+	_check(res.success, "activate: valid activation dispatches one agent")
+	_check_eq(res.target_index, board.get_cell_index(10, 10), "activate: the one reachable candidate selected")
+	_check_eq(w["dispatcher"].get_active_count(), 1, "activate: exactly one Scrubbot in flight")
+	_check(_cell_states_equal(board, before), "activate: no BoardState mutation before arrival")
+	_check_eq(slots.get_slot_palette_id(0), color, "activate: slot palette id unchanged by success")
+	_check(slots.is_slot_available(0), "activate: slot availability unchanged by success")
+
+	loop = null
+	_m20_teardown(w)
+
+func _run_m20_clear_transaction_tests() -> void:
+	print("---- M20-C001 V01: authoritative clear transaction + post-arrival tuple (section 6/10) ----")
+	var board = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var target: int = board.get_cell_index(10, 10)
+	var color: int = board.get_color_id(target)
+	var w = _m20_full(board, null, null, true)
+	var slots = _m20_slots([color, color, color, color, color])
+	var loop = _m20_loop(w, slots)
+
+	var res = _m20_activate_and_arrive(loop, 0, Vector2(-2.0, 10.5))
+	_check(res.success, "clear: activation dispatched")
+	_check_eq(loop.get_last_outcome(), CompleteClearingLoop.Outcome.CLEARED, "clear: outcome CLEARED")
+	_check_eq(loop.get_cleared_count(), 1, "clear: one cell cleared")
+	_check_eq(board.get_cell_state(target), BoardState.CellState.CLEARED, "tuple: BoardState target CLEARED")
+	_check(not w["candidates"].has_candidates(color, w["reservations"].get_reserved_indices()), "tuple: target absent from candidate bucket")
+	_check_eq(w["reservations"].get_owner(target), -1, "tuple: reservation owner cleared")
+	_check_eq(w["reservations"].get_target_for_owner(res.owner_id), -1, "tuple: owner holds no target")
+	_check(not w["dispatcher"].has_owner(res.owner_id), "tuple: dispatcher no longer tracks the owner")
+	_check_eq(w["dispatcher"].get_active_count(), 0, "tuple: dispatcher has no active entry after finalize")
+	var pos: Vector2i = board.get_cell_position(target)
+	_check_eq(w["routing_access"].classify_cell(pos.x, pos.y, -1), ProductionAccessQuery.CellClass.OPEN, "tuple: access query treats cleared cell as OPEN")
+	var px: Color = w["renderer"].get_pixel_color(pos.x, pos.y)
+	_check(_colors_close(px, Color(0, 0, 0, 0), 0.02), "tuple: renderer pixel alpha 0 at cleared cell")
+
+	loop = null
+	_m20_teardown(w)
+
+	var b2 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var t2: int = b2.get_cell_index(10, 10)
+	var c2: int = b2.get_color_id(t2)
+	var fci = M20FailingCandidate.new(); fci.bind(b2)
+	var w2 = _m20_full(b2, fci)
+	var slots2 = _m20_slots([c2, c2, c2, c2, c2])
+	var loop2 = _m20_loop(w2, slots2)
+	fci.fail_syncs = 1
+	var res2 = _m20_activate_and_arrive(loop2, 0, Vector2(-2.0, 10.5))
+	_check(res2.success, "rollback(candidate): activation dispatched")
+	_check_eq(loop2.get_last_outcome(), CompleteClearingLoop.Outcome.CANDIDATE_ROLLBACK, "rollback(candidate): outcome CANDIDATE_ROLLBACK")
+	_check_eq(b2.get_cell_state(t2), BoardState.CellState.ACTIVE, "rollback(candidate): BoardState rolled back to ACTIVE")
+	_check(w2["candidates"].has_candidates(c2, PackedInt32Array()), "rollback(candidate): candidate truth restored")
+	_check_eq(w2["reservations"].get_owner(t2), res2.owner_id, "rollback(candidate): reservation still held")
+	_check(w2["dispatcher"].has_owner(res2.owner_id), "rollback(candidate): dispatcher assignment still held")
+	_check_eq(loop2.get_cleared_count(), 0, "rollback(candidate): nothing counted as cleared")
+	loop2 = null
+	_m20_teardown(w2)
+
+	var b3 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var t3: int = b3.get_cell_index(10, 10)
+	var c3: int = b3.get_color_id(t3)
+	var frs = M20FailingReservation.new(); frs.bind(b3)
+	var w3 = _m20_full(b3, null, frs)
+	var slots3 = _m20_slots([c3, c3, c3, c3, c3])
+	var loop3 = _m20_loop(w3, slots3)
+	frs.fail_resolves = 1
+	var res3 = _m20_activate_and_arrive(loop3, 0, Vector2(-2.0, 10.5))
+	_check(res3.success, "rollback(reservation): activation dispatched")
+	_check_eq(loop3.get_last_outcome(), CompleteClearingLoop.Outcome.RESERVATION_ROLLBACK, "rollback(reservation): outcome RESERVATION_ROLLBACK")
+	_check_eq(b3.get_cell_state(t3), BoardState.CellState.ACTIVE, "rollback(reservation): BoardState rolled back to ACTIVE")
+	_check_eq(w3["reservations"].get_owner(t3), res3.owner_id, "rollback(reservation): reservation still held")
+	_check(w3["dispatcher"].has_owner(res3.owner_id), "rollback(reservation): dispatcher assignment still held")
+	_check_eq(loop3.get_cleared_count(), 0, "rollback(reservation): nothing counted as cleared")
+	loop3 = null
+	_m20_teardown(w3)
+
+func _run_m20_scenario_matrix_tests() -> void:
+	print("---- M20-C001 V01: required scenario matrix (section 11) ----")
+
+	var b1 = _m19_open_board_active(20, 20, [Vector2(4, 3)])
+	var c1: int = b1.get_color_id(b1.get_cell_index(4, 3))
+	var w1 = _m20_full(b1)
+	var l1 = _m20_loop(w1, _m20_slots([c1, c1, c1, c1, c1]))
+	_check(_m20_activate_and_arrive(l1, 0, Vector2(-2.0, 3.5)).success, "one-cell: cleared")
+	_check_eq(l1.get_cleared_count(), 1, "one-cell: exactly one clear")
+	_check_eq(l1.activate_slot(0, Vector2(-2.0, 3.5)).failure_reason, DispatchResult.FailureReason.NO_REACHABLE_TARGET, "one-cell: board exhausted -> NO_REACHABLE_TARGET")
+	l1 = null; _m20_teardown(w1)
+
+	var row_cells: Array = []
+	for x in range(6):
+		row_cells.append(Vector2(x + 2, 6))
+	var b2 = _m19_open_board_active(20, 20, row_cells)
+	var c2: int = b2.get_color_id(b2.get_cell_index(2, 6))
+	var w2 = _m20_full(b2)
+	var l2 = _m20_loop(w2, _m20_slots([c2, c2, c2, c2, c2]))
+	var cleared2 := 0
+	for _i in range(20):
+		var r = _m20_activate_and_arrive(l2, 0, Vector2(-2.0, 6.5))
+		if not r.success:
+			break
+		cleared2 += 1
+	_check_eq(cleared2, 6, "one-color: all six same-color cells cleared")
+	_check_eq(l2.get_cleared_count(), 6, "one-color: cleared count == 6")
+	_check_eq(b2.count_cells_by_state(BoardState.CellState.ACTIVE), 0, "one-color: no ACTIVE cells remain")
+	l2 = null; _m20_teardown(w2)
+
+	var mc_cells: Array = [Vector2(10, 0), Vector2(10, 1), Vector2(10, 2), Vector2(10, 3), Vector2(10, 4)]
+	var b3 = _m19_open_board_active(20, 20, mc_cells)
+	var pal3: Array = []
+	for y in range(5):
+		pal3.append(b3.get_color_id(b3.get_cell_index(10, y)))
+	_check(pal3[0] != pal3[1], "multi-color: distinct row colors present")
+	var w3 = _m20_full(b3)
+	var l3 = _m20_loop(w3, _m20_slots(pal3))
+	var inflight := 0
+	var origins3: Array = [Vector2(-2.0, 0.5), Vector2(22.0, 1.5), Vector2(-2.0, 2.5), Vector2(22.0, 3.5), Vector2(-2.0, 4.5)]
+	var results3: Array = []
+	for i in range(5):
+		var r = l3.activate_slot(i, origins3[i], 6.0)
+		if r.success:
+			inflight += 1
+			results3.append(r)
+	_check_eq(inflight, 5, "five-slot: five distinct simultaneous in-flight assignments")
+	_check_eq(w3["dispatcher"].get_active_count(), 5, "five-slot: dispatcher tracks five agents")
+	for r in results3:
+		_m19_drive_to_arrival(r.agent)
+	_check_eq(l3.get_cleared_count(), 5, "five-slot: all five arrivals cleared")
+	_check_eq(w3["dispatcher"].get_active_count(), 0, "five-slot: no active entries after all finalized")
+	l3 = null; _m20_teardown(w3)
+
+	var b4 = _m19_open_board_active(20, 20, [Vector2(10, 2)])
+	var w4 = _m20_full(b4)
+	var missing_color: int = (b4.get_color_id(b4.get_cell_index(10, 2)) + 1) % 5
+	var l4 = _m20_loop(w4, _m20_slots([missing_color, missing_color, missing_color, missing_color, missing_color]))
+	_check_eq(l4.activate_slot(0, Vector2(-2.0, 2.5)).failure_reason, DispatchResult.FailureReason.NO_REACHABLE_TARGET, "no-target: absent color -> NO_REACHABLE_TARGET")
+	_check_eq(l4.get_cleared_count(), 0, "no-target: nothing cleared")
+	_check_eq(w4["dispatcher"].get_active_count(), 0, "no-target: no agent spawned")
+	l4 = null; _m20_teardown(w4)
+
+	var b5 = _m19_enclosed_sole_candidate_board()
+	var w5 = _m20_full(b5)
+	var l5 = _m20_loop(w5, _m20_slots([1, 1, 1, 1, 1]))
+	_check_eq(l5.activate_slot(0, Vector2(-2.0, 2.5)).failure_reason, DispatchResult.FailureReason.NO_REACHABLE_TARGET, "enclosed: sole enclosed candidate -> NO_REACHABLE_TARGET")
+	_check_eq(l5.get_cleared_count(), 0, "enclosed: nothing cleared")
+	l5 = null; _m20_teardown(w5)
+
+	var dims: Array = [
+		{"w": 24, "h": 24, "name": "Easy 24x24"},
+		{"w": 34, "h": 34, "name": "Medium 34x34"},
+		{"w": 44, "h": 44, "name": "Hard 44x44"},
+		{"w": 54, "h": 54, "name": "Very Hard 54x54"},
+		{"w": 59, "h": 59, "name": "Max 59x59"},
+		{"w": 53, "h": 59, "name": "Rectangular 53x59"},
+	]
+	for d in dims:
+		var yy := 10
+		var bd = _m19_open_board_active(d["w"], d["h"], [Vector2(12, yy)])
+		var cd: int = bd.get_color_id(bd.get_cell_index(12, yy))
+		var wd = _m20_full(bd)
+		var ld = _m20_loop(wd, _m20_slots([cd, cd, cd, cd, cd]))
+		var rd = _m20_activate_and_arrive(ld, 0, Vector2(-2.0, float(yy) + 0.5))
+		_check(rd.success and ld.get_cleared_count() == 1, "dims: %s clears one reachable target" % d["name"])
+		_check_eq(bd.get_cell_state(bd.get_cell_index(12, yy)), BoardState.CellState.CLEARED, "dims: %s target CLEARED" % d["name"])
+		ld = null; _m20_teardown(wd)
+
+	var stress_cells: Array = []
+	for x in range(28):
+		stress_cells.append(Vector2(x + 1, 5))
+	var bs = _m19_open_board_active(30, 11, stress_cells)
+	var cs: int = bs.get_color_id(bs.get_cell_index(1, 5))
+	var ws = _m20_full(bs)
+	var ls = _m20_loop(ws, _m20_slots([cs, cs, cs, cs, cs]))
+	var cycles := 0
+	for _i in range(40):
+		var r = _m20_activate_and_arrive(ls, _i % 5, Vector2(-2.0, 5.5))
+		if not r.success:
+			break
+		cycles += 1
+	_check(cycles >= 25, "rapid: >= 25 sequential activate/arrival/clear cycles (%d)" % cycles)
+	_check_eq(ls.get_cleared_count(), 28, "rapid: all 28 reachable cells cleared")
+	ls = null; _m20_teardown(ws)
+
+func _run_m20_reachability_open_tests() -> void:
+	print("---- M20-C001 V01: clearing opens future reachability (section 8, AL-028) ----")
+	var wd := 8; var ht := 8
+	var b = _m19_open_board_active(wd, ht, [Vector2(1, 2), Vector2(2, 2), Vector2(3, 2), Vector2(2, 1), Vector2(2, 3)])
+	var door: int = b.get_cell_index(1, 2)
+	var inner: int = b.get_cell_index(2, 2)
+	var door_color: int = b.get_color_id(door)
+	var w = _m20_full(b)
+	var probe = ProductionTargetAccess.new(w["routing"], w["routing_access"], b)
+	probe.set_origin(Vector2(-2.0, 2.5))
+	_check(not probe.is_targetable(inner), "reach: B initially unreachable (blocked by ACTIVE A)")
+	probe.set_origin(Vector2(-2.0, 2.5))
+	_check(probe.is_targetable(door), "reach: A initially reachable")
+	var loop = _m20_loop(w, _m20_slots([door_color, door_color, door_color, door_color, door_color]))
+	var res = _m20_activate_and_arrive(loop, 0, Vector2(-2.0, 2.5))
+	_check(res.success and res.target_index == door, "reach: activation clears the reachable door A")
+	_check_eq(b.get_cell_state(door), BoardState.CellState.CLEARED, "reach: A now CLEARED")
+	var probe2 = ProductionTargetAccess.new(w["routing"], w["routing_access"], b)
+	probe2.set_origin(Vector2(-2.0, 2.5))
+	_check(probe2.is_targetable(inner), "reach: B reachable after A cleared (live read, no cache refresh)")
+	loop = null
+	_m20_teardown(w)
+
+func _run_m20_desync_adversary_tests() -> void:
+	print("---- M20-C001 V01: exactly-once / spoof / stale / desync adversaries (section 5/7) ----")
+	var board = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var target: int = board.get_cell_index(10, 10)
+	var color: int = board.get_color_id(target)
+	var w = _m20_full(board)
+	var loop = _m20_loop(w, _m20_slots([color, color, color, color, color]))
+
+	var before = _snapshot_cell_states(board)
+	loop._on_assignment_arrived(999, target, color, null)
+	_check_eq(loop.get_last_outcome(), CompleteClearingLoop.Outcome.PREFLIGHT_REJECTED, "spoof: unknown owner rejected by preflight")
+	_check(_cell_states_equal(board, before), "spoof: unknown-owner arrival mutates nothing")
+	_check_eq(loop.get_cleared_count(), 0, "spoof: nothing cleared")
+
+	var res = loop.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
+	_check(res.success, "desync: assignment dispatched")
+	w["dispatcher"].assignment_arrived.disconnect(loop._arrival_cb)
+	_m19_drive_to_arrival(res.agent)
+	var owner: int = res.owner_id
+	var agent = res.agent
+	_check(w["dispatcher"].is_arrival_pending(owner, target, color, agent), "bridge: exact arrival is pending")
+	_check(not w["dispatcher"].is_arrival_pending(owner + 1, target, color, agent), "bridge: wrong owner not pending")
+	_check(not w["dispatcher"].is_arrival_pending(owner, target + 1, color, agent), "bridge: wrong target not pending")
+	_check(not w["dispatcher"].is_arrival_pending(owner, target, color + 1, agent), "bridge: wrong color not pending")
+	_check(not w["dispatcher"].is_arrival_pending(owner, target, color, null), "bridge: wrong agent not pending")
+	_check(not w["dispatcher"].finalize_arrival(owner + 1, target, color, agent), "bridge: wrong-owner finalize false")
+	_check(w["dispatcher"].has_owner(owner), "bridge: assignment still held after spoofed finalize")
+
+	w["reservations"].release_for_owner(owner)
+	loop._on_assignment_arrived(owner, target, color, agent)
+	_check_eq(loop.get_last_outcome(), CompleteClearingLoop.Outcome.PREFLIGHT_REJECTED, "desync: reservation removed -> preflight rejected")
+	_check_eq(board.get_cell_state(target), BoardState.CellState.ACTIVE, "desync: target still ACTIVE (no clear)")
+	w["dispatcher"].finalize_arrival(owner, target, color, agent)
+	loop = null
+	_m20_teardown(w)
+
+	var b2 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var t2: int = b2.get_cell_index(10, 10)
+	var c2: int = b2.get_color_id(t2)
+	var w2 = _m20_full(b2)
+	var l2 = _m20_loop(w2, _m20_slots([c2, c2, c2, c2, c2]))
+	var r2 = l2.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
+	_m19_drive_to_arrival(r2.agent)
+	_check_eq(l2.get_cleared_count(), 1, "once: first arrival cleared once")
+	if is_instance_valid(r2.agent):
+		r2.agent.agent_completed.emit(r2.owner_id, t2, c2)
+	_check_eq(l2.get_cleared_count(), 1, "once: duplicate completion does not clear twice")
+	l2 = null; _m20_teardown(w2)
+
+	var b3 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var t3: int = b3.get_cell_index(10, 10)
+	var c3: int = b3.get_color_id(t3)
+	var w3 = _m20_full(b3)
+	var l3 = _m20_loop(w3, _m20_slots([c3, c3, c3, c3, c3]))
+	var r3 = l3.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
+	w3["dispatcher"].assignment_arrived.disconnect(l3._arrival_cb)
+	_m19_drive_to_arrival(r3.agent)
+	b3.set_cell_state(t3, BoardState.CellState.CLEARED)
+	l3._on_assignment_arrived(r3.owner_id, t3, c3, r3.agent)
+	_check_eq(l3.get_last_outcome(), CompleteClearingLoop.Outcome.PREFLIGHT_REJECTED, "desync: already-CLEARED target rejected")
+	w3["dispatcher"].finalize_arrival(r3.owner_id, t3, c3, r3.agent)
+	l3 = null; _m20_teardown(w3)
+
+func _run_m20_reset_lifecycle_tests() -> void:
+	print("---- M20-C001 V01: reset / lifecycle (section 9) ----")
+	var board = _m19_open_board_active(20, 20, [Vector2(6, 0), Vector2(6, 1), Vector2(6, 2), Vector2(6, 3), Vector2(6, 4)])
+	var pal: Array = []
+	for y in range(5):
+		pal.append(board.get_color_id(board.get_cell_index(6, y)))
+	var w = _m20_full(board)
+	var loop = _m20_loop(w, _m20_slots(pal))
+
+	var r0 = _m20_activate_and_arrive(loop, 0, Vector2(-2.0, 0.5))
+	_check(r0.success and loop.get_cleared_count() == 1, "reset: one cell cleared before reset")
+	var cleared_target: int = r0.target_index
+
+	var origins: Array = [Vector2(22.0, 1.5), Vector2(-2.0, 2.5), Vector2(22.0, 3.5)]
+	var inflight: Array = []
+	for i in range(3):
+		var r = loop.activate_slot(i + 1, origins[i], 6.0)
+		if r.success:
+			inflight.append(r)
+	_check_eq(inflight.size(), 3, "reset: three agents in flight")
+	_check_eq(w["dispatcher"].get_active_count(), 3, "reset: dispatcher tracks three in-flight")
+	_check_eq(w["reservations"].get_reservation_count(), 3, "reset: three reservations held")
+
+	var next_owner_before: int = w["dispatcher"].peek_next_owner_id()
+	loop.reset()
+	_check_eq(w["dispatcher"].get_active_count(), 0, "reset: no active assignments after reset")
+	_check_eq(w["reservations"].get_reservation_count(), 0, "reset: reservations released")
+	_check_eq(board.get_cell_state(cleared_target), BoardState.CellState.CLEARED, "reset: already-CLEARED cell preserved")
+	_check_eq(w["dispatcher"].peek_next_owner_id(), next_owner_before, "reset: owner id counter not rewound")
+	loop.reset()
+	_check_eq(w["dispatcher"].get_active_count(), 0, "reset: second reset is a stable no-op")
+
+	var stale := 0
+	for r in inflight:
+		if not w["dispatcher"].is_arrival_pending(r.owner_id, r.target_index, board.get_color_id(r.target_index), r.agent):
+			stale += 1
+	_check_eq(stale, inflight.size(), "reset: no cancelled agent is arrival-pending")
+	_check_eq(loop.get_cleared_count(), 1, "reset: clear count unchanged by reset (still 1)")
+
+	var r_after = _m20_activate_and_arrive(loop, 1, Vector2(22.0, 1.5))
+	_check(r_after.success and loop.get_cleared_count() == 2, "reset: loop usable again after reset")
+
+	loop = null
+	_m20_teardown(w)

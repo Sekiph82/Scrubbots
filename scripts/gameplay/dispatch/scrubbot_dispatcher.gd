@@ -70,6 +70,14 @@ const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 
 const DEFAULT_SPEED := 6.0
 
+## M20 arrival bridge (M20-C001 §3). Emitted ONCE per assignment, only after the
+## existing _on_agent_completed() immutable-identity checks succeed (correct
+## owner, target, color, exact source agent, known active assignment). The M20
+## CompleteClearingLoop listens to THIS — never to a raw agent_completed signal —
+## as its sole clearing authority. M19 still performs NO BoardState mutation,
+## reservation resolution or scoring; it only announces the authenticated arrival.
+signal assignment_arrived(owner_id: int, target_index: int, color_id: int, agent)
+
 ## Narrow required API surfaces validated at bind (F-M19-STRICT-001). A dependency
 ## missing any listed method is a partial/junk dependency and fails closed before
 ## any escaped call reaches it. select_access requires is_coherent_with — bundle
@@ -562,7 +570,12 @@ func _on_agent_completed(owner_id: int, target_index: int, color_id: int, src_ag
 		return
 	if color_id != int(entry["color"]):
 		return
+	# Emit the M20 arrival bridge EXACTLY ONCE: a duplicate correct completion
+	# stays idempotently arrived and does not re-announce (M20-C001 §3).
+	var was_arrived: bool = bool(entry["arrived"])
 	entry["arrived"] = true
+	if not was_arrived:
+		assignment_arrived.emit(owner_id, target_index, color_id, src_agent)
 
 # ------------------------------------------------------------------ reset ----
 
@@ -621,6 +634,53 @@ func get_agent_for_owner(owner_id: int):
 
 func has_arrived(owner_id: int) -> bool:
 	return _active.has(owner_id) and bool(_active[owner_id]["arrived"])
+
+## M20 read-only coherence query (§3). True only when this dispatcher is bound to
+## the SAME BoardState instance AND the SAME ReservationState instance the caller
+## supplies (reference identity), so the M20 loop can prove it shares the exact
+## board+reservation bundle the dispatcher releases through. Never exposes the refs.
+func is_bound_to(board, reservation_state) -> bool:
+	return _bound and _board != null and _board == board \
+		and _reservations != null and _reservations == reservation_state
+
+## M20 read-only exact arrival query (§3). True only when owner_id names a known
+## active assignment that has ARRIVED and whose immutable target/color/agent
+## identity exactly matches the arguments. Any mismatch/stale/unknown -> false.
+func is_arrival_pending(owner_id: int, target_index: int, color_id: int, agent) -> bool:
+	if not _active.has(owner_id):
+		return false
+	var entry: Dictionary = _active[owner_id]
+	if not bool(entry["arrived"]):
+		return false
+	if agent != entry["agent"]:
+		return false
+	if target_index != int(entry["target"]):
+		return false
+	if color_id != int(entry["color"]):
+		return false
+	return true
+
+## M20 narrow finalization (§3). Acts ONLY on the exact authenticated ARRIVED
+## assignment: removes this dispatcher's _active entry exactly once and schedules
+## the Scrubbot for safe destruction with NO return path. It deliberately leaves
+## BoardState mutation and ReservationState resolution to M20 (already done by the
+## loop before this call). Safe to call from inside the completion-signal stack:
+## the agent is queue_free()'d (deferred), never synchronously freed while its own
+## signal emission is unwinding. Wrong / stale / mismatched arguments return false
+## and change nothing.
+func finalize_arrival(owner_id: int, target_index: int, color_id: int, agent) -> bool:
+	if not is_arrival_pending(owner_id, target_index, color_id, agent):
+		return false
+	var entry: Dictionary = _active[owner_id]
+	var a = entry["agent"]
+	if a != null and is_instance_valid(a):
+		if a.agent_completed.is_connected(entry["cb"]):
+			a.agent_completed.disconnect(entry["cb"])
+		# Deferred free: no locked-object error even when called from the agent's
+		# own agent_completed emission, and the bot never returns to its slot.
+		a.queue_free()
+	_active.erase(owner_id)
+	return true
 
 ## Next owner id that WOULD be handed out — for tests asserting monotonicity.
 func peek_next_owner_id() -> int:
