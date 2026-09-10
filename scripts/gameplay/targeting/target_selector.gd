@@ -47,10 +47,15 @@ var _bound: bool = false
 ## select operation can prove the selector was not rebound underneath it
 ## (F-M15-STRICT-005 snapshot token).
 var _bind_generation: int = 0
-## True only while select_and_reserve() is running. Guards bind() against
-## re-entrant callbacks that would otherwise move the selector to a foreign
-## bundle mid-selection (F-M15-STRICT-005).
+## True only while select_and_reserve() is running. Guards bind() and nested
+## select_and_reserve() against re-entrant callbacks that would otherwise move
+## the selector to a foreign bundle or start a second transaction mid-selection
+## (F-M15-STRICT-005.A/.B). Armed BEFORE the first external coherence callback.
 var _in_selection: bool = false
+## True only while bind() is validating/committing. Guards bind() against a
+## re-entrant bind triggered by a candidate/reservation is_bound_to() callback
+## during the outer bind's own coherence checks (F-M15-STRICT-005.G).
+var _in_bind: bool = false
 
 ## Matches the sibling-module convention: returns the real instance, typed as
 ## RefCounted because self-referential static typing is unreliable headless.
@@ -82,10 +87,23 @@ const _RESERVATION_API := ["reserve", "release", "get_target_for_owner", "get_ow
 ## from an access/candidate/reservation callback cannot move the selector to a
 ## different bundle.
 func bind(board, candidate_index, reservation_state) -> bool:
-	# Re-entrant bind during an active selection is refused and preserves the
-	# original operation binding untouched (no _clear_binding, no field change).
-	if _in_selection:
+	# Re-entrant bind during an active selection OR an outer bind transaction is
+	# refused and preserves the current binding untouched (no _clear_binding, no
+	# field change) — a callback cannot overwrite the requested bundle
+	# (F-M15-STRICT-005.A/.G).
+	if _in_selection or _in_bind:
 		return false
+	# Arm the bind transaction guard BEFORE the is_bound_to() coherence callbacks
+	# inside validation, so a nested bind from either callback returns false and
+	# cannot commit ahead of / over the outer bind.
+	_in_bind = true
+	var ok := _bind_validate_and_commit(board, candidate_index, reservation_state)
+	_in_bind = false
+	return ok
+
+## Validate the requested bundle and commit it, or neutralize on any failure.
+## Runs inside the _in_bind transaction guard.
+func _bind_validate_and_commit(board, candidate_index, reservation_state) -> bool:
 	if not (board is BoardState) \
 			or not (candidate_index is RefCounted) or not _has_methods(candidate_index, _CANDIDATE_API) \
 			or not (reservation_state is RefCounted) or not _has_methods(reservation_state, _RESERVATION_API) \
@@ -155,12 +173,18 @@ func is_bound_to(board, reservation_state) -> bool:
 ## captured at entry. Any drift/rebind detected after a collaborator boundary
 ## fails the operation closed (-1) and never reserves through a foreign bundle.
 func select_and_reserve(color_id: int, owner_id: int, access_query) -> int:
+	# Reject recursive/re-entrant selection immediately, BEFORE any collaborator
+	# callback and with zero mutation. A nested select_and_reserve() injected from
+	# a targetability/candidate/reservation callback returns -1 (F-M15-STRICT-005.B).
+	if _in_selection:
+		return -1
 	if not _bound or _board == null or _candidate_index == null or _reservations == null:
 		return -1
 	# access_query boundary (F-M15-STRICT-004): must be a RefCounted exposing
 	# is_targetable. `is RefCounted` short-circuits BEFORE any has_method call, so
 	# a scalar/String/Vector2/Array/Dictionary never reaches has_method and a
-	# method-compatible Node is rejected on category.
+	# method-compatible Node is rejected on category. (Pure local checks — no
+	# collaborator call — so they run before the guard is armed.)
 	if not (access_query is RefCounted) or not access_query.has_method("is_targetable"):
 		return -1
 	if owner_id < 0:
@@ -172,12 +196,11 @@ func select_and_reserve(color_id: int, owner_id: int, access_query) -> int:
 	var ci = _candidate_index
 	var rs = _reservations
 	var gen := _bind_generation
-	# Initial coherence probe: original deps still exact-bound to original board,
-	# proven by actual bool-true (also the per-call F-M15-STRICT-002 re-check).
-	if not _op_coherent(board, ci, rs, gen):
-		return -1
-	# Guard the whole operation so any re-entrant bind() from a callback fails
-	# closed and cannot move the selector to another bundle.
+	# Arm the operation guard BEFORE the first external coherence callback, so a
+	# nested bind() from the INITIAL candidate/reservation is_bound_to() callback
+	# is refused and cannot move the bundle (F-M15-STRICT-005.A). Every exit from
+	# _select_core clears the guard through this one deterministic path, so an
+	# initial-coherence failure never leaves the selector stuck busy.
 	_in_selection = true
 	var result := _select_core(color_id, owner_id, access_query, board, ci, rs, gen)
 	_in_selection = false
@@ -197,14 +220,25 @@ func _op_coherent(board, ci, rs, gen) -> bool:
 		return false
 	return true
 
-## Release only THIS operation's exact (idx, owner) reservation entry, if it
-## exists — never an unrelated/competing reservation (F-M15-STRICT-005 rollback).
+## Roll back ONLY this operation's exact (idx, owner_id) reservation entry via the
+## canonical exact-pair release (F-M15-STRICT-005.E). ReservationState.release()
+## removes the entry ONLY when target idx is currently owned by exactly owner_id,
+## so it never erases another owner's reservation or a different target. It
+## deliberately does NOT consult get_owner()/get_target_for_owner() first: a
+## malformed ownership query (the very failure that triggers rollback) must never
+## be able to prevent rollback of our own exact requested pair. It also does not
+## treat release()'s own return as proof — the exact-pair contract is what makes
+## it safe, not the return value.
 func _rollback_own(rs, idx: int, owner_id: int) -> void:
-	var o = rs.get_owner(idx)
-	if typeof(o) == TYPE_INT and o == owner_id:
-		rs.release(idx, owner_id)
+	rs.release(idx, owner_id)
 
 func _select_core(color_id: int, owner_id: int, access_query, board, ci, rs, gen) -> int:
+	# Initial coherence probe under the armed guard: original deps still exact-bound
+	# to original board, proven by actual bool-true (also the per-call
+	# F-M15-STRICT-002 re-check). A nested bind from either is_bound_to() callback
+	# here is already refused by the armed _in_selection guard.
+	if not _op_coherent(board, ci, rs, gen):
+		return -1
 	# One target per owner. get_target_for_owner MUST be an int; malformed fails
 	# closed with no reservation (F-M15-STRICT-004).
 	var owned = rs.get_target_for_owner(owner_id)
@@ -240,30 +274,52 @@ func _select_core(color_id: int, owner_id: int, access_query, board, ci, rs, gen
 			continue
 		if board.get_color_id(idx) != color_id:
 			continue
-		# is_reserved MUST be a bool; a malformed verdict aborts fail-closed.
+		# is_reserved MUST be a bool; a malformed verdict aborts fail-closed. Re-check
+		# operation coherence AFTER the call regardless of true/false — an is_reserved
+		# callback can drift candidate/reservation state and return true, which must
+		# stop the operation before any later candidate is inspected
+		# (F-M15-STRICT-005.C).
 		var reserved = rs.is_reserved(idx)
 		if typeof(reserved) != TYPE_BOOL:
 			return -1
-		if reserved:
-			continue
 		if not _op_coherent(board, ci, rs, gen):
 			return -1
-		# Authoritative reachability/access truth. The verdict is accepted ONLY on
-		# actual bool-true; the callback can run arbitrary side effects, so re-check
-		# operation coherence immediately after it (the primary drift seam).
+		if reserved:
+			continue
+		# Authoritative reachability/access truth. The callback can run arbitrary
+		# side effects, so re-check operation coherence immediately after it (the
+		# primary drift seam).
 		var verdict = access_query.is_targetable(idx)
 		if not _op_coherent(board, ci, rs, gen):
 			return -1
+		# The targetability callback may have independently assigned owner_id a
+		# target (same-owner side effect) REGARDLESS of the verdict value. Once the
+		# owner holds a target, stop immediately: preserve that external reservation
+		# and query no later candidate (historical contention law,
+		# F-M15-STRICT-005.F). Validate the owner query is an actual int first.
+		var owned_after = rs.get_target_for_owner(owner_id)
+		if typeof(owned_after) != TYPE_INT:
+			return -1
+		if owned_after != -1:
+			return -1
+		# Verdict accepted ONLY on actual bool-true; otherwise skip this candidate.
 		if not _bool_true(verdict):
 			continue
 		# Atomic ownership gate. reserve MUST return a bool; only actual true is a
-		# success. A non-bool return is never treated as success.
+		# success.
 		var ok = rs.reserve(idx, owner_id)
 		if typeof(ok) != TYPE_BOOL:
+			# A malformed (non-bool) return is never success AND is never proof that
+			# nothing was stored: the collaborator may have mutated first and then
+			# returned malformed metadata. Roll back the exact requested pair before
+			# failing closed (F-M15-STRICT-004.A/005.D).
+			_rollback_own(rs, idx, owner_id)
 			return -1
 		if ok:
 			# reserve succeeded. Prove nothing drifted during reserve and that the
 			# store is exact atomic ownership before returning (F-M15-STRICT-005).
+			# ANY post-reserve coherence/proof failure rolls back the exact requested
+			# pair directly (never gated on the possibly-malformed ownership query).
 			if not _op_coherent(board, ci, rs, gen):
 				_rollback_own(rs, idx, owner_id)
 				return -1
@@ -275,9 +331,10 @@ func _select_core(color_id: int, owner_id: int, access_query, board, ci, rs, gen
 				return -1
 			return idx
 		# reserve returned actual false: the reserve lost. Re-check THIS owner —
-		# a same-owner access-query side effect may have assigned owner_id another
-		# target. If so, stop immediately (no later candidates, no new reservation).
-		# Different-owner contention leaves owner_id unassigned and continues.
+		# a same-owner side effect may have assigned owner_id another target during
+		# reserve() itself. If so, stop immediately (no later candidates, no new
+		# reservation). Different-owner contention leaves owner_id unassigned and
+		# continues.
 		var owned2 = rs.get_target_for_owner(owner_id)
 		if typeof(owned2) != TYPE_INT:
 			return -1

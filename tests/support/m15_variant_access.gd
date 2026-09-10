@@ -4,5 +4,8 @@ extends RefCounted
 ## prove the selector accepts a candidate ONLY on an actual bool true and fails
 ## closed (never treats truthy non-bool as reachable) for every other type.
 var verdict = null  ## returned verbatim by is_targetable
-func is_targetable(_index: int):
+var on_query: Callable = Callable()  ## side effect run before the verdict returns
+func is_targetable(index: int):
+	if on_query.is_valid():
+		on_query.call(index)
 	return verdict
