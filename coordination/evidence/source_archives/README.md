@@ -16,14 +16,14 @@ Original user-uploaded archive:
 - original size: 839,699 bytes
 - original SHA-256: `50b0985fa5b57b4ce6c80e6e979104df313e77c6b1e6dfc75a997412bc973088`
 
-Repository archive:
+Repository convenience archive:
 
 - derived filename: `M10_PIXEL_ART_GENERATOR_REVIEW_CORE.zip`
-- size: 199,829 bytes
-- SHA-256: `95664f9f1b8d30e0d65be38b21680761c668c606b62bfc76c8abd9adee459587`
-- derivation: deterministic review-core archive containing the files needed for visual/semantic review; large property/performance execution corpus files that are not required to recover the 100 review images were omitted from this convenience archive.
+- GitHub-reported size: 15,008 bytes
+- Git blob SHA: `8db17ba40b658fb8e0ca9de9d59c8990c143336a`
+- derivation: review-core archive containing the files needed for visual/semantic review; large property/performance execution corpus files that are not required to recover the 100 review images were omitted.
 
-This is therefore not claimed to be byte-identical to the original `m10.zip`. The original archive hash is retained above for provenance.
+This convenience archive is **not** claimed to be byte-identical to the original `m10.zip`. The original archive SHA-256 above is retained as provenance. No SHA-256 claim is made here for the derived convenience ZIP unless it is independently materialized and hashed later; Git blob SHA is the repository identity.
 
 ## 2. ScrubBots Sprite Factory v0.4.0
 
@@ -40,15 +40,15 @@ Original user-uploaded archive:
 - original SHA-256: `0f1718d4f0b635a4dba85c0020931106bc7e534bc42bff75b83d654397301086`
 - original contained 4,993 ZIP entries and approximately 96 MB uncompressed.
 
-Repository archive:
+Repository convenience archive:
 
 - derived filename: `ScrubBots_Sprite_Factory_v0.4.0_SOURCE_ONLY.zip`
-- size: 13,716 bytes
-- SHA-256: `d99e473d90bb64566cd199b17889a1d6fabeefd9951416d77b4397342184962d`
+- GitHub-reported size: 13,715 bytes
+- Git blob SHA: `e1fe2eac90aadfe8930b615039345a2709f3e8b9`
 - 16 meaningful project/source files retained.
 - deliberately excluded: `.venv/`, `build/`, `dist/`, `__pycache__/` and their third-party/compiled/reproducible artifacts.
 
-The original 66 MB package is intentionally not stored byte-for-byte in the Git source repository because most of its size is virtual-environment packages, PyInstaller build output and the generated executable. The source-only archive is the canonical convenience archive for future engineering reference; the original hash above preserves its provenance.
+The original 68,295,528-byte package is intentionally not stored byte-for-byte in the Git source repository because most of its size is virtual-environment packages, PyInstaller build output and the generated executable. The source-only archive is the canonical convenience archive for future engineering reference; the original SHA-256 above preserves provenance. No SHA-256 claim is made here for the derived convenience ZIP unless independently materialized and hashed later; Git blob SHA is the repository identity.
 
 ## Related analysis
 
