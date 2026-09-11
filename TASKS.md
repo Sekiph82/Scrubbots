@@ -5,11 +5,11 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M20
-- Current Sprint: M20-C001 V05 — auditor-authored validation-only gate
-- Current Task: M20-C001-V05 — adversarially validate accepted V04 production without committed production edits
-- Current Task Status: BLOCKED
-- Next Task/Action: V05_VALIDATION_EXPOSED_PRODUCTION_DEFECT — fresh §3E Node-lifecycle validation exposed a V04 gap in the OPTIONAL renderer: in Godot 4.7 a freed Object compares == null, so CompleteClearingLoop's `if renderer != null` guard skips the liveness check for a TRULY-FREED renderer (after a healthy bind, is_coherent() stays true and activation still succeeds instead of failing closed as §3B/§3D/§3E require; the dispatcher, checked unconditionally, is unaffected). V05 is validation-only and production is immutable, so this was NOT fixed here. ChatGPT to decide the production correction (e.g. track renderer-bound + is_instance_valid in _probe) and/or revise §3E for the before-bind freed==null case, then issue the next production prompt. Evidence: coordination/sessions/M20-C001/CLAUDE_LOG_V05.md + tests/m20_v05_lifecycle_smoke.gd. Full root suite 3640/3640 PASS; dispatcher lifecycle + §4-§7 all validated green; production blobs remain exact V04 locked values.
-- Required Actor: CHATGPT
+- Current Sprint: M20-C001 V06 — optional renderer lifecycle correction
+- Current Task: M20-C001-V06 — preserve explicit renderer presence across freed-object null aliasing
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: implement V06, validate, write CLAUDE_LOG_V06.md, hand off AWAITING_AUDIT to ChatGPT
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
