@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M20
-- Current Sprint: M20-C001 V11 — final direct-assertion reconciliation
-- Current Task: M20-C001-V11
-- Current Task Status: AWAITING_AUDIT
-- Next Task/Action: independent V11 audit against coordination/sessions/M20-C001/CLAUDE_LOG_V11.md and CHATGPT_AUDIT_CRITERIA_V11.md (validation-only; production blobs unchanged).
-- Required Actor: CHATGPT
+- Current Milestone: M21
+- Current Sprint: M21-C001 V01 — first owner-approved real-art vertical slice
+- Current Task: M21-C001-V01
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: execute this V01 prompt and hand back for independent audit.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
-- Note: M20-C001 V11 final direct-assertion reconciliation complete, AWAITING_AUDIT. Validation-only: no committed scripts/** change; production blobs unchanged (loop 06391839523cbc27e88a4b3ef12b730012cd45fa, dispatcher eee10149e4f116af6706beec832042352bf3a6dd; git diff vs accepted basis e189ee8 over scripts/ is EMPTY). New _run_m20_v11_direct_assertion_reconciliation_tests closes the five V10 direct-evidence gaps G-V10-01..05: arrival-drain inner activation proven EXACT zero side-effects inside the hook (owner-id/active/reservation-map/count captured before, asserted == after; REENTRANT; no <=); missing-reservation preflight keeps dispatcher.has_owner true; candidate rebind(null) keeps exact both-direction reservation + assignment; externally-CLEARED keeps M20 cleared_count 0 and the pair/assignment (external write not an M20 clear); reservation-rollback proves get_target_for_owner reverse identity for the current AND each unrelated owner. Per prompt no production sensitivity mutation in V11. Full suite 4294/4294 PASS on Godot 4.7.1.stable; queue-free + V04/V05/V07/V08/V09/V10 lifecycle smokes PASS; zero M20 SCRIPT/Parse error. Evidence + G-V10-01..06 table: coordination/sessions/M20-C001/CLAUDE_LOG_V11.md. No SB-M20 row marked complete.
+- Progress: 304 / 719 = 42.28% (main+ui); overall 304 / 943 = 32.24%; lastCompletedTaskId M20-C001-V11.
+- Note: M20-C001 final-closed by ChatGPT independent audit coordination/sessions/M20-C001/CHATGPT_AUDIT_V11.md (AUDITED_PASS / STRICT_V2_FINAL_CLOSURE; validation commit 412ed50, accepted basis e189ee8, locked blobs loop 06391839523cbc27e88a4b3ef12b730012cd45fa / dispatcher eee10149e4f116af6706beec832042352bf3a6dd). This tracker-only transition materializes that authorized closure (SB-M20-001..014 marked complete) and starts M21-C001 V01. M21 approved source: assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png (blob b565743ba52699899007882b750b7c8e7cdd00f9, 297 bytes, 20x20). No SB-M21 or SB-M08 row is closed by this transition; M21 closure belongs to ChatGPT.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -932,14 +932,14 @@ visual travel → arrival → target becomes CLEARED (renderer draws it
 transparent, background shows through) → candidate/access truth update →
 reservation clear → Scrubbot disappears (no return, no color carry).
 
-- [ ] SB-M20-001 Wire complete sequence.
-- [ ] SB-M20-002 No target means no bot. — [ ] SB-M20-003 No return behavior.
-- [ ] SB-M20-004 One-cell test. — [ ] SB-M20-005 One-color test.
-- [ ] SB-M20-006 Multi-color test. — [ ] SB-M20-007 Five-slot test.
-- [ ] SB-M20-008 Easy board test. — [ ] SB-M20-009 Medium board test.
-- [ ] SB-M20-010 Hard board test. — [ ] SB-M20-011 Very Hard board test.
-- [ ] SB-M20-012 59×59 stress test. — [ ] SB-M20-013 Rectangular board test.
-- [ ] SB-M20-014 State-desynchronization check.
+- [x] SB-M20-001 Wire complete sequence.
+- [x] SB-M20-002 No target means no bot. — [x] SB-M20-003 No return behavior.
+- [x] SB-M20-004 One-cell test. — [x] SB-M20-005 One-color test.
+- [x] SB-M20-006 Multi-color test. — [x] SB-M20-007 Five-slot test.
+- [x] SB-M20-008 Easy board test. — [x] SB-M20-009 Medium board test.
+- [x] SB-M20-010 Hard board test. — [x] SB-M20-011 Very Hard board test.
+- [x] SB-M20-012 59×59 stress test. — [x] SB-M20-013 Rectangular board test.
+- [x] SB-M20-014 State-desynchronization check.
 
 ### M21 — First Real-Art Vertical Slice `[CONTENT] [VISUAL REFERENCE]`
 
