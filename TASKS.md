@@ -5,11 +5,11 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M20
-- Current Sprint: M20-C001 V03 — exact dependency / exact-state closure
-- Current Task: M20-C001-V03 — close residual trust-boundary and exact-state gaps
-- Current Task Status: AWAITING_AUDIT
-- Next Task/Action: independent ChatGPT V03 audit against coordination/sessions/M20-C001/CLAUDE_LOG_V03.md + CHATGPT_AUDIT_CRITERIA_V03.md (real diff/code/tests), then publish CHATGPT_AUDIT_V03.md and either close the cycle or issue the next prompt version.
-- Required Actor: CHATGPT
+- Current Sprint: M20-C001 V04 — lifecycle/reset closure
+- Current Task: M20-C001-V04 — close Node lifetime, post-dispatch and reset-collateral gaps
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: implement V04, validate, write CLAUDE_LOG_V04.md, hand off AWAITING_AUDIT to ChatGPT
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
