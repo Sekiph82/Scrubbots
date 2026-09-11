@@ -7,13 +7,13 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Current Milestone: M20
 - Current Sprint: M20-C001 V04 — lifecycle/reset closure
 - Current Task: M20-C001-V04 — close Node lifetime, post-dispatch and reset-collateral gaps
-- Current Task Status: IN_PROGRESS
-- Next Task/Action: implement V04, validate, write CLAUDE_LOG_V04.md, hand off AWAITING_AUDIT to ChatGPT
-- Required Actor: CLAUDE
+- Current Task Status: AWAITING_AUDIT
+- Next Task/Action: independent ChatGPT V04 audit against coordination/sessions/M20-C001/CLAUDE_LOG_V04.md + CHATGPT_AUDIT_CRITERIA_V04.md (real diff/code/tests); a clean V04 source audit is followed by an auditor-authored V05 validation-only gate (production changed this cycle).
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
-- Note: M20-C001 V03 implementation complete, AWAITING_AUDIT. Closes the residual trust-boundary/exact-state gaps: exact production-script identity for ALL canonical M20 collaborators (candidate/reservation no longer subclass-open) so no adversarial subclass can enter the bind trust boundary; exact reservation owner-map snapshot + exact resolve postcondition + exact rollback verify (count-only forbidden; collateral corruption now surfaces ROLLBACK_FAILED); current-arrival dedup. Rollback sensitivity moved to a test-only transaction harness (production bind unchanged). Only production file changed: scripts/gameplay/clearing/complete_clearing_loop.gd. Full headless suite 3533/3533 PASS on Godot 4.7.1.stable (V02 baseline 3501); dedicated deferred-free smoke (tests/m20_queue_free_smoke.gd) PASS. Evidence: coordination/sessions/M20-C001/CLAUDE_LOG_V03.md. No SB-M20 row marked complete — audit closure belongs to ChatGPT.
+- Note: M20-C001 V04 implementation complete, AWAITING_AUDIT. Closes lifecycle/reset gaps: Node-lifetime bind/probe safety (dispatcher/renderer proven live — valid + not queued — before any get_script/coherence call, no SCRIPT ERROR); post-dispatch transaction bracket (a reset or coherence loss injected from inside M19 dispatch yields RESETTING/COHERENCE_FAILED, never a stale M19 SUCCESS, in-flight assignment cleaned); pair-narrow board-safe dispatcher reset (releases only the exact (target,owner) pair while the reservation layer is still bound to the dispatcher's board — a drifted/rebound ReservationState no longer loses an unrelated reservation). Production changed: scripts/gameplay/clearing/complete_clearing_loop.gd + scrubbot_dispatcher.gd RESET path only. V03-baseline S1/S2/S3 sensitivity recorded before the fix. Full headless suite 3563/3563 PASS on Godot 4.7.1.stable (V03 baseline 3533); queue-free smoke + new lifecycle smoke (tests/m20_v04_lifecycle_smoke.gd) PASS. Evidence: coordination/sessions/M20-C001/CLAUDE_LOG_V04.md. A clean V04 is not final M20 closure (production changed) — ChatGPT will issue an auditor-authored V05 validation-only gate. No SB-M20 row marked complete.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN

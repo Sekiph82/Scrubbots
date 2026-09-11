@@ -90,6 +90,7 @@ const M20FailingCandidate = preload("res://tests/support/m20_failing_candidate.g
 const M20FailingReservation = preload("res://tests/support/m20_failing_reservation.gd")
 const M20CandidateSeam = preload("res://tests/support/m20_candidate_seam.gd")
 const M20ReservationSeam = preload("res://tests/support/m20_reservation_seam.gd")
+const M20ResetSelectAccess = preload("res://tests/support/m20_reset_select_access.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -186,6 +187,10 @@ func _initialize() -> void:
 	_run_m20_v03_exact_reservation_state_tests()
 	_run_m20_v03_unrelated_truth_tests()
 	_run_m20_v03_current_arrival_dedup_tests()
+	# M20-C001 V04 — lifecycle / reset closure.
+	_run_m20_v04_node_lifetime_tests()
+	_run_m20_v04_post_dispatch_bracket_tests()
+	_run_m19_v04_pair_narrow_reset_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -9464,3 +9469,191 @@ func _run_m20_v03_current_arrival_dedup_tests() -> void:
 	seam.sync_hook = Callable()
 	loop = null
 	_m20_teardown(w)
+
+# ===================================== M20-C001 V04 lifecycle / reset closure ==
+# Node-lifetime bind/probe safety (F-M20-STRICT-001.K), post-dispatch transaction
+# bracket (F-M20-STRICT-002.K), and pair-narrow board-safe dispatcher reset
+# (F-M20-STRICT-006.K). The truly-freed (invalid) dispatcher case needs a real
+# SceneTree frame and lives in tests/m20_v04_lifecycle_smoke.gd; the queued cases
+# are directly observable in the synchronous runner.
+
+## Wire a full production bundle whose M19 dispatch uses M20ResetSelectAccess, so a
+## one-shot hook can fire loop.reset() / renderer.queue_free() from inside dispatch.
+func _m20_full_reset_access(board, use_renderer := false) -> Dictionary:
+	var reservations = ReservationState.new(); reservations.bind(board)
+	var candidates = ColorCandidateIndex.create(); candidates.bind(board)
+	var selector = TargetSelector.create(); selector.bind(board, candidates, reservations)
+	var routing = ProductionRoutingSystem.new()
+	var routing_access = ProductionAccessQuery.new(board)
+	var select_access = M20ResetSelectAccess.new(routing, routing_access, board)
+	var dispatcher = ScrubbotDispatcher.new(); root.add_child(dispatcher)
+	dispatcher.bind(board, selector, reservations, routing, routing_access, select_access)
+	var renderer = null
+	if use_renderer:
+		renderer = BoardRenderer.new(); root.add_child(renderer)
+		renderer.configure(board, PackedStringArray(BoardDebugFixturesM20.PALETTE), Vector2(300, 300))
+	return {"board": board, "reservations": reservations, "candidates": candidates,
+		"selector": selector, "routing": routing, "routing_access": routing_access,
+		"select_access": select_access, "dispatcher": dispatcher, "renderer": renderer}
+
+func _run_m20_v04_node_lifetime_tests() -> void:
+	print("---- M20-C001 V04: Node lifetime boundary (F-M20-STRICT-001.K) ----")
+	# Dispatcher queued for deletion BEFORE bind -> rejected, unbound, no signal.
+	var board = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var color: int = board.get_color_id(board.get_cell_index(10, 10))
+	var w = _m20_full(board)
+	w["dispatcher"].queue_free()
+	var loop = CompleteClearingLoop.new()
+	_check(not loop.bind(board, _m20_slots([color, color, color, color, color]), w["candidates"], w["reservations"], w["dispatcher"]), "lifetime: queued dispatcher rejected at bind")
+	_check(not loop.is_bound(), "lifetime: loop unbound after queued dispatcher")
+	_check_eq(_m20_conn_count(w["dispatcher"]), 0, "lifetime: queued dispatcher binds no arrival signal")
+	root.remove_child(w["dispatcher"]); w["dispatcher"].free()
+
+	# Renderer queued for deletion BEFORE bind -> rejected.
+	var b2 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var c2: int = b2.get_color_id(b2.get_cell_index(10, 10))
+	var w2 = _m20_full(b2, null, null, true)
+	w2["renderer"].queue_free()
+	_check(not CompleteClearingLoop.new().bind(b2, _m20_slots([c2, c2, c2, c2, c2]), w2["candidates"], w2["reservations"], w2["dispatcher"], w2["renderer"]), "lifetime: queued renderer rejected at bind")
+	root.remove_child(w2["renderer"]); w2["renderer"].free()
+	_m20_teardown(w2)
+
+	# After a healthy bind, queue-free the dispatcher: is_coherent() false, activation
+	# fails closed, reset() is safe — all without a SCRIPT ERROR.
+	var b3 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var c3: int = b3.get_color_id(b3.get_cell_index(10, 10))
+	var w3 = _m20_full(b3)
+	var l3 = _m20_loop(w3, _m20_slots([c3, c3, c3, c3, c3]))
+	_check(l3.is_coherent(), "lifetime: healthy bundle coherent before free")
+	w3["dispatcher"].queue_free()
+	_check(not l3.is_coherent(), "lifetime: queued dispatcher makes bundle incoherent")
+	_check(not l3.activate_slot(0, Vector2(-2.0, 10.5)).success, "lifetime: activation against queued dispatcher fails closed")
+	l3.reset() # must be safe (queued dispatcher still callable)
+	_check(true, "lifetime: reset() with queued dispatcher did not error")
+	root.remove_child(w3["dispatcher"]); w3["dispatcher"].free()
+
+func _run_m20_v04_post_dispatch_bracket_tests() -> void:
+	print("---- M20-C001 V04: post-dispatch transaction bracket (F-M20-STRICT-002.K) ----")
+	# Reset injected from inside M19 dispatch: M19 may still return SUCCESS, but the
+	# bracketed activate_slot() must return RESETTING (never stale SUCCESS), clean the
+	# in-flight dispatcher/reservation, keep owner ids monotonic, and recover later.
+	var board = _m19_open_board_active(20, 20, [Vector2(10, 10), Vector2(12, 10)])
+	var color: int = board.get_color_id(board.get_cell_index(10, 10))
+	var w = _m20_full_reset_access(board)
+	var loop = _m20_loop(w, _m20_slots([color, color, color, color, color]))
+	var owner_before: int = w["dispatcher"].peek_next_owner_id()
+	w["select_access"].hook = func(): loop.reset()
+	var res = loop.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
+	_check(not res.success, "bracket(reset): activation not a stale success")
+	_check_eq(res.failure_reason, DispatchResult.FailureReason.RESETTING, "bracket(reset): reason RESETTING")
+	_check_eq(w["dispatcher"].get_active_count(), 0, "bracket(reset): no live dispatcher assignment left")
+	_check_eq(w["reservations"].get_reservation_count(), 0, "bracket(reset): current reservation cleaned")
+	_check(w["dispatcher"].peek_next_owner_id() >= owner_before, "bracket(reset): owner id counter not rewound")
+	w["select_access"].hook = Callable()
+	# Later ordinary activation recovers (select_access hook is one-shot).
+	var again = _m20_activate_and_arrive(loop, 1, Vector2(22.0, 10.5))
+	_check(again.success and loop.get_cleared_count() == 1, "bracket(reset): later ordinary activation recovers and clears")
+	loop = null
+	_m20_teardown(w)
+
+	# Renderer freed from inside M19 dispatch: M20-visible coherence loss must never
+	# expose the raw M19 SUCCESS -> COHERENCE_FAILED with the in-flight assignment
+	# cleaned; a fresh healthy bundle proves later recovery.
+	var b2 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var c2: int = b2.get_color_id(b2.get_cell_index(10, 10))
+	var w2 = _m20_full_reset_access(b2, true)
+	var l2 = _m20_loop(w2, _m20_slots([c2, c2, c2, c2, c2]))
+	var rderer = w2["renderer"]
+	w2["select_access"].hook = func(): rderer.queue_free()
+	var res2 = l2.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
+	_check(not res2.success, "bracket(coherence): activation not a stale success")
+	_check_eq(res2.failure_reason, DispatchResult.FailureReason.COHERENCE_FAILED, "bracket(coherence): reason COHERENCE_FAILED")
+	_check_eq(w2["dispatcher"].get_active_count(), 0, "bracket(coherence): no live dispatcher assignment left")
+	_check_eq(w2["reservations"].get_reservation_count(), 0, "bracket(coherence): current reservation cleaned")
+	w2["select_access"].hook = Callable()
+	if is_instance_valid(rderer):
+		root.remove_child(rderer); rderer.free()
+	w2["renderer"] = null
+	l2 = null
+	_m20_teardown(w2)
+
+func _run_m19_v04_pair_narrow_reset_tests() -> void:
+	print("---- M19 V04: pair-narrow board-safe dispatcher reset (F-M20-STRICT-006.K) ----")
+	# A. healthy original board + exact T<->O -> reset releases T only.
+	var bA = _m19_open_board_active(20, 20, [Vector2(10, 10), Vector2(12, 10)])
+	var colorA: int = bA.get_color_id(bA.get_cell_index(10, 10))
+	var wA = _m19_wire_real(bA)
+	var rA = wA["dispatcher"].dispatch(colorA, Vector2(-2.0, 10.5), 6.0)
+	var tA: int = rA.target_index
+	_check(rA.success and wA["reservations"].is_reserved(tA), "pair-narrow A: dispatch reserved T")
+	wA["dispatcher"].reset()
+	_check_eq(wA["reservations"].get_reservation_count(), 0, "pair-narrow A: reset released T")
+	_check_eq(wA["dispatcher"].get_active_count(), 0, "pair-narrow A: active bookkeeping cleared")
+	_m19_teardown(wA)
+
+	# B. ReservationState rebound to foreign board B, owner O on a different B target
+	#    -> reset preserves the B reservation; dispatcher still clears its own agent.
+	var bB0 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var colorB: int = bB0.get_color_id(bB0.get_cell_index(10, 10))
+	var wB = _m19_wire_real(bB0)
+	var rB = wB["dispatcher"].dispatch(colorB, Vector2(-2.0, 10.5), 6.0)
+	var owner: int = rB.owner_id
+	var boardB = _m19_open_board_active(20, 20, [Vector2(3, 3)])
+	wB["reservations"].rebind(boardB)
+	var bTarget: int = boardB.get_cell_index(3, 3)
+	wB["reservations"].reserve(bTarget, owner)
+	wB["dispatcher"].reset()
+	_check_eq(wB["reservations"].get_owner(bTarget), owner, "pair-narrow B: foreign-board reservation preserved")
+	_check_eq(wB["dispatcher"].get_active_count(), 0, "pair-narrow B: dispatcher still cleared its agent")
+	_m19_teardown(wB)
+
+	# C. foreign board B uses the SAME numeric target index T and owner O -> still
+	#    preserved (board identity is foreign).
+	var bC0 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var colorC: int = bC0.get_color_id(bC0.get_cell_index(10, 10))
+	var wC = _m19_wire_real(bC0)
+	var rC = wC["dispatcher"].dispatch(colorC, Vector2(-2.0, 10.5), 6.0)
+	var ownerC: int = rC.owner_id
+	var tC: int = rC.target_index
+	var boardC = _m19_open_board_active(20, 20, [Vector2(int(tC % 20), int(tC / 20))])
+	wC["reservations"].rebind(boardC)
+	wC["reservations"].reserve(tC, ownerC) # same numeric target + owner, foreign board
+	wC["dispatcher"].reset()
+	_check_eq(wC["reservations"].get_owner(tC), ownerC, "pair-narrow C: same-index foreign-board reservation preserved")
+	_check_eq(wC["dispatcher"].get_active_count(), 0, "pair-narrow C: dispatcher still cleared its agent")
+	_m19_teardown(wC)
+
+	# D. same original board but O now owns V != T -> reset preserves V.
+	var bD = _m19_open_board_active(20, 20, [Vector2(10, 10), Vector2(14, 10)])
+	var colorD: int = bD.get_color_id(bD.get_cell_index(10, 10))
+	var wD = _m19_wire_real(bD)
+	var rD = wD["dispatcher"].dispatch(colorD, Vector2(-2.0, 10.5), 6.0)
+	var ownerD: int = rD.owner_id
+	var tD: int = rD.target_index
+	var vD: int = bD.get_cell_index(14, 10)
+	wD["reservations"].release(tD, ownerD)   # drop O's T
+	wD["reservations"].reserve(vD, ownerD)   # O now owns V != T
+	wD["dispatcher"].reset()
+	_check_eq(wD["reservations"].get_owner(vD), ownerD, "pair-narrow D: O-owns-V (!=T) reservation preserved")
+	_check_eq(wD["dispatcher"].get_active_count(), 0, "pair-narrow D: dispatcher still cleared its agent")
+	_m19_teardown(wD)
+
+	# E. current reservation missing -> reset does not invent/mutate another.
+	var bE = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var colorE: int = bE.get_color_id(bE.get_cell_index(10, 10))
+	var wE = _m19_wire_real(bE)
+	var rE = wE["dispatcher"].dispatch(colorE, Vector2(-2.0, 10.5), 6.0)
+	wE["reservations"].release(rE.target_index, rE.owner_id) # remove it out from under the dispatcher
+	wE["dispatcher"].reset()
+	_check_eq(wE["reservations"].get_reservation_count(), 0, "pair-narrow E: missing reservation not re-invented")
+	_check_eq(wE["dispatcher"].get_active_count(), 0, "pair-narrow E: dispatcher still cleared its agent")
+	_m19_teardown(wE)
+
+	# Owner id counter remains monotonic across all pair-narrow resets.
+	var bM = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var wM = _m19_wire_real(bM)
+	var before_owner: int = wM["dispatcher"].peek_next_owner_id()
+	wM["dispatcher"].dispatch(bM.get_color_id(bM.get_cell_index(10, 10)), Vector2(-2.0, 10.5), 6.0)
+	wM["dispatcher"].reset()
+	_check(wM["dispatcher"].peek_next_owner_id() > before_owner, "pair-narrow: owner id monotonic across reset")
+	_m19_teardown(wM)

@@ -117,13 +117,18 @@ var _last_outcome: StringName = Outcome.NONE
 # ------------------------------------------------------------------- bind ----
 
 ## Bind the separate systems into one clearing bundle as a real transaction
-## (F-M20-STRICT-001). Board / SlotSystem / ScrubbotDispatcher / BoardRenderer
-## are required to be the EXACT production scripts (no adversarial subclass seam);
-## the candidate index and reservation state accept subclasses (for controlled
-## rollback testing). The `assignment_arrived` signal is connected ONLY after full
-## validation + a drift re-check, so a nested or failed bind connects no ghost
-## callback and leaves the loop fully unbound. A second bind on an already-bound
-## loop returns false and preserves the original bundle (no destructive rebind).
+## (F-M20-STRICT-001). ALL canonical collaborators — BoardState, SlotSystem,
+## ColorCandidateIndex, ReservationState, ScrubbotDispatcher and the optional
+## BoardRenderer — are required to be the EXACT production scripts (V03 §2); no
+## subclass may enter the production trust boundary. Fault seams are test-only and
+## are wired through a test harness, never through bind(). Node collaborators
+## (dispatcher, renderer) are additionally proven live — non-null, valid, and NOT
+## queued for deletion — BEFORE any get_script()/method call, so a freed or dying
+## Node cannot raise a SCRIPT ERROR or bind a ghost signal (F-M20-STRICT-001.K).
+## The `assignment_arrived` signal is connected ONLY after full validation, so a
+## nested or failed bind connects no ghost callback and leaves the loop fully
+## unbound. A second bind on an already-bound loop returns false and preserves the
+## original bundle (no destructive rebind).
 func bind(board, slot_system, candidate_index, reservation_state, dispatcher, renderer = null) -> bool:
 	if _bound:
 		return false
@@ -154,10 +159,13 @@ func _bind_txn(board, slot_system, candidate_index, reservation_state, dispatche
 		return false
 	if not _is_exact_script(reservation_state, ReservationState):
 		return false
-	if not _is_exact_script(dispatcher, ScrubbotDispatcher):
+	# Node collaborators (F-M20-STRICT-001.K): prove non-null + valid + NOT queued
+	# for deletion BEFORE any get_script()/method call, so a freed/dying dispatcher
+	# or renderer fails closed without a SCRIPT ERROR and connects no signal.
+	if not _is_live_exact_node(dispatcher, ScrubbotDispatcher):
 		return false
 	if renderer != null:
-		if not _is_exact_script(renderer, BoardRenderer) or not is_instance_valid(renderer):
+		if not _is_live_exact_node(renderer, BoardRenderer):
 			return false
 	# Single coherence probe: every dependency is now the exact production script,
 	# so an is_bound_to() callback cannot recurse into bind or drift the bundle.
@@ -193,10 +201,13 @@ func _probe(board, ci, rs, disp, renderer) -> bool:
 		return false
 	if not _bool_true(rs.is_bound_to(board)):
 		return false
-	if not _bool_true(disp.is_bound_to(board, rs)):
+	# Node liveness before any coherence-method call (F-M20-STRICT-001.K): a
+	# dispatcher/renderer that was freed or queued for deletion after bind makes the
+	# bundle incoherent, never a SCRIPT ERROR.
+	if not _is_live_node(disp) or not _bool_true(disp.is_bound_to(board, rs)):
 		return false
 	if renderer != null:
-		if not is_instance_valid(renderer) or not _bool_true(renderer.is_bound_to(board)):
+		if not _is_live_node(renderer) or not _bool_true(renderer.is_bound_to(board)):
 			return false
 	return true
 
@@ -247,7 +258,22 @@ func _activate_core(slot_id, start_position: Vector2, speed: float, my_gen: int)
 		return _fail(DispatchResult.FailureReason.RESETTING)
 	if not is_coherent():
 		return _fail(DispatchResult.FailureReason.INVALID_REQUEST)
-	return _dispatcher.dispatch(palette_id, start_position, speed)
+	# Bracket dispatcher.dispatch() as an M20 transaction boundary (F-M20-STRICT-002.K):
+	# M19 can synchronously run injected game code (reset, renderer free) and still
+	# return SUCCESS, so its result is NOT trusted until the M20 boundary is checked.
+	var result = _dispatcher.dispatch(palette_id, start_position, speed)
+	# 1) A reset that moved during dispatch wins over any stale M19 success. The
+	#    deferred reset drained by activate_slot() cancels the just-created agent and
+	#    releases its reservation; the already-consumed owner id stays consumed.
+	if _reset_requested or _generation != my_gen:
+		return _fail(DispatchResult.FailureReason.RESETTING)
+	# 2) M20-visible coherence lost during dispatch (e.g. a bound renderer freed from
+	#    an M19 callback): never expose the raw M19 SUCCESS. Request a deterministic
+	#    M20 reset/cleanup (drained by activate_slot) and fail closed.
+	if not is_coherent():
+		reset()
+		return _fail(DispatchResult.FailureReason.COHERENCE_FAILED)
+	return result
 
 func _fail(reason: StringName) -> RefCounted:
 	return DispatchResult.failure(reason)
@@ -464,10 +490,17 @@ func _perform_reset() -> void:
 	if _reset_in_progress:
 		return
 	_reset_in_progress = true
+	# M20-local bookkeeping is cleared deterministically regardless of dispatcher
+	# lifetime.
 	_arrival_queue.clear()
 	_current_owner = -1
 	_current_agent = null
-	_dispatcher.reset()
+	# Reset law for an invalid dispatcher (F-M20-STRICT-001.K): never call an
+	# already-destroyed dispatcher. A dispatcher merely queued for deletion is still
+	# callable, so its own reset runs while valid; future coherence still returns
+	# false because _probe rejects a queued node.
+	if _is_valid_node(_dispatcher):
+		_dispatcher.reset()
 	_reset_requested = false
 	_reset_in_progress = false
 
@@ -528,6 +561,22 @@ static func _colors_close(a: Color, b: Color, tol: float) -> bool:
 
 static func _is_exact_script(obj, script) -> bool:
 	return obj != null and typeof(obj) == TYPE_OBJECT and obj.get_script() == script
+
+## A Node that is non-null and still valid (may be queued for deletion but is still
+## callable). Used by reset() so a queued-but-callable dispatcher still cleans up.
+static func _is_valid_node(n) -> bool:
+	return n != null and n is Node and is_instance_valid(n)
+
+## A LIVE Node: valid AND not queued for deletion. Used by the coherence probe so a
+## dispatcher/renderer queued for deletion makes the bundle incoherent.
+static func _is_live_node(n) -> bool:
+	return _is_valid_node(n) and not n.is_queued_for_deletion()
+
+## A live Node of EXACT production script identity — the bind-time Node gate. Proves
+## liveness BEFORE the get_script() call, so a freed/dying Node never raises a
+## SCRIPT ERROR (F-M20-STRICT-001.K).
+static func _is_live_exact_node(n, script) -> bool:
+	return _is_live_node(n) and n.get_script() == script
 
 static func _bool_true(v) -> bool:
 	return typeof(v) == TYPE_BOOL and v == true
