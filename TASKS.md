@@ -7,13 +7,13 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Current Milestone: M20
 - Current Sprint: M20-C001 V02 — strict-v2 transaction correction
 - Current Task: M20-C001-V02 — close frozen M20 transaction/re-entry/rollback gaps
-- Current Task Status: IN_PROGRESS
-- Next Task/Action: implement V02, run required validation, write CLAUDE_LOG_V02.md, then hand off AWAITING_AUDIT to ChatGPT
-- Required Actor: CLAUDE
+- Current Task Status: AWAITING_AUDIT
+- Next Task/Action: independent ChatGPT V02 audit against coordination/sessions/M20-C001/CLAUDE_LOG_V02.md + CHATGPT_AUDIT_CRITERIA_V02.md (real diff/code/tests), then publish CHATGPT_AUDIT_V02.md and either close the cycle or issue the next prompt version.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
-- Note: M20-C001 V01 AUDITED (coordination/sessions/M20-C001/CHATGPT_AUDIT_V01.md); V02 correction authorized by that audit + CHATGPT_PROMPT_V02.md/CHATGPT_AUDIT_CRITERIA_V02.md. V02 closes frozen transaction/re-entry/rollback findings (real bind transaction, serialized activation + lossless serial arrivals, transactional reset, corrected renderer-after-finalize order, exact pre-state snapshot, postcondition verification, verified rollback). No SB-M20 row marked complete — audit closure belongs to ChatGPT.
+- Note: M20-C001 V02 implementation complete, AWAITING_AUDIT. Closes frozen F-M20-STRICT-001..007 (real bind transaction, serialized activation, lossless serial arrival queue, transactional reset, corrected renderer-after-finalize order, exact pre-state snapshot, verified postconditions + verified rollback with explicit ROLLBACK_FAILED). Minimal M19 reset() hardening: cancelled agents queue_free (safe when reset runs inside an arrival/emit stack) — no M19 identity change. Full headless suite 3501/3501 PASS on Godot 4.7.1.stable (V01 baseline 3386, +115); dedicated deferred-free smoke (tests/m20_queue_free_smoke.gd) PASS. Evidence: coordination/sessions/M20-C001/CLAUDE_LOG_V02.md. No SB-M20 row marked complete — audit closure belongs to ChatGPT.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
