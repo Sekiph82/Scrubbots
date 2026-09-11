@@ -205,6 +205,8 @@ func _initialize() -> void:
 	_run_m20_v08_auditor_validation_tests()
 	# M20-C001 V09 — final exact-evidence validation-only gate.
 	_run_m20_v09_exact_evidence_tests()
+	# M20-C001 V10 — final closure-only exact-evidence reconciliation.
+	_run_m20_v10_closure_reconciliation_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -11769,3 +11771,258 @@ func _v09_rollback() -> void:
 	lb.reset(); lb.reset() # re-entry safe
 	_check(wb["dispatcher"].peek_next_owner_id() >= ob + 1, "V09.7: owner ids monotonic; reset re-entry safe")
 	lb = null; _m20_teardown(wb)
+
+# ==================== M20-C001 V10 closure-only exact-evidence reconciliation ===
+# Narrow reconciliation groups G-V09-01..05 (evidence table in CLAUDE_LOG_V10.md).
+# Validation-only against locked V07 production. Frame-only cases live in
+# tests/m20_v10_lifecycle_smoke.gd.
+
+func _run_m20_v10_closure_reconciliation_tests() -> void:
+	print("==== M20-C001 V10 closure reconciliation ====")
+	_v10_g01_claim_reset_usability()
+	_v10_g02_activation_serialization()
+	_v10_g03_failed_preflight_matrix()
+	_v10_g04_ledger_identity()
+	_v10_g05_rollback_prestate()
+	print("  M20 V10 closure reconciliation complete")
+
+# --- G-V09-01: claim/reset ACTUAL usability (second real gameplay op) ---------
+func _v10_g01_claim_reset_usability() -> void:
+	print("---- V10 G-V09-01: claim/reset actual usability ----")
+	# Two reachable same-color targets A (9,11) and B (13,11).
+	var board = _m19_open_board_active(22, 22, [Vector2(9, 11), Vector2(13, 11)])
+	var color: int = board.get_color_id(board.get_cell_index(9, 11))
+	var w = _m20_full(board)
+	var diag := func(_o, _t, _c, _a): pass
+	w["dispatcher"].assignment_arrived.connect(diag) # diagnostic BEFORE first bind
+	var l1 = CompleteClearingLoop.new()
+	_check(l1.bind(board, _m20_slots([color, color, color, color, color]), w["candidates"], w["reservations"], w["dispatcher"]), "G01: first loop binds")
+	var rA = _m20_activate_and_arrive(l1, 0, Vector2(-2.0, 11.5))
+	_check(rA.success and l1.get_cleared_count() == 1, "G01: first loop clears A")
+	# Snapshot with NO active work, then reset.
+	var cells_snap = _snapshot_cell_states(board)
+	var rmap_snap := _v09_rmap(w)
+	var rcount_snap: int = w["reservations"].get_reservation_count()
+	l1.reset()
+	_check(_cell_states_equal(board, cells_snap), "G01: owner reset preserves BoardState snapshot")
+	_check(_v09_dict_eq(_v09_rmap(w), rmap_snap) and w["reservations"].get_reservation_count() == rcount_snap, "G01: owner reset preserves exact reservation map/count")
+	# Second different loop still cannot bind (claim held by first loop, alive).
+	var l2 = CompleteClearingLoop.new()
+	_check(not l2.bind(board, _m20_slots([color, color, color, color, color]), w["candidates"], w["reservations"], w["dispatcher"]), "G01: second different loop still cannot bind")
+	# ORIGINAL first loop performs a SECOND real activation -> clears B.
+	var rB = _m20_activate_and_arrive(l1, 1, Vector2(26.0, 11.5))
+	_check(rB.success and rB.target_index == board.get_cell_index(13, 11), "G01: first loop second real activation selects B")
+	_check_eq(l1.get_cleared_count(), 2, "G01: first loop cleared_count incremented exactly once more (B)")
+	_check_eq(l2.get_cleared_count(), 0, "G01: second loop zero attribution")
+	_check_eq(board.get_cell_state(board.get_cell_index(13, 11)), BoardState.CellState.CLEARED, "G01: B actually CLEARED")
+	w["dispatcher"].assignment_arrived.disconnect(diag)
+	l1 = null; l2 = null
+	print("  G01: owner-GC claim release proven in tests/m20_v09/v10 lifecycle smokes")
+	_m20_teardown(w)
+
+# --- G-V09-02: activation serialization exactness -----------------------------
+func _v10_g02_activation_serialization() -> void:
+	print("---- V10 G-V09-02: activation serialization exactness ----")
+	# 2A nested activation from the preflight coherence callback.
+	var b = _m19_open_board_active(22, 22, [Vector2(11, 11), Vector2(13, 11)])
+	var color: int = b.get_color_id(b.get_cell_index(11, 11))
+	var seam = M20CandidateSeam.new(); seam.bind(b)
+	var w = _m20_full(b, seam)
+	var loop = _m20_harness_bind(w, _m20_slots([color, color, 0, 0, 0]))
+	var before_owner: int = w["dispatcher"].peek_next_owner_id()
+	var nested := [&""]
+	seam.coherence_hook = func(): nested[0] = loop.activate_slot(1, Vector2(26.0, 11.5)).failure_reason
+	var outer = loop.activate_slot(0, Vector2(-2.0, 11.5), 6.0)
+	_check_eq(nested[0], DispatchResult.FailureReason.REENTRANT, "G02.A: nested activation REENTRANT")
+	_check(outer.success, "G02.A: outer healthy activation succeeds")
+	_check_eq(w["dispatcher"].get_active_count(), 1, "G02.A: active count == 1")
+	_check_eq(w["reservations"].get_reservation_count(), 1, "G02.A: reservation count == 1")
+	_check_eq(w["dispatcher"].peek_next_owner_id(), before_owner + 1, "G02.A: next owner id == before + 1 (nested consumed no token)")
+	seam.coherence_hook = Callable()
+	loop = null; _m20_teardown(w)
+
+	# 2B activation DURING arrival drain (_draining true) via the candidate hook.
+	var b2 = _m19_open_board_active(22, 22, [Vector2(9, 11), Vector2(13, 11)])
+	var c2: int = b2.get_color_id(b2.get_cell_index(9, 11))
+	var seam2 = M20CandidateSeam.new(); seam2.bind(b2)
+	var w2 = _m20_full(b2, seam2)
+	var l2 = _m20_harness_bind(w2, _m20_slots([c2, c2, 0, 0, 0]))
+	var rA = l2.activate_slot(0, Vector2(-2.0, 11.5), 6.0)
+	var owner_before2: int = w2["dispatcher"].peek_next_owner_id()
+	var active_before2: int = w2["dispatcher"].get_active_count()
+	var res_before2: int = w2["reservations"].get_reservation_count()
+	var inner := [&""]
+	seam2.sync_hook = func(_i): inner[0] = l2.activate_slot(1, Vector2(26.0, 11.5)).failure_reason
+	_m19_drive_to_arrival(rA.agent) # A commits; _draining true when the hook runs
+	_check_eq(inner[0], DispatchResult.FailureReason.REENTRANT, "G02.B: activation during arrival drain -> REENTRANT")
+	_check_eq(w2["dispatcher"].peek_next_owner_id(), owner_before2, "G02.B: inner request consumed no owner token")
+	_check(l2.get_cleared_count() == 1, "G02.B: A transaction completes normally")
+	_check(w2["dispatcher"].get_active_count() <= active_before2, "G02.B: inner created no extra active agent")
+	seam2.sync_hook = Callable()
+	# After drain: a later ordinary activation remains usable (clears B).
+	var rB = _m20_activate_and_arrive(l2, 1, Vector2(26.0, 11.5))
+	_check(rB.success and l2.get_cleared_count() == 2, "G02.B: later ordinary activation usable after drain")
+	l2 = null; _m20_teardown(w2)
+
+# --- G-V09-03: exact failed-preflight matrix ----------------------------------
+func _v10_g03_failed_preflight_matrix() -> void:
+	print("---- V10 G-V09-03: exact failed-preflight matrix ----")
+	# missing reservation.
+	var wm = _m20_full(_m19_open_board_active(22, 22, [Vector2(11, 11), Vector2(13, 11)]))
+	var am = _v09_arrived_sentinel(wm)
+	wm["reservations"].release_for_owner(am["owner"])
+	am["loop"]._on_assignment_arrived(am["owner"], am["target"], am["color"], am["agent"])
+	_check_eq(am["loop"].get_last_outcome(), CompleteClearingLoop.Outcome.PREFLIGHT_REJECTED, "G03 missing reservation: rejected")
+	_check(am["loop"].get_cleared_count() == 0 and wm["board"].get_cell_state(am["target"]) == BoardState.CellState.ACTIVE, "G03 missing reservation: no clear, ACTIVE")
+	_check_eq(wm["reservations"].get_owner(am["sentinel"]), 9090, "G03 missing reservation: sentinel intact")
+	am["loop"] = null; _m20_teardown(wm)
+
+	# candidate rebind(foreign): pair + assignment + raw candidate remain.
+	var wf = _m20_full(_m19_open_board_active(22, 22, [Vector2(11, 11), Vector2(13, 11)]))
+	var af = _v09_arrived_sentinel(wf)
+	wf["candidates"].rebind(_m19_open_board_active(22, 22, [Vector2(2, 2)]))
+	af["loop"]._on_assignment_arrived(af["owner"], af["target"], af["color"], af["agent"])
+	_check_eq(af["loop"].get_last_outcome(), CompleteClearingLoop.Outcome.PREFLIGHT_REJECTED, "G03 candidate foreign: rejected")
+	_check(wf["reservations"].get_owner(af["target"]) == af["owner"] and wf["reservations"].get_target_for_owner(af["owner"]) == af["target"], "G03 candidate foreign: reservation both directions held")
+	_check(wf["dispatcher"].has_owner(af["owner"]) and af["loop"].get_cleared_count() == 0, "G03 candidate foreign: assignment pending, cleared 0")
+	_check_eq(wf["reservations"].get_owner(af["sentinel"]), 9090, "G03 candidate foreign: sentinel intact")
+	af["loop"] = null; _m20_teardown(wf)
+
+	# candidate rebind(null).
+	var wn = _m20_full(_m19_open_board_active(22, 22, [Vector2(11, 11), Vector2(13, 11)]))
+	var an = _v09_arrived_sentinel(wn)
+	wn["candidates"].rebind(null)
+	an["loop"]._on_assignment_arrived(an["owner"], an["target"], an["color"], an["agent"])
+	_check_eq(an["loop"].get_last_outcome(), CompleteClearingLoop.Outcome.PREFLIGHT_REJECTED, "G03 candidate null: rejected cleanly")
+	_check(wn["reservations"].get_owner(an["target"]) == an["owner"] and wn["dispatcher"].has_owner(an["owner"]), "G03 candidate null: pair+assignment held")
+	an["loop"] = null; _m20_teardown(wn)
+
+	# externally CLEARED target.
+	var wc = _m20_full(_m19_open_board_active(22, 22, [Vector2(11, 11), Vector2(13, 11)]))
+	var ac = _v09_arrived_sentinel(wc)
+	wc["board"].set_cell_state(ac["target"], BoardState.CellState.CLEARED)
+	ac["loop"]._on_assignment_arrived(ac["owner"], ac["target"], ac["color"], ac["agent"])
+	_check_eq(ac["loop"].get_last_outcome(), CompleteClearingLoop.Outcome.PREFLIGHT_REJECTED, "G03 externally CLEARED: rejected")
+	_check_eq(ac["loop"].get_cleared_count(), 0, "G03 externally CLEARED: cleared_count unchanged")
+	ac["loop"] = null; _m20_teardown(wc)
+
+	# renderer foreign after dispatch / before arrival.
+	var wr = _m20_full(_m19_open_board_active(22, 22, [Vector2(11, 11)]), null, null, true)
+	var tr: int = wr["board"].get_cell_index(11, 11); var cr: int = wr["board"].get_color_id(tr)
+	var lr = _m20_loop(wr, _m20_slots([cr, cr, cr, cr, cr]))
+	var rr = lr.activate_slot(0, Vector2(-2.0, 11.5), 6.0)
+	wr["renderer"].configure(_m19_open_board_active(22, 22, [Vector2(2, 2)]), PackedStringArray(BoardDebugFixturesM20.PALETTE), Vector2(90, 90))
+	_m19_drive_to_arrival(rr.agent)
+	_check(wr["board"].get_cell_state(tr) == BoardState.CellState.ACTIVE and lr.get_cleared_count() == 0, "G03 renderer foreign: no clear")
+	_check(wr["reservations"].get_owner(tr) == rr.owner_id and wr["reservations"].get_target_for_owner(rr.owner_id) == tr and wr["dispatcher"].has_owner(rr.owner_id), "G03 renderer foreign: pair both directions + assignment held")
+	_check(wr["candidates"].get_candidates(cr, null).has(tr), "G03 renderer foreign: raw target candidate present")
+	lr = null; root.remove_child(wr["renderer"]); wr["renderer"].free(); wr["renderer"] = null; _m20_teardown(wr)
+
+	# renderer queued after dispatch / before arrival.
+	var wq = _m20_full(_m19_open_board_active(22, 22, [Vector2(11, 11)]), null, null, true)
+	var tq: int = wq["board"].get_cell_index(11, 11); var cq: int = wq["board"].get_color_id(tq)
+	var lq = _m20_loop(wq, _m20_slots([cq, cq, cq, cq, cq]))
+	var rq = lq.activate_slot(0, Vector2(-2.0, 11.5), 6.0)
+	wq["renderer"].queue_free()
+	_m19_drive_to_arrival(rq.agent)
+	_check(wq["board"].get_cell_state(tq) == BoardState.CellState.ACTIVE and lq.get_cleared_count() == 0, "G03 renderer queued: no clear")
+	_check(wq["reservations"].get_owner(tq) == rq.owner_id and wq["reservations"].get_target_for_owner(rq.owner_id) == tq and wq["dispatcher"].has_owner(rq.owner_id), "G03 renderer queued: pair both directions + assignment held")
+	_check(wq["candidates"].get_candidates(cq, null).has(tq), "G03 renderer queued: raw target candidate present")
+	if is_instance_valid(wq["renderer"]): root.remove_child(wq["renderer"]); wq["renderer"].free()
+	wq["renderer"] = null; lq = null; _m20_teardown(wq)
+	print("  G03: truly-freed renderer preservation + failed-preflight cleanup -> tests/m20_v10_lifecycle_smoke.gd")
+
+# --- G-V09-04: exact ledger identity ------------------------------------------
+func _v10_g04_ledger_identity() -> void:
+	print("---- V10 G-V09-04: exact ledger identity ----")
+	# Five-slot exact both-direction identity.
+	var b = _m19_open_board_active(24, 24, [Vector2(12, 0), Vector2(12, 1), Vector2(12, 2), Vector2(12, 3), Vector2(12, 4)])
+	var pal: Array = []
+	for y in range(5): pal.append(b.get_color_id(b.get_cell_index(12, y)))
+	var w = _m20_full(b); var loop = _m20_loop(w, _m20_slots(pal))
+	var org: Array = [Vector2(-2.0, 0.5), Vector2(26.0, 1.5), Vector2(-2.0, 2.5), Vector2(26.0, 3.5), Vector2(-2.0, 4.5)]
+	var res: Array = []
+	for i in range(5):
+		var r = loop.activate_slot(i, org[i], 6.0)
+		if r.success: res.append(r)
+	_check_eq(res.size(), 5, "G04 five-slot: five in-flight")
+	_m19_drive_to_arrival(res[0].agent)
+	_check_eq(w["reservations"].get_owner(res[0].target_index), -1, "G04 five-slot: first get_owner(target) == -1")
+	_check_eq(w["reservations"].get_target_for_owner(res[0].owner_id), -1, "G04 five-slot: first get_target_for_owner(owner) == -1")
+	var four := true
+	for i in range(1, 5):
+		if w["reservations"].get_owner(res[i].target_index) != res[i].owner_id or w["reservations"].get_target_for_owner(res[i].owner_id) != res[i].target_index: four = false
+	_check(four, "G04 five-slot: remaining four exact both directions")
+	for i in range(1, 5): _m19_drive_to_arrival(res[i].agent)
+	_check(w["dispatcher"].get_active_count() == 0 and w["reservations"].get_reservation_count() == 0, "G04 five-slot: all finalize, active 0, reservations 0")
+	loop = null; _m20_teardown(w)
+	# Scale rows.
+	for d in [[24, 24, "Easy", 12], [34, 34, "Medium", 15], [44, 44, "Hard", 20], [54, 54, "VeryHard", 25], [59, 59, "59x59", 29], [53, 59, "rect", 20]]:
+		var bd = _m19_open_board_active(d[0], d[1], [Vector2(d[3], 10)])
+		var expected_target: int = bd.get_cell_index(d[3], 10)
+		var wd = _m20_full(bd); var ld = _m20_loop(wd, _m20_slots([bd.get_color_id(expected_target), 0, 0, 0, 0]))
+		var before: int = bd.count_cells_by_state(BoardState.CellState.CLEARED)
+		var rd = _m20_activate_and_arrive(ld, 0, Vector2(-2.0, 10.5))
+		_check(rd.success and rd.target_index == expected_target, "G04 %s: success at expected target" % d[2])
+		_check_eq(bd.get_cell_state(expected_target), BoardState.CellState.CLEARED, "G04 %s: expected target CLEARED" % d[2])
+		_check_eq(bd.count_cells_by_state(BoardState.CellState.CLEARED), before + 1, "G04 %s: CLEARED delta exactly +1" % d[2])
+		ld = null; _m20_teardown(wd)
+
+# --- G-V09-05: detached rollback prestate exact compare -----------------------
+func _v10_g05_rollback_prestate() -> void:
+	print("---- V10 G-V09-05: detached rollback prestate ----")
+	# Candidate mutate-before-false: T + same-color U + different-color V + unrelated reservation.
+	var b = _m19_open_board_active(22, 22, [Vector2(9, 11), Vector2(11, 11), Vector2(9, 13)])
+	var tT: int = b.get_cell_index(9, 11); var tU: int = b.get_cell_index(11, 11); var tV: int = b.get_cell_index(9, 13)
+	var cT: int = b.get_color_id(tT); var cV: int = b.get_color_id(tV)
+	var cs = M20CandidateSeam.new(); cs.bind(b)
+	var w = _m20_full(b, cs)
+	var loop = _m20_harness_bind(w, _m20_slots([cT, cT, cT, cT, cT]))
+	var r = loop.activate_slot(0, Vector2(-2.0, 11.5), 6.0) # reserves T
+	w["reservations"].reserve(tV, 5050) # unrelated reservation
+	# DETACHED prestate snapshot.
+	var pre_cells = _snapshot_cell_states(b)
+	var pre_Tbucket: Array = w["candidates"].get_candidates(cT, null)
+	var pre_Vbucket: Array = w["candidates"].get_candidates(cV, null)
+	var pre_rmap := _v09_rmap(w)
+	var pre_rcount: int = w["reservations"].get_reservation_count()
+	var pre_active: int = w["dispatcher"].get_active_count()
+	var pre_has_owner: bool = w["dispatcher"].has_owner(r.owner_id)
+	cs.mode = "mutate_false"
+	_m19_drive_to_arrival(r.agent)
+	cs.mode = "normal"
+	var oc = loop.get_last_outcome()
+	_check(oc == CompleteClearingLoop.Outcome.CANDIDATE_ROLLBACK or oc == CompleteClearingLoop.Outcome.ROLLBACK_FAILED, "G05 candidate: CANDIDATE_ROLLBACK or ROLLBACK_FAILED")
+	if oc == CompleteClearingLoop.Outcome.CANDIDATE_ROLLBACK:
+		_check(_cell_states_equal(b, pre_cells), "G05 candidate: BoardState exactly restored")
+		_check(w["candidates"].get_candidates(cT, null) == pre_Tbucket, "G05 candidate: target/same-color bucket exactly restored")
+		_check(w["candidates"].get_candidates(cV, null) == pre_Vbucket, "G05 candidate: different-color bucket exactly restored")
+		_check(_v09_dict_eq(_v09_rmap(w), pre_rmap) and w["reservations"].get_reservation_count() == pre_rcount, "G05 candidate: reservation map/count exactly restored")
+		_check(w["dispatcher"].get_active_count() == pre_active and w["dispatcher"].has_owner(r.owner_id) == pre_has_owner, "G05 candidate: dispatcher active/owner identity restored")
+	loop = null; _m20_teardown(w)
+
+	# Reservation mutate-before-false: current pair + unrelated pair.
+	var b2 = _m19_open_board_active(22, 22, [Vector2(9, 11), Vector2(13, 11)])
+	var t2T: int = b2.get_cell_index(9, 11); var u2: int = b2.get_cell_index(13, 11); var c2: int = b2.get_color_id(t2T)
+	var rs = M20ReservationSeam.new(); rs.bind(b2)
+	var w2 = _m20_full(b2, null, rs)
+	var l2 = _m20_harness_bind(w2, _m20_slots([c2, c2, c2, c2, c2]))
+	var r2 = l2.activate_slot(0, Vector2(-2.0, 11.5), 6.0) # reserves T for owner
+	w2["reservations"].reserve(u2, 6060) # unrelated pair
+	var pre_map2 := _v09_rmap(w2)
+	var pre_count2: int = w2["reservations"].get_reservation_count()
+	var pre_owner_tgt: int = w2["reservations"].get_target_for_owner(r2.owner_id)
+	var pre_u_owner: int = w2["reservations"].get_owner(u2)
+	var pre_cells2 = _snapshot_cell_states(b2)
+	var pre_active2: int = w2["dispatcher"].get_active_count()
+	rs.mode = "mutate_false"
+	_m19_drive_to_arrival(r2.agent)
+	rs.mode = "normal"
+	var oc2 = l2.get_last_outcome()
+	_check(oc2 == CompleteClearingLoop.Outcome.RESERVATION_ROLLBACK or oc2 == CompleteClearingLoop.Outcome.ROLLBACK_FAILED, "G05 reservation: RESERVATION_ROLLBACK or ROLLBACK_FAILED")
+	if oc2 == CompleteClearingLoop.Outcome.RESERVATION_ROLLBACK:
+		_check(_v09_dict_eq(_v09_rmap(w2), pre_map2) and w2["reservations"].get_reservation_count() == pre_count2, "G05 reservation: exact target->owner map/count restored")
+		_check(w2["reservations"].get_target_for_owner(r2.owner_id) == pre_owner_tgt and w2["reservations"].get_owner(u2) == pre_u_owner, "G05 reservation: owner->target reverse identity restored (both owners)")
+		_check(_cell_states_equal(b2, pre_cells2), "G05 reservation: BoardState restored")
+		_check(w2["dispatcher"].get_active_count() == pre_active2 and w2["dispatcher"].has_owner(r2.owner_id), "G05 reservation: dispatcher active/owner restored")
+	l2 = null; _m20_teardown(w2)
