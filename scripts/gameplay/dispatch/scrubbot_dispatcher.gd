@@ -615,7 +615,20 @@ func reset() -> void:
 				# reset() mid-cleanup. queue_free() is safe and leaves no orphan;
 				# _active/reservations are cleared synchronously below regardless.
 				agent.queue_free()
-		_reservations.release_for_owner(owner_id)
+		# Pair-narrow, board-safe reservation cleanup (M20-C001 V04 F-M20-STRICT-006.K).
+		# Owner-wide release_for_owner(O) is NOT reset authority: after a ReservationState
+		# drift/rebind to another board, the same numeric owner token can own an
+		# UNRELATED reservation and a board-blind owner release would destroy it. Release
+		# ONLY the exact immutable (target, owner) pair, and ONLY when the reservation
+		# layer still reports bound to this dispatcher's original board (ACTUAL bool
+		# true) and both pair directions match; otherwise skip reservation mutation (the
+		# agent/bookkeeping cleanup above still runs).
+		var target: int = int(entry["target"])
+		var bound = _reservations.is_bound_to(_board)
+		if typeof(bound) == TYPE_BOOL and bound \
+				and _reservations.get_target_for_owner(owner_id) == target \
+				and _reservations.get_owner(target) == owner_id:
+			_reservations.release(target, owner_id)
 	_active.clear()
 	_resetting = false
 

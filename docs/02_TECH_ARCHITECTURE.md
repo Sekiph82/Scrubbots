@@ -136,7 +136,17 @@ Reachability/access  --- filters blocked/unreachable candidates --->
   arrivals are drained losslessly through a private serial queue with
   current-arrival dedup, and `reset()` is transactional (records intent + a
   generation, rolls back a mid-flight arrival before applying the dispatcher
-  reset). Access truth updates
+  reset). Node collaborators (dispatcher, renderer) are proven live — valid and
+  not queued for deletion — before any `get_script()`/coherence call, so a freed
+  or dying Node fails bind/coherence closed without a SCRIPT ERROR (M20-C001 V04);
+  `dispatcher.dispatch()` is bracketed as an M20 boundary (a reset or coherence
+  loss injected from inside M19 dispatch yields RESETTING/COHERENCE_FAILED, never
+  a stale M19 SUCCESS, and the in-flight assignment is cleaned). The dispatcher's
+  own `reset()` releases reservations pair-narrow — only the exact immutable
+  `(target, owner)` pair, and only while the reservation layer is still bound to
+  the dispatcher's original board — so a drifted/rebound ReservationState cannot
+  have an unrelated reservation destroyed by an owner-wide release. Access truth
+  updates
   by reading BoardState live: `ProductionAccessQuery` receives no explicit
   mutation call. The loop introduces **no** win/lose/scoring/session-completion
   policy and no slot cooldown/queue/consumption policy (later milestones).
