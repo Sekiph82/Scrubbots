@@ -7,13 +7,13 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Current Milestone: M21
 - Current Sprint: M21-C001 V01 — first owner-approved real-art vertical slice
 - Current Task: M21-C001-V01
-- Current Task Status: IN_PROGRESS
-- Next Task/Action: execute this V01 prompt and hand back for independent audit.
-- Required Actor: CLAUDE
+- Current Task Status: AWAITING_AUDIT
+- Next Task/Action: independent V01 audit against coordination/sessions/M21-C001/CLAUDE_LOG_V01.md and CHATGPT_AUDIT_CRITERIA_V01.md.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 304 / 719 = 42.28% (main+ui); overall 304 / 943 = 32.24%; lastCompletedTaskId M20-C001-V11.
-- Note: M20-C001 final-closed by ChatGPT independent audit coordination/sessions/M20-C001/CHATGPT_AUDIT_V11.md (AUDITED_PASS / STRICT_V2_FINAL_CLOSURE; validation commit 412ed50, accepted basis e189ee8, locked blobs loop 06391839523cbc27e88a4b3ef12b730012cd45fa / dispatcher eee10149e4f116af6706beec832042352bf3a6dd). This tracker-only transition materializes that authorized closure (SB-M20-001..014 marked complete) and starts M21-C001 V01. M21 approved source: assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png (blob b565743ba52699899007882b750b7c8e7cdd00f9, 297 bytes, 20x20). No SB-M21 or SB-M08 row is closed by this transition; M21 closure belongs to ChatGPT.
+- Note: M21-C001 V01 first owner-approved real-art vertical slice implemented + validated, AWAITING_AUDIT. Owner-approved immutable source scrubbots_m21_level_001_hazard_bot_20x20.png (blob b565743ba52699899007882b750b7c8e7cdd00f9, sha256 ede1e02a…, 297 bytes, 20x20, C01=30/C03=5/C08=298/C11=11/C16=56, 76 perimeter cells all C08) unchanged. New production-art bridge scripts/tools/production_art_level_builder.gd (reuses audited M09 importer; reads palette authority; rejects off-palette/semi-transparent/out-of-band; normalizes local palette to ascending C-ID C01,C03,C08,C11,C16 with deterministic cell remap; generic M09 importer contract unchanged). Reproducibly generated data/levels/m21_level_001_hazard_bot.json (LevelValidator+ProductionLevelValidator PASS; reconstruction bytes == source for all 400 px), preview, metadata; deterministic rerun UNCHANGED. Full-real-collaborator vertical slice: AL-028 initial reachability proof (non-C08 raw-candidate-but-NO_REACHABLE_TARGET; C08 first clear; previously-unreachable→reachable) in root suite; full 400-cell run (400 clears, all 5 colors, 0 active, 0 reservations, 0 dispatcher-active, 0 orphan agents, all renderer pixels alpha 0) in tests/m21_real_art_smoke.gd. Debug scene scenes/debug/m21_real_art_vertical_slice.tscn over BG01 boots clean. Root suite 4407/4407 PASS (baseline 4294 preserved, no M19/M20 regression disabled); all M20 queue-free + V04/V05/V07/V08/V09/V10 lifecycle smokes PASS; 0 SCRIPT/Parse errors; M20 loop 06391839523cbc27e88a4b3ef12b730012cd45fa / dispatcher eee10149e4f116af6706beec832042352bf3a6dd unchanged. No SB-M21/SB-M08 row closed by Claude; M21 closure belongs to ChatGPT.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
