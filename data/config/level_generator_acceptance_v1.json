@@ -1,0 +1,61 @@
+{
+  "schema": "scrubbots-level-generator-acceptance/v1",
+  "version": 1,
+  "createdAt": "2026-09-12",
+  "hardReject": {
+    "invalidLevelData": true,
+    "offCanonicalPalette": true,
+    "semiTransparentActiveCell": true,
+    "sourceMutationWhereForbidden": true,
+    "provenUnsolvable": true,
+    "brokenReachabilitySemantics": true,
+    "routingPathology": true,
+    "duplicateProductionId": true,
+    "unsupportedDimensions": true,
+    "invalidSlotContract": true,
+    "mobileReadabilityFailure": true
+  },
+  "challengeFit": {
+    "defaultTolerance": 3.5,
+    "preferredToleranceWithLargePool": 2.0,
+    "maximumForceLabelTolerance": 5.0,
+    "forceLabelBeyondMaximumAllowed": false
+  },
+  "novelty": {
+    "recentWindowLevels": 20,
+    "maxSameDominantProfileConsecutive": 2,
+    "maxHighWorkloadConsecutive": 2,
+    "highWorkloadThreshold": 0.75,
+    "nearDuplicateVisualAndStructuralReject": true
+  },
+  "recovery": {
+    "slot4MustRecoverFrom3": true,
+    "slot6MustStronglyRecoverFrom5": true,
+    "slot9MustRecoverFrom8": true,
+    "nextCycleSlot1MustStronglyRecoverFrom10": true,
+    "compareChallengeSessionLoadAndFrustration": true
+  },
+  "largeBoard": {
+    "standardPreferredRange": [24, 40],
+    "largeRange": [41, 48],
+    "exceptionalRange": [49, 59],
+    "requireSessionLoadGateFrom": 41,
+    "requireExplicitMobileReadabilityEvidenceFrom": 49
+  },
+  "solver": {
+    "distinguishUnsolvableAndInconclusive": true,
+    "inconclusiveCannotMasqueradeAsPass": true,
+    "authoritativeSolveRequiredForProduction": true
+  },
+  "provenance": {
+    "storeGeneratorVersion": true,
+    "storeSolverVersion": true,
+    "storeScoreModelVersion": true,
+    "storeProgressionModelVersion": true,
+    "storeRequestHash": true,
+    "storeRootSeed": true,
+    "storeCandidateSeed": true,
+    "storeMutationLineage": true,
+    "storeSourceHash": true
+  }
+}
