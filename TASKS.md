@@ -5,11 +5,11 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M20
-- Current Sprint: M20-C001 V09 — final exact-evidence validation-only gate
-- Current Task: M20-C001-V09
-- Current Task Status: AWAITING_AUDIT
-- Next Task/Action: independent V09 final exact-evidence validation audit against coordination/sessions/M20-C001/CLAUDE_LOG_V09.md + CHATGPT_AUDIT_CRITERIA_V09.md (validation-only; production blobs unchanged from V07).
-- Required Actor: CHATGPT
+- Current Sprint: M20-C001 V10 — final closure-only exact-evidence reconciliation
+- Current Task: M20-C001-V10
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: execute the complete frozen V10 reconciliation, then hand back AWAITING_AUDIT / CHATGPT
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
