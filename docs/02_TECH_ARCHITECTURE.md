@@ -110,17 +110,27 @@ Reachability/access  --- filters blocked/unreachable candidates --->
   turns one slot activation into one M19 dispatch request (`activate_slot`),
   and listens **only** to the dispatcher's authenticated `assignment_arrived`
   signal (never a raw agent signal) as its clearing authority. On one healthy
-  arrival it re-validates the full pre-arrival tuple, then commits the locked
-  order: `BoardState.set_cell_state(target, CLEARED)` →
+  arrival it captures a detached pre-state snapshot and re-validates the full
+  pre-arrival tuple, then commits the locked order (M20-C001 V02):
+  `BoardState.set_cell_state(target, CLEARED)` →
   `ColorCandidateIndex.sync_cell(target)` →
-  `ReservationState.resolve_arrival(target, owner)` → optional single-cell
-  `BoardRenderer.update_cells([target])` → `ScrubbotDispatcher.finalize_arrival`.
-  A candidate-sync or reservation-resolve failure rolls BoardState back to
-  ACTIVE and restores candidate truth (reservation + dispatcher assignment
-  stay held) — never a half-clear. Access truth updates by reading BoardState
-  live: `ProductionAccessQuery` receives no explicit mutation call. The loop
-  introduces **no** win/lose/scoring/session-completion policy and no slot
-  cooldown/queue/consumption policy (those are later milestones).
+  `ReservationState.resolve_arrival(target, owner)` →
+  `ScrubbotDispatcher.finalize_arrival` → and only THEN an optional single-cell
+  `BoardRenderer.update_cells([target])`. The renderer is presentation-only and
+  never sits between reservation resolution and dispatcher finalization; a
+  renderer fault cannot roll authoritative gameplay truth backward. Each step
+  verifies its postcondition, and any failure (or a callback that mutates then
+  lies, or a mid-transaction reset) runs a **verified** rollback to the exact
+  pre-arrival tuple — or surfaces the explicit `ROLLBACK_FAILED` fatal outcome;
+  never a half-clear and never a transparent false-clear frame. bind() is a real
+  transaction (nested/failed bind connects no ghost signal), `activate_slot()`
+  is serialized (rejected while an arrival is committing or a reset is pending),
+  authenticated arrivals are drained losslessly through a private serial queue,
+  and `reset()` is transactional (records intent + a generation, rolls back a
+  mid-flight arrival before applying the dispatcher reset). Access truth updates
+  by reading BoardState live: `ProductionAccessQuery` receives no explicit
+  mutation call. The loop introduces **no** win/lose/scoring/session-completion
+  policy and no slot cooldown/queue/consumption policy (later milestones).
 
 ## Performance approach
 

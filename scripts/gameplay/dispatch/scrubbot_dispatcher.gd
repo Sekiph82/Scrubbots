@@ -609,7 +609,12 @@ func reset() -> void:
 				var parent = agent.get_parent()
 				if parent != null:
 					parent.remove_child(agent)
-				agent.free()
+				# Deferred free (M20-C001 V02): reset() can run inside an arrival/
+				# completion signal stack (M20 transactional reset), where a synchronous
+				# free() of the still-emitting agent is a locked-object error that aborts
+				# reset() mid-cleanup. queue_free() is safe and leaves no orphan;
+				# _active/reservations are cleared synchronously below regardless.
+				agent.queue_free()
 		_reservations.release_for_owner(owner_id)
 	_active.clear()
 	_resetting = false
