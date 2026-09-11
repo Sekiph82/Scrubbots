@@ -20,20 +20,22 @@ This is **validation-only**. Production is source-accepted and immutable.
 
 ## 0. Tracker start
 
-Expected initial state after ChatGPT audit handoff:
-- M20-C001 V10;
-- status CHANGES_REQUIRED;
-- actor CLAUDE;
+Expected initial state:
+- M20-C001 V09 / M20-C001-V09;
+- status AWAITING_AUDIT;
+- actor CHATGPT;
 - progress 290/719 main+ui, 290/943 overall;
 - lastCompletedTaskId M19-C001-V06;
 - all SB-M20-001..014 open.
 
-Before ANY V10 test/smoke edit:
+BEFORE ANY V10 test/smoke edit:
 1. safe sync origin/main, preserve owner work;
-2. change only root Project Status lifecycle to `M20-C001-V10 / IN_PROGRESS / CLAUDE`;
-3. tracker-only commit + push;
-4. verify remote;
-5. record no V10 validation edit existed before the push.
+2. change only root Project Status lifecycle to `M20-C001 V10 — final closure-only exact-evidence reconciliation / M20-C001-V10 / IN_PROGRESS / CLAUDE`;
+3. set Next Task/Action to execute the complete frozen V10 reconciliation then hand back `AWAITING_AUDIT / CHATGPT`;
+4. keep progress/lastCompleted and all M20 checkbox state unchanged;
+5. tracker-only commit + push;
+6. verify remote;
+7. record no V10 validation edit existed before the successful push.
 
 ## 1. Production lock
 
