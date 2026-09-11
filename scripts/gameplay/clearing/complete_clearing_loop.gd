@@ -187,9 +187,20 @@ func _bind_txn(board, slot_system, candidate_index, reservation_state, dispatche
 		return false
 	if dispatcher.get_active_count() != 0:
 		return false
-	# Commit + connect the arrival bridge ONLY now (no signal before validation).
-	# The renderer-presence bit is committed here on success only; a failed bind
-	# leaves the loop fully unbound with no renderer-present metadata.
+	# Single-M20-consumer claim + arrival connection (F-M20-STRICT-001.M), acquired
+	# ONLY after the bundle is otherwise valid. A different live loop already owning
+	# this dispatcher's arrival authority fails the claim; a benign diagnostic
+	# listener on `assignment_arrived` does not (the claim is not signal-based).
+	if not dispatcher.has_method("_claim_m20_arrival_consumer") or not dispatcher._claim_m20_arrival_consumer(self):
+		return false
+	var cb := Callable(self, "_on_assignment_arrived")
+	dispatcher.assignment_arrived.connect(cb)
+	if not dispatcher.assignment_arrived.is_connected(cb):
+		# Undo the claim/connection created by this bind; remain fully unbound.
+		dispatcher._release_m20_arrival_consumer(self)
+		return false
+	# Commit the bundle as bound ONLY now (nothing above is committed on failure).
+	# The renderer-presence bit is committed on success only.
 	_board = board
 	_slots = slot_system
 	_candidates = candidate_index
@@ -197,8 +208,7 @@ func _bind_txn(board, slot_system, candidate_index, reservation_state, dispatche
 	_dispatcher = dispatcher
 	_renderer = renderer
 	_renderer_expected = renderer_expected
-	_arrival_cb = Callable(self, "_on_assignment_arrived")
-	dispatcher.assignment_arrived.connect(_arrival_cb)
+	_arrival_cb = cb
 	_bound = true
 	return true
 
