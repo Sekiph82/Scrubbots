@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M20
-- Current Sprint: M20-C001 V01 — Complete Clearing Vertical Slice
-- Current Task: M20-C001-V01 — implement frozen complete-clearing orchestration contract
-- Current Task Status: AWAITING_AUDIT
-- Next Task/Action: ChatGPT independently audits coordination/sessions/M20-C001/CLAUDE_LOG_V01.md against CHATGPT_AUDIT_CRITERIA_V01.md (real diff/code/tests), publishes CHATGPT_AUDIT_V01.md, and either closes the cycle or issues the next prompt version.
-- Required Actor: CHATGPT
+- Current Sprint: M20-C001 V02 — strict-v2 transaction correction
+- Current Task: M20-C001-V02 — close frozen M20 transaction/re-entry/rollback gaps
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: implement V02, run required validation, write CLAUDE_LOG_V02.md, then hand off AWAITING_AUDIT to ChatGPT
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
-- Note: M20-C001 V01 implementation complete, AWAITING_AUDIT. CompleteClearingLoop orchestrator + M19 arrival bridge + minimal BoardRenderer coherence seam; evidence in coordination/sessions/M20-C001/CLAUDE_LOG_V01.md. Full headless suite 3386/3386 PASS on Godot 4.7.1.stable (up from the 3273 M19 V06 baseline; +113 M20 checks). No SB-M20 row marked complete — audit closure belongs to ChatGPT. M19-C001 V06 remained AUDITED_PASS / STRICT_V2_FINAL_CLOSURE (audit: coordination/sessions/M19-C001/CHATGPT_AUDIT_V06.md).
+- Note: M20-C001 V01 AUDITED (coordination/sessions/M20-C001/CHATGPT_AUDIT_V01.md); V02 correction authorized by that audit + CHATGPT_PROMPT_V02.md/CHATGPT_AUDIT_CRITERIA_V02.md. V02 closes frozen transaction/re-entry/rollback findings (real bind transaction, serialized activation + lossless serial arrivals, transactional reset, corrected renderer-after-finalize order, exact pre-state snapshot, postcondition verification, verified rollback). No SB-M20 row marked complete — audit closure belongs to ChatGPT.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
