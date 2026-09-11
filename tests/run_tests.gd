@@ -193,6 +193,8 @@ func _initialize() -> void:
 	_run_m19_v04_pair_narrow_reset_tests()
 	# M20-C001 V05 — auditor-authored validation-only gate (fresh arrangements).
 	_run_m20_v05_auditor_validation_tests()
+	# M20-C001 V06 — optional renderer presence: null-vs-dead distinction.
+	_run_m20_v06_renderer_presence_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -8534,6 +8536,9 @@ func _m20_harness_bind(w: Dictionary, slots) -> Object:
 	loop._reservations = w["reservations"]
 	loop._dispatcher = w["dispatcher"]
 	loop._renderer = w.get("renderer")
+	# Mirror production bind's renderer-presence bit (V06 F-M20-STRICT-001.L) so the
+	# harness reflects the same headless/configured semantics without a public setter.
+	loop._renderer_expected = w.get("renderer") != null
 	loop._arrival_cb = Callable(loop, "_on_assignment_arrived")
 	w["dispatcher"].assignment_arrived.connect(loop._arrival_cb)
 	loop._bound = true
@@ -10073,3 +10078,73 @@ func _v05_gameplay_integration() -> void:
 		cyc += 1
 	_check(cyc >= 25 and lrap.get_cleared_count() == 28, "V05.7: rapid 25+ sequential clears (%d)" % cyc)
 	lrap = null; _m20_teardown(wrap)
+
+# ===================================== M20-C001 V06 optional renderer presence ==
+# Direct null-vs-dead distinction (F-M20-STRICT-001.L). Renderer presence is the
+# persisted _renderer_expected bit (from the bind argument's Variant type), never
+# `renderer != null`. Observed through bind / is_coherent / repaint only — no
+# private getter. The truly-freed (F) case needs real frames and lives in
+# tests/m20_v05_lifecycle_smoke.gd.
+func _run_m20_v06_renderer_presence_tests() -> void:
+	print("---- M20-C001 V06: renderer presence null-vs-dead distinction (F-M20-STRICT-001.L) ----")
+	var board = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var color: int = board.get_color_id(board.get_cell_index(10, 10))
+
+	# A. renderer OMITTED -> healthy headless bind succeeds; clears normally.
+	var wA = _m20_full(board)
+	var lA = CompleteClearingLoop.new()
+	_check(lA.bind(board, _m20_slots([color, color, color, color, color]), wA["candidates"], wA["reservations"], wA["dispatcher"]), "V06.A: omitted renderer -> headless bind succeeds")
+	_check(lA.is_coherent(), "V06.A: headless bundle coherent")
+	_check(_m20_activate_and_arrive(lA, 0, Vector2(-2.0, 10.5)).success and lA.get_cleared_count() == 1, "V06.A: headless clears normally")
+	lA = null; _m20_teardown(wA)
+
+	# B. explicit null renderer -> same legitimate headless semantics.
+	var bB = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var cB: int = bB.get_color_id(bB.get_cell_index(10, 10))
+	var wB = _m20_full(bB)
+	var lB = CompleteClearingLoop.new()
+	_check(lB.bind(bB, _m20_slots([cB, cB, cB, cB, cB]), wB["candidates"], wB["reservations"], wB["dispatcher"], null), "V06.B: explicit null renderer -> headless bind succeeds")
+	_check(lB.is_coherent(), "V06.B: explicit-null headless coherent")
+	lB = null; _m20_teardown(wB)
+
+	# C. wrong scalar renderer -> rejected.
+	var bC = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var cC: int = bC.get_color_id(bC.get_cell_index(10, 10))
+	var wC = _m20_full(bC)
+	var lC = CompleteClearingLoop.new()
+	_check(not lC.bind(bC, _m20_slots([cC, cC, cC, cC, cC]), wC["candidates"], wC["reservations"], wC["dispatcher"], 123), "V06.C: scalar renderer rejected")
+	_check(not lC.is_bound(), "V06.C: unbound after scalar renderer")
+	_check_eq(_m20_conn_count(wC["dispatcher"]), 0, "V06.C: no arrival connection")
+	_m20_teardown(wC)
+
+	# D. arbitrary RefCounted / wrong Node -> rejected.
+	var bD = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var cD: int = bD.get_color_id(bD.get_cell_index(10, 10))
+	var wD = _m20_full(bD)
+	_check(not CompleteClearingLoop.new().bind(bD, _m20_slots([cD, cD, cD, cD, cD]), wD["candidates"], wD["reservations"], wD["dispatcher"], RefCounted.new()), "V06.D: arbitrary RefCounted renderer rejected")
+	_check(not CompleteClearingLoop.new().bind(bD, _m20_slots([cD, cD, cD, cD, cD]), wD["candidates"], wD["reservations"], wD["dispatcher"], wD["dispatcher"]), "V06.D: wrong Node (dispatcher as renderer) rejected")
+	_m20_teardown(wD)
+
+	# E. queued exact renderer -> rejected.
+	var bE = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var cE: int = bE.get_color_id(bE.get_cell_index(10, 10))
+	var wE = _m20_full(bE, null, null, true)
+	wE["renderer"].queue_free()
+	_check(not CompleteClearingLoop.new().bind(bE, _m20_slots([cE, cE, cE, cE, cE]), wE["candidates"], wE["reservations"], wE["dispatcher"], wE["renderer"]), "V06.E: queued exact renderer rejected")
+	root.remove_child(wE["renderer"]); wE["renderer"].free()
+	_m20_teardown(wE)
+
+	# G. healthy exact renderer -> accepted; presence proven by a real alpha-0 repaint.
+	var bG = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var tG: int = bG.get_cell_index(10, 10)
+	var cG: int = bG.get_color_id(tG)
+	var wG = _m20_full(bG, null, null, true)
+	var lG = CompleteClearingLoop.new()
+	_check(lG.bind(bG, _m20_slots([cG, cG, cG, cG, cG]), wG["candidates"], wG["reservations"], wG["dispatcher"], wG["renderer"]), "V06.G: healthy exact renderer accepted")
+	_check(lG.is_coherent(), "V06.G: configured-renderer bundle coherent")
+	_check(_m20_activate_and_arrive(lG, 0, Vector2(-2.0, 10.5)).success, "V06.G: configured clear dispatched+arrived")
+	var pG: Vector2i = bG.get_cell_position(tG)
+	_check(_colors_close(wG["renderer"].get_pixel_color(pG.x, pG.y), Color(0, 0, 0, 0), 0.02), "V06.G: renderer repainted target to alpha 0 (presence true)")
+	lG = null; _m20_teardown(wG)
+	# F (truly-freed exact renderer -> rejected despite == null) is covered by the
+	# frame-based tests/m20_v05_lifecycle_smoke.gd.
