@@ -1,6 +1,8 @@
-# 14 — Native Pixel AI & Board Composer Architecture V1
+# 14 — Native Pixel AI Provider Architecture V1
 
 Status: **CANONICAL DESIGN DRAFT — 2026-09-12**
+
+> Historical filename note: this file was initially created with `BOARD_COMPOSER` in the filename. Owner correction on 2026-09-12 narrowed the provider scope. The current content is authoritative: **PixelLab/native Pixel AI is an art-generation subsystem only.** Board composition, puzzle construction, solver/difficulty analysis and campaign sequencing are separate systems and are not implemented by this provider layer.
 
 Evidence:
 - `coordination/PIXELLAB_SPRITE_FACTORY_ENGINEERING_FINDINGS_V01.md`
@@ -8,48 +10,92 @@ Evidence:
 
 Related:
 - `docs/13_ART_INTELLIGENCE_SEMANTIC_LEVEL_ART_PIPELINE.md`
-- `docs/10_LEVEL_FACTORY_GENERATION_SCORING_ARCHITECTURE.md`
 
-## 1. Design correction
+## 1. Purpose
 
-SCRUBBOTS should prefer **native low-resolution semantic pixel generation** when a provider can generate recognizable pixel art directly at the requested logical scale.
+Generate recognizable SCRUBBOTS-compatible pixel-art candidates using a pixel-art-specialized AI provider, then compile and validate those images locally.
 
-High-resolution concept -> Pixel Compiler remains a fallback/high-control path, not a mandatory first stage.
+The subsystem ends when an art candidate is accepted visually and structurally.
 
-The reviewed Sprite Factory proves the useful pattern:
+It does **not** know or decide:
+
+- puzzle solvability;
+- puzzle topology;
+- Challenge Score;
+- Session Load;
+- Frustration Risk;
+- slots/routing;
+- campaign sequence;
+- level-number placement.
+
+## 2. Preferred path: native low-resolution semantic pixel generation
+
+When a provider can create recognizable pixel art directly at the requested logical resolution, use that path first.
 
 ```text
-semantic prompt
- -> native pixel-art model
- -> raw transparent sprite
- -> deterministic canonical compiler
- -> semantic QA
+PixelArtRequest
+    ↓
+PixelLabAdapter / other NativePixelProvider
+    ↓
+RawPixelArtArtifact
+    ↓
+CanonicalPixelCompiler
+    ↓
+StructuralArtQA
+    ↓
+SemanticArtQA
+    ↓
+AcceptedPixelArtCandidate
+    ↓
+STOP: provider/art-generation scope complete
 ```
 
-## 2. Provider-neutral source contract
+A later SCRUBBOTS content pipeline may consume the accepted art, but that is a separate contract.
 
-Every provider adapter receives a `SemanticArtRequest` and returns a `RawSemanticArtifact`.
+## 3. PixelArtRequest contract
 
-Required request fields:
+Required fields:
 
 ```text
 request_id
+candidate_batch_id
 subject_id
 subject_prompt
-logical_width / logical_height or bounded envelope
+logical_width
+logical_height
 view / direction
 background_policy
-silhouette guidance
-micro-detail policy
+silhouette_guidance
+micro_detail_policy
 style_reference_ids
 palette_guidance_version
 requested_seed
 provider_options
+prompt_template_version
 ```
 
-Required raw-artifact provenance:
+The request must express **visual intent**, not puzzle intent.
+
+Forbidden request concepts include:
 
 ```text
+make this HARD
+make this solvable
+increase unlock depth
+increase bottleneck pressure
+fit level 310
+```
+
+Those are not image-provider concerns.
+
+## 4. RawPixelArtArtifact contract
+
+Preserve the provider-native response unchanged.
+
+Required provenance:
+
+```text
+candidate_id
 provider_id
 endpoint/model/version
 provider_job_id if available
@@ -58,136 +104,87 @@ effective_seed if available
 normalized_request_hash
 raw_artifact_sha256
 created_at
-provider_usage/cost metadata
+provider usage/cost metadata
+raw width/height
 ```
 
-If exact reproduction cannot be guaranteed, the raw artifact itself is immutable required evidence.
+If exact generation cannot be reproduced from seed, the raw artifact is mandatory immutable evidence.
 
-## 3. Native exact-size path
+## 5. Native exact-size rule
 
 Preferred order:
 
-1. ask provider for the requested logical aspect ratio and size directly;
-2. preserve the raw response unchanged;
-3. compile alpha and canonical palette locally;
-4. reject unsupported dimensions instead of stretching the image;
-5. run semantic QA.
+1. request the exact logical width/height when supported;
+2. otherwise request a source with the same aspect ratio;
+3. preserve raw response;
+4. never anisotropically stretch a square source into a rectangular target;
+5. use uniform scaling/padding/crop-safe compilation only when explicitly supported by the compiler;
+6. reject unsupported geometry rather than silently distort identity.
 
-**Forbidden:** generating a square source and anisotropically resizing it to a rectangular logical target.
+## 6. Canonical Pixel Compiler
 
-## 4. Canonical Pixel Compiler
-
-The compiler owns production legality, not semantic meaning.
+The compiler owns pixel legality, not subject meaning.
 
 Responsibilities:
 
-- exact logical dimensions;
-- no interpolation in direct native path;
-- versioned alpha-mask compilation;
-- C01..C16 mapping;
-- perceptual palette distance rather than naive sRGB-only distance;
-- semantic-region adjacency contrast checks;
-- min-stroke/min-gap preservation;
-- tiny-component diagnostics/repair when semantically safe;
-- deterministic byte-identical output for identical raw input + compiler config;
-- compiled artifact SHA-256.
+- exact final logical dimensions;
+- binary alpha policy;
+- C01..C16 palette mapping;
+- no unintended interpolation;
+- perceptual palette mapping rather than naive RGB-only distance;
+- local contrast checks;
+- minimum-stroke/minimum-gap preservation;
+- tiny-component diagnostics/repair only when identity is preserved;
+- deterministic byte-identical output for identical raw artifact + compiler config;
+- compiler version and compiled SHA-256.
 
-The compiler must never overwrite the provider-native source artifact.
+The compiler must never overwrite the raw provider artifact.
 
-## 5. Semantic sprite and gameplay board are different artifacts
+## 7. Transparent sprite policy
 
-AI semantic generation should usually create an **isolated transparent subject** because this maximizes recognizability and allows clean semantic review.
+Transparent isolated subjects are valid and often preferred **art-generation outputs** because they make silhouettes and semantics easier to judge.
 
-SCRUBBOTS LevelData, however, requires a fully opaque ACTIVE logical board at level start.
+This art subsystem does not decide how transparent pixels later become gameplay content. It simply records them accurately.
 
-Therefore add an explicit `BoardComposer`:
-
-```text
-RawSemanticArtifact
- -> Canonical transparent sprite
- -> ArtReadability / blind semantic acceptance
- -> BoardComposer
- -> opaque canonical board candidate
- -> board-scale ArtReadability
- -> puzzle solver/difficulty analysis
-```
-
-Never silently reinterpret transparent background pixels as gameplay CLEARED cells.
-
-## 6. BoardComposer responsibilities
-
-Input:
+Output may therefore be:
 
 ```text
-canonical transparent sprite
-requested board envelope
-campaign visual-retention context
-canonical palette
-composition policy
+transparent semantic sprite
 ```
 
-Output:
+without making any claim that transparency means `CLEARED`, background, or playable board state.
 
-```text
-fully opaque canonical board
-placement transform (translation only unless an explicitly safe uniform scale step exists)
-background-region metadata
-composition provenance
-```
+Those semantics belong downstream.
 
-Rules:
+## 8. Structural art validation
 
-- no non-uniform stretching;
-- subject remains recognizable at actual gameplay size;
-- preserve source aspect ratio;
-- subject scale/position has explicit bounds;
-- background may not create excessive monochrome workload by accident;
-- background topology enters puzzle metrics normally;
-- composed board is re-evaluated by Art Intelligence and Puzzle Intelligence.
+`STRUCTURAL_ACCEPT` may check:
 
-## 7. Composition policy families
+- final logical size;
+- allowed palette colors;
+- binary alpha;
+- no unintended interpolation;
+- no corrupt PNG;
+- no forbidden text/frame where requested;
+- basic fragmentation/min-stroke diagnostics.
 
-Initial policies may include:
+`STRUCTURAL_ACCEPT` is not final art acceptance.
 
-### ICON_FLAT
+## 9. Semantic art validation
 
-Simple canonical background behind a strong icon-like subject. Good for compact early/recovery content.
+After structural validation, evaluate:
 
-### SOFT_GEOMETRIC
+- recognizable subject;
+- silhouette readability;
+- major-part integrity;
+- visual balance;
+- detail discipline;
+- color separation;
+- actual-size readability;
+- optional blind vision recognition;
+- owner/human review when required.
 
-A few broad canonical-color regions that frame the subject without becoming visual confetti.
-
-### SEMANTIC_CONTEXT
-
-Minimal contextual shapes related to the subject, e.g. simple water/sky bands for a boat, while remaining low-detail and puzzle-safe.
-
-### PUZZLE_AWARE_BACKGROUND
-
-Background topology is selected from safe templates to help target Challenge / Session Load, but it may not obscure or deform the subject.
-
-Every policy is versioned and regression-tested.
-
-## 8. Candidate identity and cache
-
-Do not identify artifacts by prompt-derived filenames.
-
-Use:
-
-```text
-candidate_id
-normalized_request_hash
-raw_sha256
-compiler_config_hash
-compiled_sha256
-board_composer_config_hash
-board_sha256
-```
-
-A cached artifact is reused only after current validation succeeds.
-
-## 9. Error/state model
-
-Semantic/art-quality failures are distinct from provider infrastructure failures.
+Possible states:
 
 ```text
 PENDING
@@ -200,34 +197,128 @@ COMPILE_REJECT
 STRUCTURAL_ACCEPT
 SEMANTIC_REJECT
 SEMANTIC_ACCEPT
-BOARD_COMPOSED
-PUZZLE_REJECT
-CAMPAIGN_ACCEPT
+OWNER_REVIEW_PENDING
+OWNER_ACCEPT
 ```
 
-`QUOTA_BLOCKED` must never become `SEMANTIC_REJECT`.
+No puzzle-related state exists in this provider subsystem.
 
-## 10. Retry/budget behavior
+## 10. Prompt compiler
 
-Provider adapters implement bounded retry policy:
+Do not depend on unstructured free-form prompts alone.
 
-- honor Retry-After where supplied;
-- bounded exponential backoff + jitter for transient 429/529/5xx/network failures;
-- no blind retry for authentication, quota or semantic request validation errors;
-- stop the batch when account quota is exhausted;
-- preserve pending work without charging it as failure;
-- record every attempt.
+A `PixelArtPromptCompiler` should combine:
 
-## 11. Positive/negative evidence pair
+```text
+subject phrase
+view/pose
+complete-subject requirement
+centering/framing
+silhouette requirement
+logical-size awareness
+micro-detail restrictions
+transparent-background request
+no text / no frame / no border
+style references if any
+```
 
-Two datasets now guide architecture:
+Example:
 
-1. **negative:** geometry-only 100-candidate corpus that is structurally clean but semantically unreadable;
-2. **positive:** native 20x20 semantic PixelLab-generated sprite examples that remain recognizable after deterministic C01..C16 compilation.
+```text
+cute compact cleaning robot with hazard stripes,
+three-quarter front view,
+single isolated complete subject fully visible,
+strong readable silhouette at 20x20 logical pixels,
+large major features, no tiny decorative details,
+clean pixel art, transparent background,
+no text, no lettering, no border, no frame
+```
 
-The production system must preserve the strengths of both:
+## 11. Batch generation
 
-- deterministic structural rigor from the procedural toolchain;
-- semantic subject intelligence from the native pixel-art model.
+Retain the strongest ideas from the reviewed desktop tool:
 
-Neither replaces the other.
+- sequential or bounded-concurrency requests;
+- explicit quota stop;
+- untouched remainder stays `PENDING`;
+- resume from missing/invalid candidates;
+- revalidate cache before reuse;
+- do not confuse provider failure with art rejection;
+- preserve per-attempt history.
+
+## 12. Candidate identity and storage
+
+Use immutable IDs/hashes, not prompt-derived filenames as truth.
+
+Recommended layout conceptually:
+
+```text
+art_candidates/
+  <candidate_id>/
+    request.json
+    provider_response.json
+    raw.png
+    compiled.png
+    qa.json
+    provenance.json
+```
+
+Recommended identity fields:
+
+```text
+candidate_id
+request_hash
+raw_sha256
+compiler_config_hash
+compiled_sha256
+```
+
+## 13. Provider-neutral adapter
+
+PixelLab is a strong provider candidate and positive engineering evidence, but the interface stays generic:
+
+```text
+NativePixelProvider
+    ├── PixelLabAdapter
+    └── FutureProviderAdapter
+```
+
+Provider changes must not alter candidate data contracts or local art QA.
+
+## 14. Explicit downstream boundary
+
+An `AcceptedPixelArtCandidate` may later be consumed by another SCRUBBOTS system.
+
+That downstream system may decide to:
+
+- place it in a larger composition;
+- convert it into LevelData;
+- analyze gameplay;
+- reject/resequence it;
+- use it as a UI/game asset.
+
+None of those operations belong to PixelLab or the Native Pixel AI provider layer.
+
+The integration contract is simply:
+
+```text
+PixelLab/native AI work ends at accepted pixel art.
+```
+
+## 15. Success criteria
+
+Before calling the PixelLab/native-provider subsystem production-ready:
+
+- exact-size 20x20 generation works without forced high-resolution detour;
+- supported rectangular generation never distorts aspect ratio;
+- raw provider artifact is retained;
+- deterministic local compilation exists;
+- C01..C16 and alpha checks are versioned;
+- perceptual color mapping is tested;
+- prompt compiler is versioned;
+- semantic recognizability gate exists;
+- owner review workflow exists;
+- quota/resume behavior is crash-safe;
+- candidate provenance is complete;
+- secrets never enter Git/artifact metadata;
+- no puzzle, solver or difficulty responsibility leaks into the provider subsystem.
