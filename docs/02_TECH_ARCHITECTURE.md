@@ -122,12 +122,21 @@ Reachability/access  --- filters blocked/unreachable candidates --->
   verifies its postcondition, and any failure (or a callback that mutates then
   lies, or a mid-transaction reset) runs a **verified** rollback to the exact
   pre-arrival tuple — or surfaces the explicit `ROLLBACK_FAILED` fatal outcome;
-  never a half-clear and never a transparent false-clear frame. bind() is a real
-  transaction (nested/failed bind connects no ghost signal), `activate_slot()`
-  is serialized (rejected while an arrival is committing or a reset is pending),
-  authenticated arrivals are drained losslessly through a private serial queue,
-  and `reset()` is transactional (records intent + a generation, rolls back a
-  mid-flight arrival before applying the dispatcher reset). Access truth updates
+  never a half-clear and never a transparent false-clear frame. The reservation
+  postcondition and rollback are proven against a detached **owner map** — every
+  reserved target back to its exact prior owner, no unrelated reservation
+  dropped/re-owned/added — not a count-only check (M20-C001 V03). bind() requires
+  **exact production script identity** for every canonical collaborator
+  (BoardState, SlotSystem, ColorCandidateIndex, ReservationState,
+  ScrubbotDispatcher, optional BoardRenderer), so no subclass can enter the
+  production trust boundary; rollback sensitivity is exercised by a test-only
+  transaction harness, never by widening bind. bind() is a real transaction
+  (nested/failed bind connects no ghost signal), `activate_slot()` is serialized
+  (rejected while an arrival is committing or a reset is pending), authenticated
+  arrivals are drained losslessly through a private serial queue with
+  current-arrival dedup, and `reset()` is transactional (records intent + a
+  generation, rolls back a mid-flight arrival before applying the dispatcher
+  reset). Access truth updates
   by reading BoardState live: `ProductionAccessQuery` receives no explicit
   mutation call. The loop introduces **no** win/lose/scoring/session-completion
   policy and no slot cooldown/queue/consumption policy (later milestones).

@@ -19,13 +19,14 @@ extends RefCounted
 ## ScrubbotAgent.agent_completed signal as clearing authority.
 ##
 ## strict-v2 transaction correction (M20-C001 V02, F-M20-STRICT-001..007):
-##   - bind() is a real transaction: a guard is armed before the first external
-##     coherence callback, the signal is connected ONLY after full validation +
-##     a drift re-check, and a nested/failed bind connects no ghost signal and
-##     leaves the loop unbound. Board/Slot/Dispatcher/Renderer are narrowed to
-##     EXACT production script identity (no adversarial subclass seam); only the
-##     candidate index / reservation state accept subclasses, for controlled
-##     rollback testing, and their callbacks are treated as transaction-safe.
+##   - bind() is a real transaction: a guard is armed before the coherence
+##     probe, the signal is connected ONLY after full validation, and a
+##     nested/failed bind connects no ghost signal and leaves the loop unbound.
+##     ALL canonical collaborators (BoardState, SlotSystem, ColorCandidateIndex,
+##     ReservationState, ScrubbotDispatcher, optional BoardRenderer) are narrowed
+##     to EXACT production script identity (V03 §2), so no adversarial subclass
+##     callback can ever enter the production trust boundary. Rollback sensitivity
+##     is exercised by a test-only transaction harness, never by widening bind.
 ##   - activate_slot() is serialized: at most one activation body runs, it is
 ##     rejected while an arrival transaction is committing, and a reset requested
 ##     (or live-coherence drift) during preflight aborts before dispatch.
@@ -102,6 +103,12 @@ var _reset_in_progress: bool = false
 ## Private lossless serial arrival queue of immutable tuples
 ## {owner,target,color,agent}. Never exposed by any public query.
 var _arrival_queue: Array = []
+## Identity of the arrival whose transaction is currently executing (V03 §8).
+## Defence-in-depth dedup: a duplicate of the in-flight owner+agent is never
+## re-queued while its transaction runs. Cleared after every transaction outcome
+## and on reset. Never exposed publicly.
+var _current_owner: int = -1
+var _current_agent = null
 
 # --- observation counters (no gameplay policy) -------------------------------
 var _cleared_count: int = 0
@@ -138,20 +145,23 @@ func _bind_txn(board, slot_system, candidate_index, reservation_state, dispatche
 		return false
 	if slot_system.get_slot_count() != SLOT_COUNT:
 		return false
-	# Candidate index / reservation state: subclasses accepted (rollback doubles).
-	if not (candidate_index is ColorCandidateIndex):
+	# V03 §2: candidate index and reservation state are narrowed to EXACT
+	# production script identity too — no subclass may enter the production trust
+	# boundary, so an adversarial candidate/reservation callback class is
+	# impossible at bind (category safety, not repeated-probe folklore). Rollback
+	# sensitivity is exercised by a test-only harness, never by widening this gate.
+	if not _is_exact_script(candidate_index, ColorCandidateIndex):
 		return false
-	if not (reservation_state is ReservationState):
+	if not _is_exact_script(reservation_state, ReservationState):
 		return false
 	if not _is_exact_script(dispatcher, ScrubbotDispatcher):
 		return false
 	if renderer != null:
 		if not _is_exact_script(renderer, BoardRenderer) or not is_instance_valid(renderer):
 			return false
-	# Coherence probe (external callbacks) run TWICE: the second run detects a
-	# callback-induced same-size foreign-board drift/rebind from the first.
-	if not _probe(board, candidate_index, reservation_state, dispatcher, renderer):
-		return false
+	# Single coherence probe: every dependency is now the exact production script,
+	# so an is_bound_to() callback cannot recurse into bind or drift the bundle.
+	# The _in_bind guard still fails a nested bind closed as defence-in-depth.
 	if not _probe(board, candidate_index, reservation_state, dispatcher, renderer):
 		return false
 	if dispatcher.get_active_count() != 0:
@@ -253,7 +263,10 @@ func _on_assignment_arrived(owner_id: int, target_index: int, color_id: int, age
 	_drain_arrivals()
 
 func _enqueue_arrival(owner_id: int, target_index: int, color_id: int, agent) -> void:
-	# Duplicate same assignment is not queued twice (idempotent).
+	# Duplicate of the arrival whose transaction is currently executing -> drop.
+	if owner_id == _current_owner and agent == _current_agent:
+		return
+	# Duplicate already queued -> drop (idempotent, preserves FIFO for distinct).
 	for e in _arrival_queue:
 		if e["owner"] == owner_id and e["agent"] == agent:
 			return
@@ -267,7 +280,13 @@ func _drain_arrivals() -> void:
 		if _reset_requested:
 			break
 		var t: Dictionary = _arrival_queue.pop_front()
+		# Publish the in-flight identity so a re-entrant duplicate is not re-queued;
+		# clear it after the transaction regardless of outcome.
+		_current_owner = t["owner"]
+		_current_agent = t["agent"]
 		_last_outcome = _run_transaction(t, _generation)
+		_current_owner = -1
+		_current_agent = null
 	_draining = false
 	_drain_pending_reset()
 
@@ -303,9 +322,12 @@ func _run_transaction(t: Dictionary, my_gen: int) -> StringName:
 
 	# 4. ReservationState exact arrival resolve + postcondition.
 	var rres := _bool_true(_reservations.resolve_arrival(target, owner))
+	# Exact postcondition (V03 §5): the reserved OWNER MAP must now equal exactly
+	# the pre-state map minus this target — proving no unrelated reservation was
+	# dropped, re-owned, or added. Count equality alone is forbidden.
 	var rpost: bool = _reservations.get_owner(target) == -1 \
 		and _reservations.get_target_for_owner(owner) == -1 \
-		and _reservations.get_reservation_count() == snap["res_count"] - 1
+		and _owner_map_equals(_reserved_owner_map(), _map_minus(snap["owner_map"], target))
 	if not (rres and rpost):
 		return Outcome.RESERVATION_ROLLBACK if _rollback(t, snap) else Outcome.ROLLBACK_FAILED
 	if _reset_requested or _generation != my_gen:
@@ -353,7 +375,10 @@ func _snapshot(owner: int, target: int, color: int) -> Dictionary:
 		"color": color,
 		"in_candidates": _raw_has_candidate(color, target),
 		"res_count": _reservations.get_reservation_count(),
-		"reserved": _reservations.get_reserved_indices(),
+		"reserved": _reservations.get_reserved_indices(), # sorted, detached
+		# Exact detached owner map for EVERY reserved target (V03 §5). O(reservations)
+		# — a small set bounded by slots + in-flight, never an O(board) scan.
+		"owner_map": _reserved_owner_map(),
 		"owner_of_target": _reservations.get_owner(target),
 		"target_of_owner": _reservations.get_target_for_owner(owner),
 		"active_count": _dispatcher.get_active_count(),
@@ -397,7 +422,10 @@ func _verify_pre_arrival(t: Dictionary, snap: Dictionary) -> bool:
 		return false
 	if _reservations.get_target_for_owner(owner) != target:
 		return false
-	if _reservations.get_reservation_count() != snap["res_count"]:
+	# Exact reservation rollback (V03 §6): the full reserved owner map must equal
+	# the pre-snapshot map — every reserved target back to its exact prior owner,
+	# no foreign replacement, no dropped/added reservation (subsumes count/pair).
+	if not _owner_map_equals(_reserved_owner_map(), snap["owner_map"]):
 		return false
 	if not _bool_true(_dispatcher.is_arrival_pending(owner, target, color, t["agent"])):
 		return false
@@ -437,6 +465,8 @@ func _perform_reset() -> void:
 		return
 	_reset_in_progress = true
 	_arrival_queue.clear()
+	_current_owner = -1
+	_current_agent = null
 	_dispatcher.reset()
 	_reset_requested = false
 	_reset_in_progress = false
@@ -458,6 +488,29 @@ func _raw_has_candidate(color: int, target: int) -> bool:
 	if typeof(arr) != TYPE_ARRAY:
 		return false
 	return arr.has(target)
+
+## Detached {reserved_target_index: owner_id} for every currently-reserved target.
+## Bounded by the number of live reservations (slots + in-flight), never O(board).
+func _reserved_owner_map() -> Dictionary:
+	var m: Dictionary = {}
+	for idx in _reservations.get_reserved_indices():
+		m[int(idx)] = _reservations.get_owner(int(idx))
+	return m
+
+## Copy of `m` without `key` (never mutates the snapshot's map).
+static func _map_minus(m: Dictionary, key: int) -> Dictionary:
+	var out: Dictionary = m.duplicate()
+	out.erase(key)
+	return out
+
+## Exact map equality: same keys AND same owner per key.
+static func _owner_map_equals(a: Dictionary, b: Dictionary) -> bool:
+	if a.size() != b.size():
+		return false
+	for k in a:
+		if not b.has(k) or b[k] != a[k]:
+			return false
+	return true
 
 func _renderer_pixel(target: int):
 	if _renderer == null or not is_instance_valid(_renderer):
