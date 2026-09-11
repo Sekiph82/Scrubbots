@@ -1,0 +1,44 @@
+{
+  "schema": "scrubbots-art-readability-model/v1",
+  "version": 1,
+  "status": "DESIGN_DRAFT",
+  "updated_at": "2026-09-12",
+  "score_range": [0, 100],
+  "weights": {
+    "silhouette_clarity": 0.24,
+    "region_coherence": 0.18,
+    "semantic_part_integrity": 0.15,
+    "color_separation": 0.12,
+    "detail_discipline": 0.10,
+    "negative_space_quality": 0.08,
+    "blind_recognition_confidence": 0.13
+  },
+  "acceptance": {
+    "minimum_total_score_initial": 72,
+    "minimum_blind_recognition_confidence_initial": 0.70,
+    "metadata_blind_review_required": true,
+    "structural_accept_is_semantic_accept": false,
+    "owner_visual_review_required_for_style_promotion": true
+  },
+  "hard_rejects": [
+    "off_canonical_palette_after_compilation",
+    "semi_transparent_logical_cell",
+    "unintended_interpolation",
+    "identity_fragmented_by_tiny_regions",
+    "blind_recognition_miss",
+    "mobile_readability_failure",
+    "source_or_provenance_invalid"
+  ],
+  "semantic_source_modes": [
+    "NATIVE_PIXEL_AI",
+    "CONCEPT_IMAGE_AI_PIXEL_COMPILER",
+    "OWNER_ART"
+  ],
+  "preferred_standard_logical_axis_range": [24, 40],
+  "compact_simple_subject_axis_range": [20, 23],
+  "notes": [
+    "Thresholds are calibration starting points, not eternal constants.",
+    "All score changes require model-version provenance and negative/positive regression evidence.",
+    "Difficulty Challenge Score is a separate system and must not be substituted for ArtReadability."
+  ]
+}
