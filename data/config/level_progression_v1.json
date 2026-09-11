@@ -1,0 +1,57 @@
+{
+  "schema": "scrubbots-level-progression/v1",
+  "version": 1,
+  "ownerLockedAt": "2026-09-12",
+  "cadenceLength": 10,
+  "cadence": [
+    {"slot": 1, "class": "EASY", "modifier": 0.0, "role": "cycle_relief", "noveltyTarget": 0.55},
+    {"slot": 2, "class": "EASY", "modifier": 2.0, "role": "confidence_rise", "noveltyTarget": 0.35},
+    {"slot": 3, "class": "MEDIUM", "modifier": 0.0, "role": "first_tension", "noveltyTarget": 0.45},
+    {"slot": 4, "class": "EASY", "modifier": -1.0, "role": "recovery", "noveltyTarget": 0.60},
+    {"slot": 5, "class": "HARD", "modifier": 0.0, "role": "mini_boss", "noveltyTarget": 0.30},
+    {"slot": 6, "class": "EASY", "modifier": -2.0, "role": "strong_recovery", "noveltyTarget": 0.65},
+    {"slot": 7, "class": "EASY", "modifier": 1.0, "role": "playful_novelty", "noveltyTarget": 0.75},
+    {"slot": 8, "class": "MEDIUM", "modifier": 2.0, "role": "second_tension", "noveltyTarget": 0.45},
+    {"slot": 9, "class": "EASY", "modifier": -1.0, "role": "pre_boss_confidence", "noveltyTarget": 0.50},
+    {"slot": 10, "class": "VERY_HARD", "modifier": 0.0, "role": "cycle_boss", "noveltyTarget": 0.35}
+  ],
+  "progression": {
+    "type": "saturating_exponential",
+    "formula": "1-exp(-k/tau)",
+    "tauCycles": 20.0
+  },
+  "lanes": {
+    "EASY": {"base": 20.0, "growth": 14.0, "initialFirstAttemptClearTarget": [0.85, 0.95]},
+    "MEDIUM": {"base": 40.0, "growth": 13.0, "initialFirstAttemptClearTarget": [0.70, 0.85]},
+    "HARD": {"base": 58.0, "growth": 13.0, "initialFirstAttemptClearTarget": [0.55, 0.70]},
+    "VERY_HARD": {"base": 76.0, "growth": 12.0, "initialFirstAttemptClearTarget": [0.40, 0.60]}
+  },
+  "challengeTolerance": {
+    "defaultPlusMinus": 3.5,
+    "preferredWhenPoolIsLarge": 2.0,
+    "neverForceLabelOutsidePlusMinus": 5.0
+  },
+  "recoveryGuards": [
+    {"fromSlot": 3, "toSlot": 4, "minimumChallengeDrop": 15.0},
+    {"fromSlot": 5, "toSlot": 6, "minimumChallengeDrop": 20.0},
+    {"fromSlot": 8, "toSlot": 9, "minimumChallengeDrop": 15.0},
+    {"fromSlot": 10, "toNextCycleSlot": 1, "minimumChallengeDrop": 35.0}
+  ],
+  "productionBoardEnvelope": {
+    "minWidth": 20,
+    "maxWidth": 59,
+    "minHeight": 20,
+    "maxHeight": 59,
+    "rectangularAllowed": true,
+    "preferredStandardRange": [24, 40],
+    "largeRange": [41, 48],
+    "exceptionalRange": [49, 59],
+    "difficultyClassDerivedFromDimensions": false
+  },
+  "productionColorRules": {
+    "canonicalPalette": "C01..C16",
+    "minDistinctUsedColors": 3,
+    "maxDistinctUsedColors": 12,
+    "difficultyClassDerivedFromColorCount": false
+  }
+}
