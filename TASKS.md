@@ -5,11 +5,11 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M20
-- Current Sprint: M20-C001 V06 — optional renderer lifecycle correction
-- Current Task: M20-C001-V06 — preserve explicit renderer presence across freed-object null aliasing
-- Current Task Status: AWAITING_AUDIT
-- Next Task/Action: independent ChatGPT V06 source audit against coordination/sessions/M20-C001/CLAUDE_LOG_V06.md + CHATGPT_AUDIT_CRITERIA_V06.md (real diff/code/tests); a clean V06 source audit is followed by an auditor-authored V07 validation-only gate (production changed this cycle).
-- Required Actor: CHATGPT
+- Current Sprint: M20-C001 V07 — batched whole-sprint correction + evidence closure
+- Current Task: M20-C001-V07
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: execute the V07 frozen set, run full validation, then hand back AWAITING_AUDIT / CHATGPT
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
