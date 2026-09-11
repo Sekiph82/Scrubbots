@@ -1,12 +1,14 @@
 # SCRUBBOTS Global Pixel-Art Palette V2
 
-Status: **OWNER-LOCKED — 2026-09-06**
+Status: **OWNER-LOCKED — palette 2026-09-06; difficulty semantics updated 2026-09-12**
 
-Machine-readable source of truth:
+Machine-readable palette source of truth:
 `data/palettes/scrubbots_palette_v2.json`
 
-No production SCRUBBOTS logical pixel may use a color outside this table
-unless the owner explicitly changes the rule and versions the palette.
+Difficulty/progression owner decision:
+`coordination/OWNER_DIFFICULTY_PROGRESSION_DECISION_V01.md`
+
+No production SCRUBBOTS logical pixel may use a color outside this table unless the owner explicitly changes the rule and versions the palette.
 
 | ID | Name | HEX | RGB |
 | --- | --- | --- | --- |
@@ -27,44 +29,63 @@ unless the owner explicitly changes the rule and versions the palette.
 | C15 | Pure White | `#FFFFFF` | 255, 255, 255 |
 | C16 | Pure Black | `#000000` | 0, 0, 0 |
 
-## Production distinct-color bands
+## Production used-color rule
 
-Count the number of **distinct canonical logical cell colors actually used by
-the artwork**.
+Under Difficulty / Progression V1, production artwork normally uses **3..12 distinct canonical logical colors actually referenced by cells**.
 
-| Difficulty | Required distinct used colors |
-| --- | ---: |
-| EASY | **3–5** |
-| MEDIUM | **6–7** |
-| HARD | **8–9** |
-| VERY_HARD | **10–12** |
+The historical mapping:
 
-These are hard production-content bands, not approximate guidance.
+```text
+EASY 3-5
+MEDIUM 6-7
+HARD 8-9
+VERY_HARD 10-12
+```
+
+is **superseded as a difficulty-class legality rule**.
+
+Distinct color count and color-distribution entropy now contribute to mathematical Color Complexity `C`, which is one component of Challenge Score. They do not determine the player-facing class on their own.
+
+This permits, for example:
+
+- a compact/high-unlock-depth VERY_HARD level with relatively few colors;
+- a visually rich EASY level with more colors when accessibility, bottleneck, route, slot and workload metrics keep total challenge in the EASY target envelope.
+
+Production content still must stay within the global 3..12 used-color envelope unless a later versioned owner decision changes that limit.
 
 ## Locked semantics
 
 - Every ACTIVE logical cell uses exactly one of C01..C16.
 - No seventeenth production logical color may be introduced silently.
-- A production level's local LevelData palette is a subset of C01..C16,
-  contains only canonical colors actually used by its logical cells, and is
-  ordered by ascending global C-ID.
-- `#RRGGBBFF` is serialization-equivalent to the corresponding canonical
-  opaque `#RRGGBB`. Other artwork alpha values are not production logical
-  colors.
-- **CLEARED transparency is runtime state, not a palette color.**
-  It is alpha 0 and is not a palette color.
+- A production level's local LevelData palette is a subset of C01..C16.
+- The local palette contains only canonical colors actually used by logical cells.
+- Local palette order is ascending global C-ID.
+- `#RRGGBBFF` is serialization-equivalent to canonical opaque `#RRGGBB`; other ACTIVE artwork alpha values are illegal.
+- CLEARED transparency is runtime state, not a palette color.
 - Gameplay background is not a level palette color.
-- Visible square-cell boundaries/grid/border presentation may exist, but it is
-  presentation-only and does not add logical cell colors or count toward the
-  level's color total.
-- External/reference artwork may have arbitrary source colors, but any
-  production conversion must explicitly map/reject them against C01..C16.
-  Never silently expand the SCRUBBOTS palette.
-- AI-generated production pixel artwork must use this same palette contract.
+- Presentation grid/border overlays do not count as logical colors.
+- External/reference artwork may contain arbitrary source colors only before explicit production mapping/rejection. Never silently expand the SCRUBBOTS palette.
+- AI-generated production pixel artwork follows the same contract.
+
+## Difficulty-analysis relationship
+
+Color Complexity is measured from both count and distribution.
+
+V1 concept:
+
+```text
+count_norm = clamp((distinct_used - 3) / 9, 0, 1)
+H = normalized Shannon entropy of used-color frequencies
+C = 0.50 * count_norm + 0.50 * H
+```
+
+See `docs/09_DIFFICULTY_PROGRESSION_RETENTION_SYSTEM.md` and `data/config/difficulty_score_model_v1.json`.
+
+Changing palette membership and changing difficulty coefficients are separate versioned decisions.
 
 ## Art conversion / Level Factory format
 
-The canonical data shape remains:
+Canonical data shape:
 
 ```text
 width × height logical grid
@@ -72,21 +93,27 @@ width × height logical grid
 + row-major color-ID array (index = y * width + x)
 ```
 
-Each source artwork gets its own true logical dimensions. Do not force every
-artwork to a single size such as 48×49.
+Each source artwork keeps its own true logical dimensions. Do not resize artwork merely to manufacture a difficulty class.
+
+The Level Factory may request approximate color complexity as a generation constraint, but the final difficulty class is decided by campaign target fit across the full Challenge vector, Session Load and Frustration gates.
+
+Owner-original source artwork may not be recolored silently to force a target score.
 
 ## Existing M09 importer note
 
-The audited M09 importer predates this owner lock and intentionally preserves
-source pixels exactly. Its historical round-trip guarantees remain valid, but
-an arbitrary raw import is **not automatically production-legal** under this
-new palette contract. Production mapping/validation belongs in the open
-content-audit / Level Factory / M48 QA gates before shipping.
+The audited M09 importer predates the palette lock and Difficulty V1. It intentionally preserves source pixels exactly and historically orders imported palette entries by first-seen source order.
 
+An arbitrary raw import is therefore **not automatically production-legal** under the newer contract. Production normalization/validation must prove:
+
+- every logical color maps exactly to C01..C16;
+- local palette is used-only and ascending C-ID;
+- ACTIVE alpha is 255;
+- used-color count is within current production envelope;
+- exact logical cell identity is preserved while remapping local palette IDs.
+
+M21 may use the audited legacy importer as a compatibility stage for the approved 20x20 Hazard Bot, but its production artifact must obey the canonical palette contract.
 
 ## Production gameplay background
-
-The gameplay surface behind the logical pixel artwork is owner-locked:
 
 | ID | Name | HEX | RGB | Counts as pixel-art color? |
 | --- | --- | --- | --- | --- |
@@ -94,9 +121,9 @@ The gameplay surface behind the logical pixel artwork is owner-locked:
 
 Locked behavior:
 
-- BG01 is the production gameplay background exposed through CLEARED alpha-0 cells.
-- BG01 is not part of C01..C16 and is not a logical pixel-art palette color.
-- BG01 never counts toward a level's distinct-color total.
+- BG01 is visible through CLEARED alpha-0 cells.
+- BG01 is not C01..C16.
+- BG01 never counts toward color complexity or used-color total.
 - ACTIVE logical cells still use only C01..C16.
-- Do not substitute BG01 into LevelData cell color IDs.
-- Debug backgrounds may use conspicuous colors (for example magenta) solely to prove transparency; those debug colors are not production palette/background colors.
+- Never substitute BG01 into LevelData cell IDs.
+- Debug backgrounds may differ solely to prove transparency; those debug colors are not production palette/background colors.
