@@ -7,8 +7,9 @@ added the official difficulty-band production validator; Prompt 04 (M06)
 added `BoardRenderer`; META-C004 replaced the DIRTY/CLEAN prototype with the
 owner-locked ACTIVE/CLEARED model (see "LevelData vs. BoardState",
 "Structural vs. production validation", and "BoardRenderer and the
-ACTIVE/CLEARED visual model" below; ADR-019). Everything else in the module
-table is still future work.
+ACTIVE/CLEARED visual model" below; ADR-019). The gameplay engine spine has
+since been built through M20 — see "What is explicitly NOT built yet" for the
+current boundary and what genuinely remains future (M21+).
 
 ## Guiding principles
 
@@ -404,16 +405,22 @@ gameplay scripts that need to run correctly under `godot --headless`.
 
 ## What is explicitly NOT built yet
 
-Slot System is implemented at its current M12 data-model boundary; the M13
-`ColorCandidateIndex` supplies raw color candidates only. Reachability/access
-truth, reservation (M14), TargetSelector (M15), RoutingSystem (M16+), Scrubbot
-Agent, Cleaning Feedback and Save System remain future milestones (see
-`docs/04_ROADMAP.md` / `tasks.md`). `BoardRenderer` is implemented with the
-owner-locked ACTIVE/CLEARED model (ADR-019); owner manual QA of the
-transparent model is still pending (`tasks.md` SB-M10-005..011). The Master UI
-foundation now defines responsive architecture and primitives, but production
-Gameplay/Home/Popup screens are still milestone work and must not be marked
-complete until implemented and validated.
+The gameplay engine spine is implemented through M20: `SlotSystem` (M12),
+`ColorCandidateIndex` (M13), `ReservationState` (M14), `TargetSelector` (M15),
+the RoutingSystem contract + production routing/access (M16/M17), the movement-
+only `ScrubbotAgent` (M18), the `ScrubbotDispatcher` (M19), and the
+`CompleteClearingLoop` cross-module clear orchestrator (M20) all exist and are
+tested. `BoardRenderer` is implemented with the owner-locked ACTIVE/CLEARED
+model (ADR-019) and the owner manual QA of the transparent model is complete
+(`TASKS.md` SB-M10-005..011). The current M20 boundary: one bot per activation;
+the clear transaction commits `BoardState -> candidate -> reservation ->
+dispatcher finalize` and then a presentation-only renderer repaint; M20 does not
+mutate slot availability/activity and imposes no concurrent-bot cap. What remains
+future (M21+): the real-art vertical slice and level content, production
+Gameplay/Home/Popup UI screens, win/lose/scoring/streak and session completion,
+progression/save/economy, and any slot queue/cooldown/consumption policy — all
+still milestone work (see `docs/04_ROADMAP.md` / `TASKS.md`) and must not be
+marked complete until implemented and validated.
 
 
 ## Level Platform sidecars
