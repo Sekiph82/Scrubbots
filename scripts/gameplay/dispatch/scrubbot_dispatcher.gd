@@ -127,14 +127,24 @@ var _next_owner_id: int = 0
 ## reservation for that target stays held while the entry exists (M20 resolves it).
 var _active: Dictionary = {}
 
+## Non-owning (weak) claim to the single live M20 arrival consumer that owns this
+## dispatcher's authenticated-arrival authority (M20-C001 V07 F-M20-STRICT-001.M).
+## WeakRef so the dispatcher never keeps the loop alive and a GC'd consumer frees
+## the claim automatically. Never a global/singleton; never a strong cycle.
+var _m20_consumer_ref: WeakRef = null
+
 ## Bind the separate systems (initialization-only, F-M19-STRICT-001). Every
-## required collaborator is category-narrowed (RefCounted + narrow API; only
-## agent_parent may be a Node) and proven bundle-coherent BEFORE any ref is
-## committed. Any failure returns false and leaves the dispatcher fully unbound.
-## bind() while already bound returns false and changes nothing (no destructive
-## rebind in M19 — construct a new dispatcher to replace the whole bundle).
+## required collaborator is category-narrowed (RefCounted + narrow API) and proven
+## bundle-coherent BEFORE any ref is committed. Any failure returns false and
+## leaves the dispatcher fully unbound. bind() while already bound returns false
+## and changes nothing (no destructive rebind — construct a new dispatcher).
+##
+## agent_parent is INTENTIONALLY UNTYPED (M20-C001 V07 F-M20-STRICT-001.N): a
+## `: Node` annotation makes Godot raise a hard type error for a truly-freed Node
+## before the body can fail closed, and a freed Object aliases to `== null`. So
+## presence is decided by Variant TYPE inside _bind_txn, not `agent_parent != null`.
 func bind(board, selector, reservations, routing_system, routing_access, select_access,
-		agent_parent: Node = null, agent_factory: Callable = Callable()) -> bool:
+		agent_parent = null, agent_factory: Callable = Callable()) -> bool:
 	# Ordinary initialization-only rule: already bound stays bound (no destructive
 	# rebind in M19). Checked before the transaction guard so a genuine second bind
 	# is a clean false/preserve, not a "busy" false.
@@ -174,7 +184,13 @@ func _bind_txn(board, selector, reservations, routing_system, routing_access, se
 		return false
 	if not _is_ref_with(select_access, _SELECT_ACCESS_API):
 		return false
-	if agent_parent != null and not _is_live_node(agent_parent):
+	# Explicit agent_parent presence law (F-M20-STRICT-001.N): TYPE_NIL (omitted or
+	# actual null) intentionally selects dispatcher self; ANY non-NIL Variant is an
+	# explicit dependency that MUST be a live Node (not queued, not a freed Object
+	# aliasing to null, not a scalar/wrong object). Captured BEFORE the external
+	# coherence callbacks and revalidated after them using this captured truth.
+	var parent_expected: bool = typeof(agent_parent) != TYPE_NIL
+	if parent_expected and not _is_live_node(agent_parent):
 		return false
 	if not (agent_factory == Callable() or agent_factory.is_valid()):
 		return false
@@ -191,7 +207,8 @@ func _bind_txn(board, selector, reservations, routing_system, routing_access, se
 		return false
 	# Revalidate the Node/Callable lifecycle deps after the callbacks, before commit
 	# (a callback could have freed the parent / invalidated the factory target).
-	if agent_parent != null and not _is_live_node(agent_parent):
+	# Uses the captured `parent_expected` truth, NOT `agent_parent != null`.
+	if parent_expected and not _is_live_node(agent_parent):
 		return false
 	if not (agent_factory == Callable() or agent_factory.is_valid()):
 		return false
@@ -201,7 +218,7 @@ func _bind_txn(board, selector, reservations, routing_system, routing_access, se
 	_routing_system = routing_system
 	_routing_access = routing_access
 	_select_access = select_access
-	_agent_parent = agent_parent if agent_parent != null else self
+	_agent_parent = agent_parent if parent_expected else self
 	_agent_factory = agent_factory
 	_explicit_factory = agent_factory.is_valid()
 	_bound = true
@@ -634,6 +651,32 @@ func reset() -> void:
 
 # ------------------------------------------------------------- read-only -----
 
+# ---------------------------------------------- M20 arrival-consumer claim ----
+
+## Claim this dispatcher's single M20 arrival-consumer slot (F-M20-STRICT-001.M).
+## Succeeds when the slot is free OR already held by exactly `consumer`; fails when
+## a DIFFERENT still-live consumer holds it. A previously-claimed consumer that has
+## since been freed (WeakRef resolves to null) is treated as free. Non-owning:
+## storing a WeakRef never keeps the consumer alive. This does not connect any
+## signal — a benign diagnostic listener on `assignment_arrived` never affects it.
+func _claim_m20_arrival_consumer(consumer) -> bool:
+	if consumer == null:
+		return false
+	if _m20_consumer_ref != null:
+		var cur = _m20_consumer_ref.get_ref()
+		if cur == null:
+			_m20_consumer_ref = null # stale claim from a freed consumer -> free
+		elif cur != consumer:
+			return false # a different live consumer owns the arrival authority
+	_m20_consumer_ref = weakref(consumer)
+	return true
+
+## Release the claim ONLY if it is currently held by exactly `consumer` (used to
+## undo a failed bind/connect transaction). Never touches another consumer's claim.
+func _release_m20_arrival_consumer(consumer) -> void:
+	if _m20_consumer_ref != null and _m20_consumer_ref.get_ref() == consumer:
+		_m20_consumer_ref = null
+
 func get_active_count() -> int:
 	return _active.size()
 
@@ -790,7 +833,10 @@ static func _is_ref_with(obj, api: Array) -> bool:
 	return true
 
 static func _is_live_node(n) -> bool:
-	return n is Node and is_instance_valid(n) and not n.is_queued_for_deletion()
+	# is_instance_valid() FIRST (M20-C001 V07): it is safe on any Variant (a freed
+	# Object, a scalar, null) and short-circuits, so `n is Node` never evaluates its
+	# left operand on a previously-freed instance (which is a SCRIPT ERROR).
+	return is_instance_valid(n) and n is Node and not n.is_queued_for_deletion()
 
 static func _is_finite_vec(v: Vector2) -> bool:
 	return is_finite(v.x) and is_finite(v.y)

@@ -166,8 +166,11 @@ Reachability/access  --- filters blocked/unreachable candidates --->
   single `TextureRect` (ADR-011) — not one Sprite2D/Node per cell, and not
   per-frame immediate-mode draw calls per cell.
 - Scrubbots in flight are lightweight active objects, pooled where it makes
-  sense, since the number of simultaneously active Scrubbots is small
-  (bounded by slot count) even though the board itself is large.
+  sense. Current M20 law: one bot per activation; M20 does not mutate slot
+  availability/activity to create a busy flag, so it imposes no per-slot or
+  global cap on the number of simultaneously active Scrubbots. Any concurrent-bot
+  cap, queue, cooldown or slot-consumption policy is later/design-gated and not
+  implemented by M20 (the owner-locked five *visible* slots law is unaffected).
 - Responsive UI may resize/reposition the `BoardRenderer` container but may
   not change its data-oriented rendering architecture.
 
