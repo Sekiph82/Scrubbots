@@ -91,6 +91,12 @@ const M20FailingReservation = preload("res://tests/support/m20_failing_reservati
 const M20CandidateSeam = preload("res://tests/support/m20_candidate_seam.gd")
 const M20ReservationSeam = preload("res://tests/support/m20_reservation_seam.gd")
 const M20ResetSelectAccess = preload("res://tests/support/m20_reset_select_access.gd")
+# M21 — first owner-approved real-art vertical slice.
+const ProductionArtLevelBuilder = preload("res://scripts/tools/production_art_level_builder.gd")
+const ProductionRoutingSystemM21 = preload("res://scripts/gameplay/routing/production_routing_system.gd")
+const ProductionAccessQueryM21 = preload("res://scripts/gameplay/routing/production_access_query.gd")
+const ProductionTargetAccessM21 = preload("res://scripts/gameplay/dispatch/production_target_access.gd")
+const ScrubbotAgentM21 = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 
 var _total: int = 0
 var _failures: Array[String] = []
@@ -209,6 +215,12 @@ func _initialize() -> void:
 	_run_m20_v10_closure_reconciliation_tests()
 	# M20-C001 V11 — final direct-assertion reconciliation.
 	_run_m20_v11_direct_assertion_reconciliation_tests()
+	# M21-C001 V01 — first owner-approved real-art vertical slice.
+	_run_m21_source_audit_tests()
+	_run_m21_production_art_bridge_tests()
+	_run_m21_artifact_roundtrip_tests()
+	_run_m21_real_art_reachability_tests()
+	_run_m21_debug_scene_smoke()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -12156,3 +12168,331 @@ func _v11_g05_reservation_rollback_reverse_identity() -> void:
 		_check(_cell_states_equal(b, pre_cells), "G05: BoardState restored")
 		_check(w["dispatcher"].get_active_count() == pre_active and w["dispatcher"].has_owner(r.owner_id) == pre_has_owner, "G05: dispatcher active/current-owner identity restored")
 	loop = null; _m20_teardown(w)
+
+# ============================================================================
+# M21-C001 V01 — first owner-approved real-art vertical slice
+# ============================================================================
+
+const M21_SOURCE := "res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png"
+const M21_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
+const M21_PREVIEW := "res://assets/art/levels/previews/m21_level_001_hazard_bot.png"
+const M21_BLOB_SHA1 := "b565743ba52699899007882b750b7c8e7cdd00f9"
+const M21_SHA256 := "ede1e02a9096c4c7ba040b91ed7db2d2c2af3b2e20d5c8774068c8d08ad59899"
+const M21_EXPECTED_HEX := ["#E94B4BFF", "#F2C94CFF", "#3451A3FF", "#956447FF", "#000000FF"]
+
+func _m21_load_source() -> Image:
+	var img := Image.new()
+	if img.load(M21_SOURCE) != OK:
+		return null
+	if img.get_format() != Image.FORMAT_RGBA8:
+		img.convert(Image.FORMAT_RGBA8)
+	return img
+
+## Real first-seen LevelData from the audited generic importer (dry_run).
+func _m21_raw_import():
+	var req = LevelImporter.ImportRequest.new(M21_SOURCE, "m21_level_001_hazard_bot", "Hazard Bot", "EASY", M21_LEVEL, "", "", true, true)
+	var res = LevelImporter.run_import(req)
+	if not res.is_ok():
+		return null
+	return res.level_data
+
+func _run_m21_source_audit_tests() -> void:
+	print("---- M21-C001 V01: owner-approved source integrity (section 2/B/C) ----")
+	var img := _m21_load_source()
+	_check(img != null, "M21 source: loads")
+	if img == null:
+		return
+	_check_eq(img.get_width(), 20, "M21 source: width 20")
+	_check_eq(img.get_height(), 20, "M21 source: height 20")
+	_check_eq(img.get_width() * img.get_height(), 400, "M21 source: 400 logical pixels")
+	_check_eq(ProductionArtLevelBuilder._git_blob_sha1_file(M21_SOURCE), M21_BLOB_SHA1, "M21 source: git blob SHA1 matches owner approval")
+	_check_eq(ProductionArtLevelBuilder._sha256_file(M21_SOURCE), M21_SHA256, "M21 source: SHA-256 matches owner approval")
+	_check_eq(FileAccess.get_file_as_bytes(M21_SOURCE).size(), 297, "M21 source: 297 bytes")
+
+	var auth = ProductionArtLevelBuilder.load_palette_authority()
+	_check(auth != null, "M21 source: palette authority loads")
+	var rgb_to_cid: Dictionary = auth["rgb_to_cid"]
+	var counts := {}
+	var alpha_ok := true
+	var off_palette := 0
+	var semi := 0
+	var perim_total := 0
+	var perim_non_c08 := 0
+	var w := img.get_width(); var h := img.get_height()
+	for y in h:
+		for x in w:
+			var px := img.get_pixel(x, y)
+			var r := int(round(px.r8)); var g := int(round(px.g8)); var b := int(round(px.b8)); var a := int(round(px.a8))
+			if a != 255:
+				alpha_ok = false
+				semi += 1
+			var key := "%d,%d,%d" % [r, g, b]
+			var cid = rgb_to_cid.get(key, "OFF")
+			if cid == "OFF":
+				off_palette += 1
+			counts[cid] = int(counts.get(cid, 0)) + 1
+			if x == 0 or y == 0 or x == w - 1 or y == h - 1:
+				perim_total += 1
+				if cid != "C08":
+					perim_non_c08 += 1
+	_check(alpha_ok, "M21 source: every logical pixel alpha 255")
+	_check_eq(semi, 0, "M21 source: zero semi-transparent")
+	_check_eq(off_palette, 0, "M21 source: zero off-palette")
+	_check_eq(counts.size(), 5, "M21 source: 5 distinct colors (within legacy EASY compat band 3-5 and Difficulty V1 used-color envelope 3-12; count is a V1 score input, not a class law)")
+	_check_eq(int(counts.get("C01", 0)), 30, "M21 source: C01 count 30")
+	_check_eq(int(counts.get("C03", 0)), 5, "M21 source: C03 count 5")
+	_check_eq(int(counts.get("C08", 0)), 298, "M21 source: C08 count 298")
+	_check_eq(int(counts.get("C11", 0)), 11, "M21 source: C11 count 11")
+	_check_eq(int(counts.get("C16", 0)), 56, "M21 source: C16 count 56")
+	_check_eq(perim_total, 76, "M21 source: 76 perimeter cells")
+	_check_eq(perim_non_c08, 0, "M21 source: every perimeter cell is C08")
+
+	# Raw first-seen palette order (proves the M09 gap this bridge closes).
+	var raw = _m21_raw_import()
+	_check(raw != null, "M21 source: generic importer extracts")
+	if raw != null:
+		var norm := ProductionArtLevelBuilder.normalize_from_level_data(raw, "EASY")
+		_check_eq(str(norm.first_seen_cids), str(["C08", "C16", "C01", "C03", "C11"]), "M21 source: raw first-seen order is C08,C16,C01,C03,C11")
+
+func _run_m21_production_art_bridge_tests() -> void:
+	print("---- M21-C001 V01: production-art palette bridge (section 3/D) ----")
+	var raw = _m21_raw_import()
+	if raw == null:
+		_check(false, "M21 bridge: raw import available")
+		return
+	var norm := ProductionArtLevelBuilder.normalize_from_level_data(raw, "EASY")
+	_check(norm.is_ok(), "M21 bridge: real source normalizes cleanly")
+	_check_eq(str(norm.normalized_cids), str(["C01", "C03", "C08", "C11", "C16"]), "M21 bridge: normalized ascending C-ID order")
+	_check_eq(norm.used_color_count, 5, "M21 bridge: distinct used-color count 5")
+	var lvl = norm.level_data
+	_check_eq(lvl.palette.size(), 5, "M21 bridge: 5-entry local palette")
+	for i in M21_EXPECTED_HEX.size():
+		_check_eq(String(lvl.palette[i]), M21_EXPECTED_HEX[i], "M21 bridge: palette[%d] canonical hex" % i)
+	# Reconstruction preserved despite index remap.
+	var raw_img = LevelImporter.reconstruct_image(raw)
+	var norm_img = LevelImporter.reconstruct_image(lvl)
+	_check(raw_img.get_data() == norm_img.get_data(), "M21 bridge: remap preserves visible pixels (crit 85)")
+	# Determinism: normalize twice -> identical serialized final data.
+	var norm2 := ProductionArtLevelBuilder.normalize_from_level_data(_m21_raw_import(), "EASY")
+	_check(norm2.is_ok(), "M21 bridge: second normalize ok")
+	_check(str(ProductionArtLevelBuilder._level_to_dict(lvl)) == str(ProductionArtLevelBuilder._level_to_dict(norm2.level_data)), "M21 bridge: deterministic (byte-identical final data)")
+
+	# --- negatives ---
+	# off-palette color
+	var off_pal := PackedStringArray(["#123456FF", "#3451A3FF", "#000000FF"])
+	var off_cells := PackedInt32Array([0, 1, 2, 0, 1, 2])
+	var off_ld = LevelData.new(1, "neg_off", "neg", "EASY", 3, 2, off_pal, off_cells)
+	_check(not ProductionArtLevelBuilder.normalize_from_level_data(off_ld, "EASY").is_ok(), "M21 bridge: off-palette color rejected (no nearest-color)")
+	# semi-transparent alpha
+	var semi_pal := PackedStringArray(["#E94B4B80", "#3451A3FF", "#000000FF"])
+	var semi_ld = LevelData.new(1, "neg_semi", "neg", "EASY", 3, 2, semi_pal, off_cells)
+	_check(not ProductionArtLevelBuilder.normalize_from_level_data(semi_ld, "EASY").is_ok(), "M21 bridge: semi-transparent alpha rejected")
+	# wrong EASY color count (6 distinct > 5)
+	var six_pal := PackedStringArray(["#E94B4BFF", "#F28C3CFF", "#F2C94CFF", "#55B85AFF", "#63D6A3FF", "#42C7D9FF"])
+	var six_cells := PackedInt32Array([0, 1, 2, 3, 4, 5])
+	var six_ld = LevelData.new(1, "neg_six", "neg", "EASY", 3, 2, six_pal, six_cells)
+	_check(not ProductionArtLevelBuilder.normalize_from_level_data(six_ld, "EASY").is_ok(), "M21 bridge: EASY 6-color count rejected by legacy compat band 3-5 (M21 compatibility gate, not a V1 class law)")
+	# noncanonical local order -> normalized deterministically to ascending.
+	# Use a valid 20x20 EASY board (3 distinct colors) so only palette ORDER,
+	# not dimensions/count, is under test.
+	var noncanon_pal := PackedStringArray(["#000000FF", "#E94B4BFF", "#3451A3FF"])  # C16,C01,C08
+	var noncanon_cells := PackedInt32Array()
+	noncanon_cells.resize(400)
+	for ni in range(400):
+		noncanon_cells[ni] = ni % 3
+	var noncanon_ld = LevelData.new(1, "neg_order", "neg", "EASY", 20, 20, noncanon_pal, noncanon_cells)
+	var noncanon_norm := ProductionArtLevelBuilder.normalize_from_level_data(noncanon_ld, "EASY")
+	_check(noncanon_norm.is_ok(), "M21 bridge: noncanonical order accepted+normalized")
+	_check_eq(str(noncanon_norm.normalized_cids), str(["C01", "C08", "C16"]), "M21 bridge: noncanonical order deterministically ascending")
+	var nc_before = LevelImporter.reconstruct_image(noncanon_ld)
+	var nc_after = LevelImporter.reconstruct_image(noncanon_norm.level_data)
+	_check(nc_before.get_data() == nc_after.get_data(), "M21 bridge: noncanonical remap preserves pixels")
+
+func _run_m21_artifact_roundtrip_tests() -> void:
+	print("---- M21-C001 V01: committed artifact roundtrip (section 4/E) ----")
+	var res: LevelValidationResult = LevelLoader.load_from_path(M21_LEVEL)
+	_check(res.is_ok(), "M21 artifact: LevelLoader loads committed final Level Data")
+	if not res.is_ok():
+		return
+	var lvl = res.level_data
+	_check_eq(lvl.id, "m21_level_001_hazard_bot", "M21 artifact: id")
+	_check_eq(lvl.display_name, "Hazard Bot", "M21 artifact: name Hazard Bot")
+	_check_eq(lvl.difficulty, "EASY", "M21 artifact: difficulty EASY")
+	_check_eq(lvl.width, 20, "M21 artifact: width 20")
+	_check_eq(lvl.height, 20, "M21 artifact: height 20")
+	_check_eq(lvl.get_cell_count(), 400, "M21 artifact: 400 cells")
+	_check_eq(lvl.palette.size(), 5, "M21 artifact: 5-color palette")
+	for i in M21_EXPECTED_HEX.size():
+		_check_eq(String(lvl.palette[i]), M21_EXPECTED_HEX[i], "M21 artifact: palette[%d] canonical ascending" % i)
+	# LevelValidator (structural) + ProductionLevelValidator both accept.
+	_check(LevelValidator.validate(ProductionArtLevelBuilder._level_to_dict(lvl), lvl.id).is_ok(), "M21 artifact: LevelValidator PASS")
+	_check(ProductionLevelValidator.validate(lvl).is_ok(), "M21 artifact: ProductionLevelValidator PASS")
+	# Cell-reference counts by local index.
+	var idx_counts := {}
+	for c in lvl.cells:
+		idx_counts[c] = int(idx_counts.get(c, 0)) + 1
+	_check_eq(int(idx_counts.get(0, 0)), 30, "M21 artifact: C01 cells 30")
+	_check_eq(int(idx_counts.get(1, 0)), 5, "M21 artifact: C03 cells 5")
+	_check_eq(int(idx_counts.get(2, 0)), 298, "M21 artifact: C08 cells 298")
+	_check_eq(int(idx_counts.get(3, 0)), 11, "M21 artifact: C11 cells 11")
+	_check_eq(int(idx_counts.get(4, 0)), 56, "M21 artifact: C16 cells 56")
+	# Reconstruction from final data == source raw RGBA8 for all 400 pixels.
+	var src := _m21_load_source()
+	var recon = LevelImporter.reconstruct_image(lvl)
+	_check(recon != null and src != null, "M21 artifact: reconstruction produced")
+	_check(recon.get_width() == 20 and recon.get_height() == 20, "M21 artifact: reconstruction is 20x20 RGBA8")
+	_check(recon.get_data() == src.get_data(), "M21 artifact: reconstruction bytes == source bytes (400/400)")
+	# Committed preview generated from final data, matches reconstruction/source.
+	var prev := Image.new()
+	_check(prev.load(M21_PREVIEW) == OK, "M21 artifact: committed preview loads")
+	if prev.get_format() != Image.FORMAT_RGBA8:
+		prev.convert(Image.FORMAT_RGBA8)
+	_check(prev.get_data() == recon.get_data(), "M21 artifact: preview bytes == final-data reconstruction")
+	_check(prev.get_data() == src.get_data(), "M21 artifact: preview bytes == source bytes")
+
+## Real M21 production bundle over the given board (no M20 fault seams).
+func _m21_wire(board) -> Dictionary:
+	var reservations = ReservationState.new(); reservations.bind(board)
+	var candidates = ColorCandidateIndex.create(); candidates.bind(board)
+	var selector = TargetSelector.create(); selector.bind(board, candidates, reservations)
+	var routing = ProductionRoutingSystemM21.new()
+	var routing_access = ProductionAccessQueryM21.new(board)
+	var select_access = ProductionTargetAccessM21.new(routing, routing_access, board)
+	var dispatcher = ScrubbotDispatcher.new(); root.add_child(dispatcher)
+	dispatcher.bind(board, selector, reservations, routing, routing_access, select_access)
+	return {"board": board, "reservations": reservations, "candidates": candidates,
+		"selector": selector, "routing": routing, "routing_access": routing_access,
+		"select_access": select_access, "dispatcher": dispatcher}
+
+func _run_m21_real_art_reachability_tests() -> void:
+	print("---- M21-C001 V01: real-art AL-028 reachability proof (section 6/G) ----")
+	var lvl = LevelLoader.load_from_path(M21_LEVEL).level_data
+	var board = BoardState.from_level_data(lvl)
+	var w: int = board.get_width(); var h: int = board.get_height()
+	var wire = _m21_wire(board)
+	var slots = SlotSystem.new(); slots.configure([0, 1, 2, 3, 4], lvl.palette.size())
+	# slot identity assertion (crit 124/125)
+	var slot_ids_ok := true
+	for i in range(5):
+		if slots.get_slot_palette_id(i) != i:
+			slot_ids_ok = false
+	_check(slot_ids_ok, "M21 reach: five slots map 1:1 to the five local palette identities")
+	var loop = CompleteClearingLoop.new()
+	var renderer = BoardRenderer.new(); root.add_child(renderer)
+	renderer.configure(board, lvl.palette, Vector2(400, 400))
+	_check(loop.bind(board, slots, wire["candidates"], wire["reservations"], wire["dispatcher"], renderer), "M21 reach: loop binds real bundle + renderer")
+
+	_check_eq(board.count_cells_by_state(BoardState.CellState.ACTIVE), 400, "M21 reach: all 400 cells start ACTIVE")
+	# candidate counts per color match source counts
+	_check_eq(wire["candidates"].count_candidates(0, null), 30, "M21 reach: C01 candidates 30")
+	_check_eq(wire["candidates"].count_candidates(1, null), 5, "M21 reach: C03 candidates 5")
+	_check_eq(wire["candidates"].count_candidates(2, null), 298, "M21 reach: C08 candidates 298")
+	_check_eq(wire["candidates"].count_candidates(3, null), 11, "M21 reach: C11 candidates 11")
+	_check_eq(wire["candidates"].count_candidates(4, null), 56, "M21 reach: C16 candidates 56")
+	# initial renderer equals source at every logical coordinate
+	var src := _m21_load_source()
+	var initial_match := true
+	var perim_all_c08 := true
+	for y in h:
+		for x in w:
+			if renderer.get_pixel_color(x, y) != src.get_pixel(x, y):
+				initial_match = false
+			if x == 0 or y == 0 or x == w - 1 or y == h - 1:
+				if board.get_color_id(board.get_cell_index(x, y)) != 2:
+					perim_all_c08 = false
+	_check(initial_match, "M21 reach: renderer matches source at all 400 coordinates")
+	_check(perim_all_c08, "M21 reach: all 76 perimeter cells are C08, none other")
+
+	# Each non-C08 slot: raw candidates exist, but activation fails NO_REACHABLE_TARGET
+	# (not fake absence), spawning no agent and no reservation.
+	for slot_id in [0, 1, 3, 4]:
+		var color: int = slot_id
+		_check(wire["candidates"].count_candidates(color, null) > 0, "M21 reach: slot %d has raw candidates before clear" % slot_id)
+		var r = loop.activate_slot(slot_id, Vector2(-1.5, h * 0.5), 6.0)
+		_check_eq(r.failure_reason, DispatchResult.FailureReason.NO_REACHABLE_TARGET, "M21 reach: enclosed color %d -> NO_REACHABLE_TARGET" % slot_id)
+		_check_eq(wire["dispatcher"].get_active_count(), 0, "M21 reach: color %d spawned no agent" % slot_id)
+		_check_eq(wire["reservations"].get_reservation_count(), 0, "M21 reach: color %d created no reservation" % slot_id)
+
+	# C08 slot (index 2) dispatches a real agent to a real ACTIVE C08 target.
+	var rc = loop.activate_slot(2, Vector2(-1.5, -1.5), 6.0)
+	_check(rc.success, "M21 reach: C08 slot dispatches on fresh board")
+	if rc.success:
+		var tgt: int = rc.target_index
+		_check_eq(board.get_color_id(tgt), 2, "M21 reach: C08 target color is C08")
+		_check_eq(board.get_cell_state(tgt), BoardState.CellState.ACTIVE, "M21 reach: C08 target ACTIVE before clear")
+		_check_eq(wire["reservations"].get_owner(tgt), rc.owner_id, "M21 reach: reservation exists before arrival")
+		_check(rc.agent.is_moving(), "M21 reach: real ScrubbotAgent is MOVING before arrival")
+		for _i in range(256):
+			if not rc.agent.is_moving():
+				break
+			rc.agent.advance(1.0)
+		_check_eq(loop.get_cleared_count(), 1, "M21 reach: exactly one clear after arrival")
+		_check_eq(board.get_cell_state(tgt), BoardState.CellState.CLEARED, "M21 reach: target ACTIVE->CLEARED")
+		var tp: Vector2i = board.get_cell_position(tgt)
+		_check_eq(renderer.get_pixel_color(tp.x, tp.y).a, 0.0, "M21 reach: renderer alpha 0 after clear")
+		_check(not wire["candidates"].get_candidates(2, null).has(tgt), "M21 reach: candidate index drops cleared cell")
+		_check_eq(wire["reservations"].get_owner(tgt), -1, "M21 reach: reservation resolved after commit")
+		_check(not wire["dispatcher"].has_owner(rc.owner_id), "M21 reach: dispatcher finalized assignment")
+		_check(rc.agent.is_queued_for_deletion(), "M21 reach: agent scheduled for destruction (no return trip)")
+
+	# Continue clearing C08 until a previously-unreachable non-C08 color becomes
+	# genuinely reachable, then dispatch+clear it through the real production path.
+	var opened := -1
+	var guard := 0
+	while opened == -1 and guard < 1200:
+		guard += 1
+		for cid in [0, 1, 3, 4]:
+			var pr = loop.activate_slot(cid, Vector2(-1.5, h * 0.5), 6.0)
+			if pr.success:
+				opened = cid
+				_check(board.get_color_id(pr.target_index) == cid, "M21 reach: opened color %d target identity" % cid)
+				for _i in range(256):
+					if not pr.agent.is_moving():
+						break
+					pr.agent.advance(1.0)
+				_check(board.get_cell_state(pr.target_index) == BoardState.CellState.CLEARED, "M21 reach: previously-unreachable color %d cleared via production path" % cid)
+				break
+		if opened != -1:
+			break
+		var progressed := false
+		for origin in [Vector2(-1.5, h * 0.5), Vector2(w + 1.5, h * 0.5), Vector2(w * 0.5, -1.5), Vector2(w * 0.5, h + 1.5)]:
+			var r2 = loop.activate_slot(2, origin, 6.0)
+			if r2.success:
+				for _i in range(256):
+					if not r2.agent.is_moving():
+						break
+					r2.agent.advance(1.0)
+				progressed = true
+				break
+		if not progressed:
+			break
+	_check(opened != -1, "M21 reach: an initially-unreachable non-C08 color became reachable after C08 clears (AL-028)")
+
+	loop.reset()
+	root.remove_child(wire["dispatcher"]); wire["dispatcher"].free()
+	root.remove_child(renderer); renderer.free()
+
+func _run_m21_debug_scene_smoke() -> void:
+	print("---- M21-C001 V01: debug real-art vertical-slice scene smoke (section 8) ----")
+	var scene = load("res://scenes/debug/m21_real_art_vertical_slice.tscn")
+	_check(scene != null, "M21 debug scene: resource loads")
+	if scene == null:
+		return
+	var inst = scene.instantiate()
+	_check(inst != null, "M21 debug scene: instantiates")
+	root.add_child(inst)
+	if inst._board == null:
+		inst.build()
+	_check(inst._board != null, "M21 debug scene: loads committed real Level Data into BoardState")
+	_check(inst._renderer != null and inst._renderer.is_bound_to(inst._board), "M21 debug scene: BoardRenderer bound to board")
+	_check(inst._loop != null and inst._loop.is_bound(), "M21 debug scene: real CompleteClearingLoop bound")
+	# One manual real clear (no autoplay), driven synchronously.
+	var dispatched: bool = inst.step_one_clear()
+	_check(dispatched, "M21 debug scene: manual step dispatches one real clear")
+	if dispatched and inst._active_agent != null:
+		for _i in range(256):
+			if not inst._active_agent.is_moving():
+				break
+			inst._active_agent.advance(1.0)
+		_check_eq(inst._loop.get_cleared_count(), 1, "M21 debug scene: one real ACTIVE->CLEARED clear via production path")
+	inst.free()
