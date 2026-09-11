@@ -357,3 +357,181 @@ Finding-by-finding "whack-a-mole" correction prompts are prohibited.
 
 For critical subsystem closure, the post-correction audit must rerun the same
 attack-surface matrix conceptually, not merely verify the last diff.
+
+
+## Sprint-wide exhaustive audit and prompt batching [OWNER-LOCKED — 2026-09-11]
+
+This section strengthens the full-sweep rule above. It is owner-directed and
+mandatory for every critical/stateful sprint, including all correction and
+validation versions of an already-running sprint.
+
+### 1. The audit unit is the WHOLE sprint, not the latest diff
+
+Before ChatGPT may issue any new correction or validation prompt, it MUST audit the
+entire active sprint surface again. The latest diff is only one input.
+
+The sprint-wide sweep must include:
+- every open task ID in the active sprint;
+- every task ID already tentatively/provisionally satisfied by the current code;
+- every production file owned or modified by the sprint;
+- immediate upstream dependencies whose state/lifecycle can invalidate the sprint;
+- immediate downstream consumers whose assumptions can make a seemingly-correct
+  sprint state unsafe;
+- every public/stateful entry point used by the sprint;
+- every reset/cancel/completion/lifecycle boundary;
+- all canonical-state ownership transitions;
+- all test-only seams that could accidentally widen production trust boundaries.
+
+ChatGPT MUST NOT stop the sweep after finding one defect.
+
+### 2. Mandatory sprint coverage ledger
+
+Before freezing findings, ChatGPT must build a task-by-task coverage ledger in the
+new `CHATGPT_FULL_SURFACE_REAUDIT_VNN.md` or audit file.
+
+For EACH sprint task/requirement, the ledger must identify:
+- production owner/path;
+- relevant public entry point(s);
+- canonical state touched/read;
+- upstream dependency assumptions;
+- downstream consumer assumptions;
+- applicable adversarial classes;
+- direct test/evidence that currently covers it;
+- known false-positive risk;
+- status: `PROVEN`, `GAP`, `DEFECT`, `OWNER_GATE`, or `NOT_APPLICABLE`.
+
+No correction/validation prompt may be published while an applicable task row has
+an unexplained `GAP`.
+
+### 3. Mandatory two-pass auditor sweep
+
+Every pre-prompt audit must perform TWO conceptually separate passes:
+
+**Pass A — implementation/state sweep**
+- source and diff;
+- public APIs;
+- state ownership and transaction ordering;
+- lifecycle/re-entry/reset/rollback;
+- dependency coherence;
+- integration and scale.
+
+**Pass B — evidence/test/policy sweep**
+- prompt requirement versus implementation;
+- audit criterion versus actual test;
+- test versus claimed behavior;
+- sensitivity/load-bearing quality;
+- aggregate test-count false positives;
+- missing direct observability;
+- internally inconsistent, impossible, redundant, or stale audit criteria;
+- tracker/log/source/doc consistency.
+
+The next prompt may be issued only after BOTH passes finish.
+
+### 4. Criteria-to-evidence one-to-one reconciliation
+
+Before publishing a new prompt or accepting a correction, ChatGPT must reconcile
+every material audit criterion with its intended evidence.
+
+For each criterion, classify it as:
+- `SOURCE_PROOF`;
+- `DIRECT_TEST`;
+- `SENSITIVITY`;
+- `LOG/GOVERNANCE`;
+- `OWNER_GATE`;
+- `NOT_APPLICABLE`.
+
+If a criterion requires a direct test/sensitivity result, ChatGPT must verify that
+such a test actually exists and that the recorded result corresponds to that exact
+criterion. A nearby test or aggregate green suite is not a substitute.
+
+If ChatGPT authored a contradictory/impossible/stale criterion, that is an AUDIT
+SPECIFICATION DEFECT. It must be corrected explicitly before the next prompt. It
+must not be silently blamed on Claude or converted into another implementation
+cycle.
+
+### 5. Sibling-failure search after every discovered defect
+
+Whenever any defect is found, ChatGPT must deliberately search for sibling defects
+of the same root class before freezing the next prompt.
+
+Examples:
+- one freed-Object/null-alias bug -> inspect every optional Object/Node presence
+  check in the sprint;
+- one owner-wide cleanup bug -> inspect all cleanup/reset/release paths;
+- one callback-generation gap -> inspect every callback boundary in the transaction;
+- one count-only equality bug -> inspect all exact-set/map postconditions;
+- one subclass trust-boundary bug -> inspect every collaborator category gate.
+
+The audit must record which sibling surfaces were checked and their result.
+
+### 6. Interaction sweep across findings
+
+After individual findings are collected, ChatGPT must run a second interaction
+review asking whether two individually-correct mechanisms can break each other.
+
+At minimum consider combinations of:
+- reset + callback;
+- reset + dependency drift;
+- lifecycle death + optional dependency;
+- rollback + unrelated state;
+- duplicate/re-entry + queue/current identity;
+- completion + stale owner/target;
+- scale + state synchronization;
+- presentation failure + canonical gameplay state.
+
+This interaction sweep happens BEFORE prompt issuance, not in the next version.
+
+### 7. Frozen finding set must be complete for known evidence
+
+A correction prompt must contain ALL material defects and evidence gaps known at
+freeze time. Findings must be grouped by root cause rather than emitted one prompt
+at a time.
+
+The audit file must state:
+- full frozen finding set;
+- sibling surfaces checked;
+- interaction surfaces checked;
+- criteria/evidence reconciliation result;
+- why any intentionally deferred item is safe to defer.
+
+A new version after the frozen set is allowed only for:
+1. a genuinely new runtime fact that was not available to ChatGPT during the prior
+   sweep; or
+2. a defect introduced by the correction itself that could not reasonably have
+   existed in the pre-correction source.
+
+If neither condition applies, the earlier audit was incomplete and ChatGPT must say
+so explicitly rather than pretending the issue is newly discovered.
+
+### 8. Validation-only gate requirements
+
+For final critical-sprint validation:
+- production is immutable;
+- fresh auditor-authored arrangements cover the ENTIRE sprint ledger, not only the
+  most recent fix;
+- all previously accepted high-risk findings remain regression-locked;
+- all known evidence gaps are closed in the same validation pass;
+- sensitivity mutations are mapped to named high-risk invariants and must fail for
+  the intended reason;
+- production blobs are restored exactly before the final full-suite run.
+
+If validation exposes a production defect, Claude must stop without fixing it. Then
+ChatGPT must perform a NEW whole-sprint two-pass sweep before writing the correction
+prompt, including sibling and interaction searches for the newly exposed root
+class.
+
+### 9. Prompt issuance checklist
+
+Before creating `CHATGPT_PROMPT_VNN.md`, ChatGPT must be able to answer YES to all:
+- Have all active sprint tasks been ledgered?
+- Have all sprint-owned production surfaces been inspected?
+- Have immediate upstream/downstream assumptions been inspected?
+- Have all applicable adversarial classes been considered?
+- Have sibling defects been searched for each discovered root cause?
+- Has the interaction sweep been completed?
+- Have prompt/criteria/tests/log claims been reconciled one-to-one?
+- Have impossible/stale criteria been corrected?
+- Is the frozen finding set complete for all currently available evidence?
+- Does the new prompt batch every known material correction/evidence gap?
+
+If any answer is NO, DO NOT ISSUE THE PROMPT.
