@@ -138,7 +138,13 @@ Reachability/access  --- filters blocked/unreachable candidates --->
   generation, rolls back a mid-flight arrival before applying the dispatcher
   reset). Node collaborators (dispatcher, renderer) are proven live — valid and
   not queued for deletion — before any `get_script()`/coherence call, so a freed
-  or dying Node fails bind/coherence closed without a SCRIPT ERROR (M20-C001 V04);
+  or dying Node fails bind/coherence closed without a SCRIPT ERROR (M20-C001 V04).
+  Optional-renderer presence is a persisted `_renderer_expected` bit derived from
+  the bind argument's Variant type (TYPE_NIL = headless), never `renderer != null`
+  — in Godot 4.7 a truly-freed `Object` compares `== null` while staying a
+  TYPE_OBJECT, so a configured-then-freed renderer would otherwise alias to the
+  headless case and silently drop the liveness gate; the bit keeps a dead
+  configured renderer incoherent (M20-C001 V06, F-M20-STRICT-001.L);
   `dispatcher.dispatch()` is bracketed as an M20 boundary (a reset or coherence
   loss injected from inside M19 dispatch yields RESETTING/COHERENCE_FAILED, never
   a stale M19 SUCCESS, and the in-flight assignment is cleaned). The dispatcher's

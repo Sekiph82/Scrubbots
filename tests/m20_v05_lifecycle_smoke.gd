@@ -3,18 +3,15 @@ extends SceneTree
 ## the liveness law for BOTH the dispatcher AND the renderer, destroyed before bind
 ## and after a healthy bind. Needs real SceneTree frames (queue_free defers).
 ##
-## EVIDENCE ARTIFACT — this smoke currently EXPOSES a V04 gap and exits 1 on the
-## TRULY-FREED OPTIONAL RENDERER cases (see CLAUDE_LOG_V05.md,
-## V05_VALIDATION_EXPOSED_PRODUCTION_DEFECT). In Godot 4.7 a freed Object compares
-## `== null` (verified), so the optional renderer's `if renderer != null:` guard
-## skips the liveness check once the renderer is truly destroyed: after a healthy
-## bind, `is_coherent()` stays true and activation still succeeds instead of
-## failing closed as §3B/§3D/§3E require. The DISPATCHER cases all pass (it is
-## checked unconditionally). Not fixed here — V05 is validation-only; production is
-## immutable and the fix belongs to a ChatGPT-authored production cycle.
+## PERMANENT REGRESSION ARTIFACT. Exposed the V04 freed-optional-renderer gap in
+## V05 (V05_VALIDATION_EXPOSED_PRODUCTION_DEFECT); CLOSED by the V06 correction
+## (F-M20-STRICT-001.L): renderer presence is a persisted `_renderer_expected` bit
+## derived from the bind argument's Variant type, not `renderer != null`, so a
+## configured-then-freed renderer (which aliases to `== null` in Godot 4.7) still
+## fails the liveness gate. Must exit 0.
 ##
 ## Run:  godot --headless --path . -s res://tests/m20_v05_lifecycle_smoke.gd
-## Exits 0 only once the exposed gap is closed by a future production correction.
+## Exits 0 on success, 1 on any failure.
 
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const ColorCandidateIndex = preload("res://scripts/gameplay/targeting/color_candidate_index.gd")

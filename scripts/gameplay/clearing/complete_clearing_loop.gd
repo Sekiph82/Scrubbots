@@ -80,6 +80,14 @@ var _candidates = null
 var _reservations = null
 var _dispatcher = null
 var _renderer = null
+## Whether a renderer dependency was CONFIGURED at bind (F-M20-STRICT-001.L). This
+## is the semantic authority for renderer presence — NEVER `_renderer != null`,
+## because in Godot 4.7 a truly-freed Object compares `== null` while remaining a
+## TYPE_OBJECT, so a configured-then-freed renderer would otherwise alias to the
+## legitimate headless (no-renderer) case and silently drop the liveness gate.
+## Derived from the bind argument's Variant type (TYPE_NIL => headless) and
+## committed only on a successful bind.
+var _renderer_expected: bool = false
 
 var _bound: bool = false
 var _arrival_cb: Callable = Callable()
@@ -164,23 +172,31 @@ func _bind_txn(board, slot_system, candidate_index, reservation_state, dispatche
 	# or renderer fails closed without a SCRIPT ERROR and connects no signal.
 	if not _is_live_exact_node(dispatcher, ScrubbotDispatcher):
 		return false
-	if renderer != null:
+	# Renderer presence is decided by Variant TYPE, never by `renderer != null`
+	# (F-M20-STRICT-001.L): TYPE_NIL is the intentional headless config; ANY other
+	# Variant (including a truly-freed Object that aliases to `== null`) is an
+	# explicit dependency that MUST pass the exact live-node category gate.
+	var renderer_expected: bool = typeof(renderer) != TYPE_NIL
+	if renderer_expected:
 		if not _is_live_exact_node(renderer, BoardRenderer):
 			return false
 	# Single coherence probe: every dependency is now the exact production script,
 	# so an is_bound_to() callback cannot recurse into bind or drift the bundle.
 	# The _in_bind guard still fails a nested bind closed as defence-in-depth.
-	if not _probe(board, candidate_index, reservation_state, dispatcher, renderer):
+	if not _probe(board, candidate_index, reservation_state, dispatcher, renderer, renderer_expected):
 		return false
 	if dispatcher.get_active_count() != 0:
 		return false
 	# Commit + connect the arrival bridge ONLY now (no signal before validation).
+	# The renderer-presence bit is committed here on success only; a failed bind
+	# leaves the loop fully unbound with no renderer-present metadata.
 	_board = board
 	_slots = slot_system
 	_candidates = candidate_index
 	_reservations = reservation_state
 	_dispatcher = dispatcher
 	_renderer = renderer
+	_renderer_expected = renderer_expected
 	_arrival_cb = Callable(self, "_on_assignment_arrived")
 	dispatcher.assignment_arrived.connect(_arrival_cb)
 	_bound = true
@@ -194,9 +210,13 @@ func is_bound() -> bool:
 func is_coherent() -> bool:
 	if not _bound:
 		return false
-	return _probe(_board, _candidates, _reservations, _dispatcher, _renderer)
+	# Renderer participation comes from the persisted presence bit, NEVER from the
+	# current `_renderer` reference (a configured-then-freed renderer aliases to
+	# `== null`, F-M20-STRICT-001.L). So a dead configured renderer can never
+	# silently downgrade the bundle to headless.
+	return _probe(_board, _candidates, _reservations, _dispatcher, _renderer, _renderer_expected)
 
-func _probe(board, ci, rs, disp, renderer) -> bool:
+func _probe(board, ci, rs, disp, renderer, renderer_expected: bool) -> bool:
 	if not _bool_true(ci.is_bound_to(board)):
 		return false
 	if not _bool_true(rs.is_bound_to(board)):
@@ -206,7 +226,10 @@ func _probe(board, ci, rs, disp, renderer) -> bool:
 	# bundle incoherent, never a SCRIPT ERROR.
 	if not _is_live_node(disp) or not _bool_true(disp.is_bound_to(board, rs)):
 		return false
-	if renderer != null:
+	# Renderer participation is driven by `renderer_expected`, not `renderer != null`:
+	# a configured renderer that was truly freed (aliases to `== null`) still fails
+	# _is_live_node here and makes the bundle incoherent (F-M20-STRICT-001.L).
+	if renderer_expected:
 		if not _is_live_node(renderer) or not _bool_true(renderer.is_bound_to(board)):
 			return false
 	return true
@@ -370,7 +393,7 @@ func _run_transaction(t: Dictionary, my_gen: int) -> StringName:
 		return Outcome.ROLLBACK_FAILED
 
 	# 6. Optional presentation repaint from the already-committed BoardState.
-	if _renderer != null and is_instance_valid(_renderer) and _bool_true(_renderer.is_bound_to(_board)):
+	if _renderer_expected and is_instance_valid(_renderer) and _bool_true(_renderer.is_bound_to(_board)):
 		_renderer.update_cells([target])
 
 	_cleared_count += 1
@@ -546,7 +569,8 @@ static func _owner_map_equals(a: Dictionary, b: Dictionary) -> bool:
 	return true
 
 func _renderer_pixel(target: int):
-	if _renderer == null or not is_instance_valid(_renderer):
+	# Presence via the persisted bit, not `_renderer == null` (freed aliases to null).
+	if not _renderer_expected or not is_instance_valid(_renderer):
 		return null
 	if not _bool_true(_renderer.is_bound_to(_board)):
 		return null
