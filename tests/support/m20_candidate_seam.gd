@@ -15,6 +15,11 @@ var sync_hook: Callable = Callable()
 var coherence_hook: Callable = Callable()
 var _sync_hook_fired: bool = false
 var _coh_hook_fired: bool = false
+## For mode "unrelated_loss" (V03 §3 candidate unrelated-loss mutate-false):
+## after removing the target, also drop an UNRELATED same-color candidate from the
+## bucket, then return false — collateral candidate loss.
+var loss_color: int = -1
+var loss_index: int = -1
 
 func is_bound_to(board) -> bool:
 	if coherence_hook.is_valid() and not _coh_hook_fired:
@@ -29,6 +34,10 @@ func sync_cell(index: int) -> bool:
 	match mode:
 		"mutate_false":
 			super.sync_cell(index) # real removal for the mutated target
+			return false
+		"unrelated_loss":
+			super.sync_cell(index)            # real removal for the target
+			_bucket_remove(loss_color, loss_index) # collateral: drop unrelated U
 			return false
 		"true_noop":
 			return true # lie: claims success without removing the target

@@ -7,13 +7,13 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Current Milestone: M20
 - Current Sprint: M20-C001 V03 — exact dependency / exact-state closure
 - Current Task: M20-C001-V03 — close residual trust-boundary and exact-state gaps
-- Current Task Status: IN_PROGRESS
-- Next Task/Action: implement V03, validate, write CLAUDE_LOG_V03.md, hand off AWAITING_AUDIT to ChatGPT
-- Required Actor: CLAUDE
+- Current Task Status: AWAITING_AUDIT
+- Next Task/Action: independent ChatGPT V03 audit against coordination/sessions/M20-C001/CLAUDE_LOG_V03.md + CHATGPT_AUDIT_CRITERIA_V03.md (real diff/code/tests), then publish CHATGPT_AUDIT_V03.md and either close the cycle or issue the next prompt version.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 290 / 719 = 40.33% (main+ui); overall 290 / 943 = 30.75%; lastCompletedTaskId M19-C001-V06.
-- Note: M20-C001 V02 implementation complete, AWAITING_AUDIT. Closes frozen F-M20-STRICT-001..007 (real bind transaction, serialized activation, lossless serial arrival queue, transactional reset, corrected renderer-after-finalize order, exact pre-state snapshot, verified postconditions + verified rollback with explicit ROLLBACK_FAILED). Minimal M19 reset() hardening: cancelled agents queue_free (safe when reset runs inside an arrival/emit stack) — no M19 identity change. Full headless suite 3501/3501 PASS on Godot 4.7.1.stable (V01 baseline 3386, +115); dedicated deferred-free smoke (tests/m20_queue_free_smoke.gd) PASS. Evidence: coordination/sessions/M20-C001/CLAUDE_LOG_V02.md. No SB-M20 row marked complete — audit closure belongs to ChatGPT.
+- Note: M20-C001 V03 implementation complete, AWAITING_AUDIT. Closes the residual trust-boundary/exact-state gaps: exact production-script identity for ALL canonical M20 collaborators (candidate/reservation no longer subclass-open) so no adversarial subclass can enter the bind trust boundary; exact reservation owner-map snapshot + exact resolve postcondition + exact rollback verify (count-only forbidden; collateral corruption now surfaces ROLLBACK_FAILED); current-arrival dedup. Rollback sensitivity moved to a test-only transaction harness (production bind unchanged). Only production file changed: scripts/gameplay/clearing/complete_clearing_loop.gd. Full headless suite 3533/3533 PASS on Godot 4.7.1.stable (V02 baseline 3501); dedicated deferred-free smoke (tests/m20_queue_free_smoke.gd) PASS. Evidence: coordination/sessions/M20-C001/CLAUDE_LOG_V03.md. No SB-M20 row marked complete — audit closure belongs to ChatGPT.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN

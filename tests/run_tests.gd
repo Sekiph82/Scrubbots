@@ -182,6 +182,10 @@ func _initialize() -> void:
 	_run_m20_v02_serial_arrival_tests()
 	_run_m20_v02_reachability_second_activation_tests()
 	_run_m20_v02_direct_observability_tests()
+	# M20-C001 V03 — exact dependency / exact-state closure.
+	_run_m20_v03_exact_reservation_state_tests()
+	_run_m20_v03_unrelated_truth_tests()
+	_run_m20_v03_current_arrival_dedup_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -8507,6 +8511,27 @@ func _m20_loop(w: Dictionary, slots) -> Object:
 	loop.bind(w["board"], slots, w["candidates"], w["reservations"], w["dispatcher"], w.get("renderer"))
 	return loop
 
+## Test-only M20 transaction harness (V03 §4). Production CompleteClearingLoop.bind()
+## now requires EXACT production script identity for candidate/reservation, so the
+## adversarial M20 candidate/reservation subclass seams can no longer enter the
+## real trust boundary. To keep the transaction rollback/serialization sensitivity
+## coverage, this helper wires the loop's internals directly (bypassing the bind
+## category gate) WITHOUT widening production bind — it never calls loop.bind(), so
+## the production trust boundary is unchanged. Only used with a bundle whose
+## candidate/reservation are the audited real classes or their test subclasses.
+func _m20_harness_bind(w: Dictionary, slots) -> Object:
+	var loop = CompleteClearingLoop.new()
+	loop._board = w["board"]
+	loop._slots = slots
+	loop._candidates = w["candidates"]
+	loop._reservations = w["reservations"]
+	loop._dispatcher = w["dispatcher"]
+	loop._renderer = w.get("renderer")
+	loop._arrival_cb = Callable(loop, "_on_assignment_arrived")
+	w["dispatcher"].assignment_arrived.connect(loop._arrival_cb)
+	loop._bound = true
+	return loop
+
 ## Run one full activate -> arrival -> clear cycle through the loop. Returns the
 ## DispatchResult. When the dispatch succeeds, drives the agent to arrival, which
 ## synchronously fires the authenticated arrival signal and the clear transaction.
@@ -8617,7 +8642,7 @@ func _run_m20_clear_transaction_tests() -> void:
 	var fci = M20FailingCandidate.new(); fci.bind(b2)
 	var w2 = _m20_full(b2, fci)
 	var slots2 = _m20_slots([c2, c2, c2, c2, c2])
-	var loop2 = _m20_loop(w2, slots2)
+	var loop2 = _m20_harness_bind(w2, slots2)
 	fci.fail_syncs = 1
 	var res2 = _m20_activate_and_arrive(loop2, 0, Vector2(-2.0, 10.5))
 	_check(res2.success, "rollback(candidate): activation dispatched")
@@ -8636,7 +8661,7 @@ func _run_m20_clear_transaction_tests() -> void:
 	var frs = M20FailingReservation.new(); frs.bind(b3)
 	var w3 = _m20_full(b3, null, frs)
 	var slots3 = _m20_slots([c3, c3, c3, c3, c3])
-	var loop3 = _m20_loop(w3, slots3)
+	var loop3 = _m20_harness_bind(w3, slots3)
 	frs.fail_resolves = 1
 	var res3 = _m20_activate_and_arrive(loop3, 0, Vector2(-2.0, 10.5))
 	_check(res3.success, "rollback(reservation): activation dispatched")
@@ -8897,52 +8922,68 @@ func _m20_conn_count(dispatcher) -> int:
 	return dispatcher.assignment_arrived.get_connections().size()
 
 func _run_m20_v02_bind_transaction_tests() -> void:
-	print("---- M20-C001 V02: bind transaction (F-M20-STRICT-001) ----")
-	# Nested bind injected from the candidate is_bound_to() coherence callback.
+	print("---- M20-C001 V03: exact-category bind trust boundary (F-M20-STRICT-001, §2/§9) ----")
+	# Exact production bundle binds; the exact ColorCandidateIndex and
+	# ReservationState are accepted.
 	var board = _m19_open_board_active(20, 20, [Vector2(10, 10)])
 	var color: int = board.get_color_id(board.get_cell_index(10, 10))
-	var seam = M20CandidateSeam.new(); seam.bind(board)
-	var w = _m20_full(board, seam)
+	var w = _m20_full(board)
 	var slots = _m20_slots([color, color, color, color, color])
 	var loop = CompleteClearingLoop.new()
-	var nested_ret := [true] # sentinel; nested bind must set false
-	seam.coherence_hook = func():
-		nested_ret[0] = loop.bind(board, slots, seam, w["reservations"], w["dispatcher"])
-	var ok: bool = loop.bind(board, slots, seam, w["reservations"], w["dispatcher"])
-	_check(ok, "bind-txn: outer bind commits once")
-	_check(not nested_ret[0], "bind-txn: nested bind from coherence callback rejected")
-	_check_eq(_m20_conn_count(w["dispatcher"]), 1, "bind-txn: exactly one arrival-signal connection (no ghost)")
+	_check(loop.bind(board, slots, w["candidates"], w["reservations"], w["dispatcher"]), "bind: exact ColorCandidateIndex + ReservationState accepted")
+	_check_eq(_m20_conn_count(w["dispatcher"]), 1, "bind: exact bundle connects exactly one arrival signal")
+	# Ordinary second bind preserves the original bundle.
+	_check(not loop.bind(board, slots, w["candidates"], w["reservations"], w["dispatcher"]), "bind: ordinary second bind refused, bundle preserved")
+	# Original exact bundle still works end-to-end.
+	var res = _m20_activate_and_arrive(loop, 0, Vector2(-2.0, 10.5))
+	_check(res.success and loop.get_cleared_count() == 1, "bind: original exact bundle clears an arrival")
 	loop = null
 	_m20_teardown(w)
 
-	# Callback-induced same-size foreign-board drift during bind -> fail closed, no
-	# ghost connection.
+	# Candidate SUBCLASS rejected before any callback use; no signal bound; unbound.
+	var bc = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var cc: int = bc.get_color_id(bc.get_cell_index(10, 10))
+	var wc = _m20_full(bc)
+	var slc = _m20_slots([cc, cc, cc, cc, cc])
+	var cand_sub = M20CandidateSeam.new(); cand_sub.bind(bc)
+	# Arm a coherence hook that WOULD spoof/rebind if it were ever called — proving
+	# rejection happens at the category gate, before is_bound_to() is invoked.
+	var coh_called := [false]
+	cand_sub.coherence_hook = func(): coh_called[0] = true
+	var lc = CompleteClearingLoop.new()
+	_check(not lc.bind(bc, slc, cand_sub, wc["reservations"], wc["dispatcher"]), "bind: candidate subclass rejected")
+	_check(not coh_called[0], "bind: candidate subclass rejected BEFORE any is_bound_to callback")
+	_check(not lc.is_bound(), "bind: loop unbound after rejected candidate subclass")
+	_check_eq(_m20_conn_count(wc["dispatcher"]), 0, "bind: rejected candidate subclass binds no arrival signal")
+	cand_sub.coherence_hook = Callable()
+	_m20_teardown(wc)
+
+	# Reservation SUBCLASS rejected before any callback use; no signal bound.
+	var br = _m19_open_board_active(20, 20, [Vector2(10, 10)])
+	var cr: int = br.get_color_id(br.get_cell_index(10, 10))
+	var wr = _m20_full(br)
+	var slr = _m20_slots([cr, cr, cr, cr, cr])
+	var res_sub = M20ReservationSeam.new(); res_sub.bind(br)
+	var lr = CompleteClearingLoop.new()
+	_check(not lr.bind(br, slr, wr["candidates"], res_sub, wr["dispatcher"]), "bind: reservation subclass rejected")
+	_check(not lr.is_bound(), "bind: loop unbound after rejected reservation subclass")
+	_check_eq(_m20_conn_count(wr["dispatcher"]), 0, "bind: rejected reservation subclass binds no arrival signal")
+	_m20_teardown(wr)
+
+	# Same-size DIFFERENT-board exact candidate/reservation cannot be committed
+	# (exact-identity coherence, not category alone).
 	var b2 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
 	var foreign = _m19_open_board_active(20, 20, [Vector2(5, 5)])
 	var c2: int = b2.get_color_id(b2.get_cell_index(10, 10))
-	var seam2 = M20CandidateSeam.new(); seam2.bind(b2)
-	var w2 = _m20_full(b2, seam2)
-	var slots2 = _m20_slots([c2, c2, c2, c2, c2])
-	var loop2 = CompleteClearingLoop.new()
-	seam2.coherence_hook = func(): seam2.rebind(foreign) # drift to a same-size foreign board
-	var ok2: bool = loop2.bind(b2, slots2, seam2, w2["reservations"], w2["dispatcher"])
-	_check(not ok2, "bind-txn: callback-induced foreign-board drift rejected")
-	_check(not loop2.is_bound(), "bind-txn: loop left unbound after drift")
-	_check_eq(_m20_conn_count(w2["dispatcher"]), 0, "bind-txn: no ghost connection after failed bind")
-	seam2.coherence_hook = Callable()
-	seam2.rebind(b2)
-	loop2 = null
+	var w2 = _m20_full(b2)
+	var sl2 = _m20_slots([c2, c2, c2, c2, c2])
+	var stray_ci = ColorCandidateIndex.create(); stray_ci.bind(foreign) # exact class, foreign board
+	_check(not CompleteClearingLoop.new().bind(b2, sl2, stray_ci, w2["reservations"], w2["dispatcher"]), "bind: exact candidate bound to a different board rejected")
+	var stray_rs = ReservationState.new(); stray_rs.bind(foreign)
+	_check(not CompleteClearingLoop.new().bind(b2, sl2, w2["candidates"], stray_rs, w2["dispatcher"]), "bind: exact reservation bound to a different board rejected")
+	# Non-exact board (a Node) rejected.
+	_check(not CompleteClearingLoop.new().bind(w2["dispatcher"], sl2, w2["candidates"], w2["reservations"], w2["dispatcher"]), "bind: non-exact board script rejected")
 	_m20_teardown(w2)
-
-	# Exact production-script identity: a Node method-compatible board is rejected.
-	var b3 = _m19_open_board_active(20, 20, [Vector2(10, 10)])
-	var c3: int = b3.get_color_id(b3.get_cell_index(10, 10))
-	var w3 = _m20_full(b3)
-	var slots3 = _m20_slots([c3, c3, c3, c3, c3])
-	# The dispatcher is a Node; passing it where a BoardState is required must fail
-	# the exact-script gate.
-	_check(not CompleteClearingLoop.new().bind(w3["dispatcher"], slots3, w3["candidates"], w3["reservations"], w3["dispatcher"]), "bind-txn: non-exact board script rejected")
-	_m20_teardown(w3)
 
 func _run_m20_v02_activation_serialization_tests() -> void:
 	print("---- M20-C001 V02: activation serialization (F-M20-STRICT-002) ----")
@@ -8951,7 +8992,7 @@ func _run_m20_v02_activation_serialization_tests() -> void:
 	var seam = M20CandidateSeam.new(); seam.bind(board)
 	var w = _m20_full(board, seam)
 	var slots = _m20_slots([color, color, color, color, color])
-	var loop = _m20_loop(w, slots)
+	var loop = _m20_harness_bind(w, slots)
 
 	# Nested activation injected from the activation live-coherence callback.
 	var nested_reason := [&""]
@@ -9040,7 +9081,7 @@ func _run_m20_v02_mutation_rollback_tests() -> void:
 			var seam = M20ReservationSeam.new(); seam.bind(board)
 			w = _m20_full(board, null, seam, true)
 		var slots = _m20_slots([color, color, color, color, color])
-		var loop = _m20_loop(w, slots)
+		var loop = _m20_harness_bind(w, slots)
 		var pos: Vector2i = board.get_cell_position(t)
 		source_px = w["renderer"].get_pixel_color(pos.x, pos.y)
 		# Arm the adversarial mode AFTER a clean activation dispatch.
@@ -9075,7 +9116,7 @@ func _run_m20_v02_mutation_rollback_tests() -> void:
 	var cc: int = b.get_color_id(tt)
 	var cseam = M20CandidateSeam.new(); cseam.bind(b)
 	var w2 = _m20_full(b, cseam, null, false)
-	var l2 = _m20_loop(w2, _m20_slots([cc, cc, cc, cc, cc]))
+	var l2 = _m20_harness_bind(w2, _m20_slots([cc, cc, cc, cc, cc]))
 	var r2 = l2.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
 	cseam.mode = "neutralize_false"
 	_m19_drive_to_arrival(r2.agent)
@@ -9094,7 +9135,7 @@ func _run_m20_v02_reset_during_arrival_tests() -> void:
 	var color: int = board.get_color_id(t)
 	var seam = M20CandidateSeam.new(); seam.bind(board)
 	var w = _m20_full(board, seam)
-	var loop = _m20_loop(w, _m20_slots([color, color, color, color, color]))
+	var loop = _m20_harness_bind(w, _m20_slots([color, color, color, color, color]))
 	var res = loop.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
 	seam.sync_hook = func(_idx): loop.reset()
 	_m19_drive_to_arrival(res.agent)
@@ -9116,7 +9157,7 @@ func _run_m20_v02_reset_during_arrival_tests() -> void:
 	var c2: int = b2.get_color_id(t2)
 	var rseam = M20ReservationSeam.new(); rseam.bind(b2)
 	var w2 = _m20_full(b2, null, rseam)
-	var loop2 = _m20_loop(w2, _m20_slots([c2, c2, c2, c2, c2]))
+	var loop2 = _m20_harness_bind(w2, _m20_slots([c2, c2, c2, c2, c2]))
 	var res2 = loop2.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
 	rseam.resolve_hook = func(_t, _o): loop2.reset()
 	_m19_drive_to_arrival(res2.agent)
@@ -9138,7 +9179,7 @@ func _run_m20_v02_serial_arrival_tests() -> void:
 	var color: int = board.get_color_id(tA)
 	var seam = M20CandidateSeam.new(); seam.bind(board)
 	var w = _m20_full(board, seam)
-	var loop = _m20_loop(w, _m20_slots([color, color, color, color, color]))
+	var loop = _m20_harness_bind(w, _m20_slots([color, color, color, color, color]))
 	var resA = loop.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
 	var resB = loop.activate_slot(1, Vector2(22.0, 10.5), 6.0)
 	_check(resA.success and resB.success and resA.target_index != resB.target_index, "serial: two distinct in-flight assignments")
@@ -9282,3 +9323,144 @@ func _run_m20_v02_direct_observability_tests() -> void:
 	var r3b = _m20_activate_and_arrive(l3, 0, Vector2(-2.0, 10.5))
 	_check(r3b.success and l3.get_cleared_count() == 1, "recovery: later normal activation works")
 	l3 = null; _m20_teardown(w3)
+
+# ===================================== M20-C001 V03 exact dependency / state ===
+# Exact-category trust boundary is proven in _run_m20_v02_bind_transaction_tests
+# (rewritten for V03). Here: exact reservation snapshot/postcondition/rollback
+# (owner-map, not count-only), unrelated candidate-truth preservation with the
+# single-cell healthy path intact, and current-arrival dedup. Rollback sensitivity
+# uses the test-only _m20_harness_bind (never widens production bind categories).
+
+func _run_m20_v03_exact_reservation_state_tests() -> void:
+	print("---- M20-C001 V03: exact reservation snapshot/postcondition/rollback (§5/§6) ----")
+	# Happy path with EXACT deps: an unrelated reservation keeps its exact owner
+	# across a clear (owner-map postcondition, not count-only).
+	var board = _m19_open_board_active(20, 20, [Vector2(8, 10), Vector2(10, 10)])
+	var tT: int = board.get_cell_index(8, 10)
+	var tU: int = board.get_cell_index(10, 10)
+	var color: int = board.get_color_id(tT)
+	var w = _m20_full(board)
+	var loop = _m20_loop(w, _m20_slots([color, color, color, color, color]))
+	var rT = loop.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
+	var rU = loop.activate_slot(1, Vector2(22.0, 10.5), 6.0)
+	_check(rT.success and rU.success and rT.target_index == tT and rU.target_index == tU, "exact-res: two distinct reservations (T,U)")
+	_m19_drive_to_arrival(rT.agent)
+	_check_eq(loop.get_last_outcome(), CompleteClearingLoop.Outcome.CLEARED, "exact-res: T cleared")
+	# Owner-map exactness: reserved set is exactly {U}, U keeps its exact owner.
+	var reserved = w["reservations"].get_reserved_indices()
+	_check_eq(reserved.size(), 1, "exact-res: exactly one reservation remains")
+	_check(reserved.has(tU), "exact-res: the remaining reservation is exactly U")
+	_check_eq(w["reservations"].get_owner(tU), rU.owner_id, "exact-res: U keeps its exact owner")
+	_check_eq(w["reservations"].get_owner(tT), -1, "exact-res: T reservation resolved")
+	loop = null
+	_m20_teardown(w)
+
+	# Reservation identity-swap mutate-false: the fault does the real current
+	# resolve, then drops an unrelated pair U and re-reserves ownerU on V, then
+	# returns false. V02's count-only rollback verify would report ordinary
+	# RESERVATION_ROLLBACK; V03's exact owner-map verify detects the collateral
+	# corruption and surfaces ROLLBACK_FAILED. (Test-only harness — the seam is a
+	# production-rejected subclass.)
+	var b2 = _m19_open_board_active(20, 20, [Vector2(8, 10), Vector2(10, 10), Vector2(12, 10)])
+	var t2T: int = b2.get_cell_index(8, 10)
+	var t2U: int = b2.get_cell_index(10, 10)
+	var t2V: int = b2.get_cell_index(12, 10)
+	var c2: int = b2.get_color_id(t2T)
+	var rseam = M20ReservationSeam.new(); rseam.bind(b2)
+	var w2 = _m20_full(b2, null, rseam)
+	var l2 = _m20_harness_bind(w2, _m20_slots([c2, c2, c2, c2, c2]))
+	var r2T = l2.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
+	var r2U = l2.activate_slot(1, Vector2(22.0, 10.5), 6.0)
+	_check(r2T.success and r2U.success and r2T.target_index == t2T and r2U.target_index == t2U, "identity-swap: T,U reserved; V free")
+	rseam.mode = "identity_swap"
+	rseam.swap_from_owner = r2U.owner_id
+	rseam.swap_from_target = t2U
+	rseam.swap_to_target = t2V
+	_m19_drive_to_arrival(r2T.agent)
+	_check_eq(l2.get_last_outcome(), CompleteClearingLoop.Outcome.ROLLBACK_FAILED, "identity-swap: exact owner-map verify surfaces ROLLBACK_FAILED (not ordinary rollback)")
+	_check_eq(b2.get_cell_state(t2T), BoardState.CellState.ACTIVE, "identity-swap: T BoardState rolled back to ACTIVE")
+	_check_eq(l2.get_cleared_count(), 0, "identity-swap: nothing counted as cleared")
+	rseam.mode = "normal"
+	l2 = null
+	_m20_teardown(w2)
+
+func _run_m20_v03_unrelated_truth_tests() -> void:
+	print("---- M20-C001 V03: unrelated candidate truth + single-cell path (§7) ----")
+	# EXACT-deps normal clear: two same-color candidates (T,U) + a different-color
+	# candidate W. Clearing T removes only T; U and W buckets are unchanged.
+	var board = _m19_open_board_active(20, 20, [Vector2(8, 10), Vector2(10, 10), Vector2(8, 12)])
+	var tT: int = board.get_cell_index(8, 10)
+	var tU: int = board.get_cell_index(10, 10)  # same color as T (same row)
+	var tW: int = board.get_cell_index(8, 12)   # different row -> different color
+	var colT: int = board.get_color_id(tT)
+	var colW: int = board.get_color_id(tW)
+	_check(colT != colW, "unrelated: T and W are different colors")
+	var w = _m20_full(board)
+	var loop = _m20_loop(w, _m20_slots([colT, colT, colT, colT, colT]))
+	_check(w["candidates"].get_candidates(colT, null).has(tT) and w["candidates"].get_candidates(colT, null).has(tU), "unrelated: two same-color candidates exist before clear")
+	var w_before: Array = w["candidates"].get_candidates(colW, null)
+	var rT = _m20_activate_and_arrive(loop, 0, Vector2(-2.0, 10.5))
+	_check(rT.success and rT.target_index == tT, "unrelated: T cleared")
+	_check(not w["candidates"].get_candidates(colT, null).has(tT), "unrelated: T removed from candidates")
+	_check(w["candidates"].get_candidates(colT, null).has(tU), "unrelated: same-color U still a candidate")
+	_check_eq(w["candidates"].get_candidates(colW, null), w_before, "unrelated: other-color bucket unchanged")
+	loop = null
+	_m20_teardown(w)
+
+	# Candidate unrelated-loss mutate-false (harness): fault removes T AND unrelated
+	# same-color U then returns false; the verified rollback restores BOTH T and U.
+	var b2 = _m19_open_board_active(20, 20, [Vector2(8, 10), Vector2(10, 10)])
+	var t2T: int = b2.get_cell_index(8, 10)
+	var t2U: int = b2.get_cell_index(10, 10)
+	var col2: int = b2.get_color_id(t2T)
+	var cseam = M20CandidateSeam.new(); cseam.bind(b2)
+	var w2 = _m20_full(b2, cseam)
+	var l2 = _m20_harness_bind(w2, _m20_slots([col2, col2, col2, col2, col2]))
+	var r2 = l2.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
+	cseam.mode = "unrelated_loss"
+	cseam.loss_color = col2
+	cseam.loss_index = t2U
+	_m19_drive_to_arrival(r2.agent)
+	_check_eq(l2.get_last_outcome(), CompleteClearingLoop.Outcome.CANDIDATE_ROLLBACK, "unrelated-loss: verified CANDIDATE_ROLLBACK")
+	_check_eq(b2.get_cell_state(t2T), BoardState.CellState.ACTIVE, "unrelated-loss: T back ACTIVE")
+	cseam.mode = "normal"
+	_check(w2["candidates"].get_candidates(col2, null).has(t2T), "unrelated-loss: T candidate restored")
+	_check(w2["candidates"].get_candidates(col2, null).has(t2U), "unrelated-loss: unrelated U candidate restored")
+	l2 = null
+	_m20_teardown(w2)
+
+	# 59x59 normal clear remains a single-cell sync (no M20 board scan): one clear
+	# succeeds and only the target cell changes state.
+	var big = _m19_open_board_active(59, 59, [Vector2(30, 30)])
+	var tb: int = big.get_cell_index(30, 30)
+	var cb: int = big.get_color_id(tb)
+	var wb = _m20_full(big)
+	var lb = _m20_loop(wb, _m20_slots([cb, cb, cb, cb, cb]))
+	var cleared_before: int = big.count_cells_by_state(BoardState.CellState.CLEARED)
+	var rb = _m20_activate_and_arrive(lb, 0, Vector2(-2.0, 30.5))
+	_check(rb.success and lb.get_cleared_count() == 1, "59x59: single clear succeeds")
+	_check_eq(big.count_cells_by_state(BoardState.CellState.CLEARED), cleared_before + 1, "59x59: exactly one cell changed (single-cell path)")
+	lb = null
+	_m20_teardown(wb)
+
+func _run_m20_v03_current_arrival_dedup_tests() -> void:
+	print("---- M20-C001 V03: current-arrival dedup (§8) ----")
+	# During A's transaction, inject a DUPLICATE of A (same owner+agent). It must be
+	# dropped, not re-queued or re-processed. A distinct arrival still queues FIFO
+	# (covered by _run_m20_v02_serial_arrival_tests).
+	var board = _m19_open_board_active(20, 20, [Vector2(8, 10)])
+	var tA: int = board.get_cell_index(8, 10)
+	var color: int = board.get_color_id(tA)
+	var seam = M20CandidateSeam.new(); seam.bind(board)
+	var w = _m20_full(board, seam)
+	var loop = _m20_harness_bind(w, _m20_slots([color, color, color, color, color]))
+	var resA = loop.activate_slot(0, Vector2(-2.0, 10.5), 6.0)
+	# Re-inject A's own authenticated tuple mid-transaction: dedup must drop it.
+	seam.sync_hook = func(_idx): loop._on_assignment_arrived(resA.owner_id, tA, color, resA.agent)
+	_m19_drive_to_arrival(resA.agent)
+	_check_eq(loop.get_cleared_count(), 1, "dedup: duplicate current arrival dropped (A cleared exactly once)")
+	_check_eq(board.get_cell_state(tA), BoardState.CellState.CLEARED, "dedup: A cleared")
+	_check_eq(w["dispatcher"].get_active_count(), 0, "dedup: no lingering active entry")
+	seam.sync_hook = Callable()
+	loop = null
+	_m20_teardown(w)
