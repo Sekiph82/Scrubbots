@@ -1,0 +1,18 @@
+{
+  "file": "scrubbots_m21_level_001_hazard_bot_20x20.png",
+  "repository_target_path": "assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png",
+  "width": 20,
+  "height": 20,
+  "logical_cell_count": 400,
+  "difficulty_candidate": "EASY",
+  "used_canonical_color_ids": ["C01", "C03", "C08", "C11", "C16"],
+  "distinct_canonical_colors": 5,
+  "color_counts": {"C01": 30, "C03": 5, "C08": 298, "C11": 11, "C16": 56},
+  "alpha_values": [255],
+  "off_palette_pixels": 0,
+  "transparent_source_pixels_replaced_with": "C08",
+  "transparent_source_pixels_replaced_count": 290,
+  "anti_aliasing_introduced_by_conversion": false,
+  "owner_approved": true,
+  "production_ready_for_m21_artwork_gate": true
+}
