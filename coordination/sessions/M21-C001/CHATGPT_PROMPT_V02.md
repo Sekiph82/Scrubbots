@@ -24,6 +24,22 @@ Read, in this order:
 
 Treat V01 findings F-M21-STRICT-001..004 as the **frozen correction set**. Do not expand into unrelated refactoring.
 
+### Mandatory tracker-only start transition
+
+Before editing implementation/tests/evidence, update **only** root `TASKS.md` Project Status to the truthful active state below, commit that file alone, and push it to `origin/main`:
+
+- Current Milestone: M21
+- Current Sprint: M21-C001 V02 — frozen builder corrections + adversarial validation
+- Current Task: M21-C001-V02
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: execute `coordination/sessions/M21-C001/CHATGPT_PROMPT_V02.md` and satisfy `CHATGPT_AUDIT_CRITERIA_V02.md`, then hand back for independent audit.
+- Required Actor: CLAUDE
+- Progress unchanged: 304/719 main+ui and 304/943 overall
+- lastCompletedTaskId remains M20-C001-V11
+- Note that V01 independent audit is `CHANGES_REQUIRED / FINDING_SET_FROZEN`, F-M21-STRICT-001..004 are open, V02 is active, and no M21/UI task row is closed.
+
+Do not stage any implementation file or owner/local work in that tracker-only start commit. Record its full SHA in `CLAUDE_LOG_V02.md`.
+
 ## 1. Scope protection
 
 This is still M21, not the project-wide Difficulty V1 implementation.
@@ -171,6 +187,7 @@ Create `coordination/sessions/M21-C001/CLAUDE_LOG_V02.md` containing:
 
 - synchronized starting commit;
 - all preserved owner/local work relevant to safe sync;
+- tracker-only start commit full SHA;
 - exact changed files;
 - F-M21-STRICT-001..004 closure table;
 - V02 adversarial scenario/evidence table;
