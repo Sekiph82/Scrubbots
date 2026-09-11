@@ -1,0 +1,89 @@
+{
+  "schema": "scrubbots-difficulty-score-model/v1",
+  "version": 1,
+  "ownerLockedAt": "2026-09-12",
+  "challengeScore": {
+    "range": [0.0, 100.0],
+    "weights": {
+      "workload": 0.10,
+      "colorComplexity": 0.15,
+      "accessibilityScarcity": 0.20,
+      "unlockDepth": 0.20,
+      "bottleneckPressure": 0.15,
+      "routeComplexity": 0.10,
+      "slotColorPressure": 0.10
+    },
+    "formula": "100*(0.10*W+0.15*C+0.20*A+0.20*U+0.15*B+0.10*R+0.10*S)"
+  },
+  "workload": {
+    "cellTransform": "sqrt",
+    "referenceMinCells": 400,
+    "referenceMaxCells": 2400,
+    "clamp": true,
+    "note": "Cell workload is compressed so board size cannot dominate Challenge Score; heavy large boards are primarily controlled by Session Load."
+  },
+  "colorComplexity": {
+    "countWeight": 0.50,
+    "entropyWeight": 0.50,
+    "countNormalization": {"minDistinct": 3, "maxDistinct": 12}
+  },
+  "accessibilityScarcity": {
+    "definition": "1 - reachable_matching_candidates/raw_matching_active_candidates",
+    "earlyMidProgressWeighting": true,
+    "priorityProgressFraction": 0.60
+  },
+  "unlockDepth": {
+    "p95Weight": 0.55,
+    "meanWeight": 0.30,
+    "initiallyLockedFractionWeight": 0.15,
+    "normalization": "versioned_reference_distribution"
+  },
+  "bottleneckPressure": {
+    "lowChoiceFractionWeight": 0.35,
+    "forcedFractionWeight": 0.40,
+    "forcedStreakWeight": 0.25,
+    "lowChoiceThreshold": 2
+  },
+  "routeComplexity": {
+    "averageRouteLengthWeight": 0.45,
+    "averageDetourWeight": 0.35,
+    "averageTurnWeight": 0.20,
+    "usesCanonicalProductionRouting": true
+  },
+  "slotColorPressure": {
+    "noWorkSlotFractionWeight": 0.40,
+    "singleProductiveSlotFractionWeight": 0.35,
+    "colorDemandImbalanceWeight": 0.25,
+    "mustNotInventQueueOrCooldownMechanics": true
+  },
+  "sessionLoad": {
+    "range": [0.0, 100.0],
+    "weights": {
+      "actions": 0.50,
+      "routeTime": 0.30,
+      "decisionCount": 0.20
+    },
+    "formula": "100*(0.50*actionsNorm+0.30*routeTimeNorm+0.20*decisionCountNorm)",
+    "estimatedAttemptSecondsStatusBeforeCalibration": "PROXY"
+  },
+  "frustrationRisk": {
+    "range": [0.0, 100.0],
+    "weights": {
+      "retryRisk": 0.35,
+      "sessionOverrun": 0.30,
+      "lateFailure": 0.20,
+      "choiceOpacity": 0.15
+    },
+    "formula": "100*(0.35*retryRisk+0.30*sessionOverrun+0.20*lateFailure+0.15*choiceOpacity)",
+    "provisionalUntilHumanPolicyAndPlaytestCalibration": true
+  },
+  "challengeVectorOrder": ["W", "C", "A", "U", "B", "R", "S"],
+  "modelRules": {
+    "allSubmetricsClamped01": true,
+    "coefficientsVersioned": true,
+    "publishedLevelStoresModelVersion": true,
+    "noSilentCoefficientChange": true,
+    "challengeNotEquivalentToSessionLoad": true,
+    "challengeNotEquivalentToFrustration": true
+  }
+}
