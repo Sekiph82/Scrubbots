@@ -6,8 +6,9 @@ extends SceneTree
 ## builds a full REAL production gameplay bundle (no M20 fault seams), and runs the
 ## whole 400-cell "Hazard Bot" board to completion through the real
 ## CompleteClearingLoop, then proves the exact final state, renderer transparency,
-## and no-orphan cleanup after frames. It also writes a headless evidence composite
-## (NOT a device screenshot) and records CPU/headless timing.
+## and no-orphan cleanup after frames, and records CPU/headless timing. The
+## reference composite is generated separately by
+## res://tools/build_m21_reference_composite.gd (F-M21-STRICT-004).
 ##
 ## Automation here is TEST/DEBUG orchestration only — it adds no autoplay, refill,
 ## queue, cooldown, scoring, or progression to production gameplay.
@@ -31,7 +32,6 @@ const CompleteClearingLoop = preload("res://scripts/gameplay/clearing/complete_c
 
 const LEVEL_PATH := "res://data/levels/m21_level_001_hazard_bot.json"
 const SOURCE_PATH := "res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png"
-const COMPOSITE_OUT := "res://coordination/sessions/M21-C001/M21_REFERENCE_COMPOSITE.png"
 const BG01 := Color8(32, 37, 51, 255)
 const EXPECTED_COUNTS := {0: 30, 1: 5, 2: 298, 3: 11, 4: 56}  # local index -> count
 
@@ -79,8 +79,6 @@ func _initialize() -> void:
 			if renderer.get_pixel_color(x, y) != src.get_pixel(x, y):
 				_done(false, "initial renderer mismatch at %d,%d" % [x, y]); return
 
-	var initial_snapshot := _composite_over_bg(renderer, w, h)
-
 	# --- full real-art run -------------------------------------------------
 	var cheap: Array = [Vector2(-1.5, h * 0.5), Vector2(w + 1.5, h * 0.5),
 		Vector2(w * 0.5, -1.5), Vector2(w * 0.5, h + 1.5),
@@ -92,7 +90,6 @@ func _initialize() -> void:
 		full.append(Vector2(float(x) + 0.5, -1.5)); full.append(Vector2(float(x) + 0.5, h + 1.5))
 	var slot_order := [2, 0, 1, 3, 4]  # C08 (perimeter/frame) first
 	var colors_cleared := {}
-	var mid_snapshot: Image = null
 
 	var t0 := Time.get_ticks_usec()
 	var cleared := 0
@@ -105,8 +102,6 @@ func _initialize() -> void:
 		if idx == -1:
 			_done(false, "deadlock at cleared=%d (active=%d)" % [cleared, board.count_cells_by_state(BoardState.CellState.ACTIVE)]); return
 		cleared += 1
-		if cleared == 200:
-			mid_snapshot = _composite_over_bg(renderer, w, h)
 	var elapsed_s := float(Time.get_ticks_usec() - t0) / 1000000.0
 
 	# --- exact final assertions -------------------------------------------
@@ -147,10 +142,9 @@ func _initialize() -> void:
 	if dispatcher.get_child_count() != 0:
 		_done(false, "dispatcher child count=%d after frames" % dispatcher.get_child_count()); return
 
-	# --- headless evidence composite (NOT a device screenshot) -------------
-	var final_snapshot := _composite_over_bg(renderer, w, h)
-	_write_composite(initial_snapshot, mid_snapshot, final_snapshot, w, h)
-
+	# NOTE: the reference composite is produced by the dedicated reproducible
+	# generator res://tools/build_m21_reference_composite.gd (F-M21-STRICT-004), not
+	# by this smoke, so there is a single deterministic source of that evidence.
 	print("M21 real-art smoke: clears=%d elapsed_cpu_s=%.3f guard_iters=%d colors_cleared=%d" % [
 		cleared, elapsed_s, guard, colors_cleared.size()])
 	print("M21 headless-timing note: %.3fs is CPU/headless wall time, NOT a mobile FPS/GPU claim (AL-003)." % elapsed_s)
@@ -169,43 +163,6 @@ func _try_round(loop, slot_order, origins, board, colors_cleared) -> int:
 				colors_cleared[color] = true
 				return r.target_index
 	return -1
-
-## Composite the current renderer image over an opaque BG01 ground (so CLEARED
-## alpha-0 cells read as BG01 and ACTIVE cells keep their color). Returns RGBA8.
-func _composite_over_bg(renderer, w: int, h: int) -> Image:
-	var img := Image.create(w, h, false, Image.FORMAT_RGBA8)
-	for y in h:
-		for x in w:
-			var c: Color = renderer.get_pixel_color(x, y)
-			if c.a <= 0.0:
-				img.set_pixel(x, y, BG01)
-			else:
-				img.set_pixel(x, y, c)
-	return img
-
-func _write_composite(initial: Image, mid: Image, final: Image, w: int, h: int) -> void:
-	if mid == null:
-		mid = final
-	var scale := 8
-	var gap := 4
-	var pw := w * scale
-	var ph := h * scale
-	var total_w := pw * 3 + gap * 2
-	var out := Image.create(total_w, ph, false, Image.FORMAT_RGBA8)
-	out.fill(BG01)
-	_blit_scaled(out, initial, 0, scale, w, h)
-	_blit_scaled(out, mid, pw + gap, scale, w, h)
-	_blit_scaled(out, final, (pw + gap) * 2, scale, w, h)
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://coordination/sessions/M21-C001"))
-	out.save_png(COMPOSITE_OUT)
-
-func _blit_scaled(dst: Image, srcimg: Image, x_off: int, scale: int, w: int, h: int) -> void:
-	for y in h:
-		for x in w:
-			var c: Color = srcimg.get_pixel(x, y)
-			for dy in scale:
-				for dx in scale:
-					dst.set_pixel(x_off + x * scale + dx, y * scale + dy, c)
 
 func _done(success: bool, msg: String) -> void:
 	print("M21 real-art smoke: %s — %s" % ["PASS" if success else "FAIL", msg])

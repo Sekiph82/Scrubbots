@@ -132,12 +132,39 @@ static func load_palette_authority():
 ## reading the palette authority. Never mutates `raw`.
 static func normalize_from_level_data(raw, difficulty: String) -> NormalizeResult:
 	var result := NormalizeResult.new()
+
+	# --- F-M21-STRICT-002: validate the exact/narrow LevelData contract BEFORE any
+	# field dereference. Arbitrary Variants (null, int, String, Vector2/2i, an
+	# unrelated Object/RefCounted, or a partial/malformed object) must fail closed
+	# with a normal NormalizeResult error — never a SCRIPT ERROR / Parse Error, file
+	# write, or source mutation. Exact-script identity, not widened duck typing
+	# (AL-052/AL-053). ---
+	if not _is_exact_level_data(raw):
+		result.add_error("raw must be an exact LevelData instance (got %s)" % _describe_variant(raw))
+		return result
+
 	var auth = load_palette_authority()
 	if auth == null:
 		result.add_error("Could not load palette authority %s" % PALETTE_AUTHORITY_PATH)
 		return result
-	if raw == null:
-		result.add_error("raw LevelData is null")
+
+	# --- F-M21-STRICT-001: ONE coherent difficulty identity. The explicit
+	# compatibility difficulty MUST equal raw.difficulty, and it must be an
+	# installed production difficulty (TEST/unknown/empty rejected). This prevents
+	# validating one difficulty while emitting another, and never skips production
+	# validation for a successful production result. This is an M21 legacy
+	# compatibility gate, NOT Difficulty V1 design law. ---
+	if typeof(difficulty) != TYPE_STRING or difficulty.is_empty():
+		result.add_error("difficulty argument must be a non-empty string")
+		return result
+	if difficulty != raw.difficulty:
+		result.add_error("difficulty argument '%s' must equal raw.difficulty '%s'" % [difficulty, raw.difficulty])
+		return result
+	if difficulty == DifficultyRules.TEST_DIFFICULTY:
+		result.add_error("TEST is a development fixture difficulty and is not valid production-art output")
+		return result
+	if not DifficultyRules.is_production_difficulty(difficulty):
+		result.add_error("Unknown production difficulty '%s'" % difficulty)
 		return result
 
 	var rgb_to_cid: Dictionary = auth["rgb_to_cid"]
@@ -262,6 +289,20 @@ static func build(source_path: String, level_id: String, display_name: String,
 		result.add_error(alias)
 		return result
 
+	# --- F-M21-STRICT-003: deterministic destination preflight for EVERY enabled
+	# final artifact BEFORE any write. Rejects a directory at a final path (even
+	# overwrite=true), a missing parent directory, and a non-directory parent — so a
+	# predictable later-artifact failure can never occur after an earlier artifact
+	# has already been written (no known partial commit). Existing-different-content
+	# conflicts are handled by the per-artifact write plans below (also pre-write).
+	for dest in [output_path, preview_path, metadata_path]:
+		if String(dest).is_empty():
+			continue
+		var derr := _preflight_destination(dest, overwrite)
+		if not derr.is_empty():
+			result.add_error(derr)
+			return result
+
 	# --- reuse the audited generic importer (dry_run: extract, do not write) ---
 	# dry_run guarantees no write; overwrite=true keeps the importer's own output
 	# preflight from comparing its FIRST-SEEN serialization against our already-
@@ -339,6 +380,18 @@ static func build(source_path: String, level_id: String, display_name: String,
 
 # ----------------------------------------------------------------- helpers ----
 
+## Exact LevelData identity: a valid Object whose script is exactly LevelData.
+## Rejects null/int/String/Vector*/other Object/partial-shape without dereference.
+static func _is_exact_level_data(v) -> bool:
+	return typeof(v) == TYPE_OBJECT and is_instance_valid(v) and v.get_script() == LevelData
+
+## Short, dereference-free description of an arbitrary Variant for error messages.
+static func _describe_variant(v) -> String:
+	var t := typeof(v)
+	if t == TYPE_OBJECT and is_instance_valid(v):
+		return "Object"
+	return "type %d" % t
+
 ## Parse "#RRGGBB" or "#RRGGBBAA" -> [r,g,b,a] ints, or null if malformed.
 static func _parse_hex_rgba(hex: String):
 	if typeof(hex) != TYPE_STRING or not hex.begins_with("#"):
@@ -379,6 +432,23 @@ static func _validate_canonical_palette(palette: PackedStringArray, auth) -> Str
 		last_index = gidx
 	return ""
 
+## Deterministic single-destination filesystem preflight. Empty string == OK.
+## Rejects: an existing directory at the final path (even overwrite=true), a
+## missing parent directory, and a parent that exists but is a file. Uses the
+## globalized real path (never mutates anything).
+static func _preflight_destination(path: String, _overwrite: bool) -> String:
+	var real := ProjectSettings.globalize_path(path.replace("\\", "/")).simplify_path()
+	if DirAccess.dir_exists_absolute(real):
+		return "Destination '%s' is an existing directory" % path
+	var parent := real.get_base_dir()
+	if parent.is_empty():
+		return "Destination '%s' has no resolvable parent directory" % path
+	if not DirAccess.dir_exists_absolute(parent):
+		if FileAccess.file_exists(parent):
+			return "Destination parent '%s' is a file, not a directory (for '%s')" % [parent, path]
+		return "Destination parent directory '%s' does not exist (for '%s')" % [parent, path]
+	return ""
+
 static func _check_aliases(source: String, dests: Array) -> String:
 	var src := _canon(source)
 	var seen := {}
@@ -406,7 +476,10 @@ static func _canon(p: String) -> String:
 		r = r.to_lower()
 	return r
 
-## "write" | "unchanged" | "error"
+## "write" | "unchanged" | "error". Content comparison is line-ending-insensitive
+## so a CRLF checkout (git autocrlf) of an LF-authored artifact is still detected
+## as UNCHANGED — the builder always writes LF, and git stores LF, so this only
+## normalizes the working-copy checkout convention, never a real content diff.
 static func _plan_text(path: String, text: String, overwrite: bool) -> String:
 	if path.is_empty():
 		return "unchanged"
@@ -414,7 +487,8 @@ static func _plan_text(path: String, text: String, overwrite: bool) -> String:
 		return "write"
 	if overwrite:
 		return "write"
-	return "unchanged" if FileAccess.get_file_as_string(path) == text else "error"
+	var existing := FileAccess.get_file_as_string(path)
+	return "unchanged" if existing.replace("\r\n", "\n") == text.replace("\r\n", "\n") else "error"
 
 static func _plan_image(path: String, img: Image, overwrite: bool) -> String:
 	if path.is_empty():

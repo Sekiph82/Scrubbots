@@ -221,6 +221,11 @@ func _initialize() -> void:
 	_run_m21_artifact_roundtrip_tests()
 	_run_m21_real_art_reachability_tests()
 	_run_m21_debug_scene_smoke()
+	# M21-C001 V02 — frozen builder corrections + adversarial validation.
+	_run_m21_v02_difficulty_identity_tests()
+	_run_m21_v02_malformed_raw_tests()
+	_run_m21_v02_destination_preflight_tests()
+	_run_m21_v02_adversarial_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -12496,3 +12501,220 @@ func _run_m21_debug_scene_smoke() -> void:
 			inst._active_agent.advance(1.0)
 		_check_eq(inst._loop.get_cleared_count(), 1, "M21 debug scene: one real ACTIVE->CLEARED clear via production path")
 	inst.free()
+
+# ============================================================================
+# M21-C001 V02 — frozen builder corrections + adversarial validation
+# ============================================================================
+
+func _m21_err_has(res, needle: String) -> bool:
+	for e in res.errors:
+		if String(e).findn(needle) != -1:
+			return true
+	return false
+
+## F-M21-STRICT-001: one difficulty identity at the normalization boundary.
+func _run_m21_v02_difficulty_identity_tests() -> void:
+	print("---- M21-C001 V02: F-001 one difficulty identity ----")
+	# Control: the real EASY source still normalizes to canonical order (crit 28).
+	var raw = _m21_raw_import()
+	var ok := ProductionArtLevelBuilder.normalize_from_level_data(raw, "EASY")
+	_check(ok.is_ok(), "V02 F-001: valid EASY still normalizes")
+	_check_eq(str(ok.normalized_cids), str(["C01", "C03", "C08", "C11", "C16"]), "V02 F-001: canonical order preserved")
+	# Mismatch: explicit difficulty != raw.difficulty must be rejected by the
+	# coherence guard specifically (load-bearing via the exact error).
+	var mism := ProductionArtLevelBuilder.normalize_from_level_data(_m21_raw_import(), "MEDIUM")
+	_check(not mism.is_ok(), "V02 F-001: mismatched difficulty rejected")
+	_check(_m21_err_has(mism, "must equal raw.difficulty"), "V02 F-001: rejection reason is difficulty identity (load-bearing)")
+	# TEST fixture (otherwise structurally fine) rejected by the boundary (crit 22/26).
+	var test_ld = LevelData.new(1, "v02_test", "t", "TEST", 3, 2, PackedStringArray(["#E94B4BFF", "#3451A3FF", "#000000FF"]), PackedInt32Array([0, 1, 2, 0, 1, 2]))
+	var test_r := ProductionArtLevelBuilder.normalize_from_level_data(test_ld, "TEST")
+	_check(not test_r.is_ok(), "V02 F-001: TEST difficulty rejected")
+	_check(_m21_err_has(test_r, "TEST"), "V02 F-001: TEST rejection is explicit")
+	# Unknown difficulty rejected (crit 23/27).
+	var unk_ld = LevelData.new(1, "v02_unk", "u", "SUPERHARD", 3, 2, PackedStringArray(["#E94B4BFF", "#3451A3FF", "#000000FF"]), PackedInt32Array([0, 1, 2, 0, 1, 2]))
+	var unk_r := ProductionArtLevelBuilder.normalize_from_level_data(unk_ld, "SUPERHARD")
+	_check(not unk_r.is_ok(), "V02 F-001: unknown difficulty rejected")
+	_check(_m21_err_has(unk_r, "Unknown production difficulty"), "V02 F-001: unknown rejection is explicit")
+	# Empty difficulty rejected.
+	var emp_ld = LevelData.new(1, "v02_emp", "e", "", 3, 2, PackedStringArray(["#E94B4BFF", "#3451A3FF", "#000000FF"]), PackedInt32Array([0, 1, 2, 0, 1, 2]))
+	_check(not ProductionArtLevelBuilder.normalize_from_level_data(emp_ld, "").is_ok(), "V02 F-001: empty difficulty rejected")
+
+## F-M21-STRICT-002: arbitrary Variant / malformed raw fails closed before deref.
+func _run_m21_v02_malformed_raw_tests() -> void:
+	print("---- M21-C001 V02: F-002 arbitrary-Variant fail-closed ----")
+	var blob_before := ProductionArtLevelBuilder._git_blob_sha1_file(M21_SOURCE)
+	var cases := [null, 42, "not a level", Vector2(1, 2), Vector2i(3, 4), RefCounted.new(), Image.new()]
+	for c in cases:
+		var r := ProductionArtLevelBuilder.normalize_from_level_data(c, "EASY")
+		_check(not r.is_ok(), "V02 F-002: input %s fails closed" % ProductionArtLevelBuilder._describe_variant(c))
+		_check(_m21_err_has(r, "exact LevelData instance"), "V02 F-002: contract-guard reason for %s (load-bearing)" % ProductionArtLevelBuilder._describe_variant(c))
+		_check(r.level_data == null, "V02 F-002: no normalized output for %s" % ProductionArtLevelBuilder._describe_variant(c))
+	# A partial object exposing SOME but not the exact LevelData script is rejected.
+	var partial := ColorCandidateIndex.create()  # real RefCounted, wrong script
+	_check(not ProductionArtLevelBuilder.normalize_from_level_data(partial, "EASY").is_ok(), "V02 F-002: partial/wrong-script object rejected")
+	_check_eq(ProductionArtLevelBuilder._git_blob_sha1_file(M21_SOURCE), blob_before, "V02 F-002: owner source unchanged after malformed inputs")
+
+## F-M21-STRICT-003: complete deterministic destination preflight on the builder.
+func _run_m21_v02_destination_preflight_tests() -> void:
+	print("---- M21-C001 V02: F-003 destination preflight ----")
+	var ws := "user://m21_v02_fs"
+	var real_ws := ProjectSettings.globalize_path(ws)
+	if DirAccess.dir_exists_absolute(real_ws):
+		_rmrf(real_ws)
+	DirAccess.make_dir_recursive_absolute(real_ws)
+	var blob_before := ProductionArtLevelBuilder._git_blob_sha1_file(M21_SOURCE)
+	var OUT := ws + "/out.json"
+	var PREV := ws + "/prev.png"
+	var META := ws + "/meta.json"
+
+	# source aliasing (each dest == source) rejected; source unchanged.
+	for dest_kind in ["out", "prev", "meta"]:
+		var o = M21_SOURCE if dest_kind == "out" else OUT
+		var p = M21_SOURCE if dest_kind == "prev" else PREV
+		var m = M21_SOURCE if dest_kind == "meta" else META
+		var ra := ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", o, p, m, true)
+		_check(not ra.is_ok(), "V02 F-003: source==%s alias rejected" % dest_kind)
+	# destination/destination aliases rejected.
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", OUT, OUT, META, true).is_ok(), "V02 F-003: output==preview alias rejected")
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", OUT, PREV, OUT, true).is_ok(), "V02 F-003: output==metadata alias rejected")
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", OUT, PREV, PREV, true).is_ok(), "V02 F-003: preview==metadata alias rejected")
+	# dot-segment equivalent alias rejected.
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", OUT, ws + "/./out.json", META, true).is_ok(), "V02 F-003: dot-segment output/preview alias rejected")
+
+	# LOAD-BEARING later-destination failure: preview parent missing -> reject
+	# BEFORE the output JSON is written.
+	if FileAccess.file_exists(OUT):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path(OUT))
+	var missing_parent_prev := ws + "/nope/deep/prev.png"
+	var ld := ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", OUT, missing_parent_prev, META, true)
+	_check(not ld.is_ok(), "V02 F-003: missing preview parent rejected")
+	_check(not FileAccess.file_exists(OUT), "V02 F-003: earlier output NOT written on later-destination failure (no partial commit)")
+
+	# non-directory parent rejected.
+	var fileparent := ws + "/afile"
+	var fp := FileAccess.open(fileparent, FileAccess.WRITE); fp.store_string("x"); fp.close()
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", ws + "/afile/out.json", PREV, META, true).is_ok(), "V02 F-003: non-directory parent rejected")
+
+	# existing directory at a final path rejected, even overwrite=true.
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(ws + "/dir.json"))
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", ws + "/dir.json", PREV, META, true).is_ok(), "V02 F-003: directory at output path rejected (overwrite=true)")
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(ws + "/dir.png"))
+	_check(not FileAccess.file_exists(OUT), "V02 F-003: output still absent before directory-preview rejection")
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", OUT, ws + "/dir.png", META, true).is_ok(), "V02 F-003: directory at preview path rejected before output write")
+	_check(not FileAccess.file_exists(OUT), "V02 F-003: output NOT written when preview is a directory")
+
+	# valid build to fresh temp: succeeds, reconstruction == source, deterministic.
+	var good := ProductionArtLevelBuilder.build(M21_SOURCE, "m21_level_001_hazard_bot", "Hazard Bot", "EASY", OUT, PREV, META, false)
+	_check(good.is_ok(), "V02 F-003: valid temp build succeeds")
+	_check(FileAccess.file_exists(OUT) and FileAccess.file_exists(PREV) and FileAccess.file_exists(META), "V02 F-003: all three artifacts written")
+	var tmp_src := _m21_load_source()
+	var tmp_recon = LevelImporter.reconstruct_image(good.normalize.level_data)
+	_check(tmp_recon.get_data() == tmp_src.get_data(), "V02 F-003: temp build reconstruction == source bytes")
+	# existing-different output with overwrite=false rejected.
+	var wr := FileAccess.open(OUT, FileAccess.WRITE); wr.store_string("DIFFERENT"); wr.close()
+	var conflict := ProductionArtLevelBuilder.build(M21_SOURCE, "m21_level_001_hazard_bot", "Hazard Bot", "EASY", OUT, PREV, META, false)
+	_check(not conflict.is_ok(), "V02 F-003: existing-different output overwrite=false rejected")
+	# rerun with overwrite=false against identical committed-style artifacts -> UNCHANGED.
+	ProductionArtLevelBuilder.build(M21_SOURCE, "m21_level_001_hazard_bot", "Hazard Bot", "EASY", OUT, PREV, META, true) # normalize back
+	var rerun := ProductionArtLevelBuilder.build(M21_SOURCE, "m21_level_001_hazard_bot", "Hazard Bot", "EASY", OUT, PREV, META, false)
+	_check(rerun.is_ok() and rerun.output_unchanged and rerun.preview_unchanged and rerun.metadata_unchanged, "V02 F-003: identical rerun reports UNCHANGED")
+
+	_check_eq(ProductionArtLevelBuilder._git_blob_sha1_file(M21_SOURCE), blob_before, "V02 F-003: owner source immutable across all preflight cases")
+	_rmrf(real_ws)
+
+func _rmrf(abs_dir: String) -> void:
+	var d := DirAccess.open(abs_dir)
+	if d == null:
+		return
+	d.list_dir_begin()
+	var name := d.get_next()
+	while name != "":
+		var full := abs_dir + "/" + name
+		if d.current_is_dir():
+			_rmrf(full)
+		else:
+			DirAccess.remove_absolute(full)
+		name = d.get_next()
+	d.list_dir_end()
+	DirAccess.remove_absolute(abs_dir)
+
+## Auditor-authored fresh adversarial validation (AL-035): exact zero side effects
+## on a blocked activation, then real success progression opening a blocked color.
+func _run_m21_v02_adversarial_tests() -> void:
+	print("---- M21-C001 V02: fresh adversarial validation (section 6, AL-035) ----")
+	var lvl = LevelLoader.load_from_path(M21_LEVEL).level_data
+	var board = BoardState.from_level_data(lvl)
+	var h: int = board.get_height()
+	var wire = _m21_wire(board)
+	var slots = SlotSystem.new(); slots.configure([0, 1, 2, 3, 4], lvl.palette.size())
+	var loop = CompleteClearingLoop.new()
+	_check(loop.bind(board, slots, wire["candidates"], wire["reservations"], wire["dispatcher"]), "V02 adv: fresh real bundle binds")
+	_check_eq(board.count_cells_by_state(BoardState.CellState.ACTIVE), 400, "V02 adv: fresh 400 ACTIVE")
+
+	# --- 6.1 exact zero side effect on a blocked non-C08 activation ---
+	var pre_states := _snapshot_cell_states(board)
+	var pre_buckets := []
+	for ci in range(5):
+		pre_buckets.append(wire["candidates"].get_candidates(ci, null))
+	var pre_res: int = wire["reservations"].get_reservation_count()
+	var pre_active: int = wire["dispatcher"].get_active_count()
+	var pre_cleared: int = loop.get_cleared_count()
+	var blocked = loop.activate_slot(0, Vector2(-1.5, h * 0.5), 6.0) # C01 enclosed
+	_check_eq(blocked.failure_reason, DispatchResult.FailureReason.NO_REACHABLE_TARGET, "V02 adv: blocked non-C08 -> NO_REACHABLE_TARGET")
+	_check(_cell_states_equal(board, pre_states), "V02 adv: BoardState exactly unchanged after blocked call")
+	var buckets_equal := true
+	for ci in range(5):
+		if str(wire["candidates"].get_candidates(ci, null)) != str(pre_buckets[ci]):
+			buckets_equal = false
+	_check(buckets_equal, "V02 adv: all five candidate buckets exactly unchanged")
+	_check_eq(wire["reservations"].get_reservation_count(), pre_res, "V02 adv: reservation count unchanged (0)")
+	_check_eq(wire["dispatcher"].get_active_count(), pre_active, "V02 adv: dispatcher active count unchanged (0)")
+	_check_eq(loop.get_cleared_count(), pre_cleared, "V02 adv: cleared count unchanged (0)")
+
+	# --- 6.2 fresh success progression through the real production path ---
+	var rc = loop.activate_slot(2, Vector2(-1.5, -1.5), 6.0) # C08
+	_check(rc.success, "V02 adv: fresh C08 dispatch succeeds")
+	if rc.success:
+		_check_eq(wire["reservations"].get_owner(rc.target_index), rc.owner_id, "V02 adv: reservation before arrival")
+		_check(rc.agent.is_moving(), "V02 adv: agent MOVING before arrival")
+		for _i in range(256):
+			if not rc.agent.is_moving():
+				break
+			rc.agent.advance(1.0)
+		_check_eq(loop.get_cleared_count(), 1, "V02 adv: authenticated arrival clears exactly once")
+		_check_eq(board.get_cell_state(rc.target_index), BoardState.CellState.CLEARED, "V02 adv: C08 target CLEARED")
+	# Continue real C08 clears until a previously-blocked non-C08 color opens.
+	var opened := -1
+	var guard := 0
+	while opened == -1 and guard < 1200:
+		guard += 1
+		for cid in [0, 1, 3, 4]:
+			var pr = loop.activate_slot(cid, Vector2(-1.5, h * 0.5), 6.0)
+			if pr.success:
+				opened = cid
+				var t: int = pr.target_index
+				_check_eq(board.get_cell_state(t), BoardState.CellState.ACTIVE, "V02 adv: opened color %d target ACTIVE before arrival" % cid)
+				for _i in range(256):
+					if not pr.agent.is_moving():
+						break
+					pr.agent.advance(1.0)
+				_check_eq(board.get_cell_state(t), BoardState.CellState.CLEARED, "V02 adv: opened color %d CLEARED via production path" % cid)
+				break
+		if opened != -1:
+			break
+		var progressed := false
+		for origin in [Vector2(-1.5, h * 0.5), Vector2(21.5, h * 0.5), Vector2(h * 0.5, -1.5), Vector2(h * 0.5, 21.5)]:
+			var r2 = loop.activate_slot(2, origin, 6.0)
+			if r2.success:
+				for _i in range(256):
+					if not r2.agent.is_moving():
+						break
+					r2.agent.advance(1.0)
+				progressed = true
+				break
+		if not progressed:
+			break
+	_check(opened != -1, "V02 adv: an initially-blocked non-C08 color opened and cleared via the real path (no forced target)")
+
+	loop.reset()
+	root.remove_child(wire["dispatcher"]); wire["dispatcher"].free()
