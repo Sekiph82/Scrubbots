@@ -226,6 +226,9 @@ func _initialize() -> void:
 	_run_m21_v02_malformed_raw_tests()
 	_run_m21_v02_destination_preflight_tests()
 	_run_m21_v02_adversarial_tests()
+	# M21-C001 V03 — final path-safety + direct-evidence reconciliation.
+	_run_m21_v03_path_safety_tests()
+	_run_m21_v03_direct_evidence_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -12718,3 +12721,190 @@ func _run_m21_v02_adversarial_tests() -> void:
 
 	loop.reset()
 	root.remove_child(wire["dispatcher"]); wire["dispatcher"].free()
+
+# ============================================================================
+# M21-C001 V03 — final path-safety + direct-evidence reconciliation
+# ============================================================================
+
+## F-M21-STRICT-003 residual: one physical path identity across alias/preflight/
+## plan/write, incl. bare-relative based at res:// (AL-013), plus the remaining
+## preview/metadata-conflict and metadata-directory direct cells.
+func _run_m21_v03_path_safety_tests() -> void:
+	print("---- M21-C001 V03: F-003 residual path-safety (one resolver) ----")
+	var blob_before := ProductionArtLevelBuilder._git_blob_sha1_file(M21_SOURCE)
+	# Existing project dir for bare-relative resolution proof.
+	var rel_dir := "coordination/sessions/M21-C001/_v03_tmp"
+	var abs_dir := ProjectSettings.globalize_path("res://" + rel_dir)
+	if DirAccess.dir_exists_absolute(abs_dir):
+		_rmrf(abs_dir)
+	DirAccess.make_dir_recursive_absolute(abs_dir)
+
+	# 4.1 legitimate bare-relative build resolves at the res:// equivalent location.
+	var rel_out := rel_dir + "/out.json"
+	var rel_prev := rel_dir + "/prev.png"
+	var rel_meta := rel_dir + "/meta.json"
+	var b1 := ProductionArtLevelBuilder.build(M21_SOURCE, "m21_level_001_hazard_bot", "Hazard Bot", "EASY", rel_out, rel_prev, rel_meta, false)
+	_check(b1.is_ok(), "V03 path: bare-relative three-artifact build succeeds")
+	_check(FileAccess.file_exists("res://" + rel_out), "V03 path: bare-relative output lands at res:// equivalent (not CWD)")
+	_check(FileAccess.file_exists("res://" + rel_prev), "V03 path: bare-relative preview lands at res:// equivalent")
+	_check(FileAccess.file_exists("res://" + rel_meta), "V03 path: bare-relative metadata lands at res:// equivalent")
+	# deterministic rerun UNCHANGED (crit 53)
+	var b1r := ProductionArtLevelBuilder.build(M21_SOURCE, "m21_level_001_hazard_bot", "Hazard Bot", "EASY", rel_out, rel_prev, rel_meta, false)
+	_check(b1r.is_ok() and b1r.output_unchanged and b1r.preview_unchanged and b1r.metadata_unchanged, "V03 path: bare-relative rerun UNCHANGED")
+
+	# 4.2 bare-relative aliases rejected under the single identity.
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", "assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png", rel_prev, rel_meta, true).is_ok(), "V03 path: bare-relative source-equivalent output alias rejected")
+	# bare-relative output vs equivalent res:// preview alias.
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", rel_out, "res://" + rel_out, rel_meta, true).is_ok(), "V03 path: bare-relative vs res:// destination alias rejected")
+	# bare-relative output vs equivalent absolute preview alias.
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", rel_out, abs_dir + "/out.json", rel_meta, true).is_ok(), "V03 path: bare-relative vs absolute destination alias rejected")
+	# dot-segment equivalent alias.
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", rel_out, rel_dir + "/./out.json", rel_meta, true).is_ok(), "V03 path: dot-segment destination alias rejected")
+	# overwrite=true never bypasses source aliasing.
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", M21_SOURCE, rel_prev, rel_meta, true).is_ok(), "V03 path: overwrite=true source alias still rejected")
+
+	# 4.3 later-artifact conflict matrix (direct on the new builder).
+	# existing-different PREVIEW overwrite=false rejects before output/metadata mutation.
+	var conf_dir := rel_dir + "/conf"
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://" + conf_dir))
+	var cout := conf_dir + "/out.json"
+	var cprev := conf_dir + "/prev.png"
+	var cmeta := conf_dir + "/meta.json"
+	var wf := FileAccess.open("res://" + cprev, FileAccess.WRITE); wf.store_string("DIFFERENT-PREVIEW"); wf.close()
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", cout, cprev, cmeta, false).is_ok(), "V03 path: existing-different preview overwrite=false rejected")
+	_check(not FileAccess.file_exists("res://" + cout), "V03 path: output NOT written on preview conflict")
+	_check(not FileAccess.file_exists("res://" + cmeta), "V03 path: metadata NOT written on preview conflict")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("res://" + cprev))
+	# existing-different METADATA overwrite=false rejects before output/preview mutation.
+	var wm := FileAccess.open("res://" + cmeta, FileAccess.WRITE); wm.store_string("DIFFERENT-META"); wm.close()
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", cout, cprev, cmeta, false).is_ok(), "V03 path: existing-different metadata overwrite=false rejected")
+	_check(not FileAccess.file_exists("res://" + cout), "V03 path: output NOT written on metadata conflict")
+	_check(not FileAccess.file_exists("res://" + cprev), "V03 path: preview NOT written on metadata conflict")
+	DirAccess.remove_absolute(ProjectSettings.globalize_path("res://" + cmeta))
+	# directory at METADATA path rejected for BOTH overwrite modes, before earlier mutation.
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://" + cmeta)) # meta path is now a dir
+	for ov in [false, true]:
+		_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", cout, cprev, cmeta, ov).is_ok(), "V03 path: directory at metadata path rejected (overwrite=%s)" % str(ov))
+		_check(not FileAccess.file_exists("res://" + cout), "V03 path: output absent (metadata-dir, overwrite=%s)" % str(ov))
+		_check(not FileAccess.file_exists("res://" + cprev), "V03 path: preview absent (metadata-dir, overwrite=%s)" % str(ov))
+	# directory at OUTPUT path rejected both modes.
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path("res://" + conf_dir + "/dirout.json"))
+	for ov in [false, true]:
+		_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", conf_dir + "/dirout.json", cprev, cmeta + "2", ov).is_ok(), "V03 path: directory at output path rejected (overwrite=%s)" % str(ov))
+	# non-directory parent rejected.
+	var afile := conf_dir + "/afile"
+	var af := FileAccess.open("res://" + afile, FileAccess.WRITE); af.store_string("x"); af.close()
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", afile + "/out.json", cprev, cmeta + "2", true).is_ok(), "V03 path: non-directory parent rejected")
+	# LOAD-BEARING bare-relative later preview missing parent rejects before output write.
+	if FileAccess.file_exists("res://" + cout):
+		DirAccess.remove_absolute(ProjectSettings.globalize_path("res://" + cout))
+	_check(not ProductionArtLevelBuilder.build(M21_SOURCE, "id", "n", "EASY", cout, conf_dir + "/nope/deep/prev.png", cmeta + "3", true).is_ok(), "V03 path: bare-relative missing preview parent rejected")
+	_check(not FileAccess.file_exists("res://" + cout), "V03 path: earlier output NOT written on bare-relative later-parent failure (no partial commit)")
+
+	_check_eq(ProductionArtLevelBuilder._git_blob_sha1_file(M21_SOURCE), blob_before, "V03 path: owner source immutable across all path cases")
+	_rmrf(abs_dir)
+
+## Final fresh real-art direct-evidence reconciliation (crit 55-69).
+func _run_m21_v03_direct_evidence_tests() -> void:
+	print("---- M21-C001 V03: fresh real-art direct-evidence reconciliation ----")
+	var lvl = LevelLoader.load_from_path(M21_LEVEL).level_data
+	var board = BoardState.from_level_data(lvl)
+	var h: int = board.get_height()
+	var wire = _m21_wire(board)
+	var slots = SlotSystem.new(); slots.configure([0, 1, 2, 3, 4], lvl.palette.size())
+	var renderer = BoardRenderer.new(); root.add_child(renderer)
+	renderer.configure(board, lvl.palette, Vector2(400, 400))
+	var loop = CompleteClearingLoop.new()
+	_check(loop.bind(board, slots, wire["candidates"], wire["reservations"], wire["dispatcher"], renderer), "V03 evid: fresh real bundle binds")
+
+	_check_eq(board.count_cells_by_state(BoardState.CellState.ACTIVE), 400, "V03 evid: fresh 400 ACTIVE")
+	# crit 57: exact fresh candidate counts from real committed LevelData state.
+	_check_eq(wire["candidates"].count_candidates(0, null), 30, "V03 evid: C01 candidates 30")
+	_check_eq(wire["candidates"].count_candidates(1, null), 5, "V03 evid: C03 candidates 5")
+	_check_eq(wire["candidates"].count_candidates(2, null), 298, "V03 evid: C08 candidates 298")
+	_check_eq(wire["candidates"].count_candidates(3, null), 11, "V03 evid: C11 candidates 11")
+	_check_eq(wire["candidates"].count_candidates(4, null), 56, "V03 evid: C16 candidates 56")
+
+	# crit 58-60: blocked non-C08 exact zero side effect.
+	var pre_states := _snapshot_cell_states(board)
+	var pre_buckets := []
+	for ci in range(5):
+		pre_buckets.append(wire["candidates"].get_candidates(ci, null))
+	var pre_res: int = wire["reservations"].get_reservation_count()
+	var pre_active: int = wire["dispatcher"].get_active_count()
+	var pre_cleared: int = loop.get_cleared_count()
+	var blocked = loop.activate_slot(3, Vector2(-1.5, h * 0.5), 6.0) # C11 enclosed
+	_check_eq(blocked.failure_reason, DispatchResult.FailureReason.NO_REACHABLE_TARGET, "V03 evid: blocked non-C08 -> NO_REACHABLE_TARGET")
+	_check(_cell_states_equal(board, pre_states), "V03 evid: BoardState exactly unchanged")
+	var buckets_equal := true
+	for ci in range(5):
+		if str(wire["candidates"].get_candidates(ci, null)) != str(pre_buckets[ci]):
+			buckets_equal = false
+	_check(buckets_equal, "V03 evid: all five candidate buckets exactly unchanged")
+	_check_eq(wire["reservations"].get_reservation_count(), pre_res, "V03 evid: reservation count unchanged")
+	_check_eq(wire["dispatcher"].get_active_count(), pre_active, "V03 evid: dispatcher active unchanged")
+	_check_eq(loop.get_cleared_count(), pre_cleared, "V03 evid: cleared count unchanged")
+
+	# crit 61-68: first C08 arrival full cleanup, observed on the actual owner/target.
+	var rc = loop.activate_slot(2, Vector2(-1.5, -1.5), 6.0)
+	_check(rc.success, "V03 evid: fresh C08 dispatch succeeds")
+	if rc.success:
+		var tgt: int = rc.target_index
+		var owner: int = rc.owner_id
+		_check_eq(board.get_color_id(tgt), 2, "V03 evid: target is C08")
+		_check_eq(board.get_cell_state(tgt), BoardState.CellState.ACTIVE, "V03 evid: target ACTIVE before arrival")
+		_check_eq(wire["reservations"].get_owner(tgt), owner, "V03 evid: reservation target->owner before arrival")
+		_check_eq(wire["reservations"].get_target_for_owner(owner), tgt, "V03 evid: reservation owner->target before arrival")
+		_check(wire["dispatcher"].has_owner(owner), "V03 evid: dispatcher owns assignment before arrival")
+		_check(rc.agent.is_moving(), "V03 evid: real agent MOVING before arrival")
+		var active_before: int = wire["dispatcher"].get_active_count()
+		for _i in range(256):
+			if not rc.agent.is_moving():
+				break
+			rc.agent.advance(1.0)
+		_check_eq(loop.get_cleared_count(), pre_cleared + 1, "V03 evid: cleared_count +1 exactly")
+		_check_eq(board.get_cell_state(tgt), BoardState.CellState.CLEARED, "V03 evid: target CLEARED after arrival")
+		_check(not wire["candidates"].get_candidates(2, null).has(tgt), "V03 evid: candidate bucket no longer contains target")
+		_check_eq(wire["reservations"].get_owner(tgt), -1, "V03 evid: reservation target->owner released")
+		_check_eq(wire["reservations"].get_target_for_owner(owner), -1, "V03 evid: reservation owner->target released")
+		_check(not wire["dispatcher"].has_owner(owner), "V03 evid: dispatcher no longer owns owner")
+		_check_eq(wire["dispatcher"].get_active_count(), active_before - 1, "V03 evid: dispatcher active count cleaned up")
+		var tp: Vector2i = board.get_cell_position(tgt)
+		_check_eq(renderer.get_pixel_color(tp.x, tp.y).a, 0.0, "V03 evid: renderer alpha 0 for cleared target")
+
+	# crit 69: continue until a blocked non-C08 color opens + clears (real path).
+	var opened := -1
+	var guard := 0
+	while opened == -1 and guard < 1200:
+		guard += 1
+		for cid in [0, 1, 3, 4]:
+			var pr = loop.activate_slot(cid, Vector2(-1.5, h * 0.5), 6.0)
+			if pr.success:
+				opened = cid
+				var t: int = pr.target_index
+				_check_eq(board.get_cell_state(t), BoardState.CellState.ACTIVE, "V03 evid: opened color %d ACTIVE before arrival" % cid)
+				for _i in range(256):
+					if not pr.agent.is_moving():
+						break
+					pr.agent.advance(1.0)
+				_check_eq(board.get_cell_state(t), BoardState.CellState.CLEARED, "V03 evid: opened color %d CLEARED via real path" % cid)
+				break
+		if opened != -1:
+			break
+		var progressed := false
+		for origin in [Vector2(-1.5, h * 0.5), Vector2(21.5, h * 0.5), Vector2(h * 0.5, -1.5), Vector2(h * 0.5, 21.5)]:
+			var r2 = loop.activate_slot(2, origin, 6.0)
+			if r2.success:
+				for _i in range(256):
+					if not r2.agent.is_moving():
+						break
+					r2.agent.advance(1.0)
+				progressed = true
+				break
+		if not progressed:
+			break
+	_check(opened != -1, "V03 evid: initially-blocked non-C08 color opened and cleared via real path (no forced target)")
+
+	loop.reset()
+	root.remove_child(wire["dispatcher"]); wire["dispatcher"].free()
+	root.remove_child(renderer); renderer.free()
