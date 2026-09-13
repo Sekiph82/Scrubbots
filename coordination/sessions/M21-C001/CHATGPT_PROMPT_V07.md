@@ -33,29 +33,20 @@ Never force push.
 
 Do not recreate `.hiveai` as a live tracker.
 
-## 2. Mandatory tracker-only V07 start commit
+## 2. Root TASKS.md is ChatGPT-owned — do not edit it
 
-Before implementation edits, make and push a separate commit containing only root `TASKS.md`.
+ChatGPT has already updated the canonical root `TASKS.md` after the V06 audit/owner-gate failure and before issuing this V07 prompt.
 
-Set the lifecycle to:
+**Do not modify root `TASKS.md` in V07.**
 
-- Current Milestone: `M21`
-- Current Sprint: `M21-C001 V07 — exterior corridor + slot-only owner correction`
-- Current Task: `M21-C001-V07`
-- Current Task Status: `IN_PROGRESS`
-- Required Actor: `CLAUDE`
-- Next Task/Action: implement/audit the two frozen V07 owner findings, then repeat owner manual playtest only after independent ChatGPT PASS.
-- Progress: unchanged `304 / 719 = 42.28%` main+ui and `304 / 943 = 32.24%` overall.
-- `lastCompletedTaskId`: unchanged `M20-C001-V11`.
+This applies at start, during implementation, and at handoff. Do not create a tracker-only commit. Do not change lifecycle/status/actor/progress/check boxes. The tracker will be updated by ChatGPT after the independent V07 audit and any subsequent owner gate.
 
-Also record in the canonical task/rule text, without deleting historical completion evidence:
+Your implementation handoff state is communicated only by:
 
-1. M21 owner-facing gameplay activation is now slot-click only; SPACE gameplay dispatch is superseded and must be removed.
-2. Production routing has an owner-locked one-logical-cell-wide exterior walking corridor around all four board sides, as defined in `OWNER_PLAYTEST_FINDINGS_V07.md`.
-3. TargetSelector remains bottom-most then left-most among currently targetable matching candidates.
-4. M21 remains open pending V07 engineering audit + owner manual PASS.
+- `coordination/sessions/M21-C001/CLAUDE_LOG_V07.md`; and
+- the required two-line final response.
 
-Do not close any M21/M22/UI task checkbox in the start commit.
+If the local working tree contains a pre-existing owner/local modification to `TASKS.md`, preserve it untouched and do not stage it.
 
 ## 3. Frozen finding A: remove SPACE gameplay dispatch
 
@@ -249,7 +240,7 @@ Expected authorized production changes:
 - `scripts/gameplay/routing/production_routing_system.gd` (current pre-V07 blob `0900e9554d0e64dcfbb28667e1ce1062eadba73f`)
 - `scripts/debug/m21_real_art_vertical_slice.gd` (current pre-V07 blob `66050fe5ec95498a43c6d4abccf62c4d82744d39`)
 
-Plus focused tests, owner guide, TASKS lifecycle/rule text, and V07 log.
+Plus focused tests, owner guide and V07 log. Root `TASKS.md` is not an authorized Claude change.
 
 ## 11. Current owner guide
 
@@ -309,7 +300,7 @@ Create:
 The log must include:
 
 - synchronized starting HEAD;
-- tracker-only V07 start commit SHA;
+- explicit confirmation that root `TASKS.md` was read but not modified;
 - exact root cause as reproduced before correction;
 - exact changed files;
 - implementation design of the one-cell ring;
@@ -321,14 +312,7 @@ The log must include:
 - any failed attempt and correction;
 - statement that owner manual PASS still remains pending independent ChatGPT audit.
 
-At successful handoff set only the lifecycle fields to:
-
-- Current Sprint: `M21-C001 V07 — exterior corridor + slot-only owner correction`
-- Current Task: `M21-C001-V07`
-- Current Task Status: `AWAITING_AUDIT`
-- Required Actor: `CHATGPT`
-
-Keep progress/lastCompletedTaskId unchanged and do not close M21/M22/UI checkboxes.
+Do not edit root `TASKS.md` at handoff. ChatGPT will update lifecycle/progress/closure state after independent audit.
 
 Push all authorized work safely to `origin/main`.
 
