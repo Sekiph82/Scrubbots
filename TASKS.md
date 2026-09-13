@@ -5,24 +5,24 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M21
-- Current Sprint: M21-C001 V06 — genuine tall-layout validation-only closure
-- Current Task: M21-C001-V06
-- Current Task Status: AWAITING_AUDIT
-- Next Task/Action: independent V06 audit against `coordination/sessions/M21-C001/CLAUDE_LOG_V06.md` and `CHATGPT_AUDIT_CRITERIA_V06.md`, then owner manual visual playtest per `M21_V05_OWNER_PLAYTEST.md` only if audit passes.
-- Required Actor: CHATGPT
+- Current Sprint: M21-C001 V07 — exterior corridor + slot-only owner correction
+- Current Task: M21-C001-V07
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: Claude implements `coordination/sessions/M21-C001/CHATGPT_PROMPT_V07.md` without modifying root `TASKS.md`, pushes `CLAUDE_LOG_V07.md`, and hands back `AWAITING_AUDIT`; ChatGPT then performs the independent V07 audit and updates this tracker before any further prompt/owner gate.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 304 / 719 = 42.28% (main+ui); overall 304 / 943 = 32.24%; lastCompletedTaskId M20-C001-V11.
-- Note: M21-C001 V06 genuine tall-layout validation-only closure complete, AWAITING_AUDIT (owner manual visual PASS still pending). Closed frozen residual R-V05-TALL-001: new tests/m21_v06_tall_layout_smoke.gd hosts the real owner scene in a SubViewport genuinely sized 1080x2400 (directly observed sub.size == (1080,2400), distinct from canonical 1080x2160; sensitive to removing the resize step) and re-proves under that config — five slots within tall bounds, slot bar below board, real Button pressed->slot_activated->handler->CompleteClearingLoop dispatch, agent.spawn_origin == BoardPresentation.global_to_board_local(SlotView anchor) == route[0], agent initial global == anchor global (400,880), arrival == BoardRenderer target-cell center, authenticated M20 clear of target 388 (8,19), AgentLayer 0 orphans after cleanup. Validation-only: no scripts/**, scenes/**, or project.godot change; all seven locked blobs unchanged (owner b565743…, loop 06391839523cbc27e88a4b3ef12b730012cd45fa, dispatcher eee10149e4f116af6706beec832042352bf3a6dd, TargetSelector bb1e48a2a82f6ca4e8962f2a24de60e815c1a945, controller 66050fe5ec95498a43c6d4abccf62c4d82744d39, presentation 2093df48d367903d332a910dfb3369154831a9ed, slotview 480dffc0ee135150bd3dd2258f002264273ead10). Root suite 4602/4602 PASS; V05 + M21 (400 clears) + all M20 smokes PASS; debug scene boots clean; 0 SCRIPT/Parse errors. No SB-M21/SB-M22/SB-UI checkbox closed by Claude. (Prior V05 note retained below.) M21-C001 V05 owner-playtest presentation correction complete. Closed frozen findings F-M21-V04-001..004: (001) owner controller no longer double-drives real agents — each ScrubbotAgent self-moves via its own _process; controller _process is observation-only; (002) each visible SlotView's spawn anchor (get_spawn_anchor_global) maps through BoardPresentation.global_to_board_local into board-local route start — no hardcoded left-edge constant; proven agent.spawn_origin/global-start == clicked slot anchor and route/arrival alignment for all five slots; (003) per-assignment active tracking (owner_id->slot; slot active iff >=1 in-flight) — same-slot and cross-slot concurrency correct, reset/no-orphan clean; (004) real Button pressed->slot_activated->handler activation-path test, tall 1080x2400 portrait sanity, AgentLayer no-orphan after frames — replacing V04 proxy tests. TargetSelector unchanged (bb1e48a2a82f6ca4e8962f2a24de60e815c1a945; owner bottom/left policy preserved). Root suite 4602/4602 PASS (V04 4580 baseline preserved); new tests/m21_v05_playtest_smoke.gd PASS; M21 smoke PASS (400 clears); all M20 lifecycle smokes PASS; debug scene boots clean; 0 SCRIPT/Parse errors; owner source b565743…/ede1e02… unchanged; M20 loop 06391839523cbc27e88a4b3ef12b730012cd45fa / dispatcher eee10149e4f116af6706beec832042352bf3a6dd unchanged. No SB-M21/SB-M22/SB-UI checkbox closed by Claude. (Prior V04 note retained below.) M21-C001 V04 owner-playtest integration complete. Implemented owner-locked TargetSelector priority (bottom-most/left-most reachable; TargetSelector blob a0daad67f8ba2238dd54cb903ac25dec7aa3144d -> bb1e48a2a82f6ca4e8962f2a24de60e815c1a945; strict-v2 safety preserved; superseded M15 row-major expectations updated not deleted); shared BoardPresentation/AgentLayer transform so the real ScrubbotAgent is visibly board-aligned (dispatcher agent_parent = AgentLayer); five visible SlotView components bound to real SlotSystem palette colors that activate the real CompleteClearingLoop path (M22 functional subset pulled forward); closed the V03 preview-directory/overwrite=false evidence residual. First fresh C08 target under the new rule = index 220 (0,11). Root suite 4580/4580 PASS (V03 4534 baseline preserved); M21 smoke PASS (400 clears); all M20 lifecycle smokes PASS; debug scene boots clean; 0 SCRIPT/Parse errors; owner source b565743…/ede1e02… unchanged; M20 loop 06391839523cbc27e88a4b3ef12b730012cd45fa / dispatcher eee10149e4f116af6706beec832042352bf3a6dd unchanged. No SB-M21/SB-M22/SB-UI checkbox closed by Claude. (Prior V03 note retained below.) M21-C001 V03 production correction is accepted by `CHATGPT_AUDIT_V03.md`: the V03 path-identity fix and fresh real-art direct evidence are valid, and F-M21-STRICT-001..004 remain materially closed. Final M21 closure is deferred to V04 because the owner manually ran the Godot real-art scene on 2026-09-13 and locked three new acceptance requirements: (1) TargetSelector must prioritize the bottom-most, then left-most currently targetable matching cell; (2) the real ScrubbotAgent must be visibly presented through the same board-to-screen transform as BoardRenderer; (3) exactly five functional color slots must be visible and activate the real CompleteClearingLoop path. V04 also closes the one remaining evidence-only preview-directory/overwrite=false test cell. No M21/M22 task checkbox is pre-closed by this tracker transition; independent ChatGPT audit owns closure.
+- Note: V06 engineering/validation is independently accepted, but the owner visual/game-feel gate failed on 2026-09-13. V07 is now owner-locked to two corrections: (1) remove SPACE gameplay dispatch completely so visible SlotView clicks are the only owner-facing activation path; (2) add a one-logical-cell-wide routing-only exterior walking corridor around all four board sides so the accepted bottom-most/left-most TargetSelector policy can select the true far-left bottom target when it is legally reachable through exterior space. For the fresh Hazard Bot, the first C08 click must naturally select index 380 / coordinate (0,19), with the Scrubbot leaving the clicked C08 slot, joining the bottom exterior ring, travelling left outside the artwork, and entering the target without crossing ACTIVE cells. Root `TASKS.md` is ChatGPT-write-owned: Claude/Codex must read it but must not modify lifecycle, progress, task closure, actor, or checkbox state. No M21/M22/SB-UI checkbox is closed by V06 alone; M21 remains open pending V07 independent audit and a repeated owner manual PASS.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
 
-> **H!veAI tracking [OWNER-LOCKED — 2026-09-10]:** repository-root `TASKS.md` is the one and only live project-status tracker. The top `Project Status` block controls current milestone, sprint, task, actor, next action, workflow status, and progress. Former `.hiveai` control-plane files are archived under `docs/migration/legacy-task-trackers/` and are historical evidence only. Never recreate or synchronize a competing live tracker.
+> **H!veAI tracking [OWNER-LOCKED — updated 2026-09-13]:** repository-root `TASKS.md` is the one and only live project-status tracker. The top `Project Status` block controls current milestone, sprint, task, actor, next action, workflow status, and progress. Former `.hiveai` control-plane files are archived under `docs/migration/legacy-task-trackers/` and are historical evidence only. Never recreate or synchronize a competing live tracker. **ChatGPT is the sole writer of root `TASKS.md`; Claude/Codex read it but do not edit it. ChatGPT updates it after each independent audit, owner-gate decision, and before handing off the next implementation prompt.**
 
 Permanent master execution roadmap for the SCRUBBOTS project. This file is
 authoritative alongside `CLAUDE.md`. Read both at the start of every
-session. Update this file after every numbered implementation prompt.
+session. ChatGPT updates this file after audit/owner-gate decisions; implementation agents do not mutate it.
 
 Canonical local project: `C:\Users\sekip\Desktop\ScrubBots`
 Canonical repository: `https://github.com/Sekiph82/Scrubbots`
@@ -87,7 +87,7 @@ complete — record why instead of marking `[x]`.
 - The 59×59 (3,481-cell) maximum production workload is considered wherever
   cost scales with board size.
 - Documentation reflects the actual implementation, not an aspirational one.
-- `TASKS.md` is updated to reflect true status.
+- `TASKS.md` is updated by ChatGPT after independent audit/owner-gate review to reflect true status.
 - `git diff` is reviewed before commit.
 - No cache/build junk (`.godot/`, import cache, build output) is committed.
 - A focused, understandable commit exists.
@@ -102,7 +102,7 @@ complete — record why instead of marking `[x]`.
 Every future numbered implementation prompt must:
 
 1. Read `CLAUDE.md`.
-2. Read `TASKS.md` (this file).
+2. Read `TASKS.md` (this file) without modifying it.
 3. Read relevant `docs/` files for the system being touched.
 4. Inspect `git status` / branch / remote.
 5. Confirm which milestone is actually current (don't assume from memory).
@@ -116,14 +116,13 @@ Every future numbered implementation prompt must:
 12. Run headless validation (`godot --headless --path . -s res://tests/run_tests.gd`).
 13. Fix regressions.
 14. Run relevant performance sanity tests.
-15. Update `docs/`.
-16. Update `TASKS.md`.
-17. Review `git diff`.
+15. Update authorized subsystem docs/evidence only.
+16. **Do not edit root `TASKS.md`; ChatGPT owns tracker changes after audit/owner-gate review.**
+17. Review `git diff` and ensure `TASKS.md` is absent from the implementation diff.
 18. Commit (focused, descriptive message).
 19. Push safely (`git push origin main`, never force).
 20. Never force-push.
-21. Update the current phase's Desktop log (see "PHASE LOG WORKFLOW" below)
-    — **never committed** to this repository.
+21. Write/update the matching GitHub `CLAUDE_LOG_VNN.md` and hand back `AWAITING_AUDIT`; ChatGPT then audits and updates `TASKS.md`.
 
 ---
 
@@ -185,11 +184,9 @@ The board engine remains **variable-size**. It must never become a fixed
 come from level data. Generic code uses `width`, `height`, `width * height`
 — never a hard-coded cell count. See ADR-008.
 
-### 8.3 — Official difficulty / board size bands `[LOCKED]`
+### 8.3 — Official difficulty / board size bands `[LOCKED HISTORICAL RUNTIME COMPATIBILITY]`
 
-Official SCRUBBOTS production rules, established in this planning prompt
-(supersedes the Prompt 02-era "40×40 standard / 50×50 Very Hard" framing,
-which under-specified the actual required range):
+The legacy production validator currently retains these dimension bands while Difficulty V1 migration is still open. They are not current player-facing difficulty truth; see `coordination/OWNER_DIFFICULTY_PROGRESSION_DECISION_V01.md` and `CLAUDE.md`.
 
 | Difficulty | Width range | Height range | Min cells | Max cells |
 |---|---|---|---|---|
@@ -198,20 +195,14 @@ which under-specified the actual required range):
 | HARD | 40–49 | 40–49 | 40×40 = 1600 | 49×49 = 2401 |
 | VERY_HARD | 50–59 | 50–59 | 50×50 = 2500 | 59×59 = **3481** |
 
-Examples of valid boards: Easy `20×27`, Medium `34×39`, Hard `48×41`,
-Very Hard `53×59`.
+Examples of legacy-validator-valid boards: Easy `20×27`, Medium `34×39`, Hard `48×41`, Very Hard `53×59`.
 
-**Current required production maximum: 59×59 = 3,481 logical cells.**
+**Current required production-capable maximum: 59×59 = 3,481 logical cells.**
 
 ### 8.4 — Rectangular boards `[LOCKED]`
 
 Boards do **not** have to be square. Width and height are validated
-independently against the same difficulty band. Never assume
-`width == height` in generic systems.
-
-Valid: Easy `20×27`, Medium `34×39`, Hard `48×41`, Very Hard `53×59`.
-Invalid: Easy `20×30`, Medium `39×40`, Hard `49×50`, Very Hard `49×59` —
-each has one dimension outside its band.
+independently. Never assume `width == height` in generic systems.
 
 ### 8.5 — Current maximum required workload `[LOCKED]`
 
@@ -225,8 +216,7 @@ of level state if used, and production content validation.
 
 The existing `test_3x2.json` fixture (6 cells) is valuable because it
 proves the board engine is genuinely generic — it is **not** a production
-level and must never be treated as one. Production levels obey the
-Easy/Medium/Hard/Very-Hard ranges in 8.3. Development fixtures may use a
+level and must never be treated as one. Development fixtures may use a
 `TEST` difficulty/context. `TEST` must never become a production difficulty
 exposed to players, and the future production `LevelCatalog` must reject
 accidental `TEST` fixtures (see M03, M30).
@@ -251,18 +241,9 @@ change. CLEARED alpha-0 transparency, gameplay background and
 presentation-only grid/border overlays are not logical artwork colors and do
 not add palette IDs.
 
-### 8.7B — Production distinct-color bands `[LOCKED OWNER DECISION]`
+### 8.7B — Production used-color envelope `[OWNER-LOCKED DIFFICULTY V1]`
 
-| Difficulty | Distinct canonical logical cell colors actually used |
-| --- | ---: |
-| EASY | **3–5** |
-| MEDIUM | **6–7** |
-| HARD | **8–9** |
-| VERY_HARD | **10–12** |
-
-These are hard production-content bands. Count colors actually referenced by
-logical cells, not an inflated palette array. Production local LevelData
-palettes are used subsets of C01..C16 in ascending global C-ID order.
+Production artwork may use **3–12** distinct canonical C01..C16 colors. The older class-specific `3–5 / 6–7 / 8–9 / 10–12` mapping is historical and superseded as difficulty-class legality; color count/distribution are Difficulty V1 score inputs instead.
 
 ### 8.8 — Five slots `[LOCKED]`
 
@@ -307,6 +288,14 @@ continues to the next candidate in deterministic bottom-to-top / left-to-right
 priority. This is a WHAT-policy in TargetSelector only. Routing still decides HOW
 to travel to the already-selected target and must not retarget based on geometry.
 
+### 8.10B — One-cell exterior routing corridor `[LOCKED OWNER DECISION — 2026-09-13]`
+
+Production routing must model a **one logical-cell-wide routing-only walking ring around all four board sides**. For board `W×H`, the exterior planner cells are: top `y=-1, x=-1..W`; bottom `y=H, x=-1..W`; left `x=-1, y=0..H-1`; right `x=W, y=0..H-1`, including all four corners. This ring is routing space only: it does not change LevelData, BoardState dimensions, palette cells, difficulty, or artwork. A clicked slot origin may connect through valid outside/background space to the ring; the Scrubbot may travel around the ring and enter an assigned ACTIVE perimeter target only as final arrival. Non-target ACTIVE cells remain blockers and enclosed interior ACTIVE targets remain unreachable until a legal opening exists.
+
+### 8.10C — Slot-click-only owner gameplay activation `[LOCKED OWNER DECISION — 2026-09-13]`
+
+The owner-playable gameplay path is **visible color-slot click only**. The SPACE gameplay fallback is superseded and must be removed; do not replace it with another hidden keyboard dispatch shortcut. A successful activation begins from the exact clicked SlotView spawn anchor and then follows the real CompleteClearingLoop → TargetSelector → Routing → Dispatcher → ScrubbotAgent → authenticated clear chain.
+
 ### 8.11 — Win streak `[LOCKED]`
 
 ```text
@@ -330,7 +319,6 @@ deliberately revisits ADR-009 and proves an alternative equally reliable
 via headless tests. Do not casually convert back to bare `class_name` for
 stylistic reasons.
 
-
 ### Production gameplay background `[LOCKED]`
 
 - BG01 **Midnight Slate** = `#202533` / RGB(32,37,51).
@@ -349,24 +337,15 @@ but **only artwork that physically exists in this project or is supplied
 during a task counts as available**. A visual discussed in a prior chat is
 not automatically a local file.
 
-**Verified at time of writing**: `assets/art/{characters,levels,ui,effects}/`
-are all empty except `.gitkeep` placeholders — no SCRUBBOTS artwork
-currently exists inside this repository. Several unrelated images exist on
-the user's Desktop (`ChatGPT Image Aug 16...png`, `formulation reply/request
-screen.png`, several `WhatsApp Image...jpeg` files) but none are named or
-otherwise indicated as SCRUBBOTS assets, and none have been copied into the
-project or treated as such — per rule 9.5, nothing is assumed or fabricated
-from ambiguous evidence. **All visual reference categories below are
-`STATUS = AWAITING OWNER ASSET`.**
+**Verified at time of writing**: owner references and the approved M21 Hazard Bot are now present in-repo; historical “all empty” statements elsewhere are superseded by current inventory/coordination evidence.
 
 ### 9.1 — Visual reference priority `[LOCKED]`
 
 **Priority 1 — Owner-approved original SCRUBBOTS artwork.** Canonical
 visual reference: character concepts, gameplay concepts, five-slot layouts,
-pixel-art level artwork, themed level artwork (e.g. an underwater SCRUBBOTS
-scene, if/when supplied), original UI ideas, effects concepts, screen
-compositions. If original approved artwork conflicts with a generic
-placeholder, the original artwork wins.
+pixel-art level artwork, themed level artwork, original UI ideas, effects
+concepts, screen compositions. If original approved artwork conflicts with a
+generic placeholder, the original artwork wins.
 
 **Priority 2 — Owner-supplied SCRUBBOTS reference images.** May guide
 composition, proportions, pixel-art density, UI positioning, Scrubbot size,
@@ -404,10 +383,11 @@ logical grid. SCRUBBOTS level artwork remains original.
 
 ### 9.4 — Existing SCRUBBOTS level art `[LOCKED]`
 
-Existing original SCRUBBOTS level artwork (e.g. a previously-created
-underwater theme piece) is intended to become real playable content once
-the owner supplies the actual files. Never regenerate such pieces from
-memory and present the result as "the original."
+Existing original SCRUBBOTS level artwork is intended to become real playable
+content once owner-approved source files are supplied/recorded. Never regenerate
+such pieces from memory and present the result as “the original.” The M21 Hazard
+Bot source is the first owner-approved production-art fixture and must remain
+byte-identical unless the owner explicitly replaces it.
 
 ### 9.5 — Reference file availability `[LOCKED]`
 
@@ -417,10 +397,7 @@ locally: `STATUS = AWAITING OWNER ASSET`. Do not fabricate it, do not mark
 its audit complete, do not claim a pixel-accurate comparison was performed
 against something that doesn't exist locally.
 
-### 9.6 — Recommended future visual directory structure
-
-Not implemented in this planning task — recorded here for the asset-audit
-milestone (M07) to use later:
+### 9.6 — Recommended visual directory structure
 
 ```text
 assets/
@@ -449,12 +426,12 @@ assets/
 ## VISUAL PRODUCTION / MASTER UI WORKFLOW [LOCKED OWNER DECISION]
 
 1. Visual production is an integral part of the **main SCRUBBOTS mobile game project and roadmap**. It must not be split into a Level Factory/Content Pipeline-style sidecar or treated as an unrelated final art pass.
-2. Magnific MCP is the only approved AI image-generation provider for this workflow unless the owner explicitly changes that decision. Do not add Higgsfield as a dependency.
-3. Magnific is a **development-time tool only**. The shipping game must never require Magnific, MCP, network generation, API credentials, or generation credits at runtime. Owner-approved generated outputs become ordinary versioned Godot assets.
-4. Existing owner-created SCRUBBOTS artwork is the first visual authority. Import/copy and classify owner references before generating replacements or variants. Never overwrite or delete the owner's Desktop originals.
+2. Magnific MCP remains the approved illustration-generation provider for the UI/character visual-production workflow unless the owner explicitly changes that decision. PixelLab/native pixel AI work is separately scoped to semantic pixel-art generation and does not own puzzle logic.
+3. AI image generation is a **development-time tool only**. The shipping game must never require generation APIs, credentials, or credits at runtime. Owner-approved generated outputs become ordinary versioned Godot assets.
+4. Existing owner-created SCRUBBOTS artwork is the first visual authority. Import/copy and classify owner references before generating replacements or variants. Never overwrite or delete the owner's originals.
 5. AI-generated full-screen mockups are art-direction/reference material, not shippable UI. Production screens must be composed from responsive Godot Controls/Containers plus approved illustration assets.
-6. Prefer native Godot UI for panels, buttons/interaction containers, progress bars, slots, color tiles, currency counters, text, popup bodies, dim layers and responsive layout. Use Magnific for art that genuinely benefits from illustration generation: characters, character poses/portraits, boosters, rewards, difficulty emblems, decorative props, collection/event art and similar branded artwork.
-7. Raw Magnific candidates and owner-approved production assets are different lifecycle states. Never silently regenerate, replace or overwrite an approved production asset.
+6. Prefer native Godot UI for panels, buttons/interaction containers, progress bars, slots, color tiles, currency counters, text, popup bodies, dim layers and responsive layout. Use generation for art that genuinely benefits from illustration generation: characters, character poses/portraits, boosters, rewards, difficulty emblems, decorative props, collection/event art and similar branded artwork.
+7. Raw generation candidates and owner-approved production assets are different lifecycle states. Never silently regenerate, replace or overwrite an approved production asset.
 8. Every milestone that requires new visual assets owns its own visual-generation/review/import tasks. Do not postpone all visual production to one disconnected end-of-project art phase.
 9. `docs/MASTER_UI_SYSTEM.md` is the canonical responsive UI architecture contract. `ASSET_GENERATION_MANIFEST.json` is the machine-readable Magnific generation queue/provenance contract.
 10. `BoardRenderer` remains the existing single-`Image`/`ImageTexture` data-oriented renderer. The Master UI system must not replace logical board rendering with one UI node per cell.
@@ -462,12 +439,12 @@ assets/
 
 ### Visual production order
 
-1. **Reference intake and canonical visual selection first.** Import `C:\Users\sekip\Desktop\ScrubBots Gorselleri` copy-only into the repository reference inbox, inventory/classify it, and select canonical Scrubby/gameplay/home/popup references before broad Magnific generation.
+1. **Reference intake and canonical visual selection first.** Import owner references copy-only into the repository reference inbox, inventory/classify them, and select canonical Scrubby/gameplay/home/popup references before broad generation.
 2. **Core gameplay engineering continues without waiting for decorative art.** Target selection, routing, dispatcher/agent behavior, cleaning rules and other gameplay-critical work must not be blocked by decorative asset production when programmer art is sufficient.
-3. **First real-art vertical slice.** Validate gameplay with owner-approved real level/pixel artwork before treating production visuals as proven. Magnific must not invent canonical logical level data or replace the level-data pipeline.
+3. **First real-art vertical slice.** Validate gameplay with owner-approved real level/pixel artwork before treating production visuals as proven. AI image generation must not invent canonical puzzle truth or replace the level-data/puzzle-validation pipeline.
 4. **Production gameplay UI asset generation begins when the relevant gameplay UI milestones open.** Generate only assets required by that milestone, review them, promote approved variants, then bind them to reusable Godot components.
 5. **Final Scrubbot visual production happens in the existing Scrubbot visual milestone**, using the canonical Scrubby reference and approved visual language.
-6. **Home, Results, Tutorial, Collection, Shop, Events and later screens generate their own required Magnific assets inside their existing milestones.** They do not wait for a separate global art project.
+6. **Home, Results, Tutorial, Collection, Shop, Events and later screens generate their own required assets inside their existing milestones.** They do not wait for a separate global art project.
 7. Final visual polish is a consolidation/QA pass over already-integrated milestone-owned art, not the first time production art is introduced.
 
 ---
@@ -476,18 +453,15 @@ assets/
 
 Unresolved. Do not silently invent final decisions for these:
 
-Exact slot refill/replacement behavior; how a player activates a slot;
-whether slots hold quantities; hidden/upcoming slot queue;
-exact route geometry; route crossing rules; route collision behavior; exact
-win condition; exact lose condition;
-timer; move limits; lives; blockers; boosters; hints; progression
-structure; currency meaning; economy; shop; monetization; ads; IAP; energy
-system; analytics; achievements; leaderboard; social features; cloud save;
-tutorial wording; audio direction.
+Exact slot refill/replacement behavior; whether slots hold quantities;
+hidden/upcoming slot queue; exact route visual styling beyond the locked
+one-cell exterior corridor/access law; route collision/congestion presentation;
+exact win condition; exact lose condition; timer; move limits; lives; blockers;
+boosters; hints; progression structure; currency meaning; economy; shop;
+monetization; ads; IAP; energy system; analytics; achievements; leaderboard;
+social features; cloud save; tutorial wording; audio direction.
 
-**Not design gates**: board-size bands are locked in §8.3; the global
-C01..C16 palette and difficulty distinct-color bands are locked in §8.7A/B;
-the target positional priority is owner-locked in §8.10A.
+**Not design gates**: the global C01..C16 palette, Difficulty V1 progression/challenge architecture, target positional priority, one-cell exterior routing corridor, and visible-slot-click-only owner activation are owner-locked.
 
 ---
 
@@ -563,14 +537,12 @@ Complete from Prompt 02, re-verified.
 
 ### M03 — Official Difficulty Bands + 59×59 Envelope
 
-**This is the next required architecture correction.** Prompt 02 only knew
-about 40×40 and 50×50; the official band system (8.3) is broader and must
-now be reflected in docs and enforced in code.
+Historical runtime-validator milestone. Difficulty V1 later superseded class=dimension as player-facing truth, but the completed compatibility implementation remains audited evidence until separately migrated.
 
 **Documentation**
 - [x] SB-M03-001 Search docs for old claim that 40×40 is "standard."
 - [x] SB-M03-002 Search docs for claim 50×50 is the Very Hard requirement without a range.
-- [x] SB-M03-003 Search for `2500` used as a maximum (none found; only an example error message and a factual 50×50 cell-count statement remain).
+- [x] SB-M03-003 Search for `2500` used as a maximum.
 - [x] SB-M03-004 Update `CLAUDE.md`.
 - [x] SB-M03-005 Update project brief.
 - [x] SB-M03-006 Update gameplay specification.
@@ -581,77 +553,55 @@ now be reflected in docs and enforced in code.
 - [x] SB-M03-011 Add/amend ADR for official difficulty dimension bands (ADR-010).
 
 **Production difficulty representation**
-- [x] SB-M03-012 Define canonical production difficulty IDs (`DifficultyRules`, `scripts/data/difficulty_rules.gd`).
+- [x] SB-M03-012 Define canonical legacy runtime production difficulty IDs (`DifficultyRules`).
 - [x] SB-M03-013 EASY = dimensions 20..29.
 - [x] SB-M03-014 MEDIUM = dimensions 30..39.
 - [x] SB-M03-015 HARD = dimensions 40..49.
 - [x] SB-M03-016 VERY_HARD = dimensions 50..59.
-- [x] SB-M03-017 Keep TEST/dev fixture concept separate (`DifficultyRules.TEST_DIFFICULTY`).
-- [x] SB-M03-018 Production catalog must never expose TEST (enforced at the validator layer — `ProductionLevelValidator` rejects TEST outright, tested; no `LevelCatalog` exists yet, that's M30).
+- [x] SB-M03-017 Keep TEST/dev fixture concept separate.
+- [x] SB-M03-018 Production validator rejects TEST.
 
 **Validation**
-- [x] SB-M03-019 Add production difficulty/dimension validation (`ProductionLevelValidator`).
-- [x] SB-M03-020 Accept Easy rectangular boards (tested: 20×27).
-- [x] SB-M03-021 Accept Medium rectangular boards (tested: 34×39).
-- [x] SB-M03-022 Accept Hard rectangular boards (tested: 48×41).
-- [x] SB-M03-023 Accept Very Hard rectangular boards (tested: 53×59).
-- [x] SB-M03-024 Reject cross-band Easy dimensions (tested: 20×30 upper, 19×20 lower).
-- [x] SB-M03-025 Reject cross-band Medium dimensions (tested: 39×40 upper, 29×30 lower).
-- [x] SB-M03-026 Reject cross-band Hard dimensions (tested: 49×50 upper, 39×40 lower).
-- [x] SB-M03-027 Reject cross-band Very Hard dimensions (tested: 49×59 upper, 49×50 lower).
-- [x] SB-M03-028 Produce explicit errors, e.g.:
-  ```text
-  Level level_123: difficulty VERY_HARD requires width and height in
-  range 50..59. Received width=49 height=59.
-  ```
-  (actual implemented format matches this shape, e.g. `Level easy_bad_upper:
-  difficulty EASY requires width and height in range 20..29; received
-  width=20 height=30`.)
+- [x] SB-M03-019 Add production difficulty/dimension validation.
+- [x] SB-M03-020 Accept Easy rectangular boards.
+- [x] SB-M03-021 Accept Medium rectangular boards.
+- [x] SB-M03-022 Accept Hard rectangular boards.
+- [x] SB-M03-023 Accept Very Hard rectangular boards.
+- [x] SB-M03-024 Reject cross-band Easy dimensions.
+- [x] SB-M03-025 Reject cross-band Medium dimensions.
+- [x] SB-M03-026 Reject cross-band Hard dimensions.
+- [x] SB-M03-027 Reject cross-band Very Hard dimensions.
+- [x] SB-M03-028 Produce explicit errors.
 
 ### M04 — Expanded Board Fixtures & Test Matrix
 
 Do not replace existing Prompt 02 fixtures — add to them.
 
 - [x] SB-M04-001 3×2 generic non-square fixture exists.
-
-**Easy** — all tested via in-memory `LevelData` against `ProductionLevelValidator` (see M03).
 - [x] SB-M04-002 20×20. — [x] SB-M04-003 29×29. — [x] SB-M04-004 20×27.
-
-**Medium**
 - [x] SB-M04-005 30×30. — [x] SB-M04-006 39×39. — [x] SB-M04-007 34×39.
-
-**Hard**
 - [x] SB-M04-008 40×40 generic fixture exists.
 - [x] SB-M04-009 49×49. — [x] SB-M04-010 48×41.
-
-**Very Hard**
 - [x] SB-M04-011 50×50 generic fixture exists.
-- [x] SB-M04-012 59×59 (real fixture `test_59x59.json` + in-memory production check). — [x] SB-M04-013 53×59.
-
-**Boundary rejection** — upper AND lower boundary tested for all four (prompt required at minimum the upper cases; lower cases added too).
-- [x] SB-M04-014 Easy 20×30 fails production validation (also: 19×20 lower bound).
-- [x] SB-M04-015 Medium 39×40 fails (also: 29×30 lower bound).
-- [x] SB-M04-016 Hard 49×50 fails (also: 39×40 lower bound).
-- [x] SB-M04-017 Very Hard 49×59 fails (also: 49×50 lower bound).
-
-**Maximum workload**
-- [x] SB-M04-018 59×59 loads successfully (`test_59x59.json`, full JSON pipeline).
+- [x] SB-M04-012 59×59. — [x] SB-M04-013 53×59.
+- [x] SB-M04-014 Easy 20×30 fails legacy production validation.
+- [x] SB-M04-015 Medium 39×40 fails.
+- [x] SB-M04-016 Hard 49×50 fails.
+- [x] SB-M04-017 Very Hard 49×59 fails.
+- [x] SB-M04-018 59×59 loads successfully.
 - [x] SB-M04-019 `cell_count == 3481`.
-- [x] SB-M04-020 Coordinate/index tests pass at 59×59 (4 corners + center).
-- [x] SB-M04-021 State mutation tests pass at 59×59 (single-cell isolation: 1 CLEARED / 3480 ACTIVE).
-- [x] SB-M04-022 Performance sanity benchmark runs at 3,481 cells (kept alongside the existing 50×50 benchmark, not replacing it).
-- [x] SB-M04-023 Record results without an arbitrary strict timing threshold (see `SCRUBBOTS_PHASE_M03_LOG.md` for actual measured numbers).
+- [x] SB-M04-020 Coordinate/index tests pass at 59×59.
+- [x] SB-M04-021 State mutation tests pass at 59×59.
+- [x] SB-M04-022 Performance sanity benchmark runs at 3,481 cells.
+- [x] SB-M04-023 Record results without arbitrary strict timing threshold.
 
 ### M05 — Test Harness Maturity
 
-`tests/run_tests.gd` already provides a usable native Godot headless
-runner — mark actual existing capabilities complete.
-
 - [x] SB-M05-001 Headless test script exists.
-- [x] SB-M05-002 Test process returns failure exit code (verified: exit 0 on pass).
+- [x] SB-M05-002 Test process returns failure exit code.
 - [x] SB-M05-003 Current tests print PASS/failure information.
 - [x] SB-M05-004 No third-party test framework required.
-- [x] SB-M05-005 Current 73 checks pass (re-verified this session).
+- [x] SB-M05-005 Current baseline checks pass.
 - [ ] SB-M05-006 Organize test sections as suite grows.
 - [ ] SB-M05-007 Separate performance benchmark output from assertions.
 - [ ] SB-M05-008 Add one-command PowerShell full-test wrapper if useful.
@@ -660,185 +610,150 @@ runner — mark actual existing capabilities complete.
 
 ### M06 — Board Renderer
 
-First major missing technical system after the difficulty-envelope
-correction. Render `BoardState` efficiently, never one Node per cell.
-
-- [x] SB-M06-001 Define BoardRenderer responsibility (presentation-only, see docs/02_TECH_ARCHITECTURE.md).
-- [x] SB-M06-002 Keep BoardRenderer separate from BoardState (never mutates it — tested).
-- [x] SB-M06-003 Evaluate efficient Godot rendering options (3 candidates compared, see ADR-011 / phase log).
-- [x] SB-M06-004 Choose technique based on measured simplicity/performance (Image/ImageTexture).
-- [x] SB-M06-005 Record technique in ADR (ADR-011).
+- [x] SB-M06-001 Define BoardRenderer responsibility.
+- [x] SB-M06-002 Keep BoardRenderer separate from BoardState.
+- [x] SB-M06-003 Evaluate efficient Godot rendering options.
+- [x] SB-M06-004 Choose Image/ImageTexture technique.
+- [x] SB-M06-005 Record technique in ADR.
 - [x] SB-M06-006 Render arbitrary width/height.
-- [x] SB-M06-007 Support rectangular board aspect ratio (never stretched — tested at 20×27, 34×39, 48×41, 53×59).
-- [x] SB-M06-008 Preserve logical pixel boundaries (integer `floor()` cell_size, no drift).
-- [x] SB-M06-009 Disable unwanted texture filtering (`TEXTURE_FILTER_NEAREST`).
-- [x] SB-M06-010 Render palette colors correctly (via `PaletteColors`, tested).
+- [x] SB-M06-007 Support rectangular board aspect ratio.
+- [x] SB-M06-008 Preserve logical pixel boundaries.
+- [x] SB-M06-009 Disable unwanted texture filtering.
+- [x] SB-M06-010 Render palette colors correctly.
 - [x] SB-M06-011 Render 20×20. — [x] SB-M06-012 Render 29×29.
 - [x] SB-M06-013 Render 39×39. — [x] SB-M06-014 Render 49×49.
 - [x] SB-M06-015 Render 50×50. — [x] SB-M06-016 Render 59×59.
 - [x] SB-M06-017 Render representative rectangular boards.
-- [x] SB-M06-018 Expose logical-cell center coordinate (`get_cell_center_local`/`get_cell_center_global` — geometry seam only, no movement implemented against it).
-- [x] SB-M06-019 Support efficient individual-cell update (`update_cells()`, tested).
-- [x] SB-M06-020 Support full reset (`refresh_all()`, tested).
-- [x] SB-M06-021 Benchmark 3,481-cell display (see `SCRUBBOTS_PHASE_M06_LOG.md` for actual numbers; CPU-side only — true GPU/on-screen FPS not measurable under `--headless`, stated explicitly rather than fabricated).
-- [x] SB-M06-022 Confirm no 3,481-cell Node tree exists (`get_child_count() == 0` asserted at 59×59 and every other tested size).
+- [x] SB-M06-018 Expose logical-cell center coordinate.
+- [x] SB-M06-019 Support efficient individual-cell update.
+- [x] SB-M06-020 Support full reset.
+- [x] SB-M06-021 Benchmark 3,481-cell display.
+- [x] SB-M06-022 Confirm no 3,481-cell Node tree exists.
 
 ### M07 — Visual Reference Library `[VISUAL REFERENCE]`
 
-- [x] SB-M07-001 Establish reference directory structure (9.6). Validated: directory tree created per §9.6, verified via `find assets/art -type d`.
-- [x] SB-M07-002 Create visual-reference README/guide. Validated: `assets/art/references/README.md` created with authority hierarchy, source classes, approval semantics, naming, preservation, intake, M08 boundary, M10 gate.
-- [x] SB-M07-003 Separate original SCRUBBOTS art from external inspiration. Validated: directory structure and inventory.json separate `OWNER_ORIGINAL`/`OWNER_REFERENCE` from `EXTERNAL_INSPIRATION`; Colony Flow recorded as text-only provenance.
-- [x] SB-M07-004 Define canonical asset naming. Validated: naming rules defined in README.md (lowercase, underscores, cross-platform safe, original filenames preserved).
-- [x] SB-M07-005 Define asset type metadata. Validated: inventory.json schema with id, category, sourceClass, approvalStatus, availabilityStatus, repositoryPath, originalFilename, intendedUse, width, height, candidateDifficulty, notes.
-- [x] SB-M07-006 Define owner-approved status. Validated: four approval states (APPROVED, SUPPLIED_NOT_APPROVED, AWAITING_OWNER_ASSET, UNVERIFIED) defined in README.md and used in inventory.json.
-- [x] SB-M07-007 Preserve source file originals. Validated: immutable-source-original policy defined in README.md; derived outputs must be separate files.
-- [x] SB-M07-008 Inventory Scrubbot character visuals supplied by owner. 16 collection cards + master collection reference imported and inventoried with SHA-256/dimensions in inventory.json. Production character art requires separate M08 audit.
-- [x] SB-M07-009 Inventory gameplay-screen references supplied by owner. Canonical gameplay reference selected: `Game Screens/deneme 3 OK.png`. Inventoried with SHA-256/dimensions.
-- [x] SB-M07-010 Inventory five-slot visual references. Five-slot layout visible in canonical gameplay reference (deneme 3 OK.png). Inventoried with SHA-256/dimensions.
-- [ ] SB-M07-011 Inventory level images. External level screenshots available as references in Levels/ subfolder. NOT production SCRUBBOTS level source art. M08 production-art audit still blocked on owner-supplied original level art.
-- [ ] SB-M07-012 Inventory underwater level artwork if supplied. Pixel construction reference shows underwater Scrubby scene (pixel art tam gorunum.jpeg) but this is a reference screenshot, not production level source.
-- [ ] SB-M07-013 Inventory other original theme artwork. No original themed level artwork supplied. External references exist but are not production source.
-- [x] SB-M07-014 Inventory pixel-construction reference screenshots. 2 pixel construction references imported and inventoried: pixel art tam gorunum.jpeg (key 30x30 reference) and pixel art tam gorunum 2.jpeg.
-- [x] SB-M07-015 Inventory external movement references separately. Validated: Colony Flow recorded as TEXT_ONLY `EXTERNAL_INSPIRATION` entry in inventory.json with non-copying provenance note.
-- [x] SB-M07-016 Flag previously discussed but unavailable assets as `AWAITING OWNER ASSET`. Validated: all 7 missing categories (SB-M07-008..014) flagged AWAITING_OWNER_ASSET in both tasks.md and inventory.json.
-- [x] SB-M07-017 Never regenerate missing references and label them originals. Validated: prohibition documented in README.md; no fabricated assets created.
+- [x] SB-M07-001 Establish reference directory structure.
+- [x] SB-M07-002 Create visual-reference README/guide.
+- [x] SB-M07-003 Separate original SCRUBBOTS art from external inspiration.
+- [x] SB-M07-004 Define canonical asset naming.
+- [x] SB-M07-005 Define asset type metadata.
+- [x] SB-M07-006 Define owner-approved status.
+- [x] SB-M07-007 Preserve source file originals.
+- [x] SB-M07-008 Inventory Scrubbot character visuals supplied by owner.
+- [x] SB-M07-009 Inventory gameplay-screen references supplied by owner.
+- [x] SB-M07-010 Inventory five-slot visual references.
+- [ ] SB-M07-011 Inventory level images beyond current M21 source as they are supplied/approved.
+- [ ] SB-M07-012 Inventory underwater level artwork if supplied.
+- [ ] SB-M07-013 Inventory other original theme artwork.
+- [x] SB-M07-014 Inventory pixel-construction reference screenshots.
+- [x] SB-M07-015 Inventory external movement references separately.
+- [x] SB-M07-016 Flag unavailable assets as `AWAITING OWNER ASSET`.
+- [x] SB-M07-017 Never regenerate missing references and label them originals.
 
 **Master UI / Magnific visual reference tasks (from UI_TASKS_APPENDIX migration)**
 - [ ] SB-UI-001 Treat `docs/MASTER_UI_SYSTEM.md` as the UI architecture source of truth.
 - [ ] SB-UI-002 Treat `ASSET_GENERATION_MANIFEST.json` as the machine-readable generation/provenance queue.
-- [ ] SB-UI-003 Keep Magnific MCP as the only approved AI image provider unless the owner explicitly changes it.
-- [ ] SB-UI-004 Do not add Higgsfield as a project dependency.
-- [x] SB-UI-005 Import owner visual references from `C:\Users\sekip\Desktop\ScrubBots Gorselleri` using `tools/import_desktop_visual_refs.ps1`. 51 files imported with subdirectory structure preserved.
-- [x] SB-UI-006 Preserve Desktop originals untouched and imported reference copies byte-for-byte; inventory/classify references before production promotion. 51/51 source-vs-repo SHA-256 match verified. Per-file inventory in inventory.json.
-- [x] SB-UI-007 Classify owner references at minimum into Scrubby/characters, gameplay UI, Home UI, popup/level-intro, logo/icon, pixel-construction, level-art and outdated/conflicting references. All 51 files classified with category, sourceClass, provenanceClass in inventory.json.
-- [ ] SB-UI-008 Select and record the canonical Scrubby master reference before generating new Scrubby poses/portraits. `OWNER_REQUIRED` — two candidates identified (main screen.png central Scrubby, meet the scrubbots.jpeg portraits). Owner must select.
-- [x] SB-UI-009 Select and record the canonical gameplay-screen art-direction reference. Selected: `Game Screens/deneme 3 OK.png`. Recorded in inventory.json and ASSET_GENERATION_MANIFEST.json.
-- [x] SB-UI-010 Select and record the canonical Home-screen art-direction reference. Selected: `Game Screens/main screen.png`. Recorded in inventory.json and ASSET_GENERATION_MANIFEST.json.
-- [x] SB-UI-011 Select and record canonical popup/level-intro references. Selected: level ekran acilisi.png (level intro), life screens.png (life), need a hand.png (help). Recorded in inventory.json and ASSET_GENERATION_MANIFEST.json.
-- [x] SB-UI-012 Identify conflicting/outdated references and keep them clearly non-canonical rather than deleting historical owner work. Playing Motors marked EXTERNAL_INSPIRATION, level designs 016 marked chatgpt_generated, cleaning crew duplicates preserved and marked, superseded main screen 001 preserved.
-- [ ] SB-UI-013 Validate manifest reference paths/IDs after canonical references are selected; do not begin broad Magnific production against placeholder reference IDs. Manifest canonical refs recorded but Scrubby master OWNER_REQUIRED blocks full validation.
+- [ ] SB-UI-003 Keep approved provider decisions scoped by asset type and newest owner decisions.
+- [ ] SB-UI-004 Do not add unapproved generation providers as project runtime dependencies.
+- [x] SB-UI-005 Import owner visual references copy-only.
+- [x] SB-UI-006 Preserve originals/copies byte-for-byte and inventory before promotion.
+- [x] SB-UI-007 Classify owner references.
+- [ ] SB-UI-008 Select and record canonical Scrubby master reference before final Scrubby production generation.
+- [x] SB-UI-009 Select canonical gameplay-screen art-direction reference.
+- [x] SB-UI-010 Select canonical Home-screen art-direction reference.
+- [x] SB-UI-011 Select canonical popup/level-intro references.
+- [x] SB-UI-012 Identify conflicting/outdated references and retain as non-canonical history.
+- [ ] SB-UI-013 Validate manifest reference paths/IDs after canonical references are selected.
 
 ### M08 — Level Art Technical Audit `[CONTENT] [VISUAL REFERENCE]`
 
-Per candidate production pixel-art level (none exist locally yet):
+Per candidate production pixel-art level:
 
 - [ ] SB-M08-001 Record filename. — [ ] SB-M08-002 Record original dimensions.
 - [ ] SB-M08-003 Record alpha/transparency. — [ ] SB-M08-004 Count colors.
 - [ ] SB-M08-005 Detect anti-aliasing. — [ ] SB-M08-006 Detect interpolation.
 - [ ] SB-M08-007 Determine logical-pixel grid.
-- [ ] SB-M08-008 Determine legal difficulty band.
-- [ ] SB-M08-009 Confirm width in legal range.
-- [ ] SB-M08-010 Confirm height in legal range.
+- [ ] SB-M08-008 Determine legal production envelope/context.
+- [ ] SB-M08-009 Confirm width in legal engine envelope.
+- [ ] SB-M08-010 Confirm height in legal engine envelope.
 - [ ] SB-M08-011 Preserve original. — [ ] SB-M08-012 Never silently resize.
-- [ ] SB-M08-013 Explicitly map/reject candidate source colors against locked C01..C16; never silently reduce/remap, never invent C17+, and record deterministic mapping/rejection evidence. — [ ] SB-M08-014 Produce audit report.
-
-Examples: `27×24 -> Easy`, `35×38 -> Medium`, `43×46 -> Hard`, `53×59 -> Very Hard`.
-An image must never be auto-changed to 20×20/40×40/50×50 for convenience.
+- [ ] SB-M08-013 Explicitly map/reject source colors against locked C01..C16; never invent C17+; record deterministic mapping/rejection evidence.
+- [ ] SB-M08-014 Produce audit report.
 
 ### M09 — Pixel Art → Level Data Pipeline `[CONTENT]`
 
-- [x] SB-M09-001 Create importer tool. — `scripts/tools/level_importer.gd` (core) + `tools/import_level.gd` (CLI). Validated: 286/286 tests, CLI 3x2/20x27/59x59 pass.
-- [x] SB-M09-002 Read source pixels exactly. — PNG loaded as RGBA8, no resize/resample/interpolation. Reconstruction raw-byte match proves lossless.
-- [x] SB-M09-003 Determine width. — [x] SB-M09-004 Determine height. — Taken from source Image dimensions. Rectangular boards first-class (20x27 tested).
-- [x] SB-M09-005 Determine/validate difficulty. — Uses DifficultyRules. TEST/production split enforced. auto_difficulty() convenience. Unknown rejected. Band mismatch rejected.
-- [x] SB-M09-006 Extract unique palette. — First-seen row-major scan. `#RRGGBBAA` uppercase hex preserving alpha.
-- [x] SB-M09-007 Produce stable palette ordering. — Deterministic first-seen via dictionary keyed on hex string + ordered palette array. Rerun produces identical order.
-- [x] SB-M09-008 Convert pixels to palette IDs. — Each pixel mapped to palette index via color→ID dictionary.
-- [x] SB-M09-009 Flatten using canonical row-major mapping (`index = y*width+x`). — Shares formula with BoardState/LevelData.
-- [x] SB-M09-010 Produce Level Data V1. — Output passes LevelValidator. Production-band outputs pass ProductionLevelValidator.
-- [x] SB-M09-011 Store source-asset metadata where useful. — Separate JSON sidecar (not in Level Data V1). Records importer version, source path, dimensions, palette count, difficulty, output ID/path.
-- [x] SB-M09-012 Deterministic output. — JSON.stringify with tab indent + newline. Same input = identical text.
-- [x] SB-M09-013 Re-running importer produces no meaningless diff. — UNCHANGED detection: existing identical content → no file write. Automated + CLI verified.
-- [x] SB-M09-014 Reconstruct image from generated data. — `reconstruct_image()` uses palette+cells only, never source image.
-- [x] SB-M09-015 Pixel-compare reconstruction. — Raw RGBA8 byte comparison: 3x2 (24B), 20x27 (2160B), 59x59 (13924B) all match source. Semi-transparent alpha round-trips.
-- [x] SB-M09-016 Generate preview. — Preview PNG from reconstruction, not source. Not resized or smoothed.
-- [x] SB-M09-017 Reject unsupported/broken art with useful reason. — V02 correction: PNG-only gate (JPEG/.jpg/.bmp rejected), corrupt .png rejected, source/destination path aliasing rejected (source immutable even with overwrite=true), preview/metadata overwrite safety, malformed reconstruction safety (short cells, bad palette ID, invalid hex). V03 correction (audit V02 F-M09-005): `_canonical_path()` now resolves bare relative paths against `res://` (empirically confirmed base — not OS CWD) and calls `String.simplify_path()` to collapse `.`/`..` segments before alias comparison, closing the equivalent-path bypass. 332/332 tests pass (12 new targeted equivalent-path tests); CLI-level dot-segment/absolute-alias rejection and legitimate distinct-path success independently verified. Symlink identity remains explicitly out of scope (lexical normalization only).
-- [x] SB-M09-018 Batch import. — M09-C002: `LevelBatchImporter.run_batch()` (`scripts/tools/level_batch_importer.gd`) + CLI `tools/import_level_batch.gd`. Manifest-driven, reuses audited `LevelImporter` per item (`dry_run` param), preserves manifest order. Validation-only and commit (`--commit`) modes both real-CLI-verified with a multi-item batch (3×2 TEST, 20×27 EASY): validation-only writes nothing, commit writes, rerun reports unchanged. V02 correction (audit V01 F-M09B-001/002): destination-parent-directory and catalog-root existence are now part of preflight, not discovered mid-commit. V03 correction (audit V02 F-M09B-006 / AL-017): final destination path itself is now preflighted — existing directories at output/preview/metadata destinations are rejected before any commit write. Overwrite cannot bypass directory-type safety. Applies to all three destination roles via the same `LevelImporter._resolve_path()` resolver. 447/447 tests pass (21 new V03 checks on top of the 426 V02 baseline).
-- [x] SB-M09-019 Batch validation. — Whole-batch preflight (every item `dry_run=true` + schema/destination-parent/destination-type/duplicate-ID/cross-item-path/catalog-ownership/catalog-health checks) runs before any commit write; a failing later item blocks earlier items from being committed (CLI-verified, including missing-destination-parent and destination-is-directory cases). Malformed/empty manifest, missing required fields, and wrong optional-field types rejected with actionable per-item errors and no crash. V03 correction (audit V02 F-M09B-006 / AL-017): destination-object type (existing directory at final path) is now part of preflight for output, preview, and metadata roles — validation-only mode remains fully read-only and creates/removes nothing. 447/447 tests pass.
-- [x] SB-M09-020 Duplicate level ID protection. — ChatGPT audit V02 independently accepted the V02 catalog-root/health and bidirectional ID/path ownership corrections; F-M09B-006 does not reopen duplicate-ID semantics.  Rejects duplicate IDs within one manifest and IDs already owned by a different existing catalog file (independent of `overwrite`, CLI-verified); allows re-import at the same canonical catalog path (CLI-verified: legitimate overwrite still succeeds); catalog scan reports existing duplicate IDs (both paths) and malformed/structurally-invalid catalog entries rather than ignoring them. V02 correction (audit V01 F-M09B-003): catalog scan now builds bidirectional ownership (declared ID → path *and* canonical path → declared ID) — a different ID can no longer take over an existing catalog path with `overwrite=true` (CLI-verified with byte-preservation proof), and aliasing a malformed existing catalog file fails closed. TEST and production levels share one ID-uniqueness space per catalog root.
+- [x] SB-M09-001 Create importer tool.
+- [x] SB-M09-002 Read source pixels exactly.
+- [x] SB-M09-003 Determine width. — [x] SB-M09-004 Determine height.
+- [x] SB-M09-005 Determine/validate legacy compatibility difficulty where required.
+- [x] SB-M09-006 Extract unique palette.
+- [x] SB-M09-007 Produce stable palette ordering.
+- [x] SB-M09-008 Convert pixels to palette IDs.
+- [x] SB-M09-009 Flatten using canonical row-major mapping.
+- [x] SB-M09-010 Produce Level Data V1.
+- [x] SB-M09-011 Store source-asset metadata where useful.
+- [x] SB-M09-012 Deterministic output.
+- [x] SB-M09-013 Re-running importer produces no meaningless diff.
+- [x] SB-M09-014 Reconstruct image from generated data.
+- [x] SB-M09-015 Pixel-compare reconstruction.
+- [x] SB-M09-016 Generate preview.
+- [x] SB-M09-017 Reject unsupported/broken art with useful reason.
+- [x] SB-M09-018 Batch import.
+- [x] SB-M09-019 Batch validation.
+- [x] SB-M09-020 Duplicate level ID protection.
 
-**M09 palette-lock note (owner decision 2026-09-06):** M09's completed
-exact-source-pixel importer remains valid historical/generic tooling evidence,
-but it predates the locked global C01..C16 production palette. An arbitrary
-raw M09 import is not production-legal merely because it round-trips exactly.
-Production acceptance must additionally satisfy §8.7A/B through the open
-art-audit / Level Factory / Level QA gates. Historical M09 task completion is
-not rewritten.
+**M09 palette-lock note:** M09's completed exact-source-pixel importer remains valid historical/generic tooling evidence, but production acceptance additionally obeys current canonical palette/art/difficulty systems. Historical completion is not rewritten.
 
-### M10 — ACTIVE/CLEARED Board Visual Model `[OWNER DECISION LOCKED]` `[MANUAL QA OPEN]`
+### M10 — ACTIVE/CLEARED Board Visual Model `[OWNER DECISION LOCKED]`
 
-Owner decision (2026-09-05, META-C004; ADR-019) resolves the visual model:
-**ACTIVE = the original source palette color, opaque; CLEARED = fully
-transparent (alpha 0) so the gameplay background shows through.** There is no
-grime/hidden-artwork layer and no A/B/C dirty preset. The implementation and
-its automated renderer tests are complete; the owner's manual visual QA of the NEW transparent model at native scale via
-`scenes/debug/board_renderer_debug.tscn` is complete (SB-M10-005..011 below).
-
-- [x] SB-M10-001 Define (approve) ACTIVE appearance — owner locked: original source palette color, opaque (ADR-019).
-- [x] SB-M10-002 Define CLEARED appearance — locked: fully transparent (alpha 0), background shows through (`docs/01_GAMEPLAY_SPEC.md`; was: CLEAN unmodified source color).
-- [x] SB-M10-003 Define artwork-clearing relationship to source artwork — locked: the visible source pixel is cleared to transparent; there is no separate grime/hidden layer (ADR-019).
-- [x] SB-M10-004 Implement visual mapping (`BoardRenderer._color_for_cell`: ACTIVE=source color/opaque, CLEARED=`Color(0,0,0,0)`) — implemented and tested in META-C004.
-- [x] SB-M10-005 Owner-confirm clearing is immediately readable (transparent CLEARED vs opaque ACTIVE) — owner visual QA PASS 2026-09-06.
-- [x] SB-M10-006 Owner-confirm ACTIVE artwork recognition — owner visual QA PASS 2026-09-06.
-- [x] SB-M10-007 Owner test Easy density. — [x] SB-M10-008 Owner test Medium density. (owner visual QA PASS 2026-09-06)
-- [x] SB-M10-009 Owner test Hard density. — [x] SB-M10-010 Owner test Very Hard density. (owner visual QA PASS 2026-09-06)
-- [x] SB-M10-011 Owner test 59×59 transparent-model readability — owner visual QA PASS 2026-09-06.
-- [x] SB-M10-012 Development debug tool (`scenes/debug/board_renderer_debug.tscn` — size + ACTIVE/CLEARED-pattern dropdowns, visible background behind board) migrated to the new model and proven to headless-boot in META-C004.
+- [x] SB-M10-001 ACTIVE appearance locked to original source palette color, opaque.
+- [x] SB-M10-002 CLEARED appearance locked to alpha 0/background visible.
+- [x] SB-M10-003 Define artwork-clearing relationship.
+- [x] SB-M10-004 Implement visual mapping.
+- [x] SB-M10-005 Owner-confirm clearing readability.
+- [x] SB-M10-006 Owner-confirm ACTIVE artwork recognition.
+- [x] SB-M10-007 Owner test Easy density. — [x] SB-M10-008 Owner test Medium density.
+- [x] SB-M10-009 Owner test Hard density. — [x] SB-M10-010 Owner test Very Hard density.
+- [x] SB-M10-011 Owner test 59×59 transparent-model readability.
+- [x] SB-M10-012 Development debug tool migrated/proven.
 
 ### M11 — Gameplay Session Core
 
-Strict-v2 re-audit: SB-M11-003/005/009/012 reopened; see `coordination/sessions/M11-C001/CHATGPT_STRICT_REAUDIT_V01.md`.
-
-- [x] SB-M11-001 Define session states. (UNINITIALIZED/READY/ACTIVE/PAUSED/COMPLETED enum in gameplay_session.gd; 542/542 ALL PASS)
-- [x] SB-M11-002 Initialize level. — [x] SB-M11-003 Load LevelData. (load_level uses LevelLoader, creates BoardState, enters READY; failed-load atomicity verified)
-- [x] SB-M11-004 Create BoardState. — [x] SB-M11-005 Connect renderer. (M11-23 proves pixel output follows session-owned BoardState via ACTIVE→CLEARED opaque→transparent readback; M11-24 proves renderer follows NEW BoardState after reset, not stale old. META-C004 re-verified under the ACTIVE/CLEARED model.)
-- [x] SB-M11-006 Define ready state. — [x] SB-M11-007 Define active state. (READY->ACTIVE via start(); invalid transitions rejected without state mutation)
-- [x] SB-M11-008 Define pause. — [x] SB-M11-009 Define reset. (session ACTIVE<->PAUSED; reset recreates BoardState from immutable LevelData, all cells ACTIVE, returns to READY)
-- [x] SB-M11-010 Define completion transition. (explicit complete() from session-ACTIVE only; no auto-complete from cleared-cell count; repeated completion deterministic)
-- [x] SB-M11-011 Keep UI separate from gameplay truth. (RefCounted core, no UI/Control dependency, no HUD/menu logic; renderer is optional presentation binding)
-- [x] SB-M11-012 Headless lifecycle tests where possible. (V02 correction closes F-M11-001: M11-23/24 strengthened with direct pixel readback proving renderer follows session-owned/fresh BoardState; test would fail if reset-time _configure_renderer() were removed; 548/548 ALL PASS)
+- [x] SB-M11-001 Define session states.
+- [x] SB-M11-002 Initialize level. — [x] SB-M11-003 Load LevelData.
+- [x] SB-M11-004 Create BoardState. — [x] SB-M11-005 Connect renderer.
+- [x] SB-M11-006 Define ready state. — [x] SB-M11-007 Define active state.
+- [x] SB-M11-008 Define pause. — [x] SB-M11-009 Define reset.
+- [x] SB-M11-010 Define completion transition.
+- [x] SB-M11-011 Keep UI separate from gameplay truth.
+- [x] SB-M11-012 Headless lifecycle tests.
 
 ### M12 — Five-Slot Logic
 
-Strict-v2 re-audit: SB-M12-005/009/011 reopened; see `coordination/sessions/M12-C001/CHATGPT_STRICT_REAUDIT_V01.md`.
+- [x] SB-M12-001 Create SlotState. — [x] SB-M12-002 Create SlotSystem.
+- [x] SB-M12-003 Configure five gameplay slots.
+- [x] SB-M12-004 Slot identity. — [x] SB-M12-005 Slot palette/color.
+- [x] SB-M12-006 Slot availability. — [x] SB-M12-007 Slot activity state.
+- [x] SB-M12-008 Keep model separate from UI. — [x] SB-M12-009 Query API.
+- [x] SB-M12-010 Five-slot tests. — [x] SB-M12-011 Invalid slot tests.
 
-- [x] SB-M12-001 Create SlotState. Validated: `scripts/gameplay/slots/slot_state.gd`, RefCounted, AL-001 preload, holds identity/palette/availability/activity. — [x] SB-M12-002 Create SlotSystem. Validated: `scripts/gameplay/slots/slot_system.gd`, RefCounted, AL-001 preload, owns exactly 5 SlotState instances.
-- [x] SB-M12-003 Configure five gameplay slots. Validated: palette-only-via-configure invariant enforced. get_slot() removed; no mutable internal SlotState leakage. 657/657 ALL PASS.
-- [x] SB-M12-004 Slot identity. Validated: deterministic IDs 0..4, stable across configure/state changes. — [x] SB-M12-005 Slot palette/color. Validated: palette only changeable through validated configure(). get_slot() removed; scalar getters only.
-- [x] SB-M12-006 Slot availability. Validated: per-slot available/unavailable, independent of other slots and activity. — [x] SB-M12-007 Slot activity state. Validated: per-slot active/inactive, independent of other slots and availability.
-- [x] SB-M12-008 Keep model separate from UI. Validated: both classes are RefCounted, no Node ancestry, no scene dependency. — [x] SB-M12-009 Query API. Validated: all public queries return scalars (int/bool). No mutable internal reference exposed. get_slot() removed.
-- [x] SB-M12-010 Five-slot tests. Validated: M12-18 bypass regression proves get_slot() absent, all queries return scalars, palette 999 rejected. — [x] SB-M12-011 Invalid slot tests. Validated: invalid slot IDs return -1/false, no mutable object leak possible. 657/657 ALL PASS.
-
-Remaining slot mechanics are `[DESIGN GATE]`.
+Remaining slot mechanics are `[DESIGN GATE]` except where newer owner decisions explicitly lock behavior.
 
 ### M13 — Color Candidate Index `[PERFORMANCE]`
 
-Strict-v2 re-audit: SB-M13-001/004 reopened; see `coordination/sessions/M13-C001/CHATGPT_STRICT_REAUDIT_V01.md`.
-
-Don't rescan up to 3,481 cells unnecessarily for every bot. This index
-supplies **raw ACTIVE matching-color candidates only** — it does NOT prove
-reachability (a matching-color ACTIVE cell may be blocked; AL-028).
-Renamed/migrated to `scripts/gameplay/targeting/color_candidate_index.gd`
-(`ColorCandidateIndex`) in META-C004; re-verified 774/774 ALL PASS.
-
-- [x] SB-M13-001 Define color candidate (valid + ACTIVE + matching color + caller exclusion).
+- [x] SB-M13-001 Define color candidate.
 - [x] SB-M13-002 Group/query by color.
 - [x] SB-M13-003 Implement efficient index/cache if measured useful.
 - [x] SB-M13-004 Synchronize with BoardState.
-- [x] SB-M13-005 Remove CLEARED cells from the index. — [x] SB-M13-006 Handle caller-supplied reservation/exclusion seam only (no owned reservation state).
+- [x] SB-M13-005 Remove CLEARED cells from the index. — [x] SB-M13-006 Handle caller exclusions/reservations seam.
 - [x] SB-M13-007 No-candidate query. — [x] SB-M13-008 Exhausted-color test.
 - [x] SB-M13-009 Last-candidate test. — [x] SB-M13-010 3,481-cell benchmark.
 
 ### M14 — Reservation State
 
-Strict-v2 re-audit V02: SB-M14-001/004/007/009 reopened; see `coordination/sessions/M14-C001/CHATGPT_STRICT_REAUDIT_V02.md`.
-
-RESERVED was intentionally deferred in Prompt 02 (see M02-017). Add only
-when target assignment requires it.
-
 - [x] SB-M14-001 Define reservation ownership.
-- [x] SB-M14-002 Decide whether RESERVED belongs in `BoardState.CellState` or separate data.
-- [x] SB-M14-003 Record decision (ADR).
+- [x] SB-M14-002 Decide RESERVED placement.
+- [x] SB-M14-003 Record decision.
 - [x] SB-M14-004 Reserve target atomically.
 - [x] SB-M14-005 Prevent double reservation.
 - [x] SB-M14-006 Release on dispatch failure. — [x] SB-M14-007 Release on reset.
@@ -846,52 +761,35 @@ when target assignment requires it.
 
 ### M15 — TargetSelector
 
-M15-C001 V02 strict correction independently audited PASS; SB-M15-001/007/008/011 re-closed. See `coordination/sessions/M15-C001/CHATGPT_AUDIT_V02.md`.
-
-Chooses WHAT target among **reachable/targetable** candidates. Consumes raw
-candidates from `ColorCandidateIndex` plus a narrow reachability/access truth;
-it must never generate a route. A matching-color ACTIVE cell that is
-blocked/unreachable is not a valid target (AL-028).
+M15 strict closure remains accepted. V04 later superseded only its target ordering policy while preserving strict safety contracts.
 
 - [x] SB-M15-001 Create TargetSelector.
 - [x] SB-M15-002 Keep BoardState access narrow.
-- [x] SB-M15-003 Baseline deterministic strategy. **Historical M15 completion remains valid, but the old ascending-row-major policy is superseded by owner rule §8.10A. M21-C001 V04 must implement and independently validate the new bottom-most/left-most targetable priority before current production acceptance.**
+- [x] SB-M15-003 Deterministic strategy. **Current production ordering is owner rule §8.10A: bottom-most then left-most among targetable candidates.**
 - [x] SB-M15-004 Match Scrubbot color.
-- [x] SB-M15-005 Never target CLEARED. — [x] SB-M15-006 Never target invalid or blocked/unreachable ACTIVE cells (consume a narrow reachability/access truth; a fully enclosed matching-color ACTIVE cell must not be selected and must not cause dispatch — required regression, AL-028).
+- [x] SB-M15-005 Never target CLEARED. — [x] SB-M15-006 Never target invalid or blocked/unreachable ACTIVE cells.
 - [x] SB-M15-007 Respect reservations.
 - [x] SB-M15-008 Return no-target cleanly.
-- [x] SB-M15-009 No route generation inside selector (8.10).
+- [x] SB-M15-009 No route generation inside selector.
 - [x] SB-M15-010 Determinism tests.
 - [x] SB-M15-011 Simultaneous assignment tests.
 - [x] SB-M15-012 3,481-cell benchmark.
 
-**Owner amendment [2026-09-13]:** current production acceptance additionally requires §8.10A. This amendment changes target ordering only; all audited M15 strict-v2 re-entry, bundle-coherence, reservation, rollback and fail-closed protections remain mandatory and must regress green in V04.
-
 ### M16 — RoutingSystem Interface
-
-M16-C001 V05 strict full-surface audit PASS; SB-M16-002/003/010/011 re-closed. See `coordination/sessions/M16-C001/CHATGPT_AUDIT_V05.md`.
-
-Access semantics (locked, AL-028; exact topology/path style is still design
-work): non-target ACTIVE cells are **blockers**; CLEARED cells and
-gameplay-background/outside-board space are **open**; a route ends at the
-already-assigned ACTIVE target. No route → **failure**, never a silent
-retarget (that decision belongs to TargetSelector, not RoutingSystem).
 
 - [x] SB-M16-001 Define RoutingSystem contract.
 - [x] SB-M16-002 Define route input. — [x] SB-M16-003 Define route output.
 - [x] SB-M16-004 Define coordinate space.
-- [x] SB-M16-005 Slot origin. — [x] SB-M16-006 Cell destination (the assigned ACTIVE target).
-- [x] SB-M16-007 Keep independent from TargetSelector (8.10).
+- [x] SB-M16-005 Slot origin. — [x] SB-M16-006 Cell destination.
+- [x] SB-M16-007 Keep independent from TargetSelector.
 - [x] SB-M16-008 Swappable implementations.
 - [x] SB-M16-009 Debug route visualization.
-- [x] SB-M16-010 Route validity checks: non-target ACTIVE cells block, CLEARED/background is open, route ends at the assigned target. — [x] SB-M16-011 Failure behavior: no route is a failure returned to the caller, never a silent retarget.
+- [x] SB-M16-010 Route validity checks.
+- [x] SB-M16-011 Failure behavior/no silent retarget.
 
-### M17 — Routing Prototype Lab
+### M17 — Routing Prototype Lab / Production Routing
 
-M17-C002 V03 strict full-surface audit PASS; SB-M17-002/003/015/016 re-closed. See `coordination/sessions/M17-C002/CHATGPT_AUDIT_V03.md`.
-
-One of the most important SCRUBBOTS milestones. Do not lock the first
-working solution — prototype multiple options.
+M17-C002 V03 strict full-surface audit remains accepted as the pre-V07 production-routing baseline. V07 is an owner-directed extension of the production planner domain, not a rewrite of WHAT-selection or access truth.
 
 - [x] SB-M17-001 Direct route baseline.
 - [x] SB-M17-002 Grid-aware route prototype.
@@ -899,17 +797,12 @@ working solution — prototype multiple options.
 - [x] SB-M17-004 Compare visual clarity. — [x] SB-M17-005 Compare path crossings.
 - [x] SB-M17-006 Compare congestion. — [x] SB-M17-007 Compare CPU cost.
 - [x] SB-M17-008 Compare route distance. — [x] SB-M17-009 Compare determinism.
-- [x] SB-M17-010 Compare against original SCRUBBOTS visual direction. — superseded for this gate by owner-reviewed Organized/curved selection because no authoritative original movement reference exists.
+- [x] SB-M17-010 Owner-selected organized/curved production movement language.
 - [x] SB-M17-011 Test 5 bots. — [x] SB-M17-012 Test 10 bots. — [x] SB-M17-013 Test 25 bots.
 - [x] SB-M17-014 Stress-test higher density.
-- [x] SB-M17-015 Test 59×59. — [x] SB-M17-016 Test rectangular Very Hard board.
+- [x] SB-M17-015 Test 59×59. — [x] SB-M17-016 Test rectangular board.
 
-Required cases under the access rule (AL-028): a **blocked interior** target
-(fully enclosed matching-color ACTIVE cell) yields no route (never a silent
-retarget), and a **newly-opened-after-clear** case where prior CLEARED cells
-create legal access to a previously blocked target.
-
-`[DESIGN GATE]` — owner selects final movement language.
+**V07 owner amendment:** production routing must add the one-cell exterior walking ring in §8.10B while preserving M17 strict route validation, no-retarget, ACTIVE-blocker/CLEARED-open semantics, rectangular support and 59×59 behavior.
 
 ### M18 — Scrubbot Agent
 
@@ -925,12 +818,12 @@ create legal access to a previously blocked target.
 
 ### M19 — Scrubbot Dispatcher
 
-**Strict-v2 final closure:** M19-C001 V06 `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE`. Final audit: `coordination/sessions/M19-C001/CHATGPT_AUDIT_V06.md`. Validation-only commit `77d5359`; `3273/3273` on Godot 4.7.1; V05 dispatcher production blob unchanged.
+**Strict-v2 final closure:** M19-C001 V06 `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE`.
 
 - [x] SB-M19-001 Receive slot request.
-- [x] SB-M19-002 Check work before spawn — "work" means a reachable/targetable target exists, not merely a raw color candidate.
+- [x] SB-M19-002 Check reachable work before spawn.
 - [x] SB-M19-003 Ask TargetSelector.
-- [x] SB-M19-004 Refuse spawn without a reachable target (no reachable target → no spawn).
+- [x] SB-M19-004 Refuse spawn without reachable target.
 - [x] SB-M19-005 Reserve target.
 - [x] SB-M19-006 Spawn exactly one bot per dispatch.
 - [x] SB-M19-007 Enforce one-by-one flow.
@@ -940,12 +833,6 @@ create legal access to a previously blocked target.
 - [x] SB-M19-011 Concurrent slot tests. — [x] SB-M19-012 Reset during dispatch.
 
 ### M20 — Complete Clearing Vertical Slice
-
-Required flow: slot activation → work validation (reachable target exists) →
-target selection → target reservation → Scrubbot spawn → route generation →
-visual travel → arrival → target becomes CLEARED (renderer draws it
-transparent, background shows through) → candidate/access truth update →
-reservation clear → Scrubbot disappears (no return, no color carry).
 
 - [x] SB-M20-001 Wire complete sequence.
 - [x] SB-M20-002 No target means no bot. — [x] SB-M20-003 No return behavior.
@@ -960,47 +847,40 @@ reservation clear → Scrubbot disappears (no return, no color carry).
 
 Major project gate using the owner-approved real Hazard Bot source at
 `assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png`.
-The real-art importer/LevelData/render/target/routing/dispatch/clearing chain is
-implemented and has passed V01–V03 engineering validation, but M21 remains open
-for V04 owner-playtest integration and independent final closure.
 
-**Owner live-playtest gate [2026-09-13]:** final M21 acceptance now also requires
-§8.10A bottom-most/left-most reachable target priority, a plainly visible real
-ScrubbotAgent sharing the board presentation transform, and exactly five visible
-functional color slots that activate the real CompleteClearingLoop path. The V04
-scene must be owner-playable in Godot; SPACE may remain only as a developer
-fallback. See `coordination/sessions/M21-C001/OWNER_PLAYTEST_DECISIONS_V04.md`.
+V01–V06 engineering work is materially accepted, including real-art ingestion, deterministic production-art bridge, authentic clearing chain, five visible slots, board-aligned Scrubbot presentation, bottom-most/left-most TargetSelector ordering, concurrency bookkeeping and real 1080×2400 layout evidence. **M21 remains open because the owner manual gate after V06 failed on two runtime behaviors now frozen into V07.**
+
+**V07 owner gate [2026-09-13]:**
+1. SPACE gameplay dispatch is removed completely; visible color-slot click is the only owner-facing activation path (§8.10C).
+2. Production routing gains the one-cell exterior ring around all four board sides (§8.10B), so the bottom-most/left-most priority can operate against the intended exterior reachability. On a fresh Hazard Bot, the first C08 click must naturally target index `380`, coordinate `(0,19)`, and the Scrubbot must visibly travel from the clicked C08 slot through the bottom exterior corridor to that cell without tunnelling through ACTIVE artwork.
+
+See:
+- `coordination/sessions/M21-C001/CHATGPT_OWNER_GATE_V06.md`
+- `coordination/sessions/M21-C001/OWNER_PLAYTEST_FINDINGS_V07.md`
+- `coordination/sessions/M21-C001/CHATGPT_PROMPT_V07.md`
+- `coordination/sessions/M21-C001/CHATGPT_AUDIT_CRITERIA_V07.md`
 
 - [ ] SB-M21-001 Ingest original source artwork.
 - [ ] SB-M21-002 Audit source dimensions.
-- [ ] SB-M21-003 Determine legal difficulty.
+- [ ] SB-M21-003 Determine legal compatibility context.
 - [ ] SB-M21-004 Generate level data.
 - [ ] SB-M21-005 Reconstruct and compare.
 - [ ] SB-M21-006 Render in gameplay.
-- [ ] SB-M21-007 Populate and visibly present exactly five functional slots bound to the real SlotSystem; V04 owner-playtest/audit required.
-- [ ] SB-M21-008 Dispatch a visibly moving real ScrubbotAgent through a presentation transform aligned with BoardRenderer; V04 owner-playtest/audit required.
-- [ ] SB-M21-009 Clear actual artwork pixels (ACTIVE→CLEARED; visible artwork is cleared to transparent, background shows through).
+- [ ] SB-M21-007 Populate and visibly present exactly five functional slots bound to the real SlotSystem; final closure awaits V07 owner gate.
+- [ ] SB-M21-008 Dispatch a visibly moving real ScrubbotAgent from the clicked visible slot through board-aligned presentation and V07 exterior corridor; final closure awaits V07 owner gate.
+- [ ] SB-M21-009 Clear actual artwork pixels (ACTIVE→CLEARED; transparent background reveal).
 - [ ] SB-M21-010 Run full level.
 - [ ] SB-M21-011 Profile performance.
 - [ ] SB-M21-012 Capture reference gameplay output.
 
-**First real-art vertical slice additions (from UI_TASKS_APPENDIX migration)**
-- [ ] SB-UI-014 Run at least one gameplay vertical slice using owner-approved real pixel/level artwork rather than treating a Magnific illustration as logical level data.
-- [ ] SB-UI-015 Prove the logical board renderer, ACTIVE/CLEARED treatment (opaque source color vs transparent cleared cells showing the background) and responsive board presentation remain data-driven and independent of full-screen concept art.
-- [ ] SB-UI-016 Record which visual gaps genuinely require Magnific generation before opening production gameplay UI generation.
+**First real-art vertical slice additions**
+- [ ] SB-UI-014 Run at least one gameplay vertical slice using owner-approved real pixel/level artwork.
+- [ ] SB-UI-015 Prove logical renderer/ACTIVE-CLEARED treatment/responsive presentation remain data-driven.
+- [ ] SB-UI-016 Record visual gaps requiring later illustration generation.
 
 ### M22 — Production Slot UI `[VISUAL REFERENCE]`
 
-**V04 pull-forward [OWNER DECISION — 2026-09-13]:** because the owner is now
-manually evaluating the real-art vertical slice in Godot, M21-C001 V04 is
-authorized to implement the functional production-compatible subset of M22
-immediately: slot-reference audit, reusable SlotView, exactly five-slot layout,
-SlotSystem binding, live color presentation, desktop-testable activation, simple
-active/in-flight presentation, coherent Scrubbot spawn point, and focused
-aspect-ratio/safe-content/rapid-input tests. These task checkboxes remain open
-until independent ChatGPT audit decides which can close. `SB-M22-008` final
-no-work visual language remains design-gated; V04 only needs safe no-work
-behavior. Do not start M22-013+ Magnific/decorative generation in V04.
+A functional M22 subset was pulled forward into M21 V04–V06 for owner playtesting. Final M22 closure remains independent and must not be inferred from the temporary/debug owner harness.
 
 - [ ] SB-M22-001 Audit slot references. — [ ] SB-M22-002 Create SlotView.
 - [ ] SB-M22-003 Five-slot layout. — [ ] SB-M22-004 Bind SlotState.
@@ -1009,21 +889,19 @@ behavior. Do not start M22-013+ Magnific/decorative generation in V04.
 - [ ] SB-M22-009 Scrubbot spawn point.
 - [ ] SB-M22-010 Aspect-ratio tests. — [ ] SB-M22-011 Safe-area tests.
 - [ ] SB-M22-012 Rapid-tap tests.
-
-**Production slot UI + gameplay asset production additions (from UI_TASKS_APPENDIX migration)**
-- [ ] SB-M22-013 Confirm canonical gameplay UI references are approved/recorded before final asset generation.
-- [ ] SB-M22-014 Validate the M22 entries in `ASSET_GENERATION_MANIFEST.json` before spending Magnific credits.
-- [ ] SB-M22-015 Generate required gameplay booster assets with Magnific using the canonical SCRUBBOTS visual references.
-- [ ] SB-M22-016 Generate only the gameplay decorative assets/props required by this milestone; do not generate unrelated future-screen art early.
-- [ ] SB-M22-017 Keep raw Magnific candidates separate from production-final assets and preserve generation provenance.
-- [ ] SB-M22-018 Require owner selection/approval before promoting a candidate to production-final status.
-- [ ] SB-M22-019 Never silently regenerate or overwrite an approved production asset.
-- [ ] SB-M22-020 Build slot visuals as reusable Godot components, not flattened screenshots.
-- [ ] SB-M22-021 Keep quantities/text/state badges live in Godot; do not bake them into generated textures.
-- [ ] SB-M22-022 Implement reusable BoosterButton states (`AVAILABLE`, `EMPTY`, `SELECTED`, `LOCKED`, `FREE_AD`) without baking quantity/state text into art.
-- [ ] SB-M22-023 Bind approved Magnific booster/decorative art to the reusable Godot components.
-- [ ] SB-M22-024 Preserve five visible slots at all required responsive test sizes.
-- [ ] SB-M22-025 Validate asset import settings, transparency, filtering and mobile memory footprint before marking the visual portion complete.
+- [ ] SB-M22-013 Confirm canonical gameplay UI references before final asset generation.
+- [ ] SB-M22-014 Validate M22 manifest entries before spending generation credits.
+- [ ] SB-M22-015 Generate required gameplay booster assets when milestone scope opens.
+- [ ] SB-M22-016 Generate only milestone-required decorative assets.
+- [ ] SB-M22-017 Keep raw candidates separate from production-final assets/provenance.
+- [ ] SB-M22-018 Require owner selection/approval before production promotion.
+- [ ] SB-M22-019 Never silently regenerate/overwrite approved production art.
+- [ ] SB-M22-020 Build slot visuals as reusable Godot components.
+- [ ] SB-M22-021 Keep quantities/text/state badges live in Godot.
+- [ ] SB-M22-022 Implement reusable BoosterButton states when booster scope opens.
+- [ ] SB-M22-023 Bind approved booster/decorative art to reusable components.
+- [ ] SB-M22-024 Preserve five visible slots at required responsive sizes.
+- [ ] SB-M22-025 Validate import/transparency/filtering/mobile memory before visual closure.
 
 ### M23 — Gameplay Screen Layout `[VISUAL REFERENCE]`
 
@@ -1035,21 +913,19 @@ behavior. Do not start M22-013+ Magnific/decorative generation in V04.
 - [ ] SB-M23-010 Rectangular boards. — [ ] SB-M23-011 59×59.
 - [ ] SB-M23-012 Narrow phone. — [ ] SB-M23-013 Tall phone.
 - [ ] SB-M23-014 Tablet portrait. — [ ] SB-M23-015 Input coordinate accuracy.
-
-**Gameplay screen layout + integrated visual production (from UI_TASKS_APPENDIX migration) [OWNER-APPROVED]**
-- [ ] SB-M23-016 Use `docs/MASTER_UI_SYSTEM.md` as the canonical gameplay layout contract.
-- [ ] SB-M23-017 Remove Goal/Moves panel from the approved production gameplay composition.
-- [ ] SB-M23-018 Make the board the dominant gameplay-screen region and allow it to expand before decorative regions.
-- [ ] SB-M23-019 Keep the color-selection panel at protected usable width; never shrink it merely to preserve decoration.
-- [ ] SB-M23-020 Place Scrubby low at the left of the color-selection region.
-- [ ] SB-M23-021 Place Scrubby speech bubble above Scrubby instead of consuming a full-width row or narrowing the selection panel.
-- [ ] SB-M23-022 Preserve right-side cleaning props as decorative art with lower layout priority than gameplay controls.
-- [ ] SB-M23-023 Move four booster controls to a compact horizontal row directly above the bottom/ad row.
-- [ ] SB-M23-024 Place pause to the left of the ad and settings immediately to the right of the ad.
-- [ ] SB-M23-025 Do not add the removed right-side Level/lock rail back into the approved gameplay composition.
-- [ ] SB-M23-026 Bind only owner-approved gameplay illustrations/props; keep the screen itself responsive/native rather than flattening it into one generated image.
-- [ ] SB-M23-027 Prove `BoardRenderer` coordinate mapping remains correct after responsive scaling.
-- [ ] SB-M23-028 Capture validation evidence at all required viewport sizes before marking the production gameplay composition complete.
+- [ ] SB-M23-016 Use `docs/MASTER_UI_SYSTEM.md` as canonical gameplay layout contract.
+- [ ] SB-M23-017 Remove Goal/Moves panel from approved production gameplay composition.
+- [ ] SB-M23-018 Make board dominant gameplay-screen region.
+- [ ] SB-M23-019 Keep color-selection panel protected/usable.
+- [ ] SB-M23-020 Place Scrubby low at left of color-selection region.
+- [ ] SB-M23-021 Place speech bubble above Scrubby.
+- [ ] SB-M23-022 Preserve right-side cleaning props as lower-priority decoration.
+- [ ] SB-M23-023 Put four booster controls in compact horizontal row above bottom/ad row.
+- [ ] SB-M23-024 Pause left of ad, settings right of ad.
+- [ ] SB-M23-025 Do not restore removed Level/lock rail.
+- [ ] SB-M23-026 Bind owner-approved illustrations while keeping screen responsive/native.
+- [ ] SB-M23-027 Prove BoardRenderer coordinate mapping after responsive scaling.
+- [ ] SB-M23-028 Capture viewport validation evidence.
 
 ### M24 — Mobile Touch
 
@@ -1061,10 +937,6 @@ behavior. Do not start M22-013+ Magnific/decorative generation in V04.
 - [ ] SB-M24-008 Pause during touch. — [ ] SB-M24-009 Background/foreground.
 
 ### M25 — Win/Lose Rules `[DESIGN GATE]`
-
-Owner must explicitly decide: must every cleanable cell be cleared? timer?
-move limits? can the player get stuck? fail state? free retry? score/star
-grading?
 
 - [ ] SB-M25-001 Document win condition. — [ ] SB-M25-002 Document lose condition.
 - [ ] SB-M25-003 Completion evaluator. — [ ] SB-M25-004 Emit completion once.
@@ -1085,7 +957,7 @@ grading?
 
 ### M27 — Scrubbot Final Visuals `[VISUAL REFERENCE]`
 
-- [ ] SB-M27-001 Audit original Scrubbot art. **AWAITING OWNER ASSET.**
+- [ ] SB-M27-001 Audit original Scrubbot art.
 - [ ] SB-M27-002 Select owner-approved canonical design.
 - [ ] SB-M27-003 Preserve original source.
 - [ ] SB-M27-004 Configure crisp import.
@@ -1093,22 +965,17 @@ grading?
 - [ ] SB-M27-007 Arrival animation. — [ ] SB-M27-008 Disappearance.
 - [ ] SB-M27-009 Direction/orientation if approved.
 - [ ] SB-M27-010 Density performance test.
-
-Never replace approved Scrubbot visuals with a generic robot design without
-owner instruction.
-
-**Magnific character production additions (from UI_TASKS_APPENDIX migration)**
-- [ ] SB-M27-UI-001 Use the owner-approved canonical Scrubby master reference for Magnific character generation.
-- [ ] SB-M27-UI-002 Validate character-generation manifest entries and required pose/state list before generation.
-- [ ] SB-M27-UI-003 Generate only the gameplay poses required by implemented Scrubbot behavior.
-- [ ] SB-M27-UI-004 Generate required Scrubby portrait/profile variants using the same canonical reference.
-- [ ] SB-M27-UI-005 Generate additional emotion/state variants only when an implemented screen/flow requires them.
-- [ ] SB-M27-UI-006 Preserve raw candidates and generation provenance separately from production-final character assets.
-- [ ] SB-M27-UI-007 Require owner visual approval before any generated character variant becomes production-final.
-- [ ] SB-M27-UI-008 Lock approved character assets against silent regeneration/overwrite.
-- [ ] SB-M27-UI-009 Configure Godot import/filter/compression settings appropriate to each approved character asset.
-- [ ] SB-M27-UI-010 Integrate approved art with travel, arrival, cleaning and disappearance animation/presentation without coupling visual animation to TargetSelector logic.
-- [ ] SB-M27-UI-011 Validate character readability and scale on the required phone viewport matrix.
+- [ ] SB-M27-UI-001 Use owner-approved canonical Scrubby reference for character generation.
+- [ ] SB-M27-UI-002 Validate pose/state manifest entries before generation.
+- [ ] SB-M27-UI-003 Generate only poses required by implemented behavior.
+- [ ] SB-M27-UI-004 Generate required portrait/profile variants.
+- [ ] SB-M27-UI-005 Generate emotion/state variants only when implemented flow needs them.
+- [ ] SB-M27-UI-006 Preserve raw candidates/provenance separately.
+- [ ] SB-M27-UI-007 Require owner visual approval before promotion.
+- [ ] SB-M27-UI-008 Lock approved character assets against silent overwrite.
+- [ ] SB-M27-UI-009 Configure Godot import settings.
+- [ ] SB-M27-UI-010 Integrate approved art without coupling animation to TargetSelector logic.
+- [ ] SB-M27-UI-011 Validate readability/scale on phone viewport matrix.
 
 ### M28 — Audio `[DESIGN GATE]`
 
@@ -1139,27 +1006,25 @@ owner instruction.
 
 ### M31 — Difficulty System
 
-Board bands are locked (8.3). Still unresolved: number of colors, color
-distribution, slot complexity, future queue behavior, optional blockers,
-route complexity, other puzzle constraints.
+**Difficulty V1 owner decision now governs future work.** Board dimensions remain an engine/content envelope and Session Load input, not the definition of EASY/MEDIUM/HARD/VERY_HARD.
 
-- [ ] SB-M31-001 Centralize board-band configuration.
-- [ ] SB-M31-002 Validate production catalog.
-- [ ] SB-M31-003 Define additional difficulty factors with owner. `[DESIGN GATE]`
-- [ ] SB-M31-004 Create difficulty matrix. — [ ] SB-M31-005 Playtest difficulty.
-- [ ] SB-M31-006 Prevent board size alone from becoming the sole difficulty metric unless owner decides so.
+- [ ] SB-M31-001 Migrate legacy runtime class=dimension configuration to Difficulty V1 without breaking board envelope validation.
+- [ ] SB-M31-002 Validate production catalog against current Difficulty V1 + compatibility requirements.
+- [ ] SB-M31-003 Implement/version Challenge components and owner-approved additional factors.
+- [ ] SB-M31-004 Create Difficulty V1 matrix/calibration fixtures.
+- [ ] SB-M31-005 Playtest difficulty.
+- [ ] SB-M31-006 Prove board size alone cannot determine difficulty class.
 
-### M32 — Level Progression `[DESIGN GATE]`
+### M32 — Level Progression
 
-- [ ] SB-M32-001 Unlock rule. — [ ] SB-M32-002 Current level.
+- [ ] SB-M32-001 Implement owner-locked repeating 10-level class cadence.
+- [ ] SB-M32-002 Current level.
 - [ ] SB-M32-003 Completion tracking. — [ ] SB-M32-004 Replay.
-- [ ] SB-M32-005 Difficulty sequencing.
+- [ ] SB-M32-005 Implement progression target curve/micro modifiers from Difficulty V1.
 - [ ] SB-M32-006 Level select if approved.
 - [ ] SB-M32-007 Service implementation. — [ ] SB-M32-008 Tests.
 
 ### M33 — Win Streak
-
-Use the locked mapping (8.11).
 
 - [ ] SB-M33-001 Streak state. — [ ] SB-M33-002 Increment on valid win.
 - [ ] SB-M33-003 Define reset rule with owner. `[DESIGN GATE]`
@@ -1197,16 +1062,14 @@ Do not implement until owner defines what rewards actually represent.
 - [ ] SB-M37-005 Level select if approved.
 - [ ] SB-M37-006 Gameplay transition. — [ ] SB-M37-007 Results transition.
 - [ ] SB-M37-008 Prevent duplicate transitions. — [ ] SB-M37-009 Back navigation.
-
-**Home-specific visual production additions (from UI_TASKS_APPENDIX migration)**
-- [ ] SB-M37-010 Build Home as responsive Godot containers/components, not a flattened screen image.
-- [ ] SB-M37-011 Recreate owner-approved Home art direction with `TopCurrencyHUD`, `SeasonProgress`, `MainWorldArea`, `PlayButton`, `RewardTrack` and `BottomNav` regions.
-- [ ] SB-M37-012 Keep left/right shortcut columns independently responsive around the central Scrubby/world area.
-- [ ] SB-M37-013 Validate Home-specific manifest entries before Magnific generation.
-- [ ] SB-M37-014 Generate only Home-specific illustrative assets that cannot reasonably be native Godot UI, using canonical references.
-- [ ] SB-M37-015 Keep currency values, level/XP, timers, notification counts, labels and navigation state as live Godot UI.
-- [ ] SB-M37-016 Require owner approval before promoting Home illustration candidates to production-final.
-- [ ] SB-M37-017 Bind approved Home art to responsive components and validate on the required viewport matrix.
+- [ ] SB-M37-010 Build Home as responsive Godot containers/components.
+- [ ] SB-M37-011 Recreate owner-approved Home art direction with canonical regions.
+- [ ] SB-M37-012 Keep shortcut columns responsive around central area.
+- [ ] SB-M37-013 Validate Home-specific manifest entries before generation.
+- [ ] SB-M37-014 Generate only Home-specific required illustrative assets.
+- [ ] SB-M37-015 Keep dynamic values/timers/counts/labels live in Godot UI.
+- [ ] SB-M37-016 Require owner approval before production promotion.
+- [ ] SB-M37-017 Bind approved art and validate viewport matrix.
 
 ### M38 — Results Screen
 
@@ -1215,17 +1078,16 @@ Do not implement until owner defines what rewards actually represent.
 - [ ] SB-M38-005 Continue. — [ ] SB-M38-006 Replay if approved.
 - [ ] SB-M38-007 No double reward. — [ ] SB-M38-008 Rapid-tap protection.
 
-**Popup/level-intro/results/tutorial/collection/shop/events visual production rules (from UI_TASKS_APPENDIX migration)**
-- [ ] SB-UI-017 Implement one reusable `BasePopup` composition and derive Level Intro, Life, Need a Hand, Victory, Fail and Out of Moves flows from it.
-- [ ] SB-UI-018 Keep popup text, rewards, quantities, buttons and state dynamic in Godot; Magnific may provide decorative headers/emblems/illustrations only where needed.
-- [ ] SB-UI-019 For every later screen milestone (Results, Tutorial, Collection, Shop, Events and similar), identify required illustration assets inside that milestone, add/validate manifest entries, generate with Magnific, obtain owner approval, promote final assets and bind them before closing that milestone's visual work.
-- [ ] SB-UI-020 Do not pre-generate large speculative asset libraries for screens whose actual component/state requirements are not yet known.
-- [ ] SB-UI-021 Treat final visual polish as consolidation/QA of milestone-integrated art, not as the first production-art implementation phase.
+**Shared later-screen visual production rules**
+- [ ] SB-UI-017 Implement reusable `BasePopup` composition.
+- [ ] SB-UI-018 Keep popup text/rewards/quantities/buttons/state dynamic in Godot.
+- [ ] SB-UI-019 For each later screen milestone, identify/generate/approve/bind required illustration assets inside that milestone.
+- [ ] SB-UI-020 Do not pre-generate speculative asset libraries for unknown future states.
+- [ ] SB-UI-021 Treat final visual polish as consolidation/QA, not first production-art implementation.
 
 ### M39 — Tutorial `[DESIGN GATE]`
 
-Teach five-slot interaction, color matching, Scrubbot flow, no-work
-behavior if needed. Keep tutorial logic separate from core gameplay.
+Teach five-slot interaction, color matching, Scrubbot flow, no-work behavior if needed. Keep tutorial logic separate from core gameplay.
 
 ### M40 — Debug Tooling
 
@@ -1251,19 +1113,16 @@ Maximum board target: 59×59 = 3,481.
 - [ ] SB-M41-012 Repeated restart. — [ ] SB-M41-013 Long session.
 - [ ] SB-M41-014 High agent density.
 
-Target: stable, smooth mobile gameplay. Aim for 60 FPS on reasonable target
-devices, measured rather than assumed.
-
 ### M42 — Android Device Testing
 
 - [ ] SB-M42-001 Android export setup. — [ ] SB-M42-002 Development APK.
 - [ ] SB-M42-003 Real device install. — [ ] SB-M42-004 Touch.
 - [ ] SB-M42-005 Portrait. — [ ] SB-M42-006 Safe areas.
 - [ ] SB-M42-007 Easy performance. — [ ] SB-M42-008 Medium performance.
-- [ ] SB-M42-009 Hard performance. — [ ] SB-M42-010 Very Hard 59×59 performance.
+- [ ] SB-M42-009 Hard performance. — [ ] SB-M42-010 Very Hard/59×59 performance.
 - [ ] SB-M42-011 High bot density. — [ ] SB-M42-012 Background/foreground.
 - [ ] SB-M42-013 Heat/battery extended test.
-- [ ] SB-M42-014 Record device and results.
+- [ ] SB-M42-014 Record device/results.
 
 ### M43 — iOS Readiness
 
@@ -1272,8 +1131,6 @@ devices, measured rather than assumed.
 - [ ] SB-M43-003 Prepare iOS configuration when hardware exists.
 - [ ] SB-M43-004 Real-device iOS testing later.
 
-Mark actual iOS compilation `[DEFERRED]` until macOS/Xcode is available.
-
 ### M44 — Responsive UI
 
 - [ ] SB-M44-001 16:9 portrait. — [ ] SB-M44-002 19.5:9. — [ ] SB-M44-003 20:9.
@@ -1281,22 +1138,20 @@ Mark actual iOS compilation `[DEFERRED]` until macOS/Xcode is available.
 - [ ] SB-M44-007 Five slots stay usable. — [ ] SB-M44-008 Board stays visible.
 - [ ] SB-M44-009 Rectangular boards remain correctly scaled.
 - [ ] SB-M44-010 Touch mapping remains accurate.
-
-**Responsive UI expansion additions (from UI_TASKS_APPENDIX migration) [OWNER-APPROVED]**
-- [ ] SB-M44-011 Adopt 1080×2160 as reference design viewport and `canvas_items` + `expand` stretch policy.
-- [ ] SB-M44-012 Implement reusable `SafeAreaRoot`.
+- [ ] SB-M44-011 Adopt 1080×2160 reference design viewport and stretch policy.
+- [ ] SB-M44-012 Implement reusable SafeAreaRoot.
 - [ ] SB-M44-013 Implement centralized UI tokens.
-- [ ] SB-M44-014 Implement `COMPACT` / `NORMAL` / `TALL` layout classification.
+- [ ] SB-M44-014 Implement COMPACT/NORMAL/TALL classification.
 - [ ] SB-M44-015 Validate 1080×2160.
 - [ ] SB-M44-016 Validate 1170×2532.
 - [ ] SB-M44-017 Validate 1290×2796.
 - [ ] SB-M44-018 Validate 1080×2400.
 - [ ] SB-M44-019 Validate 1440×3200.
-- [ ] SB-M44-020 Validate minimum touch target 88 reference pixels unless the accessibility pass raises it.
-- [ ] SB-M44-021 Confirm popups fit safe area without clipping at all required target sizes.
-- [ ] SB-M44-022 Confirm text containers survive longer localized strings without image regeneration.
-- [ ] SB-M44-023 Confirm board dominance does not cause protected bottom gameplay controls to clip or become unusable on compact devices.
-- [ ] SB-M44-024 Add automated/manual responsive validation evidence before any production UI milestone is marked complete.
+- [ ] SB-M44-020 Validate minimum touch target.
+- [ ] SB-M44-021 Confirm popups fit safe area.
+- [ ] SB-M44-022 Confirm text containers survive localization expansion.
+- [ ] SB-M44-023 Confirm protected bottom controls remain usable on compact devices.
+- [ ] SB-M44-024 Add automated/manual responsive validation evidence.
 
 ### M45 — Accessibility
 
@@ -1305,12 +1160,10 @@ Mark actual iOS compilation `[DEFERRED]` until macOS/Xcode is available.
 - [ ] SB-M45-003 Color vision tests. — [ ] SB-M45-004 Contrast.
 - [ ] SB-M45-005 Reduced effects. — [ ] SB-M45-006 Touch sizes.
 - [ ] SB-M45-007 Text readability.
-
-**Accessibility additions (from UI_TASKS_APPENDIX migration)**
-- [ ] SB-M45-008 Do not encode important state solely in decorative generated artwork.
-- [ ] SB-M45-009 Keep labels/counts as live Godot text and preserve contrast independently from the illustration layer.
-- [ ] SB-M45-010 Ensure generated icon families remain distinguishable at actual mobile display size, not only at Magnific source resolution.
-- [ ] SB-M45-011 Ensure essential gameplay meaning remains understandable if decorative illustration is hidden or fails to load.
+- [ ] SB-M45-008 Do not encode important state solely in decorative art.
+- [ ] SB-M45-009 Keep labels/counts live and contrast-independent from illustration.
+- [ ] SB-M45-010 Ensure generated icon families distinguishable at mobile size.
+- [ ] SB-M45-011 Ensure essential gameplay understandable without decoration.
 
 ### M46 — Localization Readiness
 
@@ -1332,21 +1185,23 @@ Mark actual iOS compilation `[DEFERRED]` until macOS/Xcode is available.
 ### M48 — Level QA `[QA]`
 
 Every production level:
-- [ ] SB-M48-001 Legal dimensions. — [ ] SB-M48-002 Correct difficulty.
-- [ ] SB-M48-003 Valid locked palette: every used logical color is C01..C16 only; local palette contains only used canonical colors in ascending C-ID order; distinct used-color count matches difficulty (Easy 3–5 / Medium 6–7 / Hard 8–9 / Very Hard 10–12). — [ ] SB-M48-004 Correct cell count.
-- [ ] SB-M48-005 No invalid palette IDs. — [ ] SB-M48-006 Recognizable ACTIVE source artwork (cells shown at their original source palette color, opaque, from level start; ADR-019).
-- [ ] SB-M48-007 No unintended interpolation. — [ ] SB-M48-008 Correct CLEARED transparency — cleared cells render alpha 0 and the gameplay background is visible through them (not a black/gray/palette substitute).
-- [ ] SB-M48-009 Solvable under canonical ACTIVE-blocker / CLEARED-open reachability semantics (non-target ACTIVE cells block access; CLEARED/background is open). — [ ] SB-M48-010 No routing pathology under those semantics; a fully enclosed matching-color ACTIVE cell must remain untargetable (no dispatch) until prior clears open legal access (AL-028).
+- [ ] SB-M48-001 Legal dimensions/envelope. — [ ] SB-M48-002 Correct Difficulty V1 metadata/score context.
+- [ ] SB-M48-003 Valid locked C01..C16 palette and current 3–12 used-color envelope; old class-specific color bands are not difficulty truth.
+- [ ] SB-M48-004 Correct cell count.
+- [ ] SB-M48-005 No invalid palette IDs. — [ ] SB-M48-006 Recognizable ACTIVE source artwork.
+- [ ] SB-M48-007 No unintended interpolation. — [ ] SB-M48-008 Correct CLEARED transparency.
+- [ ] SB-M48-009 Solvable under canonical routing/access semantics, including exterior corridor where applicable.
+- [ ] SB-M48-010 No routing pathology; fully enclosed matching ACTIVE target remains untargetable until legal opening.
 - [ ] SB-M48-011 Good performance. — [ ] SB-M48-012 Correct preview.
 - [ ] SB-M48-013 Unique ID.
 
 ### M49 — Regression Suite `[QA]`
 
-- [ ] SB-M49-001 Difficulty-range tests. — [ ] SB-M49-002 Level parser tests.
-- [ ] SB-M49-003 BoardState tests (ACTIVE/CLEARED). — [ ] SB-M49-004 Renderer tests (ACTIVE source-color/opaque; CLEARED transparent-cell behavior).
-- [ ] SB-M49-005 Slot tests. — [ ] SB-M49-006 Color-candidate + reachability/access tests (incl. blocked matching-color ACTIVE target must not dispatch).
+- [ ] SB-M49-001 Difficulty/progression tests. — [ ] SB-M49-002 Level parser tests.
+- [ ] SB-M49-003 BoardState tests. — [ ] SB-M49-004 Renderer tests.
+- [ ] SB-M49-005 Slot tests. — [ ] SB-M49-006 Color-candidate/reachability tests.
 - [ ] SB-M49-007 Reservation tests. — [ ] SB-M49-008 TargetSelector tests.
-- [ ] SB-M49-009 Routing tests. — [ ] SB-M49-010 Dispatcher tests.
+- [ ] SB-M49-009 Routing tests including exterior corridor. — [ ] SB-M49-010 Dispatcher tests.
 - [ ] SB-M49-011 Completion tests. — [ ] SB-M49-012 Save tests.
 - [ ] SB-M49-013 Reward tests. — [ ] SB-M49-014 Content validation tests.
 - [ ] SB-M49-015 59×59 regression test.
@@ -1359,7 +1214,7 @@ Every production level:
 - [ ] SB-M50-005 Complete with bots in flight.
 - [ ] SB-M50-006 Exhaust color. — [ ] SB-M50-007 Exhaust slot work.
 - [ ] SB-M50-008 Repeated scene transitions.
-- [ ] SB-M50-009 Long Very Hard session.
+- [ ] SB-M50-009 Long high-load session.
 - [ ] SB-M50-010 Memory growth monitoring.
 - [ ] SB-M50-011 Duplicate signal monitoring.
 - [ ] SB-M50-012 Orphan Node monitoring.
@@ -1383,8 +1238,6 @@ Once external services exist:
 - [ ] SB-M53-006 Age-rating review.
 - [ ] SB-M53-007 Child-directed considerations if applicable.
 
-Do not invent legal conclusions.
-
 ### M54 — Build Pipeline
 
 - [ ] SB-M54-001 Debug export. — [ ] SB-M54-002 Release export.
@@ -1401,19 +1254,19 @@ artifact validation. **Never commit signing secrets.**
 
 ---
 
-## MAGNIFIC ASSET LIFECYCLE / DEFINITION OF DONE (from UI_TASKS_APPENDIX migration)
+## MAGNIFIC / GENERATED ASSET LIFECYCLE / DEFINITION OF DONE
 
-- [ ] SB-UI-022 Use Magnific primarily for character, booster, reward, difficulty/emblem, decorative prop, collection/event and similar branded illustration assets.
-- [ ] SB-UI-023 Prefer native Godot controls/styles for panels, interaction containers, text, slots, color tiles, counters, progress bars, popup bodies and responsive layout.
-- [ ] SB-UI-024 Every generated asset must have traceable manifest ID, intended use, reference source(s), raw candidate location and production-final location/status.
+- [ ] SB-UI-022 Use image generation primarily for branded illustrative assets where it adds value.
+- [ ] SB-UI-023 Prefer native Godot controls/styles for interactive/dynamic UI.
+- [ ] SB-UI-024 Every generated asset has traceable manifest/provenance.
 - [ ] SB-UI-025 Raw generation output is never automatically production-final.
-- [ ] SB-UI-026 Owner approval is required before production promotion for character identity, major branded art and screen-defining illustration assets.
-- [ ] SB-UI-027 Approved assets must be imported/configured in Godot and actually bound to the relevant reusable component/screen before their implementation task can be complete.
-- [ ] SB-UI-028 Never silently regenerate/overwrite an approved asset. A deliberate replacement must create reviewable provenance/history.
-- [ ] SB-UI-029 Do not bake dynamic text, quantities, timers, prices, currency values or gameplay state into generated images.
-- [ ] SB-UI-030 Keep the existing single-`Image`/`ImageTexture` `BoardRenderer` architecture; never create per-cell UI nodes as part of the visual pipeline.
-- [ ] SB-UI-031 Validate transparency, edge quality, source resolution, final resize, texture filtering/compression, memory footprint and visual readability before production promotion where applicable.
-- [ ] SB-UI-032 Record Magnific credit-conscious behavior: reuse canonical references, avoid speculative bulk generation, generate by milestone need, and prefer Godot-native construction when generation adds no meaningful visual value.
+- [ ] SB-UI-026 Owner approval required before production promotion for identity/major art.
+- [ ] SB-UI-027 Approved assets must be imported/configured/bound before implementation task closes.
+- [ ] SB-UI-028 Never silently regenerate/overwrite approved asset.
+- [ ] SB-UI-029 Do not bake dynamic text/quantities/timers/prices/state into generated images.
+- [ ] SB-UI-030 Keep single-Image/ImageTexture BoardRenderer; no per-cell UI nodes.
+- [ ] SB-UI-031 Validate transparency/edges/resolution/filtering/compression/memory/readability.
+- [ ] SB-UI-032 Use generation credits consciously; generate by milestone need.
 
 ---
 
@@ -1421,18 +1274,20 @@ artifact validation. **Never commit signing secrets.**
 
 | ID | Risk | Severity | Mitigation |
 |---|---|---|---|
-| RISK-001 | Routing works technically but looks boring/confusing | CRITICAL | Multiple prototypes (M17) + visual owner review + replaceable RoutingSystem (8.10) |
-| RISK-002 | Large number of Scrubbots causes frame drops | HIGH | 59×59 density stress tests and profiling (M41) |
-| RISK-003 | Old 50×50 maximum assumption survives somewhere | HIGH | Repository searches (M03) + 59×59 regression tests (M49) |
-| RISK-004 | Production difficulty dimensions become inconsistent | HIGH | Central validator (M03, M30) |
-| RISK-005 | Generic 3×2 test breaks after production range validation | MEDIUM/HIGH | Explicit TEST fixture path/context separate from production validation (8.6) |
-| RISK-006 | Existing artwork gets silently resized or altered | HIGH | Source preservation + explicit importer + round-trip comparison (M08, M09) |
-| RISK-007 | Claude loses access to visual references and invents replacements | HIGH | Canonical local visual-reference library and manifest (M07) |
-| RISK-008 | External reference game is copied too closely | HIGH | Original SCRUBBOTS visuals primary; external games conceptual reference only (9.1–9.3) |
-| RISK-009 | Target race assigns same pixel to multiple Scrubbots | HIGH | Reservation tests (M14) |
-| RISK-010 | Renderer architecture creates thousands of Nodes | HIGH | Batched/custom rendering requirement and 3,481-cell inspection (M06) |
-| RISK-011 | Desktop testing hides mobile performance issues | HIGH | Real Android profiling before content scale-up (M42) |
-| RISK-012 | Future Claude session breaks explicit preload/headless compatibility | MEDIUM/HIGH | ADR-009 + regression headless startup tests |
+| RISK-001 | Routing works technically but looks boring/confusing | CRITICAL | Replaceable RoutingSystem + owner review + corridor/route QA |
+| RISK-002 | Large number of Scrubbots causes frame drops | HIGH | 59×59 density stress tests and profiling |
+| RISK-003 | Legacy difficulty assumptions survive as current truth | HIGH | Difficulty V1 migration + config/doc/regression checks |
+| RISK-004 | Production difficulty metadata becomes inconsistent | HIGH | Versioned Difficulty V1 evaluator/calibration |
+| RISK-005 | Generic small test fixtures break after production validation | MEDIUM/HIGH | TEST fixture path/context separate from production |
+| RISK-006 | Existing artwork gets silently resized/altered | HIGH | Source preservation + explicit compiler/importer + round-trip comparison |
+| RISK-007 | AI agent invents missing references | HIGH | Canonical reference library/manifest |
+| RISK-008 | External reference game copied too closely | HIGH | Original SCRUBBOTS visual authority; external references conceptual only |
+| RISK-009 | Target race assigns same pixel to multiple Scrubbots | HIGH | Reservation strict tests |
+| RISK-010 | Renderer creates thousands of Nodes | HIGH | Batched renderer requirement |
+| RISK-011 | Desktop testing hides mobile performance issues | HIGH | Real Android profiling |
+| RISK-012 | Future agent breaks explicit preload/headless compatibility | MEDIUM/HIGH | ADR-009 + regression tests |
+| RISK-013 | Target ordering looks wrong because routing targetability lacks exterior access | HIGH | Owner-locked one-cell four-side exterior routing corridor + exact Hazard Bot (0,19) regression |
+| RISK-014 | Hidden debug input diverges from production slot-origin behavior | HIGH | Slot-click-only owner gameplay activation; no SPACE dispatch |
 
 ---
 
@@ -1447,13 +1302,13 @@ BOARDSTATE                         DONE
 ↓
 HEADLESS CORE TESTS                DONE
 ↓
-DIFFICULTY BANDS + 59×59
+ENGINE/CONTENT ENVELOPE
 ↓
 BOARD RENDERER
 ↓
 VISUAL REFERENCE INGESTION
 ↓
-PIXEL ART IMPORT PIPELINE
+PIXEL ART IMPORT / SEMANTIC ART PIPELINES
 ↓
 GAMEPLAY SESSION
 ↓
@@ -1465,7 +1320,7 @@ RESERVATION
 ↓
 TARGETSELECTOR
 ↓
-ROUTING PROTOTYPES
+ROUTING + EXTERIOR WALKING CORRIDOR
 ↓
 SCRUBBOT AGENT
 ↓
@@ -1490,26 +1345,26 @@ RELEASE QA
 
 ## FIRST TRUE PLAYABLE TARGET
 
-The first real proof of SCRUBBOTS is **not** a menu, a polished title
-screen, a store, or a currency UI. It is:
+The first real proof of SCRUBBOTS is:
 
 ```text
 ONE REAL OWNER-APPROVED SCRUBBOTS LEVEL IMAGE
-+ A VALID EASY/MEDIUM/HARD/VERY-HARD BOARD SIZE
-+ FIVE FUNCTIONAL SLOTS
++ FIVE FUNCTIONAL VISIBLE COLOR SLOTS
++ SLOT-CLICK-ONLY OWNER GAMEPLAY ACTIVATION
 + CORRECT COLOR CANDIDATES + REACHABLE TARGET SELECTION
 + BOTTOM-MOST / LEFT-MOST PRIORITY AMONG CURRENTLY TARGETABLE MATCHING CELLS
++ ONE-LOGICAL-CELL FOUR-SIDE EXTERIOR ROUTING CORRIDOR
 + NO-REACHABLE-TARGET-NO-SPAWN
-+ SCRUBBOTS LEAVING ONE BY ONE
 + VALID TARGET RESERVATION
-+ SCRUBBOTS MOVING VISIBLY ACROSS THE ARTWORK IN THE BOARD PRESENTATION SPACE
-+ PIXELS BEING CLEANED
++ SCRUBBOTS LEAVING THE CLICKED SLOT
++ SCRUBBOTS MOVING VISIBLY THROUGH VALID ROUTES
++ PIXELS BEING CLEANED TO TRANSPARENCY
 + SCRUBBOTS DISAPPEARING AFTER CLEANING
 + A COMPLETE PLAYABLE LEVEL
 + SMOOTH MOBILE PERFORMANCE
 ```
 
-That is the vertical-slice priority (see M21).
+That is the vertical-slice priority (M21).
 
 ---
 
@@ -1522,26 +1377,20 @@ Never combine two risky architecture systems merely to save prompt count.
 PROMPT 01  Project Foundation                                    [DONE]
 PROMPT 02  Godot Installation + Variable LevelData + BoardState
            + Headless Tests                                      [DONE]
-PROMPT 03  Official Difficulty Bands + TEST vs Production
-           Validation + 20..59 Board Fixture Matrix + 59×59/3481
-           Performance Validation
-PROMPT 04  BoardRenderer + Variable Aspect Board Rendering
-           + 59×59 Renderer Benchmark
-PROMPT 05  Visual Reference Library + Existing SCRUBBOTS Asset
-           Audit + Asset Manifest
-PROMPT 06  Pixel-Art Importer + Level Conversion + Pixel-Perfect
-           Round Trip Validation
-PROMPT 07  Gameplay Session Core + Five-Slot Data Model
-PROMPT 08  Color Candidates + Reachability + Reservation + TargetSelector
-PROMPT 09  RoutingSystem + Multiple Routing Prototypes
-PROMPT 10  ScrubbotAgent + Dispatcher
-PROMPT 11  Complete Clearing Vertical Slice
-PROMPT 12  First Real SCRUBBOTS Artwork Playable Level
+PROMPT 03  Official Difficulty Bands + TEST vs Production        [HISTORICAL COMPAT DONE]
+PROMPT 04  BoardRenderer + Variable Aspect Board Rendering       [DONE]
+PROMPT 05  Visual Reference Library                              [DONE/ONGOING ASSETS]
+PROMPT 06  Pixel-Art Importer + Round Trip Validation            [DONE]
+PROMPT 07  Gameplay Session Core + Five-Slot Data Model          [DONE]
+PROMPT 08  Color Candidates + Reservation + TargetSelector       [DONE]
+PROMPT 09  RoutingSystem + Production Routing                    [DONE, V07 CORRIDOR EXTENSION ACTIVE]
+PROMPT 10  ScrubbotAgent + Dispatcher                            [DONE]
+PROMPT 11  Complete Clearing Vertical Slice                      [DONE]
+PROMPT 12  First Real SCRUBBOTS Artwork Playable Level           [M21 ACTIVE]
 PROMPT 13  Production Slot UI + Gameplay Layout + Touch Controls
 PROMPT 14  Win/Lose Completion Rules + Results Flow
 PROMPT 15  Scrubbot Final Art + Cleaning Effects + Audio/Haptics
-PROMPT 16  Level Catalog + Difficulty Content Rules + Production
-           Level Pipeline
+PROMPT 16  Level Catalog + Difficulty V1 Content Rules
 PROMPT 17  Progression + Win Streak + Save System
 PROMPT 18  Home + Settings + Tutorial + Navigation
 PROMPT 19  Android Device Performance + Full 59×59 Stress Tests
@@ -1553,414 +1402,326 @@ PROMPT 21  Release Candidate Preparation
 
 ## NEXT IMMEDIATE MILESTONE
 
-**PROMPT 03 — Official Difficulty Bands + 59×59 Validation — COMPLETE.**
-See `C:\Users\sekip\Desktop\SCRUBBOTS_PHASE_M03_LOG.md` for full detail:
-`DifficultyRules` + `ProductionLevelValidator` implemented, official bands
-(Easy 20–29, Medium 30–39, Hard 40–49, Very Hard 50–59, max 59×59=3,481)
-enforced and tested, TEST-vs-production separation proven, docs/tasks.md
-updated, 131/131 tests passing.
+**Current immediate implementation gate — M21-C001 V07:** execute
+`coordination/sessions/M21-C001/CHATGPT_PROMPT_V07.md` against
+`CHATGPT_AUDIT_CRITERIA_V07.md`.
 
-**PROMPT 04 — Board Renderer + DIRTY/CLEAN Prototype (M06) — COMPLETE.**
-See `C:\Users\sekip\Desktop\SCRUBBOTS_PHASE_M06_LOG.md` for full detail:
-`BoardRenderer` (single Image/ImageTexture, zero per-cell Nodes at any
-size, ADR-011) implemented and tested at every official band boundary plus
-rectangular boards up to 59×59/3,481 cells; `PaletteColors` and
-`DirtyCleanPresets` (3 presets, A/B/C) implemented; dev comparison tool
-(`scenes/debug/board_renderer_debug.tscn`) built for native-scale owner
-review; 227/227 tests passing. **DIRTY visual approval remains an open
-design gate** — presets exist, none is chosen (see M10 above).
-
-> **SUPERSEDED (META-C004, 2026-09-05, ADR-019):** the DIRTY/CLEAN prototype
-> and `DirtyCleanPresets` A/B/C described above were replaced by the
-> owner-locked ACTIVE/CLEARED model. `dirty_clean_presets.gd` was removed and
-> the renderer now draws ACTIVE = source color/opaque, CLEARED = transparent.
-> The paragraph above is preserved as historical record of Prompt 04 only;
-> current truth is M10 (renamed) and ADR-019. Owner manual QA of the new
-> transparent model is complete (SB-M10-005..011, owner PASS 2026-09-06).
-
-**Current immediate implementation gate — M21-C001 V04:** execute
-`coordination/sessions/M21-C001/CHATGPT_PROMPT_V04.md`. This pass preserves the
-accepted real-art vertical slice and adds the owner-live-tested target priority,
-visible board-aligned Scrubbot presentation and five-slot playable UI required
-for M21 final closure. The historical Prompt 05 guidance below is retained only
-as old roadmap context and is no longer the current project action.
-
-**Historical PROMPT 05 guidance — Visual Reference Library / Existing Artwork Audit (M07)**
-
-1. Preserve everything from M00–M06 — do not rebuild working systems
-   (LevelData, BoardState, DifficultyRules, ProductionLevelValidator,
-   BoardRenderer, DirtyCleanPresets).
-2. Establish the reference directory structure from §9.6 (Visual Reference
-   System) — `assets/art/references/{gameplay,ui,scrubbots,pixel_method,
-   external_inspiration}/`, etc. — as directories only unless the owner
-   supplies real files this session.
-3. Ask the owner for / accept any real SCRUBBOTS artwork files if supplied
-   this session; inventory them with type/status metadata. Do **not**
-   fabricate, guess, or promote ambiguous Desktop images into this
-   inventory (see tasks.md Visual Reference System §9.5 and the M03/M06
-   phase logs' explicit note that unrelated Desktop images exist but are
-   not SCRUBBOTS assets).
-4. If no real artwork is supplied, explicitly mark every reference category
-   `AWAITING OWNER ASSET` — do not mark M07 complete on directory
-   structure alone.
-5. While reviewing artwork, this is also the natural point for the project
-   owner to actually **use** `scenes/debug/board_renderer_debug.tscn` to
-   pick a DIRTY preset (or request a new one) — closing out M10's design
-   gate is not required to start M07, but should happen before real art
-   is imported and rendered in M09/M21.
-6. Do not begin the pixel-art importer (M09), slots (M12), Scrubbots
-   (M18), target selection (M15), or routing (M16-M17) in this milestone.
-7. Start the phase log immediately as `SCRUBBOTS_PHASE_M07_LOG.md`, per the
-   Phase Log Workflow above.
+V07 preserves the accepted V01–V06 engineering surface and corrects the two owner-observed runtime gaps: remove SPACE dispatch and add the one-cell exterior routing ring. The exact fresh Hazard Bot C08 acceptance target is `(0,19)` / index `380`. Claude/Codex must not edit this `TASKS.md`; after `CLAUDE_LOG_V07.md` is pushed, ChatGPT performs the independent audit and updates tracker state. Only after ChatGPT engineering PASS does the owner repeat F6 manual acceptance.
 
 ---
 
 ## PARALLEL SIDECAR PROJECTS — SCRUBBOTS LEVEL PLATFORM
 
-These tasks are canonical SCRUBBOTS tasks, but they belong to two sidecar
-systems that are intentionally isolated from the mobile game's runtime
-project:
+These tasks are canonical SCRUBBOTS tasks but belong to sidecar systems isolated from the mobile runtime:
 
-- `SB-LFxx-xxx`: **SCRUBBOTS Level Factory / Level Generator**, a separate
-  Godot project rooted at `level_factory/project.godot`.
-- `SB-CPxx-xxx`: **SCRUBBOTS Content Pipeline**, a separate publishing and
-  remote-content control plane rooted at `content_pipeline/`.
+- `SB-LFxx-xxx`: SCRUBBOTS Level Factory / Level Generator.
+- `SB-CPxx-xxx`: SCRUBBOTS Content Pipeline.
 
-The repository-root `tasks.md` remains the only canonical task ledger.
-The sidecar projects may have their own README/governance/coordination files,
-but they must not create competing task ledgers.
+The repository-root `TASKS.md` remains the only canonical task ledger and is ChatGPT-write-owned.
 
 ### Locked sidecar boundaries
 
-- The mobile game never preloads/imports `level_factory/` scripts.
-- The Level Factory exports declarative Level Data / production artifacts
-  through documented contracts.
-- Existing M09 importer/batch tooling remains the audited pixel-perfect
-  Level Data V1 compatibility gate; do not rewrite it just because the
-  Factory exists.
-- The Content Pipeline distributes declarative level/content data only.
-  Never distribute GDScript, native libraries, bytecode, plugins, or other
-  executable gameplay code as remote content.
-- Runtime remote content is installed under `user://`, never written into
-  `res://`.
-- Staging precedes production. Publication must be versioned, integrity
-  checked, reversible, and auditable.
-- Existing M30/M47/M48 remain the main-game catalog, production scale-up,
-  and level-QA milestones. Sidecar systems feed those milestones instead of
-  duplicating runtime ownership.
-- Historical Colony Flow-inspired generator ideas that depend on unresolved
-  SCRUBBOTS mechanics stay experimental/design-gated until the corresponding
-  gameplay rules are owner-approved.
-- Canonical production boards remain Easy 20–29, Medium 30–39, Hard 40–49,
-  Very Hard 50–59 per dimension, rectangular allowed, max 59×59 = 3,481.
-  Never revive legacy 16×16/18×18/fixed-40×40/Extra-Hard/2,500-max rules.
+- Mobile game never preloads/imports `level_factory/` scripts.
+- Factory exports declarative Level Data / production artifacts through documented contracts.
+- Existing M09 tooling remains compatibility/evidence; do not rewrite it merely because Factory exists.
+- Content Pipeline distributes declarative content only, never executable gameplay code.
+- Runtime remote content installs under `user://`, never writes into `res://`.
+- Staging precedes production; publication is versioned, integrity-checked, reversible and auditable.
+- Existing M30/M47/M48 remain main-game catalog/scale-up/QA milestones.
+- Campaign/difficulty work obeys Difficulty V1 owner decisions, not historical class=dimension/color rules.
 
-### GitHub-native ChatGPT ↔ Claude coordination for both sidecars [LOCKED]
+### GitHub-native ChatGPT ↔ Claude coordination for sidecars [LOCKED]
 
-Every implementation cycle uses repository evidence as the communication
-channel:
-
-1. ChatGPT writes the versioned `CHATGPT_PROMPT_VNN.md` and
-   `CHATGPT_AUDIT_CRITERIA_VNN.md` in the relevant sidecar cycle folder.
-2. Claude safely syncs `origin/main`, reads those GitHub files, implements
-   only the active prompt, runs the required validation, and appends evidence
-   to the same cycle's single `CLAUDE_IMPLEMENTATION_LOG.md`.
-3. Claude updates canonical `tasks.md`, the relevant sidecar
-   `coordination/SESSION_INDEX.md`, and root
-   `.hiveai/PROJECT_DASHBOARD.md`, pushes safely, sets the cycle to
-   `AWAITING_AUDIT`, and stops.
-4. Claude never creates an audit/self-audit file and never assigns
-   `AUDITED_PASS`/`AUDITED_FAIL`.
-5. ChatGPT reads the implementation log, actual commits/diff/code/tests from
-   GitHub, independently audits them, and writes `CHATGPT_AUDIT_VNN.md`.
-6. If correction is required, ChatGPT issues the next prompt version in the
-   same cycle. Only after an independent pass may the cycle close.
-7. Root H!veAI dashboard materializes the current state of the main game and
-   both sidecar projects; it does not replace `tasks.md`.
+1. ChatGPT writes versioned `CHATGPT_PROMPT_VNN.md` and `CHATGPT_AUDIT_CRITERIA_VNN.md`.
+2. **Before handoff, ChatGPT updates root `TASKS.md` to the audited/current next actor/action.**
+3. Claude safely syncs, reads `TASKS.md` without editing it, implements only the active prompt, runs validation, writes/pushes the matching `CLAUDE_LOG_VNN.md`, and returns `AWAITING_AUDIT`.
+4. Claude never creates an audit verdict/file and never mutates root `TASKS.md`.
+5. ChatGPT reads the log + actual commits/diff/source/tests, independently audits them, writes `CHATGPT_AUDIT_VNN.md`, and **updates root `TASKS.md` itself** with audit result/closures/progress/next frontier.
+6. If correction is required, ChatGPT issues the next prompt version only after the full-surface audit/frozen finding set and tracker update.
 
 ### LF00 — Level Factory Project Bootstrap & Isolation [SIDECAR PROJECT]
 
-- [ ] SB-LF00-001 Establish `level_factory/` as an independently openable Godot 4.7.1 project with its own `project.godot`.
-- [ ] SB-LF00-002 Maintain Factory-specific README, CLAUDE governance, docs, scenes/scripts/tests/output boundaries.
+- [ ] SB-LF00-001 Establish `level_factory/` as independently openable Godot project.
+- [ ] SB-LF00-002 Maintain Factory-specific README/governance/docs/scenes/scripts/tests/output boundaries.
 - [ ] SB-LF00-003 Enforce one-way integration: Factory exports data; main game never preloads Factory scripts.
-- [ ] SB-LF00-004 Keep Factory logic headless-testable and data-oriented; prefer RefCounted/plain data outside editor presentation.
-- [ ] SB-LF00-005 Define Factory verification commands separately from root-game verification commands.
-- [ ] SB-LF00-006 Define generated/candidate/cache/secret folders and source-control exclusions.
-- [ ] SB-LF00-007 Establish Factory GitHub coordination/session-index structure while root tasks.md remains the only task ledger.
-- [ ] SB-LF00-008 Prove a clean checkout can boot the nested Factory headlessly without loading the mobile game project.
+- [ ] SB-LF00-004 Keep Factory logic headless-testable/data-oriented.
+- [ ] SB-LF00-005 Define Factory verification commands separately.
+- [ ] SB-LF00-006 Define generated/candidate/cache/secret folders and exclusions.
+- [ ] SB-LF00-007 Establish Factory coordination structure while root TASKS remains sole ledger.
+- [ ] SB-LF00-008 Prove clean checkout boots nested Factory headlessly.
 
 ### LF01 — Deterministic Generation Configuration & Seeds
 
 - [ ] SB-LF01-001 Define deterministic LevelGenerationConfig.
-- [ ] SB-LF01-002 Store/replay a seed for every generated candidate.
-- [ ] SB-LF01-003 Prove same config + seed produces byte-identical candidate data.
-- [ ] SB-LF01-004 Prove distinct seeds can produce distinct candidates while preserving locked rules.
-- [ ] SB-LF01-005 Support explicit/automatic width-height selection under canonical difficulty bands.
-- [ ] SB-LF01-006 Support rectangular production boards; never assume width == height.
-- [ ] SB-LF01-007 Exercise 59×59 generation/validation where cost scales with board size.
+- [ ] SB-LF01-002 Store/replay seed for every candidate.
+- [ ] SB-LF01-003 Same config + seed produces byte-identical candidate data.
+- [ ] SB-LF01-004 Distinct seeds can produce distinct legal candidates.
+- [ ] SB-LF01-005 Support width/height selection within current engine/content envelope and workload guidance.
+- [ ] SB-LF01-006 Support rectangular boards.
+- [ ] SB-LF01-007 Exercise 59×59 where cost scales.
 - [ ] SB-LF01-008 Record seed/config/generator-version provenance.
-- [ ] SB-LF01-009 Separate TEST/development candidates from production candidates.
-- [ ] SB-LF01-010 Reject legacy board/difficulty assumptions.
+- [ ] SB-LF01-009 Separate TEST/development candidates from production.
+- [ ] SB-LF01-010 Reject obsolete semantic assumptions.
 
-### LF02 — Constraint-Based Candidate Generator
+### LF02 — Semantic/Constraint Candidate Generator
 
-- [ ] SB-LF02-001 Implement a constraint-based candidate architecture, not blind random board filling.
-- [ ] SB-LF02-002 Support reverse construction from a valid solution/puzzle structure when gameplay semantics permit.
-- [ ] SB-LF02-003 Support explicit PUZZLE_FIRST generation mode.
-- [ ] SB-LF02-004 Support explicit ART_FIRST mode consuming owner-supplied pixel art/masks.
-- [ ] SB-LF02-005 Implement reusable shape primitives such as blob/ring/corridor/pocket/island/snake/branch/chamber/spiral without declaring them difficulty rules.
+- [ ] SB-LF02-001 Implement evaluator-guided candidate architecture rather than blind random filling.
+- [ ] SB-LF02-002 Support reverse construction when canonical mechanics permit.
+- [ ] SB-LF02-003 Support PUZZLE_FIRST mode.
+- [ ] SB-LF02-004 Support ART_FIRST mode consuming owner/AI-approved pixel art/masks.
+- [ ] SB-LF02-005 Implement reusable shape/topology primitives without declaring them difficulty rules.
 - [ ] SB-LF02-006 Implement connected color-region representation/generation.
-- [ ] SB-LF02-007 Preserve one logical artwork square = one logical board cell in art-first flows.
-- [ ] SB-LF02-008 Never fabricate missing owner artwork or label generated art as owner-original.
-- [ ] SB-LF02-009 Keep dependency-graph semantics behind an experimental/design-gated adapter until SCRUBBOTS dependency rules exist.
-- [ ] SB-LF02-010 Keep slot/stack quantity/order generation behind an experimental/design-gated adapter until M12+ rules exist.
-- [ ] SB-LF02-011 Record candidate provenance: mode, seed, shapes/masks, constraints, generator version.
-- [ ] SB-LF02-012 Add deterministic unit/property tests for generator primitives and invalid configs.
+- [ ] SB-LF02-007 Preserve one logical artwork square = one logical board cell.
+- [ ] SB-LF02-008 Never fabricate missing owner artwork or label AI output owner-original.
+- [ ] SB-LF02-009 Keep unresolved dependency semantics behind design-gated adapters.
+- [ ] SB-LF02-010 Keep unresolved slot/stack quantity/order generation design-gated.
+- [ ] SB-LF02-011 Record candidate provenance.
+- [ ] SB-LF02-012 Add deterministic unit/property tests.
 
-### LF03 — Puzzle Simulation, Solver & State Search [DESIGN-GATED SEMANTICS]
+### LF03 — Puzzle Simulation, Solver & State Search
 
-- [ ] SB-LF03-001 Create a pure/headless puzzle simulation boundary independent of rendering/Scrubbot animation.
-- [ ] SB-LF03-002 Define a compact solver-state representation.
-- [ ] SB-LF03-003 Define a legal-move-provider interface so solver code does not invent unresolved gameplay.
-- [ ] SB-LF03-004 Implement deterministic baseline DFS when legal-move semantics are available.
-- [ ] SB-LF03-005 Add visited-state memoization and deterministic state hashing.
-- [ ] SB-LF03-006 Record solution path, states visited, dead ends, depth, branching and solve-time diagnostics.
-- [ ] SB-LF03-007 Add correctness-preserving pruning/move ordering only with tests.
-- [ ] SB-LF03-008 Add bounded solution counting / solution-entropy analysis without requiring unique solution.
-- [ ] SB-LF03-009 Keep reachability/flood-fill behind a gameplay-semantic adapter; never import Colony Flow reachability as SCRUBBOTS law.
-- [ ] SB-LF03-010 Reproduce solver bugs by candidate ID + seed + config + generator version.
-- [ ] SB-LF03-011 Define search budgets/timeouts and explicit UNSOLVED/INCONCLUSIVE distinctions.
-- [ ] SB-LF03-012 Add solver regression fixtures including rectangular and 59×59-relevant cases where practical.
+- [ ] SB-LF03-001 Create pure/headless puzzle simulation boundary.
+- [ ] SB-LF03-002 Define compact solver state.
+- [ ] SB-LF03-003 Define legal-move-provider interface.
+- [ ] SB-LF03-004 Implement deterministic baseline search when semantics available.
+- [ ] SB-LF03-005 Add visited-state memoization/hashing.
+- [ ] SB-LF03-006 Record solution path/states/dead ends/depth/branching/solve time.
+- [ ] SB-LF03-007 Add correctness-preserving pruning/order only with tests.
+- [ ] SB-LF03-008 Add bounded solution-count/entropy analysis.
+- [ ] SB-LF03-009 Reuse canonical reachability/routing semantics rather than importing another game's rules.
+- [ ] SB-LF03-010 Reproduce solver bugs by candidate/seed/config/version.
+- [ ] SB-LF03-011 Define budgets/timeouts and UNSOLVED vs INCONCLUSIVE.
+- [ ] SB-LF03-012 Add regression fixtures.
 
 ### LF04 — Difficulty Intelligence & Metrics
 
-- [ ] SB-LF04-001 Define LevelMetrics as versioned analysis output.
-- [ ] SB-LF04-002 Record solution depth/move count when meaningful.
-- [ ] SB-LF04-003 Record states visited/dead ends/branching/forced-move metrics when meaningful.
-- [ ] SB-LF04-004 Add dependency-depth metric only after dependency semantics are canonical.
-- [ ] SB-LF04-005 Add slot-pressure metric only after slot semantics are canonical.
-- [ ] SB-LF04-006 Add bait/false-move metrics only after safe/deadlock semantics are canonical.
-- [ ] SB-LF04-007 Add color-switch/remaining-state volatility metrics when they prove useful.
-- [ ] SB-LF04-008 Compute a provisional difficulty score from versioned coefficients, never hard-code unreviewed historical coefficients as truth.
-- [ ] SB-LF04-009 Map predicted difficulty to current EASY/MEDIUM/HARD/VERY_HARD labels without replacing locked dimension validation.
-- [ ] SB-LF04-010 Keep metric provenance so score-version changes are traceable.
-- [ ] SB-LF04-011 Design future calibration against real player telemetry without requiring telemetry for V1.
-- [ ] SB-LF04-012 Test that difficulty analysis cannot silently change gameplay state or exported source art.
+- [ ] SB-LF04-001 Define versioned LevelMetrics.
+- [ ] SB-LF04-002 Record solution depth/move count where meaningful.
+- [ ] SB-LF04-003 Record states/dead ends/branching/forced moves.
+- [ ] SB-LF04-004 Add dependency depth only when canonical.
+- [ ] SB-LF04-005 Add slot pressure only when canonical.
+- [ ] SB-LF04-006 Add bait/deadlock metrics only when canonical.
+- [ ] SB-LF04-007 Add color/remaining-state volatility where useful.
+- [ ] SB-LF04-008 Implement/version Difficulty V1 Challenge Score components/coefficients.
+- [ ] SB-LF04-009 Map predicted score to current lane/class rhythm without equating class to board size.
+- [ ] SB-LF04-010 Keep metric provenance/versioning.
+- [ ] SB-LF04-011 Design future calibration against player data under approved analytics policy.
+- [ ] SB-LF04-012 Tests prove analysis does not mutate gameplay/art source.
 
 ### LF05 — Factory Validation & Level QA
 
-- [ ] SB-LF05-001 Compose structural Level Data V1 validation with production difficulty validation.
-- [ ] SB-LF05-002 Reuse the audited M09 exact-pixel reconstruction/round-trip contract for art-first exports.
-- [ ] SB-LF05-003 Validate dimensions, locked C01..C16 membership/order, difficulty distinct-color bands (3–5 / 6–7 / 8–9 / 10–12), cells, ACTIVE opacity/CLEARED runtime transparency and duplicate IDs before production acceptance.
-- [ ] SB-LF05-004 Reject unsolved candidates when the solver verdict is authoritative.
-- [ ] SB-LF05-005 Distinguish solver INCONCLUSIVE from proven UNSOLVABLE.
-- [ ] SB-LF05-006 Produce actionable per-candidate rejection reasons.
-- [ ] SB-LF05-007 Generate a machine-readable QA report per accepted/rejected batch.
-- [ ] SB-LF05-008 Preserve every owner source image byte-for-byte.
-- [ ] SB-LF05-009 Add visual-review gates for recognizability/readability rather than claiming AI-only visual approval.
-- [ ] SB-LF05-010 Feed accepted artifacts into existing M30/M47/M48 contracts rather than bypassing them.
+- [ ] SB-LF05-001 Compose structural LevelData validation with current production compatibility + Difficulty V1 evaluation.
+- [ ] SB-LF05-002 Reuse audited M09 round-trip contract for art-first exports.
+- [ ] SB-LF05-003 Validate dimensions/envelope/C01..C16/3..12 used colors/cells/opacity/transparency/provenance/duplicate IDs.
+- [ ] SB-LF05-004 Reject proven-unsolvable candidates when solver authoritative.
+- [ ] SB-LF05-005 Distinguish INCONCLUSIVE from UNSOLVABLE.
+- [ ] SB-LF05-006 Actionable rejection reasons.
+- [ ] SB-LF05-007 Machine-readable QA report.
+- [ ] SB-LF05-008 Preserve owner source images byte-for-byte.
+- [ ] SB-LF05-009 Visual recognizability/readability gates, not structural-only false positives.
+- [ ] SB-LF05-010 Feed accepted artifacts into M30/M47/M48 rather than bypassing them.
 
 ### LF06 — Human-in-the-Loop Godot Factory Editor
 
-- [ ] SB-LF06-001 Build an @tool/editor-facing Level Factory workspace in the nested Godot project.
-- [ ] SB-LF06-002 Provide target difficulty, dimensions, seed, generation mode and candidate controls.
-- [ ] SB-LF06-003 Provide Generate / Solve / Validate / Analyze / Reproduce actions.
-- [ ] SB-LF06-004 Provide board/art preview with crisp logical-pixel rendering.
-- [ ] SB-LF06-005 Display solution/solver/difficulty/QA metrics with provenance.
-- [ ] SB-LF06-006 Allow owner/designer paint/erase/color edits where appropriate.
-- [ ] SB-LF06-007 Allow approved puzzle-configuration edits without exposing unresolved mechanics as final.
-- [ ] SB-LF06-008 Provide REVALIDATE after manual changes.
-- [ ] SB-LF06-009 Never auto-promote generated candidate to production without explicit acceptance.
-- [ ] SB-LF06-010 Keep editor presentation separate from generator/solver truth.
-- [ ] SB-LF06-011 Support opening/reproducing a candidate by seed/config.
-- [ ] SB-LF06-012 Add editor smoke tests and headless core tests.
+- [ ] SB-LF06-001 Build @tool/editor-facing workspace.
+- [ ] SB-LF06-002 Target difficulty/dimensions/seed/mode/candidate controls.
+- [ ] SB-LF06-003 Generate/Solve/Validate/Analyze/Reproduce actions.
+- [ ] SB-LF06-004 Crisp board/art preview.
+- [ ] SB-LF06-005 Display solution/difficulty/load/risk/art QA metrics/provenance.
+- [ ] SB-LF06-006 Owner/designer paint/edit where appropriate.
+- [ ] SB-LF06-007 Approved puzzle-config edits only.
+- [ ] SB-LF06-008 Revalidate after manual changes.
+- [ ] SB-LF06-009 Never auto-promote generated candidate.
+- [ ] SB-LF06-010 Keep editor presentation separate from truth.
+- [ ] SB-LF06-011 Reproduce candidate by seed/config.
+- [ ] SB-LF06-012 Editor smoke + headless core tests.
 
 ### LF07 — Mutation & Automatic Difficulty Targeting [V2]
 
-- [ ] SB-LF07-001 Define mutation interface and immutable candidate lineage.
-- [ ] SB-LF07-002 Add safe hardening mutations only for canonical mechanics.
-- [ ] SB-LF07-003 Add safe easing mutations only for canonical mechanics.
-- [ ] SB-LF07-004 Re-solve and revalidate after every mutation.
+- [ ] SB-LF07-001 Mutation interface/immutable lineage.
+- [ ] SB-LF07-002 Safe hardening mutations only for canonical mechanics.
+- [ ] SB-LF07-003 Safe easing mutations only for canonical mechanics.
+- [ ] SB-LF07-004 Re-solve/revalidate after every mutation.
 - [ ] SB-LF07-005 Preserve seed/parent/mutation provenance.
-- [ ] SB-LF07-006 Target a difficulty metric range without changing locked board-band legality.
-- [ ] SB-LF07-007 Bound mutation attempts and reject non-converging candidates.
-- [ ] SB-LF07-008 Compare mutate-vs-regenerate efficiency.
-- [ ] SB-LF07-009 Never mutate owner source artwork silently.
-- [ ] SB-LF07-010 Add deterministic mutation regression tests.
+- [ ] SB-LF07-006 Target Challenge Score range while respecting load/risk/retention constraints.
+- [ ] SB-LF07-007 Bound mutation attempts.
+- [ ] SB-LF07-008 Compare mutate vs regenerate efficiency.
+- [ ] SB-LF07-009 Never mutate owner source art silently.
+- [ ] SB-LF07-010 Deterministic mutation regression tests.
 
 ### LF08 — Batch Factory & Weekly Production
 
-- [ ] SB-LF08-001 Generate requested accepted counts by difficulty, e.g. 20/35/30/15 = 100.
-- [ ] SB-LF08-002 Separate candidate-generated count from accepted count.
-- [ ] SB-LF08-003 Keep rejection reasons/statistics per batch.
-- [ ] SB-LF08-004 Support deterministic/resumable batch jobs.
-- [ ] SB-LF08-005 Prevent duplicate IDs/seeds/production artifacts according to canonical ownership rules.
-- [ ] SB-LF08-006 Produce accepted Level Data, previews, metadata and QA reports as one batch result.
-- [ ] SB-LF08-007 Support owner review/approval queue before publication.
-- [ ] SB-LF08-008 Export a production-ready handoff to the Content Pipeline.
-- [ ] SB-LF08-009 Stress high rejection rates without corrupting accepted artifacts.
-- [ ] SB-LF08-010 Prove batch reruns do not create meaningless diffs.
+- [ ] SB-LF08-001 Generate requested accepted counts by lane/class cadence.
+- [ ] SB-LF08-002 Separate generated from accepted count.
+- [ ] SB-LF08-003 Rejection statistics.
+- [ ] SB-LF08-004 Deterministic/resumable batch jobs.
+- [ ] SB-LF08-005 Prevent duplicate IDs/seeds/artifacts.
+- [ ] SB-LF08-006 Accepted LevelData/previews/metadata/QA reports as batch result.
+- [ ] SB-LF08-007 Owner review/approval queue before publication.
+- [ ] SB-LF08-008 Production-ready handoff to Content Pipeline.
+- [ ] SB-LF08-009 Stress high rejection rates safely.
+- [ ] SB-LF08-010 Reruns create no meaningless diffs.
 
 ### LF09 — Advanced Generation Research [V3 / EXPERIMENTAL]
 
-- [ ] SB-LF09-001 Prototype evolutionary/genetic candidate selection behind an experimental flag.
-- [ ] SB-LF09-002 Define versioned fitness metrics without treating provisional metrics as truth.
-- [ ] SB-LF09-003 Prototype procedural art masks without replacing owner-approved art direction.
-- [ ] SB-LF09-004 Prototype telemetry-calibrated difficulty only after owner-approved analytics/data policy exists.
-- [ ] SB-LF09-005 Keep live/runtime level generation disabled unless explicitly approved later.
-- [ ] SB-LF09-006 Preserve reproducibility and lineage across generations.
-- [ ] SB-LF09-007 Compare advanced generation against V1/V2 quality and compute cost.
-- [ ] SB-LF09-008 Promote no experimental feature to production without a separate audited decision.
+- [ ] SB-LF09-001 Prototype evolutionary selection behind experimental flag.
+- [ ] SB-LF09-002 Versioned fitness metrics.
+- [ ] SB-LF09-003 Prototype procedural/semantic art helpers without replacing owner-approved art direction.
+- [ ] SB-LF09-004 Telemetry-calibrated difficulty only after approved analytics/data policy.
+- [ ] SB-LF09-005 Keep live/runtime level generation disabled unless explicitly approved.
+- [ ] SB-LF09-006 Preserve reproducibility/lineage.
+- [ ] SB-LF09-007 Compare advanced generation quality/compute cost.
+- [ ] SB-LF09-008 No production promotion without separate audit decision.
 
-### LF10 — Campaign/Sequencing Adapter [DESIGN GATE]
+### LF10 — Campaign/Sequencing Adapter
 
-- [ ] SB-LF10-001 Define a CampaignBuilder interface without choosing progression rules.
-- [ ] SB-LF10-002 Consume owner-approved progression/difficulty rhythm only after M32 rules exist.
-- [ ] SB-LF10-003 Select from accepted production levels without modifying level data.
-- [ ] SB-LF10-004 Prevent duplicate/unavailable/disabled level selection.
+- [ ] SB-LF10-001 Define CampaignBuilder interface.
+- [ ] SB-LF10-002 Consume owner-locked Difficulty V1 rhythm/progression/retention rules.
+- [ ] SB-LF10-003 Select accepted production levels without modifying their data.
+- [ ] SB-LF10-004 Prevent duplicate/unavailable/disabled selection.
 - [ ] SB-LF10-005 Preserve deterministic campaign-build provenance.
 - [ ] SB-LF10-006 Rebuild campaign ordering without regenerating levels.
-- [ ] SB-LF10-007 Support future events/featured-level selection as data, not code.
-- [ ] SB-LF10-008 Add campaign validation once progression is defined.
+- [ ] SB-LF10-007 Future events/featured selection as data, not code.
+- [ ] SB-LF10-008 Campaign validation against challenge/load/frustration/similarity constraints.
 
 ### CP00 — Content Pipeline Architecture & Security [SIDECAR PROJECT]
 
-- [ ] SB-CP00-001 Establish `content_pipeline/` as a separate publisher/control-plane project.
-- [ ] SB-CP00-002 Define APP CODE vs REMOTE CONTENT boundary.
-- [ ] SB-CP00-003 Lock remote content to declarative data; forbid executable code/plugins/scripts/native libraries.
-- [ ] SB-CP00-004 Define staging and production as separate environments.
-- [ ] SB-CP00-005 Define versioned, auditable publish/promotion/rollback state.
-- [ ] SB-CP00-006 Define secret handling so credentials/tokens never enter Git.
-- [ ] SB-CP00-007 Define publisher dry-run/validation-only behavior before remote mutation.
-- [ ] SB-CP00-008 Define provider abstraction; Cloudflare R2/CDN is preferred candidate, not silently vendor-locked before explicit infrastructure validation.
-- [ ] SB-CP00-009 Establish Content Pipeline GitHub coordination/session-index structure using the locked ChatGPT↔Claude workflow.
-- [ ] SB-CP00-010 Document mobile/store-policy boundary and require current policy re-verification before release.
+- [ ] SB-CP00-001 Establish `content_pipeline/` separate publisher/control-plane project.
+- [ ] SB-CP00-002 Define app code vs remote content boundary.
+- [ ] SB-CP00-003 Remote content declarative only; forbid executable payloads.
+- [ ] SB-CP00-004 Separate staging/production.
+- [ ] SB-CP00-005 Versioned/auditable publish/promotion/rollback state.
+- [ ] SB-CP00-006 Secret handling; no credentials in Git.
+- [ ] SB-CP00-007 Publisher dry-run/validation-only before remote mutation.
+- [ ] SB-CP00-008 Provider abstraction.
+- [ ] SB-CP00-009 Content Pipeline GitHub coordination under ChatGPT-owned root tracker.
+- [ ] SB-CP00-010 Re-verify mobile/store-policy boundary before release.
 
 ### CP01 — .scrubpack Format & Packager
 
-- [ ] SB-CP01-001 Define versioned .scrubpack container specification.
-- [ ] SB-CP01-002 Package multiple declarative levels without executable content.
-- [ ] SB-CP01-003 Record pack ID/version/created time/level range or explicit level list.
-- [ ] SB-CP01-004 Include per-pack SHA-256 integrity metadata.
-- [ ] SB-CP01-005 Define deterministic pack ordering/serialization.
-- [ ] SB-CP01-006 Prevent duplicate level IDs within a pack.
-- [ ] SB-CP01-007 Validate every included level before packaging.
-- [ ] SB-CP01-008 Support unpack/inspect tooling for QA.
-- [ ] SB-CP01-009 Prove identical inputs create deterministic pack bytes where the chosen container permits it.
-- [ ] SB-CP01-010 Reject unsupported schema/content versions safely.
+- [ ] SB-CP01-001 Define versioned .scrubpack spec.
+- [ ] SB-CP01-002 Package declarative levels only.
+- [ ] SB-CP01-003 Record pack ID/version/time/levels.
+- [ ] SB-CP01-004 Per-pack SHA-256.
+- [ ] SB-CP01-005 Deterministic pack serialization/order.
+- [ ] SB-CP01-006 Prevent duplicate level IDs.
+- [ ] SB-CP01-007 Validate every level before pack.
+- [ ] SB-CP01-008 Unpack/inspect tooling.
+- [ ] SB-CP01-009 Deterministic bytes where container permits.
+- [ ] SB-CP01-010 Reject unsupported versions safely.
 
 ### CP02 — Remote Manifest & Content Versioning
 
-- [ ] SB-CP02-001 Define versioned manifest.json schema.
-- [ ] SB-CP02-002 Include schema_version and monotonic content_version.
-- [ ] SB-CP02-003 Include minimum_game_version compatibility rule.
-- [ ] SB-CP02-004 List packs with IDs, locations and hashes.
-- [ ] SB-CP02-005 Track latest/available level metadata without assuming contiguous IDs when unnecessary.
-- [ ] SB-CP02-006 Support disabled_levels.
-- [ ] SB-CP02-007 Support scheduled activation windows as declarative content metadata.
-- [ ] SB-CP02-008 Reject duplicate pack IDs/level ownership conflicts.
-- [ ] SB-CP02-009 Validate manifest references before publish.
-- [ ] SB-CP02-010 Keep prior manifests/version history for audit/rollback.
-- [ ] SB-CP02-011 Define compatibility behavior for app versions too old/new for a content schema.
-- [ ] SB-CP02-012 Add manifest parser/schema tests.
+- [ ] SB-CP02-001 Define versioned manifest schema.
+- [ ] SB-CP02-002 schema_version + monotonic content_version.
+- [ ] SB-CP02-003 minimum_game_version compatibility.
+- [ ] SB-CP02-004 Pack IDs/locations/hashes.
+- [ ] SB-CP02-005 Level metadata without unnecessary contiguous-ID assumption.
+- [ ] SB-CP02-006 disabled_levels.
+- [ ] SB-CP02-007 Scheduled activation windows.
+- [ ] SB-CP02-008 Reject duplicate pack/level ownership conflicts.
+- [ ] SB-CP02-009 Validate references before publish.
+- [ ] SB-CP02-010 Keep prior manifests/version history.
+- [ ] SB-CP02-011 App/content schema compatibility behavior.
+- [ ] SB-CP02-012 Parser/schema tests.
 
 ### CP03 — Publisher, Staging & Production Promotion
 
-- [ ] SB-CP03-001 Implement publisher validation-only mode.
+- [ ] SB-CP03-001 Publisher validation-only mode.
 - [ ] SB-CP03-002 Serialize accepted Factory output into packs.
-- [ ] SB-CP03-003 Calculate hashes and build candidate manifest.
-- [ ] SB-CP03-004 Upload packs before exposing them in an active manifest.
-- [ ] SB-CP03-005 Verify remote object integrity after upload.
-- [ ] SB-CP03-006 Publish to STAGING first.
-- [ ] SB-CP03-007 Verify staging manifest/packs through real download.
-- [ ] SB-CP03-008 Require explicit promotion from staging to production.
-- [ ] SB-CP03-009 Promote by publishing a new versioned production manifest.
-- [ ] SB-CP03-010 Never silently overwrite a live version without an auditable version transition.
-- [ ] SB-CP03-011 Provide a one-command/one-button publish workflow only after all underlying stages are individually testable.
-- [ ] SB-CP03-012 Produce a publish report containing inputs, hashes, versions, remote verification and final URLs/keys.
+- [ ] SB-CP03-003 Hashes + candidate manifest.
+- [ ] SB-CP03-004 Upload packs before active manifest references them.
+- [ ] SB-CP03-005 Verify remote object integrity.
+- [ ] SB-CP03-006 Publish STAGING first.
+- [ ] SB-CP03-007 Verify staging through real download.
+- [ ] SB-CP03-008 Explicit staging→production promotion.
+- [ ] SB-CP03-009 New versioned production manifest.
+- [ ] SB-CP03-010 No silent live overwrite.
+- [ ] SB-CP03-011 One-command publish only after stages individually testable.
+- [ ] SB-CP03-012 Publish report.
 
 ### CP04 — Godot Remote Content Runtime
 
-- [ ] SB-CP04-001 Implement RemoteContentManager in the main Godot game only when runtime integration milestone is opened.
+- [ ] SB-CP04-001 Implement RemoteContentManager only when runtime integration milestone opens.
 - [ ] SB-CP04-002 Fetch production manifest over HTTPS.
-- [ ] SB-CP04-003 Compare remote/local content versions deterministically.
-- [ ] SB-CP04-004 Determine missing/required packs without redownloading valid cached packs.
-- [ ] SB-CP04-005 Download packs to `user://content/`, never `res://`.
-- [ ] SB-CP04-006 Verify SHA-256 before activation.
-- [ ] SB-CP04-007 Validate pack/schema/level data before activation.
-- [ ] SB-CP04-008 Activate only fully verified content atomically enough to preserve last-known-good content.
-- [ ] SB-CP04-009 Expose remote levels to LevelCatalog/LevelLoader through a narrow data interface.
-- [ ] SB-CP04-010 Keep generator/publisher code completely out of the shipping runtime.
-- [ ] SB-CP04-011 Add Android INTERNET permission only when remote content runtime is actually enabled.
-- [ ] SB-CP04-012 Handle timeout/network/server/HTTP/parse/hash failures without blocking offline play.
-- [ ] SB-CP04-013 Test app-version/content-version compatibility.
-- [ ] SB-CP04-014 Test no executable artifact is accepted as remote content.
+- [ ] SB-CP04-003 Compare remote/local content versions.
+- [ ] SB-CP04-004 Determine missing packs without redundant downloads.
+- [ ] SB-CP04-005 Download to `user://content/`, never `res://`.
+- [ ] SB-CP04-006 Verify SHA-256.
+- [ ] SB-CP04-007 Validate pack/schema/level before activation.
+- [ ] SB-CP04-008 Activate verified content preserving last-known-good.
+- [ ] SB-CP04-009 Expose remote levels to catalog/loader through narrow data interface.
+- [ ] SB-CP04-010 Keep generator/publisher code out of runtime.
+- [ ] SB-CP04-011 Add INTERNET permission only when runtime enabled.
+- [ ] SB-CP04-012 Handle network/server/parse/hash failures without blocking offline play.
+- [ ] SB-CP04-013 App/content version compatibility tests.
+- [ ] SB-CP04-014 Reject executable remote artifacts.
 
 ### CP05 — Offline Cache & Last-Known-Good Recovery
 
 - [ ] SB-CP05-001 Define local content registry under `user://`.
-- [ ] SB-CP05-002 Preserve last-known-good manifest and installed pack set.
-- [ ] SB-CP05-003 Boot/play from cached content when offline.
-- [ ] SB-CP05-004 Fall back safely when manifest fetch fails.
-- [ ] SB-CP05-005 Reject corrupt/incomplete downloads without replacing good cached content.
-- [ ] SB-CP05-006 Support interrupted-download recovery/cleanup.
-- [ ] SB-CP05-007 Define cache size/retention policy.
-- [ ] SB-CP05-008 Keep builtin app levels playable independently of remote content.
-- [ ] SB-CP05-009 Test first launch with no network.
-- [ ] SB-CP05-010 Test upgrade with partial/corrupt remote cache.
-- [ ] SB-CP05-011 Test downgrade/compatibility behavior explicitly.
-- [ ] SB-CP05-012 Never delete the only known-good playable content set before replacement validates.
+- [ ] SB-CP05-002 Preserve last-known-good manifest/packs.
+- [ ] SB-CP05-003 Boot/play cached content offline.
+- [ ] SB-CP05-004 Safe fallback on manifest fetch failure.
+- [ ] SB-CP05-005 Reject corrupt/incomplete downloads without replacing good cache.
+- [ ] SB-CP05-006 Interrupted-download recovery/cleanup.
+- [ ] SB-CP05-007 Cache size/retention policy.
+- [ ] SB-CP05-008 Builtin app levels playable independently.
+- [ ] SB-CP05-009 First launch no-network test.
+- [ ] SB-CP05-010 Upgrade with partial/corrupt cache.
+- [ ] SB-CP05-011 Downgrade/compatibility behavior.
+- [ ] SB-CP05-012 Never delete only known-good set before replacement validates.
 
 ### CP06 — Rollback, Disable & Scheduling
 
-- [ ] SB-CP06-001 Define rollback as a new auditable content version, not an invisible history rewrite.
-- [ ] SB-CP06-002 Roll back production to a known-good pack/manifest set.
-- [ ] SB-CP06-003 Support disabling individual level IDs without withdrawing an entire healthy pack.
-- [ ] SB-CP06-004 Ensure disabled levels are skipped safely by catalog/progression consumers.
-- [ ] SB-CP06-005 Support scheduled future pack/level activation.
-- [ ] SB-CP06-006 Define timezone/time-source behavior for schedules.
-- [ ] SB-CP06-007 Prevent a schedule from activating incompatible/unverified content.
-- [ ] SB-CP06-008 Support cancel/edit of future schedules with audit history.
-- [ ] SB-CP06-009 Test rollback after a bad live release.
-- [ ] SB-CP06-010 Test single-level disable in a healthy pack.
-- [ ] SB-CP06-011 Test multiple weekly packs prepared in one production session.
-- [ ] SB-CP06-012 Preserve reproducible publish/rollback reports.
+- [ ] SB-CP06-001 Rollback as new auditable content version.
+- [ ] SB-CP06-002 Roll back to known-good manifest/pack set.
+- [ ] SB-CP06-003 Disable individual level IDs.
+- [ ] SB-CP06-004 Disabled levels skipped safely.
+- [ ] SB-CP06-005 Scheduled future activation.
+- [ ] SB-CP06-006 Timezone/time-source behavior.
+- [ ] SB-CP06-007 No schedule activates incompatible/unverified content.
+- [ ] SB-CP06-008 Cancel/edit future schedules with audit history.
+- [ ] SB-CP06-009 Rollback after bad live release test.
+- [ ] SB-CP06-010 Single-level disable test.
+- [ ] SB-CP06-011 Multiple weekly packs prepared together.
+- [ ] SB-CP06-012 Reproducible publish/rollback reports.
 
 ### CP07 — Storage/CDN Provider Integration
 
-- [ ] SB-CP07-001 Evaluate Cloudflare R2/CDN against Firebase Storage, S3/CloudFront, Supabase Storage, Backblaze B2 or other approved candidates.
-- [ ] SB-CP07-002 Select provider with owner approval based on cost, HTTPS/CDN, auth, versioning, tooling and operations.
-- [ ] SB-CP07-003 Implement provider adapter without leaking credentials into project data.
-- [ ] SB-CP07-004 Separate staging and production buckets/prefixes/accounts where appropriate.
-- [ ] SB-CP07-005 Configure immutable/versioned object naming where practical.
-- [ ] SB-CP07-006 Verify upload/download/hash round trip.
-- [ ] SB-CP07-007 Define cache-control/CDN invalidation strategy without relying on purge for correctness.
-- [ ] SB-CP07-008 Document backup/export/migration path away from the chosen provider.
-- [ ] SB-CP07-009 Test least-privilege publishing credentials.
-- [ ] SB-CP07-010 Keep provider-specific code outside gameplay/content data schemas.
+- [ ] SB-CP07-001 Evaluate provider candidates.
+- [ ] SB-CP07-002 Select provider with owner approval.
+- [ ] SB-CP07-003 Provider adapter; no credentials in project data.
+- [ ] SB-CP07-004 Separate staging/production storage.
+- [ ] SB-CP07-005 Immutable/versioned object naming where practical.
+- [ ] SB-CP07-006 Upload/download/hash round trip.
+- [ ] SB-CP07-007 Cache-control/CDN strategy.
+- [ ] SB-CP07-008 Backup/export/migration path.
+- [ ] SB-CP07-009 Least-privilege publishing credentials.
+- [ ] SB-CP07-010 Keep provider-specific code outside gameplay/content schemas.
 
 ### CP08 — Content Operations, QA & Observability
 
-- [ ] SB-CP08-001 Produce weekly batch summary: generated/rejected/accepted/published counts.
-- [ ] SB-CP08-002 Record staging and production content versions.
-- [ ] SB-CP08-003 Record pack hashes and remote verification.
-- [ ] SB-CP08-004 Record disabled/scheduled/rolled-back content changes.
-- [ ] SB-CP08-005 Build a content-health check that validates manifest and referenced packs.
-- [ ] SB-CP08-006 Define safe operational alerts/errors without collecting unnecessary player data.
-- [ ] SB-CP08-007 Add reproducible content incident runbook.
-- [ ] SB-CP08-008 Test clean-machine publish dry run.
-- [ ] SB-CP08-009 Test disaster recovery from backed-up manifests/packs.
-- [ ] SB-CP08-010 Keep publication logs free of secrets.
+- [ ] SB-CP08-001 Weekly batch summary.
+- [ ] SB-CP08-002 Record staging/production versions.
+- [ ] SB-CP08-003 Record hashes/remote verification.
+- [ ] SB-CP08-004 Record disabled/scheduled/rollback changes.
+- [ ] SB-CP08-005 Content-health check.
+- [ ] SB-CP08-006 Safe operational errors/alerts without unnecessary player data.
+- [ ] SB-CP08-007 Content incident runbook.
+- [ ] SB-CP08-008 Clean-machine publish dry run.
+- [ ] SB-CP08-009 Disaster recovery from backups.
+- [ ] SB-CP08-010 Logs free of secrets.
 
 ### CP09 — Store Policy, Security & Release Gate
 
-- [ ] SB-CP09-001 Re-verify current Google Play remote-content/code policy before production launch.
-- [ ] SB-CP09-002 Re-verify Apple App Store requirements before iOS remote-content launch.
-- [ ] SB-CP09-003 Prove remote payloads are declarative content only.
+- [ ] SB-CP09-001 Re-verify current Google Play remote-content/code policy before launch.
+- [ ] SB-CP09-002 Re-verify Apple requirements before iOS remote-content launch.
+- [ ] SB-CP09-003 Prove remote payloads declarative only.
 - [ ] SB-CP09-004 Prevent content data from embedding/evaluating executable expressions/scripts.
-- [ ] SB-CP09-005 Validate TLS/HTTPS-only endpoints.
-- [ ] SB-CP09-006 Threat-model manifest/pack tampering and rollback attacks.
-- [ ] SB-CP09-007 Define signing/authenticity upgrade if hash-only integrity is insufficient.
-- [ ] SB-CP09-008 Verify no publishing secret ships inside the mobile app.
-- [ ] SB-CP09-009 Document privacy impact if future telemetry calibration is enabled.
-- [ ] SB-CP09-010 Require independent audit before enabling production remote-content delivery.
+- [ ] SB-CP09-005 HTTPS-only endpoints.
+- [ ] SB-CP09-006 Threat-model tampering/rollback attacks.
+- [ ] SB-CP09-007 Define authenticity upgrade if hash-only insufficient.
+- [ ] SB-CP09-008 No publishing secret ships in app.
+- [ ] SB-CP09-009 Privacy impact if telemetry enabled.
+- [ ] SB-CP09-010 Independent audit before production remote-content delivery.
