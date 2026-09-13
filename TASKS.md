@@ -7,7 +7,7 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Current Milestone: M21
 - Current Sprint: M21-C001 V04 — owner playtest integration + final closure
 - Current Task: M21-C001-V04
-- Current Task Status: CHANGES_REQUIRED
+- Current Task Status: IN_PROGRESS
 - Next Task/Action: execute `coordination/sessions/M21-C001/CHATGPT_PROMPT_V04.md` and satisfy `CHATGPT_AUDIT_CRITERIA_V04.md`, then hand back for independent audit and owner visual playtest.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
