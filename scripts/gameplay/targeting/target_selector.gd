@@ -125,6 +125,25 @@ func _clear_binding() -> void:
 	_reservations = null
 	_bound = false
 
+## Owner-locked V04 candidate ordering comparator (bottom-most, then left-most,
+## then smallest index). Returns true when `a` should be inspected before `b`.
+## Int entries always sort before non-int entries (which the caller skips
+## fail-closed). Uses canonical BoardState geometry only; performs no mutation.
+static func _candidate_before(a, b, board) -> bool:
+	var ai := typeof(a) == TYPE_INT
+	var bi := typeof(b) == TYPE_INT
+	if ai != bi:
+		return ai  # real int candidates before malformed entries
+	if not ai:
+		return false  # both malformed -> keep stable relative order
+	var pa: Vector2i = board.get_cell_position(a)
+	var pb: Vector2i = board.get_cell_position(b)
+	if pa.y != pb.y:
+		return pa.y > pb.y  # bottom-most (largest y) first
+	if pa.x != pb.x:
+		return pa.x < pb.x  # left-most (smallest x) first
+	return a < b  # deterministic index tie-break
+
 static func _has_methods(obj, names) -> bool:
 	for n in names:
 		if not obj.has_method(n):
@@ -151,8 +170,13 @@ func is_bound_to(board, reservation_state) -> bool:
 	return _bound and _board != null and _board == board \
 		and _reservations != null and _reservations == reservation_state
 
-## Choose the first targetable candidate in ascending row-major candidate order
-## and atomically reserve it for owner_id, all inside this one synchronous call.
+## Choose the targetable candidate with owner-locked V04 positional priority —
+## bottom-most first (largest board-local y), then left-most within that row
+## (smallest board-local x), with a deterministic index tie-break — among all
+## candidates that pass the canonical eligibility gates, and atomically reserve it
+## for owner_id, all inside this one synchronous call. (Supersedes the previous
+## ascending row-major-first policy; owner decision OWNER_PLAYTEST_DECISIONS_V04.
+## This is a WHAT policy only — routing still decides HOW, unchanged.)
 ##
 ## Returns the selected/reserved target index on success, or -1 on any
 ## no-target / invalid-call / failed-assignment condition:
@@ -265,6 +289,14 @@ func _select_core(color_id: int, owner_id: int, access_query, board, ci, rs, gen
 		return -1
 	if not _op_coherent(board, ci, rs, gen):
 		return -1
+	# Owner-locked V04 positional priority (OWNER_PLAYTEST_DECISIONS_V04): inspect
+	# candidates bottom-most first (largest board y), then left-most (smallest x),
+	# then smallest index. Sorting the DETACHED candidate copy only — never the raw
+	# candidate index or BoardState (crit 72/73). get_cell_position() is the canonical
+	# geometry (crit 49); it is a pure BoardState read, not a coherence collaborator.
+	# Non-int entries sort last and are still skipped fail-closed by the loop below.
+	var priority_cmp := func(a, b): return _candidate_before(a, b, board)
+	candidates.sort_custom(priority_cmp)
 
 	for entry in candidates:
 		# Each candidate entry MUST be an int before any BoardState call; other

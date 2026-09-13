@@ -229,6 +229,11 @@ func _initialize() -> void:
 	# M21-C001 V03 — final path-safety + direct-evidence reconciliation.
 	_run_m21_v03_path_safety_tests()
 	_run_m21_v03_direct_evidence_tests()
+	# M21-C001 V04 — owner playtest integration + final closure.
+	_run_m21_v04_preview_dir_tests()
+	_run_m21_v04_target_priority_tests()
+	_run_m21_v04_presentation_transform_tests()
+	_run_m21_v04_slot_ui_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -4300,12 +4305,13 @@ func _run_target_selector_tests() -> void:
 	_check_eq(ts.select_and_reserve(-1, 100, aq), -1, "M15-04 invalid color (-1) returns -1")
 	_check_eq(rs0.get_reservation_count(), 0, "M15-21 invalid call created no reservation")
 
-	# --- deterministic first ascending target + reservation created (tests 6,12; crit 15,26) ---
+	# --- deterministic bottom-most/left-most target + reservation created (tests 6,12; crit 15,26) ---
+	# 3x3 all-color: bottom row is y=2 (indices 6,7,8); left-most is index 6 (owner V04 rule).
 	var board_before := _snapshot_cell_states(b0)
 	var sel = ts.select_and_reserve(COLOR, 100, aq)
-	_check_eq(sel, 0, "M15-06 deterministic first ascending candidate (index 0) selected")
-	_check_eq(rs0.is_reserved(0), true, "M15-12 reservation actually created for selected target")
-	_check_eq(rs0.get_owner(0), 100, "M15-12 selected target owned by requesting owner")
+	_check_eq(sel, 6, "M15-06 deterministic bottom-most/left-most candidate (index 6) selected")
+	_check_eq(rs0.is_reserved(6), true, "M15-12 reservation actually created for selected target")
+	_check_eq(rs0.get_owner(6), 100, "M15-12 selected target owned by requesting owner")
 	# --- selector did not mutate BoardState (test 22; crit 33) ---
 	_check(_cell_states_equal(b0, board_before), "M15-22 selection did not mutate BoardState cells")
 
@@ -4325,13 +4331,14 @@ func _run_target_selector_tests() -> void:
 	_check_eq(ts.select_and_reserve(COLOR, 100, aq), -1, "M15-13 owner already holding target gets -1")
 
 	# --- reserved candidate skipped (test 11; crit 19) ---
+	# target 6 held by owner 100; next bottom-row/left-most free is index 7.
 	var sel2 = ts.select_and_reserve(COLOR, 101, aq)
-	_check_eq(sel2, 1, "M15-11 reserved target 0 skipped; next owner gets target 1")
+	_check_eq(sel2, 7, "M15-11 reserved target 6 skipped; next owner gets bottom-row target 7")
 
 	# --- after releasing selected reservation, same deterministic target for new owner (test 26) ---
-	rs0.release_for_owner(100) # frees target 0
+	rs0.release_for_owner(100) # frees target 6
 	var sel3 = ts.select_and_reserve(COLOR, 102, aq)
-	_check_eq(sel3, 0, "M15-26 released target 0 re-selected deterministically for new owner")
+	_check_eq(sel3, 6, "M15-26 released target 6 re-selected deterministically for new owner")
 
 	# --- access-query false candidate skipped; first blocked + later reachable selects later (tests 17,18; crit 20,22) ---
 	var b_blk = _make_colored_board(4, 1, [COLOR, COLOR, COLOR, COLOR])
@@ -4409,17 +4416,17 @@ func _run_target_selector_tests() -> void:
 	ts_nm.select_and_reserve(COLOR, 600, aq_nm)
 	_check_eq(ci_nm.get_candidates(COLOR), cand_before, "M15-23 selection did not mutate ColorCandidateIndex candidate truth")
 
-	# --- rectangular board (w != h), row-major ascending selection (test 30; crit 38) ---
-	# 5x2: index = y*5 + x. Only some cells are color 5 so ordering across rows matters.
+	# --- rectangular board (w != h), bottom-most/left-most selection (test 30; crit 38,47) ---
+	# 5x2: index = y*5 + x. color-5 cells at indices 1 (x1,y0), 7 (x2,y1), 9 (x4,y1).
+	# Owner V04 rule: bottom row y=1 first -> 7 then 9 (left-most first), then y=0 -> 1.
 	var b_rect = _make_colored_board(5, 2, [0, COLOR, 0, 0, 0,   0, 0, COLOR, 0, COLOR])
 	var ci_rect = ColorCandidateIndex.create(); ci_rect.bind(b_rect)
 	var rs_rect = ReservationState.create(); rs_rect.bind(b_rect)
 	var ts_rect = TargetSelector.create(); ts_rect.bind(b_rect, ci_rect, rs_rect)
 	var aq_rect = AccessQueryDouble.new(); aq_rect.default_targetable = true
-	# color-5 cells at row-major indices 1, 7, 9 -> ascending selection order.
-	_check_eq(ts_rect.select_and_reserve(COLOR, 700, aq_rect), 1, "M15-30 rectangular board: first color-5 candidate (index 1) selected")
-	_check_eq(ts_rect.select_and_reserve(COLOR, 701, aq_rect), 7, "M15-30 rectangular board: second candidate (index 7, next row) selected")
-	_check_eq(ts_rect.select_and_reserve(COLOR, 702, aq_rect), 9, "M15-30 rectangular board: third candidate (index 9) selected")
+	_check_eq(ts_rect.select_and_reserve(COLOR, 700, aq_rect), 7, "M15-30 rectangular board: bottom-row left-most candidate (index 7) selected first")
+	_check_eq(ts_rect.select_and_reserve(COLOR, 701, aq_rect), 9, "M15-30 rectangular board: second bottom-row candidate (index 9) selected")
+	_check_eq(ts_rect.select_and_reserve(COLOR, 702, aq_rect), 1, "M15-30 rectangular board: upper-row candidate (index 1) selected last")
 
 	# --- selector implements no route-generation API (test 24; crit 13,14) ---
 	var route_methods := ["generate_route", "route", "find_path", "compute_path", "astar", "get_route", "build_route", "path_to"]
@@ -5227,13 +5234,20 @@ func _run_target_selector_benchmark() -> void:
 	var candidate_count: int = ci.count_candidates(0)
 	_check_eq(candidate_count, 3481, "M15-31 candidate count for tested color on 59x59 board")
 
-	# --- bounded-iteration proof: block a prefix, confirm access queries == prefix+1, NOT full board ---
+	# --- bounded-iteration proof under the owner V04 priority: block the first N
+	# candidates in the ACTUAL bottom-most/left-most inspection order, confirm access
+	# queries == N+1 (skips exactly the blocked ones), NOT a full-board scan. ---
 	var blocked_prefix := 100
 	var aq_iter = AccessQueryDouble.new(); aq_iter.default_targetable = true
+	# Priority order: bottom rows first (largest y), left-most within each row.
+	var priority_order: Array = []
+	for y in range(58, -1, -1):
+		for x in 59:
+			priority_order.append(y * 59 + x)
 	for i in blocked_prefix:
-		aq_iter.set_targetable(i, false)
+		aq_iter.set_targetable(priority_order[i], false)
 	var sel_iter = ts.select_and_reserve(0, 1, aq_iter)
-	_check_eq(sel_iter, blocked_prefix, "M15-32 selection skipped %d blocked candidates, chose first reachable" % blocked_prefix)
+	_check_eq(sel_iter, priority_order[blocked_prefix], "M15-32 selection skipped %d blocked candidates in priority order, chose next reachable" % blocked_prefix)
 	_check_eq(aq_iter.total_queries(), blocked_prefix + 1, "M15-40 access queries == blocked prefix + 1 (no full 3481-cell scan)")
 	_check(aq_iter.total_queries() < 3481, "M15-40 steady-state selection iterates candidates, not whole board")
 	rs.release_for_owner(1)
@@ -12908,3 +12922,240 @@ func _run_m21_v03_direct_evidence_tests() -> void:
 	loop.reset()
 	root.remove_child(wire["dispatcher"]); wire["dispatcher"].free()
 	root.remove_child(renderer); renderer.free()
+
+# ============================================================================
+# M21-C001 V04 — owner playtest integration + final closure
+# ============================================================================
+
+const BoardPresentationV04 = preload("res://scripts/gameplay/board/board_presentation.gd")
+const SlotViewV04 = preload("res://scripts/ui/slot_view.gd")
+
+## §C 31-36: V03 evidence residual — preview destination is an existing directory
+## AND overwrite=false rejects before output/metadata mutation (plus overwrite=true).
+func _run_m21_v04_preview_dir_tests() -> void:
+	print("---- M21-C001 V04: V03 preview-directory evidence residual ----")
+	var ws := "user://m21_v04_fs"
+	var real_ws := ProjectSettings.globalize_path(ws)
+	if DirAccess.dir_exists_absolute(real_ws):
+		_rmrf(real_ws)
+	DirAccess.make_dir_recursive_absolute(real_ws)
+	var blob_before := ProductionArtLevelBuilder._git_blob_sha1_file(M21_SOURCE)
+	var OUT := ws + "/out.json"
+	var PREV := ws + "/prev.png"
+	var META := ws + "/meta.json"
+	# Make preview path an existing directory; leave output/metadata legitimately
+	# writable so the failure is specifically the preview object-type preflight.
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(PREV))
+	for ov in [false, true]:
+		if FileAccess.file_exists(OUT):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(OUT))
+		if FileAccess.file_exists(META):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(META))
+		var r := ProductionArtLevelBuilder.build(M21_SOURCE, "m21_level_001_hazard_bot", "Hazard Bot", "EASY", OUT, PREV, META, ov)
+		_check(not r.is_ok(), "V04 prevdir: preview-directory rejected (overwrite=%s)" % str(ov))
+		_check(_m21_err_has(r, "existing directory"), "V04 prevdir: rejection is object-type preflight, not unrelated (overwrite=%s)" % str(ov))
+		_check(not FileAccess.file_exists(OUT), "V04 prevdir: output NOT written on preview-directory (overwrite=%s)" % str(ov))
+		_check(not FileAccess.file_exists(META), "V04 prevdir: metadata NOT written on preview-directory (overwrite=%s)" % str(ov))
+	_check_eq(ProductionArtLevelBuilder._git_blob_sha1_file(M21_SOURCE), blob_before, "V04 prevdir: owner source unchanged")
+	_rmrf(real_ws)
+
+## §F 76-87: owner-locked bottom-most/left-most target priority direct matrix.
+func _run_m21_v04_target_priority_tests() -> void:
+	print("---- M21-C001 V04: owner-locked target priority (bottom-most/left-most) ----")
+	var COLOR := 5
+	# 76/77: 3x3 all-color, all targetable -> bottom row (y=2), left-most -> idx 6.
+	var b = _make_colored_board(3, 3, [COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR])
+	var ci = ColorCandidateIndex.create(); ci.bind(b)
+	var rs = ReservationState.create(); rs.bind(b)
+	var ts = TargetSelector.create(); ts.bind(b, ci, rs)
+	var aq = AccessQueryDouble.new(); aq.default_targetable = true
+	_check_eq(ts.select_and_reserve(COLOR, 1, aq), 6, "V04 pri-76/77: bottom-most then left-most (idx 6) wins")
+	# 78: bottom-left (6) blocked -> next priority reachable (7).
+	rs.release_for_owner(1)
+	var aq2 = AccessQueryDouble.new(); aq2.default_targetable = true; aq2.set_targetable(6, false)
+	_check_eq(ts.select_and_reserve(COLOR, 2, aq2), 7, "V04 pri-78: blocked bottom-left skipped -> idx 7")
+	# 79: bottom-left (6) reserved -> next eligible (7). Fresh board/selector.
+	var b3 = _make_colored_board(3, 3, [COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR])
+	var ci3 = ColorCandidateIndex.create(); ci3.bind(b3)
+	var rs3 = ReservationState.create(); rs3.bind(b3)
+	var ts3 = TargetSelector.create(); ts3.bind(b3, ci3, rs3)
+	rs3.reserve(6, 999)
+	var aq3 = AccessQueryDouble.new(); aq3.default_targetable = true
+	_check_eq(ts3.select_and_reserve(COLOR, 3, aq3), 7, "V04 pri-79: reserved bottom-left skipped -> idx 7")
+	# 80/87: whole bottom row (6,7,8) unavailable -> climb a row, left-most (idx 3).
+	var b4 = _make_colored_board(3, 3, [COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR, COLOR])
+	var ci4 = ColorCandidateIndex.create(); ci4.bind(b4)
+	var rs4 = ReservationState.create(); rs4.bind(b4)
+	var ts4 = TargetSelector.create(); ts4.bind(b4, ci4, rs4)
+	var aq4 = AccessQueryDouble.new(); aq4.default_targetable = true
+	aq4.set_targetable(6, false); aq4.set_targetable(7, false); aq4.set_targetable(8, false)
+	_check_eq(ts4.select_and_reserve(COLOR, 4, aq4), 3, "V04 pri-80/87: bottom row unavailable -> next row up left-most (idx 3); blocked-lower never beats reachable-higher")
+	# 81: rectangular 5x2, color at 1(x1,y0),7(x2,y1),9(x4,y1) -> bottom row first: 7.
+	var b5 = _make_colored_board(5, 2, [0, COLOR, 0, 0, 0,   0, 0, COLOR, 0, COLOR])
+	var ci5 = ColorCandidateIndex.create(); ci5.bind(b5)
+	var rs5 = ReservationState.create(); rs5.bind(b5)
+	var ts5 = TargetSelector.create(); ts5.bind(b5, ci5, rs5)
+	var aq5 = AccessQueryDouble.new(); aq5.default_targetable = true
+	_check_eq(ts5.select_and_reserve(COLOR, 5, aq5), 7, "V04 pri-81: rectangular board bottom-most/left-most (idx 7)")
+	# 82: comparator sorts regardless of input order (direct static-function proof).
+	_check(TargetSelector._candidate_before(6, 0, b), "V04 pri-82: comparator ranks bottom idx6 before top idx0 irrespective of input order")
+	_check(TargetSelector._candidate_before(6, 8, b), "V04 pri-82: same row left-most idx6 before idx8")
+	# 83: malformed/non-int entries sort last and do not crash the comparator.
+	_check(TargetSelector._candidate_before(0, "x", b), "V04 pri-83: int ranks before malformed entry")
+	_check(not TargetSelector._candidate_before("x", 0, b), "V04 pri-83: malformed entry never ranks before an int")
+	# 84: deterministic repeat (release then reselect same owner -> same idx).
+	rs.release_for_owner(2)
+	var again_a: int = ts.select_and_reserve(COLOR, 50, aq); rs.release_for_owner(50)
+	var again_b: int = ts.select_and_reserve(COLOR, 51, aq); rs.release_for_owner(51)
+	_check_eq(again_a, again_b, "V04 pri-84: deterministic repeat selects identical idx")
+	_check_eq(again_a, 6, "V04 pri-84: deterministic repeat is bottom-most/left-most idx 6")
+	# 75: sensitivity — ascending row-major order would have chosen idx 0, not idx 6.
+	_check(again_a != 0, "V04 pri-75: restoring ascending row-major (idx 0) would fail this test (sensitivity)")
+
+	# 85/86: M21 fresh Hazard Bot first C08 target is bottom/left among ACTUALLY
+	# targetable C08 candidates (authoritative access truth, not raw perimeter).
+	var lvl = LevelLoader.load_from_path(M21_LEVEL).level_data
+	var board = BoardState.from_level_data(lvl)
+	var wire = _m21_wire(board)
+	var slots = SlotSystem.new(); slots.configure([0, 1, 2, 3, 4], lvl.palette.size())
+	var loop = CompleteClearingLoop.new()
+	loop.bind(board, slots, wire["candidates"], wire["reservations"], wire["dispatcher"])
+	var origin := Vector2(-1.5, 10.0)
+	var rc = loop.activate_slot(2, origin, 6.0)
+	_check(rc.success, "V04 pri-85: fresh C08 dispatch succeeds")
+	if rc.success:
+		var t: int = rc.target_index
+		var pos: Vector2i = board.get_cell_position(t)
+		# Independently rebuild the targetable-C08 set from the SAME origin.
+		wire["select_access"].set_origin(origin)
+		var higher_priority_targetable := false
+		for c in wire["candidates"].get_candidates(2, null):
+			if c == t:
+				continue
+			if wire["select_access"].is_targetable(c):
+				var p: Vector2i = board.get_cell_position(c)
+				if p.y > pos.y or (p.y == pos.y and p.x < pos.x):
+					higher_priority_targetable = true
+		_check(not higher_priority_targetable, "V04 pri-85/86: no targetable C08 candidate has larger y (or same y smaller x) than the selected first target")
+		print("  M21 first C08 target under owner rule: index %d coord (%d,%d)" % [t, pos.x, pos.y])
+	loop.reset(); root.remove_child(wire["dispatcher"]); wire["dispatcher"].free()
+
+## §G/H 88-112: shared board/agent presentation transform, direct global coords.
+func _run_m21_v04_presentation_transform_tests() -> void:
+	print("---- M21-C001 V04: AgentLayer presentation transform ----")
+	var lvl = LevelLoader.load_from_path(M21_LEVEL).level_data
+	var board = BoardState.from_level_data(lvl)
+	var pres = BoardPresentationV04.new()
+	pres.position = Vector2(100, 50)
+	root.add_child(pres)
+	pres.configure(board, lvl.palette, Vector2(400, 400))  # 400/20 = cell size 20 (non-unit)
+	var renderer = pres.get_renderer()
+	var agent_layer = pres.get_agent_layer()
+	var cs: float = renderer.get_cell_size()
+	_check(cs == 20.0, "V04 xform-109: non-unit cell size (20) exercised")
+	_check(agent_layer != null, "V04 xform: AgentLayer exists")
+	# Real M19 dispatch (no clearing) so the agent persists at the target.
+	var reservations = ReservationState.new(); reservations.bind(board)
+	var candidates = ColorCandidateIndex.create(); candidates.bind(board)
+	var selector = TargetSelector.create(); selector.bind(board, candidates, reservations)
+	var routing = ProductionRoutingSystemM21.new()
+	var routing_access = ProductionAccessQueryM21.new(board)
+	var select_access = ProductionTargetAccessM21.new(routing, routing_access, board)
+	var dispatcher = ScrubbotDispatcher.new(); root.add_child(dispatcher)
+	dispatcher.bind(board, selector, reservations, routing, routing_access, select_access, agent_layer)
+	var r = dispatcher.dispatch(2, Vector2(-1.5, 10.0), 6.0)  # C08
+	_check(r.success, "V04 xform-107: real production dispatch succeeds")
+	if r.success:
+		var agent = r.agent
+		_check(agent.get_parent() == agent_layer, "V04 xform-111: real agent is an AgentLayer child")
+		# 105: transformed start ~ expected board-local start through AgentLayer.
+		var start_local: Vector2 = agent.get_local_position()
+		var start_global_expected: Vector2 = agent_layer.to_global(start_local)
+		_check(agent.global_position.distance_to(start_global_expected) < 0.001, "V04 xform-105: agent global start maps through AgentLayer transform")
+		# Drive to arrival (M19 does not clear); compare final vs renderer cell center.
+		for _i in range(256):
+			if not agent.is_moving():
+				break
+			agent.advance(1.0)
+		var tpos: Vector2i = board.get_cell_position(r.target_index)
+		var center_global: Vector2 = renderer.get_cell_center_global(tpos.x, tpos.y)
+		_check(agent.global_position.distance_to(center_global) < 1.0, "V04 xform-106/100: agent final transformed position aligns with BoardRenderer target-cell center")
+	dispatcher.reset(); root.remove_child(dispatcher); dispatcher.free()
+	root.remove_child(pres); pres.free()
+	# 110: width/height-independent — rectangular presentation cell mapping.
+	var b_rect = _m19_open_board_active(8, 4, [Vector2(1, 3)])
+	var pres2 = BoardPresentationV04.new(); pres2.position = Vector2(0, 0); root.add_child(pres2)
+	pres2.configure(b_rect, PackedStringArray(BoardDebugFixturesM20.PALETTE), Vector2(160, 160))
+	var cs2: float = pres2.get_renderer().get_cell_size()
+	# rectangular board fits by min ratio; cell-size maps board-local->global by cs2.
+	var g: Vector2 = pres2.board_local_to_global(Vector2(1.5, 3.5))
+	var expect: Vector2 = pres2.get_renderer().get_cell_center_global(1, 3)
+	_check(g.distance_to(expect) < 1.0, "V04 xform-110: rectangular board board-local->global equals renderer cell center")
+	_check(cs2 > 0.0, "V04 xform: rectangular cell size positive")
+	root.remove_child(pres2); pres2.free()
+
+## §I/J 113-147: five visible SlotViews bound to real SlotSystem, real click path.
+func _run_m21_v04_slot_ui_tests() -> void:
+	print("---- M21-C001 V04: five-slot SlotView presentation + real click path ----")
+	var scene = load("res://scenes/debug/m21_real_art_vertical_slice.tscn")
+	_check(scene != null, "V04 slot: scene loads")
+	if scene == null:
+		return
+	var inst = scene.instantiate()
+	root.add_child(inst)
+	if inst._board == null:
+		inst.build()
+	var views: Array = inst.get_slot_views()
+	_check_eq(views.size(), 5, "V04 slot-114/136: exactly five SlotView instances")
+	var lvl = inst._lvl
+	var parse = PaletteColors.parse(lvl.palette)
+	var colors_ok := true
+	for i in range(views.size()):
+		var pid: int = inst._slots.get_slot_palette_id(i)
+		if views[i].get_slot_id() != i:
+			colors_ok = false
+		if not _colors_close(views[i].get_color(), parse.colors[pid], 0.02):
+			colors_ok = false
+	_check(colors_ok, "V04 slot-137/138: each SlotView bound to real SlotSystem palette id + exact color")
+	# no-work: C01 (slot 0) enclosed on fresh board -> no dispatch, no side effect.
+	var pre_active: int = inst._dispatcher.get_active_count()
+	var r0 = inst.request_slot(0)
+	_check(r0 != null and not r0.success, "V04 slot-140: no-reachable-work slot produces no assignment")
+	_check_eq(inst._dispatcher.get_active_count(), pre_active, "V04 slot-140: no dispatcher assignment created on no-work")
+	_check_eq(inst._board.count_cells_by_state(BoardState.CellState.ACTIVE), 400, "V04 slot-140/121: no BoardState clear on no-work")
+	# real click path: C08 (slot 2) dispatches the correct color through the loop.
+	var r2 = inst.request_slot(2)
+	_check(r2 != null and r2.success, "V04 slot-120/139: visible-slot click dispatches through real CompleteClearingLoop")
+	if r2 != null and r2.success:
+		_check_eq(inst._board.get_color_id(r2.target_index), 2, "V04 slot-124: dispatched color == slot 2 bound palette id (C08)")
+		_check(inst._slot_views[2].is_active_visual(), "V04 slot-127: clicked slot shows active/in-flight state")
+		# 125/126: agent start corresponds to the slot's board-local spawn origin.
+		_check(inst._slot_origins[2] == Vector2(-1.5, inst.get_slot_origin(2).y), "V04 slot-125: slot has a coherent board-local spawn origin")
+		# 141: rapid repeat cannot duplicate the SAME target/owner assignment.
+		var r2b = inst.request_slot(2)
+		if r2b != null and r2b.success:
+			_check(r2b.target_index != r2.target_index and r2b.owner_id != r2.owner_id, "V04 slot-141: rapid activation does not duplicate the same target/owner")
+		# drive both agents to arrival, then resolve active-state via _process.
+		for _i in range(256):
+			var moving := false
+			if is_instance_valid(r2.agent) and r2.agent.is_moving():
+				r2.agent.advance(1.0); moving = true
+			if r2b != null and r2b.success and is_instance_valid(r2b.agent) and r2b.agent.is_moving():
+				r2b.agent.advance(1.0); moving = true
+			if not moving:
+				break
+		inst._process(0.0)
+		_check(not inst._slot_views[2].is_active_visual(), "V04 slot-128: active state resolves after assignment completion")
+	# 143: SlotView exposes no mutable SlotState reference (scalar-only API).
+	_check(not views[0].has_method("get_slot_state"), "V04 slot-143: SlotView exposes no mutable SlotState reference")
+	# 144: scene booted with the five-slot bar under headless (already added).
+	_check(inst.get_node_or_null("SlotBar") != null, "V04 slot-144: five-slot bar present in scene tree")
+	# 145: portrait containment — all five slot rects within the reference viewport.
+	var vp := Vector2(1080, 2160)
+	var contained := true
+	for v in views:
+		var gr: Rect2 = Rect2(v.global_position, v.size)
+		if gr.position.x < 0 or gr.position.y < 0 or gr.end.x > vp.x or gr.end.y > vp.y:
+			contained = false
+	_check(contained, "V04 slot-145: five slot rects within the 1080x2160 portrait reference viewport")
+	inst.free()
