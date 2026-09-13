@@ -2,9 +2,11 @@
 
 Canonical repository: https://github.com/Sekiph82/Scrubbots
 
-## Tracking authority override [OWNER-LOCKED — 2026-09-10]
+## Tracking authority override [OWNER-LOCKED — 2026-09-13]
 
-Root `TASKS.md` is the only live project-status tracker and H!veAI current-state surface. Former `.hiveai/*` trackers/dashboards and `coordination/SESSION_INDEX.md` are retired as live authority and may exist only as historical evidence. Any older tracking sentence below is superseded by this section. Claude may perform prompt-authorized lifecycle handoffs in root `TASKS.md`; ChatGPT owns independent audit verdicts, audit task closure, final progress updates and next-frontier advancement.
+Root `TASKS.md` is the only live project-status tracker and H!veAI current-state surface. Former `.hiveai/*` trackers/dashboards and `coordination/SESSION_INDEX.md` are retired as live authority and may exist only as historical evidence. Any older tracking sentence below is superseded by this section.
+
+**ChatGPT is the sole writer of root `TASKS.md` lifecycle/progress/task-closure state.** Claude/Codex must not edit root `TASKS.md` during implementation, validation, or handoff. After every independent audit, owner-gate decision, or new correction/validation prompt issuance, ChatGPT updates `TASKS.md` itself before handing work to Claude/Codex. Claude/Codex communicate implementation state only through the matching `CLAUDE_LOG_VNN.md` and the required handoff response.
 
 This policy defines the separation between Claude implementation/testing and ChatGPT independent auditing.
 
@@ -12,19 +14,19 @@ This policy defines the separation between Claude implementation/testing and Cha
 
 Claude is the implementer and test runner.
 
-ChatGPT is the auditor.
+ChatGPT is the auditor and live-tracker owner.
 
-Claude must **not** create audit files, self-audit files, audit verdicts, or `AUDITED_*` statuses.
+Claude must **not** create audit files, self-audit files, audit verdicts, `AUDITED_*` statuses, or edit root `TASKS.md`.
 
 Claude's job is to:
 
 1. implement the active ChatGPT prompt;
 2. run the required tests/checks while implementing;
-3. record exact commands, expected outcomes, failure conditions, actual results, failures/fixes, and relevant comparison notes in `CLAUDE_IMPLEMENTATION_LOG.md`;
-4. update root `TASKS.md` lifecycle state truthfully when the active prompt authorizes it;
-5. hand the cycle back as `AWAITING_AUDIT`.
+3. record exact commands, expected outcomes, failure conditions, actual results, failures/fixes, and relevant comparison notes in the matching `CLAUDE_LOG_VNN.md`;
+4. push the authorized implementation/evidence changes safely;
+5. hand the cycle back as `AWAITING_AUDIT` in the required response, without changing root `TASKS.md`.
 
-ChatGPT then independently reviews the repository and publishes `CHATGPT_AUDIT_VNN.md`.
+ChatGPT then independently reviews the repository, publishes `CHATGPT_AUDIT_VNN.md`, and updates root `TASKS.md` to the audited truth and next actor/action.
 
 ## Evidence levels
 
@@ -107,13 +109,13 @@ All of this stays inside the implementation log. Claude does not create a second
 
 ## Claude implementation log requirements
 
-Each material implementation pass must append to:
+Each material implementation pass must write the matching versioned log:
 
-`coordination/sessions/<CYCLE_ID>/CLAUDE_IMPLEMENTATION_LOG.md`
+`coordination/sessions/<CYCLE_ID>/CLAUDE_LOG_VNN.md`
 
 Canonical URL pattern:
 
-`https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/<CYCLE_ID>/CLAUDE_IMPLEMENTATION_LOG.md`
+`https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/<CYCLE_ID>/CLAUDE_LOG_VNN.md`
 
 The log must record:
 
@@ -128,7 +130,7 @@ The log must record:
 - false-positive risks noticed;
 - failures and fixes;
 - performance evidence only when actually measured;
-- task/doc changes;
+- documentation/evidence changes;
 - commit/push evidence;
 - blockers/unverified assumptions.
 
@@ -152,7 +154,7 @@ Each ChatGPT audit must:
 8. inspect test quality and false-positive risk where relevant;
 9. publish exact findings and corrections when status is `CHANGES_REQUIRED`;
 10. update `AUDIT_INDEX.md` with reusable findings;
-11. update root `TASKS.md` with the independent audit result, approved task closure, progress, and next frontier.
+11. update root `TASKS.md` itself with the independent audit/owner-gate result, approved task closure, progress, current actor/action, and next frontier before issuing the next implementation prompt.
 
 ## Continuous audit learning
 
@@ -160,9 +162,9 @@ Each ChatGPT audit must:
 
 The feedback loop is:
 
-`ChatGPT audit finding -> AUDIT_INDEX learning -> next ChatGPT prompt -> Claude implementation/test plan -> Claude implementation log -> next ChatGPT audit`
+`ChatGPT audit finding -> AUDIT_INDEX learning -> ChatGPT TASKS update -> next ChatGPT prompt -> Claude implementation/test plan -> Claude implementation log -> next ChatGPT audit`
 
-Claude reads and applies the learnings. ChatGPT owns and updates the audit conclusions.
+Claude reads and applies the learnings. ChatGPT owns and updates the audit conclusions and live tracker.
 
 ## Historical Claude self-audit files
 
@@ -183,7 +185,6 @@ Do not create new Claude self-audit files.
 7. Missing owner artwork remains `AWAITING OWNER ASSET`; never fabricate substitutes.
 8. M10 DIRTY/CLEAN final visual choice remains owner-controlled.
 
-
 ## Coordination v4 evidence matching [LOCKED]
 
 The active prompt version determines the expected Claude evidence file:
@@ -196,8 +197,7 @@ assigning an independent audit verdict. Claude-run tests remain E1/E2 evidence.
 Historical combined `CLAUDE_IMPLEMENTATION_LOG.md` files remain legacy
 evidence only.
 
-Root `TASKS.md` is the sole live H!veAI/project-status tracker. Former `.hiveai` derived trackers and dashboards are retired historical evidence only.
-
+Root `TASKS.md` is the sole live H!veAI/project-status tracker and is ChatGPT-owned for writes. Claude/Codex may read it but must not modify it. Former `.hiveai` derived trackers and dashboards are retired historical evidence only.
 
 ## Strict audit standard v2 [LOCKED — 2026-09-07]
 
@@ -315,7 +315,6 @@ Where owner judgement is required, status remains `OWNER_REQUIRED` until explici
 
 All audits issued after 2026-09-07 use this strict v2 standard automatically, even if an older cycle prompt did not repeat these rules.
 
-
 ## Full attack-surface sweep before correction prompts [LOCKED — 2026-09-07]
 
 This rule is mandatory for critical/stateful subsystems.
@@ -357,7 +356,6 @@ Finding-by-finding "whack-a-mole" correction prompts are prohibited.
 
 For critical subsystem closure, the post-correction audit must rerun the same
 attack-surface matrix conceptually, not merely verify the last diff.
-
 
 ## Sprint-wide exhaustive audit and prompt batching [OWNER-LOCKED — 2026-09-11]
 
