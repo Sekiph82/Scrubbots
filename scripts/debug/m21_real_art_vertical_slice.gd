@@ -43,7 +43,6 @@ const LEVEL_PATH := "res://data/levels/m21_level_001_hazard_bot.json"
 const BG01 := Color8(32, 37, 51, 255)
 const BOARD_ORIGIN := Vector2(60.0, 120.0)
 const BOARD_DISPLAY := Vector2(720.0, 720.0)
-const SLOT_ORDER := [2, 0, 1, 3, 4]  # C08 (frame) first for the SPACE fallback
 const FALLBACK_START := Vector2(-1.5, 10.0)
 
 var _background: ColorRect
@@ -179,24 +178,6 @@ func reset_presentation() -> void:
 		v.set_active_visual(false)
 	if _loop != null:
 		_loop.reset()
-
-## Developer SPACE fallback: try slots in C08-first order from off-board origins.
-func step_one_clear() -> bool:
-	if _loop == null:
-		return false
-	var origins := [Vector2(-1.5, 10.0), Vector2(21.5, 10.0), Vector2(10.0, -1.5), Vector2(10.0, 21.5)]
-	for slot_id in SLOT_ORDER:
-		for origin in origins:
-			var r = _loop.activate_slot(slot_id, origin, 6.0)
-			if r.success:
-				_assignments[r.owner_id] = {"slot": slot_id, "agent": r.agent}
-				_reconcile()
-				return true
-	return false
-
-func _unhandled_input(event: InputEvent) -> void:
-	if event is InputEventKey and event.pressed and event.keycode == KEY_SPACE:
-		step_one_clear()
 
 ## Observation only — NEVER advances a real agent (F-001). Each ScrubbotAgent moves
 ## itself through its own _process. The controller just reconciles slot visuals.
