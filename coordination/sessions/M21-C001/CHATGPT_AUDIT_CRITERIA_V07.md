@@ -13,8 +13,8 @@ A green test count alone is insufficient. The audit will inspect source, exact d
 
 - **V07-001** Work only in `Sekiph82/Scrubbots` on `main`.
 - **V07-002** Safely sync before edits; preserve owner/local work.
-- **V07-003** First implementation commit after sync is tracker-only and changes only root `TASKS.md` to V07 / IN_PROGRESS / CLAUDE.
-- **V07-004** Progress and `lastCompletedTaskId` stay unchanged until independent ChatGPT closure.
+- **V07-003** Root `TASKS.md` was updated by ChatGPT before V07 handoff and is not modified by Claude/Codex anywhere in the V07 implementation/handoff diff.
+- **V07-004** Claude does not create a tracker-only commit, does not alter lifecycle/status/actor/progress/check boxes, and records in `CLAUDE_LOG_V07.md` that `TASKS.md` was read but left unchanged.
 - **V07-005** No M21/M22/UI checkbox is pre-closed by Claude.
 - **V07-006** Read `CLAUDE.md`, root `TASKS.md`, `AUDIT_POLICY.md`, V06 audit, V06 owner-gate result, and V07 owner findings before implementation.
 - **V07-007** No force push, reset/clean/restore of owner work, or unrelated refactor.
@@ -183,10 +183,10 @@ Fresh or purpose-built boards must directly prove:
 - **V07-122** Current guide contains no instruction to use SPACE.
 - **V07-123** Current guide explicitly expects first C08 target `(0,19)` / index `380` on a fresh board.
 - **V07-124** Current guide tells owner to observe exterior bottom-ring travel before target entry.
-- **V07-125** `TASKS.md` records slot-only activation and one-cell exterior corridor as owner-locked M21 requirements.
-- **V07-126** `TASKS.md` keeps M21 open and owner acceptance pending at Claude handoff.
-- **V07-127** `CLAUDE_LOG_V07.md` contains start HEAD, tracker commit, implementation commit(s), exact changed files, commands/results, failures/corrections, route evidence, and protected blob checks.
-- **V07-128** Claude sets lifecycle to `AWAITING_AUDIT`, Required Actor `CHATGPT`, without claiming `AUDITED_PASS`.
+- **V07-125** Root `TASKS.md` already records the V07 owner findings/current action from ChatGPT's pre-handoff tracker update, and Claude leaves that file byte-identical.
+- **V07-126** Claude does not claim tracker closure/progress; M21 remains open until ChatGPT audit + owner acceptance.
+- **V07-127** `CLAUDE_LOG_V07.md` contains start HEAD, explicit TASKS non-modification confirmation, implementation commit(s), exact changed files, commands/results, failures/corrections, route evidence, and protected blob checks.
+- **V07-128** Claude hands back `AWAITING_AUDIT` only through the required final response/log and does not edit `TASKS.md` to assign CHATGPT as actor.
 - **V07-129** All authorized work is pushed safely to `origin/main`.
 - **V07-130** Final Claude response is exactly the required two-line handoff.
 
@@ -194,5 +194,6 @@ Fresh or purpose-built boards must directly prove:
 
 - **V07-131** Automated green evidence alone does not close M21.
 - **V07-132** ChatGPT must independently audit V07 source/diff/tests/log.
-- **V07-133** After ChatGPT engineering pass, owner must manually replay the Godot scene.
-- **V07-134** M21 closes only if the owner confirms slot-only interaction and correct visible bottom-left-first corridor behavior.
+- **V07-133** ChatGPT updates root `TASKS.md` after that audit before any next prompt/owner handoff.
+- **V07-134** After ChatGPT engineering pass, owner must manually replay the Godot scene.
+- **V07-135** M21 closes only if the owner confirms slot-only interaction and correct visible bottom-left-first corridor behavior.
