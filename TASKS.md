@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M21
-- Current Sprint: M21-C001 V03 — final path-safety + direct-evidence reconciliation
-- Current Task: M21-C001-V03
-- Current Task Status: AWAITING_AUDIT
-- Next Task/Action: independent V03 final M21 audit against coordination/sessions/M21-C001/CLAUDE_LOG_V03.md and CHATGPT_AUDIT_CRITERIA_V03.md.
-- Required Actor: CHATGPT
+- Current Sprint: M21-C001 V04 — owner playtest integration + final closure
+- Current Task: M21-C001-V04
+- Current Task Status: CHANGES_REQUIRED
+- Next Task/Action: execute `coordination/sessions/M21-C001/CHATGPT_PROMPT_V04.md` and satisfy `CHATGPT_AUDIT_CRITERIA_V04.md`, then hand back for independent audit and owner visual playtest.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 304 / 719 = 42.28% (main+ui); overall 304 / 943 = 32.24%; lastCompletedTaskId M20-C001-V11.
-- Note: M21-C001 V03 final path-safety + direct-evidence reconciliation complete, AWAITING_AUDIT. Closed the single F-M21-STRICT-003 residual: one physical path resolver (_resolve_physical, AL-013 res:// base for bare-relative) now drives alias identity + destination preflight + planning + writes in production_art_level_builder.gd; no destination judged as one location and written to another. New direct builder path-safety tests (bare-relative resolves at res:// equivalent + rerun UNCHANGED; bare-relative/res:///absolute/dot-segment aliases rejected; overwrite=true source alias rejected; existing-different preview/metadata + metadata-directory + non-dir-parent + bare-relative missing-parent all reject before earlier writes — no partial commit; owner source immutable). Fresh direct-evidence reconciliation: exact candidate counts 30/5/298/11/56, blocked non-C08 exact-zero-side-effect, C08 first-arrival full cleanup on the actual owner/target (cleared_count+1, CLEARED, candidate removed, reservation both-directions released, dispatcher !has_owner + active-1, renderer alpha 0), previously-blocked color opened via real path. Root suite 4534/4534 PASS (V02 4475 baseline preserved); M21 smoke PASS (400 clears); all M20 lifecycle smokes PASS; debug scene boots clean; 0 SCRIPT/Parse errors; owner source blob b565743…/sha256 ede1e02… unchanged; M20 loop 06391839523cbc27e88a4b3ef12b730012cd45fa / dispatcher eee10149e4f116af6706beec832042352bf3a6dd unchanged. F-001/F-002/F-004 remain CLOSED. No SB-M21/SB-UI row closed by Claude; closure belongs to ChatGPT. Closed frozen findings F-M21-STRICT-001..004: (001) normalize_from_level_data now requires one difficulty identity (explicit == raw.difficulty, production-only, TEST/unknown/empty rejected); (002) exact-LevelData contract guard fails closed on arbitrary Variants before any deref; (003) complete deterministic destination preflight on the new builder (dir-at-path even overwrite=true, missing/non-dir parent, all aliases, existing-diff — all before any write, no partial commit) + line-ending-insensitive UNCHANGED detection; (004) new reproducible generator tools/build_m21_reference_composite.gd rebuilds M21_REFERENCE_COMPOSITE.png deterministically (488x160 initial|partial|final over BG01), second run UNCHANGED. AL-035 fresh adversarial validation added: blocked non-C08 activation proven EXACT zero side effects (cell states + all 5 buckets + reservations + dispatcher + cleared count), fresh C08 success + previously-blocked color opened via real path. Root suite 4475/4475 PASS (V01 4407 baseline preserved); M21 smoke PASS (400 clears); all M20 queue-free + V04/V05/V07/V08/V09/V10 lifecycle smokes PASS; debug scene boots clean; 0 SCRIPT/Parse errors; owner source blob b565743… / sha256 ede1e02… unchanged; M20 loop 06391839523cbc27e88a4b3ef12b730012cd45fa / dispatcher eee10149e4f116af6706beec832042352bf3a6dd unchanged. No SB-M21/SB-UI row closed by Claude; closure belongs to ChatGPT. Owner-approved immutable source scrubbots_m21_level_001_hazard_bot_20x20.png (blob b565743ba52699899007882b750b7c8e7cdd00f9, sha256 ede1e02a…, 297 bytes, 20x20, C01=30/C03=5/C08=298/C11=11/C16=56, 76 perimeter cells all C08) unchanged. New production-art bridge scripts/tools/production_art_level_builder.gd (reuses audited M09 importer; reads palette authority; rejects off-palette/semi-transparent/out-of-band; normalizes local palette to ascending C-ID C01,C03,C08,C11,C16 with deterministic cell remap; generic M09 importer contract unchanged). Reproducibly generated data/levels/m21_level_001_hazard_bot.json (LevelValidator+ProductionLevelValidator PASS; reconstruction bytes == source for all 400 px), preview, metadata; deterministic rerun UNCHANGED. Full-real-collaborator vertical slice: AL-028 initial reachability proof (non-C08 raw-candidate-but-NO_REACHABLE_TARGET; C08 first clear; previously-unreachable→reachable) in root suite; full 400-cell run (400 clears, all 5 colors, 0 active, 0 reservations, 0 dispatcher-active, 0 orphan agents, all renderer pixels alpha 0) in tests/m21_real_art_smoke.gd. Debug scene scenes/debug/m21_real_art_vertical_slice.tscn over BG01 boots clean. Root suite 4407/4407 PASS (baseline 4294 preserved, no M19/M20 regression disabled); all M20 queue-free + V04/V05/V07/V08/V09/V10 lifecycle smokes PASS; 0 SCRIPT/Parse errors; M20 loop 06391839523cbc27e88a4b3ef12b730012cd45fa / dispatcher eee10149e4f116af6706beec832042352bf3a6dd unchanged. No SB-M21/SB-M08 row closed by Claude; M21 closure belongs to ChatGPT.
+- Note: M21-C001 V03 production correction is accepted by `CHATGPT_AUDIT_V03.md`: the V03 path-identity fix and fresh real-art direct evidence are valid, and F-M21-STRICT-001..004 remain materially closed. Final M21 closure is deferred to V04 because the owner manually ran the Godot real-art scene on 2026-09-13 and locked three new acceptance requirements: (1) TargetSelector must prioritize the bottom-most, then left-most currently targetable matching cell; (2) the real ScrubbotAgent must be visibly presented through the same board-to-screen transform as BoardRenderer; (3) exactly five functional color slots must be visible and activate the real CompleteClearingLoop path. V04 also closes the one remaining evidence-only preview-directory/overwrite=false test cell. No M21/M22 task checkbox is pre-closed by this tracker transition; independent ChatGPT audit owns closure.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -294,6 +294,19 @@ combine them. `BoardRenderer` never chooses targets. `ScrubbotAgent` never
 searches the board and picks its own arbitrary target. The routing
 implementation must remain replaceable (see ADR-005).
 
+### 8.10A — Target selection positional priority `[LOCKED OWNER DECISION — 2026-09-13]`
+
+For a requested slot/color, TargetSelector keeps the canonical eligibility
+rules: the candidate must be a valid board index, ACTIVE, matching the requested
+color, unreserved, and currently targetable/reachable according to authoritative
+access truth. **Among candidates that can otherwise proceed under that contract,
+selection priority is bottom-most first (largest board-local `y`), then left-most
+within that row (smallest board-local `x`).** A blocked/unreachable lower or
+leftward raw candidate never wins merely because of position; the selector
+continues to the next candidate in deterministic bottom-to-top / left-to-right
+priority. This is a WHAT-policy in TargetSelector only. Routing still decides HOW
+to travel to the already-selected target and must not retarget based on geometry.
+
 ### 8.11 — Win streak `[LOCKED]`
 
 ```text
@@ -464,7 +477,7 @@ assets/
 Unresolved. Do not silently invent final decisions for these:
 
 Exact slot refill/replacement behavior; how a player activates a slot;
-whether slots hold quantities; hidden/upcoming slot queue; exact target-selection heuristic;
+whether slots hold quantities; hidden/upcoming slot queue;
 exact route geometry; route crossing rules; route collision behavior; exact
 win condition; exact lose condition;
 timer; move limits; lives; blockers; boosters; hints; progression
@@ -473,7 +486,8 @@ system; analytics; achievements; leaderboard; social features; cloud save;
 tutorial wording; audio direction.
 
 **Not design gates**: board-size bands are locked in §8.3; the global
-C01..C16 palette and difficulty distinct-color bands are locked in §8.7A/B.
+C01..C16 palette and difficulty distinct-color bands are locked in §8.7A/B;
+the target positional priority is owner-locked in §8.10A.
 
 ---
 
@@ -841,7 +855,7 @@ blocked/unreachable is not a valid target (AL-028).
 
 - [x] SB-M15-001 Create TargetSelector.
 - [x] SB-M15-002 Keep BoardState access narrow.
-- [x] SB-M15-003 Baseline deterministic strategy.
+- [x] SB-M15-003 Baseline deterministic strategy. **Historical M15 completion remains valid, but the old ascending-row-major policy is superseded by owner rule §8.10A. M21-C001 V04 must implement and independently validate the new bottom-most/left-most targetable priority before current production acceptance.**
 - [x] SB-M15-004 Match Scrubbot color.
 - [x] SB-M15-005 Never target CLEARED. — [x] SB-M15-006 Never target invalid or blocked/unreachable ACTIVE cells (consume a narrow reachability/access truth; a fully enclosed matching-color ACTIVE cell must not be selected and must not cause dispatch — required regression, AL-028).
 - [x] SB-M15-007 Respect reservations.
@@ -850,6 +864,8 @@ blocked/unreachable is not a valid target (AL-028).
 - [x] SB-M15-010 Determinism tests.
 - [x] SB-M15-011 Simultaneous assignment tests.
 - [x] SB-M15-012 3,481-cell benchmark.
+
+**Owner amendment [2026-09-13]:** current production acceptance additionally requires §8.10A. This amendment changes target ordering only; all audited M15 strict-v2 re-entry, bundle-coherence, reservation, rollback and fail-closed protections remain mandatory and must regress green in V04.
 
 ### M16 — RoutingSystem Interface
 
@@ -873,7 +889,6 @@ retarget (that decision belongs to TargetSelector, not RoutingSystem).
 ### M17 — Routing Prototype Lab
 
 M17-C002 V03 strict full-surface audit PASS; SB-M17-002/003/015/016 re-closed. See `coordination/sessions/M17-C002/CHATGPT_AUDIT_V03.md`.
-
 
 One of the most important SCRUBBOTS milestones. Do not lock the first
 working solution — prototype multiple options.
@@ -943,9 +958,18 @@ reservation clear → Scrubbot disappears (no return, no color carry).
 
 ### M21 — First Real-Art Vertical Slice `[CONTENT] [VISUAL REFERENCE]`
 
-Major project gate — uses **one owner-approved original SCRUBBOTS level
-art**, not a synthetic checkerboard. Blocked until such art exists locally
-(currently `AWAITING OWNER ASSET`, see Visual Reference System).
+Major project gate using the owner-approved real Hazard Bot source at
+`assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png`.
+The real-art importer/LevelData/render/target/routing/dispatch/clearing chain is
+implemented and has passed V01–V03 engineering validation, but M21 remains open
+for V04 owner-playtest integration and independent final closure.
+
+**Owner live-playtest gate [2026-09-13]:** final M21 acceptance now also requires
+§8.10A bottom-most/left-most reachable target priority, a plainly visible real
+ScrubbotAgent sharing the board presentation transform, and exactly five visible
+functional color slots that activate the real CompleteClearingLoop path. The V04
+scene must be owner-playable in Godot; SPACE may remain only as a developer
+fallback. See `coordination/sessions/M21-C001/OWNER_PLAYTEST_DECISIONS_V04.md`.
 
 - [ ] SB-M21-001 Ingest original source artwork.
 - [ ] SB-M21-002 Audit source dimensions.
@@ -953,8 +977,8 @@ art**, not a synthetic checkerboard. Blocked until such art exists locally
 - [ ] SB-M21-004 Generate level data.
 - [ ] SB-M21-005 Reconstruct and compare.
 - [ ] SB-M21-006 Render in gameplay.
-- [ ] SB-M21-007 Populate five slots.
-- [ ] SB-M21-008 Dispatch Scrubbots.
+- [ ] SB-M21-007 Populate and visibly present exactly five functional slots bound to the real SlotSystem; V04 owner-playtest/audit required.
+- [ ] SB-M21-008 Dispatch a visibly moving real ScrubbotAgent through a presentation transform aligned with BoardRenderer; V04 owner-playtest/audit required.
 - [ ] SB-M21-009 Clear actual artwork pixels (ACTIVE→CLEARED; visible artwork is cleared to transparent, background shows through).
 - [ ] SB-M21-010 Run full level.
 - [ ] SB-M21-011 Profile performance.
@@ -966,6 +990,17 @@ art**, not a synthetic checkerboard. Blocked until such art exists locally
 - [ ] SB-UI-016 Record which visual gaps genuinely require Magnific generation before opening production gameplay UI generation.
 
 ### M22 — Production Slot UI `[VISUAL REFERENCE]`
+
+**V04 pull-forward [OWNER DECISION — 2026-09-13]:** because the owner is now
+manually evaluating the real-art vertical slice in Godot, M21-C001 V04 is
+authorized to implement the functional production-compatible subset of M22
+immediately: slot-reference audit, reusable SlotView, exactly five-slot layout,
+SlotSystem binding, live color presentation, desktop-testable activation, simple
+active/in-flight presentation, coherent Scrubbot spawn point, and focused
+aspect-ratio/safe-content/rapid-input tests. These task checkboxes remain open
+until independent ChatGPT audit decides which can close. `SB-M22-008` final
+no-work visual language remains design-gated; V04 only needs safe no-work
+behavior. Do not start M22-013+ Magnific/decorative generation in V04.
 
 - [ ] SB-M22-001 Audit slot references. — [ ] SB-M22-002 Create SlotView.
 - [ ] SB-M22-003 Five-slot layout. — [ ] SB-M22-004 Bind SlotState.
@@ -1463,10 +1498,11 @@ ONE REAL OWNER-APPROVED SCRUBBOTS LEVEL IMAGE
 + A VALID EASY/MEDIUM/HARD/VERY-HARD BOARD SIZE
 + FIVE FUNCTIONAL SLOTS
 + CORRECT COLOR CANDIDATES + REACHABLE TARGET SELECTION
++ BOTTOM-MOST / LEFT-MOST PRIORITY AMONG CURRENTLY TARGETABLE MATCHING CELLS
 + NO-REACHABLE-TARGET-NO-SPAWN
 + SCRUBBOTS LEAVING ONE BY ONE
 + VALID TARGET RESERVATION
-+ SCRUBBOTS MOVING VISIBLY ACROSS THE ARTWORK
++ SCRUBBOTS MOVING VISIBLY ACROSS THE ARTWORK IN THE BOARD PRESENTATION SPACE
 + PIXELS BEING CLEANED
 + SCRUBBOTS DISAPPEARING AFTER CLEANING
 + A COMPLETE PLAYABLE LEVEL
@@ -1542,7 +1578,14 @@ design gate** — presets exist, none is chosen (see M10 above).
 > current truth is M10 (renamed) and ADR-019. Owner manual QA of the new
 > transparent model is complete (SB-M10-005..011, owner PASS 2026-09-06).
 
-**PROMPT 05 (next) — Visual Reference Library / Existing Artwork Audit (M07)**
+**Current immediate implementation gate — M21-C001 V04:** execute
+`coordination/sessions/M21-C001/CHATGPT_PROMPT_V04.md`. This pass preserves the
+accepted real-art vertical slice and adds the owner-live-tested target priority,
+visible board-aligned Scrubbot presentation and five-slot playable UI required
+for M21 final closure. The historical Prompt 05 guidance below is retained only
+as old roadmap context and is no longer the current project action.
+
+**Historical PROMPT 05 guidance — Visual Reference Library / Existing Artwork Audit (M07)**
 
 1. Preserve everything from M00–M06 — do not rebuild working systems
    (LevelData, BoardState, DifficultyRules, ProductionLevelValidator,
@@ -1578,18 +1621,18 @@ These tasks are canonical SCRUBBOTS tasks, but they belong to two sidecar
 systems that are intentionally isolated from the mobile game's runtime
 project:
 
-- \`SB-LFxx-xxx\`: **SCRUBBOTS Level Factory / Level Generator**, a separate
-  Godot project rooted at \`level_factory/project.godot\`.
-- \`SB-CPxx-xxx\`: **SCRUBBOTS Content Pipeline**, a separate publishing and
-  remote-content control plane rooted at \`content_pipeline/\`.
+- `SB-LFxx-xxx`: **SCRUBBOTS Level Factory / Level Generator**, a separate
+  Godot project rooted at `level_factory/project.godot`.
+- `SB-CPxx-xxx`: **SCRUBBOTS Content Pipeline**, a separate publishing and
+  remote-content control plane rooted at `content_pipeline/`.
 
-The repository-root \`tasks.md\` remains the only canonical task ledger.
+The repository-root `tasks.md` remains the only canonical task ledger.
 The sidecar projects may have their own README/governance/coordination files,
 but they must not create competing task ledgers.
 
 ### Locked sidecar boundaries
 
-- The mobile game never preloads/imports \`level_factory/\` scripts.
+- The mobile game never preloads/imports `level_factory/` scripts.
 - The Level Factory exports declarative Level Data / production artifacts
   through documented contracts.
 - Existing M09 importer/batch tooling remains the audited pixel-perfect
@@ -1598,8 +1641,8 @@ but they must not create competing task ledgers.
 - The Content Pipeline distributes declarative level/content data only.
   Never distribute GDScript, native libraries, bytecode, plugins, or other
   executable gameplay code as remote content.
-- Runtime remote content is installed under \`user://\`, never written into
-  \`res://\`.
+- Runtime remote content is installed under `user://`, never written into
+  `res://`.
 - Staging precedes production. Publication must be versioned, integrity
   checked, reversible, and auditable.
 - Existing M30/M47/M48 remain the main-game catalog, production scale-up,
@@ -1617,27 +1660,27 @@ but they must not create competing task ledgers.
 Every implementation cycle uses repository evidence as the communication
 channel:
 
-1. ChatGPT writes the versioned \`CHATGPT_PROMPT_VNN.md\` and
-   \`CHATGPT_AUDIT_CRITERIA_VNN.md\` in the relevant sidecar cycle folder.
-2. Claude safely syncs \`origin/main\`, reads those GitHub files, implements
+1. ChatGPT writes the versioned `CHATGPT_PROMPT_VNN.md` and
+   `CHATGPT_AUDIT_CRITERIA_VNN.md` in the relevant sidecar cycle folder.
+2. Claude safely syncs `origin/main`, reads those GitHub files, implements
    only the active prompt, runs the required validation, and appends evidence
-   to the same cycle's single \`CLAUDE_IMPLEMENTATION_LOG.md\`.
-3. Claude updates canonical \`tasks.md\`, the relevant sidecar
-   \`coordination/SESSION_INDEX.md\`, and root
-   \`.hiveai/PROJECT_DASHBOARD.md\`, pushes safely, sets the cycle to
-   \`AWAITING_AUDIT\`, and stops.
+   to the same cycle's single `CLAUDE_IMPLEMENTATION_LOG.md`.
+3. Claude updates canonical `tasks.md`, the relevant sidecar
+   `coordination/SESSION_INDEX.md`, and root
+   `.hiveai/PROJECT_DASHBOARD.md`, pushes safely, sets the cycle to
+   `AWAITING_AUDIT`, and stops.
 4. Claude never creates an audit/self-audit file and never assigns
-   \`AUDITED_PASS\`/\`AUDITED_FAIL\`.
+   `AUDITED_PASS`/`AUDITED_FAIL`.
 5. ChatGPT reads the implementation log, actual commits/diff/code/tests from
-   GitHub, independently audits them, and writes \`CHATGPT_AUDIT_VNN.md\`.
+   GitHub, independently audits them, and writes `CHATGPT_AUDIT_VNN.md`.
 6. If correction is required, ChatGPT issues the next prompt version in the
    same cycle. Only after an independent pass may the cycle close.
 7. Root H!veAI dashboard materializes the current state of the main game and
-   both sidecar projects; it does not replace \`tasks.md\`.
+   both sidecar projects; it does not replace `tasks.md`.
 
 ### LF00 — Level Factory Project Bootstrap & Isolation [SIDECAR PROJECT]
 
-- [ ] SB-LF00-001 Establish \`level_factory/\` as an independently openable Godot 4.7.1 project with its own \`project.godot\`.
+- [ ] SB-LF00-001 Establish `level_factory/` as an independently openable Godot 4.7.1 project with its own `project.godot`.
 - [ ] SB-LF00-002 Maintain Factory-specific README, CLAUDE governance, docs, scenes/scripts/tests/output boundaries.
 - [ ] SB-LF00-003 Enforce one-way integration: Factory exports data; main game never preloads Factory scripts.
 - [ ] SB-LF00-004 Keep Factory logic headless-testable and data-oriented; prefer RefCounted/plain data outside editor presentation.
@@ -1782,7 +1825,7 @@ channel:
 
 ### CP00 — Content Pipeline Architecture & Security [SIDECAR PROJECT]
 
-- [ ] SB-CP00-001 Establish \`content_pipeline/\` as a separate publisher/control-plane project.
+- [ ] SB-CP00-001 Establish `content_pipeline/` as a separate publisher/control-plane project.
 - [ ] SB-CP00-002 Define APP CODE vs REMOTE CONTENT boundary.
 - [ ] SB-CP00-003 Lock remote content to declarative data; forbid executable code/plugins/scripts/native libraries.
 - [ ] SB-CP00-004 Define staging and production as separate environments.
@@ -1842,7 +1885,7 @@ channel:
 - [ ] SB-CP04-002 Fetch production manifest over HTTPS.
 - [ ] SB-CP04-003 Compare remote/local content versions deterministically.
 - [ ] SB-CP04-004 Determine missing/required packs without redownloading valid cached packs.
-- [ ] SB-CP04-005 Download packs to \`user://content/\`, never \`res://\`.
+- [ ] SB-CP04-005 Download packs to `user://content/`, never `res://`.
 - [ ] SB-CP04-006 Verify SHA-256 before activation.
 - [ ] SB-CP04-007 Validate pack/schema/level data before activation.
 - [ ] SB-CP04-008 Activate only fully verified content atomically enough to preserve last-known-good content.
@@ -1855,7 +1898,7 @@ channel:
 
 ### CP05 — Offline Cache & Last-Known-Good Recovery
 
-- [ ] SB-CP05-001 Define local content registry under \`user://\`.
+- [ ] SB-CP05-001 Define local content registry under `user://`.
 - [ ] SB-CP05-002 Preserve last-known-good manifest and installed pack set.
 - [ ] SB-CP05-003 Boot/play from cached content when offline.
 - [ ] SB-CP05-004 Fall back safely when manifest fetch fails.
@@ -1921,5 +1964,3 @@ channel:
 - [ ] SB-CP09-008 Verify no publishing secret ships inside the mobile app.
 - [ ] SB-CP09-009 Document privacy impact if future telemetry calibration is enabled.
 - [ ] SB-CP09-010 Require independent audit before enabling production remote-content delivery.
-
-
