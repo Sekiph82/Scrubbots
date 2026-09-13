@@ -338,22 +338,28 @@ static func build(source_path: String, level_id: String, display_name: String,
 	result.metadata_json_text = _serialize_json(result.metadata_dict)
 
 	# --- plan all destinations before writing any (fail closed on conflict) ---
-	var out_plan := _plan_text(output_path, result.level_json_text, overwrite)
+	# Planning AND writing use the SAME resolved physical path as alias/preflight, so
+	# no destination is judged as one location and written to another. The caller's
+	# logical strings are kept for metadata/errors only.
+	var real_out := _resolve_physical(output_path)
+	var real_prev := _resolve_physical(preview_path)
+	var real_meta := _resolve_physical(metadata_path)
+	var out_plan := _plan_text(real_out, result.level_json_text, overwrite)
 	if out_plan == "error":
 		result.add_error("Output '%s' exists with different content and overwrite=false" % output_path)
 		return result
-	var prev_plan := _plan_image(preview_path, preview_img, overwrite)
+	var prev_plan := _plan_image(real_prev, preview_img, overwrite)
 	if prev_plan == "error":
 		result.add_error("Preview '%s' exists with different content and overwrite=false" % preview_path)
 		return result
-	var meta_plan := _plan_text(metadata_path, result.metadata_json_text, overwrite)
+	var meta_plan := _plan_text(real_meta, result.metadata_json_text, overwrite)
 	if meta_plan == "error":
 		result.add_error("Metadata '%s' exists with different content and overwrite=false" % metadata_path)
 		return result
 
 	# --- write (or note unchanged) ---
 	if out_plan == "write":
-		if _write_text(output_path, result.level_json_text) != OK:
+		if _write_text(real_out, result.level_json_text) != OK:
 			result.add_error("Could not write output '%s'" % output_path)
 			return result
 		result.output_written = true
@@ -361,7 +367,7 @@ static func build(source_path: String, level_id: String, display_name: String,
 		result.output_unchanged = true
 
 	if prev_plan == "write":
-		if preview_img.save_png(preview_path) != OK:
+		if preview_img.save_png(real_prev) != OK:
 			result.add_error("Could not write preview '%s'" % preview_path)
 			return result
 		result.preview_written = true
@@ -369,7 +375,7 @@ static func build(source_path: String, level_id: String, display_name: String,
 		result.preview_unchanged = true
 
 	if meta_plan == "write":
-		if _write_text(metadata_path, result.metadata_json_text) != OK:
+		if _write_text(real_meta, result.metadata_json_text) != OK:
 			result.add_error("Could not write metadata '%s'" % metadata_path)
 			return result
 		result.metadata_written = true
@@ -437,7 +443,9 @@ static func _validate_canonical_palette(palette: PackedStringArray, auth) -> Str
 ## missing parent directory, and a parent that exists but is a file. Uses the
 ## globalized real path (never mutates anything).
 static func _preflight_destination(path: String, _overwrite: bool) -> String:
-	var real := ProjectSettings.globalize_path(path.replace("\\", "/")).simplify_path()
+	# ONE resolver contract (same as alias identity): a bare-relative path is based
+	# at res://, never at the process CWD (AL-013).
+	var real := _resolve_physical(path)
 	if DirAccess.dir_exists_absolute(real):
 		return "Destination '%s' is an existing directory" % path
 	var parent := real.get_base_dir()
@@ -463,7 +471,15 @@ static func _check_aliases(source: String, dests: Array) -> String:
 		seen[cd] = true
 	return ""
 
-static func _canon(p: String) -> String:
+## THE single physical path resolver (AL-013 / accepted M09 semantics), used by
+## alias identity, destination preflight, planning, and writes so they can never
+## reason about different physical locations. Case is PRESERVED for real I/O:
+##  1. normalize separators;
+##  2. res:// / user:// -> ProjectSettings.globalize_path;
+##  3. bare relative -> explicitly based at res:// before globalization (never CWD);
+##  4. absolute -> kept absolute;
+##  5. lexical . / .. simplified.
+static func _resolve_physical(p: String) -> String:
 	if p.is_empty():
 		return ""
 	var r := p.replace("\\", "/")
@@ -471,7 +487,14 @@ static func _canon(p: String) -> String:
 		r = ProjectSettings.globalize_path(r)
 	elif not r.is_absolute_path():
 		r = ProjectSettings.globalize_path("res://" + r)
-	r = r.simplify_path()
+	return r.simplify_path()
+
+## Comparison identity only: the resolved physical path plus Windows case folding.
+## Never fed back as a physical I/O path.
+static func _canon(p: String) -> String:
+	if p.is_empty():
+		return ""
+	var r := _resolve_physical(p)
 	if OS.get_name() == "Windows":
 		r = r.to_lower()
 	return r
