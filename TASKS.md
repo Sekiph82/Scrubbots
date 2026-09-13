@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M21
-- Current Sprint: M21-C001 V08 — production-immutable final exterior-corridor validation
-- Current Task: M21-C001-V08
+- Current Sprint: M21-C001 V09 — final direct-evidence reconciliation
+- Current Task: M21-C001-V09
 - Current Task Status: IN_PROGRESS
-- Next Task/Action: Claude executes `coordination/sessions/M21-C001/CHATGPT_PROMPT_V08.md` as a validation-only pass without modifying root `TASKS.md` or accepted production/scenes/project files, pushes `CLAUDE_LOG_V08.md`, and hands back `AWAITING_AUDIT`; ChatGPT then performs the independent V08 audit. If V08 passes with production unchanged, ChatGPT directly performs M21 final closure and tracker/task/progress updates because the V07 owner manual gate has already passed.
+- Next Task/Action: Claude executes `coordination/sessions/M21-C001/CHATGPT_PROMPT_V09.md` as a production-immutable validation-only pass, does not modify root `TASKS.md` or accepted production/scenes/project/artifact files, pushes `CLAUDE_LOG_V09.md`, and hands back `AWAITING_AUDIT`; ChatGPT then performs the independent V09 audit. If V09 closes the frozen V08 direct-evidence gaps with production unchanged, ChatGPT directly performs M21 final closure and tracker/task/progress updates because the V07 owner manual gate has already passed.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 304 / 719 = 42.28% (main+ui); overall 304 / 943 = 32.24%; lastCompletedTaskId M20-C001-V11.
-- Note: V07 passed ChatGPT's implementation-stage strict audit with no material production defect found. The owner then manually repeated the Godot F6 playtest and explicitly reported **“hepsi ok”**; this is recorded in `coordination/sessions/M21-C001/CHATGPT_OWNER_GATE_V07_PASS.md`. Accepted owner behavior includes slot-click-only activation, no SPACE gameplay dispatch, visible slot-origin spawning, bottom-left-first C08 behavior through outside-board routing, correct clearing, and correct subsequent ordering. V08 remains only because V07 changed production routing inside a critical sprint and ChatGPT cannot independently execute Godot; it is production-immutable auditor-authored adversarial validation. If V08 exposes a source defect Claude must stop `BLOCKED` without patching it. If V08 independently audits clean with production unchanged, no repeated owner playtest is required and ChatGPT may close M21 directly. Root `TASKS.md` remains ChatGPT-write-owned.
+- Note: V08 is accepted at the production/source level and its runtime/regression evidence is green, but ChatGPT froze five direct-observability gaps in `CHATGPT_AUDIT_V08.md`: exact no-work reservation zero-side-effect; distinct adjacent-side corner evidence; first real-scene same-transaction board/candidate/reservation delta; rapid x3 through the real visible Button path including SlotView active presentation; and reset-in-flight on a fresh real scene with exact pre/post truth. V09 is validation-only and must not patch production. The V07 owner manual PASS remains valid and no repeated owner playtest is required if V09 closes cleanly with production byte-identical. Root `TASKS.md` remains ChatGPT-write-owned.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
