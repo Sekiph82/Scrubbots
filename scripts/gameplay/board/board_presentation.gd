@@ -58,3 +58,12 @@ func board_local_to_global(p: Vector2) -> Vector2:
 	if _agent_layer == null:
 		return p
 	return _agent_layer.to_global(p)
+
+## Inverse of board_local_to_global: map a GLOBAL display point (e.g. a visible
+## SlotView spawn anchor) into board-local cell units through the SAME AgentLayer
+## transform spawned agents inherit. Lets the owner scene derive a route start from
+## real visible slot geometry instead of a hardcoded constant (F-M21-V04-002).
+func global_to_board_local(global_point: Vector2) -> Vector2:
+	if _agent_layer == null:
+		return global_point
+	return _agent_layer.to_local(global_point)

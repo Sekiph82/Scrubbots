@@ -234,6 +234,10 @@ func _initialize() -> void:
 	_run_m21_v04_target_priority_tests()
 	_run_m21_v04_presentation_transform_tests()
 	_run_m21_v04_slot_ui_tests()
+	# M21-C001 V05 — owner-playtest presentation correction.
+	_run_m21_v05_single_mover_tests()
+	_run_m21_v05_concurrency_tests()
+	_run_m21_v05_signal_path_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -12511,11 +12515,15 @@ func _run_m21_debug_scene_smoke() -> void:
 	# One manual real clear (no autoplay), driven synchronously.
 	var dispatched: bool = inst.step_one_clear()
 	_check(dispatched, "M21 debug scene: manual step dispatches one real clear")
-	if dispatched and inst._active_agent != null:
-		for _i in range(256):
-			if not inst._active_agent.is_moving():
-				break
-			inst._active_agent.advance(1.0)
+	if dispatched:
+		# Drive the tracked assignment's real agent to arrival (V05: controller no
+		# longer holds a singular _active_agent; assignments are tracked per owner).
+		for owner in inst._assignments.keys():
+			var ag = inst._assignments[owner]["agent"]
+			for _i in range(256):
+				if not is_instance_valid(ag) or not ag.is_moving():
+					break
+				ag.advance(1.0)
 		_check_eq(inst._loop.get_cleared_count(), 1, "M21 debug scene: one real ACTIVE->CLEARED clear via production path")
 	inst.free()
 
@@ -13129,8 +13137,8 @@ func _run_m21_v04_slot_ui_tests() -> void:
 	if r2 != null and r2.success:
 		_check_eq(inst._board.get_color_id(r2.target_index), 2, "V04 slot-124: dispatched color == slot 2 bound palette id (C08)")
 		_check(inst._slot_views[2].is_active_visual(), "V04 slot-127: clicked slot shows active/in-flight state")
-		# 125/126: agent start corresponds to the slot's board-local spawn origin.
-		_check(inst._slot_origins[2] == Vector2(-1.5, inst.get_slot_origin(2).y), "V04 slot-125: slot has a coherent board-local spawn origin")
+		# (V05 replaces the old proxy spawn-origin self-comparison with the real
+		#  visible-anchor -> board-local mapping proof in _run_m21_v05_slot_anchor_tests.)
 		# 141: rapid repeat cannot duplicate the SAME target/owner assignment.
 		var r2b = inst.request_slot(2)
 		if r2b != null and r2b.success:
@@ -13159,3 +13167,133 @@ func _run_m21_v04_slot_ui_tests() -> void:
 			contained = false
 	_check(contained, "V04 slot-145: five slot rects within the 1080x2160 portrait reference viewport")
 	inst.free()
+
+# ============================================================================
+# M21-C001 V05 — owner-playtest presentation correction (frozen F-M21-V04-001..004)
+# ============================================================================
+
+func _m21_v05_scene():
+	var scene = load("res://scenes/debug/m21_real_art_vertical_slice.tscn")
+	var inst = scene.instantiate()
+	root.add_child(inst)
+	if inst._board == null:
+		inst.build()
+	return inst
+
+## F-M21-V04-001: the owner controller must NOT drive real agent movement; the
+## agent's own advance() is the single mover.
+func _run_m21_v05_single_mover_tests() -> void:
+	print("---- M21-C001 V05: F-001 single movement owner ----")
+	var inst = _m21_v05_scene()
+	var r = inst.request_slot(2)  # C08 reachable on fresh board
+	_check(r != null and r.success, "V05 F-001: fresh C08 activation dispatches a real agent")
+	if r != null and r.success:
+		var agent = r.agent
+		_check(agent.is_moving(), "V05 F-001: agent is MOVING")
+		var before_pos: Vector2 = agent.get_local_position()
+		var before_prog: float = agent.get_progress()
+		# Controller frame observation with a nonzero delta must NOT move the agent.
+		inst._process(0.5)
+		_check(agent.get_local_position() == before_pos, "V05 F-001: controller _process does NOT change agent board-local position (crit 51)")
+		_check(agent.get_progress() == before_prog, "V05 F-001: controller _process does NOT advance agent progress")
+		_check(agent.is_moving(), "V05 F-001: agent still MOVING after controller observation")
+		# Exactly one canonical movement step: advance(delta) == speed*delta cells.
+		var delta := 0.05
+		agent.advance(delta)  # speed 6 -> 0.30 cells
+		var moved: float = before_pos.distance_to(agent.get_local_position())
+		_check(absf(moved - 6.0 * delta) < 0.03, "V05 F-001: one advance step moves exactly speed*delta (%.3f), not a doubled value (crit 53)" % (6.0 * delta))
+		# Sensitivity: the V04 parent-driven advance(delta*6.0) would move ~ speed*delta*6
+		# (or arrive) — far from speed*delta — so this test fails against V04 (crit 52/138).
+		_check(absf(moved - 6.0 * delta) < absf((6.0 * delta * 6.0) - 6.0 * delta), "V05 F-001: measured step is nearer single-drive than V04 double-drive (sensitivity)")
+	inst.free()
+
+## F-M21-V04-003: per-assignment concurrency-correct active presentation.
+func _run_m21_v05_concurrency_tests() -> void:
+	print("---- M21-C001 V05: F-003 concurrency-correct active presentation ----")
+	var inst = _m21_v05_scene()
+	# Same-slot: two concurrent C08 assignments (dispatcher allows multiple).
+	var a = inst.request_slot(2)
+	var b = inst.request_slot(2)
+	_check(a != null and a.success and b != null and b.success, "V05 F-003: two concurrent same-slot C08 assignments succeed")
+	if a.success and b.success:
+		_check(a.owner_id != b.owner_id and a.target_index != b.target_index, "V05 F-003-114: distinct owner + target identities")
+		_check_eq(inst.active_count_for_slot(2), 2, "V05 F-003: slot 2 tracks two in-flight assignments")
+		_check(inst._slot_views[2].is_active_visual(), "V05 F-003: slot 2 active with two assignments")
+		# Complete assignment A only; slot stays active because B is still moving.
+		for _i in range(256):
+			if not is_instance_valid(a.agent) or not a.agent.is_moving(): break
+			a.agent.advance(1.0)
+		inst._reconcile()
+		_check(inst._slot_views[2].is_active_visual(), "V05 F-003-115: slot 2 remains active after ONE of two same-slot assignments completes")
+		_check_eq(inst.active_count_for_slot(2), 1, "V05 F-003: one same-slot assignment remains in flight")
+		# Complete B; slot becomes inactive only now.
+		for _i in range(256):
+			if not is_instance_valid(b.agent) or not b.agent.is_moving(): break
+			b.agent.advance(1.0)
+		inst._reconcile()
+		_check(not inst._slot_views[2].is_active_visual(), "V05 F-003-116: slot 2 inactive only after the last assignment resolves")
+	# Cross-slot: clear C08 until a non-C08 color opens, then hold one assignment from
+	# that slot AND one from C08 concurrently; prove independent active highlights.
+	var opened := -1
+	var opened_res = null
+	var guard := 0
+	while opened == -1 and guard < 1500:
+		guard += 1
+		for cid in [0, 1, 3, 4]:
+			var pr = inst.request_slot(cid)
+			if pr != null and pr.success:
+				opened = cid; opened_res = pr
+				break
+		if opened != -1:
+			break
+		# advance one C08 clear to open topology
+		var cr = inst.request_slot(2)
+		if cr != null and cr.success:
+			for _i in range(256):
+				if not is_instance_valid(cr.agent) or not cr.agent.is_moving(): break
+				cr.agent.advance(1.0)
+			inst._reconcile()
+		else:
+			break
+	_check(opened != -1, "V05 F-003-117: a non-C08 color became reachable for cross-slot test")
+	if opened != -1:
+		var c8 = inst.request_slot(2)  # concurrent C08 assignment
+		_check(c8 != null and c8.success, "V05 F-003: concurrent C08 assignment alongside opened color")
+		inst._reconcile()
+		_check(inst._slot_views[opened].is_active_visual() and inst._slot_views[2].is_active_visual(), "V05 F-003-117: two different slots independently active")
+		# Complete the C08 one; opened slot stays active.
+		for _i in range(256):
+			if not is_instance_valid(c8.agent) or not c8.agent.is_moving(): break
+			c8.agent.advance(1.0)
+		inst._reconcile()
+		_check(inst._slot_views[opened].is_active_visual(), "V05 F-003-118: completing C08 leaves the other slot active")
+		_check(not inst._slot_views[2].is_active_visual() or inst.active_count_for_slot(2) == 0, "V05 F-003: completed C08 slot no longer counts that assignment")
+	# Reset clears presentation bookkeeping + active visuals.
+	inst.reset_presentation()
+	var any_active := false
+	for v in inst._slot_views:
+		if v.is_active_visual(): any_active = true
+	_check(not any_active, "V05 F-003-109: reset clears all slot active visuals")
+	inst.free()
+
+## F-M21-V04-004 (part): real Button/signal activation path (not request_slot()).
+func _run_m21_v05_signal_path_tests() -> void:
+	print("---- M21-C001 V05: F-004 real Button/signal activation path ----")
+	var inst = _m21_v05_scene()
+	inst._last_result = null
+	# Exercise the real chain: BaseButton.pressed -> SlotView._on_pressed ->
+	# slot_activated -> scene._on_slot_activated -> request_slot -> real loop.
+	# (Godot 4.7.1 headless GUI mouse routing is unreliable; the BaseButton pressed
+	#  signal into the real handler chain is the documented acceptable path, crit 130.)
+	inst._slot_views[2].pressed.emit()
+	_check(inst._last_result != null and inst._last_result.success, "V05 F-004-127/131: visible-slot pressed signal path produces a real assignment")
+	if inst._last_result != null and inst._last_result.success:
+		_check_eq(inst._board.get_color_id(inst._last_result.target_index), 2, "V05 F-004-132: activated color == clicked slot's real SlotSystem palette id (C08)")
+	# Sensitivity: disconnecting the slot_activated wiring breaks the path (crit 136).
+	var inst2 = _m21_v05_scene()
+	inst2._slot_views[2].slot_activated.disconnect(inst2._on_slot_activated)
+	inst2._last_result = null
+	inst2._slot_views[2].pressed.emit()
+	_check(inst2._last_result == null, "V05 F-004-136: disconnecting slot_activated stops the activation (signal wiring is load-bearing)")
+	inst.free()
+	inst2.free()

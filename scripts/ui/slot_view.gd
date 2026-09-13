@@ -51,6 +51,14 @@ func get_slot_id() -> int:
 func get_color() -> Color:
 	return _color
 
+## Presentation-only Scrubbot spawn anchor for this slot, in GLOBAL/canvas
+## coordinates, derived from the slot's ACTUAL laid-out geometry (top-center of the
+## visible button). The scene maps this through BoardPresentation/AgentLayer into
+## board-local route space (F-M21-V04-002). Presentation-only — exposes no gameplay
+## SlotState. Requires the control to have been laid out (call after a frame).
+func get_spawn_anchor_global() -> Vector2:
+	return global_position + Vector2(size.x * 0.5, 0.0)
+
 ## Presentation-only active/in-flight highlight. Not gameplay truth.
 func set_active_visual(value: bool) -> void:
 	_active = value
