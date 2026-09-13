@@ -1,6 +1,6 @@
 # SCRUBBOTS — AI Agent Operating Manual
 
-Status: **OWNER-LOCKED operating rules, updated 2026-09-12**
+Status: **OWNER-LOCKED operating rules, updated 2026-09-13**
 
 Historical pre-Difficulty-V1 manual is archived at:
 `docs/migration/legacy-task-trackers/CLAUDE_PRE_DIFFICULTY_V1_2026-09-12.md`
@@ -11,6 +11,7 @@ Historical pre-Difficulty-V1 manual is archived at:
 - Repository-root `TASKS.md` is the **only live project-status tracker**.
 - Hidden `.hiveai/*` files are historical only; do not recreate them as live state.
 - Read the root `TASKS.md` Project Status block before material work.
+- **Root `TASKS.md` is ChatGPT-write-owned. Claude/Codex must read it but must not edit it during implementation, validation, or handoff. ChatGPT updates it after independent audits, owner-gate decisions, and before handing the next prompt to an implementer.**
 - ChatGPT is the independent auditor. Claude/Codex implement and test; they do not self-award `AUDITED_PASS`.
 
 ## 1. Required reading order
@@ -59,6 +60,7 @@ No hidden clean image exists. The visible artwork itself is progressively remove
 13. Preserve unrecognized/pre-existing owner work.
 14. Documentation drift is a defect.
 15. No secrets in repository/coordination artifacts.
+16. Do not edit root `TASKS.md`; tracker state is written by ChatGPT after audit/owner decisions.
 
 ## 4. Git synchronization and owner-work preservation
 
@@ -92,12 +94,12 @@ Claude/Codex:
 - run required tests;
 - write the matching `CLAUDE_LOG_VNN.md`;
 - push safely;
-- update root `TASKS.md` lifecycle only when the prompt explicitly authorizes it;
-- hand off `AWAITING_AUDIT`;
+- **do not edit root `TASKS.md`;**
+- hand off `AWAITING_AUDIT` in the requested response;
 - return the direct GitHub blob URL requested by the prompt;
 - never create an audit verdict/file.
 
-ChatGPT independently inspects the real GitHub state and owns audit closure.
+ChatGPT independently inspects the real GitHub state, owns audit closure, and updates root `TASKS.md` to the audited truth/current actor before issuing the next prompt.
 
 ## 6. Board and LevelData `[LOCKED]`
 
@@ -420,4 +422,4 @@ For Difficulty V1 specifically, the 2026-09-12 owner decision supersedes old cla
 
 ## 20. Working style
 
-Inspect before modifying. Keep work scoped, reversible, testable and evidence-driven. Reuse audited systems rather than rebuilding them for style. Stop only when proceeding would destroy owner work, expose secrets, require an unauthorized paid/external dependency, or contradict an unresolved owner decision.
+Inspect before modifying. Keep work scoped, reversible, testable and evidence-driven. Reuse audited systems rather than rebuilding them for style. Stop only when proceeding would destroy owner work, expose secrets, require an unauthorized paid/external dependency, or contradict an unresolved owner decision. Do not edit root `TASKS.md`; leave tracker updates to ChatGPT after independent audit/owner-gate review.
