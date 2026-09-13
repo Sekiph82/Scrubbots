@@ -5,11 +5,11 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M21
-- Current Sprint: M21-C001 V05 — owner-playtest presentation correction + final validation
-- Current Task: M21-C001-V05
-- Current Task Status: AWAITING_AUDIT
-- Next Task/Action: independent V05 audit against `coordination/sessions/M21-C001/CLAUDE_LOG_V05.md` and `CHATGPT_AUDIT_CRITERIA_V05.md`, then owner manual visual playtest per `M21_V05_OWNER_PLAYTEST.md` only if audit passes.
-- Required Actor: CHATGPT
+- Current Sprint: M21-C001 V06 — genuine tall-layout validation-only closure
+- Current Task: M21-C001-V06
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: close frozen residual R-V05-TALL-001 (genuine 1080x2400 layout re-proof) and hand back for independent audit.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 304 / 719 = 42.28% (main+ui); overall 304 / 943 = 32.24%; lastCompletedTaskId M20-C001-V11.
