@@ -238,6 +238,8 @@ func _initialize() -> void:
 	_run_m21_v05_single_mover_tests()
 	_run_m21_v05_concurrency_tests()
 	_run_m21_v05_signal_path_tests()
+	# M21-C001 V07 — exterior one-cell routing corridor.
+	_run_m21_v07_corridor_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -7658,15 +7660,25 @@ func _run_m17c002_v03_hardening_tests() -> void:
 		# Validate against the SAME edge-blocking truth: route must not use that edge.
 		_check_eq(RouteValidator.validate_route(ereq, eres, eb, edge_acc), RouteResult.FailureReason.NONE, "around-route valid under the edge-blocking access")
 
-	# No alternate -> NO_ROUTE (blocked edge is the only connection).
-	var lb = BoardDebugFixtures.make_board(3, 3) # all ACTIVE
+	# No alternate -> NO_ROUTE (blocked edge is the only connection). V07: the target
+	# is INTERIOR so the owner exterior one-cell corridor cannot provide an alternate
+	# approach; its sole connection is the internal CLEARED corridor edge (1,2)->(2,2).
+	# (The old 3x3 perimeter target became legitimately ring-reachable under V07, so
+	# this fixture is retargeted to an interior cell to preserve the original safety
+	# intent: a genuinely sole blocked connecting edge must still yield NO_ROUTE.)
+	var lb = BoardDebugFixtures.make_board(5, 5) # all ACTIVE
+	# Bent L-corridor (down the left column, then right to (1,2)) so NO single
+	# straight exterior segment reaches the interior target — the direct-arrival
+	# fallback cannot bypass the blocked edge; the sole connection is (1,2)->(2,2).
+	lb.set_cell_state(lb.get_cell_index(0, 0), BoardState.CellState.CLEARED)
 	lb.set_cell_state(lb.get_cell_index(0, 1), BoardState.CellState.CLEARED)
-	lb.set_cell_state(lb.get_cell_index(1, 1), BoardState.CellState.CLEARED)
-	var lt = lb.get_cell_index(1, 2) # ACTIVE target
-	var ledge = RouteAccessEdgeBlock.new(lb, Vector2(0.5, 1.5), Vector2(1.5, 1.5))
-	var lreq = RouteRequest.for_target(lb, Vector2(-2, 1.5), lt)
+	lb.set_cell_state(lb.get_cell_index(0, 2), BoardState.CellState.CLEARED)
+	lb.set_cell_state(lb.get_cell_index(1, 2), BoardState.CellState.CLEARED)
+	var lt = lb.get_cell_index(2, 2) # ACTIVE interior target (only open neighbour is (1,2))
+	var ledge = RouteAccessEdgeBlock.new(lb, Vector2(1.5, 2.5), Vector2(2.5, 2.5))
+	var lreq = RouteRequest.for_target(lb, Vector2(-2, 0.5), lt)
 	var lres = ProductionRoutingSystem.new().compute_route(lreq, lb, ledge)
-	_check(not lres.success, "NO_ROUTE when the only connecting edge is blocked")
+	_check(not lres.success, "NO_ROUTE when the only connecting edge is blocked (interior target, ring gives no alternate)")
 	_check_eq(lres.failure_reason, RouteResult.FailureReason.NO_ROUTE, "sole-connection blocked -> NO_ROUTE")
 	_check_eq(lres.target_index, lt, "sole-connection failure keeps the same target")
 	_check(ledge.blocked_edge_queried, "planner consulted segment access on the sole connecting edge (not inferred from cell class)")
@@ -12512,9 +12524,10 @@ func _run_m21_debug_scene_smoke() -> void:
 	_check(inst._board != null, "M21 debug scene: loads committed real Level Data into BoardState")
 	_check(inst._renderer != null and inst._renderer.is_bound_to(inst._board), "M21 debug scene: BoardRenderer bound to board")
 	_check(inst._loop != null and inst._loop.is_bound(), "M21 debug scene: real CompleteClearingLoop bound")
-	# One manual real clear (no autoplay), driven synchronously.
-	var dispatched: bool = inst.step_one_clear()
-	_check(dispatched, "M21 debug scene: manual step dispatches one real clear")
+	# One real clear via the visible-slot path (V07: SPACE gameplay dispatch removed).
+	var _sr = inst.request_slot(2)  # C08 reachable on fresh board
+	var dispatched: bool = _sr != null and _sr.success
+	_check(dispatched, "M21 debug scene: visible C08 slot dispatches one real clear")
 	if dispatched:
 		# Drive the tracked assignment's real agent to arrival (V05: controller no
 		# longer holds a singular _active_agent; assignments are tracked per owner).
@@ -13297,3 +13310,96 @@ func _run_m21_v05_signal_path_tests() -> void:
 	_check(inst2._last_result == null, "V05 F-004-136: disconnecting slot_activated stops the activation (signal wiring is load-bearing)")
 	inst.free()
 	inst2.free()
+
+# ============================================================================
+# M21-C001 V07 — exterior one-cell routing corridor (four-side matrix)
+# ============================================================================
+
+## All-ACTIVE single-color board of size w x h (every cell blocks except the
+## assigned target's final arrival) — forces exterior-ring routing for a far
+## perimeter target instead of a straight interior shot.
+func _v07_all_active(w: int, h: int):
+	var cells: Array = []
+	cells.resize(w * h)
+	for i in range(w * h):
+		cells[i] = 0
+	return _make_colored_board(w, h, cells)
+
+func _v07_route(board, origin: Vector2, idx: int):
+	var routing = ProductionRoutingSystemM21.new()
+	var access = ProductionAccessQueryM21.new(board)
+	var req = RouteRequest.for_target(board, origin, idx)
+	return {"r": routing.compute_route(req, board, access), "access": access}
+
+## Any route point that lies outside the board (i.e. in the exterior ring band).
+func _v07_has_exterior_point(points: PackedVector2Array, w: int, h: int) -> bool:
+	for p in points:
+		var cx := int(floor(p.x)); var cy := int(floor(p.y))
+		if cx < 0 or cy < 0 or cx >= w or cy >= h:
+			return true
+	return false
+
+func _run_m21_v07_corridor_tests() -> void:
+	print("---- M21-C001 V07: exterior one-cell routing corridor (four-side matrix) ----")
+	# --- bottom: below-board origin -> far-left bottom perimeter via bottom ring ---
+	var wb := 20; var hb := 20
+	var bb = _v07_all_active(wb, hb)
+	var t_bl: int = bb.get_cell_index(0, hb - 1)  # (0,19)
+	var origin_b := Vector2(9.5, float(hb) + 1.5)  # below the board
+	var tc_bl := Vector2(0.5, float(hb - 1) + 0.5)
+	var rb = _v07_route(bb, origin_b, t_bl)
+	_check(rb["r"].success, "V07 corridor: below-origin reaches far-left bottom target via ring")
+	_check(not rb["access"].is_segment_traversable(origin_b, tc_bl, t_bl), "V07 corridor: direct straight shot to (0,19) is blocked (load-bearing: success needs the ring)")
+	var pts_b: PackedVector2Array = rb["r"].get_points()
+	_check(pts_b[0] == origin_b, "V07 corridor: route first point == exact slot origin")
+	_check(pts_b[pts_b.size() - 1].is_equal_approx(tc_bl), "V07 corridor: route final point == target (0,19) centre")
+	_check(_v07_has_exterior_point(pts_b, wb, hb), "V07 corridor: route travels the exterior ring (has an outside-board point)")
+
+	# --- top: above-board origin -> far-right top perimeter via top ring ---
+	var bt = _v07_all_active(wb, hb)
+	var t_tr: int = bt.get_cell_index(wb - 1, 0)  # (19,0)
+	var origin_t := Vector2(9.5, -2.5)
+	var rt = _v07_route(bt, origin_t, t_tr)
+	_check(rt["r"].success, "V07 corridor: above-origin reaches far-right top target via ring")
+	_check(_v07_has_exterior_point(rt["r"].get_points(), wb, hb), "V07 corridor: top route uses exterior ring")
+
+	# --- left: left-of-board origin -> far-bottom left perimeter via left ring ---
+	var bl = _v07_all_active(wb, hb)
+	var t_lb: int = bl.get_cell_index(0, hb - 1)  # (0,19)
+	var origin_l := Vector2(-2.5, 1.5)
+	var rl = _v07_route(bl, origin_l, t_lb)
+	_check(rl["r"].success, "V07 corridor: left-origin reaches far-bottom-left target via ring")
+	_check(_v07_has_exterior_point(rl["r"].get_points(), wb, hb), "V07 corridor: left route uses exterior ring")
+
+	# --- right: right-of-board origin -> far-top right perimeter via right ring ---
+	var br = _v07_all_active(wb, hb)
+	var t_rt: int = br.get_cell_index(wb - 1, 0)  # (19,0)
+	var origin_r := Vector2(float(wb) + 2.5, float(hb) - 1.5)
+	var rr = _v07_route(br, origin_r, t_rt)
+	_check(rr["r"].success, "V07 corridor: right-origin reaches far-top-right target via ring")
+	_check(_v07_has_exterior_point(rr["r"].get_points(), wb, hb), "V07 corridor: right route uses exterior ring")
+
+	# --- corner turn: below-left origin -> top-right target must round corners ---
+	var bc = _v07_all_active(wb, hb)
+	var t_corner: int = bc.get_cell_index(wb - 1, 0)
+	var origin_c := Vector2(-2.5, float(hb) + 2.5)
+	var rc = _v07_route(bc, origin_c, t_corner)
+	_check(rc["r"].success, "V07 corridor: below-left origin reaches top-right target (turns exterior corners)")
+
+	# --- rectangular board ---
+	var brc = _v07_all_active(30, 12)
+	var t_rect: int = brc.get_cell_index(0, 11)
+	var rrect = _v07_route(brc, Vector2(15.5, 13.5), t_rect)
+	_check(rrect["r"].success, "V07 corridor: rectangular 30x12 far-left bottom via ring")
+
+	# --- 59x59 sanity (routing cost scales with dimensions) ---
+	var b59 = _v07_all_active(59, 59)
+	var t59: int = b59.get_cell_index(0, 58)
+	var r59 = _v07_route(b59, Vector2(29.5, 60.5), t59)
+	_check(r59["r"].success, "V07 corridor: 59x59 far-left bottom reachable via ring")
+
+	# --- enclosed interior ACTIVE target remains UNtargetable (ring must not open it) ---
+	var be = _v07_all_active(wb, hb)
+	var t_interior: int = be.get_cell_index(10, 10)
+	var re = _v07_route(be, Vector2(9.5, float(hb) + 1.5), t_interior)
+	_check(not re["r"].success, "V07 corridor: enclosed interior ACTIVE target stays unreachable (no tunnelling)")

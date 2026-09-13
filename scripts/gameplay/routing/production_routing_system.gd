@@ -198,6 +198,25 @@ func _bfs_cell_path(request, board, access_query) -> Array:
 	for entry in perim:
 		var c: Vector2i = entry["c"]
 		_try_entry.call(c.x, c.y)
+	# Owner-locked V07 one-cell exterior walking corridor: seed the ring band just
+	# outside the board (top y=-1, bottom y=H, left x=-1, right x=W, incl. corners),
+	# each reachable from the exact slot origin by one access-valid connector segment.
+	# Ring cells are exterior/open per ProductionAccessQuery (outside-board -> OPEN);
+	# the access seam is NOT changed. Routing space only — never LevelData/BoardState.
+	var ring: Array = []
+	for yy in range(-1, h + 1):
+		for xx in range(-1, w + 1):
+			var rc := Vector2i(xx, yy)
+			if _is_ring(rc, w, h):
+				var rcenter := Vector2(float(xx) + 0.5, float(yy) + 0.5)
+				ring.append({"c": rc, "d": request.start_position.distance_squared_to(rcenter)})
+	ring.sort_custom(func(a, b):
+		if a["d"] != b["d"]:
+			return a["d"] < b["d"]
+		return (a["c"].y * (w + 2) + a["c"].x) < (b["c"].y * (w + 2) + b["c"].x))
+	for entry in ring:
+		var rc2: Vector2i = entry["c"]
+		_try_entry.call(rc2.x, rc2.y)
 
 	if queue.is_empty():
 		return []
@@ -214,7 +233,9 @@ func _bfs_cell_path(request, board, access_query) -> Array:
 				return _reconstruct(parent, target_cell, START)
 		for d in NEIGHBORS:
 			var n := cur + d
-			if not _inside(n, w, h) or visited.has(n):
+			# Traverse inside-board cells AND the one-cell exterior ring (V07). Anything
+			# beyond that one-cell ring is never searched.
+			if not (_inside(n, w, h) or _is_ring(n, w, h)) or visited.has(n):
 				continue
 			if _classify(access_query, n.x, n.y, idx) != ProductionAccessQuery.CellClass.OPEN:
 				continue
@@ -236,6 +257,15 @@ func _start_cell(request, access_query) -> Vector2i:
 
 func _inside(c: Vector2i, w: int, h: int) -> bool:
 	return c.x >= 0 and c.y >= 0 and c.x < w and c.y < h
+
+## Owner-locked V07 one-cell exterior walking corridor: the border band exactly one
+## logical cell outside the board — every cell in the bounding box [-1..W]x[-1..H]
+## that is not an inside-board cell (top y=-1, bottom y=H, left x=-1, right x=W,
+## corners included). Routing/planner space only; never a LevelData/BoardState cell.
+func _is_ring(c: Vector2i, w: int, h: int) -> bool:
+	if c.x < -1 or c.y < -1 or c.x > w or c.y > h:
+		return false
+	return not _inside(c, w, h)
 
 func _reconstruct(parent: Dictionary, goal: Vector2i, start_sentinel: Vector2i) -> Array:
 	var path: Array = []
