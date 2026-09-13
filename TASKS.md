@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M21
-- Current Sprint: M21-C001 V07 — exterior corridor + slot-only owner correction
-- Current Task: M21-C001-V07
+- Current Sprint: M21-C001 V08 — production-immutable exterior-corridor adversarial validation
+- Current Task: M21-C001-V08
 - Current Task Status: IN_PROGRESS
-- Next Task/Action: Claude implements `coordination/sessions/M21-C001/CHATGPT_PROMPT_V07.md` without modifying root `TASKS.md`, pushes `CLAUDE_LOG_V07.md`, and hands back `AWAITING_AUDIT`; ChatGPT then performs the independent V07 audit and updates this tracker before any further prompt/owner gate.
+- Next Task/Action: Claude executes `coordination/sessions/M21-C001/CHATGPT_PROMPT_V08.md` as a validation-only pass without modifying root `TASKS.md` or accepted production/scenes/project files, pushes `CLAUDE_LOG_V08.md`, and hands back `AWAITING_AUDIT`; ChatGPT then performs the independent V08 audit. Only after V08 audit PASS does this tracker move to `OWNER_REQUIRED` for the repeated F6 manual playtest.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 304 / 719 = 42.28% (main+ui); overall 304 / 943 = 32.24%; lastCompletedTaskId M20-C001-V11.
-- Note: V06 engineering/validation is independently accepted, but the owner visual/game-feel gate failed on 2026-09-13. V07 is now owner-locked to two corrections: (1) remove SPACE gameplay dispatch completely so visible SlotView clicks are the only owner-facing activation path; (2) add a one-logical-cell-wide routing-only exterior walking corridor around all four board sides so the accepted bottom-most/left-most TargetSelector policy can select the true far-left bottom target when it is legally reachable through exterior space. For the fresh Hazard Bot, the first C08 click must naturally select index 380 / coordinate (0,19), with the Scrubbot leaving the clicked C08 slot, joining the bottom exterior ring, travelling left outside the artwork, and entering the target without crossing ACTIVE cells. Root `TASKS.md` is ChatGPT-write-owned: Claude/Codex must read it but must not modify lifecycle, progress, task closure, actor, or checkbox state. No M21/M22/SB-UI checkbox is closed by V06 alone; M21 remains open pending V07 independent audit and a repeated owner manual PASS.
+- Note: V07 passed ChatGPT's implementation-stage strict audit with no material production defect found. SPACE gameplay dispatch is removed, visible SlotView click is the sole owner-facing activation path, and ProductionRoutingSystem now models the owner-locked one-logical-cell four-side exterior corridor while preserving TargetSelector bottom-most/left-most ordering and all locked M19/M20 authority. V08 is required only because V07 changed production routing inside a critical sprint and ChatGPT cannot independently execute Godot; V08 is therefore production-immutable auditor-authored adversarial validation. If V08 exposes a source defect Claude must stop `BLOCKED` without patching it. No M21/M22/SB-UI checkbox closes until V08 independently passes and the owner then explicitly passes the repeated manual F6 visual/game-feel gate. Root `TASKS.md` remains ChatGPT-write-owned.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -848,17 +848,26 @@ M17-C002 V03 strict full-surface audit remains accepted as the pre-V07 productio
 Major project gate using the owner-approved real Hazard Bot source at
 `assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png`.
 
-V01–V06 engineering work is materially accepted, including real-art ingestion, deterministic production-art bridge, authentic clearing chain, five visible slots, board-aligned Scrubbot presentation, bottom-most/left-most TargetSelector ordering, concurrency bookkeeping and real 1080×2400 layout evidence. **M21 remains open because the owner manual gate after V06 failed on two runtime behaviors now frozen into V07.**
+V01–V06 engineering work is materially accepted. V07 then corrected the two owner-observed runtime gaps: SPACE gameplay dispatch was removed and the production planner gained the owner-locked one-cell exterior routing ring. **ChatGPT's V07 implementation-stage strict audit found no material production defect and accepted the V07 correction candidate, but M21 remains open because V08 production-immutable adversarial validation is now required by Strict-v2 before the owner repeats the manual gate.**
 
-**V07 owner gate [2026-09-13]:**
-1. SPACE gameplay dispatch is removed completely; visible color-slot click is the only owner-facing activation path (§8.10C).
-2. Production routing gains the one-cell exterior ring around all four board sides (§8.10B), so the bottom-most/left-most priority can operate against the intended exterior reachability. On a fresh Hazard Bot, the first C08 click must naturally target index `380`, coordinate `(0,19)`, and the Scrubbot must visibly travel from the clicked C08 slot through the bottom exterior corridor to that cell without tunnelling through ACTIVE artwork.
+**Current V08 closure path [2026-09-13]:**
+1. preserve V07 production byte-for-byte;
+2. run fresh auditor-authored slot-only, exact-ring-domain, four-side/corner, Hazard Bot `380/(0,19)`, rapid-reservation, reset-in-flight, rectangular and 59×59 validation;
+3. if V08 exposes a source defect, Claude stops `BLOCKED` without patching production;
+4. if V08 independently audits PASS, ChatGPT moves this tracker to `OWNER_REQUIRED`;
+5. the owner then repeats F6 and confirms the visible slot-only, bottom-left-first exterior-corridor behavior.
+
+Owner-locked gameplay laws remain:
+- visible color-slot click only, no SPACE/hidden keyboard gameplay dispatch (§8.10C);
+- exact one-logical-cell exterior routing ring on all four sides (§8.10B);
+- TargetSelector chooses bottom-most then left-most among currently targetable matching cells (§8.10A);
+- on a fresh Hazard Bot, first C08 target must naturally be index `380`, coordinate `(0,19)`, without tunnelling through ACTIVE artwork.
 
 See:
-- `coordination/sessions/M21-C001/CHATGPT_OWNER_GATE_V06.md`
 - `coordination/sessions/M21-C001/OWNER_PLAYTEST_FINDINGS_V07.md`
-- `coordination/sessions/M21-C001/CHATGPT_PROMPT_V07.md`
-- `coordination/sessions/M21-C001/CHATGPT_AUDIT_CRITERIA_V07.md`
+- `coordination/sessions/M21-C001/CHATGPT_AUDIT_V07.md`
+- `coordination/sessions/M21-C001/CHATGPT_PROMPT_V08.md`
+- `coordination/sessions/M21-C001/CHATGPT_AUDIT_CRITERIA_V08.md`
 
 - [ ] SB-M21-001 Ingest original source artwork.
 - [ ] SB-M21-002 Audit source dimensions.
@@ -866,8 +875,8 @@ See:
 - [ ] SB-M21-004 Generate level data.
 - [ ] SB-M21-005 Reconstruct and compare.
 - [ ] SB-M21-006 Render in gameplay.
-- [ ] SB-M21-007 Populate and visibly present exactly five functional slots bound to the real SlotSystem; final closure awaits V07 owner gate.
-- [ ] SB-M21-008 Dispatch a visibly moving real ScrubbotAgent from the clicked visible slot through board-aligned presentation and V07 exterior corridor; final closure awaits V07 owner gate.
+- [ ] SB-M21-007 Populate and visibly present exactly five functional slots bound to the real SlotSystem; final closure awaits V08 audit + owner PASS.
+- [ ] SB-M21-008 Dispatch a visibly moving real ScrubbotAgent from the clicked visible slot through board-aligned presentation and exterior corridor; final closure awaits V08 audit + owner PASS.
 - [ ] SB-M21-009 Clear actual artwork pixels (ACTIVE→CLEARED; transparent background reveal).
 - [ ] SB-M21-010 Run full level.
 - [ ] SB-M21-011 Profile performance.
@@ -880,7 +889,7 @@ See:
 
 ### M22 — Production Slot UI `[VISUAL REFERENCE]`
 
-A functional M22 subset was pulled forward into M21 V04–V06 for owner playtesting. Final M22 closure remains independent and must not be inferred from the temporary/debug owner harness.
+A functional M22 subset was pulled forward into M21 V04–V07 for owner playtesting. Final M22 closure remains independent and must not be inferred from the temporary/debug owner harness.
 
 - [ ] SB-M22-001 Audit slot references. — [ ] SB-M22-002 Create SlotView.
 - [ ] SB-M22-003 Five-slot layout. — [ ] SB-M22-004 Bind SlotState.
@@ -1383,7 +1392,7 @@ PROMPT 05  Visual Reference Library                              [DONE/ONGOING A
 PROMPT 06  Pixel-Art Importer + Round Trip Validation            [DONE]
 PROMPT 07  Gameplay Session Core + Five-Slot Data Model          [DONE]
 PROMPT 08  Color Candidates + Reservation + TargetSelector       [DONE]
-PROMPT 09  RoutingSystem + Production Routing                    [DONE, V07 CORRIDOR EXTENSION ACTIVE]
+PROMPT 09  RoutingSystem + Production Routing                    [DONE, V07 CORRIDOR CANDIDATE ACCEPTED; V08 VALIDATION]
 PROMPT 10  ScrubbotAgent + Dispatcher                            [DONE]
 PROMPT 11  Complete Clearing Vertical Slice                      [DONE]
 PROMPT 12  First Real SCRUBBOTS Artwork Playable Level           [M21 ACTIVE]
@@ -1402,11 +1411,11 @@ PROMPT 21  Release Candidate Preparation
 
 ## NEXT IMMEDIATE MILESTONE
 
-**Current immediate implementation gate — M21-C001 V07:** execute
-`coordination/sessions/M21-C001/CHATGPT_PROMPT_V07.md` against
-`CHATGPT_AUDIT_CRITERIA_V07.md`.
+**Current immediate implementation gate — M21-C001 V08:** execute
+`coordination/sessions/M21-C001/CHATGPT_PROMPT_V08.md` against
+`coordination/sessions/M21-C001/CHATGPT_AUDIT_CRITERIA_V08.md`.
 
-V07 preserves the accepted V01–V06 engineering surface and corrects the two owner-observed runtime gaps: remove SPACE dispatch and add the one-cell exterior routing ring. The exact fresh Hazard Bot C08 acceptance target is `(0,19)` / index `380`. Claude/Codex must not edit this `TASKS.md`; after `CLAUDE_LOG_V07.md` is pushed, ChatGPT performs the independent audit and updates tracker state. Only after ChatGPT engineering PASS does the owner repeat F6 manual acceptance.
+V07's production correction is accepted at implementation-audit stage with no material defect found. V08 is strictly production-immutable validation-only: fresh auditor-authored tests must re-probe slot-only activation, exact one-cell ring-domain confinement, four-side/corner routing, Hazard Bot `380/(0,19)`, rapid reservations, reset while ring-routed agents are in flight, rectangular boards and 59×59. Claude/Codex must not edit this `TASKS.md` or any accepted production/scenes/project file. If validation exposes a source defect, stop `BLOCKED` without patching it. Only after ChatGPT audits V08 PASS will the owner repeat F6 manual acceptance.
 
 ---
 
