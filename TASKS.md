@@ -4,21 +4,21 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M21
-- Current Sprint: M21-C001 V10 — final ReservationState + scene direct-evidence reconciliation
-- Current Task: M21-C001-V10
+- Current Milestone: M22
+- Current Sprint: M22-C001 V01 — production five-slot UI foundation
+- Current Task: M22-C001-V01
 - Current Task Status: IN_PROGRESS
-- Next Task/Action: Claude executes `coordination/sessions/M21-C001/CHATGPT_PROMPT_V10.md` as a production-immutable validation-only pass, does not modify root `TASKS.md` or accepted production/scenes/project/artifact files, pushes `CLAUDE_LOG_V10.md`, and hands back `AWAITING_AUDIT`; ChatGPT then performs the independent V10 audit. If V10 closes the frozen V09 evidence residuals with production unchanged, ChatGPT performs M21 final closure, eligible checkbox/progress updates and advances the project frontier to M22.
+- Next Task/Action: Claude executes `coordination/sessions/M22-C001/CHATGPT_PROMPT_V01.md` against `CHATGPT_AUDIT_CRITERIA_V01.md`, preserving M21 gameplay authority and root `TASKS.md`, then pushes `CLAUDE_LOG_V01.md` and hands back `AWAITING_AUDIT`; ChatGPT performs the independent M22 V01 audit and owns subsequent tracker updates/owner-gate decisions.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 304 / 719 = 42.28% (main+ui); overall 304 / 943 = 32.24%; lastCompletedTaskId M20-C001-V11.
-- Note: V09 is accepted at the production/source level and materially closed the V08 real-scene/Button/presentation gaps. ChatGPT's strict V09 audit froze only final direct-evidence residuals: the V09 test knowingly observed dispatcher assignment mappings instead of the separate live ReservationState object required by the criteria, and a few exact scene assertions remained implicit (five SlotViews, rapid AgentLayer 3→2→1→0 counts, reset target/agent identities). V10 is validation-only and directly inspects the exact ReservationState already bound into the real owner scene/CompleteClearingLoop without adding production hooks. The V07 owner manual PASS remains valid; no repeated owner playtest is required if V10 closes cleanly with production byte-identical. Root `TASKS.md` remains ChatGPT-write-owned.
+- Progress: 319 / 719 = 44.37% (main+ui); overall 319 / 943 = 33.83%; lastCompletedTaskId M21-C001-V10.
+- Note: M21-C001 is `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE` in `coordination/sessions/M21-C001/CHATGPT_AUDIT_V10.md`. The owner manual V07 Godot gate passed and V08–V10 preserved production while closing strict validation evidence. Closed in this tracker update: `SB-M21-001..012` and `SB-UI-014..016`. M22 remains independent: the functional slot subset pulled forward into the M21 debug/owner harness is evidence/reuse input, not final production UI closure. M22 V01 builds reusable native-Godot five-slot components, validates the canonical owner gameplay reference and manifest, spends zero Magnific credits, and must not reopen accepted M21 gameplay truth. Root `TASKS.md` remains ChatGPT-write-owned.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
 
-> **H!veAI tracking [OWNER-LOCKED — updated 2026-09-13]:** repository-root `TASKS.md` is the one and only live project-status tracker. The top `Project Status` block controls current milestone, sprint, task, actor, next action, workflow status, and progress. Former `.hiveai` control-plane files are archived under `docs/migration/legacy-task-trackers/` and are historical evidence only. Never recreate or synchronize a competing live tracker. **ChatGPT is the sole writer of root `TASKS.md`; Claude/Codex read it but do not edit it. ChatGPT updates it after each independent audit, owner-gate decision, and before handing off the next implementation prompt.**
+> **H!veAI tracking [OWNER-LOCKED — updated 2026-09-14]:** repository-root `TASKS.md` is the one and only live project-status tracker. The top `Project Status` block controls current milestone, sprint, task, actor, next action, workflow status, and progress. Former `.hiveai` control-plane files are archived under `docs/migration/legacy-task-trackers/` and are historical evidence only. Never recreate or synchronize a competing live tracker. **ChatGPT is the sole writer of root `TASKS.md`; Claude/Codex read it but do not edit it. ChatGPT updates it after each independent audit, owner-gate decision, and before handing off the next implementation prompt.**
 
 Permanent master execution roadmap for the SCRUBBOTS project. This file is
 authoritative alongside `CLAUDE.md`. Read both at the start of every
@@ -191,7 +191,7 @@ The legacy production validator currently retains these dimension bands while Di
 | Difficulty | Width range | Height range | Min cells | Max cells |
 |---|---|---|---|---|
 | EASY | 20–29 | 20–29 | 20×20 = 400 | 29×29 = 841 |
-| MEDIUM | 30–39 | 30×39 | 30×30 = 900 | 39×39 = 1521 |
+| MEDIUM | 30–39 | 30–39 | 30×30 = 900 | 39×39 = 1521 |
 | HARD | 40–49 | 40–49 | 40×40 = 1600 | 49×49 = 2401 |
 | VERY_HARD | 50–59 | 50–59 | 50×50 = 2500 | 59×59 = **3481** |
 
@@ -845,56 +845,44 @@ M17-C002 V03 strict full-surface audit remains accepted as the pre-V07 productio
 
 ### M21 — First Real-Art Vertical Slice `[CONTENT] [VISUAL REFERENCE]`
 
-Major project gate using the owner-approved real Hazard Bot source at
+**Strict-v2 final closure:** M21-C001 V10 `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE` (`coordination/sessions/M21-C001/CHATGPT_AUDIT_V10.md`). Owner manual V07 Godot gate PASS remains part of the closure basis. V08–V10 were production-immutable validation passes.
+
+The owner-approved real Hazard Bot source is:
 `assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png`.
 
-V01–V06 engineering work is materially accepted. V07 corrected the two owner-observed runtime gaps: SPACE gameplay dispatch was removed and the production planner gained the owner-locked one-cell exterior routing ring. ChatGPT's V07 implementation-stage strict audit found no material production defect, and the owner then repeated the manual F6 Godot playtest and explicitly passed the V07 behavior (“hepsi ok”). V08/V09 preserved production byte-for-byte and materially closed the ring-domain and real-scene/Button/presentation validation surface. **M21 remains open only for V10 final direct ReservationState + exact scene-evidence reconciliation.**
+Locked runtime outcomes carried forward:
+- visible slot-click-only gameplay activation; no SPACE/hidden keyboard dispatch;
+- exact one-logical-cell exterior routing ring on all four sides;
+- TargetSelector bottom-most then left-most among currently targetable matching cells;
+- fresh Hazard Bot C08 first target index `380`, coordinate `(0,19)`;
+- real clicked-slot spawn anchor -> routing -> authenticated arrival -> ACTIVE→CLEARED transparency;
+- exact ReservationState/dispatcher/agent lifecycle under rapid input and reset;
+- full 400-cell real-art clear across all five colors;
+- reference composite and generated LevelData/preview/metadata reproducible/unchanged.
 
-**Current V10 closure path [2026-09-13]:**
-1. preserve accepted V07 production byte-for-byte;
-2. directly inspect the exact live ReservationState already bound into fresh real owner scenes, without adding a production hook;
-3. close exact no-work/first-clear/rapid-x3/reset reservation count and bidirectional mapping evidence plus the remaining explicit five-slot/AgentLayer/reset-identity assertions;
-4. rerun V09/V08/V07/V06/V05/M21/M20/root/build/composite regressions;
-5. if V10 exposes a source defect, Claude stops `BLOCKED` without patching production;
-6. if V10 independently audits PASS, ChatGPT directly performs M21 final closure and task/progress updates, then advances the project frontier to M22;
-7. no repeated owner playtest is required after a clean V10 because production remains unchanged and `CHATGPT_OWNER_GATE_V07_PASS.md` already records owner acceptance.
-
-Owner-locked gameplay laws remain:
-- visible color-slot click only, no SPACE/hidden keyboard gameplay dispatch (§8.10C);
-- exact one-logical-cell exterior routing ring on all four sides (§8.10B);
-- TargetSelector chooses bottom-most then left-most among currently targetable matching cells (§8.10A);
-- on a fresh Hazard Bot, first C08 target naturally resolves to index `380`, coordinate `(0,19)`, without tunnelling through ACTIVE artwork.
-
-See:
-- `coordination/sessions/M21-C001/OWNER_PLAYTEST_FINDINGS_V07.md`
-- `coordination/sessions/M21-C001/CHATGPT_AUDIT_V07.md`
-- `coordination/sessions/M21-C001/CHATGPT_OWNER_GATE_V07_PASS.md`
-- `coordination/sessions/M21-C001/CHATGPT_AUDIT_V08.md`
-- `coordination/sessions/M21-C001/CHATGPT_AUDIT_V09.md`
-- `coordination/sessions/M21-C001/CHATGPT_PROMPT_V10.md`
-- `coordination/sessions/M21-C001/CHATGPT_AUDIT_CRITERIA_V10.md`
-
-- [ ] SB-M21-001 Ingest original source artwork.
-- [ ] SB-M21-002 Audit source dimensions.
-- [ ] SB-M21-003 Determine legal compatibility context.
-- [ ] SB-M21-004 Generate level data.
-- [ ] SB-M21-005 Reconstruct and compare.
-- [ ] SB-M21-006 Render in gameplay.
-- [ ] SB-M21-007 Populate and visibly present exactly five functional slots bound to the real SlotSystem; owner gate passed, final closure awaits V10 technical audit.
-- [ ] SB-M21-008 Dispatch a visibly moving real ScrubbotAgent from the clicked visible slot through board-aligned presentation and exterior corridor; owner gate passed, final closure awaits V10 technical audit.
-- [ ] SB-M21-009 Clear actual artwork pixels (ACTIVE→CLEARED; transparent background reveal).
-- [ ] SB-M21-010 Run full level.
-- [ ] SB-M21-011 Profile performance.
-- [ ] SB-M21-012 Capture reference gameplay output.
+- [x] SB-M21-001 Ingest original source artwork.
+- [x] SB-M21-002 Audit source dimensions.
+- [x] SB-M21-003 Determine legal compatibility context.
+- [x] SB-M21-004 Generate level data.
+- [x] SB-M21-005 Reconstruct and compare.
+- [x] SB-M21-006 Render in gameplay.
+- [x] SB-M21-007 Populate and visibly present exactly five functional slots bound to the real SlotSystem.
+- [x] SB-M21-008 Dispatch a visibly moving real ScrubbotAgent from the clicked visible slot through board-aligned presentation and exterior corridor.
+- [x] SB-M21-009 Clear actual artwork pixels (ACTIVE→CLEARED; transparent background reveal).
+- [x] SB-M21-010 Run full level.
+- [x] SB-M21-011 Profile performance.
+- [x] SB-M21-012 Capture reference gameplay output.
 
 **First real-art vertical slice additions**
-- [ ] SB-UI-014 Run at least one gameplay vertical slice using owner-approved real pixel/level artwork.
-- [ ] SB-UI-015 Prove logical renderer/ACTIVE-CLEARED treatment/responsive presentation remain data-driven.
-- [ ] SB-UI-016 Record visual gaps requiring later illustration generation.
+- [x] SB-UI-014 Run at least one gameplay vertical slice using owner-approved real pixel/level artwork.
+- [x] SB-UI-015 Prove logical renderer/ACTIVE-CLEARED treatment/responsive presentation remain data-driven.
+- [x] SB-UI-016 Record visual gaps requiring later illustration generation.
 
 ### M22 — Production Slot UI `[VISUAL REFERENCE]`
 
-A functional M22 subset was pulled forward into M21 V04–V07 for owner playtesting. Final M22 closure remains independent and must not be inferred from the temporary/debug owner harness.
+**Current sprint:** M22-C001 V01 production five-slot UI foundation. The functional SlotView subset pulled forward into M21 V04–V07 is accepted reuse/evidence input, but final M22 closure remains independent and must not be inferred from the temporary/debug owner harness.
+
+V01 builds reusable native-Godot production SlotCell/ColorSelectionPanel components, audits canonical owner slot/gameplay references, validates/corrects the generation manifest's stale palette/difficulty contract, proves responsive touch/spawn/active behavior, and preserves the closed M21 gameplay authority. V01 spends **zero Magnific credits**. `SB-M22-008` no-work visual styling remains design-gated; `SB-M22-015..019` generation/promotion rows remain outside V01 unless later owner scope explicitly opens them.
 
 - [ ] SB-M22-001 Audit slot references. — [ ] SB-M22-002 Create SlotView.
 - [ ] SB-M22-003 Five-slot layout. — [ ] SB-M22-004 Bind SlotState.
@@ -1342,9 +1330,9 @@ DISPATCHER
 ↓
 COMPLETE CLEANING LOOP
 ↓
-REAL SCRUBBOTS ART VERTICAL SLICE
+REAL SCRUBBOTS ART VERTICAL SLICE             DONE (M21)
 ↓
-PRODUCTION UI / TOUCH
+PRODUCTION UI / TOUCH                         ACTIVE (M22+)
 ↓
 WIN / PROGRESSION / SAVE
 ↓
@@ -1359,7 +1347,7 @@ RELEASE QA
 
 ## FIRST TRUE PLAYABLE TARGET
 
-The first real proof of SCRUBBOTS is:
+The first real proof of SCRUBBOTS is now achieved by M21:
 
 ```text
 ONE REAL OWNER-APPROVED SCRUBBOTS LEVEL IMAGE
@@ -1375,10 +1363,9 @@ ONE REAL OWNER-APPROVED SCRUBBOTS LEVEL IMAGE
 + PIXELS BEING CLEANED TO TRANSPARENCY
 + SCRUBBOTS DISAPPEARING AFTER CLEANING
 + A COMPLETE PLAYABLE LEVEL
-+ SMOOTH MOBILE PERFORMANCE
 ```
 
-That is the vertical-slice priority (M21).
+M22+ now productionizes the UI/touch presentation around that closed gameplay slice.
 
 ---
 
@@ -1397,11 +1384,11 @@ PROMPT 05  Visual Reference Library                              [DONE/ONGOING A
 PROMPT 06  Pixel-Art Importer + Round Trip Validation            [DONE]
 PROMPT 07  Gameplay Session Core + Five-Slot Data Model          [DONE]
 PROMPT 08  Color Candidates + Reservation + TargetSelector       [DONE]
-PROMPT 09  RoutingSystem + Production Routing                    [DONE, V07 OWNER PASS; V10 FINAL VALIDATION]
+PROMPT 09  RoutingSystem + Production Routing                    [DONE]
 PROMPT 10  ScrubbotAgent + Dispatcher                            [DONE]
 PROMPT 11  Complete Clearing Vertical Slice                      [DONE]
-PROMPT 12  First Real SCRUBBOTS Artwork Playable Level           [M21 ACTIVE]
-PROMPT 13  Production Slot UI + Gameplay Layout + Touch Controls
+PROMPT 12  First Real SCRUBBOTS Artwork Playable Level           [DONE — M21 V10]
+PROMPT 13  Production Slot UI + Gameplay Layout + Touch Controls [M22 ACTIVE]
 PROMPT 14  Win/Lose Completion Rules + Results Flow
 PROMPT 15  Scrubbot Final Art + Cleaning Effects + Audio/Haptics
 PROMPT 16  Level Catalog + Difficulty V1 Content Rules
@@ -1416,11 +1403,11 @@ PROMPT 21  Release Candidate Preparation
 
 ## NEXT IMMEDIATE MILESTONE
 
-**Current immediate implementation gate — M21-C001 V10:** execute
-`coordination/sessions/M21-C001/CHATGPT_PROMPT_V10.md` against
-`coordination/sessions/M21-C001/CHATGPT_AUDIT_CRITERIA_V10.md`.
+**Current implementation gate — M22-C001 V01:** execute
+`coordination/sessions/M22-C001/CHATGPT_PROMPT_V01.md` against
+`coordination/sessions/M22-C001/CHATGPT_AUDIT_CRITERIA_V01.md`.
 
-V09 is accepted at the production/source level and its real-scene/Button/presentation evidence is strong, but final closure requires the exact separate ReservationState truth and the few remaining explicit scene assertions frozen in `CHATGPT_AUDIT_V09.md`. V10 is strictly production-immutable validation-only. Claude/Codex must not edit this `TASKS.md`, accepted production/scenes/project files, M21 artifacts, or existing V07/V08/V09 tests. If direct ReservationState evidence exposes a source defect, stop `BLOCKED` without patching it. If V10 independently audits clean, ChatGPT directly closes M21, updates eligible checkboxes/progress and advances to M22. No repeated owner playtest is needed because the V07 owner gate already passed and production remains unchanged.
+M21 is closed and must remain a protected gameplay basis. M22 V01 creates reusable production SlotCell/ColorSelectionPanel components, audits the canonical owner gameplay/five-slot references, corrects stale active manifest palette/difficulty truth, validates touch size/active state/spawn anchors across the required responsive matrix, and proves integration with the accepted M21 slot-click chain. No Magnific generation or credit spend is authorized in V01. Claude/Codex must not edit this `TASKS.md`; ChatGPT audits the implementation and updates tracker/checkbox state afterward.
 
 ---
 
