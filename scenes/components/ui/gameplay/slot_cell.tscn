@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://c22m0slotcell01"]
+
+; M22-C001 V01 production SlotCell component. Reuses the accepted M21 SlotView
+; behavior (res://scripts/ui/slot_view.gd) as its script rather than rebuilding
+; working slot logic (prompt §8). This is the reusable production scene the
+; ColorSelectionPanel instantiates. custom_minimum_size >= 88px touch target is
+; also enforced by SlotView.setup(); it is pinned here so pre-setup layout is
+; already touch-sized.
+
+[ext_resource type="Script" path="res://scripts/ui/slot_view.gd" id="1_slotcell"]
+
+[node name="SlotCell" type="Button"]
+custom_minimum_size = Vector2(120, 120)
+focus_mode = 0
+script = ExtResource("1_slotcell")

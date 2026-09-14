@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://c22m0colorpanel1"]
+
+; M22-C001 V01 reusable production five-slot color-selection panel. Container-
+; driven (HBoxContainer); its five SlotCell children are built by bind_colors()
+; so exactly five are created from the real scalar color snapshot.
+
+[ext_resource type="Script" path="res://scripts/ui/color_selection_panel.gd" id="1_csp"]
+
+[node name="ColorSelectionPanel" type="HBoxContainer"]
+custom_minimum_size = Vector2(620, 88)
+script = ExtResource("1_csp")

@@ -240,6 +240,9 @@ func _initialize() -> void:
 	_run_m21_v05_signal_path_tests()
 	# M21-C001 V07 — exterior one-cell routing corridor.
 	_run_m21_v07_corridor_tests()
+	# M22-C001 V01 — production five-slot UI foundation.
+	_run_m22_slot_component_tests()
+	_run_m22_integration_active_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -13403,3 +13406,158 @@ func _run_m21_v07_corridor_tests() -> void:
 	var t_interior: int = be.get_cell_index(10, 10)
 	var re = _v07_route(be, Vector2(9.5, float(hb) + 1.5), t_interior)
 	_check(not re["r"].success, "V07 corridor: enclosed interior ACTIVE target stays unreachable (no tunnelling)")
+
+# ============================================================================
+# M22-C001 V01 — production five-slot UI foundation
+# ============================================================================
+
+const M22_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
+const ColorSelectionPanel := preload("res://scripts/ui/color_selection_panel.gd")
+
+func _m22_level_colors() -> Array:
+	var res = LevelLoader.load_from_path(M22_LEVEL)
+	if not res.is_ok():
+		return []
+	var parse = PaletteColors.parse(res.level_data.palette)
+	var out: Array = []
+	for i in range(5):
+		out.append(parse.colors[i])
+	return out
+
+## §D/E/K unit contract: reusable production ColorSelectionPanel + SlotCell.
+## Presentation-only, scalar-bound, no gameplay authority. Synchronous (no frame):
+## touch size uses custom_minimum_size; real laid-out geometry is proven in the
+## dedicated responsive smoke (not a tautological self-comparison here).
+func _run_m22_slot_component_tests() -> void:
+	print("---- M22-C001 V01: production SlotCell / ColorSelectionPanel unit ----")
+	var colors := _m22_level_colors()
+	_check(colors.size() == 5, "M22 unit: real level palette colors available")
+	if colors.size() != 5:
+		return
+	var panel = ColorSelectionPanel.new()
+	root.add_child(panel)
+	panel.bind_colors(colors)
+	var cells: Array = panel.get_slot_cells()
+	# 086 / 031 / 032: exactly five cells with stable one-to-one IDs.
+	_check_eq(cells.size(), 5, "M22-086/031: exactly five slot cells")
+	var ids_ok := true
+	for i in range(cells.size()):
+		if cells[i].get_slot_id() != i:
+			ids_ok = false
+	_check(ids_ok, "M22-032: slot IDs stable and map one-to-one (0..4)")
+	# 087 / 033 / 034: each cell bound to the real palette color, exactly.
+	var colors_ok := true
+	for i in range(cells.size()):
+		if not _colors_close(cells[i].get_color(), colors[i], 0.001):
+			colors_ok = false
+	_check(colors_ok, "M22-087/034: each cell renders its real bound palette color exactly")
+	# 088 / 037: minimum touch target >= 88 in both dimensions.
+	var touch_ok := true
+	for c in cells:
+		if c.custom_minimum_size.x < 88 or c.custom_minimum_size.y < 88:
+			touch_ok = false
+	_check(touch_ok, "M22-088/037: every cell min touch target >= 88x88")
+	# 089 / 039: one activation emits exactly one correct slot id.
+	var events: Array = []
+	var sink := func(sid): events.append(sid)
+	panel.slot_activated.connect(sink)
+	cells[3].pressed.emit()
+	_check(events.size() == 1 and events[0] == 3, "M22-089/039: one click -> exactly one event with correct id")
+	# 095 / 043: rapid distinct presses do not collapse ids or duplicate a press.
+	events.clear()
+	cells[1].pressed.emit()
+	cells[4].pressed.emit()
+	cells[1].pressed.emit()
+	_check(events == [1, 4, 1], "M22-095/043: rapid presses preserve per-press id, no collapse/duplication")
+	panel.slot_activated.disconnect(sink)
+	# 030: no mutable gameplay reference leakage (scalar-only presentation API).
+	_check(not panel.has_method("get_slot_system"), "M22-030: panel exposes no mutable SlotSystem reference")
+	_check(not cells[0].has_method("get_slot_state"), "M22-030/143: cell exposes no mutable SlotState reference")
+	# 046 / 091: presentation-only active visual + reset cleanup.
+	panel.set_slot_active(2, true)
+	_check(panel.is_slot_active(2), "M22-046: presentation-only active visual set")
+	panel.reset_active_visuals()
+	var any_active := false
+	for c in cells:
+		if c.is_active_visual():
+			any_active = true
+	_check(not any_active, "M22-091: reset clears all active visuals")
+	# 096: two independent instances share no mutable presentation state.
+	var panel_b = ColorSelectionPanel.new()
+	root.add_child(panel_b)
+	panel_b.bind_colors(colors)
+	panel.set_slot_active(2, true)
+	_check(panel.is_slot_active(2) and not panel_b.is_slot_active(2), "M22-096: two panel instances do not share active-state")
+	_check(panel.get_slot_cells()[0] != panel_b.get_slot_cells()[0], "M22-096: instances own distinct cell nodes")
+	panel.free()
+	panel_b.free()
+
+## §F/J integration: production panel drives the accepted M21 clearing chain,
+## with concurrency-correct active presentation and preserved gameplay identities.
+func _run_m22_integration_active_tests() -> void:
+	print("---- M22-C001 V01: production panel -> accepted M21 chain integration ----")
+	var scene = load("res://scenes/demo/m22_slot_demo.tscn")
+	_check(scene != null, "M22 integ: demo scene loads (no parse error)")
+	if scene == null:
+		return
+	var inst = scene.instantiate()
+	root.add_child(inst)
+	if inst._board == null:
+		inst.build()
+	var panel = inst.get_panel()
+	_check(panel != null and panel.get_slot_count() == 5, "M22-031: demo hosts a five-cell production panel")
+	# 097: LevelData palette snapshot the UI never mutates.
+	var palette_before = inst._lvl.palette
+	# 051: no-work slot (C01 enclosed on fresh board) produces no bot, no side effect.
+	var pre_active: int = inst._dispatcher.get_active_count()
+	var r0 = inst.request_slot(0)
+	_check(r0 != null and not r0.success, "M22-051: no-reachable-work slot produces no assignment")
+	_check_eq(inst._dispatcher.get_active_count(), pre_active, "M22-051: no dispatcher assignment on no-work")
+	_check_eq(inst._board.count_cells_by_state(BoardState.CellState.ACTIVE), 400, "M22-051: no BoardState clear on no-work")
+	# 078 / 079 / 041: real panel click selects the accepted C08 target 380/(0,19).
+	inst._last_result = null
+	panel.get_cell(2).pressed.emit()
+	var r2 = inst._last_result
+	_check(r2 != null and r2.success, "M22-041/077: production panel click dispatches through real CompleteClearingLoop")
+	if r2 != null and r2.success:
+		_check_eq(r2.target_index, 380, "M22-078: first real C08 click naturally selects target 380")
+		_check_eq(inst._board.get_cell_position(r2.target_index), Vector2i(0, 19), "M22-078/079: target is bottom-most/left-most (0,19)")
+		_check_eq(inst._board.get_color_id(r2.target_index), 2, "M22-034: dispatched color == slot 2 bound palette id (C08)")
+		_check(panel.is_slot_active(2), "M22-047: clicked slot shows active/in-flight state")
+	# 048: three concurrent same-slot assignments -> active through 3->2->1->0.
+	inst.reset_presentation()
+	var a = inst.request_slot(2)
+	var b = inst.request_slot(2)
+	var c = inst.request_slot(2)
+	_check(a.success and b.success and c.success, "M22-048: three concurrent same-slot C08 assignments succeed")
+	_check_eq(inst.active_count_for_slot(2), 3, "M22-048: slot 2 tracks three in-flight assignments")
+	_check(panel.is_slot_active(2), "M22-048: slot 2 active at 3 in-flight")
+	# 049: different slots independent — slot 2 active, unrelated slots idle.
+	_check(not panel.is_slot_active(0) and not panel.is_slot_active(4), "M22-049: unrelated slots stay idle (per-slot independence, not blanket)")
+	_m22_drive_agent(a.agent)
+	inst._reconcile()
+	_check(panel.is_slot_active(2) and inst.active_count_for_slot(2) == 2, "M22-048: 3->2, slot stays active")
+	_m22_drive_agent(b.agent)
+	inst._reconcile()
+	_check(panel.is_slot_active(2) and inst.active_count_for_slot(2) == 1, "M22-048: 2->1, slot stays active")
+	_m22_drive_agent(c.agent)
+	inst._reconcile()
+	_check(not panel.is_slot_active(2) and inst.active_count_for_slot(2) == 0, "M22-048: 1->0, slot returns idle only at zero")
+	# 050 / 091: reset clears presentation without corrupting reset semantics.
+	inst.request_slot(2)
+	inst.reset_presentation()
+	var any := false
+	for cell in panel.get_slot_cells():
+		if cell.is_active_visual():
+			any = true
+	_check(not any, "M22-050: reset clears all active visuals")
+	# 097: LevelData palette not mutated by any UI/presentation path.
+	_check(inst._lvl.palette == palette_before, "M22-097: LevelData palette immutable across UI operations")
+	inst.free()
+
+## Test orchestration only: drive one agent to arrival via its OWN advance().
+func _m22_drive_agent(agent) -> void:
+	for _i in range(512):
+		if not is_instance_valid(agent) or not agent.is_moving():
+			break
+		agent.advance(1.0)

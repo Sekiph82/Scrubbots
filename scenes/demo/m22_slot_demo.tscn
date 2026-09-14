@@ -1,0 +1,16 @@
+[gd_scene load_steps=2 format=3 uid="uid://c22m0slotdemo01"]
+
+; M22-C001 V01 narrow production integration/demo harness. NOT the final M23
+; gameplay screen and NOT a rename of the M21 debug scene — it hosts the reusable
+; production ColorSelectionPanel and drives the accepted M21 clearing chain.
+
+[ext_resource type="Script" path="res://scripts/ui/gameplay_slot_demo.gd" id="1_m22demo"]
+
+[node name="M22SlotDemo" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_m22demo")
