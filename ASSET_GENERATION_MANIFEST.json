@@ -210,8 +210,8 @@
   ],
   "pixel_art_palette_contract": {
     "status": "OWNER_LOCKED",
-    "version": 1,
-    "source": "data/palettes/scrubbots_palette_v1.json",
+    "version": 2,
+    "source": "data/palettes/scrubbots_palette_v2.json",
     "rulesDoc": "docs/08_PIXEL_ART_PALETTE_RULES.md",
     "allowedColorIds": [
       "C01",
@@ -228,30 +228,19 @@
       "C12",
       "C13",
       "C14",
-      "C15"
+      "C15",
+      "C16"
     ],
     "offPaletteLogicalColors": "FORBIDDEN",
-    "difficultyDistinctUsedColorBands": {
-      "EASY": [
-        3,
-        5
-      ],
-      "MEDIUM": [
-        6,
-        7
-      ],
-      "HARD": [
-        8,
-        9
-      ],
-      "VERY_HARD": [
-        10,
-        12
-      ]
-    },
+    "productionUsedColorEnvelope": [
+      3,
+      12
+    ],
+    "difficultyClassDerivedFromColorCount": false,
+    "difficultyColorNote": "Difficulty class is NOT derived from color count. Per OWNER-LOCKED Difficulty V1 (2026-09-12), color count/entropy contributes only to Color Complexity, one component of the Challenge Score. The former class-specific used-color bands (EASY 3-5 / MEDIUM 6-7 / HARD 8-9 / VERY_HARD 10-12) are superseded and are no longer current difficulty-class law.",
     "clearedTransparencyIsPaletteColor": false,
     "backgroundIsPaletteColor": false,
     "presentationGridOrBorderIsPaletteColor": false,
-    "aiPixelArtRule": "Any AI-generated production pixel artwork must quantize/use only the locked C01..C15 palette; no silent new colors."
+    "aiPixelArtRule": "Any AI-generated production pixel artwork must quantize/use only the locked C01..C16 palette; no silent new colors."
   }
 }
