@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M22
-- Current Sprint: M22-C001 V01 — production five-slot UI foundation
-- Current Task: M22-C001-V01
+- Current Sprint: M22-C001 V02 — Scrubbot Railroad V1 + slot connector integration
+- Current Task: M22-C001-V02
 - Current Task Status: IN_PROGRESS
-- Next Task/Action: Claude executes `coordination/sessions/M22-C001/CHATGPT_PROMPT_V01.md` against `CHATGPT_AUDIT_CRITERIA_V01.md`, preserving M21 gameplay authority and root `TASKS.md`, then pushes `CLAUDE_LOG_V01.md` and hands back `AWAITING_AUDIT`; ChatGPT performs the independent M22 V01 audit and owns subsequent tracker updates/owner-gate decisions.
+- Next Task/Action: Claude executes `coordination/sessions/M22-C001/CHATGPT_PROMPT_V02.md` against `CHATGPT_AUDIT_CRITERIA_V02.md`, preserving the accepted V01 slot foundation and the still-locked M21 target/reservation/clearing authority while implementing the owner-locked Railroad V1 geometry/routing/presentation contract. Claude must not modify root `TASKS.md`; it pushes `CLAUDE_LOG_V02.md` and hands back `AWAITING_AUDIT`, then ChatGPT performs the independent audit and owns tracker/owner-gate updates.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 319 / 719 = 44.37% (main+ui); overall 319 / 943 = 33.83%; lastCompletedTaskId M21-C001-V10.
-- Note: M21-C001 is `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE` in `coordination/sessions/M21-C001/CHATGPT_AUDIT_V10.md`. The owner manual V07 Godot gate passed and V08–V10 preserved production while closing strict validation evidence. Closed in this tracker update: `SB-M21-001..012` and `SB-UI-014..016`. M22 remains independent: the functional slot subset pulled forward into the M21 debug/owner harness is evidence/reuse input, not final production UI closure. M22 V01 builds reusable native-Godot five-slot components, validates the canonical owner gameplay reference and manifest, spends zero Magnific credits, and must not reopen accepted M21 gameplay truth. Root `TASKS.md` remains ChatGPT-write-owned.
+- Progress: 337 / 729 = 46.23% (main+ui); overall 337 / 953 = 35.36%; lastCompletedTaskId M22-C001-V01.
+- Note: M22-C001 V01 is `AUDITED_PASS / PRODUCTION_SLOT_FOUNDATION_ACCEPTED` in `coordination/sessions/M22-C001/CHATGPT_AUDIT_V01.md`. Closed by that audit: `SB-M22-001..007`, `SB-M22-010..014`, `SB-M22-020`, `SB-M22-024`, and global UI-governance rows `SB-UI-001..004`. The owner then locked `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`: one consistent robotic cleaning railroad for every level, minimum/exact V1 2.0 logical-cell artwork clearance, 1.0 logical-cell rail width, 2.5-cell centerline offset, slot→bottom-rail connectors, rail-only exterior travel, and railroad departure only when exactly aligned with the already-selected target row/column followed by an orthogonal approach. Ten new M22 Railroad V1 tasks (`SB-M22-026..035`) were added, increasing main+ui/overall denominators by 10. M21 V07–V10 one-cell-adjacent-ring evidence remains valid historical evidence for those commits, but its exact exterior geometry is superseded as the future production target by Railroad V1. Root `TASKS.md` remains ChatGPT-write-owned.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -288,9 +288,13 @@ continues to the next candidate in deterministic bottom-to-top / left-to-right
 priority. This is a WHAT-policy in TargetSelector only. Routing still decides HOW
 to travel to the already-selected target and must not retarget based on geometry.
 
-### 8.10B — One-cell exterior routing corridor `[LOCKED OWNER DECISION — 2026-09-13]`
+### 8.10B — Scrubbot Railroad V1 `[OWNER-LOCKED TARGET STATE — 2026-09-14]`
 
-Production routing must model a **one logical-cell-wide routing-only walking ring around all four board sides**. For board `W×H`, the exterior planner cells are: top `y=-1, x=-1..W`; bottom `y=H, x=-1..W`; left `x=-1, y=0..H-1`; right `x=W, y=0..H-1`, including all four corners. This ring is routing space only: it does not change LevelData, BoardState dimensions, palette cells, difficulty, or artwork. A clicked slot origin may connect through valid outside/background space to the ring; the Scrubbot may travel around the ring and enter an assigned ACTIVE perimeter target only as final arrival. Non-target ACTIVE cells remain blockers and enclosed interior ACTIVE targets remain unreachable until a legal opening exists.
+The exact adjacent one-cell exterior ring proven in M21 V07–V10 remains valid historical evidence for those commits, but its geometry is superseded as the future production movement target by `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`.
+
+Railroad V1 uses one consistent robotic cleaning rail around every level. V1 geometry is derived from board `W×H`: artwork-to-rail inner-edge clearance `2.0` logical cells, rail width `1.0` logical cell, therefore rail centreline `2.5` logical cells outside each board boundary. Scrubbots start from the exact clicked SlotCell anchor, visibly connect to the BOTTOM rail, remain on the railroad during exterior travel, and may leave the rail only when exactly aligned with the already-assigned target column (TOP/BOTTOM exit) or row (LEFT/RIGHT exit). Final rail→target approach is orthogonal. No diagonal exterior shortcut, early rail departure, target retargeting or non-target ACTIVE tunnelling is legal. If one aligned side is blocked, routing may evaluate another aligned side for the same target; if all are blocked it returns no route. TargetSelector §8.10A remains WHAT-only.
+
+Railroad V1 is routing/presentation infrastructure only: it is not LevelData, BoardState, C01..C16 artwork, difficulty truth or reservation ownership. Collision/lane/congestion rules remain design-gated.
 
 ### 8.10C — Slot-click-only owner gameplay activation `[LOCKED OWNER DECISION — 2026-09-13]`
 
@@ -358,18 +362,17 @@ pixel construction methodology. Must never be copied.
 ### 9.2 — Colony Flow reference limit `[LOCKED]`
 
 May be referenced only for the broad feeling of many tiny agents moving
-across a play area. SCRUBBOTS intentionally differs:
+across a play area and the abstract idea of perimeter travel. SCRUBBOTS intentionally differs in characters, rail visual language, artwork, UI, composition and exact movement implementation:
 
 ```text
 Correct SCRUBBOTS flow:
-  slot -> Scrubbot leaves -> travels to valid pixel -> cleans pixel -> disappears
+  clicked slot -> visible connector -> Scrubbot Railroad -> aligned orthogonal target approach -> clean -> disappear
 
 NOT:
   travel to resource -> collect resource -> carry resource back -> return home
 ```
 
-Never copy Colony Flow's characters, art, levels, UI, icons, compositions,
-exact animations, routing visuals, or source code.
+Never copy Colony Flow's characters, art, level composition, UI, icons, exact rail/frame appearance, animations, routing visuals, or source code.
 
 ### 9.3 — Pixel art reference rule `[LOCKED]`
 
@@ -436,6 +439,7 @@ assets/
 9. `docs/MASTER_UI_SYSTEM.md` is the canonical responsive UI architecture contract. `ASSET_GENERATION_MANIFEST.json` is the machine-readable Magnific generation queue/provenance contract.
 10. `BoardRenderer` remains the existing single-`Image`/`ImageTexture` data-oriented renderer. The Master UI system must not replace logical board rendering with one UI node per cell.
 11. Visual milestone completion requires actual owner-approved assets where required, correct Godot import/binding, responsive validation and regression evidence. A generated image existing on disk is not by itself completion.
+12. Railroad V1 structural geometry is native/data-driven and shared by routing/presentation; V02 does not require generated railroad art. Future visual skinning may not change railroad gameplay geometry.
 
 ### Visual production order
 
@@ -454,14 +458,9 @@ assets/
 Unresolved. Do not silently invent final decisions for these:
 
 Exact slot refill/replacement behavior; whether slots hold quantities;
-hidden/upcoming slot queue; exact route visual styling beyond the locked
-one-cell exterior corridor/access law; route collision/congestion presentation;
-exact win condition; exact lose condition; timer; move limits; lives; blockers;
-boosters; hints; progression structure; currency meaning; economy; shop;
-monetization; ads; IAP; energy system; analytics; achievements; leaderboard;
-social features; cloud save; tutorial wording; audio direction.
+hidden/upcoming slot queue; railroad collision/congestion/lane-separation presentation; optional railroad glow/trail polish beyond the locked V1 structure; exact win condition; exact lose condition; timer; move limits; lives; blockers; boosters; hints; progression structure; currency meaning; economy; shop; monetization; ads; IAP; energy system; analytics; achievements; leaderboard; social features; cloud save; tutorial wording; audio direction.
 
-**Not design gates**: the global C01..C16 palette, Difficulty V1 progression/challenge architecture, target positional priority, one-cell exterior routing corridor, and visible-slot-click-only owner activation are owner-locked.
+**Not design gates**: the global C01..C16 palette, Difficulty V1 progression/challenge architecture, target positional priority, Railroad V1 geometry/travel/aligned-exit law, and visible-slot-click-only owner activation are owner-locked.
 
 ---
 
@@ -651,10 +650,10 @@ Do not replace existing Prompt 02 fixtures — add to them.
 - [x] SB-M07-017 Never regenerate missing references and label them originals.
 
 **Master UI / Magnific visual reference tasks (from UI_TASKS_APPENDIX migration)**
-- [ ] SB-UI-001 Treat `docs/MASTER_UI_SYSTEM.md` as the UI architecture source of truth.
-- [ ] SB-UI-002 Treat `ASSET_GENERATION_MANIFEST.json` as the machine-readable generation/provenance queue.
-- [ ] SB-UI-003 Keep approved provider decisions scoped by asset type and newest owner decisions.
-- [ ] SB-UI-004 Do not add unapproved generation providers as project runtime dependencies.
+- [x] SB-UI-001 Treat `docs/MASTER_UI_SYSTEM.md` as the UI architecture source of truth.
+- [x] SB-UI-002 Treat `ASSET_GENERATION_MANIFEST.json` as the machine-readable generation/provenance queue.
+- [x] SB-UI-003 Keep approved provider decisions scoped by asset type and newest owner decisions.
+- [x] SB-UI-004 Do not add unapproved generation providers as project runtime dependencies.
 - [x] SB-UI-005 Import owner visual references copy-only.
 - [x] SB-UI-006 Preserve originals/copies byte-for-byte and inventory before promotion.
 - [x] SB-UI-007 Classify owner references.
@@ -789,7 +788,7 @@ M15 strict closure remains accepted. V04 later superseded only its target orderi
 
 ### M17 — Routing Prototype Lab / Production Routing
 
-M17-C002 V03 strict full-surface audit remains accepted as the pre-V07 production-routing baseline. V07 is an owner-directed extension of the production planner domain, not a rewrite of WHAT-selection or access truth.
+M17-C002 V03 strict full-surface audit remains accepted as the pre-V07 production-routing baseline. V07 added the adjacent one-cell exterior ring and remains valid historical M21 evidence. The 2026-09-14 owner decision in `OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md` supersedes that exact exterior geometry for future production once M22 V02 passes audit; the M17 safety contracts remain mandatory.
 
 - [x] SB-M17-001 Direct route baseline.
 - [x] SB-M17-002 Grid-aware route prototype.
@@ -802,7 +801,7 @@ M17-C002 V03 strict full-surface audit remains accepted as the pre-V07 productio
 - [x] SB-M17-014 Stress-test higher density.
 - [x] SB-M17-015 Test 59×59. — [x] SB-M17-016 Test rectangular board.
 
-**V07 owner amendment:** production routing must add the one-cell exterior walking ring in §8.10B while preserving M17 strict route validation, no-retarget, ACTIVE-blocker/CLEARED-open semantics, rectangular support and 59×59 behavior.
+**Historical V07 amendment:** the one-cell exterior ring proved exterior reachability and is preserved as audit history. **Current owner target:** Railroad V1 must preserve route validation, no-retarget, ACTIVE-blocker/CLEARED-open semantics, rectangular support and 59×59 behavior while replacing the exact adjacent-ring movement geometry.
 
 ### M18 — Scrubbot Agent
 
@@ -852,7 +851,7 @@ The owner-approved real Hazard Bot source is:
 
 Locked runtime outcomes carried forward:
 - visible slot-click-only gameplay activation; no SPACE/hidden keyboard dispatch;
-- exact one-logical-cell exterior routing ring on all four sides;
+- historical-at-M21-close adjacent one-logical-cell exterior routing ring on all four sides, now superseded as future production geometry by Railroad V1 while its safety evidence remains valid;
 - TargetSelector bottom-most then left-most among currently targetable matching cells;
 - fresh Hazard Bot C08 first target index `380`, coordinate `(0,19)`;
 - real clicked-slot spawn anchor -> routing -> authenticated arrival -> ACTIVE→CLEARED transparency;
@@ -880,30 +879,42 @@ Locked runtime outcomes carried forward:
 
 ### M22 — Production Slot UI `[VISUAL REFERENCE]`
 
-**Current sprint:** M22-C001 V01 production five-slot UI foundation. The functional SlotView subset pulled forward into M21 V04–V07 is accepted reuse/evidence input, but final M22 closure remains independent and must not be inferred from the temporary/debug owner harness.
+**V01 audit:** `AUDITED_PASS / PRODUCTION_SLOT_FOUNDATION_ACCEPTED` (`coordination/sessions/M22-C001/CHATGPT_AUDIT_V01.md`). V01 created the reusable native-Godot production SlotCell/ColorSelectionPanel foundation, corrected the active manifest palette/difficulty contract, validated real reference authority, touch size, responsive/safe-area behavior, active-state lifecycle and real slot-click integration while spending zero Magnific credits.
 
-V01 builds reusable native-Godot production SlotCell/ColorSelectionPanel components, audits canonical owner slot/gameplay references, validates/corrects the generation manifest's stale palette/difficulty contract, proves responsive touch/spawn/active behavior, and preserves the closed M21 gameplay authority. V01 spends **zero Magnific credits**. `SB-M22-008` no-work visual styling remains design-gated; `SB-M22-015..019` generation/promotion rows remain outside V01 unless later owner scope explicitly opens them.
+**Current sprint — V02:** implement `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`. Railroad V1 is the new owner-locked movement/presentation target: same reusable rail visual on every level, 2.0 logical-cell artwork clearance, 1.0 logical-cell rail width, 2.5-cell centerline offset, slot connectors to bottom rail, rail-only exterior travel, and rail departure only at exact target row/column alignment followed by an orthogonal approach. V02 also hardens invalid color binding and updates current docs/tests without rewriting historical M21 audit evidence. V02 spends zero Magnific credits. Owner F6 visual acceptance follows successful strict audit.
 
-- [ ] SB-M22-001 Audit slot references. — [ ] SB-M22-002 Create SlotView.
-- [ ] SB-M22-003 Five-slot layout. — [ ] SB-M22-004 Bind SlotState.
-- [ ] SB-M22-005 Color presentation. — [ ] SB-M22-006 Touch target.
-- [ ] SB-M22-007 Active state. — [ ] SB-M22-008 No-work state if approved.
-- [ ] SB-M22-009 Scrubbot spawn point.
-- [ ] SB-M22-010 Aspect-ratio tests. — [ ] SB-M22-011 Safe-area tests.
-- [ ] SB-M22-012 Rapid-tap tests.
-- [ ] SB-M22-013 Confirm canonical gameplay UI references before final asset generation.
-- [ ] SB-M22-014 Validate M22 manifest entries before spending generation credits.
+- [x] SB-M22-001 Audit slot references. — [x] SB-M22-002 Create SlotView.
+- [x] SB-M22-003 Five-slot layout. — [x] SB-M22-004 Bind SlotState through safe scalar/query presentation binding.
+- [x] SB-M22-005 Color presentation. — [x] SB-M22-006 Touch target.
+- [x] SB-M22-007 Active state. — [ ] SB-M22-008 No-work state if approved.
+- [ ] SB-M22-009 Scrubbot spawn point / final slot→rail connector geometry.
+- [x] SB-M22-010 Aspect-ratio tests. — [x] SB-M22-011 Safe-area tests.
+- [x] SB-M22-012 Rapid-tap tests.
+- [x] SB-M22-013 Confirm canonical gameplay UI references before final asset generation.
+- [x] SB-M22-014 Validate M22 manifest entries before spending generation credits.
 - [ ] SB-M22-015 Generate required gameplay booster assets when milestone scope opens.
 - [ ] SB-M22-016 Generate only milestone-required decorative assets.
 - [ ] SB-M22-017 Keep raw candidates separate from production-final assets/provenance.
 - [ ] SB-M22-018 Require owner selection/approval before production promotion.
 - [ ] SB-M22-019 Never silently regenerate/overwrite approved production art.
-- [ ] SB-M22-020 Build slot visuals as reusable Godot components.
+- [x] SB-M22-020 Build slot visuals as reusable Godot components.
 - [ ] SB-M22-021 Keep quantities/text/state badges live in Godot.
 - [ ] SB-M22-022 Implement reusable BoosterButton states when booster scope opens.
 - [ ] SB-M22-023 Bind approved booster/decorative art to reusable components.
-- [ ] SB-M22-024 Preserve five visible slots at required responsive sizes.
+- [x] SB-M22-024 Preserve five visible slots at required responsive sizes.
 - [ ] SB-M22-025 Validate import/transparency/filtering/mobile memory before visual closure.
+
+**Railroad V1 additions [OWNER-LOCKED 2026-09-14]**
+- [ ] SB-M22-026 Implement one canonical/single-source ScrubRail geometry contract from board W/H.
+- [ ] SB-M22-027 Implement reusable four-side robotic cleaning railroad presentation with rounded corners and restrained cyan/electric accents.
+- [ ] SB-M22-028 Enforce 2.0 logical-cell artwork clearance, 1.0 rail width and 2.5-cell rail centerline offset across variable board sizes.
+- [ ] SB-M22-029 Connect each real clicked SlotCell visibly to the BOTTOM rail from its exact laid-out spawn anchor.
+- [ ] SB-M22-030 Constrain exterior Scrubbot travel to railroad sides/corners; prohibit free-space diagonal/early-exit shortcuts.
+- [ ] SB-M22-031 Leave railroad only at exact target row/column alignment and use an orthogonal final target approach; never retarget.
+- [ ] SB-M22-032 Use one consistent Railroad V1 visual language across all levels; no per-level themed rail in V1.
+- [ ] SB-M22-033 Validate Railroad V1 on rectangular boards, 59×59 and the required responsive viewport matrix.
+- [ ] SB-M22-034 Preserve rapid-dispatch reservations/active visuals and reset cleanup while multiple Scrubbots are on connector/rail travel.
+- [ ] SB-M22-035 Owner F6 visual/game-feel acceptance of the production Railroad V1 demo after strict audit.
 
 ### M23 — Gameplay Screen Layout `[VISUAL REFERENCE]`
 
@@ -1192,8 +1203,8 @@ Every production level:
 - [ ] SB-M48-004 Correct cell count.
 - [ ] SB-M48-005 No invalid palette IDs. — [ ] SB-M48-006 Recognizable ACTIVE source artwork.
 - [ ] SB-M48-007 No unintended interpolation. — [ ] SB-M48-008 Correct CLEARED transparency.
-- [ ] SB-M48-009 Solvable under canonical routing/access semantics, including exterior corridor where applicable.
-- [ ] SB-M48-010 No routing pathology; fully enclosed matching ACTIVE target remains untargetable until legal opening.
+- [ ] SB-M48-009 Solvable under canonical routing/access semantics, including Railroad V1 where applicable.
+- [ ] SB-M48-010 No routing pathology; fully enclosed matching ACTIVE target remains untargetable until legal aligned/cleared approach exists.
 - [ ] SB-M48-011 Good performance. — [ ] SB-M48-012 Correct preview.
 - [ ] SB-M48-013 Unique ID.
 
@@ -1203,7 +1214,7 @@ Every production level:
 - [ ] SB-M49-003 BoardState tests. — [ ] SB-M49-004 Renderer tests.
 - [ ] SB-M49-005 Slot tests. — [ ] SB-M49-006 Color-candidate/reachability tests.
 - [ ] SB-M49-007 Reservation tests. — [ ] SB-M49-008 TargetSelector tests.
-- [ ] SB-M49-009 Routing tests including exterior corridor. — [ ] SB-M49-010 Dispatcher tests.
+- [ ] SB-M49-009 Routing tests including Railroad V1 geometry, connectors and aligned exits. — [ ] SB-M49-010 Dispatcher tests.
 - [ ] SB-M49-011 Completion tests. — [ ] SB-M49-012 Save tests.
 - [ ] SB-M49-013 Reward tests. — [ ] SB-M49-014 Content validation tests.
 - [ ] SB-M49-015 59×59 regression test.
@@ -1276,20 +1287,21 @@ artifact validation. **Never commit signing secrets.**
 
 | ID | Risk | Severity | Mitigation |
 |---|---|---|---|
-| RISK-001 | Routing works technically but looks boring/confusing | CRITICAL | Replaceable RoutingSystem + owner review + corridor/route QA |
+| RISK-001 | Routing works technically but looks boring/confusing | CRITICAL | Owner-locked Railroad V1 + replaceable RoutingSystem + owner F6 review |
 | RISK-002 | Large number of Scrubbots causes frame drops | HIGH | 59×59 density stress tests and profiling |
 | RISK-003 | Legacy difficulty assumptions survive as current truth | HIGH | Difficulty V1 migration + config/doc/regression checks |
 | RISK-004 | Production difficulty metadata becomes inconsistent | HIGH | Versioned Difficulty V1 evaluator/calibration |
 | RISK-005 | Generic small test fixtures break after production validation | MEDIUM/HIGH | TEST fixture path/context separate from production |
 | RISK-006 | Existing artwork gets silently resized/altered | HIGH | Source preservation + explicit compiler/importer + round-trip comparison |
 | RISK-007 | AI agent invents missing references | HIGH | Canonical reference library/manifest |
-| RISK-008 | External reference game copied too closely | HIGH | Original SCRUBBOTS visual authority; external references conceptual only |
+| RISK-008 | External reference game copied too closely | HIGH | Original SCRUBBOTS rail/art/UI language; external references conceptual only |
 | RISK-009 | Target race assigns same pixel to multiple Scrubbots | HIGH | Reservation strict tests |
 | RISK-010 | Renderer creates thousands of Nodes | HIGH | Batched renderer requirement |
 | RISK-011 | Desktop testing hides mobile performance issues | HIGH | Real Android profiling |
 | RISK-012 | Future agent breaks explicit preload/headless compatibility | MEDIUM/HIGH | ADR-009 + regression tests |
-| RISK-013 | Target ordering looks wrong because routing targetability lacks exterior access | HIGH | Owner-locked one-cell four-side exterior routing corridor + exact Hazard Bot (0,19) regression |
+| RISK-013 | Target ordering appears wrong because exterior HOW cannot legally reach intended perimeter target | HIGH | Railroad V1 aligned exits + exact Hazard Bot (0,19) regression |
 | RISK-014 | Hidden debug input diverges from production slot-origin behavior | HIGH | Slot-click-only owner gameplay activation; no SPACE dispatch |
+| RISK-015 | Railroad visual and routing geometry drift apart | HIGH | One canonical ScrubRail geometry source consumed by routing, connector and presentation |
 
 ---
 
@@ -1322,7 +1334,7 @@ RESERVATION
 ↓
 TARGETSELECTOR
 ↓
-ROUTING + EXTERIOR WALKING CORRIDOR
+ROUTING + SCRUBBOT RAILROAD V1             ACTIVE (M22 V02)
 ↓
 SCRUBBOT AGENT
 ↓
@@ -1347,7 +1359,7 @@ RELEASE QA
 
 ## FIRST TRUE PLAYABLE TARGET
 
-The first real proof of SCRUBBOTS is now achieved by M21:
+M21 achieved the first real gameplay proof using the then-current adjacent exterior ring. The current productionization target now adds the owner-approved Railroad V1 movement language without changing M21's WHAT/reservation/clear invariants:
 
 ```text
 ONE REAL OWNER-APPROVED SCRUBBOTS LEVEL IMAGE
@@ -1355,17 +1367,18 @@ ONE REAL OWNER-APPROVED SCRUBBOTS LEVEL IMAGE
 + SLOT-CLICK-ONLY OWNER GAMEPLAY ACTIVATION
 + CORRECT COLOR CANDIDATES + REACHABLE TARGET SELECTION
 + BOTTOM-MOST / LEFT-MOST PRIORITY AMONG CURRENTLY TARGETABLE MATCHING CELLS
-+ ONE-LOGICAL-CELL FOUR-SIDE EXTERIOR ROUTING CORRIDOR
++ SCRUBBOT RAILROAD V1 AROUND ALL FOUR SIDES
++ 2-CELL ARTWORK CLEARANCE + 1-CELL RAIL WIDTH
++ VISIBLE SLOT -> BOTTOM-RAIL CONNECTOR
++ RAIL-ONLY EXTERIOR TRAVEL
++ EXIT ONLY AT TARGET ROW/COLUMN ALIGNMENT
++ ORTHOGONAL FINAL TARGET APPROACH
 + NO-REACHABLE-TARGET-NO-SPAWN
 + VALID TARGET RESERVATION
-+ SCRUBBOTS LEAVING THE CLICKED SLOT
-+ SCRUBBOTS MOVING VISIBLY THROUGH VALID ROUTES
 + PIXELS BEING CLEANED TO TRANSPARENCY
 + SCRUBBOTS DISAPPEARING AFTER CLEANING
 + A COMPLETE PLAYABLE LEVEL
 ```
-
-M22+ now productionizes the UI/touch presentation around that closed gameplay slice.
 
 ---
 
@@ -1384,11 +1397,11 @@ PROMPT 05  Visual Reference Library                              [DONE/ONGOING A
 PROMPT 06  Pixel-Art Importer + Round Trip Validation            [DONE]
 PROMPT 07  Gameplay Session Core + Five-Slot Data Model          [DONE]
 PROMPT 08  Color Candidates + Reservation + TargetSelector       [DONE]
-PROMPT 09  RoutingSystem + Production Routing                    [DONE]
+PROMPT 09  RoutingSystem + Production Routing                    [DONE; exterior geometry superseded by M22 Railroad V1]
 PROMPT 10  ScrubbotAgent + Dispatcher                            [DONE]
 PROMPT 11  Complete Clearing Vertical Slice                      [DONE]
 PROMPT 12  First Real SCRUBBOTS Artwork Playable Level           [DONE — M21 V10]
-PROMPT 13  Production Slot UI + Gameplay Layout + Touch Controls [M22 ACTIVE]
+PROMPT 13  Production Slot UI + Railroad + Gameplay Layout + Touch Controls [M22 ACTIVE]
 PROMPT 14  Win/Lose Completion Rules + Results Flow
 PROMPT 15  Scrubbot Final Art + Cleaning Effects + Audio/Haptics
 PROMPT 16  Level Catalog + Difficulty V1 Content Rules
@@ -1403,11 +1416,11 @@ PROMPT 21  Release Candidate Preparation
 
 ## NEXT IMMEDIATE MILESTONE
 
-**Current implementation gate — M22-C001 V01:** execute
-`coordination/sessions/M22-C001/CHATGPT_PROMPT_V01.md` against
-`coordination/sessions/M22-C001/CHATGPT_AUDIT_CRITERIA_V01.md`.
+**Current implementation gate — M22-C001 V02:** execute
+`coordination/sessions/M22-C001/CHATGPT_PROMPT_V02.md` against
+`coordination/sessions/M22-C001/CHATGPT_AUDIT_CRITERIA_V02.md` and the owner-locked `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`.
 
-M21 is closed and must remain a protected gameplay basis. M22 V01 creates reusable production SlotCell/ColorSelectionPanel components, audits the canonical owner gameplay/five-slot references, corrects stale active manifest palette/difficulty truth, validates touch size/active state/spawn anchors across the required responsive matrix, and proves integration with the accepted M21 slot-click chain. No Magnific generation or credit spend is authorized in V01. Claude/Codex must not edit this `TASKS.md`; ChatGPT audits the implementation and updates tracker/checkbox state afterward.
+V01 is independently accepted and its slot foundation must be preserved. V02 implements one canonical Railroad V1 geometry source, a reusable native railroad view, real slot→bottom-rail connectors, railroad-constrained production routing and aligned orthogonal target exits. It must preserve TargetSelector WHAT-policy, ReservationState authority, authenticated clearing, rapid/reset correctness and M21 owner-approved target order. It must migrate current tests/docs away from obsolete exact adjacent-ring geometry without rewriting historical M21 audit evidence. No Magnific/image generation or credit spend is authorized. Claude/Codex must not edit this `TASKS.md`; ChatGPT audits V02 and then decides the owner F6 visual gate.
 
 ---
 
