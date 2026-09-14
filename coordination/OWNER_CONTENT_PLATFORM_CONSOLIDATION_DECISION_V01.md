@@ -1,102 +1,56 @@
-# OWNER CONTENT PLATFORM CONSOLIDATION DECISION V01
+# CONTENT PLATFORM CONSOLIDATION PLAN V01
 
-Status: **OWNER-LOCKED**
+Status: **DRAFT / NON-DESTRUCTIVE INTEGRATION PLAN — NO TRACKER AUTHORITY MOVED**
 Date: 2026-09-14
-Owner: Şekip
+Owner direction: Şekip
 
-## Decision
+## Corrected decision
 
-The canonical program home for the 224 SCRUBBOTS Level Factory + Content/Update Platform tasks is now:
+The owner wants `Sekiph82/ScrubBots-Level-Factory` to evolve so it can eventually implement/operate the Level Factory and Content/Update Platform program planned in the main SCRUBBOTS roadmap.
 
-`https://github.com/Sekiph82/ScrubBots-Level-Factory`
+This does **not** mean the existing Level Factory roadmap is replaced, reset, or discarded.
 
-Canonical Content Platform tracker:
+This does **not** mean the 224 `SB-LF*` + `SB-CP*` rows are immediately canonicalized in the Level Factory root `TASKS.md`.
 
-`https://github.com/Sekiph82/ScrubBots-Level-Factory/blob/main/TASKS.md`
+Until an explicit mapping/audit migration is completed and owner-approved:
 
-The migrated ranges are:
+- the main `Sekiph82/Scrubbots` `TASKS.md` retains its existing LF/CP roadmap rows and their current role;
+- `Sekiph82/ScrubBots-Level-Factory/TASKS.md` retains its existing PAG/SP roadmap, completion states and active cycle;
+- no existing completed/active Level Factory task may be reset because of the proposed integration;
+- no imported LF/CP task may be marked open/completed solely because of migration.
 
-- `SB-LF00-*` through `SB-LF10-*` — 112 tasks.
-- `SB-CP00-*` through `SB-CP09-*` — 112 tasks.
+## Integration target
 
-The matching LF/CP rows currently retained in this main-game `TASKS.md` are henceforth **shadow/historical roadmap rows**. They must not be independently advanced here. Canonical acceptance/checklist state for those IDs lives in the Content Platform repository.
+The desired future architecture remains:
 
-This decision does not alter the active M22 gameplay/UI sprint.
+`Level Factory / Studio -> canonical Factory Core -> validated declarative level/campaign content -> packaging/publishing -> Scrubbots runtime`
 
-## Main-game responsibility after migration
+The two repositories remain separate implementation domains:
 
-`Sekiph82/Scrubbots` remains the canonical shipping game/client runtime and owns:
+### `Sekiph82/ScrubBots-Level-Factory`
 
-- gameplay;
-- Godot presentation/UI;
-- LevelData/runtime catalog consumption;
-- runtime `RemoteContentManager`;
-- HTTPS manifest/pack download;
-- hash/integrity validation;
-- `user://` remote-content registry/cache;
-- atomic activation and last-known-good fallback;
-- offline play behavior;
-- application permissions/store-facing runtime behavior.
+Candidate future responsibilities include generation, semantic art, solver/difficulty tooling, QA, campaign sequencing, Factory Studio, packaging and publisher/control-plane tooling.
 
-## Cross-repo tasks
+### `Sekiph82/Scrubbots`
 
-Some canonical Content Platform tasks are implemented here even though their tracker lives in `ScrubBots-Level-Factory`.
+Remains the shipping Godot game/client and owns gameplay plus runtime content consumption, download/cache/activation/offline behavior when those milestones open.
 
-Primary examples:
+## Required migration process
 
-- `CP04 — Godot Remote Content Runtime`
-- `CP05 — Offline Cache & Last-Known-Good Recovery`
-- runtime portions of CP06/CP09.
+Before tracker ownership changes:
 
-For those tasks:
+1. Inventory both current roadmaps without altering them.
+2. Map all 224 LF/CP rows to existing Level Factory tasks/evidence and implementation repositories.
+3. Preserve all existing `[x]`, `[~]`, `[ ]`, audit and active-cycle state.
+4. Determine overlap, partial coverage, missing work and conflicts through independent audit.
+5. Propose an **additive** integration structure, not a replacement tracker.
+6. Obtain owner approval for any actual tracker restructuring.
+7. Only then update tracker authority/status through the normal audit workflow.
 
-1. Content Platform `TASKS.md` declares `GAME_RUNTIME` or `CROSS_REPO` ownership.
-2. The implementation prompt explicitly names `Sekiph82/Scrubbots` as an authorized write repository.
-3. Builder follows this repository's gameplay/runtime governance while implementing.
-4. ChatGPT audits both producer and consumer evidence.
-5. Final canonical task checkbox is updated in `ScrubBots-Level-Factory/TASKS.md`.
+## Parallel development
 
-## Dependency boundary
+Claude may continue the main game while Codex continues the existing Level Factory roadmap. Integration planning must not interrupt or silently supersede either active implementation cycle.
 
-The game never imports/preloads Factory or Publisher source code.
+## Safety rule
 
-Legal flow:
-
-`Factory/Publisher -> declarative versioned artifacts -> Game Runtime`
-
-Remote content is declarative only and may not deliver executable scripts/native libraries/plugins/arbitrary evaluated code.
-
-Runtime remote content installs under `user://`, never rewrites `res://`.
-
-## Difficulty and content contract authority
-
-This main repository remains authoritative for owner-locked gameplay, LevelData, palette, Difficulty V1, campaign and runtime semantics.
-
-The Content Platform must migrate away from stale historical assumptions that:
-
-- difficulty class equals board-dimension band;
-- difficulty class equals fixed used-color band.
-
-Current relevant truth includes rectangular boards, C01..C16, general 3..12 production used-color envelope, Challenge/Session Load/Frustration separation and owner-locked campaign cadence.
-
-## Progress reporting
-
-From this decision onward, report three figures separately:
-
-1. **Game/client** completion from the main-game task set.
-2. **Content Platform** completion out of 224 from `ScrubBots-Level-Factory/TASKS.md`.
-3. **Combined SCRUBBOTS program** completion using both numerators/denominators.
-
-Moving the tracker does not create task-completion credit.
-
-The current main-game header already reports game-only and combined progress separately; denominator separation is therefore retained rather than treated as new development progress.
-
-## Parallel-agent rule
-
-Claude may continue game work in `Sekiph82/Scrubbots` while Codex advances the Content Platform in `Sekiph82/ScrubBots-Level-Factory`.
-
-Neither builder may opportunistically write into the other repository unless an explicit cross-repo prompt authorizes it.
-
-## Precedence
-
-This owner decision supersedes older main-game tracker text that says LF/CP sidecar task acceptance is written only in this root tracker. Historical rows remain for traceability until a later safe tracker compaction, but they are no longer canonical current state for those 224 IDs.
+Tracker migration itself never creates or removes completion credit. Existing evidence and existing work remain first-class project truth.
