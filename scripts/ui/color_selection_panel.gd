@@ -37,15 +37,35 @@ func _ready() -> void:
 ## Build exactly five cells bound to scalar Color snapshots. `colors` is a plain
 ## Array[Color] indexed by slot id — no gameplay reference is stored. Idempotent:
 ## a re-bind rebuilds the cells from the new scalar snapshot.
-func bind_colors(colors: Array) -> void:
+##
+## M22-C001 V02 hardening (criteria M22-V02-032/145): FAIL CLOSED on an
+## incomplete/malformed snapshot. An input that is not an Array of exactly five
+## real Colors is rejected (returns false, existing valid cells untouched) rather
+## than silently fabricating magenta as production colour truth. Returns true on a
+## successful bind.
+func bind_colors(colors) -> bool:
+	if not _is_valid_snapshot(colors):
+		return false
 	_clear_cells()
 	for slot_id in range(SLOT_COUNT):
-		var col: Color = colors[slot_id] if slot_id < colors.size() else Color(1, 0, 1, 1)
+		var col: Color = colors[slot_id]
 		var cell = SlotCellScene.instantiate()
 		add_child(cell)
 		cell.setup(slot_id, col)
 		cell.slot_activated.connect(_on_cell_activated)
 		_cells.append(cell)
+	return true
+
+## A valid production snapshot is an Array of exactly SLOT_COUNT real Colors.
+func _is_valid_snapshot(colors) -> bool:
+	if typeof(colors) != TYPE_ARRAY:
+		return false
+	if colors.size() != SLOT_COUNT:
+		return false
+	for c in colors:
+		if typeof(c) != TYPE_COLOR:
+			return false
+	return true
 
 func _clear_cells() -> void:
 	for c in _cells:

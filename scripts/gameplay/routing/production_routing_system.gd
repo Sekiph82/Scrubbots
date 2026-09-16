@@ -33,6 +33,10 @@ extends "res://scripts/gameplay/routing/routing_system.gd"
 
 const RouteValidator = preload("res://scripts/gameplay/routing/route_validator.gd")
 const ProductionAccessQuery = preload("res://scripts/gameplay/routing/production_access_query.gd")
+const ScrubRailGeometry = preload("res://scripts/gameplay/routing/scrub_rail_geometry.gd")
+
+## Route-choice tolerance for "shortest legal total rail route" comparison.
+const _RAIL_LEN_EPS := 0.0001
 
 ## Deterministic 4-neighbour order: up, right, down, left.
 const NEIGHBORS: Array[Vector2i] = [
@@ -62,6 +66,16 @@ func compute_route(request, board, access_query) -> RefCounted:
 	# types + exact board coherence, all before any route work.
 	if not _access_seam_valid(access_query, board, idx):
 		return RouteResult.failure(RouteResult.FailureReason.MISSING_ACCESS_QUERY, idx)
+
+	# Scrubbot Railroad V1 (OWNER_SCRUBBOT_RAILROAD_DECISION_V01): a below-board /
+	# slot-style start (the owner-facing production activation path — real SlotCells
+	# sit below the board) travels on the railroad, not the M21 adjacent one-cell
+	# ring. The ring exterior lane is superseded for this path (M22-C001 V02); it is
+	# retained below only for non-below-board debug/test starts (e.g. left/right
+	# injection points in low-level dispatch/clearing regressions), which the owner
+	# slot-connector law does not cover.
+	if _is_below_board_start(request, board):
+		return _railroad_route(request, board, access_query)
 
 	# Backbone: complete deterministic grid-aware reachability/path.
 	var cell_path: Array = _bfs_cell_path(request, board, access_query)
@@ -99,6 +113,81 @@ func compute_route(request, board, access_query) -> RefCounted:
 			best = c3
 
 	return RouteResult.success_route(idx, best)
+
+# ------------------------------------------- Scrubbot Railroad V1 (HOW) --
+# Owner-locked exterior travel: clicked-slot start → bottom-rail connector →
+# rail-only travel (corners only) → aligned orthogonal exit → assigned target.
+# Consumes the single-source ScrubRailGeometry; never retargets; every returned
+# route is RouteValidator-clean under the same authoritative access truth. The
+# generic collinear/shortcut/rounding post-process is intentionally NOT applied
+# here so it can never turn a rail route into a diagonal free-space shortcut
+# (criteria M22-V02-074/075).
+
+## A below-board / slot-style start (y at or below the board bottom boundary). This
+## is the owner-facing production activation path; such starts route on the rail.
+func _is_below_board_start(request, board) -> bool:
+	return request.start_position.y >= float(board.get_height())
+
+## Build the Railroad V1 route for the already-assigned target. Evaluates the four
+## aligned exit sides in the owner tie-break order (BOTTOM → LEFT → RIGHT → TOP),
+## keeps only sides whose final orthogonal approach is access-legal, and returns
+## the shortest legal total route. NO_ROUTE (never a retarget) if no side is legal.
+func _railroad_route(request, board, access_query) -> RefCounted:
+	var idx: int = request.target_index
+	var geom = ScrubRailGeometry.new(board.get_width(), board.get_height())
+	if not geom.is_valid():
+		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
+	var start: Vector2 = request.start_position
+	var target_center: Vector2 = RouteRequest.center_of_index(board, idx)
+	var entry: Vector2 = geom.bottom_entry(start.x)
+
+	var best: PackedVector2Array = PackedVector2Array()
+	var best_len: float = INF
+	# SIDE_TIEBREAK order makes equal-distance ties deterministic: the first side
+	# in BOTTOM → LEFT → RIGHT → TOP wins because we only replace on strictly less.
+	for side in ScrubRailGeometry.SIDE_TIEBREAK:
+		var exit_pt: Vector2 = geom.exit_point(side, target_center)
+		# Final approach must be a legal orthogonal segment ending at the target
+		# centre (arriving). A non-target ACTIVE blocker rejects this side.
+		if not _seg_true(access_query, exit_pt, target_center, idx):
+			continue
+		var rp: Dictionary = geom.rail_path(entry, exit_pt)
+		var pts := PackedVector2Array()
+		pts.append(start)
+		pts.append(entry)
+		for wp in rp["points"]:
+			pts.append(wp)
+		pts.append(exit_pt)
+		pts.append(target_center)
+		pts = _dedup_points(pts)
+		# The whole rail route (connector + rail + approach) must be access-clean.
+		if not _whole_route_valid(request, pts, board, access_query):
+			continue
+		var total: float = _polyline_length(pts)
+		if total < best_len - _RAIL_LEN_EPS:
+			best_len = total
+			best = pts
+
+	if best.is_empty():
+		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
+	return RouteResult.success_route(idx, best)
+
+## Drop consecutive near-duplicate points (an exit that coincides with the entry
+## or a corner) so no zero-length segment reaches the validator.
+func _dedup_points(points: PackedVector2Array) -> PackedVector2Array:
+	if points.size() <= 1:
+		return points
+	var out := PackedVector2Array([points[0]])
+	for i in range(1, points.size()):
+		if points[i].distance_to(out[out.size() - 1]) > _COLLINEAR_EPS:
+			out.append(points[i])
+	return out
+
+func _polyline_length(points: PackedVector2Array) -> float:
+	var total := 0.0
+	for i in range(points.size() - 1):
+		total += points[i].distance_to(points[i + 1])
+	return total
 
 # ------------------------------------------------------- seam / validation --
 

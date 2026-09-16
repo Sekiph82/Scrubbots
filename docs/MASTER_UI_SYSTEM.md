@@ -407,3 +407,32 @@ UI-G  Final Magnific asset production/approval pass
 ```
 
 This UI program must be scheduled alongside existing gameplay milestones without replacing gameplay-critical M13–M21 work.
+## Scrubbot Railroad V1 presentation / spacing contract `[OWNER-LOCKED 2026-09-14]`
+
+Owner decision: `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`; ADR-028.
+
+The gameplay screen renders a reusable robotic **railroad** around the pixel-art
+board via `scenes/components/ui/gameplay/scrub_rail_view.tscn`
+(`scripts/ui/scrub_rail_view.gd`), driven by the single-source `ScrubRailGeometry`.
+
+Spacing / visual contract:
+
+- artwork-to-rail clearance is exactly `2.0` logical cells (>= 2 cells of visible
+  breathing room); rail width is `1.0` logical cell; centreline `2.5` cells outside
+  each board boundary; rounded mechanical corners whose motion path stays inside the
+  rail envelope;
+- consistent dark-slate metallic track with restrained cyan/electric guide nodes â€”
+  the SAME visual language for every level; the rail never inspects level
+  subject/theme and no per-level themed rail exists in V1;
+- the rail is visually subordinate to the artwork, native/procedural Godot 2D (zero
+  generated assets), and reskinnable later without changing target/routing truth;
+- the five production `SlotCell`s (accepted M22 V01) sit BELOW the bottom rail, never
+  inside the 2-cell artwork clearance; each clicked slot shows a visible connector to
+  the bottom rail (real travel, no teleport);
+- the rail must not distort the board aspect ratio and must not add a Node per board
+  cell; the logical 2-cell clearance is invariant across physical viewport scale.
+
+The railroad is presentation/routing space only â€” not LevelData/BoardState, not a
+C01..C16 artwork layer, and it does not change Difficulty V1. It supersedes the M21
+adjacent one-cell ring as future production movement geometry; M21 V07-V10 remain
+valid historical evidence for their commits.

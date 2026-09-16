@@ -310,3 +310,34 @@ Economy around this reward remains `[TO BE DESIGNED]`.
 ## Detailed economy / shop / monetization `[TO BE DESIGNED]`
 
 Not authorized here. Difficulty/retention design does not authorize ads, energy systems, paid retries, dynamic monetization walls or failure manipulation.
+
+## Scrubbot Railroad V1 movement `[OWNER-LOCKED 2026-09-14]`
+
+Owner decision: `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`.
+
+Production exterior movement is a consistent robotic **railroad** around the
+artwork (one visual language for every level; no per-level themed rail in V1). For
+board `W Ã— H`: artwork-to-rail clearance `2.0` cells, rail width `1.0` cell,
+centreline `2.5` cells outside each boundary, corners at the four intersections.
+
+Owner-facing flow:
+
+```text
+clicked SlotCell -> visible slot connector -> BOTTOM railroad -> railroad-only
+exterior travel (corners only) -> exit aligned with the assigned target
+(TOP/BOTTOM share target x; LEFT/RIGHT share target y) -> strictly ORTHOGONAL final
+approach -> already-assigned target -> authenticated arrival -> M20 clear
+```
+
+The Scrubbot must not cut diagonally across exterior free space, leave the rail
+early, tunnel through non-target ACTIVE artwork, or retarget. If one aligned side's
+final approach is blocked by a non-target ACTIVE cell, routing may evaluate another
+aligned side **for the same target**; if no side is legal it returns no route and
+never chooses a different target. Shortest legal rail route wins; equal-distance
+tie-break is `BOTTOM -> LEFT -> RIGHT -> TOP` (HOW-only; TargetSelector bottom-most /
+left-most WHAT-order is unchanged).
+
+This supersedes the M21 adjacent one-cell exterior ring as future production
+geometry. M21 V07-V10 remain valid historical evidence for their commits. The
+railroad is presentation/routing space only â€” not a LevelData/BoardState cell layer,
+not a C01..C16 artwork colour, and it does not change Difficulty V1.

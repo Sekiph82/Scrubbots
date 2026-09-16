@@ -961,3 +961,41 @@ reservation resolution. Using routing as the sole reachability oracle keeps
 - No pooling added; rapid-dispatch profiling (headless CPU) did not justify it.
 
 **Status**: Accepted (M19-C001).
+
+### ADR-028: Scrubbot Railroad V1 supersedes M21 adjacent one-cell exterior ring (M22-C001 V02)
+
+**Status**: OWNER-LOCKED (`coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`), 2026-09-14.
+
+**Decision**: Production exterior Scrubbot travel is a consistent robotic **railroad**
+surrounding the artwork. For board `W Ã— H` the single-source geometry
+(`scripts/gameplay/routing/scrub_rail_geometry.gd`, `ScrubRailGeometry`) is:
+artwork-to-rail clearance exactly `2.0` cells, rail width `1.0` cell, centreline
+offset `2.5` cells outside each boundary; TOP `y=-2.5`, BOTTOM `y=H+2.5`,
+LEFT `x=-2.5`, RIGHT `x=W+2.5`; corners at the four intersections. The clicked-slot
+Scrubbot connects to the BOTTOM rail, travels on rail centrelines (side changes only
+through corners), leaves the rail only at an exit aligned with the assigned target
+(TOP/BOTTOM share target x; LEFT/RIGHT share target y), and makes a strictly
+orthogonal final approach. Shortest legal total rail route wins; equal-distance
+tie-break is `BOTTOM -> LEFT -> RIGHT -> TOP`.
+
+**Supersession**: the exact M21 adjacent one-cell ring (`x=-1 / x=W / y=-1 / y=H`)
+is no longer the desired production movement geometry. **M21 V07-V10 historical
+audit evidence remains valid for those commits** and is not rewritten; only future
+production geometry is superseded. The locked M21 invariants are preserved:
+TargetSelector chooses WHAT (bottom-most then left-most among targetable matching
+cells) and never absorbs railroad geometry; routing chooses HOW and never
+retargets; reservations remain atomic/authoritative; non-target ACTIVE cells block;
+no tunnelling/diagonal squeeze; no route means no spawn/no side effects;
+authenticated arrival remains required for M20 clear; slot-click-only activation.
+
+**Ownership boundaries**: the railroad is presentation/routing space only â€” never a
+LevelData/BoardState cell layer, never a C01..C16 artwork colour, never affecting
+Difficulty V1. `ScrubRailGeometry` is the single geometry source consumed by
+`ProductionRoutingSystem` (HOW) and `ScrubRailView` (presentation); constants are
+not duplicated. Below-board (slot-style) starts route on the rail; other debug/test
+injection starts retain the compatible exterior path.
+
+**Reason**: gives every level a branded, readable, reusable movement infrastructure
+with one consistent visual language (no per-level themed rail in V1), without
+reopening accepted WHAT/reservation/clearing authority. No external reference title
+assets or exact composition are copied.

@@ -459,3 +459,34 @@ Shipping runtime eventually receives only the minimal remote-content client
 needed to fetch declarative content over HTTPS, verify it, cache it under
 `user://`, and expose verified levels to the existing catalog/loader seam.
 Publisher credentials and Factory code never ship in the app.
+
+## Scrubbot Railroad V1 â€” single-source geometry + ownership boundaries (M22-C001 V02)
+
+Owner decision: `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`; ADR-028.
+
+`scripts/gameplay/routing/scrub_rail_geometry.gd` (`ScrubRailGeometry`) is the ONE
+source of railroad geometry (clearance `2.0`, rail width `1.0`, centreline offset
+`2.5`, sides/corners/entry/exit, perimeter travel + deterministic tie-break). It is
+pure/data-oriented, derives everything from board `W/H` (no fixed 20x20 assumption,
+valid for 20..59 incl. 59x59), and fails closed on invalid dimensions.
+
+Consumers of the same contract (numbers are never duplicated as magic values):
+
+```text
+ScrubRailGeometry (single source)
+â”œâ”€â”€ ProductionRoutingSystem   -> HOW: below-board/slot starts travel the rail
+â”‚                                (connector -> bottom rail -> corners -> aligned
+â”‚                                exit -> orthogonal approach); never WHAT/retarget
+â”œâ”€â”€ ScrubRailView             -> presentation: procedural dark-slate rail, cyan
+â”‚                                guide nodes, rounded corners; owns no gameplay truth
+â””â”€â”€ GameplaySlotDemo          -> maps SlotCell anchors through BoardPresentation into
+                                 board-local route space; slots sit below the rail
+```
+
+Ownership boundaries (unchanged authority): TargetSelector WHAT-order, ReservationState
+assignment truth, and CompleteClearingLoop/M20 authenticated clearing are NOT
+modified. Railroad geometry stays out of TargetSelector. The railroad is
+presentation/routing space only â€” never LevelData/BoardState, never a C01..C16
+artwork layer. `BoardPresentation` continues to map logical route coordinates to
+screen space. The generic collinear/shortcut/rounding post-process is not applied to
+rail routes (it could otherwise create a diagonal free-space shortcut).
