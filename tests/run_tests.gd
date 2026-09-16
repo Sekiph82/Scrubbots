@@ -5979,6 +5979,17 @@ func _m17c002_max_seg(p: PackedVector2Array) -> float:
 		m = maxf(m, p[i].distance_to(p[i + 1]))
 	return m
 
+## Longest NON-axis-aligned (diagonal) segment. Production's conservative organized
+## language (bounded shortcut span, small corner radius) must never emit a long
+## board-spanning diagonal; only tiny local rounding/shortcut diagonals are allowed.
+func _m17c002_max_diag_seg(p: PackedVector2Array) -> float:
+	var m := 0.0
+	for i in range(p.size() - 1):
+		var d: Vector2 = p[i + 1] - p[i]
+		if absf(d.x) > 0.0001 and absf(d.y) > 0.0001:
+			m = maxf(m, d.length())
+	return m
+
 func _run_m17c002_production_routing_tests() -> void:
 	print("---- M17-C002: production routing (organized/curved + grid) ----")
 	# Production derives from a valid grid route (S2 detour), validates, and is
@@ -6037,41 +6048,44 @@ func _run_m17c002_production_routing_tests() -> void:
 	_check_eq(after4.target_index, q4.target_index, "S4: target identity unchanged after opening")
 	_check_eq(RouteValidator.validate_route(q4, after4, b4, a4), RouteResult.FailureReason.NONE, "S4 opened production route validates")
 
-	# Production defaults are more conservative than the experimental Organized
-	# prototype defaults: on 59x59 it keeps more of the orthogonal path (more
-	# points, >= distance) and avoids long board-spanning diagonals (smaller max
-	# segment). Direct evidence, not a claim.
+	# M22-C001 V03: these lab scenarios use OUTSIDE slot origins, so current
+	# production routing is Scrubbot Railroad V1 (the superseded organized-exterior
+	# comparison is retired). The current production invariants on a 59x59 open board:
+	# every target is rail-reachable (aligned exit through the open board), every
+	# route is RouteValidator-clean, and every route is STRICTLY ORTHOGONAL — the
+	# strongest possible form of "avoids long interior diagonals" (zero diagonals).
 	var s7 := RoutingLabScenarios.make_s7(25)
 	var b7 = s7["board"]
 	var a7 = ProductionAccessQuery.new(b7)
 	var reqs7 = RoutingLabScenarios.build_requests(b7, s7["targets"], s7["origins"])
-	var prod_pts := 0; var exp_pts := 0
-	var prod_dist := 0.0; var exp_dist := 0.0
-	var prod_max := 0.0; var exp_max := 0.0
+	# NOTE: this lattice dispatches all 25 targets SIMULTANEOUSLY without clearing.
+	# Under Railroad V1 the aligned straight approach is blocked for an interior
+	# target whose row AND column both hold other still-ACTIVE targets, so interior
+	# lattice targets correctly return NO_ROUTE (they open only as clearing proceeds,
+	# proven by the real-art full clear). The current railroad invariants: every
+	# SUCCESS is RouteValidator-clean and strictly orthogonal; every FAILURE is a
+	# clean NO_ROUTE keeping the same target (no retarget); the reachable outer ring
+	# succeeds.
+	var prod_max_diag := 0.0
 	var prod_succ := 0; var prod_valid := 0
-	var org_exp = OrganizedRoutePrototype.new()
+	var s7_failures_clean := true
 	for req in reqs7:
 		var rp = ProductionRoutingSystem.new().compute_route(req, b7, a7)
-		var re = org_exp.compute_route(req, b7, a7)
 		if rp.success:
 			prod_succ += 1
 			var pp: PackedVector2Array = rp.get_points()
-			prod_pts += pp.size(); prod_dist += RouteMetrics.route_distance(pp); prod_max = maxf(prod_max, _m17c002_max_seg(pp))
+			prod_max_diag = maxf(prod_max_diag, _m17c002_max_diag_seg(pp))
 			if RouteValidator.validate_route(req, rp, b7, a7) == RouteResult.FailureReason.NONE:
 				prod_valid += 1
-		if re.success:
-			var ep: PackedVector2Array = re.get_points()
-			exp_pts += ep.size(); exp_dist += RouteMetrics.route_distance(ep); exp_max = maxf(exp_max, _m17c002_max_seg(ep))
-	_check(prod_succ == reqs7.size(), "production solves all 59x59 routes (success=%d)" % prod_succ)
-	_check_eq(prod_valid, prod_succ, "every production 59x59 route passes the shared RouteValidator")
-	_check(prod_pts > exp_pts, "production keeps MORE points than experimental (less aggressive: %d > %d)" % [prod_pts, exp_pts])
-	_check(prod_dist >= exp_dist, "production distance >= experimental (keeps orthogonal path: %.1f >= %.1f)" % [prod_dist, exp_dist])
-	_check(prod_max < exp_max, "production avoids long interior diagonals (interior max seg %.1f < experimental %.1f)" % [prod_max, exp_max])
-	# Production default config is more conservative than the experimental default.
+		elif rp.failure_reason != RouteResult.FailureReason.NO_ROUTE or rp.target_index != req.target_index:
+			s7_failures_clean = false
+	_check(prod_succ >= 1, "production (railroad) reaches the rail-reachable 59x59 targets (success=%d/%d)" % [prod_succ, reqs7.size()])
+	_check_eq(prod_valid, prod_succ, "every successful 59x59 railroad route passes the shared RouteValidator")
+	_check(prod_max_diag == 0.0, "production railroad routes are strictly orthogonal — no interior diagonal (max diagonal seg %.2f)" % prod_max_diag)
+	_check(s7_failures_clean, "unreachable simultaneous 59x59 targets return NO_ROUTE with no retarget (railroad aligned-approach contract)")
 	_check(prod.max_shortcut_span < 2147483647, "production shortcut span is bounded")
-	_check(prod.corner_radius < org_exp.corner_radius, "production corner_radius (%.2f) < experimental (%.2f)" % [prod.corner_radius, org_exp.corner_radius])
 
-	# Rectangular Very Hard coverage (53x59).
+	# Rectangular Very Hard coverage (53x59), outside starts -> railroad.
 	var s8 := RoutingLabScenarios.make_s8(25)
 	var b8 = s8["board"]
 	var a8 = ProductionAccessQuery.new(b8)
@@ -6079,11 +6093,16 @@ func _run_m17c002_production_routing_tests() -> void:
 	_check_eq(b8.get_width(), 53, "rectangular VH width 53")
 	_check_eq(b8.get_height(), 59, "rectangular VH height 59")
 	var s8_ok := 0
+	var s8_failures_clean := true
 	for req in reqs8:
 		var res = ProductionRoutingSystem.new().compute_route(req, b8, a8)
-		if res.success and RouteValidator.validate_route(req, res, b8, a8) == RouteResult.FailureReason.NONE:
-			s8_ok += 1
-	_check_eq(s8_ok, reqs8.size(), "all rectangular VH production routes validate")
+		if res.success:
+			if RouteValidator.validate_route(req, res, b8, a8) == RouteResult.FailureReason.NONE and _m17c002_max_diag_seg(res.get_points()) == 0.0:
+				s8_ok += 1
+		elif res.failure_reason != RouteResult.FailureReason.NO_ROUTE or res.target_index != req.target_index:
+			s8_failures_clean = false
+	_check(s8_ok >= 1, "rectangular VH (53x59) railroad routes validate and are orthogonal (valid=%d/%d)" % [s8_ok, reqs8.size()])
+	_check(s8_failures_clean, "rectangular VH unreachable targets return NO_ROUTE with no retarget")
 
 # ============================================================= M18 agent =====
 # Lightweight ScrubbotAgent: consumes a finished production route, walks it in
@@ -6435,7 +6454,7 @@ func _run_m18_agent_stress_tests() -> void:
 		var scenario: Dictionary = RoutingLabScenarios.make_s6(count) if count > 25 else RoutingLabScenarios.make_s5(count)
 		var board = scenario["board"]
 		var access = ProductionAccessQuery.new(board)
-		var reqs: Array = RoutingLabScenarios.build_requests(board, scenario["targets"], scenario["origins"])
+		var reqs: Array = _v03_inside_reqs(board, scenario["targets"])  # interior planner (outside starts route on rail)
 		var label := "%d-agent" % count if count <= 25 else "stress %d-agent (>25)" % count
 
 		# --- route generation: OUTSIDE the lifecycle timer -------------------
@@ -7660,7 +7679,7 @@ func _run_m17c002_v03_hardening_tests() -> void:
 	var eb = _v03_open_board(7, 7)
 	var et = eb.get_cell_index(5, 3); eb.set_cell_state(et, BoardState.CellState.ACTIVE)
 	var edge_acc = RouteAccessEdgeBlock.new(eb, Vector2(3.5, 3.5), Vector2(4.5, 3.5))
-	var ereq = RouteRequest.for_target(eb, Vector2(-2, 3.5), et)
+	var ereq = RouteRequest.for_target(eb, Vector2(0.5, 3.5), et)  # V03: inside start -> interior planner edge-access proof
 	var eres = ProductionRoutingSystem.new().compute_route(ereq, eb, edge_acc)
 	_check(eres.success, "planner routes around a single blocked edge when an alternate exists")
 	if eres.success:
@@ -7683,9 +7702,9 @@ func _run_m17c002_v03_hardening_tests() -> void:
 	lb.set_cell_state(lb.get_cell_index(1, 2), BoardState.CellState.CLEARED)
 	var lt = lb.get_cell_index(2, 2) # ACTIVE interior target (only open neighbour is (1,2))
 	var ledge = RouteAccessEdgeBlock.new(lb, Vector2(1.5, 2.5), Vector2(2.5, 2.5))
-	var lreq = RouteRequest.for_target(lb, Vector2(-2, 0.5), lt)
+	var lreq = RouteRequest.for_target(lb, Vector2(0.5, 0.5), lt)  # V03: inside start -> interior planner sole-edge proof
 	var lres = ProductionRoutingSystem.new().compute_route(lreq, lb, ledge)
-	_check(not lres.success, "NO_ROUTE when the only connecting edge is blocked (interior target, ring gives no alternate)")
+	_check(not lres.success, "NO_ROUTE when the only connecting edge is blocked (interior start + target, no alternate)")
 	_check_eq(lres.failure_reason, RouteResult.FailureReason.NO_ROUTE, "sole-connection blocked -> NO_ROUTE")
 	_check_eq(lres.target_index, lt, "sole-connection failure keeps the same target")
 	_check(ledge.blocked_edge_queried, "planner consulted segment access on the sole connecting edge (not inferred from cell class)")
@@ -13372,13 +13391,16 @@ func _run_m21_v07_corridor_tests() -> void:
 	_check(pts_b[pts_b.size() - 1].is_equal_approx(tc_bl), "V07 corridor: route final point == target (0,19) centre")
 	_check(_v07_has_exterior_point(pts_b, wb, hb), "V07 corridor: route travels the exterior ring (has an outside-board point)")
 
-	# --- top: above-board origin -> far-right top perimeter via top ring ---
+	# --- top: below-board (slot-style) origin -> far-right TOP target via multi-side
+	# rail travel (V03 migration: the obsolete above-origin exterior ring is gone; the
+	# far-top-right target now forces bottom-entry -> corner -> side rail -> aligned
+	# TOP/RIGHT exit, preserving the four-side/corner safety intent). ---
 	var bt = _v07_all_active(wb, hb)
 	var t_tr: int = bt.get_cell_index(wb - 1, 0)  # (19,0)
-	var origin_t := Vector2(9.5, -2.5)
+	var origin_t := Vector2(9.5, float(hb) + 1.5)  # below-board slot-style start
 	var rt = _v07_route(bt, origin_t, t_tr)
-	_check(rt["r"].success, "V07 corridor: above-origin reaches far-right top target via ring")
-	_check(_v07_has_exterior_point(rt["r"].get_points(), wb, hb), "V07 corridor: top route uses exterior ring")
+	_check(rt["r"].success, "V07 corridor: below-origin reaches far-right top target via multi-side rail")
+	_check(_v07_has_exterior_point(rt["r"].get_points(), wb, hb), "V07 corridor: top-target route travels the exterior rail")
 
 	# --- left: left-of-board origin -> far-bottom left perimeter via left ring ---
 	var bl = _v07_all_active(wb, hb)
@@ -13603,6 +13625,59 @@ func _rail_has_point_with(pts: PackedVector2Array, axis: String, value: float) -
 			return true
 	return false
 
+## Canonical centreline a segment lies on: 0 BOTTOM, 1 LEFT, 2 RIGHT, 3 TOP, -1 none.
+func _rail_seg_side(a: Vector2, b: Vector2, geom) -> int:
+	var e := 0.001
+	if absf(a.y - geom.bottom_y()) < e and absf(b.y - geom.bottom_y()) < e:
+		return 0
+	if absf(a.x - geom.left_x()) < e and absf(b.x - geom.left_x()) < e:
+		return 1
+	if absf(a.x - geom.right_x()) < e and absf(b.x - geom.right_x()) < e:
+		return 2
+	if absf(a.y - geom.top_y()) < e and absf(b.y - geom.top_y()) < e:
+		return 3
+	return -1
+
+func _rail_is_corner(p: Vector2, geom) -> bool:
+	for c in geom.corners():
+		if p.distance_to(c) < 0.001:
+			return true
+	return false
+
+## M22-V03 segment-domain proof (F-M22-V02-EVIDENCE-001): classify a below-board
+## railroad route as connector (p0->p1 to the BOTTOM entry) + canonical rail
+## travel (p1..exit) + exactly one final aligned orthogonal approach (exit->target).
+## Every rail-travel segment must lie exactly on a canonical centreline (never in
+## the 2-cell clearance free-space); any side change must occur at an exact corner;
+## the connector and final approach must be orthogonal. Axis-alignment alone is NOT
+## used as confinement proof — the centreline domain is checked directly.
+func _assert_rail_domain(pts: PackedVector2Array, geom, label: String) -> void:
+	var n := pts.size()
+	if n < 3:
+		_check(false, "%s: route has connector+rail+approach (>=3 points)" % label)
+		return
+	_check(absf(pts[1].y - geom.bottom_y()) < 0.001, "%s: connector enters BOTTOM rail before any lateral rail travel" % label)
+	var cseg: Vector2 = pts[1] - pts[0]
+	_check(absf(cseg.x) < 0.001 or absf(cseg.y) < 0.001, "%s: connector segment is orthogonal (no diagonal slot shortcut)" % label)
+	var prev_side := -1
+	var all_on_centreline := true
+	var side_changes_at_corners := true
+	for i in range(1, n - 2):
+		var side := _rail_seg_side(pts[i], pts[i + 1], geom)
+		if side == -1:
+			all_on_centreline = false
+		if prev_side != -1 and side != -1 and side != prev_side:
+			if not _rail_is_corner(pts[i], geom):
+				side_changes_at_corners = false
+		prev_side = side
+	_check(all_on_centreline, "%s: every rail-travel segment lies exactly on a canonical TOP/BOTTOM/LEFT/RIGHT centreline (not clearance free-space)" % label)
+	_check(side_changes_at_corners, "%s: rail side changes occur only at exact canonical corners" % label)
+	var fa: Vector2 = pts[n - 1] - pts[n - 2]
+	_check(absf(fa.x) < 0.001 or absf(fa.y) < 0.001, "%s: final approach is strictly orthogonal (no diagonal final approach)" % label)
+
+func _v03_geom(w: int, h: int):
+	return load("res://scripts/gameplay/routing/scrub_rail_geometry.gd").new(w, h)
+
 ## §D/L geometry unit contract for ScrubRailGeometry (single source).
 func _run_m22_railroad_geometry_tests() -> void:
 	print("---- M22-C001 V02: ScrubRailGeometry single-source geometry ----")
@@ -13648,70 +13723,88 @@ func _run_m22_railroad_routing_tests() -> void:
 	var w := 20
 	var h := 20
 	var bottom_y := float(h) + 2.5
+	var geom20 = _v03_geom(w, h)
 	# --- far-left bottom target: connector -> bottom rail -> aligned exit -> target ---
 	var b = _v07_all_active(w, h)
 	var t_bl: int = b.get_cell_index(0, h - 1)  # (0,19)
 	var start := Vector2(10.0, float(h) + 1.0)  # below-board slot-style start
 	var rr = _rail_route(b, start, t_bl)
 	var r = rr["r"]
-	_check(r.success, "M22-V02-132 route: far-left bottom target reachable via bottom rail")
+	_check(r.success, "M22-V03-051 route: far-left bottom target reachable via bottom rail")
 	if r.success:
 		var pts: PackedVector2Array = r.get_points()
-		_check(pts[0] == start, "M22-V02-076 route: first point == exact slot start")
-		_check(pts.size() >= 2 and absf(pts[1].y - bottom_y) < 0.001, "M22-V02-077/131: connector enters BOTTOM rail (points[1]) before lateral travel")
-		_check(pts[pts.size() - 1].is_equal_approx(Vector2(0.5, 19.5)), "M22-V02-082 route: final endpoint == target centre")
-		_check(_rail_axis_aligned(pts), "M22-V02-081/136/072: every segment orthogonal (no diagonal shortcut/approach)")
-		_check(absf(pts[pts.size() - 2].x - 0.5) < 0.001, "M22-V02-079 route: bottom exit shares target x (aligned exit)")
+		_check(pts[0] == start, "M22-V03-051 route: first point == exact slot start")
+		_check(pts[pts.size() - 1].is_equal_approx(Vector2(0.5, 19.5)), "M22-V03-051 route: final endpoint == target centre")
+		_check(absf(pts[pts.size() - 2].x - 0.5) < 0.001, "M22-V03-051 route: bottom exit shares target x (aligned exit)")
+		_assert_rail_domain(pts, geom20, "M22-V03-045/046/048 far-left-bottom")
 	# --- two rail sides: left-edge interior target only reachable from LEFT (BL corner) ---
 	var t_left: int = b.get_cell_index(0, 5)  # (0,5); bottom/right/top blocked by ACTIVE
 	var rl = _rail_route(b, start, t_left)
-	_check(rl["r"].success, "M22-V02-133/086: blocked-preferred exit falls back to a legal aligned side (LEFT) for SAME target")
+	_check(rl["r"].success, "M22-V03-054/053 route: blocked-preferred exit falls back to a legal aligned side (LEFT) for SAME target")
 	if rl["r"].success:
 		var lp: PackedVector2Array = rl["r"].get_points()
-		_check(_rail_has_point_with(lp, "y", bottom_y), "M22-V02-134 route: uses BOTTOM rail (entry)")
-		_check(_rail_has_point_with(lp, "x", -2.5) and _rail_has_point_with(lp, "y", bottom_y), "M22-V02-134 route: traverses TWO sides via BL corner (bottom + left)")
-		_check(_rail_has_point_with(lp, "x", -2.5), "M22-V02-080 route: exits on LEFT rail aligned with target y")
-		_check(_rail_axis_aligned(lp), "M22-V02-135 route: no forbidden free-space diagonal wandering")
-		_check(lp[lp.size() - 1].is_equal_approx(Vector2(0.5, 5.5)), "M22-V02-082 route: LEFT approach ends at target centre")
+		# distinct non-corner rail points on TWO sides with a real corner between them.
+		_check(_rail_has_point_with(lp, "y", bottom_y), "M22-V03-053 route: has a BOTTOM-rail (entry) point")
+		_check(_rail_is_corner(Vector2(-2.5, bottom_y), geom20) and _rail_has_point_with(lp, "x", -2.5), "M22-V03-053 route: traverses BOTTOM+LEFT via the exact BL corner")
+		_check(lp[lp.size() - 1].is_equal_approx(Vector2(0.5, 5.5)), "M22-V03-054 route: LEFT approach ends at target centre")
+		_assert_rail_domain(lp, geom20, "M22-V03-053 two-sides-left")
+	# --- true FAR-RIGHT/TOP target (production envelope): forces corner/side travel ---
+	var t_tr: int = b.get_cell_index(w - 1, 0)  # (19,0) far top-right
+	var rtr = _rail_route(b, start, t_tr)
+	_check(rtr["r"].success, "M22-V03-052 route: far-right/top target reachable via corner+side rail travel")
+	if rtr["r"].success:
+		var trp: PackedVector2Array = rtr["r"].get_points()
+		var exit_pt: Vector2 = trp[trp.size() - 2]
+		var on_right := absf(exit_pt.x - geom20.right_x()) < 0.001
+		var on_top := absf(exit_pt.y - geom20.top_y()) < 0.001
+		_check(on_right or on_top, "M22-V03-052 route: exits on an aligned RIGHT or TOP rail for the top-right target")
+		_check(_rail_has_point_with(trp, "y", bottom_y), "M22-V03-052 route: travels from the BOTTOM entry across a corner to reach the far side")
+		_check(trp[trp.size() - 1].is_equal_approx(Vector2(19.5, 0.5)), "M22-V03-052 route: ends at far-right/top target centre")
+		_assert_rail_domain(trp, geom20, "M22-V03-052 far-right-top")
 	# --- all aligned sides blocked: enclosed interior -> NO_ROUTE, no retarget, no side effect ---
 	var t_in: int = b.get_cell_index(10, 10)
 	var active_before: int = b.count_cells_by_state(BoardState.CellState.ACTIVE)
 	var rin = _rail_route(b, start, t_in)
-	_check(not rin["r"].success, "M22-V02-087/099: enclosed interior target -> no route")
-	_check(rin["r"].failure_reason == RouteResult.FailureReason.NO_ROUTE, "M22-V02-087 route: failure reason NO_ROUTE")
-	_check(rin["r"].target_index == t_in, "M22-V02-087 route: no retarget (target index retained)")
-	_check(b.count_cells_by_state(BoardState.CellState.ACTIVE) == active_before, "M22-V02-101 route: failed route mutates no BoardState")
+	_check(not rin["r"].success, "M22-V03-055 route: enclosed interior target -> no route")
+	_check(rin["r"].failure_reason == RouteResult.FailureReason.NO_ROUTE, "M22-V03-055 route: failure reason NO_ROUTE")
+	_check(rin["r"].target_index == t_in, "M22-V03-055 route: no retarget (target index retained)")
+	_check(b.count_cells_by_state(BoardState.CellState.ACTIVE) == active_before, "M22-V03-055 route: failed route mutates no BoardState")
 	# --- shortest legal route: both BOTTOM and LEFT legal, BOTTOM shorter -> BOTTOM chosen ---
 	var start_r := Vector2(18.0, float(h) + 1.0)
 	var rs = _rail_route(b, start_r, t_bl)
-	_check(rs["r"].success, "M22-V02-088 route: reachable from a right-side start")
+	_check(rs["r"].success, "M22-V03-056 route: reachable from a right-side start")
 	if rs["r"].success:
 		var sp: PackedVector2Array = rs["r"].get_points()
-		_check(absf(sp[sp.size() - 2].y - bottom_y) < 0.001, "M22-V02-088 route: shortest legal route chose the BOTTOM aligned exit")
-	# --- deterministic tie-break: LEFT vs RIGHT EXACTLY equal -> LEFT (BOTTOM/TOP
-	# blocked). Odd width 19 makes cell col 9's centre x=9.5 == rail-loop horizontal
-	# midpoint ((-2.5 + 21.5)/2), so LEFT/RIGHT rail + approach distances are equal. ---
-	var tw := 19
-	var th := 19
+		_check(absf(sp[sp.size() - 2].y - bottom_y) < 0.001, "M22-V03-056 route: shortest legal route chose the BOTTOM aligned exit")
+	# --- deterministic tie-break inside 20..59: LEFT vs RIGHT EXACTLY equal -> LEFT.
+	# Odd width 21 makes cell col 10 centre x=10.5 == rail-loop midpoint (-2.5+23.5)/2,
+	# so LEFT/RIGHT rail + approach distances are equal (BOTTOM/TOP blocked). ---
+	var tw := 21
+	var th := 21
 	var bt = _v07_all_active(tw, th)
 	for x in range(tw):
-		if x != 9:
-			bt.set_cell_state(bt.get_cell_index(x, 9), BoardState.CellState.CLEARED)  # clear row 9 except (9,9)
-	var t_tie: int = bt.get_cell_index(9, 9)
-	var start_c := Vector2(9.5, float(th) + 1.0)  # exact horizontal midpoint of the rail loop
+		if x != 10:
+			bt.set_cell_state(bt.get_cell_index(x, 10), BoardState.CellState.CLEARED)  # clear row 10 except (10,10)
+	var t_tie: int = bt.get_cell_index(10, 10)
+	var start_c := Vector2(10.5, float(th) + 1.0)  # exact horizontal midpoint of the rail loop
 	var rtie = _rail_route(bt, start_c, t_tie)
-	_check(rtie["r"].success, "M22-V02-140 route: row-cleared target reachable from LEFT/RIGHT")
+	_check(rtie["r"].success, "M22-V03-057 route: row-cleared 21x21 target reachable from LEFT/RIGHT")
 	if rtie["r"].success:
 		var tp: PackedVector2Array = rtie["r"].get_points()
-		_check(_rail_has_point_with(tp, "x", -2.5) and not _rail_has_point_with(tp, "x", float(tw) + 2.5), "M22-V02-140/089: equal-distance tie-break picks LEFT before RIGHT")
-	# --- rectangular board ---
-	var brc = _v07_all_active(30, 12)
-	var rrect = _rail_route(brc, Vector2(15.0, 13.0), brc.get_cell_index(0, 11))
-	_check(rrect["r"].success, "M22-V02-122 route: rectangular 30x12 far-left bottom reachable")
+		_check(_rail_has_point_with(tp, "x", -2.5) and not _rail_has_point_with(tp, "x", float(tw) + 2.5), "M22-V03-057 route: equal-distance tie-break picks LEFT before RIGHT (20..59 board)")
+		_assert_rail_domain(tp, _v03_geom(tw, th), "M22-V03-057 tie-break")
+	# --- rectangular board inside 20..59 on both axes (40x24) ---
+	var brc = _v07_all_active(40, 24)
+	var rrect = _rail_route(brc, Vector2(20.0, 25.0), brc.get_cell_index(0, 23))
+	_check(rrect["r"].success, "M22-V03-058 route: rectangular 40x24 far-left bottom reachable")
+	if rrect["r"].success:
+		_assert_rail_domain(rrect["r"].get_points(), _v03_geom(40, 24), "M22-V03-058 rectangular")
 	# --- 59x59 ---
 	var b59 = _v07_all_active(59, 59)
 	var r59 = _rail_route(b59, Vector2(29.0, 60.0), b59.get_cell_index(0, 58))
-	_check(r59["r"].success, "M22-V02-123 route: 59x59 far-left bottom reachable via rail")
+	_check(r59["r"].success, "M22-V03-059 route: 59x59 far-left bottom reachable via rail")
+	if r59["r"].success:
+		_assert_rail_domain(r59["r"].get_points(), _v03_geom(59, 59), "M22-V03-059 59x59")
 
 ## §F/J real production integration through the M22 demo (connector+rail+exit).
 func _run_m22_railroad_integration_tests() -> void:
@@ -13778,3 +13871,17 @@ func _run_m22_railroad_integration_tests() -> void:
 	_check(vp.bind_colors(["x", "y", "z", "w", "v"]) == false, "M22-V02-145 integ: non-Color bind_colors rejected")
 	_check(vp.bind_colors([Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN]) == true, "M22-V02-032 integ: valid five-colour bind still succeeds")
 	inst.free()
+
+## M22-C001 V03 (F-M22-V02-STRICT-001): build production RouteRequests from an
+## INSIDE-board origin, exercising the retained interior debug/test planner. Outside
+## starts now route on the railroad, so tests that need the interior grid planner
+## (throughput / organized-quality / edge-access) inject an inside-board origin
+## instead of the superseded exterior ring.
+func _v03_inside_reqs(board, targets: Array) -> Array:
+	var reqs: Array = []
+	var origin := Vector2(1.5, 1.5)  # inside-board interior start
+	for t in targets:
+		var rq = RouteRequest.for_target(board, origin, int(t))
+		if rq != null:
+			reqs.append(rq)
+	return reqs

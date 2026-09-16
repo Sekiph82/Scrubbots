@@ -67,17 +67,21 @@ func compute_route(request, board, access_query) -> RefCounted:
 	if not _access_seam_valid(access_query, board, idx):
 		return RouteResult.failure(RouteResult.FailureReason.MISSING_ACCESS_QUERY, idx)
 
-	# Scrubbot Railroad V1 (OWNER_SCRUBBOT_RAILROAD_DECISION_V01): a below-board /
-	# slot-style start (the owner-facing production activation path — real SlotCells
-	# sit below the board) travels on the railroad, not the M21 adjacent one-cell
-	# ring. The ring exterior lane is superseded for this path (M22-C001 V02); it is
-	# retained below only for non-below-board debug/test starts (e.g. left/right
-	# injection points in low-level dispatch/clearing regressions), which the owner
-	# slot-connector law does not cover.
-	if _is_below_board_start(request, board):
+	# Scrubbot Railroad V1 (OWNER_SCRUBBOT_RAILROAD_DECISION_V01): EVERY current
+	# production OUTSIDE start travels on the railroad. The exact M21 adjacent
+	# one-cell ring (x=-1 / x=W / y=-1 / y=H) is fully superseded as a production
+	# exterior movement lane (M22-C001 V03, F-M22-V02-STRICT-001) — it is no longer
+	# constructed or searched anywhere below. Real SlotCell starts sit below the
+	# board and route exact-anchor → BOTTOM connector → rail-only travel → aligned
+	# exit → assigned target; top/left/right outside starts use the same
+	# rail-compatible policy (bottom connector) or fail closed via access truth.
+	# Only a genuine INSIDE-board start (debug/test) reaches the interior planner
+	# below, which no longer touches any exterior ring.
+	if _is_outside_start(request, board):
 		return _railroad_route(request, board, access_query)
 
-	# Backbone: complete deterministic grid-aware reachability/path.
+	# Interior debug/test backbone (INSIDE-board starts only): deterministic
+	# grid-aware reachability/path. No exterior ring is seeded or traversed.
 	var cell_path: Array = _bfs_cell_path(request, board, access_query)
 	var target_center: Vector2 = RouteRequest.center_of_index(board, idx)
 	if cell_path.is_empty():
@@ -123,10 +127,15 @@ func compute_route(request, board, access_query) -> RefCounted:
 # here so it can never turn a rail route into a diagonal free-space shortcut
 # (criteria M22-V02-074/075).
 
-## A below-board / slot-style start (y at or below the board bottom boundary). This
-## is the owner-facing production activation path; such starts route on the rail.
-func _is_below_board_start(request, board) -> bool:
-	return request.start_position.y >= float(board.get_height())
+## Any start whose cell lies OUTSIDE the board (below/top/left/right). All such
+## current production starts route on the railroad; the obsolete adjacent ring is
+## never used. Only genuine inside-board starts fall through to the interior
+## debug/test planner.
+func _is_outside_start(request, board) -> bool:
+	var sp: Vector2 = request.start_position
+	var cx: int = int(floor(sp.x))
+	var cy: int = int(floor(sp.y))
+	return cx < 0 or cy < 0 or cx >= board.get_width() or cy >= board.get_height()
 
 ## Build the Railroad V1 route for the already-assigned target. Evaluates the four
 ## aligned exit sides in the owner tie-break order (BOTTOM → LEFT → RIGHT → TOP),
@@ -287,25 +296,10 @@ func _bfs_cell_path(request, board, access_query) -> Array:
 	for entry in perim:
 		var c: Vector2i = entry["c"]
 		_try_entry.call(c.x, c.y)
-	# Owner-locked V07 one-cell exterior walking corridor: seed the ring band just
-	# outside the board (top y=-1, bottom y=H, left x=-1, right x=W, incl. corners),
-	# each reachable from the exact slot origin by one access-valid connector segment.
-	# Ring cells are exterior/open per ProductionAccessQuery (outside-board -> OPEN);
-	# the access seam is NOT changed. Routing space only — never LevelData/BoardState.
-	var ring: Array = []
-	for yy in range(-1, h + 1):
-		for xx in range(-1, w + 1):
-			var rc := Vector2i(xx, yy)
-			if _is_ring(rc, w, h):
-				var rcenter := Vector2(float(xx) + 0.5, float(yy) + 0.5)
-				ring.append({"c": rc, "d": request.start_position.distance_squared_to(rcenter)})
-	ring.sort_custom(func(a, b):
-		if a["d"] != b["d"]:
-			return a["d"] < b["d"]
-		return (a["c"].y * (w + 2) + a["c"].x) < (b["c"].y * (w + 2) + b["c"].x))
-	for entry in ring:
-		var rc2: Vector2i = entry["c"]
-		_try_entry.call(rc2.x, rc2.y)
+	# NOTE (M22-C001 V03, F-M22-V02-STRICT-001): the obsolete M21 one-cell exterior
+	# ring band is NOT seeded here. Outside starts route on the railroad (handled in
+	# compute_route); this interior planner only reaches genuine inside-board
+	# debug/test starts and searches inside-board cells only.
 
 	if queue.is_empty():
 		return []
@@ -322,9 +316,9 @@ func _bfs_cell_path(request, board, access_query) -> Array:
 				return _reconstruct(parent, target_cell, START)
 		for d in NEIGHBORS:
 			var n := cur + d
-			# Traverse inside-board cells AND the one-cell exterior ring (V07). Anything
-			# beyond that one-cell ring is never searched.
-			if not (_inside(n, w, h) or _is_ring(n, w, h)) or visited.has(n):
+			# Interior planner: traverse INSIDE-board cells only. No exterior ring
+			# is searched (superseded by Railroad V1; F-M22-V02-STRICT-001).
+			if not _inside(n, w, h) or visited.has(n):
 				continue
 			if _classify(access_query, n.x, n.y, idx) != ProductionAccessQuery.CellClass.OPEN:
 				continue
@@ -346,15 +340,6 @@ func _start_cell(request, access_query) -> Vector2i:
 
 func _inside(c: Vector2i, w: int, h: int) -> bool:
 	return c.x >= 0 and c.y >= 0 and c.x < w and c.y < h
-
-## Owner-locked V07 one-cell exterior walking corridor: the border band exactly one
-## logical cell outside the board — every cell in the bounding box [-1..W]x[-1..H]
-## that is not an inside-board cell (top y=-1, bottom y=H, left x=-1, right x=W,
-## corners included). Routing/planner space only; never a LevelData/BoardState cell.
-func _is_ring(c: Vector2i, w: int, h: int) -> bool:
-	if c.x < -1 or c.y < -1 or c.x > w or c.y > h:
-		return false
-	return not _inside(c, w, h)
 
 func _reconstruct(parent: Dictionary, goal: Vector2i, start_sentinel: Vector2i) -> Array:
 	var path: Array = []
