@@ -37,6 +37,8 @@ const ProductionTargetAccess = preload("res://scripts/gameplay/dispatch/producti
 const CompleteClearingLoop = preload("res://scripts/gameplay/clearing/complete_clearing_loop.gd")
 const PaletteColors = preload("res://scripts/data/palette_colors.gd")
 const ColorSelectionPanel = preload("res://scripts/ui/color_selection_panel.gd")
+const ScrubRailView = preload("res://scripts/ui/scrub_rail_view.gd")
+const ScrubRailGeometry = preload("res://scripts/gameplay/routing/scrub_rail_geometry.gd")
 
 const LEVEL_PATH := "res://data/levels/m21_level_001_hazard_bot.json"
 const BG01 := Color8(32, 37, 51, 255)
@@ -53,6 +55,7 @@ var _loop
 var _dispatcher
 var _slots
 var _panel                  # ColorSelectionPanel
+var _rail_view              # ScrubRailView (Railroad V1 presentation)
 var _lvl
 ## Per-assignment presentation bookkeeping: owner_id -> {slot=int, agent=Object}.
 ## A slot is active iff it has >=1 still-in-flight assignment (concurrency-correct).
@@ -92,6 +95,17 @@ func build() -> void:
 	_renderer = _presentation.get_renderer()
 	_agent_layer = _presentation.get_agent_layer()
 
+	# Railroad V1 presentation: same board-local transform as the agents, inserted
+	# just under the AgentLayer so Scrubbots draw on top of the rail. Consumes the
+	# single-source ScrubRailGeometry via the board W/H.
+	_rail_view = ScrubRailView.new()
+	_presentation.add_child(_rail_view)
+	_presentation.move_child(_rail_view, _agent_layer.get_index())
+	_rail_view.position = Vector2.ZERO
+	var cs: float = _presentation.get_cell_size()
+	_rail_view.scale = Vector2(cs, cs)
+	_rail_view.configure(_board.get_width(), _board.get_height())
+
 	_dispatcher = ScrubbotDispatcher.new()
 	add_child(_dispatcher)
 	_dispatcher.bind(_board, selector, reservations, routing, routing_access, select_access, _agent_layer)
@@ -114,7 +128,15 @@ func _build_panel() -> void:
 		colors.append(parse.colors[pid] if pid >= 0 and pid < parse.colors.size() else Color(1, 0, 1, 1))
 	_panel = ColorSelectionPanel.new()
 	_panel.name = "ColorSelectionPanel"
-	_panel.position = Vector2(BOARD_ORIGIN.x, BOARD_ORIGIN.y + BOARD_DISPLAY.y + 40.0)
+	# Slots sit BELOW the bottom rail, never inside the 2-cell artwork clearance
+	# (owner §4 / criteria M22-V02-065). Bottom-rail outer edge is board-local
+	# y = H + (CENTER_OFFSET + RAIL_WIDTH*0.5) = H + 3; place the panel one cell
+	# below that. Mapped board-local anchor y therefore exceeds the rail, so the
+	# slot start is a genuine below-board railroad start.
+	var cs: float = _presentation.get_cell_size()
+	var rail_outer_local: float = float(_board.get_height()) + ScrubRailGeometry.CENTER_OFFSET + ScrubRailGeometry.RAIL_WIDTH * 0.5
+	var panel_y: float = BOARD_ORIGIN.y + (rail_outer_local + 1.0) * cs
+	_panel.position = Vector2(BOARD_ORIGIN.x, panel_y)
 	add_child(_panel)
 	_panel.bind_colors(colors)
 	_panel.slot_activated.connect(_on_slot_activated)
@@ -192,3 +214,6 @@ func get_agent_layer() -> Node2D:
 
 func get_panel():
 	return _panel
+
+func get_rail_view():
+	return _rail_view

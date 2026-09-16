@@ -243,6 +243,10 @@ func _initialize() -> void:
 	# M22-C001 V01 — production five-slot UI foundation.
 	_run_m22_slot_component_tests()
 	_run_m22_integration_active_tests()
+	# M22-C001 V02 — Scrubbot Railroad V1 geometry / routing / integration.
+	_run_m22_railroad_geometry_tests()
+	_run_m22_railroad_routing_tests()
+	_run_m22_railroad_integration_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -13343,7 +13347,17 @@ func _v07_has_exterior_point(points: PackedVector2Array, w: int, h: int) -> bool
 	return false
 
 func _run_m21_v07_corridor_tests() -> void:
-	print("---- M21-C001 V07: exterior one-cell routing corridor (four-side matrix) ----")
+	# M22-C001 V02 supersession note: the exact M21 adjacent one-cell ring
+	# (x=-1 / x=W / y=-1 / y=H) is HISTORICAL. Below-board (slot-style, y>=H) starts
+	# now travel the Scrubbot Railroad V1 (ScrubRailGeometry) instead of that ring;
+	# non-below starts retain the compatible exterior path. These checks intentionally
+	# assert only the SAFETY INTENT preserved across both geometries — exterior travel
+	# is load-bearing (outside-board point present), the direct diagonal shot stays
+	# blocked, the route starts at the exact slot origin and ends at the target centre,
+	# four-side/corner + rectangular + 59x59 coverage, and enclosed interior targets
+	# stay unreachable (no tunnelling). Exact Railroad V1 geometry is proven in
+	# _run_m22_railroad_* tests; this is not cited as current exact-geometry acceptance.
+	print("---- M21-C001 V07: exterior routing corridor (safety intent; ring superseded by Railroad V1) ----")
 	# --- bottom: below-board origin -> far-left bottom perimeter via bottom ring ---
 	var wb := 20; var hb := 20
 	var bb = _v07_all_active(wb, hb)
@@ -13561,3 +13575,206 @@ func _m22_drive_agent(agent) -> void:
 		if not is_instance_valid(agent) or not agent.is_moving():
 			break
 		agent.advance(1.0)
+
+# ============================================================================
+# M22-C001 V02 — Scrubbot Railroad V1 (single-source geometry + rail routing)
+# ============================================================================
+
+## Railroad route from a below-board (slot-style) start. Reuses the production
+## routing + access exactly as the dispatcher/loop do.
+func _rail_route(board, start: Vector2, idx: int) -> Dictionary:
+	var routing = ProductionRoutingSystemM21.new()
+	var access = ProductionAccessQueryM21.new(board)
+	var req = RouteRequest.for_target(board, start, idx)
+	return {"r": routing.compute_route(req, board, access), "access": access}
+
+func _rail_axis_aligned(pts: PackedVector2Array) -> bool:
+	for i in range(pts.size() - 1):
+		var d: Vector2 = pts[i + 1] - pts[i]
+		if absf(d.x) > 0.0001 and absf(d.y) > 0.0001:
+			return false
+	return true
+
+func _rail_has_point_with(pts: PackedVector2Array, axis: String, value: float) -> bool:
+	for p in pts:
+		if axis == "x" and absf(p.x - value) < 0.001:
+			return true
+		if axis == "y" and absf(p.y - value) < 0.001:
+			return true
+	return false
+
+## §D/L geometry unit contract for ScrubRailGeometry (single source).
+func _run_m22_railroad_geometry_tests() -> void:
+	print("---- M22-C001 V02: ScrubRailGeometry single-source geometry ----")
+	var Geo = load("res://scripts/gameplay/routing/scrub_rail_geometry.gd")
+	# 127/128/137: exact centrelines + 2.0 clearance + 1.0 rail width + 2.5 offset
+	# for several square/rectangular sizes incl. 59x59.
+	for dim in [Vector2i(20, 20), Vector2i(24, 38), Vector2i(30, 12), Vector2i(59, 59)]:
+		var g = Geo.new(dim.x, dim.y)
+		_check(g.is_valid(), "M22-V02 geom(%s): valid" % str(dim))
+		_check(g.clearance() == 2.0, "M22-V02-035 geom(%s): clearance exactly 2.0" % str(dim))
+		_check(g.rail_width() == 1.0, "M22-V02-037 geom(%s): rail width exactly 1.0" % str(dim))
+		_check(g.center_offset() == 2.5, "M22-V02-038 geom(%s): centre offset 2.5" % str(dim))
+		_check(g.top_y() == -2.5, "M22-V02-039 geom(%s): TOP y=-2.5" % str(dim))
+		_check(g.bottom_y() == float(dim.y) + 2.5, "M22-V02-040 geom(%s): BOTTOM y=H+2.5" % str(dim))
+		_check(g.left_x() == -2.5, "M22-V02-041 geom(%s): LEFT x=-2.5" % str(dim))
+		_check(g.right_x() == float(dim.x) + 2.5, "M22-V02-042 geom(%s): RIGHT x=W+2.5" % str(dim))
+		# 129/043: four exact corner centres.
+		var corners: PackedVector2Array = g.corners()
+		_check(corners.size() == 4, "M22-V02-043 geom(%s): four corners" % str(dim))
+		_check(corners[0] == Vector2(-2.5, -2.5), "M22-V02-043 geom(%s): TL corner" % str(dim))
+		_check(corners[1] == Vector2(float(dim.x) + 2.5, -2.5), "M22-V02-043 geom(%s): TR corner" % str(dim))
+		_check(corners[2] == Vector2(float(dim.x) + 2.5, float(dim.y) + 2.5), "M22-V02-043 geom(%s): BR corner" % str(dim))
+		_check(corners[3] == Vector2(-2.5, float(dim.y) + 2.5), "M22-V02-043 geom(%s): BL corner" % str(dim))
+		# exit alignment: TOP/BOTTOM share target x; LEFT/RIGHT share target y.
+		var tc := Vector2(5.5, 7.5)
+		_check(g.exit_point(Geo.Side.BOTTOM, tc) == Vector2(5.5, float(dim.y) + 2.5), "M22-V02-079 geom(%s): BOTTOM exit shares target x" % str(dim))
+		_check(g.exit_point(Geo.Side.TOP, tc) == Vector2(5.5, -2.5), "M22-V02-079 geom(%s): TOP exit shares target x" % str(dim))
+		_check(g.exit_point(Geo.Side.LEFT, tc) == Vector2(-2.5, 7.5), "M22-V02-080 geom(%s): LEFT exit shares target y" % str(dim))
+		_check(g.exit_point(Geo.Side.RIGHT, tc) == Vector2(float(dim.x) + 2.5, 7.5), "M22-V02-080 geom(%s): RIGHT exit shares target y" % str(dim))
+	# 130/048: invalid geometry input fails closed (no fault, no non-finite output).
+	_check(not Geo.new(0, 20).is_valid(), "M22-V02-130 geom: zero width fails closed")
+	_check(not Geo.new(-5, 20).is_valid(), "M22-V02-130 geom: negative dim fails closed")
+	_check(not Geo.new(NAN, 20).is_valid(), "M22-V02-130 geom: NaN dim fails closed")
+	_check(not Geo.new("x", 20).is_valid(), "M22-V02-130 geom: non-numeric dim fails closed")
+	# rail_path returns corner waypoints between two sides (BL corner bottom->left).
+	var g2 = Geo.new(20, 20)
+	var rp = g2.rail_path(Vector2(10.0, 22.5), Vector2(-2.5, 5.5))
+	_check(rp["points"].size() >= 1 and rp["points"][0] == Vector2(-2.5, 22.5), "M22-V02-071 geom: bottom->left rail path turns through BL corner")
+
+## §G rail-confined routing (single-target, no retarget).
+func _run_m22_railroad_routing_tests() -> void:
+	print("---- M22-C001 V02: Railroad V1 routing law ----")
+	var w := 20
+	var h := 20
+	var bottom_y := float(h) + 2.5
+	# --- far-left bottom target: connector -> bottom rail -> aligned exit -> target ---
+	var b = _v07_all_active(w, h)
+	var t_bl: int = b.get_cell_index(0, h - 1)  # (0,19)
+	var start := Vector2(10.0, float(h) + 1.0)  # below-board slot-style start
+	var rr = _rail_route(b, start, t_bl)
+	var r = rr["r"]
+	_check(r.success, "M22-V02-132 route: far-left bottom target reachable via bottom rail")
+	if r.success:
+		var pts: PackedVector2Array = r.get_points()
+		_check(pts[0] == start, "M22-V02-076 route: first point == exact slot start")
+		_check(pts.size() >= 2 and absf(pts[1].y - bottom_y) < 0.001, "M22-V02-077/131: connector enters BOTTOM rail (points[1]) before lateral travel")
+		_check(pts[pts.size() - 1].is_equal_approx(Vector2(0.5, 19.5)), "M22-V02-082 route: final endpoint == target centre")
+		_check(_rail_axis_aligned(pts), "M22-V02-081/136/072: every segment orthogonal (no diagonal shortcut/approach)")
+		_check(absf(pts[pts.size() - 2].x - 0.5) < 0.001, "M22-V02-079 route: bottom exit shares target x (aligned exit)")
+	# --- two rail sides: left-edge interior target only reachable from LEFT (BL corner) ---
+	var t_left: int = b.get_cell_index(0, 5)  # (0,5); bottom/right/top blocked by ACTIVE
+	var rl = _rail_route(b, start, t_left)
+	_check(rl["r"].success, "M22-V02-133/086: blocked-preferred exit falls back to a legal aligned side (LEFT) for SAME target")
+	if rl["r"].success:
+		var lp: PackedVector2Array = rl["r"].get_points()
+		_check(_rail_has_point_with(lp, "y", bottom_y), "M22-V02-134 route: uses BOTTOM rail (entry)")
+		_check(_rail_has_point_with(lp, "x", -2.5) and _rail_has_point_with(lp, "y", bottom_y), "M22-V02-134 route: traverses TWO sides via BL corner (bottom + left)")
+		_check(_rail_has_point_with(lp, "x", -2.5), "M22-V02-080 route: exits on LEFT rail aligned with target y")
+		_check(_rail_axis_aligned(lp), "M22-V02-135 route: no forbidden free-space diagonal wandering")
+		_check(lp[lp.size() - 1].is_equal_approx(Vector2(0.5, 5.5)), "M22-V02-082 route: LEFT approach ends at target centre")
+	# --- all aligned sides blocked: enclosed interior -> NO_ROUTE, no retarget, no side effect ---
+	var t_in: int = b.get_cell_index(10, 10)
+	var active_before: int = b.count_cells_by_state(BoardState.CellState.ACTIVE)
+	var rin = _rail_route(b, start, t_in)
+	_check(not rin["r"].success, "M22-V02-087/099: enclosed interior target -> no route")
+	_check(rin["r"].failure_reason == RouteResult.FailureReason.NO_ROUTE, "M22-V02-087 route: failure reason NO_ROUTE")
+	_check(rin["r"].target_index == t_in, "M22-V02-087 route: no retarget (target index retained)")
+	_check(b.count_cells_by_state(BoardState.CellState.ACTIVE) == active_before, "M22-V02-101 route: failed route mutates no BoardState")
+	# --- shortest legal route: both BOTTOM and LEFT legal, BOTTOM shorter -> BOTTOM chosen ---
+	var start_r := Vector2(18.0, float(h) + 1.0)
+	var rs = _rail_route(b, start_r, t_bl)
+	_check(rs["r"].success, "M22-V02-088 route: reachable from a right-side start")
+	if rs["r"].success:
+		var sp: PackedVector2Array = rs["r"].get_points()
+		_check(absf(sp[sp.size() - 2].y - bottom_y) < 0.001, "M22-V02-088 route: shortest legal route chose the BOTTOM aligned exit")
+	# --- deterministic tie-break: LEFT vs RIGHT EXACTLY equal -> LEFT (BOTTOM/TOP
+	# blocked). Odd width 19 makes cell col 9's centre x=9.5 == rail-loop horizontal
+	# midpoint ((-2.5 + 21.5)/2), so LEFT/RIGHT rail + approach distances are equal. ---
+	var tw := 19
+	var th := 19
+	var bt = _v07_all_active(tw, th)
+	for x in range(tw):
+		if x != 9:
+			bt.set_cell_state(bt.get_cell_index(x, 9), BoardState.CellState.CLEARED)  # clear row 9 except (9,9)
+	var t_tie: int = bt.get_cell_index(9, 9)
+	var start_c := Vector2(9.5, float(th) + 1.0)  # exact horizontal midpoint of the rail loop
+	var rtie = _rail_route(bt, start_c, t_tie)
+	_check(rtie["r"].success, "M22-V02-140 route: row-cleared target reachable from LEFT/RIGHT")
+	if rtie["r"].success:
+		var tp: PackedVector2Array = rtie["r"].get_points()
+		_check(_rail_has_point_with(tp, "x", -2.5) and not _rail_has_point_with(tp, "x", float(tw) + 2.5), "M22-V02-140/089: equal-distance tie-break picks LEFT before RIGHT")
+	# --- rectangular board ---
+	var brc = _v07_all_active(30, 12)
+	var rrect = _rail_route(brc, Vector2(15.0, 13.0), brc.get_cell_index(0, 11))
+	_check(rrect["r"].success, "M22-V02-122 route: rectangular 30x12 far-left bottom reachable")
+	# --- 59x59 ---
+	var b59 = _v07_all_active(59, 59)
+	var r59 = _rail_route(b59, Vector2(29.0, 60.0), b59.get_cell_index(0, 58))
+	_check(r59["r"].success, "M22-V02-123 route: 59x59 far-left bottom reachable via rail")
+
+## §F/J real production integration through the M22 demo (connector+rail+exit).
+func _run_m22_railroad_integration_tests() -> void:
+	print("---- M22-C001 V02: production demo Railroad V1 integration ----")
+	var scene = load("res://scenes/demo/m22_slot_demo.tscn")
+	_check(scene != null, "M22-V02 integ: demo scene loads (no parse error)")
+	if scene == null:
+		return
+	var inst = scene.instantiate()
+	root.add_child(inst)
+	if inst._board == null:
+		inst.build()
+	var panel = inst.get_panel()
+	var rail_view = inst.get_rail_view()
+	_check(rail_view != null and rail_view.get_geometry() != null and rail_view.get_geometry().is_valid(), "M22-V02-050 integ: rail view present with valid single-source geometry")
+	var h: int = inst._board.get_height()
+	var bottom_y := float(h) + 2.5
+	# 065: slot panel sits BELOW the bottom rail outer edge, not in the clearance.
+	var cs: float = inst.get_presentation().get_cell_size()
+	var rail_outer_screen: float = inst.BOARD_ORIGIN.y + (float(h) + 3.0) * cs
+	_check(panel.position.y > rail_outer_screen, "M22-V02-065 integ: slot panel positioned below the bottom rail")
+	# 141/096: real Button C08 click -> natural target 380/(0,19) via connector+rail+exit.
+	inst._last_result = null
+	panel.get_cell(2).pressed.emit()
+	var r2 = inst._last_result
+	_check(r2 != null and r2.success, "M22-V02-141 integ: production panel C08 click dispatches through real chain")
+	if r2 != null and r2.success:
+		_check_eq(r2.target_index, 380, "M22-V02-096 integ: first fresh C08 naturally selects target 380")
+		_check_eq(inst._board.get_cell_position(r2.target_index), Vector2i(0, 19), "M22-V02-096 integ: target coordinate (0,19)")
+		var pts: PackedVector2Array = r2.agent.get_route_points()
+		_check(pts[0].distance_to(r2.agent.spawn_origin) < 0.001, "M22-V02-076 integ: real agent route starts at mapped slot anchor")
+		_check(absf(pts[1].y - bottom_y) < 0.001, "M22-V02-077 integ: real agent enters BOTTOM rail before lateral travel")
+		_check(_rail_axis_aligned(pts), "M22-V02-142 integ: real agent path has no exterior diagonal shortcut (all orthogonal)")
+		_check(_rail_has_point_with(pts, "y", bottom_y), "M22-V02-097 integ: agent travels the bottom rail (aligned exit, not crossing ACTIVE)")
+		_check(pts[pts.size() - 1].is_equal_approx(Vector2(0.5, 19.5)), "M22-V02-082 integ: agent route ends at target centre")
+	# 098/143/109: rapid x3 real activations -> unique targets/owners, active visual.
+	inst.reset_presentation()
+	var a = inst.request_slot(2)
+	var b2 = inst.request_slot(2)
+	var c = inst.request_slot(2)
+	_check(a.success and b2.success and c.success, "M22-V02-109 integ: three rapid C08 assignments succeed")
+	_check(a.target_index != b2.target_index and b2.target_index != c.target_index and a.target_index != c.target_index, "M22-V02-098 integ: three rapid C08 targets unique")
+	_check(a.owner_id != b2.owner_id and b2.owner_id != c.owner_id and a.owner_id != c.owner_id, "M22-V02-094 integ: reservation owners unique (atomic, no duplicate assignment)")
+	_check(a.target_index == 380, "M22-V02-098 integ: first rapid C08 target is 380")
+	_check(panel.is_slot_active(2), "M22-V02-111 integ: slot active with concurrent rail-routed agents")
+	# 112: reset while >=2 agents still travelling releases assignments without clearing targets.
+	var cleared_before: int = inst._board.count_cells_by_state(BoardState.CellState.CLEARED)
+	var still_moving := 0
+	for res in [a, b2, c]:
+		if is_instance_valid(res.agent) and res.agent.is_moving():
+			still_moving += 1
+	_check(still_moving >= 2, "M22-V02-144 integ: at least two agents still in rail travel before reset")
+	inst.reset_presentation()
+	_check_eq(inst.active_count_for_slot(2), 0, "M22-V02-112 integ: reset clears in-flight assignment bookkeeping")
+	_check(not panel.is_slot_active(2), "M22-V02-112 integ: reset clears active visuals")
+	_check_eq(inst._board.count_cells_by_state(BoardState.CellState.CLEARED), cleared_before, "M22-V02-112 integ: reset does not clear the unarrived targets")
+	# 095: no-work slot still produces no assignment/no clear.
+	var r0 = inst.request_slot(0)
+	_check(r0 != null and not r0.success, "M22-V02-095 integ: no-work slot (C01 enclosed) produces no assignment")
+	# 145/032: malformed bind_colors fails closed, does not fabricate a canonical colour.
+	var vp = panel  # reuse existing 5-cell panel
+	_check(vp.bind_colors([]) == false, "M22-V02-145 integ: empty bind_colors rejected")
+	_check(vp.bind_colors([Color.RED, Color.RED, Color.RED]) == false, "M22-V02-145 integ: undersized bind_colors rejected")
+	_check(vp.bind_colors(["x", "y", "z", "w", "v"]) == false, "M22-V02-145 integ: non-Color bind_colors rejected")
+	_check(vp.bind_colors([Color.RED, Color.GREEN, Color.BLUE, Color.YELLOW, Color.CYAN]) == true, "M22-V02-032 integ: valid five-colour bind still succeeds")
+	inst.free()

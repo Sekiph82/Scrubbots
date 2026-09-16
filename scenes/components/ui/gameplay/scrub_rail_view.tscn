@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://c22m0scrubrail1"]
+
+; M22-C001 V02 reusable Scrubbot Railroad V1 presentation. Node2D drawn in
+; board-local cell units; the parent applies the board cell-size scale. Consumes
+; the single-source ScrubRailGeometry. Presentation only — no gameplay truth.
+
+[ext_resource type="Script" path="res://scripts/ui/scrub_rail_view.gd" id="1_rail"]
+
+[node name="ScrubRailView" type="Node2D"]
+script = ExtResource("1_rail")
