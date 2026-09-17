@@ -5,10 +5,10 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M24
-- Current Sprint: M24-C001 V01 — Five-Slot Batch Engine continuous implementation
-- Current Task: M24-C001-V01
-- Current Task Status: IN_PROGRESS
-- Next Task/Action: Claude executes `coordination/sessions/M24-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M24-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, then runs all five M24 work packages in order without intermediate handoff, completes `SB-M24-001..030`, pushes implementation commits, then `CLAUDE_LOG_V01.md` separately and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
+- Current Sprint: M24-C001 V02 — Five-Slot placement transaction serialization hardening
+- Current Task: M24-C001-V02
+- Current Task Status: CHANGES_REQUIRED
+- Next Task/Action: Claude executes `coordination/sessions/M24-C001/CHATGPT_PROMPT_V02.md` under `coordination/sessions/M24-C001/CHATGPT_AUDIT_CRITERIA_V02.md`, closes all findings in `coordination/sessions/M24-C001/CHATGPT_AUDIT_V01.md`, preserves accepted M24 V01 ordinary behavior and all M23/M22 gameplay contracts, pushes implementation first, then `CLAUDE_LOG_V02.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
