@@ -247,6 +247,8 @@ func _initialize() -> void:
 	_run_m22_railroad_geometry_tests()
 	_run_m22_railroad_routing_tests()
 	_run_m22_railroad_integration_tests()
+	# M22-C001 V07 — post-rail interior orthogonal turning.
+	_run_m22_v07_interior_turn_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -13885,3 +13887,162 @@ func _v03_inside_reqs(board, targets: Array) -> Array:
 		if rq != null:
 			reqs.append(rq)
 	return reqs
+
+# ============================================================================
+# M22-C001 V07 — post-rail interior-turn routing (owner interior-path revision)
+# ============================================================================
+
+## Direction of each non-zero route segment in BOARD coords (y grows downward):
+## U=up(toward top,-y) D=down(+y) L=left(-x) R=right(+x). Connector/rail included.
+func _v07_dirs(pts: PackedVector2Array) -> Array:
+	var out: Array = []
+	for i in range(pts.size() - 1):
+		var d: Vector2 = pts[i + 1] - pts[i]
+		if absf(d.x) > 0.001 and absf(d.y) > 0.001:
+			out.append("X")  # diagonal (must never appear)
+		elif absf(d.x) > 0.001:
+			out.append("R" if d.x > 0 else "L")
+		elif absf(d.y) > 0.001:
+			out.append("D" if d.y > 0 else "U")
+	return out
+
+## True iff dir list contains adjacent pair a then b somewhere.
+func _v07_has_seq(dirs: Array, a: String, b: String) -> bool:
+	for i in range(dirs.size() - 1):
+		if dirs[i] == a and dirs[i + 1] == b:
+			return true
+	return false
+
+## Count 90-degree turns (adjacent segments with differing orthogonal direction).
+func _v07_turn_count(dirs: Array) -> int:
+	var n := 0
+	for i in range(dirs.size() - 1):
+		if dirs[i] != dirs[i + 1]:
+			n += 1
+	return n
+
+## Carve a CLEARED cell.
+func _v07_clear(board, x: int, y: int) -> void:
+	board.set_cell_state(board.get_cell_index(x, y), BoardState.CellState.CLEARED)
+
+func _run_m22_v07_interior_turn_tests() -> void:
+	print("---- M22-C001 V07: post-rail interior orthogonal turning ----")
+	var start := Vector2(10.0, 21.0)  # below-board slot-style start
+
+	# 030: straight BOTTOM-to-target still works (all-active, bottom-left target).
+	var b0 = _v07_all_active(20, 20)
+	var r0 = _rail_route(b0, start, b0.get_cell_index(0, 19))
+	_check(r0["r"].success, "M22-V07-030: straight BOTTOM-to-target still succeeds")
+	if r0["r"].success:
+		_check(not _v07_dirs(r0["r"].get_points()).has("X"), "M22-V07-030: no diagonal segment")
+
+	# 031: BOTTOM rail -> ingress -> up -> LEFT turn -> target.
+	# Corridor: bottom ingress col5 up to row15, then left to target (3,15).
+	var b1 = _v07_all_active(20, 20)
+	for y in range(15, 20):
+		_v07_clear(b1, 5, y)         # vertical corridor col 5, rows 15..19
+	_v07_clear(b1, 4, 15)            # step left toward target
+	var t1 = b1.get_cell_index(3, 15)
+	var acc1 = ProductionAccessQueryM21.new(b1)
+	_check(not acc1.is_segment_traversable(Vector2(3.5, 22.5), Vector2(3.5, 15.5), t1), "M22-V07-031: straight BOTTOM approach to (3,15) is blocked (turn is load-bearing)")
+	var r1 = _rail_route(b1, start, t1)
+	_check(r1["r"].success, "M22-V07-031: BOTTOM -> up -> LEFT turn -> target succeeds")
+	if r1["r"].success:
+		var d1 := _v07_dirs(r1["r"].get_points())
+		_check(not d1.has("X"), "M22-V07-031: route fully orthogonal (no diagonal)")
+		_check(_v07_has_seq(d1, "U", "L"), "M22-V07-031: contains an up-then-LEFT interior turn")
+		_check(r1["r"].get_points()[r1["r"].get_points().size() - 1].is_equal_approx(Vector2(3.5, 15.5)), "M22-V07-031: ends at target (3,15)")
+
+	# 032: mirrored BOTTOM -> ingress -> up -> RIGHT turn -> target (16,15).
+	var b2 = _v07_all_active(20, 20)
+	for y in range(15, 20):
+		_v07_clear(b2, 14, y)
+	_v07_clear(b2, 15, 15)
+	var t2 = b2.get_cell_index(16, 15)
+	var r2 = _rail_route(b2, start, t2)
+	_check(r2["r"].success, "M22-V07-032: mirrored up -> RIGHT turn -> target succeeds")
+	if r2["r"].success:
+		var d2 := _v07_dirs(r2["r"].get_points())
+		_check(not d2.has("X"), "M22-V07-032: route fully orthogonal")
+		_check(_v07_has_seq(d2, "U", "R"), "M22-V07-032: contains an up-then-RIGHT interior turn")
+
+	# 033: two interior 90-degree turns (up -> right -> up) to target (8,10).
+	var b3 = _v07_all_active(20, 20)
+	for y in range(15, 20):
+		_v07_clear(b3, 5, y)         # up col 5
+	for x in range(5, 9):
+		_v07_clear(b3, x, 15)        # right along row 15 to col 8
+	for y in range(11, 16):
+		_v07_clear(b3, 8, y)         # up col 8 toward target (8,10)
+	var t3 = b3.get_cell_index(8, 10)
+	var r3 = _rail_route(b3, start, t3)
+	_check(r3["r"].success, "M22-V07-033: route with two interior 90-degree turns succeeds")
+	if r3["r"].success:
+		var d3 := _v07_dirs(r3["r"].get_points())
+		_check(not d3.has("X"), "M22-V07-033: route fully orthogonal")
+		# interior turns (exclude the connector->rail and rail-corner exterior turns
+		# is hard to isolate; require at least two turns total AND both U->R and R->U).
+		_check(_v07_has_seq(d3, "U", "R") and _v07_has_seq(d3, "R", "U"), "M22-V07-033: has up->right and right->up interior turns")
+
+	# 034: same corridor with one required cell ACTIVE -> no route.
+	var b4 = _v07_all_active(20, 20)
+	for y in range(15, 20):
+		_v07_clear(b4, 5, y)
+	_v07_clear(b4, 4, 15)
+	b4.set_cell_state(b4.get_cell_index(5, 17), BoardState.CellState.ACTIVE)  # re-block corridor
+	var t4 = b4.get_cell_index(3, 15)
+	var active_before = b4.count_cells_by_state(BoardState.CellState.ACTIVE)
+	var r4 = _rail_route(b4, start, t4)
+	_check(not r4["r"].success and r4["r"].failure_reason == RouteResult.FailureReason.NO_ROUTE, "M22-V07-034: blocking one corridor cell -> NO_ROUTE")
+	_check(r4["r"].target_index == t4, "M22-V07-034/036: no retarget (target index retained)")
+	_check(b4.count_cells_by_state(BoardState.CellState.ACTIVE) == active_before, "M22-V07-034: failed route mutates no BoardState")
+
+	# 035: diagonal-only apparent opening remains illegal. Target (3,15) with all
+	# orthogonal neighbours ACTIVE but a diagonal cleared cell (4,16).
+	var b5 = _v07_all_active(20, 20)
+	_v07_clear(b5, 4, 16)            # diagonal-adjacent to (3,15) only
+	for y in range(16, 20):
+		_v07_clear(b5, 4, y)         # give the diagonal cell a rail-reachable corridor
+	var t5 = b5.get_cell_index(3, 15)
+	var r5 = _rail_route(b5, start, t5)
+	_check(not r5["r"].success, "M22-V07-035: diagonal-only gap to target stays unreachable (no corner squeeze)")
+
+	# 037/038: rectangular board (40x24) interior-turn route stays rail-exterior + orthogonal.
+	var b6 = _v07_all_active(40, 24)
+	for y in range(15, 24):
+		_v07_clear(b6, 6, y)
+	_v07_clear(b6, 5, 15)
+	var t6 = b6.get_cell_index(4, 15)
+	var r6 = _rail_route(b6, Vector2(20.0, 25.0), t6)
+	_check(r6["r"].success, "M22-V07-038: rectangular 40x24 interior-turn route succeeds")
+	if r6["r"].success:
+		_check(not _v07_dirs(r6["r"].get_points()).has("X"), "M22-V07-038: rectangular route orthogonal")
+
+	# 039: 59x59 interior-turn route.
+	var b7 = _v07_all_active(59, 59)
+	for y in range(40, 59):
+		_v07_clear(b7, 10, y)
+	_v07_clear(b7, 9, 40)
+	var t7 = b7.get_cell_index(8, 40)
+	var r7 = _rail_route(b7, Vector2(29.0, 60.0), t7)
+	_check(r7["r"].success, "M22-V07-039: 59x59 interior-turn route succeeds")
+	if r7["r"].success:
+		_check(not _v07_dirs(r7["r"].get_points()).has("X"), "M22-V07-039: 59x59 route orthogonal")
+
+	# 040/041/042: owner-observed side-offset class (derived state). A matching cell
+	# that the OLD straight-only rule rejected but is reachable via ingress + turn.
+	var bo = _v07_all_active(20, 20)
+	for y in range(12, 20):
+		_v07_clear(bo, 7, y)         # corridor up col 7
+	for x in range(2, 8):
+		_v07_clear(bo, x, 12)        # then left along row 12 to the target column
+	var to = bo.get_cell_index(1, 12)  # side-offset target, not on col-7 straight line
+	var acc_o = ProductionAccessQueryM21.new(bo)
+	_check(not acc_o.is_segment_traversable(Vector2(1.5, 22.5), Vector2(1.5, 12.5), to), "M22-V07-041: old straight BOTTOM rule rejects side-offset target (1,12)")
+	var ro = _rail_route(bo, start, to)
+	_check(ro["r"].success, "M22-V07-041: side-offset target now targetable via rail ingress + 90-degree turn")
+	if ro["r"].success:
+		var pts_o: PackedVector2Array = ro["r"].get_points()
+		print("V07_OWNER_CLASS target_idx=%d coord=(1,12) corridor=col7[y12..19]+row12[x2..7] route=%s" % [to, str(pts_o)])
+		_check(_v07_has_seq(_v07_dirs(pts_o), "U", "L"), "M22-V07-042: owner-class route uses up-then-LEFT interior turn")
+		_check(pts_o[pts_o.size() - 1].is_equal_approx(Vector2(1.5, 12.5)), "M22-V07-042: owner-class route ends at (1,12)")
