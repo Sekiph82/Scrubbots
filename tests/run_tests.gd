@@ -14233,4 +14233,123 @@ func _run_m23_batch_supply_tests() -> void:
 	for c in bgt.keys(): bgrand += int(bgt[c])
 	_check(bg != null and bgrand == 3481, "M23 59x59: total quota == 3481 cells")
 	_check(str(bg.debug_snapshot()) == str(bg2.debug_snapshot()), "M23 59x59: deterministic (same seed identical)")
+	# F-M23-V01-STRICT-005: direct per-color conservation on the 59x59 fixture.
+	var bsrc := BatchSupplyGenerator.color_totals(blvl)
+	var bcolors_ok := bsrc.size() == 3
+	for c in bsrc.keys():
+		if int(bgt.get(c, 0)) != int(bsrc[c]):
+			bcolors_ok = false
+	_check(bcolors_ok, "M23 59x59: exact per-color conservation source==generated (each color)")
 	print("M23_PERF 59x59 x2 generate = %d ms" % elapsed)
+
+	_run_m23_v02_hardening_tests()
+
+## M23-C001 V02 — direct adversarial coverage for every prior audit finding
+## F-M23-V01-STRICT-001..005 (transaction forgery, malformed load, atomic reset,
+## strict LevelData validation, per-color conservation).
+func _run_m23_v02_hardening_tests() -> void:
+	print("---- M23-C001 V02: hardening (F-001..005) ----")
+
+	# ===== F-001: forged same-class transaction cannot mutate a live transaction ====
+	var fe = BatchSupplyEngine.create(3, 3)
+	fe.load_columns([
+		[ColorBatch.make("A0", 0, 1, 5), ColorBatch.make("A1", 0, 2, 5)],
+		[ColorBatch.make("B0", 1, 1, 5), ColorBatch.make("B1", 1, 2, 5)],
+		[ColorBatch.make("C0", 2, 1, 5)],
+	])
+	var before := str(fe.debug_snapshot())
+	var txa = fe.begin_front_selection(0)   # live transaction A (column 0)
+	var txb = fe.begin_front_selection(1)   # live transaction B (column 1)
+	# A forged object of the REAL class carrying A's live token id.
+	var forged_a = BatchSelectionTransaction.new(txa.get_token_id(), txa.get_column(), txa.get_front_batch_id(), txa.get_front_batch())
+	_check(not fe.commit(forged_a), "M23 V02 F001: forged same-class object with A's live id cannot commit")
+	_check(not fe.cancel(forged_a), "M23 V02 F001: forged object cannot cancel A")
+	_check(fe.has_open_transaction(txa), "M23 V02 F001: A still open after forged attempts")
+	_check(not fe.has_open_transaction(forged_a), "M23 V02 F001: forged object not reported as owner")
+	_check(str(fe.debug_snapshot()) == before, "M23 V02 F001: no column changed by forged commit/cancel")
+	# Same attack against B.
+	var forged_b = BatchSelectionTransaction.new(txb.get_token_id(), txb.get_column(), txb.get_front_batch_id(), txb.get_front_batch())
+	_check(not fe.commit(forged_b), "M23 V02 F001: forged object with B's id cannot commit B")
+	_check(not fe.cancel(forged_b), "M23 V02 F001: forged object with B's id cannot cancel B")
+	# Field mutation on A cannot redirect it to B's token/column.
+	txa._token_id = txb.get_token_id()
+	txa._column = txb.get_column()
+	_check(not fe.commit(txa), "M23 V02 F001: mutated A pointing at B's id cannot commit (identity mismatch)")
+	_check(str(fe.debug_snapshot()) == before, "M23 V02 F001: redirect attempt changed nothing")
+	# Both original transactions still legitimately usable (B first — A was mutated).
+	_check(fe.commit(txb), "M23 V02 F001: original B still commits after forge attempts")
+	_check_eq(fe.get_front(1).get_batch_id(), "B1", "M23 V02 F001: B advanced exactly one")
+	_check_eq(fe.get_front(0).get_batch_id(), "A0", "M23 V02 F001: column 0 untouched by all attacks")
+
+	# ===== F-002: load_columns must reject a real but corrupted ColorBatch =========
+	var le = BatchSupplyEngine.create(3, 3)
+	le.load_candidate([[ColorBatch.make("G0", 0, 3, 5)], [], []], 1, 5)
+	var good_snap := str(le.debug_snapshot())
+	# Directly instantiated, unpopulated ColorBatch (empty id / defaults).
+	var raw = ColorBatch.new()
+	_check(not le.load_columns([[raw], [], []]), "M23 V02 F002: directly-instantiated blank ColorBatch rejected")
+	# Real ColorBatch corrupted after construction: negative color id.
+	var corrupt_c = ColorBatch.make("H0", 0, 3, 5)
+	corrupt_c._color_id = -7
+	_check(not le.load_columns([[corrupt_c], [], []]), "M23 V02 F002: post-hoc negative color_id rejected")
+	# Real ColorBatch corrupted to zero quota.
+	var corrupt_q = ColorBatch.make("H1", 0, 3, 5)
+	corrupt_q._robot_count = 0
+	_check(not le.load_columns([[corrupt_q], [], []]), "M23 V02 F002: post-hoc zero robot_count rejected")
+	# Real ColorBatch corrupted to empty id.
+	var corrupt_id = ColorBatch.make("H2", 0, 3, 5)
+	corrupt_id._batch_id = ""
+	_check(not le.load_columns([[corrupt_id], [], []]), "M23 V02 F002: post-hoc empty batch_id rejected")
+	# Palette-bound violation via atomic load with known palette size.
+	var corrupt_pal = ColorBatch.make("H3", 4, 3, 5)  # valid for palette 5
+	_check(not le.load_candidate([[corrupt_pal], [], []], 1, 3), "M23 V02 F002: color_id >= known palette size rejected")
+	_check(str(le.debug_snapshot()) == good_snap, "M23 V02 F002: prior candidate preserved byte-for-byte after failed loads")
+
+	# ===== F-003: reset restores queue + seed + palette even after metadata mutation =
+	var rcells := [0,0,0, 1,1, 2,2,2,2, 3,3,3, 4,4,4,4]  # 4x4, colors 0..4
+	var rlvl = _m23_level(4, 4, rcells, 5)
+	var rge = BatchSupplyGenerator.generate(rlvl, 3, 3, 7)
+	var r_initial := str(rge.debug_snapshot())
+	var r_seed: int = rge.get_seed()
+	var r_pal: int = rge.get_palette_size()
+	_check(r_seed == 7 and r_pal == 5, "M23 V02 F003: generated candidate reports seed=7 palette=5")
+	# Mutate reporting metadata AND advance the queue.
+	rge.set_seed(999999)
+	rge.set_palette_size(2)
+	var rtok = rge.begin_front_selection(0)
+	rge.commit(rtok)
+	_check(rge.get_seed() == 999999 and rge.get_palette_size() == 2, "M23 V02 F003: setters mutated live metadata")
+	var stale = rge.begin_front_selection(1)
+	rge.reset()
+	_check(str(rge.debug_snapshot()) == r_initial, "M23 V02 F003: reset restores exact queue + seed + palette snapshot")
+	_check(rge.get_seed() == 7 and rge.get_palette_size() == 5, "M23 V02 F003: reset restored original seed/palette metadata")
+	_check(not rge.commit(stale), "M23 V02 F003: pre-reset transaction invalid after reset")
+	# Failed atomic load does not partially change committed state.
+	var pre_fail := str(rge.debug_snapshot())
+	_check(not rge.load_candidate([[ColorBatch.new()], [], []], 42, 9), "M23 V02 F003: malformed atomic load rejected")
+	_check(str(rge.debug_snapshot()) == pre_fail and rge.get_seed() == 7, "M23 V02 F003: failed load left queue+metadata untouched")
+
+	# ===== F-004: strict LevelData / foreign source validation =====================
+	_check(BatchSupplyGenerator.color_totals(null).is_empty(), "M23 V02 F004: null source -> {}")
+	_check(BatchSupplyGenerator.color_totals(RefCounted.new()).is_empty(), "M23 V02 F004: foreign RefCounted -> {}")
+	_check(BatchSupplyGenerator.generate(RefCounted.new(), 3, 3, 1) == null, "M23 V02 F004: foreign source generate -> null")
+	# LevelData with empty palette.
+	var lvl_nopal = LevelData.new(1, "x", "x", "TEST", 2, 2, PackedStringArray(), PackedInt32Array([0,0,0,0]))
+	_check(BatchSupplyGenerator.color_totals(lvl_nopal).is_empty(), "M23 V02 F004: empty palette -> {}")
+	# LevelData with a cell id out of palette range.
+	var lvl_oob = _m23_level(2, 2, [0, 1, 5, 0], 3)  # 5 >= palette 3
+	_check(BatchSupplyGenerator.color_totals(lvl_oob).is_empty(), "M23 V02 F004: out-of-range cell id -> {}")
+	# LevelData whose cells.size() != width*height.
+	var lvl_mismatch = LevelData.new(1, "x", "x", "TEST", 4, 4, PackedStringArray(["#111", "#222"]), PackedInt32Array([0,1,0]))
+	_check(BatchSupplyGenerator.color_totals(lvl_mismatch).is_empty(), "M23 V02 F004: cells.size != get_cell_count() -> {}")
+	_check(BatchSupplyGenerator.generate(lvl_mismatch, 3, 3, 1) == null, "M23 V02 F004: cell-count mismatch generate -> null")
+	# Zero dimensions.
+	var lvl_zero = LevelData.new(1, "x", "x", "TEST", 0, 0, PackedStringArray(["#111"]), PackedInt32Array())
+	_check(BatchSupplyGenerator.color_totals(lvl_zero).is_empty(), "M23 V02 F004: zero dimensions -> {}")
+	# Valid rectangular still succeeds with exact conservation.
+	var lvl_ok = _m23_level(3, 2, [0,1,2, 2,1,0], 3)
+	var ge_ok = BatchSupplyGenerator.generate(lvl_ok, 3, 3, 3)
+	_check(ge_ok != null, "M23 V02 F004: valid rectangular LevelData still generates")
+	if ge_ok != null:
+		var okt := _m23_generated_totals(ge_ok)
+		_check(int(okt.get(0,0)) == 2 and int(okt.get(1,0)) == 2 and int(okt.get(2,0)) == 2, "M23 V02 F004: valid source conserved per color")

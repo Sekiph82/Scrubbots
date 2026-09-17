@@ -13,18 +13,32 @@ extends RefCounted
 
 const BatchSupplyEngine = preload("res://scripts/gameplay/supply/batch_supply_engine.gd")
 const ColorBatch = preload("res://scripts/gameplay/supply/color_batch.gd")
+const LevelData = preload("res://scripts/data/level_data.gd")
 
 ## Upper bound on batches per color — keeps generation bounded/legal.
 const MAX_BATCHES_PER_COLOR := 8
 
 ## Deterministic per-color cell totals from LevelData.cells, or {} if the source is
-## malformed (missing/empty cells, or a cell color outside the palette).
+## malformed/foreign (M23 V02, F-M23-V01-STRICT-004). Fails closed BEFORE touching any
+## field so a foreign RefCounted/object never raises an uncaught script error. Requires:
+## the exact LevelData domain type, positive coherent dimensions, a non-empty palette,
+## a packed-int cell array whose length equals get_cell_count(), and every cell palette
+## id within range.
 static func color_totals(level) -> Dictionary:
-	if level == null:
+	if not (level is LevelData):
+		return {}
+	if typeof(level.width) != TYPE_INT or typeof(level.height) != TYPE_INT \
+			or level.width <= 0 or level.height <= 0:
+		return {}
+	if typeof(level.palette) != TYPE_PACKED_STRING_ARRAY:
+		return {}
+	var palette_size: int = level.palette.size()
+	if palette_size <= 0:
 		return {}
 	var cells = level.cells
-	var palette_size: int = level.palette.size()
-	if typeof(cells) != TYPE_PACKED_INT32_ARRAY or cells.size() == 0 or palette_size <= 0:
+	if typeof(cells) != TYPE_PACKED_INT32_ARRAY or cells.size() == 0:
+		return {}
+	if cells.size() != level.get_cell_count():
 		return {}
 	var totals: Dictionary = {}
 	for c in cells:
@@ -68,10 +82,10 @@ static func generate(level, column_count, preview_depth, seed: int) -> RefCounte
 	for i in range(flat.size()):
 		cols[i % column_count].append(flat[i])
 
-	if not engine.load_columns(cols):
+	# Atomic candidate commit: queue + seed + palette size become the initial truth
+	# together, so reset() restores all three (F-M23-V01-STRICT-003).
+	if not engine.load_candidate(cols, seed, palette_size):
 		return null
-	engine.set_seed(seed)
-	engine.set_palette_size(palette_size)
 	return engine
 
 ## Split T into k positive integers summing exactly to T (base + remainder-front).
