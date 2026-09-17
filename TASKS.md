@@ -4,15 +4,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M23
-- Current Sprint: M23-C001 V03 — engine-owned transaction identity hardening
-- Current Task: M23-C001-V03
-- Current Task Status: CHANGES_REQUIRED
-- Next Task/Action: Claude executes `coordination/sessions/M23-C001/CHATGPT_PROMPT_V03.md` under `coordination/sessions/M23-C001/CHATGPT_AUDIT_CRITERIA_V03.md`, closes the remaining transaction-identity finding in `coordination/sessions/M23-C001/CHATGPT_AUDIT_V02.md`, preserves all accepted V01/V02 Batch Supply behavior and M22 gameplay contracts, pushes implementation first, then `CLAUDE_LOG_V03.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
+- Current Milestone: M24
+- Current Sprint: M24-C001 V01 — Five-Slot Batch Engine continuous implementation
+- Current Task: M24-C001-V01
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: Claude executes `coordination/sessions/M24-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M24-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, then runs all five M24 work packages in order without intermediate handoff, completes `SB-M24-001..030`, pushes implementation commits, then `CLAUDE_LOG_V01.md` separately and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 348 / 885 = 39.32% (game+ui live scope); lastCompletedTaskId M22-C001-V07. The denominator increased by 156 newly owner-defined core-gameplay tasks across M23–M27. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
+- Progress: 378 / 885 = 42.71% (game+ui live scope); lastCompletedTaskId M23-C001-V03. M23 Batch Supply Engine is independently audited PASS at implementation `bc7f03844630377f350e2f13676ca2b8b7328ce7` with root suite `4941/0`; all `SB-M23-001..030` are closed. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
@@ -986,36 +986,36 @@ Locked runtime outcomes carried forward:
 
 Purpose: create the player-facing color/count supply queues that drive the real ScrubBots puzzle. This milestone owns batch data, queue/preview semantics and candidate generation, but does not own five-slot execution, target claims, robot dispatch or solvability proof.
 
-- [ ] SB-M23-001 Define immutable `ColorBatch` value contract.
-- [ ] SB-M23-002 Give every batch a stable unique `batch_id` for the lifetime of a session.
-- [ ] SB-M23-003 Store canonical palette/color ID, never presentation-only color guesses.
-- [ ] SB-M23-004 Store strictly positive integer `robot_count`; reject zero, negative, float, string or overflow values.
-- [ ] SB-M23-005 Preserve per-color conservation: total generated batch quota for each color must equal that level's required ACTIVE logical-pixel count for that color unless a later explicit owner rule changes the economy.
-- [ ] SB-M23-006 Reject supply containing palette IDs absent from the loaded level/palette contract.
-- [ ] SB-M23-007 Support exactly 3, 4 or 5 independent supply columns as configuration; do not hard-code one layout into gameplay truth.
-- [ ] SB-M23-008 Support configurable visible preview depth 3 or 4, with V1/Hazard Bot validation locked to exactly 3 visible rows.
-- [ ] SB-M23-009 Make only the front/top batch of each column selectable.
-- [ ] SB-M23-010 Make visible Row 2 and Row 3 preview-only in V1; they must reject gameplay activation.
-- [ ] SB-M23-011 Keep every batch deeper than the visible preview window hidden from player-facing query/UI APIs.
-- [ ] SB-M23-012 Implement each supply column as an independent FIFO queue.
-- [ ] SB-M23-013 Selecting a legal front batch removes exactly that one front item from exactly that one column.
-- [ ] SB-M23-014 After selection, advance that column by one: old Row 2→front, old Row 3→Row 2, next hidden→Row 3.
-- [ ] SB-M23-015 Prove selecting one column does not mutate ordering/content of any other column.
-- [ ] SB-M23-016 Expose read-only front-batch queries for gameplay selection.
-- [ ] SB-M23-017 Expose read-only preview queries that cannot reveal hidden queue contents.
-- [ ] SB-M23-018 Make supply consumption transactional so a rejected downstream slot placement cannot accidentally pop/advance the column.
-- [ ] SB-M23-019 Define deterministic seedable candidate generation for reproducible tests/replays.
-- [ ] SB-M23-020 Persist/report the generation seed with the session fixture/evidence.
-- [ ] SB-M23-021 Partition each level color total into legal positive batch sizes without losing or inventing quota.
-- [ ] SB-M23-022 Distribute generated batches across configured columns without changing per-color conservation.
-- [ ] SB-M23-023 Avoid malformed queues: no null batch, duplicate `batch_id`, negative count, invalid color or impossible index.
-- [ ] SB-M23-024 Define clean end-of-column behavior when fewer than the normal preview rows remain.
-- [ ] SB-M23-025 Define clean end-of-supply behavior when every column is exhausted.
-- [ ] SB-M23-026 Provide deterministic reset to the exact initial queue/seed state.
-- [ ] SB-M23-027 Provide snapshot/query data needed later by save/replay systems without coupling to UI Nodes.
-- [ ] SB-M23-028 Build Hazard Bot candidate supply fixtures from the real 20×20 level color totals.
-- [ ] SB-M23-029 Validate rectangular-board and 59×59 quota/conservation behavior.
-- [ ] SB-M23-030 Add invalid-input, deterministic-generation, FIFO, hidden-preview and conservation regression tests.
+- [x] SB-M23-001 Define immutable `ColorBatch` value contract.
+- [x] SB-M23-002 Give every batch a stable unique `batch_id` for the lifetime of a session.
+- [x] SB-M23-003 Store canonical palette/color ID, never presentation-only color guesses.
+- [x] SB-M23-004 Store strictly positive integer `robot_count`; reject zero, negative, float, string or overflow values.
+- [x] SB-M23-005 Preserve per-color conservation: total generated batch quota for each color must equal that level's required ACTIVE logical-pixel count for that color unless a later explicit owner rule changes the economy.
+- [x] SB-M23-006 Reject supply containing palette IDs absent from the loaded level/palette contract.
+- [x] SB-M23-007 Support exactly 3, 4 or 5 independent supply columns as configuration; do not hard-code one layout into gameplay truth.
+- [x] SB-M23-008 Support configurable visible preview depth 3 or 4, with V1/Hazard Bot validation locked to exactly 3 visible rows.
+- [x] SB-M23-009 Make only the front/top batch of each column selectable.
+- [x] SB-M23-010 Make visible Row 2 and Row 3 preview-only in V1; they must reject gameplay activation.
+- [x] SB-M23-011 Keep every batch deeper than the visible preview window hidden from player-facing query/UI APIs.
+- [x] SB-M23-012 Implement each supply column as an independent FIFO queue.
+- [x] SB-M23-013 Selecting a legal front batch removes exactly that one front item from exactly that one column.
+- [x] SB-M23-014 After selection, advance that column by one: old Row 2→front, old Row 3→Row 2, next hidden→Row 3.
+- [x] SB-M23-015 Prove selecting one column does not mutate ordering/content of any other column.
+- [x] SB-M23-016 Expose read-only front-batch queries for gameplay selection.
+- [x] SB-M23-017 Expose read-only preview queries that cannot reveal hidden queue contents.
+- [x] SB-M23-018 Make supply consumption transactional so a rejected downstream slot placement cannot accidentally pop/advance the column.
+- [x] SB-M23-019 Define deterministic seedable candidate generation for reproducible tests/replays.
+- [x] SB-M23-020 Persist/report the generation seed with the session fixture/evidence.
+- [x] SB-M23-021 Partition each level color total into legal positive batch sizes without losing or inventing quota.
+- [x] SB-M23-022 Distribute generated batches across configured columns without changing per-color conservation.
+- [x] SB-M23-023 Avoid malformed queues: no null batch, duplicate `batch_id`, negative count, invalid color or impossible index.
+- [x] SB-M23-024 Define clean end-of-column behavior when fewer than the normal preview rows remain.
+- [x] SB-M23-025 Define clean end-of-supply behavior when every column is exhausted.
+- [x] SB-M23-026 Provide deterministic reset to the exact initial queue/seed state.
+- [x] SB-M23-027 Provide snapshot/query data needed later by save/replay systems without coupling to UI Nodes.
+- [x] SB-M23-028 Build Hazard Bot candidate supply fixtures from the real 20×20 level color totals.
+- [x] SB-M23-029 Validate rectangular-board and 59×59 quota/conservation behavior.
+- [x] SB-M23-030 Add invalid-input, deterministic-generation, FIFO, hidden-preview and conservation regression tests.
 
 ### M24 — Five-Slot Batch Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
