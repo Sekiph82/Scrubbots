@@ -10,6 +10,16 @@ extends RefCounted
 ## player-facing queries never reveal deeper hidden batches. Front-only selection is
 ## transactional: begin does not pop; commit removes exactly the selected front of
 ## exactly its column; cancel/stale/double/cross-column/forged commits fail closed.
+##
+## Transaction authenticity (M23 V02, F-M23-V01-STRICT-001): an open transaction is
+## bound to the EXACT RefCounted instance minted by begin_front_selection(). commit,
+## cancel and has_open_transaction require reference identity, not just a matching
+## numeric token id. A freshly constructed same-class object carrying a live token id
+## — or a token whose fields were mutated to another live id — fails closed.
+##
+## Candidate metadata (M23 V02, F-M23-V01-STRICT-003): seed + palette size + column
+## order are established together by an atomic candidate-load seam and snapshotted
+## together, so reset() restores the full committed initial truth.
 
 const ColorBatch = preload("res://scripts/gameplay/supply/color_batch.gd")
 const BatchSelectionTransaction = preload("res://scripts/gameplay/supply/batch_selection_transaction.gd")
@@ -23,10 +33,13 @@ var _column_count: int = 0
 var _preview_depth: int = 0
 var _columns: Array = []            # Array[Array[ColorBatch]] — engine-owned
 var _initial: Array = []            # Array[Array[Dictionary]] — for exact reset
-var _open_tokens: Dictionary = {}   # token_id -> {"column": int, "front_id": String}
+var _open_tokens: Dictionary = {}   # token_id -> {"column": int, "front_id": String, "object": BatchSelectionTransaction}
 var _next_token_id: int = 1
 var _seed: int = 0
 var _palette_size: int = -1
+# Committed initial candidate metadata (snapshotted together with _initial columns).
+var _initial_seed: int = 0
+var _initial_palette_size: int = -1
 
 ## Fail-closed factory. column_count in [3,5], preview_depth in [3,4]; else null.
 static func create(column_count, preview_depth) -> RefCounted:
@@ -41,33 +54,69 @@ static func create(column_count, preview_depth) -> RefCounted:
 	for _i in range(column_count):
 		e._columns.append([])
 	e._initial = e._snapshot_initial(e._columns)
+	e._initial_seed = e._seed
+	e._initial_palette_size = e._palette_size
 	return e
 
-## Install a candidate layout. Fail-closed + no partial mutation: builds into a temp
-## and only commits it when the WHOLE layout validates (right column count, every
-## entry a real ColorBatch, no empty/duplicate batch_id). Engine keeps its own copies.
-func load_columns(cols) -> bool:
-	if typeof(cols) != TYPE_ARRAY or cols.size() != _column_count:
+## Atomic candidate load: establishes queue + seed + palette size together and
+## snapshots them together as the committed initial truth. Fail-closed with NO partial
+## mutation: builds into a temp and only commits when the WHOLE candidate validates.
+## Every batch value is revalidated at this trust boundary (is ColorBatch is not proof
+## on its own — underscore fields are not language-private in GDScript).
+func load_candidate(cols, seed, palette_size) -> bool:
+	if typeof(seed) != TYPE_INT:
 		return false
+	if typeof(palette_size) != TYPE_INT:
+		return false
+	var built = _build_columns(cols, palette_size)
+	if built == null:
+		return false
+	_columns = built
+	_seed = seed
+	_palette_size = palette_size
+	_initial = _snapshot_initial(built)
+	_initial_seed = seed
+	_initial_palette_size = palette_size
+	_open_tokens.clear()
+	return true
+
+## Install a candidate layout, keeping current seed/palette metadata. Fail-closed +
+## no partial mutation. Retained for direct-layout callers; generators should use
+## load_candidate() so metadata is committed atomically with the queue.
+func load_columns(cols) -> bool:
+	return load_candidate(cols, _seed, _palette_size)
+
+## Build engine-owned validated column copies from `cols`, or null on any violation.
+## Revalidates each batch's observable value (non-empty unique id, color_id >= 0,
+## robot_count > 0, and color_id < palette_size when palette_size >= 0). No engine
+## state is touched here — the caller commits only on a non-null return.
+func _build_columns(cols, palette_size):
+	if typeof(cols) != TYPE_ARRAY or cols.size() != _column_count:
+		return null
 	var seen := {}
 	var built: Array = []
 	for col in cols:
 		if typeof(col) != TYPE_ARRAY:
-			return false
+			return null
 		var q: Array = []
 		for b in col:
 			if not (b is ColorBatch):
-				return false
-			var bid: String = b.get_batch_id()
-			if bid.is_empty() or seen.has(bid):
-				return false
+				return null
+			var bid = b.get_batch_id()
+			if typeof(bid) != TYPE_STRING or (bid as String).is_empty() or seen.has(bid):
+				return null
+			var cid = b.get_color_id()
+			if typeof(cid) != TYPE_INT or cid < 0:
+				return null
+			if palette_size >= 0 and cid >= palette_size:
+				return null
+			var rc = b.get_robot_count()
+			if typeof(rc) != TYPE_INT or rc <= 0:
+				return null
 			seen[bid] = true
 			q.append(b.duplicate_batch())
 		built.append(q)
-	_columns = built
-	_initial = _snapshot_initial(built)
-	_open_tokens.clear()
-	return true
+	return built
 
 func set_seed(seed: int) -> void:
 	_seed = seed
@@ -77,6 +126,9 @@ func set_palette_size(palette_size: int) -> void:
 
 func get_seed() -> int:
 	return _seed
+
+func get_palette_size() -> int:
+	return _palette_size
 
 func get_column_count() -> int:
 	return _column_count
@@ -148,26 +200,42 @@ func debug_snapshot() -> Dictionary:
 # ------------------------------------------------- transactional selection --
 
 ## Begin a two-phase selection of the current front of `column`. Does NOT pop.
-## Returns a BatchSelectionTransaction, or null if column invalid/empty.
+## Returns a BatchSelectionTransaction, or null if column invalid/empty. The engine
+## records the EXACT returned instance so only that instance can later commit/cancel.
 func begin_front_selection(column):
 	if not _valid_column(column) or _columns[column].is_empty():
 		return null
 	var front = _columns[column][0]
 	var tid: int = _next_token_id
 	_next_token_id += 1
-	_open_tokens[tid] = {"column": column, "front_id": front.get_batch_id()}
-	return BatchSelectionTransaction.new(tid, column, front.get_batch_id(), front.duplicate_batch())
+	var tx = BatchSelectionTransaction.new(tid, column, front.get_batch_id(), front.duplicate_batch())
+	_open_tokens[tid] = {"column": column, "front_id": front.get_batch_id(), "object": tx}
+	return tx
 
-## Commit: remove exactly the selected front of exactly its column. Fails closed for
-## a malformed/forged token, a consumed/unknown token, or a front that has since
-## changed (another commit or a reset). Advances only the originating column.
-func commit(tx) -> bool:
+## Resolve `tx` to its authentic open record, or {} if it is not the exact minted
+## instance of a live token. This is the unforgeable identity gate: a forged same-class
+## object (or a token whose _token_id was mutated to another live id) resolves to a
+## record whose stored object is a DIFFERENT instance, so identity fails closed.
+func _authentic_record(tx) -> Dictionary:
 	if not (tx is BatchSelectionTransaction):
-		return false
+		return {}
 	var tid: int = tx.get_token_id()
 	if not _open_tokens.has(tid):
-		return false
+		return {}
 	var rec: Dictionary = _open_tokens[tid]
+	if rec["object"] != tx:  # exact RefCounted instance identity — unforgeable
+		return {}
+	return rec
+
+## Commit: remove exactly the selected front of exactly its column. Fails closed for
+## a malformed/forged token, a consumed/unknown token, a token that is not the exact
+## minted instance, or a front that has since changed (another commit or a reset).
+## Advances only the originating column.
+func commit(tx) -> bool:
+	var rec: Dictionary = _authentic_record(tx)
+	if rec.is_empty():
+		return false
+	var tid: int = tx.get_token_id()
 	var col: int = rec["column"]
 	if not _valid_column(col) or _columns[col].is_empty() \
 			or _columns[col][0].get_batch_id() != rec["front_id"]:
@@ -177,27 +245,30 @@ func commit(tx) -> bool:
 	_open_tokens.erase(tid)
 	return true
 
-## Cancel: leave every column unchanged. Consumes the token if valid; harmless
-## otherwise (fails closed to false).
+## Cancel: leave every column unchanged. Consumes the token only when it is the exact
+## authentic minted instance; a forged/foreign object fails closed to false and never
+## releases the legitimate open token.
 func cancel(tx) -> bool:
-	if not (tx is BatchSelectionTransaction):
+	var rec: Dictionary = _authentic_record(tx)
+	if rec.is_empty():
 		return false
-	var tid: int = tx.get_token_id()
-	if not _open_tokens.has(tid):
-		return false
-	_open_tokens.erase(tid)
+	_open_tokens.erase(tx.get_token_id())
 	return true
 
+## True only for the exact authentic minted instance of a live token. A forged
+## same-class object carrying another transaction's id is NOT reported as owning it.
 func has_open_transaction(tx) -> bool:
-	return tx is BatchSelectionTransaction and _open_tokens.has(tx.get_token_id())
+	return not _authentic_record(tx).is_empty()
 
 # --------------------------------------------------------------- reset --
 
-## Restore the exact initial candidate layout; invalidate every outstanding token.
-## Does not regenerate a different layout.
+## Restore the exact initial committed candidate — queue/order, seed, palette size —
+## and invalidate every outstanding token. Does not regenerate a different layout.
 func reset() -> void:
 	_open_tokens.clear()
 	_columns = _rebuild_from_initial()
+	_seed = _initial_seed
+	_palette_size = _initial_palette_size
 
 func _snapshot_initial(cols: Array) -> Array:
 	var out: Array = []
