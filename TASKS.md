@@ -4,15 +4,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M24
-- Current Sprint: M24-C001 V02 — Five-Slot placement transaction serialization hardening
-- Current Task: M24-C001-V02
-- Current Task Status: CHANGES_REQUIRED
-- Next Task/Action: Claude executes `coordination/sessions/M24-C001/CHATGPT_PROMPT_V02.md` under `coordination/sessions/M24-C001/CHATGPT_AUDIT_CRITERIA_V02.md`, closes all findings in `coordination/sessions/M24-C001/CHATGPT_AUDIT_V01.md`, preserves accepted M24 V01 ordinary behavior and all M23/M22 gameplay contracts, pushes implementation first, then `CLAUDE_LOG_V02.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
+- Current Milestone: M25
+- Current Sprint: M25-C001 V01 — Batch Target Claim Engine continuous implementation
+- Current Task: M25-C001-V01
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: Claude executes `coordination/sessions/M25-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M25-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, runs all five M25 work packages in order without intermediate handoff, completes `SB-M25-001..032`, preserves accepted M24/M23/M22 authorities, pushes implementation first, then `CLAUDE_LOG_V01.md` separately and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 378 / 885 = 42.71% (game+ui live scope); lastCompletedTaskId M23-C001-V03. M23 Batch Supply Engine is independently audited PASS at implementation `bc7f03844630377f350e2f13676ca2b8b7328ce7` with root suite `4941/0`; all `SB-M23-001..030` are closed. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
+- Progress: 408 / 885 = 46.10% (game+ui live scope); lastCompletedTaskId M24-C001-V02. M24 Five-Slot Batch Engine is independently audited PASS at implementation `808a06fd97ef1a7f271f675767cb9eb6697074b0` with root suite `5090/0`; all `SB-M24-001..030` are closed. M23 Batch Supply Engine remains closed. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
@@ -1021,36 +1021,36 @@ Purpose: create the player-facing color/count supply queues that drive the real 
 
 Purpose: replace the temporary directly-colored slot interaction with the real five EMPTY batch slots. Player chooses a supply batch; the engine chooses the slot automatically.
 
-- [ ] SB-M24-001 Preserve the production invariant of exactly five gameplay batch slots.
-- [ ] SB-M24-002 Initialize all five batch slots EMPTY at level/session start.
-- [ ] SB-M24-003 Define `SlotBatchState` independent of Godot presentation controls.
-- [ ] SB-M24-004 Store `batch_id`, color ID, initial count, remaining-to-clear count, committed/in-flight count and placement sequence per occupied slot.
-- [ ] SB-M24-005 Define explicit slot lifecycle states at minimum `EMPTY`, `ACTIVE` and `WAITING` without duplicating BoardState truth.
-- [ ] SB-M24-006 On accepted supply selection, place the batch automatically into the rightmost currently EMPTY slot.
-- [ ] SB-M24-007 Do not expose any production mechanic that asks the player to choose a destination slot.
-- [ ] SB-M24-008 Never shift, reorder or compact already-occupied slots merely because another slot becomes empty.
-- [ ] SB-M24-009 If holes exist, choose the rightmost available hole deterministically.
-- [ ] SB-M24-010 If all five slots are occupied, reject the new batch atomically.
-- [ ] SB-M24-011 On full-slot rejection, prove the originating supply column does not advance and the batch remains selectable.
-- [ ] SB-M24-012 Allow multiple occupied slots to contain the same color simultaneously.
-- [ ] SB-M24-013 Preserve stable batch identity after placement; never merge same-color batches silently.
-- [ ] SB-M24-014 Enforce `0 <= committed <= remaining_to_clear <= initial_count` at all times.
-- [ ] SB-M24-015 Define dispatch capacity as `remaining_to_clear - committed`.
-- [ ] SB-M24-016 Do not reduce `remaining_to_clear` on player selection, claim, route calculation or spawn.
-- [ ] SB-M24-017 Reduce `remaining_to_clear` only after authenticated successful clearing of one batch-owned target.
-- [ ] SB-M24-018 Reduce `committed` when the corresponding live assignment resolves or is safely rolled back.
-- [ ] SB-M24-019 A batch is complete only when `remaining_to_clear == 0` and `committed == 0`.
-- [ ] SB-M24-020 Return the slot to EMPTY immediately and deterministically after true batch completion.
-- [ ] SB-M24-021 If remaining quota exists but no matching target is currently claimable, enter WAITING without discarding the batch.
-- [ ] SB-M24-022 Resume a WAITING batch automatically when later BoardState changes expose claimable matching work.
-- [ ] SB-M24-023 Ensure a newly freed slot can accept the next player-selected supply batch using the same rightmost-empty rule.
-- [ ] SB-M24-024 Expose read-only slot occupancy/count/state queries for presentation without leaking mutable internal state.
-- [ ] SB-M24-025 Preserve exact slot/batch state across pause/resume.
-- [ ] SB-M24-026 Reset clears all batch occupancy, counters, placement sequence and transient state deterministically.
-- [ ] SB-M24-027 Make rapid repeated supply selections transactional; no duplicate batch insertion or double column advance.
-- [ ] SB-M24-028 Add the canonical three-same-color example (`BLUE 8`, `BLUE 14`, `BLUE 12`) as a regression fixture.
-- [ ] SB-M24-029 Test five-full-slot rejection followed by a completion/free-slot/new-selection cycle.
-- [ ] SB-M24-030 Add headless invariant tests for every state transition and invalid slot/batch mutation.
+- [x] SB-M24-001 Preserve the production invariant of exactly five gameplay batch slots.
+- [x] SB-M24-002 Initialize all five batch slots EMPTY at level/session start.
+- [x] SB-M24-003 Define `SlotBatchState` independent of Godot presentation controls.
+- [x] SB-M24-004 Store `batch_id`, color ID, initial count, remaining-to-clear count, committed/in-flight count and placement sequence per occupied slot.
+- [x] SB-M24-005 Define explicit slot lifecycle states at minimum `EMPTY`, `ACTIVE` and `WAITING` without duplicating BoardState truth.
+- [x] SB-M24-006 On accepted supply selection, place the batch automatically into the rightmost currently EMPTY slot.
+- [x] SB-M24-007 Do not expose any production mechanic that asks the player to choose a destination slot.
+- [x] SB-M24-008 Never shift, reorder or compact already-occupied slots merely because another slot becomes empty.
+- [x] SB-M24-009 If holes exist, choose the rightmost available hole deterministically.
+- [x] SB-M24-010 If all five slots are occupied, reject the new batch atomically.
+- [x] SB-M24-011 On full-slot rejection, prove the originating supply column does not advance and the batch remains selectable.
+- [x] SB-M24-012 Allow multiple occupied slots to contain the same color simultaneously.
+- [x] SB-M24-013 Preserve stable batch identity after placement; never merge same-color batches silently.
+- [x] SB-M24-014 Enforce `0 <= committed <= remaining_to_clear <= initial_count` at all times.
+- [x] SB-M24-015 Define dispatch capacity as `remaining_to_clear - committed`.
+- [x] SB-M24-016 Do not reduce `remaining_to_clear` on player selection, claim, route calculation or spawn.
+- [x] SB-M24-017 Reduce `remaining_to_clear` only after authenticated successful clearing of one batch-owned target.
+- [x] SB-M24-018 Reduce `committed` when the corresponding live assignment resolves or is safely rolled back.
+- [x] SB-M24-019 A batch is complete only when `remaining_to_clear == 0` and `committed == 0`.
+- [x] SB-M24-020 Return the slot to EMPTY immediately and deterministically after true batch completion.
+- [x] SB-M24-021 If remaining quota exists but no matching target is currently claimable, enter WAITING without discarding the batch.
+- [x] SB-M24-022 Resume a WAITING batch automatically when later BoardState changes expose claimable matching work.
+- [x] SB-M24-023 Ensure a newly freed slot can accept the next player-selected supply batch using the same rightmost-empty rule.
+- [x] SB-M24-024 Expose read-only slot occupancy/count/state queries for presentation without leaking mutable internal state.
+- [x] SB-M24-025 Preserve exact slot/batch state across pause/resume.
+- [x] SB-M24-026 Reset clears all batch occupancy, counters, placement sequence and transient state deterministically.
+- [x] SB-M24-027 Make rapid repeated supply selections transactional; no duplicate batch insertion or double column advance.
+- [x] SB-M24-028 Add the canonical three-same-color example (`BLUE 8`, `BLUE 14`, `BLUE 12`) as a regression fixture.
+- [x] SB-M24-029 Test five-full-slot rejection followed by a completion/free-slot/new-selection cycle.
+- [x] SB-M24-030 Add headless invariant tests for every state transition and invalid slot/batch mutation.
 
 ### M25 — Batch Target Claim Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
