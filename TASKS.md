@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M22
-- Current Sprint: M22-C001 V02 — Scrubbot Railroad V1 + slot connector integration
-- Current Task: M22-C001-V02
-- Current Task Status: IN_PROGRESS
-- Next Task/Action: Claude executes `coordination/sessions/M22-C001/CHATGPT_PROMPT_V02.md` against `CHATGPT_AUDIT_CRITERIA_V02.md`, preserving the accepted V01 slot foundation and the still-locked M21 target/reservation/clearing authority while implementing the owner-locked Railroad V1 geometry/routing/presentation contract. Claude must not modify root `TASKS.md`; it pushes `CLAUDE_LOG_V02.md` and hands back `AWAITING_AUDIT`, then ChatGPT performs the independent audit and owns tracker/owner-gate updates.
-- Required Actor: CLAUDE
+- Current Milestone: M23
+- Current Sprint: M23-C001 V01 — Batch Supply Engine foundation
+- Current Task: M23-C001-V01
+- Current Task Status: READY
+- Next Task/Action: ChatGPT prepares the strict M23-C001 V01 implementation prompt and audit criteria for the owner-locked Batch Supply Engine. Claude then implements only M23, preserving the accepted M22 Railroad V1/V07 routing, ReservationState, TargetSelector, dispatcher and authenticated clearing contracts. Root `TASKS.md` remains ChatGPT-write-owned.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 337 / 729 = 46.23% (game+ui live scope); lastCompletedTaskId M22-C001-V01. The 224 Level Factory + Content Platform requirements are tracked canonically in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
-- Note: M22-C001 V01 is `AUDITED_PASS / PRODUCTION_SLOT_FOUNDATION_ACCEPTED` in `coordination/sessions/M22-C001/CHATGPT_AUDIT_V01.md`. Closed by that audit: `SB-M22-001..007`, `SB-M22-010..014`, `SB-M22-020`, `SB-M22-024`, and global UI-governance rows `SB-UI-001..004`. The owner then locked `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`: one consistent robotic cleaning railroad for every level, minimum/exact V1 2.0 logical-cell artwork clearance, 1.0 logical-cell rail width, 2.5-cell centerline offset, slot→bottom-rail connectors, rail-only exterior travel, and railroad departure only when exactly aligned with the already-selected target row/column followed by an orthogonal approach. Ten new M22 Railroad V1 tasks (`SB-M22-026..035`) were added. M21 V07–V10 one-cell-adjacent-ring evidence remains valid historical evidence for those commits, but its exact exterior geometry is superseded as the future production target by Railroad V1. Root `TASKS.md` remains ChatGPT-write-owned.
+- Progress: 348 / 885 = 39.32% (game+ui live scope); lastCompletedTaskId M22-C001-V07. The denominator increased by 156 newly owner-defined core-gameplay tasks across M23–M27. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
+- Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -219,7 +219,7 @@ proves the board engine is genuinely generic — it is **not** a production
 level and must never be treated as one. Development fixtures may use a
 `TEST` difficulty/context. `TEST` must never become a production difficulty
 exposed to players, and the future production `LevelCatalog` must reject
-accidental `TEST` fixtures (see M03, M30).
+accidental `TEST` fixtures (see M03, M35).
 
 ### 8.7 — Logical pixels `[LOCKED]`
 
@@ -245,11 +245,70 @@ not add palette IDs.
 
 Production artwork may use **3–12** distinct canonical C01..C16 colors. The older class-specific `3–5 / 6–7 / 8–9 / 10–12` mapping is historical and superseded as difficulty-class legality; color count/distribution are Difficulty V1 score inputs instead.
 
-### 8.8 — Five slots `[LOCKED]`
+### 8.8 — Five batch slots `[OWNER-LOCKED 2026-09-17]`
 
-Primary gameplay presentation: **5 slots**. Player-visible gameplay uses
-five slots. Internal code may stay configurable where sensible, but the
-production game currently requires exactly five visible active slots.
+Primary gameplay presentation uses **exactly five batch slots**. They start EMPTY.
+The player never chooses a destination slot. Selecting a legal supply batch automatically
+places it into the **rightmost currently EMPTY slot**. Existing occupied slots never shift
+or reorder. If all five slots are occupied, a supply selection is rejected atomically and
+the supply column must not advance.
+
+Duplicate colors across multiple occupied slots are legal and are part of the puzzle.
+Each occupied slot owns one immutable batch identity with color, initial robot count,
+remaining-to-clear count, committed/in-flight count, placement sequence and lifecycle state.
+
+### 8.8A — Batch supply columns `[OWNER-LOCKED 2026-09-17]`
+
+- Production supply supports 3, 4 or 5 independent FIFO columns.
+- V1 gameplay validation uses **three visible rows per column**.
+- Only the front/top batch in each column is selectable.
+- Row 2 and Row 3 are preview-only future batches.
+- Everything deeper than the preview window is hidden from the player.
+- Selecting a front batch advances **only that column** by one position.
+- The previous Row 2 becomes selectable, Row 3 becomes Row 2, and the next hidden batch
+  enters Row 3. Other columns remain unchanged.
+- Each batch is `color + positive robot_count`; its identity is stable once generated.
+- Supply generation must conserve the level's logical color totals and must ultimately be
+  accepted only when the Solvability Engine proves at least one legal completion sequence.
+
+### 8.8B — Batch quota / slot lifecycle `[OWNER-LOCKED 2026-09-17]`
+
+A batch count means the number of matching logical pixels that batch must successfully clear.
+A count is **not** spent when a robot is merely spawned. It decreases only after an
+authenticated arrival clears the batch's assigned target pixel. A batch with remaining quota
+but no currently targetable matching pixel enters WAITING and stays in its slot. It resumes
+automatically when later clearing exposes a legal matching target. A slot becomes EMPTY only
+when the batch has zero remaining work and zero committed/in-flight assignments.
+
+### 8.8C — Same-color arbitration and target claims `[OWNER-LOCKED 2026-09-17]`
+
+Future inaccessible pixels are never pre-claimed. When a matching pixel becomes currently
+targetable, same-color occupied batches compete deterministically by **oldest placement first
+(FIFO)**. The oldest batch with uncommitted quota receives priority; if its remaining dispatch
+capacity is exhausted, additional targets may flow to the next same-color batch.
+
+A target claim and ReservationState reservation must be atomic. One logical pixel may belong
+to at most one live assignment at a time, regardless of how many same-color batches are in
+the five slots. Existing TargetSelector bottom-most/left-most ordering remains the target-order
+policy among currently targetable, matching, unreserved cells.
+
+### 8.8D — No ghost robots `[OWNER-LOCKED 2026-09-17]`
+
+**No target, no reservation, no valid route, no robot.** A Scrubbot may be instantiated only
+after a unique matching target has been selected, atomically reserved/claimed, and a legal
+route to that exact target has been produced and validated. A spawned robot never wanders,
+never spawns without work, never silently retargets, and never shares a target with another
+robot. Route-build failure releases the provisional claim/reservation and consumes no batch
+quota.
+
+### 8.8E — Solvability and deadlock `[OWNER-LOCKED 2026-09-17]`
+
+Generated supply is production-valid only if a deterministic solver can prove at least one
+legal player-choice sequence that clears the entire level under the real five-slot, FIFO
+column, targetability, claim, routing and batch-quota rules. Runtime must distinguish temporary
+WAITING/STALLED states from a proven deadlock. In-flight work or any legal future action that
+can open progress means the position is **not** deadlocked. A deadlock may be declared only
+when no legal future action sequence can produce further authenticated clearing.
 
 ### 8.9 — Scrubbot behavior `[LOCKED]`
 
@@ -881,13 +940,13 @@ Locked runtime outcomes carried forward:
 
 **V01 audit:** `AUDITED_PASS / PRODUCTION_SLOT_FOUNDATION_ACCEPTED` (`coordination/sessions/M22-C001/CHATGPT_AUDIT_V01.md`). V01 created the reusable native-Godot production SlotCell/ColorSelectionPanel foundation, corrected the active manifest palette/difficulty contract, validated real reference authority, touch size, responsive/safe-area behavior, active-state lifecycle and real slot-click integration while spending zero Magnific credits.
 
-**Current sprint — V02:** implement `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`. Railroad V1 is the new owner-locked movement/presentation target: same reusable rail visual on every level, 2.0 logical-cell artwork clearance, 1.0 logical-cell rail width, 2.5-cell centerline offset, slot connectors to bottom rail, rail-only exterior travel, and rail departure only at exact target row/column alignment followed by an orthogonal approach. V02 also hardens invalid color binding and updates current docs/tests without rewriting historical M21 audit evidence. V02 spends zero Magnific credits. Owner F6 visual acceptance follows successful strict audit.
+**Railroad V1 closure — V07 + owner acceptance (2026-09-17):** the accepted production movement contract is now exact clicked-slot anchor → visible BOTTOM connector → canonical Railroad V1 exterior travel → legal rail ingress → four-neighbour orthogonal OPEN/CLEARED interior corridor with one or more 90-degree turns → assigned ACTIVE target. Non-target ACTIVE cells remain blockers; no diagonal/corner-cut/teleport/free-space shortcut and no retargeting are allowed. V07 implementation evidence recorded 4,823 checks / 0 failures and preserved the fresh Hazard Bot C08 first target `380/(0,19)`. Owner manual review confirmed the routing correction. The earlier straight-only final target approach is superseded.
 
 - [x] SB-M22-001 Audit slot references. — [x] SB-M22-002 Create SlotView.
 - [x] SB-M22-003 Five-slot layout. — [x] SB-M22-004 Bind SlotState through safe scalar/query presentation binding.
 - [x] SB-M22-005 Color presentation. — [x] SB-M22-006 Touch target.
 - [x] SB-M22-007 Active state. — [ ] SB-M22-008 No-work state if approved.
-- [ ] SB-M22-009 Scrubbot spawn point / final slot→rail connector geometry.
+- [x] SB-M22-009 Scrubbot spawn point / final slot→rail connector geometry.
 - [x] SB-M22-010 Aspect-ratio tests. — [x] SB-M22-011 Safe-area tests.
 - [x] SB-M22-012 Rapid-tap tests.
 - [x] SB-M22-013 Confirm canonical gameplay UI references before final asset generation.
@@ -905,191 +964,372 @@ Locked runtime outcomes carried forward:
 - [ ] SB-M22-025 Validate import/transparency/filtering/mobile memory before visual closure.
 
 **Railroad V1 additions [OWNER-LOCKED 2026-09-14]**
-- [ ] SB-M22-026 Implement one canonical/single-source ScrubRail geometry contract from board W/H.
-- [ ] SB-M22-027 Implement reusable four-side robotic cleaning railroad presentation with rounded corners and restrained cyan/electric accents.
-- [ ] SB-M22-028 Enforce 2.0 logical-cell artwork clearance, 1.0 rail width and 2.5-cell rail centerline offset across variable board sizes.
-- [ ] SB-M22-029 Connect each real clicked SlotCell visibly to the BOTTOM rail from its exact laid-out spawn anchor.
-- [ ] SB-M22-030 Constrain exterior Scrubbot travel to railroad sides/corners; prohibit free-space diagonal/early-exit shortcuts.
-- [ ] SB-M22-031 Leave railroad only at exact target row/column alignment and use an orthogonal final target approach; never retarget.
-- [ ] SB-M22-032 Use one consistent Railroad V1 visual language across all levels; no per-level themed rail in V1.
-- [ ] SB-M22-033 Validate Railroad V1 on rectangular boards, 59×59 and the required responsive viewport matrix.
-- [ ] SB-M22-034 Preserve rapid-dispatch reservations/active visuals and reset cleanup while multiple Scrubbots are on connector/rail travel.
-- [ ] SB-M22-035 Owner F6 visual/game-feel acceptance of the production Railroad V1 demo after strict audit.
+- [x] SB-M22-026 Implement one canonical/single-source ScrubRail geometry contract from board W/H.
+- [x] SB-M22-027 Implement reusable four-side robotic cleaning railroad presentation with rounded corners and restrained cyan/electric accents.
+- [x] SB-M22-028 Enforce 2.0 logical-cell artwork clearance, 1.0 rail width and 2.5-cell rail centerline offset across variable board sizes.
+- [x] SB-M22-029 Connect each real clicked SlotCell visibly to the BOTTOM rail from its exact laid-out spawn anchor.
+- [x] SB-M22-030 Constrain exterior Scrubbot travel to railroad sides/corners; prohibit free-space diagonal/early-exit shortcuts.
+- [x] SB-M22-031 Leave Railroad V1 only through a legal rail ingress into OPEN/CLEARED perimeter space; permit four-neighbour orthogonal interior-corridor routing with one or more 90-degree turns; never retarget.
+- [x] SB-M22-032 Use one consistent Railroad V1 visual language across all levels; no per-level themed rail in V1.
+- [x] SB-M22-033 Validate Railroad V1 on rectangular boards, 59×59 and the required responsive viewport matrix.
+- [x] SB-M22-034 Preserve rapid-dispatch reservations/active visuals and reset cleanup while multiple Scrubbots are on connector/rail travel.
+- [x] SB-M22-035 Owner F6 visual/game-feel acceptance of the production Railroad V1 demo after strict audit.
 
-### M23 — Gameplay Screen Layout `[VISUAL REFERENCE]`
+### M23 — Batch Supply Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
-- [ ] SB-M23-001 Audit original gameplay reference images.
-- [ ] SB-M23-002 Board region. — [ ] SB-M23-003 Five-slot region.
-- [ ] SB-M23-004 HUD region. — [ ] SB-M23-005 Safe areas.
-- [ ] SB-M23-006 Easy dimensions. — [ ] SB-M23-007 Medium dimensions.
-- [ ] SB-M23-008 Hard dimensions. — [ ] SB-M23-009 Very Hard dimensions.
-- [ ] SB-M23-010 Rectangular boards. — [ ] SB-M23-011 59×59.
-- [ ] SB-M23-012 Narrow phone. — [ ] SB-M23-013 Tall phone.
-- [ ] SB-M23-014 Tablet portrait. — [ ] SB-M23-015 Input coordinate accuracy.
-- [ ] SB-M23-016 Use `docs/MASTER_UI_SYSTEM.md` as canonical gameplay layout contract.
-- [ ] SB-M23-017 Remove Goal/Moves panel from approved production gameplay composition.
-- [ ] SB-M23-018 Make board dominant gameplay-screen region.
-- [ ] SB-M23-019 Keep color-selection panel protected/usable.
-- [ ] SB-M23-020 Place Scrubby low at left of color-selection region.
-- [ ] SB-M23-021 Place speech bubble above Scrubby.
-- [ ] SB-M23-022 Preserve right-side cleaning props as lower-priority decoration.
-- [ ] SB-M23-023 Put four booster controls in compact horizontal row above bottom/ad row.
-- [ ] SB-M23-024 Pause left of ad, settings right of ad.
-- [ ] SB-M23-025 Do not restore removed Level/lock rail.
-- [ ] SB-M23-026 Bind owner-approved illustrations while keeping screen responsive/native.
-- [ ] SB-M23-027 Prove BoardRenderer coordinate mapping after responsive scaling.
-- [ ] SB-M23-028 Capture viewport validation evidence.
+Purpose: create the player-facing color/count supply queues that drive the real ScrubBots puzzle. This milestone owns batch data, queue/preview semantics and candidate generation, but does not own five-slot execution, target claims, robot dispatch or solvability proof.
 
-### M24 — Mobile Touch
+- [ ] SB-M23-001 Define immutable `ColorBatch` value contract.
+- [ ] SB-M23-002 Give every batch a stable unique `batch_id` for the lifetime of a session.
+- [ ] SB-M23-003 Store canonical palette/color ID, never presentation-only color guesses.
+- [ ] SB-M23-004 Store strictly positive integer `robot_count`; reject zero, negative, float, string or overflow values.
+- [ ] SB-M23-005 Preserve per-color conservation: total generated batch quota for each color must equal that level's required ACTIVE logical-pixel count for that color unless a later explicit owner rule changes the economy.
+- [ ] SB-M23-006 Reject supply containing palette IDs absent from the loaded level/palette contract.
+- [ ] SB-M23-007 Support exactly 3, 4 or 5 independent supply columns as configuration; do not hard-code one layout into gameplay truth.
+- [ ] SB-M23-008 Support configurable visible preview depth 3 or 4, with V1/Hazard Bot validation locked to exactly 3 visible rows.
+- [ ] SB-M23-009 Make only the front/top batch of each column selectable.
+- [ ] SB-M23-010 Make visible Row 2 and Row 3 preview-only in V1; they must reject gameplay activation.
+- [ ] SB-M23-011 Keep every batch deeper than the visible preview window hidden from player-facing query/UI APIs.
+- [ ] SB-M23-012 Implement each supply column as an independent FIFO queue.
+- [ ] SB-M23-013 Selecting a legal front batch removes exactly that one front item from exactly that one column.
+- [ ] SB-M23-014 After selection, advance that column by one: old Row 2→front, old Row 3→Row 2, next hidden→Row 3.
+- [ ] SB-M23-015 Prove selecting one column does not mutate ordering/content of any other column.
+- [ ] SB-M23-016 Expose read-only front-batch queries for gameplay selection.
+- [ ] SB-M23-017 Expose read-only preview queries that cannot reveal hidden queue contents.
+- [ ] SB-M23-018 Make supply consumption transactional so a rejected downstream slot placement cannot accidentally pop/advance the column.
+- [ ] SB-M23-019 Define deterministic seedable candidate generation for reproducible tests/replays.
+- [ ] SB-M23-020 Persist/report the generation seed with the session fixture/evidence.
+- [ ] SB-M23-021 Partition each level color total into legal positive batch sizes without losing or inventing quota.
+- [ ] SB-M23-022 Distribute generated batches across configured columns without changing per-color conservation.
+- [ ] SB-M23-023 Avoid malformed queues: no null batch, duplicate `batch_id`, negative count, invalid color or impossible index.
+- [ ] SB-M23-024 Define clean end-of-column behavior when fewer than the normal preview rows remain.
+- [ ] SB-M23-025 Define clean end-of-supply behavior when every column is exhausted.
+- [ ] SB-M23-026 Provide deterministic reset to the exact initial queue/seed state.
+- [ ] SB-M23-027 Provide snapshot/query data needed later by save/replay systems without coupling to UI Nodes.
+- [ ] SB-M23-028 Build Hazard Bot candidate supply fixtures from the real 20×20 level color totals.
+- [ ] SB-M23-029 Validate rectangular-board and 59×59 quota/conservation behavior.
+- [ ] SB-M23-030 Add invalid-input, deterministic-generation, FIFO, hidden-preview and conservation regression tests.
 
-- [ ] SB-M24-001 Touch slot activation.
-- [ ] SB-M24-002 Desktop mouse development support.
-- [ ] SB-M24-003 Prevent mouse/touch double-fire.
-- [ ] SB-M24-004 Touch cancel. — [ ] SB-M24-005 Focus loss.
-- [ ] SB-M24-006 Rapid tapping. — [ ] SB-M24-007 Multi-touch.
-- [ ] SB-M24-008 Pause during touch. — [ ] SB-M24-009 Background/foreground.
+### M24 — Five-Slot Batch Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
-### M25 — Win/Lose Rules `[DESIGN GATE]`
+Purpose: replace the temporary directly-colored slot interaction with the real five EMPTY batch slots. Player chooses a supply batch; the engine chooses the slot automatically.
 
-- [ ] SB-M25-001 Document win condition. — [ ] SB-M25-002 Document lose condition.
-- [ ] SB-M25-003 Completion evaluator. — [ ] SB-M25-004 Emit completion once.
-- [ ] SB-M25-005 Stop inappropriate new dispatch.
-- [ ] SB-M25-006 Resolve in-flight bots. — [ ] SB-M25-007 Retry.
-- [ ] SB-M25-008 Completion regression tests.
+- [ ] SB-M24-001 Preserve the production invariant of exactly five gameplay batch slots.
+- [ ] SB-M24-002 Initialize all five batch slots EMPTY at level/session start.
+- [ ] SB-M24-003 Define `SlotBatchState` independent of Godot presentation controls.
+- [ ] SB-M24-004 Store `batch_id`, color ID, initial count, remaining-to-clear count, committed/in-flight count and placement sequence per occupied slot.
+- [ ] SB-M24-005 Define explicit slot lifecycle states at minimum `EMPTY`, `ACTIVE` and `WAITING` without duplicating BoardState truth.
+- [ ] SB-M24-006 On accepted supply selection, place the batch automatically into the rightmost currently EMPTY slot.
+- [ ] SB-M24-007 Do not expose any production mechanic that asks the player to choose a destination slot.
+- [ ] SB-M24-008 Never shift, reorder or compact already-occupied slots merely because another slot becomes empty.
+- [ ] SB-M24-009 If holes exist, choose the rightmost available hole deterministically.
+- [ ] SB-M24-010 If all five slots are occupied, reject the new batch atomically.
+- [ ] SB-M24-011 On full-slot rejection, prove the originating supply column does not advance and the batch remains selectable.
+- [ ] SB-M24-012 Allow multiple occupied slots to contain the same color simultaneously.
+- [ ] SB-M24-013 Preserve stable batch identity after placement; never merge same-color batches silently.
+- [ ] SB-M24-014 Enforce `0 <= committed <= remaining_to_clear <= initial_count` at all times.
+- [ ] SB-M24-015 Define dispatch capacity as `remaining_to_clear - committed`.
+- [ ] SB-M24-016 Do not reduce `remaining_to_clear` on player selection, claim, route calculation or spawn.
+- [ ] SB-M24-017 Reduce `remaining_to_clear` only after authenticated successful clearing of one batch-owned target.
+- [ ] SB-M24-018 Reduce `committed` when the corresponding live assignment resolves or is safely rolled back.
+- [ ] SB-M24-019 A batch is complete only when `remaining_to_clear == 0` and `committed == 0`.
+- [ ] SB-M24-020 Return the slot to EMPTY immediately and deterministically after true batch completion.
+- [ ] SB-M24-021 If remaining quota exists but no matching target is currently claimable, enter WAITING without discarding the batch.
+- [ ] SB-M24-022 Resume a WAITING batch automatically when later BoardState changes expose claimable matching work.
+- [ ] SB-M24-023 Ensure a newly freed slot can accept the next player-selected supply batch using the same rightmost-empty rule.
+- [ ] SB-M24-024 Expose read-only slot occupancy/count/state queries for presentation without leaking mutable internal state.
+- [ ] SB-M24-025 Preserve exact slot/batch state across pause/resume.
+- [ ] SB-M24-026 Reset clears all batch occupancy, counters, placement sequence and transient state deterministically.
+- [ ] SB-M24-027 Make rapid repeated supply selections transactional; no duplicate batch insertion or double column advance.
+- [ ] SB-M24-028 Add the canonical three-same-color example (`BLUE 8`, `BLUE 14`, `BLUE 12`) as a regression fixture.
+- [ ] SB-M24-029 Test five-full-slot rejection followed by a completion/free-slot/new-selection cycle.
+- [ ] SB-M24-030 Add headless invariant tests for every state transition and invalid slot/batch mutation.
 
-### M26 — Cleaning Effects `[VISUAL REFERENCE] [PERFORMANCE]`
+### M25 — Batch Target Claim Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
-- [ ] SB-M26-001 Use original visual references where available.
-- [ ] SB-M26-002 Define cleaning event.
-- [ ] SB-M26-003 Prototype lightweight effect.
-- [ ] SB-M26-004 Separate from BoardState.
-- [ ] SB-M26-005 Toggle effects. — [ ] SB-M26-006 Concurrency limit.
-- [ ] SB-M26-007 Pool only after profiling. — [ ] SB-M26-008 Stress 59×59.
-- [ ] SB-M26-009 Measure frame cost.
-- [ ] SB-M26-010 Reduced-effects option if required.
+Purpose: arbitrate currently targetable pixels among multiple live batches, especially duplicate colors, while preserving ReservationState and TargetSelector as the existing low-level safety authorities.
 
-### M27 — Scrubbot Final Visuals `[VISUAL REFERENCE]`
+- [ ] SB-M25-001 Define a session-scoped Batch Target Claim service/ledger with narrow APIs.
+- [ ] SB-M25-002 Keep existing `ReservationState` as the authoritative live target-reservation mechanism; do not create contradictory duplicate reservation truth.
+- [ ] SB-M25-003 Represent each live claim with batch ID, slot ID, target index/coordinate, color and reservation/assignment identity.
+- [ ] SB-M25-004 Permit claims only for currently ACTIVE, matching-color, valid, unreserved and production-targetable pixels.
+- [ ] SB-M25-005 Never pre-claim a future pixel that is currently blocked/unreachable merely because it may become reachable later.
+- [ ] SB-M25-006 Support multiple simultaneous occupied batches of the same color.
+- [ ] SB-M25-007 Arbitrate same-color batches by oldest placement sequence first (FIFO).
+- [ ] SB-M25-008 Make placement-sequence arbitration deterministic across reset/replay fixtures.
+- [ ] SB-M25-009 Keep giving newly claimable work to the oldest same-color batch while it has uncommitted dispatch capacity.
+- [ ] SB-M25-010 When the oldest batch has no remaining dispatch capacity, allow additional matching targets to flow to the next same-color batch.
+- [ ] SB-M25-011 Keep different colors independent except for shared global ReservationState uniqueness.
+- [ ] SB-M25-012 Preserve TargetSelector's bottom-most then left-most order among currently targetable matching unreserved candidates.
+- [ ] SB-M25-013 Make target selection + batch ownership claim + ReservationState reservation one atomic logical transaction.
+- [ ] SB-M25-014 Prove one target index can never belong to two live batches/robots at once.
+- [ ] SB-M25-015 Prove one batch can never create duplicate live claims to the same target.
+- [ ] SB-M25-016 Refuse claim when the batch has zero dispatch capacity.
+- [ ] SB-M25-017 Increment `committed` exactly once when a claim becomes an accepted live assignment.
+- [ ] SB-M25-018 Do not change `remaining_to_clear` merely because a claim exists.
+- [ ] SB-M25-019 If route construction/validation fails before spawn, atomically release claim and reservation, decrement committed appropriately, consume zero batch quota and spawn no robot.
+- [ ] SB-M25-020 On authenticated arrival/clear, resolve exactly the claim associated with that robot/assignment.
+- [ ] SB-M25-021 Never allow a robot to clear any target other than its immutable claimed target.
+- [ ] SB-M25-022 On successful authenticated clear, decrement batch remaining and committed exactly once.
+- [ ] SB-M25-023 Fail closed on stale/already-cleared/invalid claim state; no duplicate clear, no quota loss and no ghost spawn.
+- [ ] SB-M25-024 Release every live claim/reservation safely on reset/session teardown.
+- [ ] SB-M25-025 Prevent slot completion while any claim/assignment for that batch remains committed.
+- [ ] SB-M25-026 Mark a batch WAITING when it has remaining quota but no claimable matching target.
+- [ ] SB-M25-027 Re-evaluate waiting colors after authoritative BoardState clear events rather than polling mutable UI state.
+- [ ] SB-M25-028 Add simultaneous same-color claim race tests under rapid scheduler activity.
+- [ ] SB-M25-029 Prove `BLUE 8`, `BLUE 14`, `BLUE 12` cannot target the same pixel and obey oldest-batch-first ownership when new blue pixels open.
+- [ ] SB-M25-030 Prove newly opened targets are assigned at opening time, not pre-owned while inaccessible.
+- [ ] SB-M25-031 Stress five occupied slots with duplicate colors on rectangular and 59×59 boards.
+- [ ] SB-M25-032 Add claim/reservation leak, reset, stale-target and deterministic-order regression tests.
 
-- [ ] SB-M27-001 Audit original Scrubbot art.
-- [ ] SB-M27-002 Select owner-approved canonical design.
-- [ ] SB-M27-003 Preserve original source.
-- [ ] SB-M27-004 Configure crisp import.
-- [ ] SB-M27-005 Visual component. — [ ] SB-M27-006 Travel animation.
-- [ ] SB-M27-007 Arrival animation. — [ ] SB-M27-008 Disappearance.
-- [ ] SB-M27-009 Direction/orientation if approved.
-- [ ] SB-M27-010 Density performance test.
-- [ ] SB-M27-UI-001 Use owner-approved canonical Scrubby reference for character generation.
-- [ ] SB-M27-UI-002 Validate pose/state manifest entries before generation.
-- [ ] SB-M27-UI-003 Generate only poses required by implemented behavior.
-- [ ] SB-M27-UI-004 Generate required portrait/profile variants.
-- [ ] SB-M27-UI-005 Generate emotion/state variants only when implemented flow needs them.
-- [ ] SB-M27-UI-006 Preserve raw candidates/provenance separately.
-- [ ] SB-M27-UI-007 Require owner visual approval before promotion.
-- [ ] SB-M27-UI-008 Lock approved character assets against silent overwrite.
-- [ ] SB-M27-UI-009 Configure Godot import settings.
-- [ ] SB-M27-UI-010 Integrate approved art without coupling animation to TargetSelector logic.
-- [ ] SB-M27-UI-011 Validate readability/scale on phone viewport matrix.
+### M26 — Auto Dispatch Scheduler `[OWNER-LOCKED CORE GAMEPLAY]`
 
-### M28 — Audio `[DESIGN GATE]`
+Purpose: turn an occupied color/count batch into autonomous Scrubbot work. The player selects batches, not individual robots and not individual target pixels.
 
-- [ ] SB-M28-001 Audio buses. — [ ] SB-M28-002 Master volume.
-- [ ] SB-M28-003 Music volume. — [ ] SB-M28-004 SFX volume.
-- [ ] SB-M28-005 Dispatch SFX. — [ ] SB-M28-006 Cleaning SFX.
-- [ ] SB-M28-007 Completion SFX.
-- [ ] SB-M28-008 Movement audio only if pleasant at high density.
-- [ ] SB-M28-009 Concurrency management. — [ ] SB-M28-010 Persist settings.
+- [ ] SB-M26-001 Define a gameplay-domain Auto Dispatch Scheduler independent of presentation/UI animation.
+- [ ] SB-M26-002 Automatically attempt work for every occupied batch without requiring repeated player taps on the five slots.
+- [ ] SB-M26-003 Begin scheduling a newly accepted batch immediately after transactional placement.
+- [ ] SB-M26-004 Enforce the hard invariant: no currently valid target means no robot spawn.
+- [ ] SB-M26-005 Enforce the hard invariant: no successful atomic reservation/claim means no robot spawn.
+- [ ] SB-M26-006 Enforce the hard invariant: no valid RouteValidator-clean route to the exact claimed target means no robot spawn.
+- [ ] SB-M26-007 Enforce transaction order `claim/reserve → build route → validate route → spawn exact assignment`.
+- [ ] SB-M26-008 Never retarget after route/assignment acceptance; a failed assignment is rolled back rather than redirected silently.
+- [ ] SB-M26-009 Spawn from the exact owning SlotCell anchor and preserve the accepted slot→BOTTOM connector + Railroad V1 route semantics.
+- [ ] SB-M26-010 Spawn exactly one Scrubbot per successful assignment transaction.
+- [ ] SB-M26-011 Pace sequential dispatch from a given batch/slot; do not materialize its entire count as an uncontrolled one-frame robot burst.
+- [ ] SB-M26-012 Permit safe concurrent work from different occupied slots when each assignment has a unique reservation/route.
+- [ ] SB-M26-013 Define deterministic scheduler fairness across different-color ACTIVE batches so one busy color cannot starve all others.
+- [ ] SB-M26-014 For same-color batches, defer ownership ordering to the Batch Target Claim Engine's oldest-placement-first rule.
+- [ ] SB-M26-015 Prove a `BLUE 15` batch can autonomously complete exactly 15 authenticated blue-pixel clears when the board makes them legally available.
+- [ ] SB-M26-016 Track committed/in-flight capacity so a batch never dispatches more robots than its remaining quota permits.
+- [ ] SB-M26-017 Decrement quota only from successful authenticated clearing callbacks, never from scheduler intent or spawn count.
+- [ ] SB-M26-018 When no claimable work exists, transition to WAITING without busy-looping, phantom agents or repeated reservation churn.
+- [ ] SB-M26-019 Wake/reconsider relevant WAITING colors when BoardState clearing changes reachability.
+- [ ] SB-M26-020 When one new blue pixel opens and several blue batches wait, request arbitration and dispatch only the batch selected by the same-color FIFO rule.
+- [ ] SB-M26-021 If the oldest same-color batch has only N dispatch-capacity units left and more than N targets open, allow only N claims to it and spill additional claims to the next batch deterministically.
+- [ ] SB-M26-022 Auto-finish a batch after its final authenticated clear/assignment resolves and return the slot to EMPTY.
+- [ ] SB-M26-023 Ensure freeing a slot does not reorder other occupied slots or mutate supply queues.
+- [ ] SB-M26-024 Pause prevents new dispatches while preserving valid in-memory batch/claim state according to session rules.
+- [ ] SB-M26-025 Resume safely restarts scheduling without duplicate claims/spawns.
+- [ ] SB-M26-026 Reset/session teardown cancels in-flight scheduling, releases reservations/claims and leaves no orphan Scrubbot Nodes.
+- [ ] SB-M26-027 Rapid input / simultaneous column selections cannot double-spawn, over-commit quota or duplicate target reservations.
+- [ ] SB-M26-028 Validate scheduler behavior with multiple duplicate-color batches plus different-color batches concurrently.
+- [ ] SB-M26-029 Run 59×59/high-agent-density performance sanity and allocation checks.
+- [ ] SB-M26-030 Add a full Hazard Bot auto-dispatch integration smoke proving no ghost robots, no duplicate targets and exact quota conservation.
 
-### M29 — Haptics
+### M27 — Solvability / Deadlock Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
-- [ ] SB-M29-001 Platform API research.
-- [ ] SB-M29-002 Cleaning haptic if approved. — [ ] SB-M29-003 Completion haptic.
-- [ ] SB-M29-004 Toggle. — [ ] SB-M29-005 Prevent vibration spam.
-- [ ] SB-M29-006 Real-device test.
+Purpose: prove generated supply is actually playable under the real mechanics and distinguish temporary waiting from a true no-solution state. This milestone is the final gameplay-engine closure gate before production screen/layout work.
 
-### M30 — Level Catalog
+- [ ] SB-M27-001 Define a deterministic solver operating on gameplay-domain state, not rendered UI Nodes.
+- [ ] SB-M27-002 Consume the real level BoardState/access/routing semantics rather than a contradictory simplified notion of reachability.
+- [ ] SB-M27-003 Model configured 3/4/5 independent FIFO supply columns.
+- [ ] SB-M27-004 Model the visible-front rule: only each column's front batch is a legal player choice.
+- [ ] SB-M27-005 Model preview/hidden queue ordering without allowing the solver to illegally select Row 2/Row 3/hidden batches early.
+- [ ] SB-M27-006 Model automatic rightmost-empty placement into exactly five slots.
+- [ ] SB-M27-007 Model full-slot rejection without consuming the selected supply front.
+- [ ] SB-M27-008 Model batch remaining/committed/WAITING lifecycle exactly as the runtime engine does.
+- [ ] SB-M27-009 Model same-color oldest-placement-first claim arbitration.
+- [ ] SB-M27-010 Model targetability using authoritative ProductionTargetAccess/ProductionRoutingSystem semantics, including Railroad V1 legal ingress and post-rail orthogonal turns.
+- [ ] SB-M27-011 Model dynamic ACTIVE→CLEARED board evolution after authenticated work.
+- [ ] SB-M27-012 Model WAITING batches becoming runnable when new corridors/targets open.
+- [ ] SB-M27-013 Search legal player front-batch choices rather than assuming one fixed greedy order.
+- [ ] SB-M27-014 Find at least one complete sequence that clears every required logical pixel and consumes all required batch quota.
+- [ ] SB-M27-015 Emit a deterministic solution trace for QA/debug evidence; never expose it to normal player UI.
+- [ ] SB-M27-016 Accept a generated Batch Supply layout for production only after the solver proves at least one legal completion sequence.
+- [ ] SB-M27-017 Feed unsolvable candidate layouts back to Batch Supply generation for deterministic retry/regeneration rather than shipping impossible levels.
+- [ ] SB-M27-018 Preserve generation seed + solver outcome so an accepted/rejected supply can be reproduced exactly.
+- [ ] SB-M27-019 Canonicalize/memoize equivalent search states to prevent needless combinatorial re-exploration.
+- [ ] SB-M27-020 Add explicit search/time/state-count bounds and fail closed when proof cannot be completed within policy limits.
+- [ ] SB-M27-021 Prove the real 20×20 Hazard Bot level has at least one solvable generated batch/column layout under the new five-slot rules.
+- [ ] SB-M27-022 Persist the Hazard Bot solution trace as regression evidence while keeping player-hidden future batches hidden at runtime.
+- [ ] SB-M27-023 Add rectangular-board solvability fixtures.
+- [ ] SB-M27-024 Add 59×59 solver/performance sanity fixtures with bounded evidence appropriate to the search design.
+- [ ] SB-M27-025 Define `STALLED/WAITING` separately from `DEADLOCK`.
+- [ ] SB-M27-026 Never call a state deadlocked while any valid in-flight robot can still produce an authenticated clear.
+- [ ] SB-M27-027 Never call a state deadlocked while an EMPTY slot plus at least one selectable front batch can lead to legal future progress.
+- [ ] SB-M27-028 Never call a state deadlocked merely because current batches are waiting if already-scheduled/legal clearing can open their targets.
+- [ ] SB-M27-029 Declare deadlock only when search proves there is no legal future action sequence that can produce further authenticated progress/completion.
+- [ ] SB-M27-030 Add the canonical true-deadlock fixture: five occupied WAITING batches, no in-flight progress and no legal unlock sequence.
+- [ ] SB-M27-031 Add false-positive guards where a newly opened same-color target correctly revives the oldest waiting batch.
+- [ ] SB-M27-032 Expose deterministic deadlock reason codes/debug evidence without coupling lose-screen UI to solver internals.
+- [ ] SB-M27-033 Reset/replay must reproduce identical solver classification from identical state/seed.
+- [ ] SB-M27-034 Run performance/memory profiling and regression tests before declaring the core gameplay engine complete.
 
-- [ ] SB-M30-001 Production LevelCatalog.
-- [ ] SB-M30-002 Stable IDs. — [ ] SB-M30-003 Stable ordering.
-- [ ] SB-M30-004 Difficulty. — [ ] SB-M30-005 Dimensions.
-- [ ] SB-M30-006 Preview. — [ ] SB-M30-007 Duplicate detection.
-- [ ] SB-M30-008 Missing-file detection.
-- [ ] SB-M30-009 Production/test separation.
-- [ ] SB-M30-010 Reject TEST fixture in production catalog.
-- [ ] SB-M30-011 Batch validation.
+### M28 — Gameplay Screen Layout `[VISUAL REFERENCE]`
 
-### M31 — Difficulty System
+- [ ] SB-M28-001 Audit original gameplay reference images.
+- [ ] SB-M28-002 Board region. — [ ] SB-M28-003 Five-slot region.
+- [ ] SB-M28-004 HUD region. — [ ] SB-M28-005 Safe areas.
+- [ ] SB-M28-006 Easy dimensions. — [ ] SB-M28-007 Medium dimensions.
+- [ ] SB-M28-008 Hard dimensions. — [ ] SB-M28-009 Very Hard dimensions.
+- [ ] SB-M28-010 Rectangular boards. — [ ] SB-M28-011 59×59.
+- [ ] SB-M28-012 Narrow phone. — [ ] SB-M28-013 Tall phone.
+- [ ] SB-M28-014 Tablet portrait. — [ ] SB-M28-015 Input coordinate accuracy.
+- [ ] SB-M28-016 Use `docs/MASTER_UI_SYSTEM.md` as canonical gameplay layout contract.
+- [ ] SB-M28-017 Remove Goal/Moves panel from approved production gameplay composition.
+- [ ] SB-M28-018 Make board dominant gameplay-screen region.
+- [ ] SB-M28-019 Keep color-selection panel protected/usable.
+- [ ] SB-M28-020 Place Scrubby low at left of color-selection region.
+- [ ] SB-M28-021 Place speech bubble above Scrubby.
+- [ ] SB-M28-022 Preserve right-side cleaning props as lower-priority decoration.
+- [ ] SB-M28-023 Put four booster controls in compact horizontal row above bottom/ad row.
+- [ ] SB-M28-024 Pause left of ad, settings right of ad.
+- [ ] SB-M28-025 Do not restore removed Level/lock rail.
+- [ ] SB-M28-026 Bind owner-approved illustrations while keeping screen responsive/native.
+- [ ] SB-M28-027 Prove BoardRenderer coordinate mapping after responsive scaling.
+- [ ] SB-M28-028 Capture viewport validation evidence.
+
+### M29 — Mobile Touch
+
+- [ ] SB-M29-001 Touch slot activation.
+- [ ] SB-M29-002 Desktop mouse development support.
+- [ ] SB-M29-003 Prevent mouse/touch double-fire.
+- [ ] SB-M29-004 Touch cancel. — [ ] SB-M29-005 Focus loss.
+- [ ] SB-M29-006 Rapid tapping. — [ ] SB-M29-007 Multi-touch.
+- [ ] SB-M29-008 Pause during touch. — [ ] SB-M29-009 Background/foreground.
+
+### M30 — Win/Lose Rules `[DESIGN GATE]`
+
+- [ ] SB-M30-001 Document win condition. — [ ] SB-M30-002 Document lose condition.
+- [ ] SB-M30-003 Completion evaluator. — [ ] SB-M30-004 Emit completion once.
+- [ ] SB-M30-005 Stop inappropriate new dispatch.
+- [ ] SB-M30-006 Resolve in-flight bots. — [ ] SB-M30-007 Retry.
+- [ ] SB-M30-008 Completion regression tests.
+
+### M31 — Cleaning Effects `[VISUAL REFERENCE] [PERFORMANCE]`
+
+- [ ] SB-M31-001 Use original visual references where available.
+- [ ] SB-M31-002 Define cleaning event.
+- [ ] SB-M31-003 Prototype lightweight effect.
+- [ ] SB-M31-004 Separate from BoardState.
+- [ ] SB-M31-005 Toggle effects. — [ ] SB-M31-006 Concurrency limit.
+- [ ] SB-M31-007 Pool only after profiling. — [ ] SB-M31-008 Stress 59×59.
+- [ ] SB-M31-009 Measure frame cost.
+- [ ] SB-M31-010 Reduced-effects option if required.
+
+### M32 — Scrubbot Final Visuals `[VISUAL REFERENCE]`
+
+- [ ] SB-M32-001 Audit original Scrubbot art.
+- [ ] SB-M32-002 Select owner-approved canonical design.
+- [ ] SB-M32-003 Preserve original source.
+- [ ] SB-M32-004 Configure crisp import.
+- [ ] SB-M32-005 Visual component. — [ ] SB-M32-006 Travel animation.
+- [ ] SB-M32-007 Arrival animation. — [ ] SB-M32-008 Disappearance.
+- [ ] SB-M32-009 Direction/orientation if approved.
+- [ ] SB-M32-010 Density performance test.
+- [ ] SB-M32-UI-001 Use owner-approved canonical Scrubby reference for character generation.
+- [ ] SB-M32-UI-002 Validate pose/state manifest entries before generation.
+- [ ] SB-M32-UI-003 Generate only poses required by implemented behavior.
+- [ ] SB-M32-UI-004 Generate required portrait/profile variants.
+- [ ] SB-M32-UI-005 Generate emotion/state variants only when implemented flow needs them.
+- [ ] SB-M32-UI-006 Preserve raw candidates/provenance separately.
+- [ ] SB-M32-UI-007 Require owner visual approval before promotion.
+- [ ] SB-M32-UI-008 Lock approved character assets against silent overwrite.
+- [ ] SB-M32-UI-009 Configure Godot import settings.
+- [ ] SB-M32-UI-010 Integrate approved art without coupling animation to TargetSelector logic.
+- [ ] SB-M32-UI-011 Validate readability/scale on phone viewport matrix.
+
+### M33 — Audio `[DESIGN GATE]`
+
+- [ ] SB-M33-001 Audio buses. — [ ] SB-M33-002 Master volume.
+- [ ] SB-M33-003 Music volume. — [ ] SB-M33-004 SFX volume.
+- [ ] SB-M33-005 Dispatch SFX. — [ ] SB-M33-006 Cleaning SFX.
+- [ ] SB-M33-007 Completion SFX.
+- [ ] SB-M33-008 Movement audio only if pleasant at high density.
+- [ ] SB-M33-009 Concurrency management. — [ ] SB-M33-010 Persist settings.
+
+### M34 — Haptics
+
+- [ ] SB-M34-001 Platform API research.
+- [ ] SB-M34-002 Cleaning haptic if approved. — [ ] SB-M34-003 Completion haptic.
+- [ ] SB-M34-004 Toggle. — [ ] SB-M34-005 Prevent vibration spam.
+- [ ] SB-M34-006 Real-device test.
+
+### M35 — Level Catalog
+
+- [ ] SB-M35-001 Production LevelCatalog.
+- [ ] SB-M35-002 Stable IDs. — [ ] SB-M35-003 Stable ordering.
+- [ ] SB-M35-004 Difficulty. — [ ] SB-M35-005 Dimensions.
+- [ ] SB-M35-006 Preview. — [ ] SB-M35-007 Duplicate detection.
+- [ ] SB-M35-008 Missing-file detection.
+- [ ] SB-M35-009 Production/test separation.
+- [ ] SB-M35-010 Reject TEST fixture in production catalog.
+- [ ] SB-M35-011 Batch validation.
+
+### M36 — Difficulty System
 
 **Difficulty V1 owner decision now governs future work.** Board dimensions remain an engine/content envelope and Session Load input, not the definition of EASY/MEDIUM/HARD/VERY_HARD.
 
-- [ ] SB-M31-001 Migrate legacy runtime class=dimension configuration to Difficulty V1 without breaking board envelope validation.
-- [ ] SB-M31-002 Validate production catalog against current Difficulty V1 + compatibility requirements.
-- [ ] SB-M31-003 Implement/version Challenge components and owner-approved additional factors.
-- [ ] SB-M31-004 Create Difficulty V1 matrix/calibration fixtures.
-- [ ] SB-M31-005 Playtest difficulty.
-- [ ] SB-M31-006 Prove board size alone cannot determine difficulty class.
+- [ ] SB-M36-001 Migrate legacy runtime class=dimension configuration to Difficulty V1 without breaking board envelope validation.
+- [ ] SB-M36-002 Validate production catalog against current Difficulty V1 + compatibility requirements.
+- [ ] SB-M36-003 Implement/version Challenge components and owner-approved additional factors.
+- [ ] SB-M36-004 Create Difficulty V1 matrix/calibration fixtures.
+- [ ] SB-M36-005 Playtest difficulty.
+- [ ] SB-M36-006 Prove board size alone cannot determine difficulty class.
 
-### M32 — Level Progression
+### M37 — Level Progression
 
-- [ ] SB-M32-001 Implement owner-locked repeating 10-level class cadence.
-- [ ] SB-M32-002 Current level.
-- [ ] SB-M32-003 Completion tracking. — [ ] SB-M32-004 Replay.
-- [ ] SB-M32-005 Implement progression target curve/micro modifiers from Difficulty V1.
-- [ ] SB-M32-006 Level select if approved.
-- [ ] SB-M32-007 Service implementation. — [ ] SB-M32-008 Tests.
+- [ ] SB-M37-001 Implement owner-locked repeating 10-level class cadence.
+- [ ] SB-M37-002 Current level.
+- [ ] SB-M37-003 Completion tracking. — [ ] SB-M37-004 Replay.
+- [ ] SB-M37-005 Implement progression target curve/micro modifiers from Difficulty V1.
+- [ ] SB-M37-006 Level select if approved.
+- [ ] SB-M37-007 Service implementation. — [ ] SB-M37-008 Tests.
 
-### M33 — Win Streak
+### M38 — Win Streak
 
-- [ ] SB-M33-001 Streak state. — [ ] SB-M33-002 Increment on valid win.
-- [ ] SB-M33-003 Define reset rule with owner. `[DESIGN GATE]`
-- [ ] SB-M33-004 Reward function.
-- [ ] SB-M33-005 Test 1→1. — [ ] SB-M33-006 Test 2→5.
-- [ ] SB-M33-007 Test 3→10. — [ ] SB-M33-008 Test 4→25.
-- [ ] SB-M33-009 Test 5→100. — [ ] SB-M33-010 Test 6+→100.
-- [ ] SB-M33-011 No duplicate grant. — [ ] SB-M33-012 Persistence.
+- [ ] SB-M38-001 Streak state. — [ ] SB-M38-002 Increment on valid win.
+- [ ] SB-M38-003 Define reset rule with owner. `[DESIGN GATE]`
+- [ ] SB-M38-004 Reward function.
+- [ ] SB-M38-005 Test 1→1. — [ ] SB-M38-006 Test 2→5.
+- [ ] SB-M38-007 Test 3→10. — [ ] SB-M38-008 Test 4→25.
+- [ ] SB-M38-009 Test 5→100. — [ ] SB-M38-010 Test 6+→100.
+- [ ] SB-M38-011 No duplicate grant. — [ ] SB-M38-012 Persistence.
 
-### M34 — Economy `[DESIGN GATE]`
+### M39 — Economy `[DESIGN GATE]`
 
 Do not implement until owner defines what rewards actually represent.
 
-### M35 — Save System
+### M40 — Save System
 
-- [ ] SB-M35-001 Versioned schema. — [ ] SB-M35-002 Settings.
-- [ ] SB-M35-003 Progression. — [ ] SB-M35-004 Win streak.
-- [ ] SB-M35-005 Economy if later defined.
-- [ ] SB-M35-006 Safe write strategy.
-- [ ] SB-M35-007 Missing-save behavior. — [ ] SB-M35-008 Corruption recovery.
-- [ ] SB-M35-009 Migration strategy.
-- [ ] SB-M35-010 Round-trip tests. — [ ] SB-M35-011 Corrupt-file tests.
+- [ ] SB-M40-001 Versioned schema. — [ ] SB-M40-002 Settings.
+- [ ] SB-M40-003 Progression. — [ ] SB-M40-004 Win streak.
+- [ ] SB-M40-005 Economy if later defined.
+- [ ] SB-M40-006 Safe write strategy.
+- [ ] SB-M40-007 Missing-save behavior. — [ ] SB-M40-008 Corruption recovery.
+- [ ] SB-M40-009 Migration strategy.
+- [ ] SB-M40-010 Round-trip tests. — [ ] SB-M40-011 Corrupt-file tests.
 
-### M36 — Settings
+### M41 — Settings
 
-- [ ] SB-M36-001 Master volume. — [ ] SB-M36-002 Music. — [ ] SB-M36-003 SFX.
-- [ ] SB-M36-004 Haptics. — [ ] SB-M36-005 Reduced effects.
-- [ ] SB-M36-006 Persistence. — [ ] SB-M36-007 Settings UI.
-- [ ] SB-M36-008 Relaunch tests.
+- [ ] SB-M41-001 Master volume. — [ ] SB-M41-002 Music. — [ ] SB-M41-003 SFX.
+- [ ] SB-M41-004 Haptics. — [ ] SB-M41-005 Reduced effects.
+- [ ] SB-M41-006 Persistence. — [ ] SB-M41-007 Settings UI.
+- [ ] SB-M41-008 Relaunch tests.
 
-### M37 — Home / Navigation
+### M42 — Home / Navigation
 
-- [ ] SB-M37-001 Navigation architecture. — [ ] SB-M37-002 Home.
-- [ ] SB-M37-003 Play/Continue. — [ ] SB-M37-004 Settings.
-- [ ] SB-M37-005 Level select if approved.
-- [ ] SB-M37-006 Gameplay transition. — [ ] SB-M37-007 Results transition.
-- [ ] SB-M37-008 Prevent duplicate transitions. — [ ] SB-M37-009 Back navigation.
-- [ ] SB-M37-010 Build Home as responsive Godot containers/components.
-- [ ] SB-M37-011 Recreate owner-approved Home art direction with canonical regions.
-- [ ] SB-M37-012 Keep shortcut columns responsive around central area.
-- [ ] SB-M37-013 Validate Home-specific manifest entries before generation.
-- [ ] SB-M37-014 Generate only Home-specific required illustrative assets.
-- [ ] SB-M37-015 Keep dynamic values/timers/counts/labels live in Godot UI.
-- [ ] SB-M37-016 Require owner approval before production promotion.
-- [ ] SB-M37-017 Bind approved art and validate viewport matrix.
+- [ ] SB-M42-001 Navigation architecture. — [ ] SB-M42-002 Home.
+- [ ] SB-M42-003 Play/Continue. — [ ] SB-M42-004 Settings.
+- [ ] SB-M42-005 Level select if approved.
+- [ ] SB-M42-006 Gameplay transition. — [ ] SB-M42-007 Results transition.
+- [ ] SB-M42-008 Prevent duplicate transitions. — [ ] SB-M42-009 Back navigation.
+- [ ] SB-M42-010 Build Home as responsive Godot containers/components.
+- [ ] SB-M42-011 Recreate owner-approved Home art direction with canonical regions.
+- [ ] SB-M42-012 Keep shortcut columns responsive around central area.
+- [ ] SB-M42-013 Validate Home-specific manifest entries before generation.
+- [ ] SB-M42-014 Generate only Home-specific required illustrative assets.
+- [ ] SB-M42-015 Keep dynamic values/timers/counts/labels live in Godot UI.
+- [ ] SB-M42-016 Require owner approval before production promotion.
+- [ ] SB-M42-017 Bind approved art and validate viewport matrix.
 
-### M38 — Results Screen
+### M43 — Results Screen
 
-- [ ] SB-M38-001 Result model. — [ ] SB-M38-002 Completion UI.
-- [ ] SB-M38-003 Streak. — [ ] SB-M38-004 Reward if defined.
-- [ ] SB-M38-005 Continue. — [ ] SB-M38-006 Replay if approved.
-- [ ] SB-M38-007 No double reward. — [ ] SB-M38-008 Rapid-tap protection.
+- [ ] SB-M43-001 Result model. — [ ] SB-M43-002 Completion UI.
+- [ ] SB-M43-003 Streak. — [ ] SB-M43-004 Reward if defined.
+- [ ] SB-M43-005 Continue. — [ ] SB-M43-006 Replay if approved.
+- [ ] SB-M43-007 No double reward. — [ ] SB-M43-008 Rapid-tap protection.
 
 **Shared later-screen visual production rules**
 - [ ] SB-UI-017 Implement reusable `BasePopup` composition.
@@ -1098,168 +1338,168 @@ Do not implement until owner defines what rewards actually represent.
 - [ ] SB-UI-020 Do not pre-generate speculative asset libraries for unknown future states.
 - [ ] SB-UI-021 Treat final visual polish as consolidation/QA, not first production-art implementation.
 
-### M39 — Tutorial `[DESIGN GATE]`
+### M44 — Tutorial `[DESIGN GATE]`
 
 Teach five-slot interaction, color matching, Scrubbot flow, no-work behavior if needed. Keep tutorial logic separate from core gameplay.
 
-### M40 — Debug Tooling
+### M45 — Debug Tooling
 
-- [ ] SB-M40-001 Debug overlay. — [ ] SB-M40-002 Level ID.
-- [ ] SB-M40-003 Difficulty. — [ ] SB-M40-004 Dimensions.
-- [ ] SB-M40-005 Cell count. — [ ] SB-M40-006 ACTIVE count. — [ ] SB-M40-007 CLEARED count.
-- [ ] SB-M40-008 Reserved count if implemented. — [ ] SB-M40-009 Active bots.
-- [ ] SB-M40-010 FPS. — [ ] SB-M40-011 Frame time.
-- [ ] SB-M40-012 Target markers. — [ ] SB-M40-013 Route visualization.
-- [ ] SB-M40-014 Cell grid. — [ ] SB-M40-015 Effect toggle.
-- [ ] SB-M40-016 Instant reset. — [ ] SB-M40-017 Level switcher.
-- [ ] SB-M40-018 Disable release-facing debug UI.
+- [ ] SB-M45-001 Debug overlay. — [ ] SB-M45-002 Level ID.
+- [ ] SB-M45-003 Difficulty. — [ ] SB-M45-004 Dimensions.
+- [ ] SB-M45-005 Cell count. — [ ] SB-M45-006 ACTIVE count. — [ ] SB-M45-007 CLEARED count.
+- [ ] SB-M45-008 Reserved count if implemented. — [ ] SB-M45-009 Active bots.
+- [ ] SB-M45-010 FPS. — [ ] SB-M45-011 Frame time.
+- [ ] SB-M45-012 Target markers. — [ ] SB-M45-013 Route visualization.
+- [ ] SB-M45-014 Cell grid. — [ ] SB-M45-015 Effect toggle.
+- [ ] SB-M45-016 Instant reset. — [ ] SB-M45-017 Level switcher.
+- [ ] SB-M45-018 Disable release-facing debug UI.
 
-### M41 — Performance `[PERFORMANCE]`
+### M46 — Performance `[PERFORMANCE]`
 
 Maximum board target: 59×59 = 3,481.
 
-- [ ] SB-M41-001 Level parsing. — [ ] SB-M41-002 BoardState. — [ ] SB-M41-003 Renderer.
-- [ ] SB-M41-004 Color candidate index + reachability/access. — [ ] SB-M41-005 TargetSelector. — [ ] SB-M41-006 Routing.
-- [ ] SB-M41-007 Scrubbot agents. — [ ] SB-M41-008 Effects.
-- [ ] SB-M41-009 Memory baseline. — [ ] SB-M41-010 59×59 memory.
-- [ ] SB-M41-011 Per-frame allocation detection.
-- [ ] SB-M41-012 Repeated restart. — [ ] SB-M41-013 Long session.
-- [ ] SB-M41-014 High agent density.
+- [ ] SB-M46-001 Level parsing. — [ ] SB-M46-002 BoardState. — [ ] SB-M46-003 Renderer.
+- [ ] SB-M46-004 Color candidate index + reachability/access. — [ ] SB-M46-005 TargetSelector. — [ ] SB-M46-006 Routing.
+- [ ] SB-M46-007 Scrubbot agents. — [ ] SB-M46-008 Effects.
+- [ ] SB-M46-009 Memory baseline. — [ ] SB-M46-010 59×59 memory.
+- [ ] SB-M46-011 Per-frame allocation detection.
+- [ ] SB-M46-012 Repeated restart. — [ ] SB-M46-013 Long session.
+- [ ] SB-M46-014 High agent density.
 
-### M42 — Android Device Testing
+### M47 — Android Device Testing
 
-- [ ] SB-M42-001 Android export setup. — [ ] SB-M42-002 Development APK.
-- [ ] SB-M42-003 Real device install. — [ ] SB-M42-004 Touch.
-- [ ] SB-M42-005 Portrait. — [ ] SB-M42-006 Safe areas.
-- [ ] SB-M42-007 Easy performance. — [ ] SB-M42-008 Medium performance.
-- [ ] SB-M42-009 Hard performance. — [ ] SB-M42-010 Very Hard/59×59 performance.
-- [ ] SB-M42-011 High bot density. — [ ] SB-M42-012 Background/foreground.
-- [ ] SB-M42-013 Heat/battery extended test.
-- [ ] SB-M42-014 Record device/results.
+- [ ] SB-M47-001 Android export setup. — [ ] SB-M47-002 Development APK.
+- [ ] SB-M47-003 Real device install. — [ ] SB-M47-004 Touch.
+- [ ] SB-M47-005 Portrait. — [ ] SB-M47-006 Safe areas.
+- [ ] SB-M47-007 Easy performance. — [ ] SB-M47-008 Medium performance.
+- [ ] SB-M47-009 Hard performance. — [ ] SB-M47-010 Very Hard/59×59 performance.
+- [ ] SB-M47-011 High bot density. — [ ] SB-M47-012 Background/foreground.
+- [ ] SB-M47-013 Heat/battery extended test.
+- [ ] SB-M47-014 Record device/results.
 
-### M43 — iOS Readiness
+### M48 — iOS Readiness
 
-- [ ] SB-M43-001 Avoid Android-only gameplay architecture.
-- [ ] SB-M43-002 Document Apple toolchain requirement.
-- [ ] SB-M43-003 Prepare iOS configuration when hardware exists.
-- [ ] SB-M43-004 Real-device iOS testing later.
+- [ ] SB-M48-001 Avoid Android-only gameplay architecture.
+- [ ] SB-M48-002 Document Apple toolchain requirement.
+- [ ] SB-M48-003 Prepare iOS configuration when hardware exists.
+- [ ] SB-M48-004 Real-device iOS testing later.
 
-### M44 — Responsive UI
+### M49 — Responsive UI
 
-- [ ] SB-M44-001 16:9 portrait. — [ ] SB-M44-002 19.5:9. — [ ] SB-M44-003 20:9.
-- [ ] SB-M44-004 Tall phone. — [ ] SB-M44-005 Tablet. — [ ] SB-M44-006 Notch/cutout.
-- [ ] SB-M44-007 Five slots stay usable. — [ ] SB-M44-008 Board stays visible.
-- [ ] SB-M44-009 Rectangular boards remain correctly scaled.
-- [ ] SB-M44-010 Touch mapping remains accurate.
-- [ ] SB-M44-011 Adopt 1080×2160 reference design viewport and stretch policy.
-- [ ] SB-M44-012 Implement reusable SafeAreaRoot.
-- [ ] SB-M44-013 Implement centralized UI tokens.
-- [ ] SB-M44-014 Implement COMPACT/NORMAL/TALL classification.
-- [ ] SB-M44-015 Validate 1080×2160.
-- [ ] SB-M44-016 Validate 1170×2532.
-- [ ] SB-M44-017 Validate 1290×2796.
-- [ ] SB-M44-018 Validate 1080×2400.
-- [ ] SB-M44-019 Validate 1440×3200.
-- [ ] SB-M44-020 Validate minimum touch target.
-- [ ] SB-M44-021 Confirm popups fit safe area.
-- [ ] SB-M44-022 Confirm text containers survive localization expansion.
-- [ ] SB-M44-023 Confirm protected bottom controls remain usable on compact devices.
-- [ ] SB-M44-024 Add automated/manual responsive validation evidence.
+- [ ] SB-M49-001 16:9 portrait. — [ ] SB-M49-002 19.5:9. — [ ] SB-M49-003 20:9.
+- [ ] SB-M49-004 Tall phone. — [ ] SB-M49-005 Tablet. — [ ] SB-M49-006 Notch/cutout.
+- [ ] SB-M49-007 Five slots stay usable. — [ ] SB-M49-008 Board stays visible.
+- [ ] SB-M49-009 Rectangular boards remain correctly scaled.
+- [ ] SB-M49-010 Touch mapping remains accurate.
+- [ ] SB-M49-011 Adopt 1080×2160 reference design viewport and stretch policy.
+- [ ] SB-M49-012 Implement reusable SafeAreaRoot.
+- [ ] SB-M49-013 Implement centralized UI tokens.
+- [ ] SB-M49-014 Implement COMPACT/NORMAL/TALL classification.
+- [ ] SB-M49-015 Validate 1080×2160.
+- [ ] SB-M49-016 Validate 1170×2532.
+- [ ] SB-M49-017 Validate 1290×2796.
+- [ ] SB-M49-018 Validate 1080×2400.
+- [ ] SB-M49-019 Validate 1440×3200.
+- [ ] SB-M49-020 Validate minimum touch target.
+- [ ] SB-M49-021 Confirm popups fit safe area.
+- [ ] SB-M49-022 Confirm text containers survive localization expansion.
+- [ ] SB-M49-023 Confirm protected bottom controls remain usable on compact devices.
+- [ ] SB-M49-024 Add automated/manual responsive validation evidence.
 
-### M45 — Accessibility
+### M50 — Accessibility
 
-- [ ] SB-M45-001 Review color-only information.
-- [ ] SB-M45-002 Alternative visual slot cues if necessary.
-- [ ] SB-M45-003 Color vision tests. — [ ] SB-M45-004 Contrast.
-- [ ] SB-M45-005 Reduced effects. — [ ] SB-M45-006 Touch sizes.
-- [ ] SB-M45-007 Text readability.
-- [ ] SB-M45-008 Do not encode important state solely in decorative art.
-- [ ] SB-M45-009 Keep labels/counts live and contrast-independent from illustration.
-- [ ] SB-M45-010 Ensure generated icon families distinguishable at mobile size.
-- [ ] SB-M45-011 Ensure essential gameplay understandable without decoration.
+- [ ] SB-M50-001 Review color-only information.
+- [ ] SB-M50-002 Alternative visual slot cues if necessary.
+- [ ] SB-M50-003 Color vision tests. — [ ] SB-M50-004 Contrast.
+- [ ] SB-M50-005 Reduced effects. — [ ] SB-M50-006 Touch sizes.
+- [ ] SB-M50-007 Text readability.
+- [ ] SB-M50-008 Do not encode important state solely in decorative art.
+- [ ] SB-M50-009 Keep labels/counts live and contrast-independent from illustration.
+- [ ] SB-M50-010 Ensure generated icon families distinguishable at mobile size.
+- [ ] SB-M50-011 Ensure essential gameplay understandable without decoration.
 
-### M46 — Localization Readiness
+### M51 — Localization Readiness
 
-- [ ] SB-M46-001 Avoid hard-coded user text.
-- [ ] SB-M46-002 Translation-key convention.
-- [ ] SB-M46-003 Longer-string layouts. — [ ] SB-M46-004 Pseudo-localization.
-- [ ] SB-M46-005 Actual languages decided later. `[DESIGN GATE]`
+- [ ] SB-M51-001 Avoid hard-coded user text.
+- [ ] SB-M51-002 Translation-key convention.
+- [ ] SB-M51-003 Longer-string layouts. — [ ] SB-M51-004 Pseudo-localization.
+- [ ] SB-M51-005 Actual languages decided later. `[DESIGN GATE]`
 
-### M47 — Production Content Scale-Up `[CONTENT]`
+### M52 — Production Content Scale-Up `[CONTENT]`
 
-- [ ] SB-M47-001 Import first Easy art. — [ ] SB-M47-002 Import first Medium art.
-- [ ] SB-M47-003 Import first Hard art. — [ ] SB-M47-004 Import first Very Hard art.
-- [ ] SB-M47-005 Validate rectangular production art.
-- [ ] SB-M47-006 Batch convert. — [ ] SB-M47-007 Batch validate.
-- [ ] SB-M47-008 Generate previews. — [ ] SB-M47-009 Populate catalog.
-- [ ] SB-M47-010 Verify every source image preserved.
-- [ ] SB-M47-011 Verify generated level reproduces source.
+- [ ] SB-M52-001 Import first Easy art. — [ ] SB-M52-002 Import first Medium art.
+- [ ] SB-M52-003 Import first Hard art. — [ ] SB-M52-004 Import first Very Hard art.
+- [ ] SB-M52-005 Validate rectangular production art.
+- [ ] SB-M52-006 Batch convert. — [ ] SB-M52-007 Batch validate.
+- [ ] SB-M52-008 Generate previews. — [ ] SB-M52-009 Populate catalog.
+- [ ] SB-M52-010 Verify every source image preserved.
+- [ ] SB-M52-011 Verify generated level reproduces source.
 
-### M48 — Level QA `[QA]`
+### M53 — Level QA `[QA]`
 
 Every production level:
-- [ ] SB-M48-001 Legal dimensions/envelope. — [ ] SB-M48-002 Correct Difficulty V1 metadata/score context.
-- [ ] SB-M48-003 Valid locked C01..C16 palette and current 3–12 used-color envelope; old class-specific color bands are not difficulty truth.
-- [ ] SB-M48-004 Correct cell count.
-- [ ] SB-M48-005 No invalid palette IDs. — [ ] SB-M48-006 Recognizable ACTIVE source artwork.
-- [ ] SB-M48-007 No unintended interpolation. — [ ] SB-M48-008 Correct CLEARED transparency.
-- [ ] SB-M48-009 Solvable under canonical routing/access semantics, including Railroad V1 where applicable.
-- [ ] SB-M48-010 No routing pathology; fully enclosed matching ACTIVE target remains untargetable until legal aligned/cleared approach exists.
-- [ ] SB-M48-011 Good performance. — [ ] SB-M48-012 Correct preview.
-- [ ] SB-M48-013 Unique ID.
+- [ ] SB-M53-001 Legal dimensions/envelope. — [ ] SB-M53-002 Correct Difficulty V1 metadata/score context.
+- [ ] SB-M53-003 Valid locked C01..C16 palette and current 3–12 used-color envelope; old class-specific color bands are not difficulty truth.
+- [ ] SB-M53-004 Correct cell count.
+- [ ] SB-M53-005 No invalid palette IDs. — [ ] SB-M53-006 Recognizable ACTIVE source artwork.
+- [ ] SB-M53-007 No unintended interpolation. — [ ] SB-M53-008 Correct CLEARED transparency.
+- [ ] SB-M53-009 Solvable under canonical routing/access semantics, including Railroad V1 where applicable.
+- [ ] SB-M53-010 No routing pathology; fully enclosed matching ACTIVE target remains untargetable until legal aligned/cleared approach exists.
+- [ ] SB-M53-011 Good performance. — [ ] SB-M53-012 Correct preview.
+- [ ] SB-M53-013 Unique ID.
 
-### M49 — Regression Suite `[QA]`
+### M54 — Regression Suite `[QA]`
 
-- [ ] SB-M49-001 Difficulty/progression tests. — [ ] SB-M49-002 Level parser tests.
-- [ ] SB-M49-003 BoardState tests. — [ ] SB-M49-004 Renderer tests.
-- [ ] SB-M49-005 Slot tests. — [ ] SB-M49-006 Color-candidate/reachability tests.
-- [ ] SB-M49-007 Reservation tests. — [ ] SB-M49-008 TargetSelector tests.
-- [ ] SB-M49-009 Routing tests including Railroad V1 geometry, connectors and aligned exits. — [ ] SB-M49-010 Dispatcher tests.
-- [ ] SB-M49-011 Completion tests. — [ ] SB-M49-012 Save tests.
-- [ ] SB-M49-013 Reward tests. — [ ] SB-M49-014 Content validation tests.
-- [ ] SB-M49-015 59×59 regression test.
+- [ ] SB-M54-001 Difficulty/progression tests. — [ ] SB-M54-002 Level parser tests.
+- [ ] SB-M54-003 BoardState tests. — [ ] SB-M54-004 Renderer tests.
+- [ ] SB-M54-005 Slot tests. — [ ] SB-M54-006 Color-candidate/reachability tests.
+- [ ] SB-M54-007 Reservation tests. — [ ] SB-M54-008 TargetSelector tests.
+- [ ] SB-M54-009 Routing tests including Railroad V1 geometry, connectors and aligned exits. — [ ] SB-M54-010 Dispatcher tests.
+- [ ] SB-M54-011 Completion tests. — [ ] SB-M54-012 Save tests.
+- [ ] SB-M54-013 Reward tests. — [ ] SB-M54-014 Content validation tests.
+- [ ] SB-M54-015 59×59 regression test.
 
-### M50 — Chaos / Long-Run QA `[QA]`
+### M55 — Chaos / Long-Run QA `[QA]`
 
-- [ ] SB-M50-001 Spam all five slots.
-- [ ] SB-M50-002 Restart while bots travel. — [ ] SB-M50-003 Pause while bots travel.
-- [ ] SB-M50-004 Background while bots travel.
-- [ ] SB-M50-005 Complete with bots in flight.
-- [ ] SB-M50-006 Exhaust color. — [ ] SB-M50-007 Exhaust slot work.
-- [ ] SB-M50-008 Repeated scene transitions.
-- [ ] SB-M50-009 Long high-load session.
-- [ ] SB-M50-010 Memory growth monitoring.
-- [ ] SB-M50-011 Duplicate signal monitoring.
-- [ ] SB-M50-012 Orphan Node monitoring.
-- [ ] SB-M50-013 Duplicate reward monitoring.
+- [ ] SB-M55-001 Spam all five slots.
+- [ ] SB-M55-002 Restart while bots travel. — [ ] SB-M55-003 Pause while bots travel.
+- [ ] SB-M55-004 Background while bots travel.
+- [ ] SB-M55-005 Complete with bots in flight.
+- [ ] SB-M55-006 Exhaust color. — [ ] SB-M55-007 Exhaust slot work.
+- [ ] SB-M55-008 Repeated scene transitions.
+- [ ] SB-M55-009 Long high-load session.
+- [ ] SB-M55-010 Memory growth monitoring.
+- [ ] SB-M55-011 Duplicate signal monitoring.
+- [ ] SB-M55-012 Orphan Node monitoring.
+- [ ] SB-M55-013 Duplicate reward monitoring.
 
-### M51 — Analytics `[DESIGN GATE]`
+### M56 — Analytics `[DESIGN GATE]`
 
 No analytics SDK without owner approval.
 
-### M52 — Monetization `[DESIGN GATE]`
+### M57 — Monetization `[DESIGN GATE]`
 
 Do NOT automatically add ads, rewarded ads, IAP, subscriptions, or an
 energy system. Owner decides business model first.
 
-### M53 — Privacy & Compliance
+### M58 — Privacy & Compliance
 
 Once external services exist:
-- [ ] SB-M53-001 Third-party inventory. — [ ] SB-M53-002 Data inventory.
-- [ ] SB-M53-003 Remove unnecessary collection.
-- [ ] SB-M53-004 Privacy disclosures. — [ ] SB-M53-005 Store declarations.
-- [ ] SB-M53-006 Age-rating review.
-- [ ] SB-M53-007 Child-directed considerations if applicable.
+- [ ] SB-M58-001 Third-party inventory. — [ ] SB-M58-002 Data inventory.
+- [ ] SB-M58-003 Remove unnecessary collection.
+- [ ] SB-M58-004 Privacy disclosures. — [ ] SB-M58-005 Store declarations.
+- [ ] SB-M58-006 Age-rating review.
+- [ ] SB-M58-007 Child-directed considerations if applicable.
 
-### M54 — Build Pipeline
+### M59 — Build Pipeline
 
-- [ ] SB-M54-001 Debug export. — [ ] SB-M54-002 Release export.
-- [ ] SB-M54-003 Output directories. — [ ] SB-M54-004 Versioning.
-- [ ] SB-M54-005 Build numbers. — [ ] SB-M54-006 Run tests before release build.
-- [ ] SB-M54-007 Run content validator. — [ ] SB-M54-008 Generate Android build.
-- [ ] SB-M54-009 Verify clean clone can build.
+- [ ] SB-M59-001 Debug export. — [ ] SB-M59-002 Release export.
+- [ ] SB-M59-003 Output directories. — [ ] SB-M59-004 Versioning.
+- [ ] SB-M59-005 Build numbers. — [ ] SB-M59-006 Run tests before release build.
+- [ ] SB-M59-007 Run content validator. — [ ] SB-M59-008 Generate Android build.
+- [ ] SB-M59-009 Verify clean clone can build.
 
-### M55 — Release
+### M60 — Release
 
 Application ID, icon, splash, portrait config, signing, release settings,
 debug removal, store screenshots, final QA, tagged source commit, release
@@ -1295,13 +1535,17 @@ artifact validation. **Never commit signing secrets.**
 | RISK-006 | Existing artwork gets silently resized/altered | HIGH | Source preservation + explicit compiler/importer + round-trip comparison |
 | RISK-007 | AI agent invents missing references | HIGH | Canonical reference library/manifest |
 | RISK-008 | External reference game copied too closely | HIGH | Original SCRUBBOTS rail/art/UI language; external references conceptual only |
-| RISK-009 | Target race assigns same pixel to multiple Scrubbots | HIGH | Reservation strict tests |
+| RISK-009 | Target race assigns same pixel to multiple Scrubbots/batches | HIGH | ReservationState + Batch Target Claim Engine atomic uniqueness tests |
 | RISK-010 | Renderer creates thousands of Nodes | HIGH | Batched renderer requirement |
 | RISK-011 | Desktop testing hides mobile performance issues | HIGH | Real Android profiling |
 | RISK-012 | Future agent breaks explicit preload/headless compatibility | MEDIUM/HIGH | ADR-009 + regression tests |
-| RISK-013 | Target ordering appears wrong because exterior HOW cannot legally reach intended perimeter target | HIGH | Railroad V1 aligned exits + exact Hazard Bot (0,19) regression |
+| RISK-013 | Target ordering appears wrong because exterior/interior HOW cannot legally reach intended target | HIGH | Railroad V1 legal ingress + orthogonal interior-turn routing + exact Hazard Bot regressions |
 | RISK-014 | Hidden debug input diverges from production slot-origin behavior | HIGH | Slot-click-only owner gameplay activation; no SPACE dispatch |
 | RISK-015 | Railroad visual and routing geometry drift apart | HIGH | One canonical ScrubRail geometry source consumed by routing, connector and presentation |
+| RISK-016 | Generated batch supply is mathematically impossible to finish | CRITICAL | Solvability Engine proof before production acceptance |
+| RISK-017 | Scheduler spawns a robot without unique target/reservation/valid route | CRITICAL | No-target/no-reservation/no-route/no-robot transactional invariant |
+| RISK-018 | Temporary WAITING is misclassified as deadlock | HIGH | Solver-backed STALLED vs DEADLOCK classification + in-flight/future-progress guards |
+| RISK-019 | Multiple same-color batches fight/starve or double-claim targets | HIGH | Oldest-placement-first same-color arbitration + atomic Batch Target Claim ledger |
 
 ---
 
@@ -1334,7 +1578,7 @@ RESERVATION
 ↓
 TARGETSELECTOR
 ↓
-ROUTING + SCRUBBOT RAILROAD V1             ACTIVE (M22 V02)
+ROUTING + SCRUBBOT RAILROAD V1             DONE (M22 V07 + OWNER ACCEPTANCE)
 ↓
 SCRUBBOT AGENT
 ↓
@@ -1344,7 +1588,17 @@ COMPLETE CLEANING LOOP
 ↓
 REAL SCRUBBOTS ART VERTICAL SLICE             DONE (M21)
 ↓
-PRODUCTION UI / TOUCH                         ACTIVE (M22+)
+BATCH SUPPLY ENGINE                           NEXT (M23)
+↓
+FIVE-SLOT BATCH ENGINE                        M24
+↓
+BATCH TARGET CLAIM ENGINE                     M25
+↓
+AUTO DISPATCH SCHEDULER                       M26
+↓
+SOLVABILITY / DEADLOCK ENGINE                 M27
+↓
+PRODUCTION UI / TOUCH                         M28+
 ↓
 WIN / PROGRESSION / SAVE
 ↓
@@ -1363,7 +1617,12 @@ M21 achieved the first real gameplay proof using the then-current adjacent exter
 
 ```text
 ONE REAL OWNER-APPROVED SCRUBBOTS LEVEL IMAGE
-+ FIVE FUNCTIONAL VISIBLE COLOR SLOTS
++ FIVE EMPTY BATCH SLOTS
++ 3/4/5 FIFO BATCH-SUPPLY COLUMNS
++ V1 THREE VISIBLE ROWS; FRONT ROW ONLY SELECTABLE
++ AUTOMATIC RIGHTMOST-EMPTY SLOT PLACEMENT
++ COLOR/COUNT BATCH QUOTAS WITH WAITING/RESUME
++ SAME-COLOR OLDEST-BATCH-FIRST TARGET CLAIM ARBITRATION
 + SLOT-CLICK-ONLY OWNER GAMEPLAY ACTIVATION
 + CORRECT COLOR CANDIDATES + REACHABLE TARGET SELECTION
 + BOTTOM-MOST / LEFT-MOST PRIORITY AMONG CURRENTLY TARGETABLE MATCHING CELLS
@@ -1371,9 +1630,10 @@ ONE REAL OWNER-APPROVED SCRUBBOTS LEVEL IMAGE
 + 2-CELL ARTWORK CLEARANCE + 1-CELL RAIL WIDTH
 + VISIBLE SLOT -> BOTTOM-RAIL CONNECTOR
 + RAIL-ONLY EXTERIOR TRAVEL
-+ EXIT ONLY AT TARGET ROW/COLUMN ALIGNMENT
-+ ORTHOGONAL FINAL TARGET APPROACH
-+ NO-REACHABLE-TARGET-NO-SPAWN
++ LEGAL RAIL INGRESS INTO OPEN/CLEARED PERIMETER SPACE
++ ORTHOGONAL INTERIOR-CORRIDOR ROUTING WITH 90-DEGREE TURNS
++ NO TARGET / NO RESERVATION / NO VALID ROUTE = NO ROBOT
++ SOLVABILITY-PROVED SUPPLY + RUNTIME DEADLOCK CLASSIFICATION
 + VALID TARGET RESERVATION
 + PIXELS BEING CLEANED TO TRANSPARENCY
 + SCRUBBOTS DISAPPEARING AFTER CLEANING
@@ -1401,26 +1661,30 @@ PROMPT 09  RoutingSystem + Production Routing                    [DONE; exterior
 PROMPT 10  ScrubbotAgent + Dispatcher                            [DONE]
 PROMPT 11  Complete Clearing Vertical Slice                      [DONE]
 PROMPT 12  First Real SCRUBBOTS Artwork Playable Level           [DONE — M21 V10]
-PROMPT 13  Production Slot UI + Railroad + Gameplay Layout + Touch Controls [M22 ACTIVE]
-PROMPT 14  Win/Lose Completion Rules + Results Flow
-PROMPT 15  Scrubbot Final Art + Cleaning Effects + Audio/Haptics
-PROMPT 16  Level Catalog + Difficulty V1 Content Rules
-PROMPT 17  Progression + Win Streak + Save System
-PROMPT 18  Home + Settings + Tutorial + Navigation
-PROMPT 19  Android Device Performance + Full 59×59 Stress Tests
-PROMPT 20  Production Content Scale-Up + Regression + Chaos QA
-PROMPT 21  Release Candidate Preparation
+PROMPT 13  Production Slot UI + Railroad V1                      [DONE — M22 V07 + owner acceptance]
+PROMPT 14  Batch Supply Engine                                      [NEXT — M23]
+PROMPT 15  Five-Slot Batch Engine                                   [M24]
+PROMPT 16  Batch Target Claim Engine                                [M25]
+PROMPT 17  Auto Dispatch Scheduler                                  [M26]
+PROMPT 18  Solvability / Deadlock Engine                            [M27]
+PROMPT 19  Gameplay Screen Layout + Mobile Touch                    [M28–M29]
+PROMPT 20  Win/Lose Completion Rules + Results Flow
+PROMPT 21  Scrubbot Final Art + Cleaning Effects + Audio/Haptics
+PROMPT 22  Level Catalog + Difficulty V1 Content Rules
+PROMPT 23  Progression + Win Streak + Save System
+PROMPT 24  Home + Settings + Tutorial + Navigation
+PROMPT 25  Android Device Performance + Full 59×59 Stress Tests
+PROMPT 26  Production Content Scale-Up + Regression + Chaos QA
+PROMPT 27  Release Candidate Preparation
 ```
 
 ---
 
 ## NEXT IMMEDIATE MILESTONE
 
-**Current implementation gate — M22-C001 V02:** execute
-`coordination/sessions/M22-C001/CHATGPT_PROMPT_V02.md` against
-`coordination/sessions/M22-C001/CHATGPT_AUDIT_CRITERIA_V02.md` and the owner-locked `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`.
+**M23-C001 V01 — Batch Supply Engine.** The next implementation cycle builds the real color/count supply queues before any production-screen-layout work. V1 must support owner-locked FIFO columns, three visible rows for the Hazard Bot validation path, front-row-only selection, hidden future batches, deterministic/conserved candidate generation and transactional handoff to the future Five-Slot Batch Engine. It must not weaken or rewrite the accepted M22 Railroad V1/V07 routing, TargetSelector, ReservationState, dispatcher or authenticated-clearing contracts.
 
-V01 is independently accepted and its slot foundation must be preserved. V02 implements one canonical Railroad V1 geometry source, a reusable native railroad view, real slot→bottom-rail connectors, railroad-constrained production routing and aligned orthogonal target exits. It must preserve TargetSelector WHAT-policy, ReservationState authority, authenticated clearing, rapid/reset correctness and M21 owner-approved target order. It must migrate current tests/docs away from obsolete exact adjacent-ring geometry without rewriting historical M21 audit evidence. No Magnific/image generation or credit spend is authorized. Claude/Codex must not edit this `TASKS.md`; ChatGPT audits V02 and then decides the owner F6 visual gate.
+M23 is followed strictly by M24 Five-Slot Batch Engine, M25 Batch Target Claim Engine, M26 Auto Dispatch Scheduler and M27 Solvability / Deadlock Engine. The previous Gameplay Screen Layout milestone has moved to M28; production UI work must not jump ahead of these five core-gameplay milestones.
 
 ---
 
@@ -1448,6 +1712,6 @@ Runtime implementation boundary remains explicit. The following requirements are
 
 These ranges are references here, not live checklist rows. They must not be recreated as a duplicate game-side denominator. When runtime implementation opens, the concrete main-game implementation cycle is tracked in this repository and its accepted audit evidence is mirrored back to the canonical Factory requirement.
 
-Existing game-owned catalog/content QA milestones such as M30, M47 and M48 remain unchanged and continue to gate what the shipping game accepts.
+Existing game-owned catalog/content QA milestones such as M35, M52 and M53 remain unchanged and continue to gate what the shipping game accepts.
 
 Migration note: removing the 224 duplicate sidecar checklist rows changes the game tracker denominator from 953 to 729 without changing the numerator. This is task-ownership normalization, not newly completed gameplay work.
