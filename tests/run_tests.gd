@@ -251,6 +251,8 @@ func _initialize() -> void:
 	_run_m22_v07_interior_turn_tests()
 	# M23-C001 V01 — deterministic batch supply engine.
 	_run_m23_batch_supply_tests()
+	# M24-C001 V01 — five-slot batch engine.
+	_run_m24_five_slot_batch_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -14057,6 +14059,8 @@ const ColorBatch = preload("res://scripts/gameplay/supply/color_batch.gd")
 const BatchSupplyEngine = preload("res://scripts/gameplay/supply/batch_supply_engine.gd")
 const BatchSupplyGenerator = preload("res://scripts/gameplay/supply/batch_supply_generator.gd")
 const BatchSelectionTransaction = preload("res://scripts/gameplay/supply/batch_selection_transaction.gd")
+const FiveSlotBatchEngine = preload("res://scripts/gameplay/slots/five_slot_batch_engine.gd")
+const SlotBatchState = preload("res://scripts/gameplay/slots/slot_batch_state.gd")
 
 func _m23_level(w: int, h: int, cells: Array, palette_size: int):
 	var pal := PackedStringArray()
@@ -14410,3 +14414,334 @@ func _run_m23_v03_identity_tests() -> void:
 	e.reset()
 	_check(not e.commit(pre), "M23 V03: pre-reset token fails closed after reset")
 	_check_eq(e.get_front(0).get_batch_id(), "A0", "M23 V03: reset restored original column-0 front")
+
+# ============================================================================
+# M24-C001 V01 — Five-Slot Batch Engine
+# ============================================================================
+
+## Build a 3-column M23 supply from explicit ColorBatch column arrays (real M23 API).
+func _m24_supply(col0: Array, col1: Array, col2: Array):
+	var e = BatchSupplyEngine.create(3, 3)
+	e.load_columns([col0, col1, col2])
+	return e
+
+## Place col0's front through the real M23->M24 path; returns the result dict.
+func _m24_place(engine, supply, column) -> Dictionary:
+	return engine.select_front_batch(supply, column)
+
+func _run_m24_five_slot_batch_tests() -> void:
+	print("---- M24-C001 V01: Five-Slot Batch Engine ----")
+	_m24_structure_and_invariants()   # SB-M24-001..005, 012..015, 024
+	_m24_placement_and_atomicity()    # SB-M24-006..011, 023, 027
+	_m24_lifecycle_accounting()       # SB-M24-016..022
+	_m24_reset_pause()                # SB-M24-025, 026
+	_m24_invalid_matrix()             # SB-M24-030
+
+# --- WP01: structure, invariants, queries -----------------------------------
+func _m24_structure_and_invariants() -> void:
+	var e = FiveSlotBatchEngine.new()
+	_check_eq(e.get_slot_count(), 5, "M24: exactly five slots")
+	var all_empty := true
+	for i in range(5):
+		if not e.is_empty(i) or e.get_state(i) != "EMPTY":
+			all_empty = false
+		# EMPTY exposes no stale identity.
+		if e.get_batch_id(i) != "" or e.get_color_id(i) != -1 or e.get_initial_count(i) != 0 \
+				or e.get_remaining(i) != 0 or e.get_committed(i) != 0 or e.get_capacity(i) != 0 \
+				or e.get_placement_sequence(i) != -1:
+			all_empty = false
+	_check(all_empty, "M24: all five slots start EMPTY with no stale identity")
+	_check_eq(e.occupied_count(), 0, "M24: zero occupied initially")
+	_check(FiveSlotBatchEngine.SLOT_COUNT == 5, "M24: slot count is a locked constant (not configurable)")
+
+	# SlotBatchState is gameplay-domain data (RefCounted), not a Node/Control.
+	var st = SlotBatchState.make_empty()
+	_check(st is RefCounted and not (st is Node), "M24: SlotBatchState is domain data, not a Node/Control")
+
+	# Malformed occupied state fails closed.
+	_check(SlotBatchState.make_occupied("", 0, 5, 1) == null, "M24: empty batch_id rejected")
+	_check(SlotBatchState.make_occupied("B", -1, 5, 1) == null, "M24: negative color rejected")
+	_check(SlotBatchState.make_occupied("B", 0, 0, 1) == null, "M24: zero initial_count rejected")
+	_check(SlotBatchState.make_occupied("B", 0, -3, 1) == null, "M24: negative initial_count rejected")
+	_check(SlotBatchState.make_occupied("B", 0, 5, -1) == null, "M24: negative placement_sequence rejected")
+	_check(SlotBatchState.make_occupied("B", 1.0, 5, 1) == null, "M24: float color rejected")
+	var occ = SlotBatchState.make_occupied("B", 2, 5, 1)
+	_check(occ != null and occ.get_state() == "ACTIVE" and occ.get_remaining_to_clear() == 5 \
+		and occ.get_committed() == 0 and occ.get_capacity() == 5, "M24: valid occupied state (remaining==initial, committed 0)")
+
+	# Duplicate colors legal + independent identities via real placement path.
+	var e2 = FiveSlotBatchEngine.new()
+	var sup = _m24_supply(
+		[ColorBatch.make("BLUE_8", 3, 8, 16)],
+		[ColorBatch.make("BLUE_14", 3, 14, 16)],
+		[ColorBatch.make("BLUE_12", 3, 12, 16)])
+	var r0 := _m24_place(e2, sup, 0)
+	var r1 := _m24_place(e2, sup, 1)
+	var r2 := _m24_place(e2, sup, 2)
+	_check(r0["ok"] and r1["ok"] and r2["ok"], "M24: three same-color batches placed")
+	_check_eq(r0["slot"], 4, "M24: first placement -> rightmost slot 4")
+	_check_eq(r1["slot"], 3, "M24: second placement -> slot 3")
+	_check_eq(r2["slot"], 2, "M24: third placement -> slot 2")
+	_check(e2.get_color_id(4) == 3 and e2.get_color_id(3) == 3 and e2.get_color_id(2) == 3, "M24: same color in three slots (no merge)")
+	_check(e2.get_batch_id(4) == "BLUE_8" and e2.get_batch_id(3) == "BLUE_14" and e2.get_batch_id(2) == "BLUE_12", "M24: distinct batch identities preserved")
+	_check(e2.get_initial_count(4) == 8 and e2.get_initial_count(3) == 14 and e2.get_initial_count(2) == 12, "M24: independent initial counts (BLUE 8/14/12)")
+	_check(e2.get_placement_sequence(4) < e2.get_placement_sequence(3) and e2.get_placement_sequence(3) < e2.get_placement_sequence(2), "M24: monotonic placement sequence")
+
+	# Snapshot detachment: mutating returned data cannot mutate engine truth.
+	var snap = e2.snapshot()
+	snap[4]["remaining_to_clear"] = 999
+	snap[4]["batch_id"] = "HACKED"
+	snap.append({"x": 1})
+	_check(e2.get_remaining(4) == 8 and e2.get_batch_id(4) == "BLUE_8", "M24: snapshot mutation does not mutate engine")
+
+# --- WP02: placement + M23 transaction atomicity ----------------------------
+func _m24_placement_and_atomicity() -> void:
+	# Accepted placement consumes exactly one M23 front, advances that column once.
+	var e = FiveSlotBatchEngine.new()
+	var sup = _m24_supply(
+		[ColorBatch.make("A0", 0, 2, 5), ColorBatch.make("A1", 0, 3, 5)],
+		[ColorBatch.make("B0", 1, 4, 5)],
+		[])
+	var before_rem: int = sup.get_remaining(0)
+	var r := _m24_place(e, sup, 0)
+	_check(r["ok"] and r["slot"] == 4, "M24 txn: accepted placement -> slot 4")
+	_check_eq(sup.get_remaining(0), before_rem - 1, "M24 txn: exactly one M23 front consumed")
+	_check_eq(sup.get_front(0).get_batch_id(), "A1", "M24 txn: column advanced to next front")
+	_check(e.is_occupied(4) and e.get_state(4) == "ACTIVE", "M24 txn: slot 4 EMPTY->ACTIVE")
+	_check(e.get_remaining(4) == 2 and e.get_committed(4) == 0, "M24 txn: remaining==initial, committed 0")
+	_check_eq(e.occupied_count(), 1, "M24 txn: exactly one occupied slot")
+
+	# Exhausted column -> no placement, no consumption.
+	var r_empty := _m24_place(e, sup, 2)  # column 2 empty
+	_check(not r_empty["ok"] and r_empty["error"] == "no_front", "M24 txn: exhausted column rejected")
+	_check_eq(e.occupied_count(), 1, "M24 txn: no slot created on exhausted column")
+
+	# Bad supply object fails closed.
+	_check(not e.select_front_batch(RefCounted.new(), 0)["ok"], "M24 txn: foreign supply rejected")
+	_check(not e.select_front_batch(null, 0)["ok"], "M24 txn: null supply rejected")
+
+	# Full-five rejection: fill remaining 4 slots, then reject with zero mutation.
+	var full = FiveSlotBatchEngine.new()
+	var fsup = BatchSupplyEngine.create(5, 3)
+	fsup.load_columns([
+		[ColorBatch.make("F0", 0, 1, 5), ColorBatch.make("G0", 0, 9, 5)],
+		[ColorBatch.make("F1", 1, 1, 5)],
+		[ColorBatch.make("F2", 2, 1, 5)],
+		[ColorBatch.make("F3", 3, 1, 5)],
+		[ColorBatch.make("F4", 4, 1, 5)],
+	])
+	var slots_order := []
+	for c in range(5):
+		slots_order.append(full.select_front_batch(fsup, c)["slot"])
+	_check(slots_order == [4, 3, 2, 1, 0], "M24 txn: five placements fill 4,3,2,1,0 (rightmost-empty)")
+	_check(full.is_full(), "M24 txn: engine full after five placements")
+	var front_before: String = fsup.get_front(0).get_batch_id()  # G0
+	var rem_before: int = fsup.get_remaining(0)
+	var occ_snap := str(full.snapshot())
+	var rej := full.select_front_batch(fsup, 0)
+	_check(not rej["ok"] and rej["error"] == "slots_full", "M24 txn: sixth selection rejected (slots_full)")
+	_check_eq(fsup.get_front(0).get_batch_id(), front_before, "M24 txn: rejected placement did NOT advance supply (G0 still front)")
+	_check_eq(fsup.get_remaining(0), rem_before, "M24 txn: rejected placement did not consume supply")
+	_check(str(full.snapshot()) == occ_snap, "M24 txn: rejected placement left all slots unchanged (no ghost slot)")
+
+	# Rightmost-hole after a freed slot: complete slot 2 (F2, count 1) -> EMPTY, refill.
+	_check(full.commit_work(2, "WK-F2") and full.resolve_clear("WK-F2"), "M24 txn: drive slot 2 to completion")
+	_check(full.is_empty(2), "M24 txn: slot 2 freed to EMPTY")
+	_check(full.is_occupied(3) and full.is_occupied(4), "M24 txn: neighbors did not shift")
+	_check_eq(full.rightmost_empty_index(), 2, "M24 txn: rightmost empty is the freed hole (2)")
+	var refill := full.select_front_batch(fsup, 0)  # G0
+	_check(refill["ok"] and refill["slot"] == 2, "M24 txn: refill fills the freed hole (slot 2)")
+	_check_eq(full.get_batch_id(2), "G0", "M24 txn: G0 placed into slot 2")
+	_check_eq(fsup.get_remaining(0), rem_before - 1, "M24 txn: originating column advanced exactly once on successful retry")
+
+	# Rapid repeated sequential legal requests consume distinct FIFO fronts.
+	var e3 = FiveSlotBatchEngine.new()
+	var sup3 = _m24_supply(
+		[ColorBatch.make("P0", 0, 1, 5), ColorBatch.make("P1", 0, 2, 5)],
+		[ColorBatch.make("Q0", 1, 1, 5)],
+		[ColorBatch.make("R0", 2, 1, 5)])
+	var a := e3.select_front_batch(sup3, 0)
+	var b := e3.select_front_batch(sup3, 0)
+	_check(a["ok"] and b["ok"] and a["slot"] == 4 and b["slot"] == 3, "M24 txn: two legal requests fill 4 then 3")
+	_check(e3.get_batch_id(4) == "P0" and e3.get_batch_id(3) == "P1", "M24 txn: two distinct FIFO fronts consumed")
+	_check_eq(e3.occupied_count(), 2, "M24 txn: no duplicate insertion")
+
+	# Re-entrancy: a malicious supply double re-entering select during begin fails closed.
+	var reentrant = load("res://tests/support/m24_reentrant_supply.gd").new()
+	reentrant.engine = e3
+	var rr := e3.select_front_batch(reentrant, 0)
+	_check(not rr["ok"], "M24 txn: outer re-entrant selection fails closed (no split-brain)")
+	_check(reentrant.nested_result.has("error") and reentrant.nested_result["error"] == "reentrant", "M24 txn: nested re-entrant call rejected")
+	_check_eq(e3.occupied_count(), 2, "M24 txn: re-entrancy caused no extra insertion")
+
+# --- WP03: lifecycle accounting + WAITING/ACTIVE ----------------------------
+func _m24_lifecycle_accounting() -> void:
+	var e = FiveSlotBatchEngine.new()
+	var sup = _m24_supply(
+		[ColorBatch.make("C0", 2, 3, 5)],
+		[ColorBatch.make("D0", 1, 2, 5)],
+		[])
+	e.select_front_batch(sup, 0)  # slot 4: color 2, count 3
+	e.select_front_batch(sup, 1)  # slot 3: color 1, count 2
+
+	# commit up to capacity; over-commit fails closed.
+	_check(e.commit_work(4, "W1"), "M24 acct: commit 1")
+	_check_eq(e.get_committed(4), 1, "M24 acct: committed==1")
+	_check_eq(e.get_remaining(4), 3, "M24 acct: remaining unchanged by commit")
+	_check_eq(e.get_capacity(4), 2, "M24 acct: capacity == remaining-committed")
+	_check(e.commit_work(4, "W2") and e.commit_work(4, "W3"), "M24 acct: commit to capacity (3)")
+	_check(not e.commit_work(4, "W4"), "M24 acct: over-commit beyond capacity fails closed")
+	_check(not e.commit_work(4, "W1"), "M24 acct: duplicate work id fails closed")
+	_check_eq(e.get_committed(4), 3, "M24 acct: committed capped at remaining")
+	_check_eq(e.get_capacity(4), 0, "M24 acct: capacity zero when fully committed")
+
+	# resolve one: both counters -1.
+	_check(e.resolve_clear("W1"), "M24 acct: resolve 1")
+	_check(e.get_committed(4) == 2 and e.get_remaining(4) == 2, "M24 acct: resolve decrements committed AND remaining by one")
+	# rollback one: only committed -1.
+	_check(e.rollback_work("W2"), "M24 acct: rollback 1")
+	_check(e.get_committed(4) == 1 and e.get_remaining(4) == 2, "M24 acct: rollback decrements only committed")
+	# double resolve / rollback / unknown / resolve-after-rollback fail closed.
+	_check(not e.resolve_clear("W1"), "M24 acct: double resolve fails closed")
+	_check(not e.rollback_work("W2"), "M24 acct: double rollback fails closed")
+	_check(not e.resolve_clear("NOPE"), "M24 acct: unknown work id resolve fails closed")
+	_check(not e.rollback_work("NOPE"), "M24 acct: unknown work id rollback fails closed")
+	_check(not e.resolve_clear("W2"), "M24 acct: resolve after rollback fails closed")
+
+	# Same-color slots keep separate ledgers.
+	var e2 = FiveSlotBatchEngine.new()
+	var sup2 = _m24_supply(
+		[ColorBatch.make("S0", 3, 2, 5)],
+		[ColorBatch.make("S1", 3, 2, 5)],
+		[])
+	e2.select_front_batch(sup2, 0)  # slot 4
+	e2.select_front_batch(sup2, 1)  # slot 3
+	_check(e2.commit_work(4, "X1"), "M24 acct: commit on slot 4")
+	_check(e2.get_committed(4) == 1 and e2.get_committed(3) == 0, "M24 acct: same-color sibling ledger unaffected")
+
+	# Completion only at remaining==0 AND committed==0.
+	var e3 = FiveSlotBatchEngine.new()
+	var sup3 = _m24_supply([ColorBatch.make("T0", 0, 2, 5)], [], [])
+	e3.select_front_batch(sup3, 0)  # slot 4, count 2
+	e3.commit_work(4, "R1"); e3.commit_work(4, "R2")
+	_check(e3.resolve_clear("R1"), "M24 complete: resolve first")
+	_check(e3.get_remaining(4) == 1 and not e3.is_empty(4), "M24 complete: not freed while remaining>0")
+	# remaining could reach 0 with committed>0 only transiently; here resolve second -> both 0.
+	_check(e3.resolve_clear("R2"), "M24 complete: resolve second")
+	_check(e3.is_empty(4) and e3.get_state(4) == "EMPTY", "M24 complete: slot freed to EMPTY at remaining==0 && committed==0")
+	_check(e3.get_batch_id(4) == "" and e3.get_placement_sequence(4) == -1, "M24 complete: freed slot has no stale identity")
+
+	# remaining==0 while committed>0 must NOT free (drive via rollback path).
+	var e4 = FiveSlotBatchEngine.new()
+	var sup4 = _m24_supply([ColorBatch.make("U0", 0, 1, 5)], [], [])
+	e4.select_front_batch(sup4, 0)   # count 1
+	e4.commit_work(4, "Y1")
+	_check(e4.get_capacity(4) == 0 and e4.get_remaining(4) == 1, "M24 complete: committed==remaining, capacity 0")
+	_check(not e4.is_empty(4), "M24 complete: not freed while committed>0")
+
+	# WAITING / ACTIVE seam.
+	var w = FiveSlotBatchEngine.new()
+	var supw = _m24_supply([ColorBatch.make("V0", 0, 3, 5)], [], [])
+	w.select_front_batch(supw, 0)  # slot 4 ACTIVE
+	_check(not w.set_claimable_work_available(0, false), "M24 wait: EMPTY slot cannot go WAITING")
+	_check(w.set_claimable_work_available(4, false), "M24 wait: ACTIVE with capacity -> WAITING")
+	_check_eq(w.get_state(4), "WAITING", "M24 wait: state is WAITING")
+	_check(w.get_remaining(4) == 3 and w.get_committed(4) == 0, "M24 wait: WAITING preserves counters")
+	_check(w.set_claimable_work_available(4, true), "M24 wait: authoritative available -> ACTIVE")
+	_check_eq(w.get_state(4), "ACTIVE", "M24 wait: resumed ACTIVE without re-selection")
+	_check(not w.set_claimable_work_available(4, "yes"), "M24 wait: non-bool availability rejected")
+	# committed work never decremented by state change.
+	w.commit_work(4, "WW1")
+	w.set_claimable_work_available(4, false)
+	_check(w.get_committed(4) == 1 and w.get_remaining(4) == 3, "M24 wait: state change never mutates counters")
+
+# --- WP04: reset + pause ----------------------------------------------------
+func _m24_reset_pause() -> void:
+	var e = FiveSlotBatchEngine.new()
+	var sup = _m24_supply(
+		[ColorBatch.make("K0", 0, 3, 5)],
+		[ColorBatch.make("K1", 1, 2, 5)],
+		[ColorBatch.make("K2", 2, 4, 5)])
+	e.select_front_batch(sup, 0)
+	e.select_front_batch(sup, 1)
+	e.select_front_batch(sup, 2)
+	e.commit_work(4, "RW1")
+	e.set_claimable_work_available(3, false)  # slot 3 WAITING
+	var before := str(e.snapshot())
+	var sup_before := str(sup.debug_snapshot())
+
+	# Pause/resume mutate nothing.
+	e.pause(); e.resume()
+	_check(str(e.snapshot()) == before, "M24 pause: pause/resume preserves exact slot state")
+	_check(str(sup.debug_snapshot()) == sup_before, "M24 pause: pause/resume does not touch M23 supply")
+
+	# Reset with ACTIVE + WAITING + committed live work.
+	e.reset()
+	var all_empty := true
+	for i in range(5):
+		if not e.is_empty(i) or e.get_placement_sequence(i) != -1:
+			all_empty = false
+	_check(all_empty, "M24 reset: all five slots EMPTY with reset placement sequence")
+	_check_eq(e.live_work_count(), 0, "M24 reset: live work identities cleared")
+	_check(not e.resolve_clear("RW1"), "M24 reset: pre-reset work id cannot resolve after reset")
+	_check(not e.rollback_work("RW1"), "M24 reset: pre-reset work id cannot rollback after reset")
+	# M24 reset does not own M23 supply.
+	_check(str(sup.debug_snapshot()) == sup_before, "M24 reset: M23 supply not reset by M24")
+	# Placement sequence restarts deterministically.
+	var e2 = FiveSlotBatchEngine.new()
+	var sup2 = _m24_supply([ColorBatch.make("Z0", 0, 1, 5)], [], [])
+	var seq_first: int = e2.select_front_batch(sup2, 0)["placement"]["placement_sequence"]
+	e2.reset()
+	var sup3 = _m24_supply([ColorBatch.make("Z1", 0, 1, 5)], [], [])
+	var seq_after: int = e2.select_front_batch(sup3, 0)["placement"]["placement_sequence"]
+	_check_eq(seq_after, seq_first, "M24 reset: placement sequence restarts at initial value")
+
+# --- SB-M24-030: invalid input / state-transition matrix --------------------
+func _m24_invalid_matrix() -> void:
+	var e = FiveSlotBatchEngine.new()
+	# Invalid indexes / types on queries fail closed to safe defaults.
+	for bad in [-1, 5, 99, 1.5, "0", true, null, []]:
+		_check(not e.is_occupied(bad), "M24 inv: is_occupied(%s) safe-false" % str(bad))
+		_check_eq(e.get_state(bad), "EMPTY", "M24 inv: get_state(%s) EMPTY" % str(bad))
+		_check_eq(e.get_remaining(bad), 0, "M24 inv: get_remaining(%s) 0" % str(bad))
+	# Accounting on invalid/empty targets.
+	_check(not e.commit_work(-1, "A"), "M24 inv: commit invalid index")
+	_check(not e.commit_work(4, "A"), "M24 inv: commit on EMPTY slot fails closed")
+	_check(not e.commit_work(4, ""), "M24 inv: empty work id rejected")
+	_check(not e.commit_work(4, 123), "M24 inv: non-string work id rejected")
+	_check(not e.resolve_clear("ghost"), "M24 inv: resolve unknown fails closed")
+	_check(not e.rollback_work("ghost"), "M24 inv: rollback unknown fails closed")
+	# State machine illegal transitions.
+	_check(not e.set_claimable_work_available(4, true), "M24 inv: EMPTY->ACTIVE via seam rejected")
+	_check(not e.set_claimable_work_available(4, false), "M24 inv: EMPTY->WAITING via seam rejected")
+	_check(not e.set_claimable_work_available(99, false), "M24 inv: invalid slot state seam rejected")
+	# Duplicate batch id defense across the placement path. M23 guarantees globally
+	# unique ids within one candidate, so the collision can only arise across two
+	# supplies; M24 must still refuse to hold the same id in two slots and must leave
+	# the second supply's front unconsumed.
+	var e2 = FiveSlotBatchEngine.new()
+	var supA = _m24_supply([ColorBatch.make("DUP", 0, 1, 5)], [], [])
+	var supB = _m24_supply([ColorBatch.make("DUP", 0, 1, 5)], [], [])
+	_check(e2.select_front_batch(supA, 0)["ok"], "M24 inv: first DUP placement ok")
+	var d := e2.select_front_batch(supB, 0)
+	_check(not d["ok"] and d["error"] == "duplicate_batch_id", "M24 inv: duplicate batch id rejected at placement")
+	_check_eq(supB.get_front(0).get_batch_id(), "DUP", "M24 inv: rejected duplicate left supply front unchanged")
+	_check_eq(supB.get_remaining(0), 1, "M24 inv: rejected duplicate did not consume supply")
+	# Deterministic replay: same sequence -> identical slot snapshot.
+	var rep1 := _m24_replay_snapshot()
+	var rep2 := _m24_replay_snapshot()
+	_check(rep1 == rep2, "M24 inv: deterministic replay of same placement/accounting sequence")
+
+func _m24_replay_snapshot() -> String:
+	var e = FiveSlotBatchEngine.new()
+	var sup = _m24_supply(
+		[ColorBatch.make("M0", 0, 2, 5), ColorBatch.make("M1", 0, 2, 5)],
+		[ColorBatch.make("N0", 1, 3, 5)],
+		[ColorBatch.make("O0", 2, 1, 5)])
+	e.select_front_batch(sup, 0)
+	e.select_front_batch(sup, 1)
+	e.select_front_batch(sup, 2)
+	e.commit_work(4, "RP1")
+	e.resolve_clear("RP1")
+	e.set_claimable_work_available(3, false)
+	return str(e.snapshot())
