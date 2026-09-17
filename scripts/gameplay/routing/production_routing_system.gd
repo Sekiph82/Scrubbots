@@ -137,49 +137,208 @@ func _is_outside_start(request, board) -> bool:
 	var cy: int = int(floor(sp.y))
 	return cx < 0 or cy < 0 or cx >= board.get_width() or cy >= board.get_height()
 
-## Build the Railroad V1 route for the already-assigned target. Evaluates the four
-## aligned exit sides in the owner tie-break order (BOTTOM → LEFT → RIGHT → TOP),
-## keeps only sides whose final orthogonal approach is access-legal, and returns
-## the shortest legal total route. NO_ROUTE (never a retarget) if no side is legal.
+## Build the Railroad V1 route for the already-assigned target
+## (OWNER_SCRUBBOT_RAILROAD_INTERIOR_PATH_DECISION_V01, M22-C001 V07).
+##
+##   clicked slot → BOTTOM connector → rail-only exterior travel (corners only) →
+##   a legal rail ingress into an OPEN/CLEARED perimeter cell → orthogonal
+##   four-neighbour interior path (90° turns allowed) through OPEN/CLEARED cells →
+##   assigned ACTIVE target as final arrival.
+##
+## The rail departure need NOT be aligned with the target. A single deterministic
+## Dijkstra minimises total legal route cost = connector + rail travel + ingress
+## bridge + interior orthogonal steps, so is_targetable() becomes true whenever any
+## such legal route exists. Equal total: side priority BOTTOM → LEFT → RIGHT → TOP,
+## then a stable same-side ingress order (ascending perimeter scan index), then a
+## fixed 4-neighbour interior expansion order — all deterministic. Interior movement
+## is inside-board only; exterior stays rail-only (the superseded M21 adjacent ring
+## is never revived). Uses ScrubRailGeometry + the authoritative ProductionAccessQuery
+## seam; the returned route is RouteValidator-clean.
 func _railroad_route(request, board, access_query) -> RefCounted:
 	var idx: int = request.target_index
-	var geom = ScrubRailGeometry.new(board.get_width(), board.get_height())
+	var w: int = board.get_width()
+	var h: int = board.get_height()
+	var geom = ScrubRailGeometry.new(w, h)
 	if not geom.is_valid():
 		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
 	var start: Vector2 = request.start_position
+	var target_cell: Vector2i = board.get_cell_position(idx)
 	var target_center: Vector2 = RouteRequest.center_of_index(board, idx)
 	var entry: Vector2 = geom.bottom_entry(start.x)
+	var connector_len: float = start.distance_to(entry)
 
-	var best: PackedVector2Array = PackedVector2Array()
-	var best_len: float = INF
-	# SIDE_TIEBREAK order makes equal-distance ties deterministic: the first side
-	# in BOTTOM → LEFT → RIGHT → TOP wins because we only replace on strictly less.
-	for side in ScrubRailGeometry.SIDE_TIEBREAK:
-		var exit_pt: Vector2 = geom.exit_point(side, target_center)
-		# Final approach must be a legal orthogonal segment ending at the target
-		# centre (arriving). A non-target ACTIVE blocker rejects this side.
-		if not _seg_true(access_query, exit_pt, target_center, idx):
-			continue
-		var rp: Dictionary = geom.rail_path(entry, exit_pt)
-		var pts := PackedVector2Array()
-		pts.append(start)
-		pts.append(entry)
-		for wp in rp["points"]:
-			pts.append(wp)
-		pts.append(exit_pt)
-		pts.append(target_center)
-		pts = _dedup_points(pts)
-		# The whole rail route (connector + rail + approach) must be access-clean.
-		if not _whole_route_valid(request, pts, board, access_query):
-			continue
-		var total: float = _polyline_length(pts)
-		if total < best_len - _RAIL_LEN_EPS:
-			best_len = total
-			best = pts
-
-	if best.is_empty():
+	# --- legal rail ingress sources: OPEN/CLEARED (or target) perimeter cells whose
+	# orthogonal rail→cell bridge is access-legal. side priority BOTTOM,LEFT,RIGHT,TOP.
+	var sources: Array = []  # each: {cell:int, rp:Vector2, side:int, seq:int, cost0:float}
+	var _add_source := func(cx: int, cy: int, rp: Vector2, side: int, seq: int) -> void:
+		if cx < 0 or cy < 0 or cx >= w or cy >= h:
+			return
+		var cc := Vector2(float(cx) + 0.5, float(cy) + 0.5)
+		if _classify(access_query, cx, cy, idx) == ProductionAccessQuery.CellClass.BLOCKED:
+			return
+		if not _seg_true(access_query, rp, cc, idx):
+			return
+		var rail_dist: float = float(geom.rail_path(entry, rp)["dist"])
+		var cost0: float = connector_len + rail_dist + rp.distance_to(cc)
+		sources.append({"cell": cy * w + cx, "rp": rp, "side": side, "seq": seq, "cost0": cost0})
+	for x in range(w):  # BOTTOM (side 0)
+		_add_source.call(x, h - 1, Vector2(float(x) + 0.5, geom.bottom_y()), 0, x)
+	for y in range(h):  # LEFT (side 1)
+		_add_source.call(0, y, Vector2(geom.left_x(), float(y) + 0.5), 1, y)
+	for y in range(h):  # RIGHT (side 2)
+		_add_source.call(w - 1, y, Vector2(geom.right_x(), float(y) + 0.5), 2, y)
+	for x in range(w):  # TOP (side 3)
+		_add_source.call(x, 0, Vector2(float(x) + 0.5, geom.top_y()), 3, x)
+	if sources.is_empty():
 		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
-	return RouteResult.success_route(idx, best)
+
+	var target_lin: int = target_cell.y * w + target_cell.x
+	# Fast fail (perf + correctness): the target is reachable only if it can be
+	# ENTERED as a final cell — from an adjacent OPEN interior cell, or by a direct
+	# rail ingress at the target's own perimeter cell. If neither holds it is
+	# enclosed; skip the interior Dijkstra entirely.
+	var touchable := false
+	for d in NEIGHBORS:
+		var ax: int = target_cell.x + d.x
+		var ay: int = target_cell.y + d.y
+		if ax < 0 or ay < 0 or ax >= w or ay >= h:
+			continue
+		if _classify(access_query, ax, ay, idx) == ProductionAccessQuery.CellClass.OPEN \
+				and _seg_true(access_query, Vector2(float(ax) + 0.5, float(ay) + 0.5), target_center, idx):
+			touchable = true
+			break
+	if not touchable:
+		for s in sources:
+			if s["cell"] == target_lin:
+				touchable = true
+				break
+	if not touchable:
+		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
+
+	# --- deterministic Dijkstra: sources seed board cells with their rail cost0;
+	# interior edges cost 1.0 (unit orthogonal step). Tie-break on (cost, side, seq).
+	var dist: Dictionary = {}
+	var side_of: Dictionary = {}
+	var seq_of: Dictionary = {}
+	var parent: Dictionary = {}   # cell -> predecessor cell (-1 at an ingress source)
+	var src_rp: Dictionary = {}   # cell -> ingress rail point (only at source cells)
+	var heap: Array = []
+	for s in sources:
+		var c: int = s["cell"]
+		var better = not dist.has(c) or s["cost0"] < dist[c] - _RAIL_LEN_EPS \
+			or (absf(s["cost0"] - dist[c]) <= _RAIL_LEN_EPS and _rank_lt(s["side"], s["seq"], side_of[c], seq_of[c]))
+		if better:
+			dist[c] = s["cost0"]; side_of[c] = s["side"]; seq_of[c] = s["seq"]
+			parent[c] = -1; src_rp[c] = s["rp"]
+			_heap_push(heap, [s["cost0"], s["side"], s["seq"], c])
+
+	var found := false
+	while not heap.is_empty():
+		var top: Array = _heap_pop(heap)
+		var u: int = top[3]
+		if top[0] > dist[u] + _RAIL_LEN_EPS:
+			continue  # stale
+		if u == target_lin:
+			found = true
+			break
+		var ux: int = u % w
+		var uy: int = u / w
+		var uc := Vector2(float(ux) + 0.5, float(uy) + 0.5)
+		for d in NEIGHBORS:
+			var nx: int = ux + d.x
+			var ny: int = uy + d.y
+			if nx < 0 or ny < 0 or nx >= w or ny >= h:
+				continue
+			var is_target := (nx == target_cell.x and ny == target_cell.y)
+			# Intermediate cells must be OPEN; the target is enterable only as final.
+			if not is_target and _classify(access_query, nx, ny, idx) != ProductionAccessQuery.CellClass.OPEN:
+				continue
+			var nc := Vector2(float(nx) + 0.5, float(ny) + 0.5)
+			if not _seg_true(access_query, uc, nc, idx):
+				continue
+			var nlin: int = ny * w + nx
+			var ncost: float = dist[u] + 1.0
+			var relax = not dist.has(nlin) or ncost < dist[nlin] - _RAIL_LEN_EPS \
+				or (absf(ncost - dist[nlin]) <= _RAIL_LEN_EPS and _rank_lt(side_of[u], seq_of[u], side_of[nlin], seq_of[nlin]))
+			if relax:
+				dist[nlin] = ncost; side_of[nlin] = side_of[u]; seq_of[nlin] = seq_of[u]
+				parent[nlin] = u
+				_heap_push(heap, [ncost, side_of[u], seq_of[u], nlin])
+	if not found:
+		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
+
+	# --- reconstruct: interior cell chain (source → … → target), then prepend the
+	# rail portion (connector + rail corners + ingress rail point).
+	var chain: Array = []
+	var cur: int = target_lin
+	while cur != -1:
+		chain.push_front(cur)
+		cur = parent[cur]
+	var src_cell: int = chain[0]
+	var pts := PackedVector2Array()
+	pts.append(start)
+	pts.append(entry)
+	for wp in geom.rail_path(entry, src_rp[src_cell])["points"]:
+		pts.append(wp)
+	pts.append(src_rp[src_cell])
+	for lin in chain:
+		pts.append(Vector2(float(lin % w) + 0.5, float(lin / w) + 0.5))
+	pts = _dedup_points(pts)
+	# Collinear collapse only (never a diagonal-introducing shortcut) so straight
+	# runs stay compact; every segment remains axis-aligned.
+	pts = _remove_collinear(pts)
+	if not _whole_route_valid(request, pts, board, access_query):
+		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
+	return RouteResult.success_route(idx, pts)
+
+## Lexicographic (side, seq) priority: lower side (BOTTOM<LEFT<RIGHT<TOP) then lower
+## scan index wins. Used only to break EXACTLY-equal total-length ties deterministically.
+func _rank_lt(side_a: int, seq_a: int, side_b: int, seq_b: int) -> bool:
+	if side_a != side_b:
+		return side_a < side_b
+	return seq_a < seq_b
+
+# --- tiny binary min-heap of [cost, side, seq, cell]; ordering cost,side,seq,cell.
+func _heap_less(a: Array, b: Array) -> bool:
+	if a[0] != b[0]:
+		return a[0] < b[0]
+	if a[1] != b[1]:
+		return a[1] < b[1]
+	if a[2] != b[2]:
+		return a[2] < b[2]
+	return a[3] < b[3]
+
+func _heap_push(heap: Array, e: Array) -> void:
+	heap.append(e)
+	var i: int = heap.size() - 1
+	while i > 0:
+		var p: int = (i - 1) / 2
+		if _heap_less(heap[i], heap[p]):
+			var t = heap[p]; heap[p] = heap[i]; heap[i] = t
+			i = p
+		else:
+			break
+
+func _heap_pop(heap: Array) -> Array:
+	var top: Array = heap[0]
+	var last: Array = heap.pop_back()
+	if not heap.is_empty():
+		heap[0] = last
+		var i: int = 0
+		var n: int = heap.size()
+		while true:
+			var l: int = 2 * i + 1
+			var r: int = 2 * i + 2
+			var sm: int = i
+			if l < n and _heap_less(heap[l], heap[sm]):
+				sm = l
+			if r < n and _heap_less(heap[r], heap[sm]):
+				sm = r
+			if sm == i:
+				break
+			var t = heap[sm]; heap[sm] = heap[i]; heap[i] = t
+			i = sm
+	return top
 
 ## Drop consecutive near-duplicate points (an exit that coincides with the entry
 ## or a corner) so no zero-length segment reaches the validator.
