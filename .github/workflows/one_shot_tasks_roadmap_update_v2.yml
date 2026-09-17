@@ -1,0 +1,33 @@
+name: One-shot TASKS roadmap update v2
+
+on:
+  push:
+    paths:
+      - '.github/workflows/one_shot_tasks_roadmap_update_v2.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  update-tasks:
+    if: "${{ github.event.head_commit.message == 'chore: run one-shot tasks roadmap updater v2' }}"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Rewrite TASKS.md
+        run: python tools/one_shot_update_tasks_roadmap.py
+
+      - name: Validate and commit TASKS.md only
+        shell: bash
+        run: |
+          git diff --check
+          git status --short
+          test -n "$(git status --short -- TASKS.md)"
+          git config user.name "ChatGPT Tracker Owner"
+          git config user.email "chatgpt-tracker@users.noreply.github.com"
+          git add TASKS.md
+          git commit -m "tracker: add core batch gameplay milestones M23-M27"
+          git push origin main
