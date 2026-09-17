@@ -7,9 +7,9 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Current Milestone: M23
 - Current Sprint: M23-C001 V01 — Batch Supply Engine foundation
 - Current Task: M23-C001-V01
-- Current Task Status: READY
-- Next Task/Action: ChatGPT prepares the strict M23-C001 V01 implementation prompt and audit criteria for the owner-locked Batch Supply Engine. Claude then implements only M23, preserving the accepted M22 Railroad V1/V07 routing, ReservationState, TargetSelector, dispatcher and authenticated clearing contracts. Root `TASKS.md` remains ChatGPT-write-owned.
-- Required Actor: CHATGPT
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: Claude executes `coordination/sessions/M23-C001/CHATGPT_PROMPT_V01.md` under `coordination/sessions/M23-C001/CHATGPT_AUDIT_CRITERIA_V01.md` and `coordination/OWNER_BATCH_GAMEPLAY_CORE_DECISION_V01.md`, implements only M23 Batch Supply Engine, pushes implementation first, then `CLAUDE_LOG_V01.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 348 / 885 = 39.32% (game+ui live scope); lastCompletedTaskId M22-C001-V07. The denominator increased by 156 newly owner-defined core-gameplay tasks across M23–M27. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
