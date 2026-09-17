@@ -433,7 +433,7 @@ across a play area and the abstract idea of perimeter travel. SCRUBBOTS intentio
 
 ```text
 Correct SCRUBBOTS flow:
-  clicked slot -> visible connector -> Scrubbot Railroad -> aligned orthogonal target approach -> clean -> disappear
+  selectable supply-front batch -> automatic rightmost-empty slot -> unique claim/reservation -> valid route -> exact slot connector -> Scrubbot Railroad -> legal OPEN/CLEARED ingress -> orthogonal interior corridor -> clean -> disappear
 
 NOT:
   travel to resource -> collect resource -> carry resource back -> return home
@@ -1451,7 +1451,7 @@ Every production level:
 - [ ] SB-M53-005 No invalid palette IDs. — [ ] SB-M53-006 Recognizable ACTIVE source artwork.
 - [ ] SB-M53-007 No unintended interpolation. — [ ] SB-M53-008 Correct CLEARED transparency.
 - [ ] SB-M53-009 Solvable under canonical routing/access semantics, including Railroad V1 where applicable.
-- [ ] SB-M53-010 No routing pathology; fully enclosed matching ACTIVE target remains untargetable until legal aligned/cleared approach exists.
+- [ ] SB-M53-010 No routing pathology; fully enclosed matching ACTIVE target remains untargetable until a legal Railroad ingress plus OPEN/CLEARED orthogonal interior path exists.
 - [ ] SB-M53-011 Good performance. — [ ] SB-M53-012 Correct preview.
 - [ ] SB-M53-013 Unique ID.
 
@@ -1461,7 +1461,7 @@ Every production level:
 - [ ] SB-M54-003 BoardState tests. — [ ] SB-M54-004 Renderer tests.
 - [ ] SB-M54-005 Slot tests. — [ ] SB-M54-006 Color-candidate/reachability tests.
 - [ ] SB-M54-007 Reservation tests. — [ ] SB-M54-008 TargetSelector tests.
-- [ ] SB-M54-009 Routing tests including Railroad V1 geometry, connectors and aligned exits. — [ ] SB-M54-010 Dispatcher tests.
+- [ ] SB-M54-009 Routing tests including Railroad V1 geometry, connectors, legal ingresses and post-rail orthogonal interior turns. — [ ] SB-M54-010 Dispatcher tests.
 - [ ] SB-M54-011 Completion tests. — [ ] SB-M54-012 Save tests.
 - [ ] SB-M54-013 Reward tests. — [ ] SB-M54-014 Content validation tests.
 - [ ] SB-M54-015 59×59 regression test.
