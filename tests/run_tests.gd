@@ -249,6 +249,8 @@ func _initialize() -> void:
 	_run_m22_railroad_integration_tests()
 	# M22-C001 V07 — post-rail interior orthogonal turning.
 	_run_m22_v07_interior_turn_tests()
+	# M23-C001 V01 — deterministic batch supply engine.
+	_run_m23_batch_supply_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -14046,3 +14048,189 @@ func _run_m22_v07_interior_turn_tests() -> void:
 		print("V07_OWNER_CLASS target_idx=%d coord=(1,12) corridor=col7[y12..19]+row12[x2..7] route=%s" % [to, str(pts_o)])
 		_check(_v07_has_seq(_v07_dirs(pts_o), "U", "L"), "M22-V07-042: owner-class route uses up-then-LEFT interior turn")
 		_check(pts_o[pts_o.size() - 1].is_equal_approx(Vector2(1.5, 12.5)), "M22-V07-042: owner-class route ends at (1,12)")
+
+# ============================================================================
+# M23-C001 V01 — deterministic Batch Supply Engine
+# ============================================================================
+
+const ColorBatch = preload("res://scripts/gameplay/supply/color_batch.gd")
+const BatchSupplyEngine = preload("res://scripts/gameplay/supply/batch_supply_engine.gd")
+const BatchSupplyGenerator = preload("res://scripts/gameplay/supply/batch_supply_generator.gd")
+const BatchSelectionTransaction = preload("res://scripts/gameplay/supply/batch_selection_transaction.gd")
+
+func _m23_level(w: int, h: int, cells: Array, palette_size: int):
+	var pal := PackedStringArray()
+	for i in range(palette_size):
+		pal.append("#%02x%02x%02x" % [16 + i, 16 + i, 16 + i])
+	return LevelData.new(1, "m23", "m23", "TEST", w, h, pal, PackedInt32Array(cells))
+
+## sum of generated robot_count per color from a debug snapshot.
+func _m23_generated_totals(engine) -> Dictionary:
+	var out := {}
+	for q in engine.debug_snapshot()["columns"]:
+		for d in q:
+			out[d["color_id"]] = int(out.get(d["color_id"], 0)) + int(d["robot_count"])
+	return out
+
+func _run_m23_batch_supply_tests() -> void:
+	print("---- M23-C001 V01: Batch Supply Engine ----")
+
+	# --- ColorBatch fail-closed factory ---
+	_check(ColorBatch.make("B1", 0, 3, 5) != null, "M23 batch: valid batch constructs")
+	_check(ColorBatch.make("", 0, 3, 5) == null, "M23 batch: empty id rejected")
+	_check(ColorBatch.make("B1", -1, 3, 5) == null, "M23 batch: negative color rejected")
+	_check(ColorBatch.make("B1", 5, 3, 5) == null, "M23 batch: color >= palette_size rejected")
+	_check(ColorBatch.make("B1", 0, 0, 5) == null, "M23 batch: zero quota rejected")
+	_check(ColorBatch.make("B1", 0, -2, 5) == null, "M23 batch: negative quota rejected")
+	_check(ColorBatch.make("B1", 0, 1.5, 5) == null, "M23 batch: float quota rejected")
+	_check(ColorBatch.make("B1", 0, true, 5) == null, "M23 batch: bool quota rejected")
+	_check(ColorBatch.make("B1", 0, "3", 5) == null, "M23 batch: String quota rejected")
+	_check(ColorBatch.make("B1", 0, null, 5) == null, "M23 batch: null quota rejected")
+	_check(ColorBatch.make("B1", 1.0, 3, 5) == null, "M23 batch: float color rejected")
+
+	# --- engine config validation ---
+	_check(BatchSupplyEngine.create(3, 3) != null, "M23 cfg: 3 columns / depth 3 ok")
+	_check(BatchSupplyEngine.create(5, 4) != null, "M23 cfg: 5 columns / depth 4 ok")
+	_check(BatchSupplyEngine.create(2, 3) == null, "M23 cfg: 2 columns rejected")
+	_check(BatchSupplyEngine.create(6, 3) == null, "M23 cfg: 6 columns rejected")
+	_check(BatchSupplyEngine.create(3, 2) == null, "M23 cfg: preview depth 2 rejected")
+	_check(BatchSupplyEngine.create(3, 5) == null, "M23 cfg: preview depth 5 rejected")
+	_check(BatchSupplyEngine.create("3", 3) == null, "M23 cfg: non-int column count rejected")
+
+	# --- load_columns validation ---
+	var eng = BatchSupplyEngine.create(3, 3)
+	var okcols := [[ColorBatch.make("A0", 0, 2, 5)], [ColorBatch.make("A1", 1, 3, 5)], []]
+	_check(eng.load_columns(okcols), "M23 load: valid 3-column layout accepted")
+	_check(not eng.load_columns([[ColorBatch.make("A0", 0, 2, 5)]]), "M23 load: wrong column count rejected")
+	_check(not eng.load_columns([[ColorBatch.make("D", 0, 1, 5)], [ColorBatch.make("D", 1, 1, 5)], []]), "M23 load: duplicate batch_id rejected")
+	_check(not eng.load_columns([[123], [], []]), "M23 load: non-ColorBatch entry rejected")
+	_check(not eng.load_columns([["x", null], [], []]), "M23 load: malformed queue entry rejected")
+
+	# --- deterministic conservation on a small level ---
+	var cells := [0,0,0, 1,1, 2,2,2,2, 3,3,3, 4,4,4,4]  # 4x4: {0:3,1:2,2:4,3:3,4:4}=16
+	var lvl = _m23_level(4, 4, cells, 5)
+	var src := {0:3, 1:2, 2:4, 3:3, 4:4}
+	for cc in [3, 4, 5]:
+		var e = BatchSupplyGenerator.generate(lvl, cc, 3, 7)
+		_check(e != null, "M23 gen(%d cols): generates" % cc)
+		if e != null:
+			var gt := _m23_generated_totals(e)
+			var conserved := true
+			var grand := 0
+			for c in src.keys():
+				if int(gt.get(c, 0)) != src[c]:
+					conserved = false
+				grand += int(gt.get(c, 0))
+			_check(conserved, "M23 gen(%d cols): exact per-color conservation" % cc)
+			_check(grand == lvl.get_cell_count(), "M23 gen(%d cols): total quota == cell count (16)" % cc)
+
+	# --- same-seed determinism / different-seed still conserves ---
+	var g1 = BatchSupplyGenerator.generate(lvl, 3, 3, 99)
+	var g2 = BatchSupplyGenerator.generate(lvl, 3, 3, 99)
+	_check(str(g1.debug_snapshot()) == str(g2.debug_snapshot()), "M23 determinism: same seed -> identical layout")
+	var g3 = BatchSupplyGenerator.generate(lvl, 3, 3, 100)
+	var gt3 := _m23_generated_totals(g3)
+	var cons3 := true
+	for c in src.keys():
+		if int(gt3.get(c, 0)) != src[c]: cons3 = false
+	_check(cons3, "M23 determinism: different seed still conserves all colors")
+
+	# --- no invalid/zero batch, unique ids ---
+	var ids := {}
+	var allpos := true
+	for q in g1.debug_snapshot()["columns"]:
+		for d in q:
+			if int(d["robot_count"]) <= 0: allpos = false
+			if ids.has(d["batch_id"]): allpos = false
+			ids[d["batch_id"]] = true
+	_check(allpos, "M23 gen: all batches positive with unique ids")
+
+	# --- FIFO commit advances only its column; others byte-identical ---
+	var fe = BatchSupplyEngine.create(3, 3)
+	fe.load_columns([
+		[ColorBatch.make("C0a", 0, 1, 5), ColorBatch.make("C0b", 0, 2, 5), ColorBatch.make("C0c", 0, 3, 5), ColorBatch.make("C0d", 0, 4, 5)],
+		[ColorBatch.make("C1a", 1, 1, 5), ColorBatch.make("C1b", 1, 2, 5)],
+		[ColorBatch.make("C2a", 2, 1, 5)],
+	])
+	var col1_before := str(fe.debug_snapshot()["columns"][1])
+	var col2_before := str(fe.debug_snapshot()["columns"][2])
+	_check_eq(fe.get_front(0).get_batch_id(), "C0a", "M23 fifo: front is row 1")
+	_check_eq(fe.get_preview(0).size(), 3, "M23 fifo: preview limited to depth 3 (hides row 4)")
+	_check_eq(fe.get_remaining(0), 4, "M23 fifo: remaining count includes hidden")
+	var t0 = fe.begin_front_selection(0)
+	_check(t0 != null and fe.get_front(0).get_batch_id() == "C0a", "M23 txn: begin does NOT pop")
+	_check(fe.commit(t0), "M23 txn: commit succeeds")
+	_check_eq(fe.get_front(0).get_batch_id(), "C0b", "M23 fifo: row 2 -> new front after commit")
+	_check_eq(fe.get_preview(0)[2].get_batch_id(), "C0d", "M23 fifo: hidden row 4 -> new row 3")
+	_check(str(fe.debug_snapshot()["columns"][1]) == col1_before, "M23 fifo: column 1 unchanged")
+	_check(str(fe.debug_snapshot()["columns"][2]) == col2_before, "M23 fifo: column 2 unchanged")
+
+	# --- transaction adversarials ---
+	_check(not fe.commit(t0), "M23 txn: double commit fails closed")
+	var tc = fe.begin_front_selection(1)
+	_check(fe.cancel(tc), "M23 txn: cancel succeeds")
+	_check(not fe.commit(tc), "M23 txn: commit after cancel fails closed")
+	_check_eq(fe.get_front(1).get_batch_id(), "C1a", "M23 txn: cancel left column unchanged")
+	_check(not fe.commit(null), "M23 txn: null token fails closed")
+	_check(not fe.commit({"token_id": 999}), "M23 txn: forged Dictionary token fails closed")
+	# stale front: two begins on same column, commit first, second sees changed front.
+	var s1 = fe.begin_front_selection(0)  # front C0b
+	var s2 = fe.begin_front_selection(0)  # front C0b
+	_check(fe.commit(s1), "M23 txn: first same-column commit succeeds")
+	_check(not fe.commit(s2), "M23 txn: stale token after front changed fails closed")
+	_check_eq(fe.get_front(0).get_batch_id(), "C0c", "M23 txn: only one advance happened")
+
+	# --- reset restores exact initial + invalidates old tokens ---
+	var re = BatchSupplyGenerator.generate(lvl, 3, 3, 7)
+	var initial := str(re.debug_snapshot())
+	var rt = re.begin_front_selection(0)
+	re.commit(rt)
+	_check(str(re.debug_snapshot()) != initial, "M23 reset: state changed after a commit")
+	var pre_reset_token = re.begin_front_selection(0)
+	re.reset()
+	_check(str(re.debug_snapshot()) == initial, "M23 reset: restores exact initial layout")
+	_check(not re.commit(pre_reset_token), "M23 reset: token from before reset cannot commit")
+
+	# --- exhaustion ---
+	var xe = BatchSupplyEngine.create(3, 3)
+	xe.load_columns([[ColorBatch.make("X", 0, 1, 5)], [], []])
+	_check(xe.begin_front_selection(1) == null, "M23 exhaust: begin on empty column returns null")
+	var xt = xe.begin_front_selection(0)
+	xe.commit(xt)
+	_check(xe.is_column_exhausted(0) and xe.is_exhausted(), "M23 exhaust: all columns exhausted after last commit")
+
+	# --- snapshot mutation cannot corrupt engine ---
+	var me = BatchSupplyGenerator.generate(lvl, 3, 3, 7)
+	var before_snap := str(me.debug_snapshot())
+	var psnap = me.player_snapshot()
+	if psnap[0]["preview"].size() > 0:
+		psnap[0]["preview"][0]["robot_count"] = 999999
+	psnap[0]["remaining"] = -1
+	var prev = me.get_preview(0)
+	if prev.size() > 0:
+		prev.remove_at(0)
+	_check(str(me.debug_snapshot()) == before_snap, "M23 snapshot: mutating returned snapshot/preview does not mutate engine")
+
+	# --- rectangular + 59x59 conservation/determinism ---
+	var rcells := []
+	for i in range(30 * 12):
+		rcells.append(i % 2)   # colors 0/1
+	var rlvl = _m23_level(30, 12, rcells, 2)
+	var rg = BatchSupplyGenerator.generate(rlvl, 4, 3, 5)
+	var rgt := _m23_generated_totals(rg)
+	_check(rg != null and int(rgt.get(0,0)) == 180 and int(rgt.get(1,0)) == 180, "M23 rect(30x12): exact per-color conservation")
+
+	var t_start := Time.get_ticks_msec()
+	var bcells := []
+	for i in range(59 * 59):
+		bcells.append(i % 3)   # colors 0/1/2
+	var blvl = _m23_level(59, 59, bcells, 3)
+	var bg = BatchSupplyGenerator.generate(blvl, 5, 3, 11)
+	var bg2 = BatchSupplyGenerator.generate(blvl, 5, 3, 11)
+	var elapsed := Time.get_ticks_msec() - t_start
+	var bgt := _m23_generated_totals(bg)
+	var bgrand := 0
+	for c in bgt.keys(): bgrand += int(bgt[c])
+	_check(bg != null and bgrand == 3481, "M23 59x59: total quota == 3481 cells")
+	_check(str(bg.debug_snapshot()) == str(bg2.debug_snapshot()), "M23 59x59: deterministic (same seed identical)")
+	print("M23_PERF 59x59 x2 generate = %d ms" % elapsed)
