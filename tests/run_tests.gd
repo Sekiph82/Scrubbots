@@ -14271,15 +14271,16 @@ func _run_m23_v02_hardening_tests() -> void:
 	var forged_b = BatchSelectionTransaction.new(txb.get_token_id(), txb.get_column(), txb.get_front_batch_id(), txb.get_front_batch())
 	_check(not fe.commit(forged_b), "M23 V02 F001: forged object with B's id cannot commit B")
 	_check(not fe.cancel(forged_b), "M23 V02 F001: forged object with B's id cannot cancel B")
-	# Field mutation on A cannot redirect it to B's token/column.
+	# V03: field mutation on A must NOT orphan it. Engine-owned instance identity is
+	# authoritative, so mutated A stays authentic and commits its ORIGINAL column/front.
 	txa._token_id = txb.get_token_id()
 	txa._column = txb.get_column()
-	_check(not fe.commit(txa), "M23 V02 F001: mutated A pointing at B's id cannot commit (identity mismatch)")
-	_check(str(fe.debug_snapshot()) == before, "M23 V02 F001: redirect attempt changed nothing")
-	# Both original transactions still legitimately usable (B first — A was mutated).
+	txa._front_batch_id = txb.get_front_batch_id()
+	_check(fe.has_open_transaction(txa), "M23 V02 F001: field-mutated A still authentic by engine identity")
+	_check(fe.commit(txa), "M23 V02 F001: field-mutated A still commits its ORIGINAL column 0")
+	_check_eq(fe.get_front(0).get_batch_id(), "A1", "M23 V02 F001: A advanced original column 0 exactly once (front A0 removed)")
 	_check(fe.commit(txb), "M23 V02 F001: original B still commits after forge attempts")
 	_check_eq(fe.get_front(1).get_batch_id(), "B1", "M23 V02 F001: B advanced exactly one")
-	_check_eq(fe.get_front(0).get_batch_id(), "A0", "M23 V02 F001: column 0 untouched by all attacks")
 
 	# ===== F-002: load_columns must reject a real but corrupted ColorBatch =========
 	var le = BatchSupplyEngine.create(3, 3)
@@ -14353,3 +14354,59 @@ func _run_m23_v02_hardening_tests() -> void:
 	if ge_ok != null:
 		var okt := _m23_generated_totals(ge_ok)
 		_check(int(okt.get(0,0)) == 2 and int(okt.get(1,0)) == 2 and int(okt.get(2,0)) == 2, "M23 V02 F004: valid source conserved per color")
+
+	_run_m23_v03_identity_tests()
+
+## M23-C001 V03 — engine-owned transaction identity (F-M23-V02-STRICT-001). Proves the
+## authoritative open-transaction lookup ignores caller-mutable fields: a field-mutated
+## authentic A STILL commits its ORIGINAL column/front, while a forged copy cannot.
+func _run_m23_v03_identity_tests() -> void:
+	print("---- M23-C001 V03: engine-owned transaction identity ----")
+	var e = BatchSupplyEngine.create(3, 3)
+	e.load_columns([
+		[ColorBatch.make("A0", 0, 1, 5), ColorBatch.make("A1", 0, 2, 5)],
+		[ColorBatch.make("B0", 1, 3, 5), ColorBatch.make("B1", 1, 4, 5)],
+		[ColorBatch.make("Z0", 2, 1, 5)],
+	])
+	var a = e.begin_front_selection(0)  # authentic A, column 0, front A0
+	var b = e.begin_front_selection(1)  # authentic B, column 1, front B0
+	var snap := str(e.debug_snapshot())
+
+	# Forged fresh object copying A's exact visible fields — must fail, mutate nothing.
+	var forged = BatchSelectionTransaction.new(a.get_token_id(), a.get_column(), a.get_front_batch_id(), a.get_front_batch())
+	_check(not e.commit(forged), "M23 V03: forged copy of A cannot commit")
+	_check(not e.cancel(forged), "M23 V03: forged copy of A cannot cancel")
+	_check(not e.has_open_transaction(forged), "M23 V03: forged copy not reported as open")
+	_check(str(e.debug_snapshot()) == snap, "M23 V03: forged attacks mutate no queue")
+
+	# Maliciously mutate authentic A's visible fields toward B / nonsense.
+	a._token_id = b.get_token_id()
+	a._column = b.get_column()
+	a._front_batch_id = b.get_front_batch_id()
+	a._front_batch = b.get_front_batch()   # replace detached snapshot too
+	_check(e.has_open_transaction(a), "M23 V03: field-mutated A still authentic (engine identity)")
+	_check(e.commit(a), "M23 V03: field-mutated A commits")
+	_check_eq(e.get_front(0).get_batch_id(), "A1", "M23 V03: A removed ORIGINAL column-0 front A0 (not B's)")
+	_check_eq(e.get_front(1).get_batch_id(), "B0", "M23 V03: column 1 unchanged by mutated-A commit")
+	_check_eq(e.get_remaining(1), 2, "M23 V03: no wrong-column removal from column 1")
+
+	# B remains independently valid and commits ONLY B's original column/front.
+	_check(e.has_open_transaction(b), "M23 V03: B still open after A commit")
+	_check(e.commit(b), "M23 V03: authentic B commits")
+	_check_eq(e.get_front(1).get_batch_id(), "B1", "M23 V03: B removed original column-1 front B0 exactly once")
+	_check_eq(e.get_front(0).get_batch_id(), "A1", "M23 V03: column 0 unchanged by B commit")
+
+	# Consumed A fails closed on repeat; consumed B too.
+	_check(not e.commit(a), "M23 V03: second commit(A) fails closed")
+	_check(not e.cancel(a), "M23 V03: cancel(A) after commit fails closed")
+	_check(not e.commit(b), "M23 V03: second commit(B) fails closed")
+
+	# Stale-front + reset-stale still fail closed under identity authority.
+	var s1 = e.begin_front_selection(0)  # front A1
+	var s2 = e.begin_front_selection(0)  # front A1
+	_check(e.commit(s1), "M23 V03: first same-column commit succeeds")
+	_check(not e.commit(s2), "M23 V03: stale-front token fails closed")
+	var pre = e.begin_front_selection(1)
+	e.reset()
+	_check(not e.commit(pre), "M23 V03: pre-reset token fails closed after reset")
+	_check_eq(e.get_front(0).get_batch_id(), "A0", "M23 V03: reset restored original column-0 front")

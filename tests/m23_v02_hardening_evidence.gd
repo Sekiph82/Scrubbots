@@ -48,14 +48,17 @@ func _f001_forged_transaction() -> void:
 	_ok(not e.has_open_transaction(forged), "forged object not reported as owning A")
 	_ok(e.has_open_transaction(a), "legitimate A still open")
 	_ok(str(e.debug_snapshot()) == before, "no column mutated by forged commit/cancel")
-	# redirect via field mutation
+	# V03: field mutation does NOT orphan A. Engine-owned instance identity is
+	# authoritative, so mutated A stays authentic and commits its ORIGINAL column 0.
 	a._token_id = b.get_token_id()
 	a._column = b.get_column()
-	_ok(not e.commit(a), "field-mutated A cannot redirect to B (identity mismatch)")
-	_ok(str(e.debug_snapshot()) == before, "redirect attempt changed nothing")
+	a._front_batch_id = b.get_front_batch_id()
+	_ok(e.has_open_transaction(a), "field-mutated A still authentic by engine identity")
+	_ok(e.commit(a), "field-mutated A commits its ORIGINAL column 0")
+	_ok(e.get_front(0).get_batch_id() == "A1", "A removed original column-0 front A0 (now A1)")
 	_ok(e.commit(b), "original B still commits after all attacks")
-	print("F001 after B commit: col1 front=%s col0 front=%s" % [e.get_front(1).get_batch_id(), e.get_front(0).get_batch_id()])
-	_ok(e.get_front(1).get_batch_id() == "B1" and e.get_front(0).get_batch_id() == "A0", "B advanced one; column 0 untouched")
+	print("F001 after commits: col1 front=%s col0 front=%s" % [e.get_front(1).get_batch_id(), e.get_front(0).get_batch_id()])
+	_ok(e.get_front(1).get_batch_id() == "B1", "B advanced one on its own column")
 
 # --- F-002 ---------------------------------------------------------------------
 func _f002_malformed_load() -> void:

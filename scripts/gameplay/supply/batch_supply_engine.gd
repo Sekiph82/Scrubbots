@@ -33,7 +33,13 @@ var _column_count: int = 0
 var _preview_depth: int = 0
 var _columns: Array = []            # Array[Array[ColorBatch]] — engine-owned
 var _initial: Array = []            # Array[Array[Dictionary]] — for exact reset
-var _open_tokens: Dictionary = {}   # token_id -> {"column": int, "front_id": String, "object": BatchSelectionTransaction}
+# Authoritative open-transaction map keyed by the engine-known runtime instance id of
+# the minted transaction object (get_instance_id() — immutable, not caller-mutable).
+# Each record is engine-owned truth: {"token_id": int, "column": int,
+# "front_id": String, "object": BatchSelectionTransaction}. The submitted object's
+# visible _token_id/_column/_front_batch_id/detached front are informational snapshots
+# only and are NEVER read for authority or for locating/mutating engine state.
+var _open_tokens: Dictionary = {}   # instance_id -> record (above)
 var _next_token_id: int = 1
 var _seed: int = 0
 var _palette_size: int = -1
@@ -201,7 +207,8 @@ func debug_snapshot() -> Dictionary:
 
 ## Begin a two-phase selection of the current front of `column`. Does NOT pop.
 ## Returns a BatchSelectionTransaction, or null if column invalid/empty. The engine
-## records the EXACT returned instance so only that instance can later commit/cancel.
+## records the object under its immutable runtime instance id, so only that exact
+## minted object authenticates later — regardless of any later field mutation on it.
 func begin_front_selection(column):
 	if not _valid_column(column) or _columns[column].is_empty():
 		return null
@@ -209,54 +216,56 @@ func begin_front_selection(column):
 	var tid: int = _next_token_id
 	_next_token_id += 1
 	var tx = BatchSelectionTransaction.new(tid, column, front.get_batch_id(), front.duplicate_batch())
-	_open_tokens[tid] = {"column": column, "front_id": front.get_batch_id(), "object": tx}
+	# Key by engine-known runtime identity — NOT by the caller-mutable token id.
+	_open_tokens[tx.get_instance_id()] = {"token_id": tid, "column": column,
+		"front_id": front.get_batch_id(), "object": tx}
 	return tx
 
-## Resolve `tx` to its authentic open record, or {} if it is not the exact minted
-## instance of a live token. This is the unforgeable identity gate: a forged same-class
-## object (or a token whose _token_id was mutated to another live id) resolves to a
-## record whose stored object is a DIFFERENT instance, so identity fails closed.
+## Resolve `tx` to its authentic engine-owned open record, or {} otherwise. Authority
+## is the immutable runtime instance id of the exact minted object — a value the caller
+## cannot forge or mutate. A forged same-class object (fresh instance) has a different
+## instance id and is absent from the map; the authentic object stays recognized even
+## after its visible _token_id/_column/_front_batch_id/front snapshot are mutated,
+## because none of those fields is read here.
 func _authentic_record(tx) -> Dictionary:
 	if not (tx is BatchSelectionTransaction):
 		return {}
-	var tid: int = tx.get_token_id()
-	if not _open_tokens.has(tid):
+	var iid: int = tx.get_instance_id()
+	if not _open_tokens.has(iid):
 		return {}
-	var rec: Dictionary = _open_tokens[tid]
-	if rec["object"] != tx:  # exact RefCounted instance identity — unforgeable
-		return {}
-	return rec
+	return _open_tokens[iid]
 
-## Commit: remove exactly the selected front of exactly its column. Fails closed for
-## a malformed/forged token, a consumed/unknown token, a token that is not the exact
-## minted instance, or a front that has since changed (another commit or a reset).
-## Advances only the originating column.
+## Commit: remove exactly the selected front of exactly the ORIGINAL column recorded at
+## begin time (engine-owned record, never the object's mutable fields). Fails closed for
+## a malformed/forged/consumed object or a front that has since changed (another commit
+## or a reset). Advances only the originating column.
 func commit(tx) -> bool:
 	var rec: Dictionary = _authentic_record(tx)
 	if rec.is_empty():
 		return false
-	var tid: int = tx.get_token_id()
+	var iid: int = tx.get_instance_id()
 	var col: int = rec["column"]
 	if not _valid_column(col) or _columns[col].is_empty() \
 			or _columns[col][0].get_batch_id() != rec["front_id"]:
-		_open_tokens.erase(tid)  # stale front — consume the token, change nothing
+		_open_tokens.erase(iid)  # stale front — consume the token, change nothing
 		return false
 	_columns[col].remove_at(0)
-	_open_tokens.erase(tid)
+	_open_tokens.erase(iid)
 	return true
 
-## Cancel: leave every column unchanged. Consumes the token only when it is the exact
-## authentic minted instance; a forged/foreign object fails closed to false and never
-## releases the legitimate open token.
+## Cancel: leave every column unchanged. Consumes the token only when the submitted
+## object is the exact authentic minted instance; a forged/foreign object fails closed
+## to false and never releases the legitimate open token.
 func cancel(tx) -> bool:
 	var rec: Dictionary = _authentic_record(tx)
 	if rec.is_empty():
 		return false
-	_open_tokens.erase(tx.get_token_id())
+	_open_tokens.erase(tx.get_instance_id())
 	return true
 
-## True only for the exact authentic minted instance of a live token. A forged
-## same-class object carrying another transaction's id is NOT reported as owning it.
+## True only for the exact authentic minted instance (by engine-owned runtime identity).
+## A forged same-class object copying another transaction's visible fields is NOT
+## reported as owning it.
 func has_open_transaction(tx) -> bool:
 	return not _authentic_record(tx).is_empty()
 
