@@ -113,8 +113,15 @@ func apply_rollback() -> bool:
 func is_complete() -> bool:
 	return _state != EMPTY and _remaining_to_clear == 0 and _committed == 0
 
-func set_state(new_state: String) -> void:
+## Fail-closed lifecycle setter: engine-owned state may only ever become EMPTY, ACTIVE
+## or WAITING. Any other value is rejected with no change. Returns true on a valid set.
+func set_state(new_state) -> bool:
+	if typeof(new_state) != TYPE_STRING:
+		return false
+	if new_state != EMPTY and new_state != ACTIVE and new_state != WAITING:
+		return false
 	_state = new_state
+	return true
 
 ## Detached plain-data view — safe to hand to a caller; mutating it cannot mutate the
 ## engine's state.

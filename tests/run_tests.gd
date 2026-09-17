@@ -14436,6 +14436,7 @@ func _run_m24_five_slot_batch_tests() -> void:
 	_m24_lifecycle_accounting()       # SB-M24-016..022
 	_m24_reset_pause()                # SB-M24-025, 026
 	_m24_invalid_matrix()             # SB-M24-030
+	_m24_v02_serialization()          # F-M24-V01-STRICT-001/002 + lifecycle hardening
 
 # --- WP01: structure, invariants, queries -----------------------------------
 func _m24_structure_and_invariants() -> void:
@@ -14745,3 +14746,77 @@ func _m24_replay_snapshot() -> String:
 	e.resolve_clear("RP1")
 	e.set_claimable_work_available(3, false)
 	return str(e.snapshot())
+
+# --- V02: global mutation serialization + lifecycle hardening ----------------
+func _m24_v02_serialization() -> void:
+	# Prime: slots 0..3 occupied, slot 4 EMPTY (fill 5, complete slot 4).
+	var e = FiveSlotBatchEngine.new()
+	var s = BatchSupplyEngine.create(5, 3)
+	s.load_columns([
+		[ColorBatch.make("E0", 0, 1, 6)], [ColorBatch.make("E1", 1, 1, 6)],
+		[ColorBatch.make("E2", 2, 1, 6)], [ColorBatch.make("E3", 3, 1, 6)],
+		[ColorBatch.make("E4", 4, 1, 6)]])
+	for c in range(5):
+		e.select_front_batch(s, c)
+	e.commit_work(4, "PRIME"); e.resolve_clear("PRIME")  # slot 4 -> EMPTY
+	var before := str(e.snapshot())
+
+	# Scenario A: begin-callback re-entry with reset/select/commit_work/set_claim.
+	var da = load("res://tests/support/m24_callback_supply.gd").new()
+	da.m24 = e; da.mode = "begin"
+	da.load_columns([[ColorBatch.make("NEW_A", 5, 3, 6)], [], []])
+	var ra := e.select_front_batch(da, 0)
+	_check(da.results.get("reset") == false, "M24 V02 A: nested reset fail-closed")
+	_check(typeof(da.results.get("nested_select")) == TYPE_DICTIONARY and da.results["nested_select"].get("error") == "reentrant", "M24 V02 A: nested select reentrant")
+	_check(da.results.get("commit_work") == false, "M24 V02 A: nested commit_work rejected while busy")
+	_check(da.results.get("set_claim") == false, "M24 V02 A: nested set_claimable rejected while busy")
+	_check(e.get_state(0) == "ACTIVE" and e.get_committed(0) == 0, "M24 V02 A: pre-existing slot untouched")
+	_check(ra["ok"] and ra["slot"] == 4 and e.get_batch_id(4) == "NEW_A", "M24 V02 A: outer placement used correct rightmost-empty (4)")
+	_check_eq(e.occupied_count(), 5, "M24 V02 A: no ghost/double insert")
+
+	# Scenario B: commit-callback re-entry.
+	var e2 = FiveSlotBatchEngine.new()
+	var s2 = BatchSupplyEngine.create(5, 3)
+	s2.load_columns([
+		[ColorBatch.make("H0", 0, 1, 6)], [ColorBatch.make("H1", 1, 1, 6)],
+		[ColorBatch.make("H2", 2, 1, 6)], [ColorBatch.make("H3", 3, 1, 6)],
+		[ColorBatch.make("H4", 4, 1, 6)]])
+	for c in range(5):
+		e2.select_front_batch(s2, c)
+	e2.commit_work(4, "PRIME2"); e2.resolve_clear("PRIME2")
+	var db = load("res://tests/support/m24_callback_supply.gd").new()
+	db.m24 = e2; db.mode = "commit"
+	db.load_columns([[ColorBatch.make("NEW_B", 5, 3, 6)], [], []])
+	var rb := e2.select_front_batch(db, 0)
+	_check(db.results.get("reset") == false and db.results.get("commit_work") == false and db.results.get("set_claim") == false, "M24 V02 B: nested mutations from commit callback fail-closed")
+	_check(rb["ok"] and rb["slot"] == 4 and e2.get_batch_id(4) == "NEW_B", "M24 V02 B: outer placement completed after commit callback")
+
+	# Scenario C: failed M23 commit preserves exact M24 prestate.
+	var ec = FiveSlotBatchEngine.new()
+	var sc = BatchSupplyEngine.create(5, 3)
+	sc.load_columns([
+		[ColorBatch.make("K0", 0, 1, 6)], [ColorBatch.make("K1", 1, 1, 6)],
+		[ColorBatch.make("K2", 2, 1, 6)], [ColorBatch.make("K3", 3, 1, 6)],
+		[ColorBatch.make("K4", 4, 1, 6)]])
+	for c in range(5):
+		ec.select_front_batch(sc, c)
+	ec.commit_work(4, "PRIME3"); ec.resolve_clear("PRIME3")
+	var pre := str(ec.snapshot())
+	var df = load("res://tests/support/m24_callback_supply.gd").new()
+	df.m24 = ec; df.mode = "fail"
+	df.load_columns([[ColorBatch.make("NEVER", 5, 3, 6)], [], []])
+	var rc := ec.select_front_batch(df, 0)
+	_check(not rc["ok"] and rc["error"] == "supply_commit_failed", "M24 V02 C: failed commit -> supply_commit_failed")
+	_check(str(ec.snapshot()) == pre, "M24 V02 C: exact M24 prestate preserved (no ghost/placement)")
+	_check_eq(ec.rightmost_empty_index(), 4, "M24 V02 C: rightmost-empty truth intact")
+
+	# reset() returns bool; ordinary reset true.
+	_check(e.reset() == true, "M24 V02: ordinary reset returns true")
+
+	# Lifecycle-state hardening: engine-owned state restricted to EMPTY/ACTIVE/WAITING.
+	var st = SlotBatchState.make_occupied("L", 2, 5, 1)
+	_check(st.set_state("WAITING") and st.get_state() == "WAITING", "M24 V02 L: WAITING accepted")
+	_check(not st.set_state("BOGUS") and st.get_state() == "WAITING", "M24 V02 L: invalid state rejected+unchanged")
+	_check(not st.set_state(42), "M24 V02 L: non-string state rejected")
+	_check(not st.set_state(""), "M24 V02 L: empty state rejected")
+	_check(st.set_state("EMPTY"), "M24 V02 L: EMPTY accepted")

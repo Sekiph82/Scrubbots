@@ -6,6 +6,15 @@ extends RefCounted
 ## SlotBatchState slots plus the transactional handoff to the accepted M23
 ## BatchSupplyEngine and an opaque committed-work ledger for future M25/M26.
 ##
+## Transaction serialization (M24 V02, F-M24-V01-STRICT-001): a single engine-owned
+## `_busy` guard is held for the WHOLE supply-placement transaction (which may call
+## external M23 code from begin_front_selection AND commit). While `_busy`, EVERY public
+## M24 mutator — select_front_batch, commit_work, resolve_clear, rollback_work,
+## set_claimable_work_available, pause, resume, reset — fails closed with zero state
+## change. reset() never clears/reopens the guard while busy. A synchronous re-entrant
+## callback from M23 therefore cannot cause slot/queue split-brain or stale-target
+## placement.
+##
 ## Owner-locked behavior (OWNER_BATCH_GAMEPLAY_CORE_DECISION_V01):
 ## - exactly five slots, all EMPTY initially; slot count is not configurable;
 ## - the player selects an M23 supply COLUMN/front batch, never a destination slot;
@@ -173,6 +182,8 @@ func _batch_id_occupied(batch_id) -> bool:
 ## committed by exactly one; leaves remaining_to_clear unchanged. Accounting only — the
 ## work identity carries NO target/route/robot authority.
 func commit_work(slot_index, work_id) -> bool:
+	if _busy:
+		return false
 	if not _valid_index(slot_index):
 		return false
 	if typeof(work_id) != TYPE_STRING or (work_id as String).is_empty():
@@ -192,6 +203,8 @@ func commit_work(slot_index, work_id) -> bool:
 ## committed-1 AND remaining-1; then completion check may free the slot. Fails closed
 ## for unknown/stale/double identities.
 func resolve_clear(work_id) -> bool:
+	if _busy:
+		return false
 	if not _live_work.has(work_id):
 		return false
 	var rec: Dictionary = _live_work[work_id]
@@ -210,6 +223,8 @@ func resolve_clear(work_id) -> bool:
 ## Roll back one previously committed live work identity: committed-1 only,
 ## remaining_to_clear unchanged. Fails closed for unknown/stale/double identities.
 func rollback_work(work_id) -> bool:
+	if _busy:
+		return false
 	if not _live_work.has(work_id):
 		return false
 	var rec: Dictionary = _live_work[work_id]
@@ -238,6 +253,8 @@ func _free_slot(idx: int) -> void:
 ## re-selection). EMPTY/completed slots cannot transition. Never mutates counters or the
 ## M23 supply. Returns true only when a legal transition/state confirmation occurred.
 func set_claimable_work_available(slot_index, available) -> bool:
+	if _busy:
+		return false
 	if not _valid_index(slot_index):
 		return false
 	if typeof(available) != TYPE_BOOL:
@@ -262,21 +279,29 @@ func set_claimable_work_available(slot_index, available) -> bool:
 ## time-independent. Provided as an explicit persisted seam so a session-level pause can
 ## record intent without mutating engine truth.
 func pause() -> void:
+	if _busy:
+		return
 	_paused = true
 
 func resume() -> void:
+	if _busy:
+		return
 	_paused = false
 
 ## Reset M24 to its own initial production state: five EMPTY slots, cleared live work
 ## identities, placement sequence back to INITIAL_SEQUENCE, cleared WAITING/ACTIVE and
 ## pending-transaction guard. Pre-reset work identities/snapshots cannot mutate engine
 ## truth afterward. M24 reset does NOT own or reset M23 supply — a session-level caller
-## must reset both explicitly if desired.
-func reset() -> void:
+## must reset both explicitly if desired. Fails closed (returns false, mutates nothing,
+## and critically does NOT touch the `_busy` guard) if invoked re-entrantly while a
+## placement transaction is active. Ordinary (non-busy) reset returns true.
+func reset() -> bool:
+	if _busy:
+		return false
 	_slots = []
 	for _i in range(SLOT_COUNT):
 		_slots.append(SlotBatchState.make_empty())
 	_live_work.clear()
 	_next_sequence = INITIAL_SEQUENCE
-	_busy = false
 	_paused = false
+	return true
