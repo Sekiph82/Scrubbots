@@ -1208,6 +1208,8 @@ Purpose: prove generated supply is actually playable under the real mechanics an
 - [ ] SB-M29-006 Rapid tapping. — [ ] SB-M29-007 Multi-touch.
 - [ ] SB-M29-008 Pause during touch. — [ ] SB-M29-009 Background/foreground.
 
+**Owner-locked speed integration for M29/runtime:** wire the bottom-right gameplay speed control as a real `1x <-> 2x` toggle and consume the authoritative rule in `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md`. After the final legal supply-front selection is successfully committed and M23 reports every FIFO column exhausted (hidden batches included), gameplay must switch automatically to `2x`. Do not infer this from UI rows or five-slot occupancy. New level/full reset starts at `1x`; pause preserves the selected speed.
+
 ### M30 — Win/Lose Rules `[DESIGN GATE]`
 
 - [ ] SB-M30-001 Document win condition. — [ ] SB-M30-002 Document lose condition.
