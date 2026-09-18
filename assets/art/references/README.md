@@ -183,10 +183,10 @@ and canonical state.
 ### Still awaiting
 
 - **Scrubby master reference**: `OWNER_REQUIRED` — two strong candidates
-  identified, owner must select canonical for Magnific generation
+  identified, owner must select the canonical Scrubby identity before production character generation
 - **Production level source art**: M08 audit blocked on owner-supplied
   original pixel-art level files (external screenshots are references only)
-- **M10 DIRTY/CLEAN preset**: owner design gate
+- **ACTIVE/CLEARED presentation**: owner-approved; historical DIRTY/CLEAN preset language is superseded
 
 ### Historical note (M07-C001)
 

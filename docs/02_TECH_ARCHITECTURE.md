@@ -43,7 +43,7 @@ current boundary and what genuinely remains future (M21+).
 | Board Renderer | Draws current Board State efficiently (batched, not per-cell Nodes). Implemented in Prompt 04 (M06) — see below. | `scripts/gameplay/board/` |
 | Cleaning Feedback | Visual/audio response when a cell is cleaned; poolable, toggleable. | `scripts/gameplay/cells/`, later `scenes/components/` |
 | UI | HUD, slot UI, menus, safe areas, responsive composition, reusable controls. | `scripts/ui/`, `scenes/components/ui/`, later screen scenes |
-| Visual Asset Pipeline | Owner-reference intake, Magnific-only generated illustration assets, raw/final separation. | `assets/art/references/`, `assets/ui/`, `ASSET_GENERATION_MANIFEST.json` |
+| Visual Asset Pipeline | Owner-reference intake, ChatGPT-primary generated illustration assets with Magnific fallback, raw/final separation. | `assets/art/references/`, `assets/ui/`, `ASSET_GENERATION_MANIFEST.json` |
 | Save System | Persists progress, streak, currency. Not implemented yet. | `scripts/data/` |
 | Debug/Instrumentation | Dev-only overlays, logging, inspection tools. | `scripts/debug/`, `scenes/debug/` |
 
@@ -383,10 +383,11 @@ baked into AI images. Full-screen concept renders are art direction only.
 
 ### Visual generation boundary
 
-`ASSET_GENERATION_MANIFEST.json` is the generation queue. Magnific MCP is the
-only owner-approved AI image provider for this UI pipeline unless explicitly
-changed. Generated files are presentation assets only and never carry
-canonical game state.
+`ASSET_GENERATION_MANIFEST.json` is the provider-ordered generation and
+provenance queue. ChatGPT image generation is the primary development-time
+provider; Magnific MCP remains an approved fallback/alternate. Generated files
+are presentation assets only, never carry canonical game state, and no image-
+generation provider is required by the shipping game.
 
 Owner reference intake starts from the confirmed local source:
 `C:\Users\sekip\Desktop\ScrubBots Gorselleri` using
