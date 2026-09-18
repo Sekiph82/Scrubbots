@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "decision": "coordination/OWNER_ECONOMY_REWARDS_V01.md",
   "currency": {
     "id": "scrub_bucks",
@@ -59,7 +59,6 @@
   },
   "bot_parts": {
     "first_clear": 1,
-    "collection_set_complete": 10,
     "robot_unlock_cost": 250,
     "initial_robot_id": "scrubby",
     "target_unlock_levels": [
@@ -161,7 +160,158 @@
     },
     "standard_pack_draws": 3,
     "premium_pack_draws": 5,
-    "premium_guaranteed_min_rarity": "RARE"
+    "premium_guaranteed_min_rarity": "RARE",
+    "set_rewards": [
+      {
+        "set": 1,
+        "id": "meet_the_scrubbots",
+        "name": "Meet the Scrubbots",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 350,
+        "bot_parts": 5
+      },
+      {
+        "set": 2,
+        "id": "cleaning_crew",
+        "name": "Cleaning Crew",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 400,
+        "bot_parts": 5
+      },
+      {
+        "set": 3,
+        "id": "mess_monsters",
+        "name": "Mess Monsters",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 450,
+        "bot_parts": 6
+      },
+      {
+        "set": 4,
+        "id": "color_bots",
+        "name": "Color Bots",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 500,
+        "bot_parts": 7
+      },
+      {
+        "set": 5,
+        "id": "scrubbot_workshop",
+        "name": "Scrubbot Workshop",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 550,
+        "bot_parts": 7
+      },
+      {
+        "set": 6,
+        "id": "bathroom_mayhem",
+        "name": "Bathroom Mayhem",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 600,
+        "bot_parts": 8
+      },
+      {
+        "set": 7,
+        "id": "kitchen_chaos",
+        "name": "Kitchen Chaos",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 700,
+        "bot_parts": 9
+      },
+      {
+        "set": 8,
+        "id": "garage_grime",
+        "name": "Garage Grime",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 750,
+        "bot_parts": 9
+      },
+      {
+        "set": 9,
+        "id": "sewer_squad",
+        "name": "Sewer Squad",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 800,
+        "bot_parts": 10
+      },
+      {
+        "set": 10,
+        "id": "clean_city",
+        "name": "Clean City",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 900,
+        "bot_parts": 10
+      },
+      {
+        "set": 11,
+        "id": "jungle_cleanup",
+        "name": "Jungle Cleanup",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 1000,
+        "bot_parts": 11
+      },
+      {
+        "set": 12,
+        "id": "bath_time_blitz",
+        "name": "Bath Time Blitz",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 1100,
+        "bot_parts": 12
+      },
+      {
+        "set": 13,
+        "id": "underwater_heroes",
+        "name": "Underwater Heroes",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 1250,
+        "bot_parts": 13
+      },
+      {
+        "set": 14,
+        "id": "space_cleaners",
+        "name": "Space Cleaners",
+        "rarity_profile": "4C/2R/2E/1L",
+        "difficulty_profile": "STANDARD",
+        "scrub_bucks": 1500,
+        "bot_parts": 15
+      },
+      {
+        "set": 15,
+        "id": "ultimate_cleaners",
+        "name": "Ultimate Cleaners",
+        "rarity_profile": "3R/3E/3L",
+        "difficulty_profile": "RARITY_HEAVY",
+        "scrub_bucks": 2500,
+        "bot_parts": 20
+      }
+    ],
+    "all_sets_complete": {
+      "required_completed_sets": 15,
+      "scrub_bucks": 2500,
+      "bot_parts": 20,
+      "grant_once": true
+    },
+    "all_individual_set_rewards_total": {
+      "scrub_bucks": 13350,
+      "bot_parts": 147
+    },
+    "full_collection_rewards_total_including_master_bonus": {
+      "scrub_bucks": 15850,
+      "bot_parts": 167
+    }
   },
   "cards_exchange": {
     "protected_min_owned_copies": 1,
