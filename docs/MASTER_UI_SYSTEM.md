@@ -81,6 +81,12 @@ Safe-area code belongs to presentation only.
 Canonical placement authority:
 `coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md`
 
+Canonical visual master:
+`coordination/OWNER_GAMEPLAY_MASTER_VISUAL_V01.md`
+
+Reserved final reference path:
+`assets/ui/final/gameplay/master/scrubbots_gameplay_master.png`
+
 The owner-supplied gameplay screen is the base composition. Railroad V1 is integrated into that screen rather than replacing it.
 
 ```text
