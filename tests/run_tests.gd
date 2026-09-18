@@ -253,6 +253,8 @@ func _initialize() -> void:
 	_run_m23_batch_supply_tests()
 	# M24-C001 V01 — five-slot batch engine.
 	_run_m24_five_slot_batch_tests()
+	# M25-C001 V01 — batch target claim engine.
+	_run_m25_batch_claim_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -14061,6 +14063,7 @@ const BatchSupplyGenerator = preload("res://scripts/gameplay/supply/batch_supply
 const BatchSelectionTransaction = preload("res://scripts/gameplay/supply/batch_selection_transaction.gd")
 const FiveSlotBatchEngine = preload("res://scripts/gameplay/slots/five_slot_batch_engine.gd")
 const SlotBatchState = preload("res://scripts/gameplay/slots/slot_batch_state.gd")
+const BatchTargetClaimEngine = preload("res://scripts/gameplay/targeting/batch_target_claim_engine.gd")
 
 func _m23_level(w: int, h: int, cells: Array, palette_size: int):
 	var pal := PackedStringArray()
@@ -14820,3 +14823,227 @@ func _m24_v02_serialization() -> void:
 	_check(not st.set_state(42), "M24 V02 L: non-string state rejected")
 	_check(not st.set_state(""), "M24 V02 L: empty state rejected")
 	_check(st.set_state("EMPTY"), "M24 V02 L: EMPTY accepted")
+
+# ============================================================================
+# M25-C001 V01 — Batch Target Claim Engine
+# ============================================================================
+
+## Build a board of w x h all colored fill_color, then CLEAR every cell except
+## active_indices so only those remain ACTIVE/targetable. Returns the board.
+func _m25_board(w: int, h: int, palette_size: int, fill_color: int, active_indices: Array):
+	var pal := PackedStringArray()
+	for i in range(palette_size):
+		pal.append("#%02x%02x%02x" % [16 + i, 16 + i, 16 + i])
+	var cells := PackedInt32Array(); cells.resize(w * h); cells.fill(fill_color)
+	var board = BoardState.from_level_data(LevelData.new(1, "m25", "m25", "TEST", w, h, pal, cells))
+	var keep := {}
+	for i in active_indices:
+		keep[i] = true
+	for i in range(w * h):
+		if not keep.has(i):
+			board.set_cell_state(i, BoardState.CellState.CLEARED)
+	return board
+
+## Wire the full production selection stack for board at origin. Returns a Dictionary.
+func _m25_stack(board, origin: Vector2) -> Dictionary:
+	var res = ReservationState.new(); res.bind(board)
+	var ci = ColorCandidateIndex.create(); ci.bind(board)
+	var sel = TargetSelector.create(); sel.bind(board, ci, res)
+	var routing = ProductionRoutingSystem.new()
+	var raccess = ProductionAccessQuery.new(board)
+	var access = ProductionTargetAccess.new(routing, raccess, board, origin)
+	return {"res": res, "ci": ci, "sel": sel, "routing": routing, "raccess": raccess, "access": access}
+
+## Place a list of [id,color,count] batches through the real M23->M24 path, oldest first
+## (slot 4,3,2,...). Returns the FiveSlotBatchEngine.
+func _m25_slots(specs: Array):
+	var slots = FiveSlotBatchEngine.new()
+	var cols: Array = []
+	for spec in specs:
+		cols.append([ColorBatch.make(spec[0], spec[1], spec[2], 16)])
+	while cols.size() < 3:
+		cols.append([])
+	var sup = BatchSupplyEngine.create(cols.size(), 3)
+	sup.load_columns(cols)
+	for c in range(specs.size()):
+		slots.select_front_batch(sup, c)
+	return slots
+
+func _run_m25_batch_claim_tests() -> void:
+	print("---- M25-C001 V01: Batch Target Claim Engine ----")
+	_m25_bind_and_model()
+	_m25_arbitration_and_atomic()
+	_m25_rollback_finalize()
+	_m25_waiting_reset()
+	_m25_reentrancy()
+	_m25_deterministic_replay()
+
+func _m25_bind_and_model() -> void:
+	var BLUE := 0
+	var board = _m25_board(3, 3, 4, BLUE, [6, 7, 8])
+	var st = _m25_stack(board, Vector2(1.5, 4.5))
+	var slots = _m25_slots([["B", BLUE, 8]])
+
+	var e = BatchTargetClaimEngine.new()
+	_check(not e.claim_for_color(BLUE, {})["ok"], "M25 bind: unbound engine cannot claim")
+	_check(e.claim_for_color(BLUE, {})["error"] == "unbound", "M25 bind: unbound error")
+
+	_check(e.bind(board, slots, st["sel"], st["res"]), "M25 bind: coherent bundle binds")
+	_check(e.is_bound(), "M25 bind: is_bound true")
+
+	var e2 = BatchTargetClaimEngine.new()
+	_check(not e2.bind(null, slots, st["sel"], st["res"]), "M25 bind: null board rejected")
+	_check(not e2.bind(board, RefCounted.new(), st["sel"], st["res"]), "M25 bind: foreign batch engine rejected")
+	var other = _m25_board(3, 3, 4, BLUE, [6])
+	var st2 = _m25_stack(other, Vector2(1.5, 4.5))
+	_check(not e2.bind(board, slots, st2["sel"], st2["res"]), "M25 bind: mixed board/reservation rejected")
+
+	e.claim_for_color(BLUE, {4: st["access"]})
+	var snap = e.claim_snapshot()
+	if snap.size() > 0:
+		snap[0]["target"] = 999
+		snap[0]["status"] = "HACK"
+	_check(e.live_claim_count() == 1 and e.claim_snapshot()[0]["target"] != 999, "M25 model: detached snapshot cannot mutate engine")
+
+func _m25_arbitration_and_atomic() -> void:
+	var BLUE := 0
+	var RED := 1
+	var board = _m25_board(4, 4, 4, BLUE, [12, 13, 14, 15])
+	var st = _m25_stack(board, Vector2(2.0, 5.5))
+	var slots = _m25_slots([["BLUE_8", BLUE, 8], ["BLUE_14", BLUE, 14], ["BLUE_12", BLUE, 12]])
+	var e = BatchTargetClaimEngine.new()
+	e.bind(board, slots, st["sel"], st["res"])
+	var amap := {4: st["access"], 3: st["access"], 2: st["access"]}
+
+	_check(e.claim_for_color(-1, amap)["error"] == "bad_color", "M25 arb: negative color rejected")
+	_check(e.claim_for_color(2, amap)["error"] == "no_eligible_batch", "M25 arb: no matching-color batch")
+
+	var r0 := e.claim_for_color(BLUE, amap)
+	_check(r0["ok"] and r0["slot"] == 4 and r0["target"] == 12, "M25 arb: oldest BLUE_8 gets bottom-left target 12")
+	var r1 := e.claim_for_color(BLUE, amap)
+	_check(r1["ok"] and r1["slot"] == 4 and r1["target"] == 13, "M25 arb: BLUE_8 keeps claiming (target 13)")
+	_check(slots.get_remaining(4) == 8 and slots.get_committed(4) == 2, "M25 acct: remaining unchanged, committed==2")
+	_check(r0["target"] != r1["target"] and not e.is_target_claimed(99), "M25 uniq: distinct targets per claim")
+	_check(e.claim_for_color(RED, amap)["error"] == "no_eligible_batch", "M25 arb: RED has no batch")
+
+	var board2 = _m25_board(3, 2, 4, BLUE, [3, 4, 5])  # bottom row of 3 targetable
+	var st2 = _m25_stack(board2, Vector2(1.5, 3.5))
+	var slots2 = _m25_slots([["OLD", BLUE, 2], ["NEW", BLUE, 5]])
+	var e2 = BatchTargetClaimEngine.new(); e2.bind(board2, slots2, st2["sel"], st2["res"])
+	var amap2 := {4: st2["access"], 3: st2["access"]}
+	var s0 := e2.claim_for_color(BLUE, amap2)
+	var s1 := e2.claim_for_color(BLUE, amap2)
+	_check(s0["slot"] == 4 and s1["slot"] == 4, "M25 spill: oldest OLD claims while capacity>0")
+	_check(slots2.get_capacity(4) == 0, "M25 spill: OLD capacity exhausted")
+	var s2 := e2.claim_for_color(BLUE, amap2)
+	_check(s2["ok"] and s2["slot"] == 3, "M25 spill: further claims spill to next same-color batch NEW")
+	_check(slots2.get_committed(4) == 2 and slots2.get_committed(3) == 1, "M25 spill: ledgers independent per batch")
+	_check(st2["res"].get_reservation_count() == e2.live_claim_count(), "M25 uniq: reservation count == live claim count")
+
+	var board3 = _m25_board(3, 2, 4, BLUE, [3, 4, 5])  # targetable bottom row
+	var st3 = _m25_stack(board3, Vector2(1.5, 3.5))
+	var failing = load("res://tests/support/m25_failing_commit_batches.gd").new()
+	var sup3 = BatchSupplyEngine.create(3, 3)
+	sup3.load_columns([[ColorBatch.make("FC", BLUE, 3, 16)], [], []])
+	failing.select_front_batch(sup3, 0)
+	var e3 = BatchTargetClaimEngine.new(); e3.bind(board3, failing, st3["sel"], st3["res"])
+	var rc := e3.claim_for_color(BLUE, {4: st3["access"]})
+	_check(not rc["ok"] and rc["error"] == "commit_failed", "M25 atomic: M24 commit failure -> commit_failed")
+	_check(st3["res"].get_reservation_count() == 0 and e3.live_claim_count() == 0, "M25 atomic: reservation released, no ledger entry (no half-claim)")
+
+func _m25_rollback_finalize() -> void:
+	var BLUE := 0
+	var board = _m25_board(3, 1, 4, BLUE, [0, 1, 2])
+	var st = _m25_stack(board, Vector2(1.5, -1.5))
+	var slots = _m25_slots([["B", BLUE, 5]])
+	var e = BatchTargetClaimEngine.new(); e.bind(board, slots, st["sel"], st["res"])
+	var amap := {4: st["access"]}
+	var r := e.claim_for_color(BLUE, amap)
+	var cid = r["claim_id"]; var tgt = r["target"]
+	_check(slots.get_committed(4) == 1, "M25 pre: committed 1 after claim")
+
+	_check(not e.rollback_claim("NOPE"), "M25 rollback: random id fails closed")
+	_check(e.rollback_claim(cid), "M25 rollback: exact live claim rolled back")
+	_check(slots.get_committed(4) == 0 and slots.get_remaining(4) == 5, "M25 rollback: committed-1, remaining unchanged")
+	_check(st["res"].get_owner(tgt) == -1 and e.live_claim_count() == 0, "M25 rollback: reservation released, ledger cleared")
+	_check(not e.rollback_claim(cid), "M25 rollback: double rollback fails closed")
+
+	var r2 := e.claim_for_color(BLUE, amap)
+	var cid2 = r2["claim_id"]; var tgt2 = r2["target"]; var owner2 = r2["owner_id"]
+	_check(not e.finalize_clear(cid2), "M25 finalize: fails while target still ACTIVE/reserved")
+	st["res"].resolve_arrival(tgt2, owner2)
+	board.set_cell_state(tgt2, BoardState.CellState.CLEARED)
+	var rem_before := slots.get_remaining(4); var com_before := slots.get_committed(4)
+	_check(e.finalize_clear(cid2), "M25 finalize: succeeds after authenticated clear")
+	_check(slots.get_remaining(4) == rem_before - 1 and slots.get_committed(4) == com_before - 1, "M25 finalize: remaining AND committed each -1")
+	_check(e.live_claim_count() == 0, "M25 finalize: claim erased")
+	_check(not e.finalize_clear(cid2), "M25 finalize: double/stale finalize fails closed")
+
+func _m25_waiting_reset() -> void:
+	var BLUE := 0
+	var pal := PackedStringArray()
+	for i in range(4): pal.append("#%02x%02x%02x" % [16 + i, 16 + i, 16 + i])
+	var cells := PackedInt32Array([1,1,1, 1,0,1, 1,1,1])
+	var board = BoardState.from_level_data(LevelData.new(1, "m25w", "m25w", "TEST", 3, 3, pal, cells))
+	var st = _m25_stack(board, Vector2(1.5, -1.5))
+	var slots = _m25_slots([["B", BLUE, 4]])
+	var e = BatchTargetClaimEngine.new(); e.bind(board, slots, st["sel"], st["res"])
+	var amap := {4: st["access"]}
+
+	var rw := e.claim_for_color(BLUE, amap)
+	_check(not rw["ok"] and rw["error"] == "no_target" and rw.get("waiting", false), "M25 wait: blocked blue -> no claim, WAITING")
+	_check(st["res"].get_reservation_count() == 0 and e.live_claim_count() == 0, "M25 wait: nothing reserved/claimed for blocked target")
+	_check(slots.get_state(4) == "WAITING", "M25 wait: batch marked WAITING")
+	_check(not e.is_target_claimed(4), "M25 wait: center target not owned")
+
+	board.set_cell_state(1, BoardState.CellState.CLEARED)
+	board.set_cell_state(7, BoardState.CellState.CLEARED)
+	var ro := e.reconsider_color(BLUE, amap)
+	_check(ro["ok"] and ro["target"] == 4 and ro["slot"] == 4, "M25 open: target claimed only AFTER opening, by oldest batch")
+	_check(slots.get_state(4) == "ACTIVE", "M25 open: WAITING batch resumed ACTIVE on claim")
+
+	var unrelated_owner := 987654
+	st["res"].reserve(0, unrelated_owner)
+	var before_unrelated: int = st["res"].get_owner(0)
+	_check(e.live_claim_count() == 1, "M25 reset: one live claim before reset")
+	_check(e.reset(), "M25 reset: reset ok")
+	_check(e.live_claim_count() == 0, "M25 reset: all live claims cleared")
+	_check(slots.get_committed(4) == 0, "M25 reset: M24 committed rolled back for pre-clear claim")
+	_check(st["res"].get_owner(0) == before_unrelated, "M25 reset: unrelated ReservationState owner survives")
+	_check(st["res"].get_owner(4) == -1, "M25 reset: M25-owned reservation released")
+
+	var board4 = _m25_board(3, 2, 4, BLUE, [3, 4, 5])
+	var st4 = _m25_stack(board4, Vector2(1.5, 3.5))
+	var slots4 = _m25_slots([["ONE", BLUE, 1]])
+	var e4 = BatchTargetClaimEngine.new(); e4.bind(board4, slots4, st4["sel"], st4["res"])
+	e4.claim_for_color(BLUE, {4: st4["access"]})
+	_check(slots4.get_committed(4) == 1 and not slots4.is_empty(4), "M25 guard: batch with live claim cannot complete (committed>0)")
+
+func _m25_reentrancy() -> void:
+	var BLUE := 0
+	var board = _m25_board(2, 1, 4, BLUE, [0, 1])
+	var st = _m25_stack(board, Vector2(0.5, -1.5))
+	var slots = _m25_slots([["B", BLUE, 3]])
+	var e = BatchTargetClaimEngine.new(); e.bind(board, slots, st["sel"], st["res"])
+	var reentrant = load("res://tests/support/m25_reentrant_access.gd").new()
+	reentrant.engine = e; reentrant.color = BLUE
+	reentrant.access_map = {4: reentrant}
+	var r := e.claim_for_color(BLUE, {4: reentrant})
+	_check(reentrant.nested_result.get("error", "") == "reentrant", "M25 reentry: nested claim rejected reentrant")
+	_check(e.live_claim_count() <= 1 and slots.get_committed(4) <= 1, "M25 reentry: no double insertion from nested claim")
+
+func _m25_deterministic_replay() -> void:
+	var snap1 := _m25_replay_once()
+	var snap2 := _m25_replay_once()
+	_check(snap1 == snap2, "M25 determinism: identical placement/claim sequence -> identical ledger")
+
+func _m25_replay_once() -> String:
+	var BLUE := 0
+	var board = _m25_board(4, 4, 4, BLUE, [12, 13, 14, 15])
+	var st = _m25_stack(board, Vector2(2.0, 5.5))
+	var slots = _m25_slots([["BLUE_8", BLUE, 8], ["BLUE_14", BLUE, 14], ["BLUE_12", BLUE, 12]])
+	var e = BatchTargetClaimEngine.new(); e.bind(board, slots, st["sel"], st["res"])
+	var amap := {4: st["access"], 3: st["access"], 2: st["access"]}
+	for n in range(3):
+		e.claim_for_color(BLUE, amap)
+	return str(e.claim_snapshot())
