@@ -273,3 +273,28 @@ Run via `tools/run_headless.ps1` or directly:
 Slot system, target selector, routing system, save system do not exist
 yet — their tests remain planned only. Rendering now exists
 (`BoardRenderer`) but Scrubbot movement/visual effects on top of it do not.
+
+
+## Economy & Rewards V1 regression suite
+
+Canonical decision: `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
+
+Required headless/integration coverage before Economy V1 closure:
+
+- SB wallet grant/spend insufficiency and transaction-id idempotency.
+- First-clear difficulty rewards and replay anti-farming.
+- Win Streak exact 1/5/10/25/100 SB mapping, reset semantics and +1 Bot Part each multiple of 5.
+- Gift Meter accepts ONLY streak SB; exact 10/50/250/500/1000 crossing, multi-cross, rollover and no self-feed.
+- Gift milestone reward bundles and 1000 guaranteed-new-card/500-SB fallback.
+- Bot Parts 250 unlock cost, overflow and approximate 150-level pacing simulation.
+- Hearts: max 5, 1800-second wall-clock regen, offline/menu/background behavior, loss/restart/pre-action-exit semantics and SB refills.
+- Manual 2x entitlement: current-level and 15/30/60-minute products; timed expiry continues in menus, pause, background and closed-app wall-clock time.
+- Free M23-exhausted automatic 2x remains entitlement-independent and gameplay-truth neutral.
+- +1 Slot: authoritative 5/6 capacity across M24/M27/UI, no 7+.
+- Random: remaining-supply conservation plus solver proof of at least three safe selections; no consume on failed search.
+- Selector: solver-safe eligibility, arbitrary remaining extraction, atomic rightmost-empty placement, no duplicate batch.
+- Tornado: cross-engine chosen-color reconciliation, in-flight cancellation, quota/claim/reservation conservation and rollback.
+- Daily: once-per-calendar-day claim, 5-day repeating rewards, 3-task completion booster, missed-day reset and clock-rollback duplicate protection.
+- Collection: 15x9 inventory, Standard/Premium pack contract, set-completion once-only reward.
+- Cards Exchange: protected first copy, rarity SB values, atomic EXCHANGE ALL EXTRAS under rapid/repeated input.
+- Save migration/round-trip/corruption recovery for all Economy V1 fields.
