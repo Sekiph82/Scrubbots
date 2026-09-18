@@ -367,6 +367,14 @@ The player may activate only the current front/top batch of a supply column. A s
 
 The historical M21/M22 direct color-slot click path remains valid evidence for those earlier vertical-slice and Railroad tests, but it is superseded as the production core-loop interaction. Do not retain or add hidden keyboard dispatch shortcuts such as SPACE. Presentation input must feed the real Batch Supply → Five-Slot Batch → Claim → Auto Dispatch → Routing → ScrubbotAgent → authenticated clear chain.
 
+### 8.10D — Gameplay speed / automatic endgame acceleration `[OWNER-LOCKED CURRENT — 2026-09-18]`
+
+Production gameplay V1 supports exactly **1x** and **2x** speed. A new level/full reset starts at 1x. The bottom-right gameplay speed control toggles 1x <-> 2x when production input is wired, and Pause suspends gameplay while preserving the selected speed for resume.
+
+The game automatically switches to **2x** immediately after authoritative **M23 supply exhaustion**: every 3/4/5 FIFO column has zero remaining batches, including all formerly hidden batches, because the final front-batch transaction has been successfully accepted and committed into M24. The trigger is **not** "all five slots are occupied" and is **not** "the three visible rows look empty" while hidden batches remain. A rejected final transfer does not trigger auto-2x. Automatic 2x is not permanently locked; the player may manually toggle back to 1x afterward.
+
+2x accelerates time-based gameplay execution/presentation only. It must not change M23 FIFO order, M24 placement/accounting, M25 target/claim arbitration, TargetSelector priority, ReservationState ownership, Railroad/routing geometry, M26 no-ghost semantics, authenticated clears or M27 solver/deadlock meaning. Prefer an explicit gameplay-speed authority rather than blindly doubling unrelated UI/application clocks. Canonical decision: `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md`.
+
 ### 8.11 — Win streak `[LOCKED]`
 
 ```text
@@ -1185,7 +1193,7 @@ Purpose: prove generated supply is actually playable under the real mechanics an
 - [ ] SB-M28-021 Place speech bubble above Scrubby.
 - [ ] SB-M28-022 Preserve right-side cleaning props as lower-priority decoration.
 - [ ] SB-M28-023 Put four booster controls in compact horizontal row above bottom/ad row.
-- [ ] SB-M28-024 Pause left of ad, speed-up control right of ad.
+- [ ] SB-M28-024 Pause left of ad, 2x speed control right of ad with distinct 1x/2x presentation states.
 - [ ] SB-M28-025 Do not restore removed Level/lock rail.
 - [ ] SB-M28-026 Bind owner-approved illustrations while keeping screen responsive/native.
 - [ ] SB-M28-027 Prove BoardRenderer coordinate mapping after responsive scaling.
