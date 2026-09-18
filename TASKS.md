@@ -1185,7 +1185,7 @@ Purpose: prove generated supply is actually playable under the real mechanics an
 - [ ] SB-M28-021 Place speech bubble above Scrubby.
 - [ ] SB-M28-022 Preserve right-side cleaning props as lower-priority decoration.
 - [ ] SB-M28-023 Put four booster controls in compact horizontal row above bottom/ad row.
-- [ ] SB-M28-024 Pause left of ad, settings right of ad.
+- [ ] SB-M28-024 Pause left of ad, speed-up control right of ad.
 - [ ] SB-M28-025 Do not restore removed Level/lock rail.
 - [ ] SB-M28-026 Bind owner-approved illustrations while keeping screen responsive/native.
 - [ ] SB-M28-027 Prove BoardRenderer coordinate mapping after responsive scaling.
