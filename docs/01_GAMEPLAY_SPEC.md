@@ -311,33 +311,53 @@ Economy around this reward remains `[TO BE DESIGNED]`.
 
 Not authorized here. Difficulty/retention design does not authorize ads, energy systems, paid retries, dynamic monetization walls or failure manipulation.
 
-## Scrubbot Railroad V1 movement `[OWNER-LOCKED 2026-09-14]`
+## Scrubbot Railroad V1 movement `[OWNER-LOCKED; amended 2026-09-17]`
 
-Owner decision: `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`.
+Owner decisions:
 
-Production exterior movement is a consistent robotic **railroad** around the
-artwork (one visual language for every level; no per-level themed rail in V1). For
-board `W Ã— H`: artwork-to-rail clearance `2.0` cells, rail width `1.0` cell,
-centreline `2.5` cells outside each boundary, corners at the four intersections.
+- `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`
+- `coordination/OWNER_SCRUBBOT_RAILROAD_INTERIOR_PATH_DECISION_V01.md`
+
+Production exterior movement uses one consistent robotic **railroad** around
+the artwork. For board `W × H`: artwork-to-rail clearance is `2.0` logical
+cells, rail width is `1.0` logical cell, and the rail centreline is `2.5`
+cells outside each board boundary.
 
 Owner-facing flow:
 
 ```text
-clicked SlotCell -> visible slot connector -> BOTTOM railroad -> railroad-only
-exterior travel (corners only) -> exit aligned with the assigned target
-(TOP/BOTTOM share target x; LEFT/RIGHT share target y) -> strictly ORTHOGONAL final
-approach -> already-assigned target -> authenticated arrival -> M20 clear
+clicked SlotCell
+-> visible connector
+-> BOTTOM railroad
+-> rail-only exterior travel through canonical sides/corners
+-> legal orthogonal ingress into OPEN/CLEARED perimeter space
+-> OPEN/CLEARED four-neighbour interior corridor, with zero or more 90° turns
+-> already-assigned ACTIVE target as the final endpoint
+-> authenticated arrival
+-> clear
 ```
 
-The Scrubbot must not cut diagonally across exterior free space, leave the rail
-early, tunnel through non-target ACTIVE artwork, or retarget. If one aligned side's
-final approach is blocked by a non-target ACTIVE cell, routing may evaluate another
-aligned side **for the same target**; if no side is legal it returns no route and
-never chooses a different target. Shortest legal rail route wins; equal-distance
-tie-break is `BOTTOM -> LEFT -> RIGHT -> TOP` (HOW-only; TargetSelector bottom-most /
-left-most WHAT-order is unchanged).
+The old straight-only rule is superseded. Rail departure does **not** have to
+be aligned with the final target row/column. Routing may evaluate legal
+ingress/interior-path combinations for the already-assigned target and chooses
+the shortest legal total route including connector, rail travel, ingress,
+interior travel and final arrival.
 
-This supersedes the M21 adjacent one-cell exterior ring as future production
-geometry. M21 V07-V10 remain valid historical evidence for their commits. The
-railroad is presentation/routing space only â€” not a LevelData/BoardState cell layer,
-not a C01..C16 artwork colour, and it does not change Difficulty V1.
+Non-target ACTIVE cells are hard blockers. The assigned ACTIVE target is
+enterable only as the final endpoint. No diagonal motion, corner-cutting,
+free-space exterior shortcut, tunnelling through ACTIVE artwork, teleporting
+or silent retargeting is legal.
+
+Equal-distance side priority remains:
+
+```text
+BOTTOM -> LEFT -> RIGHT -> TOP
+```
+
+This is HOW-only. TargetSelector's WHAT-order remains separate and routing
+never selects a different target merely because another target would be easier
+to reach.
+
+The railroad is presentation/routing space only, never a LevelData/BoardState
+cell layer, never a C01..C16 artwork color, and never Difficulty V1 truth.
+M21 V07-V10 remain valid historical evidence for the commits they audited.

@@ -470,14 +470,21 @@ new transparent model (`tasks.md` SB-M10-005..011) remains open.
 
 ---
 
-### ADR-020: Global 15-color production pixel-art palette and difficulty color bands
+### ADR-020: Global production pixel-art palette — amended to V2 C01..C16
 
-**Decision**: Production logical pixel artwork uses one owner-locked global
-palette, C01..C15 exactly, defined in
-`data/palettes/scrubbots_palette_v1.json` and
+**Current decision**: Production logical pixel artwork uses the owner-locked
+global Palette V2, **C01..C16**, defined in
+`data/palettes/scrubbots_palette_v2.json` and
 `docs/08_PIXEL_ART_PALETTE_RULES.md`.
 
-Distinct canonical logical colors actually used by cells must be:
+Palette V2 includes Pure White (C15) and Pure Black (C16). No seventeenth
+logical production color may be introduced without an explicit versioned owner
+decision.
+
+Production artwork normally uses **3..12 distinct canonical colors actually
+referenced by logical cells**.
+
+The historical class-specific mapping:
 
 ```text
 EASY       3..5
@@ -486,52 +493,57 @@ HARD       8..9
 VERY_HARD  10..12
 ```
 
-CLEARED alpha-0 transparency is runtime state, not a palette color. Gameplay
-background and presentation-only cell-grid/border overlays also do not count.
+is superseded as a difficulty-class legality rule. Under Difficulty V1,
+distinct color count and distribution contribute to Color Complexity, one
+component of Challenge Score. They do not independently decide the
+player-facing difficulty class.
 
-**Reason**: A fixed color vocabulary gives SCRUBBOTS a stable visual identity,
-keeps slot/Scrubbot color matching deterministic, prevents references or AI
-generation from quietly expanding the color space, and gives Level Factory a
-hard content contract. The non-overlapping difficulty bands increase visual
-complexity predictably while Very Hard's 10–12 cap avoids excessive color
-noise even though the global library contains 15 available colors.
+CLEARED alpha-0 transparency is runtime state, not a palette color. Gameplay
+background and presentation-only grid/border overlays also do not count.
+
+**Reason**: A fixed global vocabulary gives SCRUBBOTS stable visual identity,
+deterministic slot/Scrubbot color matching and a strict content contract while
+Difficulty V1 avoids using one visual proxy as the whole difficulty model.
 
 **Consequences**: External/reference/AI source colors must be explicitly
-mapped or rejected. A production local palette is a used subset of C01..C15
-in ascending global C-ID order. The older M09 exact-source importer remains
-valid generic tooling but does not by itself make arbitrary palettes
-production-legal. Production art audit, Factory validation and M48 QA must
-enforce this decision before shipping.
+mapped or rejected for production logical art. A production local palette is a
+used subset of C01..C16 in ascending global C-ID order. The M09 exact-source
+importer remains valid generic tooling but arbitrary source colors are not
+production-legal until normalized/validated. Production art audit, Factory
+validation and M53 level QA must enforce the current V2 contract.
 
-**Status**: Accepted — owner locked 2026-09-06.
+**Historical note**: ADR-020 originally locked a 15-color V1 palette and
+class-specific color bands. That form is retained in repository history but is
+superseded by Palette V2 and Difficulty V1.
 
+**Status**: OWNER-LOCKED current contract; amended to Palette V2 /
+Difficulty V1.
 
 ---
 
 ### ADR-021: Production gameplay background is BG01 Midnight Slate
 
-**Decision** (owner-locked 2026-09-06): the production gameplay surface behind
-the board is **BG01 Midnight Slate**, exactly `#202533` / RGB(32,37,51).
+**Decision**: The production gameplay surface behind the board is
+**BG01 Midnight Slate**, exactly `#202533` / RGB(32,37,51).
 
-BG01 is deliberately separate from the locked C01..C15 production logical
-pixel-art palette. It is not C16, never appears as a logical cell color in
-LevelData, and never counts toward a level's difficulty color total.
+BG01 is deliberately separate from the locked C01..C16 production logical
+pixel-art palette. It is not C17, never appears as a logical cell color in
+LevelData, and never counts toward a level's used-color total or Color
+Complexity.
 
-**Reason**: CLEARED cells are alpha-0 holes. A dedicated non-palette background
-keeps those holes visually distinct from ACTIVE C14 Charcoal/C08 Deep Blue
-cells, gives the bright 15-color palette strong contrast, and makes the
-ACTIVE->CLEARED state readable without inventing another gameplay color.
+**Reason**: CLEARED cells are alpha-0 holes. A dedicated non-palette
+background keeps those holes visually distinct from dark ACTIVE artwork and
+makes ACTIVE -> CLEARED readable without consuming another logical gameplay
+color.
 
 **Consequences**:
 
-- BoardRenderer continues to output alpha 0 for CLEARED cells; the containing
-  gameplay surface supplies BG01 underneath.
-- Production gameplay uses BG01 unless the owner explicitly versions this
-  rule.
-- Debug/transparency-test scenes may intentionally use conspicuous non-production
-  backgrounds such as magenta; those debug colors are not palette additions.
-- UI/decorative colors outside logical pixel art remain governed by UI rules;
-  this ADR only locks the gameplay board background.
+- BoardRenderer outputs alpha 0 for CLEARED cells; the containing gameplay
+  surface supplies BG01 underneath.
+- Production gameplay uses BG01 unless the owner explicitly versions the rule.
+- Debug/transparency-test scenes may use conspicuous non-production
+  backgrounds; those colors are not palette additions.
+- UI/decorative colors outside logical pixel art remain governed by UI rules.
 
 **Status**: Owner-locked.
 
@@ -964,40 +976,59 @@ reservation resolution. Using routing as the sole reachability oracle keeps
 
 **Status**: Accepted (M19-C001).
 
-### ADR-028: Scrubbot Railroad V1 supersedes M21 adjacent one-cell exterior ring (M22-C001 V02)
+### ADR-028: Scrubbot Railroad V1 + legal interior corridor routing
 
-**Status**: OWNER-LOCKED (`coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`), 2026-09-14.
+**Status**: OWNER-LOCKED. Exterior Railroad V1 decision 2026-09-14; legal
+interior-path amendment 2026-09-17.
 
-**Decision**: Production exterior Scrubbot travel is a consistent robotic **railroad**
-surrounding the artwork. For board `W Ã— H` the single-source geometry
-(`scripts/gameplay/routing/scrub_rail_geometry.gd`, `ScrubRailGeometry`) is:
-artwork-to-rail clearance exactly `2.0` cells, rail width `1.0` cell, centreline
-offset `2.5` cells outside each boundary; TOP `y=-2.5`, BOTTOM `y=H+2.5`,
-LEFT `x=-2.5`, RIGHT `x=W+2.5`; corners at the four intersections. The clicked-slot
-Scrubbot connects to the BOTTOM rail, travels on rail centrelines (side changes only
-through corners), leaves the rail only at an exit aligned with the assigned target
-(TOP/BOTTOM share target x; LEFT/RIGHT share target y), and makes a strictly
-orthogonal final approach. Shortest legal total rail route wins; equal-distance
-tie-break is `BOTTOM -> LEFT -> RIGHT -> TOP`.
+**Owner decisions**:
 
-**Supersession**: the exact M21 adjacent one-cell ring (`x=-1 / x=W / y=-1 / y=H`)
-is no longer the desired production movement geometry. **M21 V07-V10 historical
-audit evidence remains valid for those commits** and is not rewritten; only future
-production geometry is superseded. The locked M21 invariants are preserved:
-TargetSelector chooses WHAT (bottom-most then left-most among targetable matching
-cells) and never absorbs railroad geometry; routing chooses HOW and never
-retargets; reservations remain atomic/authoritative; non-target ACTIVE cells block;
-no tunnelling/diagonal squeeze; no route means no spawn/no side effects;
-authenticated arrival remains required for M20 clear; slot-click-only activation.
+- `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`
+- `coordination/OWNER_SCRUBBOT_RAILROAD_INTERIOR_PATH_DECISION_V01.md`
 
-**Ownership boundaries**: the railroad is presentation/routing space only â€” never a
-LevelData/BoardState cell layer, never a C01..C16 artwork colour, never affecting
-Difficulty V1. `ScrubRailGeometry` is the single geometry source consumed by
-`ProductionRoutingSystem` (HOW) and `ScrubRailView` (presentation); constants are
-not duplicated. Below-board (slot-style) starts route on the rail; other debug/test
-injection starts retain the compatible exterior path.
+**Decision**: Production exterior Scrubbot travel uses one consistent robotic
+railroad surrounding the artwork. For board `W × H`, the single-source
+geometry (`ScrubRailGeometry`) has artwork-to-rail clearance `2.0` cells,
+rail width `1.0` cell and centreline offset `2.5` cells outside each board
+boundary.
 
-**Reason**: gives every level a branded, readable, reusable movement infrastructure
-with one consistent visual language (no per-level themed rail in V1), without
-reopening accepted WHAT/reservation/clearing authority. No external reference title
-assets or exact composition are copied.
+A clicked slot connects visibly to the BOTTOM rail. Exterior travel remains on
+canonical rail sides/corners only.
+
+The earlier straight/aligned post-rail rule is superseded. For the already
+assigned target, routing may leave the rail through any legal orthogonal
+ingress into OPEN/CLEARED perimeter gameplay space. After ingress the route may
+traverse OPEN/CLEARED board cells by four-neighbour orthogonal movement with
+one or more 90-degree turns. The rail exit does not need to align with the
+final target row or column.
+
+Non-target ACTIVE cells are hard blockers. The assigned ACTIVE target is
+enterable only as the final endpoint. No diagonal movement, corner-cut,
+teleport, free-space exterior shortcut, ACTIVE tunnelling or silent retargeting
+is legal.
+
+Routing evaluates legal ingress/interior-path combinations for the same
+assigned target and chooses the shortest legal total route including slot
+connector, rail travel, ingress, interior path and final arrival.
+Equal-distance side priority remains:
+
+```text
+BOTTOM -> LEFT -> RIGHT -> TOP
+```
+
+**Ownership boundaries**:
+
+- TargetSelector chooses WHAT and never absorbs railroad/interior geometry.
+- RoutingSystem chooses HOW and never silently retargets.
+- Claim/reservation ownership is authoritative outside routing.
+- Railroad/interior path geometry is presentation/routing space only, never
+  LevelData/BoardState, never C01..C16 art and never Difficulty V1 truth.
+- No valid route means no spawn/no dispatch side effect.
+
+**Supersession**: M21's adjacent one-cell ring and M22's earlier straight-only
+post-rail approach remain valid historical evidence for their audited commits
+but are not current production routing law.
+
+**Reason**: The railroad gives SCRUBBOTS a consistent branded movement
+infrastructure while legal interior corridors allow reachable targets behind
+previously cleared space without weakening WHAT/claim/clear authority.

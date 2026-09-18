@@ -461,33 +461,47 @@ needed to fetch declarative content over HTTPS, verify it, cache it under
 `user://`, and expose verified levels to the existing catalog/loader seam.
 Publisher credentials and Factory code never ship in the app.
 
-## Scrubbot Railroad V1 â€” single-source geometry + ownership boundaries (M22-C001 V02)
+## Scrubbot Railroad V1 — single-source geometry + ownership boundaries
 
-Owner decision: `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`; ADR-028.
+Owner decisions:
 
-`scripts/gameplay/routing/scrub_rail_geometry.gd` (`ScrubRailGeometry`) is the ONE
-source of railroad geometry (clearance `2.0`, rail width `1.0`, centreline offset
-`2.5`, sides/corners/entry/exit, perimeter travel + deterministic tie-break). It is
-pure/data-oriented, derives everything from board `W/H` (no fixed 20x20 assumption,
-valid for 20..59 incl. 59x59), and fails closed on invalid dimensions.
+- `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md`
+- `coordination/OWNER_SCRUBBOT_RAILROAD_INTERIOR_PATH_DECISION_V01.md`
 
-Consumers of the same contract (numbers are never duplicated as magic values):
+`scripts/gameplay/routing/scrub_rail_geometry.gd` (`ScrubRailGeometry`) is
+the single source of exterior railroad geometry: clearance `2.0`, rail width
+`1.0`, centreline offset `2.5`, canonical sides/corners and deterministic
+side tie-breaks. Geometry is board-size-derived and contains no fixed 20×20
+assumption.
+
+Consumers of the same contract:
 
 ```text
-ScrubRailGeometry (single source)
-â”œâ”€â”€ ProductionRoutingSystem   -> HOW: below-board/slot starts travel the rail
-â”‚                                (connector -> bottom rail -> corners -> aligned
-â”‚                                exit -> orthogonal approach); never WHAT/retarget
-â”œâ”€â”€ ScrubRailView             -> presentation: procedural dark-slate rail, cyan
-â”‚                                guide nodes, rounded corners; owns no gameplay truth
-â””â”€â”€ GameplaySlotDemo          -> maps SlotCell anchors through BoardPresentation into
-                                 board-local route space; slots sit below the rail
+ScrubRailGeometry
+|-- ProductionRoutingSystem
+|   HOW: slot connector -> rail travel -> legal ingress
+|   -> OPEN/CLEARED orthogonal interior path -> assigned target
+|
+|-- ScrubRailView
+|   Presentation-only procedural rail; owns no gameplay truth
+|
+`-- GameplaySlotDemo / production presentation
+    Maps SlotCell anchors into the same board-local route space
 ```
 
-Ownership boundaries (unchanged authority): TargetSelector WHAT-order, ReservationState
-assignment truth, and CompleteClearingLoop/M20 authenticated clearing are NOT
-modified. Railroad geometry stays out of TargetSelector. The railroad is
-presentation/routing space only â€” never LevelData/BoardState, never a C01..C16
-artwork layer. `BoardPresentation` continues to map logical route coordinates to
-screen space. The generic collinear/shortcut/rounding post-process is not applied to
-rail routes (it could otherwise create a diagonal free-space shortcut).
+The 2026-09-17 interior-path amendment supersedes the earlier straight/aligned
+post-rail approach. A rail exit need not align with the final target row or
+column. After a legal ingress, routing may traverse OPEN/CLEARED board cells by
+four-neighbour orthogonal movement with one or more 90-degree turns. Non-target
+ACTIVE cells remain hard blockers and the assigned ACTIVE target is enterable
+only as the final endpoint.
+
+Routing chooses the shortest legal total route for the **already assigned**
+target. TargetSelector remains WHAT-only and never absorbs railroad/interior
+geometry. Reservation/claim ownership remains outside routing. No legal route
+means no dispatch side effect.
+
+The railroad is presentation/routing space only, never LevelData/BoardState,
+never a C01..C16 artwork layer and never Difficulty V1 truth.
+`BoardPresentation` continues to map logical route coordinates to screen
+space.

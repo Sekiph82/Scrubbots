@@ -1,349 +1,205 @@
 # 04 — Roadmap
 
-Status: **updated for Difficulty / Progression / Retention V1 — 2026-09-12**
+Status: **current dependency roadmap — 2026-09-18**
 
-Repository-root `TASKS.md` remains the canonical live task tracker. This document describes the architecture/dependency roadmap and the new cross-project Difficulty V1 program.
+`TASKS.md` is the only canonical live milestone/task tracker. This document
+describes dependency order and program boundaries. If status text here ever
+disagrees with `TASKS.md`, `TASKS.md` wins.
 
-Owner decision:
-`coordination/OWNER_DIFFICULTY_PROGRESSION_DECISION_V01.md`
+## 1. Completed foundation
 
-Core specs:
+The project has already established:
+
+- variable-size LevelData / BoardState;
+- exact pixel-art import and reconstruction tooling;
+- locked C01..C16 production palette rules;
+- batched BoardRenderer with ACTIVE/CLEARED transparency;
+- five-slot data/UI foundation;
+- color candidate indexing and production access truth;
+- reservation and target selection;
+- production routing and ScrubbotAgent;
+- authenticated clearing loop;
+- first real-art Hazard Bot vertical slice;
+- Railroad V1 exterior movement and slot connectors;
+- legal post-rail OPEN/CLEARED interior corridor routing;
+- Batch Supply Engine (M23);
+- Five-Slot Batch Engine (M24).
+
+The gameplay architecture remains data-oriented. UI and visual production must
+not duplicate gameplay truth.
+
+## 2. Current core-gameplay program
+
+As of 2026-09-18 the active milestone is **M25 — Batch Target Claim Engine**.
+
+Canonical sequence:
+
+```text
+M23 Batch Supply Engine                CLOSED
+-> M24 Five-Slot Batch Engine          CLOSED
+-> M25 Batch Target Claim Engine       ACTIVE
+-> M26 Auto Dispatch Scheduler
+-> M27 Solvability / Deadlock Engine
+```
+
+M25 owns unique batch/target claim identity, same-color arbitration,
+transactional claim lifecycle and rollback. M26 must consume those authorities
+without inventing a second target/claim truth. M27 must prove a full level has
+at least one legal player-choice sequence and must distinguish temporary
+WAITING/STALLED states from a proven deadlock.
+
+No production UI milestone may weaken these core invariants.
+
+## 3. Production gameplay presentation
+
+After M25–M27:
+
+### M28 — Gameplay Screen Layout
+
+- canonical `docs/MASTER_UI_SYSTEM.md` composition;
+- board is the dominant screen region;
+- five-slot/color-selection area stays usable;
+- Scrubby and decorative cleaning props remain subordinate to gameplay;
+- Railroad V1 presentation uses the same geometry truth as routing;
+- no baked dynamic labels, counters or gameplay state.
+
+### M29 — Mobile Touch
+
+- production touch targets and gesture behavior;
+- safe-area correctness;
+- board/input coordinate accuracy;
+- rapid-tap protection where needed.
+
+### M31 / M32 — Effects and final Scrubbot visuals
+
+Illustrative assets are generated only when their owning milestone needs them.
+ChatGPT image generation is primary; Magnific MCP remains an approved fallback.
+Neither is a runtime dependency.
+
+## 4. Rules / progression / persistence
+
+Canonical later milestones:
+
+```text
+M30  Win/Lose Rules
+M35  Level Catalog
+M36  Difficulty System
+M37  Level Progression
+M38  Win Streak
+M39  Economy
+M40  Save System
+M41  Settings
+```
+
+Win/lose, economy and monetization remain design-gated where `TASKS.md`
+marks them as such. Difficulty V1 does not authorize hidden timer/move-limit
+or monetization mechanics.
+
+## 5. Home and later screens
+
+```text
+M42  Home / Navigation
+M43  Results
+M44  Tutorial
+M45  Debug Tooling
+```
+
+Home preproduction already has:
+
+- canonical owner reference;
+- responsive composition contract;
+- `assets/ui/HOME_ASSET_MANIFEST.json`;
+- raw/final asset directory separation;
+- provider/provenance policy.
+
+This is **preproduction only**. It does not mark M42 complete or move Home
+implementation ahead of the core-gameplay sequence.
+
+## 6. Mobile quality / release chain
+
+```text
+M46  Performance
+M47  Android Device Testing
+M48  iOS Readiness
+M49  Responsive UI
+M50  Accessibility
+M51  Localization Readiness
+M52  Production Content Scale-Up
+M53  Level QA
+M54  Regression Suite
+M55  Chaos / Long-Run QA
+M56  Analytics [design gate]
+M57  Monetization [design gate]
+M58  Privacy & Compliance
+M59  Build Pipeline
+M60  Release
+```
+
+A milestone is not complete merely because a scene/file exists. Required
+owner gates, import/binding, viewport/device validation and regression evidence
+must also exist.
+
+## 7. Difficulty / progression V1
+
+Canonical sources:
+
 - `docs/09_DIFFICULTY_PROGRESSION_RETENTION_SYSTEM.md`
 - `docs/10_LEVEL_FACTORY_GENERATION_SCORING_ARCHITECTURE.md`
 - `docs/11_LEVEL_DIFFICULTY_CALIBRATION_QA.md`
+- `docs/12_ADR_DIFFICULTY_V1.md`
+- `coordination/OWNER_DIFFICULTY_PROGRESSION_DECISION_V01.md`
 
-## 1. Completed gameplay foundation
+Locked high-level principles:
 
-The project already has the major low-level systems needed by the new model:
-
-- variable-size LevelData / BoardState;
-- exact pixel-art importer tooling;
-- batched BoardRenderer with ACTIVE/CLEARED semantics;
-- five-slot data system;
-- color candidates;
-- reservations;
-- TargetSelector;
-- production reachability/access truth;
-- production routing;
-- ScrubbotAgent;
-- dispatcher;
-- complete M20 clearing vertical slice.
-
-This foundation is deliberately preserved. Difficulty V1 does not require rewriting gameplay truth.
-
-## 2. Current milestone — M21 real-art vertical slice
-
-M21 continues with the owner-approved 20x20 Hazard Bot.
-
-M21 remains intentionally narrow:
-
-```text
-real owner-approved artwork
-→ exact/canonical LevelData
-→ BoardState
-→ renderer
-→ five slots
-→ production target/access/routing
-→ Scrubbots
-→ ACTIVE→CLEARED
-→ complete playable real-art vertical slice
-```
-
-The current legacy EASY dimension/color validator may be used as an M21 compatibility gate only. M21 is not evidence that future EASY content must be 20x20 or use five colors.
-
-Do not destabilize M21 by mixing the entire Difficulty V1 runtime migration into its active implementation cycle.
-
-## 3. Cross-project Difficulty V1 program — effective now
-
-Design truth changes immediately:
-
-- exact cadence: `E,E,M,E,H,E,E,M,E,VH`;
-- later levels within the same class grow through a saturating progression curve;
-- board size no longer defines difficulty;
-- color count no longer defines difficulty;
+- campaign cadence is separate from board physical dimensions;
+- color count alone does not determine difficulty;
 - Challenge Score, Session Load and Frustration Risk are separate;
-- retention/recovery/novelty become first-class campaign constraints;
-- Level Factory becomes evaluator-guided rather than blind random generation.
+- difficulty class is evaluated from the full model, not one proxy metric;
+- content must be solver/QA validated before production acceptance.
 
-Runtime/content validators migrate through audited milestones rather than through an unreviewed global rewrite.
+## 8. Level Factory / Content Platform boundary
 
-## 4. Main-game milestone impact
+The 224 Level Factory + Content Platform requirements are no longer live
+checklist rows in this game repository. Their canonical tracker is:
 
-### M21 — First Real-Art Vertical Slice
+`Sekiph82/ScrubBots-Level-Factory/TASKS.md`
 
-No scope expansion. Preserve the approved 20x20 engineering proof.
+The root repository may retain historical/local `level_factory/` and
+`content_pipeline/` folders, but live requirement ownership is externalized
+to prevent double-counting.
 
-### M22–M24 — Production gameplay UI/touch
+Shipping runtime implementation remains in this game repository when it is
+actually needed, especially remote content loading/cache/disable behavior.
+Offline generation, solver authoring and publisher credentials never ship in
+the mobile app.
 
-Add one presentation requirement: gameplay layout must remain readable across compact/standard/large logical boards because dimensions no longer map to class.
+## 9. Visual-production dependency rule
 
-Do not make UI assumptions such as "Very Hard always has tiny 50..59 cells".
+Visual production is part of the main SCRUBBOTS project, not a disconnected
+final-art project.
 
-### M25 — Win/Lose Rules
-
-Still owner-gated. Difficulty V1 must not invent timer/move-limit/failure mechanics.
-
-When win/lose rules are chosen, solver/legal-move adapters must be updated without changing the Difficulty V1 separation of challenge/load/frustration.
-
-### M30 — Level Catalog
-
-Catalog must eventually store/resolve:
-
-- stable level ID;
-- campaign number/order;
-- cadence slot/class;
-- Challenge Score + model version;
-- challenge vector;
-- Session Load;
-- Frustration Risk;
-- novelty signature/version;
-- source/provenance hashes;
-- solver/generator versions.
-
-Catalog validation must no longer classify difficulty from dimensions alone.
-
-### M31 — Difficulty Intelligence V1
-
-M31 is upgraded from a small matrix task into the main-game Difficulty V1 integration milestone.
-
-Required implementation themes:
-
-1. versioned progression config loader;
-2. exact ten-level cadence calculation;
-3. target score calculation;
-4. versioned LevelMetrics schema;
-5. W/C/A/U/B/R/S metric contracts;
-6. Challenge Score calculation;
-7. Session Load calculation;
-8. provisional Frustration Risk contract;
-9. dimension/color class-gate migration;
-10. regression fixtures proving compact hard and larger easy cases;
-11. M21 compatibility preserved;
-12. legacy `DifficultyRules` migration without breaking generic LevelData/BoardState.
-
-### M32 — Campaign Progression / Sequencing
-
-M32 is no longer a blank progression design gate. The owner has selected the V1 cadence/curve.
-
-Implementation themes:
-
-- `level -> cadence slot/class`;
-- `level -> TargetChallenge`;
-- recovery validation;
-- accepted-candidate selection;
-- challenge-vector diversity;
-- novelty/recent-similarity rules;
-- Session Load / Frustration budgets;
-- deterministic campaign-build provenance;
-- replay/reordering without regenerating level data.
-
-Unlock/replay UI rules that are unrelated to difficulty may remain owner-gated where necessary.
-
-### M40 — Debug Tooling
-
-Add display of:
-
-- target vs actual Challenge Score;
-- W/C/A/U/B/R/S;
-- Session Load;
-- Frustration Risk;
-- cadence slot/class;
-- progression/model versions;
-- unlock/frontier diagnostics where available.
-
-### M41/M42 — Performance / real devices
-
-Performance matrices must sample board size independently from difficulty class.
-
-Required representative cases include:
-
-- compact high-challenge;
-- standard low/medium/high challenge;
-- large low-cognitive/high-load;
-- exceptional 49..59 readability/load cases.
-
-59x59 remains a capability stress ceiling, not the default Very Hard format.
-
-### M47 — Production Content Scale-Up
-
-Production scale-up becomes Factory-driven accepted-pool production:
+Order of authority:
 
 ```text
-request campaign envelopes
-→ generate many candidates
-→ reject invalid/unsolved/bad-fit output
-→ accepted candidate pools
-→ human/owner review where required
-→ CampaignBuilder
-→ production handoff
+owner-approved original art
+-> owner-supplied project references
+-> owner-approved generated production assets
+-> external inspiration (method/reference only; never copied)
 ```
 
-Success is measured in **accepted campaign-fit levels**, not raw generated count.
+Raw generated candidates live under `assets/ui/generated/`; only approved
+production assets belong in `assets/ui/final/`.
 
-### M48 — Level QA
-
-Every level must validate:
-
-- legal data/palette;
-- canonical solvability;
-- target Challenge fit;
-- challenge vector;
-- Session Load;
-- Frustration Risk;
-- novelty/similarity;
-- mobile readability;
-- performance;
-- campaign recovery rules;
-- provenance/model versions.
-
-### M49/M50 — Regression / chaos
-
-Add Difficulty V1 property/regression tests and long-campaign sequencing tests. Include levels 1/10/11, 111, 300/310/311 and 1000/1001/1010 in progression regression.
-
-### M51 — Analytics
-
-Analytics remains owner-gated.
-
-Difficulty V1 must work without an external analytics SDK. If analytics is later approved, aggregate player results may calibrate V2+ but no hidden individualized dynamic difficulty is authorized by V1.
-
-## 5. Level Factory roadmap impact
-
-### LF00 — isolation/bootstrap
-
-Unchanged. Factory remains a separate Godot project.
-
-### LF01 — deterministic config/seeds
-
-Update assumptions:
-
-- dimensions selected from global production envelope, not class band;
-- request contains target score/load/risk/novelty envelope;
-- progression/score model versions recorded.
-
-### LF02 — candidate generator
-
-Generation becomes multi-objective and evaluator-guided. ART_FIRST, PUZZLE_FIRST and HYBRID modes remain.
-
-### LF03 — solver/simulation
-
-This is now a critical dependency for Difficulty V1, not optional research.
-
-Provide canonical pure simulation, solvability verdicts, search diagnostics and reproducibility.
-
-### LF04 — difficulty intelligence
-
-Implement full V1:
-
-- W/C/A/U/B/R/S;
-- scalar Challenge;
-- challenge vector/profile;
-- Session Load;
-- provisional Frustration Risk;
-- novelty signature;
-- model provenance.
-
-### LF05 — Factory QA
-
-Replace historical class-by-dimension/color checks with new production legality + target-fit gates.
-
-Keep 20..59 engine envelope and C01..C16 palette. Use 3..12 global used-color envelope under V1.
-
-### LF06 — human editor
-
-Expose target challenge, measured vector, load/risk, frontier/unlock diagnostics, novelty/similarity and exact rejection reasons.
-
-### LF07 — mutation / targeting
-
-Mutation jointly targets score/load/risk/novelty. Never silently mutate owner-original art.
-
-### LF08 — batch production
-
-Request **accepted counts**, maintain rejection statistics and resumable jobs. Produce candidate pools broad enough for CampaignBuilder variety.
-
-### LF09 — advanced research
-
-Evolutionary/telemetry-calibrated methods remain experimental until the deterministic V1 pipeline is proven.
-
-### LF10 — CampaignBuilder
-
-The progression design gate is now resolved at the design level.
-
-CampaignBuilder implements exact cadence + progression target + retention constraints after solver/metrics dependencies exist.
-
-## 6. Recommended implementation dependency chain
+## 10. Current critical path
 
 ```text
-CURRENT M21 vertical slice
-        │
-        ├───────────── design/config V1 already locked now
-        │
-        ▼
-Versioned progression + metric schemas
-        ↓
-Pure canonical Factory simulation adapter
-        ↓
-Oracle solver + diagnostics
-        ↓
-Difficulty analyzers W/C/A/U/B/R/S
-        ↓
-Session Load + provisional Frustration
-        ↓
-Candidate acceptance evaluator
-        ↓
-Constraint/hybrid generator
-        ↓
-Safe mutation targeting
-        ↓
-Novelty/signature engine
-        ↓
-Accepted candidate pools
-        ↓
-CampaignBuilder
-        ↓
-Internal calibration/playtest
-        ↓
-M30/M47/M48 production integration
-        ↓
-Optional future telemetry calibration (owner gate)
+M25 claim hardening
+-> M26 auto dispatch
+-> M27 solvability/deadlock
+-> M28/M29 production gameplay UI + touch
+-> completion/progression/save
+-> Home/results/tutorial
+-> mobile performance + responsive/accessibility/localization
+-> content scale-up + QA
+-> release
 ```
-
-The design/config work does **not** need to wait for M21. Runtime migration and solver implementation remain independently auditable work packages.
-
-## 7. Content-production principle
-
-Do not generate a huge library under the obsolete dimension=difficulty model while Difficulty V1 infrastructure is unfinished.
-
-It is acceptable to create art experiments and engineering fixtures, but scaled production content should pass the new evaluator/QA pipeline.
-
-## 8. Retention north star
-
-The campaign should feel like a sequence of controlled waves:
-
-```text
-flow
-→ confidence
-→ tension
-→ recovery
-→ mini-boss
-→ strong recovery
-→ novelty
-→ tension
-→ confidence
-→ boss
-→ relief
-```
-
-Later campaign cycles become more sophisticated, not simply larger and longer.
-
-## 9. Source-of-truth hierarchy for Difficulty V1
-
-For difficulty/progression/retention questions, use:
-
-1. explicit latest owner decision;
-2. `coordination/OWNER_DIFFICULTY_PROGRESSION_DECISION_V01.md`;
-3. `data/config/level_progression_v1.json` and `data/config/difficulty_score_model_v1.json`;
-4. docs 09–11;
-5. updated gameplay/project docs;
-6. legacy dimension-band text only as migration history/compatibility evidence.
-
-Where root `TASKS.md` or `CLAUDE.md` still contains the historical class=dimension/color wording, the explicit 2026-09-12 owner decision supersedes that wording until the controlled tracker/manual migration lands.
