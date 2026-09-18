@@ -33,7 +33,7 @@ current boundary and what genuinely remains future (M21+).
 | Board State | Runtime source of truth for a level's cells' current state (cell count = width × height, level-defined). | `scripts/gameplay/board/` |
 | Pixel/Cell State | Per-cell data: index, x, y, color id, lifecycle state (ACTIVE/CLEARED). | `scripts/gameplay/cells/` |
 | Palette/Color IDs | Maps compact numeric color ids to actual colors. | `scripts/data/`, `data/palettes/` |
-| Slot System | Owns the 5 slots, their assigned color, and dispatch eligibility. | `scripts/gameplay/slots/` |
+| Slot System | Owns normal capacity 5, Economy V1 +1 booster capacity 6, assigned batches and dispatch eligibility. Capacity is authoritative gameplay state shared with solver/UI. | `scripts/gameplay/slots/` |
 | Scrubbot Dispatcher | Decides when a slot may release a Scrubbot (a reachable target must exist). | `scripts/gameplay/slots/` |
 | Color Candidate Index | Groups raw ACTIVE matching-color candidates by color (cached; M13). Does NOT prove reachability. | `scripts/gameplay/targeting/` |
 | Reachability/Access truth | Filters candidates that are currently blocked/unreachable under access semantics (future; M15/M16). | `scripts/gameplay/targeting/` or a narrow query seam |
@@ -44,7 +44,16 @@ current boundary and what genuinely remains future (M21+).
 | Cleaning Feedback | Visual/audio response when a cell is cleaned; poolable, toggleable. | `scripts/gameplay/cells/`, later `scenes/components/` |
 | UI | HUD, slot UI, menus, safe areas, responsive composition, reusable controls. | `scripts/ui/`, `scenes/components/ui/`, later screen scenes |
 | Visual Asset Pipeline | Owner-reference intake, ChatGPT-primary generated illustration assets with Magnific fallback, raw/final separation. | `assets/art/references/`, `assets/ui/`, `ASSET_GENERATION_MANIFEST.json` |
-| Save System | Persists progress, streak, currency. Not implemented yet. | `scripts/data/` |
+| Economy Wallet | Authoritative Scrub Bucks balance and atomic/idempotent grant/spend transactions. | `scripts/economy/` |
+| Reward Grant Service | Applies first-clear, streak, Gift Meter, Daily, Collection and pack reward bundles exactly once. | `scripts/economy/` |
+| Heart Service | 5-Heart state, 30-minute wall-clock regen, attempt consumption and SB refill. | `scripts/economy/` |
+| Gift Meter Service | Tracks Win-Streak-SB-only 10/50/250/500/1000 milestones, rollover and Gift Bar claim queue. | `scripts/economy/` |
+| Speed Entitlement Service | Current-level/timed paid 2x entitlements using absolute wall-clock expiry; does not own temporal factor. | `scripts/economy/` |
+| Booster Inventory | Exactly four booster charge inventories and atomic use/spend requests. | `scripts/economy/` |
+| Cards Exchange | Protects first card copy and atomically converts duplicate copies to SB. | `scripts/economy/` |
+| Robot Unlock Service | Bot Parts balance and 250-part robot unlock progression. | `scripts/progression/` |
+| Collection Inventory | Card counts, set completion and Standard/Premium pack grants. | `scripts/collection/` |
+| Save System | Persists progress, streak, economy, Hearts, Bot Parts, cards, boosters, Daily and 2x expiry. Not implemented yet. | `scripts/data/` |
 | Debug/Instrumentation | Dev-only overlays, logging, inspection tools. | `scripts/debug/`, `scenes/debug/` |
 
 ## Candidate → reachability → TargetSelector → RoutingSystem — the critical seam
@@ -419,7 +428,7 @@ dispatcher finalize` and then a presentation-only renderer repaint; M20 does not
 mutate slot availability/activity and imposes no concurrent-bot cap. What remains
 future (M21+): the real-art vertical slice and level content, production
 Gameplay/Home/Popup UI screens, win/lose/scoring/streak and session completion,
-progression/save/economy, and any slot queue/cooldown/consumption policy — all
+progression/save/economy runtime services, Economy V1 booster transactions, and remaining slot queue/cooldown/consumption policy — all
 still milestone work (see `docs/04_ROADMAP.md` / `TASKS.md`) and must not be
 marked complete until implemented and validated.
 
@@ -505,3 +514,31 @@ The railroad is presentation/routing space only, never LevelData/BoardState,
 never a C01..C16 artwork layer and never Difficulty V1 truth.
 `BoardPresentation` continues to map logical route coordinates to screen
 space.
+
+
+## Economy & Rewards V1 module contract
+
+Canonical owner decision: `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
+Machine tuning: `data/config/economy_rewards_v1.json`.
+
+Economy mutations must never live in presentation Controls. UI issues commands; domain services validate and atomically mutate/save state.
+
+Planned service boundaries:
+- `scripts/economy/economy_wallet.gd`
+- `scripts/economy/reward_grant_service.gd`
+- `scripts/economy/heart_service.gd`
+- `scripts/economy/gift_meter_service.gd`
+- `scripts/economy/daily_service.gd`
+- `scripts/economy/booster_inventory.gd`
+- `scripts/economy/speed_entitlement_service.gd`
+- `scripts/economy/cards_exchange_service.gd`
+- `scripts/progression/robot_unlock_service.gd`
+- `scripts/collection/collection_inventory.gd`
+
+GameplaySpeedAuthority remains factor/cadence-only. SpeedEntitlementService answers whether a production manual 2x request is allowed/paid. Heart and timed-2x clocks use wall-clock timestamps, never Engine.time_scale or gameplay delta.
+
+Booster engine seams:
+- +1 Slot changes authoritative capacity 5→6 for the attempt and therefore touches M24, M27 and responsive presentation.
+- Random mutates only remaining M23 supply order and requires solver proof of at least three consecutive safe legal selections.
+- Selector performs one solver-safe arbitrary-remaining-batch extraction and standard rightmost-empty placement.
+- Tornado is a cross-engine color-purge transaction that must reconcile BoardState, M23, M24, M25, M26 agents/claims and M27 state before commit.
