@@ -3,7 +3,10 @@ extends HBoxContainer
 ## Preload this script (res://scripts/ui/five_slot_strip.gd); do not rely on global
 ## class_name (AL-001).
 ##
-## Renders EXACTLY five BatchSlotView positions, left→right by slot index. It is a
+## M28/M29 BASELINE renders exactly five BatchSlotView positions, left→right by slot index.
+## Economy V1 +1 Slot does NOT exist in this accepted baseline yet; M39 must extend this
+## presentation to authoritative capacity 5/6 without falsifying the completed M28 evidence.
+## It is a
 ## status/occupancy strip, NOT a row of destination buttons: neither it nor its
 ## children emit any activation signal, and it never wires touch/click to M24/M23.
 ## M29 owns actual input; M28 is presentation only.
