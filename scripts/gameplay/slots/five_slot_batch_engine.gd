@@ -237,6 +237,19 @@ func rollback_work(work_id) -> bool:
 	_live_work.erase(work_id)
 	return true
 
+## Read-only coherence query for the M25 claim layer (M25-C001 V02 seam). NON-MUTATING and
+## policy-neutral: returns true iff work_id is a live committed identity whose recorded slot
+## still holds the exact same occupied batch — the SAME coherence resolve_clear()/
+## rollback_work() enforce before acting. It lets M25 preflight all-or-nothing rollback/
+## teardown without a second reservation/work authority. Adds no target/route/robot meaning.
+func is_work_coherent(work_id) -> bool:
+	if typeof(work_id) != TYPE_STRING or not _live_work.has(work_id):
+		return false
+	var rec: Dictionary = _live_work[work_id]
+	var idx: int = rec["slot"]
+	var s = _slots[idx]
+	return not s.is_empty() and s.get_batch_id() == rec["batch_id"]
+
 func _free_slot(idx: int) -> void:
 	# Return to exact EMPTY truth; drop any live work still keyed to this slot. Neighbors
 	# are never shifted/compacted.

@@ -54,6 +54,14 @@ func is_coherent_with(board, routing_system, routing_access) -> bool:
 		and _routing_system != null and _routing_system == routing_system \
 		and _routing_access != null and _routing_access == routing_access
 
+## Read-only board-coherence query for the M25 claim trust boundary (M25-C001 V02 seam).
+## NON-MUTATING: true iff this access adapter carries the EXACT bound BoardState instance
+## (reference identity, not merely equal dimensions), so the M25 claim path can reject a
+## foreign-board ProductionTargetAccess without learning routing internals. Never exposes
+## the board reference. Adds no reachability policy — pure identity check.
+func is_bound_to_board(board) -> bool:
+	return _board != null and _board == board
+
 ## Point subsequent reachability probes at a new slot origin. Clears the memo so
 ## a route from a previous origin can never be reused for a different dispatch.
 func set_origin(origin: Vector2) -> void:

@@ -15025,7 +15025,10 @@ func _m25_reentrancy() -> void:
 	var st = _m25_stack(board, Vector2(0.5, -1.5))
 	var slots = _m25_slots([["B", BLUE, 3]])
 	var e = BatchTargetClaimEngine.new(); e.bind(board, slots, st["sel"], st["res"])
-	var reentrant = load("res://tests/support/m25_reentrant_access.gd").new()
+	# Category-correct re-entry: a real ProductionTargetAccess subclass (same routing bundle
+	# + exact board), so the strict access gate accepts it and re-entry is proven without
+	# weakening the production trust boundary.
+	var reentrant = load("res://tests/support/m25_reentrant_access.gd").new(st["routing"], st["raccess"], board, Vector2(0.5, -1.5))
 	reentrant.engine = e; reentrant.color = BLUE
 	reentrant.access_map = {4: reentrant}
 	var r := e.claim_for_color(BLUE, {4: reentrant})
