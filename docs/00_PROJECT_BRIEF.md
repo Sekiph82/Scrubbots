@@ -100,7 +100,7 @@ target campaign envelope
 
 This architecture makes large-scale generation feasible while keeping output reproducible and auditable.
 
-## The five-slot concept
+## Slot-capacity concept
 
 The player works with **5** visible color/robot slots. Slots are the player's means of introducing Scrubbots onto the board. Slot behavior contributes to the puzzle's measured pressure but future queue/cooldown mechanics must never be invented solely to manipulate difficulty.
 
