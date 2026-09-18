@@ -4,15 +4,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M25
-- Current Sprint: M25-C001 V03 — exact claim/work slot-batch tuple binding hardening
-- Current Task: M25-C001-V03
-- Current Task Status: CHANGES_REQUIRED
-- Next Task/Action: Claude executes `coordination/sessions/M25-C001/CHATGPT_PROMPT_V03.md` under `coordination/sessions/M25-C001/CHATGPT_AUDIT_CRITERIA_V03.md`, closes `F-M25-V02-STRICT-001` by binding each claim/work identity to its exact M24 slot + batch tuple, preserves all accepted M25 V01/V02 behavior and protected M24/M23/M22 systems, pushes implementation first, then `CLAUDE_LOG_V03.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
+- Current Milestone: M26
+- Current Sprint: M26-C001 V01 — full Auto Dispatch Scheduler continuous execution
+- Current Task: M26-C001-V01
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: Claude executes `coordination/sessions/M26-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M26-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, runs all five linked M26 work packages continuously without intermediate approval, completes `SB-M26-001..030`, preserves accepted M23/M24/M25 plus M18–M22 authorities, pushes implementation first, then `CLAUDE_LOG_V01.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 408 / 885 = 46.10% (game+ui live scope); lastCompletedTaskId M24-C001-V02. M25 V01 implemented the full `SB-M25-001..032` surface; V02 closed all five V01 strict findings but independent audit found one remaining exact M24 work-tuple binding defect. No M25 tasks close until V03 passes. M24 Five-Slot Batch Engine and M23 Batch Supply Engine remain closed. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
+- Progress: 440 / 885 = 49.72% (game+ui live scope); lastCompletedTaskId M25-C001-V03. M25 Batch Target Claim Engine is independently audited PASS and all `SB-M25-001..032` are closed. M26 Auto Dispatch Scheduler is now the active milestone and must consume M23/M24/M25 as accepted authorities without duplicating reservation, target-selection, routing, spawning or clearing truth. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
@@ -1060,38 +1060,38 @@ Purpose: replace the temporary directly-colored slot interaction with the real f
 
 Purpose: arbitrate currently targetable pixels among multiple live batches, especially duplicate colors, while preserving ReservationState and TargetSelector as the existing low-level safety authorities.
 
-- [ ] SB-M25-001 Define a session-scoped Batch Target Claim service/ledger with narrow APIs.
-- [ ] SB-M25-002 Keep existing `ReservationState` as the authoritative live target-reservation mechanism; do not create contradictory duplicate reservation truth.
-- [ ] SB-M25-003 Represent each live claim with batch ID, slot ID, target index/coordinate, color and reservation/assignment identity.
-- [ ] SB-M25-004 Permit claims only for currently ACTIVE, matching-color, valid, unreserved and production-targetable pixels.
-- [ ] SB-M25-005 Never pre-claim a future pixel that is currently blocked/unreachable merely because it may become reachable later.
-- [ ] SB-M25-006 Support multiple simultaneous occupied batches of the same color.
-- [ ] SB-M25-007 Arbitrate same-color batches by oldest placement sequence first (FIFO).
-- [ ] SB-M25-008 Make placement-sequence arbitration deterministic across reset/replay fixtures.
-- [ ] SB-M25-009 Keep giving newly claimable work to the oldest same-color batch while it has uncommitted dispatch capacity.
-- [ ] SB-M25-010 When the oldest batch has no remaining dispatch capacity, allow additional matching targets to flow to the next same-color batch.
-- [ ] SB-M25-011 Keep different colors independent except for shared global ReservationState uniqueness.
-- [ ] SB-M25-012 Preserve TargetSelector's bottom-most then left-most order among currently targetable matching unreserved candidates.
-- [ ] SB-M25-013 Make target selection + batch ownership claim + ReservationState reservation one atomic logical transaction.
-- [ ] SB-M25-014 Prove one target index can never belong to two live batches/robots at once.
-- [ ] SB-M25-015 Prove one batch can never create duplicate live claims to the same target.
-- [ ] SB-M25-016 Refuse claim when the batch has zero dispatch capacity.
-- [ ] SB-M25-017 Increment `committed` exactly once when a claim becomes an accepted live assignment.
-- [ ] SB-M25-018 Do not change `remaining_to_clear` merely because a claim exists.
-- [ ] SB-M25-019 If route construction/validation fails before spawn, atomically release claim and reservation, decrement committed appropriately, consume zero batch quota and spawn no robot.
-- [ ] SB-M25-020 On authenticated arrival/clear, resolve exactly the claim associated with that robot/assignment.
-- [ ] SB-M25-021 Never allow a robot to clear any target other than its immutable claimed target.
-- [ ] SB-M25-022 On successful authenticated clear, decrement batch remaining and committed exactly once.
-- [ ] SB-M25-023 Fail closed on stale/already-cleared/invalid claim state; no duplicate clear, no quota loss and no ghost spawn.
-- [ ] SB-M25-024 Release every live claim/reservation safely on reset/session teardown.
-- [ ] SB-M25-025 Prevent slot completion while any claim/assignment for that batch remains committed.
-- [ ] SB-M25-026 Mark a batch WAITING when it has remaining quota but no claimable matching target.
-- [ ] SB-M25-027 Re-evaluate waiting colors after authoritative BoardState clear events rather than polling mutable UI state.
-- [ ] SB-M25-028 Add simultaneous same-color claim race tests under rapid scheduler activity.
-- [ ] SB-M25-029 Prove `BLUE 8`, `BLUE 14`, `BLUE 12` cannot target the same pixel and obey oldest-batch-first ownership when new blue pixels open.
-- [ ] SB-M25-030 Prove newly opened targets are assigned at opening time, not pre-owned while inaccessible.
-- [ ] SB-M25-031 Stress five occupied slots with duplicate colors on rectangular and 59×59 boards.
-- [ ] SB-M25-032 Add claim/reservation leak, reset, stale-target and deterministic-order regression tests.
+- [x] SB-M25-001 Define a session-scoped Batch Target Claim service/ledger with narrow APIs.
+- [x] SB-M25-002 Keep existing `ReservationState` as the authoritative live target-reservation mechanism; do not create contradictory duplicate reservation truth.
+- [x] SB-M25-003 Represent each live claim with batch ID, slot ID, target index/coordinate, color and reservation/assignment identity.
+- [x] SB-M25-004 Permit claims only for currently ACTIVE, matching-color, valid, unreserved and production-targetable pixels.
+- [x] SB-M25-005 Never pre-claim a future pixel that is currently blocked/unreachable merely because it may become reachable later.
+- [x] SB-M25-006 Support multiple simultaneous occupied batches of the same color.
+- [x] SB-M25-007 Arbitrate same-color batches by oldest placement sequence first (FIFO).
+- [x] SB-M25-008 Make placement-sequence arbitration deterministic across reset/replay fixtures.
+- [x] SB-M25-009 Keep giving newly claimable work to the oldest same-color batch while it has uncommitted dispatch capacity.
+- [x] SB-M25-010 When the oldest batch has no remaining dispatch capacity, allow additional matching targets to flow to the next same-color batch.
+- [x] SB-M25-011 Keep different colors independent except for shared global ReservationState uniqueness.
+- [x] SB-M25-012 Preserve TargetSelector's bottom-most then left-most order among currently targetable matching unreserved candidates.
+- [x] SB-M25-013 Make target selection + batch ownership claim + ReservationState reservation one atomic logical transaction.
+- [x] SB-M25-014 Prove one target index can never belong to two live batches/robots at once.
+- [x] SB-M25-015 Prove one batch can never create duplicate live claims to the same target.
+- [x] SB-M25-016 Refuse claim when the batch has zero dispatch capacity.
+- [x] SB-M25-017 Increment `committed` exactly once when a claim becomes an accepted live assignment.
+- [x] SB-M25-018 Do not change `remaining_to_clear` merely because a claim exists.
+- [x] SB-M25-019 If route construction/validation fails before spawn, atomically release claim and reservation, decrement committed appropriately, consume zero batch quota and spawn no robot.
+- [x] SB-M25-020 On authenticated arrival/clear, resolve exactly the claim associated with that robot/assignment.
+- [x] SB-M25-021 Never allow a robot to clear any target other than its immutable claimed target.
+- [x] SB-M25-022 On successful authenticated clear, decrement batch remaining and committed exactly once.
+- [x] SB-M25-023 Fail closed on stale/already-cleared/invalid claim state; no duplicate clear, no quota loss and no ghost spawn.
+- [x] SB-M25-024 Release every live claim/reservation safely on reset/session teardown.
+- [x] SB-M25-025 Prevent slot completion while any claim/assignment for that batch remains committed.
+- [x] SB-M25-026 Mark a batch WAITING when it has remaining quota but no claimable matching target.
+- [x] SB-M25-027 Re-evaluate waiting colors after authoritative BoardState clear events rather than polling mutable UI state.
+- [x] SB-M25-028 Add simultaneous same-color claim race tests under rapid scheduler activity.
+- [x] SB-M25-029 Prove `BLUE 8`, `BLUE 14`, `BLUE 12` cannot target the same pixel and obey oldest-batch-first ownership when new blue pixels open.
+- [x] SB-M25-030 Prove newly opened targets are assigned at opening time, not pre-owned while inaccessible.
+- [x] SB-M25-031 Stress five occupied slots with duplicate colors on rectangular and 59×59 boards.
+- [x] SB-M25-032 Add claim/reservation leak, reset, stale-target and deterministic-order regression tests.
 
 ### M26 — Auto Dispatch Scheduler `[OWNER-LOCKED CORE GAMEPLAY]`
 
