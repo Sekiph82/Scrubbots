@@ -91,9 +91,11 @@ M40  Save System
 M41  Settings
 ```
 
-Win/lose, economy and monetization remain design-gated where `TASKS.md`
-marks them as such. Difficulty V1 does not authorize hidden timer/move-limit
-or monetization mechanics.
+Win/lose and real-money monetization remain design-gated where `TASKS.md`
+marks them as such. Economy/Rewards V1 is now owner-locked by
+`coordination/OWNER_ECONOMY_REWARDS_V01.md` and M39 must implement that
+contract rather than inventing currency/reward semantics. Difficulty V1 does
+not authorize hidden timer/move-limit or monetization mechanics.
 
 ## 5. Home and later screens
 
