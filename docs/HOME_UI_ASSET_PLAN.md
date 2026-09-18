@@ -24,7 +24,7 @@ Do not ship the Home reference as one flattened interactive screenshot. Split wo
 
 ## Text that must not be baked into images
 
-Player name, rank/title, XP, level, currencies, life timer, area name/number, progress values/timers, shortcut labels/counters, PLAY/CONTINUE copy, reward milestone numbers, notification values and bottom-navigation labels remain live Godot text.
+Player name, rank/title, level, Bot Parts progress, Scrub Bucks amount, Heart count/regen timer, area name/number, Gift Meter progress/next milestone, Win Streak values, shortcut labels/counters, PLAY/CONTINUE copy, reward amounts, prices, notification values and bottom-navigation labels remain live Godot text. Stars, Event Points and profile XP are not production balances under Economy V1.
 
 ## Naming and lifecycle
 
@@ -40,3 +40,18 @@ owner reference
 ```
 
 Approved assets are never silently regenerated or overwritten.
+
+
+## Economy V1 Home migration
+
+Canonical economy decision: `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
+
+The owner reference is art direction, not literal economic semantics. Production substitutions:
+- coin icon/amount -> Scrub Bucks banknotes/amount;
+- profile XP bar -> Bot Parts next-robot bar;
+- top event bar -> Gift Meter (streak-SB-only; 10/50/250/500/1000);
+- top event timer -> removed/replaced by live next-milestone information;
+- Star Exchange -> Cards Exchange;
+- star road -> Win Streak SB Reward Track.
+
+Do not generate art that reintroduces Star currency or Event Points.
