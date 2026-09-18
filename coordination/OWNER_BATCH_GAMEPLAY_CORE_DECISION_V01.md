@@ -18,7 +18,7 @@ The player does **not** choose:
 
 A successful supply selection is handed to the future Five-Slot Batch Engine, which automatically places the batch into the **rightmost currently EMPTY** slot.
 
-If all five slots are occupied, the selection is rejected atomically and the supply column does not advance.
+If all slots in the current authoritative capacity are occupied, the selection is rejected atomically and the supply column does not advance. Normal capacity is five; Economy V1 +1 Slot may temporarily raise capacity to exactly six for the current attempt.
 
 ## 2. Supply columns
 
@@ -92,7 +92,7 @@ M23 must not fake or pre-implement that proof.
 M23 must not implement the Five-Slot Batch Engine.
 
 M24 will own:
-- exactly five EMPTY batch slots,
+- five EMPTY baseline batch slots; Economy V1 +1 Slot may authorize a sixth for the current attempt,
 - rightmost-empty automatic placement,
 - occupied-slot batch lifecycle,
 - remaining/committed counters,
@@ -164,3 +164,15 @@ M23–M27 core gameplay engineering requires zero image-generation credits unles
 This owner decision and the 2026-09-17 owner-locked batch sections in root `TASKS.md` supersede older direct-slot/"no queue mechanics" wording in historical docs or earlier operating-manual text where they conflict.
 
 Historical evidence remains historical evidence; future production behavior follows this decision.
+
+
+## Economy V1 amendment — 2026-09-18
+
+`coordination/OWNER_ECONOMY_REWARDS_V01.md` supersedes only these Batch Core assumptions:
+
+- normal slot capacity remains 5, but +1 Slot booster may raise authoritative capacity to exactly 6 for the current attempt;
+- Selector booster is the one owner-authorized transaction that may select a solver-safe remaining batch outside normal front-only order;
+- Random booster may reorder only remaining unselected supply under solver proof;
+- Tornado may atomically remove one selected color's remaining artwork/quota only through the cross-engine reconciliation contract.
+
+All other identity, conservation, rightmost-empty placement, no-ghost and transactional guarantees remain mandatory.
