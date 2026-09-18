@@ -106,7 +106,8 @@ func notify_focus_gained() -> void:
 func is_2x() -> bool:
 	return _speed != null and _speed.is_2x()
 
-## Manual bottom-right toggle. Returns the new 2x state.
+## Raw temporal toggle seam used by M29 evidence. Economy V1 shipping input must gate
+## manual activation through SpeedEntitlementService before calling this method.
 func toggle_speed() -> bool:
 	if _speed == null:
 		return false
