@@ -4,15 +4,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M28
-- Current Sprint: M28-C001 V01 — full responsive Gameplay Screen Layout continuous execution
-- Current Task: M28-C001-V01
+- Current Milestone: M29
+- Current Sprint: M29-C001 V01 — production supply-front input, 1x/2x runtime speed and manual Hazard Bot playtest
+- Current Task: M29-C001-V01
 - Current Task Status: IN_PROGRESS
-- Next Task/Action: Claude executes `coordination/sessions/M28-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M28-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, runs all five linked M28 work packages continuously without intermediate approval, completes `SB-M28-001..028`, preserves closed M23–M27 gameplay truth, does not implement M29 input mechanics, pushes implementation first, then `CLAUDE_LOG_V01.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
+- Next Task/Action: Claude executes `coordination/sessions/M29-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M29-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, runs all four linked M29 work packages continuously, completes `SB-M29-001..009`, wires real supply-front mouse/touch through M23→M24→M25→M26→M20, implements the owner-locked 1x/2x + M23-exhausted auto-2x runtime rule, creates a real Hazard Bot manual playtest scene, pushes implementation first, then `CLAUDE_LOG_V01.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 504 / 885 = 56.95% (game+ui live scope); lastCompletedTaskId M27-C001-V01. M27 Solvability / Deadlock Engine is independently audited PASS and all `SB-M27-001..034` are closed. The owner-locked M23–M27 core batch-gameplay program is complete. M28 Gameplay Screen Layout is now active; M29 owns touch activation and must not be implemented early. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
+- Progress: 532 / 885 = 60.11% (game+ui live scope); lastCompletedTaskId M28-C001-V01. M28 Gameplay Screen Layout is independently audited PASS and all `SB-M28-001..028` are closed. M29 Mobile Touch / production input integration is now active and is the first milestone expected to produce an owner-runnable mouse/touch Hazard Bot playtest through the real M23–M28 stack. M30 still owns win/lose/result flow. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
@@ -1177,27 +1177,27 @@ Purpose: prove generated supply is actually playable under the real mechanics an
 
 ### M28 — Gameplay Screen Layout `[VISUAL REFERENCE]`
 
-- [ ] SB-M28-001 Audit original gameplay reference images.
-- [ ] SB-M28-002 Board region. — [ ] SB-M28-003 Five-slot region.
-- [ ] SB-M28-004 HUD region. — [ ] SB-M28-005 Safe areas.
-- [ ] SB-M28-006 Easy dimensions. — [ ] SB-M28-007 Medium dimensions.
-- [ ] SB-M28-008 Hard dimensions. — [ ] SB-M28-009 Very Hard dimensions.
-- [ ] SB-M28-010 Rectangular boards. — [ ] SB-M28-011 59×59.
-- [ ] SB-M28-012 Narrow phone. — [ ] SB-M28-013 Tall phone.
-- [ ] SB-M28-014 Tablet portrait. — [ ] SB-M28-015 Input coordinate accuracy.
-- [ ] SB-M28-016 Use `docs/MASTER_UI_SYSTEM.md` as canonical gameplay layout contract.
-- [ ] SB-M28-017 Remove Goal/Moves panel from approved production gameplay composition.
-- [ ] SB-M28-018 Make board dominant gameplay-screen region.
-- [ ] SB-M28-019 Keep color-selection panel protected/usable.
-- [ ] SB-M28-020 Place Scrubby low at left of color-selection region.
-- [ ] SB-M28-021 Place speech bubble above Scrubby.
-- [ ] SB-M28-022 Preserve right-side cleaning props as lower-priority decoration.
-- [ ] SB-M28-023 Put four booster controls in compact horizontal row above bottom/ad row.
-- [ ] SB-M28-024 Pause left of ad, 2x speed control right of ad with distinct 1x/2x presentation states.
-- [ ] SB-M28-025 Do not restore removed Level/lock rail.
-- [ ] SB-M28-026 Bind owner-approved illustrations while keeping screen responsive/native.
-- [ ] SB-M28-027 Prove BoardRenderer coordinate mapping after responsive scaling.
-- [ ] SB-M28-028 Capture viewport validation evidence.
+- [x] SB-M28-001 Audit original gameplay reference images.
+- [x] SB-M28-002 Board region. — [x] SB-M28-003 Five-slot region.
+- [x] SB-M28-004 HUD region. — [x] SB-M28-005 Safe areas.
+- [x] SB-M28-006 Easy dimensions. — [x] SB-M28-007 Medium dimensions.
+- [x] SB-M28-008 Hard dimensions. — [x] SB-M28-009 Very Hard dimensions.
+- [x] SB-M28-010 Rectangular boards. — [x] SB-M28-011 59×59.
+- [x] SB-M28-012 Narrow phone. — [x] SB-M28-013 Tall phone.
+- [x] SB-M28-014 Tablet portrait. — [x] SB-M28-015 Input coordinate accuracy.
+- [x] SB-M28-016 Use `docs/MASTER_UI_SYSTEM.md` as canonical gameplay layout contract.
+- [x] SB-M28-017 Remove Goal/Moves panel from approved production gameplay composition.
+- [x] SB-M28-018 Make board dominant gameplay-screen region.
+- [x] SB-M28-019 Keep color-selection panel protected/usable.
+- [x] SB-M28-020 Place Scrubby low at left of color-selection region.
+- [x] SB-M28-021 Place speech bubble above Scrubby.
+- [x] SB-M28-022 Preserve right-side cleaning props as lower-priority decoration.
+- [x] SB-M28-023 Put four booster controls in compact horizontal row above bottom/ad row.
+- [x] SB-M28-024 Pause left of ad, 2x speed control right of ad with distinct 1x/2x presentation states.
+- [x] SB-M28-025 Do not restore removed Level/lock rail.
+- [x] SB-M28-026 Bind owner-approved illustrations while keeping screen responsive/native.
+- [x] SB-M28-027 Prove BoardRenderer coordinate mapping after responsive scaling.
+- [x] SB-M28-028 Capture viewport validation evidence.
 
 ### M29 — Mobile Touch
 
