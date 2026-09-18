@@ -9,7 +9,7 @@
     "gameplay": {
       "repository_path": "assets/art/references/_owner_inbox/Game Screens/deneme 3 OK.png",
       "status": "CANONICAL_SELECTED",
-      "notes": "Board dominant, 5 empty slots, color tiles, Scrubby low-left with speech bubble, cleaning props right, 4 boosters, pause/settings. Matches all approved composition rules."
+      "notes": "Board dominant, 5 empty slots, color tiles, Scrubby low-left with speech bubble, cleaning props right, 4 boosters. Bottom row is owner-overridden to pause/ad-placeholder/speed-up; Settings is not used in this gameplay-screen position."
     },
     "home_screen": {
       "repository_path": "assets/art/references/_owner_inbox/Game Screens/main screen.png",
@@ -370,7 +370,7 @@
       "provenanceClass": "owner_supplied_reference",
       "approvalStatus": "CANONICAL_SELECTED",
       "canonicalRole": "gameplay",
-      "notes": "CANONICAL gameplay reference. Board dominant, 5 empty slots, color tiles (3x5), Scrubby low-left with speech bubble, cleaning props right, 4 boosters, pause/settings."
+      "notes": "CANONICAL gameplay reference. Board dominant, 5 empty slots, color tiles (3x5), Scrubby low-left with speech bubble, cleaning props right, 4 boosters. Owner override: bottom row is pause/ad-placeholder/speed-up, not pause/settings."
     },
     {
       "id": "inbox_level_ekran_acilisi",
