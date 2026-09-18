@@ -82,16 +82,18 @@ Resume:
 - scheduler WAITING/wake behavior remains intact;
 - placement wakes scheduler.
 
-## J. 1x / 2x manual speed
+## J. 1x / 2x temporal authority and manual seam
 - new session starts 1x;
-- bottom-right button toggles 1x -> 2x -> 1x;
+- M29 direct/debug seam can prove 1x -> 2x -> 1x temporal behavior;
+- this audit seam does NOT certify a free shipping manual-2x product;
+- production manual 2x must be economy/entitlement-gated when M39 is integrated;
 - visual state follows authority;
 - 2x cadence interval is exactly half 1x;
 - future agents use 2x travel speed;
 - already-moving agents update to 2x immediately;
 - returning to 1x updates current/future agents consistently.
 
-No blind global Engine.time_scale.
+No blind global Engine.time_scale. Timed economy entitlement countdown must never use gameplay delta/time_scale.
 
 ## K. Automatic M23-exhausted -> 2x
 Direct evidence must distinguish:
@@ -99,8 +101,9 @@ Direct evidence must distinguish:
 2. all five slots full and attempted final selection rejected => NO auto-2x;
 3. successful final front transfer leaves every authoritative M23 column empty => auto-2x;
 4. already 2x => idempotent;
-5. after auto-2x, manual toggle back to 1x works;
-6. full reset/new session => 1x.
+5. after auto-2x, returning to 1x works;
+6. automatic 2x itself requires no paid entitlement;
+7. full reset/new session => 1x temporal state.
 
 Trigger must read real `BatchSupplyEngine.is_exhausted()` after successful M24 placement.
 
