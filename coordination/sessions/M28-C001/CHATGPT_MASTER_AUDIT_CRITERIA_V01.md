@@ -70,7 +70,7 @@ Essential regions remain inside safe rect:
 - board;
 - batch slots/supply;
 - boosters;
-- pause/settings.
+- pause/speed-up control.
 
 No notch/gesture overlap in evidence.
 
@@ -82,7 +82,7 @@ Directly prove:
 - speech anchor above Scrubby;
 - cleaning props anchor right;
 - 4 boosters horizontal;
-- pause left / ad placeholder center / settings right.
+- pause left / ad placeholder center / speed-up control right.
 
 Decoration may shrink before supply/slots.
 
