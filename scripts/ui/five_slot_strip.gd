@@ -50,3 +50,11 @@ func get_slot_views() -> Array:
 
 func get_slot_count() -> int:
 	return _views.size()
+
+## Presentation-only GLOBAL top-center anchor of slot `i`, or Vector2.ZERO when out of
+## range. The M29 origin provider maps this through BoardPresentation.global_to_board_local
+## to build a real laid-out slot->route origin. Geometry only; no gameplay authority.
+func get_slot_anchor_global(i: int) -> Vector2:
+	if i < 0 or i >= _views.size():
+		return Vector2.ZERO
+	return _views[i].get_spawn_anchor_global()
