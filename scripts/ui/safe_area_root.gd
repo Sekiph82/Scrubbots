@@ -4,11 +4,32 @@ extends Control
 
 @onready var _margin: MarginContainer = get_node(margin_container_path)
 
+## Narrow PRESENTATION-ONLY test seam (M28): synthetic safe-area insets in this
+## viewport's own pixels. When set, they replace the DisplayServer probe so headless
+## viewport tests can exercise non-zero notch/gesture insets deterministically. This
+## is layout data only — NEVER read as gameplay truth and changes no engine.
+var _synthetic_insets = null  # null, or {"left","top","right","bottom"} ints
+
+func set_synthetic_insets(left: int, top: int, right: int, bottom: int) -> void:
+    _synthetic_insets = {"left": max(0, left), "top": max(0, top),
+        "right": max(0, right), "bottom": max(0, bottom)}
+    if _margin != null:
+        _apply_safe_area()
+
+func clear_synthetic_insets() -> void:
+    _synthetic_insets = null
+    if _margin != null:
+        _apply_safe_area()
+
 func _ready() -> void:
     resized.connect(_apply_safe_area)
     _apply_safe_area()
 
 func _apply_safe_area() -> void:
+    if _synthetic_insets != null:
+        _set_margins(_synthetic_insets["left"], _synthetic_insets["top"],
+            _synthetic_insets["right"], _synthetic_insets["bottom"])
+        return
     var viewport_size := get_viewport_rect().size
     var safe := DisplayServer.get_display_safe_area()
 

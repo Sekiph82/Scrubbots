@@ -25,3 +25,11 @@ const REFERENCE_VIEWPORT := Vector2i(1080, 2160)
 const COLOR_SELECTION_MIN_WIDTH := 620
 const BOOSTER_ROW_MIN_HEIGHT := 108
 const BOTTOM_ACTION_ROW_MIN_HEIGHT := 120
+
+# M28 gameplay screen layout tokens (presentation only).
+const BATCH_SLOT_MIN := 120            # one read-only five-slot view (reference px)
+const FIVE_SLOT_STRIP_MIN_HEIGHT := 132
+const SUPPLY_TILE_MIN := 96            # one supply row/column cell
+const SUPPLY_VISIBLE_ROWS := 3         # V1: exactly three visible rows per column
+const SUPPLY_PANEL_MIN_WIDTH := 620    # protected usable supply width
+const BATCH_REGION_MIN_HEIGHT := 360   # slots + supply + decoration, protected
