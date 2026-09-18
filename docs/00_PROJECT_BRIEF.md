@@ -102,7 +102,7 @@ This architecture makes large-scale generation feasible while keeping output rep
 
 ## Slot-capacity concept
 
-The player works with **5** visible color/robot slots. Slots are the player's means of introducing Scrubbots onto the board. Slot behavior contributes to the puzzle's measured pressure but future queue/cooldown mechanics must never be invented solely to manipulate difficulty.
+Normal gameplay works with **5** visible execution slots. Economy V1's +1 Slot booster may temporarily expand authoritative capacity to exactly **6** for the current attempt. The player still selects supply-front batches rather than destination slots; placement remains automatic/rightmost-empty. Slot behavior contributes to measured puzzle pressure, but no 7+ capacity or invented queue/cooldown mechanic is authorized.
 
 ## Scrubbot behavior
 
