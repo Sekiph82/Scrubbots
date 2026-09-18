@@ -5,7 +5,7 @@ Tasks: SB-M28-020..026
 - SpeechBubbleAnchor above Scrubby.
 - CleaningPropsAnchor at right and lower priority.
 - Four booster controls in one horizontal row; presentation only.
-- Bottom row: pause left, central ad placeholder, settings right.
+- Bottom row: pause left, central ad placeholder, speed-up control right.
 - Ads remain disabled/design-gated.
 - Inspect asset inventory.
 - Bind only explicitly approved production illustrations.
