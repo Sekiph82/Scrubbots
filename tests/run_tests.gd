@@ -255,6 +255,8 @@ func _initialize() -> void:
 	_run_m24_five_slot_batch_tests()
 	# M25-C001 V01 — batch target claim engine.
 	_run_m25_batch_claim_tests()
+	# M26-C001 V01 — auto dispatch scheduler.
+	_run_m26_scheduler_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -14064,6 +14066,9 @@ const BatchSelectionTransaction = preload("res://scripts/gameplay/supply/batch_s
 const FiveSlotBatchEngine = preload("res://scripts/gameplay/slots/five_slot_batch_engine.gd")
 const SlotBatchState = preload("res://scripts/gameplay/slots/slot_batch_state.gd")
 const BatchTargetClaimEngine = preload("res://scripts/gameplay/targeting/batch_target_claim_engine.gd")
+# M26 — auto dispatch scheduler.
+const AutoDispatchScheduler = preload("res://scripts/gameplay/dispatch/auto_dispatch_scheduler.gd")
+const M26OriginProvider = preload("res://tests/support/m26_origin_provider.gd")
 
 func _m23_level(w: int, h: int, cells: Array, palette_size: int):
 	var pal := PackedStringArray()
@@ -15050,3 +15055,296 @@ func _m25_replay_once() -> String:
 	for n in range(3):
 		e.claim_for_color(BLUE, amap)
 	return str(e.claim_snapshot())
+
+# ============================================================================
+# M26-C001 V01 — Auto Dispatch Scheduler
+# ============================================================================
+
+## Full in-memory production chain: board -> M24 slots (from specs) -> M25 claim ->
+## dispatcher (arrival-bridge) -> arrival-only clearing loop -> M26 scheduler. All
+## slots share `origin` (a below-board railroad start) via the origin provider.
+func _m26_build(board, specs: Array, origin: Vector2) -> Dictionary:
+	var res = ReservationState.new(); res.bind(board)
+	var ci = ColorCandidateIndex.create(); ci.bind(board)
+	var sel = TargetSelector.create(); sel.bind(board, ci, res)
+	var routing = ProductionRoutingSystem.new()
+	var raccess = ProductionAccessQuery.new(board)
+	var slots = _m25_slots(specs)
+	var claim = BatchTargetClaimEngine.new(); claim.bind(board, slots, sel, res)
+	var disp = ScrubbotDispatcher.new()
+	disp.bind(board, sel, res, routing, raccess, ProductionTargetAccess.new(routing, raccess, board), null)
+	var loop = CompleteClearingLoop.new()
+	var lok: bool = loop.bind_arrival_only(board, ci, res, disp)
+	var provider = M26OriginProvider.new({}, origin)
+	var sched = AutoDispatchScheduler.new()
+	var sok: bool = sched.bind(board, slots, claim, res, routing, raccess, disp, loop, provider)
+	return {"board": board, "res": res, "ci": ci, "sel": sel, "routing": routing,
+		"raccess": raccess, "slots": slots, "claim": claim, "disp": disp, "loop": loop,
+		"provider": provider, "sched": sched, "loop_bound": lok, "sched_bound": sok}
+
+## Advance every live ScrubbotAgent child of the dispatcher to arrival, so the
+## synchronous agent_completed -> assignment_arrived -> clear transaction ->
+## authenticated_clear -> M25.finalize_clear chain runs deterministically headless.
+func _m26_drive_arrivals(disp) -> void:
+	for c in disp.get_children():
+		if c is ScrubbotAgent and c.is_moving():
+			for _i in range(4096):
+				if not c.is_moving():
+					break
+				c.advance(1.0)
+
+func _run_m26_scheduler_tests() -> void:
+	print("---- M26-C001 V01: Auto Dispatch Scheduler ----")
+	_m26_bind_and_preclaimed_boundary()
+	_m26_no_ghost_adversarial()
+	_m26_pacing_and_capacity()
+	_m26_fairness_blue()
+	_m26_waiting_and_wake()
+	_m26_pause_resume_reset()
+	_m26_blue15_autonomy()
+
+func _m26_bind_and_preclaimed_boundary() -> void:
+	var BLUE := 0
+	var board = _m25_board(3, 3, 4, BLUE, [6, 7, 8])  # bottom row active
+	var origin := Vector2(1.5, 4.5)
+	var b := _m26_build(board, [["B", BLUE, 8]], origin)
+	_check(b["loop_bound"] and b["sched_bound"], "M26 bind: arrival-only loop + scheduler bind on coherent bundle")
+	_check(b["sched"].is_bound(), "M26 bind: scheduler is_bound true")
+
+	# Arrival-only loop disables activate_slot but keeps the clear transaction path.
+	_check(not b["loop"].activate_slot(0, origin, 6.0).success, "M26 bind: activate_slot disabled in arrival-only mode")
+
+	# Establish one real M25 claim to feed the preclaimed dispatcher directly.
+	var claim = b["claim"]; var res = b["res"]; var disp = b["disp"]; var routing = b["routing"]; var raccess = b["raccess"]
+	var access = ProductionTargetAccess.new(routing, raccess, board, origin)
+	var c = claim.claim_for_color(BLUE, {4: access})
+	_check(c["ok"], "M26 preclaim: baseline M25 claim succeeds")
+	var owner: int = c["owner_id"]; var target: int = c["target"]
+	var req = RouteRequest.for_target(board, origin, target)
+	var route = access.consume_route(target)
+	if route == null:
+		route = routing.compute_route(req, board, raccess)
+	var res_count_before: int = res.get_reservation_count()
+
+	# Foreign/absent owner reservation -> COHERENCE_FAILED, reservation untouched.
+	var d_foreign = disp.dispatch_preclaimed(9999, BLUE, target, origin, req, route)
+	_check(not d_foreign.success and d_foreign.failure_reason == DispatchResult.FailureReason.COHERENCE_FAILED, "M26 preclaim: foreign owner rejected (coherence)")
+	_check(res.get_owner(target) == owner, "M26 preclaim: foreign-owner failure did not touch M25 reservation")
+
+	# Wrong target for the real owner -> COHERENCE_FAILED.
+	var other_target: int = 7 if target != 7 else 6
+	var req2 = RouteRequest.for_target(board, origin, other_target)
+	var d_wrongt = disp.dispatch_preclaimed(owner, BLUE, other_target, origin, req2, route)
+	_check(not d_wrongt.success and d_wrongt.failure_reason == DispatchResult.FailureReason.COHERENCE_FAILED, "M26 preclaim: wrong target for owner rejected")
+
+	# Null route -> ROUTE_FAILED; generic route-like object -> ROUTE_FAILED.
+	var d_null = disp.dispatch_preclaimed(owner, BLUE, target, origin, req, null)
+	_check(not d_null.success and d_null.failure_reason == DispatchResult.FailureReason.ROUTE_FAILED, "M26 preclaim: null route rejected")
+	var d_junk = disp.dispatch_preclaimed(owner, BLUE, target, origin, req, RefCounted.new())
+	_check(not d_junk.success and d_junk.failure_reason == DispatchResult.FailureReason.ROUTE_FAILED, "M26 preclaim: generic route-like object rejected")
+	_check(res.get_owner(target) == owner and res.get_reservation_count() == res_count_before, "M26 preclaim: no failure released the reservation / created a new one")
+
+	# Correct exact preclaimed assignment -> exactly one agent keyed by the M25 owner.
+	var d_ok = disp.dispatch_preclaimed(owner, BLUE, target, origin, req, route)
+	_check(d_ok.success and d_ok.owner_id == owner and d_ok.target_index == target, "M26 preclaim: exact claim/route accepted, one agent")
+	_check(disp.has_owner(owner) and disp.get_agent_for_owner(owner) == d_ok.agent, "M26 preclaim: dispatcher active keyed by exact M25 owner id")
+	_check(disp.get_active_count() == 1, "M26 preclaim: exactly one active assignment")
+
+	# Owner already active -> rejected, no second agent.
+	var route3 = routing.compute_route(req, board, raccess)
+	var d_dup = disp.dispatch_preclaimed(owner, BLUE, target, origin, req, route3)
+	_check(not d_dup.success and d_dup.failure_reason == DispatchResult.FailureReason.INVALID_REQUEST, "M26 preclaim: already-active owner rejected")
+	_check(disp.get_active_count() == 1, "M26 preclaim: no duplicate agent for active owner")
+	disp.free()
+
+func _m26_no_ghost_adversarial() -> void:
+	var BLUE := 0
+	var board = _m25_board(4, 4, 4, BLUE, [12, 13, 14, 15])
+	var origin := Vector2(2.0, 5.5)
+	# No target: the ONLY blue cell (center) is enclosed by non-blue ACTIVE cells that
+	# block every approach -> not production-targetable -> WAITING, never a ghost.
+	var blocked = _m26_enclosed_blue_board()
+	var bb := _m26_build(blocked, [["B", BLUE, 3]], Vector2(1.5, 4.5))
+	var r0 = bb["sched"].step()
+	_check(not r0["ok"], "M26 no-ghost: no reachable target => no assignment")
+	_check(bb["disp"].get_active_count() == 0 and bb["res"].get_reservation_count() == 0, "M26 no-ghost: zero robot + zero reservation on no target")
+	_check(bb["sched"].is_color_waiting(BLUE), "M26 no-ghost: color marked WAITING, not busy-looped")
+	# Repeated idle steps do not churn reservations.
+	bb["sched"].step(); bb["sched"].step()
+	_check(bb["res"].get_reservation_count() == 0 and bb["claim"].live_claim_count() == 0, "M26 no-ghost: repeated idle steps create no reservation churn")
+	bb["disp"].free()
+
+	# Wrong slot origin (non-finite) => route request fails => zero robot, claim rolled back.
+	var b2 := _m26_build(board, [["B", BLUE, 8]], Vector2(INF, INF))
+	var r2 = b2["sched"].step()
+	_check(not r2["ok"], "M26 no-ghost: wrong (non-finite) slot origin => no assignment")
+	_check(b2["disp"].get_active_count() == 0 and b2["res"].get_reservation_count() == 0 and b2["claim"].live_claim_count() == 0, "M26 no-ghost: wrong origin rolled the claim back, zero robot/claim/reservation")
+	b2["disp"].free()
+
+func _m26_pacing_and_capacity() -> void:
+	var BLUE := 0
+	# 20x20, 15 reachable active cells on the bottom row.
+	var active: Array = []
+	for x in range(15):
+		active.append(19 * 20 + x)
+	var board = _m25_board(20, 20, 4, BLUE, active)
+	var origin := Vector2(10.0, 23.0)
+	var b := _m26_build(board, [["B", BLUE, 15]], origin)
+	var sched = b["sched"]; var slots = b["slots"]; var res = b["res"]
+	# One accepted assignment per step; never a burst.
+	var a1 = sched.step()
+	_check(a1["ok"] and b["disp"].get_active_count() == 1, "M26 pacing: first step creates exactly one assignment")
+	var a2 = sched.step()
+	_check(a2["ok"] and b["disp"].get_active_count() == 2, "M26 pacing: second step adds exactly one more in-flight agent")
+	_check(a1["target"] != a2["target"], "M26 pacing: distinct targets per assignment")
+	# committed <= remaining always; remaining not decremented by claim/spawn.
+	_check(slots.get_committed(4) == 2 and slots.get_remaining(4) == 15, "M26 pacing: committed==2, remaining unchanged (no decrement on claim/spawn)")
+	_check(slots.get_committed(4) <= slots.get_remaining(4), "M26 pacing: committed <= remaining invariant")
+	b["disp"].free()
+
+func _m26_fairness_blue() -> void:
+	var BLUE := 0
+	# Same-color 8/14/12 spill: many reachable targets, no clears (agents left in-flight).
+	var active: Array = []
+	for x in range(15):
+		active.append(19 * 20 + x)
+	var board = _m25_board(20, 20, 4, BLUE, active)
+	var b := _m26_build(board, [["BLUE_8", BLUE, 8], ["BLUE_14", BLUE, 14], ["BLUE_12", BLUE, 12]], Vector2(10.0, 23.0))
+	var sched = b["sched"]; var slots = b["slots"]
+	# Oldest BLUE_8 is slot 4 (seq 1). Drive 8 assignments -> all to slot 4.
+	for _i in range(8):
+		sched.step()
+	_check(slots.get_committed(4) == 8 and slots.get_capacity(4) == 0, "M26 fairness: oldest BLUE_8 receives claims until dispatch capacity 0")
+	_check(slots.get_committed(3) == 0, "M26 fairness: newer blue untouched while oldest has capacity")
+	# 9th assignment must spill to the next oldest blue (slot 3, BLUE_14) via M25.
+	var s9 = sched.step()
+	_check(s9["ok"] and s9["slot"] == 3, "M26 fairness: capacity spill to next same-color batch (BLUE_14)")
+	_check(slots.get_committed(3) == 1, "M26 fairness: spilled claim committed on BLUE_14")
+	# No duplicate target ownership across all in-flight.
+	var seen := {}
+	var dup := false
+	for rec in sched.assignment_snapshot():
+		if seen.has(int(rec["target"])):
+			dup = true
+		seen[int(rec["target"])] = true
+	_check(not dup, "M26 fairness: no duplicate target ownership across in-flight assignments")
+	b["disp"].free()
+
+	# Different-color round-robin: RED + BLUE both eligible; a continuously busy color
+	# cannot starve the other.
+	var RED := 1
+	var pal := PackedStringArray()
+	for i in range(4):
+		pal.append("#%02x%02x%02x" % [16 + i, 16 + i, 16 + i])
+	var cells := PackedInt32Array(); cells.resize(6); cells.fill(BLUE)
+	cells[0] = BLUE; cells[5] = RED
+	var rb = BoardState.from_level_data(LevelData.new(1, "m26rr", "m26rr", "TEST", 6, 1, pal, cells))
+	for i in range(6):
+		if i != 0 and i != 5:
+			rb.set_cell_state(i, BoardState.CellState.CLEARED)
+	var b3 := _m26_build(rb, [["BB", BLUE, 5], ["RR", RED, 5]], Vector2(3.0, 3.0))
+	var colors_served := {}
+	for _i in range(4):
+		var r = b3["sched"].step()
+		if r.get("ok", false):
+			colors_served[int(r["color"])] = true
+	_check(colors_served.has(BLUE) and colors_served.has(RED), "M26 fairness: round-robin serves both colors (no starvation)")
+	b3["disp"].free()
+
+## 3x3 board, center cell (4) is the ONLY blue cell and is ACTIVE, enclosed on all
+## sides by ACTIVE non-blue (color 2) cells. The blue candidate exists but is not
+## production-targetable until a neighbour is cleared.
+func _m26_enclosed_blue_board():
+	var pal := PackedStringArray()
+	for i in range(4):
+		pal.append("#%02x%02x%02x" % [16 + i, 16 + i, 16 + i])
+	var cells := PackedInt32Array(); cells.resize(9); cells.fill(2)
+	cells[4] = 0  # center = BLUE
+	return BoardState.from_level_data(LevelData.new(1, "m26enc", "m26enc", "TEST", 3, 3, pal, cells))
+
+func _m26_waiting_and_wake() -> void:
+	var BLUE := 0
+	# Center blue enclosed by ACTIVE non-blue -> unreachable -> WAITING. Clearing the
+	# bottom-middle neighbour (7) opens a corridor from the below-board start.
+	var board = _m26_enclosed_blue_board()
+	var b := _m26_build(board, [["B", BLUE, 3]], Vector2(1.5, 4.5))
+	var sched = b["sched"]
+	_check(not sched.step()["ok"] and sched.is_color_waiting(BLUE), "M26 waiting: unreachable target => WAITING, no robot")
+	# Open a corridor by clearing the bottom-middle blocker, then wake.
+	board.set_cell_state(7, BoardState.CellState.CLEARED)  # (1,2) now open
+	b["ci"].rebuild()
+	sched.notify_placed()
+	_check(not sched.is_color_waiting(BLUE), "M26 wake: notify_placed reconsiders WAITING colors")
+	var r = sched.step()
+	_check(r["ok"] and r["target"] == 4, "M26 wake: opened corridor produces exactly one claim on the now-reachable blue target")
+	b["disp"].free()
+
+func _m26_pause_resume_reset() -> void:
+	var BLUE := 0
+	var active: Array = []
+	for x in range(6):
+		active.append(19 * 20 + x)
+	var unrelated_target := 19 * 20 + 10
+	active.append(unrelated_target)  # an extra ACTIVE cell for the unrelated reservation
+	var board = _m25_board(20, 20, 4, BLUE, active)
+	var b := _m26_build(board, [["B", BLUE, 6]], Vector2(10.0, 23.0))
+	var sched = b["sched"]; var slots = b["slots"]; var res = b["res"]; var disp = b["disp"]
+	# Seed an UNRELATED reservation (a non-scheduler owner) BEFORE scheduling, so the
+	# scheduler never claims it and it must survive reset untouched.
+	var unrelated_owner := 777
+	_check(res.reserve(unrelated_target, unrelated_owner), "M26 reset: unrelated reservation seeded")
+	# Pause blocks new dispatch; preserves live state.
+	sched.step()  # one in-flight
+	var live_before: int = sched.live_assignment_count()
+	sched.pause()
+	var rp = sched.step()
+	_check(not rp["ok"] and rp["reason"] == "paused", "M26 pause: paused step creates no assignment")
+	_check(sched.live_assignment_count() == live_before and disp.get_active_count() == live_before, "M26 pause: live claims/agents preserved")
+	sched.resume()
+	_check(sched.step()["ok"], "M26 resume: deterministic scheduling restarts without duplicates")
+	# Build several in-flight, then reset -> zero everything, remaining not decremented.
+	sched.step(); sched.step()
+	var rem_before: int = slots.get_remaining(4)
+	var inflight: int = sched.live_assignment_count()
+	_check(inflight >= 2 and slots.get_committed(4) == inflight, "M26 reset: multiple in-flight before reset")
+	sched.reset()
+	_check(sched.live_assignment_count() == 0, "M26 reset: zero scheduler assignments")
+	_check(b["claim"].live_claim_count() == 0, "M26 reset: zero live M25 claims")
+	_check(disp.get_active_count() == 0, "M26 reset: zero dispatcher active assignments")
+	_check(slots.get_committed(4) == 0, "M26 reset: M24 committed returned to 0")
+	_check(slots.get_remaining(4) == rem_before, "M26 reset: cancelled work did NOT decrement remaining quota")
+	_check(res.get_owner(unrelated_target) == unrelated_owner, "M26 reset: unrelated reservation survives teardown")
+	# Zero live/moving agents under the dispatcher after reset.
+	var moving := 0
+	for c in disp.get_children():
+		if c is ScrubbotAgent and c.is_moving():
+			moving += 1
+	_check(moving == 0, "M26 reset: zero live/moving ScrubbotAgent after reset")
+	# Idempotent repeat reset.
+	sched.reset()
+	_check(sched.live_assignment_count() == 0 and disp.get_active_count() == 0, "M26 reset: repeated reset idempotent")
+	disp.free()
+
+func _m26_blue15_autonomy() -> void:
+	var BLUE := 0
+	var active: Array = []
+	for x in range(15):
+		active.append(19 * 20 + x)
+	var board = _m25_board(20, 20, 4, BLUE, active)
+	var b := _m26_build(board, [["B", BLUE, 15]], Vector2(10.0, 23.0))
+	var sched = b["sched"]; var slots = b["slots"]; var disp = b["disp"]; var loop = b["loop"]
+	var clears := 0
+	for _i in range(40):
+		var r = sched.step()
+		if not r.get("ok", false):
+			break
+		_m26_drive_arrivals(disp)  # arrival -> clear -> authenticated_clear -> finalize
+		clears += 1
+	_check(clears == 15, "M26 BLUE15: exactly 15 autonomous assignments+authenticated clears")
+	_check(loop.get_cleared_count() == 15, "M26 BLUE15: clearing loop committed exactly 15 CLEARED transactions")
+	_check(slots.is_empty(4), "M26 BLUE15: slot returns to EMPTY after final clear")
+	_check(b["claim"].live_claim_count() == 0 and disp.get_active_count() == 0, "M26 BLUE15: zero live claims/agents at completion")
+	_check(b["res"].get_reservation_count() == 0, "M26 BLUE15: zero reservations at completion")
+	# No 16th assignment.
+	_check(not sched.step()["ok"], "M26 BLUE15: no 16th assignment after quota exhausted")
+	disp.free()

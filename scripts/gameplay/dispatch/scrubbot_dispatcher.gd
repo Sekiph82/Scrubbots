@@ -546,6 +546,132 @@ func _end_dispatch(result: RefCounted) -> RefCounted:
 	_in_dispatch = false
 	return result
 
+# ------------------------------------------------- M26 preclaimed dispatch ----
+
+## M26 Auto Dispatch Scheduler entry (M26-C001). Consume an ALREADY-CLAIMED exact
+## M25 reservation instead of selecting/reserving again. This path:
+##   - NEVER calls TargetSelector (no WHAT authority here);
+##   - NEVER creates a second reservation (M25 already reserved owner_id<->target);
+##   - NEVER retargets;
+##   - NEVER releases the M25 reservation on a pre-spawn failure — M26 rolls the
+##     whole claim back through M25.rollback_claim(); the dispatcher only reports
+##     the failure and frees any dispatcher-owned fresh agent;
+##   - on success registers exactly ONE fresh ScrubbotAgent keyed by the SAME
+##     owner_id as the M25 ReservationState claim, so M20 authenticated arrival
+##     sees one coherent owner/target/color tuple through the shared bundle.
+##
+## `owner_id` MUST already own `target_index` in this dispatcher's bound
+## ReservationState (both directions), and MUST NOT already be an active dispatcher
+## assignment. `request`/`route` are the EXACT preclaimed route to the SAME target;
+## they are RouteValidator-validated against the dispatcher's own board + routing
+## access. Any structural/coherence/route/agent failure returns a DispatchResult
+## failure with ZERO new agent and the M25 reservation left intact.
+func dispatch_preclaimed(owner_id, color_id, target_index, start_position, request, route,
+		speed: float = DEFAULT_SPEED) -> RefCounted:
+	if not _bound or _resetting:
+		return DispatchResult.failure(DispatchResult.FailureReason.RESETTING if _resetting
+			else DispatchResult.FailureReason.INVALID_REQUEST)
+	if _in_dispatch:
+		return DispatchResult.failure(DispatchResult.FailureReason.REENTRANT)
+	# Pure numeric/type request boundaries BEFORE any collaborator callback.
+	if typeof(owner_id) != TYPE_INT or owner_id < 0:
+		return DispatchResult.failure(DispatchResult.FailureReason.INVALID_REQUEST)
+	if typeof(color_id) != TYPE_INT or color_id < 0:
+		return DispatchResult.failure(DispatchResult.FailureReason.INVALID_REQUEST)
+	if typeof(target_index) != TYPE_INT or target_index < 0:
+		return DispatchResult.failure(DispatchResult.FailureReason.INVALID_REQUEST)
+	if not _is_finite_vec(start_position) or not is_finite(speed) or speed <= 0.0:
+		return DispatchResult.failure(DispatchResult.FailureReason.INVALID_REQUEST)
+	# Owner already active -> reject WITHOUT touching the live assignment or reservation.
+	if _active.has(owner_id):
+		return DispatchResult.failure(DispatchResult.FailureReason.INVALID_REQUEST)
+	# The supplied request must be a real RouteRequest for the SAME claimed target and
+	# the SAME start origin — a foreign/mismatched request is rejected before routing.
+	if not (request is RouteRequest):
+		return DispatchResult.failure(DispatchResult.FailureReason.INVALID_REQUEST)
+	if request.target_index != target_index:
+		return DispatchResult.failure(DispatchResult.FailureReason.INVALID_REQUEST)
+	if not request.start_position.is_equal_approx(start_position):
+		return DispatchResult.failure(DispatchResult.FailureReason.INVALID_REQUEST)
+
+	_in_dispatch = true
+	var my_gen: int = _generation
+
+	# Live bundle coherence (a sibling may have drifted). No reservation is ever
+	# released on the preclaimed path — M25 owns that rollback.
+	var coherent: bool = _bundle_coherent(_board, _selector, _reservations, _routing_system, _routing_access, _select_access)
+	if _reset_since(my_gen):
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+	if not coherent:
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
+
+	# Exact M25 reservation proof in the dispatcher's OWN ReservationState, both
+	# directions. A wrong/foreign/absent reservation is a mismatch -> fail closed,
+	# leaving whatever reservation exists untouched (never released here).
+	var owner_target = _reservations.get_target_for_owner(owner_id)
+	var target_owner = _reservations.get_owner(target_index)
+	if typeof(owner_target) != TYPE_INT or typeof(target_owner) != TYPE_INT:
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
+	if owner_target != target_index or target_owner != owner_id:
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
+
+	# Exact target/color/board validity for the claimed target.
+	if not _board.is_valid_index(target_index):
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
+	if _board.get_cell_state(target_index) != BoardState.CellState.ACTIVE:
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
+	if _board.get_color_id(target_index) != color_id:
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
+
+	# Validate the EXACT supplied route against this dispatcher's board + routing
+	# access. A null/junk/generic route-like object, a route for a different target,
+	# or a geometrically-invalid route all fail here (ROUTE_FAILED), zero agent.
+	if not _route_ok(route, request, target_index):
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.ROUTE_FAILED))
+	if _reset_since(my_gen):
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+
+	# Exactly one fresh, unparented, UNASSIGNED agent.
+	var agent = _make_agent()
+	if _reset_since(my_gen):
+		_dispose_fresh(agent)
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+	if not _dispatcher_ownable(agent):
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.AGENT_ASSIGN_FAILED))
+
+	var assign_ret = agent.assign(owner_id, color_id, request, route, speed)
+	if _reset_since(my_gen):
+		agent.free()
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+	if typeof(assign_ret) != TYPE_BOOL or not assign_ret:
+		agent.free()
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.AGENT_ASSIGN_FAILED))
+	if not _agent_assigned_ok(agent, owner_id, color_id, target_index):
+		agent.free()
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.AGENT_ASSIGN_FAILED))
+
+	if not _is_live_node(_agent_parent):
+		agent.free()
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.AGENT_ASSIGN_FAILED))
+	_agent_parent.add_child(agent)
+	if _reset_since(my_gen):
+		_detach_free(agent)
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.RESETTING))
+	if not is_instance_valid(agent) or agent.get_parent() != _agent_parent:
+		_detach_free(agent)
+		return _end_dispatch(DispatchResult.failure(DispatchResult.FailureReason.COHERENCE_FAILED))
+
+	# Keep legacy owner allocation collision-safe: a later legacy dispatch() must
+	# never hand out an owner id already consumed by a preclaimed assignment.
+	if owner_id >= _next_owner_id:
+		_next_owner_id = owner_id + 1
+
+	var cb := Callable(self, "_on_agent_completed").bind(agent)
+	agent.agent_completed.connect(cb)
+	_active[owner_id] = {"owner": owner_id, "target": target_index, "color": color_id,
+		"agent": agent, "cb": cb, "arrived": false}
+	return _end_dispatch(DispatchResult.success_result(owner_id, target_index, agent))
+
 func _reset_since(my_gen: int) -> bool:
 	return _generation != my_gen
 
