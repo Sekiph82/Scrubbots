@@ -1,7 +1,7 @@
 # SCRUBBOTS Master UI System
 
 Status: OWNER-APPROVED architecture baseline
-Engine: Godot 4.7.x
+Engine: Godot 4.7.2
 Primary orientation: portrait
 Visual generation provider: ChatGPT image generation primary; Magnific MCP fallback
 
