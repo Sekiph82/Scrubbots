@@ -129,8 +129,11 @@ New level/full reset:
 - speed = 1x.
 
 Manual bottom-right button:
-- toggles 1x <-> 2x;
-- immediately updates M28 visual state.
+- M29 must preserve a direct toggle seam sufficient to verify the 1x/2x temporal authority in headless/debug evidence;
+- this seam is **not** authorization for a permanently free shipping manual 2x;
+- production manual 2x must later pass the paid entitlement gate in `OWNER_ECONOMY_REWARDS_V01.md` (current level 200 SB; 15m 300 SB; 30m 500 SB; 60m 750 SB);
+- M39 owns wallet/entitlement purchase integration;
+- M28 visual state must follow the actual temporal authority.
 
 Automatic trigger:
 - after a **successful** final M24 placement, if real `M23.is_exhausted()` is true, switch to 2x;
@@ -139,7 +142,8 @@ Automatic trigger:
 - five-slot occupancy alone is irrelevant;
 - a rejected final selection cannot trigger it;
 - if already 2x, no duplicate side effect;
-- auto-2x is not locked; player may toggle back to 1x.
+- auto-2x is free and entitlement-independent;
+- player may return to 1x; any later production manual request for paid 2x must obey the entitlement gate once M39 is integrated.
 
 2x must accelerate:
 - scheduler cadence;
