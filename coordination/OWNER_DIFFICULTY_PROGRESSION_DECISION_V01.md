@@ -225,7 +225,7 @@ This decision supersedes the difficulty meaning of older statements in:
 - `docs/08_PIXEL_ART_PALETTE_RULES.md` only insofar as distinct-color bands are treated as class legality;
 - old LF04/LF05/LF07/LF08/LF10 task wording that assumes dimension bands define difficulty.
 
-The variable-size engine, 59x59 capability, C01..C16 palette, ACTIVE/CLEARED model, five slots, target/reachability laws, routing separation and all unrelated audited gameplay contracts remain intact.
+The variable-size engine, 59x59 capability, C01..C16 palette, ACTIVE/CLEARED model, normal five-slot baseline, target/reachability laws, routing separation and all unrelated audited gameplay contracts remain intact. Economy V1 later authorizes a temporary sixth slot only through the +1 Slot booster; that amendment does not change Difficulty V1 class truth.
 
 ## 13. Migration rule
 
