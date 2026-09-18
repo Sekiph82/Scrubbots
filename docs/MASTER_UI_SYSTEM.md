@@ -434,7 +434,7 @@ Spacing / visual contract:
 - the rail must not distort the board aspect ratio and must not add a Node per board
   cell; the logical 2-cell clearance is invariant across physical viewport scale.
 
-The railroad is presentation/routing space only â€” not LevelData/BoardState, not a
+The railroad is presentation/routing space only — not LevelData/BoardState, not a
 C01..C16 artwork layer, and it does not change Difficulty V1. It supersedes the M21
 adjacent one-cell ring as future production movement geometry; M21 V07-V10 remain
 valid historical evidence for their commits.

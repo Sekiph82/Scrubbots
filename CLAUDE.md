@@ -362,7 +362,9 @@ For UI/visual work also read:
 
 - `docs/MASTER_UI_SYSTEM.md`
 - `docs/07_UI_ASSET_PIPELINE_DECISIONS.md`
+- `docs/HOME_UI_ASSET_PLAN.md` when working on Home
 - `ASSET_GENERATION_MANIFEST.json`
+- `assets/ui/HOME_ASSET_MANIFEST.json` when working on Home
 
 Key rules:
 
@@ -371,6 +373,11 @@ Key rules:
 - preserve single Image/ImageTexture BoardRenderer;
 - five slots remain usable across required viewport matrix;
 - dynamic text/state stays native UI;
+- ChatGPT image generation is primary for new illustrative UI/character art;
+- Magnific MCP remains an approved fallback/alternate;
+- image generation is development-time only and never a shipping runtime dependency;
+- raw generated candidates live under `assets/ui/generated/`;
+- only owner-approved production art is promoted to `assets/ui/final/`;
 - never silently regenerate/overwrite owner-approved art;
 - approved asset provenance is preserved.
 

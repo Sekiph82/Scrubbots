@@ -1,4 +1,25 @@
 
+## 2026-09-18 — Canonical docs refresh before UI asset production
+
+Refreshed live repository documentation so visual production starts from current
+project truth rather than historical milestone/provider/routing text.
+
+- Rewrote root `README.md` around the canonical `TASKS.md` status model,
+  current M25 core-gameplay sequence, C01..C16 palette and current UI asset
+  workflow.
+- Rebuilt `docs/04_ROADMAP.md` around M25 -> M27 -> production UI and the
+  current M28..M60 milestone numbering.
+- Updated gameplay/architecture/ADR Railroad V1 documentation to the
+  owner-locked 2026-09-17 legal interior-corridor routing rule.
+- Amended ADR-020/021 to current Palette V2 (C01..C16), Difficulty V1 color
+  semantics and BG01 separation.
+- Removed obsolete DIRTY/CLEAN production guidance from the visual-reference
+  README.
+- Updated `CLAUDE.md` with ChatGPT-primary / Magnific-fallback visual
+  production paths and Home manifest entry points.
+- Cleaned remaining mojibake in current UI/railroad documentation.
+- No gameplay code, task checkbox state or milestone status was changed.
+
 ## 2026-09-18 — Legacy Master UI branch audit / provider-policy cleanup
 
 Audited the already-merged `feature/master-ui-magnific-pipeline` branch and PR #3.

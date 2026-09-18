@@ -104,37 +104,56 @@ Missing owner artwork must never be:
 
 Use `AWAITING_OWNER_ASSET` for every expected-but-absent category.
 
-## Progression from reference to production candidate
+## Progression from reference to production
 
+Owner/reference intake and production promotion are separate.
+
+For logical pixel-art level sources:
+
+```text
+owner supplies source
+-> source-original preserved + inventoried
+-> technical audit (dimensions/alpha/interpolation/logical grid)
+-> import/reconstruction tooling
+-> explicit normalization/validation to C01..C16
+-> BoardState / ACTIVE-CLEARED presentation
+-> Difficulty V1 + solvability/content QA
+-> production acceptance
 ```
-Owner supplies file
-  -> ingested into assets/art/ (source-original preserved)
-  -> M08: full technical pixel/dimension audit
-  -> M09: pixel-art importer converts to Level Data
-  -> M10: DIRTY/CLEAN visual treatment applied (owner design gate)
-  -> production candidate validated against difficulty bands
+
+For UI/character illustration:
+
+```text
+owner reference / canonical identity
+-> generated candidate under assets/ui/generated/
+-> owner review
+-> approved production derivative under assets/ui/final/
+-> Godot import/bind
+-> responsive/readability validation
 ```
+
+ChatGPT image generation is the primary workflow for new illustrative
+UI/character assets. Magnific MCP remains an approved fallback/alternate.
+Neither provider is a runtime dependency.
 
 ## M08 boundary
 
-M07 establishes the library structure, naming, intake rules, and
-availability audit. M08 performs the full per-file technical audit:
-filename, original dimensions, alpha/transparency, color count,
-anti-aliasing detection, interpolation detection, logical-pixel grid,
-legal difficulty band, source preservation verification. Do not perform
-M08 work in M07.
+M08 remains the technical audit boundary for candidate production pixel-art
+sources: dimensions, alpha/transparency, color data, interpolation/
+anti-aliasing, logical-pixel grid and source preservation. Difficulty class is
+not inferred from old size/color bands.
 
-## M10 DIRTY/CLEAN design gate
+## ACTIVE/CLEARED presentation
 
-The visual reference library preserves these rules:
-- CLEAN is the unmodified source palette color.
-- DIRTY must remain recognizably related to the underlying hue while
-  being clearly distinct using both saturation and brightness/value
-  differences (never saturation alone).
-- Three prototype presets (A/B/C) exist in `DirtyCleanPresets`.
-- Final DIRTY treatment requires owner review at realistic 50×50 and
-  59×59 display scale via `scenes/debug/board_renderer_debug.tscn`.
-- M07 must not mark M10 complete or choose a final preset.
+The historical DIRTY/CLEAN A/B/C preset system is superseded.
+
+Current production truth:
+
+- ACTIVE = the cell's canonical source palette color, opaque;
+- CLEARED = alpha 0, revealing BG01 underneath;
+- no grime transform or hidden clean artwork exists;
+- owner-approved source art is never silently recolored or overwritten;
+- logical production colors must normalize/validate to C01..C16.
 
 ## Directory structure
 
