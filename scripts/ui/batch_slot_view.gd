@@ -110,3 +110,9 @@ func get_remaining_view() -> int:
 
 func get_committed_view() -> int:
 	return int(_snapshot.get("committed", 0))
+
+## Presentation-only GLOBAL spawn anchor (top-center) of this slot view, used by the
+## M29 runtime origin provider to derive a real laid-out slot->route origin. Presentation
+## geometry only; carries no gameplay/target authority.
+func get_spawn_anchor_global() -> Vector2:
+	return global_position + Vector2(size.x * 0.5, 0.0)

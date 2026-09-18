@@ -369,6 +369,14 @@ func get_five_slot_strip():
 func get_supply_panel():
 	return _supply_panel
 
+## M29 wiring seams: the bottom-row Pause and Speed controls (presentation Buttons).
+## M28 wires no behavior; M29 connects the manual pause + 1x/2x toggle to these.
+func get_pause_button() -> Button:
+	return _pause_btn
+
+func get_speed_button() -> Button:
+	return _speed_btn
+
 func _global_rect(c: Control) -> Rect2:
 	return Rect2(c.global_position, c.size)
 
