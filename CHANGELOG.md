@@ -1,4 +1,19 @@
 
+## 2026-09-18 — Legacy Master UI branch audit / provider-policy cleanup
+
+Audited the already-merged `feature/master-ui-magnific-pipeline` branch and PR #3.
+The branch has no commits unique from `main`; its reusable UI primitives and
+reference-intake work are already present in current main.
+
+- Updated ADR-017 from Magnific-only to ChatGPT-primary with Magnific fallback.
+- Updated `docs/02_TECH_ARCHITECTURE.md` to the same provider-ordered,
+  runtime-independent visual asset policy.
+- Removed lingering Magnific-specific wording from the visual reference guide.
+- Corrected the visual-reference guide's obsolete DIRTY/CLEAN gate wording to
+  current ACTIVE/CLEARED presentation truth.
+- No gameplay behavior, task checkbox state, milestone order or asset approval
+  state changed.
+
 ## 2026-09-18 — Home UI asset pipeline scaffold and provider preference
 
 Owner changed the preferred UI/character image-generation workflow from Magnific-only to ChatGPT-primary with Magnific retained as an approved fallback.

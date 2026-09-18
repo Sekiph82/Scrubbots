@@ -379,24 +379,26 @@ component/layout contract. The existing `BoardRenderer` remains intact.
 
 ---
 
-### ADR-017: Magnific-only Master UI image generation pipeline
+### ADR-017: ChatGPT-primary Master UI image generation pipeline
 
-**Decision**: Magnific MCP is the sole approved AI image-generation provider
-for the Master UI Asset Kit unless the owner explicitly changes this rule.
-Higgsfield is not a project dependency. Owner-supplied references outrank
-Magnific output.
+**Decision**: ChatGPT image generation is the primary development-time
+image-generation workflow for the Master UI Asset Kit. Magnific MCP remains
+an approved fallback/alternate provider. Higgsfield is not a project
+dependency. Owner-supplied references outrank all generated output.
 
-**Reason**: The owner already has usable Magnific credits and wants to avoid
-an additional paid image service. Magnific covers required generation,
-reference, background-removal, resize/upscale and related workflows.
+**Reason**: The owner prefers to create and iterate SCRUBBOTS visual assets
+directly in the ChatGPT design workflow while retaining Magnific as an
+alternate production path when useful.
 
-**Consequences**: `ASSET_GENERATION_MANIFEST.json` is the machine-readable
-queue. Magnific is used mainly for Scrubby/robot character art, booster icons,
-rewards, difficulty emblems and decorative assets. Native Godot UI is
-preferred for scalable structural elements. Raw generated assets are kept
-separate from explicitly approved production finals.
+**Consequences**: `ASSET_GENERATION_MANIFEST.json` is the machine-readable,
+provider-ordered generation/provenance queue. Generated art is used mainly
+for Scrubby/robot character art, branded icons, rewards, difficulty emblems
+and decorative assets. Native Godot UI is preferred for scalable structural
+elements. Raw generated assets are kept separate from explicitly approved
+production finals. No image-generation provider is a shipping/runtime
+dependency.
 
-**Status**: Owner-approved.
+**Status**: Owner-approved; provider policy superseded on 2026-09-18.
 
 ---
 
@@ -411,7 +413,7 @@ files.
 sessions while preserving source originals.
 
 **Consequences**: Inbox files are references until inventoried, classified
-and promoted. Magnific may not overwrite owner-source references.
+and promoted. Generated derivatives may not overwrite owner-source references.
 
 **Status**: Owner-approved.
 
