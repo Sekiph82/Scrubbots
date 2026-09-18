@@ -5,7 +5,8 @@ Tasks: SB-M28-020..026
 - SpeechBubbleAnchor above Scrubby.
 - CleaningPropsAnchor at right and lower priority.
 - Four booster controls in one horizontal row; presentation only.
-- Bottom row: pause left, central ad placeholder, speed-up control right.
+- Bottom row: pause left, central ad placeholder, 2x speed control right.
+- Speed control must support distinct 1x and 2x visual states, but M28 must not implement timing/input semantics.
 - Ads remain disabled/design-gated.
 - Inspect asset inventory.
 - Bind only explicitly approved production illustrations.
