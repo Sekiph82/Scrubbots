@@ -100,7 +100,7 @@ LOWER
 BOTTOM
   pause control to the left of ad region
   ad region in center when monetization is actually enabled
-  settings control to the right
+  speed-up control to the right
 ```
 
 The board must grow before decorative regions grow. Decorative Scrubby/cleaning props may scale down or crop within approved limits before the selection panel becomes unusably narrow.
@@ -114,7 +114,7 @@ safe viewport
 - required top controls
 - selection/slot area
 - booster row
-- bottom/ad/settings row
+- bottom/ad/speed row
 - minimum spacing
 = maximum board allocation
 ```
@@ -169,7 +169,7 @@ scenes/components/ui/
   hud/
     player_profile_chip.tscn
     top_hud.tscn
-    ad_settings_row.tscn
+    ad_speed_row.tscn
     bottom_nav.tscn
   popup/
     base_popup.tscn
