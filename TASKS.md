@@ -4,15 +4,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M27
-- Current Sprint: M27-C001 V01 — full Solvability / Deadlock Engine continuous execution
-- Current Task: M27-C001-V01
+- Current Milestone: M28
+- Current Sprint: M28-C001 V01 — full responsive Gameplay Screen Layout continuous execution
+- Current Task: M28-C001-V01
 - Current Task Status: IN_PROGRESS
-- Next Task/Action: Claude executes `coordination/sessions/M27-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M27-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, runs all five linked M27 work packages continuously without intermediate approval, completes `SB-M27-001..034`, preserves accepted M23–M26 gameplay authorities, pushes implementation first, then `CLAUDE_LOG_V01.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
+- Next Task/Action: Claude executes `coordination/sessions/M28-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M28-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, runs all five linked M28 work packages continuously without intermediate approval, completes `SB-M28-001..028`, preserves closed M23–M27 gameplay truth, does not implement M29 input mechanics, pushes implementation first, then `CLAUDE_LOG_V01.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 470 / 885 = 53.11% (game+ui live scope); lastCompletedTaskId M26-C001-V02. M26 Auto Dispatch Scheduler is independently audited PASS and all `SB-M26-001..030` are closed. M27 Solvability / Deadlock Engine is now the active final core-gameplay closure milestone before M28 production gameplay screen/layout. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
+- Progress: 504 / 885 = 56.95% (game+ui live scope); lastCompletedTaskId M27-C001-V01. M27 Solvability / Deadlock Engine is independently audited PASS and all `SB-M27-001..034` are closed. The owner-locked M23–M27 core batch-gameplay program is complete. M28 Gameplay Screen Layout is now active; M29 owns touch activation and must not be implemented early. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
@@ -1132,40 +1132,40 @@ Purpose: turn an occupied color/count batch into autonomous Scrubbot work. The p
 
 Purpose: prove generated supply is actually playable under the real mechanics and distinguish temporary waiting from a true no-solution state. This milestone is the final gameplay-engine closure gate before production screen/layout work.
 
-- [ ] SB-M27-001 Define a deterministic solver operating on gameplay-domain state, not rendered UI Nodes.
-- [ ] SB-M27-002 Consume the real level BoardState/access/routing semantics rather than a contradictory simplified notion of reachability.
-- [ ] SB-M27-003 Model configured 3/4/5 independent FIFO supply columns.
-- [ ] SB-M27-004 Model the visible-front rule: only each column's front batch is a legal player choice.
-- [ ] SB-M27-005 Model preview/hidden queue ordering without allowing the solver to illegally select Row 2/Row 3/hidden batches early.
-- [ ] SB-M27-006 Model automatic rightmost-empty placement into exactly five slots.
-- [ ] SB-M27-007 Model full-slot rejection without consuming the selected supply front.
-- [ ] SB-M27-008 Model batch remaining/committed/WAITING lifecycle exactly as the runtime engine does.
-- [ ] SB-M27-009 Model same-color oldest-placement-first claim arbitration.
-- [ ] SB-M27-010 Model targetability using authoritative ProductionTargetAccess/ProductionRoutingSystem semantics, including Railroad V1 legal ingress and post-rail orthogonal turns.
-- [ ] SB-M27-011 Model dynamic ACTIVE→CLEARED board evolution after authenticated work.
-- [ ] SB-M27-012 Model WAITING batches becoming runnable when new corridors/targets open.
-- [ ] SB-M27-013 Search legal player front-batch choices rather than assuming one fixed greedy order.
-- [ ] SB-M27-014 Find at least one complete sequence that clears every required logical pixel and consumes all required batch quota.
-- [ ] SB-M27-015 Emit a deterministic solution trace for QA/debug evidence; never expose it to normal player UI.
-- [ ] SB-M27-016 Accept a generated Batch Supply layout for production only after the solver proves at least one legal completion sequence.
-- [ ] SB-M27-017 Feed unsolvable candidate layouts back to Batch Supply generation for deterministic retry/regeneration rather than shipping impossible levels.
-- [ ] SB-M27-018 Preserve generation seed + solver outcome so an accepted/rejected supply can be reproduced exactly.
-- [ ] SB-M27-019 Canonicalize/memoize equivalent search states to prevent needless combinatorial re-exploration.
-- [ ] SB-M27-020 Add explicit search/time/state-count bounds and fail closed when proof cannot be completed within policy limits.
-- [ ] SB-M27-021 Prove the real 20×20 Hazard Bot level has at least one solvable generated batch/column layout under the new five-slot rules.
-- [ ] SB-M27-022 Persist the Hazard Bot solution trace as regression evidence while keeping player-hidden future batches hidden at runtime.
-- [ ] SB-M27-023 Add rectangular-board solvability fixtures.
-- [ ] SB-M27-024 Add 59×59 solver/performance sanity fixtures with bounded evidence appropriate to the search design.
-- [ ] SB-M27-025 Define `STALLED/WAITING` separately from `DEADLOCK`.
-- [ ] SB-M27-026 Never call a state deadlocked while any valid in-flight robot can still produce an authenticated clear.
-- [ ] SB-M27-027 Never call a state deadlocked while an EMPTY slot plus at least one selectable front batch can lead to legal future progress.
-- [ ] SB-M27-028 Never call a state deadlocked merely because current batches are waiting if already-scheduled/legal clearing can open their targets.
-- [ ] SB-M27-029 Declare deadlock only when search proves there is no legal future action sequence that can produce further authenticated progress/completion.
-- [ ] SB-M27-030 Add the canonical true-deadlock fixture: five occupied WAITING batches, no in-flight progress and no legal unlock sequence.
-- [ ] SB-M27-031 Add false-positive guards where a newly opened same-color target correctly revives the oldest waiting batch.
-- [ ] SB-M27-032 Expose deterministic deadlock reason codes/debug evidence without coupling lose-screen UI to solver internals.
-- [ ] SB-M27-033 Reset/replay must reproduce identical solver classification from identical state/seed.
-- [ ] SB-M27-034 Run performance/memory profiling and regression tests before declaring the core gameplay engine complete.
+- [x] SB-M27-001 Define a deterministic solver operating on gameplay-domain state, not rendered UI Nodes.
+- [x] SB-M27-002 Consume the real level BoardState/access/routing semantics rather than a contradictory simplified notion of reachability.
+- [x] SB-M27-003 Model configured 3/4/5 independent FIFO supply columns.
+- [x] SB-M27-004 Model the visible-front rule: only each column's front batch is a legal player choice.
+- [x] SB-M27-005 Model preview/hidden queue ordering without allowing the solver to illegally select Row 2/Row 3/hidden batches early.
+- [x] SB-M27-006 Model automatic rightmost-empty placement into exactly five slots.
+- [x] SB-M27-007 Model full-slot rejection without consuming the selected supply front.
+- [x] SB-M27-008 Model batch remaining/committed/WAITING lifecycle exactly as the runtime engine does.
+- [x] SB-M27-009 Model same-color oldest-placement-first claim arbitration.
+- [x] SB-M27-010 Model targetability using authoritative ProductionTargetAccess/ProductionRoutingSystem semantics, including Railroad V1 legal ingress and post-rail orthogonal turns.
+- [x] SB-M27-011 Model dynamic ACTIVE→CLEARED board evolution after authenticated work.
+- [x] SB-M27-012 Model WAITING batches becoming runnable when new corridors/targets open.
+- [x] SB-M27-013 Search legal player front-batch choices rather than assuming one fixed greedy order.
+- [x] SB-M27-014 Find at least one complete sequence that clears every required logical pixel and consumes all required batch quota.
+- [x] SB-M27-015 Emit a deterministic solution trace for QA/debug evidence; never expose it to normal player UI.
+- [x] SB-M27-016 Accept a generated Batch Supply layout for production only after the solver proves at least one legal completion sequence.
+- [x] SB-M27-017 Feed unsolvable candidate layouts back to Batch Supply generation for deterministic retry/regeneration rather than shipping impossible levels.
+- [x] SB-M27-018 Preserve generation seed + solver outcome so an accepted/rejected supply can be reproduced exactly.
+- [x] SB-M27-019 Canonicalize/memoize equivalent search states to prevent needless combinatorial re-exploration.
+- [x] SB-M27-020 Add explicit search/time/state-count bounds and fail closed when proof cannot be completed within policy limits.
+- [x] SB-M27-021 Prove the real 20×20 Hazard Bot level has at least one solvable generated batch/column layout under the new five-slot rules.
+- [x] SB-M27-022 Persist the Hazard Bot solution trace as regression evidence while keeping player-hidden future batches hidden at runtime.
+- [x] SB-M27-023 Add rectangular-board solvability fixtures.
+- [x] SB-M27-024 Add 59×59 solver/performance sanity fixtures with bounded evidence appropriate to the search design.
+- [x] SB-M27-025 Define `STALLED/WAITING` separately from `DEADLOCK`.
+- [x] SB-M27-026 Never call a state deadlocked while any valid in-flight robot can still produce an authenticated clear.
+- [x] SB-M27-027 Never call a state deadlocked while an EMPTY slot plus at least one selectable front batch can lead to legal future progress.
+- [x] SB-M27-028 Never call a state deadlocked merely because current batches are waiting if already-scheduled/legal clearing can open their targets.
+- [x] SB-M27-029 Declare deadlock only when search proves there is no legal future action sequence that can produce further authenticated progress/completion.
+- [x] SB-M27-030 Add the canonical true-deadlock fixture: five occupied WAITING batches, no in-flight progress and no legal unlock sequence.
+- [x] SB-M27-031 Add false-positive guards where a newly opened same-color target correctly revives the oldest waiting batch.
+- [x] SB-M27-032 Expose deterministic deadlock reason codes/debug evidence without coupling lose-screen UI to solver internals.
+- [x] SB-M27-033 Reset/replay must reproduce identical solver classification from identical state/seed.
+- [x] SB-M27-034 Run performance/memory profiling and regression tests before declaring the core gameplay engine complete.
 
 ### M28 — Gameplay Screen Layout `[VISUAL REFERENCE]`
 
