@@ -5,14 +5,14 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M25
-- Current Sprint: M25-C001 V01 — Batch Target Claim Engine continuous implementation
-- Current Task: M25-C001-V01
-- Current Task Status: IN_PROGRESS
-- Next Task/Action: Claude executes `coordination/sessions/M25-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M25-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, runs all five M25 work packages in order without intermediate handoff, completes `SB-M25-001..032`, preserves accepted M24/M23/M22 authorities, pushes implementation first, then `CLAUDE_LOG_V01.md` separately and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
+- Current Sprint: M25-C001 V02 — Batch Target Claim identity / rollback / access-boundary hardening
+- Current Task: M25-C001-V02
+- Current Task Status: CHANGES_REQUIRED
+- Next Task/Action: Claude executes `coordination/sessions/M25-C001/CHATGPT_PROMPT_V02.md` under `coordination/sessions/M25-C001/CHATGPT_AUDIT_CRITERIA_V02.md`, closes all findings in `coordination/sessions/M25-C001/CHATGPT_AUDIT_V01.md` in one continuous remediation pass, preserves accepted M25 FIFO/BLUE/opening behavior and all M24/M23/M22 authorities, pushes implementation first, then `CLAUDE_LOG_V02.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 408 / 885 = 46.10% (game+ui live scope); lastCompletedTaskId M24-C001-V02. M24 Five-Slot Batch Engine is independently audited PASS at implementation `808a06fd97ef1a7f271f675767cb9eb6697074b0` with root suite `5090/0`; all `SB-M24-001..030` are closed. M23 Batch Supply Engine remains closed. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
+- Progress: 408 / 885 = 46.10% (game+ui live scope); lastCompletedTaskId M24-C001-V02. M25 V01 implemented the full `SB-M25-001..032` surface in one continuous pass but remains open after independent strict audit found identity-reuse, lifecycle rollback, cleanup transaction, production-access trust-boundary and live-rebind defects. No M25 tasks are closed until V02 passes. M24 Five-Slot Batch Engine and M23 Batch Supply Engine remain closed. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
