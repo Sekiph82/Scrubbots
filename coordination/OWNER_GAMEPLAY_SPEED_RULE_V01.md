@@ -16,15 +16,27 @@ No 3x or higher speed is part of this rule.
 
 A new level/session starts at `1x`.
 
-## 2. Manual speed control
+## 2. Manual speed control and entitlement gate
 
 The bottom-right gameplay control is the speed control.
 
-It toggles:
+The gameplay-speed authority still supports exactly:
 
 `1x <-> 2x`
 
-The control must visibly reflect the current speed state.
+However, **production manual activation of 2x is no longer always free**. It is gated by the owner-locked Economy & Rewards V1 decision:
+
+`coordination/OWNER_ECONOMY_REWARDS_V01.md`
+
+A production manual 2x request is allowed only when at least one of these is true:
+
+- the current progression level has a paid current-level 2x entitlement (200 SB);
+- a paid timed 2x entitlement is currently unexpired (15m/300 SB, 30m/500 SB, 60m/750 SB);
+- the runtime is entering the free authoritative M23-supply-exhausted endgame 2x path.
+
+The control must visibly reflect current speed state and, when manual 2x is not entitled, route the request to the economy/entitlement purchase flow rather than silently enabling 2x.
+
+Until the M39 economy services exist, M29 may keep a direct toggle seam for headless/debug verification of temporal behavior, but a shipping production UI must not expose free manual 2x.
 
 This is a gameplay-time control, not Settings.
 
@@ -50,7 +62,7 @@ If the final transfer is rejected, M23 is not exhausted and automatic 2x must no
 
 If gameplay is already at 2x, the automatic trigger is an idempotent no-op.
 
-Automatic activation does not permanently lock 2x. The player may use the speed control to return to 1x afterward.
+Automatic activation does not permanently lock 2x. The player may always return to 1x afterward. Returning from that free automatic 2x to 2x manually again before/after the automatic condition is no longer free unless a valid paid entitlement exists; the automatic M23-exhausted trigger itself may reassert free 2x only according to the authoritative runtime rule.
 
 ## 4. What 2x means
 
@@ -84,7 +96,9 @@ After resume, the previous gameplay speed (1x or 2x) is restored.
 
 ## 6. Reset / new level
 
-A new level/session and a full gameplay reset restore speed to `1x`.
+A new level/session and a full gameplay reset restore the temporal state to `1x`.
+
+A current-level paid entitlement is tied to its level ID and survives retries/restarts of that same level until successful completion. Timed entitlements are wall-clock expiry timestamps and continue counting in menus, pause, background and while the app is closed.
 
 Stale callbacks from a previous 2x session must not change a newly reset session.
 
@@ -109,3 +123,10 @@ This decision extends and supersedes the previously-deferred functional semantic
 `coordination/OWNER_GAMEPLAY_BOTTOM_ROW_SPEED_DECISION_V01.md`
 
 It also supersedes any older gameplay-screen wording that treats the bottom-right control as Settings.
+
+
+## 9. Economy V1 supersession note
+
+On 2026-09-18, `coordination/OWNER_ECONOMY_REWARDS_V01.md` superseded the earlier assumption that the bottom-right manual 1x/2x toggle is always free.
+
+The speed authority remains responsible only for temporal factor. Payment, entitlement ownership and expiry belong to the economy/speed-entitlement layer. Automatic M23-supply-exhausted 2x remains free.
