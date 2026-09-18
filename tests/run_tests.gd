@@ -259,6 +259,8 @@ func _initialize() -> void:
 	_run_m26_scheduler_tests()
 	# M27-C001 V01 — solvability / deadlock engine.
 	_run_m27_solver_tests()
+	# M28-C001 V01 — gameplay screen layout (component structural invariants).
+	_run_m28_layout_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -14068,6 +14070,11 @@ const BatchSelectionTransaction = preload("res://scripts/gameplay/supply/batch_s
 const FiveSlotBatchEngine = preload("res://scripts/gameplay/slots/five_slot_batch_engine.gd")
 const SlotBatchState = preload("res://scripts/gameplay/slots/slot_batch_state.gd")
 const BatchTargetClaimEngine = preload("res://scripts/gameplay/targeting/batch_target_claim_engine.gd")
+# M28 — gameplay screen layout (read-only batch presentation components).
+const M28BatchSlotView = preload("res://scripts/ui/batch_slot_view.gd")
+const M28FiveSlotStrip = preload("res://scripts/ui/five_slot_strip.gd")
+const M28BatchSupplyPanel = preload("res://scripts/ui/batch_supply_panel.gd")
+const M28GameplayScreen = preload("res://scripts/ui/gameplay_screen.gd")
 # M26 — auto dispatch scheduler.
 const AutoDispatchScheduler = preload("res://scripts/gameplay/dispatch/auto_dispatch_scheduler.gd")
 const M26OriginProvider = preload("res://tests/support/m26_origin_provider.gd")
@@ -15678,6 +15685,92 @@ func _m27_supply(cols_spec: Array, palette: int):
 	var e = BatchSupplyEngine.create(3, 3)
 	e.load_columns(cols)
 	return e
+
+## M28-C001 V01 — gameplay screen layout component structural invariants. Frameless
+## (no viewport rendering); the full responsive/geometry proof is the standalone
+## tests/m28_gameplay_layout_smoke.gd harness. These assert the read-only batch
+## presentation contract directly: five slots, 3/4/5 columns clamped, exactly three
+## visible rows, hidden depth never exposed, detached snapshots, no destination-slot
+## Button/signal, and the composition contract (no Goal/Moves, no Level rail).
+func _run_m28_layout_tests() -> void:
+	print("---- M28-C001 V01: Gameplay Screen Layout (SB-M28-001..028) ----")
+	# --- BatchSlotView: read-only, detached snapshot, states (SB-M28-003,019) ---
+	var empty_view = M28BatchSlotView.new()
+	empty_view.bind_snapshot(SlotBatchState.make_empty().to_dict())
+	_check(not empty_view.is_occupied_view(), "M28 slot view EMPTY not occupied")
+	_check(not (empty_view is Button), "M28 slot view is not a Button")
+	_check(not empty_view.has_signal("slot_activated"), "M28 slot view has no slot_activated signal")
+	var occ := SlotBatchState.make_occupied("b", 2, 6, 0)
+	occ.apply_commit()
+	var occ_dict: Dictionary = occ.to_dict()
+	var occ_view = M28BatchSlotView.new()
+	occ_view.bind_snapshot(occ_dict, Color(0, 1, 0, 1))
+	_check(occ_view.is_occupied_view(), "M28 slot view occupied reflects snapshot")
+	_check_eq(occ_view.get_remaining_view(), 6, "M28 slot view remaining scalar")
+	_check_eq(occ_view.get_committed_view(), 1, "M28 slot view committed scalar")
+	# Detachment: mutating the source dict after bind does not change the view.
+	occ_dict["remaining_to_clear"] = 999
+	_check_eq(occ_view.get_remaining_view(), 6, "M28 slot view snapshot is detached copy")
+	empty_view.free()
+	occ_view.free()
+
+	# --- FiveSlotStrip: exactly five, read-only (SB-M28-003) ---
+	var strip = M28FiveSlotStrip.new()
+	var seven: Array = []
+	for i in range(7):
+		seven.append(SlotBatchState.make_empty().to_dict())
+	strip.bind_snapshots(seven, [])
+	_check_eq(strip.get_slot_count(), 5, "M28 five-slot strip renders exactly five (input truncated)")
+	_check(not (strip is Button), "M28 five-slot strip is not a Button")
+	var strip_ok := true
+	for v in strip.get_slot_views():
+		if v is Button or v.has_signal("slot_activated"):
+			strip_ok = false
+	_check(strip_ok, "M28 five-slot strip has no Button / slot_activated child")
+	strip.free()
+
+	# --- BatchSupplyPanel: 3/4/5 columns clamped, exactly 3 rows, hidden depth hidden ---
+	for req in [2, 3, 4, 5, 6]:
+		var panel = M28BatchSupplyPanel.new()
+		var cols: Array = []
+		for c in range(req):
+			# Deep column: front + 2 preview + large hidden remaining. Only 3 shown.
+			var preview: Array = [
+				{"batch_id": "c%d_0" % c, "color_id": 0, "robot_count": 5},
+				{"batch_id": "c%d_1" % c, "color_id": 1, "robot_count": 4},
+				{"batch_id": "c%d_2" % c, "color_id": 2, "robot_count": 3}]
+			cols.append({"front": preview[0], "preview": preview, "remaining": 12})
+		panel.bind_player_snapshot(cols, [])
+		var want: int = clampi(req, 3, 5)
+		_check_eq(panel.get_column_count(), want, "M28 supply clamps %d columns to %d" % [req, want])
+		_check_eq(panel.get_visible_row_count(), 3, "M28 supply exactly 3 visible rows (req=%d)" % req)
+		var rows_ok := true
+		for c in range(panel.get_column_count()):
+			# Never more than 3 row panels regardless of remaining=12 hidden depth.
+			if panel.get_column_row_panels(c).size() != 3:
+				rows_ok = false
+		_check(rows_ok, "M28 supply renders exactly 3 rows/col, hidden depth not exposed (req=%d)" % req)
+		panel.free()
+
+	# --- GameplayScreen composition contract, frameless (SB-M28-002,004,016,017,020..026) ---
+	var screen = M28GameplayScreen.new()
+	var board = BoardDebugFixtures.make_board(24, 40)
+	var level = BoardDebugFixtures.make_level(24, 40)
+	screen.configure(board, level.palette, [], [])
+	_check(not screen.has_goal_moves_panel(), "M28 screen: Goal/Moves panel absent")
+	_check(not screen.has_level_lock_rail(), "M28 screen: Level/lock rail absent")
+	_check_eq(screen.get_booster_count(), 4, "M28 screen: exactly four boosters")
+	_check_eq(screen.get_five_slot_strip().get_slot_count(), 5, "M28 screen: five slot views present")
+	_check(screen.get_presentation() != null, "M28 screen: reuses BoardPresentation (single-image renderer)")
+	_check(screen.get_rail_view() != null, "M28 screen: reuses ScrubRailView")
+	# Bottom-right SPEED control (replaces Settings): presentation-only 1x/2x states,
+	# new session defaults 1x. M28 wires no timing/toggle (owner speed rule).
+	_check_eq(screen.get_speed_state(), "1x", "M28 screen: speed control defaults to 1x")
+	screen.set_speed_2x(true)
+	_check_eq(screen.get_speed_state(), "2x", "M28 screen: speed control presents 2x state")
+	screen.set_speed_2x(false)
+	_check_eq(screen.get_speed_state(), "1x", "M28 screen: speed control returns to 1x")
+	screen.free()
 
 func _run_m27_solver_tests() -> void:
 	print("---- M27-C001 V01: Solvability / Deadlock Engine (SB-M27-001..034) ----")
