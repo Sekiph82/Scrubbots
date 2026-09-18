@@ -57,7 +57,9 @@ func set_2x(value: bool) -> void:
 	_is_2x = value
 	speed_changed.emit(factor())
 
-## Manual 1x <-> 2x toggle (bottom-right control). Returns the new state.
+## Raw temporal toggle seam. M29 uses this for deterministic/debug evidence. Economy V1
+## shipping UI must gate a manual request through SpeedEntitlementService before calling
+## this seam; authoritative M23-exhausted auto-2x may call set_2x(true) for free.
 func toggle() -> bool:
 	set_2x(not _is_2x)
 	return _is_2x
