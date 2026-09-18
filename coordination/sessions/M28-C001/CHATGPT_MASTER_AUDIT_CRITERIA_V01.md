@@ -82,7 +82,9 @@ Directly prove:
 - speech anchor above Scrubby;
 - cleaning props anchor right;
 - 4 boosters horizontal;
-- pause left / ad placeholder center / speed-up control right.
+- pause left / ad placeholder center / 2x speed control right;
+- speed control has distinct/readable 1x and 2x presentation states;
+- M28 does not implement the timing transition itself.
 
 Decoration may shrink before supply/slots.
 
