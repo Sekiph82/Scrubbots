@@ -84,6 +84,19 @@ func bind(board, batch_engine, selector, reservations) -> bool:
 func is_bound() -> bool:
 	return _bound
 
+## Exact cross-engine bundle-identity query (M26-C001 V02, F-M26-V01-STRICT-004).
+## Read-only and non-mutating: returns true ONLY when this engine is bound to the
+## SAME BoardState instance, the SAME FiveSlotBatchEngine (M24) instance AND the SAME
+## ReservationState instance the caller supplies (reference identity, not equal
+## dimensions/content). It lets the M26 scheduler prove M25 owns the exact same
+## board/M24/reservation bundle it was handed, rejecting an individually-valid M25 from
+## a different session. Never exposes any of the internal references — a caller may only
+## ask "are you bound to THESE exact three?", never obtain them.
+func is_bound_to(board, batch_engine, reservations) -> bool:
+	return _bound and _board != null and _board == board \
+		and _batches != null and _batches == batch_engine \
+		and _reservations != null and _reservations == reservations
+
 # ------------------------------------------------------------ read-only query --
 
 func live_claim_count() -> int:
