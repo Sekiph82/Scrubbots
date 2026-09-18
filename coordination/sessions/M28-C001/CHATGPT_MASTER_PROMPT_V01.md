@@ -13,9 +13,10 @@ Read first:
 4. `assets/art/references/README.md`;
 5. `coordination/OWNER_BATCH_GAMEPLAY_CORE_DECISION_V01.md`;
 6. `coordination/OWNER_GAMEPLAY_BOTTOM_ROW_SPEED_DECISION_V01.md`;
-7. M22 final Railroad audit and M23–M27 final audits;
-8. `coordination/sessions/M28-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`;
-9. all linked M28 work packages.
+7. `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md`;
+8. M22 final Railroad audit and M23–M27 final audits;
+9. `coordination/sessions/M28-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`;
+10. all linked M28 work packages.
 
 ## Objective
 
@@ -161,9 +162,12 @@ Owner-approved M28 composition:
 - speech bubble above Scrubby, not full-width;
 - cleaning props at right, lower priority;
 - 4 boosters in one compact horizontal row;
-- bottom row: pause left, ad placeholder center, speed-up control right.
+- bottom row: pause left, ad placeholder center, 2x speed control right;
+- speed control presentation must support both 1x and 2x visual states and clearly indicate the current state.
 
 Ad area is presentation placeholder only. M57 monetization remains design-gated.
+
+Functional speed semantics are owner-locked in `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md`. M28 must NOT wire timing behavior, but its presentation must be compatible with the future rule: manual 1x <-> 2x toggle, plus automatic 2x when authoritative M23 supply becomes exhausted after the final successful transfer. Do not infer exhaustion from visible preview rows or five-slot occupancy.
 
 ## Illustration/asset rule
 
