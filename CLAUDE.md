@@ -371,7 +371,7 @@ Key rules:
 - responsive native Godot Controls/containers, not flattened interactive screenshots;
 - board remains dominant gameplay region;
 - preserve single Image/ImageTexture BoardRenderer;
-- five slots remain usable across required viewport matrix;
+- normal five-slot baseline remains usable across required viewport matrix, and Economy V1 +1 Slot must later prove temporary sixth-slot usability;
 - dynamic text/state stays native UI;
 - ChatGPT image generation is primary for new illustrative UI/character art;
 - Magnific MCP remains an approved fallback/alternate;
@@ -430,3 +430,12 @@ For Difficulty V1 specifically, the 2026-09-12 owner decision supersedes old cla
 ## 20. Working style
 
 Inspect before modifying. Keep work scoped, reversible, testable and evidence-driven. Reuse audited systems rather than rebuilding them for style. Stop only when proceeding would destroy owner work, expose secrets, require an unauthorized paid/external dependency, or contradict an unresolved owner decision. Do not edit root `TASKS.md`; leave tracker updates to ChatGPT after independent audit/owner-gate review.
+
+
+## Economy & Rewards V1 owner lock
+
+Before implementing economy/reward/Heart/booster/2x/Collection-exchange/robot-unlock work, read:
+- `coordination/OWNER_ECONOMY_REWARDS_V01.md`
+- `data/config/economy_rewards_v1.json`
+
+Do not invent Star/Event currencies or a fifth booster. Do not expose shipping free manual 2x. Do not mutate economy from UI Controls. M39 owns the service implementation and cross-engine booster extensions.
