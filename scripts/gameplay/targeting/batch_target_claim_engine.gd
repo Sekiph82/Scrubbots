@@ -31,6 +31,7 @@ const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const FiveSlotBatchEngine = preload("res://scripts/gameplay/slots/five_slot_batch_engine.gd")
 const TargetSelector = preload("res://scripts/gameplay/targeting/target_selector.gd")
 const ReservationState = preload("res://scripts/gameplay/targeting/reservation_state.gd")
+const ProductionTargetAccess = preload("res://scripts/gameplay/dispatch/production_target_access.gd")
 
 var _board = null
 var _batches = null          # FiveSlotBatchEngine
@@ -42,6 +43,9 @@ var _bound: bool = false
 # owned truth used for exact rollback/finalization; ReservationState stays authoritative
 # for live target ownership.
 var _claims: Dictionary = {}
+# Identity counters are MONOTONIC for the whole engine lifetime and are NEVER rewound by
+# reset() (F-M25-V01-STRICT-001): a public claim id / reservation-owner id is never
+# recycled, so a stale pre-reset handle can never act on a post-reset claim.
 var _next_owner: int = 0     # monotonic ReservationState owner id (>=0)
 var _next_claim: int = 1     # monotonic claim/work id suffix
 var _busy: bool = false      # re-entrancy guard for external-collaborator paths
@@ -51,8 +55,14 @@ var _busy: bool = false      # re-entrancy guard for external-collaborator paths
 ## Bind one coherent production bundle. Fails closed (returns false, stays unbound) for
 ## null/foreign/mixed-board dependencies: the selector must be bound to the SAME board +
 ## reservations, and reservations must be bound to the same board (exact-identity).
+## Session-stable / initialization-only (F-M25-V01-STRICT-005): once bound, any further
+## bind() fails closed and preserves the exact original bundle, so a second (even coherent)
+## bind can never migrate a live engine — including while live claims exist. There is no
+## rebind that moves authorities under live claims.
 func bind(board, batch_engine, selector, reservations) -> bool:
 	if _busy:
+		return false
+	if _bound:
 		return false
 	if not (board is BoardState):
 		return false
@@ -148,9 +158,21 @@ func _claim_for_color_guarded(color_id, access_by_slot) -> Dictionary:
 	if slot == -1:
 		return {"ok": false, "error": "no_eligible_batch"}
 	var access = access_by_slot.get(slot, null)
-	if not (access is RefCounted) or not access.has_method("is_targetable"):
-		return {"ok": false, "error": "no_access", "slot": slot}
-	# Mint deterministic unique identities.
+	# Strict production trust boundary (F-M25-V01-STRICT-004): only a canonical
+	# ProductionTargetAccess coherent with the EXACT bound board is accepted as production
+	# reachability truth. A generic method-compatible/all-true RefCounted, a null/malformed
+	# object, or a foreign-board ProductionTargetAccess is rejected here — before any
+	# reservation or M24 mutation.
+	if not (access is ProductionTargetAccess):
+		return {"ok": false, "error": "bad_access", "slot": slot}
+	if not access.is_bound_to_board(_board):
+		return {"ok": false, "error": "foreign_board_access", "slot": slot}
+	# Mint deterministic unique identities. The reservation-owner id must be an integer NOT
+	# already live in the shared ReservationState (F-M25-V01-STRICT-001): skip past any
+	# unrelated live owner (including owner 0 in a fresh session) WITHOUT stealing/releasing
+	# it, so an unrelated reservation can never stall a valid M25 claim.
+	while _reservations.get_target_for_owner(_next_owner) != -1:
+		_next_owner += 1
 	var owner_id := _next_owner
 	var claim_id := "M25C%d" % _next_claim
 	# TargetSelector selects + reserves exactly one target (or -1). It preserves the
@@ -162,11 +184,20 @@ func _claim_for_color_guarded(color_id, access_by_slot) -> Dictionary:
 		# no committed increment, no ledger entry.
 		_batches.set_claimable_work_available(slot, false)
 		return {"ok": false, "error": "no_target", "slot": slot, "waiting": true}
-	# Reserved. Confirm/resume batch ACTIVE, then commit exactly one M24 work unit.
+	# Snapshot the exact lifecycle prestate BEFORE the ACTIVE confirmation so a later commit
+	# failure can restore it (F-M25-V01-STRICT-002). Reserved -> confirm/resume ACTIVE, then
+	# commit exactly one M24 work unit.
+	var prestate = _batches.get_state(slot)
 	_batches.set_claimable_work_available(slot, true)
 	if not _batches.commit_work(slot, claim_id):
-		# M24 commit failed: release exactly the new reservation, publish no claim.
+		# M24 commit failed. Restore EXACT pre-attempt truth: release the new reservation and
+		# roll the lifecycle back to its prestate (WAITING stays WAITING; ACTIVE stays
+		# ACTIVE). No claim published, and NO identity counter advanced — so the attempt
+		# leaves no stale claim/owner alias behind. Capacity is unchanged (committed did not
+		# move), so the WAITING restore is always legal for the batch we selected.
 		_reservations.release(target, owner_id)
+		if prestate == "WAITING":
+			_batches.set_claimable_work_available(slot, false)
 		return {"ok": false, "error": "commit_failed", "slot": slot}
 	# Both reservation + M24 commit proven — advance identities and publish the ledger.
 	_next_owner += 1
@@ -199,9 +230,24 @@ func rollback_claim(claim_id) -> bool:
 	if not _claims.has(claim_id):
 		return false
 	var rec: Dictionary = _claims[claim_id]
+	var target := int(rec["target"])
+	var owner := int(rec["owner_id"])
+	# Preflight EXACT engine-owned tuple coherence BEFORE any destructive mutation
+	# (F-M25-V01-STRICT-003). The reservation pair must still be exactly this claim's
+	# target<->owner, and the M24 committed work identity must still be live+coherent. Any
+	# drift — reservation absent, target reserved by a foreign owner, M24 work stale/absent
+	# — fails closed with the ledger and BOTH canonical halves untouched (no half cleanup,
+	# no false success). This synchronous path has no external callback between preflight
+	# and mutation, so once both halves are proven exact the two mutations below cannot fail.
+	if _reservations.get_owner(target) != owner:
+		return false
+	if _reservations.get_target_for_owner(owner) != target:
+		return false
+	if not _batches.is_work_coherent(claim_id):
+		return false
 	if not _batches.rollback_work(claim_id):
 		return false
-	_reservations.release(int(rec["target"]), int(rec["owner_id"]))
+	_reservations.release(target, owner)
 	_claims.erase(claim_id)
 	return true
 
@@ -242,11 +288,29 @@ func finalize_clear(claim_id) -> bool:
 func reset() -> bool:
 	if _busy:
 		return false
+	# Phase 1 — preflight EVERY live tuple read-only (F-M25-V01-STRICT-003/004). If any
+	# claim's reservation pair or M24 work identity is incoherent, abort WITHOUT mutating
+	# anything and report failure: never silently clear the ledger over orphan
+	# M24/reservation truth.
+	for claim_id in _claims.keys():
+		var rec: Dictionary = _claims[claim_id]
+		var target := int(rec["target"])
+		var owner := int(rec["owner_id"])
+		if _reservations.get_owner(target) != owner:
+			return false
+		if _reservations.get_target_for_owner(owner) != target:
+			return false
+		if not _batches.is_work_coherent(claim_id):
+			return false
+	# Phase 2 — all tuples proven coherent: clean each exactly. Teardown order is M25 claim
+	# cleanup BEFORE any M24 reset (a session caller resets M24/M23 separately) so committed
+	# work rolls back coherently. Only exact pairs are released, so unrelated ReservationState
+	# owners survive untouched.
 	for claim_id in _claims.keys():
 		var rec: Dictionary = _claims[claim_id]
 		_batches.rollback_work(claim_id)
 		_reservations.release(int(rec["target"]), int(rec["owner_id"]))
 	_claims.clear()
-	_next_owner = 0
-	_next_claim = 1
+	# Identity counters stay MONOTONIC across reset (F-M25-V01-STRICT-001): a claim id /
+	# owner id is NEVER recycled, so stale pre-reset handles stay permanently invalid.
 	return true
