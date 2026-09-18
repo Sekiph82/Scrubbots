@@ -1,7 +1,7 @@
 # OWNER GAMEPLAY BOTTOM ROW SPEED CONTROL DECISION V01
 
 Date: 2026-09-18
-Status: OWNER-LOCKED
+Status: SUPERSEDED BY `coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md`
 Repository: `Sekiph82/Scrubbots`
 Scope: M28 production gameplay-screen composition
 
@@ -34,3 +34,18 @@ This owner decision supersedes:
 - canonical gameplay-reference inventory notes that summarize the older pause/settings composition.
 
 The canonical gameplay reference image remains the layout reference. This decision is an intentional owner override for the missing bottom-right speed-up control.
+
+
+## Supersession note — 2026-09-19
+
+`coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md` supersedes this placement decision.
+
+Current canonical gameplay placement is:
+- top-left player/profile chip;
+- top-right Pause + 2x side by side;
+- no Settings button on gameplay screen;
+- no Heart HUD during normal gameplay;
+- no mandatory ad banner in the current owner playtest/reference image;
+- board + Railroad V1 + five permanent slot connectors + five-slot/Batch Supply structure remain central.
+
+This file remains historical evidence for the earlier bottom-row concept only.
