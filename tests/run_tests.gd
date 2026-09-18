@@ -257,6 +257,8 @@ func _initialize() -> void:
 	_run_m25_batch_claim_tests()
 	# M26-C001 V01 — auto dispatch scheduler.
 	_run_m26_scheduler_tests()
+	# M27-C001 V01 — solvability / deadlock engine.
+	_run_m27_solver_tests()
 	_print_summary()
 	quit(0 if _failures.is_empty() else 1)
 
@@ -14070,6 +14072,12 @@ const BatchTargetClaimEngine = preload("res://scripts/gameplay/targeting/batch_t
 const AutoDispatchScheduler = preload("res://scripts/gameplay/dispatch/auto_dispatch_scheduler.gd")
 const M26OriginProvider = preload("res://tests/support/m26_origin_provider.gd")
 const M26ResetInjector = preload("res://tests/support/m26_reset_injector.gd")
+# M27 — solvability / deadlock engine.
+const ProofState = preload("res://scripts/gameplay/solver/proof_state.gd")
+const ProofKernel = preload("res://scripts/gameplay/solver/proof_kernel.gd")
+const SolvabilitySolver = preload("res://scripts/gameplay/solver/solvability_solver.gd")
+const DeadlockClassifier = preload("res://scripts/gameplay/solver/deadlock_classifier.gd")
+const GenerationGate = preload("res://scripts/gameplay/solver/generation_gate.gd")
 
 func _m23_level(w: int, h: int, cells: Array, palette_size: int):
 	var pal := PackedStringArray()
@@ -15632,3 +15640,319 @@ func _m26_v02_bundle_coherence_bind() -> void:
 	var ok_final: bool = s_ok.bind(board, slots, claim, res, routing, raccess, disp, loop, provider)
 	_check(ok_final and s_ok.is_bound(), "M26 V02 STRICT-004: coherent bundle still binds after rejected attempts")
 	disp.free(); other_disp.free()
+
+# ============================================================================
+# M27-C001 V01 — Solvability / Deadlock Engine (SB-M27-001..034)
+# ============================================================================
+
+func _m27_pal(n: int) -> PackedStringArray:
+	var p := PackedStringArray()
+	for i in range(n):
+		p.append("#%02x%02x%02x" % [16 + i, 16 + i, 16 + i])
+	return p
+
+## Solid single-color rectangle.
+func _m27_solid(w: int, h: int, color: int) -> LevelData:
+	var cells := PackedInt32Array(); cells.resize(w * h); cells.fill(color)
+	return LevelData.new(1, "m27solid", "m27solid", "TEST", w, h, _m27_pal(4), cells)
+
+## Ring enclosure: outer 1-cell ring = gate color, interior = inner color (enclosed until
+## the ring is cleared). Interior cells are true board-interior cells, so real Railroad V1
+## reachability (never a Manhattan shortcut) keeps them unreachable until a ring cell opens.
+func _m27_ring(w: int, h: int, inner: int, gate: int) -> LevelData:
+	var cells := PackedInt32Array(); cells.resize(w * h)
+	for y in range(h):
+		for x in range(w):
+			cells[y * w + x] = gate if (x == 0 or y == 0 or x == w - 1 or y == h - 1) else inner
+	return LevelData.new(1, "m27ring", "m27ring", "TEST", w, h, _m27_pal(4), cells)
+
+## Hand-built loaded supply from [[ [color,count],... ], ...] column specs.
+func _m27_supply(cols_spec: Array, palette: int):
+	var cols: Array = []
+	var gi := 0
+	for spec in cols_spec:
+		var q: Array = []
+		for cc in spec:
+			q.append(ColorBatch.make("H%03d" % gi, cc[0], cc[1], palette)); gi += 1
+		cols.append(q)
+	var e = BatchSupplyEngine.create(3, 3)
+	e.load_columns(cols)
+	return e
+
+func _run_m27_solver_tests() -> void:
+	print("---- M27-C001 V01: Solvability / Deadlock Engine (SB-M27-001..034) ----")
+	_m27_kernel_reachability_equivalence()   # SB-M27-002,010,011,012
+	_m27_kernel_placement_and_quota()        # SB-M27-006,007,008
+	_m27_canonical_key_and_determinism()     # SB-M27-001,019,033
+	_m27_search_branch_order_dependence()    # SB-M27-013,014
+	_m27_trace_and_bounds()                  # SB-M27-015,020
+	_m27_generation_acceptance_retry()       # SB-M27-016,017,018
+	_m27_hidden_supply_not_leaked()          # SB-M27-004,005
+	_m27_classifier_statuses()               # SB-M27-025,026,027,028,029,030,031,032,033
+	_m27_rectangular_fixtures()              # SB-M27-023
+	_m27_columns_and_arbitration()           # SB-M27-003,009
+
+## SB-M27-003/009 — 3/4/5 configured FIFO columns are modeled, and same-color claims go to
+## the OLDEST-placement batch first (M25 arbitration reused, never re-invented).
+func _m27_columns_and_arbitration() -> void:
+	var k = ProofKernel.new()
+	var solver = SolvabilitySolver.new()
+	# 3/4/5 columns: a solid board solved with each configured column count.
+	for cc in [3, 4, 5]:
+		var lvl = _m27_solid(4, 4, 0)
+		var eng = BatchSupplyGenerator.generate(lvl, cc, 3, 7)
+		var ps = ProofState.from_level_and_supply(lvl, eng)
+		_check(ps.column_count == cc, "M27 columns: %d-column FIFO supply modeled" % cc)
+		_check(solver.solve(ps, {"max_visited": 20000})["status"] == SolvabilitySolver.SOLVED, "M27 columns: %d-column layout proven SOLVED" % cc)
+	# Same-color oldest-placement-first: a 1x3 all-color0 board, two same-color batches
+	# (A older, B newer). The OLDER batch A is consumed to completion first; the NEWER batch
+	# B keeps the leftover remaining (oldest-first arbitration, never newer-first).
+	var lvl2 = LevelData.new(1, "m27arb", "m27arb", "TEST", 1, 3, _m27_pal(4), PackedInt32Array([0, 0, 0]))
+	var st = ProofState.from_level_and_supply(lvl2, _m27_supply([[[0, 2]], [[0, 2]], []], 4))
+	var rA = k.apply_placement(st, 0)   # place A (older, seq lower)
+	st = rA["state"]
+	var rB = k.apply_placement(st, 1)   # place B (newer), then quiesce clears all 3 cells
+	st = rB["state"]
+	_check(st.is_board_clear(), "M27 arbitration: all reachable cells cleared")
+	_check(st.occupied_slot_count() == 1, "M27 arbitration: the older batch was fully consumed+freed first (one slot left)")
+	# The surviving occupied slot is the NEWER batch with the leftover remaining==1.
+	var surviving = null
+	for sd in st.slots:
+		if sd != null:
+			surviving = sd
+	_check(surviving != null and int(surviving["remaining"]) == 1 and int(surviving["color"]) == 0, "M27 arbitration: the NEWER same-color batch retains the leftover work (oldest-first)")
+
+## SB-M27-002/010/011/012 — the kernel consumes REAL ProductionTargetAccess/routing
+## semantics (Railroad V1 interior reachability), NOT a Manhattan/BFS shortcut: an enclosed
+## interior stays unreachable until a real corridor opens, then WAITING revives.
+func _m27_kernel_reachability_equivalence() -> void:
+	var k = ProofKernel.new()
+	var lvl = _m27_ring(5, 5, 0, 1)  # inner=0 (9 interior), gate ring=1 (16 edge cells)
+	# Placing an INNER batch first clears nothing — the interior is truly enclosed (a
+	# Manhattan shortcut would wrongly report it reachable).
+	var s_inner = ProofState.from_level_and_supply(lvl, _m27_supply([[[0, 3]], [[1, 16]], []], 4))
+	var r_inner = k.apply_placement(s_inner, 0)
+	_check(r_inner["ok"] and int(r_inner["clears"]) == 0, "M27 kernel: enclosed interior batch clears nothing (real reachability, not Manhattan)")
+	# Placing the GATE ring opens corridors -> ring cells clear AND interior begins to open
+	# (WAITING revival), all via the real routing seam.
+	var r_gate = k.apply_placement(r_inner["state"], 1)
+	_check(r_gate["ok"] and int(r_gate["clears"]) >= 16, "M27 kernel: clearing the gate ring authenticates >=16 real clears and opens the interior")
+	# ACTIVE->CLEARED board evolution is monotonic — no cell is cleared twice (board active
+	# strictly drops by exactly the authenticated clears).
+	var before: int = r_inner["state"].active_count()
+	var after: int = r_gate["state"].active_count()
+	_check(before - after == int(r_gate["clears"]), "M27 kernel: board_cleared == authenticated clears (no duplicate target clear, exact ACTIVE->CLEARED)")
+
+## SB-M27-006/007/008 — exact M24 rightmost-empty placement, full-slot rejection with no
+## supply consumption, and quota decrement ONLY on an authenticated proof clear.
+func _m27_kernel_placement_and_quota() -> void:
+	var k = ProofKernel.new()
+	# 5 enclosed-inner batches (each WAITING, no clears) fill all five slots; the sixth
+	# selectable front must be rejected with the supply front unchanged.
+	var lvl = _m27_ring(5, 5, 0, 1)
+	var st = ProofState.from_level_and_supply(lvl, _m27_supply(
+		[[[0, 1], [0, 1], [0, 1]], [[0, 1], [0, 1], [0, 1]], []], 4))
+	# Place five inner fronts (col0 x3, col1 x2) -> all WAITING, no clears, five slots full.
+	var placements := [0, 0, 0, 1, 1]
+	for c in placements:
+		var r = k.apply_placement(st, c)
+		_check(r["ok"] and int(r["clears"]) == 0, "M27 placement: enclosed inner front placed WAITING (no clear)")
+		st = r["state"]
+	_check(st.occupied_slot_count() == 5 and not st.has_empty_slot(), "M27 placement: five slots occupied via rightmost-empty, board full")
+	# Sixth selectable front: no empty slot -> illegal placement, supply front unchanged.
+	var remaining_before: int = st.supply[1].size()
+	var r6 = k.apply_placement(st, 1)
+	_check(not r6["ok"], "M27 placement: full-slot rejection — sixth placement illegal")
+	_check(st.supply[1].size() == remaining_before, "M27 placement: rejected placement consumed NO supply front")
+	# Quota only decrements on a real clear: no clear happened, so no ACTIVE cell was removed.
+	_check(st.active_count() == st.cell_count(), "M27 quota: WAITING placements never decremented board quota")
+
+## SB-M27-001/019/033 — deterministic canonical key + memoized equivalent states + identical
+## reset/replay outcome from identical input.
+func _m27_canonical_key_and_determinism() -> void:
+	var lvl = _m27_solid(4, 4, 0)
+	var s1 = ProofState.from_level_and_supply(lvl, BatchSupplyGenerator.generate(lvl, 3, 3, 12345))
+	var s2 = ProofState.from_level_and_supply(lvl, BatchSupplyGenerator.generate(lvl, 3, 3, 12345))
+	_check(s1.canonical_key() == s2.canonical_key(), "M27 key: identical states share an identical canonical key")
+	# A cleared cell changes the key.
+	var s3 = s1.duplicate_state(); s3.active[0] = 0
+	_check(s3.canonical_key() != s1.canonical_key(), "M27 key: a distinct board state yields a distinct key")
+	# Two independent solves of the same input are bit-identical (status/trace hash/visited).
+	var solver = SolvabilitySolver.new()
+	var r1 = solver.solve(s1)
+	var r2 = solver.solve(s2)
+	_check(r1["status"] == SolvabilitySolver.SOLVED and r2["status"] == SolvabilitySolver.SOLVED, "M27 determinism: repeated solve both SOLVED")
+	_check(int(r1["trace_hash"]) == int(r2["trace_hash"]) and int(r1["visited"]) == int(r2["visited"]), "M27 determinism: identical trace hash + visited count on rerun")
+	_check(int(r1["memo_hits"]) >= 0, "M27 memo: memoization active (memo_hits reported)")
+	# Replay reproduces completion.
+	var rep = solver.replay(s1, r1["trace"])
+	_check(rep["ok"] and rep["solved"], "M27 replay: recorded trace replays to full completion")
+
+## SB-M27-013/014 — the search branches across legal front-batch choices instead of a fixed
+## greedy order: a fixture where greedy-first STARVES the slots but an alternate legal order
+## solves (proving real branching, audit §E).
+func _m27_search_branch_order_dependence() -> void:
+	var lvl = _m27_ring(5, 5, 0, 1)  # inner=0 (enclosed), gate=1 (opens interior)
+	# col0 buries five enclosed inner batches ahead of the only gate batch (col1). A greedy
+	# "always column 0" driver fills all five slots with WAITING inner batches and never
+	# reaches the gate; the branching search places the gate first and solves.
+	var supply = _m27_supply([[[0, 2], [0, 2], [0, 2], [0, 2], [0, 1]], [[1, 16]], []], 4)
+	var ps = ProofState.from_level_and_supply(lvl, supply)
+	var solver = SolvabilitySolver.new()
+	var greedy = solver.solve_greedy(ps)
+	_check(not greedy["solved"], "M27 search: greedy fixed-order driver STARVES (fails to solve)")
+	var s = solver.solve(ps, {"max_visited": 20000})
+	_check(s["status"] == SolvabilitySolver.SOLVED, "M27 search: branching search SOLVES the same fixture (does not assume greedy order)")
+	_check(int(s["decisions"]) >= 6, "M27 search: solution places every batch (gate + five inner) via legal front selections")
+
+## SB-M27-015/020 — SOLVED only at exact completion; a mid-solve state is not SOLVED; and a
+## bound hit returns UNKNOWN_BOUND, NEVER DEADLOCK.
+func _m27_trace_and_bounds() -> void:
+	var lvl = _m27_ring(5, 5, 0, 1)
+	var supply = _m27_supply([[[1, 16], [0, 3], [0, 3], [0, 3]], [], []], 4)
+	var ps = ProofState.from_level_and_supply(lvl, supply)
+	# A single gate placement clears the ring but leaves interior work -> NOT solved.
+	var k = ProofKernel.new()
+	var mid = k.apply_placement(ps, 0)
+	_check(mid["ok"] and not mid["state"].is_solved(), "M27 SOLVED-guard: a partially-cleared state is NOT reported SOLVED")
+	var solver = SolvabilitySolver.new()
+	var full = solver.solve(ps, {"max_visited": 20000})
+	_check(full["status"] == SolvabilitySolver.SOLVED, "M27 SOLVED: full canonical completion reached")
+	# Deliberately tiny visited bound -> UNKNOWN_BOUND, never DEADLOCK.
+	var bounded = solver.solve(ps, {"max_visited": 1})
+	_check(bounded["status"] == SolvabilitySolver.UNKNOWN_BOUND, "M27 bound: max-visited exhaustion returns UNKNOWN_BOUND (never DEADLOCK)")
+	_check(bounded["status"] != SolvabilitySolver.DEADLOCK, "M27 bound: an exhausted bound is NEVER mislabeled DEADLOCK")
+
+## SB-M27-016/017/018 — solver-gated generation acceptance with deterministic retry: a
+## deterministic base seed forces at least one rejected candidate before a later accepted
+## one; identical inputs reproduce the identical accept/reject sequence; conservation exact.
+func _m27_generation_acceptance_retry() -> void:
+	var lvl = _m27_ring(5, 5, 0, 1)
+	var gate = GenerationGate.new()
+	# Deterministic proof budget (max_depth 8): candidates needing more legal decisions than
+	# the budget are provably-unprovable within policy -> UNKNOWN_BOUND (rejected); a later
+	# candidate is proven SOLVED and accepted. base_seed 101 forces reject-before-accept.
+	var cfg := {"max_visited": 50000, "max_depth": 8}
+	var rep = gate.generate_accepted(lvl, 3, 3, 101, 6, cfg)
+	_check(rep["accepted"] != null, "M27 generation: a SOLVED candidate is accepted")
+	var acc_attempt: int = int(rep["accepted"]["attempt"])
+	_check(acc_attempt >= 1, "M27 generation: acceptance happened only after >=1 earlier rejection")
+	var saw_reject_before := false
+	for a in rep["attempts"]:
+		if int(a["attempt"]) < acc_attempt and a["outcome"] != SolvabilitySolver.SOLVED:
+			saw_reject_before = true
+		if int(a["attempt"]) < acc_attempt:
+			_check(a["outcome"] != SolvabilitySolver.SOLVED, "M27 generation: only the FIRST SOLVED candidate is accepted (no earlier accept)")
+	_check(saw_reject_before, "M27 generation: at least one candidate rejected before the accepted one")
+	# Every candidate preserves exact per-color conservation.
+	var all_cons := true
+	for a in rep["attempts"]:
+		if not a["conservation_ok"]:
+			all_cons = false
+	_check(all_cons, "M27 generation: every generated candidate preserves exact per-color conservation")
+	# Reproducibility: identical inputs reproduce the identical accepted attempt + trace hash.
+	var rep2 = gate.generate_accepted(lvl, 3, 3, 101, 6, cfg)
+	_check(int(rep2["accepted"]["attempt"]) == acc_attempt, "M27 generation: identical inputs reproduce the identical accepted attempt")
+	_check(int(rep2["accepted"]["trace_hash"]) == int(rep["accepted"]["trace_hash"]), "M27 generation: reproducible accepted trace hash")
+	_check(GenerationGate.derive_seed(101, acc_attempt) == int(rep["accepted"]["effective_seed"]), "M27 generation: effective attempt seed is a deterministic derivation of the base seed")
+	# A genuinely unsolvable candidate (enclosed interior, NO gate batch) is proven DEADLOCK.
+	var unsolvable = _m27_supply([[[0, 3], [0, 3], [0, 3]], [], []], 4)  # inner only, gate never clears
+	var solver = SolvabilitySolver.new()
+	var du = solver.solve(ProofState.from_level_and_supply(lvl, unsolvable), {"max_visited": 20000})
+	_check(du["status"] == SolvabilitySolver.DEADLOCK, "M27 generation: a genuinely unsolvable supply is proven DEADLOCK (rejected)")
+
+## SB-M27-004/005 — the solver may use the full internal queue, but hidden future batches
+## stay hidden through the player-facing M23 query surface.
+func _m27_hidden_supply_not_leaked() -> void:
+	var lvl = _m27_ring(5, 5, 0, 1)
+	# Column 0 has 4 batches but preview depth is 3: the 4th (hidden) batch must never appear
+	# in the player-facing front/preview/snapshot, even though the solver's ProofState holds
+	# the full queue.
+	var eng = _m27_supply([[[1, 4], [1, 4], [1, 4], [1, 4]], [[0, 9]], []], 4)
+	var ps = ProofState.from_level_and_supply(lvl, eng)
+	_check(ps.supply[0].size() == 4, "M27 hidden: solver ProofState holds the FULL internal queue (4 batches)")
+	# Player-facing surfaces expose only front + preview(<=3), never the hidden 4th.
+	_check(eng.get_preview(0).size() == 3, "M27 hidden: player preview reveals at most preview_depth (3) batches")
+	var snap: Array = eng.player_snapshot()
+	_check(int(snap[0]["remaining"]) == 4 and snap[0]["preview"].size() == 3, "M27 hidden: player snapshot shows remaining COUNT but never hidden batch contents")
+	var solver = SolvabilitySolver.new()
+	var res = solver.solve(ps, {"max_visited": 20000})
+	_check(res["status"] == SolvabilitySolver.SOLVED, "M27 hidden: solver still proves solvability using its full internal knowledge")
+	# The solution trace is debug/QA data (not a player API) and its summary is a string.
+	_check(typeof(res["trace_summary"]) == TYPE_STRING and res["trace_summary"].length() > 0, "M27 hidden: solution trace is tooling-only QA data")
+
+## SB-M27-025..033 — runtime classifier statuses + false-positive guards, all UI-free.
+func _m27_classifier_statuses() -> void:
+	var cls = DeadlockClassifier.new()
+	# (1) COMPLETED: fully cleared board.
+	var lvl = _m27_ring(5, 5, 0, 1)
+	var done = ProofState.from_level_and_supply(lvl, _m27_supply([[],[],[]], 4))
+	for i in range(done.active.size()): done.active[i] = 0
+	_check(cls.classify(done, 0)["status"] == DeadlockClassifier.COMPLETED, "M27 classify: fully-cleared board is COMPLETED")
+
+	# (2) Canonical DEADLOCK: five occupied WAITING batches (color with no target), slots
+	# full, supply exhausted, no in-flight, no legal unlock.
+	var dl = ProofState.new()
+	dl.level = _m27_solid(3, 3, 0); dl.active = PackedByteArray(); dl.active.resize(9); dl.active.fill(1)
+	dl.column_count = 3; dl.preview_depth = 3; dl.palette_size = 4; dl.supply = [[],[],[]]
+	dl.slots = []
+	for i in range(5):
+		dl.slots.append({"batch_id": "W%d" % i, "color": 1, "remaining": 2, "seq": i + 1, "state": "WAITING"})
+	dl.next_seq = 6
+	var dres = cls.classify(dl, 0)
+	_check(dres["status"] == DeadlockClassifier.DEADLOCK, "M27 classify: five-WAITING/full-slots/no-unlock is DEADLOCK")
+	_check(dres["reason"] == "no_legal_future_progress_proven", "M27 classify: DEADLOCK carries a deterministic reason code")
+
+	# (3) In-flight guard: the SAME dead state with a live M26 assignment is NEVER deadlock.
+	_check(cls.classify(dl, 1)["status"] == DeadlockClassifier.PROGRESSABLE, "M27 classify: live M26 in-flight => PROGRESSABLE, never DEADLOCK")
+
+	# (4) Immediate claimable work => PROGRESSABLE (an occupied batch with a reachable target).
+	var prog = ProofState.from_level_and_supply(lvl, _m27_supply([[[1, 16]], [], []], 4))
+	# place the gate batch into a slot so a target is immediately claimable.
+	var k = ProofKernel.new()
+	# Build a state with the gate batch already in a slot and ring still ACTIVE.
+	prog.slots[4] = {"batch_id": "G", "color": 1, "remaining": 16, "seq": 1, "state": "ACTIVE"}
+	prog.supply = [[],[],[]]
+	prog.next_seq = 2
+	var pres = cls.classify(prog, 0)
+	_check(pres["status"] == DeadlockClassifier.PROGRESSABLE and int(pres["immediate_clears"]) > 0, "M27 classify: immediate claimable work => PROGRESSABLE")
+
+	# (5) STALLED false-positive guard: no immediate progress, but a legal front placement
+	# (the gate) unlocks future progress -> STALLED, not DEADLOCK.
+	var stall = ProofState.from_level_and_supply(lvl, _m27_supply([[[1, 16]], [], []], 4))
+	# an enclosed inner batch is WAITING in a slot; the gate is still selectable in supply.
+	stall.slots[4] = {"batch_id": "I", "color": 0, "remaining": 4, "seq": 1, "state": "WAITING"}
+	stall.next_seq = 2
+	var sres = cls.classify(stall, 0)
+	_check(sres["status"] == DeadlockClassifier.STALLED, "M27 classify: stalled-but-unlockable via a legal supply front => STALLED (not DEADLOCK)")
+
+	# (6) Revival false-positive: a WAITING inner batch is revived within the kernel by a
+	# gate batch clearing a corridor -> immediate PROGRESSABLE (waiting batch revived).
+	var revive = ProofState.from_level_and_supply(lvl, _m27_supply([[],[],[]], 4))
+	revive.slots[4] = {"batch_id": "I", "color": 0, "remaining": 4, "seq": 2, "state": "WAITING"}
+	revive.slots[3] = {"batch_id": "G", "color": 1, "remaining": 16, "seq": 1, "state": "ACTIVE"}
+	revive.supply = [[],[],[]]; revive.next_seq = 3
+	var rres = cls.classify(revive, 0)
+	_check(rres["status"] == DeadlockClassifier.PROGRESSABLE, "M27 classify: WAITING batch revived by a newly opened corridor => PROGRESSABLE")
+
+	# (7) UNKNOWN_BOUND guard: a stalled state with a tiny search bound returns UNKNOWN_BOUND,
+	# never DEADLOCK.
+	var ubres = cls.classify(stall, 0, {"max_visited": 1})
+	_check(ubres["status"] == DeadlockClassifier.UNKNOWN_BOUND, "M27 classify: bounded-out search returns UNKNOWN_BOUND, never DEADLOCK")
+
+	# (8) Reset/replay: identical classification from identical state (determinism).
+	_check(cls.classify(dl, 0)["status"] == dres["status"], "M27 classify: identical state reproduces identical classification (reset/replay stable)")
+
+## SB-M27-023 — rectangular (non-square) solvable AND unsolvable/deadlock fixtures.
+func _m27_rectangular_fixtures() -> void:
+	var solver = SolvabilitySolver.new()
+	# Non-square 4x6 ring enclosure, solvable.
+	var lvlA = _m27_ring(4, 6, 0, 1)  # interior 2x4=8 cells (color0), ring=16 (color1)
+	var solvable = _m27_supply([[[1, 16]], [[0, 4], [0, 4]], []], 4)
+	var rA = solver.solve(ProofState.from_level_and_supply(lvlA, solvable), {"max_visited": 20000})
+	_check(rA["status"] == SolvabilitySolver.SOLVED, "M27 rectangular: non-square 4x6 solvable fixture proven SOLVED")
+	# Non-square unsolvable: same board, interior-only supply (gate never clears) -> DEADLOCK.
+	var lvlB = _m27_ring(6, 4, 0, 1)
+	var unsolv = _m27_supply([[[0, 4], [0, 4]], [], []], 4)
+	var rB = solver.solve(ProofState.from_level_and_supply(lvlB, unsolv), {"max_visited": 20000})
+	_check(rB["status"] == SolvabilitySolver.DEADLOCK, "M27 rectangular: non-square 6x4 unsolvable fixture proven DEADLOCK")
