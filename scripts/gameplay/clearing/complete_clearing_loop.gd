@@ -57,6 +57,17 @@ const DispatchResult = preload("res://scripts/gameplay/dispatch/dispatch_result.
 const SLOT_COUNT := 5
 const DEFAULT_SPEED := 6.0
 
+## M26 post-commit authenticated-clear notification (M26-C001 §J). Emitted EXACTLY
+## ONCE per committed CLEARED transaction, AFTER BoardState -> candidate ->
+## reservation -> dispatcher finalize all succeed and the optional renderer repaint
+## runs, carrying the immutable owner/target/color/agent identity of the cleared
+## assignment. It is NEVER emitted on a preflight rejection, any rollback, a failed/
+## fatal transaction, or a reset. The M26 Auto Dispatch Scheduler listens to THIS to
+## map an authenticated clear back to its exact live M25 claim and call
+## M25.finalize_clear() exactly once. Legacy M20 behavior is unchanged — no listener
+## is required and the direct-color activate_slot path is untouched.
+signal authenticated_clear(owner_id: int, target_index: int, color_id: int, agent)
+
 ## Stable arrival-transaction outcomes (observation/testing only — the loop
 ## introduces NO win/lose/session policy).
 class Outcome:
@@ -91,6 +102,11 @@ var _renderer_expected: bool = false
 
 var _bound: bool = false
 var _arrival_cb: Callable = Callable()
+## True when bound through the M26 arrival-only seam (no direct-color SlotSystem).
+## In this mode activate_slot() is disabled (there is no slot authority to read) but
+## the authenticated-arrival clear transaction + authenticated_clear notification run
+## exactly as in the legacy bind. Committed only on a successful bind (F-M26 §J).
+var _arrival_only: bool = false
 
 # --- transaction guards / generation -----------------------------------------
 ## Armed only while bind() validates/commits, so a nested bind() from a bind-time
@@ -147,17 +163,37 @@ func bind(board, slot_system, candidate_index, reservation_state, dispatcher, re
 	_in_bind = false
 	return ok
 
+## M26 arrival-only bind (M26-C001 WP03). Binds the SAME clearing bundle MINUS the
+## direct-color SlotSystem, so the production M26 batch scheduler can consume
+## authenticated arrivals (and receive the authenticated_clear notification) without
+## fabricating a fake historical SlotSystem. activate_slot() is disabled in this
+## mode. The legacy bind()/activate_slot() path and every M20 test are unchanged.
+func bind_arrival_only(board, candidate_index, reservation_state, dispatcher, renderer = null) -> bool:
+	if _bound:
+		return false
+	if _in_bind:
+		return false
+	_in_bind = true
+	var ok := _bind_txn(board, null, candidate_index, reservation_state, dispatcher, renderer)
+	_in_bind = false
+	return ok
+
 func _bind_txn(board, slot_system, candidate_index, reservation_state, dispatcher, renderer) -> bool:
 	# Exact production script identity for the four dependencies M20 has no reason
 	# to accept subclasses of.
 	if not _is_exact_script(board, BoardState):
 		return false
-	if not _is_exact_script(slot_system, SlotSystem):
-		return false
-	if not slot_system.is_configured():
-		return false
-	if slot_system.get_slot_count() != SLOT_COUNT:
-		return false
+	# SlotSystem is required for the legacy direct-color path, and INTENTIONALLY null
+	# for the M26 arrival-only seam (typed null => arrival-only). Any non-null value
+	# must be the exact configured production SlotSystem.
+	var arrival_only: bool = slot_system == null
+	if not arrival_only:
+		if not _is_exact_script(slot_system, SlotSystem):
+			return false
+		if not slot_system.is_configured():
+			return false
+		if slot_system.get_slot_count() != SLOT_COUNT:
+			return false
 	# V03 §2: candidate index and reservation state are narrowed to EXACT
 	# production script identity too — no subclass may enter the production trust
 	# boundary, so an adversarial candidate/reservation callback class is
@@ -202,12 +238,13 @@ func _bind_txn(board, slot_system, candidate_index, reservation_state, dispatche
 	# Commit the bundle as bound ONLY now (nothing above is committed on failure).
 	# The renderer-presence bit is committed on success only.
 	_board = board
-	_slots = slot_system
+	_slots = slot_system  # null in arrival-only mode; never read while _arrival_only.
 	_candidates = candidate_index
 	_reservations = reservation_state
 	_dispatcher = dispatcher
 	_renderer = renderer
 	_renderer_expected = renderer_expected
+	_arrival_only = arrival_only
 	_arrival_cb = cb
 	_bound = true
 	return true
@@ -254,6 +291,10 @@ func _probe(board, ci, rs, disp, renderer, renderer_expected: bool) -> bool:
 ## delegated entirely to the dispatcher path.
 func activate_slot(slot_id, start_position: Vector2, speed: float = DEFAULT_SPEED) -> RefCounted:
 	if not _bound:
+		return _fail(DispatchResult.FailureReason.INVALID_REQUEST)
+	# Arrival-only bind has no direct-color SlotSystem authority to activate. The M26
+	# scheduler drives dispatch through ScrubbotDispatcher.dispatch_preclaimed instead.
+	if _arrival_only:
 		return _fail(DispatchResult.FailureReason.INVALID_REQUEST)
 	if _in_activation or _draining:
 		return _fail(DispatchResult.FailureReason.REENTRANT)
@@ -407,6 +448,10 @@ func _run_transaction(t: Dictionary, my_gen: int) -> StringName:
 		_renderer.update_cells([target])
 
 	_cleared_count += 1
+	# 7. M26 post-commit authenticated-clear notification (§J). Emitted only HERE, on
+	# the single committed-CLEARED path, after every authority resolved — never on a
+	# rollback/failure/reset path above. Exactly one emission per committed clear.
+	authenticated_clear.emit(owner, target, color, agent)
 	return Outcome.CLEARED
 
 ## Full pre-mutation preflight. Any false leaves gameplay truth untouched.
