@@ -22,7 +22,7 @@ assets/ui/
 └── final/
     ├── common/{icons,currencies,badges,frames,navigation,effects}/
     ├── characters/{scrubby,helper_bots}/
-    ├── home/{background,environment,platform,area_banner,top_hud,event_progress,shortcuts,play_cta,reward_track,bottom_nav}/
+    ├── home/{background,environment,platform,area_banner,top_hud,gift_meter,shortcuts,play_cta,reward_track,bottom_nav}/
     ├── boosters/
     ├── rewards/
     ├── difficulty/
@@ -45,3 +45,15 @@ sky → far city → mid city → street foreground
 ```
 
 Normal UI copy, values, timers, prices and counters remain live Godot text. Generated art contains no baked dynamic text.
+
+
+## Economy V1 naming
+
+Production Home/UI assets follow `coordination/OWNER_ECONOMY_REWARDS_V01.md`:
+- `scrub_bucks`, never coin/star currency;
+- `bot_parts`, never profile XP;
+- `gift_meter`, never event points;
+- `cards_exchange`, never star exchange;
+- reward-track star currency art must not be reintroduced.
+
+Decorative sparkles may still be star-shaped, but no decorative shape creates an economic Star balance.
