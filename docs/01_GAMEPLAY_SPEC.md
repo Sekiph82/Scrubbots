@@ -9,6 +9,9 @@ Status tags:
 Canonical difficulty/progression owner decision:
 `coordination/OWNER_DIFFICULTY_PROGRESSION_DECISION_V01.md`
 
+Canonical economy/rewards owner decision:
+`coordination/OWNER_ECONOMY_REWARDS_V01.md`
+
 ## Board `[LOCKED — variable-size engine; Difficulty V1 owner update 2026-09-12]`
 
 - Logical grid is **variable-size**: width and height come from level data.
@@ -96,11 +99,14 @@ Therefore a 20x20 source may occupy a large region of the phone screen. Converse
 
 High-resolution support must never be interpreted as permission to make every HARD/VERY_HARD level large.
 
-## Slots `[LOCKED]`
+## Slots `[LOCKED — Economy V1 amendment 2026-09-18]`
 
-- Exactly **5** slots are active in the primary gameplay presentation.
-- Each slot corresponds to a color/robot type.
-- The player interacts with slots to dispatch Scrubbots.
+- Normal authoritative gameplay capacity is **5** execution slots.
+- The owner-locked **+1 Slot booster** may expand authoritative capacity to exactly **6** for the current attempt.
+- No state may exceed 6 slots in V1.
+- Slot-capacity truth must be shared by placement, scheduler, solver/deadlock and presentation; a sixth slot is never presentation-only.
+- Each occupied slot owns a color/count batch under the Batch Gameplay Core rules.
+- The player selects legal supply-front batches; normal placement goes to the rightmost EMPTY slot automatically.
 - Future queue/cooldown/stack mechanics are not implied by Difficulty V1 and may not be invented merely to raise a score.
 
 ## Scrubbot behavior `[LOCKED]`
@@ -293,23 +299,42 @@ The general concept is to clear the board, but exact win/lose conditions such as
 
 Difficulty V1 does not silently invent a fail mechanic.
 
-## Consecutive win-streak reward mapping `[LOCKED]`
+## Consecutive win-streak reward mapping `[LOCKED — Economy V1]`
 
-| Consecutive wins | Reward |
+| Consecutive progression wins | Scrub Bucks streak bonus |
 |---|---:|
-| 1 | 1 |
-| 2 | 5 |
-| 3 | 10 |
-| 4 | 25 |
-| 5 or more | 100 |
+| 1 | +1 SB |
+| 2 | +5 SB |
+| 3 | +10 SB |
+| 4 | +25 SB |
+| 5 or more | +100 SB per win |
 
-This maps consecutive-win count to reward. Do not reinterpret `1,5,10,25` as thresholds.
+This maps consecutive-win count to **Scrub Bucks**. Do not reinterpret `1,5,10,25` as thresholds.
 
-Economy around this reward remains `[TO BE DESIGNED]`.
+Only this Win Streak SB bonus advances Gift Meter by the same numeric amount. Base level SB, Daily, Cards Exchange and other grants never advance Gift Meter.
 
-## Detailed economy / shop / monetization `[TO BE DESIGNED]`
+Every multiple-of-5 active progression streak grants +1 Bot Part.
 
-Not authorized here. Difficulty/retention design does not authorize ads, energy systems, paid retries, dynamic monetization walls or failure manipulation.
+## Economy / rewards / Hearts / boosters `[OWNER-LOCKED V1]`
+
+Canonical source:
+`coordination/OWNER_ECONOMY_REWARDS_V01.md`
+
+Machine tuning:
+`data/config/economy_rewards_v1.json`
+
+Core V1 rules:
+- Scrub Bucks are the only general spendable soft currency.
+- Stars and Event Points are removed.
+- Bot Parts unlock robots only; each post-Scrubby robot costs 250 Bot Parts.
+- Hearts max at 5 and regenerate one per 30 real-world minutes.
+- Duplicate cards exchange to SB through Cards Exchange.
+- Production manual 2x is paid/entitlement-gated; automatic M23-exhausted 2x remains free.
+- Exactly four boosters exist: +1 Slot, Random, Selector and Tornado.
+- Daily includes a consecutive-login counter and repeating 5-day rewards.
+- Gift Meter thresholds are 10/50/250/500/1000 and progress ONLY from Win Streak SB.
+
+Real-money IAP/ads/subscriptions remain a separate M57 owner gate; Economy V1 does not authorize them.
 
 ## Scrubbot Railroad V1 movement `[OWNER-LOCKED; amended 2026-09-17]`
 
