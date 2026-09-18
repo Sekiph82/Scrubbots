@@ -237,18 +237,29 @@ func rollback_work(work_id) -> bool:
 	_live_work.erase(work_id)
 	return true
 
-## Read-only coherence query for the M25 claim layer (M25-C001 V02 seam). NON-MUTATING and
-## policy-neutral: returns true iff work_id is a live committed identity whose recorded slot
-## still holds the exact same occupied batch — the SAME coherence resolve_clear()/
-## rollback_work() enforce before acting. It lets M25 preflight all-or-nothing rollback/
-## teardown without a second reservation/work authority. Adds no target/route/robot meaning.
-func is_work_coherent(work_id) -> bool:
+## Read-only EXACT work-tuple binding query for the M25 claim layer (M25-C001 V03 seam).
+## NON-MUTATING and policy-neutral. Returns true ONLY when work_id names a live committed
+## identity whose engine-owned record is bound to the EXACT slot + batch_id the M25 ledger
+## expects AND that slot still holds that exact batch. This is strictly stronger than "live
+## and internally coherent somewhere": it rejects a work id that was externally rolled back
+## from batch A and re-committed to a different batch B, because the M25 caller passes A's
+## slot/batch and the redirected record now points at B. Adds no target/route/robot meaning
+## and never exposes the mutable ledger. Lets M25 preflight all-or-nothing rollback/finalize/
+## teardown against the exact claim tuple, never a merely-live foreign work id.
+func is_work_bound_to(work_id, expected_slot, expected_batch_id) -> bool:
 	if typeof(work_id) != TYPE_STRING or not _live_work.has(work_id):
 		return false
+	if typeof(expected_slot) != TYPE_INT or typeof(expected_batch_id) != TYPE_STRING:
+		return false
 	var rec: Dictionary = _live_work[work_id]
-	var idx: int = rec["slot"]
-	var s = _slots[idx]
-	return not s.is_empty() and s.get_batch_id() == rec["batch_id"]
+	# The M24 record itself must still name the exact expected slot + batch.
+	if int(rec["slot"]) != expected_slot or String(rec["batch_id"]) != expected_batch_id:
+		return false
+	# And that exact slot must still be occupied by that exact batch (no free/refilled slot).
+	if not _valid_index(expected_slot):
+		return false
+	var s = _slots[expected_slot]
+	return not s.is_empty() and s.get_batch_id() == expected_batch_id
 
 func _free_slot(idx: int) -> void:
 	# Return to exact EMPTY truth; drop any live work still keyed to this slot. Neighbors

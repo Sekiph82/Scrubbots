@@ -233,17 +233,19 @@ func rollback_claim(claim_id) -> bool:
 	var target := int(rec["target"])
 	var owner := int(rec["owner_id"])
 	# Preflight EXACT engine-owned tuple coherence BEFORE any destructive mutation
-	# (F-M25-V01-STRICT-003). The reservation pair must still be exactly this claim's
-	# target<->owner, and the M24 committed work identity must still be live+coherent. Any
-	# drift — reservation absent, target reserved by a foreign owner, M24 work stale/absent
-	# — fails closed with the ledger and BOTH canonical halves untouched (no half cleanup,
-	# no false success). This synchronous path has no external callback between preflight
-	# and mutation, so once both halves are proven exact the two mutations below cannot fail.
+	# (F-M25-V01-STRICT-003 + F-M25-V02-STRICT-001). The reservation pair must still be
+	# exactly this claim's target<->owner, and the M24 committed work identity must still be
+	# bound to THIS claim's exact slot + batch_id — not merely live/coherent somewhere else.
+	# A work id externally rolled back from batch A and re-committed to batch B is rejected
+	# here, so a redirected work id can never mutate the wrong batch's accounting. Any drift
+	# fails closed with the ledger and BOTH canonical halves untouched (no half cleanup, no
+	# false success). This synchronous path has no external callback between preflight and
+	# mutation, so once both halves are proven exact the two mutations below cannot fail.
 	if _reservations.get_owner(target) != owner:
 		return false
 	if _reservations.get_target_for_owner(owner) != target:
 		return false
-	if not _batches.is_work_coherent(claim_id):
+	if not _batches.is_work_bound_to(claim_id, int(rec["slot"]), rec["batch_id"]):
 		return false
 	if not _batches.rollback_work(claim_id):
 		return false
@@ -274,6 +276,11 @@ func finalize_clear(claim_id) -> bool:
 		return false  # target still ACTIVE -> not cleared yet -> fail closed
 	if _reservations.get_owner(target) == owner:
 		return false  # reservation not yet resolved by the clear pipeline -> fail closed
+	# Exact M24 work-tuple binding BEFORE resolve_clear (F-M25-V02-STRICT-001): the committed
+	# work must still be bound to THIS claim's exact slot + batch_id. A work id redirected to
+	# another batch is rejected here, so finalize can never decrement a different batch.
+	if not _batches.is_work_bound_to(claim_id, int(rec["slot"]), rec["batch_id"]):
+		return false
 	if not _batches.resolve_clear(claim_id):
 		return false
 	_claims.erase(claim_id)
@@ -288,10 +295,11 @@ func finalize_clear(claim_id) -> bool:
 func reset() -> bool:
 	if _busy:
 		return false
-	# Phase 1 — preflight EVERY live tuple read-only (F-M25-V01-STRICT-003/004). If any
-	# claim's reservation pair or M24 work identity is incoherent, abort WITHOUT mutating
-	# anything and report failure: never silently clear the ledger over orphan
-	# M24/reservation truth.
+	# Phase 1 — preflight EVERY live tuple read-only (F-M25-V01-STRICT-003/004 +
+	# F-M25-V02-STRICT-001). Each claim's reservation pair AND its M24 work must be bound to
+	# that claim's EXACT slot + batch_id. If any claim is incoherent — including a work id
+	# redirected to a different batch — abort WITHOUT mutating anything: never clear the
+	# ledger or roll back a healthy sibling over one redirected/orphan tuple.
 	for claim_id in _claims.keys():
 		var rec: Dictionary = _claims[claim_id]
 		var target := int(rec["target"])
@@ -300,7 +308,7 @@ func reset() -> bool:
 			return false
 		if _reservations.get_target_for_owner(owner) != target:
 			return false
-		if not _batches.is_work_coherent(claim_id):
+		if not _batches.is_work_bound_to(claim_id, int(rec["slot"]), rec["batch_id"]):
 			return false
 	# Phase 2 — all tuples proven coherent: clean each exactly. Teardown order is M25 claim
 	# cleanup BEFORE any M24 reset (a session caller resets M24/M23 separately) so committed
