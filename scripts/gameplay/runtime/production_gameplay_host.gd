@@ -72,8 +72,18 @@ var _build_error := ""
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	# A plain Control does not auto-size its Control children, so keep the screen matched
+	# to this host's rect — including after a responsive viewport/host resize, so the
+	# visible slot anchors (and thus the routing origins) track the current layout.
+	resized.connect(_fit_screen)
 	if auto_build and not _built:
 		build()
+
+func _fit_screen() -> void:
+	if _screen != null and is_instance_valid(_screen):
+		# Full-rect anchors + zero offsets make the screen track this host's rect on every
+		# layout pass (a plain Control parent does not sort its children like a Container).
+		_screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 
 ## Build the whole production stack. Returns true on success; on failure returns false
 ## and leaves get_build_error() set. Idempotent (a second call is a no-op success).
@@ -97,6 +107,7 @@ func build() -> bool:
 	# Production GameplayScreen composition (M28), configured with detached snapshots.
 	_screen = GameplayScreen.new()
 	add_child(_screen)
+	_fit_screen()   # size the screen to this host BEFORE configuring so board layout resolves
 	_screen.configure(_board, lvl.palette, _slots.snapshot(), _supply.player_snapshot())
 	var presentation = _screen.get_presentation()
 	if presentation == null:
