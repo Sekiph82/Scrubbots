@@ -4,15 +4,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M29
-- Current Sprint: M29-C001 V02 — exact laid-out slot-origin remediation
-- Current Task: M29-C001-V02
-- Current Task Status: CHANGES_REQUIRED
-- Next Task/Action: Claude executes `coordination/sessions/M29-C001/CHATGPT_PROMPT_V02.md` under `coordination/sessions/M29-C001/CHATGPT_AUDIT_CRITERIA_V02.md`, replaces the synthetic five-lane production origin with exact `FiveSlotStrip.get_slot_anchor_global(slot) -> BoardPresentation.global_to_board_local()` mapping, adds responsive exact-origin evidence, reruns the real Hazard Bot runtime smoke and full regression floor, then pushes implementation first and `CLAUDE_LOG_V02.md` separately. Root `TASKS.md` remains ChatGPT-write-owned.
-- Required Actor: CLAUDE
+- Current Milestone: M30
+- Current Sprint: M30 DESIGN GATE — owner lock required for win / lose / retry semantics
+- Current Task: M30-OWNER-DECISION
+- Current Task Status: OWNER_DECISION_REQUIRED
+- Next Task/Action: Owner explicitly locks M30 win condition, lose condition and retry semantics before any Claude implementation prompt is created. M29 is closed and the owner can already run `res://scenes/debug/m29_hazard_bot_playtest.tscn` with F6 for the real production gameplay path. Root `TASKS.md` remains ChatGPT-write-owned.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 532 / 966 = 55.07% (game+ui live scope); lastCompletedTaskId M28-C001-V01. M29 V01 implemented the full production-input/runtime surface and all nine M29 tasks remain open pending one blocking exact visible-slot-origin correction. Accepted V01 behavior includes front-only mouse/touch input, automatic M26 cadence, user/system pause, explicit 1x/2x temporal authority and authoritative M23-exhausted free auto-2x. Economy V1 now supersedes free shipping manual 2x; paid entitlement integration is tracked in M39. M30 remains unopened.
+- Progress: 541 / 966 = 56.00% (game+ui live scope); lastCompletedTaskId M29-C001-V02. M29 Mobile Touch / Production Input Integration is independently audited PASS and all `SB-M29-001..009` are closed. The first owner-runnable real gameplay path is complete. M30 Win/Lose Rules is a DESIGN GATE and remains fully open until the owner explicitly locks win, lose and retry semantics. Existing Economy/Collection owner additions remain preserved.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
@@ -1219,12 +1219,12 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 ### M29 — Mobile Touch
 
-- [ ] SB-M29-001 Touch selectable supply-front batch activation; five batch slots themselves are not player-selectable placement controls.
-- [ ] SB-M29-002 Desktop mouse development support.
-- [ ] SB-M29-003 Prevent mouse/touch double-fire.
-- [ ] SB-M29-004 Touch cancel. — [ ] SB-M29-005 Focus loss.
-- [ ] SB-M29-006 Rapid tapping. — [ ] SB-M29-007 Multi-touch.
-- [ ] SB-M29-008 Pause during touch. — [ ] SB-M29-009 Background/foreground.
+- [x] SB-M29-001 Touch selectable supply-front batch activation; five batch slots themselves are not player-selectable placement controls.
+- [x] SB-M29-002 Desktop mouse development support.
+- [x] SB-M29-003 Prevent mouse/touch double-fire.
+- [x] SB-M29-004 Touch cancel. — [x] SB-M29-005 Focus loss.
+- [x] SB-M29-006 Rapid tapping. — [x] SB-M29-007 Multi-touch.
+- [x] SB-M29-008 Pause during touch. — [x] SB-M29-009 Background/foreground.
 
 **Owner-locked speed integration for M29/runtime:** M29 proves the explicit 1x/2x temporal authority and may keep a direct debug/headless toggle seam. That seam is not authorization for free shipping manual 2x. M39 must gate production manual 2x through the paid entitlement service in `coordination/OWNER_ECONOMY_REWARDS_V01.md`. Authoritative M23-exhausted automatic 2x remains free. Do not infer exhaustion from UI rows or slot occupancy.
 
