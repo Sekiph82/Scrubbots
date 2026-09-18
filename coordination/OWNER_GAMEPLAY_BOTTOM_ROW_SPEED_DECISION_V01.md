@@ -23,7 +23,7 @@ Required composition:
 
 M28 owns placement, sizing, responsive behavior, safe-area containment and presentation of the speed-up control.
 
-M28 does **not** invent gameplay timing semantics. Functional behavior is now owner-locked by `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md`: V1 supports 1x/2x, the bottom-right control toggles 1x <-> 2x, and authoritative M23 supply exhaustion automatically switches gameplay to 2x. M28 owns only the presentation/layout side; functional activation belongs to the later production input/runtime integration.
+M28 does **not** invent gameplay timing semantics. Functional behavior is owner-locked by `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md` plus `coordination/OWNER_ECONOMY_REWARDS_V01.md`: V1 supports 1x/2x; production manual 2x requires a valid paid level/timed entitlement, while authoritative M23 supply exhaustion still switches gameplay to 2x for free. M28 owns only presentation/layout; economy entitlement and runtime activation belong to later functional integration.
 
 ## Precedence
 
