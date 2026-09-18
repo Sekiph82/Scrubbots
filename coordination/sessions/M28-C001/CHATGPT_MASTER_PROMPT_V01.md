@@ -12,9 +12,10 @@ Read first:
 3. `assets/art/references/inventory.json`;
 4. `assets/art/references/README.md`;
 5. `coordination/OWNER_BATCH_GAMEPLAY_CORE_DECISION_V01.md`;
-6. M22 final Railroad audit and M23–M27 final audits;
-7. `coordination/sessions/M28-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`;
-8. all linked M28 work packages.
+6. `coordination/OWNER_GAMEPLAY_BOTTOM_ROW_SPEED_DECISION_V01.md`;
+7. M22 final Railroad audit and M23–M27 final audits;
+8. `coordination/sessions/M28-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`;
+9. all linked M28 work packages.
 
 ## Objective
 
@@ -70,7 +71,7 @@ GameplayScreen (Control)
         │   ├── BatchSupplyPanel   # 3/4/5 columns, V1 3 visible rows
         │   └── CleaningPropsAnchor
         ├── BoosterRow             # 4 compact controls
-        └── BottomActionRow        # pause | ad placeholder | settings
+        └── BottomActionRow        # pause | ad placeholder | speed-up
 ```
 
 Exact container nesting may vary if evidence proves the same contract.
@@ -160,7 +161,7 @@ Owner-approved M28 composition:
 - speech bubble above Scrubby, not full-width;
 - cleaning props at right, lower priority;
 - 4 boosters in one compact horizontal row;
-- bottom row: pause left, ad placeholder center, settings right.
+- bottom row: pause left, ad placeholder center, speed-up control right.
 
 Ad area is presentation placeholder only. M57 monetization remains design-gated.
 
