@@ -18,7 +18,7 @@ A new level/session starts at `1x`.
 
 ## 2. Manual speed control and entitlement gate
 
-The bottom-right gameplay control is the speed control.
+The gameplay 2x control is positioned at the **top-right beside Pause** by `coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md`.
 
 The gameplay-speed authority still supports exactly:
 
@@ -104,11 +104,13 @@ Stale callbacks from a previous 2x session must not change a newly reset session
 
 ## 7. Presentation / milestone ownership
 
-M28 owns:
-- bottom-right speed-control placement;
+Gameplay-screen placement is owner-locked by `coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md`.
+
+Presentation responsibilities include:
+- top-right Pause + 2x side-by-side placement;
 - responsive sizing;
 - safe-area containment;
-- visual 1x/2x state presentation.
+- visual inactive/active/timed-countdown 2x states.
 
 M28 does not need to activate gameplay timing.
 
@@ -122,7 +124,7 @@ This decision extends and supersedes the previously-deferred functional semantic
 
 `coordination/OWNER_GAMEPLAY_BOTTOM_ROW_SPEED_DECISION_V01.md`
 
-It also supersedes any older gameplay-screen wording that treats the bottom-right control as Settings.
+It also supersedes older gameplay-screen wording that treats the speed control as bottom-right or places Settings on the gameplay screen.
 
 
 ## 9. Economy V1 supersession note
