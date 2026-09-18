@@ -33,7 +33,7 @@ Verified at time of writing (end of Phase M06):
   difficulty board ranges") — see `docs/05_TECH_DECISIONS.md` and
   CHANGELOG for the Phase M06 commit that follows it.
 - Working tree: clean, `main` up to date with `origin/main`
-- Godot: `4.7.1.stable.official.a13da4feb` (installed, `godot --version` confirmed)
+- Godot: **4.7.2-stable** is the current owner-confirmed development version. The historical M00 4.7.1 installation evidence below is preserved as history; exact current build hash should be refreshed from local `godot --version` during the next local validation pass.
 - Headless test suite (`tests/run_tests.gd`): **774/774 checks PASS**, exit
   code 0 (grown through M09/M11/M12/M13 and the META-C004 ACTIVE/CLEARED
   renderer migration; recomputed from the suite summary, not hardcoded)
@@ -77,7 +77,7 @@ satisfied. If a required validation could not run, the milestone is **not**
 complete — record why instead of marking `[x]`.
 
 - Implementation exists.
-- Code parses in the actual installed Godot version (currently 4.7.1-stable).
+- Code parses in the actual installed Godot version (currently **4.7.2-stable**).
 - Headless tests pass where applicable.
 - Invalid input is tested, not just the happy path.
 - Regression tests (everything previously passing) remain passing.
@@ -551,6 +551,8 @@ Verified complete via repo inspection + this session's re-run of
 - [x] SB-M00-010 Verification helpers created (`tools/*.ps1`).
 - [x] SB-M00-011 Godot 4.7.1-stable installed (winget, `GodotEngine.GodotEngine`).
 - [x] SB-M00-012 Godot CLI path verified (`godot --version` → `4.7.1.stable.official.a13da4feb`).
+
+Historical M00 version note: the two completed rows above record the version used when M00 was closed. The current project development version is Godot **4.7.2-stable**; do not reinterpret those historical checkboxes as the current runtime/toolchain declaration.
 - [x] SB-M00-013 Headless bootstrap test succeeds (`--headless --path . --quit`, no errors).
 - [x] SB-M00-014 Main scene parses (confirmed via headless boot).
 - [x] SB-M00-015 Existing GDScript parses (confirmed via headless test run).

@@ -49,7 +49,7 @@ No hidden clean image exists. The visible artwork itself is progressively remove
 2. Never invent major unresolved mechanics merely to complete a task.
 3. Keep gameplay logic separate from presentation.
 4. Keep level data declarative and separate from scene/script code.
-5. Use Godot 4.7 / GDScript by default.
+5. Use Godot **4.7.2** / GDScript by default.
 6. Prefer built-in Godot systems; no paid dependency/SDK/service without owner approval.
 7. Target stable mobile performance; measure instead of assuming.
 8. Never represent the logical board as one heavyweight Node/Control per cell.

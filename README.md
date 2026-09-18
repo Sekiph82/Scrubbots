@@ -11,7 +11,7 @@ production is tracked separately; see **Sidecar / content tooling** below.
 
 ## Technology
 
-- Godot Engine 4.7.x (current development install: 4.7.1)
+- Godot Engine **4.7.2** (current development version)
 - GDScript
 - Git / GitHub
 - Data-oriented board rendering with one `Image` / `ImageTexture`, not one
@@ -31,7 +31,7 @@ tracker.
 
 ## Opening and validating the project
 
-1. Install Godot 4.7.1 or a compatible 4.7.x standard build.
+1. Install Godot **4.7.2** (standard build).
 2. Import `project.godot` in Godot.
 3. For a project boot check:
    `godot --headless --path . --quit`

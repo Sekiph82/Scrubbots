@@ -1,4 +1,20 @@
 
+## 2026-09-18 — Current Godot development version corrected to 4.7.2
+
+Owner confirmed that current SCRUBBOTS development is on Godot 4.7.2, not
+4.7.1.
+
+- Updated root README current engine/install guidance to Godot 4.7.2.
+- Updated CLAUDE.md implementation guidance to Godot 4.7.2.
+- Updated the live TASKS.md environment declaration and acceptance wording to
+  4.7.2-stable.
+- Preserved the completed M00 4.7.1 installation/check rows as historical
+  evidence and explicitly marked them historical rather than rewriting past
+  milestone evidence.
+- Updated the Master UI System engine declaration to Godot 4.7.2.
+- project.godot already declares the Godot 4.7 feature family and required no
+  format change.
+
 ## 2026-09-18 — Canonical docs refresh before UI asset production
 
 Refreshed live repository documentation so visual production starts from current
