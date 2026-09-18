@@ -78,32 +78,46 @@ Safe-area code belongs to presentation only.
 
 ## 5. Gameplay screen final composition contract
 
-Owner-approved layout direction:
+Canonical placement authority:
+`coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md`
+
+The owner-supplied gameplay screen is the base composition. Railroad V1 is integrated into that screen rather than replacing it.
 
 ```text
 TOP
-  compact player/profile area where required
-  NO Goal/Moves panel in the approved gameplay composition
+  left: compact player/profile chip
+  right: Pause + 2x side by side
+  NO Heart HUD
+  NO Goal/Moves/Time panel
+  NO Settings button
 
 CENTER / PRIMARY
-  board area, largest visual element on screen
+  pixel-art board, largest visual element
+  full four-sided Railroad V1 around the board
+  exactly 2.0 logical-cell artwork-to-rail clearance
+  five permanent visible slot-to-bottom-rail connectors
 
 BELOW BOARD
-  five-slot + color-selection area at protected minimum width
+  five execution slots
+  color/count Batch Supply panel retained and fully readable
   left: Scrubby positioned low
-  Scrubby speech bubble sits above Scrubby, not as a full-width row
-  right: cleaning props/decorative equipment
+  optional Scrubby speech bubble above him
+  right: lower-priority cleaning props if space permits
 
 LOWER
-  four boosters in one horizontal row, compact icons
+  exactly four boosters in one compact horizontal row:
+  +1 Slot / Random / Selector / Tornado
 
 BOTTOM
-  pause control to the left of ad region
-  ad region in center when monetization is actually enabled
-  speed-up control to the right
+  no Settings
+  no Heart HUD
+  no mandatory ad banner in the current owner playtest/reference composition
 ```
 
-The board must grow before decorative regions grow. Decorative Scrubby/cleaning props may scale down or crop within approved limits before the selection panel becomes unusably narrow.
+Normal visual/gameplay flow must read:
+`Batch Supply -> execution slot -> connector rail -> bottom railroad -> main railroad -> legal ingress -> pixel target`.
+
+The board must grow before decorative regions grow. Decorative Scrubby/cleaning props may scale down or crop within approved limits before board, Railroad V1, slots or Batch Supply become unreadable.
 
 ### Board sizing priority
 
@@ -111,19 +125,22 @@ Available height is conceptually:
 
 ```text
 safe viewport
-- required top controls
-- selection/slot area
+- top profile + Pause/2x controls
+- board + Railroad V1 envelope
+- slot connectors
+- five-slot + Batch Supply area
 - booster row
-- bottom/ad/speed row
 - minimum spacing
-= maximum board allocation
+= gameplay allocation
 ```
+
+For the current owner playtest/reference image there is no ad placeholder; freed height belongs to gameplay readability. Real shipping ad layout remains an explicit M57 decision.
 
 The existing `BoardRenderer` remains the production board renderer. Do not replace it with one Control/Node per logical cell.
 
 ### Gameplay speed control
 
-Owner-locked V1 gameplay speed is `1x` or `2x` only. The bottom-right gameplay control is the speed control and must visually support the current 1x/2x state.
+Owner-locked V1 gameplay speed is `1x` or `2x` only. The 2x control sits **top-right beside Pause** and must visually support inactive, active-current-level and active-timed-countdown states.
 
 Production manual 2x is economy-gated:
 - current level: 200 SB;
@@ -452,9 +469,9 @@ Spacing / visual contract:
   subject/theme and no per-level themed rail exists in V1;
 - the rail is visually subordinate to the artwork, native/procedural Godot 2D (zero
   generated assets), and reskinnable later without changing target/routing truth;
-- the five production `SlotCell`s (accepted M22 V01) sit BELOW the bottom rail, never
-  inside the 2-cell artwork clearance; each clicked slot shows a visible connector to
-  the bottom rail (real travel, no teleport);
+- the five production `SlotCell`s sit BELOW the bottom rail, never inside the 2-cell artwork clearance;
+- **all five fixed slot connectors remain visibly present even when slots are empty**, each joining the exact slot spawn anchor to the bottom rail;
+- connectors are real travel, never teleport;
 - the rail must not distort the board aspect ratio and must not add a Node per board
   cell; the logical 2-cell clearance is invariant across physical viewport scale.
 
