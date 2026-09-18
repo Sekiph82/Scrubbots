@@ -66,9 +66,10 @@ var _ad_placeholder: PanelContainer
 ## Bottom-right SPEED control (owner-locked: replaces the old Settings position;
 ## OWNER_GAMEPLAY_BOTTOM_ROW_SPEED_DECISION_V01 / OWNER_GAMEPLAY_SPEED_RULE_V01).
 ## M28 owns ONLY its placement/sizing/safe-area/1x-2x visual state. It wires NO
-## timing/toggle behavior — M29 wires the manual toggle, and the automatic
-## M23-supply-exhausted -> 2x transition consumes authoritative M23 state (never
-## inferred from UI visuals). A new session presents 1x.
+## timing/payment behavior. M29 wires the temporal seam; Economy V1 M39 later gates
+## production manual 2x through paid entitlement. Automatic M23-supply-exhausted -> 2x
+## remains free and consumes authoritative M23 state (never inferred from UI visuals).
+## A new session presents 1x.
 var _speed_btn: Button
 var _speed_2x := false
 
@@ -370,7 +371,7 @@ func get_supply_panel():
 	return _supply_panel
 
 ## M29 wiring seams: the bottom-row Pause and Speed controls (presentation Buttons).
-## M28 wires no behavior; M29 connects the manual pause + 1x/2x toggle to these.
+## M28 wires no behavior; M29 connects the temporal seam. Economy V1 M39 gates shipping manual 2x entitlement/payment.
 func get_pause_button() -> Button:
 	return _pause_btn
 
