@@ -12,7 +12,7 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 532 / 885 = 60.11% (game+ui live scope); lastCompletedTaskId M28-C001-V01. M29 V01 implemented the full production-input/runtime surface and all nine M29 tasks remain open pending one blocking exact visible-slot-origin correction. Accepted V01 behavior includes front-only mouse/touch input, automatic M26 cadence, user/system pause, explicit 1x/2x runtime speed and authoritative M23-exhausted auto-2x. M30 remains unopened.
+- Progress: 532 / 962 = 55.30% (game+ui live scope); lastCompletedTaskId M28-C001-V01. M29 V01 implemented the full production-input/runtime surface and all nine M29 tasks remain open pending one blocking exact visible-slot-origin correction. Accepted V01 behavior includes front-only mouse/touch input, automatic M26 cadence, user/system pause, explicit 1x/2x temporal authority and authoritative M23-exhausted free auto-2x. Economy V1 now supersedes free shipping manual 2x; paid entitlement integration is tracked in M39. M30 remains unopened.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
@@ -361,31 +361,45 @@ Railroad V1 is routing/presentation infrastructure only: it is not LevelData, Bo
 
 ### 8.10C — Supply-front-only owner gameplay activation `[OWNER-LOCKED CURRENT — 2026-09-17]`
 
-The production player interaction is **selectable front batch click/tap**, not direct slot activation. The five batch slots are automatic destinations and Scrubbot origins; they are not player-selectable placement controls.
+The production player interaction is **selectable front batch click/tap**, not direct slot activation. Normal gameplay has five automatic destination/Scrubbot-origin slots; Economy V1 +1 Slot may expand authoritative capacity to exactly six for the current attempt. Slots are not player-selectable placement controls.
 
-The player may activate only the current front/top batch of a supply column. A successful selection transaction sends that batch to the rightmost currently EMPTY slot. If all five slots are occupied, the selection is rejected and the supply column does not advance. Once a batch occupies a slot, Auto Dispatch later spawns Scrubbots automatically from that exact SlotCell anchor only after the target-claim/reservation/valid-route transaction succeeds.
+The player may normally activate only the current front/top batch of a supply column. A successful selection transaction sends that batch to the rightmost currently EMPTY slot. If every slot in the current authoritative capacity (5 normally, 6 with +1 Slot active) is occupied, the selection is rejected and the supply column does not advance. Economy V1 Selector is the single owner-authorized exception to normal front-only selection and must use its own atomic/solver-safe transaction. Once a batch occupies a slot, Auto Dispatch later spawns Scrubbots automatically from that exact SlotCell anchor only after the target-claim/reservation/valid-route transaction succeeds.
 
 The historical M21/M22 direct color-slot click path remains valid evidence for those earlier vertical-slice and Railroad tests, but it is superseded as the production core-loop interaction. Do not retain or add hidden keyboard dispatch shortcuts such as SPACE. Presentation input must feed the real Batch Supply → Five-Slot Batch → Claim → Auto Dispatch → Routing → ScrubbotAgent → authenticated clear chain.
 
 ### 8.10D — Gameplay speed / automatic endgame acceleration `[OWNER-LOCKED CURRENT — 2026-09-18]`
 
-Production gameplay V1 supports exactly **1x** and **2x** speed. A new level/full reset starts at 1x. The bottom-right gameplay speed control toggles 1x <-> 2x when production input is wired, and Pause suspends gameplay while preserving the selected speed for resume.
+Production gameplay V1 supports exactly **1x** and **2x** temporal speed. A new level/full reset starts at 1x. Shipping manual 2x is no longer always free: Economy V1 requires a valid current-level entitlement (200 SB) or timed entitlement (15m/300 SB, 30m/500 SB, 60m/750 SB). Timed entitlement uses real wall-clock expiry and continues in gameplay, menus, pause, background and while the app is closed.
 
-The game automatically switches to **2x** immediately after authoritative **M23 supply exhaustion**: every 3/4/5 FIFO column has zero remaining batches, including all formerly hidden batches, because the final front-batch transaction has been successfully accepted and committed into M24. The trigger is **not** "all five slots are occupied" and is **not** "the three visible rows look empty" while hidden batches remain. A rejected final transfer does not trigger auto-2x. Automatic 2x is not permanently locked; the player may manually toggle back to 1x afterward.
+The game automatically switches to **2x for free** immediately after authoritative **M23 supply exhaustion**: every 3/4/5 FIFO column has zero remaining batches, including all formerly hidden batches, because the final front-batch transaction has been successfully accepted and committed into M24. The trigger is not full-slot occupancy and is not visible-row emptiness while hidden batches remain. A rejected final transfer does not trigger auto-2x.
 
-2x accelerates time-based gameplay execution/presentation only. It must not change M23 FIFO order, M24 placement/accounting, M25 target/claim arbitration, TargetSelector priority, ReservationState ownership, Railroad/routing geometry, M26 no-ghost semantics, authenticated clears or M27 solver/deadlock meaning. Prefer an explicit gameplay-speed authority rather than blindly doubling unrelated UI/application clocks. Canonical decision: `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md`.
+2x accelerates time-based gameplay execution/presentation only. It must not change M23 FIFO order, M24 placement/accounting, M25 target/claim arbitration, TargetSelector priority, ReservationState ownership, Railroad/routing geometry, M26 no-ghost semantics, authenticated clears or M27 solver/deadlock meaning. GameplaySpeedAuthority owns factor only; Economy V1 SpeedEntitlementService owns paid manual permission/expiry. Canonical decisions: `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md` and `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
 
-### 8.11 — Win streak `[LOCKED]`
+### 8.11 — Win streak `[LOCKED — Economy V1]`
 
 ```text
-1 consecutive win   -> 1
-2 consecutive wins  -> 5
-3 consecutive wins  -> 10
-4 consecutive wins  -> 25
-5+ consecutive wins -> 100
+1 consecutive progression win   -> +1 SB
+2 consecutive progression wins  -> +5 SB
+3 consecutive progression wins  -> +10 SB
+4 consecutive progression wins  -> +25 SB
+5+ consecutive progression wins -> +100 SB per win
 ```
 
-Never reinterpret `1, 5, 10, 25` as win-count thresholds.
+Never reinterpret `1, 5, 10, 25` as win-count thresholds. Only this streak-bonus SB advances Gift Meter. Every multiple-of-5 active streak also grants +1 Bot Part. Progression loss or restart after gameplay begins resets streak; replay cannot advance it.
+
+### 8.12 — Economy & Rewards V1 `[OWNER-LOCKED 2026-09-18]`
+
+Canonical decision: `coordination/OWNER_ECONOMY_REWARDS_V01.md`. Machine tuning: `data/config/economy_rewards_v1.json`.
+
+- Scrub Bucks are the only general spendable soft currency.
+- Stars, Star Exchange and Event Points are removed. Star Exchange becomes Cards Exchange.
+- Hearts: max 5, +1 every 30 real-world minutes.
+- Bot Parts: robot-unlock-only resource; every post-Scrubby robot costs 250.
+- Gift Meter progress comes ONLY from Win Streak SB and has 10/50/250/500/1000 milestones with rollover.
+- Exactly four boosters exist: +1 Slot 500 SB, Random 350 SB, Selector 500 SB, Tornado 750 SB.
+- Daily has 3 tasks, consecutive-login count and a repeating 5-day reward cycle; Daily and Gift Bar can grant booster charges.
+- Duplicate Collection cards exchange to SB; protected first copies cannot be exchanged.
+- Real-money monetization remains a separate M57 gate.
 
 ### ADR-009 — Explicit preload() convention `[LOCKED UNTIL EXPLICITLY REVISITED]`
 
@@ -970,14 +984,14 @@ Locked runtime outcomes carried forward:
 - [x] SB-M22-012 Rapid-tap tests.
 - [x] SB-M22-013 Confirm canonical gameplay UI references before final asset generation.
 - [x] SB-M22-014 Validate M22 manifest entries before spending generation credits.
-- [ ] SB-M22-015 Generate required gameplay booster assets when milestone scope opens.
+- [ ] SB-M22-015 Generate the four owner-locked gameplay booster assets (+1 Slot, Random, Selector, Tornado) when Economy V1 implementation scope opens.
 - [ ] SB-M22-016 Generate only milestone-required decorative assets.
 - [ ] SB-M22-017 Keep raw candidates separate from production-final assets/provenance.
 - [ ] SB-M22-018 Require owner selection/approval before production promotion.
 - [ ] SB-M22-019 Never silently regenerate/overwrite approved production art.
 - [x] SB-M22-020 Build slot visuals as reusable Godot components.
 - [ ] SB-M22-021 Keep quantities/text/state badges live in Godot.
-- [ ] SB-M22-022 Implement reusable BoosterButton states when booster scope opens.
+- [ ] SB-M22-022 Implement reusable BoosterButton states for CHARGE_AVAILABLE / PURCHASABLE_SB / SELECTED / UNAVAILABLE / LOCKED when Economy V1 booster scope opens.
 - [ ] SB-M22-023 Bind approved booster/decorative art to reusable components.
 - [x] SB-M22-024 Preserve five visible slots at required responsive sizes.
 - [ ] SB-M22-025 Validate import/transparency/filtering/mobile memory before visual closure.
@@ -1031,7 +1045,9 @@ Purpose: create the player-facing color/count supply queues that drive the real 
 
 ### M24 — Five-Slot Batch Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
-Purpose: replace the temporary directly-colored slot interaction with the real five EMPTY batch slots. Player chooses a supply batch; the engine chooses the slot automatically.
+Purpose: replace the temporary directly-colored slot interaction with the real five EMPTY baseline batch slots. Player chooses a supply batch; the engine chooses the slot automatically.
+
+**Economy V1 amendment:** the accepted M24 implementation remains the five-slot baseline. M39 must add an explicit runtime-capacity extension 5→6 for the +1 Slot booster without falsifying historical M24 audit evidence.
 
 - [x] SB-M24-001 Preserve the production invariant of exactly five gameplay batch slots.
 - [x] SB-M24-002 Initialize all five batch slots EMPTY at level/session start.
@@ -1138,7 +1154,9 @@ Purpose: turn an occupied color/count batch into autonomous Scrubbot work. The p
 
 ### M27 — Solvability / Deadlock Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
-Purpose: prove generated supply is actually playable under the real mechanics and distinguish temporary waiting from a true no-solution state. This milestone is the final gameplay-engine closure gate before production screen/layout work.
+Purpose: prove generated supply is actually playable under the real baseline mechanics and distinguish temporary waiting from a true no-solution state. This milestone is the final gameplay-engine closure gate before production screen/layout work.
+
+**Economy V1 amendment:** accepted M27 evidence proves the five-slot baseline. M39 must extend solver state/fixtures for temporary six-slot capacity and for Random/Selector/Tornado transactions; do not retroactively claim the completed baseline already proves those booster states.
 
 - [x] SB-M27-001 Define a deterministic solver operating on gameplay-domain state, not rendered UI Nodes.
 - [x] SB-M27-002 Consume the real level BoardState/access/routing semantics rather than a contradictory simplified notion of reachability.
@@ -1208,7 +1226,7 @@ Purpose: prove generated supply is actually playable under the real mechanics an
 - [ ] SB-M29-006 Rapid tapping. — [ ] SB-M29-007 Multi-touch.
 - [ ] SB-M29-008 Pause during touch. — [ ] SB-M29-009 Background/foreground.
 
-**Owner-locked speed integration for M29/runtime:** wire the bottom-right gameplay speed control as a real `1x <-> 2x` toggle and consume the authoritative rule in `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md`. After the final legal supply-front selection is successfully committed and M23 reports every FIFO column exhausted (hidden batches included), gameplay must switch automatically to `2x`. Do not infer this from UI rows or five-slot occupancy. New level/full reset starts at `1x`; pause preserves the selected speed.
+**Owner-locked speed integration for M29/runtime:** M29 proves the explicit 1x/2x temporal authority and may keep a direct debug/headless toggle seam. That seam is not authorization for free shipping manual 2x. M39 must gate production manual 2x through the paid entitlement service in `coordination/OWNER_ECONOMY_REWARDS_V01.md`. Authoritative M23-exhausted automatic 2x remains free. Do not infer exhaustion from UI rows or slot occupancy.
 
 ### M30 — Win/Lose Rules `[DESIGN GATE]`
 
@@ -1298,29 +1316,89 @@ Purpose: prove generated supply is actually playable under the real mechanics an
 - [ ] SB-M37-006 Level select if approved.
 - [ ] SB-M37-007 Service implementation. — [ ] SB-M37-008 Tests.
 
-### M38 — Win Streak
+### M38 — Win Streak `[OWNER-LOCKED ECONOMY V1]`
 
-- [ ] SB-M38-001 Streak state. — [ ] SB-M38-002 Increment on valid win.
-- [ ] SB-M38-003 Define reset rule with owner. `[DESIGN GATE]`
-- [ ] SB-M38-004 Reward function.
-- [ ] SB-M38-005 Test 1→1. — [ ] SB-M38-006 Test 2→5.
-- [ ] SB-M38-007 Test 3→10. — [ ] SB-M38-008 Test 4→25.
-- [ ] SB-M38-009 Test 5→100. — [ ] SB-M38-010 Test 6+→100.
+- [ ] SB-M38-001 Streak state. — [ ] SB-M38-002 Increment only on valid first-clear progression wins.
+- [ ] SB-M38-003 Reset on progression loss and restart-after-gameplay; pre-action exit does not reset.
+- [ ] SB-M38-004 Grant exact SB mapping through RewardGrantService.
+- [ ] SB-M38-005 Test 1→1 SB. — [ ] SB-M38-006 Test 2→5 SB.
+- [ ] SB-M38-007 Test 3→10 SB. — [ ] SB-M38-008 Test 4→25 SB.
+- [ ] SB-M38-009 Test 5→100 SB. — [ ] SB-M38-010 Test 6+→100 SB.
 - [ ] SB-M38-011 No duplicate grant. — [ ] SB-M38-012 Persistence.
+- [ ] SB-M38-013 Emit only streak-bonus SB amount to GiftMeterService; base/Daily/exchange SB never feeds it.
+- [ ] SB-M38-014 Grant +1 Bot Part exactly at active streak multiples of 5.
+- [ ] SB-M38-015 Replay does not advance streak, Gift Meter or streak Bot Parts.
+- [ ] SB-M38-016 Add reset/replay/idempotency integration tests.
 
-### M39 — Economy `[DESIGN GATE]`
+### M39 — Economy & Rewards V1 `[OWNER-LOCKED]`
 
-Do not implement until owner defines what rewards actually represent.
+Canonical decision: `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
+Machine tuning: `data/config/economy_rewards_v1.json`.
+
+- [ ] SB-M39-001 Load/version/validate Economy V1 tuning config and fail closed on malformed values.
+- [ ] SB-M39-002 Implement `scripts/economy/economy_wallet.gd` as authoritative Scrub Bucks balance.
+- [ ] SB-M39-003 Implement atomic SB grant/spend with stable transaction IDs and insufficient-funds failure.
+- [ ] SB-M39-004 Initialize new players at 1000 SB without double-initialization.
+- [ ] SB-M39-005 Grant first-clear SB by difficulty: EASY 50 / MEDIUM 75 / HARD 100 / VERY_HARD 150.
+- [ ] SB-M39-006 Grant +1 Bot Part per first-clear progression level and prohibit replay farming.
+- [ ] SB-M39-007 Implement `reward_grant_service.gd` idempotent reward bundles and duplicate-callback protection.
+- [ ] SB-M39-008 Implement `gift_meter_service.gd`; ONLY Win Streak SB may advance it.
+- [ ] SB-M39-009 Implement Gift Meter thresholds 10/50/250/500/1000 and exactly-once milestone crossing.
+- [ ] SB-M39-010 Support one reward crossing multiple thresholds plus 1000-cycle rollover/overflow.
+- [ ] SB-M39-011 Queue Gift Bar milestone rewards instead of silently auto-consuming them.
+- [ ] SB-M39-012 Implement exact Gift rewards from Economy V1, totaling 10 Bot Parts per complete 0→1000 cycle.
+- [ ] SB-M39-013 Implement 1000 guaranteed-new-card rule with 500 SB fallback when no eligible missing card exists.
+- [ ] SB-M39-014 Prove base level/Daily/Tasks/Gift/Cards Exchange SB cannot recursively advance Gift Meter.
+- [ ] SB-M39-015 Implement `robot_unlock_service.gd`: Scrubby initially unlocked; every later robot costs 250 Bot Parts; preserve overflow.
+- [ ] SB-M39-016 Grant +10 Bot Parts per 9/9 Collection set and wire next-robot notification/read model.
+- [ ] SB-M39-017 Add pacing simulation/evidence targeting approximately one robot unlock per 150 progression levels for average engaged play.
+- [ ] SB-M39-018 Enforce robot perks as meta/economy convenience only; never alter solver/BoardState/TargetSelector/routing legality.
+- [ ] SB-M39-019 Implement `heart_service.gd`: max 5, one Heart per 1800 real-world seconds, offline/menu/background regen.
+- [ ] SB-M39-020 Consume one Heart on progression loss or restart-after-gameplay; pre-action exit consumes none.
+- [ ] SB-M39-021 Implement +1 Heart = 500 SB and full refill = 400 SB per missing Heart.
+- [ ] SB-M39-022 Implement `speed_entitlement_service.gd` separate from GameplaySpeedAuthority.
+- [ ] SB-M39-023 Implement current-level 2x entitlement = 200 SB, surviving retries of same level until completion.
+- [ ] SB-M39-024 Implement timed 2x products 15m/300 SB, 30m/500 SB, 60m/750 SB.
+- [ ] SB-M39-025 Timed 2x uses absolute wall-clock expiry and continues in gameplay, Home/menus, pause, background and closed-app time.
+- [ ] SB-M39-026 Allow timed purchases to extend expiry deterministically; never use gameplay delta/Engine.time_scale for entitlement time.
+- [ ] SB-M39-027 Gate shipping manual 2x requests behind a valid level/timed entitlement or purchase flow.
+- [ ] SB-M39-028 Preserve free entitlement-independent authoritative M23-exhausted automatic 2x.
+- [ ] SB-M39-029 Implement `booster_inventory.gd` with exactly four charge counters and charge-before-SB consumption.
+- [ ] SB-M39-030 +1 Slot booster: 500 SB, max once/attempt, authoritative slot capacity 5→6 only for current attempt.
+- [ ] SB-M39-031 Extend M24 placement/full-slot queries from fixed five to authoritative capacity 5/6 without breaking five-slot baseline tests.
+- [ ] SB-M39-032 Extend M27 solver/deadlock state/canonicalization/fixtures to capacity 5/6.
+- [ ] SB-M39-033 Add sixth-slot presentation/layout support and mobile safe-area evidence; no 7+ slot state.
+- [ ] SB-M39-034 Random booster: 350 SB, reorder only remaining unselected M23 batches without changing identities/counts/conservation.
+- [ ] SB-M39-035 Random commit requires solver proof of at least three consecutive legal non-deadlocking front selections; failed search consumes nothing.
+- [ ] SB-M39-036 Selector booster: 500 SB; present solver-safe eligible remaining batches/colors only.
+- [ ] SB-M39-037 Selector performs one atomic arbitrary-remaining extraction + standard rightmost-EMPTY placement; full capacity/unsafe choice consumes nothing.
+- [ ] SB-M39-038 Tornado booster: 750 SB; choose exactly one present color.
+- [ ] SB-M39-039 Tornado atomically clears all remaining ACTIVE cells of chosen color and reconciles M23 supply, M24 slots, M25 claims/reservations, M26 in-flight agents/quotas and M27 state.
+- [ ] SB-M39-040 Prove Tornado rollback/failure consumes no charge/SB and leaves no ghost batch/agent/double-clear.
+- [ ] SB-M39-041 Implement `daily_service.gd`: visible consecutive-login count plus repeating 5-day reward cycle.
+- [ ] SB-M39-042 Daily login rewards: D1 100 SB; D2 Standard Pack; D3 random booster; D4 250 SB + Standard Pack; D5 300 SB + selected booster + Premium Pack.
+- [ ] SB-M39-043 Daily has exactly three tasks with 75/100/125 SB individual rewards and one random booster for completing all three.
+- [ ] SB-M39-044 Missing a local calendar day resets login streak/cycle; clock rollback can never create duplicate claims.
+- [ ] SB-M39-045 Implement `collection_inventory.gd` for 15 sets × 9 cards, protected first copy and completion state.
+- [ ] SB-M39-046 Standard Pack = 3 eligible draws; Premium Pack = 5 eligible draws with >=1 Rare-or-better; duplicates allowed.
+- [ ] SB-M39-047 Completing 9/9 set grants 500 SB + 10 Bot Parts exactly once.
+- [ ] SB-M39-048 Implement `cards_exchange_service.gd`; only copies above protected first copy are exchangeable.
+- [ ] SB-M39-049 Exchange values: Common 25 / Rare 75 / Epic 200 / Legendary 500 SB.
+- [ ] SB-M39-050 Implement per-card and EXCHANGE ALL EXTRAS atomic exchange; never reduce collected owned count below 1.
+- [ ] SB-M39-051 Prove Stars, Star Exchange, Event Points and profile-XP economic state do not exist in production save/runtime APIs.
+- [ ] SB-M39-052 Add full Economy V1 headless regression matrix for grants/spends/rollover/offline clocks/boosters/exchange/idempotency.
 
 ### M40 — Save System
 
 - [ ] SB-M40-001 Versioned schema. — [ ] SB-M40-002 Settings.
 - [ ] SB-M40-003 Progression. — [ ] SB-M40-004 Win streak.
-- [ ] SB-M40-005 Economy if later defined.
+- [ ] SB-M40-005 Persist Economy V1 wallet, Hearts/regen anchor, Bot Parts/robots, cards, booster charges, Gift Meter, Daily and 2x entitlements.
 - [ ] SB-M40-006 Safe write strategy.
 - [ ] SB-M40-007 Missing-save behavior. — [ ] SB-M40-008 Corruption recovery.
 - [ ] SB-M40-009 Migration strategy.
 - [ ] SB-M40-010 Round-trip tests. — [ ] SB-M40-011 Corrupt-file tests.
+- [ ] SB-M40-012 Migrate old saves with missing Economy V1 fields to safe defaults; never invent Star/Event balances.
+- [ ] SB-M40-013 Persist wall-clock timestamps/expiry defensively against duplicate reward/refill claims.
 
 ### M41 — Settings
 
@@ -1344,11 +1422,19 @@ Do not implement until owner defines what rewards actually represent.
 - [ ] SB-M42-015 Keep dynamic values/timers/counts/labels live in Godot UI.
 - [ ] SB-M42-016 Require owner approval before production promotion.
 - [ ] SB-M42-017 Bind approved art and validate viewport matrix.
+- [ ] SB-M42-018 Replace coin HUD semantics with Scrub Bucks banknote icon + live SB amount.
+- [ ] SB-M42-019 Replace profile XP bar with live Bot Parts next-robot progress (normally N/250).
+- [ ] SB-M42-020 Replace top event bar/timer with Gift Meter progress/next milestone; no Event Points/timer.
+- [ ] SB-M42-021 Bind Gift Bar to queued Gift Meter milestone claims and live claimable count.
+- [ ] SB-M42-022 Replace Star Exchange shortcut with Cards Exchange and duplicate-card count/state.
+- [ ] SB-M42-023 Render lower road as Win Streak SB reward track 1/5/10/25/100; no Star balance.
+- [ ] SB-M42-024 Implement Daily consecutive-login count / 5-day cycle / booster reward presentation.
+- [ ] SB-M42-025 Keep all SB prices, Bot Parts values, Gift Meter values and Daily states live/localizable.
 
 ### M43 — Results Screen
 
 - [ ] SB-M43-001 Result model. — [ ] SB-M43-002 Completion UI.
-- [ ] SB-M43-003 Streak. — [ ] SB-M43-004 Reward if defined.
+- [ ] SB-M43-003 Streak. — [ ] SB-M43-004 Show/apply first-clear difficulty SB + streak SB + Bot Part/Collection rewards through RewardGrantService.
 - [ ] SB-M43-005 Continue. — [ ] SB-M43-006 Replay if approved.
 - [ ] SB-M43-007 No double reward. — [ ] SB-M43-008 Rapid-tap protection.
 
@@ -1426,6 +1512,7 @@ Maximum board target: 59×59 = 3,481.
 - [ ] SB-M49-022 Confirm text containers survive localization expansion.
 - [ ] SB-M49-023 Confirm protected bottom controls remain usable on compact devices.
 - [ ] SB-M49-024 Add automated/manual responsive validation evidence.
+- [ ] SB-M49-025 Validate temporary sixth-slot (+1 booster) layout/touch/readability across the full viewport matrix.
 
 ### M50 — Accessibility
 
@@ -1479,6 +1566,12 @@ Every production level:
 - [ ] SB-M54-011 Completion tests. — [ ] SB-M54-012 Save tests.
 - [ ] SB-M54-013 Reward tests. — [ ] SB-M54-014 Content validation tests.
 - [ ] SB-M54-015 59×59 regression test.
+- [ ] SB-M54-016 Economy Wallet/Gift Meter/Daily/Cards Exchange idempotency regression.
+- [ ] SB-M54-017 Heart 30-minute offline/background/menu regen and clock-rollback regression.
+- [ ] SB-M54-018 2x level/timed entitlement wall-clock expiry + free M23-exhausted auto-2x regression.
+- [ ] SB-M54-019 +1 Slot 5/6-capacity runtime + solver regression.
+- [ ] SB-M54-020 Random/Selector solver-safety and no-consume-on-failure regression.
+- [ ] SB-M54-021 Tornado cross-engine conservation/rollback/no-ghost regression.
 
 ### M55 — Chaos / Long-Run QA `[QA]`
 
@@ -1493,15 +1586,19 @@ Every production level:
 - [ ] SB-M55-011 Duplicate signal monitoring.
 - [ ] SB-M55-012 Orphan Node monitoring.
 - [ ] SB-M55-013 Duplicate reward monitoring.
+- [ ] SB-M55-014 Spam booster use/purchase/charge buttons; prove no double spend/use.
+- [ ] SB-M55-015 Background/foreground across Heart regen and timed 2x expiry.
+- [ ] SB-M55-016 Tornado while matching-color agents are in flight; prove atomic reconciliation.
+- [ ] SB-M55-017 Cards Exchange-all under repeated taps; prove protected first copies and no duplicate SB grant.
 
 ### M56 — Analytics `[DESIGN GATE]`
 
 No analytics SDK without owner approval.
 
-### M57 — Monetization `[DESIGN GATE]`
+### M57 — Real-Money Monetization `[DESIGN GATE]`
 
-Do NOT automatically add ads, rewarded ads, IAP, subscriptions, or an
-energy system. Owner decides business model first.
+Economy V1 soft-currency/Hearts/booster/2x rules are already owner-locked and are NOT this gate.
+Do NOT automatically add real-money IAP, paid SB packs, rewarded ads, subscriptions, paid random packs or any additional energy currency. Owner decides real-money business model separately.
 
 ### M58 — Privacy & Compliance
 
