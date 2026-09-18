@@ -4,15 +4,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M26
-- Current Sprint: M26-C001 V02 — scheduler reset/finalize/bundle-coherence hardening
-- Current Task: M26-C001-V02
-- Current Task Status: CHANGES_REQUIRED
-- Next Task/Action: Claude executes `coordination/sessions/M26-C001/CHATGPT_PROMPT_V02.md` under `coordination/sessions/M26-C001/CHATGPT_AUDIT_CRITERIA_V02.md`, closes all four findings in `CHATGPT_AUDIT_V01.md` in one continuous remediation pass, preserves accepted M26 no-ghost/preclaimed/fairness/Hazard-Bot behavior and all M25/M24/M23/M22 authorities, pushes implementation first, then `CLAUDE_LOG_V02.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
+- Current Milestone: M27
+- Current Sprint: M27-C001 V01 — full Solvability / Deadlock Engine continuous execution
+- Current Task: M27-C001-V01
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: Claude executes `coordination/sessions/M27-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M27-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, runs all five linked M27 work packages continuously without intermediate approval, completes `SB-M27-001..034`, preserves accepted M23–M26 gameplay authorities, pushes implementation first, then `CLAUDE_LOG_V01.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 440 / 885 = 49.72% (game+ui live scope); lastCompletedTaskId M25-C001-V03. M26 V01 implemented the full `SB-M26-001..030` surface in one continuous pass but remains open after strict audit found four M26-local reset/finalize/bundle-coherence defects. No M26 tasks are closed until V02 passes. M25 Batch Target Claim Engine remains closed. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
+- Progress: 470 / 885 = 53.11% (game+ui live scope); lastCompletedTaskId M26-C001-V02. M26 Auto Dispatch Scheduler is independently audited PASS and all `SB-M26-001..030` are closed. M27 Solvability / Deadlock Engine is now the active final core-gameplay closure milestone before M28 production gameplay screen/layout. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
@@ -1097,36 +1097,36 @@ Purpose: arbitrate currently targetable pixels among multiple live batches, espe
 
 Purpose: turn an occupied color/count batch into autonomous Scrubbot work. The player selects batches, not individual robots and not individual target pixels.
 
-- [ ] SB-M26-001 Define a gameplay-domain Auto Dispatch Scheduler independent of presentation/UI animation.
-- [ ] SB-M26-002 Automatically attempt work for every occupied batch without requiring repeated player taps on the five slots.
-- [ ] SB-M26-003 Begin scheduling a newly accepted batch immediately after transactional placement.
-- [ ] SB-M26-004 Enforce the hard invariant: no currently valid target means no robot spawn.
-- [ ] SB-M26-005 Enforce the hard invariant: no successful atomic reservation/claim means no robot spawn.
-- [ ] SB-M26-006 Enforce the hard invariant: no valid RouteValidator-clean route to the exact claimed target means no robot spawn.
-- [ ] SB-M26-007 Enforce transaction order `claim/reserve → build route → validate route → spawn exact assignment`.
-- [ ] SB-M26-008 Never retarget after route/assignment acceptance; a failed assignment is rolled back rather than redirected silently.
-- [ ] SB-M26-009 Spawn from the exact owning SlotCell anchor and preserve the accepted slot→BOTTOM connector + Railroad V1 route semantics.
-- [ ] SB-M26-010 Spawn exactly one Scrubbot per successful assignment transaction.
-- [ ] SB-M26-011 Pace sequential dispatch from a given batch/slot; do not materialize its entire count as an uncontrolled one-frame robot burst.
-- [ ] SB-M26-012 Permit safe concurrent work from different occupied slots when each assignment has a unique reservation/route.
-- [ ] SB-M26-013 Define deterministic scheduler fairness across different-color ACTIVE batches so one busy color cannot starve all others.
-- [ ] SB-M26-014 For same-color batches, defer ownership ordering to the Batch Target Claim Engine's oldest-placement-first rule.
-- [ ] SB-M26-015 Prove a `BLUE 15` batch can autonomously complete exactly 15 authenticated blue-pixel clears when the board makes them legally available.
-- [ ] SB-M26-016 Track committed/in-flight capacity so a batch never dispatches more robots than its remaining quota permits.
-- [ ] SB-M26-017 Decrement quota only from successful authenticated clearing callbacks, never from scheduler intent or spawn count.
-- [ ] SB-M26-018 When no claimable work exists, transition to WAITING without busy-looping, phantom agents or repeated reservation churn.
-- [ ] SB-M26-019 Wake/reconsider relevant WAITING colors when BoardState clearing changes reachability.
-- [ ] SB-M26-020 When one new blue pixel opens and several blue batches wait, request arbitration and dispatch only the batch selected by the same-color FIFO rule.
-- [ ] SB-M26-021 If the oldest same-color batch has only N dispatch-capacity units left and more than N targets open, allow only N claims to it and spill additional claims to the next batch deterministically.
-- [ ] SB-M26-022 Auto-finish a batch after its final authenticated clear/assignment resolves and return the slot to EMPTY.
-- [ ] SB-M26-023 Ensure freeing a slot does not reorder other occupied slots or mutate supply queues.
-- [ ] SB-M26-024 Pause prevents new dispatches while preserving valid in-memory batch/claim state according to session rules.
-- [ ] SB-M26-025 Resume safely restarts scheduling without duplicate claims/spawns.
-- [ ] SB-M26-026 Reset/session teardown cancels in-flight scheduling, releases reservations/claims and leaves no orphan Scrubbot Nodes.
-- [ ] SB-M26-027 Rapid input / simultaneous column selections cannot double-spawn, over-commit quota or duplicate target reservations.
-- [ ] SB-M26-028 Validate scheduler behavior with multiple duplicate-color batches plus different-color batches concurrently.
-- [ ] SB-M26-029 Run 59×59/high-agent-density performance sanity and allocation checks.
-- [ ] SB-M26-030 Add a full Hazard Bot auto-dispatch integration smoke proving no ghost robots, no duplicate targets and exact quota conservation.
+- [x] SB-M26-001 Define a gameplay-domain Auto Dispatch Scheduler independent of presentation/UI animation.
+- [x] SB-M26-002 Automatically attempt work for every occupied batch without requiring repeated player taps on the five slots.
+- [x] SB-M26-003 Begin scheduling a newly accepted batch immediately after transactional placement.
+- [x] SB-M26-004 Enforce the hard invariant: no currently valid target means no robot spawn.
+- [x] SB-M26-005 Enforce the hard invariant: no successful atomic reservation/claim means no robot spawn.
+- [x] SB-M26-006 Enforce the hard invariant: no valid RouteValidator-clean route to the exact claimed target means no robot spawn.
+- [x] SB-M26-007 Enforce transaction order `claim/reserve → build route → validate route → spawn exact assignment`.
+- [x] SB-M26-008 Never retarget after route/assignment acceptance; a failed assignment is rolled back rather than redirected silently.
+- [x] SB-M26-009 Spawn from the exact owning SlotCell anchor and preserve the accepted slot→BOTTOM connector + Railroad V1 route semantics.
+- [x] SB-M26-010 Spawn exactly one Scrubbot per successful assignment transaction.
+- [x] SB-M26-011 Pace sequential dispatch from a given batch/slot; do not materialize its entire count as an uncontrolled one-frame robot burst.
+- [x] SB-M26-012 Permit safe concurrent work from different occupied slots when each assignment has a unique reservation/route.
+- [x] SB-M26-013 Define deterministic scheduler fairness across different-color ACTIVE batches so one busy color cannot starve all others.
+- [x] SB-M26-014 For same-color batches, defer ownership ordering to the Batch Target Claim Engine's oldest-placement-first rule.
+- [x] SB-M26-015 Prove a `BLUE 15` batch can autonomously complete exactly 15 authenticated blue-pixel clears when the board makes them legally available.
+- [x] SB-M26-016 Track committed/in-flight capacity so a batch never dispatches more robots than its remaining quota permits.
+- [x] SB-M26-017 Decrement quota only from successful authenticated clearing callbacks, never from scheduler intent or spawn count.
+- [x] SB-M26-018 When no claimable work exists, transition to WAITING without busy-looping, phantom agents or repeated reservation churn.
+- [x] SB-M26-019 Wake/reconsider relevant WAITING colors when BoardState clearing changes reachability.
+- [x] SB-M26-020 When one new blue pixel opens and several blue batches wait, request arbitration and dispatch only the batch selected by the same-color FIFO rule.
+- [x] SB-M26-021 If the oldest same-color batch has only N dispatch-capacity units left and more than N targets open, allow only N claims to it and spill additional claims to the next batch deterministically.
+- [x] SB-M26-022 Auto-finish a batch after its final authenticated clear/assignment resolves and return the slot to EMPTY.
+- [x] SB-M26-023 Ensure freeing a slot does not reorder other occupied slots or mutate supply queues.
+- [x] SB-M26-024 Pause prevents new dispatches while preserving valid in-memory batch/claim state according to session rules.
+- [x] SB-M26-025 Resume safely restarts scheduling without duplicate claims/spawns.
+- [x] SB-M26-026 Reset/session teardown cancels in-flight scheduling, releases reservations/claims and leaves no orphan Scrubbot Nodes.
+- [x] SB-M26-027 Rapid input / simultaneous column selections cannot double-spawn, over-commit quota or duplicate target reservations.
+- [x] SB-M26-028 Validate scheduler behavior with multiple duplicate-color batches plus different-color batches concurrently.
+- [x] SB-M26-029 Run 59×59/high-agent-density performance sanity and allocation checks.
+- [x] SB-M26-030 Add a full Hazard Bot auto-dispatch integration smoke proving no ghost robots, no duplicate targets and exact quota conservation.
 
 ### M27 — Solvability / Deadlock Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
