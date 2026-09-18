@@ -121,6 +121,14 @@ safe viewport
 
 The existing `BoardRenderer` remains the production board renderer. Do not replace it with one Control/Node per logical cell.
 
+### Gameplay speed control
+
+Owner-locked V1 gameplay speed is `1x` or `2x` only. The bottom-right gameplay control is the speed control and must visually support the current 1x/2x state. Manual interaction toggles 1x <-> 2x when functional input is implemented.
+
+The game also automatically switches to 2x when authoritative M23 supply is exhausted: every FIFO column, including formerly hidden future batches, has zero remaining batches after the final successful transactional transfer into M24. This is not the same as "all five slots are occupied." A rejected final placement does not trigger auto-2x. New level/full reset returns to 1x; pause preserves and resumes the prior speed.
+
+2x is a gameplay-time multiplier only and must not change FIFO order, target selection, reservations, routing, quotas, no-ghost invariants or solver semantics. See `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md`.
+
 ## 6. Home screen responsive composition
 
 Production Home uses containers, not a flattened screenshot:
