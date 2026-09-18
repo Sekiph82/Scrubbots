@@ -131,7 +131,8 @@ Bot Parts are not purchasable with SB or real money in V1.
 Canonical Bot Part sources:
 - +1 per first-clear progression level;
 - +1 each time Win Streak reaches a multiple of 5;
-- +10 when a 9/9 Collection set is completed;
+- per-set Collection completion rewards defined in §10;
+- +20 Master Collection bonus after all 15 sets are completed;
 - Gift Meter milestone rewards defined above.
 
 Target pacing is approximately one new robot every 150 progression levels for an average engaged player:
@@ -291,11 +292,66 @@ Daily rewards do not advance Gift Meter and do not grant Bot Parts.
 
 ## 10. Collection and card packs
 
-Owner reference set structure is 15 Collection sets with 9 cards per set.
+Owner reference structure is **15 Collection sets × 9 cards**.
 
-Completing a set at 9/9 grants:
-- **500 SB**
-- **10 Bot Parts**
+Collection completion rewards are **not uniform**. Reward size reflects:
+1. card-rarity burden in the owner-approved set art;
+2. how late the set becomes realistically completable as the player's eligible card pool grows;
+3. the expected duplicate pressure required to finish the last missing cards.
+
+Sets 1–14 use the standard owner-approved rarity profile of **4 Common / 2 Rare / 2 Epic / 1 Legendary**. Their reward grows with later collection access because later sets compete inside a wider eligible draw pool and are therefore slower to close. Set 15 **Ultimate Cleaners** is a separate rarity-heavy finale with **3 Rare / 3 Epic / 3 Legendary**, so it receives a much larger completion reward.
+
+### 10.1 Per-set 9/9 completion rewards
+
+| Set | Collection | Rarity profile | Exactly-once completion reward |
+|---:|---|---|---:|
+| 1 | Meet the Scrubbots | 4C/2R/2E/1L | 350 SB + 5 Bot Parts |
+| 2 | Cleaning Crew | 4C/2R/2E/1L | 400 SB + 5 Bot Parts |
+| 3 | Mess Monsters | 4C/2R/2E/1L | 450 SB + 6 Bot Parts |
+| 4 | Color Bots | 4C/2R/2E/1L | 500 SB + 7 Bot Parts |
+| 5 | Scrubbot Workshop | 4C/2R/2E/1L | 550 SB + 7 Bot Parts |
+| 6 | Bathroom Mayhem | 4C/2R/2E/1L | 600 SB + 8 Bot Parts |
+| 7 | Kitchen Chaos | 4C/2R/2E/1L | 700 SB + 9 Bot Parts |
+| 8 | Garage Grime | 4C/2R/2E/1L | 750 SB + 9 Bot Parts |
+| 9 | Sewer Squad | 4C/2R/2E/1L | 800 SB + 10 Bot Parts |
+| 10 | Clean City | 4C/2R/2E/1L | 900 SB + 10 Bot Parts |
+| 11 | Jungle Cleanup | 4C/2R/2E/1L | 1000 SB + 11 Bot Parts |
+| 12 | Bath Time Blitz | 4C/2R/2E/1L | 1100 SB + 12 Bot Parts |
+| 13 | Underwater Heroes | 4C/2R/2E/1L | 1250 SB + 13 Bot Parts |
+| 14 | Space Cleaners | 4C/2R/2E/1L | 1500 SB + 15 Bot Parts |
+| 15 | Ultimate Cleaners | 3R/3E/3L | 2500 SB + 20 Bot Parts |
+
+Total rewards from the 15 individual set completions are:
+- **13,350 SB**
+- **147 Bot Parts**
+
+Each set reward is granted exactly once, on the first transition of that set to 9/9. Re-opening, viewing, replaying or re-synchronizing a completed set never grants it again.
+
+### 10.2 Master Collection reward
+
+When **all 15 sets are completed at 9/9**, grant one additional exactly-once **Master Collection** reward:
+
+- **2,500 SB**
+- **20 Bot Parts**
+
+This is additional to Set 15's own reward.
+
+Therefore a player who completes the entire current 15-set Collection receives, across set-completion milestones plus Master Collection:
+
+- **15,850 SB total**
+- **167 Bot Parts total**
+
+The Master Collection reward is tied to the first authoritative transition from fewer than 15 completed sets to all 15 completed sets. It must be idempotent and persist its claimed/granted transaction identity.
+
+### 10.3 Collection reward balancing rule
+
+Future Collection sets must not reuse one flat reward blindly. For any added set, reward tuning must consider:
+- rarity composition;
+- eligible-pack pool size when the set becomes available;
+- expected number of duplicate draws before final completion;
+- whether the set contains multiple Legendary cards.
+
+A rarity-heavy set must never pay less than an easier standard-profile set at a comparable/later progression position.
 
 The first owned copy of every card is permanently protected from Cards Exchange.
 
