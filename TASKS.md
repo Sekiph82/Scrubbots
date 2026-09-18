@@ -5,14 +5,14 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M29
-- Current Sprint: M29-C001 V01 — production supply-front input, 1x/2x runtime speed and manual Hazard Bot playtest
-- Current Task: M29-C001-V01
-- Current Task Status: IN_PROGRESS
-- Next Task/Action: Claude executes `coordination/sessions/M29-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M29-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, runs all four linked M29 work packages continuously, completes `SB-M29-001..009`, wires real supply-front mouse/touch through M23→M24→M25→M26→M20, implements the owner-locked 1x/2x + M23-exhausted auto-2x runtime rule, creates a real Hazard Bot manual playtest scene, pushes implementation first, then `CLAUDE_LOG_V01.md` separately, and returns `AWAITING_AUDIT`. Root `TASKS.md` remains ChatGPT-write-owned.
+- Current Sprint: M29-C001 V02 — exact laid-out slot-origin remediation
+- Current Task: M29-C001-V02
+- Current Task Status: CHANGES_REQUIRED
+- Next Task/Action: Claude executes `coordination/sessions/M29-C001/CHATGPT_PROMPT_V02.md` under `coordination/sessions/M29-C001/CHATGPT_AUDIT_CRITERIA_V02.md`, replaces the synthetic five-lane production origin with exact `FiveSlotStrip.get_slot_anchor_global(slot) -> BoardPresentation.global_to_board_local()` mapping, adds responsive exact-origin evidence, reruns the real Hazard Bot runtime smoke and full regression floor, then pushes implementation first and `CLAUDE_LOG_V02.md` separately. Root `TASKS.md` remains ChatGPT-write-owned.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 532 / 885 = 60.11% (game+ui live scope); lastCompletedTaskId M28-C001-V01. M28 Gameplay Screen Layout is independently audited PASS and all `SB-M28-001..028` are closed. M29 Mobile Touch / production input integration is now active and is the first milestone expected to produce an owner-runnable mouse/touch Hazard Bot playtest through the real M23–M28 stack. M30 still owns win/lose/result flow. The 224 Level Factory + Content Platform requirements remain canonical in `Sekiph82/ScrubBots-Level-Factory` and are excluded from this repository's live denominator.
+- Progress: 532 / 885 = 60.11% (game+ui live scope); lastCompletedTaskId M28-C001-V01. M29 V01 implemented the full production-input/runtime surface and all nine M29 tasks remain open pending one blocking exact visible-slot-origin correction. Accepted V01 behavior includes front-only mouse/touch input, automatic M26 cadence, user/system pause, explicit 1x/2x runtime speed and authoritative M23-exhausted auto-2x. M30 remains unopened.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
