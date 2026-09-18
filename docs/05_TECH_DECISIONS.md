@@ -1032,3 +1032,30 @@ but are not current production routing law.
 **Reason**: The railroad gives SCRUBBOTS a consistent branded movement
 infrastructure while legal interior corridors allow reachable targets behind
 previously cleared space without weakening WHAT/claim/clear authority.
+
+
+### ADR-029: Economy & Rewards V1 domain services and economic truth
+
+**Status**: OWNER-LOCKED 2026-09-18.
+
+**Owner decision**:
+`coordination/OWNER_ECONOMY_REWARDS_V01.md`
+
+**Machine tuning**:
+`data/config/economy_rewards_v1.json`
+
+**Decision**:
+
+SCRUBBOTS V1 has one general spendable soft currency, **Scrub Bucks**. Hearts are timed attempt capacity, Bot Parts are robot-unlock-only progression, Collection duplicates exchange to SB, and Booster Charges are item inventory. Star currency, Star Exchange and Event Points are removed.
+
+Gift Meter progresses ONLY by the numeric SB bonus earned from Win Streak and has 10/50/250/500/1000 milestones. Bot Parts cost 250 per post-Scrubby robot and are sourced only by the owner-defined progression/reward paths.
+
+Economy mutation is domain logic, never presentation logic. Planned service seams live under `scripts/economy/`, `scripts/progression/` and `scripts/collection/`. Every grant/spend/exchange uses an idempotent transaction identity and atomic commit.
+
+GameplaySpeedAuthority remains temporal-only. Manual 2x is permitted by an economy entitlement layer; timed 2x uses absolute wall-clock expiry and continues in menus/background/closed-app time. Automatic M23-supply-exhausted 2x remains free.
+
+Exactly four boosters are authorized. +1 Slot requires M24/M27/UI to support authoritative capacity 5 or 6. Random and Selector require solver-backed safe transactions. Tornado requires a cross-engine atomic color purge that reconciles supply, slots, claims/reservations, in-flight agents and board truth.
+
+**Reason**:
+
+Separating wallet/reward/entitlement/inventory services from gameplay and UI prevents double grants, UI-owned balances and hidden solver divergence while preserving tunable economy data.
