@@ -123,11 +123,19 @@ The existing `BoardRenderer` remains the production board renderer. Do not repla
 
 ### Gameplay speed control
 
-Owner-locked V1 gameplay speed is `1x` or `2x` only. The bottom-right gameplay control is the speed control and must visually support the current 1x/2x state. Manual interaction toggles 1x <-> 2x when functional input is implemented.
+Owner-locked V1 gameplay speed is `1x` or `2x` only. The bottom-right gameplay control is the speed control and must visually support the current 1x/2x state.
 
-The game also automatically switches to 2x when authoritative M23 supply is exhausted: every FIFO column, including formerly hidden future batches, has zero remaining batches after the final successful transactional transfer into M24. This is not the same as "all five slots are occupied." A rejected final placement does not trigger auto-2x. New level/full reset returns to 1x; pause preserves and resumes the prior speed.
+Production manual 2x is economy-gated:
+- current level: 200 SB;
+- 15 minutes: 300 SB;
+- 30 minutes: 500 SB;
+- 60 minutes: 750 SB.
 
-2x is a gameplay-time multiplier only and must not change FIFO order, target selection, reservations, routing, quotas, no-ghost invariants or solver semantics. See `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md`.
+Timed entitlements are wall-clock expiry periods and continue counting in gameplay, Home/menus, pause, background and while the app is closed. If an entitlement exists, the player may switch 1x<->2x without another charge during that entitlement.
+
+The game also automatically switches to 2x for free when authoritative M23 supply is exhausted: every FIFO column, including formerly hidden future batches, has zero remaining batches after the final successful transactional transfer into M24. This is not the same as "all normal slots are occupied." A rejected final placement does not trigger auto-2x.
+
+2x is a gameplay-time multiplier only and must not change FIFO order, target selection, reservations, routing, quotas, no-ghost invariants or solver semantics. See `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md` and `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
 
 ## 6. Home screen responsive composition
 
@@ -138,13 +146,13 @@ HomeScreen
 └── SafeAreaRoot
     └── VBoxContainer
         ├── TopCurrencyHUD
-        ├── SeasonProgress
+        ├── GiftMeter
         ├── MainWorldArea
         │   ├── LeftShortcutColumn
         │   ├── CenterScrubbyArea
         │   └── RightShortcutColumn
         ├── PlayButton
-        ├── RewardTrack
+        ├── WinStreakRewardTrack
         └── BottomNav
 ```
 
@@ -304,14 +312,22 @@ Do not duplicate the same modal chrome in unrelated scenes.
 A reusable booster view should support at least:
 
 ```text
-AVAILABLE
-EMPTY
+CHARGE_AVAILABLE
+PURCHASABLE_SB
 SELECTED
+UNAVAILABLE
 LOCKED
-FREE_AD
 ```
 
-Quantity and plus/ad badges are separate overlays, not baked into icon art. Booster mechanics remain gameplay/economy design-gated until canonical rules exist.
+Quantity, SB price and state badges are separate live overlays, never baked into icon art.
+
+Economy V1 authorizes exactly four boosters:
+- +1 Slot: 500 SB; current-attempt capacity 5->6, max once/attempt.
+- Random: 350 SB; solver-validated remaining-supply reorder with >=3 safe moves.
+- Selector: 500 SB; one solver-safe arbitrary remaining batch into rightmost EMPTY slot.
+- Tornado: 750 SB; atomically purge one selected color and reconcile all related runtime state.
+
+Gift Bar and Daily may grant free booster charges. No fifth V1 booster is authorized. Canonical semantics: `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
 
 ## 13. Asset directories
 
@@ -446,3 +462,17 @@ The railroad is presentation/routing space only — not LevelData/BoardState, no
 C01..C16 artwork layer, and it does not change Difficulty V1. It supersedes the M21
 adjacent one-cell ring as future production movement geometry; M21 V07-V10 remain
 valid historical evidence for their commits.
+
+
+## 14. Home Economy V1 semantics
+
+Home's owner-approved visual composition remains authoritative, but production meanings are:
+- top currency = Scrub Bucks, not coin/Star;
+- Heart counter = max 5, 30-minute wall-clock regen;
+- profile progress bar = Bot Parts toward next 250-part robot unlock, not XP;
+- former event progress bar = Gift Meter fed only by Win Streak SB, milestones 10/50/250/500/1000, no event timer;
+- former Star Exchange shortcut = Cards Exchange;
+- lower reward road = Win Streak SB reward track (1/5/10/25/100 SB mapping);
+- Stars and Event Points do not exist as functional balances.
+
+All values, prices, countdowns, reward amounts and labels remain live Godot UI.
