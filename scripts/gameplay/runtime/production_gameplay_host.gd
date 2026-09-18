@@ -164,7 +164,10 @@ func _on_pause_pressed() -> void:
 	if pause_btn != null:
 		pause_btn.text = "▶" if now else "II"
 
-## Manual 1x <-> 2x toggle wired to the bottom-right control; updates M28 visual state.
+## M29 temporal/debug seam. Economy V1 supersedes free shipping manual 2x:
+## M39 must route this production-facing request through SpeedEntitlementService
+## (level/timed SB entitlement) before enabling 2x. Keep this direct toggle only as
+## pre-M39 playable/audit behavior; authoritative M23-exhausted auto-2x remains free.
 func _on_speed_pressed() -> void:
 	var two: bool = _runtime.toggle_speed()
 	_screen.set_speed_2x(two)
