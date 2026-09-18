@@ -120,7 +120,7 @@ changing the canonical core-gameplay milestone order.
 - ACTIVE cells render their canonical source color.
 - CLEARED cells render alpha 0; BG01 Midnight Slate is the gameplay surface
   visible underneath and is not a logical palette color.
-- Exactly five production batch slots are visible.
+- Normal production capacity is five batch slots; the owner-locked +1 Slot booster may temporarily expose an authoritative sixth slot for the current attempt.
 - A legal supply selection auto-places into the rightmost empty slot.
 - Target selection, reservation/claim ownership and routing remain separate.
 - Railroad V1 controls exterior travel. After a legal ingress, a Scrubbot may
@@ -162,3 +162,16 @@ app.
     <sub>Developed by Akilta</sub>
   </a>
 </p>
+
+
+### Economy & Rewards V1
+
+Owner-locked economy truth lives in `coordination/OWNER_ECONOMY_REWARDS_V01.md` with machine tuning in `data/config/economy_rewards_v1.json`.
+
+- Scrub Bucks are the only general spendable soft currency.
+- Hearts regenerate every 30 real-world minutes.
+- Bot Parts unlock post-Scrubby robots at 250 parts each.
+- Gift Meter is fed only by Win Streak SB and uses 10/50/250/500/1000 milestones.
+- Stars/Event Points are removed; Star Exchange becomes Cards Exchange.
+- Exactly four boosters are authorized: +1 Slot, Random, Selector, Tornado.
+- Manual 2x requires SB entitlement; automatic M23-exhausted 2x remains free.
