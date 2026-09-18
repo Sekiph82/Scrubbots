@@ -1350,7 +1350,7 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [ ] SB-M39-013 Implement 1000 guaranteed-new-card rule with 500 SB fallback when no eligible missing card exists.
 - [ ] SB-M39-014 Prove base level/Daily/Tasks/Gift/Cards Exchange SB cannot recursively advance Gift Meter.
 - [ ] SB-M39-015 Implement `robot_unlock_service.gd`: Scrubby initially unlocked; every later robot costs 250 Bot Parts; preserve overflow.
-- [ ] SB-M39-016 Grant +10 Bot Parts per 9/9 Collection set and wire next-robot notification/read model.
+- [ ] SB-M39-016 Grant owner-locked per-set SB/Bot Parts rewards on first 9/9 completion and wire next-robot notification/read model.
 - [ ] SB-M39-017 Add pacing simulation/evidence targeting approximately one robot unlock per 150 progression levels for average engaged play.
 - [ ] SB-M39-018 Enforce robot perks as meta/economy convenience only; never alter solver/BoardState/TargetSelector/routing legality.
 - [ ] SB-M39-019 Implement `heart_service.gd`: max 5, one Heart per 1800 real-world seconds, offline/menu/background regen.
@@ -1381,7 +1381,10 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [ ] SB-M39-044 Missing a local calendar day resets login streak/cycle; clock rollback can never create duplicate claims.
 - [ ] SB-M39-045 Implement `collection_inventory.gd` for 15 sets × 9 cards, protected first copy and completion state.
 - [ ] SB-M39-046 Standard Pack = 3 eligible draws; Premium Pack = 5 eligible draws with >=1 Rare-or-better; duplicates allowed.
-- [ ] SB-M39-047 Completing 9/9 set grants 500 SB + 10 Bot Parts exactly once.
+- [ ] SB-M39-047 Implement exact per-set 9/9 rewards from Economy V1: S1 350/5, S2 400/5, S3 450/6, S4 500/7, S5 550/7, S6 600/8, S7 700/9, S8 750/9, S9 800/10, S10 900/10, S11 1000/11, S12 1100/12, S13 1250/13, S14 1500/15, S15 2500/20 (SB/Bot Parts), each exactly once.
+- [ ] SB-M39-047A Grant Master Collection exactly once when all 15 sets first reach 9/9: +2500 SB +20 Bot Parts, additional to Set 15.
+- [ ] SB-M39-047B Prove total 15-set completion milestones = 13,350 SB +147 Bot Parts; including Master Collection = 15,850 SB +167 Bot Parts.
+- [ ] SB-M39-047C Persist per-set completion-grant transaction IDs and Master Collection transaction ID so sync/relaunch cannot double-grant.
 - [ ] SB-M39-048 Implement `cards_exchange_service.gd`; only copies above protected first copy are exchangeable.
 - [ ] SB-M39-049 Exchange values: Common 25 / Rare 75 / Epic 200 / Legendary 500 SB.
 - [ ] SB-M39-050 Implement per-card and EXCHANGE ALL EXTRAS atomic exchange; never reduce collected owned count below 1.
@@ -1566,7 +1569,8 @@ Every production level:
 - [ ] SB-M54-011 Completion tests. — [ ] SB-M54-012 Save tests.
 - [ ] SB-M54-013 Reward tests. — [ ] SB-M54-014 Content validation tests.
 - [ ] SB-M54-015 59×59 regression test.
-- [ ] SB-M54-016 Economy Wallet/Gift Meter/Daily/Cards Exchange idempotency regression.
+- [ ] SB-M54-016 Economy Wallet/Gift Meter/Daily/Cards Exchange/Collection-completion idempotency regression.
+- [ ] SB-M54-016A Test every set-specific 9/9 reward plus all-15 Master Collection +2500 SB/+20 Bot Parts exactly-once grant.
 - [ ] SB-M54-017 Heart 30-minute offline/background/menu regen and clock-rollback regression.
 - [ ] SB-M54-018 2x level/timed entitlement wall-clock expiry + free M23-exhausted auto-2x regression.
 - [ ] SB-M54-019 +1 Slot 5/6-capacity runtime + solver regression.
