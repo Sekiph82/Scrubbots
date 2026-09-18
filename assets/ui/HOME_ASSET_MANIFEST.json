@@ -5,7 +5,7 @@
   "status": "PREPRODUCTION_INVENTORY_READY",
   "updated": "2026-09-18",
   "canonical_reference": "assets/art/references/_owner_inbox/Game Screens/main screen.png",
-  "authority": "docs/MASTER_UI_SYSTEM.md",
+  "authority": "docs/MASTER_UI_SYSTEM.md + coordination/OWNER_ECONOMY_REWARDS_V01.md",
   "provider_policy": {
     "primary": "chatgpt_image_generation",
     "fallback": [
@@ -27,12 +27,12 @@
     "player name",
     "rank/title",
     "level number",
-    "XP values",
-    "coin amount",
+    "Bot Parts progress",
+    "Scrub Bucks amount",
     "life count",
     "life timer",
     "area title/number",
-    "progress values/timers",
+    "Gift Meter progress/next milestone and live timers",
     "shortcut labels/counters",
     "PLAY",
     "CONTINUE · LEVEL N",
@@ -554,25 +554,25 @@
     },
     {
       "id": "HOME-036",
-      "slug": "profile_xp_bar_bg",
+      "slug": "profile_bot_parts_bar_bg",
       "group": "profile",
       "kind": "NATIVE",
       "implementation": "godot_native",
       "generation_required": false,
       "reusable": true,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Next-robot Bot Parts progress; normal target 250."
     },
     {
       "id": "HOME-037",
-      "slug": "profile_xp_bar_fill",
+      "slug": "profile_bot_parts_bar_fill",
       "group": "profile",
       "kind": "NATIVE",
       "implementation": "godot_native",
       "generation_required": false,
       "reusable": true,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Bot Parts progress fill; not XP."
     },
     {
       "id": "HOME-038",
@@ -609,22 +609,22 @@
     },
     {
       "id": "HOME-041",
-      "slug": "profile_xp_values",
+      "slug": "profile_bot_parts_values",
       "group": "profile",
       "kind": "LIVE",
       "implementation": "live_godot_ui",
       "generation_required": false,
       "reusable": true,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "LIVE Bot Parts value, e.g. 184/250."
     },
     {
       "id": "HOME-042",
-      "slug": "icon_currency_coin",
+      "slug": "icon_currency_scrub_bucks",
       "group": "currency",
       "kind": "ART",
       "implementation": "generated_asset",
-      "path": "assets/ui/final/common/currencies/icon_currency_coin.png",
+      "path": "assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
       "generation_required": true,
       "provider": "chatgpt_image_generation",
       "fallback_providers": [
@@ -632,7 +632,7 @@
       ],
       "reusable": true,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Canonical spendable soft-currency icon; owner-approved local asset may be bulk-pushed later."
     },
     {
       "id": "HOME-043",
@@ -674,14 +674,14 @@
     },
     {
       "id": "HOME-046",
-      "slug": "currency_coin_amount",
+      "slug": "currency_scrub_bucks_amount",
       "group": "currency",
       "kind": "LIVE",
       "implementation": "live_godot_ui",
       "generation_required": false,
       "reusable": true,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "LIVE Scrub Bucks balance."
     },
     {
       "id": "HOME-047",
@@ -729,11 +729,11 @@
     },
     {
       "id": "HOME-051",
-      "slug": "event_progress_emblem",
-      "group": "top_event",
+      "slug": "gift_meter_emblem",
+      "group": "gift_meter",
       "kind": "ART",
       "implementation": "generated_asset",
-      "path": "assets/ui/final/home/event_progress/event_progress_emblem.png",
+      "path": "assets/ui/final/home/gift_meter/gift_meter_emblem.png",
       "generation_required": true,
       "provider": "chatgpt_image_generation",
       "fallback_providers": [
@@ -741,37 +741,37 @@
       ],
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Gift Meter emblem; must not imply Star/Event currency."
     },
     {
       "id": "HOME-052",
-      "slug": "event_progress_bar_bg",
-      "group": "top_event",
+      "slug": "gift_meter_bar_bg",
+      "group": "gift_meter",
       "kind": "NATIVE",
       "implementation": "godot_native",
       "generation_required": false,
       "reusable": true,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Native Gift Meter bar background."
     },
     {
       "id": "HOME-053",
-      "slug": "event_progress_bar_fill",
-      "group": "top_event",
+      "slug": "gift_meter_bar_fill",
+      "group": "gift_meter",
       "kind": "NATIVE",
       "implementation": "godot_native",
       "generation_required": false,
       "reusable": true,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Progress comes ONLY from Win Streak SB."
     },
     {
       "id": "HOME-054",
-      "slug": "event_reward_crate",
-      "group": "top_event",
+      "slug": "gift_meter_reward_crate",
+      "group": "gift_meter",
       "kind": "ART",
       "implementation": "generated_asset",
-      "path": "assets/ui/final/home/event_progress/event_reward_crate.png",
+      "path": "assets/ui/final/home/gift_meter/gift_meter_reward_crate.png",
       "generation_required": true,
       "provider": "chatgpt_image_generation",
       "fallback_providers": [
@@ -779,40 +779,40 @@
       ],
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Milestone reward crate for 10/50/250/500/1000 Gift Meter thresholds."
     },
     {
       "id": "HOME-055",
-      "slug": "event_reward_count_badge",
-      "group": "top_event",
+      "slug": "gift_meter_reward_count_badge",
+      "group": "gift_meter",
       "kind": "NATIVE",
       "implementation": "godot_native",
       "generation_required": false,
       "reusable": true,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Claimable Gift Bar milestone count."
     },
     {
       "id": "HOME-056",
-      "slug": "event_progress_value",
-      "group": "top_event",
+      "slug": "gift_meter_progress_value",
+      "group": "gift_meter",
       "kind": "LIVE",
       "implementation": "live_godot_ui",
       "generation_required": false,
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "LIVE cumulative cycle progress 0..1000."
     },
     {
       "id": "HOME-057",
-      "slug": "event_progress_timer",
-      "group": "top_event",
+      "slug": "gift_meter_next_milestone_value",
+      "group": "gift_meter",
       "kind": "LIVE",
       "implementation": "live_godot_ui",
       "generation_required": false,
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "LIVE next threshold; old event timer is removed."
     },
     {
       "id": "HOME-058",
@@ -972,11 +972,11 @@
     },
     {
       "id": "HOME-069",
-      "slug": "icon_shortcut_star_exchange",
+      "slug": "icon_shortcut_cards_exchange",
       "group": "shortcuts",
       "kind": "ART",
       "implementation": "generated_asset",
-      "path": "assets/ui/final/home/shortcuts/icon_shortcut_star_exchange.png",
+      "path": "assets/ui/final/home/shortcuts/icon_shortcut_cards_exchange.png",
       "generation_required": true,
       "provider": "chatgpt_image_generation",
       "fallback_providers": [
@@ -984,7 +984,7 @@
       ],
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Replaces Star Exchange; duplicate cards -> Scrub Bucks."
     },
     {
       "id": "HOME-070",
@@ -1169,11 +1169,11 @@
     },
     {
       "id": "HOME-086",
-      "slug": "reward_track_star_badge",
+      "slug": "win_streak_reward_badge",
       "group": "reward_track",
       "kind": "ART",
       "implementation": "generated_asset",
-      "path": "assets/ui/final/home/reward_track/reward_track_star_badge.png",
+      "path": "assets/ui/final/home/reward_track/win_streak_reward_badge.png",
       "generation_required": true,
       "provider": "chatgpt_image_generation",
       "fallback_providers": [
@@ -1181,23 +1181,19 @@
       ],
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Reward-track badge; no Star currency semantics."
     },
     {
       "id": "HOME-087",
-      "slug": "reward_track_star_icon",
+      "slug": "win_streak_reward_scrub_bucks_icon",
       "group": "reward_track",
       "kind": "ART",
       "implementation": "generated_asset",
-      "path": "assets/ui/final/common/icons/icon_star.png",
-      "generation_required": true,
-      "provider": "chatgpt_image_generation",
-      "fallback_providers": [
-        "magnific"
-      ],
+      "path": "assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
+      "generation_required": false,
       "reusable": true,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Reuse HOME-042 Scrub Bucks icon; no separate Star icon."
     },
     {
       "id": "HOME-088",
@@ -1223,7 +1219,7 @@
     },
     {
       "id": "HOME-090",
-      "slug": "reward_gift_1",
+      "slug": "win_streak_reward_gift_1",
       "group": "reward_track",
       "kind": "ART",
       "implementation": "generated_asset",
@@ -1235,11 +1231,11 @@
       ],
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Consecutive win 1 reward visual; LIVE amount +1 SB."
     },
     {
       "id": "HOME-091",
-      "slug": "reward_gift_5",
+      "slug": "win_streak_reward_gift_5",
       "group": "reward_track",
       "kind": "ART",
       "implementation": "generated_asset",
@@ -1251,11 +1247,11 @@
       ],
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Consecutive win 2 reward visual; LIVE amount +5 SB."
     },
     {
       "id": "HOME-092",
-      "slug": "reward_gift_10",
+      "slug": "win_streak_reward_gift_10",
       "group": "reward_track",
       "kind": "ART",
       "implementation": "generated_asset",
@@ -1267,11 +1263,11 @@
       ],
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Consecutive win 3 reward visual; LIVE amount +10 SB."
     },
     {
       "id": "HOME-093",
-      "slug": "reward_gift_25",
+      "slug": "win_streak_reward_gift_25",
       "group": "reward_track",
       "kind": "ART",
       "implementation": "generated_asset",
@@ -1283,11 +1279,11 @@
       ],
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Consecutive win 4 reward visual; LIVE amount +25 SB."
     },
     {
       "id": "HOME-094",
-      "slug": "reward_gift_100",
+      "slug": "win_streak_reward_gift_100",
       "group": "reward_track",
       "kind": "ART",
       "implementation": "generated_asset",
@@ -1299,7 +1295,7 @@
       ],
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "Consecutive win 5+ reward visual; LIVE amount +100 SB."
     },
     {
       "id": "HOME-095",
@@ -1336,25 +1332,25 @@
     },
     {
       "id": "HOME-098",
-      "slug": "reward_current_star_amount",
+      "slug": "reward_current_win_streak",
       "group": "reward_track",
       "kind": "LIVE",
       "implementation": "live_godot_ui",
       "generation_required": false,
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "LIVE current consecutive progression-win count; not Star amount."
     },
     {
       "id": "HOME-099",
-      "slug": "reward_milestone_numbers",
+      "slug": "win_streak_reward_amounts",
       "group": "reward_track",
       "kind": "LIVE",
       "implementation": "live_godot_ui",
       "generation_required": false,
       "reusable": false,
       "status": "PLANNED",
-      "notes": ""
+      "notes": "LIVE SB amounts 1/5/10/25/100; not thresholds/currency Stars."
     },
     {
       "id": "HOME-100",
