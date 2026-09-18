@@ -252,6 +252,19 @@ func _bind_txn(board, slot_system, candidate_index, reservation_state, dispatche
 func is_bound() -> bool:
 	return _bound
 
+## Exact cross-engine bundle-identity query (M26-C001 V02, F-M26-V01-STRICT-004).
+## Read-only and non-mutating: returns true ONLY when this loop is bound to the SAME
+## BoardState instance, the SAME ReservationState instance AND the SAME
+## ScrubbotDispatcher instance the caller supplies (reference identity, not merely
+## equal/coherent). It lets the M26 scheduler prove the arrival-clear loop shares the
+## exact same board/reservation/dispatcher bundle the scheduler drives, rejecting an
+## individually-valid loop from a different session. Never exposes any internal
+## reference — a caller may only ask "are you bound to THESE exact three?".
+func is_bound_to(board, reservations, dispatcher) -> bool:
+	return _bound and _board != null and _board == board \
+		and _reservations != null and _reservations == reservations \
+		and _dispatcher != null and _dispatcher == dispatcher
+
 ## Exact read-only bundle-coherence query. True only when every bound collaborator
 ## still reports exact-identity binding (F-M20-STRICT-001). Never exposes refs.
 func is_coherent() -> bool:

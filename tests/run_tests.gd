@@ -14069,6 +14069,7 @@ const BatchTargetClaimEngine = preload("res://scripts/gameplay/targeting/batch_t
 # M26 — auto dispatch scheduler.
 const AutoDispatchScheduler = preload("res://scripts/gameplay/dispatch/auto_dispatch_scheduler.gd")
 const M26OriginProvider = preload("res://tests/support/m26_origin_provider.gd")
+const M26ResetInjector = preload("res://tests/support/m26_reset_injector.gd")
 
 func _m23_level(w: int, h: int, cells: Array, palette_size: int):
 	var pal := PackedStringArray()
@@ -15102,6 +15103,14 @@ func _run_m26_scheduler_tests() -> void:
 	_m26_waiting_and_wake()
 	_m26_pause_resume_reset()
 	_m26_blue15_autonomy()
+	_run_m26_v02_remediation_tests()
+
+func _run_m26_v02_remediation_tests() -> void:
+	print("---- M26-C001 V02: strict remediation (F-M26-V01-STRICT-001..004) ----")
+	_m26_v02_deferred_reset_during_step()      # F-M26-V01-STRICT-001
+	_m26_v02_transaction_safe_reset()          # F-M26-V01-STRICT-002
+	_m26_v02_finalize_ordering()               # F-M26-V01-STRICT-003
+	_m26_v02_bundle_coherence_bind()           # F-M26-V01-STRICT-004
 
 func _m26_bind_and_preclaimed_boundary() -> void:
 	var BLUE := 0
@@ -15348,3 +15357,278 @@ func _m26_blue15_autonomy() -> void:
 	# No 16th assignment.
 	_check(not sched.step()["ok"], "M26 BLUE15: no 16th assignment after quota exhausted")
 	disp.free()
+
+# ============================================================================
+# M26-C001 V02 — strict remediation (F-M26-V01-STRICT-001..004)
+# ============================================================================
+
+## Build the full production M26 bundle exactly like _m26_build, but with a supplied
+## injector as BOTH the scheduler origin provider AND the dispatcher agent factory, so a
+## test can fire a deferred reset() from a mid-step callback boundary.
+func _m26_build_injected(board, specs: Array, injector, origin: Vector2) -> Dictionary:
+	var res = ReservationState.new(); res.bind(board)
+	var ci = ColorCandidateIndex.create(); ci.bind(board)
+	var sel = TargetSelector.create(); sel.bind(board, ci, res)
+	var routing = ProductionRoutingSystem.new()
+	var raccess = ProductionAccessQuery.new(board)
+	var slots = _m25_slots(specs)
+	var claim = BatchTargetClaimEngine.new(); claim.bind(board, slots, sel, res)
+	var disp = ScrubbotDispatcher.new()
+	disp.bind(board, sel, res, routing, raccess, ProductionTargetAccess.new(routing, raccess, board),
+		null, Callable(injector, "make_agent"))
+	var loop = CompleteClearingLoop.new()
+	var lok: bool = loop.bind_arrival_only(board, ci, res, disp)
+	var sched = AutoDispatchScheduler.new()
+	var sok: bool = sched.bind(board, slots, claim, res, routing, raccess, disp, loop, injector)
+	injector.setup(sched, origin)
+	return {"board": board, "res": res, "ci": ci, "sel": sel, "routing": routing,
+		"raccess": raccess, "slots": slots, "claim": claim, "disp": disp, "loop": loop,
+		"sched": sched, "loop_bound": lok, "sched_bound": sok}
+
+## F-M26-V01-STRICT-001 — a reset injected from a callback boundary mid-step() is
+## deferred/generation-safe: it is never dropped, it aborts the step with zero robot,
+## it rolls back any live M25 claim safely, it drains after the step unwinds, and later
+## scheduling still works. Exercised at TWO injection points: one BEFORE dispatch
+## (origin/route/access boundary) and one INSIDE preclaimed dispatch (agent factory).
+func _m26_v02_deferred_reset_during_step() -> void:
+	var BLUE := 0
+	var active: Array = []
+	for x in range(8):
+		active.append(19 * 20 + x)
+	var origin := Vector2(10.0, 23.0)
+
+	# --- (A) reset injected BEFORE dispatch (post-claim origin-provider callback) ---
+	var boardA = _m25_board(20, 20, 4, BLUE, active)
+	var injA = M26ResetInjector.new()
+	var bA := _m26_build_injected(boardA, [["B", BLUE, 8]], injA, origin)
+	_check(bA["sched_bound"] and bA["loop_bound"], "M26 V02 STRICT-001A: injected bundle bound")
+	injA.arm_origin(2)  # 2nd origin_for_slot lookup = post-claim, pre-dispatch
+	var rA = bA["sched"].step()
+	_check(not rA["ok"], "M26 V02 STRICT-001A: reset-before-dispatch aborts the step (no assignment)")
+	_check(injA.reset_calls == 1, "M26 V02 STRICT-001A: reset fired exactly once mid-step")
+	_check(bA["sched"].live_assignment_count() == 0, "M26 V02 STRICT-001A: zero scheduler assignments")
+	_check(bA["disp"].get_active_count() == 0, "M26 V02 STRICT-001A: zero robot (deferred reset drained)")
+	_check(bA["claim"].live_claim_count() == 0, "M26 V02 STRICT-001A: in-progress M25 claim rolled back")
+	_check(bA["res"].get_reservation_count() == 0, "M26 V02 STRICT-001A: reservation released, no leak")
+	_check(not bA["sched"].is_reset_pending() and bA["sched"].last_reset_succeeded(), "M26 V02 STRICT-001A: deferred reset drained successfully")
+	# Later scheduling still works (single-shot injector disarmed).
+	var rA2 = bA["sched"].step()
+	_check(rA2["ok"] and bA["disp"].get_active_count() == 1, "M26 V02 STRICT-001A: scheduling resumes after drained reset")
+	bA["disp"].free(); injA.free()
+
+	# --- (B) reset injected INSIDE preclaimed dispatch (agent-factory callback) ---
+	var boardB = _m25_board(20, 20, 4, BLUE, active)
+	var injB = M26ResetInjector.new()
+	var bB := _m26_build_injected(boardB, [["B", BLUE, 8]], injB, origin)
+	injB.arm_factory()  # reset fires while dispatch_preclaimed builds the agent
+	var rB = bB["sched"].step()
+	_check(not rB["ok"], "M26 V02 STRICT-001B: reset-inside-dispatch aborts the step (no accepted assignment)")
+	_check(injB.reset_calls == 1, "M26 V02 STRICT-001B: reset fired exactly once inside preclaimed dispatch")
+	_check(bB["sched"].live_assignment_count() == 0, "M26 V02 STRICT-001B: zero scheduler assignments")
+	_check(bB["disp"].get_active_count() == 0, "M26 V02 STRICT-001B: spawned agent torn down => zero robot")
+	_check(bB["claim"].live_claim_count() == 0, "M26 V02 STRICT-001B: M25 claim rolled back")
+	_check(bB["res"].get_reservation_count() == 0, "M26 V02 STRICT-001B: reservation released, no leak")
+	# Zero live/moving ScrubbotAgent under the dispatcher.
+	var movingB := 0
+	for c in bB["disp"].get_children():
+		if c is ScrubbotAgent and c.is_moving():
+			movingB += 1
+	_check(movingB == 0, "M26 V02 STRICT-001B: zero live/moving agent after drained reset")
+	var rB2 = bB["sched"].step()
+	_check(rB2["ok"] and bB["disp"].get_active_count() == 1, "M26 V02 STRICT-001B: scheduling resumes after drained reset")
+	bB["disp"].free(); injB.free()
+
+## F-M26-V01-STRICT-002 — transaction-safe reset. With two live assignments, drifting
+## one claim's exact M24 work tuple makes M25 rollback fail; reset must fail closed
+## BEFORE destroying the healthy sibling, the dispatcher agents/reservations, or the
+## scheduler ledger. After repair, reset succeeds and leaves zero of everything while an
+## unrelated reservation survives throughout.
+func _m26_v02_transaction_safe_reset() -> void:
+	var BLUE := 0
+	var RED := 1
+	# 1x6 board: BLUE at 0, RED at 5, an unrelated ACTIVE cell at 2, rest CLEARED.
+	var pal := PackedStringArray()
+	for i in range(4):
+		pal.append("#%02x%02x%02x" % [16 + i, 16 + i, 16 + i])
+	var cells := PackedInt32Array(); cells.resize(6); cells.fill(BLUE)
+	cells[5] = RED
+	var board = BoardState.from_level_data(LevelData.new(1, "m26tx", "m26tx", "TEST", 6, 1, pal, cells))
+	board.set_cell_state(1, BoardState.CellState.CLEARED)
+	board.set_cell_state(3, BoardState.CellState.CLEARED)
+	board.set_cell_state(4, BoardState.CellState.CLEARED)
+	var b := _m26_build(board, [["BB", BLUE, 5], ["RR", RED, 5]], Vector2(3.0, 3.0))
+	var sched = b["sched"]; var slots = b["slots"]; var res = b["res"]; var disp = b["disp"]; var claim = b["claim"]
+	# Seed an unrelated reservation on the still-ACTIVE cell 2 (never scheduler-claimed).
+	var unrelated_owner := 4242
+	_check(res.reserve(2, unrelated_owner), "M26 V02 STRICT-002: unrelated reservation seeded")
+	# Two live assignments (BLUE + RED via round-robin).
+	sched.step(); sched.step()
+	_check(sched.live_assignment_count() == 2 and disp.get_active_count() == 2, "M26 V02 STRICT-002: two live assignments established")
+	var snap: Array = sched.assignment_snapshot()
+	var drift_cid = snap[1]["claim_id"]
+	var committed_blue_before: int = slots.get_committed(4)
+	var committed_red_before: int = slots.get_committed(3)
+	# Drift ONE claim's exact M24 work tuple so its is_work_bound_to() (and thus M25
+	# rollback) fails: point the M24 live-work record at a bogus batch id.
+	_check(slots._live_work.has(drift_cid), "M26 V02 STRICT-002: drifted claim has a live M24 work record")
+	var saved_batch = slots._live_work[drift_cid]["batch_id"]
+	slots._live_work[drift_cid]["batch_id"] = "DRIFT_BOGUS"
+	# Reset must fail closed: nothing destroyed.
+	var ok1: bool = sched.reset()
+	_check(not ok1 and not sched.last_reset_succeeded(), "M26 V02 STRICT-002: reset fails closed on incoherent claim")
+	_check(sched.live_assignment_count() == 2, "M26 V02 STRICT-002: scheduler ledger intact after fail-closed reset")
+	_check(claim.live_claim_count() == 2, "M26 V02 STRICT-002: BOTH M25 claims (incl. healthy sibling) preserved")
+	_check(disp.get_active_count() == 2, "M26 V02 STRICT-002: dispatcher agents remain recoverable")
+	_check(res.get_owner(2) == unrelated_owner, "M26 V02 STRICT-002: unrelated reservation survives fail-closed reset")
+	_check(slots.get_committed(4) == committed_blue_before and slots.get_committed(3) == committed_red_before, "M26 V02 STRICT-002: no M24 committed mutated on fail-closed reset")
+	_check(sched.is_reset_pending(), "M26 V02 STRICT-002: reset stays pending (blocks scheduling) until repaired")
+	_check(not sched.step()["ok"], "M26 V02 STRICT-002: new scheduling blocked while reset pending")
+	# Repair the drift, then reset succeeds and leaves zero of everything.
+	slots._live_work[drift_cid]["batch_id"] = saved_batch
+	var ok2: bool = sched.reset()
+	_check(ok2 and sched.last_reset_succeeded(), "M26 V02 STRICT-002: reset succeeds after repair")
+	_check(sched.live_assignment_count() == 0, "M26 V02 STRICT-002: zero scheduler assignments after repair")
+	_check(claim.live_claim_count() == 0, "M26 V02 STRICT-002: zero live M25 claims after repair")
+	_check(disp.get_active_count() == 0, "M26 V02 STRICT-002: zero dispatcher active agents after repair")
+	_check(slots.get_committed(4) == 0 and slots.get_committed(3) == 0, "M26 V02 STRICT-002: M24 committed rolled back to 0 after repair")
+	_check(res.get_owner(2) == unrelated_owner, "M26 V02 STRICT-002: unrelated reservation still survives after successful reset")
+	_check(not sched.is_reset_pending(), "M26 V02 STRICT-002: no pending reset after success")
+	disp.free()
+
+## F-M26-V01-STRICT-003 — authenticated-clear finalize ordering. The scheduler keeps the
+## owner->claim mapping until M25.finalize_clear succeeds, validates the EXACT agent
+## identity, and on forced finalize failure retains assignment/claim/committed truth,
+## does not wake, does not decrement quota, and surfaces a fatal state.
+func _m26_v02_finalize_ordering() -> void:
+	var BLUE := 0
+	var active: Array = []
+	for x in range(15):
+		active.append(19 * 20 + x)
+	var origin := Vector2(10.0, 23.0)
+
+	# --- wrong-identity notifications are ignored (no finalize, no fatal) ---
+	var board1 = _m25_board(20, 20, 4, BLUE, active)
+	var b1 := _m26_build(board1, [["B", BLUE, 15]], origin)
+	var sched1 = b1["sched"]; var slots1 = b1["slots"]; var disp1 = b1["disp"]
+	var a1 = sched1.step()
+	_check(a1["ok"], "M26 V02 STRICT-003: baseline assignment established")
+	var owner1: int = int(a1["owner_id"]); var target1: int = int(a1["target"]); var agent1 = a1["agent"]
+	var rem_before: int = slots1.get_remaining(4)
+	# Wrong agent (otherwise-correct owner/target/color).
+	sched1._on_authenticated_clear(owner1, target1, BLUE, RefCounted.new())
+	_check(not sched1.get_assignment(owner1).is_empty(), "M26 V02 STRICT-003: wrong-agent clear ignored, assignment retained")
+	_check(b1["claim"].live_claim_count() == 1 and not sched1.is_fatal(), "M26 V02 STRICT-003: wrong-agent clear did not finalize or go fatal")
+	# Wrong target / wrong color.
+	sched1._on_authenticated_clear(owner1, target1 + 1, BLUE, agent1)
+	sched1._on_authenticated_clear(owner1, target1, BLUE + 1, agent1)
+	_check(not sched1.get_assignment(owner1).is_empty() and b1["claim"].live_claim_count() == 1, "M26 V02 STRICT-003: wrong target/color clear ignored")
+	_check(slots1.get_remaining(4) == rem_before, "M26 V02 STRICT-003: no quota decrement on ignored notifications")
+	# Stale/unknown owner does nothing.
+	sched1._on_authenticated_clear(999999, target1, BLUE, agent1)
+	_check(slots1.get_remaining(4) == rem_before and not sched1.is_fatal(), "M26 V02 STRICT-003: unknown-owner clear ignored, no quota change")
+	disp1.free()
+
+	# --- forced finalize failure retains truth + goes fatal (M24 work-tuple drift) ---
+	var board2 = _m25_board(20, 20, 4, BLUE, active)
+	var b2 := _m26_build(board2, [["B", BLUE, 15]], origin)
+	var sched2 = b2["sched"]; var slots2 = b2["slots"]; var disp2 = b2["disp"]; var claim2 = b2["claim"]
+	var a2 = sched2.step()
+	var owner2: int = int(a2["owner_id"]); var cid2 = a2["claim_id"]
+	var committed_before: int = slots2.get_committed(4)
+	var remaining_before: int = slots2.get_remaining(4)
+	# Drift the exact M24 work tuple so M25.finalize_clear() will fail after the real
+	# clear releases the reservation and CLEARs the board.
+	var saved_batch2 = slots2._live_work[cid2]["batch_id"]
+	slots2._live_work[cid2]["batch_id"] = "DRIFT_BOGUS"
+	_m26_drive_arrivals(disp2)  # real clear -> authenticated_clear -> finalize FAILS
+	_check(not sched2.get_assignment(owner2).is_empty(), "M26 V02 STRICT-003: failed finalize RETAINS scheduler assignment")
+	_check(claim2.live_claim_count() == 1, "M26 V02 STRICT-003: failed finalize retains the M25 claim")
+	_check(slots2.get_committed(4) == committed_before, "M26 V02 STRICT-003: failed finalize retains M24 committed truth")
+	_check(slots2.get_remaining(4) == remaining_before, "M26 V02 STRICT-003: NO quota decrement on failed finalization")
+	_check(sched2.is_fatal(), "M26 V02 STRICT-003: forced finalize failure surfaces fatal state")
+	_check(not sched2.step()["ok"] and sched2.step()["reason"] == "fatal", "M26 V02 STRICT-003: fatal state blocks new scheduling")
+	# Duplicate/stale notification in fatal state still changes nothing.
+	sched2._on_authenticated_clear(owner2, int(b2["sched"].get_assignment(owner2)["target"]), BLUE, b2["sched"].get_assignment(owner2)["agent"])
+	_check(slots2.get_remaining(4) == remaining_before, "M26 V02 STRICT-003: no double quota decrement while fatal")
+	slots2._live_work[cid2]["batch_id"] = saved_batch2  # leave engine self-consistent
+	disp2.free()
+
+	# --- exact successful finalize erases mapping + wakes only AFTER success ---
+	var board3 = _m26_enclosed_blue_board()
+	var b3 := _m26_build(board3, [["B", BLUE, 3]], Vector2(1.5, 4.5))
+	var sched3 = b3["sched"]; var disp3 = b3["disp"]
+	# Unreachable center -> WAITING first.
+	_check(not sched3.step()["ok"] and sched3.is_color_waiting(BLUE), "M26 V02 STRICT-003: color WAITING before corridor opens")
+	board3.set_cell_state(7, BoardState.CellState.CLEARED); b3["ci"].rebuild(); sched3.notify_placed()
+	var a3 = sched3.step()
+	_check(a3["ok"], "M26 V02 STRICT-003: assignment on opened corridor")
+	var owner3: int = int(a3["owner_id"])
+	_m26_drive_arrivals(disp3)  # real successful clear
+	_check(sched3.get_assignment(owner3).is_empty(), "M26 V02 STRICT-003: assignment erased ONLY after true finalize success")
+	_check(b3["claim"].live_claim_count() == 0 and not sched3.is_fatal(), "M26 V02 STRICT-003: successful finalize leaves no claim, no fatal")
+	disp3.free()
+
+## F-M26-V01-STRICT-004 — scheduler bind proves the EXACT M24/M25/M20 board/reservation/
+## dispatcher bundle. A coherent bundle binds (and connects the finalize signal);
+## foreign M24, foreign M25 board/reservations, and a foreign M20 loop are each rejected
+## with ZERO side effects (scheduler unbound, no signal connection).
+func _m26_v02_bundle_coherence_bind() -> void:
+	var BLUE := 0
+	var active: Array = []
+	for x in range(8):
+		active.append(19 * 20 + x)
+	var origin := Vector2(10.0, 23.0)
+
+	# Coherent baseline: bound AND the finalize signal is connected.
+	var boardC = _m25_board(20, 20, 4, BLUE, active)
+	var bc := _m26_build(boardC, [["B", BLUE, 8]], origin)
+	_check(bc["sched_bound"] and bc["sched"].is_bound(), "M26 V02 STRICT-004: coherent bundle accepted")
+	_check(bc["loop"].authenticated_clear.is_connected(Callable(bc["sched"], "_on_authenticated_clear")), "M26 V02 STRICT-004: coherent bind connected the finalize signal")
+	bc["disp"].free()
+
+	# Shared coherent collaborators for the rejection cases.
+	var board = _m25_board(20, 20, 4, BLUE, active)
+	var res = ReservationState.new(); res.bind(board)
+	var ci = ColorCandidateIndex.create(); ci.bind(board)
+	var sel = TargetSelector.create(); sel.bind(board, ci, res)
+	var routing = ProductionRoutingSystem.new()
+	var raccess = ProductionAccessQuery.new(board)
+	var slots = _m25_slots([["B", BLUE, 8]])
+	var claim = BatchTargetClaimEngine.new(); claim.bind(board, slots, sel, res)
+	var disp = ScrubbotDispatcher.new()
+	disp.bind(board, sel, res, routing, raccess, ProductionTargetAccess.new(routing, raccess, board), null)
+	var loop = CompleteClearingLoop.new(); loop.bind_arrival_only(board, ci, res, disp)
+	var provider = M26OriginProvider.new({}, origin)
+
+	# (a) Foreign M24: a different FiveSlotBatchEngine than the one M25 owns.
+	var foreign_slots = _m25_slots([["B", BLUE, 8]])
+	var s_a = AutoDispatchScheduler.new()
+	var ok_a: bool = s_a.bind(board, foreign_slots, claim, res, routing, raccess, disp, loop, provider)
+	_check(not ok_a and not s_a.is_bound(), "M26 V02 STRICT-004: foreign M24 rejected")
+	_check(not loop.authenticated_clear.is_connected(Callable(s_a, "_on_authenticated_clear")), "M26 V02 STRICT-004: foreign M24 rejection connected no signal")
+
+	# (b) Foreign M25: an M25 bound to a DIFFERENT board+reservations bundle.
+	var fboard = _m25_board(20, 20, 4, BLUE, active)
+	var fres = ReservationState.new(); fres.bind(fboard)
+	var fci = ColorCandidateIndex.create(); fci.bind(fboard)
+	var fsel = TargetSelector.create(); fsel.bind(fboard, fci, fres)
+	var fslots = _m25_slots([["B", BLUE, 8]])
+	var foreign_claim = BatchTargetClaimEngine.new(); foreign_claim.bind(fboard, fslots, fsel, fres)
+	var s_b = AutoDispatchScheduler.new()
+	var ok_b: bool = s_b.bind(board, slots, foreign_claim, res, routing, raccess, disp, loop, provider)
+	_check(not ok_b and not s_b.is_bound(), "M26 V02 STRICT-004: foreign M25 (wrong board/reservations) rejected")
+
+	# (c) Foreign M20 loop: bound to a DIFFERENT dispatcher than the scheduler's.
+	var other_disp = ScrubbotDispatcher.new()
+	other_disp.bind(board, sel, res, routing, raccess, ProductionTargetAccess.new(routing, raccess, board), null)
+	var foreign_loop = CompleteClearingLoop.new(); foreign_loop.bind_arrival_only(board, ci, res, other_disp)
+	var s_c = AutoDispatchScheduler.new()
+	var ok_c: bool = s_c.bind(board, slots, claim, res, routing, raccess, disp, foreign_loop, provider)
+	_check(not ok_c and not s_c.is_bound(), "M26 V02 STRICT-004: foreign M20 loop (wrong dispatcher) rejected")
+	_check(not foreign_loop.authenticated_clear.is_connected(Callable(s_c, "_on_authenticated_clear")), "M26 V02 STRICT-004: foreign M20 rejection connected no signal")
+
+	# The coherent bundle still binds cleanly after all rejections (no partial state).
+	var s_ok = AutoDispatchScheduler.new()
+	var ok_final: bool = s_ok.bind(board, slots, claim, res, routing, raccess, disp, loop, provider)
+	_check(ok_final and s_ok.is_bound(), "M26 V02 STRICT-004: coherent bundle still binds after rejected attempts")
+	disp.free(); other_disp.free()
