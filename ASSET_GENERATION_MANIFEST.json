@@ -27,8 +27,10 @@
   },
   "canonical_references": {
     "gameplay": {
-      "repository_path": "assets/art/references/_owner_inbox/Game Screens/deneme 3 OK.png",
-      "status": "CANONICAL_SELECTED"
+      "repository_path": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png",
+      "status": "OWNER_APPROVED_BINARY_PENDING_LOCAL_PUSH",
+      "owner_decision": "coordination/OWNER_GAMEPLAY_MASTER_VISUAL_V01.md",
+      "previous_reference": "assets/art/references/_owner_inbox/Game Screens/deneme 3 OK.png"
     },
     "home_screen": {
       "repository_path": "assets/art/references/_owner_inbox/Game Screens/main screen.png",
@@ -288,5 +290,14 @@
     "path": "assets/ui/HOME_ASSET_MANIFEST.json",
     "status": "PREPRODUCTION_INVENTORY_READY",
     "canonical_reference": "assets/art/references/_owner_inbox/Game Screens/main screen.png"
+  },
+  "gameplay_master_visual": {
+    "id": "gameplay_master_visual_v01",
+    "provider": "chatgpt_image_generation",
+    "status": "OWNER_APPROVED_BINARY_PENDING_LOCAL_PUSH",
+    "target_path": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png",
+    "regenerate": false,
+    "composition_authority": "coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md",
+    "master_visual_authority": "coordination/OWNER_GAMEPLAY_MASTER_VISUAL_V01.md"
   }
 }
