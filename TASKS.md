@@ -1211,11 +1211,13 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 - [x] SB-M28-021 Place speech bubble above Scrubby.
 - [x] SB-M28-022 Preserve right-side cleaning props as lower-priority decoration.
 - [x] SB-M28-023 Put four booster controls in compact horizontal row above bottom/ad row.
-- [x] SB-M28-024 Pause left of ad, 2x speed control right of ad with distinct 1x/2x presentation states.
+- [x] SB-M28-024 Historical M28 baseline completed. Superseded placement: Gameplay Composition V02 moves Pause + 2x side by side to top-right; current playtest/reference has no ad banner and no Settings.
 - [x] SB-M28-025 Do not restore removed Level/lock rail.
 - [x] SB-M28-026 Bind owner-approved illustrations while keeping screen responsive/native.
 - [x] SB-M28-027 Prove BoardRenderer coordinate mapping after responsive scaling.
 - [x] SB-M28-028 Capture viewport validation evidence.
+
+**Gameplay Composition V02 owner amendment [2026-09-19]:** `coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md` is now canonical for gameplay layout. Preserve the owner-supplied baseline screen, integrate full Railroad V1 around the board, show five permanent slot-to-bottom-rail connectors, retain the five-slot + Batch Supply panel, place Pause + 2x side by side top-right, remove gameplay Settings/Heart HUD, and omit the ad banner from the current owner playtest/reference mockup. This is a presentation amendment; accepted historical M28/M29 evidence remains historical and later responsive/polish work must converge to V02.
 
 ### M29 — Mobile Touch
 
@@ -1513,7 +1515,7 @@ Maximum board target: 59×59 = 3,481.
 - [ ] SB-M49-020 Validate minimum touch target.
 - [ ] SB-M49-021 Confirm popups fit safe area.
 - [ ] SB-M49-022 Confirm text containers survive localization expansion.
-- [ ] SB-M49-023 Confirm protected bottom controls remain usable on compact devices.
+- [ ] SB-M49-023 Confirm top-right Pause + 2x controls, five fixed connector rails, slots, Batch Supply and booster row remain usable on compact devices.
 - [ ] SB-M49-024 Add automated/manual responsive validation evidence.
 - [ ] SB-M49-025 Validate temporary sixth-slot (+1 booster) layout/touch/readability across the full viewport matrix.
 
