@@ -23,6 +23,7 @@ assets/ui/
     ├── common/{icons,currencies,badges,frames,navigation,effects}/
     ├── characters/{scrubby,helper_bots}/
     ├── home/{background,environment,platform,area_banner,top_hud,gift_meter,shortcuts,play_cta,reward_track,bottom_nav}/
+    ├── gameplay/master/
     ├── boosters/
     ├── rewards/
     ├── difficulty/
@@ -57,3 +58,15 @@ Production Home/UI assets follow `coordination/OWNER_ECONOMY_REWARDS_V01.md`:
 - reward-track star currency art must not be reintroduced.
 
 Decorative sparkles may still be star-shaped, but no decorative shape creates an economic Star balance.
+
+
+## Gameplay master visual
+
+Owner-approved canonical gameplay reference:
+
+`assets/ui/final/gameplay/master/scrubbots_gameplay_master.png`
+
+Authority:
+`coordination/OWNER_GAMEPLAY_MASTER_VISUAL_V01.md`
+
+Do not regenerate or substitute this reference unless the owner explicitly asks. It is a visual blueprint for Godot composition, not a flattened shipping gameplay screen.
