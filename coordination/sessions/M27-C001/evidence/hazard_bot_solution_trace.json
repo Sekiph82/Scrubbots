@@ -1,0 +1,194 @@
+{
+  "color_totals": {
+    "0": 30,
+    "1": 5,
+    "2": 298,
+    "3": 11,
+    "4": 56
+  },
+  "column_count": 3,
+  "decisions": 19,
+  "frontier_peak": 21,
+  "gen_seed": 1,
+  "level": "m21_level_001_hazard_bot",
+  "memo_hits": 0,
+  "n_batches": 19,
+  "preview_depth": 3,
+  "status": "SOLVED",
+  "trace": [
+    {
+      "active_after": 400,
+      "clears": 0,
+      "column": 0,
+      "placed": {
+        "color": 0,
+        "count": 15
+      }
+    },
+    {
+      "active_after": 400,
+      "clears": 0,
+      "column": 0,
+      "placed": {
+        "color": 1,
+        "count": 1
+      }
+    },
+    {
+      "active_after": 350,
+      "clears": 50,
+      "column": 0,
+      "placed": {
+        "color": 2,
+        "count": 50
+      }
+    },
+    {
+      "active_after": 300,
+      "clears": 50,
+      "column": 0,
+      "placed": {
+        "color": 2,
+        "count": 50
+      }
+    },
+    {
+      "active_after": 300,
+      "clears": 0,
+      "column": 0,
+      "placed": {
+        "color": 3,
+        "count": 3
+      }
+    },
+    {
+      "active_after": 300,
+      "clears": 0,
+      "column": 0,
+      "placed": {
+        "color": 3,
+        "count": 2
+      }
+    },
+    {
+      "active_after": 252,
+      "clears": 48,
+      "column": 0,
+      "placed": {
+        "color": 4,
+        "count": 28
+      }
+    },
+    {
+      "active_after": 252,
+      "clears": 0,
+      "column": 1,
+      "placed": {
+        "color": 0,
+        "count": 15
+      }
+    },
+    {
+      "active_after": 251,
+      "clears": 1,
+      "column": 1,
+      "placed": {
+        "color": 1,
+        "count": 1
+      }
+    },
+    {
+      "active_after": 201,
+      "clears": 50,
+      "column": 1,
+      "placed": {
+        "color": 2,
+        "count": 50
+      }
+    },
+    {
+      "active_after": 152,
+      "clears": 49,
+      "column": 1,
+      "placed": {
+        "color": 2,
+        "count": 49
+      }
+    },
+    {
+      "active_after": 150,
+      "clears": 2,
+      "column": 1,
+      "placed": {
+        "color": 3,
+        "count": 2
+      }
+    },
+    {
+      "active_after": 148,
+      "clears": 2,
+      "column": 1,
+      "placed": {
+        "color": 3,
+        "count": 2
+      }
+    },
+    {
+      "active_after": 132,
+      "clears": 16,
+      "column": 2,
+      "placed": {
+        "color": 1,
+        "count": 2
+      }
+    },
+    {
+      "active_after": 131,
+      "clears": 1,
+      "column": 2,
+      "placed": {
+        "color": 1,
+        "count": 1
+      }
+    },
+    {
+      "active_after": 81,
+      "clears": 50,
+      "column": 2,
+      "placed": {
+        "color": 2,
+        "count": 50
+      }
+    },
+    {
+      "active_after": 34,
+      "clears": 47,
+      "column": 2,
+      "placed": {
+        "color": 2,
+        "count": 49
+      }
+    },
+    {
+      "active_after": 28,
+      "clears": 6,
+      "column": 2,
+      "placed": {
+        "color": 3,
+        "count": 2
+      }
+    },
+    {
+      "active_after": 0,
+      "clears": 28,
+      "column": 2,
+      "placed": {
+        "color": 4,
+        "count": 28
+      }
+    }
+  ],
+  "trace_hash": 1618197986,
+  "trace_summary": "c0:C0#15/0clr|c0:C1#1/0clr|c0:C2#50/50clr|c0:C2#50/50clr|c0:C3#3/0clr|c0:C3#2/0clr|c0:C4#28/48clr|c1:C0#15/0clr|c1:C1#1/1clr|c1:C2#50/50clr|c1:C2#49/49clr|c1:C3#2/2clr|c1:C3#2/2clr|c2:C1#2/16clr|c2:C1#1/1clr|c2:C2#50/50clr|c2:C2#49/47clr|c2:C3#2/6clr|c2:C4#28/28clr",
+  "visited": 20
+}
