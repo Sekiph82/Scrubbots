@@ -496,17 +496,19 @@ assets/
 ## VISUAL PRODUCTION / MASTER UI WORKFLOW [LOCKED OWNER DECISION]
 
 1. Visual production is an integral part of the **main SCRUBBOTS mobile game project and roadmap**. It must not be split into a Level Factory/Content Pipeline-style sidecar or treated as an unrelated final art pass.
-2. Magnific MCP remains the approved illustration-generation provider for the UI/character visual-production workflow unless the owner explicitly changes that decision. PixelLab/native pixel AI work is separately scoped to semantic pixel-art generation and does not own puzzle logic.
+2. ChatGPT image generation is the owner-preferred primary illustration-generation workflow for UI/character visual production. Magnific MCP remains an approved fallback/alternate. PixelLab/native pixel AI work is separately scoped to semantic pixel-art generation and does not own puzzle logic.
 3. AI image generation is a **development-time tool only**. The shipping game must never require generation APIs, credentials, or credits at runtime. Owner-approved generated outputs become ordinary versioned Godot assets.
 4. Existing owner-created SCRUBBOTS artwork is the first visual authority. Import/copy and classify owner references before generating replacements or variants. Never overwrite or delete the owner's originals.
 5. AI-generated full-screen mockups are art-direction/reference material, not shippable UI. Production screens must be composed from responsive Godot Controls/Containers plus approved illustration assets.
 6. Prefer native Godot UI for panels, buttons/interaction containers, progress bars, slots, color tiles, currency counters, text, popup bodies, dim layers and responsive layout. Use generation for art that genuinely benefits from illustration generation: characters, character poses/portraits, boosters, rewards, difficulty emblems, decorative props, collection/event art and similar branded artwork.
 7. Raw generation candidates and owner-approved production assets are different lifecycle states. Never silently regenerate, replace or overwrite an approved production asset.
 8. Every milestone that requires new visual assets owns its own visual-generation/review/import tasks. Do not postpone all visual production to one disconnected end-of-project art phase.
-9. `docs/MASTER_UI_SYSTEM.md` is the canonical responsive UI architecture contract. `ASSET_GENERATION_MANIFEST.json` is the machine-readable Magnific generation queue/provenance contract.
+9. `docs/MASTER_UI_SYSTEM.md` is the canonical responsive UI architecture contract. `ASSET_GENERATION_MANIFEST.json` is the machine-readable provider-agnostic generation queue/provenance contract; `assets/ui/HOME_ASSET_MANIFEST.json` is the Home-screen preproduction inventory.
 10. `BoardRenderer` remains the existing single-`Image`/`ImageTexture` data-oriented renderer. The Master UI system must not replace logical board rendering with one UI node per cell.
 11. Visual milestone completion requires actual owner-approved assets where required, correct Godot import/binding, responsive validation and regression evidence. A generated image existing on disk is not by itself completion.
 12. Railroad V1 structural geometry is native/data-driven and shared by routing/presentation; V02 does not require generated railroad art. Future visual skinning may not change railroad gameplay geometry.
+
+Home preproduction note (owner decision 2026-09-18): `assets/ui/HOME_ASSET_MANIFEST.json` is preproduction inventory/scaffolding only. Creating the inventory and folders does not close M42 or authorize jumping ahead of M23–M27 core-gameplay sequencing.
 
 ### Visual production order
 
@@ -715,7 +717,7 @@ Do not replace existing Prompt 02 fixtures — add to them.
 - [x] SB-M07-016 Flag unavailable assets as `AWAITING OWNER ASSET`.
 - [x] SB-M07-017 Never regenerate missing references and label them originals.
 
-**Master UI / Magnific visual reference tasks (from UI_TASKS_APPENDIX migration)**
+**Master UI / generated visual reference tasks (from UI_TASKS_APPENDIX migration)**
 - [x] SB-UI-001 Treat `docs/MASTER_UI_SYSTEM.md` as the UI architecture source of truth.
 - [x] SB-UI-002 Treat `ASSET_GENERATION_MANIFEST.json` as the machine-readable generation/provenance queue.
 - [x] SB-UI-003 Keep approved provider decisions scoped by asset type and newest owner decisions.
@@ -1325,8 +1327,8 @@ Do not implement until owner defines what rewards actually represent.
 - [ ] SB-M42-010 Build Home as responsive Godot containers/components.
 - [ ] SB-M42-011 Recreate owner-approved Home art direction with canonical regions.
 - [ ] SB-M42-012 Keep shortcut columns responsive around central area.
-- [ ] SB-M42-013 Validate Home-specific manifest entries before generation.
-- [ ] SB-M42-014 Generate only Home-specific required illustrative assets.
+- [ ] SB-M42-013 Validate Home-specific manifest entries in `assets/ui/HOME_ASSET_MANIFEST.json` before generation.
+- [ ] SB-M42-014 Generate only Home-specific required illustrative assets using approved provider order (ChatGPT primary, Magnific fallback).
 - [ ] SB-M42-015 Keep dynamic values/timers/counts/labels live in Godot UI.
 - [ ] SB-M42-016 Require owner approval before production promotion.
 - [ ] SB-M42-017 Bind approved art and validate viewport matrix.
@@ -1514,7 +1516,7 @@ artifact validation. **Never commit signing secrets.**
 
 ---
 
-## MAGNIFIC / GENERATED ASSET LIFECYCLE / DEFINITION OF DONE
+## GENERATED ASSET LIFECYCLE / DEFINITION OF DONE
 
 - [ ] SB-UI-022 Use image generation primarily for branded illustrative assets where it adds value.
 - [ ] SB-UI-023 Prefer native Godot controls/styles for interactive/dynamic UI.

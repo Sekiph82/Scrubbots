@@ -1,0 +1,1605 @@
+{
+  "schema_version": 1,
+  "project": "SCRUBBOTS",
+  "screen": "home",
+  "status": "PREPRODUCTION_INVENTORY_READY",
+  "updated": "2026-09-18",
+  "canonical_reference": "assets/art/references/_owner_inbox/Game Screens/main screen.png",
+  "authority": "docs/MASTER_UI_SYSTEM.md",
+  "provider_policy": {
+    "primary": "chatgpt_image_generation",
+    "fallback": [
+      "magnific"
+    ],
+    "generated_assets_are_runtime_dependencies": false,
+    "no_baked_dynamic_text": true
+  },
+  "layer_order": [
+    "background.sky",
+    "background.city_far",
+    "background.city_mid",
+    "background.street_foreground",
+    "central_world_and_environment",
+    "characters",
+    "ui"
+  ],
+  "live_text_examples": [
+    "player name",
+    "rank/title",
+    "level number",
+    "XP values",
+    "coin amount",
+    "life count",
+    "life timer",
+    "area title/number",
+    "progress values/timers",
+    "shortcut labels/counters",
+    "PLAY",
+    "CONTINUE · LEVEL N",
+    "reward milestone numbers",
+    "bottom navigation labels",
+    "notification counts"
+  ],
+  "naming_rule": "lowercase_snake_case; state suffixes only when a separate texture is truly required (_normal/_pressed/_selected/_disabled/_locked/_claimable)",
+  "assets": [
+    {
+      "id": "HOME-001",
+      "slug": "home_bg_sky",
+      "group": "background",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/background/home_bg_sky.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": "Sky/atmosphere layer; no text."
+    },
+    {
+      "id": "HOME-002",
+      "slug": "home_bg_city_far",
+      "group": "background",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/background/home_bg_city_far.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": "Distant city layer for responsive crop/parallax."
+    },
+    {
+      "id": "HOME-003",
+      "slug": "home_bg_city_mid",
+      "group": "background",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/background/home_bg_city_mid.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": "Mid-city shops/buildings layer."
+    },
+    {
+      "id": "HOME-004",
+      "slug": "home_bg_street_foreground",
+      "group": "background",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/background/home_bg_street_foreground.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": "Near wet-street/foreground layer."
+    },
+    {
+      "id": "HOME-005",
+      "slug": "home_bg_vignette",
+      "group": "background",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": "Soft edge vignette; shader/overlay preferred."
+    },
+    {
+      "id": "HOME-006",
+      "slug": "home_arch_whispering_park",
+      "group": "central_world",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/area_banner/home_arch_whispering_park.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": "Arch only; title/area remain live text."
+    },
+    {
+      "id": "HOME-007",
+      "slug": "home_arch_decor",
+      "group": "central_world",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/area_banner/home_arch_decor.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-008",
+      "slug": "home_area_title",
+      "group": "central_world",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-009",
+      "slug": "home_area_number",
+      "group": "central_world",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-010",
+      "slug": "home_platform_main",
+      "group": "central_world",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/platform/home_platform_main.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-011",
+      "slug": "home_platform_top",
+      "group": "central_world",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/platform/home_platform_top.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-012",
+      "slug": "home_platform_contact_shadow",
+      "group": "central_world",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-013",
+      "slug": "home_prop_cleaning_bucket",
+      "group": "environment",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/environment/home_prop_cleaning_bucket.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-014",
+      "slug": "home_prop_hose",
+      "group": "environment",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/environment/home_prop_hose.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-015",
+      "slug": "home_prop_foam_cluster",
+      "group": "environment",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/environment/home_prop_foam_cluster.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-016",
+      "slug": "home_prop_puddles",
+      "group": "environment",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/environment/home_prop_puddles.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-017",
+      "slug": "home_fx_bubbles",
+      "group": "environment",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-018",
+      "slug": "home_prop_wet_floor_sign",
+      "group": "environment",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/environment/home_prop_wet_floor_sign.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-019",
+      "slug": "home_prop_keep_clean_sign",
+      "group": "environment",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/environment/home_prop_keep_clean_sign.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": "Avoid baked language-dependent copy."
+    },
+    {
+      "id": "HOME-020",
+      "slug": "home_prop_cleaning_equipment",
+      "group": "environment",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/environment/home_prop_cleaning_equipment.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-021",
+      "slug": "home_prop_neon_details",
+      "group": "environment",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/environment/home_prop_neon_details.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-022",
+      "slug": "helper_bot_floor_cleaner",
+      "group": "helper_bots",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/characters/helper_bots/helper_bot_floor_cleaner.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-023",
+      "slug": "helper_bot_cart",
+      "group": "helper_bots",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/characters/helper_bots/helper_bot_cart.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-024",
+      "slug": "helper_bot_alt_pose",
+      "group": "helper_bots",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/characters/helper_bots/helper_bot_alt_pose.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-025",
+      "slug": "helper_bot_shadow",
+      "group": "helper_bots",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-026",
+      "slug": "scrubby_home_pose",
+      "group": "scrubby",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/characters/scrubby/scrubby_home_pose.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": "Requires canonical Scrubby identity approval."
+    },
+    {
+      "id": "HOME-027",
+      "slug": "scrubby_portrait",
+      "group": "scrubby",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/characters/scrubby/scrubby_portrait.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-028",
+      "slug": "scrubby_hero_shadow",
+      "group": "scrubby",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-029",
+      "slug": "scrubby_backlight",
+      "group": "scrubby",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-030",
+      "slug": "scrubby_idle_sparkle_bubbles",
+      "group": "scrubby",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-031",
+      "slug": "scrubby_face_blink_layer",
+      "group": "scrubby",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/characters/scrubby/scrubby_face_blink_layer.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": "Optional idle animation layer."
+    },
+    {
+      "id": "HOME-032",
+      "slug": "scrubby_brush_arm_layer",
+      "group": "scrubby",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/characters/scrubby/scrubby_brush_arm_layer.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": "Optional idle animation layer."
+    },
+    {
+      "id": "HOME-033",
+      "slug": "profile_card_body",
+      "group": "profile",
+      "kind": "NATIVE_OR_9_SLICE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": "Native StyleBox preferred."
+    },
+    {
+      "id": "HOME-034",
+      "slug": "profile_avatar_frame",
+      "group": "profile",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/top_hud/profile_avatar_frame.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-035",
+      "slug": "profile_rank_badge",
+      "group": "profile",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/top_hud/profile_rank_badge.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-036",
+      "slug": "profile_xp_bar_bg",
+      "group": "profile",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-037",
+      "slug": "profile_xp_bar_fill",
+      "group": "profile",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-038",
+      "slug": "profile_player_name",
+      "group": "profile",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-039",
+      "slug": "profile_rank_title",
+      "group": "profile",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-040",
+      "slug": "profile_level_number",
+      "group": "profile",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-041",
+      "slug": "profile_xp_values",
+      "group": "profile",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-042",
+      "slug": "icon_currency_coin",
+      "group": "currency",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/common/currencies/icon_currency_coin.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-043",
+      "slug": "icon_currency_heart",
+      "group": "currency",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/common/currencies/icon_currency_heart.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-044",
+      "slug": "icon_plus",
+      "group": "currency",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-045",
+      "slug": "currency_chip_frame",
+      "group": "currency",
+      "kind": "NATIVE_OR_9_SLICE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-046",
+      "slug": "currency_coin_amount",
+      "group": "currency",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-047",
+      "slug": "currency_life_count",
+      "group": "currency",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-048",
+      "slug": "currency_life_timer",
+      "group": "currency",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-049",
+      "slug": "menu_button_body",
+      "group": "menu",
+      "kind": "NATIVE_OR_9_SLICE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-050",
+      "slug": "icon_hamburger",
+      "group": "menu",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-051",
+      "slug": "event_progress_emblem",
+      "group": "top_event",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/event_progress/event_progress_emblem.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-052",
+      "slug": "event_progress_bar_bg",
+      "group": "top_event",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-053",
+      "slug": "event_progress_bar_fill",
+      "group": "top_event",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-054",
+      "slug": "event_reward_crate",
+      "group": "top_event",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/event_progress/event_reward_crate.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-055",
+      "slug": "event_reward_count_badge",
+      "group": "top_event",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-056",
+      "slug": "event_progress_value",
+      "group": "top_event",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-057",
+      "slug": "event_progress_timer",
+      "group": "top_event",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-058",
+      "slug": "shortcut_button_frame",
+      "group": "shortcuts",
+      "kind": "NATIVE_OR_9_SLICE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-059",
+      "slug": "shortcut_pressed_state",
+      "group": "shortcuts",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-060",
+      "slug": "shortcut_disabled_overlay",
+      "group": "shortcuts",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-061",
+      "slug": "shortcut_claimable_glow",
+      "group": "shortcuts",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-062",
+      "slug": "icon_shortcut_win_streak",
+      "group": "shortcuts",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/shortcuts/icon_shortcut_win_streak.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-063",
+      "slug": "icon_shortcut_gift_bar",
+      "group": "shortcuts",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/shortcuts/icon_shortcut_gift_bar.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-064",
+      "slug": "icon_shortcut_collection",
+      "group": "shortcuts",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/shortcuts/icon_shortcut_collection.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-065",
+      "slug": "icon_shortcut_shop",
+      "group": "shortcuts",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/shortcuts/icon_shortcut_shop.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-066",
+      "slug": "icon_shortcut_no_ads",
+      "group": "shortcuts",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/shortcuts/icon_shortcut_no_ads.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-067",
+      "slug": "icon_shortcut_daily",
+      "group": "shortcuts",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/shortcuts/icon_shortcut_daily.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-068",
+      "slug": "icon_shortcut_tasks",
+      "group": "shortcuts",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/shortcuts/icon_shortcut_tasks.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-069",
+      "slug": "icon_shortcut_star_exchange",
+      "group": "shortcuts",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/shortcuts/icon_shortcut_star_exchange.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-070",
+      "slug": "shortcut_labels",
+      "group": "shortcuts",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-071",
+      "slug": "win_streak_value",
+      "group": "shortcuts",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-072",
+      "slug": "win_streak_timer",
+      "group": "shortcuts",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-073",
+      "slug": "shortcut_dynamic_counters",
+      "group": "shortcuts",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-074",
+      "slug": "notification_badge_body",
+      "group": "notifications",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-075",
+      "slug": "notification_exclamation",
+      "group": "notifications",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-076",
+      "slug": "notification_count",
+      "group": "notifications",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-077",
+      "slug": "notification_pulse",
+      "group": "notifications",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-078",
+      "slug": "play_button_frame",
+      "group": "play_cta",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/play_cta/play_button_frame.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": "No-text, front-facing, 9-slice-capable glossy frame."
+    },
+    {
+      "id": "HOME-079",
+      "slug": "play_triangle",
+      "group": "play_cta",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-080",
+      "slug": "play_gloss_overlay",
+      "group": "play_cta",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-081",
+      "slug": "play_pressed_state",
+      "group": "play_cta",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-082",
+      "slug": "play_disabled_state",
+      "group": "play_cta",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-083",
+      "slug": "play_claimable_glow",
+      "group": "play_cta",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-084",
+      "slug": "play_label",
+      "group": "play_cta",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-085",
+      "slug": "play_continue_level_label",
+      "group": "play_cta",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-086",
+      "slug": "reward_track_star_badge",
+      "group": "reward_track",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/reward_track/reward_track_star_badge.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-087",
+      "slug": "reward_track_star_icon",
+      "group": "reward_track",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/common/icons/icon_star.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-088",
+      "slug": "reward_track_bg",
+      "group": "reward_track",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-089",
+      "slug": "reward_track_fill",
+      "group": "reward_track",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-090",
+      "slug": "reward_gift_1",
+      "group": "reward_track",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/reward_track/reward_gift_1.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-091",
+      "slug": "reward_gift_5",
+      "group": "reward_track",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/reward_track/reward_gift_5.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-092",
+      "slug": "reward_gift_10",
+      "group": "reward_track",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/reward_track/reward_gift_10.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-093",
+      "slug": "reward_gift_25",
+      "group": "reward_track",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/reward_track/reward_gift_25.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-094",
+      "slug": "reward_gift_100",
+      "group": "reward_track",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/reward_track/reward_gift_100.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-095",
+      "slug": "reward_locked_overlay",
+      "group": "reward_track",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-096",
+      "slug": "reward_claimed_check",
+      "group": "reward_track",
+      "kind": "NATIVE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-097",
+      "slug": "reward_claimable_glow",
+      "group": "reward_track",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-098",
+      "slug": "reward_current_star_amount",
+      "group": "reward_track",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-099",
+      "slug": "reward_milestone_numbers",
+      "group": "reward_track",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": false,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-100",
+      "slug": "bottom_nav_dock",
+      "group": "bottom_nav",
+      "kind": "NATIVE_OR_9_SLICE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-101",
+      "slug": "icon_nav_events",
+      "group": "bottom_nav",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/common/navigation/icon_nav_events.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-102",
+      "slug": "icon_nav_robots",
+      "group": "bottom_nav",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/common/navigation/icon_nav_robots.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-103",
+      "slug": "icon_nav_home",
+      "group": "bottom_nav",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/common/navigation/icon_nav_home.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-104",
+      "slug": "icon_nav_leaderboard",
+      "group": "bottom_nav",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/common/navigation/icon_nav_leaderboard.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-105",
+      "slug": "icon_nav_settings",
+      "group": "bottom_nav",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/common/navigation/icon_nav_settings.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-106",
+      "slug": "bottom_nav_selected_backing",
+      "group": "bottom_nav",
+      "kind": "NATIVE_OR_9_SLICE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-107",
+      "slug": "bottom_nav_labels",
+      "group": "bottom_nav",
+      "kind": "LIVE",
+      "implementation": "live_godot_ui",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-108",
+      "slug": "bottom_nav_badges",
+      "group": "bottom_nav",
+      "kind": "REUSE",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": "Reuse notification badge component."
+    },
+    {
+      "id": "HOME-109",
+      "slug": "fx_small_sparkle",
+      "group": "shared_fx",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-110",
+      "slug": "fx_star_burst",
+      "group": "shared_fx",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-111",
+      "slug": "fx_bubble",
+      "group": "shared_fx",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-112",
+      "slug": "fx_foam_puff",
+      "group": "shared_fx",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-113",
+      "slug": "fx_soft_glow",
+      "group": "shared_fx",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-114",
+      "slug": "fx_soft_shadow",
+      "group": "shared_fx",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-115",
+      "slug": "fx_glossy_sweep",
+      "group": "shared_fx",
+      "kind": "FX",
+      "implementation": "godot_fx_or_small_texture",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": ""
+    },
+    {
+      "id": "HOME-116",
+      "slug": "font_ui_regular",
+      "group": "typography",
+      "kind": "FONT",
+      "implementation": "licensed_font_asset",
+      "generation_required": false,
+      "reusable": true,
+      "status": "AWAITING_FONT_SELECTION",
+      "notes": "Licensed production font; selection still open."
+    },
+    {
+      "id": "HOME-117",
+      "slug": "font_ui_bold",
+      "group": "typography",
+      "kind": "FONT",
+      "implementation": "licensed_font_asset",
+      "generation_required": false,
+      "reusable": true,
+      "status": "AWAITING_FONT_SELECTION",
+      "notes": "May be a weight of the same family."
+    },
+    {
+      "id": "HOME-118",
+      "slug": "font_ui_display",
+      "group": "typography",
+      "kind": "FONT",
+      "implementation": "licensed_font_asset",
+      "generation_required": false,
+      "reusable": true,
+      "status": "AWAITING_FONT_SELECTION",
+      "notes": "Heavy/display face for hero CTA/headings."
+    },
+    {
+      "id": "HOME-119",
+      "slug": "font_outline_shadow_settings",
+      "group": "typography",
+      "kind": "THEME",
+      "implementation": "godot_native",
+      "generation_required": false,
+      "reusable": true,
+      "status": "PLANNED",
+      "notes": "Central Godot Theme settings."
+    }
+  ]
+}

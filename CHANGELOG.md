@@ -1,4 +1,16 @@
 
+## 2026-09-18 — Home UI asset pipeline scaffold and provider preference
+
+Owner changed the preferred UI/character image-generation workflow from Magnific-only to ChatGPT-primary with Magnific retained as an approved fallback.
+
+- Updated the Master UI and UI asset-pipeline decisions to a provider-ordered, runtime-independent workflow.
+- Updated `ASSET_GENERATION_MANIFEST.json` to schema v2 and corrected production targets to `assets/ui/final/`.
+- Added `assets/ui/HOME_ASSET_MANIFEST.json` with the exhaustive Home-screen ART/NATIVE/LIVE/FX/FONT inventory.
+- Added the canonical `assets/ui/generated/` vs `assets/ui/final/` directory scaffold.
+- Added `docs/HOME_UI_ASSET_PLAN.md` and `assets/ui/README.md`.
+- Updated M42 wording and global UI lifecycle text without closing or reordering M23–M27/M42 work.
+- No gameplay rules, task checkbox state or current milestone status changed.
+
 ## 2026-09-06 — Global 15-color production palette locked
 
 Owner locked production logical pixel artwork to C01..C15 exactly (ADR-020).

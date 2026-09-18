@@ -3,7 +3,7 @@
 Status: OWNER-APPROVED architecture baseline
 Engine: Godot 4.7.x
 Primary orientation: portrait
-Visual generation provider: Magnific MCP only
+Visual generation provider: ChatGPT image generation primary; Magnific MCP fallback
 
 ## 1. Purpose
 
@@ -12,7 +12,7 @@ SCRUBBOTS UI is not shipped as flattened AI-generated screenshots. Full-screen A
 Core rule:
 
 ```text
-AI/Magnific concept or component art = visual source/reference
+AI-generated concept or component art     = visual source/reference
 Godot Control scene                  = production UI
 Gameplay/BoardState                  = gameplay truth
 ```
@@ -33,7 +33,7 @@ No UI scene may own or duplicate gameplay truth.
 10. Text remains live Godot text. Do not bake normal UI labels/numbers into generated images.
 11. Plain scalable panels/buttons/progress bars are Godot-native styles or 9-slice assets, not full-screen bitmaps.
 12. Owner-approved source images are immutable originals. Derived assets go to separate paths.
-13. Magnific is the sole AI image-generation provider for this pipeline unless the owner explicitly changes the rule.
+13. ChatGPT image generation is the primary AI image-generation workflow; Magnific MCP remains an approved fallback/alternate.
 14. Higgsfield is not a project dependency.
 15. Never silently regenerate or overwrite an approved visual asset.
 
@@ -142,6 +142,8 @@ HomeScreen
 
 The central Scrubby/world composition is decorative. Navigation buttons and counters remain live components.
 
+Canonical Home asset inventory: `assets/ui/HOME_ASSET_MANIFEST.json`. Raw generation candidates live under `assets/ui/generated/`; owner-approved production art lives under `assets/ui/final/`.
+
 ## 7. Reusable component library
 
 Target component structure:
@@ -234,7 +236,7 @@ Use Godot `Theme` resources so later font/spacing/style changes propagate centra
 - text, quantities and timers
 - board container and responsive sizing
 
-### Magnific-generated where illustration adds value
+### AI-generated where illustration adds value
 
 - Scrubby master character reference and approved poses
 - robot portraits
@@ -339,7 +341,7 @@ assets/art/references/_owner_inbox/
 
 After classification, originals may be copied into category folders while the inbox/source copy remains preserved according to the reference-library policy.
 
-## 15. Magnific MCP generation contract
+## 15. AI image-generation contract
 
 `ASSET_GENERATION_MANIFEST.json` is the machine-readable queue/source of truth.
 
@@ -349,7 +351,7 @@ Claude Code workflow:
 2. Inspect existing approved final assets first.
 3. Do not regenerate `APPROVED` assets unless the owner asks.
 4. Resolve the canonical Scrubby reference before character generation.
-5. Use Magnific MCP only.
+5. Use ChatGPT image generation by default; Magnific MCP may be used as an approved fallback/alternate.
 6. Generate isolated component art with transparent backgrounds where requested.
 7. Use background removal only when needed.
 8. Upscale/resize only as declared by the manifest.
@@ -371,7 +373,7 @@ Order of authority:
 
 1. Owner-approved original SCRUBBOTS assets.
 2. Owner-supplied SCRUBBOTS visual references.
-3. Magnific outputs explicitly approved for production.
+3. AI-generated outputs explicitly approved for production.
 4. External game screenshots as conceptual/method reference only.
 
 External references must never be copied into SCRUBBOTS characters, exact UI, art composition or levels.
@@ -403,7 +405,7 @@ UI-C  Gameplay reusable controls and layout
 UI-D  Home/navigation composition
 UI-E  Popup family
 UI-F  Multi-device visual/touch validation
-UI-G  Final Magnific asset production/approval pass
+UI-G  Final generated-asset production/approval pass
 ```
 
 This UI program must be scheduled alongside existing gameplay milestones without replacing gameplay-critical M13–M21 work.
