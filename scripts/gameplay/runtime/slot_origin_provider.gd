@@ -4,21 +4,28 @@ extends RefCounted
 ## rely on global class_name (AL-001).
 ##
 ## Maps a batch slot index -> the route START origin in board-local cell units, exposing
-## the exact `origin_for_slot(slot)` seam M26 consumes. It uses the canonical five-lane
-## below-board geometry the accepted M27 ProofKernel certified (see below), so the live
-## runtime reproduces the proven reachability. It reserves/selects/routes nothing.
+## the exact `origin_for_slot(slot)` seam M26 consumes. The origin is the ACTUAL visible
+## production slot top-center on the M28 screen, mapped live through the presentation
+## transform (M29-C001 V02, F-M29-V01-STRICT-001):
+##
+##   global_anchor      = FiveSlotStrip.get_slot_anchor_global(slot)
+##   board_local_origin = BoardPresentation.global_to_board_local(global_anchor)
+##
+## so what the owner sees and where a Scrubbot's route starts are the SAME point — the
+## visible slot -> BOTTOM connector -> canonical Railroad V1 contract. It queries the
+## CURRENT laid-out geometry every call (no cached screen pixels), so the origin follows
+## responsive relayout automatically. It reserves/selects/routes nothing.
+##
+## Fail closed (Vector2(INF, INF) -> RouteRequest fails -> no robot) for an out-of-range
+## slot, a missing/dead strip or presentation, or a non-finite mapped origin. There is NO
+## synthetic board-width fallback: a broken layout produces no robot rather than a robot
+## starting from a position the owner cannot see.
 
-## Five lanes spread across the board width; y one cell below the outer bottom rail
-## (CENTER_OFFSET 2.5 + RAIL_WIDTH*0.5 0.5 + 1.0 = 4.0). This is EXACTLY the canonical
-## slot-origin geometry the accepted M27 ProofKernel certified as solvable, so the real
-## runtime routing reproduces the proven reachability — the M27-solved play order clears
-## the real board through this exact origin mapping.
 const SLOT_COUNT := 5
-const ORIGIN_BELOW := 4.0
 
-var _presentation = null   # retained so the manual scene ties the mapping to the real
-var _strip = null          # laid-out screen; the certified geometry below is authority.
-var _board = null
+var _presentation = null   # BoardPresentation (global_to_board_local)
+var _strip = null          # FiveSlotStrip (get_slot_anchor_global)
+var _board = null          # retained only for slot-count context; not an origin source
 
 func _init(presentation, strip, board) -> void:
 	_presentation = presentation
@@ -26,9 +33,14 @@ func _init(presentation, strip, board) -> void:
 	_board = board
 
 func origin_for_slot(slot_index: int) -> Vector2:
-	if _board == null or slot_index < 0 or slot_index >= SLOT_COUNT:
-		return Vector2(INF, INF)   # fail closed -> no route -> no robot
-	var w: float = float(_board.get_width())
-	var h: float = float(_board.get_height())
-	var lane_x: float = (float(slot_index) + 0.5) * w / float(SLOT_COUNT)
-	return Vector2(lane_x, h + ORIGIN_BELOW)
+	if slot_index < 0 or slot_index >= SLOT_COUNT:
+		return Vector2(INF, INF)
+	if _strip == null or not is_instance_valid(_strip) \
+			or _presentation == null or not is_instance_valid(_presentation):
+		return Vector2(INF, INF)   # missing/dead layout -> fail closed, no robot
+	# Exact visible slot top-center -> board-local, queried from the CURRENT layout.
+	var anchor: Vector2 = _strip.get_slot_anchor_global(slot_index)
+	var local: Vector2 = _presentation.global_to_board_local(anchor)
+	if not (is_finite(local.x) and is_finite(local.y)):
+		return Vector2(INF, INF)   # non-finite mapping (unlaid-out/degenerate) -> fail closed
+	return local
