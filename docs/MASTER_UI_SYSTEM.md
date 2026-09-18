@@ -423,7 +423,7 @@ Spacing / visual contract:
   breathing room); rail width is `1.0` logical cell; centreline `2.5` cells outside
   each board boundary; rounded mechanical corners whose motion path stays inside the
   rail envelope;
-- consistent dark-slate metallic track with restrained cyan/electric guide nodes â€”
+- consistent dark-slate metallic track with restrained cyan/electric guide nodes —
   the SAME visual language for every level; the rail never inspects level
   subject/theme and no per-level themed rail exists in V1;
 - the rail is visually subordinate to the artwork, native/procedural Godot 2D (zero
