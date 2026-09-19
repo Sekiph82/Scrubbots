@@ -6,6 +6,7 @@ Branch: `main`
 Read:
 - `coordination/sessions/M29-C001/CHATGPT_MANUAL_AUDIT_V03.md`
 - `coordination/sessions/M29-C001/CHATGPT_AUDIT_CRITERIA_V03.md`
+- `coordination/OWNER_BATCH_SLOT_DISPLAY_DECISION_V01.md`
 
 The owner manually ran the real Godot playtest and found that batches enter M24 and M26 commits work, but robots/pixel clears are not visible.
 
@@ -43,6 +44,15 @@ Add a dedicated regression proving:
 Add a second production-style runtime smoke at 683x1366 that does NOT disable runtime processing and does NOT call `runtime.tick()` directly. Let real SceneTree frames drive `ProductionRuntimeController._process(delta)`. After one legal front activation, prove a committed Scrubbot's progress increases, it arrives, the M24 committed work resolves, and the CURRENT visible renderer pixel becomes transparent.
 
 Also exercise embedded-focus suspension/resume explicitly: focus loss may intentionally pause gameplay, but focus regain must resume it and must not leave the playtest permanently system-suspended.
+
+Also apply the owner-locked five-slot presentation correction:
+- main displayed batch count = M24 capacity = remaining_to_clear - committed;
+- a 50 batch becomes 49 immediately when one Scrubbot is successfully committed/dispatched;
+- 50 with two in-flight must display 48, not "50 (2)";
+- do NOT change M24 authoritative accounting: remaining_to_clear still decreases only on authenticated clear;
+- keep ACTIVE/WAITING core semantics unchanged.
+
+Add direct UI evidence for 50 -> 49 -> 48 on dispatch and stable displayed capacity through authenticated clear.
 
 Re-run the complete M29 Hazard Bot runtime smoke.
 
