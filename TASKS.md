@@ -375,6 +375,18 @@ The game automatically switches to **2x for free** immediately after authoritati
 
 2x accelerates time-based gameplay execution/presentation only. It must not change M23 FIFO order, M24 placement/accounting, M25 target/claim arbitration, TargetSelector priority, ReservationState ownership, Railroad/routing geometry, M26 no-ghost semantics, authenticated clears or M27 solver/deadlock meaning. GameplaySpeedAuthority owns factor only; Economy V1 SpeedEntitlementService owns paid manual permission/expiry. Canonical decisions: `coordination/OWNER_GAMEPLAY_SPEED_RULE_V01.md` and `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
 
+### 8.10E — Five-slot displayed batch count `[OWNER-LOCKED CURRENT — 2026-09-19]`
+
+The large/main number shown on an occupied production batch slot means **robots still waiting in that slot**, not raw unresolved quota. Canonical display truth is:
+
+`display_count = M24 capacity = remaining_to_clear - committed`
+
+Example: a newly placed Blue 50 displays 50; after one successful robot commit/dispatch it displays 49 immediately; with two in-flight it displays 48. Authenticated arrival later decrements both `remaining_to_clear` and `committed`, so the visible waiting count does not jump back. The current historical presentation `50 (2)` is superseded.
+
+This is presentation only. M24 authoritative accounting remains unchanged: `remaining_to_clear` decreases only after authenticated clear; `committed` tracks in-flight work; completion still requires remaining=0 and committed=0.
+
+ACTIVE/WAITING internal lifecycle semantics are also unchanged. ACTIVE means eligible/not currently marked unavailable; it does not guarantee a robot is presently moving. WAITING means no currently claimable reachable target for that batch/color, and the batch must be automatically reconsidered after relevant board changes. Canonical decision: `coordination/OWNER_BATCH_SLOT_DISPLAY_DECISION_V01.md`.
+
 ### 8.11 — Win streak `[LOCKED — Economy V1]`
 
 ```text
