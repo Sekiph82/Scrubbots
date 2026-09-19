@@ -94,7 +94,7 @@ Do not generate these until owner/system design is resolved:
 
 ## Completion condition
 
-Phase 2 is complete when P2-001..P2-144 exist at their exact target paths on `origin/codex/visual-assets-production`, with required transparency/format checks, and no forbidden file was modified.
+Phase 2 is complete when P2-001..P2-157 exist at their exact target paths on `origin/codex/visual-assets-production`, with required transparency/format checks, and no forbidden file was modified.
 
 
 ## F. Master UI Asset Kit expansion
@@ -319,3 +319,44 @@ Scrubby is already complete. Generate the same nine presentation assets for each
 | P2-144 | Atlas victory pose | `assets/ui/final/popups/victory/robots/atlas_victory_pose.png` | Celebratory victory pose. |
 
 Robot character outputs must contain no baked names, perk text, percentages, prices or unlock amounts. Those remain live UI.
+
+
+## L. Final visual closure pack
+
+This is the final planned static visual-production batch before closing Codex visual generation. It adds 13 assets: 9 robot perk icons, 3 Collection state assets, and 1 canonical 10-robot Cleaning Crew group image.
+
+### Robot perk icon family
+
+All perk icons are isolated transparent PNGs, text-free, percentage-free, price-free, and readable at mobile UI size. They visually represent meta/economy perks only. They must not imply puzzle-rule changes.
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-145 | First-clear SB bonus perk icon | `assets/ui/final/robots/perks/perk_first_clear_sb_bonus.png` | Moppy perk. Scrub Bucks + clean-finish/reward motif. No number/text. |
+| P2-146 | Gift Bar SB bonus perk icon | `assets/ui/final/robots/perks/perk_gift_bar_sb_bonus.png` | Bubbles perk. Gift/reward + Scrub Bucks motif. |
+| P2-147 | Paid 2x discount perk icon | `assets/ui/final/robots/perks/perk_speed_2x_discount.png` | Spark perk. 2x/speed + savings motif, no baked price/percent. |
+| P2-148 | Cards Exchange SB bonus perk icon | `assets/ui/final/robots/perks/perk_cards_exchange_bonus.png` | Squeegee perk. Cards exchange + Scrub Bucks motif. |
+| P2-149 | Booster purchase discount perk icon | `assets/ui/final/robots/perks/perk_booster_discount.png` | Dusty perk. Canonical booster-family + savings motif; do not invent new booster. |
+| P2-150 | Heart refill discount perk icon | `assets/ui/final/robots/perks/perk_heart_refill_discount.png` | Rinse perk. Heart/refill + savings motif. |
+| P2-151 | Win Streak SB bonus perk icon | `assets/ui/final/robots/perks/perk_win_streak_bonus.png` | Polly perk. Win-streak/flame/trophy-energy + Scrub Bucks motif. |
+| P2-152 | Daily task SB bonus perk icon | `assets/ui/final/robots/perks/perk_daily_task_bonus.png` | Clippy perk. Daily task/checklist + Scrub Bucks motif. |
+| P2-153 | Master Cleaner combined perk icon | `assets/ui/final/robots/perks/perk_master_cleaner.png` | Atlas perk. Premium combined first-clear + Cards Exchange meta-benefit emblem; no text/percent. |
+
+### Collection state art
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-154 | Generic Collection card back | `assets/ui/final/collection/states/card_back.png` | Canonical SCRUBBOTS card back for hidden/unrevealed cards; no set-specific identity. |
+| P2-155 | Unknown/uncollected card silhouette | `assets/ui/final/collection/states/card_unknown_silhouette.png` | Neutral locked/uncollected card-state silhouette; no fake card identity. |
+| P2-156 | Newly acquired card glow/burst | `assets/ui/final/collection/states/card_new_glow.png` | Transparent celebratory glow/burst for newly acquired card state. |
+
+### Canonical Cleaning Crew group art
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-157 | 10-robot Cleaning Crew canonical group | `assets/ui/final/characters/robots/cleaning_crew_group.png` | Transparent/wide group composition containing exactly Scrubby, Moppy, Bubbles, Spark, Squeegee, Dusty, Rinse, Polly, Clippy, Atlas. Preserve each approved silhouette/color identity. Scrubby remains visual anchor. No text. |
+
+### Final visual-production closure
+
+After P2-145..P2-157 are produced and published, Phase 2 canonical scope becomes **157 / 157**.
+
+No additional static visual generation should be started merely for completeness. Future visuals must be driven by a new owner-approved feature/system requirement.
