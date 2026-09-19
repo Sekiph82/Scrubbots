@@ -25,6 +25,11 @@ const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
 
 var _renderer  # BoardRenderer (Control)
 var _agent_layer: Node2D
+## M31 identity-stable presentation-only cleaning-effect layer. Created ONCE, shares this
+## node's board origin and the renderer's cell scale exactly like AgentLayer, and is kept
+## UNDER the AgentLayer so a short cleaning cue reads over the cleared (transparent) cell
+## without hiding a moving Scrubbot. Holds NO gameplay authority.
+var _fx_layer: Node2D
 
 ## Build (once) or reconfigure the renderer + agent layer sharing this node's origin.
 ## `available_size` is the display rect the board should fit inside.
@@ -53,15 +58,31 @@ func configure(board, palette: PackedStringArray, available_size: Vector2) -> vo
 		_agent_layer.name = "AgentLayer"
 		add_child(_agent_layer)
 		_agent_layer.position = Vector2.ZERO
+	# M31 CleaningFxLayer: created ONCE, same origin + cell scale as AgentLayer, kept just
+	# UNDER it (created before, so lower z). Identity-stable across relayout exactly like the
+	# renderer/AgentLayer — a later configure() only rescales it, never recreates it, so
+	# active cleaning cues are never stranded on a stale off-screen node.
+	if _fx_layer == null or not is_instance_valid(_fx_layer):
+		_fx_layer = Node2D.new()
+		_fx_layer.name = "CleaningFxLayer"
+		add_child(_fx_layer)
+		_fx_layer.position = Vector2.ZERO
+		if _agent_layer != null and is_instance_valid(_agent_layer):
+			move_child(_fx_layer, _agent_layer.get_index())
+
 	var cs: float = _renderer.get_cell_size()
 	# One board-local movement unit maps to exactly the renderer's cell-size.
 	_agent_layer.scale = Vector2(cs, cs)
+	_fx_layer.scale = Vector2(cs, cs)
 
 func get_renderer():
 	return _renderer
 
 func get_agent_layer() -> Node2D:
 	return _agent_layer
+
+func get_cleaning_fx_layer() -> Node2D:
+	return _fx_layer
 
 func get_cell_size() -> float:
 	return _renderer.get_cell_size() if _renderer != null else 1.0
