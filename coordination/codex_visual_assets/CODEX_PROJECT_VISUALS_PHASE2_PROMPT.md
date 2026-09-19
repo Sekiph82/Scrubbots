@@ -15,6 +15,29 @@ Write execution notes only to:
 
 `coordination/codex_visual_assets/CODEX_PROJECT_VISUALS_PHASE2_LOG.md`
 
+
+## MANDATORY REMOTE PUBLISH / LOG POLICY
+
+Before doing any further work, read and obey:
+
+`coordination/codex_visual_assets/CODEX_VISUAL_PUBLISH_AND_LOG_POLICY.md`
+
+Local completion is not sufficient.
+
+All completed images must exist at their exact canonical repository paths and be pushed to:
+
+`origin/codex/visual-assets-production`
+
+All Phase 2 execution history must be persisted in:
+
+`coordination/codex_visual_assets/CODEX_PROJECT_VISUALS_PHASE2_LOG.md`
+
+Also append a cross-phase batch summary to:
+
+`coordination/codex_visual_assets/CODEX_VISUAL_PRODUCTION_MASTER_LOG.md`
+
+Do not report a local Windows log path as final evidence.
+
 ## BRANCH ISOLATION
 
 Work only on:
