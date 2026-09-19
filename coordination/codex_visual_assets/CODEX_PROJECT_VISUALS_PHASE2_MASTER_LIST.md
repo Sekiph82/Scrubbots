@@ -95,3 +95,98 @@ Do not generate these until owner/system design is resolved:
 ## Completion condition
 
 Phase 2 is complete when P2-001..P2-024 exist at their exact target paths on `origin/codex/visual-assets-production`, with required transparency/format checks, and no forbidden file was modified.
+
+
+## F. Master UI Asset Kit expansion
+
+These reusable assets come from the early SCRUBBOTS UI planning work and fit the current component-based Godot architecture. They must remain text-free and reusable.
+
+| ID | Asset | Target | Method | Notes |
+|---|---|---|---|---|
+| P2-025 | Small popup frame | `assets/ui/final/common/frames/popup_small_frame.png` | GENERATE | 9-slice friendly, no text. |
+| P2-026 | Medium popup frame | `assets/ui/final/common/frames/popup_medium_frame.png` | GENERATE | 9-slice friendly, no text. |
+| P2-027 | Large popup frame | `assets/ui/final/common/frames/popup_large_frame.png` | GENERATE | 9-slice friendly, portrait-safe. |
+| P2-028 | Confirmation popup frame | `assets/ui/final/common/frames/popup_confirmation_frame.png` | GENERATE | Neutral confirmation chrome. |
+| P2-029 | Reward popup frame | `assets/ui/final/common/frames/popup_reward_frame.png` | GENERATE | Celebratory, currency-neutral. |
+| P2-030 | Warning popup frame | `assets/ui/final/common/frames/popup_warning_frame.png` | GENERATE | Friendly warning treatment. |
+| P2-031 | Blue button frame | `assets/ui/final/common/frames/button_blue_frame.png` | GENERATE | 9-slice friendly, no text/icon. |
+| P2-032 | Green button frame | `assets/ui/final/common/frames/button_green_frame.png` | GENERATE | Primary CTA frame. |
+| P2-033 | Purple button frame | `assets/ui/final/common/frames/button_purple_frame.png` | GENERATE | Special/secondary CTA frame. |
+| P2-034 | Red button frame | `assets/ui/final/common/frames/button_red_frame.png` | GENERATE | Destructive/cancel frame. |
+| P2-035 | Disabled button frame | `assets/ui/final/common/frames/button_disabled_frame.png` | GENERATE | Disabled state, no text. |
+| P2-036 | Generic badge frame | `assets/ui/final/common/badges/badge_generic_frame.png` | GENERATE | Reusable badge frame. |
+| P2-037 | Notification badge frame | `assets/ui/final/common/badges/badge_notification_frame.png` | GENERATE | No number baked. |
+| P2-038 | Quantity badge frame | `assets/ui/final/common/badges/badge_quantity_frame.png` | GENERATE | No quantity baked. |
+| P2-039 | Generic progress bar frame | `assets/ui/final/common/frames/progress_bar_frame.png` | GENERATE | Reusable frame. |
+| P2-040 | Generic progress bar fill | `assets/ui/final/common/frames/progress_bar_fill.png` | GENERATE | Stretchable fill. |
+
+## G. Booster state family
+
+V1 still has exactly four boosters. Do not invent a fifth booster. These are state overlays/frames, not new booster identities.
+
+| ID | Asset | Target | Method | Notes |
+|---|---|---|---|---|
+| P2-041 | Booster selected ring | `assets/ui/final/boosters/states/booster_selected_ring.png` | GENERATE | Reusable selected state. |
+| P2-042 | Booster unavailable overlay | `assets/ui/final/boosters/states/booster_unavailable_overlay.png` | GENERATE | Reusable disabled state. |
+| P2-043 | Booster reward glow | `assets/ui/final/boosters/states/booster_reward_glow.png` | GENERATE | Reward presentation. |
+| P2-044 | Booster activated burst | `assets/ui/final/boosters/states/booster_activated_burst.png` | GENERATE | Activation feedback. |
+| P2-045 | Booster tutorial pointer | `assets/ui/final/boosters/states/booster_tutorial_pointer.png` | GENERATE | Tutorial cue. |
+| P2-046 | Booster free/ad badge frame | `assets/ui/final/boosters/states/booster_free_badge_frame.png` | GENERATE | Frame only; no FREE/ad copy baked. |
+
+## H. Robot Collection visual system
+
+The Robot Collection system is part of the long-term SCRUBBOTS IP. UI chrome already exists in Phase 1. Phase 2 adds reusable presentation assets that do NOT invent Robot 2..6 identities.
+
+| ID | Asset | Target | Method | Notes |
+|---|---|---|---|---|
+| P2-047 | Locked robot silhouette | `assets/ui/final/robots/robot_locked_silhouette.png` | GENERATE | Generic silhouette, no identity. |
+| P2-048 | Robot portrait frame | `assets/ui/final/robots/robot_portrait_frame.png` | GENERATE | Reusable portrait frame. |
+| P2-049 | Robot detail hero frame | `assets/ui/final/robots/robot_detail_hero_frame.png` | GENERATE | Reusable hero frame. |
+| P2-050 | Robot selected ring | `assets/ui/final/robots/robot_selected_ring.png` | GENERATE | Active robot state. |
+| P2-051 | New robot unlocked burst | `assets/ui/final/robots/robot_unlocked_burst.png` | GENERATE | Unlock FX. |
+| P2-052 | Robot ability/perk emblem frame | `assets/ui/final/robots/robot_perk_emblem_frame.png` | GENERATE | No perk icon/text baked. |
+| P2-053 | Robot lock emblem | `assets/ui/final/robots/robot_lock_emblem.png` | GENERATE | Locked robot state. |
+
+### Robot roster rule
+
+Do NOT generate actual Robot 2..6 characters yet.
+
+The old planning document contained example names/concepts such as Moppy, Bubbles and Spark. Those examples are NOT current owner-approved canon and must not be promoted automatically.
+
+Actual new robot identities require a separate owner-approved Robot Roster decision. Once approved, each robot should receive:
+- full-body master
+- portrait
+- Home/collection pose
+- unlock pose
+- selected/gameplay pose
+- optional expression/animation layers
+
+## I. System-state icon family
+
+| ID | Asset | Target | Method | Notes |
+|---|---|---|---|---|
+| P2-054 | Language icon | `assets/ui/final/common/icons/icon_language.png` | GENERATE | Globe/language concept. |
+| P2-055 | Notifications icon | `assets/ui/final/common/icons/icon_notifications.png` | GENERATE | Bell/notification. |
+| P2-056 | Privacy icon | `assets/ui/final/common/icons/icon_privacy.png` | GENERATE | Friendly shield/privacy. |
+| P2-057 | Support/help icon | `assets/ui/final/common/icons/icon_support.png` | GENERATE | Support/help. |
+| P2-058 | Player ID icon | `assets/ui/final/common/icons/icon_player_id.png` | GENERATE | Profile/ID concept. |
+| P2-059 | Cloud save icon | `assets/ui/final/common/icons/icon_cloud_save.png` | GENERATE | Cloud save. |
+| P2-060 | Save conflict icon | `assets/ui/final/common/icons/icon_save_conflict.png` | GENERATE | Cloud conflict/warning. |
+| P2-061 | Maintenance icon | `assets/ui/final/common/icons/icon_maintenance.png` | GENERATE | Maintenance/tool concept. |
+| P2-062 | Update required icon | `assets/ui/final/common/icons/icon_update_required.png` | GENERATE | App/update arrow. |
+| P2-063 | Connection lost icon | `assets/ui/final/common/icons/icon_connection_lost.png` | GENERATE | Broken connection/wifi. |
+
+## J. Current exclusions from the old planning document
+
+The following old concepts are intentionally NOT added to the current production system:
+- World Map / Area Map
+- Area Complete / New Area Reveal
+- XP progression
+- Player Level Up as a separate XP system
+- Star Reward / Star Exchange
+- new Star currency
+- Weekly progression systems
+- event-specific progression/banners before event rules exist
+- robot perks that alter puzzle truth
+- seven-day login structure when current Economy V1 uses a five-day repeating cycle
+- new Pickup booster identity; current canonical boosters are +1 Slot / Random / Selector / Tornado
