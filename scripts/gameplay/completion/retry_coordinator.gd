@@ -30,32 +30,49 @@ extends RefCounted
 ##   slots            — M24 FiveSlotBatchEngine (reset())
 ##   supply           — M23 BatchSupplyEngine (reset())
 ##   board            — BoardState (restore_all_active())
-##   candidate_index  — ColorCandidateIndex (rebuild())
+##   candidate_index  — ColorCandidateIndex (rebuild()/is_bound_to()/count_candidates()/get_color_ids())
 ##   runtime          — ProductionRuntimeController (reset_runtime())
 ##   input            — ProductionInputController (set_terminal_stopped(false))
 ##   completion       — CompletionController (reset_attempt())
+##   clearing_loop    — CompleteClearingLoop (M20 attempt-observation reset seam, F-M30-V01-003)
 ## Optional keys:
-##   renderer         — BoardRenderer (refresh_all()) to repaint the full original artwork
-##   on_restored      — Callable invoked after a successful restore (e.g. UI snapshot sync)
+##   renderer         — BoardRenderer (refresh_all() + is_bound_to(board)); optional
+##   on_restored      — Callable invoked after a successful restore (e.g. UI snapshot sync); optional
 ##
-## Returns true iff the teardown gate passed AND the fresh attempt was fully restored;
-## false (with ZERO restore side effects) when the gate fails closed.
+## Returns true iff the FULL restore bundle preflighted, the teardown gate passed AND the
+## fresh attempt was fully restored + candidate coherence verified; false (with ZERO side
+## effects when the failure is at/ before the gate) otherwise. Never returns true on a failed
+## candidate rebuild/coherence verification.
 static func attempt(bundle: Dictionary) -> bool:
 	var scheduler = bundle.get("scheduler")
 	if scheduler == null:
 		return false
+	# --- PREFLIGHT (before ANY destructive teardown, F-M30-V01-002) ----------------------
+	# Validate every required restore collaborator + method + exact-board binding BEFORE the
+	# first destructive M26 gate, so a malformed/missing/incoherent restore dependency is
+	# discovered while the old attempt is still fully intact (never a half-torn attempt).
+	if not _preflight(bundle):
+		return false  # nothing mutated, scheduler.reset NOT called
+	var board = bundle["board"]
 	# --- FIRST destructive gate: M26 scheduler teardown must prove clean in THIS call ---
 	if not _scheduler_reset_clean(scheduler):
 		return false
 	# --- Gate passed: restore ONE coherent fresh attempt (in place) ---------------------
 	# M24 slots emptied, M23 supply rebuilt to the EXACT initial candidate (deterministic
-	# reset -> same batch ids/colors/counts/order), board repainted fully ACTIVE, candidate
-	# index rebuilt against the restored board. Claims/reservations/agents/committed work
-	# were already rolled back inside the scheduler teardown above.
+	# reset -> same batch ids/colors/counts/order), board repainted fully ACTIVE. Claims/
+	# reservations/agents/committed work were already rolled back inside the scheduler teardown.
 	bundle["slots"].reset()
 	bundle["supply"].reset()
-	bundle["board"].restore_all_active()
-	bundle["candidate_index"].rebuild()
+	board.restore_all_active()
+	# M20 attempt-scoped observation state (cleared_count / last_outcome) is zeroed ONLY now,
+	# after the M26 teardown gate has safely completed (F-M30-V01-003). Historical reset()
+	# semantics are untouched.
+	bundle["clearing_loop"].reset_attempt_observation()
+	# Candidate index rebuild is a REQUIRED postcondition (F-M30-V01-002): a failed rebuild,
+	# a lost board binding, or a candidate population that does not reflect the fully ACTIVE
+	# board means the fresh attempt is NOT coherent -> never report Retry success.
+	if not _rebuild_candidate_coherent(bundle["candidate_index"], board):
+		return false
 	var renderer = bundle.get("renderer")
 	if renderer != null and renderer.has_method("refresh_all"):
 		renderer.refresh_all()
@@ -71,6 +88,73 @@ static func attempt(bundle: Dictionary) -> bool:
 	if on_restored is Callable and on_restored.is_valid():
 		on_restored.call()
 	return true
+
+## Preflight the entire restore bundle BEFORE the destructive M26 gate (F-M30-V01-002). Fails
+## closed (false, no mutation) on a missing/dead object, a missing required method, a candidate
+## index not bound to the exact production board, a supplied renderer not bound to that exact
+## board, or a supplied-but-invalid restore callback.
+static func _preflight(bundle: Dictionary) -> bool:
+	var board = bundle.get("board")
+	if not _obj_with(board, ["restore_all_active", "count_cells_by_state"]):
+		return false
+	if not _obj_with(bundle.get("slots"), ["reset"]):
+		return false
+	if not _obj_with(bundle.get("supply"), ["reset"]):
+		return false
+	if not _obj_with(bundle.get("runtime"), ["reset_runtime"]):
+		return false
+	if not _obj_with(bundle.get("input"), ["set_terminal_stopped"]):
+		return false
+	if not _obj_with(bundle.get("completion"), ["reset_attempt"]):
+		return false
+	if not _obj_with(bundle.get("clearing_loop"), ["reset_attempt_observation"]):
+		return false
+	# Candidate index must exist, expose rebuild()/is_bound_to(), AND currently be bound to the
+	# exact production board (so the post-teardown rebuild targets the right board).
+	var ci = bundle.get("candidate_index")
+	if not _obj_with(ci, ["rebuild", "is_bound_to", "count_candidates", "get_color_ids"]):
+		return false
+	if not _bool_true(ci.is_bound_to(board)):
+		return false
+	# Optional renderer: when supplied it must be coherent/bound to the exact board.
+	var renderer = bundle.get("renderer")
+	if renderer != null:
+		if not _obj_with(renderer, ["refresh_all", "is_bound_to"]):
+			return false
+		if not _bool_true(renderer.is_bound_to(board)):
+			return false
+	# Optional restore callback: when SUPPLIED (a non-empty Callable) it must be valid. A null
+	# or empty Callable() means "no callback" and is fine.
+	var on_restored = bundle.get("on_restored")
+	if on_restored is Callable and not on_restored.is_null() and not on_restored.is_valid():
+		return false
+	return true
+
+## Rebuild the candidate index and verify coherence against the restored full-ACTIVE board
+## (F-M30-V01-002): rebuild() must succeed, the index must still be bound to the exact board,
+## and the total candidate population must equal the board's ACTIVE cell count (every ACTIVE
+## cell is a candidate for its own color on a freshly restored board). Never weakens M13
+## fail-closed semantics — it only requires them to hold.
+static func _rebuild_candidate_coherent(ci, board) -> bool:
+	if not _bool_true(ci.rebuild()):
+		return false
+	if not _bool_true(ci.is_bound_to(board)):
+		return false
+	var total := 0
+	for color in ci.get_color_ids():
+		total += ci.count_candidates(color)
+	return total == board.count_cells_by_state(0)  # 0 == BoardState.CellState.ACTIVE
+
+static func _obj_with(obj, methods: Array) -> bool:
+	if obj == null or typeof(obj) != TYPE_OBJECT:
+		return false
+	for m in methods:
+		if not obj.has_method(m):
+			return false
+	return true
+
+static func _bool_true(v) -> bool:
+	return typeof(v) == TYPE_BOOL and v == true
 
 ## The teardown gate. True ONLY when the scheduler proves a clean teardown completed in this
 ## call: reset() returned true, nothing is left pending/deferred, the recorded outcome is

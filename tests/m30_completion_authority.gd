@@ -54,11 +54,54 @@ class StubClassifier:
 
 func _initialize() -> void:
 	_test_win_truth()
+	_test_cross_engine_consistency()
 	_test_lose_mapping_no_duplication()
 	_test_real_classifier_deadlock()
 	_test_exact_once_latch()
 	_test_event_driven_gate()
 	_done()
+
+# --- F-M30-V01-001: full cross-engine cardinality guard ----------------------------------
+func _test_cross_engine_consistency() -> void:
+	var ev = CompletionEvaluator.new()
+	var bd = FakeBoard.new(); bd.active = 9   # non-empty so no WON short-circuit
+	# Healthy all-equal-positive N -> legitimate in-flight, PLAYING (never ERROR).
+	for n in [1, 2, 5]:
+		var e := _counters(n, n, n, n, n)
+		var r: Dictionary = ev.evaluate(bd, e[0], e[1], e[2], e[3], e[4], null, null, true)
+		_ok(r["status"] == CompletionEvaluator.PLAYING and r["reason"] == "in_flight_work",
+			"consistency: all five == %d -> legitimate in-flight PLAYING" % n)
+	# Each single-axis drift (one authority off by one) -> ERROR, never LOST/indefinite PLAYING.
+	var axes := ["scheduler", "dispatcher", "claim", "reservation", "M24 committed"]
+	for i in range(5):
+		var vals := [1, 1, 1, 1, 1]
+		vals[i] = 2   # drift exactly one authority
+		var e := _counters(vals[0], vals[1], vals[2], vals[3], vals[4])
+		var r: Dictionary = ev.evaluate(bd, e[0], e[1], e[2], e[3], e[4], null, null, true)
+		_ok(r["status"] == CompletionEvaluator.ERROR, "consistency: %s drift -> ERROR" % axes[i])
+		_ok(r["status"] != CompletionEvaluator.LOST, "consistency: %s drift is NEVER LOST" % axes[i])
+	# Orphan-from-zero drift examples from the audit (e.g. sched=0,disp=0,claim=1) -> ERROR,
+	# not an indefinite PLAYING/in_flight_work.
+	for i in range(5):
+		var vals := [0, 0, 0, 0, 0]
+		vals[i] = 1
+		var e := _counters(vals[0], vals[1], vals[2], vals[3], vals[4])
+		var r: Dictionary = ev.evaluate(bd, e[0], e[1], e[2], e[3], e[4], null, null, true)
+		_ok(r["status"] == CompletionEvaluator.ERROR, "consistency: lone %s orphan -> ERROR (not indefinite PLAYING)" % axes[i])
+	# All-zero is quiescent, not ERROR (routes to deadlock proof at a non-empty board).
+	var z := _counters(0, 0, 0, 0, 0)
+	var stub = StubClassifier.new(); stub.status = DeadlockClassifier.STALLED
+	var evz = CompletionEvaluator.new(stub)
+	var rz: Dictionary = evz.evaluate(bd, z[0], z[1], z[2], z[3], z[4], null, null, true)
+	_ok(rz["status"] == CompletionEvaluator.PLAYING, "consistency: all-zero is quiescent (not ERROR)")
+
+func _counters(a: int, b: int, c: int, d: int, e: int) -> Array:
+	var s = FakeCounter.new(); s.n = a
+	var di = FakeCounter.new(); di.n = b
+	var cl = FakeCounter.new(); cl.n = c
+	var rv = FakeCounter.new(); rv.n = d
+	var sl = FakeCounter.new(); sl.n = e
+	return [s, di, cl, rv, sl]
 
 # --- B: WIN truth ------------------------------------------------------------------------
 func _test_win_truth() -> void:
@@ -113,12 +156,13 @@ func _test_lose_mapping_no_duplication() -> void:
 		_ok(got_lost == expect_lost, "LOSE map: %s -> %s" % [pair[0], ("LOST" if expect_lost else "PLAYING")])
 		if not expect_lost:
 			_ok(r["status"] == CompletionEvaluator.PLAYING, "LOSE map: %s stays PLAYING (never LOST)" % pair[0])
-	# In-flight (not quiescent) never even reaches the proof -> PLAYING, classifier untouched.
+	# Healthy in-flight (all five cardinalities equal-positive) never reaches the proof ->
+	# PLAYING, classifier untouched.
 	var stub2 = StubClassifier.new(); stub2.status = DeadlockClassifier.DEADLOCK
 	var ev2 = CompletionEvaluator.new(stub2)
-	disp.n = 1; sch.n = 1
+	sch.n = 1; disp.n = 1; clm.n = 1; res.n = 1; slt.n = 1
 	var ri: Dictionary = ev2.evaluate(bd, sch, disp, clm, res, slt, null, null, true)
-	_ok(ri["status"] == CompletionEvaluator.PLAYING, "LOSE: a live in-flight assignment is never LOST (classifier not consulted)")
+	_ok(ri["status"] == CompletionEvaluator.PLAYING, "LOSE: a healthy in-flight transaction is never LOST (classifier not consulted)")
 	_ok(stub2.calls == 0, "LOSE: no proof runs while in-flight work exists")
 
 # --- C: real M27 DeadlockClassifier proves a real DEADLOCK -> LOST -----------------------

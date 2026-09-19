@@ -65,13 +65,25 @@ func is_quiescent(scheduler, dispatcher, claim, reservations, slots) -> bool:
 		return false
 	return true
 
-## Cheap cross-engine consistency guard. A dispatcher/scheduler live-count divergence
-## (ghost) or a surfaced M26 fatal state is NOT a normal LOSE: it is fail-closed ERROR.
-func has_fatal_inconsistency(scheduler, dispatcher) -> bool:
+## The five live production transaction cardinalities that must agree at a stable evaluation
+## boundary (M26 assignment == M19 agent == M25 claim == reservation == M24 committed work).
+## A healthy in-flight transaction holds exactly one of each; all-zero is quiescent. Returned
+## as an ordered array so callers can test all-zero / all-equal / drift.
+func transaction_cardinalities(scheduler, dispatcher, claim, reservations, slots) -> Array:
+	return [scheduler.live_assignment_count(), dispatcher.get_active_count(),
+		claim.live_claim_count(), reservations.get_reservation_count(), slots.live_work_count()]
+
+## Full cross-engine consistency guard (F-M30-V01-001). A surfaced M26 fatal state OR ANY
+## cardinality drift across the five authorities is fail-closed ERROR — never a LOSE and never
+## an indefinite PLAYING. All-zero (quiescent) and all-equal-positive (N legitimate in-flight
+## transactions) are the only consistent shapes.
+func has_fatal_inconsistency(scheduler, dispatcher, claim, reservations, slots) -> bool:
 	if scheduler.has_method("is_fatal") and scheduler.is_fatal():
 		return true
-	if dispatcher.get_active_count() != scheduler.live_assignment_count():
-		return true
+	var counts: Array = transaction_cardinalities(scheduler, dispatcher, claim, reservations, slots)
+	for i in range(1, counts.size()):
+		if counts[i] != counts[0]:
+			return true
 	return false
 
 ## Cheap WIN test (no M27 proof). WON requires a fully cleared board AND full quiescence —
@@ -89,14 +101,16 @@ func is_won(board, scheduler, dispatcher, claim, reservations, slots) -> bool:
 func evaluate(board, scheduler, dispatcher, claim, reservations, slots, level, supply,
 		allow_deadlock_proof: bool) -> Dictionary:
 	# Fail closed FIRST: a cross-engine inconsistency / fatal bookkeeping is a diagnostic
-	# ERROR, never silently reclassified as WIN or LOSE.
-	if has_fatal_inconsistency(scheduler, dispatcher):
+	# ERROR, never silently reclassified as WIN or LOSE and never left indefinitely PLAYING.
+	if has_fatal_inconsistency(scheduler, dispatcher, claim, reservations, slots):
 		return {"status": ERROR, "reason": "cross_engine_inconsistency"}
-	# Cheap WIN (quiescent + board empty).
+	# Consistent now: the five cardinalities are all-zero (quiescent) or all-equal-positive
+	# (legitimate in-flight work). Cheap WIN (quiescent + board empty).
 	if is_won(board, scheduler, dispatcher, claim, reservations, slots):
 		return {"status": WON, "reason": "board_cleared_and_quiescent"}
-	# Any live in-flight/transaction work -> nonterminal. No LOSE proof while progress may
-	# still be in flight (owner: a live assignment / in-flight Scrubbot prevents loss).
+	# Equal-positive cardinalities -> legitimate in-flight work, nonterminal. No LOSE proof
+	# while progress may still be in flight (owner: a live assignment / in-flight Scrubbot
+	# prevents loss).
 	if not is_quiescent(scheduler, dispatcher, claim, reservations, slots):
 		return {"status": PLAYING, "reason": "in_flight_work"}
 	# Quiescent but board not empty. Only NOW may a LOSE proof run — and only when the

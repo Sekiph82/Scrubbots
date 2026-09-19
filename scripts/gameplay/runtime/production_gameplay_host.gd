@@ -254,6 +254,7 @@ func retry() -> bool:
 		"runtime": _runtime,
 		"input": _input,
 		"completion": _completion,
+		"clearing_loop": _loop,
 		"renderer": _renderer(),
 		"on_restored": Callable(self, "_on_retry_restored"),
 	})

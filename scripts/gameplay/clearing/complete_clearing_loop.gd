@@ -595,6 +595,17 @@ func _perform_reset() -> void:
 	_reset_requested = false
 	_reset_in_progress = false
 
+## M30 Retry fresh-attempt observation seam (F-M30-V01-003). The historical reset()
+## intentionally preserves cumulative `_cleared_count` / `_last_outcome` because its contract
+## is in-flight cancellation, NOT a level restart. M30 Retry restores BoardState to all
+## ACTIVE and begins a fresh PLAYING attempt, so its attempt-scoped OBSERVATION state must
+## also be zeroed — otherwise attempt-1 counts/outcome bleed into attempt-2. This resets ONLY
+## the observation fields; it touches no transaction/queue/dispatcher state. The RetryCoordinator
+## calls it ONLY after the M26 teardown gate has safely completed.
+func reset_attempt_observation() -> void:
+	_cleared_count = 0
+	_last_outcome = Outcome.NONE
+
 # ------------------------------------------------------------- read-only -----
 
 func get_cleared_count() -> int:
