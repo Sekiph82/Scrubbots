@@ -116,7 +116,7 @@ For every output verify:
 ## OWNER-GATED VISUALS
 
 Do not invent:
-- Robot 2..6 identities
+- any robot identity beyond the owner-approved 10-robot roster
 - leaderboard art
 - event-specific art
 - real-money monetization art
@@ -146,12 +146,12 @@ Never push to main.
 
 ## EXECUTION
 
-Complete P2-001 through P2-063 autonomously.
+Complete P2-001 through P2-144 autonomously.
 
 Do not stop for routine approval.
 
 At the end report:
-- completed count / 63
+- completed count / 144
 - exact output paths
 - commit SHAs
 - remote branch HEAD
@@ -165,4 +165,4 @@ BEGIN PHASE 2 NOW.
 
 The early planning document contains obsolete progression ideas. Do not implement or generate visual systems for World Map, XP progression, Star Exchange, Star currency, weekly progression, or event-specific content unless separately owner-approved.
 
-Robot Collection is retained as a core long-term system, but actual Robot 2..6 identities are owner-gated. Generate only the generic robot UI/presentation assets P2-047..P2-053. Do not invent Moppy/Bubbles/Spark or any other new canonical robot without explicit owner approval.
+Robot Collection is retained as a core long-term system. The canonical 10-robot roster is now owner-approved in `coordination/OWNER_ROBOT_ROSTER_V01.md`. Generate Robot 2..10 character assets P2-064..P2-144 exactly from that authority. Do not invent Robot 11+.
