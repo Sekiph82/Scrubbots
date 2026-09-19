@@ -75,7 +75,26 @@ Direct evidence:
 
 ACTIVE/WAITING lifecycle semantics remain unchanged.
 
-## 9. Full production smoke
+## 9. Live five-slot snapshot synchronization
+
+The five-slot UI must update from fresh detached M24 snapshots after authoritative runtime mutations, not only after player placement.
+
+Direct evidence must prove:
+- successful commit/dispatch changes player-visible count immediately;
+- ACTIVE -> WAITING becomes visible without another player input;
+- WAITING -> ACTIVE after wake becomes visible without another player input;
+- rollback refreshes the visible count/state;
+- authenticated clear/finalize refreshes count/state;
+- completion -> EMPTY refreshes automatically;
+- reset refreshes automatically.
+
+The UI must not calculate targetability itself.
+
+Hazard Bot specific proof:
+- after the first two Blue50 batches have cleared their 100 immediately available blue cells, the early Brown3 remains unreachable in the accepted M27 trace and the visible slot state is WAITING;
+- it must not remain stale ACTIVE merely because the last UI refresh happened immediately after its placement.
+
+## 10. Full production smoke
 Real M29 Hazard Bot runtime:
 - 400 authenticated clears;
 - final ACTIVE=0;
@@ -84,10 +103,10 @@ Real M29 Hazard Bot runtime:
 - M23 exhausted;
 - auto-2x preserved.
 
-## 10. Preserve accepted gameplay
+## 11. Preserve accepted gameplay
 Do not rewrite M23–M27, M29 input gate, speed authority, pause/focus or exact visible slot-origin mapping.
 
-## 11. Governance
+## 12. Governance
 - root TASKS read-only for Claude;
 - no M30 implementation;
 - implementation commit first;
