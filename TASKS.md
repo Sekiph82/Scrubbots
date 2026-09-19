@@ -4,15 +4,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M29
-- Current Sprint: M29-C001 V03 — code audit pass, owner graphical retest gate
-- Current Task: M29-C001-V03-OWNER-RETEST
-- Current Task Status: OWNER_RETEST_REQUIRED
-- Next Task/Action: Owner reruns `res://scenes/debug/m29_hazard_bot_playtest.tscn` with F6 and confirms visible Scrubbot movement, Blue50 count 50→49→48, visible pixel transparency on arrival, Red/Yellow/Brown WAITING while unreachable, automatic WAITING→ACTIVE wake, pause/resume, and 1x/2x behavior. Code audit is PASS; no new Claude remediation cycle is open unless the owner reproduces a remaining graphical defect.
+- Current Milestone: M30
+- Current Sprint: M30 DESIGN GATE — owner lock required for win / lose / retry semantics
+- Current Task: M30-OWNER-DECISION
+- Current Task Status: OWNER_DECISION_REQUIRED
+- Next Task/Action: Owner explicitly locks M30 win condition, lose condition and retry semantics before any Claude implementation prompt is created. M29 is now fully closed after code audit plus owner graphical F6 acceptance. Before shipping Retry is bound, M30 must also harden `ProductionGameplayHost.reset_session()` so M24/M23 are not reset if M26 scheduler teardown fails or remains pending. Root `TASKS.md` remains ChatGPT-write-owned.
 - Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 532 / 966 = 55.07% (game+ui live scope); lastCompletedTaskId M28-C001-V01. M29 V03 code audit PASS is recorded in `coordination/sessions/M29-C001/CHATGPT_AUDIT_V03.md`; all nine M29 tasks remain open only for the owner graphical F6 retest because the prior defect was discovered in real graphical play after headless tests had passed. M30 remains blocked until owner acceptance. Existing Economy/Collection owner additions remain preserved.
+- Progress: 541 / 966 = 56.00% (game+ui live scope); lastCompletedTaskId M29-C001-V03. M29 Mobile Touch / Production Input Integration is independently audited PASS and owner graphical F6 acceptance is complete. All `SB-M29-001..009` are closed. M30 Win/Lose Rules is a DESIGN GATE and remains fully open until the owner explicitly locks win, lose and retry semantics. Existing Economy/Collection owner additions remain preserved.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
@@ -1241,12 +1241,12 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 ### M29 — Mobile Touch
 
-- [ ] SB-M29-001 Touch selectable supply-front batch activation; five batch slots themselves are not player-selectable placement controls.
-- [ ] SB-M29-002 Desktop mouse development support.
-- [ ] SB-M29-003 Prevent mouse/touch double-fire.
-- [ ] SB-M29-004 Touch cancel. — [ ] SB-M29-005 Focus loss.
-- [ ] SB-M29-006 Rapid tapping. — [ ] SB-M29-007 Multi-touch.
-- [ ] SB-M29-008 Pause during touch. — [ ] SB-M29-009 Background/foreground.
+- [x] SB-M29-001 Touch selectable supply-front batch activation; five batch slots themselves are not player-selectable placement controls.
+- [x] SB-M29-002 Desktop mouse development support.
+- [x] SB-M29-003 Prevent mouse/touch double-fire.
+- [x] SB-M29-004 Touch cancel. — [x] SB-M29-005 Focus loss.
+- [x] SB-M29-006 Rapid tapping. — [x] SB-M29-007 Multi-touch.
+- [x] SB-M29-008 Pause during touch. — [x] SB-M29-009 Background/foreground.
 
 **Owner-locked speed integration for M29/runtime:** M29 proves the explicit 1x/2x temporal authority and may keep a direct debug/headless toggle seam. That seam is not authorization for free shipping manual 2x. M39 must gate production manual 2x through the paid entitlement service in `coordination/OWNER_ECONOMY_REWARDS_V01.md`. Authoritative M23-exhausted automatic 2x remains free. Do not infer exhaustion from UI rows or slot occupancy.
 
