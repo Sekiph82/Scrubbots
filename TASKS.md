@@ -1297,9 +1297,10 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 - [ ] SB-M33-001 Audio buses. — [ ] SB-M33-002 Master volume.
 - [ ] SB-M33-003 Music volume. — [ ] SB-M33-004 SFX volume.
-- [ ] SB-M33-005 Dispatch SFX. — [ ] SB-M33-006 Cleaning SFX.
-- [ ] SB-M33-007 Completion SFX.
-- [ ] SB-M33-008 Movement audio only if pleasant at high density.
+- [x] SB-M33-005 Dispatch SFX. Owner-approved canonical asset: `assets/audio/sfx/dispatch.wav`.
+- [x] SB-M33-006 Cleaning SFX. Owner-approved canonical asset: `assets/audio/sfx/cleaning.wav`.
+- [x] SB-M33-007 Completion SFX. Owner-approved canonical asset: `assets/audio/sfx/completion.wav`.
+- [x] SB-M33-008 Movement audio only if pleasant at high density. Owner decision: no movement audio in V1.
 - [ ] SB-M33-009 Concurrency management. — [ ] SB-M33-010 Persist settings.
 
 ### M34 — Haptics
