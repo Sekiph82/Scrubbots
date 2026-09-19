@@ -7,6 +7,7 @@ Read:
 - `coordination/sessions/M29-C001/CHATGPT_MANUAL_AUDIT_V03.md`
 - `coordination/sessions/M29-C001/CHATGPT_AUDIT_CRITERIA_V03.md`
 - `coordination/OWNER_BATCH_SLOT_DISPLAY_DECISION_V01.md`
+- `coordination/OWNER_FIVE_SLOT_LIVE_PRESENTATION_SYNC_DECISION_V01.md`
 
 The owner manually ran the real Godot playtest and found that batches enter M24 and M26 commits work, but robots/pixel clears are not visible.
 
@@ -53,6 +54,13 @@ Also apply the owner-locked five-slot presentation correction:
 - keep ACTIVE/WAITING core semantics unchanged.
 
 Add direct UI evidence for 50 -> 49 -> 48 on dispatch and stable displayed capacity through authenticated clear.
+
+Also fix live slot-state synchronization. The current production UI refreshes M24 snapshots only after a successful player placement, so later authoritative scheduler mutations can remain visually stale. Add an exact presentation-sync seam so the M28 five-slot strip receives a fresh detached M24 snapshot after every player-visible M24 mutation, including commit/dispatch, ACTIVE->WAITING, WAITING->ACTIVE wake, rollback, authenticated-clear finalization, slot EMPTY completion and reset. UI must remain presentation-only and must not run targetability/routing itself.
+
+Hazard Bot reference assertion:
+- after Red15 + Yellow1 + Blue50 + Blue50 + Brown3 are placed and the two Blue50 batches have exhausted their immediately reachable work, Brown3 still has no reachable brown target under the accepted M27 trace;
+- Brown must therefore PRESENT WAITING, not stale ACTIVE, until later black/open-corridor progress wakes it;
+- when a later authoritative wake changes it back to ACTIVE, the UI must update without another player placement.
 
 Re-run the complete M29 Hazard Bot runtime smoke.
 
