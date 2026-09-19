@@ -5,14 +5,14 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M29
-- Current Sprint: M29-C001 V03 — owner graphical playtest renderer/clock regression
-- Current Task: M29-C001-V03
-- Current Task Status: CHANGES_REQUIRED
-- Next Task/Action: Claude executes `coordination/sessions/M29-C001/CHATGPT_PROMPT_V03.md` under `coordination/sessions/M29-C001/CHATGPT_AUDIT_CRITERIA_V03.md`, stabilizes BoardPresentation renderer/AgentLayer identity across relayout, proves the real SceneTree `_process(delta)` clock advances committed agents at the owner's 683×1366 viewport, verifies current visible pixels clear after authenticated arrival, preserves exact visible slot-origin V02 and all accepted M29 gameplay behavior, then pushes implementation first and `CLAUDE_LOG_V03.md` separately. Root `TASKS.md` remains ChatGPT-write-owned.
-- Required Actor: CLAUDE
+- Current Sprint: M29-C001 V03 — code audit pass, owner graphical retest gate
+- Current Task: M29-C001-V03-OWNER-RETEST
+- Current Task Status: OWNER_RETEST_REQUIRED
+- Next Task/Action: Owner reruns `res://scenes/debug/m29_hazard_bot_playtest.tscn` with F6 and confirms visible Scrubbot movement, Blue50 count 50→49→48, visible pixel transparency on arrival, Red/Yellow/Brown WAITING while unreachable, automatic WAITING→ACTIVE wake, pause/resume, and 1x/2x behavior. Code audit is PASS; no new Claude remediation cycle is open unless the owner reproduces a remaining graphical defect.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 532 / 966 = 55.07% (game+ui live scope); lastCompletedTaskId M28-C001-V01. M29 is reopened after owner graphical F6 testing exposed a presentation/runtime regression: batches enter M24 and committed M26 work appears, but visible Scrubbot movement and pixel clearing do not progress. V03 must close stable BoardRenderer/AgentLayer identity plus real SceneTree clock evidence before the nine M29 tasks can be re-closed. M30 design gate remains blocked. Existing Economy/Collection owner additions remain preserved.
+- Progress: 532 / 966 = 55.07% (game+ui live scope); lastCompletedTaskId M28-C001-V01. M29 V03 code audit PASS is recorded in `coordination/sessions/M29-C001/CHATGPT_AUDIT_V03.md`; all nine M29 tasks remain open only for the owner graphical F6 retest because the prior defect was discovered in real graphical play after headless tests had passed. M30 remains blocked until owner acceptance. Existing Economy/Collection owner additions remain preserved.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
