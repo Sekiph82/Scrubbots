@@ -166,9 +166,26 @@ Codex may execute tasks but must not edit root TASKS.md.
 - [x] P2-143 Atlas help pose
 - [x] P2-144 Atlas victory pose
 
+
+## Final visual closure pack
+
+- [ ] P2-145 First-clear SB bonus perk icon
+- [ ] P2-146 Gift Bar SB bonus perk icon
+- [ ] P2-147 Paid 2x discount perk icon
+- [ ] P2-148 Cards Exchange SB bonus perk icon
+- [ ] P2-149 Booster purchase discount perk icon
+- [ ] P2-150 Heart refill discount perk icon
+- [ ] P2-151 Win Streak SB bonus perk icon
+- [ ] P2-152 Daily task SB bonus perk icon
+- [ ] P2-153 Master Cleaner combined perk icon
+- [ ] P2-154 Generic Collection card back
+- [ ] P2-155 Unknown/uncollected card silhouette
+- [ ] P2-156 Newly acquired card glow/burst
+- [ ] P2-157 Canonical 10-robot Cleaning Crew group art
+
 ## Final gates
 
-- [x] P2-001..P2-144 all exist at exact canonical paths.
+- [x] P2-001..P2-157 all exist at exact canonical paths.
 - [ ] Transparency is correct where required.
 - [ ] No unintended text/watermark.
 - [ ] Logo/app-icon identity matches owner references.
