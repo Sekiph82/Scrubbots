@@ -28,7 +28,7 @@
   "canonical_references": {
     "gameplay": {
       "repository_path": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png",
-      "status": "OWNER_APPROVED_BINARY_PENDING_LOCAL_PUSH",
+      "status": "OWNER_APPROVED_IN_REPO",
       "owner_decision": "coordination/OWNER_GAMEPLAY_MASTER_VISUAL_V01.md",
       "previous_reference": "assets/art/references/_owner_inbox/Game Screens/deneme 3 OK.png"
     },
@@ -294,7 +294,7 @@
   "gameplay_master_visual": {
     "id": "gameplay_master_visual_v01",
     "provider": "chatgpt_image_generation",
-    "status": "OWNER_APPROVED_BINARY_PENDING_LOCAL_PUSH",
+    "status": "OWNER_APPROVED_IN_REPO",
     "target_path": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png",
     "regenerate": false,
     "composition_authority": "coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md",
@@ -306,5 +306,53 @@
       "individual_asset_count": 27,
       "note": "All image-based gameplay components have individual generated SVG candidates. Dynamic/live Godot elements remain code/native UI."
     }
+  },
+  "gameplay_component_assets": {
+    "status": "OWNER_APPROVED_IN_REPO",
+    "authority": "coordination/OWNER_GAMEPLAY_MASTER_VISUAL_V01.md",
+    "assets": [
+      {
+        "id": "gameplay_pause_button",
+        "path": "assets/ui/final/gameplay/controls/button_pause.png",
+        "status": "APPROVED"
+      },
+      {
+        "id": "gameplay_speed_2x_button",
+        "path": "assets/ui/final/gameplay/controls/button_speed_2x.png",
+        "status": "APPROVED"
+      },
+      {
+        "id": "gameplay_speed_2x_active",
+        "path": "assets/ui/final/gameplay/controls/button_speed_2x_active.png",
+        "status": "APPROVED"
+      },
+      {
+        "id": "gameplay_speed_2x_countdown_frame",
+        "path": "assets/ui/final/gameplay/controls/button_speed_2x_countdown_frame.png",
+        "status": "APPROVED",
+        "notes": "Countdown text remains live Godot text."
+      },
+      {
+        "id": "rail_straight_horizontal",
+        "path": "assets/ui/final/gameplay/railroad/rail_straight_horizontal.png",
+        "status": "APPROVED"
+      },
+      {
+        "id": "rail_straight_vertical",
+        "path": "assets/ui/final/gameplay/railroad/rail_straight_vertical.png",
+        "status": "APPROVED"
+      },
+      {
+        "id": "rail_corner_90",
+        "path": "assets/ui/final/gameplay/railroad/rail_corner_90.png",
+        "status": "APPROVED"
+      },
+      {
+        "id": "rail_slot_connector",
+        "path": "assets/ui/final/gameplay/railroad/rail_slot_connector.png",
+        "status": "APPROVED"
+      }
+    ],
+    "rule": "Do not regenerate these owner-approved gameplay components unless explicitly requested."
   }
 }
