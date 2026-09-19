@@ -12,8 +12,8 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 553 / 966 = 57.25% (game+ui live scope); lastCompletedTaskId M30-C001-V02. M30 is fully closed after strict V02 code audit plus owner F6 acceptance of AUTO-SOLVE -> WON, DEADLOCK DEMO -> LOST, and RETRY from both terminal states -> fresh PLAYING at 1x. M33 canonical Dispatch/Cleaning/Completion SFX assets and the V1 no-movement-audio decision are already owner-approved and tracked as complete asset tasks, but M33 runtime audio integration remains future work.
-- Note: All current non-main branch histories are now contained in `main`. The two historical Claude branches had zero unique commits, and `codex/visual-assets-production` was merged through PR #5. Branch deletion is safe from a commit-containment perspective; branch refs are intentionally left in place until the owner explicitly asks to delete them.
+- Progress: 553 / 966 = 57.25% (game+ui live scope snapshot before the 2026-09-19 visual/opening-video tracker additions); lastCompletedTaskId M30-C001-V02. M30 is fully closed after strict V02 code audit plus owner F6 acceptance of AUTO-SOLVE -> WON, DEADLOCK DEMO -> LOST, and RETRY from both terminal states -> fresh PLAYING at 1x. M33 canonical Dispatch/Cleaning/Completion SFX assets and the V1 no-movement-audio decision are already owner-approved and tracked as complete asset tasks, but M33 runtime audio integration remains future work.
+- Note: `codex/visual-assets-production` was merged through PR #5 for the earlier visual batch, but the later final visual-closure batch P2-145..P2-157 now exists on that visual branch at commit `65b26242f996f210a923b4536c7083f6f2d005cc` and is not yet integrated into `main`. Do not delete the visual branch until that final batch is merged/audited. The two historical Claude branches had zero unique commits.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -561,6 +561,22 @@ Home preproduction note (owner decision 2026-09-18): `assets/ui/HOME_ASSET_MANIF
 5. **Final Scrubbot visual production happens in the existing Scrubbot visual milestone**, using the canonical Scrubby reference and approved visual language.
 6. **Home, Results, Tutorial, Collection, Shop, Events and later screens generate their own required assets inside their existing milestones.** They do not wait for a separate global art project.
 7. Final visual polish is a consolidation/QA pass over already-integrated milestone-owned art, not the first time production art is introduced.
+
+---
+
+## VISUAL ASSET PRODUCTION STATUS [CONTENT]
+
+Canonical discovery index for Claude/Godot UI integration:
+`assets/ui/VISUAL_ASSET_INDEX.md`
+
+- [x] SB-UI-VIS-001 Phase 1 core visual production completed: 306 / 306 canonical targets produced and published.
+- [x] SB-UI-VIS-002 Phase 2 main visual batch P2-001..P2-144 completed and published, including branding/system assets, reusable UI kit, booster states, canonical 10-robot presentation families, and system-state icons.
+- [x] SB-UI-VIS-003 Collection extraction completed: all 15 sets × 9 cards = 135 individual canonical card PNGs exist under `assets/ui/final/collection/cards/set_01..set_15/`.
+- [ ] SB-UI-VIS-004 Integrate/audit the final visual-closure batch P2-145..P2-157 from `codex/visual-assets-production` into `main`. Source commit: `65b26242f996f210a923b4536c7083f6f2d005cc`. This batch contains 9 robot-perk icons, 3 Collection state assets, and the canonical 10-robot Cleaning Crew group art.
+- [ ] SB-UI-VIS-005 After P2-145..P2-157 integration, refresh/verify the `main` copy of `assets/ui/VISUAL_ASSET_INDEX.md` so Claude sees the final 157 / 157 Phase 2 targets and complete production paths.
+- [ ] SB-UI-VIS-006 Before UI milestone closure, perform owner/Claude pixel-level QA of production assets actually used on-screen: alpha edges, text/watermark absence, mobile readability, identity consistency, compression/import settings. Path existence alone is not visual acceptance.
+
+Static AI visual generation is considered closed after SB-UI-VIS-004/005 unless a new owner-approved feature creates a specific new requirement. Do not generate speculative World Map, XP, Star-currency, leaderboard, event, or monetization art.
 
 ---
 
@@ -1458,6 +1474,17 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [ ] SB-M42-023 Render lower road as Win Streak SB reward track 1/5/10/25/100; no Star balance.
 - [ ] SB-M42-024 Implement Daily consecutive-login count / 5-day cycle / booster reward presentation.
 - [ ] SB-M42-025 Keep all SB prices, Bot Parts values, Gift Meter values and Daily states live/localizable.
+
+**Opening cinematic / boot flow [OWNER ASSET — 2026-09-19]**
+
+- [ ] SB-M42-026 Opening cinematic source: preserve the owner-supplied 15-second source video at `assets/brand/opening/final_15_seconds_opening_video.mp4` (local source currently intended from `C:\Users\sekip\Desktop\ScrubBots\assets\brand\final 15 seconds opening video.mp4`).
+- [ ] SB-M42-027 Preserve the MP4 as source/reference, but create a Godot-runtime Ogg Theora + Vorbis version at `assets/brand/opening/scrubbots_opening_720p30.ogv`; do not rely on H.264/MP4 playback in core Godot.
+- [ ] SB-M42-028 Implement a dedicated opening-video scene using `VideoStreamPlayer`, with aspect-ratio-safe presentation for the portrait app and no image distortion.
+- [ ] SB-M42-029 On successful video completion, transition exactly once into the normal Home/bootstrap flow; failure to decode/play must fail safely into Home rather than blocking startup.
+- [ ] SB-M42-030 Decide and implement skip behavior `[DESIGN GATE]`: recommended V1 is tap/Skip to bypass the cinematic without affecting save/game state.
+- [ ] SB-M42-031 Decide playback frequency `[DESIGN GATE]`: recommended V1 is once per cold app launch, not on every internal scene transition/retry.
+- [ ] SB-M42-032 Validate opening cinematic on Android real device for smooth 720p/30 playback, audio sync, startup latency, orientation, background/foreground behavior and memory cleanup.
+- [ ] SB-M42-033 Validate iOS readiness later with the same boot-flow fallback and aspect rules.
 
 ### M43 — Results Screen
 
