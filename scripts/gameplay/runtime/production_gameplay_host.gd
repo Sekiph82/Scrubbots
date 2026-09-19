@@ -45,6 +45,7 @@ const BatchSupplyEngine = preload("res://scripts/gameplay/supply/batch_supply_en
 const CompletionEvaluator = preload("res://scripts/gameplay/completion/completion_evaluator.gd")
 const CompletionController = preload("res://scripts/gameplay/completion/completion_controller.gd")
 const RetryCoordinator = preload("res://scripts/gameplay/completion/retry_coordinator.gd")
+const CleaningEffectsController = preload("res://scripts/gameplay/presentation/cleaning_effects_controller.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -82,6 +83,7 @@ var _input
 var _origin_provider
 var _evaluator
 var _completion
+var _cleaning_fx
 var _built := false
 var _build_error := ""
 
@@ -188,6 +190,14 @@ func build() -> bool:
 		_build_error = "completion bind failed"
 		return false
 	_completion.terminal_reached.connect(_on_terminal_reached)
+	# M31 presentation-only cleaning effect: a pure observer on the SAME authoritative
+	# committed-clear notification. It never mutates gameplay truth; a bind failure (no FX
+	# layer) simply means no cues, never a build/gameplay failure.
+	_cleaning_fx = CleaningEffectsController.new()
+	add_child(_cleaning_fx)
+	_cleaning_fx.bind(presentation.get_cleaning_fx_layer(), _board)
+	_loop.authenticated_clear.connect(_cleaning_fx._on_authenticated_clear)
+
 	# Meaningful gameplay boundaries mark the completion state dirty (authenticated clear +
 	# accepted supply-front placement). on_tick (below) then gets one chance to run the M27
 	# proof at quiescence; idle ticks with no event never re-run it.
@@ -274,6 +284,11 @@ func _on_retry_restored() -> void:
 	if _screen != null and is_instance_valid(_screen) and _slots != null:
 		_screen.update_snapshots(_slots.snapshot(), _supply.player_snapshot())
 		_screen.set_speed_2x(false)
+	# M31 (§10): a successful Retry starts a fresh visual attempt — remove stale cleaning
+	# cues and reset the attempt-scoped diagnostic counters. Presentation-only; runs only on
+	# the RetryCoordinator's post-success restore seam, so it never weakens the M30 gate.
+	if _cleaning_fx != null and is_instance_valid(_cleaning_fx):
+		_cleaning_fx.reset_for_new_attempt()
 
 ## Runtime state-sync tail: refresh the five-slot strip from authoritative M24, then run one
 ## dirty/event-gated completion evaluation pass.
@@ -391,3 +406,6 @@ func get_level():
 
 func get_candidate_index():
 	return _ci
+
+func get_cleaning_fx():
+	return _cleaning_fx
