@@ -25,6 +25,8 @@ However:
 
 The owner supplied a graphical screenshot at approximately 683×1366 embedded-game viewport.
 
+A second owner screenshot taken approximately three minutes later showed the same visible slot/accounting state, including the same committed in-flight count (for example `50 (2) ACTIVE`), and the same uncleared board image. This means the manual regression cannot be closed by proving renderer identity alone: the real SceneTree-driven runtime clock must also prove that committed agents actually advance and arrive without tests manually calling `runtime.tick()`.
+
 ## F-M29-MANUAL-001 — responsive relayout recreates BoardRenderer and AgentLayer after runtime binding
 
 Root cause is in the production presentation lifecycle.
@@ -56,7 +58,7 @@ Result:
 4. A NEWER renderer/layer ordering can cover or visually separate those agents.
 5. Headless BoardState/runtime tests still pass because authoritative gameplay truth clears correctly, while the owner sees no visible cleaning.
 
-This exactly explains the owner's screenshot: M24/M25/M26 state progressed (`ACTIVE`, committed count present) while visible pixels stayed intact.
+The duplicate presentation-node lifecycle is a confirmed graphical coherence bug and explains how authoritative clears/agents can become invisible. The unchanged second screenshot additionally requires direct verification of the real graphical `_process(delta)` runtime clock, because the owner's committed count did not visibly progress for approximately three minutes.
 
 ## Required correction
 
@@ -84,7 +86,8 @@ Before -> after one or more relayouts:
 - an in-flight Scrubbot remains parented to the same AgentLayer;
 - relayout updates the layer scale/geometry without replacing it;
 - M20 authenticated clear makes the CURRENT visible renderer cell transparent;
-- real Hazard Bot production runtime still reaches 400 authenticated clears / ACTIVE=0.
+- real Hazard Bot production runtime still reaches 400 authenticated clears / ACTIVE=0;
+- a SceneTree-driven production smoke with `ProductionRuntimeController._process(delta)` enabled, not a test that manually calls `runtime.tick()`, proves committed agents advance, arrive and visibly clear pixels.
 
 Viewport evidence must include:
 - 1080×2160;
