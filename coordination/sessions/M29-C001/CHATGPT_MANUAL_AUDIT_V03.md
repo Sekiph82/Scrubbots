@@ -120,3 +120,28 @@ Owner decision:
 `coordination/OWNER_BATCH_SLOT_DISPLAY_DECISION_V01.md`.
 
 The same manual review confirmed that Red/Yellow WAITING is not automatically a bug. In the deterministic Hazard Bot first column, Red 15 and Yellow 1 have no immediate clears in the accepted M27 solution trace before Blue opens progress. WAITING therefore correctly means "no currently claimable reachable target"; ACTIVE is eligibility, not proof that a robot is currently moving.
+
+
+## F-M29-MANUAL-002 — five-slot UI snapshot is stale after scheduler mutations
+
+Owner review identified that Brown 3 was displayed ACTIVE while Red/Yellow were WAITING.
+
+The accepted M27 Hazard Bot solution trace confirms the owner's topology observation:
+- Red15: 0 immediate clear;
+- Yellow1: 0 immediate clear;
+- Blue50: 50 clear;
+- Blue50: another 50 clear;
+- Brown3: still 0 immediate clear.
+
+Therefore Brown3 is not currently reachable/claimable at that state and, once M25/M26 evaluates it, its authoritative lifecycle must be WAITING until later corridor-opening progress.
+
+The production UI currently calls `GameplayScreen.update_snapshots(...)` only after successful player placement in `ProductionInputController`. Scheduler-driven M24 changes such as commit, ACTIVE->WAITING, wake, rollback, finalize and slot-empty completion have no production presentation refresh seam. This can leave the player seeing an old ACTIVE state and old count indefinitely.
+
+Required V03 correction:
+- introduce authoritative live slot-presentation synchronization using fresh detached M24 snapshots;
+- do not let UI infer targetability;
+- Brown3 must visibly become WAITING in the above Hazard Bot state without another player click;
+- later wake must visibly return it to ACTIVE automatically.
+
+Canonical decision:
+`coordination/OWNER_FIVE_SLOT_LIVE_PRESENTATION_SYNC_DECISION_V01.md`.
