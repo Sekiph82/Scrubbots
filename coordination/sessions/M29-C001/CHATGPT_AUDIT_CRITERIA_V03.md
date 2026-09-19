@@ -47,7 +47,20 @@ Direct evidence at:
 
 Exercise a resize/relayout transition and repeat identity/clear checks.
 
-## 7. Full production smoke
+## 7. Real SceneTree clock smoke
+Add a production-style smoke that leaves `ProductionRuntimeController` processing enabled and advances real SceneTree frames. Do NOT drive progress by directly calling `runtime.tick()` in this test.
+
+At 683×1366:
+- a successful front activation creates committed work;
+- at least one real ScrubbotAgent progress value increases across subsequent frames;
+- the agent arrives within a bounded real-frame interval;
+- committed count decreases/finalizes through the normal M20/M25 chain;
+- the CURRENT visible renderer pixel becomes transparent;
+- runtime is not spuriously system-suspended while the embedded game viewport is actively focused.
+
+If focus/background suspension is intentionally triggered, focus regain must resume movement without stale input.
+
+## 8. Full production smoke
 Real M29 Hazard Bot runtime:
 - 400 authenticated clears;
 - final ACTIVE=0;
@@ -56,10 +69,10 @@ Real M29 Hazard Bot runtime:
 - M23 exhausted;
 - auto-2x preserved.
 
-## 8. Preserve accepted gameplay
+## 9. Preserve accepted gameplay
 Do not rewrite M23–M27, M29 input gate, speed authority, pause/focus or exact visible slot-origin mapping.
 
-## 9. Governance
+## 10. Governance
 - root TASKS read-only for Claude;
 - no M30 implementation;
 - implementation commit first;
