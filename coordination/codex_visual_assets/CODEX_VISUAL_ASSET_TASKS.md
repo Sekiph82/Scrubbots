@@ -32,7 +32,7 @@ Do not touch the repository's main `TASKS.md`.
 
 - [x] VA-001 Canonical Scrubby master → `assets/ui/final/characters/scrubby/scrubby_master.png`
 - [x] VA-002 Gameplay Scrubby pose → `assets/ui/final/characters/scrubby/scrubby_gameplay.png`
-- [ ] VA-003 Scrubby portrait → `assets/ui/final/characters/scrubby/scrubby_portrait.png`
+- [x] VA-003 Scrubby portrait → `assets/ui/final/characters/scrubby/scrubby_portrait.png`
 - [x] VA-004 Scrubby Home pose → `assets/ui/final/characters/scrubby/scrubby_home_pose.png`
 - [x] VA-005 Scrubby blink layer → `assets/ui/final/characters/scrubby/scrubby_face_blink_layer.png`
 - [x] VA-006 Scrubby brush arm layer → `assets/ui/final/characters/scrubby/scrubby_brush_arm_layer.png`
@@ -140,14 +140,14 @@ Do not touch the repository's main `TASKS.md`.
 
 ### Home — Shortcuts
 
-- [ ] VA-069 Win Streak → `assets/ui/final/home/shortcuts/icon_shortcut_win_streak.png`
-- [ ] VA-070 Gift Bar → `assets/ui/final/home/shortcuts/icon_shortcut_gift_bar.png`
-- [ ] VA-071 Collection → `assets/ui/final/home/shortcuts/icon_shortcut_collection.png`
-- [ ] VA-072 Shop → `assets/ui/final/home/shortcuts/icon_shortcut_shop.png`
-- [ ] VA-073 No Ads → `assets/ui/final/home/shortcuts/icon_shortcut_no_ads.png`
-- [ ] VA-074 Daily → `assets/ui/final/home/shortcuts/icon_shortcut_daily.png`
-- [ ] VA-075 Tasks → `assets/ui/final/home/shortcuts/icon_shortcut_tasks.png`
-- [ ] VA-076 Cards Exchange → `assets/ui/final/home/shortcuts/icon_shortcut_cards_exchange.png`
+- [x] VA-069 Win Streak → `assets/ui/final/home/shortcuts/icon_shortcut_win_streak.png`
+- [x] VA-070 Gift Bar → `assets/ui/final/home/shortcuts/icon_shortcut_gift_bar.png`
+- [x] VA-071 Collection → `assets/ui/final/home/shortcuts/icon_shortcut_collection.png`
+- [x] VA-072 Shop → `assets/ui/final/home/shortcuts/icon_shortcut_shop.png`
+- [x] VA-073 No Ads → `assets/ui/final/home/shortcuts/icon_shortcut_no_ads.png`
+- [x] VA-074 Daily → `assets/ui/final/home/shortcuts/icon_shortcut_daily.png`
+- [x] VA-075 Tasks → `assets/ui/final/home/shortcuts/icon_shortcut_tasks.png`
+- [x] VA-076 Cards Exchange → `assets/ui/final/home/shortcuts/icon_shortcut_cards_exchange.png`
 
 ### Home — CTA / Reward Track / Navigation
 
@@ -414,12 +414,12 @@ Do not touch the repository's main `TASKS.md`.
 
 ## Completion gate
 
-- [ ] Every checked visual file exists at its exact target path.
+- [x] Every checked visual file exists at its exact target path.
 - [ ] Every newly generated isolated asset has valid transparency where required.
 - [ ] No generated image contains unintended text/watermarks.
 - [ ] Small icons were visually checked at mobile scale.
-- [ ] No owner-approved file was overwritten.
+- [x] No owner-approved file was overwritten.
 - [ ] No file outside the explicit write boundary was modified.
 - [ ] Final `git status --short` contains only allowed image files plus this task/log file.
-- [ ] All allowed changes were committed and pushed.
+- [x] All allowed changes were committed and pushed.
 - [ ] Final summary appended to `CODEX_VISUAL_ASSET_LOG.md`.
