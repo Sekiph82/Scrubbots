@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="512" height="128" viewBox="0 0 512 128">
+<defs>
+
+<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1B6FD1"/><stop offset="1" stop-color="#08376D"/></linearGradient>
+<linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2EE8FF"/><stop offset="1" stop-color="#0A7BD8"/></linearGradient>
+<linearGradient id="cream" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF8E9"/><stop offset="1" stop-color="#D9D1BF"/></linearGradient>
+<linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5B6578"/><stop offset=".5" stop-color="#222A38"/><stop offset="1" stop-color="#0F1724"/></linearGradient>
+</defs><rect x="0" y="18" width="512" height="92" rx="18" fill="url(#metal)" stroke="#7B8494" stroke-width="7"/><rect x="0" y="34" width="512" height="12" fill="#1B2532"/><rect x="0" y="82" width="512" height="12" fill="#1B2532"/><rect x="44" y="54" width="424" height="20" rx="10" fill="#12CFF5" opacity=".9" filter="url(#glow)"/><path d="M115 64 h55 m-15 -12 l16 12 -16 12 M265 64 h55 m-15 -12 l16 12 -16 12" stroke="#E2FFFF" stroke-width="7" fill="none"/></svg>
