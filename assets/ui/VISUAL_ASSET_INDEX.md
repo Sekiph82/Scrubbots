@@ -690,6 +690,10 @@ These files exist in `assets/ui/final/**` but are not canonical targets in the c
 - Production level pixel art is intentionally outside this UI-asset index's canonical generated UI scope and belongs to the level-content pipeline.
 
 
+## Finalization batch scheduled
+
+The previously recommended Robot perk icons, Collection state art and canonical 10-robot Cleaning Crew group image are now authorized as P2-145..P2-157 in the Phase 2 master list. Until Codex publishes them, treat them as scheduled canonical targets rather than existing assets.
+
 ## Recommended future visual backlog
 
 These are not missing from the current canonical Phase 1/Phase 2 contracts. They are additional high-value visuals that would make later UI integration cleaner without introducing World Map, XP, Star currency, weekly progression, event content, or new gameplay rules.
