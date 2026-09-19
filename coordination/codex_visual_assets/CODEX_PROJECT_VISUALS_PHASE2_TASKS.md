@@ -170,10 +170,13 @@ Codex may execute tasks but must not edit root TASKS.md.
 
 - [x] P2-001..P2-144 all exist at exact canonical paths.
 - [ ] Transparency is correct where required.
-- [x] No unintended text/watermark.
+- [ ] No unintended text/watermark.
 - [ ] Logo/app-icon identity matches owner references.
 - [ ] Scrubby identity matches canonical production art.
-- [x] No fake gameplay screenshots were generated.
+- [ ] No fake gameplay screenshots were generated.
 - [x] No owner-gated robot/event/leaderboard/monetization art was invented.
-- [ ] No file outside the Phase 2 write boundary was modified.
+- [x] No file outside the Phase 2 write boundary was modified.
 - [x] All Phase 2 assets were committed and pushed only to `origin/codex/visual-assets-production`.
+
+
+> ChatGPT remote audit note: all 144 canonical Phase 2 target paths are present on the visual branch and production tasks are path-complete. Pixel-level QA gates (alpha, watermark/text, identity fidelity) remain intentionally unchecked because GitHub connector metadata does not expose image pixels for independent visual inspection.
