@@ -60,7 +60,22 @@ At 683×1366:
 
 If focus/background suspension is intentionally triggered, focus regain must resume movement without stale input.
 
-## 8. Full production smoke
+## 8. Five-slot displayed count
+
+Player-facing main slot number must equal:
+`capacity = remaining_to_clear - committed`.
+
+Direct evidence:
+- fresh 50 => displays 50;
+- one accepted dispatch/commit => displays 49 immediately;
+- two accepted dispatches => displays 48;
+- after one of those in-flight agents authenticates a clear, displayed waiting count remains 48 because both authoritative terms decrement together;
+- raw "50 (2)" presentation is gone;
+- M24 internal remaining/committed invariants are unchanged.
+
+ACTIVE/WAITING lifecycle semantics remain unchanged.
+
+## 9. Full production smoke
 Real M29 Hazard Bot runtime:
 - 400 authenticated clears;
 - final ACTIVE=0;
@@ -69,10 +84,10 @@ Real M29 Hazard Bot runtime:
 - M23 exhausted;
 - auto-2x preserved.
 
-## 9. Preserve accepted gameplay
+## 10. Preserve accepted gameplay
 Do not rewrite M23–M27, M29 input gate, speed authority, pause/focus or exact visible slot-origin mapping.
 
-## 10. Governance
+## 11. Governance
 - root TASKS read-only for Claude;
 - no M30 implementation;
 - implementation commit first;
