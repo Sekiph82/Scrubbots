@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M30
-- Current Sprint: M30-C001 V02 — narrow completion-consistency and transaction-safe Retry remediation
-- Current Task: M30-C001-V02
-- Current Task Status: CHANGES_REQUIRED
-- Next Task/Action: Claude executes `coordination/sessions/M30-C001/CHATGPT_PROMPT_V02.md` under `coordination/sessions/M30-C001/CHATGPT_AUDIT_CRITERIA_V02.md`. Scope is limited to the three findings in `CHATGPT_AUDIT_V01.md`: complete cross-engine inconsistency detection, restore-bundle/candidate-index Retry preflight and verification, and resetting M20 attempt-scoped clear observation state on successful Retry. Preserve accepted M30 V01 terminal architecture and all M23–M29 behavior. Push implementation first and `CLAUDE_LOG_V02.md` separately. Root `TASKS.md` remains ChatGPT-write-owned.
+- Current Milestone: M31
+- Current Sprint: M31-C001 V01 — Cleaning Effects
+- Current Task: M31-C001-V01
+- Current Task Status: AWAITING_IMPLEMENTATION
+- Next Task/Action: Claude executes `coordination/sessions/M31-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M31-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`. Implement presentation-only cleaning effects driven by the authoritative M20 committed-clear event, using existing merged cleaning-effect assets first, with toggle/concurrency/retry cleanup/performance evidence and an owner F6 visual gate. Do not edit root `TASKS.md`, do not start M32/M33 implementation, and do not generate new AI art unless a later owner decision explicitly requires it.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 541 / 966 = 56.00% (game+ui live scope); lastCompletedTaskId M29-C001-V03. M30 V01 core architecture is accepted but the milestone remains open under `CHANGES_REQUIRED` for three narrow V02 findings. No M30 checklist item is closed until V02 passes strict audit. Existing Economy/Collection owner additions remain preserved.
-- Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
+- Progress: 553 / 966 = 57.25% (game+ui live scope); lastCompletedTaskId M30-C001-V02. M30 is fully closed after strict V02 code audit plus owner F6 acceptance of AUTO-SOLVE -> WON, DEADLOCK DEMO -> LOST, and RETRY from both terminal states -> fresh PLAYING at 1x. M33 canonical Dispatch/Cleaning/Completion SFX assets and the V1 no-movement-audio decision are already owner-approved and tracked as complete asset tasks, but M33 runtime audio integration remains future work.
+- Note: All current non-main branch histories are now contained in `main`. The two historical Claude branches had zero unique commits, and `codex/visual-assets-production` was merged through PR #5. Branch deletion is safe from a commit-containment perspective; branch refs are intentionally left in place until the owner explicitly asks to delete them.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
