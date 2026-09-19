@@ -387,6 +387,14 @@ This is presentation only. M24 authoritative accounting remains unchanged: `rema
 
 ACTIVE/WAITING internal lifecycle semantics are also unchanged. ACTIVE means eligible/not currently marked unavailable; it does not guarantee a robot is presently moving. WAITING means no currently claimable reachable target for that batch/color, and the batch must be automatically reconsidered after relevant board changes. Canonical decision: `coordination/OWNER_BATCH_SLOT_DISPLAY_DECISION_V01.md`.
 
+### 8.10F — Live five-slot presentation synchronization `[OWNER-LOCKED CURRENT — 2026-09-19]`
+
+The production five-slot strip must reflect **current authoritative M24 state**, not merely the snapshot captured after the last player batch placement.
+
+Fresh detached slot snapshots must be pushed after player-visible M24 mutations including dispatch commit, ACTIVE->WAITING, WAITING->ACTIVE wake, rollback, authenticated-clear finalization, slot completion->EMPTY and reset. UI remains presentation-only and must not run target selection/routing to guess lifecycle state.
+
+Hazard Bot reference: after the first two Blue50 batches have cleared the initial 100 reachable blue cells, the early Brown3 batch still has no immediately reachable brown target in the accepted M27 solution trace. Its player-facing slot state must therefore be WAITING until later black/open-corridor progress wakes it. A stale ACTIVE badge after that point is a presentation-sync defect. Canonical decision: `coordination/OWNER_FIVE_SLOT_LIVE_PRESENTATION_SYNC_DECISION_V01.md`.
+
 ### 8.11 — Win streak `[LOCKED — Economy V1]`
 
 ```text
