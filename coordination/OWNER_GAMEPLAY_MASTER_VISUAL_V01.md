@@ -17,7 +17,7 @@ Owner-local staging path:
 
 The exact approved generated image is the visual master selected by the owner in the 2026-09-19 UI-design conversation.
 
-Until the binary is pushed from the owner-local repository, this document and `ASSET_GENERATION_MANIFEST.json` reserve the path and mark the image as owner-approved. Do not regenerate or substitute it.
+The binary is now committed at the canonical repository path. `ASSET_GENERATION_MANIFEST.json` marks it `OWNER_APPROVED_IN_REPO`. Do not regenerate or substitute it.
 
 ## Visual authority
 
