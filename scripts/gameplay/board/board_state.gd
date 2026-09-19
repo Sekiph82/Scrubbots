@@ -118,3 +118,12 @@ func count_cells_by_state(state: CellState) -> int:
 		if value == state:
 			count += 1
 	return count
+
+## Restore every cell to ACTIVE (the original full-artwork state) in place, keeping the
+## same instance every bound collaborator (ColorCandidateIndex, ReservationState, renderer,
+## routing/access) already points at. The immutable per-cell source palette id is never
+## touched — only the runtime lifecycle byte is reset. This is the minimum safe M30 retry
+## seam so a transaction-safe same-puzzle Retry can rebuild presentation/candidate truth
+## without swapping the BoardState instance (which would strand every bound engine).
+func restore_all_active() -> void:
+	_cell_states.fill(CellState.ACTIVE)

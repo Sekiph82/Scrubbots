@@ -40,6 +40,11 @@ const GameplaySpeedAuthority = preload("res://scripts/gameplay/runtime/gameplay_
 const ProductionRuntimeController = preload("res://scripts/gameplay/runtime/production_runtime_controller.gd")
 const SlotOriginProvider = preload("res://scripts/gameplay/runtime/slot_origin_provider.gd")
 const ProductionInputController = preload("res://scripts/ui/production_input_controller.gd")
+const ColorBatch = preload("res://scripts/gameplay/supply/color_batch.gd")
+const BatchSupplyEngine = preload("res://scripts/gameplay/supply/batch_supply_engine.gd")
+const CompletionEvaluator = preload("res://scripts/gameplay/completion/completion_evaluator.gd")
+const CompletionController = preload("res://scripts/gameplay/completion/completion_controller.gd")
+const RetryCoordinator = preload("res://scripts/gameplay/completion/retry_coordinator.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -49,9 +54,17 @@ const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 @export var preview_depth: int = 3
 @export var base_cadence: float = GameplaySpeedAuthority.DEFAULT_BASE_INTERVAL
 @export var auto_build: bool = true
+## QA/debug-only DEADLOCK fixture seam (M30 manual LOST demo + tests). When > 0, the last N
+## batches of the deterministic generated candidate are dropped so total supply robots <
+## ACTIVE cells: the board can never fully clear, and once supply is exhausted at quiescence
+## the REAL M27 DeadlockClassifier proves DEADLOCK -> owner-visible LOST via the SAME real
+## production stack. Default 0 keeps the full solvable production candidate; no production
+## path sets this.
+@export var qa_supply_drop_last: int = 0
 
 var _screen
 var _board
+var _level
 var _supply
 var _slots
 var _res
@@ -67,6 +80,8 @@ var _speed
 var _runtime
 var _input
 var _origin_provider
+var _evaluator
+var _completion
 var _built := false
 var _build_error := ""
 
@@ -95,6 +110,7 @@ func build() -> bool:
 		_build_error = "level load failed"
 		return false
 	var lvl = res_load.level_data
+	_level = lvl
 	_board = BoardState.from_level_data(lvl)
 
 	# M23 deterministic candidate (M27-proven for seed 1 / 3 columns / preview 3).
@@ -102,6 +118,12 @@ func build() -> bool:
 	if _supply == null:
 		_build_error = "supply generation failed"
 		return false
+	# QA/debug-only DEADLOCK fixture: drop the last N generated batches (see qa_supply_drop_last).
+	if qa_supply_drop_last > 0:
+		_supply = _make_deadlock_supply(_supply, qa_supply_drop_last, lvl.palette.size())
+		if _supply == null:
+			_build_error = "qa deadlock supply build failed"
+			return false
 	_slots = FiveSlotBatchEngine.new()
 
 	# Production GameplayScreen composition (M28), configured with detached snapshots.
@@ -155,30 +177,133 @@ func build() -> bool:
 	if not _input.bind(_supply, _slots, _scheduler, _runtime, _screen.get_supply_panel(), _screen):
 		_build_error = "input controller bind failed"
 		return false
-	# Live five-slot presentation sync from authoritative M24 after every driven tick.
-	_runtime.set_state_sync(Callable(self, "_sync_slots"))
+
+	# M30 completion authority: read-only evaluator + terminal controller over the exact
+	# live engines. Dirty/event-driven — the expensive real M27 proof runs only at a
+	# quiescent boundary the controller marks dirty (placement / authenticated clear).
+	_evaluator = CompletionEvaluator.new()
+	_completion = CompletionController.new()
+	if not _completion.bind(_evaluator, _board, _scheduler, _dispatcher, _claim, _res,
+			_slots, _level, _supply):
+		_build_error = "completion bind failed"
+		return false
+	_completion.terminal_reached.connect(_on_terminal_reached)
+	# Meaningful gameplay boundaries mark the completion state dirty (authenticated clear +
+	# accepted supply-front placement). on_tick (below) then gets one chance to run the M27
+	# proof at quiescence; idle ticks with no event never re-run it.
+	_loop.authenticated_clear.connect(_on_clear_event)
+	_input.activation_result.connect(_on_activation_event)
+	# Live five-slot presentation sync AND completion evaluation after every driven tick.
+	_runtime.set_state_sync(Callable(self, "_on_runtime_tick"))
 
 	_wire_controls()
 	_built = true
 	return true
 
-## Reset the production session (scheduler/slots/supply/speed) and refresh the live UI.
+## QA-only: rebuild `engine` minus `drop` batches taken from the DRAIN TAIL — the deepest
+## batches of the highest-index non-empty column first (col N back, then col N-1, ...). That
+## is exactly the tail of the col0->col1->col2 front-to-back drain the manual/test path uses,
+## so every remaining batch clears from a state a proven-solvable prefix already reached
+## (no placed batch is stranded), while the dropped tail's cells stay permanently ACTIVE.
+## Once that residual supply is exhausted at quiescence the real M27 classifier proves
+## DEADLOCK -> owner-visible LOST.
+func _make_deadlock_supply(engine, drop: int, palette_size: int):
+	var dbg: Dictionary = engine.debug_snapshot()
+	var cols: Array = dbg["columns"]
+	var remaining := drop
+	while remaining > 0:
+		var popped := false
+		for c in range(cols.size() - 1, -1, -1):
+			if cols[c].size() > 0:
+				cols[c].remove_at(cols[c].size() - 1)
+				remaining -= 1
+				popped = true
+				break
+		if not popped:
+			break  # nothing left to drop
+	var cols_out: Array = []
+	for c in range(cols.size()):
+		var q: Array = []
+		for bd in cols[c]:
+			var batch = ColorBatch.make(String(bd["batch_id"]), int(bd["color_id"]),
+				int(bd["robot_count"]), palette_size)
+			if batch == null:
+				return null
+			q.append(batch)
+		cols_out.append(q)
+	var out = BatchSupplyEngine.create(column_count, preview_depth)
+	if out == null or not out.load_candidate(cols_out, gen_seed, palette_size):
+		return null
+	return out
+
+## M30 transaction-safe same-puzzle Retry (SB-M30-007). The accepted M26 scheduler teardown
+## is the FIRST destructive gate: if it fails/defers/pends/is fatal, Retry FAILS CLOSED and
+## nothing else is reset (no half-old/half-new attempt). On a proven-clean teardown, restores
+## one coherent fresh attempt — same level, same deterministic initial supply, board fully
+## ACTIVE, empty slots, zero claims/reservations/agents/committed work, speed 1x, PLAYING,
+## input unblocked. Returns true on a fully restored attempt, false on a fail-closed gate.
+func retry() -> bool:
+	if not _built:
+		return false
+	return RetryCoordinator.attempt({
+		"scheduler": _scheduler,
+		"slots": _slots,
+		"supply": _supply,
+		"board": _board,
+		"candidate_index": _ci,
+		"runtime": _runtime,
+		"input": _input,
+		"completion": _completion,
+		"renderer": _renderer(),
+		"on_restored": Callable(self, "_on_retry_restored"),
+	})
+
+## Backwards-compatible M29 alias. reset_session() now routes through the hardened
+## transaction-safe Retry path (return value ignored by legacy void callers).
 func reset_session() -> void:
-	if _scheduler != null:
-		_scheduler.reset()
-	if _slots != null:
-		_slots.reset()
-	if _supply != null:
-		_supply.reset()
-	if _runtime != null:
-		_runtime.reset_runtime()
+	retry()
+
+func _renderer():
+	var p = _screen.get_presentation() if (_screen != null and is_instance_valid(_screen)) else null
+	return p.get_renderer() if p != null else null
+
+## After a successful Retry restore, refresh the live UI (five-slot strip + supply panel) to
+## the fresh attempt's initial state.
+func _on_retry_restored() -> void:
 	if _screen != null and is_instance_valid(_screen) and _slots != null:
 		_screen.update_snapshots(_slots.snapshot(), _supply.player_snapshot())
+		_screen.set_speed_2x(false)
+
+## Runtime state-sync tail: refresh the five-slot strip from authoritative M24, then run one
+## dirty/event-gated completion evaluation pass.
+func _on_runtime_tick() -> void:
+	_sync_slots()
+	if _completion != null:
+		_completion.on_tick()
 
 ## Push a fresh detached M24 snapshot into the live five-slot strip (runtime state-sync).
 func _sync_slots() -> void:
 	if _screen != null and is_instance_valid(_screen) and _slots != null:
 		_screen.refresh_slot_snapshot(_slots.snapshot())
+
+func _on_clear_event(_owner_id, _target_index, _color_id, _agent) -> void:
+	if _completion != null:
+		_completion.notify_event()
+
+func _on_activation_event(_column: int, ok: bool, _error: String) -> void:
+	if ok and _completion != null:
+		_completion.notify_event()
+
+## Exact-once terminal latch handler: stop new dispatch cadence + travel (distinct terminal
+## stop, not a user pause), block new M26 assignments, and block new supply-front input. No
+## legitimate in-flight work is discarded — the latch only fires at a quiescent boundary.
+func _on_terminal_reached(_status, _detail) -> void:
+	if _runtime != null:
+		_runtime.set_terminal_stopped(true)
+	if _input != null:
+		_input.set_terminal_stopped(true)
+	if _scheduler != null:
+		_scheduler.pause()
 
 func _wire_controls() -> void:
 	var pause_btn = _screen.get_pause_button()
@@ -253,3 +378,15 @@ func get_agent_layer():
 
 func get_origin_provider():
 	return _origin_provider
+
+func get_completion():
+	return _completion
+
+func get_completion_evaluator():
+	return _evaluator
+
+func get_level():
+	return _level
+
+func get_candidate_index():
+	return _ci
