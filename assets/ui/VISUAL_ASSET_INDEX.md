@@ -16,16 +16,16 @@ Purpose: single lookup map for Claude/Godot UI integration.
 
 ## Audit summary
 
-- Production visual files under `assets/ui/final/**`: **456**
+- Production visual files under `assets/ui/final/**`: **469**
 - Phase 1 canonical target paths: **306**
-- Phase 2 canonical target paths: **144**
-- Combined canonical target paths: **450**
+- Phase 2 canonical target paths: **157**
+- Combined canonical target paths: **463**
 - Canonical targets missing on audited branch: **0**
 - Extra production PNGs outside Phase 1/Phase 2 canonical lists: **6**
 - Generated candidate/source visuals: **27**
 - Owner/reference visuals: **51**
 - Other project art/reference visuals: **4**
-- Total visual files indexed here: **538**
+- Total visual files indexed here: **551**
 
 ## Canonical authorities
 
@@ -77,7 +77,7 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/cards_exchange/exchange_button_frame.png` | Phase 1 | 1,455,680 |
 | `assets/ui/final/cards_exchange/scrub_bucks_receive_bundle.png` | Phase 1 | 1,201,225 |
 
-### characters (64)
+### characters (65)
 
 | Path | Authority | Bytes |
 |---|---|---:|
@@ -145,8 +145,9 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/characters/scrubby/scrubby_home_pose.png` | Phase 1 | 1,407,303 |
 | `assets/ui/final/characters/scrubby/scrubby_master.png` | Phase 1 | 1,143,456 |
 | `assets/ui/final/characters/scrubby/scrubby_portrait.png` | Phase 1 | 741,149 |
+| `assets/ui/final/characters/robots/cleaning_crew_group.png` | Phase 2 P2-157 | 2,817,625 |
 
-### collection (145)
+### collection (148)
 
 | Path | Authority | Bytes |
 |---|---|---:|
@@ -154,6 +155,9 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/collection/card_frame_epic.png` | Phase 1 | 1,557,751 |
 | `assets/ui/final/collection/card_frame_legendary.png` | Phase 1 | 1,609,952 |
 | `assets/ui/final/collection/card_frame_rare.png` | Phase 1 | 1,511,105 |
+| `assets/ui/final/collection/states/card_back.png` | Phase 2 P2-154 | 2,120,421 |
+| `assets/ui/final/collection/states/card_new_glow.png` | Phase 2 P2-156 | 1,894,136 |
+| `assets/ui/final/collection/states/card_unknown_silhouette.png` | Phase 2 P2-155 | 1,889,099 |
 | `assets/ui/final/collection/cards/set_01/card_01.png` | Phase 1 | 130,888 |
 | `assets/ui/final/collection/cards/set_01/card_02.png` | Phase 1 | 147,614 |
 | `assets/ui/final/collection/cards/set_01/card_03.png` | Phase 1 | 124,664 |
@@ -532,12 +536,21 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/rewards/scrub_bucks_bundle_large.png` | Phase 1 | 2,037,038 |
 | `assets/ui/final/rewards/scrub_bucks_bundle_small.png` | Phase 1 | 1,091,823 |
 
-### robots (12)
+### robots (21)
 
 | Path | Authority | Bytes |
 |---|---|---:|
 | `assets/ui/final/robots/bot_parts_icon.png` | Phase 1 | 1,075,502 |
 | `assets/ui/final/robots/bot_parts_progress_frame.png` | Phase 1 | 507,078 |
+| `assets/ui/final/robots/perks/perk_booster_discount.png` | Phase 2 P2-149 | 1,953,644 |
+| `assets/ui/final/robots/perks/perk_cards_exchange_bonus.png` | Phase 2 P2-148 | 1,824,144 |
+| `assets/ui/final/robots/perks/perk_daily_task_bonus.png` | Phase 2 P2-152 | 1,869,230 |
+| `assets/ui/final/robots/perks/perk_first_clear_sb_bonus.png` | Phase 2 P2-145 | 1,909,372 |
+| `assets/ui/final/robots/perks/perk_gift_bar_sb_bonus.png` | Phase 2 P2-146 | 1,853,223 |
+| `assets/ui/final/robots/perks/perk_heart_refill_discount.png` | Phase 2 P2-150 | 1,797,330 |
+| `assets/ui/final/robots/perks/perk_master_cleaner.png` | Phase 2 P2-153 | 2,026,602 |
+| `assets/ui/final/robots/perks/perk_speed_2x_discount.png` | Phase 2 P2-147 | 1,827,088 |
+| `assets/ui/final/robots/perks/perk_win_streak_bonus.png` | Phase 2 P2-151 | 1,925,244 |
 | `assets/ui/final/robots/robot_card_frame_locked.png` | Phase 1 | 1,717,165 |
 | `assets/ui/final/robots/robot_card_frame_unlocked.png` | Phase 1 | 1,632,947 |
 | `assets/ui/final/robots/robot_detail_hero_frame.png` | Phase 2 P2-049 | 1,607,914 |
@@ -690,50 +703,16 @@ These files exist in `assets/ui/final/**` but are not canonical targets in the c
 - Production level pixel art is intentionally outside this UI-asset index's canonical generated UI scope and belongs to the level-content pipeline.
 
 
-## Finalization batch scheduled
+## Finalization batch complete
 
-The previously recommended Robot perk icons, Collection state art and canonical 10-robot Cleaning Crew group image are now authorized as P2-145..P2-157 in the Phase 2 master list. Until Codex publishes them, treat them as scheduled canonical targets rather than existing assets.
+P2-145..P2-157 are now published as canonical Phase 2 assets.
+- New finalization visuals: 13 / 13
+- Phase 2 canonical targets: 157 / 157
+- Combined Phase 1 + Phase 2 canonical targets: 463 / 463
+- Missing canonical targets: 0
+- Cleaning Crew group contains exactly the ten owner-approved robots.
+- Required transparency/no-text visual QA completed for the new batch.
 
 ## Recommended future visual backlog
 
-These are not missing from the current canonical Phase 1/Phase 2 contracts. They are additional high-value visuals that would make later UI integration cleaner without introducing World Map, XP, Star currency, weekly progression, event content, or new gameplay rules.
-
-### Robot perk icon family
-
-The 10-robot roster now has distinct meta perks, but the current asset library contains only a generic perk-emblem frame. Recommended dedicated transparent icons:
-
-- first-clear Scrub Bucks bonus
-- Gift Bar Scrub Bucks bonus
-- paid 2x discount
-- Cards Exchange bonus
-- booster-purchase discount
-- Heart-refill discount
-- Win Streak bonus
-- Daily-task bonus
-- Atlas Master Cleaner combined perk
-
-Suggested root:
-`assets/ui/final/robots/perks/`
-
-### Collection state art
-
-Useful additions for unowned/hidden Collection states:
-
-- generic Collection card back
-- unknown/uncollected card silhouette
-- newly acquired card glow/burst
-
-Suggested root:
-`assets/ui/final/collection/states/`
-
-### Cleaning Crew group art
-
-One canonical transparent/wide group composition containing all 10 robots would be useful for:
-- Robot Collection header/hero treatment
-- store/marketing compositions
-- future celebratory screens
-
-Suggested path:
-`assets/ui/final/characters/robots/cleaning_crew_group.png`
-
-These items are recommended, not required to consider the current 450 canonical visual targets complete.
+No additional static visuals are authorized by the current Phase 1/Phase 2 contracts. Future visual production requires a new owner-approved scope.
