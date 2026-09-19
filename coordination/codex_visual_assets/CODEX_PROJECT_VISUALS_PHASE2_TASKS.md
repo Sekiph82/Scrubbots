@@ -80,9 +80,95 @@ Codex may execute tasks but must not edit root TASKS.md.
 - [ ] P2-062 Update required icon
 - [ ] P2-063 Connection lost icon
 
+
+
+## Canonical Robot 2..10 character assets
+
+- [ ] P2-064 Moppy master
+- [ ] P2-065 Moppy gameplay pose
+- [ ] P2-066 Moppy portrait
+- [ ] P2-067 Moppy Home pose
+- [ ] P2-068 Moppy blink layer
+- [ ] P2-069 Moppy tool arm layer
+- [ ] P2-070 Moppy gameplay profile portrait
+- [ ] P2-071 Moppy help pose
+- [ ] P2-072 Moppy victory pose
+- [ ] P2-073 Bubbles master
+- [ ] P2-074 Bubbles gameplay pose
+- [ ] P2-075 Bubbles portrait
+- [ ] P2-076 Bubbles Home pose
+- [ ] P2-077 Bubbles blink layer
+- [ ] P2-078 Bubbles tool arm layer
+- [ ] P2-079 Bubbles gameplay profile portrait
+- [ ] P2-080 Bubbles help pose
+- [ ] P2-081 Bubbles victory pose
+- [ ] P2-082 Spark master
+- [ ] P2-083 Spark gameplay pose
+- [ ] P2-084 Spark portrait
+- [ ] P2-085 Spark Home pose
+- [ ] P2-086 Spark blink layer
+- [ ] P2-087 Spark tool arm layer
+- [ ] P2-088 Spark gameplay profile portrait
+- [ ] P2-089 Spark help pose
+- [ ] P2-090 Spark victory pose
+- [ ] P2-091 Squeegee master
+- [ ] P2-092 Squeegee gameplay pose
+- [ ] P2-093 Squeegee portrait
+- [ ] P2-094 Squeegee Home pose
+- [ ] P2-095 Squeegee blink layer
+- [ ] P2-096 Squeegee tool arm layer
+- [ ] P2-097 Squeegee gameplay profile portrait
+- [ ] P2-098 Squeegee help pose
+- [ ] P2-099 Squeegee victory pose
+- [ ] P2-100 Dusty master
+- [ ] P2-101 Dusty gameplay pose
+- [ ] P2-102 Dusty portrait
+- [ ] P2-103 Dusty Home pose
+- [ ] P2-104 Dusty blink layer
+- [ ] P2-105 Dusty tool arm layer
+- [ ] P2-106 Dusty gameplay profile portrait
+- [ ] P2-107 Dusty help pose
+- [ ] P2-108 Dusty victory pose
+- [ ] P2-109 Rinse master
+- [ ] P2-110 Rinse gameplay pose
+- [ ] P2-111 Rinse portrait
+- [ ] P2-112 Rinse Home pose
+- [ ] P2-113 Rinse blink layer
+- [ ] P2-114 Rinse tool arm layer
+- [ ] P2-115 Rinse gameplay profile portrait
+- [ ] P2-116 Rinse help pose
+- [ ] P2-117 Rinse victory pose
+- [ ] P2-118 Polly master
+- [ ] P2-119 Polly gameplay pose
+- [ ] P2-120 Polly portrait
+- [ ] P2-121 Polly Home pose
+- [ ] P2-122 Polly blink layer
+- [ ] P2-123 Polly tool arm layer
+- [ ] P2-124 Polly gameplay profile portrait
+- [ ] P2-125 Polly help pose
+- [ ] P2-126 Polly victory pose
+- [ ] P2-127 Clippy master
+- [ ] P2-128 Clippy gameplay pose
+- [ ] P2-129 Clippy portrait
+- [ ] P2-130 Clippy Home pose
+- [ ] P2-131 Clippy blink layer
+- [ ] P2-132 Clippy tool arm layer
+- [ ] P2-133 Clippy gameplay profile portrait
+- [ ] P2-134 Clippy help pose
+- [ ] P2-135 Clippy victory pose
+- [ ] P2-136 Atlas master
+- [ ] P2-137 Atlas gameplay pose
+- [ ] P2-138 Atlas portrait
+- [ ] P2-139 Atlas Home pose
+- [ ] P2-140 Atlas blink layer
+- [ ] P2-141 Atlas tool arm layer
+- [ ] P2-142 Atlas gameplay profile portrait
+- [ ] P2-143 Atlas help pose
+- [ ] P2-144 Atlas victory pose
+
 ## Final gates
 
-- [ ] P2-001..P2-063 all exist at exact canonical paths.
+- [ ] P2-001..P2-144 all exist at exact canonical paths.
 - [ ] Transparency is correct where required.
 - [ ] No unintended text/watermark.
 - [ ] Logo/app-icon identity matches owner references.
