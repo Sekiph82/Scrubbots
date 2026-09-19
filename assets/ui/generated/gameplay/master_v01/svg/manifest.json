@@ -1,0 +1,161 @@
+{
+  "schema_version": 1,
+  "status": "GENERATED_CANDIDATE_PACK_COMPLETE",
+  "generated_on": "2026-09-19",
+  "authority": {
+    "visual_master": "coordination/OWNER_GAMEPLAY_MASTER_VISUAL_V01.md",
+    "composition": "coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md",
+    "railroad": "coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md",
+    "economy": "coordination/OWNER_ECONOMY_REWARDS_V01.md"
+  },
+  "root": "assets/ui/generated/gameplay/master_v01/svg",
+  "assets": [
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/gameplay_environment.svg",
+      "role": "background",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/profile_panel_frame.svg",
+      "role": "hud_frame",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/scrubby_portrait.svg",
+      "role": "character_portrait",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/scrubby_gameplay.svg",
+      "role": "character_gameplay",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/rail_scrubbot.svg",
+      "role": "rail_agent",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/pause_button.svg",
+      "role": "control",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/speed_button_frame.svg",
+      "role": "control_frame",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/speed_button_active_frame.svg",
+      "role": "control_frame",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/rail_straight.svg",
+      "role": "railway",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/rail_corner.svg",
+      "role": "railway",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/rail_connector.svg",
+      "role": "railway",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/rail_intersection.svg",
+      "role": "railway",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/rail_end.svg",
+      "role": "railway",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/slot_empty.svg",
+      "role": "slot_frame",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/slot_active.svg",
+      "role": "slot_frame",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/slot_locked.svg",
+      "role": "slot_frame",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/batch_panel.svg",
+      "role": "panel",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/batch_tile_frame.svg",
+      "role": "batch_tile_frame",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/speech_bubble.svg",
+      "role": "tutorial_ui",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/booster_extra_slot.svg",
+      "role": "booster",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/booster_random.svg",
+      "role": "booster",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/booster_selector.svg",
+      "role": "booster",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/booster_tornado.svg",
+      "role": "booster",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/bubble_bucket.svg",
+      "role": "decorative_prop",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/caution_sign.svg",
+      "role": "decorative_prop",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/fx_clean.svg",
+      "role": "effect",
+      "status": "generated_candidate"
+    },
+    {
+      "file": "assets/ui/generated/gameplay/master_v01/svg/fx_sparkle.svg",
+      "role": "effect",
+      "status": "generated_candidate"
+    }
+  ],
+  "dynamic_native_godot_not_baked": [
+    "player name/title/level/Bot Parts values",
+    "2x label and wall-clock countdown text",
+    "batch counts",
+    "batch colors and palette-driven board cells",
+    "booster quantities and SB prices",
+    "progress bars",
+    "touch/pressed/disabled interaction logic",
+    "BoardRenderer pixel artwork",
+    "Railroad routing geometry truth"
+  ],
+  "usage_note": "SVGs are individually importable Godot visual candidates. They are not gameplay truth. Owner approval is still required before copying a candidate into assets/ui/final/."
+}
