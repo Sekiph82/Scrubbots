@@ -103,3 +103,20 @@ After the fix the owner must repeat the same F6 playtest:
 - pixels must visibly become transparent after arrivals.
 
 M30 remains blocked until this graphical M29 regression is closed.
+
+
+## Owner presentation correction discovered during manual review
+
+The owner also clarified that the main number on each occupied five-slot batch represents robots still physically waiting in that slot.
+
+Canonical presentation:
+`display_count = remaining_to_clear - committed`.
+
+Therefore the screenshot state `50 (2)` is not the desired shipping presentation. With two committed in-flight Scrubbots it must display `48`.
+
+This is UI/presentation only. M24 authoritative accounting remains unchanged: `remaining_to_clear` decrements only after authenticated clear.
+
+Owner decision:
+`coordination/OWNER_BATCH_SLOT_DISPLAY_DECISION_V01.md`.
+
+The same manual review confirmed that Red/Yellow WAITING is not automatically a bug. In the deterministic Hazard Bot first column, Red 15 and Yellow 1 have no immediate clears in the accepted M27 solution trace before Blue opens progress. WAITING therefore correctly means "no currently claimable reachable target"; ACTIVE is eligibility, not proof that a robot is currently moving.
