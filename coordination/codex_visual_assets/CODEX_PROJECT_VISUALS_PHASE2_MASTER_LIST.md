@@ -82,7 +82,7 @@ These are branded marketing components, not fake gameplay screenshots.
 
 Do not generate these until owner/system design is resolved:
 
-1. Actual Robot 2..6 character identities or perks. The roster is still an owner decision.
+1. Additional robot identities beyond the owner-approved 10-robot roster. Robot 2..10 are now authorized by `coordination/OWNER_ROBOT_ROSTER_V01.md`.
 2. Leaderboard-specific art. Leaderboard is an unresolved design gate.
 3. Event-specific banners, currencies, mascots or reward themes. Event format is unresolved.
 4. Real-money IAP pack art, ad/rewarded-ad creatives, subscription visuals or cash-price assets. M57 remains owner-gated.
@@ -94,7 +94,7 @@ Do not generate these until owner/system design is resolved:
 
 ## Completion condition
 
-Phase 2 is complete when P2-001..P2-024 exist at their exact target paths on `origin/codex/visual-assets-production`, with required transparency/format checks, and no forbidden file was modified.
+Phase 2 is complete when P2-001..P2-144 exist at their exact target paths on `origin/codex/visual-assets-production`, with required transparency/format checks, and no forbidden file was modified.
 
 
 ## F. Master UI Asset Kit expansion
@@ -149,17 +149,11 @@ The Robot Collection system is part of the long-term SCRUBBOTS IP. UI chrome alr
 
 ### Robot roster rule
 
-Do NOT generate actual Robot 2..6 characters yet.
+The canonical roster is now owner-approved in `coordination/OWNER_ROBOT_ROSTER_V01.md`:
 
-The old planning document contained example names/concepts such as Moppy, Bubbles and Spark. Those examples are NOT current owner-approved canon and must not be promoted automatically.
+Scrubby / Moppy / Bubbles / Spark / Squeegee / Dusty / Rinse / Polly / Clippy / Atlas.
 
-Actual new robot identities require a separate owner-approved Robot Roster decision. Once approved, each robot should receive:
-- full-body master
-- portrait
-- Home/collection pose
-- unlock pose
-- selected/gameplay pose
-- optional expression/animation layers
+Generate actual Robot 2..10 character assets only according to section K and the owner decision. Do not invent Robot 11+.
 
 ## I. System-state icon family
 
@@ -190,3 +184,138 @@ The following old concepts are intentionally NOT added to the current production
 - robot perks that alter puzzle truth
 - seven-day login structure when current Economy V1 uses a five-day repeating cycle
 - new Pickup booster identity; current canonical boosters are +1 Slot / Random / Selector / Tornado
+
+
+## K. Canonical Robot 2..10 character asset production
+
+Authority: `coordination/OWNER_ROBOT_ROSTER_V01.md`
+
+Scrubby is already complete. Generate the same nine presentation assets for each of the nine additional canonical robots. Total: **81 new robot character PNGs**.
+
+### Moppy
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-064 | Moppy master | `assets/ui/final/characters/robots/moppy/moppy_master.png` | Canonical full-body master; floor-cleaning specialist; aqua + lime; mop-tool silhouette. |
+| P2-065 | Moppy gameplay pose | `assets/ui/final/characters/robots/moppy/moppy_gameplay.png` | Gameplay-selected/support pose; preserve canonical identity. |
+| P2-066 | Moppy portrait | `assets/ui/final/characters/robots/moppy/moppy_portrait.png` | Reusable head/upper-body portrait. |
+| P2-067 | Moppy Home pose | `assets/ui/final/characters/robots/moppy/moppy_home_pose.png` | Home / Robot Collection hero pose. |
+| P2-068 | Moppy blink layer | `assets/ui/final/characters/robots/moppy/moppy_face_blink_layer.png` | Aligned blink/expression layer; transparent. |
+| P2-069 | Moppy tool arm layer | `assets/ui/final/characters/robots/moppy/moppy_tool_arm_layer.png` | Isolated signature tool/arm animation layer. |
+| P2-070 | Moppy gameplay profile portrait | `assets/ui/final/gameplay/profile/robots/moppy_portrait.png` | Small gameplay HUD portrait. |
+| P2-071 | Moppy help pose | `assets/ui/final/popups/help/robots/moppy_help_pose.png` | Helpful/supportive popup pose. |
+| P2-072 | Moppy victory pose | `assets/ui/final/popups/victory/robots/moppy_victory_pose.png` | Celebratory victory pose. |
+
+### Bubbles
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-073 | Bubbles master | `assets/ui/final/characters/robots/bubbles/bubbles_master.png` | Canonical full-body master; foam/detergent specialist; cyan + lavender; bubble tank silhouette. |
+| P2-074 | Bubbles gameplay pose | `assets/ui/final/characters/robots/bubbles/bubbles_gameplay.png` | Gameplay-selected/support pose; preserve canonical identity. |
+| P2-075 | Bubbles portrait | `assets/ui/final/characters/robots/bubbles/bubbles_portrait.png` | Reusable head/upper-body portrait. |
+| P2-076 | Bubbles Home pose | `assets/ui/final/characters/robots/bubbles/bubbles_home_pose.png` | Home / Robot Collection hero pose. |
+| P2-077 | Bubbles blink layer | `assets/ui/final/characters/robots/bubbles/bubbles_face_blink_layer.png` | Aligned blink/expression layer; transparent. |
+| P2-078 | Bubbles tool arm layer | `assets/ui/final/characters/robots/bubbles/bubbles_tool_arm_layer.png` | Isolated signature tool/arm animation layer. |
+| P2-079 | Bubbles gameplay profile portrait | `assets/ui/final/gameplay/profile/robots/bubbles_portrait.png` | Small gameplay HUD portrait. |
+| P2-080 | Bubbles help pose | `assets/ui/final/popups/help/robots/bubbles_help_pose.png` | Helpful/supportive popup pose. |
+| P2-081 | Bubbles victory pose | `assets/ui/final/popups/victory/robots/bubbles_victory_pose.png` | Celebratory victory pose. |
+
+### Spark
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-082 | Spark master | `assets/ui/final/characters/robots/spark/spark_master.png` | Canonical full-body master; electrical/speed specialist; electric blue + yellow; antenna/coil silhouette. |
+| P2-083 | Spark gameplay pose | `assets/ui/final/characters/robots/spark/spark_gameplay.png` | Gameplay-selected/support pose; preserve canonical identity. |
+| P2-084 | Spark portrait | `assets/ui/final/characters/robots/spark/spark_portrait.png` | Reusable head/upper-body portrait. |
+| P2-085 | Spark Home pose | `assets/ui/final/characters/robots/spark/spark_home_pose.png` | Home / Robot Collection hero pose. |
+| P2-086 | Spark blink layer | `assets/ui/final/characters/robots/spark/spark_face_blink_layer.png` | Aligned blink/expression layer; transparent. |
+| P2-087 | Spark tool arm layer | `assets/ui/final/characters/robots/spark/spark_tool_arm_layer.png` | Isolated signature tool/arm animation layer. |
+| P2-088 | Spark gameplay profile portrait | `assets/ui/final/gameplay/profile/robots/spark_portrait.png` | Small gameplay HUD portrait. |
+| P2-089 | Spark help pose | `assets/ui/final/popups/help/robots/spark_help_pose.png` | Helpful/supportive popup pose. |
+| P2-090 | Spark victory pose | `assets/ui/final/popups/victory/robots/spark_victory_pose.png` | Celebratory victory pose. |
+
+### Squeegee
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-091 | Squeegee master | `assets/ui/final/characters/robots/squeegee/squeegee_master.png` | Canonical full-body master; glass/surface specialist; sky blue + silver; broad squeegee silhouette. |
+| P2-092 | Squeegee gameplay pose | `assets/ui/final/characters/robots/squeegee/squeegee_gameplay.png` | Gameplay-selected/support pose; preserve canonical identity. |
+| P2-093 | Squeegee portrait | `assets/ui/final/characters/robots/squeegee/squeegee_portrait.png` | Reusable head/upper-body portrait. |
+| P2-094 | Squeegee Home pose | `assets/ui/final/characters/robots/squeegee/squeegee_home_pose.png` | Home / Robot Collection hero pose. |
+| P2-095 | Squeegee blink layer | `assets/ui/final/characters/robots/squeegee/squeegee_face_blink_layer.png` | Aligned blink/expression layer; transparent. |
+| P2-096 | Squeegee tool arm layer | `assets/ui/final/characters/robots/squeegee/squeegee_tool_arm_layer.png` | Isolated signature tool/arm animation layer. |
+| P2-097 | Squeegee gameplay profile portrait | `assets/ui/final/gameplay/profile/robots/squeegee_portrait.png` | Small gameplay HUD portrait. |
+| P2-098 | Squeegee help pose | `assets/ui/final/popups/help/robots/squeegee_help_pose.png` | Helpful/supportive popup pose. |
+| P2-099 | Squeegee victory pose | `assets/ui/final/popups/victory/robots/squeegee_victory_pose.png` | Celebratory victory pose. |
+
+### Dusty
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-100 | Dusty master | `assets/ui/final/characters/robots/dusty/dusty_master.png` | Canonical full-body master; dust/vacuum specialist; orange + cream; vacuum backpack/filter silhouette. |
+| P2-101 | Dusty gameplay pose | `assets/ui/final/characters/robots/dusty/dusty_gameplay.png` | Gameplay-selected/support pose; preserve canonical identity. |
+| P2-102 | Dusty portrait | `assets/ui/final/characters/robots/dusty/dusty_portrait.png` | Reusable head/upper-body portrait. |
+| P2-103 | Dusty Home pose | `assets/ui/final/characters/robots/dusty/dusty_home_pose.png` | Home / Robot Collection hero pose. |
+| P2-104 | Dusty blink layer | `assets/ui/final/characters/robots/dusty/dusty_face_blink_layer.png` | Aligned blink/expression layer; transparent. |
+| P2-105 | Dusty tool arm layer | `assets/ui/final/characters/robots/dusty/dusty_tool_arm_layer.png` | Isolated signature tool/arm animation layer. |
+| P2-106 | Dusty gameplay profile portrait | `assets/ui/final/gameplay/profile/robots/dusty_portrait.png` | Small gameplay HUD portrait. |
+| P2-107 | Dusty help pose | `assets/ui/final/popups/help/robots/dusty_help_pose.png` | Helpful/supportive popup pose. |
+| P2-108 | Dusty victory pose | `assets/ui/final/popups/victory/robots/dusty_victory_pose.png` | Celebratory victory pose. |
+
+### Rinse
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-109 | Rinse master | `assets/ui/final/characters/robots/rinse/rinse_master.png` | Canonical full-body master; water/rinse specialist; deep cyan + white; tank/nozzle silhouette. |
+| P2-110 | Rinse gameplay pose | `assets/ui/final/characters/robots/rinse/rinse_gameplay.png` | Gameplay-selected/support pose; preserve canonical identity. |
+| P2-111 | Rinse portrait | `assets/ui/final/characters/robots/rinse/rinse_portrait.png` | Reusable head/upper-body portrait. |
+| P2-112 | Rinse Home pose | `assets/ui/final/characters/robots/rinse/rinse_home_pose.png` | Home / Robot Collection hero pose. |
+| P2-113 | Rinse blink layer | `assets/ui/final/characters/robots/rinse/rinse_face_blink_layer.png` | Aligned blink/expression layer; transparent. |
+| P2-114 | Rinse tool arm layer | `assets/ui/final/characters/robots/rinse/rinse_tool_arm_layer.png` | Isolated signature tool/arm animation layer. |
+| P2-115 | Rinse gameplay profile portrait | `assets/ui/final/gameplay/profile/robots/rinse_portrait.png` | Small gameplay HUD portrait. |
+| P2-116 | Rinse help pose | `assets/ui/final/popups/help/robots/rinse_help_pose.png` | Helpful/supportive popup pose. |
+| P2-117 | Rinse victory pose | `assets/ui/final/popups/victory/robots/rinse_victory_pose.png` | Celebratory victory pose. |
+
+### Polly
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-118 | Polly master | `assets/ui/final/characters/robots/polly/polly_master.png` | Canonical full-body master; polishing specialist; magenta + cyan; polishing-disc silhouette. |
+| P2-119 | Polly gameplay pose | `assets/ui/final/characters/robots/polly/polly_gameplay.png` | Gameplay-selected/support pose; preserve canonical identity. |
+| P2-120 | Polly portrait | `assets/ui/final/characters/robots/polly/polly_portrait.png` | Reusable head/upper-body portrait. |
+| P2-121 | Polly Home pose | `assets/ui/final/characters/robots/polly/polly_home_pose.png` | Home / Robot Collection hero pose. |
+| P2-122 | Polly blink layer | `assets/ui/final/characters/robots/polly/polly_face_blink_layer.png` | Aligned blink/expression layer; transparent. |
+| P2-123 | Polly tool arm layer | `assets/ui/final/characters/robots/polly/polly_tool_arm_layer.png` | Isolated signature tool/arm animation layer. |
+| P2-124 | Polly gameplay profile portrait | `assets/ui/final/gameplay/profile/robots/polly_portrait.png` | Small gameplay HUD portrait. |
+| P2-125 | Polly help pose | `assets/ui/final/popups/help/robots/polly_help_pose.png` | Helpful/supportive popup pose. |
+| P2-126 | Polly victory pose | `assets/ui/final/popups/victory/robots/polly_victory_pose.png` | Celebratory victory pose. |
+
+### Clippy
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-127 | Clippy master | `assets/ui/final/characters/robots/clippy/clippy_master.png` | Canonical full-body master; precision/detail specialist; purple + mint; micro-claw/tool silhouette. |
+| P2-128 | Clippy gameplay pose | `assets/ui/final/characters/robots/clippy/clippy_gameplay.png` | Gameplay-selected/support pose; preserve canonical identity. |
+| P2-129 | Clippy portrait | `assets/ui/final/characters/robots/clippy/clippy_portrait.png` | Reusable head/upper-body portrait. |
+| P2-130 | Clippy Home pose | `assets/ui/final/characters/robots/clippy/clippy_home_pose.png` | Home / Robot Collection hero pose. |
+| P2-131 | Clippy blink layer | `assets/ui/final/characters/robots/clippy/clippy_face_blink_layer.png` | Aligned blink/expression layer; transparent. |
+| P2-132 | Clippy tool arm layer | `assets/ui/final/characters/robots/clippy/clippy_tool_arm_layer.png` | Isolated signature tool/arm animation layer. |
+| P2-133 | Clippy gameplay profile portrait | `assets/ui/final/gameplay/profile/robots/clippy_portrait.png` | Small gameplay HUD portrait. |
+| P2-134 | Clippy help pose | `assets/ui/final/popups/help/robots/clippy_help_pose.png` | Helpful/supportive popup pose. |
+| P2-135 | Clippy victory pose | `assets/ui/final/popups/victory/robots/clippy_victory_pose.png` | Celebratory victory pose. |
+
+### Atlas
+
+| ID | Asset | Target | Production detail |
+|---|---|---|---|
+| P2-136 | Atlas master | `assets/ui/final/characters/robots/atlas/atlas_master.png` | Canonical full-body master; heavy-duty endgame specialist; navy + gold + teal; large friendly industrial silhouette. |
+| P2-137 | Atlas gameplay pose | `assets/ui/final/characters/robots/atlas/atlas_gameplay.png` | Gameplay-selected/support pose; preserve canonical identity. |
+| P2-138 | Atlas portrait | `assets/ui/final/characters/robots/atlas/atlas_portrait.png` | Reusable head/upper-body portrait. |
+| P2-139 | Atlas Home pose | `assets/ui/final/characters/robots/atlas/atlas_home_pose.png` | Home / Robot Collection hero pose. |
+| P2-140 | Atlas blink layer | `assets/ui/final/characters/robots/atlas/atlas_face_blink_layer.png` | Aligned blink/expression layer; transparent. |
+| P2-141 | Atlas tool arm layer | `assets/ui/final/characters/robots/atlas/atlas_tool_arm_layer.png` | Isolated signature tool/arm animation layer. |
+| P2-142 | Atlas gameplay profile portrait | `assets/ui/final/gameplay/profile/robots/atlas_portrait.png` | Small gameplay HUD portrait. |
+| P2-143 | Atlas help pose | `assets/ui/final/popups/help/robots/atlas_help_pose.png` | Helpful/supportive popup pose. |
+| P2-144 | Atlas victory pose | `assets/ui/final/popups/victory/robots/atlas_victory_pose.png` | Celebratory victory pose. |
+
+Robot character outputs must contain no baked names, perk text, percentages, prices or unlock amounts. Those remain live UI.
