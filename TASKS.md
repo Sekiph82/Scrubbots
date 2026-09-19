@@ -1252,13 +1252,13 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 **Owner-locked speed integration for M29/runtime:** M29 proves the explicit 1x/2x temporal authority and may keep a direct debug/headless toggle seam. That seam is not authorization for free shipping manual 2x. M39 must gate production manual 2x through the paid entitlement service in `coordination/OWNER_ECONOMY_REWARDS_V01.md`. Authoritative M23-exhausted automatic 2x remains free. Do not infer exhaustion from UI rows or slot occupancy.
 
-### M30 — Win/Lose Rules `[OWNER-LOCKED 2026-09-19]`
+### M30 — Win/Lose Rules `[OWNER-LOCKED 2026-09-19] [CLOSED]`
 
-- [ ] SB-M30-001 Document win condition. — [ ] SB-M30-002 Document lose condition.
-- [ ] SB-M30-003 Completion evaluator. — [ ] SB-M30-004 Emit completion once.
-- [ ] SB-M30-005 Stop inappropriate new dispatch.
-- [ ] SB-M30-006 Resolve in-flight bots. — [ ] SB-M30-007 Retry.
-- [ ] SB-M30-008 Completion regression tests.
+- [x] SB-M30-001 Document win condition. — [x] SB-M30-002 Document lose condition.
+- [x] SB-M30-003 Completion evaluator. — [x] SB-M30-004 Emit completion once.
+- [x] SB-M30-005 Stop inappropriate new dispatch.
+- [x] SB-M30-006 Resolve in-flight bots. — [x] SB-M30-007 Retry.
+- [x] SB-M30-008 Completion regression tests.
 
 ### M31 — Cleaning Effects `[VISUAL REFERENCE] [PERFORMANCE]`
 
