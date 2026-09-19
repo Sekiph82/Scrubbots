@@ -688,3 +688,48 @@ These files exist in `assets/ui/final/**` but are not canonical targets in the c
 - Railroad routing/geometry truth is runtime-authoritative. PNG railroad files are presentation skins only.
 - Store screenshots are intentionally not generated here; final store screenshots should come from the integrated app.
 - Production level pixel art is intentionally outside this UI-asset index's canonical generated UI scope and belongs to the level-content pipeline.
+
+
+## Recommended future visual backlog
+
+These are not missing from the current canonical Phase 1/Phase 2 contracts. They are additional high-value visuals that would make later UI integration cleaner without introducing World Map, XP, Star currency, weekly progression, event content, or new gameplay rules.
+
+### Robot perk icon family
+
+The 10-robot roster now has distinct meta perks, but the current asset library contains only a generic perk-emblem frame. Recommended dedicated transparent icons:
+
+- first-clear Scrub Bucks bonus
+- Gift Bar Scrub Bucks bonus
+- paid 2x discount
+- Cards Exchange bonus
+- booster-purchase discount
+- Heart-refill discount
+- Win Streak bonus
+- Daily-task bonus
+- Atlas Master Cleaner combined perk
+
+Suggested root:
+`assets/ui/final/robots/perks/`
+
+### Collection state art
+
+Useful additions for unowned/hidden Collection states:
+
+- generic Collection card back
+- unknown/uncollected card silhouette
+- newly acquired card glow/burst
+
+Suggested root:
+`assets/ui/final/collection/states/`
+
+### Cleaning Crew group art
+
+One canonical transparent/wide group composition containing all 10 robots would be useful for:
+- Robot Collection header/hero treatment
+- store/marketing compositions
+- future celebratory screens
+
+Suggested path:
+`assets/ui/final/characters/robots/cleaning_crew_group.png`
+
+These items are recommended, not required to consider the current 450 canonical visual targets complete.
