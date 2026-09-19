@@ -5,14 +5,14 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M30
-- Current Sprint: M30 DESIGN GATE — owner lock required for win / lose / retry semantics
-- Current Task: M30-OWNER-DECISION
-- Current Task Status: OWNER_DECISION_REQUIRED
-- Next Task/Action: Owner explicitly locks M30 win condition, lose condition and retry semantics before any Claude implementation prompt is created. M29 is now fully closed after code audit plus owner graphical F6 acceptance. Before shipping Retry is bound, M30 must also harden `ProductionGameplayHost.reset_session()` so M24/M23 are not reset if M26 scheduler teardown fails or remains pending. Root `TASKS.md` remains ChatGPT-write-owned.
-- Required Actor: OWNER
+- Current Sprint: M30-C001 V01 - authoritative Win/Lose/Retry production loop
+- Current Task: M30-C001-V01
+- Current Task Status: IN_PROGRESS
+- Next Task/Action: Claude executes `coordination/sessions/M30-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M30-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`, runs all four M30 work packages continuously, implements exact-once WON/LOST using the owner-locked completion rules and real M27 DEADLOCK authority, hardens transaction-safe same-puzzle Retry including the M26 reset gate, provides a real owner-runnable M30 playtest, pushes implementation first and `CLAUDE_LOG_V01.md` separately. Root `TASKS.md` remains ChatGPT-write-owned.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 541 / 966 = 56.00% (game+ui live scope); lastCompletedTaskId M29-C001-V03. M29 Mobile Touch / Production Input Integration is independently audited PASS and owner graphical F6 acceptance is complete. All `SB-M29-001..009` are closed. M30 Win/Lose Rules is a DESIGN GATE and remains fully open until the owner explicitly locks win, lose and retry semantics. Existing Economy/Collection owner additions remain preserved.
+- Progress: 541 / 966 = 56.00% (game+ui live scope); lastCompletedTaskId M29-C001-V03. M29 is closed with owner graphical acceptance. M30 owner design gate is resolved by `coordination/OWNER_WIN_LOSE_RETRY_DECISION_V01.md`; all eight M30 tasks remain open for implementation/audit. Existing Economy/Collection owner additions remain preserved.
 - Note: M22 Railroad V1 engineering is closed for tracker purposes by the V07 implementation evidence (`4823` checks, `0` failures), the owner-locked interior-turn routing revision, and owner manual acceptance on 2026-09-17. The straight-only post-rail rule is superseded: Railroad travel remains exterior/rail-only, but after a legal ingress Scrubbots may traverse OPEN/CLEARED board corridors orthogonally with one or more 90-degree turns. The next core-gameplay program is M23–M27: Batch Supply Engine → Five-Slot Batch Engine → Batch Target Claim Engine → Auto Dispatch Scheduler → Solvability / Deadlock Engine.
 
 ## Tasks
@@ -568,7 +568,9 @@ Home preproduction note (owner decision 2026-09-18): `assets/ui/HOME_ASSET_MANIF
 
 Unresolved. Do not silently invent final decisions for these:
 
-railroad collision/congestion/lane-separation presentation; optional railroad glow/trail polish beyond the locked V1 structure; exact win condition; exact lose condition; timer; move limits; lives; blockers; boosters; hints; progression structure; currency meaning; economy; shop; monetization; ads; IAP; energy system; analytics; achievements; leaderboard; social features; cloud save; tutorial wording; audio direction.
+railroad collision/congestion/lane-separation presentation; optional railroad glow/trail polish beyond the locked V1 structure; timer; move limits; blockers; hints; analytics; achievements; leaderboard; social features; cloud save; tutorial wording; audio direction.
+
+**Resolved owner decisions:** M30 WIN/LOSE/Retry semantics are locked in `coordination/OWNER_WIN_LOSE_RETRY_DECISION_V01.md`. Economy V1, Hearts, boosters, currency and related soft-economy rules are separately locked in `coordination/OWNER_ECONOMY_REWARDS_V01.md`; real-money monetization remains M57-gated.
 
 **Not design gates**: the global C01..C16 palette, Difficulty V1 progression/challenge architecture, target positional priority, current Railroad V1 geometry/travel/interior-ingress law, five EMPTY batch slots, rightmost-empty automatic placement, 3/4/5 FIFO supply columns, front-row-only selection, same-color oldest-batch-first arbitration, no-ghost-robot transaction law, and solver-backed supply/deadlock contracts are owner-locked.
 
@@ -1250,7 +1252,7 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 **Owner-locked speed integration for M29/runtime:** M29 proves the explicit 1x/2x temporal authority and may keep a direct debug/headless toggle seam. That seam is not authorization for free shipping manual 2x. M39 must gate production manual 2x through the paid entitlement service in `coordination/OWNER_ECONOMY_REWARDS_V01.md`. Authoritative M23-exhausted automatic 2x remains free. Do not infer exhaustion from UI rows or slot occupancy.
 
-### M30 — Win/Lose Rules `[DESIGN GATE]`
+### M30 — Win/Lose Rules `[OWNER-LOCKED 2026-09-19]`
 
 - [ ] SB-M30-001 Document win condition. — [ ] SB-M30-002 Document lose condition.
 - [ ] SB-M30-003 Completion evaluator. — [ ] SB-M30-004 Emit completion once.
