@@ -83,8 +83,13 @@ func _refresh() -> void:
 	_swatch.color = _color
 	var remaining: int = int(_snapshot.get("remaining_to_clear", 0))
 	var committed: int = int(_snapshot.get("committed", 0))
-	# remaining shows outstanding work; committed (in-flight) shown in parentheses.
-	_remaining_label.text = "%d" % remaining if committed == 0 else "%d (%d)" % [remaining, committed]
+	# Player-facing main number = robots still physically WAITING in this slot =
+	# M24 capacity = remaining_to_clear - committed (OWNER_BATCH_SLOT_DISPLAY_DECISION_V01).
+	# A committed/in-flight Scrubbot has already left the slot, so it is subtracted
+	# immediately; remaining_to_clear and committed decrement together on an authenticated
+	# clear, so the displayed waiting count stays correct. The old "50 (2)" raw form is gone.
+	var capacity: int = maxi(remaining - committed, 0)
+	_remaining_label.text = "%d" % capacity
 	_state_label.text = state
 	var edge := _ACTIVE_EDGE if state == ACTIVE else _WAITING_EDGE
 	_set_panel_bg(_OCC_BG, edge, state == ACTIVE)
@@ -110,6 +115,16 @@ func get_remaining_view() -> int:
 
 func get_committed_view() -> int:
 	return int(_snapshot.get("committed", 0))
+
+## The player-facing MAIN number currently displayed = M24 capacity (waiting robots).
+func get_display_count() -> int:
+	if not is_occupied_view():
+		return 0
+	return maxi(int(_snapshot.get("remaining_to_clear", 0)) - int(_snapshot.get("committed", 0)), 0)
+
+## The raw displayed label text (for asserting the old "N (c)" form is gone).
+func get_count_label_text() -> String:
+	return _remaining_label.text if _remaining_label != null else ""
 
 ## Presentation-only GLOBAL spawn anchor (top-center) of this slot view, used by the
 ## M29 runtime origin provider to derive a real laid-out slot->route origin. Presentation

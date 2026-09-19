@@ -38,6 +38,11 @@ var _bound := false
 var _user_paused := false
 var _system_suspended := false
 var _accum := 0.0
+## Optional live-presentation sync (M29-C001 V03): invoked at the end of every driven
+## tick so the five-slot UI refreshes from a fresh authoritative M24 snapshot after
+## scheduler-driven mutations (commit / WAITING / wake / rollback / finalize / completion),
+## not only after player placement. Presentation-only; it must not mutate gameplay truth.
+var _state_sync: Callable = Callable()
 
 func _ready() -> void:
 	# Keep processing even if the SceneTree is globally paused, so this controller — not
@@ -69,6 +74,10 @@ func bind(scheduler, speed, agent_layer, gesture_canceler = null) -> bool:
 
 func is_bound() -> bool:
 	return _bound
+
+## Install the live five-slot presentation sync callback (see _state_sync).
+func set_state_sync(cb: Callable) -> void:
+	_state_sync = cb
 
 func get_speed_authority() -> GameplaySpeedAuthority:
 	return _speed
@@ -164,6 +173,10 @@ func tick(delta: float) -> void:
 	# Agents spawned by the steps above have not run their own _process yet; disable it now
 	# so the next frame they too are driven solely by this controller.
 	_disable_agent_self_process()
+	# Live five-slot presentation sync: reflect any M24 mutation this tick produced
+	# (commit / WAITING / wake / rollback / finalize / completion) in the UI immediately.
+	if _state_sync.is_valid():
+		_state_sync.call()
 
 func _drive_agents(scaled_delta: float) -> void:
 	if _agent_layer == null or not is_instance_valid(_agent_layer):

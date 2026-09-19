@@ -155,10 +155,30 @@ func build() -> bool:
 	if not _input.bind(_supply, _slots, _scheduler, _runtime, _screen.get_supply_panel(), _screen):
 		_build_error = "input controller bind failed"
 		return false
+	# Live five-slot presentation sync from authoritative M24 after every driven tick.
+	_runtime.set_state_sync(Callable(self, "_sync_slots"))
 
 	_wire_controls()
 	_built = true
 	return true
+
+## Reset the production session (scheduler/slots/supply/speed) and refresh the live UI.
+func reset_session() -> void:
+	if _scheduler != null:
+		_scheduler.reset()
+	if _slots != null:
+		_slots.reset()
+	if _supply != null:
+		_supply.reset()
+	if _runtime != null:
+		_runtime.reset_runtime()
+	if _screen != null and is_instance_valid(_screen) and _slots != null:
+		_screen.update_snapshots(_slots.snapshot(), _supply.player_snapshot())
+
+## Push a fresh detached M24 snapshot into the live five-slot strip (runtime state-sync).
+func _sync_slots() -> void:
+	if _screen != null and is_instance_valid(_screen) and _slots != null:
+		_screen.refresh_slot_snapshot(_slots.snapshot())
 
 func _wire_controls() -> void:
 	var pause_btn = _screen.get_pause_button()
