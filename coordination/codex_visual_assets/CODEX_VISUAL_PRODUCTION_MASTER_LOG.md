@@ -33,6 +33,18 @@ Detailed logs remain in their phase-specific files.
 - Detailed log:
   `coordination/codex_visual_assets/CODEX_PROJECT_VISUALS_PHASE2_LOG.md`
 
+## Phase 2 finalization — P2-145 through P2-157
+
+- Scope: 13 finalization assets covering robot perk icons, generic Collection states, and the canonical ten-robot Cleaning Crew group.
+- Outputs: P2-145..P2-157 at the exact canonical paths listed in `CODEX_PROJECT_VISUALS_PHASE2_MASTER_LIST.md`.
+- Index: `assets/ui/VISUAL_ASSET_INDEX.md` updated to 469 production visuals, 157 Phase 2 canonical targets, and 463 combined Phase 1 + Phase 2 canonical targets.
+- QA: 13/13 new outputs locally verified; required transparency, no-text/no-watermark, dimensions, and ten-robot group identity checks completed. P2-001..P2-144 were not regenerated.
+- Commit: publication commit to be recorded in the log-closure follow-up.
+- Remote branch HEAD: to be recorded after publication verification.
+- Result: Phase 2 finalization target count pending remote verification; main and Claude/M30 work remain untouched.
+- Detailed log:
+  `coordination/codex_visual_assets/CODEX_PROJECT_VISUALS_PHASE2_LOG.md`
+
 ## Future entries
 
 Append one concise section per future Codex visual batch:
