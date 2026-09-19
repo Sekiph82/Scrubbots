@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="300" viewBox="0 0 128 300">
+<defs>
+
+<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1B6FD1"/><stop offset="1" stop-color="#08376D"/></linearGradient>
+<linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2EE8FF"/><stop offset="1" stop-color="#0A7BD8"/></linearGradient>
+<linearGradient id="cream" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF8E9"/><stop offset="1" stop-color="#D9D1BF"/></linearGradient>
+<linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5B6578"/><stop offset=".5" stop-color="#222A38"/><stop offset="1" stop-color="#0F1724"/></linearGradient>
+</defs><rect x="22" y="4" width="84" height="292" rx="20" fill="url(#metal)" stroke="#838B99" stroke-width="6"/><rect x="49" y="28" width="30" height="244" rx="14" fill="#13CFF5" filter="url(#glow)"/><path d="M64 65 l-18 22 M64 65 l18 22 M64 135 l-18 22 M64 135 l18 22 M64 205 l-18 22 M64 205 l18 22" stroke="#E7FFFF" stroke-width="7" fill="none"/></svg>
