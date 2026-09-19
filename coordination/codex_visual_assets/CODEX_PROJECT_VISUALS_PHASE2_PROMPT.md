@@ -146,12 +146,12 @@ Never push to main.
 
 ## EXECUTION
 
-Complete P2-001 through P2-024 autonomously.
+Complete P2-001 through P2-063 autonomously.
 
 Do not stop for routine approval.
 
 At the end report:
-- completed count / 24
+- completed count / 63
 - exact output paths
 - commit SHAs
 - remote branch HEAD
@@ -159,3 +159,10 @@ At the end report:
 - confirmation that main was untouched
 
 BEGIN PHASE 2 NOW.
+
+
+## ADDITIONAL CURRENT-SYSTEM RULES
+
+The early planning document contains obsolete progression ideas. Do not implement or generate visual systems for World Map, XP progression, Star Exchange, Star currency, weekly progression, or event-specific content unless separately owner-approved.
+
+Robot Collection is retained as a core long-term system, but actual Robot 2..6 identities are owner-gated. Generate only the generic robot UI/presentation assets P2-047..P2-053. Do not invent Moppy/Bubbles/Spark or any other new canonical robot without explicit owner approval.
