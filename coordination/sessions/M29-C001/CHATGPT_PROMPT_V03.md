@@ -40,6 +40,10 @@ Add a dedicated regression proving:
 - viewport 1080x2160 -> 683x1366 -> 1080x2160;
 - exact visible slot-origin V02 still passes after these relayouts.
 
+Add a second production-style runtime smoke at 683x1366 that does NOT disable runtime processing and does NOT call `runtime.tick()` directly. Let real SceneTree frames drive `ProductionRuntimeController._process(delta)`. After one legal front activation, prove a committed Scrubbot's progress increases, it arrives, the M24 committed work resolves, and the CURRENT visible renderer pixel becomes transparent.
+
+Also exercise embedded-focus suspension/resume explicitly: focus loss may intentionally pause gameplay, but focus regain must resume it and must not leave the playtest permanently system-suspended.
+
 Re-run the complete M29 Hazard Bot runtime smoke.
 
 Do not modify TASKS.md.
