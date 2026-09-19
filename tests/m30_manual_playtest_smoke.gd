@@ -17,6 +17,7 @@ const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/productio
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 const CompletionEvaluator = preload("res://scripts/gameplay/completion/completion_evaluator.gd")
+const CompleteClearingLoop = preload("res://scripts/gameplay/clearing/complete_clearing_loop.gd")
 
 const DT := 1.0
 const MAX_TICKS := 80000
@@ -55,14 +56,23 @@ func _run() -> void:
 	_ok(not h.get_runtime().is_user_paused(), "BLOCK: terminal stop is NOT disguised as a user pause")
 	_ok(h.get_supply().debug_snapshot() == supply_before, "BLOCK: rejected activation mutated no M23 supply")
 
+	# F-M30-V01-003: after a full attempt the M20 observation counters are non-zero.
+	_ok(h.get_clearing_loop().get_cleared_count() == initial_active, "OBS: after a full attempt M20 cleared_count == %d" % initial_active)
+	_ok(h.get_clearing_loop().get_last_outcome() == CompleteClearingLoop.Outcome.CLEARED, "OBS: after a full attempt M20 last_outcome == CLEARED")
+
 	# 4: Retry restores the same board + exact initial supply at 1x, PLAYING.
 	_ok(h.retry(), "RETRY: transaction-safe retry succeeds after WON")
 	_assert_fresh_attempt(h, initial_supply, initial_active, "RETRY(after WON)")
+	# F-M30-V01-003: successful Retry zeros the M20 attempt-scoped observation state.
+	_ok(h.get_clearing_loop().get_cleared_count() == 0, "OBS: Retry zeros M20 cleared_count")
+	_ok(h.get_clearing_loop().get_last_outcome() == CompleteClearingLoop.Outcome.NONE, "OBS: Retry resets M20 last_outcome -> NONE")
 
 	# 5: restored attempt is fully playable -> a fresh WON, exactly once more.
 	_drain(h)
 	_ok(h.get_completion().is_won(), "REPLAY: the restored attempt plays to a fresh WON")
 	_ok(events[0] == 2, "REPLAY: fresh attempt latches a new terminal event exactly once")
+	# F-M30-V01-003: the replay clear count belongs ONLY to the new attempt (not cumulative).
+	_ok(h.get_clearing_loop().get_cleared_count() == initial_active, "OBS: replay M20 cleared_count == %d (new attempt only, not cumulative)" % initial_active)
 	_free_host(h)
 
 	# ---- 2: deterministic deadlock fixture -> LOST exactly once ---------------------------
