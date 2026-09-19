@@ -37,6 +37,13 @@ var _gesture_canceler = null     # optional object with cancel_all_gestures()
 var _bound := false
 var _user_paused := false
 var _system_suspended := false
+## M30 terminal stop: a DISTINCT halt reason from user pause and system suspension
+## (OWNER_WIN_LOSE_RETRY_DECISION_V01 §3). Set once the M30 CompletionController latches a
+## terminal WON/LOST/ERROR result — it freezes cadence + travel exactly like pause, but is
+## its own state so a pause/focus toggle can never clear it and a terminal result is never
+## disguised as a user pause. A full reset_runtime() (Retry) clears it back to a live 1x
+## attempt.
+var _terminal_stopped := false
 var _accum := 0.0
 ## Optional live-presentation sync (M29-C001 V03): invoked at the end of every driven
 ## tick so the five-slot UI refreshes from a fresh authoritative M24 snapshot after
@@ -93,6 +100,15 @@ func is_user_paused() -> bool:
 func is_system_suspended() -> bool:
 	return _system_suspended
 
+func is_terminal_stopped() -> bool:
+	return _terminal_stopped
+
+## M30 terminal latch entry/exit. A latched WON/LOST/ERROR sets terminal stop true; it
+## freezes cadence + travel without touching the user-pause / system-suspension reasons or
+## the selected 1x/2x speed. Distinct from pause so focus/pause callbacks cannot clear it.
+func set_terminal_stopped(value: bool) -> void:
+	_terminal_stopped = value
+
 ## Explicit user pause/unpause (the on-screen Pause control). Preserves the selected
 ## speed. Unpausing does NOT clear a separate system suspension.
 func set_user_paused(value: bool) -> void:
@@ -135,6 +151,7 @@ func reset_runtime() -> void:
 	_accum = 0.0
 	_user_paused = false
 	_system_suspended = false
+	_terminal_stopped = false
 
 ## Prime an immediate scheduler step on the next processed frame (a successful placement
 ## may wake scheduling promptly) without violating the one-assignment-per-step law.
@@ -152,6 +169,10 @@ func _process(delta: float) -> void:
 ## A no-op while unbound or paused, so pause truly freezes cadence + travel.
 func tick(delta: float) -> void:
 	if not _bound or delta <= 0.0:
+		return
+	if _terminal_stopped:
+		# Terminal WON/LOST/ERROR freezes cadence + travel just like pause, but is its own
+		# reason so a result is never mistaken for a user pause. Retry clears it.
 		return
 	if is_paused():
 		return

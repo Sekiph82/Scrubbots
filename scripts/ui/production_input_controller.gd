@@ -35,6 +35,12 @@ var _screen = null       # GameplayScreen (detached snapshot refresh + speed vis
 
 var _bound := false
 var _activating := false
+## M30 terminal gate: once the CompletionController latches WON/LOST/ERROR the host sets
+## this true, and every new supply-front activation is rejected with a deterministic
+## terminal error BEFORE any M23 consumption or M24 mutation (OWNER_WIN_LOSE_RETRY_DECISION
+## _V01 §3). Distinct from pause (which is transient) — cleared only when Retry begins a
+## fresh attempt.
+var _terminal_stopped := false
 var _last_placement := {}   # detached copy of the most recent successful result
 
 ## Bind the production bundle. Fail-closed: returns false and stays unbound on a
@@ -73,6 +79,15 @@ func bind(supply, slots, scheduler, runtime, panel, screen) -> bool:
 func is_bound() -> bool:
 	return _bound
 
+## M30 terminal gate control. The host sets this true on a latched terminal result and
+## false when Retry starts a fresh attempt. While true, activate_front rejects every
+## activation deterministically with no M23/M24 side effect.
+func set_terminal_stopped(value: bool) -> void:
+	_terminal_stopped = value
+
+func is_terminal_stopped() -> bool:
+	return _terminal_stopped
+
 func get_last_placement() -> Dictionary:
 	return _last_placement.duplicate(true)
 
@@ -86,6 +101,13 @@ func cancel_all_gestures() -> void:
 func activate_front(column: int) -> Dictionary:
 	if not _bound:
 		return {"ok": false, "error": "unbound"}
+	# M30 terminal gate: after a latched WON/LOST/ERROR, reject every new front activation
+	# deterministically BEFORE any M23 consumption or M24 mutation. Checked ahead of the
+	# reentrancy/pause guards so a terminal result is a hard, distinct rejection reason.
+	if _terminal_stopped:
+		var tr := {"ok": false, "error": "terminal"}
+		activation_result.emit(column, false, "terminal")
+		return tr
 	# Serialize: a reentrant/overlapping activation while one transaction is committing is
 	# dropped (no double consume / double place / overfill).
 	if _activating:
