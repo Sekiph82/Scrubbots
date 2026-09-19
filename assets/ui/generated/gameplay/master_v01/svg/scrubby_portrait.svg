@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256">
+<defs>
+
+<filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+<linearGradient id="blue" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#1B6FD1"/><stop offset="1" stop-color="#08376D"/></linearGradient>
+<linearGradient id="cyan" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#2EE8FF"/><stop offset="1" stop-color="#0A7BD8"/></linearGradient>
+<linearGradient id="cream" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#FFF8E9"/><stop offset="1" stop-color="#D9D1BF"/></linearGradient>
+<linearGradient id="metal" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#5B6578"/><stop offset=".5" stop-color="#222A38"/><stop offset="1" stop-color="#0F1724"/></linearGradient>
+</defs><g transform="scale(1)">
+    <path d="M128 12 C138 0 151 0 160 12 C150 18 140 21 128 19Z" fill="#7DEB3C" stroke="#205A2B" stroke-width="4"/>
+    <path d="M145 18 C145 9 151 4 158 1" fill="none" stroke="#205A2B" stroke-width="4"/>
+    <rect x="54" y="42" width="148" height="105" rx="42" fill="url(#cream)" stroke="#67707D" stroke-width="6"/>
+    <rect x="72" y="61" width="112" height="70" rx="28" fill="#091320" stroke="#28384E" stroke-width="6"/>
+    <path d="M96 92 q12 -18 24 0" fill="none" stroke="#6DEBFF" stroke-width="8" stroke-linecap="round"/>
+    <path d="M136 92 q12 -18 24 0" fill="none" stroke="#6DEBFF" stroke-width="8" stroke-linecap="round"/>
+    <path d="M119 109 q10 10 20 0" fill="none" stroke="#6DEBFF" stroke-width="6" stroke-linecap="round"/>
+    <circle cx="51" cy="94" r="18" fill="#192B3D" stroke="#20CDE5" stroke-width="5"/>
+    <circle cx="205" cy="94" r="18" fill="#192B3D" stroke="#20CDE5" stroke-width="5"/>
+    
+  </g></svg>
