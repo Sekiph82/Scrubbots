@@ -39,9 +39,9 @@ Detailed logs remain in their phase-specific files.
 - Outputs: P2-145..P2-157 at the exact canonical paths listed in `CODEX_PROJECT_VISUALS_PHASE2_MASTER_LIST.md`.
 - Index: `assets/ui/VISUAL_ASSET_INDEX.md` updated to 469 production visuals, 157 Phase 2 canonical targets, and 463 combined Phase 1 + Phase 2 canonical targets.
 - QA: 13/13 new outputs locally verified; required transparency, no-text/no-watermark, dimensions, and ten-robot group identity checks completed. P2-001..P2-144 were not regenerated.
-- Commit: publication commit to be recorded in the log-closure follow-up.
-- Remote branch HEAD: to be recorded after publication verification.
-- Result: Phase 2 finalization target count pending remote verification; main and Claude/M30 work remain untouched.
+- Commit: `65b26242f996f210a923b4536c7083f6f2d005cc`
+- Remote branch HEAD after asset publication: `65b26242f996f210a923b4536c7083f6f2d005cc`
+- Result: Phase 2 finalization verification: 157 / 157 canonical targets found remotely, missing none; main and Claude/M30 work remain untouched.
 - Detailed log:
   `coordination/codex_visual_assets/CODEX_PROJECT_VISUALS_PHASE2_LOG.md`
 

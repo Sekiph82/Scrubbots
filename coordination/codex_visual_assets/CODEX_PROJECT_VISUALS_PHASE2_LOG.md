@@ -43,7 +43,7 @@ Do not record Claude/M30 work here.
   - `assets/ui/final/characters/robots/cleaning_crew_group.png`
 - References: CODEX_VISUAL_FINALIZATION_PROMPT.md; CODEX_VISUAL_PUBLISH_AND_LOG_POLICY.md; OWNER_ROBOT_ROSTER_V01.md; CODEX_PROJECT_VISUALS_PHASE2_MASTER_LIST.md; existing ten robot master assets.
 - QA notes: All 13 outputs are valid PNGs with expected dimensions and transparent outer pixels where required. Perk icons are isolated, mobile-readable, and contain no text, prices, percentages, or fake currency. Collection states are generic and contain no unreleased set identity. The Cleaning Crew group contains exactly Scrubby, Moppy, Bubbles, Spark, Squeegee, Dusty, Rinse, Polly, Clippy, and Atlas with no text or logo. Completed P2-001..P2-144 assets were not regenerated.
-- Commit: publication commit to be recorded in the log-closure follow-up.
-- Remote branch HEAD: to be recorded after publication verification.
+- Commit: `65b26242f996f210a923b4536c7083f6f2d005cc`
+- Remote branch HEAD after asset publication: `65b26242f996f210a923b4536c7083f6f2d005cc`
 - Blocker/deferred: None for P2-145..P2-157. Owner-gated future categories remain outside this finalization scope.
-- Result: 13 / 13 new finalization targets present locally; Phase 2 target verification pending publication.
+- Result: 13 / 13 new finalization targets present remotely; Phase 2 verification: 157 / 157 canonical targets found, missing none.
