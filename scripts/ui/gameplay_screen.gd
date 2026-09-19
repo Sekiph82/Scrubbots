@@ -105,6 +105,15 @@ func update_snapshots(slot_snapshots: Array, supply_snapshot: Array) -> void:
 	_supply_snapshot = supply_snapshot.duplicate(true)
 	_bind_batch_views()
 
+## Live five-slot refresh (M29-C001 V03, OWNER_FIVE_SLOT_LIVE_PRESENTATION_SYNC_DECISION_V01):
+## push a fresh DETACHED authoritative M24 snapshot into the strip after ANY runtime M24
+## mutation (commit, ACTIVE<->WAITING, wake, rollback, finalize, completion, reset) — not
+## only after player placement. Strip-only (supply is unchanged by these), presentation-only.
+func refresh_slot_snapshot(slot_snapshots: Array) -> void:
+	_slot_snapshots = slot_snapshots.duplicate(true)
+	if _five_slot_strip != null:
+		_five_slot_strip.bind_snapshots(_slot_snapshots, _palette_colors)
+
 ## Test/preview seam: apply synthetic safe-area insets (this viewport's pixels).
 func set_synthetic_safe_insets(left: int, top: int, right: int, bottom: int) -> void:
 	if _safe_root != null:

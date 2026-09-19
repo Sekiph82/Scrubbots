@@ -26,18 +26,33 @@ const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
 var _renderer  # BoardRenderer (Control)
 var _agent_layer: Node2D
 
-## Build the renderer + agent layer sharing this node's origin. `available_size` is
-## the display rect the board should fit inside (same contract as BoardRenderer).
+## Build (once) or reconfigure the renderer + agent layer sharing this node's origin.
+## `available_size` is the display rect the board should fit inside.
+##
+## IDENTITY-STABLE (M29-C001 V03, F-M29-MANUAL-001): the BoardRenderer and AgentLayer are
+## created EXACTLY ONCE per presentation. Every later call — the responsive relayout path
+## calls this on each resize — REUSES those exact instances: it re-renders the same
+## renderer at the new cell size and rescales the same AgentLayer, changing geometry, not
+## presentation-node authority identity. The M29 runtime binds M20 to get_renderer() and
+## the dispatcher/runtime to get_agent_layer(); recreating them here would strand those
+## bindings on stale, off-screen nodes (authoritative clears + live agents becoming
+## invisible), which is exactly the owner-observed freeze. Live ScrubbotAgent children of
+## the AgentLayer, and the ScrubRailView the screen inserts, survive untouched because
+## neither node is replaced or reordered here.
 func configure(board, palette: PackedStringArray, available_size: Vector2) -> void:
-	_renderer = BoardRenderer.new()
-	add_child(_renderer)
+	if _renderer == null or not is_instance_valid(_renderer):
+		_renderer = BoardRenderer.new()
+		_renderer.name = "BoardRenderer"
+		add_child(_renderer)
+		_renderer.position = Vector2.ZERO
 	_renderer.configure(board, palette, available_size)
 	_renderer.position = Vector2.ZERO
 
-	_agent_layer = Node2D.new()
-	_agent_layer.name = "AgentLayer"
-	add_child(_agent_layer)
-	_agent_layer.position = Vector2.ZERO
+	if _agent_layer == null or not is_instance_valid(_agent_layer):
+		_agent_layer = Node2D.new()
+		_agent_layer.name = "AgentLayer"
+		add_child(_agent_layer)
+		_agent_layer.position = Vector2.ZERO
 	var cs: float = _renderer.get_cell_size()
 	# One board-local movement unit maps to exactly the renderer's cell-size.
 	_agent_layer.scale = Vector2(cs, cs)
