@@ -298,6 +298,13 @@
     "target_path": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png",
     "regenerate": false,
     "composition_authority": "coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md",
-    "master_visual_authority": "coordination/OWNER_GAMEPLAY_MASTER_VISUAL_V01.md"
+    "master_visual_authority": "coordination/OWNER_GAMEPLAY_MASTER_VISUAL_V01.md",
+    "generated_asset_pack": {
+      "path": "assets/ui/generated/gameplay/master_v01/svg/manifest.json",
+      "status": "GENERATED_CANDIDATE_PACK_COMPLETE",
+      "format": "svg",
+      "individual_asset_count": 27,
+      "note": "All image-based gameplay components have individual generated SVG candidates. Dynamic/live Godot elements remain code/native UI."
+    }
   }
 }
