@@ -12,11 +12,20 @@ Criteria: `coordination/sessions/M29-C001/CHATGPT_AUDIT_CRITERIA_V03.md`
 
 ## Verdict
 
-**CODE_AUDIT_PASS / OWNER_GRAPHICAL_RETEST_REQUIRED**
+**AUDITED_PASS / M29 MOBILE TOUCH & PRODUCTION INPUT CLOSED**
 
-No new Claude remediation cycle is opened at this time.
+The owner completed the required graphical F6 retest after the code audit and explicitly confirmed all observed behaviors are now correct.
 
-The V03 implementation closes the code-level causes identified from the owner's graphical F6 playtest. Because the defect was originally discovered only in the owner's real graphical run after earlier headless evidence passed, M29 remains open until the owner repeats the graphical playtest and confirms the visible behavior.
+Owner acceptance confirms:
+- visible Scrubbot movement works;
+- Blue batch countdown works as robots leave the slot;
+- visible pixel clearing works;
+- ACTIVE / WAITING transitions are correct;
+- WAITING -> ACTIVE wake works;
+- Pause/resume works;
+- manual 1x/2x works.
+
+No further M29 remediation cycle is required.
 
 ## Implementation isolation
 
@@ -107,7 +116,7 @@ Direct evidence proves:
 
 ## Live ACTIVE / WAITING / EMPTY synchronization
 
-**CODE CLOSED, OWNER VISUAL CONFIRMATION REQUIRED.**
+**CLOSED / OWNER VISUALLY CONFIRMED.**
 
 The production runtime now invokes a presentation sync callback after each driven tick. The host pushes a fresh detached M24 snapshot into the five-slot strip.
 
@@ -171,7 +180,7 @@ The accepted M26 scheduler reset contract can fail/defer rather than partially t
 
 Before M30 binds a real Retry action to this helper, reset/retry must honor the M26 reset result and must not reset M24/M23 if scheduler teardown failed or is still pending.
 
-## Required owner graphical retest
+## Owner graphical retest — PASS
 
 Open:
 
@@ -181,7 +190,7 @@ Press **F6**.
 
 Use the same first-column test that originally exposed the bug.
 
-Owner should directly confirm:
+Owner directly confirmed:
 
 1. After placing Red15 / Yellow1 / Blue50 / Blue50 / Brown3, visible debug Scrubbot circles actually move.
 2. Blue50 count drops 50 -> 49 -> 48 as robots leave the slot.
@@ -196,12 +205,12 @@ Known complete-clear click order:
 
 `1,1,1,1,1,1,1,2,2,2,2,2,2,3,3,3,3,3,3`
 
-## Closure rule
+## Final closure
 
-If the owner graphical retest confirms the eight behaviors above:
+Owner graphical acceptance is complete.
 
-- upgrade this cycle to `AUDITED_PASS / M29 CLOSED`;
-- close `SB-M29-001..009`;
-- advance to M30 owner design gate.
+Close `SB-M29-001..009`.
 
-If any of the visible behaviors still fail, reopen only the specific reproduced graphical defect. Do not reopen already-proven M23–M27 architecture without new concrete evidence.
+Advance to **M30 — Win/Lose Rules [DESIGN GATE]**.
+
+The non-blocking `reset_session()` hardening note remains mandatory before shipping Retry is bound in M30, but it does not reopen M29.
