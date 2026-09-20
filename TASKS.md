@@ -5,10 +5,10 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M32
-- Current Sprint: M32-C001 V01 — Scrubbot Final Visuals
-- Current Task: M32-C001-V01
-- Current Task Status: AWAITING_IMPLEMENTATION
-- Next Task/Action: Claude executes `coordination/sessions/M32-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M32-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`. Integrate the existing owner-approved canonical Scrubby gameplay visual into the real production agent path, preserve all M18-M31 gameplay truth, add presentation-only travel/arrival/disappearance behavior, audit existing Scrubby asset provenance instead of regenerating art, prove viewport/density/performance/retry hygiene, and provide a dedicated owner F6 visual gate. Do not edit root `TASKS.md`, do not generate new AI art, and do not start M33+ runtime systems.
+- Current Sprint: M32-C001 V02 — Scrubbot Final Visuals Performance Evidence Repair
+- Current Task: M32-C001-V02
+- Current Task Status: CHANGES_REQUIRED
+- Next Task/Action: Claude executes `coordination/sessions/M32-C001/CHATGPT_PROMPT_V02.md` under `coordination/sessions/M32-C001/CHATGPT_AUDIT_CRITERIA_V02.md`. Preserve the accepted V01 Scrubby architecture and close only the blocking scale/performance evidence gap: add real 59×59 presentation stress evidence, measure actual ScrubbotVisual animation update cost at 1x/2x-equivalent density, correct the invalid/ambiguous 395-node concurrency interpretation caused by deferred queue_free cleanup, prove shared texture + zero residue, rerun regressions, and hand back `AWAITING_AUDIT / M32-C001 V02 / OWNER_F6_REQUIRED`. Do not edit root `TASKS.md`, do not generate new AI art, and do not proceed to formal owner F6 closure until V02 code audit passes.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
@@ -1291,7 +1291,7 @@ Closure evidence: `coordination/sessions/M31-C001/CHATGPT_AUDIT_V01.md` + `coord
 
 ### M32 — Scrubbot Final Visuals `[VISUAL REFERENCE]`
 
-Active cycle: `M32-C001 V01`. Use the existing owner-approved canonical Scrubby asset family; do not regenerate approved Scrubby art. Implementation/audit authority: `coordination/sessions/M32-C001/CHATGPT_MASTER_PROMPT_V01.md` + `coordination/sessions/M32-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`.
+Active cycle: `M32-C001 V02`. V01 architecture is accepted, but code-audit closure is blocked on corrected 59×59 presentation/performance evidence. See `coordination/sessions/M32-C001/CHATGPT_AUDIT_V01.md`, `CHATGPT_PROMPT_V02.md`, and `CHATGPT_AUDIT_CRITERIA_V02.md`. Do not regenerate approved Scrubby art.
 
 - [ ] SB-M32-001 Audit original Scrubbot art.
 - [ ] SB-M32-002 Select owner-approved canonical design.
