@@ -34,8 +34,11 @@ extends Node2D
 ## exactly. Movement is driven by _process(delta) once MOVING, and equally by
 ## an explicit advance(delta) call for deterministic headless testing.
 ##
-## The agent owns NO child nodes, tweens or timers, so freeing it at any state
-## (moving, cancelled, completed) leaves no orphan nodes (SB-M18-013).
+## The agent owns no gameplay-authoritative child nodes, tweens or timers of its own, so
+## freeing it at any state (moving, cancelled, completed) leaves no orphan nodes (SB-M18-013).
+## (M32: a presentation-only ScrubbotVisual MAY be attached as a child by the presentation
+## layer; it is a pure Node2D/Sprite2D child that is freed together with the agent and holds
+## no gameplay identity, so this freeing/no-orphan guarantee is unchanged.)
 
 const RouteResult = preload("res://scripts/gameplay/routing/route_result.gd")
 
