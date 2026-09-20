@@ -4,15 +4,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M31
-- Current Sprint: M31-C001 V01 — Cleaning Effects
-- Current Task: M31-C001-V01
+- Current Milestone: M32
+- Current Sprint: M32-C001 V01 — Scrubbot Final Visuals
+- Current Task: M32-C001-V01
 - Current Task Status: AWAITING_IMPLEMENTATION
-- Next Task/Action: Claude executes `coordination/sessions/M31-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M31-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`. Implement presentation-only cleaning effects driven by the authoritative M20 committed-clear event, using existing merged cleaning-effect assets first, with toggle/concurrency/retry cleanup/performance evidence and an owner F6 visual gate. Do not edit root `TASKS.md`, do not start M32/M33 implementation, and do not generate new AI art unless a later owner decision explicitly requires it.
+- Next Task/Action: Claude executes `coordination/sessions/M32-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M32-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`. Integrate the existing owner-approved canonical Scrubby gameplay visual into the real production agent path, preserve all M18-M31 gameplay truth, add presentation-only travel/arrival/disappearance behavior, audit existing Scrubby asset provenance instead of regenerating art, prove viewport/density/performance/retry hygiene, and provide a dedicated owner F6 visual gate. Do not edit root `TASKS.md`, do not generate new AI art, and do not start M33+ runtime systems.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 553 / 966 = 57.25% (game+ui live scope snapshot before the 2026-09-19 visual/opening-video tracker additions); lastCompletedTaskId M30-C001-V02. M30 is fully closed after strict V02 code audit plus owner F6 acceptance of AUTO-SOLVE -> WON, DEADLOCK DEMO -> LOST, and RETRY from both terminal states -> fresh PLAYING at 1x. M33 canonical Dispatch/Cleaning/Completion SFX assets and the V1 no-movement-audio decision are already owner-approved and tracked as complete asset tasks, but M33 runtime audio integration remains future work.
+- Progress: 566 / 980 = 57.76% (canonical `SB-*` checklist recount after M31 closure and the 2026-09-19 tracker additions); lastCompletedTaskId M31-C001-V01. M31 is fully closed after independent code audit plus owner F6 acceptance of FX ON/OFF, BURST, AUTO-SOLVE, REDUCED ON/OFF, 1x/2x and RETRY cleanup. M33 canonical Dispatch/Cleaning/Completion SFX assets and the V1 no-movement-audio decision are already owner-approved and tracked as complete asset tasks, but M33 runtime audio integration remains future work.
 - Note: `codex/visual-assets-production` was merged through PR #5 for the earlier visual batch, but the later final visual-closure batch P2-145..P2-157 now exists on that visual branch at commit `65b26242f996f210a923b4536c7083f6f2d005cc` and is not yet integrated into `main`. Do not delete the visual branch until that final batch is merged/audited. The two historical Claude branches had zero unique commits.
 
 ## Tasks
@@ -1276,18 +1276,22 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 - [x] SB-M30-006 Resolve in-flight bots. — [x] SB-M30-007 Retry.
 - [x] SB-M30-008 Completion regression tests.
 
-### M31 — Cleaning Effects `[VISUAL REFERENCE] [PERFORMANCE]`
+### M31 — Cleaning Effects `[VISUAL REFERENCE] [PERFORMANCE] [CLOSED 2026-09-20]`
 
-- [ ] SB-M31-001 Use original visual references where available.
-- [ ] SB-M31-002 Define cleaning event.
-- [ ] SB-M31-003 Prototype lightweight effect.
-- [ ] SB-M31-004 Separate from BoardState.
-- [ ] SB-M31-005 Toggle effects. — [ ] SB-M31-006 Concurrency limit.
-- [ ] SB-M31-007 Pool only after profiling. — [ ] SB-M31-008 Stress 59×59.
-- [ ] SB-M31-009 Measure frame cost.
-- [ ] SB-M31-010 Reduced-effects option if required.
+- [x] SB-M31-001 Use original visual references where available.
+- [x] SB-M31-002 Define cleaning event.
+- [x] SB-M31-003 Prototype lightweight effect.
+- [x] SB-M31-004 Separate from BoardState.
+- [x] SB-M31-005 Toggle effects. — [x] SB-M31-006 Concurrency limit.
+- [x] SB-M31-007 Pool only after profiling. — [x] SB-M31-008 Stress 59×59.
+- [x] SB-M31-009 Measure frame cost.
+- [x] SB-M31-010 Reduced-effects option if required.
+
+Closure evidence: `coordination/sessions/M31-C001/CHATGPT_AUDIT_V01.md` + `coordination/sessions/M31-C001/OWNER_F6_ACCEPTANCE_V01.md`. Final verdict: `AUDITED_PASS / M31-C001 CLOSED`.
 
 ### M32 — Scrubbot Final Visuals `[VISUAL REFERENCE]`
+
+Active cycle: `M32-C001 V01`. Use the existing owner-approved canonical Scrubby asset family; do not regenerate approved Scrubby art. Implementation/audit authority: `coordination/sessions/M32-C001/CHATGPT_MASTER_PROMPT_V01.md` + `coordination/sessions/M32-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`.
 
 - [ ] SB-M32-001 Audit original Scrubbot art.
 - [ ] SB-M32-002 Select owner-approved canonical design.
