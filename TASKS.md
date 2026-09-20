@@ -4,15 +4,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M32
-- Current Sprint: M32-C001 V02 — Scrubbot Final Visuals Owner F6 Gate
-- Current Task: M32-C001-V02-OWNER-F6
-- Current Task Status: AWAITING_OWNER_F6
-- Next Task/Action: OWNER runs `res://scenes/debug/m32_scrubbot_visual_playtest.tscn` with F6 and visually validates canonical Scrubby appearance/scale, path-following travel, restrained bob/lean/squash, disappearance echo, coexistence with M31 cleaning FX, actual 1x/2x behavior, BURST/high-density readability, RETRY cleanup, and absence of the colored debug-circle fallback. Code audit passed in `coordination/sessions/M32-C001/CHATGPT_AUDIT_V02.md`. Do not start M33 until owner acceptance is recorded and M32 is formally closed.
+- Current Milestone: M33
+- Current Sprint: M33-C001 V01 — Audio Runtime Integration
+- Current Task: M33-C001-V01
+- Current Task Status: AWAITING_IMPLEMENTATION
+- Next Task/Action: Claude executes `coordination/sessions/M33-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M33-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`. Integrate the owner-approved dispatch/cleaning/completion WAV assets with authoritative gameplay events, create Master/Music/SFX buses, bounded SFX voice concurrency, persisted Master/Music/SFX settings, and a dedicated owner F6 audio playtest. Honor the owner-locked V1 decision of NO movement audio. Do not generate new audio, do not edit root `TASKS.md`, and do not start M34+.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 566 / 980 = 57.76% (canonical `SB-*` checklist recount after M31 closure and the 2026-09-19 tracker additions); lastCompletedTaskId M31-C001-V01. M31 is fully closed after independent code audit plus owner F6 acceptance of FX ON/OFF, BURST, AUTO-SOLVE, REDUCED ON/OFF, 1x/2x and RETRY cleanup. M33 canonical Dispatch/Cleaning/Completion SFX assets and the V1 no-movement-audio decision are already owner-approved and tracked as complete asset tasks, but M33 runtime audio integration remains future work.
+- Progress: 587 / 980 = 59.90% (canonical `SB-*` checklist recount after M32 closure); lastCompletedTaskId M32-C001-V02. M32 is fully closed after V02 code audit plus owner F6 acceptance of canonical Scrubby appearance/scale, travel animation, retire echo, M31 coexistence, 1x/2x, BURST density and RETRY cleanup. M33 canonical Dispatch/Cleaning/Completion SFX assets and the V1 no-movement-audio decision are already owner-approved; M33 runtime audio/settings integration is now active.
 - Note: `codex/visual-assets-production` was merged through PR #5 for the earlier visual batch, but the later final visual-closure batch P2-145..P2-157 now exists on that visual branch at commit `65b26242f996f210a923b4536c7083f6f2d005cc` and is not yet integrated into `main`. Do not delete the visual branch until that final batch is merged/audited. The two historical Claude branches had zero unique commits.
 
 ## Tasks
@@ -1289,31 +1289,33 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 Closure evidence: `coordination/sessions/M31-C001/CHATGPT_AUDIT_V01.md` + `coordination/sessions/M31-C001/OWNER_F6_ACCEPTANCE_V01.md`. Final verdict: `AUDITED_PASS / M31-C001 CLOSED`.
 
-### M32 — Scrubbot Final Visuals `[VISUAL REFERENCE]`
+### M32 — Scrubbot Final Visuals `[VISUAL REFERENCE] [CLOSED 2026-09-20]`
 
-Active cycle: `M32-C001 V02` owner F6 gate. V02 code audit passed: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V02.md`. The owner must now validate the dedicated M32 F6 scene before any M32 checklist closure or M33 start.
+Closure evidence: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V03.md` + `coordination/sessions/M32-C001/OWNER_F6_ACCEPTANCE_V01.md`. Final verdict: `AUDITED_PASS / M32-C001 CLOSED`.
 
-- [ ] SB-M32-001 Audit original Scrubbot art.
-- [ ] SB-M32-002 Select owner-approved canonical design.
-- [ ] SB-M32-003 Preserve original source.
-- [ ] SB-M32-004 Configure crisp import.
-- [ ] SB-M32-005 Visual component. — [ ] SB-M32-006 Travel animation.
-- [ ] SB-M32-007 Arrival animation. — [ ] SB-M32-008 Disappearance.
-- [ ] SB-M32-009 Direction/orientation if approved.
-- [ ] SB-M32-010 Density performance test.
-- [ ] SB-M32-UI-001 Use owner-approved canonical Scrubby reference for character generation.
-- [ ] SB-M32-UI-002 Validate pose/state manifest entries before generation.
-- [ ] SB-M32-UI-003 Generate only poses required by implemented behavior.
-- [ ] SB-M32-UI-004 Generate required portrait/profile variants.
-- [ ] SB-M32-UI-005 Generate emotion/state variants only when implemented flow needs them.
-- [ ] SB-M32-UI-006 Preserve raw candidates/provenance separately.
-- [ ] SB-M32-UI-007 Require owner visual approval before promotion.
-- [ ] SB-M32-UI-008 Lock approved character assets against silent overwrite.
-- [ ] SB-M32-UI-009 Configure Godot import settings.
-- [ ] SB-M32-UI-010 Integrate approved art without coupling animation to TargetSelector logic.
-- [ ] SB-M32-UI-011 Validate readability/scale on phone viewport matrix.
+- [x] SB-M32-001 Audit original Scrubbot art.
+- [x] SB-M32-002 Select owner-approved canonical design.
+- [x] SB-M32-003 Preserve original source.
+- [x] SB-M32-004 Configure crisp import.
+- [x] SB-M32-005 Visual component. — [x] SB-M32-006 Travel animation.
+- [x] SB-M32-007 Arrival animation. — [x] SB-M32-008 Disappearance.
+- [x] SB-M32-009 Direction/orientation if approved.
+- [x] SB-M32-010 Density performance test.
+- [x] SB-M32-UI-001 Use owner-approved canonical Scrubby reference for character generation.
+- [x] SB-M32-UI-002 Validate pose/state manifest entries before generation.
+- [x] SB-M32-UI-003 Generate only poses required by implemented behavior.
+- [x] SB-M32-UI-004 Generate required portrait/profile variants.
+- [x] SB-M32-UI-005 Generate emotion/state variants only when implemented flow needs them.
+- [x] SB-M32-UI-006 Preserve raw candidates/provenance separately.
+- [x] SB-M32-UI-007 Require owner visual approval before promotion.
+- [x] SB-M32-UI-008 Lock approved character assets against silent overwrite.
+- [x] SB-M32-UI-009 Configure Godot import settings.
+- [x] SB-M32-UI-010 Integrate approved art without coupling animation to TargetSelector logic.
+- [x] SB-M32-UI-011 Validate readability/scale on phone viewport matrix.
 
-### M33 — Audio `[DESIGN GATE]`
+### M33 — Audio `[OWNER-LOCKED AUDIO SELECTION 2026-09-19]`
+
+Active cycle: `M33-C001 V01`. Canonical owner decision: `coordination/OWNER_M33_AUDIO_SELECTION_DECISION_V01.md`. Runtime implementation authority: `coordination/sessions/M33-C001/CHATGPT_MASTER_PROMPT_V01.md` + `coordination/sessions/M33-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`. No movement audio in V1; no new audio generation.
 
 - [ ] SB-M33-001 Audio buses. — [ ] SB-M33-002 Master volume.
 - [ ] SB-M33-003 Music volume. — [ ] SB-M33-004 SFX volume.
