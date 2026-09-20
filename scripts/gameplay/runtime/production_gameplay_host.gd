@@ -46,6 +46,9 @@ const CompletionEvaluator = preload("res://scripts/gameplay/completion/completio
 const CompletionController = preload("res://scripts/gameplay/completion/completion_controller.gd")
 const RetryCoordinator = preload("res://scripts/gameplay/completion/retry_coordinator.gd")
 const CleaningEffectsController = preload("res://scripts/gameplay/presentation/cleaning_effects_controller.gd")
+const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
+const ScrubbotVisual = preload("res://scripts/gameplay/presentation/scrubbot_visual.gd")
+const ScrubbotRetireEchoController = preload("res://scripts/gameplay/presentation/scrubbot_retire_echo_controller.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -84,6 +87,7 @@ var _origin_provider
 var _evaluator
 var _completion
 var _cleaning_fx
+var _retire_echo
 var _built := false
 var _build_error := ""
 
@@ -148,8 +152,14 @@ func build() -> bool:
 	_raccess = ProductionAccessQuery.new(_board)
 	_dispatcher = ScrubbotDispatcher.new()
 	add_child(_dispatcher)
+	# M32: inject an agent factory so every dispatched (legacy AND preclaimed) agent is born
+	# with one canonical Scrubby ScrubbotVisual child. The factory returns a fresh, unparented,
+	# UNASSIGNED ScrubbotAgent exactly as the dispatcher requires; the visual is a
+	# presentation-only child that rides the agent transform and owns no gameplay identity, so
+	# target/route/clear truth is untouched (M32 audit §3/§9).
 	if not _dispatcher.bind(_board, _sel, _res, _routing, _raccess,
-			ProductionTargetAccess.new(_routing, _raccess, _board), agent_layer):
+			ProductionTargetAccess.new(_routing, _raccess, _board), agent_layer,
+			Callable(self, "_make_scrubbot_agent")):
 		_build_error = "dispatcher bind failed"
 		return false
 	_loop = CompleteClearingLoop.new()
@@ -197,6 +207,15 @@ func build() -> bool:
 	add_child(_cleaning_fx)
 	_cleaning_fx.bind(presentation.get_cleaning_fx_layer(), _board)
 	_loop.authenticated_clear.connect(_cleaning_fx._on_authenticated_clear)
+
+	# M32 presentation-only arrival/disappearance echo: a second pure observer on the SAME
+	# authoritative committed-clear notification. It spawns a short detached Scrubby echo at the
+	# cleared cell and never mutates gameplay truth or delays the M20 finalize; a bind failure
+	# (no retire layer) simply means no echoes, never a build/gameplay failure.
+	_retire_echo = ScrubbotRetireEchoController.new()
+	add_child(_retire_echo)
+	_retire_echo.bind(presentation.get_retire_fx_layer(), _board)
+	_loop.authenticated_clear.connect(_retire_echo._on_authenticated_clear)
 
 	# Meaningful gameplay boundaries mark the completion state dirty (authenticated clear +
 	# accepted supply-front placement). on_tick (below) then gets one chance to run the M27
@@ -289,6 +308,10 @@ func _on_retry_restored() -> void:
 	# the RetryCoordinator's post-success restore seam, so it never weakens the M30 gate.
 	if _cleaning_fx != null and is_instance_valid(_cleaning_fx):
 		_cleaning_fx.reset_for_new_attempt()
+	# M32 (§13): the same Retry restore removes stale disappearance echoes and resets their
+	# attempt-scoped counters. Presentation-only; never weakens the M30 gate.
+	if _retire_echo != null and is_instance_valid(_retire_echo):
+		_retire_echo.reset_for_new_attempt()
 
 ## Runtime state-sync tail: refresh the five-slot strip from authoritative M24, then run one
 ## dirty/event-gated completion evaluation pass.
@@ -409,3 +432,18 @@ func get_candidate_index():
 
 func get_cleaning_fx():
 	return _cleaning_fx
+
+func get_retire_echo():
+	return _retire_echo
+
+# ------------------------------------------------------------ M32 agent factory ----
+
+## Dispatcher agent factory (M32). Returns a fresh, unparented, UNASSIGNED ScrubbotAgent
+## carrying one presentation-only canonical Scrubby ScrubbotVisual child. The visual reads
+## only the parent transform and mutates no gameplay truth, so the dispatcher's ownability /
+## assignment postconditions (UNASSIGNED, unparented, MOVING-after-assign) are all preserved.
+func _make_scrubbot_agent():
+	var a = ScrubbotAgent.new()
+	var v = ScrubbotVisual.new()
+	a.add_child(v)
+	return a

@@ -68,6 +68,14 @@ var _total_len: float = 0.0
 var _travelled: float = 0.0
 var _completed_emitted: bool = false
 
+## M32: true once a canonical ScrubbotVisual child has attached and taken over
+## presentation. Presentation-only flag — it changes NOTHING about movement, route,
+## progress, completion or identity truth; it merely suppresses the debug-circle
+## _draw() so the normal production path shows Scrubby, not the fallback marker. When
+## no visual attaches (headless / missing-asset), it stays false and the isolated
+## debug circle still renders (M32 prompt §6, audit §9).
+var _visual_present: bool = false
+
 ## Board-local positions within this tolerance are treated as equal. Route
 ## coordinates are small integers + 0.5, so this is generous yet safe.
 const _MATCH_EPS := 0.001
@@ -230,7 +238,21 @@ func get_progress() -> float:
 ## container magnifies it to screen size; the agent bakes no pixels. Colour is a
 ## deterministic debug hue from color_id (identity presentation only — the agent
 ## carries no resource). No child node is created for this.
+## M32 presentation seam. Called by a ScrubbotVisual child on attach to suppress the
+## debug-circle fallback. Presentation-only: never affects movement/route/identity.
+func set_visual_present(present: bool) -> void:
+	_visual_present = present
+	queue_redraw()
+
+func is_visual_present() -> bool:
+	return _visual_present
+
 func _draw() -> void:
+	# Canonical Scrubby visual present -> draw nothing here; the ScrubbotVisual child
+	# renders the character. The circle remains the isolated debug/headless/missing-asset
+	# fallback (M32 prompt §6).
+	if _visual_present:
+		return
 	var hue: float = fposmod(float(maxi(color_id, 0)) * 0.13, 1.0)
 	var c := Color.from_hsv(hue, 0.55, 0.95)
 	if _state == State.CANCELLED:

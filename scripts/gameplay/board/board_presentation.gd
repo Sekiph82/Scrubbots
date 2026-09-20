@@ -30,6 +30,11 @@ var _agent_layer: Node2D
 ## UNDER the AgentLayer so a short cleaning cue reads over the cleared (transparent) cell
 ## without hiding a moving Scrubbot. Holds NO gameplay authority.
 var _fx_layer: Node2D
+## M32 identity-stable presentation-only Scrubbot retire-echo layer. Created ONCE, shares
+## this node's board origin and the renderer's cell scale exactly like AgentLayer, and is
+## kept ABOVE the AgentLayer so a short disappearance echo reads on top of the vanished
+## bot without hiding live board truth. Holds NO gameplay authority.
+var _retire_layer: Node2D
 
 ## Build (once) or reconfigure the renderer + agent layer sharing this node's origin.
 ## `available_size` is the display rect the board should fit inside.
@@ -70,10 +75,21 @@ func configure(board, palette: PackedStringArray, available_size: Vector2) -> vo
 		if _agent_layer != null and is_instance_valid(_agent_layer):
 			move_child(_fx_layer, _agent_layer.get_index())
 
+	# M32 RetireFxLayer: created ONCE, same origin + cell scale as AgentLayer, kept ABOVE
+	# it (created after, so higher z). Identity-stable across relayout exactly like the
+	# renderer/AgentLayer/CleaningFxLayer — a later configure() only rescales it, never
+	# recreates it, so an active disappearance echo is never stranded on a stale node.
+	if _retire_layer == null or not is_instance_valid(_retire_layer):
+		_retire_layer = Node2D.new()
+		_retire_layer.name = "RetireFxLayer"
+		add_child(_retire_layer)
+		_retire_layer.position = Vector2.ZERO
+
 	var cs: float = _renderer.get_cell_size()
 	# One board-local movement unit maps to exactly the renderer's cell-size.
 	_agent_layer.scale = Vector2(cs, cs)
 	_fx_layer.scale = Vector2(cs, cs)
+	_retire_layer.scale = Vector2(cs, cs)
 
 func get_renderer():
 	return _renderer
@@ -83,6 +99,9 @@ func get_agent_layer() -> Node2D:
 
 func get_cleaning_fx_layer() -> Node2D:
 	return _fx_layer
+
+func get_retire_fx_layer() -> Node2D:
+	return _retire_layer
 
 func get_cell_size() -> float:
 	return _renderer.get_cell_size() if _renderer != null else 1.0
