@@ -5,10 +5,10 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M32
-- Current Sprint: M32-C001 V02 — Scrubbot Final Visuals Performance Evidence Repair
-- Current Task: M32-C001-V02
-- Current Task Status: CHANGES_REQUIRED
-- Next Task/Action: Claude executes `coordination/sessions/M32-C001/CHATGPT_PROMPT_V02.md` under `coordination/sessions/M32-C001/CHATGPT_AUDIT_CRITERIA_V02.md`. Preserve the accepted V01 Scrubby architecture and close only the blocking scale/performance evidence gap: add real 59×59 presentation stress evidence, measure actual ScrubbotVisual animation update cost at 1x/2x-equivalent density, correct the invalid/ambiguous 395-node concurrency interpretation caused by deferred queue_free cleanup, prove shared texture + zero residue, rerun regressions, and hand back `AWAITING_AUDIT / M32-C001 V02 / OWNER_F6_REQUIRED`. Do not edit root `TASKS.md`, do not generate new AI art, and do not proceed to formal owner F6 closure until V02 code audit passes.
+- Current Sprint: M32-C001 V02 — Scrubbot Final Visuals Owner F6 Gate
+- Current Task: M32-C001-V02-OWNER-F6
+- Current Task Status: AWAITING_OWNER_F6
+- Next Task/Action: OWNER runs `res://scenes/debug/m32_scrubbot_visual_playtest.tscn` with F6 and visually validates canonical Scrubby appearance/scale, path-following travel, restrained bob/lean/squash, disappearance echo, coexistence with M31 cleaning FX, actual 1x/2x behavior, BURST/high-density readability, RETRY cleanup, and absence of the colored debug-circle fallback. Code audit passed in `coordination/sessions/M32-C001/CHATGPT_AUDIT_V02.md`. Do not start M33 until owner acceptance is recorded and M32 is formally closed.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
@@ -1291,7 +1291,7 @@ Closure evidence: `coordination/sessions/M31-C001/CHATGPT_AUDIT_V01.md` + `coord
 
 ### M32 — Scrubbot Final Visuals `[VISUAL REFERENCE]`
 
-Active cycle: `M32-C001 V02`. V01 architecture is accepted, but code-audit closure is blocked on corrected 59×59 presentation/performance evidence. See `coordination/sessions/M32-C001/CHATGPT_AUDIT_V01.md`, `CHATGPT_PROMPT_V02.md`, and `CHATGPT_AUDIT_CRITERIA_V02.md`. Do not regenerate approved Scrubby art.
+Active cycle: `M32-C001 V02` owner F6 gate. V02 code audit passed: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V02.md`. The owner must now validate the dedicated M32 F6 scene before any M32 checklist closure or M33 start.
 
 - [ ] SB-M32-001 Audit original Scrubbot art.
 - [ ] SB-M32-002 Select owner-approved canonical design.
