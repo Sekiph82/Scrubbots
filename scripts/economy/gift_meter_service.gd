@@ -48,7 +48,12 @@ func add_streak_sb(tx_id: String, amount: int) -> Array:
 		# Milestones crossed in this segment of the CURRENT cycle.
 		for m in MILESTONES:
 			if before < m and after >= m:
-				var occ := {"cycle": _cycles_completed, "milestone": m}
+				var occ := {
+					"id": "gift_ms:c%d:m%d" % [_cycles_completed, m],
+					"cycle": _cycles_completed,
+					"milestone": m,
+					"claimed": false,
+				}
 				_gift_bar_queue.append(occ)
 				newly.append(occ)
 		_cycle_progress = after
@@ -70,6 +75,38 @@ func cycles_completed() -> int:
 
 func gift_bar_queue() -> Array:
 	return _gift_bar_queue.duplicate(true)
+
+## Unclaimed queued milestone occurrences (Gift Bar surface). Never auto-consumed.
+func claimable() -> Array:
+	var out: Array = []
+	for occ in _gift_bar_queue:
+		if not occ.get("claimed", false):
+			out.append(occ.duplicate())
+	return out
+
+## Claim one queued milestone occurrence by its stable id, granting the
+## config-defined rewards through the reward service. Idempotent: the reward
+## grant uses the occurrence id as its transaction id, and the occurrence is
+## marked claimed. Returns {ok, rewards} or {ok:false}.
+func claim(occurrence_id: String, reward_service, config) -> Dictionary:
+	for occ in _gift_bar_queue:
+		if occ.get("id", "") == occurrence_id:
+			if occ.get("claimed", false):
+				return {"ok": false, "reason": "already_claimed"}
+			var rewards: Dictionary = config.gift_meter_milestone(int(occ["milestone"]))
+			var applied = reward_service.grant(occurrence_id, rewards)
+			if not applied and not reward_service.already_applied(occurrence_id):
+				return {"ok": false, "reason": "grant_failed"}
+			occ["claimed"] = true
+			return {"ok": true, "rewards": rewards}
+	return {"ok": false, "reason": "not_found"}
+
+## Total Bot Parts a full 0->1000 cycle grants (proof helper for SB-M39-012).
+func full_cycle_bot_parts(config) -> int:
+	var total := 0
+	for m in MILESTONES:
+		total += int(config.gift_meter_milestone(m).get("bot_parts", 0))
+	return total
 
 func snapshot() -> Dictionary:
 	return {

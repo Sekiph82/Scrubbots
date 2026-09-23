@@ -26,12 +26,23 @@ func bot_parts() -> int:
 	return get_balance(BOT_PARTS)
 
 ## Credit a non-negative amount. Returns the new balance. Negative amounts are
-## rejected (spends go through explicit M39 spend APIs, not credit).
+## rejected (spends go through debit, not credit).
 func credit(resource: String, amount: int) -> int:
 	if amount < 0:
 		return get_balance(resource)
 	_balances[resource] = get_balance(resource) + amount
 	return _balances[resource]
+
+## Debit a non-negative amount. Atomic and fail-closed: if the balance is
+## insufficient (would go negative) nothing changes and it returns false. Used
+## by the explicit M39 spend services (robot unlock, hearts, boosters, speed).
+func debit(resource: String, amount: int) -> bool:
+	if amount < 0:
+		return false
+	if get_balance(resource) < amount:
+		return false
+	_balances[resource] = get_balance(resource) - amount
+	return true
 
 func snapshot() -> Dictionary:
 	return {"scrub_bucks": scrub_bucks(), "bot_parts": bot_parts()}
