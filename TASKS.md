@@ -5,10 +5,10 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M33
-- Current Sprint: M33-C001 V01 — Audio Runtime Integration
-- Current Task: M33-C001-V01
-- Current Task Status: AWAITING_IMPLEMENTATION
-- Next Task/Action: Claude executes `coordination/sessions/M33-C001/CHATGPT_MASTER_PROMPT_V01.md` under `coordination/sessions/M33-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`. Integrate the owner-approved dispatch/cleaning/completion WAV assets with authoritative gameplay events, create Master/Music/SFX buses, bounded SFX voice concurrency, persisted Master/Music/SFX settings, and a dedicated owner F6 audio playtest. Honor the owner-locked V1 decision of NO movement audio. Do not generate new audio, do not edit root `TASKS.md`, and do not start M34+.
+- Current Sprint: M33-C001 V01 — Audio Owner F6 Gate
+- Current Task: M33-C001-V01-OWNER-F6
+- Current Task Status: AWAITING_OWNER_F6
+- Next Task/Action: OWNER runs `res://scenes/debug/m33_audio_playtest.tscn` with F6 and performs the listening gate defined in `coordination/sessions/M33-C001/CHATGPT_AUDIT_V01.md`: verify real dispatch/cleaning/completion event sounds, no movement loop, realtime 1x/2x mix quality, cleaning-stress density, Master/SFX controls, Music bus persistence, save/reload, and Retry/fresh-WON behavior. Code audit passed. Do not start M34 until owner acceptance is recorded and M33 is formally closed.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
@@ -1315,7 +1315,7 @@ Closure evidence: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V03.md` + `coord
 
 ### M33 — Audio `[OWNER-LOCKED AUDIO SELECTION 2026-09-19]`
 
-Active cycle: `M33-C001 V01`. Canonical owner decision: `coordination/OWNER_M33_AUDIO_SELECTION_DECISION_V01.md`. Runtime implementation authority: `coordination/sessions/M33-C001/CHATGPT_MASTER_PROMPT_V01.md` + `coordination/sessions/M33-C001/CHATGPT_MASTER_AUDIT_CRITERIA_V01.md`. No movement audio in V1; no new audio generation.
+Active cycle: `M33-C001 V01` owner F6 audio gate. Code audit passed in `coordination/sessions/M33-C001/CHATGPT_AUDIT_V01.md`. Owner must now complete the dedicated listening/persistence/Retry gate before M33 closure or M34 start.
 
 - [ ] SB-M33-001 Audio buses. — [ ] SB-M33-002 Master volume.
 - [ ] SB-M33-003 Music volume. — [ ] SB-M33-004 SFX volume.
