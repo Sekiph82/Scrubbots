@@ -5,14 +5,14 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M34
-- Current Sprint: M34-M40-BATCH V01 — Overnight Uninterrupted Implementation
-- Current Task: M34-M40-BATCH-V01
-- Current Task Status: AWAITING_IMPLEMENTATION
-- Next Task/Action: CLAUDE executes `coordination/sessions/M34-M40-BATCH/CHATGPT_MASTER_PROMPT_V01.md`. Owner explicitly deferred the M33 listening gate for later; M33 remains `CODE_AUDIT_PASS / OWNER_F6_REQUIRED` and is NOT closed. Claude is authorized to implement/test/log/push M34→M40 sequentially without waiting between milestones, using each milestone's pre-authored `CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`, creating one GitHub task log per task plus a canonical `CLAUDE_LOG_V01.md` per milestone. Claude must not edit root `TASKS.md`, self-audit, or start M41+.
+- Current Sprint: M34-M40-BATCH V02 — Audit-Driven Remediation
+- Current Task: M34-M40-BATCH-V02
+- Current Task Status: CHANGES_REQUIRED
+- Next Task/Action: CLAUDE executes `coordination/sessions/M34-M40-BATCH/CHATGPT_MASTER_PROMPT_V02.md`. Independent V01 audits are published for M34..M40. Frozen findings include missing production haptics wiring; mutable/legacy-gated LevelCatalog; incomplete Difficulty V1 production migration; required strict-v2 adversarial validation for progression/streak; incomplete live M24/M27/booster/manual-2x/economy integration and atomicity defects in M39; and save replacement/backup/future-schema/type/Daily/bootstrap defects in M40. Claude must execute every matching V02 prompt/criteria, write `task_logs_v02/` + `CLAUDE_LOG_V02.md`, push each remediation stage, not edit root `TASKS.md`, not self-audit, and not start M41+.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 587 / 980 = 59.90% (no new task closures claimed by batch authorization); lastCompletedTaskId M32-C001-V02. M33 code audit passed but owner F6 listening acceptance is explicitly deferred and remains open. Owner-authorized M34→M40 implementation may proceed continuously; task closure/progress changes remain ChatGPT-audit-owned and will occur only after later audits/owner gates.
+- Progress: 587 / 980 = 59.90% (no M34-M40 task closure awarded by V01 implementation alone); lastCompletedTaskId M32-C001-V02. M33 code audit passed but owner F6 listening acceptance remains explicitly deferred/open. M34-M40 V01 produced all 115 task logs, but independent audit returned CHANGES_REQUIRED; closure/progress changes wait for V02 re-audit and remaining owner/device gates.
 - Note: `codex/visual-assets-production` was merged through PR #5 for the earlier visual batch, but the later final visual-closure batch P2-145..P2-157 now exists on that visual branch at commit `65b26242f996f210a923b4536c7083f6f2d005cc` and is not yet integrated into `main`. Do not delete the visual branch until that final batch is merged/audited. The two historical Claude branches had zero unique commits.
 
 ## Tasks
