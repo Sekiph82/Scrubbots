@@ -19,6 +19,10 @@ const BOOSTERS := [PLUS_ONE_SLOT, RANDOM, SELECTOR, TORNADO]
 var _wallet: EconomyWallet
 var _config
 var _charges: Dictionary = {}
+## Player-selected booster charges granted (e.g. Gift Meter 500/1000, Daily D5)
+## that the player later redeems onto a chosen booster. Modeled as a pending
+## pool so we do not silently pick a booster for the player.
+var _pending_selected: int = 0
 
 func _init(wallet: EconomyWallet, config) -> void:
 	_wallet = wallet
@@ -62,8 +66,26 @@ func refund(id: String, reservation: Dictionary) -> void:
 	elif reservation.get("paid_with") == "sb":
 		_wallet.credit(EconomyWallet.SCRUB_BUCKS, int(reservation.get("price", 0)))
 
+## Grant `n` player-selected charges to the pending pool.
+func add_pending_selected(n: int) -> void:
+	if n > 0:
+		_pending_selected += n
+
+func pending_selected() -> int:
+	return _pending_selected
+
+## Redeem one pending selected charge onto a chosen booster.
+func redeem_selected(id: String) -> bool:
+	if _pending_selected <= 0 or not is_booster(id):
+		return false
+	_pending_selected -= 1
+	_charges[id] = charges(id) + 1
+	return true
+
 func snapshot() -> Dictionary:
-	return _charges.duplicate()
+	var d := _charges.duplicate()
+	d["_pending_selected"] = _pending_selected
+	return d
 
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
@@ -76,5 +98,11 @@ func import_snapshot(s) -> bool:
 		if int(v) < 0:
 			return false
 		new_charges[b] = int(v)
+	var ps = s.get("_pending_selected", 0)
+	if typeof(ps) != TYPE_INT and typeof(ps) != TYPE_FLOAT:
+		return false
+	if int(ps) < 0:
+		return false
 	_charges = new_charges
+	_pending_selected = int(ps)
 	return true
