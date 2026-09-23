@@ -1,7 +1,10 @@
 ; Engine configuration file.
 ; It's best edited using the editor UI and not directly,
-; since the parameters that go here are meant to be edited
-; using the UI and not by hand, with the exception of adding custom sections.
+; since the parameters that go here are not all obvious.
+;
+; Format:
+;   [section] ; section goes between []
+;   param=value ; assign values to parameters
 
 config_version=5
 
@@ -16,9 +19,13 @@ boot_splash/bg_color=Color(0.070588, 0.078431, 0.098039, 1)
 
 window/size/viewport_width=1080
 window/size/viewport_height=2160
-window/handheld/orientation=1
 window/stretch/mode="canvas_items"
 window/stretch/aspect="expand"
+window/handheld/orientation=1
+
+[audio]
+
+buses/default_bus_layout="res://default_bus_layout.tres"
 
 [rendering]
 
