@@ -116,6 +116,9 @@ func snapshot() -> Dictionary:
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
+	# Missing hearts section keeps the fresh default (full hearts, anchor now).
+	if s.is_empty():
+		return true
 	var h = s.get("hearts", null)
 	var a = s.get("anchor", null)
 	if typeof(h) != TYPE_INT and typeof(h) != TYPE_FLOAT:

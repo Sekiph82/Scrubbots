@@ -58,7 +58,7 @@ func snapshot() -> Dictionary:
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
-	var raw = s.get("unlocked", null)
+	var raw = s.get("unlocked", [])
 	if typeof(raw) != TYPE_ARRAY:
 		return false
 	var new_unlocked: Dictionary = {}

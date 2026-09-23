@@ -78,7 +78,7 @@ func snapshot() -> Dictionary:
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
-	var applied_raw = s.get("applied", null)
+	var applied_raw = s.get("applied", [])
 	if typeof(applied_raw) != TYPE_ARRAY:
 		return false
 	var wallet_ok := true

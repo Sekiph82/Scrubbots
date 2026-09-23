@@ -135,6 +135,10 @@ func snapshot() -> Dictionary:
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
+	# A missing streak section keeps the fresh default (streak 0). A present
+	# section must carry the correct schema.
+	if s.is_empty():
+		return true
 	if s.get("schema", "") != SNAPSHOT_SCHEMA:
 		return false
 	var st = s.get("streak", null)

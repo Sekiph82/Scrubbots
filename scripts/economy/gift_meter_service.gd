@@ -120,9 +120,11 @@ func snapshot() -> Dictionary:
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
-	var cp = s.get("cycle_progress", null)
-	var tp = s.get("total_progress", null)
-	var cc = s.get("cycles_completed", null)
+	# Missing fields default to a fresh cycle (safe default); present-but-invalid
+	# fields fail closed.
+	var cp = s.get("cycle_progress", 0)
+	var tp = s.get("total_progress", 0)
+	var cc = s.get("cycles_completed", 0)
 	if not _is_nonneg_int(cp) or not _is_nonneg_int(tp) or not _is_nonneg_int(cc):
 		return false
 	if int(cp) >= CYCLE_MAX:
