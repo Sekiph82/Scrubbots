@@ -1,0 +1,12 @@
+{
+	"schema": "scrubbots.production_catalog.v1",
+	"entries": [
+		{
+			"id": "m21_level_001_hazard_bot",
+			"order": 1,
+			"level_path": "res://data/levels/m21_level_001_hazard_bot.json",
+			"metadata_path": "res://data/levels/metadata/m21_level_001_hazard_bot.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/m21_level_001_hazard_bot.png"
+		}
+	]
+}
