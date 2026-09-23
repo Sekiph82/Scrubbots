@@ -49,6 +49,8 @@ const CleaningEffectsController = preload("res://scripts/gameplay/presentation/c
 const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 const ScrubbotVisual = preload("res://scripts/gameplay/presentation/scrubbot_visual.gd")
 const ScrubbotRetireEchoController = preload("res://scripts/gameplay/presentation/scrubbot_retire_echo_controller.gd")
+const GameplayAudioController = preload("res://scripts/audio/gameplay_audio_controller.gd")
+const AudioSettingsService = preload("res://scripts/audio/audio_settings_service.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -88,6 +90,8 @@ var _evaluator
 var _completion
 var _cleaning_fx
 var _retire_echo
+var _audio
+var _audio_settings
 var _built := false
 var _build_error := ""
 
@@ -217,6 +221,18 @@ func build() -> bool:
 	_retire_echo.bind(presentation.get_retire_fx_layer(), _board)
 	_loop.authenticated_clear.connect(_retire_echo._on_authenticated_clear)
 
+	# M33 presentation-only audio: user volume settings (persisted) + a bounded-voice SFX
+	# controller observing the SAME authoritative events. All three wirings are pure observers
+	# — dispatch on committed dispatch, cleaning on authenticated clear, completion on WON
+	# only. Audio never mutates gameplay/terminal/speed truth.
+	_audio_settings = AudioSettingsService.new()
+	_audio_settings.load()  # persisted user volumes -> AudioServer buses (defaults if none)
+	_audio = GameplayAudioController.new()
+	add_child(_audio)
+	_dispatcher.assignment_dispatched.connect(_audio._on_assignment_dispatched)
+	_loop.authenticated_clear.connect(_audio._on_authenticated_clear)
+	_completion.terminal_reached.connect(_audio._on_terminal_reached)
+
 	# Meaningful gameplay boundaries mark the completion state dirty (authenticated clear +
 	# accepted supply-front placement). on_tick (below) then gets one chance to run the M27
 	# proof at quiescence; idle ticks with no event never re-run it.
@@ -312,6 +328,10 @@ func _on_retry_restored() -> void:
 	# attempt-scoped counters. Presentation-only; never weakens the M30 gate.
 	if _retire_echo != null and is_instance_valid(_retire_echo):
 		_retire_echo.reset_for_new_attempt()
+	# M33 (§11): re-arm the once-per-attempt completion-audio latch so a later fresh WON can
+	# play completion again. Presentation-only; user volume settings are unchanged.
+	if _audio != null and is_instance_valid(_audio):
+		_audio.reset_for_new_attempt()
 
 ## Runtime state-sync tail: refresh the five-slot strip from authoritative M24, then run one
 ## dirty/event-gated completion evaluation pass.
@@ -435,6 +455,12 @@ func get_cleaning_fx():
 
 func get_retire_echo():
 	return _retire_echo
+
+func get_audio_controller():
+	return _audio
+
+func get_audio_settings():
+	return _audio_settings
 
 # ------------------------------------------------------------ M32 agent factory ----
 

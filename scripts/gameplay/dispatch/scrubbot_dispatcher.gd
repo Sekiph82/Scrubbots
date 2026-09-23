@@ -78,6 +78,16 @@ const DEFAULT_SPEED := 6.0
 ## reservation resolution or scoring; it only announces the authenticated arrival.
 signal assignment_arrived(owner_id: int, target_index: int, color_id: int, agent)
 
+## M33 presentation-only successful-dispatch notification (SB-M33 §6). Emitted EXACTLY
+## ONCE per assignment, only after the agent is fully attached/validated and registered in
+## `_active` on a successful dispatch path (both the legacy dispatch() and the production
+## dispatch_preclaimed() paths). It is NEVER emitted on an invalid request, route failure,
+## reset abort, coherence failure or agent-assignment failure. It is OBSERVATION ONLY — the
+## M33 GameplayAudioController listens to play dispatch.wav; gameplay never depends on a
+## listener and dispatch success/failure semantics, reservation truth, assignment identity
+## and scheduling are all unchanged by adding this signal.
+signal assignment_dispatched(owner_id: int, target_index: int, color_id: int, agent)
+
 ## Narrow required API surfaces validated at bind (F-M19-STRICT-001). A dependency
 ## missing any listed method is a partial/junk dependency and fails closed before
 ## any escaped call reaches it. select_access requires is_coherent_with — bundle
@@ -538,6 +548,9 @@ func dispatch(color_id: int, start_position: Vector2, speed: float = DEFAULT_SPE
 	agent.agent_completed.connect(cb)
 	_active[owner_id] = {"owner": owner_id, "target": target, "color": color_id,
 		"agent": agent, "cb": cb, "arrived": false}
+	# M33 §6: announce the committed successful dispatch AFTER full registration in _active.
+	# Observation only — never gates gameplay.
+	assignment_dispatched.emit(owner_id, target, color_id, agent)
 	return _end_dispatch(DispatchResult.success_result(owner_id, target, agent))
 
 ## Clear the in-dispatch guard and return the result (single exit for the guarded
@@ -670,6 +683,8 @@ func dispatch_preclaimed(owner_id, color_id, target_index, start_position, reque
 	agent.agent_completed.connect(cb)
 	_active[owner_id] = {"owner": owner_id, "target": target_index, "color": color_id,
 		"agent": agent, "cb": cb, "arrived": false}
+	# M33 §6: announce the committed successful preclaimed dispatch AFTER full registration.
+	assignment_dispatched.emit(owner_id, target_index, color_id, agent)
 	return _end_dispatch(DispatchResult.success_result(owner_id, target_index, agent))
 
 func _reset_since(my_gen: int) -> bool:
