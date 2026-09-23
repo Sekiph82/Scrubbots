@@ -4,15 +4,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M33
-- Current Sprint: M33-C001 V01 — Audio Owner F6 Gate
-- Current Task: M33-C001-V01-OWNER-F6
-- Current Task Status: AWAITING_OWNER_F6
-- Next Task/Action: OWNER runs `res://scenes/debug/m33_audio_playtest.tscn` with F6 and performs the listening gate defined in `coordination/sessions/M33-C001/CHATGPT_AUDIT_V01.md`: verify real dispatch/cleaning/completion event sounds, no movement loop, realtime 1x/2x mix quality, cleaning-stress density, Master/SFX controls, Music bus persistence, save/reload, and Retry/fresh-WON behavior. Code audit passed. Do not start M34 until owner acceptance is recorded and M33 is formally closed.
+- Current Milestone: M34
+- Current Sprint: M34-M40-BATCH V01 — Overnight Uninterrupted Implementation
+- Current Task: M34-M40-BATCH-V01
+- Current Task Status: AWAITING_IMPLEMENTATION
+- Next Task/Action: CLAUDE executes `coordination/sessions/M34-M40-BATCH/CHATGPT_MASTER_PROMPT_V01.md`. Owner explicitly deferred the M33 listening gate for later; M33 remains `CODE_AUDIT_PASS / OWNER_F6_REQUIRED` and is NOT closed. Claude is authorized to implement/test/log/push M34→M40 sequentially without waiting between milestones, using each milestone's pre-authored `CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`, creating one GitHub task log per task plus a canonical `CLAUDE_LOG_V01.md` per milestone. Claude must not edit root `TASKS.md`, self-audit, or start M41+.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 587 / 980 = 59.90% (canonical `SB-*` checklist recount after M32 closure); lastCompletedTaskId M32-C001-V02. M32 is fully closed after V02 code audit plus owner F6 acceptance of canonical Scrubby appearance/scale, travel animation, retire echo, M31 coexistence, 1x/2x, BURST density and RETRY cleanup. M33 canonical Dispatch/Cleaning/Completion SFX assets and the V1 no-movement-audio decision are already owner-approved; M33 runtime audio/settings integration is now active.
+- Progress: 587 / 980 = 59.90% (no new task closures claimed by batch authorization); lastCompletedTaskId M32-C001-V02. M33 code audit passed but owner F6 listening acceptance is explicitly deferred and remains open. Owner-authorized M34→M40 implementation may proceed continuously; task closure/progress changes remain ChatGPT-audit-owned and will occur only after later audits/owner gates.
 - Note: `codex/visual-assets-production` was merged through PR #5 for the earlier visual batch, but the later final visual-closure batch P2-145..P2-157 now exists on that visual branch at commit `65b26242f996f210a923b4536c7083f6f2d005cc` and is not yet integrated into `main`. Do not delete the visual branch until that final batch is merged/audited. The two historical Claude branches had zero unique commits.
 
 ## Tasks
@@ -1327,12 +1327,16 @@ Active cycle: `M33-C001 V01` owner F6 audio gate. Code audit passed in `coordina
 
 ### M34 — Haptics
 
+Pre-authored batch bundle: `coordination/sessions/M34-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Owner/device gate does not stop the batch.
+
 - [ ] SB-M34-001 Platform API research.
 - [ ] SB-M34-002 Cleaning haptic if approved. — [ ] SB-M34-003 Completion haptic.
 - [ ] SB-M34-004 Toggle. — [ ] SB-M34-005 Prevent vibration spam.
 - [ ] SB-M34-006 Real-device test.
 
 ### M35 — Level Catalog
+
+Pre-authored batch bundle: `coordination/sessions/M35-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`.
 
 - [ ] SB-M35-001 Production LevelCatalog.
 - [ ] SB-M35-002 Stable IDs. — [ ] SB-M35-003 Stable ordering.
@@ -1345,6 +1349,8 @@ Active cycle: `M33-C001 V01` owner F6 audio gate. Code audit passed in `coordina
 
 ### M36 — Difficulty System
 
+Pre-authored batch bundle: `coordination/sessions/M36-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Human playtest gate does not stop the batch.
+
 **Difficulty V1 owner decision now governs future work.** Board dimensions remain an engine/content envelope and Session Load input, not the definition of EASY/MEDIUM/HARD/VERY_HARD.
 
 - [ ] SB-M36-001 Migrate legacy runtime class=dimension configuration to Difficulty V1 without breaking board envelope validation.
@@ -1356,6 +1362,8 @@ Active cycle: `M33-C001 V01` owner F6 audio gate. Code audit passed in `coordina
 
 ### M37 — Level Progression
 
+Pre-authored batch bundle: `coordination/sessions/M37-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Unapproved shipping Level Select remains owner-gated.
+
 - [ ] SB-M37-001 Implement owner-locked repeating 10-level class cadence.
 - [ ] SB-M37-002 Current level.
 - [ ] SB-M37-003 Completion tracking. — [ ] SB-M37-004 Replay.
@@ -1364,6 +1372,8 @@ Active cycle: `M33-C001 V01` owner F6 audio gate. Code audit passed in `coordina
 - [ ] SB-M37-007 Service implementation. — [ ] SB-M37-008 Tests.
 
 ### M38 — Win Streak `[OWNER-LOCKED ECONOMY V1]`
+
+Pre-authored batch bundle: `coordination/sessions/M38-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Durable central persistence is finalized by M40.
 
 - [ ] SB-M38-001 Streak state. — [ ] SB-M38-002 Increment only on valid first-clear progression wins.
 - [ ] SB-M38-003 Reset on progression loss and restart-after-gameplay; pre-action exit does not reset.
@@ -1378,6 +1388,8 @@ Active cycle: `M33-C001 V01` owner F6 audio gate. Code audit passed in `coordina
 - [ ] SB-M38-016 Add reset/replay/idempotency integration tests.
 
 ### M39 — Economy & Rewards V1 `[OWNER-LOCKED]`
+
+Pre-authored batch bundle: `coordination/sessions/M39-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. All 55 task IDs require separate GitHub task logs; M39 remains subject to later strict full-surface ChatGPT audit.
 
 Canonical decision: `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
 Machine tuning: `data/config/economy_rewards_v1.json`.
@@ -1439,6 +1451,8 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [ ] SB-M39-052 Add full Economy V1 headless regression matrix for grants/spends/rollover/offline clocks/boosters/exchange/idempotency.
 
 ### M40 — Save System
+
+Pre-authored batch bundle: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. All 13 task IDs require separate GitHub task logs; M40 is the batch endpoint and remains subject to later strict full-surface ChatGPT audit.
 
 - [ ] SB-M40-001 Versioned schema. — [ ] SB-M40-002 Settings.
 - [ ] SB-M40-003 Progression. — [ ] SB-M40-004 Win streak.
