@@ -19,7 +19,7 @@ Required direct scenarios:
 
 If any scenario fails, fix minimally and rerun all M35/M36/M37 regression.
 
-SB-M37-006 remains OWNER_REQUIRED.
+SB-M37-006 owner gate is RESOLVED by `coordination/OWNER_M37_LEVEL_SELECT_DECISION_V01.md`: no shipping Level Select in V1; debug/test seam only. Audit must prove no player-facing level-select flow exists.
 
 Handoff:
 `AWAITING_AUDIT / M37-C001 V02 / STRICT_V2_VALIDATION_COMPLETE`
