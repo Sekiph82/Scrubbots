@@ -131,17 +131,48 @@ func import_snapshot(s) -> bool:
 		return false
 	if int(cp) >= CYCLE_MAX:
 		return false
+	# Coherence: total_progress must equal cycles_completed*CYCLE_MAX + cycle_progress.
+	if int(tp) != int(cc) * CYCLE_MAX + int(cp):
+		return false
 	var q = s.get("gift_bar_queue", [])
 	if typeof(q) != TYPE_ARRAY:
 		return false
+	# Canonical queue occurrence shape (M39 V03, F-M39-V02-012). Every entry must
+	# be a dict with id (non-empty unique string) / cycle (nonneg int) / milestone
+	# (in {10,50,250,500,1000}) / claimed (bool). Malformed entries fail closed.
+	var seen_ids := {}
+	var new_queue: Array = []
+	for e in q:
+		if typeof(e) != TYPE_DICTIONARY:
+			return false
+		var eid = e.get("id", null)
+		if typeof(eid) != TYPE_STRING or String(eid).is_empty() or seen_ids.has(eid):
+			return false
+		seen_ids[eid] = true
+		var cyc = IntDomain.nonneg_int(e.get("cycle", null))
+		var mile = IntDomain.exact_int(e.get("milestone", null))
+		var claimed = e.get("claimed", null)
+		if cyc == null or mile == null or typeof(claimed) != TYPE_BOOL:
+			return false
+		if not MILESTONES.has(mile):
+			return false
+		new_queue.append({"id": String(eid), "cycle": cyc, "milestone": mile, "claimed": claimed})
 	var applied = s.get("applied", [])
 	if typeof(applied) != TYPE_ARRAY:
 		return false
+	# Applied tx ids must be non-empty unique strings.
+	var new_applied := {}
+	for tx in applied:
+		if typeof(tx) != TYPE_STRING:
+			return false
+		var tid := String(tx)
+		if tid.is_empty() or new_applied.has(tid):
+			return false
+		new_applied[tid] = true
+	# All-or-nothing apply (nothing above mutated live state).
 	_cycle_progress = int(cp)
 	_total_progress = int(tp)
 	_cycles_completed = int(cc)
-	_gift_bar_queue = q.duplicate(true)
-	_applied_tx = {}
-	for tx in applied:
-		_applied_tx[String(tx)] = true
+	_gift_bar_queue = new_queue
+	_applied_tx = new_applied
 	return true

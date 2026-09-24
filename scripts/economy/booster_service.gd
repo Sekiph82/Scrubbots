@@ -29,8 +29,10 @@ func _init(inventory: BoosterInventory) -> void:
 
 ## Generic multi-stage transaction. `stages` is an Array of dicts, each:
 ##   {"apply": Callable() -> bool, "rollback": Callable() -> void}
-## Applies in order; on the first failure rolls back all previously-applied
-## stages in reverse. Returns true iff every stage applied.
+## Applies in order; on the first failure the FAILING stage itself is rolled
+## back first (M39 V03, F-M39-V02-005 — a stage that partially mutated must
+## unwind its own mutations), then previously-applied stages roll back in
+## reverse. Returns true iff every stage applied.
 func _run_transaction(stages: Array) -> bool:
 	var applied: Array = []
 	for stage in stages:
@@ -39,6 +41,11 @@ func _run_transaction(stages: Array) -> bool:
 		if apply.is_valid():
 			ok = bool(apply.call())
 		if not ok:
+			# Roll back the failing stage first (it may have mutated partially),
+			# then unwind earlier successes in reverse.
+			var rb_self: Callable = stage.get("rollback", Callable())
+			if rb_self.is_valid():
+				rb_self.call()
 			for i in range(applied.size() - 1, -1, -1):
 				var rb: Callable = applied[i].get("rollback", Callable())
 				if rb.is_valid():

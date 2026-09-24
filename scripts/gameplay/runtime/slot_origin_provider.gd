@@ -21,7 +21,11 @@ extends RefCounted
 ## synthetic board-width fallback: a broken layout produces no robot rather than a robot
 ## starting from a position the owner cannot see.
 
-const SLOT_COUNT := 5
+## Baseline/max capacity (M39 V03, F-M39-V02-001). The provider defers to the
+## live strip's active capacity — 5 baseline, 6 after +1 Slot — so slot index 5
+## has a valid production origin whenever the strip has grown. Hard-clamped so
+## a seventh slot can never be routed.
+const MAX_SLOTS := 6
 
 var _presentation = null   # BoardPresentation (global_to_board_local)
 var _strip = null          # FiveSlotStrip (get_slot_anchor_global)
@@ -33,11 +37,13 @@ func _init(presentation, strip, board) -> void:
 	_board = board
 
 func origin_for_slot(slot_index: int) -> Vector2:
-	if slot_index < 0 or slot_index >= SLOT_COUNT:
+	if slot_index < 0 or slot_index >= MAX_SLOTS:
 		return Vector2(INF, INF)
 	if _strip == null or not is_instance_valid(_strip) \
 			or _presentation == null or not is_instance_valid(_presentation):
 		return Vector2(INF, INF)   # missing/dead layout -> fail closed, no robot
+	if slot_index >= _strip.get_slot_count():
+		return Vector2(INF, INF)   # strip not grown to this capacity yet
 	# Exact visible slot top-center -> board-local, queried from the CURRENT layout.
 	var anchor: Vector2 = _strip.get_slot_anchor_global(slot_index)
 	var local: Vector2 = _presentation.global_to_board_local(anchor)

@@ -81,13 +81,23 @@ func import_snapshot(s) -> bool:
 	var applied_raw = s.get("applied", [])
 	if typeof(applied_raw) != TYPE_ARRAY:
 		return false
+	# Canonical applied tx ids (M39 V03, F-M39-V02-012): non-empty strings, no
+	# duplicates. Non-string / empty / duplicate entries fail closed rather than
+	# being silently coerced.
+	var new_applied: Dictionary = {}
+	for tx in applied_raw:
+		if typeof(tx) != TYPE_STRING:
+			return false
+		var id := String(tx)
+		if id.is_empty():
+			return false
+		if new_applied.has(id):
+			return false
+		new_applied[id] = {}
 	var wallet_ok := true
 	if s.has("wallet"):
 		wallet_ok = _wallet.import_snapshot(s["wallet"])
 	if not wallet_ok:
 		return false
-	var new_applied: Dictionary = {}
-	for tx in applied_raw:
-		new_applied[String(tx)] = {}
 	_applied = new_applied
 	return true
