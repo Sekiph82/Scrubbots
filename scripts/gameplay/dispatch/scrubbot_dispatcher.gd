@@ -790,6 +790,37 @@ func reset() -> void:
 	_active.clear()
 	_resetting = false
 
+## Targeted single-assignment cancellation (M39 V04 Tornado, F-M39-V03-001).
+## Cancels ONLY the exact (owner_id, agent) in-flight assignment that has NOT
+## arrived: disconnects its completion callback, cancels + detaches + deferred-
+## frees the agent, and erases its _active entry. It deliberately does NOT touch
+## ReservationState — the M25 claim layer (rollback_claim) owns that pair for
+## preclaimed M26 assignments. Unknown/arrived/mismatched agent -> false, no
+## change. Never advances the generation, never touches other owners.
+func can_cancel_owner(owner_id, agent) -> bool:
+	if _resetting or _in_dispatch or typeof(owner_id) != TYPE_INT:
+		return false
+	if not _active.has(owner_id):
+		return false
+	var entry: Dictionary = _active[owner_id]
+	return not bool(entry["arrived"]) and entry["agent"] == agent \
+		and agent != null and is_instance_valid(agent)
+
+func cancel_owner(owner_id, agent) -> bool:
+	if not can_cancel_owner(owner_id, agent):
+		return false
+	var entry: Dictionary = _active[owner_id]
+	_active.erase(owner_id)
+	if agent.agent_completed.is_connected(entry["cb"]):
+		agent.agent_completed.disconnect(entry["cb"])
+	agent.cancel()
+	if is_instance_valid(agent):
+		var parent = agent.get_parent()
+		if parent != null:
+			parent.remove_child(agent)
+		agent.queue_free()
+	return true
+
 # ------------------------------------------------------------- read-only -----
 
 # ---------------------------------------------- M20 arrival-consumer claim ----

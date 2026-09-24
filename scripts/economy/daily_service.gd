@@ -13,6 +13,7 @@ extends RefCounted
 
 const EconomyWallet = preload("res://scripts/economy/economy_wallet.gd")
 const IntDomain = preload("res://scripts/economy/int_domain.gd")
+const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
 
 const LOGIN_CYCLE_DAYS := 5
 
@@ -20,10 +21,10 @@ var _config
 var _reward
 ## Wall-clock provider: returns absolute unix seconds.
 var _clock: Callable
-## Local calendar-day provider: returns int local-date key (e.g. yyyy*372 + mmm*31
-## + dd). Owner-required LOCAL date semantics — NOT unix_seconds/86400 UTC-day
+## Local calendar-day provider: returns the LocalCalendar civil-day ordinal
+## (consecutive across month/year/leap). Owner-required LOCAL date semantics — NOT unix_seconds/86400 UTC-day
 ## (M39 V03, F-M39-V02-009). Tests inject this to cross local midnight
-## deterministically; production defaults to a local-day derivation of _clock().
+## deterministically; production defaults to LocalCalendar.system_provider().
 var _local_day_provider: Callable
 var _login_rewards: Dictionary = {}  ## day(1..5) -> reward dict
 var _task_sb: Array = []             ## [75,100,125]
@@ -41,7 +42,15 @@ func _init(config, reward, clock: Callable = Callable(), local_day: Callable = C
 	_config = config
 	_reward = reward
 	_clock = clock if clock.is_valid() else Callable(self, "_default_clock")
-	_local_day_provider = local_day if local_day.is_valid() else Callable(self, "_default_local_day")
+	# M39 V04 (F-M39-V03-002): production (no injected clock) uses the OS LOCAL
+	# calendar date; never unix-seconds/86400. An injected test clock without an
+	# injected provider derives its date at UTC offset 0 (deterministic tests).
+	if local_day.is_valid():
+		_local_day_provider = local_day
+	elif clock.is_valid():
+		_local_day_provider = LocalCalendar.offset_provider(_clock, 0)
+	else:
+		_local_day_provider = LocalCalendar.system_provider()
 	var d = config.daily_config()
 	var lr = d.get("login_rewards", {})
 	for k in lr.keys():
@@ -51,14 +60,6 @@ func _init(config, reward, clock: Callable = Callable(), local_day: Callable = C
 
 func _default_clock() -> int:
 	return int(Time.get_unix_time_from_system())
-
-## Default local-day derivation from the injected wall clock (unix-day). Tests
-## are deterministic under `_clock`. Production host injects a local-timezone-
-## aware provider so day boundaries match the player's real local midnight, not
-## UTC noon (audit spec: local-timezone semantics are the runtime injection's
-## job; the service does not read the real system clock behind `_clock`).
-func _default_local_day() -> int:
-	return int(_clock.call() / 86400)
 
 func _today() -> int:
 	# Owner-required LOCAL calendar-day key (F-M39-V02-009). Tests inject this
@@ -70,7 +71,9 @@ func _today() -> int:
 ## when no login claim has run first (F-M39-V02-015).
 func _sync_tasks_to_today() -> void:
 	var today := _today()
-	if _tasks_day != today:
+	# Forward-only (M39 V04): a clock/local-day rollback never rewrites the task
+	# day or wipes progress; task claims refuse while today < _tasks_day.
+	if today > _tasks_day:
 		_tasks_done = {}
 		_tasks_day = today
 		_tasks_claimed_day = -1
@@ -93,7 +96,6 @@ func cycle_day() -> int:
 ##     grant fails and is not already-applied, NOTHING mutates (day/ts/streak/
 ##     tasks all untouched).
 func claim_login() -> Dictionary:
-	_sync_tasks_to_today()
 	var today := _today()
 	var now := int(_clock.call())
 	if today <= _last_claim_day:
@@ -116,10 +118,12 @@ func claim_login() -> Dictionary:
 	_last_claim_day = today
 	_last_claim_ts = now
 	_highest_seen_ts = max(_highest_seen_ts, now)
-	# Fresh day resets task progress.
-	_tasks_done = {}
-	_tasks_day = today
-	_tasks_claimed_day = -1
+	# A fresh day resets task progress — but never wipes tasks already done
+	# earlier TODAY before the login claim.
+	if _tasks_day != today:
+		_tasks_done = {}
+		_tasks_day = today
+		_tasks_claimed_day = -1
 	return {"ok": true, "day": new_cycle_day, "reward": reward}
 
 # --------------------------------------------------------------- tasks ----
@@ -139,6 +143,8 @@ func claim_task(task_index: int) -> Dictionary:
 	_sync_tasks_to_today()
 	if task_index < 0 or task_index >= _task_sb.size():
 		return {"ok": false, "reason": "invalid_task"}
+	if _today() < _tasks_day:
+		return {"ok": false, "reason": "clock_rollback"}
 	if not _tasks_done.has(task_index):
 		return {"ok": false, "reason": "not_done"}
 	var today := _today()
@@ -151,6 +157,8 @@ func claim_task(task_index: int) -> Dictionary:
 ## Claim the all-three-tasks bonus (1 random booster charge) once per day.
 func claim_all_tasks_bonus() -> Dictionary:
 	_sync_tasks_to_today()
+	if _today() < _tasks_day:
+		return {"ok": false, "reason": "clock_rollback"}
 	if _tasks_done.size() < _task_sb.size():
 		return {"ok": false, "reason": "not_all_done"}
 	var today := _today()

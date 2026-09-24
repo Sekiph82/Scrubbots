@@ -65,7 +65,10 @@ func apply_plus_one_slot(capacity_authority) -> Dictionary:
 	if not capacity_authority.activate_plus_one():
 		_inventory.refund(BoosterInventory.PLUS_ONE_SLOT, res)
 		return {"ok": false, "reason": "activate_failed"}
-	return {"ok": true, "paid_with": res.get("paid_with"), "capacity": capacity_authority.active_capacity()}
+	# M39 V04: carry the exact reservation price so a later caller-side rollback
+	# (engine/strip failure) can refund an SB payment exactly.
+	return {"ok": true, "paid_with": res.get("paid_with"), "price": int(res.get("price", 0)),
+		"capacity": capacity_authority.active_capacity()}
 
 # ------------------------------------------------------------ Random ----
 

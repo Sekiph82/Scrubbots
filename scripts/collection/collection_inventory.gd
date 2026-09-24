@@ -105,6 +105,24 @@ func add_card(card_id: String) -> Dictionary:
 	_process_master_completion(result)
 	return result
 
+## Canonical Collection claim (M39 V04, F-M39-V03-005): (re)process every
+## complete-but-unclaimed set reward and the master reward. Normally add_card
+## already granted them; this recovers a grant that could not apply at the time.
+## Idempotent via the stable tx ids. ok only when something newly committed.
+func claim_pending_rewards() -> Dictionary:
+	var claimed: Array = []
+	var result := {"set_completed": false, "master_completed": false}
+	for set_no in range(1, SETS + 1):
+		result["set_completed"] = false
+		_process_set_completion(set_no, result)
+		if result["set_completed"]:
+			claimed.append(set_no)
+	result["master_completed"] = false
+	_process_master_completion(result)
+	var any: bool = not claimed.is_empty() or bool(result["master_completed"])
+	return {"ok": any, "sets": claimed, "master": result["master_completed"],
+		"reason": "" if any else "nothing_to_claim"}
+
 func _process_set_completion(set_no: int, result: Dictionary) -> void:
 	if _set_reward_claimed.has(set_no):
 		return

@@ -121,6 +121,20 @@ func grow_to_sixth() -> bool:
 func can_grow_to_sixth() -> bool:
 	return not _busy and _slots.size() == SLOT_COUNT
 
+## Exact rollback of grow_to_sixth (M39 V04, F-M39-V03-003). Only legal for an
+## UNCOMMITTED sixth-slot transition: capacity is six, the sixth slot is still
+## EMPTY, and no live work is keyed to it. Anything else fails closed unchanged.
+func rollback_grow_to_sixth() -> bool:
+	if _busy or _slots.size() != MAX_CAPACITY:
+		return false
+	if not _slots[MAX_CAPACITY - 1].is_empty():
+		return false
+	for wid in _live_work:
+		if int(_live_work[wid]["slot"]) == MAX_CAPACITY - 1:
+			return false
+	_slots.resize(SLOT_COUNT)
+	return true
+
 func is_paused() -> bool:
 	return _paused
 
@@ -323,6 +337,33 @@ func restore_idle_slot(index, batch: Dictionary) -> bool:
 	if placed == null:
 		return false
 	_slots[index] = placed
+	return true
+
+## Tornado selected-color purge seam (M39 V04, F-M39-V03-001). Unlike
+## free_slot_if_idle this accepts partial progress and WAITING, because Tornado
+## removes the whole color: it requires only that NO committed work remains
+## (the caller has already rolled its claims back). The detached SlotBatchState
+## object is returned untouched so restore_purged_slot can reinstate it exactly.
+func purge_uncommitted_slot(index) -> Dictionary:
+	if _busy or not _valid_index(index):
+		return {"ok": false}
+	var s = _slots[index]
+	if s.is_empty() or s.get_committed() != 0:
+		return {"ok": false}
+	for wid in _live_work:
+		if int(_live_work[wid]["slot"]) == index:
+			return {"ok": false}
+	_slots[index] = SlotBatchState.make_empty()
+	return {"ok": true, "slot_state": s}
+
+## Rollback companion of purge_uncommitted_slot: reinstate the exact detached
+## slot object into the still-EMPTY index.
+func restore_purged_slot(index, slot_state) -> bool:
+	if _busy or not _valid_index(index) or slot_state == null:
+		return false
+	if not _slots[index].is_empty():
+		return false
+	_slots[index] = slot_state
 	return true
 
 func _free_slot(idx: int) -> void:

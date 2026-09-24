@@ -27,6 +27,8 @@ const HapticsSettingsService = preload("res://scripts/haptics/haptics_settings_s
 const LevelProgressionService = preload("res://scripts/progression/level_progression_service.gd")
 const EconomyServices = preload("res://scripts/economy/economy_services.gd")
 const SaveService = preload("res://scripts/save/save_service.gd")
+const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
+const EconomyConfig = preload("res://scripts/economy/economy_config.gd")
 
 const CANONICAL_SAVE_PATH := "user://scrubbots_save.dat"
 
@@ -38,11 +40,14 @@ var save: SaveService
 var load_result: Dictionary = {}
 var is_blocked: bool = false
 
-func _init(save_path: String = CANONICAL_SAVE_PATH) -> void:
+## clock/local_day are test seams. Production passes neither: the shipping graph
+## injects the real OS local-calendar provider explicitly (F-M39-V03-002).
+func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable(), local_day: Callable = Callable()) -> void:
 	audio = AudioSettingsService.new()
 	haptics = HapticsSettingsService.new()
 	progression = LevelProgressionService.new()
-	economy = EconomyServices.new()
+	var day_provider: Callable = local_day if local_day.is_valid() else LocalCalendar.system_provider()
+	economy = EconomyServices.new(EconomyConfig.DEFAULT_PATH, clock, null, day_provider)
 	save = SaveService.new(save_path, audio, haptics, progression, economy)
 	load_result = save.load()
 	is_blocked = not bool(load_result.get("ok", false)) and String(load_result.get("source", "")) == "future_schema"

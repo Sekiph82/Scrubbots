@@ -78,6 +78,10 @@ func get_slot_views() -> Array:
 func get_slot_count() -> int:
 	return _views.size()
 
+## Active presentation capacity (5 or 6) as last set by set_capacity.
+func get_capacity() -> int:
+	return _capacity
+
 ## Presentation-only GLOBAL top-center anchor of slot `i`, or Vector2.ZERO when out of
 ## range. The M29 origin provider maps this through BoardPresentation.global_to_board_local
 ## to build a real laid-out slot->route origin. Geometry only; no gameplay authority.

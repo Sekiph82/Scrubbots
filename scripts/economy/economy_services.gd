@@ -43,7 +43,9 @@ var collection: CollectionInventory
 var packs: CardPackService
 var exchange: CardsExchangeService
 
-func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = Callable(), pack_rng: RandomNumberGenerator = null) -> void:
+## local_day: Daily local-calendar ordinal provider (M39 V04, F-M39-V03-002).
+## Omitted in production -> DailyService uses LocalCalendar.system_provider().
+func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = Callable(), pack_rng: RandomNumberGenerator = null, local_day: Callable = Callable()) -> void:
 	config = EconomyConfig.new(config_path)
 	wallet = EconomyWallet.new(config.starting_scrub_bucks())
 	reward = RewardGrantService.new(wallet)
@@ -54,7 +56,7 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	speed = SpeedEntitlementService.new(wallet, config, clock)
 	boosters = BoosterInventory.new(wallet, config)
 	capacity = SlotCapacityAuthority.new()
-	daily = DailyService.new(config, reward, clock)
+	daily = DailyService.new(config, reward, clock, local_day)
 	collection = CollectionInventory.new(config, reward)
 	packs = CardPackService.new(collection, pack_rng)
 	exchange = CardsExchangeService.new(collection, reward, config)

@@ -92,6 +92,20 @@ func load_candidate(cols, seed, palette_size) -> bool:
 func load_columns(cols) -> bool:
 	return load_candidate(cols, _seed, _palette_size)
 
+## Live-queue replacement for in-attempt boosters (M39 V04). Unlike load_columns
+## it does NOT touch the Retry/reset baseline (_initial/_initial_seed/palette), so
+## a Random/Selector/Tornado edit — or its rollback — never rewrites what Retry
+## restores. Refused while any selection transaction is open. Fail-closed, no
+## partial mutation.
+func replace_live_columns(cols) -> bool:
+	if not _open_tokens.is_empty():
+		return false
+	var built = _build_columns(cols, _palette_size)
+	if built == null:
+		return false
+	_columns = built
+	return true
+
 ## Build engine-owned validated column copies from `cols`, or null on any violation.
 ## Revalidates each batch's observable value (non-empty unique id, color_id >= 0,
 ## robot_count > 0, and color_id < palette_size when palette_size >= 0). No engine
