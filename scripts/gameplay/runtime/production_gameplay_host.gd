@@ -53,6 +53,10 @@ const GameplayAudioController = preload("res://scripts/audio/gameplay_audio_cont
 const AudioSettingsService = preload("res://scripts/audio/audio_settings_service.gd")
 const HapticsController = preload("res://scripts/haptics/haptics_controller.gd")
 const HapticsSettingsService = preload("res://scripts/haptics/haptics_settings_service.gd")
+const EconomyServices = preload("res://scripts/economy/economy_services.gd")
+const LevelProgressionService = preload("res://scripts/progression/level_progression_service.gd")
+const BoosterService = preload("res://scripts/economy/booster_service.gd")
+const ProductionBoosterAdapter = preload("res://scripts/economy/production_booster_adapter.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -62,6 +66,9 @@ const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 @export var preview_depth: int = 3
 @export var base_cadence: float = GameplaySpeedAuthority.DEFAULT_BASE_INTERVAL
 @export var auto_build: bool = true
+## Campaign progression level number this host instance represents (M39 V02).
+## Drives first-clear class/reward and the current-level 2x entitlement gate.
+@export var progression_level: int = 1
 ## QA/debug-only DEADLOCK fixture seam (M30 manual LOST demo + tests). When > 0, the last N
 ## batches of the deterministic generated candidate are dropped so total supply robots <
 ## ACTIVE cells: the board can never fully clear, and once supply is exhausted at quiescence
@@ -96,6 +103,13 @@ var _audio
 var _audio_settings
 var _haptics
 var _haptics_settings
+## M39 V02 Economy V1 runtime composition (fail-safe: economy never blocks
+## gameplay). Present when the config loads; null otherwise.
+var _economy
+var _progression
+var _booster_service
+var _booster_adapter
+var _economy_terminal_done := false
 var _built := false
 var _build_error := ""
 
@@ -250,6 +264,20 @@ func build() -> bool:
 	add_child(_haptics)
 	_bind_haptics_signals()
 
+	# M39 V02 Economy V1 runtime composition. Fail-safe: economy is meta state and
+	# never affects gameplay/terminal/solver truth. If the config cannot load,
+	# _economy stays null and gameplay proceeds normally. The canonical service
+	# graph is driven by authoritative production events (see _on_terminal_reached
+	# and the manual-2x gate) — never by UI directly.
+	_economy = EconomyServices.new()
+	if _economy != null and not _economy.config.is_ok():
+		_economy = null
+	if _economy != null:
+		_progression = LevelProgressionService.new()
+		_booster_adapter = ProductionBoosterAdapter.new(_level, _board, _supply, _slots, _scheduler)
+		_booster_service = BoosterService.new(_economy.boosters)
+	_economy_terminal_done = false
+
 	# Meaningful gameplay boundaries mark the completion state dirty (authenticated clear +
 	# accepted supply-front placement). on_tick (below) then gets one chance to run the M27
 	# proof at quiescence; idle ticks with no event never re-run it.
@@ -354,6 +382,13 @@ func _on_retry_restored() -> void:
 	# the persisted enabled setting is unchanged.
 	if _haptics != null and is_instance_valid(_haptics):
 		_haptics.reset_for_new_attempt()
+	# M39 V02: a fresh attempt re-arms the terminal economy hook and the once-per-
+	# attempt +1 Slot gate (the engine reset already restored the baseline five),
+	# and a restart after real gameplay resets the Win Streak (owner §3).
+	if _economy != null:
+		_economy_terminal_done = false
+		_economy.capacity.begin_new_attempt()
+		_economy.streak.on_restart()
 
 ## Connect the live haptics controller to the authoritative committed seams exactly
 ## once. Idempotent: a rebuild/rebind that re-runs this never stacks duplicate
@@ -396,6 +431,28 @@ func _on_terminal_reached(_status, _detail) -> void:
 		_input.set_terminal_stopped(true)
 	if _scheduler != null:
 		_scheduler.pause()
+	_drive_economy_terminal(_status)
+
+## M39 V02 (F-M39-010): the authoritative M30 terminal drives Economy V1 exactly
+## once per attempt. WON => first-clear reward + Win Streak + progression advance
+## + current-level 2x entitlement clear. LOST => Heart consume + streak reset +
+## entitlement survives the failed attempt. Economy never affects gameplay truth;
+## a null economy (config missing) is a silent no-op.
+func _drive_economy_terminal(status) -> void:
+	if _economy == null or _economy_terminal_done:
+		return
+	if status == CompletionEvaluator.WON:
+		_economy_terminal_done = true
+		var cls: String = _progression.class_for(progression_level)
+		_economy.first_clear.grant_first_clear(progression_level, cls)
+		_economy.streak.process_first_clear_win(progression_level)
+		_progression.record_win(progression_level)
+		_economy.speed.on_level_completed(progression_level, true)
+	elif status == CompletionEvaluator.LOST:
+		_economy_terminal_done = true
+		_economy.hearts.consume()
+		_economy.streak.on_progression_loss()
+		_economy.speed.on_level_completed(progression_level, false)
 
 func _wire_controls() -> void:
 	var pause_btn = _screen.get_pause_button()
@@ -416,9 +473,36 @@ func _on_pause_pressed() -> void:
 ## M39 must route this production-facing request through SpeedEntitlementService
 ## (level/timed SB entitlement) before enabling 2x. Keep this direct toggle only as
 ## pre-M39 playable/audit behavior; authoritative M23-exhausted auto-2x remains free.
+## Manual 2x request path. M39 V02 (F-M39-004): turning 2x ON is gated by
+## SpeedEntitlementService — no valid current-level/timed entitlement => the
+## manual request is refused (no toggle). Turning 2x OFF is always allowed. The
+## free M23-exhausted automatic 2x uses the speed authority directly (set_2x),
+## never this button, so it stays free and entitlement-independent.
 func _on_speed_pressed() -> void:
+	var currently_2x: bool = _speed != null and _speed.is_2x()
+	if not currently_2x and _economy != null:
+		if not _economy.speed.is_manual_2x_entitled(progression_level):
+			return  # refused: no entitlement
 	var two: bool = _runtime.toggle_speed()
 	_screen.set_speed_2x(two)
+
+## +1 Slot booster: economy gate (charge-first-then-SB, once per attempt) AND the
+## live engine grow to a temporary sixth slot. Atomic: if either side refuses,
+## neither is applied. Returns true on a committed 6-slot upgrade.
+func activate_plus_one_slot() -> bool:
+	if _economy == null or _slots == null:
+		return false
+	if not _slots.can_grow_to_sixth():
+		return false
+	var res = _booster_service.apply_plus_one_slot(_economy.capacity)
+	if not res.get("ok", false):
+		return false
+	if not _slots.grow_to_sixth():
+		# Economy committed but the engine refused: refund the reservation is not
+		# exposed here, so re-sync the authority instead (should not happen — we
+		# checked can_grow_to_sixth above under the same synchronous frame).
+		return false
+	return true
 
 # ---------------------------------------------------------------- accessors ----
 
@@ -500,6 +584,18 @@ func get_haptics_controller():
 
 func get_haptics_settings():
 	return _haptics_settings
+
+func get_economy():
+	return _economy
+
+func get_progression():
+	return _progression
+
+func get_booster_service():
+	return _booster_service
+
+func get_booster_adapter():
+	return _booster_adapter
 
 # ------------------------------------------------------------ M32 agent factory ----
 

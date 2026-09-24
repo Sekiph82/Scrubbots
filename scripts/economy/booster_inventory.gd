@@ -9,6 +9,7 @@ extends RefCounted
 ## rejected. Activation is atomic: a failed SB debit consumes nothing.
 
 const EconomyWallet = preload("res://scripts/economy/economy_wallet.gd")
+const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
 const PLUS_ONE_SLOT := "plus_one_slot"
 const RANDOM := "random"
@@ -92,17 +93,13 @@ func import_snapshot(s) -> bool:
 		return false
 	var new_charges: Dictionary = {}
 	for b in BOOSTERS:
-		var v = s.get(b, 0)
-		if typeof(v) != TYPE_INT and typeof(v) != TYPE_FLOAT:
+		var v = IntDomain.nonneg_int(s.get(b, 0))
+		if v == null:
 			return false
-		if int(v) < 0:
-			return false
-		new_charges[b] = int(v)
-	var ps = s.get("_pending_selected", 0)
-	if typeof(ps) != TYPE_INT and typeof(ps) != TYPE_FLOAT:
-		return false
-	if int(ps) < 0:
+		new_charges[b] = v
+	var ps = IntDomain.nonneg_int(s.get("_pending_selected", 0))
+	if ps == null:
 		return false
 	_charges = new_charges
-	_pending_selected = int(ps)
+	_pending_selected = ps
 	return true

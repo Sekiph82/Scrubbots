@@ -7,6 +7,8 @@ extends RefCounted
 ## Balances are non-negative integers. Only RewardGrantService (and, in M39, the
 ## explicit spend services) mutate it — UI never mutates the wallet directly.
 
+const IntDomain = preload("res://scripts/economy/int_domain.gd")
+
 const SCRUB_BUCKS := "scrub_bucks"
 const BOT_PARTS := "bot_parts"
 
@@ -50,15 +52,10 @@ func snapshot() -> Dictionary:
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
-	var sb = s.get("scrub_bucks", null)
-	var bp = s.get("bot_parts", null)
-	if not _is_non_negative_int(sb) or not _is_non_negative_int(bp):
+	var sb = IntDomain.nonneg_int(s.get("scrub_bucks", null))
+	var bp = IntDomain.nonneg_int(s.get("bot_parts", null))
+	if sb == null or bp == null:
 		return false
-	_balances[SCRUB_BUCKS] = int(sb)
-	_balances[BOT_PARTS] = int(bp)
+	_balances[SCRUB_BUCKS] = sb
+	_balances[BOT_PARTS] = bp
 	return true
-
-func _is_non_negative_int(v) -> bool:
-	if typeof(v) != TYPE_INT and typeof(v) != TYPE_FLOAT:
-		return false
-	return int(v) >= 0

@@ -13,6 +13,7 @@ extends RefCounted
 ## duplicate rewards.
 
 const EconomyWallet = preload("res://scripts/economy/economy_wallet.gd")
+const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
 const SETS := 15
 const CARDS_PER_SET := 9
@@ -141,6 +142,14 @@ func _set_reward_for(set_no: int) -> Dictionary:
 			}
 	return {}
 
+## Add `count` copies back (used by CardsExchangeService rollback). Does not
+## re-trigger set/master reward processing (those are already claimed if the set
+## was complete; a rollback of an exchange never crosses a new completion).
+func add_copies(card_id: String, count: int) -> void:
+	if not _catalog.has(card_id) or count <= 0:
+		return
+	_owned[card_id] = owned(card_id) + count
+
 ## Remove `count` copies of a card (used by CardsExchangeService). Never drops
 ## below `protected_min` (default 1). Returns true on success. Atomic.
 func remove_copies(card_id: String, count: int, protected_min: int = 1) -> bool:
@@ -177,17 +186,32 @@ func import_snapshot(s) -> bool:
 	var owned_raw = s.get("owned", {})
 	if typeof(owned_raw) != TYPE_DICTIONARY:
 		return false
+	# Canonical validation (F-M39-009): reject unknown card ids and fractional/
+	# negative counts. Nothing is stored unless the whole snapshot is canonical.
 	var new_owned: Dictionary = {}
 	for cid in owned_raw.keys():
-		var v = owned_raw[cid]
-		if typeof(v) != TYPE_INT and typeof(v) != TYPE_FLOAT:
+		var key := String(cid)
+		if not _catalog.has(key):
+			return false   # unknown card id => noncanonical, fail closed
+		var v = IntDomain.nonneg_int(owned_raw[cid])
+		if v == null:
 			return false
-		if int(v) < 0:
+		new_owned[key] = v
+	# Set-reward-claimed ids must be exact ints in 1..SETS.
+	var claimed_raw = s.get("set_reward_claimed", [])
+	if typeof(claimed_raw) != TYPE_ARRAY:
+		return false
+	var new_claimed: Dictionary = {}
+	for s_no in claimed_raw:
+		var si = IntDomain.exact_int(s_no)
+		if si == null or si < 1 or si > SETS:
 			return false
-		new_owned[String(cid)] = int(v)
+		new_claimed[si] = true
+	var master = s.get("master_claimed", false)
+	if typeof(master) != TYPE_BOOL:
+		return false
+	# All-or-nothing apply.
 	_owned = new_owned
-	_set_reward_claimed = {}
-	for s_no in s.get("set_reward_claimed", []):
-		_set_reward_claimed[int(s_no)] = true
-	_master_claimed = bool(s.get("master_claimed", false))
+	_set_reward_claimed = new_claimed
+	_master_claimed = master
 	return true
