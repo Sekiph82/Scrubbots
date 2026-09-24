@@ -1362,7 +1362,7 @@ Pre-authored batch bundle: `coordination/sessions/M36-C001/CHATGPT_PROMPT_V01.md
 
 ### M37 — Level Progression
 
-Pre-authored batch bundle: `coordination/sessions/M37-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Unapproved shipping Level Select remains owner-gated.
+V02 remediation authority: `coordination/sessions/M37-C001/CHATGPT_PROMPT_V02.md` + `CHATGPT_AUDIT_CRITERIA_V02.md`. Owner decision is locked in `coordination/OWNER_M37_LEVEL_SELECT_DECISION_V01.md`: no shipping Level Select in V1; forward-only progression, debug/test seam only. Per-task V02 logs required under `task_logs_v02/`.
 
 - [ ] SB-M37-001 Implement owner-locked repeating 10-level class cadence.
 - [ ] SB-M37-002 Current level.
