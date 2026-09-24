@@ -44,7 +44,23 @@ The V02 adversarial suite is load-bearing in the wrong direction: it codifies th
 - SB-M37-007 service implementation: **DEFECT** through record_win boundary.
 - SB-M37-008 tests: **DEFECT** because V02 expects wrong future-level law.
 
-Frozen finding set: F-M37-V02-001 only.
+### F-M37-V02-002 — imported completed-set truth is not coherent with a forward-only frontier
+`import_snapshot()` validates element types and duplicates, but does not enforce campaign coherence.
+
+Examples currently accepted:
+- current_level=2 with completed=[99];
+- current_level=10 with completed=[1,3,9];
+- current_level=1 with non-empty completed set.
+
+Under the owner-locked no-Level-Select forward-only model, canonical shipping progression produced by normal play is contiguous:
+- current_level N;
+- completed first-clears are exactly levels 1..N-1.
+
+A malformed/gapped/future completed set must fail closed on import.
+
+The non-shipping debug frontier seam may still create synthetic states in debug/tests, but those synthetic states must not redefine the canonical persisted shipping contract.
+
+Frozen finding set: **F-M37-V02-001..002**.
 
 Verdict string:
-`CHANGES_REQUIRED / M37-C001 V02 / F-M37-V02-001`
+`CHANGES_REQUIRED / M37-C001 V02 / F-M37-V02-001..002`
