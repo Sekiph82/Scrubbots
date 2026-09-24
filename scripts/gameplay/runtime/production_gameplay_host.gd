@@ -62,6 +62,7 @@ const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
 const ProductionBoosterAdapter = preload("res://scripts/economy/production_booster_adapter.gd")
 const SaveService = preload("res://scripts/save/save_service.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
+const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -129,6 +130,8 @@ var _economy_terminal_done := false
 ## Last WON first-clear transaction result (diagnostic; M39 V04).
 var last_first_clear_result: Dictionary = {}
 var _actions = null   # ProductionActionFacade (M39 V04)
+## Catalog entry id the AppState path resolved for this attempt (M40 V04).
+var launch_entry_id: String = ""
 ## Test-only fault seam forwarded to FirstClearTransaction.commit.
 var _first_clear_fault: Callable = Callable()
 
@@ -168,8 +171,19 @@ func build() -> bool:
 	# LevelProgressionService frontier when AppState is present. This closes the
 	# hazard where a loaded frontier can disagree with the host's separate
 	# `progression_level` export.
-	if app_state != null and app_state.progression != null:
-		progression_level = app_state.progression.current_level()
+	# M40 V04 (F-M40-V03-002): in the AppState (shipping) path the frontier is
+	# resolved through the canonical LevelCatalog; the exported level_path /
+	# progression_level are ignored. No catalog entry => explicit CONTENT_MISSING
+	# (never run level-1 content labelled as level N). The exports remain only
+	# for the no-AppState debug/test harness path.
+	if app_state != null:
+		var launch := GameplayLaunchResolver.resolve(app_state)
+		if not launch.get("ok", false):
+			_build_error = String(launch.get("reason", GameplayLaunchResolver.CONTENT_MISSING))
+			return false
+		level_path = launch["level_path"]
+		progression_level = int(launch["level"])
+		launch_entry_id = String(launch["entry_id"])
 	var res_load = LevelLoader.load_from_path(level_path)
 	if not res_load.is_ok():
 		_build_error = "level load failed"
@@ -456,9 +470,14 @@ func _on_retry_restored() -> void:
 	if _economy != null:
 		_economy_terminal_done = false
 		_economy.capacity.begin_new_attempt()
-		if _economy.streak.gameplay_started():
+		var restart_mutated: bool = _economy.streak.gameplay_started()
+		if restart_mutated:
 			_economy.hearts.consume()
 		_economy.streak.on_restart()
+		# M40 V04: a post-action Retry consumed a Heart + reset the streak —
+		# a durable mutation, so it hits the save boundary.
+		if restart_mutated:
+			_flush_durable_save()
 	# M39 V03 (F-M39-V02-001): the M24 engine reset restored the baseline five;
 	# also shrink the presentation strip back so a fresh attempt shows exactly
 	# five slots and slot index 5 has no origin until +1 Slot is used again.
@@ -546,8 +565,7 @@ func _drive_economy_terminal(status) -> void:
 		_economy.streak.on_progression_loss()
 		_economy.speed.on_level_completed(progression_level, false)
 	# M40 V02 (F-M40-006): terminal is a defined safe save boundary (not per-frame).
-	if _save != null:
-		_save.save()
+	_flush_durable_save()
 
 func _wire_controls() -> void:
 	var pause_btn = _screen.get_pause_button()
@@ -573,10 +591,13 @@ func _on_pause_pressed() -> void:
 ## unlock, exchange, settings) and by external callers via request_save(). Not
 ## per-frame. Fail-safe when no SaveService is bound.
 func _flush_durable_save() -> void:
-	if _save != null:
-		_save.save()
+	request_save()
 
+## M40 V04 (F-M40-V03-003): with an AppState the canonical app save boundary
+## (blocked-safe, clears dirty) is used; otherwise the legacy host SaveService.
 func request_save() -> Dictionary:
+	if app_state != null:
+		return app_state.request_save()
 	if _save == null:
 		return {"ok": true, "source": "no_save_bound"}
 	return _save.save()

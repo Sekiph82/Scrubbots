@@ -29,6 +29,7 @@ const EconomyServices = preload("res://scripts/economy/economy_services.gd")
 const SaveService = preload("res://scripts/save/save_service.gd")
 const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
 const EconomyConfig = preload("res://scripts/economy/economy_config.gd")
+const ProductionActionFacade = preload("res://scripts/economy/production_action_facade.gd")
 
 const CANONICAL_SAVE_PATH := "user://scrubbots_save.dat"
 
@@ -39,6 +40,10 @@ var economy: EconomyServices
 var save: SaveService
 var load_result: Dictionary = {}
 var is_blocked: bool = false
+## App-wide economy action facade (menus/Home; no gameplay host). Committed
+## actions save through request_save (M40 V04, F-M40-V03-003).
+var actions: ProductionActionFacade
+var _dirty: bool = false
 
 ## clock/local_day are test seams. Production passes neither: the shipping graph
 ## injects the real OS local-calendar provider explicitly (F-M39-V03-002).
@@ -51,16 +56,51 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	save = SaveService.new(save_path, audio, haptics, progression, economy)
 	load_result = save.load()
 	is_blocked = not bool(load_result.get("ok", false)) and String(load_result.get("source", "")) == "future_schema"
+	actions = ProductionActionFacade.new(economy, null, Callable(self, "request_save"))
 
 ## True when the app must not proceed to gameplay against fresh defaults
 ## (F-M40-V02-002/-008: future/unsupported schema case).
 func blocked_reason() -> String:
 	return String(load_result.get("source", ""))
 
-## Marks durable meta state dirty for later coalesced save. Non-per-frame save
-## coordinator (F-M40-V02-008): callers request a save at defined lifecycle
-## boundaries (purchase, claim, unlock, terminal, background/quit). This
-## minimal implementation flushes immediately — a coalescing timer belongs to
-## M41 UI/app layer and does not change the observable behavior.
+## Canonical durable save (M40 V04). Called by the action facade after every
+## committed durable action, by the gameplay host at its save boundaries and by
+## flush(). Never writes while blocked (future-schema save is preserved).
 func request_save() -> Dictionary:
-	return save.save()
+	if is_blocked:
+		return {"ok": false, "reason": "app_blocked"}
+	var r: Dictionary = save.save()
+	if r.get("ok", false):
+		_dirty = false
+	return r
+
+## Mark in-memory durable state as pending (no write). Flushed at the next
+## lifecycle boundary. Not per-frame.
+func mark_dirty() -> void:
+	_dirty = true
+
+func is_dirty() -> bool:
+	return _dirty
+
+## Lifecycle flush (background/pause, focus loss, close/quit). Writes the
+## canonical save once; lifecycle events are rare, so this also captures any
+## state a caller forgot to mark dirty. Refused while blocked.
+func flush() -> Dictionary:
+	return request_save()
+
+# ----------------------------------------------------- settings actions ----
+# Settings mutate only through these app actions, which persist canonically.
+
+func set_haptics_enabled(enabled: bool) -> Dictionary:
+	if is_blocked:
+		return {"ok": false, "reason": "app_blocked"}
+	haptics.set_enabled(enabled)
+	return request_save()
+
+func set_volumes(master: float, music: float, sfx: float) -> Dictionary:
+	if is_blocked:
+		return {"ok": false, "reason": "app_blocked"}
+	audio.set_master_volume(master)
+	audio.set_music_volume(music)
+	audio.set_sfx_volume(sfx)
+	return request_save()
