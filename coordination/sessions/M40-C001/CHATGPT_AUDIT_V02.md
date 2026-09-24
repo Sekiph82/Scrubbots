@@ -111,7 +111,29 @@ That item is therefore corrected as an **AUDIT SPECIFICATION DEFECT**, not a Cla
 - separate `progression_level` means a technically successful load can still feed stale gameplay identity to economy.
 - separate audio/haptics config files conflict with the “one canonical save authority” requirement and directly intersects the owner-authorized M41 settings work.
 
-Frozen finding set: **F-M40-V02-001..007**.
+### F-M40-V02-008 — canonical save boundaries do not cover non-terminal durable mutations
+The current runtime saves canonical state from terminal WON/LOST only.
+
+No repository production lifecycle currently guarantees a canonical save after:
+- Daily/Gift/Collection/exchange claims;
+- robot unlocks;
+- booster/economy purchases;
+- timed/current-level 2x purchases;
+- settings mutations;
+- app background/quit.
+
+This means a legitimate durable mutation can be lost if the process stops before a gameplay terminal event.
+
+M40 must define an event/dirty save coordinator or explicit authoritative save seam for durable meta-state mutations plus app lifecycle flushes. Per-frame saving is not required or desired.
+
+### F-M40-V02-009 — nested M39 canonical state validation must be re-run as part of full-save validation
+The completed M39 sibling sweep found that several nested import contracts still accept noncanonical state, including RewardGrant transaction collections, Gift Meter queue/applied structure, unknown booster keys and noncanonical Heart/2x domains.
+
+Because SaveService delegates semantic validation to those imports, `validate_candidate()` cannot currently certify the whole save as canonical.
+
+This is an upstream-owned dependency, but M40 V03 must include end-to-end malformed full-save fixtures after M39 V03 lands.
+
+Frozen finding set: **F-M40-V02-001..009**.
 
 Verdict string:
-`CHANGES_REQUIRED / M40-C001 V02 / F-M40-V02-001..007`
+`CHANGES_REQUIRED / M40-C001 V02 / F-M40-V02-001..009`
