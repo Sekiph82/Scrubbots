@@ -157,9 +157,69 @@ The findings interact:
 - quiescence-only Tornado avoids the very active-work transaction the owner specifically required;
 - missing gameplay-start wiring means Retry economics are wrong even if terminal WON/LOST economics are correct.
 
-Frozen finding set: **F-M39-V02-001..010**.
+### F-M39-V02-011 — EconomyConfig is not actually fail-closed on malformed/out-of-range owner tuning
+`EconomyConfig._load()` validates only schema_version by `int()`, required section presence, and removed_systems array shape.
+
+It does not validate the owner-locked values/types/ranges inside currency, first-clear, streak, Gift Meter, Hearts, 2x, boosters, Daily, Collection or exchange tables. Fractional/string/negative values can be silently coerced later by typed accessors.
+
+Even `schema_version: 2.9` can satisfy `int(schema_version) == 2`.
+
+This violates SB-M39-001.
+
+### F-M39-V02-012 — canonical economy snapshot import remains permissive in Reward/Gift/Booster state
+Sibling sweep found:
+- `RewardGrantService.import_snapshot()` string-coerces arbitrary applied transaction entries and does not reject duplicate/non-string/empty IDs;
+- `GiftMeterService.import_snapshot()` accepts arbitrary queue element shapes, arbitrary applied IDs and inconsistent total/cycle/queue truth. A malformed queue element can later reach `occ.get(...)` in claim/read paths;
+- `BoosterInventory.import_snapshot()` reads the four known keys but silently ignores an injected fifth/unknown booster key.
+
+These violate exact canonical save/import requirements and the "exactly four boosters" law.
+
+### F-M39-V02-013 — removed currencies can still be created through EconomyWallet runtime API
+`EconomyWallet.credit/debit/get_balance` accept arbitrary resource strings.
+A production caller can therefore create runtime balances such as `"stars"` even though snapshots omit them.
+
+SB-M39-051 requires Stars/Event Points/profile-XP economic state to not exist in production runtime/save APIs. Wallet mutation must reject unknown resource IDs.
+
+### F-M39-V02-014 — first-clear economy is applied before progression authority accepts the win
+On WON, `ProductionGameplayHost._drive_economy_terminal()` currently performs:
+1. first-clear grant;
+2. streak grant;
+3. `progression.record_win()`.
+
+The return value from progression is ignored.
+
+After M37 V03 correctly rejects stale/future non-frontier wins, this ordering could still grant economy before the canonical progression authority rejects the completion.
+
+A first-clear progression transaction must gate economic rewards on the authoritative current-frontier transition, with no reward/progression partial success.
+
+### F-M39-V02-015 — Daily task state is not bound to a local day and login claim is not atomic with reward grant
+`_tasks_done` is reset only when `claim_login()` runs. Crossing into a new day without first claiming login can leave yesterday's completed tasks claimable under today's transaction IDs.
+
+Also `claim_login()` mutates streak/day state before calling `RewardGrantService.grant()` and ignores the grant result. A reward failure can advance Daily state without delivering the reward.
+
+This compounds F-M39-V02-009 and affects SB-M39-041..044.
+
+### F-M39-V02-016 — Heart/2x imported sentinel/timestamp domains are not fully canonical
+`HeartService.import_snapshot()` accepts a negative regen anchor.
+`SpeedEntitlementService.import_snapshot()` accepts arbitrary negative `entitled_level` values rather than only the sentinel -1 or a valid positive level.
+
+These are noncanonical persisted states and must fail closed.
+
+## Audit-spec correction discovered during the sweep
+The earlier M40 criterion that said "reject invalid robot IDs" is too broad for the current owner law because the exact post-Scrubby robot roster is explicitly a later owner tuning decision. Claude cannot validate against a roster that does not yet exist.
+
+For M39/M40 V03:
+- empty/malformed robot IDs must fail;
+- Scrubby must remain canonical initial unlocked robot;
+- duplicate/invalid-shape entries must fail;
+- a closed-world unknown-ID roster check is **NOT required until an owner-approved robot ID catalog exists**.
+
+This is an auditor specification correction, not a Claude defect.
+
+## Final frozen finding set
+**F-M39-V02-001..016**
 
 SB-M39-033 remains a later DEVICE/OWNER gate only *after* the sixth-slot production presentation/origin code exists.
 
 Verdict string:
-`CHANGES_REQUIRED / M39-C001 V02 / F-M39-V02-001..010`
+`CHANGES_REQUIRED / M39-C001 V02 / F-M39-V02-001..016`
