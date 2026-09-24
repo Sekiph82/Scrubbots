@@ -57,6 +57,7 @@ const EconomyServices = preload("res://scripts/economy/economy_services.gd")
 const LevelProgressionService = preload("res://scripts/progression/level_progression_service.gd")
 const BoosterService = preload("res://scripts/economy/booster_service.gd")
 const ProductionBoosterAdapter = preload("res://scripts/economy/production_booster_adapter.gd")
+const SaveService = preload("res://scripts/save/save_service.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -69,6 +70,11 @@ const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 ## Campaign progression level number this host instance represents (M39 V02).
 ## Drives first-clear class/reward and the current-level 2x entitlement gate.
 @export var progression_level: int = 1
+## M40 V02 canonical save path. Empty (default) => no disk save lifecycle (tests
+## and the regression suite are unaffected). A real app/bootstrap sets this to a
+## user:// path; the host then loads it BEFORE gameplay consumes economy/
+## progression/settings, and saves at the terminal lifecycle boundary.
+@export var save_path: String = ""
 ## QA/debug-only DEADLOCK fixture seam (M30 manual LOST demo + tests). When > 0, the last N
 ## batches of the deterministic generated candidate are dropped so total supply robots <
 ## ACTIVE cells: the board can never fully clear, and once supply is exhausted at quiescence
@@ -109,6 +115,7 @@ var _economy
 var _progression
 var _booster_service
 var _booster_adapter
+var _save
 var _economy_terminal_done := false
 var _built := false
 var _build_error := ""
@@ -276,6 +283,13 @@ func build() -> bool:
 		_progression = LevelProgressionService.new()
 		_booster_adapter = ProductionBoosterAdapter.new(_level, _board, _supply, _slots, _scheduler)
 		_booster_service = BoosterService.new(_economy.boosters)
+		# M40 V02 (F-M40-006): one canonical SaveService in the runtime composition.
+		# When a save_path is configured, LOAD here — before any gameplay event
+		# consumes economy/progression/settings — so persisted state is authoritative
+		# from the first frame. Empty save_path keeps the host disk-free (tests/suite).
+		if not save_path.is_empty():
+			_save = SaveService.new(save_path, _audio_settings, _haptics_settings, _progression, _economy)
+			_save.load()
 	_economy_terminal_done = false
 
 	# Meaningful gameplay boundaries mark the completion state dirty (authenticated clear +
@@ -453,6 +467,9 @@ func _drive_economy_terminal(status) -> void:
 		_economy.hearts.consume()
 		_economy.streak.on_progression_loss()
 		_economy.speed.on_level_completed(progression_level, false)
+	# M40 V02 (F-M40-006): terminal is a defined safe save boundary (not per-frame).
+	if _save != null:
+		_save.save()
 
 func _wire_controls() -> void:
 	var pause_btn = _screen.get_pause_button()
@@ -596,6 +613,9 @@ func get_booster_service():
 
 func get_booster_adapter():
 	return _booster_adapter
+
+func get_save():
+	return _save
 
 # ------------------------------------------------------------ M32 agent factory ----
 

@@ -111,7 +111,7 @@ func _crash_before_replace() -> void:
 	_ok(g["svc"].save()["ok"], "initial good save")
 	# Now inject a replace failure on the next save.
 	g["prog"].record_win(2)
-	g["svc"].set_fault_injector(func(stage): return stage == "replace")
+	g["svc"].set_fault_injector(func(stage): return stage == "primary_replace")
 	var r = g["svc"].save()
 	_ok(not r["ok"] and r["reason"] == "replace_failed", "replace fault reported")
 	# Primary still holds the previous good save (frontier 2, i.e. one win).
@@ -153,8 +153,9 @@ func _future_schema_refused() -> void:
 	_write(path, JSON.stringify({"schema": "scrubbots.save", "version": 999, "settings": {"audio": {}}, "economy": {}, "progression": {}}))
 	var g = _graph(path)
 	var r = g["svc"].load()
-	# Primary refused (future), no backup -> defaults, primary NOT rewritten.
-	_ok(r["source"] == "defaults", "future schema refused -> defaults (no downgrade)")
+	# M40 V02 (F-M40-003): future schema with no compatible backup returns an
+	# explicit unsupported result — NOT a fresh-profile defaults fall-through.
+	_ok(not r["ok"] and r["source"] == "future_schema", "future schema -> explicit unsupported (no downgrade)")
 	var raw = _read(path)
 	_ok(raw.find("999") != -1, "future save left on disk, not silently downgraded")
 
