@@ -1313,9 +1313,9 @@ Closure evidence: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V03.md` + `coord
 - [x] SB-M32-UI-010 Integrate approved art without coupling animation to TargetSelector logic.
 - [x] SB-M32-UI-011 Validate readability/scale on phone viewport matrix.
 
-### M33 — Audio `[OWNER-LOCKED AUDIO SELECTION 2026-09-19]`
+### M33 — Audio `[OWNER-LOCKED AUDIO SELECTION V02 2026-09-24]`
 
-Active cycle: `M33-C001 V01` owner F6 audio gate. Code audit passed in `coordination/sessions/M33-C001/CHATGPT_AUDIT_V01.md`. Owner must now complete the dedicated listening/persistence/Retry gate before M33 closure or M34 start.
+Owner F6 listening feedback on 2026-09-24 did **not** accept the V01 mix for final closure. New owner lock: no dispatch SFX; cleaning uses the preserved `dispatch.wav` sonic identity with a short bounded tail; completion remains WON-only; no movement audio; continuous background music is required; final music asset remains owner-selection-gated. Remediation authority: `coordination/OWNER_M33_AUDIO_SELECTION_DECISION_V02.md`, `coordination/sessions/M33-C001/CHATGPT_PROMPT_V02.md`, and `CHATGPT_AUDIT_CRITERIA_V02.md`. M33 status is `CHANGES_REQUIRED / OWNER_F6_RETEST_REQUIRED`.
 
 - [ ] SB-M33-001 Audio buses. — [ ] SB-M33-002 Master volume.
 - [ ] SB-M33-003 Music volume. — [ ] SB-M33-004 SFX volume.
@@ -1465,6 +1465,8 @@ Pre-authored batch bundle: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V01.md
 - [ ] SB-M40-013 Persist wall-clock timestamps/expiry defensively against duplicate reward/refill claims.
 
 ### M41 — Settings
+
+Owner-authorized early audio/haptics settings slice (2026-09-24): `SB-M41-001,002,003,004,006,007,008` may be implemented before the broader M41 cycle to support the revised M33 audio/haptics UX. Authority: `coordination/sessions/M41-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. `SB-M41-005 Reduced effects` remains outside this early slice.
 
 - [ ] SB-M41-001 Master volume. — [ ] SB-M41-002 Music. — [ ] SB-M41-003 SFX.
 - [ ] SB-M41-004 Haptics. — [ ] SB-M41-005 Reduced effects.
