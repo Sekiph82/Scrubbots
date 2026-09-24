@@ -68,6 +68,12 @@ func _minimal_valid_level(id: String, difficulty: String = "EASY", width: int = 
 func _tmp(base: String) -> String:
 	return "user://m35_%s_%d.json" % [base, Time.get_ticks_usec()]
 
+## Level files referenced as level_path must be res:// (the production catalog
+## confines level_path to the res:// root since M35 V02). res:// is writable in
+## a headless-from-source dev run.
+func _res_tmp(base: String) -> String:
+	return "res://m35_lvl_%s_%d.json" % [base, Time.get_ticks_usec()]
+
 # --- cases ---
 
 func _production_catalog_loads() -> void:
@@ -156,7 +162,7 @@ func _missing_level_file() -> void:
 
 func _malformed_level_json() -> void:
 	print("[malformed]")
-	var bad_level := "user://m35_bad_%d.json" % Time.get_ticks_usec()
+	var bad_level := _res_tmp("bad")
 	_write_text(bad_level, "{{ not json")
 	var path := _tmp("bad_ref")
 	_write_json(path, {
@@ -173,7 +179,7 @@ func _test_fixture_insertion() -> void:
 	print("[test fixture]")
 	# Author a level file with canonical difficulty=TEST and insert it into the
 	# catalog. It must be rejected on the CANONICAL field, not filename.
-	var lvl := _tmp("test_fixture")
+	var lvl := _res_tmp("test_fixture")
 	_write_json(lvl, _minimal_valid_level("test_inserted", "TEST"))
 	var path := _tmp("test_manifest")
 	_write_json(path, {
@@ -188,7 +194,7 @@ func _test_fixture_insertion() -> void:
 
 func _unknown_difficulty() -> void:
 	print("[unknown difficulty]")
-	var lvl := _tmp("unk_diff")
+	var lvl := _res_tmp("unk_diff")
 	_write_json(lvl, _minimal_valid_level("unk_diff", "SUPER"))
 	var path := _tmp("unk_manifest")
 	_write_json(path, {
@@ -203,9 +209,9 @@ func _unknown_difficulty() -> void:
 
 func _rectangular_boundary() -> void:
 	print("[rect]")
-	# A rectangular 24x28 EASY level is legal per legacy structural bands
-	# (20..29). This proves rectangular support in the catalog read model.
-	var lvl := _tmp("rect")
+	# A rectangular 24x28 EASY level is within the 20..59 production envelope
+	# (Difficulty V1). This proves rectangular support in the catalog read model.
+	var lvl := _res_tmp("rect")
 	_write_json(lvl, _minimal_valid_level("rect_easy", "EASY", 24, 28))
 	var path := _tmp("rect_manifest")
 	_write_json(path, {

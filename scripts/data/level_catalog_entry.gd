@@ -14,3 +14,18 @@ var difficulty: String
 var width: int
 var height: int
 var preview_exists: bool
+
+## Deep value copy — LevelCatalog returns copies so consumers can never mutate
+## the canonical internal entry objects (F-M35-001).
+func duplicate() -> RefCounted:
+	var e = get_script().new()
+	e.id = id
+	e.order = order
+	e.level_path = level_path
+	e.metadata_path = metadata_path
+	e.preview_path = preview_path
+	e.difficulty = difficulty
+	e.width = width
+	e.height = height
+	e.preview_exists = preview_exists
+	return e
