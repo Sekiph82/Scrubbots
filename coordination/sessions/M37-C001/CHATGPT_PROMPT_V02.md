@@ -9,7 +9,7 @@ If a test exposes a concrete defect, implement the smallest production correctio
 
 Create task_logs_v02 for affected SB-M37 IDs and CLAUDE_LOG_V02.md.
 
-Do not implement shipping Level Select.
+Owner decision is now locked in `coordination/OWNER_M37_LEVEL_SELECT_DECISION_V01.md`: do not implement shipping Level Select. Keep the existing non-shipping debug seam only and add a regression proving no player-facing level-select flow is introduced.
 
 Handoff:
 `AWAITING_AUDIT / M37-C001 V02 / STRICT_V2_VALIDATION_COMPLETE`
