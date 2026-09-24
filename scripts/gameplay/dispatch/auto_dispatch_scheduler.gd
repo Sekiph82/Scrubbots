@@ -167,6 +167,84 @@ func assignment_snapshot() -> Array:
 func is_color_waiting(color_id) -> bool:
 	return _waiting_colors.has(color_id)
 
+# ------------------------------------ targeted selected-color cancel (M39 V04) --
+# Tornado seam (F-M39-V03-001). NO global reset: only the selected color's live
+# assignments are touched, one exact identity at a time, in three phases the
+# caller sequences transactionally:
+#   preflight_color_cancel (read-only) -> detach_assignment (reversible, via
+#   M25 rollback_claim; undone by reattach_assignment) -> finalize_detached
+#   (irreversible agent cancel, run last after every reversible stage passed).
+
+## Owner ids of the live assignments for color, ascending (deterministic).
+func color_assignment_owners(color_id) -> Array:
+	var out: Array = []
+	for o in _assignments:
+		if int(_assignments[o]["color"]) == int(color_id):
+			out.append(o)
+	out.sort()
+	return out
+
+## Read-only exact-coherence proof for every selected-color assignment:
+## scheduler assignment -> M25 claim tuple -> reservation pair -> M24 work
+## binding -> dispatcher agent identity (not arrived). Any drift -> false.
+func preflight_color_cancel(color_id) -> bool:
+	if not _bound or _fatal or _in_step or _reset_in_progress or _reset_requested:
+		return false
+	for o in color_assignment_owners(color_id):
+		if not _assignment_coherent(o):
+			return false
+	return true
+
+func _assignment_coherent(owner_id) -> bool:
+	var a: Dictionary = _assignments[owner_id]
+	var c: Dictionary = _claim.get_claim(a["claim_id"])
+	if c.is_empty():
+		return false
+	if int(c["owner_id"]) != int(owner_id) or int(c["target"]) != int(a["target"]) \
+			or int(c["slot"]) != int(a["slot"]) or int(c["color_id"]) != int(a["color"]):
+		return false
+	if _reservations.get_owner(int(a["target"])) != int(owner_id) \
+			or _reservations.get_target_for_owner(int(owner_id)) != int(a["target"]):
+		return false
+	if not _batches.is_work_bound_to(a["claim_id"], int(c["slot"]), c["batch_id"]):
+		return false
+	return _dispatcher.can_cancel_owner(int(owner_id), a["agent"])
+
+## Reversible step: re-prove this one assignment, roll back its M25 claim
+## (reservation pair + M24 committed work + ledger) and detach it from the
+## scheduler. The dispatcher agent is left alive (no board/reservation authority
+## without its claim) until finalize_detached. Returns {} on any failure with
+## zero mutation.
+func detach_assignment(owner_id) -> Dictionary:
+	if not _assignments.has(owner_id) or not _assignment_coherent(owner_id):
+		return {}
+	var a: Dictionary = _assignments[owner_id]
+	var c: Dictionary = _claim.get_claim(a["claim_id"])
+	if not _claim.rollback_claim(a["claim_id"]):
+		return {}
+	_assignments.erase(owner_id)
+	return {"owner": owner_id, "assignment": a, "claim": c}
+
+## Exact undo of detach_assignment.
+func reattach_assignment(entry: Dictionary) -> bool:
+	var o = entry.get("owner", null)
+	if o == null or _assignments.has(o):
+		return false
+	if not _claim.restore_claim(entry["claim"]):
+		return false
+	_assignments[o] = entry["assignment"]
+	return true
+
+## Read-only: would finalize_detached(entry) succeed right now?
+func get_dispatcher_can_cancel(entry: Dictionary) -> bool:
+	var a: Dictionary = entry.get("assignment", {})
+	return _dispatcher.can_cancel_owner(int(entry.get("owner", -1)), a.get("agent", null))
+
+## Irreversible final step: cancel the detached assignment's exact agent.
+func finalize_detached(entry: Dictionary) -> bool:
+	var a: Dictionary = entry.get("assignment", {})
+	return _dispatcher.cancel_owner(int(entry.get("owner", -1)), a.get("agent", null))
+
 # ------------------------------------------------------------- scheduling -----
 
 ## One deterministic scheduling step/cadence event. Produces AT MOST one new accepted

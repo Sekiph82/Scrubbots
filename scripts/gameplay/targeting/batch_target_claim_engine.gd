@@ -266,6 +266,40 @@ func rollback_claim(claim_id) -> bool:
 	_claims.erase(claim_id)
 	return true
 
+## Exact rollback companion of rollback_claim (M39 V04, Tornado targeted cancel).
+## Re-establishes ONE previously rolled-back claim tuple: re-reserves the exact
+## (target, owner) pair, re-commits the exact M24 work id on the exact slot/batch,
+## and re-inserts the exact ledger record. Only valid when the target is ACTIVE,
+## unreserved, the slot still holds the recorded batch, and the claim id is not
+## live. Any mismatch fails closed with zero mutation (preflight before mutate).
+func restore_claim(rec: Dictionary) -> bool:
+	if _busy or typeof(rec) != TYPE_DICTIONARY:
+		return false
+	var claim_id = rec.get("claim_id", null)
+	if typeof(claim_id) != TYPE_STRING or _claims.has(claim_id):
+		return false
+	var target := int(rec.get("target", -1))
+	var owner := int(rec.get("owner_id", -1))
+	var slot := int(rec.get("slot", -1))
+	if not _board.is_valid_index(target):
+		return false
+	if _board.get_cell_state(target) != BoardState.CellState.ACTIVE:
+		return false
+	if _reservations.is_reserved(target) or _reservations.get_target_for_owner(owner) != -1:
+		return false
+	if not _batches.is_occupied(slot) or _batches.get_batch_id(slot) != rec.get("batch_id", ""):
+		return false
+	if _batches.get_capacity(slot) <= 0:
+		return false
+	# Mutate: reserve, then commit work; undo the reservation if commit fails.
+	if not _reservations.reserve(target, owner):
+		return false
+	if not _batches.commit_work(slot, claim_id):
+		_reservations.release(target, owner)
+		return false
+	_claims[claim_id] = rec.duplicate(true)
+	return true
+
 # ----------------------------------------- authenticated-clear finalization (WP03 B) --
 
 ## Finalize one live claim AFTER the authoritative clear pipeline has cleared its target

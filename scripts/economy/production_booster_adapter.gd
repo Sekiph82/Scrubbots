@@ -54,20 +54,6 @@ func _inflight() -> int:
 		return _scheduler.live_assignment_count()
 	return 0
 
-## Count only in-flight scheduler assignments whose color_id matches `color`.
-## Unrelated colors' work is preserved (M39 V03, F-M39-V02-006). Falls back to
-## the global inflight count when the scheduler has no snapshot API.
-func _color_inflight_count(color) -> int:
-	if _scheduler == null:
-		return 0
-	if _scheduler.has_method("assignment_snapshot"):
-		var n := 0
-		for a in _scheduler.assignment_snapshot():
-			if typeof(a) == TYPE_DICTIONARY and int(a.get("color_id", -1)) == int(color):
-				n += 1
-		return n
-	return _inflight()
-
 ## Current supply as Array[column] of Array[ColorBatch] (deep, detached).
 func _current_cols() -> Array:
 	var dbg: Dictionary = _supply.debug_snapshot()
@@ -129,9 +115,9 @@ func propose_random_reorder() -> Dictionary:
 		"commit": func():
 			if _faulted("random_commit"):
 				return false
-			return _supply.load_columns(reordered),
+			return _supply.replace_live_columns(reordered),
 		"rollback": func():
-			_supply.load_columns(original),
+			_supply.replace_live_columns(original),
 	}
 
 ## Owner-required 3-consecutive safe-selection proof (F-M39-V02-003). Simulates
@@ -289,21 +275,21 @@ func extract_batch(batch_id) -> Dictionary:
 			var cols = _cols_with_front(original, batch_id)
 			if cols == null:
 				return false
-			if not _supply.load_columns(cols):
+			if not _supply.replace_live_columns(cols):
 				return false
 			var r = _slots.select_front_batch(_supply, target_col)
 			if not r.get("ok", false):
 				# The failing stage partially mutated (supply reorder happened);
 				# unwind the supply reload here so the transaction runner's own
 				# rollback sees the pre-apply state.
-				_supply.load_columns(original)
+				_supply.replace_live_columns(original)
 				return false
 			placed_slot[0] = int(r.get("slot", -1))
 			return true,
 		"rollback": func():
 			# Restore exact prior supply + free the placed slot if any (leaves
 			# no orphan sixth-slot batch on a later transaction failure).
-			_supply.load_columns(original)
+			_supply.replace_live_columns(original)
 			if placed_slot[0] != -1:
 				_slots.free_slot_if_idle(placed_slot[0]),
 	}
@@ -334,26 +320,50 @@ func present_colors() -> Array:
 ## (it allows Tornado while other colors are in flight) while remaining
 ## identity-safe against active same-color work.
 func tornado_stages(color) -> Array:
+	# M39 V04 (F-M39-V03-001): Tornado works WITH selected-color in-flight work.
+	# guard (read-only exact-identity preflight) -> claims (reversible targeted
+	# M25/M26 detach, one identity at a time) -> board -> slots -> supply ->
+	# finalize (irreversible agent cancel, only after every reversible stage).
+	# Never a global scheduler/dispatcher reset; unrelated colors are untouched.
+	var detached: Array = []              # scheduler detach entries (claims rolled back)
 	var cleared_indices: Array = []       # board cells set CLEARED by this purge
-	var freed_slots: Array = []           # {index, batch} freed idle slots
+	var purged_slots: Array = []          # {index, slot_state} detached slot objects
 	var supply_before: Array = []         # exact prior supply for rollback
+	var has_sched: bool = _scheduler != null and _scheduler.has_method("preflight_color_cancel")
 
 	var stage_guard := {
 		"apply": func():
 			if _faulted("tornado_guard"):
 				return false
-			return _color_inflight_count(color) == 0,
+			if not has_sched:
+				return _inflight() == 0
+			return _scheduler.preflight_color_cancel(int(color)),
 		"rollback": func(): pass,
+	}
+	var stage_claims := {
+		"apply": func():
+			if not has_sched:
+				return true
+			for o in _scheduler.color_assignment_owners(int(color)):
+				var e: Dictionary = _scheduler.detach_assignment(o)
+				if e.is_empty():
+					return false
+				detached.append(e)
+				if detached.size() == 1 and _faulted("tornado_cancel_one"):
+					return false
+			return not _faulted("tornado_claims"),
+		"rollback": func():
+			for i in range(detached.size() - 1, -1, -1):
+				_scheduler.reattach_assignment(detached[i])
+			detached.clear(),
 	}
 	var stage_board := {
 		"apply": func():
-			if _faulted("tornado_board"):
-				return false
 			for i in range(_board.get_cell_count()):
 				if _board.get_cell_state(i) == BoardState.CellState.ACTIVE and _board.get_color_id(i) == int(color):
 					if _board.set_cell_state(i, BoardState.CellState.CLEARED):
 						cleared_indices.append(i)
-			return true,
+			return not _faulted("tornado_board"),
 		"rollback": func():
 			for i in cleared_indices:
 				_board.set_cell_state(i, BoardState.CellState.ACTIVE)
@@ -361,25 +371,22 @@ func tornado_stages(color) -> Array:
 	}
 	var stage_slots := {
 		"apply": func():
-			if _faulted("tornado_slots"):
-				return false
 			for si in range(_slots.get_slot_count()):
 				if _slots.is_occupied(si) and _slots.get_color_id(si) == int(color):
-					var r = _slots.free_slot_if_idle(si)
+					var r = _slots.purge_uncommitted_slot(si)
 					if not r.get("ok", false):
-						return false   # a non-idle color slot => cannot purge safely
-					freed_slots.append({"index": si, "batch": r["batch"]})
-			return true,
+						return false   # committed work still bound => cannot purge safely
+					purged_slots.append({"index": si, "slot_state": r["slot_state"]})
+			return not _faulted("tornado_slots"),
 		"rollback": func():
-			for f in freed_slots:
-				_slots.restore_idle_slot(f["index"], f["batch"])
-			freed_slots.clear(),
+			for i in range(purged_slots.size() - 1, -1, -1):
+				_slots.restore_purged_slot(purged_slots[i]["index"], purged_slots[i]["slot_state"])
+			purged_slots.clear(),
 	}
 	var stage_supply := {
 		"apply": func():
-			if _faulted("tornado_supply"):
-				return false
-			supply_before = _current_cols()
+			supply_before.clear()
+			supply_before.append_array(_current_cols())
 			var cols: Array = []
 			for q in supply_before:
 				var nq: Array = []
@@ -387,9 +394,26 @@ func tornado_stages(color) -> Array:
 					if b.get_color_id() != int(color):
 						nq.append(b)
 				cols.append(nq)
-			return _supply.load_columns(cols),
+			if not _supply.replace_live_columns(cols):
+				return false
+			return not _faulted("tornado_supply"),
 		"rollback": func():
 			if not supply_before.is_empty():
-				_supply.load_columns(supply_before),
+				_supply.replace_live_columns(supply_before),
 	}
-	return [stage_guard, stage_board, stage_slots, stage_supply]
+	var stage_finalize := {
+		"apply": func():
+			if _faulted("tornado_finalize"):
+				return false
+			# Re-prove every detached agent is still cancellable BEFORE the first
+			# irreversible cancel, so this stage is all-or-nothing.
+			for e in detached:
+				if not _scheduler.get_dispatcher_can_cancel(e):
+					return false
+			for e in detached:
+				_scheduler.finalize_detached(e)
+			detached.clear()
+			return true,
+		"rollback": func(): pass,
+	}
+	return [stage_guard, stage_claims, stage_board, stage_slots, stage_supply, stage_finalize]

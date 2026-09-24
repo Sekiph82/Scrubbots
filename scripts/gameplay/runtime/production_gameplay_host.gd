@@ -54,6 +54,8 @@ const AudioSettingsService = preload("res://scripts/audio/audio_settings_service
 const HapticsController = preload("res://scripts/haptics/haptics_controller.gd")
 const HapticsSettingsService = preload("res://scripts/haptics/haptics_settings_service.gd")
 const EconomyServices = preload("res://scripts/economy/economy_services.gd")
+const FirstClearTransaction = preload("res://scripts/economy/first_clear_transaction.gd")
+const ProductionActionFacade = preload("res://scripts/economy/production_action_facade.gd")
 const LevelProgressionService = preload("res://scripts/progression/level_progression_service.gd")
 const BoosterService = preload("res://scripts/economy/booster_service.gd")
 const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
@@ -124,6 +126,14 @@ var _save
 ## bootstrap wires the app-level AppState here.
 var app_state = null
 var _economy_terminal_done := false
+## Last WON first-clear transaction result (diagnostic; M39 V04).
+var last_first_clear_result: Dictionary = {}
+var _actions = null   # ProductionActionFacade (M39 V04)
+## Test-only fault seam forwarded to FirstClearTransaction.commit.
+var _first_clear_fault: Callable = Callable()
+
+func set_first_clear_fault_injector(f: Callable) -> void:
+	_first_clear_fault = f
 var _built := false
 var _build_error := ""
 
@@ -328,6 +338,9 @@ func build() -> bool:
 	if _economy != null:
 		_booster_adapter = ProductionBoosterAdapter.new(_level, _board, _supply, _slots, _scheduler)
 		_booster_service = BoosterService.new(_economy.boosters)
+		# M39 V04 (F-M39-V03-005): the ONE canonical production action surface.
+		# Committed actions hit the host save boundary; M40 binds the same seam.
+		_actions = ProductionActionFacade.new(_economy, self, Callable(self, "request_save"))
 	_economy_terminal_done = false
 
 	# Meaningful gameplay boundaries mark the completion state dirty (authenticated clear +
@@ -523,11 +536,10 @@ func _drive_economy_terminal(status) -> void:
 		#      level 2x entitlement on success.
 		# All service calls are idempotent by stable tx id, so a stale double-WON
 		# in the same attempt (economy_terminal_done latches above) is a no-op.
-		if _progression.record_win(progression_level):
-			var cls: String = _progression.class_for(progression_level)
-			_economy.first_clear.grant_first_clear(progression_level, cls)
-			_economy.streak.process_first_clear_win(progression_level)
-			_economy.speed.on_level_completed(progression_level, true)
+		# M39 V04 (F-M39-V03-004): progression + first-clear + streak/Gift +
+		# entitlement commit as ONE snapshot/rollback transaction.
+		last_first_clear_result = FirstClearTransaction.commit(_progression, _economy,
+			progression_level, _first_clear_fault)
 	elif status == CompletionEvaluator.LOST:
 		_economy_terminal_done = true
 		_economy.hearts.consume()
@@ -582,48 +594,54 @@ func _on_speed_pressed() -> void:
 	var two: bool = _runtime.toggle_speed()
 	_screen.set_speed_2x(two)
 
-## +1 Slot booster: economy reserve (charge-first-then-SB, once per attempt) AND
-## the live engine grow to a temporary sixth slot are ONE atomic transaction
-## (M39 V03, F-M39-V02-008). Order:
-##   1. reserve via BoosterInventory (returns paid_with + price for refund);
-##   2. grow the engine — infallible in the same synchronous frame after
-##      can_grow_to_sixth, but if it does fail, REFUND the reservation and roll
-##      the capacity authority back to baseline five;
-##   3. also try the M28 strip resize; on strip failure, engine grow is rolled
-##      back too.
-## Returns true on a committed 6-slot upgrade with UI/state/routing capacity
-## coherent; false with no state mutation on any failure.
+## Test-only fault seam for the +1 Slot transition (M39 V04, F-M39-V03-003):
+## f(stage) -> true forces a failure at "engine" (after the M24 grow) or
+## "strip" (after the presentation grow). Never set in production.
+var _plus_one_fault: Callable = Callable()
+
+func set_plus_one_fault_injector(f: Callable) -> void:
+	_plus_one_fault = f
+
+func _plus_one_faulted(stage: String) -> bool:
+	return _plus_one_fault.is_valid() and bool(_plus_one_fault.call(stage))
+
+## +1 Slot booster: economy reserve + capacity authority + M24 engine grow +
+## presentation strip/origin grow are ONE reversible transition (M39 V04,
+## F-M39-V03-003). Any failure after the reservation restores the exact prior
+## five-slot state: charge/SB refunded, capacity authority back to (5, unused),
+## M24 shrunk via rollback_grow_to_sixth (legal: the new sixth slot is still
+## EMPTY and uncommitted inside this synchronous call), strip back to its prior
+## capacity (so origin_for_slot(5) is unroutable again). Never returns false
+## with M24 left at six.
 func activate_plus_one_slot() -> bool:
 	if _economy == null or _slots == null:
 		return false
 	if not _slots.can_grow_to_sixth():
 		return false
-	# Do the economy pre-checks + capacity authority upgrade + reservation.
+	var strip = _screen.get_five_slot_strip() if _screen != null else null
+	var strip_prev: int = strip.get_capacity() if strip != null else 5
 	var res = _booster_service.apply_plus_one_slot(_economy.capacity)
 	if not res.get("ok", false):
 		return false
-	# Attempt the live engine grow.
-	if not _slots.grow_to_sixth():
-		# Roll back both economy and capacity authority (F-M39-V02-008).
+	var engine_grown := false
+	var ok: bool = _slots.grow_to_sixth()
+	if ok:
+		engine_grown = true
+		ok = not _plus_one_faulted("engine")
+	if ok and strip != null:
+		ok = strip.set_capacity(6) and not _plus_one_faulted("strip")
+	if not ok:
+		if strip != null:
+			strip.set_capacity(strip_prev)
+		if engine_grown:
+			_slots.rollback_grow_to_sixth()
 		_economy.boosters.refund(BoosterInventory.PLUS_ONE_SLOT, res)
-		_economy.capacity.begin_new_attempt()
-		return false
-	# Grow the strip so the sixth slot is visible + routable (F-M39-V02-001).
-	# If the strip refuses (unlikely — max 6 is a hard clamp), roll every side
-	# back so neither the presentation nor the engine end up out of sync.
-	var strip = _screen.get_five_slot_strip() if _screen != null else null
-	if strip != null and not strip.set_capacity(6):
-		# Undo engine + economy: shrink is not exposed on the engine, so reset
-		# through the runtime restore path is out of scope here. Fail closed.
-		_economy.boosters.refund(BoosterInventory.PLUS_ONE_SLOT, res)
-		_economy.capacity.begin_new_attempt()
+		_economy.capacity.begin_new_attempt()   # pre-state was (5, unused): exact
 		return false
 	# Push a fresh 6-slot snapshot so the newly appended view has content.
 	if _screen != null and _slots != null:
 		_screen.refresh_slot_snapshot(_slots.snapshot())
-	# M40 V03 (F-M40-V02-008): a durable meta mutation (charge/SB spent + booster
-	# committed) is a defined save boundary. Coalescing timers belong to M41 UI;
-	# a per-action flush here is safe because +1 Slot is at most once per attempt.
+	# M40 V03 (F-M40-V02-008): a durable meta mutation is a defined save boundary.
 	_flush_durable_save()
 	return true
 
@@ -719,6 +737,25 @@ func get_booster_service():
 
 func get_booster_adapter():
 	return _booster_adapter
+
+## Canonical production action facade (M39 V04). null when economy is absent.
+func get_actions():
+	return _actions
+
+## Post-commit reconciliation after a booster edited board/supply/slots outside
+## the clearing loop (Random/Selector/Tornado): resync the raw candidate index
+## and renderer to BoardState truth, refresh slot/supply UI, and mark the
+## completion evaluator dirty (a Tornado can finish the board).
+func on_booster_committed() -> void:
+	if _ci != null:
+		_ci.rebuild()
+	var r = _renderer()
+	if r != null:
+		r.refresh_all()
+	if _screen != null and is_instance_valid(_screen):
+		_screen.update_snapshots(_slots.snapshot(), _supply.player_snapshot())
+	if _completion != null:
+		_completion.notify_event()
 
 func get_save():
 	return _save
