@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M37
-- Current Sprint: M37-M40-BATCH V03 — Final Audit-Driven Remediation
-- Current Task: M37-M40-BATCH-V03
+- Current Milestone: M39
+- Current Sprint: M39-M40-BATCH V04 — Final Runtime/App Integration
+- Current Task: M39-M40-BATCH-V04
 - Current Task Status: CHANGES_REQUIRED
-- Next Task/Action: CLAUDE executes `coordination/sessions/M37-M40-BATCH/CHATGPT_MASTER_PROMPT_V03.md` in dependency order M37 V03 -> M39 V03 -> M40 V03. M35 and M38 are independently closed. M34 code passed with SB-M34-006 real-device haptics still open. M36 code passed with SB-M36-005 human difficulty playtest still open. M37 frozen findings are F-M37-V02-001..002; M39 F-M39-V02-001..016; M40 F-M40-V02-001..009. Claude writes task_logs_v03 + CLAUDE_LOG_V03, pushes each cycle, does not edit TASKS.md, does not self-audit, and does not start M41+.
+- Next Task/Action: CLAUDE executes `coordination/sessions/M39-M40-BATCH/CHATGPT_MASTER_PROMPT_V04.md` in order M39 V04 -> M40 V04 without stopping. M37 is now independently closed. M39 frozen findings are F-M39-V03-001..005; M40 frozen findings are F-M40-V03-001..004. Claude writes task_logs_v04 + CLAUDE_LOG_V04, pushes each cycle, does not edit TASKS.md, does not self-audit, and does not start M41+.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 659 / 980 = 67.24% after independent V02 audit task-by-task closure. Remaining code remediation is concentrated in M37/M39/M40; M34/M36 retain owner/device gates. M33 audio V02 owner-feedback remediation remains a separate open audio/settings thread and is not silently closed by this batch.
-- Note: `codex/visual-assets-production` was merged through PR #5 for the earlier visual batch, but the later final visual-closure batch P2-145..P2-157 now exists on that visual branch at commit `65b26242f996f210a923b4536c7083f6f2d005cc` and is not yet integrated into `main`. Do not delete the visual branch until that final batch is merged/audited. The two historical Claude branches had zero unique commits.
+- Progress: 684 / 980 = 69.80% after independent V03 audit closures. M34 code remains passed with SB-M34-006 real-device haptics open; M36 code remains passed with SB-M36-005 human difficulty playtest open; M39/M40 are the only active code-remediation cycles in this batch. M33 audio V02 owner-feedback remediation remains a separate open audio/settings thread.
+- Note: `codex/visual-assets-production` final visual-closure batch P2-145..P2-157 remains separate from this runtime remediation and is not silently closed here.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1368,16 +1368,18 @@ Pre-authored batch bundle: `coordination/sessions/M36-C001/CHATGPT_PROMPT_V01.md
 
 ### M37 — Level Progression
 
+V03 independent audit: `AUDITED_PASS / M37 LEVEL PROGRESSION CLOSED`. Forward-only progression and contiguous persisted history accepted; owner decision remains no shipping Level Select, debug seam only.
+
 V03 remediation authority: `coordination/sessions/M37-C001/CHATGPT_PROMPT_V03.md` + `CHATGPT_AUDIT_CRITERIA_V03.md`. Frozen F-M37-V02-001..002. Owner lock remains: forward-only progression, no shipping Level Select; debug seam only.
 
 V02 remediation authority: `coordination/sessions/M37-C001/CHATGPT_PROMPT_V02.md` + `CHATGPT_AUDIT_CRITERIA_V02.md`. Owner decision is locked in `coordination/OWNER_M37_LEVEL_SELECT_DECISION_V01.md`: no shipping Level Select in V1; forward-only progression, debug/test seam only. Per-task V02 logs required under `task_logs_v02/`.
 
 - [x] SB-M37-001 Implement owner-locked repeating 10-level class cadence.
 - [x] SB-M37-002 Current level.
-- [ ] SB-M37-003 Completion tracking. — [x] SB-M37-004 Replay.
+- [x] SB-M37-003 Completion tracking. — [x] SB-M37-004 Replay.
 - [x] SB-M37-005 Implement progression target curve/micro modifiers from Difficulty V1.
 - [x] SB-M37-006 Level select if approved.
-- [ ] SB-M37-007 Service implementation. — [ ] SB-M37-008 Tests.
+- [x] SB-M37-007 Service implementation. — [x] SB-M37-008 Tests.
 
 ### M38 — Win Streak `[OWNER-LOCKED ECONOMY V1]`
 
@@ -1399,6 +1401,8 @@ Pre-authored batch bundle: `coordination/sessions/M38-C001/CHATGPT_PROMPT_V01.md
 
 ### M39 — Economy & Rewards V1 `[OWNER-LOCKED]`
 
+V04 remediation authority: `coordination/sessions/M39-C001/CHATGPT_PROMPT_V04.md` + `CHATGPT_AUDIT_CRITERIA_V04.md`. Frozen F-M39-V03-001..005. Remaining code work is targeted Tornado cancellation, production local-day wiring, exact +1 rollback, atomic first-clear transaction and canonical action seams. SB-M39-033 also retains the later device safe-area/touch gate.
+
 V03 remediation authority: `coordination/sessions/M39-C001/CHATGPT_PROMPT_V03.md` + `CHATGPT_AUDIT_CRITERIA_V03.md`. Frozen F-M39-V02-001..016. Proven unrelated M39 tasks are closed individually; SB-M39-033 also retains a later real-device safe-area/touch gate after code remediation.
 
 Pre-authored batch bundle: `coordination/sessions/M39-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. All 55 task IDs require separate GitHub task logs; M39 remains subject to later strict full-surface ChatGPT audit.
@@ -1406,14 +1410,14 @@ Pre-authored batch bundle: `coordination/sessions/M39-C001/CHATGPT_PROMPT_V01.md
 Canonical decision: `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
 Machine tuning: `data/config/economy_rewards_v1.json`.
 
-- [ ] SB-M39-001 Load/version/validate Economy V1 tuning config and fail closed on malformed values.
-- [ ] SB-M39-002 Implement `scripts/economy/economy_wallet.gd` as authoritative Scrub Bucks balance.
+- [x] SB-M39-001 Load/version/validate Economy V1 tuning config and fail closed on malformed values.
+- [x] SB-M39-002 Implement `scripts/economy/economy_wallet.gd` as authoritative Scrub Bucks balance.
 - [x] SB-M39-003 Implement atomic SB grant/spend with stable transaction IDs and insufficient-funds failure.
 - [x] SB-M39-004 Initialize new players at 1000 SB without double-initialization.
 - [ ] SB-M39-005 Grant first-clear SB by difficulty: EASY 50 / MEDIUM 75 / HARD 100 / VERY_HARD 150.
 - [ ] SB-M39-006 Grant +1 Bot Part per first-clear progression level and prohibit replay farming.
-- [ ] SB-M39-007 Implement `reward_grant_service.gd` idempotent reward bundles and duplicate-callback protection.
-- [ ] SB-M39-008 Implement `gift_meter_service.gd`; ONLY Win Streak SB may advance it.
+- [x] SB-M39-007 Implement `reward_grant_service.gd` idempotent reward bundles and duplicate-callback protection.
+- [x] SB-M39-008 Implement `gift_meter_service.gd`; ONLY Win Streak SB may advance it.
 - [x] SB-M39-009 Implement Gift Meter thresholds 10/50/250/500/1000 and exactly-once milestone crossing.
 - [x] SB-M39-010 Support one reward crossing multiple thresholds plus 1000-cycle rollover/overflow.
 - [x] SB-M39-011 Queue Gift Bar milestone rewards instead of silently auto-consuming them.
@@ -1424,20 +1428,20 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [x] SB-M39-016 Grant owner-locked per-set SB/Bot Parts rewards on first 9/9 completion and wire next-robot notification/read model.
 - [x] SB-M39-017 Add pacing simulation/evidence targeting approximately one robot unlock per 150 progression levels for average engaged play.
 - [x] SB-M39-018 Enforce robot perks as meta/economy convenience only; never alter solver/BoardState/TargetSelector/routing legality.
-- [ ] SB-M39-019 Implement `heart_service.gd`: max 5, one Heart per 1800 real-world seconds, offline/menu/background regen.
-- [ ] SB-M39-020 Consume one Heart on progression loss or restart-after-gameplay; pre-action exit consumes none.
+- [x] SB-M39-019 Implement `heart_service.gd`: max 5, one Heart per 1800 real-world seconds, offline/menu/background regen.
+- [x] SB-M39-020 Consume one Heart on progression loss or restart-after-gameplay; pre-action exit consumes none.
 - [x] SB-M39-021 Implement +1 Heart = 500 SB and full refill = 400 SB per missing Heart.
-- [ ] SB-M39-022 Implement `speed_entitlement_service.gd` separate from GameplaySpeedAuthority.
-- [ ] SB-M39-023 Implement current-level 2x entitlement = 200 SB, surviving retries of same level until completion.
+- [x] SB-M39-022 Implement `speed_entitlement_service.gd` separate from GameplaySpeedAuthority.
+- [x] SB-M39-023 Implement current-level 2x entitlement = 200 SB, surviving retries of same level until completion.
 - [x] SB-M39-024 Implement timed 2x products 15m/300 SB, 30m/500 SB, 60m/750 SB.
 - [x] SB-M39-025 Timed 2x uses absolute wall-clock expiry and continues in gameplay, Home/menus, pause, background and closed-app time.
 - [x] SB-M39-026 Allow timed purchases to extend expiry deterministically; never use gameplay delta/Engine.time_scale for entitlement time.
 - [x] SB-M39-027 Gate shipping manual 2x requests behind a valid level/timed entitlement or purchase flow.
 - [x] SB-M39-028 Preserve free entitlement-independent authoritative M23-exhausted automatic 2x.
-- [ ] SB-M39-029 Implement `booster_inventory.gd` with exactly four charge counters and charge-before-SB consumption.
+- [x] SB-M39-029 Implement `booster_inventory.gd` with exactly four charge counters and charge-before-SB consumption.
 - [ ] SB-M39-030 +1 Slot booster: 500 SB, max once/attempt, authoritative slot capacity 5→6 only for current attempt.
-- [ ] SB-M39-031 Extend M24 placement/full-slot queries from fixed five to authoritative capacity 5/6 without breaking five-slot baseline tests.
-- [ ] SB-M39-032 Extend M27 solver/deadlock state/canonicalization/fixtures to capacity 5/6.
+- [x] SB-M39-031 Extend M24 placement/full-slot queries from fixed five to authoritative capacity 5/6 without breaking five-slot baseline tests.
+- [x] SB-M39-032 Extend M27 solver/deadlock state/canonicalization/fixtures to capacity 5/6.
 - [ ] SB-M39-033 Add sixth-slot presentation/layout support and mobile safe-area evidence; no 7+ slot state.
 - [x] SB-M39-034 Random booster: 350 SB, reorder only remaining unselected M23 batches without changing identities/counts/conservation.
 - [ ] SB-M39-035 Random commit requires solver proof of at least three consecutive legal non-deadlocking front selections; failed search consumes nothing.
@@ -1446,11 +1450,11 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [x] SB-M39-038 Tornado booster: 750 SB; choose exactly one present color.
 - [ ] SB-M39-039 Tornado atomically clears all remaining ACTIVE cells of chosen color and reconciles M23 supply, M24 slots, M25 claims/reservations, M26 in-flight agents/quotas and M27 state.
 - [ ] SB-M39-040 Prove Tornado rollback/failure consumes no charge/SB and leaves no ghost batch/agent/double-clear.
-- [ ] SB-M39-041 Implement `daily_service.gd`: visible consecutive-login count plus repeating 5-day reward cycle.
-- [ ] SB-M39-042 Daily login rewards: D1 100 SB; D2 Standard Pack; D3 random booster; D4 250 SB + Standard Pack; D5 300 SB + selected booster + Premium Pack.
-- [ ] SB-M39-043 Daily has exactly three tasks with 75/100/125 SB individual rewards and one random booster for completing all three.
+- [x] SB-M39-041 Implement `daily_service.gd`: visible consecutive-login count plus repeating 5-day reward cycle.
+- [x] SB-M39-042 Daily login rewards: D1 100 SB; D2 Standard Pack; D3 random booster; D4 250 SB + Standard Pack; D5 300 SB + selected booster + Premium Pack.
+- [x] SB-M39-043 Daily has exactly three tasks with 75/100/125 SB individual rewards and one random booster for completing all three.
 - [ ] SB-M39-044 Missing a local calendar day resets login streak/cycle; clock rollback can never create duplicate claims.
-- [ ] SB-M39-045 Implement `collection_inventory.gd` for 15 sets × 9 cards, protected first copy and completion state.
+- [x] SB-M39-045 Implement `collection_inventory.gd` for 15 sets × 9 cards, protected first copy and completion state.
 - [x] SB-M39-046 Standard Pack = 3 eligible draws; Premium Pack = 5 eligible draws with >=1 Rare-or-better; duplicates allowed.
 - [x] SB-M39-047 Implement exact per-set 9/9 rewards from Economy V1: S1 350/5, S2 400/5, S3 450/6, S4 500/7, S5 550/7, S6 600/8, S7 700/9, S8 750/9, S9 800/10, S10 900/10, S11 1000/11, S12 1100/12, S13 1250/13, S14 1500/15, S15 2500/20 (SB/Bot Parts), each exactly once.
 - [x] SB-M39-047A Grant Master Collection exactly once when all 15 sets first reach 9/9: +2500 SB +20 Bot Parts, additional to Set 15.
@@ -1459,23 +1463,25 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [x] SB-M39-048 Implement `cards_exchange_service.gd`; only copies above protected first copy are exchangeable.
 - [x] SB-M39-049 Exchange values: Common 25 / Rare 75 / Epic 200 / Legendary 500 SB.
 - [x] SB-M39-050 Implement per-card and EXCHANGE ALL EXTRAS atomic exchange; never reduce collected owned count below 1.
-- [ ] SB-M39-051 Prove Stars, Star Exchange, Event Points and profile-XP economic state do not exist in production save/runtime APIs.
+- [x] SB-M39-051 Prove Stars, Star Exchange, Event Points and profile-XP economic state do not exist in production save/runtime APIs.
 - [ ] SB-M39-052 Add full Economy V1 headless regression matrix for grants/spends/rollover/offline clocks/boosters/exchange/idempotency.
 
 ### M40 — Save System
+
+V04 remediation authority: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V04.md` + `CHATGPT_AUDIT_CRITERIA_V04.md`. Frozen F-M40-V03-001..004. Remaining work is actual app bootstrap, frontier-to-catalog content resolution, app-owned durable action/save boundaries and local-day end-to-end persistence.
 
 V03 remediation authority: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V03.md` + `CHATGPT_AUDIT_CRITERIA_V03.md`. Frozen F-M40-V02-001..009. SB-M40-004/006/007 are independently accepted; remaining rows await V03/dependency closure.
 
 Pre-authored batch bundle: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. All 13 task IDs require separate GitHub task logs; M40 is the batch endpoint and remains subject to later strict full-surface ChatGPT audit.
 
-- [ ] SB-M40-001 Versioned schema. — [ ] SB-M40-002 Settings.
+- [x] SB-M40-001 Versioned schema. — [ ] SB-M40-002 Settings.
 - [ ] SB-M40-003 Progression. — [x] SB-M40-004 Win streak.
 - [ ] SB-M40-005 Persist Economy V1 wallet, Hearts/regen anchor, Bot Parts/robots, cards, booster charges, Gift Meter, Daily and 2x entitlements.
 - [x] SB-M40-006 Safe write strategy.
-- [x] SB-M40-007 Missing-save behavior. — [ ] SB-M40-008 Corruption recovery.
-- [ ] SB-M40-009 Migration strategy.
-- [ ] SB-M40-010 Round-trip tests. — [ ] SB-M40-011 Corrupt-file tests.
-- [ ] SB-M40-012 Migrate old saves with missing Economy V1 fields to safe defaults; never invent Star/Event balances.
+- [x] SB-M40-007 Missing-save behavior. — [x] SB-M40-008 Corruption recovery.
+- [x] SB-M40-009 Migration strategy.
+- [ ] SB-M40-010 Round-trip tests. — [x] SB-M40-011 Corrupt-file tests.
+- [x] SB-M40-012 Migrate old saves with missing Economy V1 fields to safe defaults; never invent Star/Event balances.
 - [ ] SB-M40-013 Persist wall-clock timestamps/expiry defensively against duplicate reward/refill claims.
 
 ### M41 — Settings
