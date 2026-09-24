@@ -97,10 +97,22 @@ func load_manifest(path: String = DEFAULT_MANIFEST_PATH) -> LevelCatalogValidati
 			continue
 		seen_ids[id] = true
 
-		if typeof(order_value) != TYPE_INT and typeof(order_value) != TYPE_FLOAT:
-			_last_result.add_entry_error(id, "'order' must be an integer")
+		# Exact-integer order only (F-M35-003). JSON numbers arrive as int or
+		# float; a float is accepted ONLY when it is finite and integral (e.g.
+		# 1.0). A fractional value (1.5), NaN or INF fails closed rather than
+		# silently truncating.
+		var order := 0
+		if typeof(order_value) == TYPE_INT:
+			order = order_value
+		elif typeof(order_value) == TYPE_FLOAT:
+			var fv: float = order_value
+			if is_nan(fv) or is_inf(fv) or floor(fv) != fv:
+				_last_result.add_entry_error(id, "'order' must be an exact integer (got %s)" % str(order_value))
+				continue
+			order = int(fv)
+		else:
+			_last_result.add_entry_error(id, "'order' must be an exact integer (got %s)" % type_string(typeof(order_value)))
 			continue
-		var order := int(order_value)
 		if seen_orders.has(order):
 			_last_result.add_entry_error(id, "duplicate order %d (also used by %s)" % [order, seen_orders[order]])
 			continue
@@ -110,6 +122,9 @@ func load_manifest(path: String = DEFAULT_MANIFEST_PATH) -> LevelCatalogValidati
 			_last_result.add_entry_error(id, "'level_path' missing")
 			continue
 		var norm_level_path := _normalize_path(level_path)
+		if norm_level_path.is_empty():
+			_last_result.add_entry_error(id, "level_path is not a canonical res:// path within the level root: %s" % level_path)
+			continue
 		if seen_paths.has(norm_level_path):
 			_last_result.add_entry_error(id, "level_path alias collides with %s" % seen_paths[norm_level_path])
 			continue
@@ -169,24 +184,45 @@ func _compare_entries(a, b) -> bool:
 		return a.order < b.order
 	return a.id < b.id
 
+## Canonicalize a res:// path: resolve "." and ".." segments and confine the
+## result to the res:// root. Returns "" (invalid) for a non-res:// path or one
+## that escapes above the root via ".." (F-M35-004). Equivalent aliases
+## (extra slashes, "/./", resolvable "/../") canonicalize to the same string so
+## duplicate detection cannot be bypassed.
 func _normalize_path(p: String) -> String:
-	# Collapse the res:// prefix to normalized form so an alias like
-	# "res://data/levels/./foo.json" cannot smuggle in as a "different" path.
 	var s := p.replace("\\", "/")
-	while s.find("/./") != -1:
-		s = s.replace("/./", "/")
-	return s
+	if not s.begins_with("res://"):
+		return ""
+	var rest := s.substr("res://".length())
+	var out: Array = []
+	for seg in rest.split("/", false):  # false: skip empty segments (collapses //)
+		if seg == ".":
+			continue
+		if seg == "..":
+			if out.is_empty():
+				return ""  # escapes above the res:// root
+			out.pop_back()
+			continue
+		out.append(seg)
+	return "res://" + "/".join(out)
 
 func last_result() -> LevelCatalogValidationResult:
 	return _last_result
 
-## Immutable copy of the catalog in deterministic explicit order. Mutating the
-## returned Array does not affect internal catalog state.
+## Deterministic explicit-order view of the catalog as DEEP COPIES: mutating
+## the returned Array or any returned entry cannot corrupt the canonical read
+## model (F-M35-001).
 func get_entries_ordered() -> Array:
-	return _entries.duplicate()
+	var out: Array = []
+	for e in _entries:
+		out.append(e.duplicate())
+	return out
 
+## Returns a DEEP COPY of the entry (or null). Never exposes the internal
+## mutable identity (F-M35-001).
 func get_entry_by_id(id: String):
-	return _by_id.get(id, null)
+	var e = _by_id.get(id, null)
+	return e.duplicate() if e != null else null
 
 func size() -> int:
 	return _entries.size()
