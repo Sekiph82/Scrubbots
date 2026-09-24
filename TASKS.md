@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M39
-- Current Sprint: M39-M40-BATCH V04 — Final Runtime/App Integration
-- Current Task: M39-M40-BATCH-V04
-- Current Task Status: CHANGES_REQUIRED
-- Next Task/Action: CLAUDE executes `coordination/sessions/M39-M40-BATCH/CHATGPT_MASTER_PROMPT_V04.md` in order M39 V04 -> M40 V04 without stopping. M37 is now independently closed. M39 frozen findings are F-M39-V03-001..005; M40 frozen findings are F-M40-V03-001..004. Claude writes task_logs_v04 + CLAUDE_LOG_V04, pushes each cycle, does not edit TASKS.md, does not self-audit, and does not start M41+.
+- Current Milestone: M38
+- Current Sprint: M38-C001 V03 — Strict Evidence Repair
+- Current Task: SB-M38-016
+- Current Task Status: CHANGES_REQUIRED / VALIDATION_EVIDENCE_REPAIR
+- Next Task/Action: CLAUDE executes `coordination/sessions/M38-C001/CHATGPT_PROMPT_V03.md`. Fix only the false-PASS M38 strict test harness: use a true RewardGrantService subclass for the failing-reward case, add expected/completed sub-test sentinels, prove no SCRIPT ERROR, then rerun M38 + M39 V04 + M40 V04 + root regressions. Production M38 code remains unchanged unless the repaired test exposes a real defect; if so Claude must STOP and hand back BLOCKED rather than patching production.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 684 / 980 = 69.80% after independent V03 audit closures. M34 code remains passed with SB-M34-006 real-device haptics open; M36 code remains passed with SB-M36-005 human difficulty playtest open; M39/M40 are the only active code-remediation cycles in this batch. M33 audio V02 owner-feedback remediation remains a separate open audio/settings thread.
-- Note: `codex/visual-assets-production` final visual-closure batch P2-145..P2-157 remains separate from this runtime remediation and is not silently closed here.
+- Progress: 697 / 980 = 71.12% after V04 code audit closures and reopening only SB-M38-016. M39 V04 is code-audited pass with SB-M39-052 regression evidence and SB-M39-033 device gate open. M40 V04 is code-audited pass; final milestone audit waits for the repaired mandatory M38 strict regression. M34 real-device haptics and M36 human difficulty owner gates remain open.
+- Note: The V04 root-suite claim `5336 / 0` is not accepted as complete critical-regression evidence because `m38_v02_strict.gd` emitted a SCRIPT ERROR while still printing PASS. Aggregate green counts cannot override the named missing sub-test.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1383,6 +1383,8 @@ V02 remediation authority: `coordination/sessions/M37-C001/CHATGPT_PROMPT_V02.md
 
 ### M38 — Win Streak `[OWNER-LOCKED ECONOMY V1]`
 
+Prior V02 final closure is temporarily suspended by `coordination/sessions/M38-C001/CHATGPT_FULL_SURFACE_REAUDIT_V02.md`: the reward-failure strict sub-test aborted on a typed fake yet the suite printed PASS. Only SB-M38-016 is reopened. V03 prompt/criteria repair evidence only; production changes are forbidden unless the repaired test exposes a real defect.
+
 V02 strict independent audit: `AUDITED_PASS / M38 WIN STREAK CLOSED`. All M38 tasks closed.
 
 Pre-authored batch bundle: `coordination/sessions/M38-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Durable central persistence is finalized by M40.
@@ -1397,9 +1399,11 @@ Pre-authored batch bundle: `coordination/sessions/M38-C001/CHATGPT_PROMPT_V01.md
 - [x] SB-M38-013 Emit only streak-bonus SB amount to GiftMeterService; base/Daily/exchange SB never feeds it.
 - [x] SB-M38-014 Grant +1 Bot Part exactly at active streak multiples of 5.
 - [x] SB-M38-015 Replay does not advance streak, Gift Meter or streak Bot Parts.
-- [x] SB-M38-016 Add reset/replay/idempotency integration tests.
+- [ ] SB-M38-016 Add reset/replay/idempotency integration tests.
 
 ### M39 — Economy & Rewards V1 `[OWNER-LOCKED]`
+
+V04 independent audit: `CODE_AUDIT_PASS / REGRESSION_GATE_OPEN / DEVICE_OWNER_GATE_OPEN`. F-M39-V03-001..005 are source/direct-test accepted. SB-M39-052 waits for repaired M38 strict regression; SB-M39-033 remains real-device safe-area/touch/readability.
 
 V04 remediation authority: `coordination/sessions/M39-C001/CHATGPT_PROMPT_V04.md` + `CHATGPT_AUDIT_CRITERIA_V04.md`. Frozen F-M39-V03-001..005. Remaining code work is targeted Tornado cancellation, production local-day wiring, exact +1 rollback, atomic first-clear transaction and canonical action seams. SB-M39-033 also retains the later device safe-area/touch gate.
 
@@ -1414,8 +1418,8 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [x] SB-M39-002 Implement `scripts/economy/economy_wallet.gd` as authoritative Scrub Bucks balance.
 - [x] SB-M39-003 Implement atomic SB grant/spend with stable transaction IDs and insufficient-funds failure.
 - [x] SB-M39-004 Initialize new players at 1000 SB without double-initialization.
-- [ ] SB-M39-005 Grant first-clear SB by difficulty: EASY 50 / MEDIUM 75 / HARD 100 / VERY_HARD 150.
-- [ ] SB-M39-006 Grant +1 Bot Part per first-clear progression level and prohibit replay farming.
+- [x] SB-M39-005 Grant first-clear SB by difficulty: EASY 50 / MEDIUM 75 / HARD 100 / VERY_HARD 150.
+- [x] SB-M39-006 Grant +1 Bot Part per first-clear progression level and prohibit replay farming.
 - [x] SB-M39-007 Implement `reward_grant_service.gd` idempotent reward bundles and duplicate-callback protection.
 - [x] SB-M39-008 Implement `gift_meter_service.gd`; ONLY Win Streak SB may advance it.
 - [x] SB-M39-009 Implement Gift Meter thresholds 10/50/250/500/1000 and exactly-once milestone crossing.
@@ -1439,21 +1443,21 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [x] SB-M39-027 Gate shipping manual 2x requests behind a valid level/timed entitlement or purchase flow.
 - [x] SB-M39-028 Preserve free entitlement-independent authoritative M23-exhausted automatic 2x.
 - [x] SB-M39-029 Implement `booster_inventory.gd` with exactly four charge counters and charge-before-SB consumption.
-- [ ] SB-M39-030 +1 Slot booster: 500 SB, max once/attempt, authoritative slot capacity 5→6 only for current attempt.
+- [x] SB-M39-030 +1 Slot booster: 500 SB, max once/attempt, authoritative slot capacity 5→6 only for current attempt.
 - [x] SB-M39-031 Extend M24 placement/full-slot queries from fixed five to authoritative capacity 5/6 without breaking five-slot baseline tests.
 - [x] SB-M39-032 Extend M27 solver/deadlock state/canonicalization/fixtures to capacity 5/6.
 - [ ] SB-M39-033 Add sixth-slot presentation/layout support and mobile safe-area evidence; no 7+ slot state.
 - [x] SB-M39-034 Random booster: 350 SB, reorder only remaining unselected M23 batches without changing identities/counts/conservation.
-- [ ] SB-M39-035 Random commit requires solver proof of at least three consecutive legal non-deadlocking front selections; failed search consumes nothing.
-- [ ] SB-M39-036 Selector booster: 500 SB; present solver-safe eligible remaining batches/colors only.
-- [ ] SB-M39-037 Selector performs one atomic arbitrary-remaining extraction + standard rightmost-EMPTY placement; full capacity/unsafe choice consumes nothing.
+- [x] SB-M39-035 Random commit requires solver proof of at least three consecutive legal non-deadlocking front selections; failed search consumes nothing.
+- [x] SB-M39-036 Selector booster: 500 SB; present solver-safe eligible remaining batches/colors only.
+- [x] SB-M39-037 Selector performs one atomic arbitrary-remaining extraction + standard rightmost-EMPTY placement; full capacity/unsafe choice consumes nothing.
 - [x] SB-M39-038 Tornado booster: 750 SB; choose exactly one present color.
-- [ ] SB-M39-039 Tornado atomically clears all remaining ACTIVE cells of chosen color and reconciles M23 supply, M24 slots, M25 claims/reservations, M26 in-flight agents/quotas and M27 state.
-- [ ] SB-M39-040 Prove Tornado rollback/failure consumes no charge/SB and leaves no ghost batch/agent/double-clear.
+- [x] SB-M39-039 Tornado atomically clears all remaining ACTIVE cells of chosen color and reconciles M23 supply, M24 slots, M25 claims/reservations, M26 in-flight agents/quotas and M27 state.
+- [x] SB-M39-040 Prove Tornado rollback/failure consumes no charge/SB and leaves no ghost batch/agent/double-clear.
 - [x] SB-M39-041 Implement `daily_service.gd`: visible consecutive-login count plus repeating 5-day reward cycle.
 - [x] SB-M39-042 Daily login rewards: D1 100 SB; D2 Standard Pack; D3 random booster; D4 250 SB + Standard Pack; D5 300 SB + selected booster + Premium Pack.
 - [x] SB-M39-043 Daily has exactly three tasks with 75/100/125 SB individual rewards and one random booster for completing all three.
-- [ ] SB-M39-044 Missing a local calendar day resets login streak/cycle; clock rollback can never create duplicate claims.
+- [x] SB-M39-044 Missing a local calendar day resets login streak/cycle; clock rollback can never create duplicate claims.
 - [x] SB-M39-045 Implement `collection_inventory.gd` for 15 sets × 9 cards, protected first copy and completion state.
 - [x] SB-M39-046 Standard Pack = 3 eligible draws; Premium Pack = 5 eligible draws with >=1 Rare-or-better; duplicates allowed.
 - [x] SB-M39-047 Implement exact per-set 9/9 rewards from Economy V1: S1 350/5, S2 400/5, S3 450/6, S4 500/7, S5 550/7, S6 600/8, S7 700/9, S8 750/9, S9 800/10, S10 900/10, S11 1000/11, S12 1100/12, S13 1250/13, S14 1500/15, S15 2500/20 (SB/Bot Parts), each exactly once.
@@ -1468,21 +1472,23 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 
 ### M40 — Save System
 
+V04 independent audit: `CODE_AUDIT_PASS / M38 STRICT REGRESSION REQUIRED`. All M40 task rows are code/evidence-proven; final milestone `AUDITED_PASS` waits for M38 V03 repaired strict regression plus rerun of M40 V04 bootstrap/root suite.
+
 V04 remediation authority: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V04.md` + `CHATGPT_AUDIT_CRITERIA_V04.md`. Frozen F-M40-V03-001..004. Remaining work is actual app bootstrap, frontier-to-catalog content resolution, app-owned durable action/save boundaries and local-day end-to-end persistence.
 
 V03 remediation authority: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V03.md` + `CHATGPT_AUDIT_CRITERIA_V03.md`. Frozen F-M40-V02-001..009. SB-M40-004/006/007 are independently accepted; remaining rows await V03/dependency closure.
 
 Pre-authored batch bundle: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. All 13 task IDs require separate GitHub task logs; M40 is the batch endpoint and remains subject to later strict full-surface ChatGPT audit.
 
-- [x] SB-M40-001 Versioned schema. — [ ] SB-M40-002 Settings.
-- [ ] SB-M40-003 Progression. — [x] SB-M40-004 Win streak.
-- [ ] SB-M40-005 Persist Economy V1 wallet, Hearts/regen anchor, Bot Parts/robots, cards, booster charges, Gift Meter, Daily and 2x entitlements.
+- [x] SB-M40-001 Versioned schema. — [x] SB-M40-002 Settings.
+- [x] SB-M40-003 Progression. — [x] SB-M40-004 Win streak.
+- [x] SB-M40-005 Persist Economy V1 wallet, Hearts/regen anchor, Bot Parts/robots, cards, booster charges, Gift Meter, Daily and 2x entitlements.
 - [x] SB-M40-006 Safe write strategy.
 - [x] SB-M40-007 Missing-save behavior. — [x] SB-M40-008 Corruption recovery.
 - [x] SB-M40-009 Migration strategy.
-- [ ] SB-M40-010 Round-trip tests. — [x] SB-M40-011 Corrupt-file tests.
+- [x] SB-M40-010 Round-trip tests. — [x] SB-M40-011 Corrupt-file tests.
 - [x] SB-M40-012 Migrate old saves with missing Economy V1 fields to safe defaults; never invent Star/Event balances.
-- [ ] SB-M40-013 Persist wall-clock timestamps/expiry defensively against duplicate reward/refill claims.
+- [x] SB-M40-013 Persist wall-clock timestamps/expiry defensively against duplicate reward/refill claims.
 
 ### M41 — Settings
 
