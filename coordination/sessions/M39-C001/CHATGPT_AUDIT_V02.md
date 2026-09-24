@@ -91,63 +91,63 @@ Key false-positive risks found:
 
 ## Sprint coverage ledger
 
-| Task | Production owner / surface | Status | Audit note |
-|---|---|---|---|
-| SB-M39-001 | `economy_services.gd` / wallet/reward/config services | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-002 | `economy_services.gd` / wallet/reward/config services | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-003 | `economy_services.gd` / wallet/reward/config services | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-004 | `economy_services.gd` / wallet/reward/config services | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-005 | `economy_services.gd` / wallet/reward/config services | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-006 | `economy_services.gd` / wallet/reward/config services | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-007 | `economy_services.gd` / wallet/reward/config services | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-008 | `gift_meter_service.gd` / RewardGrantService | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-009 | `gift_meter_service.gd` / RewardGrantService | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-010 | `gift_meter_service.gd` / RewardGrantService | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-011 | `gift_meter_service.gd` / RewardGrantService | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-012 | `gift_meter_service.gd` / RewardGrantService | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-013 | `gift_meter_service.gd` / RewardGrantService | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-014 | `gift_meter_service.gd` / RewardGrantService | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-015 | `robot_unlock_service.gd` / pacing/perk evidence | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-016 | `robot_unlock_service.gd` / pacing/perk evidence | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-017 | `robot_unlock_service.gd` / pacing/perk evidence | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-018 | `robot_unlock_service.gd` / pacing/perk evidence | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-019 | `heart_service.gd` + `production_gameplay_host.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-020 | `heart_service.gd` + `production_gameplay_host.gd` | **DEFECT/GAP** | restart-after-gameplay is not armed and Retry consumes no Heart |
-| SB-M39-021 | `heart_service.gd` + `production_gameplay_host.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-022 | `speed_entitlement_service.gd` / production host speed seam | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-023 | `speed_entitlement_service.gd` / production host speed seam | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-024 | `speed_entitlement_service.gd` / production host speed seam | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-025 | `speed_entitlement_service.gd` / production host speed seam | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-026 | `speed_entitlement_service.gd` / production host speed seam | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-027 | `speed_entitlement_service.gd` / production host speed seam | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-028 | `speed_entitlement_service.gd` / production host speed seam | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-029 | `economy_services.gd` / wallet/reward/config services | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-030 | `five_slot_batch_engine.gd` / `proof_state.gd` / `proof_kernel.gd` / `five_slot_strip.gd` / `slot_origin_provider.gd` | **DEFECT/GAP** | +1 Slot is not cross-engine atomic if grow fails after economy reserve/commit |
-| SB-M39-031 | `five_slot_batch_engine.gd` / `proof_state.gd` / `proof_kernel.gd` / `five_slot_strip.gd` / `slot_origin_provider.gd` | **DEFECT/GAP** | engine grows to six, but downstream slot origin/presentation still hard-code five |
-| SB-M39-032 | `five_slot_batch_engine.gd` / `proof_state.gd` / `proof_kernel.gd` / `five_slot_strip.gd` / `slot_origin_provider.gd` | **DEFECT/GAP** | ProofKernel reconstruct/read-back/origin logic still hard-codes ProofState.SLOT_COUNT=5 |
-| SB-M39-033 | `five_slot_batch_engine.gd` / `proof_state.gd` / `proof_kernel.gd` / `five_slot_strip.gd` / `slot_origin_provider.gd` | **DEFECT/GAP** | FiveSlotStrip renders/binds exactly five; slot 5 has no visible/touch/origin support; device gate cannot cure missing code |
-| SB-M39-034 | `production_booster_adapter.gd` / `booster_service.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-035 | `production_booster_adapter.gd` / `booster_service.gd` | **DEFECT/GAP** | Random checks only current reordered-state classifier; no 3-consecutive-move proof |
-| SB-M39-036 | `production_booster_adapter.gd` / `booster_service.gd` | **DEFECT/GAP** | Selector eligibility checks reorder state only, not the post-extraction/placement state |
-| SB-M39-037 | `production_booster_adapter.gd` / `booster_service.gd` | **DEFECT/GAP** | failing extraction stage can leave reordered supply because current failing stage is not rolled back |
-| SB-M39-038 | `production_booster_adapter.gd` / `booster_service.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-039 | `production_booster_adapter.gd` / `booster_service.gd` | **DEFECT/GAP** | Tornado substitutes quiescence-only rejection for owner-required in-flight claim/agent reconciliation |
-| SB-M39-040 | `production_booster_adapter.gd` / `booster_service.gd` | **DEFECT/GAP** | transaction runner rolls back only previously successful stages; a partially-mutating failing stage is not rolled back |
-| SB-M39-041 | `daily_service.gd` | **DEFECT/GAP** | day identity is unix/86400 UTC-style, not owner-required local calendar day |
-| SB-M39-042 | `daily_service.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-043 | `daily_service.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-044 | `daily_service.gd` | **DEFECT/GAP** | no persisted claim timestamp/highest-seen trusted/system timestamp; rollback defense is incomplete vs owner lock |
-| SB-M39-045 | `collection/*` / `cards_exchange_service.gd` | **DEFECT/GAP** | collection import accepts claimed-set/master flags inconsistent with actual owned-card completion state |
-| SB-M39-046 | `collection/*` / `cards_exchange_service.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-047 | `collection/*` / `cards_exchange_service.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-047A | `collection/*` / `cards_exchange_service.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-047B | `collection/*` / `cards_exchange_service.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-047C | `collection/*` / `cards_exchange_service.gd` | **DEFECT/GAP** | claimed set/master metadata is not coherency-validated against inventory truth on import |
-| SB-M39-048 | `collection/*` / `cards_exchange_service.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-049 | `collection/*` / `cards_exchange_service.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-050 | `collection/*` / `cards_exchange_service.gd` | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-051 | `economy_services.gd` / wallet/reward/config services | PROVEN/NO NEW GAP | V01/V02 source + focused evidence reviewed; no new material gap found in this row. |
-| SB-M39-052 | `economy_services.gd` / wallet/reward/config services | **DEFECT/GAP** | full matrix misses the defects above and cannot be closure evidence |
+| Task | Status | Audit note |
+|---|---|---|
+| SB-M39-001 | **DEFECT/GAP** | F-M39-V02-011 EconomyConfig validation incomplete |
+| SB-M39-002 | **DEFECT/GAP** | F-M39-V02-013 wallet accepts arbitrary removed-currency resource IDs |
+| SB-M39-003 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-004 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-005 | **DEFECT/GAP** | F-M39-V02-014 first-clear reward precedes progression acceptance |
+| SB-M39-006 | **DEFECT/GAP** | F-M39-V02-014 Bot Part first-clear reward shares wrong transaction ordering |
+| SB-M39-007 | **DEFECT/GAP** | F-M39-V02-012 RewardGrant applied-tx import noncanonical |
+| SB-M39-008 | **DEFECT/GAP** | F-M39-V02-012 Gift Meter import/queue noncanonical |
+| SB-M39-009 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-010 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-011 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-012 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-013 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-014 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-015 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-016 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-017 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-018 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-019 | **DEFECT/GAP** | F-M39-V02-016 Heart anchor domain noncanonical |
+| SB-M39-020 | **DEFECT/GAP** | F-M39-V02-007 restart-after-gameplay Heart/streak law not wired |
+| SB-M39-021 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-022 | **DEFECT/GAP** | F-M39-V02-016 2x entitlement sentinel domain noncanonical |
+| SB-M39-023 | **DEFECT/GAP** | F-M39-V02-016 current-level entitlement state domain requires hardening |
+| SB-M39-024 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-025 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-026 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-027 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-028 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-029 | **DEFECT/GAP** | F-M39-V02-012 unknown fifth booster snapshot key ignored |
+| SB-M39-030 | **DEFECT/GAP** | F-M39-V02-008 +1 Slot economy/engine commit not atomic |
+| SB-M39-031 | **DEFECT/GAP** | F-M39-V02-001 sixth slot not integrated through presentation/origin |
+| SB-M39-032 | **DEFECT/GAP** | F-M39-V02-002 ProofKernel still fixed-five |
+| SB-M39-033 | **DEFECT/GAP** | F-M39-V02-001 production sixth-slot presentation absent; device gate follows code fix |
+| SB-M39-034 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-035 | **DEFECT/GAP** | F-M39-V02-003 no 3-consecutive safe-selection proof |
+| SB-M39-036 | **DEFECT/GAP** | F-M39-V02-004 selector safety checked before actual placement |
+| SB-M39-037 | **DEFECT/GAP** | F-M39-V02-004/005 selector partial failure rollback unsafe |
+| SB-M39-038 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-039 | **DEFECT/GAP** | F-M39-V02-006 Tornado owner in-flight law replaced by quiescence-only rule |
+| SB-M39-040 | **DEFECT/GAP** | F-M39-V02-005 failing-stage rollback missing |
+| SB-M39-041 | **DEFECT/GAP** | F-M39-V02-009/015 local-day/task-day semantics incomplete |
+| SB-M39-042 | **DEFECT/GAP** | F-M39-V02-015 login state mutates before unchecked reward grant |
+| SB-M39-043 | **DEFECT/GAP** | F-M39-V02-015 prior-day task completion can leak into next-day claim |
+| SB-M39-044 | **DEFECT/GAP** | F-M39-V02-009/015 required local date + timestamps/rollback state absent |
+| SB-M39-045 | **DEFECT/GAP** | F-M39-V02-010 collection claimed-state coherence missing |
+| SB-M39-046 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-047 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-047A | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-047B | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-047C | **DEFECT/GAP** | F-M39-V02-010 persisted completion-grant state not coherency-validated |
+| SB-M39-048 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-049 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-050 | PROVEN / no new material gap | V01/V02 source + direct evidence reviewed; rerun regression if touched by V03 dependencies. |
+| SB-M39-051 | **DEFECT/GAP** | F-M39-V02-013 removed currency can exist through wallet runtime API |
+| SB-M39-052 | **DEFECT/GAP** | full matrix misses frozen findings |
 
 ## Interaction sweep
 The findings interact:
