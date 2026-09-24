@@ -141,22 +141,35 @@ func import_snapshot(s) -> bool:
 		return true
 	if s.get("schema", "") != SNAPSHOT_SCHEMA:
 		return false
-	var st = s.get("streak", null)
-	if typeof(st) != TYPE_INT and typeof(st) != TYPE_FLOAT:
-		return false
-	if int(st) < 0:
+	# Integer state must be an exact integer (int or integral float); fractional,
+	# NaN or INF fails closed rather than silently truncating (M38 V02).
+	var st_i = _as_exact_int(s.get("streak", null))
+	if st_i == null or st_i < 0:
 		return false
 	var processed_raw = s.get("processed", null)
 	if typeof(processed_raw) != TYPE_ARRAY:
 		return false
 	var new_processed: Dictionary = {}
 	for v in processed_raw:
-		if typeof(v) != TYPE_INT and typeof(v) != TYPE_FLOAT:
+		var iv = _as_exact_int(v)
+		if iv == null or iv < 1:
 			return false
-		if int(v) < 1:
-			return false
-		new_processed[int(v)] = true
-	_streak = int(st)
+		if new_processed.has(iv):
+			return false   # duplicate processed id => corrupt snapshot, fail closed
+		new_processed[iv] = true
+	# All-or-nothing apply (nothing above mutated live state).
+	_streak = st_i
 	_processed_levels = new_processed
 	_gameplay_started = false
 	return true
+
+## Returns the exact integer value of `v`, or null if `v` is not an exact
+## integer (non-numeric, fractional float, NaN or INF).
+func _as_exact_int(v):
+	if typeof(v) == TYPE_INT:
+		return v
+	if typeof(v) == TYPE_FLOAT:
+		if is_nan(v) or is_inf(v) or floor(v) != v:
+			return null
+		return int(v)
+	return null
