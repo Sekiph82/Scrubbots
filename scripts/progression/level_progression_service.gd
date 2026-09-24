@@ -101,24 +101,35 @@ func import_snapshot(s) -> bool:
 		return false
 	if s.get("schema", "") != SNAPSHOT_SCHEMA:
 		return false
-	var cur = s.get("current_level", null)
-	if typeof(cur) != TYPE_INT and typeof(cur) != TYPE_FLOAT:
-		return false
-	var cur_i := int(cur)
-	if cur_i < 1:
+	# Integer state must be an exact integer: JSON delivers whole numbers as int
+	# or integral float; a fractional value, NaN or INF fails closed rather than
+	# silently truncating (M37 V02 / strict-v2).
+	var cur_i := _as_exact_int(s.get("current_level", null))
+	if cur_i == null or cur_i < 1:
 		return false
 	var completed_raw = s.get("completed", null)
 	if typeof(completed_raw) != TYPE_ARRAY:
 		return false
 	var new_completed: Dictionary = {}
 	for v in completed_raw:
-		if typeof(v) != TYPE_INT and typeof(v) != TYPE_FLOAT:
+		var iv := _as_exact_int(v)
+		if iv == null or iv < 1:
 			return false
-		var iv := int(v)
-		if iv < 1:
-			return false
+		if new_completed.has(iv):
+			return false   # duplicate id in a loaded snapshot => corruption, fail closed
 		new_completed[iv] = true
-	# All-or-nothing apply.
+	# All-or-nothing apply (nothing above mutated live state).
 	_current_level = cur_i
 	_completed = new_completed
 	return true
+
+## Returns the exact integer value of `v`, or null if `v` is not an exact
+## integer (non-numeric, fractional float, NaN or INF).
+func _as_exact_int(v):
+	if typeof(v) == TYPE_INT:
+		return v
+	if typeof(v) == TYPE_FLOAT:
+		if is_nan(v) or is_inf(v) or floor(v) != v:
+			return null
+		return int(v)
+	return null
