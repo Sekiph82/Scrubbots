@@ -478,37 +478,25 @@ func _run_independence_tests() -> void:
 ## ProductionLevelValidator. Distinct from _run_level_validation_tests(),
 ## which only tests generic structural validity (LevelValidator).
 func _run_production_difficulty_tests() -> void:
-	# --- Easy: 20..29 ---
-	_check(ProductionLevelValidator.validate(_make_level("easy_min", "EASY", 20, 20)).is_ok(), "Easy 20x20 (min) PASS -> cell_count %d" % 400)
-	_check(ProductionLevelValidator.validate(_make_level("easy_max", "EASY", 29, 29)).is_ok(), "Easy 29x29 (max) PASS -> cell_count %d" % 841)
-	_check(ProductionLevelValidator.validate(_make_level("easy_rect", "EASY", 20, 27)).is_ok(), "Easy 20x27 (rectangular) PASS -> cell_count %d" % 540)
+	# Difficulty V1 (2026-09-12, migrated in M36 V02): production legality is
+	# class-token + 20..59 envelope; CLASS IS NOT DERIVED FROM DIMENSIONS. The
+	# old class=dimension bands are retired (legacy M21 seam only).
 
-	# --- Medium: 30..39 ---
-	_check(ProductionLevelValidator.validate(_make_level("medium_min", "MEDIUM", 30, 30)).is_ok(), "Medium 30x30 (min) PASS -> cell_count %d" % 900)
-	_check(ProductionLevelValidator.validate(_make_level("medium_max", "MEDIUM", 39, 39)).is_ok(), "Medium 39x39 (max) PASS -> cell_count %d" % 1521)
-	_check(ProductionLevelValidator.validate(_make_level("medium_rect", "MEDIUM", 34, 39)).is_ok(), "Medium 34x39 (rectangular) PASS -> cell_count %d" % 1326)
+	# --- Any production class is legal anywhere in the 20..59 envelope ---
+	_check(ProductionLevelValidator.validate(_make_level("easy_min", "EASY", 20, 20)).is_ok(), "EASY 20x20 (min envelope) PASS")
+	_check(ProductionLevelValidator.validate(_make_level("veryhard_max", "VERY_HARD", 59, 59)).is_ok(), "VERY_HARD 59x59 (max envelope) PASS")
 
-	# --- Hard: 40..49 ---
-	_check(ProductionLevelValidator.validate(_make_level("hard_min", "HARD", 40, 40)).is_ok(), "Hard 40x40 (min) PASS -> cell_count %d" % 1600)
-	_check(ProductionLevelValidator.validate(_make_level("hard_max", "HARD", 49, 49)).is_ok(), "Hard 49x49 (max) PASS -> cell_count %d" % 2401)
-	_check(ProductionLevelValidator.validate(_make_level("hard_rect", "HARD", 48, 41)).is_ok(), "Hard 48x41 (rectangular) PASS -> cell_count %d" % 1968)
+	# --- Class independent of dimensions (the core Difficulty V1 property) ---
+	_check(ProductionLevelValidator.validate(_make_level("compact_boss", "VERY_HARD", 24, 24)).is_ok(), "VERY_HARD 24x24 PASS (compact board can be a boss)")
+	_check(ProductionLevelValidator.validate(_make_level("large_relief", "EASY", 38, 38)).is_ok(), "EASY 38x38 PASS (large board can be relief)")
+	_check(ProductionLevelValidator.validate(_make_level("wide_medium", "MEDIUM", 59, 20)).is_ok(), "MEDIUM 59x20 (rectangular) PASS")
+	_check(ProductionLevelValidator.validate(_make_level("tall_hard", "HARD", 20, 59)).is_ok(), "HARD 20x59 (rectangular) PASS")
 
-	# --- Very Hard: 50..59 ---
-	_check(ProductionLevelValidator.validate(_make_level("veryhard_min", "VERY_HARD", 50, 50)).is_ok(), "Very Hard 50x50 (min) PASS -> cell_count %d" % 2500)
-	_check(ProductionLevelValidator.validate(_make_level("veryhard_max", "VERY_HARD", 59, 59)).is_ok(), "Very Hard 59x59 (max, current maximum) PASS -> cell_count %d" % 3481)
-	_check(ProductionLevelValidator.validate(_make_level("veryhard_rect", "VERY_HARD", 53, 59)).is_ok(), "Very Hard 53x59 (rectangular) PASS -> cell_count %d" % 3127)
-
-	# --- Cross-band (upper) rejection ---
-	_check(not ProductionLevelValidator.validate(_make_level("easy_bad_upper", "EASY", 20, 30)).is_ok(), "Easy 20x30 rejected (height out of band)")
-	_check(not ProductionLevelValidator.validate(_make_level("medium_bad_upper", "MEDIUM", 39, 40)).is_ok(), "Medium 39x40 rejected (height out of band)")
-	_check(not ProductionLevelValidator.validate(_make_level("hard_bad_upper", "HARD", 49, 50)).is_ok(), "Hard 49x50 rejected (height out of band)")
-	_check(not ProductionLevelValidator.validate(_make_level("veryhard_bad_upper", "VERY_HARD", 49, 59)).is_ok(), "Very Hard 49x59 rejected (width out of band)")
-
-	# --- Cross-band (lower) rejection ---
-	_check(not ProductionLevelValidator.validate(_make_level("easy_bad_lower", "EASY", 19, 20)).is_ok(), "Easy 19x20 rejected (width below band)")
-	_check(not ProductionLevelValidator.validate(_make_level("medium_bad_lower", "MEDIUM", 29, 30)).is_ok(), "Medium 29x30 rejected (width below band)")
-	_check(not ProductionLevelValidator.validate(_make_level("hard_bad_lower", "HARD", 39, 40)).is_ok(), "Hard 39x40 rejected (width below band)")
-	_check(not ProductionLevelValidator.validate(_make_level("veryhard_bad_lower", "VERY_HARD", 49, 50)).is_ok(), "Very Hard 49x50 rejected (width below band)")
+	# --- Envelope rejection (below 20 or above 59), class-agnostic ---
+	_check(not ProductionLevelValidator.validate(_make_level("under_w", "EASY", 19, 24)).is_ok(), "19x24 rejected (width below envelope)")
+	_check(not ProductionLevelValidator.validate(_make_level("under_h", "VERY_HARD", 24, 19)).is_ok(), "24x19 rejected (height below envelope)")
+	_check(not ProductionLevelValidator.validate(_make_level("over_w", "MEDIUM", 60, 24)).is_ok(), "60x24 rejected (width above envelope)")
+	_check(not ProductionLevelValidator.validate(_make_level("over_h", "HARD", 24, 60)).is_ok(), "24x60 rejected (height above envelope)")
 
 	# --- Unknown production difficulty ---
 	var unknown_result = ProductionLevelValidator.validate(_make_level("mystery", "IMPOSSIBLE", 40, 40))
