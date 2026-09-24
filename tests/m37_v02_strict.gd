@@ -30,16 +30,16 @@ func _duplicate_and_reentrant() -> void:
 	_ok(s.completed_count() == 1 and s.current_level() == 2, "reentrant duplicates never double-advance")
 
 func _stale_and_future() -> void:
-	print("[stale/future]")
+	print("[stale/future — V03 forward-only shipping law]")
 	var s = LevelProgressionService.new()
 	s.record_win(1); s.record_win(2); s.record_win(3)   # frontier 4
 	_ok(not s.record_win(1), "stale lower-level completion rejected (already complete)")
 	_ok(s.current_level() == 4, "frontier unaffected by stale completion")
-	# Future level out of order: recorded as a first-clear but the frontier does
-	# NOT jump (frontier only advances when clearing the current frontier level).
-	_ok(s.record_win(99), "out-of-order future level records a first-clear")
-	_ok(s.current_level() == 4, "future completion does not jump the frontier")
-	_ok(s.is_completed(99), "future level marked completed")
+	# Forward-only law (M37 V03, F-M37-V02-001, owner decision): out-of-order
+	# future level is rejected outright, no mutation.
+	_ok(not s.record_win(99), "out-of-order future level rejected (forward-only shipping)")
+	_ok(s.current_level() == 4, "future completion did not mutate the frontier")
+	_ok(not s.is_completed(99), "future level not marked completed")
 
 func _replay() -> void:
 	print("[replay]")

@@ -43,8 +43,15 @@ func debug_set_current_level(n: int) -> bool:
 # ------------------------------------------------------ completion ----
 
 ## Record a first-clear WON for a level number. Returns true only if this call
-## caused a NEW first-clear (idempotent). Duplicate/stale/invalid calls return
-## false and never advance the frontier.
+## caused a NEW first-clear (idempotent). Duplicate/stale/invalid/future/replay
+## calls return false and never mutate state.
+##
+## Owner shipping law (M37 V03, F-M37-V02-001, owner
+## OWNER_M37_LEVEL_SELECT_DECISION_V01): the game is forward-only with no
+## player-facing Level Select, so a shipping first-clear may ONLY come from the
+## current frontier level. Stale lower and out-of-order future calls are
+## rejected. To jump the frontier for tests/dev use the explicitly non-shipping
+## `debug_set_current_level`.
 ##
 ## is_replay: when true the caller loaded a previously completed level for
 ## replay — completion must not advance progression or first-clear truth.
@@ -55,11 +62,10 @@ func record_win(level_number: int, is_replay: bool = false) -> bool:
 		return false
 	if _completed.has(level_number):
 		return false
-	# First clear.
+	if level_number != _current_level:
+		return false   # stale lower OR out-of-order future -> zero mutation
 	_completed[level_number] = true
-	# Advance the frontier only when clearing the current frontier level.
-	if level_number == _current_level:
-		_current_level += 1
+	_current_level += 1
 	return true
 
 func is_completed(level_number: int) -> bool:
@@ -118,6 +124,17 @@ func import_snapshot(s) -> bool:
 		if new_completed.has(iv):
 			return false   # duplicate id in a loaded snapshot => corruption, fail closed
 		new_completed[iv] = true
+	# Canonical shipping snapshot coherence (M37 V03, F-M37-V02-002): the game
+	# is forward-only with no player-facing Level Select, so a shipping-produced
+	# completed set is exactly the contiguous range 1..current_level-1. A gapped/
+	# future/current-included set is corrupt and fails closed. Debug snapshots
+	# built via debug_set_current_level are non-shipping and never round-tripped
+	# through this canonical import.
+	if new_completed.size() != cur_i - 1:
+		return false
+	for n in range(1, cur_i):
+		if not new_completed.has(n):
+			return false
 	# All-or-nothing apply (nothing above mutated live state).
 	_current_level = cur_i
 	_completed = new_completed
