@@ -19,10 +19,10 @@ extends RefCounted
 ##     (SB-M35-007).
 ##
 ## Difficulty V1 note: SB-M35 exposes the level's difficulty token verbatim as
-## surfaced by LevelData. M36 owns the class-vs-dimension semantics; this
-## catalog does NOT re-lock legacy dimension bands beyond the structural
-## `ProductionLevelValidator` check already required for M21 production
-## compatibility.
+## surfaced by LevelData. M36 owns the class semantics. Since M36 V02 the
+## `ProductionLevelValidator` gate is class-token + 20..59 envelope based (class
+## is NOT derived from dimensions); this catalog re-locks no legacy dimension
+## bands.
 ##
 ## Consumers get immutable LevelCatalogEntry copies; mutating the returned
 ## Array does not mutate canonical catalog state.
