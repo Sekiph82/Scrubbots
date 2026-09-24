@@ -116,8 +116,12 @@ func validate_candidate(cand) -> Dictionary:
 	var scratch_prog = LevelProgressionService.new()
 	if not scratch_prog.import_snapshot(cand.get("progression", {})):
 		return {"ok": false, "reason": "progression_import"}
+	# Strict haptics validation (F-M40-V02-006): a corrupt canonical
+	# `settings.haptics` invalidates the whole candidate rather than being
+	# silently normalized to the safe default.
 	var scratch_hap = HapticsSettingsService.new("user://__scratch_haptics.cfg")
-	scratch_hap.import_snapshot(settings.get("haptics", {}))
+	if not scratch_hap.strict_import_snapshot(settings.get("haptics", {})):
+		return {"ok": false, "reason": "haptics_malformed"}
 	return {"ok": true}
 
 # --------------------------------------------------------------- migration ----
@@ -127,10 +131,14 @@ func validate_candidate(cand) -> Dictionary:
 ## empty state, never re-initialization rewards). Future versions are refused by
 ## validate_candidate before this runs.
 func migrate(cand: Dictionary) -> Dictionary:
-	var v := int(cand.get("version", 0))
-	# v == VERSION: nothing to do.
-	# v < VERSION: apply each step in order. (Only one version so far, so this is
-	# the extension point; missing sections are backfilled to safe empties.)
+	# Reject malformed version before any coercion (F-M40-V02-003): 0.5 / "0" /
+	# NaN / INF must never be int()-coerced into a valid older version. The load
+	# path calls validate_candidate() before migrate so this is a defensive
+	# double-check; direct callers get the same fail-closed guarantee (returns
+	# the input untouched, so validate_candidate later rejects it).
+	var v = IntDomain.exact_int(cand.get("version", null))
+	if v == null:
+		return cand
 	if v < VERSION:
 		if not cand.has("economy"):
 			cand["economy"] = {}
@@ -152,7 +160,9 @@ func _apply(cand: Dictionary) -> bool:
 	_audio.set_master_volume(float(audio.get("master", 1.0)))
 	_audio.set_music_volume(float(audio.get("music", 1.0)))
 	_audio.set_sfx_volume(float(audio.get("sfx", 1.0)))
-	_haptics.import_snapshot(settings.get("haptics", {}))
+	# strict_import_snapshot is guaranteed to succeed here — validate_candidate
+	# rejected malformed haptics upstream.
+	_haptics.strict_import_snapshot(settings.get("haptics", {}))
 	var ok := _progression.import_snapshot(cand.get("progression", {})) and _economy.import_snapshot(cand.get("economy", {}))
 	if not ok:
 		# Restore exactly.

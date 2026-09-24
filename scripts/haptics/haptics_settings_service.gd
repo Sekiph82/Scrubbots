@@ -42,9 +42,25 @@ func snapshot() -> Dictionary:
 	return {"enabled": _enabled}
 
 ## Idempotent import; unknown/malformed inputs fall back to safe default.
+## Kept for M33 back-compat.
 func import_snapshot(s: Dictionary) -> void:
 	var v = s.get("enabled", true)
 	_enabled = bool(v) if typeof(v) == TYPE_BOOL else true
+
+## Strict canonical import (M40 V03, F-M40-V02-006): returns true only when the
+## snapshot is a Dictionary with an explicit boolean `enabled`. Any other shape
+## fails closed so a corrupt canonical save invalidates the whole candidate
+## instead of silently normalizing to the safe default.
+func strict_import_snapshot(s) -> bool:
+	if typeof(s) != TYPE_DICTIONARY:
+		return false
+	if not s.has("enabled"):
+		return false
+	var v = s["enabled"]
+	if typeof(v) != TYPE_BOOL:
+		return false
+	_enabled = v
+	return true
 
 func get_path() -> String:
 	return _path

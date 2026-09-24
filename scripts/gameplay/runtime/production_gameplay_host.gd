@@ -59,6 +59,7 @@ const BoosterService = preload("res://scripts/economy/booster_service.gd")
 const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
 const ProductionBoosterAdapter = preload("res://scripts/economy/production_booster_adapter.gd")
 const SaveService = preload("res://scripts/save/save_service.gd")
+const AppState = preload("res://scripts/app/app_state.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -117,6 +118,11 @@ var _progression
 var _booster_service
 var _booster_adapter
 var _save
+## M40 V03: optional injected AppState composition root. When set, the host
+## consumes its canonical audio/haptics/progression/economy/save graph instead
+## of building duplicates. Tests inject an isolated instance; production
+## bootstrap wires the app-level AppState here.
+var app_state = null
 var _economy_terminal_done := false
 var _built := false
 var _build_error := ""
@@ -141,6 +147,19 @@ func _fit_screen() -> void:
 func build() -> bool:
 	if _built:
 		return true
+	# M40 V03 (F-M40-V02-002): if an AppState was injected and its SaveService
+	# rejected the primary save with an unsupported/future-schema result, refuse
+	# to run normal gameplay. Fresh in-memory defaults must not silently take
+	# over an unsupported future save.
+	if app_state != null and app_state.is_blocked:
+		_build_error = "save_blocked:%s" % app_state.blocked_reason()
+		return false
+	# M40 V03 (F-M40-V02-004): bind the gameplay level identity to the canonical
+	# LevelProgressionService frontier when AppState is present. This closes the
+	# hazard where a loaded frontier can disagree with the host's separate
+	# `progression_level` export.
+	if app_state != null and app_state.progression != null:
+		progression_level = app_state.progression.current_level()
 	var res_load = LevelLoader.load_from_path(level_path)
 	if not res_load.is_ok():
 		_build_error = "level load failed"
@@ -251,8 +270,15 @@ func build() -> bool:
 	# controller observing the SAME authoritative events. All three wirings are pure observers
 	# — dispatch on committed dispatch, cleaning on authenticated clear, completion on WON
 	# only. Audio never mutates gameplay/terminal/speed truth.
-	_audio_settings = AudioSettingsService.new()
-	_audio_settings.load()  # persisted user volumes -> AudioServer buses (defaults if none)
+	# M40 V03 (F-M40-V02-005/G): when an AppState is injected, consume its
+	# canonical audio settings rather than loading the legacy side file (which
+	# would be a competing persistence authority). No injection => back-compat
+	# side-file load.
+	if app_state != null and app_state.audio != null:
+		_audio_settings = app_state.audio
+	else:
+		_audio_settings = AudioSettingsService.new()
+		_audio_settings.load()
 	_audio = GameplayAudioController.new()
 	add_child(_audio)
 	_dispatcher.assignment_dispatched.connect(_audio._on_assignment_dispatched)
@@ -265,8 +291,13 @@ func build() -> bool:
 	# disabled toggle or throttled request never blocks the gameplay clear/terminal.
 	# The persisted enabled setting drives the live controller. Bound exactly once here;
 	# _bind_haptics_signals guards against duplicate connections on host rebuild.
-	_haptics_settings = HapticsSettingsService.new()
-	_haptics_settings.load()  # persisted enabled bit (default true if none)
+	# M40 V03 (F-M40-V02-005/G): consume AppState haptics settings when
+	# available; back-compat side-file otherwise.
+	if app_state != null and app_state.haptics != null:
+		_haptics_settings = app_state.haptics
+	else:
+		_haptics_settings = HapticsSettingsService.new()
+		_haptics_settings.load()
 	_haptics = HapticsController.new()
 	_haptics.set_enabled(_haptics_settings.is_enabled())
 	add_child(_haptics)
@@ -277,20 +308,26 @@ func build() -> bool:
 	# _economy stays null and gameplay proceeds normally. The canonical service
 	# graph is driven by authoritative production events (see _on_terminal_reached
 	# and the manual-2x gate) — never by UI directly.
-	_economy = EconomyServices.new()
-	if _economy != null and not _economy.config.is_ok():
-		_economy = null
+	# M40 V03 (F-M40-V02-001): when an AppState is injected, consume its shared
+	# progression + economy + save graph so there is EXACTLY ONE authoritative
+	# graph app-wide. Fall back to the pre-M40-V03 legacy path only when no
+	# AppState was supplied (tests + a few older harnesses).
+	if app_state != null and app_state.economy != null:
+		_economy = app_state.economy
+		_progression = app_state.progression
+		_save = app_state.save
+	else:
+		_economy = EconomyServices.new()
+		if _economy != null and not _economy.config.is_ok():
+			_economy = null
+		if _economy != null:
+			_progression = LevelProgressionService.new()
+			if not save_path.is_empty():
+				_save = SaveService.new(save_path, _audio_settings, _haptics_settings, _progression, _economy)
+				_save.load()
 	if _economy != null:
-		_progression = LevelProgressionService.new()
 		_booster_adapter = ProductionBoosterAdapter.new(_level, _board, _supply, _slots, _scheduler)
 		_booster_service = BoosterService.new(_economy.boosters)
-		# M40 V02 (F-M40-006): one canonical SaveService in the runtime composition.
-		# When a save_path is configured, LOAD here — before any gameplay event
-		# consumes economy/progression/settings — so persisted state is authoritative
-		# from the first frame. Empty save_path keeps the host disk-free (tests/suite).
-		if not save_path.is_empty():
-			_save = SaveService.new(save_path, _audio_settings, _haptics_settings, _progression, _economy)
-			_save.load()
 	_economy_terminal_done = false
 
 	# Meaningful gameplay boundaries mark the completion state dirty (authenticated clear +
@@ -519,6 +556,19 @@ func _on_pause_pressed() -> void:
 ## M39 must route this production-facing request through SpeedEntitlementService
 ## (level/timed SB entitlement) before enabling 2x. Keep this direct toggle only as
 ## pre-M39 playable/audit behavior; authoritative M23-exhausted auto-2x remains free.
+## M40 V03 (F-M40-V02-008): durable save at a defined runtime boundary. Used by
+## host-owned action APIs (activate_plus_one_slot, terminal, purchase, claim,
+## unlock, exchange, settings) and by external callers via request_save(). Not
+## per-frame. Fail-safe when no SaveService is bound.
+func _flush_durable_save() -> void:
+	if _save != null:
+		_save.save()
+
+func request_save() -> Dictionary:
+	if _save == null:
+		return {"ok": true, "source": "no_save_bound"}
+	return _save.save()
+
 ## Manual 2x request path. M39 V02 (F-M39-004): turning 2x ON is gated by
 ## SpeedEntitlementService — no valid current-level/timed entitlement => the
 ## manual request is refused (no toggle). Turning 2x OFF is always allowed. The
@@ -571,6 +621,10 @@ func activate_plus_one_slot() -> bool:
 	# Push a fresh 6-slot snapshot so the newly appended view has content.
 	if _screen != null and _slots != null:
 		_screen.refresh_slot_snapshot(_slots.snapshot())
+	# M40 V03 (F-M40-V02-008): a durable meta mutation (charge/SB spent + booster
+	# committed) is a defined save boundary. Coalescing timers belong to M41 UI;
+	# a per-action flush here is safe because +1 Slot is at most once per attempt.
+	_flush_durable_save()
 	return true
 
 # ---------------------------------------------------------------- accessors ----
