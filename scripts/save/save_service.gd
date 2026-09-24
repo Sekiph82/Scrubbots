@@ -22,6 +22,7 @@ const AudioSettingsService = preload("res://scripts/audio/audio_settings_service
 const HapticsSettingsService = preload("res://scripts/haptics/haptics_settings_service.gd")
 const LevelProgressionService = preload("res://scripts/progression/level_progression_service.gd")
 const EconomyServices = preload("res://scripts/economy/economy_services.gd")
+const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
 var _path: String
 var _audio: AudioSettingsService
@@ -83,10 +84,10 @@ func validate_candidate(cand) -> Dictionary:
 		return {"ok": false, "reason": "not_object"}
 	if cand.get("schema", "") != SCHEMA:
 		return {"ok": false, "reason": "bad_schema"}
-	var ver = cand.get("version", null)
-	if typeof(ver) != TYPE_INT and typeof(ver) != TYPE_FLOAT:
-		return {"ok": false, "reason": "bad_version_type"}
-	if int(ver) > VERSION:
+	var ver = IntDomain.exact_int(cand.get("version", null))
+	if ver == null:
+		return {"ok": false, "reason": "bad_version_type"}   # fractional/NaN/non-int
+	if ver > VERSION:
 		return {"ok": false, "reason": "future_schema"}   # fail closed, no downgrade
 	# Settings shape.
 	var settings = cand.get("settings", {})
@@ -165,40 +166,79 @@ func _apply(cand: Dictionary) -> bool:
 
 # --------------------------------------------------------------- save ----
 
-## Serialize -> temp -> validate temp -> backup -> replace. Returns {ok, reason}.
+## Safe write lifecycle (M40 V02, F-M40-001/002/003):
+##   1. serialize + write TEMP; validate TEMP by reading it back.
+##   2. refuse if the existing primary is a FUTURE schema (never overwrite it).
+##   3. rotate backup ONLY from a fully VALIDATED existing primary — a corrupt/
+##      unvalidated primary never poisons the last-known-good backup.
+##   4. replace the primary by RENAMING the validated temp over it (near-atomic;
+##      the primary path is freed first so the rename cannot leave a truncated
+##      primary). Every I/O result is checked. On a replace failure the previous
+##      primary/backup are left intact.
+## Returns {ok, reason}.
 func save() -> Dictionary:
 	var cand := collect()
 	var text := JSON.stringify(cand)
-	# 1. write temp
-	if _faulted("temp_write"):
+
+	# 1. temp write + validate.
+	if _faulted("temp_write") or not _write_file(_temp_path(), text):
+		_remove(_temp_path())
 		return {"ok": false, "reason": "temp_write_failed"}
-	if not _write_file(_temp_path(), text):
-		return {"ok": false, "reason": "temp_write_failed"}
-	# 2. validate temp by reading it back
-	var reread = _read_json(_temp_path())
-	if reread == null or validate_candidate(reread).get("ok", false) == false:
+	if _faulted("temp_validate"):
 		_remove(_temp_path())
 		return {"ok": false, "reason": "temp_invalid"}
-	# 3. back up the last good primary (if any) before destructive replace
+	var reread = _read_json(_temp_path())
+	if reread == null or not validate_candidate(reread).get("ok", false):
+		_remove(_temp_path())
+		return {"ok": false, "reason": "temp_invalid"}
+
+	# 2. never overwrite a future-schema primary.
 	if FileAccess.file_exists(_path):
-		var prev := _read_text(_path)
-		if prev != "":
-			_write_file(_backup_path(), prev)
-	# 4. replace primary
-	if _faulted("replace"):
-		# Leave primary + backup untouched; temp discarded.
+		var existing = _read_json(_path)
+		if typeof(existing) == TYPE_DICTIONARY and existing.get("schema", "") == SCHEMA:
+			var ev = IntDomain.exact_int(existing.get("version", null))
+			if ev != null and ev > VERSION:
+				_remove(_temp_path())
+				return {"ok": false, "reason": "would_overwrite_future_schema"}
+
+	# 3. rotate backup ONLY from a validated primary.
+	if FileAccess.file_exists(_path):
+		var current = _read_json(_path)
+		var primary_valid := false
+		if typeof(current) == TYPE_DICTIONARY:
+			primary_valid = bool(validate_candidate(migrate(current.duplicate(true))).get("ok", false))
+		if _faulted("backup_rotate"):
+			_remove(_temp_path())
+			return {"ok": false, "reason": "backup_rotate_failed"}
+		if primary_valid:
+			# Move the validated primary into backup (replacing the old backup).
+			_remove(_backup_path())
+			if not _rename(_path, _backup_path()):
+				_remove(_temp_path())
+				return {"ok": false, "reason": "backup_rotate_failed"}
+		else:
+			# Corrupt/unvalidated primary: preserve the good backup, discard the
+			# corrupt primary so the rename target is free.
+			_remove(_path)
+
+	# 4. near-atomic replace: rename validated temp over the (now free) primary.
+	if _faulted("primary_replace"):
+		# Leave temp for diagnosis-free cleanup; primary/backup untouched.
 		_remove(_temp_path())
 		return {"ok": false, "reason": "replace_failed"}
-	if not _write_file(_path, text):
+	if not _rename(_temp_path(), _path):
+		_remove(_temp_path())
 		return {"ok": false, "reason": "replace_failed"}
-	_remove(_temp_path())
 	return {"ok": true}
 
 # --------------------------------------------------------------- load ----
 
 ## Read primary; on any failure fall back to backup; if both fail, new-player
-## defaults (services stay at their construction defaults). Returns
-## {ok, source} where source is primary/backup/defaults.
+## defaults. A FUTURE-schema primary with no compatible backup returns an
+## explicit unsupported result (ok:false, source:"future_schema") and does NOT
+## start a fresh profile — so a later save cannot auto-overwrite the future save
+## (F-M40-003). Returns {ok, source} where source is primary/backup/defaults or,
+## on the unsupported path, {ok:false, source:"future_schema"}.
 func load() -> Dictionary:
 	var primary := _try_load_path(_path)
 	if primary.get("ok", false):
@@ -206,7 +246,11 @@ func load() -> Dictionary:
 	var backup := _try_load_path(_backup_path())
 	if backup.get("ok", false):
 		return {"ok": true, "source": "backup"}
-	# No usable save: one-time legacy audio cfg migration if present.
+	# No usable save from either slot. If the primary is a future schema, refuse
+	# explicitly and preserve it (never auto-overwrite via a fresh profile).
+	if primary.get("reason", "") == "future_schema":
+		return {"ok": false, "source": "future_schema"}
+	# Otherwise: new-player defaults; one-time legacy audio cfg migration if present.
 	_maybe_migrate_legacy_audio()
 	return {"ok": true, "source": "defaults"}
 
@@ -268,3 +312,11 @@ func _read_json(path: String):
 func _remove(path: String) -> void:
 	if FileAccess.file_exists(path):
 		DirAccess.remove_absolute(ProjectSettings.globalize_path(path))
+
+## Rename (near-atomic replace). Returns true on success. The caller frees the
+## destination path first so the rename never has to overwrite an existing file
+## (portable across platforms whose rename() refuses an existing destination).
+func _rename(from_path: String, to_path: String) -> bool:
+	return DirAccess.rename_absolute(
+		ProjectSettings.globalize_path(from_path),
+		ProjectSettings.globalize_path(to_path)) == OK
