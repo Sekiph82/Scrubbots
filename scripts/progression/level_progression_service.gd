@@ -104,7 +104,7 @@ func import_snapshot(s) -> bool:
 	# Integer state must be an exact integer: JSON delivers whole numbers as int
 	# or integral float; a fractional value, NaN or INF fails closed rather than
 	# silently truncating (M37 V02 / strict-v2).
-	var cur_i := _as_exact_int(s.get("current_level", null))
+	var cur_i = _as_exact_int(s.get("current_level", null))
 	if cur_i == null or cur_i < 1:
 		return false
 	var completed_raw = s.get("completed", null)
@@ -112,7 +112,7 @@ func import_snapshot(s) -> bool:
 		return false
 	var new_completed: Dictionary = {}
 	for v in completed_raw:
-		var iv := _as_exact_int(v)
+		var iv = _as_exact_int(v)
 		if iv == null or iv < 1:
 			return false
 		if new_completed.has(iv):
