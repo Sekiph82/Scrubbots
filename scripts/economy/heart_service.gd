@@ -12,6 +12,7 @@ extends RefCounted
 ## resisted: a backwards clock accrues nothing and never moves the anchor back.
 
 const EconomyWallet = preload("res://scripts/economy/economy_wallet.gd")
+const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
 var _max: int
 var _regen_seconds: int
@@ -119,15 +120,12 @@ func import_snapshot(s) -> bool:
 	# Missing hearts section keeps the fresh default (full hearts, anchor now).
 	if s.is_empty():
 		return true
-	var h = s.get("hearts", null)
-	var a = s.get("anchor", null)
-	if typeof(h) != TYPE_INT and typeof(h) != TYPE_FLOAT:
+	var hi = IntDomain.nonneg_int(s.get("hearts", null))
+	var a = IntDomain.exact_int(s.get("anchor", null))
+	if hi == null or a == null:
 		return false
-	if typeof(a) != TYPE_INT and typeof(a) != TYPE_FLOAT:
-		return false
-	var hi := int(h)
-	if hi < 0 or hi > _max:
+	if hi > _max:
 		return false
 	_hearts = hi
-	_anchor = int(a)
+	_anchor = a
 	return true

@@ -39,14 +39,16 @@ func exchange_card(card_id: String, count: int, tx_id: String) -> Dictionary:
 	if exchangeable(card_id) < count:
 		return {"ok": false, "reason": "not_enough_extras"}
 	var value := card_value(card_id) * count
-	# Remove copies first (state), then credit; if the grant is a duplicate tx we
-	# must not remove again — so guard on the reward idempotency.
 	if _reward.already_applied(tx_id):
 		return {"ok": false, "reason": "duplicate"}
-	# Atomic: credit via reward service, then decrement owned.
+	# Atomic (F-M39-007): remove the copies FIRST (the fallible, gating step). Only
+	# on a confirmed removal do we credit SB. If the credit then fails, roll the
+	# removal back so neither side is left half-applied — never SB without cards.
+	if not _inventory.remove_copies(card_id, count, _protected):
+		return {"ok": false, "reason": "removal_failed"}
 	if not _reward.grant(tx_id, {EconomyWallet.SCRUB_BUCKS: value}):
+		_inventory.add_copies(card_id, count)   # rollback the removal
 		return {"ok": false, "reason": "grant_failed"}
-	_inventory.remove_copies(card_id, count, _protected)
 	return {"ok": true, "sb": value, "card_id": card_id, "count": count}
 
 ## Exchange ALL extras across the whole collection in one atomic transaction.
@@ -62,10 +64,20 @@ func exchange_all_extras(tx_id: String) -> Dictionary:
 			total += card_value(cid) * extra
 	if total <= 0:
 		return {"ok": false, "reason": "nothing_to_exchange"}
-	if not _reward.grant(tx_id, {EconomyWallet.SCRUB_BUCKS: total}):
-		return {"ok": false, "reason": "grant_failed"}
+	# Atomic: remove every planned extra FIRST (each gated); on any removal
+	# failure, roll back the removals already done and grant nothing. Only when
+	# all removals succeed do we credit; if the credit fails, roll back all.
+	var removed: Dictionary = {}
 	for cid in plan.keys():
-		_inventory.remove_copies(cid, plan[cid], _protected)
+		if not _inventory.remove_copies(cid, plan[cid], _protected):
+			for done in removed.keys():
+				_inventory.add_copies(done, removed[done])
+			return {"ok": false, "reason": "removal_failed"}
+		removed[cid] = plan[cid]
+	if not _reward.grant(tx_id, {EconomyWallet.SCRUB_BUCKS: total}):
+		for cid in removed.keys():
+			_inventory.add_copies(cid, removed[cid])
+		return {"ok": false, "reason": "grant_failed"}
 	return {"ok": true, "sb": total, "exchanged": plan}
 
 func next_tx_id(prefix: String = "exch") -> String:

@@ -100,14 +100,24 @@ func snapshot() -> Dictionary:
 		"collection": collection.snapshot(),
 	}
 
-## All-or-nothing import: validate every section into staging first, then apply.
-## A single malformed section leaves ALL services untouched (fail-closed).
+## Independently all-or-nothing import (F-M39-005). Captures the exact current
+## live state first, then applies each section; if ANY section import fails, the
+## captured backup is restored so the whole service graph is left exactly as it
+## was before the call. Safe to call directly, not only through SaveService.
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
-	# Import into the live services but abort on first failure. Because reward
-	# holds the wallet, import reward first; if any later section fails we return
-	# false and the caller (M40) falls back to last-known-good/new-player.
+	var backup := snapshot()
+	if _apply_sections(s):
+		return true
+	# Roll back to the captured pre-call state. The backup was produced by our
+	# own snapshot(), so every section import accepts it.
+	_apply_sections(backup)
+	return false
+
+## Applies each section import in order; returns false on the first failure
+## (leaving partial mutation for import_snapshot to roll back).
+func _apply_sections(s) -> bool:
 	if not reward.import_snapshot(s.get("reward", {})):
 		return false
 	if not gift.import_snapshot(s.get("gift", {})):

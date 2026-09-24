@@ -39,6 +39,10 @@ var next_seq: int = 1
 var column_count: int = 0
 var preview_depth: int = 3
 var palette_size: int = 0
+## Active slot capacity for this state (5 baseline, 6 after +1 Slot). Part of the
+## canonical key so a 5-slot and a 6-slot state with otherwise-equal data never
+## collapse to the same fingerprint (M39 V02, F-M39-002).
+var capacity: int = SLOT_COUNT
 
 # --------------------------------------------------------------- construction --
 
@@ -72,6 +76,7 @@ static func from_level_and_supply(p_level, supply_engine):
 	s.slots = []
 	for _i in range(SLOT_COUNT):
 		s.slots.append(null)
+	s.capacity = SLOT_COUNT   # initial state is always the baseline five
 	s.next_seq = 1
 	return s
 
@@ -106,8 +111,12 @@ static func from_runtime(p_level, board, supply_engine, slots_engine):
 			q.append({"id": String(b["batch_id"]), "color": int(b["color_id"]), "count": int(b["robot_count"])})
 		s.supply.append(q)
 	s.slots = []
+	# Honor the engine's ACTIVE capacity (5 or 6) rather than a fixed constant so
+	# a temporary sixth slot is part of the proof state (M39 V02, F-M39-002).
+	var slot_n: int = slots_engine.get_slot_count()
+	s.capacity = slot_n
 	var max_seq := 0
-	for i in range(SLOT_COUNT):
+	for i in range(slot_n):
 		if not slots_engine.is_occupied(i):
 			s.slots.append(null)
 		else:
@@ -127,6 +136,7 @@ func duplicate_state():
 	s.column_count = column_count
 	s.preview_depth = preview_depth
 	s.palette_size = palette_size
+	s.capacity = capacity
 	s.next_seq = next_seq
 	s.supply = []
 	for q in supply:
@@ -239,6 +249,8 @@ func canonical_key() -> String:
 		else:
 			slot_strs.append("%d,%d,%d" % [int(sd["color"]), int(sd["remaining"]), int(rank_of[int(sd["seq"])])])
 	parts.append(",".join(slot_strs))
+	# Active capacity: 5-slot vs 6-slot states must not collapse (M39 V02, F-M39-002).
+	parts.append("C%d" % capacity)
 	return "".join(parts)
 
 ## Detached debug/QA view (never a player-facing surface). Includes hidden supply depth on

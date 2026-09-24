@@ -35,10 +35,15 @@ extends RefCounted
 const SlotBatchState = preload("res://scripts/gameplay/slots/slot_batch_state.gd")
 const BatchSupplyEngine = preload("res://scripts/gameplay/supply/batch_supply_engine.gd")
 
-const SLOT_COUNT := 5
+const SLOT_COUNT := 5               # baseline attempt capacity (unchanged default)
+const MAX_CAPACITY := 6             # temporary +1 Slot booster cap; never 7+
 const INITIAL_SEQUENCE := 1
 
-var _slots: Array = []              # exactly SLOT_COUNT SlotBatchState (EMPTY or occupied)
+# Physical slots: `SLOT_COUNT` at baseline, grown to `MAX_CAPACITY` for the
+# current attempt only when the +1 Slot booster activates. `_slots.size()` is the
+# ONE authoritative active capacity every placement/full/rightmost-empty query
+# honors (M39 V02, F-M39-001). reset() returns to the baseline five.
+var _slots: Array = []              # active-capacity SlotBatchState (EMPTY or occupied)
 var _next_sequence: int = INITIAL_SEQUENCE
 var _live_work: Dictionary = {}     # work_id -> {"slot": int, "batch_id": String}
 var _busy: bool = false             # re-entrancy guard for the external-collaborator path
@@ -50,11 +55,16 @@ func _init() -> void:
 
 # --------------------------------------------------------- read-only queries --
 
+## Active capacity — the number of physical slots for the current attempt (5 or
+## 6). This is the authoritative capacity the solver and runtime read.
 func get_slot_count() -> int:
-	return SLOT_COUNT
+	return _slots.size()
+
+func active_capacity() -> int:
+	return _slots.size()
 
 func _valid_index(i) -> bool:
-	return typeof(i) == TYPE_INT and i >= 0 and i < SLOT_COUNT
+	return typeof(i) == TYPE_INT and i >= 0 and i < _slots.size()
 
 func is_empty(i) -> bool:
 	return _valid_index(i) and _slots[i].is_empty()
@@ -94,7 +104,22 @@ func occupied_count() -> int:
 	return n
 
 func is_full() -> bool:
-	return occupied_count() == SLOT_COUNT
+	return occupied_count() == _slots.size()
+
+## +1 Slot booster: grow to a temporary sixth slot for the CURRENT attempt only,
+## at most once (5 -> 6). The new EMPTY slot is appended at the rightmost index.
+## Fails closed (no change) while a placement transaction is busy, if already at
+## MAX_CAPACITY, or if capacity is not the baseline five. reset() restores five.
+func grow_to_sixth() -> bool:
+	if _busy:
+		return false
+	if _slots.size() != SLOT_COUNT:
+		return false
+	_slots.append(SlotBatchState.make_empty())
+	return true
+
+func can_grow_to_sixth() -> bool:
+	return not _busy and _slots.size() == SLOT_COUNT
 
 func is_paused() -> bool:
 	return _paused
@@ -110,9 +135,10 @@ func snapshot() -> Array:
 		out.append(s.to_dict())
 	return out
 
-## Index of the rightmost EMPTY slot, or -1 if all occupied.
+## Index of the rightmost EMPTY slot, or -1 if all occupied. Honors the current
+## active capacity (5 or 6).
 func rightmost_empty_index() -> int:
-	for i in range(SLOT_COUNT - 1, -1, -1):
+	for i in range(_slots.size() - 1, -1, -1):
 		if _slots[i].is_empty():
 			return i
 	return -1
@@ -261,6 +287,44 @@ func is_work_bound_to(work_id, expected_slot, expected_batch_id) -> bool:
 	var s = _slots[expected_slot]
 	return not s.is_empty() and s.get_batch_id() == expected_batch_id
 
+## Tornado reconciliation seam (M39 V02). Frees an UNTOUCHED occupied slot (ACTIVE,
+## committed==0, remaining==initial, no live work) to EMPTY and returns the captured
+## batch so the caller can restore it exactly on rollback. Fails closed (returns
+## {"ok": false}) for a busy engine, invalid index, empty slot, or any slot with
+## committed work / partial progress / WAITING state — so a purge never silently
+## drops in-flight or partially-cleared work.
+func free_slot_if_idle(index) -> Dictionary:
+	if _busy or not _valid_index(index):
+		return {"ok": false}
+	var s = _slots[index]
+	if s.is_empty():
+		return {"ok": false}
+	if s.get_state() != SlotBatchState.ACTIVE:
+		return {"ok": false}
+	if s.get_committed() != 0 or s.get_remaining() != s.get_initial_count():
+		return {"ok": false}
+	# Drop any live work keyed to this slot (there is none when committed==0, but
+	# stay defensive) and empty it.
+	var captured := {"batch_id": s.get_batch_id(), "color": s.get_color_id(),
+		"count": s.get_initial_count(), "seq": s.get_placement_sequence()}
+	_free_slot(index)
+	return {"ok": true, "batch": captured}
+
+## Rollback companion to free_slot_if_idle: re-occupy an EMPTY slot with a
+## previously-captured untouched batch, restoring exact prior state. Fails closed
+## for a busy engine, invalid/occupied index, or malformed capture.
+func restore_idle_slot(index, batch: Dictionary) -> bool:
+	if _busy or not _valid_index(index):
+		return false
+	if not _slots[index].is_empty():
+		return false
+	var placed = SlotBatchState.make_occupied(batch.get("batch_id"), batch.get("color"),
+		batch.get("count"), batch.get("seq"))
+	if placed == null:
+		return false
+	_slots[index] = placed
+	return true
+
 func _free_slot(idx: int) -> void:
 	# Return to exact EMPTY truth; drop any live work still keyed to this slot. Neighbors
 	# are never shifted/compacted.
@@ -323,7 +387,7 @@ func reset() -> bool:
 	if _busy:
 		return false
 	_slots = []
-	for _i in range(SLOT_COUNT):
+	for _i in range(SLOT_COUNT):   # new attempt returns to the baseline five
 		_slots.append(SlotBatchState.make_empty())
 	_live_work.clear()
 	_next_sequence = INITIAL_SEQUENCE

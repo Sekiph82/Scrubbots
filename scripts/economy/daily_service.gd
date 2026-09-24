@@ -12,6 +12,7 @@ extends RefCounted
 ## feed the Gift Meter (owner §4 / SB-M39-014).
 
 const EconomyWallet = preload("res://scripts/economy/economy_wallet.gd")
+const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
 const LOGIN_CYCLE_DAYS := 5
 
@@ -114,22 +115,43 @@ func claim_all_tasks_bonus() -> Dictionary:
 # --------------------------------------------------------------- snapshot ----
 
 func snapshot() -> Dictionary:
+	# Persist current-day task completion so relaunch continuity survives (F-M39-008):
+	# which tasks are done today and which day that progress belongs to.
+	var done: Array = []
+	for k in _tasks_done.keys():
+		done.append(k)
+	done.sort()
 	return {
 		"last_claim_day": _last_claim_day,
 		"streak": _streak,
+		"tasks_done": done,
+		"tasks_claimed_day": _tasks_claimed_day,
 	}
 
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
-	var d = s.get("last_claim_day", -1)
-	var st = s.get("streak", 0)
-	if typeof(d) != TYPE_INT and typeof(d) != TYPE_FLOAT:
+	var d = IntDomain.exact_int(s.get("last_claim_day", -1))
+	var st = IntDomain.nonneg_int(s.get("streak", 0))
+	if d == null or st == null:
 		return false
-	if typeof(st) != TYPE_INT and typeof(st) != TYPE_FLOAT:
+	# Task state (optional; missing => no task progress). Indices must be exact
+	# ints within the task range.
+	var tasks_done_raw = s.get("tasks_done", [])
+	if typeof(tasks_done_raw) != TYPE_ARRAY:
 		return false
-	if int(st) < 0:
+	var new_done: Dictionary = {}
+	for ti in tasks_done_raw:
+		var idx = IntDomain.exact_int(ti)
+		if idx == null or idx < 0 or idx >= _task_sb.size():
+			return false
+		new_done[idx] = true
+	var tcd = IntDomain.exact_int(s.get("tasks_claimed_day", -1))
+	if tcd == null:
 		return false
-	_last_claim_day = int(d)
-	_streak = int(st)
+	# All-or-nothing apply.
+	_last_claim_day = d
+	_streak = st
+	_tasks_done = new_done
+	_tasks_claimed_day = tcd
 	return true

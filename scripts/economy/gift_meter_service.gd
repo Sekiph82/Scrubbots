@@ -17,6 +17,8 @@ extends RefCounted
 ## card) is M39 behavior layered on top of this queue; M38 does not fabricate
 ## those subsystems.
 
+const IntDomain = preload("res://scripts/economy/int_domain.gd")
+
 const CYCLE_MAX := 1000
 const MILESTONES := [10, 50, 250, 500, 1000]
 
@@ -121,11 +123,11 @@ func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
 	# Missing fields default to a fresh cycle (safe default); present-but-invalid
-	# fields fail closed.
-	var cp = s.get("cycle_progress", 0)
-	var tp = s.get("total_progress", 0)
-	var cc = s.get("cycles_completed", 0)
-	if not _is_nonneg_int(cp) or not _is_nonneg_int(tp) or not _is_nonneg_int(cc):
+	# (fractional/NaN/INF/negative) fields fail closed.
+	var cp = IntDomain.nonneg_int(s.get("cycle_progress", 0))
+	var tp = IntDomain.nonneg_int(s.get("total_progress", 0))
+	var cc = IntDomain.nonneg_int(s.get("cycles_completed", 0))
+	if cp == null or tp == null or cc == null:
 		return false
 	if int(cp) >= CYCLE_MAX:
 		return false
@@ -143,8 +145,3 @@ func import_snapshot(s) -> bool:
 	for tx in applied:
 		_applied_tx[String(tx)] = true
 	return true
-
-func _is_nonneg_int(v) -> bool:
-	if typeof(v) != TYPE_INT and typeof(v) != TYPE_FLOAT:
-		return false
-	return int(v) >= 0

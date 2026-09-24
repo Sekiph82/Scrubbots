@@ -16,6 +16,7 @@ extends RefCounted
 ## gameplay delta / Engine.time_scale.
 
 const EconomyWallet = preload("res://scripts/economy/economy_wallet.gd")
+const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
 var _wallet: EconomyWallet
 var _current_level_price: int
@@ -86,14 +87,10 @@ func snapshot() -> Dictionary:
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
-	var lvl = s.get("entitled_level", -1)
-	var exp = s.get("timed_expiry", 0)
-	if typeof(lvl) != TYPE_INT and typeof(lvl) != TYPE_FLOAT:
+	var lvl = IntDomain.exact_int(s.get("entitled_level", -1))
+	var exp = IntDomain.nonneg_int(s.get("timed_expiry", 0))
+	if lvl == null or exp == null:
 		return false
-	if typeof(exp) != TYPE_INT and typeof(exp) != TYPE_FLOAT:
-		return false
-	if int(exp) < 0:
-		return false
-	_entitled_level = int(lvl)
-	_timed_expiry = int(exp)
+	_entitled_level = lvl
+	_timed_expiry = exp
 	return true
