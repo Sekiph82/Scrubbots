@@ -51,6 +51,8 @@ const ScrubbotVisual = preload("res://scripts/gameplay/presentation/scrubbot_vis
 const ScrubbotRetireEchoController = preload("res://scripts/gameplay/presentation/scrubbot_retire_echo_controller.gd")
 const GameplayAudioController = preload("res://scripts/audio/gameplay_audio_controller.gd")
 const AudioSettingsService = preload("res://scripts/audio/audio_settings_service.gd")
+const HapticsController = preload("res://scripts/haptics/haptics_controller.gd")
+const HapticsSettingsService = preload("res://scripts/haptics/haptics_settings_service.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -92,6 +94,8 @@ var _cleaning_fx
 var _retire_echo
 var _audio
 var _audio_settings
+var _haptics
+var _haptics_settings
 var _built := false
 var _build_error := ""
 
@@ -233,6 +237,19 @@ func build() -> bool:
 	_loop.authenticated_clear.connect(_audio._on_authenticated_clear)
 	_completion.terminal_reached.connect(_audio._on_terminal_reached)
 
+	# M34 presentation-only haptics: one live HapticsController owned by the production
+	# host, observing the SAME authoritative committed events — cleaning on
+	# authenticated_clear, completion on WON only. Fail-open: an unsupported platform,
+	# disabled toggle or throttled request never blocks the gameplay clear/terminal.
+	# The persisted enabled setting drives the live controller. Bound exactly once here;
+	# _bind_haptics_signals guards against duplicate connections on host rebuild.
+	_haptics_settings = HapticsSettingsService.new()
+	_haptics_settings.load()  # persisted enabled bit (default true if none)
+	_haptics = HapticsController.new()
+	_haptics.set_enabled(_haptics_settings.is_enabled())
+	add_child(_haptics)
+	_bind_haptics_signals()
+
 	# Meaningful gameplay boundaries mark the completion state dirty (authenticated clear +
 	# accepted supply-front placement). on_tick (below) then gets one chance to run the M27
 	# proof at quiescence; idle ticks with no event never re-run it.
@@ -332,6 +349,22 @@ func _on_retry_restored() -> void:
 	# play completion again. Presentation-only; user volume settings are unchanged.
 	if _audio != null and is_instance_valid(_audio):
 		_audio.reset_for_new_attempt()
+	# M34 (V02): re-arm the once-per-attempt completion-haptic latch and clear the
+	# cleaning throttle window so a later fresh WON buzzes again. Presentation-only;
+	# the persisted enabled setting is unchanged.
+	if _haptics != null and is_instance_valid(_haptics):
+		_haptics.reset_for_new_attempt()
+
+## Connect the live haptics controller to the authoritative committed seams exactly
+## once. Idempotent: a rebuild/rebind that re-runs this never stacks duplicate
+## connections (Godot's connect would push an error and double-fire).
+func _bind_haptics_signals() -> void:
+	if _haptics == null:
+		return
+	if not _loop.authenticated_clear.is_connected(_haptics._on_authenticated_clear):
+		_loop.authenticated_clear.connect(_haptics._on_authenticated_clear)
+	if not _completion.terminal_reached.is_connected(_haptics._on_terminal_reached):
+		_completion.terminal_reached.connect(_haptics._on_terminal_reached)
 
 ## Runtime state-sync tail: refresh the five-slot strip from authoritative M24, then run one
 ## dirty/event-gated completion evaluation pass.
@@ -461,6 +494,12 @@ func get_audio_controller():
 
 func get_audio_settings():
 	return _audio_settings
+
+func get_haptics_controller():
+	return _haptics
+
+func get_haptics_settings():
+	return _haptics_settings
 
 # ------------------------------------------------------------ M32 agent factory ----
 
