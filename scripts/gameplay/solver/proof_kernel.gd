@@ -115,8 +115,16 @@ func _build_live(state) -> Dictionary:
 	# state, so `remaining` is the whole accounting; initial == remaining is future-
 	# behavior-equivalent — nothing reads initial_count for future behavior).
 	var slots = FiveSlotBatchEngine.new()
+	# Reconstruct at the state's active capacity (M39 V03, F-M39-V02-002). A
+	# 6-slot proof state must reconstruct into a 6-slot engine so future-behavior
+	# solver transitions see slot 5 exactly as the runtime would.
+	var cap: int = int(state.capacity) if state.capacity != null else ProofState.SLOT_COUNT
+	if cap == FiveSlotBatchEngine.MAX_CAPACITY:
+		slots.grow_to_sixth()
 	var max_seq := 0
-	for i in range(ProofState.SLOT_COUNT):
+	for i in range(cap):
+		if i >= state.slots.size():
+			break
 		var sd = state.slots[i]
 		if sd == null:
 			continue
@@ -208,7 +216,7 @@ func _attempt_claim(live: Dictionary, color: int) -> Dictionary:
 			continue
 		if live.slots.get_color_id(i) != color:
 			continue
-		var origin: Vector2 = _origin_for_slot(i, live.w, live.h)
+		var origin: Vector2 = _origin_for_slot(i, live.w, live.h, live.slots.get_slot_count())
 		access_by_slot[i] = ProductionTargetAccess.new(live.routing, live.raccess, live.board, origin)
 	return live.claim.claim_for_color(color, access_by_slot)
 
@@ -253,9 +261,11 @@ func _read_back(template, live: Dictionary):
 		for b in col:
 			q.append({"id": String(b["batch_id"]), "color": int(b["color_id"]), "count": int(b["robot_count"])})
 		s.supply.append(q)
-	# Slots.
+	# Slots. Read back the ACTIVE capacity (5 or 6) so a 6-slot readout carries
+	# the sixth slot's occupancy (M39 V03, F-M39-V02-002).
+	s.capacity = live.slots.get_slot_count()
 	s.slots = []
-	for i in range(ProofState.SLOT_COUNT):
+	for i in range(live.slots.get_slot_count()):
 		if not live.slots.is_occupied(i):
 			s.slots.append(null)
 		else:
@@ -272,8 +282,12 @@ func _read_back(template, live: Dictionary):
 ## slot anchor semantics (slot -> BOTTOM connector -> rail -> interior turns) hold headless
 ## without any UI layout. Reachability via the rail is lane-robust, so this is a faithful
 ## legal start for every slot.
-func _origin_for_slot(slot: int, w: int, h: int) -> Vector2:
-	var lane_x: float = (float(slot) + 0.5) * float(w) / float(ProofState.SLOT_COUNT)
+## Below-board slot origin lane math uses the CURRENT active capacity so at
+## capacity 6 the lanes spread across six rather than five slots (M39 V03,
+## F-M39-V02-002). Signature is unchanged; the kernel passes the live capacity
+## via the `cap` argument.
+func _origin_for_slot(slot: int, w: int, h: int, cap: int = ProofState.SLOT_COUNT) -> Vector2:
+	var lane_x: float = (float(slot) + 0.5) * float(w) / float(cap)
 	return Vector2(lane_x, float(h) + ORIGIN_BELOW)
 
 static func _bool_true(v) -> bool:

@@ -121,7 +121,9 @@ func import_snapshot(s) -> bool:
 	if s.is_empty():
 		return true
 	var hi = IntDomain.nonneg_int(s.get("hearts", null))
-	var a = IntDomain.exact_int(s.get("anchor", null))
+	# Canonical anchor domain (M39 V03, F-M39-V02-016): must be non-negative;
+	# negative wall-clock anchors are noncanonical and fail closed.
+	var a = IntDomain.nonneg_int(s.get("anchor", null))
 	if hi == null or a == null:
 		return false
 	if hi > _max:

@@ -61,10 +61,18 @@ func import_snapshot(s) -> bool:
 	var raw = s.get("unlocked", [])
 	if typeof(raw) != TYPE_ARRAY:
 		return false
+	# Canonical robot-ID validation (M39 V03, per audit spec-correction): reject
+	# empty/malformed/duplicate ids. No closed-world catalog check — the owner
+	# has not locked the post-Scrubby roster yet.
 	var new_unlocked: Dictionary = {}
 	for r in raw:
-		new_unlocked[String(r)] = true
-	# Initial robot is always unlocked regardless of snapshot content.
+		if typeof(r) != TYPE_STRING:
+			return false
+		var id := String(r)
+		if id.is_empty() or new_unlocked.has(id):
+			return false
+		new_unlocked[id] = true
+	# Scrubby remains the canonical initial unlocked robot regardless of snapshot content.
 	new_unlocked[_initial_robot] = true
 	_unlocked = new_unlocked
 	return true

@@ -18,20 +18,30 @@ const LOGIN_CYCLE_DAYS := 5
 
 var _config
 var _reward
-var _clock: Callable                 ## returns absolute unix seconds
+## Wall-clock provider: returns absolute unix seconds.
+var _clock: Callable
+## Local calendar-day provider: returns int local-date key (e.g. yyyy*372 + mmm*31
+## + dd). Owner-required LOCAL date semantics — NOT unix_seconds/86400 UTC-day
+## (M39 V03, F-M39-V02-009). Tests inject this to cross local midnight
+## deterministically; production defaults to a local-day derivation of _clock().
+var _local_day_provider: Callable
 var _login_rewards: Dictionary = {}  ## day(1..5) -> reward dict
 var _task_sb: Array = []             ## [75,100,125]
 var _all_tasks_booster := 0
 
-var _last_claim_day := -1            ## calendar-day index of last login claim (monotonic).
+var _last_claim_day := -1            ## local calendar-day key of last login claim.
+var _last_claim_ts := 0              ## wall-clock seconds of last login claim.
+var _highest_seen_ts := 0            ## defensive monotonic clock high-water mark.
 var _streak := 0                     ## consecutive login count.
-var _tasks_claimed_day := -1         ## calendar day tasks were last claimed.
+var _tasks_claimed_day := -1         ## local calendar day tasks were last claimed.
+var _tasks_day := -1                 ## local calendar day _tasks_done belongs to.
 var _tasks_done: Dictionary = {}     ## task_index -> true (current day).
 
-func _init(config, reward, clock: Callable = Callable()) -> void:
+func _init(config, reward, clock: Callable = Callable(), local_day: Callable = Callable()) -> void:
 	_config = config
 	_reward = reward
 	_clock = clock if clock.is_valid() else Callable(self, "_default_clock")
+	_local_day_provider = local_day if local_day.is_valid() else Callable(self, "_default_local_day")
 	var d = config.daily_config()
 	var lr = d.get("login_rewards", {})
 	for k in lr.keys():
@@ -42,9 +52,28 @@ func _init(config, reward, clock: Callable = Callable()) -> void:
 func _default_clock() -> int:
 	return int(Time.get_unix_time_from_system())
 
-func _today() -> int:
-	# Calendar day index (UTC day number). Deterministic under the injected clock.
+## Default local-day derivation from the injected wall clock (unix-day). Tests
+## are deterministic under `_clock`. Production host injects a local-timezone-
+## aware provider so day boundaries match the player's real local midnight, not
+## UTC noon (audit spec: local-timezone semantics are the runtime injection's
+## job; the service does not read the real system clock behind `_clock`).
+func _default_local_day() -> int:
 	return int(_clock.call() / 86400)
+
+func _today() -> int:
+	# Owner-required LOCAL calendar-day key (F-M39-V02-009). Tests inject this
+	# so a synthetic day cross does not require moving 86400 unix seconds.
+	return int(_local_day_provider.call())
+
+## Reset task state whenever the local day differs from the day _tasks_done
+## belongs to. Prevents prior-day completion from leaking into a new day even
+## when no login claim has run first (F-M39-V02-015).
+func _sync_tasks_to_today() -> void:
+	var today := _today()
+	if _tasks_day != today:
+		_tasks_done = {}
+		_tasks_day = today
+		_tasks_claimed_day = -1
 
 func streak() -> int:
 	return _streak
@@ -55,42 +84,59 @@ func cycle_day() -> int:
 		return 0
 	return ((_streak - 1) % LOGIN_CYCLE_DAYS) + 1
 
-## Claim today's login reward. Advances/repairs the streak by calendar day:
+## Claim today's login reward. Advances/repairs the streak by LOCAL calendar day
+## (M39 V03, F-M39-V02-009/015):
 ##   - same day already claimed -> no-op;
-##   - exactly next day -> streak += 1;
-##   - gap (missed day) OR clock rollback -> streak resets to 1.
-## Returns {ok, day, reward} or {ok:false, reason}.
+##   - clock rollback below highest-seen ts -> fail closed;
+##   - exactly next day (numeric next, tolerant of jumps > 1 as "missed") -> +1 or reset;
+##   - login mutation is ATOMIC with the reward grant: if the RewardGrantService
+##     grant fails and is not already-applied, NOTHING mutates (day/ts/streak/
+##     tasks all untouched).
 func claim_login() -> Dictionary:
+	_sync_tasks_to_today()
 	var today := _today()
+	var now := int(_clock.call())
 	if today <= _last_claim_day:
-		# Same day or a rolled-back clock: never duplicate a claim.
 		return {"ok": false, "reason": "already_claimed_or_rollback"}
-	if _last_claim_day >= 0 and today == _last_claim_day + 1:
-		_streak += 1
-	else:
-		_streak = 1   # first login or missed a day -> reset cycle
-	_last_claim_day = today
-	# New day resets task progress.
-	_tasks_done = {}
-	_tasks_claimed_day = -1
-	var day := cycle_day()
-	var reward: Dictionary = _login_rewards.get(day, {})
+	if now < _highest_seen_ts:
+		return {"ok": false, "reason": "clock_rollback"}
+	# Compute the tentative next state without committing.
+	var new_streak := (_streak + 1) if (_last_claim_day >= 0 and today == _last_claim_day + 1) else 1
+	var new_cycle_day := ((new_streak - 1) % LOGIN_CYCLE_DAYS) + 1
+	var reward: Dictionary = _login_rewards.get(new_cycle_day, {})
 	var tx := "daily_login:%d" % today
-	_reward.grant(tx, reward)
-	return {"ok": true, "day": day, "reward": reward}
+	# Grant is atomic with the state transition (F-M39-V02-015). Idempotency: a
+	# reward already applied for this tx id is treated as a successful commit so
+	# a mid-flight crash+relaunch cannot leave state ahead of the reward.
+	var granted = _reward.grant(tx, reward)
+	if not granted and not _reward.already_applied(tx):
+		return {"ok": false, "reason": "grant_failed"}
+	# Commit local-day + streak + timestamps.
+	_streak = new_streak
+	_last_claim_day = today
+	_last_claim_ts = now
+	_highest_seen_ts = max(_highest_seen_ts, now)
+	# Fresh day resets task progress.
+	_tasks_done = {}
+	_tasks_day = today
+	_tasks_claimed_day = -1
+	return {"ok": true, "day": new_cycle_day, "reward": reward}
 
 # --------------------------------------------------------------- tasks ----
 
 func mark_task_done(task_index: int) -> void:
+	_sync_tasks_to_today()   # prior-day completion cannot leak into today
 	if task_index < 0 or task_index >= _task_sb.size():
 		return
 	_tasks_done[task_index] = true
 
 func tasks_done_count() -> int:
+	_sync_tasks_to_today()
 	return _tasks_done.size()
 
-## Claim a completed task's SB (once per calendar day per task).
+## Claim a completed task's SB (once per LOCAL calendar day per task).
 func claim_task(task_index: int) -> Dictionary:
+	_sync_tasks_to_today()
 	if task_index < 0 or task_index >= _task_sb.size():
 		return {"ok": false, "reason": "invalid_task"}
 	if not _tasks_done.has(task_index):
@@ -104,6 +150,7 @@ func claim_task(task_index: int) -> Dictionary:
 
 ## Claim the all-three-tasks bonus (1 random booster charge) once per day.
 func claim_all_tasks_bonus() -> Dictionary:
+	_sync_tasks_to_today()
 	if _tasks_done.size() < _task_sb.size():
 		return {"ok": false, "reason": "not_all_done"}
 	var today := _today()
@@ -115,15 +162,19 @@ func claim_all_tasks_bonus() -> Dictionary:
 # --------------------------------------------------------------- snapshot ----
 
 func snapshot() -> Dictionary:
-	# Persist current-day task completion so relaunch continuity survives (F-M39-008):
-	# which tasks are done today and which day that progress belongs to.
+	# Owner-required daily persisted state (M39 V03, F-M39-V02-009/015):
+	# local-day key + last-claim timestamp + highest-seen timestamp (defensive
+	# monotonic rollback guard) + task local-day + current task completion.
 	var done: Array = []
 	for k in _tasks_done.keys():
 		done.append(k)
 	done.sort()
 	return {
 		"last_claim_day": _last_claim_day,
+		"last_claim_ts": _last_claim_ts,
+		"highest_seen_ts": _highest_seen_ts,
 		"streak": _streak,
+		"tasks_day": _tasks_day,
 		"tasks_done": done,
 		"tasks_claimed_day": _tasks_claimed_day,
 	}
@@ -133,7 +184,9 @@ func import_snapshot(s) -> bool:
 		return false
 	var d = IntDomain.exact_int(s.get("last_claim_day", -1))
 	var st = IntDomain.nonneg_int(s.get("streak", 0))
-	if d == null or st == null:
+	var lts = IntDomain.nonneg_int(s.get("last_claim_ts", 0))
+	var hts = IntDomain.nonneg_int(s.get("highest_seen_ts", 0))
+	if d == null or st == null or lts == null or hts == null:
 		return false
 	# Task state (optional; missing => no task progress). Indices must be exact
 	# ints within the task range.
@@ -147,11 +200,15 @@ func import_snapshot(s) -> bool:
 			return false
 		new_done[idx] = true
 	var tcd = IntDomain.exact_int(s.get("tasks_claimed_day", -1))
-	if tcd == null:
+	var td = IntDomain.exact_int(s.get("tasks_day", -1))
+	if tcd == null or td == null:
 		return false
 	# All-or-nothing apply.
 	_last_claim_day = d
+	_last_claim_ts = lts
+	_highest_seen_ts = hts
 	_streak = st
 	_tasks_done = new_done
 	_tasks_claimed_day = tcd
+	_tasks_day = td
 	return true

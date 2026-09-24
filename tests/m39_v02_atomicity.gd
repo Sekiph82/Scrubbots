@@ -93,8 +93,16 @@ func _collection_canonical() -> void:
 	# Invalid set id rejected.
 	_ok(not e.collection.import_snapshot({"owned": {}, "set_reward_claimed": [99], "master_claimed": false}), "set id > 15 rejected")
 	_ok(not e.collection.import_snapshot({"owned": {}, "set_reward_claimed": [0], "master_claimed": false}), "set id 0 rejected")
-	# Canonical snapshot accepted.
-	_ok(e.collection.import_snapshot({"owned": {"s1_c0": 2}, "set_reward_claimed": [1], "master_claimed": false}), "canonical collection snapshot accepted")
+	# Canonical snapshot accepted. Post-M39-V03 claimed-set coherence requires the
+	# claimed set's 9 cards to actually be owned in the same snapshot.
+	var full_set_1 = {}
+	for i in range(9):
+		full_set_1["s1_c%d" % i] = 1
+	_ok(e.collection.import_snapshot({"owned": full_set_1, "set_reward_claimed": [1], "master_claimed": false}), "canonical collection snapshot accepted")
+	# Post-V03: claimed set with missing cards MUST fail (F-M39-V02-010).
+	_ok(not e.collection.import_snapshot({"owned": {"s1_c0": 2}, "set_reward_claimed": [1], "master_claimed": false}), "claimed set without 9/9 owned rejected")
+	# master_claimed=true without all 15 sets claimed MUST fail.
+	_ok(not e.collection.import_snapshot({"owned": full_set_1, "set_reward_claimed": [1], "master_claimed": true}), "master_claimed without all 15 sets rejected")
 
 func _ok(cond: bool, msg: String) -> void:
 	if not cond:

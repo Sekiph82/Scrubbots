@@ -130,7 +130,10 @@ func _tornado_rollback() -> void:
 	var a1 = _TornadoAdapter.new(["C01"], -1)
 	var r = svc.apply_tornado(a1, "C01")
 	_ok(r["ok"] and a1.applied_count == 5 and w.scrub_bucks() == before - 750, "tornado 5-stage commit + charge 750")
-	# Fault injected at each stage: every prior stage rolled back, no charge.
+	# Fault injected at each stage: V03 runner rolls back the failing stage itself
+	# too (F-M39-V02-005), then unwinds earlier successes. The fake adapter's
+	# rollback only decrements if that stage actually applied, so net mutation
+	# always ends at 0 regardless of which stage failed.
 	for fail_stage in range(5):
 		var mm = _mk()
 		var ww = mm[1]; var ii = mm[2]
@@ -138,9 +141,8 @@ func _tornado_rollback() -> void:
 		var a = _TornadoAdapter.new(["C01"], fail_stage)
 		var start = ww.scrub_bucks()
 		var rr = ss.apply_tornado(a, "C01")
-		var expected_rollbacks := fail_stage   # stages 0..fail_stage-1 applied then rolled back
 		_ok(not rr["ok"], "tornado fails at stage %d" % fail_stage)
-		_ok(a.rolled_back_count == expected_rollbacks, "stage %d: %d prior stages rolled back" % [fail_stage, expected_rollbacks])
+		_ok(a.rolled_back_count == fail_stage, "stage %d: %d prior stages rolled back" % [fail_stage, fail_stage])
 		_ok(ww.scrub_bucks() == start, "stage %d: no charge on rollback" % fail_stage)
 		_ok(a.net_applied() == 0, "stage %d: no net system mutation after rollback" % fail_stage)
 
@@ -198,9 +200,12 @@ class _SelectorAdapter:
 
 ## Models the 5-system tornado reconciliation (supply/slots/claims/agents/solver).
 ## `fail_at` is the stage index that fails (-1 = all succeed).
+## Per-stage `_applied` flag: rollback only decrements when its own apply ran, so
+## the V03 failing-stage rollback on a non-mutating stage is a safe no-op.
 class _TornadoAdapter:
 	var _colors: Array
 	var _fail_at: int
+	var _applied: Array = [false, false, false, false, false]
 	var applied_count := 0
 	var rolled_back_count := 0
 	func _init(colors: Array, fail_at: int) -> void:
@@ -218,8 +223,12 @@ class _TornadoAdapter:
 				"apply": func():
 					if idx == _fail_at:
 						return false
+					_applied[idx] = true
 					applied_count += 1
 					return true,
-				"rollback": func(): rolled_back_count += 1,
+				"rollback": func():
+					if _applied[idx]:
+						_applied[idx] = false
+						rolled_back_count += 1,
 			})
 		return stages

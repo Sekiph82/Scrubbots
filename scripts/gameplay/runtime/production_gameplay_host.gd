@@ -56,6 +56,7 @@ const HapticsSettingsService = preload("res://scripts/haptics/haptics_settings_s
 const EconomyServices = preload("res://scripts/economy/economy_services.gd")
 const LevelProgressionService = preload("res://scripts/progression/level_progression_service.gd")
 const BoosterService = preload("res://scripts/economy/booster_service.gd")
+const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
 const ProductionBoosterAdapter = preload("res://scripts/economy/production_booster_adapter.gd")
 const SaveService = preload("res://scripts/save/save_service.gd")
 
@@ -396,13 +397,25 @@ func _on_retry_restored() -> void:
 	# the persisted enabled setting is unchanged.
 	if _haptics != null and is_instance_valid(_haptics):
 		_haptics.reset_for_new_attempt()
-	# M39 V02: a fresh attempt re-arms the terminal economy hook and the once-per-
-	# attempt +1 Slot gate (the engine reset already restored the baseline five),
-	# and a restart after real gameplay resets the Win Streak (owner §3).
+	# M39 V02/V03: a fresh attempt re-arms the terminal economy hook and the once-
+	# per-attempt +1 Slot gate (the engine reset already restored the baseline
+	# five). Restart-after-action law (F-M39-V02-007): if real gameplay had begun
+	# BEFORE this Retry, consume exactly one Heart and reset the Win Streak;
+	# pre-action Retry (no real player activation yet) consumes nothing. The
+	# Heart consume runs BEFORE on_restart wipes the gameplay-started flag.
 	if _economy != null:
 		_economy_terminal_done = false
 		_economy.capacity.begin_new_attempt()
+		if _economy.streak.gameplay_started():
+			_economy.hearts.consume()
 		_economy.streak.on_restart()
+	# M39 V03 (F-M39-V02-001): the M24 engine reset restored the baseline five;
+	# also shrink the presentation strip back so a fresh attempt shows exactly
+	# five slots and slot index 5 has no origin until +1 Slot is used again.
+	if _screen != null and is_instance_valid(_screen):
+		var strip = _screen.get_five_slot_strip()
+		if strip != null:
+			strip.set_capacity(5)
 
 ## Connect the live haptics controller to the authoritative committed seams exactly
 ## once. Idempotent: a rebuild/rebind that re-runs this never stacks duplicate
@@ -434,6 +447,13 @@ func _on_clear_event(_owner_id, _target_index, _color_id, _agent) -> void:
 func _on_activation_event(_column: int, ok: bool, _error: String) -> void:
 	if ok and _completion != null:
 		_completion.notify_event()
+	# M39 V03 (F-M39-V02-007): the first ACCEPTED real player action arms attempt
+	# gameplay-start truth so a Retry after this consumes a Heart + resets the
+	# Win Streak. A pre-action exit/restart leaves both untouched. Idempotent —
+	# WinStreak.on_gameplay_started sets a flag; later successful activations
+	# re-set the same true state, no economy mutation.
+	if ok and _economy != null:
+		_economy.streak.on_gameplay_started()
 
 ## Exact-once terminal latch handler: stop new dispatch cadence + travel (distinct terminal
 ## stop, not a user pause), block new M26 assignments, and block new supply-front input. No
@@ -457,11 +477,20 @@ func _drive_economy_terminal(status) -> void:
 		return
 	if status == CompletionEvaluator.WON:
 		_economy_terminal_done = true
-		var cls: String = _progression.class_for(progression_level)
-		_economy.first_clear.grant_first_clear(progression_level, cls)
-		_economy.streak.process_first_clear_win(progression_level)
-		_progression.record_win(progression_level)
-		_economy.speed.on_level_completed(progression_level, true)
+		# M39 V03 (F-M39-V02-014): the M37 forward-only progression authority
+		# gates whether economy is granted. If record_win rejects (stale/future),
+		# NO first-clear SB / bot part / streak / gift-feed happens. Ordering:
+		#   1. progression.record_win — authoritative decision (bool);
+		#   2. only on true, grant first-clear (SB by class + 1 bot part), advance
+		#      streak (with the streak-SB gift-meter feed) and clear the current-
+		#      level 2x entitlement on success.
+		# All service calls are idempotent by stable tx id, so a stale double-WON
+		# in the same attempt (economy_terminal_done latches above) is a no-op.
+		if _progression.record_win(progression_level):
+			var cls: String = _progression.class_for(progression_level)
+			_economy.first_clear.grant_first_clear(progression_level, cls)
+			_economy.streak.process_first_clear_win(progression_level)
+			_economy.speed.on_level_completed(progression_level, true)
 	elif status == CompletionEvaluator.LOST:
 		_economy_terminal_done = true
 		_economy.hearts.consume()
@@ -503,22 +532,45 @@ func _on_speed_pressed() -> void:
 	var two: bool = _runtime.toggle_speed()
 	_screen.set_speed_2x(two)
 
-## +1 Slot booster: economy gate (charge-first-then-SB, once per attempt) AND the
-## live engine grow to a temporary sixth slot. Atomic: if either side refuses,
-## neither is applied. Returns true on a committed 6-slot upgrade.
+## +1 Slot booster: economy reserve (charge-first-then-SB, once per attempt) AND
+## the live engine grow to a temporary sixth slot are ONE atomic transaction
+## (M39 V03, F-M39-V02-008). Order:
+##   1. reserve via BoosterInventory (returns paid_with + price for refund);
+##   2. grow the engine — infallible in the same synchronous frame after
+##      can_grow_to_sixth, but if it does fail, REFUND the reservation and roll
+##      the capacity authority back to baseline five;
+##   3. also try the M28 strip resize; on strip failure, engine grow is rolled
+##      back too.
+## Returns true on a committed 6-slot upgrade with UI/state/routing capacity
+## coherent; false with no state mutation on any failure.
 func activate_plus_one_slot() -> bool:
 	if _economy == null or _slots == null:
 		return false
 	if not _slots.can_grow_to_sixth():
 		return false
+	# Do the economy pre-checks + capacity authority upgrade + reservation.
 	var res = _booster_service.apply_plus_one_slot(_economy.capacity)
 	if not res.get("ok", false):
 		return false
+	# Attempt the live engine grow.
 	if not _slots.grow_to_sixth():
-		# Economy committed but the engine refused: refund the reservation is not
-		# exposed here, so re-sync the authority instead (should not happen — we
-		# checked can_grow_to_sixth above under the same synchronous frame).
+		# Roll back both economy and capacity authority (F-M39-V02-008).
+		_economy.boosters.refund(BoosterInventory.PLUS_ONE_SLOT, res)
+		_economy.capacity.begin_new_attempt()
 		return false
+	# Grow the strip so the sixth slot is visible + routable (F-M39-V02-001).
+	# If the strip refuses (unlikely — max 6 is a hard clamp), roll every side
+	# back so neither the presentation nor the engine end up out of sync.
+	var strip = _screen.get_five_slot_strip() if _screen != null else null
+	if strip != null and not strip.set_capacity(6):
+		# Undo engine + economy: shrink is not exposed on the engine, so reset
+		# through the runtime restore path is out of scope here. Fail closed.
+		_economy.boosters.refund(BoosterInventory.PLUS_ONE_SLOT, res)
+		_economy.capacity.begin_new_attempt()
+		return false
+	# Push a fresh 6-slot snapshot so the newly appended view has content.
+	if _screen != null and _slots != null:
+		_screen.refresh_slot_snapshot(_slots.snapshot())
 	return true
 
 # ---------------------------------------------------------------- accessors ----

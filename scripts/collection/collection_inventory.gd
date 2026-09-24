@@ -210,6 +210,26 @@ func import_snapshot(s) -> bool:
 	var master = s.get("master_claimed", false)
 	if typeof(master) != TYPE_BOOL:
 		return false
+	# Claimed-set coherence (M39 V03, F-M39-V02-010): a claimed set MUST be
+	# actually 9/9 owned in the same snapshot; master_claimed MUST imply all 15
+	# sets complete. Otherwise the persisted state is internally inconsistent
+	# and fails closed.
+	for set_no in new_claimed.keys():
+		var complete := true
+		for cid in _set_cards.get(set_no, []):
+			if int(new_owned.get(cid, 0)) < 1:
+				complete = false
+				break
+		if not complete:
+			return false
+	if master:
+		var all_complete := true
+		for si in range(1, SETS + 1):
+			if not new_claimed.has(si):
+				all_complete = false
+				break
+		if not all_complete:
+			return false
 	# All-or-nothing apply.
 	_owned = new_owned
 	_set_reward_claimed = new_claimed

@@ -18,9 +18,14 @@ extends HBoxContainer
 const BatchSlotView = preload("res://scripts/ui/batch_slot_view.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 
+## Baseline attempt capacity. Economy V1 +1 Slot may grow the strip to
+## `MAX_CAPACITY` for the current attempt via `set_capacity(n)` (M39 V03,
+## F-M39-V02-001). A new attempt always returns to `SLOT_COUNT`.
 const SLOT_COUNT := 5
+const MAX_CAPACITY := 6
 
 var _views: Array = []
+var _capacity: int = SLOT_COUNT
 
 func _ready() -> void:
 	add_theme_constant_override("separation", UiTokens.SPACE_SM)
@@ -29,20 +34,39 @@ func _ready() -> void:
 		_build_views()
 
 func _build_views() -> void:
-	for i in range(SLOT_COUNT):
+	while _views.size() < _capacity:
 		var v = BatchSlotView.new()
-		v.name = "BatchSlot%d" % i
+		v.name = "BatchSlot%d" % _views.size()
 		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		add_child(v)
 		_views.append(v)
 
-## Bind detached slot snapshots. `snapshots` is truncated/padded to exactly five;
-## deeper input is ignored so the strip can never expose more than five positions.
-## `colors` maps color_id -> Color (or is indexed per snapshot color_id).
+## Grow/shrink the strip to `n` slots (5 or 6). Grows by appending a fresh
+## BatchSlotView; shrinks by removing the trailing view. Hard-clamped to
+## [SLOT_COUNT, MAX_CAPACITY] — never a seventh slot (M39 V03,
+## F-M39-V02-001). Returns true on a legal capacity for the strip.
+func set_capacity(n: int) -> bool:
+	if n < SLOT_COUNT or n > MAX_CAPACITY:
+		return false
+	_capacity = n
+	while _views.size() < n:
+		var v = BatchSlotView.new()
+		v.name = "BatchSlot%d" % _views.size()
+		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		add_child(v)
+		_views.append(v)
+	while _views.size() > n:
+		var v = _views.pop_back()
+		v.queue_free()
+	return true
+
+## Bind detached slot snapshots. Truncated/padded to the CURRENT active capacity
+## (5 or 6). Deeper input beyond capacity is ignored so the strip can never
+## expose more than `MAX_CAPACITY` positions. `colors` maps color_id -> Color.
 func bind_snapshots(snapshots: Array, colors: Array = []) -> void:
 	if _views.is_empty():
 		_build_views()
-	for i in range(SLOT_COUNT):
+	for i in range(_views.size()):
 		var snap: Dictionary = snapshots[i] if i < snapshots.size() and snapshots[i] is Dictionary else {"state": "EMPTY", "occupied": false}
 		var cid: int = int(snap.get("color_id", -1))
 		var col: Color = colors[cid] if cid >= 0 and cid < colors.size() else Color(1, 0, 1, 1)

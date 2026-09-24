@@ -91,6 +91,10 @@ func import_snapshot(s) -> bool:
 	var exp = IntDomain.nonneg_int(s.get("timed_expiry", 0))
 	if lvl == null or exp == null:
 		return false
+	# Canonical sentinel domain (M39 V03, F-M39-V02-016): exactly -1 or >= 1.
+	# Anything else (0, other negatives) is noncanonical and fails closed.
+	if lvl != -1 and lvl < 1:
+		return false
 	_entitled_level = lvl
 	_timed_expiry = exp
 	return true

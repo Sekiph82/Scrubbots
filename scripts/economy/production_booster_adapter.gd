@@ -54,6 +54,20 @@ func _inflight() -> int:
 		return _scheduler.live_assignment_count()
 	return 0
 
+## Count only in-flight scheduler assignments whose color_id matches `color`.
+## Unrelated colors' work is preserved (M39 V03, F-M39-V02-006). Falls back to
+## the global inflight count when the scheduler has no snapshot API.
+func _color_inflight_count(color) -> int:
+	if _scheduler == null:
+		return 0
+	if _scheduler.has_method("assignment_snapshot"):
+		var n := 0
+		for a in _scheduler.assignment_snapshot():
+			if typeof(a) == TYPE_DICTIONARY and int(a.get("color_id", -1)) == int(color):
+				n += 1
+		return n
+	return _inflight()
+
 ## Current supply as Array[column] of Array[ColorBatch] (deep, detached).
 func _current_cols() -> Array:
 	var dbg: Dictionary = _supply.debug_snapshot()
@@ -90,7 +104,8 @@ func _is_safe(cols: Array) -> bool:
 func propose_random_reorder() -> Dictionary:
 	# Reorder the flattened remaining batches deterministically, refilling columns
 	# with their original sizes (conservation of ids/colors/counts, only order
-	# changes). Prove solvability before offering commit.
+	# changes). Prove owner-required >=3 consecutive legal accepted front choices
+	# BEFORE offering commit (M39 V03, F-M39-V02-003).
 	var original := _current_cols()
 	var flat: Array = []
 	for q in original:
@@ -107,7 +122,7 @@ func propose_random_reorder() -> Dictionary:
 		for _i in range(q.size()):
 			nq.append(flat[k]); k += 1
 		reordered.append(nq)
-	if not _is_safe(reordered):
+	if not _prove_three_consecutive_safe(reordered):
 		return {"safe": false}
 	return {
 		"safe": true,
@@ -118,6 +133,80 @@ func propose_random_reorder() -> Dictionary:
 		"rollback": func():
 			_supply.load_columns(original),
 	}
+
+## Owner-required 3-consecutive safe-selection proof (F-M39-V02-003). Simulates
+## up to `steps` (default 3) successive accepted front-batch selections from the
+## reordered supply and requires each resulting state to remain non-DEADLOCK.
+## Deterministic: picks the LOWEST-index column with a non-empty front + an
+## empty slot at each step. If no qualifying step exists (no empty slot / all
+## columns empty), the sequence fails (`no_step`). Returns true only when three
+## consecutive steps all succeed with a non-deadlock classifier verdict.
+func _prove_three_consecutive_safe(cols: Array, steps: int = 3) -> bool:
+	# Simulate on a scratch supply engine + a scratch slot engine mirroring the
+	# current live slots — never mutate the live engines.
+	var scratch_supply = BatchSupplyEngine.create(_supply.get_column_count(), _supply.get_preview_depth())
+	if scratch_supply == null:
+		return false
+	if not scratch_supply.load_candidate(cols, _supply.get_seed(), _supply.get_palette_size()):
+		return false
+	var scratch_slots = _scratch_slots_from_live()
+	if scratch_slots == null:
+		return false
+	# Baseline safety on the reordered starting state must hold.
+	if not _is_safe_probe(scratch_supply, scratch_slots):
+		return false
+	for _step in range(steps):
+		# Pick the lowest-index column whose front batch is a legal placement
+		# (front non-null + at least one EMPTY slot). If none, the sequence
+		# cannot produce three accepted selections deterministically.
+		if scratch_slots.rightmost_empty_index() == -1:
+			return false
+		var chosen := -1
+		for c in range(scratch_supply.get_column_count()):
+			if scratch_supply.get_front(c) != null:
+				chosen = c
+				break
+		if chosen == -1:
+			return false
+		var r = scratch_slots.select_front_batch(scratch_supply, chosen)
+		if not r.get("ok", false):
+			return false
+		# The state after the accepted selection must remain non-deadlocked.
+		if not _is_safe_probe(scratch_supply, scratch_slots):
+			return false
+	return true
+
+func _scratch_slots_from_live():
+	# Rebuild a detached FiveSlotBatchEngine matching the live capacity and
+	# current occupancy from the M24 snapshot. Committed work is 0 at this
+	# adapter's entry (a booster is a discrete player action at quiescence).
+	var live = load("res://scripts/gameplay/slots/five_slot_batch_engine.gd").new()
+	if _slots.get_slot_count() == FiveSlotEngineMaxCapacity():
+		live.grow_to_sixth()
+	# Rehydrate occupied slots.
+	for i in range(_slots.get_slot_count()):
+		if _slots.is_occupied(i):
+			var occ = load("res://scripts/gameplay/slots/slot_batch_state.gd").make_occupied(
+				_slots.get_batch_id(i), _slots.get_color_id(i),
+				_slots.get_initial_count(i) if _slots.has_method("get_initial_count") else _slots.get_remaining(i),
+				_slots.get_placement_sequence(i))
+			if occ != null:
+				live._slots[i] = occ
+	return live
+
+static func FiveSlotEngineMaxCapacity() -> int:
+	return load("res://scripts/gameplay/slots/five_slot_batch_engine.gd").MAX_CAPACITY
+
+## Same DeadlockClassifier gate as `_is_safe` but taking already-built scratch
+## supply + slots engines (used inside the 3-consecutive simulation).
+func _is_safe_probe(scratch_supply, scratch_slots) -> bool:
+	var state = ProofState.from_runtime(_level, _board, scratch_supply, scratch_slots)
+	if state == null:
+		return false
+	var status = _classifier.classify(state, _inflight()).get("status", &"")
+	return status == DeadlockClassifier.PROGRESSABLE \
+		or status == DeadlockClassifier.STALLED \
+		or status == DeadlockClassifier.COMPLETED
 
 # ------------------------------------------------------------ Selector ----
 
@@ -151,11 +240,36 @@ func _cols_with_front(original: Array, batch_id: String):
 		out.append(front + rest)
 	return out if found else null
 
-func _selector_reorder_solvable(original: Array, batch_id: String) -> bool:
-	var cols = _cols_with_front(original, batch_id)
+## Solver safety of the ACTUAL post-extraction/post-placement state
+## (F-M39-V02-004): reorder the selected batch to the front, actually place it
+## into the rightmost EMPTY slot on scratch engines, then classify. A reorder-
+## only check is insufficient because the placement itself changes the supply
+## queue AND the slot state.
+func _selector_reorder_solvable(_original: Array, batch_id: String) -> bool:
+	# Which column holds this batch?
+	var target_col := -1
+	for c in range(_original.size()):
+		for b in _original[c]:
+			if b.get_batch_id() == batch_id:
+				target_col = c
+	if target_col == -1:
+		return false
+	var cols = _cols_with_front(_original, batch_id)
 	if cols == null:
 		return false
-	return _is_safe(cols)
+	# Build scratch supply + slots and actually perform the M24 select_front.
+	var scratch_supply = BatchSupplyEngine.create(_supply.get_column_count(), _supply.get_preview_depth())
+	if scratch_supply == null or not scratch_supply.load_candidate(cols, _supply.get_seed(), _supply.get_palette_size()):
+		return false
+	var scratch_slots = _scratch_slots_from_live()
+	if scratch_slots == null:
+		return false
+	if scratch_slots.rightmost_empty_index() == -1:
+		return false
+	var r = scratch_slots.select_front_batch(scratch_supply, target_col)
+	if not r.get("ok", false):
+		return false
+	return _is_safe_probe(scratch_supply, scratch_slots)
 
 func extract_batch(batch_id) -> Dictionary:
 	var original := _current_cols()
@@ -164,6 +278,10 @@ func extract_batch(batch_id) -> Dictionary:
 		for b in original[c]:
 			if b.get_batch_id() == batch_id:
 				target_col = c
+	# Track exactly which slot the extraction placed the batch into so a stage
+	# failure or a later transaction failure can free just that slot (M39 V03,
+	# F-M39-V02-004/005). -1 = nothing placed yet.
+	var placed_slot := [-1]
 	return {
 		"apply": func():
 			if _faulted("selector_extract"):
@@ -174,9 +292,20 @@ func extract_batch(batch_id) -> Dictionary:
 			if not _supply.load_columns(cols):
 				return false
 			var r = _slots.select_front_batch(_supply, target_col)
-			return bool(r.get("ok", false)),
+			if not r.get("ok", false):
+				# The failing stage partially mutated (supply reorder happened);
+				# unwind the supply reload here so the transaction runner's own
+				# rollback sees the pre-apply state.
+				_supply.load_columns(original)
+				return false
+			placed_slot[0] = int(r.get("slot", -1))
+			return true,
 		"rollback": func():
-			_supply.load_columns(original),
+			# Restore exact prior supply + free the placed slot if any (leaves
+			# no orphan sixth-slot batch on a later transaction failure).
+			_supply.load_columns(original)
+			if placed_slot[0] != -1:
+				_slots.free_slot_if_idle(placed_slot[0]),
 	}
 
 # ------------------------------------------------------------ Tornado ----
@@ -192,10 +321,18 @@ func present_colors() -> Array:
 				out.append(c)
 	return out
 
-## Atomic multi-system purge of one color. Requires quiescence (no in-flight M26
-## work) so there are no live claims/agents to strand — the agent/claim systems
-## are reconciled by the precondition, and board/supply/idle-slots are reconciled
-## with exact per-stage rollback.
+## Atomic multi-system purge of one color across BoardState + supply + idle
+## slots. Owner in-flight law (M39 V03, F-M39-V02-006): Tornado must reconcile
+## selected-color committed/in-flight assignments. The audited M25/M26/M19
+## APIs do not currently expose a targeted per-color cancellation seam that
+## unwinds claims + agents + committed slot work atomically. Adding that
+## surgery is a follow-up in its own audited cycle (recorded in the V03 log).
+## Interim honest behavior: the guard checks whether ANY in-flight assignment
+## currently carries the SELECTED color; if so, Tornado fails closed and no
+## state mutates — unrelated colors' work is preserved, and no charge/SB is
+## consumed. This is strictly stronger than the V02 global-quiescence rule
+## (it allows Tornado while other colors are in flight) while remaining
+## identity-safe against active same-color work.
 func tornado_stages(color) -> Array:
 	var cleared_indices: Array = []       # board cells set CLEARED by this purge
 	var freed_slots: Array = []           # {index, batch} freed idle slots
@@ -205,7 +342,7 @@ func tornado_stages(color) -> Array:
 		"apply": func():
 			if _faulted("tornado_guard"):
 				return false
-			return _inflight() == 0,       # quiescence: no in-flight agents/claims
+			return _color_inflight_count(color) == 0,
 		"rollback": func(): pass,
 	}
 	var stage_board := {

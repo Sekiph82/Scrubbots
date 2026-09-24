@@ -5,11 +5,16 @@ extends RefCounted
 ## Versioned, validated reader for `data/config/economy_rewards_v1.json`
 ## (SB-M39-001). Fail-closed: a missing/malformed/out-of-range config leaves
 ## `is_ok()` false and callers must not proceed with contradictory defaults.
-## Values are read verbatim from the owner-locked config; this class never
-## silently substitutes contradictory numbers.
+##
+## Strict schema (M39 V03, F-M39-V02-011): `schema_version` must be an EXACT
+## integer (int or integral float only — 2.9 fails); every owner-locked section
+## has explicit type/domain validation for the values M39 consumes.
+
+const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
 const DEFAULT_PATH := "res://data/config/economy_rewards_v1.json"
 const EXPECTED_SCHEMA_VERSION := 2
+const DIFFICULTIES := ["EASY", "MEDIUM", "HARD", "VERY_HARD"]
 
 var _ok := false
 var _error := ""
@@ -33,8 +38,10 @@ func _load(path: String) -> void:
 	if typeof(data) != TYPE_DICTIONARY:
 		_error = "root must be an object"
 		return
-	if int(data.get("schema_version", -1)) != EXPECTED_SCHEMA_VERSION:
-		_error = "unexpected schema_version (need %d)" % EXPECTED_SCHEMA_VERSION
+	# Strict schema_version type/value (F-M39-V02-011). 2.9 must not slip through.
+	var sv = IntDomain.exact_int(data.get("schema_version", null))
+	if sv == null or sv != EXPECTED_SCHEMA_VERSION:
+		_error = "unexpected schema_version (need exact %d)" % EXPECTED_SCHEMA_VERSION
 		return
 	# Minimal required-section validation (fail closed if a core section is absent).
 	for section in ["currency", "first_clear_sb", "win_streak", "gift_meter", "bot_parts", "hearts", "speed_2x", "boosters", "daily", "collection", "cards_exchange"]:
@@ -46,8 +53,69 @@ func _load(path: String) -> void:
 	if typeof(removed) != TYPE_ARRAY:
 		_error = "removed_systems must be an array"
 		return
+	# Validate the exact owner-locked values M39 consumes (F-M39-V02-011).
+	var ve := _validate_values(data)
+	if not ve.is_empty():
+		_error = ve
+		return
 	_data = data
 	_ok = true
+
+## Enforce exact type/domain for every owner-locked value M39 reads. Returns "" on
+## success or a diagnostic reason on failure.
+func _validate_values(data: Dictionary) -> String:
+	# currency.starting_balance is non-negative int
+	var start = IntDomain.nonneg_int(data.get("currency", {}).get("starting_balance", null))
+	if start == null: return "currency.starting_balance must be a non-negative integer"
+	# first_clear_sb entries for each difficulty are non-negative int
+	var fc = data.get("first_clear_sb", {})
+	for d in DIFFICULTIES:
+		var v = IntDomain.nonneg_int(fc.get(d, null))
+		if v == null: return "first_clear_sb.%s must be a non-negative integer" % d
+	# win_streak table
+	var ws = data.get("win_streak", {})
+	var sbc = ws.get("sb_by_consecutive_win", {})
+	for k in ["1", "2", "3", "4", "5_plus"]:
+		var v = IntDomain.nonneg_int(sbc.get(k, null))
+		if v == null: return "win_streak.sb_by_consecutive_win.%s must be a non-negative integer" % k
+	var bpn = IntDomain.exact_int(ws.get("bot_parts_every_n_wins", null))
+	if bpn == null or bpn < 1: return "win_streak.bot_parts_every_n_wins must be a positive integer"
+	# gift_meter.cycle_max positive int
+	var cm = IntDomain.exact_int(data.get("gift_meter", {}).get("cycle_max", null))
+	if cm == null or cm < 1: return "gift_meter.cycle_max must be a positive integer"
+	# bot_parts.robot_unlock_cost positive int
+	var bp = data.get("bot_parts", {})
+	var cost = IntDomain.exact_int(bp.get("robot_unlock_cost", null))
+	if cost == null or cost < 1: return "bot_parts.robot_unlock_cost must be a positive integer"
+	var initial = bp.get("initial_robot_id", null)
+	if typeof(initial) != TYPE_STRING or String(initial).is_empty(): return "bot_parts.initial_robot_id must be a non-empty string"
+	# hearts
+	var h = data.get("hearts", {})
+	var hmax = IntDomain.exact_int(h.get("max", null))
+	if hmax == null or hmax < 1: return "hearts.max must be a positive integer"
+	var reg = IntDomain.exact_int(h.get("regen_seconds", null))
+	if reg == null or reg < 1: return "hearts.regen_seconds must be a positive integer"
+	for k in ["plus_one_sb", "full_refill_sb_per_missing"]:
+		var v = IntDomain.nonneg_int(h.get(k, null))
+		if v == null: return "hearts.%s must be a non-negative integer" % k
+	# speed_2x current-level price
+	var sp = data.get("speed_2x", {})
+	var slv = IntDomain.nonneg_int(sp.get("current_level_sb", null))
+	if slv == null: return "speed_2x.current_level_sb must be a non-negative integer"
+	var timed = sp.get("timed_products", null)
+	if typeof(timed) != TYPE_ARRAY: return "speed_2x.timed_products must be an array"
+	for p in timed:
+		if typeof(p) != TYPE_DICTIONARY: return "speed_2x.timed_products entry must be an object"
+		var secs = IntDomain.exact_int(p.get("seconds", null))
+		var pr = IntDomain.nonneg_int(p.get("sb", null))
+		if secs == null or secs < 1 or pr == null: return "speed_2x.timed_products entry must have positive-int seconds + non-neg int sb"
+	# boosters: exactly the four canonical entries, each with a non-negative price_sb
+	var boosters = data.get("boosters", {})
+	for id in ["plus_one_slot", "random", "selector", "tornado"]:
+		if not boosters.has(id): return "boosters.%s missing" % id
+		var price = IntDomain.nonneg_int(boosters.get(id, {}).get("price_sb", null))
+		if price == null: return "boosters.%s.price_sb must be a non-negative integer" % id
+	return ""
 
 func is_ok() -> bool:
 	return _ok

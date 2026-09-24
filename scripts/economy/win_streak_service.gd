@@ -49,6 +49,12 @@ func streak() -> int:
 func on_gameplay_started() -> void:
 	_gameplay_started = true
 
+## Read-only probe: has real gameplay been armed for the current attempt?
+## Used by the production host to decide whether a Retry consumes a Heart
+## (post-action) or not (pre-action). Reflects the same flag on_restart consumes.
+func gameplay_started() -> bool:
+	return _gameplay_started
+
 ## Progression loss: always reset.
 func on_progression_loss() -> void:
 	_streak = 0

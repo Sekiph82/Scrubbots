@@ -88,9 +88,17 @@ func snapshot() -> Dictionary:
 	d["_pending_selected"] = _pending_selected
 	return d
 
+const _METADATA_KEYS := ["_pending_selected"]
+
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
+	# Reject unknown/fifth booster keys (M39 V03, F-M39-V02-012). Only the four
+	# canonical boosters plus documented metadata may appear. This enforces the
+	# "exactly four boosters" law at the persisted-state boundary.
+	for k in s.keys():
+		if not (BOOSTERS.has(k) or _METADATA_KEYS.has(k)):
+			return false
 	var new_charges: Dictionary = {}
 	for b in BOOSTERS:
 		var v = IntDomain.nonneg_int(s.get(b, 0))
