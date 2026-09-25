@@ -278,3 +278,6 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 | PALETTE-V3-C001 V01 independent audit | coordination/sessions/PALETTE-V3-C001/CHATGPT_AUDIT_V01.md | `AUDITED_PASS / PALETTE V3 + LEVEL DATA V1 CONTRACT REPAIRED` | Hazard Bot remains Level Data V1 under owner-approved Alpix palette v3; undefined V2 remains rejected; actual-main regressions green. |
 | M33-C001 V02 palette-blocker closure | coordination/sessions/M33-C001/CHATGPT_AUDIT_V02.md | `CODE_AUDIT_PASS / OWNER_MUSIC_SELECTION_AND_F6_REQUIRED` | Actual-main M33 9/9 after palette repair; only owner music selection/listening gates remain. |
 | M41-C001 V01 palette-blocker closure | coordination/sessions/M41-C001/CHATGPT_AUDIT_V01.md | `CODE_AUDIT_PASS / SETTINGS_OWNER_F6_REQUIRED` | Actual-main M41 13/13 after palette repair; early settings slice code-side accepted, Reduced Effects still outside scope. |
+
+
+| OWNER M33 music selection V03 | coordination/OWNER_M33_MUSIC_SELECTION_DECISION_V03.md | `OWNER LOCKED` | Gameplay source selected: Pixel Polish Parade. Workshop source reserved: ScrubBots Workshop. M33 now needs seamless OGG preparation + owner F6 listening, not music-source selection. |
