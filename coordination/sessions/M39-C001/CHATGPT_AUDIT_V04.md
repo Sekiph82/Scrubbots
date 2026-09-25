@@ -1,7 +1,7 @@
 # M39-C001 V04 — ChatGPT Independent Full-Surface Audit
 
 Date: 2026-09-25
-Verdict: **CODE_AUDIT_PASS / REGRESSION_GATE_OPEN / DEVICE_OWNER_GATE_OPEN**
+Verdict: **AUDITED_PASS / M39 ECONOMY CODE CLOSED / DEVICE_OWNER_GATE_REMAINS**
 
 Implementation: `3a8943d`
 Claude log: `coordination/sessions/M39-C001/CLAUDE_LOG_V04.md`
@@ -192,3 +192,32 @@ Owner/device open:
 
 Verdict string:
 `CODE_AUDIT_PASS / M39-C001 V04 / SB-M39-052 REGRESSION_REQUIRED / SB-M39-033 DEVICE_OWNER_REQUIRED`
+
+
+## Final regression-gate closure — 2026-09-25
+
+M38 V03 repaired the previously false-positive strict suite without changing
+production M38 code.
+
+The repaired suite now:
+- executes the reward-failure/no-mutation path with a true RewardGrantService subclass;
+- reports 11/11 expected cases complete;
+- contains no SCRIPT ERROR;
+- fails nonzero when a named case aborts.
+
+Claude then reran the M39 V04 required regressions:
+- `m39_v04_integration.gd`: PASS
+- `m39_v04_tornado_inflight.gd`: PASS
+- repaired `m38_v02_strict.gd`: PASS 11/11, no SCRIPT ERROR
+- `m40_v04_bootstrap.gd`: PASS
+- root: 5336 checks / 0 failures
+
+Therefore SB-M39-052 regression evidence is now closed.
+
+M39 code/audit status:
+- all code tasks: AUDITED_PASS
+- SB-M39-033: remains DEVICE/OWNER_REQUIRED for real-phone sixth-slot
+  safe-area/touch/readability.
+
+Final verdict string:
+`AUDITED_PASS / M39 ECONOMY CODE CLOSED / SB-M39-033 DEVICE_OWNER_REQUIRED`
