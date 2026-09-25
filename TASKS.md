@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M33
-- Current Sprint: M33-M41 EARLY SETTINGS BATCH V01
-- Current Task: M33-C001 V02 -> M41-C001 V01
-- Current Task Status: READY_FOR_IMPLEMENTATION
-- Next Task/Action: CLAUDE executes `coordination/sessions/M33-M41-BATCH/CHATGPT_MASTER_PROMPT_V01.md` without stopping between M33 V02 and the owner-authorized M41 early Settings slice. M33 removes dispatch SFX, repurposes dispatch.wav as bounded cleaning audio, adds reusable Music-bus looping support, and integrates canonical settings. M41 then exposes/persists Master/Music/SFX/Haptics controls using the post-M40 AppState/SaveService graph. Final music asset selection and owner F6 listening remain owner gates.
+- Current Milestone: PALETTE-V3-C001
+- Current Sprint: Palette V3 / Level Data V1 Contract Repair
+- Current Task: PALETTE-V3-C001 V01
+- Current Task Status: CHANGES_REQUIRED / UPSTREAM_COMPATIBILITY_BLOCKER
+- Next Task/Action: CLAUDE executes `coordination/sessions/PALETTE-V3-C001/CHATGPT_PROMPT_V01.md`. Keep the owner-approved Alpix-aligned palette v3 colors, restore Hazard Bot to Level Data schema `version: 1`, synchronize active v3 authority docs, add a palette-v3/LevelData-v1 regression, then rerun M29/M33/M41/M40/M38/M39/root on the actual repaired `main`. Do not broaden LevelLoader to an undefined Level Data V2.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 699 / 980 = 71.33% after M38 strict-evidence closure, M39 regression closure and M40 final audit closure. M34 SB-M34-006 real-device haptics, M36 SB-M36-005 human difficulty playtest and M39 SB-M39-033 real-device sixth-slot evidence remain open owner/device gates.
-- Note: M38 V03 repaired a false-PASS test harness without changing production M38. M39 V04 code is independently accepted; only SB-M39-033 device evidence remains. M40 is independently closed. M33 audio V02 and the explicitly authorized M41 audio/haptics settings slice are now the active implementation frontier.
+- Progress: 699 / 980 = 71.33%. No M33/M41 tasks are newly closed yet because required real-stack validation is blocked on current `main`. M33 V02 and M41 V01 are independently code-audited pass in isolation; final integration status waits for this palette repair and rerun.
+- Note: Canonical pixel-art authority is now `data/palettes/scrubbots_palette_v3.json` (Alpix-aligned owner decision). This does NOT change the current Level Data schema: `LevelData.FORMAT_VERSION` remains 1. M33 still requires owner background-music selection + F6 listening; M41 Settings still requires owner visual/manual F6. M34 real-device haptics, M36 human difficulty and M39 sixth-slot device gates remain separately open.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -230,7 +230,9 @@ represented as thousands of heavyweight Godot Nodes (see ADR-004, ADR-008).
 ### 8.7A — Global 16-color pixel-art palette `[LOCKED OWNER DECISION]`
 
 Canonical machine-readable palette:
-`data/palettes/scrubbots_palette_v2.json`
+`data/palettes/scrubbots_palette_v3.json`
+
+Palette authority version and Level Data schema version are independent. The current Level Data schema remains V1 (`version: 1`); palette v3 does not authorize Level Data V2.
 
 Canonical human-readable rule:
 `docs/08_PIXEL_ART_PALETTE_RULES.md`
@@ -1315,12 +1317,14 @@ Closure evidence: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V03.md` + `coord
 
 ### M33 — Audio `[OWNER-LOCKED AUDIO SELECTION V02 2026-09-24]`
 
+V02 independent audit: `CODE_AUDIT_PASS / PALETTE-V3-BLOCKER / OWNER_MUSIC_SELECTION_AND_F6_REQUIRED`. Source/wiring remediation is accepted, but required real-stack validation must be rerun on repaired current `main` before code-task closure.
+
 Owner F6 listening feedback on 2026-09-24 did **not** accept the V01 mix for final closure. New owner lock: no dispatch SFX; cleaning uses the preserved `dispatch.wav` sonic identity with a short bounded tail; completion remains WON-only; no movement audio; continuous background music is required; final music asset remains owner-selection-gated. Remediation authority: `coordination/OWNER_M33_AUDIO_SELECTION_DECISION_V02.md`, `coordination/sessions/M33-C001/CHATGPT_PROMPT_V02.md`, and `CHATGPT_AUDIT_CRITERIA_V02.md`. M33 status is `CHANGES_REQUIRED / OWNER_F6_RETEST_REQUIRED`.
 
 - [ ] SB-M33-001 Audio buses. — [ ] SB-M33-002 Master volume.
 - [ ] SB-M33-003 Music volume. — [ ] SB-M33-004 SFX volume.
-- [x] SB-M33-005 Dispatch SFX. Owner-approved canonical asset: `assets/audio/sfx/dispatch.wav`.
-- [x] SB-M33-006 Cleaning SFX. Owner-approved canonical asset: `assets/audio/sfx/cleaning.wav`.
+- [x] SB-M33-005 Dispatch SFX decision resolved: **NONE in production V1**. `assets/audio/sfx/dispatch.wav` is preserved and repurposed as the cleaning sonic source.
+- [x] SB-M33-006 Cleaning SFX. Owner-approved V02 source: `assets/audio/sfx/dispatch.wav`; legacy `cleaning.wav` is preserved but not used by production cleaning playback.
 - [x] SB-M33-007 Completion SFX. Owner-approved canonical asset: `assets/audio/sfx/completion.wav`.
 - [x] SB-M33-008 Movement audio only if pleasant at high density. Owner decision: no movement audio in V1.
 - [ ] SB-M33-009 Concurrency management. — [ ] SB-M33-010 Persist settings.
@@ -1497,6 +1501,8 @@ Pre-authored batch bundle: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V01.md
 - [x] SB-M40-013 Persist wall-clock timestamps/expiry defensively against duplicate reward/refill claims.
 
 ### M41 — Settings
+
+V01 early-slice independent audit: `CODE_AUDIT_PASS / PALETTE-V3-BLOCKER / SETTINGS_OWNER_F6_REQUIRED`. Source/persistence/UI implementation is accepted, but real-host integration must be rerun on repaired current `main`; owner visual/manual F6 remains required.
 
 Owner-authorized early audio/haptics settings slice (2026-09-24): `SB-M41-001,002,003,004,006,007,008` may be implemented before the broader M41 cycle to support the revised M33 audio/haptics UX. Authority: `coordination/sessions/M41-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. `SB-M41-005 Reduced effects` remains outside this early slice.
 
