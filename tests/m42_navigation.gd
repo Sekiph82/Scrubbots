@@ -13,7 +13,7 @@ const R := NavigationController.Route
 
 var EXPECTED_CASES := [
 	"nav_edges", "nav_reentry", "nav_terminal_latch", "nav_settings_overlay",
-	"nav_back", "main_owns_one_nav",
+	"nav_back", "main_owns_one_nav", "no_shipping_level_select",
 ]
 
 var _fail := 0
@@ -28,6 +28,7 @@ func _initialize() -> void:
 	_nav_settings_overlay()
 	_nav_back()
 	await _main_owns_one_nav()
+	_no_shipping_level_select()
 	_cleanup()
 	_done()
 
@@ -130,6 +131,51 @@ func _main_owns_one_nav() -> void:
 	_ok(not root.get_settings_panel().visible, "nav close hides the panel")
 	_shutdown(root)
 	_complete("main_owns_one_nav")
+
+## SB-M42-005 / OWNER_M37_LEVEL_SELECT_DECISION_V01: NO SHIPPING LEVEL SELECT.
+func _no_shipping_level_select() -> void:
+	print("[no shipping level select]")
+	var offenders: Array = []
+	for dir in ["res://scripts/app", "res://scripts/ui", "res://scenes/app", "res://scenes/ui"]:
+		for f in _files(dir):
+			var t := _strip_comments(FileAccess.get_file_as_string(f)).to_lower()
+			if t.find("debug_set_current_level") != -1 or t.find("level_select") != -1 or t.find("levelselect") != -1 or t.find("level select") != -1:
+				offenders.append(f)
+	_ok(offenders.is_empty(), "no production app/ui code references a level picker or the debug frontier seam %s" % str(offenders))
+	var probe = MainScript.new()
+	var main_methods: Array = []
+	for m in probe.get_method_list():
+		main_methods.append(m["name"])
+	_ok(main_methods.has("play_current_frontier") and not main_methods.has("play_level") and not main_methods.has("launch_level"), "app root exposes only frontier launch, no level-number launch")
+	var play_args: Array = []
+	for m in probe.get_method_list():
+		if m["name"] == "play_current_frontier":
+			play_args = m["args"]
+	probe.free()
+	_ok(play_args.is_empty(), "play_current_frontier takes no level argument")
+	_complete("no_shipping_level_select")
+
+## Code only: drop `#` comments so documentation of the prohibition is not a hit.
+func _strip_comments(text: String) -> String:
+	var out := PackedStringArray()
+	for line in text.split("
+"):
+		var i := line.find("#")
+		out.append(line if i == -1 else line.substr(0, i))
+	return "
+".join(out)
+
+func _files(dir: String) -> Array:
+	var out: Array = []
+	var d := DirAccess.open(dir)
+	if d == null:
+		return out
+	for f in d.get_files():
+		if f.ends_with(".gd") or f.ends_with(".tscn"):
+			out.append(dir + "/" + f)
+	for sub in d.get_directories():
+		out.append_array(_files(dir + "/" + sub))
+	return out
 
 # ---------------------------------------------------------------- helpers ----
 
