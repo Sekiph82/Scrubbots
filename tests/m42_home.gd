@@ -18,7 +18,7 @@ var EXPECTED_CASES := [
 	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
 	"shortcut_columns_responsive", "live_binding", "approved_art_only", "scrub_bucks_chip",
 	"bot_parts_progress", "gift_meter_semantics", "gift_bar_claims", "cards_exchange_presentation",
-	"win_streak_track",
+	"win_streak_track", "daily_presentation",
 ]
 
 var _fail := 0
@@ -44,6 +44,7 @@ func _initialize() -> void:
 	await _gift_bar_claims()
 	await _cards_exchange_presentation()
 	await _win_streak_track()
+	await _daily_presentation()
 	_cleanup()
 	_done()
 
@@ -572,6 +573,48 @@ func _win_streak_track() -> void:
 	_ok(home.get_region("Shortcut_win_streak").badge.visible == false and home.get_region("TrackStep1").modulate.a < 1.0, "loss resets the live track")
 	sub.free()
 	_complete("win_streak_track")
+
+## SB-M42-024: Daily login count / 5-day cycle / booster reward state from DailyService;
+## claims via the canonical facade; no Home calendar logic.
+func _daily_presentation() -> void:
+	print("[daily presentation]")
+	_now = 1790000000
+	var clock := func(): return _now
+	var app = AppState.new(_uniq("daily"), clock, LocalCalendar.offset_provider(clock, 0))
+	var sub := _sub(Vector2i(1080, 2160))
+	var home = HomeScreenScene.instantiate()
+	sub.add_child(home)
+	home.bind(app)
+	await process_frame
+	var d = app.economy.daily
+	var w = app.economy.wallet
+	var sc = home.get_region("Shortcut_daily")
+	_ok(not sc.disabled and sc.badge.visible, "Daily shortcut live, claimable badge on a fresh day")
+	sc.pressed.emit()
+	var popup = home.get_popup("daily")
+	_ok(popup.get_row_count() == 5, "5-day cycle rows")
+	var btn = popup.get_action_button("login")
+	_ok(btn != null and not btn.disabled, "CLAIM offered for today's day 1")
+	var r3_text: String = popup.find_child("Rows", true, false).get_child(2).get_child(0).text
+	_ok(r3_text.find("Random Booster x1") != -1, "day 3 shows the configured booster reward (%s)" % r3_text)
+	var sb0: int = w.scrub_bucks()
+	btn.pressed.emit()
+	home.refresh()
+	_ok(w.scrub_bucks() == sb0 + int(d.login_reward_for(1).get("scrub_bucks", 0)) and d.claimed_today() and d.streak() == 1, "claim grants day-1 reward via canonical service")
+	_ok(not sc.badge.visible and popup.get_action_button("login") == null and popup.find_child("Rows", true, false).get_child(0).get_child(0).text.find("CLAIMED TODAY") != -1, "claimed state shown, no second CLAIM")
+	_ok(not app.actions.claim_daily_login().get("ok", true) and w.scrub_bucks() == sb0 + 100, "same-day second claim refused")
+	_now += 86400
+	home.refresh()
+	_ok(sc.badge.visible and d.next_claim_cycle_day() == 2 and popup.get_action_button("login") != null, "next local day: day 2 claimable")
+	popup.get_action_button("login").pressed.emit()
+	_ok(d.streak() == 2 and d.claimed_today(), "consecutive login streak 2")
+	_now += 86400 * 3
+	home.refresh()
+	_ok(d.next_claim_cycle_day() == 1, "missed days -> cycle restarts at day 1 (DailyService rule)")
+	var src := FileAccess.get_file_as_string("res://scripts/ui/home/home_screen.gd")
+	_ok(src.find("86400") == -1 and src.find("get_unix_time") == -1 and src.find("get_datetime") == -1, "Home has no calendar/clock logic of its own")
+	sub.free()
+	_complete("daily_presentation")
 
 # ---------------------------------------------------------------- helpers ----
 

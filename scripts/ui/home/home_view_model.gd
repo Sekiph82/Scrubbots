@@ -56,5 +56,7 @@ static func build(app) -> Dictionary:
 		"win_streak_track": track,
 		"daily_streak": int(e.daily.streak()),
 		"daily_cycle_day": int(e.daily.cycle_day()),
+		"daily_claimed_today": bool(e.daily.claimed_today()),
+		"daily_next_day": int(e.daily.next_claim_cycle_day()),
 		"cards_duplicates": dupes,
 	}

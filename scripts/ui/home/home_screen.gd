@@ -39,7 +39,7 @@ const HomePopup = preload("res://scripts/ui/home/home_popup.gd")
 
 ## Shortcuts with a V1 Home destination (popup). Others belong to later milestones and
 ## are shown disabled.
-const LIVE_SHORTCUTS := ["gift_bar", "cards_exchange"]
+const LIVE_SHORTCUTS := ["gift_bar", "cards_exchange", "daily"]
 ## Friendly names for canonical reward-bundle keys (presentation only).
 const REWARD_NAMES := {
 	"scrub_bucks": "SB", "bot_parts": "Bot Parts", "standard_card_packs": "Card Pack",
@@ -412,7 +412,8 @@ func _render_values() -> void:
 	(_nodes["Shortcut_win_streak"] as UiShortcutButton).set_badge(_vm["win_streak"])
 	(_nodes["Shortcut_gift_bar"] as UiShortcutButton).set_badge(_vm["gift_claimable"])
 	(_nodes["Shortcut_cards_exchange"] as UiShortcutButton).set_badge(_vm["cards_duplicates"])
-	(_nodes["Shortcut_daily"] as UiShortcutButton).set_badge(_vm["daily_cycle_day"])
+	# SB-M42-024: Daily badge = 1 when today's login reward is claimable.
+	(_nodes["Shortcut_daily"] as UiShortcutButton).set_badge(0 if _vm["daily_claimed_today"] else 1)
 	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
 		(_nodes["Shortcut_" + id[0]] as Button).disabled = not LIVE_SHORTCUTS.has(id[0])
 	for pid in _popups:
@@ -465,6 +466,8 @@ func _render_popup(id: String) -> void:
 			_render_gift_bar(popup)
 		"cards_exchange":
 			_render_cards_exchange(popup)
+		"daily":
+			_render_daily(popup)
 
 ## SB-M42-021: queued Gift Meter milestone rewards from GiftMeterService.claimable();
 ## CLAIM goes through the canonical action facade (idempotent by occurrence id, saves).
@@ -498,12 +501,37 @@ func _render_cards_exchange(popup: HomePopup) -> void:
 	var note := "No duplicate cards yet." if rows.is_empty() else 		"%d duplicate card(s) worth %d SB. Exchange them in the Collection (coming later)." % [_vm.get("cards_duplicates", 0), total_sb]
 	popup.set_content("CARDS EXCHANGE", rows, note)
 
+## SB-M42-024: Daily consecutive-login count, 5-day cycle and each day's configured
+## reward (incl. booster charges) from DailyService; CLAIM goes through the canonical
+## facade (local-calendar rules, atomic grant, saved). Home owns no calendar logic.
+func _render_daily(popup: HomePopup) -> void:
+	var d = _app.economy.daily
+	var claimed: bool = d.claimed_today()
+	var next_day: int = d.next_claim_cycle_day()
+	var rows: Array = []
+	for day in range(1, 6):
+		var state := ""
+		if claimed and day == next_day:
+			state = " · CLAIMED TODAY"
+		elif not claimed and day == next_day:
+			state = " · TODAY"
+		var row := {"text": "DAY %d · %s%s" % [day, _reward_text(d.login_reward_for(day)), state]}
+		if not claimed and day == next_day:
+			row["action_id"] = "login"
+			row["action_text"] = "CLAIM"
+			row["action_enabled"] = not _app.is_blocked
+		rows.append(row)
+	popup.set_content("DAILY REWARDS", rows, "Login streak: %d day(s)." % int(d.streak()))
+
 func _on_popup_action(action_id: String, popup_id: String) -> void:
 	if _app == null or _app.is_blocked:
 		return
 	match popup_id:
 		"gift_bar":
 			_app.actions.claim_gift(action_id)
+		"daily":
+			if action_id == "login":
+				_app.actions.claim_daily_login()
 	refresh()
 
 static func _reward_text(rewards: Dictionary) -> String:

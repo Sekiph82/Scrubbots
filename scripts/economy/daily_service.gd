@@ -87,6 +87,25 @@ func cycle_day() -> int:
 		return 0
 	return ((_streak - 1) % LOGIN_CYCLE_DAYS) + 1
 
+## M42 (SB-M42-024) read-only presentation queries. They never mutate state.
+## True when today's LOCAL-day login reward was already claimed.
+func claimed_today() -> bool:
+	return _last_claim_day >= 0 and _today() <= _last_claim_day
+
+## Cycle day (1..5) a claim made today would grant (streak continues only when the last
+## claim was exactly yesterday, mirroring claim_login()).
+func next_claim_cycle_day() -> int:
+	var today := _today()
+	var next_streak := (_streak + 1) if (_last_claim_day >= 0 and today == _last_claim_day + 1) else 1
+	if claimed_today():
+		next_streak = _streak
+	return ((max(next_streak, 1) - 1) % LOGIN_CYCLE_DAYS) + 1
+
+## Configured login reward bundle for cycle day 1..5 (detached copy).
+func login_reward_for(day: int) -> Dictionary:
+	var r = _login_rewards.get(day, {})
+	return (r as Dictionary).duplicate() if typeof(r) == TYPE_DICTIONARY else {}
+
 ## Claim today's login reward. Advances/repairs the streak by LOCAL calendar day
 ## (M39 V03, F-M39-V02-009/015):
 ##   - same day already claimed -> no-op;
