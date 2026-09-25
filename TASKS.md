@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M42
-- Current Sprint: M42-C001 Home / Navigation Preparation
-- Current Task: M42 prompt + audit bundle
-- Current Task Status: CHATGPT_PREPARING
-- Next Task/Action: ChatGPT prepares per-task implementation prompts and strict audit criteria for SB-M42-001..033 plus one master execution prompt. Claude must not start until the published M42 bundle is ready. Owner decisions already locked elsewhere must be consumed; unresolved M42 design gates remain explicit owner gates and must not be silently invented.
-- Required Actor: CHATGPT
+- Current Sprint: M42-C001 Home / Navigation Continuous Execution
+- Current Task: SB-M42-001..033 master batch
+- Current Task Status: READY_FOR_IMPLEMENTATION
+- Next Task/Action: CLAUDE executes `coordination/sessions/M42-C001/CHATGPT_MASTER_PROMPT_V01.md`. Run SB-M42-001..033 in order, publish one task log per task plus the master log, print each full GitHub log URL, continue across non-blocking owner/device/asset/tooling gates, then stop at `AWAITING_BATCH_AUDIT / M42-C001 V01`. Claude must not edit root TASKS.md or write audit verdicts.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 713 / 980 = 72.76%. M41 is fully closed; SB-M41-005 owner acceptance is recorded.
-- Note: M41 final status is `AUDITED_PASS / OWNER_F6_PASS / M41 SETTINGS CLOSED`. M42 SB-M42-005 inherits the owner-locked V1 decision: NO SHIPPING LEVEL SELECT / DEBUG SEAM ONLY. Separate open pre-existing gates remain M34 real-device haptics, M36 human difficulty playtest and M39 sixth-slot phone safe-area/touch/readability.
+- Progress: 713 / 980 = 72.76%. M41 is fully closed; M42 checklist rows remain open until independent task audits/required owner gates.
+- Note: M42-C001 bundle contains 33 per-task prompts + 33 strict audit criteria. SB-M42-005 is owner-locked NO SHIPPING LEVEL SELECT. SB-M42-031 is owner-locked once per cold/native launch. SB-M42-030 remains OWNER_DECISION_REQUIRED and must not be invented. Separate pre-existing gates remain M34 real-device haptics, M36 human difficulty playtest and M39 sixth-slot phone safe-area/touch/readability.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1525,6 +1525,14 @@ Evidence:
 - [x] SB-M41-008 Relaunch tests.
 
 ### M42 — Home / Navigation
+
+M42-C001 execution bundle published:
+- master: `coordination/sessions/M42-C001/CHATGPT_MASTER_PROMPT_V01.md`
+- prompts: `coordination/sessions/M42-C001/task_prompts/SB-M42-001.md` .. `SB-M42-033.md`
+- strict audit criteria: `coordination/sessions/M42-C001/audit_criteria/SB-M42-001.md` .. `SB-M42-033.md`
+
+Claude executes sequentially and publishes separate task logs; ChatGPT audits each task afterward. SB-M42-030 remains an explicit owner design gate and is not to be invented. SB-M42-032 requires real Android-device evidence for full closure.
+
 
 - [ ] SB-M42-001 Navigation architecture. — [ ] SB-M42-002 Home.
 - [ ] SB-M42-003 Play/Continue. — [ ] SB-M42-004 Settings.
