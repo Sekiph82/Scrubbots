@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M41 OWNER GATE
-- Current Sprint: Settings Owner Acceptance
-- Current Task: M41 Settings visual/manual F6
-- Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER checks the M41 Settings panel for layout/readability, slider/toggle interaction, haptics toggle behavior and relaunch restoration. M33 is fully closed: code audit passed and owner F6 audio acceptance is recorded.
-- Required Actor: OWNER
+- Current Milestone: M41
+- Current Sprint: Reduced Effects Completion
+- Current Task: SB-M41-005 Reduced Effects
+- Current Task Status: CHATGPT_PROMPT_REQUIRED
+- Next Task/Action: ChatGPT prepares the focused M41-C002 implementation prompt and strict audit criteria for SB-M41-005 Reduced Effects. The M41-C001 Settings owner F6/manual gate is closed with 9/9 owner checks accepted; Claude must not alter root TASKS.md.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 712 / 980 = 72.65%. M33 closure is a milestone/owner-gate closure and does not change the checklist numerator because its task rows were already complete.
-- Note: M33 final audio is accepted: Gameplay = `Pixel Polish Parade` via `assets/audio/music/background_loop.ogg`; Workshop = `ScrubBots Workshop` reserved for future Workshop UI. Separate open gates remain M34 real-device haptics, M36 human difficulty playtest, M39 sixth-slot phone safe-area/touch/readability, and M41 visual/manual F6. SB-M41-005 Reduced Effects remains open.
+- Progress: 712 / 980 = 72.65%. M41-C001 owner acceptance closes an owner gate but does not change the checklist numerator; SB-M41-005 remains the only open M41 checklist row.
+- Note: M33 final audio remains fully accepted. M41-C001 Settings early slice is `CODE_AUDIT_PASS / OWNER_F6_PASS` with owner evidence at `coordination/OWNER_M41_SETTINGS_ACCEPTANCE_V01.md`. Separate open gates remain M34 real-device haptics, M36 human difficulty playtest and M39 sixth-slot phone safe-area/touch/readability.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1507,11 +1507,15 @@ Pre-authored batch bundle: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V01.md
 
 ### M41 — Settings
 
-Palette blocker closed by PALETTE-V3-C001 V01. Actual-main `m41_settings` is 13/13 with zero SCRIPT ERROR. Owner-authorized early slice SB-M41-001/002/003/004/006/007/008 is code-side accepted. SB-M41-005 Reduced Effects remains open/outside the early slice; Settings visual/manual F6 remains owner-required.
+M41-C001 early Settings slice final status: **`CODE_AUDIT_PASS / OWNER_F6_PASS / SETTINGS EARLY SLICE ACCEPTED`**. Palette blocker is closed, actual-main `m41_settings` passed 13/13 with zero SCRIPT ERROR, and owner completed the requested 9/9 visual/manual checks covering layout/readability, slider/toggle interaction, Master/Music/SFX isolation, live haptics toggle behavior, panel reopen persistence and full relaunch restoration.
 
-V01 early-slice independent audit: `CODE_AUDIT_PASS / PALETTE-V3-BLOCKER / SETTINGS_OWNER_F6_REQUIRED`. Source/persistence/UI implementation is accepted, but real-host integration must be rerun on repaired current `main`; owner visual/manual F6 remains required.
+Owner acceptance evidence:
+`coordination/OWNER_M41_SETTINGS_ACCEPTANCE_V01.md`
 
-Owner-authorized early audio/haptics settings slice (2026-09-24): `SB-M41-001,002,003,004,006,007,008` may be implemented before the broader M41 cycle to support the revised M33 audio/haptics UX. Authority: `coordination/sessions/M41-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. `SB-M41-005 Reduced effects` remains outside this early slice.
+V01 independent audit:
+`coordination/sessions/M41-C001/CHATGPT_AUDIT_V01.md`
+
+Owner-authorized early audio/haptics settings slice (2026-09-24): `SB-M41-001,002,003,004,006,007,008` is fully accepted. `SB-M41-005 Reduced Effects` remains the only open M41 checklist row and was intentionally outside M41-C001 scope. It requires a separate focused implementation/audit cycle before M41 can be fully closed.
 
 - [x] SB-M41-001 Master volume. — [x] SB-M41-002 Music. — [x] SB-M41-003 SFX.
 - [x] SB-M41-004 Haptics. — [ ] SB-M41-005 Reduced effects.
