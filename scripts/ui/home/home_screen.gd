@@ -399,10 +399,16 @@ func _render_values() -> void:
 	var next_text := ("NEXT GIFT AT %d" % _vm["gift_next_milestone"]) if _vm["gift_next_milestone"] > 0 else "CYCLE COMPLETE"
 	(_nodes["GiftMeterBar"] as UiProgressMeter).set_progress(_vm["gift_progress"], _vm["gift_cycle_max"],
 		"GIFT METER %d/%d · %s" % [_vm["gift_progress"], _vm["gift_cycle_max"], next_text])
+	# SB-M42-023: the lower road is the Win Streak Scrub Bucks reward track: position
+	# 1/2/3/4/5+ pays 1/5/10/25/100 SB (WinStreakService, owner-locked). Reached steps are
+	# fully opaque, the current step is marked, future steps are dimmed. Not Stars.
 	for step in _vm["win_streak_track"]:
 		var chip: UiValueChip = _nodes["TrackStep%d" % step["position"]]
+		chip.set_tag("SB")
 		chip.set_value("+%d" % step["sb"])
-		chip.set_sub(("%d+" % step["position"]) if step["position"] == HomeViewModel.TRACK_POSITIONS else str(step["position"]))
+		var pos_text: String = ("%d+" % step["position"]) if step["position"] == HomeViewModel.TRACK_POSITIONS else str(step["position"])
+		chip.set_sub(("WIN %s · NOW" % pos_text) if step["current"] else ("WIN %s" % pos_text))
+		chip.modulate.a = 1.0 if step["reached"] else 0.55
 	(_nodes["Shortcut_win_streak"] as UiShortcutButton).set_badge(_vm["win_streak"])
 	(_nodes["Shortcut_gift_bar"] as UiShortcutButton).set_badge(_vm["gift_claimable"])
 	(_nodes["Shortcut_cards_exchange"] as UiShortcutButton).set_badge(_vm["cards_duplicates"])
