@@ -7,15 +7,19 @@ extends RefCounted
 ## maps them safely onto the Godot AudioServer bus volume/mute, and persists them under
 ## a user-data ConfigFile. It holds NO gameplay state and never reads or mutates board,
 ## reservation, dispatch, clearing, completion or progression truth (owner audio decision:
-## audio is presentation-only). M41 Settings UI will later consume this — M33 does not
-## build that UI.
+## audio is presentation-only). The M41 Settings UI consumes this through AppState.
+##
+## M41 V01 adds per-channel ON/OFF toggles: OFF mutes the bus but keeps the slider value.
+## The canonical persisted form is snapshot() inside the M40 SaveService save.
 ##
 ## Volume model: a stable normalized 0.0..1.0 per bus. 0.0 mutes the bus (deterministic
 ## silence); >0 unmutes and sets volume_db = linear_to_db(value). Inputs are clamped, so
 ## NaN / out-of-range never reach the AudioServer. A missing bus (no bus layout loaded) is
 ## a safe no-op, never a crash.
 ##
-## Persistence: ConfigFile at `user://audio_settings.cfg` (or an injected test path). A
+## LEGACY persistence (read-only compatibility since M40): ConfigFile at
+## `user://audio_settings.cfg` (or an injected test path). The shipping app persists audio
+## ONLY through the canonical SaveService; this file is read once for migration. A
 ## missing or corrupt file loads full-neutral defaults (1.0) and never blocks startup.
 ## Saving/loading audio settings touches only this file — never gameplay/progression saves.
 
@@ -34,6 +38,11 @@ var _config_path: String = DEFAULT_CONFIG_PATH
 var _master: float = DEFAULT_VOLUME
 var _music: float = DEFAULT_VOLUME
 var _sfx: float = DEFAULT_VOLUME
+## M41 V01 on/off toggles. OFF mutes the bus while keeping the slider value, so turning a
+## channel back ON restores the exact previous level. Default ON.
+var _master_on: bool = true
+var _music_on: bool = true
+var _sfx_on: bool = true
 
 ## `config_path` lets tests inject an isolated file so real owner settings are never
 ## overwritten. Omit for the production `user://audio_settings.cfg`.
@@ -55,27 +64,56 @@ func get_music_volume() -> float:
 func get_sfx_volume() -> float:
 	return _sfx
 
+func is_master_enabled() -> bool:
+	return _master_on
+
+func is_music_enabled() -> bool:
+	return _music_on
+
+func is_sfx_enabled() -> bool:
+	return _sfx_on
+
+## Canonical settings.audio snapshot (M40 save + M41). Plain values only.
+func snapshot() -> Dictionary:
+	return {
+		"master": _master, "music": _music, "sfx": _sfx,
+		"master_on": _master_on, "music_on": _music_on, "sfx_on": _sfx_on,
+	}
+
 # ------------------------------------------------------------------- set ----
 
 ## Set + apply normalized Master volume (clamped 0..1). Applies to the AudioServer bus.
 func set_master_volume(value: float) -> void:
 	_master = _clamp01(value)
-	_apply_bus(BUS_MASTER, _master)
+	_apply_bus(BUS_MASTER, _master if _master_on else 0.0)
 
 func set_music_volume(value: float) -> void:
 	_music = _clamp01(value)
-	_apply_bus(BUS_MUSIC, _music)
+	_apply_bus(BUS_MUSIC, _music if _music_on else 0.0)
 
 func set_sfx_volume(value: float) -> void:
 	_sfx = _clamp01(value)
-	_apply_bus(BUS_SFX, _sfx)
+	_apply_bus(BUS_SFX, _sfx if _sfx_on else 0.0)
+
+## M41 toggles: OFF mutes the bus, ON restores the kept slider value. Applies live.
+func set_master_enabled(on: bool) -> void:
+	_master_on = on
+	_apply_bus(BUS_MASTER, _master if _master_on else 0.0)
+
+func set_music_enabled(on: bool) -> void:
+	_music_on = on
+	_apply_bus(BUS_MUSIC, _music if _music_on else 0.0)
+
+func set_sfx_enabled(on: bool) -> void:
+	_sfx_on = on
+	_apply_bus(BUS_SFX, _sfx if _sfx_on else 0.0)
 
 ## Push the current in-memory values onto the AudioServer buses (e.g. right after load or
 ## after a bus layout becomes available). Idempotent.
 func apply_all() -> void:
-	_apply_bus(BUS_MASTER, _master)
-	_apply_bus(BUS_MUSIC, _music)
-	_apply_bus(BUS_SFX, _sfx)
+	_apply_bus(BUS_MASTER, _master if _master_on else 0.0)
+	_apply_bus(BUS_MUSIC, _music if _music_on else 0.0)
+	_apply_bus(BUS_SFX, _sfx if _sfx_on else 0.0)
 
 # ------------------------------------------------------- persistence ----
 

@@ -97,6 +97,40 @@ func set_haptics_enabled(enabled: bool) -> Dictionary:
 	haptics.set_enabled(enabled)
 	return request_save()
 
+## M41 V01 live audio actions. `bus` is "master" | "music" | "sfx". The value applies to
+## the AudioServer immediately. persist=false (slider drag in progress) only marks the state
+## dirty; the Settings UI saves on drag end / close and the app lifecycle flush covers the
+## rest. Unknown bus => rejected, nothing mutated.
+func set_audio_volume(bus: String, value: float, persist: bool = true) -> Dictionary:
+	if is_blocked:
+		return {"ok": false, "reason": "app_blocked"}
+	match bus:
+		"master": audio.set_master_volume(value)
+		"music": audio.set_music_volume(value)
+		"sfx": audio.set_sfx_volume(value)
+		_: return {"ok": false, "reason": "unknown_bus"}
+	if not persist:
+		mark_dirty()
+		return {"ok": true, "pending": true}
+	return request_save()
+
+## M41 V01 channel ON/OFF (OFF mutes, keeps the slider value). Applies live and persists.
+func set_audio_enabled(bus: String, on: bool) -> Dictionary:
+	if is_blocked:
+		return {"ok": false, "reason": "app_blocked"}
+	match bus:
+		"master": audio.set_master_enabled(on)
+		"music": audio.set_music_enabled(on)
+		"sfx": audio.set_sfx_enabled(on)
+		_: return {"ok": false, "reason": "unknown_bus"}
+	return request_save()
+
+## Save only when a deferred settings change is pending (Settings drag end / close).
+func flush_if_dirty() -> Dictionary:
+	if not _dirty:
+		return {"ok": true, "skipped": true}
+	return request_save()
+
 func set_volumes(master: float, music: float, sfx: float) -> Dictionary:
 	if is_blocked:
 		return {"ok": false, "reason": "app_blocked"}
