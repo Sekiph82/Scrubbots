@@ -15,7 +15,7 @@ const REQUIRED_VIEWPORTS := [Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2
 var EXPECTED_CASES := [
 	"home_shell_tree", "home_in_real_root", "home_blocked_state",
 	"play_cta_fresh", "continue_cta_frontier",
-	"settings_single_authority", "components_viewport_matrix",
+	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
 ]
 
 var _fail := 0
@@ -31,6 +31,7 @@ func _initialize() -> void:
 	await _continue_cta_frontier()
 	await _settings_single_authority()
 	await _components_viewport_matrix()
+	await _layered_art_regions()
 	_cleanup()
 	_done()
 
@@ -213,6 +214,44 @@ func _components_viewport_matrix() -> void:
 	_ok(h2.get_region("ScrubBucksChip").value_label is Label and h2.get_region("GiftMeterBar").bar is ProgressBar and h2.get_region("Shortcut_daily") is Button, "live Label / native ProgressBar / Button components")
 	sub2.free()
 	_complete("components_viewport_matrix")
+
+## SB-M42-011: layered canonical regions, reference never shipped as one bitmap.
+func _layered_art_regions() -> void:
+	print("[layered art regions]")
+	var manifest = JSON.parse_string(FileAccess.get_file_as_string("res://assets/ui/HOME_ASSET_MANIFEST.json"))
+	var order: Array = manifest["layer_order"]
+	var sub := _sub(Vector2i(1080, 2160))
+	var home = HomeScreenScene.instantiate()
+	sub.add_child(home)
+	home.bind(AppState.new(_uniq("layers")))
+	await process_frame
+	var layers: Array = home.get_art_layers()
+	var names: Array = []
+	for l in layers:
+		names.append(String(l.name).trim_prefix("Layer_"))
+	var expected: Array = []
+	for o in order:
+		if o != "ui":
+			expected.append(String(o).replace(".", "_"))
+	_ok(names == expected, "art layers follow manifest layer_order %s" % str(names))
+	var all_ignore := true
+	for l in layers:
+		all_ignore = all_ignore and (l as Control).mouse_filter == Control.MOUSE_FILTER_IGNORE
+	_ok(all_ignore, "every art layer is decorative (ignores input)")
+	_ok(home.get_region("Background").get_index() < home.get_region("SafeAreaRoot").get_index(), "screen art layers draw behind all UI")
+	_ok(layers[4].get_parent() == home.get_region("CenterScrubbyArea") and layers[5].get_parent() == home.get_region("CenterScrubbyArea"), "world/character layers live in CenterScrubbyArea between the shortcut columns")
+	var ref_hits: Array = []
+	for f in ["res://scripts/ui/home/home_screen.gd", "res://scenes/ui/home/home_screen.tscn", "res://scripts/app/main.gd", "res://scenes/app/main.tscn"]:
+		if FileAccess.get_file_as_string(f).find("main screen.png") != -1 or FileAccess.get_file_as_string(f).find("_owner_inbox") != -1:
+			ref_hits.append(f)
+	_ok(ref_hits.is_empty(), "owner reference screenshot never loaded by Home/app %s" % str(ref_hits))
+	var bound := 0
+	for l in layers:
+		if (l as TextureRect).texture != null:
+			bound += 1
+	_ok(bound == 0, "no art bound before owner approval (SB-M42-016/017 gate)")
+	sub.free()
+	_complete("layered_art_regions")
 
 # ---------------------------------------------------------------- helpers ----
 

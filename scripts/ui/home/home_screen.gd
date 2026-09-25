@@ -41,6 +41,14 @@ const RIGHT_SHORTCUTS := [["daily", "DAILY"], ["tasks", "TASKS"], ["cards_exchan
 ## Win Streak track positions 1..5+ (values are rendered live from WinStreakService).
 const TRACK_POSITIONS := 5
 
+## SB-M42-011: layered art regions recreating the owner Home art direction. Names follow
+## assets/ui/HOME_ASSET_MANIFEST.json layer_order. Screen-wide layers sit behind the UI;
+## world/character layers sit inside CenterScrubbyArea. Every layer is a decorative
+## TextureRect that never receives input. The owner reference image itself is never
+## loaded or shipped — layers stay empty until owner-approved assets bind (SB-M42-016/017).
+const SCREEN_LAYERS := ["background.sky", "background.city_far", "background.city_mid", "background.street_foreground"]
+const WORLD_LAYERS := ["central_world_and_environment", "characters"]
+
 const BG01 := Color(0.125, 0.145, 0.2, 1.0)   ## Midnight Slate #202533.
 
 var _app = null
@@ -83,6 +91,8 @@ func _build() -> void:
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 	_nodes["Background"] = bg
+	for layer in SCREEN_LAYERS:
+		bg.add_child(_art_layer(layer, TextureRect.STRETCH_KEEP_ASPECT_COVERED))
 
 	var safe = SafeAreaRootScene.instantiate()
 	safe.name = "SafeAreaRoot"
@@ -151,6 +161,8 @@ func _build() -> void:
 	layout.add_child(track)
 	_nodes["WinStreakRewardTrack"] = track
 
+	for layer in WORLD_LAYERS:
+		_nodes["CenterScrubbyArea"].add_child(_art_layer(layer, TextureRect.STRETCH_KEEP_ASPECT_CENTERED))
 	_build_hud(_nodes["TopCurrencyHUD"])
 	_build_gift_meter(_nodes["GiftMeter"])
 	_build_shortcuts(_nodes["LeftShortcutColumn"], LEFT_SHORTCUTS)
@@ -164,6 +176,23 @@ func _build() -> void:
 	layout.add_child(nav)
 	_nodes["BottomNav"] = nav
 	_build_bottom_nav(nav)
+
+func _art_layer(layer: String, stretch: int) -> TextureRect:
+	var t := TextureRect.new()
+	t.name = "Layer_" + layer.replace(".", "_")
+	t.set_anchors_preset(Control.PRESET_FULL_RECT)
+	t.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	t.stretch_mode = stretch
+	t.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_nodes["Layer_" + layer] = t
+	return t
+
+## Ordered art layer nodes (manifest layer_order minus the "ui" layer).
+func get_art_layers() -> Array:
+	var out: Array = []
+	for layer in SCREEN_LAYERS + WORLD_LAYERS:
+		out.append(_nodes["Layer_" + layer])
+	return out
 
 ## SB-M42-010: reusable live components; text is set only by refresh().
 func _build_hud(hud: HBoxContainer) -> void:
