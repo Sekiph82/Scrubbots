@@ -17,6 +17,7 @@ var EXPECTED_CASES := [
 	"play_cta_fresh", "continue_cta_frontier",
 	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
 	"shortcut_columns_responsive", "live_binding", "approved_art_only", "scrub_bucks_chip",
+	"bot_parts_progress",
 ]
 
 var _fail := 0
@@ -37,6 +38,7 @@ func _initialize() -> void:
 	await _live_binding()
 	await _approved_art_only()
 	await _scrub_bucks_chip()
+	await _bot_parts_progress()
 	_cleanup()
 	_done()
 
@@ -409,6 +411,32 @@ func _scrub_bucks_chip() -> void:
 	_ok(hit == null, "Home code has no coin / Star / Event Points / XP authority (%s)" % ("" if hit == null else hit.get_string()))
 	sub.free()
 	_complete("scrub_bucks_chip")
+
+## SB-M42-019: profile bar = Bot Parts toward the next robot (N/250), not XP.
+func _bot_parts_progress() -> void:
+	print("[bot parts progress]")
+	var app = AppState.new(_uniq("parts"))
+	var sub := _sub(Vector2i(1080, 2160))
+	var home = HomeScreenScene.instantiate()
+	sub.add_child(home)
+	home.bind(app)
+	await process_frame
+	var e = app.economy
+	var meter = home.get_region("ProfileBotParts")
+	var cost: int = e.robots.unlock_cost()
+	_ok(cost == 250, "owner economy robot unlock cost 250 (%d)" % cost)
+	for want in [0, 184, 249, 250, 310]:
+		e.wallet.credit("bot_parts", want - e.wallet.bot_parts()) if want > e.wallet.bot_parts() else e.wallet.debit("bot_parts", e.wallet.bot_parts() - want)
+		home.refresh()
+		var ready: bool = want >= cost
+		_ok(meter.caption.text.find("BOT PARTS %d/250" % want) != -1 and meter.caption.text.find("ROBOT READY") != -1 == ready, "%d parts -> '%s'" % [want, meter.caption.text])
+		_ok(is_equal_approx(meter.bar.value, minf(want, cost)) and is_equal_approx(meter.bar.max_value, cost), "%d parts -> bar %s/%s" % [want, meter.bar.value, meter.bar.max_value])
+	var r: Dictionary = e.robots.unlock("robot_02")
+	home.refresh()
+	_ok(r.get("ok", false) and meter.caption.text.find("BOT PARTS %d/250" % e.wallet.bot_parts()) != -1, "after a canonical unlock the bar shows the carried-over parts (%s)" % meter.caption.text)
+	_ok(meter.caption.text.to_lower().find("xp") == -1, "no XP wording")
+	sub.free()
+	_complete("bot_parts_progress")
 
 # ---------------------------------------------------------------- helpers ----
 

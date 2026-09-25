@@ -364,8 +364,13 @@ func _render_values() -> void:
 	_vm = HomeViewModel.build(_app)
 	if not _vm.get("ok", false):
 		return
+	# SB-M42-019: the profile bar is Bot Parts toward the next 250-part robot (canonical
+	# RobotUnlockService / wallet), never XP. At >= target the bar is full and READY.
+	var parts_text := "BOT PARTS %d/%d" % [_vm["bot_parts"], _vm["bot_parts_target"]]
+	if _vm["robot_can_unlock"]:
+		parts_text += " · ROBOT READY"
 	(_nodes["ProfileBotParts"] as UiProgressMeter).set_progress(_vm["bot_parts"], _vm["bot_parts_target"],
-		"LEVEL %d · BOT PARTS %d/%d" % [_vm["level"], _vm["bot_parts"], _vm["bot_parts_target"]])
+		"LEVEL %d · %s" % [_vm["level"], parts_text])
 	# SB-M42-018: top currency is Scrub Bucks (banknote icon once approved; native "SB"
 	# tag meanwhile) with the live canonical wallet balance. No coin/Star authority.
 	var sb: UiValueChip = _nodes["ScrubBucksChip"]
