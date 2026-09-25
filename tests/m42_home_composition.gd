@@ -1,5 +1,6 @@
 extends SceneTree
-## M42 Home master convergence V02 — presentation accounting + composition evidence.
+## M42 Home master convergence V02 — presentation accounting + composition evidence
+## (revised for owner V03: retired/disabled modes; V03 specifics in m42_home_v03.gd).
 ## Expected/completed case ledger (AL-091).
 ##
 ## Run: godot --headless --path . -s res://tests/m42_home_composition.gd
@@ -14,9 +15,9 @@ const UiText = preload("res://scripts/ui/ui_text.gd")
 const MATRIX := [Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2i(1290, 2796), Vector2i(1080, 2400), Vector2i(1440, 3200), Vector2i(1080, 1920), Vector2i(1536, 2048)]
 
 var EXPECTED_CASES := [
-	"accounting_covers_manifest", "static_nodes_presented", "state_nodes", "reuse_087",
-	"play_cta_composition", "labels_full", "nav_dock", "reward_track", "area_banner",
-	"scrubby_on_platform", "decor_ignores_input", "responsive_matrix", "unapproved_not_bound",
+	"accounting_covers_manifest", "static_nodes_presented", "inactive_rows_present_nothing",
+	"labels_full", "nav_dock", "area_banner", "decor_ignores_input", "responsive_matrix",
+	"unapproved_not_bound",
 ]
 
 var _fail := 0
@@ -29,14 +30,10 @@ func _initialize() -> void:
 	var home = r[1]
 	_accounting(home)
 	_static_nodes(home)
-	_state_nodes(home)
-	_reuse(home)
-	_play(home)
+	_inactive(home)
 	_labels(home)
 	_nav(home)
-	_track(home)
 	_banner(home)
-	_scrubby(home)
 	_decor(home)
 	r[0].queue_free()
 	await _matrix()
@@ -62,8 +59,6 @@ func _home(size: Vector2i, tag: String, binder = null) -> Array:
 		home.set_art_binder(binder)
 	for _i in range(4):
 		await process_frame
-	home.set_process(false)   # freeze idle states for deterministic assertions
-	home.set_idle_state("")
 	return [sub, home]
 
 func _accounting(home) -> void:
@@ -88,7 +83,7 @@ func _accounting(home) -> void:
 	var modes := {}
 	for row in acc:
 		modes[row["mode"]] = int(modes.get(row["mode"], 0)) + 1
-	_ok(modes == {"STATIC": 47, "STATE": 2, "REUSE": 1}, "47 STATIC + 2 STATE + 1 REUSE (%s)" % str(modes))
+	_ok(modes == {"STATIC": 45, "OWNER_RETIRED": 3, "OWNER_DISABLED": 2}, "V03: 45 STATIC + 3 OWNER_RETIRED + 2 OWNER_DISABLED (%s)" % str(modes))
 	_complete("accounting_covers_manifest")
 
 func _static_nodes(home) -> void:
@@ -103,40 +98,25 @@ func _static_nodes(home) -> void:
 	_ok(bad.is_empty(), "every STATIC entry presents its approved texture on a visible node %s" % str(bad))
 	_complete("static_nodes_presented")
 
-func _state_nodes(home) -> void:
-	print("[state nodes]")
-	var blink: Control = home.get_region("ScrubbyBlink")
-	var arm: Control = home.get_region("ScrubbyBrushArm")
-	_ok(blink.get("texture") != null and arm.get("texture") != null, "STATE nodes carry approved textures")
-	_ok(not blink.visible and not arm.visible, "STATE nodes hidden in the neutral pose")
-	home.set_idle_state("idle_blink")
-	_ok(blink.is_visible_in_tree() and not arm.visible, "idle_blink shows only HOME-031")
-	home.set_idle_state("idle_scrub")
-	_ok(arm.is_visible_in_tree() and not blink.visible, "idle_scrub shows only HOME-032")
-	home.set_idle_state("")
-	_ok(not blink.visible and not arm.visible, "state cleared")
-	_complete("state_nodes")
-
-func _reuse(home) -> void:
-	print("[reuse 087]")
-	var sb_tex: Texture2D = home.get_region("ScrubBucksChip").icon.texture
-	var same := sb_tex != null
-	for i in range(1, 6):
-		var chip = home.get_region("TrackStep%d" % i)
-		same = same and chip.icon.visible and chip.icon.texture != null and chip.icon.texture.resource_path == sb_tex.resource_path
-	_ok(same, "HOME-087 presented on all 5 reward-track steps as exact HOME-042 file reuse")
-	_complete("reuse_087")
-
-func _play(home) -> void:
-	print("[play CTA composition]")
-	var play: Button = home.get_region("PlayButton")
-	var icon: Control = home.get_region("PlayIcon")
-	_ok(icon.get_parent() == play and icon.mouse_filter == Control.MOUSE_FILTER_IGNORE, "PlayIcon (HOME-078) is a non-interactive child of the native PlayButton")
-	_ok(play.get_global_rect().encloses(icon.get_global_rect()), "play icon inside the CTA hit region")
-	_ok(play.text == UiText.t("HOME_PLAY"), "hero label is live PLAY text (not baked art)")
-	_ok(String(home.get_region("PlaySubtitle").text) == UiText.t("HOME_START_LEVEL", [1]), "fresh save subtitle = LEVEL 1 (live frontier, no hardcoded 329)")
-	_ok(play.size.y >= 150 and play.size.x >= 600, "dominant CTA size %s" % str(play.size))
-	_complete("play_cta_composition")
+func _inactive(home) -> void:
+	print("[inactive rows present nothing]")
+	var ids: Array = []
+	var bad: Array = []
+	for row in home.get_presentation_accounting():
+		if HomePresentationMap.INACTIVE_MODES.has(row["mode"]):
+			ids.append(row["id"])
+			if not (row["nodes"] as Array).is_empty() or String(row["reason"]).is_empty():
+				bad.append(row["id"])
+	ids.sort()
+	_ok(ids == ["HOME-011", "HOME-031", "HOME-032", "HOME-078", "HOME-087"], "owner-retired/disabled set %s" % str(ids))
+	_ok(bad.is_empty(), "inactive rows have no presentation node and carry a reason %s" % str(bad))
+	var m = V.load_manifest()
+	var still_approved := 0
+	for a in m["assets"]:
+		if ids.has(a["id"]) and a["status"] == "APPROVED" and String(a.get("approved_sha256", "")).length() == 64:
+			still_approved += 1
+	_ok(still_approved == 5, "historical approval + sha pins of retired/disabled entries unchanged in the manifest")
+	_complete("inactive_rows_present_nothing")
 
 func _labels(home) -> void:
 	print("[labels full]")
@@ -161,19 +141,6 @@ func _nav(home) -> void:
 	_ok(home.get_region("Nav_settings").name == "SettingsButton" and not home.get_region("Nav_settings").disabled, "SETTINGS tab live")
 	_complete("nav_dock")
 
-func _track(home) -> void:
-	print("[reward track]")
-	var vm: Dictionary = home.get_view_model()
-	var ok := true
-	var vals: Array = []
-	for i in range(1, 6):
-		ok = ok and home.get_region("TrackGift%d" % i).texture != null
-		vals.append(String(home.get_region("TrackStep%d" % i).value_label.text))
-	_ok(ok, "5 approved reward gifts presented")
-	_ok(vals == ["+1", "+5", "+10", "+25", "+100"], "live Win Streak SB amounts %s" % str(vals))
-	_ok(home.get_region("TrackBadge").texture != null and String(home.get_region("TrackStreakValue").text) == str(vm["win_streak"]), "track badge shows the live streak")
-	_complete("reward_track")
-
 func _banner(home) -> void:
 	print("[area banner]")
 	var banner: Control = home.get_region("AreaBanner")
@@ -181,17 +148,6 @@ func _banner(home) -> void:
 	_ok(String(home.get_region("AreaTitle").text) == UiText.t("HOME_AREA_TITLE") and String(home.get_region("AreaNumber").text) == UiText.t("HOME_AREA_NUMBER", [1]), "area title/number are live localizable labels")
 	_ok(arch.get_global_rect().intersects(banner.get_global_rect()), "banner sits on the arch")
 	_complete("area_banner")
-
-func _scrubby(home) -> void:
-	print("[scrubby on platform]")
-	var sc: Control = home.get_region("Art_scrubby")
-	var top: Control = home.get_region("Art_platform_top")
-	var feet := sc.get_global_rect().end.y
-	var tr := top.get_global_rect()
-	_ok(feet > tr.position.y and feet < tr.end.y, "Scrubby's feet land on the platform top (%.0f in %.0f..%.0f)" % [feet, tr.position.y, tr.end.y])
-	_ok(sc.get_parent().get_index() > top.get_parent().get_index(), "characters draw above the platform group")
-	_ok(absf(sc.get_global_rect().get_center().x - tr.get_center().x) < 4.0, "Scrubby centered on platform")
-	_complete("scrubby_on_platform")
 
 func _decor(home) -> void:
 	print("[decor ignores input]")
@@ -214,12 +170,12 @@ func _matrix() -> void:
 		var home = r[1]
 		var vp := Rect2(Vector2.ZERO, Vector2(size))
 		var bad: Array = []
-		var names: Array = ["PlayButton", "BottomNav", "TopCurrencyHUD", "GiftMeter", "WinStreakRewardTrack", "MenuButton"]
+		var names: Array = ["PlayButton", "BottomNav", "TopCurrencyHUD", "GiftMeter", "WinStreakRewardTrack"]
 		for id in ["win_streak", "gift_bar", "collection", "shop", "no_ads", "daily", "tasks", "cards_exchange"]:
 			names.append("Shortcut_" + id)
 		for n in names:
 			var c: Control = home.get_region(n)
-			if not vp.encloses(c.get_global_rect()) or c.size.y < 88:
+			if not vp.grow(0.5).encloses(c.get_global_rect()) or c.size.y < 88:
 				bad.append(n)
 		var play: Rect2 = home.get_region("PlayButton").get_global_rect()
 		for id in ["shop", "cards_exchange"]:

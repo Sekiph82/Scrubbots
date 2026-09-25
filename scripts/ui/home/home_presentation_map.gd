@@ -1,12 +1,16 @@
 extends RefCounted
 ## HomePresentationMap — preload (res://scripts/ui/home/home_presentation_map.gd).
 ##
-## M42 master-convergence V02 presentation accounting. HomeArtBinder proves that an
-## approved asset is AVAILABLE; this map proves where it is PRESENTED. Every ART entry
-## of assets/ui/HOME_ASSET_MANIFEST.json has exactly one row:
-##   STATIC — a concrete Home node visible in the normal composition;
-##   STATE  — a concrete node shown only in a named idle/animation state;
-##   REUSE  — HOME-087: exact-file reuse of HOME-042, presented on the reward track.
+## M42 presentation accounting (V02; revised by owner decision V03,
+## coordination/OWNER_M42_HOME_VISUAL_REVISION_V03.md). HomeArtBinder proves that an
+## approved asset is AVAILABLE (historical approval + sha pin, unchanged); this map says
+## whether and where it is PRESENTED. Every ART entry of assets/ui/HOME_ASSET_MANIFEST.json
+## has exactly one row:
+##   STATIC         — a concrete Home node visible in the normal composition;
+##   OWNER_RETIRED  — approved file kept byte-identical, owner removed it from the active
+##                    Home composition (no node; never loaded by Home);
+##   OWNER_DISABLED — approved idle overlay kept byte-identical, owner disabled it in
+##                    production Home (no node, no idle timer).
 ## `nodes` are Home region names (HomeScreen.get_region). `slot` says how the texture is
 ## applied: "texture" (TextureRect), "button_icon" (Button.icon), "chip_icon"
 ## (UiValueChip.set_icon).
@@ -19,7 +23,7 @@ const ENTRIES := {
 	"HOME-006": {"slug": "home_arch_whispering_park", "mode": "STATIC", "slot": "texture", "nodes": ["Art_arch"]},
 	"HOME-007": {"slug": "home_arch_decor", "mode": "STATIC", "slot": "texture", "nodes": ["Art_arch_decor"]},
 	"HOME-010": {"slug": "home_platform_main", "mode": "STATIC", "slot": "texture", "nodes": ["Art_platform_main"]},
-	"HOME-011": {"slug": "home_platform_top", "mode": "STATIC", "slot": "texture", "nodes": ["Art_platform_top"]},
+	"HOME-011": {"slug": "home_platform_top", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "V03 E: one platform only (HOME-010)"},
 	"HOME-013": {"slug": "home_prop_cleaning_bucket", "mode": "STATIC", "slot": "texture", "nodes": ["Art_bucket"]},
 	"HOME-014": {"slug": "home_prop_hose", "mode": "STATIC", "slot": "texture", "nodes": ["Art_hose"]},
 	"HOME-015": {"slug": "home_prop_foam_cluster", "mode": "STATIC", "slot": "texture", "nodes": ["Art_foam"]},
@@ -33,8 +37,8 @@ const ENTRIES := {
 	"HOME-024": {"slug": "helper_bot_alt_pose", "mode": "STATIC", "slot": "texture", "nodes": ["Art_helper_alt"]},
 	"HOME-026": {"slug": "scrubby_home_pose", "mode": "STATIC", "slot": "texture", "nodes": ["Art_scrubby"]},
 	"HOME-027": {"slug": "scrubby_portrait", "mode": "STATIC", "slot": "texture", "nodes": ["ProfilePortrait"]},
-	"HOME-031": {"slug": "scrubby_face_blink_layer", "mode": "STATE", "slot": "texture", "nodes": ["ScrubbyBlink"], "state": "idle_blink"},
-	"HOME-032": {"slug": "scrubby_brush_arm_layer", "mode": "STATE", "slot": "texture", "nodes": ["ScrubbyBrushArm"], "state": "idle_scrub"},
+	"HOME-031": {"slug": "scrubby_face_blink_layer", "mode": "OWNER_DISABLED", "slot": "texture", "nodes": [], "reason": "V03 F: idle face overlay disabled"},
+	"HOME-032": {"slug": "scrubby_brush_arm_layer", "mode": "OWNER_DISABLED", "slot": "texture", "nodes": [], "reason": "V03 F: idle brush-arm overlay disabled"},
 	"HOME-034": {"slug": "profile_avatar_frame", "mode": "STATIC", "slot": "texture", "nodes": ["ProfileAvatarFrame"]},
 	"HOME-035": {"slug": "profile_rank_badge", "mode": "STATIC", "slot": "texture", "nodes": ["ProfileRankBadge"]},
 	"HOME-042": {"slug": "icon_currency_scrub_bucks", "mode": "STATIC", "slot": "chip_icon", "nodes": ["ScrubBucksChip"]},
@@ -49,9 +53,9 @@ const ENTRIES := {
 	"HOME-067": {"slug": "icon_shortcut_daily", "mode": "STATIC", "slot": "button_icon", "nodes": ["Shortcut_daily"]},
 	"HOME-068": {"slug": "icon_shortcut_tasks", "mode": "STATIC", "slot": "button_icon", "nodes": ["Shortcut_tasks"]},
 	"HOME-069": {"slug": "icon_shortcut_cards_exchange", "mode": "STATIC", "slot": "button_icon", "nodes": ["Shortcut_cards_exchange"]},
-	"HOME-078": {"slug": "play_button_frame", "mode": "STATIC", "slot": "texture", "nodes": ["PlayIcon"]},
+	"HOME-078": {"slug": "play_button_frame", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "V03 H: native white play triangle replaces it"},
 	"HOME-086": {"slug": "win_streak_reward_badge", "mode": "STATIC", "slot": "texture", "nodes": ["TrackBadge"]},
-	"HOME-087": {"slug": "win_streak_reward_scrub_bucks_icon", "mode": "REUSE", "reuse_of": "HOME-042", "slot": "chip_icon", "nodes": ["TrackStep1", "TrackStep2", "TrackStep3", "TrackStep4", "TrackStep5"]},
+	"HOME-087": {"slug": "win_streak_reward_scrub_bucks_icon", "mode": "OWNER_RETIRED", "reuse_of": "HOME-042", "slot": "chip_icon", "nodes": [], "reason": "V03 I: per-step SB icons removed from the reward track"},
 	"HOME-090": {"slug": "win_streak_reward_gift_1", "mode": "STATIC", "slot": "texture", "nodes": ["TrackGift1"]},
 	"HOME-091": {"slug": "win_streak_reward_gift_5", "mode": "STATIC", "slot": "texture", "nodes": ["TrackGift2"]},
 	"HOME-092": {"slug": "win_streak_reward_gift_10", "mode": "STATIC", "slot": "texture", "nodes": ["TrackGift3"]},
@@ -63,6 +67,9 @@ const ENTRIES := {
 	"HOME-104": {"slug": "icon_nav_leaderboard", "mode": "STATIC", "slot": "texture", "nodes": ["NavIcon_leaderboard"]},
 	"HOME-105": {"slug": "icon_nav_settings", "mode": "STATIC", "slot": "texture", "nodes": ["NavIcon_settings"]},
 }
+
+## Modes that present nothing in the active Home composition.
+const INACTIVE_MODES := ["OWNER_RETIRED", "OWNER_DISABLED"]
 
 ## Apply `tex` to one node according to the slot kind.
 static func apply(node, slot: String, tex: Texture2D) -> void:

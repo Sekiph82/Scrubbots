@@ -9,6 +9,7 @@ const MainScript = preload("res://scripts/app/main.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
+const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 
 const REQUIRED_VIEWPORTS := [Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2i(1290, 2796), Vector2i(1080, 2400), Vector2i(1440, 3200)]
 
@@ -63,7 +64,8 @@ func _home_shell_tree() -> void:
 	var names: Array = []
 	for c in layout.get_children():
 		names.append(String(c.name))
-	_ok(names == ["TopCurrencyHUD", "GiftMeter", "MainWorldArea", "PlayButton", "StatusLabel", "WinStreakRewardTrack", "BottomNav"], "MASTER_UI §6 region order %s" % str(names))
+	_ok(names == ["TopCurrencyHUD", "GiftMeter", "MainWorldArea", "ActionRow", "StatusLabel", "WinStreakRewardTrack", "BottomNav"], "MASTER_UI §6 region order (V03: SHOP | PLAY | CARDS EXCHANGE row) %s" % str(names))
+	_ok(home.get_region("PlayButton").get_parent() == home.get_region("ActionRow"), "PLAY lives in the lower action row")
 	var world_names: Array = []
 	for c in home.get_region("MainWorldArea").get_children():
 		world_names.append(String(c.name))
@@ -347,6 +349,7 @@ func _live_binding() -> void:
 	_complete("live_binding")
 
 const HomeArtBinder = preload("res://scripts/ui/home/home_art_binder.gd")
+const HomePresentationMap = preload("res://scripts/ui/home/home_presentation_map.gd")
 const V = preload("res://scripts/tools/home_asset_manifest_validator.gd")
 
 ## SB-M42-017: only owner-approved art binds; pending candidates keep native placeholders.
@@ -364,7 +367,11 @@ func _approved_art_only() -> void:
 		for n in row["nodes"]:
 			if n["texture"] != null:
 				bound += 1
-	_ok(rows.size() == 50 and bound == 54 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved): all 50 entries presented on 54 nodes (%d)" % bound)
+	var active := 0
+	for row in rows:
+		if not HomePresentationMap.INACTIVE_MODES.has(row["mode"]):
+			active += 1
+	_ok(rows.size() == 50 and active == 45 and bound == 45 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved): 50 entries accounted, 45 active entries presented (%d bound), V03 retired/disabled entries present nothing" % bound)
 	# Un-approval simulation on an in-memory manifest copy (repo manifest untouched):
 	# entries that are not APPROVED keep native placeholders.
 	var m = V.load_manifest()
@@ -456,12 +463,13 @@ func _bot_parts_progress() -> void:
 		e.wallet.credit("bot_parts", want - e.wallet.bot_parts()) if want > e.wallet.bot_parts() else e.wallet.debit("bot_parts", e.wallet.bot_parts() - want)
 		home.refresh()
 		var ready: bool = want >= cost
-		_ok(meter.caption.text.find("BOT PARTS %d/250" % want) != -1 and meter.caption.text.find("ROBOT READY") != -1 == ready, "%d parts -> '%s'" % [want, meter.caption.text])
+		var fill: Color = (meter.bar.get_theme_stylebox("fill") as StyleBoxFlat).bg_color
+		_ok(meter.caption.text == "%s/250" % UiText.num(want) and (fill == HomeStyle.GOLD) == ready, "%d parts -> '%s' (V03: ratio only; ready = gold bar)" % [want, meter.caption.text])
 		_ok(is_equal_approx(meter.bar.value, minf(want, cost)) and is_equal_approx(meter.bar.max_value, cost), "%d parts -> bar %s/%s" % [want, meter.bar.value, meter.bar.max_value])
 	var r: Dictionary = e.robots.unlock("robot_02")
 	home.refresh()
-	_ok(r.get("ok", false) and meter.caption.text.find("BOT PARTS %d/250" % e.wallet.bot_parts()) != -1, "after a canonical unlock the bar shows the carried-over parts (%s)" % meter.caption.text)
-	_ok(meter.caption.text.to_lower().find("xp") == -1, "no XP wording")
+	_ok(r.get("ok", false) and meter.caption.text == "%d/250" % e.wallet.bot_parts(), "after a canonical unlock the bar shows the carried-over parts (%s)" % meter.caption.text)
+	_ok(meter.caption.text.to_lower().find("xp") == -1 and meter.caption.text.find("BOT PARTS") == -1, "no XP wording, no inline BOT PARTS label")
 	sub.free()
 	_complete("bot_parts_progress")
 
@@ -477,16 +485,17 @@ func _gift_meter_semantics() -> void:
 	await process_frame
 	var e = app.economy
 	var meter = home.get_region("GiftMeterBar")
-	_ok(meter.caption.text == "GIFT METER 0/1,000 · NEXT GIFT AT 10", "fresh: 0/1,000, next 10 (%s)" % meter.caption.text)
+	_ok(meter.caption.text == "0/1,000", "fresh: ratio only 0/1,000 (%s)" % meter.caption.text)
 	e.wallet.credit("scrub_bucks", 5000)
 	home.refresh()
-	_ok(meter.caption.text.begins_with("GIFT METER 0/"), "non-streak SB (wallet credit) does not move the Gift Meter")
+	_ok(meter.caption.text.begins_with("0/"), "non-streak SB (wallet credit) does not move the Gift Meter")
 	var r: Dictionary = e.streak.process_first_clear_win(1)
 	home.refresh()
-	_ok(r.get("applied", false) and e.gift.cycle_progress() == 1 and meter.caption.text == "GIFT METER 1/1,000 · NEXT GIFT AT 10", "Win Streak SB (+1) advances it (%s)" % meter.caption.text)
+	_ok(r.get("applied", false) and e.gift.cycle_progress() == 1 and meter.caption.text == "1/1,000", "Win Streak SB (+1) advances it (%s)" % meter.caption.text)
 	e.gift.add_streak_sb("t_gm_2", 60)
 	home.refresh()
-	_ok(meter.caption.text == "GIFT METER 61/1,000 · NEXT GIFT AT 250" and is_equal_approx(meter.bar.value, 61.0), "crossing 10 and 50 -> next 250 (%s)" % meter.caption.text)
+	_ok(meter.caption.text == "61/1,000" and is_equal_approx(meter.bar.value, 61.0), "crossing 10 and 50 -> 61/1,000 (%s)" % meter.caption.text)
+	_ok(home.get_view_model()["gift_next_milestone"] == 250, "canonical next milestone still 250 (service unchanged; not shown as caption)")
 	var gm_nodes := 0
 	for n in home.get_region("GiftMeter").find_children("*", "Label", true, false):
 		var t := String(n.text).to_lower()
@@ -575,25 +584,27 @@ func _win_streak_track() -> void:
 	var want := [1, 5, 10, 25, 100]
 	var vals: Array = []
 	for i in range(5):
-		vals.append(home.get_region("TrackStep%d" % (i + 1)).value_label.text)
+		vals.append(home.get_region("TrackStep%d" % (i + 1)).text)
 		_ok(e.config.win_streak_sb(i + 1) == want[i], "config position %d pays %d SB" % [i + 1, want[i]])
-	_ok(vals == ["+1", "+5", "+10", "+25", "+100"], "track amounts +1/+5/+10/+25/+100 (%s)" % str(vals))
-	_ok(home.get_region("TrackStep5").sub_label.text.find("5+") != -1 and home.get_region("TrackStep1").tag.text == "SB", "last step is 5+, amounts tagged SB")
+	_ok(vals == ["1", "5", "10", "25", "100"], "V03 track values exactly 1/5/10/25/100 (%s)" % str(vals))
 	for lvl in [1, 2, 3]:
 		e.streak.process_first_clear_win(lvl)
 	home.refresh()
 	_ok(e.streak.streak() == 3, "canonical streak 3 after three first-clear wins")
-	_ok(home.get_region("TrackStep3").sub_label.text.find("NOW") != -1 and home.get_region("TrackStep2").sub_label.text.find("NOW") == -1, "current step marked at position 3")
+	_ok(_is_current(home, 3) and not _is_current(home, 2), "current step marked (gold) at position 3")
 	_ok(home.get_region("TrackStep1").modulate.a == 1.0 and home.get_region("TrackStep3").modulate.a == 1.0 and home.get_region("TrackStep4").modulate.a < 1.0, "reached steps opaque, future dimmed")
 	for lvl in [4, 5, 6, 7]:
 		e.streak.process_first_clear_win(lvl)
 	home.refresh()
-	_ok(e.streak.streak() == 7 and home.get_region("TrackStep5").sub_label.text.find("NOW") != -1, "streak 7 marks the 5+ step")
+	_ok(e.streak.streak() == 7 and _is_current(home, 5), "streak 7 marks the 5+ step")
 	e.streak.on_progression_loss()
 	home.refresh()
 	_ok(home.get_region("Shortcut_win_streak").badge.visible == false and home.get_region("TrackStep1").modulate.a < 1.0, "loss resets the live track")
 	sub.free()
 	_complete("win_streak_track")
+
+func _is_current(home, pos: int) -> bool:
+	return (home.get_region("TrackStep%d" % pos) as Label).get_theme_color("font_color") == HomeStyle.GOLD
 
 ## SB-M42-024: Daily login count / 5-day cycle / booster reward state from DailyService;
 ## claims via the canonical facade; no Home calendar logic.
@@ -658,26 +669,29 @@ func _localization_seam() -> void:
 	sub.add_child(home)
 	home.bind(app)
 	await process_frame
-	for id in ["gift_bar", "cards_exchange", "daily"]:
-		home.open_popup(id)
 	var res = ResultsScreen.new()
 	sub.add_child(res)
 	res.show_result({"status": "WON", "level": 1, "attempt": 1}, false)
 	var numeric := RegEx.create_from_string("^[0-9,/:+. -]*$")
 	var untranslated: Array = []
 	var checked := 0
-	for root in [home, res]:
-		for n in root.find_children("*", "", true, false):
-			if (n is Label or n is Button) and n.is_visible_in_tree():
-				var t := String(n.text)
-				if t.is_empty():
-					continue
-				checked += 1
-				if t.find("<<") == -1 and numeric.search(t) == null:
-					untranslated.append(t)
+	# V03: one Home modal at a time hides the Home action controls, so the Home screen
+	# and each popup are scanned in turn.
+	for pass_id in ["", "gift_bar", "cards_exchange", "daily"]:
+		if pass_id != "":
+			home.open_popup(pass_id)
+		for root in [home, res]:
+			for n in root.find_children("*", "", true, false):
+				if (n is Label or n is Button) and n.is_visible_in_tree():
+					var t := String(n.text)
+					if t.is_empty():
+						continue
+					checked += 1
+					if t.find("<<") == -1 and numeric.search(t) == null:
+						untranslated.append(t)
 	_ok(checked >= 30, "checked %d visible labels/buttons" % checked)
 	_ok(untranslated.is_empty(), "every visible copy string is routed through the seam %s" % str(untranslated))
-	_ok(home.get_region("TrackStep5").value_label.text == "<<+100>>" and home.get_region("GiftMeterBar").caption.text.find("12") != -1, "live values stay arguments; Economy V1 numbers unchanged")
+	_ok(home.get_region("TrackStep5").text == "100" and home.get_region("GiftMeterBar").caption.text.find("12") != -1, "live values stay arguments; Economy V1 numbers unchanged")
 	TranslationServer.set_locale(prev_locale)
 	TranslationServer.remove_translation(tr)
 	home.refresh()

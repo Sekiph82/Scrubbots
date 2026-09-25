@@ -3,12 +3,15 @@ extends SceneTree
 ## Renders the REAL scenes/ui/home/home_screen.tscn bound to a representative,
 ## non-destructive AppState (isolated temp save) inside a SubViewport and saves PNGs.
 ## Needs a rendering driver (run WITHOUT --headless):
-##   godot --path . -s res://tests/tools/home_snapshot.gd -- <out_dir> [WxH ...]
+##   godot --path . -s res://tests/tools/home_snapshot.gd -- <out_dir> [WxH ...] [modals]
+## `modals` additionally captures, at the first size, Gifts / Daily / Cards Exchange and
+## the Settings panel open over Home (V03 modal state).
 ## Output goes to <out_dir> (never to approved art paths).
 
 const AppState = preload("res://scripts/app/app_state.gd")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
+const SettingsPanelScene = preload("res://scenes/ui/settings_panel.tscn")
 
 const DEFAULT_SIZES := [Vector2i(1080, 2160)]
 
@@ -16,7 +19,10 @@ func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	var out_dir := "user://home_snapshots"
 	var sizes: Array = []
+	var modals := args.has("modals")
 	for a in args:
+		if a == "modals":
+			continue
 		if a.find("x") > 0 and a.split("x").size() == 2 and a.split("x")[0].is_valid_int():
 			sizes.append(Vector2i(int(a.split("x")[0]), int(a.split("x")[1])))
 		else:
@@ -48,18 +54,38 @@ func _initialize() -> void:
 		var home = HomeScreenScene.instantiate()
 		sub.add_child(home)
 		home.bind(app)
+		# A phone without notch/gesture insets (desktop work-area insets are not a phone).
+		home.get_region("SafeAreaRoot").set_synthetic_insets(0, 0, 0, 0)
 		for _i in range(12):
 			await process_frame
 		home.refresh()
 		for _i in range(6):
 			await process_frame
-		var img := sub.get_texture().get_image()
-		var path := "%s/home_%dx%d.png" % [out_dir, size.x, size.y]
-		var err := img.save_png(path)
-		print("SNAPSHOT ", path, " err=", err, " size=", img.get_size())
+		_save(sub, "%s/home_%dx%d.png" % [out_dir, size.x, size.y])
+		if modals and size == sizes[0]:
+			for id in ["gift_bar", "daily", "cards_exchange"]:
+				var p = home.open_popup(id)
+				for _i in range(6):
+					await process_frame
+				_save(sub, "%s/modal_%s_%dx%d.png" % [out_dir, id, size.x, size.y])
+				p.close_popup()
+			# Same wiring as the app root (main.gd): Settings panel above Home + modal state.
+			var panel = SettingsPanelScene.instantiate()
+			sub.add_child(panel)
+			panel.bind(app)
+			panel.open_panel()
+			home.set_modal_active("settings", true)
+			for _i in range(6):
+				await process_frame
+			_save(sub, "%s/modal_settings_%dx%d.png" % [out_dir, size.x, size.y])
 		sub.queue_free()
 		await process_frame
 	for suffix in ["", ".bak", ".tmp"]:
 		if FileAccess.file_exists(save_path + suffix):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(save_path + suffix))
 	quit(0)
+
+func _save(sub: SubViewport, path: String) -> void:
+	var img := sub.get_texture().get_image()
+	var err := img.save_png(path)
+	print("SNAPSHOT ", path, " err=", err, " size=", img.get_size())
