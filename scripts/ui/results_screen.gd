@@ -17,6 +17,7 @@ signal continue_requested
 signal retry_requested
 
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 
 var _payload: Dictionary = {}
 var _title: Label
@@ -76,13 +77,13 @@ func show_result(payload: Dictionary, continue_available: bool) -> void:
 	_payload = payload.duplicate(true)
 	var status := String(_payload.get("status", ""))
 	var won := status == "WON"
-	_title.text = "LEVEL COMPLETE" if won else ("LEVEL FAILED" if status == "LOST" else "SOMETHING WENT WRONG")
-	_level.text = "Level %d" % int(_payload.get("level", 0))
-	_primary.text = "CONTINUE" if won else "RETRY"
+	_title.text = UiText.t("RESULTS_WON" if won else ("RESULTS_LOST" if status == "LOST" else "RESULTS_ERROR"))
+	_level.text = UiText.t("RESULTS_LEVEL", [int(_payload.get("level", 0))])
+	_primary.text = UiText.t("RESULTS_CONTINUE" if won else "RESULTS_RETRY")
 	# WON continues only to real next-frontier content; LOST may Retry; ERROR only HOME.
 	_primary.disabled = (won and not continue_available) or not (won or status == "LOST")
 	_primary.visible = won or status == "LOST"
-	_home.text = "HOME"
+	_home.text = UiText.t("RESULTS_HOME")
 
 func _on_primary() -> void:
 	if _primary.disabled:

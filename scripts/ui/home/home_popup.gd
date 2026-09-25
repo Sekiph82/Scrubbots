@@ -10,6 +10,7 @@ signal action_pressed(action_id: String)
 signal closed
 
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 
 var popup_id: String
 var _title: Label
@@ -56,7 +57,7 @@ func _init(id: String = "popup") -> void:
 	col.add_child(_note)
 	var close := Button.new()
 	close.name = "CloseButton"
-	close.text = "CLOSE"
+	close.text = UiText.t("POPUP_CLOSE")
 	close.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
 	close.add_theme_font_size_override("font_size", UiTokens.FONT_BUTTON)
 	close.pressed.connect(close_popup)

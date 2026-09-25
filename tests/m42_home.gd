@@ -18,7 +18,7 @@ var EXPECTED_CASES := [
 	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
 	"shortcut_columns_responsive", "live_binding", "approved_art_only", "scrub_bucks_chip",
 	"bot_parts_progress", "gift_meter_semantics", "gift_bar_claims", "cards_exchange_presentation",
-	"win_streak_track", "daily_presentation",
+	"win_streak_track", "daily_presentation", "localization_seam",
 ]
 
 var _fail := 0
@@ -45,6 +45,7 @@ func _initialize() -> void:
 	await _cards_exchange_presentation()
 	await _win_streak_track()
 	await _daily_presentation()
+	await _localization_seam()
 	_cleanup()
 	_done()
 
@@ -456,16 +457,16 @@ func _gift_meter_semantics() -> void:
 	await process_frame
 	var e = app.economy
 	var meter = home.get_region("GiftMeterBar")
-	_ok(meter.caption.text == "GIFT METER 0/1000 · NEXT GIFT AT 10", "fresh: 0/1000, next 10 (%s)" % meter.caption.text)
+	_ok(meter.caption.text == "GIFT METER 0/1,000 · NEXT GIFT AT 10", "fresh: 0/1,000, next 10 (%s)" % meter.caption.text)
 	e.wallet.credit("scrub_bucks", 5000)
 	home.refresh()
 	_ok(meter.caption.text.begins_with("GIFT METER 0/"), "non-streak SB (wallet credit) does not move the Gift Meter")
 	var r: Dictionary = e.streak.process_first_clear_win(1)
 	home.refresh()
-	_ok(r.get("applied", false) and e.gift.cycle_progress() == 1 and meter.caption.text == "GIFT METER 1/1000 · NEXT GIFT AT 10", "Win Streak SB (+1) advances it (%s)" % meter.caption.text)
+	_ok(r.get("applied", false) and e.gift.cycle_progress() == 1 and meter.caption.text == "GIFT METER 1/1,000 · NEXT GIFT AT 10", "Win Streak SB (+1) advances it (%s)" % meter.caption.text)
 	e.gift.add_streak_sb("t_gm_2", 60)
 	home.refresh()
-	_ok(meter.caption.text == "GIFT METER 61/1000 · NEXT GIFT AT 250" and is_equal_approx(meter.bar.value, 61.0), "crossing 10 and 50 -> next 250 (%s)" % meter.caption.text)
+	_ok(meter.caption.text == "GIFT METER 61/1,000 · NEXT GIFT AT 250" and is_equal_approx(meter.bar.value, 61.0), "crossing 10 and 50 -> next 250 (%s)" % meter.caption.text)
 	var gm_nodes := 0
 	for n in home.get_region("GiftMeter").find_children("*", "Label", true, false):
 		var t := String(n.text).to_lower()
@@ -615,6 +616,55 @@ func _daily_presentation() -> void:
 	_ok(src.find("86400") == -1 and src.find("get_unix_time") == -1 and src.find("get_datetime") == -1, "Home has no calendar/clock logic of its own")
 	sub.free()
 	_complete("daily_presentation")
+
+const UiText = preload("res://scripts/ui/ui_text.gd")
+const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
+
+## SB-M42-025: every Home / popup / Results string goes through the UiText seam
+## (TranslationServer first); live values stay arguments; Economy V1 numbers unchanged.
+func _localization_seam() -> void:
+	print("[localization seam]")
+	var tr := Translation.new()
+	tr.locale = "zz"
+	for k in UiText.EN:
+		tr.add_message(k, "<<" + String(UiText.EN[k]) + ">>")
+	TranslationServer.add_translation(tr)
+	var prev_locale := TranslationServer.get_locale()
+	TranslationServer.set_locale("zz")
+	var app = AppState.new(_uniq("l10n"))
+	app.economy.gift.add_streak_sb("t_l10n", 12)
+	var sub := _sub(Vector2i(1080, 2160))
+	var home = HomeScreenScene.instantiate()
+	sub.add_child(home)
+	home.bind(app)
+	await process_frame
+	for id in ["gift_bar", "cards_exchange", "daily"]:
+		home.open_popup(id)
+	var res = ResultsScreen.new()
+	sub.add_child(res)
+	res.show_result({"status": "WON", "level": 1, "attempt": 1}, false)
+	var numeric := RegEx.create_from_string("^[0-9,/:+. -]*$")
+	var untranslated: Array = []
+	var checked := 0
+	for root in [home, res]:
+		for n in root.find_children("*", "", true, false):
+			if (n is Label or n is Button) and n.is_visible_in_tree():
+				var t := String(n.text)
+				if t.is_empty():
+					continue
+				checked += 1
+				if t.find("<<") == -1 and numeric.search(t) == null:
+					untranslated.append(t)
+	_ok(checked >= 30, "checked %d visible labels/buttons" % checked)
+	_ok(untranslated.is_empty(), "every visible copy string is routed through the seam %s" % str(untranslated))
+	_ok(home.get_region("TrackStep5").value_label.text == "<<+100>>" and home.get_region("GiftMeterBar").caption.text.find("12") != -1, "live values stay arguments; Economy V1 numbers unchanged")
+	TranslationServer.set_locale(prev_locale)
+	TranslationServer.remove_translation(tr)
+	home.refresh()
+	_ok(home.get_region("PlayButton").text == "PLAY" and UiText.t("HOME_CONTINUE_LEVEL", [3]) == "CONTINUE · LEVEL 3", "English fallback restored")
+	_ok(UiText.num(1234567) == "1,234,567" and UiText.num(-5000) == "-5,000" and UiText.num(0) == "0", "number formatting seam")
+	sub.free()
+	_complete("localization_seam")
 
 # ---------------------------------------------------------------- helpers ----
 
