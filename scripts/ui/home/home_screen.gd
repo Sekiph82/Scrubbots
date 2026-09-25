@@ -39,7 +39,7 @@ const HomePopup = preload("res://scripts/ui/home/home_popup.gd")
 
 ## Shortcuts with a V1 Home destination (popup). Others belong to later milestones and
 ## are shown disabled.
-const LIVE_SHORTCUTS := ["gift_bar"]
+const LIVE_SHORTCUTS := ["gift_bar", "cards_exchange"]
 ## Friendly names for canonical reward-bundle keys (presentation only).
 const REWARD_NAMES := {
 	"scrub_bucks": "SB", "bot_parts": "Bot Parts", "standard_card_packs": "Card Pack",
@@ -457,6 +457,8 @@ func _render_popup(id: String) -> void:
 	match id:
 		"gift_bar":
 			_render_gift_bar(popup)
+		"cards_exchange":
+			_render_cards_exchange(popup)
 
 ## SB-M42-021: queued Gift Meter milestone rewards from GiftMeterService.claimable();
 ## CLAIM goes through the canonical action facade (idempotent by occurrence id, saves).
@@ -472,6 +474,23 @@ func _render_gift_bar(popup: HomePopup) -> void:
 	elif _app.is_blocked:
 		note = "Claims are unavailable while the save is read-only."
 	popup.set_content("GIFTS", rows, note)
+
+## SB-M42-022: former Star Exchange = Cards Exchange. Presentation/navigation only:
+## live duplicate-card count and their canonical SB value (CardsExchangeService), no
+## Star balance and no exchange execution (the exchange flow belongs to the Collection
+## milestone; no transaction rules are invented here).
+func _render_cards_exchange(popup: HomePopup) -> void:
+	var rows: Array = []
+	var total_sb := 0
+	var ex = _app.economy.exchange
+	for cid in _app.economy.collection.all_card_ids():
+		var n: int = ex.exchangeable(cid)
+		if n > 0:
+			var v: int = n * int(ex.card_value(cid))
+			total_sb += v
+			rows.append({"text": "%s · x%d duplicate(s) · %d SB" % [cid, n, v]})
+	var note := "No duplicate cards yet." if rows.is_empty() else 		"%d duplicate card(s) worth %d SB. Exchange them in the Collection (coming later)." % [_vm.get("cards_duplicates", 0), total_sb]
+	popup.set_content("CARDS EXCHANGE", rows, note)
 
 func _on_popup_action(action_id: String, popup_id: String) -> void:
 	if _app == null or _app.is_blocked:
