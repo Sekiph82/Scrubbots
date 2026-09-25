@@ -61,6 +61,9 @@ func _ready() -> void:
 
 ## M42: show the screen that belongs to the current route.
 func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
+	# Returning HOME ends the gameplay scene: the host (and its music/FX) is released.
+	if to == NavigationController.Route.HOME:
+		_release_gameplay_host()
 	if _home != null:
 		_home.visible = to == NavigationController.Route.HOME
 		if _home.visible:
@@ -113,22 +116,42 @@ func launch_gameplay(parent: Node = null) -> Dictionary:
 	if not launch.get("ok", false):
 		last_launch = {"ok": false, "reason": launch.get("reason", ""), "launch": launch}
 		return last_launch
-	if _gameplay_host != null and is_instance_valid(_gameplay_host):
-		_gameplay_host.queue_free()
+	# SB-M42-006: exactly one gameplay host. The previous host leaves the tree NOW
+	# (not a deferred queue_free that would coexist for a frame).
+	_release_gameplay_host()
 	var host = ProductionGameplayHost.new()
+	host.name = "GameplayHost"
 	host.app_state = app_state
 	host.auto_build = false
 	host.set_anchors_preset(Control.PRESET_FULL_RECT)
 	(parent if parent != null else self).add_child(host)
 	var ok: bool = host.build()
+	if not ok:
+		# A failed build never leaves an orphan half-built host behind.
+		var err: String = host.get_build_error()
+		host.get_parent().remove_child(host)
+		host.queue_free()
+		last_launch = {"ok": false, "reason": err, "launch": launch}
+		return last_launch
 	_gameplay_host = host
-	last_launch = {"ok": ok, "reason": "" if ok else host.get_build_error(), "launch": launch, "host": host}
+	last_launch = {"ok": true, "reason": "", "launch": launch, "host": host}
 	return last_launch
+
+## Remove the current gameplay host from the tree immediately and free it. Only the
+## app root owns host lifetime.
+func _release_gameplay_host() -> void:
+	if _gameplay_host != null and is_instance_valid(_gameplay_host):
+		if _gameplay_host.get_parent() != null:
+			_gameplay_host.get_parent().remove_child(_gameplay_host)
+		_gameplay_host.queue_free()
+	_gameplay_host = null
 
 ## SB-M42-003: Home PLAY/CONTINUE. Launches ONLY the canonical frontier through the
 ## existing resolver + launch_gameplay() (same AppState). Returns the launch result.
 func play_current_frontier() -> Dictionary:
-	if nav.current() != NavigationController.Route.HOME:
+	# SB-M42-006: accepted only when navigation can enter GAMEPLAY right now (HOME, no
+	# transition in flight); otherwise nothing is built.
+	if not nav.can_go(NavigationController.Route.GAMEPLAY) or nav.current() != NavigationController.Route.HOME:
 		return {"ok": false, "reason": "not_home"}
 	var r := launch_gameplay()
 	if r.get("ok", false):

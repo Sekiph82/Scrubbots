@@ -14,6 +14,7 @@ const R := NavigationController.Route
 var EXPECTED_CASES := [
 	"nav_edges", "nav_reentry", "nav_terminal_latch", "nav_settings_overlay",
 	"nav_back", "main_owns_one_nav", "no_shipping_level_select",
+	"home_to_gameplay_once",
 ]
 
 var _fail := 0
@@ -29,6 +30,7 @@ func _initialize() -> void:
 	_nav_back()
 	await _main_owns_one_nav()
 	_no_shipping_level_select()
+	await _home_to_gameplay_once()
 	_cleanup()
 	_done()
 
@@ -131,6 +133,43 @@ func _main_owns_one_nav() -> void:
 	_ok(not root.get_settings_panel().visible, "nav close hides the panel")
 	_shutdown(root)
 	_complete("main_owns_one_nav")
+
+## SB-M42-006: Home -> Gameplay exactly once per accepted activation, one host,
+## same AppState graph, host released on return HOME.
+func _home_to_gameplay_once() -> void:
+	print("[home to gameplay once]")
+	var root = await _boot_main(_uniq("h2g"))
+	var app = root.get_app_state()
+	var nav = root.get_navigation()
+	var r1: Dictionary = root.play_current_frontier()
+	var r2: Dictionary = root.play_current_frontier()
+	await process_frame
+	_ok(r1.get("ok", false) and not r2.get("ok", true) and r2.get("reason") == "not_home", "second activation refused while in GAMEPLAY")
+	_ok(_hosts(root) == 1 and nav.attempt_id() == 1, "exactly one GameplayHost, attempt 1")
+	var h = root.get_gameplay_host()
+	_ok(h.app_state == app and h.get_audio_settings() == app.audio, "host uses the same AppState + audio settings service")
+	_ok(h._economy == app.economy and h._progression == app.progression and h._save == app.save, "host uses the same economy/progression/save graph")
+	# Direct relaunch replaces, never duplicates (old host leaves the tree immediately).
+	root.launch_gameplay()
+	var old_in_tree: bool = is_instance_valid(h) and h.is_inside_tree()
+	_ok(_hosts(root) == 1 and root.get_gameplay_host() != h and not old_in_tree, "direct relaunch keeps exactly one host in the tree (old one removed immediately)")
+	# Pre-action exit back to HOME releases the host.
+	_ok(nav.back(true) == "home" and nav.current() == R.HOME, "pre-action back -> HOME")
+	await process_frame
+	_ok(_hosts(root) == 0 and root.get_gameplay_host() == null, "host released on return HOME (no orphan)")
+	_ok(root.get_home().visible, "Home visible again")
+	var r3: Dictionary = root.play_current_frontier()
+	await process_frame
+	_ok(r3.get("ok", false) and _hosts(root) == 1 and nav.attempt_id() == 2, "next activation -> new single host, attempt 2")
+	_shutdown(root)
+	_complete("home_to_gameplay_once")
+
+func _hosts(root) -> int:
+	var n := 0
+	for c in root.get_children():
+		if String(c.name).begins_with("GameplayHost"):
+			n += 1
+	return n
 
 ## SB-M42-005 / OWNER_M37_LEVEL_SELECT_DECISION_V01: NO SHIPPING LEVEL SELECT.
 func _no_shipping_level_select() -> void:
