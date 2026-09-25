@@ -15,7 +15,7 @@ var EXPECTED_CASES := [
 	"nav_edges", "nav_reentry", "nav_terminal_latch", "nav_settings_overlay",
 	"nav_back", "main_owns_one_nav", "no_shipping_level_select",
 	"home_to_gameplay_once", "results_on_real_won", "results_lost_retry_error",
-	"duplicate_transitions",
+	"duplicate_transitions", "back_navigation_real_root",
 ]
 
 var _fail := 0
@@ -35,6 +35,7 @@ func _initialize() -> void:
 	await _results_on_real_won()
 	await _results_lost_retry_error()
 	await _duplicate_transitions()
+	await _back_navigation_real_root()
 	_cleanup()
 	_done()
 
@@ -269,6 +270,43 @@ func _duplicate_transitions() -> void:
 	app.save.set_fault_injector(Callable())
 	_shutdown(root)
 	_complete("duplicate_transitions")
+
+## SB-M42-009: deterministic back on the real app root (Android back notification and
+## handle_back()); no free mid-level exit, no Level Select, no replayed rewards.
+func _back_navigation_real_root() -> void:
+	print("[back navigation real root]")
+	_ok(ProjectSettings.get_setting("application/config/quit_on_go_back") == false, "OS auto-quit on back disabled; back is routed through nav")
+	var root = await _boot_main(_uniq("back"))
+	var app = root.get_app_state()
+	var nav = root.get_navigation()
+	_ok(root.handle_back() == "none" and nav.current() == R.HOME, "HOME back: nothing")
+	root.open_settings()
+	root.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	_ok(not nav.is_settings_open() and not root.get_settings_panel().visible, "Android back closes Settings")
+	var hearts0: int = app.economy.hearts.hearts()
+	var streak_before: Dictionary = app.economy.streak.snapshot()
+	root.play_current_frontier()
+	await process_frame
+	_ok(root.handle_back() == "home" and nav.current() == R.HOME and root.get_gameplay_host() == null, "GAMEPLAY pre-action back -> HOME, host released")
+	_ok(app.economy.hearts.hearts() == hearts0 and app.economy.streak.snapshot() == streak_before, "pre-action exit: no Heart / streak consequence")
+	root.play_current_frontier()
+	await process_frame
+	var h = root.get_gameplay_host()
+	h.get_runtime().set_process(false)
+	var acted := false
+	for col in range(h.get_supply().get_column_count()):
+		if h.get_supply().get_front(col) != null:
+			acted = h.get_input_controller().activate_front(col).get("ok", false)
+			break
+	_ok(acted and app.economy.streak.gameplay_started(), "first real action taken")
+	root.notification(Node.NOTIFICATION_WM_GO_BACK_REQUEST)
+	_ok(nav.current() == R.GAMEPLAY and root.get_gameplay_host() == h and app.economy.hearts.hearts() == hearts0, "post-action back does nothing (no undefined exit rule invented)")
+	_drain(h)
+	_ok(nav.current() == R.RESULTS, "terminal -> RESULTS")
+	var sb: int = app.economy.wallet.scrub_bucks()
+	_ok(root.handle_back() == "home" and nav.current() == R.HOME and app.economy.wallet.scrub_bucks() == sb, "RESULTS back -> HOME, no reward replay")
+	_shutdown(root)
+	_complete("back_navigation_real_root")
 
 const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 

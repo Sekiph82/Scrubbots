@@ -222,8 +222,32 @@ func flush_lifecycle(reason: String) -> Dictionary:
 	last_flush["lifecycle"] = reason
 	return last_flush
 
+## SB-M42-009: deterministic back (Android back / Esc). The OS auto-quit on back is
+## disabled in project.godot (application/config/quit_on_go_back=false) so back is
+## routed only through the navigation authority:
+##   Settings open -> close it; RESULTS -> HOME;
+##   GAMEPLAY -> HOME only before the first real action (Economy V1: pre-action exit =
+##   no Heart/streak consequence; WinStreakService.on_pre_action_exit); after the first
+##   action there is no owner-defined mid-level exit rule, so back does nothing;
+##   HOME / OPENING -> nothing (no Level Select, no exit policy invented).
+func handle_back() -> String:
+	var pre_action := false
+	if nav.current() == NavigationController.Route.GAMEPLAY and _gameplay_host != null 			and app_state != null and app_state.economy != null:
+		pre_action = not app_state.economy.streak.gameplay_started() 			and not _gameplay_host.get_completion().is_terminal()
+	var action: String = nav.back(pre_action)
+	if action == "home" and pre_action:
+		app_state.economy.streak.on_pre_action_exit()
+	return action
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event.is_action_pressed("ui_cancel"):
+		handle_back()
+		get_viewport().set_input_as_handled()
+
 func _notification(what: int) -> void:
 	match what:
+		NOTIFICATION_WM_GO_BACK_REQUEST:
+			handle_back()
 		NOTIFICATION_APPLICATION_PAUSED:
 			flush_lifecycle("application_paused")
 		NOTIFICATION_APPLICATION_FOCUS_OUT:
