@@ -281,3 +281,7 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 
 
 | OWNER M33 music selection V03 | coordination/OWNER_M33_MUSIC_SELECTION_DECISION_V03.md | `OWNER LOCKED` | Gameplay source selected: Pixel Polish Parade. Workshop source reserved: ScrubBots Workshop. M33 now needs seamless OGG preparation + owner F6 listening, not music-source selection. |
+
+
+| AL-096 | Audio auto-start must be validated on the real scene lifecycle, not only by manually calling start() | M33 V02 manually injected/started music in tests, so a parent-_enter_tree timing defect left real gameplay silent while tests were green. | For presentation lifecycle behavior, test the actual production host from scene entry and assert observable PLAYING/start-count state before calling any test seam. | M33-C001 V03 latent auto-start defect, 2026-09-25 |
+| M33-C001 V03 independent audit | coordination/sessions/M33-C001/CHATGPT_AUDIT_V03.md | `CODE_AUDIT_PASS / OWNER_F6_REQUIRED` | Approved Pixel Polish Parade OGG is integrated and auto-starts correctly; only owner listening acceptance remains. |
