@@ -38,3 +38,27 @@ Root `TASKS.md` is never edited by Claude. Task-log commit SHA = the commit that
 | SB-M42-031 | ca72859 | [SB-M42-031.md](https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M42-C001/task_logs/SB-M42-031.md) | AWAITING_AUDIT / SB-M42-031 | m42_opening 6/6, m42_navigation 12/12, m42_home 19/19, m41 17/17, m40_v04 PASS, root 5322 ALL PASS |
 | SB-M42-032 | d60f99c | [SB-M42-032.md](https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M42-C001/task_logs/SB-M42-032.md) | CODE_COMPLETE / SB-M42-032 / DEVICE_OWNER_REQUIRED | m42_opening 7/7; device run pending |
 | SB-M42-033 | 85d07f2 | [SB-M42-033.md](https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M42-C001/task_logs/SB-M42-033.md) | CODE_COMPLETE / SB-M42-033 / IOS_DEVICE_LATER | final batch regression: all suites PASS, root 5322 ALL PASS, 0 SCRIPT ERROR |
+
+## Notes
+
+- Base: `281ea38`. Final implementation SHA: `85d07f2`. Every task was committed and pushed individually, then its task log was published in a separate commit.
+- Test method: each implementation SHA was re-run in a clean detached worktree (`git worktree add --detach <sha>`, fresh import). Each run was checked for exit code, footer/ledger completeness, `FAIL:` lines, `SCRIPT ERROR` count and engine `ERROR:` lines (excluding the exit-time "resources still in use" leak line).
+- Root `run_tests` = 5322 checks at every root-regressed SHA; this is the current-main baseline after owner commit `89eb552` (MAINT-PALETTE-V3-001) changed `tests/run_tests.gd` before this batch. It prints 8 engine `ERROR:` lines from the pre-existing intentional corrupt-PNG importer negative tests (the same 8 appear at baseline).
+- New M42 suites: `tests/m42_navigation.gd` (12 cases), `tests/m42_home.gd` (19), `tests/m42_assets.gd` (4), `tests/m42_opening.gd` (8). All use expected/completed ledgers (AL-091).
+- Final batch regression at `85d07f2`: m42_opening 8/8, m42_navigation 12/12, m42_home 19/19, m42_assets 4/4, m41_settings 17/17, m40_v04_bootstrap PASS, m33_audio_runtime 10/10, m38_v02_strict 11/11, m39_v04_integration PASS, palette_v3_leveldata_contract 6/6, root 5322 ALL PASS. Everything exited 0 with 0 SCRIPT ERROR.
+- Godot headless runs sometimes rewrite `project.godot` and drop the `[audio]` bus-layout line. I restored it before every commit and never committed the stripped version. `project.godot` has one intended change: `application/config/quit_on_go_back=false` (SB-M42-009).
+- A pre-existing untracked opening OGV of unknown provenance was moved unchanged to `assets/brand/opening/_preexisting_untracked/`. That folder is untracked and `.gdignore`d, so the file is kept locally but not in the repo.
+
+## Remaining owner / device / asset / tooling gates
+
+- OWNER_DECISION_REQUIRED — SB-M42-030 opening skip policy (skippable? which input? delay? first launch?).
+- OWNER_ASSET_APPROVAL_REQUIRED — 50 Home ART entries in `assets/ui/HOME_ASSET_MANIFEST.json`. For each approved entry the owner sets `"status": "APPROVED"` plus `"approved_sha256"`; HomeArtBinder then binds it automatically. Until then Home uses native placeholders. Affects SB-M42-014/016/017/018.
+- OWNER_VISUAL_REVIEW_REQUIRED — on-device look of the recreated Home composition (SB-M42-011/017).
+- DEVICE_OWNER_REQUIRED — Android opening validation (SB-M42-032), using `docs/OPENING_CINEMATIC_DEVICE_VALIDATION.md`.
+- IOS_DEVICE_LATER — physical iOS playback (SB-M42-033). Needs macOS/Xcode and an iOS export preset.
+- Optional owner decisions noted, not invented: mid-level exit after the first action, and Home back-button exit behaviour (SB-M42-009); zero-Heart play gating (not specified in Economy V1).
+- Pre-existing, unchanged: M34 real-device haptics, M36 human difficulty playtest, M39 sixth-slot device evidence.
+
+Root `TASKS.md`, ChatGPT audit files and owner decision/acceptance files were not edited. No audit verdict was created.
+
+Final handoff: `AWAITING_BATCH_AUDIT / M42-C001 V01`
