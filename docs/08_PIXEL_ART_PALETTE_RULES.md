@@ -1,9 +1,21 @@
-# SCRUBBOTS Global Pixel-Art Palette V2
+# SCRUBBOTS Global Pixel-Art Palette V3
 
-Status: **OWNER-LOCKED — palette 2026-09-06; difficulty semantics updated 2026-09-12**
+Status: **OWNER-LOCKED — palette V3 2026-09-25 (Alpix-aligned 16-color subset); difficulty semantics updated 2026-09-12**
 
 Machine-readable palette source of truth:
-`data/palettes/scrubbots_palette_v2.json`
+`data/palettes/scrubbots_palette_v3.json` (schema `scrubbots-global-palette/v3`, version 3)
+
+Palette V3 is an exact 16-color subset of the Alpix fixed 32-color palette (upstream
+`alpic-ai/alpix` `packages/component/src/palette.ts`, MIT), adopted 2026-09-25 so
+Alpix-authored logical grids are canonical without post-generation quantization. C-IDs are
+stable: V2 -> V3 is an exact C-ID remap.
+
+Historical (superseded, kept for provenance only): `data/palettes/scrubbots_palette_v2.json`
+(V2, locked 2026-09-06).
+
+The palette version is independent of the Level Data schema version: palette V3 does NOT
+imply Level Data V2/V3. Level files stay `"version": 1` (`LevelData.FORMAT_VERSION`); see
+`docs/03_LEVEL_DATA_SPEC.md` §4.2.
 
 Difficulty/progression owner decision:
 `coordination/OWNER_DIFFICULTY_PROGRESSION_DECISION_V01.md`
@@ -12,22 +24,22 @@ No production SCRUBBOTS logical pixel may use a color outside this table unless 
 
 | ID | Name | HEX | RGB |
 | --- | --- | --- | --- |
-| C01 | Coral Red | `#E94B4B` | 233, 75, 75 |
-| C02 | Tangerine Orange | `#F28C3C` | 242, 140, 60 |
-| C03 | Sunny Yellow | `#F2C94C` | 242, 201, 76 |
-| C04 | Leaf Green | `#55B85A` | 85, 184, 90 |
-| C05 | Mint Green | `#63D6A3` | 99, 214, 163 |
-| C06 | Cyan | `#42C7D9` | 66, 199, 217 |
-| C07 | Ocean Blue | `#3E7EDB` | 62, 126, 219 |
-| C08 | Deep Blue | `#3451A3` | 52, 81, 163 |
-| C09 | Purple | `#845EC2` | 132, 94, 194 |
-| C10 | Candy Pink | `#E66FA5` | 230, 111, 165 |
-| C11 | Earth Brown | `#956447` | 149, 100, 71 |
-| C12 | Sand / Cream | `#E8CFA0` | 232, 207, 160 |
-| C13 | Light Gray | `#B8C2CC` | 184, 194, 204 |
-| C14 | Charcoal | `#3D4652` | 61, 70, 82 |
-| C15 | Pure White | `#FFFFFF` | 255, 255, 255 |
-| C16 | Pure Black | `#000000` | 0, 0, 0 |
+| C01 | Orange Red | `#FF4500` | 255, 69, 0 |
+| C02 | Orange | `#FFA800` | 255, 168, 0 |
+| C03 | Yellow | `#FFD635` | 255, 214, 53 |
+| C04 | Green | `#00CC78` | 0, 204, 120 |
+| C05 | Light Teal | `#00CCC0` | 0, 204, 192 |
+| C06 | Light Blue | `#51E9F4` | 81, 233, 244 |
+| C07 | Blue | `#3690EA` | 54, 144, 234 |
+| C08 | Dark Blue | `#2450A4` | 36, 80, 164 |
+| C09 | Periwinkle | `#6A5CFF` | 106, 92, 255 |
+| C10 | Pink | `#FF3881` | 255, 56, 129 |
+| C11 | Brown | `#9C6926` | 156, 105, 38 |
+| C12 | Pale Yellow | `#FFF8B8` | 255, 248, 184 |
+| C13 | Light Gray | `#D4D7D9` | 212, 215, 217 |
+| C14 | Dark Gray | `#515252` | 81, 82, 82 |
+| C15 | White | `#FFFFFF` | 255, 255, 255 |
+| C16 | Black | `#000000` | 0, 0, 0 |
 
 ## Production used-color rule
 

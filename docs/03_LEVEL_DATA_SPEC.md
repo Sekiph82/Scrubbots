@@ -24,7 +24,7 @@ The board engine remains variable-size and dimension-generic.
   "difficulty": "EASY",
   "width": 20,
   "height": 20,
-  "palette": ["#E94B4BFF", "#F2C94CFF", "#3451A3FF", "#956447FF", "#000000FF"],
+  "palette": ["#FF4500FF", "#FFD635FF", "#2450A4FF", "#9C6926FF", "#000000FF"],
   "cells": [0, 0, 2, 2 /* ... exactly width*height entries ... */]
 }
 ```
@@ -88,8 +88,16 @@ VERY_HARD = 50..59
 
 ### 4.2 Production palette contract
 
-Canonical global palette:
-`data/palettes/scrubbots_palette_v2.json`
+Canonical global palette (active authority):
+`data/palettes/scrubbots_palette_v3.json` (schema `scrubbots-global-palette/v3`, version 3;
+Alpix-aligned, owner-locked 2026-09-25; C01..C16 table in `docs/08_PIXEL_ART_PALETTE_RULES.md`).
+Historical: `data/palettes/scrubbots_palette_v2.json` (V2, superseded; provenance only).
+
+**Palette version and Level Data schema version are separate.** A palette-authority version
+change (V2 -> V3) does not by itself change the Level Data schema version. Level files keep
+`"version": 1` (`LevelData.FORMAT_VERSION == 1`; `LevelLoader` accepts exactly 1). A Level
+Data V2 schema is not defined or authorized; bumping a level file's `version` to match the
+palette version makes it unloadable.
 
 Production rules:
 
