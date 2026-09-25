@@ -14,6 +14,7 @@ const REQUIRED_VIEWPORTS := [Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2
 
 var EXPECTED_CASES := [
 	"home_shell_tree", "home_in_real_root", "home_blocked_state",
+	"play_cta_fresh", "continue_cta_frontier",
 ]
 
 var _fail := 0
@@ -25,6 +26,8 @@ func _initialize() -> void:
 	await _home_shell_tree()
 	await _home_in_real_root()
 	await _home_blocked_state()
+	await _play_cta_fresh()
+	await _continue_cta_frontier()
 	_cleanup()
 	_done()
 
@@ -88,6 +91,43 @@ func _home_blocked_state() -> void:
 	_shutdown(root)
 	_ok(FileAccess.get_file_as_string(path) == before, "blocked future-schema save untouched")
 	_complete("home_blocked_state")
+
+func _play_cta_fresh() -> void:
+	print("[play cta fresh]")
+	var root = await _boot_main(_uniq("play"))
+	var home = root.get_home()
+	var play: Button = home.get_region("PlayButton")
+	_ok(play.text == "PLAY" and not play.disabled, "fresh save: live CTA 'PLAY'")
+	_ok(home.get_launch_preview().get("level") == 1 and home.get_launch_preview().get("ok"), "CTA previews canonical frontier level 1")
+	play.pressed.emit()
+	await process_frame
+	var host = root.get_gameplay_host()
+	_ok(root.get_navigation().current() == NavigationController.Route.GAMEPLAY, "PLAY -> GAMEPLAY")
+	_ok(host != null and host.is_built() and host.app_state == root.get_app_state(), "host built with the same AppState")
+	_ok(host != null and host.progression_level == 1 and root.last_launch["launch"]["entry_id"] == "m21_level_001_hazard_bot", "launched exactly the frontier entry")
+	_ok(not home.visible, "Home hidden during gameplay")
+	var pickers: int = root.find_children("*", "OptionButton", true, false).size() + root.find_children("*", "ItemList", true, false).size()
+	_ok(pickers == 0, "no level picker control anywhere")
+	_shutdown(root)
+	_complete("play_cta_fresh")
+
+func _continue_cta_frontier() -> void:
+	print("[continue cta frontier]")
+	var path := _uniq("cont")
+	var app = AppState.new(path)
+	_ok(app.progression.record_win(1), "record level-1 win")
+	app.request_save()
+	var root = await _boot_main(path)
+	var home = root.get_home()
+	var play: Button = home.get_region("PlayButton")
+	_ok(play.text == "CONTINUE · LEVEL 2", "CTA shows CONTINUE · LEVEL 2 (%s)" % play.text)
+	_ok(play.disabled and String(home.get_region("StatusLabel").text).find("coming soon") != -1, "frontier without content: disabled + honest message")
+	play.pressed.emit()
+	var r: Dictionary = root.play_current_frontier()
+	_ok(not r.get("ok", true) and r.get("reason") == "CONTENT_MISSING", "direct launch refuses CONTENT_MISSING")
+	_ok(root.get_gameplay_host() == null and root.get_navigation().current() == NavigationController.Route.HOME, "no gameplay, still HOME (never falls back to level 1)")
+	_shutdown(root)
+	_complete("continue_cta_frontier")
 
 # ---------------------------------------------------------------- helpers ----
 

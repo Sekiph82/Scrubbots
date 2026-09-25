@@ -54,6 +54,7 @@ func _ready() -> void:
 	add_child(_home)
 	_home.bind(app_state)
 	_home.settings_requested.connect(open_settings)
+	_home.play_requested.connect(play_current_frontier)
 	_build_settings_entry()
 	nav.route_changed.connect(_on_route_changed)
 	nav.go(NavigationController.Route.HOME, {"via": "boot"})
@@ -123,6 +124,18 @@ func launch_gameplay(parent: Node = null) -> Dictionary:
 	_gameplay_host = host
 	last_launch = {"ok": ok, "reason": "" if ok else host.get_build_error(), "launch": launch, "host": host}
 	return last_launch
+
+## SB-M42-003: Home PLAY/CONTINUE. Launches ONLY the canonical frontier through the
+## existing resolver + launch_gameplay() (same AppState). Returns the launch result.
+func play_current_frontier() -> Dictionary:
+	if nav.current() != NavigationController.Route.HOME:
+		return {"ok": false, "reason": "not_home"}
+	var r := launch_gameplay()
+	if r.get("ok", false):
+		nav.go(NavigationController.Route.GAMEPLAY, {"level": r["launch"]["level"], "entry_id": r["launch"]["entry_id"]})
+	elif _home != null:
+		_home.refresh()
+	return r
 
 func get_gameplay_host():
 	return _gameplay_host
