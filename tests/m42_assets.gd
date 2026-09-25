@@ -6,7 +6,7 @@ extends SceneTree
 
 const V = preload("res://scripts/tools/home_asset_manifest_validator.gd")
 
-var EXPECTED_CASES := ["manifest_valid", "manifest_adversarial"]
+var EXPECTED_CASES := ["manifest_valid", "manifest_adversarial", "generation_inventory"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -15,6 +15,7 @@ func _initialize() -> void:
 	await process_frame
 	_manifest_valid()
 	_manifest_adversarial()
+	_generation_inventory()
 	_done()
 
 func _manifest_valid() -> void:
@@ -80,6 +81,32 @@ func _manifest_adversarial() -> void:
 	m["assets"][0]["approved_sha256"] = FileAccess.get_sha256("res://" + m["assets"][0]["path"])
 	_ok(V.validate(m)["ok"], "APPROVED with matching sha256 validates")
 	_complete("manifest_adversarial")
+
+## SB-M42-014: inspect before generating. Every generation_required Home ART target
+## already exists on disk (Codex visual batch 47b4343/3012ebb/03109d2), so nothing is
+## generated; none of them is APPROVED, so none may bind (OWNER_ASSET_APPROVAL_REQUIRED).
+func _generation_inventory() -> void:
+	print("[generation inventory]")
+	var m = V.load_manifest()
+	var required := 0
+	var missing: Array = []
+	var approved := 0
+	var sizes_ok := true
+	for a in m["assets"]:
+		if a.get("kind") == "ART" and a.get("generation_required") == true:
+			required += 1
+			var p := "res://" + String(a["path"])
+			if not FileAccess.file_exists(p):
+				missing.append(a["id"])
+			elif FileAccess.get_file_as_bytes(p).size() < 1024:
+				sizes_ok = false
+			if a.get("status") == "APPROVED":
+				approved += 1
+	_ok(required == 49, "49 generation_required ART targets in the manifest (%d)" % required)
+	_ok(missing.is_empty(), "all generation targets already exist -> no generation needed %s" % str(missing))
+	_ok(sizes_ok, "existing targets are real images (> 1 KiB)")
+	_ok(approved == 0, "none approved -> OWNER_ASSET_APPROVAL_REQUIRED before binding")
+	_complete("generation_inventory")
 
 func _complete(c: String) -> void:
 	_completed[c] = true
