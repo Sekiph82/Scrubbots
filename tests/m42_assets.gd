@@ -30,7 +30,21 @@ func _manifest_valid() -> void:
 	for a in m["assets"]:
 		if a["status"] == "APPROVED":
 			approved += 1
-	_ok(approved == 0, "no asset is currently APPROVED in the manifest (owner approval pending)")
+	_ok(approved == 50, "owner-approved production state: 50 ART entries APPROVED (49 unique + HOME-087 reuse) (%d)" % approved)
+	var sha_042 := ""
+	var sha_087 := ""
+	var pins_ok := true
+	for a in m["assets"]:
+		if a["status"] == "APPROVED":
+			var want := String(a.get("approved_sha256", ""))
+			var got := FileAccess.get_sha256("res://" + String(a["path"]))
+			pins_ok = pins_ok and want.length() == 64 and want == want.to_lower() and want == got
+			if a["id"] == "HOME-042":
+				sha_042 = want
+			if a["id"] == "HOME-087":
+				sha_087 = want
+	_ok(pins_ok, "every approved_sha256 is 64-char lowercase and equals the actual file bytes")
+	_ok(sha_087 == sha_042 and sha_042.length() == 64, "HOME-087 reuse carries HOME-042's pin")
 	_complete("manifest_valid")
 
 func _mut(fn: Callable) -> Dictionary:
@@ -62,7 +76,9 @@ func _manifest_adversarial() -> void:
 		["Event Points path", func(m): m["assets"][0]["path"] = "assets/ui/final/home/event_points_bar.png", "banned Economy V1 token"],
 		["profile XP", func(m): m["assets"][40]["slug"] = "profile_xp_values", "banned Economy V1 token"],
 		["coin icon", func(m): m["assets"][41]["slug"] = "icon_currency_coin", "banned Economy V1 token 'coin'"],
-		["APPROVED without hash", func(m): m["assets"][0]["status"] = "APPROVED", "approved_sha256"],
+		["APPROVED without hash", func(m):
+			m["assets"][0]["status"] = "APPROVED"
+			m["assets"][0].erase("approved_sha256"), "approved_sha256"],
 		["APPROVED hash mismatch", func(m):
 			m["assets"][0]["status"] = "APPROVED"
 			m["assets"][0]["approved_sha256"] = "0".repeat(64), "approved asset changed on disk"],
@@ -106,7 +122,7 @@ func _generation_inventory() -> void:
 	_ok(required == 49, "49 generation_required ART targets in the manifest (%d)" % required)
 	_ok(missing.is_empty(), "all generation targets already exist -> no generation needed %s" % str(missing))
 	_ok(sizes_ok, "existing targets are real images (> 1 KiB)")
-	_ok(approved == 0, "none approved -> OWNER_ASSET_APPROVAL_REQUIRED before binding")
+	_ok(approved == 49, "all 49 generation targets owner-APPROVED (OWNER_M42_HOME_ART_COMPLETE_APPROVAL_V01); nothing generated")
 	_complete("generation_inventory")
 
 const HomeArtBinder = preload("res://scripts/ui/home/home_art_binder.gd")
@@ -115,16 +131,32 @@ const HomeArtBinder = preload("res://scripts/ui/home/home_art_binder.gd")
 func _lifecycle_gate() -> void:
 	print("[lifecycle gate]")
 	var b = HomeArtBinder.new()
-	_ok(b.is_manifest_valid() and b.summary() == {"NOT_APPROVED": 50}, "real manifest: all 50 ART entries NOT_APPROVED (%s)" % str(b.summary()))
+	_ok(b.is_manifest_valid() and b.summary() == {"APPROVED_BOUND": 50}, "real manifest: all 50 ART entries APPROVED_BOUND (%s)" % str(b.summary()))
 	var any_tex := false
 	for a in V.load_manifest()["assets"]:
 		if a["kind"] == "ART" and b.texture(a["slug"]) != null:
 			any_tex = true
-	_ok(not any_tex, "no Home texture binds while unapproved")
+	var all_tex := true
+	for a in V.load_manifest()["assets"]:
+		if a["kind"] == "ART" and b.texture(a["slug"]) == null:
+			all_tex = false
+	_ok(any_tex and all_tex, "every approved Home ART texture binds")
+	var m0 = V.load_manifest()
+	m0["assets"][0]["status"] = "PLANNED"
+	m0["assets"][0].erase("approved_sha256")
+	var b0 = HomeArtBinder.new(m0)
+	_ok(b0.state("home_bg_sky") == "NOT_APPROVED" and b0.texture("home_bg_sky") == null and b0.texture("home_bg_city_far") != null, "an entry reverted to unapproved stops binding; others unaffected")
+	var protected_all := true
+	for a in V.load_manifest()["assets"]:
+		if a["kind"] == "ART" and b.can_write(String(a["path"])):
+			protected_all = false
+	_ok(protected_all and b.can_write("assets/ui/generated/home/new_candidate.png"), "every approved final path is write-protected; a new candidate path is not")
 	_ok(b.state("nope") == "UNKNOWN" and b.texture("nope") == null, "unknown slug -> null")
 	var m = V.load_manifest()
 	m["assets"][0]["status"] = "APPROVED"
 	m["assets"][0]["approved_sha256"] = FileAccess.get_sha256("res://" + m["assets"][0]["path"])
+	m["assets"][1]["status"] = "PLANNED"
+	m["assets"][1].erase("approved_sha256")
 	var b2 = HomeArtBinder.new(m)
 	_ok(b2.state("home_bg_sky") == "APPROVED_BOUND" and b2.texture("home_bg_sky") != null, "owner-approved + hash-pinned asset binds")
 	_ok(not b2.can_write(m["assets"][0]["path"]) and b2.can_write(m["assets"][1]["path"]), "approved final path is write-protected; unapproved is not")
