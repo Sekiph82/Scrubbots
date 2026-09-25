@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M33 / M41 OWNER GATES
-- Current Sprint: Owner Audio + Settings Acceptance
-- Current Task: M33 music selection/F6 + M41 Settings F6
-- Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER selects/approves the final background music asset for M33, then runs `res://scenes/debug/m33_audio_playtest.tscn` for listening acceptance and checks the M41 Settings panel on the main screen/F6 scene. Code-side M33 V02 and M41 early Settings slice are accepted on actual repaired `main`. After owner acceptance, ChatGPT closes the owner gates and advances the roadmap.
-- Required Actor: OWNER
+- Current Sprint: M33 Final Music Integration + Owner Audio/Settings Acceptance
+- Current Task: M33 seamless gameplay loop preparation
+- Current Task Status: READY_FOR_IMPLEMENTATION / OWNER_SOURCE_SELECTED
+- Next Task/Action: Prepare the owner-approved `Pixel Polish Parade(1).mp3` as a genuinely seamless gameplay loop at `assets/audio/music/background_loop.ogg`, integrate it through the already-audited M33 Music-bus controller, rerun M33/M41/root regressions, then OWNER performs final F6 listening + Settings acceptance. `ScrubBots Workshop(1).mp3` is separately owner-approved and reserved for a future Workshop screen; do not use it as gameplay music.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 712 / 980 = 72.65% after PALETTE-V3-C001 closure plus M33/M41 code-task closure.
-- Note: PALETTE-V3-C001 is `AUDITED_PASS`: canonical palette authority is v3 while Level Data remains V1. Actual-main regressions are green: root 5336/0, M33 9/9, M41 13/13, M38 11/11, with zero SCRIPT ERROR. Separate open owner/device gates remain M34 SB-M34-006 real-device haptics, M36 SB-M36-005 human difficulty playtest and M39 SB-M39-033 sixth-slot phone safe-area/touch/readability. M41 SB-M41-005 Reduced Effects is still unimplemented/outside the early slice.
+- Progress: 712 / 980 = 72.65%. Music-source selection is an owner gate decision rather than a checklist-row completion, so the numerator is unchanged.
+- Note: Owner music decision V03 is locked: Gameplay = `Pixel Polish Parade`; Workshop = `ScrubBots Workshop`. M33 still needs seamless-loop preparation and final owner F6. M41 early Settings code is accepted but owner visual/manual F6 remains. Separate open gates: M34 real-device haptics, M36 human difficulty playtest, M39 sixth-slot phone safe-area/touch/readability. SB-M41-005 Reduced Effects remains open.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1316,6 +1316,8 @@ Closure evidence: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V03.md` + `coord
 - [x] SB-M32-UI-011 Validate readability/scale on phone viewport matrix.
 
 ### M33 — Audio `[OWNER-LOCKED AUDIO SELECTION V02 2026-09-24]`
+
+Owner music selection V03: Gameplay source is `Pixel Polish Parade(1).mp3`; `ScrubBots Workshop(1).mp3` is reserved for the future Workshop screen. Music-source selection gate is resolved. Remaining M33 work: seamless `background_loop.ogg` preparation/integration + owner F6 listening.
 
 Palette blocker closed by PALETTE-V3-C001 V01. Actual-main `m33_audio_runtime` is 9/9 with zero SCRIPT ERROR. All M33 code tasks are now code-side accepted. Final M33 closure remains `OWNER_MUSIC_SELECTION_REQUIRED + OWNER_F6_REQUIRED`.
 
