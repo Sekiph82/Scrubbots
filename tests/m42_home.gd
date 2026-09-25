@@ -263,7 +263,7 @@ func _layered_art_regions() -> void:
 	for l in layers:
 		if (l as TextureRect).texture != null:
 			bound += 1
-	_ok(bound == 0, "no art bound before owner approval (SB-M42-016/017 gate)")
+	_ok(bound == layers.size(), "owner-approved production art bound on all %d layers (SB-M42-016/017 gate open)" % layers.size())
 	sub.free()
 	_complete("layered_art_regions")
 
@@ -357,26 +357,29 @@ func _approved_art_only() -> void:
 	for id in ["Shortcut_daily", "Shortcut_cards_exchange"]:
 		if home.get_region(id).icon != null:
 			bound += 1
-	_ok(bound == 0 and home.get_region("ScrubBucksChip").icon.texture == null, "production manifest (nothing approved): no art bound, native placeholders")
-	# Owner-approval simulation on an in-memory manifest copy (repo manifest untouched).
+	_ok(bound == home.get_art_layers().size() + 2 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved): all mapped art bound")
+	# Un-approval simulation on an in-memory manifest copy (repo manifest untouched):
+	# entries that are not APPROVED keep native placeholders.
 	var m = V.load_manifest()
-	var approve := ["home_bg_sky", "scrubby_home_pose", "icon_currency_scrub_bucks", "icon_shortcut_daily"]
+	var keep := ["home_bg_sky", "scrubby_home_pose", "icon_currency_scrub_bucks", "icon_shortcut_daily"]
 	for a in m["assets"]:
-		if approve.has(a["slug"]):
-			a["status"] = "APPROVED"
-			a["approved_sha256"] = FileAccess.get_sha256("res://" + a["path"])
+		if a["kind"] == "ART" and not keep.has(a["slug"]) and a["id"] != "HOME-087":
+			a["status"] = "PLANNED"
+			a.erase("approved_sha256")
 	home.set_art_binder(HomeArtBinder.new(m))
 	await process_frame
 	_ok(home.get_region("Layer_background.sky").texture != null and home.get_region("Layer_characters").texture != null, "approved sky + Scrubby bind to their layers")
 	_ok(home.get_region("Layer_background.city_far").texture == null and home.get_region("Layer_central_world_and_environment").texture == null, "unapproved layers stay empty")
 	_ok(home.get_region("ScrubBucksChip").icon.texture != null and home.get_region("Shortcut_daily").icon != null and home.get_region("Shortcut_shop").icon == null, "approved icons bind; unapproved do not")
+	home.set_art_binder(HomeArtBinder.new())
+	await process_frame
 	var outside: Array = []
 	var safe := Rect2(Vector2.ZERO, Vector2(1080, 2160))
 	for b in home.find_children("*", "BaseButton", true, false):
 		if not safe.grow(0.5).encloses((b as Control).get_global_rect()) or (b as Control).size.y < 87.5:
 			outside.append(b.name)
 	_ok(outside.is_empty(), "with art bound, controls still inside viewport and >= 88 px %s" % str(outside))
-	_ok(FileAccess.get_file_as_string("res://assets/ui/HOME_ASSET_MANIFEST.json").find("APPROVED\"") == -1, "repository manifest still has no APPROVED entry (never self-approved)")
+	_ok(FileAccess.file_exists("res://coordination/OWNER_M42_HOME_ART_COMPLETE_APPROVAL_V01.md"), "repository APPROVED entries are backed by the owner approval artifact")
 	sub.free()
 	_complete("approved_art_only")
 
@@ -391,6 +394,16 @@ func _scrub_bucks_chip() -> void:
 	await process_frame
 	var chip = home.get_region("ScrubBucksChip")
 	var w = app.economy.wallet
+	_ok(chip.icon.texture != null and not chip.tag.visible, "owner-approved banknote icon bound, native tag hidden")
+	var mu = V.load_manifest()
+	for a in mu["assets"]:
+		if a["slug"] == "icon_currency_scrub_bucks":
+			a["status"] = "PLANNED"
+			a.erase("approved_sha256")
+		if a["id"] == "HOME-087":
+			a["status"] = "PLANNED"
+			a.erase("approved_sha256")
+	home.set_art_binder(HomeArtBinder.new(mu))
 	_ok(chip.tag.visible and chip.tag.text == "SB" and chip.icon.texture == null, "unapproved banknote icon -> native 'SB' tag")
 	w.credit("scrub_bucks", 1234567 - w.scrub_bucks())
 	home.refresh()

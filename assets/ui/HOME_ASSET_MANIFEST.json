@@ -55,7 +55,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "d0353c68c944a188b53256e028f483873b4abe23fb4cc76bdddcba8e2803779c",
       "notes": "Sky/atmosphere layer; no text."
     },
     {
@@ -71,7 +72,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "d1ff336dc6d076654c3ff3177b97d86c87b7b74b542403a1cd98f81886fbd1f9",
       "notes": "Distant city layer for responsive crop/parallax."
     },
     {
@@ -87,7 +89,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "cf8403d29e033594d24d9f1a7b8b1dd1e36804b15dcbb3f4affe8eda299cbd78",
       "notes": "Mid-city shops/buildings layer."
     },
     {
@@ -103,7 +106,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "3b3ef164d5a5945259eb53ef3720f3fb55fae0afcb8410f9d98d11a154bd772d",
       "notes": "Near wet-street/foreground layer."
     },
     {
@@ -130,7 +134,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "b6cea5f6f16974884c81cbaef0050fddd29ad3965f78ec57fefa096b4d528046",
       "notes": "Arch only; title/area remain live text."
     },
     {
@@ -146,7 +151,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "af4d834a07f926906056a9e0b3a1608d6af285b14a741da4ce53c3fdc85591b2",
       "notes": ""
     },
     {
@@ -184,7 +190,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "61f4b715da49f4bf08a8cf32bfef778168e33689c2f4bf4b5d0eecfc511d7999",
       "notes": ""
     },
     {
@@ -200,7 +207,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "3b0b1187c6d0c32465a67713b31b986730e09ce744e5c669f00bd3f7159f9e70",
       "notes": ""
     },
     {
@@ -227,7 +235,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "7681d0adaaa6506da968904bf1262c57301a01446d743a4e3aa69c94c30f7eea",
       "notes": ""
     },
     {
@@ -243,7 +252,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "38c214d93ff8222c0ba71f7a3f0e776dd46940e3873e44427acf32abd263df2a",
       "notes": ""
     },
     {
@@ -259,7 +269,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "ba69053c78c468326a91bff32abba51f742cd9d75616eb33086e548067bf2aa0",
       "notes": ""
     },
     {
@@ -275,7 +286,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "692271af12062350b412b6e919e4bc24849df2ce0c18023cdcca75cce8c5e124",
       "notes": ""
     },
     {
@@ -302,7 +314,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "d59eea2db0e7761500116308723448d5bc24c8bcb039fdc22652c205888803da",
       "notes": ""
     },
     {
@@ -318,7 +331,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "6d08b69f0aad74d0fdea9a696ab615a69e11f0796a5a23e0fa858032dcff9baa",
       "notes": "Avoid baked language-dependent copy."
     },
     {
@@ -334,7 +348,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "c83036875ad4f5d4d2ba65c2b3567d39d292f894629a5f64ba7e8f73ac19511d",
       "notes": ""
     },
     {
@@ -350,7 +365,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "dcb568463a3a560d950ac35196bcbd722b8d6fc248b767aab86466dafce0a2e5",
       "notes": ""
     },
     {
@@ -366,7 +382,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "d0cb14782d36a793c180904f0c61c59be938aa3c897afc342f19e721659a3119",
       "notes": ""
     },
     {
@@ -382,7 +399,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "1f85faf4c52ae20687a7e6667e7ce3162828dce8a4172380c1df0c540406242e",
       "notes": ""
     },
     {
@@ -398,7 +416,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "27eaa6a3da946991e08cc351bd0175daa4c56a0298dfec3fa85f3bce2c1e51b7",
       "notes": ""
     },
     {
@@ -425,7 +444,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "fc30b992787c644822a6cd02510e481fab9010cd89ab75fc4a9909ca713d5c18",
       "notes": "Requires canonical Scrubby identity approval."
     },
     {
@@ -441,7 +461,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "2b3cf915e93b8bf0e9c51014f2ca7ee8182377a5d4b9cd8ad61996aa9071187c",
       "notes": ""
     },
     {
@@ -490,7 +511,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "a6c6f9c6f4117284d28a4a64ce7665b1807a46c12ad2b78ddf5eb871fc407b92",
       "notes": "Optional idle animation layer."
     },
     {
@@ -506,7 +528,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "bf33c73a26c1368d773774d1ea8bc6e7d9bbeadef18afeb2ce5258c1c52c2521",
       "notes": "Optional idle animation layer."
     },
     {
@@ -533,7 +556,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "f0bb1b5c6ccec79a407d6f0f6f93283aae7656568628b71e665c99e2fafe35d3",
       "notes": ""
     },
     {
@@ -549,7 +573,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "d80e15270972d5b74f82d915e7252f405a040135ec2845f02b4438e3fd7e6617",
       "notes": ""
     },
     {
@@ -631,7 +656,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "a843e21f429b28f2f2c91e9b5015efee7312e96e9112ce616947035dff68a8ef",
       "notes": "Canonical spendable soft-currency icon; owner-approved local asset may be bulk-pushed later."
     },
     {
@@ -647,7 +673,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "245721d4166ba6f8bb2c21a907cf27165698a09709476b1dc9f5c7b05c36aad5",
       "notes": ""
     },
     {
@@ -740,7 +767,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "0ba66f7b48f72b19c8bf4d402ae57553f8f13079728ffe37c66a5aef3e0d3917",
       "notes": "Gift Meter emblem; must not imply Star/Event currency."
     },
     {
@@ -778,7 +806,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "9785ea7c680d9d36d548785ca3041ec489f24f75db1442d933ee0e8ad27f71fc",
       "notes": "Milestone reward crate for 10/50/250/500/1000 Gift Meter thresholds."
     },
     {
@@ -871,7 +900,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "e44be6b876b76644cf390bed6207be20db4ffa10bd7aa12316a5cd4f0738353d",
       "notes": ""
     },
     {
@@ -887,7 +917,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "3fc1b5e2f859e79f2aafb4e842c0d99950d44f65bd912b44259b0092f7b3d7b9",
       "notes": ""
     },
     {
@@ -903,7 +934,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "bde7a0442a016c272897e2487a85c2895f4883afbffd07efd5126a54c9d05872",
       "notes": ""
     },
     {
@@ -919,7 +951,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "471416cbb6ab7100c0404170a15f49e250b61a03d713b7ec162e8571343864ef",
       "notes": ""
     },
     {
@@ -935,7 +968,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "2a86a0373526adbb2a774d58a6fc08a6f5375a27ad807ad4644255f4d00752ab",
       "notes": ""
     },
     {
@@ -951,7 +985,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "a01e49ac28f8665443a3c11d9ee2b6f806b5649d4b1456167c36bef7d2044ad7",
       "notes": ""
     },
     {
@@ -967,7 +1002,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "711df18c7df43f3ebc036ac2c3486216334d0a4b403264650a40f5cb22658a00",
       "notes": ""
     },
     {
@@ -983,7 +1019,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "5de717cbe474fdc46bad67e3bcf78cced1272a5f16843fa9b570d5f3ab63cec8",
       "notes": "CARDS EXCHANGE shortcut. Visual should communicate duplicate Collection cards converting into Scrub Bucks: 2–3 overlapping collectible cards plus a small Scrub Bucks banknote/bundle and a clear exchange/transform cue. No Stars, no coins, no baked text; readable at Home shortcut size and stylistically matched to the canonical master Home icons."
     },
     {
@@ -1087,7 +1124,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "6a41ee7b2dd9f22736276b99134c85abc2fd27638125fe044592c0c6d5d46d77",
       "notes": "No-text, front-facing, 9-slice-capable glossy frame."
     },
     {
@@ -1180,7 +1218,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "52304ff7cb6a1ed276f8139a76dfed3dec1b84de7ee1b5daa9ce7c1b1fb44812",
       "notes": "Reward-track badge; no Star currency semantics."
     },
     {
@@ -1192,7 +1231,8 @@
       "path": "assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
       "generation_required": false,
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "a843e21f429b28f2f2c91e9b5015efee7312e96e9112ce616947035dff68a8ef",
       "notes": "Reuse HOME-042 Scrub Bucks icon; no separate Star icon."
     },
     {
@@ -1230,7 +1270,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "3ae3614634dd11105de2e32a3d75185cc918946714918b914351102fba029e25",
       "notes": "Consecutive win 1 reward visual; LIVE amount +1 SB."
     },
     {
@@ -1246,7 +1287,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "b5c7a95bc65a821aadcc95293fae36f7a2124ea02f5cd99df760e991865d918d",
       "notes": "Consecutive win 2 reward visual; LIVE amount +5 SB."
     },
     {
@@ -1262,7 +1304,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "8443069ab6286a51658808ef9e20a5de328a206cd3bea7a35a83d10638f4d209",
       "notes": "Consecutive win 3 reward visual; LIVE amount +10 SB."
     },
     {
@@ -1278,7 +1321,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "d22bdcc0369668d19b5885284ab492111d990a1c643f9fd68ba5436964db0ccb",
       "notes": "Consecutive win 4 reward visual; LIVE amount +25 SB."
     },
     {
@@ -1294,7 +1338,8 @@
         "magnific"
       ],
       "reusable": false,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "0ce0b75ef56cb08f9c6d144d5109206e738e6b2157dd89935c6179eee171d6e3",
       "notes": "Consecutive win 5+ reward visual; LIVE amount +100 SB."
     },
     {
@@ -1376,7 +1421,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "32fa8f755d6695af29d4583fec8cdeebe16893f26b5dcc969b721ab34545c0fb",
       "notes": ""
     },
     {
@@ -1392,7 +1438,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "b069f66152e9e843dcc056eb570af34686b7324aab6172fa1062153df4f34590",
       "notes": ""
     },
     {
@@ -1408,7 +1455,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "2cf852c038f2c66755bb5b132103f11a601cb46903c33bd4f11bd15d74468254",
       "notes": ""
     },
     {
@@ -1424,7 +1472,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "bf0fc3ff250092db2bf5ee922960e039e95b8e0980289e74e40f34c37e2bc452",
       "notes": ""
     },
     {
@@ -1440,7 +1489,8 @@
         "magnific"
       ],
       "reusable": true,
-      "status": "PLANNED",
+      "status": "APPROVED",
+      "approved_sha256": "c8f1981b4c63c3853267b9886ef94200030823c2268a6edff606c1eb0ddfaf04",
       "notes": ""
     },
     {
