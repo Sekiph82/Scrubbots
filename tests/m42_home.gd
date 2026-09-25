@@ -16,7 +16,7 @@ var EXPECTED_CASES := [
 	"home_shell_tree", "home_in_real_root", "home_blocked_state",
 	"play_cta_fresh", "continue_cta_frontier",
 	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
-	"shortcut_columns_responsive", "live_binding", "approved_art_only",
+	"shortcut_columns_responsive", "live_binding", "approved_art_only", "scrub_bucks_chip",
 ]
 
 var _fail := 0
@@ -36,6 +36,7 @@ func _initialize() -> void:
 	await _shortcut_columns_responsive()
 	await _live_binding()
 	await _approved_art_only()
+	await _scrub_bucks_chip()
 	_cleanup()
 	_done()
 
@@ -306,14 +307,14 @@ func _live_binding() -> void:
 		home.refresh()
 	_ok(e.snapshot() == before and app.progression.snapshot() == prog_before, "refresh never mutates economy/progression")
 	var vm: Dictionary = home.get_view_model()
-	_ok(vm["scrub_bucks"] == e.wallet.scrub_bucks() and home.get_region("ScrubBucksChip").value_label.text == str(e.wallet.scrub_bucks()), "SB chip == wallet")
+	_ok(vm["scrub_bucks"] == e.wallet.scrub_bucks() and home.get_region("ScrubBucksChip").value_label.text.replace(",", "") == str(e.wallet.scrub_bucks()), "SB chip == wallet")
 	e.wallet.credit("scrub_bucks", 1234)
 	e.wallet.credit("bot_parts", 37)
 	e.hearts.consume()
 	e.gift.add_streak_sb("t_live_1", 25)
 	home.refresh()
 	vm = home.get_view_model()
-	_ok(home.get_region("ScrubBucksChip").value_label.text == str(e.wallet.scrub_bucks()), "SB chip follows the wallet live")
+	_ok(home.get_region("ScrubBucksChip").value_label.text.replace(",", "") == str(e.wallet.scrub_bucks()), "SB chip follows the wallet live")
 	_ok(vm["bot_parts"] == e.wallet.bot_parts() and home.get_region("ProfileBotParts").caption.text.find("%d/%d" % [e.wallet.bot_parts(), e.robots.unlock_cost()]) != -1, "Bot Parts N/%d follows the wallet" % e.robots.unlock_cost())
 	_ok(home.get_region("HeartsChip").value_label.text == "%d/%d" % [e.hearts.hearts(), e.hearts.max_hearts()] and home.get_region("HeartsChip").sub_label.visible, "Hearts count + live regen timer shown when not full")
 	_now += 60
@@ -369,6 +370,45 @@ func _approved_art_only() -> void:
 	_ok(FileAccess.get_file_as_string("res://assets/ui/HOME_ASSET_MANIFEST.json").find("APPROVED\"") == -1, "repository manifest still has no APPROVED entry (never self-approved)")
 	sub.free()
 	_complete("approved_art_only")
+
+## SB-M42-018: Scrub Bucks semantics; no coin/Star authority anywhere in Home.
+func _scrub_bucks_chip() -> void:
+	print("[scrub bucks chip]")
+	var app = AppState.new(_uniq("sb"))
+	var sub := _sub(Vector2i(1080, 2160))
+	var home = HomeScreenScene.instantiate()
+	sub.add_child(home)
+	home.bind(app)
+	await process_frame
+	var chip = home.get_region("ScrubBucksChip")
+	var w = app.economy.wallet
+	_ok(chip.tag.visible and chip.tag.text == "SB" and chip.icon.texture == null, "unapproved banknote icon -> native 'SB' tag")
+	w.credit("scrub_bucks", 1234567 - w.scrub_bucks())
+	home.refresh()
+	_ok(chip.value_label.text == "1,234,567", "live canonical balance, grouped (%s)" % chip.value_label.text)
+	app.economy.hearts.consume()
+	app.economy.hearts.purchase_plus_one()
+	home.refresh()
+	_ok(chip.value_label.text.replace(",", "") == str(w.scrub_bucks()), "balance follows canonical spend")
+	var m = V.load_manifest()
+	for a in m["assets"]:
+		if a["slug"] == "icon_currency_scrub_bucks":
+			a["status"] = "APPROVED"
+			a["approved_sha256"] = FileAccess.get_sha256("res://" + a["path"])
+	home.set_art_binder(HomeArtBinder.new(m))
+	_ok(chip.icon.texture != null and not chip.tag.visible, "approved banknote icon replaces the tag")
+	var src := FileAccess.get_file_as_string("res://scripts/ui/home/home_screen.gd") + FileAccess.get_file_as_string("res://scripts/ui/home/home_view_model.gd")
+	var code := ""
+	for line in src.split("
+"):
+		var i := line.find("#")
+		code += (line if i == -1 else line.substr(0, i)).to_lower() + "
+"
+	var banned := RegEx.create_from_string("\\b(coins?|stars?|event_points?|profile_xp|xp)\\b")
+	var hit = banned.search(code)
+	_ok(hit == null, "Home code has no coin / Star / Event Points / XP authority (%s)" % ("" if hit == null else hit.get_string()))
+	sub.free()
+	_complete("scrub_bucks_chip")
 
 # ---------------------------------------------------------------- helpers ----
 

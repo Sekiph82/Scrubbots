@@ -366,8 +366,11 @@ func _render_values() -> void:
 		return
 	(_nodes["ProfileBotParts"] as UiProgressMeter).set_progress(_vm["bot_parts"], _vm["bot_parts_target"],
 		"LEVEL %d · BOT PARTS %d/%d" % [_vm["level"], _vm["bot_parts"], _vm["bot_parts_target"]])
+	# SB-M42-018: top currency is Scrub Bucks (banknote icon once approved; native "SB"
+	# tag meanwhile) with the live canonical wallet balance. No coin/Star authority.
 	var sb: UiValueChip = _nodes["ScrubBucksChip"]
-	sb.set_value(str(_vm["scrub_bucks"]))
+	sb.set_tag("SB")
+	sb.set_value(_group_digits(_vm["scrub_bucks"]))
 	var hearts: UiValueChip = _nodes["HeartsChip"]
 	hearts.set_value("%d/%d" % [_vm["hearts"], _vm["hearts_max"]])
 	hearts.set_sub("" if _vm["hearts"] >= _vm["hearts_max"] else _mmss(_vm["heart_seconds_to_next"]))
@@ -381,6 +384,16 @@ func _render_values() -> void:
 	(_nodes["Shortcut_gift_bar"] as UiShortcutButton).set_badge(_vm["gift_claimable"])
 	(_nodes["Shortcut_cards_exchange"] as UiShortcutButton).set_badge(_vm["cards_duplicates"])
 	(_nodes["Shortcut_daily"] as UiShortcutButton).set_badge(_vm["daily_cycle_day"])
+
+## 1234567 -> "1,234,567" (moved behind the localization seam in SB-M42-025).
+static func _group_digits(n: int) -> String:
+	var neg := n < 0
+	var d := str(absi(n))
+	var out := ""
+	while d.length() > 3:
+		out = "," + d.substr(d.length() - 3) + out
+		d = d.substr(0, d.length() - 3)
+	return ("-" if neg else "") + d + out
 
 static func _mmss(seconds: int) -> String:
 	return "%02d:%02d" % [seconds / 60, seconds % 60]
