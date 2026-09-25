@@ -14,7 +14,7 @@ const R := NavigationController.Route
 var EXPECTED_CASES := [
 	"nav_edges", "nav_reentry", "nav_terminal_latch", "nav_settings_overlay",
 	"nav_back", "main_owns_one_nav", "no_shipping_level_select",
-	"home_to_gameplay_once",
+	"home_to_gameplay_once", "results_on_real_won", "results_lost_retry_error",
 ]
 
 var _fail := 0
@@ -31,6 +31,8 @@ func _initialize() -> void:
 	await _main_owns_one_nav()
 	_no_shipping_level_select()
 	await _home_to_gameplay_once()
+	await _results_on_real_won()
+	await _results_lost_retry_error()
 	_cleanup()
 	_done()
 
@@ -163,6 +165,94 @@ func _home_to_gameplay_once() -> void:
 	_ok(r3.get("ok", false) and _hosts(root) == 1 and nav.attempt_id() == 2, "next activation -> new single host, attempt 2")
 	_shutdown(root)
 	_complete("home_to_gameplay_once")
+
+## SB-M42-007: authoritative terminal -> RESULTS once, minimal payload, economy/save
+## already committed by the host before Results appears.
+func _results_on_real_won() -> void:
+	print("[results on real WON]")
+	var root = await _boot_main(_uniq("won"))
+	var app = root.get_app_state()
+	var nav = root.get_navigation()
+	var sb0: int = app.economy.wallet.scrub_bucks()
+	root.play_current_frontier()
+	await process_frame
+	var h = root.get_gameplay_host()
+	h.get_runtime().set_process(false)
+	var seen := {"sb_at_results": -1, "count": 0}
+	nav.route_changed.connect(func(_f, t, _p):
+		if t == R.RESULTS:
+			seen["count"] += 1
+			seen["sb_at_results"] = app.economy.wallet.scrub_bucks())
+	_drain(h)
+	_ok(h.get_completion().is_won(), "real gameplay reached WON")
+	_ok(nav.current() == R.RESULTS and seen["count"] == 1, "exactly one RESULTS transition")
+	_ok(nav.last_payload() == {"status": "WON", "level": 1, "attempt": 1}, "minimal payload %s" % str(nav.last_payload()))
+	_ok(seen["sb_at_results"] > sb0 and app.progression.current_level() == 2, "first-clear economy + progression committed before Results")
+	var res = root.get_results_screen()
+	_ok(res.visible and res.get_payload()["status"] == "WON" and res.get_primary_button().text == "CONTINUE", "Results visible: WON / CONTINUE")
+	_ok(res.get_primary_button().disabled and not root.continue_from_results().get("ok", true), "CONTINUE disabled: next frontier (level 2) has no content")
+	h.get_completion().terminal_reached.emit(&"WON", {})
+	_ok(seen["count"] == 1 and nav.current() == R.RESULTS, "repeated terminal callback ignored")
+	res.get_home_button().pressed.emit()
+	await process_frame
+	_ok(nav.current() == R.HOME and root.get_gameplay_host() == null and not res.visible, "HOME from Results releases the host")
+	_shutdown(root)
+	_complete("results_on_real_won")
+
+func _results_lost_retry_error() -> void:
+	print("[results LOST / retry / ERROR]")
+	var root = await _boot_main(_uniq("lost"))
+	var nav = root.get_navigation()
+	root.play_current_frontier()
+	await process_frame
+	var h = root.get_gameplay_host()
+	h.get_runtime().set_process(false)
+	# Signal-level terminal injection on the REAL completion controller (a LOST board
+	# cannot be produced from the shipped level without a QA seam).
+	h.get_completion().terminal_reached.emit(&"LOST", {})
+	_ok(nav.current() == R.RESULTS and nav.last_payload()["status"] == "LOST", "LOST -> RESULTS")
+	var res = root.get_results_screen()
+	_ok(res.get_primary_button().text == "RETRY" and not res.get_primary_button().disabled, "Results LOST offers RETRY")
+	_ok(root.retry_from_results() and nav.current() == R.GAMEPLAY and nav.attempt_id() == 2, "RETRY -> same host transaction-safe retry, attempt 2")
+	_ok(root.get_gameplay_host() == h and not res.visible, "same host, Results hidden")
+	h.get_completion().terminal_reached.emit(&"ERROR", {})
+	_ok(nav.current() == R.RESULTS and nav.last_payload()["attempt"] == 2 and nav.last_payload()["status"] == "ERROR", "new attempt terminal accepted once")
+	_ok(not res.get_primary_button().visible, "ERROR: HOME only")
+	_shutdown(root)
+	_complete("results_lost_retry_error")
+
+const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
+
+func _drain(h) -> void:
+	var supply = h.get_supply()
+	var slots = h.get_slots()
+	var input = h.get_input_controller()
+	var runtime = h.get_runtime()
+	var scheduler = h.get_scheduler()
+	var agent_layer = h.get_agent_layer()
+	for _i in range(80000):
+		if slots.rightmost_empty_index() != -1:
+			for col in range(supply.get_column_count()):
+				if supply.get_front(col) != null:
+					input.activate_front(col)
+					break
+		runtime.tick(1.0)
+		if h.get_completion().is_terminal():
+			break
+		if supply.is_exhausted() and scheduler.live_assignment_count() == 0 and not _any_moving(agent_layer):
+			runtime.tick(1.0)
+			if h.get_completion().is_terminal():
+				break
+			runtime.tick(1.0)
+			break
+
+func _any_moving(agent_layer) -> bool:
+	if agent_layer == null:
+		return false
+	for c in agent_layer.get_children():
+		if c is ScrubbotAgent and c.is_moving():
+			return true
+	return false
 
 func _hosts(root) -> int:
 	var n := 0
