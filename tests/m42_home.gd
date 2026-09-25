@@ -17,7 +17,7 @@ var EXPECTED_CASES := [
 	"play_cta_fresh", "continue_cta_frontier",
 	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
 	"shortcut_columns_responsive", "live_binding", "approved_art_only", "scrub_bucks_chip",
-	"bot_parts_progress",
+	"bot_parts_progress", "gift_meter_semantics",
 ]
 
 var _fail := 0
@@ -39,6 +39,7 @@ func _initialize() -> void:
 	await _approved_art_only()
 	await _scrub_bucks_chip()
 	await _bot_parts_progress()
+	await _gift_meter_semantics()
 	_cleanup()
 	_done()
 
@@ -437,6 +438,37 @@ func _bot_parts_progress() -> void:
 	_ok(meter.caption.text.to_lower().find("xp") == -1, "no XP wording")
 	sub.free()
 	_complete("bot_parts_progress")
+
+## SB-M42-020: Gift Meter progress/next milestone from canonical GiftMeterService,
+## advanced only by Win Streak SB; no event timer / Event Points.
+func _gift_meter_semantics() -> void:
+	print("[gift meter semantics]")
+	var app = AppState.new(_uniq("gift"))
+	var sub := _sub(Vector2i(1080, 2160))
+	var home = HomeScreenScene.instantiate()
+	sub.add_child(home)
+	home.bind(app)
+	await process_frame
+	var e = app.economy
+	var meter = home.get_region("GiftMeterBar")
+	_ok(meter.caption.text == "GIFT METER 0/1000 · NEXT GIFT AT 10", "fresh: 0/1000, next 10 (%s)" % meter.caption.text)
+	e.wallet.credit("scrub_bucks", 5000)
+	home.refresh()
+	_ok(meter.caption.text.begins_with("GIFT METER 0/"), "non-streak SB (wallet credit) does not move the Gift Meter")
+	var r: Dictionary = e.streak.process_first_clear_win(1)
+	home.refresh()
+	_ok(r.get("applied", false) and e.gift.cycle_progress() == 1 and meter.caption.text == "GIFT METER 1/1000 · NEXT GIFT AT 10", "Win Streak SB (+1) advances it (%s)" % meter.caption.text)
+	e.gift.add_streak_sb("t_gm_2", 60)
+	home.refresh()
+	_ok(meter.caption.text == "GIFT METER 61/1000 · NEXT GIFT AT 250" and is_equal_approx(meter.bar.value, 61.0), "crossing 10 and 50 -> next 250 (%s)" % meter.caption.text)
+	var gm_nodes := 0
+	for n in home.get_region("GiftMeter").find_children("*", "Label", true, false):
+		var t := String(n.text).to_lower()
+		if t.find(":") != -1 or t.find("event") != -1 or t.find("point") != -1:
+			gm_nodes += 1
+	_ok(gm_nodes == 0, "no timer / event wording in the Gift Meter region")
+	sub.free()
+	_complete("gift_meter_semantics")
 
 # ---------------------------------------------------------------- helpers ----
 
