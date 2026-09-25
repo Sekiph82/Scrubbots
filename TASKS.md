@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M42
-- Current Sprint: M42-C001 Home / Navigation Continuous Execution
-- Current Task: SB-M42-001..033 master batch
-- Current Task Status: READY_FOR_IMPLEMENTATION
-- Next Task/Action: CLAUDE executes `coordination/sessions/M42-C001/CHATGPT_MASTER_PROMPT_V01.md`. Run SB-M42-001..033 in order, publish one task log per task plus the master log, print each full GitHub log URL, continue across non-blocking owner/device/asset/tooling gates, then stop at `AWAITING_BATCH_AUDIT / M42-C001 V01`. Claude must not edit root TASKS.md or write audit verdicts.
-- Required Actor: CLAUDE
+- Current Milestone: M42 OWNER / DEVICE GATES
+- Current Sprint: M42-C001 Post-Audit Closure
+- Current Task: M42 remaining owner/device gates
+- Current Task Status: OWNER_REQUIRED
+- Next Task/Action: OWNER resolves SB-M42-030 opening-skip policy and reviews/approves the pending Home art/visual composition for SB-M42-011/014/016/017/018. SB-M42-032 additionally requires a real Android-device cinematic run; SB-M42-033 physical iOS validation remains later. No M42 remediation is open.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 713 / 980 = 72.76%. M41 is fully closed; M42 checklist rows remain open until independent task audits/required owner gates.
-- Note: M42-C001 bundle contains 33 per-task prompts + 33 strict audit criteria. SB-M42-005 is owner-locked NO SHIPPING LEVEL SELECT. SB-M42-031 is owner-locked once per cold/native launch. SB-M42-030 remains OWNER_DECISION_REQUIRED and must not be invented. Separate pre-existing gates remain M34 real-device haptics, M36 human difficulty playtest and M39 sixth-slot phone safe-area/touch/readability.
+- Progress: 738 / 980 = 75.31%. M42-C001 independent audit closed 25 checklist rows; 8 rows remain open only on owner/device gates.
+- Note: M42-C001 batch verdict: 25 AUDITED_PASS, 8 CODE_AUDIT_PASS with external gates, 0 CHANGES_REQUIRED. Summary: `coordination/sessions/M42-C001/CHATGPT_BATCH_AUDIT_V01.md`. Open M42 rows: 011, 014, 016, 017, 018, 030, 032, 033. Separate pre-existing gates remain M34 real-device haptics, M36 human difficulty playtest and M39 sixth-slot phone safe-area/touch/readability.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1526,46 +1526,48 @@ Evidence:
 
 ### M42 — Home / Navigation
 
-M42-C001 execution bundle published:
-- master: `coordination/sessions/M42-C001/CHATGPT_MASTER_PROMPT_V01.md`
-- prompts: `coordination/sessions/M42-C001/task_prompts/SB-M42-001.md` .. `SB-M42-033.md`
-- strict audit criteria: `coordination/sessions/M42-C001/audit_criteria/SB-M42-001.md` .. `SB-M42-033.md`
+M42-C001 V01 independent batch audit:
+`coordination/sessions/M42-C001/CHATGPT_BATCH_AUDIT_V01.md`
 
-Claude executes sequentially and publishes separate task logs; ChatGPT audits each task afterward. SB-M42-030 remains an explicit owner design gate and is not to be invented. SB-M42-032 requires real Android-device evidence for full closure.
+Batch result: **25 AUDITED_PASS / 8 CODE_AUDIT_PASS WITH EXTERNAL GATES / 0 CHANGES_REQUIRED**.
 
+Individual audit files:
+`coordination/sessions/M42-C001/audits/SB-M42-001_CHATGPT_AUDIT_V01.md` .. `SB-M42-033_CHATGPT_AUDIT_V01.md`.
 
-- [ ] SB-M42-001 Navigation architecture. — [ ] SB-M42-002 Home.
-- [ ] SB-M42-003 Play/Continue. — [ ] SB-M42-004 Settings.
-- [ ] SB-M42-005 Level select if approved.
-- [ ] SB-M42-006 Gameplay transition. — [ ] SB-M42-007 Results transition.
-- [ ] SB-M42-008 Prevent duplicate transitions. — [ ] SB-M42-009 Back navigation.
-- [ ] SB-M42-010 Build Home as responsive Godot containers/components.
-- [ ] SB-M42-011 Recreate owner-approved Home art direction with canonical regions.
-- [ ] SB-M42-012 Keep shortcut columns responsive around central area.
-- [ ] SB-M42-013 Validate Home-specific manifest entries in `assets/ui/HOME_ASSET_MANIFEST.json` before generation.
-- [ ] SB-M42-014 Generate only Home-specific required illustrative assets using approved provider order (ChatGPT primary, Magnific fallback).
-- [ ] SB-M42-015 Keep dynamic values/timers/counts/labels live in Godot UI.
-- [ ] SB-M42-016 Require owner approval before production promotion.
-- [ ] SB-M42-017 Bind approved art and validate viewport matrix.
-- [ ] SB-M42-018 Replace coin HUD semantics with Scrub Bucks banknote icon + live SB amount.
-- [ ] SB-M42-019 Replace profile XP bar with live Bot Parts next-robot progress (normally N/250).
-- [ ] SB-M42-020 Replace top event bar/timer with Gift Meter progress/next milestone; no Event Points/timer.
-- [ ] SB-M42-021 Bind Gift Bar to queued Gift Meter milestone claims and live claimable count.
-- [ ] SB-M42-022 Replace Star Exchange shortcut with Cards Exchange and duplicate-card count/state.
-- [ ] SB-M42-023 Render lower road as Win Streak SB reward track 1/5/10/25/100; no Star balance.
-- [ ] SB-M42-024 Implement Daily consecutive-login count / 5-day cycle / booster reward presentation.
-- [ ] SB-M42-025 Keep all SB prices, Bot Parts values, Gift Meter values and Daily states live/localizable.
+No remediation is open. Remaining rows are owner/device gates only.
+
+- [x] SB-M42-001 Navigation architecture. — [x] SB-M42-002 Home.
+- [x] SB-M42-003 Play/Continue. — [x] SB-M42-004 Settings.
+- [x] SB-M42-005 Level select if approved. `[OWNER-LOCKED: NO SHIPPING LEVEL SELECT]`
+- [x] SB-M42-006 Gameplay transition. — [x] SB-M42-007 Results transition.
+- [x] SB-M42-008 Prevent duplicate transitions. — [x] SB-M42-009 Back navigation.
+- [x] SB-M42-010 Build Home as responsive Godot containers/components.
+- [ ] SB-M42-011 Recreate owner-approved Home art direction with canonical regions. `[CODE_AUDIT_PASS / OWNER_VISUAL_REVIEW_REQUIRED]`
+- [x] SB-M42-012 Keep shortcut columns responsive around central area.
+- [x] SB-M42-013 Validate Home-specific manifest entries in `assets/ui/HOME_ASSET_MANIFEST.json` before generation.
+- [ ] SB-M42-014 Generate only Home-specific required illustrative assets using approved provider order (ChatGPT primary, Magnific fallback). `[CODE_AUDIT_PASS / OWNER_ASSET_APPROVAL_REQUIRED]`
+- [x] SB-M42-015 Keep dynamic values/timers/counts/labels live in Godot UI.
+- [ ] SB-M42-016 Require owner approval before production promotion. `[CODE_AUDIT_PASS / OWNER_ASSET_APPROVAL_REQUIRED]`
+- [ ] SB-M42-017 Bind approved art and validate viewport matrix. `[CODE_AUDIT_PASS / OWNER_ASSET_APPROVAL_REQUIRED / OWNER_VISUAL_REVIEW_REQUIRED]`
+- [ ] SB-M42-018 Replace coin HUD semantics with Scrub Bucks banknote icon + live SB amount. `[CODE_AUDIT_PASS / OWNER_ASSET_APPROVAL_REQUIRED]`
+- [x] SB-M42-019 Replace profile XP bar with live Bot Parts next-robot progress (normally N/250).
+- [x] SB-M42-020 Replace top event bar/timer with Gift Meter progress/next milestone; no Event Points/timer.
+- [x] SB-M42-021 Bind Gift Bar to queued Gift Meter milestone claims and live claimable count.
+- [x] SB-M42-022 Replace Star Exchange shortcut with Cards Exchange and duplicate-card count/state.
+- [x] SB-M42-023 Render lower road as Win Streak SB reward track 1/5/10/25/100; no Star balance.
+- [x] SB-M42-024 Implement Daily consecutive-login count / 5-day cycle / booster reward presentation.
+- [x] SB-M42-025 Keep all SB prices, Bot Parts values, Gift Meter values and Daily states live/localizable.
 
 **Opening cinematic / boot flow [OWNER ASSET — 2026-09-19]**
 
-- [ ] SB-M42-026 Opening cinematic source: preserve the owner-supplied 15-second source video at `assets/brand/opening/final_15_seconds_opening_video.mp4` (local source currently intended from `C:\Users\sekip\Desktop\ScrubBots\assets\brand\final 15 seconds opening video.mp4`).
-- [ ] SB-M42-027 Preserve the MP4 as source/reference, but create a Godot-runtime Ogg Theora + Vorbis version at `assets/brand/opening/scrubbots_opening_720p30.ogv`; do not rely on H.264/MP4 playback in core Godot.
-- [ ] SB-M42-028 Implement a dedicated opening-video scene using `VideoStreamPlayer`, with aspect-ratio-safe presentation for the portrait app and no image distortion.
-- [ ] SB-M42-029 On successful video completion, transition exactly once into the normal Home/bootstrap flow; failure to decode/play must fail safely into Home rather than blocking startup.
-- [ ] SB-M42-030 Decide and implement skip behavior `[DESIGN GATE]`: recommended V1 is tap/Skip to bypass the cinematic without affecting save/game state.
-- [ ] SB-M42-031 Decide playback frequency `[DESIGN GATE]`: recommended V1 is once per cold app launch, not on every internal scene transition/retry.
-- [ ] SB-M42-032 Validate opening cinematic on Android real device for smooth 720p/30 playback, audio sync, startup latency, orientation, background/foreground behavior and memory cleanup.
-- [ ] SB-M42-033 Validate iOS readiness later with the same boot-flow fallback and aspect rules.
+- [x] SB-M42-026 Opening cinematic source: preserve the owner-supplied 15-second source video at `assets/brand/opening/final_15_seconds_opening_video.mp4`.
+- [x] SB-M42-027 Preserve the MP4 as source/reference, but create a Godot-runtime Ogg Theora + Vorbis version at `assets/brand/opening/scrubbots_opening_720p30.ogv`; do not rely on H.264/MP4 playback in core Godot.
+- [x] SB-M42-028 Implement a dedicated opening-video scene using `VideoStreamPlayer`, with aspect-ratio-safe presentation for the portrait app and no image distortion.
+- [x] SB-M42-029 On successful video completion, transition exactly once into the normal Home/bootstrap flow; failure to decode/play must fail safely into Home rather than blocking startup.
+- [ ] SB-M42-030 Decide and implement skip behavior `[DESIGN GATE]`. `[CODE_AUDIT_PASS / OWNER_DECISION_REQUIRED]`
+- [x] SB-M42-031 Decide playback frequency `[OWNER-LOCKED]`: once per cold/native app launch; no replay for internal navigation/retry/background resume.
+- [ ] SB-M42-032 Validate opening cinematic on Android real device for smooth 720p/30 playback, audio sync, startup latency, orientation, background/foreground behavior and memory cleanup. `[CODE_AUDIT_PASS / DEVICE_OWNER_REQUIRED]`
+- [ ] SB-M42-033 Validate iOS readiness later with the same boot-flow fallback and aspect rules. `[CODE_AUDIT_PASS / IOS_DEVICE_LATER]`
 
 ### M43 — Results Screen
 
