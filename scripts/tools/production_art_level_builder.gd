@@ -23,7 +23,7 @@ extends RefCounted
 ## importer semantics and never mutates the source PNG.
 ##
 ## Palette authority is the machine-readable
-## `data/palettes/scrubbots_palette_v2.json` — never a parallel hardcoded table
+## `data/palettes/scrubbots_palette_v3.json` — never a parallel hardcoded table
 ## (docs/08_PIXEL_ART_PALETTE_RULES.md).
 ##
 ## Production-art rules enforced (docs/08_PIXEL_ART_PALETTE_RULES.md):
@@ -40,7 +40,7 @@ const ProductionLevelValidator = preload("res://scripts/data/production_level_va
 const DifficultyRules = preload("res://scripts/data/difficulty_rules.gd")
 
 const BUILDER_VERSION := "M21-C001/v1"
-const PALETTE_AUTHORITY_PATH := "res://data/palettes/scrubbots_palette_v2.json"
+const PALETTE_AUTHORITY_PATH := "res://data/palettes/scrubbots_palette_v3.json"
 
 ## M21 LEGACY compatibility color-count gate ONLY (see
 ## coordination/sessions/M21-C001/OWNER_DIFFICULTY_V1_SCOPE_NOTE.md). Under

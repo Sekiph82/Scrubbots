@@ -1,0 +1,59 @@
+{
+  "schema": "scrubbots-global-palette/v3",
+  "version": 3,
+  "ownerLocked": true,
+  "lockedAt": "2026-09-25",
+  "difficultySemanticsUpdatedAt": "2026-09-12",
+  "description": "Canonical owner-locked 16-color logical cell palette for SCRUBBOTS production pixel artwork. V3 adopts an exact 16-color subset of the Alpix fixed 32-color palette so Alpix-authored logical pixel grids can be canonical without post-generation color quantization.",
+  "source": {
+    "kind": "ALPIX_FIXED_PALETTE_SUBSET",
+    "upstreamRepository": "https://github.com/alpic-ai/alpix",
+    "upstreamCommit": "08525cfd4cf5101cf801345daf5a45a694da58d2",
+    "upstreamPath": "packages/component/src/palette.ts",
+    "license": "MIT",
+    "selectionLockedAt": "2026-09-25"
+  },
+  "colors": [
+    {"id":"C01","index":0,"name":"Orange Red","alpixName":"orange_red","hex":"#FF4500","rgb":[255,69,0]},
+    {"id":"C02","index":1,"name":"Orange","alpixName":"orange","hex":"#FFA800","rgb":[255,168,0]},
+    {"id":"C03","index":2,"name":"Yellow","alpixName":"yellow","hex":"#FFD635","rgb":[255,214,53]},
+    {"id":"C04","index":3,"name":"Green","alpixName":"green","hex":"#00CC78","rgb":[0,204,120]},
+    {"id":"C05","index":4,"name":"Light Teal","alpixName":"light_teal","hex":"#00CCC0","rgb":[0,204,192]},
+    {"id":"C06","index":5,"name":"Light Blue","alpixName":"light_blue","hex":"#51E9F4","rgb":[81,233,244]},
+    {"id":"C07","index":6,"name":"Blue","alpixName":"blue","hex":"#3690EA","rgb":[54,144,234]},
+    {"id":"C08","index":7,"name":"Dark Blue","alpixName":"dark_blue","hex":"#2450A4","rgb":[36,80,164]},
+    {"id":"C09","index":8,"name":"Periwinkle","alpixName":"periwinkle","hex":"#6A5CFF","rgb":[106,92,255]},
+    {"id":"C10","index":9,"name":"Pink","alpixName":"pink","hex":"#FF3881","rgb":[255,56,129]},
+    {"id":"C11","index":10,"name":"Brown","alpixName":"brown","hex":"#9C6926","rgb":[156,105,38]},
+    {"id":"C12","index":11,"name":"Pale Yellow","alpixName":"pale_yellow","hex":"#FFF8B8","rgb":[255,248,184]},
+    {"id":"C13","index":12,"name":"Light Gray","alpixName":"light_gray","hex":"#D4D7D9","rgb":[212,215,217]},
+    {"id":"C14","index":13,"name":"Dark Gray","alpixName":"dark_gray","hex":"#515252","rgb":[81,82,82]},
+    {"id":"C15","index":14,"name":"White","alpixName":"white","hex":"#FFFFFF","rgb":[255,255,255]},
+    {"id":"C16","index":15,"name":"Black","alpixName":"black","hex":"#000000","rgb":[0,0,0]}
+  ],
+  "productionRules": {
+    "offPaletteLogicalCellColors": "FORBIDDEN",
+    "activeCellAlpha": 255,
+    "clearedRuntimeAlpha": 0,
+    "clearedIsPaletteColor": false,
+    "backgroundIsPaletteColor": false,
+    "presentationGridOrBorderIsPaletteColor": false,
+    "localLevelPalette": "Subset of C01..C16 containing only canonical colors actually used by logical cells, ordered by ascending C-ID.",
+    "colorCountDefinition": "Distinct canonical logical cell colors actually referenced by artwork cells. Excludes CLEARED transparency, gameplay background, and presentation grid/border overlays.",
+    "usedColorEnvelopeV1": {"min":3,"max":12},
+    "difficultyClassDerivedFromColorCount": false,
+    "difficultyModel": "data/config/difficulty_score_model_v1.json",
+    "difficultyDesign": "docs/09_DIFFICULTY_PROGRESSION_RETENTION_SYSTEM.md",
+    "supersededDifficultyColorCountBands": "Historical EASY 3-5 / MEDIUM 6-7 / HARD 8-9 / VERY_HARD 10-12 bands are not V1 class-legality rules."
+  },
+  "gameplayBackground": {
+    "id":"BG01",
+    "name":"Midnight Slate",
+    "hex":"#202533",
+    "rgb":[32,37,51],
+    "role":"Production gameplay background visible through CLEARED alpha-0 cells.",
+    "pixelArtPaletteColor":false,
+    "countsTowardLevelColorTotal":false,
+    "ownerLocked":true
+  }
+}
