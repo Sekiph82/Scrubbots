@@ -6,7 +6,7 @@ extends SceneTree
 
 const V = preload("res://scripts/tools/home_asset_manifest_validator.gd")
 
-var EXPECTED_CASES := ["manifest_valid", "manifest_adversarial", "generation_inventory"]
+var EXPECTED_CASES := ["manifest_valid", "manifest_adversarial", "generation_inventory", "lifecycle_gate"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -16,6 +16,7 @@ func _initialize() -> void:
 	_manifest_valid()
 	_manifest_adversarial()
 	_generation_inventory()
+	_lifecycle_gate()
 	_done()
 
 func _manifest_valid() -> void:
@@ -107,6 +108,42 @@ func _generation_inventory() -> void:
 	_ok(sizes_ok, "existing targets are real images (> 1 KiB)")
 	_ok(approved == 0, "none approved -> OWNER_ASSET_APPROVAL_REQUIRED before binding")
 	_complete("generation_inventory")
+
+const HomeArtBinder = preload("res://scripts/ui/home/home_art_binder.gd")
+
+## SB-M42-016: only owner-APPROVED, hash-pinned final assets can bind.
+func _lifecycle_gate() -> void:
+	print("[lifecycle gate]")
+	var b = HomeArtBinder.new()
+	_ok(b.is_manifest_valid() and b.summary() == {"NOT_APPROVED": 50}, "real manifest: all 50 ART entries NOT_APPROVED (%s)" % str(b.summary()))
+	var any_tex := false
+	for a in V.load_manifest()["assets"]:
+		if a["kind"] == "ART" and b.texture(a["slug"]) != null:
+			any_tex = true
+	_ok(not any_tex, "no Home texture binds while unapproved")
+	_ok(b.state("nope") == "UNKNOWN" and b.texture("nope") == null, "unknown slug -> null")
+	var m = V.load_manifest()
+	m["assets"][0]["status"] = "APPROVED"
+	m["assets"][0]["approved_sha256"] = FileAccess.get_sha256("res://" + m["assets"][0]["path"])
+	var b2 = HomeArtBinder.new(m)
+	_ok(b2.state("home_bg_sky") == "APPROVED_BOUND" and b2.texture("home_bg_sky") != null, "owner-approved + hash-pinned asset binds")
+	_ok(not b2.can_write(m["assets"][0]["path"]) and b2.can_write(m["assets"][1]["path"]), "approved final path is write-protected; unapproved is not")
+	var m3 = V.load_manifest()
+	m3["assets"][0]["status"] = "APPROVED"
+	m3["assets"][0]["approved_sha256"] = "f".repeat(64)
+	var b3 = HomeArtBinder.new(m3)
+	_ok(b3.texture("home_bg_sky") == null and not b3.is_manifest_valid(), "silently changed approved file -> manifest invalid, nothing binds")
+	var m4 = V.load_manifest()
+	m4["assets"][0]["status"] = "APPROVED"
+	m4["assets"][0]["path"] = "assets/ui/generated/home/home_bg_sky.png"
+	var b4 = HomeArtBinder.new(m4)
+	_ok(b4.texture("home_bg_sky") == null and b4.state("home_bg_sky") == "MANIFEST_INVALID", "generated candidate path can never bind")
+	var m5 = V.load_manifest()
+	m5["assets"][2]["id"] = m5["assets"][1]["id"]
+	m5["assets"][0]["status"] = "APPROVED"
+	m5["assets"][0]["approved_sha256"] = FileAccess.get_sha256("res://" + m5["assets"][0]["path"])
+	_ok(HomeArtBinder.new(m5).texture("home_bg_sky") == null, "any manifest error blocks all binding")
+	_complete("lifecycle_gate")
 
 func _complete(c: String) -> void:
 	_completed[c] = true
