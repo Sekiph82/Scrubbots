@@ -17,7 +17,7 @@ var EXPECTED_CASES := [
 	"play_cta_fresh", "continue_cta_frontier",
 	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
 	"shortcut_columns_responsive", "live_binding", "approved_art_only", "scrub_bucks_chip",
-	"bot_parts_progress", "gift_meter_semantics", "gift_bar_claims",
+	"bot_parts_progress", "gift_meter_semantics", "gift_bar_claims", "cards_exchange_presentation",
 ]
 
 var _fail := 0
@@ -41,6 +41,7 @@ func _initialize() -> void:
 	await _bot_parts_progress()
 	await _gift_meter_semantics()
 	await _gift_bar_claims()
+	await _cards_exchange_presentation()
 	_cleanup()
 	_done()
 
@@ -504,6 +505,38 @@ func _gift_bar_claims() -> void:
 	var src := FileAccess.get_file_as_string("res://scripts/ui/home/home_screen.gd")
 	_ok(src.find("wallet.credit") == -1 and src.find("reward.grant") == -1, "Home code never credits/grants directly")
 	_complete("gift_bar_claims")
+
+## SB-M42-022: Cards Exchange = live duplicate count/value, presentation only.
+func _cards_exchange_presentation() -> void:
+	print("[cards exchange presentation]")
+	var app = AppState.new(_uniq("cards"))
+	var sub := _sub(Vector2i(1080, 2160))
+	var home = HomeScreenScene.instantiate()
+	sub.add_child(home)
+	home.bind(app)
+	await process_frame
+	var e = app.economy
+	var sc = home.get_region("Shortcut_cards_exchange")
+	_ok(not sc.disabled and not sc.badge.visible and sc.text == "CARDS EXCHANGE", "CARDS EXCHANGE shortcut live, no badge without duplicates")
+	var ids: Array = e.collection.all_card_ids()
+	e.collection.add_copies(ids[0], 3)
+	e.collection.add_copies(ids[5], 2)
+	home.refresh()
+	var want := 0
+	var want_sb := 0
+	for cid in ids:
+		want += e.exchange.exchangeable(cid)
+		want_sb += e.exchange.exchangeable(cid) * e.exchange.card_value(cid)
+	_ok(want > 0 and sc.badge.text == str(want), "badge = live exchangeable duplicate count %d" % want)
+	var snap: Dictionary = e.snapshot()
+	sc.pressed.emit()
+	var popup = home.get_popup("cards_exchange")
+	_ok(popup.visible and popup.get_row_count() == 2 and popup.get_note().find("%d SB" % want_sb) != -1, "popup lists duplicate cards and their canonical SB value (%s)" % popup.get_note())
+	_ok(popup.find_children("Action_*", "", true, false).is_empty(), "no exchange execution button (presentation only)")
+	_ok(e.snapshot() == snap, "opening Cards Exchange mutates nothing")
+	_ok(popup.get_title() == "CARDS EXCHANGE" and popup.get_note().to_lower().find("star") == -1, "no Star balance/semantics")
+	sub.free()
+	_complete("cards_exchange_presentation")
 
 # ---------------------------------------------------------------- helpers ----
 
