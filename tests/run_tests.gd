@@ -12242,9 +12242,9 @@ func _v11_g05_reservation_rollback_reverse_identity() -> void:
 const M21_SOURCE := "res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png"
 const M21_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 const M21_PREVIEW := "res://assets/art/levels/previews/m21_level_001_hazard_bot.png"
-const M21_BLOB_SHA1 := "b565743ba52699899007882b750b7c8e7cdd00f9"
-const M21_SHA256 := "ede1e02a9096c4c7ba040b91ed7db2d2c2af3b2e20d5c8774068c8d08ad59899"
-const M21_EXPECTED_HEX := ["#E94B4BFF", "#F2C94CFF", "#3451A3FF", "#956447FF", "#000000FF"]
+const M21_BLOB_SHA1 := "4af4a2d4438191cfb05a5d3a119c0c55e406e2e4"  # palette v3 source (d6bb8df metadata)
+const M21_SHA256 := "34dfa3548b6c73b7ca3bfaaadb67388c0073595b049ca32466af4b12d6d71530"
+const M21_EXPECTED_HEX := ["#FF4500FF", "#FFD635FF", "#2450A4FF", "#9C6926FF", "#000000FF"]
 
 func _m21_load_source() -> Image:
 	var img := Image.new()
@@ -12273,7 +12273,7 @@ func _run_m21_source_audit_tests() -> void:
 	_check_eq(img.get_width() * img.get_height(), 400, "M21 source: 400 logical pixels")
 	_check_eq(ProductionArtLevelBuilder._git_blob_sha1_file(M21_SOURCE), M21_BLOB_SHA1, "M21 source: git blob SHA1 matches owner approval")
 	_check_eq(ProductionArtLevelBuilder._sha256_file(M21_SOURCE), M21_SHA256, "M21 source: SHA-256 matches owner approval")
-	_check_eq(FileAccess.get_file_as_bytes(M21_SOURCE).size(), 297, "M21 source: 297 bytes")
+	_check_eq(FileAccess.get_file_as_bytes(M21_SOURCE).size(), 279, "M21 source: 279 bytes (palette v3 source)")
 
 	var auth = ProductionArtLevelBuilder.load_palette_authority()
 	_check(auth != null, "M21 source: palette authority loads")
@@ -12345,23 +12345,23 @@ func _run_m21_production_art_bridge_tests() -> void:
 
 	# --- negatives ---
 	# off-palette color
-	var off_pal := PackedStringArray(["#123456FF", "#3451A3FF", "#000000FF"])
+	var off_pal := PackedStringArray(["#123456FF", "#2450A4FF", "#000000FF"])
 	var off_cells := PackedInt32Array([0, 1, 2, 0, 1, 2])
 	var off_ld = LevelData.new(1, "neg_off", "neg", "EASY", 3, 2, off_pal, off_cells)
 	_check(not ProductionArtLevelBuilder.normalize_from_level_data(off_ld, "EASY").is_ok(), "M21 bridge: off-palette color rejected (no nearest-color)")
 	# semi-transparent alpha
-	var semi_pal := PackedStringArray(["#E94B4B80", "#3451A3FF", "#000000FF"])
+	var semi_pal := PackedStringArray(["#FF450080", "#2450A4FF", "#000000FF"])
 	var semi_ld = LevelData.new(1, "neg_semi", "neg", "EASY", 3, 2, semi_pal, off_cells)
 	_check(not ProductionArtLevelBuilder.normalize_from_level_data(semi_ld, "EASY").is_ok(), "M21 bridge: semi-transparent alpha rejected")
 	# wrong EASY color count (6 distinct > 5)
-	var six_pal := PackedStringArray(["#E94B4BFF", "#F28C3CFF", "#F2C94CFF", "#55B85AFF", "#63D6A3FF", "#42C7D9FF"])
+	var six_pal := PackedStringArray(["#FF4500FF", "#FFA800FF", "#FFD635FF", "#00CC78FF", "#00CCC0FF", "#51E9F4FF"])
 	var six_cells := PackedInt32Array([0, 1, 2, 3, 4, 5])
 	var six_ld = LevelData.new(1, "neg_six", "neg", "EASY", 3, 2, six_pal, six_cells)
 	_check(not ProductionArtLevelBuilder.normalize_from_level_data(six_ld, "EASY").is_ok(), "M21 bridge: EASY 6-color count rejected by legacy compat band 3-5 (M21 compatibility gate, not a V1 class law)")
 	# noncanonical local order -> normalized deterministically to ascending.
 	# Use a valid 20x20 EASY board (3 distinct colors) so only palette ORDER,
 	# not dimensions/count, is under test.
-	var noncanon_pal := PackedStringArray(["#000000FF", "#E94B4BFF", "#3451A3FF"])  # C16,C01,C08
+	var noncanon_pal := PackedStringArray(["#000000FF", "#FF4500FF", "#2450A4FF"])  # C16,C01,C08
 	var noncanon_cells := PackedInt32Array()
 	noncanon_cells.resize(400)
 	for ni in range(400):
@@ -12592,17 +12592,17 @@ func _run_m21_v02_difficulty_identity_tests() -> void:
 	_check(not mism.is_ok(), "V02 F-001: mismatched difficulty rejected")
 	_check(_m21_err_has(mism, "must equal raw.difficulty"), "V02 F-001: rejection reason is difficulty identity (load-bearing)")
 	# TEST fixture (otherwise structurally fine) rejected by the boundary (crit 22/26).
-	var test_ld = LevelData.new(1, "v02_test", "t", "TEST", 3, 2, PackedStringArray(["#E94B4BFF", "#3451A3FF", "#000000FF"]), PackedInt32Array([0, 1, 2, 0, 1, 2]))
+	var test_ld = LevelData.new(1, "v02_test", "t", "TEST", 3, 2, PackedStringArray(["#FF4500FF", "#2450A4FF", "#000000FF"]), PackedInt32Array([0, 1, 2, 0, 1, 2]))
 	var test_r := ProductionArtLevelBuilder.normalize_from_level_data(test_ld, "TEST")
 	_check(not test_r.is_ok(), "V02 F-001: TEST difficulty rejected")
 	_check(_m21_err_has(test_r, "TEST"), "V02 F-001: TEST rejection is explicit")
 	# Unknown difficulty rejected (crit 23/27).
-	var unk_ld = LevelData.new(1, "v02_unk", "u", "SUPERHARD", 3, 2, PackedStringArray(["#E94B4BFF", "#3451A3FF", "#000000FF"]), PackedInt32Array([0, 1, 2, 0, 1, 2]))
+	var unk_ld = LevelData.new(1, "v02_unk", "u", "SUPERHARD", 3, 2, PackedStringArray(["#FF4500FF", "#2450A4FF", "#000000FF"]), PackedInt32Array([0, 1, 2, 0, 1, 2]))
 	var unk_r := ProductionArtLevelBuilder.normalize_from_level_data(unk_ld, "SUPERHARD")
 	_check(not unk_r.is_ok(), "V02 F-001: unknown difficulty rejected")
 	_check(_m21_err_has(unk_r, "Unknown production difficulty"), "V02 F-001: unknown rejection is explicit")
 	# Empty difficulty rejected.
-	var emp_ld = LevelData.new(1, "v02_emp", "e", "", 3, 2, PackedStringArray(["#E94B4BFF", "#3451A3FF", "#000000FF"]), PackedInt32Array([0, 1, 2, 0, 1, 2]))
+	var emp_ld = LevelData.new(1, "v02_emp", "e", "", 3, 2, PackedStringArray(["#FF4500FF", "#2450A4FF", "#000000FF"]), PackedInt32Array([0, 1, 2, 0, 1, 2]))
 	_check(not ProductionArtLevelBuilder.normalize_from_level_data(emp_ld, "").is_ok(), "V02 F-001: empty difficulty rejected")
 
 ## F-M21-STRICT-002: arbitrary Variant / malformed raw fails closed before deref.
