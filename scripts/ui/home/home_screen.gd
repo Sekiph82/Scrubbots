@@ -35,6 +35,17 @@ const UiProgressMeter = preload("res://scripts/ui/components/ui_progress_meter.g
 const UiShortcutButton = preload("res://scripts/ui/components/ui_shortcut_button.gd")
 const HomeViewModel = preload("res://scripts/ui/home/home_view_model.gd")
 const HomeArtBinder = preload("res://scripts/ui/home/home_art_binder.gd")
+const HomePopup = preload("res://scripts/ui/home/home_popup.gd")
+
+## Shortcuts with a V1 Home destination (popup). Others belong to later milestones and
+## are shown disabled.
+const LIVE_SHORTCUTS := ["gift_bar"]
+## Friendly names for canonical reward-bundle keys (presentation only).
+const REWARD_NAMES := {
+	"scrub_bucks": "SB", "bot_parts": "Bot Parts", "standard_card_packs": "Card Pack",
+	"premium_card_packs": "Premium Pack", "random_booster_charges": "Random Booster",
+	"selected_booster_charges": "Booster of choice", "guaranteed_new_cards": "New Card",
+}
 
 ## SB-M42-017: manifest slug -> Home node that may display it once owner-approved.
 const LAYER_ART := {
@@ -84,6 +95,7 @@ var _launch: Dictionary = {}
 ## never read back as truth; every refresh re-reads the canonical services.
 var _vm: Dictionary = {}
 var _art = null
+var _popups: Dictionary = {}   ## id -> HomePopup (presentation only)
 var _tick: Timer
 
 func _ready() -> void:
@@ -275,7 +287,9 @@ func _build_shortcuts(column: VBoxContainer, specs: Array) -> void:
 	for spec in specs:
 		var b := UiShortcutButton.new(spec[0], spec[1])
 		var id: String = spec[0]
-		b.pressed.connect(func(): shortcut_requested.emit(id))
+		b.pressed.connect(func():
+			shortcut_requested.emit(id)
+			open_popup(id))
 		column.add_child(b)
 		_nodes["Shortcut_" + id] = b
 
@@ -393,6 +407,11 @@ func _render_values() -> void:
 	(_nodes["Shortcut_gift_bar"] as UiShortcutButton).set_badge(_vm["gift_claimable"])
 	(_nodes["Shortcut_cards_exchange"] as UiShortcutButton).set_badge(_vm["cards_duplicates"])
 	(_nodes["Shortcut_daily"] as UiShortcutButton).set_badge(_vm["daily_cycle_day"])
+	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
+		(_nodes["Shortcut_" + id[0]] as Button).disabled = not LIVE_SHORTCUTS.has(id[0])
+	for pid in _popups:
+		if (_popups[pid] as Control).visible:
+			_render_popup(pid)
 
 ## 1234567 -> "1,234,567" (moved behind the localization seam in SB-M42-025).
 static func _group_digits(n: int) -> String:
@@ -403,6 +422,73 @@ static func _group_digits(n: int) -> String:
 		out = "," + d.substr(d.length() - 3) + out
 		d = d.substr(0, d.length() - 3)
 	return ("-" if neg else "") + d + out
+
+
+# ------------------------------------------------------------- popups ----
+
+## Open the Home popup for a live shortcut. Returns the popup or null.
+func open_popup(id: String):
+	if not LIVE_SHORTCUTS.has(id) or _app == null:
+		return null
+	if not _popups.has(id):
+		var p := HomePopup.new(id)
+		p.action_pressed.connect(_on_popup_action.bind(id))
+		add_child(p)
+		_popups[id] = p
+	var popup: HomePopup = _popups[id]
+	move_child(popup, get_child_count() - 1)
+	popup.show()
+	_render_popup(id)
+	return popup
+
+func get_popup(id: String):
+	return _popups.get(id)
+
+## Close the topmost visible popup (back navigation). True when one was closed.
+func close_top_popup() -> bool:
+	for pid in _popups:
+		if (_popups[pid] as Control).visible:
+			(_popups[pid] as HomePopup).close_popup()
+			return true
+	return false
+
+func _render_popup(id: String) -> void:
+	var popup: HomePopup = _popups[id]
+	match id:
+		"gift_bar":
+			_render_gift_bar(popup)
+
+## SB-M42-021: queued Gift Meter milestone rewards from GiftMeterService.claimable();
+## CLAIM goes through the canonical action facade (idempotent by occurrence id, saves).
+func _render_gift_bar(popup: HomePopup) -> void:
+	var rows: Array = []
+	for occ in _app.economy.gift.claimable():
+		var rewards: Dictionary = _app.economy.config.gift_meter_milestone(int(occ["milestone"]))
+		rows.append({"text": "GIFT %d · %s" % [int(occ["milestone"]), _reward_text(rewards)],
+			"action_id": String(occ["id"]), "action_text": "CLAIM", "action_enabled": not _app.is_blocked})
+	var note := ""
+	if rows.is_empty():
+		note = "No gifts to claim. Win levels in a row to fill the Gift Meter."
+	elif _app.is_blocked:
+		note = "Claims are unavailable while the save is read-only."
+	popup.set_content("GIFTS", rows, note)
+
+func _on_popup_action(action_id: String, popup_id: String) -> void:
+	if _app == null or _app.is_blocked:
+		return
+	match popup_id:
+		"gift_bar":
+			_app.actions.claim_gift(action_id)
+	refresh()
+
+static func _reward_text(rewards: Dictionary) -> String:
+	var parts: Array = []
+	var keys: Array = rewards.keys()
+	keys.sort()
+	for k in keys:
+		if int(rewards[k]) > 0:
+			parts.append("%s x%d" % [REWARD_NAMES.get(k, k), int(rewards[k])])
+	return ", ".join(parts)
 
 static func _mmss(seconds: int) -> String:
 	return "%02d:%02d" % [seconds / 60, seconds % 60]
