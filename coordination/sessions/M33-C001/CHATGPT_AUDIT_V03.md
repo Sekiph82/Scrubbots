@@ -1,7 +1,7 @@
 # M33-C001 V03 — ChatGPT Independent Audit
 
 Date: 2026-09-25
-Verdict: **CODE_AUDIT_PASS / OWNER_F6_REQUIRED**
+Verdict: **AUDITED_PASS / OWNER_F6_PASS / M33 AUDIO CLOSED**
 
 Implementation: `18020ef`
 Claude log: `coordination/sessions/M33-C001/CLAUDE_LOG_V03.md`
@@ -79,3 +79,22 @@ Workshop music is a separate owner-approved future asset and is outside M33 game
 
 Verdict string:
 `CODE_AUDIT_PASS / M33-C001 V03 / OWNER_F6_REQUIRED`
+
+
+## Owner F6 closure — 2026-09-25
+
+Owner completed `res://scenes/debug/m33_audio_playtest.tscn` and accepted:
+- loop seam: no audible click/gap;
+- music/cleaning balance: acceptable;
+- cleaning readability: acceptable;
+- Music/SFX/Master isolation: correct;
+- no music restart on Retry/2x/cleaning;
+- repeated listening: not fatiguing.
+
+Owner acceptance record:
+`coordination/OWNER_M33_FINAL_AUDIO_ACCEPTANCE_V01.md`
+
+M33 is fully closed.
+
+Final verdict string:
+`AUDITED_PASS / OWNER_F6_PASS / M33 AUDIO CLOSED`

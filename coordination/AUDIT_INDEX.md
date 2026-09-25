@@ -285,3 +285,7 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 
 | AL-096 | Audio auto-start must be validated on the real scene lifecycle, not only by manually calling start() | M33 V02 manually injected/started music in tests, so a parent-_enter_tree timing defect left real gameplay silent while tests were green. | For presentation lifecycle behavior, test the actual production host from scene entry and assert observable PLAYING/start-count state before calling any test seam. | M33-C001 V03 latent auto-start defect, 2026-09-25 |
 | M33-C001 V03 independent audit | coordination/sessions/M33-C001/CHATGPT_AUDIT_V03.md | `CODE_AUDIT_PASS / OWNER_F6_REQUIRED` | Approved Pixel Polish Parade OGG is integrated and auto-starts correctly; only owner listening acceptance remains. |
+
+
+| OWNER M33 final audio acceptance V01 | coordination/OWNER_M33_FINAL_AUDIO_ACCEPTANCE_V01.md | `OWNER_F6_PASS / M33 AUDIO ACCEPTED` | Owner accepted seam, mix balance, bus isolation, no-restart behavior and fatigue after F6 listening. |
+| M33-C001 V03 final closure | coordination/sessions/M33-C001/CHATGPT_AUDIT_V03.md | `AUDITED_PASS / OWNER_F6_PASS / M33 AUDIO CLOSED` | Pixel Polish Parade gameplay integration and owner listening are both complete. |
