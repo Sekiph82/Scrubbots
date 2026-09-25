@@ -1,18 +1,21 @@
 extends Control
-## M33 V02 audio manual playtest. Open
+## M33 V02 / M41 V01 audio + settings manual playtest. Open
 ## res://scenes/debug/m33_audio_playtest.tscn and run it in graphical Godot (F6).
-## Owner F6 re-listening gate (M33 V02) — Claude cannot self-close it.
+## Owner F6 re-listening gate (M33 V02) + Settings manual gate (M41 V01) — Claude cannot
+## self-close either.
 ##
 ## Hosts the REAL production stack (ProductionGameplayHost) on the 20x20 Hazard Bot level with
 ## an injected canonical AppState on an ISOLATED debug save path (never the real player save),
-## so cleaning/completion audio fires from the ACTUAL authoritative events. Debug-only controls:
+## so cleaning/completion audio fires from the ACTUAL authoritative events and the Settings
+## panel drives the same canonical settings graph the shipping app uses. Debug-only controls:
 ##   - AUTO-SOLVE: drain the solved candidate so real clears fire continuously.
 ##   - SPEED 1x/2x: raise real event density; canonical one-shots keep normal pitch.
 ##   - RETRY: transaction-safe retry; stale cleaning/completion voices are stopped.
 ##   - TEST CLEANING / TEST COMPLETION: isolated presentation seams.
 ##   - CLEANING STRESS: burst cleaning requests far beyond the voice cap.
 ##   - MUSIC TEST TONE: DEBUG-ONLY quiet generated sine loop on the Music bus so the Music
-##     bus can be heard before an owner-approved track exists. Not a music asset.
+##     slider/toggle can be heard before an owner-approved track exists. Not a music asset.
+##   - SETTINGS: the M41 Settings panel (Master/Music/SFX sliders+toggles, Vibration).
 ## A live readout shows per-category voice diagnostics and the music controller status.
 ##
 ## Owner F6 checklist (also in coordination/sessions/M33-C001/CLAUDE_LOG_V02.md):
@@ -22,9 +25,12 @@ extends Control
 ##   4. no robot movement loop.
 ##   5. 1x and 2x auto-solve are listenable, not an audio wall.
 ##   6. Music status shows OWNER_MUSIC_SELECTION_REQUIRED until a track is approved.
-##   7. Retry leaves no stale cleaning/completion tail.
+##   7. Settings: Master 0 silences all, Music 0 only music (test tone), SFX 0 only SFX,
+##      toggles mute and restore, values survive closing and relaunching this scene.
+##   8. Retry leaves no stale cleaning/completion tail.
 
 const AppState = preload("res://scripts/app/app_state.gd")
+const SettingsPanelScene = preload("res://scenes/ui/settings_panel.tscn")
 const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/production_gameplay_host.gd")
 const GameplayAudioController = preload("res://scripts/audio/gameplay_audio_controller.gd")
 
@@ -39,12 +45,17 @@ var _auto_btn: Button
 var _speed_btn: Button
 var _vol_label: Label
 var _app
+var _settings_panel
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	_app = AppState.new(DEBUG_SAVE_PATH)
 	_build_host()
 	_build_overlay()
+	_settings_panel = SettingsPanelScene.instantiate()
+	_settings_panel.visible = false
+	add_child(_settings_panel)
+	_settings_panel.bind(_app)
 
 func _build_host() -> void:
 	_host = ProductionGameplayHost.new()
@@ -99,6 +110,7 @@ func _build_overlay() -> void:
 	row3.add_theme_constant_override("separation", 8)
 	bar.add_child(row3)
 	row3.add_child(_make_button("MUSIC TEST TONE", _on_test_tone))
+	row3.add_child(_make_button("SETTINGS", _on_settings))
 
 func _make_button(text: String, cb: Callable) -> Button:
 	var b := Button.new()
@@ -125,8 +137,9 @@ func _process(_delta: float) -> void:
 		_diag.text = "DISPATCH none (owner V02)\nCLEANING %s\nCOMPLETION %s\nMUSIC %s" % [_fmt(c), _fmt(w), String(m.get_status()) if m != null else "-"]
 	var s = _settings()
 	if s != null:
-		_vol_label.text = "master %.2f | music %.2f | sfx %.2f | vibration %s" % [
-			s.get_master_volume(), s.get_music_volume(), s.get_sfx_volume(), _onoff(_app.haptics.is_enabled())]
+		_vol_label.text = "master %.2f %s | music %.2f %s | sfx %.2f %s | vibration %s" % [
+			s.get_master_volume(), _onoff(s.is_master_enabled()), s.get_music_volume(), _onoff(s.is_music_enabled()),
+			s.get_sfx_volume(), _onoff(s.is_sfx_enabled()), _onoff(_app.haptics.is_enabled())]
 	if _auto_solve and _host.get_completion().is_playing():
 		var slots = _host.get_slots()
 		var supply = _host.get_supply()
@@ -197,6 +210,9 @@ func _on_test_tone() -> void:
 	w.data = data
 	m.set_track(w)
 	m.start()
+
+func _on_settings() -> void:
+	_settings_panel.open_panel()
 
 func _exit_tree() -> void:
 	if _app != null:

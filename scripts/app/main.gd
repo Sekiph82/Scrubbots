@@ -17,6 +17,7 @@ const LevelLoader = preload("res://scripts/data/level_loader.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
 const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
 const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/production_gameplay_host.gd")
+const SettingsPanelScene = preload("res://scenes/ui/settings_panel.tscn")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -28,6 +29,8 @@ var app_state = null
 var last_launch: Dictionary = {}
 var last_flush: Dictionary = {}
 var _gameplay_host = null
+## M41 V01 Settings panel bound to THIS canonical AppState (no second settings authority).
+var _settings_panel = null
 
 func _enter_tree() -> void:
 	_boot()
@@ -44,6 +47,31 @@ func _ready() -> void:
 	var status := get_node_or_null("VBoxContainer/StatusLabel")
 	if status != null:
 		status.text = _describe_app_state()
+	_build_settings_entry()
+
+## M41 V01: a native SETTINGS button on the pre-M42 app root opens the Settings panel.
+func _build_settings_entry() -> void:
+	var box := get_node_or_null("VBoxContainer")
+	if box != null:
+		var b := Button.new()
+		b.name = "SettingsButton"
+		b.text = "SETTINGS"
+		b.custom_minimum_size = Vector2(360, 88)
+		b.add_theme_font_size_override("font_size", 34)
+		b.pressed.connect(open_settings)
+		box.add_child(b)
+	_settings_panel = SettingsPanelScene.instantiate()
+	_settings_panel.name = "SettingsPanel"
+	_settings_panel.visible = false
+	add_child(_settings_panel)
+	_settings_panel.bind(app_state)
+
+func open_settings() -> void:
+	if _settings_panel != null:
+		_settings_panel.open_panel()
+
+func get_settings_panel():
+	return _settings_panel
 
 func get_app_state():
 	return app_state

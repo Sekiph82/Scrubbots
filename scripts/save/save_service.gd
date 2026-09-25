@@ -24,6 +24,9 @@ const LevelProgressionService = preload("res://scripts/progression/level_progres
 const EconomyServices = preload("res://scripts/economy/economy_services.gd")
 const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
+## M41 V01 settings.audio on/off keys (optional for pre-M41 saves, default ON).
+const AUDIO_TOGGLE_KEYS := ["master_on", "music_on", "sfx_on"]
+
 var _path: String
 var _audio: AudioSettingsService
 var _haptics: HapticsSettingsService
@@ -64,11 +67,7 @@ func collect() -> Dictionary:
 		"schema": SCHEMA,
 		"version": VERSION,
 		"settings": {
-			"audio": {
-				"master": _audio.get_master_volume(),
-				"music": _audio.get_music_volume(),
-				"sfx": _audio.get_sfx_volume(),
-			},
+			"audio": _audio.snapshot(),
 			"haptics": _haptics.snapshot(),
 		},
 		"progression": _progression.snapshot(),
@@ -102,6 +101,11 @@ func validate_candidate(cand) -> Dictionary:
 			return {"ok": false, "reason": "audio_%s_type" % k}
 		if is_nan(v) or is_inf(v) or v < 0.0 or v > 1.0:
 			return {"ok": false, "reason": "audio_%s_range" % k}
+	# M41 V01 channel toggles. Absent (a save written before M41) => ON; present but not an
+	# exact bool => the whole candidate fails closed (AL-083: no silent normalization).
+	for k in AUDIO_TOGGLE_KEYS:
+		if audio.has(k) and typeof(audio[k]) != TYPE_BOOL:
+			return {"ok": false, "reason": "audio_%s_type" % k}
 	# Removed economies must not appear as authoritative economy state.
 	var economy = cand.get("economy", {})
 	if typeof(economy) != TYPE_DICTIONARY:
@@ -160,6 +164,7 @@ func _apply(cand: Dictionary) -> bool:
 	_audio.set_master_volume(float(audio.get("master", 1.0)))
 	_audio.set_music_volume(float(audio.get("music", 1.0)))
 	_audio.set_sfx_volume(float(audio.get("sfx", 1.0)))
+	_apply_audio_toggles(audio)
 	# strict_import_snapshot is guaranteed to succeed here — validate_candidate
 	# rejected malformed haptics upstream.
 	_haptics.strict_import_snapshot(settings.get("haptics", {}))
@@ -170,9 +175,16 @@ func _apply(cand: Dictionary) -> bool:
 		_economy.import_snapshot(backup["economy"])
 		var ba = backup["settings"]["audio"]
 		_audio.set_master_volume(ba["master"]); _audio.set_music_volume(ba["music"]); _audio.set_sfx_volume(ba["sfx"])
+		_apply_audio_toggles(ba)
 		_haptics.import_snapshot(backup["settings"]["haptics"])
 		return false
 	return true
+
+## Apply validated M41 toggles (validate_candidate already rejected non-bool values).
+func _apply_audio_toggles(audio: Dictionary) -> void:
+	_audio.set_master_enabled(bool(audio.get("master_on", true)))
+	_audio.set_music_enabled(bool(audio.get("music_on", true)))
+	_audio.set_sfx_enabled(bool(audio.get("sfx_on", true)))
 
 # --------------------------------------------------------------- save ----
 

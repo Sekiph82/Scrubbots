@@ -30,6 +30,10 @@ const WON := &"WON"
 enum Category { CLEANING, COMPLETION }
 
 var _enabled: bool = true
+## M41 V01: optional live canonical HapticsSettingsService. When bound, the user's persisted
+## toggle is read at every request, so a Settings change applies immediately without a
+## rebuild. Haptics OFF suppresses vibration only; gameplay is never consulted or mutated.
+var _settings = null
 var _completion_played_this_attempt: bool = false
 var _last_clean_ms: int = -100000
 var _requests_clean: int = 0
@@ -49,8 +53,19 @@ var _platform_total_ms: int = 0
 func set_enabled(v: bool) -> void:
 	_enabled = v
 
+## Bind the live settings service (must expose is_enabled() -> bool). Null unbinds.
+func bind_settings(settings) -> void:
+	_settings = settings if (settings != null and settings.has_method("is_enabled")) else null
+
+## Effective state: the local seam AND (when bound) the user's live setting. A malformed
+## settings answer fails closed to OFF (no vibration) — never a gameplay effect.
 func is_enabled() -> bool:
-	return _enabled
+	if not _enabled:
+		return false
+	if _settings == null:
+		return true
+	var v = _settings.is_enabled()
+	return typeof(v) == TYPE_BOOL and v
 
 # --------------------------------------------------- authoritative observers ----
 
@@ -72,7 +87,7 @@ func _on_terminal_reached(status, _detail) -> void:
 
 func request_cleaning() -> bool:
 	_requests_clean += 1
-	if not _enabled:
+	if not is_enabled():
 		_suppressed_clean += 1
 		return false
 	var now := Time.get_ticks_msec()
@@ -86,7 +101,7 @@ func request_cleaning() -> bool:
 
 func request_completion() -> bool:
 	_requests_completion += 1
-	if not _enabled:
+	if not is_enabled():
 		_suppressed_completion += 1
 		return false
 	_played_completion += 1

@@ -330,7 +330,8 @@ func build() -> bool:
 		_haptics_settings = HapticsSettingsService.new()
 		_haptics_settings.load()
 	_haptics = HapticsController.new()
-	_haptics.set_enabled(_haptics_settings.is_enabled())
+	# M41 V01: bind the live canonical settings so a Settings toggle applies immediately.
+	_haptics.bind_settings(_haptics_settings)
 	add_child(_haptics)
 	_bind_haptics_signals()
 
