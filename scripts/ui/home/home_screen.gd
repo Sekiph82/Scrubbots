@@ -29,6 +29,17 @@ signal shortcut_requested(id: String)
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const SafeAreaRootScene = preload("res://scenes/components/ui/common/safe_area_root.tscn")
 const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
+const ResponsiveLayout = preload("res://scripts/ui/responsive_layout.gd")
+const UiValueChip = preload("res://scripts/ui/components/ui_value_chip.gd")
+const UiProgressMeter = preload("res://scripts/ui/components/ui_progress_meter.gd")
+const UiShortcutButton = preload("res://scripts/ui/components/ui_shortcut_button.gd")
+
+## Shortcut columns (SB-M42-010/012). Destinations belonging to later milestones are
+## rendered disabled by refresh(), never faked.
+const LEFT_SHORTCUTS := [["win_streak", "WIN STREAK"], ["gift_bar", "GIFTS"], ["collection", "COLLECTION"], ["shop", "SHOP"]]
+const RIGHT_SHORTCUTS := [["daily", "DAILY"], ["tasks", "TASKS"], ["cards_exchange", "CARDS EXCHANGE"], ["no_ads", "NO ADS"]]
+## Win Streak track positions 1..5+ (values are rendered live from WinStreakService).
+const TRACK_POSITIONS := 5
 
 const BG01 := Color(0.125, 0.145, 0.2, 1.0)   ## Midnight Slate #202533.
 
@@ -40,6 +51,8 @@ var _launch: Dictionary = {}
 
 func _ready() -> void:
 	_build()
+	resized.connect(_apply_layout_mode)
+	_apply_layout_mode()
 	refresh()
 
 ## Bind the canonical AppState (app root). Re-renders.
@@ -138,6 +151,12 @@ func _build() -> void:
 	layout.add_child(track)
 	_nodes["WinStreakRewardTrack"] = track
 
+	_build_hud(_nodes["TopCurrencyHUD"])
+	_build_gift_meter(_nodes["GiftMeter"])
+	_build_shortcuts(_nodes["LeftShortcutColumn"], LEFT_SHORTCUTS)
+	_build_shortcuts(_nodes["RightShortcutColumn"], RIGHT_SHORTCUTS)
+	_build_track(track)
+
 	var nav := HBoxContainer.new()
 	nav.name = "BottomNav"
 	nav.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
@@ -145,6 +164,50 @@ func _build() -> void:
 	layout.add_child(nav)
 	_nodes["BottomNav"] = nav
 	_build_bottom_nav(nav)
+
+## SB-M42-010: reusable live components; text is set only by refresh().
+func _build_hud(hud: HBoxContainer) -> void:
+	var profile := UiProgressMeter.new("ProfileBotParts")
+	profile.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	hud.add_child(profile)
+	_nodes["ProfileBotParts"] = profile
+	for id in ["ScrubBucksChip", "HeartsChip"]:
+		var chip := UiValueChip.new(id)
+		hud.add_child(chip)
+		_nodes[id] = chip
+
+func _build_gift_meter(gm: HBoxContainer) -> void:
+	var meter := UiProgressMeter.new("GiftMeterBar")
+	meter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	gm.add_child(meter)
+	_nodes["GiftMeterBar"] = meter
+
+func _build_shortcuts(column: VBoxContainer, specs: Array) -> void:
+	column.alignment = BoxContainer.ALIGNMENT_CENTER
+	for spec in specs:
+		var b := UiShortcutButton.new(spec[0], spec[1])
+		var id: String = spec[0]
+		b.pressed.connect(func(): shortcut_requested.emit(id))
+		column.add_child(b)
+		_nodes["Shortcut_" + id] = b
+
+func _build_track(track: HBoxContainer) -> void:
+	for i in range(TRACK_POSITIONS):
+		var node := UiValueChip.new("TrackStep%d" % (i + 1))
+		node.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		track.add_child(node)
+		_nodes["TrackStep%d" % (i + 1)] = node
+
+## Responsive spacing by layout mode (COMPACT/NORMAL/TALL). Presentation only.
+func _apply_layout_mode() -> void:
+	if not _built:
+		return
+	var mode := ResponsiveLayout.get_layout_mode(get_viewport_rect().size)
+	var gap: int = UiTokens.SPACE_XS if mode == ResponsiveLayout.LayoutMode.COMPACT else (UiTokens.SPACE_LG if mode == ResponsiveLayout.LayoutMode.TALL else UiTokens.SPACE_SM)
+	(_nodes["HomeLayout"] as VBoxContainer).add_theme_constant_override("separation", gap)
+
+func get_layout_mode() -> int:
+	return ResponsiveLayout.get_layout_mode(get_viewport_rect().size)
 
 ## Bottom navigation. Only HOME and SETTINGS have V1 destinations; the other tabs are
 ## shown disabled (their screens belong to later milestones) — never faked.
