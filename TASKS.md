@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M33 / M41 OWNER GATES
-- Current Sprint: Owner Audio + Settings Acceptance
-- Current Task: M33 gameplay-music F6 + M41 Settings F6
+- Current Milestone: M41 OWNER GATE
+- Current Sprint: Settings Owner Acceptance
+- Current Task: M41 Settings visual/manual F6
 - Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER runs `res://scenes/debug/m33_audio_playtest.tscn` and accepts/rejects the integrated Pixel Polish Parade loop for seam quality, music-vs-cleaning balance, fatigue and Master/Music/SFX behavior; then checks the M41 Settings panel for visual/manual acceptance. M33 V03 code is independently accepted and the real gameplay auto-start defect is closed.
+- Next Task/Action: OWNER checks the M41 Settings panel for layout/readability, slider/toggle interaction, haptics toggle behavior and relaunch restoration. M33 is fully closed: code audit passed and owner F6 audio acceptance is recorded.
 - Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 712 / 980 = 72.65%. No checklist numerator change in this audit because M33 code rows were already closed; this audit removes the implementation uncertainty and leaves only owner/manual gates.
-- Note: Gameplay music is now the approved `Pixel Polish Parade` seamless OGG at `assets/audio/music/background_loop.ogg`. Future Workshop music is owner-approved separately as `ScrubBots Workshop` and is not part of M33 gameplay closure. Open separate gates remain M34 real-device haptics, M36 human difficulty playtest, M39 sixth-slot phone safe-area/touch/readability and M41 SB-M41-005 Reduced Effects.
+- Progress: 712 / 980 = 72.65%. M33 closure is a milestone/owner-gate closure and does not change the checklist numerator because its task rows were already complete.
+- Note: M33 final audio is accepted: Gameplay = `Pixel Polish Parade` via `assets/audio/music/background_loop.ogg`; Workshop = `ScrubBots Workshop` reserved for future Workshop UI. Separate open gates remain M34 real-device haptics, M36 human difficulty playtest, M39 sixth-slot phone safe-area/touch/readability, and M41 visual/manual F6. SB-M41-005 Reduced Effects remains open.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1317,9 +1317,14 @@ Closure evidence: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V03.md` + `coord
 
 ### M33 — Audio `[OWNER-LOCKED AUDIO SELECTION V02 2026-09-24]`
 
-V03 independent audit: `CODE_AUDIT_PASS / OWNER_F6_REQUIRED`. Owner-approved gameplay music `Pixel Polish Parade` is now integrated byte-exact at `assets/audio/music/background_loop.ogg`; real gameplay auto-start is fixed and actual-main `m33_audio_runtime` passes 10/10 with zero SCRIPT ERROR. Final M33 closure is now listening-only: owner must approve loop seam, mix balance, fatigue and Music/SFX/Master behavior in `res://scenes/debug/m33_audio_playtest.tscn`.
+**FINAL STATUS: `AUDITED_PASS / OWNER_F6_PASS / M33 AUDIO CLOSED`.**
 
-Owner audio law remains: no dispatch SFX; cleaning uses bounded `dispatch.wav`; completion is WON-only; no movement audio. `ScrubBots Workshop` is separately owner-approved for a future Workshop screen and is not gameplay music.
+Owner accepted the integrated Pixel Polish Parade gameplay loop in `res://scenes/debug/m33_audio_playtest.tscn`: no audible loop seam, comfortable music-vs-cleaning balance, cleaning remains readable, Music/SFX/Master isolation is correct, Retry/2x/cleaning do not restart music, and repeated listening is not fatiguing.
+
+Final owner acceptance:
+`coordination/OWNER_M33_FINAL_AUDIO_ACCEPTANCE_V01.md`
+
+Owner audio law remains: no dispatch SFX; cleaning uses bounded `dispatch.wav`; completion is WON-only; no movement audio. `ScrubBots Workshop` remains separately owner-approved for a future Workshop screen.
 
 - [x] SB-M33-001 Audio buses. — [x] SB-M33-002 Master volume.
 - [x] SB-M33-003 Music volume. — [x] SB-M33-004 SFX volume.
