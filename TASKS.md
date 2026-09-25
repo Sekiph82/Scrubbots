@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M33 / M41 OWNER GATES
-- Current Sprint: M33 Final Music Integration + Owner Audio/Settings Acceptance
-- Current Task: M33 seamless gameplay loop preparation
-- Current Task Status: READY_FOR_IMPLEMENTATION / OWNER_SOURCE_SELECTED
-- Next Task/Action: Prepare the owner-approved `Pixel Polish Parade(1).mp3` as a genuinely seamless gameplay loop at `assets/audio/music/background_loop.ogg`, integrate it through the already-audited M33 Music-bus controller, rerun M33/M41/root regressions, then OWNER performs final F6 listening + Settings acceptance. `ScrubBots Workshop(1).mp3` is separately owner-approved and reserved for a future Workshop screen; do not use it as gameplay music.
-- Required Actor: CLAUDE
+- Current Milestone: M33
+- Current Sprint: M33-C001 V03 — Final Gameplay Music Integration
+- Current Task: Integrate approved `background_loop.ogg`
+- Current Task Status: READY_FOR_IMPLEMENTATION / APPROVED_ASSET_PREPARED
+- Next Task/Action: Place the ChatGPT-prepared owner-approved gameplay loop at `assets/audio/music/background_loop.ogg`, verify SHA-256 `8c94897ea022924bb32c1e8384fd0b73ea21863f522c4d1dd682ca773ef9ae2a`, then CLAUDE executes `coordination/sessions/M33-C001/CHATGPT_PROMPT_V03.md`. After independent code audit, OWNER performs final F6 listening/Settings acceptance.
+- Required Actor: OWNER + CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 712 / 980 = 72.65%. Music-source selection is an owner gate decision rather than a checklist-row completion, so the numerator is unchanged.
-- Note: Owner music decision V03 is locked: Gameplay = `Pixel Polish Parade`; Workshop = `ScrubBots Workshop`. M33 still needs seamless-loop preparation and final owner F6. M41 early Settings code is accepted but owner visual/manual F6 remains. Separate open gates: M34 real-device haptics, M36 human difficulty playtest, M39 sixth-slot phone safe-area/touch/readability. SB-M41-005 Reduced Effects remains open.
+- Progress: 712 / 980 = 72.65%. Asset preparation does not itself close a checklist row.
+- Note: Approved gameplay source = `Pixel Polish Parade`. Prepared loop provenance: 5.841610s -> 142.994989s, duration 137.153379s, stereo 44.1kHz OGG Vorbis. `ScrubBots Workshop` remains owner-approved/reserved for a future Workshop screen and must not be integrated in gameplay. M41 Settings code is accepted but owner F6 remains; separate device/owner gates remain M34, M36, M39.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
