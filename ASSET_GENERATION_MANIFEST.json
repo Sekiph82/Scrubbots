@@ -253,8 +253,8 @@
   ],
   "pixel_art_palette_contract": {
     "status": "OWNER_LOCKED",
-    "version": 2,
-    "source": "data/palettes/scrubbots_palette_v2.json",
+    "version": 3,
+    "source": "data/palettes/scrubbots_palette_v3.json",
     "rulesDoc": "docs/08_PIXEL_ART_PALETTE_RULES.md",
     "allowedColorIds": [
       "C01",
@@ -280,7 +280,7 @@
       12
     ],
     "difficultyClassDerivedFromColorCount": false,
-    "difficultyColorNote": "Difficulty class is NOT derived from color count. Per OWNER-LOCKED Difficulty V1 (2026-09-12), color count/entropy contributes only to Color Complexity, one component of the Challenge Score. The former class-specific used-color bands (EASY 3-5 / MEDIUM 6-7 / HARD 8-9 / VERY_HARD 10-12) are superseded and are no longer current difficulty-class law.",
+    "difficultyColorNote": "Difficulty class is NOT derived from color count. Per OWNER-LOCKED Difficulty V1 (2026-09-12), color count/entropy contributes only to Color Complexity, one component of the Challenge Score. The former class-specific used-color bands are historical provenance only and are no longer current difficulty-class law.",
     "clearedTransparencyIsPaletteColor": false,
     "backgroundIsPaletteColor": false,
     "presentationGridOrBorderIsPaletteColor": false,

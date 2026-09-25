@@ -39,24 +39,24 @@ configuration + seed.
   Factory builds/validates puzzle data around it and reuses the audited M09
   exact-pixel contract. Any source color must be deterministically mapped to /
   rejected against C01..C16 — never silently expanded — and the result must
-  satisfy the difficulty distinct-used-color bands.
+  satisfy the V3 used-color envelope of 3..12.
 - **PUZZLE_FIRST**: Factory constructs puzzle/geometry candidates first, then
   produces previewable candidate art/data. Generated art is never labeled as
   owner-original. Generated logical colors come only from C01..C16, honor the
-  difficulty color-count bands, sit on the fixed BG01 background (not a logical
+  the V3 used-color envelope, sit on the fixed BG01 background (not a logical
   color), and render as flat solid square cells — never glossy/beveled/3D/bead
   styling.
 
 ## Canonical visual contract (owner-locked, META-C005)
 
 Every Factory mode and phase obeys the root owner-locked visual contract
-(`docs/08_PIXEL_ART_PALETTE_RULES.md` + `data/palettes/scrubbots_palette_v2.json`;
+(`docs/08_PIXEL_ART_PALETTE_RULES.md` + `data/palettes/scrubbots_palette_v3.json`;
 Factory descriptor `level_factory/data/canonical_visual_contract_v1.json`):
 
 - **Logical artwork colors are C01..C16 only** — no C17, no off-palette RGB.
-- **Difficulty color-count bands are hard legality**, not guidance:
-  EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12 (distinct canonical logical
-  cell colors actually used by artwork cells).
+- **V3 used-color envelope is 3..12** distinct canonical logical cell colors
+  actually used by artwork cells; `difficultyClassDerivedFromColorCount` is
+  false and class is not derived from count.
 - **BG01 Midnight Slate `#202533` / RGB(32,37,51)** is the fixed production
   background: shown through CLEARED alpha-0 cells, outside C01..C16, not a logical
   color, never a LevelData cell color, never counted toward difficulty totals.

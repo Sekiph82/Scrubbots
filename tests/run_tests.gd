@@ -701,22 +701,15 @@ func _run_board_renderer_active_cleared_tests() -> void:
 func _run_board_renderer_real_fixture_tests() -> void:
 	print("---- M10-C001: Real Artwork debug fixtures ----")
 	var suffix_hex := BoardDebugFixtures.load_global_palette_hex_by_suffix()
-	# M10-C001 V06: canonical palette is now v2 = 16 colors (C16 Pure Black).
-	_check(suffix_hex.size() == 16, "global palette v2 exposes 16 C-IDs (got %d)" % suffix_hex.size())
-	_check(str(suffix_hex.get(6, "")).to_lower() == "#42c7d9", "C06 maps to Cyan #42C7D9 (Level 010 blue recolor source)")
-	_check(str(suffix_hex.get(16, "")).to_lower() == "#000000", "C16 is Pure Black #000000 (V06 owner-locked addition)")
+	# M10-C001 current authority: Palette V3 preserves 16 C-IDs and exact Alpix colors.
+	_check(suffix_hex.size() == 16, "global palette v3 exposes 16 C-IDs (got %d)" % suffix_hex.size())
+	_check(str(suffix_hex.get(1, "")).to_lower() == "#ff4500", "C01 maps to Orange Red #FF4500")
+	_check(str(suffix_hex.get(6, "")).to_lower() == "#51e9f4", "C06 maps to Light Blue #51E9F4 (Level 010 blue recolor source)")
+	_check(str(suffix_hex.get(16, "")).to_lower() == "#000000", "C16 is Black #000000 (V3 owner-locked palette)")
 	_check(not suffix_hex.has(17), "no C17 in canonical palette (16-color legality)")
 
-	# C01..C15 values are unchanged from historical palette v1 (v2 only appends C16).
-	var v1 = JSON.parse_string(FileAccess.get_file_as_string("res://data/palettes/scrubbots_palette_v1.json"))
-	var v1_hex := {}
-	if typeof(v1) == TYPE_DICTIONARY and v1.has("colors"):
-		for c in v1.colors:
-			v1_hex[str(c.get("id", ""))] = str(c.get("hex", "")).to_lower()
-	_check(v1_hex.size() == 15, "historical palette v1 preserved with 15 colors (got %d)" % v1_hex.size())
-	for n in range(1, 16):
-		var cid := "C%02d" % n
-		_check(v1_hex.get(cid, "") == str(suffix_hex.get(n, "")).to_lower(), "%s unchanged between palette v1 and v2" % cid)
+	var v3 = JSON.parse_string(FileAccess.get_file_as_string("res://data/palettes/scrubbots_palette_v3.json"))
+	_check(typeof(v3) == TYPE_DICTIONARY and v3.get("schema", "") == "scrubbots-global-palette/v3" and v3.get("version", -1) == 3, "Palette V3 schema/version is current")
 
 	var fixtures := [
 		"res://data/debug/board_renderer_fixtures/level_007.json",
@@ -12304,7 +12297,7 @@ func _run_m21_source_audit_tests() -> void:
 	_check(alpha_ok, "M21 source: every logical pixel alpha 255")
 	_check_eq(semi, 0, "M21 source: zero semi-transparent")
 	_check_eq(off_palette, 0, "M21 source: zero off-palette")
-	_check_eq(counts.size(), 5, "M21 source: 5 distinct colors (within legacy EASY compat band 3-5 and Difficulty V1 used-color envelope 3-12; count is a V1 score input, not a class law)")
+	_check_eq(counts.size(), 5, "M21 source: 5 distinct colors (within V3 used-color envelope 3-12; count is not a difficulty-class law)")
 	_check_eq(int(counts.get("C01", 0)), 30, "M21 source: C01 count 30")
 	_check_eq(int(counts.get("C03", 0)), 5, "M21 source: C03 count 5")
 	_check_eq(int(counts.get("C08", 0)), 298, "M21 source: C08 count 298")
@@ -12353,11 +12346,13 @@ func _run_m21_production_art_bridge_tests() -> void:
 	var semi_pal := PackedStringArray(["#FF450080", "#2450A4FF", "#000000FF"])
 	var semi_ld = LevelData.new(1, "neg_semi", "neg", "EASY", 3, 2, semi_pal, off_cells)
 	_check(not ProductionArtLevelBuilder.normalize_from_level_data(semi_ld, "EASY").is_ok(), "M21 bridge: semi-transparent alpha rejected")
-	# wrong EASY color count (6 distinct > 5)
+	# Six distinct colors remain legal for EASY because V3 color count is a global envelope, not a class gate.
 	var six_pal := PackedStringArray(["#FF4500FF", "#FFA800FF", "#FFD635FF", "#00CC78FF", "#00CCC0FF", "#51E9F4FF"])
-	var six_cells := PackedInt32Array([0, 1, 2, 3, 4, 5])
-	var six_ld = LevelData.new(1, "neg_six", "neg", "EASY", 3, 2, six_pal, six_cells)
-	_check(not ProductionArtLevelBuilder.normalize_from_level_data(six_ld, "EASY").is_ok(), "M21 bridge: EASY 6-color count rejected by legacy compat band 3-5 (M21 compatibility gate, not a V1 class law)")
+	var six_cells := PackedInt32Array()
+	six_cells.resize(400)
+	for six_i in range(400): six_cells[six_i] = six_i % 6
+	var six_ld = LevelData.new(1, "neg_six", "neg", "EASY", 20, 20, six_pal, six_cells)
+	_check(ProductionArtLevelBuilder.normalize_from_level_data(six_ld, "EASY").is_ok(), "M21 bridge: EASY 6-color count accepted by V3 used-color envelope (class is independent)")
 	# noncanonical local order -> normalized deterministically to ascending.
 	# Use a valid 20x20 EASY board (3 distinct colors) so only palette ORDER,
 	# not dimensions/count, is under test.

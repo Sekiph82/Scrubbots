@@ -470,14 +470,15 @@ new transparent model (`tasks.md` SB-M10-005..011) remains open.
 
 ---
 
-### ADR-020: Global production pixel-art palette — amended to V2 C01..C16
+### ADR-020: Global production pixel-art palette — amended to V3 C01..C16
 
 **Current decision**: Production logical pixel artwork uses the owner-locked
-global Palette V2, **C01..C16**, defined in
-`data/palettes/scrubbots_palette_v2.json` and
+global Palette V3, **C01..C16**, defined in
+`data/palettes/scrubbots_palette_v3.json` and
 `docs/08_PIXEL_ART_PALETTE_RULES.md`.
 
-Palette V2 includes Pure White (C15) and Pure Black (C16). No seventeenth
+Palette V3 is the exact Alpix fixed-palette subset, including White (C15) and
+Black (C16). No seventeenth
 logical production color may be introduced without an explicit versioned owner
 decision.
 
@@ -510,13 +511,13 @@ mapped or rejected for production logical art. A production local palette is a
 used subset of C01..C16 in ascending global C-ID order. The M09 exact-source
 importer remains valid generic tooling but arbitrary source colors are not
 production-legal until normalized/validated. Production art audit, Factory
-validation and M53 level QA must enforce the current V2 contract.
+validation and M53 level QA must enforce the current V3 contract.
 
 **Historical note**: ADR-020 originally locked a 15-color V1 palette and
 class-specific color bands. That form is retained in repository history but is
-superseded by Palette V2 and Difficulty V1.
+superseded by Palette V3 and Difficulty V1.
 
-**Status**: OWNER-LOCKED current contract; amended to Palette V2 /
+**Status**: OWNER-LOCKED current contract; amended to Palette V3 /
 Difficulty V1.
 
 ---

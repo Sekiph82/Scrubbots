@@ -145,7 +145,9 @@ level files stay `"version": 1` (`LevelData.FORMAT_VERSION`); no Level Data V2 e
 
 ### Difficulty V1 color semantics `[OWNER-LOCKED 2026-09-12]`
 
-Production artwork normally uses 3..12 distinct canonical colors.
+Production artwork uses the V3 `usedColorEnvelopeV1` of 3..12 distinct canonical colors.
+`difficultyClassDerivedFromColorCount` is false; color count never independently
+assigns EASY/MEDIUM/HARD/VERY_HARD.
 
 The old `EASY 3–5 / MEDIUM 6–7 / HARD 8–9 / VERY_HARD 10–12` mapping is superseded as class legality. Count and entropy contribute to Color Complexity, one part of Challenge Score.
 

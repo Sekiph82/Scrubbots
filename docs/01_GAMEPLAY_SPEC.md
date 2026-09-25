@@ -36,7 +36,7 @@ The old table `EASY=20..29, MEDIUM=30..39, HARD=40..49, VERY_HARD=50..59` is ret
 
 ## Global production pixel-art palette `[LOCKED]`
 
-Only C01..C16 from `data/palettes/scrubbots_palette_v2.json` are legal production logical artwork colors. C16 Pure Black is a normal logical artwork color.
+Only C01..C16 from `data/palettes/scrubbots_palette_v3.json` are legal production logical artwork colors. C16 Black is a normal logical artwork color.
 
 Under Difficulty V1:
 

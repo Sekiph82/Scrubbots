@@ -32,7 +32,7 @@ pixel-art-generation session MUST read and obey the owner-locked root visual
 contract (META-C005):
 
 - Root palette rules: `docs/08_PIXEL_ART_PALETTE_RULES.md`
-- Root palette (single authority): `data/palettes/scrubbots_palette_v2.json`
+- Root palette (single authority): `data/palettes/scrubbots_palette_v3.json`
 - Factory descriptor (references the root, never redefines it):
   `level_factory/data/canonical_visual_contract_v1.json`
 
@@ -40,9 +40,8 @@ Locked rules the Factory must enforce, never weaken:
 
 - Logical artwork colors are **C01..C16 only** (root palette). No C17, no
   off-palette RGB.
-- Difficulty distinct-used-color bands are hard legality:
-  EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12. Count only distinct
-  canonical logical cell colors actually used by artwork cells.
+- The V3 `usedColorEnvelopeV1` is 3..12 distinct canonical logical cell colors.
+  `difficultyClassDerivedFromColorCount` is false; count is not class legality.
 - `BG01 Midnight Slate #202533 = RGB(32,37,51)` is the production gameplay
   background: visible through CLEARED alpha-0 cells, **not** C16, **not** a
   logical artwork color, never a LevelData cell color, and never counted
