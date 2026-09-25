@@ -129,8 +129,13 @@ Legacy runtime validators may retain old bands temporarily during audited migrat
 
 ## 7. Canonical pixel-art palette `[LOCKED]`
 
-Machine source:
-`data/palettes/scrubbots_palette_v2.json`
+Machine source (active authority, palette V3 — Alpix-aligned, owner-locked 2026-09-25):
+`data/palettes/scrubbots_palette_v3.json`
+
+Historical only: `data/palettes/scrubbots_palette_v2.json`.
+
+Palette version != Level Data schema version. Palette V3 does not change Level Data:
+level files stay `"version": 1` (`LevelData.FORMAT_VERSION`); no Level Data V2 exists.
 
 - Production ACTIVE logical cells use only C01..C16.
 - ACTIVE alpha is 255.
