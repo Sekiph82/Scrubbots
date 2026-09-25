@@ -138,7 +138,8 @@ func _continue_cta_frontier() -> void:
 	var root = await _boot_main(path)
 	var home = root.get_home()
 	var play: Button = home.get_region("PlayButton")
-	_ok(play.text == "CONTINUE · LEVEL 2", "CTA shows CONTINUE · LEVEL 2 (%s)" % play.text)
+	var sub_text: String = home.get_region("PlaySubtitle").text
+	_ok(play.text == "PLAY" and sub_text == "CONTINUE · LEVEL 2", "CTA shows PLAY + live subtitle CONTINUE · LEVEL 2 (%s / %s)" % [play.text, sub_text])
 	_ok(play.disabled and String(home.get_region("StatusLabel").text).find("coming soon") != -1, "frontier without content: disabled + honest message")
 	play.pressed.emit()
 	var r: Dictionary = root.play_current_frontier()
@@ -207,6 +208,8 @@ func _components_viewport_matrix() -> void:
 			var prev_end := -1.0
 			var overlap := false
 			for c in home.get_region("HomeLayout").get_children():
+				if not (c as Control).visible:
+					continue   # V02: StatusLabel is hidden when there is nothing to say
 				var r2: Rect2 = (c as Control).get_global_rect()
 				if r2.position.y < prev_end - 0.5:
 					overlap = true
@@ -253,17 +256,22 @@ func _layered_art_regions() -> void:
 		all_ignore = all_ignore and (l as Control).mouse_filter == Control.MOUSE_FILTER_IGNORE
 	_ok(all_ignore, "every art layer is decorative (ignores input)")
 	_ok(home.get_region("Background").get_index() < home.get_region("SafeAreaRoot").get_index(), "screen art layers draw behind all UI")
-	_ok(layers[4].get_parent() == home.get_region("CenterScrubbyArea") and layers[5].get_parent() == home.get_region("CenterScrubbyArea"), "world/character layers live in CenterScrubbyArea between the shortcut columns")
+	var stage: Control = home.get_region("WorldStage")
+	_ok(stage.get_parent() == home.get_region("CenterScrubbyArea") and layers[4].get_parent() == stage and layers[5].get_parent() == stage, "world/character layers live in CenterScrubbyArea/WorldStage")
+	_ok(home.get_region("LeftShortcutColumn").z_index > 0 and home.get_region("RightShortcutColumn").z_index > 0, "shortcut cards draw in front of the world stage")
 	var ref_hits: Array = []
 	for f in ["res://scripts/ui/home/home_screen.gd", "res://scenes/ui/home/home_screen.tscn", "res://scripts/app/main.gd", "res://scenes/app/main.tscn"]:
 		if FileAccess.get_file_as_string(f).find("main screen.png") != -1 or FileAccess.get_file_as_string(f).find("_owner_inbox") != -1:
 			ref_hits.append(f)
 	_ok(ref_hits.is_empty(), "owner reference screenshot never loaded by Home/app %s" % str(ref_hits))
 	var bound := 0
-	for l in layers:
+	for l in layers.slice(0, 4):
 		if (l as TextureRect).texture != null:
 			bound += 1
-	_ok(bound == layers.size(), "owner-approved production art bound on all %d layers (SB-M42-016/017 gate open)" % layers.size())
+	for n in ["Art_arch", "Art_scrubby"]:
+		if home.get_region(n).texture != null:
+			bound += 1
+	_ok(bound == 6, "owner-approved production art bound on the 4 screen layers + world arch + Scrubby (SB-M42-016/017 gate open)")
 	sub.free()
 	_complete("layered_art_regions")
 
@@ -351,13 +359,12 @@ func _approved_art_only() -> void:
 	home.bind(app)
 	await process_frame
 	var bound := 0
-	for l in home.get_art_layers():
-		if l.texture != null:
-			bound += 1
-	for id in ["Shortcut_daily", "Shortcut_cards_exchange"]:
-		if home.get_region(id).icon != null:
-			bound += 1
-	_ok(bound == home.get_art_layers().size() + 2 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved): all mapped art bound")
+	var rows: Array = home.get_presentation_accounting()
+	for row in rows:
+		for n in row["nodes"]:
+			if n["texture"] != null:
+				bound += 1
+	_ok(rows.size() == 50 and bound == 54 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved): all 50 entries presented on 54 nodes (%d)" % bound)
 	# Un-approval simulation on an in-memory manifest copy (repo manifest untouched):
 	# entries that are not APPROVED keep native placeholders.
 	var m = V.load_manifest()
@@ -368,8 +375,8 @@ func _approved_art_only() -> void:
 			a.erase("approved_sha256")
 	home.set_art_binder(HomeArtBinder.new(m))
 	await process_frame
-	_ok(home.get_region("Layer_background.sky").texture != null and home.get_region("Layer_characters").texture != null, "approved sky + Scrubby bind to their layers")
-	_ok(home.get_region("Layer_background.city_far").texture == null and home.get_region("Layer_central_world_and_environment").texture == null, "unapproved layers stay empty")
+	_ok(home.get_region("Layer_background.sky").texture != null and home.get_region("Art_scrubby").texture != null, "approved sky + Scrubby bind to their nodes")
+	_ok(home.get_region("Layer_background.city_far").texture == null and home.get_region("Art_arch").texture == null, "unapproved layers stay empty")
 	_ok(home.get_region("ScrubBucksChip").icon.texture != null and home.get_region("Shortcut_daily").icon != null and home.get_region("Shortcut_shop").icon == null, "approved icons bind; unapproved do not")
 	home.set_art_binder(HomeArtBinder.new())
 	await process_frame
