@@ -8,12 +8,12 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Current Sprint: M42-C001 Post-Audit Closure
 - Current Task: M42 remaining owner/device gates
 - Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER resolves SB-M42-030 opening-skip policy and reviews/approves the pending Home art/visual composition for SB-M42-011/014/016/017/018. SB-M42-032 additionally requires a real Android-device cinematic run; SB-M42-033 physical iOS validation remains later. No M42 remediation is open.
+- Next Task/Action: OWNER reviews/approves the pending Home art/visual composition for SB-M42-011/014/016/017/018. SB-M42-032 additionally requires a real Android-device cinematic run; SB-M42-033 physical iOS validation remains later. SB-M42-030 is owner-locked NO SKIP and closed. No M42 remediation is open.
 - Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 738 / 980 = 75.31%. M42-C001 independent audit closed 25 checklist rows; 8 rows remain open only on owner/device gates.
-- Note: M42-C001 batch verdict: 25 AUDITED_PASS, 8 CODE_AUDIT_PASS with external gates, 0 CHANGES_REQUIRED. Summary: `coordination/sessions/M42-C001/CHATGPT_BATCH_AUDIT_V01.md`. Open M42 rows: 011, 014, 016, 017, 018, 030, 032, 033. Separate pre-existing gates remain M34 real-device haptics, M36 human difficulty playtest and M39 sixth-slot phone safe-area/touch/readability.
+- Progress: 739 / 980 = 75.41%. M42-C001 independent audit + post-audit owner decision closed 26 checklist rows; 7 rows remain open only on owner/device gates.
+- Note: M42-C001 batch verdict at initial audit: 25 AUDITED_PASS, 8 CODE_AUDIT_PASS with external gates, 0 CHANGES_REQUIRED. SB-M42-030 then closed by owner decision `coordination/OWNER_M42_OPENING_CINEMATIC_POLICY_DECISION_V02.md` and audit V02. Current open M42 rows: 011, 014, 016, 017, 018, 032, 033. Separate pre-existing gates remain M34 real-device haptics, M36 human difficulty playtest and M39 sixth-slot phone safe-area/touch/readability.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1534,7 +1534,10 @@ Batch result: **25 AUDITED_PASS / 8 CODE_AUDIT_PASS WITH EXTERNAL GATES / 0 CHAN
 Individual audit files:
 `coordination/sessions/M42-C001/audits/SB-M42-001_CHATGPT_AUDIT_V01.md` .. `SB-M42-033_CHATGPT_AUDIT_V01.md`.
 
-No remediation is open. Remaining rows are owner/device gates only.
+No remediation is open. Post-audit owner decision closed SB-M42-030 as mandatory NO SKIP. Current closure state: **26 closed / 7 owner-device gates**.
+
+Opening policy: `coordination/OWNER_M42_OPENING_CINEMATIC_POLICY_DECISION_V02.md`
+SB-M42-030 audit closure: `coordination/sessions/M42-C001/audits/SB-M42-030_CHATGPT_AUDIT_V02.md`.
 
 - [x] SB-M42-001 Navigation architecture. — [x] SB-M42-002 Home.
 - [x] SB-M42-003 Play/Continue. — [x] SB-M42-004 Settings.
@@ -1564,8 +1567,8 @@ No remediation is open. Remaining rows are owner/device gates only.
 - [x] SB-M42-027 Preserve the MP4 as source/reference, but create a Godot-runtime Ogg Theora + Vorbis version at `assets/brand/opening/scrubbots_opening_720p30.ogv`; do not rely on H.264/MP4 playback in core Godot.
 - [x] SB-M42-028 Implement a dedicated opening-video scene using `VideoStreamPlayer`, with aspect-ratio-safe presentation for the portrait app and no image distortion.
 - [x] SB-M42-029 On successful video completion, transition exactly once into the normal Home/bootstrap flow; failure to decode/play must fail safely into Home rather than blocking startup.
-- [ ] SB-M42-030 Decide and implement skip behavior `[DESIGN GATE]`. `[CODE_AUDIT_PASS / OWNER_DECISION_REQUIRED]`
-- [x] SB-M42-031 Decide playback frequency `[OWNER-LOCKED]`: once per cold/native app launch; no replay for internal navigation/retry/background resume.
+- [x] SB-M42-030 Opening cinematic skip behavior. `[OWNER-LOCKED: NO SKIP / AUDITED_PASS]`
+- [x] SB-M42-031 Playback frequency `[OWNER-LOCKED]`: cinematic plays on every cold/native app launch; no replay for internal navigation/retry/background resume.
 - [ ] SB-M42-032 Validate opening cinematic on Android real device for smooth 720p/30 playback, audio sync, startup latency, orientation, background/foreground behavior and memory cleanup. `[CODE_AUDIT_PASS / DEVICE_OWNER_REQUIRED]`
 - [ ] SB-M42-033 Validate iOS readiness later with the same boot-flow fallback and aspect rules. `[CODE_AUDIT_PASS / IOS_DEVICE_LATER]`
 
