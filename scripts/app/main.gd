@@ -20,12 +20,16 @@ const SettingsPanelScene = preload("res://scenes/ui/settings_panel.tscn")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
+const OpeningScreen = preload("res://scripts/app/opening_screen.gd")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
 static var boot_save_path_override: String = ""
 static var boot_clock_override: Callable = Callable()
 static var boot_local_day_override: Callable = Callable()
+## SB-M42-029 opening boot policy seam: -1 auto (play when a display exists; a headless
+## run has nothing to present on and boots straight to Home), 0 never, 1 always.
+static var boot_opening_override: int = -1
 
 var app_state = null
 ## M42 (SB-M42-001): the ONE app-root-owned navigation authority.
@@ -39,6 +43,8 @@ var _settings_panel = null
 var _home = null
 ## M42 Results surface (SB-M42-007): shown once per gameplay terminal.
 var _results = null
+## SB-M42-028/029 opening cinematic (only during the OPENING route).
+var _opening = null
 
 func _enter_tree() -> void:
 	_boot()
@@ -66,13 +72,49 @@ func _ready() -> void:
 	_results.retry_requested.connect(retry_from_results)
 	_build_settings_entry()
 	nav.route_changed.connect(_on_route_changed)
-	nav.go(NavigationController.Route.HOME, {"via": "boot"})
+	if _should_play_opening():
+		_start_opening()
+	else:
+		nav.go(NavigationController.Route.HOME, {"via": "boot"})
+
+func _should_play_opening() -> bool:
+	if boot_opening_override == 0:
+		return false
+	if boot_opening_override == 1:
+		return true
+	return DisplayServer.get_name() != "headless"
+
+## SB-M42-029: BOOT -> OPENING; the cinematic's single terminal outcome (completed or
+## failed) enters normal Home exactly once. Any load/decode/play failure is fail-safe.
+func _start_opening() -> void:
+	if not nav.go(NavigationController.Route.OPENING, {"via": "boot"}):
+		nav.go(NavigationController.Route.HOME, {"via": "boot"})
+		return
+	_opening = OpeningScreen.new()
+	add_child(_opening)
+	_opening.completed.connect(func(): _finish_opening("completed"))
+	_opening.failed.connect(func(reason): _finish_opening("failed:" + reason))
+	_opening.begin()
+
+## Idempotent: only the first outcome transitions (nav OPENING -> HOME edge exists once).
+func _finish_opening(outcome: String) -> void:
+	if nav.current() != NavigationController.Route.OPENING:
+		return
+	nav.go(NavigationController.Route.HOME, {"via": "opening", "outcome": outcome})
+
+func get_opening():
+	return _opening
 
 ## M42: show the screen that belongs to the current route.
 func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 	# Returning HOME ends the gameplay scene: the host (and its music/FX) is released.
 	if to == NavigationController.Route.HOME:
 		_release_gameplay_host()
+		if _opening != null and is_instance_valid(_opening):
+			_opening.cleanup()
+			remove_child(_opening)
+			_opening.queue_free()
+			_opening = null
 	if _home != null:
 		_home.visible = to == NavigationController.Route.HOME
 		if _home.visible:

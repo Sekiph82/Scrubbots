@@ -9,7 +9,8 @@ const MP4_SHA256 := "c044841d4aad1bc97c3d2bd144468c44f514bc2e288a970ae0a6aa14191
 const OGV := "res://assets/brand/opening/scrubbots_opening_720p30.ogv"
 const OGV_SHA256 := "3ec6e1347bbb1d8ced2709f3383b06ae6dbfba017e0a6d23a0fb991ec78ee89a"
 
-var EXPECTED_CASES := ["mp4_preserved", "ogv_runtime_asset", "opening_player_aspect", "opening_lifecycle"]
+var EXPECTED_CASES := ["mp4_preserved", "ogv_runtime_asset", "opening_player_aspect", "opening_lifecycle",
+	"boot_opening_to_home_once"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -20,6 +21,8 @@ func _initialize() -> void:
 	_ogv_runtime_asset()
 	await _opening_player_aspect()
 	await _opening_lifecycle()
+	await _boot_opening_to_home_once()
+	_cleanup()
 	_done()
 
 ## SB-M42-026: owner MP4 preserved byte-exact with provenance.
@@ -138,6 +141,70 @@ func _opening_lifecycle() -> void:
 	_ok(src.find("app_state") == -1 and src.find("economy") == -1 and src.find("save") == -1 and src.find("progression") == -1 and src.find(".mp4") == -1, "isolated from AppState/economy/save/progression; no MP4 path")
 	sub.free()
 	_complete("opening_lifecycle")
+
+const MainScript = preload("res://scripts/app/main.gd")
+const MainScene = preload("res://scenes/app/main.tscn")
+const NavigationController = preload("res://scripts/app/navigation_controller.gd")
+var _tmp: Array = []
+
+func _uniq(tag: String) -> String:
+	var p := "user://m42open_%s_%d.save" % [tag, Time.get_ticks_usec()]
+	_tmp.append(p)
+	return p
+
+func _cleanup() -> void:
+	for p in _tmp:
+		for suffix in ["", ".bak", ".tmp"]:
+			if FileAccess.file_exists(p + suffix):
+				DirAccess.remove_absolute(ProjectSettings.globalize_path(p + suffix))
+
+func _boot(opening: int):
+	MainScript.boot_save_path_override = _uniq("boot")
+	MainScript.boot_opening_override = opening
+	var root = MainScene.instantiate()
+	get_root().add_child(root)
+	await process_frame
+	return root
+
+func _shutdown(root) -> void:
+	if root != null and is_instance_valid(root):
+		root.free()
+	MainScript.boot_save_path_override = ""
+	MainScript.boot_opening_override = -1
+
+## SB-M42-029: cinematic completion -> Home exactly once; failure -> Home; repeated
+## finished/error callbacks never duplicate Home/navigation state.
+func _boot_opening_to_home_once() -> void:
+	print("[boot opening to home once]")
+	var R := NavigationController.Route
+	var root = await _boot(1)
+	var nav = root.get_navigation()
+	var op = root.get_opening()
+	_ok(nav.current() == R.OPENING and op != null and op.is_started() and not root.get_home().visible, "boot -> OPENING, cinematic playing, Home hidden")
+	_ok(not root.play_current_frontier().get("ok", true) and not nav.open_settings(), "no gameplay/settings during the cinematic")
+	var t0: int = nav.transition_id()
+	op.get_player().finished.emit()
+	op.get_player().finished.emit()
+	op.failed.emit("late_error")
+	await process_frame
+	_ok(nav.current() == R.HOME and nav.transition_id() == t0 + 1, "completion -> HOME exactly once (repeated finished/error ignored)")
+	_ok(root.get_opening() == null and root.get_home().visible and root.get_home().get_region("PlayButton") != null, "opening released, normal Home shown")
+	_ok(nav.last_payload().get("outcome") == "completed", "outcome recorded: completed")
+	_shutdown(root)
+	var root2 = await _boot(1)
+	var nav2 = root2.get_navigation()
+	var t1: int = nav2.transition_id()
+	var op2 = root2.get_opening()
+	op2.failed.emit("decode_error")
+	op2.failed.emit("decode_error")
+	op2.get_player().finished.emit()
+	await process_frame
+	_ok(nav2.current() == R.HOME and nav2.transition_id() == t1 + 1 and nav2.last_payload().get("outcome") == "failed:decode_error", "failure -> HOME exactly once (fail-safe)")
+	_shutdown(root2)
+	var root3 = await _boot(-1)
+	_ok(root3.get_navigation().current() == R.HOME and root3.get_opening() == null, "auto policy in a headless run (no display) boots straight to Home")
+	_shutdown(root3)
+	_complete("boot_opening_to_home_once")
 
 func _find(hay: PackedByteArray, needle: PackedByteArray) -> int:
 	for i in range(hay.size() - needle.size()):
