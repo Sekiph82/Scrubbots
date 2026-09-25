@@ -1,7 +1,7 @@
 # M41-C001 V01 — ChatGPT Independent Audit
 
 Date: 2026-09-25
-Verdict: **CODE_AUDIT_PASS / UPSTREAM_PALETTE_BLOCKER / SETTINGS_OWNER_F6_REQUIRED**
+Verdict: **CODE_AUDIT_PASS / SETTINGS_OWNER_F6_REQUIRED**
 
 Implementation: `8a423d3`
 Claude log: `coordination/sessions/M41-C001/CLAUDE_LOG_V01.md`
@@ -47,3 +47,29 @@ Settings visual/manual F6 remains required for:
 
 Verdict string:
 `CODE_AUDIT_PASS / M41-C001 V01 / PALETTE-V3-BLOCKER / SETTINGS_OWNER_F6_REQUIRED`
+
+
+## Palette blocker closure — 2026-09-25
+
+PALETTE-V3-C001 V01 is independently audited pass.
+
+On the repaired ACTUAL main, Claude reran:
+- m41_settings: 13/13
+- m33_audio_runtime: 9/9
+- m40_v04_bootstrap: PASS
+- m38_v02_strict: 11/11
+- m39_v04_integration: PASS
+- root: 5336 / 0
+with zero SCRIPT ERROR.
+
+Therefore the upstream palette blocker is closed.
+
+The owner-authorized early Settings slice is code-side accepted:
+SB-M41-001,002,003,004,006,007,008.
+
+SB-M41-005 Reduced Effects remains intentionally unimplemented and outside this early slice.
+
+Final milestone closure remains owner visual/manual F6 gated.
+
+Final verdict string:
+`CODE_AUDIT_PASS / M41-C001 V01 / SETTINGS_OWNER_F6_REQUIRED`
