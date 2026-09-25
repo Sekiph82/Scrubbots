@@ -15,7 +15,7 @@ const REQUIRED_VIEWPORTS := [Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2
 var EXPECTED_CASES := [
 	"home_shell_tree", "home_in_real_root", "home_blocked_state",
 	"play_cta_fresh", "continue_cta_frontier",
-	"settings_single_authority",
+	"settings_single_authority", "components_viewport_matrix",
 ]
 
 var _fail := 0
@@ -30,6 +30,7 @@ func _initialize() -> void:
 	await _play_cta_fresh()
 	await _continue_cta_frontier()
 	await _settings_single_authority()
+	await _components_viewport_matrix()
 	_cleanup()
 	_done()
 
@@ -158,6 +159,60 @@ func _settings_single_authority() -> void:
 	_ok(not root.get_navigation().is_settings_open() and not panel.visible, "Settings cannot open during gameplay")
 	_shutdown(root)
 	_complete("settings_single_authority")
+
+## SB-M42-010: reusable components inside the safe area across the required viewport
+## matrix (+16:9 and tablet portrait), touch >= 88, regions never overlap.
+func _components_viewport_matrix() -> void:
+	print("[components viewport matrix]")
+	var app = AppState.new(_uniq("vp"))
+	var sizes: Array = REQUIRED_VIEWPORTS + [Vector2i(1080, 1920), Vector2i(1536, 2048)]
+	for size in sizes:
+		for insets in [[0, 0, 0, 0], [0, 132, 0, 96]]:
+			var sub := _sub(size)
+			var home = HomeScreenScene.instantiate()
+			sub.add_child(home)
+			home.bind(app)
+			await process_frame
+			home.get_region("SafeAreaRoot").set_synthetic_insets(insets[0], insets[1], insets[2], insets[3])
+			await process_frame
+			await process_frame
+			var safe := Rect2(Vector2(insets[0], insets[1]), Vector2(size) - Vector2(insets[0] + insets[2], insets[1] + insets[3]))
+			var tag := "%s insets=%s" % [str(size), str(insets)]
+			var small: Array = []
+			var outside: Array = []
+			for b in home.find_children("*", "BaseButton", true, false):
+				var r: Rect2 = (b as Control).get_global_rect()
+				if r.size.y < 88.0 - 0.5 or r.size.x < 88.0 - 0.5:
+					small.append(String(b.name))
+				if not safe.grow(0.5).encloses(r):
+					outside.append(String(b.name))
+			_ok(home.find_children("*", "BaseButton", true, false).size() >= 14, "%s: >= 14 live buttons measured (8 shortcuts + PLAY + 5 nav)" % tag)
+			_ok(small.is_empty(), "%s: every button >= 88x88 %s" % [tag, str(small)])
+			_ok(outside.is_empty(), "%s: every button inside safe area %s" % [tag, str(outside)])
+			var prev_end := -1.0
+			var overlap := false
+			for c in home.get_region("HomeLayout").get_children():
+				var r2: Rect2 = (c as Control).get_global_rect()
+				if r2.position.y < prev_end - 0.5:
+					overlap = true
+				prev_end = r2.end.y
+			_ok(not overlap and prev_end <= safe.end.y + 0.5, "%s: regions stacked without overlap, inside safe bottom" % tag)
+			var world: Rect2 = home.get_region("MainWorldArea").get_global_rect()
+			for col in ["LeftShortcutColumn", "RightShortcutColumn"]:
+				for b in home.get_region(col).get_children():
+					if not world.grow(0.5).encloses((b as Control).get_global_rect()):
+						outside.append(String(b.name))
+			_ok(outside.is_empty(), "%s: shortcuts fit inside MainWorldArea" % tag)
+			sub.free()
+	# Components are live Labels / native bars (no baked text textures).
+	var sub2 := _sub(Vector2i(1080, 2160))
+	var h2 = HomeScreenScene.instantiate()
+	sub2.add_child(h2)
+	h2.bind(app)
+	await process_frame
+	_ok(h2.get_region("ScrubBucksChip").value_label is Label and h2.get_region("GiftMeterBar").bar is ProgressBar and h2.get_region("Shortcut_daily") is Button, "live Label / native ProgressBar / Button components")
+	sub2.free()
+	_complete("components_viewport_matrix")
 
 # ---------------------------------------------------------------- helpers ----
 
