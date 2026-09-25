@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M42 OWNER / DEVICE GATES
-- Current Sprint: M42-C001 Post-Audit Closure
-- Current Task: M42 composed Home visual review
-- Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER runs/views the production Home screen with all approved art bound and accepts or rejects the full composition for SB-M42-011/SB-M42-017. After that, SB-M42-032 still requires the real Android-device opening-cinematic run; SB-M42-033 physical iOS validation remains later. No M42 remediation is open.
-- Required Actor: OWNER
+- Current Milestone: M42 HOME COMPOSITION REMEDIATION
+- Current Sprint: M42-C001 Runtime Visual Remediation
+- Current Task: Fix live Home composition after first owner runtime screenshot
+- Current Task Status: IMPLEMENTATION_REQUIRED
+- Next Task/Action: CLAUDE executes `coordination/sessions/M42-C001/task_prompts/SB-M42-HOME-COMPOSITION-REMEDIATION.md`, then hands back for ChatGPT audit. After audit, OWNER reruns Home and supplies a new runtime screenshot for final SB-M42-011/SB-M42-017 visual review.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 742 / 980 = 75.71%. M42 now has 29 closed checklist rows and 4 open owner/device gates.
-- Note: M42-C001 initial batch verdict remains the historical 25 AUDITED_PASS, 8 CODE_AUDIT_PASS with external gates, 0 CHANGES_REQUIRED. SB-M42-030 subsequently closed by owner decision/audit V02. The owner then approved all 49 unique Home generation-required ART files; deterministic promotion `317b1e1` passed independent audit `coordination/sessions/M42-C001/audits/SB-M42-HOME-ART-PROMOTION_CHATGPT_AUDIT_V01.md`, closing SB-M42-014, SB-M42-016 and SB-M42-018 and clearing the asset-approval dependency from SB-M42-017. Current open M42 rows: 011, 017, 032, 033. Separate pre-existing gates remain M34 real-device haptics, M36 human difficulty playtest and M39 sixth-slot phone safe-area/touch/readability.
+- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011 and SB-M42-017 are now CHANGES_REQUIRED rather than owner-gate-only.
+- Note: Owner approval of all 49 unique Home ART files and deterministic manifest promotion remain valid and closed. First runtime visual evidence showed that many approved assets are hash-valid but not actually composed on screen. ChatGPT visual audit `coordination/sessions/M42-C001/audits/SB-M42-HOME-COMPOSED_VISUAL_AUDIT_V01.md` found missing Play frame, bottom-nav icons, central banner, platform-top/environment/helper/profile/Gift Meter/reward-track art, incorrect Scrubby/platform composition and clipped shortcut labels. Current open M42 rows: 011, 017, 032, 033.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1534,7 +1534,7 @@ Batch result: **25 AUDITED_PASS / 8 CODE_AUDIT_PASS WITH EXTERNAL GATES / 0 CHAN
 Individual audit files:
 `coordination/sessions/M42-C001/audits/SB-M42-001_CHATGPT_AUDIT_V01.md` .. `SB-M42-033_CHATGPT_AUDIT_V01.md`.
 
-No remediation is open. Post-audit owner decision closed SB-M42-030 as mandatory NO SKIP. The owner then approved all 49 unique generation-required Home ART files and the audited deterministic promotion bound all 50 ART manifest entries (49 unique + HOME-087 reuse). Current closure state: **29 closed / 4 owner-device gates**.
+Post-audit owner decision closed SB-M42-030 as mandatory NO SKIP. The owner then approved all 49 unique generation-required Home ART files and the audited deterministic promotion bound all 50 ART manifest entries (49 unique + HOME-087 reuse). The first live owner screenshot subsequently exposed a composition/integration defect, so SB-M42-011 and SB-M42-017 are reopened as runtime remediation work. Current closure state: **29 closed / 4 open rows**, with 011/017 implementation-required and 032/033 device gates.
 
 Opening policy: `coordination/OWNER_M42_OPENING_CINEMATIC_POLICY_DECISION_V02.md`
 SB-M42-030 audit closure: `coordination/sessions/M42-C001/audits/SB-M42-030_CHATGPT_AUDIT_V02.md`.
@@ -1547,13 +1547,13 @@ Home art promotion audit: `coordination/sessions/M42-C001/audits/SB-M42-HOME-ART
 - [x] SB-M42-006 Gameplay transition. — [x] SB-M42-007 Results transition.
 - [x] SB-M42-008 Prevent duplicate transitions. — [x] SB-M42-009 Back navigation.
 - [x] SB-M42-010 Build Home as responsive Godot containers/components.
-- [ ] SB-M42-011 Recreate owner-approved Home art direction with canonical regions. `[CODE_AUDIT_PASS / OWNER_VISUAL_REVIEW_REQUIRED]`
+- [ ] SB-M42-011 Recreate owner-approved Home art direction with canonical regions. `[CHANGES_REQUIRED / RUNTIME_COMPOSITION_REMEDIATION]`
 - [x] SB-M42-012 Keep shortcut columns responsive around central area.
 - [x] SB-M42-013 Validate Home-specific manifest entries in `assets/ui/HOME_ASSET_MANIFEST.json` before generation.
 - [x] SB-M42-014 Generate only Home-specific required illustrative assets using approved provider order (ChatGPT primary, Magnific fallback). `[AUDITED_PASS / V02]`
 - [x] SB-M42-015 Keep dynamic values/timers/counts/labels live in Godot UI.
 - [x] SB-M42-016 Require owner approval before production promotion. `[AUDITED_PASS / V02]`
-- [ ] SB-M42-017 Bind approved art and validate viewport matrix. `[CODE_AUDIT_PASS / OWNER_VISUAL_REVIEW_REQUIRED]`
+- [ ] SB-M42-017 Bind approved art and validate viewport matrix. `[CHANGES_REQUIRED / RUNTIME_COMPOSITION_REMEDIATION]`
 - [x] SB-M42-018 Replace coin HUD semantics with Scrub Bucks banknote icon + live SB amount. `[AUDITED_PASS / V02]`
 - [x] SB-M42-019 Replace profile XP bar with live Bot Parts next-robot progress (normally N/250).
 - [x] SB-M42-020 Replace top event bar/timer with Gift Meter progress/next milestone; no Event Points/timer.
