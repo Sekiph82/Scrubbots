@@ -16,7 +16,7 @@ var EXPECTED_CASES := [
 	"home_shell_tree", "home_in_real_root", "home_blocked_state",
 	"play_cta_fresh", "continue_cta_frontier",
 	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
-	"shortcut_columns_responsive",
+	"shortcut_columns_responsive", "live_binding",
 ]
 
 var _fail := 0
@@ -34,6 +34,7 @@ func _initialize() -> void:
 	await _components_viewport_matrix()
 	await _layered_art_regions()
 	await _shortcut_columns_responsive()
+	await _live_binding()
 	_cleanup()
 	_done()
 
@@ -282,6 +283,49 @@ func _shortcut_columns_responsive() -> void:
 		_ok(min_w >= 88.0 - 0.5, "%s: shortcut width >= 88 (%.0f)" % [tag, min_w])
 		sub.free()
 	_complete("shortcut_columns_responsive")
+
+const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
+var _now := 1790000000
+
+## SB-M42-015: every Home value is a live projection of canonical services; Home never
+## writes state and never keeps its own copy.
+func _live_binding() -> void:
+	print("[live binding]")
+	var clock := func(): return _now
+	var app = AppState.new(_uniq("live"), clock, LocalCalendar.offset_provider(clock, 0))
+	var sub := _sub(Vector2i(1080, 2160))
+	var home = HomeScreenScene.instantiate()
+	sub.add_child(home)
+	home.bind(app)
+	await process_frame
+	var e = app.economy
+	var before: Dictionary = e.snapshot()
+	var prog_before: Dictionary = app.progression.snapshot()
+	for _i in range(3):
+		home.refresh()
+	_ok(e.snapshot() == before and app.progression.snapshot() == prog_before, "refresh never mutates economy/progression")
+	var vm: Dictionary = home.get_view_model()
+	_ok(vm["scrub_bucks"] == e.wallet.scrub_bucks() and home.get_region("ScrubBucksChip").value_label.text == str(e.wallet.scrub_bucks()), "SB chip == wallet")
+	e.wallet.credit("scrub_bucks", 1234)
+	e.wallet.credit("bot_parts", 37)
+	e.hearts.consume()
+	e.gift.add_streak_sb("t_live_1", 25)
+	home.refresh()
+	vm = home.get_view_model()
+	_ok(home.get_region("ScrubBucksChip").value_label.text == str(e.wallet.scrub_bucks()), "SB chip follows the wallet live")
+	_ok(vm["bot_parts"] == e.wallet.bot_parts() and home.get_region("ProfileBotParts").caption.text.find("%d/%d" % [e.wallet.bot_parts(), e.robots.unlock_cost()]) != -1, "Bot Parts N/%d follows the wallet" % e.robots.unlock_cost())
+	_ok(home.get_region("HeartsChip").value_label.text == "%d/%d" % [e.hearts.hearts(), e.hearts.max_hearts()] and home.get_region("HeartsChip").sub_label.visible, "Hearts count + live regen timer shown when not full")
+	_now += 60
+	home.refresh()
+	_ok(home.get_region("HeartsChip").sub_label.text == "29:00", "Heart timer counts down from wall clock (%s)" % home.get_region("HeartsChip").sub_label.text)
+	_ok(vm["gift_progress"] == e.gift.cycle_progress() and vm["gift_claimable"] == e.gift.claimable().size(), "Gift Meter progress / claimable follow GiftMeterService")
+	_ok(home.get_region("Shortcut_gift_bar").badge.visible and home.get_region("Shortcut_gift_bar").badge.text == str(e.gift.claimable().size()), "Gift shortcut badge = live claimable count")
+	var props: Array = []
+	for pr in home.get_script().get_script_property_list():
+		props.append(pr["name"])
+	_ok(not props.has("scrub_bucks") and not props.has("hearts") and not props.has("bot_parts"), "Home script declares no balance fields of its own")
+	sub.free()
+	_complete("live_binding")
 
 # ---------------------------------------------------------------- helpers ----
 
