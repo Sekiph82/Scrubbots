@@ -15,6 +15,7 @@ var EXPECTED_CASES := [
 	"nav_edges", "nav_reentry", "nav_terminal_latch", "nav_settings_overlay",
 	"nav_back", "main_owns_one_nav", "no_shipping_level_select",
 	"home_to_gameplay_once", "results_on_real_won", "results_lost_retry_error",
+	"duplicate_transitions",
 ]
 
 var _fail := 0
@@ -33,6 +34,7 @@ func _initialize() -> void:
 	await _home_to_gameplay_once()
 	await _results_on_real_won()
 	await _results_lost_retry_error()
+	await _duplicate_transitions()
 	_cleanup()
 	_done()
 
@@ -220,6 +222,53 @@ func _results_lost_retry_error() -> void:
 	_ok(not res.get_primary_button().visible, "ERROR: HOME only")
 	_shutdown(root)
 	_complete("results_lost_retry_error")
+
+## SB-M42-008: double taps, repeated terminal callbacks and rapid re-entry never
+## duplicate hosts/Results, rewards or saves.
+func _duplicate_transitions() -> void:
+	print("[duplicate transitions]")
+	var root = await _boot_main(_uniq("dup"))
+	var app = root.get_app_state()
+	var nav = root.get_navigation()
+	var saves := [0]
+	app.save.set_fault_injector(func(stage):
+		if stage == "temp_write":
+			saves[0] += 1
+		return false)
+	var play: Button = root.get_home().get_region("PlayButton")
+	for _i in range(5):
+		play.pressed.emit()   # same-frame double/triple tap
+	await process_frame
+	_ok(_hosts(root) == 1 and nav.attempt_id() == 1 and nav.transition_id() == 2, "5 PLAY taps -> 1 host, 1 attempt, 1 transition")
+	var h = root.get_gameplay_host()
+	h.get_runtime().set_process(false)
+	_drain(h)
+	var sb_after: int = app.economy.wallet.scrub_bucks()
+	var saves_after_terminal: int = saves[0]
+	var results_count := [0]
+	nav.route_changed.connect(func(_f, t, _p):
+		if t == R.RESULTS:
+			results_count[0] += 1)
+	for _i in range(5):
+		h.get_completion().terminal_reached.emit(&"WON", {})
+	_ok(results_count[0] == 0 and nav.current() == R.RESULTS, "5 repeated terminal callbacks -> no extra Results")
+	_ok(app.economy.wallet.scrub_bucks() == sb_after and app.progression.current_level() == 2, "no double reward / double progression")
+	_ok(saves[0] == saves_after_terminal, "no repeated saves from repeated terminals")
+	var res = root.get_results_screen()
+	var t0: int = nav.transition_id()
+	res.get_home_button().pressed.emit()
+	res.get_home_button().pressed.emit()
+	res.get_primary_button().pressed.emit()
+	await process_frame
+	_ok(nav.current() == R.HOME and nav.transition_id() == t0 + 1 and _hosts(root) == 0, "double HOME + late CONTINUE -> one transition, no host")
+	_ok(not root.retry_from_results() and not root.continue_from_results().get("ok", true), "Results actions refused outside RESULTS")
+	root.open_settings()
+	root.open_settings()
+	_ok(root.find_children("*", "", true, false).filter(func(n): return n == root.get_settings_panel()).size() == 1 and nav.is_settings_open(), "double Settings open -> one overlay")
+	_ok(nav.back() == "close_settings" and nav.back() == "none", "back twice: close then nothing")
+	app.save.set_fault_injector(Callable())
+	_shutdown(root)
+	_complete("duplicate_transitions")
 
 const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 
