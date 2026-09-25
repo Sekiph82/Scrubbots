@@ -8,12 +8,12 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Current Sprint: M42-C001 Runtime Visual Remediation
 - Current Task: Fix live Home composition after first owner runtime screenshot
 - Current Task Status: IMPLEMENTATION_REQUIRED
-- Next Task/Action: CLAUDE executes `coordination/sessions/M42-C001/task_prompts/SB-M42-HOME-COMPOSITION-REMEDIATION.md`, then hands back for ChatGPT audit. After audit, OWNER reruns Home and supplies a new runtime screenshot for final SB-M42-011/SB-M42-017 visual review.
+- Next Task/Action: CLAUDE executes the superseding one-pass V02 prompt `coordination/sessions/M42-C001/task_prompts/SB-M42-HOME-MASTER-CONVERGENCE_V02.md`. It must first commit the owner comparison PNG from the local repo path, then process the full 222-point master-vs-actual visual gap register, iterate against runtime snapshots, run all regressions, and hand back for ChatGPT audit. After audit, OWNER reruns Home and supplies a new runtime screenshot for final SB-M42-011/SB-M42-017 visual review.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011 and SB-M42-017 are now CHANGES_REQUIRED rather than owner-gate-only.
-- Note: Owner approval of all 49 unique Home ART files and deterministic manifest promotion remain valid and closed. First runtime visual evidence showed that many approved assets are hash-valid but not actually composed on screen. ChatGPT visual audit `coordination/sessions/M42-C001/audits/SB-M42-HOME-COMPOSED_VISUAL_AUDIT_V01.md` found missing Play frame, bottom-nav icons, central banner, platform-top/environment/helper/profile/Gift Meter/reward-track art, incorrect Scrubby/platform composition and clipped shortcut labels. Current open M42 rows: 011, 017, 032, 033.
+- Note: Owner approval of all 49 unique Home ART files and deterministic manifest promotion remain valid and closed. First runtime visual evidence showed that many approved assets are hash-valid but not actually composed on screen. ChatGPT visual audit `coordination/sessions/M42-C001/audits/SB-M42-HOME-COMPOSED_VISUAL_AUDIT_V01.md` plus the 222-point register `coordination/sessions/M42-C001/SB-M42-HOME-MASTER_ACTUAL_VISUAL_GAP_REGISTER_V01.md` now define the remediation contract. V02 supersedes the earlier composition-remediation prompt. Current open M42 rows: 011, 017, 032, 033.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
