@@ -260,3 +260,8 @@ Claude does not create a self-audit file and does not assign audit verdicts.
 | M38-C001 reopened full-surface audit | coordination/sessions/M38-C001/CHATGPT_FULL_SURFACE_REAUDIT_V02.md | `CHANGES_REQUIRED / F-M38-REOPEN-001..002` | Reward-failure sub-test never executed because fake was not a RewardGrantService subclass; suite could still print PASS after sub-test abort. SB-M38-016 reopened only. |
 | M39-C001 V04 independent audit | coordination/sessions/M39-C001/CHATGPT_AUDIT_V04.md | `CODE_AUDIT_PASS / REGRESSION_GATE_OPEN / DEVICE_OWNER_GATE_OPEN` | V04 production findings accepted; SB-M39-052 waits for repaired M38 strict regression, SB-M39-033 real-device gate remains. |
 | M40-C001 V04 independent audit | coordination/sessions/M40-C001/CHATGPT_AUDIT_V04.md | `CODE_AUDIT_PASS / M38 STRICT REGRESSION REQUIRED` | Actual bootstrap/content/save/local-day remediation accepted; final AUDITED_PASS waits only for repaired mandatory M38 regression evidence. |
+
+
+| M38-C001 V03 final audit | coordination/sessions/M38-C001/CHATGPT_AUDIT_V03.md | `AUDITED_PASS / M38 WIN STREAK CLOSED / STRICT EVIDENCE REPAIRED` | Type-valid failing RewardGrantService double now executes the failure branch; 11/11 completion ledger prevents aborted-subtest false PASS. |
+| M39-C001 V04 final audit | coordination/sessions/M39-C001/CHATGPT_AUDIT_V04.md | `AUDITED_PASS / M39 ECONOMY CODE CLOSED / SB-M39-033 DEVICE_OWNER_REQUIRED` | Repaired M38 regression rerun closes SB-M39-052; only real-device sixth-slot gate remains. |
+| M40-C001 V04 final audit | coordination/sessions/M40-C001/CHATGPT_AUDIT_V04.md | `AUDITED_PASS / M40 SAVE SYSTEM CLOSED` | Repaired mandatory M38 regression rerun closes the final external gate. |
