@@ -33,6 +33,7 @@ const ResponsiveLayout = preload("res://scripts/ui/responsive_layout.gd")
 const UiValueChip = preload("res://scripts/ui/components/ui_value_chip.gd")
 const UiProgressMeter = preload("res://scripts/ui/components/ui_progress_meter.gd")
 const UiShortcutButton = preload("res://scripts/ui/components/ui_shortcut_button.gd")
+const HomeViewModel = preload("res://scripts/ui/home/home_view_model.gd")
 
 ## Shortcut columns (SB-M42-010/012). Destinations belonging to later milestones are
 ## rendered disabled by refresh(), never faked.
@@ -56,9 +57,21 @@ var _built := false
 var _nodes: Dictionary = {}   ## region name -> Control
 ## Last frontier resolution shown on the CTA (SB-M42-003). Read-only presentation copy.
 var _launch: Dictionary = {}
+## Last live projection rendered (SB-M42-015). A detached copy for tests/diagnostics —
+## never read back as truth; every refresh re-reads the canonical services.
+var _vm: Dictionary = {}
+var _tick: Timer
 
 func _ready() -> void:
 	_build()
+	# SB-M42-015: live values (Heart regen timer) re-read once per second while visible.
+	_tick = Timer.new()
+	_tick.wait_time = 1.0
+	_tick.timeout.connect(func():
+		if is_visible_in_tree():
+			refresh())
+	add_child(_tick)
+	_tick.start()
 	resized.connect(_apply_layout_mode)
 	_nodes["MainWorldArea"].resized.connect(_apply_layout_mode)
 	_apply_layout_mode()
@@ -298,6 +311,37 @@ func refresh() -> void:
 		status.text = "Save data is from a newer version. Update the game to continue."
 	else:
 		_render_play(play, status)
+	_render_values()
+
+## SB-M42-015: bind every live Home value from the canonical services (via the pure
+## HomeViewModel). Home stores nothing but the last rendered copy.
+func _render_values() -> void:
+	_vm = HomeViewModel.build(_app)
+	if not _vm.get("ok", false):
+		return
+	(_nodes["ProfileBotParts"] as UiProgressMeter).set_progress(_vm["bot_parts"], _vm["bot_parts_target"],
+		"LEVEL %d · BOT PARTS %d/%d" % [_vm["level"], _vm["bot_parts"], _vm["bot_parts_target"]])
+	var sb: UiValueChip = _nodes["ScrubBucksChip"]
+	sb.set_value(str(_vm["scrub_bucks"]))
+	var hearts: UiValueChip = _nodes["HeartsChip"]
+	hearts.set_value("%d/%d" % [_vm["hearts"], _vm["hearts_max"]])
+	hearts.set_sub("" if _vm["hearts"] >= _vm["hearts_max"] else _mmss(_vm["heart_seconds_to_next"]))
+	(_nodes["GiftMeterBar"] as UiProgressMeter).set_progress(_vm["gift_progress"], _vm["gift_cycle_max"],
+		"GIFT METER %d · NEXT %d" % [_vm["gift_progress"], _vm["gift_next_milestone"]])
+	for step in _vm["win_streak_track"]:
+		var chip: UiValueChip = _nodes["TrackStep%d" % step["position"]]
+		chip.set_value("+%d" % step["sb"])
+		chip.set_sub(("%d+" % step["position"]) if step["position"] == HomeViewModel.TRACK_POSITIONS else str(step["position"]))
+	(_nodes["Shortcut_win_streak"] as UiShortcutButton).set_badge(_vm["win_streak"])
+	(_nodes["Shortcut_gift_bar"] as UiShortcutButton).set_badge(_vm["gift_claimable"])
+	(_nodes["Shortcut_cards_exchange"] as UiShortcutButton).set_badge(_vm["cards_duplicates"])
+	(_nodes["Shortcut_daily"] as UiShortcutButton).set_badge(_vm["daily_cycle_day"])
+
+static func _mmss(seconds: int) -> String:
+	return "%02d:%02d" % [seconds / 60, seconds % 60]
+
+func get_view_model() -> Dictionary:
+	return _vm.duplicate(true)
 
 ## SB-M42-003: the ONE CTA launches only the canonical progression frontier.
 ##   no completed level -> "PLAY"; otherwise "CONTINUE · LEVEL N".
