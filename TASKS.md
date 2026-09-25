@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M41 OWNER GATE
-- Current Sprint: M41-C002 Reduced Effects Owner Acceptance
-- Current Task: SB-M41-005 Reduced Effects
-- Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER runs the main app, opens SETTINGS, confirms the new REDUCED EFFECTS row is readable/usable, toggles it ON during gameplay and confirms the cleaning cue becomes lighter/shorter, toggles it OFF and confirms normal cleaning FX returns, then relaunches once with it ON and confirms persistence. M41-C002 code is independently audited PASS; no remediation is open.
-- Required Actor: OWNER
+- Current Milestone: M42
+- Current Sprint: M42-C001 Home / Navigation Preparation
+- Current Task: M42 prompt + audit bundle
+- Current Task Status: CHATGPT_PREPARING
+- Next Task/Action: ChatGPT prepares per-task implementation prompts and strict audit criteria for SB-M42-001..033 plus one master execution prompt. Claude must not start until the published M42 bundle is ready. Owner decisions already locked elsewhere must be consumed; unresolved M42 design gates remain explicit owner gates and must not be silently invented.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 712 / 980 = 72.65%. SB-M41-005 is code-audited but remains open until owner visual/manual acceptance.
-- Note: M41-C002 V01 verdict is `AUDITED_PASS / SB-M41-005 CODE CLOSED / OWNER_F6_REQUIRED` at `coordination/sessions/M41-C002/CHATGPT_AUDIT_V01.md`. M33 and the M41-C001 Settings slice remain fully accepted. Separate open gates remain M34 real-device haptics, M36 human difficulty playtest and M39 sixth-slot phone safe-area/touch/readability.
+- Progress: 713 / 980 = 72.76%. M41 is fully closed; SB-M41-005 owner acceptance is recorded.
+- Note: M41 final status is `AUDITED_PASS / OWNER_F6_PASS / M41 SETTINGS CLOSED`. M42 SB-M42-005 inherits the owner-locked V1 decision: NO SHIPPING LEVEL SELECT / DEBUG SEAM ONLY. Separate open pre-existing gates remain M34 real-device haptics, M36 human difficulty playtest and M39 sixth-slot phone safe-area/touch/readability.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1505,23 +1505,22 @@ Pre-authored batch bundle: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V01.md
 - [x] SB-M40-012 Migrate old saves with missing Economy V1 fields to safe defaults; never invent Star/Event balances.
 - [x] SB-M40-013 Persist wall-clock timestamps/expiry defensively against duplicate reward/refill claims.
 
-### M41 — Settings
+### M41 — Settings `[CLOSED 2026-09-25]`
 
-M41-C001 early Settings slice final status: **`CODE_AUDIT_PASS / OWNER_F6_PASS / SETTINGS EARLY SLICE ACCEPTED`**. Palette blocker is closed, actual-main `m41_settings` passed 13/13 with zero SCRIPT ERROR, and owner completed the requested 9/9 visual/manual checks covering layout/readability, slider/toggle interaction, Master/Music/SFX isolation, live haptics toggle behavior, panel reopen persistence and full relaunch restoration.
+Final status: **`AUDITED_PASS / OWNER_F6_PASS / M41 SETTINGS CLOSED`**.
 
-Owner acceptance evidence:
-`coordination/OWNER_M41_SETTINGS_ACCEPTANCE_V01.md`
+M41-C001 closed Master/Music/SFX/Haptics/Persistence/UI/Relaunch with independent code audit plus owner 9/9 manual acceptance.
 
-M41-C001 independent audit:
-`coordination/sessions/M41-C001/CHATGPT_AUDIT_V01.md`
+M41-C002 closed the final row, `SB-M41-005 Reduced Effects`, with independent code audit plus owner 5/5 manual acceptance. The setting is canonical/persistent, strict-validated, live-bound to the accepted M31 reduced cleaning presentation, gameplay-invariant and owner-accepted.
 
-M41-C002 implements the final row, `SB-M41-005 Reduced Effects`. Independent code audit result: **`AUDITED_PASS / M41-C002 V01 / SB-M41-005 CODE CLOSED / OWNER_F6_REQUIRED`**. Canonical persistence, strict validation, live production-host binding, Settings UI integration, ON/OFF relaunch restoration and gameplay invariance are accepted. No remediation is open. Because this cycle adds a new visible Settings row and a user-visible live cleaning-FX change, final owner visual/manual acceptance is still required before the checkbox and milestone close.
-
-M41-C002 independent audit:
-`coordination/sessions/M41-C002/CHATGPT_AUDIT_V01.md`
+Evidence:
+- `coordination/sessions/M41-C001/CHATGPT_AUDIT_V01.md`
+- `coordination/OWNER_M41_SETTINGS_ACCEPTANCE_V01.md`
+- `coordination/sessions/M41-C002/CHATGPT_AUDIT_V01.md`
+- `coordination/OWNER_M41_C002_REDUCED_EFFECTS_ACCEPTANCE_V01.md`
 
 - [x] SB-M41-001 Master volume. — [x] SB-M41-002 Music. — [x] SB-M41-003 SFX.
-- [x] SB-M41-004 Haptics. — [ ] SB-M41-005 Reduced effects. `[CODE_AUDIT_PASS / OWNER_REQUIRED]`
+- [x] SB-M41-004 Haptics. — [x] SB-M41-005 Reduced effects.
 - [x] SB-M41-006 Persistence. — [x] SB-M41-007 Settings UI.
 - [x] SB-M41-008 Relaunch tests.
 
