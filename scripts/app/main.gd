@@ -10,15 +10,15 @@ extends Control
 ##     the frontier through LevelCatalog and injects this same AppState;
 ##   - flushes durable state at app lifecycle boundaries (background/pause,
 ##     focus loss, close/quit) — never per frame.
-## The debug labels remain (no Home UI before M42) but are no longer the whole
-## bootstrap.
+## M42: the pre-M42 debug label shell is replaced by the production Home screen
+## (SB-M42-002), shown whenever the navigation route is HOME.
 
-const LevelLoader = preload("res://scripts/data/level_loader.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
 const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
 const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/production_gameplay_host.gd")
 const SettingsPanelScene = preload("res://scenes/ui/settings_panel.tscn")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
+const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -34,6 +34,8 @@ var last_flush: Dictionary = {}
 var _gameplay_host = null
 ## M41 V01 Settings panel bound to THIS canonical AppState (no second settings authority).
 var _settings_panel = null
+## M42 production Home (SB-M42-002), bound to THIS AppState.
+var _home = null
 
 func _enter_tree() -> void:
 	_boot()
@@ -47,25 +49,27 @@ func _boot() -> void:
 	nav.settings_changed.connect(_on_nav_settings_changed)
 
 func _ready() -> void:
-	%GodotVersionLabel.text = "Godot %s" % Engine.get_version_info().string
-	%BoardCoreLabel.text = _describe_board_core()
-	var status := get_node_or_null("VBoxContainer/StatusLabel")
-	if status != null:
-		status.text = _describe_app_state()
+	_home = HomeScreenScene.instantiate()
+	_home.name = "HomeScreen"
+	add_child(_home)
+	_home.bind(app_state)
+	_home.settings_requested.connect(open_settings)
 	_build_settings_entry()
+	nav.route_changed.connect(_on_route_changed)
 	nav.go(NavigationController.Route.HOME, {"via": "boot"})
 
-## M41 V01: a native SETTINGS button on the pre-M42 app root opens the Settings panel.
+## M42: show the screen that belongs to the current route.
+func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
+	if _home != null:
+		_home.visible = to == NavigationController.Route.HOME
+		if _home.visible:
+			_home.refresh()
+
+func get_home():
+	return _home
+
+## M41 V01 Settings panel (M42: opened from the Home bottom-nav SETTINGS button).
 func _build_settings_entry() -> void:
-	var box := get_node_or_null("VBoxContainer")
-	if box != null:
-		var b := Button.new()
-		b.name = "SettingsButton"
-		b.text = "SETTINGS"
-		b.custom_minimum_size = Vector2(360, 88)
-		b.add_theme_font_size_override("font_size", 34)
-		b.pressed.connect(open_settings)
-		box.add_child(b)
 	_settings_panel = SettingsPanelScene.instantiate()
 	_settings_panel.name = "SettingsPanel"
 	_settings_panel.visible = false
@@ -141,24 +145,3 @@ func _notification(what: int) -> void:
 			flush_lifecycle("focus_out")
 		NOTIFICATION_WM_CLOSE_REQUEST:
 			flush_lifecycle("close_request")
-
-func _describe_app_state() -> String:
-	if app_state == null:
-		return "AppState: missing"
-	if app_state.is_blocked:
-		return "Save blocked: %s" % app_state.blocked_reason()
-	var launch := GameplayLaunchResolver.resolve(app_state)
-	if launch.get("ok", false):
-		return "Frontier %d: %s" % [launch["level"], launch["entry_id"]]
-	return "Frontier %d: %s" % [int(launch.get("level", 0)), launch.get("reason", "")]
-
-func _describe_board_core() -> String:
-	var parts: PackedStringArray = []
-	for path in ["res://data/levels/test_40x40.json", "res://data/levels/test_50x50.json"]:
-		var result = LevelLoader.load_from_path(path)
-		if result.is_ok():
-			var level = result.level_data
-			parts.append("%dx%d: %d" % [level.width, level.height, level.get_cell_count()])
-		else:
-			parts.append("%s: FAILED" % path)
-	return "Board Core OK  |  " + "  |  ".join(parts)
