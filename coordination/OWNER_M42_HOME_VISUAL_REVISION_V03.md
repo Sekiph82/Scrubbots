@@ -160,6 +160,7 @@ Owner-retired/disabled assets in V03:
 - HOME-011 platform top
 - HOME-031 blink layer
 - HOME-032 brush-arm layer
+- HOME-087 per-step Scrub Bucks reuse in the reward track (owner removed repeated currency icons)
 - HOME-078 only if replaced by the native white triangle per item 44
 
 Do not delete these files. Do not falsify them as visible.
