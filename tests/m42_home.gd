@@ -15,6 +15,7 @@ const REQUIRED_VIEWPORTS := [Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2
 var EXPECTED_CASES := [
 	"home_shell_tree", "home_in_real_root", "home_blocked_state",
 	"play_cta_fresh", "continue_cta_frontier",
+	"settings_single_authority",
 ]
 
 var _fail := 0
@@ -28,6 +29,7 @@ func _initialize() -> void:
 	await _home_blocked_state()
 	await _play_cta_fresh()
 	await _continue_cta_frontier()
+	await _settings_single_authority()
 	_cleanup()
 	_done()
 
@@ -128,6 +130,34 @@ func _continue_cta_frontier() -> void:
 	_ok(root.get_gameplay_host() == null and root.get_navigation().current() == NavigationController.Route.HOME, "no gameplay, still HOME (never falls back to level 1)")
 	_shutdown(root)
 	_complete("continue_cta_frontier")
+
+## SB-M42-004: Home Settings reuses the ONE M41 panel bound to the ONE AppState.
+func _settings_single_authority() -> void:
+	print("[settings single authority]")
+	var path := _uniq("settings")
+	var root = await _boot_main(path)
+	var app = root.get_app_state()
+	var btn: Button = root.get_home().get_region("Nav_settings")
+	var panel = root.get_settings_panel()
+	for _i in range(3):
+		btn.pressed.emit()
+		panel.close_panel()
+	btn.pressed.emit()
+	_ok(root.find_children("*", "", true, false).filter(func(n): return n.get_script() == panel.get_script()).size() == 1, "exactly one SettingsPanel instance after repeated opens")
+	_ok(panel.visible and root.get_navigation().is_settings_open(), "Home SETTINGS opens it")
+	panel.get_toggle("music").button_pressed = false
+	panel.get_reduced_effects_toggle().button_pressed = true
+	_ok(not app.audio.is_music_enabled() and app.effects.is_reduced(), "changes land in the canonical AppState services")
+	panel.close_panel()
+	var p2 = AppState.new(path)
+	_ok(not p2.audio.is_music_enabled() and p2.effects.is_reduced(), "persisted through the canonical save (no side authority)")
+	_ok(root.get_navigation().current() == NavigationController.Route.HOME and not root.get_navigation().is_settings_open(), "closing returns to Home")
+	_ok(app.progression.current_level() == 1 and app.economy.wallet.scrub_bucks() == p2.economy.wallet.scrub_bucks(), "no unrelated side effects (progression/economy unchanged)")
+	root.get_home().get_region("PlayButton").pressed.emit()
+	root.open_settings()
+	_ok(not root.get_navigation().is_settings_open() and not panel.visible, "Settings cannot open during gameplay")
+	_shutdown(root)
+	_complete("settings_single_authority")
 
 # ---------------------------------------------------------------- helpers ----
 
