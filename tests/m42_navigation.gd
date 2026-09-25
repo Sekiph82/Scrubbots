@@ -1,0 +1,179 @@
+extends SceneTree
+## M42-C001 — NavigationController + app-root ownership evidence.
+## Covers SB-M42-001 (architecture) and later nav tasks append cases here.
+## Expected/completed case ledger (AL-091).
+##
+## Run: godot --headless --path . -s res://tests/m42_navigation.gd
+
+const NavigationController = preload("res://scripts/app/navigation_controller.gd")
+const MainScript = preload("res://scripts/app/main.gd")
+const MainScene = preload("res://scenes/app/main.tscn")
+
+const R := NavigationController.Route
+
+var EXPECTED_CASES := [
+	"nav_edges", "nav_reentry", "nav_terminal_latch", "nav_settings_overlay",
+	"nav_back", "main_owns_one_nav",
+]
+
+var _fail := 0
+var _completed: Dictionary = {}
+var _tmp: Array = []
+
+func _initialize() -> void:
+	await process_frame
+	_nav_edges()
+	_nav_reentry()
+	_nav_terminal_latch()
+	_nav_settings_overlay()
+	_nav_back()
+	await _main_owns_one_nav()
+	_cleanup()
+	_done()
+
+func _nav_edges() -> void:
+	print("[nav edges]")
+	var n = NavigationController.new()
+	_ok(n.current() == R.BOOT and n.transition_id() == 0, "starts at BOOT, transition 0")
+	_ok(not n.go(R.GAMEPLAY) and not n.go(R.RESULTS) and n.current() == R.BOOT, "BOOT cannot jump to GAMEPLAY/RESULTS")
+	_ok(not n.go(99) and not n.go(-1), "unknown route ids rejected")
+	_ok(n.go(R.HOME) and n.current() == R.HOME and n.transition_id() == 1, "BOOT -> HOME")
+	_ok(not n.go(R.HOME) and n.transition_id() == 1, "same-route request rejected (idempotent)")
+	_ok(not n.go(R.RESULTS) and not n.go(R.OPENING), "HOME cannot go to RESULTS/OPENING")
+	_ok(n.go(R.GAMEPLAY) and n.attempt_id() == 1, "HOME -> GAMEPLAY starts attempt 1")
+	_ok(not n.go(R.OPENING), "GAMEPLAY cannot go to OPENING")
+	var log: Array = []
+	n.route_changed.connect(func(f, t, p): log.append([f, t, p]))
+	_ok(n.go(R.HOME, {"x": 1}) and log.size() == 1 and log[0][0] == R.GAMEPLAY and log[0][1] == R.HOME and log[0][2] == {"x": 1}, "route_changed carries from/to/payload")
+	var names: Array = []
+	for k in R:
+		names.append(k)
+	_ok(names == ["BOOT", "OPENING", "HOME", "GAMEPLAY", "RESULTS"], "closed route set, no LEVEL_SELECT")
+	_complete("nav_edges")
+
+func _nav_reentry() -> void:
+	print("[nav re-entry]")
+	var n = NavigationController.new()
+	n.go(R.HOME)
+	var inner := [null]
+	n.route_changed.connect(func(_f, _t, _p): inner[0] = n.go(R.HOME))
+	_ok(n.go(R.GAMEPLAY), "outer transition accepted")
+	_ok(inner[0] == false and n.current() == R.GAMEPLAY and n.transition_id() == 2, "re-entrant go() inside route_changed rejected")
+	var payload := {"a": [1]}
+	var n2 = NavigationController.new()
+	n2.go(R.HOME, payload)
+	payload["a"].append(2)
+	_ok(n2.last_payload() == {"a": [1]}, "payload stored as detached copy")
+	var lp: Dictionary = n2.last_payload()
+	lp["a"].append(3)
+	_ok(n2.last_payload() == {"a": [1]}, "last_payload() returns a detached copy")
+	_complete("nav_reentry")
+
+func _nav_terminal_latch() -> void:
+	print("[nav terminal latch]")
+	var n = NavigationController.new()
+	n.go(R.HOME)
+	_ok(not n.on_gameplay_terminal(0, &"WON", 1), "terminal outside GAMEPLAY rejected")
+	n.go(R.GAMEPLAY)
+	var a: int = n.attempt_id()
+	_ok(not n.on_gameplay_terminal(a + 1, &"WON", 1), "wrong attempt id rejected")
+	_ok(n.on_gameplay_terminal(a, &"WON", 1) and n.current() == R.RESULTS, "terminal -> RESULTS")
+	_ok(n.last_payload() == {"status": "WON", "level": 1, "attempt": a}, "minimal results payload")
+	_ok(not n.on_gameplay_terminal(a, &"WON", 1) and n.transition_id() == 3, "repeated terminal ignored")
+	_ok(n.resume_gameplay_after_retry() and n.attempt_id() == a + 1, "RESULTS -> GAMEPLAY retry = new attempt")
+	_ok(not n.on_gameplay_terminal(a, &"LOST", 1), "stale attempt terminal ignored after retry")
+	_ok(n.on_gameplay_terminal(a + 1, &"LOST", 1) and n.last_payload()["status"] == "LOST", "new attempt terminal accepted once")
+	_complete("nav_terminal_latch")
+
+func _nav_settings_overlay() -> void:
+	print("[nav settings overlay]")
+	var n = NavigationController.new()
+	_ok(not n.open_settings(), "no Settings outside HOME (BOOT)")
+	n.go(R.HOME)
+	var ev: Array = []
+	n.settings_changed.connect(func(o): ev.append(o))
+	_ok(n.open_settings() and n.is_settings_open() and ev == [true], "HOME opens Settings")
+	_ok(not n.open_settings() and ev == [true], "double open ignored")
+	_ok(n.go(R.GAMEPLAY) and not n.is_settings_open() and ev == [true, false], "leaving HOME closes Settings")
+	_ok(not n.open_settings(), "no Settings during GAMEPLAY")
+	_ok(not n.close_settings(), "close when closed is a no-op")
+	_complete("nav_settings_overlay")
+
+func _nav_back() -> void:
+	print("[nav back]")
+	var n = NavigationController.new()
+	_ok(n.back() == "none" and n.current() == R.BOOT, "BOOT back: none")
+	n.go(R.HOME)
+	_ok(n.back() == "none" and n.current() == R.HOME, "HOME back: none (no exit/level select)")
+	n.open_settings()
+	_ok(n.back() == "close_settings" and not n.is_settings_open() and n.current() == R.HOME, "back closes Settings first")
+	n.go(R.GAMEPLAY)
+	_ok(n.back() == "none" and n.current() == R.GAMEPLAY, "GAMEPLAY back after action: none")
+	_ok(n.back(true) == "home" and n.current() == R.HOME, "GAMEPLAY back pre-action: HOME")
+	n.go(R.GAMEPLAY)
+	n.on_gameplay_terminal(n.attempt_id(), &"WON", 1)
+	_ok(n.back() == "home" and n.current() == R.HOME, "RESULTS back: HOME")
+	_complete("nav_back")
+
+func _main_owns_one_nav() -> void:
+	print("[main owns one nav]")
+	var root = await _boot_main(_uniq("nav"))
+	var nav = root.get_navigation()
+	_ok(nav != null and nav.current() == R.HOME, "real main.tscn root owns the navigation authority, at HOME")
+	_ok(root.get_navigation() == nav, "same instance on repeated access")
+	root.open_settings()
+	_ok(nav.is_settings_open() and root.get_settings_panel().visible, "main Settings opens via nav overlay")
+	root.get_settings_panel().close_panel()
+	_ok(not nav.is_settings_open() and not root.get_settings_panel().visible, "panel Close closes the nav overlay")
+	root.open_settings()
+	nav.close_settings()
+	_ok(not root.get_settings_panel().visible, "nav close hides the panel")
+	_shutdown(root)
+	_complete("main_owns_one_nav")
+
+# ---------------------------------------------------------------- helpers ----
+
+func _boot_main(path: String):
+	MainScript.boot_save_path_override = path
+	var root = MainScene.instantiate()
+	get_root().add_child(root)
+	await process_frame
+	return root
+
+func _shutdown(root) -> void:
+	if root != null and is_instance_valid(root):
+		root.free()
+	MainScript.boot_save_path_override = ""
+
+func _uniq(tag: String) -> String:
+	var p := "user://m42nav_%s_%d.save" % [tag, Time.get_ticks_usec()]
+	_tmp.append(p)
+	return p
+
+func _cleanup() -> void:
+	for p in _tmp:
+		for suffix in ["", ".bak", ".tmp"]:
+			if FileAccess.file_exists(p + suffix):
+				DirAccess.remove_absolute(ProjectSettings.globalize_path(p + suffix))
+
+func _complete(c: String) -> void:
+	_completed[c] = true
+
+func _ok(cond: bool, msg: String) -> void:
+	if not cond:
+		_fail += 1
+		print("  FAIL: %s" % msg)
+	else:
+		print("  ok: %s" % msg)
+
+func _done() -> void:
+	var missing: Array = []
+	for c in EXPECTED_CASES:
+		if not _completed.has(c):
+			missing.append(c)
+	for c in missing:
+		print("  FAIL: sub-test did not complete: %s" % c)
+	_fail += missing.size()
+	print("M42 navigation cases completed: %d/%d" % [EXPECTED_CASES.size() - missing.size(), EXPECTED_CASES.size()])
+	print("M42 navigation evidence: %s" % ("PASS" if _fail == 0 else "FAIL (%d)" % _fail))
+	quit(0 if _fail == 0 else 1)

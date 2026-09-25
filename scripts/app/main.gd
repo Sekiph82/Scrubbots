@@ -18,6 +18,7 @@ const AppState = preload("res://scripts/app/app_state.gd")
 const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
 const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/production_gameplay_host.gd")
 const SettingsPanelScene = preload("res://scenes/ui/settings_panel.tscn")
+const NavigationController = preload("res://scripts/app/navigation_controller.gd")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -26,6 +27,8 @@ static var boot_clock_override: Callable = Callable()
 static var boot_local_day_override: Callable = Callable()
 
 var app_state = null
+## M42 (SB-M42-001): the ONE app-root-owned navigation authority.
+var nav = null
 var last_launch: Dictionary = {}
 var last_flush: Dictionary = {}
 var _gameplay_host = null
@@ -40,6 +43,8 @@ func _boot() -> void:
 		return
 	var path: String = boot_save_path_override if not boot_save_path_override.is_empty() else AppState.CANONICAL_SAVE_PATH
 	app_state = AppState.new(path, boot_clock_override, boot_local_day_override)
+	nav = NavigationController.new()
+	nav.settings_changed.connect(_on_nav_settings_changed)
 
 func _ready() -> void:
 	%GodotVersionLabel.text = "Godot %s" % Engine.get_version_info().string
@@ -48,6 +53,7 @@ func _ready() -> void:
 	if status != null:
 		status.text = _describe_app_state()
 	_build_settings_entry()
+	nav.go(NavigationController.Route.HOME, {"via": "boot"})
 
 ## M41 V01: a native SETTINGS button on the pre-M42 app root opens the Settings panel.
 func _build_settings_entry() -> void:
@@ -65,10 +71,22 @@ func _build_settings_entry() -> void:
 	_settings_panel.visible = false
 	add_child(_settings_panel)
 	_settings_panel.bind(app_state)
+	_settings_panel.closed.connect(func(): nav.close_settings())
 
+## Settings is a navigation overlay (HOME only); the panel follows nav state.
 func open_settings() -> void:
-	if _settings_panel != null:
+	nav.open_settings()
+
+func _on_nav_settings_changed(open: bool) -> void:
+	if _settings_panel == null:
+		return
+	if open:
 		_settings_panel.open_panel()
+	elif _settings_panel.visible:
+		_settings_panel.close_panel()
+
+func get_navigation():
+	return nav
 
 func get_settings_panel():
 	return _settings_panel
