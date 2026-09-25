@@ -19,6 +19,7 @@ const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/productio
 const SettingsPanelScene = preload("res://scenes/ui/settings_panel.tscn")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
+const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -36,6 +37,8 @@ var _gameplay_host = null
 var _settings_panel = null
 ## M42 production Home (SB-M42-002), bound to THIS AppState.
 var _home = null
+## M42 Results surface (SB-M42-007): shown once per gameplay terminal.
+var _results = null
 
 func _enter_tree() -> void:
 	_boot()
@@ -55,6 +58,12 @@ func _ready() -> void:
 	_home.bind(app_state)
 	_home.settings_requested.connect(open_settings)
 	_home.play_requested.connect(play_current_frontier)
+	_results = ResultsScreen.new()
+	_results.visible = false
+	add_child(_results)
+	_results.home_requested.connect(func(): nav.go(NavigationController.Route.HOME, {"via": "results"}))
+	_results.continue_requested.connect(continue_from_results)
+	_results.retry_requested.connect(retry_from_results)
 	_build_settings_entry()
 	nav.route_changed.connect(_on_route_changed)
 	nav.go(NavigationController.Route.HOME, {"via": "boot"})
@@ -68,6 +77,11 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 		_home.visible = to == NavigationController.Route.HOME
 		if _home.visible:
 			_home.refresh()
+	if _results != null:
+		_results.visible = to == NavigationController.Route.RESULTS
+		if _results.visible:
+			_results.show_result(_payload, GameplayLaunchResolver.resolve(app_state).get("ok", false))
+			move_child(_results, get_child_count() - 1)
 
 func get_home():
 	return _home
@@ -156,9 +170,44 @@ func play_current_frontier() -> Dictionary:
 	var r := launch_gameplay()
 	if r.get("ok", false):
 		nav.go(NavigationController.Route.GAMEPLAY, {"level": r["launch"]["level"], "entry_id": r["launch"]["entry_id"]})
+		_bind_terminal(r["host"])
 	elif _home != null:
 		_home.refresh()
 	return r
+
+## SB-M42-007: authoritative M30 terminal -> RESULTS exactly once per attempt. The host's
+## own terminal handler (economy + save) is connected first, so it has committed before
+## Results appear. The attempt id is read at signal time (Retry re-arms a new attempt).
+func _bind_terminal(host) -> void:
+	var completion = host.get_completion()
+	if completion == null:
+		return
+	completion.terminal_reached.connect(func(status, _detail):
+		if host == _gameplay_host:
+			nav.on_gameplay_terminal(nav.attempt_id(), status, int(host.progression_level)))
+
+## RESULTS (WON) -> next canonical frontier, only when it has content.
+func continue_from_results() -> Dictionary:
+	if nav.current() != NavigationController.Route.RESULTS:
+		return {"ok": false, "reason": "not_results"}
+	if not GameplayLaunchResolver.resolve(app_state).get("ok", false):
+		return {"ok": false, "reason": "no_next_content"}
+	var r := launch_gameplay()
+	if r.get("ok", false):
+		nav.go(NavigationController.Route.GAMEPLAY, {"level": r["launch"]["level"], "entry_id": r["launch"]["entry_id"]})
+		_bind_terminal(r["host"])
+	return r
+
+## RESULTS (LOST) -> M30 transaction-safe Retry of the same host, new attempt id.
+func retry_from_results() -> bool:
+	if nav.current() != NavigationController.Route.RESULTS or _gameplay_host == null:
+		return false
+	if not _gameplay_host.retry():
+		return false
+	return nav.resume_gameplay_after_retry()
+
+func get_results_screen():
+	return _results
 
 func get_gameplay_host():
 	return _gameplay_host
