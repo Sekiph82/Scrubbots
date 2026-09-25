@@ -56,6 +56,16 @@ func _init(id: String = "chip") -> void:
 	sub_label.visible = false
 	col.add_child(sub_label)
 
+## V02: larger icons for the branded HUD / reward track.
+func set_icon_size(px: int) -> void:
+	icon.custom_minimum_size = Vector2(px, px)
+
+func set_panel_style(sb: StyleBox) -> void:
+	add_theme_stylebox_override("panel", sb)
+
+func set_value_size(px: int) -> void:
+	value_label.add_theme_font_size_override("font_size", px)
+
 func set_icon(tex: Texture2D) -> void:
 	icon.texture = tex
 	icon.visible = tex != null

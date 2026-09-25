@@ -11,6 +11,10 @@ extends RefCounted
 const EN := {
 	"HOME_PLAY": "PLAY",
 	"HOME_CONTINUE_LEVEL": "CONTINUE · LEVEL %d",
+	"HOME_START_LEVEL": "LEVEL %d",
+	"HOME_PLAYER_NAME_DEFAULT": "Scrubby",
+	"HOME_AREA_TITLE": "WHISPERING PARK",
+	"HOME_AREA_NUMBER": "AREA %d",
 	"HOME_LEVEL_COMING_SOON": "Level %d is coming soon.",
 	"HOME_LEVELS_UNAVAILABLE": "Levels unavailable (%s).",
 	"HOME_LOADING": "Loading...",
