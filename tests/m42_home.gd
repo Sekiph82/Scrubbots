@@ -16,7 +16,7 @@ var EXPECTED_CASES := [
 	"home_shell_tree", "home_in_real_root", "home_blocked_state",
 	"play_cta_fresh", "continue_cta_frontier",
 	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
-	"shortcut_columns_responsive", "live_binding",
+	"shortcut_columns_responsive", "live_binding", "approved_art_only",
 ]
 
 var _fail := 0
@@ -35,6 +35,7 @@ func _initialize() -> void:
 	await _layered_art_regions()
 	await _shortcut_columns_responsive()
 	await _live_binding()
+	await _approved_art_only()
 	_cleanup()
 	_done()
 
@@ -326,6 +327,48 @@ func _live_binding() -> void:
 	_ok(not props.has("scrub_bucks") and not props.has("hearts") and not props.has("bot_parts"), "Home script declares no balance fields of its own")
 	sub.free()
 	_complete("live_binding")
+
+const HomeArtBinder = preload("res://scripts/ui/home/home_art_binder.gd")
+const V = preload("res://scripts/tools/home_asset_manifest_validator.gd")
+
+## SB-M42-017: only owner-approved art binds; pending candidates keep native placeholders.
+func _approved_art_only() -> void:
+	print("[approved art only]")
+	var app = AppState.new(_uniq("art"))
+	var sub := _sub(Vector2i(1080, 2160))
+	var home = HomeScreenScene.instantiate()
+	sub.add_child(home)
+	home.bind(app)
+	await process_frame
+	var bound := 0
+	for l in home.get_art_layers():
+		if l.texture != null:
+			bound += 1
+	for id in ["Shortcut_daily", "Shortcut_cards_exchange"]:
+		if home.get_region(id).icon != null:
+			bound += 1
+	_ok(bound == 0 and home.get_region("ScrubBucksChip").icon.texture == null, "production manifest (nothing approved): no art bound, native placeholders")
+	# Owner-approval simulation on an in-memory manifest copy (repo manifest untouched).
+	var m = V.load_manifest()
+	var approve := ["home_bg_sky", "scrubby_home_pose", "icon_currency_scrub_bucks", "icon_shortcut_daily"]
+	for a in m["assets"]:
+		if approve.has(a["slug"]):
+			a["status"] = "APPROVED"
+			a["approved_sha256"] = FileAccess.get_sha256("res://" + a["path"])
+	home.set_art_binder(HomeArtBinder.new(m))
+	await process_frame
+	_ok(home.get_region("Layer_background.sky").texture != null and home.get_region("Layer_characters").texture != null, "approved sky + Scrubby bind to their layers")
+	_ok(home.get_region("Layer_background.city_far").texture == null and home.get_region("Layer_central_world_and_environment").texture == null, "unapproved layers stay empty")
+	_ok(home.get_region("ScrubBucksChip").icon.texture != null and home.get_region("Shortcut_daily").icon != null and home.get_region("Shortcut_shop").icon == null, "approved icons bind; unapproved do not")
+	var outside: Array = []
+	var safe := Rect2(Vector2.ZERO, Vector2(1080, 2160))
+	for b in home.find_children("*", "BaseButton", true, false):
+		if not safe.grow(0.5).encloses((b as Control).get_global_rect()) or (b as Control).size.y < 87.5:
+			outside.append(b.name)
+	_ok(outside.is_empty(), "with art bound, controls still inside viewport and >= 88 px %s" % str(outside))
+	_ok(FileAccess.get_file_as_string("res://assets/ui/HOME_ASSET_MANIFEST.json").find("APPROVED\"") == -1, "repository manifest still has no APPROVED entry (never self-approved)")
+	sub.free()
+	_complete("approved_art_only")
 
 # ---------------------------------------------------------------- helpers ----
 

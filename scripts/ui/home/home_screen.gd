@@ -34,6 +34,29 @@ const UiValueChip = preload("res://scripts/ui/components/ui_value_chip.gd")
 const UiProgressMeter = preload("res://scripts/ui/components/ui_progress_meter.gd")
 const UiShortcutButton = preload("res://scripts/ui/components/ui_shortcut_button.gd")
 const HomeViewModel = preload("res://scripts/ui/home/home_view_model.gd")
+const HomeArtBinder = preload("res://scripts/ui/home/home_art_binder.gd")
+
+## SB-M42-017: manifest slug -> Home node that may display it once owner-approved.
+const LAYER_ART := {
+	"home_bg_sky": "Layer_background.sky",
+	"home_bg_city_far": "Layer_background.city_far",
+	"home_bg_city_mid": "Layer_background.city_mid",
+	"home_bg_street_foreground": "Layer_background.street_foreground",
+	"home_platform_main": "Layer_central_world_and_environment",
+	"scrubby_home_pose": "Layer_characters",
+}
+const ICON_ART := {
+	"icon_currency_scrub_bucks": "ScrubBucksChip",
+	"icon_currency_heart": "HeartsChip",
+	"icon_shortcut_win_streak": "Shortcut_win_streak",
+	"icon_shortcut_gift_bar": "Shortcut_gift_bar",
+	"icon_shortcut_collection": "Shortcut_collection",
+	"icon_shortcut_shop": "Shortcut_shop",
+	"icon_shortcut_no_ads": "Shortcut_no_ads",
+	"icon_shortcut_daily": "Shortcut_daily",
+	"icon_shortcut_tasks": "Shortcut_tasks",
+	"icon_shortcut_cards_exchange": "Shortcut_cards_exchange",
+}
 
 ## Shortcut columns (SB-M42-010/012). Destinations belonging to later milestones are
 ## rendered disabled by refresh(), never faked.
@@ -60,6 +83,7 @@ var _launch: Dictionary = {}
 ## Last live projection rendered (SB-M42-015). A detached copy for tests/diagnostics —
 ## never read back as truth; every refresh re-reads the canonical services.
 var _vm: Dictionary = {}
+var _art = null
 var _tick: Timer
 
 func _ready() -> void:
@@ -75,6 +99,8 @@ func _ready() -> void:
 	resized.connect(_apply_layout_mode)
 	_nodes["MainWorldArea"].resized.connect(_apply_layout_mode)
 	_apply_layout_mode()
+	if _art == null:
+		set_art_binder(HomeArtBinder.new())
 	refresh()
 
 ## Bind the canonical AppState (app root). Re-renders.
@@ -82,6 +108,25 @@ func bind(app_state) -> void:
 	_app = app_state
 	if _built:
 		refresh()
+
+## SB-M42-017: bind ONLY owner-approved art (HomeArtBinder gate). Unapproved slugs keep
+## the native placeholder (null texture). Injectable for tests.
+func set_art_binder(binder) -> void:
+	_art = binder
+	if not _built:
+		return
+	for slug in LAYER_ART:
+		(_nodes[LAYER_ART[slug]] as TextureRect).texture = _art.texture(slug)
+	for slug in ICON_ART:
+		var n = _nodes[ICON_ART[slug]]
+		var tex: Texture2D = _art.texture(slug)
+		if n is Button:
+			(n as Button).icon = tex
+		else:
+			n.set_icon(tex)
+
+func get_art_binder():
+	return _art
 
 func get_app_state():
 	return _app
