@@ -40,3 +40,8 @@ Implementation, commands, failures/corrections, tests, changed files, commits, p
 
 - Implementation commit: `89eb552` (`MAINT-PALETTE-V3-001 migrate live Scrubbots consumers to Palette V3`).
 - Evidence log is being published in a separate builder-log commit after this implementation commit; no product files are added to that evidence commit.
+
+- Evidence-log commit: `4c766bec0ca2823ad32cd09343b6833ecd1c0d3d`.
+- Because `origin/main` advanced with four unrelated owner/audit/tracker commits after the initial sync, the local implementation was merged non-destructively with `origin/main` as merge commit `1822e4f4535c1898b26828056e8c0a3f3ab9af1b`; no reset, rebase, force-push, or owner-file cleanup was used.
+- Push result: `origin HEAD:main` succeeded from `3a2a10f` to `1822e4f`; the four remote owner/audit/tracker commits were preserved.
+- Final Scrubbots publication state before this final log-only update: local `HEAD == origin/main == 1822e4f`; protected `TASKS.md` and pre-existing `project.godot` owner changes were preserved.
