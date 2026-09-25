@@ -13,8 +13,10 @@ extends SceneTree
 ##   - completion once per WON attempt; LOST/ERROR silent; Retry stops stale cleaning AND
 ##     completion voices and re-arms completion;
 ##   - no movement stream/player/loop among SFX;
+##   - V03 approved gameplay music: exact asset identity (SHA-256, OGG Vorbis stereo 44.1 kHz,
+##     137.153379 s), auto-discovered, looping, PLAYING on normal gameplay entry;
 ##   - MusicController: Music bus, looping, idempotent start, OWNER_MUSIC_SELECTION_REQUIRED
-##     without an approved track, start count stays 1 across real gameplay + Retry, stopped at
+##     only without a track, start count stays 1 across real gameplay + 2x + Retry, stopped at
 ##     scene exit;
 ##   - real production stack at 1x AND 2x with interleaved realtime voice ageing (clutter
 ##     stress): bounded active voices, no voice older than the bound.
@@ -38,13 +40,18 @@ const DISPATCH_WAV := "res://assets/audio/sfx/dispatch.wav"
 const CLEANING_WAV := "res://assets/audio/sfx/cleaning.wav"
 const COMPLETION_WAV := "res://assets/audio/sfx/completion.wav"
 
+const MUSIC_PATH := "res://assets/audio/music/background_loop.ogg"
+const MUSIC_SHA256 := "8c94897ea022924bb32c1e8384fd0b73ea21863f522c4d1dd682ca773ef9ae2a"
+const MUSIC_BYTES := 2686777
+const MUSIC_SECONDS := 137.153379
+
 const DT := 1.0
 const FRAME := 1.0 / 60.0
 const MAX_TICKS := 80000
 
 const EXPECTED_CASES := [
 	"bus_layout", "settings_service", "bus_routing_independence", "controller_unit",
-	"cleaning_tail_bound", "retry_cleanup_unit", "music_controller_unit",
+	"cleaning_tail_bound", "retry_cleanup_unit", "approved_music_asset", "music_controller_unit",
 	"real_stack_1x", "real_stack_2x",
 ]
 
@@ -59,6 +66,7 @@ func _initialize() -> void:
 	await _controller_unit()
 	await _cleaning_tail_bound()
 	await _retry_cleanup_unit()
+	_approved_music_asset()
 	await _music_controller_unit()
 	await _real_stack(false)
 	await _real_stack(true)
@@ -246,23 +254,56 @@ func _retry_cleanup_unit() -> void:
 
 # ------------------------------------------------------ music controller ----
 
+## V03: the owner-approved Pixel Polish Parade loop, byte-exact (no transcode/replace).
+func _approved_music_asset() -> void:
+	print("[approved music asset]")
+	var path := MusicController.APPROVED_TRACK_PATH
+	_ok(path == MUSIC_PATH, "controller track path is %s" % MUSIC_PATH)
+	_ok(FileAccess.file_exists(path), "approved OGG exists")
+	_ok(FileAccess.get_sha256(path) == MUSIC_SHA256, "SHA-256 == approved %s" % MUSIC_SHA256)
+	var bytes := FileAccess.get_file_as_bytes(path)
+	_ok(bytes.size() == MUSIC_BYTES, "file size %d bytes" % bytes.size())
+	# Vorbis identification header: channels / sample rate; last Ogg page granule = frames.
+	var id := _find(bytes, PackedByteArray([0x01, 0x76, 0x6f, 0x72, 0x62, 0x69, 0x73]), 0)
+	_ok(id >= 0, "Ogg Vorbis identification header present")
+	if id >= 0:
+		_ok(bytes[id + 11] == 2, "2 channels (stereo)")
+		_ok(bytes.decode_u32(id + 12) == 44100, "44.1 kHz")
+	var last := _rfind_oggs(bytes)
+	var frames := bytes.decode_s64(last + 6) if last >= 0 else -1
+	_ok(frames == 6048464 and absf(float(frames) / 44100.0 - MUSIC_SECONDS) < 0.000001, "container duration %.6f s == 137.153379 s" % (float(frames) / 44100.0))
+	var s = load(path)
+	_ok(s is AudioStreamOggVorbis, "Godot imports it as AudioStreamOggVorbis")
+	_ok(s != null and absf(s.get_length() - MUSIC_SECONDS) < 0.01, "Godot stream length %.6f within 10 ms" % (s.get_length() if s else -1.0))
+	var extra: Array = []
+	for f in DirAccess.get_files_at("res://assets/audio/music"):
+		if not (f in [".gitkeep", "background_loop.ogg", "background_loop.ogg.import"]):
+			extra.append(f)
+	_ok(extra.is_empty(), "no other/replacement music file in assets/audio/music %s" % str(extra))
+	_complete("approved_music_asset")
+
 func _music_controller_unit() -> void:
 	print("[music controller unit]")
-	_ok(not ResourceLoader.exists(MusicController.APPROVED_TRACK_PATH), "no approved music asset is shipped (owner selection pending)")
 	var mc = MusicController.new()
+	_ok(mc.has_track() and mc.get_track_source_path() == MUSIC_PATH, "controller auto-discovers the approved OGG")
+	_ok(mc.get_track() is AudioStreamOggVorbis and mc.is_looping() and mc.get_track().loop == true, "controller OGG track loop == true")
+	_ok((load(MUSIC_PATH) as AudioStreamOggVorbis).loop == false, "shared imported resource not mutated (loop set on a duplicate)")
 	get_root().add_child(mc)
 	await process_frame
+	_ok(mc.get_status() == MusicController.STATUS_PLAYING and mc.get_start_count() == 1, "entering the tree starts the approved loop once (PLAYING)")
 	_ok(mc.get_player().bus == "Music", "music player routes to the Music bus")
-	_ok(mc.get_status() == MusicController.STATUS_OWNER_MUSIC_SELECTION_REQUIRED, "status OWNER_MUSIC_SELECTION_REQUIRED without an approved track")
+	mc.set_track(null)
+	_ok(mc.get_status() == MusicController.STATUS_OWNER_MUSIC_SELECTION_REQUIRED and not mc.is_playing(), "no track -> OWNER_MUSIC_SELECTION_REQUIRED, silent")
 	_ok(not mc.start() and not mc.is_playing(), "no track -> start() refuses, nothing plays")
 	var w := _test_loop_stream()
 	mc.set_track(w)
 	_ok(w.loop_mode == AudioStreamWAV.LOOP_DISABLED, "the injected source resource is not mutated")
 	_ok(mc.is_looping(), "controller track is looping")
 	_ok(mc.start() and mc.is_playing(), "start() plays the loop")
+	var c0: int = mc.get_start_count()
 	mc.start()
 	mc.start()
-	_ok(mc.get_start_count() == 1, "repeated start() never restarts the track (count 1)")
+	_ok(mc.get_start_count() == c0, "repeated start() never restarts the track")
 	_ok(mc.get_status() == MusicController.STATUS_PLAYING, "status PLAYING")
 	mc.stop()
 	_ok(not mc.is_playing() and mc.get_status() == MusicController.STATUS_STOPPED, "explicit stop() stops at the lifecycle boundary")
@@ -285,10 +326,8 @@ func _real_stack(two_x: bool) -> void:
 	var mc = h.get_music_controller()
 	ac.set_process(false)   # ageing is interleaved below at realistic frame time.
 	_ok(mc != null and mc.get_player().bus == "Music", "%s: host owns a Music-bus MusicController" % tag)
-	_ok(mc.get_status() == MusicController.STATUS_OWNER_MUSIC_SELECTION_REQUIRED, "%s: production host music is OWNER_MUSIC_SELECTION_REQUIRED" % tag)
-	mc.set_track(_test_loop_stream())
-	mc.start()
-	_ok(mc.is_playing() and mc.get_start_count() == 1, "%s: injected test loop playing" % tag)
+	_ok(mc.has_track() and mc.get_track_source_path() == MUSIC_PATH and mc.is_looping(), "%s: production host music = approved looping OGG" % tag)
+	_ok(mc.get_status() == MusicController.STATUS_PLAYING and mc.get_start_count() == 1, "%s: music PLAYING on normal gameplay entry, started once" % tag)
 
 	# No audio observer on assignment_dispatched.
 	var disp = h.get_dispatcher()
@@ -418,6 +457,23 @@ func _cleaning_player(ac) -> AudioStreamPlayer:
 			return c
 	return null
 
+func _find(hay: PackedByteArray, needle: PackedByteArray, from: int) -> int:
+	for i in range(from, hay.size() - needle.size()):
+		var hit := true
+		for k in range(needle.size()):
+			if hay[i + k] != needle[k]:
+				hit = false
+				break
+		if hit:
+			return i
+	return -1
+
+func _rfind_oggs(b: PackedByteArray) -> int:
+	for i in range(b.size() - 4, -1, -1):
+		if b[i] == 0x4f and b[i + 1] == 0x67 and b[i + 2] == 0x67 and b[i + 3] == 0x53:
+			return i
+	return -1
+
 ## A 1 s silent 16-bit test stream (NOT a music asset) — proves loop/lifecycle wiring only.
 func _test_loop_stream() -> AudioStreamWAV:
 	var w := AudioStreamWAV.new()
@@ -451,6 +507,6 @@ func _done() -> void:
 	for c in missing:
 		print("  FAIL: sub-test did not complete: %s" % c)
 	_fail += missing.size()
-	print("M33 V02 cases completed: %d/%d" % [EXPECTED_CASES.size() - missing.size(), EXPECTED_CASES.size()])
+	print("M33 V03 cases completed: %d/%d" % [EXPECTED_CASES.size() - missing.size(), EXPECTED_CASES.size()])
 	print("M33 audio runtime evidence: %s" % ("PASS" if _fail == 0 else "FAIL (%d)" % _fail))
 	quit(0 if _fail == 0 else 1)

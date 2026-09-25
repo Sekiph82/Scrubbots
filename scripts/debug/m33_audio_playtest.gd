@@ -13,8 +13,7 @@ extends Control
 ##   - RETRY: transaction-safe retry; stale cleaning/completion voices are stopped.
 ##   - TEST CLEANING / TEST COMPLETION: isolated presentation seams.
 ##   - CLEANING STRESS: burst cleaning requests far beyond the voice cap.
-##   - MUSIC TEST TONE: DEBUG-ONLY quiet generated sine loop on the Music bus so the Music
-##     slider/toggle can be heard before an owner-approved track exists. Not a music asset.
+##   - MUSIC: the owner-approved "Pixel Polish Parade" loop plays automatically (M33 V03).
 ##   - SETTINGS: the M41 Settings panel (Master/Music/SFX sliders+toggles, Vibration).
 ## A live readout shows per-category voice diagnostics and the music controller status.
 ##
@@ -24,8 +23,9 @@ extends Control
 ##   3. completion.wav plays once on WON; LOST plays nothing.
 ##   4. no robot movement loop.
 ##   5. 1x and 2x auto-solve are listenable, not an audio wall.
-##   6. Music status shows OWNER_MUSIC_SELECTION_REQUIRED until a track is approved.
-##   7. Settings: Master 0 silences all, Music 0 only music (test tone), SFX 0 only SFX,
+##   6. Music: PLAYING; no audible click/gap at the 137.15 s loop seam; comfortable level
+##      under cleaning SFX; not fatiguing on repeat.
+##   7. Settings: Master 0 silences all, Music 0 only music, SFX 0 only SFX,
 ##      toggles mute and restore, values survive closing and relaunching this scene.
 ##   8. Retry leaves no stale cleaning/completion tail.
 
@@ -109,7 +109,6 @@ func _build_overlay() -> void:
 	row3.alignment = BoxContainer.ALIGNMENT_CENTER
 	row3.add_theme_constant_override("separation", 8)
 	bar.add_child(row3)
-	row3.add_child(_make_button("MUSIC TEST TONE", _on_test_tone))
 	row3.add_child(_make_button("SETTINGS", _on_settings))
 
 func _make_button(text: String, cb: Callable) -> Button:
@@ -191,25 +190,6 @@ func _on_stress() -> void:
 		return
 	for _i in range(48):
 		ac.request_cleaning()
-
-## DEBUG-ONLY: a quiet generated 220 Hz sine loop on the Music bus (not a music asset) so the
-## owner can hear Music vs SFX settings before a real track is approved.
-func _on_test_tone() -> void:
-	var m = _host.get_music_controller() if (_host != null and _host.is_built()) else null
-	if m == null:
-		return
-	var rate := 22050
-	var frames := rate   # 1 s loop, whole number of 220 Hz cycles.
-	var data := PackedByteArray()
-	data.resize(frames * 2)
-	for i in range(frames):
-		data.encode_s16(i * 2, int(sin(TAU * 220.0 * float(i) / float(rate)) * 3000.0))
-	var w := AudioStreamWAV.new()
-	w.format = AudioStreamWAV.FORMAT_16_BITS
-	w.mix_rate = rate
-	w.data = data
-	m.set_track(w)
-	m.start()
 
 func _on_settings() -> void:
 	_settings_panel.open_panel()
