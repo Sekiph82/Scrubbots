@@ -23,6 +23,7 @@ const HapticsSettingsService = preload("res://scripts/haptics/haptics_settings_s
 const LevelProgressionService = preload("res://scripts/progression/level_progression_service.gd")
 const EconomyServices = preload("res://scripts/economy/economy_services.gd")
 const IntDomain = preload("res://scripts/economy/int_domain.gd")
+const EffectsSettingsService = preload("res://scripts/settings/effects_settings_service.gd")
 
 ## M41 V01 settings.audio on/off keys (optional for pre-M41 saves, default ON).
 const AUDIO_TOGGLE_KEYS := ["master_on", "music_on", "sfx_on"]
@@ -32,14 +33,18 @@ var _audio: AudioSettingsService
 var _haptics: HapticsSettingsService
 var _progression: LevelProgressionService
 var _economy: EconomyServices
+## M41-C002 Reduced Effects (settings.effects). Optional ctor arg so pre-C002 callers keep
+## working; they get a private default (OFF) service.
+var _effects: EffectsSettingsService
 ## Test-only fault injector: Callable(stage:String) -> bool; true forces failure.
 var _fault: Callable = Callable()
 ## Legacy M33 audio cfg path for the one-time migration (injectable for test
 ## isolation so tests never read the owner's real user:// settings).
 var _legacy_audio_path: String = AudioSettingsService.DEFAULT_CONFIG_PATH
 
-func _init(path: String, audio, haptics, progression, economy) -> void:
+func _init(path: String, audio, haptics, progression, economy, effects = null) -> void:
 	_path = path
+	_effects = effects if effects != null else EffectsSettingsService.new()
 	_audio = audio
 	_haptics = haptics
 	_progression = progression
@@ -69,6 +74,7 @@ func collect() -> Dictionary:
 		"settings": {
 			"audio": _audio.snapshot(),
 			"haptics": _haptics.snapshot(),
+			"effects": _effects.snapshot(),
 		},
 		"progression": _progression.snapshot(),
 		"economy": _economy.snapshot(),
@@ -126,6 +132,10 @@ func validate_candidate(cand) -> Dictionary:
 	var scratch_hap = HapticsSettingsService.new("user://__scratch_haptics.cfg")
 	if not scratch_hap.strict_import_snapshot(settings.get("haptics", {})):
 		return {"ok": false, "reason": "haptics_malformed"}
+	# M41-C002: settings.effects is optional (pre-C002 saves => Reduced Effects OFF); when
+	# present it must be {reduced: <exact bool>} or the whole candidate is rejected.
+	if settings.has("effects") and not EffectsSettingsService.new().strict_import_snapshot(settings["effects"]):
+		return {"ok": false, "reason": "effects_malformed"}
 	return {"ok": true}
 
 # --------------------------------------------------------------- migration ----
@@ -168,6 +178,7 @@ func _apply(cand: Dictionary) -> bool:
 	# strict_import_snapshot is guaranteed to succeed here — validate_candidate
 	# rejected malformed haptics upstream.
 	_haptics.strict_import_snapshot(settings.get("haptics", {}))
+	_apply_effects(settings)
 	var ok := _progression.import_snapshot(cand.get("progression", {})) and _economy.import_snapshot(cand.get("economy", {}))
 	if not ok:
 		# Restore exactly.
@@ -177,8 +188,16 @@ func _apply(cand: Dictionary) -> bool:
 		_audio.set_master_volume(ba["master"]); _audio.set_music_volume(ba["music"]); _audio.set_sfx_volume(ba["sfx"])
 		_apply_audio_toggles(ba)
 		_haptics.import_snapshot(backup["settings"]["haptics"])
+		_apply_effects(backup["settings"])
 		return false
 	return true
+
+## Apply validated settings.effects; absent => OFF (validate_candidate rejected malformed).
+func _apply_effects(settings: Dictionary) -> void:
+	if settings.has("effects"):
+		_effects.strict_import_snapshot(settings["effects"])
+	else:
+		_effects.set_reduced(false)
 
 ## Apply validated M41 toggles (validate_candidate already rejected non-bool values).
 func _apply_audio_toggles(audio: Dictionary) -> void:

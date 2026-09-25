@@ -7,6 +7,7 @@ extends RefCounted
 ## used by the shipping runtime:
 ##   - AudioSettingsService (M33)
 ##   - HapticsSettingsService (M34)
+##   - EffectsSettingsService (M41-C002 Reduced Effects)
 ##   - LevelProgressionService (M37)
 ##   - EconomyServices (M39)
 ##   - SaveService (M40) — bound to the above, using the canonical save path.
@@ -27,6 +28,7 @@ const HapticsSettingsService = preload("res://scripts/haptics/haptics_settings_s
 const LevelProgressionService = preload("res://scripts/progression/level_progression_service.gd")
 const EconomyServices = preload("res://scripts/economy/economy_services.gd")
 const SaveService = preload("res://scripts/save/save_service.gd")
+const EffectsSettingsService = preload("res://scripts/settings/effects_settings_service.gd")
 const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
 const EconomyConfig = preload("res://scripts/economy/economy_config.gd")
 const ProductionActionFacade = preload("res://scripts/economy/production_action_facade.gd")
@@ -35,6 +37,8 @@ const CANONICAL_SAVE_PATH := "user://scrubbots_save.dat"
 
 var audio: AudioSettingsService
 var haptics: HapticsSettingsService
+## M41-C002 canonical Reduced Effects setting (default OFF).
+var effects: EffectsSettingsService
 var progression: LevelProgressionService
 var economy: EconomyServices
 var save: SaveService
@@ -50,10 +54,11 @@ var _dirty: bool = false
 func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable(), local_day: Callable = Callable()) -> void:
 	audio = AudioSettingsService.new()
 	haptics = HapticsSettingsService.new()
+	effects = EffectsSettingsService.new()
 	progression = LevelProgressionService.new()
 	var day_provider: Callable = local_day if local_day.is_valid() else LocalCalendar.system_provider()
 	economy = EconomyServices.new(EconomyConfig.DEFAULT_PATH, clock, null, day_provider)
-	save = SaveService.new(save_path, audio, haptics, progression, economy)
+	save = SaveService.new(save_path, audio, haptics, progression, economy, effects)
 	load_result = save.load()
 	is_blocked = not bool(load_result.get("ok", false)) and String(load_result.get("source", "")) == "future_schema"
 	actions = ProductionActionFacade.new(economy, null, Callable(self, "request_save"))
@@ -129,6 +134,14 @@ func set_audio_enabled(bus: String, on: bool) -> Dictionary:
 func flush_if_dirty() -> Dictionary:
 	if not _dirty:
 		return {"ok": true, "skipped": true}
+	return request_save()
+
+## M41-C002 Reduced Effects: applies live (service `changed` -> gameplay cleaning FX) and
+## persists canonically. Refused while blocked.
+func set_reduced_effects(on: bool) -> Dictionary:
+	if is_blocked:
+		return {"ok": false, "reason": "app_blocked"}
+	effects.set_reduced(on)
 	return request_save()
 
 func set_volumes(master: float, music: float, sfx: float) -> Dictionary:

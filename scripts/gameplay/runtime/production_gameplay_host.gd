@@ -282,6 +282,13 @@ func build() -> bool:
 	add_child(_cleaning_fx)
 	_cleaning_fx.bind(presentation.get_cleaning_fx_layer(), _board)
 	_loop.authenticated_clear.connect(_cleaning_fx._on_authenticated_clear)
+	# M41-C002 (SB-M41-005): the canonical Reduced Effects setting drives the accepted M31
+	# set_reduced_effects() seam, now and live on every later change (no rebuild).
+	# Presentation-only; the FX enable toggle stays independent. No AppState => OFF.
+	if app_state != null and app_state.effects != null:
+		_cleaning_fx.set_reduced_effects(app_state.effects.is_reduced())
+		if not app_state.effects.changed.is_connected(_cleaning_fx.set_reduced_effects):
+			app_state.effects.changed.connect(_cleaning_fx.set_reduced_effects)
 
 	# M32 presentation-only arrival/disappearance echo: a second pure observer on the SAME
 	# authoritative committed-clear notification. It spawns a short detached Scrubby echo at the
