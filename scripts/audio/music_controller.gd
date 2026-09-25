@@ -13,10 +13,12 @@ extends Node
 ## AudioSettingsService (Master and Music user settings), so Music 0 silences only music and
 ## SFX 0 never touches it.
 ##
-## Track selection is owner-gated. APPROVED_TRACK_PATH names the file an owner-approved track
-## must be exported to; until it exists the controller stays idle with status
-## OWNER_MUSIC_SELECTION_REQUIRED (no invented/downloaded placeholder music). Tests inject a
-## generated stream through set_track().
+## Track: owner-approved "Pixel Polish Parade" seamless loop (owner decision V03,
+## 2026-09-25) at APPROVED_TRACK_PATH — OGG Vorbis, stereo 44.1 kHz, 137.153379 s,
+## SHA-256 8c94897e...f9ae2a. Auto-discovered in _init and looped in code (import params are
+## left at defaults; the imported resource itself is never mutated). If the file is ever
+## missing the controller stays idle with status OWNER_MUSIC_SELECTION_REQUIRED. The Workshop
+## track is a separate future selection and is NOT played here.
 
 const MUSIC_BUS := "Music"
 const APPROVED_TRACK_PATH := "res://assets/audio/music/background_loop.ogg"
@@ -29,6 +31,7 @@ var _player: AudioStreamPlayer
 var _track: AudioStream = null
 var _start_count: int = 0
 var _stopped_explicitly: bool = false
+var _track_source_path: String = ""
 
 func _init() -> void:
 	_player = AudioStreamPlayer.new()
@@ -40,10 +43,18 @@ func _init() -> void:
 	add_child(_player)
 	if ResourceLoader.exists(APPROVED_TRACK_PATH):
 		_track = _as_looping(load(APPROVED_TRACK_PATH))
+		_track_source_path = APPROVED_TRACK_PATH if _track != null else ""
 
-func _enter_tree() -> void:
+## Auto-start on gameplay entry. _ready (not _enter_tree): the child player is only inside the
+## tree once the parent is ready — a play() from the parent's _enter_tree is refused by Godot.
+func _ready() -> void:
 	if not _stopped_explicitly:
 		start()
+
+## Re-entering the tree after a removal resumes once the child player is back in the tree.
+func _enter_tree() -> void:
+	if is_node_ready() and not _stopped_explicitly:
+		start.call_deferred()
 
 func _exit_tree() -> void:
 	if _player.playing:
@@ -53,9 +64,11 @@ func _exit_tree() -> void:
 func set_track(stream: AudioStream) -> void:
 	var was_playing := _player.playing
 	_track = _as_looping(stream)
-	_player.stream = _track
+	_track_source_path = stream.resource_path if stream != null else ""
 	if was_playing:
 		_player.stop()
+	_player.stream = _track
+	if was_playing and _track != null:
 		_start_count += 1
 		_player.play()
 
@@ -115,6 +128,13 @@ func has_track() -> bool:
 ## gameplay session — the "never restarts on minor events" evidence.
 func get_start_count() -> int:
 	return _start_count
+
+## Resource path of the source stream behind the current track ("" when none/generated).
+func get_track_source_path() -> String:
+	return _track_source_path
+
+func get_track() -> AudioStream:
+	return _track
 
 func get_player() -> AudioStreamPlayer:
 	return _player
