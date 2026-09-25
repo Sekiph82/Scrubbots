@@ -50,6 +50,7 @@ const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 const ScrubbotVisual = preload("res://scripts/gameplay/presentation/scrubbot_visual.gd")
 const ScrubbotRetireEchoController = preload("res://scripts/gameplay/presentation/scrubbot_retire_echo_controller.gd")
 const GameplayAudioController = preload("res://scripts/audio/gameplay_audio_controller.gd")
+const MusicController = preload("res://scripts/audio/music_controller.gd")
 const AudioSettingsService = preload("res://scripts/audio/audio_settings_service.gd")
 const HapticsController = preload("res://scripts/haptics/haptics_controller.gd")
 const HapticsSettingsService = preload("res://scripts/haptics/haptics_settings_service.gd")
@@ -112,6 +113,7 @@ var _cleaning_fx
 var _retire_echo
 var _audio
 var _audio_settings
+var _music
 var _haptics
 var _haptics_settings
 ## M39 V02 Economy V1 runtime composition (fail-safe: economy never blocks
@@ -291,9 +293,11 @@ func build() -> bool:
 	_loop.authenticated_clear.connect(_retire_echo._on_authenticated_clear)
 
 	# M33 presentation-only audio: user volume settings (persisted) + a bounded-voice SFX
-	# controller observing the SAME authoritative events. All three wirings are pure observers
-	# — dispatch on committed dispatch, cleaning on authenticated clear, completion on WON
-	# only. Audio never mutates gameplay/terminal/speed truth.
+	# controller observing the SAME authoritative events. Owner audio decision V02: NO dispatch
+	# sound (assignment_dispatched has no audio observer); cleaning (dispatch.wav, short
+	# bounded) on authenticated clear; completion on WON only. Plus one looping Music-bus
+	# background controller that no gameplay event restarts. Audio never mutates
+	# gameplay/terminal/speed truth.
 	# M40 V03 (F-M40-V02-005/G): when an AppState is injected, consume its
 	# canonical audio settings rather than loading the legacy side file (which
 	# would be a competing persistence authority). No injection => back-compat
@@ -305,9 +309,12 @@ func build() -> bool:
 		_audio_settings.load()
 	_audio = GameplayAudioController.new()
 	add_child(_audio)
-	_dispatcher.assignment_dispatched.connect(_audio._on_assignment_dispatched)
 	_loop.authenticated_clear.connect(_audio._on_authenticated_clear)
 	_completion.terminal_reached.connect(_audio._on_terminal_reached)
+	# Background music: started once when the host enters gameplay; stopped only when the
+	# host (scene) leaves the tree. Retry/dispatch/clear/terminal/speed never touch it.
+	_music = MusicController.new()
+	add_child(_music)
 
 	# M34 presentation-only haptics: one live HapticsController owned by the production
 	# host, observing the SAME authoritative committed events — cleaning on
@@ -740,6 +747,9 @@ func get_audio_controller():
 
 func get_audio_settings():
 	return _audio_settings
+
+func get_music_controller():
+	return _music
 
 func get_haptics_controller():
 	return _haptics
