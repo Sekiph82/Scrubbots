@@ -21,6 +21,7 @@ const NavigationController = preload("res://scripts/app/navigation_controller.gd
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
 const OpeningScreen = preload("res://scripts/app/opening_screen.gd")
+const LaunchSession = preload("res://scripts/app/launch_session.gd")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -77,12 +78,14 @@ func _ready() -> void:
 	else:
 		nav.go(NavigationController.Route.HOME, {"via": "boot"})
 
+## SB-M42-031: presentation policy (display available / test override) AND the
+## once-per-cold-launch LaunchSession gate. Only a new native process plays it again.
 func _should_play_opening() -> bool:
 	if boot_opening_override == 0:
 		return false
-	if boot_opening_override == 1:
-		return true
-	return DisplayServer.get_name() != "headless"
+	if boot_opening_override == -1 and DisplayServer.get_name() == "headless":
+		return false
+	return LaunchSession.try_consume_opening()
 
 ## SB-M42-029: BOOT -> OPENING; the cinematic's single terminal outcome (completed or
 ## failed) enters normal Home exactly once. Any load/decode/play failure is fail-safe.

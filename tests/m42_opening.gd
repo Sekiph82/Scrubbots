@@ -10,7 +10,7 @@ const OGV := "res://assets/brand/opening/scrubbots_opening_720p30.ogv"
 const OGV_SHA256 := "3ec6e1347bbb1d8ced2709f3383b06ae6dbfba017e0a6d23a0fb991ec78ee89a"
 
 var EXPECTED_CASES := ["mp4_preserved", "ogv_runtime_asset", "opening_player_aspect", "opening_lifecycle",
-	"boot_opening_to_home_once"]
+	"boot_opening_to_home_once", "once_per_cold_launch"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -22,6 +22,7 @@ func _initialize() -> void:
 	await _opening_player_aspect()
 	await _opening_lifecycle()
 	await _boot_opening_to_home_once()
+	await _once_per_cold_launch()
 	_cleanup()
 	_done()
 
@@ -158,8 +159,13 @@ func _cleanup() -> void:
 			if FileAccess.file_exists(p + suffix):
 				DirAccess.remove_absolute(ProjectSettings.globalize_path(p + suffix))
 
-func _boot(opening: int):
-	MainScript.boot_save_path_override = _uniq("boot")
+const LaunchSession = preload("res://scripts/app/launch_session.gd")
+
+## cold=true simulates a new native process (fresh launch session) before booting.
+func _boot(opening: int, cold: bool = true, path: String = ""):
+	if cold:
+		LaunchSession.debug_reset_for_new_process()
+	MainScript.boot_save_path_override = path if not path.is_empty() else _uniq("boot")
 	MainScript.boot_opening_override = opening
 	var root = MainScene.instantiate()
 	get_root().add_child(root)
@@ -205,6 +211,48 @@ func _boot_opening_to_home_once() -> void:
 	_ok(root3.get_navigation().current() == R.HOME and root3.get_opening() == null, "auto policy in a headless run (no display) boots straight to Home")
 	_shutdown(root3)
 	_complete("boot_opening_to_home_once")
+
+## SB-M42-031: once per cold/native launch; never on internal navigation, Retry,
+## returning from screens, root re-creation or background/foreground resume.
+func _once_per_cold_launch() -> void:
+	print("[once per cold launch]")
+	var R := NavigationController.Route
+	var path := _uniq("session")
+	var root = await _boot(1, true, path)
+	var nav = root.get_navigation()
+	_ok(nav.current() == R.OPENING and LaunchSession.opening_consumed(), "cold launch plays the opening")
+	root.get_opening().get_player().finished.emit()
+	await process_frame
+	_ok(nav.current() == R.HOME, "completion -> Home")
+	for what in [Node.NOTIFICATION_APPLICATION_PAUSED, Node.NOTIFICATION_APPLICATION_FOCUS_OUT, Node.NOTIFICATION_APPLICATION_RESUMED, Node.NOTIFICATION_APPLICATION_FOCUS_IN]:
+		root.notification(what)
+	await process_frame
+	_ok(nav.current() == R.HOME and root.get_opening() == null, "background/foreground resume does not replay")
+	root.play_current_frontier()
+	await process_frame
+	var h = root.get_gameplay_host()
+	h.get_runtime().set_process(false)
+	h.get_completion().terminal_reached.emit(&"LOST", {})
+	root.retry_from_results()
+	_ok(nav.current() == R.GAMEPLAY and root.get_opening() == null, "Retry does not replay")
+	root.handle_back()
+	h.get_completion().terminal_reached.emit(&"LOST", {})
+	root.get_results_screen().get_home_button().pressed.emit()
+	root.open_settings()
+	root.get_settings_panel().close_panel()
+	await process_frame
+	_ok(nav.current() == R.HOME and root.get_opening() == null, "returning from gameplay/results/settings does not replay")
+	_shutdown(root)
+	var again = await _boot(1, false, path)
+	_ok(again.get_navigation().current() == R.HOME and again.get_opening() == null, "re-creating the app root in the same process (no native restart) does not replay")
+	_shutdown(again)
+	var cold = await _boot(1, true, path)
+	_ok(cold.get_navigation().current() == R.OPENING, "a true native restart (new process) plays it again")
+	cold.get_opening().get_player().finished.emit()
+	_shutdown(cold)
+	var saved := FileAccess.get_file_as_string(path).to_lower()
+	_ok(saved.find("opening") == -1 and saved.find("launch") == -1 and saved.find("cinematic") == -1, "launch-session state is never written to the save")
+	_complete("once_per_cold_launch")
 
 func _find(hay: PackedByteArray, needle: PackedByteArray) -> int:
 	for i in range(hay.size() - needle.size()):
