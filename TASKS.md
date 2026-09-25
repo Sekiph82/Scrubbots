@@ -5,11 +5,11 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M41
-- Current Sprint: Reduced Effects Completion
+- Current Sprint: M41-C002 Reduced Effects Completion
 - Current Task: SB-M41-005 Reduced Effects
-- Current Task Status: CHATGPT_PROMPT_REQUIRED
-- Next Task/Action: ChatGPT prepares the focused M41-C002 implementation prompt and strict audit criteria for SB-M41-005 Reduced Effects. The M41-C001 Settings owner F6/manual gate is closed with 9/9 owner checks accepted; Claude must not alter root TASKS.md.
-- Required Actor: CHATGPT
+- Current Task Status: READY_FOR_IMPLEMENTATION
+- Next Task/Action: CLAUDE executes `coordination/sessions/M41-C002/CHATGPT_PROMPT_V01.md` against `CHATGPT_AUDIT_CRITERIA_V01.md`, publishes `CLAUDE_LOG_V01.md` plus `task_logs/SB-M41-005.md` with full GitHub links, then stops at AWAITING_AUDIT. Do not start M42 and do not edit root TASKS.md.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 712 / 980 = 72.65%. M41-C001 owner acceptance closes an owner gate but does not change the checklist numerator; SB-M41-005 remains the only open M41 checklist row.
