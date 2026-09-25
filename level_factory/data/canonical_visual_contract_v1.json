@@ -4,11 +4,11 @@
   "ownerLocked": true,
   "lockedAt": "2026-09-06",
   "cycle": "META-C005",
-  "description": "Machine-readable Level Factory visual-contract descriptor. Propagates the already owner-locked SCRUBBOTS visual contract (root docs/08_PIXEL_ART_PALETTE_RULES.md + data/palettes/scrubbots_palette_v2.json) into Level Factory governance. This descriptor is NOT a second palette authority.",
+  "description": "Machine-readable Level Factory visual-contract descriptor. Propagates the owner-locked SCRUBBOTS Palette V3 contract (root docs/08_PIXEL_ART_PALETTE_RULES.md + data/palettes/scrubbots_palette_v3.json) into Level Factory governance. This descriptor is NOT a second palette authority.",
   "paletteAuthority": {
     "note": "The root palette JSON is the single source of truth for C01..C16. This descriptor never redefines those colors; if any duplication ever conflicts, the root palette wins.",
-    "rootPaletteRepoPath": "data/palettes/scrubbots_palette_v2.json",
-    "rootPaletteRelativeFromThisFile": "../../data/palettes/scrubbots_palette_v2.json",
+    "rootPaletteRepoPath": "data/palettes/scrubbots_palette_v3.json",
+    "rootPaletteRelativeFromThisFile": "../../data/palettes/scrubbots_palette_v3.json",
     "rootPaletteRulesDoc": "docs/08_PIXEL_ART_PALETTE_RULES.md",
     "legalLogicalColorIds": "C01..C16 only",
     "colorCount": 16,
@@ -18,24 +18,11 @@
       "silently expanding the SCRUBBOTS palette"
     ]
   },
-  "difficultyDistinctUsedColorBands": {
-    "note": "Count only distinct canonical logical cell colors actually used by artwork cells. Hard production legality, not a heuristic score.",
-    "EASY": {
-      "min": 3,
-      "max": 5
-    },
-    "MEDIUM": {
-      "min": 6,
-      "max": 7
-    },
-    "HARD": {
-      "min": 8,
-      "max": 9
-    },
-    "VERY_HARD": {
-      "min": 10,
-      "max": 12
-    },
+  "usedColorEnvelopeV1": {
+    "min": 3,
+    "max": 12,
+    "difficultyClassDerivedFromColorCount": false,
+    "note": "Count only distinct canonical logical cell colors actually used by artwork cells. This global envelope is not a difficulty-class legality table.",
     "excludedFromCount": [
       "CLEARED transparency",
       "gameplay background BG01",
@@ -79,7 +66,8 @@
     "rejectOffPaletteLogicalColor": true,
     "rejectBg01AsLogicalColor": true,
     "rejectGridOrBorderCountingTowardDifficulty": true,
-    "enforceDifficultyDistinctUsedColorBands": true,
+    "enforceUsedColorEnvelopeV1": true,
+    "difficultyClassDerivedFromColorCount": false,
     "localPaletteMustBeAscendingCId": true,
     "localPaletteMustBeSubsetOfC01ToC16": true
   },

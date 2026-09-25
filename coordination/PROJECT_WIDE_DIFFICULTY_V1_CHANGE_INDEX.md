@@ -75,7 +75,7 @@ The following historical interpretations are no longer authoritative:
 - `docs/03_LEVEL_DATA_SPEC.md`
 - `docs/04_ROADMAP.md`
 - `docs/08_PIXEL_ART_PALETTE_RULES.md`
-- `data/palettes/scrubbots_palette_v2.json`
+- `data/palettes/scrubbots_palette_v3.json`
 - configs/docs listed in section A.
 
 Historical pre-Difficulty-V1 operating manual preserved at:

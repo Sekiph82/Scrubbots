@@ -45,7 +45,7 @@ See `docs/03_LEVEL_DATA_SPEC.md` for data representation and `docs/09_DIFFICULTY
 
 ## Canonical pixel-art palette
 
-Production logical artwork uses only C01..C16 from `data/palettes/scrubbots_palette_v2.json`. Under Difficulty V1, production artwork normally uses **3..12 distinct canonical colors**, but the number of colors no longer defines EASY/MEDIUM/HARD/VERY_HARD by itself.
+Production logical artwork uses only C01..C16 from `data/palettes/scrubbots_palette_v3.json`. Under Difficulty V1, `usedColorEnvelopeV1` is **3..12** and `difficultyClassDerivedFromColorCount` is **false**; the number of colors no longer defines EASY/MEDIUM/HARD/VERY_HARD by itself.
 
 Color count, entropy and distribution contribute to the mathematical Challenge Score together with accessibility, unlock depth, bottlenecks, routing, slot pressure and workload.
 

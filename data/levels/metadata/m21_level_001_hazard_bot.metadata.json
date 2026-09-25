@@ -33,7 +33,7 @@
 	"usedColorCount": 5,
 	"width": 20,
 	"paletteMigration": {
-		"from": "scrubbots-global-palette/v2",
+		"from": "scrubbots-global-palette/v2 (historical provenance)",
 		"to": "scrubbots-global-palette/v3",
 		"authorizedAt": "2026-09-25",
 		"method": "Exact stable C-ID remap to the owner-approved Alpix 16-color subset"

@@ -29,7 +29,7 @@ extends RefCounted
 ## Production-art rules enforced (docs/08_PIXEL_ART_PALETTE_RULES.md):
 ##   - off-palette logical color        -> REJECT (no nearest-color approximation)
 ##   - non-opaque (alpha != 255) cell   -> REJECT (canonical #RRGGBBFF == #RRGGBB)
-##   - distinct used-color count        -> enforce the difficulty band
+##   - distinct used-color count        -> enforce the global V1 envelope (3..12)
 ##   - final local palette              -> only used canonical colors, ascending C-ID
 ##   - determinism                      -> identical input yields identical output
 
@@ -41,22 +41,6 @@ const DifficultyRules = preload("res://scripts/data/difficulty_rules.gd")
 
 const BUILDER_VERSION := "M21-C001/v1"
 const PALETTE_AUTHORITY_PATH := "res://data/palettes/scrubbots_palette_v3.json"
-
-## M21 LEGACY compatibility color-count gate ONLY (see
-## coordination/sessions/M21-C001/OWNER_DIFFICULTY_V1_SCOPE_NOTE.md). Under
-## Difficulty V1 color count is a SCORE INPUT, not a difficulty-class law; the
-## owner scope note explicitly permits the legacy validator as the M21
-## compatibility gate because the approved Hazard Bot asset already fits it. This
-## is NOT a future design law and is applied only when the palette authority still
-## exposes no per-difficulty bands. Do not treat "5 colors => EASY" as design law.
-const LEGACY_M21_DIFFICULTY_COLOR_BANDS := {
-	"EASY": {"min": 3, "max": 5},
-	"MEDIUM": {"min": 6, "max": 7},
-	"HARD": {"min": 8, "max": 9},
-	"VERY_HARD": {"min": 10, "max": 12},
-}
-## Fallback global used-color envelope if the authority omits usedColorEnvelopeV1.
-const DEFAULT_USED_COLOR_ENVELOPE := {"min": 3, "max": 12}
 
 ## Pure normalization result (no file IO). errors empty == OK.
 class NormalizeResult:
@@ -100,32 +84,47 @@ static func load_palette_authority():
 		return null
 	var parsed = JSON.parse_string(f.get_as_text())
 	f.close()
-	if typeof(parsed) != TYPE_DICTIONARY or not parsed.has("colors"):
+	if typeof(parsed) != TYPE_DICTIONARY:
+		return null
+	if parsed.get("schema", "") != "scrubbots-global-palette/v3" or parsed.get("version", -1) != 3 or parsed.get("ownerLocked", false) != true:
+		return null
+	if not parsed.has("colors") or typeof(parsed["colors"]) != TYPE_ARRAY or parsed["colors"].size() != 16:
 		return null
 	var rgb_to_cid := {}     # "r,g,b" -> "Cnn"
 	var cid_to_index := {}   # "Cnn" -> global int index (0..15)
 	var cid_to_hex := {}     # "Cnn" -> "#RRGGBBFF"
-	for c in parsed["colors"]:
-		var r := int(c["rgb"][0]); var g := int(c["rgb"][1]); var b := int(c["rgb"][2])
+	for i in parsed["colors"].size():
+		var c: Dictionary = parsed["colors"][i]
+		if String(c.get("id", "")) != "C%02d" % (i + 1) or int(c.get("index", -1)) != i:
+			return null
+		var rgb = c.get("rgb", [])
+		if typeof(rgb) != TYPE_ARRAY or rgb.size() != 3:
+			return null
+		var r := int(rgb[0]); var g := int(rgb[1]); var b := int(rgb[2])
+		if r < 0 or r > 255 or g < 0 or g > 255 or b < 0 or b > 255:
+			return null
 		var cid := String(c["id"])
+		var expected_hex := "#%02X%02X%02X" % [r, g, b]
+		if String(c.get("hex", "")).to_upper() != expected_hex:
+			return null
 		rgb_to_cid["%d,%d,%d" % [r, g, b]] = cid
 		cid_to_index[cid] = int(c["index"])
 		cid_to_hex[cid] = "#%02X%02X%02XFF" % [r, g, b]
-	var rules := {}
-	if parsed.has("productionRules"):
-		rules = parsed["productionRules"]
-	# Legacy per-difficulty color-count bands (present pre-Difficulty-V1). Under
-	# Difficulty V1 (docs/12_ADR_DIFFICULTY_V1.md) these are removed from palette
-	# truth and color count is a score INPUT, not a class gate.
-	var bands := {}
-	if rules.has("difficultyColorCountBands"):
-		bands = rules["difficultyColorCountBands"]
-	# Difficulty V1 global used-color envelope (3..12) — current design truth.
-	var envelope := {}
-	if rules.has("usedColorEnvelopeV1"):
-		envelope = rules["usedColorEnvelopeV1"]
+	var rules = parsed.get("productionRules", {})
+	if typeof(rules) != TYPE_DICTIONARY:
+		return null
+	var envelope = rules.get("usedColorEnvelopeV1", {})
+	if typeof(envelope) != TYPE_DICTIONARY or int(envelope.get("min", -1)) != 3 or int(envelope.get("max", -1)) != 12:
+		return null
+	if rules.get("difficultyClassDerivedFromColorCount", true) != false:
+		return null
+	var background = parsed.get("gameplayBackground", {})
+	var background_rgb = background.get("rgb", []) if typeof(background) == TYPE_DICTIONARY else []
+	var background_rgb_ok: bool = typeof(background_rgb) == TYPE_ARRAY and background_rgb.size() == 3 and int(background_rgb[0]) == 32 and int(background_rgb[1]) == 37 and int(background_rgb[2]) == 51
+	if typeof(background) != TYPE_DICTIONARY or background.get("id", "") != "BG01" or background.get("hex", "") != "#202533" or not background_rgb_ok or background.get("pixelArtPaletteColor", true) != false or background.get("countsTowardLevelColorTotal", true) != false:
+		return null
 	return {"rgb_to_cid": rgb_to_cid, "cid_to_index": cid_to_index,
-		"cid_to_hex": cid_to_hex, "bands": bands, "envelope": envelope}
+		"cid_to_hex": cid_to_hex, "envelope": envelope}
 
 ## Pure production-art validation + palette normalization from a raw first-seen
 ## LevelData (as produced by the generic M09 importer). Never touches disk except
@@ -207,23 +206,10 @@ static func normalize_from_level_data(raw, difficulty: String) -> NormalizeResul
 	result.used_color_count = used_cids.size()
 
 	# --- enforce Difficulty V1 global used-color envelope (current design truth) ---
-	var envelope: Dictionary = auth["envelope"] if not auth["envelope"].is_empty() else DEFAULT_USED_COLOR_ENVELOPE
+	var envelope: Dictionary = auth["envelope"]
 	var emin := int(envelope["min"]); var emax := int(envelope["max"])
 	if result.used_color_count < emin or result.used_color_count > emax:
 		result.add_error("Distinct used-color count %d outside V1 used-color envelope %d..%d" % [result.used_color_count, emin, emax])
-		return result
-
-	# --- enforce the M21 LEGACY per-difficulty color-count compatibility gate ---
-	# (compat only; see LEGACY_M21_DIFFICULTY_COLOR_BANDS). Prefer authority bands
-	# if still present, else the documented legacy compat constant.
-	var bands: Dictionary = auth["bands"] if not auth["bands"].is_empty() else LEGACY_M21_DIFFICULTY_COLOR_BANDS
-	if not bands.has(difficulty):
-		result.add_error("Difficulty '%s' has no legacy color-count compatibility band" % difficulty)
-		return result
-	var band: Dictionary = bands[difficulty]
-	var bmin := int(band["min"]); var bmax := int(band["max"])
-	if result.used_color_count < bmin or result.used_color_count > bmax:
-		result.add_error("Distinct used-color count %d outside legacy %s compat band %d..%d" % [result.used_color_count, difficulty, bmin, bmax])
 		return result
 
 	# --- normalize local palette to ascending global C-ID order ---
