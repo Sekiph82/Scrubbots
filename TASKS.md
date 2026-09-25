@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M38
-- Current Sprint: M38-C001 V03 — Strict Evidence Repair
-- Current Task: SB-M38-016
-- Current Task Status: CHANGES_REQUIRED / VALIDATION_EVIDENCE_REPAIR
-- Next Task/Action: CLAUDE executes `coordination/sessions/M38-C001/CHATGPT_PROMPT_V03.md`. Fix only the false-PASS M38 strict test harness: use a true RewardGrantService subclass for the failing-reward case, add expected/completed sub-test sentinels, prove no SCRIPT ERROR, then rerun M38 + M39 V04 + M40 V04 + root regressions. Production M38 code remains unchanged unless the repaired test exposes a real defect; if so Claude must STOP and hand back BLOCKED rather than patching production.
+- Current Milestone: M33
+- Current Sprint: M33-M41 EARLY SETTINGS BATCH V01
+- Current Task: M33-C001 V02 -> M41-C001 V01
+- Current Task Status: READY_FOR_IMPLEMENTATION
+- Next Task/Action: CLAUDE executes `coordination/sessions/M33-M41-BATCH/CHATGPT_MASTER_PROMPT_V01.md` without stopping between M33 V02 and the owner-authorized M41 early Settings slice. M33 removes dispatch SFX, repurposes dispatch.wav as bounded cleaning audio, adds reusable Music-bus looping support, and integrates canonical settings. M41 then exposes/persists Master/Music/SFX/Haptics controls using the post-M40 AppState/SaveService graph. Final music asset selection and owner F6 listening remain owner gates.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 697 / 980 = 71.12% after V04 code audit closures and reopening only SB-M38-016. M39 V04 is code-audited pass with SB-M39-052 regression evidence and SB-M39-033 device gate open. M40 V04 is code-audited pass; final milestone audit waits for the repaired mandatory M38 strict regression. M34 real-device haptics and M36 human difficulty owner gates remain open.
-- Note: The V04 root-suite claim `5336 / 0` is not accepted as complete critical-regression evidence because `m38_v02_strict.gd` emitted a SCRIPT ERROR while still printing PASS. Aggregate green counts cannot override the named missing sub-test.
+- Progress: 699 / 980 = 71.33% after M38 strict-evidence closure, M39 regression closure and M40 final audit closure. M34 SB-M34-006 real-device haptics, M36 SB-M36-005 human difficulty playtest and M39 SB-M39-033 real-device sixth-slot evidence remain open owner/device gates.
+- Note: M38 V03 repaired a false-PASS test harness without changing production M38. M39 V04 code is independently accepted; only SB-M39-033 device evidence remains. M40 is independently closed. M33 audio V02 and the explicitly authorized M41 audio/haptics settings slice are now the active implementation frontier.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1383,6 +1383,8 @@ V02 remediation authority: `coordination/sessions/M37-C001/CHATGPT_PROMPT_V02.md
 
 ### M38 — Win Streak `[OWNER-LOCKED ECONOMY V1]`
 
+V03 independent final audit: `AUDITED_PASS / M38 WIN STREAK CLOSED / STRICT EVIDENCE REPAIRED`. SB-M38-016 is reclosed. The reward-failure strict case now runs through a true RewardGrantService subclass, and the suite fails if any named sub-test aborts.
+
 Prior V02 final closure is temporarily suspended by `coordination/sessions/M38-C001/CHATGPT_FULL_SURFACE_REAUDIT_V02.md`: the reward-failure strict sub-test aborted on a typed fake yet the suite printed PASS. Only SB-M38-016 is reopened. V03 prompt/criteria repair evidence only; production changes are forbidden unless the repaired test exposes a real defect.
 
 V02 strict independent audit: `AUDITED_PASS / M38 WIN STREAK CLOSED`. All M38 tasks closed.
@@ -1399,9 +1401,11 @@ Pre-authored batch bundle: `coordination/sessions/M38-C001/CHATGPT_PROMPT_V01.md
 - [x] SB-M38-013 Emit only streak-bonus SB amount to GiftMeterService; base/Daily/exchange SB never feeds it.
 - [x] SB-M38-014 Grant +1 Bot Part exactly at active streak multiples of 5.
 - [x] SB-M38-015 Replay does not advance streak, Gift Meter or streak Bot Parts.
-- [ ] SB-M38-016 Add reset/replay/idempotency integration tests.
+- [x] SB-M38-016 Add reset/replay/idempotency integration tests.
 
 ### M39 — Economy & Rewards V1 `[OWNER-LOCKED]`
+
+V04 final independent audit: `AUDITED_PASS / M39 ECONOMY CODE CLOSED / SB-M39-033 DEVICE_OWNER_REQUIRED`. The repaired M38 strict regression closes SB-M39-052. All M39 code tasks are audited; only real-phone sixth-slot safe-area/touch/readability evidence remains.
 
 V04 independent audit: `CODE_AUDIT_PASS / REGRESSION_GATE_OPEN / DEVICE_OWNER_GATE_OPEN`. F-M39-V03-001..005 are source/direct-test accepted. SB-M39-052 waits for repaired M38 strict regression; SB-M39-033 remains real-device safe-area/touch/readability.
 
@@ -1468,9 +1472,11 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [x] SB-M39-049 Exchange values: Common 25 / Rare 75 / Epic 200 / Legendary 500 SB.
 - [x] SB-M39-050 Implement per-card and EXCHANGE ALL EXTRAS atomic exchange; never reduce collected owned count below 1.
 - [x] SB-M39-051 Prove Stars, Star Exchange, Event Points and profile-XP economic state do not exist in production save/runtime APIs.
-- [ ] SB-M39-052 Add full Economy V1 headless regression matrix for grants/spends/rollover/offline clocks/boosters/exchange/idempotency.
+- [x] SB-M39-052 Add full Economy V1 headless regression matrix for grants/spends/rollover/offline clocks/boosters/exchange/idempotency.
 
 ### M40 — Save System
+
+V04 final independent audit: `AUDITED_PASS / M40 SAVE SYSTEM CLOSED`. The repaired M38 strict regression and rerun of M40 V04 bootstrap/root suite close the final external gate.
 
 V04 independent audit: `CODE_AUDIT_PASS / M38 STRICT REGRESSION REQUIRED`. All M40 task rows are code/evidence-proven; final milestone `AUDITED_PASS` waits for M38 V03 repaired strict regression plus rerun of M40 V04 bootstrap/root suite.
 
