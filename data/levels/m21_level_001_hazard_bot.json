@@ -406,12 +406,12 @@
 	"id": "m21_level_001_hazard_bot",
 	"name": "Hazard Bot",
 	"palette": [
-		"#E94B4BFF",
-		"#F2C94CFF",
-		"#3451A3FF",
-		"#956447FF",
+		"#FF4500FF",
+		"#FFD635FF",
+		"#2450A4FF",
+		"#9C6926FF",
 		"#000000FF"
 	],
-	"version": 1,
+	"version": 2,
 	"width": 20
 }

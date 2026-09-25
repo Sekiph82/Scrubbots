@@ -164,7 +164,7 @@ func _gap_B_corner() -> void:
 		print("  B route vertices = %s" % str(_vertex_cells(pts)))
 
 func _all_active(w: int, h: int):
-	var pal := PackedStringArray(["#3451A3FF"])
+	var pal := PackedStringArray(["#2450A4FF"])
 	var arr := PackedInt32Array(); arr.resize(w * h)
 	for i in range(w * h): arr[i] = 0
 	return BoardState.from_level_data(LevelData.new(1, "va", "va", "TEST", w, h, pal, arr))
