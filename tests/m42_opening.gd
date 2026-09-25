@@ -10,7 +10,7 @@ const OGV := "res://assets/brand/opening/scrubbots_opening_720p30.ogv"
 const OGV_SHA256 := "3ec6e1347bbb1d8ced2709f3383b06ae6dbfba017e0a6d23a0fb991ec78ee89a"
 
 var EXPECTED_CASES := ["mp4_preserved", "ogv_runtime_asset", "opening_player_aspect", "opening_lifecycle",
-	"boot_opening_to_home_once", "once_per_cold_launch"]
+	"boot_opening_to_home_once", "once_per_cold_launch", "device_instrumentation"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -23,6 +23,7 @@ func _initialize() -> void:
 	await _opening_lifecycle()
 	await _boot_opening_to_home_once()
 	await _once_per_cold_launch()
+	await _device_instrumentation()
 	_cleanup()
 	_done()
 
@@ -253,6 +254,29 @@ func _once_per_cold_launch() -> void:
 	var saved := FileAccess.get_file_as_string(path).to_lower()
 	_ok(saved.find("opening") == -1 and saved.find("launch") == -1 and saved.find("cinematic") == -1, "launch-session state is never written to the save")
 	_complete("once_per_cold_launch")
+
+## SB-M42-032: code-side device instrumentation (real-device evidence is owner-gated).
+func _device_instrumentation() -> void:
+	print("[device instrumentation]")
+	var sub := _sub(Vector2i(1080, 2160))
+	var o = OpeningScreen.new()
+	sub.add_child(o)
+	await process_frame
+	o.begin()
+	for _i in range(30):
+		await process_frame
+	var mid: Dictionary = o.get_metrics()
+	_ok(mid["process_frames"] > 0 and mid["outcome"] == "", "metrics accumulate while playing (%d frames)" % mid["process_frames"])
+	o.get_player().finished.emit()
+	var m: Dictionary = o.get_metrics()
+	_ok(m["outcome"] == "completed:finished" and m["playback_ms"] >= 0 and m["stream_released"], "terminal metrics: outcome, playback_ms, stream released (%s)" % str(m))
+	_ok(m["video_rect"] == [0, 776, 1080, 607] and m["screen"] == [1080, 2160], "letterbox rect recorded for portrait 1080x2160")
+	_ok(m["startup_latency_ms"] >= 0, "first decoded frame observed (startup_latency_ms=%d)" % m["startup_latency_ms"])
+	o.free()
+	sub.free()
+	var doc := FileAccess.get_file_as_string("res://docs/OPENING_CINEMATIC_DEVICE_VALIDATION.md")
+	_ok(doc.find("[OPENING_METRICS]") != -1 and doc.find("not run yet") != -1 and doc.find("DEVICE_OWNER_REQUIRED") != -1, "device checklist published; no device result claimed")
+	_complete("device_instrumentation")
 
 func _find(hay: PackedByteArray, needle: PackedByteArray) -> int:
 	for i in range(hay.size() - needle.size()):

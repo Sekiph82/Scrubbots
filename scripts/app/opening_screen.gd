@@ -28,6 +28,14 @@ var _terminal := false
 var _elapsed := 0.0
 var _stream_path := OPENING_OGV
 var _video_size := DEFAULT_VIDEO_SIZE
+## SB-M42-032 device instrumentation (presentation diagnostics only; printed once as a
+## single "[OPENING_METRICS]" line for logcat/Xcode capture on real devices).
+var _t_begin_ms := -1
+var _t_first_frame_ms := -1
+var _t_end_ms := -1
+var _max_frame_gap_ms := 0.0
+var _process_frames := 0
+var _outcome := ""
 
 func _init() -> void:
 	name = "OpeningScreen"
@@ -64,6 +72,7 @@ func begin() -> bool:
 	if stream == null:
 		_fail_deferred("stream_unavailable")
 		return false
+	_t_begin_ms = Time.get_ticks_msec()
 	_player.stream = stream
 	_player.play()
 	_elapsed = 0.0
@@ -78,7 +87,11 @@ func _process(delta: float) -> void:
 	if _terminal:
 		return
 	_elapsed += delta
+	_process_frames += 1
+	_max_frame_gap_ms = maxf(_max_frame_gap_ms, delta * 1000.0)
 	var tex := _player.get_video_texture()
+	if _t_first_frame_ms < 0 and tex != null and tex.get_size().x > 0:
+		_t_first_frame_ms = Time.get_ticks_msec()
 	if tex != null and tex.get_size().x > 0 and tex.get_size() != _video_size:
 		_video_size = tex.get_size()
 		_fit()
@@ -106,7 +119,10 @@ func _finish(ok: bool, reason: String) -> void:
 	if _terminal:
 		return
 	_terminal = true
+	_t_end_ms = Time.get_ticks_msec()
+	_outcome = ("completed:" if ok else "failed:") + reason
 	cleanup()
+	print("[OPENING_METRICS] ", JSON.stringify(get_metrics()))
 	if ok:
 		completed.emit()
 	else:
@@ -133,6 +149,22 @@ func is_started() -> bool:
 
 func get_player() -> VideoStreamPlayer:
 	return _player
+
+## Device-validation metrics (SB-M42-032). Latencies in ms; -1 = not observed.
+func get_metrics() -> Dictionary:
+	return {
+		"outcome": _outcome,
+		"startup_latency_ms": (_t_first_frame_ms - _t_begin_ms) if (_t_first_frame_ms >= 0 and _t_begin_ms >= 0) else -1,
+		"playback_ms": (_t_end_ms - _t_begin_ms) if (_t_end_ms >= 0 and _t_begin_ms >= 0) else -1,
+		"max_frame_gap_ms": snappedf(_max_frame_gap_ms, 0.1),
+		"process_frames": _process_frames,
+		"video_size": [int(_video_size.x), int(_video_size.y)],
+		"video_rect": [int(_player.position.x), int(_player.position.y), int(_player.size.x), int(_player.size.y)],
+		"screen": [int(size.x), int(size.y)],
+		"stream_released": _player.stream == null,
+		"platform": OS.get_name(),
+		"display": DisplayServer.get_name(),
+	}
 
 func get_video_rect() -> Rect2:
 	return Rect2(_player.position, _player.size)
