@@ -28,12 +28,15 @@ signal shortcut_requested(id: String)
 
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const SafeAreaRootScene = preload("res://scenes/components/ui/common/safe_area_root.tscn")
+const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
 
 const BG01 := Color(0.125, 0.145, 0.2, 1.0)   ## Midnight Slate #202533.
 
 var _app = null
 var _built := false
 var _nodes: Dictionary = {}   ## region name -> Control
+## Last frontier resolution shown on the CTA (SB-M42-003). Read-only presentation copy.
+var _launch: Dictionary = {}
 
 func _ready() -> void:
 	_build()
@@ -114,7 +117,9 @@ func _build() -> void:
 	play.text = "PLAY"
 	play.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN + UiTokens.SPACE_XL)
 	play.add_theme_font_size_override("font_size", UiTokens.FONT_HERO)
-	play.pressed.connect(func(): play_requested.emit())
+	play.pressed.connect(func():
+		if not play.disabled:
+			play_requested.emit())
 	layout.add_child(play)
 	_nodes["PlayButton"] = play
 
@@ -183,5 +188,26 @@ func refresh() -> void:
 		play.disabled = true
 		status.text = "Save data is from a newer version. Update the game to continue."
 	else:
+		_render_play(play, status)
+
+## SB-M42-003: the ONE CTA launches only the canonical progression frontier.
+##   no completed level -> "PLAY"; otherwise "CONTINUE · LEVEL N".
+## A frontier without catalog content is shown honestly and disabled (never falls back
+## to other content, never offers a picker).
+func _render_play(play: Button, status: Label) -> void:
+	_launch = GameplayLaunchResolver.resolve(_app)
+	var level := int(_launch.get("level", _app.progression.current_level()))
+	var first_time: bool = _app.progression.completed_count() == 0
+	play.text = "PLAY" if first_time else "CONTINUE · LEVEL %d" % level
+	if _launch.get("ok", false):
 		play.disabled = false
 		status.text = ""
+	elif _launch.get("reason", "") == GameplayLaunchResolver.CONTENT_MISSING:
+		play.disabled = true
+		status.text = "Level %d is coming soon." % level
+	else:
+		play.disabled = true
+		status.text = "Levels unavailable (%s)." % String(_launch.get("reason", ""))
+
+func get_launch_preview() -> Dictionary:
+	return _launch.duplicate(true)
