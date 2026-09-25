@@ -37,6 +37,8 @@ const EXPECTED_CASES := [
 	"deferred_slider_persistence", "toggle_schema_validation", "settings_ui_controls",
 	"settings_ui_layout", "main_root_settings", "blocked_app_readonly",
 	"haptics_live_no_gameplay_mutation", "real_host_bus_routing", "no_legacy_side_files",
+	"reduced_effects_persistence", "reduced_effects_ui", "reduced_effects_live_host",
+	"reduced_effects_gameplay_invariance",
 ]
 
 var _fail := 0
@@ -60,6 +62,10 @@ func _initialize() -> void:
 	await _haptics_live_no_gameplay_mutation()
 	await _real_host_bus_routing()
 	_no_legacy_side_files()
+	_reduced_effects_persistence()
+	await _reduced_effects_ui()
+	await _reduced_effects_live_host()
+	await _reduced_effects_gameplay_invariance()
 	_neutral()
 	_cleanup()
 	_done()
@@ -253,11 +259,12 @@ func _settings_ui_controls() -> void:
 	app.set_audio_volume("sfx", 0.05)
 	panel.open_panel()
 	_ok(is_equal_approx(panel.get_slider("sfx").value, 0.05), "open_panel re-syncs from canonical AppState")
-	var reduced := false
+	# M41-C002: exactly one Reduced Effects control (SB-M41-005), nothing else added.
+	var reduced_nodes: Array = []
 	for n in panel.find_children("*", "", true, false):
 		if (n is Button or n is Label) and String(n.get("text")).to_lower().find("reduced") != -1:
-			reduced = true
-	_ok(not reduced, "no Reduced Effects UI node exists (SB-M41-005 untouched)")
+			reduced_nodes.append(n)
+	_ok(reduced_nodes.size() == 1 and reduced_nodes[0] == panel.get_reduced_effects_toggle() and panel.get_reduced_effects_toggle().text == "REDUCED EFFECTS", "exactly one REDUCED EFFECTS control")
 	sub.free()
 	_complete("settings_ui_controls")
 
@@ -333,7 +340,10 @@ func _blocked_app_readonly() -> void:
 	sub.add_child(panel)
 	panel.bind(app)
 	await process_frame
-	_ok(panel.get_toggle("music").disabled and not panel.get_slider("music").editable and panel.get_haptics_toggle().disabled, "Settings controls read-only while blocked")
+	_ok(panel.get_toggle("music").disabled and not panel.get_slider("music").editable and panel.get_haptics_toggle().disabled and panel.get_reduced_effects_toggle().disabled, "Settings controls (incl. REDUCED EFFECTS) read-only while blocked")
+	_ok(not app.set_reduced_effects(true).get("ok", true) and not app.effects.is_reduced(), "Reduced Effects mutation refused while blocked")
+	panel.get_reduced_effects_toggle().button_pressed = true
+	_ok(not app.effects.is_reduced(), "blocked panel toggle does not change canonical state")
 	panel.close_panel()
 	_ok(FileAccess.get_file_as_string(path) == before, "future-schema save untouched")
 	sub.free()
@@ -424,9 +434,179 @@ func _no_legacy_side_files() -> void:
 	_ok(src.find("audio.save()") == -1 and src.find("haptics.save()") == -1, "Settings/AppState never call the legacy side-file save()")
 	_complete("no_legacy_side_files")
 
+# ------------------------------------------------ M41-C002 Reduced Effects ----
+
+const CleaningEffectsController = preload("res://scripts/gameplay/presentation/cleaning_effects_controller.gd")
+const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
+
+func _reduced_effects_persistence() -> void:
+	print("[reduced effects persistence]")
+	var path := _uniq("reduced")
+	var app = AppState.new(path)
+	_ok(not app.effects.is_reduced(), "new state: Reduced Effects OFF")
+	_ok(app.set_reduced_effects(true).get("ok", false), "set ON saves")
+	var r1 = AppState.new(path)
+	_ok(r1.load_result.get("source") == "primary" and r1.effects.is_reduced(), "relaunch: ON restored")
+	r1.set_reduced_effects(false)
+	var r2 = AppState.new(path)
+	_ok(not r2.effects.is_reduced(), "relaunch: OFF restored")
+	var saved = JSON.parse_string(FileAccess.get_file_as_string(path))
+	_ok(saved["settings"]["effects"] == {"reduced": false}, "canonical save carries settings.effects.reduced (exact bool)")
+	# Pre-C002 save (no settings.effects) loads with OFF.
+	var base := {"schema": "scrubbots.save", "version": 1,
+		"settings": {"audio": {"master": 1.0, "music": 1.0, "sfx": 1.0}, "haptics": {"enabled": true}},
+		"progression": app.progression.snapshot(), "economy": app.economy.snapshot()}
+	var old_path := _uniq("prec002")
+	_write(old_path, JSON.stringify(base))
+	var r3 = AppState.new(old_path)
+	_ok(r3.load_result.get("source") == "primary" and not r3.effects.is_reduced(), "pre-C002 save loads, Reduced Effects OFF")
+	var svc = app.save
+	_ok(svc.validate_candidate(base.duplicate(true)).get("ok", false), "candidate without settings.effects is valid")
+	var rejected := 0
+	var bads: Array = [1, 0, "true", 1.0, null, [], {}]
+	for bad in bads:
+		var c: Dictionary = base.duplicate(true)
+		c["settings"]["effects"] = {"reduced": bad}
+		var v: Dictionary = svc.validate_candidate(c)
+		if not v.get("ok", false) and v.get("reason") == "effects_malformed":
+			rejected += 1
+	_ok(rejected == bads.size(), "every non-bool reduced value rejects the whole candidate (%d/%d)" % [rejected, bads.size()])
+	var shape_rej := 0
+	for bad_shape in [true, "on", [], {}, {"enabled": true}]:
+		var c2: Dictionary = base.duplicate(true)
+		c2["settings"]["effects"] = bad_shape
+		if svc.validate_candidate(c2).get("reason") == "effects_malformed":
+			shape_rej += 1
+	_ok(shape_rej == 5, "malformed settings.effects shapes rejected (%d/5)" % shape_rej)
+	for good in [true, false]:
+		var c4: Dictionary = base.duplicate(true)
+		c4["settings"]["effects"] = {"reduced": good}
+		_ok(svc.validate_candidate(c4).get("ok", false), "reduced=%s (exact bool) valid" % str(good))
+	# Load path: corrupt effects primary never applies partially (no silent coercion).
+	var bad_path := _uniq("badfx")
+	var c3: Dictionary = base.duplicate(true)
+	c3["settings"]["effects"] = {"reduced": "yes"}
+	c3["settings"]["audio"]["music"] = 0.4
+	_write(bad_path, JSON.stringify(c3))
+	var r4 = AppState.new(bad_path)
+	_ok(r4.load_result.get("source") == "defaults" and not r4.effects.is_reduced() and is_equal_approx(r4.audio.get_music_volume(), 1.0), "corrupt effects save rejected wholesale")
+	_complete("reduced_effects_persistence")
+
+func _reduced_effects_ui() -> void:
+	print("[reduced effects UI]")
+	var path := _uniq("fxui")
+	var app = AppState.new(path)
+	var sub := _sub(Vector2i(1080, 2160))
+	var panel = SettingsPanelScene.instantiate()
+	sub.add_child(panel)
+	panel.bind(app)
+	await process_frame
+	await process_frame
+	var t: CheckButton = panel.get_reduced_effects_toggle()
+	_ok(t != null and not t.button_pressed and t.size.y >= SettingsPanel.TOUCH_MIN - 0.5 and t.get_theme_font_size("font_size") >= 30, "toggle OFF by default, >= 88 px, font >= 30")
+	t.button_pressed = true
+	_ok(app.effects.is_reduced() and AppState.new(path).effects.is_reduced(), "UI ON -> canonical ON, persisted immediately")
+	t.button_pressed = false
+	_ok(not app.effects.is_reduced() and not AppState.new(path).effects.is_reduced(), "UI OFF -> canonical OFF, persisted")
+	app.set_reduced_effects(true)
+	panel.close_panel()
+	panel.open_panel()
+	_ok(t.button_pressed, "reopen re-syncs from canonical state")
+	_ok(app.haptics.is_enabled() and app.audio.is_music_enabled() and app.audio.is_sfx_enabled(), "Reduced Effects does not touch other settings")
+	sub.free()
+	_complete("reduced_effects_ui")
+
+func _fx_first_container(fx) -> Node:
+	return fx._fx_layer.get_child(0)
+
+func _reduced_effects_live_host() -> void:
+	print("[reduced effects live host]")
+	var app = AppState.new(_uniq("fxlive"))
+	var h = await _make_host(app)
+	if h == null:
+		return
+	var fx = h.get_cleaning_fx()
+	var cells: int = h.get_board().get_width() * h.get_board().get_height()
+	fx.set_process(false)   # deterministic ageing via age()
+	_ok(fx.is_bound() and not fx.is_reduced_effects(), "real host FX starts in accepted M31 normal mode (setting OFF)")
+	_ok(fx.request_effect(0) and _fx_first_container(fx).get_child_count() == 2, "OFF: normal cue has 2 sprites")
+	fx.age(0.2)
+	_ok(fx.get_active_count() == 1, "OFF: cue alive at 0.20 s (normal 0.30 s lifetime)")
+	fx.clear_all()
+	for i in range(40):
+		fx.request_effect(i % cells)
+	_ok(fx.get_active_count() == CleaningEffectsController.MAX_ACTIVE_EFFECTS, "OFF: cap 24")
+	fx.clear_all()
+	var same = fx
+	app.set_reduced_effects(true)
+	_ok(h.get_cleaning_fx() == same and fx.is_reduced_effects(), "canonical ON applies live to the existing controller (no rebuild)")
+	_ok(fx.request_effect(0) and _fx_first_container(fx).get_child_count() == 1, "ON: reduced single-sprite cue")
+	fx.age(0.2)
+	_ok(fx.get_active_count() == 0, "ON: reduced 0.18 s lifetime expired by 0.20 s")
+	for i in range(40):
+		fx.request_effect(i % cells)
+	_ok(fx.get_active_count() == CleaningEffectsController.REDUCED_MAX_ACTIVE, "ON: reduced cap 8")
+	fx.clear_all()
+	app.set_reduced_effects(false)
+	_ok(not fx.is_reduced_effects() and fx.request_effect(0) and _fx_first_container(fx).get_child_count() == 2, "canonical OFF restores normal live")
+	fx.clear_all()
+	fx.set_effects_enabled(false)
+	app.set_reduced_effects(true)
+	_ok(not fx.is_effects_enabled() and fx.is_reduced_effects() and not fx.request_effect(0), "FX disabled stays disabled when Reduced toggles")
+	fx.set_effects_enabled(true)
+	_ok(fx.is_reduced_effects() and fx.request_effect(0), "re-enabling FX keeps the Reduced setting")
+	fx.clear_all()
+	_free_host(h)
+	var h2 = await _make_host(app)
+	if h2 != null:
+		_ok(h2.get_cleaning_fx().is_reduced_effects(), "host built with setting ON starts reduced")
+		_free_host(h2)
+	app.set_reduced_effects(false)
+	_complete("reduced_effects_live_host")
+
+func _reduced_effects_gameplay_invariance() -> void:
+	print("[reduced effects gameplay invariance]")
+	var results: Array = []
+	var clock := func(): return 1790000000
+	for mode in ["off", "on", "live_toggle"]:
+		var app = AppState.new(_uniq("fxinv"), clock, LocalCalendar.offset_provider(clock, 0))
+		app.set_reduced_effects(mode == "on")
+		var h = await _make_host(app)
+		if h == null:
+			return
+		var initial: int = h.get_board().count_cells_by_state(BoardState.CellState.ACTIVE)
+		var fx_reduced_at_start: bool = h.get_cleaning_fx().is_reduced_effects()
+		var hook := Callable()
+		if mode == "live_toggle":
+			hook = func(): app.set_reduced_effects(not app.effects.is_reduced())
+		_drain(h, hook)
+		var cells: Array = []
+		for i in range(h.get_board().get_width() * h.get_board().get_height()):
+			cells.append(h.get_board().get_cell_state(i))
+		results.append({"mode": mode, "won": h.get_completion().is_won(), "state": String(h.get_completion().get_state()),
+			"clears": h.get_clearing_loop().get_cleared_count(), "initial": initial, "cells": cells,
+			"supply": h.get_supply().is_exhausted(), "live": h.get_scheduler().live_assignment_count(),
+			"fx_reduced": fx_reduced_at_start,
+			"prog": app.progression.snapshot(), "econ": app.economy.snapshot()})
+		_free_host(h)
+	_ok(results.size() == 3, "three runs completed")
+	if results.size() == 3:
+		var a: Dictionary = results[0]
+		_ok(a["won"] and a["clears"] == a["initial"], "OFF: WON, all %d cells cleared" % a["initial"])
+		for b in results.slice(1):
+			_ok(b["won"] == a["won"] and b["state"] == a["state"] and b["clears"] == a["clears"] and b["cells"] == a["cells"] and b["supply"] == a["supply"] and b["live"] == a["live"], "%s: identical terminal/clear/cell/supply truth to OFF" % b["mode"])
+			_ok(b["prog"] == a["prog"] and b["econ"] == a["econ"], "%s: identical progression/economy result to OFF" % b["mode"])
+		_ok(results[1]["fx_reduced"] and not results[0]["fx_reduced"], "ON run used reduced presentation, OFF run normal")
+	_complete("reduced_effects_gameplay_invariance")
+
+func _write(path: String, text: String) -> void:
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	f.store_string(text)
+	f.close()
+
 # ---------------------------------------------------------------- helpers ----
 
-func _drain(h) -> void:
+func _drain(h, per_tick: Callable = Callable()) -> void:
 	var supply = h.get_supply()
 	var slots = h.get_slots()
 	var input = h.get_input_controller()
@@ -440,6 +620,8 @@ func _drain(h) -> void:
 					input.activate_front(col)
 					break
 		runtime.tick(1.0)
+		if per_tick.is_valid() and _i % 7 == 0:
+			per_tick.call()
 		if supply.is_exhausted() and scheduler.live_assignment_count() == 0 and not _any_moving(agent_layer):
 			runtime.tick(1.0)
 			if h.get_completion().is_terminal():

@@ -11,7 +11,8 @@ extends Control
 ## immediately; a slider applies live while dragging and persists on drag end, on Close,
 ## and at the app lifecycle flush. The panel never touches gameplay state.
 ##
-## SB-M41-005 Reduced Effects is intentionally NOT part of this slice.
+## M41-C002 (SB-M41-005): REDUCED EFFECTS toggle -> AppState.set_reduced_effects (canonical,
+## persisted immediately, applied live to gameplay cleaning FX).
 
 signal closed
 
@@ -30,6 +31,7 @@ var _toggles: Dictionary = {}    ## bus -> CheckButton
 var _sliders: Dictionary = {}    ## bus -> HSlider
 var _values: Dictionary = {}     ## bus -> Label
 var _haptics_toggle: CheckButton
+var _reduced_toggle: CheckButton
 var _status: Label
 var _built := false
 
@@ -91,6 +93,11 @@ func _build() -> void:
 	_haptics_toggle.name = "HapticsToggle"
 	_haptics_toggle.toggled.connect(_on_haptics_toggled)
 	col.add_child(_haptics_toggle)
+
+	_reduced_toggle = _make_toggle("REDUCED EFFECTS")
+	_reduced_toggle.name = "ReducedEffectsToggle"
+	_reduced_toggle.toggled.connect(_on_reduced_toggled)
+	col.add_child(_reduced_toggle)
 
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -171,6 +178,8 @@ func _sync_from_state() -> void:
 		_update_value_label(bus)
 	_haptics_toggle.set_pressed_no_signal(_app.haptics.is_enabled() if _app != null else true)
 	_haptics_toggle.disabled = not usable
+	_reduced_toggle.set_pressed_no_signal(_app.effects.is_reduced() if _app != null else false)
+	_reduced_toggle.disabled = not usable
 	if _app == null:
 		_status.text = "Settings unavailable"
 	elif _app.is_blocked:
@@ -222,6 +231,12 @@ func _on_haptics_toggled(on: bool) -> void:
 		return
 	_app.set_haptics_enabled(on)
 
+func _on_reduced_toggled(on: bool) -> void:
+	if not _usable():
+		_sync_from_state()
+		return
+	_app.set_reduced_effects(on)
+
 ## Persist any pending slider change and hide the panel.
 func close_panel() -> void:
 	if _usable():
@@ -247,3 +262,6 @@ func get_value_label(bus: String) -> Label:
 
 func get_haptics_toggle() -> CheckButton:
 	return _haptics_toggle
+
+func get_reduced_effects_toggle() -> CheckButton:
+	return _reduced_toggle
