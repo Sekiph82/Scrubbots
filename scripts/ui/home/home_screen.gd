@@ -379,8 +379,12 @@ func _render_values() -> void:
 	var hearts: UiValueChip = _nodes["HeartsChip"]
 	hearts.set_value("%d/%d" % [_vm["hearts"], _vm["hearts_max"]])
 	hearts.set_sub("" if _vm["hearts"] >= _vm["hearts_max"] else _mmss(_vm["heart_seconds_to_next"]))
+	# SB-M42-020: the former event bar is the canonical Gift Meter (fed only by Win Streak
+	# SB inside GiftMeterService) with live progress + next milestone (10/50/250/500/1000).
+	# There is no event timer and no Event Points.
+	var next_text := ("NEXT GIFT AT %d" % _vm["gift_next_milestone"]) if _vm["gift_next_milestone"] > 0 else "CYCLE COMPLETE"
 	(_nodes["GiftMeterBar"] as UiProgressMeter).set_progress(_vm["gift_progress"], _vm["gift_cycle_max"],
-		"GIFT METER %d · NEXT %d" % [_vm["gift_progress"], _vm["gift_next_milestone"]])
+		"GIFT METER %d/%d · %s" % [_vm["gift_progress"], _vm["gift_cycle_max"], next_text])
 	for step in _vm["win_streak_track"]:
 		var chip: UiValueChip = _nodes["TrackStep%d" % step["position"]]
 		chip.set_value("+%d" % step["sb"])
