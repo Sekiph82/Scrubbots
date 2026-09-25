@@ -60,6 +60,7 @@ var _launch: Dictionary = {}
 func _ready() -> void:
 	_build()
 	resized.connect(_apply_layout_mode)
+	_nodes["MainWorldArea"].resized.connect(_apply_layout_mode)
 	_apply_layout_mode()
 	refresh()
 
@@ -234,6 +235,22 @@ func _apply_layout_mode() -> void:
 	var mode := ResponsiveLayout.get_layout_mode(get_viewport_rect().size)
 	var gap: int = UiTokens.SPACE_XS if mode == ResponsiveLayout.LayoutMode.COMPACT else (UiTokens.SPACE_LG if mode == ResponsiveLayout.LayoutMode.TALL else UiTokens.SPACE_SM)
 	(_nodes["HomeLayout"] as VBoxContainer).add_theme_constant_override("separation", gap)
+	_apply_shortcut_columns(mode)
+
+## SB-M42-012: shortcut columns scale with the safe width so the central world area
+## keeps >= CENTER_MIN_FRACTION of the width; buttons never drop below TOUCH_MIN.
+## COMPACT (short/wide) packs the columns tighter vertically; TALL spreads them.
+const CENTER_MIN_FRACTION := 0.4
+func _apply_shortcut_columns(mode: int) -> void:
+	var world: Control = _nodes["MainWorldArea"]
+	var width: float = world.size.x if world.size.x > 0.0 else get_viewport_rect().size.x
+	var col_w: float = clampf(width * (1.0 - CENTER_MIN_FRACTION) * 0.5 - UiTokens.SPACE_SM, UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN * 3)
+	var vgap: int = UiTokens.SPACE_XS if mode == ResponsiveLayout.LayoutMode.COMPACT else (UiTokens.SPACE_LG if mode == ResponsiveLayout.LayoutMode.TALL else UiTokens.SPACE_SM)
+	for side in ["LeftShortcutColumn", "RightShortcutColumn"]:
+		var col: VBoxContainer = _nodes[side]
+		col.add_theme_constant_override("separation", vgap)
+		for b in col.get_children():
+			(b as Control).custom_minimum_size = Vector2(col_w, UiTokens.TOUCH_MIN)
 
 func get_layout_mode() -> int:
 	return ResponsiveLayout.get_layout_mode(get_viewport_rect().size)

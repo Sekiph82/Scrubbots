@@ -16,6 +16,7 @@ var EXPECTED_CASES := [
 	"home_shell_tree", "home_in_real_root", "home_blocked_state",
 	"play_cta_fresh", "continue_cta_frontier",
 	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
+	"shortcut_columns_responsive",
 ]
 
 var _fail := 0
@@ -32,6 +33,7 @@ func _initialize() -> void:
 	await _settings_single_authority()
 	await _components_viewport_matrix()
 	await _layered_art_regions()
+	await _shortcut_columns_responsive()
 	_cleanup()
 	_done()
 
@@ -252,6 +254,34 @@ func _layered_art_regions() -> void:
 	_ok(bound == 0, "no art bound before owner approval (SB-M42-016/017 gate)")
 	sub.free()
 	_complete("layered_art_regions")
+
+## SB-M42-012: shortcut columns flank the center world area without collision.
+func _shortcut_columns_responsive() -> void:
+	print("[shortcut columns responsive]")
+	var app = AppState.new(_uniq("cols"))
+	for size in REQUIRED_VIEWPORTS + [Vector2i(1080, 1920), Vector2i(1536, 2048)]:
+		var sub := _sub(size)
+		var home = HomeScreenScene.instantiate()
+		sub.add_child(home)
+		home.bind(app)
+		for _i in range(4):
+			await process_frame
+		var tag := str(size)
+		var world: Rect2 = home.get_region("MainWorldArea").get_global_rect()
+		var center: Rect2 = home.get_region("CenterScrubbyArea").get_global_rect()
+		var left: Rect2 = home.get_region("LeftShortcutColumn").get_global_rect()
+		var right: Rect2 = home.get_region("RightShortcutColumn").get_global_rect()
+		var play: Rect2 = home.get_region("PlayButton").get_global_rect()
+		_ok(center.size.x >= world.size.x * 0.4 - 1.0, "%s: center world keeps >= 40%% width (%.0f/%.0f)" % [tag, center.size.x, world.size.x])
+		_ok(left.end.x <= center.position.x + 0.5 and right.position.x >= center.end.x - 0.5, "%s: columns left/right of center, no overlap" % tag)
+		_ok(left.end.y <= play.position.y + 0.5 and right.end.y <= play.position.y + 0.5, "%s: columns end above the PLAY CTA" % tag)
+		var min_w := 99999.0
+		for side in ["LeftShortcutColumn", "RightShortcutColumn"]:
+			for b in home.get_region(side).get_children():
+				min_w = minf(min_w, (b as Control).size.x)
+		_ok(min_w >= 88.0 - 0.5, "%s: shortcut width >= 88 (%.0f)" % [tag, min_w])
+		sub.free()
+	_complete("shortcut_columns_responsive")
 
 # ---------------------------------------------------------------- helpers ----
 
