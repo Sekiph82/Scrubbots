@@ -18,6 +18,7 @@ var EXPECTED_CASES := [
 	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
 	"shortcut_columns_responsive", "live_binding", "approved_art_only", "scrub_bucks_chip",
 	"bot_parts_progress", "gift_meter_semantics", "gift_bar_claims", "cards_exchange_presentation",
+	"win_streak_track",
 ]
 
 var _fail := 0
@@ -42,6 +43,7 @@ func _initialize() -> void:
 	await _gift_meter_semantics()
 	await _gift_bar_claims()
 	await _cards_exchange_presentation()
+	await _win_streak_track()
 	_cleanup()
 	_done()
 
@@ -537,6 +539,39 @@ func _cards_exchange_presentation() -> void:
 	_ok(popup.get_title() == "CARDS EXCHANGE" and popup.get_note().to_lower().find("star") == -1, "no Star balance/semantics")
 	sub.free()
 	_complete("cards_exchange_presentation")
+
+## SB-M42-023: Win Streak SB reward track 1/5/10/25/100 for positions 1/2/3/4/5+.
+func _win_streak_track() -> void:
+	print("[win streak track]")
+	var app = AppState.new(_uniq("streak"))
+	var sub := _sub(Vector2i(1080, 2160))
+	var home = HomeScreenScene.instantiate()
+	sub.add_child(home)
+	home.bind(app)
+	await process_frame
+	var e = app.economy
+	var want := [1, 5, 10, 25, 100]
+	var vals: Array = []
+	for i in range(5):
+		vals.append(home.get_region("TrackStep%d" % (i + 1)).value_label.text)
+		_ok(e.config.win_streak_sb(i + 1) == want[i], "config position %d pays %d SB" % [i + 1, want[i]])
+	_ok(vals == ["+1", "+5", "+10", "+25", "+100"], "track amounts +1/+5/+10/+25/+100 (%s)" % str(vals))
+	_ok(home.get_region("TrackStep5").sub_label.text.find("5+") != -1 and home.get_region("TrackStep1").tag.text == "SB", "last step is 5+, amounts tagged SB")
+	for lvl in [1, 2, 3]:
+		e.streak.process_first_clear_win(lvl)
+	home.refresh()
+	_ok(e.streak.streak() == 3, "canonical streak 3 after three first-clear wins")
+	_ok(home.get_region("TrackStep3").sub_label.text.find("NOW") != -1 and home.get_region("TrackStep2").sub_label.text.find("NOW") == -1, "current step marked at position 3")
+	_ok(home.get_region("TrackStep1").modulate.a == 1.0 and home.get_region("TrackStep3").modulate.a == 1.0 and home.get_region("TrackStep4").modulate.a < 1.0, "reached steps opaque, future dimmed")
+	for lvl in [4, 5, 6, 7]:
+		e.streak.process_first_clear_win(lvl)
+	home.refresh()
+	_ok(e.streak.streak() == 7 and home.get_region("TrackStep5").sub_label.text.find("NOW") != -1, "streak 7 marks the 5+ step")
+	e.streak.on_progression_loss()
+	home.refresh()
+	_ok(home.get_region("Shortcut_win_streak").badge.visible == false and home.get_region("TrackStep1").modulate.a < 1.0, "loss resets the live track")
+	sub.free()
+	_complete("win_streak_track")
 
 # ---------------------------------------------------------------- helpers ----
 
