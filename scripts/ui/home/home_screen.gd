@@ -36,16 +36,11 @@ const UiShortcutButton = preload("res://scripts/ui/components/ui_shortcut_button
 const HomeViewModel = preload("res://scripts/ui/home/home_view_model.gd")
 const HomeArtBinder = preload("res://scripts/ui/home/home_art_binder.gd")
 const HomePopup = preload("res://scripts/ui/home/home_popup.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 
 ## Shortcuts with a V1 Home destination (popup). Others belong to later milestones and
 ## are shown disabled.
 const LIVE_SHORTCUTS := ["gift_bar", "cards_exchange", "daily"]
-## Friendly names for canonical reward-bundle keys (presentation only).
-const REWARD_NAMES := {
-	"scrub_bucks": "SB", "bot_parts": "Bot Parts", "standard_card_packs": "Card Pack",
-	"premium_card_packs": "Premium Pack", "random_booster_charges": "Random Booster",
-	"selected_booster_charges": "Booster of choice", "guaranteed_new_cards": "New Card",
-}
 
 ## SB-M42-017: manifest slug -> Home node that may display it once owner-approved.
 const LAYER_ART := {
@@ -71,8 +66,8 @@ const ICON_ART := {
 
 ## Shortcut columns (SB-M42-010/012). Destinations belonging to later milestones are
 ## rendered disabled by refresh(), never faked.
-const LEFT_SHORTCUTS := [["win_streak", "WIN STREAK"], ["gift_bar", "GIFTS"], ["collection", "COLLECTION"], ["shop", "SHOP"]]
-const RIGHT_SHORTCUTS := [["daily", "DAILY"], ["tasks", "TASKS"], ["cards_exchange", "CARDS EXCHANGE"], ["no_ads", "NO ADS"]]
+const LEFT_SHORTCUTS := [["win_streak", "HOME_SC_WIN_STREAK"], ["gift_bar", "HOME_SC_GIFT_BAR"], ["collection", "HOME_SC_COLLECTION"], ["shop", "HOME_SC_SHOP"]]
+const RIGHT_SHORTCUTS := [["daily", "HOME_SC_DAILY"], ["tasks", "HOME_SC_TASKS"], ["cards_exchange", "HOME_SC_CARDS_EXCHANGE"], ["no_ads", "HOME_SC_NO_ADS"]]
 ## Win Streak track positions 1..5+ (values are rendered live from WinStreakService).
 const TRACK_POSITIONS := 5
 
@@ -208,7 +203,7 @@ func _build() -> void:
 
 	var play := Button.new()
 	play.name = "PlayButton"
-	play.text = "PLAY"
+	play.text = UiText.t("HOME_PLAY")
 	play.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN + UiTokens.SPACE_XL)
 	play.add_theme_font_size_override("font_size", UiTokens.FONT_HERO)
 	play.pressed.connect(func():
@@ -285,7 +280,7 @@ func _build_gift_meter(gm: HBoxContainer) -> void:
 func _build_shortcuts(column: VBoxContainer, specs: Array) -> void:
 	column.alignment = BoxContainer.ALIGNMENT_CENTER
 	for spec in specs:
-		var b := UiShortcutButton.new(spec[0], spec[1])
+		var b := UiShortcutButton.new(spec[0], UiText.t(spec[1]))
 		var id: String = spec[0]
 		b.pressed.connect(func():
 			shortcut_requested.emit(id)
@@ -330,10 +325,10 @@ func get_layout_mode() -> int:
 ## Bottom navigation. Only HOME and SETTINGS have V1 destinations; the other tabs are
 ## shown disabled (their screens belong to later milestones) — never faked.
 func _build_bottom_nav(nav: HBoxContainer) -> void:
-	for spec in [["events", "EVENTS"], ["robots", "ROBOTS"], ["home", "HOME"], ["leaderboard", "RANKS"], ["settings", "SETTINGS"]]:
+	for spec in [["events", "HOME_NAV_EVENTS"], ["robots", "HOME_NAV_ROBOTS"], ["home", "HOME_NAV_HOME"], ["leaderboard", "HOME_NAV_LEADERBOARD"], ["settings", "HOME_NAV_SETTINGS"]]:
 		var b := Button.new()
 		b.name = "SettingsButton" if spec[0] == "settings" else "Nav_" + spec[0]
-		b.text = spec[1]
+		b.text = UiText.t(spec[1])
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		b.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
 		b.add_theme_font_size_override("font_size", UiTokens.FONT_BODY)
@@ -349,7 +344,7 @@ func _build_bottom_nav(nav: HBoxContainer) -> void:
 				b.disabled = true   # already here
 			_:
 				b.disabled = true
-				b.tooltip_text = "Coming later"
+				b.tooltip_text = UiText.t("HOME_COMING_LATER")
 		b.pressed.connect(func(): nav_requested.emit(id))
 		nav.add_child(b)
 		_nodes["Nav_" + id] = b
@@ -364,10 +359,10 @@ func refresh() -> void:
 	var status: Label = _nodes["StatusLabel"]
 	if _app == null:
 		play.disabled = true
-		status.text = "Loading..."
+		status.text = UiText.t("HOME_LOADING")
 	elif _app.is_blocked:
 		play.disabled = true
-		status.text = "Save data is from a newer version. Update the game to continue."
+		status.text = UiText.t("HOME_SAVE_BLOCKED")
 	else:
 		_render_play(play, status)
 	_render_values()
@@ -380,34 +375,34 @@ func _render_values() -> void:
 		return
 	# SB-M42-019: the profile bar is Bot Parts toward the next 250-part robot (canonical
 	# RobotUnlockService / wallet), never XP. At >= target the bar is full and READY.
-	var parts_text := "BOT PARTS %d/%d" % [_vm["bot_parts"], _vm["bot_parts_target"]]
+	var parts_text := UiText.t("HOME_BOT_PARTS", [UiText.num(_vm["bot_parts"]), UiText.num(_vm["bot_parts_target"])])
 	if _vm["robot_can_unlock"]:
-		parts_text += " · ROBOT READY"
+		parts_text += UiText.t("HOME_ROBOT_READY")
 	(_nodes["ProfileBotParts"] as UiProgressMeter).set_progress(_vm["bot_parts"], _vm["bot_parts_target"],
-		"LEVEL %d · %s" % [_vm["level"], parts_text])
+		UiText.t("HOME_PROFILE_LINE", [_vm["level"], parts_text]))
 	# SB-M42-018: top currency is Scrub Bucks (banknote icon once approved; native "SB"
 	# tag meanwhile) with the live canonical wallet balance. No coin/Star authority.
 	var sb: UiValueChip = _nodes["ScrubBucksChip"]
-	sb.set_tag("SB")
-	sb.set_value(_group_digits(_vm["scrub_bucks"]))
+	sb.set_tag(UiText.t("HOME_CURRENCY_SB"))
+	sb.set_value(UiText.num(_vm["scrub_bucks"]))
 	var hearts: UiValueChip = _nodes["HeartsChip"]
 	hearts.set_value("%d/%d" % [_vm["hearts"], _vm["hearts_max"]])
 	hearts.set_sub("" if _vm["hearts"] >= _vm["hearts_max"] else _mmss(_vm["heart_seconds_to_next"]))
 	# SB-M42-020: the former event bar is the canonical Gift Meter (fed only by Win Streak
 	# SB inside GiftMeterService) with live progress + next milestone (10/50/250/500/1000).
 	# There is no event timer and no Event Points.
-	var next_text := ("NEXT GIFT AT %d" % _vm["gift_next_milestone"]) if _vm["gift_next_milestone"] > 0 else "CYCLE COMPLETE"
+	var next_text := UiText.t("HOME_GIFT_NEXT", [UiText.num(_vm["gift_next_milestone"])]) if _vm["gift_next_milestone"] > 0 else UiText.t("HOME_GIFT_CYCLE_COMPLETE")
 	(_nodes["GiftMeterBar"] as UiProgressMeter).set_progress(_vm["gift_progress"], _vm["gift_cycle_max"],
-		"GIFT METER %d/%d · %s" % [_vm["gift_progress"], _vm["gift_cycle_max"], next_text])
+		UiText.t("HOME_GIFT_METER", [UiText.num(_vm["gift_progress"]), UiText.num(_vm["gift_cycle_max"]), next_text]))
 	# SB-M42-023: the lower road is the Win Streak Scrub Bucks reward track: position
 	# 1/2/3/4/5+ pays 1/5/10/25/100 SB (WinStreakService, owner-locked). Reached steps are
 	# fully opaque, the current step is marked, future steps are dimmed. Not Stars.
 	for step in _vm["win_streak_track"]:
 		var chip: UiValueChip = _nodes["TrackStep%d" % step["position"]]
-		chip.set_tag("SB")
-		chip.set_value("+%d" % step["sb"])
+		chip.set_tag(UiText.t("HOME_CURRENCY_SB"))
+		chip.set_value(UiText.t("HOME_TRACK_AMOUNT", [UiText.num(step["sb"])]))
 		var pos_text: String = ("%d+" % step["position"]) if step["position"] == HomeViewModel.TRACK_POSITIONS else str(step["position"])
-		chip.set_sub(("WIN %s · NOW" % pos_text) if step["current"] else ("WIN %s" % pos_text))
+		chip.set_sub(UiText.t("HOME_TRACK_WIN_NOW" if step["current"] else "HOME_TRACK_WIN", [pos_text]))
 		chip.modulate.a = 1.0 if step["reached"] else 0.55
 	(_nodes["Shortcut_win_streak"] as UiShortcutButton).set_badge(_vm["win_streak"])
 	(_nodes["Shortcut_gift_bar"] as UiShortcutButton).set_badge(_vm["gift_claimable"])
@@ -419,16 +414,6 @@ func _render_values() -> void:
 	for pid in _popups:
 		if (_popups[pid] as Control).visible:
 			_render_popup(pid)
-
-## 1234567 -> "1,234,567" (moved behind the localization seam in SB-M42-025).
-static func _group_digits(n: int) -> String:
-	var neg := n < 0
-	var d := str(absi(n))
-	var out := ""
-	while d.length() > 3:
-		out = "," + d.substr(d.length() - 3) + out
-		d = d.substr(0, d.length() - 3)
-	return ("-" if neg else "") + d + out
 
 
 # ------------------------------------------------------------- popups ----
@@ -475,14 +460,14 @@ func _render_gift_bar(popup: HomePopup) -> void:
 	var rows: Array = []
 	for occ in _app.economy.gift.claimable():
 		var rewards: Dictionary = _app.economy.config.gift_meter_milestone(int(occ["milestone"]))
-		rows.append({"text": "GIFT %d · %s" % [int(occ["milestone"]), _reward_text(rewards)],
-			"action_id": String(occ["id"]), "action_text": "CLAIM", "action_enabled": not _app.is_blocked})
+		rows.append({"text": UiText.t("GIFTS_ROW", [UiText.num(int(occ["milestone"])), UiText.reward_text(rewards)]),
+			"action_id": String(occ["id"]), "action_text": UiText.t("POPUP_CLAIM"), "action_enabled": not _app.is_blocked})
 	var note := ""
 	if rows.is_empty():
-		note = "No gifts to claim. Win levels in a row to fill the Gift Meter."
+		note = UiText.t("GIFTS_EMPTY")
 	elif _app.is_blocked:
-		note = "Claims are unavailable while the save is read-only."
-	popup.set_content("GIFTS", rows, note)
+		note = UiText.t("GIFTS_READ_ONLY")
+	popup.set_content(UiText.t("GIFTS_TITLE"), rows, note)
 
 ## SB-M42-022: former Star Exchange = Cards Exchange. Presentation/navigation only:
 ## live duplicate-card count and their canonical SB value (CardsExchangeService), no
@@ -497,9 +482,9 @@ func _render_cards_exchange(popup: HomePopup) -> void:
 		if n > 0:
 			var v: int = n * int(ex.card_value(cid))
 			total_sb += v
-			rows.append({"text": "%s · x%d duplicate(s) · %d SB" % [cid, n, v]})
-	var note := "No duplicate cards yet." if rows.is_empty() else 		"%d duplicate card(s) worth %d SB. Exchange them in the Collection (coming later)." % [_vm.get("cards_duplicates", 0), total_sb]
-	popup.set_content("CARDS EXCHANGE", rows, note)
+			rows.append({"text": UiText.t("CARDS_ROW", [cid, UiText.num(n), UiText.num(v)])})
+	var note := UiText.t("CARDS_EMPTY") if rows.is_empty() else UiText.t("CARDS_NOTE", [UiText.num(int(_vm.get("cards_duplicates", 0))), UiText.num(total_sb)])
+	popup.set_content(UiText.t("CARDS_TITLE"), rows, note)
 
 ## SB-M42-024: Daily consecutive-login count, 5-day cycle and each day's configured
 ## reward (incl. booster charges) from DailyService; CLAIM goes through the canonical
@@ -512,16 +497,16 @@ func _render_daily(popup: HomePopup) -> void:
 	for day in range(1, 6):
 		var state := ""
 		if claimed and day == next_day:
-			state = " · CLAIMED TODAY"
+			state = UiText.t("DAILY_CLAIMED_TODAY")
 		elif not claimed and day == next_day:
-			state = " · TODAY"
-		var row := {"text": "DAY %d · %s%s" % [day, _reward_text(d.login_reward_for(day)), state]}
+			state = UiText.t("DAILY_TODAY")
+		var row := {"text": UiText.t("DAILY_ROW", [day, UiText.reward_text(d.login_reward_for(day)), state])}
 		if not claimed and day == next_day:
 			row["action_id"] = "login"
-			row["action_text"] = "CLAIM"
+			row["action_text"] = UiText.t("POPUP_CLAIM")
 			row["action_enabled"] = not _app.is_blocked
 		rows.append(row)
-	popup.set_content("DAILY REWARDS", rows, "Login streak: %d day(s)." % int(d.streak()))
+	popup.set_content(UiText.t("DAILY_TITLE"), rows, UiText.t("DAILY_STREAK", [UiText.num(int(d.streak()))]))
 
 func _on_popup_action(action_id: String, popup_id: String) -> void:
 	if _app == null or _app.is_blocked:
@@ -533,15 +518,6 @@ func _on_popup_action(action_id: String, popup_id: String) -> void:
 			if action_id == "login":
 				_app.actions.claim_daily_login()
 	refresh()
-
-static func _reward_text(rewards: Dictionary) -> String:
-	var parts: Array = []
-	var keys: Array = rewards.keys()
-	keys.sort()
-	for k in keys:
-		if int(rewards[k]) > 0:
-			parts.append("%s x%d" % [REWARD_NAMES.get(k, k), int(rewards[k])])
-	return ", ".join(parts)
 
 static func _mmss(seconds: int) -> String:
 	return "%02d:%02d" % [seconds / 60, seconds % 60]
@@ -557,16 +533,16 @@ func _render_play(play: Button, status: Label) -> void:
 	_launch = GameplayLaunchResolver.resolve(_app)
 	var level := int(_launch.get("level", _app.progression.current_level()))
 	var first_time: bool = _app.progression.completed_count() == 0
-	play.text = "PLAY" if first_time else "CONTINUE · LEVEL %d" % level
+	play.text = UiText.t("HOME_PLAY") if first_time else UiText.t("HOME_CONTINUE_LEVEL", [level])
 	if _launch.get("ok", false):
 		play.disabled = false
 		status.text = ""
 	elif _launch.get("reason", "") == GameplayLaunchResolver.CONTENT_MISSING:
 		play.disabled = true
-		status.text = "Level %d is coming soon." % level
+		status.text = UiText.t("HOME_LEVEL_COMING_SOON", [level])
 	else:
 		play.disabled = true
-		status.text = "Levels unavailable (%s)." % String(_launch.get("reason", ""))
+		status.text = UiText.t("HOME_LEVELS_UNAVAILABLE", [String(_launch.get("reason", ""))])
 
 func get_launch_preview() -> Dictionary:
 	return _launch.duplicate(true)
