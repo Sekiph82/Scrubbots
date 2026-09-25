@@ -1,7 +1,7 @@
 # M40-C001 V04 — ChatGPT Independent Full-Surface Audit
 
 Date: 2026-09-25
-Verdict: **CODE_AUDIT_PASS / REQUIRED REGRESSION GATE OPEN**
+Verdict: **AUDITED_PASS / M40 SAVE SYSTEM CLOSED**
 
 Implementation: `21f8892`
 Claude log: `coordination/sessions/M40-C001/CLAUDE_LOG_V04.md`
@@ -121,3 +121,24 @@ No additional material M40 production defect found.
 
 Verdict string:
 `CODE_AUDIT_PASS / M40-C001 V04 / M38 STRICT REGRESSION REQUIRED BEFORE FINAL AUDITED_PASS`
+
+
+## Final mandatory-regression closure — 2026-09-25
+
+The M38 strict false-PASS harness was repaired in M38 V03 with production M38
+unchanged. The corrected suite now runs all 11 expected cases, contains no
+SCRIPT ERROR, and fails if a sub-test aborts.
+
+Claude reran the M40 V04 required dependency/regression set after that repair:
+- repaired `m38_v02_strict.gd`: PASS 11/11
+- `m39_v04_integration.gd`: PASS
+- `m39_v04_tornado_inflight.gd`: PASS
+- `m40_v04_bootstrap.gd`: PASS
+- root: 5336 checks / 0 failures
+
+The external regression gate is therefore closed.
+
+All M40 task rows are now independently accepted.
+
+Final verdict string:
+`AUDITED_PASS / M40 SAVE SYSTEM CLOSED`
