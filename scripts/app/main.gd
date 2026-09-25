@@ -234,6 +234,9 @@ func handle_back() -> String:
 	var pre_action := false
 	if nav.current() == NavigationController.Route.GAMEPLAY and _gameplay_host != null 			and app_state != null and app_state.economy != null:
 		pre_action = not app_state.economy.streak.gameplay_started() 			and not _gameplay_host.get_completion().is_terminal()
+	# Home popups (Gift Bar / Cards Exchange / Daily) close before anything else.
+	if nav.current() == NavigationController.Route.HOME and not nav.is_settings_open() 			and _home != null and _home.close_top_popup():
+		return "close_popup"
 	var action: String = nav.back(pre_action)
 	if action == "home" and pre_action:
 		app_state.economy.streak.on_pre_action_exit()

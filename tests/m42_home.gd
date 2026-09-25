@@ -17,7 +17,7 @@ var EXPECTED_CASES := [
 	"play_cta_fresh", "continue_cta_frontier",
 	"settings_single_authority", "components_viewport_matrix", "layered_art_regions",
 	"shortcut_columns_responsive", "live_binding", "approved_art_only", "scrub_bucks_chip",
-	"bot_parts_progress", "gift_meter_semantics",
+	"bot_parts_progress", "gift_meter_semantics", "gift_bar_claims",
 ]
 
 var _fail := 0
@@ -40,6 +40,7 @@ func _initialize() -> void:
 	await _scrub_bucks_chip()
 	await _bot_parts_progress()
 	await _gift_meter_semantics()
+	await _gift_bar_claims()
 	_cleanup()
 	_done()
 
@@ -469,6 +470,40 @@ func _gift_meter_semantics() -> void:
 	_ok(gm_nodes == 0, "no timer / event wording in the Gift Meter region")
 	sub.free()
 	_complete("gift_meter_semantics")
+
+## SB-M42-021: Gift Bar lists canonical queued milestone rewards; CLAIM goes through the
+## canonical facade (idempotent, saved); Home never mints.
+func _gift_bar_claims() -> void:
+	print("[gift bar claims]")
+	var path := _uniq("giftbar")
+	var root = await _boot_main(path)
+	var app = root.get_app_state()
+	var home = root.get_home()
+	var e = app.economy
+	e.gift.add_streak_sb("t_gb_1", 60)   # crosses 10 and 50
+	home.refresh()
+	var sc = home.get_region("Shortcut_gift_bar")
+	_ok(not sc.disabled and sc.badge.visible and sc.badge.text == "2", "Gift shortcut live with claimable badge 2")
+	sc.pressed.emit()
+	var popup = home.get_popup("gift_bar")
+	_ok(popup != null and popup.visible and popup.get_row_count() == 2, "Gift Bar popup lists 2 queued milestones")
+	var occ: Dictionary = e.gift.claimable()[0]
+	var reward: Dictionary = e.config.gift_meter_milestone(int(occ["milestone"]))
+	var sb0: int = e.wallet.scrub_bucks()
+	var parts0: int = e.wallet.bot_parts()
+	var btn: Button = popup.get_action_button(String(occ["id"]))
+	btn.pressed.emit()
+	_ok(e.wallet.scrub_bucks() == sb0 + int(reward.get("scrub_bucks", 0)) and e.wallet.bot_parts() == parts0 + int(reward.get("bot_parts", 0)), "CLAIM grants exactly the configured milestone reward %s" % str(reward))
+	_ok(e.gift.claimable().size() == 1 and popup.get_row_count() == 1 and sc.badge.text == "1", "claimed row gone, badge 1")
+	btn.pressed.emit()
+	var again: Dictionary = app.actions.claim_gift(String(occ["id"]))
+	_ok(not again.get("ok", true) and e.wallet.scrub_bucks() == sb0 + int(reward.get("scrub_bucks", 0)), "second claim of the same occurrence refused, no double reward")
+	_ok(AppState.new(path).economy.gift.claimable().size() == 1, "claim persisted canonically")
+	_ok(root.handle_back() == "close_popup" and not popup.visible and root.get_navigation().current() == NavigationController.Route.HOME, "back closes the popup first")
+	_shutdown(root)
+	var src := FileAccess.get_file_as_string("res://scripts/ui/home/home_screen.gd")
+	_ok(src.find("wallet.credit") == -1 and src.find("reward.grant") == -1, "Home code never credits/grants directly")
+	_complete("gift_bar_claims")
 
 # ---------------------------------------------------------------- helpers ----
 
