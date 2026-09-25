@@ -46,3 +46,23 @@ Capture it with `adb logcat -s godot` (Android) or the Xcode console (iOS).
 | Date | Device | OS | Checks passed | Metrics line | Notes |
 |---|---|---|---|---|---|
 | — | — | — | — | — | not run yet |
+
+## iOS readiness (SB-M42-033)
+
+Static / configuration readiness checked in this repository (no macOS/Xcode, iOS export
+template or iOS device available here, so physical playback is **IOS_DEVICE_LATER**):
+
+| Check | Result |
+|---|---|
+| Codec path | runtime asset is Ogg Theora/Vorbis decoded by Godot's built-in, platform-independent `VideoStreamTheora` (no H.264/MP4, no AVFoundation dependency) |
+| Same fail-safe | missing/undecodable stream -> `failed(reason)` -> Home exactly once (identical code path on every platform) |
+| Same aspect rules | letterbox fit is computed from the Control size, no platform branches; safe-area insets do not affect the full-screen letterbox |
+| Same lifecycle cleanup | `cleanup()` on outcome and on `_exit_tree`; watchdog independent of platform `finished` delivery |
+| Same frequency contract | `LaunchSession` static state resets only with a new process; iOS app termination/relaunch = new process; suspend/resume keeps the process -> no replay |
+| Orientation | `display/window/handheld/orientation=1` (portrait) applies to iOS export |
+| Lifecycle notifications | iOS delivers `NOTIFICATION_APPLICATION_PAUSED/RESUMED/FOCUS_*`; app root flush and opening behaviour identical to Android |
+| Platform-specific branches | none in `main.gd`, `opening_screen.gd`, `launch_session.gd`, `navigation_controller.gd` |
+| Export preset | no `export_presets.cfg` in the repository yet; an iOS preset (bundle id, signing team, icons) is an owner/tooling step |
+
+Physical iOS checks to run later: the same 12-item checklist above on an iPhone
+(record the `[OPENING_METRICS]` line from the Xcode console).
