@@ -147,6 +147,9 @@ func open_settings() -> void:
 func _on_nav_settings_changed(open: bool) -> void:
 	if _settings_panel == null:
 		return
+	# V03 K: Settings obscures Home exactly like a Home popup (action controls hidden).
+	if _home != null:
+		_home.set_modal_active("settings", open)
 	if open:
 		_settings_panel.open_panel()
 	elif _settings_panel.visible:
