@@ -10,7 +10,7 @@ const OGV := "res://assets/brand/opening/scrubbots_opening_720p30.ogv"
 const OGV_SHA256 := "3ec6e1347bbb1d8ced2709f3383b06ae6dbfba017e0a6d23a0fb991ec78ee89a"
 
 var EXPECTED_CASES := ["mp4_preserved", "ogv_runtime_asset", "opening_player_aspect", "opening_lifecycle",
-	"boot_opening_to_home_once", "once_per_cold_launch", "device_instrumentation"]
+	"boot_opening_to_home_once", "once_per_cold_launch", "device_instrumentation", "ios_static_readiness"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -24,6 +24,7 @@ func _initialize() -> void:
 	await _boot_opening_to_home_once()
 	await _once_per_cold_launch()
 	await _device_instrumentation()
+	_ios_static_readiness()
 	_cleanup()
 	_done()
 
@@ -277,6 +278,23 @@ func _device_instrumentation() -> void:
 	var doc := FileAccess.get_file_as_string("res://docs/OPENING_CINEMATIC_DEVICE_VALIDATION.md")
 	_ok(doc.find("[OPENING_METRICS]") != -1 and doc.find("not run yet") != -1 and doc.find("DEVICE_OWNER_REQUIRED") != -1, "device checklist published; no device result claimed")
 	_complete("device_instrumentation")
+
+## SB-M42-033: iOS static readiness of the same boot/cinematic architecture.
+func _ios_static_readiness() -> void:
+	print("[ios static readiness]")
+	_ok(ClassDB.class_exists("VideoStreamTheora") and load(OGV) is VideoStreamTheora, "Theora decoder is Godot built-in (platform independent)")
+	_ok(int(ProjectSettings.get_setting("display/window/handheld/orientation")) == 1, "portrait orientation for handheld (iOS/Android)")
+	var branches: Array = []
+	for f in ["res://scripts/app/main.gd", "res://scripts/app/opening_screen.gd", "res://scripts/app/launch_session.gd", "res://scripts/app/navigation_controller.gd"]:
+		var t := FileAccess.get_file_as_string(f)
+		if t.find("OS.get_name() ==") != -1 or t.find("OS.has_feature(\"ios\")") != -1 or t.find("OS.has_feature(\"android\")") != -1 or t.find("\"iOS\"") != -1:
+			branches.append(f)
+	_ok(branches.is_empty(), "no platform-specific branches in boot/cinematic/session/nav %s" % str(branches))
+	var main_src := FileAccess.get_file_as_string("res://scripts/app/main.gd")
+	_ok(main_src.find("NOTIFICATION_APPLICATION_PAUSED") != -1 and main_src.find("NOTIFICATION_WM_GO_BACK_REQUEST") != -1, "lifecycle notifications handled generically (iOS delivers PAUSED/RESUMED)")
+	var doc := FileAccess.get_file_as_string("res://docs/OPENING_CINEMATIC_DEVICE_VALIDATION.md")
+	_ok(doc.find("IOS_DEVICE_LATER") != -1 and doc.find("## iOS readiness") != -1, "iOS readiness recorded; physical playback not claimed")
+	_complete("ios_static_readiness")
 
 func _find(hay: PackedByteArray, needle: PackedByteArray) -> int:
 	for i in range(hay.size() - needle.size()):
