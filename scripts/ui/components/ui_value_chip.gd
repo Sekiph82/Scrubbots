@@ -9,6 +9,9 @@ extends PanelContainer
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 
 var icon: TextureRect
+## Native text tag shown in place of the icon while no approved icon art is bound
+## (e.g. "SB" for Scrub Bucks). Live Label, never baked.
+var tag: Label
 var value_label: Label
 var sub_label: Label
 
@@ -33,6 +36,12 @@ func _init(id: String = "chip") -> void:
 	icon.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	icon.visible = false
 	row.add_child(icon)
+	tag = Label.new()
+	tag.name = "Tag"
+	tag.add_theme_font_size_override("font_size", UiTokens.FONT_BODY)
+	tag.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	tag.visible = false
+	row.add_child(tag)
 	var col := VBoxContainer.new()
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.add_theme_constant_override("separation", 0)
@@ -50,6 +59,11 @@ func _init(id: String = "chip") -> void:
 func set_icon(tex: Texture2D) -> void:
 	icon.texture = tex
 	icon.visible = tex != null
+	tag.visible = tex == null and not tag.text.is_empty()
+
+func set_tag(text: String) -> void:
+	tag.text = text
+	tag.visible = icon.texture == null and not text.is_empty()
 
 func set_value(text: String) -> void:
 	value_label.text = text
