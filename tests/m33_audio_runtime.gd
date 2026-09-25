@@ -275,11 +275,15 @@ func _approved_music_asset() -> void:
 	var s = load(path)
 	_ok(s is AudioStreamOggVorbis, "Godot imports it as AudioStreamOggVorbis")
 	_ok(s != null and absf(s.get_length() - MUSIC_SECONDS) < 0.01, "Godot stream length %.6f within 10 ms" % (s.get_length() if s else -1.0))
+	# The gameplay asset must not be replaced; the only other allowed file is the owner-reserved
+	# future Workshop track (owner decision V03), which gameplay must never reference.
 	var extra: Array = []
 	for f in DirAccess.get_files_at("res://assets/audio/music"):
-		if not (f in [".gitkeep", "background_loop.ogg", "background_loop.ogg.import"]):
+		if not (f in [".gitkeep", "background_loop.ogg", "background_loop.ogg.import", "workshop_loop.ogg", "workshop_loop.ogg.import"]):
 			extra.append(f)
 	_ok(extra.is_empty(), "no other/replacement music file in assets/audio/music %s" % str(extra))
+	var mc_src := FileAccess.get_file_as_string("res://scripts/audio/music_controller.gd")
+	_ok(mc_src.to_lower().find("workshop_loop") == -1, "gameplay MusicController never references the Workshop track")
 	_complete("approved_music_asset")
 
 func _music_controller_unit() -> void:
