@@ -1,34 +1,35 @@
 extends Control
-## M33 Audio manual playtest. Open/instantiate res://scenes/debug/m33_audio_playtest.tscn
-## and run it in graphical Godot (F6). Owner F6 audio listening gate — Claude cannot self-close M33.
+## M33 V02 audio manual playtest. Open
+## res://scenes/debug/m33_audio_playtest.tscn and run it in graphical Godot (F6).
+## Owner F6 re-listening gate (M33 V02) — Claude cannot self-close it.
 ##
-## Hosts the REAL production stack (ProductionGameplayHost) on the 20x20 Hazard Bot level, so
-## dispatch/cleaning/completion audio fires from the ACTUAL authoritative gameplay events
-## (committed dispatch, authenticated clear, WON terminal) — not faked. Debug-only overlay
-## controls (never shipped UI):
-##   - AUTO-SOLVE: drain the solved candidate so real dispatch + clears fire continuously.
+## Hosts the REAL production stack (ProductionGameplayHost) on the 20x20 Hazard Bot level with
+## an injected canonical AppState on an ISOLATED debug save path (never the real player save),
+## so cleaning/completion audio fires from the ACTUAL authoritative events. Debug-only controls:
+##   - AUTO-SOLVE: drain the solved candidate so real clears fire continuously.
 ##   - SPEED 1x/2x: raise real event density; canonical one-shots keep normal pitch.
-##   - RETRY: transaction-safe retry; a later fresh WON must play completion again.
-##   - TEST DISPATCH / TEST CLEANING / TEST COMPLETION: isolated presentation seams.
-##   - CLEANING STRESS: burst cleaning requests far beyond the voice cap to hear suppression.
-##   - Master / Music / SFX sliders: live user volume; SAVE / RELOAD persist + reload.
-## A live readout shows per-category voice diagnostics (requests / played / suppressed /
-## active / peak / cap) and the current volumes.
+##   - RETRY: transaction-safe retry; stale cleaning/completion voices are stopped.
+##   - TEST CLEANING / TEST COMPLETION: isolated presentation seams.
+##   - CLEANING STRESS: burst cleaning requests far beyond the voice cap.
+##   - MUSIC TEST TONE: DEBUG-ONLY quiet generated sine loop on the Music bus so the Music
+##     bus can be heard before an owner-approved track exists. Not a music asset.
+## A live readout shows per-category voice diagnostics and the music controller status.
 ##
-## Owner F6 checklist (also in coordination/sessions/M33-C001/CLAUDE_LOG_V01.md):
-##   1. dispatch.wav sounds once per real successful dispatch and is appropriate.
-##   2. cleaning.wav sounds on committed cleaning and is not intolerable under density.
-##   3. completion.wav plays once on WON.
-##   4. no robot movement loop exists.
-##   5. actual 1x and 2x remain listenable.
-##   6. cleaning/dispatch overlap does not clip into an uncontrolled wall.
-##   7. Master slider works.  8. SFX slider works.
-##   9. Music slider changes/persists its bus value (no music track ships in M33).
-##  10. settings survive save/reload.  11. Retry allows a fresh completion + no stale audio.
+## Owner F6 checklist (also in coordination/sessions/M33-C001/CLAUDE_LOG_V02.md):
+##   1. NO sound on robot dispatch.
+##   2. cleaning uses the dispatch.wav sound, short, with no tail after the pixel is gone.
+##   3. completion.wav plays once on WON; LOST plays nothing.
+##   4. no robot movement loop.
+##   5. 1x and 2x auto-solve are listenable, not an audio wall.
+##   6. Music status shows OWNER_MUSIC_SELECTION_REQUIRED until a track is approved.
+##   7. Retry leaves no stale cleaning/completion tail.
 
+const AppState = preload("res://scripts/app/app_state.gd")
 const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/production_gameplay_host.gd")
 const GameplayAudioController = preload("res://scripts/audio/gameplay_audio_controller.gd")
-const AudioSettingsService = preload("res://scripts/audio/audio_settings_service.gd")
+
+## Isolated debug save: the playtest never touches the real player save.
+const DEBUG_SAVE_PATH := "user://debug_m33_m41_playtest_save.dat"
 
 var _host
 var _status: Label
@@ -36,19 +37,18 @@ var _diag: Label
 var _auto_solve := false
 var _auto_btn: Button
 var _speed_btn: Button
-var _master_slider: HSlider
-var _music_slider: HSlider
-var _sfx_slider: HSlider
 var _vol_label: Label
+var _app
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	_app = AppState.new(DEBUG_SAVE_PATH)
 	_build_host()
 	_build_overlay()
-	_sync_sliders_from_settings()
 
 func _build_host() -> void:
 	_host = ProductionGameplayHost.new()
+	_host.app_state = _app
 	_host.set_anchors_preset(Control.PRESET_FULL_RECT)
 	add_child(_host)
 	if not _host.is_built():
@@ -90,21 +90,15 @@ func _build_overlay() -> void:
 	row2.alignment = BoxContainer.ALIGNMENT_CENTER
 	row2.add_theme_constant_override("separation", 8)
 	bar.add_child(row2)
-	row2.add_child(_make_button("TEST DISPATCH", _on_test_dispatch))
 	row2.add_child(_make_button("TEST CLEANING", _on_test_cleaning))
 	row2.add_child(_make_button("TEST COMPLETION", _on_test_completion))
 	row2.add_child(_make_button("CLEANING STRESS", _on_stress))
-
-	_master_slider = _add_slider(bar, "MASTER", _on_master_changed)
-	_music_slider = _add_slider(bar, "MUSIC", _on_music_changed)
-	_sfx_slider = _add_slider(bar, "SFX", _on_sfx_changed)
 
 	var row3 := HBoxContainer.new()
 	row3.alignment = BoxContainer.ALIGNMENT_CENTER
 	row3.add_theme_constant_override("separation", 8)
 	bar.add_child(row3)
-	row3.add_child(_make_button("SAVE", _on_save))
-	row3.add_child(_make_button("RELOAD", _on_reload))
+	row3.add_child(_make_button("MUSIC TEST TONE", _on_test_tone))
 
 func _make_button(text: String, cb: Callable) -> Button:
 	var b := Button.new()
@@ -113,38 +107,11 @@ func _make_button(text: String, cb: Callable) -> Button:
 	b.pressed.connect(cb)
 	return b
 
-func _add_slider(parent: VBoxContainer, name_text: String, cb: Callable) -> HSlider:
-	var row := HBoxContainer.new()
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 8)
-	parent.add_child(row)
-	var lbl := Label.new()
-	lbl.text = name_text
-	lbl.custom_minimum_size = Vector2(80, 0)
-	row.add_child(lbl)
-	var s := HSlider.new()
-	s.min_value = 0.0
-	s.max_value = 1.0
-	s.step = 0.01
-	s.value = 1.0
-	s.custom_minimum_size = Vector2(320, 0)
-	s.value_changed.connect(cb)
-	row.add_child(s)
-	return s
-
 func _settings():
 	return _host.get_audio_settings() if (_host != null and is_instance_valid(_host) and _host.is_built()) else null
 
 func _audio():
 	return _host.get_audio_controller() if (_host != null and is_instance_valid(_host) and _host.is_built()) else null
-
-func _sync_sliders_from_settings() -> void:
-	var s = _settings()
-	if s == null:
-		return
-	_master_slider.set_value_no_signal(s.get_master_volume())
-	_music_slider.set_value_no_signal(s.get_music_volume())
-	_sfx_slider.set_value_no_signal(s.get_sfx_volume())
 
 func _process(_delta: float) -> void:
 	if _host == null or not is_instance_valid(_host) or not _host.is_built():
@@ -152,13 +119,14 @@ func _process(_delta: float) -> void:
 	_status.text = String(_host.get_completion().get_state())
 	var ac = _audio()
 	if ac != null:
-		var d: Dictionary = ac.get_diagnostics(GameplayAudioController.Category.DISPATCH)
 		var c: Dictionary = ac.get_diagnostics(GameplayAudioController.Category.CLEANING)
 		var w: Dictionary = ac.get_diagnostics(GameplayAudioController.Category.COMPLETION)
-		_diag.text = "DISPATCH %s\nCLEANING %s\nCOMPLETION %s" % [_fmt(d), _fmt(c), _fmt(w)]
+		var m = _host.get_music_controller()
+		_diag.text = "DISPATCH none (owner V02)\nCLEANING %s\nCOMPLETION %s\nMUSIC %s" % [_fmt(c), _fmt(w), String(m.get_status()) if m != null else "-"]
 	var s = _settings()
 	if s != null:
-		_vol_label.text = "vol  master %.2f | music %.2f | sfx %.2f" % [s.get_master_volume(), s.get_music_volume(), s.get_sfx_volume()]
+		_vol_label.text = "master %.2f | music %.2f | sfx %.2f | vibration %s" % [
+			s.get_master_volume(), s.get_music_volume(), s.get_sfx_volume(), _onoff(_app.haptics.is_enabled())]
 	if _auto_solve and _host.get_completion().is_playing():
 		var slots = _host.get_slots()
 		var supply = _host.get_supply()
@@ -171,7 +139,10 @@ func _process(_delta: float) -> void:
 func _fmt(d: Dictionary) -> String:
 	if d.is_empty():
 		return "-"
-	return "req %d played %d supp %d active %d peak %d cap %d" % [d["requests"], d["played"], d["suppressed"], d["active"], d["peak"], d["cap"]]
+	return "req %d played %d supp %d cut %d active %d peak %d cap %d" % [d["requests"], d["played"], d["suppressed"], d["cut"], d["active"], d["peak"], d["cap"]]
+
+func _onoff(v: bool) -> String:
+	return "on" if v else "OFF"
 
 func _on_auto_pressed() -> void:
 	_auto_solve = not _auto_solve
@@ -188,11 +159,6 @@ func _on_retry_pressed() -> void:
 		_auto_solve = false
 		_auto_btn.text = "AUTO-SOLVE"
 		_speed_btn.text = "SPEED 1x"
-
-func _on_test_dispatch() -> void:
-	var ac = _audio()
-	if ac != null:
-		ac.request_dispatch()
 
 func _on_test_cleaning() -> void:
 	var ac = _audio()
@@ -213,31 +179,28 @@ func _on_stress() -> void:
 	for _i in range(48):
 		ac.request_cleaning()
 
-func _on_master_changed(v: float) -> void:
-	var s = _settings()
-	if s != null:
-		s.set_master_volume(v)
+## DEBUG-ONLY: a quiet generated 220 Hz sine loop on the Music bus (not a music asset) so the
+## owner can hear Music vs SFX settings before a real track is approved.
+func _on_test_tone() -> void:
+	var m = _host.get_music_controller() if (_host != null and _host.is_built()) else null
+	if m == null:
+		return
+	var rate := 22050
+	var frames := rate   # 1 s loop, whole number of 220 Hz cycles.
+	var data := PackedByteArray()
+	data.resize(frames * 2)
+	for i in range(frames):
+		data.encode_s16(i * 2, int(sin(TAU * 220.0 * float(i) / float(rate)) * 3000.0))
+	var w := AudioStreamWAV.new()
+	w.format = AudioStreamWAV.FORMAT_16_BITS
+	w.mix_rate = rate
+	w.data = data
+	m.set_track(w)
+	m.start()
 
-func _on_music_changed(v: float) -> void:
-	var s = _settings()
-	if s != null:
-		s.set_music_volume(v)
-
-func _on_sfx_changed(v: float) -> void:
-	var s = _settings()
-	if s != null:
-		s.set_sfx_volume(v)
-
-func _on_save() -> void:
-	var s = _settings()
-	if s != null:
-		s.save()
-
-func _on_reload() -> void:
-	var s = _settings()
-	if s != null:
-		s.load()
-		_sync_sliders_from_settings()
+func _exit_tree() -> void:
+	if _app != null:
+		_app.flush()
 
 func get_host():
 	return _host

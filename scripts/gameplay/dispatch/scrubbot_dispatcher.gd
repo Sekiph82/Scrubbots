@@ -83,7 +83,8 @@ signal assignment_arrived(owner_id: int, target_index: int, color_id: int, agent
 ## `_active` on a successful dispatch path (both the legacy dispatch() and the production
 ## dispatch_preclaimed() paths). It is NEVER emitted on an invalid request, route failure,
 ## reset abort, coherence failure or agent-assignment failure. It is OBSERVATION ONLY — the
-## M33 GameplayAudioController listens to play dispatch.wav; gameplay never depends on a
+## M33 V01 audio listened here; owner audio decision V02 removed dispatch SFX, so production
+## has no audio observer on this signal (dispatch.wav now backs cleaning). Gameplay never depends on a
 ## listener and dispatch success/failure semantics, reservation truth, assignment identity
 ## and scheduling are all unchanged by adding this signal.
 signal assignment_dispatched(owner_id: int, target_index: int, color_id: int, agent)
