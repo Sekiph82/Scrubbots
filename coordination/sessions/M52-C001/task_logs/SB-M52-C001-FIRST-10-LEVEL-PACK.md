@@ -71,7 +71,7 @@ Configuration (runtime authority `ProductionGameplayHost`): 3 FIFO columns, `pre
 | 7 | Pigeon | **DEADLOCK** at seed 1 (exhaustive; ~28 min per attempt) | 1 / 0 | 342 | — | — | — | — |
 | 8 | Butterfly | **DEADLOCK** at seed 1 (exhaustive; ~28 min per attempt) | 1 / 0 | 429 | — | — | — | — |
 | 9 | Frog | **UNRESOLVED** — search still running at report time (>70 min, no verdict) | — | — | — | — | — | — |
-| 10 | Ice Cube | **DEADLOCK ×64** (attempts 0..63, every one exhaustive DEADLOCK) | — | 92..440 | — | — | — | — |
+| 10 | Ice Cube | generator seeds: **DEADLOCK ×64**. Owner candidate V01 (§9): **SOLVED** | owner layout | 47 | 40 = 40 | [14, 13, 13] | 1273423104 | exact completion |
 
 Full per-level records (attempt lists, accepted seed, full hidden batch layout per column, ProofState queue lengths, trace summary/hash, replay): `coordination/sessions/M52-C001/evidence/solve_*.json`. Raw tool output lines: `coordination/sessions/M52-C001/evidence/m52_solver_run_lines.txt`.
 
@@ -133,4 +133,24 @@ To admit Levels 5/7/8/10 (and possibly 4/9) one of these is required — all are
 3. revise the Level 5/7/8/10 artworks/outline structure;
 4. accept a smaller first pack (e.g. only proven levels) — conflicts with the owner-locked 1..10 mapping/cadence.
 
-`BLOCKED / M52-C001 FIRST 10 LEVEL PACK — Levels 5, 7, 8, 10 DEADLOCK under canonical rules; 4, 9 unresolved; catalog unchanged`
+## 9. Addendum — Level 010 owner supply candidate V01 (owner instruction 2026-09-26)
+
+Owner input: `coordination/sessions/M52-C001/owner_inputs/LEVEL_010_ICE_CUBE_SUPPLY_BATCH_CANDIDATE_V01.md` (`b26cf4c`). Implemented exactly, no regeneration/repartition:
+
+- Declarative layout: `data/levels/supply/level_010_ice_cube_supply_candidate_v1.json` (3 columns, 14/13/13 batches, every hidden row kept, C-IDs resolved to local palette indices through the palette authority, `status: OWNER_CANDIDATE_UNPROVEN` until audit).
+- Verifier: `tools/verify_m52_supply_candidate.gd` — loads the layout through real `ColorBatch.make` + `BatchSupplyEngine.load_candidate` (same direct-layout path the runtime host uses), builds `ProofState.from_level_and_supply`, drives the owner click sequence through the real `ProofKernel`, then runs `SolvabilitySolver.solve` (default bounds) and `replay`.
+- Evidence: `coordination/sessions/M52-C001/evidence/level_010_owner_candidate_v1_verification.json`.
+
+Results:
+
+| Gate | Result |
+|---|---|
+| Conservation | PASS — every batch 1..30; per-color totals == LevelData (C02 6, C03 14, C05 93, C06 16, C07 2, C08 259, C13 270, C14 78, C15 70, C16 216); grand total 1024 == cells |
+| Hidden FIFO | PASS — queue lengths [14, 13, 13]; solver ProofState holds [14, 13, 13] |
+| Owner intended click sequence (1,2,3 ×13, 1) | COMPLETED — all 40 placements legal; every batch clears its full count on placement; slots never accumulate; board 1024 → 0 |
+| `SolvabilitySolver.solve` | **SOLVED** — visited 47, decisions 40 (= 40 batches, full queue consumed), max depth 40, trace hash 1273423104, elapsed 294.6 s |
+| Trace replay | PASS — 40 steps, final active 0, no divergence |
+
+Not done (out of this instruction's scope): the runtime still generates Level 010 supply with `BatchSupplyGenerator` (seed 1); playing this layout in production needs runtime/catalog wiring for a declarative supply candidate, which only makes sense once the whole pack can be admitted.
+
+`BLOCKED / M52-C001 FIRST 10 LEVEL PACK — Levels 5, 7, 8 DEADLOCK under canonical rules; 4, 9 unresolved; Level 10 owner candidate V01 SOLVED (not yet wired); catalog unchanged`
