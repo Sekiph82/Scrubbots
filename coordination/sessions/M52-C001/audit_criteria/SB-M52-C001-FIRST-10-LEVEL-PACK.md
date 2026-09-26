@@ -49,6 +49,15 @@ For every Level 2-10:
 
 No gameplay/solver weakening.
 
+## D1. Supply queue visibility/depth
+- exactly 3 FIFO supply columns are used for this pack;
+- player-facing visible depth is exactly 3 rows per column;
+- visible depth 3 is NOT a total queue-depth cap;
+- full hidden FIFO depth is preserved for each candidate;
+- evidence records full queue lengths / hidden layout;
+- solver proof consumes the full hidden queue, not only visible rows;
+- five-slot capacity remains a separate 5-slot gameplay constraint.
+
 ## E. Catalog
 Production catalog first ten orders exactly:
 1 Hazard Bot
