@@ -69,6 +69,23 @@ Do not revive the obsolete class=dimension or class=color-count rules.
 
 Do not fabricate Challenge Score / Session Load / Frustration metrics if the repository does not yet contain a canonical real-level analyzer for those values. M53 owns full per-level Difficulty/QA evidence. M52-C001 must still enforce all currently implemented production legality, palette, source-reconstruction, catalog and authoritative-solvability gates.
 
+## Supply columns / visible rows / hidden depth
+
+For this first-10 production pack, use **3 independent FIFO supply columns**.
+
+The player-facing supply panel shows exactly **3 visible rows per column**:
+- Row 1 = front/selectable batch;
+- Row 2 = preview only;
+- Row 3 = preview only.
+
+**This is NOT a total queue-depth limit.** Each column may contain any deeper number of hidden batches required by the generated candidate. A column may therefore be 4, 8, 20 or more batches deep; only the first 3 rows are visible to the player. Hidden rows remain real FIFO gameplay state and become visible only as earlier rows are consumed.
+
+In the current engine/API, `preview_depth = 3` means **visible preview depth only**. It must never be interpreted as "three batches total per column".
+
+The authoritative solver must receive and reason over the **entire per-column FIFO queue, including all hidden depth**, exactly as `ProofState.from_level_and_supply()` does from the non-player-facing supply snapshot.
+
+Normal slot capacity remains **5**. The player chooses a front batch from one of the 3 supply columns; a successful selection goes automatically to the rightmost empty slot. Supply column depth and five-slot capacity are separate concepts.
+
 ## Solver rule
 
 Each admitted level must be proven solvable under the current canonical gameplay/supply/routing semantics using the existing authoritative solver/generation gate.
