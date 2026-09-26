@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M52 PRODUCTION CONTENT SCALE-UP
-- Current Sprint: M52-C001 First 10 Level Pack — Owner Playtest
-- Current Task: Owner functional playtest of production Levels 2–10 after independent M52-C001 audit
-- Current Task Status: AUDITED_PASS / OWNER_PLAYTEST_REQUIRED
-- Next Task/Action: OWNER runs `coordination/sessions/M52-C001/OWNER_PLAYTEST_CHECKLIST_V01.md`, records PASS/NOT PASS for Levels 2–10 and the Level 11 coming-soon gate. On owner PASS, ChatGPT records acceptance and advances the locked First 10 block to M53 per-level QA.
-- Required Actor: OWNER
+- Current Sprint: M52-C001-R01 Parallel Runtime Remediation
+- Current Task: Remediate owner-observed serial same-color dispatch, departure-count timing, silent 2x no-op and Level 2 micro-stutter
+- Current Task Status: OWNER_PLAYTEST_NOT_PASS / IMPLEMENTATION_REQUIRED
+- Next Task/Action: CLAUDE executes `coordination/sessions/M52-C001/task_prompts/SB-M52-C001-R01_PARALLEL_RUNTIME_REMEDIATION.md`. After implementation, ChatGPT audits against the R01 criteria; only then does owner replay Levels 2–10.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 757 / 1280 = 59.14%. M52-C001 code/evidence audit passed; owner functional playtest is the active First 10 gate. The denominator is larger than earlier reports because the owner-requested complete Player Experience roadmap was added to TASKS; this is planning expansion, not lost completed work.
-- Note: M52-C001 independent audit: `coordination/sessions/M52-C001/CHATGPT_AUDIT_V01.md` = `AUDITED_PASS / 10 OF 10 PRODUCTION ADMITTED`. Implementation `2b3d29f`; integration log `2881073`. Actual Challenge/SessionLoad/Frustration evidence remains explicitly deferred to M53 under `OWNER_M52_C001_FIRST_10_LEVEL_PACK_DECISION_V01.md`.
+- Note: Original M52-C001 content/catalog audit passed, but owner functional playtest is NOT PASS due runtime-feel blockers recorded in `coordination/sessions/M52-C001/OWNER_PLAYTEST_FINDINGS_V01.md`. New owner authority: `coordination/OWNER_PARALLEL_SLOT_DISPATCH_AND_DEPARTURE_COUNT_V01.md`. M53 remains blocked until R01 + owner replay close.
 - Owner sequencing lock: stay on the **First 10 Level Pack** until all work tied to Levels 1–10 is finished. This includes M52-C001 implementation/integration, independent audit, any remediation, owner playtest/acceptance, the applicable M53 per-level QA for Levels 1–10, and the applicable M54 content/regression validation needed to prove this ten-level pack stable. Only after that block is fully closed do we resume the main roadmap at **M43 Results Screen**. M43 remains fully open and is intentionally deferred, not skipped.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -2028,9 +2028,32 @@ M52-C001 independent audit: **AUDITED_PASS / 10 OF 10 PRODUCTION ADMITTED / OWNE
 
 #### M52-C001 Owner Playtest Gate
 
+Status: **PAUSED / NOT PASS at Level 2 pending R01 runtime remediation.**
+Owner findings: `coordination/sessions/M52-C001/OWNER_PLAYTEST_FINDINGS_V01.md`.
+
 - [ ] SB-M52-C001-O01 Owner plays Levels 2–10 through the real Home/AppState production path and accepts correct artwork/order, supply behavior, intended sequence legality and WON completion.
 - [ ] SB-M52-C001-O02 Owner confirms progression transitions 2→3→...→10 correctly with no Hazard Bot/wrong-level fallback.
 - [ ] SB-M52-C001-O03 Owner confirms Level 10 completion advances to frontier 11 and Home honestly shows disabled Level 11 / coming-soon content rather than replaying existing content.
+
+#### M52-C001-R01 Parallel Runtime Remediation
+
+- [ ] SB-M52-R01-001 Replace production same-color oldest-batch monopolization with independent per-slot claim lanes.
+- [ ] SB-M52-R01-002 Implement deterministic dispatch waves: max one new Scrubby per eligible slot per cadence, up to 5 baseline / 6 boosted.
+- [ ] SB-M52-R01-003 Prove five 30-count same-color batches launch five concurrent agents in the first eligible wave.
+- [ ] SB-M52-R01-004 Make waiting lane-specific so one blocked same-color slot does not block siblings.
+- [ ] SB-M52-R01-005 Preserve exact target/reservation/route/no-ghost identity under parallel assignments.
+- [ ] SB-M52-R01-006 Preserve authoritative M24 remaining-on-clear accounting while player count decrements at successful departure/commit.
+- [ ] SB-M52-R01-007 Add departure-time and rollback counter tests.
+- [ ] SB-M52-R01-008 Replace silent no-entitlement 2x press with functional 2x acquisition flow using canonical products/prices.
+- [ ] SB-M52-R01-009 Successful 2x purchase activates immediately; cancel/fail/insufficient funds are no-spend/no-speed-change.
+- [ ] SB-M52-R01-010 Preserve free supply-exhausted automatic 2x.
+- [ ] SB-M52-R01-011 Profile owner-observed Level 2 micro-stutter and identify the dominant main-thread cause.
+- [ ] SB-M52-R01-012 Remove the stutter cause without disabling terminal/deadlock/routing correctness.
+- [ ] SB-M52-R01-013 Review/update M27 ProofKernel/solver equivalence for slot-parallel dispatch.
+- [ ] SB-M52-R01-014 Re-prove/replay Levels 1–10 and re-run Levels 2–10 through production runtime.
+- [ ] SB-M52-R01-015 Full focused + historical + root regression and diff hygiene pass.
+- [ ] SB-M52-R01-016 Independent ChatGPT audit required.
+- [ ] SB-M52-R01-017 Owner replay of Levels 2–10 required after audit before M53.
 
 ### M53 — Level QA `[QA]`
 
