@@ -4,8 +4,8 @@ extends SceneTree
 ## non-destructive AppState (isolated temp save) inside a SubViewport and saves PNGs.
 ## Needs a rendering driver (run WITHOUT --headless):
 ##   godot --path . -s res://tests/tools/home_snapshot.gd -- <out_dir> [WxH ...] [modals]
-## `modals` additionally captures, at the first size, Gifts / Daily / Cards Exchange and
-## the Settings panel open over Home (V03 modal state).
+## `modals` additionally captures, at the first size, the ad slot collapsed and the Daily
+## popup / Settings panel open over Home (modal state).
 ## Output goes to <out_dir> (never to approved art paths).
 
 const AppState = preload("res://scripts/app/app_state.gd")
@@ -63,7 +63,15 @@ func _initialize() -> void:
 			await process_frame
 		_save(sub, "%s/home_%dx%d.png" % [out_dir, size.x, size.y])
 		if modals and size == sizes[0]:
-			for id in ["gift_bar", "daily", "cards_exchange"]:
+			# V04: ad slot collapsed (future No-Ads entitlement simulation).
+			home.set_ad_slot_enabled(false)
+			for _i in range(6):
+				await process_frame
+			_save(sub, "%s/home_adslot_collapsed_%dx%d.png" % [out_dir, size.x, size.y])
+			home.set_ad_slot_enabled(true)
+			for _i in range(6):
+				await process_frame
+			for id in ["daily"]:
 				var p = home.open_popup(id)
 				for _i in range(6):
 					await process_frame

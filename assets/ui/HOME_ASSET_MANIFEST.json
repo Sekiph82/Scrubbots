@@ -1646,6 +1646,25 @@
       "reusable": true,
       "status": "PLANNED",
       "notes": "Central Godot Theme settings."
+    },
+    {
+      "id": "HOME-120",
+      "slug": "world_01_whispering_park_background",
+      "group": "world",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "APPROVED",
+      "approved_sha256": "8e04eda668aabd9f96172c0e82fd7dd47e61083cb691402a313120443a525e5b",
+      "approval_authority": "coordination/OWNER_M42_HOME_REBUILD_V04_SINGLE_WORLD_BACKGROUND.md",
+      "source_path": "assets/art/references/_owner_inbox/world_01_whispering_park_1080x2160.png",
+      "notes": "V04 single complete World 01 Home background (1080x2160, 1:2). City, sky, portal, platform, props, helper bots and the owner-approved baked 'WHISPERING PARK / AREA 1' sign are one composition; promoted byte-identical from the owner inbox. Scrubby and all HUD/controls stay live Godot layers."
     }
   ]
 }

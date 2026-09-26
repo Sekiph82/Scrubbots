@@ -1,6 +1,7 @@
 extends SceneTree
 ## M42 Home master convergence V02 — presentation accounting + composition evidence
-## (revised for owner V03: retired/disabled modes; V03 specifics in m42_home_v03.gd).
+## (revised for owner V03 retired/disabled modes and V04 single-world-background
+## retirements; V04 specifics in m42_home_v04.gd).
 ## Expected/completed case ledger (AL-091).
 ##
 ## Run: godot --headless --path . -s res://tests/m42_home_composition.gd
@@ -83,7 +84,7 @@ func _accounting(home) -> void:
 	var modes := {}
 	for row in acc:
 		modes[row["mode"]] = int(modes.get(row["mode"], 0)) + 1
-	_ok(modes == {"STATIC": 45, "OWNER_RETIRED": 3, "OWNER_DISABLED": 2}, "V03: 45 STATIC + 3 OWNER_RETIRED + 2 OWNER_DISABLED (%s)" % str(modes))
+	_ok(modes == {"STATIC": 24, "WORLD_BAKED_RETIRED": 18, "OWNER_RETIRED": 7, "OWNER_DISABLED": 2}, "V04: 24 STATIC + 18 WORLD_BAKED_RETIRED + 7 OWNER_RETIRED + 2 OWNER_DISABLED (%s)" % str(modes))
 	_complete("accounting_covers_manifest")
 
 func _static_nodes(home) -> void:
@@ -108,25 +109,26 @@ func _inactive(home) -> void:
 			if not (row["nodes"] as Array).is_empty() or String(row["reason"]).is_empty():
 				bad.append(row["id"])
 	ids.sort()
-	_ok(ids == ["HOME-011", "HOME-031", "HOME-032", "HOME-078", "HOME-087"], "owner-retired/disabled set %s" % str(ids))
+	var want := ["HOME-001", "HOME-002", "HOME-003", "HOME-004", "HOME-006", "HOME-007", "HOME-010", "HOME-011", "HOME-013", "HOME-014", "HOME-015", "HOME-016", "HOME-018", "HOME-019", "HOME-020", "HOME-021", "HOME-022", "HOME-023", "HOME-024", "HOME-031", "HOME-032", "HOME-062", "HOME-063", "HOME-066", "HOME-069", "HOME-078", "HOME-087"]
+	_ok(ids == want, "retired/disabled set (V03 + V04) %s" % str(ids))
 	_ok(bad.is_empty(), "inactive rows have no presentation node and carry a reason %s" % str(bad))
 	var m = V.load_manifest()
 	var still_approved := 0
 	for a in m["assets"]:
 		if ids.has(a["id"]) and a["status"] == "APPROVED" and String(a.get("approved_sha256", "")).length() == 64:
 			still_approved += 1
-	_ok(still_approved == 5, "historical approval + sha pins of retired/disabled entries unchanged in the manifest")
+	_ok(still_approved == 27, "historical approval + sha pins of retired/disabled entries unchanged in the manifest")
 	_complete("inactive_rows_present_nothing")
 
 func _labels(home) -> void:
 	print("[labels full]")
 	var bad: Array = []
-	for id in ["win_streak", "gift_bar", "collection", "shop", "no_ads", "daily", "tasks", "cards_exchange"]:
+	for id in ["shop", "collection", "tasks", "daily"]:
 		var b: Button = home.get_region("Shortcut_" + id)
-		if b.clip_text or b.text_overrun_behavior != TextServer.OVERRUN_NO_TRIMMING or b.icon == null:
+		if b.clip_text or b.text_overrun_behavior != TextServer.OVERRUN_NO_TRIMMING or home.get_region("ShortcutIcon_" + id).texture == null:
 			bad.append(id)
-	_ok(bad.is_empty(), "shortcut cards: icon + untrimmed wrapping label %s" % str(bad))
-	_ok(home.get_region("Shortcut_cards_exchange").text == "CARDS EXCHANGE" and home.get_region("Shortcut_win_streak").text == "WIN STREAK" and home.get_region("Shortcut_collection").text == "COLLECTION", "full labels WIN STREAK / COLLECTION / CARDS EXCHANGE")
+	_ok(bad.is_empty(), "shortcut panels: icon + untrimmed wrapping label %s" % str(bad))
+	_ok(home.get_region("Shortcut_shop").text == "SHOP" and home.get_region("Shortcut_collection").text == "COLLECTION" and home.get_region("Shortcut_tasks").text == "TASKS" and home.get_region("Shortcut_daily").text == "DAILY", "full live labels SHOP / COLLECTION / TASKS / DAILY")
 	_complete("labels_full")
 
 func _nav(home) -> void:
@@ -143,10 +145,8 @@ func _nav(home) -> void:
 
 func _banner(home) -> void:
 	print("[area banner]")
-	var banner: Control = home.get_region("AreaBanner")
-	var arch: Control = home.get_region("Art_arch")
-	_ok(String(home.get_region("AreaTitle").text) == UiText.t("HOME_AREA_TITLE") and String(home.get_region("AreaNumber").text) == UiText.t("HOME_AREA_NUMBER", [1]), "area title/number are live localizable labels")
-	_ok(arch.get_global_rect().intersects(banner.get_global_rect()), "banner sits on the arch")
+	# V04 (owner 5-7): WHISPERING PARK / AREA 1 is baked into HOME-120; no live overlay.
+	_ok(home.get_region("AreaBanner") == null and home.get_region("AreaTitle") == null and home.get_region("AreaNumber") == null, "no live area banner over the baked World 01 sign")
 	_complete("area_banner")
 
 func _decor(home) -> void:
@@ -157,7 +157,7 @@ func _decor(home) -> void:
 			var node: Control = home.get_region(n["name"])
 			if node is TextureRect and node.mouse_filter != Control.MOUSE_FILTER_IGNORE:
 				bad.append(n["name"])
-	for n in ["WorldStage", "Layer_central_world_and_environment", "Layer_characters", "AreaBanner"]:
+	for n in ["Background", "WorldBackground", "Layer_characters", "Art_scrubby", "ActionHost", "WorldMargin", "MainWorldArea"]:
 		if home.get_region(n).mouse_filter != Control.MOUSE_FILTER_IGNORE:
 			bad.append(n)
 	_ok(bad.is_empty(), "decorative art never steals input %s" % str(bad))
@@ -171,18 +171,18 @@ func _matrix() -> void:
 		var vp := Rect2(Vector2.ZERO, Vector2(size))
 		var bad: Array = []
 		var names: Array = ["PlayButton", "BottomNav", "TopCurrencyHUD", "GiftMeter", "WinStreakRewardTrack"]
-		for id in ["win_streak", "gift_bar", "collection", "shop", "no_ads", "daily", "tasks", "cards_exchange"]:
+		for id in ["shop", "collection", "tasks", "daily"]:
 			names.append("Shortcut_" + id)
 		for n in names:
 			var c: Control = home.get_region(n)
 			if not vp.grow(0.5).encloses(c.get_global_rect()) or c.size.y < 88:
 				bad.append(n)
 		var play: Rect2 = home.get_region("PlayButton").get_global_rect()
-		for id in ["shop", "cards_exchange"]:
+		for id in ["shop", "collection", "tasks", "daily"]:
 			if home.get_region("Shortcut_" + id).get_global_rect().intersects(play):
 				bad.append("overlap:" + id)
 		var sc := (home.get_region("Art_scrubby") as Control).get_global_rect()
-		if not home.get_region("MainWorldArea").get_global_rect().grow(8).encloses(sc):
+		if not home.get_region("Background").get_global_rect().encloses(sc):
 			bad.append("scrubby_outside_world")
 		_ok(bad.is_empty(), "%dx%d: regions in viewport, >=88px, no CTA overlap, hero in world %s" % [size.x, size.y, str(bad)])
 		r[0].queue_free()
