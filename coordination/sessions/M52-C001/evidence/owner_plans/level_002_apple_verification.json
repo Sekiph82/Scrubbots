@@ -1146,7 +1146,7 @@
 	"schema": "scrubbots.supply_plan_verification.v1",
 	"solver": {
 		"decisions": 36,
-		"elapsedMs": 38956,
+		"elapsedMs": 36111,
 		"frontierPeak": 37,
 		"fullQueueConsumed": true,
 		"maxDepthReached": 36,

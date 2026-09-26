@@ -1,0 +1,267 @@
+{
+	"context": {
+		"cores": 16,
+		"cpu": "12th Gen Intel(R) Core(TM) i7-1260P",
+		"godot": "4.7.2-stable (official)",
+		"headless": true,
+		"os": "Windows",
+		"tick_dt": 0.0166666666666667
+	},
+	"git_head": "0fa38f6",
+	"mode": "perf",
+	"result": {
+		"clicks_applied": 36,
+		"frame_ms": {
+			"max": 1840.305,
+			"p50": 0.747,
+			"p95": 1.253,
+			"p99": 160.873,
+			"total_s": 231.021156999999
+		},
+		"frames_over_ms": {
+			"100": 516,
+			"16.7": 906,
+			"33": 837,
+			"50": 755
+		},
+		"peak_live_assignments": 36,
+		"peak_moving_agents": 36,
+		"sections": {
+			"agent_drive_arrival": {
+				"count": 31162,
+				"max_ms": 1.961,
+				"mean_ms": 0.343,
+				"total_ms": 10681.679
+			},
+			"completion_on_tick": {
+				"count": 31162,
+				"max_ms": 8.074,
+				"mean_ms": 0.052,
+				"total_ms": 1628.367
+			},
+			"dispatcher_spawn": {
+				"count": 1024,
+				"max_ms": 18.98,
+				"mean_ms": 0.501,
+				"total_ms": 512.654
+			},
+			"m25_claim": {
+				"count": 1175,
+				"max_ms": 1549.598,
+				"mean_ms": 177.302,
+				"total_ms": 208330.016
+			},
+			"m26_dispatch_wave": {
+				"count": 1129,
+				"max_ms": 1839.11,
+				"mean_ms": 185.181,
+				"total_ms": 209069.628
+			},
+			"renderer_update": {
+				"count": 1024,
+				"max_ms": 0.119,
+				"mean_ms": 0.033,
+				"total_ms": 33.831
+			},
+			"target_selection": {
+				"count": 1175,
+				"max_ms": 1549.529,
+				"mean_ms": 177.22,
+				"total_ms": 208233.442
+			},
+			"ui_snapshot_sync": {
+				"count": 31162,
+				"max_ms": 1.012,
+				"mean_ms": 0.157,
+				"total_ms": 4880.145
+			}
+		},
+		"sim_seconds": 519.366666666667,
+		"speed": "1x",
+		"terminal": "WON",
+		"ticks": 31162,
+		"worst_frames": [
+			{
+				"agents": 32,
+				"live": 32,
+				"ms": 1840.305,
+				"sections": {
+					"agent_drive_arrival": 382,
+					"completion_on_tick": 69,
+					"dispatcher_spawn": 589,
+					"m25_claim": 1838190,
+					"m26_dispatch_wave": 1839110,
+					"target_selection": 1838019,
+					"ui_snapshot_sync": 411
+				},
+				"t": 17638
+			},
+			{
+				"agents": 32,
+				"live": 32,
+				"ms": 1804.486,
+				"sections": {
+					"agent_drive_arrival": 394,
+					"completion_on_tick": 93,
+					"dispatcher_spawn": 656,
+					"m25_claim": 1802184,
+					"m26_dispatch_wave": 1803194,
+					"target_selection": 1802014,
+					"ui_snapshot_sync": 402
+				},
+				"t": 17668
+			},
+			{
+				"agents": 29,
+				"live": 29,
+				"ms": 1797.81,
+				"sections": {
+					"agent_drive_arrival": 385,
+					"completion_on_tick": 67,
+					"dispatcher_spawn": 604,
+					"m25_claim": 1795778,
+					"m26_dispatch_wave": 1796688,
+					"target_selection": 1795624,
+					"ui_snapshot_sync": 344
+				},
+				"t": 17397
+			},
+			{
+				"agents": 29,
+				"live": 29,
+				"ms": 1789.38,
+				"sections": {
+					"agent_drive_arrival": 1042,
+					"completion_on_tick": 72,
+					"dispatcher_spawn": 642,
+					"m25_claim": 1786642,
+					"m26_dispatch_wave": 1787582,
+					"renderer_update": 54,
+					"target_selection": 1786490,
+					"ui_snapshot_sync": 365
+				},
+				"t": 17367
+			},
+			{
+				"agents": 32,
+				"live": 32,
+				"ms": 1747.117,
+				"sections": {
+					"agent_drive_arrival": 377,
+					"completion_on_tick": 67,
+					"dispatcher_spawn": 549,
+					"m25_claim": 1745011,
+					"m26_dispatch_wave": 1745868,
+					"target_selection": 1744855,
+					"ui_snapshot_sync": 495
+				},
+				"t": 17187
+			},
+			{
+				"agents": 33,
+				"live": 33,
+				"ms": 1714.994,
+				"sections": {
+					"agent_drive_arrival": 322,
+					"completion_on_tick": 69,
+					"dispatcher_spawn": 670,
+					"m25_claim": 1712903,
+					"m26_dispatch_wave": 1713859,
+					"target_selection": 1712749,
+					"ui_snapshot_sync": 410
+				},
+				"t": 18118
+			},
+			{
+				"agents": 29,
+				"live": 29,
+				"ms": 1697.948,
+				"sections": {
+					"agent_drive_arrival": 395,
+					"completion_on_tick": 73,
+					"dispatcher_spawn": 887,
+					"m25_claim": 1695492,
+					"m26_dispatch_wave": 1696700,
+					"target_selection": 1695333,
+					"ui_snapshot_sync": 423
+				},
+				"t": 18388
+			},
+			{
+				"agents": 30,
+				"live": 30,
+				"ms": 1630.148,
+				"sections": {
+					"agent_drive_arrival": 285,
+					"completion_on_tick": 73,
+					"dispatcher_spawn": 655,
+					"m25_claim": 1628038,
+					"m26_dispatch_wave": 1629009,
+					"target_selection": 1627862,
+					"ui_snapshot_sync": 417
+				},
+				"t": 17307
+			},
+			{
+				"agents": 32,
+				"live": 32,
+				"ms": 1586.326,
+				"sections": {
+					"agent_drive_arrival": 389,
+					"completion_on_tick": 74,
+					"dispatcher_spawn": 629,
+					"m25_claim": 1584156,
+					"m26_dispatch_wave": 1585115,
+					"target_selection": 1583988,
+					"ui_snapshot_sync": 389
+				},
+				"t": 17217
+			},
+			{
+				"agents": 30,
+				"live": 30,
+				"ms": 1576.711,
+				"sections": {
+					"agent_drive_arrival": 868,
+					"completion_on_tick": 69,
+					"dispatcher_spawn": 695,
+					"m25_claim": 1574073,
+					"m26_dispatch_wave": 1575096,
+					"renderer_update": 31,
+					"target_selection": 1573918,
+					"ui_snapshot_sync": 354
+				},
+				"t": 17277
+			},
+			{
+				"agents": 29,
+				"live": 29,
+				"ms": 1487.849,
+				"sections": {
+					"agent_drive_arrival": 420,
+					"completion_on_tick": 72,
+					"m25_claim": 1486275,
+					"m26_dispatch_wave": 1486539,
+					"target_selection": 1486131,
+					"ui_snapshot_sync": 458
+				},
+				"t": 19279
+			},
+			{
+				"agents": 23,
+				"live": 23,
+				"ms": 1461.339,
+				"sections": {
+					"agent_drive_arrival": 429,
+					"completion_on_tick": 71,
+					"dispatcher_spawn": 663,
+					"m25_claim": 1459061,
+					"m26_dispatch_wave": 1460036,
+					"target_selection": 1458896,
+					"ui_snapshot_sync": 438
+				},
+				"t": 19939
+			}
+		]
+	}
+}

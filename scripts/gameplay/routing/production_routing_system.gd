@@ -34,6 +34,8 @@ extends "res://scripts/gameplay/routing/routing_system.gd"
 const RouteValidator = preload("res://scripts/gameplay/routing/route_validator.gd")
 const ProductionAccessQuery = preload("res://scripts/gameplay/routing/production_access_query.gd")
 const ScrubRailGeometry = preload("res://scripts/gameplay/routing/scrub_rail_geometry.gd")
+const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
+const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 
 ## Route-choice tolerance for "shortest legal total rail route" comparison.
 const _RAIL_LEN_EPS := 0.0001
@@ -169,6 +171,13 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 
 	# --- legal rail ingress sources: OPEN/CLEARED (or target) perimeter cells whose
 	# orthogonal rail→cell bridge is access-legal. side priority BOTTOM,LEFT,RIGHT,TOP.
+	var tp_src := RuntimePerfProbe.now()
+	# Canonical-access fast path (exact-equivalent, M52-C001-R01): for the EXACT production
+	# ProductionAccessQuery, the orthogonal rail->perimeter-cell bridge crosses only exterior
+	# (OPEN) cells and that perimeter cell, with no corner crossing, so the segment verdict
+	# equals the (already required) non-BLOCKED class of the cell. Other access objects keep
+	# the full segment confirmation. rail_dist == rail_path(...)["dist"] without polyline.
+	var fast: bool = access_query.get_script() == ProductionAccessQuery
 	var sources: Array = []  # each: {cell:int, rp:Vector2, side:int, seq:int, cost0:float}
 	var _add_source := func(cx: int, cy: int, rp: Vector2, side: int, seq: int) -> void:
 		if cx < 0 or cy < 0 or cx >= w or cy >= h:
@@ -176,9 +185,9 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 		var cc := Vector2(float(cx) + 0.5, float(cy) + 0.5)
 		if _classify(access_query, cx, cy, idx) == ProductionAccessQuery.CellClass.BLOCKED:
 			return
-		if not _seg_true(access_query, rp, cc, idx):
+		if not fast and not _seg_true(access_query, rp, cc, idx):
 			return
-		var rail_dist: float = float(geom.rail_path(entry, rp)["dist"])
+		var rail_dist: float = geom.rail_dist(entry, rp)
 		var cost0: float = connector_len + rail_dist + rp.distance_to(cc)
 		sources.append({"cell": cy * w + cx, "rp": rp, "side": side, "seq": seq, "cost0": cost0})
 	for x in range(w):  # BOTTOM (side 0)
@@ -189,6 +198,7 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 		_add_source.call(w - 1, y, Vector2(geom.right_x(), float(y) + 0.5), 2, y)
 	for x in range(w):  # TOP (side 3)
 		_add_source.call(x, 0, Vector2(float(x) + 0.5, geom.top_y()), 3, x)
+	RuntimePerfProbe.add("route_sources", tp_src)
 	if sources.is_empty():
 		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
 
@@ -217,26 +227,44 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 
 	# --- deterministic Dijkstra: sources seed board cells with their rail cost0;
 	# interior edges cost 1.0 (unit orthogonal step). Tie-break on (cost, side, seq).
-	var dist: Dictionary = {}
-	var side_of: Dictionary = {}
-	var seq_of: Dictionary = {}
-	var parent: Dictionary = {}   # cell -> predecessor cell (-1 at an ingress source)
+	# M52-C001-R01 perf (exact-equivalent): flat packed per-cell arrays instead of
+	# Dictionaries (INF == "not yet reached"), identical relax/tie-break logic.
+	var n_cells: int = w * h
+	var dist := PackedFloat64Array()
+	dist.resize(n_cells)
+	dist.fill(INF)
+	var side_of := PackedInt32Array()
+	side_of.resize(n_cells)
+	var seq_of := PackedInt32Array()
+	seq_of.resize(n_cells)
+	var parent := PackedInt32Array()   # predecessor cell (-1 at an ingress source)
+	parent.resize(n_cells)
 	var src_rp: Dictionary = {}   # cell -> ingress rail point (only at source cells)
-	var heap: Array = []
+	# Packed binary heap (M52-C001-R01 perf). Keys (cost, side, seq, cell) are a strict
+	# total order, so pop order is identical to the former Array-entry heap.
+	var hq := _PackedHeap.new()
 	for s in sources:
 		var c: int = s["cell"]
-		var better = not dist.has(c) or s["cost0"] < dist[c] - _RAIL_LEN_EPS \
+		var better = dist[c] == INF or s["cost0"] < dist[c] - _RAIL_LEN_EPS \
 			or (absf(s["cost0"] - dist[c]) <= _RAIL_LEN_EPS and _rank_lt(s["side"], s["seq"], side_of[c], seq_of[c]))
 		if better:
 			dist[c] = s["cost0"]; side_of[c] = s["side"]; seq_of[c] = s["seq"]
 			parent[c] = -1; src_rp[c] = s["rp"]
-			_heap_push(heap, [s["cost0"], s["side"], s["seq"], c])
+			hq.push(s["cost0"], s["side"], s["seq"], c)
 
+	# Canonical-access fast path (exact-equivalent, M52-C001-R01). For the EXACT production
+	# ProductionAccessQuery (script identity — never a subclass/double), an interior edge is
+	# an axis-aligned unit step between adjacent cell centres from an OPEN cell: its
+	# supercover crosses only those two cells and no corner, so is_segment_traversable is
+	# exactly "neighbour enterable" = neighbour CLEARED, or the target on arrival. The
+	# classification is read straight from BoardState (classify_cell's own rule). Any other
+	# access object keeps the full classify + segment confirmation per edge.
+	var tp_dij := RuntimePerfProbe.now()
 	var found := false
-	while not heap.is_empty():
-		var top: Array = _heap_pop(heap)
-		var u: int = top[3]
-		if top[0] > dist[u] + _RAIL_LEN_EPS:
+	while not hq.is_empty():
+		var top_cost: float = hq.pop()
+		var u: int = hq.last_cell
+		if top_cost > dist[u] + _RAIL_LEN_EPS:
 			continue  # stale
 		if u == target_lin:
 			found = true
@@ -249,21 +277,26 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 			var ny: int = uy + d.y
 			if nx < 0 or ny < 0 or nx >= w or ny >= h:
 				continue
-			var is_target := (nx == target_cell.x and ny == target_cell.y)
-			# Intermediate cells must be OPEN; the target is enterable only as final.
-			if not is_target and _classify(access_query, nx, ny, idx) != ProductionAccessQuery.CellClass.OPEN:
-				continue
-			var nc := Vector2(float(nx) + 0.5, float(ny) + 0.5)
-			if not _seg_true(access_query, uc, nc, idx):
-				continue
 			var nlin: int = ny * w + nx
+			var is_target := (nlin == target_lin)
+			# Intermediate cells must be OPEN; the target is enterable only as final.
+			if fast:
+				if not is_target and board.get_cell_state(nlin) != BoardState.CellState.CLEARED:
+					continue
+			else:
+				if not is_target and _classify(access_query, nx, ny, idx) != ProductionAccessQuery.CellClass.OPEN:
+					continue
+				var nc := Vector2(float(nx) + 0.5, float(ny) + 0.5)
+				if not _seg_true(access_query, uc, nc, idx):
+					continue
 			var ncost: float = dist[u] + 1.0
-			var relax = not dist.has(nlin) or ncost < dist[nlin] - _RAIL_LEN_EPS \
+			var relax = dist[nlin] == INF or ncost < dist[nlin] - _RAIL_LEN_EPS \
 				or (absf(ncost - dist[nlin]) <= _RAIL_LEN_EPS and _rank_lt(side_of[u], seq_of[u], side_of[nlin], seq_of[nlin]))
 			if relax:
 				dist[nlin] = ncost; side_of[nlin] = side_of[u]; seq_of[nlin] = seq_of[u]
 				parent[nlin] = u
-				_heap_push(heap, [ncost, side_of[u], seq_of[u], nlin])
+				hq.push(ncost, side_of[u], seq_of[u], nlin)
+	RuntimePerfProbe.add("route_dijkstra", tp_dij)
 	if not found:
 		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
 
@@ -287,7 +320,10 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 	# Collinear collapse only (never a diagonal-introducing shortcut) so straight
 	# runs stay compact; every segment remains axis-aligned.
 	pts = _remove_collinear(pts)
-	if not _whole_route_valid(request, pts, board, access_query):
+	var tp_val := RuntimePerfProbe.now()
+	var valid := _whole_route_valid(request, pts, board, access_query)
+	RuntimePerfProbe.add("route_validate", tp_val)
+	if not valid:
 		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
 	return RouteResult.success_route(idx, pts)
 
@@ -299,46 +335,70 @@ func _rank_lt(side_a: int, seq_a: int, side_b: int, seq_b: int) -> bool:
 	return seq_a < seq_b
 
 # --- tiny binary min-heap of [cost, side, seq, cell]; ordering cost,side,seq,cell.
-func _heap_less(a: Array, b: Array) -> bool:
-	if a[0] != b[0]:
-		return a[0] < b[0]
-	if a[1] != b[1]:
-		return a[1] < b[1]
-	if a[2] != b[2]:
-		return a[2] < b[2]
-	return a[3] < b[3]
+## Allocation-free binary min-heap over parallel packed arrays, ordered by
+## (cost, side, seq, cell) lexicographically — the same strict total order as _heap_less.
+class _PackedHeap:
+	var cost := PackedFloat64Array()
+	var side := PackedInt32Array()
+	var seq := PackedInt32Array()
+	var cell := PackedInt32Array()
+	var n: int = 0
+	var last_cell: int = -1
 
-func _heap_push(heap: Array, e: Array) -> void:
-	heap.append(e)
-	var i: int = heap.size() - 1
-	while i > 0:
-		var p: int = (i - 1) / 2
-		if _heap_less(heap[i], heap[p]):
-			var t = heap[p]; heap[p] = heap[i]; heap[i] = t
-			i = p
-		else:
-			break
+	func is_empty() -> bool:
+		return n == 0
 
-func _heap_pop(heap: Array) -> Array:
-	var top: Array = heap[0]
-	var last: Array = heap.pop_back()
-	if not heap.is_empty():
-		heap[0] = last
-		var i: int = 0
-		var n: int = heap.size()
-		while true:
-			var l: int = 2 * i + 1
-			var r: int = 2 * i + 2
-			var sm: int = i
-			if l < n and _heap_less(heap[l], heap[sm]):
-				sm = l
-			if r < n and _heap_less(heap[r], heap[sm]):
-				sm = r
-			if sm == i:
+	func _less(i: int, j: int) -> bool:
+		if cost[i] != cost[j]:
+			return cost[i] < cost[j]
+		if side[i] != side[j]:
+			return side[i] < side[j]
+		if seq[i] != seq[j]:
+			return seq[i] < seq[j]
+		return cell[i] < cell[j]
+
+	func _swap(i: int, j: int) -> void:
+		var tc: float = cost[i]; cost[i] = cost[j]; cost[j] = tc
+		var ts: int = side[i]; side[i] = side[j]; side[j] = ts
+		var tq: int = seq[i]; seq[i] = seq[j]; seq[j] = tq
+		var tl: int = cell[i]; cell[i] = cell[j]; cell[j] = tl
+
+	func push(c: float, sd: int, sq: int, cl: int) -> void:
+		if n == cost.size():
+			var cap: int = maxi(64, n * 2)
+			cost.resize(cap); side.resize(cap); seq.resize(cap); cell.resize(cap)
+		cost[n] = c; side[n] = sd; seq[n] = sq; cell[n] = cl
+		var i: int = n
+		n += 1
+		while i > 0:
+			var p: int = (i - 1) / 2
+			if _less(i, p):
+				_swap(i, p)
+				i = p
+			else:
 				break
-			var t = heap[sm]; heap[sm] = heap[i]; heap[i] = t
-			i = sm
-	return top
+
+	## Pops the minimum; returns its cost and leaves its cell in last_cell.
+	func pop() -> float:
+		var top_cost: float = cost[0]
+		last_cell = cell[0]
+		n -= 1
+		if n > 0:
+			cost[0] = cost[n]; side[0] = side[n]; seq[0] = seq[n]; cell[0] = cell[n]
+			var i: int = 0
+			while true:
+				var l: int = 2 * i + 1
+				var r: int = l + 1
+				var sm: int = i
+				if l < n and _less(l, sm):
+					sm = l
+				if r < n and _less(r, sm):
+					sm = r
+				if sm == i:
+					break
+				_swap(sm, i)
+				i = sm
+		return top_cost
 
 ## Drop consecutive near-duplicate points (an exit that coincides with the entry
 ## or a corner) so no zero-length segment reaches the validator.

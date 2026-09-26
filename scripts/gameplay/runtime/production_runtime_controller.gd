@@ -4,8 +4,9 @@ extends Node
 ## rely on global class_name (AL-001).
 ##
 ## This is the automatic production cadence driver the accepted M26 AutoDispatchScheduler
-## needs: M26 guarantees ONE accepted assignment per step(), and this controller calls
-## step() on a deterministic timer (never run_until_idle(), never a per-frame burst). It
+## needs: each M26 step() is ONE bounded parallel dispatch wave (at most one assignment per
+## eligible slot, M52-C001-R01), and this controller calls step() on a deterministic timer
+## (never run_until_idle(), at most one wave per frame). It
 ## also owns the in-flight ScrubbotAgent travel clock and the two pause reasons.
 ##
 ## Speed authority (OWNER_GAMEPLAY_SPEED_RULE_V01): the single GameplaySpeedAuthority
@@ -23,11 +24,17 @@ extends Node
 
 const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 const GameplaySpeedAuthority = preload("res://scripts/gameplay/runtime/gameplay_speed_authority.gd")
+const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
 
-## Max scheduler steps serviced in a single _process frame. Bounds the catch-up after a
-## long/first frame so a huge delta cannot become an uncontrolled burst; each serviced
-## step is still exactly one M26 cadence event -> at most one assignment.
-const MAX_STEPS_PER_FRAME := 4
+## Max dispatch waves serviced in a single _process frame (M52-C001-R01). Each M26 step()
+## is now one parallel wave (<= one assignment per eligible slot, so up to 5/6 agents), so a
+## long/first frame must never become a multi-wave storm: exactly one wave per frame, and
+## any cadence backlog beyond one pending interval is dropped (no unbounded catch-up).
+const MAX_STEPS_PER_FRAME := 1
+## Lanes of the current wave serviced per frame (M52-C001-R01 stutter fix). One exact-slot
+## claim + route per frame keeps the per-frame cost to a single lane; a full 5/6-lane wave
+## still completes within 5/6 frames, far below one cadence interval (0.5 s / 0.25 s).
+const MAX_LANES_PER_FRAME := 1
 
 var _scheduler = null            # AutoDispatchScheduler (M26)
 var _speed: GameplaySpeedAuthority = null
@@ -153,8 +160,8 @@ func reset_runtime() -> void:
 	_system_suspended = false
 	_terminal_stopped = false
 
-## Prime an immediate scheduler step on the next processed frame (a successful placement
-## may wake scheduling promptly) without violating the one-assignment-per-step law.
+## Prime an immediate dispatch wave on the next processed frame (a successful placement
+## may wake scheduling promptly) without exceeding one wave per frame.
 func request_immediate_step() -> void:
 	if _speed != null:
 		_accum = maxf(_accum, _speed.cadence_interval())
@@ -181,16 +188,37 @@ func tick(delta: float) -> void:
 	# advancing every moving agent by delta*factor accelerates current + future agents
 	# uniformly at 2x and freezes them under pause. advance() drives the whole
 	# arrival -> M20 authenticated clear -> M25 finalize chain synchronously.
+	var t0 := RuntimePerfProbe.now()
 	_drive_agents(delta * factor)
+	RuntimePerfProbe.add("agent_drive_arrival", t0)
 	# Deterministic cadence: one scheduler step per cadence interval (base at 1x, half at
 	# 2x). Bounded catch-up; never run_until_idle.
 	_accum += delta
 	var interval: float = _speed.cadence_interval()
-	var serviced := 0
-	while _accum >= interval and serviced < MAX_STEPS_PER_FRAME:
-		_accum -= interval
-		serviced += 1
-		_scheduler.step()
+	if _scheduler.has_method("step_lane"):
+		# Production: one wave per cadence event (lane list fixed at the event), serviced
+		# MAX_LANES_PER_FRAME lane(s) per frame so claim/route cost never lands in one long
+		# frame. A new wave starts only once the previous one is fully serviced.
+		if not _scheduler.has_pending_lanes() and _accum >= interval:
+			_accum -= interval
+			_scheduler.begin_wave()
+		var lanes := 0
+		while lanes < MAX_LANES_PER_FRAME and _scheduler.has_pending_lanes():
+			lanes += 1
+			var tl := RuntimePerfProbe.now()
+			_scheduler.step_lane()
+			RuntimePerfProbe.add("m26_dispatch_lane", tl)
+	else:
+		# Legacy/duck-typed scheduler: one full step per cadence event, one per frame.
+		var serviced := 0
+		while _accum >= interval and serviced < MAX_STEPS_PER_FRAME:
+			_accum -= interval
+			serviced += 1
+			var tw := RuntimePerfProbe.now()
+			_scheduler.step()
+			RuntimePerfProbe.add("m26_dispatch_wave", tw)
+	# Drop backlog beyond one pending interval: a hitch never replays several waves later.
+	_accum = minf(_accum, interval)
 	# Agents spawned by the steps above have not run their own _process yet; disable it now
 	# so the next frame they too are driven solely by this controller.
 	_disable_agent_self_process()

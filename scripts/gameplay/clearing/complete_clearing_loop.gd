@@ -46,6 +46,7 @@ extends RefCounted
 ##     ROLLBACK_FAILED fatal outcome. Never a half-clear, never a false-clear
 ##     frame on rollback.
 
+const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const ColorCandidateIndex = preload("res://scripts/gameplay/targeting/color_candidate_index.gd")
 const ReservationState = preload("res://scripts/gameplay/targeting/reservation_state.gd")
@@ -458,7 +459,9 @@ func _run_transaction(t: Dictionary, my_gen: int) -> StringName:
 
 	# 6. Optional presentation repaint from the already-committed BoardState.
 	if _renderer_expected and is_instance_valid(_renderer) and _bool_true(_renderer.is_bound_to(_board)):
+		var tr := RuntimePerfProbe.now()
 		_renderer.update_cells([target])
+		RuntimePerfProbe.add("renderer_update", tr)
 
 	_cleared_count += 1
 	# 7. M26 post-commit authenticated-clear notification (§J). Emitted only HERE, on

@@ -20,10 +20,12 @@ extends RefCounted
 ## - FiveSlotBatchEngine owns slot/batch counters, placement sequence and committed work;
 ## - CompleteClearingLoop remains the authenticated board-clear authority.
 ##
-## Owner-locked arbitration (OWNER_BATCH_GAMEPLAY_CORE_DECISION_V01): same-color batches
-## are independent; claims go to the OLDEST placement-sequence batch while it has dispatch
-## capacity; only when that batch's capacity is exhausted (filtered out at capacity 0) may
-## claims spill to the next same-color batch. remaining_to_clear is NEVER decremented by a
+## Production scheduling uses claim_for_slot (M52-C001-R01,
+## OWNER_PARALLEL_SLOT_DISPATCH_AND_DEPARTURE_COUNT_V01): every occupied slot is an
+## independent lane claiming with its OWN origin/access. The historical claim_for_color
+## (oldest same-color batch first, spill at capacity 0 — OWNER_BATCH_GAMEPLAY_CORE_DECISION_V01)
+## is retained only for M25 API/evidence compatibility; that arbitration is SUPERSEDED for
+## production dispatch. remaining_to_clear is NEVER decremented by a
 ## claim; each accepted claim increments M24 committed exactly once via commit_work(slot,
 ## claim_id). A blocked/unreachable future pixel is never pre-owned.
 
@@ -32,6 +34,7 @@ const FiveSlotBatchEngine = preload("res://scripts/gameplay/slots/five_slot_batc
 const TargetSelector = preload("res://scripts/gameplay/targeting/target_selector.gd")
 const ReservationState = preload("res://scripts/gameplay/targeting/reservation_state.gd")
 const ProductionTargetAccess = preload("res://scripts/gameplay/dispatch/production_target_access.gd")
+const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
 
 var _board = null
 var _batches = null          # FiveSlotBatchEngine
@@ -170,7 +173,40 @@ func _claim_for_color_guarded(color_id, access_by_slot) -> Dictionary:
 	var slot := oldest_capacity_slot(color_id)
 	if slot == -1:
 		return {"ok": false, "error": "no_eligible_batch"}
-	var access = access_by_slot.get(slot, null)
+	return _claim_exact_slot(slot, color_id, access_by_slot.get(slot, null))
+
+# --------------------------------------------- exact slot claim (M52-C001-R01) --
+
+## Production scheduling seam (OWNER_PARALLEL_SLOT_DISPATCH_AND_DEPARTURE_COUNT_V01 §4):
+## claim ONE target for EXACTLY `slot_index` using that slot's own ProductionTargetAccess
+## (its own route origin). Color and batch identity come from M24, never from the caller.
+## Same-color sibling slots are independent: no oldest-batch arbitration here. The slot
+## must be occupied with dispatch capacity > 0. No target => that slot alone goes WAITING.
+## Malformed/foreign access fails closed before any reservation or M24 mutation. On
+## success the exact claim/reservation/committed-work tuple is established (identical
+## rollback/finalize/reset guarantees as claim_for_color).
+func claim_for_slot(slot_index, access) -> Dictionary:
+	if _busy:
+		return {"ok": false, "error": "reentrant"}
+	_busy = true
+	var r := _claim_for_slot_guarded(slot_index, access)
+	_busy = false
+	return r
+
+func _claim_for_slot_guarded(slot_index, access) -> Dictionary:
+	if not _bound:
+		return {"ok": false, "error": "unbound"}
+	if typeof(slot_index) != TYPE_INT or slot_index < 0 or slot_index >= _batches.get_slot_count():
+		return {"ok": false, "error": "bad_slot"}
+	if not _batches.is_occupied(slot_index):
+		return {"ok": false, "error": "empty_slot", "slot": slot_index}
+	if _batches.get_capacity(slot_index) <= 0:
+		return {"ok": false, "error": "no_capacity", "slot": slot_index}
+	return _claim_exact_slot(slot_index, _batches.get_color_id(slot_index), access)
+
+## Shared exact-slot claim core (caller already chose `slot`; `color_id` is that slot's
+## M24 color). Establishes the atomic claim/reservation/commit tuple or restores prestate.
+func _claim_exact_slot(slot: int, color_id: int, access) -> Dictionary:
 	# Strict production trust boundary (F-M25-V01-STRICT-004): only a canonical
 	# ProductionTargetAccess coherent with the EXACT bound board is accepted as production
 	# reachability truth. A generic method-compatible/all-true RefCounted, a null/malformed
@@ -191,7 +227,9 @@ func _claim_for_color_guarded(color_id, access_by_slot) -> Dictionary:
 	# TargetSelector selects + reserves exactly one target (or -1). It preserves the
 	# owner-locked bottom-most/left-most order and only accepts production-targetable,
 	# ACTIVE, matching-color, unreserved pixels.
+	var ts := RuntimePerfProbe.now()
 	var target: int = _selector.select_and_reserve(color_id, owner_id, access)
+	RuntimePerfProbe.add("target_selection", ts)
 	if target == -1:
 		# No claimable target now: WAITING without discarding the batch. No reservation,
 		# no committed increment, no ledger entry.

@@ -1210,7 +1210,7 @@
 	"schema": "scrubbots.supply_plan_verification.v1",
 	"solver": {
 		"decisions": 38,
-		"elapsedMs": 489937,
+		"elapsedMs": 60544,
 		"frontierPeak": 40,
 		"fullQueueConsumed": true,
 		"maxDepthReached": 38,
@@ -1433,8 +1433,8 @@
 				}
 			},
 			{
-				"active_after": 363,
-				"clears": 4,
+				"active_after": 359,
+				"clears": 8,
 				"column": 1,
 				"placed": {
 					"color": 6,
@@ -1442,7 +1442,7 @@
 				}
 			},
 			{
-				"active_after": 352,
+				"active_after": 348,
 				"clears": 11,
 				"column": 1,
 				"placed": {
@@ -1451,8 +1451,8 @@
 				}
 			},
 			{
-				"active_after": 351,
-				"clears": 1,
+				"active_after": 346,
+				"clears": 2,
 				"column": 1,
 				"placed": {
 					"color": 5,
@@ -1461,7 +1461,7 @@
 			},
 			{
 				"active_after": 303,
-				"clears": 48,
+				"clears": 43,
 				"column": 2,
 				"placed": {
 					"color": 2,
@@ -1523,8 +1523,8 @@
 				}
 			},
 			{
-				"active_after": 92,
-				"clears": 29,
+				"active_after": 91,
+				"clears": 30,
 				"column": 2,
 				"placed": {
 					"color": 2,
@@ -1532,8 +1532,8 @@
 				}
 			},
 			{
-				"active_after": 66,
-				"clears": 26,
+				"active_after": 61,
+				"clears": 30,
 				"column": 2,
 				"placed": {
 					"color": 6,
@@ -1542,7 +1542,7 @@
 			},
 			{
 				"active_after": 30,
-				"clears": 36,
+				"clears": 31,
 				"column": 2,
 				"placed": {
 					"color": 3,
@@ -1568,8 +1568,8 @@
 				}
 			}
 		],
-		"traceHash": 2614056311,
-		"traceSummary": "c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C1#30/0clr|c0:C1#30/0clr|c0:C1#30/0clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C6#30/26clr|c1:C2#30/121clr|c0:C6#30/0clr|c0:C2#17/19clr|c0:C3#10/0clr|c1:C2#30/38clr|c1:C1#30/35clr|c1:C1#30/46clr|c1:C1#30/30clr|c1:C2#30/32clr|c1:C1#30/30clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C6#30/40clr|c1:C6#20/4clr|c1:C0#15/11clr|c1:C5#2/1clr|c2:C2#30/48clr|c2:C2#30/30clr|c2:C1#30/30clr|c2:C1#30/31clr|c2:C1#30/31clr|c2:C2#30/30clr|c2:C2#30/30clr|c2:C2#30/29clr|c2:C6#30/26clr|c2:C3#30/36clr|c2:C1#18/18clr|c2:C4#12/12clr",
+		"traceHash": 3800836965,
+		"traceSummary": "c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C1#30/0clr|c0:C1#30/0clr|c0:C1#30/0clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C6#30/26clr|c1:C2#30/121clr|c0:C6#30/0clr|c0:C2#17/19clr|c0:C3#10/0clr|c1:C2#30/38clr|c1:C1#30/35clr|c1:C1#30/46clr|c1:C1#30/30clr|c1:C2#30/32clr|c1:C1#30/30clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C6#30/40clr|c1:C6#20/8clr|c1:C0#15/11clr|c1:C5#2/2clr|c2:C2#30/43clr|c2:C2#30/30clr|c2:C1#30/30clr|c2:C1#30/31clr|c2:C1#30/31clr|c2:C2#30/30clr|c2:C2#30/30clr|c2:C2#30/30clr|c2:C6#30/30clr|c2:C3#30/31clr|c2:C1#18/18clr|c2:C4#12/12clr",
 		"visited": 40
 	},
 	"solverBounds": {

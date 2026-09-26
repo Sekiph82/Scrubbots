@@ -21,6 +21,8 @@ const CompleteClearingLoop = preload("res://scripts/gameplay/clearing/complete_c
 
 const DT := 1.0
 const MAX_TICKS := 80000
+## Settled window (> one 1x cadence of 0.5 s at 60 Hz) before the drain stops.
+const SETTLE_TICKS := 40
 
 var _fail := 0
 
@@ -123,6 +125,7 @@ func _drain(h) -> void:
 	var runtime = h.get_runtime()
 	var scheduler = h.get_scheduler()
 	var agent_layer = h.get_agent_layer()
+	var settled := 0
 	for _i in range(MAX_TICKS):
 		if slots.rightmost_empty_index() != -1:
 			for col in range(h.get_supply().get_column_count()):
@@ -130,14 +133,18 @@ func _drain(h) -> void:
 					input.activate_front(col)
 					break
 		runtime.tick(DT)
-		if supply.is_exhausted() and scheduler.live_assignment_count() == 0 and not _any_moving(agent_layer):
-			# Give the completion authority one settled quiescent tick to latch.
-			runtime.tick(DT)
-			if h.get_completion().is_terminal():
-				break
-			# Not yet terminal (still PLAYING) — one extra settle then stop.
-			runtime.tick(DT)
+		if h.get_completion().is_terminal():
 			break
+		# M52-C001-R01: a dispatch wave is serviced one lane per frame, so "no live work"
+		# can be momentarily true between lanes/waves. Settled = supply exhausted, no live
+		# assignment, nothing moving AND no queued lane, held for a full 1x cadence.
+		if supply.is_exhausted() and scheduler.live_assignment_count() == 0 and not _any_moving(agent_layer) \
+				and not scheduler.has_pending_lanes():
+			settled += 1
+			if settled >= SETTLE_TICKS:
+				break
+		else:
+			settled = 0
 
 func _make_host(drop: int):
 	var sub := SubViewport.new()

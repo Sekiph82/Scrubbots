@@ -16,14 +16,27 @@ extends RefCounted
 ##    supply), then run the serial clear kernel to quiescence.
 ##  - quiesce(state): run the serial clear kernel to quiescence with no placement.
 ##
-## Serial clear kernel (master prompt "legal serial authenticated progress"): repeatedly
-## perform ONE legal M25-style claim at a time — real production targetability/routing for
-## the exact slot origin — and apply one authenticated-equivalent clear transition
-## synchronously (BoardState ACTIVE->CLEARED -> candidate sync -> reservation resolve ->
-## M25.finalize_clear updating M24 quota exactly as successful finalization would). WAITING
-## colors are skipped until any clear opens a corridor (wake), mirroring M26 fairness/wake.
-## A serial schedule that completes the board is a valid legal execution schedule, so it
-## proves solvability; the kernel never uses ScrubbotAgent animation timing.
+## Wave clear kernel (M52-C001-R01; supersedes the M27 color-serialized kernel): runtime
+## dispatch is now one parallel wave per cadence — at most one exact-slot M25 claim per
+## eligible occupied slot, each from that slot's own origin, same-color slots independent
+## (OWNER_PARALLEL_SLOT_DISPATCH_AND_DEPARTURE_COUNT_V01). The kernel applies exactly that
+## lane policy: one wave of exact-slot claims against the pre-wave board, then the wave's
+## authenticated-equivalent clears (BoardState ACTIVE->CLEARED -> candidate sync ->
+## reservation resolve -> M25.finalize_clear updating M24 quota exactly as successful
+## finalization would), repeated to quiescence. WAITING is per slot and every clear wakes
+## all lanes, mirroring M26. It never uses ScrubbotAgent animation timing.
+##
+## Proof/runtime relationship (documented, not overclaimed): claim semantics (per-slot
+## origin access, TargetSelector order, reservation uniqueness) are identical to runtime;
+## what the kernel fixes is one TIMING of clears (all of a wave's clears land before the
+## next wave). Runtime travel time may let later waves claim before earlier clears land,
+## selecting different same-color cells. Consequences:
+##   - DEADLOCK/LOST soundness: from a quiescent state no clear happens before the next
+##     successful claim, and claims are identical, so "no future progress" in the kernel is
+##     exactly "no future progress" at runtime — the classifier cannot report a false LOST.
+##   - SOLVED is a proof for this canonical timing only; production admission additionally
+##     requires the owner click sequence to reach WON through the REAL production runtime
+##     (tests/m52_owner_supply_plans.gd, tests/m52_r01_parallel_runtime.gd).
 
 const LevelData = preload("res://scripts/data/level_data.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
@@ -162,63 +175,59 @@ func _build_live(state) -> Dictionary:
 
 # --------------------------------------------------------- serial clear kernel --
 
-## Repeatedly perform one legal M25 claim + authenticated-equivalent clear until no
-## occupied non-WAITING batch can claim a production-targetable cell. Returns the number
-## of clears, or -1 if an authenticated-clear transition unexpectedly failed (incoherent).
+## Wave kernel (M52-C001-R01, mirrors the production M26 parallel wave): each iteration
+## is ONE dispatch wave — every eligible slot (occupied, capacity > 0, not WAITING on its
+## current batch), in ascending placement sequence then slot index, makes at most one
+## exact-slot M25 claim using ITS OWN below-board origin/access, all against the same
+## pre-wave board (reservations keep the wave's targets unique). The wave's clears are then
+## applied (authenticated-equivalent, claim order). A clear wakes every WAITING lane.
+## Repeats until a wave claims nothing. Returns the number of clears, or -1 if an
+## authenticated-clear transition unexpectedly failed (incoherent).
 func _run_to_quiescence(live: Dictionary) -> int:
 	var clears := 0
-	var waiting: Dictionary = {}
+	var waiting: Dictionary = {}   # slot -> batch_id WAITING on its current batch
 	while true:
-		var progressed := false
-		for color in _eligible_colors(live.slots, waiting):
-			var claim: Dictionary = _attempt_claim(live, color)
+		var claims: Array = []
+		for slot in _eligible_slots(live.slots, waiting):
+			var origin: Vector2 = _origin_for_slot(slot, live.w, live.h, live.slots.get_slot_count())
+			var access = ProductionTargetAccess.new(live.routing, live.raccess, live.board, origin)
+			var batch_id: String = live.slots.get_batch_id(slot)
+			var claim: Dictionary = live.claim.claim_for_slot(slot, access)
 			if claim.get("ok", false):
-				if not _apply_clear(live, claim):
-					return -1
-				waiting.clear()  # a clear can open corridors -> wake all WAITING colors
-				clears += 1
-				if clears > MAX_CLEARS_GUARD:
-					return -1
-				progressed = true
-				break
+				claims.append(claim)
 			elif claim.get("waiting", false):
-				waiting[color] = true
-		if not progressed:
+				waiting[slot] = batch_id
+		if claims.is_empty():
 			break
+		for claim in claims:
+			if not _apply_clear(live, claim):
+				return -1
+			clears += 1
+			if clears > MAX_CLEARS_GUARD:
+				return -1
+		waiting.clear()  # clears can open corridors -> wake all WAITING lanes
 	return clears
 
-## Eligible colors: occupied slots with dispatch capacity > 0 whose color is not currently
-## WAITING, ordered by the OLDEST placement sequence among those slots (deterministic;
-## never Dictionary iteration order) — exactly M26 fairness ordering.
-func _eligible_colors(slots, waiting: Dictionary) -> Array:
-	var min_seq: Dictionary = {}
+## Eligible lanes, exactly the production M26 wave order: occupied slots with dispatch
+## capacity > 0 not WAITING on their current batch, ascending placement sequence then
+## physical slot index (deterministic; never Dictionary iteration order).
+func _eligible_slots(slots, waiting: Dictionary) -> Array:
+	var lanes: Array = []
 	for i in range(slots.get_slot_count()):
 		if not slots.is_occupied(i):
 			continue
 		if slots.get_capacity(i) <= 0:
 			continue
-		var color: int = slots.get_color_id(i)
-		if waiting.has(color):
+		if waiting.get(i, "") == slots.get_batch_id(i):
 			continue
-		var seq: int = slots.get_placement_sequence(i)
-		if not min_seq.has(color) or seq < int(min_seq[color]):
-			min_seq[color] = seq
-	var colors: Array = min_seq.keys()
-	colors.sort_custom(func(a, b): return int(min_seq[a]) < int(min_seq[b]))
-	return colors
-
-## Attempt exactly one M25 claim for `color` using real per-slot ProductionTargetAccess at
-## each occupied slot's below-board origin (M25 arbitrates oldest-placement-first).
-func _attempt_claim(live: Dictionary, color: int) -> Dictionary:
-	var access_by_slot: Dictionary = {}
-	for i in range(live.slots.get_slot_count()):
-		if not live.slots.is_occupied(i):
-			continue
-		if live.slots.get_color_id(i) != color:
-			continue
-		var origin: Vector2 = _origin_for_slot(i, live.w, live.h, live.slots.get_slot_count())
-		access_by_slot[i] = ProductionTargetAccess.new(live.routing, live.raccess, live.board, origin)
-	return live.claim.claim_for_color(color, access_by_slot)
+		lanes.append(i)
+	lanes.sort_custom(func(a, b):
+		var sa: int = slots.get_placement_sequence(a)
+		var sb: int = slots.get_placement_sequence(b)
+		if sa != sb:
+			return sa < sb
+		return a < b)
+	return lanes
 
 ## Apply one authenticated-equivalent clear transition synchronously, exactly mirroring
 ## CompleteClearingLoop's committed order (BoardState -> candidate -> reservation ->

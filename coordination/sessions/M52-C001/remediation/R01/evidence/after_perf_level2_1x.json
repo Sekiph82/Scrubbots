@@ -1,0 +1,358 @@
+{
+	"context": {
+		"cores": 16,
+		"cpu": "12th Gen Intel(R) Core(TM) i7-1260P",
+		"godot": "4.7.2-stable (official)",
+		"headless": true,
+		"os": "Windows",
+		"tick_dt": 0.0166666666666667
+	},
+	"git_head": "0fa38f6",
+	"mode": "perf",
+	"result": {
+		"clicks_applied": 36,
+		"frame_ms": {
+			"max": 30.494,
+			"p50": 0.819,
+			"p95": 4.561,
+			"p99": 19.115,
+			"total_s": 28.0955989999998
+		},
+		"frames_over_ms": {
+			"100": 0,
+			"16.7": 303,
+			"33": 0,
+			"50": 0
+		},
+		"peak_live_assignments": 115,
+		"peak_moving_agents": 115,
+		"sections": {
+			"access_compute_route": {
+				"count": 1024,
+				"max_ms": 23.056,
+				"mean_ms": 8.112,
+				"total_ms": 8306.61
+			},
+			"access_validate": {
+				"count": 1024,
+				"max_ms": 0.537,
+				"mean_ms": 0.225,
+				"total_ms": 230.127
+			},
+			"agent_drive_arrival": {
+				"count": 19872,
+				"max_ms": 1.439,
+				"mean_ms": 0.396,
+				"total_ms": 7863.312
+			},
+			"completion_on_tick": {
+				"count": 19872,
+				"max_ms": 8.48,
+				"mean_ms": 0.047,
+				"total_ms": 940.264
+			},
+			"dispatcher_spawn": {
+				"count": 1024,
+				"max_ms": 15.328,
+				"mean_ms": 0.381,
+				"total_ms": 390.463
+			},
+			"m25_claim": {
+				"count": 1710,
+				"max_ms": 27.424,
+				"mean_ms": 7.305,
+				"total_ms": 12491.884
+			},
+			"m26_dispatch_lane": {
+				"count": 1710,
+				"max_ms": 28.295,
+				"mean_ms": 7.595,
+				"total_ms": 12987.272
+			},
+			"renderer_update": {
+				"count": 1024,
+				"max_ms": 0.066,
+				"mean_ms": 0.024,
+				"total_ms": 24.554
+			},
+			"route_dijkstra": {
+				"count": 1024,
+				"max_ms": 19.666,
+				"mean_ms": 5.951,
+				"total_ms": 6093.851
+			},
+			"route_sources": {
+				"count": 1024,
+				"max_ms": 2.337,
+				"mean_ms": 1.274,
+				"total_ms": 1304.428
+			},
+			"route_validate": {
+				"count": 1024,
+				"max_ms": 1.125,
+				"mean_ms": 0.257,
+				"total_ms": 263.051
+			},
+			"target_selection": {
+				"count": 1710,
+				"max_ms": 27.352,
+				"mean_ms": 7.269,
+				"total_ms": 12429.142
+			},
+			"ui_snapshot_sync": {
+				"count": 19872,
+				"max_ms": 0.564,
+				"mean_ms": 0.149,
+				"total_ms": 2961.289
+			}
+		},
+		"sim_seconds": 331.2,
+		"speed": "1x",
+		"terminal": "WON",
+		"ticks": 19872,
+		"worst_frames": [
+			{
+				"agents": 58,
+				"live": 58,
+				"ms": 30.494,
+				"sections": {
+					"access_compute_route": 23056,
+					"access_validate": 427,
+					"agent_drive_arrival": 1092,
+					"completion_on_tick": 77,
+					"dispatcher_spawn": 742,
+					"m25_claim": 27424,
+					"m26_dispatch_lane": 28295,
+					"renderer_update": 34,
+					"route_dijkstra": 19666,
+					"route_sources": 1798,
+					"route_validate": 546,
+					"target_selection": 27352,
+					"ui_snapshot_sync": 433
+				},
+				"t": 18644
+			},
+			{
+				"agents": 34,
+				"live": 34,
+				"ms": 29.342,
+				"sections": {
+					"access_compute_route": 22072,
+					"access_validate": 479,
+					"agent_drive_arrival": 640,
+					"completion_on_tick": 64,
+					"dispatcher_spawn": 724,
+					"m25_claim": 26893,
+					"m26_dispatch_lane": 27733,
+					"route_dijkstra": 18634,
+					"route_sources": 1948,
+					"route_validate": 549,
+					"target_selection": 26822,
+					"ui_snapshot_sync": 405
+				},
+				"t": 17033
+			},
+			{
+				"agents": 24,
+				"live": 24,
+				"ms": 28.797,
+				"sections": {
+					"access_compute_route": 20426,
+					"access_validate": 477,
+					"agent_drive_arrival": 443,
+					"completion_on_tick": 69,
+					"dispatcher_spawn": 753,
+					"m25_claim": 26572,
+					"m26_dispatch_lane": 27442,
+					"route_dijkstra": 16879,
+					"route_sources": 1881,
+					"route_validate": 543,
+					"target_selection": 26507,
+					"ui_snapshot_sync": 405
+				},
+				"t": 14879
+			},
+			{
+				"agents": 34,
+				"live": 34,
+				"ms": 28.645,
+				"sections": {
+					"access_compute_route": 21607,
+					"access_validate": 500,
+					"agent_drive_arrival": 530,
+					"completion_on_tick": 62,
+					"dispatcher_spawn": 688,
+					"m25_claim": 26371,
+					"m26_dispatch_lane": 27173,
+					"route_dijkstra": 18213,
+					"route_sources": 1852,
+					"route_validate": 555,
+					"target_selection": 26307,
+					"ui_snapshot_sync": 393
+				},
+				"t": 17003
+			},
+			{
+				"agents": 27,
+				"live": 27,
+				"ms": 28.41,
+				"sections": {
+					"access_compute_route": 22093,
+					"access_validate": 325,
+					"agent_drive_arrival": 563,
+					"completion_on_tick": 59,
+					"dispatcher_spawn": 536,
+					"m25_claim": 26290,
+					"m26_dispatch_lane": 26929,
+					"route_dijkstra": 18925,
+					"route_sources": 1832,
+					"route_validate": 396,
+					"target_selection": 26229,
+					"ui_snapshot_sync": 398
+				},
+				"t": 19091
+			},
+			{
+				"agents": 21,
+				"live": 21,
+				"ms": 28.373,
+				"sections": {
+					"access_compute_route": 18437,
+					"access_validate": 456,
+					"agent_drive_arrival": 411,
+					"completion_on_tick": 63,
+					"dispatcher_spawn": 733,
+					"m25_claim": 26157,
+					"m26_dispatch_lane": 27007,
+					"route_dijkstra": 14726,
+					"route_sources": 2239,
+					"route_validate": 528,
+					"target_selection": 26091,
+					"ui_snapshot_sync": 425
+				},
+				"t": 12775
+			},
+			{
+				"agents": 41,
+				"live": 41,
+				"ms": 28.338,
+				"sections": {
+					"access_compute_route": 21854,
+					"access_validate": 360,
+					"agent_drive_arrival": 598,
+					"completion_on_tick": 59,
+					"dispatcher_spawn": 620,
+					"m25_claim": 26099,
+					"m26_dispatch_lane": 26818,
+					"route_dijkstra": 18729,
+					"route_sources": 1792,
+					"route_validate": 427,
+					"target_selection": 26039,
+					"ui_snapshot_sync": 380
+				},
+				"t": 18851
+			},
+			{
+				"agents": 58,
+				"live": 58,
+				"ms": 28.192,
+				"sections": {
+					"access_compute_route": 21413,
+					"access_validate": 334,
+					"agent_drive_arrival": 665,
+					"completion_on_tick": 61,
+					"dispatcher_spawn": 595,
+					"m25_claim": 25744,
+					"m26_dispatch_lane": 26455,
+					"route_dijkstra": 18119,
+					"route_sources": 1821,
+					"route_validate": 390,
+					"target_selection": 25674,
+					"ui_snapshot_sync": 361
+				},
+				"t": 18626
+			},
+			{
+				"agents": 43,
+				"live": 43,
+				"ms": 28.108,
+				"sections": {
+					"access_compute_route": 20633,
+					"access_validate": 477,
+					"agent_drive_arrival": 544,
+					"completion_on_tick": 63,
+					"dispatcher_spawn": 728,
+					"m25_claim": 25810,
+					"m26_dispatch_lane": 26653,
+					"route_dijkstra": 17383,
+					"route_sources": 1793,
+					"route_validate": 518,
+					"target_selection": 25750,
+					"ui_snapshot_sync": 348
+				},
+				"t": 17333
+			},
+			{
+				"agents": 40,
+				"live": 40,
+				"ms": 28.016,
+				"sections": {
+					"access_compute_route": 20776,
+					"access_validate": 476,
+					"agent_drive_arrival": 929,
+					"completion_on_tick": 57,
+					"dispatcher_spawn": 704,
+					"m25_claim": 25457,
+					"m26_dispatch_lane": 26270,
+					"renderer_update": 25,
+					"route_dijkstra": 17461,
+					"route_sources": 1809,
+					"route_validate": 533,
+					"target_selection": 25395,
+					"ui_snapshot_sync": 364
+				},
+				"t": 17303
+			},
+			{
+				"agents": 40,
+				"live": 40,
+				"ms": 27.98,
+				"sections": {
+					"access_compute_route": 21527,
+					"access_validate": 360,
+					"agent_drive_arrival": 590,
+					"completion_on_tick": 59,
+					"dispatcher_spawn": 586,
+					"m25_claim": 25849,
+					"m26_dispatch_lane": 26532,
+					"route_dijkstra": 18329,
+					"route_sources": 1827,
+					"route_validate": 417,
+					"target_selection": 25775,
+					"ui_snapshot_sync": 322
+				},
+				"t": 18866
+			},
+			{
+				"agents": 21,
+				"live": 21,
+				"ms": 27.968,
+				"sections": {
+					"access_compute_route": 19068,
+					"access_validate": 456,
+					"agent_drive_arrival": 416,
+					"completion_on_tick": 60,
+					"dispatcher_spawn": 696,
+					"m25_claim": 25898,
+					"m26_dispatch_lane": 26711,
+					"route_dijkstra": 15540,
+					"route_sources": 2013,
+					"route_validate": 516,
+					"target_selection": 25834,
+					"ui_snapshot_sync": 426
+				},
+				"t": 13825
+			}
+		]
+	}
+}

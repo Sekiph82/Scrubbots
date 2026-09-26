@@ -6,9 +6,10 @@ extends RefCounted
 ## Branches over LEGAL player front-batch selections only (never Row2/Row3/hidden batches,
 ## never an internal reachability shortcut) using the ProofKernel to apply each transition
 ## through the accepted M23/M24/M25/routing semantics. Player placement is the ONLY choice
-## point: same-color arbitration, target selection and clearing are all forced/deterministic
-## inside the kernel, and clearing is monotonic, so exhaustively branching over which column
-## front to place next is a complete legal-schedule search (audit §E).
+## point: per-slot parallel dispatch waves, target selection and clearing are all
+## forced/deterministic inside the kernel (M52-C001-R01 wave kernel; see ProofKernel for the
+## exact proof/runtime timing relationship), and clearing is monotonic, so exhaustively
+## branching over which column front to place next is a complete search of player choices.
 ##
 ## Deterministic DFS: ascending column action order, canonical-state memoization, explicit
 ## max-visited-states and max-depth bounds. SOLVED only at exact canonical completion.

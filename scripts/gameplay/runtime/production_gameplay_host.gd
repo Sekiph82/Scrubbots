@@ -64,7 +64,9 @@ const ProductionBoosterAdapter = preload("res://scripts/economy/production_boost
 const SaveService = preload("res://scripts/save/save_service.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
 const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
+const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
 const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
+const SpeedAcquisitionPopup = preload("res://scripts/ui/speed_acquisition_popup.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -138,6 +140,10 @@ var _economy_terminal_done := false
 ## Last WON first-clear transaction result (diagnostic; M39 V04).
 var last_first_clear_result: Dictionary = {}
 var _actions = null   # ProductionActionFacade (M39 V04)
+## M52-C001-R01 functional 2x acquisition popup (created on first need).
+var _speed_popup = null
+## Last 2x purchase result from the popup (diagnostic/tests).
+var last_speed_purchase_result: Dictionary = {}
 ## Catalog entry id the AppState path resolved for this attempt (M40 V04).
 var launch_entry_id: String = ""
 ## Test-only fault seam forwarded to FirstClearTransaction.commit.
@@ -529,9 +535,13 @@ func _bind_haptics_signals() -> void:
 ## Runtime state-sync tail: refresh the five-slot strip from authoritative M24, then run one
 ## dirty/event-gated completion evaluation pass.
 func _on_runtime_tick() -> void:
+	var t0 := RuntimePerfProbe.now()
 	_sync_slots()
+	RuntimePerfProbe.add("ui_snapshot_sync", t0)
 	if _completion != null:
+		var t1 := RuntimePerfProbe.now()
 		_completion.on_tick()
+		RuntimePerfProbe.add("completion_on_tick", t1)
 
 ## Push a fresh detached M24 snapshot into the live five-slot strip (runtime state-sync).
 func _sync_slots() -> void:
@@ -631,18 +641,62 @@ func request_save() -> Dictionary:
 		return {"ok": true, "source": "no_save_bound"}
 	return _save.save()
 
-## Manual 2x request path. M39 V02 (F-M39-004): turning 2x ON is gated by
-## SpeedEntitlementService — no valid current-level/timed entitlement => the
-## manual request is refused (no toggle). Turning 2x OFF is always allowed. The
-## free M23-exhausted automatic 2x uses the speed authority directly (set_2x),
-## never this button, so it stays free and entitlement-independent.
+## Manual 2x control (M52-C001-R01; OWNER_PARALLEL_SLOT_DISPATCH_AND_DEPARTURE_COUNT_V01
+## §6). The control NEVER silently does nothing:
+##   - currently 2x                    -> back to 1x (always allowed);
+##   - 1x + manual entitlement          -> 2x;
+##   - 1x + NO entitlement (Economy V1) -> open the functional 2x acquisition popup.
+## Turning 2x ON stays gated by SpeedEntitlementService. The free M23-exhausted automatic
+## 2x uses the speed authority directly (set_2x), never this button, so it stays free and
+## entitlement-independent.
 func _on_speed_pressed() -> void:
 	var currently_2x: bool = _speed != null and _speed.is_2x()
 	if not currently_2x and _economy != null:
 		if not _economy.speed.is_manual_2x_entitled(progression_level):
-			return  # refused: no entitlement
+			_open_speed_acquisition()
+			return
 	var two: bool = _runtime.toggle_speed()
 	_screen.set_speed_2x(two)
+
+## Canonical Economy V1 2x offers (prices from EconomyConfig, never hardcoded here).
+func speed_offers() -> Array:
+	var out: Array = [{"key": "level", "kind": "level", "seconds": 0, "label": "This level",
+		"price_sb": _economy.config.speed_current_level_sb()}]
+	for p in _economy.config.speed_timed_products():
+		var secs: int = int(p.get("seconds", 0))
+		out.append({"key": "timed_%d" % secs, "kind": "timed", "seconds": secs,
+			"label": "%d minutes" % (secs / 60), "price_sb": int(p.get("sb", 0))})
+	return out
+
+func _open_speed_acquisition() -> void:
+	if _speed_popup == null:
+		_speed_popup = SpeedAcquisitionPopup.new()
+		_screen.add_child(_speed_popup)
+		_speed_popup.offer_chosen.connect(_on_speed_offer_chosen)
+	_speed_popup.open(speed_offers(), _economy.wallet.scrub_bucks())
+
+## Purchase through the ONE canonical action surface (durable save on commit). Success ->
+## 2x immediately + control updated + popup closed. Failure/insufficient SB -> nothing
+## spent, no entitlement, speed unchanged, visible reason in the popup.
+func _on_speed_offer_chosen(kind: String, seconds: int) -> void:
+	if _actions == null:
+		_speed_popup.show_status("2x purchase unavailable right now.")
+		return
+	var r: Dictionary = _actions.buy_current_level_2x(progression_level) if kind == "level" \
+		else _actions.buy_timed_2x(seconds)
+	last_speed_purchase_result = r
+	if not r.get("ok", false):
+		var reason: String = String(r.get("reason", "failed"))
+		_speed_popup.show_status("Not enough Scrub Bucks." if reason == "insufficient_sb"
+			else "Purchase unavailable (%s)." % reason)
+		return
+	_speed_popup.close()
+	if _economy.speed.is_manual_2x_entitled(progression_level):
+		_runtime.set_speed_2x(true)
+		_screen.set_speed_2x(true)
+
+func get_speed_acquisition_popup():
+	return _speed_popup
 
 ## Test-only fault seam for the +1 Slot transition (M39 V04, F-M39-V03-003):
 ## f(stage) -> true forces a failure at "engine" (after the M24 grow) or

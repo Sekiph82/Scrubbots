@@ -1,0 +1,360 @@
+{
+	"context": {
+		"cores": 16,
+		"cpu": "12th Gen Intel(R) Core(TM) i7-1260P",
+		"godot": "4.7.2-stable (official)",
+		"headless": true,
+		"os": "Windows",
+		"tick_dt": 0.0166666666666667
+	},
+	"git_head": "0fa38f6",
+	"mode": "perf",
+	"result": {
+		"clicks_applied": 36,
+		"frame_ms": {
+			"max": 30.722,
+			"p50": 0.863,
+			"p95": 9.837,
+			"p99": 21.693,
+			"total_s": 20.6100530000001
+		},
+		"frames_over_ms": {
+			"100": 0,
+			"16.7": 299,
+			"33": 0,
+			"50": 0
+		},
+		"peak_live_assignments": 115,
+		"peak_moving_agents": 115,
+		"sections": {
+			"access_compute_route": {
+				"count": 1024,
+				"max_ms": 22.754,
+				"mean_ms": 7.748,
+				"total_ms": 7934.207
+			},
+			"access_validate": {
+				"count": 1024,
+				"max_ms": 0.586,
+				"mean_ms": 0.214,
+				"total_ms": 219.328
+			},
+			"agent_drive_arrival": {
+				"count": 10580,
+				"max_ms": 1.491,
+				"mean_ms": 0.402,
+				"total_ms": 4251.531
+			},
+			"completion_on_tick": {
+				"count": 10580,
+				"max_ms": 8.597,
+				"mean_ms": 0.046,
+				"total_ms": 490.469
+			},
+			"dispatcher_spawn": {
+				"count": 1024,
+				"max_ms": 15.623,
+				"mean_ms": 0.357,
+				"total_ms": 365.527
+			},
+			"m25_claim": {
+				"count": 1724,
+				"max_ms": 27.231,
+				"mean_ms": 6.931,
+				"total_ms": 11948.476
+			},
+			"m26_dispatch_lane": {
+				"count": 1724,
+				"max_ms": 28.114,
+				"mean_ms": 7.2,
+				"total_ms": 12412.514
+			},
+			"renderer_update": {
+				"count": 1024,
+				"max_ms": 0.057,
+				"mean_ms": 0.021,
+				"total_ms": 21.087
+			},
+			"route_dijkstra": {
+				"count": 1024,
+				"max_ms": 19.229,
+				"mean_ms": 5.747,
+				"total_ms": 5884.523
+			},
+			"route_sources": {
+				"count": 1024,
+				"max_ms": 2.14,
+				"mean_ms": 1.177,
+				"total_ms": 1204.892
+			},
+			"route_validate": {
+				"count": 1024,
+				"max_ms": 0.656,
+				"mean_ms": 0.242,
+				"total_ms": 248.08
+			},
+			"target_selection": {
+				"count": 1724,
+				"max_ms": 27.172,
+				"mean_ms": 6.897,
+				"total_ms": 11890.111
+			},
+			"ui_snapshot_sync": {
+				"count": 10580,
+				"max_ms": 0.507,
+				"mean_ms": 0.153,
+				"total_ms": 1618.21
+			}
+		},
+		"sim_seconds": 176.333333333333,
+		"speed": "2x",
+		"terminal": "WON",
+		"ticks": 10580,
+		"worst_frames": [
+			{
+				"agents": 28,
+				"live": 28,
+				"ms": 30.722,
+				"sections": {
+					"access_compute_route": 22129,
+					"access_validate": 518,
+					"agent_drive_arrival": 920,
+					"completion_on_tick": 64,
+					"dispatcher_spawn": 778,
+					"m25_claim": 27231,
+					"m26_dispatch_lane": 28114,
+					"renderer_update": 29,
+					"route_dijkstra": 18815,
+					"route_sources": 1801,
+					"route_validate": 562,
+					"target_selection": 27172,
+					"ui_snapshot_sync": 349
+				},
+				"t": 8526
+			},
+			{
+				"agents": 30,
+				"live": 30,
+				"ms": 29.661,
+				"sections": {
+					"access_compute_route": 21546,
+					"access_validate": 523,
+					"agent_drive_arrival": 863,
+					"completion_on_tick": 75,
+					"dispatcher_spawn": 853,
+					"m25_claim": 26567,
+					"m26_dispatch_lane": 27547,
+					"renderer_update": 27,
+					"route_dijkstra": 18125,
+					"route_sources": 1883,
+					"route_validate": 568,
+					"target_selection": 26495,
+					"ui_snapshot_sync": 465
+				},
+				"t": 8500
+			},
+			{
+				"agents": 29,
+				"live": 29,
+				"ms": 29.108,
+				"sections": {
+					"access_compute_route": 21295,
+					"access_validate": 504,
+					"agent_drive_arrival": 482,
+					"completion_on_tick": 75,
+					"dispatcher_spawn": 739,
+					"m25_claim": 26819,
+					"m26_dispatch_lane": 27670,
+					"route_dijkstra": 17602,
+					"route_sources": 2108,
+					"route_validate": 548,
+					"target_selection": 26757,
+					"ui_snapshot_sync": 507
+				},
+				"t": 8155
+			},
+			{
+				"agents": 29,
+				"live": 29,
+				"ms": 28.884,
+				"sections": {
+					"access_compute_route": 21892,
+					"access_validate": 482,
+					"agent_drive_arrival": 846,
+					"completion_on_tick": 58,
+					"dispatcher_spawn": 679,
+					"m25_claim": 26541,
+					"m26_dispatch_lane": 27311,
+					"renderer_update": 27,
+					"route_dijkstra": 18477,
+					"route_sources": 1812,
+					"route_validate": 534,
+					"target_selection": 26489,
+					"ui_snapshot_sync": 329
+				},
+				"t": 8515
+			},
+			{
+				"agents": 28,
+				"live": 28,
+				"ms": 28.877,
+				"sections": {
+					"access_compute_route": 20940,
+					"access_validate": 532,
+					"agent_drive_arrival": 480,
+					"completion_on_tick": 65,
+					"dispatcher_spawn": 728,
+					"m25_claim": 26657,
+					"m26_dispatch_lane": 27496,
+					"route_dijkstra": 17609,
+					"route_sources": 1764,
+					"route_validate": 599,
+					"target_selection": 26594,
+					"ui_snapshot_sync": 340
+				},
+				"t": 7990
+			},
+			{
+				"agents": 28,
+				"live": 28,
+				"ms": 28.803,
+				"sections": {
+					"access_compute_route": 20479,
+					"access_validate": 476,
+					"agent_drive_arrival": 563,
+					"completion_on_tick": 69,
+					"dispatcher_spawn": 709,
+					"m25_claim": 25591,
+					"m26_dispatch_lane": 26409,
+					"route_dijkstra": 17159,
+					"route_sources": 1817,
+					"route_validate": 537,
+					"target_selection": 25527,
+					"ui_snapshot_sync": 391
+				},
+				"t": 7975
+			},
+			{
+				"agents": 21,
+				"live": 21,
+				"ms": 28.523,
+				"sections": {
+					"access_compute_route": 18990,
+					"access_validate": 458,
+					"agent_drive_arrival": 449,
+					"completion_on_tick": 65,
+					"dispatcher_spawn": 717,
+					"m25_claim": 26297,
+					"m26_dispatch_lane": 27131,
+					"route_dijkstra": 15554,
+					"route_sources": 1961,
+					"route_validate": 522,
+					"target_selection": 26232,
+					"ui_snapshot_sync": 436
+				},
+				"t": 6920
+			},
+			{
+				"agents": 36,
+				"live": 36,
+				"ms": 28.509,
+				"sections": {
+					"access_compute_route": 22086,
+					"access_validate": 359,
+					"agent_drive_arrival": 571,
+					"completion_on_tick": 58,
+					"dispatcher_spawn": 567,
+					"m25_claim": 26412,
+					"m26_dispatch_lane": 27081,
+					"route_dijkstra": 18942,
+					"route_sources": 1805,
+					"route_validate": 403,
+					"target_selection": 26343,
+					"ui_snapshot_sync": 351
+				},
+				"t": 9574
+			},
+			{
+				"agents": 36,
+				"live": 36,
+				"ms": 28.476,
+				"sections": {
+					"access_compute_route": 22060,
+					"access_validate": 356,
+					"agent_drive_arrival": 575,
+					"completion_on_tick": 58,
+					"dispatcher_spawn": 603,
+					"m25_claim": 26328,
+					"m26_dispatch_lane": 27049,
+					"route_dijkstra": 18876,
+					"route_sources": 1805,
+					"route_validate": 406,
+					"target_selection": 26266,
+					"ui_snapshot_sync": 360
+				},
+				"t": 9559
+			},
+			{
+				"agents": 36,
+				"live": 36,
+				"ms": 28.418,
+				"sections": {
+					"access_compute_route": 21143,
+					"access_validate": 478,
+					"agent_drive_arrival": 535,
+					"completion_on_tick": 62,
+					"dispatcher_spawn": 688,
+					"m25_claim": 26184,
+					"m26_dispatch_lane": 26974,
+					"route_dijkstra": 17754,
+					"route_sources": 1871,
+					"route_validate": 521,
+					"target_selection": 26112,
+					"ui_snapshot_sync": 390
+				},
+				"t": 8676
+			},
+			{
+				"agents": 21,
+				"live": 21,
+				"ms": 28.408,
+				"sections": {
+					"access_compute_route": 18175,
+					"access_validate": 458,
+					"agent_drive_arrival": 428,
+					"completion_on_tick": 67,
+					"dispatcher_spawn": 861,
+					"m25_claim": 26012,
+					"m26_dispatch_lane": 26991,
+					"route_dijkstra": 14683,
+					"route_sources": 1979,
+					"route_validate": 519,
+					"target_selection": 25942,
+					"ui_snapshot_sync": 390
+				},
+				"t": 6395
+			},
+			{
+				"agents": 54,
+				"live": 54,
+				"ms": 28.353,
+				"sections": {
+					"access_compute_route": 21452,
+					"access_validate": 339,
+					"agent_drive_arrival": 1167,
+					"completion_on_tick": 58,
+					"dispatcher_spawn": 520,
+					"m25_claim": 25771,
+					"m26_dispatch_lane": 26391,
+					"renderer_update": 45,
+					"route_dijkstra": 18205,
+					"route_sources": 1832,
+					"route_validate": 379,
+					"target_selection": 25718,
+					"ui_snapshot_sync": 318
+				},
+				"t": 9327
+			}
+		]
+	}
+}

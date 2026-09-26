@@ -44,6 +44,10 @@ var _height: int
 var _color_ids: PackedInt32Array
 ## Current CellState per cell, flat row-major. All cells start ACTIVE.
 var _cell_states: PackedByteArray
+## Monotonic lifecycle revision: advances on every accepted cell-state write and on
+## restore_all_active(). Lets read-only caches (ProductionTargetAccess reachability
+## prefilter) prove they are current without scanning the board. Never decreases.
+var _revision: int = 0
 
 ## Returns RefCounted (not a self-typed return) because self-referential
 ## static typing is unreliable in headless Godot without a prebuilt global
@@ -110,7 +114,11 @@ func set_cell_state(index: int, state: CellState) -> bool:
 	if state != CellState.ACTIVE and state != CellState.CLEARED:
 		return false
 	_cell_states[index] = state
+	_revision += 1
 	return true
+
+func get_revision() -> int:
+	return _revision
 
 func count_cells_by_state(state: CellState) -> int:
 	var count := 0
@@ -127,3 +135,4 @@ func count_cells_by_state(state: CellState) -> int:
 ## without swapping the BoardState instance (which would strand every bound engine).
 func restore_all_active() -> void:
 	_cell_states.fill(CellState.ACTIVE)
+	_revision += 1

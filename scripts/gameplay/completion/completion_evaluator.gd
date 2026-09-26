@@ -29,6 +29,7 @@ extends RefCounted
 
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const DeadlockClassifier = preload("res://scripts/gameplay/solver/deadlock_classifier.gd")
+const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
 
 const PLAYING := &"PLAYING"
 const WON := &"WON"
@@ -117,7 +118,9 @@ func evaluate(board, scheduler, dispatcher, claim, reservations, slots, level, s
 	# controller's dirty/event gate permits it (audit §G: no unconditional per-frame proof).
 	if not allow_deadlock_proof:
 		return {"status": PLAYING, "reason": "deadlock_proof_gated"}
+	var tc := RuntimePerfProbe.now()
 	var c: Dictionary = _classifier.classify_runtime(level, board, supply, slots, 0)
+	RuntimePerfProbe.add("m27_classifier", tc)
 	var st = c.get("status", DeadlockClassifier.UNKNOWN_BOUND)
 	if st == DeadlockClassifier.DEADLOCK:
 		return {"status": LOST, "reason": "m27_deadlock_at_quiescence", "classifier": c}
