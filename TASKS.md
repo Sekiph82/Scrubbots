@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M42 OWNER VISUAL / DEVICE GATES
-- Current Sprint: M42-C001 V07 Post-Audit Closure
-- Current Task: Owner visual acceptance of final V07 Home
-- Current Task Status: OWNER_VISUAL_ACCEPTANCE_REQUIRED
-- Next Task/Action: OWNER confirms whether the current V07 Home is visually accepted. V07 independently passes: Windows desktop safe-area margins are zero, the real 683×1366 window uses a 1080×2160 logical canvas with a 100-logical-pixel AdBannerSlot, and the owner-supplied screenshot measures approximately 62 physical pixels for the bottom dark band, matching the expected ~63 px after scaling. If OWNER says OK, ChatGPT closes SB-M42-011 and SB-M42-017. SB-M42-032 Android real-device cinematic validation and SB-M42-033 iOS-later remain separate device gates.
-- Required Actor: OWNER
+- Current Milestone: M52 PRODUCTION CONTENT SCALE-UP
+- Current Sprint: M52-C001 First 10 Level Pack
+- Current Task: Integrate production Levels 2–10 from the owner-selected pixel-art candidates
+- Current Task Status: PREPARATION_REQUIRED
+- Next Task/Action: Prepare the nine canonical Level 2–10 source PNGs for repo import, then run the production importer/analyzer/solver/content-validation pipeline against the owner-locked cadence: L2 EASY, L3 MEDIUM, L4 EASY, L5 HARD, L6 EASY, L7 EASY, L8 MEDIUM, L9 EASY, L10 VERY_HARD. Level 1 remains the existing Hazard Bot. Do not admit any level whose measured difficulty/solver/content gates fail.
+- Required Actor: CHATGPT then CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011/SB-M42-017 are independently code-audited under V07 and wait only on explicit owner visual acceptance.
-- Note: V07 implementation `632bc2e` passed independent audit at `coordination/sessions/M42-C001/audits/SB-M42-HOME-POLISH_V07_CHATGPT_AUDIT_V01.md`. The Windows taskbar/work-area delta no longer inflates Home's bottom safe-area. HOME-120 and all V06 Home geometry remain unchanged. Current open M42 rows remain 011, 017, 032, 033.
+- Progress: 744 / 980 = 75.92%. M42 Home visual gates SB-M42-011 and SB-M42-017 are now closed by explicit owner V07 acceptance. M42 remains open only for SB-M42-032 Android real-device opening-cinematic validation and SB-M42-033 iOS-later validation.
+- Note: Final Home owner acceptance: `coordination/OWNER_M42_HOME_V07_FINAL_VISUAL_ACCEPTANCE.md`. V07 code audit: `coordination/sessions/M42-C001/audits/SB-M42-HOME-POLISH_V07_CHATGPT_AUDIT_V01.md`. New active content objective is the first ten-level playable pack.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1534,7 +1534,7 @@ Batch result: **25 AUDITED_PASS / 8 CODE_AUDIT_PASS WITH EXTERNAL GATES / 0 CHAN
 Individual audit files:
 `coordination/sessions/M42-C001/audits/SB-M42-001_CHATGPT_AUDIT_V01.md` .. `SB-M42-033_CHATGPT_AUDIT_V01.md`.
 
-Post-audit owner decision closed SB-M42-030 as mandatory NO SKIP. The Home then went through owner-approved asset promotion, V02 master convergence and V03 visual/modal remediation. After V03 runtime review, the owner changed the Home architecture again: World 01 will use one complete baked 1080x2160 world background while Scrubby remains a separate runtime hero, and Home shortcuts are reduced to four. Current closure state remains **29 closed / 4 open rows**, with 011/017 V04 implementation + owner-visual gates and 032/033 device gates.
+Post-audit owner decision closed SB-M42-030 as mandatory NO SKIP. The Home then went through owner-approved asset promotion, V02 master convergence and V03 visual/modal remediation. After V03 runtime review, the owner changed the Home architecture again: World 01 will use one complete baked 1080x2160 world background while Scrubby remains a separate runtime hero, and Home shortcuts are reduced to four. Current closure state is **31 closed / 2 open rows**. Final Home V07 visuals are owner-accepted; only 032/033 external device gates remain.
 
 Opening policy: `coordination/OWNER_M42_OPENING_CINEMATIC_POLICY_DECISION_V02.md`
 SB-M42-030 audit closure: `coordination/sessions/M42-C001/audits/SB-M42-030_CHATGPT_AUDIT_V02.md`.
@@ -1553,13 +1553,13 @@ V04 implementation prompt: `coordination/sessions/M42-C001/task_prompts/SB-M42-H
 - [x] SB-M42-006 Gameplay transition. — [x] SB-M42-007 Results transition.
 - [x] SB-M42-008 Prevent duplicate transitions. — [x] SB-M42-009 Back navigation.
 - [x] SB-M42-010 Build Home as responsive Godot containers/components.
-- [ ] SB-M42-011 Recreate owner-approved Home art direction with canonical regions. `[V04_IMPLEMENTATION_REQUIRED / OWNER_VISUAL_REVIEW_REQUIRED]`
+- [x] SB-M42-011 Recreate owner-approved Home art direction with canonical regions. `[AUDITED_PASS / V07 / OWNER_VISUAL_PASS]`
 - [x] SB-M42-012 Keep shortcut columns responsive around central area.
 - [x] SB-M42-013 Validate Home-specific manifest entries in `assets/ui/HOME_ASSET_MANIFEST.json` before generation.
 - [x] SB-M42-014 Generate only Home-specific required illustrative assets using approved provider order (ChatGPT primary, Magnific fallback). `[AUDITED_PASS / V02]`
 - [x] SB-M42-015 Keep dynamic values/timers/counts/labels live in Godot UI.
 - [x] SB-M42-016 Require owner approval before production promotion. `[AUDITED_PASS / V02]`
-- [ ] SB-M42-017 Bind approved art and validate viewport matrix. `[V04_IMPLEMENTATION_REQUIRED / OWNER_VISUAL_REVIEW_REQUIRED]`
+- [x] SB-M42-017 Bind approved art and validate viewport matrix. `[AUDITED_PASS / V07 / OWNER_VISUAL_PASS]`
 - [x] SB-M42-018 Replace coin HUD semantics with Scrub Bucks banknote icon + live SB amount. `[AUDITED_PASS / V02]`
 - [x] SB-M42-019 Replace profile XP bar with live Bot Parts next-robot progress (normally N/250).
 - [x] SB-M42-020 Replace top event bar/timer with Gift Meter progress/next milestone; no Event Points/timer.
