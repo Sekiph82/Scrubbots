@@ -1,0 +1,337 @@
+{
+  "schema_version": 1,
+  "status": "PLANNING_MANIFEST",
+  "authority": "coordination/OWNER_PLAYER_EXPERIENCE_SURFACE_PROGRAM_V01.md",
+  "note": "Required visual masters/references and production surfaces. Dynamic text/prices/timers/progress remain native/live Godot UI.",
+  "canonical_references": {
+    "gameplay_v02": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png",
+    "life": "assets/art/references/_owner_inbox/Additionals/life screens.png",
+    "need_a_hand": "assets/art/references/_owner_inbox/Additionals/need a hand.png",
+    "level_intro": "assets/art/references/_owner_inbox/Game Screens/level ekran acilisi.png"
+  },
+  "lifecycle": [
+    "PLANNED",
+    "REFERENCE_SELECTED",
+    "MASTER_REQUIRED",
+    "MASTER_OWNER_APPROVED",
+    "ASSETS_INVENTORIED",
+    "COMPONENTS_APPROVED",
+    "BOUND",
+    "AUDITED",
+    "OWNER_ACCEPTED"
+  ],
+  "surfaces": [
+    {
+      "id": "gameplay_v02",
+      "type": "screen",
+      "status": "REFERENCE_SELECTED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "pause",
+      "type": "popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "level_intro",
+      "type": "popup",
+      "status": "REFERENCE_SELECTED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "victory_results",
+      "type": "screen_popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "fail_retry",
+      "type": "popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "life_heart_refill",
+      "type": "popup",
+      "status": "REFERENCE_SELECTED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "need_a_hand",
+      "type": "popup",
+      "status": "REFERENCE_SELECTED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "booster_acquire",
+      "type": "popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "speed_2x_acquire",
+      "type": "popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "insufficient_sb",
+      "type": "popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "shop",
+      "type": "screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "collection_album",
+      "type": "screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "collection_set_detail",
+      "type": "screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "card_detail",
+      "type": "popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "cards_exchange",
+      "type": "screen_popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "standard_pack_open",
+      "type": "ceremony",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "premium_pack_open",
+      "type": "ceremony",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "collection_set_complete",
+      "type": "ceremony",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "master_collection_complete",
+      "type": "ceremony",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "robots_main",
+      "type": "screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "robot_detail_locked",
+      "type": "screen_popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "robot_unlock",
+      "type": "ceremony",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "tasks",
+      "type": "screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "daily",
+      "type": "screen_popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "gift_bar",
+      "type": "screen_popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "gift_meter_milestone",
+      "type": "ceremony",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "profile",
+      "type": "screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "achievements",
+      "type": "screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "events_main",
+      "type": "screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "event_detail",
+      "type": "screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "ranks",
+      "type": "screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "comeback_summary",
+      "type": "popup_screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "feature_unlock",
+      "type": "ceremony_coachmark",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "world_unlock_transition",
+      "type": "ceremony",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "account_cloud_sync_conflict",
+      "type": "screen_popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "generic_reward_confirmation",
+      "type": "popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "generic_error_offline_loading",
+      "type": "popup_state",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "notification_education_settings",
+      "type": "screen_popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    },
+    {
+      "id": "friends_postlaunch",
+      "type": "screen",
+      "status": "MASTER_REQUIRED_POSTLAUNCH",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true
+    }
+  ]
+}

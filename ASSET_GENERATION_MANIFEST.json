@@ -352,5 +352,11 @@
         "status": "APPROVED"
       }
     ]
+  },
+  "player_experience_asset_manifest": {
+    "path": "assets/ui/PLAYER_EXPERIENCE_ASSET_MANIFEST.json",
+    "status": "PLANNING_INVENTORY_READY",
+    "authority": "coordination/OWNER_PLAYER_EXPERIENCE_SURFACE_PROGRAM_V01.md",
+    "note": "Covers complete results/fail/recovery/acquisition/meta destination visual program. Does not auto-approve generated art."
   }
 }

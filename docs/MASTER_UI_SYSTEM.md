@@ -499,3 +499,23 @@ Home's owner-approved visual composition remains authoritative, but production m
 - Stars and Event Points do not exist as functional balances.
 
 All values, prices, countdowns, reward amounts and labels remain live Godot UI.
+
+
+## 19. Complete Player Experience Surface Program
+
+Canonical owner rule:
+`coordination/OWNER_PLAYER_EXPERIENCE_SURFACE_PROGRAM_V01.md`
+
+Subsystem visual inventory:
+`assets/ui/PLAYER_EXPERIENCE_ASSET_MANIFEST.json`
+
+Architecture:
+`docs/15_PLAYER_EXPERIENCE_UI_ARCHITECTURE.md`
+
+The reusable popup family now explicitly covers Pause, Life, Need a Hand, booster acquisition, 2x acquisition, Fail/Retry, Results/reward, card detail/pack opening, robot/feature/world unlock, error/offline/loading and account/cloud conflict where custom UI is needed.
+
+Destination screens include Shop, Collection, Robots, Tasks, Daily, Gift Bar, Profile, Achievements, Events and Ranks. Home HUD plus controls and BottomNav may not ship as dead routes.
+
+Life and Need a Hand canonical owner references already exist in the global asset manifest. All new material surfaces require owner-approved masters and live responsive Godot implementation.
+
+Rewarded ads, real-money store products, notifications, analytics, account/cloud and networked Events/Ranks remain provider/privacy gated, but their UI/error states are part of the planned surface architecture.
