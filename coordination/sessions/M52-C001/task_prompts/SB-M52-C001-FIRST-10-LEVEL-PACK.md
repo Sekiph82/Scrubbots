@@ -159,6 +159,21 @@ If no such analyzer exists, do NOT invent those values. Record that full Challen
 
 ## D. Authoritative solvability gate
 
+### Supply visibility vs total FIFO depth
+
+Do not confuse presentation depth with gameplay queue depth.
+
+- columns: **3**
+- visible rows per column: **3**
+- `preview_depth = 3`: presentation/player-facing preview only
+- total batches in a column: **not limited to 3**
+- hidden rows: retained in the FIFO queue and part of gameplay truth
+- solver: must reason over every hidden batch in every column
+- slots: **5** baseline, separate from supply queue depth
+
+A generated column with 20 batches is valid if all other gameplay/solver gates pass; the player sees only its first 3 rows at any one time.
+
+
 Every Level 2-10 candidate must be proven playable under the current canonical gameplay semantics before catalog admission.
 
 Use the existing:
@@ -169,13 +184,15 @@ Use the existing:
 Do not invent alternate gameplay.
 
 For each level:
-1. locate the canonical runtime column count / preview depth / supply configuration from existing gameplay authority;
-2. use deterministic seeds;
-3. search only through a bounded, reproducible seed/attempt procedure;
-4. require exact per-color conservation;
-5. require solver status `SOLVED`;
-6. replay the emitted solution trace and require exact completion;
-7. record accepted seed, attempt, visited state count, decisions, trace hash and replay result in M52 QA evidence.
+1. use **3 FIFO supply columns** and `preview_depth = 3` as the player-facing visible-row setting only;
+2. do **not** cap each column to 3 batches. The generated candidate may contain arbitrary deeper hidden FIFO rows (for example 20 batches in one column); preserve the complete generated queue;
+3. prove that the solver receives the full hidden queue from the non-player-facing supply snapshot, not only the 3 visible rows;
+4. use deterministic seeds;
+5. search only through a bounded, reproducible seed/attempt procedure;
+6. require exact per-color conservation;
+7. require solver status `SOLVED`;
+8. replay the emitted solution trace and require exact completion;
+9. record accepted seed, attempt, **full per-column queue lengths and full hidden batch layout**, visited state count, decisions, trace hash and replay result in M52 QA evidence.
 
 Hard rules:
 - `DEADLOCK` = reject;
