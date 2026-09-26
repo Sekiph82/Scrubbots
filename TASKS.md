@@ -6,14 +6,14 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 - Current Milestone: M52 PRODUCTION CONTENT SCALE-UP
 - Current Sprint: M52-C001 First 10 Level Pack
-- Current Task: Integrate production Levels 2–10 from the owner-selected pixel-art candidates
-- Current Task Status: PREPARATION_REQUIRED
-- Next Task/Action: Prepare the nine canonical Level 2–10 source PNGs for repo import, then run the production importer/analyzer/solver/content-validation pipeline against the owner-locked cadence: L2 EASY, L3 MEDIUM, L4 EASY, L5 HARD, L6 EASY, L7 EASY, L8 MEDIUM, L9 EASY, L10 VERY_HARD. Level 1 remains the existing Hazard Bot. Do not admit any level whose measured difficulty/solver/content gates fail.
-- Required Actor: CHATGPT then CLAUDE
+- Current Task: Integrate production Levels 2–10 from the owner-selected canonical pixel-art sources
+- Current Task Status: IMPLEMENTATION_REQUIRED
+- Next Task/Action: CLAUDE executes `coordination/sessions/M52-C001/task_prompts/SB-M52-C001_FIRST10_LEVEL_PACK.md`. The nine canonical source PNGs are already committed at `1ec599bfef82568f92413ac7dd24f558aa7bf53f`. Claude must exact-import, validate, solve, Difficulty-V1 analyze, safely mutate only derivative candidates when needed, and admit only honestly passing Levels 2–10 into the production catalog. Level 1 Hazard Bot remains unchanged. No slot may be mislabelled or cataloged on an invented/inconclusive Challenge result.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 744 / 980 = 75.92%. M42 Home visual gates SB-M42-011 and SB-M42-017 are now closed by explicit owner V07 acceptance. M42 remains open only for SB-M42-032 Android real-device opening-cinematic validation and SB-M42-033 iOS-later validation.
-- Note: Final Home owner acceptance: `coordination/OWNER_M42_HOME_V07_FINAL_VISUAL_ACCEPTANCE.md`. V07 code audit: `coordination/sessions/M42-C001/audits/SB-M42-HOME-POLISH_V07_CHATGPT_AUDIT_V01.md`. New active content objective is the first ten-level playable pack.
+- Progress: 744 / 980 = 75.92%. M42 Home visual gates are closed. M52-C001 is active. M42 remains externally open only for Android/iOS opening-cinematic device gates.
+- Note: Owner pack decision: `coordination/OWNER_M52_FIRST_10_LEVEL_PACK_V01.md`. Implementation prompt: `coordination/sessions/M52-C001/task_prompts/SB-M52-C001_FIRST10_LEVEL_PACK.md`. Audit criteria: `coordination/sessions/M52-C001/audit_criteria/SB-M52-C001_FIRST10_LEVEL_PACK.md`. Full-success target is exactly 10 production catalog entries in orders 1..10; partial/blocker truth is preferred over fabricated completion.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
