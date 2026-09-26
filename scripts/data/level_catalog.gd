@@ -33,6 +33,7 @@ const ProductionLevelValidator = preload("res://scripts/data/production_level_va
 const DifficultyRules = preload("res://scripts/data/difficulty_rules.gd")
 const LevelCatalogEntry = preload("res://scripts/data/level_catalog_entry.gd")
 const LevelCatalogValidationResult = preload("res://scripts/data/level_catalog_validation_result.gd")
+const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
 
 const DEFAULT_MANIFEST_PATH := "res://data/levels/catalog/production_catalog_v1.json"
 const EXPECTED_SCHEMA := "scrubbots.production_catalog.v1"
@@ -77,6 +78,7 @@ func load_manifest(path: String = DEFAULT_MANIFEST_PATH) -> LevelCatalogValidati
 	var seen_ids: Dictionary = {}
 	var seen_orders: Dictionary = {}
 	var seen_paths: Dictionary = {}
+	var seen_plans: Dictionary = {}
 
 	for raw in entries_raw:
 		if typeof(raw) != TYPE_DICTIONARY:
@@ -158,6 +160,24 @@ func load_manifest(path: String = DEFAULT_MANIFEST_PATH) -> LevelCatalogValidati
 				_last_result.add_entry_error(id, "production: %s" % String(e))
 			continue
 
+		# M52-C001: optional owner supply plan. When declared it must be a canonical
+		# res:// path, unique, and must load into an exact, conserving engine for THIS
+		# level — otherwise the entry fails closed (never a generated fallback).
+		var supply_plan_path := String(raw.get("supply_plan_path", "")).strip_edges()
+		if raw.has("supply_plan_path"):
+			var norm_plan := _normalize_path(supply_plan_path)
+			if norm_plan.is_empty():
+				_last_result.add_entry_error(id, "supply_plan_path is not a canonical res:// path: %s" % supply_plan_path)
+				continue
+			if seen_plans.has(norm_plan):
+				_last_result.add_entry_error(id, "supply_plan_path collides with %s" % seen_plans[norm_plan])
+				continue
+			seen_plans[norm_plan] = id
+			var plan_res := SupplyPlanLoader.load_engine(supply_plan_path, level)
+			if not plan_res["ok"]:
+				_last_result.add_entry_error(id, "supply plan: %s" % plan_res["error"])
+				continue
+
 		var preview_exists := preview_path.is_empty() or FileAccess.file_exists(preview_path)
 
 		var entry := LevelCatalogEntry.new()
@@ -170,6 +190,7 @@ func load_manifest(path: String = DEFAULT_MANIFEST_PATH) -> LevelCatalogValidati
 		entry.width = level.width
 		entry.height = level.height
 		entry.preview_exists = preview_exists
+		entry.supply_plan_path = supply_plan_path
 		_entries.append(entry)
 		_by_id[id] = entry
 

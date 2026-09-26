@@ -147,12 +147,25 @@ func _continue_cta_frontier() -> void:
 	var play: Button = home.get_region("PlayButton")
 	var sub_text: String = home.get_region("PlaySubtitle").text
 	_ok(play.text == "PLAY" and sub_text == "CONTINUE · LEVEL 2", "CTA shows PLAY + live subtitle CONTINUE · LEVEL 2 (%s / %s)" % [play.text, sub_text])
-	_ok(play.disabled and String(home.get_region("StatusLabel").text).find("coming soon") != -1, "frontier without content: disabled + honest message")
-	play.pressed.emit()
-	var r: Dictionary = root.play_current_frontier()
-	_ok(not r.get("ok", true) and r.get("reason") == "CONTENT_MISSING", "direct launch refuses CONTENT_MISSING")
-	_ok(root.get_gameplay_host() == null and root.get_navigation().current() == NavigationController.Route.HOME, "no gameplay, still HOME (never falls back to level 1)")
+	# M52-C001: Level 2 (Apple) now exists — no coming-soon state at frontier 2.
+	_ok(not play.disabled and String(home.get_region("StatusLabel").text).find("coming soon") == -1, "frontier 2 has real content: enabled, no coming-soon message")
 	_shutdown(root)
+	# First frontier without content (11) keeps the honest coming-soon state.
+	var path11 := _uniq("cont11")
+	var app11 = AppState.new(path11)
+	for n in range(1, 11):
+		app11.progression.record_win(n)
+	app11.request_save()
+	var root11 = await _boot_main(path11)
+	var home11 = root11.get_home()
+	var play11: Button = home11.get_region("PlayButton")
+	_ok(home11.get_region("PlaySubtitle").text == "CONTINUE · LEVEL 11", "subtitle reflects real frontier 11")
+	_ok(play11.disabled and String(home11.get_region("StatusLabel").text).find("coming soon") != -1, "frontier without content: disabled + honest message")
+	play11.pressed.emit()
+	var r: Dictionary = root11.play_current_frontier()
+	_ok(not r.get("ok", true) and r.get("reason") == "CONTENT_MISSING", "direct launch refuses CONTENT_MISSING")
+	_ok(root11.get_gameplay_host() == null and root11.get_navigation().current() == NavigationController.Route.HOME, "no gameplay, still HOME (never falls back to level 1)")
+	_shutdown(root11)
 	_complete("continue_cta_frontier")
 
 ## SB-M42-004: Home Settings reuses the ONE M41 panel bound to the ONE AppState.

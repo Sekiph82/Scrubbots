@@ -135,15 +135,22 @@ func _frontier_resolves_catalog() -> void:
 	_shutdown(root)
 
 func _frontier_missing_content() -> void:
-	print("[frontier 2 -> CONTENT_MISSING]")
-	var path := _uniq("f2")
+	# M52-C001: the catalog now holds orders 1..10, so frontier 2 is real content
+	# (Apple) and the first frontier without content is 11.
+	print("[frontier 2 -> Apple; frontier 11 -> CONTENT_MISSING]")
+	var path := _uniq("f11")
 	var root = await _boot(path)
 	var app = root.get_app_state()
 	_ok(app.progression.record_win(1), "frontier advanced to 2")
+	var r2: Dictionary = GameplayLaunchResolver.resolve(app)
+	_ok(r2["ok"] and r2["level"] == 2 and r2["entry_id"] == "level_002_apple", "frontier 2 resolves level_002_apple (no level-1 fallback)")
+	for n in range(2, 11):
+		app.progression.record_win(n)
+	_ok(app.progression.current_level() == 11, "frontier advanced to 11")
 	_ok(app.request_save()["ok"], "saved")
 	_shutdown(root)
 	var root2 = await _boot(path)
-	_ok(root2.get_app_state().progression.current_level() == 2, "relaunch frontier 2")
+	_ok(root2.get_app_state().progression.current_level() == 11, "relaunch frontier 11")
 	var r = root2.launch_gameplay()
 	_ok(not r["ok"] and r["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "launch refuses: CONTENT_MISSING")
 	_ok(root2.get_gameplay_host() == null, "no gameplay host created for missing content")
@@ -151,7 +158,7 @@ func _frontier_missing_content() -> void:
 	h.app_state = root2.get_app_state()
 	h.auto_build = false
 	root2.add_child(h)
-	_ok(not h.build() and h.get_build_error() == GameplayLaunchResolver.CONTENT_MISSING, "direct host build also fails CONTENT_MISSING (never runs level-1 content as level 2)")
+	_ok(not h.build() and h.get_build_error() == GameplayLaunchResolver.CONTENT_MISSING, "direct host build also fails CONTENT_MISSING (never runs level-1 content as level 11)")
 	_shutdown(root2)
 
 func _durable_action_relaunch() -> void:

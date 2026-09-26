@@ -30,5 +30,6 @@ static func resolve(app_state, catalog = null) -> Dictionary:
 	for e in cat.get_entries_ordered():
 		if int(e.order) == level:
 			return {"ok": true, "level": level, "entry_id": e.id,
-				"level_path": e.level_path, "difficulty": e.difficulty}
+				"level_path": e.level_path, "difficulty": e.difficulty,
+				"supply_plan_path": e.supply_plan_path}
 	return {"ok": false, "reason": CONTENT_MISSING, "level": level}
