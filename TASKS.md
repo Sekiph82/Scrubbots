@@ -15,6 +15,7 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Progress: 744 / 980 = 75.92%. M42 Home visual gates are closed. M52-C001 is active. M42 remains externally open only for Android/iOS opening-cinematic device gates.
 - Note: Owner pack decision: `coordination/OWNER_M52_FIRST_10_LEVEL_PACK_V01.md`. Implementation prompt: `coordination/sessions/M52-C001/task_prompts/SB-M52-C001_FIRST10_LEVEL_PACK.md`. Audit criteria: `coordination/sessions/M52-C001/audit_criteria/SB-M52-C001_FIRST10_LEVEL_PACK.md`. Full-success target is exactly 10 production catalog entries in orders 1..10; partial/blocker truth is preferred over fabricated completion.
 - Owner sequencing lock: stay on the **First 10 Level Pack** until all work tied to Levels 1–10 is finished. This includes M52-C001 implementation/integration, independent audit, any remediation, owner playtest/acceptance, the applicable M53 per-level QA for Levels 1–10, and the applicable M54 content/regression validation needed to prove this ten-level pack stable. Only after that block is fully closed do we resume the main roadmap at **M43 Results Screen**. M43 remains fully open and is intentionally deferred, not skipped.
+- Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1260,6 +1261,31 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 **Gameplay Composition V02 owner amendment [2026-09-19]:** `coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md` is now canonical for gameplay layout. Preserve the owner-supplied baseline screen, integrate full Railroad V1 around the board, show five permanent slot-to-bottom-rail connectors, retain the five-slot + Batch Supply panel, place Pause + 2x side by side top-right, remove gameplay Settings/Heart HUD, and omit the ad banner from the current owner playtest/reference mockup. This is a presentation amendment; accepted historical M28/M29 evidence remains historical and later responsive/polish work must converge to V02.
 
+#### M28-C002 - Gameplay Screen V02 Production Convergence [PLANNED / REQUIRED BEFORE FINAL META-UI INTEGRATION]
+
+Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master visual into the actual shipping gameplay screen. Historical M28 closure remains historical; this sprint closes the later V02 delta without falsifying earlier evidence.
+
+- [ ] SB-M28-C002-001 Build the production Gameplay V02 scene from responsive Godot Controls/Containers plus the approved visual assets; do not ship a flattened screenshot.
+- [ ] SB-M28-C002-002 Bind the real BoardRenderer as the dominant board region with exact aspect preservation for rectangular boards.
+- [ ] SB-M28-C002-003 Render the full four-sided Railroad V1 using the canonical geometry contract and approved production skin.
+- [ ] SB-M28-C002-004 Keep all five slot-to-bottom-rail connectors permanently visible and aligned to exact slot spawn anchors.
+- [ ] SB-M28-C002-005 Render exactly five normal execution slots and support the temporary authoritative sixth slot when +1 Slot is active.
+- [ ] SB-M28-C002-006 Render the current owner-selected Batch Supply presentation with five columns x three visible rows when configured for five columns; preserve support for 3/4/5 columns and hidden deeper queue truth.
+- [ ] SB-M28-C002-007 Keep only supply-front batches interactive; preview rows remain non-interactive and visually distinct.
+- [ ] SB-M28-C002-008 Bind Pause and 2x side by side at top-right with inactive/current-level/timed-countdown states.
+- [ ] SB-M28-C002-009 Bind the selected robot/player profile presentation without reintroducing a gameplay Heart HUD or Settings button.
+- [ ] SB-M28-C002-010 Bind the four canonical booster buttons: +1 Slot / Random / Selector / Tornado.
+- [ ] SB-M28-C002-011 Booster quantity, price, locked/unavailable and selected states remain live Godot UI overlays and are never baked into art.
+- [ ] SB-M28-C002-012 Tapping a booster with no charge routes into the canonical Booster Acquire popup defined by M43-C003 rather than silently failing.
+- [ ] SB-M28-C002-013 Tapping locked/manual 2x without entitlement routes into the canonical 2x Acquire popup defined by M43-C003.
+- [ ] SB-M28-C002-014 Implement the canonical Pause popup entry and deterministic modal stacking rules from M43-C002.
+- [ ] SB-M28-C002-015 Preserve gameplay input isolation while any popup/modal is open; board, supply and booster controls behind it receive no input.
+- [ ] SB-M28-C002-016 Preserve the approved gameplay background, Scrubby/selected-robot support presentation and lower decorative hierarchy without shrinking gameplay-critical controls first.
+- [ ] SB-M28-C002-017 Validate 1080x2160, 1170x2532, 1290x2796, 1080x2400, 1440x3200, short 16:9 portrait and tablet portrait.
+- [ ] SB-M28-C002-018 Validate mouse/touch mapping, rapid taps, popup-open input suppression and temporary sixth-slot readability.
+- [ ] SB-M28-C002-019 Capture owner-review screenshots/video for fresh level, active cleaning, full five-slot state, sixth-slot state, booster popup open, Pause open and timed 2x state.
+- [ ] SB-M28-C002-020 Independent ChatGPT audit plus owner visual/playtest acceptance required before this V02 convergence is closed.
+
 ### M29 — Mobile Touch
 
 - [x] SB-M29-001 Touch selectable supply-front batch activation; five batch slots themselves are not player-selectable placement controls.
@@ -1581,12 +1607,274 @@ V04 implementation prompt: `coordination/sessions/M42-C001/task_prompts/SB-M42-H
 - [ ] SB-M42-032 Validate opening cinematic on Android real device for smooth 720p/30 playback, audio sync, startup latency, orientation, background/foreground behavior and memory cleanup. `[CODE_AUDIT_PASS / DEVICE_OWNER_REQUIRED]`
 - [ ] SB-M42-033 Validate iOS readiness later with the same boot-flow fallback and aspect rules. `[CODE_AUDIT_PASS / IOS_DEVICE_LATER]`
 
-### M43 — Results Screen
+### M43 - Results / Player Experience / Meta UI Surface Program [PLANNED / REQUIRED]
 
-- [ ] SB-M43-001 Result model. — [ ] SB-M43-002 Completion UI.
-- [ ] SB-M43-003 Streak. — [ ] SB-M43-004 Show/apply first-clear difficulty SB + streak SB + Bot Part/Collection rewards through RewardGrantService.
-- [ ] SB-M43-005 Continue. — [ ] SB-M43-006 Replay if approved.
-- [ ] SB-M43-007 No double reward. — [ ] SB-M43-008 Rapid-tap protection.
+**Owner completeness rule:** every player-facing button, HUD `+`, Home shortcut, bottom-navigation destination, gameplay purchase/acquisition action, fail/win state, reward event and feature unlock must terminate in a real implemented screen/popup or an explicitly disabled state. No shipping dead buttons, placeholder pages, invisible economic transactions or "coming later" holes are allowed for V1-required surfaces.
+
+**Canonical visual references already selected:**
+- Life popup: `assets/art/references/_owner_inbox/Additionals/life screens.png`
+- Need a Hand popup: `assets/art/references/_owner_inbox/Additionals/need a hand.png`
+- Level intro popup: `assets/art/references/_owner_inbox/Game Screens/level ekran acilisi.png`
+- Gameplay master: `assets/ui/final/gameplay/master/scrubbots_gameplay_master.png`
+- Home master/World 01 authority remains M42 V07 + owner decisions.
+
+**Visual production rule for every surface below:** create/identify a visual master or canonical reference, inventory required illustration assets, generate only the needed component art, obtain owner visual approval, build the production screen in responsive Godot UI with live text/data, run independent audit, then run owner playtest/visual acceptance. A screen is not complete merely because a service exists.
+
+#### M43-C001 - Results Screen
+
+- [ ] SB-M43-001 Result model.
+- [ ] SB-M43-002 Completion UI.
+- [ ] SB-M43-003 Streak presentation.
+- [ ] SB-M43-004 Show/apply first-clear difficulty SB + streak SB + Bot Part/Collection rewards through RewardGrantService.
+- [ ] SB-M43-005 Continue.
+- [ ] SB-M43-006 Replay if approved; replay never farms progression economy.
+- [ ] SB-M43-007 No double reward.
+- [ ] SB-M43-008 Rapid-tap protection.
+- [ ] SB-M43-009 Produce and owner-approve a canonical Victory/Results visual master consistent with the Life/Help popup family.
+- [ ] SB-M43-010 Reveal first-clear SB, Win Streak bonus, Bot Parts, Gift Meter progress and Collection/Card rewards in a short ordered celebration sequence rather than dumping all rewards silently.
+- [ ] SB-M43-011 Support a compact replay result path that clearly communicates zero progression reward on replay.
+- [ ] SB-M43-012 If a win crosses a Gift Meter milestone, queue/show the milestone celebration without double granting.
+- [ ] SB-M43-013 If the win unlocks a robot, collection set, Master Collection, feature or world, hand off to the corresponding ceremony in M43-C005 after the core Results reward commit succeeds.
+- [ ] SB-M43-014 Results Continue advances exactly once to the next canonical progression level and cannot be double-tapped into duplicate transitions.
+
+#### M43-C002 - Reusable Popup / Modal / Pause Foundation
+
+- [ ] SB-M43-015 Implement reusable `BasePopup` with dim background, responsive frame, header/content/footer slots and canonical close behavior.
+- [ ] SB-M43-016 Implement modal stack authority so exactly one top modal owns input; background Home/gameplay controls are hidden or input-disabled as appropriate.
+- [ ] SB-M43-017 Implement reusable confirm popup for destructive/costly actions.
+- [ ] SB-M43-018 Implement reusable reward/confirmation popup.
+- [ ] SB-M43-019 Implement canonical Pause popup with Resume / Restart / Home and current level context.
+- [ ] SB-M43-020 Restart confirmation must state Heart/streak consequence when gameplay has begun and must use M30/M39 truth rather than UI guesses.
+- [ ] SB-M43-021 Home/exit confirmation must distinguish pre-first-action no-cost exit from post-action loss semantics.
+- [ ] SB-M43-022 Implement generic insufficient-SB route that can open Shop without losing the pending acquisition context.
+- [ ] SB-M43-023 Implement generic network-required/error state for rewarded ad, store, cloud and live-event surfaces.
+- [ ] SB-M43-024 Implement loading/busy state and disable duplicate taps while an external transaction is unresolved.
+- [ ] SB-M43-025 Implement canonical success/failure feedback for purchases, rewarded grants, exchanges and claims.
+- [ ] SB-M43-026 Back/Escape closes the top modal first and never leaks an action into the screen behind it.
+- [ ] SB-M43-027 Modal open/close state survives focus loss/background safely without duplicate callback execution.
+- [ ] SB-M43-028 Produce/approve the popup chrome visual kit and keep normal labels, values, timers and prices live in Godot.
+- [ ] SB-M43-029 Add focused automated tests for modal priority, background input suppression, duplicate callbacks and deterministic close/back behavior.
+
+#### M43-C003 - Life / Hearts / Scrub Bucks / Booster / 2x Acquisition Surfaces
+
+- [ ] SB-M43-030 Implement the canonical Life popup from the selected Life master reference.
+- [ ] SB-M43-031 Life popup shows live Hearts current/max and the real next-Heart wall-clock countdown; timer hides at 5/5.
+- [ ] SB-M43-032 Heart `+` on Home opens Life popup; zero-Heart attempt gate opens the same canonical surface instead of a separate inconsistent dialog.
+- [ ] SB-M43-033 Life popup supports +1 Heart for 500 SB and full refill at 400 SB per missing Heart using HeartService/EconomyWallet atomically.
+- [ ] SB-M43-034 Life popup includes the canonical rewarded-video path for +1 Heart when a rewarded placement is available and policy permits it; ad-unavailable state must degrade cleanly.
+- [ ] SB-M43-035 Rewarded Heart grant is exactly-once per completed verified reward callback; closing/skipping/failing an ad grants nothing.
+- [ ] SB-M43-036 Scrub Bucks `+` on Home opens the canonical Shop / SB acquisition destination and preserves return context.
+- [ ] SB-M43-037 Implement one reusable `BoosterAcquirePopup` driven by booster definition data rather than four duplicated scenes.
+- [ ] SB-M43-038 Booster Acquire popup shows selected booster icon/name, concise effect explanation, owned charges and live SB price.
+- [ ] SB-M43-039 If a booster charge exists, gameplay uses the charge-first Economy V1 rule and does not unnecessarily open purchase UI.
+- [ ] SB-M43-040 With zero charge, +1 Slot offers one-use acquisition at 500 SB or one rewarded-video charge/use when available.
+- [ ] SB-M43-041 With zero charge, Random offers one-use acquisition at 350 SB or one rewarded-video charge/use when available.
+- [ ] SB-M43-042 With zero charge, Selector offers one-use acquisition at 500 SB or one rewarded-video charge/use when available.
+- [ ] SB-M43-043 With zero charge, Tornado offers one-use acquisition at 750 SB or one rewarded-video charge/use when available.
+- [ ] SB-M43-044 A rewarded booster grant must never bypass solver-safety/availability checks; if the booster cannot legally execute, do not consume the newly granted use until the player can use it.
+- [ ] SB-M43-045 Implement canonical 2x Acquire popup for current level 200 SB / 15m 300 SB / 30m 500 SB / 60m 750 SB.
+- [ ] SB-M43-046 2x popup shows existing entitlement/time remaining and never charges again for switching 1x/2x while entitlement is active.
+- [ ] SB-M43-047 Free M23-supply-exhausted auto-2x never opens purchase UI and never consumes/extends paid entitlement.
+- [ ] SB-M43-048 All acquisition surfaces survive insufficient balance, rapid taps, background/resume, ad unavailable and transaction retry without double spend/grant.
+- [ ] SB-M43-049 Produce/owner-approve visual masters for Booster Acquire, 2x Acquire and insufficient-SB/Shop handoff states in the canonical popup family.
+
+#### M43-C004 - Fail / Retry / Need a Hand Recovery
+
+- [ ] SB-M43-050 Produce/owner-approve a canonical Fail/Retry popup visual master.
+- [ ] SB-M43-051 Track consecutive failed attempts per current progression level separately from lifetime stats; replay failures do not pollute progression assistance.
+- [ ] SB-M43-052 Winning the level or changing progression level resets the same-level assistance counter.
+- [ ] SB-M43-053 After the third consecutive failed attempt on the same progression level, show the canonical Need a Hand? popup after failure resolution and Heart/streak accounting.
+- [ ] SB-M43-054 Need a Hand? uses the owner-selected `need a hand.png` as art-direction authority but is implemented with live Godot text/buttons/data.
+- [ ] SB-M43-055 Need a Hand? presents exactly two helpful booster recommendations, not an arbitrary storefront.
+- [ ] SB-M43-056 Recommendation engine must prefer boosters that are legal/useful for the level/current canonical start-state and must never recommend an unavailable/meaningless action.
+- [ ] SB-M43-057 Where solver/context evidence cannot distinguish a best pair safely, use a deterministic owner-configured fallback pair rather than fake intelligence.
+- [ ] SB-M43-058 Each recommended booster can be acquired with its canonical SB cost or a rewarded-video grant when available.
+- [ ] SB-M43-059 Closing Need a Hand? never spends currency, consumes a Heart, grants a booster or changes puzzle truth.
+- [ ] SB-M43-060 Assistance popup frequency after the initial third failure is configurable and must avoid appearing after every tap/instant retry in an annoying loop.
+- [ ] SB-M43-061 Record assistance shown/acquired/declined locally and later expose analytics events under M56 without changing gameplay difficulty behind the player's back.
+- [ ] SB-M43-062 Test third-failure trigger, reset-on-win, reset-on-level-change, ad/SB acquisition, no-double-grant and unavailable-booster fallback.
+
+#### M43-C005 - Reward, Pack, Collection, Robot, Feature and World Ceremonies
+
+- [ ] SB-M43-063 Implement reusable short reward-reveal sequencing with skip/fast-forward only where it cannot skip authoritative grant commits.
+- [ ] SB-M43-064 Implement Standard Card Pack opening presentation for 3 draws with rarity reveal and duplicate/new distinction.
+- [ ] SB-M43-065 Implement Premium Card Pack opening presentation for 5 draws including guaranteed Rare-or-better truth from the pack service.
+- [ ] SB-M43-066 Pack contents are committed before/atomically with presentation and reopening the reveal never duplicates cards.
+- [ ] SB-M43-067 Implement first-new-card celebration and clear duplicate-count presentation.
+- [ ] SB-M43-068 Implement Collection set 9/9 completion ceremony with the exact per-set SB/Bot Part reward.
+- [ ] SB-M43-069 Implement Master Collection completion ceremony for +2500 SB +20 Bot Parts exactly once.
+- [ ] SB-M43-070 Implement Robot Unlock ceremony with canonical robot art, name, personality/perk summary and remaining Bot Parts carryover.
+- [ ] SB-M43-071 Robot unlock ceremony allows selecting/equipping the unlocked robot or continuing with the current robot.
+- [ ] SB-M43-072 Implement feature-unlock ceremony/coachmark used when a new meta system becomes available through M44 feature-unlock pacing.
+- [ ] SB-M43-073 Implement World unlock/transition ceremony once world-range rules are owner-defined; never invent ranges in UI.
+- [ ] SB-M43-074 Implement Gift Meter milestone celebration for 10/50/250/500/1000 with exact queued reward truth.
+- [ ] SB-M43-075 Implement Daily cycle reward celebration and 3/3 Tasks booster-completion celebration.
+- [ ] SB-M43-076 Produce/owner-approve visual masters for pack opening, robot unlock, set completion, Master Collection, Gift milestone and generic feature/world unlock.
+- [ ] SB-M43-077 Meta reward ceremonies respect Reduced Effects and can collapse to concise accessible presentation without changing grants.
+
+#### M43-C006 - Shop / Store / Currency Destination
+
+- [ ] SB-M43-078 Implement a real Shop destination opened by the Home SHOP shortcut and Scrub Bucks `+`.
+- [ ] SB-M43-079 Produce/owner-approve a Shop visual master before final production binding.
+- [ ] SB-M43-080 Shop V1 surface groups Hearts, boosters, 2x products and later real-money/SB acquisition without inventing a second premium currency.
+- [ ] SB-M43-081 No Ads entry belongs to Shop, not Home, and remains gated by M57 product definition.
+- [ ] SB-M43-082 Shop shows live wallet/Heart/booster/entitlement state and never displays baked prices or stale quantities.
+- [ ] SB-M43-083 Soft-currency purchases route through existing authoritative services; UI never mutates balances directly.
+- [ ] SB-M43-084 Real-money product cards, localized cash prices, restore purchases and receipt state are bound only after M57 authorizes products/provider.
+- [ ] SB-M43-085 Implement purchase confirmation where platform policy/product risk requires it and clear pending state on failure/cancel.
+- [ ] SB-M43-086 Preserve exact return context when Shop was opened because a player lacked SB for a booster/Heart/2x action.
+- [ ] SB-M43-087 Implement sold/unavailable/offline/loading/error states without dead buttons.
+- [ ] SB-M43-088 Test rapid taps, insufficient SB, provider cancel/failure, restore, background/resume and idempotent fulfillment.
+- [ ] SB-M43-089 Shop visual/audio feedback must not imitate guaranteed rewards for uncompleted purchases.
+
+#### M43-C007 - Collection / Cards Exchange Destination
+
+- [ ] SB-M43-090 Implement Collection main screen for all 15 canonical sets x 9 cards = 135 cards.
+- [ ] SB-M43-091 Produce/owner-approve Collection album visual master using existing canonical card art.
+- [ ] SB-M43-092 Show set progress N/9, completed state and exact set-completion reward without hiding rarity burden.
+- [ ] SB-M43-093 Implement set detail page with 9 card slots, rarity, owned/new/duplicate state and protected first-copy semantics.
+- [ ] SB-M43-094 Implement card detail popup with full art, name/rarity, owned count and exchangeable extra count.
+- [ ] SB-M43-095 Cards Exchange is a Collection-owned flow, not a Home shortcut.
+- [ ] SB-M43-096 Implement per-card duplicate exchange and EXCHANGE ALL EXTRAS with atomic confirmation and protected-copy floor of 1.
+- [ ] SB-M43-097 Show live exchange SB values Common 25 / Rare 75 / Epic 200 / Legendary 500.
+- [ ] SB-M43-098 Add Standard/Premium pack inventory/open entry and route opening to M43-C005.
+- [ ] SB-M43-099 Completed-set and Master Collection reward history/status must be visible enough to prevent confusion without enabling duplicate grants.
+- [ ] SB-M43-100 Collection supports locked/future set presentation without leaking nonexistent cards or fake progress.
+- [ ] SB-M43-101 Validate 135-card performance, scrolling, touch targets, localization, duplicate-heavy inventories and completion transitions.
+
+#### M43-C008 - Robots Destination
+
+- [ ] SB-M43-102 Implement ROBOTS bottom-nav destination for the canonical 10-robot roster.
+- [ ] SB-M43-103 Produce/owner-approve Robots screen visual master using the existing robot asset family.
+- [ ] SB-M43-104 Show unlocked/locked state, canonical order, Bot Parts N/250 toward next unlock and overflow.
+- [ ] SB-M43-105 Show each robot's canonical 20% meta perk clearly without implying puzzle-solvability power.
+- [ ] SB-M43-106 Allow selecting/equipping any unlocked robot and persist active robot.
+- [ ] SB-M43-107 Locked robot detail shows required Bot Parts and preview/perk; Bot Parts cannot be bought with SB or real money in V1.
+- [ ] SB-M43-108 Active robot selection updates Home/gameplay/profile/support/victory presentation using the approved per-robot asset family.
+- [ ] SB-M43-109 Robot selection must never mutate BoardState, TargetSelector, routing, solver or batch legality.
+- [ ] SB-M43-110 Implement robot unlock history/NEW badge clearing without repeated ceremonies.
+- [ ] SB-M43-111 Validate all 10 robots at mobile scale and fall back safely if a presentation asset is missing rather than corrupting gameplay.
+
+#### M43-C009 - Tasks / Daily / Gift Bar Destinations
+
+- [ ] SB-M43-112 Implement TASKS Home destination showing exactly three daily tasks, progress and individual 75/100/125 SB rewards.
+- [ ] SB-M43-113 Produce/owner-approve Tasks visual master.
+- [ ] SB-M43-114 Claim state is exactly-once and 3/3 completion grants one random Booster Charge exactly once.
+- [ ] SB-M43-115 Implement final DAILY destination/popup with visible consecutive-login count and repeating 5-day reward cycle.
+- [ ] SB-M43-116 Produce/owner-approve final Daily visual master and reward-state variants.
+- [ ] SB-M43-117 Daily shows claimed/today/future-day states, current consecutive days and canonical D1-D5 rewards.
+- [ ] SB-M43-118 Implement Gift Bar claim/history surface for queued Gift Meter milestones.
+- [ ] SB-M43-119 Produce/owner-approve Gift Bar visual master and milestone reward cards.
+- [ ] SB-M43-120 Gift Bar claim/history never feeds Gift Meter recursively and never re-grants claimed milestones.
+- [ ] SB-M43-121 Test local-day rollover, missed-day reset, clock rollback, all-3 Tasks completion, Gift rollover and duplicate taps.
+
+#### M43-C010 - Bottom Navigation / Profile / Achievements / Events / Ranks
+
+- [ ] SB-M43-122 BottomNav destinations are real: EVENTS / ROBOTS / HOME / RANKS / SETTINGS. No shipping dead tab.
+- [ ] SB-M43-123 Preserve M41 Settings as the canonical Settings destination and do not duplicate Settings behavior.
+- [ ] SB-M43-124 Add player Profile entry from the Home/profile card with active robot, campaign level, key lifetime stats, Collection completion and achievement summary.
+- [ ] SB-M43-125 Produce/owner-approve Profile visual master.
+- [ ] SB-M43-126 Implement an Achievements framework and screen with data-driven achievement definitions, progress, completed state and cosmetic/reward policy separated from gameplay truth.
+- [ ] SB-M43-127 Produce/owner-approve Achievements visual master before broad achievement-content production.
+- [ ] SB-M43-128 Define and implement EVENTS destination without Event Points or a new event currency; use existing SB/Bot Parts/Card Packs/Booster rewards unless a later owner decision adds something.
+- [ ] SB-M43-129 Events support event list/home, detail, countdown, participation/progress, reward summary, ended/claimed state and offline/unavailable state.
+- [ ] SB-M43-130 Produce/owner-approve Events visual master and at least one reusable event card/detail family.
+- [ ] SB-M43-131 Define RANKS scoring/ranking policy in an owner decision before implementation; never invent a pay-to-win ranking metric.
+- [ ] SB-M43-132 Implement RANKS destination with season/window label, player placement, surrounding ranks, top ranks, loading/offline/empty states and privacy-safe display identity.
+- [ ] SB-M43-133 Produce/owner-approve Ranks visual master before production binding.
+- [ ] SB-M43-134 Home/BottomNav badge system supports Tasks ready, Daily ready, Gift claimable, Robot unlock/new, Collection new, Event active/reward and other approved attention states without notification spam.
+
+#### M43-C011 - World Progression / World Home System
+
+- [ ] SB-M43-135 Preserve World 01 Whispering Park as current default complete 1080x2160 Home background.
+- [ ] SB-M43-136 Define owner-approved campaign level ranges / completion conditions for future worlds before any hardcoded range exists.
+- [ ] SB-M43-137 Implement data-driven world registry mapping world ID to background, title/area semantics, unlock condition and optional world reward.
+- [ ] SB-M43-138 Produce/owner-approve one complete visual master/background for every shipping world before activation.
+- [ ] SB-M43-139 Implement locked/current/completed world states and deterministic transition after qualifying progression.
+- [ ] SB-M43-140 Implement world-unlock ceremony via M43-C005.
+- [ ] SB-M43-141 Home world selection/automatic current-world presentation must never desynchronize from progression truth.
+- [ ] SB-M43-142 Future world art remains decorative/meta presentation and cannot change level solver/difficulty truth.
+
+#### M43-C012 - Comeback / Notifications / Return-to-Game Experience
+
+- [ ] SB-M43-143 Implement a non-punitive comeback surface for players returning after a configurable long absence, summarizing ready Hearts/Daily/Event/Gift/Tasks state without fabricating rewards.
+- [ ] SB-M43-144 Comeback flow may highlight existing claimable rewards but cannot mint an unapproved "welcome back" reward silently.
+- [ ] SB-M43-145 Design opt-in push-notification categories: Hearts full/ready, Daily available, Event ending, claimable reward and other owner-approved reminders.
+- [ ] SB-M43-146 Request notification permission contextually, not on first frame, and explain the benefit before the OS prompt where platform policy permits.
+- [ ] SB-M43-147 Implement per-category toggles plus global notification control and quiet-hours/local-time awareness.
+- [ ] SB-M43-148 Notifications deep-link only to valid in-app destinations and fail safely to Home when content is stale.
+- [ ] SB-M43-149 Never send notification spam for every Heart tick, every failed attempt or repeated unclaimed badge.
+- [ ] SB-M43-150 Produce/approve any comeback/notification-permission illustration needed; keep system permission UI native.
+- [ ] SB-M43-151 Test timezone changes, missed days, expired events, disabled permissions and stale deep links.
+
+#### M43-C013 - Account / Cloud Save / Cross-Device Recovery
+
+- [ ] SB-M43-152 Keep local save authoritative/offline-capable even when account/cloud features are unavailable.
+- [ ] SB-M43-153 Define optional account/sign-in provider strategy in an owner/platform decision before adding SDKs.
+- [ ] SB-M43-154 Implement cloud-save schema/versioning compatible with M40 and preserve idempotent economy transaction IDs.
+- [ ] SB-M43-155 Implement explicit cloud conflict resolution using revision/timestamp/progression/economy safety rules; never silently duplicate currency/rewards.
+- [ ] SB-M43-156 Implement sign-in, signed-out, syncing, synced, conflict, error and offline states.
+- [ ] SB-M43-157 Implement restore-on-new-device flow and verify Collection/robots/booster/entitlement/Daily state integrity.
+- [ ] SB-M43-158 Platform purchase restore remains tied to M57/store authority and must reconcile with cloud/local save idempotently.
+- [ ] SB-M43-159 Produce/owner-approve only the minimal account/cloud screens needed; do not replace platform-native sign-in consent UI.
+- [ ] SB-M43-160 Add destructive account/sign-out/reset confirmations and privacy-data entry points as required by M58.
+
+#### M43-C014 - Meta UI Audio / Haptics / Offline / Error Language
+
+- [ ] SB-M43-161 Define a compact meta-UI audio family for button confirm/back, popup open/close, reward reveal, pack reveal, robot unlock and error; reuse where pleasant rather than create noisy per-screen sounds.
+- [ ] SB-M43-162 Define haptic moments for success, warning, pack rare reveal and unlock while respecting Haptics OFF and Reduced Effects.
+- [ ] SB-M43-163 Meta UI must obey Master/Music/SFX/Haptics settings immediately.
+- [ ] SB-M43-164 No purchase/ad/error sound may falsely imply success before an authoritative callback.
+- [ ] SB-M43-165 Implement consistent offline/error language and retry affordances for Shop, ads, cloud, Events, Ranks and notifications/deep links.
+- [ ] SB-M43-166 Implement graceful empty states for no events, no rankings result, no exchangeable duplicates, no claimable gifts and no tasks ready.
+- [ ] SB-M43-167 Validate meta audio/haptic fatigue in repeated menu/claim/open/close loops.
+- [ ] SB-M43-168 Owner acceptance required for the final cross-screen sound/haptic feel.
+
+#### M43-C015 - Player-Facing Surface Visual Inventory Gate
+
+Before M43 program closure, the following surfaces must each have a canonical visual master/reference, production scene, responsive validation, independent audit and owner acceptance where visually material:
+
+1. Gameplay V02.
+2. Pause.
+3. Level Intro.
+4. Victory / Results.
+5. Fail / Retry.
+6. Life / Heart refill.
+7. Need a Hand.
+8. Booster Acquire.
+9. 2x Acquire.
+10. Insufficient SB / purchase handoff.
+11. Shop.
+12. Collection album.
+13. Collection set detail.
+14. Card detail.
+15. Cards Exchange.
+16. Standard Pack opening.
+17. Premium Pack opening.
+18. Collection-set completion.
+19. Master Collection completion.
+20. Robots main.
+21. Robot detail/locked.
+22. Robot unlock.
+23. Tasks.
+24. Daily.
+25. Gift Bar.
+26. Gift Meter milestone.
+27. Profile.
+28. Achievements.
+29. Events main/list.
+30. Event detail/reward.
+31. Ranks.
+32. Comeback/return summary.
+33. Feature unlock/coachmark.
+34. World unlock/transition.
+35. Account/cloud sync/conflict where custom UI is needed.
+36. Generic reward/confirmation.
+37. Generic error/offline/loading.
+38. Notification education/settings where custom UI is needed.
+
+- [ ] SB-M43-169 Create `assets/ui/PLAYER_EXPERIENCE_ASSET_MANIFEST.json` covering every surface above and all generated illustration components.
+- [ ] SB-M43-170 No M43 program closure while any required surface is missing, visually unreviewed, wired to dummy data or reachable only through debug tooling.
 
 **Shared later-screen visual production rules**
 - [ ] SB-UI-017 Implement reusable `BasePopup` composition.
@@ -1595,9 +1883,30 @@ V04 implementation prompt: `coordination/sessions/M42-C001/task_prompts/SB-M42-H
 - [ ] SB-UI-020 Do not pre-generate speculative asset libraries for unknown future states.
 - [ ] SB-UI-021 Treat final visual polish as consolidation/QA, not first production-art implementation.
 
-### M44 — Tutorial `[DESIGN GATE]`
+### M44 - Tutorial / FTUE / Feature Unlock Pacing [DESIGN + IMPLEMENTATION REQUIRED]
 
-Teach five-slot interaction, color matching, Scrubbot flow, no-work behavior if needed. Keep tutorial logic separate from core gameplay.
+Purpose: teach the real production game progressively and prevent the first session from exposing every meta system at once. Feature unlocks are presentation/access pacing only; they do not rewrite already-earned authoritative state.
+
+- [ ] SB-M44-001 Define the complete first-time user experience from cold launch through the first 10 progression levels.
+- [ ] SB-M44-002 Level 1 teaches only the minimum real core loop needed to make a legal supply-front selection and observe Scrubbot cleaning.
+- [ ] SB-M44-003 Teach five execution slots and automatic rightmost-empty placement through play, not a detached rules wall.
+- [ ] SB-M44-004 Teach preview rows/front-only interaction at the first point the distinction matters.
+- [ ] SB-M44-005 Teach WAITING/no-current-target behavior only when the player first encounters it, using contextual coachmark/highlight.
+- [ ] SB-M44-006 Teach win/fail/Retry and Heart consequence at first relevant occurrence.
+- [ ] SB-M44-007 Introduce the four boosters progressively; do not unlock/show all acquisition prompts in the opening minute.
+- [ ] SB-M44-008 Teach +1 Slot, Random, Selector and Tornado using real mechanics and solver-safe tutorial fixtures/states.
+- [ ] SB-M44-009 Introduce 2x only after the player understands normal-speed cleaning; explain paid manual entitlement vs free automatic endgame 2x without clutter.
+- [ ] SB-M44-010 Define owner-approved feature-unlock order/campaign points for Hearts, booster acquisition, Daily, Tasks, Collection, Card Packs, Robots, Gift Meter/Gift Bar, Shop, Events, Ranks, Achievements and any later system.
+- [ ] SB-M44-011 Do not invent exact unlock level numbers until the owner approves the pacing table; store unlocks data-driven once approved.
+- [ ] SB-M44-012 Feature-unlock ceremony uses M43-C005 and is shown at most once per feature/version.
+- [ ] SB-M44-013 Newly unlocked Home shortcut/Nav destination may show a NEW badge until first visit; badge clearing persists.
+- [ ] SB-M44-014 Tutorial can be skipped/replayed only according to an owner decision and must never duplicate rewards or economy grants.
+- [ ] SB-M44-015 Returning existing users after a version adds a feature receive a concise "What's New / feature unlocked" path rather than being forced through beginner tutorial.
+- [ ] SB-M44-016 Tutorial overlays pause or gate only presentation/input needed for the lesson; they never inject illegal board/supply state.
+- [ ] SB-M44-017 All tutorial copy is localization-ready and essential cues are not color-only.
+- [ ] SB-M44-018 Produce/owner-approve tutorial coachmark/highlight visual language and any Scrubby/robot teaching poses actually required.
+- [ ] SB-M44-019 Validate tutorial on fresh-save, interrupted/resumed, app-backgrounded, skipped/replayed and migrated-save paths.
+- [ ] SB-M44-020 Owner playtest the complete first-session funnel and revise friction before M44 closes.
 
 ### M45 — Debug Tooling
 
@@ -1664,6 +1973,12 @@ Maximum board target: 59×59 = 3,481.
 - [ ] SB-M49-024 Add automated/manual responsive validation evidence.
 - [ ] SB-M49-025 Validate temporary sixth-slot (+1 booster) layout/touch/readability across the full viewport matrix.
 
+#### M49 Player-Experience Responsive Expansion
+- [ ] SB-M49-026 Validate every M43/M44 screen/popup in the complete Player-Facing Surface Visual Inventory across the full viewport matrix.
+- [ ] SB-M49-027 Validate long prices, timers, event/rank labels, card/robot names and reward bundles without clipping.
+- [ ] SB-M49-028 Validate modal stacks, keyboard/back navigation and scrollable Collection/Shop/Events/Robots screens on compact and tall devices.
+- [ ] SB-M49-029 Validate rewarded-ad/store return transitions and platform overlays do not corrupt safe-area layout.
+- [ ] SB-M49-030 Validate notification deep links and account/cloud conflict screens enter a safe responsive destination.
 ### M50 — Accessibility
 
 - [ ] SB-M50-001 Review color-only information.
@@ -1676,6 +1991,12 @@ Maximum board target: 59×59 = 3,481.
 - [ ] SB-M50-010 Ensure generated icon families distinguishable at mobile size.
 - [ ] SB-M50-011 Ensure essential gameplay understandable without decoration.
 
+#### M50 Player-Experience Accessibility Expansion
+- [ ] SB-M50-012 All M43/M44 screens support readable text scale, contrast, focus order and non-color-only state cues.
+- [ ] SB-M50-013 Reward/pack/unlock ceremonies have Reduced Effects alternatives without hiding reward truth.
+- [ ] SB-M50-014 Video/ad acquisition has an accessible non-video paid/earned path where product policy permits and never traps navigation.
+- [ ] SB-M50-015 Event/rank/card rarity/robot-lock states have icon/text cues in addition to color.
+- [ ] SB-M50-016 Screen-reader/accessibility-label strategy is defined for interactive controls before release.
 ### M51 — Localization Readiness
 
 - [ ] SB-M51-001 Avoid hard-coded user text.
@@ -1683,6 +2004,11 @@ Maximum board target: 59×59 = 3,481.
 - [ ] SB-M51-003 Longer-string layouts. — [ ] SB-M51-004 Pseudo-localization.
 - [ ] SB-M51-005 Actual languages decided later. `[DESIGN GATE]`
 
+#### M51 Player-Experience Localization Expansion
+- [ ] SB-M51-006 Localize every M43/M44 surface including popup titles, booster descriptions, shop products, errors, notifications, event/rank labels and achievement copy.
+- [ ] SB-M51-007 Prices supplied by platform stores remain platform-localized and are never hand-formatted as fixed currency strings.
+- [ ] SB-M51-008 Validate pluralization for Hearts, Bot Parts, cards, days, attempts, ranks and time remaining.
+- [ ] SB-M51-009 Pseudo-localize the complete Player-Facing Surface Visual Inventory before final visual closure.
 ### M52 — Production Content Scale-Up `[CONTENT]`
 
 - [ ] SB-M52-001 Import first Easy art. — [ ] SB-M52-002 Import first Medium art.
@@ -1724,6 +2050,18 @@ Every production level:
 - [ ] SB-M54-020 Random/Selector solver-safety and no-consume-on-failure regression.
 - [ ] SB-M54-021 Tornado cross-engine conservation/rollback/no-ghost regression.
 
+#### M54 Player-Experience / Meta Regression Expansion
+- [ ] SB-M54-022 Results/fail/retry/Need-a-Hand third-failure regression.
+- [ ] SB-M54-023 Heart/SB/booster/2x popup spend-grant-idempotency regression.
+- [ ] SB-M54-024 Rewarded-ad callback success/cancel/fail/duplicate/background regression with provider mocked.
+- [ ] SB-M54-025 Shop return-context and insufficient-SB regression.
+- [ ] SB-M54-026 Card pack opening, duplicate/new card, Collection completion and Master Collection ceremony regression.
+- [ ] SB-M54-027 Robot unlock/equip/perk persistence regression.
+- [ ] SB-M54-028 Tasks/Daily/Gift Bar/notification-badge regression.
+- [ ] SB-M54-029 BottomNav Events/Robots/Home/Ranks/Settings transition and modal-stack regression.
+- [ ] SB-M54-030 Feature-unlock/FTUE migration and once-only coachmark regression.
+- [ ] SB-M54-031 Cloud/account sync/conflict/restore regression once provider exists.
+- [ ] SB-M54-032 World registry/unlock/transition regression once future world ranges are owner-defined.
 ### M55 — Chaos / Long-Run QA `[QA]`
 
 - [ ] SB-M55-001 Spam all five slots.
@@ -1742,23 +2080,79 @@ Every production level:
 - [ ] SB-M55-016 Tornado while matching-color agents are in flight; prove atomic reconciliation.
 - [ ] SB-M55-017 Cards Exchange-all under repeated taps; prove protected first copies and no duplicate SB grant.
 
-### M56 — Analytics `[DESIGN GATE]`
+#### M55 Player-Experience Chaos Expansion
+- [ ] SB-M55-018 Spam open/close/purchase/reward buttons across every popup without double transition/spend/grant.
+- [ ] SB-M55-019 Background/foreground during rewarded ad, store purchase, pack reveal, robot unlock and cloud sync.
+- [ ] SB-M55-020 Lose three times rapidly with restart/exit mixtures and prove Need a Hand trigger remains correct.
+- [ ] SB-M55-021 Repeatedly switch BottomNav destinations while badges/rewards update; prove no orphan UI/signals.
+- [ ] SB-M55-022 Open huge duplicate-card inventories and Collection lists repeatedly; monitor memory growth.
+- [ ] SB-M55-023 Expire Events/timed 2x/Heart timers while relevant screens are open and prove safe refresh.
+- [ ] SB-M55-024 Simulate offline/online flapping during Shop/Events/Ranks/cloud/rewarded-ad surfaces without data corruption.
+### M56 - Analytics / Retention Calibration [DESIGN GATE -> REQUIRED BEFORE PRODUCTION TUNING]
 
-No analytics SDK without owner approval.
+No analytics SDK without owner approval. Event contracts may be designed and locally tested before choosing a provider. Analytics must support product calibration, not covert profiling.
 
-### M57 — Real-Money Monetization `[DESIGN GATE]`
+- [ ] SB-M56-001 Define privacy-minimized analytics event taxonomy and version it.
+- [ ] SB-M56-002 Session events: app/session start/end, foreground/background, session duration bucket.
+- [ ] SB-M56-003 Level funnel: level start, first action, win/fail/exit/restart, attempt number, duration, failure progress bucket and difficulty/session-load metadata version.
+- [ ] SB-M56-004 Retention calibration: first-attempt clear, attempts-to-clear, retry latency, abandonment after level and recovery-level performance.
+- [ ] SB-M56-005 Assistance: Need a Hand shown/declined, recommended booster IDs, acquisition path and later clear outcome.
+- [ ] SB-M56-006 Booster: charge/SB/rewarded acquisition path, activation success/fail-closed reason and level context without raw board/player-identifying data.
+- [ ] SB-M56-007 Economy: aggregate SB source/sink categories, Heart starvation/refill, 2x product use, Cards Exchange and Gift/Daily reward categories.
+- [ ] SB-M56-008 Collection/robots: pack opened, new-vs-duplicate counts, set completion, Master Collection, robot unlock/equip.
+- [ ] SB-M56-009 Navigation: Home shortcut/BottomNav destination open, Shop entry reason and major screen completion/error states.
+- [ ] SB-M56-010 Ads/store: offer, request, show, complete, skip/cancel, fail and verified reward/purchase fulfillment using provider-safe transaction identifiers.
+- [ ] SB-M56-011 Events/Ranks: participation, completion/claim and rank-window engagement once their owner rules exist.
+- [ ] SB-M56-012 Notifications: permission state/category opt-in, send/open/deep-link result only after privacy/platform review.
+- [ ] SB-M56-013 Define dashboard metrics for D1/D7/D30 retention, level drop-off, fail-progress distribution, help conversion, booster reliance, Heart starvation and session length.
+- [ ] SB-M56-014 Analytics events never grant rewards, alter difficulty, change solver truth or become a required dependency for offline gameplay.
+- [ ] SB-M56-015 Define consent/age/privacy gating with M58 before production provider activation.
+- [ ] SB-M56-016 Add analytics schema tests, duplicate-event guards where important and provider-offline fail-safe behavior.
 
-Economy V1 soft-currency/Hearts/booster/2x rules are already owner-locked and are NOT this gate.
-Do NOT automatically add real-money IAP, paid SB packs, rewarded ads, subscriptions, paid random packs or any additional energy currency. Owner decides real-money business model separately.
+### M57 - Monetization / Rewarded Ads / Store Products [OWNER-LOCKED SCOPE, IMPLEMENTATION GATED BY PROVIDER DECISION]
 
-### M58 — Privacy & Compliance
+Economy V1 soft-currency/Hearts/booster/2x rules are already owner-locked. The owner has additionally required rewarded-video acquisition surfaces for Hearts and boosters. Provider choice, cash prices, ad frequency/cooldowns and regional availability remain tuning/provider decisions and must be data-driven.
+
+- [ ] SB-M57-001 Choose/approve rewarded-ad and IAP provider/platform architecture; no SDK before owner approval.
+- [ ] SB-M57-002 Define rewarded-ad placement IDs separately for Heart +1, booster acquisition and any later approved placement.
+- [ ] SB-M57-003 Rewarded Heart path grants exactly +1 Heart after a verified completed reward callback only.
+- [ ] SB-M57-004 Rewarded +1 Slot path grants exactly one canonical charge/use entitlement after verified completion.
+- [ ] SB-M57-005 Rewarded Random path grants exactly one canonical charge/use entitlement after verified completion.
+- [ ] SB-M57-006 Rewarded Selector path grants exactly one canonical charge/use entitlement after verified completion.
+- [ ] SB-M57-007 Rewarded Tornado path grants exactly one canonical charge/use entitlement after verified completion.
+- [ ] SB-M57-008 Need a Hand recommendations reuse the same rewarded acquisition authority; they do not create hidden extra reward rules.
+- [ ] SB-M57-009 Configure per-placement availability/frequency/cooldown/cap server-side or versioned data after owner tuning; never bury hardcoded ad pressure inside popup code.
+- [ ] SB-M57-010 Ad unavailable/loading/fail/skip states grant nothing and always leave a usable non-broken UI.
+- [ ] SB-M57-011 App background/kill/relaunch during an ad cannot duplicate a reward.
+- [ ] SB-M57-012 Define Scrub Bucks real-money packs, localized store product IDs and value ladder in an owner decision before publishing cash prices.
+- [ ] SB-M57-013 Define No Ads product and exactly which ad surfaces it removes; rewarded ads requested voluntarily by the player must follow the owner-approved No Ads policy.
+- [ ] SB-M57-014 Implement purchase request, pending, success, cancel, failure, restore and already-owned states.
+- [ ] SB-M57-015 Fulfillment is idempotent by platform transaction/receipt identity and persists across relaunch.
+- [ ] SB-M57-016 Restore purchases and account/cloud reconciliation cannot duplicate SB/entitlements.
+- [ ] SB-M57-017 No paid random card pack/gacha is authorized without a new explicit owner decision and platform/compliance review.
+- [ ] SB-M57-018 No second premium currency is authorized.
+- [ ] SB-M57-019 Do not dynamically make levels harder because a player purchases, watches ads or refuses ads.
+- [ ] SB-M57-020 Do not block basic navigation/Settings/Collection/Robots behind ads.
+- [ ] SB-M57-021 All real-money and ad surfaces use the M43 visual/acquisition family and M50 accessibility rules.
+- [ ] SB-M57-022 Test sandbox purchases/rewarded ads on real Android and later iOS devices before release.
+
+### M58 - Privacy / Compliance / Consent
 
 Once external services exist:
-- [ ] SB-M58-001 Third-party inventory. — [ ] SB-M58-002 Data inventory.
+- [ ] SB-M58-001 Third-party inventory.
+- [ ] SB-M58-002 Data inventory.
 - [ ] SB-M58-003 Remove unnecessary collection.
-- [ ] SB-M58-004 Privacy disclosures. — [ ] SB-M58-005 Store declarations.
+- [ ] SB-M58-004 Privacy disclosures.
+- [ ] SB-M58-005 Store declarations.
 - [ ] SB-M58-006 Age-rating review.
 - [ ] SB-M58-007 Child-directed considerations if applicable.
+- [ ] SB-M58-008 Analytics consent/legal-basis strategy by region/provider.
+- [ ] SB-M58-009 Personalized/non-personalized ad consent flow where required; gameplay remains usable when personalized consent is refused.
+- [ ] SB-M58-010 Notification permission/settings and deep-link privacy review.
+- [ ] SB-M58-011 Account/cloud data deletion/export/sign-out requirements and recovery policy.
+- [ ] SB-M58-012 Leaderboard/profile display-name privacy, reporting/blocking needs and minors policy before Ranks/social exposure.
+- [ ] SB-M58-013 Purchase receipt/transaction identifier retention policy and least-data principle.
+- [ ] SB-M58-014 Verify all consent/error/privacy screens are localization-ready and accessible.
 
 ### M59 — Build Pipeline
 
@@ -1773,6 +2167,27 @@ Once external services exist:
 Application ID, icon, splash, portrait config, signing, release settings,
 debug removal, store screenshots, final QA, tagged source commit, release
 artifact validation. **Never commit signing secrets.**
+
+Release readiness additionally requires:
+- [ ] SB-M60-001 No dead Home shortcut, HUD `+`, BottomNav destination, gameplay booster, 2x control or required popup route.
+- [ ] SB-M60-002 Required V1 M43 Player-Facing Surface Visual Inventory is owner-approved and production-bound.
+- [ ] SB-M60-003 FTUE/feature-unlock path is playable from a fresh save without debug intervention.
+- [ ] SB-M60-004 Shop/ad/IAP surfaces either function with approved providers or are cleanly feature-disabled with no broken navigation.
+- [ ] SB-M60-005 Events/Ranks shipping policy is explicit; if enabled, live backend/content and privacy requirements are proven.
+- [ ] SB-M60-006 Release build passes full M49-M58 player-experience, economy, device, compliance and regression gates.
+
+### M61 - Friends / Social Comparison [POST-LAUNCH REQUIRED ROADMAP, NO CHAT/CLANS/BATTLE PASS BY DEFAULT]
+
+This closes the previously identified social gap without expanding V1 into a chat/clan product. It is planned for a later release after account/privacy/ranks foundations are stable.
+
+- [ ] SB-M61-001 Define owner-approved Friends scope and identity model.
+- [ ] SB-M61-002 Friend add/invite/discovery policy with privacy-safe identifiers and no unsolicited contact exposure.
+- [ ] SB-M61-003 Friends list with online-agnostic progress summary and active robot/avatar presentation.
+- [ ] SB-M61-004 Optional friend progress/rank comparison using the same fair Ranks metric; no pay-to-win multiplier.
+- [ ] SB-M61-005 Define whether lightweight friend gifts/challenges exist before implementing; do not invent transferable premium value.
+- [ ] SB-M61-006 Block/report/remove-friend and minors/privacy rules before production.
+- [ ] SB-M61-007 Produce/owner-approve Friends visual master if/when the feature enters implementation.
+- [ ] SB-M61-008 No global chat, clan/guild system or battle pass is implied by this milestone; each would require a separate explicit owner decision.
 
 ---
 
