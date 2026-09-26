@@ -68,7 +68,9 @@ func _home_shell_tree() -> void:
 	var act_names: Array = []
 	for c in home.get_region("HomeActionLayer").get_children():
 		act_names.append(String(c.name))
-	_ok(act_names == ["WorldMargin", "PlayButton", "WinStreakRewardTrack", "BottomNav"], "V04 HomeActionLayer: panels, centred PLAY, track, nav %s" % str(act_names))
+	for c in home.get_region("BottomActionStack").get_children():
+		act_names.append(String(c.name))
+	_ok(act_names == ["WorldMargin", "BottomActionStack", "PlayButton", "WinStreakRewardTrack", "BottomNav"], "V05 HomeActionLayer: panels + bottom stack (PLAY, track, nav) %s" % str(act_names))
 	var world_names: Array = []
 	for c in home.get_region("MainWorldArea").get_children():
 		world_names.append(String(c.name))

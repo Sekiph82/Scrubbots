@@ -1,7 +1,10 @@
 extends SceneTree
 ## M42 Home REBUILD V04 — single world background evidence
 ## (coordination/OWNER_M42_HOME_REBUILD_V04_SINGLE_WORLD_BACKGROUND.md). Expected /
-## completed case ledger (AL-091).
+## completed case ledger (AL-091). Kept as the V04-invariant suite after owner polish V05
+## (coordination/OWNER_M42_HOME_POLISH_V05.md): the assertions V05 deliberately changes
+## (Scrubby +15% beyond the V04 safe box, panel glass alpha, (+) overlapping its pill,
+## ad reservation 96..160) are updated here; V05 specifics live in m42_home_v05.gd.
 ##
 ## Run: godot --headless --path . -s res://tests/m42_home_v04.gd
 
@@ -171,8 +174,9 @@ func _anchor(home) -> void:
 	_ok(absf(c["center_x"] - 540.0) < 0.01 and absf(c["feet_y"] - 1297.0) < 0.01, "visible centre X = 540, visible soles Y = 1297 (%.2f, %.2f)" % [c["center_x"], c["feet_y"]])
 	var vr: Rect2 = c["visible_rect"]
 	var box: Rect2 = w["scrubby_safe_box"]
-	_ok(vr.position.x >= box.position.x - 0.01 and vr.end.x <= box.end.x + 0.01 and vr.position.y >= box.position.y - 0.01, "visible Scrubby inside the safe box horizontally and from the top (%s)" % str(vr))
-	_ok(vr.end.y - 1297.0 <= 6.0, "only the brush bristles reach below the soles line (%.1f px)" % (vr.end.y - 1297.0))
+	var v04_vis := Rect2(Vector2(540.0 - box.size.x * 0.5, 1297.0 - (1318.0 - 7.0) * c["k_v04"]), Vector2(box.size.x, 1327.0 * c["k_v04"]))
+	_ok(v04_vis.position.x >= box.position.x - 0.01 and v04_vis.end.x <= box.end.x + 0.01 and v04_vis.position.y >= box.position.y - 0.01, "the V04 base fit stays inside the safe box (V05 enlarges it about the soles)")
+	_ok(vr.end.y - 1297.0 <= 7.0, "only the brush bristles reach below the soles line (%.1f px)" % (vr.end.y - 1297.0))
 	_ok(HomeScreenScript.SCRUBBY_FEET_Y == 1318.0 and HomeScreenScript.SCRUBBY_VISIBLE_BBOX == Rect2(27, 7, 1130, 1327), "documented HOME-026 visible-feet offset (soles at 1318 of 1358; visible bbox 27,7 1130x1327)")
 	var sc: TextureRect = home.get_region("Art_scrubby")
 	var feet_screen: Vector2 = home.world_to_screen(Vector2(540, 1297))
@@ -237,12 +241,12 @@ func _panel_style(home) -> void:
 		var b: Button = home.get_region("Shortcut_" + id)
 		sizes[b.size] = true
 		var sb := b.get_theme_stylebox("normal") as StyleBoxFlat
-		alpha_ok = alpha_ok and sb != null and sb.bg_color.a <= 0.35 and sb.border_width_left <= 3
+		alpha_ok = alpha_ok and sb != null and sb.bg_color.a >= 0.40 and sb.bg_color.a <= 0.48 and sb.border_width_left >= 2 and sb.border_width_left <= 3
 		var r: Rect2 = b.get_global_rect()
 		margin_ok = margin_ok and r.position.x >= 20.0 and vp.x - r.end.x >= 20.0
 	_ok(sizes.size() == 1, "one panel size system for all four (%s)" % str(sizes.keys()))
 	_ok(sizes.keys()[0].x <= 226.0 and sizes.keys()[0].y < 220.0, "panels smaller than V03 cards (226 x 220)")
-	_ok(alpha_ok, "near-transparent tinted body (alpha <= 0.35) with thin outline")
+	_ok(alpha_ok, "V05 translucent glass body (alpha 0.40..0.48) with 2-3 px outline")
 	_ok(margin_ok, "visible outer margin from the screen edges (>= 20 px)")
 	var sc: Rect2 = home.get_region("Art_scrubby").get_global_rect()
 	var c: Dictionary = home.get_scrubby_canonical()
@@ -311,7 +315,7 @@ func _currency(home) -> void:
 		b.pressed.emit()
 	_ok(got == ["sb", "hearts"] and app.economy.snapshot() == before, "(+) buttons emit intents only; economy untouched")
 	var sb_line: Rect2 = home.get_region("ScrubBucksChip").get_global_rect()
-	_ok(home.get_region("ScrubBucksPlus").get_global_rect().position.x >= sb_line.end.x, "(+) on the right of its chip")
+	_ok(home.get_region("ScrubBucksPlus").get_global_rect().get_center().x > sb_line.end.x - 1.0, "(+) attached on the right end of its pill")
 	_complete("currency_hud")
 
 func _gift_track(home) -> void:
@@ -340,7 +344,7 @@ func _nav_ad(home) -> void:
 	var track: Control = home.get_region("WinStreakRewardTrack")
 	var vp: Vector2 = home.get_viewport_rect().size
 	_ok(track.get_global_rect().end.y <= nav.get_global_rect().position.y and nav.get_global_rect().end.y <= ad.get_global_rect().position.y + 0.5, "order: track -> nav -> ad slot")
-	_ok(absf(ad.get_global_rect().end.y - vp.y) < 1.0 and ad.size.y >= 100.0, "ad slot is the screen-bottom element (%.0f px tall)" % ad.size.y)
+	_ok(absf(ad.get_global_rect().end.y - vp.y) < 1.0 and ad.size.y >= 96.0 and ad.size.y <= 160.0, "ad slot is the screen-bottom element (%.0f px tall)" % ad.size.y)
 	_ok(home.get_ad_mount() != null and home.get_ad_mount().get_parent() == ad and home.get_ad_mount().get_child_count() == 0, "empty AdMount seam (no fake ad content)")
 	var labels := ad.find_children("*", "Label", true, false)
 	_ok(labels.is_empty(), "no fake ad text")
@@ -433,7 +437,9 @@ func _matrix() -> void:
 			if absf(wb.size.x / wb.size.y - 0.5) > 0.001:
 				bad.append("world_stretched")
 			var canvas: Rect2 = home.get_region("Background").get_global_rect()
-			var covered := wb.position.y <= canvas.position.y + 0.5 and wb.end.y >= canvas.end.y - 0.5
+			# V05: the world is locked to its V04 transform; the ad-slot clip may sit lower
+			# than the image bottom only behind the opaque nav dock.
+			var covered: bool = wb.position.y <= canvas.position.y + 0.5 and wb.end.y >= home.get_region("BottomNav").get_global_rect().position.y - 0.5
 			if not covered:
 				bad.append("world_not_covering_canvas")
 			var play: Rect2 = home.get_region("PlayButton").get_global_rect()

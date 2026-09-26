@@ -55,12 +55,13 @@ static func style_card_button(b: Button) -> void:
 	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	_text_colors(b)
 
-## V04 light shortcut panel: near-transparent tint, thin cyan outline + soft glow; the
-## label sits in the bottom band (content_margin_top pushes it down).
-static func style_light_panel(b: Button, label_top: int) -> void:
+## Home shortcut glass panel (V04; V05 owner alpha 0.40-0.48 + 2-3 px outline): dark
+## navy/cyan translucent tint, cyan outline + soft glow; the label sits in the bottom band
+## (content_margin_top pushes it down). Disabled (future) panels keep the same body.
+static func style_light_panel(b: Button, label_top: int, alpha_normal: float = 0.30, border: int = 2) -> void:
 	for st in ["normal", "hover", "pressed", "disabled"]:
-		var alpha := 0.30 if st == "normal" else (0.42 if st == "hover" else (0.50 if st == "pressed" else 0.24))
-		var s := box(Color(0.035, 0.125, 0.330, alpha), Color(0.560, 0.890, 1.0, 0.85 if st != "disabled" else 0.55), 2, 24, 0)
+		var alpha := alpha_normal if st == "normal" or st == "disabled" else (alpha_normal + 0.10 if st == "hover" else alpha_normal + 0.16)
+		var s := box(Color(0.030, 0.105, 0.290, alpha), Color(0.500, 0.870, 1.0, 0.90 if st != "disabled" else 0.80), border, 24, 0)
 		s.shadow_color = Color(0.25, 0.75, 1.0, 0.28)
 		s.shadow_size = 8
 		s.shadow_offset = Vector2.ZERO
