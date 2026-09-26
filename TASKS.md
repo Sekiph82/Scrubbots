@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M42 HOME POLISH V07
-- Current Sprint: M42-C001 Desktop Safe-Area Fix
-- Current Task: Remove false Windows taskbar-derived bottom safe-area without changing V06 Home
-- Current Task Status: IMPLEMENTATION_REQUIRED
-- Next Task/Action: CLAUDE executes `coordination/sessions/M42-C001/task_prompts/SB-M42-HOME-POLISH_V07.md`. V07 must change only the shared SafeAreaRoot platform policy so desktop runtimes use zero runtime safe-area margins while Android/iOS keep real DisplayServer safe-area handling and synthetic test insets remain authoritative. V06 Home geometry stays frozen, including the 100px@1080 / 72..112 AdBannerSlot rule.
-- Required Actor: CLAUDE
+- Current Milestone: M42 OWNER VISUAL / DEVICE GATES
+- Current Sprint: M42-C001 V07 Post-Audit Closure
+- Current Task: Owner visual acceptance of final V07 Home
+- Current Task Status: OWNER_VISUAL_ACCEPTANCE_REQUIRED
+- Next Task/Action: OWNER confirms whether the current V07 Home is visually accepted. V07 independently passes: Windows desktop safe-area margins are zero, the real 683×1366 window uses a 1080×2160 logical canvas with a 100-logical-pixel AdBannerSlot, and the owner-supplied screenshot measures approximately 62 physical pixels for the bottom dark band, matching the expected ~63 px after scaling. If OWNER says OK, ChatGPT closes SB-M42-011 and SB-M42-017. SB-M42-032 Android real-device cinematic validation and SB-M42-033 iOS-later remain separate device gates.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011/SB-M42-017 remain open for V07 audit and final owner runtime visual review.
-- Note: The owner screenshot exposed a Windows embedded-debug presentation bug: desktop work-area/taskbar delta was being interpreted as a mobile bottom safe inset, visually doubling the dark ad region. `coordination/OWNER_M42_HOME_POLISH_V07_DESKTOP_SAFE_AREA.md` authorizes only this platform-safe-area fix. Current open M42 rows remain 011, 017, 032, 033.
+- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011/SB-M42-017 are independently code-audited under V07 and wait only on explicit owner visual acceptance.
+- Note: V07 implementation `632bc2e` passed independent audit at `coordination/sessions/M42-C001/audits/SB-M42-HOME-POLISH_V07_CHATGPT_AUDIT_V01.md`. The Windows taskbar/work-area delta no longer inflates Home's bottom safe-area. HOME-120 and all V06 Home geometry remain unchanged. Current open M42 rows remain 011, 017, 032, 033.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
