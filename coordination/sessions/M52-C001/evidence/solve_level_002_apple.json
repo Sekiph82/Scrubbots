@@ -1,0 +1,144 @@
+{
+	"levelSha256": "f0cf2a00898582979e9078a00ce2d0935030bc67ba7d7295360cea40ca889486",
+	"solverAuthority": {
+		"baseSeed": 1,
+		"columnCount": 3,
+		"gate": "res://scripts/gameplay/solver/generation_gate.gd",
+		"maxAttempts": 1,
+		"maxDepth": 400,
+		"maxVisited": 200000,
+		"previewDepthSemantics": "player-facing visible rows only; total FIFO depth per column is not capped",
+		"runtimeSupplyAuthority": "res://scripts/gameplay/runtime/production_gameplay_host.gd",
+		"slotCapacity": 5,
+		"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+		"visiblePreviewDepth": 3
+	},
+	"solve": {
+		"acceptedAttempt": 0.0,
+		"acceptedSeed": 1.0,
+		"conservationOk": true,
+		"decisions": 16.0,
+		"fullQueueConsumed": true,
+		"hiddenBatchesBeyondVisibleRows": [
+			3.0,
+			2.0,
+			2.0
+		],
+		"proofStateHoldsFullQueue": true,
+		"proofStateQueueLengths": [
+			6.0,
+			5.0,
+			5.0
+		],
+		"queueLayout": [
+			[
+				{
+					"batchId": "B00000",
+					"colorIndex": 0.0,
+					"robots": 148.0
+				},
+				{
+					"batchId": "B00003",
+					"colorIndex": 2.0,
+					"robots": 107.0
+				},
+				{
+					"batchId": "B00006",
+					"colorIndex": 2.0,
+					"robots": 106.0
+				},
+				{
+					"batchId": "B00009",
+					"colorIndex": 3.0,
+					"robots": 12.0
+				},
+				{
+					"batchId": "B00012",
+					"colorIndex": 3.0,
+					"robots": 11.0
+				},
+				{
+					"batchId": "B00015",
+					"colorIndex": 4.0,
+					"robots": 5.0
+				}
+			],
+			[
+				{
+					"batchId": "B00001",
+					"colorIndex": 0.0,
+					"robots": 148.0
+				},
+				{
+					"batchId": "B00004",
+					"colorIndex": 2.0,
+					"robots": 107.0
+				},
+				{
+					"batchId": "B00007",
+					"colorIndex": 2.0,
+					"robots": 106.0
+				},
+				{
+					"batchId": "B00010",
+					"colorIndex": 3.0,
+					"robots": 11.0
+				},
+				{
+					"batchId": "B00013",
+					"colorIndex": 3.0,
+					"robots": 11.0
+				}
+			],
+			[
+				{
+					"batchId": "B00002",
+					"colorIndex": 1.0,
+					"robots": 23.0
+				},
+				{
+					"batchId": "B00005",
+					"colorIndex": 2.0,
+					"robots": 107.0
+				},
+				{
+					"batchId": "B00008",
+					"colorIndex": 2.0,
+					"robots": 106.0
+				},
+				{
+					"batchId": "B00011",
+					"colorIndex": 3.0,
+					"robots": 11.0
+				},
+				{
+					"batchId": "B00014",
+					"colorIndex": 4.0,
+					"robots": 5.0
+				}
+			]
+		],
+		"queueLengths": [
+			6.0,
+			5.0,
+			5.0
+		],
+		"replaySolved": true,
+		"replaySteps": 16.0,
+		"runtimeSeedMatchesAccepted": true,
+		"solverAttempts": [
+			{
+				"attempt": 0.0,
+				"conservationOk": true,
+				"effectiveSeed": 1.0,
+				"outcome": "SOLVED",
+				"visited": 17.0
+			}
+		],
+		"solverStatus": "SOLVED",
+		"totalBatches": 16.0,
+		"traceHash": 2919019324.0,
+		"traceSummary": "c0:C0#148/0clr|c0:C2#107/107clr|c0:C2#106/254clr|c0:C3#12/12clr|c0:C3#11/10clr|c0:C4#5/0clr|c1:C0#148/154clr|c1:C2#107/107clr|c1:C2#106/106clr|c1:C3#11/11clr|c1:C3#11/11clr|c2:C1#23/23clr|c2:C2#107/107clr|c2:C2#106/106clr|c2:C3#11/11clr|c2:C4#5/5clr",
+		"visitedStates": 17.0
+	}
+}

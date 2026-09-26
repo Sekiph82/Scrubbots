@@ -1,0 +1,35 @@
+{
+	"builderVersion": "M21-C001/v1",
+	"cellCount": 1024,
+	"cellReferenceCounts": {
+		"C01": 296,
+		"C04": 23,
+		"C08": 639,
+		"C11": 56,
+		"C12": 10
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C08",
+		"C11",
+		"C04",
+		"C01",
+		"C12"
+	],
+	"height": 32,
+	"normalizedColorOrder": [
+		"C01",
+		"C04",
+		"C08",
+		"C11",
+		"C12"
+	],
+	"outputPath": "res://data/levels/level_002_apple.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_002_apple.png",
+	"sourceGitBlobSha1": "f696d8b1e17712098e860945785d4a00c79139c0",
+	"sourcePath": "res://assets/art/levels/source/easy/level_002_apple_32x32.png",
+	"sourceSha256": "b1dd3b414738cf0557cf9baabb5d3a12208df3c3a57d3ab3184e990df1dcf580",
+	"usedColorCount": 5,
+	"width": 32
+}

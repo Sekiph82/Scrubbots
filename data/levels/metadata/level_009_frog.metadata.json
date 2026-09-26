@@ -1,0 +1,41 @@
+{
+	"builderVersion": "M21-C001/v1",
+	"cellCount": 1024,
+	"cellReferenceCounts": {
+		"C06": 15,
+		"C07": 318,
+		"C08": 497,
+		"C12": 40,
+		"C13": 12,
+		"C15": 2,
+		"C16": 140
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C08",
+		"C16",
+		"C07",
+		"C06",
+		"C12",
+		"C15",
+		"C13"
+	],
+	"height": 32,
+	"normalizedColorOrder": [
+		"C06",
+		"C07",
+		"C08",
+		"C12",
+		"C13",
+		"C15",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_009_frog.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_009_frog.png",
+	"sourceGitBlobSha1": "14cc86e7a7eb60cc7426dd4e0cbc166d6bb01e76",
+	"sourcePath": "res://assets/art/levels/source/easy/level_009_frog_32x32.png",
+	"sourceSha256": "b0bd1638961cd69e64f2bd174df117d3c75520be0804a114362efc96663d036f",
+	"usedColorCount": 7,
+	"width": 32
+}

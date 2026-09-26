@@ -1,0 +1,209 @@
+{
+	"levelSha256": "22aa7df9e837e1403f672fea0efc988ce8222840f9a9c24a3f943685525ca762",
+	"solverAuthority": {
+		"baseSeed": 1,
+		"columnCount": 3,
+		"gate": "res://scripts/gameplay/solver/generation_gate.gd",
+		"maxAttempts": 1,
+		"maxDepth": 400,
+		"maxVisited": 200000,
+		"previewDepthSemantics": "player-facing visible rows only; total FIFO depth per column is not capped",
+		"runtimeSupplyAuthority": "res://scripts/gameplay/runtime/production_gameplay_host.gd",
+		"slotCapacity": 5,
+		"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+		"visiblePreviewDepth": 3
+	},
+	"solve": {
+		"acceptedAttempt": 0.0,
+		"acceptedSeed": 1.0,
+		"conservationOk": true,
+		"decisions": 29.0,
+		"fullQueueConsumed": true,
+		"hiddenBatchesBeyondVisibleRows": [
+			7.0,
+			7.0,
+			6.0
+		],
+		"proofStateHoldsFullQueue": true,
+		"proofStateQueueLengths": [
+			10.0,
+			10.0,
+			9.0
+		],
+		"queueLayout": [
+			[
+				{
+					"batchId": "B00000",
+					"colorIndex": 0.0,
+					"robots": 6.0
+				},
+				{
+					"batchId": "B00003",
+					"colorIndex": 1.0,
+					"robots": 1.0
+				},
+				{
+					"batchId": "B00006",
+					"colorIndex": 2.0,
+					"robots": 7.0
+				},
+				{
+					"batchId": "B00009",
+					"colorIndex": 2.0,
+					"robots": 7.0
+				},
+				{
+					"batchId": "B00012",
+					"colorIndex": 3.0,
+					"robots": 141.0
+				},
+				{
+					"batchId": "B00015",
+					"colorIndex": 3.0,
+					"robots": 140.0
+				},
+				{
+					"batchId": "B00018",
+					"colorIndex": 4.0,
+					"robots": 29.0
+				},
+				{
+					"batchId": "B00021",
+					"colorIndex": 6.0,
+					"robots": 12.0
+				},
+				{
+					"batchId": "B00024",
+					"colorIndex": 6.0,
+					"robots": 12.0
+				},
+				{
+					"batchId": "B00027",
+					"colorIndex": 7.0,
+					"robots": 1.0
+				}
+			],
+			[
+				{
+					"batchId": "B00001",
+					"colorIndex": 0.0,
+					"robots": 6.0
+				},
+				{
+					"batchId": "B00004",
+					"colorIndex": 1.0,
+					"robots": 1.0
+				},
+				{
+					"batchId": "B00007",
+					"colorIndex": 2.0,
+					"robots": 7.0
+				},
+				{
+					"batchId": "B00010",
+					"colorIndex": 2.0,
+					"robots": 7.0
+				},
+				{
+					"batchId": "B00013",
+					"colorIndex": 3.0,
+					"robots": 141.0
+				},
+				{
+					"batchId": "B00016",
+					"colorIndex": 3.0,
+					"robots": 140.0
+				},
+				{
+					"batchId": "B00019",
+					"colorIndex": 5.0,
+					"robots": 67.0
+				},
+				{
+					"batchId": "B00022",
+					"colorIndex": 6.0,
+					"robots": 12.0
+				},
+				{
+					"batchId": "B00025",
+					"colorIndex": 6.0,
+					"robots": 12.0
+				},
+				{
+					"batchId": "B00028",
+					"colorIndex": 7.0,
+					"robots": 1.0
+				}
+			],
+			[
+				{
+					"batchId": "B00002",
+					"colorIndex": 1.0,
+					"robots": 2.0
+				},
+				{
+					"batchId": "B00005",
+					"colorIndex": 1.0,
+					"robots": 1.0
+				},
+				{
+					"batchId": "B00008",
+					"colorIndex": 2.0,
+					"robots": 7.0
+				},
+				{
+					"batchId": "B00011",
+					"colorIndex": 2.0,
+					"robots": 6.0
+				},
+				{
+					"batchId": "B00014",
+					"colorIndex": 3.0,
+					"robots": 140.0
+				},
+				{
+					"batchId": "B00017",
+					"colorIndex": 4.0,
+					"robots": 29.0
+				},
+				{
+					"batchId": "B00020",
+					"colorIndex": 5.0,
+					"robots": 66.0
+				},
+				{
+					"batchId": "B00023",
+					"colorIndex": 6.0,
+					"robots": 12.0
+				},
+				{
+					"batchId": "B00026",
+					"colorIndex": 6.0,
+					"robots": 11.0
+				}
+			]
+		],
+		"queueLengths": [
+			10.0,
+			10.0,
+			9.0
+		],
+		"replaySolved": true,
+		"replaySteps": 29.0,
+		"runtimeSeedMatchesAccepted": true,
+		"solverAttempts": [
+			{
+				"attempt": 0.0,
+				"conservationOk": true,
+				"effectiveSeed": 1.0,
+				"outcome": "SOLVED",
+				"visited": 30.0
+			}
+		],
+		"solverStatus": "SOLVED",
+		"totalBatches": 29.0,
+		"traceHash": 84831996.0,
+		"traceSummary": "c0:C0#6/0clr|c0:C1#1/0clr|c0:C2#7/0clr|c0:C2#7/0clr|c0:C3#141/141clr|c0:C3#140/140clr|c0:C4#29/44clr|c0:C6#12/12clr|c0:C6#12/12clr|c0:C7#1/1clr|c1:C0#6/0clr|c1:C1#1/1clr|c1:C2#7/3clr|c1:C2#7/0clr|c1:C3#141/141clr|c1:C3#140/151clr|c1:C5#67/78clr|c1:C6#12/13clr|c1:C6#12/12clr|c1:C7#1/0clr|c2:C1#2/2clr|c2:C1#1/1clr|c2:C2#7/7clr|c2:C2#6/1clr|c2:C3#140/140clr|c2:C4#29/22clr|c2:C5#66/79clr|c2:C6#12/12clr|c2:C6#11/11clr",
+		"visitedStates": 30.0
+	}
+}

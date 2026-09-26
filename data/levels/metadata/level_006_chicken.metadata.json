@@ -1,0 +1,44 @@
+{
+	"builderVersion": "M21-C001/v1",
+	"cellCount": 1024,
+	"cellReferenceCounts": {
+		"C01": 12,
+		"C02": 5,
+		"C03": 41,
+		"C08": 702,
+		"C11": 58,
+		"C12": 133,
+		"C14": 71,
+		"C16": 2
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C08",
+		"C14",
+		"C01",
+		"C11",
+		"C12",
+		"C03",
+		"C16",
+		"C02"
+	],
+	"height": 32,
+	"normalizedColorOrder": [
+		"C01",
+		"C02",
+		"C03",
+		"C08",
+		"C11",
+		"C12",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_006_chicken.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_006_chicken.png",
+	"sourceGitBlobSha1": "ed403914d5694dca753a8adeb63041dbabbe81f1",
+	"sourcePath": "res://assets/art/levels/source/easy/level_006_chicken_32x32.png",
+	"sourceSha256": "9e15e570a7b8d5a31f4cd0eb37e4f6e48e18e71f66b7c56e08510738412ff790",
+	"usedColorCount": 8,
+	"width": 32
+}

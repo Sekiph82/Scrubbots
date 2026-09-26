@@ -122,13 +122,16 @@ static func run_import(request: ImportRequest) -> ImportResult:
 	var w := img.get_width()
 	var h := img.get_height()
 
-	# --- validate dimensions against difficulty band ---
+	# --- validate dimensions against the production envelope ---
+	# Difficulty V1 (owner decision 2026-09-12, migrated M52-C001): class is NOT
+	# derived from dimensions, so a production import is gated by the 20..59
+	# per-dimension envelope only — the same rule as ProductionLevelValidator.
+	# The retired class=dimension bands stay only in DifficultyRules' legacy seam.
 	if DifficultyRules.is_production_difficulty(request.difficulty):
-		if not DifficultyRules.is_within_band(request.difficulty, w, h):
-			var band = DifficultyRules.get_band(request.difficulty)
+		if not DifficultyRules.is_within_production_envelope(w, h):
 			result.add_error(
-				"Source dimensions %dx%d outside %s band (%d..%d)" % [
-					w, h, request.difficulty, band.min, band.max])
+				"Source dimensions %dx%d outside production envelope (%d..%d per dimension)" % [
+					w, h, DifficultyRules.ENVELOPE_MIN, DifficultyRules.ENVELOPE_MAX])
 			return result
 
 	# --- extract palette and cells (deterministic first-seen row-major) ---

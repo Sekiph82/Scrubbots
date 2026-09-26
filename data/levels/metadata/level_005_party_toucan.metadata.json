@@ -1,0 +1,50 @@
+{
+	"builderVersion": "M21-C001/v1",
+	"cellCount": 1089,
+	"cellReferenceCounts": {
+		"C01": 7,
+		"C02": 26,
+		"C03": 106,
+		"C06": 9,
+		"C07": 8,
+		"C08": 611,
+		"C10": 15,
+		"C11": 52,
+		"C14": 78,
+		"C16": 177
+	},
+	"difficulty": "HARD",
+	"firstSeenColorOrder": [
+		"C08",
+		"C16",
+		"C03",
+		"C11",
+		"C10",
+		"C06",
+		"C02",
+		"C07",
+		"C14",
+		"C01"
+	],
+	"height": 33,
+	"normalizedColorOrder": [
+		"C01",
+		"C02",
+		"C03",
+		"C06",
+		"C07",
+		"C08",
+		"C10",
+		"C11",
+		"C14",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_005_party_toucan.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_005_party_toucan.png",
+	"sourceGitBlobSha1": "db6654ddfe764e8eeefd03df1243c602e54bf4e8",
+	"sourcePath": "res://assets/art/levels/source/hard/level_005_party_toucan_33x33.png",
+	"sourceSha256": "c95c0fd4021bb90eacd78dbc2279809f26fe0ed435cca260881ee6961eb9874f",
+	"usedColorCount": 10,
+	"width": 33
+}
