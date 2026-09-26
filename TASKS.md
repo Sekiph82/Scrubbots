@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M42 OWNER VISUAL / DEVICE GATES
-- Current Sprint: M42-C001 V04 Post-Audit Closure
-- Current Task: Owner visual review of rebuilt World 01 Home
-- Current Task Status: OWNER_VISUAL_REVIEW_REQUIRED
-- Next Task/Action: OWNER pulls current `main`, runs the game, and supplies a fresh normal Home screenshot for V04 visual acceptance. Review should focus on the single baked World 01 composition, Scrubby feet/platform alignment, 2+2 shortcut placement, profile portrait/frame anchoring, standalone Play, reward track, currency/Heart HUD and the AdBannerSlot below BottomNav. If visually accepted, ChatGPT can close SB-M42-011 and SB-M42-017. SB-M42-032 Android real-device cinematic validation and SB-M42-033 iOS-later remain separate device gates.
-- Required Actor: OWNER
+- Current Milestone: M42 HOME POLISH V05
+- Current Sprint: M42-C001 HUD Polish + Bottom Reflow
+- Current Task: Implement owner V05 Home polish without moving World 01
+- Current Task Status: IMPLEMENTATION_REQUIRED
+- Next Task/Action: CLAUDE executes `coordination/sessions/M42-C001/task_prompts/SB-M42-HOME-POLISH_V05.md`. V05 keeps HOME-120 placement locked, enlarges Scrubby from the same feet anchor, makes the four shortcut panels visibly translucent, rebuilds Scrub Bucks/Hearts, Gift Meter and Win Streak toward the master mobile-game HUD style, reduces AdBannerSlot to the owner-marked banner height, and bottom-anchors PLAY -> Win Streak -> BottomNav -> AdBannerSlot so Play/track/nav move downward while the background stays fixed. Then hand back for ChatGPT audit and owner screenshot review.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011/SB-M42-017 are independently code-audited under V04 and wait only on owner visual review.
-- Note: V04 implementation `a8b953e` passed independent audit at `coordination/sessions/M42-C001/audits/SB-M42-HOME-REBUILD_V04_CHATGPT_AUDIT_V01.md`. Exact World 01 source/final bytes are verified (1080x2160, SHA-256 `8e04eda668aabd9f96172c0e82fd7dd47e61083cb691402a313120443a525e5b`, identical Git blob `208795e92533844065110a644ecf2c87184aca82`). Presentation accounting covers all 51 approved ART entries; 83-point ledger is complete at 70 FIXED / 11 PRESERVED_CURRENT / 2 DEFERRED_BY_OWNER_ARCHITECTURE / 0 BLOCKED. Current open M42 rows remain 011, 017, 032, 033.
+- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011/SB-M42-017 are reopened for V05 polish and final owner visual review.
+- Note: V04 remains the canonical single-world-background architecture and passed independent audit. `coordination/OWNER_M42_HOME_POLISH_V05.md` supersedes only HUD styling, Scrubby scale and lower-stack/ad geometry. World 01 bytes and current placement are owner-locked for V05. Current open M42 rows remain 011, 017, 032, 033.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
