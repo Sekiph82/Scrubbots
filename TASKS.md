@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M42 OWNER VISUAL / DEVICE GATES
-- Current Sprint: M42-C001 V05 Post-Audit Closure
-- Current Task: Owner visual review of V05 Home polish
-- Current Task Status: OWNER_VISUAL_REVIEW_REQUIRED
-- Next Task/Action: OWNER pulls current `main`, runs the game, and supplies a fresh normal Home screenshot for V05 visual acceptance. Review should focus on the locked World 01 placement, larger Scrubby with unchanged feet anchor, visible translucent 4-panel treatment, master-style Scrub Bucks/Hearts chips, rebuilt Gift Meter, rebuilt Win Streak rail, shorter ad slot, and the lowered PLAY -> track -> BottomNav stack. If visually accepted, ChatGPT can close SB-M42-011 and SB-M42-017. SB-M42-032 Android real-device cinematic validation and SB-M42-033 iOS-later remain separate device gates.
-- Required Actor: OWNER
+- Current Milestone: M42 HOME POLISH V06
+- Current Sprint: M42-C001 Final Hero/HUD Polish
+- Current Task: Implement owner V06 final Home polish
+- Current Task Status: IMPLEMENTATION_REQUIRED
+- Next Task/Action: CLAUDE executes `coordination/sessions/M42-C001/task_prompts/SB-M42-HOME-POLISH_V06.md`. V06 keeps HOME-120, Gift Meter, Win Streak, Play, BottomNav and profile architecture locked; reduces AdBannerSlot to ~100 px and lowers the bottom stack, enlarges Scrubby to ~1.24x from the same feet anchor with a dark focus-separation layer behind him, raises shortcut-panel opacity slightly, thins the SB/Heart pills by ~20%, moves the new white/navy/cyan plus glyph inside the pills, and changes canonical Heart regen from 30 minutes to 15 minutes with live 15:00 wall-clock countdown behavior. Then hand back for ChatGPT audit and final owner screenshot review.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011/SB-M42-017 are independently code-audited under V05 and now wait only on owner visual review.
-- Note: V05 implementation `6d1708a` passed independent audit at `coordination/sessions/M42-C001/audits/SB-M42-HOME-POLISH_V05_CHATGPT_AUDIT_V01.md`. HOME-120 remained byte-identical and transform-locked to V04 across the full viewport/inset matrix; Scrubby is 1.15x from the same (540,1297) feet anchor; panel glass, HUD chips, Gift Meter, reward rail, 144 px canonical ad slot and bottom-stack reflow are covered by focused V05 tests. Current open M42 rows remain 011, 017, 032, 033.
+- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011/SB-M42-017 are reopened for the final V06 polish and owner visual review.
+- Note: V05 passed independent code audit. `coordination/OWNER_M42_HOME_POLISH_V06.md` supersedes V05 only for ad-slot height, Scrubby focus/scale, panel opacity, currency/Heart pill geometry, plus-glyph presentation and Heart regeneration timing. Gift Meter and Win Streak are explicitly locked with no V06 changes. Current open M42 rows remain 011, 017, 032, 033.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
