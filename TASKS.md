@@ -14,7 +14,7 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 - Tracking Branch: main
 - Progress: 744 / 980 = 75.92%. M42 Home visual gates are closed. M52-C001 is active. M42 remains externally open only for Android/iOS opening-cinematic device gates.
 - Note: Owner pack decision: `coordination/OWNER_M52_FIRST_10_LEVEL_PACK_V01.md`. Implementation prompt: `coordination/sessions/M52-C001/task_prompts/SB-M52-C001_FIRST10_LEVEL_PACK.md`. Audit criteria: `coordination/sessions/M52-C001/audit_criteria/SB-M52-C001_FIRST10_LEVEL_PACK.md`. Full-success target is exactly 10 production catalog entries in orders 1..10; partial/blocker truth is preferred over fabricated completion.
-- Sequencing correction: M52-C001 is an owner-requested content sprint running in parallel with the main milestone order. After M52-C001 implementation + ChatGPT audit/owner gate, resume the main roadmap at **M43 Results Screen** before moving to M53/M54. M43 is still fully open and was not skipped or closed.
+- Owner sequencing lock: stay on the **First 10 Level Pack** until all work tied to Levels 1–10 is finished. This includes M52-C001 implementation/integration, independent audit, any remediation, owner playtest/acceptance, the applicable M53 per-level QA for Levels 1–10, and the applicable M54 content/regression validation needed to prove this ten-level pack stable. Only after that block is fully closed do we resume the main roadmap at **M43 Results Screen**. M43 remains fully open and is intentionally deferred, not skipped.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
