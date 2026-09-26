@@ -3,9 +3,9 @@
 Date: 2026-09-26
 Repository: Sekiph82/Scrubbots
 Scope: M52-C001 / Level 002 Apple
-Status: OWNER-SPECIFIED CANDIDATE / SOLVER VERIFICATION REQUIRED
+Status: SUPERSEDED — DO NOT USE
 
-## Purpose
+## SUPERSEDED NOTICE\n\nThis V01 file contains incorrect Apple pixel/color totals and MUST NOT be used for implementation or solver proof. Use `LEVEL_002_APPLE_SUPPLY_BATCH_CANDIDATE_V02.md` instead.\n\n## Purpose
 
 Use this exact supply/batch layout as the **first candidate** for Level 002 Apple.
 
