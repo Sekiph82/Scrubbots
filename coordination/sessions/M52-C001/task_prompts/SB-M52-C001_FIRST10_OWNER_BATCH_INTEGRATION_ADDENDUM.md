@@ -38,10 +38,10 @@ Important scope truth:
 
 ## Owner batch/color inputs
 
-These files are authoritative first-candidate queue layouts:
+These files are authoritative first-candidate queue layouts. **Level 002 V02 supersedes Level 002 V01; V01 must not be used:**
 
 - Level 2 Apple:
-  `coordination/sessions/M52-C001/owner_inputs/LEVEL_002_APPLE_SUPPLY_BATCH_CANDIDATE_V01.md`
+  `coordination/sessions/M52-C001/owner_inputs/LEVEL_002_APPLE_SUPPLY_BATCH_CANDIDATE_V02.md`
 - Level 3 Palm Tree:
   `coordination/sessions/M52-C001/owner_inputs/LEVEL_003_PALM_TREE_SUPPLY_BATCH_CANDIDATE_V01.md`
 - Level 4 Orange Cat:
