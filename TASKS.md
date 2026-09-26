@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M52 PRODUCTION CONTENT SCALE-UP
-- Current Sprint: M52-C001 First 10 Level Pack
-- Current Task: Integrate production Levels 2–10 from the owner-selected canonical pixel-art sources
-- Current Task Status: IMPLEMENTATION_REQUIRED
-- Next Task/Action: CLAUDE executes `coordination/sessions/M52-C001/task_prompts/SB-M52-C001_FIRST10_LEVEL_PACK.md`. The nine canonical source PNGs are already committed at `1ec599bfef82568f92413ac7dd24f558aa7bf53f`. Claude must exact-import, validate, solve, Difficulty-V1 analyze, safely mutate only derivative candidates when needed, and admit only honestly passing Levels 2–10 into the production catalog. Level 1 Hazard Bot remains unchanged. No slot may be mislabelled or cataloged on an invented/inconclusive Challenge result.
-- Required Actor: CLAUDE
+- Current Sprint: M52-C001 First 10 Level Pack — Owner Playtest
+- Current Task: Owner functional playtest of production Levels 2–10 after independent M52-C001 audit
+- Current Task Status: AUDITED_PASS / OWNER_PLAYTEST_REQUIRED
+- Next Task/Action: OWNER runs `coordination/sessions/M52-C001/OWNER_PLAYTEST_CHECKLIST_V01.md`, records PASS/NOT PASS for Levels 2–10 and the Level 11 coming-soon gate. On owner PASS, ChatGPT records acceptance and advances the locked First 10 block to M53 per-level QA.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 744 / 980 = 75.92%. M42 Home visual gates are closed. M52-C001 is active. M42 remains externally open only for Android/iOS opening-cinematic device gates.
-- Note: Owner pack decision: `coordination/OWNER_M52_FIRST_10_LEVEL_PACK_V01.md`. Implementation prompt: `coordination/sessions/M52-C001/task_prompts/SB-M52-C001_FIRST10_LEVEL_PACK.md`. Audit criteria: `coordination/sessions/M52-C001/audit_criteria/SB-M52-C001_FIRST10_LEVEL_PACK.md`. Full-success target is exactly 10 production catalog entries in orders 1..10; partial/blocker truth is preferred over fabricated completion.
+- Progress: 654 / 1124 = 58.19%. M52-C001 code/evidence audit passed; owner functional playtest is the active First 10 gate. The denominator is larger than earlier reports because the owner-requested complete Player Experience roadmap was added to TASKS; this is planning expansion, not lost completed work.
+- Note: M52-C001 independent audit: `coordination/sessions/M52-C001/CHATGPT_AUDIT_V01.md` = `AUDITED_PASS / 10 OF 10 PRODUCTION ADMITTED`. Implementation `2b3d29f`; integration log `2881073`. Actual Challenge/SessionLoad/Frustration evidence remains explicitly deferred to M53 under `OWNER_M52_C001_FIRST_10_LEVEL_PACK_DECISION_V01.md`.
 - Owner sequencing lock: stay on the **First 10 Level Pack** until all work tied to Levels 1–10 is finished. This includes M52-C001 implementation/integration, independent audit, any remediation, owner playtest/acceptance, the applicable M53 per-level QA for Levels 1–10, and the applicable M54 content/regression validation needed to prove this ten-level pack stable. Only after that block is fully closed do we resume the main roadmap at **M43 Results Screen**. M43 remains fully open and is intentionally deferred, not skipped.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -2011,13 +2011,26 @@ Maximum board target: 59×59 = 3,481.
 - [ ] SB-M51-009 Pseudo-localize the complete Player-Facing Surface Visual Inventory before final visual closure.
 ### M52 — Production Content Scale-Up `[CONTENT]`
 
-- [ ] SB-M52-001 Import first Easy art. — [ ] SB-M52-002 Import first Medium art.
-- [ ] SB-M52-003 Import first Hard art. — [ ] SB-M52-004 Import first Very Hard art.
+M52-C001 independent audit: **AUDITED_PASS / 10 OF 10 PRODUCTION ADMITTED / OWNER_PLAYTEST_REQUIRED**.
+- Audit: `coordination/sessions/M52-C001/CHATGPT_AUDIT_V01.md`
+- Final matrix: `coordination/sessions/M52-C001/evidence/FIRST10_FINAL_MATRIX_V01.md`
+- Owner playtest: `coordination/sessions/M52-C001/OWNER_PLAYTEST_CHECKLIST_V01.md`
+- Scope note: canonical real-level Challenge / Session Load / Frustration evidence is an explicit M53 carry-forward under the newer owner decision; it was not fabricated in M52-C001.
+- `SB-M52-005` remains broader M52 work: the owner-selected First 10 pack contains no rectangular production source, so this row is not falsely closed by C001.
+
+- [x] SB-M52-001 Import first Easy art. — [x] SB-M52-002 Import first Medium art.
+- [x] SB-M52-003 Import first Hard art. — [x] SB-M52-004 Import first Very Hard art.
 - [ ] SB-M52-005 Validate rectangular production art.
-- [ ] SB-M52-006 Batch convert. — [ ] SB-M52-007 Batch validate.
-- [ ] SB-M52-008 Generate previews. — [ ] SB-M52-009 Populate catalog.
-- [ ] SB-M52-010 Verify every source image preserved.
-- [ ] SB-M52-011 Verify generated level reproduces source.
+- [x] SB-M52-006 Batch convert. — [x] SB-M52-007 Batch validate.
+- [x] SB-M52-008 Generate previews. — [x] SB-M52-009 Populate catalog.
+- [x] SB-M52-010 Verify every source image preserved.
+- [x] SB-M52-011 Verify generated level reproduces source.
+
+#### M52-C001 Owner Playtest Gate
+
+- [ ] SB-M52-C001-O01 Owner plays Levels 2–10 through the real Home/AppState production path and accepts correct artwork/order, supply behavior, intended sequence legality and WON completion.
+- [ ] SB-M52-C001-O02 Owner confirms progression transitions 2→3→...→10 correctly with no Hazard Bot/wrong-level fallback.
+- [ ] SB-M52-C001-O03 Owner confirms Level 10 completion advances to frontier 11 and Home honestly shows disabled Level 11 / coming-soon content rather than replaying existing content.
 
 ### M53 — Level QA `[QA]`
 
