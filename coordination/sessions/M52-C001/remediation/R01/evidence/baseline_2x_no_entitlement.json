@@ -1,0 +1,22 @@
+{
+	"context": {
+		"cores": 16,
+		"cpu": "12th Gen Intel(R) Core(TM) i7-1260P",
+		"godot": "4.7.2-stable (official)",
+		"headless": true,
+		"os": "Windows",
+		"tick_dt": 0.0166666666666667
+	},
+	"git_head": "0fa38f6",
+	"mode": "speed",
+	"result": {
+		"button_text": "1x",
+		"entitled": false,
+		"popups_after": [],
+		"popups_before": [],
+		"sb_after": 1000,
+		"sb_before": 1000,
+		"speed_after_2x": false,
+		"speed_before_2x": false
+	}
+}

@@ -1240,7 +1240,7 @@
 	"schema": "scrubbots.supply_plan_verification.v1",
 	"solver": {
 		"decisions": 39,
-		"elapsedMs": 163628,
+		"elapsedMs": 43205,
 		"frontierPeak": 40,
 		"fullQueueConsumed": true,
 		"maxDepthReached": 39,
@@ -1355,8 +1355,8 @@
 				}
 			},
 			{
-				"active_after": 690,
-				"clears": 4,
+				"active_after": 688,
+				"clears": 6,
 				"column": 0,
 				"placed": {
 					"color": 3,
@@ -1364,7 +1364,7 @@
 				}
 			},
 			{
-				"active_after": 682,
+				"active_after": 680,
 				"clears": 8,
 				"column": 0,
 				"placed": {
@@ -1373,7 +1373,7 @@
 				}
 			},
 			{
-				"active_after": 652,
+				"active_after": 650,
 				"clears": 30,
 				"column": 1,
 				"placed": {
@@ -1382,7 +1382,7 @@
 				}
 			},
 			{
-				"active_after": 622,
+				"active_after": 620,
 				"clears": 30,
 				"column": 1,
 				"placed": {
@@ -1391,7 +1391,7 @@
 				}
 			},
 			{
-				"active_after": 592,
+				"active_after": 590,
 				"clears": 30,
 				"column": 1,
 				"placed": {
@@ -1400,7 +1400,7 @@
 				}
 			},
 			{
-				"active_after": 562,
+				"active_after": 560,
 				"clears": 30,
 				"column": 1,
 				"placed": {
@@ -1409,7 +1409,7 @@
 				}
 			},
 			{
-				"active_after": 532,
+				"active_after": 530,
 				"clears": 30,
 				"column": 1,
 				"placed": {
@@ -1418,7 +1418,7 @@
 				}
 			},
 			{
-				"active_after": 502,
+				"active_after": 500,
 				"clears": 30,
 				"column": 1,
 				"placed": {
@@ -1427,8 +1427,8 @@
 				}
 			},
 			{
-				"active_after": 470,
-				"clears": 32,
+				"active_after": 469,
+				"clears": 31,
 				"column": 1,
 				"placed": {
 					"color": 6,
@@ -1437,7 +1437,7 @@
 			},
 			{
 				"active_after": 438,
-				"clears": 32,
+				"clears": 31,
 				"column": 1,
 				"placed": {
 					"color": 0,
@@ -1607,8 +1607,8 @@
 				}
 			}
 		],
-		"traceHash": 2117980132,
-		"traceSummary": "c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C0#30/2clr|c0:C0#30/0clr|c0:C2#30/88clr|c0:C6#30/30clr|c0:C3#13/4clr|c0:C4#8/8clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C6#30/32clr|c1:C0#30/32clr|c1:C4#30/30clr|c1:C0#30/30clr|c1:C2#30/30clr|c1:C6#10/10clr|c1:C5#5/1clr|c2:C2#30/30clr|c2:C2#30/30clr|c2:C2#30/30clr|c2:C2#30/30clr|c2:C2#30/30clr|c2:C6#30/30clr|c2:C0#30/35clr|c2:C2#30/30clr|c2:C6#30/32clr|c2:C4#30/32clr|c2:C0#17/17clr|c2:C2#9/9clr|c2:C1#2/2clr",
+		"traceHash": 2842640196,
+		"traceSummary": "c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C2#30/30clr|c0:C0#30/2clr|c0:C0#30/0clr|c0:C2#30/88clr|c0:C6#30/30clr|c0:C3#13/6clr|c0:C4#8/8clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C2#30/30clr|c1:C6#30/31clr|c1:C0#30/31clr|c1:C4#30/30clr|c1:C0#30/30clr|c1:C2#30/30clr|c1:C6#10/10clr|c1:C5#5/1clr|c2:C2#30/30clr|c2:C2#30/30clr|c2:C2#30/30clr|c2:C2#30/30clr|c2:C2#30/30clr|c2:C6#30/30clr|c2:C0#30/35clr|c2:C2#30/30clr|c2:C6#30/32clr|c2:C4#30/32clr|c2:C0#17/17clr|c2:C2#9/9clr|c2:C1#2/2clr",
 		"visited": 40
 	},
 	"solverBounds": {

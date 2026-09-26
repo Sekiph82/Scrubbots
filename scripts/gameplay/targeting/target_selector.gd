@@ -144,6 +144,31 @@ static func _candidate_before(a, b, board) -> bool:
 		return pa.x < pb.x  # left-most (smallest x) first
 	return a < b  # deterministic index tie-break
 
+## Positional priority order of `candidates` (bottom-most, then left-most, then index).
+## M52-C001-R01 perf, exact-equivalent: when every entry is a valid in-board int index the
+## comparator order equals ascending integer key (h-1-y)*w + x (row-major index -> unique
+## (x, y)), so a native int sort reproduces it exactly without per-compare callbacks.
+## Anything else (non-int / out-of-range entries) keeps the original comparator sort.
+static func _priority_sorted(candidates: Array, board) -> Array:
+	var w: int = board.get_width()
+	var h: int = board.get_height()
+	var keys := PackedInt32Array()
+	keys.resize(candidates.size())
+	for i in candidates.size():
+		var c = candidates[i]
+		if typeof(c) != TYPE_INT or not board.is_valid_index(c):
+			var cmp := func(a, b): return _candidate_before(a, b, board)
+			candidates.sort_custom(cmp)
+			return candidates
+		keys[i] = (h - 1 - c / w) * w + c % w
+	keys.sort()
+	var out: Array = []
+	out.resize(keys.size())
+	for i in keys.size():
+		var k: int = keys[i]
+		out[i] = (h - 1 - k / w) * w + k % w
+	return out
+
 static func _has_methods(obj, names) -> bool:
 	for n in names:
 		if not obj.has_method(n):
@@ -295,8 +320,7 @@ func _select_core(color_id: int, owner_id: int, access_query, board, ci, rs, gen
 	# candidate index or BoardState (crit 72/73). get_cell_position() is the canonical
 	# geometry (crit 49); it is a pure BoardState read, not a coherence collaborator.
 	# Non-int entries sort last and are still skipped fail-closed by the loop below.
-	var priority_cmp := func(a, b): return _candidate_before(a, b, board)
-	candidates.sort_custom(priority_cmp)
+	candidates = _priority_sorted(candidates, board)
 
 	for entry in candidates:
 		# Each candidate entry MUST be an int before any BoardState call; other

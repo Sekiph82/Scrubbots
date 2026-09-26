@@ -1,0 +1,716 @@
+{
+	"context": {
+		"cores": 16,
+		"cpu": "12th Gen Intel(R) Core(TM) i7-1260P",
+		"godot": "4.7.2-stable (official)",
+		"headless": true,
+		"os": "Windows",
+		"tick_dt": 0.0166666666666667
+	},
+	"git_head": "0fa38f6",
+	"mode": "blue",
+	"result": {
+		"cadence_interval": 0.5,
+		"first_wave": {
+			"assignments_by_slot": {
+				"4": 2
+			},
+			"cadence": 1,
+			"cleared_so_far": 0,
+			"live": 2,
+			"slots": [
+				{
+					"batch": "L002-K2-02",
+					"color": 2,
+					"committed": 0,
+					"displayed": 30,
+					"remaining": 30,
+					"state": "ACTIVE"
+				},
+				{
+					"batch": "L002-K1-02",
+					"color": 2,
+					"committed": 0,
+					"displayed": 30,
+					"remaining": 30,
+					"state": "ACTIVE"
+				},
+				{
+					"batch": "L002-K3-01",
+					"color": 2,
+					"committed": 0,
+					"displayed": 30,
+					"remaining": 30,
+					"state": "ACTIVE"
+				},
+				{
+					"batch": "L002-K2-01",
+					"color": 2,
+					"committed": 0,
+					"displayed": 30,
+					"remaining": 30,
+					"state": "ACTIVE"
+				},
+				{
+					"batch": "L002-K1-01",
+					"color": 2,
+					"committed": 2,
+					"displayed": 28,
+					"remaining": 30,
+					"state": "ACTIVE"
+				}
+			]
+		},
+		"placed_ok": [
+			true,
+			true,
+			true,
+			true,
+			true
+		],
+		"slots_before": [
+			{
+				"batch": "L002-K2-02",
+				"color": 2,
+				"committed": 0,
+				"displayed": 30,
+				"remaining": 30,
+				"state": "ACTIVE"
+			},
+			{
+				"batch": "L002-K1-02",
+				"color": 2,
+				"committed": 0,
+				"displayed": 30,
+				"remaining": 30,
+				"state": "ACTIVE"
+			},
+			{
+				"batch": "L002-K3-01",
+				"color": 2,
+				"committed": 0,
+				"displayed": 30,
+				"remaining": 30,
+				"state": "ACTIVE"
+			},
+			{
+				"batch": "L002-K2-01",
+				"color": 2,
+				"committed": 0,
+				"displayed": 30,
+				"remaining": 30,
+				"state": "ACTIVE"
+			},
+			{
+				"batch": "L002-K1-01",
+				"color": 2,
+				"committed": 0,
+				"displayed": 30,
+				"remaining": 30,
+				"state": "ACTIVE"
+			}
+		],
+		"timeline": [
+			{
+				"assignments_by_slot": {
+					"4": 2
+				},
+				"cadence": 1,
+				"cleared_so_far": 0,
+				"live": 2,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 2,
+						"displayed": 28,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			},
+			{
+				"assignments_by_slot": {
+					"4": 3
+				},
+				"cadence": 2,
+				"cleared_so_far": 0,
+				"live": 3,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 3,
+						"displayed": 27,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			},
+			{
+				"assignments_by_slot": {
+					"4": 4
+				},
+				"cadence": 3,
+				"cleared_so_far": 0,
+				"live": 4,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 4,
+						"displayed": 26,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			},
+			{
+				"assignments_by_slot": {
+					"4": 5
+				},
+				"cadence": 4,
+				"cleared_so_far": 0,
+				"live": 5,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 5,
+						"displayed": 25,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			},
+			{
+				"assignments_by_slot": {
+					"4": 6
+				},
+				"cadence": 5,
+				"cleared_so_far": 0,
+				"live": 6,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 6,
+						"displayed": 24,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			},
+			{
+				"assignments_by_slot": {
+					"4": 7
+				},
+				"cadence": 6,
+				"cleared_so_far": 0,
+				"live": 7,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 7,
+						"displayed": 23,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			},
+			{
+				"assignments_by_slot": {
+					"4": 8
+				},
+				"cadence": 7,
+				"cleared_so_far": 0,
+				"live": 8,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 8,
+						"displayed": 22,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			},
+			{
+				"assignments_by_slot": {
+					"4": 9
+				},
+				"cadence": 8,
+				"cleared_so_far": 0,
+				"live": 9,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 9,
+						"displayed": 21,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			},
+			{
+				"assignments_by_slot": {
+					"4": 10
+				},
+				"cadence": 9,
+				"cleared_so_far": 0,
+				"live": 10,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 10,
+						"displayed": 20,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			},
+			{
+				"assignments_by_slot": {
+					"4": 11
+				},
+				"cadence": 10,
+				"cleared_so_far": 0,
+				"live": 11,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 11,
+						"displayed": 19,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			},
+			{
+				"assignments_by_slot": {
+					"4": 12
+				},
+				"cadence": 11,
+				"cleared_so_far": 0,
+				"live": 12,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 12,
+						"displayed": 18,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			},
+			{
+				"assignments_by_slot": {
+					"4": 13
+				},
+				"cadence": 12,
+				"cleared_so_far": 0,
+				"live": 13,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 0,
+						"displayed": 30,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 13,
+						"displayed": 17,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				]
+			}
+		]
+	}
+}

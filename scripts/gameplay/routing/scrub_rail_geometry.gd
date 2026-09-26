@@ -162,6 +162,14 @@ func point_at_s(s: float) -> Vector2:
 		return Vector2(right_x() - (s - b), bottom_y())
 	return Vector2(left_x(), bottom_y() - (s - c))
 
+## Shortest rail travel DISTANCE from `a` to `b` — exactly rail_path(a, b)["dist"]
+## (same arithmetic) without building the corner polyline (M52-C001-R01 perf).
+func rail_dist(a: Vector2, b: Vector2) -> float:
+	var per := perimeter()
+	var cw := fposmod(s_of(b) - s_of(a), per)
+	var ccw := per - cw
+	return cw if cw <= ccw else ccw
+
 ## Shortest rail travel from point `a` to point `b` (both on the rail loop).
 ## Returns { "points": PackedVector2Array of the corner waypoints strictly between
 ## a and b along the shorter arc, in travel order, "dist": arc length }. Side

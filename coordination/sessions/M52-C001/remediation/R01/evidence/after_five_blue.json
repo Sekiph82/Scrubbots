@@ -1,0 +1,781 @@
+{
+	"context": {
+		"cores": 16,
+		"cpu": "12th Gen Intel(R) Core(TM) i7-1260P",
+		"godot": "4.7.2-stable (official)",
+		"headless": true,
+		"os": "Windows",
+		"tick_dt": 0.0166666666666667
+	},
+	"git_head": "0fa38f6",
+	"mode": "blue",
+	"result": {
+		"cadence_interval": 0.5,
+		"first_wave": {
+			"assignments_by_slot": {
+				"0": 1,
+				"1": 1,
+				"2": 1,
+				"3": 1,
+				"4": 1
+			},
+			"cadence": 1,
+			"cleared_so_far": 0,
+			"live": 5,
+			"slots": [
+				{
+					"batch": "L002-K2-02",
+					"color": 2,
+					"committed": 1,
+					"displayed": 29,
+					"remaining": 30,
+					"state": "ACTIVE"
+				},
+				{
+					"batch": "L002-K1-02",
+					"color": 2,
+					"committed": 1,
+					"displayed": 29,
+					"remaining": 30,
+					"state": "ACTIVE"
+				},
+				{
+					"batch": "L002-K3-01",
+					"color": 2,
+					"committed": 1,
+					"displayed": 29,
+					"remaining": 30,
+					"state": "ACTIVE"
+				},
+				{
+					"batch": "L002-K2-01",
+					"color": 2,
+					"committed": 1,
+					"displayed": 29,
+					"remaining": 30,
+					"state": "ACTIVE"
+				},
+				{
+					"batch": "L002-K1-01",
+					"color": 2,
+					"committed": 1,
+					"displayed": 29,
+					"remaining": 30,
+					"state": "ACTIVE"
+				}
+			],
+			"wave_frames": 5
+		},
+		"placed_ok": [
+			true,
+			true,
+			true,
+			true,
+			true
+		],
+		"slots_before": [
+			{
+				"batch": "L002-K2-02",
+				"color": 2,
+				"committed": 0,
+				"displayed": 30,
+				"remaining": 30,
+				"state": "ACTIVE"
+			},
+			{
+				"batch": "L002-K1-02",
+				"color": 2,
+				"committed": 0,
+				"displayed": 30,
+				"remaining": 30,
+				"state": "ACTIVE"
+			},
+			{
+				"batch": "L002-K3-01",
+				"color": 2,
+				"committed": 0,
+				"displayed": 30,
+				"remaining": 30,
+				"state": "ACTIVE"
+			},
+			{
+				"batch": "L002-K2-01",
+				"color": 2,
+				"committed": 0,
+				"displayed": 30,
+				"remaining": 30,
+				"state": "ACTIVE"
+			},
+			{
+				"batch": "L002-K1-01",
+				"color": 2,
+				"committed": 0,
+				"displayed": 30,
+				"remaining": 30,
+				"state": "ACTIVE"
+			}
+		],
+		"timeline": [
+			{
+				"assignments_by_slot": {
+					"0": 1,
+					"1": 1,
+					"2": 1,
+					"3": 1,
+					"4": 1
+				},
+				"cadence": 1,
+				"cleared_so_far": 0,
+				"live": 5,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 1,
+						"displayed": 29,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 1,
+						"displayed": 29,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 1,
+						"displayed": 29,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 1,
+						"displayed": 29,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 1,
+						"displayed": 29,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			},
+			{
+				"assignments_by_slot": {
+					"0": 2,
+					"1": 2,
+					"2": 2,
+					"3": 2,
+					"4": 2
+				},
+				"cadence": 2,
+				"cleared_so_far": 0,
+				"live": 10,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 2,
+						"displayed": 28,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 2,
+						"displayed": 28,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 2,
+						"displayed": 28,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 2,
+						"displayed": 28,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 2,
+						"displayed": 28,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			},
+			{
+				"assignments_by_slot": {
+					"0": 3,
+					"1": 3,
+					"2": 3,
+					"3": 3,
+					"4": 3
+				},
+				"cadence": 3,
+				"cleared_so_far": 0,
+				"live": 15,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 3,
+						"displayed": 27,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 3,
+						"displayed": 27,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 3,
+						"displayed": 27,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 3,
+						"displayed": 27,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 3,
+						"displayed": 27,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			},
+			{
+				"assignments_by_slot": {
+					"0": 4,
+					"1": 4,
+					"2": 4,
+					"3": 4,
+					"4": 4
+				},
+				"cadence": 4,
+				"cleared_so_far": 0,
+				"live": 20,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 4,
+						"displayed": 26,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 4,
+						"displayed": 26,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 4,
+						"displayed": 26,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 4,
+						"displayed": 26,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 4,
+						"displayed": 26,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			},
+			{
+				"assignments_by_slot": {
+					"0": 5,
+					"1": 5,
+					"2": 5,
+					"3": 5,
+					"4": 5
+				},
+				"cadence": 5,
+				"cleared_so_far": 0,
+				"live": 25,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 5,
+						"displayed": 25,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 5,
+						"displayed": 25,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 5,
+						"displayed": 25,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 5,
+						"displayed": 25,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 5,
+						"displayed": 25,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			},
+			{
+				"assignments_by_slot": {
+					"0": 6,
+					"1": 6,
+					"2": 6,
+					"3": 6,
+					"4": 6
+				},
+				"cadence": 6,
+				"cleared_so_far": 0,
+				"live": 30,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 6,
+						"displayed": 24,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 6,
+						"displayed": 24,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 6,
+						"displayed": 24,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 6,
+						"displayed": 24,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 6,
+						"displayed": 24,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			},
+			{
+				"assignments_by_slot": {
+					"0": 7,
+					"1": 7,
+					"2": 7,
+					"3": 7,
+					"4": 7
+				},
+				"cadence": 7,
+				"cleared_so_far": 0,
+				"live": 35,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 7,
+						"displayed": 23,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 7,
+						"displayed": 23,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 7,
+						"displayed": 23,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 7,
+						"displayed": 23,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 7,
+						"displayed": 23,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			},
+			{
+				"assignments_by_slot": {
+					"0": 8,
+					"1": 8,
+					"2": 8,
+					"3": 8,
+					"4": 8
+				},
+				"cadence": 8,
+				"cleared_so_far": 0,
+				"live": 40,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 8,
+						"displayed": 22,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 8,
+						"displayed": 22,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 8,
+						"displayed": 22,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 8,
+						"displayed": 22,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 8,
+						"displayed": 22,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			},
+			{
+				"assignments_by_slot": {
+					"0": 9,
+					"1": 9,
+					"2": 9,
+					"3": 9,
+					"4": 9
+				},
+				"cadence": 9,
+				"cleared_so_far": 0,
+				"live": 45,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 9,
+						"displayed": 21,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 9,
+						"displayed": 21,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 9,
+						"displayed": 21,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 9,
+						"displayed": 21,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 9,
+						"displayed": 21,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			},
+			{
+				"assignments_by_slot": {
+					"0": 10,
+					"1": 10,
+					"2": 10,
+					"3": 10,
+					"4": 10
+				},
+				"cadence": 10,
+				"cleared_so_far": 0,
+				"live": 50,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 10,
+						"displayed": 20,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 10,
+						"displayed": 20,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 10,
+						"displayed": 20,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 10,
+						"displayed": 20,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 10,
+						"displayed": 20,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			},
+			{
+				"assignments_by_slot": {
+					"0": 11,
+					"1": 11,
+					"2": 11,
+					"3": 11,
+					"4": 11
+				},
+				"cadence": 11,
+				"cleared_so_far": 0,
+				"live": 55,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 11,
+						"displayed": 19,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 11,
+						"displayed": 19,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 11,
+						"displayed": 19,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 11,
+						"displayed": 19,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 11,
+						"displayed": 19,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			},
+			{
+				"assignments_by_slot": {
+					"0": 12,
+					"1": 12,
+					"2": 12,
+					"3": 12,
+					"4": 12
+				},
+				"cadence": 12,
+				"cleared_so_far": 0,
+				"live": 60,
+				"slots": [
+					{
+						"batch": "L002-K2-02",
+						"color": 2,
+						"committed": 12,
+						"displayed": 18,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-02",
+						"color": 2,
+						"committed": 12,
+						"displayed": 18,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K3-01",
+						"color": 2,
+						"committed": 12,
+						"displayed": 18,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K2-01",
+						"color": 2,
+						"committed": 12,
+						"displayed": 18,
+						"remaining": 30,
+						"state": "ACTIVE"
+					},
+					{
+						"batch": "L002-K1-01",
+						"color": 2,
+						"committed": 12,
+						"displayed": 18,
+						"remaining": 30,
+						"state": "ACTIVE"
+					}
+				],
+				"wave_frames": 5
+			}
+		]
+	}
+}

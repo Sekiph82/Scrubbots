@@ -1276,7 +1276,7 @@
 	"schema": "scrubbots.supply_plan_verification.v1",
 	"solver": {
 		"decisions": 40,
-		"elapsedMs": 298838,
+		"elapsedMs": 45360,
 		"frontierPeak": 42,
 		"fullQueueConsumed": true,
 		"maxDepthReached": 40,
@@ -1481,8 +1481,8 @@
 				}
 			},
 			{
-				"active_after": 448,
-				"clears": 35,
+				"active_after": 451,
+				"clears": 32,
 				"column": 1,
 				"placed": {
 					"color": 6,
@@ -1490,7 +1490,7 @@
 				}
 			},
 			{
-				"active_after": 418,
+				"active_after": 421,
 				"clears": 30,
 				"column": 1,
 				"placed": {
@@ -1499,7 +1499,7 @@
 				}
 			},
 			{
-				"active_after": 418,
+				"active_after": 421,
 				"clears": 0,
 				"column": 1,
 				"placed": {
@@ -1509,7 +1509,7 @@
 			},
 			{
 				"active_after": 394,
-				"clears": 24,
+				"clears": 27,
 				"column": 1,
 				"placed": {
 					"color": 5,
@@ -1652,8 +1652,8 @@
 				}
 			}
 		],
-		"traceHash": 1273423104,
-		"traceSummary": "c0:C5#30/30clr|c0:C5#30/30clr|c0:C5#30/30clr|c0:C9#30/30clr|c0:C9#30/30clr|c0:C6#30/30clr|c0:C7#30/30clr|c0:C6#30/30clr|c0:C6#30/30clr|c0:C8#30/6clr|c0:C9#30/30clr|c0:C3#16/0clr|c0:C0#6/0clr|c0:C4#2/1clr|c1:C5#30/30clr|c1:C5#30/30clr|c1:C9#30/30clr|c1:C6#30/32clr|c1:C5#30/30clr|c1:C9#30/33clr|c1:C9#30/49clr|c1:C6#30/35clr|c1:C2#30/30clr|c1:C9#30/0clr|c1:C5#19/24clr|c2:C5#30/44clr|c2:C5#30/29clr|c2:C7#30/37clr|c1:C1#14/14clr|c1:C9#6/0clr|c2:C6#30/34clr|c2:C6#30/47clr|c2:C2#30/34clr|c2:C6#30/30clr|c2:C6#30/30clr|c2:C8#30/34clr|c2:C2#30/30clr|c2:C7#18/18clr|c2:C8#10/10clr|c2:C2#3/3clr",
+		"traceHash": 1480752256,
+		"traceSummary": "c0:C5#30/30clr|c0:C5#30/30clr|c0:C5#30/30clr|c0:C9#30/30clr|c0:C9#30/30clr|c0:C6#30/30clr|c0:C7#30/30clr|c0:C6#30/30clr|c0:C6#30/30clr|c0:C8#30/6clr|c0:C9#30/30clr|c0:C3#16/0clr|c0:C0#6/0clr|c0:C4#2/1clr|c1:C5#30/30clr|c1:C5#30/30clr|c1:C9#30/30clr|c1:C6#30/32clr|c1:C5#30/30clr|c1:C9#30/33clr|c1:C9#30/49clr|c1:C6#30/32clr|c1:C2#30/30clr|c1:C9#30/0clr|c1:C5#19/27clr|c2:C5#30/44clr|c2:C5#30/29clr|c2:C7#30/37clr|c1:C1#14/14clr|c1:C9#6/0clr|c2:C6#30/34clr|c2:C6#30/47clr|c2:C2#30/34clr|c2:C6#30/30clr|c2:C6#30/30clr|c2:C8#30/34clr|c2:C2#30/30clr|c2:C7#18/18clr|c2:C8#10/10clr|c2:C2#3/3clr",
 		"visited": 47
 	},
 	"solverBounds": {

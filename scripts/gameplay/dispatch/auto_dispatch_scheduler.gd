@@ -29,6 +29,7 @@ const ScrubbotDispatcher = preload("res://scripts/gameplay/dispatch/scrubbot_dis
 const CompleteClearingLoop = preload("res://scripts/gameplay/clearing/complete_clearing_loop.gd")
 const ProductionTargetAccess = preload("res://scripts/gameplay/dispatch/production_target_access.gd")
 const RouteRequest = preload("res://scripts/gameplay/routing/route_request.gd")
+const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
 
 const DEFAULT_SPEED := 6.0
 
@@ -71,13 +72,16 @@ var _clear_cb: Callable = Callable()
 ## assignment (in-flight robot). The reservation + M24 committed work for that entry
 ## stay held until an authenticated clear finalizes it (or reset rolls it back).
 var _assignments: Dictionary = {}
-## Colors whose oldest capacity-bearing batch produced no claimable target on their
-## most recent scheduling turn. Skipped (no reservation churn / busy-loop) until an
-## authoritative wake event (placement, authenticated clear, resume) clears the set.
-var _waiting_colors: Dictionary = {}
-## Fairness cursor: the color id that most recently received a scheduling turn. The
-## next step starts round-robin at the eligible color AFTER it.
-var _last_served_color: int = -1
+## Per-slot WAITING (M52-C001-R01; supersedes global per-color waiting): slot_index ->
+## batch_id of the batch that produced no claimable target on its lane's most recent wave.
+## That lane is skipped (no reservation churn / busy-loop) until an authoritative wake
+## event (placement, authenticated clear, resume) clears the map. Keyed by batch id so a
+## different batch later placed in the same slot is never treated as waiting.
+var _waiting_slots: Dictionary = {}
+## Frame-budgeted wave state (begin_wave/step_lane): queued lanes + the generation they
+## were queued under (a reset discards them).
+var _wave_lanes: Array = []
+var _wave_gen: int = -1
 
 # --------------------------------------------------------------------- bind --
 
@@ -164,8 +168,18 @@ func assignment_snapshot() -> Array:
 		out.append(_assignments[k].duplicate(true))
 	return out
 
+## True iff some occupied slot of `color_id` is WAITING on its current batch.
 func is_color_waiting(color_id) -> bool:
-	return _waiting_colors.has(color_id)
+	for slot in _waiting_slots:
+		if is_slot_waiting(slot) and _batches.get_color_id(slot) == int(color_id):
+			return true
+	return false
+
+## True iff `slot` is WAITING on the batch it currently holds.
+func is_slot_waiting(slot) -> bool:
+	if not _waiting_slots.has(slot) or not _batches.is_occupied(slot):
+		return false
+	return _batches.get_batch_id(slot) == _waiting_slots[slot]
 
 # ------------------------------------ targeted selected-color cancel (M39 V04) --
 # Tornado seam (F-M39-V03-001). NO global reset: only the selected color's live
@@ -247,11 +261,17 @@ func finalize_detached(entry: Dictionary) -> bool:
 
 # ------------------------------------------------------------- scheduling -----
 
-## One deterministic scheduling step/cadence event. Produces AT MOST one new accepted
-## assignment (one M25 claim + one preclaimed spawn), never a synchronous batch burst.
-## Round-robin across eligible colors so a continuously busy color cannot starve
-## another. Returns a detached result dict; {ok:true,...} exactly when one agent was
-## created this step. Idle/paused/reset/no-eligible-work return {ok:false, reason}.
+## One deterministic cadence event = ONE parallel dispatch wave
+## (OWNER_PARALLEL_SLOT_DISPATCH_AND_DEPARTURE_COUNT_V01 §2, M52-C001-R01). Every eligible
+## occupied slot (capacity > 0, not WAITING on its current batch) is an independent lane,
+## visited once in ascending placement sequence (physical slot index tie-break), and may
+## produce AT MOST ONE new accepted assignment (exact slot claim + preclaimed spawn). A wave
+## therefore creates 0..capacity (5, or 6 with +1 Slot) agents, never two from one slot,
+## never a recursive burst. A WAITING/failed lane never aborts its siblings. State mutation
+## stays serial/deterministic inside the wave; the resulting agents travel/clean
+## concurrently. Returns a detached dict: ok=true iff >=1 assignment was created;
+## `assigned` (count) and `assignments` (ordered results); the first assignment's fields are
+## mirrored at top level for single-lane callers.
 func step() -> Dictionary:
 	if not _bound:
 		return {"ok": false, "reason": "unbound"}
@@ -271,42 +291,95 @@ func step() -> Dictionary:
 		return {"ok": false, "reason": "resetting"}
 	_in_step = true
 	var my_gen: int = _generation
-	var r := _step_guarded(my_gen)
+	var r := _wave_guarded(my_gen)
 	_in_step = false
-	# Drain any reset injected DURING this step (from an origin/route/access/dispatcher
-	# callback). The step already rolled back its own in-progress claim and recorded no
-	# assignment, so the teardown below only frees prior in-flight state — and by the time
-	# step() returns, a mid-step reset has produced zero net robot.
+	# Drain any reset injected DURING this wave (from an origin/route/access/dispatcher
+	# callback). Each lane already rolled back its own in-progress claim and recorded no
+	# assignment, so the teardown below only frees prior in-flight state.
 	_drain_pending_reset()
 	return r
 
-func _step_guarded(my_gen: int) -> Dictionary:
-	var ordered := _eligible_colors()
-	if ordered.is_empty():
-		return {"ok": false, "reason": "idle"}
-	var start := 0
-	var pos := ordered.find(_last_served_color)
-	if pos != -1:
-		start = (pos + 1) % ordered.size()
-	# Give at most one color an ACCEPTED assignment this step. A color that yields no
-	# claimable target is marked WAITING and the rotation continues to the next color.
-	for k in range(ordered.size()):
-		var color: int = ordered[(start + k) % ordered.size()]
-		var res := _attempt_color(color, my_gen)
+func _wave_guarded(my_gen: int) -> Dictionary:
+	var lanes := _eligible_slots()
+	if lanes.is_empty():
+		return {"ok": false, "reason": "idle", "assigned": 0, "assignments": []}
+	var assigned: Array = []
+	for slot in lanes:
+		var res := _attempt_slot(slot, my_gen)
 		if res.get("ok", false):
-			_last_served_color = color
-			return res
-		# A reset injected during this color's attempt aborts the whole step immediately
-		# (the in-progress claim, if any, was already rolled back inside _attempt_color).
+			assigned.append(res)
+		# A reset injected during this lane aborts the rest of the wave immediately (the
+		# lane's in-progress claim, if any, was already rolled back inside _attempt_slot).
 		if _generation != my_gen:
-			return res
-	# No color produced an assignment (all waiting/failed this pass): advance the
-	# cursor deterministically so the next step does not re-favour the same color.
-	_last_served_color = ordered[(start + ordered.size() - 1) % ordered.size()]
-	return {"ok": false, "reason": "no_assignment"}
+			break
+	if assigned.is_empty():
+		return {"ok": false, "reason": "no_assignment", "assigned": 0, "assignments": []}
+	var out: Dictionary = assigned[0].duplicate()
+	out["assigned"] = assigned.size()
+	out["assignments"] = assigned
+	return out
 
-## Repeatedly step() until idle or `max_steps` reached. Still one assignment per
-## step. Returns the number of accepted assignments created.
+## --- Frame-budgeted wave (production runtime, M52-C001-R01) --------------------
+## The SAME wave semantics as step(), serviced one lane per call so a wave's claim/route
+## cost is spread over consecutive frames instead of one long frame. begin_wave() fixes
+## the lane list (eligible slots, deterministic order) at the cadence event; each
+## step_lane() re-proves the next lane is still eligible (same batch, capacity > 0, not
+## WAITING) and makes at most one exact-slot assignment for it. A slot therefore still
+## gets at most one assignment per wave; a reset/generation change discards the wave.
+
+## Start a new wave at a cadence event. Returns the number of lanes queued (0 = idle).
+## Refused (0) while unbound/fatal/paused/resetting/re-entrant or a wave is pending.
+func begin_wave() -> int:
+	if not _bound or _fatal or _paused or _reset_in_progress or _in_step:
+		return 0
+	if _reset_requested:
+		_drain_pending_reset()
+		return 0
+	if has_pending_lanes():
+		return 0
+	_wave_lanes = _eligible_slots()
+	_wave_gen = _generation
+	return _wave_lanes.size()
+
+## True while the current wave still has queued lanes (and no reset intervened).
+func has_pending_lanes() -> bool:
+	return not _wave_lanes.is_empty() and _wave_gen == _generation
+
+## Service the next queued lane of the current wave. Lanes that are no longer eligible are
+## skipped (cheap) until one lane is actually attempted or the wave is exhausted. Returns
+## the lane result ({ok, slot, ...}) or {ok:false, reason:"no_wave"|"lane_skipped"|...}.
+func step_lane() -> Dictionary:
+	if not _bound:
+		return {"ok": false, "reason": "unbound"}
+	if _fatal:
+		return {"ok": false, "reason": "fatal"}
+	if _paused:
+		return {"ok": false, "reason": "paused"}
+	if _reset_in_progress or _in_step:
+		return {"ok": false, "reason": "busy"}
+	if _reset_requested:
+		_wave_lanes.clear()
+		_drain_pending_reset()
+		return {"ok": false, "reason": "resetting"}
+	if not has_pending_lanes():
+		_wave_lanes.clear()
+		return {"ok": false, "reason": "no_wave"}
+	while not _wave_lanes.is_empty():
+		var slot: int = _wave_lanes.pop_front()
+		if not _batches.is_occupied(slot) or _batches.get_capacity(slot) <= 0 or is_slot_waiting(slot):
+			continue
+		_in_step = true
+		var my_gen: int = _generation
+		var r := _attempt_slot(slot, my_gen)
+		_in_step = false
+		if _generation != my_gen:
+			_wave_lanes.clear()
+		_drain_pending_reset()
+		return r
+	return {"ok": false, "reason": "lane_skipped"}
+
+## Repeatedly step() until idle or `max_steps` reached. Each step is one bounded wave.
+## Returns the number of accepted assignments created.
 func run_until_idle(max_steps: int = 100000) -> int:
 	var n := 0
 	var guard := max_steps
@@ -314,119 +387,99 @@ func run_until_idle(max_steps: int = 100000) -> int:
 		guard -= 1
 		var r := step()
 		if r.get("ok", false):
-			n += 1
+			n += int(r.get("assigned", 1))
 		else:
 			break
 	return n
 
-## Ordered eligible color ids: colors with at least one occupied capacity-bearing
-## batch that is NOT currently WAITING, ordered by the oldest placement sequence
-## among those batches (never arbitrary Dictionary iteration order).
-func _eligible_colors() -> Array:
-	var min_seq: Dictionary = {}   # color -> min placement sequence
+## Ordered eligible lanes: occupied slots with dispatch capacity > 0 that are not WAITING
+## on their current batch, ascending placement sequence then physical slot index
+## (deterministic; never Dictionary iteration order).
+func _eligible_slots() -> Array:
+	var lanes: Array = []
 	for i in range(_batches.get_slot_count()):
 		if not _batches.is_occupied(i):
 			continue
 		if _batches.get_capacity(i) <= 0:
 			continue
-		var color: int = _batches.get_color_id(i)
-		if _waiting_colors.has(color):
+		if is_slot_waiting(i):
 			continue
-		var seq: int = _batches.get_placement_sequence(i)
-		if not min_seq.has(color) or seq < int(min_seq[color]):
-			min_seq[color] = seq
-	var colors: Array = min_seq.keys()
-	colors.sort_custom(func(a, b): return int(min_seq[a]) < int(min_seq[b]))
-	return colors
+		lanes.append(i)
+	lanes.sort_custom(_lane_before)
+	return lanes
 
-## Attempt exactly one claim+dispatch for `color`. On no claimable target the color
-## is marked WAITING (no robot, no reservation churn). On any pre-spawn failure after
-## a successful claim, the whole claim is rolled back through M25 and zero robot
-## exists. On success exactly one ScrubbotAgent is registered.
-func _attempt_color(color: int, my_gen: int) -> Dictionary:
-	# _build_access_for_color reads the origin provider (a callback boundary that can
-	# inject reset) but performs NO claim/reservation yet, so a reset here just aborts.
-	var access_by_slot := _build_access_for_color(color)
+func _lane_before(a: int, b: int) -> bool:
+	var sa: int = _batches.get_placement_sequence(a)
+	var sb: int = _batches.get_placement_sequence(b)
+	if sa != sb:
+		return sa < sb
+	return a < b
+
+## Attempt exactly one exact-slot claim+dispatch for `slot`. No claimable target => that
+## slot alone is WAITING (no robot, no reservation churn). Any pre-spawn failure after a
+## successful claim rolls the claim back through M25 and zero robot exists. On success
+## exactly one ScrubbotAgent is registered.
+func _attempt_slot(slot: int, my_gen: int) -> Dictionary:
+	# Origin read is a callback boundary that can inject reset; no claim exists yet.
+	var origin: Vector2 = _origin_for_slot(slot)
 	if _generation != my_gen:
-		return {"ok": false, "reason": "reset_pending"}
-	# claim_for_color runs the M25 selector + per-slot access callbacks (a callback
-	# boundary). A failure creates no claim (M25 restored its own prestate), so a reset
-	# during it needs no rollback here.
-	var claim: Dictionary = _claim.claim_for_color(color, access_by_slot)
+		return {"ok": false, "reason": "reset_pending", "slot": slot}
+	var batch_id: String = _batches.get_batch_id(slot)
+	var access = ProductionTargetAccess.new(_routing_system, _routing_access, _board, origin)
+	# claim_for_slot runs the selector + this slot's access callbacks (a callback boundary).
+	# A failure creates no claim (M25 restored its own prestate), so no rollback needed.
+	var tcl := RuntimePerfProbe.now()
+	var claim: Dictionary = _claim.claim_for_slot(slot, access)
+	RuntimePerfProbe.add("m25_claim", tcl)
 	if not claim.get("ok", false):
-		# no_target -> WAITING; commit_failed/other -> not an assignment, no rollback
-		# needed (M25 already restored its own prestate). Never retarget.
 		if claim.get("waiting", false):
-			_waiting_colors[color] = true
-		return {"ok": false, "reason": claim.get("error", "no_claim")}
+			_waiting_slots[slot] = batch_id
+		return {"ok": false, "reason": claim.get("error", "no_claim"), "slot": slot}
 	var claim_id = claim["claim_id"]
-	var slot: int = int(claim["slot"])
+	var color: int = int(claim["color_id"])
 	var owner: int = int(claim["owner_id"])
 	var target: int = int(claim["target"])
 	# From here a live M25 claim EXISTS. Every subsequent early return that observes a
-	# generation move (reset injected before the assignment is committed) MUST roll that
-	# claim back through M25 so no orphan claim/reservation/committed-work survives, and
-	# it MUST NOT record an assignment — the step then produces zero robot.
+	# generation move MUST roll that claim back through M25 and record NO assignment.
 	if _generation != my_gen:
 		_claim.rollback_claim(claim_id)
-		return {"ok": false, "reason": "reset_pending"}
-	var origin: Vector2 = _origin_for_slot(slot)  # origin-provider callback boundary
+		return {"ok": false, "reason": "reset_pending", "slot": slot}
+	# Re-read the live slot origin for the route (same post-claim origin-provider callback
+	# boundary as the audited M26 flow; a reset injected here rolls the claim back).
+	origin = _origin_for_slot(slot)
 	if _generation != my_gen:
 		_claim.rollback_claim(claim_id)
-		return {"ok": false, "reason": "reset_pending"}
-	# Build the exact route request for the SAME claimed target from the slot origin.
+		return {"ok": false, "reason": "reset_pending", "slot": slot}
 	var request = RouteRequest.for_target(_board, origin, target)
 	if request == null:
 		_claim.rollback_claim(claim_id)
-		return {"ok": false, "reason": "route_request_failed"}
-	# Reuse M25's memoized winning route for this exact target when present; otherwise
-	# recompute a route ONLY for the same claimed target (no reselection). Both are
-	# route/access callback boundaries.
-	var route = null
-	var access = access_by_slot.get(slot, null)
-	if access != null and access.has_method("consume_route"):
-		route = access.consume_route(target)
+		return {"ok": false, "reason": "route_request_failed", "slot": slot}
+	# Reuse the access's memoized winning route for this exact target when present;
+	# otherwise recompute ONLY for the same claimed target (no reselection).
+	var route = access.consume_route(target)
 	if route == null:
+		var tr := RuntimePerfProbe.now()
 		route = _routing_system.compute_route(request, _board, _routing_access)
+		RuntimePerfProbe.add("routing", tr)
 	if _generation != my_gen:
 		_claim.rollback_claim(claim_id)
-		return {"ok": false, "reason": "reset_pending"}
-	# Exact preclaimed assignment. The dispatcher RouteValidator-validates the route
-	# and proves the M25 reservation; it never selects/reserves and never releases the
-	# reservation on failure. Its factory/assign/add-child callbacks are the last
-	# callback boundary that can inject a reset.
+		return {"ok": false, "reason": "reset_pending", "slot": slot}
+	# Exact preclaimed assignment. The dispatcher RouteValidator-validates the route and
+	# proves the M25 reservation; it never selects/reserves and never releases on failure.
+	var td := RuntimePerfProbe.now()
 	var dr = _dispatcher.dispatch_preclaimed(owner, color, target, origin, request, route, _speed)
-	# A reset injected DURING preclaimed dispatch does not move the dispatcher's own
-	# generation (the scheduler's reset is deferred while _in_step), so dispatch may
-	# return SUCCESS with a spawned agent. Detect the scheduler reset here: roll the M25
-	# claim back and record NO assignment. Any agent the dispatch spawned is torn down by
-	# the deferred teardown (_loop.reset()) that drains right after the step unwinds, so
-	# the net result is zero robot.
+	RuntimePerfProbe.add("dispatcher_spawn", td)
 	if _generation != my_gen:
 		_claim.rollback_claim(claim_id)
-		return {"ok": false, "reason": "reset_pending"}
+		return {"ok": false, "reason": "reset_pending", "slot": slot}
 	if dr == null or not dr.success:
 		_claim.rollback_claim(claim_id)
-		return {"ok": false, "reason": "dispatch_failed",
+		return {"ok": false, "reason": "dispatch_failed", "slot": slot,
 			"dispatch_reason": (dr.failure_reason if dr != null else &"NULL")}
 	_assignments[owner] = {"claim_id": claim_id, "slot": slot, "color": color,
 		"target": target, "agent": dr.agent}
 	return {"ok": true, "reason": "assigned", "owner_id": owner, "target": target,
 		"color": color, "slot": slot, "claim_id": claim_id, "agent": dr.agent}
-
-## Build {slot_index: ProductionTargetAccess} for every occupied slot of `color`,
-## each pointed at that slot's real board-local origin. M25 chooses which slot (the
-## oldest capacity-bearing one) — the scheduler never overrides that ordering.
-func _build_access_for_color(color: int) -> Dictionary:
-	var out: Dictionary = {}
-	for i in range(_batches.get_slot_count()):
-		if not _batches.is_occupied(i):
-			continue
-		if _batches.get_color_id(i) != color:
-			continue
-		var origin: Vector2 = _origin_for_slot(i)
-		out[i] = ProductionTargetAccess.new(_routing_system, _routing_access, _board, origin)
-	return out
 
 func _origin_for_slot(slot: int) -> Vector2:
 	var o = _origin_provider.origin_for_slot(slot)
@@ -440,7 +493,7 @@ func _origin_for_slot(slot: int) -> Vector2:
 
 ## M20 committed-clear notification handler (§J). Maps the authenticated owner id back
 ## to the exact live scheduler claim and calls M25.finalize_clear once, then wakes
-## WAITING colors (a cleared cell can open new corridors). A duplicate/stale/unknown
+## WAITING slots (a cleared cell can open new corridors). A duplicate/stale/unknown
 ## owner id (no live assignment) is ignored and CANNOT double-decrement M24 quota.
 func _on_authenticated_clear(owner_id: int, target_index: int, color_id: int, agent) -> void:
 	# A fatal scheduler state blocks further clear processing until reset/recovery.
@@ -485,7 +538,7 @@ func notify_placed() -> void:
 	_wake()
 
 func _wake() -> void:
-	_waiting_colors.clear()
+	_waiting_slots.clear()
 
 # --------------------------------------------------------- pause / resume -----
 
@@ -574,8 +627,8 @@ func _reset_teardown() -> bool:
 	# dispatcher owner ids stay monotonic), so stale callbacks after reset cannot mutate
 	# new-session state.
 	_assignments.clear()
-	_waiting_colors.clear()
-	_last_served_color = -1
+	_waiting_slots.clear()
+	_wave_lanes.clear()
 	return true
 
 ## Outcome of the most recent teardown attempt (true until the first failed one).

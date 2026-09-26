@@ -15211,22 +15211,31 @@ func _m26_pacing_and_capacity() -> void:
 
 func _m26_fairness_blue() -> void:
 	var BLUE := 0
-	# Same-color 8/14/12 spill: many reachable targets, no clears (agents left in-flight).
+	# M52-C001-R01 (OWNER_PARALLEL_SLOT_DISPATCH_AND_DEPARTURE_COUNT_V01): the former
+	# "oldest same-color batch monopolizes until capacity 0, then spills" rule is
+	# SUPERSEDED. Every occupied slot is an independent lane: one wave = at most one
+	# assignment per eligible slot, ascending placement sequence, same-color lanes
+	# independent. Same-color 8/14/12 lanes, 15 reachable targets, no clears.
 	var active: Array = []
 	for x in range(15):
 		active.append(19 * 20 + x)
 	var board = _m25_board(20, 20, 4, BLUE, active)
 	var b := _m26_build(board, [["BLUE_8", BLUE, 8], ["BLUE_14", BLUE, 14], ["BLUE_12", BLUE, 12]], Vector2(10.0, 23.0))
 	var sched = b["sched"]; var slots = b["slots"]
-	# Oldest BLUE_8 is slot 4 (seq 1). Drive 8 assignments -> all to slot 4.
-	for _i in range(8):
+	# Oldest BLUE_8 is slot 4 (seq 1), BLUE_14 slot 3, BLUE_12 slot 2.
+	var w1 = sched.step()
+	var lanes: Array = []
+	for a in w1.get("assignments", []):
+		lanes.append(int(a["slot"]))
+	_check(w1["ok"] and int(w1["assigned"]) == 3 and lanes == [4, 3, 2], "M26 lanes: one wave -> one assignment per same-color slot, placement order (%s)" % str(lanes))
+	_check(slots.get_committed(4) == 1 and slots.get_committed(3) == 1 and slots.get_committed(2) == 1, "M26 lanes: newer same-color batches dispatch while the oldest still has capacity")
+	for _i in range(3):
 		sched.step()
-	_check(slots.get_committed(4) == 8 and slots.get_capacity(4) == 0, "M26 fairness: oldest BLUE_8 receives claims until dispatch capacity 0")
-	_check(slots.get_committed(3) == 0, "M26 fairness: newer blue untouched while oldest has capacity")
-	# 9th assignment must spill to the next oldest blue (slot 3, BLUE_14) via M25.
-	var s9 = sched.step()
-	_check(s9["ok"] and s9["slot"] == 3, "M26 fairness: capacity spill to next same-color batch (BLUE_14)")
-	_check(slots.get_committed(3) == 1, "M26 fairness: spilled claim committed on BLUE_14")
+	_check(slots.get_committed(4) == 4 and slots.get_committed(3) == 4 and slots.get_committed(2) == 4, "M26 lanes: four waves -> exactly four per slot (never two per slot per wave)")
+	var w5 = sched.step()
+	_check(int(w5.get("assigned", 0)) == 3 and sched.live_assignment_count() == 15, "M26 lanes: fifth wave uses the last three reachable targets")
+	var w6 = sched.step()
+	_check(not w6["ok"] and sched.is_color_waiting(BLUE), "M26 lanes: no target left -> lanes WAITING, no over-claim")
 	# No duplicate target ownership across all in-flight.
 	var seen := {}
 	var dup := false
@@ -15251,11 +15260,10 @@ func _m26_fairness_blue() -> void:
 			rb.set_cell_state(i, BoardState.CellState.CLEARED)
 	var b3 := _m26_build(rb, [["BB", BLUE, 5], ["RR", RED, 5]], Vector2(3.0, 3.0))
 	var colors_served := {}
-	for _i in range(4):
-		var r = b3["sched"].step()
-		if r.get("ok", false):
-			colors_served[int(r["color"])] = true
-	_check(colors_served.has(BLUE) and colors_served.has(RED), "M26 fairness: round-robin serves both colors (no starvation)")
+	var r = b3["sched"].step()
+	for a in r.get("assignments", []):
+		colors_served[int(a["color"])] = true
+	_check(colors_served.has(BLUE) and colors_served.has(RED), "M26 lanes: one wave serves both colors (no starvation)")
 	b3["disp"].free()
 
 ## 3x3 board, center cell (4) is the ONLY blue cell and is ACTIVE, enclosed on all
