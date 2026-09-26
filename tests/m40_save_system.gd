@@ -214,8 +214,9 @@ func _wallclock_across_relaunch() -> void:
 	g["econ"].speed.purchase_timed(1800)
 	g["svc"].save()
 	var hearts_at_save = g["econ"].hearts.hearts()
-	# Relaunch 1 hour later (2 regens) into a fresh graph sharing the same clock.
-	_t[0] += 3600
+	# Relaunch 30 minutes later (2 regens at the owner-V06 900 s interval) into a fresh
+	# graph sharing the same clock.
+	_t[0] += 1800
 	var g2 = _graph(path)
 	g2["svc"].load()
 	_ok(g2["econ"].hearts.hearts() == hearts_at_save + 2, "heart regen continues across relaunch by wall clock")

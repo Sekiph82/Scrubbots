@@ -2,9 +2,11 @@ extends RefCounted
 ## HeartService — preload
 ## (res://scripts/economy/heart_service.gd).
 ##
-## Owner §: Hearts are attempt capacity (max 5), regen 1 per 1800 real-world
-## seconds using an ABSOLUTE wall clock (offline/menu/background/closed-app time
-## all count). Never uses gameplay delta or Engine.time_scale.
+## Owner §: Hearts are attempt capacity (max 5), regen 1 per `hearts.regen_seconds`
+## real-world seconds (900 = 15 min since owner decision
+## coordination/OWNER_M42_HOME_POLISH_V06.md §E; was 1800) using an ABSOLUTE wall clock
+## (offline/menu/background/closed-app time all count). Never uses gameplay delta or
+## Engine.time_scale.
 ##
 ## The wall clock is injected (`_clock`) so tests are deterministic. Regen is
 ## computed lazily on query/mutation by accruing elapsed intervals since an

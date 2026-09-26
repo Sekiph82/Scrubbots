@@ -4,8 +4,8 @@ extends SceneTree
 ## non-destructive AppState (isolated temp save) inside a SubViewport and saves PNGs.
 ## Needs a rendering driver (run WITHOUT --headless):
 ##   godot --path . -s res://tests/tools/home_snapshot.gd -- <out_dir> [WxH ...] [modals]
-## `modals` additionally captures, at the first size, the ad slot collapsed and the Daily
-## popup / Settings panel open over Home (modal state).
+## `modals` additionally captures, at the first size, the Heart full / after-consume
+## states, the ad slot collapsed and the Daily popup / Settings panel open over Home.
 ## Output goes to <out_dir> (never to approved art paths).
 
 const AppState = preload("res://scripts/app/app_state.gd")
@@ -63,6 +63,21 @@ func _initialize() -> void:
 			await process_frame
 		_save(sub, "%s/home_%dx%d.png" % [out_dir, size.x, size.y])
 		if modals and size == sizes[0]:
+			# V06: Heart display — full (static 15:00) then immediately after one consume.
+			# Temp-save state only (the snapshot AppState is discarded).
+			var sb_before: int = app.economy.wallet.scrub_bucks()
+			app.economy.hearts.purchase_full_refill()
+			# keep the displayed balance identical across evidence shots (temp app only)
+			app.economy.wallet.credit("scrub_bucks", sb_before - app.economy.wallet.scrub_bucks())
+			home.refresh()
+			for _i in range(4):
+				await process_frame
+			_save(sub, "%s/hearts_full_%dx%d.png" % [out_dir, size.x, size.y])
+			app.economy.hearts.consume()
+			home.refresh()
+			for _i in range(4):
+				await process_frame
+			_save(sub, "%s/hearts_after_consume_%dx%d.png" % [out_dir, size.x, size.y])
 			# V04: ad slot collapsed (future No-Ads entitlement simulation).
 			home.set_ad_slot_enabled(false)
 			for _i in range(6):

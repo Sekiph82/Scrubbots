@@ -32,16 +32,31 @@ func _hearts_regen() -> void:
 	var w = EconomyWallet.new(10000)
 	var h = HeartService.new(w, c, Callable(self, "_clock"))
 	_ok(h.hearts() == 5, "starts at max 5")
-	# Consume 3 -> 2. Regen 1 per 1800s.
+	_ok(c.hearts_regen_seconds() == 900, "owner V06: canonical regen interval 900 s (15 min)")
+	_ok(h.seconds_to_next() == 0, "full: no pending regen")
+	# One consume from full -> 4, countdown starts at the full 900 s interval.
+	h.consume()
+	_ok(h.hearts() == 4 and h.seconds_to_next() == 900, "consume from full -> 4, seconds_to_next 900 (%d)" % h.seconds_to_next())
+	_advance(899)
+	_ok(h.hearts() == 4 and h.seconds_to_next() == 1, "+899 s: no regen yet, 1 s left")
+	_advance(1)
+	_ok(h.hearts() == 5 and h.seconds_to_next() == 0, "+900 s: one Heart regenerated, full again")
+	# Consume 3 -> 2. Regen 1 per 900 s, each missing Heart on its own interval.
 	h.consume(); h.consume(); h.consume()
 	_ok(h.hearts() == 2, "after 3 consumes -> 2")
-	_advance(1800)
-	_ok(h.hearts() == 3, "one regen after 1800s")
-	_advance(1800 * 2)
-	_ok(h.hearts() == 5, "two more regens cap at max 5")
+	_advance(900)
+	_ok(h.hearts() == 3 and h.seconds_to_next() == 900, "one regen after 900 s; next interval restarts at 900")
+	_advance(450)
+	_ok(h.hearts() == 3 and h.seconds_to_next() == 450, "mid-interval: 450 s left")
+	_advance(450 + 900)
+	_ok(h.hearts() == 5, "two more regens (900 s each) cap at max 5")
 	# At full the anchor tracks now, so no overflow.
-	_advance(1800 * 10)
+	_advance(900 * 20)
 	_ok(h.hearts() == 5, "no overflow past max after long offline")
+	# Offline burst: 3 missing Hearts and 2700 s away (app closed) -> all back.
+	h.consume(); h.consume(); h.consume()
+	_advance(2700)
+	_ok(h.hearts() == 5, "offline wall-clock time regenerates 3 Hearts in 3 x 900 s")
 
 func _hearts_consume_and_purchase() -> void:
 	print("[hearts purchase]")
@@ -76,8 +91,8 @@ func _hearts_clock_rollback() -> void:
 	# Roll clock BACKWARD: no regen, no anchor corruption.
 	_t[0] -= 100000
 	_ok(h.hearts() == 4, "clock rollback does not regen")
-	# Forward again normally still regens.
-	_t[0] = 3_000_000 + 1800
+	# Forward again normally still regens (one 900 s interval after the consume).
+	_t[0] = 3_000_000 + 900
 	_ok(h.hearts() == 5, "forward time after rollback regens normally")
 
 func _speed_current_level() -> void:

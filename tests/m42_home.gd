@@ -325,10 +325,10 @@ func _live_binding() -> void:
 	vm = home.get_view_model()
 	_ok(home.get_region("ScrubBucksChip").value_label.text.replace(",", "") == str(e.wallet.scrub_bucks()), "SB chip follows the wallet live")
 	_ok(vm["bot_parts"] == e.wallet.bot_parts() and home.get_region("ProfileBotParts").caption.text.find("%d/%d" % [e.wallet.bot_parts(), e.robots.unlock_cost()]) != -1, "Bot Parts N/%d follows the wallet" % e.robots.unlock_cost())
-	_ok(home.get_region("HeartsChip").value_label.text == "%d/%d" % [e.hearts.hearts(), e.hearts.max_hearts()] and home.get_region("HeartsChip").sub_label.visible, "Hearts count + live regen timer shown when not full")
+	_ok(home.get_region("HeartsCount").text == str(e.hearts.hearts()) and home.get_region("HeartsChip").value_label.text == "%02d:%02d" % [e.hearts.seconds_to_next() / 60, e.hearts.seconds_to_next() % 60] and home.get_region("HeartsChip").value_label.text.find("/") == -1, "V06: Heart count on the icon, live regen timer in the pill (no N/5)")
 	_now += 60
 	home.refresh()
-	_ok(home.get_region("HeartsChip").sub_label.text == "29:00", "Heart timer counts down from wall clock (%s)" % home.get_region("HeartsChip").sub_label.text)
+	_ok(home.get_region("HeartsChip").value_label.text == "14:00", "Heart timer counts down from wall clock, 900 s interval (%s)" % home.get_region("HeartsChip").value_label.text)
 	_ok(vm["gift_progress"] == e.gift.cycle_progress() and vm["gift_claimable"] == e.gift.claimable().size(), "Gift Meter progress / claimable follow GiftMeterService")
 	_ok(home.get_region("GiftClaimableBadge").visible and home.get_region("GiftClaimableBadge").text == str(e.gift.claimable().size()), "Gift crate badge = live claimable count")
 	var props: Array = []

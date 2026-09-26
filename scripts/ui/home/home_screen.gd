@@ -26,7 +26,10 @@ extends Control
 ##
 ## V05 (coordination/OWNER_M42_HOME_POLISH_V05.md): the world transform is a pure
 ## function of the viewport + safe area and the frozen V04 reference geometry, so HUD /
-## stack / ad-slot changes can never move HOME-120; Scrubby is 15% larger about his feet.
+## stack / ad-slot changes can never move HOME-120.
+## V06 (coordination/OWNER_M42_HOME_POLISH_V06.md): ad slot 100 px, Scrubby 1.24x the V04
+## fit with a soft dark HeroFocusShade behind him, panel glass 0.51, thinner currency
+## pills with an in-pill glow '+', Heart count on the heart icon + regen clock in the pill.
 ##
 ## Every approved ART entry is accounted in HomePresentationMap. The screen owns NO
 ## durable truth: it reads the canonical AppState and only emits intents.
@@ -67,19 +70,18 @@ const RIGHT_SHORTCUTS := [["tasks", "HOME_SC_TASKS"], ["daily", "HOME_SC_DAILY"]
 ## enlarged 1.2x (owner V04 43-46). Icons stand on the label band and may rise above.
 const PANEL_SIZE := Vector2(210, 156)
 ## V05 panel glass: body alpha / outline (owner target alpha 0.40-0.48, 2-3 px outline).
-const PANEL_ALPHA := 0.44
+const PANEL_ALPHA := 0.51   # V06 (0.50..0.52)
 const PANEL_BORDER := 3
 const V03_ICON_BOX := Vector2(206, 164)
 const ICON_SCALE := {"shop": 1.2, "collection": 1.2, "tasks": 1.0, "daily": 1.0}
 const PANEL_EDGE_MARGIN := 26
 ## Win Streak track positions 1..5+ (values are rendered live from WinStreakService).
 const TRACK_POSITIONS := 5
-## V05 ad slot reservation: 144 px at the 1080 px canonical width (owner-marked banner
-## height), scaled with width and clamped 96..160. Explicit reservation only — never
-## EXPAND/FILL, not a provider contract.
-const AD_SLOT_RATIO := 144.0 / 1080.0
-const AD_SLOT_MIN_H := 96.0
-const AD_SLOT_MAX_H := 160.0
+## V06 ad slot reservation: 100 px at the 1080 px canonical width, scaled with width and
+## clamped 72..112. Explicit reservation only — never EXPAND/FILL, not a provider contract.
+const AD_SLOT_RATIO := 100.0 / 1080.0
+const AD_SLOT_MIN_H := 72.0
+const AD_SLOT_MAX_H := 112.0
 
 ## V05 world-transform lock. The V04 transform was derived from the V04 layout; these
 ## are that layout's measured reference values (commit a8b953e, per layout mode
@@ -91,8 +93,13 @@ const V04_REF_GIFT_BOTTOM := {0: 398.0, 1: 406.0, 2: 414.0}
 const V04_REF_AD_RATIO := 50.0 / 320.0
 const V04_REF_AD_MIN := 100.0
 const V04_REF_AD_MAX := 180.0
-## V05 hero scale relative to the V04 safe-box fit, applied about the visible soles.
-const SCRUBBY_V05_SCALE := 1.15
+## Hero scale relative to the V04 safe-box fit, applied about the visible soles
+## (V05 1.15; V06 owner target 1.24 — clears the baked sign and helper bots).
+const SCRUBBY_SCALE := 1.24
+## V06 HeroFocusShade (canonical 1080x2160 px): soft dark radial dimmer behind Scrubby's
+## torso, starting below the baked sign (bottom y 745), peak alpha 0.20 fading to 0.
+const HERO_SHADE_RECT := Rect2(252, 760, 576, 640)
+const HERO_SHADE_ALPHA := 0.20
 
 ## HOME-026 texture facts used by the World anchor contract (texture pixels of the
 ## 1158x1358 approved Scrubby): alpha>128 visible bbox and the soles' ground line (the
@@ -233,6 +240,14 @@ func _build() -> void:
 	chars.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	bg.add_child(chars)
 	_nodes["Layer_characters"] = chars
+	# V06: native radial dimmer (GradientTexture2D) above the world, behind Scrubby.
+	var shade := TextureRect.new()
+	shade.name = "HeroFocusShade"
+	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	shade.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	shade.stretch_mode = TextureRect.STRETCH_SCALE
+	shade.texture = make_hero_shade_texture()
+	chars.add_child(_reg(shade))
 	var sc := HomeStyle.art("Art_scrubby")
 	sc.stretch_mode = TextureRect.STRETCH_SCALE   # sized to the texture aspect by _layout_world
 	chars.add_child(_reg(sc))
@@ -448,44 +463,93 @@ func _build_hud(hud: MarginContainer) -> void:
 	for spec in [["ScrubBucksChip", "ScrubBucksPlus", scrub_bucks_purchase_requested], ["HeartsChip", "HeartsPlus", hearts_purchase_requested]]:
 		var line := HBoxContainer.new()
 		line.name = spec[0].replace("Chip", "Widget")
+		# The (+) hit target overlaps the pill so its glyph sits INSIDE the pill's right end.
 		line.add_theme_constant_override("separation", -CURRENCY_PLUS_OVERLAP)
 		right.add_child(_reg(line))
 		var chip := UiValueChip.new(spec[0])
 		chip.set_icon_size(CURRENCY_ICON_FOOTPRINT)
 		chip.set_icon_pop(CURRENCY_ICON_POP)   # drawn 110 px, overhanging the pill
-		chip.set_value_size(46)
+		chip.set_value_size(40)
 		chip.custom_minimum_size = Vector2(CURRENCY_PILL_W, CURRENCY_PILL_H)
 		chip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		var csb := HomeStyle.box(Color(0.035, 0.090, 0.230), HomeStyle.GLOW, 4, int(CURRENCY_PILL_H / 2), 8)
 		csb.content_margin_left = 10
-		csb.content_margin_right = CURRENCY_PLUS_OVERLAP + 10
+		csb.content_margin_right = PLUS_GLYPH_INSET + PLUS_GLYPH * 0.5 + 12.0
+		csb.content_margin_top = 0
+		csb.content_margin_bottom = 0
 		chip.set_panel_style(csb)
 		chip.value_label.add_theme_constant_override("outline_size", 12)
 		line.add_child(_reg(chip))
+		# Transparent >= 88x88 hit target centred on a native glow '+' glyph (owner plus
+		# reference: bold white plus, dark navy outline, cyan outer glow, no circle).
 		var plus := Button.new()
 		plus.name = spec[1]
-		plus.text = "+"
+		plus.flat = true
 		plus.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
 		plus.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 		plus.focus_mode = Control.FOCUS_NONE
-		plus.add_theme_font_size_override("font_size", 52)
-		for st in ["normal", "hover", "pressed"]:
-			var sb := HomeStyle.box(HomeStyle.GREEN if st != "pressed" else HomeStyle.GREEN_PRESSED, Color(1, 1, 1), 4, UiTokens.TOUCH_MIN / 2, 8)
-			sb.set_content_margin_all(0)   # keeps the (+) exactly 88x88 (circular)
-			plus.add_theme_stylebox_override(st, sb)
-		plus.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
-		plus.add_theme_constant_override("outline_size", 12)
-		plus.add_theme_color_override("font_outline_color", HomeStyle.GREEN_EDGE)
+		for st in ["normal", "hover", "pressed", "disabled", "focus"]:
+			plus.add_theme_stylebox_override(st, StyleBoxEmpty.new())
+		var glyph := PlusGlyph.new()
+		glyph.name = spec[1] + "Glyph"
+		glyph.set_anchors_preset(Control.PRESET_CENTER)
+		glyph.offset_left = -PLUS_GLYPH * 0.5
+		glyph.offset_right = PLUS_GLYPH * 0.5
+		glyph.offset_top = -PLUS_GLYPH * 0.5
+		glyph.offset_bottom = PLUS_GLYPH * 0.5
+		plus.add_child(_reg(glyph))
+		plus.button_down.connect(func(): glyph.modulate = Color(0.85, 0.85, 0.85))
+		plus.button_up.connect(func(): glyph.modulate = Color(1, 1, 1))
 		var sig: Signal = spec[2]
 		plus.pressed.connect(func(): sig.emit())
 		line.add_child(_reg(plus))
+	# V06: the live Heart count sits on the heart icon itself (white, navy outline).
+	var hicon: TextureRect = (_nodes["HeartsChip"] as UiValueChip).icon
+	var hcount := HomeStyle.label("", 48, Color(1, 1, 1), 14)
+	hcount.name = "HeartsCount"
+	hcount.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	hcount.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	hcount.set_anchors_preset(Control.PRESET_FULL_RECT)
+	hcount.offset_top = -4
+	hicon.add_child(_reg(hcount))
 
-## V05 currency widget geometry (1080x2160 reference px).
-const CURRENCY_ICON_FOOTPRINT := 80
-const CURRENCY_ICON_POP := 1.375
-const CURRENCY_PILL_W := 262.0
-const CURRENCY_PILL_H := 84.0
-const CURRENCY_PLUS_OVERLAP := 22
+## Currency widget geometry (1080x2160 reference px). V06: pill 84 -> 68 (-20%), icon
+## unchanged (110), '+' glyph 52 px inside the pill's right end (centre PLUS_GLYPH_INSET +
+## glyph/2 from the pill edge) with a transparent 88x88 hit target centred on it.
+const CURRENCY_ICON_FOOTPRINT := 64
+const CURRENCY_ICON_POP := 1.71875   # 64 x 1.71875 = 110 px drawn (unchanged)
+const CURRENCY_PILL_W := 282.0
+const CURRENCY_PILL_H := 68.0
+const PLUS_GLYPH := 52.0
+const PLUS_GLYPH_INSET := 14.0
+const CURRENCY_PLUS_OVERLAP := 44 + 40   # hit half-width + glyph centre inset (14 + 26)
+
+## Native plus glyph: cyan outer glow, dark navy outline, bold white plus. Transparent
+## background; never receives input (the parent Button is the hit target).
+class PlusGlyph extends Control:
+	func _init() -> void:
+		mouse_filter = Control.MOUSE_FILTER_IGNORE
+	func _bar_rects(r: Rect2, thick: float) -> Array:
+		var c := r.get_center()
+		return [Rect2(c.x - r.size.x * 0.5, c.y - thick * 0.5, r.size.x, thick), Rect2(c.x - thick * 0.5, c.y - r.size.y * 0.5, thick, r.size.y)]
+	func _draw() -> void:
+		var r := Rect2(Vector2.ZERO, size)
+		var inner := r.grow(-size.x * 0.12)
+		var thick := size.x * 0.26
+		# soft cyan outer glow: concentric translucent discs (no hard square edge)
+		var c := r.get_center()
+		for i in range(8):
+			var rad := size.x * (0.62 - float(i) * 0.035)
+			draw_circle(c, rad, Color(0.30, 0.90, 1.0, 0.035 + float(i) * 0.006))
+		# dark navy outline
+		for b in _bar_rects(inner.grow(5.0), thick + 10.0):
+			draw_rect(b, Color(0.035, 0.086, 0.216), true)
+		# bold white plus
+		for b in _bar_rects(inner, thick):
+			draw_rect(b, Color(1, 1, 1), true)
+	func _notification(what: int) -> void:
+		if what == NOTIFICATION_RESIZED:
+			queue_redraw()
 
 ## Put a meter's live caption inside (centred over) its bar.
 static func _center_caption_in_bar(meter: UiProgressMeter, font: int) -> void:
@@ -629,6 +693,9 @@ func _layout_world() -> void:
 	var c := get_scrubby_canonical()
 	sc.position = world_to_screen(c["origin"])
 	sc.size = tex_size * float(c["k"]) * s
+	var shade: Control = _nodes["HeroFocusShade"]
+	shade.position = world_to_screen(HERO_SHADE_RECT.position)
+	shade.size = HERO_SHADE_RECT.size * s
 	_avoid_helper_bots()
 
 ## Panels must not cover the baked helper bots. When a panel overlaps a bot's mapped
@@ -662,14 +729,37 @@ func _avoid_helper_bots() -> void:
 		if over - float(sep - new_sep) > 0.0:
 			col.custom_minimum_size.x = PANEL_SIZE.x + ceilf(shift)
 
+## Feathered navy radial gradient: peak HERO_SHADE_ALPHA at the centre, eased to 0 at
+## the ellipse edge (several stops -> no visible edge). Ellipse = the texture rect.
+static func make_hero_shade_texture() -> GradientTexture2D:
+	var g := Gradient.new()
+	var navy := Color(0.012, 0.024, 0.070)
+	var offs := PackedFloat32Array()
+	var cols := PackedColorArray()
+	for i in range(9):
+		var t := float(i) / 8.0
+		offs.append(t)
+		# smooth (cosine) falloff from peak to 0
+		cols.append(Color(navy.r, navy.g, navy.b, HERO_SHADE_ALPHA * (0.5 + 0.5 * cos(PI * t))))
+	g.offsets = offs
+	g.colors = cols
+	var tex := GradientTexture2D.new()
+	tex.gradient = g
+	tex.fill = GradientTexture2D.FILL_RADIAL
+	tex.fill_from = Vector2(0.5, 0.5)
+	tex.fill_to = Vector2(1.0, 0.5)
+	tex.width = 256
+	tex.height = 256
+	return tex
+
 ## Scrubby's canonical placement (for layout, tests and evidence). k_v04 = the V04
-## safe-box fit; k = k_v04 * SCRUBBY_V05_SCALE, anchored at the visible soles.
+## safe-box fit; k = k_v04 * SCRUBBY_SCALE, anchored at the visible soles.
 func get_scrubby_canonical() -> Dictionary:
 	var box: Rect2 = _world["scrubby_safe_box"]
 	var feet: Vector2 = _world["scrubby_feet_anchor"]
 	var vis := SCRUBBY_VISIBLE_BBOX
 	var k_v04: float = minf(box.size.x / vis.size.x, (feet.y - box.position.y) / (SCRUBBY_FEET_Y - vis.position.y))
-	var k: float = k_v04 * SCRUBBY_V05_SCALE
+	var k: float = k_v04 * SCRUBBY_SCALE
 	var origin := Vector2(feet.x - (vis.position.x + vis.size.x * 0.5) * k, feet.y - SCRUBBY_FEET_Y * k)
 	return {"k": k, "k_v04": k_v04, "origin": origin, "visible_rect": Rect2(origin + vis.position * k, vis.size * k), "feet_y": origin.y + SCRUBBY_FEET_Y * k, "center_x": origin.x + (vis.position.x + vis.size.x * 0.5) * k}
 
@@ -995,9 +1085,13 @@ func _render_values() -> void:
 	var sb: UiValueChip = _nodes["ScrubBucksChip"]
 	sb.set_tag(UiText.t("HOME_CURRENCY_SB"))
 	sb.set_value(UiText.num(_vm["scrub_bucks"]))
+	# V06: count on the heart icon; the pill shows ONLY the regen clock — a static
+	# full-interval ready state (15:00) at max, else HeartService.seconds_to_next().
 	var hearts: UiValueChip = _nodes["HeartsChip"]
-	hearts.set_value("%d/%d" % [_vm["hearts"], _vm["hearts_max"]])
-	hearts.set_sub("" if _vm["hearts"] >= _vm["hearts_max"] else _mmss(_vm["heart_seconds_to_next"]))
+	(_nodes["HeartsCount"] as Label).text = str(_vm["hearts"])
+	var full: bool = _vm["hearts"] >= _vm["hearts_max"]
+	hearts.set_value(_mmss(int(_app.economy.config.hearts_regen_seconds()) if full else _vm["heart_seconds_to_next"]))
+	hearts.set_sub("")
 	(_nodes["GiftMeterBar"] as UiProgressMeter).set_progress(_vm["gift_progress"], _vm["gift_cycle_max"],
 		UiText.t("HOME_RATIO", [UiText.num(_vm["gift_progress"]), UiText.num(_vm["gift_cycle_max"])]))
 	var gbadge: Label = _nodes["GiftClaimableBadge"]

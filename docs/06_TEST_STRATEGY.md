@@ -287,7 +287,7 @@ Required headless/integration coverage before Economy V1 closure:
 - Gift Meter accepts ONLY streak SB; exact 10/50/250/500/1000 crossing, multi-cross, rollover and no self-feed.
 - Gift milestone reward bundles and 1000 guaranteed-new-card/500-SB fallback.
 - Bot Parts 250 unlock cost, overflow and approximate 150-level pacing simulation.
-- Hearts: max 5, 1800-second wall-clock regen, offline/menu/background behavior, loss/restart/pre-action-exit semantics and SB refills.
+- Hearts: max 5, 900-second (owner V06; was 1800) wall-clock regen, offline/menu/background behavior, loss/restart/pre-action-exit semantics and SB refills.
 - Manual 2x entitlement: current-level and 15/30/60-minute products; timed expiry continues in menus, pause, background and closed-app wall-clock time.
 - Free M23-exhausted automatic 2x remains entitlement-independent and gameplay-truth neutral.
 - +1 Slot: authoritative 5/6 capacity across M24/M27/UI, no 7+.

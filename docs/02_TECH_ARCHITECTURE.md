@@ -46,7 +46,7 @@ current boundary and what genuinely remains future (M21+).
 | Visual Asset Pipeline | Owner-reference intake, ChatGPT-primary generated illustration assets with Magnific fallback, raw/final separation. | `assets/art/references/`, `assets/ui/`, `ASSET_GENERATION_MANIFEST.json` |
 | Economy Wallet | Authoritative Scrub Bucks balance and atomic/idempotent grant/spend transactions. | `scripts/economy/` |
 | Reward Grant Service | Applies first-clear, streak, Gift Meter, Daily, Collection and pack reward bundles exactly once. | `scripts/economy/` |
-| Heart Service | 5-Heart state, 30-minute wall-clock regen, attempt consumption and SB refill. | `scripts/economy/` |
+| Heart Service | 5-Heart state, 15-minute (900 s, owner V06) wall-clock regen, attempt consumption and SB refill. | `scripts/economy/` |
 | Gift Meter Service | Tracks Win-Streak-SB-only 10/50/250/500/1000 milestones, rollover and Gift Bar claim queue. | `scripts/economy/` |
 | Speed Entitlement Service | Current-level/timed paid 2x entitlements using absolute wall-clock expiry; does not own temporal factor. | `scripts/economy/` |
 | Booster Inventory | Exactly four booster charge inventories and atomic use/spend requests. | `scripts/economy/` |

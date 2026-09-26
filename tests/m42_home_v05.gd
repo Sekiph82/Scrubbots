@@ -1,5 +1,9 @@
 extends SceneTree
 ## M42 Home POLISH V05 — focused evidence (coordination/OWNER_M42_HOME_POLISH_V05.md).
+## Owner V06 (coordination/OWNER_M42_HOME_POLISH_V06.md) supersedes V05 on hero scale,
+## panel alpha, currency pill/plus and the ad reservation; those assertions follow the
+## current owner values (V06 specifics in m42_home_v06.gd). World lock, Gift Meter, rail,
+## stack order/reflow and modals remain the V05 contract.
 ## Expected/completed case ledger (AL-091).
 ##
 ## Run: godot --headless --path . -s res://tests/m42_home_v05.gd
@@ -123,7 +127,7 @@ func _scrubby(home) -> void:
 	var c: Dictionary = home.get_scrubby_canonical()
 	var w: Dictionary = home.get_world()
 	_ok(absf(c["center_x"] - 540.0) < 0.01 and absf(c["feet_y"] - 1297.0) < 0.01, "centre X 540 / soles Y 1297 unchanged (%.2f, %.2f)" % [c["center_x"], c["feet_y"]])
-	_ok(absf(float(c["k"]) / float(c["k_v04"]) - 1.15) < 0.001 and HS.SCRUBBY_V05_SCALE == 1.15, "visible scale 1.15 x V04 (k %.5f vs %.5f)" % [c["k"], c["k_v04"]])
+	_ok(absf(float(c["k"]) / float(c["k_v04"]) - HS.SCRUBBY_SCALE) < 0.001 and HS.SCRUBBY_SCALE >= 1.15, "visible scale %.2f x V04 (V05 1.15, V06 1.24) (k %.5f vs %.5f)" % [HS.SCRUBBY_SCALE, c["k"], c["k_v04"]])
 	var vr: Rect2 = c["visible_rect"]
 	_ok(not vr.intersects(w["baked_sign_rect"]), "clears the baked sign (top %.1f > sign bottom %.1f)" % [vr.position.y, (w["baked_sign_rect"] as Rect2).end.y])
 	var hit := false
@@ -144,8 +148,8 @@ func _panels(home) -> void:
 	var ok := true
 	for id in ["shop", "collection", "tasks", "daily"]:
 		var sb := home.get_region("Shortcut_" + id).get_theme_stylebox("normal") as StyleBoxFlat
-		ok = ok and sb.bg_color.a >= 0.40 and sb.bg_color.a <= 0.48 and sb.border_width_left >= 2 and sb.border_width_left <= 3 and sb.border_color.a >= 0.7
-	_ok(ok, "glass body alpha %.2f in 0.40..0.48, outline %d px visible" % [HS.PANEL_ALPHA, HS.PANEL_BORDER])
+		ok = ok and sb.bg_color.a >= 0.40 and sb.bg_color.a <= 0.52 and sb.border_width_left >= 2 and sb.border_width_left <= 3 and sb.border_color.a >= 0.7
+	_ok(ok, "glass body alpha %.2f (V05 0.40..0.48 / V06 0.50..0.52), outline %d px visible" % [HS.PANEL_ALPHA, HS.PANEL_BORDER])
 	var d := {}
 	for id in ["shop", "collection", "tasks", "daily"]:
 		var tex: Texture2D = home.get_region("ShortcutIcon_" + id).texture
@@ -171,18 +175,18 @@ func _currency(home) -> void:
 		var pill: Rect2 = chip.get_global_rect()
 		var pr: Rect2 = plus.get_global_rect()
 		_ok(icon.size.y >= 110.0 and icon.size.y <= 122.0, "%s icon %.0f px tall (110..122)" % [spec[0], icon.size.y])
-		_ok(pill.size.y >= 82.0 and pill.size.y <= 94.0, "%s pill %.0f px tall (82..94)" % [spec[0], pill.size.y])
+		_ok(pill.size.y >= 67.0 and pill.size.y <= 70.0, "%s pill %.0f px tall (V06 67..70)" % [spec[0], pill.size.y])
 		_ok(icon.position.y < pill.position.y and icon.end.y > pill.end.y and icon.position.x < pill.position.x, "%s icon overhangs the pill (top, bottom, left)" % spec[0])
 		_ok(chip.icon_slot.get_parent().get_index() > -1 and chip.icon.get_parent() == chip.icon_slot, "%s icon drawn above the pill body" % spec[0])
-		var sb := plus.get_theme_stylebox("normal") as StyleBoxFlat
-		_ok(pr.size.x >= 88.0 and pr.size.y >= 88.0 and absf(pr.size.x - pr.size.y) < 1.0 and sb.corner_radius_top_left >= int(pr.size.x / 2) - 1, "%s circular (+) %s" % [spec[1], str(pr.size)])
-		_ok(pr.position.x < pill.end.x and pr.end.x > pill.end.x and plus.get_index() > chip.get_index(), "%s (+) attached over the pill's right end, drawn in front" % spec[1])
+		_ok(pr.size.x >= 88.0 and pr.size.y >= 88.0, "%s (+) hit target >= 88 %s" % [spec[1], str(pr.size)])
+		var gr: Rect2 = home.get_region(spec[1] + "Glyph").get_global_rect()
+		_ok(pill.encloses(gr) and plus.get_index() > chip.get_index(), "%s (+) glyph inside the pill's right end, drawn in front (V06)" % spec[1])
 	var sbw: Rect2 = home.get_region("ScrubBucksWidget").get_global_rect()
 	var hw: Rect2 = home.get_region("HeartsWidget").get_global_rect()
 	var sb_icon: Rect2 = home.get_region("ScrubBucksChip").icon.get_global_rect()
 	var h_icon: Rect2 = home.get_region("HeartsChip").icon.get_global_rect()
 	_ok(not sbw.intersects(hw) and not sb_icon.intersects(h_icon) and not home.get_region("ProfileCard").get_global_rect().intersects(sb_icon) and not home.get_region("ProfileCard").get_global_rect().intersects(h_icon), "widgets/icons do not overlap each other or the profile card")
-	_ok(home.get_region("ScrubBucksChip").value_label.get_theme_font_size("font_size") >= 44, "large live value text")
+	_ok(home.get_region("ScrubBucksChip").value_label.get_theme_font_size("font_size") >= 40, "large live value text")
 	var app = home.get_app_state()
 	var before: Dictionary = app.economy.snapshot()
 	var got: Array = []
@@ -253,7 +257,7 @@ func _rail(home) -> void:
 func _ad(home) -> void:
 	print("[ad slot]")
 	var ad: Control = home.get_region("AdBannerSlot")
-	_ok(absf(ad.size.y - 144.0) < 1.0, "ad slot 144 px at 1080x2160 (%.0f)" % ad.size.y)
+	_ok(absf(ad.size.y - 100.0) < 1.0, "ad slot at the current owner reservation (V05 144 -> V06 100 px) at 1080x2160 (%.0f)" % ad.size.y)
 	_ok(ad.size_flags_vertical & Control.SIZE_EXPAND == 0 and ad.size.y == ad.custom_minimum_size.y, "fixed reservation, no vertical EXPAND")
 	_ok(home.get_ad_mount().get_child_count() == 0 and ad.find_children("*", "Label", true, false).is_empty(), "empty AdMount, no fake ad content")
 	_complete("ad_slot")
@@ -270,7 +274,8 @@ func _stack(home) -> void:
 	_ok(home.get_region("PlayButton").get_global_rect().end.y <= home.get_region("WinStreakRewardTrack").get_global_rect().position.y and home.get_region("WinStreakRewardTrack").get_global_rect().end.y <= home.get_region("BottomNav").get_global_rect().position.y and absf(ad.position.y - stack.end.y - sep) < 1.0, "nav sits directly above the ad slot (one layout gap)")
 	_ok(home.get_region("StatusLabel").get_parent() == home.get_region("PlayButton"), "status pill attached to PLAY (no extra row)")
 	var play_top: float = home.get_region("PlayButton").get_global_rect().position.y
-	_ok(absf(play_top - (V04_PLAY_TOP_1080 + (V04_AD_H_1080 - 144.0))) < 1.0, "1080x2160: PLAY moved down by exactly the released ad height (%.0f = V04 %.0f + %.0f)" % [play_top, V04_PLAY_TOP_1080, V04_AD_H_1080 - 144.0])
+	var ad_now: float = home.get_region("AdBannerSlot").size.y
+	_ok(absf(play_top - (V04_PLAY_TOP_1080 + (V04_AD_H_1080 - ad_now))) < 1.0, "1080x2160: PLAY moved down by exactly the released ad height (%.0f = V04 %.0f + %.0f)" % [play_top, V04_PLAY_TOP_1080, V04_AD_H_1080 - ad_now])
 	_complete("bottom_stack")
 
 func _reflow(home) -> void:
@@ -346,9 +351,9 @@ func _touch() -> void:
 			if HS.PLATFORM_BOTTOM_Y * float(t["scale"]) + (t["offset"] as Vector2).y > play.position.y + 0.5:
 				bad.append("play_over_platform_region")
 			var ad: Control = home.get_region("AdBannerSlot")
-			if ad.size.y < 96.0 or ad.size.y > 160.0 or absf(ad.get_global_rect().end.y - safe.end.y) > 1.0:
+			if ad.size.y < HS.AD_SLOT_MIN_H or ad.size.y > HS.AD_SLOT_MAX_H or absf(ad.get_global_rect().end.y - safe.end.y) > 1.0:
 				bad.append("ad_slot")
-			_ok(bad.is_empty(), "%s insets=%s: buttons >= 88 in safe area, PLAY below the platform region, ad 96..160 at the bottom %s" % [str(size), str(insets), str(bad)])
+			_ok(bad.is_empty(), "%s insets=%s: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom %s" % [str(size), str(insets), str(bad)])
 			r[0].free()
 			await process_frame
 	_complete("touch_targets")

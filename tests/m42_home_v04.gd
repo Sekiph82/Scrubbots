@@ -241,12 +241,12 @@ func _panel_style(home) -> void:
 		var b: Button = home.get_region("Shortcut_" + id)
 		sizes[b.size] = true
 		var sb := b.get_theme_stylebox("normal") as StyleBoxFlat
-		alpha_ok = alpha_ok and sb != null and sb.bg_color.a >= 0.40 and sb.bg_color.a <= 0.48 and sb.border_width_left >= 2 and sb.border_width_left <= 3
+		alpha_ok = alpha_ok and sb != null and sb.bg_color.a >= 0.40 and sb.bg_color.a <= 0.52 and sb.border_width_left >= 2 and sb.border_width_left <= 3
 		var r: Rect2 = b.get_global_rect()
 		margin_ok = margin_ok and r.position.x >= 20.0 and vp.x - r.end.x >= 20.0
 	_ok(sizes.size() == 1, "one panel size system for all four (%s)" % str(sizes.keys()))
 	_ok(sizes.keys()[0].x <= 226.0 and sizes.keys()[0].y < 220.0, "panels smaller than V03 cards (226 x 220)")
-	_ok(alpha_ok, "V05 translucent glass body (alpha 0.40..0.48) with 2-3 px outline")
+	_ok(alpha_ok, "translucent glass body (V05 0.40..0.48 / V06 0.50..0.52) with 2-3 px outline")
 	_ok(margin_ok, "visible outer margin from the screen edges (>= 20 px)")
 	var sc: Rect2 = home.get_region("Art_scrubby").get_global_rect()
 	var c: Dictionary = home.get_scrubby_canonical()
@@ -311,11 +311,12 @@ func _currency(home) -> void:
 	var before: Dictionary = app.economy.snapshot()
 	for n in ["ScrubBucksPlus", "HeartsPlus"]:
 		var b: Button = home.get_region(n)
-		_ok(b.is_visible_in_tree() and b.text == "+" and b.size.x >= 88 and b.size.y >= 88, "%s visible, >= 88 px" % n)
+		_ok(b.is_visible_in_tree() and home.get_region(n + "Glyph") != null and b.size.x >= 88 and b.size.y >= 88, "%s visible '+' glyph, >= 88 px hit target" % n)
 		b.pressed.emit()
 	_ok(got == ["sb", "hearts"] and app.economy.snapshot() == before, "(+) buttons emit intents only; economy untouched")
 	var sb_line: Rect2 = home.get_region("ScrubBucksChip").get_global_rect()
-	_ok(home.get_region("ScrubBucksPlus").get_global_rect().get_center().x > sb_line.end.x - 1.0, "(+) attached on the right end of its pill")
+	var gx: float = home.get_region("ScrubBucksPlusGlyph").get_global_rect().get_center().x
+	_ok(gx < sb_line.end.x and gx > sb_line.end.x - 80.0, "(+) glyph at the right end of its pill (V06: inside the pill)")
 	_complete("currency_hud")
 
 func _gift_track(home) -> void:
@@ -344,7 +345,7 @@ func _nav_ad(home) -> void:
 	var track: Control = home.get_region("WinStreakRewardTrack")
 	var vp: Vector2 = home.get_viewport_rect().size
 	_ok(track.get_global_rect().end.y <= nav.get_global_rect().position.y and nav.get_global_rect().end.y <= ad.get_global_rect().position.y + 0.5, "order: track -> nav -> ad slot")
-	_ok(absf(ad.get_global_rect().end.y - vp.y) < 1.0 and ad.size.y >= 96.0 and ad.size.y <= 160.0, "ad slot is the screen-bottom element (%.0f px tall)" % ad.size.y)
+	_ok(absf(ad.get_global_rect().end.y - vp.y) < 1.0 and ad.size.y >= 72.0 and ad.size.y <= 160.0, "ad slot is the screen-bottom element (%.0f px tall)" % ad.size.y)
 	_ok(home.get_ad_mount() != null and home.get_ad_mount().get_parent() == ad and home.get_ad_mount().get_child_count() == 0, "empty AdMount seam (no fake ad content)")
 	var labels := ad.find_children("*", "Label", true, false)
 	_ok(labels.is_empty(), "no fake ad text")
