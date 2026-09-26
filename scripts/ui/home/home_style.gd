@@ -55,6 +55,22 @@ static func style_card_button(b: Button) -> void:
 	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
 	_text_colors(b)
 
+## V04 light shortcut panel: near-transparent tint, thin cyan outline + soft glow; the
+## label sits in the bottom band (content_margin_top pushes it down).
+static func style_light_panel(b: Button, label_top: int) -> void:
+	for st in ["normal", "hover", "pressed", "disabled"]:
+		var alpha := 0.30 if st == "normal" else (0.42 if st == "hover" else (0.50 if st == "pressed" else 0.24))
+		var s := box(Color(0.035, 0.125, 0.330, alpha), Color(0.560, 0.890, 1.0, 0.85 if st != "disabled" else 0.55), 2, 24, 0)
+		s.shadow_color = Color(0.25, 0.75, 1.0, 0.28)
+		s.shadow_size = 8
+		s.shadow_offset = Vector2.ZERO
+		pad(s, 8, 6)
+		s.content_margin_top = label_top
+		b.add_theme_stylebox_override(st, s)
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	_text_colors(b)
+	b.add_theme_color_override("font_disabled_color", Color(0.92, 0.95, 1.0))
+
 ## Hero Play CTA: dominant green, thick dark bevel, big rounded body.
 static func style_play_button(b: Button) -> void:
 	b.add_theme_stylebox_override("normal", pad(box(GREEN, GREEN_EDGE, 6, 48, 12, 12), 36, 10))

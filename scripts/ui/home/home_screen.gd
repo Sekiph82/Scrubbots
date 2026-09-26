@@ -1,40 +1,40 @@
 extends Control
 ## HomeScreen — res://scenes/ui/home/home_screen.tscn (preload this script; AL-001).
 ##
-## M42 production Home (SB-M42-002 shell; master-convergence V02 composition; owner
-## revision V03 — coordination/OWNER_M42_HOME_VISUAL_REVISION_V03.md). Responsive native
-## Godot Controls — never a flattened interactive screenshot:
+## M42 production Home. V04 (coordination/OWNER_M42_HOME_REBUILD_V04_SINGLE_WORLD_
+## BACKGROUND.md) supersedes the earlier layered composition: the world is ONE complete
+## owner-approved background per world (HomeWorldCatalog; World 01 = HOME-120 with the
+## city, portal, baked WHISPERING PARK / AREA 1 sign, platform, props and helper bots).
+## Only Scrubby is a separate runtime layer, placed by the world's canonical 1080x2160
+## anchor contract. Everything else is native Godot UI:
 ##
 ##   HomeScreen (Home theme: bold face + navy outline)
-##   ├── Background        sky / far city / mid city / street layers (decorative); the
-##   │                     cities frame the portal, the street starts right above the dock
+##   ├── Background          world canvas (clipped above the ad slot)
+##   │     ├── WorldBackground   HOME-120, uniform scale, never stretched
+##   │     └── Layer_characters/Art_scrubby   feet on the baked platform
 ##   └── SafeAreaRoot/MarginContainer/Content/HomeLayout (VBox)
-##       ├── TopCurrencyHUD      narrow profile card (pop-out portrait in front of its
-##       │                       frame, name, rank badge + live level, Bot Parts N/250)
-##       │                       · Scrub Bucks chip · Hearts chip  (no top Settings entry)
-##       ├── GiftMeter           emblem · thick gold meter with only N/1000 · reward crate
-##       ├── MainWorldArea       Left cards (3) · CenterScrubbyArea · Right cards (3)
-##       │     CenterScrubbyArea/WorldStage (spans the whole MainWorldArea, behind cards):
-##       │       Layer_central_world_and_environment  neon, arch, arch decor, area banner
-##       │         (live title/number), puddles, props, ONE platform (HOME-010)
-##       │       Layer_characters  helper bots, Scrubby (feet on HOME-010), foreground props
-##       ├── ActionRow           SHOP | PLAY (native triangle + live subtitle) | CARDS EXCHANGE
-##       ├── StatusLabel         (only when there is something to say)
-##       ├── WinStreakRewardTrack thin track: badge + streak · progress · 5 gifts · 1/5/10/25/100
-##       └── BottomNav           full-width dock flush to the screen bottom, 5 icon tabs
+##       ├── TopCurrencyHUD      narrow profile card (portrait in front of its frame,
+##       │                       bottom-anchored; level badge + thick Bot Parts N/250 bar)
+##       │                       · Scrub Bucks chip + (+) · Hearts chip + (+)
+##       ├── GiftMeter           emblem · thick gold meter with only N/1000 · crate
+##       ├── ActionHost/HomeActionLayer   (hidden as ONE layer while a modal is open)
+##       │     ├── WorldMargin/MainWorldArea   SHOP, COLLECTION | (world) | TASKS, DAILY
+##       │     ├── PlayButton          centred standalone CTA (+ compact StatusLabel pill)
+##       │     ├── WinStreakRewardTrack  thin track: 5 gifts · 1/5/10/25/100
+##       │     └── BottomNav           5 icon tabs, HOME selected
+##       └── AdBannerSlot        persistent, empty integration seam for a future ad SDK;
+##                               collapsible (future No-Ads entitlement)
 ##
-## Modal state (V03 K): while any Home popup or the Settings panel is open, every Home
-## ACTION region is hidden (no draw, no input); closing restores them.
-##
-## Every approved ART entry is accounted in HomePresentationMap (STATIC / OWNER_RETIRED /
-## OWNER_DISABLED). The screen owns NO durable truth: it reads the canonical AppState and
-## only emits intents (play/settings/nav/shortcut). A blocked (future-schema) save shows an
-## explicit read-only state and disables PLAY.
+## Every approved ART entry is accounted in HomePresentationMap. The screen owns NO
+## durable truth: it reads the canonical AppState and only emits intents.
 
 signal play_requested
 signal settings_requested
 signal nav_requested(id: String)
 signal shortcut_requested(id: String)
+## V04: HUD (+) buttons — intent only (no price/product/transaction is implemented here).
+signal scrub_bucks_purchase_requested
+signal hearts_purchase_requested
 
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const SafeAreaRootScene = preload("res://scenes/components/ui/common/safe_area_root.tscn")
@@ -48,70 +48,60 @@ const HomeArtBinder = preload("res://scripts/ui/home/home_art_binder.gd")
 const HomePopup = preload("res://scripts/ui/home/home_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const HomePresentationMap = preload("res://scripts/ui/home/home_presentation_map.gd")
+const HomeWorldCatalog = preload("res://scripts/ui/home/home_world_catalog.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 
-## Shortcuts with a V1 Home destination (popup). Others belong to later milestones and
-## are shown disabled.
+## Popups with a V1 Home destination. Only DAILY is a Home panel in V04; Gifts and Cards
+## Exchange popups remain reachable through open_popup() as seams for their owning flows
+## (automatic rewards / Collection).
 const LIVE_SHORTCUTS := ["gift_bar", "cards_exchange", "daily"]
 
-## Shortcut columns (SB-M42-010/012; V03 G: 3 + 3). Destinations belonging to later
-## milestones are rendered disabled by refresh(), never faked.
-const LEFT_SHORTCUTS := [["win_streak", "HOME_SC_WIN_STREAK"], ["gift_bar", "HOME_SC_GIFT_BAR"], ["collection", "HOME_SC_COLLECTION"]]
-const RIGHT_SHORTCUTS := [["no_ads", "HOME_SC_NO_ADS"], ["daily", "HOME_SC_DAILY"], ["tasks", "HOME_SC_TASKS"]]
-## V03 G: lower action row SHOP | PLAY | CARDS EXCHANGE.
-const ROW_SHORTCUTS := [["shop", "HOME_SC_SHOP"], ["cards_exchange", "HOME_SC_CARDS_EXCHANGE"]]
+## V04: exactly four Home panels (left SHOP / COLLECTION, right TASKS / DAILY).
+const LEFT_SHORTCUTS := [["shop", "HOME_SC_SHOP"], ["collection", "HOME_SC_COLLECTION"]]
+const RIGHT_SHORTCUTS := [["tasks", "HOME_SC_TASKS"], ["daily", "HOME_SC_DAILY"]]
+## Panel size system (one size for all four) and icon boxes. V03 drew each icon fitted
+## into ~206x164 inside its card; TASKS/DAILY keep that exact box, SHOP/COLLECTION are
+## enlarged 1.2x (owner V04 43-46). Icons stand on the label band and may rise above.
+const PANEL_SIZE := Vector2(210, 156)
+const V03_ICON_BOX := Vector2(206, 164)
+const ICON_SCALE := {"shop": 1.2, "collection": 1.2, "tasks": 1.0, "daily": 1.0}
+const PANEL_EDGE_MARGIN := 26
 ## Win Streak track positions 1..5+ (values are rendered live from WinStreakService).
 const TRACK_POSITIONS := 5
-## Home action regions hidden while a modal (popup / Settings) is open (V03 K).
-const MODAL_HIDDEN_REGIONS := ["LeftShortcutColumn", "RightShortcutColumn", "ActionRow", "WinStreakRewardTrack", "BottomNav"]
+## Ad slot reservation: a banner-proportion placeholder (width * 50/320) clamped to a
+## sane band. Presentation reservation only — not a provider contract.
+const AD_SLOT_RATIO := 50.0 / 320.0
+const AD_SLOT_MIN_H := 100.0
+const AD_SLOT_MAX_H := 180.0
 
-## Layered art regions (SB-M42-011), named by assets/ui/HOME_ASSET_MANIFEST.json
-## layer_order. The owner reference image itself is never loaded or shipped.
-const SCREEN_LAYERS := ["background.sky", "background.city_far", "background.city_mid", "background.street_foreground"]
-const WORLD_LAYERS := ["central_world_and_environment", "characters"]
-
-## World-stage placement, in reference pixels of a 1080x1154 stage (scaled by the stage
-## unit). [node, center-x fraction of stage width, bottom-y fraction of stage height,
-## height px]. Order inside each group = draw order (back to front).
-const WORLD_GROUP := [
-	["Art_neon", 0.50, 0.86, 280],
-	["Art_arch", 0.50, 0.83, 900],
-	["Art_arch_decor", 0.50, 0.30, 330],
-	["Art_puddles", 0.50, 1.03, 300],
-	["Art_keep_clean_sign", 0.70, 0.84, 165],
-	["Art_cleaning_equipment", 0.31, 0.87, 160],
-	["Art_hose", 0.67, 1.00, 120],
-	["Art_platform_main", 0.50, 1.00, 430],
-	["Art_wet_floor_sign", 0.74, 0.99, 145],
-]
-const CHARACTER_GROUP := [
-	["Art_helper_alt", 0.29, 0.82, 185],
-	["Art_helper_floor", 0.25, 1.00, 210],
-	["Art_helper_cart", 0.77, 1.00, 210],
-	["Art_scrubby", 0.50, 0.78, 590],
-	["Art_bucket", 0.37, 1.02, 120],
-	["Art_foam", 0.63, 1.02, 100],
-]
-const STAGE_REF := Vector2(1080, 1154)
-## HOME-010 geometry (fractions of the texture): visible centre of the top walking
-## surface (Scrubby's feet) and the stone base line.
-const PLATFORM_FEET_Y := 0.40
-const PLATFORM_TOP_Y := 0.24
+## HOME-026 texture facts used by the World anchor contract (texture pixels of the
+## 1158x1358 approved Scrubby): alpha>128 visible bbox and the soles' ground line (the
+## brush bristles reach 16 px lower and rest on the platform).
+const SCRUBBY_VISIBLE_BBOX := Rect2(27, 7, 1130, 1327)
+const SCRUBBY_FEET_Y := 1318.0
+## World canonical rows used to keep the composition readable: the owner's platform-top
+## visual region (y 1240..1337, where Scrubby stands) must stay above the Play CTA (on
+## short screens Play may overlap the lower stone steps); the baked sign's top should
+## stay below the Gift Meter.
+const PLATFORM_BOTTOM_Y := 1345.0
+const SIGN_TOP_Y := 653.0
 
 const BG01 := Color(0.125, 0.145, 0.2, 1.0)   ## Midnight Slate #202533.
 
 var _app = null
 var _built := false
 var _nodes: Dictionary = {}   ## region name -> Control
-## Last frontier resolution shown on the CTA (SB-M42-003). Read-only presentation copy.
 var _launch: Dictionary = {}
-## Last live projection rendered (SB-M42-015). A detached copy for tests/diagnostics —
-## never read back as truth; every refresh re-reads the canonical services.
 var _vm: Dictionary = {}
 var _art = null
 var _popups: Dictionary = {}   ## id -> HomePopup (presentation only)
 var _external_modals: Dictionary = {}   ## source id (e.g. "settings") -> true while open
 var _tick: Timer
+var _world: Dictionary = {}
+## Current canonical->screen transform of the world (scale, offset) for tests/evidence.
+var _world_scale := 1.0
+var _world_offset := Vector2.ZERO
+var _ad_slot_enabled := true
 
 func _ready() -> void:
 	_build()
@@ -124,23 +114,20 @@ func _ready() -> void:
 	add_child(_tick)
 	_tick.start()
 	resized.connect(_apply_layout_mode)
-	_nodes["MainWorldArea"].resized.connect(_apply_layout_mode)
 	_nodes["HomeLayout"].resized.connect(_apply_layout_mode)
-	_nodes["BottomNav"].resized.connect(_layout_background)
+	_nodes["PlayButton"].resized.connect(_queue_world)
 	_apply_layout_mode()
 	if _art == null:
 		set_art_binder(HomeArtBinder.new())
 	refresh()
 
-## Bind the canonical AppState (app root). Re-renders.
 func bind(app_state) -> void:
 	_app = app_state
 	if _built:
 		refresh()
 
 ## SB-M42-017: bind ONLY owner-approved art (HomeArtBinder gate) onto the nodes the
-## HomePresentationMap names. OWNER_RETIRED / OWNER_DISABLED entries have no node and are
-## never loaded. Unapproved slugs keep the native placeholder (null).
+## HomePresentationMap names. Retired/disabled entries have no node and are never loaded.
 func set_art_binder(binder) -> void:
 	_art = binder
 	if not _built:
@@ -152,7 +139,10 @@ func set_art_binder(binder) -> void:
 		var tex: Texture2D = _art.texture(String(e["slug"]))
 		for n in e["nodes"]:
 			HomePresentationMap.apply(_nodes[n], String(e["slot"]), tex)
-	_layout_world()
+	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
+		var b: UiShortcutButton = _nodes["Shortcut_" + id[0]]
+		b.set_icon_box(b.get_icon_box())
+	_queue_world()
 
 func get_art_binder():
 	return _art
@@ -163,9 +153,16 @@ func get_app_state():
 func get_region(region: String) -> Control:
 	return _nodes.get(region)
 
-## Presentation accounting: one row per HomePresentationMap entry with the concrete
-## node(s), whether each node presents a texture and is visible. Retired/disabled rows
-## carry no nodes.
+func get_world() -> Dictionary:
+	return _world.duplicate(true)
+
+## Canonical world point -> HomeScreen-local point (current layout).
+func world_to_screen(p: Vector2) -> Vector2:
+	return p * _world_scale + _world_offset
+
+func get_world_transform() -> Dictionary:
+	return {"scale": _world_scale, "offset": _world_offset}
+
 func get_presentation_accounting() -> Array:
 	var out: Array = []
 	for id in HomePresentationMap.ENTRIES:
@@ -178,12 +175,17 @@ func get_presentation_accounting() -> Array:
 		out.append({"id": id, "slug": e["slug"], "mode": e["mode"], "reason": e.get("reason", ""), "reuse_of": e.get("reuse_of", ""), "nodes": nodes})
 	return out
 
+## Ordered art layers: the single world background, then the character layer.
+func get_art_layers() -> Array:
+	return [_nodes["WorldBackground"], _nodes["Layer_characters"]]
+
 # ------------------------------------------------------------------ build ----
 
 func _build() -> void:
 	if _built:
 		return
 	_built = true
+	_world = HomeWorldCatalog.world()
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	theme = HomeStyle.make_theme()
@@ -191,21 +193,29 @@ func _build() -> void:
 	var bg := ColorRect.new()
 	bg.name = "Background"
 	bg.color = BG01
-	bg.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bg.clip_contents = true
 	bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(bg)
 	_nodes["Background"] = bg
-	for layer in SCREEN_LAYERS:
-		var t := HomeStyle.art("Layer_" + layer.replace(".", "_"))
-		t.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED if layer == "background.sky" else TextureRect.STRETCH_SCALE
-		bg.add_child(t)
-		_nodes["Layer_" + layer] = t
-	var shade := ColorRect.new()
-	shade.name = "BackgroundShade"
-	shade.color = Color(0.02, 0.06, 0.16, 0.12)
-	shade.set_anchors_preset(Control.PRESET_FULL_RECT)
-	shade.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	bg.add_child(shade)
+	var wb := HomeStyle.art("WorldBackground")
+	wb.stretch_mode = TextureRect.STRETCH_SCALE   # sized to the texture aspect by _layout_world
+	bg.add_child(_reg(wb))
+	# Wide (tablet) canvases: mirrored continuation of the same world image fills the
+	# narrow side bands beyond the 1:2 world instead of flat BG01 bars.
+	for side in ["WorldEdgeLeft", "WorldEdgeRight"]:
+		var edge := HomeStyle.art(side)
+		edge.stretch_mode = TextureRect.STRETCH_SCALE
+		edge.flip_h = true
+		edge.visible = false
+		bg.add_child(_reg(edge))
+	var chars := Control.new()
+	chars.name = "Layer_characters"
+	chars.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	bg.add_child(chars)
+	_nodes["Layer_characters"] = chars
+	var sc := HomeStyle.art("Art_scrubby")
+	sc.stretch_mode = TextureRect.STRETCH_SCALE   # sized to the texture aspect by _layout_world
+	chars.add_child(_reg(sc))
 
 	var safe = SafeAreaRootScene.instantiate()
 	safe.name = "SafeAreaRoot"
@@ -222,21 +232,36 @@ func _build() -> void:
 
 	var hud := MarginContainer.new()
 	hud.name = "TopCurrencyHUD"
-	_side_margins(hud, 18, 84, 0)
-	layout.add_child(hud)
-	_nodes["TopCurrencyHUD"] = hud
+	_side_margins(hud, 18, 64, 0)
+	layout.add_child(_reg(hud))
 	var gm := MarginContainer.new()
 	gm.name = "GiftMeter"
 	_side_margins(gm, 34, 0, 0)
-	layout.add_child(gm)
-	_nodes["GiftMeter"] = gm
+	layout.add_child(_reg(gm))
 
+	# One action layer hidden as a unit by the modal state; its host keeps the layout
+	# slot so nothing else moves while a modal is open.
+	var host := Control.new()
+	host.name = "ActionHost"
+	host.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	host.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	layout.add_child(_reg(host))
+	var actions := VBoxContainer.new()
+	actions.name = "HomeActionLayer"
+	actions.set_anchors_preset(Control.PRESET_FULL_RECT)
+	actions.add_theme_constant_override("separation", UiTokens.SPACE_MD)
+	host.add_child(_reg(actions))
+
+	var wm := MarginContainer.new()
+	wm.name = "WorldMargin"
+	wm.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	wm.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_side_margins(wm, PANEL_EDGE_MARGIN, PANEL_TOP, 0)
+	actions.add_child(_reg(wm))
 	var world := HBoxContainer.new()
 	world.name = "MainWorldArea"
-	world.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	world.add_theme_constant_override("separation", UiTokens.SPACE_SM)
-	layout.add_child(world)
-	_nodes["MainWorldArea"] = world
+	world.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	wm.add_child(_reg(world))
 	for region in ["LeftShortcutColumn", "CenterScrubbyArea", "RightShortcutColumn"]:
 		var c: Control
 		if region == "CenterScrubbyArea":
@@ -245,41 +270,17 @@ func _build() -> void:
 			c.mouse_filter = Control.MOUSE_FILTER_IGNORE
 		else:
 			var v := VBoxContainer.new()
-			v.add_theme_constant_override("separation", UiTokens.SPACE_MD)
-			v.alignment = BoxContainer.ALIGNMENT_CENTER
-			v.z_index = 1   # cards draw in front of the world stage that spans behind them
+			v.add_theme_constant_override("separation", PANEL_GAP)   # room for the next icon's pop-out
+			v.alignment = BoxContainer.ALIGNMENT_BEGIN
 			c = v
 		c.name = region
-		world.add_child(c)
-		_nodes[region] = c
-	_build_world(_nodes["CenterScrubbyArea"])
+		world.add_child(_reg(c))
 
-	var row := HBoxContainer.new()
-	row.name = "ActionRow"
-	row.alignment = BoxContainer.ALIGNMENT_CENTER
-	row.add_theme_constant_override("separation", 18)
-	layout.add_child(_reg(row))
-	_build_action_row(row)
-
-	var status := HomeStyle.label("", UiTokens.FONT_BODY)
-	status.name = "StatusLabel"
-	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	status.visible = false
-	layout.add_child(status)
-	_nodes["StatusLabel"] = status
-
+	_build_play(actions)
 	var track := MarginContainer.new()
 	track.name = "WinStreakRewardTrack"
 	_side_margins(track, 22, 0, 0)
-	layout.add_child(track)
-	_nodes["WinStreakRewardTrack"] = track
-
-	_build_hud(hud)
-	_build_gift_meter(gm)
-	_build_shortcuts(_nodes["LeftShortcutColumn"], LEFT_SHORTCUTS)
-	_build_shortcuts(_nodes["RightShortcutColumn"], RIGHT_SHORTCUTS)
-	_build_track(track)
+	actions.add_child(_reg(track))
 
 	var nav := PanelContainer.new()
 	nav.name = "BottomNav"
@@ -287,13 +288,30 @@ func _build() -> void:
 	dock.border_width_top = 5
 	dock.corner_radius_top_left = 34
 	dock.corner_radius_top_right = 34
-	# V03 J: the dock paints down through any bottom safe-area inset to the screen edge,
-	# so no world/street strip ever shows beneath it.
+	# Paints down through any bottom inset when the ad slot is collapsed (no world strip).
 	dock.expand_margin_bottom = 600
 	HomeStyle.pad(dock, 14, 14)
 	nav.add_theme_stylebox_override("panel", dock)
-	layout.add_child(nav)
-	_nodes["BottomNav"] = nav
+	actions.add_child(_reg(nav))
+
+	var ad := PanelContainer.new()
+	ad.name = "AdBannerSlot"
+	var adsb := HomeStyle.box(Color(0.03, 0.05, 0.10), Color(0.16, 0.26, 0.42), 0, 0, 0)
+	adsb.border_width_top = 2
+	adsb.expand_margin_bottom = 600   # covers the bottom inset down to the screen edge
+	ad.add_theme_stylebox_override("panel", adsb)
+	ad.mouse_filter = Control.MOUSE_FILTER_PASS
+	layout.add_child(_reg(ad))
+	var ad_mount := Control.new()
+	ad_mount.name = "AdMount"   # the future ad SDK view attaches here; empty in V04
+	ad_mount.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ad.add_child(_reg(ad_mount))
+
+	_build_hud(hud)
+	_build_gift_meter(gm)
+	_build_shortcuts(_nodes["LeftShortcutColumn"], LEFT_SHORTCUTS)
+	_build_shortcuts(_nodes["RightShortcutColumn"], RIGHT_SHORTCUTS)
+	_build_track(track)
 	_build_bottom_nav(nav)
 
 static func _side_margins(m: MarginContainer, h: int, top: int, bottom: int) -> void:
@@ -306,20 +324,20 @@ func _reg(n: Control) -> Control:
 	_nodes[String(n.name)] = n
 	return n
 
-## Ordered art layer nodes (manifest layer_order minus the "ui" layer).
-func get_art_layers() -> Array:
-	var out: Array = []
-	for layer in SCREEN_LAYERS + WORLD_LAYERS:
-		out.append(_nodes["Layer_" + layer])
-	return out
-
 # ------------------------------------------------------------- top HUD ----
 
-## V03 A: NARROW profile card (width only) with a pop-out portrait — the approved frame
-## sits behind, the larger portrait draws in front and rises above the frame and the card
-## (nothing clips it). Live name, rank badge with live level, Bot Parts as N/250 only.
-## Scrub Bucks + Hearts on the right. No top Settings/menu entry (bottom nav only).
+## Narrow profile card: the larger portrait stands in FRONT of the approved frame with its
+## visible bottom resting on the ring's inner bottom (frame side/bottom segments stay
+## visible) and pops out above the ring. Level badge + thick Bot Parts bar with the live
+## N/250 ratio centred inside. No top Settings/menu entry (bottom nav only).
 const PROFILE_CARD_WIDTH_FRACTION := 0.50
+const AVATAR := 150.0
+## HOME-034 ring inner bottom (fraction of the frame) and HOME-027 visible bbox rows
+## (fractions of the 1254 px portrait texture).
+const FRAME_INNER_BOTTOM := 0.83
+const PORTRAIT_VIS_TOP := 189.0 / 1254.0
+const PORTRAIT_VIS_BOTTOM := 1135.0 / 1254.0
+const PORTRAIT_SCALE := 1.3
 func _build_hud(hud: MarginContainer) -> void:
 	var row := HBoxContainer.new()
 	row.name = "HudRow"
@@ -337,28 +355,24 @@ func _build_hud(hud: MarginContainer) -> void:
 
 	var avatar := Control.new()
 	avatar.name = "ProfileAvatar"
-	avatar.custom_minimum_size = Vector2(150, 150)
+	avatar.custom_minimum_size = Vector2(AVATAR, AVATAR)
+	avatar.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	avatar.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	avatar.clip_contents = false
 	cardrow.add_child(_reg(avatar))
 	var frame := HomeStyle.art("ProfileAvatarFrame")
 	frame.set_anchors_preset(Control.PRESET_FULL_RECT)
 	avatar.add_child(_reg(frame))
-	# In front of the frame, larger than it, bottom-aligned inside the ring and rising
-	# above its top edge.
+	var p := AVATAR * PORTRAIT_SCALE
 	var portrait := HomeStyle.art("ProfilePortrait")
-	portrait.set_anchors_preset(Control.PRESET_FULL_RECT)
-	portrait.offset_left = -16
-	portrait.offset_right = 16
-	portrait.offset_top = -86
-	portrait.offset_bottom = -54
+	portrait.position = Vector2((AVATAR - p) * 0.5, AVATAR * FRAME_INNER_BOTTOM - PORTRAIT_VIS_BOTTOM * p)
+	portrait.size = Vector2(p, p)
 	avatar.add_child(_reg(portrait))
 
 	var info := VBoxContainer.new()
 	info.name = "ProfileInfo"
 	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	info.alignment = BoxContainer.ALIGNMENT_CENTER
-	info.add_theme_constant_override("separation", 2)
+	info.add_theme_constant_override("separation", 4)
 	cardrow.add_child(info)
 	var name_label := HomeStyle.label("", 40)
 	name_label.name = "ProfileName"
@@ -369,10 +383,12 @@ func _build_hud(hud: MarginContainer) -> void:
 	rank_title.visible = false   # shown only when a canonical rank/title exists
 	info.add_child(_reg(rank_title))
 	var lvl_row := HBoxContainer.new()
-	lvl_row.add_theme_constant_override("separation", 6)
-	info.add_child(lvl_row)
+	lvl_row.name = "ProfileLevelRow"
+	lvl_row.add_theme_constant_override("separation", -10)   # badge overlaps the bar end
+	info.add_child(_reg(lvl_row))
 	var rank := HomeStyle.art("ProfileRankBadge")
-	rank.custom_minimum_size = Vector2(70, 64)
+	rank.custom_minimum_size = Vector2(74, 68)
+	rank.z_index = 1
 	lvl_row.add_child(_reg(rank))
 	var lvl := HomeStyle.label("", 28)
 	lvl.name = "ProfileLevel"
@@ -383,9 +399,8 @@ func _build_hud(hud: MarginContainer) -> void:
 	var parts := UiProgressMeter.new("ProfileBotParts")
 	parts.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	parts.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	parts.caption.add_theme_font_size_override("font_size", 26)
-	parts.caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	HomeStyle.style_meter(parts.bar, HomeStyle.GREEN, 24)
+	HomeStyle.style_meter(parts.bar, HomeStyle.GREEN, 42)
+	_center_caption_in_bar(parts, 28)
 	lvl_row.add_child(_reg(parts))
 
 	var spacer := Control.new()
@@ -396,15 +411,47 @@ func _build_hud(hud: MarginContainer) -> void:
 	var right := VBoxContainer.new()
 	right.name = "HudCurrencies"
 	right.alignment = BoxContainer.ALIGNMENT_CENTER
-	right.add_theme_constant_override("separation", 10)
+	right.add_theme_constant_override("separation", 12)
 	row.add_child(right)
-	for id in ["ScrubBucksChip", "HeartsChip"]:
-		var chip := UiValueChip.new(id)
-		chip.set_icon_size(72)
+	for spec in [["ScrubBucksChip", "ScrubBucksPlus", scrub_bucks_purchase_requested], ["HeartsChip", "HeartsPlus", hearts_purchase_requested]]:
+		var line := HBoxContainer.new()
+		line.add_theme_constant_override("separation", 6)
+		right.add_child(line)
+		var chip := UiValueChip.new(spec[0])
+		chip.set_icon_size(70)
+		chip.set_icon_pop(1.4)   # icon drawn in front of / overhanging its chip panel
 		chip.set_value_size(40)
-		chip.custom_minimum_size = Vector2(300, UiTokens.TOUCH_MIN)
-		chip.set_panel_style(HomeStyle.pad(HomeStyle.box(HomeStyle.NAVY, HomeStyle.GLOW, 4, 44, 8), 12, 2))
-		right.add_child(_reg(chip))
+		chip.custom_minimum_size = Vector2(250, UiTokens.TOUCH_MIN)
+		var csb := HomeStyle.pad(HomeStyle.box(HomeStyle.NAVY, HomeStyle.GLOW, 4, 44, 8), 14, 2)
+		csb.content_margin_left = 18
+		chip.set_panel_style(csb)
+		line.add_child(_reg(chip))
+		var plus := Button.new()
+		plus.name = spec[1]
+		plus.text = "+"
+		plus.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
+		plus.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		plus.focus_mode = Control.FOCUS_NONE
+		plus.add_theme_font_size_override("font_size", 60)
+		for st in ["normal", "hover", "pressed"]:
+			var s := HomeStyle.box(HomeStyle.GREEN if st != "pressed" else HomeStyle.GREEN_PRESSED, HomeStyle.GREEN_EDGE, 4, 44, 6, 4)
+			s.content_margin_bottom = 8
+			plus.add_theme_stylebox_override(st, s)
+		plus.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+		plus.add_theme_constant_override("outline_size", 10)
+		plus.add_theme_color_override("font_outline_color", HomeStyle.GREEN_EDGE)
+		var sig: Signal = spec[2]
+		plus.pressed.connect(func(): sig.emit())
+		line.add_child(_reg(plus))
+
+## Put a meter's live caption inside (centred over) its bar.
+static func _center_caption_in_bar(meter: UiProgressMeter, font: int) -> void:
+	meter.caption.add_theme_font_size_override("font_size", font)
+	meter.caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	meter.caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	meter.caption.clip_text = false
+	meter.caption.reparent(meter.bar, false)
+	meter.caption.set_anchors_preset(Control.PRESET_FULL_RECT)
 
 # ---------------------------------------------------------- Gift Meter ----
 
@@ -417,28 +464,23 @@ func _build_gift_meter(gm: MarginContainer) -> void:
 	row.add_theme_constant_override("separation", 12)
 	panel.add_child(row)
 	var emblem := HomeStyle.art("GiftEmblem")
-	emblem.custom_minimum_size = Vector2(100, 100)
+	emblem.custom_minimum_size = Vector2(112, 112)
 	row.add_child(_reg(emblem))
-	# V03 B: the live ratio sits over the thick meter; no long caption line.
+	# Live ratio over the thick meter; no long caption, no event timer / Event Points.
 	var meter := UiProgressMeter.new("GiftMeterBar")
 	meter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	meter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	HomeStyle.style_meter(meter.bar, HomeStyle.GOLD, 52)
-	meter.caption.add_theme_font_size_override("font_size", 34)
-	meter.caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	meter.caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	meter.caption.reparent(meter.bar, false)
-	meter.caption.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_center_caption_in_bar(meter, 34)
 	row.add_child(_reg(meter))
 	var crate := HomeStyle.art("GiftCrate")
-	crate.custom_minimum_size = Vector2(100, 100)
+	crate.custom_minimum_size = Vector2(112, 112)
 	row.add_child(_reg(crate))
 	var count := HomeStyle.label("", 28)
 	count.name = "GiftClaimableBadge"
 	count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	var sb := HomeStyle.box(Color(0.95, 0.55, 0.05), Color(1, 1, 1), 3, 24, 0)
-	count.add_theme_stylebox_override("normal", sb)
+	count.add_theme_stylebox_override("normal", HomeStyle.box(Color(0.95, 0.55, 0.05), Color(1, 1, 1), 3, 24, 0))
 	count.set_anchors_preset(Control.PRESET_BOTTOM_RIGHT)
 	count.offset_left = -48
 	count.offset_top = -48
@@ -446,173 +488,139 @@ func _build_gift_meter(gm: MarginContainer) -> void:
 	count.offset_bottom = 4
 	crate.add_child(_reg(count))
 
-# ---------------------------------------------------------- world stage ----
+# ---------------------------------------------------------- world canvas ----
 
-func _build_world(center: Control) -> void:
-	center.clip_contents = false
-	var stage := Control.new()
-	stage.name = "WorldStage"
-	stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	center.add_child(_reg(stage))
-	for group in WORLD_LAYERS:
-		var g := Control.new()
-		g.name = "Layer_" + group.replace(".", "_")
-		g.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		stage.add_child(g)
-		_nodes["Layer_" + group] = g
-	var world_g: Control = _nodes["Layer_central_world_and_environment"]
-	for spec in WORLD_GROUP:
-		world_g.add_child(_reg(HomeStyle.art(spec[0])))
-		if spec[0] == "Art_arch_decor":
-			# V03 D: the live title plate is set INTO the arch head (drawn over the stone,
-			# under the leafy crown), not a free-floating capsule.
-			var banner := PanelContainer.new()
-			banner.name = "AreaBanner"
-			banner.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			var plate := HomeStyle.pad(HomeStyle.box(Color(0.04, 0.22, 0.28, 0.90), Color(0.36, 0.86, 0.78), 3, 18, 4, 3), 22, 2)
-			banner.add_theme_stylebox_override("panel", plate)
-			world_g.add_child(_reg(banner))
-			var bcol := VBoxContainer.new()
-			bcol.add_theme_constant_override("separation", -6)
-			bcol.mouse_filter = Control.MOUSE_FILTER_IGNORE
-			banner.add_child(bcol)
-			var title := HomeStyle.label("", 40, Color(0.62, 1.0, 0.92))
-			title.name = "AreaTitle"
-			title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			bcol.add_child(_reg(title))
-			var number := HomeStyle.label("", 26, Color(0.80, 1.0, 0.95))
-			number.name = "AreaNumber"
-			number.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-			bcol.add_child(_reg(number))
-	var chars: Control = _nodes["Layer_characters"]
-	for spec in CHARACTER_GROUP:
-		chars.add_child(_reg(HomeStyle.art(spec[0])))
+func _queue_world() -> void:
+	_layout_world.call_deferred()
 
-## Lay out every world node inside the stage that spans the whole MainWorldArea (behind
-## the shortcut cards), then re-compose the screen background around it.
+## Place the single world background and Scrubby. Uniform scale s + offset map the
+## canonical 1080x2160 world onto the canvas above the ad slot:
+##   s covers the canvas width and height, the baked platform's bottom stays above the
+##   Play CTA, the baked sign's top stays below the Gift Meter (wide/tablet screens then
+##   show BG01 at the far sides rather than hiding the sign or the platform).
 func _layout_world() -> void:
-	if not _built:
+	if not _built or _world.is_empty() or size.x <= 0.0:
 		return
-	var world: Control = _nodes["MainWorldArea"]
-	var center: Control = _nodes["CenterScrubbyArea"]
-	var stage: Control = _nodes["WorldStage"]
-	if world.size.x <= 0 or world.size.y <= 0:
-		return
-	stage.position = world.global_position - center.global_position
-	stage.size = world.size
-	for g in WORLD_LAYERS:
-		var gc: Control = _nodes["Layer_" + g]
-		gc.position = Vector2.ZERO
-		gc.size = world.size
-	var W := world.size.x
-	var H := world.size.y
-	var s := minf(W / STAGE_REF.x, H / STAGE_REF.y)
-	for spec in WORLD_GROUP + CHARACTER_GROUP:
-		var n: TextureRect = _nodes[spec[0]]
-		var h: float = float(spec[3]) * s
-		var aspect := _aspect(n)
-		var w := minf(h * aspect, W * 0.96)
-		h = w / aspect
-		n.size = Vector2(w, h)
-		n.position = Vector2(W * float(spec[1]) - w * 0.5, H * float(spec[2]) - h)
-	# ONE platform (HOME-010). The portal base stands on the same plane: it sits at the
-	# platform's top rim, so the platform reads in front of / within the portal base.
-	var plat: TextureRect = _nodes["Art_platform_main"]
-	var arch: TextureRect = _nodes["Art_arch"]
-	var arch_bottom := plat.position.y + plat.size.y * 0.50
-	var arch_h := minf(arch_bottom - H * 0.04, 1000.0 * s * 1.25)
-	arch.size = Vector2(arch_h * _aspect(arch), arch_h)
-	if arch.size.x > W * 0.90:
-		arch.size = Vector2(W * 0.90, W * 0.90 / _aspect(arch))
-	arch.position = Vector2(W * 0.5 - arch.size.x * 0.5, arch_bottom - arch.size.y)
-	var neon: TextureRect = _nodes["Art_neon"]
-	neon.position.y = arch_bottom - neon.size.y - arch.size.y * 0.04
-	var decor: TextureRect = _nodes["Art_arch_decor"]
-	decor.size = Vector2(arch.size.x * 1.02, arch.size.x * 1.02 / _aspect(decor))
-	decor.position = Vector2(arch.position.x + (arch.size.x - decor.size.x) * 0.5, arch.position.y - decor.size.y * 0.22)
-	# Title plate set into the arch head, overlapping the lower edge of the crown.
-	var banner: Control = _nodes["AreaBanner"]
-	banner.size = Vector2.ZERO
-	var bmin := banner.get_combined_minimum_size()
-	banner.size = bmin
-	banner.position = Vector2(W * 0.5 - bmin.x * 0.5, decor.position.y + decor.size.y * 0.62)
-	# Scrubby's feet stand directly on the top walking surface of HOME-010.
+	var bg: Control = _nodes["Background"]
+	var ad: Control = _nodes["AdBannerSlot"]
+	var canvas_h: float = (ad.global_position.y - global_position.y) if ad.is_visible_in_tree() else size.y
+	bg.position = Vector2.ZERO
+	bg.size = Vector2(size.x, canvas_h)
+	(_nodes["Layer_characters"] as Control).size = bg.size
+	var C: Vector2 = _world["canvas"]
+	var play: Control = _nodes["PlayButton"]
+	var gift: Control = _nodes["GiftMeter"]
+	var P: float = (play.global_position.y - global_position.y - 8.0) if play.is_visible_in_tree() else canvas_h
+	var G: float = gift.global_position.y - global_position.y + gift.size.y + 8.0
+	var s: float = maxf(size.x / C.x, canvas_h / C.y)
+	# Keep the platform above Play: oy = P - PLATFORM_BOTTOM_Y*s (when that is above).
+	var oy: float = minf(0.0, P - PLATFORM_BOTTOM_Y * s)
+	# The world must still reach the canvas bottom.
+	if C.y * s + oy < canvas_h:
+		s = maxf(s, (canvas_h - P) / (C.y - PLATFORM_BOTTOM_Y))
+		oy = minf(0.0, P - PLATFORM_BOTTOM_Y * s)
+	# Keep the baked sign below the Gift Meter when that forces a smaller scale.
+	if SIGN_TOP_Y * s + oy < G and P - G > 0.0:
+		var s_sign := (P - G) / (PLATFORM_BOTTOM_Y - SIGN_TOP_Y)
+		if s_sign < s:
+			s = maxf(s_sign, canvas_h / C.y)
+			oy = minf(0.0, P - PLATFORM_BOTTOM_Y * s)
+	var ox: float = (size.x - C.x * s) * 0.5
+	_world_scale = s
+	_world_offset = Vector2(ox, oy)
+	var wb: TextureRect = _nodes["WorldBackground"]
+	wb.position = _world_offset
+	wb.size = C * s
+	for side in ["WorldEdgeLeft", "WorldEdgeRight"]:
+		var edge: TextureRect = _nodes[side]
+		edge.texture = wb.texture
+		edge.size = wb.size
+		edge.position = _world_offset + Vector2(-wb.size.x if side == "WorldEdgeLeft" else wb.size.x, 0.0)
+		edge.visible = ox > 0.5 and wb.texture != null
+	# Scrubby: fit the visible bbox into the safe box (keeping aspect), centre it on the
+	# anchor X, put the visible soles on the anchor Y.
 	var sc: TextureRect = _nodes["Art_scrubby"]
-	sc.position.y = plat.position.y + plat.size.y * PLATFORM_FEET_Y - sc.size.y
-	_layout_background()
+	var tex := sc.texture
+	var tex_size := Vector2(1158, 1358) if tex == null else Vector2(tex.get_width(), tex.get_height())
+	var box: Rect2 = _world["scrubby_safe_box"]
+	var feet: Vector2 = _world["scrubby_feet_anchor"]
+	var vis := SCRUBBY_VISIBLE_BBOX
+	var k: float = minf(box.size.x / vis.size.x, (feet.y - box.position.y) / (SCRUBBY_FEET_Y - vis.position.y))
+	var canon_pos := Vector2(feet.x - (vis.position.x + vis.size.x * 0.5) * k, feet.y - SCRUBBY_FEET_Y * k)
+	sc.position = world_to_screen(canon_pos)
+	sc.size = tex_size * k * s
+	_avoid_helper_bots()
 
-func _aspect(t: TextureRect) -> float:
-	if t.texture != null and t.texture.get_height() > 0:
-		return float(t.texture.get_width()) / float(t.texture.get_height())
-	return 1.0
+## Panels must not cover the baked helper bots. When a panel overlaps a bot's mapped
+## rect: 1) that column's gap tightens (never below the icon pop-out clearance); 2) if
+## that is not enough (short/wide screens), the column shifts inward just past the bot
+## (panels stay clear of Scrubby's visible rect). The top margin stays fixed so enlarged
+## icons never reach the Gift Meter. _apply_layout_mode restores the defaults on resize.
+const PANEL_GAP := 72
+## Clears the tallest pop-out (SHOP/COLLECTION icon box 197 px on a 110 px icon floor).
+const PANEL_TOP := 92
+## Clears the TASKS/DAILY pop-out (164 px icon on a 110 px floor) between panels.
+const PANEL_GAP_MIN := 58
+func _avoid_helper_bots() -> void:
+	for side in ["LeftShortcutColumn", "RightShortcutColumn"]:
+		var col: VBoxContainer = _nodes[side]
+		var sep: int = col.get_theme_constant("separation")
+		var over := 0.0
+		var shift := 0.0
+		for b in col.get_children():
+			var r: Rect2 = (b as Control).get_global_rect()
+			r.position -= global_position
+			for bot in _world["helper_bot_rects"]:
+				var br := Rect2(world_to_screen(bot.position), bot.size * _world_scale)
+				if r.intersects(br):
+					over = maxf(over, r.end.y - br.position.y + 8.0)
+					shift = maxf(shift, (r.end.x - br.position.x + 8.0) if side == "RightShortcutColumn" else (br.end.x - r.position.x + 8.0))
+		if over <= 0.0:
+			continue
+		var new_sep: int = maxi(PANEL_GAP_MIN, sep - int(ceil(over)))
+		col.add_theme_constant_override("separation", new_sep)
+		if over - float(sep - new_sep) > 0.0:
+			col.custom_minimum_size.x = PANEL_SIZE.x + ceilf(shift)
 
-## V03 C: screen background composed AROUND the world: the mid city stands behind the
-## portal (buildings left, right and above it), the far city rises behind it, the street
-## foreground is raised so its pavement starts right above the nav dock and runs up to the
-## platform base. Uniform scaling only (no stretched proportions).
-func _layout_background() -> void:
-	var bg: Control = _nodes.get("Background")
-	var world: Control = _nodes.get("MainWorldArea")
-	var nav: Control = _nodes.get("BottomNav")
-	if bg == null or bg.size.x <= 0 or world == null or world.size.y <= 0:
-		return
-	var W := bg.size.x
-	var H := bg.size.y
-	var wr := Rect2(world.global_position - bg.global_position, world.size)
-	var nav_top: float = (nav.global_position.y - bg.global_position.y) if nav != null and nav.is_visible_in_tree() else H
-	var sky: TextureRect = _nodes["Layer_background.sky"]
-	sky.position = Vector2.ZERO
-	sky.size = bg.size
-	# Street: pavement (bottom ~27% of HOME-004) spans nav top up to the platform base.
-	var street: TextureRect = _nodes["Layer_background.street_foreground"]
-	var pave := maxf(nav_top - (wr.end.y - wr.size.y * 0.06), 160.0)
-	var sh := maxf(pave / 0.27, W / _aspect(street))
-	street.size = Vector2(sh * _aspect(street), sh)
-	street.position = Vector2((W - street.size.x) * 0.5, nav_top + 40.0 - sh)
-	# Mid city: base behind the platform, wide enough to show buildings beside the portal.
-	var mid: TextureRect = _nodes["Layer_background.city_mid"]
-	var mh := maxf(wr.size.y * 0.72, W * 1.7 / _aspect(mid))
-	mid.size = Vector2(mh * _aspect(mid), mh)
-	mid.position = Vector2((W - mid.size.x) * 0.5, wr.end.y - wr.size.y * 0.10 - mh)
-	# Far city: rises above/behind the portal crown.
-	var far: TextureRect = _nodes["Layer_background.city_far"]
-	var fh := mh * 1.35
-	far.size = Vector2(fh * _aspect(far), fh)
-	far.position = Vector2((W - far.size.x) * 0.5, mid.position.y + mh * 0.70 - fh)
+## Scrubby's canonical visible rect / feet line (for tests and evidence).
+func get_scrubby_canonical() -> Dictionary:
+	var box: Rect2 = _world["scrubby_safe_box"]
+	var feet: Vector2 = _world["scrubby_feet_anchor"]
+	var vis := SCRUBBY_VISIBLE_BBOX
+	var k: float = minf(box.size.x / vis.size.x, (feet.y - box.position.y) / (SCRUBBY_FEET_Y - vis.position.y))
+	var origin := Vector2(feet.x - (vis.position.x + vis.size.x * 0.5) * k, feet.y - SCRUBBY_FEET_Y * k)
+	return {"k": k, "visible_rect": Rect2(origin + vis.position * k, vis.size * k), "feet_y": origin.y + SCRUBBY_FEET_Y * k, "center_x": origin.x + (vis.position.x + vis.size.x * 0.5) * k}
 
 # ------------------------------------------------------------ shortcuts ----
 
-func _make_shortcut(spec: Array) -> UiShortcutButton:
-	var b := UiShortcutButton.new(spec[0], UiText.t(spec[1]))
-	HomeStyle.style_card_button(b)
-	b.add_theme_font_size_override("font_size", 26)
-	var id: String = spec[0]
-	b.pressed.connect(func():
-		shortcut_requested.emit(id)
-		open_popup(id))
-	_nodes["Shortcut_" + id] = b
-	return b
-
 func _build_shortcuts(column: VBoxContainer, specs: Array) -> void:
 	for spec in specs:
-		column.add_child(_make_shortcut(spec))
+		var b := UiShortcutButton.new(spec[0], UiText.t(spec[1]))
+		HomeStyle.style_light_panel(b, int(PANEL_SIZE.y) - UiShortcutButton.LABEL_BAND)
+		b.add_theme_font_size_override("font_size", 28)
+		b.custom_minimum_size = PANEL_SIZE
+		# Panels hug the column's inner edge, so a widened column shifts them inward.
+		b.size_flags_horizontal = Control.SIZE_SHRINK_END if column.name == "LeftShortcutColumn" else Control.SIZE_SHRINK_BEGIN
+		b.set_icon_box(V03_ICON_BOX * float(ICON_SCALE[spec[0]]))
+		var id: String = spec[0]
+		b.pressed.connect(func():
+			shortcut_requested.emit(id)
+			open_popup(id))
+		column.add_child(b)
+		_nodes["Shortcut_" + id] = b
+		_nodes["ShortcutIcon_" + id] = b.icon_rect
 
-# ------------------------------------------------------ action row / Play ----
+# ------------------------------------------------------------- Play CTA ----
 
-## V03 G/H: SHOP | PLAY | CARDS EXCHANGE. PLAY is a smaller green native CTA with a live
-## label, a native white play triangle and a compact live frontier subtitle; the hit
-## region is the visible CTA.
+## Centred standalone CTA (V03 size): live PLAY, native white triangle, compact live
+## frontier subtitle. The status pill floats just above the button (no layout change).
 const PLAY_SIZE := Vector2(470, 150)
-const ROW_CARD_SIZE := Vector2(214, 150)
-func _build_action_row(row: HBoxContainer) -> void:
-	var shop := _make_shortcut(ROW_SHORTCUTS[0])
-	shop.custom_minimum_size = ROW_CARD_SIZE
-	shop.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(shop)
+func _build_play(parent: VBoxContainer) -> void:
 	var play := Button.new()
 	play.name = "PlayButton"
 	play.text = UiText.t("HOME_PLAY")
 	play.custom_minimum_size = PLAY_SIZE
+	play.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 	play.focus_mode = Control.FOCUS_NONE
 	play.add_theme_font_size_override("font_size", 76)
 	HomeStyle.style_play_button(play)
@@ -625,7 +633,7 @@ func _build_action_row(row: HBoxContainer) -> void:
 	play.pressed.connect(func():
 		if not play.disabled:
 			play_requested.emit())
-	row.add_child(_reg(play))
+	parent.add_child(_reg(play))
 	var tri := PlayTriangle.new()
 	tri.name = "PlayTriangle"
 	tri.set_anchors_preset(Control.PRESET_CENTER_RIGHT)
@@ -642,10 +650,17 @@ func _build_action_row(row: HBoxContainer) -> void:
 	sub.offset_top = -54
 	sub.offset_bottom = -16
 	play.add_child(_reg(sub))
-	var cards := _make_shortcut(ROW_SHORTCUTS[1])
-	cards.custom_minimum_size = ROW_CARD_SIZE
-	cards.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	row.add_child(cards)
+	var status := HomeStyle.label("", 24)
+	status.name = "StatusLabel"
+	status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	status.add_theme_stylebox_override("normal", HomeStyle.pad(HomeStyle.box(Color(0.02, 0.06, 0.16, 0.82), HomeStyle.GLOW, 2, 18, 0), 16, 2))
+	status.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	status.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	status.grow_vertical = Control.GROW_DIRECTION_BEGIN
+	status.offset_top = -8
+	status.offset_bottom = -8
+	status.visible = false
+	play.add_child(_reg(status))
 
 ## Native white play triangle (no texture).
 class PlayTriangle extends Control:
@@ -653,17 +668,16 @@ class PlayTriangle extends Control:
 		mouse_filter = Control.MOUSE_FILTER_IGNORE
 	func _draw() -> void:
 		var r := Rect2(Vector2.ZERO, size)
-		var pts := PackedVector2Array([r.position + Vector2(r.size.x * 0.12, 0), r.position + Vector2(r.size.x, r.size.y * 0.5), r.position + Vector2(r.size.x * 0.12, r.size.y)])
-		draw_colored_polygon(pts, Color(1, 1, 1))
+		draw_colored_polygon(PackedVector2Array([r.position + Vector2(r.size.x * 0.12, 0), r.position + Vector2(r.size.x, r.size.y * 0.5), r.position + Vector2(r.size.x * 0.12, r.size.y)]), Color(1, 1, 1))
 	func _notification(what: int) -> void:
 		if what == NOTIFICATION_RESIZED:
 			queue_redraw()
 
 # ---------------------------------------------------- Win Streak track ----
 
-## V03 I: thin track — badge with the live streak, progress line, five gift objects and
-## ONLY the live SB value under each (1/5/10/25/100): no "+", no per-step currency icon,
-## no per-step WIN copy. Current step highlighted, reached full, future dimmed.
+## Thin track: badge with the live streak, progress line, five gift objects and ONLY
+## the live SB value under each (1/5/10/25/100). Current step gold, reached full,
+## future dimmed.
 func _build_track(track: MarginContainer) -> void:
 	var panel := PanelContainer.new()
 	panel.name = "TrackPanel"
@@ -734,19 +748,19 @@ func _build_bottom_nav(nav: PanelContainer) -> void:
 		b.name = "SettingsButton" if id == "settings" else "Nav_" + id
 		b.text = UiText.t(spec[1])
 		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.custom_minimum_size = Vector2(0, 160)
+		b.custom_minimum_size = Vector2(0, 150)
 		b.add_theme_font_size_override("font_size", 26)
 		b.focus_mode = Control.FOCUS_NONE
 		HomeStyle.style_nav_button(b, id == "home")
 		for st in ["normal", "hover", "pressed", "disabled"]:
 			var sb: StyleBoxFlat = b.get_theme_stylebox(st)
-			sb.content_margin_top = 104
+			sb.content_margin_top = 96
 		var icon := HomeStyle.art("NavIcon_" + id)
 		icon.set_anchors_preset(Control.PRESET_CENTER_TOP)
-		icon.offset_left = -46
-		icon.offset_right = 46
-		icon.offset_top = 8
-		icon.offset_bottom = 100
+		icon.offset_left = -44
+		icon.offset_right = 44
+		icon.offset_top = 6
+		icon.offset_bottom = 94
 		b.add_child(_reg(icon))
 		match id:
 			"settings":
@@ -762,54 +776,52 @@ func _build_bottom_nav(nav: PanelContainer) -> void:
 		row.add_child(b)
 		_nodes["Nav_" + id] = b
 
+# ------------------------------------------------------------ ad slot ----
+
+## V04 persistent ad slot below the nav. Empty integration seam: a future ad SDK view is
+## attached to get_ad_mount(); a future No-Ads entitlement collapses the slot with
+## set_ad_slot_enabled(false). No provider, no fake content.
+func set_ad_slot_enabled(enabled: bool) -> void:
+	_ad_slot_enabled = enabled
+	(_nodes["AdBannerSlot"] as Control).visible = enabled
+	_apply_layout_mode()
+
+func is_ad_slot_enabled() -> bool:
+	return _ad_slot_enabled
+
+func get_ad_mount() -> Control:
+	return _nodes["AdMount"]
+
 # ------------------------------------------------------------ responsive ----
 
-## Responsive spacing by layout mode (COMPACT/NORMAL/TALL). Presentation only.
 func _apply_layout_mode() -> void:
 	if not _built:
 		return
-	var mode := ResponsiveLayout.get_layout_mode(get_viewport_rect().size)
+	var vp := get_viewport_rect().size
+	var mode := ResponsiveLayout.get_layout_mode(vp)
 	var gap: int = UiTokens.SPACE_SM if mode == ResponsiveLayout.LayoutMode.COMPACT else (UiTokens.SPACE_LG if mode == ResponsiveLayout.LayoutMode.TALL else UiTokens.SPACE_MD)
 	(_nodes["HomeLayout"] as VBoxContainer).add_theme_constant_override("separation", gap)
-	var vw := get_viewport_rect().size.x
-	(_nodes["ProfileCard"] as Control).custom_minimum_size.x = clampf(vw * PROFILE_CARD_WIDTH_FRACTION, 460.0, 620.0)
-	_apply_shortcut_columns(mode)
-	_layout_world.call_deferred()
-
-## SB-M42-012: shortcut card width scales with the world width so the central world keeps
-## >= CENTER_MIN_FRACTION; cards never drop below TOUCH_MIN; card height follows the
-## available world height so the three cards frame the hero with an even rhythm.
-const CENTER_MIN_FRACTION := 0.4
-const COLUMN_CARDS := 3
-func _apply_shortcut_columns(_mode: int) -> void:
-	var world: Control = _nodes["MainWorldArea"]
-	var width: float = world.size.x if world.size.x > 0.0 else get_viewport_rect().size.x
-	# Height available to the world = layout height minus the other regions (never the
-	# world's own size, which the card minimums feed back into).
-	var layout: VBoxContainer = _nodes["HomeLayout"]
-	var height: float = layout.size.y if layout.size.y > 0.0 else get_viewport_rect().size.y
-	var sep: int = layout.get_theme_constant("separation")
-	for c in layout.get_children():
-		if c != world and (c as Control).visible:
-			height -= (c as Control).get_combined_minimum_size().y + sep
-	var col_w: float = clampf(width * (1.0 - CENTER_MIN_FRACTION) * 0.5 - UiTokens.SPACE_SM, UiTokens.TOUCH_MIN, 226.0)
-	var card_h: float = clampf((height - (COLUMN_CARDS - 1) * UiTokens.SPACE_MD) / COLUMN_CARDS, UiTokens.TOUCH_MIN, 220.0)
-	var vgap: int = int(clampf((height - COLUMN_CARDS * card_h) / (COLUMN_CARDS + 1), UiTokens.SPACE_XS, 64))
+	(_nodes["HomeActionLayer"] as VBoxContainer).add_theme_constant_override("separation", gap)
+	(_nodes["ProfileCard"] as Control).custom_minimum_size.x = clampf(vp.x * PROFILE_CARD_WIDTH_FRACTION, 460.0, 620.0)
+	(_nodes["AdBannerSlot"] as Control).custom_minimum_size.y = clampf(vp.x * AD_SLOT_RATIO, AD_SLOT_MIN_H, AD_SLOT_MAX_H)
+	(_nodes["WorldMargin"] as MarginContainer).add_theme_constant_override("margin_top", PANEL_TOP)
 	for side in ["LeftShortcutColumn", "RightShortcutColumn"]:
-		var col: VBoxContainer = _nodes[side]
-		col.add_theme_constant_override("separation", vgap)
-		for b in col.get_children():
-			(b as Control).custom_minimum_size = Vector2(col_w, card_h)
+		(_nodes[side] as VBoxContainer).add_theme_constant_override("separation", PANEL_GAP)
+		(_nodes[side] as Control).custom_minimum_size.x = PANEL_SIZE.x
+	# The host reserves the action layer's minimum so the layout never overlaps.
+	(_nodes["ActionHost"] as Control).custom_minimum_size.y = (_nodes["HomeActionLayer"] as Control).get_combined_minimum_size().y
+	_queue_world()
 
 func get_layout_mode() -> int:
 	return ResponsiveLayout.get_layout_mode(get_viewport_rect().size)
 
 # ------------------------------------------------------------- modal ----
 
-## V03 K: deterministic modal state. `source` is an external overlay id (the app root
-## passes "settings" for the Settings panel); Home popups drive it internally. While any
-## source is active, every Home action region is hidden (not drawn, no pointer/keyboard
-## input); when the last one closes they are restored exactly.
+## Deterministic modal state (V03 K, V04 79): while any Home popup or an external source
+## (the app root passes "settings") is open, the single HomeActionLayer and the HUD (+)
+## buttons are hidden (not drawn; no pointer/keyboard input). The ActionHost keeps its
+## layout slot, so closing restores exactly the previous Home.
+const MODAL_HIDDEN := ["HomeActionLayer", "ScrubBucksPlus", "HeartsPlus"]
 func set_modal_active(source: String, active: bool) -> void:
 	if active:
 		_external_modals[source] = true
@@ -829,13 +841,12 @@ func _sync_modal() -> void:
 	if not _built:
 		return
 	var modal := is_modal_active()
-	for region in MODAL_HIDDEN_REGIONS:
+	for region in MODAL_HIDDEN:
 		(_nodes[region] as Control).visible = not modal
-	_apply_layout_mode()
+	_queue_world()
 
 # ---------------------------------------------------------------- refresh ----
 
-## Re-read canonical state into the live controls. Never mutates state.
 func refresh() -> void:
 	if not _built:
 		return
@@ -853,44 +864,29 @@ func refresh() -> void:
 	status.visible = not status.text.is_empty()
 	_render_values()
 
-## SB-M42-015: bind every live Home value from the canonical services (via the pure
-## HomeViewModel). Home stores nothing but the last rendered copy.
 func _render_values() -> void:
 	_vm = HomeViewModel.build(_app)
 	if not _vm.get("ok", false):
 		return
-	# Profile: presentational display name through the localization seam (no canonical
-	# player-profile name exists yet); rank/title stays hidden until a canonical one exists.
 	(_nodes["ProfileName"] as Label).text = UiText.t("HOME_PLAYER_NAME_DEFAULT")
 	(_nodes["ProfileLevel"] as Label).text = UiText.num(_vm["level"])
-	# SB-M42-019 / V03 A: Bot Parts toward the next 250-part robot (canonical
-	# RobotUnlockService / wallet), never XP — shown ONLY as the live ratio. When a robot
-	# is unlockable the bar turns gold (no extra copy).
+	# Bot Parts toward the next 250-part robot (canonical wallet / RobotUnlockService),
+	# never XP — only the live ratio, centred in the bar; gold bar when unlockable.
 	var parts: UiProgressMeter = _nodes["ProfileBotParts"]
 	parts.set_progress(_vm["bot_parts"], _vm["bot_parts_target"],
 		UiText.t("HOME_RATIO", [UiText.num(_vm["bot_parts"]), UiText.num(_vm["bot_parts_target"])]))
-	HomeStyle.style_meter(parts.bar, HomeStyle.GOLD if _vm["robot_can_unlock"] else HomeStyle.GREEN, 24)
-	# SB-M42-018: top currency is Scrub Bucks (banknote icon) with the live canonical
-	# wallet balance. No coin/Star authority.
+	HomeStyle.style_meter(parts.bar, HomeStyle.GOLD if _vm["robot_can_unlock"] else HomeStyle.GREEN, 42)
 	var sb: UiValueChip = _nodes["ScrubBucksChip"]
 	sb.set_tag(UiText.t("HOME_CURRENCY_SB"))
 	sb.set_value(UiText.num(_vm["scrub_bucks"]))
 	var hearts: UiValueChip = _nodes["HeartsChip"]
 	hearts.set_value("%d/%d" % [_vm["hearts"], _vm["hearts_max"]])
 	hearts.set_sub("" if _vm["hearts"] >= _vm["hearts_max"] else _mmss(_vm["heart_seconds_to_next"]))
-	# SB-M42-020 / V03 B: canonical Gift Meter (fed only by Win Streak SB inside
-	# GiftMeterService), shown only as the live N/1000 ratio. No event timer / Event Points.
 	(_nodes["GiftMeterBar"] as UiProgressMeter).set_progress(_vm["gift_progress"], _vm["gift_cycle_max"],
 		UiText.t("HOME_RATIO", [UiText.num(_vm["gift_progress"]), UiText.num(_vm["gift_cycle_max"])]))
 	var gbadge: Label = _nodes["GiftClaimableBadge"]
 	gbadge.text = str(_vm["gift_claimable"])
 	gbadge.visible = _vm["gift_claimable"] > 0
-	# Area plate: live/localizable title + number (presentational V1 defaults through the
-	# localization seam; no area progression truth exists yet).
-	(_nodes["AreaTitle"] as Label).text = UiText.t("HOME_AREA_TITLE")
-	(_nodes["AreaNumber"] as Label).text = UiText.t("HOME_AREA_NUMBER", [1])
-	# SB-M42-023: Win Streak SB track: position 1/2/3/4/5+ pays 1/5/10/25/100 SB
-	# (WinStreakService, owner-locked). Current step gold, reached white, future dimmed.
 	(_nodes["TrackStreakValue"] as Label).text = UiText.num(_vm["win_streak"])
 	(_nodes["TrackProgress"] as ProgressBar).value = clampi(_vm["win_streak"], 0, TRACK_POSITIONS)
 	for step in _vm["win_streak_track"]:
@@ -900,12 +896,9 @@ func _render_values() -> void:
 		value.modulate.a = 1.0 if step["reached"] or step["current"] else 0.6
 		var gift: Control = _nodes["TrackGift%d" % step["position"]]
 		gift.modulate = Color(1, 1, 1, 1) if step["reached"] or step["current"] else Color(0.72, 0.78, 0.92, 0.80)
-	(_nodes["Shortcut_win_streak"] as UiShortcutButton).set_badge(_vm["win_streak"])
-	(_nodes["Shortcut_gift_bar"] as UiShortcutButton).set_badge(_vm["gift_claimable"])
-	(_nodes["Shortcut_cards_exchange"] as UiShortcutButton).set_badge(_vm["cards_duplicates"])
 	# SB-M42-024: Daily badge = 1 when today's login reward is claimable.
 	(_nodes["Shortcut_daily"] as UiShortcutButton).set_badge(0 if _vm["daily_claimed_today"] else 1)
-	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS + ROW_SHORTCUTS:
+	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
 		(_nodes["Shortcut_" + id[0]] as Button).disabled = not LIVE_SHORTCUTS.has(id[0])
 	for pid in _popups:
 		if (_popups[pid] as Control).visible:

@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "authority": "coordination/OWNER_M42_HOME_REBUILD_V04_SINGLE_WORLD_BACKGROUND.md",
+  "notes": "Home world backgrounds: one complete owner-approved background per world, canonical 1080x2160 coordinate space. Level-number -> world mapping is intentionally absent until the owner defines progression ranges (V04 item 83). Rects are [x, y, w, h] in canonical pixels.",
+  "default_world": "world_01",
+  "worlds": {
+    "world_01": {
+      "background_slug": "world_01_whispering_park_background",
+      "canvas": [1080, 2160],
+      "baked_title": "WHISPERING PARK / AREA 1",
+      "scrubby_feet_anchor": [540, 1297],
+      "scrubby_safe_box": [353, 779, 374, 518],
+      "platform_top_rect": [256, 1240, 570, 97],
+      "baked_sign_rect": [351, 653, 383, 92],
+      "helper_bot_rects": [
+        [59, 1177, 189, 173],
+        [97, 1415, 135, 205],
+        [956, 940, 124, 151],
+        [902, 1193, 119, 222]
+      ]
+    }
+  }
+}

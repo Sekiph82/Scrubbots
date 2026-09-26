@@ -64,8 +64,11 @@ func _home_shell_tree() -> void:
 	var names: Array = []
 	for c in layout.get_children():
 		names.append(String(c.name))
-	_ok(names == ["TopCurrencyHUD", "GiftMeter", "MainWorldArea", "ActionRow", "StatusLabel", "WinStreakRewardTrack", "BottomNav"], "MASTER_UI §6 region order (V03: SHOP | PLAY | CARDS EXCHANGE row) %s" % str(names))
-	_ok(home.get_region("PlayButton").get_parent() == home.get_region("ActionRow"), "PLAY lives in the lower action row")
+	_ok(names == ["TopCurrencyHUD", "GiftMeter", "ActionHost", "AdBannerSlot"], "V04 region order: HUD, Gift Meter, action host, ad slot %s" % str(names))
+	var act_names: Array = []
+	for c in home.get_region("HomeActionLayer").get_children():
+		act_names.append(String(c.name))
+	_ok(act_names == ["WorldMargin", "PlayButton", "WinStreakRewardTrack", "BottomNav"], "V04 HomeActionLayer: panels, centred PLAY, track, nav %s" % str(act_names))
 	var world_names: Array = []
 	for c in home.get_region("MainWorldArea").get_children():
 		world_names.append(String(c.name))
@@ -204,7 +207,7 @@ func _components_viewport_matrix() -> void:
 					small.append(String(b.name))
 				if not safe.grow(0.5).encloses(r):
 					outside.append(String(b.name))
-			_ok(home.find_children("*", "BaseButton", true, false).size() >= 14, "%s: >= 14 live buttons measured (8 shortcuts + PLAY + 5 nav)" % tag)
+			_ok(home.find_children("*", "BaseButton", true, false).size() >= 12, "%s: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)" % tag)
 			_ok(small.is_empty(), "%s: every button >= 88x88 %s" % [tag, str(small)])
 			_ok(outside.is_empty(), "%s: every button inside safe area %s" % [tag, str(outside)])
 			var prev_end := -1.0
@@ -237,8 +240,6 @@ func _components_viewport_matrix() -> void:
 ## SB-M42-011: layered canonical regions, reference never shipped as one bitmap.
 func _layered_art_regions() -> void:
 	print("[layered art regions]")
-	var manifest = JSON.parse_string(FileAccess.get_file_as_string("res://assets/ui/HOME_ASSET_MANIFEST.json"))
-	var order: Array = manifest["layer_order"]
 	var sub := _sub(Vector2i(1080, 2160))
 	var home = HomeScreenScene.instantiate()
 	sub.add_child(home)
@@ -248,32 +249,19 @@ func _layered_art_regions() -> void:
 	var names: Array = []
 	for l in layers:
 		names.append(String(l.name).trim_prefix("Layer_"))
-	var expected: Array = []
-	for o in order:
-		if o != "ui":
-			expected.append(String(o).replace(".", "_"))
-	_ok(names == expected, "art layers follow manifest layer_order %s" % str(names))
+	_ok(names == ["WorldBackground", "characters"], "V04 art layers: ONE world background, then the character layer %s" % str(names))
 	var all_ignore := true
 	for l in layers:
 		all_ignore = all_ignore and (l as Control).mouse_filter == Control.MOUSE_FILTER_IGNORE
 	_ok(all_ignore, "every art layer is decorative (ignores input)")
 	_ok(home.get_region("Background").get_index() < home.get_region("SafeAreaRoot").get_index(), "screen art layers draw behind all UI")
-	var stage: Control = home.get_region("WorldStage")
-	_ok(stage.get_parent() == home.get_region("CenterScrubbyArea") and layers[4].get_parent() == stage and layers[5].get_parent() == stage, "world/character layers live in CenterScrubbyArea/WorldStage")
-	_ok(home.get_region("LeftShortcutColumn").z_index > 0 and home.get_region("RightShortcutColumn").z_index > 0, "shortcut cards draw in front of the world stage")
+	_ok(layers[0].get_parent() == home.get_region("Background") and layers[1].get_parent() == home.get_region("Background") and layers[1].get_index() > layers[0].get_index(), "world + Scrubby live in the clipped world canvas, Scrubby above the world")
 	var ref_hits: Array = []
 	for f in ["res://scripts/ui/home/home_screen.gd", "res://scenes/ui/home/home_screen.tscn", "res://scripts/app/main.gd", "res://scenes/app/main.tscn"]:
 		if FileAccess.get_file_as_string(f).find("main screen.png") != -1 or FileAccess.get_file_as_string(f).find("_owner_inbox") != -1:
 			ref_hits.append(f)
 	_ok(ref_hits.is_empty(), "owner reference screenshot never loaded by Home/app %s" % str(ref_hits))
-	var bound := 0
-	for l in layers.slice(0, 4):
-		if (l as TextureRect).texture != null:
-			bound += 1
-	for n in ["Art_arch", "Art_scrubby"]:
-		if home.get_region(n).texture != null:
-			bound += 1
-	_ok(bound == 6, "owner-approved production art bound on the 4 screen layers + world arch + Scrubby (SB-M42-016/017 gate open)")
+	_ok(home.get_region("WorldBackground").texture != null and home.get_region("Art_scrubby").texture != null, "owner-approved World 01 background + Scrubby bound (SB-M42-016/017 gate open)")
 	sub.free()
 	_complete("layered_art_regions")
 
@@ -340,7 +328,7 @@ func _live_binding() -> void:
 	home.refresh()
 	_ok(home.get_region("HeartsChip").sub_label.text == "29:00", "Heart timer counts down from wall clock (%s)" % home.get_region("HeartsChip").sub_label.text)
 	_ok(vm["gift_progress"] == e.gift.cycle_progress() and vm["gift_claimable"] == e.gift.claimable().size(), "Gift Meter progress / claimable follow GiftMeterService")
-	_ok(home.get_region("Shortcut_gift_bar").badge.visible and home.get_region("Shortcut_gift_bar").badge.text == str(e.gift.claimable().size()), "Gift shortcut badge = live claimable count")
+	_ok(home.get_region("GiftClaimableBadge").visible and home.get_region("GiftClaimableBadge").text == str(e.gift.claimable().size()), "Gift crate badge = live claimable count")
 	var props: Array = []
 	for pr in home.get_script().get_script_property_list():
 		props.append(pr["name"])
@@ -371,20 +359,20 @@ func _approved_art_only() -> void:
 	for row in rows:
 		if not HomePresentationMap.INACTIVE_MODES.has(row["mode"]):
 			active += 1
-	_ok(rows.size() == 50 and active == 45 and bound == 45 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved): 50 entries accounted, 45 active entries presented (%d bound), V03 retired/disabled entries present nothing" % bound)
+	_ok(rows.size() == 51 and active == 24 and bound == 24 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved): 51 entries accounted, 24 active entries presented (%d bound), retired/disabled entries present nothing" % bound)
 	# Un-approval simulation on an in-memory manifest copy (repo manifest untouched):
 	# entries that are not APPROVED keep native placeholders.
 	var m = V.load_manifest()
-	var keep := ["home_bg_sky", "scrubby_home_pose", "icon_currency_scrub_bucks", "icon_shortcut_daily"]
+	var keep := ["world_01_whispering_park_background", "scrubby_home_pose", "icon_currency_scrub_bucks", "icon_shortcut_daily"]
 	for a in m["assets"]:
 		if a["kind"] == "ART" and not keep.has(a["slug"]) and a["id"] != "HOME-087":
 			a["status"] = "PLANNED"
 			a.erase("approved_sha256")
 	home.set_art_binder(HomeArtBinder.new(m))
 	await process_frame
-	_ok(home.get_region("Layer_background.sky").texture != null and home.get_region("Art_scrubby").texture != null, "approved sky + Scrubby bind to their nodes")
-	_ok(home.get_region("Layer_background.city_far").texture == null and home.get_region("Art_arch").texture == null, "unapproved layers stay empty")
-	_ok(home.get_region("ScrubBucksChip").icon.texture != null and home.get_region("Shortcut_daily").icon != null and home.get_region("Shortcut_shop").icon == null, "approved icons bind; unapproved do not")
+	_ok(home.get_region("WorldBackground").texture != null and home.get_region("Art_scrubby").texture != null, "approved world + Scrubby bind to their nodes")
+	_ok(home.get_region("ProfilePortrait").texture == null and home.get_region("TrackBadge").texture == null, "unapproved art stays empty")
+	_ok(home.get_region("ScrubBucksChip").icon.texture != null and home.get_region("ShortcutIcon_daily").texture != null and home.get_region("ShortcutIcon_shop").texture == null, "approved icons bind; unapproved do not")
 	home.set_art_binder(HomeArtBinder.new())
 	await process_frame
 	var outside: Array = []
@@ -516,10 +504,9 @@ func _gift_bar_claims() -> void:
 	var e = app.economy
 	e.gift.add_streak_sb("t_gb_1", 60)   # crosses 10 and 50
 	home.refresh()
-	var sc = home.get_region("Shortcut_gift_bar")
-	_ok(not sc.disabled and sc.badge.visible and sc.badge.text == "2", "Gift shortcut live with claimable badge 2")
-	sc.pressed.emit()
-	var popup = home.get_popup("gift_bar")
+	var gb: Label = home.get_region("GiftClaimableBadge")
+	_ok(home.get_region("Shortcut_gift_bar") == null and gb.visible and gb.text == "2", "V04: no Gifts Home panel; Gift Meter crate shows claimable badge 2")
+	var popup = home.open_popup("gift_bar")   # service-driven gifts flow seam (not a Home panel)
 	_ok(popup != null and popup.visible and popup.get_row_count() == 2, "Gift Bar popup lists 2 queued milestones")
 	var occ: Dictionary = e.gift.claimable()[0]
 	var reward: Dictionary = e.config.gift_meter_milestone(int(occ["milestone"]))
@@ -528,7 +515,7 @@ func _gift_bar_claims() -> void:
 	var btn: Button = popup.get_action_button(String(occ["id"]))
 	btn.pressed.emit()
 	_ok(e.wallet.scrub_bucks() == sb0 + int(reward.get("scrub_bucks", 0)) and e.wallet.bot_parts() == parts0 + int(reward.get("bot_parts", 0)), "CLAIM grants exactly the configured milestone reward %s" % str(reward))
-	_ok(e.gift.claimable().size() == 1 and popup.get_row_count() == 1 and sc.badge.text == "1", "claimed row gone, badge 1")
+	_ok(e.gift.claimable().size() == 1 and popup.get_row_count() == 1 and gb.text == "1", "claimed row gone, badge 1")
 	btn.pressed.emit()
 	var again: Dictionary = app.actions.claim_gift(String(occ["id"]))
 	_ok(not again.get("ok", true) and e.wallet.scrub_bucks() == sb0 + int(reward.get("scrub_bucks", 0)), "second claim of the same occurrence refused, no double reward")
@@ -549,8 +536,7 @@ func _cards_exchange_presentation() -> void:
 	home.bind(app)
 	await process_frame
 	var e = app.economy
-	var sc = home.get_region("Shortcut_cards_exchange")
-	_ok(not sc.disabled and not sc.badge.visible and sc.text == "CARDS EXCHANGE", "CARDS EXCHANGE shortcut live, no badge without duplicates")
+	_ok(home.get_region("Shortcut_cards_exchange") == null and home.get_view_model()["cards_duplicates"] == 0, "V04: no CARDS EXCHANGE Home panel (Collection-owned flow); 0 duplicates")
 	var ids: Array = e.collection.all_card_ids()
 	e.collection.add_copies(ids[0], 3)
 	e.collection.add_copies(ids[5], 2)
@@ -560,10 +546,9 @@ func _cards_exchange_presentation() -> void:
 	for cid in ids:
 		want += e.exchange.exchangeable(cid)
 		want_sb += e.exchange.exchangeable(cid) * e.exchange.card_value(cid)
-	_ok(want > 0 and sc.badge.text == str(want), "badge = live exchangeable duplicate count %d" % want)
+	_ok(want > 0 and home.get_view_model()["cards_duplicates"] == want, "live exchangeable duplicate count %d" % want)
 	var snap: Dictionary = e.snapshot()
-	sc.pressed.emit()
-	var popup = home.get_popup("cards_exchange")
+	var popup = home.open_popup("cards_exchange")   # Collection-owned flow seam
 	_ok(popup.visible and popup.get_row_count() == 2 and popup.get_note().find("%d SB" % want_sb) != -1, "popup lists duplicate cards and their canonical SB value (%s)" % popup.get_note())
 	_ok(popup.find_children("Action_*", "", true, false).is_empty(), "no exchange execution button (presentation only)")
 	_ok(e.snapshot() == snap, "opening Cards Exchange mutates nothing")
@@ -599,7 +584,7 @@ func _win_streak_track() -> void:
 	_ok(e.streak.streak() == 7 and _is_current(home, 5), "streak 7 marks the 5+ step")
 	e.streak.on_progression_loss()
 	home.refresh()
-	_ok(home.get_region("Shortcut_win_streak").badge.visible == false and home.get_region("TrackStep1").modulate.a < 1.0, "loss resets the live track")
+	_ok(home.get_region("TrackStreakValue").text == "0" and not _is_current(home, 1) and home.get_region("TrackStep1").modulate.a < 1.0 and home.get_region("TrackProgress").value == 0, "loss resets the live track")
 	sub.free()
 	_complete("win_streak_track")
 
