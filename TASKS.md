@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M42 OWNER VISUAL / DEVICE GATES
-- Current Sprint: M42-C001 V06 Post-Audit Closure
-- Current Task: Owner visual review of V06 Home
-- Current Task Status: OWNER_VISUAL_REVIEW_REQUIRED
-- Next Task/Action: OWNER reviews the current V06 Home in the running build. Focus on final Scrubby dominance/focus separation, four-panel readability, thinner SB/Heart pills and in-pill plus glyphs, Heart count/timer presentation, and the apparent ad-reservation height in the actual runtime viewport. If visually accepted, ChatGPT can close SB-M42-011 and SB-M42-017. SB-M42-032 Android real-device cinematic validation and SB-M42-033 iOS-later remain separate device gates.
-- Required Actor: OWNER
+- Current Milestone: M42 HOME POLISH V07
+- Current Sprint: M42-C001 Desktop Safe-Area Fix
+- Current Task: Remove false Windows taskbar-derived bottom safe-area without changing V06 Home
+- Current Task Status: IMPLEMENTATION_REQUIRED
+- Next Task/Action: CLAUDE executes `coordination/sessions/M42-C001/task_prompts/SB-M42-HOME-POLISH_V07.md`. V07 must change only the shared SafeAreaRoot platform policy so desktop runtimes use zero runtime safe-area margins while Android/iOS keep real DisplayServer safe-area handling and synthetic test insets remain authoritative. V06 Home geometry stays frozen, including the 100px@1080 / 72..112 AdBannerSlot rule.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011/SB-M42-017 are independently code-audited under V06 and now wait only on owner visual review.
-- Note: V06 implementation `0f0614f` passed independent audit at `coordination/sessions/M42-C001/audits/SB-M42-HOME-POLISH_V06_CHATGPT_AUDIT_V01.md`. HOME-120 is byte/transform locked; Scrubby is 1.24x from the same feet anchor with a native dark focus shade; Heart regen is now canonical 900 s; Gift Meter and Win Streak remain V05-locked. The owner screenshot looks directionally correct, but the visible dark ad band should be judged/measured in the actual runtime viewport before final visual closure. Current open M42 rows remain 011, 017, 032, 033.
+- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011/SB-M42-017 remain open for V07 audit and final owner runtime visual review.
+- Note: The owner screenshot exposed a Windows embedded-debug presentation bug: desktop work-area/taskbar delta was being interpreted as a mobile bottom safe inset, visually doubling the dark ad region. `coordination/OWNER_M42_HOME_POLISH_V07_DESKTOP_SAFE_AREA.md` authorizes only this platform-safe-area fix. Current open M42 rows remain 011, 017, 032, 033.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
