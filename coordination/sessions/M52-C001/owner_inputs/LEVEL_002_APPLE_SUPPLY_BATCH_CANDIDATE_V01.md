@@ -59,7 +59,7 @@ This candidate uses the minimum possible number of batches under the hard `<= 30
 - C11: 21
 - C12: 14
 
-Total batches: **35**
+Total batches: **36**
 
 ## Intended global player selection sequence
 
