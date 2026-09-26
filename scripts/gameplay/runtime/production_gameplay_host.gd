@@ -64,6 +64,7 @@ const ProductionBoosterAdapter = preload("res://scripts/economy/production_boost
 const SaveService = preload("res://scripts/save/save_service.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
 const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
+const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -71,6 +72,11 @@ const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 @export var gen_seed: int = 1
 @export var column_count: int = 3
 @export var preview_depth: int = 3
+## M52-C001 owner supply plan. Empty => M23 generator candidate (gen_seed/column_count/
+## preview_depth). Non-empty => the exact plan queues via SupplyPlanLoader; a missing or
+## malformed plan fails the build closed (no generated fallback). In the AppState path
+## this is set from the resolved catalog entry.
+@export var supply_plan_path: String = ""
 @export var base_cadence: float = GameplaySpeedAuthority.DEFAULT_BASE_INTERVAL
 @export var auto_build: bool = true
 ## Campaign progression level number this host instance represents (M39 V02).
@@ -186,6 +192,7 @@ func build() -> bool:
 		level_path = launch["level_path"]
 		progression_level = int(launch["level"])
 		launch_entry_id = String(launch["entry_id"])
+		supply_plan_path = String(launch.get("supply_plan_path", ""))
 	var res_load = LevelLoader.load_from_path(level_path)
 	if not res_load.is_ok():
 		_build_error = "level load failed"
@@ -195,10 +202,17 @@ func build() -> bool:
 	_board = BoardState.from_level_data(lvl)
 
 	# M23 deterministic candidate (M27-proven for seed 1 / 3 columns / preview 3).
-	_supply = BatchSupplyGenerator.generate(lvl, column_count, preview_depth, gen_seed)
-	if _supply == null:
-		_build_error = "supply generation failed"
-		return false
+	if supply_plan_path.is_empty():
+		_supply = BatchSupplyGenerator.generate(lvl, column_count, preview_depth, gen_seed)
+		if _supply == null:
+			_build_error = "supply generation failed"
+			return false
+	else:
+		var plan := SupplyPlanLoader.load_engine(supply_plan_path, lvl)
+		if not plan["ok"]:
+			_build_error = "supply_plan_invalid:%s" % plan["error"]
+			return false
+		_supply = plan["engine"]
 	# QA/debug-only DEADLOCK fixture: drop the last N generated batches (see qa_supply_drop_last).
 	if qa_supply_drop_last > 0:
 		_supply = _make_deadlock_supply(_supply, qa_supply_drop_last, lvl.palette.size())

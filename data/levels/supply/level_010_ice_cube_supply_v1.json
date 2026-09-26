@@ -1,10 +1,9 @@
 {
-	"schema": "scrubbots.level_supply_candidate.v1",
+	"schema": "scrubbots.level_supply_plan.v1",
 	"version": 1,
 	"levelId": "level_010_ice_cube",
-	"levelPath": "res://data/levels/level_010_ice_cube.json",
 	"ownerInput": "coordination/sessions/M52-C001/owner_inputs/LEVEL_010_ICE_CUBE_SUPPLY_BATCH_CANDIDATE_V01.md",
-	"status": "OWNER_CANDIDATE_UNPROVEN",
+	"ownerInputSha256": "3f2c3e7e77d74210923158583d2b83a1dcb5499fc29a9c8b7d97d0b3e0fbe9cf",
 	"columnCount": 3,
 	"visiblePreviewDepth": 3,
 	"maxRobotsPerBatch": 30,

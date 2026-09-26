@@ -14,6 +14,9 @@ var difficulty: String
 var width: int
 var height: int
 var preview_exists: bool
+## Owner supply plan (M52-C001). Empty => the level uses the M23 generator candidate
+## (Level 1 historical path). Non-empty => runtime MUST load exactly this plan.
+var supply_plan_path: String = ""
 
 ## Deep value copy — LevelCatalog returns copies so consumers can never mutate
 ## the canonical internal entry objects (F-M35-001).
@@ -28,4 +31,5 @@ func duplicate() -> RefCounted:
 	e.width = width
 	e.height = height
 	e.preview_exists = preview_exists
+	e.supply_plan_path = supply_plan_path
 	return e
