@@ -1,0 +1,12 @@
+os=Windows
+window_size=(683, 1366)
+screen_size=(2560, 1600)
+display_safe_area_probe=[P: (0, 0), S: (2560, 1504)]
+logical_viewport=(1080.0, 2160.0)
+uses_runtime_display_safe_area=false
+pre_v07_margins_ltrb=[0, 0, 0, 130]
+v07_applied_margins_ltrb=[0, 0, 0, 0]
+ad_banner_slot=[P: (0.0, 2060.0), S: (1080.0, 100.0)]
+bottom_nav=[P: (0.0, 1866.0), S: (1080.0, 178.0)]
+play=[P: (305.0, 1559.0), S: (470.0, 155.0)]
+world_transform={ "scale": 1.0, "offset": (0.0, 0.0) }
