@@ -1,0 +1,38 @@
+{
+	"builderVersion": "M21-C001/v1",
+	"cellCount": 1444,
+	"cellReferenceCounts": {
+		"C02": 28,
+		"C04": 452,
+		"C05": 88,
+		"C08": 601,
+		"C11": 72,
+		"C16": 203
+	},
+	"difficulty": "MEDIUM",
+	"firstSeenColorOrder": [
+		"C08",
+		"C16",
+		"C04",
+		"C05",
+		"C11",
+		"C02"
+	],
+	"height": 38,
+	"normalizedColorOrder": [
+		"C02",
+		"C04",
+		"C05",
+		"C08",
+		"C11",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_003_palm_tree.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_003_palm_tree.png",
+	"sourceGitBlobSha1": "096a2fef7e1f0a6dc7831715eef225022a784d78",
+	"sourcePath": "res://assets/art/levels/source/medium/level_003_palm_tree_38x38.png",
+	"sourceSha256": "84960199759b1c3a1e130a24149c14fff9a5ee6ffb53db4ec6f138e34c6116cc",
+	"usedColorCount": 6,
+	"width": 38
+}

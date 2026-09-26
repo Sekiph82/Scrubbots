@@ -1,0 +1,44 @@
+{
+	"builderVersion": "M21-C001/v1",
+	"cellCount": 1024,
+	"cellReferenceCounts": {
+		"C01": 9,
+		"C08": 666,
+		"C10": 2,
+		"C11": 9,
+		"C13": 43,
+		"C14": 126,
+		"C15": 58,
+		"C16": 111
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C08",
+		"C16",
+		"C15",
+		"C14",
+		"C01",
+		"C11",
+		"C13",
+		"C10"
+	],
+	"height": 32,
+	"normalizedColorOrder": [
+		"C01",
+		"C08",
+		"C10",
+		"C11",
+		"C13",
+		"C14",
+		"C15",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_007_pigeon.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_007_pigeon.png",
+	"sourceGitBlobSha1": "434a92143e9ce4c667fb776c7389714f63331115",
+	"sourcePath": "res://assets/art/levels/source/easy/level_007_pigeon_32x32.png",
+	"sourceSha256": "ca6004936d2ab9f4a8faef3215f9887157a407a7b63743ec07cc0a922530158a",
+	"usedColorCount": 8,
+	"width": 32
+}

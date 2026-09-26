@@ -1,0 +1,44 @@
+{
+	"builderVersion": "M21-C001/v1",
+	"cellCount": 1024,
+	"cellReferenceCounts": {
+		"C01": 55,
+		"C02": 150,
+		"C03": 47,
+		"C08": 482,
+		"C11": 7,
+		"C14": 15,
+		"C15": 28,
+		"C16": 240
+	},
+	"difficulty": "MEDIUM",
+	"firstSeenColorOrder": [
+		"C08",
+		"C16",
+		"C15",
+		"C01",
+		"C02",
+		"C03",
+		"C14",
+		"C11"
+	],
+	"height": 32,
+	"normalizedColorOrder": [
+		"C01",
+		"C02",
+		"C03",
+		"C08",
+		"C11",
+		"C14",
+		"C15",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_008_butterfly.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_008_butterfly.png",
+	"sourceGitBlobSha1": "af1a431f4fbb27ecd7420188f024eaa0246d5c10",
+	"sourcePath": "res://assets/art/levels/source/medium/level_008_butterfly_32x32.png",
+	"sourceSha256": "9a623fece67690862ba73b737e5e52d9acfbe1e46b160c411eee5714ea01b2fc",
+	"usedColorCount": 8,
+	"width": 32
+}

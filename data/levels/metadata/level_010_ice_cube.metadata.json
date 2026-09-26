@@ -1,0 +1,50 @@
+{
+	"builderVersion": "M21-C001/v1",
+	"cellCount": 1024,
+	"cellReferenceCounts": {
+		"C02": 6,
+		"C03": 14,
+		"C05": 93,
+		"C06": 16,
+		"C07": 2,
+		"C08": 259,
+		"C13": 270,
+		"C14": 78,
+		"C15": 70,
+		"C16": 216
+	},
+	"difficulty": "VERY_HARD",
+	"firstSeenColorOrder": [
+		"C08",
+		"C16",
+		"C14",
+		"C15",
+		"C06",
+		"C05",
+		"C13",
+		"C07",
+		"C03",
+		"C02"
+	],
+	"height": 32,
+	"normalizedColorOrder": [
+		"C02",
+		"C03",
+		"C05",
+		"C06",
+		"C07",
+		"C08",
+		"C13",
+		"C14",
+		"C15",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_010_ice_cube.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_010_ice_cube.png",
+	"sourceGitBlobSha1": "229319f4847f70271dddff40f578c33cb3bc5449",
+	"sourcePath": "res://assets/art/levels/source/very_hard/level_010_ice_cube_32x32.png",
+	"sourceSha256": "a39b54c0adc05ca4778536cd9f0b5bccaa7cfde786fb8c72efa4be91029d3d61",
+	"usedColorCount": 10,
+	"width": 32
+}

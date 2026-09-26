@@ -1,0 +1,159 @@
+{
+	"levelSha256": "ae725a9c86839dcffb6444f3208416b553679878be7999ef8814de51241e8c1c",
+	"solverAuthority": {
+		"baseSeed": 1,
+		"columnCount": 3,
+		"gate": "res://scripts/gameplay/solver/generation_gate.gd",
+		"maxAttempts": 1,
+		"maxDepth": 400,
+		"maxVisited": 200000,
+		"previewDepthSemantics": "player-facing visible rows only; total FIFO depth per column is not capped",
+		"runtimeSupplyAuthority": "res://scripts/gameplay/runtime/production_gameplay_host.gd",
+		"slotCapacity": 5,
+		"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+		"visiblePreviewDepth": 3
+	},
+	"solve": {
+		"acceptedAttempt": 0.0,
+		"acceptedSeed": 1.0,
+		"conservationOk": true,
+		"decisions": 19.0,
+		"fullQueueConsumed": true,
+		"hiddenBatchesBeyondVisibleRows": [
+			4.0,
+			3.0,
+			3.0
+		],
+		"proofStateHoldsFullQueue": true,
+		"proofStateQueueLengths": [
+			7.0,
+			6.0,
+			6.0
+		],
+		"queueLayout": [
+			[
+				{
+					"batchId": "B00000",
+					"colorIndex": 0.0,
+					"robots": 15.0
+				},
+				{
+					"batchId": "B00003",
+					"colorIndex": 1.0,
+					"robots": 1.0
+				},
+				{
+					"batchId": "B00006",
+					"colorIndex": 2.0,
+					"robots": 50.0
+				},
+				{
+					"batchId": "B00009",
+					"colorIndex": 2.0,
+					"robots": 50.0
+				},
+				{
+					"batchId": "B00012",
+					"colorIndex": 3.0,
+					"robots": 3.0
+				},
+				{
+					"batchId": "B00015",
+					"colorIndex": 3.0,
+					"robots": 2.0
+				},
+				{
+					"batchId": "B00018",
+					"colorIndex": 4.0,
+					"robots": 28.0
+				}
+			],
+			[
+				{
+					"batchId": "B00001",
+					"colorIndex": 0.0,
+					"robots": 15.0
+				},
+				{
+					"batchId": "B00004",
+					"colorIndex": 1.0,
+					"robots": 1.0
+				},
+				{
+					"batchId": "B00007",
+					"colorIndex": 2.0,
+					"robots": 50.0
+				},
+				{
+					"batchId": "B00010",
+					"colorIndex": 2.0,
+					"robots": 49.0
+				},
+				{
+					"batchId": "B00013",
+					"colorIndex": 3.0,
+					"robots": 2.0
+				},
+				{
+					"batchId": "B00016",
+					"colorIndex": 3.0,
+					"robots": 2.0
+				}
+			],
+			[
+				{
+					"batchId": "B00002",
+					"colorIndex": 1.0,
+					"robots": 2.0
+				},
+				{
+					"batchId": "B00005",
+					"colorIndex": 1.0,
+					"robots": 1.0
+				},
+				{
+					"batchId": "B00008",
+					"colorIndex": 2.0,
+					"robots": 50.0
+				},
+				{
+					"batchId": "B00011",
+					"colorIndex": 2.0,
+					"robots": 49.0
+				},
+				{
+					"batchId": "B00014",
+					"colorIndex": 3.0,
+					"robots": 2.0
+				},
+				{
+					"batchId": "B00017",
+					"colorIndex": 4.0,
+					"robots": 28.0
+				}
+			]
+		],
+		"queueLengths": [
+			7.0,
+			6.0,
+			6.0
+		],
+		"replaySolved": true,
+		"replaySteps": 19.0,
+		"runtimeSeedMatchesAccepted": true,
+		"solverAttempts": [
+			{
+				"attempt": 0.0,
+				"conservationOk": true,
+				"effectiveSeed": 1.0,
+				"outcome": "SOLVED",
+				"visited": 20.0
+			}
+		],
+		"solverStatus": "SOLVED",
+		"totalBatches": 19.0,
+		"traceHash": 1618197986.0,
+		"traceSummary": "c0:C0#15/0clr|c0:C1#1/0clr|c0:C2#50/50clr|c0:C2#50/50clr|c0:C3#3/0clr|c0:C3#2/0clr|c0:C4#28/48clr|c1:C0#15/0clr|c1:C1#1/1clr|c1:C2#50/50clr|c1:C2#49/49clr|c1:C3#2/2clr|c1:C3#2/2clr|c2:C1#2/16clr|c2:C1#1/1clr|c2:C2#50/50clr|c2:C2#49/47clr|c2:C3#2/6clr|c2:C4#28/28clr",
+		"visitedStates": 20.0
+	}
+}

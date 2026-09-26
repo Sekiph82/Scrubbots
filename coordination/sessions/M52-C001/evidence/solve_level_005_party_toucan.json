@@ -1,0 +1,469 @@
+{
+	"levelSha256": "b2c61546e75c4a203d902889e8bf41f0c82827bfdc01d9aea9a8c58ba1c5be36",
+	"solverAuthority": {
+		"baseSeed": 1,
+		"columnCount": 3,
+		"gate": "res://scripts/gameplay/solver/generation_gate.gd",
+		"maxAttempts": 64,
+		"maxDepth": 400,
+		"maxVisited": 200000,
+		"previewDepthSemantics": "player-facing visible rows only; total FIFO depth per column is not capped",
+		"runtimeSupplyAuthority": "res://scripts/gameplay/runtime/production_gameplay_host.gd",
+		"slotCapacity": 5,
+		"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+		"visiblePreviewDepth": 3
+	},
+	"solve": {
+		"solverAttempts": [
+			{
+				"attempt": 0.0,
+				"conservationOk": true,
+				"effectiveSeed": 1.0,
+				"outcome": "DEADLOCK",
+				"visited": 82.0
+			},
+			{
+				"attempt": 1.0,
+				"conservationOk": true,
+				"effectiveSeed": 2654435762.0,
+				"outcome": "DEADLOCK",
+				"visited": 222.0
+			},
+			{
+				"attempt": 2.0,
+				"conservationOk": true,
+				"effectiveSeed": 5308871523.0,
+				"outcome": "DEADLOCK",
+				"visited": 82.0
+			},
+			{
+				"attempt": 3.0,
+				"conservationOk": true,
+				"effectiveSeed": 7963307284.0,
+				"outcome": "DEADLOCK",
+				"visited": 82.0
+			},
+			{
+				"attempt": 4.0,
+				"conservationOk": true,
+				"effectiveSeed": 10617743045.0,
+				"outcome": "DEADLOCK",
+				"visited": 82.0
+			},
+			{
+				"attempt": 5.0,
+				"conservationOk": true,
+				"effectiveSeed": 13272178806.0,
+				"outcome": "DEADLOCK",
+				"visited": 167.0
+			},
+			{
+				"attempt": 6.0,
+				"conservationOk": true,
+				"effectiveSeed": 15926614567.0,
+				"outcome": "DEADLOCK",
+				"visited": 225.0
+			},
+			{
+				"attempt": 7.0,
+				"conservationOk": true,
+				"effectiveSeed": 18581050328.0,
+				"outcome": "DEADLOCK",
+				"visited": 258.0
+			},
+			{
+				"attempt": 8.0,
+				"conservationOk": true,
+				"effectiveSeed": 21235486089.0,
+				"outcome": "DEADLOCK",
+				"visited": 269.0
+			},
+			{
+				"attempt": 9.0,
+				"conservationOk": true,
+				"effectiveSeed": 23889921850.0,
+				"outcome": "DEADLOCK",
+				"visited": 354.0
+			},
+			{
+				"attempt": 10.0,
+				"conservationOk": true,
+				"effectiveSeed": 26544357611.0,
+				"outcome": "DEADLOCK",
+				"visited": 222.0
+			},
+			{
+				"attempt": 11.0,
+				"conservationOk": true,
+				"effectiveSeed": 29198793372.0,
+				"outcome": "DEADLOCK",
+				"visited": 330.0
+			},
+			{
+				"attempt": 12.0,
+				"conservationOk": true,
+				"effectiveSeed": 31853229133.0,
+				"outcome": "DEADLOCK",
+				"visited": 269.0
+			},
+			{
+				"attempt": 13.0,
+				"conservationOk": true,
+				"effectiveSeed": 34507664894.0,
+				"outcome": "DEADLOCK",
+				"visited": 222.0
+			},
+			{
+				"attempt": 14.0,
+				"conservationOk": true,
+				"effectiveSeed": 37162100655.0,
+				"outcome": "DEADLOCK",
+				"visited": 317.0
+			},
+			{
+				"attempt": 15.0,
+				"conservationOk": true,
+				"effectiveSeed": 39816536416.0,
+				"outcome": "DEADLOCK",
+				"visited": 82.0
+			},
+			{
+				"attempt": 16.0,
+				"conservationOk": true,
+				"effectiveSeed": 42470972177.0,
+				"outcome": "DEADLOCK",
+				"visited": 82.0
+			},
+			{
+				"attempt": 17.0,
+				"conservationOk": true,
+				"effectiveSeed": 45125407938.0,
+				"outcome": "DEADLOCK",
+				"visited": 264.0
+			},
+			{
+				"attempt": 18.0,
+				"conservationOk": true,
+				"effectiveSeed": 47779843699.0,
+				"outcome": "DEADLOCK",
+				"visited": 174.0
+			},
+			{
+				"attempt": 19.0,
+				"conservationOk": true,
+				"effectiveSeed": 50434279460.0,
+				"outcome": "DEADLOCK",
+				"visited": 174.0
+			},
+			{
+				"attempt": 20.0,
+				"conservationOk": true,
+				"effectiveSeed": 53088715221.0,
+				"outcome": "DEADLOCK",
+				"visited": 258.0
+			},
+			{
+				"attempt": 21.0,
+				"conservationOk": true,
+				"effectiveSeed": 55743150982.0,
+				"outcome": "DEADLOCK",
+				"visited": 264.0
+			},
+			{
+				"attempt": 22.0,
+				"conservationOk": true,
+				"effectiveSeed": 58397586743.0,
+				"outcome": "DEADLOCK",
+				"visited": 234.0
+			},
+			{
+				"attempt": 23.0,
+				"conservationOk": true,
+				"effectiveSeed": 61052022504.0,
+				"outcome": "DEADLOCK",
+				"visited": 222.0
+			},
+			{
+				"attempt": 24.0,
+				"conservationOk": true,
+				"effectiveSeed": 63706458265.0,
+				"outcome": "DEADLOCK",
+				"visited": 258.0
+			},
+			{
+				"attempt": 25.0,
+				"conservationOk": true,
+				"effectiveSeed": 66360894026.0,
+				"outcome": "DEADLOCK",
+				"visited": 264.0
+			},
+			{
+				"attempt": 26.0,
+				"conservationOk": true,
+				"effectiveSeed": 69015329787.0,
+				"outcome": "DEADLOCK",
+				"visited": 222.0
+			},
+			{
+				"attempt": 27.0,
+				"conservationOk": true,
+				"effectiveSeed": 71669765548.0,
+				"outcome": "DEADLOCK",
+				"visited": 225.0
+			},
+			{
+				"attempt": 28.0,
+				"conservationOk": true,
+				"effectiveSeed": 74324201309.0,
+				"outcome": "DEADLOCK",
+				"visited": 330.0
+			},
+			{
+				"attempt": 29.0,
+				"conservationOk": true,
+				"effectiveSeed": 76978637070.0,
+				"outcome": "DEADLOCK",
+				"visited": 228.0
+			},
+			{
+				"attempt": 30.0,
+				"conservationOk": true,
+				"effectiveSeed": 79633072831.0,
+				"outcome": "DEADLOCK",
+				"visited": 174.0
+			},
+			{
+				"attempt": 31.0,
+				"conservationOk": true,
+				"effectiveSeed": 82287508592.0,
+				"outcome": "DEADLOCK",
+				"visited": 305.0
+			},
+			{
+				"attempt": 32.0,
+				"conservationOk": true,
+				"effectiveSeed": 84941944353.0,
+				"outcome": "DEADLOCK",
+				"visited": 167.0
+			},
+			{
+				"attempt": 33.0,
+				"conservationOk": true,
+				"effectiveSeed": 87596380114.0,
+				"outcome": "DEADLOCK",
+				"visited": 222.0
+			},
+			{
+				"attempt": 34.0,
+				"conservationOk": true,
+				"effectiveSeed": 90250815875.0,
+				"outcome": "DEADLOCK",
+				"visited": 301.0
+			},
+			{
+				"attempt": 35.0,
+				"conservationOk": true,
+				"effectiveSeed": 92905251636.0,
+				"outcome": "DEADLOCK",
+				"visited": 264.0
+			},
+			{
+				"attempt": 36.0,
+				"conservationOk": true,
+				"effectiveSeed": 95559687397.0,
+				"outcome": "DEADLOCK",
+				"visited": 167.0
+			},
+			{
+				"attempt": 37.0,
+				"conservationOk": true,
+				"effectiveSeed": 98214123158.0,
+				"outcome": "DEADLOCK",
+				"visited": 264.0
+			},
+			{
+				"attempt": 38.0,
+				"conservationOk": true,
+				"effectiveSeed": 100868558919.0,
+				"outcome": "DEADLOCK",
+				"visited": 310.0
+			},
+			{
+				"attempt": 39.0,
+				"conservationOk": true,
+				"effectiveSeed": 103522994680.0,
+				"outcome": "DEADLOCK",
+				"visited": 181.0
+			},
+			{
+				"attempt": 40.0,
+				"conservationOk": true,
+				"effectiveSeed": 106177430441.0,
+				"outcome": "DEADLOCK",
+				"visited": 225.0
+			},
+			{
+				"attempt": 41.0,
+				"conservationOk": true,
+				"effectiveSeed": 108831866202.0,
+				"outcome": "DEADLOCK",
+				"visited": 181.0
+			},
+			{
+				"attempt": 42.0,
+				"conservationOk": true,
+				"effectiveSeed": 111486301963.0,
+				"outcome": "DEADLOCK",
+				"visited": 167.0
+			},
+			{
+				"attempt": 43.0,
+				"conservationOk": true,
+				"effectiveSeed": 114140737724.0,
+				"outcome": "DEADLOCK",
+				"visited": 269.0
+			},
+			{
+				"attempt": 44.0,
+				"conservationOk": true,
+				"effectiveSeed": 116795173485.0,
+				"outcome": "DEADLOCK",
+				"visited": 167.0
+			},
+			{
+				"attempt": 45.0,
+				"conservationOk": true,
+				"effectiveSeed": 119449609246.0,
+				"outcome": "DEADLOCK",
+				"visited": 305.0
+			},
+			{
+				"attempt": 46.0,
+				"conservationOk": true,
+				"effectiveSeed": 122104045007.0,
+				"outcome": "DEADLOCK",
+				"visited": 310.0
+			},
+			{
+				"attempt": 47.0,
+				"conservationOk": true,
+				"effectiveSeed": 124758480768.0,
+				"outcome": "DEADLOCK",
+				"visited": 229.0
+			},
+			{
+				"attempt": 48.0,
+				"conservationOk": true,
+				"effectiveSeed": 127412916529.0,
+				"outcome": "DEADLOCK",
+				"visited": 222.0
+			},
+			{
+				"attempt": 49.0,
+				"conservationOk": true,
+				"effectiveSeed": 130067352290.0,
+				"outcome": "DEADLOCK",
+				"visited": 174.0
+			},
+			{
+				"attempt": 50.0,
+				"conservationOk": true,
+				"effectiveSeed": 132721788051.0,
+				"outcome": "DEADLOCK",
+				"visited": 222.0
+			},
+			{
+				"attempt": 51.0,
+				"conservationOk": true,
+				"effectiveSeed": 135376223812.0,
+				"outcome": "DEADLOCK",
+				"visited": 256.0
+			},
+			{
+				"attempt": 52.0,
+				"conservationOk": true,
+				"effectiveSeed": 138030659573.0,
+				"outcome": "DEADLOCK",
+				"visited": 264.0
+			},
+			{
+				"attempt": 53.0,
+				"conservationOk": true,
+				"effectiveSeed": 140685095334.0,
+				"outcome": "DEADLOCK",
+				"visited": 225.0
+			},
+			{
+				"attempt": 54.0,
+				"conservationOk": true,
+				"effectiveSeed": 143339531095.0,
+				"outcome": "DEADLOCK",
+				"visited": 266.0
+			},
+			{
+				"attempt": 55.0,
+				"conservationOk": true,
+				"effectiveSeed": 145993966856.0,
+				"outcome": "DEADLOCK",
+				"visited": 258.0
+			},
+			{
+				"attempt": 56.0,
+				"conservationOk": true,
+				"effectiveSeed": 148648402617.0,
+				"outcome": "DEADLOCK",
+				"visited": 258.0
+			},
+			{
+				"attempt": 57.0,
+				"conservationOk": true,
+				"effectiveSeed": 151302838378.0,
+				"outcome": "DEADLOCK",
+				"visited": 264.0
+			},
+			{
+				"attempt": 58.0,
+				"conservationOk": true,
+				"effectiveSeed": 153957274139.0,
+				"outcome": "DEADLOCK",
+				"visited": 308.0
+			},
+			{
+				"attempt": 59.0,
+				"conservationOk": true,
+				"effectiveSeed": 156611709900.0,
+				"outcome": "DEADLOCK",
+				"visited": 167.0
+			},
+			{
+				"attempt": 60.0,
+				"conservationOk": true,
+				"effectiveSeed": 159266145661.0,
+				"outcome": "DEADLOCK",
+				"visited": 167.0
+			},
+			{
+				"attempt": 61.0,
+				"conservationOk": true,
+				"effectiveSeed": 161920581422.0,
+				"outcome": "DEADLOCK",
+				"visited": 305.0
+			},
+			{
+				"attempt": 62.0,
+				"conservationOk": true,
+				"effectiveSeed": 164575017183.0,
+				"outcome": "DEADLOCK",
+				"visited": 219.0
+			},
+			{
+				"attempt": 63.0,
+				"conservationOk": true,
+				"effectiveSeed": 167229452944.0,
+				"outcome": "DEADLOCK",
+				"visited": 222.0
+			}
+		],
+		"solverStatus": "DEADLOCK"
+	}
+}
