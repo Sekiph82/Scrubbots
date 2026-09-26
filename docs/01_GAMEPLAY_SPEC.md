@@ -327,7 +327,7 @@ Core V1 rules:
 - Scrub Bucks are the only general spendable soft currency.
 - Stars and Event Points are removed.
 - Bot Parts unlock robots only; each post-Scrubby robot costs 250 Bot Parts.
-- Hearts max at 5 and regenerate one per 30 real-world minutes.
+- Hearts max at 5 and regenerate one per 15 real-world minutes (900 s; owner V06, `coordination/OWNER_M42_HOME_POLISH_V06.md` §E supersedes the earlier 30 minutes).
 - Duplicate cards exchange to SB through Cards Exchange.
 - Production manual 2x is paid/entitlement-gated; automatic M23-exhausted 2x remains free.
 - Exactly four boosters exist: +1 Slot, Random, Selector and Tornado.

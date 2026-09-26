@@ -71,7 +71,7 @@
   },
   "hearts": {
     "max": 5,
-    "regen_seconds": 1800,
+    "regen_seconds": 900,
     "plus_one_sb": 500,
     "full_refill_sb_per_missing": 400
   },

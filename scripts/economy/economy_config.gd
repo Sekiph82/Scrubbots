@@ -172,7 +172,7 @@ func hearts_max() -> int:
 	return int(_data.get("hearts", {}).get("max", 5))
 
 func hearts_regen_seconds() -> int:
-	return int(_data.get("hearts", {}).get("regen_seconds", 1800))
+	return int(_data.get("hearts", {}).get("regen_seconds", 900))
 
 func hearts_plus_one_sb() -> int:
 	return int(_data.get("hearts", {}).get("plus_one_sb", 500))
