@@ -101,10 +101,24 @@ not authorize hidden timer/move-limit or monetization mechanics.
 
 ```text
 M42  Home / Navigation
-M43  Results
-M44  Tutorial
+M43  Results + complete Player Experience / Meta UI surface program
+M44  Tutorial / FTUE / feature-unlock pacing
 M45  Debug Tooling
 ```
+
+### Player experience completion program
+
+After the locked First 10 Level Pack closes, the roadmap must also close the later Gameplay V02 delta (M28-C002) and the expanded M43/M44 player-facing program defined in root TASKS.md.
+
+The program includes fail/retry/Life/Need-a-Hand, booster and 2x acquisition, Shop, Collection/Cards Exchange, pack opening, Robots, Tasks/Daily/Gift Bar, Profile/Achievements, Events/Ranks, reward/unlock ceremonies, world progression, comeback/notifications, account/cloud recovery, meta audio/haptics and all required visual masters.
+
+Canonical rules:
+- `coordination/OWNER_PLAYER_EXPERIENCE_SURFACE_PROGRAM_V01.md`
+- `coordination/OWNER_FAILURE_RECOVERY_AND_ACQUISITION_V01.md`
+- `coordination/OWNER_META_NAVIGATION_AND_DESTINATIONS_V01.md`
+- `coordination/OWNER_REWARD_CEREMONY_FEATURE_UNLOCK_V01.md`
+- `docs/15_PLAYER_EXPERIENCE_UI_ARCHITECTURE.md`
+- `assets/ui/PLAYER_EXPERIENCE_ASSET_MANIFEST.json`
 
 Home preproduction already has:
 
@@ -200,7 +214,11 @@ M25 claim hardening
 -> M27 solvability/deadlock
 -> M28/M29 production gameplay UI + touch
 -> completion/progression/save
--> Home/results/tutorial
+-> Home
+-> Gameplay V02 production convergence
+-> Results + popup/recovery/acquisition family
+-> Shop/Collection/Robots/Tasks/Daily/Gift/Profile/Achievements/Events/Ranks
+-> FTUE/feature unlock + reward/pack/robot/world ceremonies
 -> mobile performance + responsive/accessibility/localization
 -> content scale-up + QA
 -> release

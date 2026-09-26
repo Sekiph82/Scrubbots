@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "status": "PLANNING_ONLY",
+  "rule": "Every enabled player-facing action must resolve to a valid route or popup.",
+  "screens": [
+    "home",
+    "gameplay",
+    "results",
+    "shop",
+    "collection",
+    "collection_set",
+    "robots",
+    "tasks",
+    "daily",
+    "gift_bar",
+    "profile",
+    "achievements",
+    "events",
+    "event_detail",
+    "ranks",
+    "settings",
+    "friends"
+  ],
+  "popups": [
+    "pause",
+    "level_intro",
+    "fail_retry",
+    "life",
+    "need_a_hand",
+    "booster_acquire",
+    "speed_acquire",
+    "insufficient_sb",
+    "reward",
+    "confirm",
+    "card_detail",
+    "pack_open",
+    "robot_unlock",
+    "feature_unlock",
+    "world_unlock",
+    "error",
+    "loading",
+    "account_conflict",
+    "comeback"
+  ],
+  "routes": [
+    {
+      "source": "home.shortcut_shop",
+      "destination": "shop"
+    },
+    {
+      "source": "home.shortcut_collection",
+      "destination": "collection"
+    },
+    {
+      "source": "home.shortcut_tasks",
+      "destination": "tasks"
+    },
+    {
+      "source": "home.shortcut_daily",
+      "destination": "daily"
+    },
+    {
+      "source": "home.scrub_bucks_plus",
+      "destination": "shop",
+      "context": "currency_acquisition"
+    },
+    {
+      "source": "home.heart_plus",
+      "destination": "popup:life"
+    },
+    {
+      "source": "bottom_nav.events",
+      "destination": "events"
+    },
+    {
+      "source": "bottom_nav.robots",
+      "destination": "robots"
+    },
+    {
+      "source": "bottom_nav.home",
+      "destination": "home"
+    },
+    {
+      "source": "bottom_nav.ranks",
+      "destination": "ranks"
+    },
+    {
+      "source": "bottom_nav.settings",
+      "destination": "settings"
+    },
+    {
+      "source": "home.profile",
+      "destination": "profile"
+    },
+    {
+      "source": "gameplay.pause",
+      "destination": "popup:pause"
+    },
+    {
+      "source": "gameplay.booster_no_charge",
+      "destination": "popup:booster_acquire"
+    },
+    {
+      "source": "gameplay.speed_no_entitlement",
+      "destination": "popup:speed_acquire"
+    },
+    {
+      "source": "progression.third_consecutive_fail",
+      "destination": "popup:need_a_hand"
+    },
+    {
+      "source": "attempt.zero_hearts",
+      "destination": "popup:life"
+    },
+    {
+      "source": "collection.cards_exchange",
+      "destination": "cards_exchange"
+    },
+    {
+      "source": "collection.pack_open",
+      "destination": "popup:pack_open"
+    },
+    {
+      "source": "reward.robot_unlock",
+      "destination": "popup:robot_unlock"
+    },
+    {
+      "source": "reward.world_unlock",
+      "destination": "popup:world_unlock"
+    }
+  ]
+}

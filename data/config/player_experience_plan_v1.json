@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "status": "PLANNING_ONLY_NOT_YET_RUNTIME_AUTHORITY",
+  "authority_files": [
+    "coordination/OWNER_PLAYER_EXPERIENCE_SURFACE_PROGRAM_V01.md",
+    "coordination/OWNER_FAILURE_RECOVERY_AND_ACQUISITION_V01.md",
+    "coordination/OWNER_META_NAVIGATION_AND_DESTINATIONS_V01.md",
+    "coordination/OWNER_REWARD_CEREMONY_FEATURE_UNLOCK_V01.md"
+  ],
+  "failure_assistance": {
+    "progression_same_level_consecutive_fail_threshold": 3,
+    "reset_on_progression_win": true,
+    "reset_on_level_change": true,
+    "replay_fail_counts": false,
+    "recommendation_count": 2,
+    "repeat_frequency_after_threshold": "OWNER_TUNING_REQUIRED"
+  },
+  "hearts": {
+    "max": 5,
+    "regen_minutes_per_heart": 30,
+    "plus_one_sb": 500,
+    "full_refill_sb_per_missing": 400,
+    "rewarded_video_plus_one": true
+  },
+  "boosters": {
+    "extra_slot": {
+      "sb": 500,
+      "rewarded_video_one_charge": true
+    },
+    "random": {
+      "sb": 350,
+      "rewarded_video_one_charge": true
+    },
+    "selector": {
+      "sb": 500,
+      "rewarded_video_one_charge": true
+    },
+    "tornado": {
+      "sb": 750,
+      "rewarded_video_one_charge": true
+    }
+  },
+  "speed_2x": {
+    "current_level_sb": 200,
+    "minutes_15_sb": 300,
+    "minutes_30_sb": 500,
+    "minutes_60_sb": 750,
+    "free_auto_endgame_on_authoritative_supply_exhaustion": true
+  },
+  "feature_unlock_levels": {
+    "status": "OWNER_TUNING_REQUIRED",
+    "rule": "Do not invent exact level numbers before approval."
+  },
+  "notifications": {
+    "categories": [
+      "hearts_ready",
+      "daily_available",
+      "event_ending",
+      "claimable_reward"
+    ],
+    "opt_in": true,
+    "quiet_hours_required": true
+  },
+  "monetization": {
+    "provider": "OWNER_DECISION_REQUIRED",
+    "ad_frequency_caps": "OWNER_TUNING_REQUIRED",
+    "real_money_product_ids": "OWNER_DECISION_REQUIRED",
+    "second_premium_currency": false,
+    "paid_random_card_packs": false
+  }
+}
