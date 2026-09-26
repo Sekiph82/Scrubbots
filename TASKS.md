@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M42 HOME OWNER REVISION V03
-- Current Sprint: M42-C001 V03 Visual / Modal Remediation
-- Current Task: Implement owner V03 Home revisions
-- Current Task Status: IMPLEMENTATION_REQUIRED
-- Next Task/Action: CLAUDE executes `coordination/sessions/M42-C001/task_prompts/SB-M42-HOME-OWNER-REVISION_V03.md`. The V03 owner decision narrows/rebuilds the profile treatment, removes duplicate top Settings, simplifies Bot Parts/Gift Meter/reward-track text, forces visible city + grounded Whispering Park portal, retires platform-top and idle face/arm overlays, moves SHOP/CARDS EXCHANGE beside a smaller Play CTA, flushes bottom nav to screen bottom, and fixes modal layering so Home action buttons disappear behind Gifts/Daily/Cards/Settings. Then hand back for ChatGPT audit and owner screenshot review.
-- Required Actor: CLAUDE
+- Current Milestone: M42 OWNER VISUAL / DEVICE GATES
+- Current Sprint: M42-C001 V03 Post-Audit Closure
+- Current Task: Owner visual review of V03 Home
+- Current Task Status: OWNER_VISUAL_REVIEW_REQUIRED
+- Next Task/Action: OWNER pulls current `main`, runs the game, and supplies a fresh normal Home screenshot after the opening cinematic. Also open at least one of Gifts / Daily / Cards Exchange / Settings and capture one modal screenshot so the V03 layering behavior can be visually confirmed. If the owner accepts the V03 Home composition, ChatGPT can close SB-M42-011 and SB-M42-017. SB-M42-032 Android real-device cinematic validation and SB-M42-033 iOS-later remain separate device gates.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011/SB-M42-017 are reopened for owner-directed V03 implementation + final visual review.
-- Note: V02 remains a valid historical audit, but `coordination/OWNER_M42_HOME_VISUAL_REVISION_V03.md` supersedes its specific Home composition choices. V03 explicitly retires HOME-011, HOME-031, HOME-032 and HOME-087 from active presentation; HOME-078 is also retired if replaced by the requested native white play triangle. Current open M42 rows remain 011, 017, 032, 033.
+- Progress: 742 / 980 = 75.71%. M42 still has 29 closed checklist rows and 4 open rows; SB-M42-011/SB-M42-017 are code-audited and now wait only on owner visual review.
+- Note: V03 implementation `d5f11e1` passed independent audit at `coordination/sessions/M42-C001/audits/SB-M42-HOME-OWNER-REVISION_V03_CHATGPT_AUDIT_V01.md`. Independent audit verified 49/49 approved PNG blobs unchanged, 50/50 presentation accounting complete (45 STATIC / 3 OWNER_RETIRED / 2 OWNER_DISABLED), top duplicate Settings removed, one-platform/idle-retirement/reward simplification/modal hiding implemented, and focused V03 tests substantively cover the owner revision. Current open M42 rows remain 011, 017, 032, 033.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -1543,6 +1543,7 @@ Home art promotion audit: `coordination/sessions/M42-C001/audits/SB-M42-HOME-ART
 Home master convergence V02 audit: `coordination/sessions/M42-C001/audits/SB-M42-HOME-MASTER-CONVERGENCE_V02_CHATGPT_AUDIT_V01.md`.
 Home owner visual revision V03: `coordination/OWNER_M42_HOME_VISUAL_REVISION_V03.md`
 V03 implementation prompt: `coordination/sessions/M42-C001/task_prompts/SB-M42-HOME-OWNER-REVISION_V03.md`.
+V03 independent audit: `coordination/sessions/M42-C001/audits/SB-M42-HOME-OWNER-REVISION_V03_CHATGPT_AUDIT_V01.md`.
 
 - [x] SB-M42-001 Navigation architecture. — [x] SB-M42-002 Home.
 - [x] SB-M42-003 Play/Continue. — [x] SB-M42-004 Settings.
@@ -1550,13 +1551,13 @@ V03 implementation prompt: `coordination/sessions/M42-C001/task_prompts/SB-M42-H
 - [x] SB-M42-006 Gameplay transition. — [x] SB-M42-007 Results transition.
 - [x] SB-M42-008 Prevent duplicate transitions. — [x] SB-M42-009 Back navigation.
 - [x] SB-M42-010 Build Home as responsive Godot containers/components.
-- [ ] SB-M42-011 Recreate owner-approved Home art direction with canonical regions. `[V03_IMPLEMENTATION_REQUIRED / OWNER_VISUAL_REVIEW_REQUIRED]`
+- [ ] SB-M42-011 Recreate owner-approved Home art direction with canonical regions. `[CODE_AUDIT_PASS / V03 / OWNER_VISUAL_REVIEW_REQUIRED]`
 - [x] SB-M42-012 Keep shortcut columns responsive around central area.
 - [x] SB-M42-013 Validate Home-specific manifest entries in `assets/ui/HOME_ASSET_MANIFEST.json` before generation.
 - [x] SB-M42-014 Generate only Home-specific required illustrative assets using approved provider order (ChatGPT primary, Magnific fallback). `[AUDITED_PASS / V02]`
 - [x] SB-M42-015 Keep dynamic values/timers/counts/labels live in Godot UI.
 - [x] SB-M42-016 Require owner approval before production promotion. `[AUDITED_PASS / V02]`
-- [ ] SB-M42-017 Bind approved art and validate viewport matrix. `[V03_IMPLEMENTATION_REQUIRED / OWNER_VISUAL_REVIEW_REQUIRED]`
+- [ ] SB-M42-017 Bind approved art and validate viewport matrix. `[CODE_AUDIT_PASS / V03 / OWNER_VISUAL_REVIEW_REQUIRED]`
 - [x] SB-M42-018 Replace coin HUD semantics with Scrub Bucks banknote icon + live SB amount. `[AUDITED_PASS / V02]`
 - [x] SB-M42-019 Replace profile XP bar with live Bot Parts next-robot progress (normally N/250).
 - [x] SB-M42-020 Replace top event bar/timer with Gift Meter progress/next milestone; no Event Points/timer.
