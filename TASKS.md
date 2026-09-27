@@ -5,15 +5,15 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M53 LEVEL QA
-- Current Sprint: M53-C002 Owner Difficulty Calibration Review
-- Current Task: Owner rates perceived difficulty/fairness/engagement for Levels 1–10 before any V2 adoption or content tuning
-- Current Task Status: AUDITED_PASS / OWNER_REVIEW_REQUIRED
-- Next Task/Action: OWNER completes `coordination/sessions/M53-C002/OWNER_CALIBRATION_REVIEW_V01.md` using the blank rating sheet. ChatGPT then compares owner perception against V2 candidate, V1, target cadence and robustness diagnostics before opening adoption/refinement/tuning work.
-- Required Actor: OWNER
+- Current Sprint: M53-C003 V2.1 Stage-B Difficulty Calibration Refinement
+- Current Task: Refine the candidate difficulty model against owner Stage-B perceived-difficulty/class-feel/cadence evidence without changing production content
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M53-C003/task_prompts/SB-M53-C003_V21_STAGE_B_CALIBRATION.md`; ChatGPT audits. Level 1 supply tuning is explicitly deferred to a separate post-C003 task so model calibration and content changes are not confounded.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 822 / 1347 = 61.02%. M53-C002 technical calibration is complete and audited; owner Stage-B difficulty review is the active First 10 gate.
-- Note: M53-C002 technical calibration AUDIT PASS. V2 remains candidate-only pending owner review. Important review flags: L7 gated robustness 1.89 > 1.75; L1 neutral RR policies can deadlock; V2 A/S are explicit candidate deviations from locked V1 wording. Audit: `coordination/sessions/M53-C002/CHATGPT_AUDIT_V01.md`.
+- Progress: 827 / 1361 = 60.76%. Owner Stage-B calibration review is complete; M53-C003 V2.1 refinement is active. No production content changes are authorized in C003.
+- Note: Owner Stage-B review is complete: difficulty `[6,3,6,3,5,3,3,5,3,5]`, all first-attempt PASS, L3→4/L5→6/L8→9 recoveries YES, L10 boss YES. Only L1 class feel is `harder`; owner also flagged the deep black supply batch as difficult to discover. V2 is NOT adopted because it misorders L5/L7/L8/L9 and fails owner-perceived recovery cadence. C003 refines the model first; Level 1 content tuning follows separately.
 - Owner sequencing lock: stay on the **First 10 Level Pack** until all work tied to Levels 1–10 is finished. This includes M52-C001 implementation/integration, independent audit, any remediation, owner playtest/acceptance, the applicable M53 per-level QA for Levels 1–10, and the applicable M54 content/regression validation needed to prove this ten-level pack stable. Only after that block is fully closed do we resume the main roadmap at **M43 Results Screen**. M43 remains fully open and is intentionally deferred, not skipped.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -2136,11 +2136,31 @@ V2 remains `CANDIDATE_NOT_PRODUCTION_AUTHORITY`; no production content/target/mo
 
 #### M53-C002 Owner Calibration Review
 
-- [ ] SB-M53-C002-O01 Owner rates perceived difficulty 1..7 for Levels 1–10 under consistent 1x/no-booster conditions.
-- [ ] SB-M53-C002-O02 Owner rates fairness and engagement 1..7 and class feel for Levels 1–10.
-- [ ] SB-M53-C002-O03 Owner evaluates recovery cadence L3→4, L5→6, L8→9 and whether L10 feels like the cycle boss.
-- [ ] SB-M53-C002-O04 Owner explicitly reviews L1 neutral-policy deadlock/fairness and L7 relative difficulty/robustness concern.
-- [ ] SB-M53-C002-O05 ChatGPT compares owner Stage-B ratings with V2/V1/targets and opens the exact adoption, calibration-refinement or content-tuning next task.
+- [x] SB-M53-C002-O01 Owner rates perceived difficulty 1..7 for Levels 1–10 under consistent 1x/no-booster conditions.
+- [x] SB-M53-C002-O02 Owner rates fairness and engagement 1..7 and class feel for Levels 1–10.
+- [x] SB-M53-C002-O03 Owner evaluates recovery cadence L3→4, L5→6, L8→9 and whether L10 feels like the cycle boss.
+- [x] SB-M53-C002-O04 Owner explicitly reviews L1 neutral-policy deadlock/fairness and L7 relative difficulty/robustness concern.
+- [x] SB-M53-C002-O05 ChatGPT compares owner Stage-B ratings with V2/V1/targets and opens the exact adoption, calibration-refinement or content-tuning next task.
+
+**Owner Stage-B evidence:** `coordination/sessions/M53-C002/OWNER_DIFFICULTY_RATINGS_V01.md`
+**ChatGPT reconciliation:** `coordination/sessions/M53-C002/CHATGPT_STAGE_B_RECONCILIATION_V01.md`
+
+#### M53-C003 V2.1 Stage-B Difficulty Calibration Refinement
+
+- [ ] SB-M53-C003-001 Diagnose V2 component-level mismatch for L1/L5/L7/L8/L9 before changing the candidate model.
+- [ ] SB-M53-C003-002 Preserve Challenge as W/C/A/U/B/R/S; Fairness and Engagement remain separate Stage-B diagnostics, never Challenge inputs.
+- [ ] SB-M53-C003-003 Create separately versioned V2.1 candidate analyzer/config without overwriting V1/V2 provenance.
+- [ ] SB-M53-C003-004 Refine only causally justified operational definitions/normalization/policy aggregation needed by Stage-B evidence.
+- [ ] SB-M53-C003-005 Prove no level-ID special cases, per-level offsets or memorized First 10 lookup table.
+- [ ] SB-M53-C003-006 Add leave-one-level-out anti-overfit validation across owner-rated Levels 1–10.
+- [ ] SB-M53-C003-007 Preserve all independent calibration-corpus ordinal/structural checks.
+- [ ] SB-M53-C003-008 Validate owner qualitative ordering: L3>L4, L5>L6, L8>L9, L10 boss, L5>L7/L9 and L8>L7/L9.
+- [ ] SB-M53-C003-009 Keep L2/L4/L6/L7/L9 as the low-difficulty cluster while L1 remains outside normal EASY until content tuning.
+- [ ] SB-M53-C003-010 Produce V1/V2/V2.1 owner-alignment matrix and robustness/sensitivity evidence.
+- [ ] SB-M53-C003-011 Reproduce L1 black-batch/deadlock issue and write supply-only tuning recommendation without changing production content.
+- [ ] SB-M53-C003-012 Run focused + C001/C002 + M52/R01/R02 + relevant historical + root regressions and diff hygiene.
+- [ ] SB-M53-C003-013 Write evidence/log and hand off for independent ChatGPT audit.
+- [ ] SB-M53-C003-014 Independent ChatGPT audit; on PASS request owner V2.1 adoption review and open isolated L1 supply tuning.
 
 ### M54 — Regression Suite `[QA]`
 
