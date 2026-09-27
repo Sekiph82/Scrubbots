@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M53 LEVEL QA
-- Current Sprint: M53-C001 First 10 Level QA + Difficulty V1
-- Current Task: Build and run canonical real-level QA / Difficulty V1 evidence for production Levels 1–10
-- Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M53-C001/task_prompts/SB-M53-C001_FIRST10_LEVEL_QA_DIFFICULTY.md`; ChatGPT then audits. If all ten pass M53, advance the locked First 10 block to M54 regression/content validation.
+- Current Sprint: M53-C002 Difficulty V1 Calibration / Policy Robustness
+- Current Task: Calibrate the difficulty measurement layer before changing any First 10 production content
+- Current Task Status: CHANGES_REQUIRED / CALIBRATION_REQUIRED
+- Next Task/Action: CLAUDE executes `coordination/sessions/M53-C002/task_prompts/SB-M53-C002_DIFFICULTY_CALIBRATION.md`. First 10 remains a holdout set; no production content/class/supply tuning is authorized until candidate calibration is independently audited.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 793 / 1327 = 59.76%. M52-C001 First 10 gameplay/content owner acceptance is closed. M53-C001 real per-level QA / Difficulty V1 analysis is now active.
-- Note: M52-C001 is FINAL OWNER PASS. Final acceptance: `coordination/sessions/M52-C001/FINAL_OWNER_ACCEPTANCE_V01.md`. M53 now owns the previously deferred real per-level Challenge / Session Load / Frustration evidence; values must be analyzed, never fabricated.
+- Progress: 807 / 1342 = 60.13%. M53-C001 implementation/static QA is complete and audited; Difficulty V1 production authority is blocked on M53-C002 calibration.
+- Note: M53-C001 static QA is 10/10 PASS and analyzer engineering is accepted, but the Stage-A Challenge score is not yet production-authoritative: policy choice moves D by 6–14 points and provisional normalization produces a scale floor inconsistent with the owner difficulty design. Audit: `coordination/sessions/M53-C001/CHATGPT_AUDIT_V01.md`. Do not tune First 10 content until M53-C002 calibration is audited.
 - Owner sequencing lock: stay on the **First 10 Level Pack** until all work tied to Levels 1–10 is finished. This includes M52-C001 implementation/integration, independent audit, any remediation, owner playtest/acceptance, the applicable M53 per-level QA for Levels 1–10, and the applicable M54 content/regression validation needed to prove this ten-level pack stable. Only after that block is fully closed do we resume the main roadmap at **M43 Results Screen**. M43 remains fully open and is intentionally deferred, not skipped.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -2095,20 +2095,41 @@ Every production level:
 
 #### M53-C001 First 10 Level QA + Difficulty V1
 
-- [ ] SB-M53-C001-001 Implement/version a canonical deterministic real-level Difficulty V1 analyzer if one does not yet exist.
-- [ ] SB-M53-C001-002 Compute raw + normalized W/C/A/U/B/R/S evidence for each production Level 1–10 using production semantics.
-- [ ] SB-M53-C001-003 Compute exact Challenge Score D, TargetChallenge and delta for Levels 1–10; never force-label an out-of-window level.
-- [ ] SB-M53-C001-004 Produce versioned Stage-A Session Load evidence and explicit normalization provenance.
-- [ ] SB-M53-C001-005 Produce honest Frustration Risk evidence; mark unsupported/human-policy components provisional rather than fabricating values.
-- [ ] SB-M53-C001-006 Verify every M53 static QA gate for each Level 1–10 with machine-readable provenance.
-- [ ] SB-M53-C001-007 Check actual recovery cadence L3→4, L5→6, L8→9 and Level 10 boss relationship using analyzed scores.
-- [ ] SB-M53-C001-008 Produce measurable novelty/profile evidence without inventing missing taxonomy.
-- [ ] SB-M53-C001-009 Preserve owner source art, owner supply plans, Level 1 history and R01/R02 gameplay behavior unchanged.
-- [ ] SB-M53-C001-010 Re-run First 10 canonical proof/replay and production runtime after analyzer work.
-- [ ] SB-M53-C001-011 Add focused analyzer/QA determinism/formula/schema tests.
-- [ ] SB-M53-C001-012 Run M53 + M52/R01/R02 + relevant progression + root regression and diff hygiene.
-- [ ] SB-M53-C001-013 Write First 10 M53 matrix/evidence/log and hand off for independent ChatGPT audit.
-- [ ] SB-M53-C001-014 Independent ChatGPT audit; only all-ten PASS may advance directly to M54, otherwise exact TUNING_REQUIRED remediation is opened.
+- [x] SB-M53-C001-001 Implement/version a canonical deterministic real-level Difficulty V1 analyzer if one does not yet exist.
+- [x] SB-M53-C001-002 Compute raw + normalized W/C/A/U/B/R/S evidence for each production Level 1–10 using production semantics.
+- [x] SB-M53-C001-003 Compute exact Challenge Score D, TargetChallenge and delta for Levels 1–10; never force-label an out-of-window level.
+- [x] SB-M53-C001-004 Produce versioned Stage-A Session Load evidence and explicit normalization provenance.
+- [x] SB-M53-C001-005 Produce honest Frustration Risk evidence; mark unsupported/human-policy components provisional rather than fabricating values.
+- [x] SB-M53-C001-006 Verify every M53 static QA gate for each Level 1–10 with machine-readable provenance.
+- [x] SB-M53-C001-007 Check actual recovery cadence L3→4, L5→6, L8→9 and Level 10 boss relationship using analyzed scores.
+- [x] SB-M53-C001-008 Produce measurable novelty/profile evidence without inventing missing taxonomy.
+- [x] SB-M53-C001-009 Preserve owner source art, owner supply plans, Level 1 history and R01/R02 gameplay behavior unchanged.
+- [x] SB-M53-C001-010 Re-run First 10 canonical proof/replay and production runtime after analyzer work.
+- [x] SB-M53-C001-011 Add focused analyzer/QA determinism/formula/schema tests.
+- [x] SB-M53-C001-012 Run M53 + M52/R01/R02 + relevant progression + root regression and diff hygiene.
+- [x] SB-M53-C001-013 Write First 10 M53 matrix/evidence/log and hand off for independent ChatGPT audit.
+- [x] SB-M53-C001-014 Independent ChatGPT audit; only all-ten PASS may advance directly to M54, otherwise exact TUNING_REQUIRED remediation is opened.
+
+**M53-C001 audit verdict:** `CHANGES_REQUIRED / DIFFICULTY CALIBRATION REQUIRED`.
+Static content QA is accepted 10/10. The Stage-A D classifications are retained as diagnostics but are not yet authority for mutating production content.
+
+#### M53-C002 Difficulty V1 Calibration / Policy Robustness
+
+- [ ] SB-M53-C002-001 Build an independent QA-only calibration corpus covering controlled W/C/A/U/B/R/S changes.
+- [ ] SB-M53-C002-002 Define expected ordinal relationships for calibration pairs without assigning arbitrary production class labels.
+- [ ] SB-M53-C002-003 Remove arbitrary oracle-trace dependence from primary B/S/A scoring.
+- [ ] SB-M53-C002-004 Implement a deterministic non-adversarial reference-policy family and robust primary aggregate; keep stress policy separate.
+- [ ] SB-M53-C002-005 Derive/version candidate normalization anchors from the independent corpus/envelope, never from First 10 target fitting.
+- [ ] SB-M53-C002-006 Create versioned V2-candidate analyzer/config without overwriting V1 evidence.
+- [ ] SB-M53-C002-007 Prove candidate determinism, bounded metrics and solver-search-order robustness.
+- [ ] SB-M53-C002-008 Prove board size alone and color count alone do not dictate class-like Challenge behavior.
+- [ ] SB-M53-C002-009 Prove controlled route/access/unlock/bottleneck/slot-pressure pairs move intended axes in the expected direction.
+- [ ] SB-M53-C002-010 Freeze candidate calibration before scoring First 10 as a holdout.
+- [ ] SB-M53-C002-011 Produce First 10 V1-vs-V2 candidate matrix, policy spread and recovery evidence with no post-hoc retuning.
+- [ ] SB-M53-C002-012 Produce owner difficulty/fairness/engagement rating sheet with no fabricated responses.
+- [ ] SB-M53-C002-013 Run focused + M53-C001 + M52/R01/R02 + historical + root regression; no production gameplay changes.
+- [ ] SB-M53-C002-014 Write evidence/log and hand off for independent ChatGPT audit.
+- [ ] SB-M53-C002-015 Independent ChatGPT audit; on PASS request owner calibration review before adopting any new production difficulty authority.
 
 ### M54 — Regression Suite `[QA]`
 
