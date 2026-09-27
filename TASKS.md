@@ -4,17 +4,17 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 ## Project Status
 
-- Current Milestone: M54 REGRESSION SUITE
-- Current Sprint: M54-C001 First 10 Final Regression / Content Validation
-- Current Task: Validate the owner-accepted First 10 pack and all currently implemented supporting systems without difficulty recalibration or solution redesign
-- Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER rules the canonical Heart regen interval: **A = 900 s / 15 min** (`OWNER_M42_HOME_POLISH_V06.md`, current config/code/tests) or **B = 1800 s / 30 min** (`OWNER_FAILURE_RECOVERY_AND_ACQUISITION_V01.md` §4, `player_experience_plan_v1.json`, `docs/MASTER_UI_SYSTEM.md`). ChatGPT audit `coordination/sessions/M54-C001/CHATGPT_AUDIT_V01.md` passed 21/22 M54-C001 rows; only SB-M54-017 is gated. After the ruling ChatGPT closes M54-C001 (A) or issues a Claude remediation (B), then opens the next milestone per the owner's 2026-09-27 controller directive (M55 Chaos / Long-Run QA).
-- Required Actor: OWNER
+- Current Milestone: M55 CHAOS / LONG-RUN QA
+- Current Sprint: M55-C001 Core Chaos / Long-Run QA + Heart 900s Reconciliation
+- Current Task: Reconcile stale active Heart 30-minute references to the owner-locked 900-second rule, then validate SB-M55-001..017 against the production stack
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M55-C001/task_prompts/SB-M55-C001_CORE_CHAOS_HEART900.md`; ChatGPT audits. SB-M55-018..024 remain deferred until their M43+ owning surfaces exist.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 861 / 1347 = 63.92%. M54-C001 audited: SB-M54-001..016, 016A, 018..021 AUDITED_PASS; SB-M54-017 OWNER_REQUIRED (Heart interval spec conflict, mechanics verified). No First 10 regression found. Difficulty/solution automation work is deferred by owner.
-- Note: OWNER accepts all Levels 1–10 for the current build. Difficulty-score recalibration, final difficulty criteria, automated solution generation and batch/color-choice optimization are deferred until the broader game systems are built. Existing owner-provided First 10 sequences remain the current validation inputs. Decision: `coordination/OWNER_FIRST10_ACCEPTED_DIFFICULTY_DEFERRED_V01.md`.
-- Owner sequencing lock: stay on the **First 10 Level Pack** until all work tied to Levels 1–10 is finished. This includes M52-C001 implementation/integration, independent audit, any remediation, owner playtest/acceptance, the applicable M53 per-level QA for Levels 1–10, and the applicable M54 content/regression validation needed to prove this ten-level pack stable. Only after that block is fully closed do we resume the main roadmap at **M43 Results Screen**. M43 remains fully open and is intentionally deferred, not skipped.
+- Progress: 862 / 1347 = 63.99%. M54-C001 is fully AUDITED_PASS at 22/22 after owner ruling A = 900 s / 15 min; M55-C001 SB-M55-001..017 is active.
+- Note: OWNER ruling `coordination/OWNER_HEART_REGEN_INTERVAL_V01.md` locks Heart regeneration to 900 real-world seconds / 15 minutes. Current runtime/config/tests already use 900; Claude must reconcile stale active planning docs/config before M55 chaos validation. The 30-minute 2x product is unchanged.
+- Owner sequencing lock: the First 10 Level Pack block is now CLOSED through M54-C001. Per the owner/controller 2026-09-27 directive, execute M55 core Chaos / Long-Run QA next; after the current-build M55 gate closes, resume the deferred M43 Results Screen / Player Experience roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -417,7 +417,7 @@ Canonical decision: `coordination/OWNER_ECONOMY_REWARDS_V01.md`. Machine tuning:
 
 - Scrub Bucks are the only general spendable soft currency.
 - Stars, Star Exchange and Event Points are removed. Star Exchange becomes Cards Exchange.
-- Hearts: max 5, +1 every 30 real-world minutes.
+- Hearts: max 5, +1 every **15 real-world minutes / 900 seconds** [OWNER-LOCKED 2026-09-27].
 - Bot Parts: robot-unlock-only resource; every post-Scrubby robot costs 250.
 - Gift Meter progress comes ONLY from Win Streak SB and has 10/50/250/500/1000 milestones with rollover.
 - Exactly four boosters exist: +1 Slot 500 SB, Random 350 SB, Selector 500 SB, Tornado 750 SB.
@@ -1472,7 +1472,7 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [x] SB-M39-016 Grant owner-locked per-set SB/Bot Parts rewards on first 9/9 completion and wire next-robot notification/read model.
 - [x] SB-M39-017 Add pacing simulation/evidence targeting approximately one robot unlock per 150 progression levels for average engaged play.
 - [x] SB-M39-018 Enforce robot perks as meta/economy convenience only; never alter solver/BoardState/TargetSelector/routing legality.
-- [x] SB-M39-019 Implement `heart_service.gd`: max 5, one Heart per 1800 real-world seconds, offline/menu/background regen.
+- [x] SB-M39-019 Implement `heart_service.gd`: max 5, one Heart per **900 real-world seconds / 15 minutes**, offline/menu/background regen. [Interval superseded by OWNER_HEART_REGEN_INTERVAL_V01]
 - [x] SB-M39-020 Consume one Heart on progression loss or restart-after-gameplay; pre-action exit consumes none.
 - [x] SB-M39-021 Implement +1 Heart = 500 SB and full refill = 400 SB per missing Heart.
 - [x] SB-M39-022 Implement `speed_entitlement_service.gd` separate from GameplaySpeedAuthority.
@@ -1662,7 +1662,7 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 #### M43-C003 - Life / Hearts / Scrub Bucks / Booster / 2x Acquisition Surfaces
 
 - [ ] SB-M43-030 Implement the canonical Life popup from the selected Life master reference.
-- [ ] SB-M43-031 Life popup shows live Hearts current/max and the real next-Heart wall-clock countdown; timer hides at 5/5.
+- [ ] SB-M43-031 Life popup shows live Hearts current/max and the real next-Heart wall-clock countdown; at 5/5 use the canonical static **15:00 ready state** rather than a separate authoritative timer.
 - [ ] SB-M43-032 Heart `+` on Home opens Life popup; zero-Heart attempt gate opens the same canonical surface instead of a separate inconsistent dialog.
 - [ ] SB-M43-033 Life popup supports +1 Heart for 500 SB and full refill at 400 SB per missing Heart using HeartService/EconomyWallet atomically.
 - [ ] SB-M43-034 Life popup includes the canonical rewarded-video path for +1 Heart when a rewarded placement is available and policy permits it; ad-unavailable state must degrade cleanly.
@@ -2158,7 +2158,7 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 
 ### M54 — Regression Suite `[QA]`
 
-**M54-C001 First 10 gate:** current scope is SB-M54-001..021 only. SB-M54-022..032 depend on later M43+ Player Experience implementation and do not block closing the current First 10 sequencing lock. **Audit:** `coordination/sessions/M54-C001/CHATGPT_AUDIT_V01.md` (HEAD `92a6034`) — 21 rows AUDITED_PASS; SB-M54-017 OWNER_REQUIRED.
+**M54-C001 First 10 gate: CLOSED.** SB-M54-001..021 + 016A are 22/22 AUDITED_PASS after owner ruling A = 900 s / 15 min. Final closure: `coordination/sessions/M54-C001/CHATGPT_AUDIT_V02.md`. SB-M54-022..032 remain later M43+ regression work.
 
 - [x] SB-M54-001 Difficulty/progression tests. — [x] SB-M54-002 Level parser tests.
 - [x] SB-M54-003 BoardState tests. — [x] SB-M54-004 Renderer tests.
@@ -2170,7 +2170,7 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 - [x] SB-M54-015 59×59 regression test.
 - [x] SB-M54-016 Economy Wallet/Gift Meter/Daily/Cards Exchange/Collection-completion idempotency regression.
 - [x] SB-M54-016A Test every set-specific 9/9 reward plus all-15 Master Collection +2500 SB/+20 Bot Parts exactly-once grant.
-- [ ] SB-M54-017 [OWNER_REQUIRED — interval 900 s vs 30 min, see M54-C001 CHATGPT_AUDIT_V01 §1] Heart 30-minute offline/background/menu regen and clock-rollback regression.
+- [x] SB-M54-017 Heart **900-second / 15-minute** offline/background/menu regen and clock-rollback regression. [OWNER ruling A; `OWNER_HEART_REGEN_INTERVAL_V01.md`; M54-C001 V02 CLOSED]
 - [x] SB-M54-018 2x level/timed entitlement wall-clock expiry + free M23-exhausted auto-2x regression.
 - [x] SB-M54-019 +1 Slot 5/6-capacity runtime + solver regression.
 - [x] SB-M54-020 Random/Selector solver-safety and no-consume-on-failure regression.
@@ -2189,6 +2189,8 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 - [ ] SB-M54-031 Cloud/account sync/conflict/restore regression once provider exists.
 - [ ] SB-M54-032 World registry/unlock/transition regression once future world ranges are owner-defined.
 ### M55 — Chaos / Long-Run QA `[QA]`
+
+**M55-C001 current-build gate:** active scope is SB-M55-001..017 only. First reconcile active nonhistorical Heart interval docs/config to owner ruling `OWNER_HEART_REGEN_INTERVAL_V01.md`. SB-M55-018..024 remain deferred until M43+ surfaces exist.
 
 - [ ] SB-M55-001 Spam all five slots.
 - [ ] SB-M55-002 Restart while bots travel. — [ ] SB-M55-003 Pause while bots travel.
