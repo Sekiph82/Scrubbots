@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M53 LEVEL QA
-- Current Sprint: M53-C002 Difficulty V1 Calibration / Policy Robustness
-- Current Task: Calibrate the difficulty measurement layer before changing any First 10 production content
-- Current Task Status: CHANGES_REQUIRED / CALIBRATION_REQUIRED
-- Next Task/Action: CLAUDE executes `coordination/sessions/M53-C002/task_prompts/SB-M53-C002_DIFFICULTY_CALIBRATION.md`. First 10 remains a holdout set; no production content/class/supply tuning is authorized until candidate calibration is independently audited.
-- Required Actor: CLAUDE
+- Current Sprint: M53-C002 Owner Difficulty Calibration Review
+- Current Task: Owner rates perceived difficulty/fairness/engagement for Levels 1–10 before any V2 adoption or content tuning
+- Current Task Status: AUDITED_PASS / OWNER_REVIEW_REQUIRED
+- Next Task/Action: OWNER completes `coordination/sessions/M53-C002/OWNER_CALIBRATION_REVIEW_V01.md` using the blank rating sheet. ChatGPT then compares owner perception against V2 candidate, V1, target cadence and robustness diagnostics before opening adoption/refinement/tuning work.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 807 / 1342 = 60.13%. M53-C001 implementation/static QA is complete and audited; Difficulty V1 production authority is blocked on M53-C002 calibration.
-- Note: M53-C001 static QA is 10/10 PASS and analyzer engineering is accepted, but the Stage-A Challenge score is not yet production-authoritative: policy choice moves D by 6–14 points and provisional normalization produces a scale floor inconsistent with the owner difficulty design. Audit: `coordination/sessions/M53-C001/CHATGPT_AUDIT_V01.md`. Do not tune First 10 content until M53-C002 calibration is audited.
+- Progress: 822 / 1347 = 61.02%. M53-C002 technical calibration is complete and audited; owner Stage-B difficulty review is the active First 10 gate.
+- Note: M53-C002 technical calibration AUDIT PASS. V2 remains candidate-only pending owner review. Important review flags: L7 gated robustness 1.89 > 1.75; L1 neutral RR policies can deadlock; V2 A/S are explicit candidate deviations from locked V1 wording. Audit: `coordination/sessions/M53-C002/CHATGPT_AUDIT_V01.md`.
 - Owner sequencing lock: stay on the **First 10 Level Pack** until all work tied to Levels 1–10 is finished. This includes M52-C001 implementation/integration, independent audit, any remediation, owner playtest/acceptance, the applicable M53 per-level QA for Levels 1–10, and the applicable M54 content/regression validation needed to prove this ten-level pack stable. Only after that block is fully closed do we resume the main roadmap at **M43 Results Screen**. M43 remains fully open and is intentionally deferred, not skipped.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -2115,21 +2115,32 @@ Static content QA is accepted 10/10. The Stage-A D classifications are retained 
 
 #### M53-C002 Difficulty V1 Calibration / Policy Robustness
 
-- [ ] SB-M53-C002-001 Build an independent QA-only calibration corpus covering controlled W/C/A/U/B/R/S changes.
-- [ ] SB-M53-C002-002 Define expected ordinal relationships for calibration pairs without assigning arbitrary production class labels.
-- [ ] SB-M53-C002-003 Remove arbitrary oracle-trace dependence from primary B/S/A scoring.
-- [ ] SB-M53-C002-004 Implement a deterministic non-adversarial reference-policy family and robust primary aggregate; keep stress policy separate.
-- [ ] SB-M53-C002-005 Derive/version candidate normalization anchors from the independent corpus/envelope, never from First 10 target fitting.
-- [ ] SB-M53-C002-006 Create versioned V2-candidate analyzer/config without overwriting V1 evidence.
-- [ ] SB-M53-C002-007 Prove candidate determinism, bounded metrics and solver-search-order robustness.
-- [ ] SB-M53-C002-008 Prove board size alone and color count alone do not dictate class-like Challenge behavior.
-- [ ] SB-M53-C002-009 Prove controlled route/access/unlock/bottleneck/slot-pressure pairs move intended axes in the expected direction.
-- [ ] SB-M53-C002-010 Freeze candidate calibration before scoring First 10 as a holdout.
-- [ ] SB-M53-C002-011 Produce First 10 V1-vs-V2 candidate matrix, policy spread and recovery evidence with no post-hoc retuning.
-- [ ] SB-M53-C002-012 Produce owner difficulty/fairness/engagement rating sheet with no fabricated responses.
-- [ ] SB-M53-C002-013 Run focused + M53-C001 + M52/R01/R02 + historical + root regression; no production gameplay changes.
-- [ ] SB-M53-C002-014 Write evidence/log and hand off for independent ChatGPT audit.
-- [ ] SB-M53-C002-015 Independent ChatGPT audit; on PASS request owner calibration review before adopting any new production difficulty authority.
+- [x] SB-M53-C002-001 Build an independent QA-only calibration corpus covering controlled W/C/A/U/B/R/S changes.
+- [x] SB-M53-C002-002 Define expected ordinal relationships for calibration pairs without assigning arbitrary production class labels.
+- [x] SB-M53-C002-003 Remove arbitrary oracle-trace dependence from primary B/S/A scoring.
+- [x] SB-M53-C002-004 Implement a deterministic non-adversarial reference-policy family and robust primary aggregate; keep stress policy separate.
+- [x] SB-M53-C002-005 Derive/version candidate normalization anchors from the independent corpus/envelope, never from First 10 target fitting.
+- [x] SB-M53-C002-006 Create versioned V2-candidate analyzer/config without overwriting V1 evidence.
+- [x] SB-M53-C002-007 Prove candidate determinism, bounded metrics and solver-search-order robustness.
+- [x] SB-M53-C002-008 Prove board size alone and color count alone do not dictate class-like Challenge behavior.
+- [x] SB-M53-C002-009 Prove controlled route/access/unlock/bottleneck/slot-pressure pairs move intended axes in the expected direction.
+- [x] SB-M53-C002-010 Freeze candidate calibration before scoring First 10 as a holdout.
+- [x] SB-M53-C002-011 Produce First 10 V1-vs-V2 candidate matrix, policy spread and recovery evidence with no post-hoc retuning.
+- [x] SB-M53-C002-012 Produce owner difficulty/fairness/engagement rating sheet with no fabricated responses.
+- [x] SB-M53-C002-013 Run focused + M53-C001 + M52/R01/R02 + historical + root regression; no production gameplay changes.
+- [x] SB-M53-C002-014 Write evidence/log and hand off for independent ChatGPT audit.
+- [x] SB-M53-C002-015 Independent ChatGPT audit; on PASS request owner calibration review before adopting any new production difficulty authority.
+
+**M53-C002 audit verdict:** `AUDITED_PASS / OWNER DIFFICULTY CALIBRATION REVIEW REQUIRED`.
+V2 remains `CANDIDATE_NOT_PRODUCTION_AUTHORITY`; no production content/target/model adoption is authorized yet.
+
+#### M53-C002 Owner Calibration Review
+
+- [ ] SB-M53-C002-O01 Owner rates perceived difficulty 1..7 for Levels 1–10 under consistent 1x/no-booster conditions.
+- [ ] SB-M53-C002-O02 Owner rates fairness and engagement 1..7 and class feel for Levels 1–10.
+- [ ] SB-M53-C002-O03 Owner evaluates recovery cadence L3→4, L5→6, L8→9 and whether L10 feels like the cycle boss.
+- [ ] SB-M53-C002-O04 Owner explicitly reviews L1 neutral-policy deadlock/fairness and L7 relative difficulty/robustness concern.
+- [ ] SB-M53-C002-O05 ChatGPT compares owner Stage-B ratings with V2/V1/targets and opens the exact adoption, calibration-refinement or content-tuning next task.
 
 ### M54 — Regression Suite `[QA]`
 
