@@ -393,7 +393,11 @@ func _drain(h, ac) -> Dictionary:
 	var max_active := 0
 	var max_age := 0.0
 	for _i in range(MAX_TICKS):
-		if slots.rightmost_empty_index() != -1:
+		# M52-C001-R02: released slots are reusable while their old batch drains; this greedy
+		# first-front player is only a proven-solvable Hazard order under completion-time
+		# reuse, so it places once no released batch is still draining.
+		var draining_idle: bool = not slots.has_method("draining_count") or slots.draining_count() == 0
+		if slots.rightmost_empty_index() != -1 and draining_idle:
 			for col in range(h.get_supply().get_column_count()):
 				if supply.get_front(col) != null:
 					input.activate_front(col)

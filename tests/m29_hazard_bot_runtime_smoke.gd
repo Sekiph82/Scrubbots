@@ -142,7 +142,12 @@ func _play(host, order: Array) -> Dictionary:
 	var dup := false
 	for _i in range(MAX_TICKS):
 		ticks += 1
-		if idx < order.size() and slots.rightmost_empty_index() != -1:
+		# M52-C001-R02: a released slot is reusable while its old batch still drains. This
+		# fixed column order is proven solvable under completion-time reuse, so the harness
+		# places only once no released batch is still draining (a greedier player may
+		# legitimately deadlock this fixture — proven LOST by M27, never a false outcome).
+		var draining_idle: bool = not slots.has_method("draining_count") or slots.draining_count() == 0
+		if idx < order.size() and slots.rightmost_empty_index() != -1 and draining_idle:
 			var col: int = order[idx]
 			if supply.get_front(col) != null:
 				if input.activate_front(col).get("ok", false):

@@ -337,9 +337,38 @@ func begin_wave() -> int:
 		return 0
 	if has_pending_lanes():
 		return 0
-	_wave_lanes = _eligible_slots()
+	# Lanes are pinned to the batch identity each slot held at the cadence event
+	# (M52-C001-R02): a slot released and refilled mid-wave never lets the replacement
+	# batch act on the old wave's lane — it joins a future cadence wave only.
+	_wave_lanes = []
+	for slot in _eligible_slots():
+		_wave_lanes.append({"slot": slot, "batch_id": _batches.get_batch_id(slot)})
 	_wave_gen = _generation
 	return _wave_lanes.size()
+
+## Placement wake (M52-C001-R02): queue ONE lane for the batch just placed into `slot`,
+## pinned to its batch id, so a new batch starts promptly WITHOUT firing an immediate wave
+## for every other slot (those stay on the cadence — preserving 1x/2x pacing even when
+## early slot release makes placements frequent). A slot already queued for the same batch
+## is not queued twice. Returns true iff a lane was queued.
+func queue_lane(slot) -> bool:
+	if not _bound or _fatal or _paused or _reset_in_progress or _reset_requested:
+		return false
+	if not _batches.is_occupied(slot) or _batches.get_capacity(slot) <= 0:
+		return false
+	var bid: String = _batches.get_batch_id(slot)
+	if not has_pending_lanes():
+		_wave_lanes = []
+		_wave_gen = _generation
+	for lane in _wave_lanes:
+		if int(lane["slot"]) == slot and lane["batch_id"] == bid:
+			return false
+	_wave_lanes.append({"slot": slot, "batch_id": bid})
+	return true
+
+## Number of lanes still queued in the current wave (0 when none / reset intervened).
+func pending_lane_count() -> int:
+	return _wave_lanes.size() if has_pending_lanes() else 0
 
 ## True while the current wave still has queued lanes (and no reset intervened).
 func has_pending_lanes() -> bool:
@@ -365,8 +394,10 @@ func step_lane() -> Dictionary:
 		_wave_lanes.clear()
 		return {"ok": false, "reason": "no_wave"}
 	while not _wave_lanes.is_empty():
-		var slot: int = _wave_lanes.pop_front()
-		if not _batches.is_occupied(slot) or _batches.get_capacity(slot) <= 0 or is_slot_waiting(slot):
+		var lane: Dictionary = _wave_lanes.pop_front()
+		var slot: int = int(lane["slot"])
+		if not _batches.is_occupied(slot) or _batches.get_batch_id(slot) != lane["batch_id"] \
+				or _batches.get_capacity(slot) <= 0 or is_slot_waiting(slot):
 			continue
 		_in_step = true
 		var my_gen: int = _generation
@@ -478,8 +509,19 @@ func _attempt_slot(slot: int, my_gen: int) -> Dictionary:
 			"dispatch_reason": (dr.failure_reason if dr != null else &"NULL")}
 	_assignments[owner] = {"claim_id": claim_id, "slot": slot, "color": color,
 		"target": target, "agent": dr.agent}
+	# M52-C001-R02 (OWNER_SLOT_RELEASE_ON_DISPATCH_EXHAUSTION_V01): the real agent exists,
+	# so confirm this exact work unit as DEPARTED. If that was the batch's last waiting
+	# Scrubby (launch capacity 0, every committed unit departed) M24 retires the batch to
+	# its draining ledger and the physical slot is EMPTY now — in this same runtime
+	# transition, before any state sync. Never at raw commit time (route/spawn could fail).
+	var retired := false
+	if _batches.has_method("confirm_departed"):
+		retired = bool(_batches.confirm_departed(claim_id).get("retired", false))
+		if retired:
+			_waiting_slots.erase(slot)   # the WAITING marker belonged to the retired batch
 	return {"ok": true, "reason": "assigned", "owner_id": owner, "target": target,
-		"color": color, "slot": slot, "claim_id": claim_id, "agent": dr.agent}
+		"color": color, "slot": slot, "claim_id": claim_id, "agent": dr.agent,
+		"batch_id": batch_id, "retired": retired}
 
 func _origin_for_slot(slot: int) -> Vector2:
 	var o = _origin_provider.origin_for_slot(slot)

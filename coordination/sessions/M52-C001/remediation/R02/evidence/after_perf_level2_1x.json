@@ -1,0 +1,360 @@
+{
+	"context": {
+		"cores": 16,
+		"cpu": "12th Gen Intel(R) Core(TM) i7-1260P",
+		"godot": "4.7.2-stable (official)",
+		"headless": true,
+		"os": "Windows",
+		"tick_dt": 0.0166666666666667
+	},
+	"git_head": "01046ef",
+	"mode": "perf",
+	"result": {
+		"clicks_applied": 36,
+		"frame_ms": {
+			"max": 18.61,
+			"p50": 0.31,
+			"p95": 3.408,
+			"p99": 7.209,
+			"total_s": 11.647939
+		},
+		"frames_over_ms": {
+			"100": 0,
+			"16.7": 1,
+			"33": 0,
+			"50": 0
+		},
+		"peak_live_assignments": 121,
+		"peak_moving_agents": 121,
+		"sections": {
+			"access_compute_route": {
+				"count": 1024,
+				"max_ms": 7.874,
+				"mean_ms": 3.133,
+				"total_ms": 3208.275
+			},
+			"access_validate": {
+				"count": 1024,
+				"max_ms": 0.231,
+				"mean_ms": 0.106,
+				"total_ms": 108.507
+			},
+			"agent_drive_arrival": {
+				"count": 16981,
+				"max_ms": 0.773,
+				"mean_ms": 0.177,
+				"total_ms": 3013.047
+			},
+			"completion_on_tick": {
+				"count": 16981,
+				"max_ms": 3.26,
+				"mean_ms": 0.021,
+				"total_ms": 361.13
+			},
+			"dispatcher_spawn": {
+				"count": 1024,
+				"max_ms": 16.617,
+				"mean_ms": 0.217,
+				"total_ms": 222.533
+			},
+			"m25_claim": {
+				"count": 2043,
+				"max_ms": 9.379,
+				"mean_ms": 2.803,
+				"total_ms": 5726.054
+			},
+			"m26_dispatch_lane": {
+				"count": 2043,
+				"max_ms": 17.795,
+				"mean_ms": 2.95,
+				"total_ms": 6026.59
+			},
+			"renderer_update": {
+				"count": 1024,
+				"max_ms": 0.057,
+				"mean_ms": 0.015,
+				"total_ms": 15.668
+			},
+			"route_dijkstra": {
+				"count": 1024,
+				"max_ms": 6.752,
+				"mean_ms": 2.178,
+				"total_ms": 2230.069
+			},
+			"route_sources": {
+				"count": 1024,
+				"max_ms": 1.142,
+				"mean_ms": 0.545,
+				"total_ms": 557.995
+			},
+			"route_validate": {
+				"count": 1024,
+				"max_ms": 0.259,
+				"mean_ms": 0.127,
+				"total_ms": 129.911
+			},
+			"target_selection": {
+				"count": 2043,
+				"max_ms": 9.345,
+				"mean_ms": 2.785,
+				"total_ms": 5688.812
+			},
+			"ui_snapshot_sync": {
+				"count": 16981,
+				"max_ms": 0.522,
+				"mean_ms": 0.057,
+				"total_ms": 974.906
+			}
+		},
+		"sim_seconds": 283.016666666667,
+		"speed": "1x",
+		"terminal": "WON",
+		"ticks": 16981,
+		"worst_frames": [
+			{
+				"agents": 1,
+				"live": 1,
+				"ms": 18.61,
+				"sections": {
+					"access_compute_route": 545,
+					"access_validate": 90,
+					"agent_drive_arrival": 4,
+					"completion_on_tick": 40,
+					"dispatcher_spawn": 16617,
+					"m25_claim": 1072,
+					"m26_dispatch_lane": 17795,
+					"route_dijkstra": 3,
+					"route_sources": 314,
+					"route_validate": 112,
+					"target_selection": 1040,
+					"ui_snapshot_sync": 224
+				},
+				"t": 0
+			},
+			{
+				"agents": 62,
+				"live": 62,
+				"ms": 10.521,
+				"sections": {
+					"access_compute_route": 7604,
+					"access_validate": 178,
+					"agent_drive_arrival": 452,
+					"completion_on_tick": 31,
+					"dispatcher_spawn": 309,
+					"m25_claim": 9210,
+					"m26_dispatch_lane": 9597,
+					"renderer_update": 19,
+					"route_dijkstra": 6333,
+					"route_sources": 600,
+					"route_validate": 223,
+					"target_selection": 9176,
+					"ui_snapshot_sync": 209
+				},
+				"t": 15181
+			},
+			{
+				"agents": 24,
+				"live": 24,
+				"ms": 10.374,
+				"sections": {
+					"access_compute_route": 7874,
+					"access_validate": 125,
+					"agent_drive_arrival": 261,
+					"completion_on_tick": 22,
+					"dispatcher_spawn": 247,
+					"m25_claim": 9379,
+					"m26_dispatch_lane": 9702,
+					"route_dijkstra": 6752,
+					"route_sources": 607,
+					"route_validate": 149,
+					"target_selection": 9345,
+					"ui_snapshot_sync": 202
+				},
+				"t": 16230
+			},
+			{
+				"agents": 24,
+				"live": 24,
+				"ms": 10.189,
+				"sections": {
+					"access_compute_route": 7652,
+					"access_validate": 117,
+					"agent_drive_arrival": 328,
+					"completion_on_tick": 37,
+					"dispatcher_spawn": 243,
+					"m25_claim": 9093,
+					"m26_dispatch_lane": 9391,
+					"renderer_update": 9,
+					"route_dijkstra": 6570,
+					"route_sources": 584,
+					"route_validate": 155,
+					"target_selection": 9066,
+					"ui_snapshot_sync": 210
+				},
+				"t": 16185
+			},
+			{
+				"agents": 64,
+				"live": 64,
+				"ms": 10.158,
+				"sections": {
+					"access_compute_route": 7582,
+					"access_validate": 164,
+					"agent_drive_arrival": 226,
+					"completion_on_tick": 25,
+					"dispatcher_spawn": 301,
+					"m25_claim": 9115,
+					"m26_dispatch_lane": 9470,
+					"route_dijkstra": 6499,
+					"route_sources": 564,
+					"route_validate": 189,
+					"target_selection": 9088,
+					"ui_snapshot_sync": 174
+				},
+				"t": 15300
+			},
+			{
+				"agents": 28,
+				"live": 28,
+				"ms": 10.143,
+				"sections": {
+					"access_compute_route": 7516,
+					"access_validate": 146,
+					"agent_drive_arrival": 328,
+					"completion_on_tick": 27,
+					"dispatcher_spawn": 271,
+					"m25_claim": 9007,
+					"m26_dispatch_lane": 9340,
+					"renderer_update": 9,
+					"route_dijkstra": 6462,
+					"route_sources": 562,
+					"route_validate": 168,
+					"target_selection": 8977,
+					"ui_snapshot_sync": 212
+				},
+				"t": 16095
+			},
+			{
+				"agents": 24,
+				"live": 24,
+				"ms": 10.035,
+				"sections": {
+					"access_compute_route": 6796,
+					"access_validate": 183,
+					"agent_drive_arrival": 165,
+					"completion_on_tick": 26,
+					"dispatcher_spawn": 299,
+					"m25_claim": 9112,
+					"m26_dispatch_lane": 9475,
+					"route_dijkstra": 5637,
+					"route_sources": 599,
+					"route_validate": 209,
+					"target_selection": 9056,
+					"ui_snapshot_sync": 227
+				},
+				"t": 12360
+			},
+			{
+				"agents": 69,
+				"live": 69,
+				"ms": 10.028,
+				"sections": {
+					"access_compute_route": 7447,
+					"access_validate": 122,
+					"agent_drive_arrival": 251,
+					"completion_on_tick": 27,
+					"dispatcher_spawn": 256,
+					"m25_claim": 9054,
+					"m26_dispatch_lane": 9358,
+					"route_dijkstra": 6273,
+					"route_sources": 692,
+					"route_validate": 145,
+					"target_selection": 9027,
+					"ui_snapshot_sync": 169
+				},
+				"t": 15765
+			},
+			{
+				"agents": 29,
+				"live": 29,
+				"ms": 9.885,
+				"sections": {
+					"access_compute_route": 7548,
+					"access_validate": 120,
+					"agent_drive_arrival": 208,
+					"completion_on_tick": 21,
+					"dispatcher_spawn": 261,
+					"m25_claim": 9003,
+					"m26_dispatch_lane": 9336,
+					"route_dijkstra": 6462,
+					"route_sources": 571,
+					"route_validate": 154,
+					"target_selection": 8966,
+					"ui_snapshot_sync": 163
+				},
+				"t": 16140
+			},
+			{
+				"agents": 69,
+				"live": 69,
+				"ms": 9.862,
+				"sections": {
+					"access_compute_route": 7398,
+					"access_validate": 126,
+					"agent_drive_arrival": 241,
+					"completion_on_tick": 27,
+					"dispatcher_spawn": 248,
+					"m25_claim": 8796,
+					"m26_dispatch_lane": 9105,
+					"route_dijkstra": 6377,
+					"route_sources": 560,
+					"route_validate": 152,
+					"target_selection": 8766,
+					"ui_snapshot_sync": 230
+				},
+				"t": 15735
+			},
+			{
+				"agents": 24,
+				"live": 24,
+				"ms": 9.807,
+				"sections": {
+					"access_compute_route": 6723,
+					"access_validate": 167,
+					"agent_drive_arrival": 165,
+					"completion_on_tick": 28,
+					"dispatcher_spawn": 278,
+					"m25_claim": 8904,
+					"m26_dispatch_lane": 9240,
+					"route_dijkstra": 5635,
+					"route_sources": 568,
+					"route_validate": 192,
+					"target_selection": 8878,
+					"ui_snapshot_sync": 175
+				},
+				"t": 12150
+			},
+			{
+				"agents": 37,
+				"live": 37,
+				"ms": 9.752,
+				"sections": {
+					"access_compute_route": 7051,
+					"access_validate": 182,
+					"agent_drive_arrival": 360,
+					"completion_on_tick": 31,
+					"dispatcher_spawn": 255,
+					"m25_claim": 8761,
+					"m26_dispatch_lane": 9062,
+					"renderer_update": 14,
+					"route_dijkstra": 5837,
+					"route_sources": 635,
+					"route_validate": 225,
+					"target_selection": 8739,
+					"ui_snapshot_sync": 151
+				},
+				"t": 14253
+			}
+		]
+	}
+}

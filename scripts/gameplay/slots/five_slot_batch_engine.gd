@@ -25,7 +25,14 @@ extends RefCounted
 ## - 0 <= committed <= remaining_to_clear <= initial_count; capacity = remaining-committed;
 ## - remaining_to_clear drops ONLY on authenticated resolve of a previously committed
 ##   live work identity; rollback reduces only committed;
-## - completion requires remaining==0 AND committed==0, then the slot becomes EMPTY;
+## - completion requires remaining==0 AND committed==0, then the batch accounting ends;
+## - M52-C001-R02 (OWNER_SLOT_RELEASE_ON_DISPATCH_EXHAUSTION_V01): the PHYSICAL slot is
+##   released EARLIER — as soon as the batch's launch capacity (remaining - committed)
+##   is 0 and every live committed unit has a confirmed real dispatch (confirm_departed).
+##   The batch's accounting then moves to the DRAINING ledger keyed by its immutable
+##   batch_id; its in-flight work keeps resolving there while the physical slot is
+##   EMPTY and reusable. Live work always resolves by batch identity, never by slot index,
+##   so a replacement batch in the same physical slot can never be mutated;
 ## - WAITING preserves the batch; an authoritative claimability notification resumes ACTIVE.
 ##
 ## M24 does NOT choose targets, reserve pixels, route, spawn robots, or claim
@@ -45,7 +52,12 @@ const INITIAL_SEQUENCE := 1
 # honors (M39 V02, F-M39-001). reset() returns to the baseline five.
 var _slots: Array = []              # active-capacity SlotBatchState (EMPTY or occupied)
 var _next_sequence: int = INITIAL_SEQUENCE
-var _live_work: Dictionary = {}     # work_id -> {"slot": int, "batch_id": String}
+var _live_work: Dictionary = {}     # work_id -> {"slot": int, "batch_id": String, "departed": bool}
+## Draining ledger (M52-C001-R02): batch_id -> {"state": SlotBatchState, "slot": int}.
+## A batch here has left its physical slot (launch capacity exhausted, every committed
+## unit departed) but still owns in-flight work. `slot` is provenance only — never proof
+## of ownership. Removed when remaining == 0 AND committed == 0.
+var _draining: Dictionary = {}
 var _busy: bool = false             # re-entrancy guard for the external-collaborator path
 var _paused: bool = false           # informational; M24 state is time-independent
 
@@ -141,6 +153,129 @@ func is_paused() -> bool:
 func live_work_count() -> int:
 	return _live_work.size()
 
+# ------------------------------------------------ draining ledger (M52-C001-R02) --
+
+func draining_count() -> int:
+	return _draining.size()
+
+func is_draining(batch_id) -> bool:
+	return typeof(batch_id) == TYPE_STRING and _draining.has(batch_id)
+
+## Detached draining view, ordered by batch_id (deterministic).
+func draining_snapshot() -> Array:
+	var out: Array = []
+	var keys: Array = _draining.keys()
+	keys.sort()
+	for k in keys:
+		var d: Dictionary = _draining[k]
+		var e: Dictionary = d["state"].to_dict()
+		e["provenance_slot"] = int(d["slot"])
+		e["draining"] = true
+		out.append(e)
+	return out
+
+## The SlotBatchState that OWNS a live work record: the batch physically in the record's
+## slot only if it is the exact same batch identity, otherwise the draining entry for that
+## batch_id, otherwise null. Never infers ownership from the slot index alone.
+func _owner_state(rec: Dictionary):
+	var idx: int = int(rec["slot"])
+	if _valid_index(idx):
+		var s = _slots[idx]
+		if not s.is_empty() and s.get_batch_id() == rec["batch_id"]:
+			return s
+	var d = _draining.get(rec["batch_id"], null)
+	return d["state"] if d != null else null
+
+func _batch_all_departed(batch_id: String) -> bool:
+	for wid in _live_work:
+		var r: Dictionary = _live_work[wid]
+		if r["batch_id"] == batch_id and not bool(r["departed"]):
+			return false
+	return true
+
+## Mark one live work unit as having a successfully established real dispatch (an agent
+## exists). Flag only — no retirement (used when exactly restoring a prior tuple).
+func mark_departed(work_id) -> bool:
+	if _busy or typeof(work_id) != TYPE_STRING or not _live_work.has(work_id):
+		return false
+	_live_work[work_id]["departed"] = true
+	return true
+
+## Production departure confirmation (called by M26 right after dispatch_preclaimed
+## succeeded for this exact work identity). Marks it departed; then, if the owning batch
+## still physically occupies its slot, has launch capacity 0 and every one of its live
+## committed units is departed, RETIRES it atomically: accounting moves to the draining
+## ledger (same state object, exact counters) and the physical slot becomes EMPTY.
+## Returns {ok, retired, slot, batch_id}. Fails closed ({ok:false}) for unknown/stale ids.
+func confirm_departed(work_id) -> Dictionary:
+	if _busy or typeof(work_id) != TYPE_STRING or not _live_work.has(work_id):
+		return {"ok": false}
+	var rec: Dictionary = _live_work[work_id]
+	var s = _owner_state(rec)
+	if s == null:
+		return {"ok": false}
+	rec["departed"] = true
+	var idx: int = int(rec["slot"])
+	var bid: String = rec["batch_id"]
+	var retired := false
+	if _valid_index(idx) and _slots[idx] == s and s.get_capacity() == 0 and s.get_committed() > 0 \
+			and _batch_all_departed(bid) and not _draining.has(bid):
+		_draining[bid] = {"state": s, "slot": idx}
+		_slots[idx] = SlotBatchState.make_empty()
+		retired = true
+	return {"ok": true, "retired": retired, "slot": idx, "batch_id": bid}
+
+## Exact restore of a draining work identity (Tornado reattach / transactional undo):
+## re-commit `work_id` on the DRAINING batch `batch_id` (never on whatever batch now
+## occupies its old physical slot). Requires the batch to be draining with capacity > 0
+## and the id not live. The restored unit is departed (its agent still exists).
+func recommit_draining_work(batch_id, work_id) -> bool:
+	if _busy or typeof(work_id) != TYPE_STRING or (work_id as String).is_empty():
+		return false
+	if not is_draining(batch_id) or _live_work.has(work_id):
+		return false
+	var d: Dictionary = _draining[batch_id]
+	if not d["state"].apply_commit():
+		return false
+	_live_work[work_id] = {"slot": int(d["slot"]), "batch_id": batch_id, "departed": true}
+	return true
+
+## Tornado selected-color purge of DRAINING batches. Only legal once no live work remains
+## for them (the caller rolled their claims back first). All-or-nothing: any draining batch
+## of `color` that still has live work fails the whole call with zero change. Returns
+## {ok, records:[{batch_id, entry}]} for exact restore_draining.
+func purge_draining_color(color) -> Dictionary:
+	if _busy:
+		return {"ok": false}
+	var picked: Array = []
+	for bid in _draining:
+		var d: Dictionary = _draining[bid]
+		if d["state"].get_color_id() != int(color):
+			continue
+		if d["state"].get_committed() != 0:
+			return {"ok": false}
+		for wid in _live_work:
+			if _live_work[wid]["batch_id"] == bid:
+				return {"ok": false}
+		picked.append(bid)
+	var records: Array = []
+	picked.sort()
+	for bid in picked:
+		records.append({"batch_id": bid, "entry": _draining[bid]})
+		_draining.erase(bid)
+	return {"ok": true, "records": records}
+
+## Exact rollback companion of purge_draining_color.
+func restore_draining(records: Array) -> bool:
+	if _busy:
+		return false
+	for r in records:
+		if _draining.has(r["batch_id"]):
+			return false
+	for r in records:
+		_draining[r["batch_id"]] = r["entry"]
+	return true
+
 ## Detached per-slot snapshot array (index 0..4). Mutating returned dicts/array cannot
 ## mutate engine truth (each entry is a fresh plain Dictionary).
 func snapshot() -> Array:
@@ -210,6 +345,8 @@ func _select_front_batch_guarded(supply_engine, column) -> Dictionary:
 	return {"ok": true, "slot": target, "placement": placed.to_dict()}
 
 func _batch_id_occupied(batch_id) -> bool:
+	if _draining.has(batch_id):
+		return true
 	for s in _slots:
 		if s.is_occupied() and s.get_batch_id() == batch_id:
 			return true
@@ -235,42 +372,48 @@ func commit_work(slot_index, work_id) -> bool:
 		return false
 	if not s.apply_commit():
 		return false
-	_live_work[work_id] = {"slot": slot_index, "batch_id": s.get_batch_id()}
+	_live_work[work_id] = {"slot": slot_index, "batch_id": s.get_batch_id(), "departed": false}
 	return true
 
 ## Resolve one previously committed live work identity as an authenticated successful
-## clear. Located by engine-owned slot/batch record (never caller-mutable fields):
-## committed-1 AND remaining-1; then completion check may free the slot. Fails closed
-## for unknown/stale/double identities.
+## clear. Located by the engine-owned record's IMMUTABLE batch identity — the batch still
+## in its physical slot, or its draining entry (M52-C001-R02) — never by slot index alone:
+## committed-1 AND remaining-1 on exactly that batch. A physical batch that completes frees
+## its slot; a draining batch that completes leaves the ledger (its old physical slot, and
+## any replacement batch there, are untouched). Fails closed for unknown/stale/double ids.
 func resolve_clear(work_id) -> bool:
 	if _busy:
 		return false
 	if not _live_work.has(work_id):
 		return false
 	var rec: Dictionary = _live_work[work_id]
-	var idx: int = rec["slot"]
-	var s = _slots[idx]
-	# Engine-owned identity check: the same occupied batch must still be there.
-	if s.is_empty() or s.get_batch_id() != rec["batch_id"]:
+	var s = _owner_state(rec)
+	if s == null:
 		return false
 	if not s.apply_resolve():
 		return false
 	_live_work.erase(work_id)
 	if s.is_complete():
-		_free_slot(idx)
+		var bid: String = rec["batch_id"]
+		if _draining.has(bid) and _draining[bid]["state"] == s:
+			_draining.erase(bid)
+		else:
+			_free_slot(int(rec["slot"]))
 	return true
 
 ## Roll back one previously committed live work identity: committed-1 only,
 ## remaining_to_clear unchanged. Fails closed for unknown/stale/double identities.
+## Located by immutable batch identity (physical or draining, M52-C001-R02). A rollback
+## on a DRAINING batch restores launch capacity that no physical slot can schedule; the
+## owning transaction (Tornado purge/restore, Retry reset) must restore, purge or reset it.
 func rollback_work(work_id) -> bool:
 	if _busy:
 		return false
 	if not _live_work.has(work_id):
 		return false
 	var rec: Dictionary = _live_work[work_id]
-	var idx: int = rec["slot"]
-	var s = _slots[idx]
-	if s.is_empty() or s.get_batch_id() != rec["batch_id"]:
+	var s = _owner_state(rec)
+	if s == null:
 		return false
 	if not s.apply_rollback():
 		return false
@@ -295,11 +438,9 @@ func is_work_bound_to(work_id, expected_slot, expected_batch_id) -> bool:
 	# The M24 record itself must still name the exact expected slot + batch.
 	if int(rec["slot"]) != expected_slot or String(rec["batch_id"]) != expected_batch_id:
 		return false
-	# And that exact slot must still be occupied by that exact batch (no free/refilled slot).
-	if not _valid_index(expected_slot):
-		return false
-	var s = _slots[expected_slot]
-	return not s.is_empty() and s.get_batch_id() == expected_batch_id
+	# And that exact batch must still own it: physically in that slot, or draining
+	# (M52-C001-R02). A replacement batch occupying the old slot never qualifies.
+	return _owner_state(rec) != null
 
 ## Tornado reconciliation seam (M39 V02). Frees an UNTOUCHED occupied slot (ACTIVE,
 ## committed==0, remaining==initial, no live work) to EMPTY and returns the captured
@@ -351,7 +492,7 @@ func purge_uncommitted_slot(index) -> Dictionary:
 	if s.is_empty() or s.get_committed() != 0:
 		return {"ok": false}
 	for wid in _live_work:
-		if int(_live_work[wid]["slot"]) == index:
+		if _live_work[wid]["batch_id"] == s.get_batch_id():
 			return {"ok": false}
 	_slots[index] = SlotBatchState.make_empty()
 	return {"ok": true, "slot_state": s}
@@ -367,10 +508,12 @@ func restore_purged_slot(index, slot_state) -> bool:
 	return true
 
 func _free_slot(idx: int) -> void:
-	# Return to exact EMPTY truth; drop any live work still keyed to this slot. Neighbors
+	# Return to exact EMPTY truth; drop any live work still owned by THIS slot's batch
+	# (never work of a draining batch whose provenance slot is the same index). Neighbors
 	# are never shifted/compacted.
+	var bid: String = _slots[idx].get_batch_id()
 	for wid in _live_work.keys():
-		if int(_live_work[wid]["slot"]) == idx:
+		if _live_work[wid]["batch_id"] == bid:
 			_live_work.erase(wid)
 	_slots[idx] = SlotBatchState.make_empty()
 
@@ -431,6 +574,7 @@ func reset() -> bool:
 	for _i in range(SLOT_COUNT):   # new attempt returns to the baseline five
 		_slots.append(SlotBatchState.make_empty())
 	_live_work.clear()
+	_draining.clear()
 	_next_sequence = INITIAL_SEQUENCE
 	_paused = false
 	return true

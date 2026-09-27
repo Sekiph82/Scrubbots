@@ -99,7 +99,11 @@ func _run() -> void:
 	print("SCALE59 board=%dx%d cells=%d peak_inflight=%d assigned=%d claim_ms=%.1f" % [N, N, N * N, peak, assigned, t_claim])
 	_ok(assigned == BATCH, "59x59: exactly BATCH assignments (one per step, no burst)")
 	_ok(peak == BATCH and dispatcher.get_active_count() == BATCH, "59x59: peak concurrent in-flight == BATCH")
-	_ok(slots.get_committed(4) == BATCH and slots.get_capacity(4) == 0, "59x59: committed == BATCH, capacity exhausted")
+	# M52-C001-R02: once the last waiting robot departed, the batch left its physical slot
+	# and its accounting lives in the draining ledger (committed == BATCH, capacity 0).
+	var drain: Array = slots.draining_snapshot()
+	_ok(slots.is_empty(4) and drain.size() == 1 and int(drain[0]["committed"]) == BATCH and int(drain[0]["capacity"]) == 0,
+		"59x59: capacity exhausted -> slot released, draining batch holds committed == BATCH")
 	_ok(not overcommit, "59x59: committed <= remaining held every step")
 	_ok(not dup, "59x59: no duplicate target reservation across dense in-flight set")
 	_ok(sched.live_assignment_count() <= slots.occupied_count() + BATCH, "59x59: scheduler bookkeeping bounded by slots + in-flight (no unbounded hidden queue)")

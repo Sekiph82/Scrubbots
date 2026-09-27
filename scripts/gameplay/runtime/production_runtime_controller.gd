@@ -160,9 +160,14 @@ func reset_runtime() -> void:
 	_system_suspended = false
 	_terminal_stopped = false
 
-## Prime an immediate dispatch wave on the next processed frame (a successful placement
-## may wake scheduling promptly) without exceeding one wave per frame.
-func request_immediate_step() -> void:
+## A successful placement wakes scheduling promptly. With a lane-capable scheduler and a
+## known slot, only that newly placed batch gets an immediate lane (M52-C001-R02); every
+## other lane keeps the 1x/2x cadence. Otherwise (legacy scheduler / unknown slot) prime
+## the next cadence event as before. Never more than one lane serviced per frame.
+func request_immediate_step(slot: int = -1) -> void:
+	if slot >= 0 and _scheduler != null and _scheduler.has_method("queue_lane"):
+		_scheduler.queue_lane(slot)
+		return
 	if _speed != null:
 		_accum = maxf(_accum, _speed.cadence_interval())
 

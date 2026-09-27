@@ -325,16 +325,27 @@ func restore_claim(rec: Dictionary) -> bool:
 		return false
 	if _reservations.is_reserved(target) or _reservations.get_target_for_owner(owner) != -1:
 		return false
-	if not _batches.is_occupied(slot) or _batches.get_batch_id(slot) != rec.get("batch_id", ""):
+	var batch_id: String = String(rec.get("batch_id", ""))
+	# M52-C001-R02: the claim's batch may still physically occupy its slot, or it may be a
+	# DRAINING batch (slot already released/reused). Restore onto that exact identity only —
+	# never onto a replacement batch that now occupies the old physical slot.
+	var physical: bool = _batches.is_occupied(slot) and _batches.get_batch_id(slot) == batch_id
+	var draining: bool = not physical and _batches.has_method("is_draining") and _batches.is_draining(batch_id)
+	if not physical and not draining:
 		return false
-	if _batches.get_capacity(slot) <= 0:
+	if physical and _batches.get_capacity(slot) <= 0:
 		return false
 	# Mutate: reserve, then commit work; undo the reservation if commit fails.
 	if not _reservations.reserve(target, owner):
 		return false
-	if not _batches.commit_work(slot, claim_id):
+	var committed: bool = _batches.commit_work(slot, claim_id) if physical \
+		else _batches.recommit_draining_work(batch_id, claim_id)
+	if not committed:
 		_reservations.release(target, owner)
 		return false
+	# A restored claim belongs to a still-alive dispatched agent: its work is departed.
+	if physical and _batches.has_method("mark_departed"):
+		_batches.mark_departed(claim_id)
 	_claims[claim_id] = rec.duplicate(true)
 	return true
 
