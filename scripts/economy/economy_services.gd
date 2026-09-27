@@ -88,6 +88,15 @@ func _register_handlers() -> void:
 	# double-grant it.
 	reward.register_handler("guaranteed_new_fallback_sb", func(_n): pass)
 
+## M55-C001 (SB-M55-010): release a graph that is being discarded. The reward handlers
+## (registered above and RewardGrantService's own defaults) are lambdas that capture
+## this graph, so without this call a dropped EconomyServices is a reference cycle that
+## leaks every service it owns. Only for throw-away graphs (dry-run validation, a host's
+## private fallback economy); the canonical AppState graph lives for the app lifetime.
+func dispose() -> void:
+	if reward != null:
+		reward.release_handlers()
+
 ## Aggregate versioned snapshot (M40 persists this).
 func snapshot() -> Dictionary:
 	return {

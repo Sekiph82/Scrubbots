@@ -9,7 +9,7 @@ Planned modules:
 
 - `economy_wallet.gd` — Scrub Bucks authoritative balance; atomic/idempotent grant/spend.
 - `reward_grant_service.gd` — first-clear, streak, Gift Meter, Daily and Collection reward bundles.
-- `heart_service.gd` — max-5 Hearts, 30-minute real-world regen, attempt consumption/refill.
+- `heart_service.gd` — max-5 Hearts, 15-minute (900 s) real-world regen, attempt consumption/refill.
 - `gift_meter_service.gd` — Win-Streak-SB-only meter, milestones 10/50/250/500/1000, rollover, Gift Bar queue.
 - `daily_service.gd` — consecutive-login streak, 5-day cycle and three daily tasks.
 - `booster_inventory.gd` — exactly four charge counters: +1 Slot, Random, Selector, Tornado.
