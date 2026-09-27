@@ -5,15 +5,15 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M55 CHAOS / LONG-RUN QA
-- Current Sprint: M55-C001 Core Chaos / Long-Run QA — Owner 2x Clock-Rollback Gate
-- Current Task: Owner decides timed 2x device-clock rollback semantics after ChatGPT audit accepted SB-M55-001..017
-- Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER chooses timed 2x rollback policy: **A = fail closed / never regain expired time after backward clock movement**, or **B = remain pure wall-clock and allow current rollback behavior**. ChatGPT then records the ruling, closes M55-C001 if applicable, updates TASKS.md and opens the next governed task.
-- Required Actor: OWNER
+- Current Sprint: M55-C002 Timed 2x Anti-Rollback Remediation
+- Current Task: Implement owner ruling A so timed 2x never regains time or revives after backward device-clock movement
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M55-C002/task_prompts/SB-M55-C002_TIMED_2X_ANTI_ROLLBACK.md`; ChatGPT audits. M55 core closes only after C002 PASS.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 879 / 1347 = 65.26%. M55-C001 SB-M55-001..017 are technically AUDITED_PASS; cycle remains OWNER_REQUIRED only for timed 2x clock-rollback policy.
-- Note: M55-C001 audit: `coordination/sessions/M55-C001/CHATGPT_AUDIT_V01.md`. Heart 900 s reconciliation PASS. Save-validation EconomyServices leak found by chaos testing and fixed with sensitivity regression. Timed 2x uses absolute wall-clock expiry and currently can revive after clock rollback; no owner policy existed, so no behavior was invented.
+- Progress: 879 / 1355 = 64.87%. M55-C001 SB-M55-001..017 remain technically AUDITED_PASS. Owner selected A = fail-closed anti-rollback; M55-C002 remediation is active.
+- Note: OWNER ruling `coordination/OWNER_TIMED_2X_CLOCK_ROLLBACK_V01.md`: timed 2x remaining time is monotonic non-increasing without a new purchase; expired timed 2x may never revive after a backward clock jump. Implement with persistent backward-compatible anti-rollback authority.
 - Owner sequencing lock: the First 10 Level Pack block is now CLOSED through M54-C001. Per the owner/controller 2026-09-27 directive, execute M55 core Chaos / Long-Run QA next; after the current-build M55 gate closes, resume the deferred M43 Results Screen / Player Experience roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -2190,7 +2190,7 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 - [ ] SB-M54-032 World registry/unlock/transition regression once future world ranges are owner-defined.
 ### M55 — Chaos / Long-Run QA `[QA]`
 
-**M55-C001 current-build gate:** SB-M55-001..017 technically AUDITED_PASS at `8852045`; ChatGPT audit: `coordination/sessions/M55-C001/CHATGPT_AUDIT_V01.md`. Cycle remains OWNER_REQUIRED only for timed 2x clock-rollback policy. SB-M55-018..024 remain deferred until M43+ surfaces exist.
+**M55-C001 current-build gate:** SB-M55-001..017 technically AUDITED_PASS at `8852045`; ChatGPT audit: `coordination/sessions/M55-C001/CHATGPT_AUDIT_V01.md`. Owner resolved the remaining policy gate with **A = fail-closed timed-2x anti-rollback**. Implementation is M55-C002. SB-M55-018..024 remain deferred until M43+ surfaces exist.
 
 - [x] SB-M55-001 Spam all five slots.
 - [x] SB-M55-002 Restart while bots travel. — [x] SB-M55-003 Pause while bots travel.
@@ -2207,6 +2207,17 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 - [x] SB-M55-015 Background/foreground across Heart regen and timed 2x expiry.
 - [x] SB-M55-016 Tornado while matching-color agents are in flight; prove atomic reconciliation.
 - [x] SB-M55-017 Cards Exchange-all under repeated taps; prove protected first copies and no duplicate SB grant.
+
+#### M55-C002 Timed 2x Anti-Rollback Remediation
+
+- [ ] SB-M55-C002-001 Add persistent non-decreasing effective/high-water wall-clock authority for timed 2x.
+- [ ] SB-M55-C002-002 Ensure remaining timed-2x seconds cannot increase and an expired entitlement cannot revive after backward clock movement.
+- [ ] SB-M55-C002-003 Preserve normal forward expiry, current-level 2x and free M23 auto-2x semantics.
+- [ ] SB-M55-C002-004 Add backward-compatible legacy snapshot migration without wiping legitimately active legacy timed entitlements.
+- [ ] SB-M55-C002-005 Persist/strictly validate the new anti-rollback state across save/relaunch; malformed present values fail closed.
+- [ ] SB-M55-C002-006 Prove explicit new timed purchase can extend from the canonical effective base and charges exactly once.
+- [ ] SB-M55-C002-007 Add focused rollback/migration/persistence sensitivity regression plus relevant M39/M40/M55/root regressions.
+- [ ] SB-M55-C002-008 Write evidence/log and hand off for independent ChatGPT audit.
 
 #### M55 Player-Experience Chaos Expansion
 - [ ] SB-M55-018 Spam open/close/purchase/reward buttons across every popup without double transition/spend/grant.
