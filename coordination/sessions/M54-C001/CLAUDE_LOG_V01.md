@@ -228,7 +228,19 @@ The gap: existing coverage (`m39d_daily_collection`) proved set 1 exactly and th
 
 ## 8. Commit / push
 
-The commit that adds this file on `origin/main` is pushed with a plain `git push origin main`, never forced.
+- The evidence commit `825a58b` was made on base `7363468`.
+- The first `git push origin main` was rejected as non-fast-forward. While the suites ran, the owner had pushed `b3361d1` ("Merge remaining visual finalization commits into main": Codex visual assets under `assets/ui/final/**`, `assets/ui/VISUAL_ASSET_INDEX.md`, `coordination/codex_visual_assets/*`).
+- None of the incoming paths touch `tests/`, `scripts/`, `scenes/`, `data/`, `project.godot` or root `TASKS.md`. There was no untracked-file collision, and the live `TASKS.md` status was unchanged (READY_FOR_CLAUDE / CLAUDE).
+- Synchronized with a plain non-destructive `git merge origin/main` (merge commit `b208060`) with no conflicts. No rebase, reset, stash or force was used.
+- Post-merge revalidation on the merged tree: the asset/Home/content-sensitive suites all exit 0 with 0 FAIL and 0 SCRIPT ERROR:
+  - `m42_assets` 40 ok;
+  - `m42_home` 224 ok;
+  - `m42_navigation` 82 ok;
+  - `m54_collection_set_master_exactly_once` 192 ok;
+  - `palette_v3_leveldata_contract` 26 ok;
+  - `m35_level_catalog` 20 ok.
+- The incoming commits change no code, content or config. The full-suite results in §4 therefore still apply to the merged tree.
+- Pushed with plain `git push origin main` (`b3361d1..b208060`), never forced. This §8 record is a follow-up log-only commit.
 
 ## Handoff
 
