@@ -137,10 +137,10 @@ func _commit_activation(column: int) -> Dictionary:
 	# Refresh DETACHED M23/M24 snapshots only after the authoritative result.
 	if _screen != null and is_instance_valid(_screen):
 		_screen.update_snapshots(_slots.snapshot(), _supply.player_snapshot())
-	# Wake the scheduler and prime a prompt (still one-per-step) cadence.
+	# Wake the scheduler and give ONLY the newly placed batch a prompt lane (M52-C001-R02).
 	_scheduler.notify_placed()
 	if _runtime != null and _runtime.has_method("request_immediate_step"):
-		_runtime.request_immediate_step()
+		_runtime.request_immediate_step(int(res.get("slot", -1)))
 	# Only AFTER a successful final transfer, read authoritative M23 exhaustion; hidden
 	# future batches count. Exhausted => switch runtime to 2x (idempotent if already 2x).
 	if _supply.is_exhausted() and _runtime != null and _runtime.has_method("set_speed_2x"):

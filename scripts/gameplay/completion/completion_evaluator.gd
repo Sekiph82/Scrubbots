@@ -64,6 +64,9 @@ func is_quiescent(scheduler, dispatcher, claim, reservations, slots) -> bool:
 		return false
 	if slots.live_work_count() != 0:
 		return false
+	# M52-C001-R02: a draining batch (physical slot already released) still owes clears.
+	if slots.has_method("draining_count") and slots.draining_count() != 0:
+		return false
 	return true
 
 ## The five live production transaction cardinalities that must agree at a stable evaluation

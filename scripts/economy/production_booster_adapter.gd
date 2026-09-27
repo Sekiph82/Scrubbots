@@ -328,6 +328,7 @@ func tornado_stages(color) -> Array:
 	var detached: Array = []              # scheduler detach entries (claims rolled back)
 	var cleared_indices: Array = []       # board cells set CLEARED by this purge
 	var purged_slots: Array = []          # {index, slot_state} detached slot objects
+	var purged_draining: Array = []       # M52-C001-R02 draining records of the color
 	var supply_before: Array = []         # exact prior supply for rollback
 	var has_sched: bool = _scheduler != null and _scheduler.has_method("preflight_color_cancel")
 
@@ -377,8 +378,19 @@ func tornado_stages(color) -> Array:
 					if not r.get("ok", false):
 						return false   # committed work still bound => cannot purge safely
 					purged_slots.append({"index": si, "slot_state": r["slot_state"]})
+			# M52-C001-R02: batches of this color that already released their physical slot
+			# (draining, all claims rolled back by stage_claims) are purged too, so no
+			# unschedulable capacity is stranded. Exact records kept for rollback.
+			if _slots.has_method("purge_draining_color"):
+				var dr = _slots.purge_draining_color(int(color))
+				if not dr.get("ok", false):
+					return false
+				purged_draining.append_array(dr["records"])
 			return not _faulted("tornado_slots"),
 		"rollback": func():
+			if not purged_draining.is_empty():
+				_slots.restore_draining(purged_draining)
+				purged_draining.clear()
 			for i in range(purged_slots.size() - 1, -1, -1):
 				_slots.restore_purged_slot(purged_slots[i]["index"], purged_slots[i]["slot_state"])
 			purged_slots.clear(),

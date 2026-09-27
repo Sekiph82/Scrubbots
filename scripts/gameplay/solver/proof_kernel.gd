@@ -34,6 +34,13 @@ extends RefCounted
 ##   - DEADLOCK/LOST soundness: from a quiescent state no clear happens before the next
 ##     successful claim, and claims are identical, so "no future progress" in the kernel is
 ##     exactly "no future progress" at runtime — the classifier cannot report a false LOST.
+##   - Early slot release (M52-C001-R02): at runtime a batch whose last waiting Scrubby has
+##     departed leaves its PHYSICAL slot at once (M24 draining ledger) so the player may
+##     place during travel. The kernel never confirms departures, so its batches free their
+##     slot on completion — identical at every quiescent decision point (all of a wave's
+##     clears are applied before the next placement), where the solver branches. It adds
+##     no capacity and never releases an undispatched unit, so it cannot admit a level the
+##     runtime could not play; earlier runtime placement only adds player options.
 ##   - SOLVED is a proof for this canonical timing only; production admission additionally
 ##     requires the owner click sequence to reach WON through the REAL production runtime
 ##     (tests/m52_owner_supply_plans.gd, tests/m52_r01_parallel_runtime.gd).
