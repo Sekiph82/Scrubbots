@@ -1,0 +1,4055 @@
+{
+	"schema": "scrubbots.m53.first10_difficulty_v2_candidate.v1",
+	"version": 1,
+	"sprint": "M53-C002",
+	"status": "CANDIDATE_HOLDOUT_EVALUATION (not production authority)",
+	"analyzer": {
+		"analyzerVersion": "m53-level-difficulty-analyzer/v2-candidate",
+		"analysisConfig": "res://data/config/level_difficulty_analysis_v2_candidate.json",
+		"analysisConfigVersion": 2,
+		"status": "CANDIDATE_NOT_PRODUCTION_AUTHORITY",
+		"scoreModelVersion": 1,
+		"progressionModelVersion": 1,
+		"freeze": {
+			"frozen": true,
+			"frozenBy": "tools/calibrate_difficulty_v2.gd --calibrate",
+			"date": "2026-09-27",
+			"rule": "No V2 candidate change after this point; First 10 holdout is measured and scored only against this exact file (sha256 recorded in calibration_corpus_v1.json)."
+		}
+	},
+	"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+	"summary": {
+		"inDefaultWindow": 2,
+		"missing": [
+			"m21_level_001_hazard_bot",
+			"level_004_orange_cat",
+			"level_005_party_toucan",
+			"level_006_chicken",
+			"level_007_pigeon",
+			"level_008_butterfly",
+			"level_009_frog",
+			"level_010_ice_cube"
+		],
+		"robustnessPassAll": false
+	},
+	"recovery": {
+		"guards": [
+			{
+				"fromLevel": 3,
+				"toLevel": 4,
+				"actualFrom": 38.9364708561903,
+				"actualTo": 24.95869148582,
+				"actualDrop": 13.9777793703703,
+				"designMinimumDrop": 15.0,
+				"targetDrop": 21.0,
+				"lowerThanPeak": true,
+				"pass": false,
+				"sessionLoadDrop": 10.6043137501928
+			},
+			{
+				"fromLevel": 5,
+				"toLevel": 6,
+				"actualFrom": 29.3714448774597,
+				"actualTo": 23.5750102741376,
+				"actualDrop": 5.79643460332212,
+				"designMinimumDrop": 20.0,
+				"targetDrop": 40.0,
+				"lowerThanPeak": true,
+				"pass": false,
+				"sessionLoadDrop": 1.391508418556
+			},
+			{
+				"fromLevel": 8,
+				"toLevel": 9,
+				"actualFrom": 28.6921466242318,
+				"actualTo": 37.1461114554315,
+				"actualDrop": -8.45396483119975,
+				"designMinimumDrop": 15.0,
+				"targetDrop": 23.0,
+				"lowerThanPeak": false,
+				"pass": false,
+				"sessionLoadDrop": 0.042362138678012
+			}
+		],
+		"boss": {
+			"level": 10,
+			"actualD": 46.7238529973165,
+			"isCycleMaximum": true,
+			"rankByActualD": 1,
+			"actualOrderDescending": [
+				10,
+				1,
+				3,
+				9,
+				7,
+				5,
+				8,
+				4,
+				6,
+				2
+			]
+		},
+		"note": "Computed from ACTUAL analyzed D, never target D. The 10 -> next-cycle-1 guard needs Level 11 (CONTENT_MISSING) and is not evaluated."
+	},
+	"corpusStrategyFamilySpread": {
+		"flow_stripes3_20": {
+			"maxLeaveFamilyOutDeviation": 1.27182760651488,
+			"familyOnlyD": {
+				"RR": 11.424843942672,
+				"GREEDY": 15.2403267622166,
+				"ACCESS": 15.2403267622166
+			},
+			"gatedMaxDeviation": 0.7093774184477
+		},
+		"flow_stripes3_24": {
+			"maxLeaveFamilyOutDeviation": 1.07138321497939,
+			"familyOnlyD": {
+				"RR": 10.3636343540493,
+				"GREEDY": 13.5777839989875,
+				"ACCESS": 13.5777839989875
+			},
+			"gatedMaxDeviation": 0.486599734374023
+		},
+		"flow_stripes3_32": {
+			"maxLeaveFamilyOutDeviation": 0.186607122548965,
+			"familyOnlyD": {
+				"RR": 11.7767702572073,
+				"GREEDY": 11.9653844561412,
+				"ACCESS": 11.9653844561412
+			},
+			"gatedMaxDeviation": 0.0747668956138074
+		},
+		"flow_stripes3_40": {
+			"maxLeaveFamilyOutDeviation": 0.0156372670972988,
+			"familyOnlyD": {
+				"RR": 14.5992604524166,
+				"GREEDY": 14.5523486511247,
+				"ACCESS": 14.5523486511247
+			},
+			"gatedMaxDeviation": 0.0269681739594247
+		},
+		"flow_stripes3_48": {
+			"maxLeaveFamilyOutDeviation": 0.00214953566644382,
+			"familyOnlyD": {
+				"RR": 17.3229870440412,
+				"GREEDY": 17.3165384370419,
+				"ACCESS": 17.3165384370419
+			},
+			"gatedMaxDeviation": 0.0194203582191044
+		},
+		"color_stripes6_24": {
+			"maxLeaveFamilyOutDeviation": 2.81188939931582,
+			"familyOnlyD": {
+				"RR": 15.8284502467517,
+				"GREEDY": 24.2641184446992,
+				"ACCESS": 24.2641184446992
+			},
+			"gatedMaxDeviation": 1.47336136481945
+		},
+		"color_stripes12_24": {
+			"maxLeaveFamilyOutDeviation": 2.7123155868986,
+			"familyOnlyD": {
+				"RR": 26.7252997338354,
+				"GREEDY": 34.8622464945311,
+				"ACCESS": 34.8622464945311
+			},
+			"gatedMaxDeviation": 1.15674011059932
+		},
+		"color_skew6_24": {
+			"maxLeaveFamilyOutDeviation": 1.4035039663987,
+			"familyOnlyD": {
+				"RR": 9.64224287767493,
+				"GREEDY": 13.852754776871,
+				"ACCESS": 13.852754776871
+			},
+			"gatedMaxDeviation": 0.642517473723542
+		},
+		"color_m3_24": {
+			"maxLeaveFamilyOutDeviation": 0.513148884350377,
+			"familyOnlyD": {
+				"RR": 9.26145973652485,
+				"GREEDY": 10.800906389576,
+				"ACCESS": 10.800906389576
+			},
+			"gatedMaxDeviation": 0.246547008239634
+		},
+		"color_m6_24": {
+			"maxLeaveFamilyOutDeviation": 2.85083810981721,
+			"familyOnlyD": {
+				"RR": 12.6642739622772,
+				"GREEDY": 21.2167882917288,
+				"ACCESS": 21.2167882917288
+			},
+			"gatedMaxDeviation": 1.29500746384254
+		},
+		"color_m12_24": {
+			"maxLeaveFamilyOutDeviation": 2.7123155868986,
+			"familyOnlyD": {
+				"RR": 26.7252997338354,
+				"GREEDY": 34.8622464945311,
+				"ACCESS": 34.8622464945311
+			},
+			"gatedMaxDeviation": 1.15674011059932
+		},
+		"color_m6skew_24": {
+			"maxLeaveFamilyOutDeviation": 1.87941741190181,
+			"familyOnlyD": {
+				"RR": 19.3949518145306,
+				"GREEDY": 25.033204050236,
+				"ACCESS": 25.033204050236
+			},
+			"gatedMaxDeviation": 0.823511722363371
+		},
+		"access_band3_24": {
+			"maxLeaveFamilyOutDeviation": 0.500823914765224,
+			"familyOnlyD": {
+				"RR": 7.71608280955573,
+				"GREEDY": 9.1133306420684,
+				"ACCESS": 9.32377846563441
+			},
+			"gatedMaxDeviation": 0.215005297420822
+		},
+		"access_shafts3_24": {
+			"maxLeaveFamilyOutDeviation": 0.40984636310413,
+			"familyOnlyD": {
+				"RR": 18.0411280364361,
+				"GREEDY": 18.9816212099988,
+				"ACCESS": 19.5597130414982
+			},
+			"gatedMaxDeviation": 0.233655960676071
+		},
+		"access_halves3_24": {
+			"maxLeaveFamilyOutDeviation": 0.10991775800566,
+			"familyOnlyD": {
+				"RR": 6.80086762122921,
+				"GREEDY": 7.13062089524619,
+				"ACCESS": 7.13062089524619
+			},
+			"gatedMaxDeviation": 0.0486219047813377
+		},
+		"access_comb3_24": {
+			"maxLeaveFamilyOutDeviation": 0.0756719633945835,
+			"familyOnlyD": {
+				"RR": 10.0041977192787,
+				"GREEDY": 10.2445654254199,
+				"ACCESS": 10.0309013511936
+			},
+			"gatedMaxDeviation": 0.0516116448257193
+		},
+		"access_stripes4_24": {
+			"maxLeaveFamilyOutDeviation": 2.03851933090862,
+			"familyOnlyD": {
+				"RR": 14.1921617413534,
+				"GREEDY": 20.3077197340793,
+				"ACCESS": 20.3077197340793
+			},
+			"gatedMaxDeviation": 1.10522894012925
+		},
+		"access_mosaic4_24": {
+			"maxLeaveFamilyOutDeviation": 1.3033575002313,
+			"familyOnlyD": {
+				"RR": 25.2823237573262,
+				"GREEDY": 27.2321278556407,
+				"ACCESS": 30.1672983071773
+			},
+			"gatedMaxDeviation": 0.57629342221701
+		},
+		"unlock_shallow_24": {
+			"maxLeaveFamilyOutDeviation": 0.666251724987729,
+			"familyOnlyD": {
+				"RR": 14.5247617744191,
+				"GREEDY": 16.2050007705643,
+				"ACCESS": 16.2050007705643
+			},
+			"gatedMaxDeviation": 0.306845927875012
+		},
+		"unlock_deep_24": {
+			"maxLeaveFamilyOutDeviation": 0.464660291010176,
+			"familyOnlyD": {
+				"RR": 30.3839792155624,
+				"GREEDY": 28.9899983425319,
+				"ACCESS": 28.9899983425319
+			},
+			"gatedMaxDeviation": 0.363932021734939
+		},
+		"route_straight_24": {
+			"maxLeaveFamilyOutDeviation": 0.348775417557203,
+			"familyOnlyD": {
+				"RR": 11.8257344693773,
+				"GREEDY": 11.2090217397754,
+				"ACCESS": 10.4725918691511
+			},
+			"gatedMaxDeviation": 0.265931332984836
+		},
+		"route_maze_24": {
+			"maxLeaveFamilyOutDeviation": 3.74015207698757,
+			"familyOnlyD": {
+				"RR": 32.0079657911747,
+				"GREEDY": 32.5792920774869,
+				"ACCESS": 32.9601989118548
+			},
+			"gatedMaxDeviation": 1.51145797113931
+		},
+		"bottleneck_low_24": {
+			"maxLeaveFamilyOutDeviation": 0.525758809893283,
+			"familyOnlyD": {
+				"RR": 17.3880410712346,
+				"GREEDY": 18.0960254251804,
+				"ACCESS": 18.0960254251804
+			},
+			"gatedMaxDeviation": 0.217404113821623
+		},
+		"bottleneck_high_24": {
+			"maxLeaveFamilyOutDeviation": 1.80594203490953,
+			"familyOnlyD": {
+				"RR": 30.8916297785718,
+				"GREEDY": 25.4738036738432,
+				"ACCESS": 25.4738036738432
+			},
+			"gatedMaxDeviation": 0.734081704402826
+		},
+		"slot_low_24": {
+			"maxLeaveFamilyOutDeviation": 0.0689370743926467,
+			"familyOnlyD": {
+				"RR": 21.2545552687254,
+				"GREEDY": 21.0412108310043,
+				"ACCESS": 21.0804337223816
+			},
+			"gatedMaxDeviation": 0.0689730723848996
+		},
+		"slot_high_24": {
+			"maxLeaveFamilyOutDeviation": 3.07979707285953,
+			"familyOnlyD": {
+				"RR": 31.8162023230698,
+				"GREEDY": 22.5257760031287,
+				"ACCESS": 22.6278462058537
+			},
+			"gatedMaxDeviation": 1.26500104298735
+		},
+		"compact_hard_20": {
+			"maxLeaveFamilyOutDeviation": 1.22066855298479,
+			"familyOnlyD": {
+				"RR": 33.6820239101695,
+				"GREEDY": 29.9509955989385,
+				"ACCESS": 30.0890409034918
+			},
+			"gatedMaxDeviation": 0.512101038430966
+		}
+	},
+	"levels": [
+		{
+			"order": 1,
+			"id": "m21_level_001_hazard_bot",
+			"class": "EASY",
+			"role": "cycle_relief",
+			"levelSha256": "ae725a9c86839dcffb6444f3208416b553679878be7999ef8814de51241e8c1c",
+			"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+			"v1StageA": {
+				"challengeScore": 46.0311119033444,
+				"vector": {
+					"W": 0.0,
+					"C": 0.372826943364748,
+					"A": 0.779112086649057,
+					"U": 0.283741379310345,
+					"B": 0.639473684210526,
+					"R": 0.305677472073045,
+					"S": 0.653275844979681
+				},
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 9.86751223967476
+			},
+			"v2Candidate": {
+				"challengeScore": 42.3729935754073,
+				"vector": {
+					"W": 0.0,
+					"C": 0.372826943364748,
+					"A": 0.628210220435709,
+					"U": 0.406086363636364,
+					"B": 0.698717948717949,
+					"R": 0.0847020075379408,
+					"S": 0.4766868437346
+				},
+				"targetChallenge": 20.0,
+				"signedDelta": 22.3729935754073,
+				"absoluteDelta": 22.3729935754073,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 7.49900045628072,
+				"sessionInputs": {
+					"actions": 0.0861342526094034,
+					"routeTime": 0.0209395087235996,
+					"decisionCount": 0.128205128205128
+				},
+				"unlock": {
+					"p95Wave": 2.0,
+					"meanWave": 0.4575,
+					"maxWave": 3.0,
+					"lockedFraction": 0.275
+				},
+				"aggregateRaw": {
+					"A_raw": 0.379828430476057,
+					"B": 0.698717948717949,
+					"B_lowChoice": 0.698717948717949,
+					"B_forced": 0.698717948717949,
+					"B_streakNorm": 0.698717948717949,
+					"S": 0.4766868437346,
+					"S_noWork": 0.662907268170426,
+					"S_singleColor": 0.349624060150376,
+					"S_imbalance": 0.356622061655191,
+					"R_len": 0.665027678024801,
+					"R_detour": 1.30109685755114,
+					"R_turn": 3.13329975049167,
+					"dispatches": 299.833333333333,
+					"routeSeconds": 1013.47222222222,
+					"decisions": 15.0,
+					"durationProxySeconds": 182.388888888889,
+					"nonProductiveLegalFraction": 0.597337505232242
+				},
+				"profile": {
+					"dominant": "FORTRESS",
+					"scores": {
+						"FLOW": 0.422328489069993,
+						"COLOR": 0.424756893549674,
+						"FORTRESS": 0.552402156177156,
+						"ROUTE": 0.356456113986825,
+						"MARATHON": -0.552402156177156
+					},
+					"runnerUp": "COLOR"
+				}
+			},
+			"policySpread": {
+				"perPolicy": {
+					"ACCESS": {
+						"D": 39.2982783660488,
+						"vector": {
+							"W": 0.0,
+							"C": 0.372826943364748,
+							"A": 0.628518716822336,
+							"U": 0.406086363636364,
+							"B": 0.615384615384615,
+							"R": 0.0521885763406957,
+							"S": 0.326111761222746
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 19.0
+					},
+					"ACCESS_HI": {
+						"D": 39.0856744317056,
+						"vector": {
+							"W": 0.0,
+							"C": 0.372826943364748,
+							"A": 0.591465497272458,
+							"U": 0.406086363636364,
+							"B": 0.5,
+							"R": 0.123507477726591,
+							"S": 0.480715828579205
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 19.0
+					},
+					"GREEDY": {
+						"D": 39.2982783660488,
+						"vector": {
+							"W": 0.0,
+							"C": 0.372826943364748,
+							"A": 0.628518716822336,
+							"U": 0.406086363636364,
+							"B": 0.615384615384615,
+							"R": 0.0521885763406957,
+							"S": 0.326111761222746
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 19.0
+					},
+					"GREEDY_HI": {
+						"D": 39.2958158022714,
+						"vector": {
+							"W": 0.0,
+							"C": 0.372826943364748,
+							"A": 0.545574831874925,
+							"U": 0.406086363636364,
+							"B": 0.461538461538462,
+							"R": 0.155857100893653,
+							"S": 0.618853980956101
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 19.0
+					},
+					"ORACLE_DIAGNOSTIC": {
+						"D": 43.7289884066672,
+						"vector": {
+							"W": 0.0,
+							"C": 0.372826943364748,
+							"A": 0.670002494395623,
+							"U": 0.406086363636364,
+							"B": 0.615384615384615,
+							"R": 0.102308229094578,
+							"S": 0.636095557384129
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 19.0
+					},
+					"RR": {
+						"D": 48.7066821212768,
+						"vector": {
+							"W": 0.0,
+							"C": 0.372826943364748,
+							"A": 0.685418694378486,
+							"U": 0.406086363636364,
+							"B": 1.0,
+							"R": 0.0742538158374557,
+							"S": 0.5541638652134
+						},
+						"completed": false,
+						"finalProgress": 0.25,
+						"decisions": 7.0
+					},
+					"RR_REV": {
+						"D": 48.7681381503342,
+						"vector": {
+							"W": 0.0,
+							"C": 0.372826943364748,
+							"A": 0.689764865443714,
+							"U": 0.406086363636364,
+							"B": 1.0,
+							"R": 0.0717070766127424,
+							"S": 0.5541638652134
+						},
+						"completed": false,
+						"finalProgress": 0.2475,
+						"decisions": 7.0
+					},
+					"STRESS": {
+						"D": 53.4546289642129,
+						"vector": {
+							"W": 0.0,
+							"C": 0.372826943364748,
+							"A": 1.0,
+							"U": 0.406086363636364,
+							"B": 0.87,
+							"R": 0.0,
+							"S": 0.66904975410144
+						},
+						"completed": false,
+						"finalProgress": 0.0,
+						"decisions": 5.0
+					}
+				},
+				"primaryEnsembleDRange": [
+					39.0856744317056,
+					48.7681381503342
+				],
+				"allPolicyDRange": [
+					39.0856744317056,
+					53.4546289642129
+				]
+			},
+			"robustness": {
+				"toleranceD": 1.75,
+				"variants": [
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR",
+						"D": 41.1062558662334,
+						"deviation": -1.26673770917389
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR_REV",
+						"D": 41.0939646604219,
+						"deviation": -1.27902891498537
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY",
+						"D": 43.0023407886772,
+						"deviation": 0.629347213269909
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY_HI",
+						"D": 42.9912109699415,
+						"deviation": 0.618217394534184
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS",
+						"D": 43.0023407886772,
+						"deviation": 0.629347213269909
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS_HI",
+						"D": 43.0418483784926,
+						"deviation": 0.668854803085289
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR",
+						"D": 42.3627509038977,
+						"deviation": -0.0102426715095589
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR_REV",
+						"D": 42.3832362469169,
+						"deviation": 0.0102426715095802
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY",
+						"D": 42.3637187264609,
+						"deviation": -0.00927484894643271
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY_HI",
+						"D": 42.3822684243537,
+						"deviation": 0.00927484894643982
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS",
+						"D": 42.4059165669201,
+						"deviation": 0.0329229915128124
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS_HI",
+						"D": 42.3400705838945,
+						"deviation": -0.0329229915128124
+					}
+				],
+				"maxDeviation": 1.27902891498537,
+				"pass": true,
+				"tieBreakHalvesD": {
+					"RR,GREEDY,ACCESS": 42.3863990464641,
+					"RR_REV,GREEDY_HI,ACCESS_HI": 42.3595881043505
+				}
+			},
+			"strategyFamilySpread": {
+				"leaveFamilyOut": [
+					{
+						"withoutFamily": "RR",
+						"D": 39.2445117415187,
+						"deviation": -3.12848183388862
+					},
+					{
+						"withoutFamily": "GREEDY",
+						"D": 43.9324493351624,
+						"deviation": 1.55945575975511
+					},
+					{
+						"withoutFamily": "ACCESS",
+						"D": 43.9957460958513,
+						"deviation": 1.62275252044399
+					}
+				],
+				"maxLeaveFamilyOutDeviation": 3.12848183388862,
+				"familyOnlyD": {
+					"RR": 48.7374101358055,
+					"GREEDY": 39.2970470841601,
+					"ACCESS": 39.1919763988772
+				},
+				"note": "genuine strategy differences between valid policy families; reported, not gated"
+			},
+			"diagnosticPathsD": {
+				"ORACLE_DIAGNOSTIC": 43.7289884066672
+			},
+			"anchorSensitivityDRange": [
+				39.7563230732072,
+				45.7216624154761
+			],
+			"frustration": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; policy/solver completion is not a human clear rate"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner per-slot Session Load budget"
+					},
+					"lateFailure": {
+						"status": "DIAGNOSTIC_ONLY",
+						"stressCompleted": false,
+						"stressStopReason": "no_legal_placement",
+						"stressFailureProgress": 0.0,
+						"stressLateFailure": false
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.648027726975095
+					}
+				},
+				"stressDeadPlacements": 5,
+				"stressDecisions": 5.0,
+				"primaryPoliciesCompleted": "4/6"
+			},
+			"verdict": "MISSES_TARGET_WINDOW"
+		},
+		{
+			"order": 2,
+			"id": "level_002_apple",
+			"class": "EASY",
+			"role": "confidence_rise",
+			"levelSha256": "f0cf2a00898582979e9078a00ce2d0935030bc67ba7d7295360cea40ca889486",
+			"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+			"v1StageA": {
+				"challengeScore": 45.0425796993399,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.403890889150178,
+					"A": 0.695559094963593,
+					"U": 0.409529903017241,
+					"B": 0.45,
+					"R": 0.290282374281639,
+					"S": 0.309022496831432
+				},
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 24.3989987505248
+			},
+			"v2Candidate": {
+				"challengeScore": 22.0758621976627,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.403890889150178,
+					"A": 0.26617688515981,
+					"U": 0.269642223011364,
+					"B": 0.01,
+					"R": 0.0689889716598449,
+					"S": 0.0321839289048314
+				},
+				"targetChallenge": 22.0,
+				"signedDelta": 0.0758621976627083,
+				"absoluteDelta": 0.0758621976627083,
+				"acceptanceWindow": "IN_DEFAULT_WINDOW",
+				"sessionLoad": 24.52423979381,
+				"sessionInputs": {
+					"actions": 0.294168342430336,
+					"routeTime": 0.122065883948236,
+					"decisionCount": 0.307692307692308
+				},
+				"unlock": {
+					"p95Wave": 1.0,
+					"meanWave": 0.3857421875,
+					"maxWave": 2.0,
+					"lockedFraction": 0.3759765625
+				},
+				"aggregateRaw": {
+					"A_raw": 0.177725568700792,
+					"B": 0.01,
+					"B_lowChoice": 0.0285714285714286,
+					"B_forced": 0.0,
+					"B_streakNorm": 0.0,
+					"S": 0.0321839289048314,
+					"S_noWork": 0.0,
+					"S_singleColor": 0.0138888888888889,
+					"S_imbalance": 0.109291271174881,
+					"R_len": 0.764937548529101,
+					"R_detour": 1.33490936111333,
+					"R_turn": 2.61914069788425,
+					"dispatches": 1024.0,
+					"routeSeconds": 5907.98878309462,
+					"decisions": 36.0,
+					"durationProxySeconds": 708.255552079942,
+					"nonProductiveLegalFraction": 0.00980486398154379
+				},
+				"profile": {
+					"dominant": "FLOW",
+					"scores": {
+						"FLOW": 0.818060297276276,
+						"COLOR": 0.218037409027505,
+						"FORTRESS": 0.139821111505682,
+						"ROUTE": 0.167582928409827,
+						"MARATHON": 0.2741176576283
+					},
+					"runnerUp": "MARATHON"
+				}
+			},
+			"policySpread": {
+				"perPolicy": {
+					"ACCESS": {
+						"D": 23.3941382719758,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.403890889150178,
+							"A": 0.351179755565471,
+							"U": 0.269642223011364,
+							"B": 0.0,
+							"R": 0.0622985219959001,
+							"S": 0.0156962451887627
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 36.0
+					},
+					"ACCESS_HI": {
+						"D": 24.851465550411,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.403890889150178,
+							"A": 0.375999385299872,
+							"U": 0.269642223011364,
+							"B": 0.03,
+							"R": 0.0603494560461668,
+							"S": 0.0687387795132183
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 36.0
+					},
+					"GREEDY": {
+						"D": 23.3066590920533,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.403890889150178,
+							"A": 0.346805796569346,
+							"U": 0.269642223011364,
+							"B": 0.0,
+							"R": 0.0622985219959001,
+							"S": 0.0156962451887627
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 36.0
+					},
+					"GREEDY_HI": {
+						"D": 24.3348459764062,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.403890889150178,
+							"A": 0.353863150873911,
+							"U": 0.269642223011364,
+							"B": 0.03,
+							"R": 0.0669391007210972,
+							"S": 0.0547596462897258
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 36.0
+					},
+					"ORACLE_DIAGNOSTIC": {
+						"D": 18.2375050828321,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.403890889150178,
+							"A": 0.0594868894915519,
+							"U": 0.269642223011364,
+							"B": 0.0,
+							"R": 0.06332623626144,
+							"S": 0.0823909441566871
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 36.0
+					},
+					"OWNER_DIAGNOSTIC": {
+						"D": 18.0519943542166,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.403890889150178,
+							"A": 0.0759536509922475,
+							"U": 0.269642223011364,
+							"B": 0.0,
+							"R": 0.0824549668776336,
+							"S": 0.0117776176775539
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 36.0
+					},
+					"RR": {
+						"D": 18.0519943542166,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.403890889150178,
+							"A": 0.0759536509922475,
+							"U": 0.269642223011364,
+							"B": 0.0,
+							"R": 0.0824549668776336,
+							"S": 0.0117776176775539
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 36.0
+					},
+					"RR_REV": {
+						"D": 18.5160699409134,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.403890889150178,
+							"A": 0.0932595716580118,
+							"U": 0.269642223011364,
+							"B": 0.0,
+							"R": 0.079593262322372,
+							"S": 0.0264350395709652
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 36.0
+					},
+					"STRESS": {
+						"D": 18.2375050828321,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.403890889150178,
+							"A": 0.0594868894915519,
+							"U": 0.269642223011364,
+							"B": 0.0,
+							"R": 0.06332623626144,
+							"S": 0.0823909441566871
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 36.0
+					}
+				},
+				"primaryEnsembleDRange": [
+					18.0519943542166,
+					24.851465550411
+				],
+				"allPolicyDRange": [
+					18.0519943542166,
+					24.851465550411
+				]
+			},
+			"robustness": {
+				"toleranceD": 1.75,
+				"variants": [
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR",
+						"D": 22.8806357663519,
+						"deviation": 0.804773568689225
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR_REV",
+						"D": 22.7878206490126,
+						"deviation": 0.711958451349865
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY",
+						"D": 21.8297028187846,
+						"deviation": -0.246159378878119
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY_HI",
+						"D": 21.624065441914,
+						"deviation": -0.451796755748699
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS",
+						"D": 21.8122069828001,
+						"deviation": -0.263655214862624
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS_HI",
+						"D": 21.520741527113,
+						"deviation": -0.555120670549666
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR",
+						"D": 21.9985162665466,
+						"deviation": -0.0773459311161311
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR_REV",
+						"D": 22.1532081287788,
+						"deviation": 0.0773459311161275
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY",
+						"D": 21.9044977169372,
+						"deviation": -0.17136448072549
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY_HI",
+						"D": 22.2472266783882,
+						"deviation": 0.171364480725483
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS",
+						"D": 21.8329743179235,
+						"deviation": -0.242887879739214
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS_HI",
+						"D": 22.3187500774019,
+						"deviation": 0.242887879739204
+					}
+				],
+				"maxDeviation": 0.804773568689225,
+				"pass": true,
+				"tieBreakHalvesD": {
+					"RR,GREEDY,ACCESS": 21.5842639060819,
+					"RR_REV,GREEDY_HI,ACCESS_HI": 22.5674604892435
+				}
+			},
+			"strategyFamilySpread": {
+				"leaveFamilyOut": [
+					{
+						"withoutFamily": "RR",
+						"D": 23.9717772227116,
+						"deviation": 1.89591502504886
+					},
+					{
+						"withoutFamily": "GREEDY",
+						"D": 21.2034170293792,
+						"deviation": -0.872445168283527
+					},
+					{
+						"withoutFamily": "ACCESS",
+						"D": 21.0523923408973,
+						"deviation": -1.02346985676536
+					}
+				],
+				"maxLeaveFamilyOutDeviation": 1.89591502504886,
+				"familyOnlyD": {
+					"RR": 18.284032147565,
+					"GREEDY": 23.8207525342297,
+					"ACCESS": 24.1228019111934
+				},
+				"note": "genuine strategy differences between valid policy families; reported, not gated"
+			},
+			"diagnosticPathsD": {
+				"ORACLE_DIAGNOSTIC": 18.2375050828321,
+				"OWNER_DIAGNOSTIC": 18.0519943542166
+			},
+			"anchorSensitivityDRange": [
+				20.9671613502265,
+				23.4947156519459
+			],
+			"frustration": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; policy/solver completion is not a human clear rate"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner per-slot Session Load budget"
+					},
+					"lateFailure": {
+						"status": "DIAGNOSTIC_ONLY",
+						"stressCompleted": true,
+						"stressStopReason": "solved",
+						"stressFailureProgress": null,
+						"stressLateFailure": false
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.00990243199077189
+					}
+				},
+				"stressDeadPlacements": 0,
+				"stressDecisions": 36.0,
+				"primaryPoliciesCompleted": "6/6"
+			},
+			"verdict": "FITS_TARGET_WINDOW"
+		},
+		{
+			"order": 3,
+			"id": "level_003_palm_tree",
+			"class": "MEDIUM",
+			"role": "first_tension",
+			"levelSha256": "0aceddb060f9770fda64ad55c3d3121530d3dc9d6b18f7901a382b2fb2d1d2aa",
+			"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+			"v1StageA": {
+				"challengeScore": 54.2738774887647,
+				"vector": {
+					"W": 0.620908153700972,
+					"C": 0.557537509151548,
+					"A": 0.735324427483468,
+					"U": 0.460578851848314,
+					"B": 0.477450980392157,
+					"R": 0.339039930238551,
+					"S": 0.523150371957828
+				},
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 35.284342379238
+			},
+			"v2Candidate": {
+				"challengeScore": 38.9364708561903,
+				"vector": {
+					"W": 0.620908153700972,
+					"C": 0.557537509151548,
+					"A": 0.492271427537129,
+					"U": 0.513402165701334,
+					"B": 0.047291724967913,
+					"R": 0.239856650679161,
+					"S": 0.114291243582781
+				},
+				"targetChallenge": 40.0,
+				"signedDelta": -1.06352914380969,
+				"absoluteDelta": 1.06352914380969,
+				"acceptanceWindow": "IN_DEFAULT_WINDOW",
+				"sessionLoad": 35.6433127776302,
+				"sessionInputs": {
+					"actions": 0.414823326630279,
+					"routeTime": 0.206139924272252,
+					"decisionCount": 0.435897435897436
+				},
+				"unlock": {
+					"p95Wave": 2.0,
+					"meanWave": 0.770775623268698,
+					"maxWave": 3.0,
+					"lockedFraction": 0.580332409972299
+				},
+				"aggregateRaw": {
+					"A_raw": 0.303941443300854,
+					"B": 0.047291724967913,
+					"B_lowChoice": 0.128928738003561,
+					"B_forced": 0.00333333333333333,
+					"B_streakNorm": 0.00333333333333333,
+					"S": 0.114291243582781,
+					"S_noWork": 0.107843137254902,
+					"S_singleColor": 0.124183006535948,
+					"S_imbalance": 0.110759745572953,
+					"R_len": 0.771423627531815,
+					"R_detour": 1.3814210042528,
+					"R_turn": 4.74780714966361,
+					"dispatches": 1444.0,
+					"routeSeconds": 9977.17233477699,
+					"decisions": 51.0,
+					"durationProxySeconds": 1104.23333809111,
+					"nonProductiveLegalFraction": 0.0461611861298658
+				},
+				"profile": {
+					"dominant": "FLOW",
+					"scores": {
+						"FLOW": 0.649011560597875,
+						"COLOR": 0.335914376367164,
+						"FORTRESS": 0.280346945334624,
+						"ROUTE": 0.366064039108145,
+						"MARATHON": 0.340561208366348
+					},
+					"runnerUp": "ROUTE"
+				}
+			},
+			"policySpread": {
+				"perPolicy": {
+					"ACCESS": {
+						"D": 41.483526017321,
+						"vector": {
+							"W": 0.620908153700972,
+							"C": 0.557537509151548,
+							"A": 0.583841680323066,
+							"U": 0.513402165701334,
+							"B": 0.0569767441860465,
+							"R": 0.155958231852216,
+							"S": 0.255227144123717
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 51.0
+					},
+					"ACCESS_HI": {
+						"D": 39.6536453131792,
+						"vector": {
+							"W": 0.620908153700972,
+							"C": 0.557537509151548,
+							"A": 0.576215442615939,
+							"U": 0.513402165701334,
+							"B": 0.0622222222222222,
+							"R": 0.172605940080213,
+							"S": 0.0629756238415352
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 51.0
+					},
+					"GREEDY": {
+						"D": 41.67265439684,
+						"vector": {
+							"W": 0.620908153700972,
+							"C": 0.557537509151548,
+							"A": 0.590894402072644,
+							"U": 0.513402165701334,
+							"B": 0.0556818181818182,
+							"R": 0.154034895949946,
+							"S": 0.263900263485078
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 51.0
+					},
+					"GREEDY_HI": {
+						"D": 39.5979667521861,
+						"vector": {
+							"W": 0.620908153700972,
+							"C": 0.557537509151548,
+							"A": 0.574446007319904,
+							"U": 0.513402165701334,
+							"B": 0.0608695652173913,
+							"R": 0.172605940080213,
+							"S": 0.0629756238415352
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 51.0
+					},
+					"ORACLE_DIAGNOSTIC": {
+						"D": 43.6078527100929,
+						"vector": {
+							"W": 0.620908153700972,
+							"C": 0.557537509151548,
+							"A": 0.546317170356962,
+							"U": 0.513402165701334,
+							"B": 0.113235294117647,
+							"R": 0.208160930662645,
+							"S": 0.406118309625291
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 51.0
+					},
+					"OWNER_DIAGNOSTIC": {
+						"D": 34.0304451247648,
+						"vector": {
+							"W": 0.620908153700972,
+							"C": 0.557537509151548,
+							"A": 0.30388397507064,
+							"U": 0.513402165701334,
+							"B": 0.027,
+							"R": 0.252366102693341,
+							"S": 0.0183917108108943
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 51.0
+					},
+					"RR": {
+						"D": 34.0304451247648,
+						"vector": {
+							"W": 0.620908153700972,
+							"C": 0.557537509151548,
+							"A": 0.30388397507064,
+							"U": 0.513402165701334,
+							"B": 0.027,
+							"R": 0.252366102693341,
+							"S": 0.0183917108108943
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 51.0
+					},
+					"RR_REV": {
+						"D": 34.425333710595,
+						"vector": {
+							"W": 0.620908153700972,
+							"C": 0.557537509151548,
+							"A": 0.324347057820579,
+							"U": 0.513402165701334,
+							"B": 0.021,
+							"R": 0.256043411193455,
+							"S": 0.0222770953939257
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 51.0
+					},
+					"STRESS": {
+						"D": 29.8519328734548,
+						"vector": {
+							"W": 0.620908153700972,
+							"C": 0.557537509151548,
+							"A": 0.0,
+							"U": 0.513402165701334,
+							"B": 0.145833333333333,
+							"R": 0.00286408839778757,
+							"S": 0.279560450116729
+						},
+						"completed": false,
+						"finalProgress": 0.145429362880886,
+						"decisions": 12.0
+					}
+				},
+				"primaryEnsembleDRange": [
+					34.0304451247648,
+					41.67265439684
+				],
+				"allPolicyDRange": [
+					29.8519328734548,
+					43.6078527100929
+				]
+			},
+			"robustness": {
+				"toleranceD": 1.75,
+				"variants": [
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR",
+						"D": 39.6596923168875,
+						"deviation": 0.72322146069714
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR_REV",
+						"D": 39.6067373419506,
+						"deviation": 0.670266485760322
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY",
+						"D": 38.2440401657215,
+						"deviation": -0.692430690468768
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY_HI",
+						"D": 38.6738931688569,
+						"deviation": -0.262577687333405
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS",
+						"D": 38.2817600581204,
+						"deviation": -0.654710798069956
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS_HI",
+						"D": 38.6627574566583,
+						"deviation": -0.273713399532056
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR",
+						"D": 38.8706560918853,
+						"deviation": -0.0658147643050455
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR_REV",
+						"D": 39.0022856204954,
+						"deviation": 0.0658147643050384
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY",
+						"D": 39.2946816921364,
+						"deviation": 0.358210835946132
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY_HI",
+						"D": 38.5782600202442,
+						"deviation": -0.358210835946124
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS",
+						"D": 39.2539686883052,
+						"deviation": 0.31749783211491
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS_HI",
+						"D": 38.6189730240754,
+						"deviation": -0.31749783211491
+					}
+				],
+				"maxDeviation": 0.72322146069714,
+				"pass": true,
+				"tieBreakHalvesD": {
+					"RR,GREEDY,ACCESS": 39.5463647599463,
+					"RR_REV,GREEDY_HI,ACCESS_HI": 38.3265769524343
+				}
+			},
+			"strategyFamilySpread": {
+				"leaveFamilyOut": [
+					{
+						"withoutFamily": "RR",
+						"D": 40.6019481198816,
+						"deviation": 1.66547726369124
+					},
+					{
+						"withoutFamily": "GREEDY",
+						"D": 37.7427103839376,
+						"deviation": -1.19376047225271
+					},
+					{
+						"withoutFamily": "ACCESS",
+						"D": 37.7759406091878,
+						"deviation": -1.1605302470025
+					}
+				],
+				"maxLeaveFamilyOutDeviation": 1.66547726369124,
+				"familyOnlyD": {
+					"RR": 34.2278894176799,
+					"GREEDY": 40.635310574513,
+					"ACCESS": 40.5685856652501
+				},
+				"note": "genuine strategy differences between valid policy families; reported, not gated"
+			},
+			"diagnosticPathsD": {
+				"ORACLE_DIAGNOSTIC": 43.6078527100929,
+				"OWNER_DIAGNOSTIC": 34.0304451247648
+			},
+			"anchorSensitivityDRange": [
+				36.8860232805063,
+				41.5605192027875
+			],
+			"frustration": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; policy/solver completion is not a human clear rate"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner per-slot Session Load budget"
+					},
+					"lateFailure": {
+						"status": "DIAGNOSTIC_ONLY",
+						"stressCompleted": false,
+						"stressStopReason": "no_legal_placement",
+						"stressFailureProgress": 0.145429362880886,
+						"stressLateFailure": false
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.0467264555488894
+					}
+				},
+				"stressDeadPlacements": 5,
+				"stressDecisions": 12.0,
+				"primaryPoliciesCompleted": "6/6"
+			},
+			"verdict": "FITS_TARGET_WINDOW"
+		},
+		{
+			"order": 4,
+			"id": "level_004_orange_cat",
+			"class": "EASY",
+			"role": "recovery",
+			"levelSha256": "070ec1f61ebf8c2b824a62bdcd0a9e1f1b51a8588c59dc0e86a36f440f93066e",
+			"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+			"v1StageA": {
+				"challengeScore": 49.4946186331064,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.511480590658638,
+					"A": 0.688422858399483,
+					"U": 0.409529903017241,
+					"B": 0.458974358974359,
+					"R": 0.341857101875838,
+					"S": 0.542078045017881
+				},
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 24.8888440926345
+			},
+			"v2Candidate": {
+				"challengeScore": 24.95869148582,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.511480590658638,
+					"A": 0.10833450184245,
+					"U": 0.470769708806818,
+					"B": 0.0,
+					"R": 0.100485933514919,
+					"S": 0.0560151386466118
+				},
+				"targetChallenge": 19.0,
+				"signedDelta": 5.95869148582004,
+				"absoluteDelta": 5.95869148582004,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.0389990274374,
+				"sessionInputs": {
+					"actions": 0.294168342430336,
+					"routeTime": 0.122130507975133,
+					"decisionCount": 0.333333333333333
+				},
+				"unlock": {
+					"p95Wave": 2.0,
+					"meanWave": 0.693359375,
+					"maxWave": 3.0,
+					"lockedFraction": 0.3974609375
+				},
+				"aggregateRaw": {
+					"A_raw": 0.0896110381602378,
+					"B": 0.0,
+					"B_lowChoice": 0.0,
+					"B_forced": 0.0,
+					"B_streakNorm": 0.0,
+					"S": 0.0560151386466118,
+					"S_noWork": 0.0683760683760684,
+					"S_singleColor": 0.0128205128205128,
+					"S_imbalance": 0.09671012723602,
+					"R_len": 0.765342521180848,
+					"R_detour": 1.34406563458538,
+					"R_turn": 3.00260425022176,
+					"dispatches": 1024.0,
+					"routeSeconds": 5911.11658599642,
+					"decisions": 39.0,
+					"durationProxySeconds": 745.511108027564,
+					"nonProductiveLegalFraction": 0.0
+				},
+				"profile": {
+					"dominant": "FLOW",
+					"scores": {
+						"FLOW": 0.806965263116911,
+						"COLOR": 0.283747864652625,
+						"FORTRESS": 0.235384854403409,
+						"ROUTE": 0.104410217678684,
+						"MARATHON": 0.178553914730572
+					},
+					"runnerUp": "COLOR"
+				}
+			},
+			"policySpread": {
+				"perPolicy": {
+					"ACCESS": {
+						"D": 28.0701172292595,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.511480590658638,
+							"A": 0.235711862804692,
+							"U": 0.470769708806818,
+							"B": 0.0,
+							"R": 0.0872797949477884,
+							"S": 0.1256091296332
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"ACCESS_HI": {
+						"D": 24.6969762297769,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.511480590658638,
+							"A": 0.0824924770410985,
+							"U": 0.470769708806818,
+							"B": 0.0,
+							"R": 0.106606825752957,
+							"S": 0.0754067704069652
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"GREEDY": {
+						"D": 26.7137685397739,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.511480590658638,
+							"A": 0.210489738165741,
+							"U": 0.470769708806818,
+							"B": 0.0,
+							"R": 0.0948454179098826,
+							"S": 0.0328528870004471
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"GREEDY_HI": {
+						"D": 24.49132360061,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.511480590658638,
+							"A": 0.0832037462903193,
+							"U": 0.470769708806818,
+							"B": 0.0,
+							"R": 0.106235416483839,
+							"S": 0.0537903782609531
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"ORACLE_DIAGNOSTIC": {
+						"D": 32.9829621194525,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.511480590658638,
+							"A": 0.207857742018636,
+							"U": 0.470769708806818,
+							"B": 0.0134615384615385,
+							"R": 0.193224039776945,
+							"S": 0.546465307703149
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"OWNER_DIAGNOSTIC": {
+						"D": 22.5400686457179,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.511480590658638,
+							"A": 0.0130969969090405,
+							"U": 0.470769708806818,
+							"B": 0.0,
+							"R": 0.100917731901317,
+							"S": 0.0041960661168162
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"RR": {
+						"D": 22.5400686457179,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.511480590658638,
+							"A": 0.0130969969090405,
+							"U": 0.470769708806818,
+							"B": 0.0,
+							"R": 0.100917731901317,
+							"S": 0.0041960661168162
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"RR_REV": {
+						"D": 23.2398946697821,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.511480590658638,
+							"A": 0.0250121898438086,
+							"U": 0.470769708806818,
+							"B": 0.0,
+							"R": 0.107030414093728,
+							"S": 0.0442356004612896
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"STRESS": {
+						"D": 32.9829621194525,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.511480590658638,
+							"A": 0.207857742018636,
+							"U": 0.470769708806818,
+							"B": 0.0134615384615385,
+							"R": 0.193224039776945,
+							"S": 0.546465307703149
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					}
+				},
+				"primaryEnsembleDRange": [
+					22.5400686457179,
+					28.0701172292595
+				],
+				"allPolicyDRange": [
+					22.5400686457179,
+					32.9829621194525
+				]
+			},
+			"robustness": {
+				"toleranceD": 1.75,
+				"variants": [
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR",
+						"D": 25.4424160538405,
+						"deviation": 0.483724568020435
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR_REV",
+						"D": 25.3024508490276,
+						"deviation": 0.343759363207592
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY",
+						"D": 24.6076760750293,
+						"deviation": -0.351015410790762
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY_HI",
+						"D": 25.052165062862,
+						"deviation": 0.0934735770419977
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS",
+						"D": 24.3364063371322,
+						"deviation": -0.622285148687883
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS_HI",
+						"D": 25.0110345370287,
+						"deviation": 0.05234305120862
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR",
+						"D": 24.8420538151427,
+						"deviation": -0.116637670677367
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR_REV",
+						"D": 25.0753291564974,
+						"deviation": 0.116637670677367
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY",
+						"D": 25.3290989756807,
+						"deviation": 0.370407489860632
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY_HI",
+						"D": 24.5882839959594,
+						"deviation": -0.370407489860636
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS",
+						"D": 25.5208816524005,
+						"deviation": 0.562190166580418
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS_HI",
+						"D": 24.3965013192396,
+						"deviation": -0.562190166580418
+					}
+				],
+				"maxDeviation": 0.622285148687883,
+				"pass": true,
+				"tieBreakHalvesD": {
+					"RR,GREEDY,ACCESS": 25.7746514715837,
+					"RR_REV,GREEDY_HI,ACCESS_HI": 24.1427315000564
+				}
+			},
+			"strategyFamilySpread": {
+				"leaveFamilyOut": [
+					{
+						"withoutFamily": "RR",
+						"D": 25.9930463998551,
+						"deviation": 1.03435491403503
+					},
+					{
+						"withoutFamily": "GREEDY",
+						"D": 24.6367641936341,
+						"deviation": -0.321927292185954
+					},
+					{
+						"withoutFamily": "ACCESS",
+						"D": 24.246263863971,
+						"deviation": -0.712427621849077
+					}
+				],
+				"maxLeaveFamilyOutDeviation": 1.03435491403503,
+				"familyOnlyD": {
+					"RR": 22.88998165775,
+					"GREEDY": 25.602546070192,
+					"ACCESS": 26.3835467295182
+				},
+				"note": "genuine strategy differences between valid policy families; reported, not gated"
+			},
+			"diagnosticPathsD": {
+				"ORACLE_DIAGNOSTIC": 32.9829621194525,
+				"OWNER_DIAGNOSTIC": 22.5400686457179
+			},
+			"anchorSensitivityDRange": [
+				23.85869148582,
+				26.33369148582
+			],
+			"frustration": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; policy/solver completion is not a human clear rate"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner per-slot Session Load budget"
+					},
+					"lateFailure": {
+						"status": "DIAGNOSTIC_ONLY",
+						"stressCompleted": true,
+						"stressStopReason": "solved",
+						"stressFailureProgress": null,
+						"stressLateFailure": false
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.0
+					}
+				},
+				"stressDeadPlacements": 1,
+				"stressDecisions": 39.0,
+				"primaryPoliciesCompleted": "6/6"
+			},
+			"verdict": "MISSES_TARGET_WINDOW"
+		},
+		{
+			"order": 5,
+			"id": "level_005_party_toucan",
+			"class": "HARD",
+			"role": "mini_boss",
+			"levelSha256": "b2c61546e75c4a203d902889e8bf41f0c82827bfdc01d9aea9a8c58ba1c5be36",
+			"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+			"v1StageA": {
+				"challengeScore": 53.1884451537783,
+				"vector": {
+					"W": 0.448433666561813,
+					"C": 0.700874046904867,
+					"A": 0.686555901132021,
+					"U": 0.411783984041037,
+					"B": 0.458536585365854,
+					"R": 0.370589476338568,
+					"S": 0.564025653725248
+				},
+				"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT",
+				"sessionLoad": 26.6814820249315
+			},
+			"v2Candidate": {
+				"challengeScore": 29.3714448774597,
+				"vector": {
+					"W": 0.448433666561813,
+					"C": 0.700874046904867,
+					"A": 0.109181278949051,
+					"U": 0.491731780616078,
+					"B": 0.0573931623931624,
+					"R": 0.09063632772258,
+					"S": 0.0588475603842796
+				},
+				"targetChallenge": 58.0,
+				"signedDelta": -28.6285551225403,
+				"absoluteDelta": 28.6285551225403,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 26.6049290066677,
+				"sessionInputs": {
+					"actions": 0.312841137604137,
+					"routeTime": 0.131810837263794,
+					"decisionCount": 0.35042735042735
+				},
+				"unlock": {
+					"p95Wave": 2.0,
+					"meanWave": 0.764921946740129,
+					"maxWave": 3.0,
+					"lockedFraction": 0.443526170798898
+				},
+				"aggregateRaw": {
+					"A_raw": 0.0900837462228789,
+					"B": 0.0573931623931624,
+					"B_lowChoice": 0.101282051282051,
+					"B_forced": 0.0337606837606838,
+					"B_streakNorm": 0.0337606837606838,
+					"S": 0.0588475603842796,
+					"S_noWork": 0.0528455284552845,
+					"S_singleColor": 0.0731707317073171,
+					"S_imbalance": 0.0483983716184192,
+					"R_len": 0.753166358489738,
+					"R_detour": 1.32937011720266,
+					"R_turn": 2.99357216778492,
+					"dispatches": 1089.0,
+					"routeSeconds": 6379.64452356762,
+					"decisions": 41.0,
+					"durationProxySeconds": 788.494447231293,
+					"nonProductiveLegalFraction": 0.0448210922787194
+				},
+				"profile": {
+					"dominant": "FLOW",
+					"scores": {
+						"FLOW": 0.78056459268057,
+						"COLOR": 0.379860803644573,
+						"FORTRESS": 0.27456247150462,
+						"ROUTE": 0.0999088033358153,
+						"MARATHON": 0.173871195057193
+					},
+					"runnerUp": "COLOR"
+				}
+			},
+			"policySpread": {
+				"perPolicy": {
+					"ACCESS": {
+						"D": 35.589167634983,
+						"vector": {
+							"W": 0.448433666561813,
+							"C": 0.700874046904867,
+							"A": 0.320191387192591,
+							"U": 0.491731780616078,
+							"B": 0.156410256410256,
+							"R": 0.0929828950882934,
+							"S": 0.107727411258175
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 41.0
+					},
+					"ACCESS_HI": {
+						"D": 27.0132969341726,
+						"vector": {
+							"W": 0.448433666561813,
+							"C": 0.700874046904867,
+							"A": 0.0215934933324705,
+							"U": 0.491731780616078,
+							"B": 0.0179487179487179,
+							"R": 0.0928810617573948,
+							"S": 0.0551302699205766
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 41.0
+					},
+					"GREEDY": {
+						"D": 35.2105460064028,
+						"vector": {
+							"W": 0.448433666561813,
+							"C": 0.700874046904867,
+							"A": 0.312686382061645,
+							"U": 0.491731780616078,
+							"B": 0.1525,
+							"R": 0.0977071990968783,
+							"S": 0.0860163392688426
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 41.0
+					},
+					"GREEDY_HI": {
+						"D": 26.7667123771611,
+						"vector": {
+							"W": 0.448433666561813,
+							"C": 0.700874046904867,
+							"A": 0.0143393571136216,
+							"U": 0.491731780616078,
+							"B": 0.0175,
+							"R": 0.0945904053790662,
+							"S": 0.043943819958526
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 41.0
+					},
+					"ORACLE_DIAGNOSTIC": {
+						"D": 44.9763814122672,
+						"vector": {
+							"W": 0.448433666561813,
+							"C": 0.700874046904867,
+							"A": 0.472486056588022,
+							"U": 0.491731780616078,
+							"B": 0.240625,
+							"R": 0.24090948780401,
+							"S": 0.467610742095396
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 41.0
+					},
+					"OWNER_DIAGNOSTIC": {
+						"D": 25.8607978196782,
+						"vector": {
+							"W": 0.448433666561813,
+							"C": 0.700874046904867,
+							"A": 0.0,
+							"U": 0.491731780616078,
+							"B": 0.0,
+							"R": 0.0962660745427359,
+							"S": 0.0066054092738103
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 41.0
+					},
+					"RR": {
+						"D": 25.8607978196782,
+						"vector": {
+							"W": 0.448433666561813,
+							"C": 0.700874046904867,
+							"A": 0.0,
+							"U": 0.491731780616078,
+							"B": 0.0,
+							"R": 0.0962660745427359,
+							"S": 0.0066054092738103
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 41.0
+					},
+					"RR_REV": {
+						"D": 26.0626074124813,
+						"vector": {
+							"W": 0.448433666561813,
+							"C": 0.700874046904867,
+							"A": 0.0,
+							"U": 0.491731780616078,
+							"B": 0.0,
+							"R": 0.0693903304711115,
+							"S": 0.0536621126257476
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 41.0
+					},
+					"STRESS": {
+						"D": 42.3507391718571,
+						"vector": {
+							"W": 0.448433666561813,
+							"C": 0.700874046904867,
+							"A": 0.461742474624386,
+							"U": 0.491731780616078,
+							"B": 0.0931034482758621,
+							"R": 0.226450475269314,
+							"S": 0.462275022102562
+						},
+						"completed": false,
+						"finalProgress": 0.685032139577594,
+						"decisions": 29.0
+					}
+				},
+				"primaryEnsembleDRange": [
+					25.8607978196782,
+					35.589167634983
+				],
+				"allPolicyDRange": [
+					25.8607978196782,
+					44.9763814122672
+				]
+			},
+			"robustness": {
+				"toleranceD": 1.75,
+				"variants": [
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR",
+						"D": 30.128346921455,
+						"deviation": 0.756902043995265
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR_REV",
+						"D": 30.0333315220406,
+						"deviation": 0.66188664458085
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY",
+						"D": 28.2036246516711,
+						"deviation": -1.16782022578861
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY_HI",
+						"D": 29.8923913775195,
+						"deviation": 0.520946500059743
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS",
+						"D": 28.1279003259551,
+						"deviation": -1.24354455150466
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS_HI",
+						"D": 29.8430744661172,
+						"deviation": 0.471629588657439
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR",
+						"D": 29.2922653779477,
+						"deviation": -0.0791794995120227
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR_REV",
+						"D": 29.4506243769718,
+						"deviation": 0.0791794995120227
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY",
+						"D": 30.7787504823334,
+						"deviation": 1.40730560487363
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY_HI",
+						"D": 27.9641392725861,
+						"deviation": -1.40730560487362
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS",
+						"D": 30.8007566609282,
+						"deviation": 1.42931178346841
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS_HI",
+						"D": 27.9421330939913,
+						"deviation": -1.42931178346841
+					}
+				],
+				"maxDeviation": 1.42931178346841,
+				"pass": true,
+				"tieBreakHalvesD": {
+					"RR,GREEDY,ACCESS": 32.1288827662898,
+					"RR_REV,GREEDY_HI,ACCESS_HI": 26.6140069886297
+				}
+			},
+			"strategyFamilySpread": {
+				"leaveFamilyOut": [
+					{
+						"withoutFamily": "RR",
+						"D": 31.1449307381799,
+						"deviation": 1.77348586072013
+					},
+					{
+						"withoutFamily": "GREEDY",
+						"D": 28.5628527202987,
+						"deviation": -0.808592157161087
+					},
+					{
+						"withoutFamily": "ACCESS",
+						"D": 28.4065511739007,
+						"deviation": -0.964893703559035
+					}
+				],
+				"maxLeaveFamilyOutDeviation": 1.77348586072013,
+				"familyOnlyD": {
+					"RR": 25.9617026160797,
+					"GREEDY": 30.9886291917819,
+					"ACCESS": 31.3012322845778
+				},
+				"note": "genuine strategy differences between valid policy families; reported, not gated"
+			},
+			"diagnosticPathsD": {
+				"ORACLE_DIAGNOSTIC": 44.9763814122672,
+				"OWNER_DIAGNOSTIC": 25.8607978196782
+			},
+			"anchorSensitivityDRange": [
+				28.2714448774597,
+				30.7464448774597
+			],
+			"frustration": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; policy/solver completion is not a human clear rate"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner per-slot Session Load budget"
+					},
+					"lateFailure": {
+						"status": "DIAGNOSTIC_ONLY",
+						"stressCompleted": false,
+						"stressStopReason": "no_legal_placement",
+						"stressFailureProgress": 0.685032139577594,
+						"stressLateFailure": false
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.0511071273359409
+					}
+				},
+				"stressDeadPlacements": 4,
+				"stressDecisions": 29.0,
+				"primaryPoliciesCompleted": "6/6"
+			},
+			"verdict": "MISSES_TARGET_WINDOW"
+		},
+		{
+			"order": 6,
+			"id": "level_006_chicken",
+			"class": "EASY",
+			"role": "strong_recovery",
+			"levelSha256": "22aa7df9e837e1403f672fea0efc988ce8222840f9a9c24a3f943685525ca762",
+			"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+			"v1StageA": {
+				"challengeScore": 50.9106785361777,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.54003753714462,
+					"A": 0.705826417516291,
+					"U": 0.409529903017241,
+					"B": 0.47375,
+					"R": 0.342344498835549,
+					"S": 0.583390638864241
+				},
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 24.9649702188449
+			},
+			"v2Candidate": {
+				"challengeScore": 23.5750102741376,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.54003753714462,
+					"A": 0.0440378677213169,
+					"U": 0.43607421875,
+					"B": 0.00776728145149198,
+					"R": 0.112051550483789,
+					"S": 0.0495793069591902
+				},
+				"targetChallenge": 18.0,
+				"signedDelta": 5.57501027413762,
+				"absoluteDelta": 5.57501027413762,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.2134205881117,
+				"sessionInputs": {
+					"actions": 0.294168342430336,
+					"routeTime": 0.122246554299601,
+					"decisionCount": 0.341880341880342
+				},
+				"unlock": {
+					"p95Wave": 2.0,
+					"meanWave": 0.580078125,
+					"maxWave": 3.0,
+					"lockedFraction": 0.314453125
+				},
+				"aggregateRaw": {
+					"A_raw": 0.0537178413404055,
+					"B": 0.00776728145149198,
+					"B_lowChoice": 0.0221922327185485,
+					"B_forced": 0.0,
+					"B_streakNorm": 0.0,
+					"S": 0.0495793069591902,
+					"S_noWork": 0.00833333333333333,
+					"S_singleColor": 0.00833333333333333,
+					"S_imbalance": 0.173317227836761,
+					"R_len": 0.766069736583573,
+					"R_detour": 1.35491920631266,
+					"R_turn": 3.11816414927083,
+					"dispatches": 1024.0,
+					"routeSeconds": 5916.73322810067,
+					"decisions": 40.0,
+					"durationProxySeconds": 734.6388847563,
+					"nonProductiveLegalFraction": 0.00753768236815704
+				},
+				"profile": {
+					"dominant": "FLOW",
+					"scores": {
+						"FLOW": 0.83737354402573,
+						"COLOR": 0.294808422051905,
+						"FORTRESS": 0.221920750100746,
+						"ROUTE": 0.078044709102553,
+						"MARATHON": 0.192018019033235
+					},
+					"runnerUp": "COLOR"
+				}
+			},
+			"policySpread": {
+				"perPolicy": {
+					"ACCESS": {
+						"D": 23.4142116208137,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.54003753714462,
+							"A": 0.0546609892816342,
+							"U": 0.43607421875,
+							"B": 0.0,
+							"R": 0.087183640880641,
+							"S": 0.0487720302865511
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"ACCESS_HI": {
+						"D": 24.4644764862893,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.54003753714462,
+							"A": 0.0707990496499791,
+							"U": 0.43607421875,
+							"B": 0.0194444444444444,
+							"R": 0.10634409635876,
+							"S": 0.0731952739526316
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"GREEDY": {
+						"D": 23.6354145341894,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.54003753714462,
+							"A": 0.0535461176330269,
+							"U": 0.43607421875,
+							"B": 0.0,
+							"R": 0.101716991779752,
+							"S": 0.0585887140222198
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"GREEDY_HI": {
+						"D": 24.1047416565118,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.54003753714462,
+							"A": 0.0604211817199578,
+							"U": 0.43607421875,
+							"B": 0.0179487179487179,
+							"R": 0.10186616305047,
+							"S": 0.0646990498868113
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"ORACLE_DIAGNOSTIC": {
+						"D": 34.988764182416,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.54003753714462,
+							"A": 0.261814286004071,
+							"U": 0.43607421875,
+							"B": 0.0518518518518518,
+							"R": 0.211147554509324,
+							"S": 0.590179001595447
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"OWNER_DIAGNOSTIC": {
+						"D": 22.6907517447062,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.54003753714462,
+							"A": 0.00692592149926564,
+							"U": 0.43607421875,
+							"B": 0.0,
+							"R": 0.138102166148522,
+							"S": 0.0209776529726526
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"RR": {
+						"D": 22.6907517447062,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.54003753714462,
+							"A": 0.00692592149926564,
+							"U": 0.43607421875,
+							"B": 0.0,
+							"R": 0.138102166148522,
+							"S": 0.0209776529726526
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"RR_REV": {
+						"D": 23.1404656023153,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.54003753714462,
+							"A": 0.0178739465440377,
+							"U": 0.43607421875,
+							"B": 0.00921052631578947,
+							"R": 0.137096244684589,
+							"S": 0.0312431206342749
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"STRESS": {
+						"D": 34.988764182416,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.54003753714462,
+							"A": 0.261814286004071,
+							"U": 0.43607421875,
+							"B": 0.0518518518518518,
+							"R": 0.211147554509324,
+							"S": 0.590179001595447
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					}
+				},
+				"primaryEnsembleDRange": [
+					22.6907517447062,
+					24.4644764862893
+				],
+				"allPolicyDRange": [
+					22.6907517447062,
+					34.988764182416
+				]
+			},
+			"robustness": {
+				"toleranceD": 1.75,
+				"variants": [
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR",
+						"D": 23.7518619800239,
+						"deviation": 0.176851705886289
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR_REV",
+						"D": 23.6619192085021,
+						"deviation": 0.0869089343644553
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY",
+						"D": 23.5629294221273,
+						"deviation": -0.0120808520103495
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY_HI",
+						"D": 23.4690639976628,
+						"deviation": -0.10594627647485
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS",
+						"D": 23.6071700048024,
+						"deviation": 0.0321597306647803
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS_HI",
+						"D": 23.3971170317073,
+						"deviation": -0.177893242430329
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR",
+						"D": 23.5000579645361,
+						"deviation": -0.0749523096015281
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR_REV",
+						"D": 23.6499625837391,
+						"deviation": 0.0749523096015281
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY",
+						"D": 23.4967890870839,
+						"deviation": -0.0782211870537459
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY_HI",
+						"D": 23.6532314611914,
+						"deviation": 0.0782211870537495
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS",
+						"D": 23.3999661298917,
+						"deviation": -0.175044144245931
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS_HI",
+						"D": 23.7500544183835,
+						"deviation": 0.175044144245923
+					}
+				],
+				"maxDeviation": 0.177893242430329,
+				"pass": true,
+				"tieBreakHalvesD": {
+					"RR,GREEDY,ACCESS": 23.2467926332364,
+					"RR_REV,GREEDY_HI,ACCESS_HI": 23.9032279150388
+				}
+			},
+			"strategyFamilySpread": {
+				"leaveFamilyOut": [
+					{
+						"withoutFamily": "RR",
+						"D": 23.9047110744511,
+						"deviation": 0.329700800313432
+					},
+					{
+						"withoutFamily": "GREEDY",
+						"D": 23.4274763635311,
+						"deviation": -0.147533910606491
+					},
+					{
+						"withoutFamily": "ACCESS",
+						"D": 23.3928433844307,
+						"deviation": -0.182166889706942
+					}
+				],
+				"maxLeaveFamilyOutDeviation": 0.329700800313432,
+				"familyOnlyD": {
+					"RR": 22.9156086735108,
+					"GREEDY": 23.8700780953506,
+					"ACCESS": 23.9393440535515
+				},
+				"note": "genuine strategy differences between valid policy families; reported, not gated"
+			},
+			"diagnosticPathsD": {
+				"ORACLE_DIAGNOSTIC": 34.988764182416,
+				"OWNER_DIAGNOSTIC": 22.6907517447062
+			},
+			"anchorSensitivityDRange": [
+				22.4750102741376,
+				24.9500102741376
+			],
+			"frustration": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; policy/solver completion is not a human clear rate"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner per-slot Session Load budget"
+					},
+					"lateFailure": {
+						"status": "DIAGNOSTIC_ONLY",
+						"stressCompleted": true,
+						"stressStopReason": "solved",
+						"stressFailureProgress": null,
+						"stressLateFailure": false
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.00765248190982451
+					}
+				},
+				"stressDeadPlacements": 4,
+				"stressDecisions": 40.0,
+				"primaryPoliciesCompleted": "6/6"
+			},
+			"verdict": "MISSES_TARGET_WINDOW"
+		},
+		{
+			"order": 7,
+			"id": "level_007_pigeon",
+			"class": "EASY",
+			"role": "playful_novelty",
+			"levelSha256": "7b2884005a7685e3bfe6d47e99f197e56a395a5e914c3479f830fd1dcb200272",
+			"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+			"v1StageA": {
+				"challengeScore": 50.9586583460781,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.559005909908171,
+					"A": 0.687336785452279,
+					"U": 0.409529903017241,
+					"B": 0.476923076923077,
+					"R": 0.362450408133652,
+					"S": 0.571849800154267
+				},
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.0097325120222
+			},
+			"v2Candidate": {
+				"challengeScore": 33.19050760441,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.559005909908171,
+					"A": 0.340609660454362,
+					"U": 0.453383345170454,
+					"B": 0.149664602683179,
+					"R": 0.117099916502855,
+					"S": 0.137020294667508
+				},
+				"targetChallenge": 21.0,
+				"signedDelta": 12.19050760441,
+				"absoluteDelta": 12.19050760441,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.1735789138884,
+				"sessionInputs": {
+					"actions": 0.294168342430336,
+					"routeTime": 0.126616504190163,
+					"decisionCount": 0.333333333333333
+				},
+				"unlock": {
+					"p95Wave": 2.0,
+					"meanWave": 0.640625,
+					"maxWave": 4.0,
+					"lockedFraction": 0.3505859375
+				},
+				"aggregateRaw": {
+					"A_raw": 0.219277203401614,
+					"B": 0.149664602683179,
+					"B_lowChoice": 0.253611971104231,
+					"B_forced": 0.097265221878225,
+					"B_streakNorm": 0.0879772961816305,
+					"S": 0.137020294667508,
+					"S_noWork": 0.102564102564103,
+					"S_singleColor": 0.196581196581197,
+					"S_imbalance": 0.108764939353791,
+					"R_len": 0.79345444595822,
+					"R_detour": 1.38389213504215,
+					"R_turn": 2.92626961268088,
+					"dispatches": 1024.0,
+					"routeSeconds": 6128.23880280389,
+					"decisions": 39.0,
+					"durationProxySeconds": 739.716663890415,
+					"nonProductiveLegalFraction": 0.116407971007412
+				},
+				"profile": {
+					"dominant": "FLOW",
+					"scores": {
+						"FLOW": 0.685447463897335,
+						"COLOR": 0.348013102287839,
+						"FORTRESS": 0.301523973926816,
+						"ROUTE": 0.228854788478609,
+						"MARATHON": 0.112414795207165
+					},
+					"runnerUp": "COLOR"
+				}
+			},
+			"policySpread": {
+				"perPolicy": {
+					"ACCESS": {
+						"D": 42.6198080488907,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.559005909908171,
+							"A": 0.611229824838999,
+							"U": 0.453383345170454,
+							"B": 0.320588235294118,
+							"R": 0.114519350100436,
+							"S": 0.284905127832315
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"ACCESS_HI": {
+						"D": 32.1026838971434,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.559005909908171,
+							"A": 0.295280359435265,
+							"U": 0.453383345170454,
+							"B": 0.110294117647059,
+							"R": 0.114562426375604,
+							"S": 0.180489743660466
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"GREEDY": {
+						"D": 40.7827061250421,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.559005909908171,
+							"A": 0.597036417611474,
+							"U": 0.453383345170454,
+							"B": 0.286842105263158,
+							"R": 0.116190576347187,
+							"S": 0.178529718702188
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"GREEDY_HI": {
+						"D": 31.1204079454211,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.559005909908171,
+							"A": 0.293972070064289,
+							"U": 0.453383345170454,
+							"B": 0.0986842105263158,
+							"R": 0.112537063321006,
+							"S": 0.104318950965901
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"ORACLE_DIAGNOSTIC": {
+						"D": 38.2746131552043,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.559005909908171,
+							"A": 0.414491360962825,
+							"U": 0.453383345170454,
+							"B": 0.0403846153846154,
+							"R": 0.242591878180036,
+							"S": 0.536095468000673
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"OWNER_DIAGNOSTIC": {
+						"D": 26.8502085232045,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.559005909908171,
+							"A": 0.149380095329886,
+							"U": 0.453383345170454,
+							"B": 0.0539473684210526,
+							"R": 0.131165091013313,
+							"S": 0.0149601936786404
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"RR": {
+						"D": 26.8502085232045,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.559005909908171,
+							"A": 0.149380095329886,
+							"U": 0.453383345170454,
+							"B": 0.0539473684210526,
+							"R": 0.131165091013313,
+							"S": 0.0149601936786404
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"RR_REV": {
+						"D": 25.6672310867584,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.559005909908171,
+							"A": 0.096759195446262,
+							"U": 0.453383345170454,
+							"B": 0.0276315789473684,
+							"R": 0.113624991859581,
+							"S": 0.0589180331655349
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					},
+					"STRESS": {
+						"D": 38.2746131552043,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.559005909908171,
+							"A": 0.414491360962825,
+							"U": 0.453383345170454,
+							"B": 0.0403846153846154,
+							"R": 0.242591878180036,
+							"S": 0.536095468000673
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 39.0
+					}
+				},
+				"primaryEnsembleDRange": [
+					25.6672310867584,
+					42.6198080488907
+				],
+				"allPolicyDRange": [
+					25.6672310867584,
+					42.6198080488907
+				]
+			},
+			"robustness": {
+				"toleranceD": 1.75,
+				"variants": [
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR",
+						"D": 34.4585674206511,
+						"deviation": 1.2680598162411
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR_REV",
+						"D": 34.6951629079403,
+						"deviation": 1.50465530353032
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY",
+						"D": 31.6720679002836,
+						"deviation": -1.51843970412642
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY_HI",
+						"D": 33.6045275362078,
+						"deviation": 0.414019931797782
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS",
+						"D": 31.3046475155139,
+						"deviation": -1.88586008889614
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS_HI",
+						"D": 33.4080723458633,
+						"deviation": 0.217564741453323
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR",
+						"D": 33.3876705104844,
+						"deviation": 0.197162906074347
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR_REV",
+						"D": 32.9933446983357,
+						"deviation": -0.197162906074361
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY",
+						"D": 34.8008906343469,
+						"deviation": 1.61038302993683
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY_HI",
+						"D": 31.5801245744732,
+						"deviation": -1.61038302993684
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS",
+						"D": 34.9433616297012,
+						"deviation": 1.75285402529122
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS_HI",
+						"D": 31.4376535791188,
+						"deviation": -1.75285402529123
+					}
+				],
+				"maxDeviation": 1.88586008889614,
+				"pass": false,
+				"tieBreakHalvesD": {
+					"RR,GREEDY,ACCESS": 36.7509075657124,
+					"RR_REV,GREEDY_HI,ACCESS_HI": 29.6301076431076
+				}
+			},
+			"strategyFamilySpread": {
+				"leaveFamilyOut": [
+					{
+						"withoutFamily": "RR",
+						"D": 36.6564015041243,
+						"deviation": 3.46589389971428
+					},
+					{
+						"withoutFamily": "GREEDY",
+						"D": 31.8099828889992,
+						"deviation": -1.38052471541078
+					},
+					{
+						"withoutFamily": "ACCESS",
+						"D": 31.1051384201065,
+						"deviation": -2.08536918430351
+					}
+				],
+				"maxLeaveFamilyOutDeviation": 3.46589389971428,
+				"familyOnlyD": {
+					"RR": 26.2587198049815,
+					"GREEDY": 35.9515570352316,
+					"ACCESS": 37.361245973017
+				},
+				"note": "genuine strategy differences between valid policy families; reported, not gated"
+			},
+			"diagnosticPathsD": {
+				"ORACLE_DIAGNOSTIC": 38.2746131552043,
+				"OWNER_DIAGNOSTIC": 26.8502085232045
+			},
+			"anchorSensitivityDRange": [
+				31.7717735210053,
+				35.0061242873077
+			],
+			"frustration": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; policy/solver completion is not a human clear rate"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner per-slot Session Load budget"
+					},
+					"lateFailure": {
+						"status": "DIAGNOSTIC_ONLY",
+						"stressCompleted": true,
+						"stressStopReason": "solved",
+						"stressFailureProgress": null,
+						"stressLateFailure": false
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.133036286845295
+					}
+				},
+				"stressDeadPlacements": 3,
+				"stressDecisions": 39.0,
+				"primaryPoliciesCompleted": "6/6"
+			},
+			"verdict": "MISSES_TARGET_WINDOW"
+		},
+		{
+			"order": 8,
+			"id": "level_008_butterfly",
+			"class": "MEDIUM",
+			"role": "second_tension",
+			"levelSha256": "672053fc43ec1d5f50cc5f27ed98e7e0d022c62524b47b831a8addf32343f339",
+			"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+			"v1StageA": {
+				"challengeScore": 47.373224283699,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.630985712663501,
+					"A": 0.612964450410319,
+					"U": 0.409529903017241,
+					"B": 0.437837837837838,
+					"R": 0.370962569127666,
+					"S": 0.304197057501124
+				},
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 24.9329554691094
+			},
+			"v2Candidate": {
+				"challengeScore": 28.6921466242318,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.630985712663501,
+					"A": 0.140937813618383,
+					"U": 0.467421875,
+					"B": 0.0328703703703704,
+					"R": 0.210392390545548,
+					"S": 0.0323800009560764
+				},
+				"targetChallenge": 42.0,
+				"signedDelta": -13.3078533757682,
+				"absoluteDelta": 13.3078533757682,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.1109823191096,
+				"sessionInputs": {
+					"actions": 0.294168342430336,
+					"routeTime": 0.135925962426884,
+					"decisionCount": 0.316239316239316
+				},
+				"unlock": {
+					"p95Wave": 2.0,
+					"meanWave": 0.6337890625,
+					"maxWave": 3.0,
+					"lockedFraction": 0.453125
+				},
+				"aggregateRaw": {
+					"A_raw": 0.107811634545225,
+					"B": 0.0328703703703704,
+					"B_lowChoice": 0.0939153439153439,
+					"B_forced": 0.0,
+					"B_streakNorm": 0.0,
+					"S": 0.0323800009560764,
+					"S_noWork": 0.027027027027027,
+					"S_singleColor": 0.027027027027027,
+					"S_imbalance": 0.0484389227432244,
+					"R_len": 0.85179305729987,
+					"R_detour": 1.45919046714308,
+					"R_turn": 3.55908213029051,
+					"dispatches": 1024.0,
+					"routeSeconds": 6578.81658146116,
+					"decisions": 37.0,
+					"durationProxySeconds": 743.022220293681,
+					"nonProductiveLegalFraction": 0.0317719680464779
+				},
+				"profile": {
+					"dominant": "FLOW",
+					"scores": {
+						"FLOW": 0.786256647003749,
+						"COLOR": 0.331682856809789,
+						"FORTRESS": 0.250146122685185,
+						"ROUTE": 0.175665102081966,
+						"MARATHON": 0.163792646448796
+					},
+					"runnerUp": "COLOR"
+				}
+			},
+			"policySpread": {
+				"perPolicy": {
+					"ACCESS": {
+						"D": 27.3119408090903,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.630985712663501,
+							"A": 0.114080451903645,
+							"U": 0.467421875,
+							"B": 0.0,
+							"R": 0.201501146965922,
+							"S": 0.00627094200658517
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 37.0
+					},
+					"ACCESS_HI": {
+						"D": 34.1810756195608,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.630985712663501,
+							"A": 0.331958657951341,
+							"U": 0.467421875,
+							"B": 0.1,
+							"R": 0.211443999795722,
+							"S": 0.0974851581284445
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 37.0
+					},
+					"GREEDY": {
+						"D": 26.9597964243817,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.630985712663501,
+							"A": 0.0909803772329027,
+							"U": 0.467421875,
+							"B": 0.0,
+							"R": 0.207191115831254,
+							"S": 0.0115666840118821
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 37.0
+					},
+					"GREEDY_HI": {
+						"D": 33.7101882086124,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.630985712663501,
+							"A": 0.324747166933698,
+							"U": 0.467421875,
+							"B": 0.0972222222222222,
+							"R": 0.223129032501012,
+							"S": 0.0573010330302676
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 37.0
+					},
+					"ORACLE_DIAGNOSTIC": {
+						"D": 30.3336078891313,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.630985712663501,
+							"A": 0.15289616831486,
+							"U": 0.467421875,
+							"B": 0.0,
+							"R": 0.247227061945003,
+							"S": 0.185080302209176
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 37.0
+					},
+					"OWNER_DIAGNOSTIC": {
+						"D": 25.0689531154489,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.630985712663501,
+							"A": 0.0,
+							"U": 0.467421875,
+							"B": 0.0,
+							"R": 0.206911137310642,
+							"S": 0.00472308610501759
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 37.0
+					},
+					"RR": {
+						"D": 25.0689531154489,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.630985712663501,
+							"A": 0.0,
+							"U": 0.467421875,
+							"B": 0.0,
+							"R": 0.206911137310642,
+							"S": 0.00472308610501759
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 37.0
+					},
+					"RR_REV": {
+						"D": 25.2437210145223,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.630985712663501,
+							"A": 0.0,
+							"U": 0.467421875,
+							"B": 0.0,
+							"R": 0.212177910868735,
+							"S": 0.0169331024542613
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 37.0
+					},
+					"STRESS": {
+						"D": 30.3336078891313,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.630985712663501,
+							"A": 0.15289616831486,
+							"U": 0.467421875,
+							"B": 0.0,
+							"R": 0.247227061945003,
+							"S": 0.185080302209176
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 37.0
+					}
+				},
+				"primaryEnsembleDRange": [
+					25.0689531154489,
+					34.1810756195608
+				],
+				"allPolicyDRange": [
+					25.0689531154489,
+					34.1810756195608
+				]
+			},
+			"robustness": {
+				"toleranceD": 1.75,
+				"variants": [
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR",
+						"D": 29.4609380748017,
+						"deviation": 0.768791450569875
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR_REV",
+						"D": 29.4022380866055,
+						"deviation": 0.710091462373747
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY",
+						"D": 29.0386166642018,
+						"deviation": 0.346470039970011
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY_HI",
+						"D": 27.6885383073557,
+						"deviation": -1.00360831687613
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS",
+						"D": 28.9681877872601,
+						"deviation": 0.276041163028307
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS_HI",
+						"D": 27.594360825166,
+						"deviation": -1.0977857990658
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR",
+						"D": 28.6432299674017,
+						"deviation": -0.0489166568301087
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR_REV",
+						"D": 28.7410632810619,
+						"deviation": 0.0489166568301087
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY",
+						"D": 27.56708132686,
+						"deviation": -1.12506529737178
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY_HI",
+						"D": 29.8172119216036,
+						"deviation": 1.12506529737178
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS",
+						"D": 27.5472908224867,
+						"deviation": -1.14485580174509
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS_HI",
+						"D": 29.8370024259769,
+						"deviation": 1.14485580174509
+					}
+				],
+				"maxDeviation": 1.14485580174509,
+				"pass": true,
+				"tieBreakHalvesD": {
+					"RR,GREEDY,ACCESS": 26.3733088682848,
+					"RR_REV,GREEDY_HI,ACCESS_HI": 31.0109843801788
+				}
+			},
+			"strategyFamilySpread": {
+				"leaveFamilyOut": [
+					{
+						"withoutFamily": "RR",
+						"D": 30.5407502654113,
+						"deviation": 1.84860364117953
+					},
+					{
+						"withoutFamily": "GREEDY",
+						"D": 27.8707237780991,
+						"deviation": -0.821422846132645
+					},
+					{
+						"withoutFamily": "ACCESS",
+						"D": 27.6649658291849,
+						"deviation": -1.02718079504688
+					}
+				],
+				"maxLeaveFamilyOutDeviation": 1.84860364117953,
+				"familyOnlyD": {
+					"RR": 25.1563370649856,
+					"GREEDY": 30.3349923164971,
+					"ACCESS": 30.7465082143256
+				},
+				"note": "genuine strategy differences between valid policy families; reported, not gated"
+			},
+			"diagnosticPathsD": {
+				"ORACLE_DIAGNOSTIC": 30.3336078891313,
+				"OWNER_DIAGNOSTIC": 25.0689531154489
+			},
+			"anchorSensitivityDRange": [
+				27.5921466242318,
+				30.0671466242318
+			],
+			"frustration": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; policy/solver completion is not a human clear rate"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner per-slot Session Load budget"
+					},
+					"lateFailure": {
+						"status": "DIAGNOSTIC_ONLY",
+						"stressCompleted": true,
+						"stressStopReason": "solved",
+						"stressFailureProgress": null,
+						"stressLateFailure": false
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.0323211692084241
+					}
+				},
+				"stressDeadPlacements": 0,
+				"stressDecisions": 37.0,
+				"primaryPoliciesCompleted": "6/6"
+			},
+			"verdict": "MISSES_TARGET_WINDOW"
+		},
+		{
+			"order": 9,
+			"id": "level_009_frog",
+			"class": "EASY",
+			"role": "pre_boss_confidence",
+			"levelSha256": "b5989964a4dd1e909e169c0b796919e34165ff9fe1f4d10679f6cffc17a4604f",
+			"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+			"v1StageA": {
+				"challengeScore": 50.7804887087904,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.540551758134193,
+					"A": 0.694779488016706,
+					"U": 0.409529903017241,
+					"B": 0.481578947368421,
+					"R": 0.301895791525473,
+					"S": 0.620399469897766
+				},
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 24.6906311850129
+			},
+			"v2Candidate": {
+				"challengeScore": 37.1461114554315,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.540551758134193,
+					"A": 0.408249280439914,
+					"U": 0.529552556818182,
+					"B": 0.151907790143084,
+					"R": 0.260993144428755,
+					"S": 0.125386235048312
+				},
+				"targetChallenge": 19.0,
+				"signedDelta": 18.1461114554315,
+				"absoluteDelta": 18.1461114554315,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.0686201804316,
+				"sessionInputs": {
+					"actions": 0.294168342430336,
+					"routeTime": 0.128815885439611,
+					"decisionCount": 0.324786324786325
+				},
+				"unlock": {
+					"p95Wave": 2.0,
+					"meanWave": 0.8427734375,
+					"maxWave": 3.0,
+					"lockedFraction": 0.59375
+				},
+				"aggregateRaw": {
+					"A_raw": 0.257036601325712,
+					"B": 0.151907790143084,
+					"B_lowChoice": 0.323794382617912,
+					"B_forced": 0.059353471118177,
+					"B_streakNorm": 0.059353471118177,
+					"S": 0.125386235048312,
+					"S_noWork": 0.087719298245614,
+					"S_singleColor": 0.175438596491228,
+					"S_imbalance": 0.115580027912545,
+					"R_len": 0.807237079129885,
+					"R_detour": 1.45144852779953,
+					"R_turn": 4.5279949176696,
+					"dispatches": 1024.0,
+					"routeSeconds": 6234.68885527716,
+					"decisions": 38.0,
+					"durationProxySeconds": 747.549998866187,
+					"nonProductiveLegalFraction": 0.12960960960961
+				},
+				"profile": {
+					"dominant": "FLOW",
+					"scores": {
+						"FLOW": 0.63676345753294,
+						"COLOR": 0.332968996591252,
+						"FORTRESS": 0.340730173480633,
+						"ROUTE": 0.334621212434334,
+						"MARATHON": 0.0732085956533484
+					},
+					"runnerUp": "FORTRESS"
+				}
+			},
+			"policySpread": {
+				"perPolicy": {
+					"ACCESS": {
+						"D": 34.2838908336738,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.540551758134193,
+							"A": 0.301755551804697,
+							"U": 0.529552556818182,
+							"B": 0.141176470588235,
+							"R": 0.20247569405122,
+							"S": 0.126766059852775
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 38.0
+					},
+					"ACCESS_HI": {
+						"D": 42.5085705895559,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.540551758134193,
+							"A": 0.587636841070456,
+							"U": 0.529552556818182,
+							"B": 0.251351351351351,
+							"R": 0.198425176002611,
+							"S": 0.216259653813404
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 38.0
+					},
+					"GREEDY": {
+						"D": 33.8379313013421,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.540551758134193,
+							"A": 0.300227897022807,
+							"U": 0.529552556818182,
+							"B": 0.12972972972973,
+							"R": 0.209448811423726,
+							"S": 0.0954224100986463
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 38.0
+					},
+					"GREEDY_HI": {
+						"D": 42.1177854481836,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.540551758134193,
+							"A": 0.582997490695071,
+							"U": 0.529552556818182,
+							"B": 0.241891891891892,
+							"R": 0.202082767469038,
+							"S": 0.196991438149711
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 38.0
+					},
+					"ORACLE_DIAGNOSTIC": {
+						"D": 41.3692268320304,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.540551758134193,
+							"A": 0.50808382437776,
+							"U": 0.529552556818182,
+							"B": 0.0807692307692308,
+							"R": 0.0941848196089461,
+							"S": 0.621544848713093
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 38.0
+					},
+					"OWNER_DIAGNOSTIC": {
+						"D": 33.5041995697344,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.540551758134193,
+							"A": 0.315094738920256,
+							"U": 0.529552556818182,
+							"B": 0.0554054054054054,
+							"R": 0.29926616755582,
+							"S": 0.0539846834973656
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 38.0
+					},
+					"RR": {
+						"D": 33.5041995697344,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.540551758134193,
+							"A": 0.315094738920256,
+							"U": 0.529552556818182,
+							"B": 0.0554054054054054,
+							"R": 0.29926616755582,
+							"S": 0.0539846834973656
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 38.0
+					},
+					"RR_REV": {
+						"D": 35.0766114320885,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.540551758134193,
+							"A": 0.361783163126195,
+							"U": 0.529552556818182,
+							"B": 0.0918918918918919,
+							"R": 0.299492294269025,
+							"S": 0.0628931648779676
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 38.0
+					},
+					"STRESS": {
+						"D": 39.4432565420105,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.540551758134193,
+							"A": 0.457191236690944,
+							"U": 0.529552556818182,
+							"B": 0.127272727272727,
+							"R": 0.0737962620173683,
+							"S": 0.481366307921067
+						},
+						"completed": false,
+						"finalProgress": 0.201171875,
+						"decisions": 11.0
+					}
+				},
+				"primaryEnsembleDRange": [
+					33.5041995697344,
+					42.5085705895559
+				],
+				"allPolicyDRange": [
+					33.5041995697344,
+					42.5085705895559
+				]
+			},
+			"robustness": {
+				"toleranceD": 1.75,
+				"variants": [
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR",
+						"D": 37.7203225618528,
+						"deviation": 0.574211106421224
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR_REV",
+						"D": 37.4046468192162,
+						"deviation": 0.258535363784645
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY",
+						"D": 37.8077474862494,
+						"deviation": 0.661636030817881
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY_HI",
+						"D": 36.1517766568811,
+						"deviation": -0.994334798550412
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS",
+						"D": 37.7185555797831,
+						"deviation": 0.572444124351556
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS_HI",
+						"D": 36.0736196286067,
+						"deviation": -1.07249182682487
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR",
+						"D": 36.8830483365677,
+						"deviation": -0.263063118863805
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR_REV",
+						"D": 37.4091745742953,
+						"deviation": 0.263063118863812
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY",
+						"D": 35.7661357642913,
+						"deviation": -1.37997569114025
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY_HI",
+						"D": 38.5260871465718,
+						"deviation": 1.37997569114025
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS",
+						"D": 35.7753314961179,
+						"deviation": -1.37077995931369
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS_HI",
+						"D": 38.5168914147452,
+						"deviation": 1.37077995931369
+					}
+				],
+				"maxDeviation": 1.37997569114025,
+				"pass": true,
+				"tieBreakHalvesD": {
+					"RR,GREEDY,ACCESS": 34.1322926861138,
+					"RR_REV,GREEDY_HI,ACCESS_HI": 40.1599302247493
+				}
+			},
+			"strategyFamilySpread": {
+				"leaveFamilyOut": [
+					{
+						"withoutFamily": "RR",
+						"D": 38.1870445431889,
+						"deviation": 1.04093308775732
+					},
+					{
+						"withoutFamily": "GREEDY",
+						"D": 36.6328899294676,
+						"deviation": -0.513221525963971
+					},
+					{
+						"withoutFamily": "ACCESS",
+						"D": 36.4069219930858,
+						"deviation": -0.739189462345742
+					}
+				],
+				"maxLeaveFamilyOutDeviation": 1.04093308775732,
+				"familyOnlyD": {
+					"RR": 34.2904055009115,
+					"GREEDY": 37.9778583747629,
+					"ACCESS": 38.3962307116148
+				},
+				"note": "genuine strategy differences between valid policy families; reported, not gated"
+			},
+			"diagnosticPathsD": {
+				"ORACLE_DIAGNOSTIC": 41.3692268320304,
+				"OWNER_DIAGNOSTIC": 33.5041995697344
+			},
+			"anchorSensitivityDRange": [
+				35.4456395195712,
+				39.3222805146383
+			],
+			"frustration": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; policy/solver completion is not a human clear rate"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner per-slot Session Load budget"
+					},
+					"lateFailure": {
+						"status": "DIAGNOSTIC_ONLY",
+						"stressCompleted": false,
+						"stressStopReason": "no_legal_placement",
+						"stressFailureProgress": 0.201171875,
+						"stressLateFailure": false
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.140758699876347
+					}
+				},
+				"stressDeadPlacements": 4,
+				"stressDecisions": 11.0,
+				"primaryPoliciesCompleted": "6/6"
+			},
+			"verdict": "MISSES_TARGET_WINDOW"
+		},
+		{
+			"order": 10,
+			"id": "level_010_ice_cube",
+			"class": "VERY_HARD",
+			"role": "cycle_boss",
+			"levelSha256": "ab7a93178852441d1750c66fed3e24b30b906d145383f7df5113eda7b8dff8ed",
+			"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+			"v1StageA": {
+				"challengeScore": 51.499634774498,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.777756298258324,
+					"A": 0.613728950631849,
+					"U": 0.409529903017241,
+					"B": 0.46375,
+					"R": 0.33067960937928,
+					"S": 0.496567944250871
+				},
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.0509412826883
+			},
+			"v2Candidate": {
+				"challengeScore": 46.7238529973165,
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.777756298258324,
+					"A": 0.453175582110865,
+					"U": 0.966748046875,
+					"B": 0.0302294197031039,
+					"R": 0.109084631207347,
+					"S": 0.0975360644764527
+				},
+				"targetChallenge": 76.0,
+				"signedDelta": -29.2761470026835,
+				"absoluteDelta": 29.2761470026835,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.1195707423515,
+				"sessionInputs": {
+					"actions": 0.294168342430336,
+					"routeTime": 0.119118226107597,
+					"decisionCount": 0.341880341880342
+				},
+				"unlock": {
+					"p95Wave": 4.0,
+					"meanWave": 1.62890625,
+					"maxWave": 5.0,
+					"lockedFraction": 0.7783203125
+				},
+				"aggregateRaw": {
+					"A_raw": 0.282116430313721,
+					"B": 0.0302294197031039,
+					"B_lowChoice": 0.0863697705802969,
+					"B_forced": 0.0,
+					"B_streakNorm": 0.0,
+					"S": 0.0975360644764527,
+					"S_noWork": 0.141666666666667,
+					"S_singleColor": 0.0458333333333333,
+					"S_imbalance": 0.0993109245724774,
+					"R_len": 0.746465768457631,
+					"R_detour": 1.3306188769715,
+					"R_turn": 3.27425139319771,
+					"dispatches": 1024.0,
+					"routeSeconds": 5765.32214360767,
+					"decisions": 40.0,
+					"durationProxySeconds": 759.466664261288,
+					"nonProductiveLegalFraction": 0.0291756804573405
+				},
+				"profile": {
+					"dominant": "BALANCED",
+					"scores": {
+						"FLOW": 0.516615650437011,
+						"COLOR": 0.437646181367389,
+						"FORTRESS": 0.498488733289052,
+						"ROUTE": 0.281130106659106,
+						"MARATHON": -0.0845499641550706
+					},
+					"runnerUp": "FORTRESS"
+				}
+			},
+			"policySpread": {
+				"perPolicy": {
+					"ACCESS": {
+						"D": 43.0193919348577,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.777756298258324,
+							"A": 0.306851579678861,
+							"U": 0.966748046875,
+							"B": 0.0184210526315789,
+							"R": 0.105546636252604,
+							"S": 0.0409885086566081
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"ACCESS_HI": {
+						"D": 52.5703749377986,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.777756298258324,
+							"A": 0.665965360433939,
+							"U": 0.966748046875,
+							"B": 0.0552631578947368,
+							"R": 0.109037710119525,
+							"S": 0.219105015678887
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"GREEDY": {
+						"D": 42.2293133272967,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.777756298258324,
+							"A": 0.266603897570542,
+							"U": 0.966748046875,
+							"B": 0.0,
+							"R": 0.127208231318985,
+							"S": 0.0484459959981325
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"GREEDY_HI": {
+						"D": 52.1185713296242,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.777756298258324,
+							"A": 0.661496640662794,
+							"U": 0.966748046875,
+							"B": 0.0538461538461538,
+							"R": 0.110753525487349,
+							"S": 0.18327178510878
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"ORACLE_DIAGNOSTIC": {
+						"D": 53.831819573885,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.777756298258324,
+							"A": 0.480841409341517,
+							"U": 0.966748046875,
+							"B": 0.173333333333333,
+							"R": 0.181619315244856,
+							"S": 0.465810513189142
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"OWNER_DIAGNOSTIC": {
+						"D": 44.6297843124345,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.777756298258324,
+							"A": 0.398004546675364,
+							"U": 0.966748046875,
+							"B": 0.0179487179487179,
+							"R": 0.105232723314344,
+							"S": 0.0207442273838347
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"RR": {
+						"D": 44.6297843124345,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.777756298258324,
+							"A": 0.398004546675364,
+							"U": 0.966748046875,
+							"B": 0.0179487179487179,
+							"R": 0.105232723314344,
+							"S": 0.0207442273838347
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"RR_REV": {
+						"D": 45.8140406677772,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.777756298258324,
+							"A": 0.420131467643687,
+							"U": 0.966748046875,
+							"B": 0.0358974358974359,
+							"R": 0.100564813340246,
+							"S": 0.0726608540324746
+						},
+						"completed": true,
+						"finalProgress": 1.0,
+						"decisions": 40.0
+					},
+					"STRESS": {
+						"D": 51.7664443199597,
+						"vector": {
+							"W": 0.413938769133981,
+							"C": 0.777756298258324,
+							"A": 0.429341581229719,
+							"U": 0.966748046875,
+							"B": 0.127777777777778,
+							"R": 0.19707925700064,
+							"S": 0.415146035597758
+						},
+						"completed": false,
+						"finalProgress": 0.615234375,
+						"decisions": 27.0
+					}
+				},
+				"primaryEnsembleDRange": [
+					42.2293133272967,
+					52.5703749377986
+				],
+				"allPolicyDRange": [
+					42.2293133272967,
+					53.831819573885
+				]
+			},
+			"robustness": {
+				"toleranceD": 1.75,
+				"variants": [
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR",
+						"D": 47.1426667342929,
+						"deviation": 0.418813736976396
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-RR_REV",
+						"D": 46.9058154632244,
+						"deviation": 0.181962465907866
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY",
+						"D": 47.6227609313205,
+						"deviation": 0.898907934003958
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-GREEDY_HI",
+						"D": 45.6465235392966,
+						"deviation": -1.07732945801993
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS",
+						"D": 47.4647452098083,
+						"deviation": 0.740892212491758
+					},
+					{
+						"kind": "leave_one_out",
+						"variant": "-ACCESS_HI",
+						"D": 45.5606061059565,
+						"deviation": -1.16324689136007
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR",
+						"D": 46.5264769380927,
+						"deviation": -0.197376059223778
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "RR->RR_REV",
+						"D": 46.9212290565403,
+						"deviation": 0.197376059223771
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY",
+						"D": 45.0769885039633,
+						"deviation": -1.64686449335325
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "GREEDY->GREEDY_HI",
+						"D": 48.3707174906698,
+						"deviation": 1.64686449335324
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS",
+						"D": 45.1370704107733,
+						"deviation": -1.5867825865432
+					},
+					{
+						"kind": "tie_break_uniform",
+						"variant": "ACCESS->ACCESS_HI",
+						"D": 48.3106355838597,
+						"deviation": 1.58678258654319
+					}
+				],
+				"maxDeviation": 1.64686449335325,
+				"pass": true,
+				"tieBreakHalvesD": {
+					"RR,GREEDY,ACCESS": 43.2928298581963,
+					"RR_REV,GREEDY_HI,ACCESS_HI": 50.1653572887368
+				}
+			},
+			"strategyFamilySpread": {
+				"leaveFamilyOut": [
+					{
+						"withoutFamily": "RR",
+						"D": 47.4748232509219,
+						"deviation": 0.750970253605345
+					},
+					{
+						"withoutFamily": "GREEDY",
+						"D": 46.5008260922966,
+						"deviation": -0.223026905019957
+					},
+					{
+						"withoutFamily": "ACCESS",
+						"D": 46.1959096487311,
+						"deviation": -0.527943348585396
+					}
+				],
+				"maxLeaveFamilyOutDeviation": 0.750970253605345,
+				"familyOnlyD": {
+					"RR": 45.2219124901058,
+					"GREEDY": 47.1699068073564,
+					"ACCESS": 47.7797396944873
+				},
+				"note": "genuine strategy differences between valid policy families; reported, not gated"
+			},
+			"diagnosticPathsD": {
+				"ORACLE_DIAGNOSTIC": 53.831819573885,
+				"OWNER_DIAGNOSTIC": 44.6297843124345
+			},
+			"anchorSensitivityDRange": [
+				44.5238529973165,
+				49.1395012970882
+			],
+			"frustration": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; policy/solver completion is not a human clear rate"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner per-slot Session Load budget"
+					},
+					"lateFailure": {
+						"status": "DIAGNOSTIC_ONLY",
+						"stressCompleted": false,
+						"stressStopReason": "no_legal_placement",
+						"stressFailureProgress": 0.615234375,
+						"stressLateFailure": false
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.0297025500802222
+					}
+				},
+				"stressDeadPlacements": 5,
+				"stressDecisions": 27.0,
+				"primaryPoliciesCompleted": "6/6"
+			},
+			"verdict": "MISSES_TARGET_WINDOW"
+		}
+	]
+}
