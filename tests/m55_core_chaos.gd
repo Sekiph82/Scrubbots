@@ -590,8 +590,9 @@ func _heart_2x_background() -> void:
 	eco.hearts.consume()
 	t[0] -= 5000
 	_ok(eco.hearts.hearts() == 4, "clock rolled back 5000 s: no Heart gained or lost (owner rollback-safety rule)")
-	# Observation only (no owner rollback rule exists for timed 2x; see M55 matrix finding).
-	print("    OBSERVED: timed 2x seconds remaining after a 5000 s clock rollback = %d" % eco.speed.timed_seconds_remaining())
+	# M55-C002 owner ruling (OWNER_TIMED_2X_CLOCK_ROLLBACK_V01): timed 2x fails closed.
+	_ok(eco.speed.timed_seconds_remaining() == 0 and not eco.speed.is_manual_2x_entitled(3),
+		"clock rolled back 5000 s: expired timed 2x stays expired (was 5000 s revived before M55-C002)")
 	t[0] += 5000
 	_ok(eco.hearts.hearts() == 4 and eco.hearts.seconds_to_next() <= 900, "clock restored: Hearts still 4, regen interval intact")
 	t[0] += 900
