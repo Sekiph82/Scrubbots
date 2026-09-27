@@ -5,6 +5,7 @@ Actor: Claude (implementer/test runner). Results here are E1/E2 Claude-run evide
 Prompt: `coordination/sessions/M54-C001/task_prompts/SB-M54-C001_FIRST10_FINAL_REGRESSION.md`
 Prompt URL: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M54-C001/task_prompts/SB-M54-C001_FIRST10_FINAL_REGRESSION.md
 Matrix: `coordination/sessions/M54-C001/FIRST10_M54_REGRESSION_MATRIX_V01.md`
+Criteria: `coordination/sessions/M54-C001/audit_criteria/SB-M54-C001_FIRST10_FINAL_REGRESSION.md`. These were published with the prompt in `7363468`. The first log commit did not cite them; they are reconciled in §9.
 Root `TASKS.md`: read only, not edited. It is absent from this cycle's diff.
 
 ## 1. Result in one line
@@ -241,6 +242,26 @@ The gap: existing coverage (`m39d_daily_collection`) proved set 1 exactly and th
   - `m35_level_catalog` 20 ok.
 - The incoming commits change no code, content or config. The full-suite results in §4 therefore still apply to the merged tree.
 - Pushed with plain `git push origin main` (`b3361d1..b208060`), never forced. This §8 record is a follow-up log-only commit.
+
+## 9. Audit-criteria reconciliation (added on a later builder run, log-only)
+
+- No new tests were run for this section.
+- No product, test or matrix file changed.
+- Each criterion maps to evidence already recorded above.
+
+| # | Criterion | Evidence type | Where |
+|---|---|---|---|
+| 1 | No First 10 content/art/supply/owner-solution mutation | DIRECT_TEST + LOG | §3 last row. `m53_*` checks "LevelData + supply plan bytes == M52 owner-accepted evidence" L1–10. `git diff --name-only 7363468 f3b32b5`, excluding the owner's incoming `assets/ui/**` and `coordination/codex_visual_assets/**`, contains only the 3 M54 files. |
+| 2 | No difficulty recalibration / auto solution / batch-color work | LOG | §7.5. There are no `data/config/*difficulty*`, `scripts/difficulty/**` or supply-plan changes in the cycle diff. |
+| 3 | Every applicable row has exact evidence | DIRECT_TEST | Matrix: 22 rows with suite names, ok counts and quoted check names. |
+| 4 | Unavailable subsystems labeled NOT_APPLICABLE_CURRENT_BUILD | LOG | Every 001–021 row has an implemented owner and tests, so 0 rows are N/A. Nothing was fake-PASSed. The 016A gap was closed with a new direct test (§5) rather than being claimed. The row 017 interval conflict is flagged (§7.1). |
+| 5 | Owner First 10 sequences replay | DIRECT_TEST | §3 rows 1 and 5: L2–10 owner click/solver replays; L1 trace `1618197986`. |
+| 6 | Production L2–10 reach WON | DIRECT_TEST | §3 row 2: 9/9. |
+| 7 | L1 accepted/playable | DIRECT_TEST | §3 row 3. |
+| 8 | M52 / R01 / R02 regressions pass | DIRECT_TEST | §4: `m52_owner_supply_plans` 255, `m52_r01_parallel_runtime` 79, `m52_r02_early_slot_release` 65. All exit 0. |
+| 9 | Root suite: no new unexplained FAIL/SCRIPT ERROR/runtime errors | DIRECT_TEST + LOG | §4: 5323 checks ALL PASS, 0 SCRIPT ERROR. The 9 engine `ERROR:` lines match the baseline and are classified. The two M21 exit-1 suites are auditor-classified historical failures. |
+| 10 | Diff hygiene clean | LOG | `git diff --check 7363468 f3b32b5` is clean. Only the 3 M54 files are Claude-authored. `TASKS.md` is untouched, and owner `project.godot` is not committed. |
+| 11 | No M43+ scope implementation | LOG | There are no `scripts/`, `scenes/` or `data/` changes. SB-M54-022..032 were not touched. |
 
 ## Handoff
 
