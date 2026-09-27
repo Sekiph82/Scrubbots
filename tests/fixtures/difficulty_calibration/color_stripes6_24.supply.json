@@ -1,0 +1,138 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "color_stripes6_24-001",
+				"cid": "C01",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-002",
+				"cid": "C01",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-003",
+				"cid": "C03",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-004",
+				"cid": "C04",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-005",
+				"cid": "C07",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-006",
+				"cid": "C07",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-007",
+				"cid": "C08",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-008",
+				"cid": "C10",
+				"robots": 24
+			}
+		],
+		[
+			{
+				"batchId": "color_stripes6_24-009",
+				"cid": "C01",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-010",
+				"cid": "C03",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-011",
+				"cid": "C03",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-012",
+				"cid": "C04",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-013",
+				"cid": "C07",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-014",
+				"cid": "C08",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-015",
+				"cid": "C08",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-016",
+				"cid": "C10",
+				"robots": 24
+			}
+		],
+		[
+			{
+				"batchId": "color_stripes6_24-017",
+				"cid": "C01",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-018",
+				"cid": "C03",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-019",
+				"cid": "C04",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-020",
+				"cid": "C04",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-021",
+				"cid": "C07",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-022",
+				"cid": "C08",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-023",
+				"cid": "C10",
+				"robots": 24
+			},
+			{
+				"batchId": "color_stripes6_24-024",
+				"cid": "C10",
+				"robots": 24
+			}
+		]
+	],
+	"levelId": "calib_color_stripes6_24",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

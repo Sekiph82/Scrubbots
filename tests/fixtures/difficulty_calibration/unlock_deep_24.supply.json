@@ -1,0 +1,123 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "unlock_deep_24-001",
+				"cid": "C08",
+				"robots": 30
+			},
+			{
+				"batchId": "unlock_deep_24-002",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "unlock_deep_24-003",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "unlock_deep_24-004",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "unlock_deep_24-005",
+				"cid": "C03",
+				"robots": 28
+			},
+			{
+				"batchId": "unlock_deep_24-006",
+				"cid": "C08",
+				"robots": 27
+			},
+			{
+				"batchId": "unlock_deep_24-007",
+				"cid": "C01",
+				"robots": 24
+			}
+		],
+		[
+			{
+				"batchId": "unlock_deep_24-008",
+				"cid": "C08",
+				"robots": 30
+			},
+			{
+				"batchId": "unlock_deep_24-009",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "unlock_deep_24-010",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "unlock_deep_24-011",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "unlock_deep_24-012",
+				"cid": "C03",
+				"robots": 28
+			},
+			{
+				"batchId": "unlock_deep_24-013",
+				"cid": "C08",
+				"robots": 27
+			},
+			{
+				"batchId": "unlock_deep_24-014",
+				"cid": "C01",
+				"robots": 24
+			}
+		],
+		[
+			{
+				"batchId": "unlock_deep_24-015",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "unlock_deep_24-016",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "unlock_deep_24-017",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "unlock_deep_24-018",
+				"cid": "C03",
+				"robots": 28
+			},
+			{
+				"batchId": "unlock_deep_24-019",
+				"cid": "C03",
+				"robots": 28
+			},
+			{
+				"batchId": "unlock_deep_24-020",
+				"cid": "C08",
+				"robots": 26
+			},
+			{
+				"batchId": "unlock_deep_24-021",
+				"cid": "C03",
+				"robots": 16
+			}
+		]
+	],
+	"levelId": "calib_unlock_deep_24",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

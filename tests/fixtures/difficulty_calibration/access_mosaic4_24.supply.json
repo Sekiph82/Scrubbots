@@ -1,0 +1,158 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "access_mosaic4_24-001",
+				"cid": "C01",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-002",
+				"cid": "C03",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-003",
+				"cid": "C04",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-004",
+				"cid": "C07",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-005",
+				"cid": "C01",
+				"robots": 23
+			},
+			{
+				"batchId": "access_mosaic4_24-006",
+				"cid": "C03",
+				"robots": 22
+			},
+			{
+				"batchId": "access_mosaic4_24-007",
+				"cid": "C07",
+				"robots": 23
+			},
+			{
+				"batchId": "access_mosaic4_24-008",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "access_mosaic4_24-009",
+				"cid": "C01",
+				"robots": 9
+			},
+			{
+				"batchId": "access_mosaic4_24-010",
+				"cid": "C07",
+				"robots": 9
+			}
+		],
+		[
+			{
+				"batchId": "access_mosaic4_24-011",
+				"cid": "C01",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-012",
+				"cid": "C03",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-013",
+				"cid": "C04",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-014",
+				"cid": "C07",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-015",
+				"cid": "C01",
+				"robots": 22
+			},
+			{
+				"batchId": "access_mosaic4_24-016",
+				"cid": "C04",
+				"robots": 23
+			},
+			{
+				"batchId": "access_mosaic4_24-017",
+				"cid": "C07",
+				"robots": 22
+			},
+			{
+				"batchId": "access_mosaic4_24-018",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "access_mosaic4_24-019",
+				"cid": "C03",
+				"robots": 9
+			}
+		],
+		[
+			{
+				"batchId": "access_mosaic4_24-020",
+				"cid": "C01",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-021",
+				"cid": "C03",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-022",
+				"cid": "C04",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-023",
+				"cid": "C07",
+				"robots": 21
+			},
+			{
+				"batchId": "access_mosaic4_24-024",
+				"cid": "C03",
+				"robots": 23
+			},
+			{
+				"batchId": "access_mosaic4_24-025",
+				"cid": "C04",
+				"robots": 22
+			},
+			{
+				"batchId": "access_mosaic4_24-026",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "access_mosaic4_24-027",
+				"cid": "C07",
+				"robots": 27
+			},
+			{
+				"batchId": "access_mosaic4_24-028",
+				"cid": "C04",
+				"robots": 9
+			}
+		]
+	],
+	"levelId": "calib_access_mosaic4_24",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}
