@@ -1,6 +1,6 @@
 # 04 — Roadmap
 
-Status: **current dependency roadmap — 2026-09-18**
+Status: **current dependency roadmap — 2026-09-27**
 
 `TASKS.md` is the only canonical live milestone/task tracker. This document
 describes dependency order and program boundaries. If status text here ever
@@ -28,27 +28,27 @@ The project has already established:
 The gameplay architecture remains data-oriented. UI and visual production must
 not duplicate gameplay truth.
 
-## 2. Current core-gameplay program
+## 2. Current First 10 validation program
 
-As of 2026-09-18 the active milestone is **M25 — Batch Target Claim Engine**.
+As of 2026-09-27, the core gameplay chain through M52 is implemented and the First 10 production pack has final owner gameplay acceptance.
 
-Canonical sequence:
+Current locked sequence:
 
 ```text
-M23 Batch Supply Engine                CLOSED
--> M24 Five-Slot Batch Engine          CLOSED
--> M25 Batch Target Claim Engine       ACTIVE
--> M26 Auto Dispatch Scheduler
--> M27 Solvability / Deadlock Engine
+M52 First 10 Production Pack          CLOSED / OWNER PASS
+-> M53-C001 Static QA + Stage-A Difficulty   COMPLETE / calibration required
+-> M53-C002 Difficulty Calibration           AUDITED_PASS / OWNER REVIEW ACTIVE
+-> applicable M54 Regression/Content Validation
+-> return to the deferred player-experience roadmap
 ```
 
-M25 owns unique batch/target claim identity, same-color arbitration,
-transactional claim lifecycle and rollback. M26 must consume those authorities
-without inventing a second target/claim truth. M27 must prove a full level has
-at least one legal player-choice sequence and must distinguish temporary
-WAITING/STALLED states from a proven deadlock.
+M53-C002 produced a candidate-only V2 difficulty analyzer using an independent calibration corpus and a frozen holdout discipline. It is **not** production authority until owner Stage-B review. No First 10 art, LevelData, supply plans, class labels or locked progression targets may be changed merely to fit candidate scores.
 
-No production UI milestone may weaken these core invariants.
+Current owner review:
+- `coordination/sessions/M53-C002/OWNER_CALIBRATION_REVIEW_V01.md`
+- `coordination/sessions/M53-C002/OWNER_DIFFICULTY_RATING_SHEET_V01.md`
+
+The First 10 sequencing lock remains active: M54 still follows M53 before the roadmap returns to Gameplay V02 / M43 player-experience work.
 
 ## 3. Production gameplay presentation
 
@@ -209,17 +209,16 @@ production assets belong in `assets/ui/final/`.
 ## 10. Current critical path
 
 ```text
-M25 claim hardening
--> M26 auto dispatch
--> M27 solvability/deadlock
--> M28/M29 production gameplay UI + touch
--> completion/progression/save
--> Home
--> Gameplay V02 production convergence
--> Results + popup/recovery/acquisition family
+M53-C002 owner Stage-B difficulty review
+-> decide V2 adoption / V2.1 refinement / targeted content tuning
+-> close M53
+-> applicable M54 First 10 regression/content validation
+-> M28-C002 Gameplay V02 production convergence
+-> M43 Results + popup/recovery/acquisition family
 -> Shop/Collection/Robots/Tasks/Daily/Gift/Profile/Achievements/Events/Ranks
--> FTUE/feature unlock + reward/pack/robot/world ceremonies
+-> M44 FTUE/feature unlock + reward/pack/robot/world ceremonies
 -> mobile performance + responsive/accessibility/localization
--> content scale-up + QA
--> release
+-> release chain
 ```
+
+The owner-approved First 10 gameplay/content pack remains frozen while the difficulty-measurement decision is under review.

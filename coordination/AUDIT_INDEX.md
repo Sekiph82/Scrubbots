@@ -53,6 +53,10 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | AL-032 | Difficulty distinct-color bands | Production levels use EASY 3–5, MEDIUM 6–7, HARD 8–9, VERY_HARD 10–12 distinct canonical logical cell colors actually used. | Count cell-referenced canonical colors, not palette array length. Exclude CLEARED transparency, gameplay background and presentation grid/border overlays. | Owner decision 2026-09-06 |
 | AL-033 | Current canonical palette v2 | The owner explicitly expanded the production logical palette to C01..C16, adding C16 Pure Black `#000000` / RGB(0,0,0). | Treat `data/palettes/scrubbots_palette_v2.json` as current machine-readable palette authority. C01..C15 remain unchanged; C16 is a normal logical artwork color and counts when used. BG01 `#202533` remains outside the logical palette. | Owner decision / M10-C001 V06, 2026-09-06 |
 
+
+| AL-097 | Difficulty metric calibration / holdout discipline | A deterministic difficulty score is not production-authoritative if valid policy choice moves the score beyond its acceptance window or normalization anchors are uncalibrated. | Calibrate on an independent corpus, freeze the candidate before reading production holdout levels, report policy spread, and do not mutate production content merely to fit an unvalidated metric. | M53-C001/C002 audits, 2026-09-27 |
+| AL-098 | Candidate-model adoption | A technically valid candidate analyzer may intentionally change metric operationalization while preserving locked high-level weights/targets. Audit PASS does not silently make those semantics canonical. | Require explicit owner adoption after Stage-B playtest review; preserve the prior analyzer/evidence for provenance and version the new authority separately. | M53-C002 audit, 2026-09-27 |
+
 ## Audit history
 
 | Cycle | ChatGPT audit | Final/current state | Reusable learning |
@@ -73,6 +77,10 @@ https://github.com/Sekiph82/Scrubbots/blob/main/coordination/AUDIT_POLICY.md
 | M13-C001 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M13-C001/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 added AL-026 and reopened scan observability/remaining formal scope; V02 closes findings and completes M13. |
 
 | META-C004 | V01: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V01.md; V02: https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/META-C004/CHATGPT_AUDIT_V02.md | `AUDITED_PASS` | V01 accepted core migration and added AL-029/030; V02 closes M48/Project Brief/receipt findings. ACTIVE/CLEARED final canonical truth. |
+
+
+| M53-C001 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M53-C001/CHATGPT_AUDIT_V01.md | `CHANGES_REQUIRED / DIFFICULTY CALIBRATION REQUIRED` | Static QA 10/10 accepted; Stage-A D rejected as production authority because solver/owner paths moved D by 6–14 points and anchors were provisional. Added AL-097. |
+| M53-C002 | https://github.com/Sekiph82/Scrubbots/blob/main/coordination/sessions/M53-C002/CHATGPT_AUDIT_V01.md | `AUDITED_PASS / OWNER DIFFICULTY CALIBRATION REVIEW REQUIRED` | Independent corpus + pre-holdout freeze + path-robust candidate accepted technically. V2 remains candidate-only pending explicit owner adoption. Added AL-098. |
 
 ## Claude usage rule
 
