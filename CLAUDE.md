@@ -1,6 +1,6 @@
 # SCRUBBOTS — AI Agent Operating Manual
 
-Status: **OWNER-LOCKED operating rules, updated 2026-09-13**
+Status: **OWNER-LOCKED operating rules, updated 2026-09-27**
 
 Historical pre-Difficulty-V1 manual is archived at:
 `docs/migration/legacy-task-trackers/CLAUDE_PRE_DIFFICULTY_V1_2026-09-12.md`
@@ -9,7 +9,7 @@ Historical pre-Difficulty-V1 manual is archived at:
 
 - GitHub `origin/main` is repository/project-state authority.
 - Repository-root `TASKS.md` is the **only live project-status tracker**.
-- Hidden `.hiveai/*` files are historical only; do not recreate them as live state.
+- There is no parallel project-status index/dashboard/roadmap. Do not create or maintain `coordination/SESSION_INDEX.md`, `coordination/AUDIT_INDEX.md`, `docs/04_ROADMAP.md`, `.hiveai/PROJECT_DASHBOARD.md`, or any equivalent live tracker.
 - Read the root `TASKS.md` Project Status block before material work.
 - **Root `TASKS.md` is ChatGPT-write-owned. Claude/Codex must read it but must not edit it during implementation, validation, or handoff. ChatGPT updates it after independent audits, owner-gate decisions, and before handing the next prompt to an implementer.**
 - ChatGPT is the independent auditor. Claude/Codex implement and test; they do not self-award `AUDITED_PASS`.
@@ -21,10 +21,9 @@ Before material implementation:
 1. `CLAUDE.md`.
 2. root `TASKS.md`.
 3. `coordination/AUDIT_POLICY.md`.
-4. `coordination/AUDIT_INDEX.md`.
-5. active cycle prompt/criteria/owner artifacts in version order.
-6. latest explicit owner decisions relevant to the subsystem.
-7. relevant `docs/` specifications.
+4. active cycle prompt/criteria/owner artifacts in version order.
+5. latest explicit owner decisions relevant to the subsystem.
+6. relevant `docs/` specifications.
 
 For difficulty, progression, level generation, campaign sequencing or level QA, always read:
 
