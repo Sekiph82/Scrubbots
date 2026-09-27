@@ -35,6 +35,13 @@ func wallet() -> EconomyWallet:
 func register_handler(resource: String, handler: Callable) -> void:
 	_handlers[resource] = handler
 
+## M55-C001 (SB-M55-010): the handler lambdas capture their owning service graph, so a
+## graph that is discarded (e.g. SaveService's dry-run scratch) forms a reference cycle
+## RefCounted can never free. Owners of a throw-away graph call this (via
+## EconomyServices.dispose) to break the cycle. The service must not grant afterwards.
+func release_handlers() -> void:
+	_handlers.clear()
+
 func has_handler(resource: String) -> bool:
 	return _handlers.has(resource)
 

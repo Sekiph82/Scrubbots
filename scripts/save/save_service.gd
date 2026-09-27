@@ -121,7 +121,11 @@ func validate_candidate(cand) -> Dictionary:
 			return {"ok": false, "reason": "removed_economy_%s" % banned}
 	# Dry-run: import into scratch services; any failure => invalid candidate.
 	var scratch = EconomyServices.new()
-	if not scratch.import_snapshot(economy):
+	var econ_ok: bool = scratch.import_snapshot(economy)
+	# M55-C001 (SB-M55-010): the dry-run graph is discarded; break its handler cycle so
+	# every save validation does not leak a whole EconomyServices graph.
+	scratch.dispose()
+	if not econ_ok:
 		return {"ok": false, "reason": "economy_import"}
 	var scratch_prog = LevelProgressionService.new()
 	if not scratch_prog.import_snapshot(cand.get("progression", {})):

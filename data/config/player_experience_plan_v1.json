@@ -17,7 +17,7 @@
   },
   "hearts": {
     "max": 5,
-    "regen_minutes_per_heart": 30,
+    "regen_minutes_per_heart": 15,
     "plus_one_sb": 500,
     "full_refill_sb_per_missing": 400,
     "rewarded_video_plus_one": true

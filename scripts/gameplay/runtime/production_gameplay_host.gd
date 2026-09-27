@@ -127,6 +127,9 @@ var _haptics_settings
 ## M39 V02 Economy V1 runtime composition (fail-safe: economy never blocks
 ## gameplay). Present when the config loads; null otherwise.
 var _economy
+## M55-C001: true only for the legacy no-AppState path, where this host built its own
+## private EconomyServices graph and must dispose it (breaks its handler cycle).
+var _owns_economy := false
 var _progression
 var _booster_service
 var _booster_adapter
@@ -153,6 +156,17 @@ func set_first_clear_fault_injector(f: Callable) -> void:
 	_first_clear_fault = f
 var _built := false
 var _build_error := ""
+
+## M55-C001 (SB-M55-010): a host-private fallback economy (no AppState) is released
+## with the host; the shared AppState graph is never touched here.
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_PREDELETE:
+		_release_owned_economy()
+
+func _release_owned_economy() -> void:
+	if _owns_economy and _economy != null:
+		_economy.dispose()
+	_owns_economy = false
 
 func _ready() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -376,7 +390,9 @@ func build() -> bool:
 		_progression = app_state.progression
 		_save = app_state.save
 	else:
+		_release_owned_economy()
 		_economy = EconomyServices.new()
+		_owns_economy = true
 		if _economy != null and not _economy.config.is_ok():
 			_economy = null
 		if _economy != null:

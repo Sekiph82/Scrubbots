@@ -491,7 +491,7 @@ valid historical evidence for their commits.
 
 Home's owner-approved visual composition remains authoritative, but production meanings are:
 - top currency = Scrub Bucks, not coin/Star;
-- Heart counter = max 5, 30-minute wall-clock regen;
+- Heart counter = max 5, 15-minute (900 s) wall-clock regen (`coordination/OWNER_HEART_REGEN_INTERVAL_V01.md`);
 - profile progress bar = Bot Parts toward next 250-part robot unlock, not XP;
 - former event progress bar = Gift Meter fed only by Win Streak SB, milestones 10/50/250/500/1000, no event timer;
 - former Star Exchange shortcut = Cards Exchange;

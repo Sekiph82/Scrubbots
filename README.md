@@ -169,7 +169,7 @@ app.
 Owner-locked economy truth lives in `coordination/OWNER_ECONOMY_REWARDS_V01.md` with machine tuning in `data/config/economy_rewards_v1.json`.
 
 - Scrub Bucks are the only general spendable soft currency.
-- Hearts regenerate every 30 real-world minutes.
+- Hearts regenerate every 15 real-world minutes (900 s; `coordination/OWNER_HEART_REGEN_INTERVAL_V01.md`).
 - Bot Parts unlock post-Scrubby robots at 250 parts each.
 - Gift Meter is fed only by Win Streak SB and uses 10/50/250/500/1000 milestones.
 - Stars/Event Points are removed; Star Exchange becomes Cards Exchange.
