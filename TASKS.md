@@ -7,12 +7,12 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - Current Milestone: M54 REGRESSION SUITE
 - Current Sprint: M54-C001 First 10 Final Regression / Content Validation
 - Current Task: Validate the owner-accepted First 10 pack and all currently implemented supporting systems without difficulty recalibration or solution redesign
-- Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M54-C001/task_prompts/SB-M54-C001_FIRST10_FINAL_REGRESSION.md`; ChatGPT audits. On PASS, the First 10 sequencing lock closes and the project resumes at M43 Results Screen / Player Experience.
-- Required Actor: CLAUDE
+- Current Task Status: OWNER_REQUIRED
+- Next Task/Action: OWNER rules the canonical Heart regen interval: **A = 900 s / 15 min** (`OWNER_M42_HOME_POLISH_V06.md`, current config/code/tests) or **B = 1800 s / 30 min** (`OWNER_FAILURE_RECOVERY_AND_ACQUISITION_V01.md` §4, `player_experience_plan_v1.json`, `docs/MASTER_UI_SYSTEM.md`). ChatGPT audit `coordination/sessions/M54-C001/CHATGPT_AUDIT_V01.md` passed 21/22 M54-C001 rows; only SB-M54-017 is gated. After the ruling ChatGPT closes M54-C001 (A) or issues a Claude remediation (B), then opens the next milestone per the owner's 2026-09-27 controller directive (M55 Chaos / Long-Run QA).
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 840 / 1347 = 62.36%. M53 First 10 QA/playtest is closed for current sequencing; M54-C001 current-build regression is active. Difficulty/solution automation work is deferred by owner.
+- Progress: 861 / 1347 = 63.92%. M54-C001 audited: SB-M54-001..016, 016A, 018..021 AUDITED_PASS; SB-M54-017 OWNER_REQUIRED (Heart interval spec conflict, mechanics verified). No First 10 regression found. Difficulty/solution automation work is deferred by owner.
 - Note: OWNER accepts all Levels 1–10 for the current build. Difficulty-score recalibration, final difficulty criteria, automated solution generation and batch/color-choice optimization are deferred until the broader game systems are built. Existing owner-provided First 10 sequences remain the current validation inputs. Decision: `coordination/OWNER_FIRST10_ACCEPTED_DIFFICULTY_DEFERRED_V01.md`.
 - Owner sequencing lock: stay on the **First 10 Level Pack** until all work tied to Levels 1–10 is finished. This includes M52-C001 implementation/integration, independent audit, any remediation, owner playtest/acceptance, the applicable M53 per-level QA for Levels 1–10, and the applicable M54 content/regression validation needed to prove this ten-level pack stable. Only after that block is fully closed do we resume the main roadmap at **M43 Results Screen**. M43 remains fully open and is intentionally deferred, not skipped.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
@@ -2158,23 +2158,23 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 
 ### M54 — Regression Suite `[QA]`
 
-**M54-C001 First 10 gate:** current scope is SB-M54-001..021 only. SB-M54-022..032 depend on later M43+ Player Experience implementation and do not block closing the current First 10 sequencing lock.
+**M54-C001 First 10 gate:** current scope is SB-M54-001..021 only. SB-M54-022..032 depend on later M43+ Player Experience implementation and do not block closing the current First 10 sequencing lock. **Audit:** `coordination/sessions/M54-C001/CHATGPT_AUDIT_V01.md` (HEAD `92a6034`) — 21 rows AUDITED_PASS; SB-M54-017 OWNER_REQUIRED.
 
-- [ ] SB-M54-001 Difficulty/progression tests. — [ ] SB-M54-002 Level parser tests.
-- [ ] SB-M54-003 BoardState tests. — [ ] SB-M54-004 Renderer tests.
-- [ ] SB-M54-005 Slot tests. — [ ] SB-M54-006 Color-candidate/reachability tests.
-- [ ] SB-M54-007 Reservation tests. — [ ] SB-M54-008 TargetSelector tests.
-- [ ] SB-M54-009 Routing tests including Railroad V1 geometry, connectors, legal ingresses and post-rail orthogonal interior turns. — [ ] SB-M54-010 Dispatcher tests.
-- [ ] SB-M54-011 Completion tests. — [ ] SB-M54-012 Save tests.
-- [ ] SB-M54-013 Reward tests. — [ ] SB-M54-014 Content validation tests.
-- [ ] SB-M54-015 59×59 regression test.
-- [ ] SB-M54-016 Economy Wallet/Gift Meter/Daily/Cards Exchange/Collection-completion idempotency regression.
-- [ ] SB-M54-016A Test every set-specific 9/9 reward plus all-15 Master Collection +2500 SB/+20 Bot Parts exactly-once grant.
-- [ ] SB-M54-017 Heart 30-minute offline/background/menu regen and clock-rollback regression.
-- [ ] SB-M54-018 2x level/timed entitlement wall-clock expiry + free M23-exhausted auto-2x regression.
-- [ ] SB-M54-019 +1 Slot 5/6-capacity runtime + solver regression.
-- [ ] SB-M54-020 Random/Selector solver-safety and no-consume-on-failure regression.
-- [ ] SB-M54-021 Tornado cross-engine conservation/rollback/no-ghost regression.
+- [x] SB-M54-001 Difficulty/progression tests. — [x] SB-M54-002 Level parser tests.
+- [x] SB-M54-003 BoardState tests. — [x] SB-M54-004 Renderer tests.
+- [x] SB-M54-005 Slot tests. — [x] SB-M54-006 Color-candidate/reachability tests.
+- [x] SB-M54-007 Reservation tests. — [x] SB-M54-008 TargetSelector tests.
+- [x] SB-M54-009 Routing tests including Railroad V1 geometry, connectors, legal ingresses and post-rail orthogonal interior turns. — [x] SB-M54-010 Dispatcher tests.
+- [x] SB-M54-011 Completion tests. — [x] SB-M54-012 Save tests.
+- [x] SB-M54-013 Reward tests. — [x] SB-M54-014 Content validation tests.
+- [x] SB-M54-015 59×59 regression test.
+- [x] SB-M54-016 Economy Wallet/Gift Meter/Daily/Cards Exchange/Collection-completion idempotency regression.
+- [x] SB-M54-016A Test every set-specific 9/9 reward plus all-15 Master Collection +2500 SB/+20 Bot Parts exactly-once grant.
+- [ ] SB-M54-017 [OWNER_REQUIRED — interval 900 s vs 30 min, see M54-C001 CHATGPT_AUDIT_V01 §1] Heart 30-minute offline/background/menu regen and clock-rollback regression.
+- [x] SB-M54-018 2x level/timed entitlement wall-clock expiry + free M23-exhausted auto-2x regression.
+- [x] SB-M54-019 +1 Slot 5/6-capacity runtime + solver regression.
+- [x] SB-M54-020 Random/Selector solver-safety and no-consume-on-failure regression.
+- [x] SB-M54-021 Tornado cross-engine conservation/rollback/no-ghost regression.
 
 #### M54 Player-Experience / Meta Regression Expansion
 - [ ] SB-M54-022 Results/fail/retry/Need-a-Hand third-failure regression.
