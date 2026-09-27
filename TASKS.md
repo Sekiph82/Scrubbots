@@ -1,6 +1,6 @@
 # ScrubBots — Canonical GitHub Task State
 
-This root TASKS.md is the only authoritative project-status tracker consumed by H!veAI. GitHub repository metadata and the latest commit are the remaining project-truth inputs. Hidden .hiveai control-plane files are historical only and are not read for current project state.
+This root TASKS.md is the **only** authoritative project-status tracker and the **only project-status file consumed by the H!veAI parser**. GitHub repository metadata and the latest commit are the remaining project-truth inputs. No parallel session index, roadmap, audit index, dashboard, hidden control-plane tracker, or equivalent status mirror is permitted.
 
 ## Project Status
 
@@ -20,7 +20,7 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
 
-> **H!veAI tracking [OWNER-LOCKED — updated 2026-09-14]:** repository-root `TASKS.md` is the one and only live project-status tracker. The top `Project Status` block controls current milestone, sprint, task, actor, next action, workflow status, and progress. Former `.hiveai` control-plane files are archived under `docs/migration/legacy-task-trackers/` and are historical evidence only. Never recreate or synchronize a competing live tracker. **ChatGPT is the sole writer of root `TASKS.md`; Claude/Codex read it but do not edit it. ChatGPT updates it after each independent audit, owner-gate decision, and before handing off the next implementation prompt.**
+> **H!veAI tracking [OWNER-LOCKED — updated 2026-09-27]:** repository-root `TASKS.md` is the one and only live project-status tracker and H!veAI parser input. The top `Project Status` block controls current milestone, sprint, task, actor, next action, workflow status, and progress. **Do not recreate `coordination/SESSION_INDEX.md`, `coordination/AUDIT_INDEX.md`, `docs/04_ROADMAP.md`, `.hiveai/PROJECT_DASHBOARD.md`, or any equivalent parallel tracker/status mirror.** Audit/prompt/log files may exist only as cycle evidence, never as project-state authorities. **ChatGPT is the sole writer of root `TASKS.md`; Claude/Codex read it but do not edit it. ChatGPT updates it after each independent audit, owner-gate decision, and before handing off the next implementation prompt.**
 
 Permanent master execution roadmap for the SCRUBBOTS project. This file is
 authoritative alongside `CLAUDE.md`. Read both at the start of every
