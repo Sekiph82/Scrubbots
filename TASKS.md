@@ -5,15 +5,15 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M55 CHAOS / LONG-RUN QA
-- Current Sprint: M55-C001 Core Chaos / Long-Run QA + Heart 900s Reconciliation
-- Current Task: Reconcile stale active Heart 30-minute references to the owner-locked 900-second rule, then validate SB-M55-001..017 against the production stack
-- Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M55-C001/task_prompts/SB-M55-C001_CORE_CHAOS_HEART900.md`; ChatGPT audits. SB-M55-018..024 remain deferred until their M43+ owning surfaces exist.
-- Required Actor: CLAUDE
+- Current Sprint: M55-C001 Core Chaos / Long-Run QA — Owner 2x Clock-Rollback Gate
+- Current Task: Owner decides timed 2x device-clock rollback semantics after ChatGPT audit accepted SB-M55-001..017
+- Current Task Status: OWNER_REQUIRED
+- Next Task/Action: OWNER chooses timed 2x rollback policy: **A = fail closed / never regain expired time after backward clock movement**, or **B = remain pure wall-clock and allow current rollback behavior**. ChatGPT then records the ruling, closes M55-C001 if applicable, updates TASKS.md and opens the next governed task.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 862 / 1347 = 63.99%. M54-C001 is fully AUDITED_PASS at 22/22 after owner ruling A = 900 s / 15 min; M55-C001 SB-M55-001..017 is active.
-- Note: OWNER ruling `coordination/OWNER_HEART_REGEN_INTERVAL_V01.md` locks Heart regeneration to 900 real-world seconds / 15 minutes. Current runtime/config/tests already use 900; Claude must reconcile stale active planning docs/config before M55 chaos validation. The 30-minute 2x product is unchanged.
+- Progress: 879 / 1347 = 65.26%. M55-C001 SB-M55-001..017 are technically AUDITED_PASS; cycle remains OWNER_REQUIRED only for timed 2x clock-rollback policy.
+- Note: M55-C001 audit: `coordination/sessions/M55-C001/CHATGPT_AUDIT_V01.md`. Heart 900 s reconciliation PASS. Save-validation EconomyServices leak found by chaos testing and fixed with sensitivity regression. Timed 2x uses absolute wall-clock expiry and currently can revive after clock rollback; no owner policy existed, so no behavior was invented.
 - Owner sequencing lock: the First 10 Level Pack block is now CLOSED through M54-C001. Per the owner/controller 2026-09-27 directive, execute M55 core Chaos / Long-Run QA next; after the current-build M55 gate closes, resume the deferred M43 Results Screen / Player Experience roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -2190,23 +2190,23 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 - [ ] SB-M54-032 World registry/unlock/transition regression once future world ranges are owner-defined.
 ### M55 — Chaos / Long-Run QA `[QA]`
 
-**M55-C001 current-build gate:** active scope is SB-M55-001..017 only. First reconcile active nonhistorical Heart interval docs/config to owner ruling `OWNER_HEART_REGEN_INTERVAL_V01.md`. SB-M55-018..024 remain deferred until M43+ surfaces exist.
+**M55-C001 current-build gate:** SB-M55-001..017 technically AUDITED_PASS at `8852045`; ChatGPT audit: `coordination/sessions/M55-C001/CHATGPT_AUDIT_V01.md`. Cycle remains OWNER_REQUIRED only for timed 2x clock-rollback policy. SB-M55-018..024 remain deferred until M43+ surfaces exist.
 
-- [ ] SB-M55-001 Spam all five slots.
-- [ ] SB-M55-002 Restart while bots travel. — [ ] SB-M55-003 Pause while bots travel.
-- [ ] SB-M55-004 Background while bots travel.
-- [ ] SB-M55-005 Complete with bots in flight.
-- [ ] SB-M55-006 Exhaust color. — [ ] SB-M55-007 Exhaust slot work.
-- [ ] SB-M55-008 Repeated scene transitions.
-- [ ] SB-M55-009 Long high-load session.
-- [ ] SB-M55-010 Memory growth monitoring.
-- [ ] SB-M55-011 Duplicate signal monitoring.
-- [ ] SB-M55-012 Orphan Node monitoring.
-- [ ] SB-M55-013 Duplicate reward monitoring.
-- [ ] SB-M55-014 Spam booster use/purchase/charge buttons; prove no double spend/use.
-- [ ] SB-M55-015 Background/foreground across Heart regen and timed 2x expiry.
-- [ ] SB-M55-016 Tornado while matching-color agents are in flight; prove atomic reconciliation.
-- [ ] SB-M55-017 Cards Exchange-all under repeated taps; prove protected first copies and no duplicate SB grant.
+- [x] SB-M55-001 Spam all five slots.
+- [x] SB-M55-002 Restart while bots travel. — [x] SB-M55-003 Pause while bots travel.
+- [x] SB-M55-004 Background while bots travel.
+- [x] SB-M55-005 Complete with bots in flight.
+- [x] SB-M55-006 Exhaust color. — [x] SB-M55-007 Exhaust slot work.
+- [x] SB-M55-008 Repeated scene transitions.
+- [x] SB-M55-009 Long high-load session.
+- [x] SB-M55-010 Memory growth monitoring.
+- [x] SB-M55-011 Duplicate signal monitoring.
+- [x] SB-M55-012 Orphan Node monitoring.
+- [x] SB-M55-013 Duplicate reward monitoring.
+- [x] SB-M55-014 Spam booster use/purchase/charge buttons; prove no double spend/use.
+- [x] SB-M55-015 Background/foreground across Heart regen and timed 2x expiry.
+- [x] SB-M55-016 Tornado while matching-color agents are in flight; prove atomic reconciliation.
+- [x] SB-M55-017 Cards Exchange-all under repeated taps; prove protected first copies and no duplicate SB grant.
 
 #### M55 Player-Experience Chaos Expansion
 - [ ] SB-M55-018 Spam open/close/purchase/reward buttons across every popup without double transition/spend/grant.
