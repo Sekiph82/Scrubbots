@@ -4,16 +4,16 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 
 ## Project Status
 
-- Current Milestone: M52 PRODUCTION CONTENT SCALE-UP
-- Current Sprint: M52-C001-R02 Owner Spot-Check
-- Current Task: Owner confirms zero-count physical slot disappears immediately and can be reused before the old Scrubby clears
-- Current Task Status: AUDITED_PASS / OWNER_SPOT_CHECK_REQUIRED
-- Next Task/Action: OWNER runs `coordination/sessions/M52-C001/remediation/R02/OWNER_SPOT_CHECK_V01.md`. On PASS, ChatGPT closes the M52 owner replay and advances the locked First 10 block to M53 per-level QA.
-- Required Actor: OWNER
+- Current Milestone: M53 LEVEL QA
+- Current Sprint: M53-C001 First 10 Level QA + Difficulty V1
+- Current Task: Build and run canonical real-level QA / Difficulty V1 evidence for production Levels 1–10
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M53-C001/task_prompts/SB-M53-C001_FIRST10_LEVEL_QA_DIFFICULTY.md`; ChatGPT then audits. If all ten pass M53, advance the locked First 10 block to M54 regression/content validation.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 788 / 1313 = 60.02%. M52-C001-R02 implementation and independent audit are complete; one owner slot-lifecycle spot-check is the active First 10 gate.
-- Note: R02 independent audit PASS: `coordination/sessions/M52-C001/remediation/R02/CHATGPT_AUDIT_V01.md`. Authoritative early slot release, draining-batch anti-cross-talk, Retry/Tornado, stale-wave safety, completion and First 10 regression all pass. Only a short owner visual/reuse spot-check remains before M53.
+- Progress: 793 / 1327 = 59.76%. M52-C001 First 10 gameplay/content owner acceptance is closed. M53-C001 real per-level QA / Difficulty V1 analysis is now active.
+- Note: M52-C001 is FINAL OWNER PASS. Final acceptance: `coordination/sessions/M52-C001/FINAL_OWNER_ACCEPTANCE_V01.md`. M53 now owns the previously deferred real per-level Challenge / Session Load / Frustration evidence; values must be analyzed, never fabricated.
 - Owner sequencing lock: stay on the **First 10 Level Pack** until all work tied to Levels 1–10 is finished. This includes M52-C001 implementation/integration, independent audit, any remediation, owner playtest/acceptance, the applicable M53 per-level QA for Levels 1–10, and the applicable M54 content/regression validation needed to prove this ten-level pack stable. Only after that block is fully closed do we resume the main roadmap at **M43 Results Screen**. M43 remains fully open and is intentionally deferred, not skipped.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -2035,9 +2035,9 @@ M52-C001 independent audit: **AUDITED_PASS / 10 OF 10 PRODUCTION ADMITTED / OWNE
 Status: **PAUSED / NOT PASS at Level 2 pending R01 runtime remediation.**
 Owner findings: `coordination/sessions/M52-C001/OWNER_PLAYTEST_FINDINGS_V01.md`.
 
-- [ ] SB-M52-C001-O01 Owner plays Levels 2–10 through the real Home/AppState production path and accepts correct artwork/order, supply behavior, intended sequence legality and WON completion.
-- [ ] SB-M52-C001-O02 Owner confirms progression transitions 2→3→...→10 correctly with no Hazard Bot/wrong-level fallback.
-- [ ] SB-M52-C001-O03 Owner confirms Level 10 completion advances to frontier 11 and Home honestly shows disabled Level 11 / coming-soon content rather than replaying existing content.
+- [x] SB-M52-C001-O01 Owner plays Levels 2–10 through the real Home/AppState production path and accepts correct artwork/order, supply behavior, intended sequence legality and WON completion.
+- [x] SB-M52-C001-O02 Owner confirms progression transitions 2→3→...→10 correctly with no Hazard Bot/wrong-level fallback.
+- [x] SB-M52-C001-O03 Owner confirms Level 10 completion advances to frontier 11 and Home honestly shows disabled Level 11 / coming-soon content rather than replaying existing content.
 
 #### M52-C001-R01 Parallel Runtime Remediation
 
@@ -2057,7 +2057,7 @@ Owner findings: `coordination/sessions/M52-C001/OWNER_PLAYTEST_FINDINGS_V01.md`.
 - [x] SB-M52-R01-014 Re-prove/replay Levels 1–10 and re-run Levels 2–10 through production runtime.
 - [x] SB-M52-R01-015 Full focused + historical + root regression and diff hygiene pass.
 - [x] SB-M52-R01-016 Independent ChatGPT audit required.
-- [ ] SB-M52-R01-017 Owner replay of Levels 2–10 required after audit before M53. — PASS except R02 early-slot-release spot-check remains.
+- [x] SB-M52-R01-017 Owner replay of Levels 2–10 required after audit before M53. — PASS except R02 early-slot-release spot-check remains.
 
 #### M52-C001-R02 Dispatch-Exhausted Physical Slot Release
 
@@ -2076,7 +2076,9 @@ Owner findings: `coordination/sessions/M52-C001/OWNER_PLAYTEST_FINDINGS_V01.md`.
 - [x] SB-M52-R02-013 Re-run First 10 proof/replay/production runtime.
 - [x] SB-M52-R02-014 Run R02 + R01 + historical + root regression and diff hygiene.
 - [x] SB-M52-R02-015 Independent ChatGPT audit.
-- [ ] SB-M52-R02-016 Owner zero-count slot-reuse spot-check; on PASS close M52 owner replay and advance to M53.
+- [x] SB-M52-R02-016 Owner zero-count slot-reuse spot-check; on PASS close M52 owner replay and advance to M53.
+
+**M52-C001 FINAL OWNER PASS [2026-09-27]:** `coordination/sessions/M52-C001/FINAL_OWNER_ACCEPTANCE_V01.md`. First 10 production gameplay/content integration, R01 parallel-runtime remediation, R02 early-slot-release remediation and owner replay/spot-check are closed. The sequencing lock now proceeds to M53 then applicable M54 before returning to M43.
 
 ### M53 — Level QA `[QA]`
 
@@ -2090,6 +2092,23 @@ Every production level:
 - [ ] SB-M53-010 No routing pathology; fully enclosed matching ACTIVE target remains untargetable until a legal Railroad ingress plus OPEN/CLEARED orthogonal interior path exists.
 - [ ] SB-M53-011 Good performance. — [ ] SB-M53-012 Correct preview.
 - [ ] SB-M53-013 Unique ID.
+
+#### M53-C001 First 10 Level QA + Difficulty V1
+
+- [ ] SB-M53-C001-001 Implement/version a canonical deterministic real-level Difficulty V1 analyzer if one does not yet exist.
+- [ ] SB-M53-C001-002 Compute raw + normalized W/C/A/U/B/R/S evidence for each production Level 1–10 using production semantics.
+- [ ] SB-M53-C001-003 Compute exact Challenge Score D, TargetChallenge and delta for Levels 1–10; never force-label an out-of-window level.
+- [ ] SB-M53-C001-004 Produce versioned Stage-A Session Load evidence and explicit normalization provenance.
+- [ ] SB-M53-C001-005 Produce honest Frustration Risk evidence; mark unsupported/human-policy components provisional rather than fabricating values.
+- [ ] SB-M53-C001-006 Verify every M53 static QA gate for each Level 1–10 with machine-readable provenance.
+- [ ] SB-M53-C001-007 Check actual recovery cadence L3→4, L5→6, L8→9 and Level 10 boss relationship using analyzed scores.
+- [ ] SB-M53-C001-008 Produce measurable novelty/profile evidence without inventing missing taxonomy.
+- [ ] SB-M53-C001-009 Preserve owner source art, owner supply plans, Level 1 history and R01/R02 gameplay behavior unchanged.
+- [ ] SB-M53-C001-010 Re-run First 10 canonical proof/replay and production runtime after analyzer work.
+- [ ] SB-M53-C001-011 Add focused analyzer/QA determinism/formula/schema tests.
+- [ ] SB-M53-C001-012 Run M53 + M52/R01/R02 + relevant progression + root regression and diff hygiene.
+- [ ] SB-M53-C001-013 Write First 10 M53 matrix/evidence/log and hand off for independent ChatGPT audit.
+- [ ] SB-M53-C001-014 Independent ChatGPT audit; only all-ten PASS may advance directly to M54, otherwise exact TUNING_REQUIRED remediation is opened.
 
 ### M54 — Regression Suite `[QA]`
 
