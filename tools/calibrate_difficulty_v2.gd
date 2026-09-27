@@ -613,7 +613,8 @@ func holdout_merge() -> int:
 				"signedDelta": s["signedDelta"], "absoluteDelta": s["absoluteDelta"], "acceptanceWindow": s["acceptanceWindow"],
 				"sessionLoad": s["sessionLoad"], "sessionInputs": s["sessionInputs"], "unlock": s["unlock"],
 				"aggregateRaw": s["aggregateRaw"], "profile": s["profile"]},
-			"policySpread": s["policySpread"], "robustness": s["robustness"], "diagnosticPathsD": diag,
+			"policySpread": s["policySpread"], "robustness": s["robustness"], "strategyFamilySpread": s["strategyFamilySpread"],
+			"diagnosticPathsD": diag,
 			"anchorSensitivityDRange": [dmin, dmax], "frustration": s["frustration"],
 			"verdict": "FITS_TARGET_WINDOW" if s["acceptanceWindow"] == V1.WINDOW_IN else "MISSES_TARGET_WINDOW"})
 	var rec := Tool1.recovery_checks(_as_v1_shape(levels), prog)
@@ -624,11 +625,19 @@ func holdout_merge() -> int:
 		else:
 			summary["missing"].append(l["id"])
 		summary["robustnessPassAll"] = summary["robustnessPassAll"] and bool(l["robustness"]["pass"])
+	# Corpus strategy-family spread (re-scored from the committed corpus raw with the frozen
+	# config; reporting only - calibration evidence itself is not rewritten).
+	var corpus_fam := {}
+	for spec in FIXTURES:
+		var cs: Dictionary = an.score(_corpus_raw(spec["id"])["raw"])
+		corpus_fam[spec["id"]] = {"maxLeaveFamilyOutDeviation": cs["strategyFamilySpread"]["maxLeaveFamilyOutDeviation"],
+			"familyOnlyD": cs["strategyFamilySpread"]["familyOnlyD"], "gatedMaxDeviation": cs["robustness"]["maxDeviation"]}
 	var out := {"schema": "scrubbots.m53.first10_difficulty_v2_candidate.v1", "version": 1, "sprint": "M53-C002",
 		"status": "CANDIDATE_HOLDOUT_EVALUATION (not production authority)", "analyzer": an.provenance(),
-		"frozenConfigSha256": Pack.content_sha256(V2.CONFIG_PATH), "summary": summary, "recovery": rec, "levels": levels}
+		"frozenConfigSha256": Pack.content_sha256(V2.CONFIG_PATH), "summary": summary, "recovery": rec,
+		"corpusStrategyFamilySpread": corpus_fam, "levels": levels}
 	_write(HOLDOUT_EVIDENCE, JSON.stringify(out, "\t", false) + "\n")
-	_write(MATRIX_PATH, matrix_md(levels, rec, summary, V1._read_json(CORPUS_EVIDENCE)))
+	_write(MATRIX_PATH, matrix_md(levels, rec, summary, V1._read_json(CORPUS_EVIDENCE), corpus_fam))
 	print("HOLDOUT_MERGED inWindow=%d missing=%s robustAll=%s" % [summary["inDefaultWindow"], str(summary["missing"]), summary["robustnessPassAll"]])
 	return 0
 
@@ -642,7 +651,7 @@ static func _as_v1_shape(levels: Array) -> Array:
 static func _f(v, d: int = 2) -> String:
 	return ("%." + str(d) + "f") % float(v)
 
-static func matrix_md(levels: Array, rec: Dictionary, summary: Dictionary, corpus: Dictionary) -> String:
+static func matrix_md(levels: Array, rec: Dictionary, summary: Dictionary, corpus: Dictionary, corpus_fam: Dictionary) -> String:
 	var L := PackedStringArray()
 	L.append("# M53-C002 — DIFFICULTY CALIBRATION MATRIX V01")
 	L.append("")
@@ -651,14 +660,15 @@ static func matrix_md(levels: Array, rec: Dictionary, summary: Dictionary, corpu
 	L.append("")
 	L.append("## 1. Calibration corpus (independent, QA-only)")
 	L.append("")
-	L.append("| Fixture | Family | Axis | Size | Colours | D | W | C | A | U | B | R | S | SL | Policy D range | Robust max dev |")
-	L.append("|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|")
+	L.append("| Fixture | Family | Axis | Size | Colours | D | W | C | A | U | B | R | S | SL | Policy D range | Gated robust max dev | Strategy-family max dev |")
+	L.append("|---|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|")
 	for f in corpus["fixtures"]:
 		var v: Dictionary = f["vector"]
 		var pr: Array = f["policySpread"]["primaryEnsembleDRange"]
-		L.append("| `%s` | %s | %s | %d | %d | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s–%s | %s |" % [f["id"], f["family"], f["intendedAxis"],
+		L.append("| `%s` | %s | %s | %d | %d | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s–%s | %s | %s |" % [f["id"], f["family"], f["intendedAxis"],
 			int(f["size"]), int(f["usedColors"]), _f(f["challengeScore"]), _f(v["W"], 3), _f(v["C"], 3), _f(v["A"], 3), _f(v["U"], 3),
-			_f(v["B"], 3), _f(v["R"], 3), _f(v["S"], 3), _f(f["sessionLoad"], 1), _f(pr[0]), _f(pr[1]), _f(f["robustness"]["maxDeviation"])])
+			_f(v["B"], 3), _f(v["R"], 3), _f(v["S"], 3), _f(f["sessionLoad"], 1), _f(pr[0]), _f(pr[1]), _f(f["robustness"]["maxDeviation"]),
+			_f(corpus_fam[f["id"]]["maxLeaveFamilyOutDeviation"])])
 	L.append("")
 	L.append("### Ordinal relationships (declared before measurement)")
 	L.append("")
@@ -684,8 +694,8 @@ static func matrix_md(levels: Array, rec: Dictionary, summary: Dictionary, corpu
 	L.append("In default ±3.5 window under V2: **%d/10**. Policy robustness within ±%s D on all ten: **%s**." % [int(summary["inDefaultWindow"]),
 		_f(levels[0]["robustness"]["toleranceD"]), "yes" if summary["robustnessPassAll"] else "NO"])
 	L.append("")
-	L.append("| L | ID | Class | Target | V1 D | V2 D | V2 delta | V2 window | W | C | A | U | B | R | S | V2 SL | Policy D range (6 non-adv) | Robust max dev | Oracle / owner path D (diag) | Anchor ±sens D |")
-	L.append("|---:|---|---|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---|---|")
+	L.append("| L | ID | Class | Target | V1 D | V2 D | V2 delta | V2 window | W | C | A | U | B | R | S | V2 SL | Policy D range (6 non-adv) | Gated robust max dev | Strategy-family max dev | Oracle / owner path D (diag) | Anchor ±sens D |")
+	L.append("|---:|---|---|---:|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---:|---:|---|---|")
 	for l in levels:
 		var c: Dictionary = l["v2Candidate"]
 		var v: Dictionary = c["vector"]
@@ -696,10 +706,10 @@ static func matrix_md(levels: Array, rec: Dictionary, summary: Dictionary, corpu
 			lo = minf(lo, float(pp[k]["D"]))
 			hi = maxf(hi, float(pp[k]["D"]))
 		var dg: Dictionary = l["diagnosticPathsD"]
-		L.append("| %d | `%s` | %s | %s | %s | **%s** | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s–%s | %s | %s / %s | %s–%s |" % [l["order"], l["id"], l["class"],
+		L.append("| %d | `%s` | %s | %s | %s | **%s** | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | %s–%s | %s | %s | %s / %s | %s–%s |" % [l["order"], l["id"], l["class"],
 			_f(c["targetChallenge"], 0), _f(l["v1StageA"]["challengeScore"]), _f(c["challengeScore"]), "%+.2f" % float(c["signedDelta"]), c["acceptanceWindow"],
 			_f(v["W"], 3), _f(v["C"], 3), _f(v["A"], 3), _f(v["U"], 3), _f(v["B"], 3), _f(v["R"], 3), _f(v["S"], 3), _f(c["sessionLoad"], 1),
-			_f(lo), _f(hi), _f(l["robustness"]["maxDeviation"]), _f(dg.get("ORACLE_DIAGNOSTIC", 0.0)), _f(dg["OWNER_DIAGNOSTIC"]) if dg.has("OWNER_DIAGNOSTIC") else "n/a",
+			_f(lo), _f(hi), _f(l["robustness"]["maxDeviation"]), _f(l["strategyFamilySpread"]["maxLeaveFamilyOutDeviation"]), _f(dg.get("ORACLE_DIAGNOSTIC", 0.0)), _f(dg["OWNER_DIAGNOSTIC"]) if dg.has("OWNER_DIAGNOSTIC") else "n/a",
 			_f(l["anchorSensitivityDRange"][0]), _f(l["anchorSensitivityDRange"][1])])
 	L.append("")
 	L.append("### Recovery cadence (actual V2 D)")

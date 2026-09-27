@@ -200,6 +200,8 @@ func _no_runtime_dependency() -> void:
 	_scan("res://scripts", hits)
 	_scan("res://scenes", hits)
 	hits.erase("res://scripts/difficulty/level_difficulty_analyzer_v1.gd")
+	# M53-C002 offline V2-candidate analyzer builds on V1 (preloads it); it is QA tooling too.
+	hits.erase("res://scripts/difficulty/level_difficulty_analyzer_v2_candidate.gd")
 	_ok(hits.is_empty(), "no shipping script/scene references the analyzer or M53 tool %s" % str(hits))
 
 func _scan(dir: String, hits: Array) -> void:
