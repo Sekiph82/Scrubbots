@@ -1,0 +1,78 @@
+{
+	"schema": "scrubbots-level-difficulty-analysis/v1",
+	"version": 1,
+	"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+	"createdFor": "M53-C001",
+	"calibrationStage": "STAGE_A_PROVISIONAL",
+	"calibrationNote": "Every anchor below is a documented provisional Stage-A reference, chosen from production-envelope geometry or the canonical runtime constants BEFORE any level was analyzed. None is fitted to player data or tuned to make a First 10 level hit its target. Changing any value requires a new version of this file; the locked coefficients live only in difficulty_score_model_v1.json and are never duplicated here.",
+	"consumes": {
+		"scoreModel": "res://data/config/difficulty_score_model_v1.json",
+		"progressionModel": "res://data/config/level_progression_v1.json"
+	},
+	"productionEnvelope": {
+		"maxDimension": 59,
+		"maxCells": 3481,
+		"slotCapacity": 5,
+		"maxRobotsPerBatch": 30
+	},
+	"runtimeConstants": {
+		"botSpeedCellsPerSecond": 6.0,
+		"baseCadenceSeconds": 0.5,
+		"source": "ScrubbotAgent.DEFAULT_SPEED / AutoDispatchScheduler.DEFAULT_SPEED and GameplaySpeedAuthority.DEFAULT_BASE_INTERVAL (1x)"
+	},
+	"anchors": {
+		"accessibilityEarlyWeight": {
+			"value": 2.0,
+			"meaning": "decision states with progress < scoreModel.accessibilityScarcity.priorityProgressFraction weigh 2.0, later states weigh 1.0"
+		},
+		"unlockReferenceWave": {
+			"value": 29,
+			"meaning": "p95/mean unlock waves are divided by the deepest possible peel wave of the 59x59 production envelope, floor((59-1)/2)"
+		},
+		"routeLengthReferenceDiagonals": {
+			"value": 2.0,
+			"meaning": "avg_route_length_norm = clamp((avg route length / board diagonal) / 2.0)"
+		},
+		"routeDetourReference": {
+			"value": 3.0,
+			"meaning": "avg_detour_norm = clamp((avg detour ratio - 1) / (3.0 - 1))"
+		},
+		"routeTurnReference": {
+			"value": 8.0,
+			"meaning": "avg_turn_norm = clamp(avg equivalent right-angle turns per route / 8.0)"
+		},
+		"sessionActionsReference": {
+			"value": 3481,
+			"meaning": "actions_norm = clamp(dispatches / 3481): one dispatch per cell of the 59x59 envelope maximum"
+		},
+		"sessionRouteTimeReferenceSeconds": {
+			"value": 48400.0,
+			"meaning": "route_time_norm = clamp(cumulative bot travel seconds / 48400): 3481 dispatches each travelling one 59x59 diagonal (83.4 cells) at 6 cells/s, rounded"
+		},
+		"sessionDecisionReference": {
+			"value": 117,
+			"meaning": "decision_count_norm = clamp(player placements / 117) = ceil(3481 / 30): fewest placements a max-envelope board needs at the max batch size"
+		}
+	},
+	"sensitivity": {
+		"factors": [0.5, 2.0],
+		"note": "Each provisional anchor is re-scored at 0.5x and 2x (one at a time) from the recorded raw measurements; accessibilityEarlyWeight uses 1.0 (no emphasis) and 4.0."
+	},
+	"operationalDefinitions": {
+		"referencePath": "canonical SolvabilitySolver trace (oracle policy, doc 09 section 13) replayed through ProofKernel; owner intended click path analyzed as a sensitivity path where a plan exists",
+		"decisionState": "every quiescent ProofState at which the reference path makes a player placement",
+		"reachability": "ProductionTargetAccess.is_targetable (production routing + RouteValidator), from the canonical ProofKernel slot origin",
+		"W": "ChallengeScoreModelV1.workload_submetric(cell count); dispatch count and route distance recorded as supporting measurements only",
+		"C": "ChallengeScoreModelV1.color_submetric(used colors, Shannon entropy / ln(used colors))",
+		"A": "A_t = 1 - reachable/raw over the ACTIVE cells of every color the player can currently act on (legal front batches plus occupied slot batches); progress-weighted mean",
+		"U": "earliest reachability wave per cell: wave 0 = cells targetable on the untouched board; each later wave = cells targetable after every earlier-wave cell is CLEARED (colour-agnostic ACTIVE-blocker / CLEARED-open peel); p95 by nearest rank",
+		"B": "productive action = legal front column whose color has >= 1 reachable target from the placement slot; low-choice <= 2 productive, forced == 1 productive; forced_streak_norm = longest forced streak / decision count",
+		"R": "every reference-path claim's production route (ProductionRoutingSystem.compute_route + RouteValidator) from its slot origin: length, straight-line origin->target distance, detour = length / straight, turns = total absolute heading change / 90 degrees",
+		"S": "no_work_slot_fraction = decision states with >= 1 occupied slot whose batch has no reachable target; single_productive_slot_fraction = decision states where exactly one distinct color can progress; color_demand_imbalance = robot-weighted mean over legal front batches of clamp(1 - reachable/robots)",
+		"sessionLoad": "actions = dispatches (== cells), routeTime = cumulative reference-path route seconds at bot speed, decisionCount = reference-path placements",
+		"attemptDurationProxySeconds": "sum over placements of (dispatch waves * base cadence + longest route of the final wave / bot speed): the kernel's wait-for-quiescence timing, not a human time",
+		"frustrationRisk": "PROVISIONAL_STAGE_A: only choice_opacity is supported (0.5 * B + 0.5 * non-productive legal choice fraction); retry_risk (simulated human clear rate), session_overrun (no owner slot budget) and late_failure (no failing simulation population) are UNSUPPORTED and no scalar F is claimed",
+		"profiles": "FLOW = 1 - mean(A,U,B); COLOR = mean(C,S); FORTRESS = mean(U,B); ROUTE = mean(R,A); MARATHON = W - mean(B,U); dominant = argmax, BALANCED when the top two differ by < 0.05",
+		"similarity": "challenge-vector similarity = 1 - euclidean distance / sqrt(7); palette similarity = Jaccard of used C-IDs; dimension similarity = 1 when equal else min/max area ratio; combined = mean of the three"
+	}
+}

@@ -1,0 +1,6822 @@
+{
+	"schema": "scrubbots.m53.first10_difficulty.v1",
+	"version": 1,
+	"sprint": "M53-C001",
+	"provenance": {
+		"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+		"analysisConfig": "res://data/config/level_difficulty_analysis_v1.json",
+		"analysisConfigVersion": 1,
+		"calibrationStage": "STAGE_A_PROVISIONAL",
+		"scoreModelSchema": "scrubbots-difficulty-score-model/v1",
+		"scoreModelVersion": 1,
+		"progressionModelSchema": "scrubbots-level-progression/v1",
+		"progressionModelVersion": 1,
+		"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+		"kernel": "res://scripts/gameplay/solver/proof_kernel.gd",
+		"routing": "res://scripts/gameplay/routing/production_routing_system.gd",
+		"access": "res://scripts/gameplay/dispatch/production_target_access.gd"
+	},
+	"analysisConfig": {
+		"schema": "scrubbots-level-difficulty-analysis/v1",
+		"version": 1.0,
+		"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+		"createdFor": "M53-C001",
+		"calibrationStage": "STAGE_A_PROVISIONAL",
+		"calibrationNote": "Every anchor below is a documented provisional Stage-A reference, chosen from production-envelope geometry or the canonical runtime constants BEFORE any level was analyzed. None is fitted to player data or tuned to make a First 10 level hit its target. Changing any value requires a new version of this file; the locked coefficients live only in difficulty_score_model_v1.json and are never duplicated here.",
+		"consumes": {
+			"scoreModel": "res://data/config/difficulty_score_model_v1.json",
+			"progressionModel": "res://data/config/level_progression_v1.json"
+		},
+		"productionEnvelope": {
+			"maxDimension": 59.0,
+			"maxCells": 3481.0,
+			"slotCapacity": 5.0,
+			"maxRobotsPerBatch": 30.0
+		},
+		"runtimeConstants": {
+			"botSpeedCellsPerSecond": 6.0,
+			"baseCadenceSeconds": 0.5,
+			"source": "ScrubbotAgent.DEFAULT_SPEED / AutoDispatchScheduler.DEFAULT_SPEED and GameplaySpeedAuthority.DEFAULT_BASE_INTERVAL (1x)"
+		},
+		"anchors": {
+			"accessibilityEarlyWeight": {
+				"value": 2.0,
+				"meaning": "decision states with progress < scoreModel.accessibilityScarcity.priorityProgressFraction weigh 2.0, later states weigh 1.0"
+			},
+			"unlockReferenceWave": {
+				"value": 29.0,
+				"meaning": "p95/mean unlock waves are divided by the deepest possible peel wave of the 59x59 production envelope, floor((59-1)/2)"
+			},
+			"routeLengthReferenceDiagonals": {
+				"value": 2.0,
+				"meaning": "avg_route_length_norm = clamp((avg route length / board diagonal) / 2.0)"
+			},
+			"routeDetourReference": {
+				"value": 3.0,
+				"meaning": "avg_detour_norm = clamp((avg detour ratio - 1) / (3.0 - 1))"
+			},
+			"routeTurnReference": {
+				"value": 8.0,
+				"meaning": "avg_turn_norm = clamp(avg equivalent right-angle turns per route / 8.0)"
+			},
+			"sessionActionsReference": {
+				"value": 3481.0,
+				"meaning": "actions_norm = clamp(dispatches / 3481): one dispatch per cell of the 59x59 envelope maximum"
+			},
+			"sessionRouteTimeReferenceSeconds": {
+				"value": 48400.0,
+				"meaning": "route_time_norm = clamp(cumulative bot travel seconds / 48400): 3481 dispatches each travelling one 59x59 diagonal (83.4 cells) at 6 cells/s, rounded"
+			},
+			"sessionDecisionReference": {
+				"value": 117.0,
+				"meaning": "decision_count_norm = clamp(player placements / 117) = ceil(3481 / 30): fewest placements a max-envelope board needs at the max batch size"
+			}
+		},
+		"sensitivity": {
+			"factors": [
+				0.5,
+				2.0
+			],
+			"note": "Each provisional anchor is re-scored at 0.5x and 2x (one at a time) from the recorded raw measurements; accessibilityEarlyWeight uses 1.0 (no emphasis) and 4.0."
+		},
+		"operationalDefinitions": {
+			"referencePath": "canonical SolvabilitySolver trace (oracle policy, doc 09 section 13) replayed through ProofKernel; owner intended click path analyzed as a sensitivity path where a plan exists",
+			"decisionState": "every quiescent ProofState at which the reference path makes a player placement",
+			"reachability": "ProductionTargetAccess.is_targetable (production routing + RouteValidator), from the canonical ProofKernel slot origin",
+			"W": "ChallengeScoreModelV1.workload_submetric(cell count); dispatch count and route distance recorded as supporting measurements only",
+			"C": "ChallengeScoreModelV1.color_submetric(used colors, Shannon entropy / ln(used colors))",
+			"A": "A_t = 1 - reachable/raw over the ACTIVE cells of every color the player can currently act on (legal front batches plus occupied slot batches); progress-weighted mean",
+			"U": "earliest reachability wave per cell: wave 0 = cells targetable on the untouched board; each later wave = cells targetable after every earlier-wave cell is CLEARED (colour-agnostic ACTIVE-blocker / CLEARED-open peel); p95 by nearest rank",
+			"B": "productive action = legal front column whose color has >= 1 reachable target from the placement slot; low-choice <= 2 productive, forced == 1 productive; forced_streak_norm = longest forced streak / decision count",
+			"R": "every reference-path claim's production route (ProductionRoutingSystem.compute_route + RouteValidator) from its slot origin: length, straight-line origin->target distance, detour = length / straight, turns = total absolute heading change / 90 degrees",
+			"S": "no_work_slot_fraction = decision states with >= 1 occupied slot whose batch has no reachable target; single_productive_slot_fraction = decision states where exactly one distinct color can progress; color_demand_imbalance = robot-weighted mean over legal front batches of clamp(1 - reachable/robots)",
+			"sessionLoad": "actions = dispatches (== cells), routeTime = cumulative reference-path route seconds at bot speed, decisionCount = reference-path placements",
+			"attemptDurationProxySeconds": "sum over placements of (dispatch waves * base cadence + longest route of the final wave / bot speed): the kernel's wait-for-quiescence timing, not a human time",
+			"frustrationRisk": "PROVISIONAL_STAGE_A: only choice_opacity is supported (0.5 * B + 0.5 * non-productive legal choice fraction); retry_risk (simulated human clear rate), session_overrun (no owner slot budget) and late_failure (no failing simulation population) are UNSUPPORTED and no scalar F is claimed",
+			"profiles": "FLOW = 1 - mean(A,U,B); COLOR = mean(C,S); FORTRESS = mean(U,B); ROUTE = mean(R,A); MARATHON = W - mean(B,U); dominant = argmax, BALANCED when the top two differ by < 0.05",
+			"similarity": "challenge-vector similarity = 1 - euclidean distance / sqrt(7); palette similarity = Jaccard of used C-IDs; dimension similarity = 1 when equal else min/max area ratio; combined = mean of the three"
+		}
+	},
+	"summary": {
+		"levels": 10,
+		"staticQaPass": 10,
+		"inDefaultWindow": 0,
+		"tuningRequired": [
+			"m21_level_001_hazard_bot",
+			"level_002_apple",
+			"level_003_palm_tree",
+			"level_004_orange_cat",
+			"level_005_party_toucan",
+			"level_006_chicken",
+			"level_007_pigeon",
+			"level_008_butterfly",
+			"level_009_frog",
+			"level_010_ice_cube"
+		],
+		"qaFail": [],
+		"overall": "TUNING_REQUIRED"
+	},
+	"recovery": {
+		"guards": [
+			{
+				"fromLevel": 3,
+				"toLevel": 4,
+				"actualFrom": 54.2738774887647,
+				"actualTo": 49.4946186331064,
+				"actualDrop": 4.77925885565828,
+				"designMinimumDrop": 15.0,
+				"targetDrop": 21.0,
+				"lowerThanPeak": true,
+				"pass": false,
+				"sessionLoadDrop": 10.3954982866035
+			},
+			{
+				"fromLevel": 5,
+				"toLevel": 6,
+				"actualFrom": 53.1884451537783,
+				"actualTo": 50.9106785361777,
+				"actualDrop": 2.27776661760061,
+				"designMinimumDrop": 20.0,
+				"targetDrop": 40.0,
+				"lowerThanPeak": true,
+				"pass": false,
+				"sessionLoadDrop": 1.71651180608664
+			},
+			{
+				"fromLevel": 8,
+				"toLevel": 9,
+				"actualFrom": 47.373224283699,
+				"actualTo": 50.7804887087904,
+				"actualDrop": -3.40726442509138,
+				"designMinimumDrop": 15.0,
+				"targetDrop": 23.0,
+				"lowerThanPeak": false,
+				"pass": false,
+				"sessionLoadDrop": 0.242324284096512
+			}
+		],
+		"boss": {
+			"level": 10,
+			"actualD": 51.499634774498,
+			"isCycleMaximum": false,
+			"rankByActualD": 3,
+			"actualOrderDescending": [
+				3,
+				5,
+				10,
+				7,
+				6,
+				9,
+				4,
+				8,
+				1,
+				2
+			]
+		},
+		"note": "Computed from ACTUAL analyzed D, never target D. The 10 -> next-cycle-1 guard needs Level 11 (CONTENT_MISSING) and is not evaluated."
+	},
+	"levels": [
+		{
+			"order": 1,
+			"id": "m21_level_001_hazard_bot",
+			"class": "EASY",
+			"slot": 1,
+			"role": "cycle_relief",
+			"noveltyTarget": 0.55,
+			"width": 20,
+			"height": 20,
+			"palette": [
+				"C01",
+				"C03",
+				"C08",
+				"C11",
+				"C16"
+			],
+			"levelSha256": "ae725a9c86839dcffb6444f3208416b553679878be7999ef8814de51241e8c1c",
+			"provenance": {
+				"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+				"analysisConfig": "res://data/config/level_difficulty_analysis_v1.json",
+				"analysisConfigVersion": 1.0,
+				"calibrationStage": "STAGE_A_PROVISIONAL",
+				"scoreModelSchema": "scrubbots-difficulty-score-model/v1",
+				"scoreModelVersion": 1.0,
+				"progressionModelSchema": "scrubbots-level-progression/v1",
+				"progressionModelVersion": 1.0,
+				"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+				"kernel": "res://scripts/gameplay/solver/proof_kernel.gd",
+				"routing": "res://scripts/gameplay/routing/production_routing_system.gd",
+				"access": "res://scripts/gameplay/dispatch/production_target_access.gd"
+			},
+			"supplyAuthority": "BatchSupplyGenerator seed 1 / 3 columns / 3 visible rows (historical Level 1 path)",
+			"referencePath": {
+				"policy": "ORACLE_SOLVER_TRACE",
+				"traceHash": 1618197986.0,
+				"traceSource": "SolvabilitySolver.solve re-run (visited 20); hash == M52 evidence",
+				"decisions": 19,
+				"path": {
+					"steps": 19.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 400.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 379.0,
+					"maxParallelClaims": 3.0
+				}
+			},
+			"vector": {
+				"W": 0.0,
+				"C": 0.372826943364748,
+				"A": 0.779112086649057,
+				"U": 0.283741379310345,
+				"B": 0.639473684210526,
+				"R": 0.305677472073045,
+				"S": 0.653275844979681
+			},
+			"challengeScore": 46.0311119033444,
+			"targetChallenge": 20.0,
+			"signedDelta": 26.0311119033444,
+			"absoluteDelta": 26.0311119033444,
+			"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+			"supporting": {
+				"W": {
+					"activeCells": 400,
+					"dispatches": 400,
+					"routeDistanceTotal": 8462.0,
+					"cellTransform": "sqrt",
+					"W": 0.0
+				},
+				"C": {
+					"usedColors": 5.0,
+					"frequencyByHex": {
+						"#FF4500FF": 30.0,
+						"#FFD635FF": 5.0,
+						"#2450A4FF": 298.0,
+						"#9C6926FF": 11.0,
+						"#000000FF": 56.0
+					},
+					"normalizedEntropy": 0.523431664507273,
+					"countNorm": 0.222222222222222,
+					"C": 0.372826943364748
+				},
+				"A": {
+					"samples": [
+						{
+							"progress": 0.0,
+							"raw": 35,
+							"reachable": 0,
+							"A_t": 1.0,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.0,
+							"raw": 35,
+							"reachable": 0,
+							"A_t": 1.0,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.0,
+							"raw": 333,
+							"reachable": 76,
+							"A_t": 0.771771771771772,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.125,
+							"raw": 283,
+							"reachable": 71,
+							"A_t": 0.749116607773852,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.25,
+							"raw": 46,
+							"reachable": 0,
+							"A_t": 1.0,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.25,
+							"raw": 46,
+							"reachable": 0,
+							"A_t": 1.0,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.25,
+							"raw": 102,
+							"reachable": 10,
+							"A_t": 0.901960784313726,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.37,
+							"raw": 20,
+							"reachable": 4,
+							"A_t": 0.8,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.37,
+							"raw": 20,
+							"reachable": 4,
+							"A_t": 0.8,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3725,
+							"raw": 217,
+							"reachable": 73,
+							"A_t": 0.663594470046083,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4975,
+							"raw": 167,
+							"reachable": 46,
+							"A_t": 0.724550898203593,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.62,
+							"raw": 25,
+							"reachable": 8,
+							"A_t": 0.68,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.625,
+							"raw": 23,
+							"reachable": 6,
+							"A_t": 0.739130434782609,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.63,
+							"raw": 19,
+							"reachable": 3,
+							"A_t": 0.842105263157895,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.67,
+							"raw": 3,
+							"reachable": 1,
+							"A_t": 0.666666666666667,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.6725,
+							"raw": 101,
+							"reachable": 41,
+							"A_t": 0.594059405940594,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7975,
+							"raw": 51,
+							"reachable": 41,
+							"A_t": 0.196078431372549,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.915,
+							"raw": 6,
+							"reachable": 1,
+							"A_t": 0.833333333333333,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.93,
+							"raw": 28,
+							"reachable": 28,
+							"A_t": 0.0,
+							"weight": 1.0
+						}
+					],
+					"priorityProgressFraction": 0.6,
+					"A": 0.779112086649057
+				},
+				"U": {
+					"meanWave": 2.85,
+					"p95Wave": 7.0,
+					"maxWave": 9.0,
+					"initiallyLockedFraction": 0.81,
+					"p95Norm": 0.241379310344828,
+					"meanNorm": 0.0982758620689655,
+					"U": 0.283741379310345
+				},
+				"B": {
+					"decisionStates": 19,
+					"productiveActionHistogram": {
+						"0": 4,
+						"1": 10,
+						"2": 5
+					},
+					"reachableAlternativesTotal": 417,
+					"lowChoiceFraction": 1.0,
+					"forcedFraction": 0.526315789473684,
+					"zeroProductiveStates": 4,
+					"longestForcedStreak": 6,
+					"forcedStreakNorm": 0.315789473684211,
+					"B": 0.639473684210526
+				},
+				"R": {
+					"meanLength": 21.155,
+					"boardDiagonal": 28.2842712474619,
+					"meanDetour": 1.33187414491976,
+					"meanTurns": 3.17250008828286,
+					"lengthVariance": 65.160975,
+					"lengthNorm": 0.373971098900035,
+					"detourNorm": 0.16593707245988,
+					"turnNorm": 0.396562511035358,
+					"R": 0.305677472073045
+				},
+				"S": {
+					"noWorkSlotFraction": 0.894736842105263,
+					"singleProductiveSlotFraction": 0.578947368421053,
+					"colorDemandImbalance": 0.370998116760829,
+					"S": 0.653275844979681
+				}
+			},
+			"sessionLoad": {
+				"value": 9.86751223967476,
+				"status": "PROVISIONAL_STAGE_A",
+				"actionsNorm": 0.11490950876185,
+				"routeTimeNorm": 0.0291391184573003,
+				"decisionCountNorm": 0.162393162393162,
+				"dispatches": 400,
+				"routeTravelSeconds": 1410.33333333333,
+				"decisions": 19,
+				"estimatedAttemptSecondsProxy": 237.0,
+				"proxyNote": "kernel wait-for-quiescence timing at 1x; not a calibrated human time"
+			},
+			"frustrationRisk": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"scalarNote": "No Frustration Risk scalar is claimed: 85% of the V1 weight (retryRisk, sessionOverrun, lateFailure) has no trustworthy supporting simulation or owner budget.",
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; solver success is not a human first-attempt clear probability"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner-locked per-slot Session Load budget exists"
+					},
+					"lateFailure": {
+						"status": "UNSUPPORTED",
+						"reason": "no failing-simulation population exists"
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.563326585695007,
+						"inputs": {
+							"B": 0.639473684210526,
+							"nonProductiveLegalChoiceFraction": 0.487179487179487
+						}
+					}
+				},
+				"supportedLowerBoundContribution": 8.4498987854251
+			},
+			"profile": {
+				"dominant": "BALANCED",
+				"scores": {
+					"FLOW": 0.432557616610024,
+					"COLOR": 0.513051394172214,
+					"FORTRESS": 0.461607531760436,
+					"ROUTE": 0.542394779361051,
+					"MARATHON": -0.461607531760436
+				},
+				"runnerUp": "COLOR"
+			},
+			"noveltySignatureInputs": {
+				"colorLayers": {
+					"maxLayers": 4.0,
+					"meanLayers": 1.4575
+				},
+				"peelHistogram": [
+					76.0,
+					68.0,
+					60.0,
+					52.0,
+					44.0,
+					36.0,
+					28.0,
+					20.0,
+					12.0,
+					4.0
+				],
+				"routeMeanLength": 21.155,
+				"aspectRatio": 1.0,
+				"artCategory": "NOT_DEFINED (no canonical art taxonomy exists)",
+				"sourceFamily": "owner_original_art"
+			},
+			"sensitivity": {
+				"challengeRange": [
+					44.408698110241,
+					49.2759394895513
+				],
+				"sessionLoadRange": [
+					6.99477452062851,
+					15.6129876777673
+				],
+				"windowsReached": [
+					"OUTSIDE_HARD_LIMIT"
+				],
+				"variants": [
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 45.1460997149556,
+						"sessionLoad": 9.86751223967476,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 46.6778515794747,
+						"sessionLoad": 9.86751223967476,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 0.5,
+						"value": 14.5,
+						"challengeScore": 49.2759394895513,
+						"sessionLoad": 9.86751223967476,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 2.0,
+						"value": 58.0,
+						"challengeScore": 44.408698110241,
+						"sessionLoad": 9.86751223967476,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 47.7139818483946,
+						"sessionLoad": 9.86751223967476,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 45.1896769308193,
+						"sessionLoad": 9.86751223967476,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 0.5,
+						"value": 1.5,
+						"challengeScore": 47.7734511641731,
+						"sessionLoad": 9.86751223967476,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 2.0,
+						"value": 6.0,
+						"challengeScore": 45.6826440511787,
+						"sessionLoad": 9.86751223967476,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 0.5,
+						"value": 4.0,
+						"challengeScore": 46.8242369254151,
+						"sessionLoad": 9.86751223967476,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 2.0,
+						"value": 16.0,
+						"challengeScore": 45.634549392309,
+						"sessionLoad": 9.86751223967476,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 0.5,
+						"value": 1740.5,
+						"challengeScore": 46.0311119033444,
+						"sessionLoad": 15.6129876777673,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 2.0,
+						"value": 6962.0,
+						"challengeScore": 46.0311119033444,
+						"sessionLoad": 6.99477452062851,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 0.5,
+						"value": 24200.0,
+						"challengeScore": 46.0311119033444,
+						"sessionLoad": 10.7416857933938,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 2.0,
+						"value": 96800.0,
+						"challengeScore": 46.0311119033444,
+						"sessionLoad": 9.43042546281525,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 0.5,
+						"value": 58.5,
+						"challengeScore": 46.0311119033444,
+						"sessionLoad": 13.115375487538,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 2.0,
+						"value": 234.0,
+						"challengeScore": 46.0311119033444,
+						"sessionLoad": 8.24358061574313,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					}
+				]
+			},
+			"ownerPathSensitivity": {
+				"policy": "NONE",
+				"note": "Level 1 has no owner supply plan (historical generator path)"
+			},
+			"staticQa": "PASS",
+			"m53Verdict": "TUNING_REQUIRED",
+			"novelty": {
+				"nearestPriorLevel": "NONE (first level)",
+				"nearestPriorSimilarity": {},
+				"novelty": 1.0,
+				"noveltyTarget": 0.55,
+				"meetsNoveltyTarget": true,
+				"status": "INFORMATIONAL_STAGE_A (provisional similarity; no art taxonomy)"
+			}
+		},
+		{
+			"order": 2,
+			"id": "level_002_apple",
+			"class": "EASY",
+			"slot": 2,
+			"role": "confidence_rise",
+			"noveltyTarget": 0.35,
+			"width": 32,
+			"height": 32,
+			"palette": [
+				"C01",
+				"C04",
+				"C08",
+				"C11",
+				"C12"
+			],
+			"levelSha256": "f0cf2a00898582979e9078a00ce2d0935030bc67ba7d7295360cea40ca889486",
+			"provenance": {
+				"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+				"analysisConfig": "res://data/config/level_difficulty_analysis_v1.json",
+				"analysisConfigVersion": 1.0,
+				"calibrationStage": "STAGE_A_PROVISIONAL",
+				"scoreModelSchema": "scrubbots-difficulty-score-model/v1",
+				"scoreModelVersion": 1.0,
+				"progressionModelSchema": "scrubbots-level-progression/v1",
+				"progressionModelVersion": 1.0,
+				"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+				"kernel": "res://scripts/gameplay/solver/proof_kernel.gd",
+				"routing": "res://scripts/gameplay/routing/production_routing_system.gd",
+				"access": "res://scripts/gameplay/dispatch/production_target_access.gd"
+			},
+			"supplyAuthority": "SupplyPlanLoader res://data/levels/supply/level_002_apple_supply_v1.json",
+			"referencePath": {
+				"policy": "ORACLE_SOLVER_TRACE",
+				"traceHash": 4098941249.0,
+				"traceSource": "M52 owner-plan verification evidence (hash-verified; replayed step-exact here)",
+				"decisions": 36,
+				"path": {
+					"steps": 36.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1012.0,
+					"maxParallelClaims": 2.0
+				}
+			},
+			"vector": {
+				"W": 0.413938769133981,
+				"C": 0.403890889150178,
+				"A": 0.695559094963593,
+				"U": 0.409529903017241,
+				"B": 0.45,
+				"R": 0.290282374281639,
+				"S": 0.309022496831432
+			},
+			"challengeScore": 45.0425796993399,
+			"targetChallenge": 22.0,
+			"signedDelta": 23.0425796993399,
+			"absoluteDelta": 23.0425796993399,
+			"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+			"supporting": {
+				"W": {
+					"activeCells": 1024,
+					"dispatches": 1024,
+					"routeDistanceTotal": 34235.5993995667,
+					"cellTransform": "sqrt",
+					"W": 0.413938769133981
+				},
+				"C": {
+					"usedColors": 5.0,
+					"frequencyByHex": {
+						"#FF4500FF": 296.0,
+						"#00CC78FF": 23.0,
+						"#2450A4FF": 639.0,
+						"#9C6926FF": 56.0,
+						"#FFF8B8FF": 10.0
+					},
+					"normalizedEntropy": 0.585559556078133,
+					"countNorm": 0.222222222222222,
+					"C": 0.403890889150178
+				},
+				"A": {
+					"samples": [
+						{
+							"progress": 0.0,
+							"raw": 639,
+							"reachable": 124,
+							"A_t": 0.805946791862285,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.029296875,
+							"raw": 609,
+							"reachable": 123,
+							"A_t": 0.798029556650246,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.05859375,
+							"raw": 579,
+							"reachable": 121,
+							"A_t": 0.791018998272884,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.087890625,
+							"raw": 549,
+							"reachable": 119,
+							"A_t": 0.783242258652095,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.1171875,
+							"raw": 519,
+							"reachable": 117,
+							"A_t": 0.774566473988439,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.146484375,
+							"raw": 489,
+							"reachable": 109,
+							"A_t": 0.777096114519427,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.17578125,
+							"raw": 459,
+							"reachable": 103,
+							"A_t": 0.775599128540305,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.205078125,
+							"raw": 429,
+							"reachable": 95,
+							"A_t": 0.778554778554779,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.2138671875,
+							"raw": 716,
+							"reachable": 101,
+							"A_t": 0.858938547486033,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.2431640625,
+							"raw": 686,
+							"reachable": 106,
+							"A_t": 0.845481049562682,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.2724609375,
+							"raw": 656,
+							"reachable": 110,
+							"A_t": 0.832317073170732,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3017578125,
+							"raw": 476,
+							"reachable": 107,
+							"A_t": 0.775210084033613,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3154296875,
+							"raw": 462,
+							"reachable": 99,
+							"A_t": 0.785714285714286,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3447265625,
+							"raw": 432,
+							"reachable": 89,
+							"A_t": 0.793981481481482,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3779296875,
+							"raw": 398,
+							"reachable": 81,
+							"A_t": 0.796482412060302,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4150390625,
+							"raw": 330,
+							"reachable": 75,
+							"A_t": 0.772727272727273,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4443359375,
+							"raw": 300,
+							"reachable": 65,
+							"A_t": 0.783333333333333,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4736328125,
+							"raw": 270,
+							"reachable": 61,
+							"A_t": 0.774074074074074,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5029296875,
+							"raw": 240,
+							"reachable": 61,
+							"A_t": 0.745833333333333,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5322265625,
+							"raw": 416,
+							"reachable": 101,
+							"A_t": 0.757211538461538,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5615234375,
+							"raw": 386,
+							"reachable": 99,
+							"A_t": 0.743523316062176,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5908203125,
+							"raw": 356,
+							"reachable": 98,
+							"A_t": 0.724719101123596,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.6201171875,
+							"raw": 326,
+							"reachable": 92,
+							"A_t": 0.717791411042945,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.6455078125,
+							"raw": 233,
+							"reachable": 69,
+							"A_t": 0.703862660944206,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.66796875,
+							"raw": 210,
+							"reachable": 78,
+							"A_t": 0.628571428571429,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.697265625,
+							"raw": 180,
+							"reachable": 72,
+							"A_t": 0.6,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7265625,
+							"raw": 150,
+							"reachable": 67,
+							"A_t": 0.553333333333333,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.755859375,
+							"raw": 120,
+							"reachable": 65,
+							"A_t": 0.458333333333333,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.78515625,
+							"raw": 90,
+							"reachable": 63,
+							"A_t": 0.3,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.814453125,
+							"raw": 60,
+							"reachable": 58,
+							"A_t": 0.0333333333333333,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.84375,
+							"raw": 30,
+							"reachable": 30,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.873046875,
+							"raw": 90,
+							"reachable": 24,
+							"A_t": 0.733333333333333,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.90234375,
+							"raw": 60,
+							"reachable": 22,
+							"A_t": 0.633333333333333,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.931640625,
+							"raw": 30,
+							"reachable": 20,
+							"A_t": 0.333333333333333,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9609375,
+							"raw": 30,
+							"reachable": 30,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.990234375,
+							"raw": 10,
+							"reachable": 9,
+							"A_t": 0.1,
+							"weight": 1.0
+						}
+					],
+					"priorityProgressFraction": 0.6,
+					"A": 0.695559094963593
+				},
+				"U": {
+					"meanWave": 4.84375,
+					"p95Wave": 12.0,
+					"maxWave": 15.0,
+					"initiallyLockedFraction": 0.87890625,
+					"p95Norm": 0.413793103448276,
+					"meanNorm": 0.167025862068966,
+					"U": 0.409529903017241
+				},
+				"B": {
+					"decisionStates": 36,
+					"productiveActionHistogram": {
+						"3": 12,
+						"2": 12,
+						"1": 12
+					},
+					"reachableAlternativesTotal": 5588,
+					"lowChoiceFraction": 0.666666666666667,
+					"forcedFraction": 0.333333333333333,
+					"zeroProductiveStates": 0,
+					"longestForcedStreak": 12,
+					"forcedStreakNorm": 0.333333333333333,
+					"B": 0.45
+				},
+				"R": {
+					"meanLength": 33.4332025386393,
+					"boardDiagonal": 45.254833995939,
+					"meanDetour": 1.31213767196709,
+					"meanTurns": 2.77734382728666,
+					"lengthVariance": 163.558190973746,
+					"lengthNorm": 0.369388191122737,
+					"detourNorm": 0.156068835983545,
+					"turnNorm": 0.347167978410833,
+					"R": 0.290282374281639
+				},
+				"S": {
+					"noWorkSlotFraction": 0.0833333333333333,
+					"singleProductiveSlotFraction": 0.75,
+					"colorDemandImbalance": 0.0527566539923954,
+					"S": 0.309022496831432
+				}
+			},
+			"sessionLoad": {
+				"value": 24.3989987505248,
+				"status": "PROVISIONAL_STAGE_A",
+				"actionsNorm": 0.294168342430336,
+				"routeTimeNorm": 0.117891182505395,
+				"decisionCountNorm": 0.307692307692308,
+				"dispatches": 1024,
+				"routeTravelSeconds": 5705.93323326112,
+				"decisions": 36,
+				"estimatedAttemptSecondsProxy": 712.266662915548,
+				"proxyNote": "kernel wait-for-quiescence timing at 1x; not a calibrated human time"
+			},
+			"frustrationRisk": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"scalarNote": "No Frustration Risk scalar is claimed: 85% of the V1 weight (retryRisk, sessionOverrun, lateFailure) has no trustworthy supporting simulation or owner budget.",
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; solver success is not a human first-attempt clear probability"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner-locked per-slot Session Load budget exists"
+					},
+					"lateFailure": {
+						"status": "UNSUPPORTED",
+						"reason": "no failing-simulation population exists"
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.225,
+						"inputs": {
+							"B": 0.45,
+							"nonProductiveLegalChoiceFraction": 0.0
+						}
+					}
+				},
+				"supportedLowerBoundContribution": 3.375
+			},
+			"profile": {
+				"dominant": "BALANCED",
+				"scores": {
+					"FLOW": 0.481637000673055,
+					"COLOR": 0.356456692990805,
+					"FORTRESS": 0.429764951508621,
+					"ROUTE": 0.492920734622616,
+					"MARATHON": -0.0158261823746393
+				},
+				"runnerUp": "FLOW"
+			},
+			"noveltySignatureInputs": {
+				"colorLayers": {
+					"maxLayers": 3.0,
+					"meanLayers": 1.3857421875
+				},
+				"peelHistogram": [
+					124.0,
+					116.0,
+					108.0,
+					100.0,
+					92.0,
+					84.0,
+					76.0,
+					68.0,
+					60.0,
+					52.0,
+					44.0,
+					36.0,
+					28.0,
+					20.0,
+					12.0,
+					4.0
+				],
+				"routeMeanLength": 33.4332025386393,
+				"aspectRatio": 1.0,
+				"artCategory": "NOT_DEFINED (no canonical art taxonomy exists)",
+				"sourceFamily": "owner_original_art"
+			},
+			"sensitivity": {
+				"challengeRange": [
+					42.2656400441675,
+					50.5964590096847
+				],
+				"sessionLoadRange": [
+					17.0447901897664,
+					39.1074158720416
+				],
+				"windowsReached": [
+					"OUTSIDE_HARD_LIMIT"
+				],
+				"variants": [
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 43.9474125246366,
+						"sessionLoad": 24.3989987505248,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 45.8156388814834,
+						"sessionLoad": 24.3989987505248,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 0.5,
+						"value": 14.5,
+						"challengeScore": 50.5964590096847,
+						"sessionLoad": 24.3989987505248,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 2.0,
+						"value": 58.0,
+						"challengeScore": 42.2656400441675,
+						"sessionLoad": 24.3989987505248,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 46.7048265593922,
+						"sessionLoad": 24.3989987505248,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 44.2114562693137,
+						"sessionLoad": 24.3989987505248,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 0.5,
+						"value": 1.5,
+						"challengeScore": 46.6813024771671,
+						"sessionLoad": 24.3989987505248,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 2.0,
+						"value": 6.0,
+						"challengeScore": 44.7148351437744,
+						"sessionLoad": 24.3989987505248,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 0.5,
+						"value": 4.0,
+						"challengeScore": 45.7369156561615,
+						"sessionLoad": 24.3989987505248,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 2.0,
+						"value": 16.0,
+						"challengeScore": 44.695411720929,
+						"sessionLoad": 24.3989987505248,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 0.5,
+						"value": 1740.5,
+						"challengeScore": 45.0425796993399,
+						"sessionLoad": 39.1074158720416,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 2.0,
+						"value": 6962.0,
+						"challengeScore": 45.0425796993399,
+						"sessionLoad": 17.0447901897664,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 0.5,
+						"value": 24200.0,
+						"challengeScore": 45.0425796993399,
+						"sessionLoad": 27.9357342256867,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 2.0,
+						"value": 96800.0,
+						"challengeScore": 45.0425796993399,
+						"sessionLoad": 22.6306310129439,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 0.5,
+						"value": 58.5,
+						"challengeScore": 45.0425796993399,
+						"sessionLoad": 30.552844904371,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 2.0,
+						"value": 234.0,
+						"challengeScore": 45.0425796993399,
+						"sessionLoad": 21.3220756736017,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					}
+				]
+			},
+			"ownerPathSensitivity": {
+				"policy": "OWNER_INTENDED_CLICKS",
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.403890889150178,
+					"A": 0.677151971650317,
+					"U": 0.409529903017241,
+					"B": 0.0375,
+					"R": 0.301519743686797,
+					"S": 0.309442767717416
+				},
+				"challengeScore": 38.6035136359858,
+				"signedDelta": 16.6035136359858,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 24.5390813916062,
+				"decisions": 36,
+				"path": {
+					"steps": 36.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1024.0,
+					"maxParallelClaims": 1.0
+				}
+			},
+			"staticQa": "PASS",
+			"m53Verdict": "TUNING_REQUIRED",
+			"novelty": {
+				"nearestPriorLevel": "m21_level_001_hazard_bot",
+				"nearestPriorSimilarity": {
+					"vector": 0.776469311090189,
+					"palette": 0.428571428571429,
+					"dimensions": 0.390625,
+					"combined": 0.531888579887206
+				},
+				"novelty": 0.468111420112794,
+				"noveltyTarget": 0.35,
+				"meetsNoveltyTarget": true,
+				"status": "INFORMATIONAL_STAGE_A (provisional similarity; no art taxonomy)"
+			}
+		},
+		{
+			"order": 3,
+			"id": "level_003_palm_tree",
+			"class": "MEDIUM",
+			"slot": 3,
+			"role": "first_tension",
+			"noveltyTarget": 0.45,
+			"width": 38,
+			"height": 38,
+			"palette": [
+				"C02",
+				"C04",
+				"C05",
+				"C08",
+				"C11",
+				"C16"
+			],
+			"levelSha256": "0aceddb060f9770fda64ad55c3d3121530d3dc9d6b18f7901a382b2fb2d1d2aa",
+			"provenance": {
+				"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+				"analysisConfig": "res://data/config/level_difficulty_analysis_v1.json",
+				"analysisConfigVersion": 1.0,
+				"calibrationStage": "STAGE_A_PROVISIONAL",
+				"scoreModelSchema": "scrubbots-difficulty-score-model/v1",
+				"scoreModelVersion": 1.0,
+				"progressionModelSchema": "scrubbots-level-progression/v1",
+				"progressionModelVersion": 1.0,
+				"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+				"kernel": "res://scripts/gameplay/solver/proof_kernel.gd",
+				"routing": "res://scripts/gameplay/routing/production_routing_system.gd",
+				"access": "res://scripts/gameplay/dispatch/production_target_access.gd"
+			},
+			"supplyAuthority": "SupplyPlanLoader res://data/levels/supply/level_003_palm_tree_supply_v1.json",
+			"referencePath": {
+				"policy": "ORACLE_SOLVER_TRACE",
+				"traceHash": 3808086370.0,
+				"traceSource": "M52 owner-plan verification evidence (hash-verified; replayed step-exact here)",
+				"decisions": 51,
+				"path": {
+					"steps": 51.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1444.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1312.0,
+					"maxParallelClaims": 5.0
+				}
+			},
+			"vector": {
+				"W": 0.620908153700972,
+				"C": 0.557537509151548,
+				"A": 0.735324427483468,
+				"U": 0.460578851848314,
+				"B": 0.477450980392157,
+				"R": 0.339039930238551,
+				"S": 0.523150371957828
+			},
+			"challengeScore": 54.2738774887647,
+			"targetChallenge": 40.0,
+			"signedDelta": 14.2738774887647,
+			"absoluteDelta": 14.2738774887647,
+			"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+			"supporting": {
+				"W": {
+					"activeCells": 1444,
+					"dispatches": 1444,
+					"routeDistanceTotal": 56388.2005522251,
+					"cellTransform": "sqrt",
+					"W": 0.620908153700972
+				},
+				"C": {
+					"usedColors": 6.0,
+					"frequencyByHex": {
+						"#FFA800FF": 28.0,
+						"#00CC78FF": 452.0,
+						"#00CCC0FF": 88.0,
+						"#2450A4FF": 601.0,
+						"#9C6926FF": 72.0,
+						"#000000FF": 203.0
+					},
+					"normalizedEntropy": 0.781741684969762,
+					"countNorm": 0.333333333333333,
+					"C": 0.557537509151548
+				},
+				"A": {
+					"samples": [
+						{
+							"progress": 0.0,
+							"raw": 601,
+							"reachable": 140,
+							"A_t": 0.767054908485857,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.0207756232686981,
+							"raw": 571,
+							"reachable": 133,
+							"A_t": 0.76707530647986,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.0415512465373962,
+							"raw": 541,
+							"reachable": 129,
+							"A_t": 0.761552680221811,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.0623268698060941,
+							"raw": 511,
+							"reachable": 125,
+							"A_t": 0.755381604696673,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.0831024930747922,
+							"raw": 481,
+							"reachable": 121,
+							"A_t": 0.748440748440748,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.10387811634349,
+							"raw": 451,
+							"reachable": 118,
+							"A_t": 0.738359201773836,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.124653739612188,
+							"raw": 421,
+							"reachable": 111,
+							"A_t": 0.736342042755344,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.145429362880886,
+							"raw": 843,
+							"reachable": 105,
+							"A_t": 0.875444839857651,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.145429362880886,
+							"raw": 843,
+							"reachable": 105,
+							"A_t": 0.875444839857651,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.145429362880886,
+							"raw": 843,
+							"reachable": 105,
+							"A_t": 0.875444839857651,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.145429362880886,
+							"raw": 843,
+							"reachable": 105,
+							"A_t": 0.875444839857651,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.145429362880886,
+							"raw": 843,
+							"reachable": 105,
+							"A_t": 0.875444839857651,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.166204986149584,
+							"raw": 813,
+							"reachable": 97,
+							"A_t": 0.880688806888069,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.186980609418283,
+							"raw": 783,
+							"reachable": 90,
+							"A_t": 0.885057471264368,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.207756232686981,
+							"raw": 753,
+							"reachable": 85,
+							"A_t": 0.887118193891102,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.228531855955679,
+							"raw": 723,
+							"reachable": 83,
+							"A_t": 0.885200553250346,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.249307479224377,
+							"raw": 693,
+							"reachable": 76,
+							"A_t": 0.89033189033189,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.270083102493075,
+							"raw": 866,
+							"reachable": 161,
+							"A_t": 0.814087759815243,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.373961218836565,
+							"raw": 543,
+							"reachable": 75,
+							"A_t": 0.861878453038674,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.394736842105263,
+							"raw": 585,
+							"reachable": 88,
+							"A_t": 0.84957264957265,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.415512465373961,
+							"raw": 686,
+							"reachable": 166,
+							"A_t": 0.75801749271137,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.436288088642659,
+							"raw": 656,
+							"reachable": 139,
+							"A_t": 0.788109756097561,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.457063711911357,
+							"raw": 541,
+							"reachable": 84,
+							"A_t": 0.844731977818854,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.469529085872576,
+							"raw": 636,
+							"reachable": 112,
+							"A_t": 0.823899371069182,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.485457063711911,
+							"raw": 523,
+							"reachable": 90,
+							"A_t": 0.82791586998088,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.506232686980609,
+							"raw": 493,
+							"reachable": 88,
+							"A_t": 0.821501014198783,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.527008310249308,
+							"raw": 463,
+							"reachable": 96,
+							"A_t": 0.792656587473002,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.547783933518005,
+							"raw": 433,
+							"reachable": 99,
+							"A_t": 0.771362586605081,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.568559556786704,
+							"raw": 309,
+							"reachable": 107,
+							"A_t": 0.653721682847896,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.589335180055402,
+							"raw": 221,
+							"reachable": 67,
+							"A_t": 0.69683257918552,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.6101108033241,
+							"raw": 281,
+							"reachable": 98,
+							"A_t": 0.651245551601424,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.630886426592798,
+							"raw": 251,
+							"reachable": 68,
+							"A_t": 0.729083665338645,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.639196675900277,
+							"raw": 297,
+							"reachable": 75,
+							"A_t": 0.747474747474747,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.653739612188366,
+							"raw": 318,
+							"reachable": 87,
+							"A_t": 0.726415094339623,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.668975069252078,
+							"raw": 266,
+							"reachable": 64,
+							"A_t": 0.759398496240602,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.699445983379501,
+							"raw": 222,
+							"reachable": 64,
+							"A_t": 0.711711711711712,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.722991689750693,
+							"raw": 158,
+							"reachable": 55,
+							"A_t": 0.651898734177215,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.743767313019391,
+							"raw": 128,
+							"reachable": 48,
+							"A_t": 0.625,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.764542936288089,
+							"raw": 98,
+							"reachable": 53,
+							"A_t": 0.459183673469388,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.785318559556787,
+							"raw": 68,
+							"reachable": 31,
+							"A_t": 0.544117647058824,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.806094182825485,
+							"raw": 219,
+							"reachable": 66,
+							"A_t": 0.698630136986301,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.831717451523546,
+							"raw": 152,
+							"reachable": 54,
+							"A_t": 0.644736842105263,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.852493074792244,
+							"raw": 122,
+							"reachable": 43,
+							"A_t": 0.647540983606557,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.873268698060942,
+							"raw": 92,
+							"reachable": 29,
+							"A_t": 0.684782608695652,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.89404432132964,
+							"raw": 62,
+							"reachable": 22,
+							"A_t": 0.645161290322581,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.914819944598338,
+							"raw": 30,
+							"reachable": 20,
+							"A_t": 0.333333333333333,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.934210526315789,
+							"raw": 32,
+							"reachable": 19,
+							"A_t": 0.40625,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.954986149584488,
+							"raw": 32,
+							"reachable": 30,
+							"A_t": 0.0625,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.977146814404432,
+							"raw": 32,
+							"reachable": 31,
+							"A_t": 0.03125,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.978531855955679,
+							"raw": 30,
+							"reachable": 29,
+							"A_t": 0.0333333333333333,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.999307479224377,
+							"raw": 1,
+							"reachable": 1,
+							"A_t": 0.0,
+							"weight": 1.0
+						}
+					],
+					"priorityProgressFraction": 0.6,
+					"A": 0.735324427483468
+				},
+				"U": {
+					"meanWave": 5.84210526315789,
+					"p95Wave": 14.0,
+					"maxWave": 18.0,
+					"initiallyLockedFraction": 0.897506925207756,
+					"p95Norm": 0.482758620689655,
+					"meanNorm": 0.201451905626134,
+					"U": 0.460578851848314
+				},
+				"B": {
+					"decisionStates": 51,
+					"productiveActionHistogram": {
+						"3": 13,
+						"2": 21,
+						"1": 17
+					},
+					"reachableAlternativesTotal": 6979,
+					"lowChoiceFraction": 0.745098039215686,
+					"forcedFraction": 0.333333333333333,
+					"zeroProductiveStates": 0,
+					"longestForcedStreak": 17,
+					"forcedStreakNorm": 0.333333333333333,
+					"B": 0.477450980392157
+				},
+				"R": {
+					"meanLength": 39.0500003824274,
+					"boardDiagonal": 53.7401153701776,
+					"meanDetour": 1.34096402042165,
+					"meanTurns": 4.63504168022825,
+					"lengthVariance": 250.439082674766,
+					"lengthNorm": 0.36332263257568,
+					"detourNorm": 0.170482010210825,
+					"turnNorm": 0.579380210028531,
+					"R": 0.339039930238551
+				},
+				"S": {
+					"noWorkSlotFraction": 0.588235294117647,
+					"singleProductiveSlotFraction": 0.686274509803922,
+					"colorDemandImbalance": 0.190640703517588,
+					"S": 0.523150371957828
+				}
+			},
+			"sessionLoad": {
+				"value": 35.284342379238,
+				"status": "PROVISIONAL_STAGE_A",
+				"actionsNorm": 0.414823326630279,
+				"routeTimeNorm": 0.194174244325844,
+				"decisionCountNorm": 0.435897435897436,
+				"dispatches": 1444,
+				"routeTravelSeconds": 9398.03342537085,
+				"decisions": 51,
+				"estimatedAttemptSecondsProxy": 976.333336393039,
+				"proxyNote": "kernel wait-for-quiescence timing at 1x; not a calibrated human time"
+			},
+			"frustrationRisk": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"scalarNote": "No Frustration Risk scalar is claimed: 85% of the V1 weight (retryRisk, sessionOverrun, lateFailure) has no trustworthy supporting simulation or owner budget.",
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; solver success is not a human first-attempt clear probability"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner-locked per-slot Session Load budget exists"
+					},
+					"lateFailure": {
+						"status": "UNSUPPORTED",
+						"reason": "no failing-simulation population exists"
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.289184205792409,
+						"inputs": {
+							"B": 0.477450980392157,
+							"nonProductiveLegalChoiceFraction": 0.100917431192661
+						}
+					}
+				},
+				"supportedLowerBoundContribution": 4.33776308688613
+			},
+			"profile": {
+				"dominant": "BALANCED",
+				"scores": {
+					"FLOW": 0.442215246758687,
+					"COLOR": 0.540343940554688,
+					"FORTRESS": 0.469014916120235,
+					"ROUTE": 0.53718217886101,
+					"MARATHON": 0.151893237580737
+				},
+				"runnerUp": "ROUTE"
+			},
+			"noveltySignatureInputs": {
+				"colorLayers": {
+					"maxLayers": 4.0,
+					"meanLayers": 1.7707756232687
+				},
+				"peelHistogram": [
+					148.0,
+					140.0,
+					132.0,
+					124.0,
+					116.0,
+					108.0,
+					100.0,
+					92.0,
+					84.0,
+					76.0,
+					68.0,
+					60.0,
+					52.0,
+					44.0,
+					36.0,
+					28.0,
+					20.0,
+					12.0,
+					4.0
+				],
+				"routeMeanLength": 39.0500003824274,
+				"aspectRatio": 1.0,
+				"artCategory": "NOT_DEFINED (no canonical art taxonomy exists)",
+				"sourceFamily": "owner_original_art"
+			},
+			"sensitivity": {
+				"challengeRange": [
+					51.0143493580932,
+					60.7929337501077
+				],
+				"sessionLoadRange": [
+					24.913759213481,
+					56.0255087107519
+				],
+				"windowsReached": [
+					"OUTSIDE_HARD_LIMIT"
+				],
+				"variants": [
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 53.362354914773,
+						"sessionLoad": 35.284342379238,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 54.9332767976098,
+						"sessionLoad": 35.284342379238,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 0.5,
+						"value": 14.5,
+						"challengeScore": 60.7929337501077,
+						"sessionLoad": 35.284342379238,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 2.0,
+						"value": 58.0,
+						"challengeScore": 51.0143493580932,
+						"sessionLoad": 35.284342379238,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 55.9088293353553,
+						"sessionLoad": 35.284342379238,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 53.4564015654694,
+						"sessionLoad": 35.284342379238,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 0.5,
+						"value": 1.5,
+						"challengeScore": 56.0639385959784,
+						"sessionLoad": 35.284342379238,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 2.0,
+						"value": 6.0,
+						"challengeScore": 53.915865267322,
+						"sessionLoad": 35.284342379238,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 0.5,
+						"value": 4.0,
+						"challengeScore": 55.1151170687077,
+						"sessionLoad": 35.284342379238,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 2.0,
+						"value": 16.0,
+						"challengeScore": 53.6944972787362,
+						"sessionLoad": 35.284342379238,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 0.5,
+						"value": 1740.5,
+						"challengeScore": 54.2738774887647,
+						"sessionLoad": 56.0255087107519,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 2.0,
+						"value": 6962.0,
+						"challengeScore": 54.2738774887647,
+						"sessionLoad": 24.913759213481,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 0.5,
+						"value": 24200.0,
+						"challengeScore": 54.2738774887647,
+						"sessionLoad": 41.1095697090133,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 2.0,
+						"value": 96800.0,
+						"challengeScore": 54.2738774887647,
+						"sessionLoad": 32.3717287143503,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 0.5,
+						"value": 58.5,
+						"challengeScore": 54.2738774887647,
+						"sessionLoad": 44.0022910971867,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 2.0,
+						"value": 234.0,
+						"challengeScore": 54.2738774887647,
+						"sessionLoad": 30.9253680202636,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					}
+				]
+			},
+			"ownerPathSensitivity": {
+				"policy": "OWNER_INTENDED_CLICKS",
+				"vector": {
+					"W": 0.620908153700972,
+					"C": 0.557537509151548,
+					"A": 0.648232974760267,
+					"U": 0.460578851848314,
+					"B": 0.0480392156862745,
+					"R": 0.416748933412654,
+					"S": 0.283840169731259
+				},
+				"challengeScore": 44.4748599731878,
+				"signedDelta": 4.47485997318781,
+				"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT",
+				"sessionLoad": 35.7803547967544,
+				"decisions": 51,
+				"path": {
+					"steps": 51.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1444.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1444.0,
+					"maxParallelClaims": 1.0
+				}
+			},
+			"staticQa": "PASS",
+			"m53Verdict": "TUNING_REQUIRED",
+			"novelty": {
+				"nearestPriorLevel": "level_002_apple",
+				"nearestPriorSimilarity": {
+					"vector": 0.869280841208236,
+					"palette": 0.375,
+					"dimensions": 0.709141274238227,
+					"combined": 0.651140705148821
+				},
+				"novelty": 0.348859294851179,
+				"noveltyTarget": 0.45,
+				"meetsNoveltyTarget": false,
+				"status": "INFORMATIONAL_STAGE_A (provisional similarity; no art taxonomy)"
+			}
+		},
+		{
+			"order": 4,
+			"id": "level_004_orange_cat",
+			"class": "EASY",
+			"slot": 4,
+			"role": "recovery",
+			"noveltyTarget": 0.6,
+			"width": 32,
+			"height": 32,
+			"palette": [
+				"C02",
+				"C04",
+				"C08",
+				"C11",
+				"C12",
+				"C13",
+				"C16"
+			],
+			"levelSha256": "070ec1f61ebf8c2b824a62bdcd0a9e1f1b51a8588c59dc0e86a36f440f93066e",
+			"provenance": {
+				"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+				"analysisConfig": "res://data/config/level_difficulty_analysis_v1.json",
+				"analysisConfigVersion": 1.0,
+				"calibrationStage": "STAGE_A_PROVISIONAL",
+				"scoreModelSchema": "scrubbots-difficulty-score-model/v1",
+				"scoreModelVersion": 1.0,
+				"progressionModelSchema": "scrubbots-level-progression/v1",
+				"progressionModelVersion": 1.0,
+				"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+				"kernel": "res://scripts/gameplay/solver/proof_kernel.gd",
+				"routing": "res://scripts/gameplay/routing/production_routing_system.gd",
+				"access": "res://scripts/gameplay/dispatch/production_target_access.gd"
+			},
+			"supplyAuthority": "SupplyPlanLoader res://data/levels/supply/level_004_orange_cat_supply_v1.json",
+			"referencePath": {
+				"policy": "ORACLE_SOLVER_TRACE",
+				"traceHash": 2842640196.0,
+				"traceSource": "M52 owner-plan verification evidence (hash-verified; replayed step-exact here)",
+				"decisions": 39,
+				"path": {
+					"steps": 39.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 968.0,
+					"maxParallelClaims": 3.0
+				}
+			},
+			"vector": {
+				"W": 0.413938769133981,
+				"C": 0.511480590658638,
+				"A": 0.688422858399483,
+				"U": 0.409529903017241,
+				"B": 0.458974358974359,
+				"R": 0.341857101875838,
+				"S": 0.542078045017881
+			},
+			"challengeScore": 49.4946186331064,
+			"targetChallenge": 19.0,
+			"signedDelta": 30.4946186331064,
+			"absoluteDelta": 30.4946186331064,
+			"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+			"supporting": {
+				"W": {
+					"activeCells": 1024,
+					"dispatches": 1024,
+					"routeDistanceTotal": 34013.1997470856,
+					"cellTransform": "sqrt",
+					"W": 0.413938769133981
+				},
+				"C": {
+					"usedColors": 7.0,
+					"frequencyByHex": {
+						"#FFA800FF": 167.0,
+						"#00CC78FF": 2.0,
+						"#2450A4FF": 639.0,
+						"#9C6926FF": 13.0,
+						"#FFF8B8FF": 68.0,
+						"#D4D7D9FF": 5.0,
+						"#000000FF": 130.0
+					},
+					"normalizedEntropy": 0.578516736872831,
+					"countNorm": 0.444444444444444,
+					"C": 0.511480590658638
+				},
+				"A": {
+					"samples": [
+						{
+							"progress": 0.0,
+							"raw": 639,
+							"reachable": 124,
+							"A_t": 0.805946791862285,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.029296875,
+							"raw": 609,
+							"reachable": 123,
+							"A_t": 0.798029556650246,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.05859375,
+							"raw": 579,
+							"reachable": 110,
+							"A_t": 0.810017271157168,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.087890625,
+							"raw": 549,
+							"reachable": 99,
+							"A_t": 0.819672131147541,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.1171875,
+							"raw": 519,
+							"reachable": 93,
+							"A_t": 0.820809248554913,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.146484375,
+							"raw": 489,
+							"reachable": 88,
+							"A_t": 0.820040899795501,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.17578125,
+							"raw": 459,
+							"reachable": 86,
+							"A_t": 0.812636165577342,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.205078125,
+							"raw": 596,
+							"reachable": 89,
+							"A_t": 0.850671140939597,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.20703125,
+							"raw": 594,
+							"reachable": 90,
+							"A_t": 0.848484848484849,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.20703125,
+							"raw": 594,
+							"reachable": 90,
+							"A_t": 0.848484848484849,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.29296875,
+							"raw": 529,
+							"reachable": 125,
+							"A_t": 0.763705103969754,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.322265625,
+							"raw": 412,
+							"reachable": 92,
+							"A_t": 0.776699029126214,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.328125,
+							"raw": 474,
+							"reachable": 95,
+							"A_t": 0.79957805907173,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3359375,
+							"raw": 406,
+							"reachable": 86,
+							"A_t": 0.788177339901478,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.365234375,
+							"raw": 376,
+							"reachable": 82,
+							"A_t": 0.781914893617021,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.39453125,
+							"raw": 346,
+							"reachable": 72,
+							"A_t": 0.791907514450867,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.423828125,
+							"raw": 316,
+							"reachable": 67,
+							"A_t": 0.787974683544304,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.453125,
+							"raw": 286,
+							"reachable": 66,
+							"A_t": 0.769230769230769,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.482421875,
+							"raw": 256,
+							"reachable": 62,
+							"A_t": 0.7578125,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.51171875,
+							"raw": 326,
+							"reachable": 99,
+							"A_t": 0.696319018404908,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5419921875,
+							"raw": 332,
+							"reachable": 81,
+							"A_t": 0.756024096385542,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.572265625,
+							"raw": 284,
+							"reachable": 84,
+							"A_t": 0.704225352112676,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.6015625,
+							"raw": 301,
+							"reachable": 61,
+							"A_t": 0.79734219269103,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.630859375,
+							"raw": 224,
+							"reachable": 58,
+							"A_t": 0.741071428571429,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.66015625,
+							"raw": 264,
+							"reachable": 99,
+							"A_t": 0.625,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.669921875,
+							"raw": 199,
+							"reachable": 60,
+							"A_t": 0.698492462311558,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.6708984375,
+							"raw": 198,
+							"reachable": 59,
+							"A_t": 0.702020202020202,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7001953125,
+							"raw": 168,
+							"reachable": 57,
+							"A_t": 0.660714285714286,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7294921875,
+							"raw": 138,
+							"reachable": 56,
+							"A_t": 0.594202898550725,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7587890625,
+							"raw": 108,
+							"reachable": 63,
+							"A_t": 0.416666666666667,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7880859375,
+							"raw": 78,
+							"reachable": 64,
+							"A_t": 0.17948717948718,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8173828125,
+							"raw": 69,
+							"reachable": 48,
+							"A_t": 0.304347826086957,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8466796875,
+							"raw": 56,
+							"reachable": 18,
+							"A_t": 0.678571428571429,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.880859375,
+							"raw": 43,
+							"reachable": 34,
+							"A_t": 0.209302325581395,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.91015625,
+							"raw": 34,
+							"reachable": 21,
+							"A_t": 0.382352941176471,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.94140625,
+							"raw": 32,
+							"reachable": 26,
+							"A_t": 0.1875,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.97265625,
+							"raw": 17,
+							"reachable": 17,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9892578125,
+							"raw": 9,
+							"reachable": 9,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.998046875,
+							"raw": 2,
+							"reachable": 2,
+							"A_t": 0.0,
+							"weight": 1.0
+						}
+					],
+					"priorityProgressFraction": 0.6,
+					"A": 0.688422858399483
+				},
+				"U": {
+					"meanWave": 4.84375,
+					"p95Wave": 12.0,
+					"maxWave": 15.0,
+					"initiallyLockedFraction": 0.87890625,
+					"p95Norm": 0.413793103448276,
+					"meanNorm": 0.167025862068966,
+					"U": 0.409529903017241
+				},
+				"B": {
+					"decisionStates": 39,
+					"productiveActionHistogram": {
+						"3": 12,
+						"2": 14,
+						"1": 13
+					},
+					"reachableAlternativesTotal": 5310,
+					"lowChoiceFraction": 0.692307692307692,
+					"forcedFraction": 0.333333333333333,
+					"zeroProductiveStates": 0,
+					"longestForcedStreak": 13,
+					"forcedStreakNorm": 0.333333333333333,
+					"B": 0.458974358974359
+				},
+				"R": {
+					"meanLength": 33.2160153780133,
+					"boardDiagonal": 45.254833995939,
+					"meanDetour": 1.40305986231709,
+					"meanTurns": 4.2470704306855,
+					"lengthVariance": 146.306773886547,
+					"lengthNorm": 0.366988589340466,
+					"detourNorm": 0.201529931158545,
+					"turnNorm": 0.530883803835687,
+					"R": 0.341857101875838
+				},
+				"S": {
+					"noWorkSlotFraction": 0.666666666666667,
+					"singleProductiveSlotFraction": 0.743589743589744,
+					"colorDemandImbalance": 0.060619872379216,
+					"S": 0.542078045017881
+				}
+			},
+			"sessionLoad": {
+				"value": 24.8888440926345,
+				"status": "PROVISIONAL_STAGE_A",
+				"actionsNorm": 0.294168342430336,
+				"routeTimeNorm": 0.1171253434817,
+				"decisionCountNorm": 0.333333333333333,
+				"dispatches": 1024,
+				"routeTravelSeconds": 5668.86662451427,
+				"decisions": 39,
+				"estimatedAttemptSecondsProxy": 684.999998728434,
+				"proxyNote": "kernel wait-for-quiescence timing at 1x; not a calibrated human time"
+			},
+			"frustrationRisk": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"scalarNote": "No Frustration Risk scalar is claimed: 85% of the V1 weight (retryRisk, sessionOverrun, lateFailure) has no trustworthy supporting simulation or owner budget.",
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; solver success is not a human first-attempt clear probability"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner-locked per-slot Session Load budget exists"
+					},
+					"lateFailure": {
+						"status": "UNSUPPORTED",
+						"reason": "no failing-simulation population exists"
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.235897435897436,
+						"inputs": {
+							"B": 0.458974358974359,
+							"nonProductiveLegalChoiceFraction": 0.0128205128205128
+						}
+					}
+				},
+				"supportedLowerBoundContribution": 3.53846153846154
+			},
+			"profile": {
+				"dominant": "BALANCED",
+				"scores": {
+					"FLOW": 0.481024293202972,
+					"COLOR": 0.526779317838259,
+					"FORTRESS": 0.4342521309958,
+					"ROUTE": 0.51513998013766,
+					"MARATHON": -0.0203133618618188
+				},
+				"runnerUp": "ROUTE"
+			},
+			"noveltySignatureInputs": {
+				"colorLayers": {
+					"maxLayers": 4.0,
+					"meanLayers": 1.693359375
+				},
+				"peelHistogram": [
+					124.0,
+					116.0,
+					108.0,
+					100.0,
+					92.0,
+					84.0,
+					76.0,
+					68.0,
+					60.0,
+					52.0,
+					44.0,
+					36.0,
+					28.0,
+					20.0,
+					12.0,
+					4.0
+				],
+				"routeMeanLength": 33.2160153780133,
+				"aspectRatio": 1.0,
+				"artCategory": "NOT_DEFINED (no canonical art taxonomy exists)",
+				"sourceFamily": "owner_original_art"
+			},
+			"sensitivity": {
+				"challengeRange": [
+					46.717678977934,
+					55.0484979434513
+				],
+				"sessionLoadRange": [
+					17.5346355318761,
+					39.5972612141513
+				],
+				"windowsReached": [
+					"OUTSIDE_HARD_LIMIT"
+				],
+				"variants": [
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 48.3340758753213,
+						"sessionLoad": 24.8888440926345,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 50.3567361103182,
+						"sessionLoad": 24.8888440926345,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 0.5,
+						"value": 14.5,
+						"challengeScore": 55.0484979434513,
+						"sessionLoad": 24.8888440926345,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 2.0,
+						"value": 58.0,
+						"challengeScore": 46.717678977934,
+						"sessionLoad": 24.8888440926345,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 51.1460672851385,
+						"sessionLoad": 24.8888440926345,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 48.6688943070904,
+						"sessionLoad": 24.8888440926345,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 0.5,
+						"value": 1.5,
+						"challengeScore": 51.6106829102712,
+						"sessionLoad": 24.8888440926345,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 2.0,
+						"value": 6.0,
+						"challengeScore": 49.0714057776735,
+						"sessionLoad": 24.8888440926345,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 0.5,
+						"value": 4.0,
+						"challengeScore": 50.4328510254351,
+						"sessionLoad": 24.8888440926345,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 2.0,
+						"value": 16.0,
+						"challengeScore": 48.9637348292707,
+						"sessionLoad": 24.8888440926345,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 0.5,
+						"value": 1740.5,
+						"challengeScore": 49.4946186331064,
+						"sessionLoad": 39.5972612141513,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 2.0,
+						"value": 6962.0,
+						"challengeScore": 49.4946186331064,
+						"sessionLoad": 17.5346355318761,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 0.5,
+						"value": 24200.0,
+						"challengeScore": 49.4946186331064,
+						"sessionLoad": 28.4026043970855,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 2.0,
+						"value": 96800.0,
+						"challengeScore": 49.4946186331064,
+						"sessionLoad": 23.131963940409,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 0.5,
+						"value": 58.5,
+						"challengeScore": 49.4946186331064,
+						"sessionLoad": 31.5555107593011,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 2.0,
+						"value": 234.0,
+						"challengeScore": 49.4946186331064,
+						"sessionLoad": 21.5555107593011,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					}
+				]
+			},
+			"ownerPathSensitivity": {
+				"policy": "OWNER_INTENDED_CLICKS",
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.511480590658638,
+					"A": 0.590998998149185,
+					"U": 0.409529903017241,
+					"B": 0.0346153846153846,
+					"R": 0.308859677628504,
+					"S": 0.166229427849146
+				},
+				"challengeScore": 37.0922963985552,
+				"signedDelta": 18.0922963985552,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.0770672085003,
+				"decisions": 39,
+				"path": {
+					"steps": 39.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1024.0,
+					"maxParallelClaims": 1.0
+				}
+			},
+			"staticQa": "PASS",
+			"m53Verdict": "TUNING_REQUIRED",
+			"novelty": {
+				"nearestPriorLevel": "level_002_apple",
+				"nearestPriorSimilarity": {
+					"vector": 0.900946010443885,
+					"palette": 0.5,
+					"dimensions": 1.0,
+					"combined": 0.800315336814628
+				},
+				"novelty": 0.199684663185372,
+				"noveltyTarget": 0.6,
+				"meetsNoveltyTarget": false,
+				"status": "INFORMATIONAL_STAGE_A (provisional similarity; no art taxonomy)"
+			}
+		},
+		{
+			"order": 5,
+			"id": "level_005_party_toucan",
+			"class": "HARD",
+			"slot": 5,
+			"role": "mini_boss",
+			"noveltyTarget": 0.3,
+			"width": 33,
+			"height": 33,
+			"palette": [
+				"C01",
+				"C02",
+				"C03",
+				"C06",
+				"C07",
+				"C08",
+				"C10",
+				"C11",
+				"C14",
+				"C16"
+			],
+			"levelSha256": "b2c61546e75c4a203d902889e8bf41f0c82827bfdc01d9aea9a8c58ba1c5be36",
+			"provenance": {
+				"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+				"analysisConfig": "res://data/config/level_difficulty_analysis_v1.json",
+				"analysisConfigVersion": 1.0,
+				"calibrationStage": "STAGE_A_PROVISIONAL",
+				"scoreModelSchema": "scrubbots-difficulty-score-model/v1",
+				"scoreModelVersion": 1.0,
+				"progressionModelSchema": "scrubbots-level-progression/v1",
+				"progressionModelVersion": 1.0,
+				"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+				"kernel": "res://scripts/gameplay/solver/proof_kernel.gd",
+				"routing": "res://scripts/gameplay/routing/production_routing_system.gd",
+				"access": "res://scripts/gameplay/dispatch/production_target_access.gd"
+			},
+			"supplyAuthority": "SupplyPlanLoader res://data/levels/supply/level_005_party_toucan_supply_v1.json",
+			"referencePath": {
+				"policy": "ORACLE_SOLVER_TRACE",
+				"traceHash": 3056207161.0,
+				"traceSource": "M52 owner-plan verification evidence (hash-verified; replayed step-exact here)",
+				"decisions": 41,
+				"path": {
+					"steps": 41.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1089.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1010.0,
+					"maxParallelClaims": 3.0
+				}
+			},
+			"vector": {
+				"W": 0.448433666561813,
+				"C": 0.700874046904867,
+				"A": 0.686555901132021,
+				"U": 0.411783984041037,
+				"B": 0.458536585365854,
+				"R": 0.370589476338568,
+				"S": 0.564025653725248
+			},
+			"challengeScore": 53.1884451537783,
+			"targetChallenge": 58.0,
+			"signedDelta": -4.81155484622174,
+			"absoluteDelta": 4.81155484622174,
+			"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT",
+			"supporting": {
+				"W": {
+					"activeCells": 1089,
+					"dispatches": 1089,
+					"routeDistanceTotal": 39018.9003582001,
+					"cellTransform": "sqrt",
+					"W": 0.448433666561813
+				},
+				"C": {
+					"usedColors": 10.0,
+					"frequencyByHex": {
+						"#FF4500FF": 7.0,
+						"#FFA800FF": 26.0,
+						"#FFD635FF": 106.0,
+						"#51E9F4FF": 9.0,
+						"#3690EAFF": 8.0,
+						"#2450A4FF": 611.0,
+						"#FF3881FF": 15.0,
+						"#9C6926FF": 52.0,
+						"#515252FF": 78.0,
+						"#000000FF": 177.0
+					},
+					"normalizedEntropy": 0.623970316031956,
+					"countNorm": 0.777777777777778,
+					"C": 0.700874046904867
+				},
+				"A": {
+					"samples": [
+						{
+							"progress": 0.0,
+							"raw": 611,
+							"reachable": 121,
+							"A_t": 0.801963993453355,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.0275482093663911,
+							"raw": 581,
+							"reachable": 116,
+							"A_t": 0.800344234079174,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.0550964187327824,
+							"raw": 551,
+							"reachable": 113,
+							"A_t": 0.79491833030853,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.0826446280991735,
+							"raw": 521,
+							"reachable": 107,
+							"A_t": 0.794625719769674,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.110192837465565,
+							"raw": 491,
+							"reachable": 102,
+							"A_t": 0.792260692464358,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.137741046831956,
+							"raw": 461,
+							"reachable": 96,
+							"A_t": 0.79175704989154,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.165289256198347,
+							"raw": 431,
+							"reachable": 92,
+							"A_t": 0.786542923433875,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.192837465564738,
+							"raw": 401,
+							"reachable": 88,
+							"A_t": 0.780548628428928,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.220385674931129,
+							"raw": 548,
+							"reachable": 124,
+							"A_t": 0.773722627737226,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.247933884297521,
+							"raw": 477,
+							"reachable": 85,
+							"A_t": 0.821802935010482,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.247933884297521,
+							"raw": 624,
+							"reachable": 113,
+							"A_t": 0.818910256410256,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.272727272727273,
+							"raw": 529,
+							"reachable": 85,
+							"A_t": 0.839319470699433,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.272727272727273,
+							"raw": 529,
+							"reachable": 85,
+							"A_t": 0.839319470699433,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.282828282828283,
+							"raw": 526,
+							"reachable": 83,
+							"A_t": 0.842205323193916,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.286501377410468,
+							"raw": 522,
+							"reachable": 79,
+							"A_t": 0.848659003831418,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.314049586776859,
+							"raw": 492,
+							"reachable": 71,
+							"A_t": 0.855691056910569,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.341597796143251,
+							"raw": 462,
+							"reachable": 70,
+							"A_t": 0.848484848484849,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.369146005509642,
+							"raw": 432,
+							"reachable": 61,
+							"A_t": 0.858796296296296,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.396694214876033,
+							"raw": 402,
+							"reachable": 62,
+							"A_t": 0.845771144278607,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.424242424242424,
+							"raw": 372,
+							"reachable": 58,
+							"A_t": 0.844086021505376,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.451790633608815,
+							"raw": 342,
+							"reachable": 59,
+							"A_t": 0.827485380116959,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.479338842975207,
+							"raw": 432,
+							"reachable": 121,
+							"A_t": 0.719907407407407,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.539026629935721,
+							"raw": 201,
+							"reachable": 56,
+							"A_t": 0.721393034825871,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.566574839302112,
+							"raw": 247,
+							"reachable": 70,
+							"A_t": 0.716599190283401,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.602387511478421,
+							"raw": 208,
+							"reachable": 63,
+							"A_t": 0.697115384615385,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.602387511478421,
+							"raw": 208,
+							"reachable": 63,
+							"A_t": 0.697115384615385,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.629935720844812,
+							"raw": 178,
+							"reachable": 62,
+							"A_t": 0.651685393258427,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.657483930211203,
+							"raw": 148,
+							"reachable": 48,
+							"A_t": 0.675675675675676,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.685032139577594,
+							"raw": 178,
+							"reachable": 74,
+							"A_t": 0.584269662921348,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.73921028466483,
+							"raw": 89,
+							"reachable": 54,
+							"A_t": 0.393258426966292,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.73921028466483,
+							"raw": 104,
+							"reachable": 54,
+							"A_t": 0.480769230769231,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.73921028466483,
+							"raw": 111,
+							"reachable": 61,
+							"A_t": 0.45045045045045,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.745638200183655,
+							"raw": 104,
+							"reachable": 54,
+							"A_t": 0.480769230769231,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.786960514233242,
+							"raw": 59,
+							"reachable": 30,
+							"A_t": 0.491525423728814,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.839302112029385,
+							"raw": 32,
+							"reachable": 28,
+							"A_t": 0.125,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.868686868686869,
+							"raw": 78,
+							"reachable": 73,
+							"A_t": 0.0641025641025641,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.89623507805326,
+							"raw": 48,
+							"reachable": 43,
+							"A_t": 0.104166666666667,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.923783287419651,
+							"raw": 30,
+							"reachable": 30,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.951331496786042,
+							"raw": 26,
+							"reachable": 26,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.975206611570248,
+							"raw": 18,
+							"reachable": 18,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.991735537190083,
+							"raw": 9,
+							"reachable": 9,
+							"A_t": 0.0,
+							"weight": 1.0
+						}
+					],
+					"priorityProgressFraction": 0.6,
+					"A": 0.686555901132021
+				},
+				"U": {
+					"meanWave": 5.01010101010101,
+					"p95Wave": 12.0,
+					"maxWave": 16.0,
+					"initiallyLockedFraction": 0.882460973370064,
+					"p95Norm": 0.413793103448276,
+					"meanNorm": 0.172762103796587,
+					"U": 0.411783984041037
+				},
+				"B": {
+					"decisionStates": 41,
+					"productiveActionHistogram": {
+						"3": 12,
+						"2": 13,
+						"1": 16
+					},
+					"reachableAlternativesTotal": 5680,
+					"lowChoiceFraction": 0.707317073170732,
+					"forcedFraction": 0.390243902439024,
+					"zeroProductiveStates": 0,
+					"longestForcedStreak": 9,
+					"forcedStreakNorm": 0.219512195121951,
+					"B": 0.458536585365854
+				},
+				"R": {
+					"meanLength": 35.8300278771351,
+					"boardDiagonal": 46.6690475583121,
+					"meanDetour": 1.39435756205935,
+					"meanTurns": 5.15335184221128,
+					"lengthVariance": 221.040281971037,
+					"lengthNorm": 0.383873570939777,
+					"detourNorm": 0.197178781029675,
+					"turnNorm": 0.64416898027641,
+					"R": 0.370589476338568
+				},
+				"S": {
+					"noWorkSlotFraction": 0.609756097560976,
+					"singleProductiveSlotFraction": 0.853658536585366,
+					"colorDemandImbalance": 0.0853709075839204,
+					"S": 0.564025653725248
+				}
+			},
+			"sessionLoad": {
+				"value": 26.6814820249315,
+				"status": "PROVISIONAL_STAGE_A",
+				"actionsNorm": 0.312841137604137,
+				"routeTimeNorm": 0.134362604539257,
+				"decisionCountNorm": 0.35042735042735,
+				"dispatches": 1089,
+				"routeTravelSeconds": 6503.15005970002,
+				"decisions": 41,
+				"estimatedAttemptSecondsProxy": 724.433334986369,
+				"proxyNote": "kernel wait-for-quiescence timing at 1x; not a calibrated human time"
+			},
+			"frustrationRisk": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"scalarNote": "No Frustration Risk scalar is claimed: 85% of the V1 weight (retryRisk, sessionOverrun, lateFailure) has no trustworthy supporting simulation or owner budget.",
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; solver success is not a human first-attempt clear probability"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner-locked per-slot Session Load budget exists"
+					},
+					"lateFailure": {
+						"status": "UNSUPPORTED",
+						"reason": "no failing-simulation population exists"
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.280992430613961,
+						"inputs": {
+							"B": 0.458536585365854,
+							"nonProductiveLegalChoiceFraction": 0.103448275862069
+						}
+					}
+				},
+				"supportedLowerBoundContribution": 4.21488645920942
+			},
+			"profile": {
+				"dominant": "COLOR",
+				"scores": {
+					"FLOW": 0.481041176487029,
+					"COLOR": 0.632449850315058,
+					"FORTRESS": 0.435160284703445,
+					"ROUTE": 0.528572688735294,
+					"MARATHON": 0.0132733818583677
+				},
+				"runnerUp": "ROUTE"
+			},
+			"noveltySignatureInputs": {
+				"colorLayers": {
+					"maxLayers": 4.0,
+					"meanLayers": 1.76492194674013
+				},
+				"peelHistogram": [
+					128.0,
+					120.0,
+					112.0,
+					104.0,
+					96.0,
+					88.0,
+					80.0,
+					72.0,
+					64.0,
+					56.0,
+					48.0,
+					40.0,
+					32.0,
+					24.0,
+					16.0,
+					8.0,
+					1.0
+				],
+				"routeMeanLength": 35.8300278771351,
+				"aspectRatio": 1.0,
+				"artCategory": "NOT_DEFINED (no canonical art taxonomy exists)",
+				"sourceFamily": "owner_original_art"
+			},
+			"sensitivity": {
+				"challengeRange": [
+					50.394296773423,
+					58.7767419144888
+				],
+				"sessionLoadRange": [
+					18.8604535848281,
+					42.3235389051384
+				],
+				"windowsReached": [
+					"OUTSIDE_HARD_LIMIT",
+					"OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT",
+					"IN_DEFAULT_WINDOW"
+				],
+				"variants": [
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 51.7797751965332,
+						"sessionLoad": 26.6814820249315,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 54.2106658307172,
+						"sessionLoad": 26.6814820249315,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 0.5,
+						"value": 14.5,
+						"challengeScore": 58.7767419144888,
+						"sessionLoad": 26.6814820249315,
+						"acceptanceWindow": "IN_DEFAULT_WINDOW"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 2.0,
+						"value": 58.0,
+						"challengeScore": 50.394296773423,
+						"sessionLoad": 26.6814820249315,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 54.9158762230073,
+						"sessionLoad": 26.6814820249315,
+						"acceptanceWindow": "IN_DEFAULT_WINDOW"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 52.3247296191638,
+						"sessionLoad": 26.6814820249315,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 0.5,
+						"value": 1.5,
+						"challengeScore": 55.2588223545899,
+						"sessionLoad": 26.6814820249315,
+						"acceptanceWindow": "IN_DEFAULT_WINDOW"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 2.0,
+						"value": 6.0,
+						"challengeScore": 52.7743697136159,
+						"sessionLoad": 26.6814820249315,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 0.5,
+						"value": 4.0,
+						"challengeScore": 53.9001071932254,
+						"sessionLoad": 26.6814820249315,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 2.0,
+						"value": 16.0,
+						"challengeScore": 52.5442761735019,
+						"sessionLoad": 26.6814820249315,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 0.5,
+						"value": 1740.5,
+						"challengeScore": 53.1884451537783,
+						"sessionLoad": 42.3235389051384,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 2.0,
+						"value": 6962.0,
+						"challengeScore": 53.1884451537783,
+						"sessionLoad": 18.8604535848281,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 0.5,
+						"value": 24200.0,
+						"challengeScore": 53.1884451537783,
+						"sessionLoad": 30.7123601611092,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 2.0,
+						"value": 96800.0,
+						"challengeScore": 53.1884451537783,
+						"sessionLoad": 24.6660429568427,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 0.5,
+						"value": 58.5,
+						"challengeScore": 53.1884451537783,
+						"sessionLoad": 33.6900290334786,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 2.0,
+						"value": 234.0,
+						"challengeScore": 53.1884451537783,
+						"sessionLoad": 23.177208520658,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					}
+				]
+			},
+			"ownerPathSensitivity": {
+				"policy": "OWNER_INTENDED_CLICKS",
+				"vector": {
+					"W": 0.448433666561813,
+					"C": 0.700874046904867,
+					"A": 0.559144921136758,
+					"U": 0.411783984041037,
+					"B": 0.0329268292682927,
+					"R": 0.305045269427922,
+					"S": 0.110465464428015
+				},
+				"challengeScore": 39.0650352503308,
+				"signedDelta": -18.9349647496692,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 26.6419779065323,
+				"decisions": 41,
+				"path": {
+					"steps": 41.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1089.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1089.0,
+					"maxParallelClaims": 1.0
+				}
+			},
+			"staticQa": "PASS",
+			"m53Verdict": "TUNING_REQUIRED",
+			"novelty": {
+				"nearestPriorLevel": "level_004_orange_cat",
+				"nearestPriorSimilarity": {
+					"vector": 0.925957749374216,
+					"palette": 0.307692307692308,
+					"dimensions": 0.940312213039486,
+					"combined": 0.724654090035337
+				},
+				"novelty": 0.275345909964663,
+				"noveltyTarget": 0.3,
+				"meetsNoveltyTarget": false,
+				"status": "INFORMATIONAL_STAGE_A (provisional similarity; no art taxonomy)"
+			}
+		},
+		{
+			"order": 6,
+			"id": "level_006_chicken",
+			"class": "EASY",
+			"slot": 6,
+			"role": "strong_recovery",
+			"noveltyTarget": 0.65,
+			"width": 32,
+			"height": 32,
+			"palette": [
+				"C01",
+				"C02",
+				"C03",
+				"C08",
+				"C11",
+				"C12",
+				"C14",
+				"C16"
+			],
+			"levelSha256": "22aa7df9e837e1403f672fea0efc988ce8222840f9a9c24a3f943685525ca762",
+			"provenance": {
+				"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+				"analysisConfig": "res://data/config/level_difficulty_analysis_v1.json",
+				"analysisConfigVersion": 1.0,
+				"calibrationStage": "STAGE_A_PROVISIONAL",
+				"scoreModelSchema": "scrubbots-difficulty-score-model/v1",
+				"scoreModelVersion": 1.0,
+				"progressionModelSchema": "scrubbots-level-progression/v1",
+				"progressionModelVersion": 1.0,
+				"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+				"kernel": "res://scripts/gameplay/solver/proof_kernel.gd",
+				"routing": "res://scripts/gameplay/routing/production_routing_system.gd",
+				"access": "res://scripts/gameplay/dispatch/production_target_access.gd"
+			},
+			"supplyAuthority": "SupplyPlanLoader res://data/levels/supply/level_006_chicken_supply_v1.json",
+			"referencePath": {
+				"policy": "ORACLE_SOLVER_TRACE",
+				"traceHash": 3310440768.0,
+				"traceSource": "M52 owner-plan verification evidence (hash-verified; replayed step-exact here)",
+				"decisions": 40,
+				"path": {
+					"steps": 40.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 970.0,
+					"maxParallelClaims": 3.0
+				}
+			},
+			"vector": {
+				"W": 0.413938769133981,
+				"C": 0.54003753714462,
+				"A": 0.705826417516291,
+				"U": 0.409529903017241,
+				"B": 0.47375,
+				"R": 0.342344498835549,
+				"S": 0.583390638864241
+			},
+			"challengeScore": 50.9106785361777,
+			"targetChallenge": 18.0,
+			"signedDelta": 32.9106785361777,
+			"absoluteDelta": 32.9106785361777,
+			"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+			"supporting": {
+				"W": {
+					"activeCells": 1024,
+					"dispatches": 1024,
+					"routeDistanceTotal": 33095.3997941017,
+					"cellTransform": "sqrt",
+					"W": 0.413938769133981
+				},
+				"C": {
+					"usedColors": 8.0,
+					"frequencyByHex": {
+						"#FF4500FF": 12.0,
+						"#FFA800FF": 5.0,
+						"#FFD635FF": 41.0,
+						"#2450A4FF": 702.0,
+						"#9C6926FF": 58.0,
+						"#FFF8B8FF": 133.0,
+						"#515252FF": 71.0,
+						"#000000FF": 2.0
+					},
+					"normalizedEntropy": 0.524519518733684,
+					"countNorm": 0.555555555555556,
+					"C": 0.54003753714462
+				},
+				"A": {
+					"samples": [
+						{
+							"progress": 0.0,
+							"raw": 702,
+							"reachable": 124,
+							"A_t": 0.823361823361823,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.029296875,
+							"raw": 672,
+							"reachable": 123,
+							"A_t": 0.816964285714286,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.05859375,
+							"raw": 642,
+							"reachable": 121,
+							"A_t": 0.811526479750779,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.087890625,
+							"raw": 612,
+							"reachable": 119,
+							"A_t": 0.805555555555556,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.1171875,
+							"raw": 582,
+							"reachable": 117,
+							"A_t": 0.798969072164949,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.146484375,
+							"raw": 552,
+							"reachable": 108,
+							"A_t": 0.804347826086957,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.17578125,
+							"raw": 522,
+							"reachable": 104,
+							"A_t": 0.800766283524904,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.205078125,
+							"raw": 492,
+							"reachable": 100,
+							"A_t": 0.796747967479675,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.234375,
+							"raw": 533,
+							"reachable": 110,
+							"A_t": 0.793621013133208,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.251953125,
+							"raw": 527,
+							"reachable": 97,
+							"A_t": 0.815939278937381,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.251953125,
+							"raw": 660,
+							"reachable": 97,
+							"A_t": 0.853030303030303,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.251953125,
+							"raw": 660,
+							"reachable": 97,
+							"A_t": 0.853030303030303,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.251953125,
+							"raw": 701,
+							"reachable": 101,
+							"A_t": 0.855920114122682,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.328125,
+							"raw": 490,
+							"reachable": 110,
+							"A_t": 0.775510204081633,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.328125,
+							"raw": 490,
+							"reachable": 110,
+							"A_t": 0.775510204081633,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.357421875,
+							"raw": 460,
+							"reachable": 101,
+							"A_t": 0.780434782608696,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.38671875,
+							"raw": 430,
+							"reachable": 93,
+							"A_t": 0.783720930232558,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.416015625,
+							"raw": 400,
+							"reachable": 85,
+							"A_t": 0.7875,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4453125,
+							"raw": 370,
+							"reachable": 77,
+							"A_t": 0.791891891891892,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.474609375,
+							"raw": 340,
+							"reachable": 67,
+							"A_t": 0.802941176470588,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.50390625,
+							"raw": 310,
+							"reachable": 61,
+							"A_t": 0.803225806451613,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.533203125,
+							"raw": 280,
+							"reachable": 58,
+							"A_t": 0.792857142857143,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5732421875,
+							"raw": 280,
+							"reachable": 89,
+							"A_t": 0.682142857142857,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.6064453125,
+							"raw": 240,
+							"reachable": 71,
+							"A_t": 0.704166666666667,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.611328125,
+							"raw": 329,
+							"reachable": 89,
+							"A_t": 0.729483282674772,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.640625,
+							"raw": 293,
+							"reachable": 118,
+							"A_t": 0.597269624573379,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.669921875,
+							"raw": 246,
+							"reachable": 72,
+							"A_t": 0.707317073170732,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.6748046875,
+							"raw": 241,
+							"reachable": 68,
+							"A_t": 0.717842323651452,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7060546875,
+							"raw": 198,
+							"reachable": 73,
+							"A_t": 0.631313131313131,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7353515625,
+							"raw": 168,
+							"reachable": 71,
+							"A_t": 0.577380952380952,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7646484375,
+							"raw": 138,
+							"reachable": 69,
+							"A_t": 0.5,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7939453125,
+							"raw": 108,
+							"reachable": 67,
+							"A_t": 0.37962962962963,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8232421875,
+							"raw": 78,
+							"reachable": 65,
+							"A_t": 0.166666666666667,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8525390625,
+							"raw": 48,
+							"reachable": 42,
+							"A_t": 0.125,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8818359375,
+							"raw": 18,
+							"reachable": 12,
+							"A_t": 0.333333333333333,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8935546875,
+							"raw": 17,
+							"reachable": 9,
+							"A_t": 0.470588235294118,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.908203125,
+							"raw": 66,
+							"reachable": 30,
+							"A_t": 0.545454545454545,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.939453125,
+							"raw": 34,
+							"reachable": 18,
+							"A_t": 0.470588235294118,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.96875,
+							"raw": 28,
+							"reachable": 28,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.99609375,
+							"raw": 4,
+							"reachable": 4,
+							"A_t": 0.0,
+							"weight": 1.0
+						}
+					],
+					"priorityProgressFraction": 0.6,
+					"A": 0.705826417516291
+				},
+				"U": {
+					"meanWave": 4.84375,
+					"p95Wave": 12.0,
+					"maxWave": 15.0,
+					"initiallyLockedFraction": 0.87890625,
+					"p95Norm": 0.413793103448276,
+					"meanNorm": 0.167025862068966,
+					"U": 0.409529903017241
+				},
+				"B": {
+					"decisionStates": 40,
+					"productiveActionHistogram": {
+						"3": 10,
+						"2": 17,
+						"1": 13
+					},
+					"reachableAlternativesTotal": 6254,
+					"lowChoiceFraction": 0.75,
+					"forcedFraction": 0.325,
+					"zeroProductiveStates": 0,
+					"longestForcedStreak": 13,
+					"forcedStreakNorm": 0.325,
+					"B": 0.47375
+				},
+				"R": {
+					"meanLength": 32.3197263614275,
+					"boardDiagonal": 45.254833995939,
+					"meanDetour": 1.33853560295958,
+					"meanTurns": 4.89648451125704,
+					"lengthVariance": 144.889378063957,
+					"lengthNorm": 0.357085901191547,
+					"detourNorm": 0.16926780147979,
+					"turnNorm": 0.61206056390713,
+					"R": 0.342344498835549
+				},
+				"S": {
+					"noWorkSlotFraction": 0.7,
+					"singleProductiveSlotFraction": 0.825,
+					"colorDemandImbalance": 0.0585625554569654,
+					"S": 0.583390638864241
+				}
+			},
+			"sessionLoad": {
+				"value": 24.9649702188449,
+				"status": "PROVISIONAL_STAGE_A",
+				"actionsNorm": 0.294168342430336,
+				"routeTimeNorm": 0.113964875324042,
+				"decisionCountNorm": 0.341880341880342,
+				"dispatches": 1024,
+				"routeTravelSeconds": 5515.89996568362,
+				"decisions": 40,
+				"estimatedAttemptSecondsProxy": 675.033332308133,
+				"proxyNote": "kernel wait-for-quiescence timing at 1x; not a calibrated human time"
+			},
+			"frustrationRisk": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"scalarNote": "No Frustration Risk scalar is claimed: 85% of the V1 weight (retryRisk, sessionOverrun, lateFailure) has no trustworthy supporting simulation or owner budget.",
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; solver success is not a human first-attempt clear probability"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner-locked per-slot Session Load budget exists"
+					},
+					"lateFailure": {
+						"status": "UNSUPPORTED",
+						"reason": "no failing-simulation population exists"
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.261566358024691,
+						"inputs": {
+							"B": 0.47375,
+							"nonProductiveLegalChoiceFraction": 0.0493827160493827
+						}
+					}
+				},
+				"supportedLowerBoundContribution": 3.92349537037037
+			},
+			"profile": {
+				"dominant": "BALANCED",
+				"scores": {
+					"FLOW": 0.470297893155489,
+					"COLOR": 0.56171408800443,
+					"FORTRESS": 0.441639951508621,
+					"ROUTE": 0.52408545817592,
+					"MARATHON": -0.0277011823746393
+				},
+				"runnerUp": "ROUTE"
+			},
+			"noveltySignatureInputs": {
+				"colorLayers": {
+					"maxLayers": 4.0,
+					"meanLayers": 1.580078125
+				},
+				"peelHistogram": [
+					124.0,
+					116.0,
+					108.0,
+					100.0,
+					92.0,
+					84.0,
+					76.0,
+					68.0,
+					60.0,
+					52.0,
+					44.0,
+					36.0,
+					28.0,
+					20.0,
+					12.0,
+					4.0
+				],
+				"routeMeanLength": 32.3197263614275,
+				"aspectRatio": 1.0,
+				"artCategory": "NOT_DEFINED (no canonical art taxonomy exists)",
+				"sourceFamily": "owner_original_art"
+			},
+			"sensitivity": {
+				"challengeRange": [
+					48.1337388810052,
+					56.4645578465225
+				],
+				"sessionLoadRange": [
+					17.6107616580865,
+					39.6733873403617
+				],
+				"windowsReached": [
+					"OUTSIDE_HARD_LIMIT"
+				],
+				"variants": [
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 49.8249246867593,
+						"sessionLoad": 24.9649702188449,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 51.7075620953838,
+						"sessionLoad": 24.9649702188449,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 0.5,
+						"value": 14.5,
+						"challengeScore": 56.4645578465225,
+						"sessionLoad": 24.9649702188449,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 2.0,
+						"value": 58.0,
+						"challengeScore": 48.1337388810052,
+						"sessionLoad": 24.9649702188449,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 52.5175650915396,
+						"sessionLoad": 24.9649702188449,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 50.1072352584967,
+						"sessionLoad": 24.9649702188449,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 0.5,
+						"value": 1.5,
+						"challengeScore": 52.6879904517155,
+						"sessionLoad": 24.9649702188449,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 2.0,
+						"value": 6.0,
+						"challengeScore": 50.5552161530701,
+						"sessionLoad": 24.9649702188449,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 0.5,
+						"value": 4.0,
+						"challengeScore": 51.6865574083634,
+						"sessionLoad": 24.9649702188449,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 2.0,
+						"value": 16.0,
+						"challengeScore": 50.2986179722705,
+						"sessionLoad": 24.9649702188449,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 0.5,
+						"value": 1740.5,
+						"challengeScore": 50.9106785361777,
+						"sessionLoad": 39.6733873403617,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 2.0,
+						"value": 6962.0,
+						"challengeScore": 50.9106785361777,
+						"sessionLoad": 17.6107616580865,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 0.5,
+						"value": 24200.0,
+						"challengeScore": 50.9106785361777,
+						"sessionLoad": 28.3839164785661,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 2.0,
+						"value": 96800.0,
+						"challengeScore": 50.9106785361777,
+						"sessionLoad": 23.2554970889843,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 0.5,
+						"value": 58.5,
+						"challengeScore": 50.9106785361777,
+						"sessionLoad": 31.8025770564517,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 2.0,
+						"value": 234.0,
+						"challengeScore": 50.9106785361777,
+						"sessionLoad": 21.5461668000415,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					}
+				]
+			},
+			"ownerPathSensitivity": {
+				"policy": "OWNER_INTENDED_CLICKS",
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.54003753714462,
+					"A": 0.603318499345802,
+					"U": 0.409529903017241,
+					"B": 0.03375,
+					"R": 0.323697124794016,
+					"S": 0.251424379610999
+				},
+				"challengeScore": 38.7543838398201,
+				"signedDelta": 20.7543838398201,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.2668503398297,
+				"decisions": 40,
+				"path": {
+					"steps": 40.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1024.0,
+					"maxParallelClaims": 1.0
+				}
+			},
+			"staticQa": "PASS",
+			"m53Verdict": "TUNING_REQUIRED",
+			"novelty": {
+				"nearestPriorLevel": "level_005_party_toucan",
+				"nearestPriorSimilarity": {
+					"vector": 0.935813949121321,
+					"palette": 0.636363636363636,
+					"dimensions": 0.940312213039486,
+					"combined": 0.837496599508147
+				},
+				"novelty": 0.162503400491853,
+				"noveltyTarget": 0.65,
+				"meetsNoveltyTarget": false,
+				"status": "INFORMATIONAL_STAGE_A (provisional similarity; no art taxonomy)"
+			}
+		},
+		{
+			"order": 7,
+			"id": "level_007_pigeon",
+			"class": "EASY",
+			"slot": 7,
+			"role": "playful_novelty",
+			"noveltyTarget": 0.75,
+			"width": 32,
+			"height": 32,
+			"palette": [
+				"C01",
+				"C08",
+				"C10",
+				"C11",
+				"C13",
+				"C14",
+				"C15",
+				"C16"
+			],
+			"levelSha256": "7b2884005a7685e3bfe6d47e99f197e56a395a5e914c3479f830fd1dcb200272",
+			"provenance": {
+				"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+				"analysisConfig": "res://data/config/level_difficulty_analysis_v1.json",
+				"analysisConfigVersion": 1.0,
+				"calibrationStage": "STAGE_A_PROVISIONAL",
+				"scoreModelSchema": "scrubbots-difficulty-score-model/v1",
+				"scoreModelVersion": 1.0,
+				"progressionModelSchema": "scrubbots-level-progression/v1",
+				"progressionModelVersion": 1.0,
+				"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+				"kernel": "res://scripts/gameplay/solver/proof_kernel.gd",
+				"routing": "res://scripts/gameplay/routing/production_routing_system.gd",
+				"access": "res://scripts/gameplay/dispatch/production_target_access.gd"
+			},
+			"supplyAuthority": "SupplyPlanLoader res://data/levels/supply/level_007_pigeon_supply_v1.json",
+			"referencePath": {
+				"policy": "ORACLE_SOLVER_TRACE",
+				"traceHash": 2191893116.0,
+				"traceSource": "M52 owner-plan verification evidence (hash-verified; replayed step-exact here)",
+				"decisions": 39,
+				"path": {
+					"steps": 39.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 973.0,
+					"maxParallelClaims": 3.0
+				}
+			},
+			"vector": {
+				"W": 0.413938769133981,
+				"C": 0.559005909908171,
+				"A": 0.687336785452279,
+				"U": 0.409529903017241,
+				"B": 0.476923076923077,
+				"R": 0.362450408133652,
+				"S": 0.571849800154267
+			},
+			"challengeScore": 50.9586583460781,
+			"targetChallenge": 21.0,
+			"signedDelta": 29.9586583460781,
+			"absoluteDelta": 29.9586583460781,
+			"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+			"supporting": {
+				"W": {
+					"activeCells": 1024,
+					"dispatches": 1024,
+					"routeDistanceTotal": 35183.399646759,
+					"cellTransform": "sqrt",
+					"W": 0.413938769133981
+				},
+				"C": {
+					"usedColors": 8.0,
+					"frequencyByHex": {
+						"#FF4500FF": 9.0,
+						"#2450A4FF": 666.0,
+						"#FF3881FF": 2.0,
+						"#9C6926FF": 9.0,
+						"#D4D7D9FF": 43.0,
+						"#515252FF": 126.0,
+						"#FFFFFFFF": 58.0,
+						"#000000FF": 111.0
+					},
+					"normalizedEntropy": 0.562456264260787,
+					"countNorm": 0.555555555555556,
+					"C": 0.559005909908171
+				},
+				"A": {
+					"samples": [
+						{
+							"progress": 0.0,
+							"raw": 666,
+							"reachable": 124,
+							"A_t": 0.813813813813814,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.029296875,
+							"raw": 636,
+							"reachable": 123,
+							"A_t": 0.806603773584906,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.05859375,
+							"raw": 606,
+							"reachable": 121,
+							"A_t": 0.8003300330033,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.087890625,
+							"raw": 576,
+							"reachable": 117,
+							"A_t": 0.796875,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.1171875,
+							"raw": 546,
+							"reachable": 107,
+							"A_t": 0.804029304029304,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.146484375,
+							"raw": 516,
+							"reachable": 103,
+							"A_t": 0.800387596899225,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.17578125,
+							"raw": 486,
+							"reachable": 90,
+							"A_t": 0.814814814814815,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.205078125,
+							"raw": 582,
+							"reachable": 85,
+							"A_t": 0.853951890034364,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.205078125,
+							"raw": 625,
+							"reachable": 85,
+							"A_t": 0.864,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.205078125,
+							"raw": 736,
+							"reachable": 117,
+							"A_t": 0.841032608695652,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.2646484375,
+							"raw": 498,
+							"reachable": 86,
+							"A_t": 0.827309236947791,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.2939453125,
+							"raw": 468,
+							"reachable": 81,
+							"A_t": 0.826923076923077,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.2939453125,
+							"raw": 468,
+							"reachable": 81,
+							"A_t": 0.826923076923077,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.2998046875,
+							"raw": 462,
+							"reachable": 82,
+							"A_t": 0.822510822510823,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3291015625,
+							"raw": 432,
+							"reachable": 79,
+							"A_t": 0.81712962962963,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3583984375,
+							"raw": 402,
+							"reachable": 76,
+							"A_t": 0.810945273631841,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3876953125,
+							"raw": 372,
+							"reachable": 74,
+							"A_t": 0.801075268817204,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4169921875,
+							"raw": 342,
+							"reachable": 71,
+							"A_t": 0.792397660818713,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4462890625,
+							"raw": 312,
+							"reachable": 70,
+							"A_t": 0.775641025641026,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4755859375,
+							"raw": 282,
+							"reachable": 66,
+							"A_t": 0.765957446808511,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5048828125,
+							"raw": 348,
+							"reachable": 73,
+							"A_t": 0.790229885057471,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5615234375,
+							"raw": 282,
+							"reachable": 73,
+							"A_t": 0.74113475177305,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5908203125,
+							"raw": 290,
+							"reachable": 74,
+							"A_t": 0.744827586206896,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.62890625,
+							"raw": 296,
+							"reachable": 128,
+							"A_t": 0.567567567567568,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.6494140625,
+							"raw": 224,
+							"reachable": 70,
+							"A_t": 0.6875,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.658203125,
+							"raw": 251,
+							"reachable": 83,
+							"A_t": 0.669322709163347,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.6640625,
+							"raw": 215,
+							"reachable": 66,
+							"A_t": 0.693023255813954,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.693359375,
+							"raw": 185,
+							"reachable": 61,
+							"A_t": 0.67027027027027,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.72265625,
+							"raw": 155,
+							"reachable": 60,
+							"A_t": 0.612903225806452,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.751953125,
+							"raw": 125,
+							"reachable": 57,
+							"A_t": 0.544,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.78125,
+							"raw": 95,
+							"reachable": 62,
+							"A_t": 0.347368421052632,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.810546875,
+							"raw": 65,
+							"reachable": 58,
+							"A_t": 0.107692307692308,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.83984375,
+							"raw": 65,
+							"reachable": 59,
+							"A_t": 0.0923076923076923,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.869140625,
+							"raw": 35,
+							"reachable": 29,
+							"A_t": 0.171428571428571,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9033203125,
+							"raw": 30,
+							"reachable": 22,
+							"A_t": 0.266666666666667,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9326171875,
+							"raw": 30,
+							"reachable": 30,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9619140625,
+							"raw": 28,
+							"reachable": 25,
+							"A_t": 0.107142857142857,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9892578125,
+							"raw": 9,
+							"reachable": 9,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.998046875,
+							"raw": 2,
+							"reachable": 2,
+							"A_t": 0.0,
+							"weight": 1.0
+						}
+					],
+					"priorityProgressFraction": 0.6,
+					"A": 0.687336785452279
+				},
+				"U": {
+					"meanWave": 4.84375,
+					"p95Wave": 12.0,
+					"maxWave": 15.0,
+					"initiallyLockedFraction": 0.87890625,
+					"p95Norm": 0.413793103448276,
+					"meanNorm": 0.167025862068966,
+					"U": 0.409529903017241
+				},
+				"B": {
+					"decisionStates": 39,
+					"productiveActionHistogram": {
+						"3": 10,
+						"2": 16,
+						"1": 13
+					},
+					"reachableAlternativesTotal": 5637,
+					"lowChoiceFraction": 0.743589743589744,
+					"forcedFraction": 0.333333333333333,
+					"zeroProductiveStates": 0,
+					"longestForcedStreak": 13,
+					"forcedStreakNorm": 0.333333333333333,
+					"B": 0.476923076923077
+				},
+				"R": {
+					"meanLength": 34.3587887175381,
+					"boardDiagonal": 45.254833995939,
+					"meanDetour": 1.42088627566685,
+					"meanTurns": 4.71875013131115,
+					"lengthVariance": 174.158104670821,
+					"lengthNorm": 0.37961457024261,
+					"detourNorm": 0.210443137833425,
+					"turnNorm": 0.589843766413894,
+					"R": 0.362450408133652
+				},
+				"S": {
+					"noWorkSlotFraction": 0.666666666666667,
+					"singleProductiveSlotFraction": 0.82051282051282,
+					"colorDemandImbalance": 0.0720145852324521,
+					"S": 0.571849800154267
+				}
+			},
+			"sessionLoad": {
+				"value": 25.0097325120222,
+				"status": "PROVISIONAL_STAGE_A",
+				"actionsNorm": 0.294168342430336,
+				"routeTimeNorm": 0.121154957461291,
+				"decisionCountNorm": 0.333333333333333,
+				"dispatches": 1024,
+				"routeTravelSeconds": 5863.8999411265,
+				"decisions": 39,
+				"estimatedAttemptSecondsProxy": 699.166664441427,
+				"proxyNote": "kernel wait-for-quiescence timing at 1x; not a calibrated human time"
+			},
+			"frustrationRisk": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"scalarNote": "No Frustration Risk scalar is claimed: 85% of the V1 weight (retryRisk, sessionOverrun, lateFailure) has no trustworthy supporting simulation or owner budget.",
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; solver success is not a human first-attempt clear probability"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner-locked per-slot Session Load budget exists"
+					},
+					"lateFailure": {
+						"status": "UNSUPPORTED",
+						"reason": "no failing-simulation population exists"
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.257692307692308,
+						"inputs": {
+							"B": 0.476923076923077,
+							"nonProductiveLegalChoiceFraction": 0.0384615384615385
+						}
+					}
+				},
+				"supportedLowerBoundContribution": 3.86538461538462
+			},
+			"profile": {
+				"dominant": "BALANCED",
+				"scores": {
+					"FLOW": 0.475403411535801,
+					"COLOR": 0.565427855031219,
+					"FORTRESS": 0.443226489970159,
+					"ROUTE": 0.524893596792965,
+					"MARATHON": -0.0292877208361778
+				},
+				"runnerUp": "ROUTE"
+			},
+			"noveltySignatureInputs": {
+				"colorLayers": {
+					"maxLayers": 5.0,
+					"meanLayers": 1.640625
+				},
+				"peelHistogram": [
+					124.0,
+					116.0,
+					108.0,
+					100.0,
+					92.0,
+					84.0,
+					76.0,
+					68.0,
+					60.0,
+					52.0,
+					44.0,
+					36.0,
+					28.0,
+					20.0,
+					12.0,
+					4.0
+				],
+				"routeMeanLength": 34.3587887175381,
+				"aspectRatio": 1.0,
+				"artCategory": "NOT_DEFINED (no canonical art taxonomy exists)",
+				"sourceFamily": "owner_original_art"
+			},
+			"sensitivity": {
+				"challengeRange": [
+					48.1817186909057,
+					56.512537656423
+				],
+				"sessionLoadRange": [
+					17.6555239512638,
+					39.718149633539
+				],
+				"windowsReached": [
+					"OUTSIDE_HARD_LIMIT"
+				],
+				"variants": [
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 49.558608340354,
+						"sessionLoad": 25.0097325120222,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 51.9698055724345,
+						"sessionLoad": 25.0097325120222,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 0.5,
+						"value": 14.5,
+						"challengeScore": 56.512537656423,
+						"sessionLoad": 25.0097325120222,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 2.0,
+						"value": 58.0,
+						"challengeScore": 48.1817186909057,
+						"sessionLoad": 25.0097325120222,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 52.6669239121699,
+						"sessionLoad": 25.0097325120222,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 50.1045255630323,
+						"sessionLoad": 25.0097325120222,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 0.5,
+						"value": 1.5,
+						"challengeScore": 53.1683112933291,
+						"sessionLoad": 25.0097325120222,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 2.0,
+						"value": 6.0,
+						"challengeScore": 50.5167277566279,
+						"sessionLoad": 25.0097325120222,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 0.5,
+						"value": 4.0,
+						"challengeScore": 51.7789708132503,
+						"sessionLoad": 25.0097325120222,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 2.0,
+						"value": 16.0,
+						"challengeScore": 50.3688145796642,
+						"sessionLoad": 25.0097325120222,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 0.5,
+						"value": 1740.5,
+						"challengeScore": 50.9586583460781,
+						"sessionLoad": 39.718149633539,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 2.0,
+						"value": 6962.0,
+						"challengeScore": 50.9586583460781,
+						"sessionLoad": 17.6555239512638,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 0.5,
+						"value": 24200.0,
+						"challengeScore": 50.9586583460781,
+						"sessionLoad": 28.6443812358609,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 2.0,
+						"value": 96800.0,
+						"challengeScore": 50.9586583460781,
+						"sessionLoad": 23.1924081501028,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 0.5,
+						"value": 58.5,
+						"challengeScore": 50.9586583460781,
+						"sessionLoad": 31.6763991786889,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 2.0,
+						"value": 234.0,
+						"challengeScore": 50.9586583460781,
+						"sessionLoad": 21.6763991786889,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					}
+				]
+			},
+			"ownerPathSensitivity": {
+				"policy": "OWNER_INTENDED_CLICKS",
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.559005909908171,
+					"A": 0.604942559926641,
+					"U": 0.409529903017241,
+					"B": 0.0807692307692308,
+					"R": 0.326508114388582,
+					"S": 0.217716555744725
+				},
+				"challengeScore": 39.4677107617116,
+				"signedDelta": 18.4677107617116,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.2221085213564,
+				"decisions": 39,
+				"path": {
+					"steps": 39.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1024.0,
+					"maxParallelClaims": 1.0
+				}
+			},
+			"staticQa": "PASS",
+			"m53Verdict": "TUNING_REQUIRED",
+			"novelty": {
+				"nearestPriorLevel": "level_006_chicken",
+				"nearestPriorSimilarity": {
+					"vector": 0.986641361151714,
+					"palette": 0.454545454545455,
+					"dimensions": 1.0,
+					"combined": 0.813728938565723
+				},
+				"novelty": 0.186271061434277,
+				"noveltyTarget": 0.75,
+				"meetsNoveltyTarget": false,
+				"status": "INFORMATIONAL_STAGE_A (provisional similarity; no art taxonomy)"
+			}
+		},
+		{
+			"order": 8,
+			"id": "level_008_butterfly",
+			"class": "MEDIUM",
+			"slot": 8,
+			"role": "second_tension",
+			"noveltyTarget": 0.45,
+			"width": 32,
+			"height": 32,
+			"palette": [
+				"C01",
+				"C02",
+				"C03",
+				"C08",
+				"C11",
+				"C14",
+				"C15",
+				"C16"
+			],
+			"levelSha256": "672053fc43ec1d5f50cc5f27ed98e7e0d022c62524b47b831a8addf32343f339",
+			"provenance": {
+				"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+				"analysisConfig": "res://data/config/level_difficulty_analysis_v1.json",
+				"analysisConfigVersion": 1.0,
+				"calibrationStage": "STAGE_A_PROVISIONAL",
+				"scoreModelSchema": "scrubbots-difficulty-score-model/v1",
+				"scoreModelVersion": 1.0,
+				"progressionModelSchema": "scrubbots-level-progression/v1",
+				"progressionModelVersion": 1.0,
+				"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+				"kernel": "res://scripts/gameplay/solver/proof_kernel.gd",
+				"routing": "res://scripts/gameplay/routing/production_routing_system.gd",
+				"access": "res://scripts/gameplay/dispatch/production_target_access.gd"
+			},
+			"supplyAuthority": "SupplyPlanLoader res://data/levels/supply/level_008_butterfly_supply_v1.json",
+			"referencePath": {
+				"policy": "ORACLE_SOLVER_TRACE",
+				"traceHash": 2524445735.0,
+				"traceSource": "M52 owner-plan verification evidence (hash-verified; replayed step-exact here)",
+				"decisions": 37,
+				"path": {
+					"steps": 37.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 994.0,
+					"maxParallelClaims": 2.0
+				}
+			},
+			"vector": {
+				"W": 0.413938769133981,
+				"C": 0.630985712663501,
+				"A": 0.612964450410319,
+				"U": 0.409529903017241,
+				"B": 0.437837837837838,
+				"R": 0.370962569127666,
+				"S": 0.304197057501124
+			},
+			"challengeScore": 47.373224283699,
+			"targetChallenge": 42.0,
+			"signedDelta": 5.37322428369899,
+			"absoluteDelta": 5.37322428369899,
+			"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+			"supporting": {
+				"W": {
+					"activeCells": 1024,
+					"dispatches": 1024,
+					"routeDistanceTotal": 37749.5995807648,
+					"cellTransform": "sqrt",
+					"W": 0.413938769133981
+				},
+				"C": {
+					"usedColors": 8.0,
+					"frequencyByHex": {
+						"#FF4500FF": 55.0,
+						"#FFA800FF": 150.0,
+						"#FFD635FF": 47.0,
+						"#2450A4FF": 482.0,
+						"#9C6926FF": 7.0,
+						"#515252FF": 15.0,
+						"#FFFFFFFF": 28.0,
+						"#000000FF": 240.0
+					},
+					"normalizedEntropy": 0.706415869771446,
+					"countNorm": 0.555555555555556,
+					"C": 0.630985712663501
+				},
+				"A": {
+					"samples": [
+						{
+							"progress": 0.0,
+							"raw": 482,
+							"reachable": 110,
+							"A_t": 0.771784232365145,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.029296875,
+							"raw": 452,
+							"reachable": 109,
+							"A_t": 0.758849557522124,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.05859375,
+							"raw": 422,
+							"reachable": 107,
+							"A_t": 0.746445497630332,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.087890625,
+							"raw": 392,
+							"reachable": 103,
+							"A_t": 0.737244897959184,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.1171875,
+							"raw": 602,
+							"reachable": 117,
+							"A_t": 0.805647840531561,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.146484375,
+							"raw": 572,
+							"reachable": 125,
+							"A_t": 0.781468531468531,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.17578125,
+							"raw": 512,
+							"reachable": 127,
+							"A_t": 0.751953125,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.205078125,
+							"raw": 482,
+							"reachable": 126,
+							"A_t": 0.738589211618257,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.234375,
+							"raw": 452,
+							"reachable": 127,
+							"A_t": 0.719026548672566,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.255859375,
+							"raw": 477,
+							"reachable": 128,
+							"A_t": 0.731656184486373,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.29296875,
+							"raw": 542,
+							"reachable": 172,
+							"A_t": 0.682656826568266,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.322265625,
+							"raw": 379,
+							"reachable": 143,
+							"A_t": 0.622691292875989,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3388671875,
+							"raw": 362,
+							"reachable": 131,
+							"A_t": 0.638121546961326,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3408203125,
+							"raw": 360,
+							"reachable": 129,
+							"A_t": 0.641666666666667,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3701171875,
+							"raw": 330,
+							"reachable": 112,
+							"A_t": 0.660606060606061,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3994140625,
+							"raw": 300,
+							"reachable": 100,
+							"A_t": 0.666666666666667,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4287109375,
+							"raw": 420,
+							"reachable": 136,
+							"A_t": 0.676190476190476,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4580078125,
+							"raw": 390,
+							"reachable": 134,
+							"A_t": 0.656410256410256,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4873046875,
+							"raw": 330,
+							"reachable": 135,
+							"A_t": 0.590909090909091,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5166015625,
+							"raw": 360,
+							"reachable": 125,
+							"A_t": 0.652777777777778,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5458984375,
+							"raw": 330,
+							"reachable": 113,
+							"A_t": 0.657575757575758,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5751953125,
+							"raw": 300,
+							"reachable": 120,
+							"A_t": 0.6,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5771484375,
+							"raw": 298,
+							"reachable": 121,
+							"A_t": 0.593959731543624,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.6064453125,
+							"raw": 296,
+							"reachable": 126,
+							"A_t": 0.574324324324324,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.6357421875,
+							"raw": 281,
+							"reachable": 113,
+							"A_t": 0.597864768683274,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.654296875,
+							"raw": 262,
+							"reachable": 100,
+							"A_t": 0.618320610687023,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.68359375,
+							"raw": 232,
+							"reachable": 85,
+							"A_t": 0.633620689655172,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.720703125,
+							"raw": 194,
+							"reachable": 64,
+							"A_t": 0.670103092783505,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7626953125,
+							"raw": 151,
+							"reachable": 70,
+							"A_t": 0.536423841059603,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.79296875,
+							"raw": 120,
+							"reachable": 68,
+							"A_t": 0.433333333333333,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.822265625,
+							"raw": 90,
+							"reachable": 65,
+							"A_t": 0.277777777777778,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8515625,
+							"raw": 60,
+							"reachable": 60,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.880859375,
+							"raw": 30,
+							"reachable": 30,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.91015625,
+							"raw": 55,
+							"reachable": 35,
+							"A_t": 0.363636363636364,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.939453125,
+							"raw": 30,
+							"reachable": 28,
+							"A_t": 0.0666666666666667,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.96875,
+							"raw": 25,
+							"reachable": 19,
+							"A_t": 0.24,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9931640625,
+							"raw": 7,
+							"reachable": 7,
+							"A_t": 0.0,
+							"weight": 1.0
+						}
+					],
+					"priorityProgressFraction": 0.6,
+					"A": 0.612964450410319
+				},
+				"U": {
+					"meanWave": 4.84375,
+					"p95Wave": 12.0,
+					"maxWave": 15.0,
+					"initiallyLockedFraction": 0.87890625,
+					"p95Norm": 0.413793103448276,
+					"meanNorm": 0.167025862068966,
+					"U": 0.409529903017241
+				},
+				"B": {
+					"decisionStates": 37,
+					"productiveActionHistogram": {
+						"3": 13,
+						"2": 12,
+						"1": 12
+					},
+					"reachableAlternativesTotal": 6210,
+					"lowChoiceFraction": 0.648648648648649,
+					"forcedFraction": 0.324324324324324,
+					"zeroProductiveStates": 0,
+					"longestForcedStreak": 12,
+					"forcedStreakNorm": 0.324324324324324,
+					"B": 0.437837837837838
+				},
+				"R": {
+					"meanLength": 36.8648433405906,
+					"boardDiagonal": 45.254833995939,
+					"meanDetour": 1.4626424475926,
+					"meanTurns": 4.26855480628337,
+					"lengthVariance": 244.520324967259,
+					"lengthNorm": 0.407302823648615,
+					"detourNorm": 0.2313212237963,
+					"turnNorm": 0.533569350785421,
+					"R": 0.370962569127666
+				},
+				"S": {
+					"noWorkSlotFraction": 0.216216216216216,
+					"singleProductiveSlotFraction": 0.567567567567568,
+					"colorDemandImbalance": 0.0762476894639556,
+					"S": 0.304197057501124
+				}
+			},
+			"sessionLoad": {
+				"value": 24.9329554691094,
+				"status": "PROVISIONAL_STAGE_A",
+				"actionsNorm": 0.294168342430336,
+				"routeTimeNorm": 0.129991734093543,
+				"decisionCountNorm": 0.316239316239316,
+				"dispatches": 1024,
+				"routeTravelSeconds": 6291.59993012747,
+				"decisions": 37,
+				"estimatedAttemptSecondsProxy": 726.766665458679,
+				"proxyNote": "kernel wait-for-quiescence timing at 1x; not a calibrated human time"
+			},
+			"frustrationRisk": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"scalarNote": "No Frustration Risk scalar is claimed: 85% of the V1 weight (retryRisk, sessionOverrun, lateFailure) has no trustworthy supporting simulation or owner budget.",
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; solver success is not a human first-attempt clear probability"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner-locked per-slot Session Load budget exists"
+					},
+					"lateFailure": {
+						"status": "UNSUPPORTED",
+						"reason": "no failing-simulation population exists"
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.218918918918919,
+						"inputs": {
+							"B": 0.437837837837838,
+							"nonProductiveLegalChoiceFraction": 0.0
+						}
+					}
+				},
+				"supportedLowerBoundContribution": 3.28378378378378
+			},
+			"profile": {
+				"dominant": "BALANCED",
+				"scores": {
+					"FLOW": 0.513222602911534,
+					"COLOR": 0.467591385082312,
+					"FORTRESS": 0.42368387042754,
+					"ROUTE": 0.491963509768992,
+					"MARATHON": -0.00974510129355827
+				},
+				"runnerUp": "ROUTE"
+			},
+			"noveltySignatureInputs": {
+				"colorLayers": {
+					"maxLayers": 4.0,
+					"meanLayers": 1.6337890625
+				},
+				"peelHistogram": [
+					124.0,
+					116.0,
+					108.0,
+					100.0,
+					92.0,
+					84.0,
+					76.0,
+					68.0,
+					60.0,
+					52.0,
+					44.0,
+					36.0,
+					28.0,
+					20.0,
+					12.0,
+					4.0
+				],
+				"routeMeanLength": 36.8648433405906,
+				"aspectRatio": 1.0,
+				"artCategory": "NOT_DEFINED (no canonical art taxonomy exists)",
+				"sourceFamily": "owner_original_art"
+			},
+			"sensitivity": {
+				"challengeRange": [
+					44.5962846285266,
+					52.9271035940438
+				],
+				"sessionLoadRange": [
+					17.578746908351,
+					39.6413725906262
+				],
+				"windowsReached": [
+					"OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT",
+					"OUTSIDE_HARD_LIMIT",
+					"IN_DEFAULT_WINDOW"
+				],
+				"variants": [
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 46.4085132466348,
+						"sessionLoad": 24.9329554691094,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					},
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 48.04670180014,
+						"sessionLoad": 24.9329554691094,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 0.5,
+						"value": 14.5,
+						"challengeScore": 52.9271035940438,
+						"sessionLoad": 24.9329554691094,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 2.0,
+						"value": 58.0,
+						"challengeScore": 44.5962846285266,
+						"sessionLoad": 24.9329554691094,
+						"acceptanceWindow": "IN_DEFAULT_WINDOW"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 49.2060869901178,
+						"sessionLoad": 24.9329554691094,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 46.4567929304896,
+						"sessionLoad": 24.9329554691094,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 0.5,
+						"value": 1.5,
+						"challengeScore": 49.8020971335601,
+						"sessionLoad": 24.9329554691094,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 2.0,
+						"value": 6.0,
+						"challengeScore": 46.8874497137268,
+						"sessionLoad": 24.9329554691094,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 0.5,
+						"value": 4.0,
+						"challengeScore": 48.3060855821281,
+						"sessionLoad": 24.9329554691094,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 2.0,
+						"value": 16.0,
+						"challengeScore": 46.8396549329136,
+						"sessionLoad": 24.9329554691094,
+						"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 0.5,
+						"value": 1740.5,
+						"challengeScore": 47.373224283699,
+						"sessionLoad": 39.6413725906262,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 2.0,
+						"value": 6962.0,
+						"challengeScore": 47.373224283699,
+						"sessionLoad": 17.578746908351,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 0.5,
+						"value": 24200.0,
+						"challengeScore": 47.373224283699,
+						"sessionLoad": 28.8327074919157,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 2.0,
+						"value": 96800.0,
+						"challengeScore": 47.373224283699,
+						"sessionLoad": 22.9830794577063,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 0.5,
+						"value": 58.5,
+						"challengeScore": 47.373224283699,
+						"sessionLoad": 31.2577417938957,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 2.0,
+						"value": 234.0,
+						"challengeScore": 47.373224283699,
+						"sessionLoad": 21.7705623067162,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					}
+				]
+			},
+			"ownerPathSensitivity": {
+				"policy": "OWNER_INTENDED_CLICKS",
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.630985712663501,
+					"A": 0.542124512761049,
+					"U": 0.409529903017241,
+					"B": 0.0364864864864865,
+					"R": 0.355524387146137,
+					"S": 0.0933510975764497
+				},
+				"challengeScore": 37.6733138413813,
+				"signedDelta": -4.32668615861871,
+				"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT",
+				"sessionLoad": 25.0106827283985,
+				"decisions": 37,
+				"path": {
+					"steps": 37.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1024.0,
+					"maxParallelClaims": 1.0
+				}
+			},
+			"staticQa": "PASS",
+			"m53Verdict": "TUNING_REQUIRED",
+			"novelty": {
+				"nearestPriorLevel": "level_006_chicken",
+				"nearestPriorSimilarity": {
+					"vector": 0.882312369397524,
+					"palette": 0.777777777777778,
+					"dimensions": 1.0,
+					"combined": 0.886696715725101
+				},
+				"novelty": 0.113303284274899,
+				"noveltyTarget": 0.45,
+				"meetsNoveltyTarget": false,
+				"status": "INFORMATIONAL_STAGE_A (provisional similarity; no art taxonomy)"
+			}
+		},
+		{
+			"order": 9,
+			"id": "level_009_frog",
+			"class": "EASY",
+			"slot": 9,
+			"role": "pre_boss_confidence",
+			"noveltyTarget": 0.5,
+			"width": 32,
+			"height": 32,
+			"palette": [
+				"C06",
+				"C07",
+				"C08",
+				"C12",
+				"C13",
+				"C15",
+				"C16"
+			],
+			"levelSha256": "b5989964a4dd1e909e169c0b796919e34165ff9fe1f4d10679f6cffc17a4604f",
+			"provenance": {
+				"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+				"analysisConfig": "res://data/config/level_difficulty_analysis_v1.json",
+				"analysisConfigVersion": 1.0,
+				"calibrationStage": "STAGE_A_PROVISIONAL",
+				"scoreModelSchema": "scrubbots-difficulty-score-model/v1",
+				"scoreModelVersion": 1.0,
+				"progressionModelSchema": "scrubbots-level-progression/v1",
+				"progressionModelVersion": 1.0,
+				"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+				"kernel": "res://scripts/gameplay/solver/proof_kernel.gd",
+				"routing": "res://scripts/gameplay/routing/production_routing_system.gd",
+				"access": "res://scripts/gameplay/dispatch/production_target_access.gd"
+			},
+			"supplyAuthority": "SupplyPlanLoader res://data/levels/supply/level_009_frog_supply_v1.json",
+			"referencePath": {
+				"policy": "ORACLE_SOLVER_TRACE",
+				"traceHash": 3800836965.0,
+				"traceSource": "M52 owner-plan verification evidence (hash-verified; replayed step-exact here)",
+				"decisions": 38,
+				"path": {
+					"steps": 38.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 899.0,
+					"maxParallelClaims": 4.0
+				}
+			},
+			"vector": {
+				"W": 0.413938769133981,
+				"C": 0.540551758134193,
+				"A": 0.694779488016706,
+				"U": 0.409529903017241,
+				"B": 0.481578947368421,
+				"R": 0.301895791525473,
+				"S": 0.620399469897766
+			},
+			"challengeScore": 50.7804887087904,
+			"targetChallenge": 19.0,
+			"signedDelta": 31.7804887087904,
+			"absoluteDelta": 31.7804887087904,
+			"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+			"supporting": {
+				"W": {
+					"activeCells": 1024,
+					"dispatches": 1024,
+					"routeDistanceTotal": 33749.1996560097,
+					"cellTransform": "sqrt",
+					"W": 0.413938769133981
+				},
+				"C": {
+					"usedColors": 7.0,
+					"frequencyByHex": {
+						"#51E9F4FF": 15.0,
+						"#3690EAFF": 318.0,
+						"#2450A4FF": 497.0,
+						"#FFF8B8FF": 40.0,
+						"#D4D7D9FF": 12.0,
+						"#FFFFFFFF": 2.0,
+						"#000000FF": 140.0
+					},
+					"normalizedEntropy": 0.636659071823941,
+					"countNorm": 0.444444444444444,
+					"C": 0.540551758134193
+				},
+				"A": {
+					"samples": [
+						{
+							"progress": 0.0,
+							"raw": 497,
+							"reachable": 124,
+							"A_t": 0.750503018108652,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.029296875,
+							"raw": 467,
+							"reachable": 123,
+							"A_t": 0.73661670235546,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.05859375,
+							"raw": 437,
+							"reachable": 121,
+							"A_t": 0.723112128146453,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.087890625,
+							"raw": 725,
+							"reachable": 119,
+							"A_t": 0.835862068965517,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.087890625,
+							"raw": 725,
+							"reachable": 119,
+							"A_t": 0.835862068965517,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.087890625,
+							"raw": 725,
+							"reachable": 119,
+							"A_t": 0.835862068965517,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.087890625,
+							"raw": 725,
+							"reachable": 119,
+							"A_t": 0.835862068965517,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.1171875,
+							"raw": 695,
+							"reachable": 103,
+							"A_t": 0.851798561151079,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.146484375,
+							"raw": 665,
+							"reachable": 95,
+							"A_t": 0.857142857142857,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.17578125,
+							"raw": 775,
+							"reachable": 107,
+							"A_t": 0.861935483870968,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.201171875,
+							"raw": 749,
+							"reachable": 107,
+							"A_t": 0.857142857142857,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3193359375,
+							"raw": 400,
+							"reachable": 109,
+							"A_t": 0.7275,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3193359375,
+							"raw": 400,
+							"reachable": 109,
+							"A_t": 0.7275,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.337890625,
+							"raw": 421,
+							"reachable": 93,
+							"A_t": 0.779097387173397,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.337890625,
+							"raw": 421,
+							"reachable": 93,
+							"A_t": 0.779097387173397,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.375,
+							"raw": 611,
+							"reachable": 106,
+							"A_t": 0.826513911620295,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4091796875,
+							"raw": 576,
+							"reachable": 95,
+							"A_t": 0.835069444444444,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4541015625,
+							"raw": 530,
+							"reachable": 102,
+							"A_t": 0.807547169811321,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4833984375,
+							"raw": 362,
+							"reachable": 84,
+							"A_t": 0.767955801104972,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5146484375,
+							"raw": 388,
+							"reachable": 86,
+							"A_t": 0.778350515463918,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5439453125,
+							"raw": 250,
+							"reachable": 67,
+							"A_t": 0.732,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5732421875,
+							"raw": 220,
+							"reachable": 53,
+							"A_t": 0.759090909090909,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.6025390625,
+							"raw": 270,
+							"reachable": 65,
+							"A_t": 0.759259259259259,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.6416015625,
+							"raw": 200,
+							"reachable": 53,
+							"A_t": 0.735,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.6494140625,
+							"raw": 207,
+							"reachable": 64,
+							"A_t": 0.690821256038647,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.66015625,
+							"raw": 198,
+							"reachable": 55,
+							"A_t": 0.722222222222222,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.662109375,
+							"raw": 196,
+							"reachable": 53,
+							"A_t": 0.729591836734694,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7041015625,
+							"raw": 123,
+							"reachable": 58,
+							"A_t": 0.528455284552846,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7333984375,
+							"raw": 111,
+							"reachable": 40,
+							"A_t": 0.63963963963964,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.7626953125,
+							"raw": 81,
+							"reachable": 21,
+							"A_t": 0.740740740740741,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.79296875,
+							"raw": 50,
+							"reachable": 20,
+							"A_t": 0.6,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8232421875,
+							"raw": 91,
+							"reachable": 67,
+							"A_t": 0.263736263736264,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8525390625,
+							"raw": 61,
+							"reachable": 60,
+							"A_t": 0.0163934426229508,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8818359375,
+							"raw": 31,
+							"reachable": 30,
+							"A_t": 0.032258064516129,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9111328125,
+							"raw": 31,
+							"reachable": 29,
+							"A_t": 0.0645161290322581,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9404296875,
+							"raw": 31,
+							"reachable": 26,
+							"A_t": 0.161290322580645,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.970703125,
+							"raw": 18,
+							"reachable": 18,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.98828125,
+							"raw": 12,
+							"reachable": 12,
+							"A_t": 0.0,
+							"weight": 1.0
+						}
+					],
+					"priorityProgressFraction": 0.6,
+					"A": 0.694779488016706
+				},
+				"U": {
+					"meanWave": 4.84375,
+					"p95Wave": 12.0,
+					"maxWave": 15.0,
+					"initiallyLockedFraction": 0.87890625,
+					"p95Norm": 0.413793103448276,
+					"meanNorm": 0.167025862068966,
+					"U": 0.409529903017241
+				},
+				"B": {
+					"decisionStates": 38,
+					"productiveActionHistogram": {
+						"3": 8,
+						"2": 18,
+						"1": 12
+					},
+					"reachableAlternativesTotal": 5556,
+					"lowChoiceFraction": 0.789473684210526,
+					"forcedFraction": 0.315789473684211,
+					"zeroProductiveStates": 0,
+					"longestForcedStreak": 12,
+					"forcedStreakNorm": 0.315789473684211,
+					"B": 0.481578947368421
+				},
+				"R": {
+					"meanLength": 32.9582027890719,
+					"boardDiagonal": 45.254833995939,
+					"meanDetour": 1.33898166142015,
+					"meanTurns": 3.14843758761328,
+					"lengthVariance": 204.467700663084,
+					"lengthNorm": 0.364140135748033,
+					"detourNorm": 0.169490830710075,
+					"turnNorm": 0.39355469845166,
+					"R": 0.301895791525473
+				},
+				"S": {
+					"noWorkSlotFraction": 0.815789473684211,
+					"singleProductiveSlotFraction": 0.763157894736842,
+					"colorDemandImbalance": 0.107913669064748,
+					"S": 0.620399469897766
+				}
+			},
+			"sessionLoad": {
+				"value": 24.6906311850129,
+				"status": "PROVISIONAL_STAGE_A",
+				"actionsNorm": 0.294168342430336,
+				"routeTimeNorm": 0.116216252258987,
+				"decisionCountNorm": 0.324786324786325,
+				"dispatches": 1024,
+				"routeTravelSeconds": 5624.86660933495,
+				"decisions": 38,
+				"estimatedAttemptSecondsProxy": 636.766665458679,
+				"proxyNote": "kernel wait-for-quiescence timing at 1x; not a calibrated human time"
+			},
+			"frustrationRisk": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"scalarNote": "No Frustration Risk scalar is claimed: 85% of the V1 weight (retryRisk, sessionOverrun, lateFailure) has no trustworthy supporting simulation or owner budget.",
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; solver success is not a human first-attempt clear probability"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner-locked per-slot Session Load budget exists"
+					},
+					"lateFailure": {
+						"status": "UNSUPPORTED",
+						"reason": "no failing-simulation population exists"
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.279251012145749,
+						"inputs": {
+							"B": 0.481578947368421,
+							"nonProductiveLegalChoiceFraction": 0.0769230769230769
+						}
+					}
+				},
+				"supportedLowerBoundContribution": 4.18876518218624
+			},
+			"profile": {
+				"dominant": "COLOR",
+				"scores": {
+					"FLOW": 0.471370553865877,
+					"COLOR": 0.580475614015979,
+					"FORTRESS": 0.445554425192831,
+					"ROUTE": 0.49833763977109,
+					"MARATHON": -0.0316156560588498
+				},
+				"runnerUp": "ROUTE"
+			},
+			"noveltySignatureInputs": {
+				"colorLayers": {
+					"maxLayers": 4.0,
+					"meanLayers": 1.8427734375
+				},
+				"peelHistogram": [
+					124.0,
+					116.0,
+					108.0,
+					100.0,
+					92.0,
+					84.0,
+					76.0,
+					68.0,
+					60.0,
+					52.0,
+					44.0,
+					36.0,
+					28.0,
+					20.0,
+					12.0,
+					4.0
+				],
+				"routeMeanLength": 32.9582027890719,
+				"aspectRatio": 1.0,
+				"artCategory": "NOT_DEFINED (no canonical art taxonomy exists)",
+				"sourceFamily": "owner_original_art"
+			},
+			"sensitivity": {
+				"challengeRange": [
+					48.003549053618,
+					56.3343680191352
+				],
+				"sessionLoadRange": [
+					17.3364226242545,
+					39.3990483065297
+				],
+				"windowsReached": [
+					"OUTSIDE_HARD_LIMIT"
+				],
+				"variants": [
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 49.6140288807401,
+						"sessionLoad": 24.6906311850129,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 51.6329016600579,
+						"sessionLoad": 24.6906311850129,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 0.5,
+						"value": 14.5,
+						"challengeScore": 56.3343680191352,
+						"sessionLoad": 24.6906311850129,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 2.0,
+						"value": 58.0,
+						"challengeScore": 48.003549053618,
+						"sessionLoad": 24.6906311850129,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 52.4191193196565,
+						"sessionLoad": 24.6906311850129,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 49.9611734033573,
+						"sessionLoad": 24.6906311850129,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 0.5,
+						"value": 1.5,
+						"challengeScore": 52.5601424312462,
+						"sessionLoad": 24.6906311850129,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 2.0,
+						"value": 6.0,
+						"challengeScore": 50.4245579642992,
+						"sessionLoad": 24.6906311850129,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 0.5,
+						"value": 4.0,
+						"challengeScore": 51.5675981056937,
+						"sessionLoad": 24.6906311850129,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 2.0,
+						"value": 16.0,
+						"challengeScore": 50.3869340103387,
+						"sessionLoad": 24.6906311850129,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 0.5,
+						"value": 1740.5,
+						"challengeScore": 50.7804887087904,
+						"sessionLoad": 39.3990483065297,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 2.0,
+						"value": 6962.0,
+						"challengeScore": 50.7804887087904,
+						"sessionLoad": 17.3364226242545,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 0.5,
+						"value": 24200.0,
+						"challengeScore": 50.7804887087904,
+						"sessionLoad": 28.1771187527825,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 2.0,
+						"value": 96800.0,
+						"challengeScore": 50.7804887087904,
+						"sessionLoad": 22.9473874011281,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 0.5,
+						"value": 58.5,
+						"challengeScore": 50.7804887087904,
+						"sessionLoad": 31.1863576807394,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 2.0,
+						"value": 234.0,
+						"challengeScore": 50.7804887087904,
+						"sessionLoad": 21.4427679371497,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					}
+				]
+			},
+			"ownerPathSensitivity": {
+				"policy": "OWNER_INTENDED_CLICKS",
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.540551758134193,
+					"A": 0.627170949756385,
+					"U": 0.409529903017241,
+					"B": 0.0828947368421052,
+					"R": 0.418588229270329,
+					"S": 0.258538953016344
+				},
+				"challengeScore": 40.9963739943235,
+				"signedDelta": 21.9963739943235,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.2293708920198,
+				"decisions": 38,
+				"path": {
+					"steps": 38.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1024.0,
+					"maxParallelClaims": 1.0
+				}
+			},
+			"staticQa": "PASS",
+			"m53Verdict": "TUNING_REQUIRED",
+			"novelty": {
+				"nearestPriorLevel": "level_004_orange_cat",
+				"nearestPriorSimilarity": {
+					"vector": 0.963889734631111,
+					"palette": 0.4,
+					"dimensions": 1.0,
+					"combined": 0.787963244877037
+				},
+				"novelty": 0.212036755122963,
+				"noveltyTarget": 0.5,
+				"meetsNoveltyTarget": false,
+				"status": "INFORMATIONAL_STAGE_A (provisional similarity; no art taxonomy)"
+			}
+		},
+		{
+			"order": 10,
+			"id": "level_010_ice_cube",
+			"class": "VERY_HARD",
+			"slot": 10,
+			"role": "cycle_boss",
+			"noveltyTarget": 0.35,
+			"width": 32,
+			"height": 32,
+			"palette": [
+				"C02",
+				"C03",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C13",
+				"C14",
+				"C15",
+				"C16"
+			],
+			"levelSha256": "ab7a93178852441d1750c66fed3e24b30b906d145383f7df5113eda7b8dff8ed",
+			"provenance": {
+				"analyzerVersion": "m53-level-difficulty-analyzer/v1",
+				"analysisConfig": "res://data/config/level_difficulty_analysis_v1.json",
+				"analysisConfigVersion": 1.0,
+				"calibrationStage": "STAGE_A_PROVISIONAL",
+				"scoreModelSchema": "scrubbots-difficulty-score-model/v1",
+				"scoreModelVersion": 1.0,
+				"progressionModelSchema": "scrubbots-level-progression/v1",
+				"progressionModelVersion": 1.0,
+				"solver": "res://scripts/gameplay/solver/solvability_solver.gd",
+				"kernel": "res://scripts/gameplay/solver/proof_kernel.gd",
+				"routing": "res://scripts/gameplay/routing/production_routing_system.gd",
+				"access": "res://scripts/gameplay/dispatch/production_target_access.gd"
+			},
+			"supplyAuthority": "SupplyPlanLoader res://data/levels/supply/level_010_ice_cube_supply_v1.json",
+			"referencePath": {
+				"policy": "ORACLE_SOLVER_TRACE",
+				"traceHash": 1480752256.0,
+				"traceSource": "M52 owner-plan verification evidence (hash-verified; replayed step-exact here)",
+				"decisions": 40,
+				"path": {
+					"steps": 40.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 956.0,
+					"maxParallelClaims": 4.0
+				}
+			},
+			"vector": {
+				"W": 0.413938769133981,
+				"C": 0.777756298258324,
+				"A": 0.613728950631849,
+				"U": 0.409529903017241,
+				"B": 0.46375,
+				"R": 0.33067960937928,
+				"S": 0.496567944250871
+			},
+			"challengeScore": 51.499634774498,
+			"targetChallenge": 76.0,
+			"signedDelta": -24.500365225502,
+			"absoluteDelta": 24.500365225502,
+			"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+			"supporting": {
+				"W": {
+					"activeCells": 1024,
+					"dispatches": 1024,
+					"routeDistanceTotal": 33927.5996921062,
+					"cellTransform": "sqrt",
+					"W": 0.413938769133981
+				},
+				"C": {
+					"usedColors": 10.0,
+					"frequencyByHex": {
+						"#FFA800FF": 6.0,
+						"#FFD635FF": 14.0,
+						"#00CCC0FF": 93.0,
+						"#51E9F4FF": 16.0,
+						"#3690EAFF": 2.0,
+						"#2450A4FF": 259.0,
+						"#D4D7D9FF": 270.0,
+						"#515252FF": 78.0,
+						"#FFFFFFFF": 70.0,
+						"#000000FF": 216.0
+					},
+					"normalizedEntropy": 0.777734818738871,
+					"countNorm": 0.777777777777778,
+					"C": 0.777756298258324
+				},
+				"A": {
+					"samples": [
+						{
+							"progress": 0.0,
+							"raw": 259,
+							"reachable": 113,
+							"A_t": 0.563706563706564,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.029296875,
+							"raw": 229,
+							"reachable": 103,
+							"A_t": 0.550218340611354,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.05859375,
+							"raw": 199,
+							"reachable": 91,
+							"A_t": 0.542713567839196,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.087890625,
+							"raw": 385,
+							"reachable": 117,
+							"A_t": 0.696103896103896,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.1171875,
+							"raw": 355,
+							"reachable": 97,
+							"A_t": 0.726760563380282,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.146484375,
+							"raw": 439,
+							"reachable": 94,
+							"A_t": 0.785876993166287,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.17578125,
+							"raw": 247,
+							"reachable": 121,
+							"A_t": 0.510121457489878,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.205078125,
+							"raw": 409,
+							"reachable": 101,
+							"A_t": 0.753056234718826,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.234375,
+							"raw": 379,
+							"reachable": 105,
+							"A_t": 0.722955145118733,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.263671875,
+							"raw": 239,
+							"reachable": 94,
+							"A_t": 0.606694560669456,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.26953125,
+							"raw": 389,
+							"reachable": 127,
+							"A_t": 0.673521850899743,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.298828125,
+							"raw": 249,
+							"reachable": 95,
+							"A_t": 0.618473895582329,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.298828125,
+							"raw": 255,
+							"reachable": 95,
+							"A_t": 0.627450980392157,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.298828125,
+							"raw": 257,
+							"reachable": 96,
+							"A_t": 0.626459143968872,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.2998046875,
+							"raw": 256,
+							"reachable": 95,
+							"A_t": 0.62890625,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3291015625,
+							"raw": 226,
+							"reachable": 72,
+							"A_t": 0.68141592920354,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3583984375,
+							"raw": 322,
+							"reachable": 90,
+							"A_t": 0.720496894409938,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.3876953125,
+							"raw": 376,
+							"reachable": 88,
+							"A_t": 0.765957446808511,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4189453125,
+							"raw": 194,
+							"reachable": 58,
+							"A_t": 0.701030927835052,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.4482421875,
+							"raw": 260,
+							"reachable": 68,
+							"A_t": 0.738461538461539,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.48046875,
+							"raw": 227,
+							"reachable": 56,
+							"A_t": 0.753303964757709,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5283203125,
+							"raw": 288,
+							"reachable": 88,
+							"A_t": 0.694444444444444,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5595703125,
+							"raw": 229,
+							"reachable": 107,
+							"A_t": 0.532751091703057,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5888671875,
+							"raw": 136,
+							"reachable": 58,
+							"A_t": 0.573529411764706,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.5888671875,
+							"raw": 136,
+							"reachable": 58,
+							"A_t": 0.573529411764706,
+							"weight": 2.0
+						},
+						{
+							"progress": 0.615234375,
+							"raw": 123,
+							"reachable": 46,
+							"A_t": 0.626016260162602,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.658203125,
+							"raw": 79,
+							"reachable": 29,
+							"A_t": 0.632911392405063,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.6865234375,
+							"raw": 98,
+							"reachable": 31,
+							"A_t": 0.683673469387755,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.72265625,
+							"raw": 163,
+							"reachable": 37,
+							"A_t": 0.773006134969325,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.736328125,
+							"raw": 149,
+							"reachable": 28,
+							"A_t": 0.812080536912752,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.736328125,
+							"raw": 149,
+							"reachable": 28,
+							"A_t": 0.812080536912752,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.76953125,
+							"raw": 115,
+							"reachable": 29,
+							"A_t": 0.747826086956522,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8154296875,
+							"raw": 71,
+							"reachable": 42,
+							"A_t": 0.408450704225352,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8486328125,
+							"raw": 64,
+							"reachable": 31,
+							"A_t": 0.515625,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.8779296875,
+							"raw": 34,
+							"reachable": 18,
+							"A_t": 0.470588235294118,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9072265625,
+							"raw": 44,
+							"reachable": 25,
+							"A_t": 0.431818181818182,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9404296875,
+							"raw": 33,
+							"reachable": 25,
+							"A_t": 0.242424242424242,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9697265625,
+							"raw": 18,
+							"reachable": 18,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9873046875,
+							"raw": 10,
+							"reachable": 10,
+							"A_t": 0.0,
+							"weight": 1.0
+						},
+						{
+							"progress": 0.9970703125,
+							"raw": 3,
+							"reachable": 3,
+							"A_t": 0.0,
+							"weight": 1.0
+						}
+					],
+					"priorityProgressFraction": 0.6,
+					"A": 0.613728950631849
+				},
+				"U": {
+					"meanWave": 4.84375,
+					"p95Wave": 12.0,
+					"maxWave": 15.0,
+					"initiallyLockedFraction": 0.87890625,
+					"p95Norm": 0.413793103448276,
+					"meanNorm": 0.167025862068966,
+					"U": 0.409529903017241
+				},
+				"B": {
+					"decisionStates": 40,
+					"productiveActionHistogram": {
+						"3": 12,
+						"2": 13,
+						"1": 15
+					},
+					"reachableAlternativesTotal": 4556,
+					"lowChoiceFraction": 0.7,
+					"forcedFraction": 0.375,
+					"zeroProductiveStates": 0,
+					"longestForcedStreak": 11,
+					"forcedStreakNorm": 0.275,
+					"B": 0.46375
+				},
+				"R": {
+					"meanLength": 33.1324215743225,
+					"boardDiagonal": 45.254833995939,
+					"meanDetour": 1.33263485007533,
+					"meanTurns": 4.30957043242471,
+					"lengthVariance": 182.302464439147,
+					"lengthNorm": 0.366064999567733,
+					"detourNorm": 0.166317425037665,
+					"turnNorm": 0.538696304053089,
+					"R": 0.33067960937928
+				},
+				"S": {
+					"noWorkSlotFraction": 0.65,
+					"singleProductiveSlotFraction": 0.6,
+					"colorDemandImbalance": 0.106271777003484,
+					"S": 0.496567944250871
+				}
+			},
+			"sessionLoad": {
+				"value": 25.0509412826883,
+				"status": "PROVISIONAL_STAGE_A",
+				"actionsNorm": 0.294168342430336,
+				"routeTimeNorm": 0.116830577452156,
+				"decisionCountNorm": 0.341880341880342,
+				"dispatches": 1024,
+				"routeTravelSeconds": 5654.59994868437,
+				"decisions": 40,
+				"estimatedAttemptSecondsProxy": 703.366664250692,
+				"proxyNote": "kernel wait-for-quiescence timing at 1x; not a calibrated human time"
+			},
+			"frustrationRisk": {
+				"status": "PROVISIONAL_STAGE_A",
+				"scalar": null,
+				"scalarNote": "No Frustration Risk scalar is claimed: 85% of the V1 weight (retryRisk, sessionOverrun, lateFailure) has no trustworthy supporting simulation or owner budget.",
+				"components": {
+					"retryRisk": {
+						"status": "UNSUPPORTED",
+						"reason": "no trustworthy simulated-human policy; solver success is not a human first-attempt clear probability"
+					},
+					"sessionOverrun": {
+						"status": "UNSUPPORTED",
+						"reason": "no owner-locked per-slot Session Load budget exists"
+					},
+					"lateFailure": {
+						"status": "UNSUPPORTED",
+						"reason": "no failing-simulation population exists"
+					},
+					"choiceOpacity": {
+						"status": "SUPPORTED_PROXY",
+						"value": 0.273541666666667,
+						"inputs": {
+							"B": 0.46375,
+							"nonProductiveLegalChoiceFraction": 0.0833333333333333
+						}
+					}
+				},
+				"supportedLowerBoundContribution": 4.103125
+			},
+			"profile": {
+				"dominant": "COLOR",
+				"scores": {
+					"FLOW": 0.50433038211697,
+					"COLOR": 0.637162121254598,
+					"FORTRESS": 0.436639951508621,
+					"ROUTE": 0.472204280005565,
+					"MARATHON": -0.0227011823746393
+				},
+				"runnerUp": "FLOW"
+			},
+			"noveltySignatureInputs": {
+				"colorLayers": {
+					"maxLayers": 6.0,
+					"meanLayers": 2.62890625
+				},
+				"peelHistogram": [
+					124.0,
+					116.0,
+					108.0,
+					100.0,
+					92.0,
+					84.0,
+					76.0,
+					68.0,
+					60.0,
+					52.0,
+					44.0,
+					36.0,
+					28.0,
+					20.0,
+					12.0,
+					4.0
+				],
+				"routeMeanLength": 33.1324215743225,
+				"aspectRatio": 1.0,
+				"artCategory": "NOT_DEFINED (no canonical art taxonomy exists)",
+				"sourceFamily": "owner_original_art"
+			},
+			"sensitivity": {
+				"challengeRange": [
+					48.7226951193256,
+					57.0535140848428
+				],
+				"sessionLoadRange": [
+					17.6967327219299,
+					39.7593584042051
+				],
+				"windowsReached": [
+					"OUTSIDE_HARD_LIMIT"
+				],
+				"variants": [
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 50.9872764049957,
+						"sessionLoad": 25.0509412826883,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "accessibilityEarlyWeight",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 51.8560579880648,
+						"sessionLoad": 25.0509412826883,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 0.5,
+						"value": 14.5,
+						"challengeScore": 57.0535140848428,
+						"sessionLoad": 25.0509412826883,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "unlockReferenceWave",
+						"factor": 2.0,
+						"value": 58.0,
+						"challengeScore": 48.7226951193256,
+						"sessionLoad": 25.0509412826883,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 0.5,
+						"value": 1.0,
+						"challengeScore": 53.1469272725528,
+						"sessionLoad": 25.0509412826883,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeLengthReferenceDiagonals",
+						"factor": 2.0,
+						"value": 4.0,
+						"challengeScore": 50.6759885254706,
+						"sessionLoad": 25.0509412826883,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 0.5,
+						"value": 1.5,
+						"challengeScore": 53.2459677373935,
+						"sessionLoad": 25.0509412826883,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeDetourReference",
+						"factor": 2.0,
+						"value": 6.0,
+						"challengeScore": 51.1503681819189,
+						"sessionLoad": 25.0509412826883,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 0.5,
+						"value": 4.0,
+						"challengeScore": 52.4222421663918,
+						"sessionLoad": 25.0509412826883,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "routeTurnReference",
+						"factor": 2.0,
+						"value": 16.0,
+						"challengeScore": 50.9609384704449,
+						"sessionLoad": 25.0509412826883,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 0.5,
+						"value": 1740.5,
+						"challengeScore": 51.499634774498,
+						"sessionLoad": 39.7593584042051,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionActionsReference",
+						"factor": 2.0,
+						"value": 6962.0,
+						"challengeScore": 51.499634774498,
+						"sessionLoad": 17.6967327219299,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 0.5,
+						"value": 24200.0,
+						"challengeScore": 51.499634774498,
+						"sessionLoad": 28.555858606253,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionRouteTimeReferenceSeconds",
+						"factor": 2.0,
+						"value": 96800.0,
+						"challengeScore": 51.499634774498,
+						"sessionLoad": 23.298482620906,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 0.5,
+						"value": 58.5,
+						"challengeScore": 51.499634774498,
+						"sessionLoad": 31.8885481202952,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					},
+					{
+						"anchor": "sessionDecisionReference",
+						"factor": 2.0,
+						"value": 234.0,
+						"challengeScore": 51.499634774498,
+						"sessionLoad": 21.6321378638849,
+						"acceptanceWindow": "OUTSIDE_HARD_LIMIT"
+					}
+				]
+			},
+			"ownerPathSensitivity": {
+				"policy": "OWNER_INTENDED_CLICKS",
+				"vector": {
+					"W": 0.413938769133981,
+					"C": 0.777756298258324,
+					"A": 0.570636611357056,
+					"U": 0.409529903017241,
+					"B": 0.05125,
+					"R": 0.307231280043863,
+					"S": 0.151970154258887
+				},
+				"challengeScore": 40.7698267957281,
+				"signedDelta": -35.2301732042719,
+				"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
+				"sessionLoad": 25.1860858853743,
+				"decisions": 40,
+				"path": {
+					"steps": 40.0,
+					"solved": true,
+					"finalActive": 0.0,
+					"totalClears": 1024.0,
+					"routeFailures": 0.0,
+					"productivityMismatches": 0.0,
+					"dispatchWaves": 1024.0,
+					"maxParallelClaims": 1.0
+				}
+			},
+			"staticQa": "PASS",
+			"m53Verdict": "TUNING_REQUIRED",
+			"novelty": {
+				"nearestPriorLevel": "level_009_frog",
+				"nearestPriorSimilarity": {
+					"vector": 0.893553628697412,
+					"palette": 0.545454545454545,
+					"dimensions": 1.0,
+					"combined": 0.813002724717319
+				},
+				"novelty": 0.186997275282681,
+				"noveltyTarget": 0.35,
+				"meetsNoveltyTarget": false,
+				"status": "INFORMATIONAL_STAGE_A (provisional similarity; no art taxonomy)"
+			}
+		}
+	]
+}

@@ -68,6 +68,13 @@ const ORIGIN_BELOW := 4.0
 ## every clear strictly reduces ACTIVE cells — but fail-closed rather than hang).
 const MAX_CLEARS_GUARD := 4000000
 
+## Optional READ-ONLY analysis observer (M53-C001 LevelDifficultyAnalyzerV1). null in
+## every gameplay/solver path. When set, it is told each successful exact-slot claim
+## (on_claim(live, slot, origin, claim)) and each dispatch wave (on_wave(live, lanes,
+## claims)). It must never mutate the live bundle; the kernel's transitions are identical
+## with or without it.
+var observer = null
+
 # ---------------------------------------------------------------- public API ---
 
 ## Run the serial clear kernel from `state` (no placement). Returns
@@ -195,15 +202,20 @@ func _run_to_quiescence(live: Dictionary) -> int:
 	var waiting: Dictionary = {}   # slot -> batch_id WAITING on its current batch
 	while true:
 		var claims: Array = []
-		for slot in _eligible_slots(live.slots, waiting):
+		var lanes: Array = _eligible_slots(live.slots, waiting)
+		for slot in lanes:
 			var origin: Vector2 = _origin_for_slot(slot, live.w, live.h, live.slots.get_slot_count())
 			var access = ProductionTargetAccess.new(live.routing, live.raccess, live.board, origin)
 			var batch_id: String = live.slots.get_batch_id(slot)
 			var claim: Dictionary = live.claim.claim_for_slot(slot, access)
 			if claim.get("ok", false):
 				claims.append(claim)
+				if observer != null:
+					observer.on_claim(live, slot, origin, claim)
 			elif claim.get("waiting", false):
 				waiting[slot] = batch_id
+		if observer != null:
+			observer.on_wave(live, lanes, claims)
 		if claims.is_empty():
 			break
 		for claim in claims:

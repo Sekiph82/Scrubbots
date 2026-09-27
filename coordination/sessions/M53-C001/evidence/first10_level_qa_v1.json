@@ -1,0 +1,1279 @@
+{
+	"schema": "scrubbots.m53.first10_level_qa.v1",
+	"version": 1,
+	"sprint": "M53-C001",
+	"catalogValid": true,
+	"levels": [
+		{
+			"order": 1,
+			"id": "m21_level_001_hazard_bot",
+			"gates": [
+				{
+					"gate": "legal_dimensions_envelope",
+					"pass": true,
+					"evidence": "20x20 within 20..59"
+				},
+				{
+					"gate": "owner_locked_class_token",
+					"pass": true,
+					"evidence": "LevelData/metadata/catalog/cadence all EASY"
+				},
+				{
+					"gate": "canonical_palette_c01_c16",
+					"pass": true,
+					"evidence": "palette [\"C01\", \"C03\", \"C08\", \"C11\", \"C16\"]"
+				},
+				{
+					"gate": "used_color_count_3_12",
+					"pass": true,
+					"evidence": "5 used of 5 palette entries"
+				},
+				{
+					"gate": "exact_cell_count",
+					"pass": true,
+					"evidence": "400 cells"
+				},
+				{
+					"gate": "no_invalid_palette_ids",
+					"pass": true,
+					"evidence": "0 invalid cell palette ids"
+				},
+				{
+					"gate": "source_reconstruction_exact",
+					"pass": true,
+					"evidence": "LevelImporter.reconstruct_image(LevelData) == source RGBA8 bytes"
+				},
+				{
+					"gate": "no_unintended_interpolation",
+					"pass": true,
+					"evidence": "source 20x20 == board, all alpha 255, 1 source pixel = 1 cell; exact byte equality above excludes resampling"
+				},
+				{
+					"gate": "cleared_transparency_render",
+					"pass": true,
+					"evidence": "BoardRenderer: every ACTIVE pixel == palette opaque; CLEARED cells alpha 0; NEAREST filter"
+				},
+				{
+					"gate": "canonical_solvability",
+					"pass": true,
+					"evidence": "reference trace 19 replayed step-exact to SOLVED (hash 1618197986)"
+				},
+				{
+					"gate": "routing_access_sanity",
+					"pass": true,
+					"evidence": {
+						"unreachableCellsInPeel": 0.0,
+						"routeValidatorFailures": 0.0,
+						"analyzerVsKernelProductivityMismatches": 0.0,
+						"claimsWithValidatedRoutes": 400.0,
+						"peelGeometricMismatchCells": 0.0
+					}
+				},
+				{
+					"gate": "performance_sanity",
+					"pass": true,
+					"evidence": {
+						"headlessKernelPlacementMeanMs": 194.684210526316,
+						"headlessKernelPlacementMaxMs": 821.0,
+						"headlessRouteComputeMaxMs": 12.0,
+						"headlessRouteComputeMeanMs": 3.745,
+						"bounds": "offline sanity bounds: placement < 30000 ms, single route < 1000 ms; runtime frame performance is proven by m52_r01_parallel_runtime"
+					}
+				},
+				{
+					"gate": "preview_exact",
+					"pass": true,
+					"evidence": "preview res://assets/art/levels/previews/m21_level_001_hazard_bot.png == LevelData reconstruction; catalog/metadata point to it"
+				},
+				{
+					"gate": "unique_stable_id",
+					"pass": true,
+					"evidence": "LevelData.id m21_level_001_hazard_bot"
+				},
+				{
+					"gate": "catalog_order",
+					"pass": true,
+					"evidence": "catalog order 1 -> m21_level_001_hazard_bot"
+				},
+				{
+					"gate": "source_metadata_provenance",
+					"pass": true,
+					"evidence": {
+						"sourcePathMatchesOwnerLock": true,
+						"sourceSha256Matches": true,
+						"sourceGitBlobSha1Matches": true,
+						"cellReferenceCountsMatch": true,
+						"rawBoundToCurrentLevelData": true,
+						"levelSha256BoundToM52Acceptance": true,
+						"sourcePath": "res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png",
+						"sourceSha256": "34dfa3548b6c73b7ca3bfaaadb67388c0073595b049ca32466af4b12d6d71530",
+						"levelSha256": "ae725a9c86839dcffb6444f3208416b553679878be7999ef8814de51241e8c1c"
+					}
+				},
+				{
+					"gate": "level1_historical_generator_path",
+					"pass": true,
+					"evidence": "catalog order 1 has no supply plan; reference supply = M23 generator seed 1; solver trace hash == M52"
+				}
+			],
+			"staticQa": "PASS",
+			"timing": {
+				"totalMs": 5609.0,
+				"peelMs": 517.0,
+				"kernelPlacementMeanMs": 194.684210526316,
+				"kernelPlacementMaxMs": 821.0,
+				"routeComputeMaxMs": 12.0,
+				"routeComputeMeanMs": 3.745
+			}
+		},
+		{
+			"order": 2,
+			"id": "level_002_apple",
+			"gates": [
+				{
+					"gate": "legal_dimensions_envelope",
+					"pass": true,
+					"evidence": "32x32 within 20..59"
+				},
+				{
+					"gate": "owner_locked_class_token",
+					"pass": true,
+					"evidence": "LevelData/metadata/catalog/cadence all EASY"
+				},
+				{
+					"gate": "canonical_palette_c01_c16",
+					"pass": true,
+					"evidence": "palette [\"C01\", \"C04\", \"C08\", \"C11\", \"C12\"]"
+				},
+				{
+					"gate": "used_color_count_3_12",
+					"pass": true,
+					"evidence": "5 used of 5 palette entries"
+				},
+				{
+					"gate": "exact_cell_count",
+					"pass": true,
+					"evidence": "1024 cells"
+				},
+				{
+					"gate": "no_invalid_palette_ids",
+					"pass": true,
+					"evidence": "0 invalid cell palette ids"
+				},
+				{
+					"gate": "source_reconstruction_exact",
+					"pass": true,
+					"evidence": "LevelImporter.reconstruct_image(LevelData) == source RGBA8 bytes"
+				},
+				{
+					"gate": "no_unintended_interpolation",
+					"pass": true,
+					"evidence": "source 32x32 == board, all alpha 255, 1 source pixel = 1 cell; exact byte equality above excludes resampling"
+				},
+				{
+					"gate": "cleared_transparency_render",
+					"pass": true,
+					"evidence": "BoardRenderer: every ACTIVE pixel == palette opaque; CLEARED cells alpha 0; NEAREST filter"
+				},
+				{
+					"gate": "canonical_solvability",
+					"pass": true,
+					"evidence": "reference trace 36 replayed step-exact to SOLVED (hash 4098941249); owner intended path SOLVED"
+				},
+				{
+					"gate": "routing_access_sanity",
+					"pass": true,
+					"evidence": {
+						"unreachableCellsInPeel": 0.0,
+						"routeValidatorFailures": 0.0,
+						"analyzerVsKernelProductivityMismatches": 0.0,
+						"claimsWithValidatedRoutes": 1024.0,
+						"peelGeometricMismatchCells": 0.0
+					}
+				},
+				{
+					"gate": "performance_sanity",
+					"pass": true,
+					"evidence": {
+						"headlessKernelPlacementMeanMs": 995.777777777778,
+						"headlessKernelPlacementMaxMs": 1726.0,
+						"headlessRouteComputeMaxMs": 44.0,
+						"headlessRouteComputeMeanMs": 15.0009765625,
+						"bounds": "offline sanity bounds: placement < 30000 ms, single route < 1000 ms; runtime frame performance is proven by m52_r01_parallel_runtime"
+					}
+				},
+				{
+					"gate": "preview_exact",
+					"pass": true,
+					"evidence": "preview res://assets/art/levels/previews/level_002_apple.png == LevelData reconstruction; catalog/metadata point to it"
+				},
+				{
+					"gate": "unique_stable_id",
+					"pass": true,
+					"evidence": "LevelData.id level_002_apple"
+				},
+				{
+					"gate": "catalog_order",
+					"pass": true,
+					"evidence": "catalog order 2 -> level_002_apple"
+				},
+				{
+					"gate": "source_metadata_provenance",
+					"pass": true,
+					"evidence": {
+						"sourcePathMatchesOwnerLock": true,
+						"sourceSha256Matches": true,
+						"sourceGitBlobSha1Matches": true,
+						"cellReferenceCountsMatch": true,
+						"rawBoundToCurrentLevelData": true,
+						"levelSha256BoundToM52Acceptance": true,
+						"sourcePath": "res://assets/art/levels/source/easy/level_002_apple_32x32.png",
+						"sourceSha256": "b1dd3b414738cf0557cf9baabb5d3a12208df3c3a57d3ab3184e990df1dcf580",
+						"levelSha256": "f0cf2a00898582979e9078a00ce2d0935030bc67ba7d7295360cea40ca889486"
+					}
+				},
+				{
+					"gate": "owner_supply_plan_provenance",
+					"pass": true,
+					"evidence": {
+						"planPath": "res://data/levels/supply/level_002_apple_supply_v1.json",
+						"planSha256": "d7207fbc766f9da28b37c4ecab319720fa4b882af79cea5f19961b60abfcb2ec",
+						"boundToM52Evidence": true,
+						"ownerInput": "coordination/sessions/M52-C001/owner_inputs/LEVEL_002_APPLE_SUPPLY_BATCH_CANDIDATE_V02.md"
+					}
+				}
+			],
+			"staticQa": "PASS",
+			"timing": {
+				"totalMs": 88346.0,
+				"peelMs": 10557.0,
+				"kernelPlacementMeanMs": 995.777777777778,
+				"kernelPlacementMaxMs": 1726.0,
+				"routeComputeMaxMs": 44.0,
+				"routeComputeMeanMs": 15.0009765625
+			}
+		},
+		{
+			"order": 3,
+			"id": "level_003_palm_tree",
+			"gates": [
+				{
+					"gate": "legal_dimensions_envelope",
+					"pass": true,
+					"evidence": "38x38 within 20..59"
+				},
+				{
+					"gate": "owner_locked_class_token",
+					"pass": true,
+					"evidence": "LevelData/metadata/catalog/cadence all MEDIUM"
+				},
+				{
+					"gate": "canonical_palette_c01_c16",
+					"pass": true,
+					"evidence": "palette [\"C02\", \"C04\", \"C05\", \"C08\", \"C11\", \"C16\"]"
+				},
+				{
+					"gate": "used_color_count_3_12",
+					"pass": true,
+					"evidence": "6 used of 6 palette entries"
+				},
+				{
+					"gate": "exact_cell_count",
+					"pass": true,
+					"evidence": "1444 cells"
+				},
+				{
+					"gate": "no_invalid_palette_ids",
+					"pass": true,
+					"evidence": "0 invalid cell palette ids"
+				},
+				{
+					"gate": "source_reconstruction_exact",
+					"pass": true,
+					"evidence": "LevelImporter.reconstruct_image(LevelData) == source RGBA8 bytes"
+				},
+				{
+					"gate": "no_unintended_interpolation",
+					"pass": true,
+					"evidence": "source 38x38 == board, all alpha 255, 1 source pixel = 1 cell; exact byte equality above excludes resampling"
+				},
+				{
+					"gate": "cleared_transparency_render",
+					"pass": true,
+					"evidence": "BoardRenderer: every ACTIVE pixel == palette opaque; CLEARED cells alpha 0; NEAREST filter"
+				},
+				{
+					"gate": "canonical_solvability",
+					"pass": true,
+					"evidence": "reference trace 51 replayed step-exact to SOLVED (hash 3808086370); owner intended path SOLVED"
+				},
+				{
+					"gate": "routing_access_sanity",
+					"pass": true,
+					"evidence": {
+						"unreachableCellsInPeel": 0.0,
+						"routeValidatorFailures": 0.0,
+						"analyzerVsKernelProductivityMismatches": 0.0,
+						"claimsWithValidatedRoutes": 1444.0,
+						"peelGeometricMismatchCells": 0.0
+					}
+				},
+				{
+					"gate": "performance_sanity",
+					"pass": true,
+					"evidence": {
+						"headlessKernelPlacementMeanMs": 1750.80392156863,
+						"headlessKernelPlacementMaxMs": 5681.0,
+						"headlessRouteComputeMaxMs": 156.0,
+						"headlessRouteComputeMeanMs": 22.4224376731302,
+						"bounds": "offline sanity bounds: placement < 30000 ms, single route < 1000 ms; runtime frame performance is proven by m52_r01_parallel_runtime"
+					}
+				},
+				{
+					"gate": "preview_exact",
+					"pass": true,
+					"evidence": "preview res://assets/art/levels/previews/level_003_palm_tree.png == LevelData reconstruction; catalog/metadata point to it"
+				},
+				{
+					"gate": "unique_stable_id",
+					"pass": true,
+					"evidence": "LevelData.id level_003_palm_tree"
+				},
+				{
+					"gate": "catalog_order",
+					"pass": true,
+					"evidence": "catalog order 3 -> level_003_palm_tree"
+				},
+				{
+					"gate": "source_metadata_provenance",
+					"pass": true,
+					"evidence": {
+						"sourcePathMatchesOwnerLock": true,
+						"sourceSha256Matches": true,
+						"sourceGitBlobSha1Matches": true,
+						"cellReferenceCountsMatch": true,
+						"rawBoundToCurrentLevelData": true,
+						"levelSha256BoundToM52Acceptance": true,
+						"sourcePath": "res://assets/art/levels/source/medium/level_003_palm_tree_38x38.png",
+						"sourceSha256": "84960199759b1c3a1e130a24149c14fff9a5ee6ffb53db4ec6f138e34c6116cc",
+						"levelSha256": "0aceddb060f9770fda64ad55c3d3121530d3dc9d6b18f7901a382b2fb2d1d2aa"
+					}
+				},
+				{
+					"gate": "owner_supply_plan_provenance",
+					"pass": true,
+					"evidence": {
+						"planPath": "res://data/levels/supply/level_003_palm_tree_supply_v1.json",
+						"planSha256": "41b163d7a074328ffb315526885d91d133e50d018717f0857607de6e97c9be15",
+						"boundToM52Evidence": true,
+						"ownerInput": "coordination/sessions/M52-C001/owner_inputs/LEVEL_003_PALM_TREE_SUPPLY_BATCH_CANDIDATE_V01.md"
+					}
+				}
+			],
+			"staticQa": "PASS",
+			"timing": {
+				"totalMs": 202331.0,
+				"peelMs": 22810.0,
+				"kernelPlacementMeanMs": 1750.80392156863,
+				"kernelPlacementMaxMs": 5681.0,
+				"routeComputeMaxMs": 156.0,
+				"routeComputeMeanMs": 22.4224376731302
+			}
+		},
+		{
+			"order": 4,
+			"id": "level_004_orange_cat",
+			"gates": [
+				{
+					"gate": "legal_dimensions_envelope",
+					"pass": true,
+					"evidence": "32x32 within 20..59"
+				},
+				{
+					"gate": "owner_locked_class_token",
+					"pass": true,
+					"evidence": "LevelData/metadata/catalog/cadence all EASY"
+				},
+				{
+					"gate": "canonical_palette_c01_c16",
+					"pass": true,
+					"evidence": "palette [\"C02\", \"C04\", \"C08\", \"C11\", \"C12\", \"C13\", \"C16\"]"
+				},
+				{
+					"gate": "used_color_count_3_12",
+					"pass": true,
+					"evidence": "7 used of 7 palette entries"
+				},
+				{
+					"gate": "exact_cell_count",
+					"pass": true,
+					"evidence": "1024 cells"
+				},
+				{
+					"gate": "no_invalid_palette_ids",
+					"pass": true,
+					"evidence": "0 invalid cell palette ids"
+				},
+				{
+					"gate": "source_reconstruction_exact",
+					"pass": true,
+					"evidence": "LevelImporter.reconstruct_image(LevelData) == source RGBA8 bytes"
+				},
+				{
+					"gate": "no_unintended_interpolation",
+					"pass": true,
+					"evidence": "source 32x32 == board, all alpha 255, 1 source pixel = 1 cell; exact byte equality above excludes resampling"
+				},
+				{
+					"gate": "cleared_transparency_render",
+					"pass": true,
+					"evidence": "BoardRenderer: every ACTIVE pixel == palette opaque; CLEARED cells alpha 0; NEAREST filter"
+				},
+				{
+					"gate": "canonical_solvability",
+					"pass": true,
+					"evidence": "reference trace 39 replayed step-exact to SOLVED (hash 2842640196); owner intended path SOLVED"
+				},
+				{
+					"gate": "routing_access_sanity",
+					"pass": true,
+					"evidence": {
+						"unreachableCellsInPeel": 0.0,
+						"routeValidatorFailures": 0.0,
+						"analyzerVsKernelProductivityMismatches": 0.0,
+						"claimsWithValidatedRoutes": 1024.0,
+						"peelGeometricMismatchCells": 0.0
+					}
+				},
+				{
+					"gate": "performance_sanity",
+					"pass": true,
+					"evidence": {
+						"headlessKernelPlacementMeanMs": 971.051282051282,
+						"headlessKernelPlacementMaxMs": 2381.0,
+						"headlessRouteComputeMaxMs": 55.0,
+						"headlessRouteComputeMeanMs": 15.5986328125,
+						"bounds": "offline sanity bounds: placement < 30000 ms, single route < 1000 ms; runtime frame performance is proven by m52_r01_parallel_runtime"
+					}
+				},
+				{
+					"gate": "preview_exact",
+					"pass": true,
+					"evidence": "preview res://assets/art/levels/previews/level_004_orange_cat.png == LevelData reconstruction; catalog/metadata point to it"
+				},
+				{
+					"gate": "unique_stable_id",
+					"pass": true,
+					"evidence": "LevelData.id level_004_orange_cat"
+				},
+				{
+					"gate": "catalog_order",
+					"pass": true,
+					"evidence": "catalog order 4 -> level_004_orange_cat"
+				},
+				{
+					"gate": "source_metadata_provenance",
+					"pass": true,
+					"evidence": {
+						"sourcePathMatchesOwnerLock": true,
+						"sourceSha256Matches": true,
+						"sourceGitBlobSha1Matches": true,
+						"cellReferenceCountsMatch": true,
+						"rawBoundToCurrentLevelData": true,
+						"levelSha256BoundToM52Acceptance": true,
+						"sourcePath": "res://assets/art/levels/source/easy/level_004_orange_cat_32x32.png",
+						"sourceSha256": "0b8cbc068d1d070cc5c68ee439ccb908a09cc99180f6a068ba4475339f41c926",
+						"levelSha256": "070ec1f61ebf8c2b824a62bdcd0a9e1f1b51a8588c59dc0e86a36f440f93066e"
+					}
+				},
+				{
+					"gate": "owner_supply_plan_provenance",
+					"pass": true,
+					"evidence": {
+						"planPath": "res://data/levels/supply/level_004_orange_cat_supply_v1.json",
+						"planSha256": "074b8f817eb5349f7fff903eb1431e8a5b7b8be7c25695f1773409c29aa0517e",
+						"boundToM52Evidence": true,
+						"ownerInput": "coordination/sessions/M52-C001/owner_inputs/LEVEL_004_ORANGE_CAT_SUPPLY_BATCH_CANDIDATE_V01.md"
+					}
+				}
+			],
+			"staticQa": "PASS",
+			"timing": {
+				"totalMs": 90853.0,
+				"peelMs": 10838.0,
+				"kernelPlacementMeanMs": 971.051282051282,
+				"kernelPlacementMaxMs": 2381.0,
+				"routeComputeMaxMs": 55.0,
+				"routeComputeMeanMs": 15.5986328125
+			}
+		},
+		{
+			"order": 5,
+			"id": "level_005_party_toucan",
+			"gates": [
+				{
+					"gate": "legal_dimensions_envelope",
+					"pass": true,
+					"evidence": "33x33 within 20..59"
+				},
+				{
+					"gate": "owner_locked_class_token",
+					"pass": true,
+					"evidence": "LevelData/metadata/catalog/cadence all HARD"
+				},
+				{
+					"gate": "canonical_palette_c01_c16",
+					"pass": true,
+					"evidence": "palette [\"C01\", \"C02\", \"C03\", \"C06\", \"C07\", \"C08\", \"C10\", \"C11\", \"C14\", \"C16\"]"
+				},
+				{
+					"gate": "used_color_count_3_12",
+					"pass": true,
+					"evidence": "10 used of 10 palette entries"
+				},
+				{
+					"gate": "exact_cell_count",
+					"pass": true,
+					"evidence": "1089 cells"
+				},
+				{
+					"gate": "no_invalid_palette_ids",
+					"pass": true,
+					"evidence": "0 invalid cell palette ids"
+				},
+				{
+					"gate": "source_reconstruction_exact",
+					"pass": true,
+					"evidence": "LevelImporter.reconstruct_image(LevelData) == source RGBA8 bytes"
+				},
+				{
+					"gate": "no_unintended_interpolation",
+					"pass": true,
+					"evidence": "source 33x33 == board, all alpha 255, 1 source pixel = 1 cell; exact byte equality above excludes resampling"
+				},
+				{
+					"gate": "cleared_transparency_render",
+					"pass": true,
+					"evidence": "BoardRenderer: every ACTIVE pixel == palette opaque; CLEARED cells alpha 0; NEAREST filter"
+				},
+				{
+					"gate": "canonical_solvability",
+					"pass": true,
+					"evidence": "reference trace 41 replayed step-exact to SOLVED (hash 3056207161); owner intended path SOLVED"
+				},
+				{
+					"gate": "routing_access_sanity",
+					"pass": true,
+					"evidence": {
+						"unreachableCellsInPeel": 0.0,
+						"routeValidatorFailures": 0.0,
+						"analyzerVsKernelProductivityMismatches": 0.0,
+						"claimsWithValidatedRoutes": 1089.0,
+						"peelGeometricMismatchCells": 0.0
+					}
+				},
+				{
+					"gate": "performance_sanity",
+					"pass": true,
+					"evidence": {
+						"headlessKernelPlacementMeanMs": 1038.75609756098,
+						"headlessKernelPlacementMaxMs": 3134.0,
+						"headlessRouteComputeMaxMs": 58.0,
+						"headlessRouteComputeMeanMs": 15.603305785124,
+						"bounds": "offline sanity bounds: placement < 30000 ms, single route < 1000 ms; runtime frame performance is proven by m52_r01_parallel_runtime"
+					}
+				},
+				{
+					"gate": "preview_exact",
+					"pass": true,
+					"evidence": "preview res://assets/art/levels/previews/level_005_party_toucan.png == LevelData reconstruction; catalog/metadata point to it"
+				},
+				{
+					"gate": "unique_stable_id",
+					"pass": true,
+					"evidence": "LevelData.id level_005_party_toucan"
+				},
+				{
+					"gate": "catalog_order",
+					"pass": true,
+					"evidence": "catalog order 5 -> level_005_party_toucan"
+				},
+				{
+					"gate": "source_metadata_provenance",
+					"pass": true,
+					"evidence": {
+						"sourcePathMatchesOwnerLock": true,
+						"sourceSha256Matches": true,
+						"sourceGitBlobSha1Matches": true,
+						"cellReferenceCountsMatch": true,
+						"rawBoundToCurrentLevelData": true,
+						"levelSha256BoundToM52Acceptance": true,
+						"sourcePath": "res://assets/art/levels/source/hard/level_005_party_toucan_33x33.png",
+						"sourceSha256": "c95c0fd4021bb90eacd78dbc2279809f26fe0ed435cca260881ee6961eb9874f",
+						"levelSha256": "b2c61546e75c4a203d902889e8bf41f0c82827bfdc01d9aea9a8c58ba1c5be36"
+					}
+				},
+				{
+					"gate": "owner_supply_plan_provenance",
+					"pass": true,
+					"evidence": {
+						"planPath": "res://data/levels/supply/level_005_party_toucan_supply_v1.json",
+						"planSha256": "6eb38b0448221010791c9568ad5bf76bc17257d5736595e438d4ffa723711fd8",
+						"boundToM52Evidence": true,
+						"ownerInput": "coordination/sessions/M52-C001/owner_inputs/LEVEL_005_PARTY_TOUCAN_SUPPLY_BATCH_CANDIDATE_V01.md"
+					}
+				}
+			],
+			"staticQa": "PASS",
+			"timing": {
+				"totalMs": 97842.0,
+				"peelMs": 12430.0,
+				"kernelPlacementMeanMs": 1038.75609756098,
+				"kernelPlacementMaxMs": 3134.0,
+				"routeComputeMaxMs": 58.0,
+				"routeComputeMeanMs": 15.603305785124
+			}
+		},
+		{
+			"order": 6,
+			"id": "level_006_chicken",
+			"gates": [
+				{
+					"gate": "legal_dimensions_envelope",
+					"pass": true,
+					"evidence": "32x32 within 20..59"
+				},
+				{
+					"gate": "owner_locked_class_token",
+					"pass": true,
+					"evidence": "LevelData/metadata/catalog/cadence all EASY"
+				},
+				{
+					"gate": "canonical_palette_c01_c16",
+					"pass": true,
+					"evidence": "palette [\"C01\", \"C02\", \"C03\", \"C08\", \"C11\", \"C12\", \"C14\", \"C16\"]"
+				},
+				{
+					"gate": "used_color_count_3_12",
+					"pass": true,
+					"evidence": "8 used of 8 palette entries"
+				},
+				{
+					"gate": "exact_cell_count",
+					"pass": true,
+					"evidence": "1024 cells"
+				},
+				{
+					"gate": "no_invalid_palette_ids",
+					"pass": true,
+					"evidence": "0 invalid cell palette ids"
+				},
+				{
+					"gate": "source_reconstruction_exact",
+					"pass": true,
+					"evidence": "LevelImporter.reconstruct_image(LevelData) == source RGBA8 bytes"
+				},
+				{
+					"gate": "no_unintended_interpolation",
+					"pass": true,
+					"evidence": "source 32x32 == board, all alpha 255, 1 source pixel = 1 cell; exact byte equality above excludes resampling"
+				},
+				{
+					"gate": "cleared_transparency_render",
+					"pass": true,
+					"evidence": "BoardRenderer: every ACTIVE pixel == palette opaque; CLEARED cells alpha 0; NEAREST filter"
+				},
+				{
+					"gate": "canonical_solvability",
+					"pass": true,
+					"evidence": "reference trace 40 replayed step-exact to SOLVED (hash 3310440768); owner intended path SOLVED"
+				},
+				{
+					"gate": "routing_access_sanity",
+					"pass": true,
+					"evidence": {
+						"unreachableCellsInPeel": 0.0,
+						"routeValidatorFailures": 0.0,
+						"analyzerVsKernelProductivityMismatches": 0.0,
+						"claimsWithValidatedRoutes": 1024.0,
+						"peelGeometricMismatchCells": 0.0
+					}
+				},
+				{
+					"gate": "performance_sanity",
+					"pass": true,
+					"evidence": {
+						"headlessKernelPlacementMeanMs": 968.975,
+						"headlessKernelPlacementMaxMs": 2284.0,
+						"headlessRouteComputeMaxMs": 59.0,
+						"headlessRouteComputeMeanMs": 15.9052734375,
+						"bounds": "offline sanity bounds: placement < 30000 ms, single route < 1000 ms; runtime frame performance is proven by m52_r01_parallel_runtime"
+					}
+				},
+				{
+					"gate": "preview_exact",
+					"pass": true,
+					"evidence": "preview res://assets/art/levels/previews/level_006_chicken.png == LevelData reconstruction; catalog/metadata point to it"
+				},
+				{
+					"gate": "unique_stable_id",
+					"pass": true,
+					"evidence": "LevelData.id level_006_chicken"
+				},
+				{
+					"gate": "catalog_order",
+					"pass": true,
+					"evidence": "catalog order 6 -> level_006_chicken"
+				},
+				{
+					"gate": "source_metadata_provenance",
+					"pass": true,
+					"evidence": {
+						"sourcePathMatchesOwnerLock": true,
+						"sourceSha256Matches": true,
+						"sourceGitBlobSha1Matches": true,
+						"cellReferenceCountsMatch": true,
+						"rawBoundToCurrentLevelData": true,
+						"levelSha256BoundToM52Acceptance": true,
+						"sourcePath": "res://assets/art/levels/source/easy/level_006_chicken_32x32.png",
+						"sourceSha256": "9e15e570a7b8d5a31f4cd0eb37e4f6e48e18e71f66b7c56e08510738412ff790",
+						"levelSha256": "22aa7df9e837e1403f672fea0efc988ce8222840f9a9c24a3f943685525ca762"
+					}
+				},
+				{
+					"gate": "owner_supply_plan_provenance",
+					"pass": true,
+					"evidence": {
+						"planPath": "res://data/levels/supply/level_006_chicken_supply_v1.json",
+						"planSha256": "247acffc2049784207449c72a0e3dff7c181c631a4ee4461675465f6f2230411",
+						"boundToM52Evidence": true,
+						"ownerInput": "coordination/sessions/M52-C001/owner_inputs/LEVEL_006_CHICKEN_SUPPLY_BATCH_CANDIDATE_V01.md"
+					}
+				}
+			],
+			"staticQa": "PASS",
+			"timing": {
+				"totalMs": 97176.0,
+				"peelMs": 10727.0,
+				"kernelPlacementMeanMs": 968.975,
+				"kernelPlacementMaxMs": 2284.0,
+				"routeComputeMaxMs": 59.0,
+				"routeComputeMeanMs": 15.9052734375
+			}
+		},
+		{
+			"order": 7,
+			"id": "level_007_pigeon",
+			"gates": [
+				{
+					"gate": "legal_dimensions_envelope",
+					"pass": true,
+					"evidence": "32x32 within 20..59"
+				},
+				{
+					"gate": "owner_locked_class_token",
+					"pass": true,
+					"evidence": "LevelData/metadata/catalog/cadence all EASY"
+				},
+				{
+					"gate": "canonical_palette_c01_c16",
+					"pass": true,
+					"evidence": "palette [\"C01\", \"C08\", \"C10\", \"C11\", \"C13\", \"C14\", \"C15\", \"C16\"]"
+				},
+				{
+					"gate": "used_color_count_3_12",
+					"pass": true,
+					"evidence": "8 used of 8 palette entries"
+				},
+				{
+					"gate": "exact_cell_count",
+					"pass": true,
+					"evidence": "1024 cells"
+				},
+				{
+					"gate": "no_invalid_palette_ids",
+					"pass": true,
+					"evidence": "0 invalid cell palette ids"
+				},
+				{
+					"gate": "source_reconstruction_exact",
+					"pass": true,
+					"evidence": "LevelImporter.reconstruct_image(LevelData) == source RGBA8 bytes"
+				},
+				{
+					"gate": "no_unintended_interpolation",
+					"pass": true,
+					"evidence": "source 32x32 == board, all alpha 255, 1 source pixel = 1 cell; exact byte equality above excludes resampling"
+				},
+				{
+					"gate": "cleared_transparency_render",
+					"pass": true,
+					"evidence": "BoardRenderer: every ACTIVE pixel == palette opaque; CLEARED cells alpha 0; NEAREST filter"
+				},
+				{
+					"gate": "canonical_solvability",
+					"pass": true,
+					"evidence": "reference trace 39 replayed step-exact to SOLVED (hash 2191893116); owner intended path SOLVED"
+				},
+				{
+					"gate": "routing_access_sanity",
+					"pass": true,
+					"evidence": {
+						"unreachableCellsInPeel": 0.0,
+						"routeValidatorFailures": 0.0,
+						"analyzerVsKernelProductivityMismatches": 0.0,
+						"claimsWithValidatedRoutes": 1024.0,
+						"peelGeometricMismatchCells": 0.0
+					}
+				},
+				{
+					"gate": "performance_sanity",
+					"pass": true,
+					"evidence": {
+						"headlessKernelPlacementMeanMs": 964.230769230769,
+						"headlessKernelPlacementMaxMs": 2111.0,
+						"headlessRouteComputeMaxMs": 45.0,
+						"headlessRouteComputeMeanMs": 15.1279296875,
+						"bounds": "offline sanity bounds: placement < 30000 ms, single route < 1000 ms; runtime frame performance is proven by m52_r01_parallel_runtime"
+					}
+				},
+				{
+					"gate": "preview_exact",
+					"pass": true,
+					"evidence": "preview res://assets/art/levels/previews/level_007_pigeon.png == LevelData reconstruction; catalog/metadata point to it"
+				},
+				{
+					"gate": "unique_stable_id",
+					"pass": true,
+					"evidence": "LevelData.id level_007_pigeon"
+				},
+				{
+					"gate": "catalog_order",
+					"pass": true,
+					"evidence": "catalog order 7 -> level_007_pigeon"
+				},
+				{
+					"gate": "source_metadata_provenance",
+					"pass": true,
+					"evidence": {
+						"sourcePathMatchesOwnerLock": true,
+						"sourceSha256Matches": true,
+						"sourceGitBlobSha1Matches": true,
+						"cellReferenceCountsMatch": true,
+						"rawBoundToCurrentLevelData": true,
+						"levelSha256BoundToM52Acceptance": true,
+						"sourcePath": "res://assets/art/levels/source/easy/level_007_pigeon_32x32.png",
+						"sourceSha256": "ca6004936d2ab9f4a8faef3215f9887157a407a7b63743ec07cc0a922530158a",
+						"levelSha256": "7b2884005a7685e3bfe6d47e99f197e56a395a5e914c3479f830fd1dcb200272"
+					}
+				},
+				{
+					"gate": "owner_supply_plan_provenance",
+					"pass": true,
+					"evidence": {
+						"planPath": "res://data/levels/supply/level_007_pigeon_supply_v1.json",
+						"planSha256": "0bebd941d7969839ccf028b93ad091d88e028b501aef5e71e4b15199397b5c2c",
+						"boundToM52Evidence": true,
+						"ownerInput": "coordination/sessions/M52-C001/owner_inputs/LEVEL_007_PIGEON_SUPPLY_BATCH_CANDIDATE_V01.md"
+					}
+				}
+			],
+			"staticQa": "PASS",
+			"timing": {
+				"totalMs": 90438.0,
+				"peelMs": 10717.0,
+				"kernelPlacementMeanMs": 964.230769230769,
+				"kernelPlacementMaxMs": 2111.0,
+				"routeComputeMaxMs": 45.0,
+				"routeComputeMeanMs": 15.1279296875
+			}
+		},
+		{
+			"order": 8,
+			"id": "level_008_butterfly",
+			"gates": [
+				{
+					"gate": "legal_dimensions_envelope",
+					"pass": true,
+					"evidence": "32x32 within 20..59"
+				},
+				{
+					"gate": "owner_locked_class_token",
+					"pass": true,
+					"evidence": "LevelData/metadata/catalog/cadence all MEDIUM"
+				},
+				{
+					"gate": "canonical_palette_c01_c16",
+					"pass": true,
+					"evidence": "palette [\"C01\", \"C02\", \"C03\", \"C08\", \"C11\", \"C14\", \"C15\", \"C16\"]"
+				},
+				{
+					"gate": "used_color_count_3_12",
+					"pass": true,
+					"evidence": "8 used of 8 palette entries"
+				},
+				{
+					"gate": "exact_cell_count",
+					"pass": true,
+					"evidence": "1024 cells"
+				},
+				{
+					"gate": "no_invalid_palette_ids",
+					"pass": true,
+					"evidence": "0 invalid cell palette ids"
+				},
+				{
+					"gate": "source_reconstruction_exact",
+					"pass": true,
+					"evidence": "LevelImporter.reconstruct_image(LevelData) == source RGBA8 bytes"
+				},
+				{
+					"gate": "no_unintended_interpolation",
+					"pass": true,
+					"evidence": "source 32x32 == board, all alpha 255, 1 source pixel = 1 cell; exact byte equality above excludes resampling"
+				},
+				{
+					"gate": "cleared_transparency_render",
+					"pass": true,
+					"evidence": "BoardRenderer: every ACTIVE pixel == palette opaque; CLEARED cells alpha 0; NEAREST filter"
+				},
+				{
+					"gate": "canonical_solvability",
+					"pass": true,
+					"evidence": "reference trace 37 replayed step-exact to SOLVED (hash 2524445735); owner intended path SOLVED"
+				},
+				{
+					"gate": "routing_access_sanity",
+					"pass": true,
+					"evidence": {
+						"unreachableCellsInPeel": 0.0,
+						"routeValidatorFailures": 0.0,
+						"analyzerVsKernelProductivityMismatches": 0.0,
+						"claimsWithValidatedRoutes": 1024.0,
+						"peelGeometricMismatchCells": 0.0
+					}
+				},
+				{
+					"gate": "performance_sanity",
+					"pass": true,
+					"evidence": {
+						"headlessKernelPlacementMeanMs": 930.621621621622,
+						"headlessKernelPlacementMaxMs": 2697.0,
+						"headlessRouteComputeMaxMs": 57.0,
+						"headlessRouteComputeMeanMs": 14.025390625,
+						"bounds": "offline sanity bounds: placement < 30000 ms, single route < 1000 ms; runtime frame performance is proven by m52_r01_parallel_runtime"
+					}
+				},
+				{
+					"gate": "preview_exact",
+					"pass": true,
+					"evidence": "preview res://assets/art/levels/previews/level_008_butterfly.png == LevelData reconstruction; catalog/metadata point to it"
+				},
+				{
+					"gate": "unique_stable_id",
+					"pass": true,
+					"evidence": "LevelData.id level_008_butterfly"
+				},
+				{
+					"gate": "catalog_order",
+					"pass": true,
+					"evidence": "catalog order 8 -> level_008_butterfly"
+				},
+				{
+					"gate": "source_metadata_provenance",
+					"pass": true,
+					"evidence": {
+						"sourcePathMatchesOwnerLock": true,
+						"sourceSha256Matches": true,
+						"sourceGitBlobSha1Matches": true,
+						"cellReferenceCountsMatch": true,
+						"rawBoundToCurrentLevelData": true,
+						"levelSha256BoundToM52Acceptance": true,
+						"sourcePath": "res://assets/art/levels/source/medium/level_008_butterfly_32x32.png",
+						"sourceSha256": "9a623fece67690862ba73b737e5e52d9acfbe1e46b160c411eee5714ea01b2fc",
+						"levelSha256": "672053fc43ec1d5f50cc5f27ed98e7e0d022c62524b47b831a8addf32343f339"
+					}
+				},
+				{
+					"gate": "owner_supply_plan_provenance",
+					"pass": true,
+					"evidence": {
+						"planPath": "res://data/levels/supply/level_008_butterfly_supply_v1.json",
+						"planSha256": "c63617d297301bc35060c8e8ddf46210b59b124f4f13dde0eb46c8fc0ed2df91",
+						"boundToM52Evidence": true,
+						"ownerInput": "coordination/sessions/M52-C001/owner_inputs/LEVEL_008_BUTTERFLY_SUPPLY_BATCH_CANDIDATE_V01.md"
+					}
+				}
+			],
+			"staticQa": "PASS",
+			"timing": {
+				"totalMs": 94642.0,
+				"peelMs": 10634.0,
+				"kernelPlacementMeanMs": 930.621621621622,
+				"kernelPlacementMaxMs": 2697.0,
+				"routeComputeMaxMs": 57.0,
+				"routeComputeMeanMs": 14.025390625
+			}
+		},
+		{
+			"order": 9,
+			"id": "level_009_frog",
+			"gates": [
+				{
+					"gate": "legal_dimensions_envelope",
+					"pass": true,
+					"evidence": "32x32 within 20..59"
+				},
+				{
+					"gate": "owner_locked_class_token",
+					"pass": true,
+					"evidence": "LevelData/metadata/catalog/cadence all EASY"
+				},
+				{
+					"gate": "canonical_palette_c01_c16",
+					"pass": true,
+					"evidence": "palette [\"C06\", \"C07\", \"C08\", \"C12\", \"C13\", \"C15\", \"C16\"]"
+				},
+				{
+					"gate": "used_color_count_3_12",
+					"pass": true,
+					"evidence": "7 used of 7 palette entries"
+				},
+				{
+					"gate": "exact_cell_count",
+					"pass": true,
+					"evidence": "1024 cells"
+				},
+				{
+					"gate": "no_invalid_palette_ids",
+					"pass": true,
+					"evidence": "0 invalid cell palette ids"
+				},
+				{
+					"gate": "source_reconstruction_exact",
+					"pass": true,
+					"evidence": "LevelImporter.reconstruct_image(LevelData) == source RGBA8 bytes"
+				},
+				{
+					"gate": "no_unintended_interpolation",
+					"pass": true,
+					"evidence": "source 32x32 == board, all alpha 255, 1 source pixel = 1 cell; exact byte equality above excludes resampling"
+				},
+				{
+					"gate": "cleared_transparency_render",
+					"pass": true,
+					"evidence": "BoardRenderer: every ACTIVE pixel == palette opaque; CLEARED cells alpha 0; NEAREST filter"
+				},
+				{
+					"gate": "canonical_solvability",
+					"pass": true,
+					"evidence": "reference trace 38 replayed step-exact to SOLVED (hash 3800836965); owner intended path SOLVED"
+				},
+				{
+					"gate": "routing_access_sanity",
+					"pass": true,
+					"evidence": {
+						"unreachableCellsInPeel": 0.0,
+						"routeValidatorFailures": 0.0,
+						"analyzerVsKernelProductivityMismatches": 0.0,
+						"claimsWithValidatedRoutes": 1024.0,
+						"peelGeometricMismatchCells": 0.0
+					}
+				},
+				{
+					"gate": "performance_sanity",
+					"pass": true,
+					"evidence": {
+						"headlessKernelPlacementMeanMs": 1181.15789473684,
+						"headlessKernelPlacementMaxMs": 3935.0,
+						"headlessRouteComputeMaxMs": 64.0,
+						"headlessRouteComputeMeanMs": 16.11328125,
+						"bounds": "offline sanity bounds: placement < 30000 ms, single route < 1000 ms; runtime frame performance is proven by m52_r01_parallel_runtime"
+					}
+				},
+				{
+					"gate": "preview_exact",
+					"pass": true,
+					"evidence": "preview res://assets/art/levels/previews/level_009_frog.png == LevelData reconstruction; catalog/metadata point to it"
+				},
+				{
+					"gate": "unique_stable_id",
+					"pass": true,
+					"evidence": "LevelData.id level_009_frog"
+				},
+				{
+					"gate": "catalog_order",
+					"pass": true,
+					"evidence": "catalog order 9 -> level_009_frog"
+				},
+				{
+					"gate": "source_metadata_provenance",
+					"pass": true,
+					"evidence": {
+						"sourcePathMatchesOwnerLock": true,
+						"sourceSha256Matches": true,
+						"sourceGitBlobSha1Matches": true,
+						"cellReferenceCountsMatch": true,
+						"rawBoundToCurrentLevelData": true,
+						"levelSha256BoundToM52Acceptance": true,
+						"sourcePath": "res://assets/art/levels/source/easy/level_009_frog_32x32.png",
+						"sourceSha256": "b0bd1638961cd69e64f2bd174df117d3c75520be0804a114362efc96663d036f",
+						"levelSha256": "b5989964a4dd1e909e169c0b796919e34165ff9fe1f4d10679f6cffc17a4604f"
+					}
+				},
+				{
+					"gate": "owner_supply_plan_provenance",
+					"pass": true,
+					"evidence": {
+						"planPath": "res://data/levels/supply/level_009_frog_supply_v1.json",
+						"planSha256": "aeba673bb44229cc9e6a61b8bfc6b455e95a6bde2517b631c45d9910ee627992",
+						"boundToM52Evidence": true,
+						"ownerInput": "coordination/sessions/M52-C001/owner_inputs/LEVEL_009_FROG_SUPPLY_BATCH_CANDIDATE_V01.md"
+					}
+				}
+			],
+			"staticQa": "PASS",
+			"timing": {
+				"totalMs": 95417.0,
+				"peelMs": 10866.0,
+				"kernelPlacementMeanMs": 1181.15789473684,
+				"kernelPlacementMaxMs": 3935.0,
+				"routeComputeMaxMs": 64.0,
+				"routeComputeMeanMs": 16.11328125
+			}
+		},
+		{
+			"order": 10,
+			"id": "level_010_ice_cube",
+			"gates": [
+				{
+					"gate": "legal_dimensions_envelope",
+					"pass": true,
+					"evidence": "32x32 within 20..59"
+				},
+				{
+					"gate": "owner_locked_class_token",
+					"pass": true,
+					"evidence": "LevelData/metadata/catalog/cadence all VERY_HARD"
+				},
+				{
+					"gate": "canonical_palette_c01_c16",
+					"pass": true,
+					"evidence": "palette [\"C02\", \"C03\", \"C05\", \"C06\", \"C07\", \"C08\", \"C13\", \"C14\", \"C15\", \"C16\"]"
+				},
+				{
+					"gate": "used_color_count_3_12",
+					"pass": true,
+					"evidence": "10 used of 10 palette entries"
+				},
+				{
+					"gate": "exact_cell_count",
+					"pass": true,
+					"evidence": "1024 cells"
+				},
+				{
+					"gate": "no_invalid_palette_ids",
+					"pass": true,
+					"evidence": "0 invalid cell palette ids"
+				},
+				{
+					"gate": "source_reconstruction_exact",
+					"pass": true,
+					"evidence": "LevelImporter.reconstruct_image(LevelData) == source RGBA8 bytes"
+				},
+				{
+					"gate": "no_unintended_interpolation",
+					"pass": true,
+					"evidence": "source 32x32 == board, all alpha 255, 1 source pixel = 1 cell; exact byte equality above excludes resampling"
+				},
+				{
+					"gate": "cleared_transparency_render",
+					"pass": true,
+					"evidence": "BoardRenderer: every ACTIVE pixel == palette opaque; CLEARED cells alpha 0; NEAREST filter"
+				},
+				{
+					"gate": "canonical_solvability",
+					"pass": true,
+					"evidence": "reference trace 40 replayed step-exact to SOLVED (hash 1480752256); owner intended path SOLVED"
+				},
+				{
+					"gate": "routing_access_sanity",
+					"pass": true,
+					"evidence": {
+						"unreachableCellsInPeel": 0.0,
+						"routeValidatorFailures": 0.0,
+						"analyzerVsKernelProductivityMismatches": 0.0,
+						"claimsWithValidatedRoutes": 1024.0,
+						"peelGeometricMismatchCells": 0.0
+					}
+				},
+				{
+					"gate": "performance_sanity",
+					"pass": true,
+					"evidence": {
+						"headlessKernelPlacementMeanMs": 958.0,
+						"headlessKernelPlacementMaxMs": 2907.0,
+						"headlessRouteComputeMaxMs": 62.0,
+						"headlessRouteComputeMeanMs": 15.50390625,
+						"bounds": "offline sanity bounds: placement < 30000 ms, single route < 1000 ms; runtime frame performance is proven by m52_r01_parallel_runtime"
+					}
+				},
+				{
+					"gate": "preview_exact",
+					"pass": true,
+					"evidence": "preview res://assets/art/levels/previews/level_010_ice_cube.png == LevelData reconstruction; catalog/metadata point to it"
+				},
+				{
+					"gate": "unique_stable_id",
+					"pass": true,
+					"evidence": "LevelData.id level_010_ice_cube"
+				},
+				{
+					"gate": "catalog_order",
+					"pass": true,
+					"evidence": "catalog order 10 -> level_010_ice_cube"
+				},
+				{
+					"gate": "source_metadata_provenance",
+					"pass": true,
+					"evidence": {
+						"sourcePathMatchesOwnerLock": true,
+						"sourceSha256Matches": true,
+						"sourceGitBlobSha1Matches": true,
+						"cellReferenceCountsMatch": true,
+						"rawBoundToCurrentLevelData": true,
+						"levelSha256BoundToM52Acceptance": true,
+						"sourcePath": "res://assets/art/levels/source/very_hard/level_010_ice_cube_32x32.png",
+						"sourceSha256": "a39b54c0adc05ca4778536cd9f0b5bccaa7cfde786fb8c72efa4be91029d3d61",
+						"levelSha256": "ab7a93178852441d1750c66fed3e24b30b906d145383f7df5113eda7b8dff8ed"
+					}
+				},
+				{
+					"gate": "owner_supply_plan_provenance",
+					"pass": true,
+					"evidence": {
+						"planPath": "res://data/levels/supply/level_010_ice_cube_supply_v1.json",
+						"planSha256": "414ea406e2b4d76991e2024fb3397add0cfae0e6234b838cd3fc595827ba84bd",
+						"boundToM52Evidence": true,
+						"ownerInput": "coordination/sessions/M52-C001/owner_inputs/LEVEL_010_ICE_CUBE_SUPPLY_BATCH_CANDIDATE_V01.md"
+					}
+				}
+			],
+			"staticQa": "PASS",
+			"timing": {
+				"totalMs": 85493.0,
+				"peelMs": 10527.0,
+				"kernelPlacementMeanMs": 958.0,
+				"kernelPlacementMaxMs": 2907.0,
+				"routeComputeMaxMs": 62.0,
+				"routeComputeMeanMs": 15.50390625
+			}
+		}
+	],
+	"protectedBehaviorSuites": [
+		"tests/m52_owner_supply_plans.gd",
+		"tests/m52_r01_parallel_runtime.gd",
+		"tests/m52_r02_early_slot_release.gd"
+	],
+	"note": "Runtime WON 9/9 (Levels 2-10), frontier 11 CONTENT_MISSING, R01/R02 behavior and runtime performance are proven by the protected suites above (re-run for M53; see CLAUDE_LOG_V01.md)."
+}
