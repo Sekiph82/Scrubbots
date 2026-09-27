@@ -1596,6 +1596,10 @@ V04 implementation prompt: `coordination/sessions/M42-C001/task_prompts/SB-M42-H
 - [x] SB-M42-024 Implement Daily consecutive-login count / 5-day cycle / booster reward presentation.
 - [x] SB-M42-025 Keep all SB prices, Bot Parts values, Gift Meter values and Daily states live/localizable.
 
+**Owner runtime validation [2026-09-27 / OWNER_RUNTIME_PASS / VISUAL_POLISH_OPEN]:**
+`coordination/OWNER_ECONOMY_PROGRESSION_RUNTIME_VALIDATION_V01.md`.
+During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Bucks balance, Gift Meter, Bot Parts/next-robot progress and Home progression bars were manually confirmed to update correctly. Treat these mechanics/data bindings as working runtime truth; later tasks remain responsible for improving their visual quality and reward/presentation polish without rewriting the validated backend unnecessarily.
+
 **Opening cinematic / boot flow [OWNER ASSET — 2026-09-19]**
 
 - [x] SB-M42-026 Opening cinematic source: preserve the owner-supplied 15-second source video at `assets/brand/opening/final_15_seconds_opening_video.mp4`.

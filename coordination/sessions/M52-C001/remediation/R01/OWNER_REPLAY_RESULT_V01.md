@@ -35,3 +35,20 @@ R01 gameplay feel is accepted except for the slot-release lifecycle rule above.
 Open M52-C001-R02 to implement safe **dispatch-exhausted slot release**.
 
 After R02 implementation + independent audit + a short owner spot-check, the M52 owner gameplay replay can be considered complete and the First 10 sequence may continue to M53.
+
+
+## Economy / progression runtime validation
+
+During the same owner replay, the owner additionally confirmed:
+
+- 2x purchase flow works in production gameplay;
+- correct Scrub Bucks are deducted;
+- the live Scrub Bucks HUD/balance updates correctly;
+- Gift Meter updates correctly;
+- Bot Parts / next-robot progress updates correctly;
+- Home progression bars update correctly.
+
+These systems are accepted as **systemically correct** for the observed runtime path. Their current visual presentation is **not final/visually sufficient** and remains subject to later Player Experience/UI polish.
+
+Durable validation record:
+`coordination/OWNER_ECONOMY_PROGRESSION_RUNTIME_VALIDATION_V01.md`
