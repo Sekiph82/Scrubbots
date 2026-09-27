@@ -5,15 +5,15 @@ This root TASKS.md is the only authoritative project-status tracker consumed by 
 ## Project Status
 
 - Current Milestone: M52 PRODUCTION CONTENT SCALE-UP
-- Current Sprint: M52-C001-R02 Early Slot Release
-- Current Task: Release physical slot immediately when the batch has no Scrubbys left waiting to launch, while preserving in-flight batch accounting
-- Current Task Status: OWNER_REPLAY_PASS_WITH_ONE_REMEDIATION / IMPLEMENTATION_REQUIRED
-- Next Task/Action: CLAUDE executes `coordination/sessions/M52-C001/remediation/R02/SB-M52-C001-R02_EARLY_SLOT_RELEASE.md`. ChatGPT then audits; owner performs a short zero-count slot-reuse spot-check. If PASS, M52 owner replay closes and First 10 advances to M53.
-- Required Actor: CLAUDE
+- Current Sprint: M52-C001-R02 Owner Spot-Check
+- Current Task: Owner confirms zero-count physical slot disappears immediately and can be reused before the old Scrubby clears
+- Current Task Status: AUDITED_PASS / OWNER_SPOT_CHECK_REQUIRED
+- Next Task/Action: OWNER runs `coordination/sessions/M52-C001/remediation/R02/OWNER_SPOT_CHECK_V01.md`. On PASS, ChatGPT closes the M52 owner replay and advances the locked First 10 block to M53 per-level QA.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 773 / 1313 = 58.87%. R01 owner replay passed except for the single R02 early-slot-release blocker; R02 implementation is now the active First 10 gate.
-- Note: R01 owner replay is PASS for parallel lanes, counter timing, 2x, stutter, Levels 2–10 and progression. One final blocker remains: a zero launch-count batch still occupies its physical slot until the last in-flight clear. Owner result: `coordination/sessions/M52-C001/remediation/R01/OWNER_REPLAY_RESULT_V01.md`. R02 implements authoritative early physical-slot release with draining-batch accounting.
+- Progress: 788 / 1313 = 60.02%. M52-C001-R02 implementation and independent audit are complete; one owner slot-lifecycle spot-check is the active First 10 gate.
+- Note: R02 independent audit PASS: `coordination/sessions/M52-C001/remediation/R02/CHATGPT_AUDIT_V01.md`. Authoritative early slot release, draining-batch anti-cross-talk, Retry/Tornado, stale-wave safety, completion and First 10 regression all pass. Only a short owner visual/reuse spot-check remains before M53.
 - Owner sequencing lock: stay on the **First 10 Level Pack** until all work tied to Levels 1–10 is finished. This includes M52-C001 implementation/integration, independent audit, any remediation, owner playtest/acceptance, the applicable M53 per-level QA for Levels 1–10, and the applicable M54 content/regression validation needed to prove this ten-level pack stable. Only after that block is fully closed do we resume the main roadmap at **M43 Results Screen**. M43 remains fully open and is intentionally deferred, not skipped.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -2061,21 +2061,21 @@ Owner findings: `coordination/sessions/M52-C001/OWNER_PLAYTEST_FINDINGS_V01.md`.
 
 #### M52-C001-R02 Dispatch-Exhausted Physical Slot Release
 
-- [ ] SB-M52-R02-001 Separate physical slot occupancy from retired/draining in-flight batch accounting.
-- [ ] SB-M52-R02-002 Release the physical slot only after the final zero-capacity work unit has successfully established a real dispatched agent.
-- [ ] SB-M52-R02-003 Make the released slot immediately reusable through normal rightmost-empty placement.
-- [ ] SB-M52-R02-004 Bind old in-flight work to immutable batch identity so a reused physical slot cannot receive old clears.
-- [ ] SB-M52-R02-005 Prove Batch A can retire, Batch B reuse the same slot, then A clear without mutating/freeing B.
-- [ ] SB-M52-R02-006 Preserve exact rollback/pre-spawn failure behavior: failed dispatch never releases the slot.
-- [ ] SB-M52-R02-007 Preserve Retry/reset with active + draining batches and zero ghosts.
-- [ ] SB-M52-R02-008 Preserve Tornado transactional behavior with draining selected-color work.
-- [ ] SB-M52-R02-009 Prevent stale frame-budgeted wave lanes from acting on a replacement batch in a reused slot.
-- [ ] SB-M52-R02-010 Make UI show EMPTY immediately on the same departure/retirement sync, with no zero-count linger.
-- [ ] SB-M52-R02-011 Preserve completion cardinalities and prevent early WON.
-- [ ] SB-M52-R02-012 Review/document M27 proof consistency under early physical-slot reuse.
-- [ ] SB-M52-R02-013 Re-run First 10 proof/replay/production runtime.
-- [ ] SB-M52-R02-014 Run R02 + R01 + historical + root regression and diff hygiene.
-- [ ] SB-M52-R02-015 Independent ChatGPT audit.
+- [x] SB-M52-R02-001 Separate physical slot occupancy from retired/draining in-flight batch accounting.
+- [x] SB-M52-R02-002 Release the physical slot only after the final zero-capacity work unit has successfully established a real dispatched agent.
+- [x] SB-M52-R02-003 Make the released slot immediately reusable through normal rightmost-empty placement.
+- [x] SB-M52-R02-004 Bind old in-flight work to immutable batch identity so a reused physical slot cannot receive old clears.
+- [x] SB-M52-R02-005 Prove Batch A can retire, Batch B reuse the same slot, then A clear without mutating/freeing B.
+- [x] SB-M52-R02-006 Preserve exact rollback/pre-spawn failure behavior: failed dispatch never releases the slot.
+- [x] SB-M52-R02-007 Preserve Retry/reset with active + draining batches and zero ghosts.
+- [x] SB-M52-R02-008 Preserve Tornado transactional behavior with draining selected-color work.
+- [x] SB-M52-R02-009 Prevent stale frame-budgeted wave lanes from acting on a replacement batch in a reused slot.
+- [x] SB-M52-R02-010 Make UI show EMPTY immediately on the same departure/retirement sync, with no zero-count linger.
+- [x] SB-M52-R02-011 Preserve completion cardinalities and prevent early WON.
+- [x] SB-M52-R02-012 Review/document M27 proof consistency under early physical-slot reuse.
+- [x] SB-M52-R02-013 Re-run First 10 proof/replay/production runtime.
+- [x] SB-M52-R02-014 Run R02 + R01 + historical + root regression and diff hygiene.
+- [x] SB-M52-R02-015 Independent ChatGPT audit.
 - [ ] SB-M52-R02-016 Owner zero-count slot-reuse spot-check; on PASS close M52 owner replay and advance to M53.
 
 ### M53 — Level QA `[QA]`
