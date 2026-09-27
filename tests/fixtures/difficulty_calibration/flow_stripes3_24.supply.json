@@ -1,0 +1,123 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "flow_stripes3_24-001",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_24-002",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "flow_stripes3_24-003",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "flow_stripes3_24-004",
+				"cid": "C04",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_24-005",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "flow_stripes3_24-006",
+				"cid": "C08",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_24-007",
+				"cid": "C08",
+				"robots": 27
+			}
+		],
+		[
+			{
+				"batchId": "flow_stripes3_24-008",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_24-009",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "flow_stripes3_24-010",
+				"cid": "C04",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_24-011",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "flow_stripes3_24-012",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "flow_stripes3_24-013",
+				"cid": "C08",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_24-014",
+				"cid": "C08",
+				"robots": 27
+			}
+		],
+		[
+			{
+				"batchId": "flow_stripes3_24-015",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_24-016",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "flow_stripes3_24-017",
+				"cid": "C04",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_24-018",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "flow_stripes3_24-019",
+				"cid": "C08",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_24-020",
+				"cid": "C08",
+				"robots": 27
+			},
+			{
+				"batchId": "flow_stripes3_24-021",
+				"cid": "C08",
+				"robots": 27
+			}
+		]
+	],
+	"levelId": "calib_flow_stripes3_24",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

@@ -1,0 +1,845 @@
+{
+	"familyChecks": {
+		"flowMaxD": 40.0,
+		"flowSizeSpreadLimitD": 18.0,
+		"reason": "board size alone must not move D across the smallest cycle-0 lane gap (EASY 22 -> MEDIUM 40 = 18) nor lift a flow board to the MEDIUM target"
+	},
+	"fixtures": [
+		{
+			"axis": "W",
+			"batches": 14,
+			"colors": [
+				"C01",
+				"C04",
+				"C08"
+			],
+			"family": "FLOW_SIZE",
+			"id": "flow_stripes3_20",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/flow_stripes3_20.level.json",
+			"shape": "stripes",
+			"size": 20,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/flow_stripes3_20.supply.json",
+			"usedColors": [
+				"C01",
+				"C04",
+				"C08"
+			]
+		},
+		{
+			"axis": "W",
+			"batches": 21,
+			"colors": [
+				"C01",
+				"C04",
+				"C08"
+			],
+			"family": "FLOW_SIZE",
+			"id": "flow_stripes3_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/flow_stripes3_24.level.json",
+			"shape": "stripes",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/flow_stripes3_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C04",
+				"C08"
+			]
+		},
+		{
+			"axis": "W",
+			"batches": 35,
+			"colors": [
+				"C01",
+				"C04",
+				"C08"
+			],
+			"family": "FLOW_SIZE",
+			"id": "flow_stripes3_32",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/flow_stripes3_32.level.json",
+			"shape": "stripes",
+			"size": 32,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/flow_stripes3_32.supply.json",
+			"usedColors": [
+				"C01",
+				"C04",
+				"C08"
+			]
+		},
+		{
+			"axis": "W",
+			"batches": 55,
+			"colors": [
+				"C01",
+				"C04",
+				"C08"
+			],
+			"family": "FLOW_SIZE",
+			"id": "flow_stripes3_40",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/flow_stripes3_40.level.json",
+			"shape": "stripes",
+			"size": 40,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/flow_stripes3_40.supply.json",
+			"usedColors": [
+				"C01",
+				"C04",
+				"C08"
+			]
+		},
+		{
+			"axis": "W",
+			"batches": 78,
+			"colors": [
+				"C01",
+				"C04",
+				"C08"
+			],
+			"family": "FLOW_SIZE",
+			"id": "flow_stripes3_48",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/flow_stripes3_48.level.json",
+			"shape": "stripes",
+			"size": 48,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/flow_stripes3_48.supply.json",
+			"usedColors": [
+				"C01",
+				"C04",
+				"C08"
+			]
+		},
+		{
+			"axis": "C",
+			"batches": 24,
+			"colors": [
+				"C01",
+				"C03",
+				"C04",
+				"C07",
+				"C08",
+				"C10"
+			],
+			"family": "COLOR_EXPLORATORY",
+			"id": "color_stripes6_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/color_stripes6_24.level.json",
+			"shape": "stripes",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/color_stripes6_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C04",
+				"C07",
+				"C08",
+				"C10"
+			]
+		},
+		{
+			"axis": "C",
+			"batches": 24,
+			"colors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10",
+				"C11",
+				"C14"
+			],
+			"family": "COLOR_EXPLORATORY",
+			"id": "color_stripes12_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/color_stripes12_24.level.json",
+			"shape": "stripes",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/color_stripes12_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10",
+				"C11",
+				"C14"
+			]
+		},
+		{
+			"axis": "C",
+			"batches": 21,
+			"colors": [
+				"C08",
+				"C01",
+				"C03",
+				"C04",
+				"C07",
+				"C10"
+			],
+			"family": "COLOR_EXPLORATORY",
+			"id": "color_skew6_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/color_skew6_24.level.json",
+			"shape": "skew",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/color_skew6_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C04",
+				"C07",
+				"C08",
+				"C10"
+			]
+		},
+		{
+			"axis": "C",
+			"batches": 21,
+			"colors": [
+				"C01",
+				"C04",
+				"C08"
+			],
+			"family": "COLOR",
+			"id": "color_m3_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/color_m3_24.level.json",
+			"pattern": [
+				0,
+				1,
+				2,
+				0,
+				1,
+				2,
+				0,
+				1,
+				2,
+				0,
+				1,
+				2
+			],
+			"shape": "pattern12",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/color_m3_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C04",
+				"C08"
+			]
+		},
+		{
+			"axis": "C",
+			"batches": 24,
+			"colors": [
+				"C01",
+				"C03",
+				"C04",
+				"C07",
+				"C08",
+				"C10"
+			],
+			"family": "COLOR",
+			"id": "color_m6_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/color_m6_24.level.json",
+			"pattern": [
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				0,
+				1,
+				2,
+				3,
+				4,
+				5
+			],
+			"shape": "pattern12",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/color_m6_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C04",
+				"C07",
+				"C08",
+				"C10"
+			]
+		},
+		{
+			"axis": "C",
+			"batches": 24,
+			"colors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10",
+				"C11",
+				"C14"
+			],
+			"family": "COLOR",
+			"id": "color_m12_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/color_m12_24.level.json",
+			"pattern": [
+				0,
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				7,
+				8,
+				9,
+				10,
+				11
+			],
+			"shape": "pattern12",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/color_m12_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10",
+				"C11",
+				"C14"
+			]
+		},
+		{
+			"axis": "C",
+			"batches": 22,
+			"colors": [
+				"C08",
+				"C01",
+				"C03",
+				"C04",
+				"C07",
+				"C10"
+			],
+			"family": "COLOR",
+			"id": "color_m6skew_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/color_m6skew_24.level.json",
+			"pattern": [
+				0,
+				1,
+				0,
+				2,
+				0,
+				3,
+				0,
+				4,
+				0,
+				5,
+				0,
+				1
+			],
+			"shape": "pattern12",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/color_m6skew_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C04",
+				"C07",
+				"C08",
+				"C10"
+			]
+		},
+		{
+			"axis": "A",
+			"batches": 21,
+			"colors": [
+				"C01",
+				"C07",
+				"C03"
+			],
+			"family": "ACCESSIBILITY",
+			"id": "access_band3_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/access_band3_24.level.json",
+			"order": [
+				"C01",
+				"C07",
+				"C03"
+			],
+			"shape": "band",
+			"size": 24,
+			"supply": "color_first",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/access_band3_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C07"
+			]
+		},
+		{
+			"axis": "A",
+			"batches": 21,
+			"colors": [
+				"C01",
+				"C07",
+				"C03"
+			],
+			"family": "ACCESSIBILITY",
+			"id": "access_shafts3_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/access_shafts3_24.level.json",
+			"order": [
+				"C01",
+				"C07",
+				"C03"
+			],
+			"shape": "shafts",
+			"size": 24,
+			"supply": "color_first",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/access_shafts3_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C07"
+			]
+		},
+		{
+			"axis": "A",
+			"batches": 21,
+			"colors": [
+				"C01",
+				"C07",
+				"C03"
+			],
+			"family": "ACCESSIBILITY_EXPLORATORY",
+			"id": "access_halves3_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/access_halves3_24.level.json",
+			"shape": "halves",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/access_halves3_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C07"
+			]
+		},
+		{
+			"axis": "A",
+			"batches": 21,
+			"colors": [
+				"C01",
+				"C07",
+				"C03"
+			],
+			"family": "ACCESSIBILITY_EXPLORATORY",
+			"id": "access_comb3_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/access_comb3_24.level.json",
+			"shape": "comb",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/access_comb3_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C07"
+			]
+		},
+		{
+			"axis": "A",
+			"batches": 20,
+			"colors": [
+				"C01",
+				"C03",
+				"C04",
+				"C07"
+			],
+			"family": "ACCESSIBILITY_EXPLORATORY",
+			"id": "access_stripes4_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/access_stripes4_24.level.json",
+			"shape": "stripes",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/access_stripes4_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C04",
+				"C07"
+			]
+		},
+		{
+			"axis": "A",
+			"batches": 28,
+			"colors": [
+				"C01",
+				"C03",
+				"C04",
+				"C07"
+			],
+			"family": "ACCESSIBILITY_EXPLORATORY",
+			"id": "access_mosaic4_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/access_mosaic4_24.level.json",
+			"shape": "mosaic",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/access_mosaic4_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C04",
+				"C07"
+			]
+		},
+		{
+			"axis": "U",
+			"batches": 21,
+			"colors": [
+				"C08",
+				"C01",
+				"C03"
+			],
+			"family": "UNLOCK",
+			"id": "unlock_shallow_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/unlock_shallow_24.level.json",
+			"shape": "shallow",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/unlock_shallow_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C08"
+			]
+		},
+		{
+			"axis": "U",
+			"batches": 21,
+			"colors": [
+				"C08",
+				"C01",
+				"C03"
+			],
+			"family": "UNLOCK",
+			"id": "unlock_deep_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/unlock_deep_24.level.json",
+			"ring": 2,
+			"shape": "rings",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/unlock_deep_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C08"
+			]
+		},
+		{
+			"axis": "R",
+			"batches": 21,
+			"colors": [
+				"C07",
+				"C14",
+				"C03"
+			],
+			"family": "ROUTE",
+			"id": "route_straight_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/route_straight_24.level.json",
+			"order": [
+				"C07",
+				"C14",
+				"C03"
+			],
+			"shape": "open_block",
+			"size": 24,
+			"supply": "color_first",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/route_straight_24.supply.json",
+			"usedColors": [
+				"C03",
+				"C07",
+				"C14"
+			]
+		},
+		{
+			"axis": "R",
+			"batches": 21,
+			"colors": [
+				"C07",
+				"C14",
+				"C03"
+			],
+			"family": "ROUTE",
+			"id": "route_maze_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/route_maze_24.level.json",
+			"order": [
+				"C07",
+				"C14",
+				"C03"
+			],
+			"shape": "maze",
+			"size": 24,
+			"supply": "color_first",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/route_maze_24.supply.json",
+			"usedColors": [
+				"C03",
+				"C07",
+				"C14"
+			]
+		},
+		{
+			"axis": "B",
+			"batches": 21,
+			"colors": [
+				"C08",
+				"C01",
+				"C03"
+			],
+			"family": "BOTTLENECK",
+			"id": "bottleneck_low_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/bottleneck_low_24.level.json",
+			"ring": 4,
+			"shape": "rings",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/bottleneck_low_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C08"
+			]
+		},
+		{
+			"axis": "B",
+			"batches": 21,
+			"colors": [
+				"C08",
+				"C01",
+				"C03"
+			],
+			"family": "BOTTLENECK",
+			"id": "bottleneck_high_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/bottleneck_high_24.level.json",
+			"ring": 4,
+			"shape": "rings",
+			"size": 24,
+			"supply": "layer_split",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/bottleneck_high_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C08"
+			]
+		},
+		{
+			"axis": "S",
+			"batches": 21,
+			"colors": [
+				"C01",
+				"C04",
+				"C03"
+			],
+			"family": "SLOT",
+			"id": "slot_low_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/slot_low_24.level.json",
+			"shape": "slot_rings",
+			"size": 24,
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/slot_low_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C04"
+			]
+		},
+		{
+			"axis": "S",
+			"batches": 20,
+			"colors": [
+				"C01",
+				"C04",
+				"C03"
+			],
+			"family": "SLOT",
+			"id": "slot_high_24",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/slot_high_24.level.json",
+			"shape": "slot_rings",
+			"size": 24,
+			"supply": "straddle30",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/slot_high_24.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C04"
+			]
+		},
+		{
+			"axis": "D",
+			"batches": 15,
+			"colors": [
+				"C08",
+				"C01",
+				"C03"
+			],
+			"family": "COMPACT_HARD",
+			"id": "compact_hard_20",
+			"levelPath": "res://tests/fixtures/difficulty_calibration/compact_hard_20.level.json",
+			"ring": 2,
+			"shape": "rings",
+			"size": 20,
+			"supply": "layer_split",
+			"supplyPath": "res://tests/fixtures/difficulty_calibration/compact_hard_20.supply.json",
+			"usedColors": [
+				"C01",
+				"C03",
+				"C08"
+			]
+		}
+	],
+	"note": "QA-only calibration fixtures. Never production catalog content. Intent and ordinal expectations were declared before any measurement.",
+	"ordinalPairs": [
+		{
+			"axis": "C",
+			"easier": "flow_stripes3_24",
+			"harder": "color_stripes6_24",
+			"requireD": true,
+			"why": "more balanced colours, same geometry"
+		},
+		{
+			"axis": "C",
+			"easier": "color_stripes6_24",
+			"harder": "color_stripes12_24",
+			"requireD": true,
+			"why": "12 vs 6 balanced colours, same geometry"
+		},
+		{
+			"axis": "C",
+			"easier": "color_skew6_24",
+			"harder": "color_stripes6_24",
+			"requireD": true,
+			"why": "same 6 colours, balanced vs one dominant"
+		},
+		{
+			"axis": "A",
+			"easier": "access_band3_24",
+			"harder": "access_shafts3_24",
+			"requireD": true,
+			"why": "same colours/cell counts, both border-touching (unlock wave 0): eight 1-wide shafts expose ~8 targets at a time vs a solid band exposing a whole edge"
+		},
+		{
+			"axis": "U",
+			"easier": "unlock_shallow_24",
+			"harder": "unlock_deep_24",
+			"requireD": true,
+			"why": "six alternating rings vs one outer band"
+		},
+		{
+			"axis": "R",
+			"easier": "route_straight_24",
+			"harder": "route_maze_24",
+			"requireD": true,
+			"why": "serpentine single-entrance corridor vs open block"
+		},
+		{
+			"axis": "B",
+			"easier": "bottleneck_low_24",
+			"harder": "bottleneck_high_24",
+			"requireD": true,
+			"why": "same board; outer layer only in column 1, inner layers only in columns 2-3"
+		},
+		{
+			"axis": "S",
+			"easier": "slot_low_24",
+			"harder": "slot_high_24",
+			"requireD": true,
+			"why": "same board; 30-robot batches straddle rings and wait vs ring-aligned batches"
+		},
+		{
+			"axis": "W",
+			"easier": "flow_stripes3_20",
+			"harder": "flow_stripes3_48",
+			"requireD": false,
+			"why": "workload grows with cells"
+		},
+		{
+			"axis": "SL",
+			"easier": "flow_stripes3_20",
+			"harder": "flow_stripes3_48",
+			"requireD": false,
+			"why": "session load grows with cells"
+		},
+		{
+			"axis": "D",
+			"easier": "flow_stripes3_48",
+			"harder": "compact_hard_20",
+			"requireD": true,
+			"why": "a compact 20x20 fortress/bottleneck is harder than a 48x48 flow board (size does not dictate class)"
+		},
+		{
+			"axis": "C",
+			"easier": "color_m3_24",
+			"harder": "color_m6_24",
+			"requireD": true,
+			"why": "identical 12 two-wide stripes; 6 vs 3 balanced colours"
+		},
+		{
+			"axis": "C",
+			"easier": "color_m6_24",
+			"harder": "color_m12_24",
+			"requireD": true,
+			"why": "identical 12 two-wide stripes; 12 vs 6 balanced colours"
+		},
+		{
+			"axis": "C",
+			"dExpectationWithdrawn": "pre-freeze dry run: putting one colour on six narrow stripes also raises accessibility scarcity (A), so D is not expected to follow C for this pair; only the C ordering is claimed",
+			"easier": "color_m6skew_24",
+			"harder": "color_m6_24",
+			"requireD": false,
+			"why": "identical 12 two-wide stripes, 6 colours; balanced vs one colour on half the stripes"
+		}
+	],
+	"qaOnly": true,
+	"schema": "scrubbots.m53.difficulty_calibration_corpus.v1",
+	"version": 1,
+	"withdrawnPairs": [
+		{
+			"axis": "D",
+			"easier": "color_stripes12_24",
+			"harder": "unlock_deep_24",
+			"reason": "first-draft hypothesis treated color_stripes12_24 as a flow board. Its twelve 2-wide stripes each expose ~4 targets per 29-robot batch, so it is also an accessibility-scarcity board (A ~0.8): the pair confounded colour count with stripe width. Replaced by the geometry-matched colour family (color_m*) and the colourCountAlone family check."
+		},
+		{
+			"axis": "A",
+			"easier": "access_halves3_24",
+			"harder": "access_comb3_24",
+			"reason": "first-draft hypothesis. Under 30-robot batches both expose >= a batch of targets almost every state (per-batch A ~0 for both); clearing one comb frees the whole neighbouring comb, so interleaving increases, not decreases, exposure. Replaced by band vs shafts."
+		},
+		{
+			"axis": "A",
+			"easier": "access_stripes4_24",
+			"harder": "access_mosaic4_24",
+			"reason": "first-draft hypothesis. The 3x3 mosaic exposes a tile of every colour along the whole border and each clear exposes new tiles, while 6-wide stripes expose a single narrow frontier; measured scarcity is lower for the mosaic. The mosaic raises U (colour layers), not A."
+		}
+	]
+}

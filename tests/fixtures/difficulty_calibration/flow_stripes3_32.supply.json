@@ -1,0 +1,193 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "flow_stripes3_32-001",
+				"cid": "C01",
+				"robots": 30
+			},
+			{
+				"batchId": "flow_stripes3_32-002",
+				"cid": "C01",
+				"robots": 30
+			},
+			{
+				"batchId": "flow_stripes3_32-003",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-004",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-005",
+				"cid": "C04",
+				"robots": 30
+			},
+			{
+				"batchId": "flow_stripes3_32-006",
+				"cid": "C04",
+				"robots": 30
+			},
+			{
+				"batchId": "flow_stripes3_32-007",
+				"cid": "C04",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-008",
+				"cid": "C04",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-009",
+				"cid": "C08",
+				"robots": 30
+			},
+			{
+				"batchId": "flow_stripes3_32-010",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-011",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-012",
+				"cid": "C08",
+				"robots": 29
+			}
+		],
+		[
+			{
+				"batchId": "flow_stripes3_32-013",
+				"cid": "C01",
+				"robots": 30
+			},
+			{
+				"batchId": "flow_stripes3_32-014",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-015",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-016",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-017",
+				"cid": "C04",
+				"robots": 30
+			},
+			{
+				"batchId": "flow_stripes3_32-018",
+				"cid": "C04",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-019",
+				"cid": "C04",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-020",
+				"cid": "C04",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-021",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-022",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-023",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-024",
+				"cid": "C08",
+				"robots": 29
+			}
+		],
+		[
+			{
+				"batchId": "flow_stripes3_32-025",
+				"cid": "C01",
+				"robots": 30
+			},
+			{
+				"batchId": "flow_stripes3_32-026",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-027",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-028",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-029",
+				"cid": "C04",
+				"robots": 30
+			},
+			{
+				"batchId": "flow_stripes3_32-030",
+				"cid": "C04",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-031",
+				"cid": "C04",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-032",
+				"cid": "C04",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-033",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-034",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "flow_stripes3_32-035",
+				"cid": "C08",
+				"robots": 29
+			}
+		]
+	],
+	"levelId": "calib_flow_stripes3_32",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

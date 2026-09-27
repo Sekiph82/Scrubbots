@@ -1,0 +1,88 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "flow_stripes3_20-001",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_20-002",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_20-003",
+				"cid": "C04",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_20-004",
+				"cid": "C04",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_20-005",
+				"cid": "C08",
+				"robots": 30
+			}
+		],
+		[
+			{
+				"batchId": "flow_stripes3_20-006",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_20-007",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_20-008",
+				"cid": "C04",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_20-009",
+				"cid": "C08",
+				"robots": 30
+			},
+			{
+				"batchId": "flow_stripes3_20-010",
+				"cid": "C08",
+				"robots": 30
+			}
+		],
+		[
+			{
+				"batchId": "flow_stripes3_20-011",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_20-012",
+				"cid": "C04",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_20-013",
+				"cid": "C04",
+				"robots": 28
+			},
+			{
+				"batchId": "flow_stripes3_20-014",
+				"cid": "C08",
+				"robots": 30
+			}
+		]
+	],
+	"levelId": "calib_flow_stripes3_20",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

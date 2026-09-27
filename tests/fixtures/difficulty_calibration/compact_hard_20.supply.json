@@ -1,0 +1,93 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "compact_hard_20-001",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "compact_hard_20-002",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "compact_hard_20-003",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "compact_hard_20-004",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "compact_hard_20-005",
+				"cid": "C08",
+				"robots": 28
+			}
+		],
+		[
+			{
+				"batchId": "compact_hard_20-006",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "compact_hard_20-007",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "compact_hard_20-008",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "compact_hard_20-009",
+				"cid": "C03",
+				"robots": 26
+			},
+			{
+				"batchId": "compact_hard_20-010",
+				"cid": "C08",
+				"robots": 24
+			}
+		],
+		[
+			{
+				"batchId": "compact_hard_20-011",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "compact_hard_20-012",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "compact_hard_20-013",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "compact_hard_20-014",
+				"cid": "C08",
+				"robots": 24
+			},
+			{
+				"batchId": "compact_hard_20-015",
+				"cid": "C01",
+				"robots": 16
+			}
+		]
+	],
+	"levelId": "calib_compact_hard_20",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_split",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

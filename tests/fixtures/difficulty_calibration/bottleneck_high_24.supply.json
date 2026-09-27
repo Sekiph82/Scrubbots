@@ -1,0 +1,123 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "bottleneck_high_24-001",
+				"cid": "C08",
+				"robots": 30
+			},
+			{
+				"batchId": "bottleneck_high_24-002",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "bottleneck_high_24-003",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "bottleneck_high_24-004",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "bottleneck_high_24-005",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "bottleneck_high_24-006",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "bottleneck_high_24-007",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "bottleneck_high_24-008",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "bottleneck_high_24-009",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "bottleneck_high_24-010",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "bottleneck_high_24-011",
+				"cid": "C08",
+				"robots": 29
+			}
+		],
+		[
+			{
+				"batchId": "bottleneck_high_24-012",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "bottleneck_high_24-013",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "bottleneck_high_24-014",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "bottleneck_high_24-015",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "bottleneck_high_24-016",
+				"cid": "C03",
+				"robots": 21
+			}
+		],
+		[
+			{
+				"batchId": "bottleneck_high_24-017",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "bottleneck_high_24-018",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "bottleneck_high_24-019",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "bottleneck_high_24-020",
+				"cid": "C03",
+				"robots": 22
+			},
+			{
+				"batchId": "bottleneck_high_24-021",
+				"cid": "C03",
+				"robots": 21
+			}
+		]
+	],
+	"levelId": "calib_bottleneck_high_24",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_split",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}
