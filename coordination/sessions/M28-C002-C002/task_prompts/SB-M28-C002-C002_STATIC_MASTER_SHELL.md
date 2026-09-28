@@ -7,7 +7,7 @@ Branch: `main`
 
 ## Mission
 
-Replace the C001 native-redrawn gameplay chrome with the owner-locked **three full-screen static gameplay masters**, while preserving all authoritative live gameplay overlays and systems.
+Replace the C001 native-redrawn gameplay chrome with the owner-locked **six full-screen static gameplay masters**: 3/4/5-column normal five-slot shells plus matching 3/4/5-column six-slot shells for +1 Slot.
 
 Canonical owner decision:
 `coordination/OWNER_GAMEPLAY_345_STATIC_MASTER_SHELL_V01.md`
@@ -26,40 +26,56 @@ Do NOT edit root `TASKS.md`.
 
 ## Step 0 — exact owner asset intake
 
-Find the exact three owner files in the already-authorized local project/reference locations:
+Find and copy byte-preserving all six exact owner files.
 
+### Five-slot normal masters
 - `3 lu renk secim alani.png`
 - `4lu renk secim alani.png`
 - `5li renk secim alani.png`
 
-Likely owner source includes the established visual-reference library / project owner inbox.
+### Six-slot +1 Slot masters
+- `6 li slot 3 renk-batch sistemi.png`
+- `6 li slot 4 renk-batch sistemi.png`
+- `6 li slot 5 renk-batch sistemi.png`
 
-Copy bytes, do not regenerate.
+Expected dimensions: 887×1774 RGBA for all six.
+
+Expected SHA-256 values are locked in:
+`coordination/OWNER_GAMEPLAY_345_STATIC_MASTER_SHELL_V01.md`
 
 Canonical repo destinations:
 
-- `assets/ui/final/gameplay/master/gameplay_v02_shell_3col.png`
-- `assets/ui/final/gameplay/master/gameplay_v02_shell_4col.png`
-- `assets/ui/final/gameplay/master/gameplay_v02_shell_5col.png`
+- `assets/ui/final/gameplay/master/gameplay_v02_shell_5slot_3col.png`
+- `assets/ui/final/gameplay/master/gameplay_v02_shell_5slot_4col.png`
+- `assets/ui/final/gameplay/master/gameplay_v02_shell_5slot_5col.png`
+- `assets/ui/final/gameplay/master/gameplay_v02_shell_6slot_3col.png`
+- `assets/ui/final/gameplay/master/gameplay_v02_shell_6slot_4col.png`
+- `assets/ui/final/gameplay/master/gameplay_v02_shell_6slot_5col.png`
 
-Record source filename, dimensions and SHA-256.
+Record source filename, dimensions and SHA-256 and verify exact match before binding.
 
 Preserve historical `scrubbots_gameplay_master.png`.
 
-If any exact master is missing:
+If any exact master is missing or hash-mismatched:
 - do not substitute;
 - do not synthesize;
-- stop with `OWNER_ASSET_REQUIRED / M28-C002-C002 / <missing file>`.
+- stop with `OWNER_ASSET_REQUIRED / M28-C002-C002 / <missing-or-mismatched file>`.
 
 ## Runtime shell selection
 
-Choose shell from authoritative Batch Supply column count:
+Choose shell from authoritative **Batch Supply column count AND current slot capacity**:
 
-- 3 -> 3col shell
-- 4 -> 4col shell
-- 5 -> 5col shell
+| Supply columns | Capacity 5 | Capacity 6 |
+|---|---|---|
+| 3 | 5slot_3col | 6slot_3col |
+| 4 | 5slot_4col | 6slot_4col |
+| 5 | 5slot_5col | 6slot_5col |
 
-Fail closed for unsupported count.
+Capacity 6 occurs only through authoritative +1 Slot.
+
+Switch shell immediately when capacity changes 5 <-> 6, without changing gameplay state.
+
+Fail closed for unsupported column count or capacity.
 
 Use a single shell-reference coordinate system and uniform transform for:
 - image;
@@ -123,18 +139,21 @@ Overlay:
 
 Input law unchanged: slots are not destination buttons.
 
-### Temporary sixth slot
+### +1 Slot / six-slot shell
 
-Keep +1 Slot functional.
+Do NOT dynamically draw a sixth slot or sixth connector.
 
-When capacity becomes six:
-- create only the sixth slot + sixth connector as a dynamic overlay;
-- match master visual language;
-- use real sixth SlotOriginProvider / bottom_entry geometry;
-- do not redraw the other five;
-- remove it on retry/reset.
+When authoritative capacity becomes six:
+- switch to the matching 6-slot master for the current 3/4/5 supply column count;
+- bind all six live slot contents/counts into the six baked frames;
+- keep the real sixth slot runtime authority and routing unchanged;
+- keep live agent motion aligned with the six baked connectors.
 
-Capture dedicated owner evidence.
+On retry/reset back to capacity five:
+- switch to the matching five-slot shell;
+- bind five live slot overlays.
+
+Prove repeated 5 -> 6 -> 5 transitions do not leak nodes/signals and do not mutate unrelated gameplay state.
 
 ## Batch Supply overlays
 
@@ -234,7 +253,7 @@ Add focused tests proving:
 4. BoardRenderer aligned to shell board/rail aperture;
 5. runtime agent rail/path overlay aligns to baked rail;
 6. five slot overlays align to baked slots;
-7. temporary sixth slot/connector only on capacity 6;
+7. matching six-slot master selected only on authoritative capacity 6, and five-slot master restored on reset/retry;
 8. supply overlay/hitbox alignment for 3/4/5 masters;
 9. front-only input law unchanged;
 10. profile dynamic data only;
@@ -259,7 +278,7 @@ Produce at minimum:
 - 5-column fresh state;
 - active cleaning with Scrubbots visibly following baked rail;
 - five occupied slots;
-- temporary sixth slot;
+- +1 Slot active using the matching six-slot master;
 - timed 2x countdown;
 - tall phone;
 - short phone;
@@ -278,7 +297,7 @@ Create:
 ## Scope locks
 
 Do not:
-- regenerate or substitute the three masters;
+- regenerate or substitute any of the six masters;
 - rewrite routing/gameplay truth;
 - change level content/supply plans;
 - change economy prices/Heart/2x rules;
