@@ -87,7 +87,7 @@ static func streak_sb_for(active_streak: int) -> int:
 # --------------------------------------------------- process a win ----
 
 ## Process an authenticated first-clear progression WON for `level_number`.
-## Returns a result dict: {applied, streak, streak_sb, bot_part, reason}.
+## Returns a result dict: {applied, streak, streak_sb, bot_part, gift_milestones, reason}.
 ## Duplicate/replay/invalid calls return applied=false and change nothing.
 func process_first_clear_win(level_number: int, is_replay: bool = false) -> Dictionary:
 	if is_replay:
@@ -111,8 +111,9 @@ func process_first_clear_win(level_number: int, is_replay: bool = false) -> Dict
 	_processed_levels[level_number] = true
 	_gameplay_started = false
 
-	# Feed ONLY streak-bonus SB to the gift meter.
-	_gift.add_streak_sb("gift:L%d" % level_number, sb)
+	# Feed ONLY streak-bonus SB to the gift meter. The milestone occurrences THIS feed
+	# newly queued are reported back (M43 Results receipt / Gift handoff truth).
+	var gift_milestones: Array = _gift.add_streak_sb("gift:L%d" % level_number, sb)
 
 	# Bot Part at every multiple of 5.
 	var bot_part := false
@@ -124,6 +125,7 @@ func process_first_clear_win(level_number: int, is_replay: bool = false) -> Dict
 		"streak": _streak,
 		"streak_sb": sb,
 		"bot_part": bot_part,
+		"gift_milestones": gift_milestones,
 		"reason": "ok",
 	}
 

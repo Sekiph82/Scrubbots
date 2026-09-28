@@ -21,15 +21,18 @@ static func commit(progression, economy, level_number: int, fault: Callable = Ca
 	if not progression.record_win(level_number):
 		return {"ok": false, "reason": "not_frontier"}   # zero mutation by contract
 	var failed := ""
+	var cls := ""
+	var fc: Dictionary = {}
+	var st: Dictionary = {}
 	if _hit(fault, "progression"):
 		failed = "progression"
 	if failed == "":
-		var cls: String = progression.class_for(level_number)
-		var fc: Dictionary = economy.first_clear.grant_first_clear(level_number, cls)
+		cls = progression.class_for(level_number)
+		fc = economy.first_clear.grant_first_clear(level_number, cls)
 		if not bool(fc.get("applied", false)) or _hit(fault, "first_clear"):
 			failed = "first_clear"
 	if failed == "":
-		var st: Dictionary = economy.streak.process_first_clear_win(level_number)
+		st = economy.streak.process_first_clear_win(level_number)
 		if not bool(st.get("applied", false)) or _hit(fault, "streak"):
 			failed = "streak"
 	if failed == "":
@@ -39,7 +42,8 @@ static func commit(progression, economy, level_number: int, fault: Callable = Ca
 	if failed != "":
 		var rolled: bool = progression.import_snapshot(pre_prog) and economy.import_snapshot(pre_econ)
 		return {"ok": false, "reason": "rolled_back", "stage": failed, "restored": rolled}
-	return {"ok": true}
+	# M43-C001A: the committed service results ARE the Results receipt source.
+	return {"ok": true, "difficulty": cls, "first_clear": fc, "streak": st}
 
 static func _hit(fault: Callable, stage: String) -> bool:
 	return fault.is_valid() and bool(fault.call(stage))
