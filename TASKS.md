@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M28-C002-C002-R01 Interrupted Visual Remediation — Completion
-- Current Task: Resume the existing uncommitted R01 local work; render/inspect evidence, run final regressions, write evidence docs, commit and push
-- Current Task Status: INTERRUPTED_LOCAL_WORK / READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE resumes local work using `coordination/sessions/M28-C002-C002-R01/task_prompts/SB-M28-C002-C002-R01_CONTINUE.md`; do not rebuild or discard local changes. ChatGPT audits only after push.
-- Required Actor: CLAUDE
+- Current Sprint: M28-C002-C002-R01 Gameplay Visual Remediation — Owner Acceptance
+- Current Task: Owner reviews enlarged 2.4-cell mini Scrubbots and live speech-bubble copy/readability after R01 technical audit PASS
+- Current Task Status: OWNER_REQUIRED
+- Next Task/Action: OWNER resolves `coordination/sessions/M28-C002-C002-R01/OWNER_VISUAL_ACCEPTANCE_GATE_V01.md`. ChatGPT records acceptance, updates TASKS.md, then opens remaining Pause/Booster/2x/modal dependency work.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 912 / 1355 = 67.31%. Gameplay V02 C001 technical core accepted; C002 static 3/4/5 master-shell convergence is active.
-- Note: R01 implementation is reported locally complete through focused/sensitivity tests but was interrupted by Claude Code safety-check service before evidence/full regression/docs/commit/push. GitHub main remains pre-R01 at `22423aeb`. Continuation must preserve local work and finish only the remaining steps.
-- Owner sequencing lock: finish M28 C002-R01 visual remediation + owner acceptance first; then implement remaining Pause/Booster/2x/modal dependencies before final M28-C002 playtest.
+- Note: R01 technical audit PASS at `47b7b9f`. 2.4-cell Scrubby, 2.1-cell echo, live bubble text, 88px short-phone front hitboxes, hidden AD placeholder and S6-C square-production gate are accepted technically. Owner visual R1-R3 remains.
+- Owner sequencing lock: resolve R01 owner visual gate first; then finish M28 Gameplay V02 remaining Pause/Booster/2x/modal dependencies before final owner playtest.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
