@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M28-C002 Gameplay V02 — Popup-Inclusive Final Evidence / Playtest
-- Current Task: Produce and validate the final popup-inclusive Gameplay V02 evidence/playtest now that M43-C002 and M43-C003 dependencies are closed
-- Current Task Status: READY_FOR_NEXT_IMPLEMENTATION_CYCLE
-- Next Task/Action: ChatGPT opens the M28-C002 popup-inclusive final evidence/playtest cycle using the accepted Pause/modal and Life/Booster/2x acquisition surfaces.
-- Required Actor: CHATGPT
+- Current Sprint: M28-C002-C003 Gameplay V02 — Final Popup-Inclusive Gate
+- Current Task: Claude validates final Gameplay V02 integration for SB-M28-C002-012/013/019 and prepares the SB-M28-C002-020 owner playtest gate
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M28-C002-C003/CHATGPT_PROMPT_V01.md`, reads paired audit criteria, pushes fresh popup-inclusive evidence/log, then returns AWAITING_CHATGPT_AUDIT.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 951 / 1355 = 70.18%. M43-C003 is technically and owner-accepted; acquisition visual/UX gate is closed.
-- Note: M43-C003-C001 independent audit PASS at `58899a2`; owner gate approved A1-KEEP / B1-POPUP / C1-KEEP / D1-OK / E1-OK / F1-GATE. Rewarded-video remains limited to +1 Heart + four Boosters; no rewarded 2x; Heart regen remains 900 s / 15 min.
-- Owner sequencing lock: M43-C003 is closed. Return to M28-C002 popup-inclusive final evidence/playtest before proceeding further.
+- Note: M43-C003-C001 is closed. M28-C002-C003 is validation-first: prove visible Gameplay V02 zero-charge Booster -> Acquire routing, unentitled 2x -> Acquire routing, popup input isolation, fresh final evidence, and owner playtest checklist. Do not redesign accepted static shell.
+- Owner sequencing lock: M28-C002-C003 must close the remaining Gameplay V02 convergence rows before proceeding further.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
