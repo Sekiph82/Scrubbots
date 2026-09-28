@@ -4,17 +4,17 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 ## Project Status
 
-- Current Milestone: M43 RESULTS / PLAYER EXPERIENCE
-- Current Sprint: M43-C001B-R01 Complete Interrupted WON Results Visual Binding
-- Current Task: Recover the interrupted local C001B work, fix the invalid snapshot harness using existing owner click plans, regenerate valid evidence, run final regressions, commit and push
-- Current Task Status: REMEDIATION_REQUIRED / READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C001B/remediation/SB-M43-C001B-R01_COMPLETE_INTERRUPTED_RESULTS.md`; ChatGPT audits. On PASS, immediately activate M28-C002 Gameplay Screen V02.
+- Current Milestone: M28 GAMEPLAY SCREEN V02
+- Current Sprint: M28-C002-C001 Gameplay Screen V02 Core Production Convergence
+- Current Task: Convert the real production gameplay screen to owner-approved Gameplay Composition V02: profile, dominant board/Railroad, permanent slot connectors, 5x3 supply, top-right Pause+2x, four boosters and responsive production layout
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M28-C002-C001/task_prompts/SB-M28-C002-C001_GAMEPLAY_V02_CORE.md`; ChatGPT audits. Canonical popup integrations remain dependency-deferred until M43-C002/C003.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 895 / 1355 = 66.05%. C001B remains open; remediation completion is active. M28-C002 Gameplay V02 is queued next.
-- Note: Previous C001B attempt was interrupted by Claude Code safety-check service failures before commit/push. Reported local implementation exists but GitHub main still has no C001B code. R01 must recover local work, replace naive snapshot driving with existing owner click plans, regenerate valid WON evidence, complete regressions/evidence and push.
-- Owner sequencing lock: finish the already-started M43-C001B visual binding without leaving it half-done. Immediately after C001B-R01 AUDITED_PASS, switch active development to M28-C002 Gameplay Screen V02 Production Convergence before continuing broader M43 meta-UI work.
+- Progress: 895 / 1355 = 66.05%. Results binding technically closed; Gameplay V02 core is now active.
+- Note: M43-C001B-R01 is technically AUDITED_PASS at `4d198e9`; owner visual acceptance remains pending/non-blocking. Per owner instruction, active development has switched immediately to Gameplay Screen V02. C001B audit: `coordination/sessions/M43-C001B/CHATGPT_AUDIT_V01.md`.
+- Owner sequencing lock: M43-C001B implementation is technically closed with owner visual sign-off pending. Active priority is now M28-C002 Gameplay Screen V02. Do not resume broader M43 meta-UI work until the Gameplay V02 core has reached audit + owner review.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1263,6 +1263,8 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 #### M28-C002 - Gameplay Screen V02 Production Convergence [PLANNED / REQUIRED BEFORE FINAL META-UI INTEGRATION]
 
+**Active cycle M28-C002-C001:** core production convergence for rows 001-011 and 016-018, with owner-review evidence. Rows 012-015/019 remain dependency-gated by final M43 popup/modal surfaces and must not be fake-closed.
+
 Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master visual into the actual shipping gameplay screen. Historical M28 closure remains historical; this sprint closes the later V02 delta without falsifying earlier evidence.
 
 - [ ] SB-M28-C002-001 Build the production Gameplay V02 scene from responsive Godot Controls/Containers plus the approved visual assets; do not ship a flattened screenshot.
@@ -1626,7 +1628,7 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 
 #### M43-C001 - Results Screen
 
-**C001B interruption/remediation:** previous local C001B implementation was interrupted before commit/push. Active completion prompt: `coordination/sessions/M43-C001B/remediation/SB-M43-C001B-R01_COMPLETE_INTERRUPTED_RESULTS.md`. After audit PASS, immediately activate M28-C002 Gameplay Screen V02.
+**C001B status:** remediation implementation is technically AUDITED_PASS at `4d198e9`; owner visual acceptance remains pending. Active development moved to M28-C002 Gameplay Screen V02 per owner sequencing.
 
 - [x] SB-M43-001 Result model.
 - [ ] SB-M43-002 Completion UI.
