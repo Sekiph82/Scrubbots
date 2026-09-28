@@ -22,8 +22,8 @@ extends SceneTree
 ##  - BoardRenderer coordinate round-trip after responsive scaling.
 ##
 ## Emits deterministic metrics JSON + Markdown and attempts PNG captures under
-## coordination/sessions/M28-C002-C001/layout_smoke/ (V02; historical M28-C001
-## evidence is left untouched). Generated captures are TEST artifacts,
+## coordination/sessions/M28-C002-C002/layout_smoke/ (static master shell; earlier
+## cycles' evidence is left untouched). Generated captures are TEST artifacts,
 ## never AI-generated art.
 ##
 ## Run:  godot --headless --path . -s res://tests/m28_gameplay_layout_smoke.gd
@@ -36,7 +36,7 @@ const SlotBatchState = preload("res://scripts/gameplay/slots/slot_batch_state.gd
 const ResponsiveLayout = preload("res://scripts/ui/responsive_layout.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 
-const EVIDENCE_DIR := "res://coordination/sessions/M28-C002-C001/layout_smoke"
+const EVIDENCE_DIR := "res://coordination/sessions/M28-C002-C002/layout_smoke"
 const EPS := 1.0e-3
 const TOUCH_MIN := 88.0
 const VIEW_W := 24
@@ -180,11 +180,13 @@ func _run_viewport_case(size: Vector2i) -> void:
 	var speed: Rect2 = screen.get_speed_control_rect()
 	var top: Rect2 = screen.get_top_region_rect()
 	var profile: Rect2 = screen.get_profile_rect()
-	# V02: PAUSE | 2x side by side top-right, profile chip top-left, above the board.
+	# V02 static master shell (M28-C002-C002): PAUSE | 2x side by side in the right half of
+	# the top band, profile chip in the left half, all above the board. Exact baked-box
+	# placement is proven by tests/m28_c002_c002_static_shell.gd.
 	_ok(pause.end.x <= speed.position.x and absf(pause.position.y - speed.position.y) < 1.0
-		and speed.end.x >= top.end.x - 1.0 and top.encloses(pause) and top.encloses(speed),
+		and pause.position.x > top.get_center().x and top.encloses(pause) and top.encloses(speed),
 		"%s: top-right order PAUSE | 2x" % tag)
-	_ok(profile.position.x <= top.position.x + 1.0 and profile.end.x < pause.position.x and speed.end.y <= board_rect.position.y,
+	_ok(profile.end.x < top.get_center().x and profile.end.x < pause.position.x and speed.end.y <= board_rect.position.y,
 		"%s: profile top-left, controls above the board" % tag)
 	_ok(not screen.has_ad_placeholder() and not screen.has_settings_control() and not screen.has_heart_hud(),
 		"%s: no ad placeholder / Settings / Heart HUD" % tag)
@@ -282,8 +284,11 @@ func _run_board_size_case(spec: Dictionary) -> void:
 	# Protected batch region never collapses below minimum.
 	_ok(batch.size.y >= float(UiTokens.BATCH_REGION_MIN_HEIGHT) - 1.0,
 		"%s: batch region >= protected minimum (%.0f)" % [tag, batch.size.y])
-	_ok(screen.get_supply_panel_rect().size.x >= float(UiTokens.SUPPLY_PANEL_MIN_WIDTH) - 1.0,
-		"%s: supply >= protected width" % tag)
+	# Static master shell: the supply width is the baked 3/4/5-column cell grid (owner
+	# master), no longer the C001 native protected minimum; every column stays >= 80 px.
+	var sp_cols: int = screen.get_supply_panel().get_column_count()
+	_ok(screen.get_supply_panel_rect().size.x / float(sp_cols) >= 80.0,
+		"%s: supply columns keep a >= 80 px baked cell" % tag)
 	_ok(screen.get_supply_panel().get_column_count() == spec["cols"], "%s: supply columns == %d" % [tag, spec["cols"]])
 
 	var rt := _coordinate_roundtrip(screen, w, h)

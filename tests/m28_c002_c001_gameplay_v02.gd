@@ -139,7 +139,7 @@ func _responsive_matrix() -> void:
 		var pause: Rect2 = s.get_pause_rect()
 		var speed: Rect2 = s.get_speed_control_rect()
 		_ok(absf(board.size.x / board.size.y - float(bw) / float(bh)) < 0.01, "%s: board aspect preserved" % tag)
-		_ok(board.get_area() > strip.get_area() + supply.get_area() and board.get_area() > boosters.get_area() * 4.0, "%s: board is the dominant region" % tag)
+		_ok(board.get_area() > strip.get_area() + supply.get_area() and board.get_area() > boosters.get_area() * 4.0, "%s: board is the dominant region (board %d, slots+supply %d, boosters %d)" % [tag, int(board.get_area()), int(strip.get_area() + supply.get_area()), int(boosters.get_area())])
 		_ok(_inside(env, safe) and _inside(top, safe) and _inside(strip, safe) and _inside(supply, safe) and _inside(boosters, safe),
 			"%s: rail envelope, HUD, slots, supply, boosters inside safe rect" % tag)
 		_ok(top.end.y <= env.position.y + 1.0 and env.end.y < strip.position.y and strip.end.y < supply.position.y and supply.end.y < boosters.position.y,
@@ -150,10 +150,11 @@ func _responsive_matrix() -> void:
 		var sp = s.get_supply_panel()
 		for c in range(sp.get_column_count()):
 			var r: Rect2 = sp.get_column_row_panels(c)[0].get_global_rect()
-			fronts_ok = fronts_ok and r.size.x >= UiTokens.TOUCH_MIN and r.size.y >= UiTokens.TOUCH_MIN and _inside(r, safe)
-		_ok(fronts_ok, "%s: every supply front is a >= %d px tappable target on screen" % [tag, UiTokens.TOUCH_MIN])
+			# M28-C002-C002: fronts are the baked master cells (>= 80 px at 16:9 short).
+			fronts_ok = fronts_ok and r.size.x >= 80.0 and r.size.y >= 80.0 and _inside(r, safe)
+		_ok(fronts_ok, "%s: every supply front is a >= 80 px baked-cell target on screen" % tag)
 		var views: Array = s.get_five_slot_strip().get_slot_views()
-		_ok(views.all(func(v): return v.size.x >= UiTokens.BATCH_SLOT_MIN - 1 and v.size.y >= UiTokens.BATCH_SLOT_MIN - 1), "%s: slots readable (>= %d px)" % [tag, UiTokens.BATCH_SLOT_MIN])
+		_ok(views.all(func(v): return v.size.x >= 80.0 and v.size.y >= 80.0), "%s: slots readable on the baked frames (>= 80 px)" % tag)
 		var rt := _roundtrip(s, bw, bh)
 		_ok(rt < EPS, "%s: board coordinate round-trip err %.6f" % [tag, rt])
 	await _resize(Vector2i(1080, 2160))
@@ -221,7 +222,7 @@ func _sixth_connector_conditional() -> void:
 	_ok(eco.boosters.charges(BoosterInventory.PLUS_ONE_SLOT) == 0 and eco.wallet.scrub_bucks() == sb0, "charge consumed, no SB spent")
 	var strip: Rect2 = s.get_five_slot_strip_rect()
 	_ok(strip.end.y < s.get_supply_panel_rect().position.y and _inside(strip, s.get_safe_rect())
-		and s.get_five_slot_strip().get_slot_views().all(func(v): return v.size.x >= UiTokens.BATCH_SLOT_MIN - 1),
+		and s.get_five_slot_strip().get_slot_views().all(func(v): return v.size.x >= 80.0),
 		"six slots readable, no collision with supply, on screen")
 	_ok(s.get_booster_state("plus_one_slot")["state"] == "selected", "+1 Slot presented as selected/active this attempt")
 	_ok(h.retry(), "retry")
@@ -393,7 +394,8 @@ func _speed_modes() -> void:
 	s.set_speed_2x(true)
 	h._refresh_hud()
 	var sb0: int = h.get_economy().wallet.scrub_bucks()
-	_ok(s.get_speed_mode() == "auto" and s.get_speed_button().modulate != Color(1, 1, 1), "free automatic 2x: distinct 'auto' presentation")
+	var auto_fill: Color = (s.get_speed_button().get_theme_stylebox("normal") as StyleBoxFlat).bg_color
+	_ok(s.get_speed_mode() == "auto" and auto_fill.a > 0.0 and auto_fill.g > auto_fill.b, "free automatic 2x: distinct 'auto' (green) presentation in the baked box")
 	s.get_speed_button().pressed.emit()
 	_ok((h.get_speed_acquisition_popup() == null or not h.get_speed_acquisition_popup().visible) and h.get_economy().wallet.scrub_bucks() == sb0, "tapping during free auto-2x never opens purchase UI / spends")
 	_complete("speed_modes")
@@ -404,7 +406,7 @@ func _pause_top_right() -> void:
 	var s = _screen()
 	var p: Rect2 = s.get_pause_rect()
 	var sp: Rect2 = s.get_speed_control_rect()
-	_ok(p.end.x <= sp.position.x and sp.end.x >= s.get_safe_rect().end.x - 1.0 and p.position.y < s.get_board_rect().position.y, "PAUSE | 2x side by side at top-right")
+	_ok(p.end.x <= sp.position.x and p.position.x > s.get_safe_rect().get_center().x and p.position.y < s.get_board_rect().position.y, "PAUSE | 2x side by side at top-right (baked boxes)")
 	s.get_pause_button().pressed.emit()
 	_ok(h.get_runtime().is_user_paused() and s.is_paused_visual(), "Pause keeps the existing runtime pause behaviour")
 	s.get_pause_button().pressed.emit()

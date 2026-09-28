@@ -80,7 +80,9 @@ func get_cell_center_local(x: int, y: int) -> Vector2:
 	return Vector2((x + 0.5) * _cell_size, (y + 0.5) * _cell_size)
 
 func get_cell_center_global(x: int, y: int) -> Vector2:
-	return global_position + get_cell_center_local(x, y)
+	# Transform-aware (a scaled parent, e.g. the static-shell board fit, is honoured);
+	# identical to global_position + local centre when no scale/rotation is applied.
+	return get_global_transform() * get_cell_center_local(x, y)
 
 ## Full rebuild of the displayed image from current BoardState. Use
 ## update_cells() instead when only a few cells changed.

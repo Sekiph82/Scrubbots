@@ -1,4 +1,4 @@
-extends HBoxContainer
+extends Container
 ## FiveSlotStrip — M28 production READ-ONLY presentation of the five M24 batch slots.
 ## Preload this script (res://scripts/ui/five_slot_strip.gd); do not rely on global
 ## class_name (AL-001).
@@ -14,6 +14,10 @@ extends HBoxContainer
 ## Input is a DETACHED scalar snapshot Array (the shape produced by
 ## FiveSlotBatchEngine.snapshot(): five SlotBatchState.to_dict() dicts) plus a
 ## per-slot palette Color list. The strip retains NO engine/state reference.
+##
+## M28-C002-C002: a plain Container (was HBoxContainer). By default the slots are laid out
+## evenly left->right exactly like before; `set_slot_rects()` places each slot view on an
+## explicit local rect (the baked slot frames of the static gameplay master shell).
 
 const BatchSlotView = preload("res://scripts/ui/batch_slot_view.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
@@ -26,12 +30,59 @@ const MAX_CAPACITY := 6
 
 var _views: Array = []
 var _capacity: int = SLOT_COUNT
+var _slot_rects: Array = []     # explicit local Rect2 per slot (shell mode); [] = even layout
+var _shell_mode := false
+var _separation: float = UiTokens.SPACE_SM
 
 func _ready() -> void:
-	add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	custom_minimum_size.y = maxf(custom_minimum_size.y, UiTokens.FIVE_SLOT_STRIP_MIN_HEIGHT)
 	if _views.is_empty():
 		_build_views()
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_SORT_CHILDREN:
+		_layout_views()
+
+## Explicit local rects (one per slot, left->right) — the baked frames of the shell.
+## Also switches the views to shell presentation (no frame chrome, no fixed minimum).
+func set_slot_rects(rects: Array) -> void:
+	_slot_rects = rects.duplicate()
+	_shell_mode = true
+	custom_minimum_size = Vector2.ZERO
+	for v in _views:
+		_apply_mode(v)
+	_layout_views()   # synchronous: slot anchors (route origins) are valid immediately
+	queue_sort()
+
+func is_shell_mode() -> bool:
+	return _shell_mode
+
+func _apply_mode(v) -> void:
+	if _shell_mode:
+		v.set_shell_mode(true)
+
+func _layout_views() -> void:
+	var n := _views.size()
+	if n == 0:
+		return
+	if _slot_rects.size() >= n:
+		for i in range(n):
+			fit_child_in_rect(_views[i], _slot_rects[i])
+		return
+	var w: float = maxf((size.x - _separation * (n - 1)) / float(n), 1.0)
+	for i in range(n):
+		fit_child_in_rect(_views[i], Rect2(i * (w + _separation), 0.0, w, size.y))
+
+func _get_minimum_size() -> Vector2:
+	if _shell_mode:
+		return Vector2.ZERO
+	var w := 0.0
+	var h := 0.0
+	for v in _views:
+		var m: Vector2 = v.get_combined_minimum_size()
+		w += m.x
+		h = maxf(h, m.y)
+	return Vector2(w + _separation * maxf(_views.size() - 1, 0), h)
 
 func _build_views() -> void:
 	while _views.size() < _capacity:
@@ -40,6 +91,7 @@ func _build_views() -> void:
 		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		add_child(v)
 		_views.append(v)
+		_apply_mode(v)
 
 ## Grow/shrink the strip to `n` slots (5 or 6). Grows by appending a fresh
 ## BatchSlotView; shrinks by removing the trailing view. Hard-clamped to
@@ -55,9 +107,11 @@ func set_capacity(n: int) -> bool:
 		v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		add_child(v)
 		_views.append(v)
+		_apply_mode(v)
 	while _views.size() > n:
 		var v = _views.pop_back()
 		v.queue_free()
+	_layout_views()
 	return true
 
 ## Bind detached slot snapshots. Truncated/padded to the CURRENT active capacity
