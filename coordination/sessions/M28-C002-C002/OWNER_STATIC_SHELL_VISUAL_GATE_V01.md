@@ -1,7 +1,7 @@
 # M28-C002-C002 — OWNER STATIC SHELL VISUAL GATE V01
 
 Date: 2026-09-28
-Status: OWNER INPUT REQUIRED
+Status: RESOLVED — see `coordination/OWNER_GAMEPLAY_STATIC_SHELL_VISUAL_ACCEPTANCE_V01.md`
 Technical audit: `coordination/sessions/M28-C002-C002/CHATGPT_AUDIT_V01.md`
 Review pack: `coordination/sessions/M28-C002-C002/OWNER_GAMEPLAY_STATIC_SHELL_REVIEW_V01.md`
 
@@ -85,3 +85,21 @@ Even after S1-S6 are resolved, full M28-C002 still needs:
 - final owner playtest.
 
 Those are separate implementation dependencies, not part of this visual gate.
+
+
+## Resolution
+
+Owner selections:
+- S1-A
+- S2-B
+- S3-B
+- S4-A
+- S5-A
+- S6-C
+
+Additional owner tuning:
+- moving mini Scrubby size: 1.8 -> 2.4 cell span;
+- speech bubble must contain live, mechanically correct text rather than remain blank.
+
+Canonical ruling:
+`coordination/OWNER_GAMEPLAY_STATIC_SHELL_VISUAL_ACCEPTANCE_V01.md`
