@@ -34,6 +34,10 @@ func _wiring_and_gate() -> void:
 	_ok(not h.get_speed_authority().is_2x(), "starts at 1x")
 	h._on_speed_pressed()
 	_ok(not h.get_speed_authority().is_2x(), "manual 2x refused without entitlement")
+	# M43-C003 migration: the refused press opened the canonical (modal) 2x Acquire popup,
+	# which owns input; close it before pressing the background control again.
+	_ok(h.get_speed_acquisition_popup() != null, "refused press opens 2x Acquire")
+	h.get_modal_stack().clear("t")
 	# Buy current-level 2x -> entitled -> allowed.
 	var buy = econ.speed.purchase_current_level(h.progression_level)
 	_ok(buy["ok"], "current-level 2x purchased")

@@ -55,6 +55,10 @@ const ROYAL_EDGE := Color(0.047, 0.180, 0.459)
 const ROW := Color(0.976, 0.898, 0.769)
 const ROW_EDGE := Color(0.749, 0.604, 0.380)
 const INK := Color(0.106, 0.180, 0.349)
+## M43-C003 yellow SB offer CTA (Life reference: gold body, warm edge, white label).
+const GOLD_BODY := Color(1.0, 0.765, 0.102)
+const GOLD_EDGE := Color(0.690, 0.380, 0.020)
+const GOLD_DISABLED := Color(0.78, 0.70, 0.52)
 const WARN_INK := Color(0.62, 0.12, 0.10)
 
 enum State { NEW, OPEN, CLOSED }
@@ -77,6 +81,8 @@ var _frame_kind := "medium"
 var _scrim: ColorRect
 var _safe
 var _frame
+var _hero: TextureRect
+var _stack_box: VBoxContainer
 var _title: Label
 var _close: Button
 var _content: VBoxContainer
@@ -107,9 +113,19 @@ func _init(id: String = "popup") -> void:
 	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	content_root.add_child(center)
 	content_root.resized.connect(_fit_width)
+	# Optional hero art above/overlapping the frame (hidden unless set_hero()).
+	_stack_box = VBoxContainer.new()
+	_stack_box.name = "Stack"
+	_stack_box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_stack_box.add_theme_constant_override("separation", 0)
+	center.add_child(_stack_box)
+	_hero = HomeStyle.art("Hero")
+	_hero.visible = false
+	_hero.z_index = 1
+	_stack_box.add_child(_hero)
 	_frame = FrameBox.new()
 	_frame.name = "Frame"
-	center.add_child(_frame)
+	_stack_box.add_child(_frame)
 	var body := VBoxContainer.new()
 	body.name = "Body"
 	body.add_theme_constant_override("separation", UiTokens.SPACE_MD)
@@ -169,6 +185,16 @@ func set_frame(kind: String) -> void:
 	_frame_kind = kind
 	_frame.set_frame(FRAMES[kind])
 
+## Existing approved art drawn above the frame, overlapping its top edge by `overlap`.
+func set_hero(texture_path: String, hero_size: Vector2, overlap: int) -> void:
+	_hero.texture = load(texture_path) as Texture2D
+	_hero.custom_minimum_size = hero_size
+	_hero.visible = _hero.texture != null
+	_stack_box.add_theme_constant_override("separation", -overlap if _hero.visible else 0)
+
+func get_hero() -> TextureRect:
+	return _hero
+
 func get_frame_kind() -> String:
 	return _frame_kind
 
@@ -207,12 +233,20 @@ func add_body_line(text: String, node_name: String = "", color: Color = INK, siz
 	_content.add_child(l)
 	return l
 
+## Small live note at the very bottom of the frame, under the actions.
+func add_footer_note(text: String, node_name: String) -> Label:
+	var l := body_label(text, 24)
+	l.name = node_name
+	_footer.add_child(l)
+	return l
+
 func get_content() -> VBoxContainer:
 	return _content
 
-## style: "primary" (green Life/Help CTA) | "secondary" (cream). `closes`: the action
-## closes this popup before it is emitted; otherwise it latches the popup (see header).
-func add_action(id: String, text: String, style: String = "secondary", closes: bool = true) -> Button:
+## style: "primary" (green Life/Help CTA) | "secondary" (cream) | "offer" (yellow SB
+## offer). `closes`: the action closes this popup before it is emitted; otherwise it
+## latches the popup (see header). `row`: buttons sharing a row id sit side by side.
+func add_action(id: String, text: String, style: String = "secondary", closes: bool = true, row: String = "") -> Button:
 	var b := Button.new()
 	b.name = ("Action_" + id).validate_node_name()
 	b.text = text
@@ -220,6 +254,18 @@ func add_action(id: String, text: String, style: String = "secondary", closes: b
 	b.add_theme_font_size_override("font_size", UiTokens.FONT_BUTTON)
 	if style == "primary":
 		HomeStyle.style_play_button(b)
+		b.custom_minimum_size = Vector2(0, PRIMARY_HEIGHT)
+	elif style == "offer":
+		b.add_theme_stylebox_override("normal", HomeStyle.pad(HomeStyle.box(GOLD_BODY, GOLD_EDGE, 6, 40, 10, 10), 20, 8))
+		b.add_theme_stylebox_override("hover", HomeStyle.pad(HomeStyle.box(GOLD_BODY.lightened(0.1), GOLD_EDGE, 6, 40, 10, 10), 20, 8))
+		b.add_theme_stylebox_override("pressed", HomeStyle.pad(HomeStyle.box(GOLD_BODY.darkened(0.1), GOLD_EDGE, 6, 40, 5, 5), 20, 8))
+		b.add_theme_stylebox_override("disabled", HomeStyle.pad(HomeStyle.box(GOLD_DISABLED, Color(0.55, 0.47, 0.33), 6, 40, 6, 8), 20, 8))
+		b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+		for c in ["font_color", "font_hover_color", "font_pressed_color", "font_hover_pressed_color", "font_focus_color"]:
+			b.add_theme_color_override(c, Color(1, 1, 1))
+		b.add_theme_color_override("font_disabled_color", Color(1, 1, 1, 0.75))
+		b.add_theme_color_override("font_outline_color", GOLD_EDGE.darkened(0.3))
+		b.add_theme_constant_override("outline_size", 10)
 		b.custom_minimum_size = Vector2(0, PRIMARY_HEIGHT)
 	else:
 		var sb := HomeStyle.box(ROW, ROW_EDGE, 4, 30, 4, 4)
@@ -232,7 +278,17 @@ func add_action(id: String, text: String, style: String = "secondary", closes: b
 		b.add_theme_constant_override("outline_size", 0)
 		b.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
 	b.pressed.connect(_on_action.bind(id))
-	_footer.add_child(b)
+	if row.is_empty():
+		_footer.add_child(b)
+	else:
+		var line: HBoxContainer = _footer.get_node_or_null(("Row_" + row).validate_node_name())
+		if line == null:
+			line = HBoxContainer.new()
+			line.name = ("Row_" + row).validate_node_name()
+			line.add_theme_constant_override("separation", UiTokens.SPACE_MD)
+			_footer.add_child(line)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		line.add_child(b)
 	_actions[id] = {"button": b, "closes": closes}
 	_sync_buttons()
 	return b
@@ -242,6 +298,18 @@ func get_action_button(id: String) -> Button:
 
 func get_action_ids() -> Array:
 	return _actions.keys()
+
+## Hide/show one action (live availability). A hidden action cannot be pressed.
+func set_action_visible(id: String, v: bool) -> void:
+	var b: Button = get_action_button(id)
+	if b != null:
+		b.visible = v
+
+## Force-disable one action on top of the lifecycle gating (e.g. unaffordable / illegal).
+func set_action_blocked(id: String, blocked: bool) -> void:
+	if _actions.has(id):
+		_actions[id]["blocked"] = blocked
+		_sync_buttons()
 
 func get_close_button() -> Button:
 	return _close
@@ -314,8 +382,20 @@ func rearm() -> void:
 	_latched = false
 	_sync_buttons()
 
+## Re-arm after a short guard so a same-frame / double tap cannot repeat a committed
+## purchase (M43-C003 SB-M43-048). No node is created; closing first cancels it.
+func rearm_soon(delay_s: float = 0.35) -> void:
+	if not is_inside_tree():
+		rearm()
+		return
+	get_tree().create_timer(delay_s, true, false, true).timeout.connect(func():
+		if _state == State.OPEN and not is_busy():
+			rearm())
+
 func _on_action(id: String) -> void:
 	if _state != State.OPEN or not _top or is_busy() or _latched or not _actions.has(id):
+		return
+	if bool(_actions[id].get("blocked", false)) or not (_actions[id]["button"] as Button).visible:
 		return
 	if bool(_actions[id]["closes"]):
 		close("action:" + id)
@@ -379,7 +459,7 @@ func _clear_pending() -> void:
 func _sync_buttons() -> void:
 	var live: bool = _state == State.OPEN and _top and not is_busy() and not _latched
 	for id in _actions:
-		(_actions[id]["button"] as Button).disabled = not live
+		(_actions[id]["button"] as Button).disabled = not live or bool(_actions[id].get("blocked", false))
 	if _close != null:
 		_close.disabled = not (_state == State.OPEN and _top and not is_busy())
 

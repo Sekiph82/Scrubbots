@@ -405,26 +405,31 @@ func _two_x_acquisition() -> void:
 		"offers: current level / 15m / 30m / 60m")
 	_ok(pop.get_offer_button("level").text.find("200") != -1 and pop.get_offer_button("timed_900").text.find("300") != -1
 		and pop.get_offer_button("timed_1800").text.find("500") != -1 and pop.get_offer_button("timed_3600").text.find("750") != -1, "canonical prices 200/300/500/750 SB")
+	# M43-C003 migration: the canonical 2x Acquire popup is a one-shot BasePopup on the
+	# ModalStack (closed popups are freed), so each open is re-fetched from the host.
 	pop.get_cancel_button().pressed.emit()
-	_ok(not pop.visible and eco.wallet.scrub_bucks() == sb0 and not h.get_speed_authority().is_2x() and not eco.speed.is_manual_2x_entitled(2), "cancel: nothing spent, no entitlement, speed unchanged")
+	_ok(h.get_speed_acquisition_popup() == null and eco.wallet.scrub_bucks() == sb0 and not h.get_speed_authority().is_2x() and not eco.speed.is_manual_2x_entitled(2), "cancel: nothing spent, no entitlement, speed unchanged")
 	# Insufficient SB.
 	eco.wallet.debit(EconomyWallet.SCRUB_BUCKS, eco.wallet.scrub_bucks() - 100)
 	btn.pressed.emit()
+	pop = h.get_speed_acquisition_popup()
 	pop.get_offer_button("level").pressed.emit()
-	_ok(pop.visible and pop.get_status_text().find("Not enough") != -1 and eco.wallet.scrub_bucks() == 100 and not h.get_speed_authority().is_2x(),
-		"insufficient SB: visible message, nothing spent, speed unchanged")
-	pop.get_cancel_button().pressed.emit()
+	_ok(pop.is_open() and pop.get_status_text().find("Not enough") != -1 and eco.wallet.scrub_bucks() == 100 and not h.get_speed_authority().is_2x()
+		and h.get_modal_stack().top().popup_id == "insufficient_sb",
+		"insufficient SB: visible message + Shop handoff popup, nothing spent, speed unchanged")
+	h.get_modal_stack().clear("t")
 	# Current-level purchase.
 	eco.wallet.credit(EconomyWallet.SCRUB_BUCKS, 900)
 	btn.pressed.emit()
+	pop = h.get_speed_acquisition_popup()
 	pop.get_offer_button("level").pressed.emit()
-	_ok(not pop.visible and h.get_speed_authority().is_2x() and h.get_screen().get_speed_state() == "2x" and btn.text == "2x" and eco.wallet.scrub_bucks() == 800 and eco.speed.is_manual_2x_entitled(2),
+	_ok(h.get_speed_acquisition_popup() == null and h.get_speed_authority().is_2x() and h.get_screen().get_speed_state() == "2x" and btn.text == "2x" and eco.wallet.scrub_bucks() == 800 and eco.speed.is_manual_2x_entitled(2),
 		"current-level purchase: 200 SB spent, 2x immediately, control shows 2x")
 	_ok(h.last_speed_purchase_result.has("save"), "purchase went through the durable-save action boundary")
 	btn.pressed.emit()
 	_ok(not h.get_speed_authority().is_2x() and h.get_screen().get_speed_state() == "1x", "entitled + 2x press -> 1x (V02 label stays '2x'; state is the truth)")
 	btn.pressed.emit()
-	_ok(h.get_speed_authority().is_2x() and (pop == null or not pop.visible), "entitled + 1x press -> 2x (no popup)")
+	_ok(h.get_speed_authority().is_2x() and h.get_speed_acquisition_popup() == null, "entitled + 1x press -> 2x (no popup)")
 	h.free()
 	# Timed purchase on a fresh attempt.
 	var h2 = _host_level(2)

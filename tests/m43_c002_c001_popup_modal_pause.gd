@@ -459,7 +459,10 @@ func _restart_post_action() -> void:
 	conf.get_action_button("confirm").pressed.emit()
 	await _settle()
 	_ok(_eco().hearts.hearts() == pre["hearts_after"] and _eco().streak.streak() == 0 and not _eco().streak.gameplay_started(), "real Retry applied exactly the previewed loss")
-	_ok(_host.get_slots().snapshot().all(func(sl2): return sl2.get("state", "") == "EMPTY" or sl2.get("batch", null) == null) or true, "fresh attempt")
+	# NB-001 (C002 audit): real assertion — every slot unoccupied, board fully ACTIVE again.
+	var b = _host.get_board()
+	_ok(_host.get_slots().snapshot().all(func(sl2): return not bool(sl2["occupied"])) and _host.get_slots().snapshot().size() == 5
+		and b.count_cells_by_state(0) == b.get_width() * b.get_height(), "fresh attempt: 5 empty slots, board fully ACTIVE")
 	# Zero-Heart edge: consume() fails closed, so no Heart line is promised.
 	_first_action()
 	_set_hearts(0)

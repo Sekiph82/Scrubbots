@@ -68,8 +68,12 @@ const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolv
 const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
 const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
 const SpeedAcquisitionPopup = preload("res://scripts/ui/speed_acquisition_popup.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 const Popups = preload("res://scripts/ui/popup/popups.gd")
+const AcquisitionFlow = preload("res://scripts/ui/popup/acquisition_flow.gd")
+const ShopHandoff = preload("res://scripts/app/shop_handoff.gd")
+const PaletteColors = preload("res://scripts/data/palette_colors.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -167,6 +171,10 @@ var launch_entry_id: String = ""
 ## a harness host with none creates (and owns) a private one.
 var modal_stack = null
 var _owns_modal_stack := false
+## M43-C003: the ONE AcquisitionFlow (Life / Booster Acquire / Shop handoff). The app root
+## injects its own; a harness host with none creates a private one on its own stack.
+var acquisition = null
+var _owns_acquisition := false
 ## True only while THIS host's modal hold set the runtime user pause (so closing the last
 ## popup resumes exactly what the modal suspended, never a system suspension).
 var _paused_by_modal := false
@@ -436,6 +444,9 @@ func build() -> bool:
 		# M39 V04 (F-M39-V03-005): the ONE canonical production action surface.
 		# Committed actions hit the host save boundary; M40 binds the same seam.
 		_actions = ProductionActionFacade.new(_economy, self, Callable(self, "request_save"))
+		# No AppState: this host's private economy saves rewarded grants at its boundary.
+		if app_state == null:
+			_economy.rewarded.bind_save(Callable(self, "request_save"))
 	_economy_terminal_done = false
 	_bind_modal_stack()
 
@@ -731,6 +742,73 @@ func booster_states() -> Array:
 		out.append({"id": id, "charges": charges, "price": price, "state": state})
 	return out
 
+## M43-C003: can booster `id` legally execute right now? Read-only proofs from the SAME
+## adapter the transaction uses (Random: >=3 safe fronts; Selector: solver-safe batches +
+## empty slot; Tornado: present colours; +1 Slot: once per attempt, capacity <= 6).
+## {legal, reason, targets:[{key, color, label}]}. Never reserves or mutates.
+func booster_legality(id: String) -> Dictionary:
+	if _economy == null or _booster_adapter == null:
+		return {"legal": false, "reason": "economy_unavailable", "targets": []}
+	if _completion != null and _completion.is_terminal():
+		return {"legal": false, "reason": "terminal", "targets": []}
+	var colors: Array = PaletteColors.parse(_level.palette).colors if _level != null else []
+	match id:
+		BoosterInventory.PLUS_ONE_SLOT:
+			var ok: bool = _economy.capacity.can_activate_plus_one() and _slots != null and _slots.can_grow_to_sixth()
+			return {"legal": ok, "reason": "" if ok else "plus_one_used", "targets": []}
+		BoosterInventory.RANDOM:
+			var ok2: bool = bool(_booster_adapter.propose_random_reorder().get("safe", false))
+			return {"legal": ok2, "reason": "" if ok2 else "not_solver_safe", "targets": []}
+		BoosterInventory.SELECTOR:
+			var info := {}
+			for col in _supply.debug_snapshot()["columns"]:
+				for bd in col:
+					info[String(bd["batch_id"])] = bd
+			var targets: Array = []
+			for bid in _booster_adapter.eligible_safe_batches():
+				var bd: Dictionary = info.get(String(bid), {})
+				var ci := int(bd.get("color_id", -1))
+				targets.append({"key": bid, "color": colors[ci] if ci >= 0 and ci < colors.size() else Color(0.5, 0.5, 0.5),
+					"label": str(int(bd.get("robot_count", 0)))})
+			return {"legal": not targets.is_empty(), "reason": "" if not targets.is_empty() else "not_eligible", "targets": targets}
+		BoosterInventory.TORNADO:
+			var ct: Array = []
+			for c in _booster_adapter.present_colors():
+				ct.append({"key": c, "color": colors[int(c)] if int(c) >= 0 and int(c) < colors.size() else Color(0.5, 0.5, 0.5), "label": ""})
+			return {"legal": not ct.is_empty(), "reason": "" if not ct.is_empty() else "color_not_present", "targets": ct}
+	return {"legal": false, "reason": "unknown_booster", "targets": []}
+
+## M43-C003: execute booster `id` through the canonical facade (charge-first, then SB,
+## reserved only after the solver-safety pre-checks; refunded on a failed commit).
+## Called by the Booster Acquire popup while it owns input, so the modal gate of
+## request_booster() does not apply; the terminal gate does.
+func execute_booster(id: String, target = null) -> Dictionary:
+	var r: Dictionary
+	if _economy == null or _actions == null:
+		r = {"ok": false, "reason": "economy_unavailable"}
+	elif not BoosterInventory.BOOSTERS.has(id):
+		r = {"ok": false, "reason": "unknown_booster"}
+	elif _completion != null and _completion.is_terminal():
+		r = {"ok": false, "reason": "terminal"}
+	elif id == BoosterInventory.PLUS_ONE_SLOT:
+		# activate_plus_one_slot() reports only bool; surface the SB shortfall explicitly.
+		if _economy.boosters.charges(id) <= 0 and _economy.wallet.scrub_bucks() < int(_economy.config.booster_price(id)):
+			r = {"ok": false, "reason": "insufficient_sb"}
+		else:
+			r = _actions.plus_one_slot()
+	elif id == BoosterInventory.RANDOM:
+		r = _actions.random()
+	elif target == null:
+		r = {"ok": false, "reason": "target_required"}
+	elif id == BoosterInventory.SELECTOR:
+		r = _actions.selector(target)
+	else:
+		r = _actions.tornado(target)
+	r["id"] = id
+	last_booster_request = r
+	_refresh_hud()
+	return r
+
 ## Booster control intent (V02 booster row). Never spends SB from a tap:
 ##   - owned charge + no target needed (+1 Slot, Random) -> canonical action facade, which
 ##     consumes the charge (Economy V1 charge-first) through BoosterService;
@@ -748,14 +826,21 @@ func request_booster(id: String) -> Dictionary:
 	elif is_modal_open():
 		r = {"ok": false, "reason": "modal_open"}
 	elif _economy.boosters.charges(id) <= 0:
+		# M43-C003: zero charge -> the canonical Booster Acquire popup (SB / rewarded).
 		r = {"ok": false, "reason": "acquire_required"}
 		booster_acquire_requested.emit(id)
+		if acquisition != null:
+			acquisition.open_booster(self, id)
 	elif id == BoosterInventory.PLUS_ONE_SLOT:
 		r = _actions.plus_one_slot()
 	elif id == BoosterInventory.RANDOM:
 		r = _actions.random()
 	else:
-		r = {"ok": false, "reason": "target_selection_required"}
+		# Owned Selector / Tornado charge: the same component in USE mode picks the target
+		# (solver-safe batches / present colours); no purchase CTA, nothing consumed yet.
+		r = {"ok": false, "reason": "target_selection"}
+		if acquisition != null:
+			acquisition.open_booster(self, id)
 	r["id"] = id
 	last_booster_request = r
 	_refresh_hud()
@@ -775,14 +860,23 @@ func _bind_modal_stack() -> void:
 		add_child(modal_stack)
 	if not modal_stack.modal_changed.is_connected(_on_modal_changed):
 		modal_stack.modal_changed.connect(_on_modal_changed)
+	if acquisition == null and _economy != null:
+		acquisition = AcquisitionFlow.new()
+		acquisition.bind(modal_stack, _economy, _actions, ShopHandoff.new())
+		_owns_acquisition = true
 
 func _exit_tree() -> void:
+	if _owns_acquisition and acquisition != null:
+		acquisition.unbind()
 	if modal_stack != null and is_instance_valid(modal_stack) and not _owns_modal_stack \
 			and modal_stack.modal_changed.is_connected(_on_modal_changed):
 		modal_stack.modal_changed.disconnect(_on_modal_changed)
 
 func get_modal_stack():
 	return modal_stack
+
+func get_acquisition():
+	return acquisition
 
 func is_modal_open() -> bool:
 	return modal_stack != null and is_instance_valid(modal_stack) and modal_stack.is_open()
@@ -847,6 +941,13 @@ func _on_attempt_confirmed(id: String, _ctx: Dictionary, kind: String) -> void:
 	if id != "confirm":
 		return
 	if kind == "restart":
+		# M43-C003 zero-Heart attempt gate: a Restart that would begin the new attempt with
+		# no Heart opens the canonical Life popup instead (nothing is consumed or reset).
+		if _economy != null and int(attempt_consequence()["hearts_after"]) < 1:
+			last_pause_outcome = "restart_gated"
+			if acquisition != null:
+				acquisition.open_life("restart_gate")
+			return
 		# The REAL M30 transaction-safe Retry; its restore seam applies the M39
 		# restart-after-action law (Heart + Win Streak) exactly as the preview stated.
 		if retry():
@@ -944,20 +1045,42 @@ func _on_speed_pressed() -> void:
 
 ## Canonical Economy V1 2x offers (prices from EconomyConfig, never hardcoded here).
 func speed_offers() -> Array:
-	var out: Array = [{"key": "level", "kind": "level", "seconds": 0, "label": "This level",
+	var out: Array = [{"key": "level", "kind": "level", "seconds": 0, "label": UiText.t("SPEED_LABEL_LEVEL"),
 		"price_sb": _economy.config.speed_current_level_sb()}]
 	for p in _economy.config.speed_timed_products():
 		var secs: int = int(p.get("seconds", 0))
 		out.append({"key": "timed_%d" % secs, "kind": "timed", "seconds": secs,
-			"label": "%d minutes" % (secs / 60), "price_sb": int(p.get("sb", 0))})
+			"label": UiText.t("SPEED_LABEL_MINUTES", [secs / 60]), "price_sb": int(p.get("sb", 0))})
 	return out
 
+## M43-C003: the canonical 2x Acquire popup on the shared ModalStack.
 func _open_speed_acquisition() -> void:
-	if _speed_popup == null:
-		_speed_popup = SpeedAcquisitionPopup.new()
-		_screen.add_child(_speed_popup)
-		_speed_popup.offer_chosen.connect(_on_speed_offer_chosen)
-	_speed_popup.open(speed_offers(), _economy.wallet.scrub_bucks())
+	if is_modal_open():
+		return
+	_speed_popup = SpeedAcquisitionPopup.new()
+	_speed_popup.offer_chosen.connect(_on_speed_offer_chosen)
+	_speed_popup.open(speed_offers(), speed_state())
+	if not modal_stack.push(_speed_popup):
+		_speed_popup.free()
+		_speed_popup = null
+		return
+	# Live timed countdown: popup-owned 1 s redraw of SpeedEntitlementService truth.
+	var t := Timer.new()
+	t.name = "LiveRefresh"
+	t.wait_time = 1.0
+	t.ignore_time_scale = true
+	var pop = _speed_popup
+	t.timeout.connect(func():
+		if is_instance_valid(pop) and pop.is_open():
+			pop.refresh(speed_state()))
+	pop.add_child(t)
+	t.start()
+
+## Live 2x entitlement view for the popup (SpeedEntitlementService truth).
+func speed_state() -> Dictionary:
+	return {"scrub_bucks": _economy.wallet.scrub_bucks(),
+		"level_active": _economy.speed.is_level_entitled(progression_level),
+		"timed_remaining": _economy.speed.timed_seconds_remaining()}
 
 ## Purchase through the ONE canonical action surface (durable save on commit). Success ->
 ## 2x immediately + control updated + popup closed. Failure/insufficient SB -> nothing
@@ -969,19 +1092,38 @@ func _on_speed_offer_chosen(kind: String, seconds: int) -> void:
 	var r: Dictionary = _actions.buy_current_level_2x(progression_level) if kind == "level" \
 		else _actions.buy_timed_2x(seconds)
 	last_speed_purchase_result = r
+	var pop = get_speed_acquisition_popup()
 	if not r.get("ok", false):
 		var reason: String = String(r.get("reason", "failed"))
-		_speed_popup.show_status("Not enough Scrub Bucks." if reason == "insufficient_sb"
-			else "Purchase unavailable (%s)." % reason)
+		if pop != null:
+			pop.show_status(UiText.t("ACQ_NOT_ENOUGH") if reason == "insufficient_sb"
+				else UiText.t("SPEED_UNAVAILABLE", [reason]))
+			pop.rearm_soon()
+			pop.refresh(speed_state())
+		if reason == "insufficient_sb" and acquisition != null:
+			var key := "level" if kind == "level" else "timed_%d" % seconds
+			var price := 0
+			var label := key
+			for o in speed_offers():
+				if o["key"] == key:
+					price = int(o["price_sb"])
+					label = UiText.t("SPEED_ITEM", [o["label"]])
+			acquisition.open_insufficient({"source": "speed", "product": "speed:" + key, "offer_key": key,
+				"level": progression_level, "item_label": label,
+				"price_sb": price, "balance_sb": _economy.wallet.scrub_bucks()})
 		return
-	_speed_popup.close()
+	if pop != null:
+		pop.close("purchased")
 	if _economy.speed.is_manual_2x_entitled(progression_level):
 		_runtime.set_speed_2x(true)
 		_screen.set_speed_2x(true)
 	_refresh_hud()
 
+## The open canonical 2x Acquire popup, or null.
 func get_speed_acquisition_popup():
-	return _speed_popup
+	if _speed_popup != null and is_instance_valid(_speed_popup) and _speed_popup.is_open():
+		return _speed_popup
+	return null
 
 ## Test-only fault seam for the +1 Slot transition (M39 V04, F-M39-V03-003):
 ## f(stage) -> true forces a failure at "engine" (after the M24 grow) or

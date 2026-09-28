@@ -74,6 +74,10 @@ func on_level_completed(level: int, success: bool) -> void:
 	if success and _entitled_level == level:
 		_entitled_level = -1
 
+## Read-only: is the CURRENT-LEVEL entitlement held for `level` (timed ignored)?
+func is_level_entitled(level: int) -> bool:
+	return level >= 1 and _entitled_level == level
+
 # --- timed 2x ---
 
 func purchase_timed(seconds: int) -> Dictionary:

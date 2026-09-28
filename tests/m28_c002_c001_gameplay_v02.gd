@@ -331,12 +331,17 @@ func _booster_requests_no_silent_spend() -> void:
 	var sb0: int = eco.wallet.scrub_bucks()
 	var e0: Dictionary = eco.boosters.snapshot()
 	s.get_booster_button("tornado").pressed.emit()
-	_ok(h.last_booster_request.get("reason") == "acquire_required" and asked == ["tornado"] and eco.wallet.scrub_bucks() == sb0 and eco.boosters.snapshot() == e0,
-		"no charge: acquire seam emitted, NO SB spent, nothing consumed")
+	# M43-C003 migration: zero charge opens the canonical Booster Acquire popup.
+	_ok(h.last_booster_request.get("reason") == "acquire_required" and asked == ["tornado"] and eco.wallet.scrub_bucks() == sb0 and eco.boosters.snapshot() == e0
+		and h.get_modal_stack().ids() == ["booster_tornado"],
+		"no charge: acquire seam emitted + Booster Acquire open, NO SB spent, nothing consumed")
+	h.get_modal_stack().clear("t")
 	eco.boosters.add_charges(BoosterInventory.SELECTOR, 1)
 	s.get_booster_button("selector").pressed.emit()
-	_ok(h.last_booster_request.get("reason") == "target_selection_required" and eco.boosters.charges(BoosterInventory.SELECTOR) == 1 and eco.wallet.scrub_bucks() == sb0,
-		"Selector with charge: target UI deferred, charge NOT consumed")
+	_ok(h.last_booster_request.get("reason") == "target_selection" and h.get_modal_stack().ids() == ["booster_selector"]
+		and eco.boosters.charges(BoosterInventory.SELECTOR) == 1 and eco.wallet.scrub_bucks() == sb0,
+		"Selector with charge: USE-mode target picker opens, charge NOT consumed")
+	h.get_modal_stack().clear("t")
 	s.get_booster_button("random").pressed.emit()
 	var rr: Dictionary = h.last_booster_request
 	_ok(eco.wallet.scrub_bucks() == sb0 and (rr.get("ok", false) == (eco.boosters.charges(BoosterInventory.RANDOM) == 2)),

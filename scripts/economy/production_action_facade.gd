@@ -89,6 +89,18 @@ func buy_heart() -> Dictionary:
 func refill_hearts() -> Dictionary:
 	return _finish("refill_hearts", _economy.hearts.purchase_full_refill())
 
+# ------------------------------------------------------------ rewarded (M43-C003) ----
+
+## Rewarded products: "heart" | "booster:<id>". The grant itself commits (and saves) in
+## RewardedGrantService.resolve() when the provider reports a verified completion.
+func rewarded_available(product: String) -> bool:
+	return _economy.rewarded.is_available(product)
+
+func start_rewarded(product: String, token: String = "") -> Dictionary:
+	var r: Dictionary = _economy.rewarded.start(product, token)
+	r["action"] = "start_rewarded"
+	return r
+
 # ------------------------------------------------------------ claims ----
 
 func claim_daily_login() -> Dictionary:

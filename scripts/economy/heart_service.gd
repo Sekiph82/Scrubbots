@@ -98,6 +98,17 @@ func purchase_plus_one() -> Dictionary:
 		_anchor = _now()
 	return {"ok": true, "hearts": _hearts, "spent": _plus_one_sb}
 
+## M43-C003: +1 Heart from a verified rewarded grant (RewardGrantService handler only;
+## RewardedGrantService pre-checks fullness). Never exceeds max; no SB involved.
+func grant_one() -> bool:
+	_accrue()
+	if _hearts >= _max:
+		return false
+	_hearts += 1
+	if _hearts >= _max:
+		_anchor = _now()
+	return true
+
 ## Full refill = 400 SB per missing heart. Atomic.
 func purchase_full_refill() -> Dictionary:
 	_accrue()
