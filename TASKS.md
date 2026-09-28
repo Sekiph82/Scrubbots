@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M43-C003-C001 Life / Booster / 2x Acquisition
-- Current Task: Claude implements SB-M43-030..049 from the canonical M43-C003 acquisition prompt
-- Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C003-C001/CHATGPT_PROMPT_V01.md`, reads the paired `CHATGPT_AUDIT_CRITERIA_V01.md`, pushes implementation/evidence/log, then returns AWAITING_CHATGPT_AUDIT.
-- Required Actor: CLAUDE
+- Current Sprint: M43-C003-C001 Acquisition — Owner Visual / UX Gate
+- Current Task: Owner reviews the technically accepted Life / Booster / 2x / Shop-handoff acquisition family and resolves A1/B1/C1/D1/E1/F1
+- Current Task Status: OWNER_REQUIRED
+- Next Task/Action: OWNER resolves `coordination/sessions/M43-C003-C001/OWNER_ACQUISITION_GATE_V01.md`. ChatGPT records acceptance/remediation; if approved, SB-M43-049 closes and sequencing returns to M28-C002 popup-inclusive final evidence/playtest.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 931 / 1355 = 68.71%. M43-C002 popup/modal/Pause foundation is technically accepted and owner visually approved; M43-C003 acquisition surfaces are next.
-- Note: M43-C002-C001 is technically + owner visually closed. M43-C003-C001 prompt/audit criteria are now canonical. Rewarded-video `WATCH / GET` is limited to +1 Heart and the four Booster acquisition flows; no rewarded 2x and no generic-popup ad CTA. Heart regen authority remains 900 s / 15 min. M43-C002 non-blocking `or true` test note remains excluded from final closure evidence.
-- Owner sequencing lock: M43-C002 is closed; execute M43-C003 Life/Booster/2x acquisition next, then return to M28-C002 popup-inclusive final evidence/playtest.
+- Progress: 950 / 1355 = 70.11%. M43-C003 SB-M43-030..048 are technically accepted; only the acquisition visual/UX owner gate (SB-M43-049) remains.
+- Note: M43-C003-C001 independent audit PASS at `58899a2` for SB-M43-030..048. Rewarded-video remains limited to +1 Heart + four Boosters, production provider defaults unavailable until M57, no rewarded 2x, Heart regen remains 900 s / 15 min. Owner gate also resolves Selector/Tornado target-picker UX and last-Heart Restart semantics.
+- Owner sequencing lock: resolve M43-C003 owner gate; if accepted, close M43-C003 then return to M28-C002 popup-inclusive final evidence/playtest before proceeding further.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1665,25 +1665,25 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 
 #### M43-C003 - Life / Hearts / Scrub Bucks / Booster / 2x Acquisition Surfaces
 
-- [ ] SB-M43-030 Implement the canonical Life popup from the selected Life master reference.
-- [ ] SB-M43-031 Life popup shows live Hearts current/max and the real next-Heart wall-clock countdown; at 5/5 use the canonical static **15:00 ready state** rather than a separate authoritative timer.
-- [ ] SB-M43-032 Heart `+` on Home opens Life popup; zero-Heart attempt gate opens the same canonical surface instead of a separate inconsistent dialog.
-- [ ] SB-M43-033 Life popup supports +1 Heart for 500 SB and full refill at 400 SB per missing Heart using HeartService/EconomyWallet atomically.
-- [ ] SB-M43-034 Life popup includes the canonical rewarded-video path for +1 Heart when a rewarded placement is available and policy permits it; ad-unavailable state must degrade cleanly.
-- [ ] SB-M43-035 Rewarded Heart grant is exactly-once per completed verified reward callback; closing/skipping/failing an ad grants nothing.
-- [ ] SB-M43-036 Scrub Bucks `+` on Home opens the canonical Shop / SB acquisition destination and preserves return context.
-- [ ] SB-M43-037 Implement one reusable `BoosterAcquirePopup` driven by booster definition data rather than four duplicated scenes.
-- [ ] SB-M43-038 Booster Acquire popup shows selected booster icon/name, concise effect explanation, owned charges and live SB price.
-- [ ] SB-M43-039 If a booster charge exists, gameplay uses the charge-first Economy V1 rule and does not unnecessarily open purchase UI.
-- [ ] SB-M43-040 With zero charge, +1 Slot offers one-use acquisition at 500 SB or one rewarded-video charge/use when available.
-- [ ] SB-M43-041 With zero charge, Random offers one-use acquisition at 350 SB or one rewarded-video charge/use when available.
-- [ ] SB-M43-042 With zero charge, Selector offers one-use acquisition at 500 SB or one rewarded-video charge/use when available.
-- [ ] SB-M43-043 With zero charge, Tornado offers one-use acquisition at 750 SB or one rewarded-video charge/use when available.
-- [ ] SB-M43-044 A rewarded booster grant must never bypass solver-safety/availability checks; if the booster cannot legally execute, do not consume the newly granted use until the player can use it.
-- [ ] SB-M43-045 Implement canonical 2x Acquire popup for current level 200 SB / 15m 300 SB / 30m 500 SB / 60m 750 SB.
-- [ ] SB-M43-046 2x popup shows existing entitlement/time remaining and never charges again for switching 1x/2x while entitlement is active.
-- [ ] SB-M43-047 Free M23-supply-exhausted auto-2x never opens purchase UI and never consumes/extends paid entitlement.
-- [ ] SB-M43-048 All acquisition surfaces survive insufficient balance, rapid taps, background/resume, ad unavailable and transaction retry without double spend/grant.
+- [x] SB-M43-030 Implement the canonical Life popup from the selected Life master reference.
+- [x] SB-M43-031 Life popup shows live Hearts current/max and the real next-Heart wall-clock countdown; at 5/5 use the canonical static **15:00 ready state** rather than a separate authoritative timer.
+- [x] SB-M43-032 Heart `+` on Home opens Life popup; zero-Heart attempt gate opens the same canonical surface instead of a separate inconsistent dialog.
+- [x] SB-M43-033 Life popup supports +1 Heart for 500 SB and full refill at 400 SB per missing Heart using HeartService/EconomyWallet atomically.
+- [x] SB-M43-034 Life popup includes the canonical rewarded-video path for +1 Heart when a rewarded placement is available and policy permits it; ad-unavailable state must degrade cleanly.
+- [x] SB-M43-035 Rewarded Heart grant is exactly-once per completed verified reward callback; closing/skipping/failing an ad grants nothing.
+- [x] SB-M43-036 Scrub Bucks `+` on Home opens the canonical Shop / SB acquisition destination and preserves return context.
+- [x] SB-M43-037 Implement one reusable `BoosterAcquirePopup` driven by booster definition data rather than four duplicated scenes.
+- [x] SB-M43-038 Booster Acquire popup shows selected booster icon/name, concise effect explanation, owned charges and live SB price.
+- [x] SB-M43-039 If a booster charge exists, gameplay uses the charge-first Economy V1 rule and does not unnecessarily open purchase UI.
+- [x] SB-M43-040 With zero charge, +1 Slot offers one-use acquisition at 500 SB or one rewarded-video charge/use when available.
+- [x] SB-M43-041 With zero charge, Random offers one-use acquisition at 350 SB or one rewarded-video charge/use when available.
+- [x] SB-M43-042 With zero charge, Selector offers one-use acquisition at 500 SB or one rewarded-video charge/use when available.
+- [x] SB-M43-043 With zero charge, Tornado offers one-use acquisition at 750 SB or one rewarded-video charge/use when available.
+- [x] SB-M43-044 A rewarded booster grant must never bypass solver-safety/availability checks; if the booster cannot legally execute, do not consume the newly granted use until the player can use it.
+- [x] SB-M43-045 Implement canonical 2x Acquire popup for current level 200 SB / 15m 300 SB / 30m 500 SB / 60m 750 SB.
+- [x] SB-M43-046 2x popup shows existing entitlement/time remaining and never charges again for switching 1x/2x while entitlement is active.
+- [x] SB-M43-047 Free M23-supply-exhausted auto-2x never opens purchase UI and never consumes/extends paid entitlement.
+- [x] SB-M43-048 All acquisition surfaces survive insufficient balance, rapid taps, background/resume, ad unavailable and transaction retry without double spend/grant.
 - [ ] SB-M43-049 Produce/owner-approve visual masters for Booster Acquire, 2x Acquire and insufficient-SB/Shop handoff states in the canonical popup family.
 
 #### M43-C004 - Fail / Retry / Need a Hand Recovery
