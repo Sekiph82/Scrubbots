@@ -5,15 +5,15 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE
-- Current Sprint: M43-C001 Results — Owner Visual + Replay Gate
-- Current Task: Owner decides Results Replay policy and final Victory/Results visual-master composition after C001A foundation audit PASS
-- Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER resolves `coordination/sessions/M43-C001/OWNER_RESULTS_GATE_V01.md`. ChatGPT records the rulings, updates TASKS.md and opens the final M43-C001 visual/production binding cycle.
-- Required Actor: OWNER
+- Current Sprint: M43-C001B WON Results Visual / Production Binding
+- Current Task: Implement owner-locked WON Results composition on the accepted C001A receipt/model foundation; no Replay; LOST remains separate for M43-C004
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C001B/task_prompts/SB-M43-C001B_WON_RESULTS_VISUAL_BINDING.md`; ChatGPT audits, then OWNER performs runtime/visual acceptance before SB-M43-009 closes.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 893 / 1355 = 65.90%. M43-C001A foundation closed; owner visual/Replay gate is active.
-- Note: M43-C001A foundation AUDITED_PASS at `b3c44d1`: authoritative terminal receipt/model, no Results re-grant, Continue exactly-once, rapid/stale/no-content guards. Final visual master, celebration presentation and Replay remain owner-gated. Audit: `coordination/sessions/M43-C001A/CHATGPT_AUDIT_V01.md`.
+- Progress: 895 / 1355 = 66.05%. Results Replay gate resolved NO; M43-C001B WON visual binding is active.
+- Note: OWNER Results ruling `coordination/OWNER_RESULTS_VISUAL_REPLAY_V01.md`: A1-NO Replay; B1-A robot-over-frame + small emblem; B2-A green/yellow Life/Help CTA; B3-A LOST routed to dedicated M43-C004 family. C001A foundation remains AUDITED_PASS.
 - Owner sequencing lock: First 10 + applicable M54 + current-build M55 core are CLOSED. Main roadmap has resumed at M43 Results / Player Experience. M55 Player-Experience Chaos rows remain deferred until their owning M43 surfaces exist.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -1631,12 +1631,12 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 - [ ] SB-M43-003 Streak presentation.
 - [x] SB-M43-004 Show/apply first-clear difficulty SB + streak SB + Bot Part/Collection rewards through RewardGrantService.
 - [x] SB-M43-005 Continue.
-- [ ] SB-M43-006 Replay if approved; replay never farms progression economy.
+- [x] SB-M43-006 Replay if approved; replay never farms progression economy. **[OWNER: NO SHIPPING REPLAY IN V1 RESULTS]**
 - [x] SB-M43-007 No double reward.
 - [x] SB-M43-008 Rapid-tap protection.
 - [ ] SB-M43-009 Produce and owner-approve a canonical Victory/Results visual master consistent with the Life/Help popup family.
 - [ ] SB-M43-010 Reveal first-clear SB, Win Streak bonus, Bot Parts, Gift Meter progress and Collection/Card rewards in a short ordered celebration sequence rather than dumping all rewards silently.
-- [ ] SB-M43-011 Support a compact replay result path that clearly communicates zero progression reward on replay.
+- [x] SB-M43-011 Support a compact replay result path that clearly communicates zero progression reward on replay. **[RESOLVED BY OWNER: NO SHIPPING REPLAY, so no replay result path is built.]**
 - [ ] SB-M43-012 If a win crosses a Gift Meter milestone, queue/show the milestone celebration without double granting.
 - [ ] SB-M43-013 If the win unlocks a robot, collection set, Master Collection, feature or world, hand off to the corresponding ceremony in M43-C005 after the core Results reward commit succeeds.
 - [x] SB-M43-014 Results Continue advances exactly once to the next canonical progression level and cannot be double-tapped into duplicate transitions.
