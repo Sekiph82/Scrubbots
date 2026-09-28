@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M28-C002-C002-R01 Gameplay Visual Remediation — Owner Acceptance
-- Current Task: Owner reviews enlarged 2.4-cell mini Scrubbots and live speech-bubble copy/readability after R01 technical audit PASS
-- Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER resolves `coordination/sessions/M28-C002-C002-R01/OWNER_VISUAL_ACCEPTANCE_GATE_V01.md`. ChatGPT records acceptance, updates TASKS.md, then opens remaining Pause/Booster/2x/modal dependency work.
-- Required Actor: OWNER
+- Current Sprint: M43-C002-C001 Reusable Popup / Modal / Pause Foundation
+- Current Task: Build reusable BasePopup + modal-stack authority + canonical Gameplay Pause/Restart/Home flow and generic acquisition-state foundations
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C002-C001/task_prompts/SB-M43-C002-C001_POPUP_MODAL_PAUSE_FOUNDATION.md`; ChatGPT audits, then OWNER reviews popup/Pause visuals before M43-C003.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 912 / 1355 = 67.31%. Gameplay V02 C001 technical core accepted; C002 static 3/4/5 master-shell convergence is active.
-- Note: R01 technical audit PASS at `47b7b9f`. 2.4-cell Scrubby, 2.1-cell echo, live bubble text, 88px short-phone front hitboxes, hidden AD placeholder and S6-C square-production gate are accepted technically. Owner visual R1-R3 remains.
-- Owner sequencing lock: resolve R01 owner visual gate first; then finish M28 Gameplay V02 remaining Pause/Booster/2x/modal dependencies before final owner playtest.
+- Progress: 913 / 1355 = 67.38%. Gameplay V02 static-shell visual family is technically and owner accepted; popup/modal/Pause dependency work is active.
+- Note: R01 owner visual PASS recorded: R1-OK 2.4-cell mini Scrubbots, R2-OK bubble copy, R3-OK short-phone readability. SB-M28-C002-016 is closed. Remaining Gameplay V02 blockers are M43-C002 Pause/modal and M43-C003 Booster/2x acquisition surfaces.
+- Owner sequencing lock: complete M43-C002 popup/modal/Pause foundation and owner visual review, then M43-C003 Booster/2x acquisition, then return to M28-C002 final popup-inclusive evidence/playtest.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1263,7 +1263,7 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 #### M28-C002 - Gameplay Screen V02 Production Convergence [PLANNED / REQUIRED BEFORE FINAL META-UI INTEGRATION]
 
-**M28-C002-C002 static-shell audit:** AUDITED_PASS at `0044349`. Six-master matrix (5/6 slots × 3/4/5 supply columns), reference transform, 5↔6 switching and live-overlay alignment are technically accepted. Owner visual gate S1-S6 is active. Rows 012-015/018(part)/019/020 remain dependency/final-gate work.
+**M28-C002-C002/R01 static-shell status:** technical PASS and FINAL OWNER VISUAL PASS. Six-master matrix (5/6 slots × 3/4/5 supply columns), 2.4-cell mini Scrubbots, live bubble copy, responsive/touch choices and S1-S6 are owner-accepted. Row 016 is closed. Rows 012-015/018(part)/019/020 remain dependency/final-gate work.
 
 Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master visual into the actual shipping gameplay screen. Historical M28 closure remains historical; this sprint closes the later V02 delta without falsifying earlier evidence.
 
@@ -1282,7 +1282,7 @@ Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master vi
 - [ ] SB-M28-C002-013 Tapping locked/manual 2x without entitlement routes into the canonical 2x Acquire popup defined by M43-C003.
 - [ ] SB-M28-C002-014 Implement the canonical Pause popup entry and deterministic modal stacking rules from M43-C002.
 - [ ] SB-M28-C002-015 Preserve gameplay input isolation while any popup/modal is open; board, supply and booster controls behind it receive no input.
-- [ ] SB-M28-C002-016 Preserve the approved gameplay background, Scrubby/selected-robot support presentation and lower decorative hierarchy without shrinking gameplay-critical controls first.
+- [x] SB-M28-C002-016 Preserve the approved gameplay background, Scrubby/selected-robot support presentation and lower decorative hierarchy without shrinking gameplay-critical controls first. — R01 technical PASS + FINAL OWNER VISUAL PASS.
 - [x] SB-M28-C002-017 Validate 1080x2160, 1170x2532, 1290x2796, 1080x2400, 1440x3200, short 16:9 portrait and tablet portrait.
 - [ ] SB-M28-C002-018 Validate mouse/touch mapping, rapid taps, popup-open input suppression and temporary sixth-slot readability.
 - [ ] SB-M28-C002-019 Capture owner-review screenshots/video for fresh level, active cleaning, full five-slot state, sixth-slot state, booster popup open, Pause open and timed 2x state.
