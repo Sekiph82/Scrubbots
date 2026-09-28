@@ -159,6 +159,10 @@ func load_manifest(path: String = DEFAULT_MANIFEST_PATH) -> LevelCatalogValidati
 			for e in prod_result.errors:
 				_last_result.add_entry_error(id, "production: %s" % String(e))
 			continue
+		var shell_err := square_shell_error(level.width, level.height)
+		if not shell_err.is_empty():
+			_last_result.add_entry_error(id, shell_err)
+			continue
 
 		# M52-C001: optional owner supply plan. When declared it must be a canonical
 		# res:// path, unique, and must load into an exact, conserving engine for THIS
@@ -199,6 +203,15 @@ func load_manifest(path: String = DEFAULT_MANIFEST_PATH) -> LevelCatalogValidati
 	# keeps get_entries_ordered() stable if caller injects entries directly).
 	_entries.sort_custom(func(a, b): return _compare_entries(a, b))
 	return _last_result
+
+## OWNER_GAMEPLAY_STATIC_SHELL_VISUAL_ACCEPTANCE_V01 S6-C: the Gameplay V02 static master
+## shells are owner-approved for SQUARE production boards only (their baked Railway is a
+## near-square loop). The generic board engine stays rectangular-capable; a non-square
+## production level fails closed here until an alternate shell/rail treatment is approved.
+static func square_shell_error(width: int, height: int) -> String:
+	if width == height:
+		return ""
+	return "V02 static shell is owner-approved for square boards only (S6-C); got %dx%d" % [width, height]
 
 func _compare_entries(a, b) -> bool:
 	if a.order != b.order:
@@ -268,4 +281,7 @@ func validate_all() -> LevelCatalogValidationResult:
 		if not pr.is_ok():
 			for msg in pr.errors:
 				r.add_entry_error(e.id, "production: %s" % String(msg))
+		var se := square_shell_error(e.width, e.height)
+		if not se.is_empty():
+			r.add_entry_error(e.id, se)
 	return r

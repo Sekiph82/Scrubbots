@@ -41,7 +41,10 @@ const BODY_TEX_PATH := "res://assets/ui/final/characters/scrubby/scrubby_gamepla
 ## Apparent Scrubby size in CELL units (the layer scales cells to pixels). Legible but
 ## intentionally small enough not to blanket a cluster of board cells (M32 prompt §7).
 ## The larger texture dimension is mapped to this span so the character never crops.
-const BODY_SPAN_CELLS := 1.8
+## M28-C002-C002-R01 (OWNER_GAMEPLAY_STATIC_SHELL_VISUAL_ACCEPTANCE_V01, item A): 1.8 -> 2.4
+## so the moving mini Scrubbots read clearly on the static master shells. Presentation
+## only — route position, speed, arrival and clears are untouched.
+const BODY_SPAN_CELLS := 2.4
 
 ## Restrained travel motion tuned for readability, not gameplay (M32 prompt §8). All
 ## values are in CELL units / cycles-per-second and drive ONLY the local body sprite.

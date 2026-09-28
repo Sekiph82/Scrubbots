@@ -82,6 +82,8 @@ const EN := {
 	"RESULTS_CARDS": "+%s Card(s)",
 	"RESULTS_ALREADY_CLEARED": "Already cleared · no progression reward",
 	"RESULTS_NEXT_UNAVAILABLE": "Level %d is coming soon.",
+	"GP_BUBBLE_HEADLINE": "LET'S CLEAN THIS MESS!",
+	"GP_BUBBLE_INSTRUCTION": "Tap a batch below to send the Scrubbots.",
 }
 
 ## Translated (or English fallback) copy for `key`, formatted with `args`.

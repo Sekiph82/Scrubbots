@@ -23,18 +23,17 @@ const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 
 ## [stem, size, path, level, columns(host path), scenario]
 const SHOTS := [
-	["c002_5slot_3col_L2_fresh", Vector2i(1080, 2160), "main", 2, 0, "fresh"],
-	["c002_5slot_4col_L1gen_fresh", Vector2i(1080, 2160), "host", 1, 4, "fresh"],
-	["c002_5slot_5col_L1gen_fresh", Vector2i(1080, 2160), "host", 1, 5, "fresh"],
-	["c002_6slot_3col_L2_plus_one", Vector2i(1080, 2160), "main", 2, 0, "sixth_slot"],
-	["c002_6slot_4col_L1gen_plus_one", Vector2i(1080, 2160), "host", 1, 4, "sixth_slot"],
-	["c002_6slot_5col_L1gen_plus_one", Vector2i(1080, 2160), "host", 1, 5, "sixth_slot"],
-	["c002_5slot_3col_L2_active_cleaning", Vector2i(1080, 2160), "main", 2, 0, "cleaning"],
-	["c002_5slot_3col_L2_five_slots_occupied", Vector2i(1080, 2160), "main", 2, 0, "five_slots"],
-	["c002_5slot_3col_L2_timed_2x", Vector2i(1080, 2160), "main", 2, 0, "timed_2x"],
-	["c002_5slot_3col_L3_tall_phone", Vector2i(1290, 2796), "main", 3, 0, "cleaning"],
-	["c002_5slot_3col_L3_short_phone", Vector2i(1080, 1920), "main", 3, 0, "cleaning"],
-	["c002_5slot_3col_L1_tablet", Vector2i(1536, 2048), "main", 1, 0, "fresh"],
+	["r01_5slot_3col_L2_cleaning_1x", Vector2i(1080, 2160), "main", 2, 0, "cleaning"],
+	["r01_5slot_3col_L2_cleaning_2x", Vector2i(1080, 2160), "main", 2, 0, "cleaning_2x"],
+	["r01_5slot_3col_L2_dense_agents", Vector2i(1080, 2160), "main", 2, 0, "dense"],
+	["r01_5slot_3col_L1_cleaning_small_board", Vector2i(1080, 2160), "main", 1, 0, "cleaning"],
+	["r01_5slot_3col_L3_cleaning_large_board", Vector2i(1080, 2160), "main", 3, 0, "cleaning"],
+	["r01_5slot_3col_L3_short_phone_touch", Vector2i(1080, 1920), "main", 3, 0, "cleaning"],
+	["r01_5slot_3col_L2_bubble", Vector2i(1080, 2160), "main", 2, 0, "fresh"],
+	["r01_5slot_3col_L3_bubble_short", Vector2i(1080, 1920), "main", 3, 0, "fresh"],
+	["r01_5slot_3col_L1_tablet", Vector2i(1536, 2048), "main", 1, 0, "fresh"],
+	["r01_6slot_3col_L2_plus_one", Vector2i(1080, 2160), "main", 2, 0, "sixth_slot"],
+	["r01_5slot_5col_L1gen_bubble", Vector2i(1080, 2160), "host", 1, 5, "fresh"],
 ]
 
 var _bad := 0
@@ -86,6 +85,13 @@ func _shot(out_dir: String, shot: Array) -> void:
 	match shot[5]:
 		"cleaning":
 			note = _drive_until_agents(h, 3)
+		"cleaning_2x":
+			app.economy.wallet.credit("scrub_bucks", 500)
+			h.get_screen().get_speed_button().pressed.emit()
+			h.get_speed_acquisition_popup().get_offer_button("level").pressed.emit()
+			note = "2x=%s " % str(h.get_speed_authority().is_2x()) + _drive_until_agents(h, 3)
+		"dense":
+			note = _drive_until_agents(h, 40)
 		"five_slots":
 			note = _fill_slots(h, 5)
 		"sixth_slot":
@@ -159,6 +165,8 @@ func _drive_until_agents(h, want: int) -> String:
 			i += 1
 		rt.tick(0.05)
 		if frame > 40 and _moving(h) >= want:
+			break
+		if h.get_completion().is_terminal():
 			break
 	return "activations=%d moving=%d" % [i, _moving(h)]
 

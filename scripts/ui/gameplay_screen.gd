@@ -58,6 +58,15 @@ const BOOSTERS := [
 	{"id": "selector", "art": "res://assets/ui/final/boosters/selector.png"},
 	{"id": "tornado", "art": "res://assets/ui/final/boosters/tornado.png"},
 ]
+## Live bubble copy layout inside the masked text area (master px) + colours sampled to
+## match the master's own navy lettering.
+const BUBBLE_HEADLINE_REF := [34, 1200, 191, 1252]
+const BUBBLE_INSTRUCTION_REF := [34, 1256, 191, 1320]
+const BUBBLE_HEADLINE_COLOR := Color8(22, 36, 128)
+const BUBBLE_TEXT_COLOR := Color8(28, 44, 110)
+const BUBBLE_HEADLINE_REF_PX := 21.0
+const BUBBLE_TEXT_REF_PX := 17.0
+
 const BOOSTER_SELECTED_ART := "res://assets/ui/final/boosters/states/booster_selected_ring.png"
 const BOOSTER_UNAVAILABLE_ART := "res://assets/ui/final/boosters/states/booster_unavailable_overlay.png"
 const BOOSTER_AVAILABLE := "available"
@@ -93,6 +102,8 @@ var _content: Control
 var _screen_content: Control
 var _shell: TextureRect
 var _bubble_mask: Panel
+var _bubble_headline: Label
+var _bubble_instruction: Label
 var _top_region: Control
 var _profile: Control
 var _profile_name: Label
@@ -236,6 +247,10 @@ func _build_tree() -> void:
 	_bubble_mask.name = "SpeechBubbleMask"
 	_bubble_mask.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_screen_content.add_child(_bubble_mask)
+	# R01 (owner item B): live, localizable bubble copy over the masked area (the master
+	# bytes are untouched; the obsolete baked sentence stays covered).
+	_bubble_headline = _bubble_label("BubbleHeadline", "GP_BUBBLE_HEADLINE", BUBBLE_HEADLINE_COLOR)
+	_bubble_instruction = _bubble_label("BubbleInstruction", "GP_BUBBLE_INSTRUCTION", BUBBLE_TEXT_COLOR)
 
 	_top_region = _new_region("TopRegion")
 	_board_region = _new_region("BoardRegion")
@@ -254,6 +269,7 @@ func _build_tree() -> void:
 	_supply_panel.name = "BatchSupplyPanel"
 	_batch_region.add_child(_supply_panel)
 	_supply_panel.set_shell_grid(Vector2(UiTokens.SPACE_SM, UiTokens.SPACE_SM))
+	_supply_panel.set_min_hit_size(float(UiTokens.TOUCH_MIN))   # S2-B invisible touch geometry
 
 	_booster_row = HBoxContainer.new()
 	_booster_row.name = "BoosterRow"
@@ -270,12 +286,8 @@ func _build_tree() -> void:
 	_ad_region = Panel.new()
 	_ad_region.name = "AdRegion"
 	_ad_region.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_ad_region.add_theme_stylebox_override("panel", HomeStyle.box(Color(0.02, 0.04, 0.09, 0.62), Color(0.30, 0.45, 0.70, 0.55), 2, 14, 0))
-	var ad_label := HomeStyle.label("AD", 24, Color(0.62, 0.70, 0.84), 4)
-	ad_label.set_anchors_preset(Control.PRESET_FULL_RECT)
-	ad_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ad_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	_ad_region.add_child(ad_label)
+	# S3-B: reserved but INVISIBLE until M57 real ad integration (no band, no label).
+	_ad_region.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	_screen_content.add_child(_ad_region)
 
 func _build_top() -> void:
@@ -333,6 +345,47 @@ func _build_top() -> void:
 	_speed_time.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	_speed_btn.add_child(_speed_time)
 	_apply_speed_visual()
+
+func _bubble_label(node_name: String, key: String, color: Color) -> Label:
+	var l := Label.new()
+	l.name = node_name
+	l.text = UiText.t(key)
+	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.clip_text = false
+	l.add_theme_color_override("font_color", color)
+	l.add_theme_constant_override("outline_size", 0)
+	l.add_theme_color_override("font_shadow_color", Color(0, 0, 0, 0))
+	_screen_content.add_child(l)
+	return l
+
+## Place both bubble lines through the master transform and shrink each font until its
+## wrapped text fits its box (all six masters share the same bubble geometry).
+func _layout_bubble_text() -> void:
+	for pair in [[_bubble_headline, BUBBLE_HEADLINE_REF, BUBBLE_HEADLINE_REF_PX], [_bubble_instruction, BUBBLE_INSTRUCTION_REF, BUBBLE_TEXT_REF_PX]]:
+		var l: Label = pair[0]
+		_place_ref(l, pair[1])
+		var px: int = maxi(int(pair[2] * _scale), 8)
+		var box: Rect2 = ref_rect_to_local(Shell.rect(pair[1]))
+		# Measure with the Label's own wrapped minimum (includes its line spacing), not a
+		# raw font metric, so the chosen size can never make the Label outgrow its box.
+		while true:
+			l.add_theme_font_size_override("font_size", px)
+			l.size = Vector2(box.size.x, 0.0)
+			if px <= 8 or l.get_minimum_size().y <= box.size.y:
+				break
+			px -= 1
+		l.position = box.position
+		l.size = box.size
+
+## True when both live bubble strings fit their boxes at the current size (tests).
+func bubble_text_fits() -> bool:
+	for l in [_bubble_headline, _bubble_instruction]:
+		if l.text.is_empty() or l.get_minimum_size().y > l.size.y + 0.5:
+			return false
+	return true
 
 func _new_region(node_name: String) -> Control:
 	var c := Control.new()
@@ -490,6 +543,7 @@ func relayout() -> void:
 	_place_rect(_shell, Rect2(Vector2.ZERO, Shell.SIZE))
 	_place_ref(_bubble_mask, Shell.BUBBLE_TEXT)
 	_bubble_mask.add_theme_stylebox_override("panel", HomeStyle.box(Shell.BUBBLE_FILL, Shell.BUBBLE_FILL, 0, int(18.0 * _scale), 0))
+	_layout_bubble_text()
 	_place_ref(_speech_anchor, SPEECH_ANCHOR)
 	_place_ref(_scrubby_anchor, SCRUBBY_ANCHOR)
 	_place_ref(_props_anchor, PROPS_ANCHOR)
@@ -597,6 +651,7 @@ func _layout_batch() -> void:
 	_supply_panel.position = (g.position - union.position) * _scale
 	_supply_panel.size = g.size * _scale
 	_supply_panel.set_shell_grid(Vector2(grid["gap_x"], grid["gap_y"]) * _scale)
+	_supply_panel.call_deferred("refresh_hit_areas")   # after the containers sort
 
 # ------------------------------------------------------------------ connectors --
 
@@ -840,8 +895,19 @@ func has_level_lock_rail() -> bool:
 func has_ad_placeholder() -> bool:
 	return _find_named(self, ["AdPlaceholder", "BottomActionRow"])
 
+## The reserved ad band exists (layout anchor for M57) ...
 func has_ad_region() -> bool:
 	return _ad_region != null and _ad_region.visible
+
+## ... but draws nothing until M57 (owner S3-B).
+func is_ad_placeholder_visible() -> bool:
+	if _ad_region == null:
+		return false
+	var drawn: bool = not (_ad_region.get_theme_stylebox("panel") is StyleBoxEmpty)
+	return drawn or _ad_region.get_children().any(func(c): return c is CanvasItem and c.visible)
+
+func get_bubble_labels() -> Array:
+	return [_bubble_headline, _bubble_instruction]
 
 func has_settings_control() -> bool:
 	return _find_named(self, ["SettingsButton", "SettingsControl", "Settings"])
