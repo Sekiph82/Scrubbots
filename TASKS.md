@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M28-C002-C003 Gameplay V02 — Final Popup-Inclusive Gate
-- Current Task: Claude validates final Gameplay V02 integration for SB-M28-C002-012/013/019 and prepares the SB-M28-C002-020 owner playtest gate
-- Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M28-C002-C003/CHATGPT_PROMPT_V01.md`, reads paired audit criteria, pushes fresh popup-inclusive evidence/log, then returns AWAITING_CHATGPT_AUDIT.
-- Required Actor: CLAUDE
+- Current Sprint: M28-C002-C003 Gameplay V02 — Final Owner Playtest Gate
+- Current Task: Owner performs the final 15-item Gameplay V02 visual / hands-on playtest for SB-M28-C002-020
+- Current Task Status: OWNER_REQUIRED
+- Next Task/Action: OWNER reviews `coordination/sessions/M28-C002-C003/OWNER_GAMEPLAY_V02_FINAL_REVIEW_V01.md` and performs the short hands-on playtest. If 15/15 PASS, ChatGPT closes SB-M28-C002-020 and M28-C002.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 951 / 1355 = 70.18%. M43-C003 is technically and owner-accepted; acquisition visual/UX gate is closed.
-- Note: M43-C003-C001 is closed. M28-C002-C003 is validation-first: prove visible Gameplay V02 zero-charge Booster -> Acquire routing, unentitled 2x -> Acquire routing, popup input isolation, fresh final evidence, and owner playtest checklist. Do not redesign accepted static shell.
-- Owner sequencing lock: M28-C002-C003 must close the remaining Gameplay V02 convergence rows before proceeding further.
+- Progress: 954 / 1355 = 70.41%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains.
+- Note: M28-C002-C003 independent technical audit PASS at `ecbf634`. Visible Booster/2x routing, popup input isolation, fresh screenshots and real Godot Movie Maker video are accepted technically. Non-blocking follow-up: `m39_v04_integration` has a pre-existing real-clock snapshot equality flake; no M28 production regression was found.
+- Owner sequencing lock: complete SB-M28-C002-020 owner playtest before proceeding further.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1278,14 +1278,14 @@ Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master vi
 - [x] SB-M28-C002-009 Bind the selected robot/player profile presentation without reintroducing a gameplay Heart HUD or Settings button.
 - [x] SB-M28-C002-010 Bind the four canonical booster buttons: +1 Slot / Random / Selector / Tornado.
 - [x] SB-M28-C002-011 Booster quantity, price, locked/unavailable and selected states remain live Godot UI overlays and are never baked into art.
-- [ ] SB-M28-C002-012 Tapping a booster with no charge routes into the canonical Booster Acquire popup defined by M43-C003 rather than silently failing.
-- [ ] SB-M28-C002-013 Tapping locked/manual 2x without entitlement routes into the canonical 2x Acquire popup defined by M43-C003.
+- [x] SB-M28-C002-012 Tapping a booster with no charge routes into the canonical Booster Acquire popup defined by M43-C003 rather than silently failing. — AUDITED_PASS M28-C002-C003.
+- [x] SB-M28-C002-013 Tapping locked/manual 2x without entitlement routes into the canonical 2x Acquire popup defined by M43-C003. — AUDITED_PASS M28-C002-C003.
 - [x] SB-M28-C002-014 Implement the canonical Pause popup entry and deterministic modal stacking rules from M43-C002.
 - [x] SB-M28-C002-015 Preserve gameplay input isolation while any popup/modal is open; board, supply and booster controls behind it receive no input.
 - [x] SB-M28-C002-016 Preserve the approved gameplay background, Scrubby/selected-robot support presentation and lower decorative hierarchy without shrinking gameplay-critical controls first. — R01 technical PASS + FINAL OWNER VISUAL PASS.
 - [x] SB-M28-C002-017 Validate 1080x2160, 1170x2532, 1290x2796, 1080x2400, 1440x3200, short 16:9 portrait and tablet portrait.
 - [x] SB-M28-C002-018 Validate mouse/touch mapping, rapid taps, popup-open input suppression and temporary sixth-slot readability.
-- [ ] SB-M28-C002-019 Capture owner-review screenshots/video for fresh level, active cleaning, full five-slot state, sixth-slot state, booster popup open, Pause open and timed 2x state.
+- [x] SB-M28-C002-019 Capture owner-review screenshots/video for fresh level, active cleaning, full five-slot state, sixth-slot state, booster popup open, Pause open and timed 2x state. — AUDITED_PASS: fresh screenshots + real runtime Movie Maker video.
 - [ ] SB-M28-C002-020 Independent ChatGPT audit plus owner visual/playtest acceptance required before this V02 convergence is closed.
 
 ### M29 — Mobile Touch
