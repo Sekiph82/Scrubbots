@@ -13,14 +13,17 @@ extends SceneTree
 ##  - board dominance / aspect-correct / rectangular-not-stretched;
 ##  - five read-only slots, 3/4/5 supply columns, exactly 3 visible rows;
 ##  - composition contract (no Goal/Moves, no Level rail, Scrubby low-left,
-##    speech above, props right, 4 boosters, pause|ad|speed-up order,
-##    speed control 1x/2x presentation states);
+##    speech above, props right, 4 boosters, speed control 1x/2x states).
+##    M28-C002-C001: migrated to Gameplay V02 authority
+##    (OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02): the historical bottom Pause|ad|speed row
+##    is superseded by top-right PAUSE|2x; no ad placeholder / Settings / Heart HUD;
 ##  - synthetic non-zero safe-area insets, no clipping / notch overlap;
 ##  - board-size matrix (small/medium/hard/59x59 + two rectangular);
 ##  - BoardRenderer coordinate round-trip after responsive scaling.
 ##
 ## Emits deterministic metrics JSON + Markdown and attempts PNG captures under
-## coordination/sessions/M28-C001/evidence/. Generated captures are TEST artifacts,
+## coordination/sessions/M28-C002-C001/layout_smoke/ (V02; historical M28-C001
+## evidence is left untouched). Generated captures are TEST artifacts,
 ## never AI-generated art.
 ##
 ## Run:  godot --headless --path . -s res://tests/m28_gameplay_layout_smoke.gd
@@ -33,7 +36,7 @@ const SlotBatchState = preload("res://scripts/gameplay/slots/slot_batch_state.gd
 const ResponsiveLayout = preload("res://scripts/ui/responsive_layout.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 
-const EVIDENCE_DIR := "res://coordination/sessions/M28-C001/evidence"
+const EVIDENCE_DIR := "res://coordination/sessions/M28-C002-C001/layout_smoke"
 const EPS := 1.0e-3
 const TOUCH_MIN := 88.0
 const VIEW_W := 24
@@ -136,13 +139,12 @@ func _run_viewport_case(size: Vector2i) -> void:
 	var board_region: Rect2 = screen.get_board_region_rect()
 	var batch: Rect2 = screen.get_batch_region_rect()
 	var booster: Rect2 = screen.get_booster_row_rect()
-	var bottom: Rect2 = screen.get_bottom_row_rect()
 	var board_rect: Rect2 = screen.get_board_rect()
 
 	# Board dominance: board region is the largest band, larger than every other.
 	_ok(board_region.get_area() > batch.get_area(), "%s: board region > batch region" % tag)
 	_ok(board_region.get_area() > booster.get_area(), "%s: board region > booster row" % tag)
-	_ok(board_region.get_area() > bottom.get_area(), "%s: board region > bottom row" % tag)
+	_ok(board_region.get_area() > screen.get_top_region_rect().get_area(), "%s: board region > top HUD" % tag)
 	# Board aspect preserved (rectangular 24x40 not stretched to square).
 	var aspect: float = board_rect.size.x / max(board_rect.size.y, 1.0)
 	_ok(absf(aspect - float(VIEW_W) / float(VIEW_H)) < 0.02, "%s: board aspect preserved (%.4f)" % [tag, aspect])
@@ -175,10 +177,17 @@ func _run_viewport_case(size: Vector2i) -> void:
 	_ok(screen.get_booster_count() == 4, "%s: exactly four boosters" % tag)
 
 	var pause: Rect2 = screen.get_pause_rect()
-	var ad: Rect2 = screen.get_ad_placeholder_rect()
 	var speed: Rect2 = screen.get_speed_control_rect()
-	_ok(pause.position.x < ad.position.x and ad.position.x < speed.position.x,
-		"%s: bottom order pause < ad < speed-up" % tag)
+	var top: Rect2 = screen.get_top_region_rect()
+	var profile: Rect2 = screen.get_profile_rect()
+	# V02: PAUSE | 2x side by side top-right, profile chip top-left, above the board.
+	_ok(pause.end.x <= speed.position.x and absf(pause.position.y - speed.position.y) < 1.0
+		and speed.end.x >= top.end.x - 1.0 and top.encloses(pause) and top.encloses(speed),
+		"%s: top-right order PAUSE | 2x" % tag)
+	_ok(profile.position.x <= top.position.x + 1.0 and profile.end.x < pause.position.x and speed.end.y <= board_rect.position.y,
+		"%s: profile top-left, controls above the board" % tag)
+	_ok(not screen.has_ad_placeholder() and not screen.has_settings_control() and not screen.has_heart_hud(),
+		"%s: no ad placeholder / Settings / Heart HUD" % tag)
 	_ok(pause.size.x >= TOUCH_MIN and pause.size.y >= TOUCH_MIN, "%s: pause >= TOUCH_MIN" % tag)
 	_ok(speed.size.x >= TOUCH_MIN and speed.size.y >= TOUCH_MIN, "%s: speed control >= TOUCH_MIN" % tag)
 	# Speed control 1x/2x presentation states (distinct/readable); default new session = 1x.
@@ -200,7 +209,7 @@ func _run_viewport_case(size: Vector2i) -> void:
 	var essentials := {
 		"board": board_rect, "five_slots": screen.get_five_slot_strip_rect(),
 		"supply": screen.get_supply_panel_rect(), "boosters": booster,
-		"pause": pause, "speed": speed, "ad": ad}
+		"pause": pause, "speed": speed, "profile": profile}
 	var clip_ok := true
 	for k in essentials.keys():
 		if not _rect_approx_inside(essentials[k], safe):
@@ -223,7 +232,7 @@ func _run_viewport_case(size: Vector2i) -> void:
 		"supply_rect": _r(screen.get_supply_panel_rect()), "supply_columns": supply.get_column_count(),
 		"supply_visible_rows": supply.get_visible_row_count(),
 		"booster_row": _r(booster), "booster_count": screen.get_booster_count(),
-		"bottom_row": _r(bottom), "pause": _r(pause), "ad": _r(ad), "speed": _r(speed),
+		"profile": _r(profile), "pause": _r(pause), "speed": _r(speed),
 		"scrubby_anchor": _r(scrubby), "speech_anchor": _r(speech), "props_anchor": _r(props),
 		"coord_roundtrip_max_err": rt["max_err"], "coord_samples": rt["samples"],
 		"clip_ok": clip_ok, "png_saved": png_saved,

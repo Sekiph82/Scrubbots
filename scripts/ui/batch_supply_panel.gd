@@ -188,20 +188,22 @@ func _make_row(col: VBoxContainer, front: bool) -> Dictionary:
 		panel.custom_minimum_size.y = int(UiTokens.SUPPLY_TILE_MIN * 0.72)
 	col.add_child(panel)
 
-	var hbox := HBoxContainer.new()
-	hbox.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	panel.add_child(hbox)
-
+	# Gameplay V02 tile: the whole tile is the batch colour (swatch fills it) with the live
+	# robot count centred on top — colour/count stay live Godot UI.
 	var swatch := ColorRect.new()
 	swatch.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	swatch.custom_minimum_size = Vector2(UiTokens.ICON_SM, UiTokens.ICON_SM)
-	swatch.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	hbox.add_child(swatch)
+	swatch.visible = false   # colour is carried by the tile stylebox; kept as a data probe
+	panel.add_child(swatch)
 
 	var count := Label.new()
 	count.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	hbox.add_child(count)
+	count.add_theme_font_size_override("font_size", 40 if front else 32)
+	count.add_theme_color_override("font_color", Color(1, 1, 1))
+	count.add_theme_color_override("font_outline_color", Color(0.04, 0.07, 0.16))
+	count.add_theme_constant_override("outline_size", 10)
+	panel.add_child(count)
 
 	return {"panel": panel, "swatch": swatch, "count": count, "front": front}
 
@@ -210,30 +212,46 @@ func _bind_row(row: Dictionary, batch, front: bool, colors: Array) -> void:
 	var swatch: ColorRect = row["swatch"]
 	var count: Label = row["count"]
 	var sb := StyleBoxFlat.new()
-	sb.set_corner_radius_all(UiTokens.RADIUS_SM)
+	sb.set_corner_radius_all(UiTokens.RADIUS_MD)
 	sb.set_content_margin_all(UiTokens.SPACE_XS)
+	sb.anti_aliasing = true
 	if batch == null or not (batch is Dictionary):
 		# Clean empty / end-of-column tile.
 		swatch.color = Color(0, 0, 0, 0)
 		count.text = ""
 		sb.bg_color = _EMPTY_TILE
+		sb.set_border_width_all(2)
+		sb.border_color = Color(0.20, 0.25, 0.40, 1.0)
 		panel.add_theme_stylebox_override("panel", sb)
 		panel.modulate = Color(1, 1, 1, 1)
 		return
 	var cid: int = int(batch.get("color_id", -1))
-	swatch.color = colors[cid] if cid >= 0 and cid < colors.size() else Color(1, 0, 1, 1)
-	count.text = "x%d" % int(batch.get("robot_count", 0))
-	sb.bg_color = _ROW_BG
+	var col: Color = colors[cid] if cid >= 0 and cid < colors.size() else Color(1, 0, 1, 1)
+	swatch.color = col
+	count.text = "%d" % int(batch.get("robot_count", 0))
+	sb.bg_color = col
+	sb.border_color = col.lightened(0.45)
+	sb.border_width_bottom = 6
 	if front:
-		sb.set_border_width_all(3)
-		sb.border_color = Color(0.20, 0.85, 0.95, 1.0)
+		# Front = the only selectable batch: full colour, bright cyan rim.
+		sb.set_border_width_all(4)
+		sb.border_width_bottom = 7
+		sb.border_color = Color(0.55, 0.95, 1.0, 1.0)
+		sb.shadow_color = Color(0.25, 0.85, 1.0, 0.55)
+		sb.shadow_size = 6
 		panel.modulate = Color(1, 1, 1, 1)
 	else:
-		sb.set_border_width_all(1)
-		sb.border_color = Color(0.30, 0.35, 0.44, 1.0)
-		# Preview rows visibly secondary.
-		panel.modulate = Color(1, 1, 1, 0.7)
+		sb.set_border_width_all(2)
+		sb.border_width_bottom = 4
+		# Preview rows visibly secondary (dimmed, thinner rim) and never interactive.
+		panel.modulate = Color(0.62, 0.62, 0.70, 0.85)
 	panel.add_theme_stylebox_override("panel", sb)
+
+## Test/evidence accessor: displayed count text of a row (column, row).
+func get_row_count_text(column: int, row: int) -> String:
+	if column < 0 or column >= _columns.size() or row < 0 or row >= VISIBLE_ROWS:
+		return ""
+	return _columns[column]["rows"][row]["count"].text
 
 func get_column_count() -> int:
 	return _columns.size()

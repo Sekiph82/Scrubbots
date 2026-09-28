@@ -321,7 +321,11 @@ func _art_and_manifest_governance() -> void:
 	for s in m["surfaces"]:
 		if s["id"] == "victory_results":
 			status = s["status"]
-	_ok(status == "MASTER_REQUIRED", "victory_results not promoted to MASTER_OWNER_APPROVED (%s)" % status)
+	# The implementer never promotes; MASTER_OWNER_APPROVED is valid only with the owner's
+	# final acceptance record (owner commit e6e0ace, 2026-09-28).
+	var owner_ok := FileAccess.file_exists("res://coordination/sessions/M43-C001B/FINAL_OWNER_VISUAL_ACCEPTANCE_V01.md")
+	_ok(status == "MASTER_REQUIRED" or (status == "MASTER_OWNER_APPROVED" and owner_ok),
+		"victory_results status %s is backed by owner authority" % status)
 	_complete("art_and_manifest_governance")
 
 # ---------------------------------------------------------------- helpers ----
