@@ -5,15 +5,15 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M43-C003 Life / Hearts / Scrub Bucks / Booster / 2x Acquisition Surfaces
-- Current Task: Prepare and execute the canonical Life / Booster Acquire / 2x Acquire acquisition surfaces using the now owner-approved M43-C002 popup foundation
-- Current Task Status: READY_FOR_NEXT_IMPLEMENTATION_CYCLE
-- Next Task/Action: ChatGPT opens the M43-C003 implementation cycle. Rewarded-video CTAs belong only to eligible acquisition flows (Heart/Booster), not the generic M43-C002 popup family.
-- Required Actor: CHATGPT
+- Current Sprint: M43-C003-C001 Life / Booster / 2x Acquisition
+- Current Task: Claude implements SB-M43-030..049 from the canonical M43-C003 acquisition prompt
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C003-C001/CHATGPT_PROMPT_V01.md`, reads the paired `CHATGPT_AUDIT_CRITERIA_V01.md`, pushes implementation/evidence/log, then returns AWAITING_CHATGPT_AUDIT.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 931 / 1355 = 68.71%. M43-C002 popup/modal/Pause foundation is technically accepted and owner visually approved; M43-C003 acquisition surfaces are next.
-- Note: M43-C002-C001 technical audit PASS at `75eefa5`; owner visual gate approved all current candidates at the 2026-09-28 gate (P1-OK / P2-KEEP / P3-STACKED / P4-LOSS-PRIMARY / P6-OK). Rewarded-video `WATCH / GET` remains reserved for acquisition-specific M43-C003 flows. Non-blocking audit note: one `or true` expression in the focused test must not be relied on in final closure evidence.
+- Note: M43-C002-C001 is technically + owner visually closed. M43-C003-C001 prompt/audit criteria are now canonical. Rewarded-video `WATCH / GET` is limited to +1 Heart and the four Booster acquisition flows; no rewarded 2x and no generic-popup ad CTA. Heart regen authority remains 900 s / 15 min. M43-C002 non-blocking `or true` test note remains excluded from final closure evidence.
 - Owner sequencing lock: M43-C002 is closed; execute M43-C003 Life/Booster/2x acquisition next, then return to M28-C002 popup-inclusive final evidence/playtest.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
