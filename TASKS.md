@@ -4,17 +4,17 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 ## Project Status
 
-- Current Milestone: M55 CHAOS / LONG-RUN QA
-- Current Sprint: M55-C002 Timed 2x Anti-Rollback Remediation
-- Current Task: Implement owner ruling A so timed 2x never regains time or revives after backward device-clock movement
+- Current Milestone: M43 RESULTS / PLAYER EXPERIENCE
+- Current Sprint: M43-C001A Results Foundation + Visual Master Readiness
+- Current Task: Build the authoritative Results receipt/model, reward/continue idempotency and visual-master readiness without inventing Replay policy or final visual approval
 - Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M55-C002/task_prompts/SB-M55-C002_TIMED_2X_ANTI_ROLLBACK.md`; ChatGPT audits. M55 core closes only after C002 PASS.
+- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C001A/task_prompts/SB-M43-C001A_RESULTS_FOUNDATION.md`; ChatGPT audits. Then owner gates the canonical Victory/Results visual master and Replay policy before final Results UI promotion.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 879 / 1355 = 64.87%. M55-C001 SB-M55-001..017 remain technically AUDITED_PASS. Owner selected A = fail-closed anti-rollback; M55-C002 remediation is active.
-- Note: OWNER ruling `coordination/OWNER_TIMED_2X_CLOCK_ROLLBACK_V01.md`: timed 2x remaining time is monotonic non-increasing without a new purchase; expired timed 2x may never revive after a backward clock jump. Implement with persistent backward-compatible anti-rollback authority.
-- Owner sequencing lock: the First 10 Level Pack block is now CLOSED through M54-C001. Per the owner/controller 2026-09-27 directive, execute M55 core Chaos / Long-Run QA next; after the current-build M55 gate closes, resume the deferred M43 Results Screen / Player Experience roadmap.
+- Progress: 887 / 1355 = 65.46%. M55 core closed; M43-C001A Results foundation is active.
+- Note: M55 current-build core is CLOSED. C002 audit PASS: `coordination/sessions/M55-C002/CHATGPT_AUDIT_V01.md`. M43 resumes with the existing minimal M42 Results shell and existing victory asset family; `victory_results` still requires a canonical owner-approved visual master.
+- Owner sequencing lock: First 10 + applicable M54 + current-build M55 core are CLOSED. Main roadmap has resumed at M43 Results / Player Experience. M55 Player-Experience Chaos rows remain deferred until their owning M43 surfaces exist.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -2190,7 +2190,7 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 - [ ] SB-M54-032 World registry/unlock/transition regression once future world ranges are owner-defined.
 ### M55 — Chaos / Long-Run QA `[QA]`
 
-**M55-C001 current-build gate:** SB-M55-001..017 technically AUDITED_PASS at `8852045`; ChatGPT audit: `coordination/sessions/M55-C001/CHATGPT_AUDIT_V01.md`. Owner resolved the remaining policy gate with **A = fail-closed timed-2x anti-rollback**. Implementation is M55-C002. SB-M55-018..024 remain deferred until M43+ surfaces exist.
+**M55 current-build core: CLOSED.** SB-M55-001..017 AUDITED_PASS in C001; timed-2x anti-rollback remediation C002 AUDITED_PASS at `023a0fc`. Audits: `coordination/sessions/M55-C001/CHATGPT_AUDIT_V01.md`, `coordination/sessions/M55-C002/CHATGPT_AUDIT_V01.md`. SB-M55-018..024 remain deferred until their M43+ surfaces exist.
 
 - [x] SB-M55-001 Spam all five slots.
 - [x] SB-M55-002 Restart while bots travel. — [x] SB-M55-003 Pause while bots travel.
@@ -2210,14 +2210,14 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 
 #### M55-C002 Timed 2x Anti-Rollback Remediation
 
-- [ ] SB-M55-C002-001 Add persistent non-decreasing effective/high-water wall-clock authority for timed 2x.
-- [ ] SB-M55-C002-002 Ensure remaining timed-2x seconds cannot increase and an expired entitlement cannot revive after backward clock movement.
-- [ ] SB-M55-C002-003 Preserve normal forward expiry, current-level 2x and free M23 auto-2x semantics.
-- [ ] SB-M55-C002-004 Add backward-compatible legacy snapshot migration without wiping legitimately active legacy timed entitlements.
-- [ ] SB-M55-C002-005 Persist/strictly validate the new anti-rollback state across save/relaunch; malformed present values fail closed.
-- [ ] SB-M55-C002-006 Prove explicit new timed purchase can extend from the canonical effective base and charges exactly once.
-- [ ] SB-M55-C002-007 Add focused rollback/migration/persistence sensitivity regression plus relevant M39/M40/M55/root regressions.
-- [ ] SB-M55-C002-008 Write evidence/log and hand off for independent ChatGPT audit.
+- [x] SB-M55-C002-001 Add persistent non-decreasing effective/high-water wall-clock authority for timed 2x.
+- [x] SB-M55-C002-002 Ensure remaining timed-2x seconds cannot increase and an expired entitlement cannot revive after backward clock movement.
+- [x] SB-M55-C002-003 Preserve normal forward expiry, current-level 2x and free M23 auto-2x semantics.
+- [x] SB-M55-C002-004 Add backward-compatible legacy snapshot migration without wiping legitimately active legacy timed entitlements.
+- [x] SB-M55-C002-005 Persist/strictly validate the new anti-rollback state across save/relaunch; malformed present values fail closed.
+- [x] SB-M55-C002-006 Prove explicit new timed purchase can extend from the canonical effective base and charges exactly once.
+- [x] SB-M55-C002-007 Add focused rollback/migration/persistence sensitivity regression plus relevant M39/M40/M55/root regressions.
+- [x] SB-M55-C002-008 Write evidence/log and hand off for independent ChatGPT audit.
 
 #### M55 Player-Experience Chaos Expansion
 - [ ] SB-M55-018 Spam open/close/purchase/reward buttons across every popup without double transition/spend/grant.
