@@ -355,11 +355,14 @@ func _econ(eco) -> Dictionary:
 	s["speed"].erase("clock_high_water")
 	return s
 
+## Shown reward-row texts (C001B rows are icon+text cards; see ResultsScreen.shown_row_texts).
 func _labels(box: Node) -> Array:
 	var out: Array = []
 	for c in box.get_children():
-		if c is Label and not c.is_queued_for_deletion():
-			out.append(c.text)
+		if c.is_queued_for_deletion():
+			continue
+		for l in ([c] if c is Label else c.find_children("Text", "Label", true, false)):
+			out.append(l.text)
 	return out
 
 func _drain(h) -> void:
