@@ -55,11 +55,16 @@ func _build_children() -> void:
 	_remaining_label = Label.new()
 	_remaining_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_remaining_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_remaining_label.add_theme_font_size_override("font_size", 34)
+	_remaining_label.add_theme_color_override("font_outline_color", Color(0.04, 0.07, 0.16))
+	_remaining_label.add_theme_constant_override("outline_size", 8)
 	vbox.add_child(_remaining_label)
 
 	_state_label = Label.new()
 	_state_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_state_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_state_label.add_theme_font_size_override("font_size", 18)
+	_state_label.add_theme_color_override("font_color", Color(0.72, 0.82, 0.95))
 	vbox.add_child(_state_label)
 
 ## Bind a DETACHED scalar snapshot (dict is duplicated; no reference retained) plus
@@ -77,8 +82,8 @@ func _refresh() -> void:
 	if not occupied:
 		_swatch.color = Color(0, 0, 0, 0)
 		_remaining_label.text = ""
-		_state_label.text = "EMPTY"
-		_set_panel_bg(_EMPTY_BG, _WAITING_EDGE, false)
+		_state_label.text = ""   # V02: an empty slot is shown by the approved empty-slot art
+		_set_empty_art()
 		return
 	_swatch.color = _color
 	var remaining: int = int(_snapshot.get("remaining_to_clear", 0))
@@ -94,13 +99,27 @@ func _refresh() -> void:
 	var edge := _ACTIVE_EDGE if state == ACTIVE else _WAITING_EDGE
 	_set_panel_bg(_OCC_BG, edge, state == ACTIVE)
 
+## V02 empty execution slot: native rendition of the approved slot_empty design (deep navy
+## well, light rim). The slot_*.png sources carry an opaque white background, so they
+## cannot be composited over the slot tray without editing approved art.
+func _set_empty_art() -> void:
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = Color(0.09, 0.13, 0.31, 1.0)
+	sb.set_corner_radius_all(UiTokens.RADIUS_MD)
+	sb.set_border_width_all(4)
+	sb.border_color = Color(0.86, 0.90, 1.0, 0.95)
+	sb.set_content_margin_all(UiTokens.SPACE_XS)
+	sb.anti_aliasing = true
+	add_theme_stylebox_override("panel", sb)
+
 func _set_panel_bg(bg: Color, edge: Color, emphasized: bool) -> void:
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = bg
-	sb.set_corner_radius_all(UiTokens.RADIUS_SM)
-	sb.set_border_width_all(3 if emphasized else 1)
+	sb.set_corner_radius_all(UiTokens.RADIUS_MD)
+	sb.set_border_width_all(4 if emphasized else 2)
 	sb.border_color = edge
 	sb.set_content_margin_all(UiTokens.SPACE_XS)
+	sb.anti_aliasing = true
 	add_theme_stylebox_override("panel", sb)
 
 # --- read-only test/presentation accessors (no gameplay authority) ---

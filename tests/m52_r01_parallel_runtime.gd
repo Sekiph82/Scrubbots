@@ -418,11 +418,11 @@ func _two_x_acquisition() -> void:
 	eco.wallet.credit(EconomyWallet.SCRUB_BUCKS, 900)
 	btn.pressed.emit()
 	pop.get_offer_button("level").pressed.emit()
-	_ok(not pop.visible and h.get_speed_authority().is_2x() and btn.text == "2x" and eco.wallet.scrub_bucks() == 800 and eco.speed.is_manual_2x_entitled(2),
+	_ok(not pop.visible and h.get_speed_authority().is_2x() and h.get_screen().get_speed_state() == "2x" and btn.text == "2x" and eco.wallet.scrub_bucks() == 800 and eco.speed.is_manual_2x_entitled(2),
 		"current-level purchase: 200 SB spent, 2x immediately, control shows 2x")
 	_ok(h.last_speed_purchase_result.has("save"), "purchase went through the durable-save action boundary")
 	btn.pressed.emit()
-	_ok(not h.get_speed_authority().is_2x() and btn.text == "1x", "entitled + 2x press -> 1x")
+	_ok(not h.get_speed_authority().is_2x() and h.get_screen().get_speed_state() == "1x", "entitled + 2x press -> 1x (V02 label stays '2x'; state is the truth)")
 	btn.pressed.emit()
 	_ok(h.get_speed_authority().is_2x() and (pop == null or not pop.visible), "entitled + 1x press -> 2x (no popup)")
 	h.free()

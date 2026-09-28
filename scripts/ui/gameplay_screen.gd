@@ -1,80 +1,143 @@
 extends Control
-## GameplayScreen — M28-C001 V01 production responsive gameplay screen LAYOUT.
+## GameplayScreen — production gameplay screen (M28-C002 Gameplay V02 composition).
 ## Preload/instantiate scene res://scenes/gameplay/gameplay_screen.tscn (AL-001).
 ##
-## M28 owns presentation composition and responsive geometry ONLY. It composes the
-## already-closed M23–M27 gameplay engine's presentation pieces (BoardRenderer via
-## BoardPresentation, ScrubRailView on canonical ScrubRailGeometry) plus read-only
-## batch presentation (FiveSlotStrip, BatchSupplyPanel) and neutral decoration/HUD
-## anchors, and lays them out responsively (SafeAreaRoot + ResponsiveLayout
-## COMPACT/NORMAL/TALL) with the board as the dominant, aspect-correct region.
+## Composition authority: coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md and the
+## owner-approved master visual (assets/ui/final/gameplay/master/scrubbots_gameplay_master.png,
+## REFERENCE ONLY — never shipped as a flattened screen). V02 supersedes the historical
+## M28-C001 bottom Pause / ad / speed row.
 ##
-## Boundaries (blocking):
-##   - NO gameplay input. Production input is supply-front batch selection; M29 wires
-##     touch. This screen never revives ColorSelectionPanel.slot_activated as input,
-##     never makes the five slots clickable destinations, and wires no clearing loop
-##     / dispatch / target selection.
-##   - NO UI component owns BoardState/M23/M24/M25/M26/M27 mutable truth. All batch
-##     presentation is fed DETACHED scalar snapshots.
-##   - NO Goal/Moves panel, NO Level/lock rail.
-##   - NO per-cell Control/Node board renderer (single-Image BoardRenderer preserved).
-##   - NO AI-generated / cropped / reference-promoted art. Decoration is neutral
-##     native placeholders until an explicitly APPROVED asset exists.
+##   TOP      profile chip (top-left)                     PAUSE | 2x (top-right)
+##   BOARD    BoardRenderer + full four-sided Railroad V1 (dominant, aspect-correct)
+##            five permanent slot -> bottom-rail connectors (sixth only with +1 Slot)
+##   SLOTS    execution slots immediately below the board
+##   SUPPLY   Batch Supply (3/4/5 columns x 3 visible rows; only fronts interactive)
+##            Scrubby / speech area low-left, cleaning props right
+##   BOOSTERS exactly four: +1 Slot / Random / Selector / Tornado
+##   (no Settings, no Heart HUD, no Goal/Moves/Time, no Level rail, no ad placeholder)
+##
+## Boundaries (blocking, unchanged from M28-C001):
+##   - This screen is PRESENTATION. It owns no BoardState/M23/M24/M25/M26/M27 truth; batch
+##     views are fed DETACHED scalar snapshots; HUD/booster/speed values are pushed in by
+##     the host from the canonical services. Controls only emit intents.
+##   - Supply-front selection stays the only board-side input (M29 controller); the slots
+##     are never destination buttons.
+##   - Single-Image BoardRenderer preserved; railroad geometry comes only from
+##     ScrubRailGeometry; connectors come from the SAME slot-origin mapping the runtime
+##     route uses (SlotOriginProvider + ScrubRailGeometry.bottom_entry).
+
+signal booster_pressed(booster_id: String)
 
 const SafeAreaRootScene = preload("res://scenes/components/ui/common/safe_area_root.tscn")
 const BoardPresentation = preload("res://scripts/gameplay/board/board_presentation.gd")
 const ScrubRailView = preload("res://scripts/ui/scrub_rail_view.gd")
 const ScrubRailGeometry = preload("res://scripts/gameplay/routing/scrub_rail_geometry.gd")
+const SlotOriginProvider = preload("res://scripts/gameplay/runtime/slot_origin_provider.gd")
 const FiveSlotStrip = preload("res://scripts/ui/five_slot_strip.gd")
 const BatchSupplyPanel = preload("res://scripts/ui/batch_supply_panel.gd")
 const ResponsiveLayout = preload("res://scripts/ui/responsive_layout.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
+const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const PaletteColors = preload("res://scripts/data/palette_colors.gd")
 
 const BG01 := Color8(32, 37, 51, 255)   # BG01 Midnight Slate — gameplay background
-## Rail envelope pad in logical cells beyond the board on each side, so the
-## ScrubRailView (drawn 3 cells outside the board boundary) is never clipped:
-## outer rail edge = board boundary + CENTER_OFFSET + RAIL_WIDTH*0.5 = +3.0 cells.
+## Rail envelope pad in logical cells beyond the board on each side: outer rail edge =
+## board boundary + CENTER_OFFSET (2.5) + RAIL_WIDTH * 0.5 = +3.0 cells.
 const RAIL_PAD_CELLS := 3.0
+
+## V02 layout metrics (reference px; the safe rect is the layout space).
+const TOP_H := 128.0
+const CONTROL_SIZE := 112.0        # Pause / 2x (>= TOUCH_MIN)
+const CONNECTOR_GAP := 84.0        # bottom rail outer edge -> slot tops (visible connectors)
+const STRIP_H := 132.0
+const TRAY_GAP := 14.0
+const SUPPLY_H := 262.0
+const BOOSTER_H := 150.0
+const BOOSTER_SIZE := 132.0
+const GAP := 16.0
+const STRIP_WIDTH_FRAC := 0.68
+
+## Approved art (read-only; never regenerated/overwritten).
+const ART := {
+	"portrait": "res://assets/ui/final/gameplay/profile/scrubby_portrait.png",
+	"pause": "res://assets/ui/final/gameplay/controls/button_pause.png",
+	"speed": "res://assets/ui/final/gameplay/controls/button_speed_2x.png",
+	"speed_active": "res://assets/ui/final/gameplay/controls/button_speed_2x_active.png",
+	"speed_timed": "res://assets/ui/final/gameplay/controls/button_speed_2x_countdown_frame.png",
+	"scrubby": "res://assets/ui/final/characters/scrubby/scrubby_gameplay.png",
+	"speech": "res://assets/ui/final/gameplay/tutorial/speech_bubble.png",
+	"bucket": "res://assets/ui/final/gameplay/decorative/bubble_bucket.png",
+	"wet_sign": "res://assets/ui/final/gameplay/decorative/caution_wet_floor_sign.png",
+	"booster_selected": "res://assets/ui/final/boosters/states/booster_selected_ring.png",
+	"booster_unavailable": "res://assets/ui/final/boosters/states/booster_unavailable_overlay.png",
+}
+## Exactly the four canonical Economy V1 boosters, in owner order.
+const BOOSTERS := [
+	{"id": "plus_one_slot", "art": "res://assets/ui/final/boosters/extra_slot.png"},
+	{"id": "random", "art": "res://assets/ui/final/boosters/random.png"},
+	{"id": "selector", "art": "res://assets/ui/final/boosters/selector.png"},
+	{"id": "tornado", "art": "res://assets/ui/final/boosters/tornado.png"},
+]
+## Booster presentation states (pushed by the host from canonical services).
+const BOOSTER_AVAILABLE := "available"      # owned charge(s): shows the live count
+const BOOSTER_PURCHASABLE := "purchasable"  # no charge: shows the canonical SB price
+const BOOSTER_UNAVAILABLE := "unavailable"  # cannot be used right now
+const BOOSTER_SELECTED := "selected"        # active this attempt (e.g. +1 Slot in use)
+const BOOSTER_LOCKED := "locked"            # feature-locked (no unlock authority yet)
+
+## 2x presentation modes.
+const SPEED_OFF := "off"
+const SPEED_LEVEL := "level"    # manual 2x on, current-level entitlement
+const SPEED_TIMED := "timed"    # timed entitlement exists: live wall-clock label
+const SPEED_AUTO := "auto"      # free M23-exhausted automatic 2x (never a purchase)
 
 # --- bound presentation state (detached; no gameplay truth retained) ---
 var _board                       # BoardState (read-only source for renderer/geometry)
 var _palette: PackedStringArray
 var _palette_colors: Array = []
-var _slot_snapshots: Array = []  # detached FiveSlotBatchEngine.snapshot()
-var _supply_snapshot: Array = [] # detached BatchSupplyEngine.player_snapshot()
+var _slot_snapshots: Array = []
+var _supply_snapshot: Array = []
 
 # --- node handles ---
 var _background: ColorRect
-var _safe_root                   # SafeAreaRoot (Control) instance
-var _content: Control            # inner safe Content control
+var _backdrop: TextureRect
+var _safe_root
+var _content: Control
 var _screen_content: Control
 var _top_region: Control
+var _profile: Panel
+var _profile_name: Label
+var _profile_level: Label
+var _profile_parts: Label
+var _profile_bar: ProgressBar
 var _board_region: Control
-var _presentation                # BoardPresentation (Node2D)
+var _presentation
 var _rail_view
 var _batch_region: Control
-var _speech_anchor: Control
-var _scrubby_anchor: Control
+var _slot_tray: Panel
+var _supply_tray: Panel
+var _speech_anchor: TextureRect
+var _scrubby_anchor: TextureRect
 var _props_anchor: Control
 var _five_slot_strip
 var _supply_panel
 var _booster_row: HBoxContainer
-var _bottom_row: HBoxContainer
+var _booster_buttons: Dictionary = {}   # id -> Button
+var _booster_states: Dictionary = {}    # id -> {charges, price, state}
 var _pause_btn: Button
-var _ad_placeholder: PanelContainer
-## Bottom-right SPEED control (owner-locked: replaces the old Settings position;
-## OWNER_GAMEPLAY_BOTTOM_ROW_SPEED_DECISION_V01 / OWNER_GAMEPLAY_SPEED_RULE_V01).
-## M28 owns ONLY its placement/sizing/safe-area/1x-2x visual state. It wires NO
-## timing/payment behavior. M29 wires the temporal seam; Economy V1 M39 later gates
-## production manual 2x through paid entitlement. Automatic M23-supply-exhausted -> 2x
-## remains free and consumes authoritative M23 state (never inferred from UI visuals).
-## A new session presents 1x.
+var _paused := false
 var _speed_btn: Button
+var _speed_top: Label
+var _speed_time: Label
 var _speed_2x := false
+var _speed_entitlement := "none"        # none | level | timed
+var _speed_remaining := 0
 
 var _layout_mode: int = ResponsiveLayout.LayoutMode.NORMAL
 var _cell_size: float = 1.0
+var _laid_capacity: int = FiveSlotStrip.SLOT_COUNT
+var _connector_segments: Array = []
 var _built := false
 
 func _ready() -> void:
@@ -83,9 +146,7 @@ func _ready() -> void:
 	resized.connect(relayout)
 	relayout()
 
-## Bind a board fixture + palette + detached batch snapshots, then relayout. `board`
-## is a BoardState (used read-only for size/pixels). `palette` is the LevelData
-## palette. Snapshots are detached scalar arrays; pass [] to leave a region empty.
+## Bind a board + palette + detached batch snapshots, then relayout.
 func configure(board, palette: PackedStringArray, slot_snapshots: Array = [], supply_snapshot: Array = []) -> void:
 	_board = board
 	_palette = palette
@@ -104,24 +165,27 @@ func update_snapshots(slot_snapshots: Array, supply_snapshot: Array) -> void:
 	_slot_snapshots = slot_snapshots.duplicate(true)
 	_supply_snapshot = supply_snapshot.duplicate(true)
 	_bind_batch_views()
+	_sync_capacity_layout()
 
-## Live five-slot refresh (M29-C001 V03, OWNER_FIVE_SLOT_LIVE_PRESENTATION_SYNC_DECISION_V01):
-## push a fresh DETACHED authoritative M24 snapshot into the strip after ANY runtime M24
-## mutation (commit, ACTIVE<->WAITING, wake, rollback, finalize, completion, reset) — not
-## only after player placement. Strip-only (supply is unchanged by these), presentation-only.
+## Live five-slot refresh (M29-C001 V03): push a fresh DETACHED authoritative M24
+## snapshot into the strip after any runtime M24 mutation. Presentation-only.
 func refresh_slot_snapshot(slot_snapshots: Array) -> void:
 	_slot_snapshots = slot_snapshots.duplicate(true)
 	if _five_slot_strip != null:
 		_five_slot_strip.bind_snapshots(_slot_snapshots, _palette_colors)
+	_sync_capacity_layout()
 
 ## Test/preview seam: apply synthetic safe-area insets (this viewport's pixels).
 func set_synthetic_safe_insets(left: int, top: int, right: int, bottom: int) -> void:
 	if _safe_root != null:
 		_safe_root.set_synthetic_insets(left, top, right, bottom)
 
+# ------------------------------------------------------------------ tree build --
+
 func _build_tree() -> void:
 	_built = true
 	set_anchors_preset(Control.PRESET_FULL_RECT)
+	theme = HomeStyle.make_theme()
 
 	_background = ColorRect.new()
 	_background.name = "Background"
@@ -129,6 +193,24 @@ func _build_tree() -> void:
 	_background.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_background.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_background)
+	# Native depth gradient over BG01 (no approved portrait gameplay backdrop exists).
+	_backdrop = TextureRect.new()
+	_backdrop.name = "Backdrop"
+	_backdrop.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_backdrop.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_backdrop.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_backdrop.stretch_mode = TextureRect.STRETCH_SCALE
+	var grad := Gradient.new()
+	grad.set_color(0, Color(0.10, 0.17, 0.33))
+	grad.set_color(1, Color(0.035, 0.05, 0.10))
+	var gt := GradientTexture2D.new()
+	gt.gradient = grad
+	gt.fill_from = Vector2(0.5, 0.0)
+	gt.fill_to = Vector2(0.5, 1.0)
+	gt.width = 8
+	gt.height = 256
+	_backdrop.texture = gt
+	add_child(_backdrop)
 
 	_safe_root = SafeAreaRootScene.instantiate()
 	add_child(_safe_root)
@@ -139,69 +221,112 @@ func _build_tree() -> void:
 	_screen_content.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_screen_content.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_content.add_child(_screen_content)
-	# Content (the inner safe rect) is sized by the MarginContainer a layout pass
-	# AFTER this Control first gets its own size, so relayout must react to Content's
-	# own resize, not only this node's.
 	_content.resized.connect(relayout)
 
-	# NOTE: NO Goal/Moves panel and NO Level/lock rail are created (owner-locked
-	# M28 composition). TopRegion is an intentionally minimal spacer.
 	_top_region = _new_region("TopRegion")
 	_board_region = _new_region("BoardRegion")
 	_batch_region = _new_region("BatchRegion")
+	_build_top()
 
-	# --- BatchRegion contents ---
-	# Left decoration column: SpeechAnchor above ScrubbyAnchor (Scrubby low-left).
-	_speech_anchor = _new_placeholder_anchor("ScrubbySpeechAnchor", Color(0.20, 0.24, 0.30, 0.55))
-	_scrubby_anchor = _new_placeholder_anchor("ScrubbyDecorationAnchor", Color(0.16, 0.19, 0.25, 0.65))
-	_props_anchor = _new_placeholder_anchor("CleaningPropsAnchor", Color(0.16, 0.19, 0.25, 0.5))
-	_batch_region.add_child(_speech_anchor)
-	_batch_region.add_child(_scrubby_anchor)
-	_batch_region.add_child(_props_anchor)
+	# --- Slots / supply trays, decoration, batch views ---
+	_slot_tray = _tray("SlotTray")
+	_supply_tray = _tray("SupplyTray")
+	_speech_anchor = _art_rect("ScrubbySpeechAnchor", ART["speech"])
+	_speech_anchor.visible = false   # no authorised tutorial copy yet (FTUE is M44)
+	_scrubby_anchor = _art_rect("ScrubbyDecorationAnchor", ART["scrubby"])
+	_props_anchor = Control.new()
+	_props_anchor.name = "CleaningPropsAnchor"
+	_props_anchor.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var bucket := _art_rect("BubbleBucket", ART["bucket"])
+	bucket.set_anchors_preset(Control.PRESET_FULL_RECT)
+	bucket.anchor_top = 0.0
+	bucket.anchor_bottom = 0.55
+	var wet_sign := _art_rect("WetFloorSign", ART["wet_sign"])
+	wet_sign.set_anchors_preset(Control.PRESET_FULL_RECT)
+	wet_sign.anchor_top = 0.42
+	_props_anchor.add_child(bucket)
+	_props_anchor.add_child(wet_sign)
+	for n in [_slot_tray, _supply_tray, _speech_anchor, _scrubby_anchor, _props_anchor]:
+		_batch_region.add_child(n)
 
 	_five_slot_strip = FiveSlotStrip.new()
 	_five_slot_strip.name = "FiveSlotStrip"
 	_batch_region.add_child(_five_slot_strip)
+	# Connectors track the strip's REAL laid-out slot anchors (incl. the +1 Slot sixth).
+	_five_slot_strip.sort_children.connect(_queue_connector_update)
 
 	_supply_panel = BatchSupplyPanel.new()
 	_supply_panel.name = "BatchSupplyPanel"
 	_batch_region.add_child(_supply_panel)
 
-	# --- Booster row: exactly four compact presentation-only controls ---
+	# --- Booster row: exactly four canonical boosters ---
 	_booster_row = HBoxContainer.new()
 	_booster_row.name = "BoosterRow"
-	_booster_row.add_theme_constant_override("separation", UiTokens.SPACE_MD)
+	_booster_row.alignment = BoxContainer.ALIGNMENT_CENTER
+	_booster_row.add_theme_constant_override("separation", 40)
 	_screen_content.add_child(_booster_row)
-	for i in range(4):
-		var b := PanelContainer.new()
-		b.name = "Booster%d" % i
-		b.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
-		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		b.mouse_filter = Control.MOUSE_FILTER_IGNORE  # presentation only; no mechanic
+	for spec in BOOSTERS:
+		var b := _make_booster(spec)
 		_booster_row.add_child(b)
+		_booster_buttons[spec["id"]] = b
+		_booster_states[spec["id"]] = {"charges": 0, "price": 0, "state": BOOSTER_UNAVAILABLE}
+		_apply_booster_visual(spec["id"])
 
-	# --- Bottom action row: pause | ad placeholder | settings ---
-	_bottom_row = HBoxContainer.new()
-	_bottom_row.name = "BottomActionRow"
-	_bottom_row.add_theme_constant_override("separation", UiTokens.SPACE_MD)
-	_screen_content.add_child(_bottom_row)
-	_pause_btn = _new_action_button("PauseButton", "II")
-	_bottom_row.add_child(_pause_btn)
-	_ad_placeholder = PanelContainer.new()
-	_ad_placeholder.name = "AdPlaceholder"
-	_ad_placeholder.custom_minimum_size = Vector2(0, UiTokens.BOTTOM_ACTION_ROW_MIN_HEIGHT)
-	_ad_placeholder.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	_ad_placeholder.mouse_filter = Control.MOUSE_FILTER_IGNORE  # ads design-gated (M57)
-	var ad_label := Label.new()
-	ad_label.text = "AD"
-	ad_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	ad_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	ad_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_ad_placeholder.add_child(ad_label)
-	_bottom_row.add_child(_ad_placeholder)
-	# Bottom-right SPEED control (not Settings). Presentation-only; no handler wired.
-	_speed_btn = _new_action_button("SpeedControl", "1x")
-	_bottom_row.add_child(_speed_btn)
+func _build_top() -> void:
+	# Profile chip (top-left): native panel (the approved profile_panel_frame / bar_fill
+	# pieces carry opaque white corners and cannot be shown as-is) + approved Scrubby
+	# portrait + live level / Bot Parts progress.
+	_profile = Panel.new()
+	_profile.name = "ProfileChip"
+	_profile.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_profile.add_theme_stylebox_override("panel", HomeStyle.box(Color(0.05, 0.15, 0.40, 0.96), HomeStyle.EDGE, 5, 30, 10, 3))
+	_top_region.add_child(_profile)
+	var portrait := _art_rect("Portrait", ART["portrait"])
+	_frac(portrait, 0.03, 0.12, 0.235, 0.88)
+	_profile.add_child(portrait)
+	_profile_name = HomeStyle.label(UiText.t("HOME_PLAYER_NAME_DEFAULT"), 32)
+	_profile_name.name = "ProfileName"
+	_profile_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_frac(_profile_name, 0.27, 0.06, 0.64, 0.50)
+	_profile.add_child(_profile_name)
+	_profile_level = HomeStyle.label("", 26, HomeStyle.SUBTITLE)
+	_profile_level.name = "ProfileLevel"
+	_profile_level.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_profile_level.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	_frac(_profile_level, 0.62, 0.06, 0.95, 0.50)
+	_profile.add_child(_profile_level)
+	_profile_bar = ProgressBar.new()
+	_profile_bar.name = "BotPartsBar"
+	_profile_bar.show_percentage = false
+	_profile_bar.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	HomeStyle.style_meter(_profile_bar, HomeStyle.GOLD, 34)
+	_frac(_profile_bar, 0.27, 0.56, 0.95, 0.86)
+	_profile.add_child(_profile_bar)
+	_profile_parts = HomeStyle.label("", 22)
+	_profile_parts.name = "BotPartsText"
+	_profile_parts.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_profile_parts.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_frac(_profile_parts, 0.27, 0.56, 0.95, 0.86)
+	_profile.add_child(_profile_parts)
+
+	# PAUSE | 2x (top-right). Existing host seams: pressed -> pause toggle / speed gate.
+	_pause_btn = _art_button("PauseButton", ART["pause"])
+	_pause_btn.text = "II"
+	_top_region.add_child(_pause_btn)
+	_speed_btn = _art_button("SpeedControl", ART["speed"])
+	_top_region.add_child(_speed_btn)
+	_speed_top = HomeStyle.label("2x", 40)
+	_speed_top.name = "SpeedTop"
+	_speed_top.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_speed_top.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_frac(_speed_top, 0.08, 0.08, 0.92, 0.50)
+	_speed_btn.add_child(_speed_top)
+	_speed_time = HomeStyle.label("", 26)
+	_speed_time.name = "SpeedTime"
+	_speed_time.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_speed_time.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	_frac(_speed_time, 0.15, 0.50, 0.85, 0.78)
+	_speed_btn.add_child(_speed_time)
 	_apply_speed_visual()
 
 func _new_region(node_name: String) -> Control:
@@ -211,25 +336,97 @@ func _new_region(node_name: String) -> Control:
 	_screen_content.add_child(c)
 	return c
 
-func _new_placeholder_anchor(node_name: String, tint: Color) -> Control:
-	# Neutral native placeholder for a later explicitly-APPROVED illustration. No art
-	# is bound; it is intentionally empty decoration that shrinks before supply/slots.
-	var p := PanelContainer.new()
+func _tray(node_name: String) -> Panel:
+	var p := Panel.new()
 	p.name = node_name
 	p.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = tint
-	sb.set_corner_radius_all(UiTokens.RADIUS_MD)
-	p.add_theme_stylebox_override("panel", sb)
+	p.add_theme_stylebox_override("panel", HomeStyle.box(Color(0.075, 0.13, 0.30, 0.92), Color(0.30, 0.55, 0.95, 0.9), 4, 30, 10, 3))
 	return p
 
-func _new_action_button(node_name: String, glyph: String) -> Button:
+func _art_rect(node_name: String, path: String) -> TextureRect:
+	var t := HomeStyle.art(node_name)
+	t.texture = load(path) as Texture2D
+	return t
+
+## Anchor a child by fractions of its parent (resolution independent).
+func _frac(c: Control, l: float, t: float, r: float, b: float) -> void:
+	c.anchor_left = l
+	c.anchor_top = t
+	c.anchor_right = r
+	c.anchor_bottom = b
+	c.offset_left = 0
+	c.offset_top = 0
+	c.offset_right = 0
+	c.offset_bottom = 0
+
+static func _texture_style(path: String) -> StyleBox:
+	var tex := load(path) as Texture2D
+	if tex == null:
+		return HomeStyle.box(HomeStyle.CARD, HomeStyle.EDGE, 4, 24)
+	var s := StyleBoxTexture.new()
+	s.texture = tex
+	return s
+
+func _art_button(node_name: String, path: String) -> Button:
 	var b := Button.new()
 	b.name = node_name
-	b.text = glyph
 	b.focus_mode = Control.FOCUS_NONE
-	b.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
+	b.custom_minimum_size = Vector2(CONTROL_SIZE, CONTROL_SIZE)
+	_set_button_art(b, path)
+	# The approved control art carries its own glyph; the Button text stays as the
+	# semantic/accessibility value but is not painted over the art.
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color", "font_disabled_color"]:
+		b.add_theme_color_override(c, Color(0, 0, 0, 0))
+	b.add_theme_constant_override("outline_size", 0)
 	return b
+
+func _set_button_art(b: Button, path: String) -> void:
+	var s := _texture_style(path)
+	for st in ["normal", "hover", "pressed", "disabled", "hover_pressed"]:
+		b.add_theme_stylebox_override(st, s)
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+
+func _make_booster(spec: Dictionary) -> Button:
+	var b := Button.new()
+	b.name = "Booster_" + String(spec["id"])
+	b.focus_mode = Control.FOCUS_NONE
+	b.custom_minimum_size = Vector2(BOOSTER_SIZE, BOOSTER_SIZE)
+	var disc := HomeStyle.box(Color(0.96, 0.92, 0.84), Color(0.62, 0.72, 0.88), 5, int(BOOSTER_SIZE / 2), 8, 4)
+	for st in ["normal", "hover", "pressed", "disabled", "hover_pressed"]:
+		b.add_theme_stylebox_override(st, disc)
+	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	var icon := _art_rect("Icon", spec["art"])
+	_frac(icon, 0.12, 0.12, 0.88, 0.88)
+	b.add_child(icon)
+	var ring := _art_rect("SelectedRing", ART["booster_selected"])
+	_frac(ring, -0.08, -0.08, 1.08, 1.08)
+	b.add_child(ring)
+	var overlay := _art_rect("UnavailableOverlay", ART["booster_unavailable"])
+	_frac(overlay, 0.0, 0.0, 1.0, 1.0)
+	b.add_child(overlay)
+	var badge := Label.new()
+	badge.name = "Badge"
+	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	badge.add_theme_font_size_override("font_size", 30)
+	badge.add_theme_stylebox_override("normal", HomeStyle.box(HomeStyle.GREEN, Color(1, 1, 1), 4, 26, 4, 0))
+	_frac(badge, 0.66, -0.04, 1.08, 0.36)
+	b.add_child(badge)
+	var price := Label.new()
+	price.name = "Price"
+	price.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	price.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	price.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	price.add_theme_font_size_override("font_size", 26)
+	price.add_theme_stylebox_override("normal", HomeStyle.box(Color(0.08, 0.20, 0.50), HomeStyle.GOLD, 3, 18, 4, 0))
+	_frac(price, 0.10, 0.78, 0.90, 1.06)
+	b.add_child(price)
+	var id: String = spec["id"]
+	b.pressed.connect(func(): booster_pressed.emit(id))
+	return b
+
+# ------------------------------------------------------------ board presentation --
 
 func _build_board_presentation() -> void:
 	if _board == null:
@@ -239,12 +436,9 @@ func _build_board_presentation() -> void:
 	_presentation = BoardPresentation.new()
 	_presentation.name = "BoardPresentation"
 	_board_region.add_child(_presentation)
-	# available_size set precisely in relayout() once BoardRegion has real geometry;
-	# configure once here so the renderer/agent-layer exist before first layout.
 	_presentation.configure(_board, _palette, Vector2(_board.get_width(), _board.get_height()))
-	# ScrubRailView: canonical ScrubRailGeometry, same board-local transform as the
-	# agents, drawn just under AgentLayer. Created here so it exists after configure;
-	# its scale/position are finalized per-layout in _layout_board().
+	# ScrubRailView: canonical ScrubRailGeometry, same board-local transform as the agents,
+	# drawn just under AgentLayer; finalized per layout in _layout_board().
 	_rail_view = ScrubRailView.new()
 	_rail_view.name = "ScrubRailView"
 	_presentation.add_child(_rail_view)
@@ -259,104 +453,251 @@ func _bind_batch_views() -> void:
 	if _supply_panel != null and not _supply_snapshot.is_empty():
 		_supply_panel.bind_player_snapshot(_supply_snapshot, _palette_colors)
 
-## Recompute all responsive band rects from the current inner safe Content rect.
+## +1 Slot grows the strip to six (host-owned transition): widen the slot row and
+## redraw connectors so the sixth connector appears only while the sixth slot exists.
+func _sync_capacity_layout() -> void:
+	if _five_slot_strip != null and _five_slot_strip.get_capacity() != _laid_capacity:
+		relayout()
+
+# ------------------------------------------------------------------ layout --
+
 func relayout() -> void:
 	if not _built or _content == null:
 		return
-	# Content already sits inside SafeAreaRoot's MarginContainer, so its rect IS the
-	# safe rect. ScreenContent fills it; band math is in ScreenContent-local space.
 	var s: Vector2 = _content.size
 	if s.x <= 0.0 or s.y <= 0.0:
 		return
 	_layout_mode = ResponsiveLayout.get_layout_mode(get_viewport_rect().size)
+	var bw: float = float(_board.get_width()) if _board != null else 20.0
+	var bh: float = float(_board.get_height()) if _board != null else 20.0
+	var batch_h: float = STRIP_H + TRAY_GAP + 10.0 + SUPPLY_H
+	var fixed: float = TOP_H + GAP + CONNECTOR_GAP + batch_h + GAP + BOOSTER_H + GAP
+	var avail: float = maxf(s.y - fixed, 1.0)
+	var env := Vector2(bw + 2.0 * RAIL_PAD_CELLS, bh + 2.0 * RAIL_PAD_CELLS)
+	_cell_size = maxf(floor(minf(s.x / env.x, avail / env.y)), 1.0)
+	var env_px: Vector2 = env * _cell_size
+	# Spare height (tall phones) is shared above the board and above the boosters so the
+	# board -> connectors -> slots -> supply chain stays contiguous.
+	var extra: float = maxf(avail - env_px.y, 0.0)
 
-	var gap: float = float(UiTokens.SPACE_MD)
-	var top_h: float = float(UiTokens.SPACE_LG)          # minimal; no HUD content
-	var bottom_h: float = float(UiTokens.BOTTOM_ACTION_ROW_MIN_HEIGHT)
-	var booster_h: float = float(UiTokens.BOOSTER_ROW_MIN_HEIGHT)
-	# Protected batch region: never below its usable minimum.
-	var batch_h: float = maxf(float(UiTokens.BATCH_REGION_MIN_HEIGHT), s.y * 0.28)
-	var fixed: float = top_h + batch_h + booster_h + bottom_h + gap * 4.0
-	var board_h: float = s.y - fixed
-	# Board must stay dominant: if a short viewport squeezes it under the batch
-	# region, reclaim height from the batch region down to its protected minimum.
-	if board_h < batch_h:
-		var need: float = batch_h - board_h
-		var slack: float = batch_h - float(UiTokens.BATCH_REGION_MIN_HEIGHT)
-		var give: float = minf(need, maxf(0.0, slack))
-		batch_h -= give
-		board_h = s.y - (top_h + batch_h + booster_h + bottom_h + gap * 4.0)
-	board_h = maxf(board_h, 1.0)
+	_place(_top_region, 0.0, 0.0, s.x, TOP_H)
+	_layout_top(Vector2(s.x, TOP_H))
+	var y: float = TOP_H + GAP + extra * 0.35
+	_place(_board_region, 0.0, y, s.x, env_px.y)
+	y += env_px.y + CONNECTOR_GAP
+	_place(_batch_region, 0.0, y, s.x, batch_h)
+	y += batch_h + GAP + extra * 0.35
+	var row_w: float = minf(s.x, 4.0 * BOOSTER_SIZE + 3.0 * 40.0 + 2.0 * GAP)
+	_place(_booster_row, (s.x - row_w) * 0.5, y, row_w, BOOSTER_H)
 
-	var y: float = 0.0
-	_place(_top_region, 0.0, y, s.x, top_h); y += top_h + gap
-	_place(_board_region, 0.0, y, s.x, board_h); y += board_h + gap
-	_place(_batch_region, 0.0, y, s.x, batch_h); y += batch_h + gap
-	_place(_booster_row, 0.0, y, s.x, booster_h); y += booster_h + gap
-	_place(_bottom_row, 0.0, y, s.x, bottom_h)
-
-	_layout_batch_region(Vector2(s.x, batch_h))
-	_layout_board()
+	_layout_board(env)
+	_layout_batch_region(Vector2(s.x, batch_h), bw)
+	_laid_capacity = _five_slot_strip.get_capacity()
+	_queue_connector_update()
 
 func _place(c: Control, x: float, y: float, w: float, h: float) -> void:
 	c.position = Vector2(x, y)
 	c.size = Vector2(w, h)
 
-func _layout_batch_region(region: Vector2) -> void:
-	# Top sub-band: five-slot status strip (full width). Lower sub-band: [Scrubby
-	# decoration + speech | protected supply | cleaning props].
-	var strip_h: float = float(UiTokens.FIVE_SLOT_STRIP_MIN_HEIGHT)
-	var gap: float = float(UiTokens.SPACE_SM)
-	_place(_five_slot_strip, 0.0, 0.0, region.x, strip_h)
-	var lower_y: float = strip_h + gap
-	var lower_h: float = maxf(region.y - lower_y, 1.0)
+func _layout_top(region: Vector2) -> void:
+	var ch: float = region.y - 8.0
+	var cw: float = minf(500.0, region.x - 2.0 * CONTROL_SIZE - 3.0 * GAP)
+	_place(_profile, 0.0, 4.0, cw, ch)
+	var cy: float = (region.y - CONTROL_SIZE) * 0.5
+	_place(_speed_btn, region.x - CONTROL_SIZE, cy, CONTROL_SIZE, CONTROL_SIZE)
+	_place(_pause_btn, region.x - 2.0 * CONTROL_SIZE - GAP, cy, CONTROL_SIZE, CONTROL_SIZE)
 
-	# Supply keeps its protected minimum width; decoration/props share the rest and
-	# shrink first. Scrubby anchored low-left, props right.
-	var supply_w: float = maxf(float(UiTokens.SUPPLY_PANEL_MIN_WIDTH), region.x * 0.5)
-	var side_total: float = maxf(region.x - supply_w - gap * 2.0, 0.0)
-	var scrubby_w: float = side_total * 0.55
-	var props_w: float = side_total - scrubby_w
-	var supply_x: float = scrubby_w + gap
+func _layout_batch_region(region: Vector2, bw: float) -> void:
+	var cx: float = region.x * 0.5
+	var cap: int = _five_slot_strip.get_capacity()
+	var min_strip: float = cap * UiTokens.BATCH_SLOT_MIN + (cap - 1) * UiTokens.SPACE_SM
+	var rail_span: float = (bw + 2.0 * ScrubRailGeometry.CENTER_OFFSET) * _cell_size
+	# Slots sit under the bottom rail: kept within the rail span (vertical connectors),
+	# never narrower than their readable minimum (then outer anchors clamp exactly as
+	# the route does).
+	var strip_w: float = clampf(region.x * STRIP_WIDTH_FRAC, min_strip, maxf(min_strip, rail_span - _cell_size))
+	strip_w = minf(strip_w, region.x)
+	var supply_w: float = minf(maxf(strip_w, float(UiTokens.SUPPLY_PANEL_MIN_WIDTH)), region.x)
+	var pad := 10.0
+	_place(_five_slot_strip, cx - strip_w * 0.5, 0.0, strip_w, STRIP_H)
+	_place(_slot_tray, cx - strip_w * 0.5 - pad, -pad, strip_w + 2.0 * pad, STRIP_H + 2.0 * pad)
+	var sy: float = STRIP_H + TRAY_GAP + pad
+	_place(_supply_tray, cx - supply_w * 0.5, sy, supply_w, SUPPLY_H)
+	_place(_supply_panel, cx - supply_w * 0.5 + pad, sy + pad, supply_w - 2.0 * pad, SUPPLY_H - 2.0 * pad)
+	# Decoration shares the side space left of / right of the supply and shrinks first.
+	var side: float = maxf(cx - supply_w * 0.5 - 8.0, 0.0)
+	_place(_speech_anchor, 0.0, sy, side, SUPPLY_H * 0.42)
+	_place(_scrubby_anchor, 0.0, sy + SUPPLY_H * 0.30, side, SUPPLY_H * 0.70)
+	_place(_props_anchor, region.x - side, sy + SUPPLY_H * 0.22, side, SUPPLY_H * 0.78)
+	var show_decor: bool = side >= 96.0
+	_scrubby_anchor.visible = show_decor
+	_props_anchor.visible = show_decor
 
-	# Left decoration column (in batch-region-local coords).
-	var speech_h: float = lower_h * 0.42
-	var scrubby_h: float = lower_h - speech_h - gap
-	_place(_speech_anchor, 0.0, lower_y, scrubby_w, speech_h)
-	_place(_scrubby_anchor, 0.0, lower_y + speech_h + gap, scrubby_w, scrubby_h)  # low-left
-	_place(_supply_panel, supply_x, lower_y, supply_w, lower_h)
-	_place(_props_anchor, supply_x + supply_w + gap, lower_y, props_w, lower_h)
-
-func _layout_board() -> void:
+func _layout_board(env: Vector2) -> void:
 	if _presentation == null or not is_instance_valid(_presentation) or _board == null:
 		return
-	var region: Vector2 = _board_region.size
 	var w: int = _board.get_width()
 	var h: int = _board.get_height()
-	# Fit board+rail envelope (board + RAIL_PAD_CELLS on each side) inside the region,
-	# preserving the board's true aspect (never stretched to square). Integer cell.
-	var env_w: float = float(w) + 2.0 * RAIL_PAD_CELLS
-	var env_h: float = float(h) + 2.0 * RAIL_PAD_CELLS
-	var fit: float = min(region.x / env_w, region.y / env_h)
-	_cell_size = max(floor(fit), 1.0)
-	# Configure the renderer to reproduce exactly this cell size.
 	_presentation.configure(_board, _palette, Vector2(w * _cell_size, h * _cell_size))
 	_cell_size = _presentation.get_cell_size()
-
-	# Rail view already exists (built in _build_board_presentation); finalize its
-	# per-layout transform so it aligns exactly with the rendered board cell size.
 	if _rail_view != null:
 		_rail_view.position = Vector2.ZERO
 		_rail_view.scale = Vector2(_cell_size, _cell_size)
 		_rail_view.configure(w, h)
-
-	# Center the board+rail envelope within the region; board origin is offset by the
-	# rail pad so the rail loop stays inside the region (no clipping).
-	var env_px: Vector2 = Vector2(env_w * _cell_size, env_h * _cell_size)
-	var board_origin := Vector2(
+	var region: Vector2 = _board_region.size
+	var env_px: Vector2 = env * _cell_size
+	_presentation.position = Vector2(
 		(region.x - env_px.x) * 0.5 + RAIL_PAD_CELLS * _cell_size,
 		(region.y - env_px.y) * 0.5 + RAIL_PAD_CELLS * _cell_size)
-	_presentation.position = board_origin
+
+# ------------------------------------------------------------------ connectors --
+
+func _queue_connector_update() -> void:
+	if is_inside_tree():
+		call_deferred("_update_connectors")
+	else:
+		_update_connectors()
+
+## One connector per CURRENT slot (5, or 6 with +1 Slot): the exact runtime route start
+## (SlotOriginProvider.origin_for_slot) to its bottom-rail entry
+## (ScrubRailGeometry.bottom_entry(origin.x)) — the same two points ProductionRoutingSystem
+## uses for real Scrubbot travel. Unmappable slots get no connector (fail closed).
+func _update_connectors() -> void:
+	_connector_segments = []
+	if _rail_view == null or not is_instance_valid(_rail_view) or _board == null:
+		return
+	var geom = _rail_view.get_geometry()
+	if geom == null or not geom.is_valid():
+		return
+	var provider = SlotOriginProvider.new(_presentation, _five_slot_strip, _board)
+	for i in range(_five_slot_strip.get_slot_count()):
+		var o: Vector2 = provider.origin_for_slot(i)
+		if not (is_finite(o.x) and is_finite(o.y)):
+			continue
+		_connector_segments.append([o, geom.bottom_entry(o.x)])
+	_rail_view.set_connectors(_connector_segments)
+
+## Board-local [origin, bottom_entry] per visible slot connector.
+func get_connector_segments() -> Array:
+	return _connector_segments.duplicate(true)
+
+# ------------------------------------------------------------------ HUD binding --
+
+## Live profile values from canonical authorities (host): {level, bot_parts, bot_parts_cost}.
+func set_profile(data: Dictionary) -> void:
+	var level: int = int(data.get("level", 0))
+	_profile_level.text = UiText.t("RESULTS_LEVEL", [level]) if level > 0 else ""
+	var parts: int = int(data.get("bot_parts", -1))
+	var cost: int = int(data.get("bot_parts_cost", 0))
+	var has_parts: bool = parts >= 0 and cost > 0
+	_profile_parts.text = UiText.t("HOME_RATIO", [parts, cost]) if has_parts else ""
+	_profile_bar.max_value = maxf(float(cost), 1.0)
+	_profile_bar.value = clampf(float(parts), 0.0, float(cost)) if has_parts else 0.0
+	_profile_bar.visible = has_parts
+
+func get_profile_level_text() -> String:
+	return _profile_level.text
+
+func get_profile_parts_text() -> String:
+	return _profile_parts.text
+
+## Entitlement presentation pushed by the host from SpeedEntitlementService:
+## entitlement = "none" | "level" | "timed"; timed_remaining = wall-clock seconds.
+func set_speed_presentation(entitlement: String, timed_remaining: int = 0) -> void:
+	_speed_entitlement = entitlement
+	_speed_remaining = maxi(timed_remaining, 0)
+	_apply_speed_visual()
+
+## Presented gameplay speed ("1x"/"2x"). A new session presents 1x.
+func get_speed_state() -> String:
+	return "2x" if _speed_2x else "1x"
+
+## Presentation-only: displayed speed state. Never changes timing truth.
+func set_speed_2x(value: bool) -> void:
+	_speed_2x = value
+	_apply_speed_visual()
+
+## off | level | timed | auto (see constants).
+func get_speed_mode() -> String:
+	if _speed_entitlement == "timed" and _speed_remaining > 0:
+		return SPEED_TIMED
+	if not _speed_2x:
+		return SPEED_OFF
+	return SPEED_LEVEL if _speed_entitlement == "level" else SPEED_AUTO
+
+## Live label: remaining wall-clock time while a timed entitlement exists, else "2x".
+func get_speed_label() -> String:
+	return _speed_btn.text
+
+static func format_remaining(seconds: int) -> String:
+	var s := maxi(seconds, 0)
+	if s >= 3600:
+		return "%d:%02d:%02d" % [s / 3600, (s % 3600) / 60, s % 60]
+	return "%02d:%02d" % [s / 60, s % 60]
+
+func _apply_speed_visual() -> void:
+	if _speed_btn == null:
+		return
+	var mode := get_speed_mode()
+	var timed := mode == SPEED_TIMED
+	_speed_btn.text = format_remaining(_speed_remaining) if timed else "2x"
+	_speed_top.visible = timed
+	_speed_time.visible = timed
+	_speed_time.text = _speed_btn.text if timed else ""
+	var path: String = ART["speed_timed"] if timed else (ART["speed_active"] if _speed_2x else ART["speed"])
+	_set_button_art(_speed_btn, path)
+	# Timed but currently 1x: the countdown keeps running, the control reads unselected.
+	# Free automatic 2x is visibly distinct from paid 2x (green tint).
+	if timed and not _speed_2x:
+		_speed_btn.modulate = Color(0.72, 0.76, 0.86)
+	elif mode == SPEED_AUTO:
+		_speed_btn.modulate = Color(0.70, 1.0, 0.72)
+	else:
+		_speed_btn.modulate = Color(1, 1, 1)
+
+## Presentation-only pause state (the canonical Pause popup is M43-C002).
+func set_paused(paused: bool) -> void:
+	_paused = paused
+	if _pause_btn != null:
+		_pause_btn.modulate = Color(0.62, 0.66, 0.78) if paused else Color(1, 1, 1)
+
+func is_paused_visual() -> bool:
+	return _paused
+
+## Push live booster states from the canonical services:
+## [{id, charges, price, state}] with state in available/purchasable/unavailable/selected/locked.
+func set_booster_states(states: Array) -> void:
+	for st in states:
+		var id := String(st.get("id", ""))
+		if not _booster_states.has(id):
+			continue   # exactly four canonical boosters; anything else is ignored
+		_booster_states[id] = {"charges": int(st.get("charges", 0)), "price": int(st.get("price", 0)),
+			"state": String(st.get("state", BOOSTER_UNAVAILABLE))}
+		_apply_booster_visual(id)
+
+func _apply_booster_visual(id: String) -> void:
+	var b: Button = _booster_buttons.get(id)
+	var st: Dictionary = _booster_states[id]
+	var state := String(st["state"])
+	var badge: Label = b.get_node("Badge")
+	var price: Label = b.get_node("Price")
+	badge.visible = int(st["charges"]) > 0
+	badge.text = str(int(st["charges"]))
+	price.visible = int(st["charges"]) <= 0 and int(st["price"]) > 0 and state != BOOSTER_LOCKED and state != BOOSTER_SELECTED
+	price.text = "%d SB" % int(st["price"])
+	b.get_node("SelectedRing").visible = state == BOOSTER_SELECTED
+	b.get_node("UnavailableOverlay").visible = state == BOOSTER_UNAVAILABLE or state == BOOSTER_LOCKED
+	b.disabled = state == BOOSTER_LOCKED
+	b.modulate = Color(0.72, 0.72, 0.78) if state == BOOSTER_UNAVAILABLE or state == BOOSTER_LOCKED else Color(1, 1, 1)
+
+func get_booster_button(id: String) -> Button:
+	return _booster_buttons.get(id)
+
+func get_booster_state(id: String) -> Dictionary:
+	return (_booster_states.get(id, {}) as Dictionary).duplicate()
+
+func get_booster_ids() -> Array:
+	return BOOSTERS.map(func(b): return b["id"])
 
 # ---------------------------------------------------------------- accessors --
 # Read-only presentation/test accessors. None expose or mutate gameplay truth.
@@ -379,8 +720,7 @@ func get_five_slot_strip():
 func get_supply_panel():
 	return _supply_panel
 
-## M29 wiring seams: the bottom-row Pause and Speed controls (presentation Buttons).
-## M28 wires no behavior; M29 connects the temporal seam. Economy V1 M39 gates shipping manual 2x entitlement/payment.
+## Host wiring seams: top-right Pause and 2x controls.
 func get_pause_button() -> Button:
 	return _pause_btn
 
@@ -396,6 +736,10 @@ func get_safe_rect() -> Rect2:
 func get_top_region_rect() -> Rect2:
 	return _global_rect(_top_region)
 
+func get_profile_rect() -> Rect2:
+	return _global_rect(_profile)
+
+## Board + four-sided rail envelope region (global).
 func get_board_region_rect() -> Rect2:
 	return _global_rect(_board_region)
 
@@ -430,45 +774,32 @@ func get_booster_row_rect() -> Rect2:
 func get_booster_count() -> int:
 	return _booster_row.get_child_count() if _booster_row != null else 0
 
-func get_bottom_row_rect() -> Rect2:
-	return _global_rect(_bottom_row)
-
 func get_pause_rect() -> Rect2:
 	return _global_rect(_pause_btn)
-
-func get_ad_placeholder_rect() -> Rect2:
-	return _global_rect(_ad_placeholder)
 
 func get_speed_control_rect() -> Rect2:
 	return _global_rect(_speed_btn)
 
-## Current presented gameplay speed state: "1x" or "2x". A new session presents 1x.
-func get_speed_state() -> String:
-	return "2x" if _speed_2x else "1x"
-
-## Presentation-only: set the displayed speed state (distinct/readable 1x vs 2x). Does
-## NOT change any timing/gameplay truth; M28 never activates the transition itself.
-func set_speed_2x(value: bool) -> void:
-	_speed_2x = value
-	_apply_speed_visual()
-
-func _apply_speed_visual() -> void:
-	if _speed_btn == null:
-		return
-	_speed_btn.text = "2x" if _speed_2x else "1x"
-	# Distinct state visual so 1x and 2x are readable at a glance.
-	_speed_btn.modulate = Color(0.20, 0.85, 0.95, 1.0) if _speed_2x else Color(1, 1, 1, 1)
-
 ## True iff a Goal/Moves panel exists anywhere in the tree (must be false).
 func has_goal_moves_panel() -> bool:
-	return _find_named(self, ["GoalMoves", "GoalPanel", "MovesPanel", "GoalMovesPanel"])
+	return _find_named(self, ["GoalMoves", "GoalPanel", "MovesPanel", "GoalMovesPanel", "TimePanel", "MovesTimePanel"])
 
 ## True iff a Level/lock rail exists anywhere in the tree (must be false).
 func has_level_lock_rail() -> bool:
 	return _find_named(self, ["LevelRail", "LockRail", "LevelLockRail"])
 
+## V02: no gameplay ad placeholder / bottom action row, no Settings, no Heart HUD.
+func has_ad_placeholder() -> bool:
+	return _find_named(self, ["AdPlaceholder", "BottomActionRow", "AdBanner"])
+
+func has_settings_control() -> bool:
+	return _find_named(self, ["SettingsButton", "SettingsControl", "Settings"])
+
+func has_heart_hud() -> bool:
+	return _find_named(self, ["HeartsChip", "HeartHud", "HeartsHud", "Hearts"])
+
 func _find_named(node: Node, names: Array) -> bool:
-	if names.has(node.name):
+	if names.has(String(node.name)):
 		return true
 	for child in node.get_children():
 		if _find_named(child, names):

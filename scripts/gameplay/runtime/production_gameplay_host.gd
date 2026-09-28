@@ -151,6 +151,13 @@ var _actions = null   # ProductionActionFacade (M39 V04)
 var _speed_popup = null
 ## Last 2x purchase result from the popup (diagnostic/tests).
 var last_speed_purchase_result: Dictionary = {}
+## M28-C002 V02: last booster-control request result (diagnostic/tests) and the 1 s HUD
+## redraw timer (wall-clock values are read from services, never accumulated).
+var last_booster_request: Dictionary = {}
+var _hud_timer: Timer = null
+## Request seam for the canonical BoosterAcquire popup (SB-M28-C002-012 / M43, deferred):
+## emitted when a booster control is tapped with no owned charge. Nothing is spent.
+signal booster_acquire_requested(booster_id: String)
 ## Catalog entry id the AppState path resolved for this attempt (M40 V04).
 var launch_entry_id: String = ""
 ## Test-only fault seam forwarded to FirstClearTransaction.commit.
@@ -541,6 +548,10 @@ func _on_retry_restored() -> void:
 		var strip = _screen.get_five_slot_strip()
 		if strip != null:
 			strip.set_capacity(5)
+		# V02: re-lay the slot row for five and drop the sixth connector; fresh HUD.
+		_screen.refresh_slot_snapshot(_slots.snapshot())
+		_screen.set_paused(_runtime != null and _runtime.is_user_paused())
+	_refresh_hud()
 
 ## Connect the live haptics controller to the authoritative committed seams exactly
 ## once. Idempotent: a rebuild/rebind that re-runs this never stacks duplicate
@@ -595,6 +606,7 @@ func _on_terminal_reached(_status, _detail) -> void:
 	if _scheduler != null:
 		_scheduler.pause()
 	_drive_economy_terminal(_status)
+	_refresh_hud()
 
 ## M39 V02 (F-M39-010): the authoritative M30 terminal drives Economy V1 exactly
 ## once per attempt. WON => first-clear reward + Win Streak + progression advance
@@ -647,6 +659,85 @@ func _wire_controls() -> void:
 	var speed_btn = _screen.get_speed_button()
 	if speed_btn != null and not speed_btn.pressed.is_connected(_on_speed_pressed):
 		speed_btn.pressed.connect(_on_speed_pressed)
+	if not _screen.booster_pressed.is_connected(request_booster):
+		_screen.booster_pressed.connect(request_booster)
+	# M28-C002 V02: live HUD (profile / 2x state / boosters). The timer only schedules a
+	# redraw; the timed-2x value itself is SpeedEntitlementService wall-clock truth (with
+	# its anti-rollback high-water), never gameplay delta or Engine.time_scale.
+	if _hud_timer == null:
+		_hud_timer = Timer.new()
+		_hud_timer.name = "HudTimer"
+		_hud_timer.wait_time = 1.0
+		_hud_timer.ignore_time_scale = true
+		add_child(_hud_timer)
+		_hud_timer.timeout.connect(_refresh_hud)
+		_hud_timer.start()
+	_refresh_hud()
+
+## Push live, canonical values into the V02 HUD. Presentation only; reads services.
+func _refresh_hud() -> void:
+	if _screen == null or not is_instance_valid(_screen):
+		return
+	var prof := {"level": progression_level}
+	if _economy != null:
+		var p: Dictionary = _economy.robots.next_robot_progress()
+		prof["bot_parts"] = int(p.get("parts", 0))
+		prof["bot_parts_cost"] = int(p.get("cost", 0))
+		var rem: int = _economy.speed.timed_seconds_remaining()
+		var ent := "timed" if rem > 0 else ("level" if _economy.speed.is_manual_2x_entitled(progression_level) else "none")
+		_screen.set_speed_presentation(ent, rem)
+		_screen.set_booster_states(booster_states())
+	_screen.set_profile(prof)
+
+## Live state of the four canonical boosters from BoosterInventory / EconomyConfig /
+## wallet / capacity authority. No feature-unlock authority exists for boosters yet, so
+## none is presented as locked.
+func booster_states() -> Array:
+	var out: Array = []
+	if _economy == null:
+		return out
+	var terminal: bool = _completion != null and _completion.is_terminal()
+	for id in BoosterInventory.BOOSTERS:
+		var charges: int = _economy.boosters.charges(id)
+		var price: int = int(_economy.config.booster_price(id))
+		var state := "available" if charges > 0 else ("purchasable" if _economy.wallet.scrub_bucks() >= price else "unavailable")
+		if id == BoosterInventory.PLUS_ONE_SLOT:
+			if _economy.capacity.plus_one_active():
+				state = "selected"
+			elif _slots == null or not _slots.can_grow_to_sixth():
+				state = "unavailable"
+		if terminal and state != "selected":
+			state = "unavailable"
+		out.append({"id": id, "charges": charges, "price": price, "state": state})
+	return out
+
+## Booster control intent (V02 booster row). Never spends SB from a tap:
+##   - owned charge + no target needed (+1 Slot, Random) -> canonical action facade, which
+##     consumes the charge (Economy V1 charge-first) through BoosterService;
+##   - no charge -> no spend; `booster_acquire_requested` seam for the canonical
+##     BoosterAcquire popup (SB-M28-C002-012 / M43, not implemented here);
+##   - Selector / Tornado need a target choice UI that does not exist yet -> no spend.
+func request_booster(id: String) -> Dictionary:
+	var r: Dictionary
+	if _economy == null or _actions == null:
+		r = {"ok": false, "reason": "economy_unavailable"}
+	elif not BoosterInventory.BOOSTERS.has(id):
+		r = {"ok": false, "reason": "unknown_booster"}
+	elif _completion != null and _completion.is_terminal():
+		r = {"ok": false, "reason": "terminal"}
+	elif _economy.boosters.charges(id) <= 0:
+		r = {"ok": false, "reason": "acquire_required"}
+		booster_acquire_requested.emit(id)
+	elif id == BoosterInventory.PLUS_ONE_SLOT:
+		r = _actions.plus_one_slot()
+	elif id == BoosterInventory.RANDOM:
+		r = _actions.random()
+	else:
+		r = {"ok": false, "reason": "target_selection_required"}
+	r["id"] = id
+	last_booster_request = r
+	_refresh_hud()
+	return r
 
 func _on_pause_pressed() -> void:
 	var now: bool = not _runtime.is_user_paused()
@@ -654,6 +745,7 @@ func _on_pause_pressed() -> void:
 	var pause_btn = _screen.get_pause_button()
 	if pause_btn != null:
 		pause_btn.text = "▶" if now else "II"
+	_screen.set_paused(now)
 
 ## M29 temporal/debug seam. Economy V1 supersedes free shipping manual 2x:
 ## M39 must route this production-facing request through SpeedEntitlementService
@@ -691,6 +783,7 @@ func _on_speed_pressed() -> void:
 			return
 	var two: bool = _runtime.toggle_speed()
 	_screen.set_speed_2x(two)
+	_refresh_hud()
 
 ## Canonical Economy V1 2x offers (prices from EconomyConfig, never hardcoded here).
 func speed_offers() -> Array:
@@ -728,6 +821,7 @@ func _on_speed_offer_chosen(kind: String, seconds: int) -> void:
 	if _economy.speed.is_manual_2x_entitled(progression_level):
 		_runtime.set_speed_2x(true)
 		_screen.set_speed_2x(true)
+	_refresh_hud()
 
 func get_speed_acquisition_popup():
 	return _speed_popup
@@ -775,6 +869,8 @@ func activate_plus_one_slot() -> bool:
 			_slots.rollback_grow_to_sixth()
 		_economy.boosters.refund(BoosterInventory.PLUS_ONE_SLOT, res)
 		_economy.capacity.begin_new_attempt()   # pre-state was (5, unused): exact
+		if _screen != null:
+			_screen.refresh_slot_snapshot(_slots.snapshot())
 		return false
 	# Push a fresh 6-slot snapshot so the newly appended view has content.
 	if _screen != null and _slots != null:
@@ -897,6 +993,7 @@ func on_booster_committed() -> void:
 		_screen.update_snapshots(_slots.snapshot(), _supply.player_snapshot())
 	if _completion != null:
 		_completion.notify_event()
+	_refresh_hud()
 
 func get_save():
 	return _save
