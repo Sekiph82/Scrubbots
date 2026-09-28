@@ -812,9 +812,10 @@ func execute_booster(id: String, target = null) -> Dictionary:
 ## Booster control intent (V02 booster row). Never spends SB from a tap:
 ##   - owned charge + no target needed (+1 Slot, Random) -> canonical action facade, which
 ##     consumes the charge (Economy V1 charge-first) through BoosterService;
-##   - no charge -> no spend; `booster_acquire_requested` seam for the canonical
-##     BoosterAcquire popup (SB-M28-C002-012 / M43, not implemented here);
-##   - Selector / Tornado need a target choice UI that does not exist yet -> no spend.
+##   - no charge -> no spend; `booster_acquire_requested` + the canonical M43-C003
+##     Booster Acquire popup on the shared ModalStack (SB-M28-C002-012);
+##   - owned Selector / Tornado -> the same popup in USE mode for the target pick
+##     (owner decision B1-POPUP); nothing is consumed until the pick is committed.
 func request_booster(id: String) -> Dictionary:
 	var r: Dictionary
 	if _economy == null or _actions == null:

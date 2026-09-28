@@ -1,0 +1,13 @@
+STEP 0.00 Fresh Level 2 - Gameplay V02 (5 slots, 3-column supply)
+STEP 1.80 Tapping supply fronts (owner plan order): Scrubbots dispatch and clean
+STEP 6.70 Pause control -> canonical Pause popup; gameplay held
+STEP 8.97 RESUME -> cleaning continues
+STEP 11.03 Tornado with 0 charges -> Booster Acquire (nothing spent)
+STEP 13.10 Owner-approved picker: choose a colour
+STEP 14.77 Close X -> no charge, no SB, no gameplay change
+STEP 16.43 +1 Slot with 0 charges -> Booster Acquire
+STEP 18.30 USE 500 SB -> temporary sixth slot (solver-safe BoosterService)
+STEP 21.93 2x without entitlement -> 2x Acquire (200 / 300 / 500 / 750 SB)
+STEP 24.40 15 MIN bought (300 SB): 2x on, live countdown in the 2x box
+STEP 28.80 Entitled: free switch to 1x
+STEP 30.47 ...and back to 2x, no charge
