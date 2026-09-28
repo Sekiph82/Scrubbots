@@ -407,10 +407,14 @@ func _pause_top_right() -> void:
 	var p: Rect2 = s.get_pause_rect()
 	var sp: Rect2 = s.get_speed_control_rect()
 	_ok(p.end.x <= sp.position.x and p.position.x > s.get_safe_rect().get_center().x and p.position.y < s.get_board_rect().position.y, "PAUSE | 2x side by side at top-right (baked boxes)")
+	# M43-C002 migration: Pause opens the canonical Pause popup (runtime held paused);
+	# a second Pause press behind the popup is blocked; Resume resumes.
 	s.get_pause_button().pressed.emit()
-	_ok(h.get_runtime().is_user_paused() and s.is_paused_visual(), "Pause keeps the existing runtime pause behaviour")
+	_ok(h.get_runtime().is_user_paused() and s.is_paused_visual() and h.get_pause_popup() != null, "Pause opens the Pause popup and holds the runtime paused")
 	s.get_pause_button().pressed.emit()
-	_ok(not h.get_runtime().is_user_paused() and not s.is_paused_visual(), "second press resumes")
+	_ok(h.get_runtime().is_user_paused() and h.get_modal_stack().depth() == 1, "second press behind the popup is blocked")
+	h.get_pause_popup().get_action_button("resume").pressed.emit()
+	_ok(not h.get_runtime().is_user_paused() and not s.is_paused_visual(), "Resume resumes")
 	_complete("pause_top_right")
 
 func _retry_no_accumulation() -> void:

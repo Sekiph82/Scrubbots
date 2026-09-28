@@ -41,6 +41,7 @@ var _activating := false
 ## _V01 §3). Distinct from pause (which is transient) — cleared only when Retry begins a
 ## fresh attempt.
 var _terminal_stopped := false
+var _modal_blocked := false
 var _last_placement := {}   # detached copy of the most recent successful result
 
 ## Bind the production bundle. Fail-closed: returns false and stays unbound on a
@@ -88,6 +89,15 @@ func set_terminal_stopped(value: bool) -> void:
 func is_terminal_stopped() -> bool:
 	return _terminal_stopped
 
+## M43-C002 modal gate: the host mirrors ModalStack.modal_changed here.
+func set_modal_blocked(value: bool) -> void:
+	_modal_blocked = value
+	if value:
+		cancel_all_gestures()
+
+func is_modal_blocked() -> bool:
+	return _modal_blocked
+
 func get_last_placement() -> Dictionary:
 	return _last_placement.duplicate(true)
 
@@ -119,6 +129,12 @@ func activate_front(column: int) -> Dictionary:
 		var pr := {"ok": false, "error": "paused"}
 		activation_result.emit(column, false, "paused")
 		return pr
+	# M43-C002: no activation while any ModalStack popup owns input (defence in depth
+	# behind the popup scrim; covers non-GUI/programmatic paths).
+	if _modal_blocked:
+		var mr := {"ok": false, "error": "modal"}
+		activation_result.emit(column, false, "modal")
+		return mr
 	_activating = true
 	var result := _commit_activation(column)
 	_activating = false

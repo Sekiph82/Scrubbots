@@ -68,6 +68,8 @@ const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolv
 const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
 const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
 const SpeedAcquisitionPopup = preload("res://scripts/ui/speed_acquisition_popup.gd")
+const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
+const Popups = preload("res://scripts/ui/popup/popups.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -149,6 +151,7 @@ var _terminal_receipt: Dictionary = {}
 var _actions = null   # ProductionActionFacade (M39 V04)
 ## M52-C001-R01 functional 2x acquisition popup (created on first need).
 var _speed_popup = null
+var _pause_popup = null
 ## Last 2x purchase result from the popup (diagnostic/tests).
 var last_speed_purchase_result: Dictionary = {}
 ## M28-C002 V02: last booster-control request result (diagnostic/tests) and the 1 s HUD
@@ -160,6 +163,18 @@ var _hud_timer: Timer = null
 signal booster_acquire_requested(booster_id: String)
 ## Catalog entry id the AppState path resolved for this attempt (M40 V04).
 var launch_entry_id: String = ""
+## M43-C002: the ONE ModalStack authority. The app root injects its own before build();
+## a harness host with none creates (and owns) a private one.
+var modal_stack = null
+var _owns_modal_stack := false
+## True only while THIS host's modal hold set the runtime user pause (so closing the last
+## popup resumes exactly what the modal suspended, never a system suspension).
+var _paused_by_modal := false
+var _exited := false
+## Pause -> Home confirmed: the applied attempt consequence (see exit_to_home).
+signal home_requested(result: Dictionary)
+## Diagnostic: last Pause-flow outcome ("resume" | "restart" | "restart_failed" | "home").
+var last_pause_outcome: String = ""
 ## Test-only fault seam forwarded to FirstClearTransaction.commit.
 var _first_clear_fault: Callable = Callable()
 
@@ -173,6 +188,10 @@ var _build_error := ""
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_PREDELETE:
 		_release_owned_economy()
+	elif what == NOTIFICATION_WM_GO_BACK_REQUEST and _owns_modal_stack and modal_stack != null:
+		# Harness host (no app root): its private stack consumes back. With an app root,
+		# main.handle_back() consults the shared stack first.
+		modal_stack.handle_back()
 
 func _release_owned_economy() -> void:
 	if _owns_economy and _economy != null:
@@ -418,6 +437,7 @@ func build() -> bool:
 		# Committed actions hit the host save boundary; M40 binds the same seam.
 		_actions = ProductionActionFacade.new(_economy, self, Callable(self, "request_save"))
 	_economy_terminal_done = false
+	_bind_modal_stack()
 
 	# Meaningful gameplay boundaries mark the completion state dirty (authenticated clear +
 	# accepted supply-front placement). on_tick (below) then gets one chance to run the M27
@@ -725,6 +745,8 @@ func request_booster(id: String) -> Dictionary:
 		r = {"ok": false, "reason": "unknown_booster"}
 	elif _completion != null and _completion.is_terminal():
 		r = {"ok": false, "reason": "terminal"}
+	elif is_modal_open():
+		r = {"ok": false, "reason": "modal_open"}
 	elif _economy.boosters.charges(id) <= 0:
 		r = {"ok": false, "reason": "acquire_required"}
 		booster_acquire_requested.emit(id)
@@ -739,13 +761,146 @@ func request_booster(id: String) -> Dictionary:
 	_refresh_hud()
 	return r
 
+## M43-C002 (SB-M43-019): the V02 top-right Pause control opens the canonical Pause
+## popup. Ignored while any popup owns input or after a terminal result (Results owns it).
 func _on_pause_pressed() -> void:
-	var now: bool = not _runtime.is_user_paused()
-	_runtime.set_user_paused(now)
-	var pause_btn = _screen.get_pause_button()
-	if pause_btn != null:
-		pause_btn.text = "▶" if now else "II"
-	_screen.set_paused(now)
+	open_pause()
+
+# ------------------------------------------------------------- M43-C002 modal --
+
+func _bind_modal_stack() -> void:
+	if modal_stack == null:
+		modal_stack = ModalStack.new()
+		_owns_modal_stack = true
+		add_child(modal_stack)
+	if not modal_stack.modal_changed.is_connected(_on_modal_changed):
+		modal_stack.modal_changed.connect(_on_modal_changed)
+
+func _exit_tree() -> void:
+	if modal_stack != null and is_instance_valid(modal_stack) and not _owns_modal_stack \
+			and modal_stack.modal_changed.is_connected(_on_modal_changed):
+		modal_stack.modal_changed.disconnect(_on_modal_changed)
+
+func get_modal_stack():
+	return modal_stack
+
+func is_modal_open() -> bool:
+	return modal_stack != null and is_instance_valid(modal_stack) and modal_stack.is_open()
+
+## Canonical modal hold: while ANY popup is on the stack over gameplay, supply input is
+## gated and the runtime is held in user pause (no cadence, no agent travel). Closing the
+## last popup releases ONLY a pause this hold created; a focus/system suspension is a
+## separate runtime reason and is never cleared here.
+func _on_modal_changed(active: bool) -> void:
+	if _input != null:
+		_input.set_modal_blocked(active)
+	if _runtime == null:
+		return
+	if active:
+		if not _runtime.is_user_paused():
+			_runtime.set_user_paused(true)
+			_paused_by_modal = true
+	elif _paused_by_modal:
+		_paused_by_modal = false
+		_runtime.set_user_paused(false)
+	if _screen != null and is_instance_valid(_screen):
+		_screen.set_paused(_runtime.is_user_paused())
+		var pause_btn = _screen.get_pause_button()
+		if pause_btn != null:
+			pause_btn.text = "▶" if _runtime.is_user_paused() else "II"
+
+## Open the Pause popup. Returns it, or null when refused (not built, terminal, exited, or
+## a popup already owns input -- rapid repeats are therefore no-ops).
+func open_pause():
+	if not _built or _exited or is_modal_open():
+		return null
+	if _completion != null and _completion.is_terminal():
+		return null
+	var p = Popups.pause({"level": progression_level})
+	p.action_selected.connect(_on_pause_action.bind(p))
+	if not modal_stack.push(p):
+		p.free()
+		return null
+	_pause_popup = p
+	return p
+
+## The open Pause popup, or null.
+func get_pause_popup():
+	if _pause_popup != null and is_instance_valid(_pause_popup) and _pause_popup.is_open():
+		return _pause_popup
+	return null
+
+func _on_pause_action(id: String, _ctx: Dictionary, pause) -> void:
+	match id:
+		"resume":
+			last_pause_outcome = "resume"
+		"restart", "home":
+			var c = Popups.attempt_confirm(id, attempt_consequence())
+			c.action_selected.connect(_on_attempt_confirmed.bind(id))
+			c.closed.connect(func(_r):
+				if is_instance_valid(pause) and pause.is_open():
+					pause.rearm())
+			modal_stack.push(c)
+
+## Exactly-once confirmation (the confirm popup closes itself before emitting).
+func _on_attempt_confirmed(id: String, _ctx: Dictionary, kind: String) -> void:
+	if id != "confirm":
+		return
+	if kind == "restart":
+		# The REAL M30 transaction-safe Retry; its restore seam applies the M39
+		# restart-after-action law (Heart + Win Streak) exactly as the preview stated.
+		if retry():
+			last_pause_outcome = "restart"
+			modal_stack.clear("restart")
+		else:
+			last_pause_outcome = "restart_failed"
+			modal_stack.push(Popups.feedback({"ok": false, "reason": "restart_unavailable"}))
+	else:
+		var r := exit_to_home()
+		last_pause_outcome = "home"
+		modal_stack.clear("home")
+		home_requested.emit(r)
+
+## Read-only consequence of ending this attempt now (Restart or Home), derived from the
+## accepted authorities the Retry/exit paths themselves use: WinStreakService
+## .gameplay_started() (armed by the first accepted supply activation), HeartService
+## .hearts() (consume() fails closed at 0) and WinStreakService.streak(). Never a UI flag.
+func attempt_consequence() -> Dictionary:
+	var started: bool = _economy != null and _economy.streak.gameplay_started()
+	var out := {"level": progression_level, "gameplay_started": started, "economy": _economy != null,
+		"heart_loss": false, "hearts_before": -1, "hearts_after": -1, "streak_before": 0, "streak_reset": false}
+	if _economy != null:
+		var h: int = _economy.hearts.hearts()
+		var st: int = _economy.streak.streak()
+		out["hearts_before"] = h
+		out["streak_before"] = st
+		out["heart_loss"] = started and h > 0
+		out["hearts_after"] = maxi(h - 1, 0) if started else h
+		out["streak_reset"] = started and st > 0
+	return out
+
+## End this attempt to Home (Pause -> Home confirmed). Owner Economy V1: leaving before
+## the first real action costs nothing (WinStreakService.on_pre_action_exit); leaving after
+## it counts as a loss exactly like restart-after-action (-1 Heart, streak reset). The
+## attempt-scoped +1 Slot capacity ends with the attempt. Exactly once per host.
+func exit_to_home() -> Dictionary:
+	if _exited:
+		return {"ok": false, "reason": "already_exited"}
+	if _completion != null and _completion.is_terminal():
+		return {"ok": false, "reason": "terminal"}
+	_exited = true
+	var c := attempt_consequence()
+	if _economy != null:
+		if bool(c["gameplay_started"]):
+			_economy.hearts.consume()
+			_economy.streak.on_restart()
+		else:
+			_economy.streak.on_pre_action_exit()
+		_economy.capacity.begin_new_attempt()
+		if bool(c["gameplay_started"]):
+			_flush_durable_save()
+	c["ok"] = true
+	return c
 
 ## M29 temporal/debug seam. Economy V1 supersedes free shipping manual 2x:
 ## M39 must route this production-facing request through SpeedEntitlementService
@@ -776,6 +931,8 @@ func request_save() -> Dictionary:
 ## 2x uses the speed authority directly (set_2x), never this button, so it stays free and
 ## entitlement-independent.
 func _on_speed_pressed() -> void:
+	if is_modal_open():
+		return
 	var currently_2x: bool = _speed != null and _speed.is_2x()
 	if not currently_2x and _economy != null:
 		if not _economy.speed.is_manual_2x_entitled(progression_level):

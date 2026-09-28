@@ -22,6 +22,7 @@ const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
 const OpeningScreen = preload("res://scripts/app/opening_screen.gd")
 const LaunchSession = preload("res://scripts/app/launch_session.gd")
+const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -46,6 +47,8 @@ var _home = null
 var _results = null
 ## SB-M42-028/029 opening cinematic (only during the OPENING route).
 var _opening = null
+## M43-C002 (SB-M43-016): the ONE app-level ModalStack, above Home / gameplay / Results.
+var _modals = null
 
 func _enter_tree() -> void:
 	_boot()
@@ -59,6 +62,8 @@ func _boot() -> void:
 	nav.settings_changed.connect(_on_nav_settings_changed)
 
 func _ready() -> void:
+	_modals = ModalStack.new()
+	add_child(_modals)
 	_home = HomeScreenScene.instantiate()
 	_home.name = "HomeScreen"
 	add_child(_home)
@@ -72,6 +77,8 @@ func _ready() -> void:
 	_results.continue_requested.connect(continue_from_results)
 	_results.retry_requested.connect(retry_from_results)
 	_build_settings_entry()
+	# Home hides its action layer while any stacked popup owns input (existing seam).
+	_modals.modal_changed.connect(func(active): _home.set_modal_active("modal_stack", active))
 	nav.route_changed.connect(_on_route_changed)
 	if _should_play_opening():
 		_start_opening()
@@ -197,6 +204,8 @@ func launch_gameplay(parent: Node = null) -> Dictionary:
 	var host = ProductionGameplayHost.new()
 	host.name = "GameplayHost"
 	host.app_state = app_state
+	host.modal_stack = _modals
+	host.home_requested.connect(_on_gameplay_home_requested.bind(host))
 	host.auto_build = false
 	host.set_anchors_preset(Control.PRESET_FULL_RECT)
 	(parent if parent != null else self).add_child(host)
@@ -215,6 +224,9 @@ func launch_gameplay(parent: Node = null) -> Dictionary:
 ## Remove the current gameplay host from the tree immediately and free it. Only the
 ## app root owns host lifetime.
 func _release_gameplay_host() -> void:
+	# Popups over the released gameplay never outlive it (no stale callbacks).
+	if _modals != null:
+		_modals.clear("host_released")
 	if _gameplay_host != null and is_instance_valid(_gameplay_host):
 		if _gameplay_host.get_parent() != null:
 			_gameplay_host.get_parent().remove_child(_gameplay_host)
@@ -286,6 +298,17 @@ func retry_from_results() -> bool:
 func get_results_screen():
 	return _results
 
+func get_modal_stack():
+	return _modals
+
+## Pause -> Home confirmed by the CURRENT host (which already applied the owner
+## pre-/post-action exit law). GAMEPLAY -> HOME releases the host.
+func _on_gameplay_home_requested(result: Dictionary, host) -> void:
+	if host != _gameplay_host or nav.current() != NavigationController.Route.GAMEPLAY:
+		return
+	nav.go(NavigationController.Route.HOME, {"via": "pause_home",
+		"gameplay_started": bool(result.get("gameplay_started", false))})
+
 func get_gameplay_host():
 	return _gameplay_host
 
@@ -307,7 +330,12 @@ func flush_lifecycle(reason: String) -> Dictionary:
 ##   no Heart/streak consequence; WinStreakService.on_pre_action_exit); after the first
 ##   action there is no owner-defined mid-level exit rule, so back does nothing;
 ##   HOME / OPENING -> nothing (no Level Select, no exit policy invented).
+## M43-C002: any ModalStack popup takes back first; mid-level exit after the first
+## action is available only through Pause -> Home with its loss confirmation.
 func handle_back() -> String:
+	# M43-C002 (SB-M43-026): an open popup consumes back first (top only, never leaks).
+	if _modals != null and _modals.handle_back():
+		return "close_modal"
 	var pre_action := false
 	if nav.current() == NavigationController.Route.GAMEPLAY and _gameplay_host != null 			and app_state != null and app_state.economy != null:
 		pre_action = not app_state.economy.streak.gameplay_started() 			and not _gameplay_host.get_completion().is_terminal()
