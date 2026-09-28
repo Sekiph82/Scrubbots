@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M43-C002-C001 Reusable Popup / Modal / Pause Foundation
-- Current Task: Build reusable BasePopup + modal-stack authority + canonical Gameplay Pause/Restart/Home flow and generic acquisition-state foundations
-- Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C002-C001/task_prompts/SB-M43-C002-C001_POPUP_MODAL_PAUSE_FOUNDATION.md`; ChatGPT audits, then OWNER reviews popup/Pause visuals before M43-C003.
-- Required Actor: CLAUDE
+- Current Sprint: M43-C002-C001 Popup / Modal / Pause — Owner Visual Gate
+- Current Task: Owner reviews the technically accepted popup/Pause family and resolves P1/P2/P3/P4/P6
+- Current Task Status: OWNER_REQUIRED
+- Next Task/Action: OWNER resolves `coordination/sessions/M43-C002-C001/OWNER_POPUP_PAUSE_GATE_V01.md`. ChatGPT records visual acceptance, then opens M43-C003 Life / Booster Acquire / 2x Acquire.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 913 / 1355 = 67.38%. Gameplay V02 static-shell visual family is technically and owner accepted; popup/modal/Pause dependency work is active.
-- Note: R01 owner visual PASS recorded: R1-OK 2.4-cell mini Scrubbots, R2-OK bubble copy, R3-OK short-phone readability. SB-M28-C002-016 is closed. Remaining Gameplay V02 blockers are M43-C002 Pause/modal and M43-C003 Booster/2x acquisition surfaces.
-- Owner sequencing lock: complete M43-C002 popup/modal/Pause foundation and owner visual review, then M43-C003 Booster/2x acquisition, then return to M28-C002 final popup-inclusive evidence/playtest.
+- Progress: 930 / 1355 = 68.63%. M43-C002 technical foundation and the corresponding M28 Pause/modal dependencies are accepted; popup visual owner gate remains.
+- Note: M43-C002-C001 technical audit PASS at `75eefa5`. BasePopup, one ModalStack, canonical Pause/Restart/Home, input isolation and generic acquisition-state foundations are accepted technically. Non-blocking audit note: one `or true` expression in the focused test must not be relied on in final closure evidence.
+- Owner sequencing lock: resolve M43-C002 visual gate, then M43-C003 Life/Booster/2x acquisition, then return to M28-C002 popup-inclusive final evidence/playtest.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1280,11 +1280,11 @@ Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master vi
 - [x] SB-M28-C002-011 Booster quantity, price, locked/unavailable and selected states remain live Godot UI overlays and are never baked into art.
 - [ ] SB-M28-C002-012 Tapping a booster with no charge routes into the canonical Booster Acquire popup defined by M43-C003 rather than silently failing.
 - [ ] SB-M28-C002-013 Tapping locked/manual 2x without entitlement routes into the canonical 2x Acquire popup defined by M43-C003.
-- [ ] SB-M28-C002-014 Implement the canonical Pause popup entry and deterministic modal stacking rules from M43-C002.
-- [ ] SB-M28-C002-015 Preserve gameplay input isolation while any popup/modal is open; board, supply and booster controls behind it receive no input.
+- [x] SB-M28-C002-014 Implement the canonical Pause popup entry and deterministic modal stacking rules from M43-C002.
+- [x] SB-M28-C002-015 Preserve gameplay input isolation while any popup/modal is open; board, supply and booster controls behind it receive no input.
 - [x] SB-M28-C002-016 Preserve the approved gameplay background, Scrubby/selected-robot support presentation and lower decorative hierarchy without shrinking gameplay-critical controls first. — R01 technical PASS + FINAL OWNER VISUAL PASS.
 - [x] SB-M28-C002-017 Validate 1080x2160, 1170x2532, 1290x2796, 1080x2400, 1440x3200, short 16:9 portrait and tablet portrait.
-- [ ] SB-M28-C002-018 Validate mouse/touch mapping, rapid taps, popup-open input suppression and temporary sixth-slot readability.
+- [x] SB-M28-C002-018 Validate mouse/touch mapping, rapid taps, popup-open input suppression and temporary sixth-slot readability.
 - [ ] SB-M28-C002-019 Capture owner-review screenshots/video for fresh level, active cleaning, full five-slot state, sixth-slot state, booster popup open, Pause open and timed 2x state.
 - [ ] SB-M28-C002-020 Independent ChatGPT audit plus owner visual/playtest acceptance required before this V02 convergence is closed.
 
@@ -1647,21 +1647,21 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 
 #### M43-C002 - Reusable Popup / Modal / Pause Foundation
 
-- [ ] SB-M43-015 Implement reusable `BasePopup` with dim background, responsive frame, header/content/footer slots and canonical close behavior.
-- [ ] SB-M43-016 Implement modal stack authority so exactly one top modal owns input; background Home/gameplay controls are hidden or input-disabled as appropriate.
-- [ ] SB-M43-017 Implement reusable confirm popup for destructive/costly actions.
-- [ ] SB-M43-018 Implement reusable reward/confirmation popup.
-- [ ] SB-M43-019 Implement canonical Pause popup with Resume / Restart / Home and current level context.
-- [ ] SB-M43-020 Restart confirmation must state Heart/streak consequence when gameplay has begun and must use M30/M39 truth rather than UI guesses.
-- [ ] SB-M43-021 Home/exit confirmation must distinguish pre-first-action no-cost exit from post-action loss semantics.
-- [ ] SB-M43-022 Implement generic insufficient-SB route that can open Shop without losing the pending acquisition context.
-- [ ] SB-M43-023 Implement generic network-required/error state for rewarded ad, store, cloud and live-event surfaces.
-- [ ] SB-M43-024 Implement loading/busy state and disable duplicate taps while an external transaction is unresolved.
-- [ ] SB-M43-025 Implement canonical success/failure feedback for purchases, rewarded grants, exchanges and claims.
-- [ ] SB-M43-026 Back/Escape closes the top modal first and never leaks an action into the screen behind it.
-- [ ] SB-M43-027 Modal open/close state survives focus loss/background safely without duplicate callback execution.
+- [x] SB-M43-015 Implement reusable `BasePopup` with dim background, responsive frame, header/content/footer slots and canonical close behavior.
+- [x] SB-M43-016 Implement modal stack authority so exactly one top modal owns input; background Home/gameplay controls are hidden or input-disabled as appropriate.
+- [x] SB-M43-017 Implement reusable confirm popup for destructive/costly actions.
+- [x] SB-M43-018 Implement reusable reward/confirmation popup.
+- [x] SB-M43-019 Implement canonical Pause popup with Resume / Restart / Home and current level context.
+- [x] SB-M43-020 Restart confirmation must state Heart/streak consequence when gameplay has begun and must use M30/M39 truth rather than UI guesses.
+- [x] SB-M43-021 Home/exit confirmation must distinguish pre-first-action no-cost exit from post-action loss semantics.
+- [x] SB-M43-022 Implement generic insufficient-SB route that can open Shop without losing the pending acquisition context.
+- [x] SB-M43-023 Implement generic network-required/error state for rewarded ad, store, cloud and live-event surfaces.
+- [x] SB-M43-024 Implement loading/busy state and disable duplicate taps while an external transaction is unresolved.
+- [x] SB-M43-025 Implement canonical success/failure feedback for purchases, rewarded grants, exchanges and claims.
+- [x] SB-M43-026 Back/Escape closes the top modal first and never leaks an action into the screen behind it.
+- [x] SB-M43-027 Modal open/close state survives focus loss/background safely without duplicate callback execution.
 - [ ] SB-M43-028 Produce/approve the popup chrome visual kit and keep normal labels, values, timers and prices live in Godot.
-- [ ] SB-M43-029 Add focused automated tests for modal priority, background input suppression, duplicate callbacks and deterministic close/back behavior.
+- [x] SB-M43-029 Add focused automated tests for modal priority, background input suppression, duplicate callbacks and deterministic close/back behavior.
 
 #### M43-C003 - Life / Hearts / Scrub Bucks / Booster / 2x Acquisition Surfaces
 
