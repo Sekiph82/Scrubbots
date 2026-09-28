@@ -13,6 +13,20 @@ This cycle converts the current historical M28 screen into the owner-approved Ga
 
 This is not a mockup exercise. Work on the real production gameplay screen used by `ProductionGameplayHost`.
 
+## Prior Results gate — CLOSED
+
+M43-C001B is now **FINAL OWNER VISUAL PASS**.
+
+Read:
+`coordination/sessions/M43-C001B/FINAL_OWNER_VISUAL_ACCEPTANCE_V01.md`
+
+Consequences for this gameplay cycle:
+- do not spend time revisiting Results/Victory;
+- do not wait for any Results owner sign-off;
+- `victory_results` is already `MASTER_OWNER_APPROVED`;
+- current Results timing, Scrubby overlap, frame treatment, disabled-Continue state and reward wording are accepted;
+- remain focused on the actual Gameplay V02 screen.
+
 ## Active tracked scope
 
 Primary M28-C002 rows for this core cycle:

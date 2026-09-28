@@ -48,7 +48,7 @@
     {
       "id": "victory_results",
       "type": "screen_popup",
-      "status": "MASTER_REQUIRED",
+      "status": "MASTER_OWNER_APPROVED",
       "owner_visual_gate": true,
       "responsive_gate": true,
       "production_scene_required": true

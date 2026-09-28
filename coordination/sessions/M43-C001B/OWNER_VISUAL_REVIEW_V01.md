@@ -1,7 +1,7 @@
 # M43-C001B — OWNER VISUAL REVIEW V01
 
 Date: 2026-09-28
-Status: **CANDIDATE — awaiting owner visual acceptance.** This is not an owner approval. `victory_results` remains `MASTER_REQUIRED`.
+Status: **OWNER VISUAL ACCEPTED / FINAL PASS.** Canonical acceptance: `coordination/sessions/M43-C001B/FINAL_OWNER_VISUAL_ACCEPTANCE_V01.md`. `victory_results` is promoted to `MASTER_OWNER_APPROVED`.
 Owner decisions applied: `coordination/OWNER_RESULTS_VISUAL_REPLAY_V01.md` (no Replay; Scrubby over frame; small emblem; green Continue; LOST excluded).
 
 ## How these images were made
@@ -47,10 +47,10 @@ You can also play it live: win any level in the app; Results appears automatical
 6. No Replay anywhere.
 7. LOST (#6) carries no Victory decoration.
 
-## Genuinely unresolved visual-only items (owner choice; no engine or economy impact)
+## Owner-accepted visual choices
 
-1. **Reveal timing.** The current candidate fades each row in over 0.16 s, in order, with no sound or haptic. This timing is a placeholder until you approve one. With Reduced Effects on, everything appears instantly.
-2. **Robot overlap depth.** 96 px overlap; the robot's feet touch the header ribbon. Say if you want the robot higher, i.e. clear of the ribbon.
-3. **Title and rim treatment.** "LEVEL COMPLETE" uses the Home font: the project default emboldened, with a navy outline. The panel rim is a single flat royal blue with no bolts or leaf accents. The Life/Help references have bolts, leaves and a footer plaque, and no chrome asset for those exists in the repo. Accept the flat native version, or request a chrome kit (SB-M43-028)?
-4. **Disabled Continue look (#4).** Muted green with light text. Would you prefer the button hidden, or a different "coming soon" treatment?
-5. **Row copy.** The texts are the existing technical strings, e.g. "First clear +75 SB" and "Gift ready! Claim it in Gifts." The owner ruling says copy may be polished later without changing economy truth.
+1. **Reveal timing accepted.** 0.16 s per row, ordered; Reduced Effects shows everything instantly.
+2. **Robot overlap accepted.** 96 px overlap; Scrubby's feet may touch the header ribbon.
+3. **Title/rim accepted.** Current Home-font title and flat royal-blue native rim are approved for Results; no extra chrome kit is required for this surface.
+4. **Disabled Continue accepted.** Muted green + current coming-soon treatment.
+5. **Row copy accepted.** Current live Results wording is approved; later localization/copy polish may occur without changing reward truth.
