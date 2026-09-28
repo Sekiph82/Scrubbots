@@ -1,142 +1,117 @@
-# SCRUBBOTS — REQUIRED VISUAL GAPS V01
+# SCRUBBOTS — REQUIRED VISUAL GAPS V02
 
 Date: 2026-09-28
-Scope: **only visual deliverables that are still required and currently lack an owner-approved full visual master/reference.**
-Status authority remains repository-root `TASKS.md`; this file is a scoped visual-production inventory, not a project-status tracker.
+Scope: **only visual masters / visual families that still have to be CREATED or COMPOSED.**
+This is not a project-status tracker. Root `TASKS.md` remains authoritative.
 
-## Rules used for this inventory
+## Inclusion rule
 
-Included only when all are true:
+An item appears below only when:
+1. it is required by the current V1 player-facing plan;
+2. a usable ScrubBots-specific final/candidate master has not already been produced for that surface;
+3. more visual-production work is still required.
 
-1. the surface is required by the current V1 player-experience program;
-2. the final visual master/reference is not yet owner-approved;
-3. the visual still has to be produced/reviewed before the corresponding production surface can close.
+Therefore this list does **not** include visuals that merely await owner approval.
 
-Excluded:
+## Already produced / referenced — NOT missing
 
-- Gameplay V02 — final owner visual PASS.
+Do not regenerate these merely to fill a checklist:
+
+- Gameplay V02 six-master family — owner-approved.
 - Home / World 01 — owner-approved.
-- Victory / Results — final owner visual PASS.
-- Level Intro — owner reference already selected and production assets already exist.
-- Life / Heart refill — owner reference already selected.
-- Need a Hand — owner reference already selected.
-- all four gameplay booster icons — already present in `assets/ui/final/boosters/`.
-- Scrubby / 10-robot production families — already present.
-- all 135 Collection cards and rarity/state frames — already present.
-- common popup/button/currency/navigation/system icon families — already present.
-- speculative/post-launch Friends art.
-- optional illustrations whose need has not yet been proven.
-- external game screenshots/references, including Colony Flow material.
+- Victory / Results — owner-approved.
+- Level Intro — reference + assets exist.
+- Life — ScrubBots-specific owner reference exists at `assets/art/references/_owner_inbox/Additionals/life screens.png`.
+- Need a Hand — ScrubBots-specific owner reference exists at `assets/art/references/_owner_inbox/Additionals/need a hand.png`.
+- Pause popup — M43-C002 production candidate/evidence already exists; owner review only.
+- Generic confirm — M43-C002 candidate exists.
+- Generic reward/confirmation — M43-C002 candidate exists.
+- Insufficient-SB / Shop handoff — M43-C002 candidate exists.
+- Generic network/error/busy/loading/feedback — M43-C002 candidates exist.
+- all four gameplay booster icons.
+- Scrubby and the full 10-robot production families.
+- all 135 Collection card images and rarity/state frames.
+- common popup/button/currency/navigation/system icon families.
 
-## A. Required missing visual masters / references
+## A. Visual masters still to create / compose
 
-These **33** visual masters are still required.
+Exactly **26** currently-required visual deliverables remain to be visually produced.
 
-| # | Required visual deliverable | Milestone / surface | Existing ScrubBots art that should be reused | Net-new standalone image generation required now? |
+| # | Visual deliverable still to create | Milestone | Existing assets to reuse | New standalone image art required? |
 |---:|---|---|---|---|
-| 1 | **Pause popup master** | M43-C002 | common popup frames, close icon, gameplay Pause icon | **No** — compose/approve master from existing art |
-| 2 | **Fail / Retry popup master** | M43-C004 | `popups/failure/*`, Heart assets, common frames | **No** |
-| 3 | **Booster Acquire popup master** | M43-C003 | four final booster icons, common popup/button frames | **No** |
-| 4 | **2x Acquire popup master** | M43-C003 | 2x gameplay/shop assets, common popup/button frames | **No** |
-| 5 | **Insufficient SB / Shop handoff master** | M43-C002/C003 | SB currency icon, common warning/confirmation frames, Shop assets | **No** |
-| 6 | **Shop full-screen master** | M43-C006 | `assets/ui/final/shop/*`, common HUD/currency assets | **No** |
-| 7 | **Collection Album master** | M43-C007 | 135 final cards, rarity frames, Collection panel/state assets | **No** |
-| 8 | **Collection Set Detail master** | M43-C007 | set header/frame/navigation assets + card family | **No** |
-| 9 | **Card Detail popup master** | M43-C007 | final card art + rarity frames + common popup frames | **No** |
-| 10 | **Cards Exchange master** | M43-C007 | `assets/ui/final/cards_exchange/*` + final Collection cards | **No** |
-| 11 | **Standard Pack Opening ceremony master** | M43-C005 | standard pack asset, card art/state assets, reward glow | **No** |
-| 12 | **Premium Pack Opening ceremony master** | M43-C005 | premium pack asset, card art/state assets, reward glow | **No** |
-| 13 | **Collection Set Complete ceremony master** | M43-C005 | `collection_complete_emblem.png`, reward assets | **No** |
-| 14 | **Master Collection Complete ceremony master** | M43-C005 | `master_collection_emblem.png`, reward assets | **No** |
-| 15 | **Robots Main screen master** | M43-C008 | complete 10-robot families + `assets/ui/final/robots/*` | **No** |
-| 16 | **Locked Robot Detail master** | M43-C008 | robot detail frame, locked silhouette, lock emblem, perk assets | **No** |
-| 17 | **Robot Unlock ceremony master** | M43-C005/C008 | robot art, unlock glow/burst, Bot Parts assets | **No** |
-| 18 | **Tasks screen master** | M43-C009 | common panels/progress/buttons, SB/reward icons, Tasks shortcut icon | **No** — no unique illustration is mandatory |
-| 19 | **Daily screen/popup master + reward-state layout** | M43-C009 | complete `assets/ui/final/daily/*` family | **No** |
-| 20 | **Gift Bar master + milestone-card layout** | M43-C009 | Gift Meter assets, reward/gift assets, common frames | **No** — compose cards from existing reward art unless owner later requests unique illustration |
-| 21 | **Gift Meter milestone ceremony master** | M43-C005 | gift-meter reward crate, gift box, reward assets | **No** |
-| 22 | **Profile screen master** | M43-C010 | robot portraits, profile frames, level/rank assets | **No** |
-| 23 | **Achievements screen master** | M43-C010 | common frames/badges only | **Yes, partly** — see Section B |
-| 24 | **Events Main screen master** | M43-C010 | nav Events icon + common frames only | **Yes** — see Section B |
-| 25 | **Event Detail / Reward master** | M43-C010 | common reward assets; no event visual family exists | **Yes** — share Section B event family |
-| 26 | **Ranks screen master** | M43-C010 | leaderboard nav icon, profile rank badge, robot portraits, common frames | **No mandatory new image asset yet** |
-| 27 | **Comeback / Return Summary master** | M43-C011 | common popup/reward/status assets | **No** |
-| 28 | **Feature Unlock / Coachmark master** | M43-C005 / M44 | tutorial pointer, highlight ring, speech bubble, robot art | **No mandatory new pose until a lesson proves it is needed** |
-| 29 | **World Unlock / Transition ceremony master** | M43-C005/C011 | World 01 background and common reward/ceremony assets | **No for World 01**; future world backgrounds are Section B |
-| 30 | **Account / Cloud Sync Conflict custom master** | M43-C012 | cloud-save, save-conflict, warning/refresh icons + common frames | **No** |
-| 31 | **Generic Reward / Confirmation master** | M43-C002 | popup reward/confirmation frames + reward assets | **No** |
-| 32 | **Generic Error / Offline / Loading state master** | M43-C002/C013 | offline, connection-lost, warning, refresh, maintenance icons + common frames | **No** |
-| 33 | **Notification Education / Settings custom master** | M43-C011 | notification icons, settings/navigation assets, common frames | **No** |
+| 1 | **Fail / Retry popup master** | M43-C004 | failure/Heart/common popup assets | No |
+| 2 | **Booster Acquire popup master** | M43-C003 | four final booster icons + popup/button frames | No |
+| 3 | **2x Acquire popup master** | M43-C003 | existing 2x/shop/common popup assets | No |
+| 4 | **Shop full-screen master** | M43-C006 | `assets/ui/final/shop/*` + HUD/currency family | No |
+| 5 | **Collection Album master** | M43-C007 | 135 cards + rarity/state/panel assets | No |
+| 6 | **Collection Set Detail master** | M43-C007 | set frame/navigation + cards | No |
+| 7 | **Card Detail popup master** | M43-C007 | card art + rarity/common popup assets | No |
+| 8 | **Cards Exchange master** | M43-C007 | `assets/ui/final/cards_exchange/*` + Collection cards | No |
+| 9 | **Standard Pack Opening ceremony master** | M43-C005 | pack/card/reward assets | No |
+| 10 | **Premium Pack Opening ceremony master** | M43-C005 | pack/card/reward assets | No |
+| 11 | **Collection Set Complete ceremony master** | M43-C005 | completion emblem + rewards | No |
+| 12 | **Master Collection Complete ceremony master** | M43-C005 | master emblem + rewards | No |
+| 13 | **Robots Main screen master** | M43-C008 | 10-robot families + robot UI assets | No |
+| 14 | **Locked Robot Detail master** | M43-C008 | silhouette/lock/detail/perk assets | No |
+| 15 | **Robot Unlock ceremony master** | M43-C005/C008 | robot art + unlock glow/burst + Bot Parts | No |
+| 16 | **Tasks screen master** | M43-C009 | common panels/progress/reward assets | No |
+| 17 | **Daily screen/popup master + reward-state layout** | M43-C009 | complete Daily family | No |
+| 18 | **Gift Bar master + milestone-card layout** | M43-C009 | Gift Meter/gift/reward/common assets | No |
+| 19 | **Gift Meter milestone ceremony master** | M43-C005 | reward crate/gift/reward assets | No |
+| 20 | **Profile screen master** | M43-C010 | robot portraits/profile/rank assets | No |
+| 21 | **Achievements screen master** | M43-C010 | common frames; new icon family required after definitions lock | **Partly yes** |
+| 22 | **Events Main screen master** | M43-C010 | Events nav + common assets; event family absent | **Yes** |
+| 23 | **Event Detail / Reward master** | M43-C010 | reuse new event family + existing rewards | **Yes, same family** |
+| 24 | **Ranks screen master** | M43-C010 | profile/rank/robot/common assets | No |
+| 25 | **Comeback / Return Summary master** | M43-C011 | common status/reward/popup assets | No |
+| 26 | **Feature Unlock / Tutorial Coachmark visual family** | M43-C005 / M44 | pointer/highlight/speech bubble/robot art | No mandatory new pose unless a real lesson requires it |
 
-## B. Net-new image asset families that really still need to be created
+## B. Net-new standalone image art that is actually justified now
 
-The 33 masters above **do not mean 33 new AI-art batches**.
+Only **two** new art families are proven necessary at the current state:
 
-At the current repository state, only these visual families have a proven need for genuinely new standalone image art rather than composition from existing production components:
+### B1. Achievements iconography
+Create only after the shipping achievement definitions are locked:
+- achievement badge/emblem treatment if existing common badges are insufficient;
+- distinct readable icons for the actual shipping achievement definitions/categories.
 
-### B1. Achievements badge/icon family
+Do not generate a speculative giant badge library.
 
-Required for the shipping Achievements screen once the achievement definitions are owner-locked.
+### B2. Events reusable art family
+Before Events can visually close:
+- event-card family;
+- event-detail/header family;
+- active / ended / claimed / unavailable treatments;
+- approved event hero/theme art only for real shipping events.
 
-Minimum deliverable:
-- reusable achievement badge/emblem frame if the common badge family is insufficient;
-- one distinct readable icon per shipping achievement definition, or a smaller canonical icon family if multiple achievements share categories;
-- locked/completed/progress presentation must remain native/live where possible.
+Reuse existing SB / Bot Parts / Card Pack / Booster rewards. Do not invent an event currency.
 
-Do **not** generate a speculative large icon library before the actual achievement definitions exist.
+## C. Conditional visuals — NOT on the current creation list
 
-### B2. Events reusable visual family
+These become required only after their governing owner/platform decision exists:
 
-`assets/ui/final/events/` currently has no production art.
+- additional world backgrounds beyond approved World 01;
+- world-specific decorative hero art;
+- account/cloud conflict/sign-in custom screens beyond platform-native UI;
+- notification-permission education illustration;
+- any extra tutorial character pose not proven necessary by a real lesson;
+- Friends/social visuals (post-V1 / conditional).
 
-Required minimum before Events can visually close:
-- reusable event-card visual family;
-- reusable event-detail/header visual family;
-- reusable event state treatment for active / ended / claimed / unavailable;
-- event reward presentation that reuses existing SB/Bot Parts/Card Pack/Booster assets;
-- hero/theme illustration only for an event that is actually approved to ship.
+Do not generate these in advance.
 
-Do not invent an event currency or speculative seasonal art library.
+## D. Colony Flow rule
 
-### B3. Future shipping world backgrounds
+Colony Flow screenshots are **not** ScrubBots project assets or canonical references.
 
-World 01 Whispering Park already exists and is approved.
+Repository code/text search at this revision finds no Colony Flow-named/text-matching project content.
 
-For every **additional world that is actually approved to ship**, create:
-- one complete world background/master matching the final Home composition;
-- any world-specific decorative illustration required by that approved world;
-- transition/unlock presentation can otherwise reuse the generic ceremony system.
+The two Additionals references named above are ScrubBots-specific Life / Need-a-Hand mockups, not a reason to store external-game screenshots.
 
-Quantity is intentionally **TBD** until owner-approved world ranges/registry exist. Do not generate unnamed future-world backgrounds in advance.
+Do not commit the Colony Flow screenshots supplied in chat.
 
-## C. Production rule
+## Bottom line
 
-For every item in Section A:
-
-1. first try to build the visual master from the already-promoted ScrubBots assets;
-2. generate new image art only when Section B or a later owner decision proves it is necessary;
-3. dynamic text, prices, timers, counts, ranks, progress, rewards and states stay live in Godot;
-4. full-screen AI mockups are visual masters/references, not flattened shipping UI;
-5. owner visual approval is required before a master is treated as production authority.
-
-## D. External-reference rule
-
-External-game screenshots are not project assets and are not canonical visual references.
-
-In particular:
-- Colony Flow screenshots supplied in chat must **not** be committed to this repository;
-- they must not be added to `assets/art/references/`;
-- they must not be cited as canonical project authority.
-
-A repository search performed when this inventory was authored found no Colony Flow-named content in the repository.
-
-## Snapshot conclusion
-
-- **33** required surface masters/references remain visually unapproved.
-- **30** of those can currently be designed using already-existing ScrubBots production assets and native Godot UI, without a new standalone illustration batch.
-- **3 net-new art families** are currently justified:
-  1. Achievements iconography after definitions;
-  2. Events reusable art family / approved event hero art;
-  3. future shipping-world backgrounds after world definitions.
-
-Anything else should **not** be generated merely “just in case.”
+- **26** visual masters/families still genuinely need visual-production work.
+- **24** can be composed from assets ScrubBots already owns.
+- **2** require net-new standalone art families now: Achievements + Events.
+- Conditional future-world/account/notification/Friends art is explicitly excluded until its owner decision exists.
