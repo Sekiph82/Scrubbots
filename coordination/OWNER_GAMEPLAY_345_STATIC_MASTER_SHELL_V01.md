@@ -221,9 +221,31 @@ Recommended canonical paths:
 
 Preserve historical `scrubbots_gameplay_master.png`; do not overwrite it.
 
-Exact filenames/hashes are locked in Section 1. If any exact file cannot be found from the owner-approved source, stop and report `OWNER_ASSET_REQUIRED`. Do not regenerate or substitute.
+Exact filenames/hashes are locked in Section 1. The owner may provide these assets either under their original owner filenames OR already renamed to the canonical repository filenames above.
 
-The six exact files are also persisted in the user's ChatGPT Library under `/ScrubBots/Gameplay Masters/` as a preservation copy. Runtime implementation still requires committing them into the repository.
+Acceptance is based on:
+1. exact locked SHA-256;
+2. exact 887×1774 RGBA dimensions;
+3. correct 5-slot/6-slot × 3/4/5 mapping.
+
+Filename alone is not authority.
+
+If any exact file cannot be found from the owner-approved source, stop and report `OWNER_ASSET_REQUIRED`. Do not regenerate or substitute.
+
+The six exact files are also persisted in the user's ChatGPT Library under `/ScrubBots/Gameplay Masters/` as a preservation copy.
+
+A convenience package also exists:
+`ScrubBots_Gameplay_V02_Canonical_Masters.zip`
+
+That package uses the canonical repository filenames:
+- `gameplay_v02_shell_5slot_3col.png`
+- `gameplay_v02_shell_5slot_4col.png`
+- `gameplay_v02_shell_5slot_5col.png`
+- `gameplay_v02_shell_6slot_3col.png`
+- `gameplay_v02_shell_6slot_4col.png`
+- `gameplay_v02_shell_6slot_5col.png`
+
+Runtime implementation still requires committing the exact bytes into the repository.
 
 Search only authorized project/reference locations; do not create extra Desktop project copies.
 

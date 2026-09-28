@@ -28,15 +28,32 @@ Do NOT edit root `TASKS.md`.
 
 Find and copy byte-preserving all six exact owner files.
 
+They may exist under either the original owner filenames OR the canonical filenames.
+
 ### Five-slot normal masters
+Original owner names:
 - `3 lu renk secim alani.png`
 - `4lu renk secim alani.png`
 - `5li renk secim alani.png`
 
+Canonical names:
+- `gameplay_v02_shell_5slot_3col.png`
+- `gameplay_v02_shell_5slot_4col.png`
+- `gameplay_v02_shell_5slot_5col.png`
+
 ### Six-slot +1 Slot masters
+Original owner names:
 - `6 li slot 3 renk-batch sistemi.png`
 - `6 li slot 4 renk-batch sistemi.png`
 - `6 li slot 5 renk-batch sistemi.png`
+
+Canonical names:
+- `gameplay_v02_shell_6slot_3col.png`
+- `gameplay_v02_shell_6slot_4col.png`
+- `gameplay_v02_shell_6slot_5col.png`
+
+**Do not reject a canonical-named file merely because its original owner filename is absent.**
+The locked SHA-256 + dimensions + mapping are the authority.
 
 Expected dimensions: 887×1774 RGBA for all six.
 
@@ -55,6 +72,8 @@ Canonical repo destinations:
 Record source filename, dimensions and SHA-256 and verify exact match before binding.
 
 Preserve historical `scrubbots_gameplay_master.png`.
+
+If the owner has extracted `ScrubBots_Gameplay_V02_Canonical_Masters.zip` into an authorized reference folder, accept those canonical-named PNGs after hash verification.
 
 If any exact master is missing or hash-mismatched:
 - do not substitute;
