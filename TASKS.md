@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M28-C002-C002 3/4/5 Static Master Shell Production Binding
-- Current Task: Bind six owner-approved static gameplay masters: 5-slot 3/4/5 shells for normal play and matching 6-slot 3/4/5 shells whenever +1 Slot is active
-- Current Task Status: OWNER_ASSET_HANDOFF_REQUIRED
-- Next Task/Action: OWNER extracts `ScrubBots_Gameplay_V02_Canonical_Masters.zip` into an authorized Claude-visible reference folder (recommended `C:\Users\sekip\Desktop\ScrubBots Gorselleri\Game Screens\`). Then CLAUDE resumes the same C002 prompt, verifies all six locked hashes and completes implementation.
-- Required Actor: OWNER -> CLAUDE
+- Current Sprint: M28-C002-C002 Static Master Shell — Owner Visual Gate
+- Current Task: Owner reviews the technically accepted six-shell Gameplay V02 implementation and resolves S1-S6 visual/UX choices
+- Current Task Status: OWNER_REQUIRED
+- Next Task/Action: OWNER resolves `coordination/sessions/M28-C002-C002/OWNER_STATIC_SHELL_VISUAL_GATE_V01.md`. ChatGPT records the decisions, updates TASKS.md, then opens the remaining Gameplay V02 dependency cycle.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 912 / 1355 = 67.31%. Gameplay V02 C001 technical core accepted; C002 static 3/4/5 master-shell convergence is active.
-- Note: All six exact master PNGs are preserved in ChatGPT Library and bundled as `ScrubBots_Gameplay_V02_Canonical_Masters.zip` using canonical repo filenames. Claude cannot access ChatGPT Library directly; owner must extract the package once into an authorized local reference path. Prompt now accepts canonical filenames by hash, so no rename-back is required.
-- Owner sequencing lock: stay on M28 Gameplay Screen V02. First complete C002 static 3/4/5 master-shell binding and owner review; then resolve remaining popup/modal dependencies.
+- Note: M28-C002-C002 technical audit PASS at `0044349`. All six owner masters are byte-locked and production-bound; 5↔6 shell switching, 3/4/5 supply alignment, board/rail/agent alignment and responsive transform are accepted technically. Owner visual choices S1-S6 remain.
+- Owner sequencing lock: stay on M28 Gameplay Screen V02. Resolve C002 owner visual gate, then implement remaining Pause/Booster/2x/modal dependencies before final M28-C002 owner playtest.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1263,7 +1263,7 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 #### M28-C002 - Gameplay Screen V02 Production Convergence [PLANNED / REQUIRED BEFORE FINAL META-UI INTEGRATION]
 
-**M28-C002-C001 core audit:** AUDITED_PASS at `202e06c`. Owner superseded the native-redraw approach with a six-master static-shell matrix: normal 5-slot × 3/4/5 Batch Supply plus +1 Slot 6-slot × 3/4/5. Active convergence: M28-C002-C002. Previous C001 native redraw remains historical implementation evidence, not final visual architecture.
+**M28-C002-C002 static-shell audit:** AUDITED_PASS at `0044349`. Six-master matrix (5/6 slots × 3/4/5 supply columns), reference transform, 5↔6 switching and live-overlay alignment are technically accepted. Owner visual gate S1-S6 is active. Rows 012-015/018(part)/019/020 remain dependency/final-gate work.
 
 Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master visual into the actual shipping gameplay screen. Historical M28 closure remains historical; this sprint closes the later V02 delta without falsifying earlier evidence.
 
