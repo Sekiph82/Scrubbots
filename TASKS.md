@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M43-C003-C001 Acquisition — Owner Visual / UX Gate
-- Current Task: Owner reviews the technically accepted Life / Booster / 2x / Shop-handoff acquisition family and resolves A1/B1/C1/D1/E1/F1
-- Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER resolves `coordination/sessions/M43-C003-C001/OWNER_ACQUISITION_GATE_V01.md`. ChatGPT records acceptance/remediation; if approved, SB-M43-049 closes and sequencing returns to M28-C002 popup-inclusive final evidence/playtest.
-- Required Actor: OWNER
+- Current Sprint: M28-C002 Gameplay V02 — Popup-Inclusive Final Evidence / Playtest
+- Current Task: Produce and validate the final popup-inclusive Gameplay V02 evidence/playtest now that M43-C002 and M43-C003 dependencies are closed
+- Current Task Status: READY_FOR_NEXT_IMPLEMENTATION_CYCLE
+- Next Task/Action: ChatGPT opens the M28-C002 popup-inclusive final evidence/playtest cycle using the accepted Pause/modal and Life/Booster/2x acquisition surfaces.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 950 / 1355 = 70.11%. M43-C003 SB-M43-030..048 are technically accepted; only the acquisition visual/UX owner gate (SB-M43-049) remains.
-- Note: M43-C003-C001 independent audit PASS at `58899a2` for SB-M43-030..048. Rewarded-video remains limited to +1 Heart + four Boosters, production provider defaults unavailable until M57, no rewarded 2x, Heart regen remains 900 s / 15 min. Owner gate also resolves Selector/Tornado target-picker UX and last-Heart Restart semantics.
-- Owner sequencing lock: resolve M43-C003 owner gate; if accepted, close M43-C003 then return to M28-C002 popup-inclusive final evidence/playtest before proceeding further.
+- Progress: 951 / 1355 = 70.18%. M43-C003 is technically and owner-accepted; acquisition visual/UX gate is closed.
+- Note: M43-C003-C001 independent audit PASS at `58899a2`; owner gate approved A1-KEEP / B1-POPUP / C1-KEEP / D1-OK / E1-OK / F1-GATE. Rewarded-video remains limited to +1 Heart + four Boosters; no rewarded 2x; Heart regen remains 900 s / 15 min.
+- Owner sequencing lock: M43-C003 is closed. Return to M28-C002 popup-inclusive final evidence/playtest before proceeding further.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1684,7 +1684,7 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 - [x] SB-M43-046 2x popup shows existing entitlement/time remaining and never charges again for switching 1x/2x while entitlement is active.
 - [x] SB-M43-047 Free M23-supply-exhausted auto-2x never opens purchase UI and never consumes/extends paid entitlement.
 - [x] SB-M43-048 All acquisition surfaces survive insufficient balance, rapid taps, background/resume, ad unavailable and transaction retry without double spend/grant.
-- [ ] SB-M43-049 Produce/owner-approve visual masters for Booster Acquire, 2x Acquire and insufficient-SB/Shop handoff states in the canonical popup family.
+- [x] SB-M43-049 Produce/owner-approve visual masters for Booster Acquire, 2x Acquire and insufficient-SB/Shop handoff states in the canonical popup family. — OWNER VISUAL/UX PASS 2026-09-28.
 
 #### M43-C004 - Fail / Retry / Need a Hand Recovery
 
