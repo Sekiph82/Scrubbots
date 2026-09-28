@@ -62,6 +62,8 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	load_result = save.load()
 	is_blocked = not bool(load_result.get("ok", false)) and String(load_result.get("source", "")) == "future_schema"
 	actions = ProductionActionFacade.new(economy, null, Callable(self, "request_save"))
+	# M43-C003: a committed rewarded grant hits the canonical save boundary.
+	economy.rewarded.bind_save(Callable(self, "request_save"))
 
 ## True when the app must not proceed to gameplay against fresh defaults
 ## (F-M40-V02-002/-008: future/unsupported schema case).

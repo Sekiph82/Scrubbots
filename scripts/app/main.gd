@@ -23,6 +23,8 @@ const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
 const OpeningScreen = preload("res://scripts/app/opening_screen.gd")
 const LaunchSession = preload("res://scripts/app/launch_session.gd")
 const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
+const AcquisitionFlow = preload("res://scripts/ui/popup/acquisition_flow.gd")
+const ShopHandoff = preload("res://scripts/app/shop_handoff.gd")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -49,6 +51,9 @@ var _results = null
 var _opening = null
 ## M43-C002 (SB-M43-016): the ONE app-level ModalStack, above Home / gameplay / Results.
 var _modals = null
+## M43-C003: the ONE Shop handoff + acquisition flow (Life / Booster / Shop), app-level.
+var shop = null
+var _acq = null
 
 func _enter_tree() -> void:
 	_boot()
@@ -77,8 +82,19 @@ func _ready() -> void:
 	_results.continue_requested.connect(continue_from_results)
 	_results.retry_requested.connect(retry_from_results)
 	_build_settings_entry()
-	# Home hides its action layer while any stacked popup owns input (existing seam).
-	_modals.modal_changed.connect(func(active): _home.set_modal_active("modal_stack", active))
+	# Home hides its action layer while any stacked popup owns input (existing seam);
+	# closing the last popup re-reads live values (a purchase may have changed them).
+	_modals.modal_changed.connect(func(active):
+		_home.set_modal_active("modal_stack", active)
+		if not active and _home.visible:
+			_home.refresh())
+	shop = ShopHandoff.new()
+	_acq = AcquisitionFlow.new()
+	if app_state != null and app_state.economy != null:
+		_acq.bind(_modals, app_state.economy, app_state.actions, shop)
+	# SB-M43-032 / 036: Home Heart + -> canonical Life; Home SB + -> canonical Shop intent.
+	_home.hearts_purchase_requested.connect(func(): open_life("home_heart_plus"))
+	_home.scrub_bucks_purchase_requested.connect(func(): _acq.open_shop({"source": "home_sb_plus"}))
 	nav.route_changed.connect(_on_route_changed)
 	if _should_play_opening():
 		_start_opening()
@@ -205,6 +221,7 @@ func launch_gameplay(parent: Node = null) -> Dictionary:
 	host.name = "GameplayHost"
 	host.app_state = app_state
 	host.modal_stack = _modals
+	host.acquisition = _acq
 	host.home_requested.connect(_on_gameplay_home_requested.bind(host))
 	host.auto_build = false
 	host.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -240,6 +257,8 @@ func play_current_frontier() -> Dictionary:
 	# transition in flight); otherwise nothing is built.
 	if not nav.can_go(NavigationController.Route.GAMEPLAY) or nav.current() != NavigationController.Route.HOME:
 		return {"ok": false, "reason": "not_home"}
+	if _zero_heart_gate("attempt_gate"):
+		return {"ok": false, "reason": "no_hearts"}
 	var r := launch_gameplay()
 	if r.get("ok", false):
 		nav.go(NavigationController.Route.GAMEPLAY, {"level": r["launch"]["level"], "entry_id": r["launch"]["entry_id"]})
@@ -274,6 +293,9 @@ func continue_from_results(attempt: int = -1) -> Dictionary:
 	if not GameplayLaunchResolver.resolve(app_state).get("ok", false):
 		_results.show_model(_results_model(shown))
 		return {"ok": false, "reason": "no_next_content"}
+	if _zero_heart_gate("attempt_gate"):
+		_results.show_model(_results.get_model())   # re-arm Continue
+		return {"ok": false, "reason": "no_hearts"}
 	var r := launch_gameplay()
 	if r.get("ok", false):
 		nav.go(NavigationController.Route.GAMEPLAY, {"level": r["launch"]["level"], "entry_id": r["launch"]["entry_id"]})
@@ -291,6 +313,8 @@ func continue_from_results(attempt: int = -1) -> Dictionary:
 func retry_from_results() -> bool:
 	if nav.current() != NavigationController.Route.RESULTS or _gameplay_host == null:
 		return false
+	if _zero_heart_gate("attempt_gate"):
+		return false
 	if not _gameplay_host.retry():
 		return false
 	return nav.resume_gameplay_after_retry()
@@ -300,6 +324,21 @@ func get_results_screen():
 
 func get_modal_stack():
 	return _modals
+
+func get_acquisition():
+	return _acq
+
+## SB-M43-032: the ONE Life surface (Home Heart + and every zero-Heart attempt gate).
+func open_life(source: String):
+	return _acq.open_life(source) if _acq != null else null
+
+## Zero-Heart attempt gate: a new attempt needs >= 1 Heart (HeartService truth). With none,
+## the canonical Life popup opens and nothing launches. Returns true when gated.
+func _zero_heart_gate(source: String) -> bool:
+	if app_state == null or app_state.economy == null or app_state.economy.hearts.hearts() > 0:
+		return false
+	open_life(source)
+	return true
 
 ## Pause -> Home confirmed by the CURRENT host (which already applied the owner
 ## pre-/post-action exit law). GAMEPLAY -> HOME releases the host.

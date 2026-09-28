@@ -24,6 +24,7 @@ const DailyService = preload("res://scripts/economy/daily_service.gd")
 const CollectionInventory = preload("res://scripts/collection/collection_inventory.gd")
 const CardPackService = preload("res://scripts/collection/card_pack_service.gd")
 const CardsExchangeService = preload("res://scripts/economy/cards_exchange_service.gd")
+const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
 
 const GUARANTEED_NEW_FALLBACK_SB := 500
 
@@ -42,6 +43,8 @@ var daily: DailyService
 var collection: CollectionInventory
 var packs: CardPackService
 var exchange: CardsExchangeService
+## M43-C003 rewarded-video grants (provider-neutral; production provider = unavailable).
+var rewarded: RewardedGrantService
 
 ## local_day: Daily local-calendar ordinal provider (M39 V04, F-M39-V03-002).
 ## Omitted in production -> DailyService uses LocalCalendar.system_provider().
@@ -61,6 +64,7 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	packs = CardPackService.new(collection, pack_rng)
 	exchange = CardsExchangeService.new(collection, reward, config)
 	streak = WinStreakService.new(reward, gift)
+	rewarded = RewardedGrantService.new(reward, hearts)
 	_register_handlers()
 
 func _register_handlers() -> void:
@@ -87,6 +91,15 @@ func _register_handlers() -> void:
 	# guaranteed_new_cards handler only when no card is available, so we never
 	# double-grant it.
 	reward.register_handler("guaranteed_new_fallback_sb", func(_n): pass)
+	# M43-C003 rewarded grants (RewardedGrantService is the only caller; it pre-checks
+	# Heart fullness, so grant_one never has to fail here).
+	reward.register_handler(RewardedGrantService.RES_HEART, func(n):
+		for _i in range(n):
+			hearts.grant_one())
+	for b in BoosterInventory.BOOSTERS:
+		var id: String = b
+		reward.register_handler(RewardedGrantService.RES_BOOSTER_PREFIX + id, func(n):
+			boosters.add_charges(id, n))
 
 ## M55-C001 (SB-M55-010): release a graph that is being discarded. The reward handlers
 ## (registered above and RewardGrantService's own defaults) are lambdas that capture

@@ -1,87 +1,101 @@
-extends PanelContainer
+extends "res://scripts/ui/popup/base_popup.gd"
 ## SpeedAcquisitionPopup — preload (res://scripts/ui/speed_acquisition_popup.gd).
 ##
-## M52-C001-R01 FUNCTIONAL production 2x acquisition UI (live Godot Controls). Opened when
-## the player presses the 2x control without a manual 2x entitlement, so the control never
-## silently does nothing (OWNER_PARALLEL_SLOT_DISPATCH_AND_DEPARTURE_COUNT_V01 §6).
-## Presentation only: it lists the canonical Economy V1 offers it is given and emits the
-## player's choice; the host performs the purchase through ProductionActionFacade and
-## reports the outcome back via show_status(). Final art/layout is PENDING the M43 visual
-## master/polish — this is intentionally plain.
+## M43-C003 (SB-M43-045/046) canonical 2x Acquire popup. Converged into the M43-C002
+## BasePopup / ModalStack family (replaces the M52-C001-R01 plain PanelContainer; no
+## parallel modal). Presentation only: shows the live Economy V1 offers, balance and
+## entitlement state it is given and emits offer_chosen(kind, seconds); the gameplay host
+## purchases through ProductionActionFacade and reports back via show_status()/refresh().
+## Exactly the four paid products (current level / 15m / 30m / 60m). No rewarded 2x.
 
 signal offer_chosen(kind: String, seconds: int)
 signal cancelled
 
-var _status: Label
-var _offer_box: VBoxContainer
-var _buttons: Dictionary = {}   # offer key -> Button
-var _cancel: Button
+const SPEED_ART := "res://assets/ui/final/shop/shop_speed_2x_icon.png"
+
+var _offers: Array = []
 
 func _init() -> void:
-	name = "SpeedAcquisitionPopup"
-	visible = false
-	mouse_filter = Control.MOUSE_FILTER_STOP
+	super("speed_acquire")
+	set_frame("medium")
+	set_title(UiText.t("SPEED_TITLE"))
+	var row := HBoxContainer.new()
+	row.name = "Summary"
+	row.add_theme_constant_override("separation", UiTokens.SPACE_MD)
+	get_content().add_child(row)
+	var icon := HomeStyle.art("SpeedIcon")
+	icon.texture = load(SPEED_ART)
+	icon.custom_minimum_size = Vector2(150, 150)
+	row.add_child(icon)
 	var col := VBoxContainer.new()
-	col.add_theme_constant_override("separation", 8)
-	add_child(col)
-	var title := Label.new()
-	title.name = "Title"
-	title.text = "2x SPEED"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	col.add_child(title)
-	_offer_box = VBoxContainer.new()
-	_offer_box.name = "Offers"
-	col.add_child(_offer_box)
-	_status = Label.new()
-	_status.name = "Status"
-	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_status.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
-	col.add_child(_status)
-	_cancel = Button.new()
-	_cancel.name = "Cancel"
-	_cancel.text = "Cancel"
-	_cancel.pressed.connect(_on_cancel)
-	col.add_child(_cancel)
+	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(col)
+	for n in ["Entitlement", "Balance"]:
+		var l := body_label("", UiTokens.FONT_BODY)
+		l.name = n
+		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+		col.add_child(l)
+	add_body_line(UiText.t("SPEED_EXPLAIN"), "Explain", INK, 26)
+	add_body_line("", "Status")
+	action_selected.connect(_on_selected)
+	closed.connect(func(r):
+		if not String(r).begins_with("action:offer") and r != "purchased":
+			cancelled.emit())
 
-## offers: Array of {key, kind ("level"|"timed"), seconds, label, price_sb}.
-func open(offers: Array, scrub_bucks: int) -> void:
-	for c in _offer_box.get_children():
-		c.queue_free()
-	_buttons.clear()
-	for o in offers:
-		var b := Button.new()
-		b.name = "Offer_%s" % o["key"]
-		b.text = "%s — %d SB" % [o["label"], int(o["price_sb"])]
-		var kind: String = o["kind"]
-		var seconds: int = int(o["seconds"])
-		b.pressed.connect(func(): offer_chosen.emit(kind, seconds))
-		_offer_box.add_child(b)
-		_buttons[o["key"]] = b
-	_status.text = "Scrub Bucks: %d" % scrub_bucks
-	visible = true
-	_center()
+## offers: [{key, kind ("level"|"timed"), seconds, label, price_sb}] (canonical config).
+## state: {scrub_bucks, level_active, timed_remaining}
+func open(offers: Array, state: Dictionary) -> void:
+	if _offers.is_empty():
+		_offers = offers.duplicate(true)
+		for i in range(_offers.size()):
+			var o: Dictionary = _offers[i]
+			add_action(String(o["key"]), "", "offer", false, "r%d" % (i / 2))
+		add_action("cancel", UiText.t("CONFIRM_CANCEL"), "secondary", true)
+	refresh(state)
+
+func refresh(state: Dictionary) -> void:
+	var level_active := bool(state.get("level_active", false))
+	var rem := int(state.get("timed_remaining", 0))
+	var ent := UiText.t("SPEED_NONE")
+	if rem > 0:
+		ent = UiText.t("SPEED_TIMED_ACTIVE", [_hms(rem)])
+	elif level_active:
+		ent = UiText.t("SPEED_LEVEL_ACTIVE")
+	(find_child("Entitlement", true, false) as Label).text = ent
+	(find_child("Balance", true, false) as Label).text = UiText.t("ACQ_BALANCE", [UiText.num(int(state.get("scrub_bucks", 0)))])
+	for o in _offers:
+		var b: Button = get_action_button(String(o["key"]))
+		var active: bool = o["kind"] == "level" and level_active
+		# While timed 2x runs, a timed purchase EXTENDS it (SpeedEntitlementService).
+		var label: String = ("+" + String(o["label"])) if o["kind"] == "timed" and rem > 0 else String(o["label"])
+		b.text = UiText.t("SPEED_OFFER_ACTIVE", [label]) if active else UiText.t("SPEED_OFFER", [label, UiText.num(int(o["price_sb"]))])
+		# An already-owned current-level entitlement is never offered again.
+		set_action_blocked(String(o["key"]), active)
 
 func show_status(text: String) -> void:
-	_status.text = text
+	(find_child("Status", true, false) as Label).text = text
 
 func get_status_text() -> String:
-	return _status.text
+	return (find_child("Status", true, false) as Label).text
 
 func get_offer_button(key: String) -> Button:
-	return _buttons.get(key, null)
+	return get_action_button(key)
 
 func get_cancel_button() -> Button:
-	return _cancel
+	return get_action_button("cancel")
 
-func close() -> void:
-	visible = false
+func get_offer_keys() -> Array:
+	return _offers.map(func(o): return String(o["key"]))
 
-func _on_cancel() -> void:
-	close()
-	cancelled.emit()
+func _on_selected(id: String, _ctx: Dictionary) -> void:
+	for o in _offers:
+		if String(o["key"]) == id:
+			offer_chosen.emit(String(o["kind"]), int(o["seconds"]))
+			return
 
-func _center() -> void:
-	var p := get_parent()
-	if p is Control:
-		reset_size()
-		position = ((p as Control).size - size) * 0.5
+static func _hms(seconds: int) -> String:
+	var s := maxi(seconds, 0)
+	if s >= 3600:
+		return "%d:%02d:%02d" % [s / 3600, (s % 3600) / 60, s % 60]
+	return "%02d:%02d" % [s / 60, s % 60]
