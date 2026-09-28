@@ -396,9 +396,10 @@ func _pause_2x_boxes() -> void:
 	var s = _screen()
 	_ok(_near(s.get_pause_rect(), s.ref_rect_to_global(Shell.rect(Shell.PAUSE)), _tol()) and _near(s.get_speed_control_rect(), s.ref_rect_to_global(Shell.rect(Shell.SPEED)), _tol()), "Pause / 2x hit areas = baked boxes")
 	_ok(s.get_pause_rect().size.y >= UiTokens.TOUCH_MIN and s.get_speed_control_rect().size.y >= UiTokens.TOUCH_MIN, "Pause / 2x >= touch minimum")
+	# M43-C002 migration: Pause opens the canonical Pause popup; Resume resumes.
 	s.get_pause_button().pressed.emit()
-	_ok(_host.get_runtime().is_user_paused() and s.is_paused_visual(), "Pause keeps runtime pause behaviour")
-	s.get_pause_button().pressed.emit()
+	_ok(_host.get_runtime().is_user_paused() and s.is_paused_visual() and _host.get_pause_popup() != null, "Pause opens the Pause popup (runtime paused)")
+	_host.get_pause_popup().get_action_button("resume").pressed.emit()
 	_ok(not _host.get_runtime().is_user_paused(), "resume")
 	_complete("pause_2x_boxes")
 
