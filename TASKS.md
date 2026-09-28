@@ -7,13 +7,13 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
 - Current Sprint: M28-C002-C002 3/4/5 Static Master Shell Production Binding
 - Current Task: Bind six owner-approved static gameplay masters: 5-slot 3/4/5 shells for normal play and matching 6-slot 3/4/5 shells whenever +1 Slot is active
-- Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M28-C002-C002/task_prompts/SB-M28-C002-C002_STATIC_MASTER_SHELL.md`; ChatGPT audits. Exact owner files must be copied from authorized local reference sources; no regeneration/substitution.
-- Required Actor: CLAUDE
+- Current Task Status: OWNER_ASSET_HANDOFF_REQUIRED
+- Next Task/Action: OWNER extracts `ScrubBots_Gameplay_V02_Canonical_Masters.zip` into an authorized Claude-visible reference folder (recommended `C:\Users\sekip\Desktop\ScrubBots Gorselleri\Game Screens\`). Then CLAUDE resumes the same C002 prompt, verifies all six locked hashes and completes implementation.
+- Required Actor: OWNER -> CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 912 / 1355 = 67.31%. Gameplay V02 C001 technical core accepted; C002 static 3/4/5 master-shell convergence is active.
-- Note: Owner additionally approved exact 6-slot 3/4/5 masters for +1 Slot. +1 Slot no longer draws a dynamic sixth slot/connector; runtime switches to the matching six-slot shell, then back to five-slot shell on reset/retry. All six assets are preserved in ChatGPT Library `/ScrubBots/Gameplay Masters/` and must be committed byte-exact into the repo by Claude.
+- Note: All six exact master PNGs are preserved in ChatGPT Library and bundled as `ScrubBots_Gameplay_V02_Canonical_Masters.zip` using canonical repo filenames. Claude cannot access ChatGPT Library directly; owner must extract the package once into an authorized local reference path. Prompt now accepts canonical filenames by hash, so no rename-back is required.
 - Owner sequencing lock: stay on M28 Gameplay Screen V02. First complete C002 static 3/4/5 master-shell binding and owner review; then resolve remaining popup/modal dependencies.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
