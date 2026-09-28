@@ -137,6 +137,8 @@ func _results_model(payload: Dictionary) -> Dictionary:
 	var launch := GameplayLaunchResolver.resolve(app_state)
 	m["continue"] = {"available": bool(launch.get("ok", false)), "reason": String(launch.get("reason", "")),
 		"next_level": int(launch.get("level", 0))}
+	# M43-C001B: presentation-only Reduced Effects flag (canonical settings service).
+	m["reduced_effects"] = app_state != null and app_state.effects != null and app_state.effects.is_reduced()
 	return m
 
 func get_home():
