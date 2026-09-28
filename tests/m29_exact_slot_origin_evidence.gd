@@ -42,6 +42,7 @@ func _run() -> void:
 
 	# §1 exact mapping at 1080x2160: provider == strip anchor mapped through presentation.
 	var origins_1080: Array = []
+	var anchors_1080: Array = []
 	var all_below := true
 	var any_diff_from_synthetic := false
 	var w: float = float(board.get_width())
@@ -50,6 +51,7 @@ func _run() -> void:
 		var expected: Vector2 = pres.global_to_board_local(strip.get_slot_anchor_global(i))
 		var got: Vector2 = provider.origin_for_slot(i)
 		origins_1080.append(got)
+		anchors_1080.append(strip.get_slot_anchor_global(i))
 		_ok(got.is_equal_approx(expected), "slot %d origin == visible top-center mapping at 1080x2160 (%s == %s)" % [i, got, expected])
 		if not (is_finite(got.x) and is_finite(got.y)) or got.y <= h:
 			all_below = false
@@ -67,12 +69,17 @@ func _run() -> void:
 	screen.relayout()
 	await process_frame
 	await process_frame
+	# M28-C002-C002 static master shell: board and slots share ONE uniform transform, so a
+	# slot origin in board-local cell units is (correctly) size-invariant. "No stale cached
+	# screen coordinate" is proven by the on-screen anchors MOVING while the provider keeps
+	# returning the live remapped value.
 	var moved := false
 	for i in range(SLOT_COUNT):
-		var expected2: Vector2 = pres.global_to_board_local(strip.get_slot_anchor_global(i))
+		var anchor2: Vector2 = strip.get_slot_anchor_global(i)
+		var expected2: Vector2 = pres.global_to_board_local(anchor2)
 		var got2: Vector2 = provider.origin_for_slot(i)
 		_ok(got2.is_equal_approx(expected2), "slot %d origin tracks the visible mapping after relayout (%s)" % [i, got2])
-		if not got2.is_equal_approx(origins_1080[i]):
+		if not anchor2.is_equal_approx(anchors_1080[i]):
 			moved = true
 	_ok(moved, "origins updated after responsive viewport/layout change (no stale cached screen coordinate)")
 

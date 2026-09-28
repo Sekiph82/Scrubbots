@@ -33,8 +33,11 @@ var _swatch: ColorRect
 var _remaining_label: Label
 var _state_label: Label
 
+var _shell := false
+
 func _ready() -> void:
-	custom_minimum_size = Vector2(UiTokens.BATCH_SLOT_MIN, UiTokens.BATCH_SLOT_MIN)
+	if not _shell:
+		custom_minimum_size = Vector2(UiTokens.BATCH_SLOT_MIN, UiTokens.BATCH_SLOT_MIN)
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if _swatch == null:
 		_build_children()
@@ -76,9 +79,25 @@ func bind_snapshot(snapshot: Dictionary, color: Color = Color(1, 0, 1, 1)) -> vo
 		_build_children()
 	_refresh()
 
+## M28-C002-C002 static master shell: the slot FRAME is baked into the shell art, so this
+## view draws no frame chrome — an EMPTY slot is fully transparent and an occupied slot
+## shows only its live batch colour fill, waiting count and state.
+func set_shell_mode(on: bool) -> void:
+	_shell = on
+	if on:
+		custom_minimum_size = Vector2.ZERO
+	if _swatch != null:
+		_refresh()
+
+func is_shell_mode() -> bool:
+	return _shell
+
 func _refresh() -> void:
 	var state: String = str(_snapshot.get("state", EMPTY))
 	var occupied: bool = bool(_snapshot.get("occupied", false)) and state != EMPTY
+	if _shell:
+		_refresh_shell(state, occupied)
+		return
 	if not occupied:
 		_swatch.color = Color(0, 0, 0, 0)
 		_remaining_label.text = ""
@@ -98,6 +117,27 @@ func _refresh() -> void:
 	_state_label.text = state
 	var edge := _ACTIVE_EDGE if state == ACTIVE else _WAITING_EDGE
 	_set_panel_bg(_OCC_BG, edge, state == ACTIVE)
+
+func _refresh_shell(state: String, occupied: bool) -> void:
+	_swatch.visible = false
+	if not occupied:
+		_swatch.color = Color(0, 0, 0, 0)
+		_remaining_label.text = ""
+		_state_label.text = ""
+		add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+		return
+	_swatch.color = _color
+	var capacity: int = maxi(int(_snapshot.get("remaining_to_clear", 0)) - int(_snapshot.get("committed", 0)), 0)
+	_remaining_label.text = "%d" % capacity
+	_state_label.text = state
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = _color
+	sb.set_corner_radius_all(UiTokens.RADIUS_SM)
+	sb.anti_aliasing = true
+	if state == ACTIVE:
+		sb.set_border_width_all(3)
+		sb.border_color = _ACTIVE_EDGE
+	add_theme_stylebox_override("panel", sb)
 
 ## V02 empty execution slot: native rendition of the approved slot_empty design (deep navy
 ## well, light rim). The slot_*.png sources carry an opaque white background, so they

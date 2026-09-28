@@ -52,9 +52,38 @@ var _pending_is_touch := false
 var _pending_touch_index: int = -1
 var _last_touch_msec: int = -100000
 
+## M28-C002-C002 static master shell mode: the panel is placed exactly over the baked
+## Batch Supply cell grid; columns/rows become equal cells separated by the baked gaps, so
+## every tile (and every front hitbox) coincides with a baked cell interior. Tiles draw no
+## frame chrome — only the live batch colour, count and front/preview state.
+var _shell_mode := false
+var _gap := Vector2(UiTokens.SPACE_SM, UiTokens.SPACE_XS)
+
 func _ready() -> void:
-	add_theme_constant_override("separation", UiTokens.SPACE_SM)
-	custom_minimum_size.x = maxf(custom_minimum_size.x, UiTokens.SUPPLY_PANEL_MIN_WIDTH)
+	add_theme_constant_override("separation", int(_gap.x))
+	if not _shell_mode:
+		custom_minimum_size.x = maxf(custom_minimum_size.x, UiTokens.SUPPLY_PANEL_MIN_WIDTH)
+
+func set_shell_grid(gap: Vector2) -> void:
+	_shell_mode = true
+	_gap = gap
+	custom_minimum_size = Vector2.ZERO
+	add_theme_constant_override("separation", int(round(gap.x)))
+	for col in _columns:
+		_apply_shell_column(col["root"])
+		for r in col["rows"]:
+			_apply_shell_row(r["panel"], r["count"], r["front"])
+
+func is_shell_mode() -> bool:
+	return _shell_mode
+
+func _apply_shell_column(col: VBoxContainer) -> void:
+	col.add_theme_constant_override("separation", int(round(_gap.y)))
+
+func _apply_shell_row(panel: PanelContainer, count: Label, front: bool) -> void:
+	panel.custom_minimum_size = Vector2.ZERO
+	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	count.add_theme_font_size_override("font_size", 38 if front else 32)
 
 ## Bind detached player snapshot. `column_snapshots` is clamped to [3,5] columns;
 ## `colors` maps color_id -> Color. Rebuilds column widgets when the column count
@@ -91,6 +120,10 @@ func _rebuild_columns(n: int) -> void:
 		var rows: Array = []
 		for r in range(VISIBLE_ROWS):
 			rows.append(_make_row(col, r == 0))
+		if _shell_mode:
+			_apply_shell_column(col)
+			for row in rows:
+				_apply_shell_row(row["panel"], row["count"], row["front"])
 		_columns.append({"root": col, "rows": rows})
 		_front_panels.append(rows[0]["panel"])
 		_front_enabled.append(false)
@@ -215,6 +248,9 @@ func _bind_row(row: Dictionary, batch, front: bool, colors: Array) -> void:
 	sb.set_corner_radius_all(UiTokens.RADIUS_MD)
 	sb.set_content_margin_all(UiTokens.SPACE_XS)
 	sb.anti_aliasing = true
+	if _shell_mode:
+		_bind_shell_row(panel, swatch, count, batch, front, colors)
+		return
 	if batch == null or not (batch is Dictionary):
 		# Clean empty / end-of-column tile.
 		swatch.color = Color(0, 0, 0, 0)
@@ -244,6 +280,32 @@ func _bind_row(row: Dictionary, batch, front: bool, colors: Array) -> void:
 		sb.set_border_width_all(2)
 		sb.border_width_bottom = 4
 		# Preview rows visibly secondary (dimmed, thinner rim) and never interactive.
+		panel.modulate = Color(0.62, 0.62, 0.70, 0.85)
+	panel.add_theme_stylebox_override("panel", sb)
+
+## Shell tile: empty = transparent (the baked cell shows); batch = live colour fill with
+## the live count. Front (the only interactive batch) is full strength with a cyan edge;
+## preview rows are dimmed and never interactive.
+func _bind_shell_row(panel: PanelContainer, swatch: ColorRect, count: Label, batch, front: bool, colors: Array) -> void:
+	if batch == null or not (batch is Dictionary):
+		swatch.color = Color(0, 0, 0, 0)
+		count.text = ""
+		panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+		panel.modulate = Color(1, 1, 1, 1)
+		return
+	var cid: int = int(batch.get("color_id", -1))
+	var col: Color = colors[cid] if cid >= 0 and cid < colors.size() else Color(1, 0, 1, 1)
+	swatch.color = col
+	count.text = "%d" % int(batch.get("robot_count", 0))
+	var sb := StyleBoxFlat.new()
+	sb.bg_color = col
+	sb.set_corner_radius_all(UiTokens.RADIUS_SM)
+	sb.anti_aliasing = true
+	if front:
+		sb.set_border_width_all(3)
+		sb.border_color = Color(0.55, 0.95, 1.0, 1.0)
+		panel.modulate = Color(1, 1, 1, 1)
+	else:
 		panel.modulate = Color(0.62, 0.62, 0.70, 0.85)
 	panel.add_theme_stylebox_override("panel", sb)
 
