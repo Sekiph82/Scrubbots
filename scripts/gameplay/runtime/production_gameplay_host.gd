@@ -56,6 +56,7 @@ const HapticsController = preload("res://scripts/haptics/haptics_controller.gd")
 const HapticsSettingsService = preload("res://scripts/haptics/haptics_settings_service.gd")
 const EconomyServices = preload("res://scripts/economy/economy_services.gd")
 const FirstClearTransaction = preload("res://scripts/economy/first_clear_transaction.gd")
+const TerminalRewardReceipt = preload("res://scripts/economy/terminal_reward_receipt.gd")
 const ProductionActionFacade = preload("res://scripts/economy/production_action_facade.gd")
 const LevelProgressionService = preload("res://scripts/progression/level_progression_service.gd")
 const BoosterService = preload("res://scripts/economy/booster_service.gd")
@@ -142,6 +143,9 @@ var app_state = null
 var _economy_terminal_done := false
 ## Last WON first-clear transaction result (diagnostic; M39 V04).
 var last_first_clear_result: Dictionary = {}
+## M43-C001A: read-only receipt of what THIS attempt's terminal committed (built once,
+## inside the latched terminal economy transaction; cleared by a successful Retry).
+var _terminal_receipt: Dictionary = {}
 var _actions = null   # ProductionActionFacade (M39 V04)
 ## M52-C001-R01 functional 2x acquisition popup (created on first need).
 var _speed_popup = null
@@ -520,6 +524,7 @@ func _on_retry_restored() -> void:
 	# Heart consume runs BEFORE on_restart wipes the gameplay-started flag.
 	if _economy != null:
 		_economy_terminal_done = false
+		_terminal_receipt = {}
 		_economy.capacity.begin_new_attempt()
 		var restart_mutated: bool = _economy.streak.gameplay_started()
 		if restart_mutated:
@@ -599,6 +604,8 @@ func _on_terminal_reached(_status, _detail) -> void:
 func _drive_economy_terminal(status) -> void:
 	if _economy == null or _economy_terminal_done:
 		return
+	# M43-C001A: authoritative pre-commit probe for the Results receipt (read-only).
+	var pre: Dictionary = TerminalRewardReceipt.capture(_progression, _economy)
 	if status == CompletionEvaluator.WON:
 		_economy_terminal_done = true
 		# M39 V03 (F-M39-V02-014): the M37 forward-only progression authority
@@ -620,7 +627,18 @@ func _drive_economy_terminal(status) -> void:
 		_economy.streak.on_progression_loss()
 		_economy.speed.on_level_completed(progression_level, false)
 	# M40 V02 (F-M40-006): terminal is a defined safe save boundary (not per-frame).
-	_flush_durable_save()
+	var saved: Dictionary = request_save()
+	# M43-C001A: receipt = committed before/after truth. Built only by the latched
+	# WON/LOST branch, so a duplicate terminal can never rebuild/overwrite it.
+	if _economy_terminal_done:
+		_terminal_receipt = TerminalRewardReceipt.build(String(status), progression_level, pre,
+			TerminalRewardReceipt.capture(_progression, _economy),
+			last_first_clear_result if status == CompletionEvaluator.WON else {}, saved)
+
+## M43-C001A: detached copy of this attempt's terminal receipt ({} before a WON/LOST
+## terminal committed, or after a Retry began a fresh attempt).
+func get_terminal_receipt() -> Dictionary:
+	return _terminal_receipt.duplicate(true)
 
 func _wire_controls() -> void:
 	var pause_btn = _screen.get_pause_button()

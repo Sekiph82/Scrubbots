@@ -125,8 +125,19 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 	if _results != null:
 		_results.visible = to == NavigationController.Route.RESULTS
 		if _results.visible:
-			_results.show_result(_payload, GameplayLaunchResolver.resolve(app_state).get("ok", false))
+			_results.show_model(_results_model(_payload))
 			move_child(_results, get_child_count() - 1)
+
+## M43-C001A: the ONE Results model for a RESULTS route payload. The receipt is the
+## host's committed terminal truth (never recomputed here); continue availability is the
+## canonical frontier resolver. Pure read: building it any number of times grants nothing.
+func _results_model(payload: Dictionary) -> Dictionary:
+	var m := payload.duplicate(true)
+	m["receipt"] = _gameplay_host.get_terminal_receipt() if _gameplay_host != null and is_instance_valid(_gameplay_host) else {}
+	var launch := GameplayLaunchResolver.resolve(app_state)
+	m["continue"] = {"available": bool(launch.get("ok", false)), "reason": String(launch.get("reason", "")),
+		"next_level": int(launch.get("level", 0))}
+	return m
 
 func get_home():
 	return _home
@@ -234,16 +245,32 @@ func _bind_terminal(host) -> void:
 		if host == _gameplay_host:
 			nav.on_gameplay_terminal(nav.attempt_id(), status, int(host.progression_level)))
 
-## RESULTS (WON) -> next canonical frontier, only when it has content.
-func continue_from_results() -> Dictionary:
+## RESULTS (WON) -> next canonical frontier, only when it has content. Exactly one
+## accepted launch per Results: the first success leaves RESULTS, so every later/rapid
+## call is refused. attempt (from ResultsScreen) must match the shown Results attempt,
+## so a stale Continue from an earlier Results can never launch. Never grants rewards.
+func continue_from_results(attempt: int = -1) -> Dictionary:
 	if nav.current() != NavigationController.Route.RESULTS:
 		return {"ok": false, "reason": "not_results"}
+	var shown: Dictionary = nav.last_payload()
+	if attempt >= 0 and attempt != int(shown.get("attempt", -1)):
+		return {"ok": false, "reason": "stale_results"}
+	if String(shown.get("status", "")) != "WON":
+		return {"ok": false, "reason": "not_won"}
 	if not GameplayLaunchResolver.resolve(app_state).get("ok", false):
+		_results.show_model(_results_model(shown))
 		return {"ok": false, "reason": "no_next_content"}
 	var r := launch_gameplay()
 	if r.get("ok", false):
 		nav.go(NavigationController.Route.GAMEPLAY, {"level": r["launch"]["level"], "entry_id": r["launch"]["entry_id"]})
 		_bind_terminal(r["host"])
+	elif nav.current() == NavigationController.Route.RESULTS:
+		# Launch failed with no transition: re-show the same committed model (re-arms
+		# Continue). launch_gameplay released the old host, so the receipt comes from
+		# the Results model already shown.
+		var m: Dictionary = _results.get_model()
+		m["continue"] = _results_model(shown)["continue"]
+		_results.show_model(m)
 	return r
 
 ## RESULTS (LOST) -> M30 transaction-safe Retry of the same host, new attempt id.

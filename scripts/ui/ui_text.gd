@@ -74,6 +74,14 @@ const EN := {
 	"RESULTS_CONTINUE": "CONTINUE",
 	"RESULTS_RETRY": "RETRY",
 	"RESULTS_HOME": "HOME",
+	"RESULTS_FIRST_CLEAR_SB": "First clear +%s SB",
+	"RESULTS_STREAK_SB": "Win Streak %s · +%s SB",
+	"RESULTS_BOT_PARTS": "+%s Bot Parts",
+	"RESULTS_GIFT_METER": "Gift Meter %s/%s",
+	"RESULTS_GIFT_READY": "Gift ready! Claim it in Gifts.",
+	"RESULTS_CARDS": "+%s Card(s)",
+	"RESULTS_ALREADY_CLEARED": "Already cleared · no progression reward",
+	"RESULTS_NEXT_UNAVAILABLE": "Level %d is coming soon.",
 }
 
 ## Translated (or English fallback) copy for `key`, formatted with `args`.
