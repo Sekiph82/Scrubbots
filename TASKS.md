@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE
-- Current Sprint: M43-C001B WON Results Visual / Production Binding
-- Current Task: Implement owner-locked WON Results composition on the accepted C001A receipt/model foundation; no Replay; LOST remains separate for M43-C004
-- Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C001B/task_prompts/SB-M43-C001B_WON_RESULTS_VISUAL_BINDING.md`; ChatGPT audits, then OWNER performs runtime/visual acceptance before SB-M43-009 closes.
+- Current Sprint: M43-C001B-R01 Complete Interrupted WON Results Visual Binding
+- Current Task: Recover the interrupted local C001B work, fix the invalid snapshot harness using existing owner click plans, regenerate valid evidence, run final regressions, commit and push
+- Current Task Status: REMEDIATION_REQUIRED / READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C001B/remediation/SB-M43-C001B-R01_COMPLETE_INTERRUPTED_RESULTS.md`; ChatGPT audits. On PASS, immediately activate M28-C002 Gameplay Screen V02.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 895 / 1355 = 66.05%. Results Replay gate resolved NO; M43-C001B WON visual binding is active.
-- Note: OWNER Results ruling `coordination/OWNER_RESULTS_VISUAL_REPLAY_V01.md`: A1-NO Replay; B1-A robot-over-frame + small emblem; B2-A green/yellow Life/Help CTA; B3-A LOST routed to dedicated M43-C004 family. C001A foundation remains AUDITED_PASS.
-- Owner sequencing lock: First 10 + applicable M54 + current-build M55 core are CLOSED. Main roadmap has resumed at M43 Results / Player Experience. M55 Player-Experience Chaos rows remain deferred until their owning M43 surfaces exist.
+- Progress: 895 / 1355 = 66.05%. C001B remains open; remediation completion is active. M28-C002 Gameplay V02 is queued next.
+- Note: Previous C001B attempt was interrupted by Claude Code safety-check service failures before commit/push. Reported local implementation exists but GitHub main still has no C001B code. R01 must recover local work, replace naive snapshot driving with existing owner click plans, regenerate valid WON evidence, complete regressions/evidence and push.
+- Owner sequencing lock: finish the already-started M43-C001B visual binding without leaving it half-done. Immediately after C001B-R01 AUDITED_PASS, switch active development to M28-C002 Gameplay Screen V02 Production Convergence before continuing broader M43 meta-UI work.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1625,6 +1625,8 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 **Visual production rule for every surface below:** create/identify a visual master or canonical reference, inventory required illustration assets, generate only the needed component art, obtain owner visual approval, build the production screen in responsive Godot UI with live text/data, run independent audit, then run owner playtest/visual acceptance. A screen is not complete merely because a service exists.
 
 #### M43-C001 - Results Screen
+
+**C001B interruption/remediation:** previous local C001B implementation was interrupted before commit/push. Active completion prompt: `coordination/sessions/M43-C001B/remediation/SB-M43-C001B-R01_COMPLETE_INTERRUPTED_RESULTS.md`. After audit PASS, immediately activate M28-C002 Gameplay Screen V02.
 
 - [x] SB-M43-001 Result model.
 - [ ] SB-M43-002 Completion UI.
