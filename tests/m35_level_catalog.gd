@@ -210,7 +210,9 @@ func _unknown_difficulty() -> void:
 func _rectangular_boundary() -> void:
 	print("[rect]")
 	# A rectangular 24x28 EASY level is within the 20..59 production envelope
-	# (Difficulty V1). This proves rectangular support in the catalog read model.
+	# (Difficulty V1) and stays legal to the rectangular-capable engine/validator.
+	# M28-C002-C002-R01 (owner S6-C): the V02 static-shell path is approved for square
+	# production boards only, so the catalog now rejects it — for that reason alone.
 	var lvl := _res_tmp("rect")
 	_write_json(lvl, _minimal_valid_level("rect_easy", "EASY", 24, 28))
 	var path := _tmp("rect_manifest")
@@ -220,10 +222,10 @@ func _rectangular_boundary() -> void:
 	})
 	var c = LevelCatalog.new()
 	var r = c.load_manifest(path)
-	_ok(r.ok, "rectangular EASY 24x28 accepted: %s" % r.summary())
-	if r.ok:
-		var e = c.get_entry_by_id("rect_easy")
-		_ok(e != null and e.width == 24 and e.height == 28, "dims exposed as 24x28")
+	var errs: PackedStringArray = r.entry_errors.get("rect_easy", PackedStringArray())
+	_ok(not r.ok and errs.size() == 1 and errs[0].find("S6-C") != -1 and errs[0].find("24x28") != -1,
+		"rectangular EASY 24x28 otherwise legal, rejected only by the S6-C square-shell gate: %s" % r.summary())
+	_ok(c.get_entry_by_id("rect_easy") == null, "non-square entry not exposed to the production catalog")
 	_remove(lvl)
 	_remove(path)
 

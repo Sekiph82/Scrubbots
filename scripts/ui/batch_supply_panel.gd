@@ -64,6 +64,37 @@ func _ready() -> void:
 	if not _shell_mode:
 		custom_minimum_size.x = maxf(custom_minimum_size.x, UiTokens.SUPPLY_PANEL_MIN_WIDTH)
 
+## M28-C002-C002-R01 (owner S2-B): invisible front touch geometry may exceed the painted
+## cell up to the nominal touch target, never beyond half the baked gap (no overlap).
+var _min_hit: float = 0.0
+
+func set_min_hit_size(px: float) -> void:
+	_min_hit = px
+	if _input_enabled:
+		_apply_front_input_surfaces()
+
+## Re-fit every front HitArea to its tile's CURRENT global rect (call after layout).
+func refresh_hit_areas() -> void:
+	for p in _front_panels:
+		if p != null and is_instance_valid(p):
+			_size_hit(p)
+
+func get_front_hit_rect(column: int) -> Rect2:
+	if column < 0 or column >= _front_panels.size():
+		return Rect2()
+	var hit = _front_panels[column].get_node_or_null("HitArea")
+	return hit.get_global_rect() if hit != null else _front_panels[column].get_global_rect()
+
+func _size_hit(panel: PanelContainer) -> void:
+	var hit: Control = panel.get_node_or_null("HitArea")
+	if hit == null:
+		return
+	var sz: Vector2 = panel.size
+	var ex: float = clampf((_min_hit - sz.x) * 0.5, 0.0, maxf(_gap.x * 0.5 - 0.5, 0.0))
+	var ey: float = clampf((_min_hit - sz.y) * 0.5, 0.0, maxf(_gap.y * 0.5 - 0.5, 0.0))
+	hit.global_position = panel.global_position - Vector2(ex, ey)
+	hit.size = sz + Vector2(ex, ey) * 2.0
+
 func set_shell_grid(gap: Vector2) -> void:
 	_shell_mode = true
 	_gap = gap
@@ -166,6 +197,17 @@ func _apply_front_input_surfaces() -> void:
 		var cb := Callable(self, "_on_front_gui_input").bind(c)
 		if not panel.gui_input.is_connected(cb):
 			panel.gui_input.connect(cb)
+		# S2-B: invisible, slightly larger hit surface over the same front (top_level, so no
+		# container resizes it); same gesture handler, so one gesture = one activation.
+		if _shell_mode and _min_hit > 0.0 and panel.get_node_or_null("HitArea") == null:
+			var hit := Control.new()
+			hit.name = "HitArea"
+			hit.top_level = true
+			hit.mouse_filter = Control.MOUSE_FILTER_STOP
+			panel.add_child(hit)
+			hit.gui_input.connect(cb)
+			panel.item_rect_changed.connect(_size_hit.bind(panel))
+		_size_hit(panel)
 
 ## Per-front gesture handler. Press arms a single serialized pending gesture; the
 ## matching release emits exactly once. Mouse and touch are de-duplicated so one

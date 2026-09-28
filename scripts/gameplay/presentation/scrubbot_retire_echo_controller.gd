@@ -34,8 +34,9 @@ const MAX_ACTIVE_ECHOES := 16
 ## not a celebration.
 const LIFETIME := 0.28
 ## Echo footprint in CELL units (slightly smaller than the live travel body) and how far
-## it shrinks over its life.
-const ECHO_SPAN_CELLS := 1.6
+## it shrinks over its life. M28-C002-C002-R01: 1.6 -> 2.1, keeping the previous ~0.89
+## echo/live ratio with the enlarged 2.4-cell live body. Presentation only.
+const ECHO_SPAN_CELLS := 2.1
 const SHRINK := 0.5
 
 var _layer: Node2D = null
