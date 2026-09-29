@@ -6,14 +6,14 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
 - Current Sprint: M28-C002-C003-R01 — Five-Finding Final Remediation V02
-- Current Task: Claude resolves the five owner findings: timed-2x auto-start, slot label cleanup, railway-first Scrubbot routing, dynamic pixel grid/bevel, and canonical Home background replacement
-- Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M28-C002-C003-R01/CHATGPT_PROMPT_V02.md` with paired V02 audit criteria, then returns for independent ChatGPT audit. Owner replay follows technical PASS.
-- Required Actor: CLAUDE
+- Current Task: OWNER final replay of the five audited M28 V02 findings: timed-2x auto-start, slot label cleanup, railway-first Scrubbot routing, dynamic pixel grid/bevel, and canonical Home background
+- Current Task Status: AUDITED_PASS / OWNER_FINAL_REPLAY_REQUIRED
+- Next Task/Action: OWNER replays the five V02 findings in the actual Godot runtime. Only owner acceptance may close SB-M28-C002-020. Independent audit: `coordination/sessions/M28-C002-C003-R01/CHATGPT_AUDIT_V02.md`.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 954 / 1361 = 70.10%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains. Separate M28 tile-polish, M29 gameplay-tempo, M32 Scrubbot-size, M39 test-stability and two-stage M42 Home Scrubby scale/animation follow-ups are queued.
-- Note: Owner expanded the final remediation to five findings. V02 supersedes the prior R01 V01 prompt/criteria. Scope: timed 2x active => each new gameplay auto-starts 2x; remove WAITING/ACTIVE slot text; railway-first Scrubbot travel; dynamic visible logical-pixel grid + subtle bevel; Home uses `assets/ui/final/home/background/home_background.png` exactly.
+- Note: M28-C002-C003-R01 V02 implementation `041729c92b57517e2c203306b0666f341c75eee5` is independently `AUDITED_PASS / OWNER FINAL REPLAY REQUIRED`. Railway-first route-choice authority is now `coordination/OWNER_SCRUBBOT_RAILWAY_FIRST_ROUTING_V02.md`. Scope accepted technically: timed 2x new-attempt auto-start; no WAITING/ACTIVE slot words; railway-first travel; dynamic visible logical-pixel grid + subtle bevel; exact Home background path.
 - Owner sequencing lock: close M28-C002-C003-R01 V02 technical remediation, then owner replays/reviews all five findings before SB-M28-C002-020 can close. After M28 V02 closure: (1) SB-M28-C002-021 Color / Batch Tile Visual Polish as M28-C002-C004; (2) SB-M29-010 Gameplay Tempo Retune; (3) SB-M32-UI-012 board-resolution-independent Scrubbot apparent size; (4) SB-M39-053 test-stability; (5) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (6) only after that owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation authored/integrated against the enlarged hero; (7) resume the existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -1264,6 +1264,8 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 #### M28-C002 - Gameplay Screen V02 Production Convergence [PLANNED / REQUIRED BEFORE FINAL META-UI INTEGRATION]
 
 **M28-C002-C002/R01 static-shell status:** technical PASS and FINAL OWNER VISUAL PASS. Six-master matrix (5/6 slots × 3/4/5 supply columns), 2.4-cell mini Scrubbots, live bubble copy, responsive/touch choices and S1-S6 are owner-accepted. Row 016 is closed. Rows 012-015/018(part)/019/020 remain dependency/final-gate work.
+
+**M28-C002-C003-R01 V02 independent audit:** `AUDITED_PASS / OWNER FINAL REPLAY REQUIRED`. Audit: `coordination/sessions/M28-C002-C003-R01/CHATGPT_AUDIT_V02.md`. Technical remediation is accepted; SB-M28-C002-020 remains open solely for owner replay/visual acceptance of all five findings.
 
 Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master visual into the actual shipping gameplay screen. Historical M28 closure remains historical; this sprint closes the later V02 delta without falsifying earlier evidence.
 
