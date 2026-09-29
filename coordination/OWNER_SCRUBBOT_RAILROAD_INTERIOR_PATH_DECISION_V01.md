@@ -1,8 +1,10 @@
 # OWNER DECISION — Scrubbot Railroad Interior Path Revision V01
 
 Date: 2026-09-17
-Status: **OWNER-LOCKED**
+Status: **OWNER-LOCKED HISTORICAL / ROUTE-CHOICE PARTIALLY SUPERSEDED 2026-09-29**
 Repository: `Sekiph82/Scrubbots`
+
+> **Current route-choice authority:** `coordination/OWNER_SCRUBBOT_RAILWAY_FIRST_ROUTING_V02.md` supersedes only §5's shortest-total-route preference. Sections 1–4 and 6–7 remain authoritative for legal access, interior turns, Railroad geometry and no-retarget behavior.
 Applies to: M22 Railroad V1 production routing after owner F6 review
 Supersedes: only the target-approach restrictions in sections 6–8 of `coordination/OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md` where they required rail departure to be directly target-aligned and the entire post-rail approach to be one straight segment.
 
@@ -60,15 +62,11 @@ Interior post-rail movement is grid-aware and orthogonal:
 
 The implementation should reuse authoritative `ProductionAccessQuery` truth and existing route validation rather than create a second contradictory access model.
 
-## 5. Route choice
+## 5. Route choice `[SUPERSEDED BY V02 — 2026-09-29]`
 
-Routing remains HOW-only after TargetSelector has chosen the target.
+Historical V01 rule: routing minimized total legal route length.
 
-For that assigned target, routing should evaluate legal railroad ingress + interior path combinations and choose the shortest legal total route measured from the real clicked-slot start:
-
-`slot connector + railroad travel + ingress bridge + interior orthogonal path + final target arrival`.
-
-Equal-distance routing must remain deterministic. Preserve the existing side priority `BOTTOM -> LEFT -> RIGHT -> TOP` as the first tie-break dimension. Within the same side, use a stable deterministic ingress ordering documented by the implementation/tests.
+**Current rule:** `coordination/OWNER_SCRUBBOT_RAILWAY_FIRST_ROUTING_V02.md` supersedes this section. Production runtime now minimizes board-interior travel first, then rail/connector travel, then deterministic side/scan tie-breaks. WHAT/targetability/legal-access rules remain unchanged.
 
 ## 6. Preserved Railroad V1 rules
 
