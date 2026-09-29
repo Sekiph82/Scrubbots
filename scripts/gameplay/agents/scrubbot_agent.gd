@@ -54,7 +54,11 @@ enum State {
 ## release the reservation, score). The agent itself does none of those.
 signal agent_completed(owner_id: int, target_index: int, color_id: int)
 
-const DEFAULT_SPEED := 6.0 ## board-local cells / second.
+## Canonical production 1x travel baseline, board-local cells / second (M29-C002,
+## OWNER_SCRUBBOT_SIZE_AND_GAMEPLAY_TEMPO_V01 §2: new 1x = historical 6.0 * 1.5). The
+## runtime 2x factor doubles it to 18. Dispatcher / scheduler / clearing-loop defaults
+## derive from THIS constant — do not duplicate the number elsewhere.
+const DEFAULT_SPEED := 9.0
 
 # --- assigned identity / assignment record (read-only after assign) ----------
 var owner_id: int = -1

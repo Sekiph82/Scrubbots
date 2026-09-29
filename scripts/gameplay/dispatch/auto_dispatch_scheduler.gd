@@ -31,7 +31,9 @@ const ProductionTargetAccess = preload("res://scripts/gameplay/dispatch/producti
 const RouteRequest = preload("res://scripts/gameplay/routing/route_request.gd")
 const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
 
-const DEFAULT_SPEED := 6.0
+## Single source: the canonical agent travel baseline via the dispatcher (M29-C002).
+## This is the speed the production host path passes to every dispatched agent.
+const DEFAULT_SPEED := ScrubbotDispatcher.DEFAULT_SPEED
 
 # --- injected bundle (all null until bind()) ---------------------------------
 var _board = null

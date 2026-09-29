@@ -1,0 +1,127 @@
+M29-C002 regression run — Godot 4.7.2 headless, 6-way parallel, 115 suites (tests/_m55_diag_tmp.gd owner scratch excluded; the focused tests/m29_c002_tempo_retune.gd ran separately, PASS).
+Format: suite rc=<exit code> secs=<wall seconds>. Host was also running 3 unrelated Godot m17 campaign processes.
+
+m20_queue_free_smoke rc=0 secs=1
+m20_v04_lifecycle_smoke rc=0 secs=1
+m20_v05_lifecycle_smoke rc=0 secs=1
+m20_v07_lifecycle_smoke rc=0 secs=1
+m20_v08_lifecycle_smoke rc=0 secs=0
+m20_v09_lifecycle_smoke rc=0 secs=0
+m20_v10_lifecycle_smoke rc=0 secs=1
+m21_real_art_smoke rc=0 secs=3
+m21_v05_playtest_smoke rc=0 secs=1
+m21_v06_tall_layout_smoke rc=0 secs=1
+m21_v07_corridor_smoke rc=0 secs=1
+m21_v08_corridor_validation rc=1 secs=1
+m21_v09_direct_evidence_reconciliation rc=1 secs=1
+m21_v10_final_reservation_evidence rc=0 secs=1
+m22_railroad_responsive_smoke rc=0 secs=1
+m22_responsive_smoke rc=0 secs=1
+m22_v03_connector_evidence rc=0 secs=1
+m22_v04_final_evidence rc=0 secs=1
+m22_v05_final_state_evidence rc=0 secs=1
+m22_v06_real_demo_state_evidence rc=0 secs=0
+m23_v01_batch_supply_evidence rc=0 secs=0
+m23_v02_hardening_evidence rc=0 secs=0
+m23_v03_transaction_identity_evidence rc=0 secs=1
+m24_blue_fixture_evidence rc=0 secs=1
+m24_five_full_refill_evidence rc=0 secs=1
+m24_slot_state_evidence rc=0 secs=1
+m24_supply_handoff_evidence rc=0 secs=1
+m24_v02_transaction_hardening_evidence rc=0 secs=0
+m25_blue_arbitration_evidence rc=0 secs=0
+m25_claim_model_evidence rc=0 secs=0
+m25_rollback_finalize_reset_evidence rc=0 secs=0
+m25_scale_evidence rc=0 secs=0
+m25_v02_strict_remediation_evidence rc=0 secs=1
+m25_v03_exact_work_binding_evidence rc=0 secs=1
+m26_hazard_bot_integration rc=0 secs=2
+m26_scale_59_sanity rc=0 secs=1
+m27_generation_retry rc=0 secs=2
+m27_hazard_bot_solve rc=0 secs=12
+m27_scale_59 rc=0 secs=22
+m28_c002_c001_gameplay_v02 rc=0 secs=57
+m28_c002_c002_r01_visual rc=0 secs=95
+m28_c002_c002_static_shell rc=0 secs=109
+m28_c002_c003_final_gate rc=0 secs=362
+m28_c002_c003_r01_remediation rc=0 secs=171
+m28_c002_c004_tile_visual rc=0 secs=33
+m28_gameplay_layout_smoke rc=0 secs=2
+m29_exact_slot_origin_evidence rc=0 secs=2
+m29_hazard_bot_runtime_smoke rc=1 secs=71
+m29_input_gate_evidence rc=0 secs=1
+m29_presentation_identity_evidence rc=0 secs=2
+m29_realtime_movement_smoke rc=0 secs=3
+m29_slot_display_sync_evidence rc=0 secs=20
+m29_speed_authority_evidence rc=0 secs=1
+m30_completion_authority rc=0 secs=0
+m30_manual_playtest_smoke rc=0 secs=69
+m30_transaction_safe_retry rc=0 secs=2
+m31_cleaning_effects_evidence rc=0 secs=3
+m31_scale_59_effects rc=0 secs=0
+m32_scale_59_visuals rc=0 secs=1
+m32_scrubbot_visual_evidence rc=0 secs=35
+m33_audio_runtime rc=0 secs=66
+m34_haptics_production rc=0 secs=26
+m34_haptics_runtime rc=0 secs=0
+m35_level_catalog rc=0 secs=0
+m35_v02_hardening rc=0 secs=1
+m36_difficulty_v1 rc=0 secs=1
+m36_v02_migration rc=0 secs=0
+m37_level_progression rc=0 secs=1
+m37_v02_strict rc=0 secs=0
+m37_v03_forward_only rc=0 secs=1
+m38_v02_strict rc=0 secs=0
+m38_win_streak rc=0 secs=1
+m39_v02_atomicity rc=0 secs=0
+m39_v02_capacity rc=0 secs=1
+m39_v02_integration rc=0 secs=19
+m39_v03_full_surface rc=0 secs=0
+m39_v03_integration rc=0 secs=20
+m39_v04_integration rc=0 secs=37
+m39_v04_tornado_inflight rc=0 secs=14
+m39a_economy_core rc=0 secs=0
+m39b_hearts_speed rc=0 secs=1
+m39c_boosters rc=0 secs=0
+m39d_daily_collection rc=0 secs=1
+m39e_full_matrix rc=0 secs=1
+m40_save_system rc=0 secs=1
+m40_v02_safety rc=0 secs=19
+m40_v03_canonical rc=0 secs=2
+m40_v04_bootstrap rc=0 secs=63
+m41_settings rc=0 secs=110
+m42_assets rc=0 secs=25
+m42_home rc=0 secs=113
+m42_home_composition rc=0 secs=18
+m42_home_v04 rc=0 secs=40
+m42_home_v05 rc=0 secs=83
+m42_home_v06 rc=0 secs=89
+m42_home_v07_safe_area rc=0 secs=63
+m42_navigation rc=0 secs=63
+m42_opening rc=0 secs=14
+m43_c001a_results_foundation rc=0 secs=118
+m43_c001b_won_results_visual rc=0 secs=110
+m43_c002_c001_popup_modal_pause rc=0 secs=45
+m43_c003_c001_acquisition rc=0 secs=262
+m52_owner_supply_plans rc=0 secs=797
+m52_r01_parallel_runtime rc=0 secs=106
+m52_r02_early_slot_release rc=0 secs=8
+m53_c002_difficulty_calibration rc=0 secs=88
+m53_first10_difficulty rc=0 secs=21
+m54_collection_set_master_exactly_once rc=0 secs=0
+m55_c002_timed_2x_anti_rollback rc=0 secs=16
+m55_core_chaos rc=0 secs=399
+m55_economy_release_regression rc=0 secs=4
+m55_heart_900_authority rc=0 secs=2
+m55_long_session rc=0 secs=401
+palette_v3_leveldata_contract rc=0 secs=1
+run_tests rc=0 secs=70
+
+Non-zero exits:
+m21_v08_corridor_validation: FAIL C/043 'above -> far-right top', C/047 'corner route uses BOTH left and top exterior sides' (documented pre-existing baseline)
+m21_v09_direct_evidence_reconciliation: FAIL B 'route crosses a distinct adjacent vertical-side NON-corner ring cell' (documented pre-existing baseline)
+m29_hazard_bot_runtime_smoke: FAIL '2x completes in no more ticks than 1x (625 <= 622)' at the old DT=1.0 harness clock; harness moved to a 60 FPS clock + zeroed pre-play accumulator (see CLAUDE_LOG_V01.md); rerun 3x in parallel: PASS PASS PASS
+
+run_tests: Total checks: 5323, RESULT: ALL PASS
+m55_long_session: M55 LONG SESSION: PASS
+SCRIPT ERROR lines only in the known m20_v04/v05/v07/v08 lifecycle baseline (all exit 0).
