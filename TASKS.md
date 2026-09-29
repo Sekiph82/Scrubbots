@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M28-C002-C003-R01 — Timed 2x Cross-Level Remediation
-- Current Task: Claude fixes timed 2x continuity so an active timed entitlement remains live 2x across Level 2 -> Level 3 and expires correctly without breaking free auto-2x
+- Current Sprint: M28-C002-C003-R01 — Five-Finding Final Remediation V02
+- Current Task: Claude resolves the five owner findings: timed-2x auto-start, slot label cleanup, railway-first Scrubbot routing, dynamic pixel grid/bevel, and canonical Home background replacement
 - Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M28-C002-C003-R01/CHATGPT_PROMPT_V01.md`, then returns for independent ChatGPT audit. Owner replay follows technical PASS.
+- Next Task/Action: CLAUDE executes `coordination/sessions/M28-C002-C003-R01/CHATGPT_PROMPT_V02.md` with paired V02 audit criteria, then returns for independent ChatGPT audit. Owner replay follows technical PASS.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 954 / 1355 = 70.41%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains.
-- Note: Final owner playtest found a blocking timed-2x runtime defect: countdown survives Level 2 -> Level 3 but live GameplaySpeedAuthority resets to 1x. Owner ruling `OWNER_TIMED_2X_CROSS_LEVEL_RUNTIME_V01.md` requires active timed 2x to remain live across level transitions and to fall back correctly on expiry without overriding free M23 auto-2x.
-- Owner sequencing lock: close M28-C002-C003-R01 technical remediation, then repeat the owner Level 2 -> Level 3 timed-2x playtest before closing SB-M28-C002-020.
+- Note: Owner expanded the final remediation to five findings. V02 supersedes the prior R01 V01 prompt/criteria. Scope: timed 2x active => each new gameplay auto-starts 2x; remove WAITING/ACTIVE slot text; railway-first Scrubbot travel; dynamic visible logical-pixel grid + subtle bevel; Home uses `assets/ui/final/home/background/home_background.png` exactly.
+- Owner sequencing lock: close M28-C002-C003-R01 V02 technical remediation, then owner replays/reviews all five findings before SB-M28-C002-020 can close.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
