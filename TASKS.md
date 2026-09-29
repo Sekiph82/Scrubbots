@@ -4,17 +4,17 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 ## Project Status
 
-- Current Milestone: M29 GAMEPLAY TEMPO RETUNE
-- Current Sprint: M29-C002 — Gameplay Tempo Retune
-- Current Task: CLAUDE implements SB-M29-010 Gameplay Tempo Retune: new 1x = old 1.5x, new 2x = old 3.0x
-- Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M29-C002/CHATGPT_PROMPT_V01.md` against `coordination/sessions/M29-C002/CHATGPT_AUDIT_CRITERIA_V01.md`, pushes implementation/evidence/logs, then returns for independent ChatGPT audit.
+- Current Milestone: M29 GAMEPLAY TEMPO RETUNE — PERFORMANCE BLOCKER
+- Current Sprint: M25-C002 — 59x59 Target-Selection Performance Investigation
+- Current Task: CLAUDE investigates SB-M25-033 59x59 M25 target-selection scan cost; proposal only, no production gameplay changes
+- Current Task Status: READY_FOR_CLAUDE / INVESTIGATION_ONLY
+- Next Task/Action: CLAUDE executes `coordination/sessions/M25-C002/CHATGPT_PROMPT_V01.md` against `coordination/sessions/M25-C002/CHATGPT_AUDIT_CRITERIA_V01.md`, producing per-lane hotspot measurements and a truth-preserving mitigation proposal only. M29 tempo implementation remains in main but SB-M29-010 stays open pending this blocker.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 956 / 1361 = 70.24%. M28-C002-C004 / SB-M28-C002-021 is CLOSED after V02 independent technical PASS + owner final visual PASS. Current work is SB-M29-010 Gameplay Tempo Retune.
-- Note: C004 final owner gate PASS is recorded at `coordination/sessions/M28-C002-C004/OWNER_VISUAL_GATE_V02.md`. Accepted ColorBatchTile uses exact same batch color for Face + lower Base body, with all other V01 visual approvals preserved. M29-C002 now owns only gameplay tempo retuning.
-- Owner sequencing lock: (1) SB-M29-010 Gameplay Tempo Retune; (2) SB-M32-UI-012 board-resolution-independent Scrubbot apparent size; (3) SB-M39-053 test-stability; (4) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (5) only after that owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation authored/integrated against the enlarged hero; (6) resume the existing M43/meta roadmap.
+- Progress: 956 / 1362 = 70.19%. M29-C002 tempo implementation `8787d38dba65a084e6169ea8e8ccc623ab63e0ae` is FUNCTIONAL_AUDIT_PASS but performance-gate BLOCKED by dense 59x59 M25 target-selection stalls. New SB-M25-033 investigation is current; SB-M29-010 remains open.
+- Note: M29 tempo functional behavior is accepted by `coordination/sessions/M29-C002/CHATGPT_AUDIT_V01.md`, but 59x59 evidence shows synchronous target-selection stalls up to multi-second range. Investigation must explain current M52 prefilter limits and propose a bounded exact-safe mitigation before M29 owner tempo playtest.
+- Owner sequencing lock: (1) SB-M25-033 investigation/proposal; (2) if proposal audit requires it, implement and audit the bounded M25 remediation; (3) return to SB-M29-010 owner tempo playtest/closure; (4) SB-M32-UI-012 board-resolution-independent Scrubbot apparent size; (5) SB-M39-053 test-stability; (6) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (7) only after that owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation; (8) resume existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1304,7 +1304,7 @@ This is intentionally NOT part of the active `M28-C002-C003-R01 V02` remediation
 - [x] SB-M29-004 Touch cancel. — [x] SB-M29-005 Focus loss.
 - [x] SB-M29-006 Rapid tapping. — [x] SB-M29-007 Multi-touch.
 - [x] SB-M29-008 Pause during touch. — [x] SB-M29-009 Background/foreground.
-- [ ] SB-M29-010 Gameplay Tempo Retune: raise the canonical normal gameplay baseline to OLD 1.5x while preserving the user-facing 1x/2x relationship. New 1x effective tempo = 9 cells/s Scrubbot travel + 1/3 s dispatch cadence; new 2x = exactly 2x the new baseline = OLD 3.0x = 18 cells/s + 1/6 s cadence. Retune the canonical temporal baseline coherently rather than changing only sprite travel. Preserve Engine.time_scale isolation, pause/resume, paid/timed/current-level entitlement semantics, M23 free auto-2x, routing/claims/accounting/clear truth, bounded one-wave/one-lane-per-frame behavior, and prove no dispatch storm at 5/6 slots including representative 30/60 fps timing. 30 FPS + six lanes may be service-limited to ~0.20 s per complete wave; safety cap wins over overlapping-wave catch-up. Authority: `coordination/OWNER_SCRUBBOT_SIZE_AND_GAMEPLAY_TEMPO_V01.md`. Prompt: `coordination/sessions/M29-C002/CHATGPT_PROMPT_V01.md`; criteria: `coordination/sessions/M29-C002/CHATGPT_AUDIT_CRITERIA_V01.md`. `[CURRENT / READY_FOR_CLAUDE]`
+- [ ] SB-M29-010 Gameplay Tempo Retune: canonical baseline retuned to 9 cells/s + 1/3 s cadence at 1x and 18 cells/s + 1/6 s cadence at 2x. Implementation `8787d38dba65a084e6169ea8e8ccc623ab63e0ae`; audit `coordination/sessions/M29-C002/CHATGPT_AUDIT_V01.md`: `[FUNCTIONAL_AUDIT_PASS / PERFORMANCE_GATE_BLOCKED]`. One-lane-per-frame safety, entitlement semantics, pause/reset and truth checks pass. Closure/owner feel-playtest is blocked by SB-M25-033 because dense 59x59 target-selection can synchronously stall a lane for multi-second time.
 
 **Owner-locked speed integration for M29/runtime:** M29 proves the explicit 1x/2x temporal authority and may keep a direct debug/headless toggle seam. That seam is not authorization for free shipping manual 2x. M39 must gate production manual 2x through the paid entitlement service in `coordination/OWNER_ECONOMY_REWARDS_V01.md`. Authoritative M23-exhausted automatic 2x remains free. Do not infer exhaustion from UI rows or slot occupancy.
 
