@@ -39,17 +39,33 @@ var _origin: Vector2 = Vector2.ZERO
 ## Memo of the most recent successful probe (winning target reuse).
 var _last_index: int = -1
 var _last_route = null
-## M52-C001-R01 exact-safe reachability prefilter (outside/rail starts only). 1 = CLEARED
-## cell 4-connected through CLEARED cells to a perimeter CLEARED cell, i.e. a cell the
-## Railroad V1 interior Dijkstra can stand on. Rebuilt whenever BoardState revision moves.
+## M52-C001-R01 exact-safe reachability prefilter (outside/rail starts only), materialised
+## per board state (M25-C003 S1-A):
+##   reach[i] = 1  CLEARED cell 4-connected through CLEARED cells to a perimeter CLEARED
+##                 cell, i.e. a cell the Railroad V1 interior Dijkstra can stand on;
+##   touch[i] = 1  i is a perimeter cell (direct rail ingress) OR 4-adjacent to a reach
+##                 cell — the exact M52 necessary condition for a Railroad V1 route to end
+##                 at i. touch[i] == 0 => compute_route(i) is NO_ROUTE (never a success).
+## Both are rebuilt whenever the BoardState revision moves; a lookup is then O(1).
 var _reach_mask: PackedByteArray = PackedByteArray()
+var _touch_mask: PackedByteArray = PackedByteArray()
 var _reach_revision: int = -1
-## Shared across access instances (all lanes of one wave probe the same board state):
+var _mask_board_id: int = 0
+## Shared across access instances (all lanes of one board state probe the same masks):
 ## keyed by the EXACT BoardState instance id + its monotonic revision, so a mask is never
 ## reused for a different board or a different lifecycle state (restore bumps revision).
+## Single slot: at most one board state's masks are retained (bounded, never grows).
 static var _shared_board_id: int = 0
 static var _shared_revision: int = -1
 static var _shared_mask: PackedByteArray = PackedByteArray()
+static var _shared_touch: PackedByteArray = PackedByteArray()
+## Diagnostic counter of mask builds (tests prove same-revision sharing / invalidation).
+static var mask_build_count: int = 0
+## Cached "prefilter supported for this board + origin" decision, recomputed whenever the
+## origin value differs from the one it was computed for (NaN never matches -> recomputed,
+## and stays unsupported).
+var _support_origin: Vector2 = Vector2(NAN, NAN)
+var _supported: bool = false
 
 func _init(routing_system, routing_access, board, origin: Vector2 = Vector2.ZERO) -> void:
 	_routing_system = routing_system
@@ -136,62 +152,115 @@ func consume_route(index: int):
 		return r
 	return null
 
-func _could_reach(index: int) -> bool:
-	if not (_board is BoardState) or not _board.is_valid_index(index):
-		return true  # let _probe fail closed with its own checks
-	if not (is_finite(_origin.x) and is_finite(_origin.y)):
+## Optional conservative necessary-condition capability (M25-C003 S1-B), consumed by
+## TargetSelector BEFORE its strict per-candidate body. Opaque to the selector:
+##   false -> `index` is mathematically NOT targetable for this access state (the exact M52
+##            necessary condition fails, so compute_route would be NO_ROUTE). Mirrors the
+##            observable side effect of is_targetable()'s false path (memo cleared).
+##   true  -> MAY be targetable; the caller must still run the authoritative is_targetable().
+##   null  -> unsupported here (invalid board/index, non-finite origin, or an inside-board
+##            debug start that uses the interior planner): the caller must not filter.
+## Never a success verdict.
+func prefilter_maybe_targetable(index: int) -> Variant:
+	if _origin != _support_origin:
+		_support_origin = _origin
+		_supported = _board is BoardState and _outside_origin()
+	if not _supported:
+		return null
+	# Hot path: this instance's masks are current for its (fixed) board's revision.
+	if _reach_revision != _board.get_revision() or _mask_board_id == 0:
+		if not _ensure_masks():
+			return null
+	if index < 0 or index >= _touch_mask.size():
+		return null   # invalid index (touch size == W*H): unsupported, never false
+	if _touch_mask[index] == 1:
 		return true
-	var w: int = _board.get_width()
-	var h: int = _board.get_height()
-	var ox: int = int(floor(_origin.x))
-	var oy: int = int(floor(_origin.y))
-	if ox >= 0 and oy >= 0 and ox < w and oy < h:
-		return true  # inside-board (debug) starts use the interior planner: no prefilter
-	var pos: Vector2i = _board.get_cell_position(index)
-	if pos.x == 0 or pos.y == 0 or pos.x == w - 1 or pos.y == h - 1:
-		return true
-	if _reach_revision != _board.get_revision() or _reach_mask.size() != w * h:
-		if _shared_board_id == _board.get_instance_id() and _shared_revision == _board.get_revision() 				and _shared_mask.size() == w * h:
-			_reach_mask = _shared_mask
-			_reach_revision = _shared_revision
-		else:
-			_build_reach_mask(w, h)
-			_shared_board_id = _board.get_instance_id()
-			_shared_revision = _reach_revision
-			_shared_mask = _reach_mask
-	for d in [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]:
-		var nx: int = pos.x + d.x
-		var ny: int = pos.y + d.y
-		if nx >= 0 and ny >= 0 and nx < w and ny < h and _reach_mask[ny * w + nx] == 1:
-			return true
+	_clear_memo()
 	return false
 
-func _build_reach_mask(w: int, h: int) -> void:
+func _could_reach(index: int) -> bool:
+	# Unsupported (null) -> probe; let _probe fail closed with its own checks.
+	return prefilter_maybe_targetable(index) != false
+
+func _outside_origin() -> bool:
+	if not (is_finite(_origin.x) and is_finite(_origin.y)):
+		return false
+	var ox: int = int(floor(_origin.x))
+	var oy: int = int(floor(_origin.y))
+	# Inside-board (debug) starts use the interior planner: no prefilter.
+	return not (ox >= 0 and oy >= 0 and ox < _board.get_width() and oy < _board.get_height())
+
+## Make the reach/touch masks current for the exact bound board + revision: reuse this
+## instance's, adopt the shared single-slot cache, or rebuild. False if the board has no
+## cells (nothing to filter).
+func _ensure_masks() -> bool:
+	var n: int = _board.get_width() * _board.get_height()
+	if n <= 0:
+		return false
+	var bid: int = _board.get_instance_id()
+	var rev: int = _board.get_revision()
+	if _mask_board_id == bid and _reach_revision == rev and _touch_mask.size() == n:
+		return true
+	if _shared_board_id == bid and _shared_revision == rev and _shared_touch.size() == n and _shared_mask.size() == n:
+		_reach_mask = _shared_mask
+		_touch_mask = _shared_touch
+	else:
+		_build_masks(_board.get_width(), _board.get_height())
+		_shared_board_id = bid
+		_shared_revision = rev
+		_shared_mask = _reach_mask
+		_shared_touch = _touch_mask
+	_mask_board_id = bid
+	_reach_revision = rev
+	return true
+
+func _build_masks(w: int, h: int) -> void:
+	mask_build_count += 1
+	var n: int = w * h
+	var tb := RuntimePerfProbe.now()
+	# One detached bulk read of the lifecycle bytes, then a local flood (no per-cell calls).
+	var st: PackedByteArray = _board.get_cell_states_copy()
+	var cleared: int = BoardState.CellState.CLEARED
 	_reach_mask = PackedByteArray()
-	_reach_mask.resize(w * h)
+	_reach_mask.resize(n)
 	var stack: PackedInt32Array = PackedInt32Array()
 	for y in range(h):
 		for x in range(w):
 			if x == 0 or y == 0 or x == w - 1 or y == h - 1:
 				var i: int = y * w + x
-				if _board.get_cell_state(i) == BoardState.CellState.CLEARED and _reach_mask[i] == 0:
+				if st[i] == cleared and _reach_mask[i] == 0:
 					_reach_mask[i] = 1
 					stack.append(i)
 	while not stack.is_empty():
 		var u: int = stack[stack.size() - 1]
 		stack.resize(stack.size() - 1)
 		var ux: int = u % w
-		var uy: int = u / w
-		for d in [Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)]:
-			var nx: int = ux + d.x
-			var ny: int = uy + d.y
-			if nx < 0 or ny < 0 or nx >= w or ny >= h:
-				continue
-			var n: int = ny * w + nx
-			if _reach_mask[n] == 0 and _board.get_cell_state(n) == BoardState.CellState.CLEARED:
-				_reach_mask[n] = 1
-				stack.append(n)
-	_reach_revision = _board.get_revision()
+		if u >= w and _reach_mask[u - w] == 0 and st[u - w] == cleared:
+			_reach_mask[u - w] = 1
+			stack.append(u - w)
+		if ux < w - 1 and _reach_mask[u + 1] == 0 and st[u + 1] == cleared:
+			_reach_mask[u + 1] = 1
+			stack.append(u + 1)
+		if u + w < n and _reach_mask[u + w] == 0 and st[u + w] == cleared:
+			_reach_mask[u + w] = 1
+			stack.append(u + w)
+		if ux > 0 and _reach_mask[u - 1] == 0 and st[u - 1] == cleared:
+			_reach_mask[u - 1] = 1
+			stack.append(u - 1)
+	# touch = perimeter OR 4-adjacent to a reach cell (the former per-call _could_reach rule).
+	_touch_mask = PackedByteArray()
+	_touch_mask.resize(n)
+	for x in range(w):
+		_touch_mask[x] = 1
+		_touch_mask[n - w + x] = 1
+	for y in range(1, h - 1):
+		var row: int = y * w
+		_touch_mask[row] = 1
+		_touch_mask[row + w - 1] = 1
+		for i in range(row + 1, row + w - 1):
+			if _reach_mask[i - w] == 1 or _reach_mask[i + 1] == 1 or _reach_mask[i + w] == 1 or _reach_mask[i - 1] == 1:
+				_touch_mask[i] = 1
+	RuntimePerfProbe.add("access_mask_build", tb)
 
 func _clear_memo() -> void:
 	_last_index = -1
