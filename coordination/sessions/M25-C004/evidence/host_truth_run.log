@@ -1,0 +1,43 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+  ok: laid-out host builds
+  base 2x: won=true clears=3481 frames=9588 routes=3481
+  ok: laid-out host builds
+  opt 2x: won=true clears=3481 frames=9588 routes=3481
+  ok: laid-out host builds
+  base 1x: won=true clears=3481 frames=19204 routes=3481
+  ok: laid-out host builds
+  opt 1x: won=true clears=3481 frames=19204 routes=3481
+  ok: laid-out host builds
+  shadow 2x: won=true clears=3481 frames=9588 routes=3481
+  ok: base 2x: every slot origin finite and below the board
+  ok: base 2x: WON, 3481/3481 clears, no duplicate claim/dispatch/clear, zero residue
+  ok: base 2x: compute_route <= 1 per lane (max 1)
+  ok: base 2x: one lane per frame
+  ok: opt 2x: every slot origin finite and below the board
+  ok: opt 2x: WON, 3481/3481 clears, no duplicate claim/dispatch/clear, zero residue
+  ok: opt 2x: compute_route <= 1 per lane (max 1)
+  ok: opt 2x: one lane per frame
+  ok: 2x: every compute_route call (origin, target, success, reason, full point sequence) identical base vs opt (3481 routes)
+  ok: 2x: dispatch target/colour sequence identical (3481)
+  ok: 2x: authenticated clear sequence identical (3481)
+  ok: 2x: identical final board
+  ok: 2x: 0 failed route probes over the full level (got 0)
+  ok: base 1x: every slot origin finite and below the board
+  ok: base 1x: WON, 3481/3481 clears, no duplicate claim/dispatch/clear, zero residue
+  ok: base 1x: compute_route <= 1 per lane (max 1)
+  ok: base 1x: one lane per frame
+  ok: opt 1x: every slot origin finite and below the board
+  ok: opt 1x: WON, 3481/3481 clears, no duplicate claim/dispatch/clear, zero residue
+  ok: opt 1x: compute_route <= 1 per lane (max 1)
+  ok: opt 1x: one lane per frame
+  ok: 1x: every compute_route call (origin, target, success, reason, full point sequence) identical base vs opt (3481 routes)
+  ok: 1x: dispatch target/colour sequence identical (3481)
+  ok: 1x: authenticated clear sequence identical (3481)
+  ok: 1x: identical final board
+  ok: 1x: 0 failed route probes over the full level (got 0)
+  ok: shadow: 3481 live routes, optimized == frozen oracle point-for-point (diffs 0), counting replica == oracle (diffs 0)
+  ok: shadow run WON 3481/3481, no duplicates
+  ok: shadow run == opt 2x dispatch and final board
+WORK {"baseline_max_heap":{"max":232,"mean":169.01,"n":3481,"p50":177,"p99":232},"baseline_neighbor_checks":{"max":13192,"mean":4572.45,"n":3481,"p50":3986,"p99":12459},"baseline_pops":{"max":3358,"mean":1186.6,"n":3481,"p50":1045,"p99":3172},"baseline_pushes":{"max":3371,"mean":1241.5,"n":3481,"p50":1106,"p99":3191},"baseline_relaxations":{"max":3139,"mean":1072.49,"n":3481,"p50":926,"p99":2968},"baseline_sources":{"max":236,"mean":171.07,"n":3481,"p50":179,"p99":236},"baseline_stale_pops":{"max":0,"mean":0.0,"n":3481,"p50":0,"p99":0},"baseline_state_reads":{"max":13191,"mean":4571.45,"n":3481,"p50":3985,"p99":12458},"optimized_chain_cells":{"max":38,"mean":11.51,"n":3481,"p50":10,"p99":35},"optimized_critical_sources":{"max":2,"mean":1.02,"n":3481,"p50":1,"p99":2},"optimized_k_steps":{"max":37,"mean":10.51,"n":3481,"p50":9,"p99":34},"optimized_rev_expanded":{"max":1005,"mean":150.08,"n":3481,"p50":53,"p99":880},"optimized_rev_neighbor_checks":{"max":4020,"mean":600.31,"n":3481,"p50":212,"p99":3520},"optimized_rev_reached":{"max":1079,"mean":170.29,"n":3481,"p50":67,"p99":947},"optimized_snapshots":{"max":1,"mean":1.0,"n":3481,"p50":1,"p99":1},"optimized_sweep_cells":{"max":133,"mean":12.19,"n":3481,"p50":9,"p99":65},"pop_ratio_baseline_over_optimized":{"max":213.5,"mean":31.48,"n":3481,"p50":16.1,"p99":174.0},"routes_layered":3481}
+m25_c004_host_truth: PASS (0 failed checks)

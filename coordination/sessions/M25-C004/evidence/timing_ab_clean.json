@@ -1,0 +1,1334 @@
+{
+  "engine": "4.7.2-stable (official)",
+  "label": "clean",
+  "runs": [
+    {
+      "clear_hash": 3442509311,
+      "clears": 3481,
+      "dispatch_hash": 2865577215,
+      "dup": [
+        0,
+        0
+      ],
+      "final_hash": 3105958246,
+      "frames": 9588,
+      "lanes": 5177,
+      "max_route_per_lane": 1,
+      "origins_below": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "round": 0,
+      "sections": {
+        "access_compute_route": {
+          "count": 3481,
+          "max_ms": 93.379,
+          "mean_ms": 29.144,
+          "total_ms": 101450.273
+        },
+        "access_mask_build": {
+          "count": 2108,
+          "max_ms": 5.875,
+          "mean_ms": 2.284,
+          "total_ms": 4815.558
+        },
+        "access_validate": {
+          "count": 3481,
+          "max_ms": 1.267,
+          "mean_ms": 0.246,
+          "total_ms": 857.385
+        },
+        "agent_drive_arrival": {
+          "count": 9588,
+          "max_ms": 7.338,
+          "mean_ms": 1.937,
+          "total_ms": 18570.953
+        },
+        "completion_on_tick": {
+          "count": 9588,
+          "max_ms": 1.582,
+          "mean_ms": 0.148,
+          "total_ms": 1418.146
+        },
+        "dispatcher_spawn": {
+          "count": 3481,
+          "max_ms": 18.658,
+          "mean_ms": 0.468,
+          "total_ms": 1629.536
+        },
+        "m25_claim": {
+          "count": 5177,
+          "max_ms": 96.825,
+          "mean_ms": 21.439,
+          "total_ms": 110991.886
+        },
+        "m26_dispatch_lane": {
+          "count": 5177,
+          "max_ms": 97.579,
+          "mean_ms": 21.874,
+          "total_ms": 113243.565
+        },
+        "renderer_update": {
+          "count": 3481,
+          "max_ms": 0.121,
+          "mean_ms": 0.034,
+          "total_ms": 118.205
+        },
+        "route_dijkstra": {
+          "count": 3481,
+          "max_ms": 86.729,
+          "mean_ms": 24.941,
+          "total_ms": 86819.178
+        },
+        "route_sources": {
+          "count": 3481,
+          "max_ms": 16.255,
+          "mean_ms": 2.818,
+          "total_ms": 9810.171
+        },
+        "route_validate": {
+          "count": 3481,
+          "max_ms": 0.932,
+          "mean_ms": 0.31,
+          "total_ms": 1077.793
+        },
+        "target_selection": {
+          "count": 5177,
+          "max_ms": 96.76,
+          "mean_ms": 21.384,
+          "total_ms": 110705.421
+        },
+        "ui_snapshot_sync": {
+          "count": 9588,
+          "max_ms": 8.782,
+          "mean_ms": 2.148,
+          "total_ms": 20591.991
+        }
+      },
+      "spec": "oracle2x",
+      "timing": {
+        "frame_ms": {
+          "max": 104.549,
+          "mean": 16.836,
+          "n": 9588,
+          "p50": 6.159,
+          "p90": 49.333,
+          "p99": 79.536
+        },
+        "lanes": 5177,
+        "note": "RuntimePerfProbe per frame (one lane per frame); instrumentation adds overhead in counting/baseline modes",
+        "route_dijkstra_ms": {
+          "max": 86.729,
+          "mean": 24.941,
+          "n": 3481,
+          "p50": 21.08,
+          "p90": 53.546,
+          "p99": 68.89
+        },
+        "route_sources_ms": {
+          "max": 16.255,
+          "mean": 2.818,
+          "n": 3481,
+          "p50": 3.005,
+          "p90": 3.43,
+          "p99": 4.474
+        },
+        "route_validate_ms": {
+          "max": 0.932,
+          "mean": 0.31,
+          "n": 3481,
+          "p50": 0.313,
+          "p90": 0.445,
+          "p99": 0.592
+        },
+        "scan_excl_route_ms": {
+          "max": 6.111,
+          "mean": 1.622,
+          "n": 5177,
+          "p50": 0.926,
+          "p90": 3.433,
+          "p99": 3.957
+        },
+        "target_selection_ms": {
+          "max": 96.76,
+          "mean": 21.384,
+          "n": 5177,
+          "p50": 15.3,
+          "p90": 55.355,
+          "p99": 74.873
+        },
+        "winner_route_ms": {
+          "max": 93.379,
+          "mean": 29.144,
+          "n": 3481,
+          "p50": 25.59,
+          "p90": 58.664,
+          "p99": 74.874
+        }
+      },
+      "won": true
+    },
+    {
+      "clear_hash": 3442509311,
+      "clears": 3481,
+      "dispatch_hash": 2865577215,
+      "dup": [
+        0,
+        0
+      ],
+      "final_hash": 3105958246,
+      "frames": 9588,
+      "lanes": 5177,
+      "max_route_per_lane": 1,
+      "origins_below": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "round": 0,
+      "sections": {
+        "access_compute_route": {
+          "count": 3481,
+          "max_ms": 2.105,
+          "mean_ms": 0.615,
+          "total_ms": 2141.172
+        },
+        "access_mask_build": {
+          "count": 2108,
+          "max_ms": 4.636,
+          "mean_ms": 2.326,
+          "total_ms": 4902.17
+        },
+        "access_validate": {
+          "count": 3481,
+          "max_ms": 0.762,
+          "mean_ms": 0.258,
+          "total_ms": 898.087
+        },
+        "agent_drive_arrival": {
+          "count": 9588,
+          "max_ms": 6.103,
+          "mean_ms": 1.96,
+          "total_ms": 18787.946
+        },
+        "completion_on_tick": {
+          "count": 9588,
+          "max_ms": 1.41,
+          "mean_ms": 0.152,
+          "total_ms": 1458.797
+        },
+        "dispatcher_spawn": {
+          "count": 3481,
+          "max_ms": 1.193,
+          "mean_ms": 0.455,
+          "total_ms": 1582.826
+        },
+        "m25_claim": {
+          "count": 5177,
+          "max_ms": 6.803,
+          "mean_ms": 2.309,
+          "total_ms": 11953.029
+        },
+        "m26_dispatch_lane": {
+          "count": 5177,
+          "max_ms": 7.792,
+          "mean_ms": 2.727,
+          "total_ms": 14116.686
+        },
+        "renderer_update": {
+          "count": 3481,
+          "max_ms": 0.092,
+          "mean_ms": 0.035,
+          "total_ms": 120.274
+        },
+        "route_dijkstra": {
+          "count": 3481,
+          "max_ms": 0.969,
+          "mean_ms": 0.165,
+          "total_ms": 573.181
+        },
+        "route_validate": {
+          "count": 3481,
+          "max_ms": 0.847,
+          "mean_ms": 0.29,
+          "total_ms": 1010.7
+        },
+        "target_selection": {
+          "count": 5177,
+          "max_ms": 6.723,
+          "mean_ms": 2.258,
+          "total_ms": 11691.99
+        },
+        "ui_snapshot_sync": {
+          "count": 9588,
+          "max_ms": 4.758,
+          "mean_ms": 2.229,
+          "total_ms": 21376.205
+        }
+      },
+      "spec": "opt2x",
+      "timing": {
+        "frame_ms": {
+          "max": 17.842,
+          "mean": 6.568,
+          "n": 9588,
+          "p50": 6.106,
+          "p90": 9.729,
+          "p99": 12.883
+        },
+        "lanes": 5177,
+        "note": "RuntimePerfProbe per frame (one lane per frame); instrumentation adds overhead in counting/baseline modes",
+        "route_dijkstra_ms": {
+          "max": 0.969,
+          "mean": 0.165,
+          "n": 3481,
+          "p50": 0.102,
+          "p90": 0.387,
+          "p99": 0.69
+        },
+        "route_sources_ms": {
+          "max": 0.0,
+          "mean": 0.0,
+          "n": 3481,
+          "p50": 0.0,
+          "p90": 0.0,
+          "p99": 0.0
+        },
+        "route_validate_ms": {
+          "max": 0.847,
+          "mean": 0.29,
+          "n": 3481,
+          "p50": 0.282,
+          "p90": 0.406,
+          "p99": 0.557
+        },
+        "scan_excl_route_ms": {
+          "max": 5.44,
+          "mean": 1.671,
+          "n": 5177,
+          "p50": 0.995,
+          "p90": 3.406,
+          "p99": 3.786
+        },
+        "target_selection_ms": {
+          "max": 6.723,
+          "mean": 2.258,
+          "n": 5177,
+          "p50": 1.786,
+          "p90": 4.101,
+          "p99": 4.998
+        },
+        "winner_route_ms": {
+          "max": 2.105,
+          "mean": 0.615,
+          "n": 3481,
+          "p50": 0.556,
+          "p90": 0.912,
+          "p99": 1.405
+        }
+      },
+      "won": true
+    },
+    {
+      "clear_hash": 533425599,
+      "clears": 3481,
+      "dispatch_hash": 1234950815,
+      "dup": [
+        0,
+        0
+      ],
+      "final_hash": 3105958246,
+      "frames": 19204,
+      "lanes": 5256,
+      "max_route_per_lane": 1,
+      "origins_below": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "round": 0,
+      "sections": {
+        "access_compute_route": {
+          "count": 3481,
+          "max_ms": 100.342,
+          "mean_ms": 29.451,
+          "total_ms": 102517.708
+        },
+        "access_mask_build": {
+          "count": 1590,
+          "max_ms": 5.642,
+          "mean_ms": 2.36,
+          "total_ms": 3752.715
+        },
+        "access_validate": {
+          "count": 3481,
+          "max_ms": 0.848,
+          "mean_ms": 0.256,
+          "total_ms": 891.118
+        },
+        "agent_drive_arrival": {
+          "count": 19204,
+          "max_ms": 5.496,
+          "mean_ms": 1.803,
+          "total_ms": 34623.857
+        },
+        "completion_on_tick": {
+          "count": 19204,
+          "max_ms": 1.384,
+          "mean_ms": 0.152,
+          "total_ms": 2911.978
+        },
+        "dispatcher_spawn": {
+          "count": 3481,
+          "max_ms": 1.485,
+          "mean_ms": 0.481,
+          "total_ms": 1674.632
+        },
+        "m25_claim": {
+          "count": 5256,
+          "max_ms": 100.964,
+          "mean_ms": 21.186,
+          "total_ms": 111351.008
+        },
+        "m26_dispatch_lane": {
+          "count": 5256,
+          "max_ms": 101.526,
+          "mean_ms": 21.628,
+          "total_ms": 113676.53
+        },
+        "renderer_update": {
+          "count": 3481,
+          "max_ms": 0.095,
+          "mean_ms": 0.036,
+          "total_ms": 124.762
+        },
+        "route_dijkstra": {
+          "count": 3481,
+          "max_ms": 85.394,
+          "mean_ms": 25.088,
+          "total_ms": 87329.609
+        },
+        "route_sources": {
+          "count": 3481,
+          "max_ms": 10.767,
+          "mean_ms": 2.943,
+          "total_ms": 10244.055
+        },
+        "route_validate": {
+          "count": 3481,
+          "max_ms": 0.921,
+          "mean_ms": 0.32,
+          "total_ms": 1115.536
+        },
+        "target_selection": {
+          "count": 5256,
+          "max_ms": 100.898,
+          "mean_ms": 21.128,
+          "total_ms": 111051.392
+        },
+        "ui_snapshot_sync": {
+          "count": 19204,
+          "max_ms": 6.807,
+          "mean_ms": 2.185,
+          "total_ms": 41954.495
+        }
+      },
+      "spec": "oracle1x",
+      "timing": {
+        "frame_ms": {
+          "max": 107.109,
+          "mean": 10.784,
+          "n": 19204,
+          "p50": 5.298,
+          "p90": 30.403,
+          "p99": 74.041
+        },
+        "lanes": 5256,
+        "note": "RuntimePerfProbe per frame (one lane per frame); instrumentation adds overhead in counting/baseline modes",
+        "route_dijkstra_ms": {
+          "max": 85.394,
+          "mean": 25.088,
+          "n": 3481,
+          "p50": 21.65,
+          "p90": 53.766,
+          "p99": 68.834
+        },
+        "route_sources_ms": {
+          "max": 10.767,
+          "mean": 2.943,
+          "n": 3481,
+          "p50": 2.992,
+          "p90": 3.423,
+          "p99": 4.239
+        },
+        "route_validate_ms": {
+          "max": 0.921,
+          "mean": 0.32,
+          "n": 3481,
+          "p50": 0.316,
+          "p90": 0.442,
+          "p99": 0.593
+        },
+        "scan_excl_route_ms": {
+          "max": 6.561,
+          "mean": 1.454,
+          "n": 5256,
+          "p50": 0.905,
+          "p90": 3.374,
+          "p99": 3.711
+        },
+        "target_selection_ms": {
+          "max": 100.898,
+          "mean": 21.128,
+          "n": 5256,
+          "p50": 14.345,
+          "p90": 54.712,
+          "p99": 74.842
+        },
+        "winner_route_ms": {
+          "max": 100.342,
+          "mean": 29.451,
+          "n": 3481,
+          "p50": 26.046,
+          "p90": 59.019,
+          "p99": 74.47
+        }
+      },
+      "won": true
+    },
+    {
+      "clear_hash": 533425599,
+      "clears": 3481,
+      "dispatch_hash": 1234950815,
+      "dup": [
+        0,
+        0
+      ],
+      "final_hash": 3105958246,
+      "frames": 19204,
+      "lanes": 5256,
+      "max_route_per_lane": 1,
+      "origins_below": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "round": 0,
+      "sections": {
+        "access_compute_route": {
+          "count": 3481,
+          "max_ms": 1.916,
+          "mean_ms": 0.618,
+          "total_ms": 2149.621
+        },
+        "access_mask_build": {
+          "count": 1590,
+          "max_ms": 6.197,
+          "mean_ms": 2.368,
+          "total_ms": 3765.626
+        },
+        "access_validate": {
+          "count": 3481,
+          "max_ms": 0.754,
+          "mean_ms": 0.256,
+          "total_ms": 892.372
+        },
+        "agent_drive_arrival": {
+          "count": 19204,
+          "max_ms": 6.418,
+          "mean_ms": 1.821,
+          "total_ms": 34973.678
+        },
+        "completion_on_tick": {
+          "count": 19204,
+          "max_ms": 1.358,
+          "mean_ms": 0.152,
+          "total_ms": 2926.726
+        },
+        "dispatcher_spawn": {
+          "count": 3481,
+          "max_ms": 1.04,
+          "mean_ms": 0.456,
+          "total_ms": 1585.951
+        },
+        "m25_claim": {
+          "count": 5256,
+          "max_ms": 6.9,
+          "mean_ms": 2.079,
+          "total_ms": 10925.646
+        },
+        "m26_dispatch_lane": {
+          "count": 5256,
+          "max_ms": 8.025,
+          "mean_ms": 2.494,
+          "total_ms": 13106.096
+        },
+        "renderer_update": {
+          "count": 3481,
+          "max_ms": 0.16,
+          "mean_ms": 0.037,
+          "total_ms": 127.118
+        },
+        "route_dijkstra": {
+          "count": 3481,
+          "max_ms": 1.13,
+          "mean_ms": 0.165,
+          "total_ms": 575.868
+        },
+        "route_validate": {
+          "count": 3481,
+          "max_ms": 0.815,
+          "mean_ms": 0.289,
+          "total_ms": 1006.918
+        },
+        "target_selection": {
+          "count": 5256,
+          "max_ms": 6.83,
+          "mean_ms": 2.028,
+          "total_ms": 10656.544
+        },
+        "ui_snapshot_sync": {
+          "count": 19204,
+          "max_ms": 12.473,
+          "mean_ms": 2.201,
+          "total_ms": 42274.731
+        }
+      },
+      "spec": "opt1x",
+      "timing": {
+        "frame_ms": {
+          "max": 18.257,
+          "mean": 5.575,
+          "n": 19204,
+          "p50": 5.319,
+          "p90": 7.943,
+          "p99": 11.714
+        },
+        "lanes": 5256,
+        "note": "RuntimePerfProbe per frame (one lane per frame); instrumentation adds overhead in counting/baseline modes",
+        "route_dijkstra_ms": {
+          "max": 1.13,
+          "mean": 0.165,
+          "n": 3481,
+          "p50": 0.105,
+          "p90": 0.39,
+          "p99": 0.682
+        },
+        "route_sources_ms": {
+          "max": 0.0,
+          "mean": 0.0,
+          "n": 3481,
+          "p50": 0.0,
+          "p90": 0.0,
+          "p99": 0.0
+        },
+        "route_validate_ms": {
+          "max": 0.815,
+          "mean": 0.289,
+          "n": 3481,
+          "p50": 0.283,
+          "p90": 0.405,
+          "p99": 0.55
+        },
+        "scan_excl_route_ms": {
+          "max": 6.83,
+          "mean": 1.449,
+          "n": 5256,
+          "p50": 0.893,
+          "p90": 3.373,
+          "p99": 3.826
+        },
+        "target_selection_ms": {
+          "max": 6.83,
+          "mean": 2.028,
+          "n": 5256,
+          "p50": 1.615,
+          "p90": 3.938,
+          "p99": 5.054
+        },
+        "winner_route_ms": {
+          "max": 1.916,
+          "mean": 0.618,
+          "n": 3481,
+          "p50": 0.563,
+          "p90": 0.925,
+          "p99": 1.375
+        }
+      },
+      "won": true
+    },
+    {
+      "clear_hash": 3442509311,
+      "clears": 3481,
+      "dispatch_hash": 2865577215,
+      "dup": [
+        0,
+        0
+      ],
+      "final_hash": 3105958246,
+      "frames": 9588,
+      "lanes": 5177,
+      "max_route_per_lane": 1,
+      "origins_below": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "round": 1,
+      "sections": {
+        "access_compute_route": {
+          "count": 3481,
+          "max_ms": 124.466,
+          "mean_ms": 29.293,
+          "total_ms": 101970.503
+        },
+        "access_mask_build": {
+          "count": 2108,
+          "max_ms": 17.383,
+          "mean_ms": 2.325,
+          "total_ms": 4900.107
+        },
+        "access_validate": {
+          "count": 3481,
+          "max_ms": 1.912,
+          "mean_ms": 0.261,
+          "total_ms": 909.021
+        },
+        "agent_drive_arrival": {
+          "count": 9588,
+          "max_ms": 10.835,
+          "mean_ms": 1.965,
+          "total_ms": 18838.054
+        },
+        "completion_on_tick": {
+          "count": 9588,
+          "max_ms": 2.169,
+          "mean_ms": 0.154,
+          "total_ms": 1480.739
+        },
+        "dispatcher_spawn": {
+          "count": 3481,
+          "max_ms": 2.755,
+          "mean_ms": 0.486,
+          "total_ms": 1690.398
+        },
+        "m25_claim": {
+          "count": 5177,
+          "max_ms": 131.205,
+          "mean_ms": 21.615,
+          "total_ms": 111898.571
+        },
+        "m26_dispatch_lane": {
+          "count": 5177,
+          "max_ms": 134.496,
+          "mean_ms": 22.067,
+          "total_ms": 114240.818
+        },
+        "renderer_update": {
+          "count": 3481,
+          "max_ms": 0.183,
+          "mean_ms": 0.035,
+          "total_ms": 121.925
+        },
+        "route_dijkstra": {
+          "count": 3481,
+          "max_ms": 116.413,
+          "mean_ms": 24.927,
+          "total_ms": 86769.954
+        },
+        "route_sources": {
+          "count": 3481,
+          "max_ms": 18.415,
+          "mean_ms": 2.942,
+          "total_ms": 10240.356
+        },
+        "route_validate": {
+          "count": 3481,
+          "max_ms": 2.262,
+          "mean_ms": 0.324,
+          "total_ms": 1127.326
+        },
+        "target_selection": {
+          "count": 5177,
+          "max_ms": 130.932,
+          "mean_ms": 21.557,
+          "total_ms": 111599.61
+        },
+        "ui_snapshot_sync": {
+          "count": 9588,
+          "max_ms": 14.355,
+          "mean_ms": 2.236,
+          "total_ms": 21436.894
+        }
+      },
+      "spec": "oracle2x",
+      "timing": {
+        "frame_ms": {
+          "max": 158.699,
+          "mean": 17.071,
+          "n": 9588,
+          "p50": 6.341,
+          "p90": 49.052,
+          "p99": 79.977
+        },
+        "lanes": 5177,
+        "note": "RuntimePerfProbe per frame (one lane per frame); instrumentation adds overhead in counting/baseline modes",
+        "route_dijkstra_ms": {
+          "max": 116.413,
+          "mean": 24.927,
+          "n": 3481,
+          "p50": 21.432,
+          "p90": 53.524,
+          "p99": 69.457
+        },
+        "route_sources_ms": {
+          "max": 18.415,
+          "mean": 2.942,
+          "n": 3481,
+          "p50": 2.992,
+          "p90": 3.437,
+          "p99": 4.465
+        },
+        "route_validate_ms": {
+          "max": 2.262,
+          "mean": 0.324,
+          "n": 3481,
+          "p50": 0.314,
+          "p90": 0.446,
+          "p99": 0.612
+        },
+        "scan_excl_route_ms": {
+          "max": 18.921,
+          "mean": 1.684,
+          "n": 5177,
+          "p50": 1.015,
+          "p90": 3.407,
+          "p99": 3.908
+        },
+        "target_selection_ms": {
+          "max": 130.932,
+          "mean": 21.557,
+          "n": 5177,
+          "p50": 15.213,
+          "p90": 54.277,
+          "p99": 75.191
+        },
+        "winner_route_ms": {
+          "max": 124.466,
+          "mean": 29.293,
+          "n": 3481,
+          "p50": 25.968,
+          "p90": 58.638,
+          "p99": 75.127
+        }
+      },
+      "won": true
+    },
+    {
+      "clear_hash": 3442509311,
+      "clears": 3481,
+      "dispatch_hash": 2865577215,
+      "dup": [
+        0,
+        0
+      ],
+      "final_hash": 3105958246,
+      "frames": 9588,
+      "lanes": 5177,
+      "max_route_per_lane": 1,
+      "origins_below": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "round": 1,
+      "sections": {
+        "access_compute_route": {
+          "count": 3481,
+          "max_ms": 3.551,
+          "mean_ms": 0.604,
+          "total_ms": 2102.012
+        },
+        "access_mask_build": {
+          "count": 2108,
+          "max_ms": 5.003,
+          "mean_ms": 2.274,
+          "total_ms": 4793.028
+        },
+        "access_validate": {
+          "count": 3481,
+          "max_ms": 0.73,
+          "mean_ms": 0.249,
+          "total_ms": 866.025
+        },
+        "agent_drive_arrival": {
+          "count": 9588,
+          "max_ms": 6.191,
+          "mean_ms": 1.945,
+          "total_ms": 18647.608
+        },
+        "completion_on_tick": {
+          "count": 9588,
+          "max_ms": 1.477,
+          "mean_ms": 0.149,
+          "total_ms": 1424.08
+        },
+        "dispatcher_spawn": {
+          "count": 3481,
+          "max_ms": 1.542,
+          "mean_ms": 0.445,
+          "total_ms": 1549.468
+        },
+        "m25_claim": {
+          "count": 5177,
+          "max_ms": 8.109,
+          "mean_ms": 2.256,
+          "total_ms": 11681.658
+        },
+        "m26_dispatch_lane": {
+          "count": 5177,
+          "max_ms": 9.154,
+          "mean_ms": 2.666,
+          "total_ms": 13799.793
+        },
+        "renderer_update": {
+          "count": 3481,
+          "max_ms": 0.189,
+          "mean_ms": 0.034,
+          "total_ms": 119.453
+        },
+        "route_dijkstra": {
+          "count": 3481,
+          "max_ms": 3.045,
+          "mean_ms": 0.163,
+          "total_ms": 566.897
+        },
+        "route_validate": {
+          "count": 3481,
+          "max_ms": 0.811,
+          "mean_ms": 0.281,
+          "total_ms": 978.757
+        },
+        "target_selection": {
+          "count": 5177,
+          "max_ms": 8.027,
+          "mean_ms": 2.207,
+          "total_ms": 11424.601
+        },
+        "ui_snapshot_sync": {
+          "count": 9588,
+          "max_ms": 4.943,
+          "mean_ms": 2.157,
+          "total_ms": 20685.788
+        }
+      },
+      "spec": "opt2x",
+      "timing": {
+        "frame_ms": {
+          "max": 17.128,
+          "mean": 6.443,
+          "n": 9588,
+          "p50": 5.96,
+          "p90": 9.681,
+          "p99": 12.67
+        },
+        "lanes": 5177,
+        "note": "RuntimePerfProbe per frame (one lane per frame); instrumentation adds overhead in counting/baseline modes",
+        "route_dijkstra_ms": {
+          "max": 3.045,
+          "mean": 0.163,
+          "n": 3481,
+          "p50": 0.103,
+          "p90": 0.386,
+          "p99": 0.68
+        },
+        "route_sources_ms": {
+          "max": 0.0,
+          "mean": 0.0,
+          "n": 3481,
+          "p50": 0.0,
+          "p90": 0.0,
+          "p99": 0.0
+        },
+        "route_validate_ms": {
+          "max": 0.811,
+          "mean": 0.281,
+          "n": 3481,
+          "p50": 0.275,
+          "p90": 0.395,
+          "p99": 0.541
+        },
+        "scan_excl_route_ms": {
+          "max": 6.381,
+          "mean": 1.633,
+          "n": 5177,
+          "p50": 0.984,
+          "p90": 3.385,
+          "p99": 3.716
+        },
+        "target_selection_ms": {
+          "max": 8.027,
+          "mean": 2.207,
+          "n": 5177,
+          "p50": 1.781,
+          "p90": 4.085,
+          "p99": 5.006
+        },
+        "winner_route_ms": {
+          "max": 3.551,
+          "mean": 0.604,
+          "n": 3481,
+          "p50": 0.55,
+          "p90": 0.901,
+          "p99": 1.377
+        }
+      },
+      "won": true
+    },
+    {
+      "clear_hash": 533425599,
+      "clears": 3481,
+      "dispatch_hash": 1234950815,
+      "dup": [
+        0,
+        0
+      ],
+      "final_hash": 3105958246,
+      "frames": 19204,
+      "lanes": 5256,
+      "max_route_per_lane": 1,
+      "origins_below": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "round": 1,
+      "sections": {
+        "access_compute_route": {
+          "count": 3481,
+          "max_ms": 86.063,
+          "mean_ms": 29.413,
+          "total_ms": 102388.374
+        },
+        "access_mask_build": {
+          "count": 1590,
+          "max_ms": 4.978,
+          "mean_ms": 2.336,
+          "total_ms": 3713.843
+        },
+        "access_validate": {
+          "count": 3481,
+          "max_ms": 0.609,
+          "mean_ms": 0.255,
+          "total_ms": 887.251
+        },
+        "agent_drive_arrival": {
+          "count": 19204,
+          "max_ms": 5.356,
+          "mean_ms": 1.809,
+          "total_ms": 34743.986
+        },
+        "completion_on_tick": {
+          "count": 19204,
+          "max_ms": 1.398,
+          "mean_ms": 0.149,
+          "total_ms": 2862.788
+        },
+        "dispatcher_spawn": {
+          "count": 3481,
+          "max_ms": 1.123,
+          "mean_ms": 0.488,
+          "total_ms": 1699.14
+        },
+        "m25_claim": {
+          "count": 5256,
+          "max_ms": 90.155,
+          "mean_ms": 21.144,
+          "total_ms": 111130.517
+        },
+        "m26_dispatch_lane": {
+          "count": 5256,
+          "max_ms": 90.88,
+          "mean_ms": 21.589,
+          "total_ms": 113470.186
+        },
+        "renderer_update": {
+          "count": 3481,
+          "max_ms": 0.131,
+          "mean_ms": 0.036,
+          "total_ms": 123.922
+        },
+        "route_dijkstra": {
+          "count": 3481,
+          "max_ms": 80.814,
+          "mean_ms": 25.082,
+          "total_ms": 87309.777
+        },
+        "route_sources": {
+          "count": 3481,
+          "max_ms": 7.185,
+          "mean_ms": 2.925,
+          "total_ms": 10183.416
+        },
+        "route_validate": {
+          "count": 3481,
+          "max_ms": 0.726,
+          "mean_ms": 0.318,
+          "total_ms": 1107.857
+        },
+        "target_selection": {
+          "count": 5256,
+          "max_ms": 90.086,
+          "mean_ms": 21.087,
+          "total_ms": 110833.296
+        },
+        "ui_snapshot_sync": {
+          "count": 19204,
+          "max_ms": 5.165,
+          "mean_ms": 2.163,
+          "total_ms": 41535.868
+        }
+      },
+      "spec": "oracle1x",
+      "timing": {
+        "frame_ms": {
+          "max": 97.575,
+          "mean": 10.755,
+          "n": 19204,
+          "p50": 5.342,
+          "p90": 30.404,
+          "p99": 74.112
+        },
+        "lanes": 5256,
+        "note": "RuntimePerfProbe per frame (one lane per frame); instrumentation adds overhead in counting/baseline modes",
+        "route_dijkstra_ms": {
+          "max": 80.814,
+          "mean": 25.082,
+          "n": 3481,
+          "p50": 21.656,
+          "p90": 53.793,
+          "p99": 68.656
+        },
+        "route_sources_ms": {
+          "max": 7.185,
+          "mean": 2.925,
+          "n": 3481,
+          "p50": 3.006,
+          "p90": 3.403,
+          "p99": 3.731
+        },
+        "route_validate_ms": {
+          "max": 0.726,
+          "mean": 0.318,
+          "n": 3481,
+          "p50": 0.313,
+          "p90": 0.443,
+          "p99": 0.581
+        },
+        "scan_excl_route_ms": {
+          "max": 5.217,
+          "mean": 1.438,
+          "n": 5256,
+          "p50": 0.892,
+          "p90": 3.364,
+          "p99": 3.655
+        },
+        "target_selection_ms": {
+          "max": 90.086,
+          "mean": 21.087,
+          "n": 5256,
+          "p50": 14.421,
+          "p90": 55.079,
+          "p99": 74.626
+        },
+        "winner_route_ms": {
+          "max": 86.063,
+          "mean": 29.413,
+          "n": 3481,
+          "p50": 26.063,
+          "p90": 59.059,
+          "p99": 74.352
+        }
+      },
+      "won": true
+    },
+    {
+      "clear_hash": 533425599,
+      "clears": 3481,
+      "dispatch_hash": 1234950815,
+      "dup": [
+        0,
+        0
+      ],
+      "final_hash": 3105958246,
+      "frames": 19204,
+      "lanes": 5256,
+      "max_route_per_lane": 1,
+      "origins_below": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "round": 1,
+      "sections": {
+        "access_compute_route": {
+          "count": 3481,
+          "max_ms": 2.996,
+          "mean_ms": 0.613,
+          "total_ms": 2135.157
+        },
+        "access_mask_build": {
+          "count": 1590,
+          "max_ms": 4.453,
+          "mean_ms": 2.348,
+          "total_ms": 3732.657
+        },
+        "access_validate": {
+          "count": 3481,
+          "max_ms": 0.637,
+          "mean_ms": 0.256,
+          "total_ms": 891.678
+        },
+        "agent_drive_arrival": {
+          "count": 19204,
+          "max_ms": 5.393,
+          "mean_ms": 1.815,
+          "total_ms": 34845.703
+        },
+        "completion_on_tick": {
+          "count": 19204,
+          "max_ms": 1.575,
+          "mean_ms": 0.149,
+          "total_ms": 2863.533
+        },
+        "dispatcher_spawn": {
+          "count": 3481,
+          "max_ms": 1.214,
+          "mean_ms": 0.448,
+          "total_ms": 1558.1
+        },
+        "m25_claim": {
+          "count": 5256,
+          "max_ms": 5.979,
+          "mean_ms": 2.054,
+          "total_ms": 10797.545
+        },
+        "m26_dispatch_lane": {
+          "count": 5256,
+          "max_ms": 6.893,
+          "mean_ms": 2.459,
+          "total_ms": 12922.541
+        },
+        "renderer_update": {
+          "count": 3481,
+          "max_ms": 0.244,
+          "mean_ms": 0.035,
+          "total_ms": 123.481
+        },
+        "route_dijkstra": {
+          "count": 3481,
+          "max_ms": 0.848,
+          "mean_ms": 0.163,
+          "total_ms": 568.427
+        },
+        "route_validate": {
+          "count": 3481,
+          "max_ms": 0.756,
+          "mean_ms": 0.291,
+          "total_ms": 1013.406
+        },
+        "target_selection": {
+          "count": 5256,
+          "max_ms": 5.893,
+          "mean_ms": 2.006,
+          "total_ms": 10543.284
+        },
+        "ui_snapshot_sync": {
+          "count": 19204,
+          "max_ms": 5.787,
+          "mean_ms": 2.165,
+          "total_ms": 41585.656
+        }
+      },
+      "spec": "opt1x",
+      "timing": {
+        "frame_ms": {
+          "max": 16.99,
+          "mean": 5.499,
+          "n": 19204,
+          "p50": 5.326,
+          "p90": 7.701,
+          "p99": 11.252
+        },
+        "lanes": 5256,
+        "note": "RuntimePerfProbe per frame (one lane per frame); instrumentation adds overhead in counting/baseline modes",
+        "route_dijkstra_ms": {
+          "max": 0.848,
+          "mean": 0.163,
+          "n": 3481,
+          "p50": 0.102,
+          "p90": 0.386,
+          "p99": 0.662
+        },
+        "route_sources_ms": {
+          "max": 0.0,
+          "mean": 0.0,
+          "n": 3481,
+          "p50": 0.0,
+          "p90": 0.0,
+          "p99": 0.0
+        },
+        "route_validate_ms": {
+          "max": 0.756,
+          "mean": 0.291,
+          "n": 3481,
+          "p50": 0.288,
+          "p90": 0.403,
+          "p99": 0.528
+        },
+        "scan_excl_route_ms": {
+          "max": 4.882,
+          "mean": 1.43,
+          "n": 5256,
+          "p50": 0.88,
+          "p90": 3.352,
+          "p99": 3.609
+        },
+        "target_selection_ms": {
+          "max": 5.893,
+          "mean": 2.006,
+          "n": 5256,
+          "p50": 1.595,
+          "p90": 3.925,
+          "p99": 4.826
+        },
+        "winner_route_ms": {
+          "max": 2.996,
+          "mean": 0.613,
+          "n": 3481,
+          "p50": 0.559,
+          "p90": 0.903,
+          "p99": 1.341
+        }
+      },
+      "won": true
+    }
+  ]
+}

@@ -1,0 +1,158 @@
+{
+  "1x": {
+    "clears": 3481,
+    "dispatch_hash": 1234950815,
+    "max_route_per_lane": 1,
+    "origins": [
+      [
+        6.28,
+        72.78
+      ],
+      [
+        15.6,
+        72.78
+      ],
+      [
+        24.91,
+        72.78
+      ],
+      [
+        34.13,
+        72.78
+      ],
+      [
+        43.45,
+        72.78
+      ],
+      [
+        52.76,
+        72.78
+      ]
+    ],
+    "origins_below": true,
+    "timing": {
+      "frame_ms": {
+        "max": 108.552,
+        "mean": 11.338,
+        "n": 19204,
+        "p50": 5.631,
+        "p90": 31.93,
+        "p99": 76.062
+      },
+      "lanes": 5256,
+      "note": "RuntimePerfProbe per frame (one lane per frame); instrumentation adds overhead in counting/baseline modes",
+      "route_dijkstra_ms": {
+        "max": 94.709,
+        "mean": 25.926,
+        "n": 3481,
+        "p50": 22.899,
+        "p90": 54.858,
+        "p99": 70.339
+      },
+      "scan_excl_route_ms": {
+        "max": 6.049,
+        "mean": 1.52,
+        "n": 5256,
+        "p50": 0.931,
+        "p90": 3.447,
+        "p99": 4.844
+      },
+      "target_selection_ms": {
+        "max": 101.044,
+        "mean": 21.885,
+        "n": 5256,
+        "p50": 14.868,
+        "p90": 56.924,
+        "p99": 76.191
+      },
+      "winner_route_ms": {
+        "max": 100.276,
+        "mean": 30.48,
+        "n": 3481,
+        "p50": 27.634,
+        "p90": 60.092,
+        "p99": 75.939
+      }
+    },
+    "won": true
+  },
+  "2x": {
+    "clears": 3481,
+    "dispatch_hash": 2865577215,
+    "max_route_per_lane": 1,
+    "origins": [
+      [
+        6.28,
+        72.78
+      ],
+      [
+        15.6,
+        72.78
+      ],
+      [
+        24.91,
+        72.78
+      ],
+      [
+        34.13,
+        72.78
+      ],
+      [
+        43.45,
+        72.78
+      ],
+      [
+        52.76,
+        72.78
+      ]
+    ],
+    "origins_below": true,
+    "timing": {
+      "frame_ms": {
+        "max": 124.324,
+        "mean": 19.994,
+        "n": 9588,
+        "p50": 7.606,
+        "p90": 57.652,
+        "p99": 97.896
+      },
+      "lanes": 5177,
+      "note": "RuntimePerfProbe per frame (one lane per frame); instrumentation adds overhead in counting/baseline modes",
+      "route_dijkstra_ms": {
+        "max": 102.669,
+        "mean": 29.677,
+        "n": 3481,
+        "p50": 27.132,
+        "p90": 61.301,
+        "p99": 86.554
+      },
+      "scan_excl_route_ms": {
+        "max": 7.153,
+        "mean": 1.931,
+        "n": 5177,
+        "p50": 1.145,
+        "p90": 4.2,
+        "p99": 5.672
+      },
+      "target_selection_ms": {
+        "max": 112.865,
+        "mean": 25.465,
+        "n": 5177,
+        "p50": 19.096,
+        "p90": 62.868,
+        "p99": 94.397
+      },
+      "winner_route_ms": {
+        "max": 110.012,
+        "mean": 34.704,
+        "n": 3481,
+        "p50": 32.282,
+        "p90": 67.287,
+        "p99": 93.682
+      }
+    },
+    "won": true
+  },
+  "engine": "4.7.2-stable (official)",
+  "label": "preS2"
+}
