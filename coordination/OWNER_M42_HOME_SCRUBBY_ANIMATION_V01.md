@@ -3,20 +3,46 @@
 Date: 2026-09-29
 Authority: OWNER
 Status: PLANNED / OWNER-DESIGNED
-Target task: SB-M42-034
-Target cycle: M42-C002 — Home Scrubby Runtime Animation
+Target tasks: SB-M42-034 + SB-M42-035
+Target cycle: M42-C002 — Home Scrubby Hero Scale Lock + Runtime Animation
 
 ## Goal
 
-Make Scrubby feel alive on the Home screen without turning Home into a noisy animation showcase.
+Make Scrubby the clear Home-screen hero, first at the new owner-approved enlarged scale and then with restrained runtime animation, without turning Home into a noisy animation showcase.
 
 Scrubby remains the dominant visual focus and remains a separate runtime hero layer above the static Home world background.
 
 This task must not bake Scrubby into the Home background.
 
+## Owner scale revision — 2026-09-29
+
+The current production Home uses:
+
+`SCRUBBY_SCALE = 1.24`
+
+The owner now requires the Home Scrubby to be **30% larger than that current production size**.
+
+Canonical target:
+
+`1.24 x 1.30 = 1.612`
+
+Therefore the Home hero scale target is:
+
+`SCRUBBY_SCALE = 1.612`
+
+This is relative to the existing V04 safe-box fit and remains anchored about the visible soles / canonical platform contact point.
+
+The scale/placement must be implemented and visually locked **before animation asset production/integration**.
+
+All Wave / Bow / Turn-Look frame sets, atlases, pivots, alpha bounds, feet registration and runtime animation tuning must be authored against this enlarged Home hero presentation, not against the old 1.24-scale visual.
+
+If responsive collision with Play/HUD/shortcuts occurs, preserve the 30% enlargement target and solve through the approved hero-safe placement contract/minimal layout tuning rather than silently shrinking Scrubby back toward the old size.
+
 ## Existing architecture to preserve
 
 Current Home already renders Scrubby separately as `Art_scrubby` inside the character layer.
+
+Before animation integration, SB-M42-034 must lock the new 1.612 hero scale and responsive placement against the currently approved Home background.
 
 Preserve:
 
@@ -172,7 +198,7 @@ The component must not:
 
 ## Responsive invariants
 
-Across supported Home viewports:
+Across supported Home viewports, using the new 1.612 scale authority:
 
 - Scrubby's soles stay aligned to the owner-approved platform/ground line;
 - animation never clips through the Play CTA/top HUD/shortcut panels;
@@ -215,11 +241,13 @@ Owner visual acceptance is required before SB-M42-034 closes.
 
 Do not interrupt the current M28-C002-C003-R01 V02 remediation.
 
-Canonical order:
+Canonical Home animation dependency order:
 
-1. close M28-C002-C003-R01 V02 + owner replay;
-2. execute SB-M39-053 clock-boundary test-stability follow-up;
-3. execute SB-M42-034 Home Scrubby Runtime Animation;
+1. finish the earlier queued gameplay follow-ups;
+2. execute SB-M42-034 Home Scrubby Hero Scale + Placement Lock: change current 1.24 to canonical 1.612 (+30%), validate all Home viewports and obtain owner visual acceptance;
+3. only after SB-M42-034 passes, execute SB-M42-035 Home Scrubby Runtime Animation using animation assets authored for the approved enlarged 1.612 hero presentation;
 4. return to the existing M43/meta roadmap.
 
-No implementation prompt is opened until this task becomes current.
+Do not generate/finalize gesture frame assets against the old 1.24 Home Scrubby and then scale them opportunistically. The animation source/art registration must be based on the enlarged canonical hero.
+
+No implementation prompt is opened until each task becomes current.
