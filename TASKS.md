@@ -12,9 +12,9 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 954 / 1357 = 70.30%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains. Separate M39 test-stability and M42 Home Scrubby animation follow-ups are queued.
+- Progress: 954 / 1358 = 70.25%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains. Separate M28 tile-polish, M39 test-stability and M42 Home Scrubby animation follow-ups are queued.
 - Note: Owner expanded the final remediation to five findings. V02 supersedes the prior R01 V01 prompt/criteria. Scope: timed 2x active => each new gameplay auto-starts 2x; remove WAITING/ACTIVE slot text; railway-first Scrubbot travel; dynamic visible logical-pixel grid + subtle bevel; Home uses `assets/ui/final/home/background/home_background.png` exactly.
-- Owner sequencing lock: close M28-C002-C003-R01 V02 technical remediation, then owner replays/reviews all five findings before SB-M28-C002-020 can close. After M28 V02 closure: (1) schedule SB-M39-053 test-stability through the normal ChatGPT prompt/audit cycle; (2) then schedule SB-M42-034 Home Scrubby Runtime Animation; (3) then resume the existing M43/meta roadmap.
+- Owner sequencing lock: close M28-C002-C003-R01 V02 technical remediation, then owner replays/reviews all five findings before SB-M28-C002-020 can close. After M28 V02 closure: (1) schedule SB-M28-C002-021 Color / Batch Tile Visual Polish as its own M28-C002-C004 prompt/audit cycle; (2) then SB-M39-053 test-stability; (3) then SB-M42-034 Home Scrubby Runtime Animation; (4) then resume the existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1287,6 +1287,12 @@ Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master vi
 - [x] SB-M28-C002-018 Validate mouse/touch mapping, rapid taps, popup-open input suppression and temporary sixth-slot readability.
 - [x] SB-M28-C002-019 Capture owner-review screenshots/video for fresh level, active cleaning, full five-slot state, sixth-slot state, booster popup open, Pause open and timed 2x state. — AUDITED_PASS: fresh screenshots + real runtime Movie Maker video.
 - [ ] SB-M28-C002-020 Independent ChatGPT audit plus owner visual/playtest acceptance required before this V02 convergence is closed.
+
+#### M28-C002-C004 - Color / Batch Tile Visual Polish [QUEUED / SEPARATE CYCLE]
+
+This is intentionally NOT part of the active `M28-C002-C003-R01 V02` remediation. Owner visual authority: `coordination/OWNER_M28_COLOR_BATCH_TILE_VISUAL_V01.md`.
+
+- [ ] SB-M28-C002-021 Replace occupied 5/6-slot and Batch Supply/color-selection rectangles with one reusable rounded 3D `ColorBatchTile` presentation: Palette v3 face, subtle top highlight, visible white/light-gray lower base, compact shadow, large centered white count with strong dark outline, visual-only ACTIVE emphasis, no WAITING/ACTIVE text, neutral EMPTY state and lower-emphasis non-interactive preview state. Preserve slot housing/rail visuals, 3/4/5-column supply layouts, 5->6 slot behavior, all counts/selectability and gameplay/solver/economy truth. Require responsive runtime evidence and owner visual acceptance.
 
 ### M29 — Mobile Touch
 
