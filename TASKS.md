@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M28-C002-C003 Gameplay V02 — Final Owner Playtest Gate
-- Current Task: Owner performs the final 15-item Gameplay V02 visual / hands-on playtest for SB-M28-C002-020
-- Current Task Status: OWNER_REQUIRED
-- Next Task/Action: OWNER reviews `coordination/sessions/M28-C002-C003/OWNER_GAMEPLAY_V02_FINAL_REVIEW_V01.md` and performs the short hands-on playtest. If 15/15 PASS, ChatGPT closes SB-M28-C002-020 and M28-C002.
-- Required Actor: OWNER
+- Current Sprint: M28-C002-C003-R01 — Timed 2x Cross-Level Remediation
+- Current Task: Claude fixes timed 2x continuity so an active timed entitlement remains live 2x across Level 2 -> Level 3 and expires correctly without breaking free auto-2x
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M28-C002-C003-R01/CHATGPT_PROMPT_V01.md`, then returns for independent ChatGPT audit. Owner replay follows technical PASS.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 954 / 1355 = 70.41%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains.
-- Note: M28-C002-C003 independent technical audit PASS at `ecbf634`. Visible Booster/2x routing, popup input isolation, fresh screenshots and real Godot Movie Maker video are accepted technically. Non-blocking follow-up: `m39_v04_integration` has a pre-existing real-clock snapshot equality flake; no M28 production regression was found.
-- Owner sequencing lock: complete SB-M28-C002-020 owner playtest before proceeding further.
+- Note: Final owner playtest found a blocking timed-2x runtime defect: countdown survives Level 2 -> Level 3 but live GameplaySpeedAuthority resets to 1x. Owner ruling `OWNER_TIMED_2X_CROSS_LEVEL_RUNTIME_V01.md` requires active timed 2x to remain live across level transitions and to fall back correctly on expiry without overriding free M23 auto-2x.
+- Owner sequencing lock: close M28-C002-C003-R01 technical remediation, then repeat the owner Level 2 -> Level 3 timed-2x playtest before closing SB-M28-C002-020.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
