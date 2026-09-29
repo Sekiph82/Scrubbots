@@ -5,16 +5,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M28 GAMEPLAY SCREEN V02
-- Current Sprint: M28-C002-C003-R01 — Five-Finding Final Remediation V02
-- Current Task: OWNER final replay of the five audited M28 V02 findings: timed-2x auto-start, slot label cleanup, railway-first Scrubbot routing, dynamic pixel grid/bevel, and canonical Home background
-- Current Task Status: AUDITED_PASS / OWNER_FINAL_REPLAY_REQUIRED
-- Next Task/Action: OWNER replays the five V02 findings in the actual Godot runtime. Only owner acceptance may close SB-M28-C002-020. Independent audit: `coordination/sessions/M28-C002-C003-R01/CHATGPT_AUDIT_V02.md`.
-- Required Actor: OWNER
+- Current Sprint: M28-C002-C004 — Color / Batch Tile Visual Polish
+- Current Task: CLAUDE implements SB-M28-C002-021 reusable 3D Color / Batch Tile visual polish, including exact slot-count centering in the colored face
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M28-C002-C004/CHATGPT_PROMPT_V01.md` against `coordination/sessions/M28-C002-C004/CHATGPT_AUDIT_CRITERIA_V01.md`, pushes evidence/logs, then returns for independent ChatGPT audit.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 954 / 1361 = 70.10%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains. Separate M28 tile-polish, M29 gameplay-tempo, M32 Scrubbot-size, M39 test-stability and two-stage M42 Home Scrubby scale/animation follow-ups are queued.
-- Note: M28-C002-C003-R01 V02 implementation `041729c92b57517e2c203306b0666f341c75eee5` is independently `AUDITED_PASS / OWNER FINAL REPLAY REQUIRED`. Railway-first route-choice authority is now `coordination/OWNER_SCRUBBOT_RAILWAY_FIRST_ROUTING_V02.md`. Scope accepted technically: timed 2x new-attempt auto-start; no WAITING/ACTIVE slot words; railway-first travel; dynamic visible logical-pixel grid + subtle bevel; exact Home background path.
-- Owner sequencing lock: close M28-C002-C003-R01 V02 technical remediation, then owner replays/reviews all five findings before SB-M28-C002-020 can close. After M28 V02 closure: (1) SB-M28-C002-021 Color / Batch Tile Visual Polish as M28-C002-C004; (2) SB-M29-010 Gameplay Tempo Retune; (3) SB-M32-UI-012 board-resolution-independent Scrubbot apparent size; (4) SB-M39-053 test-stability; (5) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (6) only after that owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation authored/integrated against the enlarged hero; (7) resume the existing M43/meta roadmap.
+- Progress: 955 / 1361 = 70.17%. M28-C002-C003-R01 is CLOSED after independent technical PASS + owner final replay PASS. Current work is SB-M28-C002-021 tile polish; M29 gameplay-tempo, M32 Scrubbot-size, M39 test-stability and two-stage M42 Home Scrubby scale/animation follow.
+- Note: Owner final replay passed all five M28-C002-C003-R01 findings; SB-M28-C002-020 is closed. New owner polish: slot/batch numbers must be geometrically centered in the colored top face, unaffected by the lower 3D base or hidden state-line spacer. This is part of SB-M28-C002-021, not a reopen of V02.
+- Owner sequencing lock: (1) complete SB-M28-C002-021 Color / Batch Tile Visual Polish as M28-C002-C004; (2) SB-M29-010 Gameplay Tempo Retune; (3) SB-M32-UI-012 board-resolution-independent Scrubbot apparent size; (4) SB-M39-053 test-stability; (5) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (6) only after that owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation authored/integrated against the enlarged hero; (7) resume the existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1265,7 +1265,7 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 **M28-C002-C002/R01 static-shell status:** technical PASS and FINAL OWNER VISUAL PASS. Six-master matrix (5/6 slots × 3/4/5 supply columns), 2.4-cell mini Scrubbots, live bubble copy, responsive/touch choices and S1-S6 are owner-accepted. Row 016 is closed. Rows 012-015/018(part)/019/020 remain dependency/final-gate work.
 
-**M28-C002-C003-R01 V02 independent audit:** `AUDITED_PASS / OWNER FINAL REPLAY REQUIRED`. Audit: `coordination/sessions/M28-C002-C003-R01/CHATGPT_AUDIT_V02.md`. Technical remediation is accepted; SB-M28-C002-020 remains open solely for owner replay/visual acceptance of all five findings.
+**M28-C002-C003-R01 V02 closure:** independent `AUDITED_PASS` followed by OWNER FINAL REPLAY PASS. Audit: `coordination/sessions/M28-C002-C003-R01/CHATGPT_AUDIT_V02.md`. Owner gate: `coordination/sessions/M28-C002-C003/OWNER_GAMEPLAY_V02_FINAL_GATE_V01.md`. SB-M28-C002-020 is closed.
 
 Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master visual into the actual shipping gameplay screen. Historical M28 closure remains historical; this sprint closes the later V02 delta without falsifying earlier evidence.
 
@@ -1288,13 +1288,13 @@ Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master vi
 - [x] SB-M28-C002-017 Validate 1080x2160, 1170x2532, 1290x2796, 1080x2400, 1440x3200, short 16:9 portrait and tablet portrait.
 - [x] SB-M28-C002-018 Validate mouse/touch mapping, rapid taps, popup-open input suppression and temporary sixth-slot readability.
 - [x] SB-M28-C002-019 Capture owner-review screenshots/video for fresh level, active cleaning, full five-slot state, sixth-slot state, booster popup open, Pause open and timed 2x state. — AUDITED_PASS: fresh screenshots + real runtime Movie Maker video.
-- [ ] SB-M28-C002-020 Independent ChatGPT audit plus owner visual/playtest acceptance required before this V02 convergence is closed.
+- [x] SB-M28-C002-020 Independent ChatGPT audit plus owner visual/playtest acceptance required before this V02 convergence is closed. `[AUDITED_PASS + OWNER FINAL REPLAY PASS / CLOSED 2026-09-29]`
 
-#### M28-C002-C004 - Color / Batch Tile Visual Polish [QUEUED / SEPARATE CYCLE]
+#### M28-C002-C004 - Color / Batch Tile Visual Polish [CURRENT / READY_FOR_CLAUDE]
 
 This is intentionally NOT part of the active `M28-C002-C003-R01 V02` remediation. Owner visual authority: `coordination/OWNER_M28_COLOR_BATCH_TILE_VISUAL_V01.md`.
 
-- [ ] SB-M28-C002-021 Replace occupied 5/6-slot and Batch Supply/color-selection rectangles with one reusable rounded 3D `ColorBatchTile` presentation: Palette v3 face, subtle top highlight, visible white/light-gray lower base, compact shadow, large centered white count with strong dark outline, visual-only ACTIVE emphasis, no WAITING/ACTIVE text, neutral EMPTY state and lower-emphasis non-interactive preview state. Preserve slot housing/rail visuals, 3/4/5-column supply layouts, 5->6 slot behavior, all counts/selectability and gameplay/solver/economy truth. Require responsive runtime evidence and owner visual acceptance.
+- [ ] SB-M28-C002-021 Replace occupied 5/6-slot and Batch Supply/color-selection rectangles with one reusable rounded 3D `ColorBatchTile` presentation: Palette v3 face, subtle top highlight, visible white/light-gray lower base, compact shadow, large white count with strong dark outline, visual-only ACTIVE emphasis, no WAITING/ACTIVE text, neutral EMPTY state and lower-emphasis non-interactive preview state. **Owner correction:** slot count must be geometrically centered in the COLORED TOP FACE on both axes; the lower 3D base, hidden state-line spacer or legacy VBox layout must not shift it, and 1/2/3-digit counts must remain centered responsively. Preserve slot housing/rail visuals, spawn anchors, 3/4/5-column supply layouts, 5->6 slot behavior, all counts/selectability and gameplay/solver/economy truth. Prompt: `coordination/sessions/M28-C002-C004/CHATGPT_PROMPT_V01.md`; criteria: `coordination/sessions/M28-C002-C004/CHATGPT_AUDIT_CRITERIA_V01.md`. Require responsive runtime evidence and owner visual acceptance.
 
 ### M29 — Mobile Touch
 
