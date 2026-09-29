@@ -22,6 +22,7 @@ extends TextureRect
 
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const PaletteColors = preload("res://scripts/data/palette_colors.gd")
+const GRID_SHADER = preload("res://scripts/gameplay/board/board_pixel_grid.gdshader")
 
 ## Color drawn for a CLEARED cell: fully transparent, so the gameplay
 ## background behind the board shows through the cleared hole (ADR-019,
@@ -32,6 +33,10 @@ var _board: BoardState
 var _palette_colors: Array[Color] = []
 var _cell_size: float = 1.0
 var _image: Image
+## Presentation-only pixel grid / tile bevel (board_pixel_grid.gdshader): ONE ShaderMaterial on
+## this TextureRect, driven by the real board width/height. Never a node per cell.
+var _grid_material: ShaderMaterial
+var _grid_enabled := true
 
 ## available_size: the display rect (in this Control's parent's local
 ## space) that the board should fit inside. Palette is a LevelData.palette
@@ -46,6 +51,7 @@ func configure(board: BoardState, palette: PackedStringArray, available_size: Ve
 		push_warning("BoardRenderer: palette parse errors: %s" % str(parse_result.errors))
 	_recompute_geometry(available_size)
 	refresh_all()
+	_apply_grid_style()
 
 func _recompute_geometry(available_size: Vector2) -> void:
 	var w: int = _board.get_width()
@@ -57,6 +63,38 @@ func _recompute_geometry(available_size: Vector2) -> void:
 	size = board_pixel_size
 	stretch_mode = TextureRect.STRETCH_SCALE
 	texture_filter = TEXTURE_FILTER_NEAREST
+
+## Grid + bevel style derived from the ACTUAL logical dimensions. `density` runs 0 (20-cell
+## board) .. 1 (59-cell board): dense art gets a fainter gutter and bevel so the grid never
+## overwhelms it, small boards get a bolder tile read. The uniforms below are the only inputs;
+## board colours, coordinates and hit-testing are untouched.
+func _apply_grid_style() -> void:
+	if not _grid_enabled or _board == null:
+		material = null
+		return
+	if _grid_material == null:
+		_grid_material = ShaderMaterial.new()
+		_grid_material.shader = GRID_SHADER
+	var w: int = _board.get_width()
+	var h: int = _board.get_height()
+	var density: float = clampf((float(maxi(w, h)) - 20.0) / 39.0, 0.0, 1.0)
+	_grid_material.set_shader_parameter("grid_size", Vector2(float(w), float(h)))
+	_grid_material.set_shader_parameter("gutter_alpha", lerpf(0.62, 0.40, density))
+	_grid_material.set_shader_parameter("bevel_strength", lerpf(0.16, 0.09, density))
+	_grid_material.set_shader_parameter("corner_radius", lerpf(0.13, 0.08, density))
+	material = _grid_material
+
+## Enable / disable the presentation grid (debug + evidence comparison only).
+func set_grid_enabled(enabled: bool) -> void:
+	_grid_enabled = enabled
+	_apply_grid_style()
+
+func is_grid_enabled() -> bool:
+	return _grid_enabled and material != null
+
+## The grid ShaderMaterial (tests/evidence read its uniforms), or null when disabled.
+func get_grid_material() -> ShaderMaterial:
+	return _grid_material if is_grid_enabled() else null
 
 ## Read-only exact-identity coherence query (M20-C001 §2). True only when this
 ## renderer is configured against the SAME BoardState instance the caller

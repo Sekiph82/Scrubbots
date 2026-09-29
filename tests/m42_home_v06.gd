@@ -14,22 +14,22 @@ const V = preload("res://scripts/tools/home_asset_manifest_validator.gd")
 
 const WORLD_PATH := "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png"
 const WORLD_SHA := "8e04eda668aabd9f96172c0e82fd7dd47e61083cb691402a313120443a525e5b"
-## V05 audited world transforms (= V04), [size, inset top, inset bottom, scale, offset].
+## World transforms re-baselined for the owner-selected 940x1672 Home background (M28-C002-C003-R01 V02), [size, inset top, inset bottom, scale, offset].
 const WORLD_MATRIX := [
-	[Vector2i(1080, 2160), 0, 0, 1.0, Vector2(0, 0)],
-	[Vector2i(1080, 2160), 132, 96, 1.0, Vector2(0, 0)],
-	[Vector2i(1170, 2532), 0, 0, 1.08888888888889, Vector2(-3, 0)],
-	[Vector2i(1170, 2532), 132, 96, 1.08333333333333, Vector2(0, 0)],
-	[Vector2i(1290, 2796), 0, 0, 1.21111111111111, Vector2(-9, 0)],
-	[Vector2i(1290, 2796), 132, 96, 1.19444444444444, Vector2(0, 0)],
-	[Vector2i(1080, 2400), 0, 0, 1.03287037037037, Vector2(-17.75, 0)],
-	[Vector2i(1080, 2400), 132, 96, 1.0, Vector2(0, 0)],
-	[Vector2i(1440, 3200), 0, 0, 1.39814814814815, Vector2(-35, 0)],
-	[Vector2i(1440, 3200), 132, 96, 1.3537037037037, Vector2(-11, 0)],
-	[Vector2i(1080, 1920), 0, 0, 1.0, Vector2(0, -79)],
-	[Vector2i(1080, 1920), 132, 96, 0.91329479768786, Vector2(46.82081, -58.3815)],
-	[Vector2i(1536, 2048), 0, 0, 1.41184971098266, Vector2(5.601156, -515.9379)],
-	[Vector2i(1536, 2048), 132, 96, 1.08236994219653, Vector2(183.5202, -168.7876)],
+	[Vector2i(1080, 2160), 0, 0, 1.23544, Vector2(-40.65534, -74.65048)],
+	[Vector2i(1080, 2160), 132, 96, 1.13337, Vector2(7.314593, -42.05024)],
+	[Vector2i(1170, 2532), 0, 0, 1.4067, Vector2(-76.14832, 0.0)],
+	[Vector2i(1170, 2532), 132, 96, 1.34928, Vector2(-49.16268, 0.0)],
+	[Vector2i(1290, 2796), 0, 0, 1.56459, Vector2(-90.35885, 0.0)],
+	[Vector2i(1290, 2796), 132, 96, 1.50718, Vector2(-63.37321, 0.0)],
+	[Vector2i(1080, 2400), 0, 0, 1.33433, Vector2(-87.13517, 0.0)],
+	[Vector2i(1080, 2400), 132, 96, 1.27691, Vector2(-60.14952, -6.911483)],
+	[Vector2i(1440, 3200), 0, 0, 1.80622, Vector2(-128.9234, 0.0)],
+	[Vector2i(1440, 3200), 132, 96, 1.7488, Vector2(-101.9378, 0.0)],
+	[Vector2i(1080, 1920), 0, 0, 1.04725, Vector2(47.79306, -53.53349)],
+	[Vector2i(1080, 1920), 132, 96, 0.98983, Vector2(74.77871, -77.189)],
+	[Vector2i(1536, 2048), 0, 0, 1.14269, Vector2(230.9357, -56.78947)],
+	[Vector2i(1536, 2048), 132, 96, 1.05981, Vector2(269.89, -48.35885)],
 ]
 ## V05 audited geometry at 1080x2160 (6d1708a): lower stack tops, ad height, Gift Meter
 ## and reward-rail rects (the latter measured relative to the track top).
@@ -113,14 +113,14 @@ func _scrubby(home) -> void:
 	var w: Dictionary = home.get_world()
 	var ratio: float = float(c["k"]) / float(c["k_v04"])
 	_ok(absf(ratio - 1.24) < 0.001 and HS.SCRUBBY_SCALE == 1.24, "hero scale 1.24 x V04 base fit (%.4f)" % ratio)
-	_ok(absf(c["center_x"] - 540.0) < 0.01 and absf(c["feet_y"] - 1297.0) < 0.01, "centre X 540 / soles 1297 unchanged")
+	_ok(absf(c["center_x"] - 470.0) < 0.01 and absf(c["feet_y"] - 1240.0) < 0.01, "centre X 470 / soles 1240 (new world anchor)")
 	var vr: Rect2 = c["visible_rect"]
 	_ok(not vr.intersects(w["baked_sign_rect"]), "clears the baked sign (visible top %.1f > sign bottom %.1f)" % [vr.position.y, (w["baked_sign_rect"] as Rect2).end.y])
 	var hit := false
 	for b in w["helper_bot_rects"]:
 		hit = hit or vr.intersects(b)
 	_ok(not hit, "clears the baked helper bots (visible x %.1f..%.1f)" % [vr.position.x, vr.end.x])
-	_ok(absf(_rect(home, "Art_scrubby").position.y + HS.SCRUBBY_FEET_Y * float(c["k"]) - 1297.0) < 0.5, "on screen the soles stay on y=1297")
+	_ok(absf(_rect(home, "Art_scrubby").position.y + HS.SCRUBBY_FEET_Y * float(c["k"]) * float(home.get_world_transform()["scale"]) - home.world_to_screen(Vector2(470, 1240)).y) < 0.5, "on screen the soles stay on the mapped world anchor (470,1240)")
 	_complete("scrubby_scale")
 
 func _shade(home) -> void:
@@ -149,7 +149,7 @@ func _shade(home) -> void:
 	_ok(not bots_hit, "does not reach the baked helper bots")
 	var c: Dictionary = home.get_scrubby_canonical()
 	var torso := Vector2(c["center_x"], (c["visible_rect"] as Rect2).get_center().y)
-	_ok(canon.has_point(torso) and absf(canon.get_center().x - 540.0) < 0.5, "centred behind Scrubby's torso")
+	_ok(canon.has_point(torso) and absf(canon.get_center().x - 470.0) < 0.5, "centred behind Scrubby's torso")
 	_ok(_rect(home, "HeroFocusShade").is_equal_approx(Rect2(home.world_to_screen(canon.position), canon.size * home.get_world_transform()["scale"])), "mapped with the locked world transform")
 	_ok(shade.mouse_filter == Control.MOUSE_FILTER_IGNORE, "decorative, never takes input")
 	_complete("hero_focus_shade")
@@ -350,7 +350,7 @@ func _assets() -> void:
 			n += 1
 			if FileAccess.get_sha256("res://" + String(a["path"])) != String(a["approved_sha256"]):
 				bad.append(a["id"])
-	_ok(n == 51 and bad.is_empty(), "all 51 approved entries match their pins %s" % str(bad))
+	_ok(n == 52 and bad.is_empty(), "all 52 approved entries match their pins %s" % str(bad))
 	_complete("asset_integrity")
 
 func _complete(c: String) -> void:

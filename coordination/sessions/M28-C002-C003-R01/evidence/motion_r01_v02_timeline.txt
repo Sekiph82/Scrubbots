@@ -1,0 +1,12 @@
+STEP 0.00 Home with the owner-selected background (home_background.png)
+STEP 2.47 PLAY -> Level 1 starts at 1x (no timed entitlement yet)
+STEP 3.97 Scrubbots leave the slot connector and follow the railway
+STEP 8.37 2x without entitlement -> 2x Acquire
+STEP 10.03 15 MIN timed 2x bought: 2x on, countdown in the 2x box
+STEP 13.03 (Level 1 is fast-forwarded to WON for this recording)
+STEP 14.30 Results (win)
+STEP 16.63 Level 2 starts at 2x automatically - the timed countdown keeps running
+STEP 23.03 Manual 1x is free (no popup, no SB)
+STEP 26.30 ...and back to 2x at no cost; bots hug the rail to the nearest exit
+975 frames at 30 FPS (movie length: 00:00:32:15), recorded in 00:01:19 (40% of real-time speed).
+ERROR: 19 resources still in use at exit (run with --verbose for details).

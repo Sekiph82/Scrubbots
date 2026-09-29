@@ -158,6 +158,10 @@ var _speed_popup = null
 var _pause_popup = null
 ## Last 2x purchase result from the popup (diagnostic/tests).
 var last_speed_purchase_result: Dictionary = {}
+## True while the live 2x is a PAID/entitled 2x (timed default, purchase or entitled
+## toggle) as opposed to the free M23 supply-exhausted auto-2x. Only a paid 2x is dropped
+## when its entitlement expires mid-level (OWNER_TIMED_2X_CROSS_LEVEL_RUNTIME_V01 §5).
+var _paid_2x := false
 ## M28-C002 V02: last booster-control request result (diagnostic/tests) and the 1 s HUD
 ## redraw timer (wall-clock values are read from services, never accumulated).
 var last_booster_request: Dictionary = {}
@@ -458,6 +462,7 @@ func build() -> bool:
 	# Live five-slot presentation sync AND completion evaluation after every driven tick.
 	_runtime.set_state_sync(Callable(self, "_on_runtime_tick"))
 
+	_apply_default_speed()
 	_wire_controls()
 	_built = true
 	return true
@@ -536,6 +541,7 @@ func _on_retry_restored() -> void:
 	if _screen != null and is_instance_valid(_screen) and _slots != null:
 		_screen.update_snapshots(_slots.snapshot(), _supply.player_snapshot())
 		_screen.set_speed_2x(false)
+		_apply_default_speed()
 	# M31 (§10): a successful Retry starts a fresh visual attempt — remove stale cleaning
 	# cues and reset the attempt-scoped diagnostic counters. Presentation-only; runs only on
 	# the RetryCoordinator's post-success restore seam, so it never weakens the M30 gate.
@@ -705,10 +711,39 @@ func _wire_controls() -> void:
 		_hud_timer.start()
 	_refresh_hud()
 
+## Default live speed of a newly built / restarted attempt (OWNER_TIMED_2X_CROSS_LEVEL_
+## RUNTIME_V01): an active timed 2x entitlement (remaining wall-clock time > 0) is a
+## cross-level entitlement, so the attempt starts at live 2x; otherwise 1x. The runtime
+## speed authority and the HUD are set together so the countdown and the live factor
+## cannot disagree. The current-level 200 SB entitlement is level-scoped and manual, so
+## it never auto-starts 2x here. Free M23 auto-2x is applied by the input controller
+## later and is never touched by this.
+func _apply_default_speed() -> void:
+	var two: bool = _economy != null and _economy.speed.timed_seconds_remaining() > 0
+	_paid_2x = two
+	if _runtime != null:
+		_runtime.set_speed_2x(two)
+	if _screen != null and is_instance_valid(_screen):
+		_screen.set_speed_2x(two)
+
+## Timed / level 2x expired mid-level: a PAID 2x no longer holds gameplay at 2x, but the
+## free M23 supply-exhausted auto-2x stays independent and is never dropped.
+func _drop_expired_paid_2x() -> void:
+	if not _paid_2x or _economy == null or _speed == null or not _speed.is_2x():
+		return
+	if _economy.speed.is_manual_2x_entitled(progression_level):
+		return
+	_paid_2x = false
+	if _supply != null and _supply.is_exhausted():
+		return   # the free auto-2x owns the speed now
+	_runtime.set_speed_2x(false)
+	_screen.set_speed_2x(false)
+
 ## Push live, canonical values into the V02 HUD. Presentation only; reads services.
 func _refresh_hud() -> void:
 	if _screen == null or not is_instance_valid(_screen):
 		return
+	_drop_expired_paid_2x()
 	var prof := {"level": progression_level}
 	if _economy != null:
 		var p: Dictionary = _economy.robots.next_robot_progress()
@@ -1041,6 +1076,7 @@ func _on_speed_pressed() -> void:
 			_open_speed_acquisition()
 			return
 	var two: bool = _runtime.toggle_speed()
+	_paid_2x = two
 	_screen.set_speed_2x(two)
 	_refresh_hud()
 
@@ -1116,6 +1152,7 @@ func _on_speed_offer_chosen(kind: String, seconds: int) -> void:
 	if pop != null:
 		pop.close("purchased")
 	if _economy.speed.is_manual_2x_entitled(progression_level):
+		_paid_2x = true
 		_runtime.set_speed_2x(true)
 		_screen.set_speed_2x(true)
 	_refresh_hud()

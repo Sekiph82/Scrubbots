@@ -112,6 +112,10 @@ func unlock_waves(level) -> Dictionary:
 	var h: int = board.get_height()
 	var n: int = board.get_cell_count()
 	var routing = ProductionRoutingSystem.new()
+	# Difficulty analysis measures the shortest TOTAL legal travel (the audited route-complexity basis),
+	# not the railway-first visual preference: keeps every Difficulty V1 score / committed evidence
+	# byte-stable when the travel-path presentation routing changes (M28-C002-C003-R01 V02).
+	routing.interior_step_cost = ProductionRoutingSystem.TOTAL_TRAVEL_COST
 	var raccess = ProductionAccessQuery.new(board)
 	var origin: Vector2 = ProofKernel.new()._origin_for_slot(ProofState.SLOT_COUNT - 1, w, h)
 	var waves := PackedInt32Array()

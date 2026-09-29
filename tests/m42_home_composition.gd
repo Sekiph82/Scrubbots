@@ -84,7 +84,7 @@ func _accounting(home) -> void:
 	var modes := {}
 	for row in acc:
 		modes[row["mode"]] = int(modes.get(row["mode"], 0)) + 1
-	_ok(modes == {"STATIC": 24, "WORLD_BAKED_RETIRED": 18, "OWNER_RETIRED": 7, "OWNER_DISABLED": 2}, "V04: 24 STATIC + 18 WORLD_BAKED_RETIRED + 7 OWNER_RETIRED + 2 OWNER_DISABLED (%s)" % str(modes))
+	_ok(modes == {"STATIC": 24, "WORLD_BAKED_RETIRED": 18, "OWNER_RETIRED": 8, "OWNER_DISABLED": 2}, "V04 + R01-V02: 24 STATIC + 18 WORLD_BAKED_RETIRED + 8 OWNER_RETIRED (7 + HOME-120 replaced by HOME-121) + 2 OWNER_DISABLED (%s)" % str(modes))
 	_complete("accounting_covers_manifest")
 
 func _static_nodes(home) -> void:
@@ -109,15 +109,15 @@ func _inactive(home) -> void:
 			if not (row["nodes"] as Array).is_empty() or String(row["reason"]).is_empty():
 				bad.append(row["id"])
 	ids.sort()
-	var want := ["HOME-001", "HOME-002", "HOME-003", "HOME-004", "HOME-006", "HOME-007", "HOME-010", "HOME-011", "HOME-013", "HOME-014", "HOME-015", "HOME-016", "HOME-018", "HOME-019", "HOME-020", "HOME-021", "HOME-022", "HOME-023", "HOME-024", "HOME-031", "HOME-032", "HOME-062", "HOME-063", "HOME-066", "HOME-069", "HOME-078", "HOME-087"]
-	_ok(ids == want, "retired/disabled set (V03 + V04) %s" % str(ids))
+	var want := ["HOME-001", "HOME-002", "HOME-003", "HOME-004", "HOME-006", "HOME-007", "HOME-010", "HOME-011", "HOME-013", "HOME-014", "HOME-015", "HOME-016", "HOME-018", "HOME-019", "HOME-020", "HOME-021", "HOME-022", "HOME-023", "HOME-024", "HOME-031", "HOME-032", "HOME-062", "HOME-063", "HOME-066", "HOME-069", "HOME-078", "HOME-087", "HOME-120"]
+	_ok(ids == want, "retired/disabled set (V03 + V04 + R01-V02 HOME-120) %s" % str(ids))
 	_ok(bad.is_empty(), "inactive rows have no presentation node and carry a reason %s" % str(bad))
 	var m = V.load_manifest()
 	var still_approved := 0
 	for a in m["assets"]:
 		if ids.has(a["id"]) and a["status"] == "APPROVED" and String(a.get("approved_sha256", "")).length() == 64:
 			still_approved += 1
-	_ok(still_approved == 27, "historical approval + sha pins of retired/disabled entries unchanged in the manifest")
+	_ok(still_approved == 28, "historical approval + sha pins of retired/disabled entries unchanged in the manifest")
 	_complete("inactive_rows_present_nothing")
 
 func _labels(home) -> void:

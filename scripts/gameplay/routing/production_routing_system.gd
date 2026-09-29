@@ -40,6 +40,22 @@ const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 ## Route-choice tolerance for "shortest legal total rail route" comparison.
 const _RAIL_LEN_EPS := 0.0001
 
+## RAILWAY-FIRST cost model (M28-C002-C003-R01 V02, owner finding 3). Travel on the rail
+## and the ingress bridge cost 1.0 per logical cell; every interior board step costs
+## INTERIOR_STEP_COST. It is deliberately larger than the longest possible rail loop
+## (2 * (59 + 5) + 2 * (59 + 5) = 256 cells), so the Dijkstra is LEXICOGRAPHIC: first
+## minimise the number of steps through the pixel-art board (= leave the rail at the
+## perimeter point closest to the target; when the target's own column / row is open this
+## is the aligned exit and the final leg is one straight line), then minimise rail
+## distance, then the deterministic side / scan tie-break. Before this, a rail unit and an
+## interior unit cost the same, so an equal-length staircase through the artwork tied with
+## "follow the rail" and the BOTTOM-first tie-break always won: bots left the connector at
+## once and crossed the board.
+const INTERIOR_STEP_COST := 1000.0
+## Equal-weight cost (rail unit == interior unit): the shortest TOTAL legal travel. Used by the
+## difficulty analyzers, whose route-complexity metrics are defined on that basis.
+const TOTAL_TRAVEL_COST := 1.0
+
 ## Deterministic 4-neighbour order: up, right, down, left.
 const NEIGHBORS: Array[Vector2i] = [
 	Vector2i(0, -1), Vector2i(1, 0), Vector2i(0, 1), Vector2i(-1, 0)
@@ -52,6 +68,10 @@ var max_shortcut_span: int = 2
 var corner_radius: float = 0.25
 var corner_samples: int = 3
 var enable_rounding: bool = true
+## Interior-step weight of the railroad Dijkstra. Production default = INTERIOR_STEP_COST
+## (railway-first). Tests set 1.0 to reproduce the pre-V02 equal-weight behaviour and prove
+## that ONLY the travel path changes, never the assigned target / claim identity.
+var interior_step_cost: float = INTERIOR_STEP_COST
 
 func compute_route(request, board, access_query) -> RefCounted:
 	# F-006: require a real RouteRequest BEFORE reading any field (a scalar/junk
@@ -149,7 +169,8 @@ func _is_outside_start(request, board) -> bool:
 ##
 ## The rail departure need NOT be aligned with the target. A single deterministic
 ## Dijkstra minimises total legal route cost = connector + rail travel + ingress
-## bridge + interior orthogonal steps, so is_targetable() becomes true whenever any
+## bridge + INTERIOR_STEP_COST x interior orthogonal steps (railway-first: fewest board
+## steps first, see the constant), so is_targetable() becomes true whenever any
 ## such legal route exists. Equal total: side priority BOTTOM → LEFT → RIGHT → TOP,
 ## then a stable same-side ingress order (ascending perimeter scan index), then a
 ## fixed 4-neighbour interior expansion order — all deterministic. Interior movement
@@ -289,7 +310,7 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 				var nc := Vector2(float(nx) + 0.5, float(ny) + 0.5)
 				if not _seg_true(access_query, uc, nc, idx):
 					continue
-			var ncost: float = dist[u] + 1.0
+			var ncost: float = dist[u] + interior_step_cost
 			var relax = dist[nlin] == INF or ncost < dist[nlin] - _RAIL_LEN_EPS \
 				or (absf(ncost - dist[nlin]) <= _RAIL_LEN_EPS and _rank_lt(side_of[u], seq_of[u], side_of[nlin], seq_of[nlin]))
 			if relax:

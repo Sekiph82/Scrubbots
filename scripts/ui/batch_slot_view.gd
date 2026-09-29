@@ -41,6 +41,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
 	if _swatch == null:
 		_build_children()
+	_reserve_state_line()   # in the tree now: the real theme font
 
 func _build_children() -> void:
 	var vbox := VBoxContainer.new()
@@ -63,12 +64,31 @@ func _build_children() -> void:
 	_remaining_label.add_theme_constant_override("outline_size", 8)
 	vbox.add_child(_remaining_label)
 
+	# Owner (M28-C002-C003-R01 V02): the words WAITING / ACTIVE are not shown on the slot.
+	# The state is carried by the border colour only. The label node is kept (always empty, so it
+	# draws nothing) so the slot's measured layout and every slot origin / anchor derived from it
+	# stay exactly as accepted; only the words are gone.
 	_state_label = Label.new()
 	_state_label.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_state_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_state_label.add_theme_font_size_override("font_size", 18)
 	_state_label.add_theme_color_override("font_color", Color(0.72, 0.82, 0.95))
 	vbox.add_child(_state_label)
+	_reserve_state_line()
+
+## Reserve exactly the box the words used to occupy (the wider of ACTIVE / WAITING x one
+## line), so the slot's measured layout - and every slot origin / anchor derived from it - is
+## unchanged. Measured with the label's real theme font; draws nothing.
+func _reserve_state_line() -> void:
+	if _state_label == null:
+		return
+	var f: Font = _state_label.get_theme_font("font")
+	if f == null:
+		return
+	var w := 0.0
+	for word in [ACTIVE, WAITING]:
+		w = maxf(w, f.get_string_size(word, HORIZONTAL_ALIGNMENT_LEFT, -1, 18).x)
+	_state_label.custom_minimum_size = Vector2(ceilf(w), ceilf(f.get_height(18)))
 
 ## Bind a DETACHED scalar snapshot (dict is duplicated; no reference retained) plus
 ## a scalar palette Color for the batch color. Safe to call before or after _ready.
@@ -114,7 +134,7 @@ func _refresh() -> void:
 	# clear, so the displayed waiting count stays correct. The old "50 (2)" raw form is gone.
 	var capacity: int = maxi(remaining - committed, 0)
 	_remaining_label.text = "%d" % capacity
-	_state_label.text = state
+	_state_label.text = ""
 	var edge := _ACTIVE_EDGE if state == ACTIVE else _WAITING_EDGE
 	_set_panel_bg(_OCC_BG, edge, state == ACTIVE)
 
@@ -129,7 +149,7 @@ func _refresh_shell(state: String, occupied: bool) -> void:
 	_swatch.color = _color
 	var capacity: int = maxi(int(_snapshot.get("remaining_to_clear", 0)) - int(_snapshot.get("committed", 0)), 0)
 	_remaining_label.text = "%d" % capacity
-	_state_label.text = state
+	_state_label.text = ""
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = _color
 	sb.set_corner_radius_all(UiTokens.RADIUS_SM)
@@ -137,6 +157,10 @@ func _refresh_shell(state: String, occupied: bool) -> void:
 	if state == ACTIVE:
 		sb.set_border_width_all(3)
 		sb.border_color = _ACTIVE_EDGE
+	else:
+		# WAITING: muted thin rim (no word) so the two states stay visually distinct.
+		sb.set_border_width_all(2)
+		sb.border_color = _WAITING_EDGE
 	add_theme_stylebox_override("panel", sb)
 
 ## V02 empty execution slot: native rendition of the approved slot_empty design (deep navy
@@ -180,6 +204,10 @@ func get_display_count() -> int:
 	if not is_occupied_view():
 		return 0
 	return maxi(int(_snapshot.get("remaining_to_clear", 0)) - int(_snapshot.get("committed", 0)), 0)
+
+## The (always empty) state-word label text; the words WAITING/ACTIVE are never displayed.
+func get_state_text() -> String:
+	return _state_label.text if _state_label != null else ""
 
 ## The raw displayed label text (for asserting the old "N (c)" form is gone).
 func get_count_label_text() -> String:
