@@ -12,9 +12,9 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 954 / 1356 = 70.35%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains. One separate M39 test-stability follow-up has been queued.
+- Progress: 954 / 1357 = 70.30%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains. Separate M39 test-stability and M42 Home Scrubby animation follow-ups are queued.
 - Note: Owner expanded the final remediation to five findings. V02 supersedes the prior R01 V01 prompt/criteria. Scope: timed 2x active => each new gameplay auto-starts 2x; remove WAITING/ACTIVE slot text; railway-first Scrubbot travel; dynamic visible logical-pixel grid + subtle bevel; Home uses `assets/ui/final/home/background/home_background.png` exactly.
-- Owner sequencing lock: close M28-C002-C003-R01 V02 technical remediation, then owner replays/reviews all five findings before SB-M28-C002-020 can close. After M28 V02 closure, schedule SB-M39-053 through the normal ChatGPT prompt/audit cycle.
+- Owner sequencing lock: close M28-C002-C003-R01 V02 technical remediation, then owner replays/reviews all five findings before SB-M28-C002-020 can close. After M28 V02 closure: (1) schedule SB-M39-053 test-stability through the normal ChatGPT prompt/audit cycle; (2) then schedule SB-M42-034 Home Scrubby Runtime Animation; (3) then resume the existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1613,6 +1613,7 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 - [x] SB-M42-031 Playback frequency `[OWNER-LOCKED]`: cinematic plays on every cold/native app launch; no replay for internal navigation/retry/background resume.
 - [ ] SB-M42-032 Validate opening cinematic on Android real device for smooth 720p/30 playback, audio sync, startup latency, orientation, background/foreground behavior and memory cleanup. `[CODE_AUDIT_PASS / DEVICE_OWNER_REQUIRED]`
 - [ ] SB-M42-033 Validate iOS readiness later with the same boot-flow fallback and aspect rules. `[CODE_AUDIT_PASS / IOS_DEVICE_LATER]`
+- [ ] SB-M42-034 Home Scrubby Runtime Animation: keep Scrubby as the separate Home hero layer and add a presentation-only animation component with calm idle micro-motion plus short Wave / Bow / Turn-Look gestures, 6–12 s low-frequency scheduling, no immediate repeats, stable feet/anchor across responsive layouts, no Home input blocking, lifecycle/modal pause safety, Reduced Effects static/low-motion fallback, cached transparent frame/atlas assets for gestures, and owner visual acceptance. Authority: `coordination/OWNER_M42_HOME_SCRUBBY_ANIMATION_V01.md`. Sequence after SB-M39-053; do not interrupt current M28 remediation.
 
 ### M43 - Results / Player Experience / Meta UI Surface Program [PLANNED / REQUIRED]
 
