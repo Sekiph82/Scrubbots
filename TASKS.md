@@ -1158,6 +1158,7 @@ Purpose: arbitrate currently targetable pixels among multiple live batches, espe
 - [x] SB-M25-030 Prove newly opened targets are assigned at opening time, not pre-owned while inaccessible.
 - [x] SB-M25-031 Stress five occupied slots with duplicate colors on rectangular and 59×59 boards.
 - [x] SB-M25-032 Add claim/reservation leak, reset, stale-target and deterministic-order regression tests.
+- [ ] SB-M25-033 Bound 59x59 target-selection scan cost: investigate the dense 59x59 real-host hotspot where one M25 lane can issue 100+ targetability/route probes and synchronously stall the main thread for ~0.9–3.4 s. First cycle is investigation/proposal only: per-lane attribution, existing M52 `_could_reach` prefilter analysis, compare stronger exact-safe frontier filter vs exact memo/cache vs bounded deterministic continuation, preserve exact bottom-most/left-most winner + WHAT/HOW separation + atomic reservation truth. Prompt: `coordination/sessions/M25-C002/CHATGPT_PROMPT_V01.md`; criteria: `coordination/sessions/M25-C002/CHATGPT_AUDIT_CRITERIA_V01.md`. `[CURRENT / INVESTIGATION ONLY / BLOCKS SB-M29-010]`
 
 ### M26 — Auto Dispatch Scheduler `[OWNER-LOCKED CORE GAMEPLAY]`
 
