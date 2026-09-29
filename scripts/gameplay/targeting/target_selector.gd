@@ -321,6 +321,14 @@ func _select_core(color_id: int, owner_id: int, access_query, board, ci, rs, gen
 	# geometry (crit 49); it is a pure BoardState read, not a coherence collaborator.
 	# Non-int entries sort last and are still skipped fail-closed by the loop below.
 	candidates = _priority_sorted(candidates, board)
+	# M25-C003 S1-B optional conservative prefilter. The access layer (HOW) may expose an
+	# opaque necessary-condition query; the selector never computes reachability itself.
+	# ONLY an exact bool `false` ("provably not targetable") skips a candidate, and only
+	# before the strict body below. `true`, null, any malformed value, or a missing
+	# capability run the unchanged strict body, so a candidate can only ever be SELECTED
+	# through the full is_reserved / coherence / authoritative is_targetable() / owner /
+	# reserve path. A skip performs no reservation and cannot change canonical order.
+	var has_prefilter: bool = access_query.has_method("prefilter_maybe_targetable")
 
 	for entry in candidates:
 		# Each candidate entry MUST be an int before any BoardState call; other
@@ -328,6 +336,10 @@ func _select_core(color_id: int, owner_id: int, access_query, board, ci, rs, gen
 		if typeof(entry) != TYPE_INT:
 			continue
 		var idx: int = entry
+		if has_prefilter:
+			var maybe = access_query.prefilter_maybe_targetable(idx)
+			if typeof(maybe) == TYPE_BOOL and not maybe:
+				continue
 		# Narrow final validation against live BoardState truth (AL-028).
 		if not board.is_valid_index(idx):
 			continue

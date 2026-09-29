@@ -120,6 +120,12 @@ func set_cell_state(index: int, state: CellState) -> bool:
 func get_revision() -> int:
 	return _revision
 
+## Detached copy of every cell's lifecycle byte (row-major, ACTIVE=0 / CLEARED=1). Read-only
+## bulk view for per-revision derived caches (M25-C003 access masks); mutating the copy
+## never touches board truth.
+func get_cell_states_copy() -> PackedByteArray:
+	return _cell_states.duplicate()
+
 func count_cells_by_state(state: CellState) -> int:
 	var count := 0
 	for value in _cell_states:

@@ -98,7 +98,7 @@ func _initialize() -> void:
 	_s5_truth_equivalence()
 	await _s6_authorities()
 	_s7_reset()
-	_s8_real_host()
+	await _s8_real_host()
 	_write_evidence()
 	_cleanup()
 	_done()
@@ -555,20 +555,23 @@ func _s7_reset() -> void:
 	h.free()
 
 # ======================================================= s8 real-host 59x59 ==
+## M25-C003 S0: every s8 host is a REAL laid-out 1080x2160 production host, and every slot
+## origin is asserted finite and below the board before measurement (the V01 s8 helper ran
+## unlaid hosts whose slot anchors mapped to board-local y = 0 — see M25-C002 findings).
 func _s8_real_host() -> void:
-	print("[s8 real host: 32x32 full completion + 59x59 dense window, 5/6 slots, 1x/2x, 30/60 FPS]")
+	print("[s8 real LAID-OUT host: 32x32 full completion + 59x59 dense window, 5/6 slots, 1x/2x, 30/60 FPS]")
 	var full: Array = []
 	for slots_n in [5, 6]:
 		for two in [false, true]:
 			for fps in [60, 30]:
-				full.append(_run_fixture(32, slots_n, two, fps, 0.0, false))
+				full.append(await _run_fixture(32, slots_n, two, fps, 0.0, false))
 	_report["real_host_32x32_full_completion"] = full
 	var dense: Array = []
 	for cfg in [[5, false, 60], [5, true, 60], [6, false, 60], [6, true, 60], [6, false, 30], [6, true, 30]]:
-		dense.append(_run_fixture(59, cfg[0], cfg[1], cfg[2], WINDOW_59, false))
+		dense.append(await _run_fixture(59, cfg[0], cfg[1], cfg[2], WINDOW_59, false))
 	# Same harness at the HISTORICAL tempo (6 cells/s, 0.5 s base) for cost attribution only.
 	for two in [false, true]:
-		dense.append(_run_fixture(59, 6, two, 60, WINDOW_59, true))
+		dense.append(await _run_fixture(59, 6, two, 60, WINDOW_59, true))
 	_report["real_host_59x59_dense_window"] = dense
 	var new2: Dictionary = dense[3]
 	var old2: Dictionary = dense[7]
@@ -582,16 +585,26 @@ func _run_fixture(w: int, slots_n: int, two: bool, fps: int, window_s: float, le
 	var tag := "%dx%d %d slots %s %dfps%s" % [w, w, slots_n, "2x" if two else "1x", fps, " HISTORICAL-TEMPO" if legacy else ""]
 	var dt := 1.0 / float(fps)
 	var lvl := _stripe_level_dict(w, w, 6, "m29c002_%d_%d_%s_%d_%s" % [w, slots_n, "2x" if two else "1x", fps, "old" if legacy else "new"])
-	var h = _host_fixture(lvl, _stripe_plan(lvl), 0.5 if legacy else -1.0)
+	var h = await _host_fixture(lvl, _stripe_plan(lvl), 0.5 if legacy else -1.0)
 	if not h.is_built():
 		return {"tag": tag, "built": false}
 	if legacy:
 		h.get_scheduler()._speed = 6.0
-	RP.enabled = true
-	RP.reset()
 	if slots_n == 6:
 		h.get_economy().boosters.add_charges(BoosterInventory.PLUS_ONE_SLOT, 1)
 		_ok(h.activate_plus_one_slot() and h.get_slots().active_capacity() == 6, "%s: +1 Slot active (6 lanes)" % tag)
+		await _settle(h)
+	h.get_runtime().set_process(false)
+	h.get_runtime().reset_runtime()   # zero the cadence phase picked up during layout frames
+	var origins: Array = []
+	var below := true
+	for i in range(h.get_slots().active_capacity()):
+		var o: Vector2 = h.get_origin_provider().origin_for_slot(i)
+		origins.append([snappedf(o.x, 0.01), snappedf(o.y, 0.01)])
+		below = below and is_finite(o.x) and is_finite(o.y) and o.y >= float(h.get_board().get_height())
+	_ok(below, "%s: every slot origin finite and below the board %s" % [tag, str(origins)])
+	RP.enabled = true
+	RP.reset()
 	var rt = h.get_runtime()
 	var sch = h.get_scheduler()
 	rt.set_speed_2x(two)
@@ -657,7 +670,7 @@ func _run_fixture(w: int, slots_n: int, two: bool, fps: int, window_s: float, le
 	var route: Dictionary = probe.get("access_compute_route", {"count": 0, "total_ms": 0.0})
 	var sel: Dictionary = probe.get("target_selection", {"count": 0, "max_ms": 0.0})
 	var out := {"tag": tag, "size": w, "slots": slots_n, "speed": "2x" if two else "1x", "fps": fps, "built": true,
-		"historical_tempo": legacy, "window_s": window_s,
+		"historical_tempo": legacy, "window_s": window_s, "laid_out": true, "slot_origins": origins, "origins_below_board": below,
 		"lanes_serviced": int(probe.get("m26_dispatch_lane", {}).get("count", 0)), "route_probes": int(route["count"]),
 		"route_ms_per_probe": snappedf(float(route["total_ms"]) / maxf(1.0, float(route["count"])), 0.001),
 		"target_selection_max_ms": snappedf(float(sel.get("max_ms", 0.0)), 0.01),
@@ -681,7 +694,7 @@ func _run_fixture(w: int, slots_n: int, two: bool, fps: int, window_s: float, le
 	_ok(max_accum <= interval + 1e-9, "%s: cadence backlog <= one interval" % tag)
 	_ok(dup_dispatch[0] == 0 and dup_clear[0] == 0, "%s: no duplicate claim/dispatch or clear" % tag)
 	_ok(card_bad == 0 and not fatal, "%s: transaction cardinalities consistent, no fatal inconsistency" % tag)
-	h.free()
+	h.get_meta("sub").free()
 	return out
 
 # ================================================================== helpers ====
@@ -710,10 +723,28 @@ func _host_fixture(level_dict: Dictionary, plan: Dictionary, base_cadence: float
 	h.auto_build = false
 	h.level_path = lp
 	h.supply_plan_path = pp
-	get_root().add_child(h)
-	_ok(h.build(), "fixture host builds %s" % h.get_build_error())
+	# Real production slot geometry (M25-C003 S0): sized viewport, settle, build, relayout.
+	var sub := SubViewport.new()
+	sub.size = Vector2i(1080, 2160)
+	sub.disable_3d = true
+	sub.render_target_update_mode = SubViewport.UPDATE_ALWAYS
+	get_root().add_child(sub)
+	h.set_anchors_preset(Control.PRESET_FULL_RECT)
+	sub.add_child(h)
+	h.set_meta("sub", sub)
+	await process_frame
+	await process_frame
+	_ok(h.build(), "laid-out fixture host builds %s" % h.get_build_error())
+	await _settle(h)
 	h.get_runtime().set_process(false)
 	return h
+
+func _settle(h) -> void:
+	await process_frame
+	await process_frame
+	h.get_screen().relayout()
+	await process_frame
+	await process_frame
 
 ## TEST fixture: w x h, `k` vertical stripes of C01..Ck (every stripe touches the edges).
 func _stripe_level_dict(w: int, hgt: int, k: int, id: String) -> Dictionary:
@@ -816,7 +847,7 @@ func _write_evidence() -> void:
 			"2x" if r["factor"] == 2.0 else "1x", r["nominal"], r["service_time"], r["mean"], r["max_lanes_per_frame"], r["overlap"], r["max_accum"], r["service_limited"]])
 	lines.append("")
 	for sec in [["real-host 32x32 full completion (1024 cells, 6-colour stripe TEST fixture):", "real_host_32x32_full_completion"],
-			["real-host 59x59 dense window (3481 cells, 6-colour wide-stripe worst case, %.0f s gameplay):" % WINDOW_59, "real_host_59x59_dense_window"]]:
+			["real LAID-OUT host 59x59 dense window (3481 cells, 6-colour wide-stripe, %.0f s gameplay; origins below board):" % WINDOW_59, "real_host_59x59_dense_window"]]:
 		lines.append(sec[0])
 		for r in _report.get(sec[1], []):
 			lines.append("%s: %s frames=%d gameplay=%.2fs clears=%d lanes=%d max_assign/frame=%d max_pending=%d max_backlog=%.4f dup_dispatch=%d dup_clear=%d route_ms/probe=%.3f sel_max_ms=%.1f tick_ms mean=%.3f p99=%.3f max=%.3f" % [

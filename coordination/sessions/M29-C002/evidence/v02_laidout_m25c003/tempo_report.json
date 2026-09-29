@@ -1,0 +1,1242 @@
+{
+  "authorities_effective_cells_per_s": {
+    "current_level_2x": 18.0,
+    "m23_auto_2x": 18.0,
+    "timed_expired": 9.0,
+    "timed_expired_m23_owns": 18.0,
+    "timed_manual_1x": 9.0,
+    "timed_new_level": 18.0,
+    "timed_relaunch": 18.0,
+    "timed_retry": 18.0
+  },
+  "cadence": {
+    "1x": {
+      "dt": 0.000833333333333333,
+      "factor": 1.0,
+      "lanes": 1,
+      "max": 0.333333333333385,
+      "max_accum": 0.332500000000036,
+      "max_begins_per_frame": 1,
+      "max_lanes_per_frame": 1,
+      "mean": 0.333333333333253,
+      "min": 0.33333333333303,
+      "nominal": 0.333333333333333,
+      "overlap": 0,
+      "waves": 36
+    },
+    "2x": {
+      "dt": 0.000833333333333333,
+      "factor": 2.0,
+      "lanes": 1,
+      "max": 0.166666666666693,
+      "max_accum": 0.166666666666667,
+      "max_begins_per_frame": 1,
+      "max_lanes_per_frame": 1,
+      "mean": 0.166666666666629,
+      "min": 0.166666666666515,
+      "nominal": 0.166666666666667,
+      "overlap": 0,
+      "waves": 71
+    }
+  },
+  "constants": {
+    "agent_default_speed": 9.0,
+    "base_interval": 0.333333333333333,
+    "dispatcher_default_speed": 9.0,
+    "factor_1x": 1.0,
+    "factor_2x": 2.0,
+    "max_lanes_per_frame": 1,
+    "scheduler_default_speed": 9.0
+  },
+  "engine": "4.7.2-stable (official)",
+  "failures": 0,
+  "real_host_32x32_full_completion": [
+    {
+      "built": true,
+      "cadence_interval_s": 0.333333333333333,
+      "cardinality_mismatch_samples": 0,
+      "cells": 1024,
+      "clears": 1024,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 60,
+      "frames": 7162,
+      "gameplay_seconds": 119.367,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 1491,
+      "max_accum_s": 0.3167,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 4,
+      "origins_below_board": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "route_ms_per_probe": 3.644,
+      "route_probes": 1024,
+      "size": 32,
+      "slot_origins": [
+        [
+          5.55,
+          41.0
+        ],
+        [
+          10.85,
+          41.0
+        ],
+        [
+          16.16,
+          41.0
+        ],
+        [
+          21.44,
+          41.0
+        ],
+        [
+          26.75,
+          41.0
+        ]
+      ],
+      "slots": 5,
+      "speed": "1x",
+      "state": "WON",
+      "tag": "32x32 5 slots 1x 60fps",
+      "target_selection_max_ms": 9.76,
+      "tick_ms_max": 12.716,
+      "tick_ms_mean": 1.629,
+      "tick_ms_p99": 9.582,
+      "window_s": 0.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.333333333333333,
+      "cardinality_mismatch_samples": 0,
+      "cells": 1024,
+      "clears": 1024,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 30,
+      "frames": 3633,
+      "gameplay_seconds": 121.1,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 1440,
+      "max_accum_s": 0.3,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 4,
+      "origins_below_board": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "route_ms_per_probe": 3.912,
+      "route_probes": 1024,
+      "size": 32,
+      "slot_origins": [
+        [
+          5.55,
+          41.0
+        ],
+        [
+          10.85,
+          41.0
+        ],
+        [
+          16.16,
+          41.0
+        ],
+        [
+          21.44,
+          41.0
+        ],
+        [
+          26.75,
+          41.0
+        ]
+      ],
+      "slots": 5,
+      "speed": "1x",
+      "state": "WON",
+      "tag": "32x32 5 slots 1x 30fps",
+      "target_selection_max_ms": 10.46,
+      "tick_ms_max": 13.072,
+      "tick_ms_mean": 2.601,
+      "tick_ms_p99": 9.712,
+      "window_s": 0.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.166666666666667,
+      "cardinality_mismatch_samples": 0,
+      "cells": 1024,
+      "clears": 1024,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 60,
+      "frames": 3633,
+      "gameplay_seconds": 60.55,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 1440,
+      "max_accum_s": 0.15,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 4,
+      "origins_below_board": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "route_ms_per_probe": 3.349,
+      "route_probes": 1024,
+      "size": 32,
+      "slot_origins": [
+        [
+          5.55,
+          41.0
+        ],
+        [
+          10.85,
+          41.0
+        ],
+        [
+          16.16,
+          41.0
+        ],
+        [
+          21.44,
+          41.0
+        ],
+        [
+          26.75,
+          41.0
+        ]
+      ],
+      "slots": 5,
+      "speed": "2x",
+      "state": "WON",
+      "tag": "32x32 5 slots 2x 60fps",
+      "target_selection_max_ms": 10.74,
+      "tick_ms_max": 13.304,
+      "tick_ms_mean": 2.156,
+      "tick_ms_p99": 9.604,
+      "window_s": 0.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.166666666666667,
+      "cardinality_mismatch_samples": 0,
+      "cells": 1024,
+      "clears": 1024,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 30,
+      "frames": 1847,
+      "gameplay_seconds": 61.567,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 1405,
+      "max_accum_s": 0.1667,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 4,
+      "origins_below_board": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "route_ms_per_probe": 3.363,
+      "route_probes": 1024,
+      "size": 32,
+      "slot_origins": [
+        [
+          5.55,
+          41.0
+        ],
+        [
+          10.85,
+          41.0
+        ],
+        [
+          16.16,
+          41.0
+        ],
+        [
+          21.44,
+          41.0
+        ],
+        [
+          26.75,
+          41.0
+        ]
+      ],
+      "slots": 5,
+      "speed": "2x",
+      "state": "WON",
+      "tag": "32x32 5 slots 2x 30fps",
+      "target_selection_max_ms": 15.02,
+      "tick_ms_max": 18.832,
+      "tick_ms_mean": 3.484,
+      "tick_ms_p99": 11.902,
+      "window_s": 0.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.333333333333333,
+      "cardinality_mismatch_samples": 0,
+      "cells": 1024,
+      "clears": 1024,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 60,
+      "frames": 6498,
+      "gameplay_seconds": 108.3,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 1607,
+      "max_accum_s": 0.3167,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 5,
+      "origins_below_board": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "route_ms_per_probe": 3.399,
+      "route_probes": 1024,
+      "size": 32,
+      "slot_origins": [
+        [
+          2.58,
+          41.02
+        ],
+        [
+          7.96,
+          41.02
+        ],
+        [
+          13.35,
+          41.02
+        ],
+        [
+          18.68,
+          41.02
+        ],
+        [
+          24.06,
+          41.02
+        ],
+        [
+          29.45,
+          41.02
+        ]
+      ],
+      "slots": 6,
+      "speed": "1x",
+      "state": "WON",
+      "tag": "32x32 6 slots 1x 60fps",
+      "target_selection_max_ms": 16.47,
+      "tick_ms_max": 19.723,
+      "tick_ms_mean": 1.754,
+      "tick_ms_p99": 9.477,
+      "window_s": 0.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.333333333333333,
+      "cardinality_mismatch_samples": 0,
+      "cells": 1024,
+      "clears": 1024,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 30,
+      "frames": 3447,
+      "gameplay_seconds": 114.9,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 1662,
+      "max_accum_s": 0.3,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 5,
+      "origins_below_board": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "route_ms_per_probe": 3.571,
+      "route_probes": 1024,
+      "size": 32,
+      "slot_origins": [
+        [
+          2.58,
+          41.02
+        ],
+        [
+          7.96,
+          41.02
+        ],
+        [
+          13.35,
+          41.02
+        ],
+        [
+          18.68,
+          41.02
+        ],
+        [
+          24.06,
+          41.02
+        ],
+        [
+          29.45,
+          41.02
+        ]
+      ],
+      "slots": 6,
+      "speed": "1x",
+      "state": "WON",
+      "tag": "32x32 6 slots 1x 30fps",
+      "target_selection_max_ms": 19.12,
+      "tick_ms_max": 22.74,
+      "tick_ms_mean": 2.652,
+      "tick_ms_p99": 10.666,
+      "window_s": 0.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.166666666666667,
+      "cardinality_mismatch_samples": 0,
+      "cells": 1024,
+      "clears": 1024,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 60,
+      "frames": 3447,
+      "gameplay_seconds": 57.45,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 1662,
+      "max_accum_s": 0.15,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 5,
+      "origins_below_board": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "route_ms_per_probe": 3.658,
+      "route_probes": 1024,
+      "size": 32,
+      "slot_origins": [
+        [
+          2.58,
+          41.02
+        ],
+        [
+          7.96,
+          41.02
+        ],
+        [
+          13.35,
+          41.02
+        ],
+        [
+          18.68,
+          41.02
+        ],
+        [
+          24.06,
+          41.02
+        ],
+        [
+          29.45,
+          41.02
+        ]
+      ],
+      "slots": 6,
+      "speed": "2x",
+      "state": "WON",
+      "tag": "32x32 6 slots 2x 60fps",
+      "target_selection_max_ms": 13.94,
+      "tick_ms_max": 17.201,
+      "tick_ms_mean": 2.652,
+      "tick_ms_p99": 10.361,
+      "window_s": 0.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.166666666666667,
+      "cardinality_mismatch_samples": 0,
+      "cells": 1024,
+      "clears": 1024,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 30,
+      "frames": 1775,
+      "gameplay_seconds": 59.167,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 1416,
+      "max_accum_s": 0.1667,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 5,
+      "origins_below_board": true,
+      "residue": [
+        0,
+        0,
+        0,
+        0
+      ],
+      "route_ms_per_probe": 3.362,
+      "route_probes": 1024,
+      "size": 32,
+      "slot_origins": [
+        [
+          2.58,
+          41.02
+        ],
+        [
+          7.96,
+          41.02
+        ],
+        [
+          13.35,
+          41.02
+        ],
+        [
+          18.68,
+          41.02
+        ],
+        [
+          24.06,
+          41.02
+        ],
+        [
+          29.45,
+          41.02
+        ]
+      ],
+      "slots": 6,
+      "speed": "2x",
+      "state": "WON",
+      "tag": "32x32 6 slots 2x 30fps",
+      "target_selection_max_ms": 13.26,
+      "tick_ms_max": 17.843,
+      "tick_ms_mean": 3.666,
+      "tick_ms_p99": 11.368,
+      "window_s": 0.0
+    }
+  ],
+  "real_host_59x59_dense_window": [
+    {
+      "built": true,
+      "cadence_interval_s": 0.333333333333333,
+      "cardinality_mismatch_samples": 0,
+      "cells": 3481,
+      "clears": 27,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 60,
+      "frames": 360,
+      "gameplay_seconds": 6.0,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 91,
+      "max_accum_s": 0.3167,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 4,
+      "origins_below_board": true,
+      "residue": [
+        64,
+        64,
+        64,
+        64
+      ],
+      "route_ms_per_probe": 0.808,
+      "route_probes": 91,
+      "size": 59,
+      "slot_origins": [
+        [
+          11.42,
+          72.75
+        ],
+        [
+          20.6,
+          72.75
+        ],
+        [
+          29.78,
+          72.75
+        ],
+        [
+          38.92,
+          72.75
+        ],
+        [
+          48.1,
+          72.75
+        ]
+      ],
+      "slots": 5,
+      "speed": "1x",
+      "state": "PLAYING",
+      "tag": "59x59 5 slots 1x 60fps",
+      "target_selection_max_ms": 2.42,
+      "tick_ms_max": 3.639,
+      "tick_ms_mean": 1.189,
+      "tick_ms_p99": 3.543,
+      "window_s": 6.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.166666666666667,
+      "cardinality_mismatch_samples": 0,
+      "cells": 3481,
+      "clears": 105,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 60,
+      "frames": 360,
+      "gameplay_seconds": 6.0,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 186,
+      "max_accum_s": 0.15,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 4,
+      "origins_below_board": true,
+      "residue": [
+        81,
+        81,
+        81,
+        81
+      ],
+      "route_ms_per_probe": 1.029,
+      "route_probes": 186,
+      "size": 59,
+      "slot_origins": [
+        [
+          11.42,
+          72.75
+        ],
+        [
+          20.6,
+          72.75
+        ],
+        [
+          29.78,
+          72.75
+        ],
+        [
+          38.92,
+          72.75
+        ],
+        [
+          48.1,
+          72.75
+        ]
+      ],
+      "slots": 5,
+      "speed": "2x",
+      "state": "PLAYING",
+      "tag": "59x59 5 slots 2x 60fps",
+      "target_selection_max_ms": 2.82,
+      "tick_ms_max": 4.6,
+      "tick_ms_mean": 1.873,
+      "tick_ms_p99": 4.386,
+      "window_s": 6.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.333333333333333,
+      "cardinality_mismatch_samples": 0,
+      "cells": 3481,
+      "clears": 28,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 60,
+      "frames": 360,
+      "gameplay_seconds": 6.0,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 109,
+      "max_accum_s": 0.3167,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 5,
+      "origins_below_board": true,
+      "residue": [
+        81,
+        81,
+        81,
+        81
+      ],
+      "route_ms_per_probe": 0.791,
+      "route_probes": 109,
+      "size": 59,
+      "slot_origins": [
+        [
+          6.28,
+          72.78
+        ],
+        [
+          15.6,
+          72.78
+        ],
+        [
+          24.91,
+          72.78
+        ],
+        [
+          34.13,
+          72.78
+        ],
+        [
+          43.45,
+          72.78
+        ],
+        [
+          52.76,
+          72.78
+        ]
+      ],
+      "slots": 6,
+      "speed": "1x",
+      "state": "PLAYING",
+      "tag": "59x59 6 slots 1x 60fps",
+      "target_selection_max_ms": 2.22,
+      "tick_ms_max": 3.576,
+      "tick_ms_mean": 1.369,
+      "tick_ms_p99": 3.546,
+      "window_s": 6.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.166666666666667,
+      "cardinality_mismatch_samples": 0,
+      "cells": 3481,
+      "clears": 111,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 60,
+      "frames": 360,
+      "gameplay_seconds": 6.0,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 222,
+      "max_accum_s": 0.1667,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 5,
+      "origins_below_board": true,
+      "residue": [
+        108,
+        108,
+        108,
+        108
+      ],
+      "route_ms_per_probe": 1.041,
+      "route_probes": 219,
+      "size": 59,
+      "slot_origins": [
+        [
+          6.28,
+          72.78
+        ],
+        [
+          15.6,
+          72.78
+        ],
+        [
+          24.91,
+          72.78
+        ],
+        [
+          34.13,
+          72.78
+        ],
+        [
+          43.45,
+          72.78
+        ],
+        [
+          52.76,
+          72.78
+        ]
+      ],
+      "slots": 6,
+      "speed": "2x",
+      "state": "PLAYING",
+      "tag": "59x59 6 slots 2x 60fps",
+      "target_selection_max_ms": 3.02,
+      "tick_ms_max": 4.948,
+      "tick_ms_mean": 2.18,
+      "tick_ms_p99": 4.73,
+      "window_s": 6.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.333333333333333,
+      "cardinality_mismatch_samples": 0,
+      "cells": 3481,
+      "clears": 28,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 30,
+      "frames": 180,
+      "gameplay_seconds": 6.0,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 109,
+      "max_accum_s": 0.3,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 5,
+      "origins_below_board": true,
+      "residue": [
+        81,
+        81,
+        81,
+        81
+      ],
+      "route_ms_per_probe": 0.785,
+      "route_probes": 109,
+      "size": 59,
+      "slot_origins": [
+        [
+          6.28,
+          72.78
+        ],
+        [
+          15.6,
+          72.78
+        ],
+        [
+          24.91,
+          72.78
+        ],
+        [
+          34.13,
+          72.78
+        ],
+        [
+          43.45,
+          72.78
+        ],
+        [
+          52.76,
+          72.78
+        ]
+      ],
+      "slots": 6,
+      "speed": "1x",
+      "state": "PLAYING",
+      "tag": "59x59 6 slots 1x 30fps",
+      "target_selection_max_ms": 2.27,
+      "tick_ms_max": 4.046,
+      "tick_ms_mean": 1.927,
+      "tick_ms_p99": 3.944,
+      "window_s": 6.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.166666666666667,
+      "cardinality_mismatch_samples": 0,
+      "cells": 3481,
+      "clears": 93,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 30,
+      "frames": 180,
+      "gameplay_seconds": 6.0,
+      "historical_tempo": false,
+      "laid_out": true,
+      "lanes_serviced": 180,
+      "max_accum_s": 0.1667,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 5,
+      "origins_below_board": true,
+      "residue": [
+        87,
+        87,
+        87,
+        87
+      ],
+      "route_ms_per_probe": 1.03,
+      "route_probes": 180,
+      "size": 59,
+      "slot_origins": [
+        [
+          6.28,
+          72.78
+        ],
+        [
+          15.6,
+          72.78
+        ],
+        [
+          24.91,
+          72.78
+        ],
+        [
+          34.13,
+          72.78
+        ],
+        [
+          43.45,
+          72.78
+        ],
+        [
+          52.76,
+          72.78
+        ]
+      ],
+      "slots": 6,
+      "speed": "2x",
+      "state": "PLAYING",
+      "tag": "59x59 6 slots 2x 30fps",
+      "target_selection_max_ms": 2.99,
+      "tick_ms_max": 5.037,
+      "tick_ms_mean": 3.085,
+      "tick_ms_p99": 4.845,
+      "window_s": 6.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.5,
+      "cardinality_mismatch_samples": 0,
+      "cells": 3481,
+      "clears": 8,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 60,
+      "frames": 360,
+      "gameplay_seconds": 6.0,
+      "historical_tempo": true,
+      "laid_out": true,
+      "lanes_serviced": 72,
+      "max_accum_s": 0.5,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 5,
+      "origins_below_board": true,
+      "residue": [
+        64,
+        64,
+        64,
+        64
+      ],
+      "route_ms_per_probe": 0.742,
+      "route_probes": 72,
+      "size": 59,
+      "slot_origins": [
+        [
+          6.28,
+          72.78
+        ],
+        [
+          15.6,
+          72.78
+        ],
+        [
+          24.91,
+          72.78
+        ],
+        [
+          34.13,
+          72.78
+        ],
+        [
+          43.45,
+          72.78
+        ],
+        [
+          52.76,
+          72.78
+        ]
+      ],
+      "slots": 6,
+      "speed": "1x",
+      "state": "PLAYING",
+      "tag": "59x59 6 slots 1x 60fps HISTORICAL-TEMPO",
+      "target_selection_max_ms": 2.19,
+      "tick_ms_max": 3.531,
+      "tick_ms_mean": 1.135,
+      "tick_ms_p99": 3.127,
+      "window_s": 6.0
+    },
+    {
+      "built": true,
+      "cadence_interval_s": 0.25,
+      "cardinality_mismatch_samples": 0,
+      "cells": 3481,
+      "clears": 58,
+      "dup_clear": 0,
+      "dup_dispatch": 0,
+      "fatal": false,
+      "fps": 60,
+      "frames": 360,
+      "gameplay_seconds": 6.0,
+      "historical_tempo": true,
+      "laid_out": true,
+      "lanes_serviced": 144,
+      "max_accum_s": 0.25,
+      "max_assignments_per_frame": 1,
+      "max_pending_lanes": 5,
+      "origins_below_board": true,
+      "residue": [
+        86,
+        86,
+        86,
+        86
+      ],
+      "route_ms_per_probe": 0.865,
+      "route_probes": 144,
+      "size": 59,
+      "slot_origins": [
+        [
+          6.28,
+          72.78
+        ],
+        [
+          15.6,
+          72.78
+        ],
+        [
+          24.91,
+          72.78
+        ],
+        [
+          34.13,
+          72.78
+        ],
+        [
+          43.45,
+          72.78
+        ],
+        [
+          52.76,
+          72.78
+        ]
+      ],
+      "slots": 6,
+      "speed": "2x",
+      "state": "PLAYING",
+      "tag": "59x59 6 slots 2x 60fps HISTORICAL-TEMPO",
+      "target_selection_max_ms": 2.45,
+      "tick_ms_max": 4.042,
+      "tick_ms_mean": 1.613,
+      "tick_ms_p99": 3.815,
+      "window_s": 6.0
+    }
+  ],
+  "reset": {
+    "cadence": 0.333333333333333,
+    "cells_per_s": 9.0,
+    "factor": 1.0
+  },
+  "suite": "tests/m29_c002_tempo_retune.gd",
+  "travel": {
+    "30fps": {
+      "cells_1s_1x": 9.0,
+      "cells_1s_2x_moving_agent": 18.0,
+      "cells_1s_2x_new_agent": 18.0,
+      "cells_1s_back_to_1x": 9.0,
+      "paused_delta": 0.0,
+      "ratio": 2.0,
+      "resume_0_5s_2x": 9.00000000000002
+    },
+    "60fps": {
+      "cells_1s_1x": 9.00000000000001,
+      "cells_1s_2x_moving_agent": 18.0,
+      "cells_1s_2x_new_agent": 18.0,
+      "cells_1s_back_to_1x": 9.00000000000001,
+      "paused_delta": 0.0,
+      "ratio": 2.0,
+      "resume_0_5s_2x": 8.99999999999998
+    }
+  },
+  "travel_route_len_cells": 132.5,
+  "truth_equivalence": {
+    "normalised": {
+      "assignments": 1024,
+      "clears": 1024,
+      "frames": 12927,
+      "identical_clears": true,
+      "identical_dispatch": true,
+      "identical_slot_accounting": true,
+      "seconds_1x": 215.450000000064,
+      "seconds_2x": 107.725000000032
+    },
+    "same_60fps_clock": {
+      "same_cleared_set": true,
+      "same_order": false,
+      "seconds_1x": 196.400000000048,
+      "seconds_2x": 106.433333333329,
+      "won_1x": true,
+      "won_2x": true
+    }
+  },
+  "wave_stress_probe": [
+    {
+      "dt": 0.0166666666666667,
+      "factor": 1.0,
+      "fps": 60,
+      "lanes": 5,
+      "max": 0.33333333333335,
+      "max_accum": 0.316666666666667,
+      "max_begins_per_frame": 1,
+      "max_lanes_per_frame": 1,
+      "mean": 0.333333333333336,
+      "min": 0.333333333333314,
+      "nominal": 0.333333333333333,
+      "overlap": 0,
+      "service_limited": false,
+      "service_time": 0.0833333333333333,
+      "waves": 60
+    },
+    {
+      "dt": 0.0166666666666667,
+      "factor": 2.0,
+      "fps": 60,
+      "lanes": 5,
+      "max": 0.166666666666675,
+      "max_accum": 0.15,
+      "max_begins_per_frame": 1,
+      "max_lanes_per_frame": 1,
+      "mean": 0.166666666666668,
+      "min": 0.166666666666657,
+      "nominal": 0.166666666666667,
+      "overlap": 0,
+      "service_limited": false,
+      "service_time": 0.0833333333333333,
+      "waves": 120
+    },
+    {
+      "dt": 0.0166666666666667,
+      "factor": 1.0,
+      "fps": 60,
+      "lanes": 6,
+      "max": 0.33333333333335,
+      "max_accum": 0.316666666666667,
+      "max_begins_per_frame": 1,
+      "max_lanes_per_frame": 1,
+      "mean": 0.333333333333336,
+      "min": 0.333333333333314,
+      "nominal": 0.333333333333333,
+      "overlap": 0,
+      "service_limited": false,
+      "service_time": 0.1,
+      "waves": 60
+    },
+    {
+      "dt": 0.0166666666666667,
+      "factor": 2.0,
+      "fps": 60,
+      "lanes": 6,
+      "max": 0.166666666666675,
+      "max_accum": 0.15,
+      "max_begins_per_frame": 1,
+      "max_lanes_per_frame": 1,
+      "mean": 0.166666666666668,
+      "min": 0.166666666666657,
+      "nominal": 0.166666666666667,
+      "overlap": 0,
+      "service_limited": false,
+      "service_time": 0.1,
+      "waves": 120
+    },
+    {
+      "dt": 0.0333333333333333,
+      "factor": 1.0,
+      "fps": 30,
+      "lanes": 5,
+      "max": 0.33333333333335,
+      "max_accum": 0.3,
+      "max_begins_per_frame": 1,
+      "max_lanes_per_frame": 1,
+      "mean": 0.333333333333336,
+      "min": 0.333333333333332,
+      "nominal": 0.333333333333333,
+      "overlap": 0,
+      "service_limited": false,
+      "service_time": 0.166666666666667,
+      "waves": 60
+    },
+    {
+      "dt": 0.0333333333333333,
+      "factor": 2.0,
+      "fps": 30,
+      "lanes": 5,
+      "max": 0.166666666666675,
+      "max_accum": 0.133333333333333,
+      "max_begins_per_frame": 1,
+      "max_lanes_per_frame": 1,
+      "mean": 0.166666666666668,
+      "min": 0.166666666666666,
+      "nominal": 0.166666666666667,
+      "overlap": 0,
+      "service_limited": false,
+      "service_time": 0.166666666666667,
+      "waves": 120
+    },
+    {
+      "dt": 0.0333333333333333,
+      "factor": 1.0,
+      "fps": 30,
+      "lanes": 6,
+      "max": 0.33333333333335,
+      "max_accum": 0.3,
+      "max_begins_per_frame": 1,
+      "max_lanes_per_frame": 1,
+      "mean": 0.333333333333336,
+      "min": 0.333333333333332,
+      "nominal": 0.333333333333333,
+      "overlap": 0,
+      "service_limited": false,
+      "service_time": 0.2,
+      "waves": 60
+    },
+    {
+      "dt": 0.0333333333333333,
+      "factor": 2.0,
+      "fps": 30,
+      "lanes": 6,
+      "max": 0.20000000000001,
+      "max_accum": 0.166666666666667,
+      "max_begins_per_frame": 1,
+      "max_lanes_per_frame": 1,
+      "mean": 0.200000000000002,
+      "min": 0.199999999999999,
+      "nominal": 0.166666666666667,
+      "overlap": 0,
+      "service_limited": true,
+      "service_time": 0.2,
+      "waves": 100
+    }
+  ]
+}
