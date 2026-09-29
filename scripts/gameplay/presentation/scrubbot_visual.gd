@@ -20,8 +20,9 @@ extends Node2D
 ## The canonical Scrubby gameplay texture is loaded ONCE into a shared static cache
 ## and reused by every spawned visual (no per-agent Image/Texture decode, M32 audit
 ## §8). Sizing is in board-local CELL units (the AgentLayer already scales one unit
-## to the renderer's cell size), so a responsive relayout rescales the visual for
-## free and no screen pixels are baked in.
+## to the renderer's cell size), compensated by the BoardPresentation reference/actual
+## cell-size ratio (M32-C002) so the displayed size does not depend on board resolution;
+## a responsive relayout bumps the presentation generation and the visual re-reads it.
 ##
 ## V01 scope (M32 prompt §4/§8/§10): the DEFAULT Scrubby only, single gameplay body
 ## pose, no route-dependent mirroring/rotation (no owner directional decision exists).
@@ -44,7 +45,13 @@ const BODY_TEX_PATH := "res://assets/ui/final/characters/scrubby/scrubby_gamepla
 ## M28-C002-C002-R01 (OWNER_GAMEPLAY_STATIC_SHELL_VISUAL_ACCEPTANCE_V01, item A): 1.8 -> 2.4
 ## so the moving mini Scrubbots read clearly on the static master shells. Presentation
 ## only — route position, speed, arrival and clears are untouched.
+## M32-C002: this is the span at the 32x32 REFERENCE presentation. The live local span is
+## BODY_SPAN_CELLS * BoardPresentation.get_scrubbot_size_compensation() (reference cell size /
+## actual rendered cell size), so the DISPLAYED size is board-resolution independent.
 const BODY_SPAN_CELLS := 2.4
+## How far up the parent chain (agent -> AgentLayer -> BoardPresentation) to look for the
+## presentation geometry seam. Without one (bare tests) the compensation is 1.0.
+const _PRESENTATION_SEARCH_DEPTH := 4
 
 ## Restrained travel motion tuned for readability, not gameplay (M32 prompt §8). All
 ## values are in CELL units / cycles-per-second and drive ONLY the local body sprite.
@@ -84,6 +91,12 @@ static func _force_missing_for_test() -> void:
 var _body: Sprite2D = null
 var _base_scale: Vector2 = Vector2.ONE
 var _t: float = 0.0
+## Presentation geometry seam (BoardPresentation) found once on attach, and the generation
+## the current _base_scale was computed for. Relayout bumps the generation; animate()
+## recomputes only then (O(1) compare per frame, no tree scan, no texture work).
+var _presentation: Node = null
+var _size_generation: int = -1
+var _compensation: float = 1.0
 
 func _ready() -> void:
 	_ensure_texture()
@@ -95,9 +108,8 @@ func _ready() -> void:
 	_body.centered = true
 	# Smooth anti-aliased character art: linear filtering, never nearest (M32 §8/§11).
 	_body.texture_filter = CanvasItem.TEXTURE_FILTER_LINEAR
-	var longest: float = float(max(_body_tex.get_width(), _body_tex.get_height(), 1))
-	var s: float = BODY_SPAN_CELLS / longest
-	_base_scale = Vector2(s, s)
+	_presentation = _find_presentation()
+	_apply_size()
 	_body.scale = _base_scale
 	add_child(_body)
 	# Canonical Scrubby is present -> suppress the parent agent's debug circle so the
@@ -109,12 +121,45 @@ func _ready() -> void:
 func _process(delta: float) -> void:
 	animate(delta)
 
+func _find_presentation() -> Node:
+	var n: Node = get_parent()
+	for _i in range(_PRESENTATION_SEARCH_DEPTH):
+		if n == null:
+			return null
+		if n.has_method("get_scrubbot_size_compensation") and n.has_method("get_presentation_generation"):
+			return n
+		n = n.get_parent()
+	return null
+
+## Recompute the compensated base scale from the presentation seam (1.0 without one).
+func _apply_size() -> void:
+	_compensation = 1.0
+	_size_generation = -1
+	if _presentation != null and is_instance_valid(_presentation):
+		var c = _presentation.get_scrubbot_size_compensation()
+		if (typeof(c) == TYPE_FLOAT or typeof(c) == TYPE_INT) and is_finite(float(c)) and float(c) > 0.0:
+			_compensation = float(c)
+		_size_generation = int(_presentation.get_presentation_generation())
+	var longest: float = float(max(_body_tex.get_width(), _body_tex.get_height(), 1))
+	var s: float = BODY_SPAN_CELLS * _compensation / longest
+	_base_scale = Vector2(s, s)
+
+## Re-read the presentation geometry now (also done automatically on the next animate()
+## after a relayout). Presentation-only; the agent's transform is untouched.
+func refresh_size() -> void:
+	if _body == null or not is_instance_valid(_body):
+		return
+	_apply_size()
+	_body.scale = _base_scale
+
 ## Advance the presentation-only travel animation by `delta`. Public so tests can drive
 ## it deterministically with set_process(false). Moves/rotates/squashes ONLY the local
 ## body sprite — never this node's own position and never the authoritative agent.
 func animate(delta: float) -> void:
 	if _body == null or not is_instance_valid(_body):
 		return
+	if _presentation != null and is_instance_valid(_presentation) 			and _presentation.get_presentation_generation() != _size_generation:
+		_apply_size()
 	_t += delta
 	var tau := TAU
 	_body.position = Vector2(0.0, -sin(_t * BOB_HZ * tau) * BOB_AMPLITUDE_CELLS)
@@ -129,3 +174,10 @@ func has_body() -> bool:
 
 func get_body_texture() -> Texture2D:
 	return _body_tex
+
+## Current compensated local body span in board cells (BODY_SPAN_CELLS at the reference).
+func get_local_body_span_cells() -> float:
+	return BODY_SPAN_CELLS * _compensation
+
+func get_size_compensation() -> float:
+	return _compensation

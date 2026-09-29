@@ -36,6 +36,20 @@ var _fx_layer: Node2D
 ## bot without hiding live board truth. Holds NO gameplay authority.
 var _retire_layer: Node2D
 
+## M32-C002 board-resolution-independent Scrubbot apparent size (OWNER_SCRUBBOT_SIZE_AND_
+## GAMEPLAY_TEMPO_V01 §1). The owner reference is the accepted 32x32 / 2.4-cell look: a
+## 32-cell board fitted into the SAME available rect by the SAME floored rule BoardRenderer
+## uses. Presentation-only: never read by routing/agents/BoardState.
+const SCRUBBOT_REFERENCE_CELLS := 32.0
+var _available_size: Vector2 = Vector2.ZERO
+## Reference 32-cell display size for the current available rect, and the resulting
+## compensation = reference / actual rendered cell size (1.0 on a 32x32 board).
+var _reference_cell_size: float = 1.0
+var _scrubbot_size_compensation: float = 1.0
+## Bumped on every configure() (responsive relayout). Live visuals/echoes compare it in
+## O(1) and recompute their local scale only when it changes — no scene-tree scan.
+var _presentation_generation: int = 0
+
 ## Build (once) or reconfigure the renderer + agent layer sharing this node's origin.
 ## `available_size` is the display rect the board should fit inside.
 ##
@@ -90,6 +104,49 @@ func configure(board, palette: PackedStringArray, available_size: Vector2) -> vo
 	_agent_layer.scale = Vector2(cs, cs)
 	_fx_layer.scale = Vector2(cs, cs)
 	_retire_layer.scale = Vector2(cs, cs)
+
+	_available_size = available_size
+	_reference_cell_size = reference_cell_size_for(available_size)
+	_scrubbot_size_compensation = _reference_cell_size / cs if cs > 0.0 else 1.0
+	_presentation_generation += 1
+
+## The display size one cell would have if a SCRUBBOT_REFERENCE_CELLS x SCRUBBOT_REFERENCE_CELLS
+## board were fitted into `available_size` by BoardRenderer's own floored rule.
+static func reference_cell_size_for(available_size: Vector2) -> float:
+	if not (is_finite(available_size.x) and is_finite(available_size.y)):
+		return 1.0
+	var fit: float = min(available_size.x / SCRUBBOT_REFERENCE_CELLS, available_size.y / SCRUBBOT_REFERENCE_CELLS)
+	return max(floor(fit), 1.0)
+
+## Production seam (GameplayScreen._layout_board): after it scales this presentation, the screen
+## reports the DISPLAY cell size a 32x32 reference board would get from the SAME layout rule in
+## the SAME region. Compensation = that / this presentation's actual display cell (renderer
+## integer cell x this node's uniform scale), so the displayed Scrubbot is identical to the
+## 32x32 look on every board resolution / aspect. Non-finite or non-positive input is ignored.
+func set_scrubbot_reference_display_cell(reference_display_cell: float) -> void:
+	if not is_finite(reference_display_cell) or reference_display_cell <= 0.0:
+		return
+	var display_cell: float = get_cell_size() * absf(scale.x)
+	if not is_finite(display_cell) or display_cell <= 0.0:
+		return
+	_reference_cell_size = reference_display_cell
+	_scrubbot_size_compensation = reference_display_cell / display_cell
+	_presentation_generation += 1
+
+## Board-cell multiplier that keeps a Scrubbot's DISPLAYED size equal to its 32x32-reference
+## size on this presentation: local_span_cells = reference_span_cells * compensation, so
+## displayed span = reference_span_cells * reference_cell_size for every board resolution.
+func get_scrubbot_size_compensation() -> float:
+	return _scrubbot_size_compensation
+
+func get_reference_cell_size() -> float:
+	return _reference_cell_size
+
+func get_available_size() -> Vector2:
+	return _available_size
+
+func get_presentation_generation() -> int:
+	return _presentation_generation
 
 func get_renderer():
 	return _renderer
