@@ -96,9 +96,10 @@ const V04_REF_AD_MAX := 180.0
 ## Hero scale relative to the V04 safe-box fit, applied about the visible soles
 ## (V05 1.15; V06 owner target 1.24 — clears the baked sign and helper bots).
 const SCRUBBY_SCALE := 1.24
-## V06 HeroFocusShade (canonical 1080x2160 px): soft dark radial dimmer behind Scrubby's
-## torso, starting below the baked sign (bottom y 745), peak alpha 0.20 fading to 0.
-const HERO_SHADE_RECT := Rect2(252, 760, 576, 640)
+## V06 HeroFocusShade (world canvas px; re-based for the owner-selected 940x1672 Home
+## background, M28-C002-C003-R01 V02): soft dark radial dimmer behind Scrubby's torso,
+## starting below the baked sign (bottom y 545), peak alpha 0.20 fading to 0.
+const HERO_SHADE_RECT := Rect2(260, 600, 420, 690)
 const HERO_SHADE_ALPHA := 0.20
 
 ## HOME-026 texture facts used by the World anchor contract (texture pixels of the
@@ -106,12 +107,12 @@ const HERO_SHADE_ALPHA := 0.20
 ## brush bristles reach 16 px lower and rest on the platform).
 const SCRUBBY_VISIBLE_BBOX := Rect2(27, 7, 1130, 1327)
 const SCRUBBY_FEET_Y := 1318.0
-## World canonical rows used to keep the composition readable: the owner's platform-top
-## visual region (y 1240..1337, where Scrubby stands) must stay above the Play CTA (on
-## short screens Play may overlap the lower stone steps); the baked sign's top should
-## stay below the Gift Meter.
-const PLATFORM_BOTTOM_Y := 1345.0
-const SIGN_TOP_Y := 653.0
+## World canonical rows (in the world canvas: the owner-selected 940x1672 Home background)
+## used to keep the composition readable: the platform row where Scrubby stands (feet y
+## 1240, dais floor 1180..1400) must stay above the Play CTA (on short screens Play may
+## overlap the lower stone steps); the baked sign's top should stay below the Gift Meter.
+const PLATFORM_BOTTOM_Y := 1260.0
+const SIGN_TOP_Y := 405.0
 
 const BG01 := Color(0.125, 0.145, 0.2, 1.0)   ## Midnight Slate #202533.
 
@@ -638,7 +639,7 @@ func _queue_world() -> void:
 ## the V04 ad reservation), the baked platform-top region stays above the V04 PLAY line,
 ## the baked sign stays below the V04 Gift Meter line (wide/tablet screens then show a
 ## mirrored continuation at the far sides).
-static func compute_world_transform(vp: Vector2, safe_top: float, safe_bottom: float, canvas: Vector2 = Vector2(1080, 2160)) -> Dictionary:
+static func compute_world_transform(vp: Vector2, safe_top: float, safe_bottom: float, canvas: Vector2 = Vector2(940, 1672)) -> Dictionary:
 	var mode: int = ResponsiveLayout.get_layout_mode(vp)
 	var ad_ref: float = roundf(clampf(vp.x * V04_REF_AD_RATIO, V04_REF_AD_MIN, V04_REF_AD_MAX))   # V04 layout rounded it
 	var canvas_h: float = safe_bottom - ad_ref

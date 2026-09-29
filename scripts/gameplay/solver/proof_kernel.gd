@@ -137,6 +137,10 @@ func _build_live(state) -> Dictionary:
 	if not sel.bind(board, ci, res):
 		return {}
 	var routing = ProductionRoutingSystem.new()
+	# The solver reasons about legal reachability and reports shortest TOTAL travel exactly as
+	# audited (M27 / Difficulty V1 evidence). The railway-first visual preference of the live host
+	# (M28-C002-C003-R01 V02) never enters solver truth, so this kernel keeps the equal-weight cost.
+	routing.interior_step_cost = ProductionRoutingSystem.TOTAL_TRAVEL_COST
 	var raccess = ProductionAccessQuery.new(board)
 	# Reconstruct the five M24 slots exactly (committed is 0 at every quiescent proof
 	# state, so `remaining` is the whole accounting; initial == remaining is future-

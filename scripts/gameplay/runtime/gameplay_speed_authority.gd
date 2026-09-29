@@ -16,7 +16,12 @@ extends RefCounted
 ## accounting, targets, routes, reservations, clear identity) — that lives entirely in
 ## the accepted M23–M27/M19/M20 engines, which this object never touches.
 ##
-## A new level / full reset restores 1x (owner rule §6). Pause is tracked by the
+## A new level / full reset restores 1x (owner rule §6) at THIS authority. The production
+## host then applies the owner's timed-2x cross-level default on top of that reset
+## (coordination/OWNER_TIMED_2X_CROSS_LEVEL_RUNTIME_V01.md): while a timed entitlement still
+## has wall-clock time left, a newly built / restarted attempt is set to 2x by the host
+## (ProductionGameplayHost._apply_default_speed); this object stays entitlement-agnostic.
+## Pause is tracked by the
 ## runtime controller, not here: pause overrides speed but preserves the selected
 ## speed across resume (owner rule §5).
 

@@ -20,9 +20,15 @@ const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const V = preload("res://scripts/tools/home_asset_manifest_validator.gd")
 
-const WORLD_PATH := "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png"
-const WORLD_SRC := "res://assets/art/references/_owner_inbox/world_01_whispering_park_1080x2160.png"
-const WORLD_SHA := "8e04eda668aabd9f96172c0e82fd7dd47e61083cb691402a313120443a525e5b"
+## M28-C002-C003-R01 V02: the Home background is the owner-selected file below (940x1672,
+## HOME-121); the V04 1080x2160 HOME-120 file stays on disk, retired and never loaded.
+const WORLD_PATH := "res://assets/ui/final/home/background/home_background.png"
+const WORLD_SHA := "9d5db29513d25ad5c0932840c08027be0198d0cd85dc758a69e09e800c7aabe2"
+const WORLD_SLUG := "home_background_whispering_park"
+const OLD_WORLD_PATH := "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png"
+const FEET := Vector2(470, 1240)
+const SAFE_BOX := Rect2(305, 620, 330, 620)
+const WORLD_ASPECT := 940.0 / 1672.0
 const MATRIX := [Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2i(1290, 2796), Vector2i(1080, 2400), Vector2i(1440, 3200), Vector2i(1080, 1920), Vector2i(1536, 2048)]
 ## V03 measured references at 1080x2160 (audited V03 build): Bot Parts bar 24 px, icon box
 ## 206x164 inside each shortcut card, PLAY 470x150.
@@ -106,9 +112,9 @@ func _drawn_paths(root: Node) -> Array:
 func _world_identity() -> void:
 	print("[world asset identity]")
 	var img := Image.load_from_file(ProjectSettings.globalize_path(WORLD_PATH))
-	_ok(img != null and img.get_size() == Vector2i(1080, 2160), "World 01 is exactly 1080x2160 (%s)" % str(img.get_size() if img else null))
-	_ok(FileAccess.get_sha256(WORLD_PATH) == WORLD_SHA, "World 01 SHA-256 is the owner-approved %s" % WORLD_SHA)
-	_ok(FileAccess.get_file_as_bytes(WORLD_PATH) == FileAccess.get_file_as_bytes(WORLD_SRC), "promoted final bytes == owner-inbox source bytes")
+	_ok(img != null and img.get_size() == Vector2i(940, 1672), "Home background is exactly 940x1672 (%s)" % str(img.get_size() if img else null))
+	_ok(FileAccess.get_sha256(WORLD_PATH) == WORLD_SHA, "Home background SHA-256 is the owner-selected %s" % WORLD_SHA)
+	_ok(FileAccess.file_exists(OLD_WORLD_PATH), "retired HOME-120 file is kept on disk (never deleted or overwritten)")
 	_complete("world_asset_identity")
 
 func _binds(home) -> void:
@@ -116,18 +122,18 @@ func _binds(home) -> void:
 	var m = V.load_manifest()
 	var entry: Dictionary = {}
 	for a in m["assets"]:
-		if a["slug"] == "world_01_whispering_park_background":
+		if a["slug"] == WORLD_SLUG:
 			entry = a
-	_ok(entry.get("id") == "HOME-120" and entry.get("status") == "APPROVED" and entry.get("approved_sha256") == WORLD_SHA and entry.get("path") == WORLD_PATH.trim_prefix("res://"), "manifest HOME-120 APPROVED with the exact sha + final path")
-	_ok(V.validate(m)["ok"], "manifest validates with HOME-120")
+	_ok(entry.get("id") == "HOME-121" and entry.get("status") == "APPROVED" and entry.get("approved_sha256") == WORLD_SHA and entry.get("path") == WORLD_PATH.trim_prefix("res://"), "manifest HOME-121 APPROVED with the exact sha + final path")
+	_ok(V.validate(m)["ok"], "manifest validates with HOME-121")
 	var binder := HomeArtBinder.new()
-	_ok(binder.state("world_01_whispering_park_background") == "APPROVED_BOUND", "HomeArtBinder gate: APPROVED_BOUND")
+	_ok(binder.state(WORLD_SLUG) == "APPROVED_BOUND", "HomeArtBinder gate: APPROVED_BOUND")
 	var wb: TextureRect = home.get_region("WorldBackground")
-	_ok(wb.texture != null and wb.texture.resource_path == WORLD_PATH and wb.is_visible_in_tree(), "WorldBackground presents HOME-120")
+	_ok(wb.texture != null and wb.texture.resource_path == WORLD_PATH and wb.is_visible_in_tree(), "WorldBackground presents HOME-121 (the owner-selected file)")
 	var acc: Dictionary = {}
 	for row in home.get_presentation_accounting():
 		acc[row["id"]] = row
-	_ok(acc["HOME-120"]["mode"] == "STATIC" and acc["HOME-120"]["nodes"][0]["name"] == "WorldBackground", "HOME-120 accounted STATIC on WorldBackground")
+	_ok(acc["HOME-121"]["mode"] == "STATIC" and acc["HOME-121"]["nodes"][0]["name"] == "WorldBackground" and acc["HOME-120"]["mode"] == "OWNER_RETIRED" and (acc["HOME-120"]["nodes"] as Array).is_empty(), "HOME-121 accounted STATIC on WorldBackground; replaced HOME-120 is OWNER_RETIRED with no node")
 	_complete("world_binds_through_lifecycle")
 
 func _no_duplicates(home) -> void:
@@ -170,16 +176,16 @@ func _anchor(home) -> void:
 	var w: Dictionary = home.get_world()
 	var c: Dictionary = home.get_scrubby_canonical()
 	var t: Dictionary = home.get_world_transform()
-	_ok(w["scrubby_feet_anchor"] == Vector2(540, 1297) and w["scrubby_safe_box"] == Rect2(353, 779, 374, 518), "catalog contract feet (540,1297) / safe box 353..727 x 779..1297")
-	_ok(absf(c["center_x"] - 540.0) < 0.01 and absf(c["feet_y"] - 1297.0) < 0.01, "visible centre X = 540, visible soles Y = 1297 (%.2f, %.2f)" % [c["center_x"], c["feet_y"]])
+	_ok(w["scrubby_feet_anchor"] == FEET and w["scrubby_safe_box"] == SAFE_BOX, "catalog contract feet (470,1240) / safe box 305..635 x 620..1240")
+	_ok(absf(c["center_x"] - FEET.x) < 0.01 and absf(c["feet_y"] - FEET.y) < 0.01, "visible centre X = 470, visible soles Y = 1240 (%.2f, %.2f)" % [c["center_x"], c["feet_y"]])
 	var vr: Rect2 = c["visible_rect"]
 	var box: Rect2 = w["scrubby_safe_box"]
-	var v04_vis := Rect2(Vector2(540.0 - box.size.x * 0.5, 1297.0 - (1318.0 - 7.0) * c["k_v04"]), Vector2(box.size.x, 1327.0 * c["k_v04"]))
+	var v04_vis := Rect2(Vector2(FEET.x - box.size.x * 0.5, FEET.y - (1318.0 - 7.0) * c["k_v04"]), Vector2(box.size.x, 1327.0 * c["k_v04"]))
 	_ok(v04_vis.position.x >= box.position.x - 0.01 and v04_vis.end.x <= box.end.x + 0.01 and v04_vis.position.y >= box.position.y - 0.01, "the V04 base fit stays inside the safe box (V05 enlarges it about the soles)")
-	_ok(vr.end.y - 1297.0 <= 7.0, "only the brush bristles reach below the soles line (%.1f px)" % (vr.end.y - 1297.0))
+	_ok(vr.end.y - FEET.y <= 7.0, "only the brush bristles reach below the soles line (%.1f px)" % (vr.end.y - FEET.y))
 	_ok(HomeScreenScript.SCRUBBY_FEET_Y == 1318.0 and HomeScreenScript.SCRUBBY_VISIBLE_BBOX == Rect2(27, 7, 1130, 1327), "documented HOME-026 visible-feet offset (soles at 1318 of 1358; visible bbox 27,7 1130x1327)")
 	var sc: TextureRect = home.get_region("Art_scrubby")
-	var feet_screen: Vector2 = home.world_to_screen(Vector2(540, 1297))
+	var feet_screen: Vector2 = home.world_to_screen(FEET)
 	var k: float = c["k"] * t["scale"]
 	_ok(absf(sc.position.y + HomeScreenScript.SCRUBBY_FEET_Y * k - feet_screen.y) < 0.5, "on screen the soles sit on the mapped anchor")
 	var sign: Rect2 = w["baked_sign_rect"]
@@ -417,7 +423,7 @@ func _world_seam() -> void:
 	var txt := FileAccess.get_file_as_string(HomeWorldCatalog.PATH).to_lower()
 	_ok(txt.find("level_range") == -1 and txt.find("\"levels\"") == -1 and txt.find("world_02") == -1, "no level ranges / World 02+ invented")
 	var w := HomeWorldCatalog.world("world_01")
-	_ok(w["background_slug"] == "world_01_whispering_park_background" and w["canvas"] == Vector2(1080, 2160), "world_id -> background slug + canvas + anchor contract")
+	_ok(w["background_slug"] == WORLD_SLUG and w["canvas"] == Vector2(940, 1672), "world_id -> background slug + canvas + anchor contract")
 	_ok(HomeWorldCatalog.world("world_99").is_empty(), "unknown world -> empty (no fallback invention)")
 	_complete("world_seam")
 
@@ -435,7 +441,7 @@ func _matrix() -> void:
 					bad.append(b.name)
 			var t: Dictionary = home.get_world_transform()
 			var wb: Rect2 = home.get_region("WorldBackground").get_global_rect()
-			if absf(wb.size.x / wb.size.y - 0.5) > 0.001:
+			if absf(wb.size.x / wb.size.y - WORLD_ASPECT) > 0.001:
 				bad.append("world_stretched")
 			var canvas: Rect2 = home.get_region("Background").get_global_rect()
 			# V05: the world is locked to its V04 transform; the ad-slot clip may sit lower
@@ -448,7 +454,7 @@ func _matrix() -> void:
 			if plat_bottom > play.position.y:
 				bad.append("platform_under_play")
 			var c: Dictionary = home.get_scrubby_canonical()
-			var feet_screen: float = home.world_to_screen(Vector2(540, 1297)).y
+			var feet_screen: float = home.world_to_screen(FEET).y
 			var sc: TextureRect = home.get_region("Art_scrubby")
 			if absf(sc.position.y + HomeScreenScript.SCRUBBY_FEET_Y * c["k"] * t["scale"] - feet_screen) > 0.5:
 				bad.append("feet_off_anchor")
@@ -477,7 +483,7 @@ func _historical() -> void:
 			n += 1
 			if FileAccess.get_sha256("res://" + String(a["path"])) != String(a["approved_sha256"]):
 				bad.append(a["id"])
-	_ok(n == 51 and bad.is_empty(), "all 51 APPROVED entries (incl. retired history) match their pinned sha %s" % str(bad))
+	_ok(n == 52 and bad.is_empty(), "all 52 APPROVED entries (incl. retired history) match their pinned sha %s" % str(bad))
 	_complete("historical_assets_intact")
 
 func _complete(c: String) -> void:
