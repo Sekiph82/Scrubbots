@@ -22,8 +22,12 @@ const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/productio
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 
-const DT := 1.0
-const MAX_TICKS := 80000
+## Real 60 FPS clock (M29-C002). The former 1.0 s tick sampled a 1 FPS clock: at the
+## retuned 9 cells/s most Hazard Bot routes finish inside one tick even at 1x, so both runs
+## became bound by the one-lane-per-frame budget and the 2x-vs-1x tick comparison no longer
+## observed speed (625 vs 622). At 60 FPS the travel/cadence clock dominates as in play.
+const DT := 1.0 / 60.0
+const MAX_TICKS := 400000
 
 var _fail := 0
 
@@ -106,6 +110,10 @@ func _make_host():
 	await process_frame
 	await process_frame
 	host.get_runtime().set_process(false)
+	# The awaited layout frames above ran the runtime with real wall-clock deltas; zero its
+	# cadence accumulator (no gameplay has happened yet) so every run starts in the same
+	# phase on the deterministic 60 FPS harness clock.
+	host.get_runtime().reset_runtime()
 	host.set_meta("sub", sub)
 	return host
 

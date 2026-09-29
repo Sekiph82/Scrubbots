@@ -33,7 +33,10 @@ const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
 const MAX_STEPS_PER_FRAME := 1
 ## Lanes of the current wave serviced per frame (M52-C001-R01 stutter fix). One exact-slot
 ## claim + route per frame keeps the per-frame cost to a single lane; a full 5/6-lane wave
-## still completes within 5/6 frames, far below one cadence interval (0.5 s / 0.25 s).
+## completes within 5/6 frames. At 60 FPS that is ~0.08-0.10 s, inside the 1x/2x cadence
+## (1/3 s / 1/6 s, M29-C002). At 30 FPS a six-lane wave needs ~0.20 s > 1/6 s, so 2x
+## becomes wave-service limited: the next wave waits for the current one (no overlap, no
+## catch-up burst). That is the owner-accepted trade; do not raise this budget to chase it.
 const MAX_LANES_PER_FRAME := 1
 
 var _scheduler = null            # AutoDispatchScheduler (M26)

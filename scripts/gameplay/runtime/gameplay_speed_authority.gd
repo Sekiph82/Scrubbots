@@ -29,7 +29,9 @@ signal speed_changed(factor: float)
 
 const FACTOR_1X := 1.0
 const FACTOR_2X := 2.0
-const DEFAULT_BASE_INTERVAL := 0.5   # seconds between scheduler steps at 1x
+## Seconds between scheduler waves at 1x: exactly 1/3 s (M29-C002 owner tempo retune;
+## historical baseline was 0.5 s). 2x = 1/6 s. Kept as an exact quotient, never 0.33.
+const DEFAULT_BASE_INTERVAL := 1.0 / 3.0
 
 var _base_interval: float = DEFAULT_BASE_INTERVAL
 var _is_2x: bool = false

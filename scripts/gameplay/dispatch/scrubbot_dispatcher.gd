@@ -68,7 +68,8 @@ const RouteValidator = preload("res://scripts/gameplay/routing/route_validator.g
 const DispatchResult = preload("res://scripts/gameplay/dispatch/dispatch_result.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 
-const DEFAULT_SPEED := 6.0
+## Single source: the canonical agent travel baseline (M29-C002).
+const DEFAULT_SPEED := ScrubbotAgent.DEFAULT_SPEED
 
 ## M20 arrival bridge (M20-C001 §3). Emitted ONCE per assignment, only after the
 ## existing _on_agent_completed() immutable-identity checks succeed (correct

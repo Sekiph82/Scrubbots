@@ -56,7 +56,8 @@ const BoardRenderer = preload("res://scripts/gameplay/board/board_renderer.gd")
 const DispatchResult = preload("res://scripts/gameplay/dispatch/dispatch_result.gd")
 
 const SLOT_COUNT := 5
-const DEFAULT_SPEED := 6.0
+## Single source: the canonical agent travel baseline via the dispatcher (M29-C002).
+const DEFAULT_SPEED := ScrubbotDispatcher.DEFAULT_SPEED
 
 ## M26 post-commit authenticated-clear notification (M26-C001 §J). Emitted EXACTLY
 ## ONCE per committed CLEARED transaction, AFTER BoardState -> candidate ->
