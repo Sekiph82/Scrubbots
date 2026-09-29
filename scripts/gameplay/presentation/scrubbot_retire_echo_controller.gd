@@ -36,6 +36,9 @@ const LIFETIME := 0.28
 ## Echo footprint in CELL units (slightly smaller than the live travel body) and how far
 ## it shrinks over its life. M28-C002-C002-R01: 1.6 -> 2.1, keeping the previous ~0.89
 ## echo/live ratio with the enlarged 2.4-cell live body. Presentation only.
+## M32-C002: span at the 32x32 REFERENCE presentation; the live span is multiplied by the
+## SAME BoardPresentation compensation as the travel body, so the 2.1/2.4 ratio holds and
+## the echo is board-resolution independent too.
 const ECHO_SPAN_CELLS := 2.1
 const SHRINK := 0.5
 
@@ -43,7 +46,8 @@ var _layer: Node2D = null
 var _board = null
 var _enabled: bool = true
 
-## Active echo records: {"node": Sprite2D, "elapsed": float, "base": Vector2}.
+## Active echo records: {"node": Sprite2D, "elapsed": float, "unit": Vector2 (reference-span
+## scale), "base": Vector2 (unit * current compensation)}.
 var _active: Array = []
 var _peak_active: int = 0
 var _suppressed: int = 0
@@ -60,6 +64,19 @@ func bind(retire_layer: Node2D, board) -> bool:
 	_layer = retire_layer
 	_board = board
 	return true
+
+## Board-resolution compensation of the bound retire layer's BoardPresentation (the SAME
+## seam ScrubbotVisual uses); 1.0 when the layer has no presentation parent.
+func get_size_compensation() -> float:
+	if _layer == null or not is_instance_valid(_layer):
+		return 1.0
+	var p = _layer.get_parent()
+	if p == null or not p.has_method("get_scrubbot_size_compensation"):
+		return 1.0
+	var c = p.get_scrubbot_size_compensation()
+	if (typeof(c) == TYPE_FLOAT or typeof(c) == TYPE_INT) and is_finite(float(c)) and float(c) > 0.0:
+		return float(c)
+	return 1.0
 
 func is_bound() -> bool:
 	return _layer != null and is_instance_valid(_layer) and _board != null
@@ -102,9 +119,10 @@ func _spawn(cell: Vector2i) -> bool:
 	s.position = Vector2(cell.x + 0.5, cell.y + 0.5)
 	var longest: float = float(max(tex.get_width(), tex.get_height(), 1))
 	var sc: float = ECHO_SPAN_CELLS / longest
-	s.scale = Vector2(sc, sc)
+	var base: Vector2 = Vector2(sc, sc) * get_size_compensation()
+	s.scale = base
 	_layer.add_child(s)
-	_active.append({"node": s, "elapsed": 0.0, "base": Vector2(sc, sc)})
+	_active.append({"node": s, "elapsed": 0.0, "unit": Vector2(sc, sc), "base": base})
 	return true
 
 # ------------------------------------------------------------------- aging ----
@@ -117,6 +135,8 @@ func _process(delta: float) -> void:
 func age(delta: float) -> void:
 	if _active.is_empty():
 		return
+	# One compensation read per tick (not per echo): a relayout mid-echo rescales it too.
+	var comp: float = get_size_compensation()
 	var i := _active.size() - 1
 	while i >= 0:
 		var e: Dictionary = _active[i]
@@ -131,6 +151,7 @@ func age(delta: float) -> void:
 			_active.remove_at(i)
 		else:
 			node.modulate.a = 1.0 - p
+			e["base"] = e["unit"] * comp
 			var shrink: float = 1.0 - SHRINK * p
 			node.scale = e["base"] * shrink
 		i -= 1

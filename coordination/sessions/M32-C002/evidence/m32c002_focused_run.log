@@ -1,0 +1,96 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+[s0 real production GameplayScreen @1080x2160]
+  ok: host builds level_002_apple.json
+  ok: 32x32 production L2 apple (REFERENCE) 32x32: renderer cell 24 x scale 1.0181 = display cell 24.434; ref32 display cell 24.434; compensation 1.0000; local span 2.4000 cells; body 58.64 px vs ref 58.64 (delta +0.000%; pre-C002 58.6 px, +0.0%)
+  ok: host builds m21_level_001_hazard_bot.json
+  ok: 20x20 production L1 hazard bot 20x20: renderer cell 36 x scale 1.0045 = display cell 36.162; ref32 display cell 24.434; compensation 0.6757; local span 1.6216 cells; body 58.64 px vs ref 58.64 (delta +0.000%; pre-C002 86.8 px, +48.0%)
+  ok: host builds level_003_palm_tree.json
+  ok: 38x38 production L3 palm tree 38x38: renderer cell 21 x scale 1.0012 = display cell 21.025; ref32 display cell 24.434; compensation 1.1622; local span 2.7892 cells; body 58.64 px vs ref 58.64 (delta +0.000%; pre-C002 50.5 px, -14.0%)
+  ok: host builds m32c002_2063398.json
+  ok: 59x59 TEST stripe 59x59: renderer cell 14 x scale 1.0090 = display cell 14.126; ref32 display cell 24.434; compensation 1.7297; local span 4.1514 cells; body 58.64 px vs ref 58.64 (delta +0.000%; pre-C002 33.9 px, -42.2%)
+  ok: host builds m32c002_5496680.json
+  ok: 59x40 TEST rect (width-limited) 59x40: renderer cell 14 x scale 1.0281 = display cell 14.393; ref32 display cell 24.434; compensation 1.6976; local span 4.0743 cells; body 58.64 px vs ref 58.64 (delta +0.000%; pre-C002 34.5 px, -41.1%)
+  ok: host builds m32c002_7296986.json
+  ok: 24x40 TEST rect (height-limited) 24x40: renderer cell 20 x scale 1.0458 = display cell 20.916; ref32 display cell 24.434; compensation 1.1682; local span 2.8037 cells; body 58.64 px vs ref 58.64 (delta +0.000%; pre-C002 50.2 px, -14.4%)
+  ok: host builds level_002_apple.json
+  ok: 100x100 TEST synthetic (not production; screen-only) 100x100: renderer cell 8 x scale 1.0763 = display cell 8.610; ref32 display cell 24.434; compensation 2.8378; local span 6.8108 cells; body 58.64 px vs ref 58.64 (delta +0.000%; pre-C002 20.7 px, -64.8%)
+[s1 geometry-derived formula]
+  ok: 20x20: cell 40 px, ref32 25 px, compensation 0.6250, local span 1.5000 cells (= 2.4*ref/cell 1.5000; naive 2.4*N/32 1.500) [width-limited]
+  ok: 32x32: cell 25 px, ref32 25 px, compensation 1.0000, local span 2.4000 cells (= 2.4*ref/cell 2.4000; naive 2.4*N/32 2.400) [width-limited]
+  ok: 38x38: cell 21 px, ref32 25 px, compensation 1.1905, local span 2.8571 cells (= 2.4*ref/cell 2.8571; naive 2.4*N/32 2.850) [width-limited]
+  ok: 59x59: cell 13 px, ref32 25 px, compensation 1.9231, local span 4.6154 cells (= 2.4*ref/cell 4.6154; naive 2.4*N/32 4.425) [width-limited]
+  ok: 59x24: cell 13 px, ref32 25 px, compensation 1.9231, local span 4.6154 cells (= 2.4*ref/cell 4.6154; naive 2.4*N/32 4.425) [width-limited]
+  ok: 24x59: cell 13 px, ref32 25 px, compensation 1.9231, local span 4.6154 cells (= 2.4*ref/cell 4.6154; naive 2.4*N/32 4.425) [height-limited]
+  ok: 40x24: cell 20 px, ref32 25 px, compensation 1.2500, local span 3.0000 cells (= 2.4*ref/cell 3.0000; naive 2.4*N/32 3.000) [width-limited]
+  ok: 24x40: cell 20 px, ref32 25 px, compensation 1.2500, local span 3.0000 cells (= 2.4*ref/cell 3.0000; naive 2.4*N/32 3.000) [height-limited]
+  ok: 100x100: cell 8 px, ref32 25 px, compensation 3.1250, local span 7.5000 cells (= 2.4*ref/cell 7.5000; naive 2.4*N/32 7.500) [width-limited]
+  ok: sweep: 140 (w, h, rect) presentations, compensation == floor-ref / floor-cell every time (0 mismatches)
+  ok: 20x20 local span depends on presentation geometry, not a size table: { "(800.0, 820.0)": 1.5, "(700.0, 900.0)": 1.44, "(1400.0, 1000.0)": 1.488, "(333.0, 517.0)": 1.5 }
+[s2 32x32 reference lock]
+  ok: rect (800.0, 820.0): 32x32 compensation exactly 1.0, local span exactly 2.4 cells, displayed 60.00 px = 2.4 x 25 px cell
+  ok: rect (1000.0, 1000.0): 32x32 compensation exactly 1.0, local span exactly 2.4 cells, displayed 74.40 px = 2.4 x 31 px cell
+  ok: rect (640.0, 900.0): 32x32 compensation exactly 1.0, local span exactly 2.4 cells, displayed 48.00 px = 2.4 x 20 px cell
+  ok: owner reference constants unchanged (2.4 body / 2.1 echo)
+[s3 measured apparent size vs 32x32 reference]
+  ok: 20x20: displayed body 60.00 px vs 32x32 60.00 px (delta +0.000%; pre-C002 would be 96.0 px, +60.0%)
+  ok: 32x32: displayed body 60.00 px vs 32x32 60.00 px (delta +0.000%; pre-C002 would be 60.0 px, -0.0%)
+  ok: 38x38: displayed body 60.00 px vs 32x32 60.00 px (delta +0.000%; pre-C002 would be 50.4 px, -16.0%)
+  ok: 59x59: displayed body 60.00 px vs 32x32 60.00 px (delta +0.000%; pre-C002 would be 31.2 px, -48.0%)
+  ok: 59x24: displayed body 60.00 px vs 32x32 60.00 px (delta +0.000%; pre-C002 would be 31.2 px, -48.0%)
+  ok: 24x59: displayed body 60.00 px vs 32x32 60.00 px (delta +0.000%; pre-C002 would be 31.2 px, -48.0%)
+  ok: 40x24: displayed body 60.00 px vs 32x32 60.00 px (delta +0.000%; pre-C002 would be 48.0 px, -20.0%)
+  ok: 24x40: displayed body 60.00 px vs 32x32 60.00 px (delta +0.000%; pre-C002 would be 48.0 px, -20.0%)
+  ok: 100x100: displayed body 60.00 px vs 32x32 60.00 px (delta +0.000%; pre-C002 would be 19.2 px, -68.0%)
+[s4 live relayout on a real laid-out production host]
+  ok: host builds level_003_palm_tree.json
+  ok: a live Scrubbot is moving on the 38x38 host
+  ok: live visual picked up the new compensation through its own frame update (1.1622)
+  ok: relayout bumped presentation generation (5 -> 11) and reference cell (24 -> 23 px)
+  ok: same agent instance survives relayout (no recreation)
+  ok: route (4 pts), progress 0.0566 and board-local position (6.852861, 47.15757) unchanged by relayout
+  ok: body re-sized live: 58.64 px (ref32 display cell 24.434) -> 55.60 px (ref32 display cell 23.167), local span 2.7892 -> 2.7892 cells
+  ok: no texture reload (same shared texture object)
+  ok: the same agent continues after relayout and arrives
+[s5 presentation-only differential]
+  ok: 59x59 route available (4 points)
+  ok: same assignment (18 cells/s 2x tempo) on both agents
+  ok: 115 frames with 2 live relayouts: compensated-visual agent == bare agent (position/progress/state bit-identical)
+  ok: completion count 1/1, identical exact endpoint (30.5, 56.5)
+[s6 retire echo consistency]
+  ok: 32x32 echo spawned
+  ok: 32x32: echo 52.50 px (32x32 52.50), live 60.00 px, ratio 0.8750 (2.1/2.4 = 0.8750), at exact cell centre
+  ok: 32x32 half-life: shrink 0.75 and fade 0.5 unchanged
+  ok: 32x32: mid-echo relayout -> echo 44.10 px = 2.1 x new ref 21 px
+  ok: 32x32 echo expires on the unchanged lifetime
+  ok: 20x20 echo spawned
+  ok: 20x20: echo 52.50 px (32x32 52.50), live 60.00 px, ratio 0.8750 (2.1/2.4 = 0.8750), at exact cell centre
+  ok: 20x20 half-life: shrink 0.75 and fade 0.5 unchanged
+  ok: 20x20: mid-echo relayout -> echo 44.10 px = 2.1 x new ref 21 px
+  ok: 20x20 echo expires on the unchanged lifetime
+  ok: 38x38 echo spawned
+  ok: 38x38: echo 52.50 px (32x32 52.50), live 60.00 px, ratio 0.8750 (2.1/2.4 = 0.8750), at exact cell centre
+  ok: 38x38 half-life: shrink 0.75 and fade 0.5 unchanged
+  ok: 38x38: mid-echo relayout -> echo 44.10 px = 2.1 x new ref 21 px
+  ok: 38x38 echo expires on the unchanged lifetime
+  ok: 59x59 echo spawned
+  ok: 59x59: echo 52.50 px (32x32 52.50), live 60.00 px, ratio 0.8750 (2.1/2.4 = 0.8750), at exact cell centre
+  ok: 59x59 half-life: shrink 0.75 and fade 0.5 unchanged
+  ok: 59x59: mid-echo relayout -> echo 44.10 px = 2.1 x new ref 21 px
+  ok: 59x59 echo expires on the unchanged lifetime
+  ok: 59x24 echo spawned
+  ok: 59x24: echo 52.50 px (32x32 52.50), live 60.00 px, ratio 0.8750 (2.1/2.4 = 0.8750), at exact cell centre
+  ok: 59x24 half-life: shrink 0.75 and fade 0.5 unchanged
+  ok: 59x24: mid-echo relayout -> echo 44.10 px = 2.1 x new ref 21 px
+  ok: 59x24 echo expires on the unchanged lifetime
+  ok: 100x100 echo spawned
+  ok: 100x100: echo 52.50 px (32x32 52.50), live 60.00 px, ratio 0.8750 (2.1/2.4 = 0.8750), at exact cell centre
+  ok: 100x100 half-life: shrink 0.75 and fade 0.5 unchanged
+  ok: 100x100: mid-echo relayout -> echo 44.10 px = 2.1 x new ref 21 px
+  ok: 100x100 echo expires on the unchanged lifetime
+  ok: cap 16 / lifetime 0.28 s / shrink 0.5 unchanged (20 requests -> 16 active, 4 suppressed)
+[s7 performance: 59x59, 30 live visuals]
+  ok: 30 visuals share ONE texture object
+  ok: 600 frames x 30 visuals: object count stable (1858 -> 1858), no per-frame allocation of nodes/resources
+  ok: after 3 relayouts every live visual carries the current compensation
+  ok: steady animate 38.2 us/frame for 30 visuals; first frame after relayout 83.0 us (bounded)
+M32-C002 BOARD-INDEPENDENT SIZE: PASS (86 checks, 0 failed)

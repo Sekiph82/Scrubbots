@@ -608,20 +608,22 @@ func _layout_board() -> void:
 		return
 	var w: int = _board.get_width()
 	var h: int = _board.get_height()
-	var loop := Vector2(w + 2.0 * ScrubRailGeometry.CENTER_OFFSET, h + 2.0 * ScrubRailGeometry.CENTER_OFFSET)
 	# Square cells onto a baked loop that is not exactly square: take the cell that splits
 	# the horizontal/vertical misfit evenly. The renderer draws at an integer cell; the whole
 	# BoardPresentation (renderer + agents + rail geometry, one transform) is then scaled by
 	# the small fractional remainder so the runtime rail centrelines meet the baked rail.
 	# Capped at 3% over the strict fit so a non-square board (not in the current catalog)
 	# always stays inside the baked rail; near-square boards keep the even split.
-	var fit_x: float = rr.size.x / loop.x
-	var fit_y: float = rr.size.y / loop.y
-	var exact: float = maxf(minf((fit_x + fit_y) * 0.5, minf(fit_x, fit_y) * 1.03), 1.0)
+	var exact: float = _board_display_cell(rr, w, h)
 	var cell: float = maxf(floor(exact), 1.0)
 	_presentation.configure(_board, _palette, Vector2(w * cell, h * cell))
 	var render_cell: float = _presentation.get_cell_size()
 	_presentation.scale = Vector2.ONE * (exact / render_cell)
+	# M32-C002: Scrubbot apparent size is board-resolution independent. The reference is the
+	# display cell a 32x32 board gets from this SAME fit in this SAME rail region (presentation
+	# only; the board/agent transform above is unchanged).
+	var ref_n: int = int(BoardPresentation.SCRUBBOT_REFERENCE_CELLS)
+	_presentation.set_scrubbot_reference_display_cell(_board_display_cell(rr, ref_n, ref_n))
 	_cell_size = exact
 	if _rail_view != null:
 		_rail_view.position = Vector2.ZERO
@@ -629,6 +631,13 @@ func _layout_board() -> void:
 		_rail_view.configure(w, h)
 	var board_px := Vector2(w, h) * _cell_size
 	_presentation.position = (rr.size - board_px) * 0.5
+
+## Display cell size (exact, unfloored) for a w x h board fitted onto the baked rail region.
+func _board_display_cell(rr: Rect2, w: int, h: int) -> float:
+	var loop := Vector2(w + 2.0 * ScrubRailGeometry.CENTER_OFFSET, h + 2.0 * ScrubRailGeometry.CENTER_OFFSET)
+	var fit_x: float = rr.size.x / loop.x
+	var fit_y: float = rr.size.y / loop.y
+	return maxf(minf((fit_x + fit_y) * 0.5, minf(fit_x, fit_y) * 1.03), 1.0)
 
 func _layout_batch() -> void:
 	var slots: Array = Shell.slot_rects(_geom_id)
