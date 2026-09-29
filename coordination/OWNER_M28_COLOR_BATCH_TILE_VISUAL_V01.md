@@ -28,14 +28,38 @@ Each occupied color/batch tile should look like a compact rounded 3D game button
 - main face uses the authoritative ScrubBots Palette v3 color;
 - slightly lighter top highlight;
 - subtle face shading only, avoiding heavy gradients that alter perceived palette identity;
-- a clearly visible lower white / light-gray base layer projecting below the colored face;
+- a clearly visible lower base layer projecting below the colored face; **OWNER REVISION 2026-09-29:** its fill color must be exactly the SAME authoritative Palette v3 batch color as the colored top face, not white/light-gray;
 - soft compact shadow under the tile;
 - large centered batch/count number;
 - count fill: white;
 - count outline: strong black/dark outline for readability;
 - clean, toy-like depth without becoming glossy plastic overload.
 
-The overall reference is the owner-approved mockup shown in chat on 2026-09-29: colored rounded raised face, white/light lower platform, centered outlined white number.
+The overall reference is the owner-approved mockup shown in chat on 2026-09-29, with one later owner correction: the lower platform keeps the same height/depth/shadow language but its fill color is the exact same batch color as the top face. The centered outlined white number remains unchanged.
+
+## Owner visual review revision — 2026-09-29
+
+Owner reviewed the C004 V01 evidence and ruled:
+
+- tile height: **OK**;
+- shadow: **OK**;
+- top highlight: **OK**;
+- count spacing/weight including 120 / 250: **OK**;
+- perceived centering: **OK**;
+- ACTIVE / WAITING distinction: **OK**;
+- supply front / preview hierarchy: **OK**;
+- EMPTY appearance: **OK**;
+- **ONLY REQUIRED REMEDIATION:** the lower 3D base must NOT be white or light gray. Its fill must be the exact same canonical Palette v3 batch color as that tile's top face.
+
+Implementation consequence:
+
+- for an occupied tile, `Base` fill == `Face` canonical batch color exactly;
+- do not introduce a second approximate/lighter substitute color for the base fill;
+- preserve current base height, geometry, shadow size/offset, highlight strength, count styling/centering and state hierarchy;
+- a darker edge/shadow treatment may remain only as depth treatment; the visible base body/fill itself must read as the same batch color;
+- EMPTY behavior remains unchanged.
+
+This is a narrow visual remediation. Do not redesign the tile.
 
 ## Reusable implementation
 
@@ -65,6 +89,7 @@ A lightweight shader may be used only if native controls cannot produce the requ
 
 - standard raised tile;
 - Palette v3 face color;
+- lower base fill uses that exact same Palette v3 batch color;
 - white outlined count;
 - normal base/shadow.
 
@@ -134,7 +159,7 @@ Rules:
 
 - horizontal center of count label == horizontal center of colored face;
 - vertical center of count label == vertical center of colored face;
-- the white/light-gray lower 3D base is NOT part of the centering box;
+- the lower same-color 3D base is NOT part of the centering box;
 - the lower base must not pull the number downward;
 - invisible WAITING/ACTIVE spacer nodes, legacy VBox spacing, or any compatibility label must not influence the count's visual center;
 - 1-, 2- and 3-digit counts must all remain centered without hand-tuned per-number offsets;
