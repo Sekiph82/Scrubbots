@@ -68,6 +68,7 @@ func _layout_views() -> void:
 	if _slot_rects.size() >= n:
 		for i in range(n):
 			fit_child_in_rect(_views[i], _slot_rects[i])
+			_views[i].set_shell_tile_size((_slot_rects[i] as Rect2).size)
 		return
 	var w: float = maxf((size.x - _separation * (n - 1)) / float(n), 1.0)
 	for i in range(n):

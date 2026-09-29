@@ -1,0 +1,10 @@
+SNAPSHOT c004_5slot_5col_phone_1080x2160.png shell=5slot_5col slots=5 s0[7 d=(0.00,0.00) ink=(0.6,-0.1)] s1[42 d=(0.00,0.00) ink=(-0.1,-0.1)] s2[120 d=(0.00,0.00) ink=(1.7,-0.1)] s3[32 d=(0.00,0.00) ink=(-0.3,0.4)]
+SNAPSHOT c004_6slot_4col_phone_1080x2160.png shell=6slot_4col slots=6 s0[5 d=(0.00,0.00) ink=(0.7,-0.6)] s1[16 d=(0.00,0.00) ink=(1.2,-0.1)] s2[250 d=(0.00,0.00) ink=(-0.1,-1.1)] s3[60 d=(0.00,0.00) ink=(0.5,-0.1)] s4[9 d=(0.00,0.00) ink=(0.6,-0.2)]
+SNAPSHOT c004_5slot_3col_phone_1080x2160.png shell=5slot_3col slots=5 s0[7 d=(0.00,0.00) ink=(0.6,-0.1)] s1[42 d=(0.00,0.00) ink=(-0.1,-0.1)] s2[120 d=(0.00,0.00) ink=(1.7,-0.1)] s3[32 d=(0.00,0.00) ink=(-0.3,0.4)]
+SNAPSHOT c004_5slot_4col_phone_1080x2160.png shell=5slot_4col slots=5 s0[7 d=(0.00,0.00) ink=(0.6,-0.1)] s1[42 d=(0.00,0.00) ink=(-0.1,-0.1)] s2[120 d=(0.00,0.00) ink=(1.7,-0.1)] s3[32 d=(0.00,0.00) ink=(-0.3,0.4)]
+SNAPSHOT c004_6slot_5col_phone_1080x2160.png shell=6slot_5col slots=6 s0[5 d=(0.00,0.00) ink=(0.7,-0.4)] s1[16 d=(0.00,0.00) ink=(2.0,-0.4)] s2[250 d=(0.00,0.00) ink=(0.5,-0.4)] s3[60 d=(0.00,0.00) ink=(1.2,-0.4)] s4[9 d=(0.00,0.00) ink=(0.7,0.2)]
+SNAPSHOT c004_5slot_5col_narrow_720x1600.png shell=5slot_5col slots=5 s0[7 d=(0.00,0.00) ink=(0.6,-1.4)] s1[42 d=(0.00,0.00) ink=(-0.9,-1.4)] s2[120 d=(0.00,0.00) ink=(0.7,-0.4)] s3[32 d=(0.00,0.00) ink=(0.1,-1.4)]
+SNAPSHOT c004_6slot_5col_narrow_720x1600.png shell=6slot_5col slots=6 s0[5 d=(0.00,0.00) ink=(-0.4,-1.1)] s1[16 d=(0.00,0.00) ink=(-0.1,-0.6)] s2[250 d=(0.00,0.00) ink=(0.5,-0.6)] s3[60 d=(0.00,0.00) ink=(-0.1,-1.1)] s4[9 d=(0.00,0.00) ink=(0.5,-1.2)]
+SNAPSHOT c004_5slot_5col_tablet_1536x2048.png shell=5slot_5col slots=5 s0[7 d=(0.00,0.00) ink=(0.4,-0.5)] s1[42 d=(0.00,0.00) ink=(-0.6,-0.5)] s2[120 d=(0.00,0.00) ink=(0.5,0.5)] s3[32 d=(0.00,0.00) ink=(-0.4,0.0)]
+SNAPSHOT c004_6slot_3col_tablet_1536x2048.png shell=6slot_3col slots=6 s0[5 d=(0.00,0.00) ink=(0.0,-0.2)] s1[16 d=(0.00,0.00) ink=(0.9,-0.2)] s2[250 d=(0.00,0.00) ink=(-0.8,-0.2)] s3[60 d=(0.00,0.00) ink=(-0.3,-0.2)] s4[9 d=(0.00,0.00) ink=(-0.5,0.3)]
+GALLERY worst layout delta = 0.000 px over 26 tiles
