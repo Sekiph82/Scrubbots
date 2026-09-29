@@ -124,9 +124,28 @@ For the Batch Supply / color selection grid:
 
 Counts must remain readable at all supported phone/tablet sizes.
 
+### Owner correction — exact count centering
+
+The player-facing batch/count number must be **geometrically centered in the COLORED TOP FACE of the tile on both axes**.
+
+This is especially mandatory for the permanent five-slot / temporary sixth-slot system.
+
+Rules:
+
+- horizontal center of count label == horizontal center of colored face;
+- vertical center of count label == vertical center of colored face;
+- the white/light-gray lower 3D base is NOT part of the centering box;
+- the lower base must not pull the number downward;
+- invisible WAITING/ACTIVE spacer nodes, legacy VBox spacing, or any compatibility label must not influence the count's visual center;
+- 1-, 2- and 3-digit counts must all remain centered without hand-tuned per-number offsets;
+- use layout/anchors/alignment so centering remains correct after responsive resizing;
+- if a legacy hidden state-label spacer must remain to preserve outer slot geometry/spawn anchors, keep it outside the colored-face count-layout calculation.
+
+The shared ColorBatchTile should therefore own an explicit colored-face rect and place the count label as a full-face overlay centered with horizontal and vertical alignment.
+
 Requirements:
 
-- centered text;
+- exact centered text on the colored face;
 - bold font;
 - white fill;
 - dark/black outline;
@@ -184,15 +203,16 @@ No one-node-per-logical-pixel relationship.
 
 Implementation cycle must provide fresh runtime evidence for:
 
-- 5-slot occupied state;
-- 6-slot occupied state;
+- 5-slot occupied state, including exact geometric count centering;
+- 6-slot occupied state, including exact geometric count centering;
 - Batch Supply 5x3 visible layout;
 - representative 3-column and 4-column layouts;
 - ACTIVE state;
 - EMPTY state;
 - preview/non-interactive state;
 - light and dark Palette v3 colors;
-- narrow phone and tablet.
+- narrow phone and tablet;
+- explicit 1-, 2- and 3-digit count-centering evidence on slot tiles.
 
 Owner visual acceptance is required before SB-M28-C002-021 closes.
 
