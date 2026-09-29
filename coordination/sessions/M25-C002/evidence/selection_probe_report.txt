@@ -1,0 +1,205 @@
+M25-C002 per-lane target-selection probe (tests/tools/m25_c002_selection_probe.gd)
+
+## UNLAID 59x59 6 slots 2x 60fps (M29-C002 harness shape)
+lanes=123 inside-board-origin lanes=10 no_target=23 candidates/lane { "n": 123, "min": 531, "p50": 576, "p90": 589, "max": 590, "mean": 574.9 }
+is_targetable/lane { "n": 123, "min": 1, "p50": 163, "p90": 571, "max": 590, "mean": 271.3 }
+compute_route/lane { "n": 123, "min": 0, "p50": 1, "p90": 1, "max": 590, "mean": 46.4 }
+selection_ms/lane { "n": 123, "min": 1.12, "p50": 8.95, "p90": 28.39, "p99": 2271.28, "max": 2382.62, "mean": 146.04 }
+winner rank { "n": 100, "min": 0, "p50": 63, "p90": 570, "max": 570, "mean": 202.6 }
+prefilter rejected=27669 route ok=100 fail=5605 (perimeter 475 / interior 5130) route_ms mean=2.938 max=8.909
+failed repeats same(rev,origin,idx)=0 same(rev,idx) any origin=1121; verdict disagreements across origins=0; distinct revs=7 origins=12
+frame_ms { "n": 360, "min": 0.89, "p50": 3.05, "p90": 26.81, "p99": 2167.47, "max": 2387.3, "mean": 53.46 }
+prefilter-rejected is_targetable ms/lane { "n": 123, "min": 0.0, "p50": 0.65, "p90": 5.42, "p99": 6.46, "max": 7.49, "mean": 1.99 } | us per rejected call { "n": 69, "min": 3.01, "p50": 9.01, "p90": 10.68, "p99": 13.13, "max": 13.13, "mean": 8.91 } | selector loop + proxy overhead ms/lane { "n": 123, "min": 0.31, "p50": 5.29, "p90": 16.65, "p99": 20.28, "max": 23.85, "mean": 7.8 }
+  worst lane: {"batch":"T004","candidates":590,"color":4,"compute_route":590,"failed_rows_hist":{"0":10,"1":10,"2":10,"3":10,"4":10,"5":10,"6":10,"7":10,"8":10,"9":10,"10":10,"11":10,"12":10,"13":10,"14":10,"15":10,"16":10,"17":10,"18":10,"19":10,"20":10,"21":10,"22":10,"23":10,"24":10,"25":10,"26":10,"27":10,"28":10,"29":10,"30":10,"31":10,"32":10,"33":10,"34":10,"35":10,"36":10,"37":10,"38":10,"39":10,"40":10,"41":10,"42":10,"43":10,"44":10,"45":10,"46":10,"47":10,"48":10,"49":10,"50":10,"51":10,"52":10,"53":10,"54":10,"55":10,"56":10,"57":10,"58":10},"first_failed_xy":[[40,58],[41,58],[42,58],[43,58],[44,58],[45,58]],"frame":352,"is_targetable":590,"origin":[51.0,0.0],"prefilter_rejected":0,"rev":5,"route_fail":590,"route_ms_max":6.96,"route_ms_total":2363.18,"route_ok":0,"selection_ms":2382.62,"skipped_before_first_probe_or_unasked":0,"slot":1,"winner":-1,"winner_rank":-1,"winner_xy":[]}
+  worst lane: {"batch":"T004","candidates":590,"color":4,"compute_route":590,"failed_rows_hist":{"0":10,"1":10,"2":10,"3":10,"4":10,"5":10,"6":10,"7":10,"8":10,"9":10,"10":10,"11":10,"12":10,"13":10,"14":10,"15":10,"16":10,"17":10,"18":10,"19":10,"20":10,"21":10,"22":10,"23":10,"24":10,"25":10,"26":10,"27":10,"28":10,"29":10,"30":10,"31":10,"32":10,"33":10,"34":10,"35":10,"36":10,"37":10,"38":10,"39":10,"40":10,"41":10,"42":10,"43":10,"44":10,"45":10,"46":10,"47":10,"48":10,"49":10,"50":10,"51":10,"52":10,"53":10,"54":10,"55":10,"56":10,"57":10,"58":10},"first_failed_xy":[[40,58],[41,58],[42,58],[43,58],[44,58],[45,58]],"frame":302,"is_targetable":590,"origin":[51.0,0.0],"prefilter_rejected":0,"rev":0,"route_fail":590,"route_ms_max":6.58,"route_ms_total":2252.2,"route_ok":0,"selection_ms":2271.28,"skipped_before_first_probe_or_unasked":0,"slot":1,"winner":-1,"winner_rank":-1,"winner_xy":[]}
+  worst lane: {"batch":"T005","candidates":531,"color":5,"compute_route":531,"failed_rows_hist":{"0":9,"1":9,"2":9,"3":9,"4":9,"5":9,"6":9,"7":9,"8":9,"9":9,"10":9,"11":9,"12":9,"13":9,"14":9,"15":9,"16":9,"17":9,"18":9,"19":9,"20":9,"21":9,"22":9,"23":9,"24":9,"25":9,"26":9,"27":9,"28":9,"29":9,"30":9,"31":9,"32":9,"33":9,"34":9,"35":9,"36":9,"37":9,"38":9,"39":9,"40":9,"41":9,"42":9,"43":9,"44":9,"45":9,"46":9,"47":9,"48":9,"49":9,"50":9,"51":9,"52":9,"53":9,"54":9,"55":9,"56":9,"57":9,"58":9},"first_failed_xy":[[50,58],[51,58],[52,58],[53,58],[54,58],[55,58]],"frame":353,"is_targetable":531,"origin":[42.0,0.0],"prefilter_rejected":0,"rev":6,"route_fail":531,"route_ms_max":6.67,"route_ms_total":2151.02,"route_ok":0,"selection_ms":2167.16,"skipped_before_first_probe_or_unasked":0,"slot":0,"winner":-1,"winner_rank":-1,"winner_xy":[]}
+  worst lane: {"batch":"T005","candidates":531,"color":5,"compute_route":531,"failed_rows_hist":{"0":9,"1":9,"2":9,"3":9,"4":9,"5":9,"6":9,"7":9,"8":9,"9":9,"10":9,"11":9,"12":9,"13":9,"14":9,"15":9,"16":9,"17":9,"18":9,"19":9,"20":9,"21":9,"22":9,"23":9,"24":9,"25":9,"26":9,"27":9,"28":9,"29":9,"30":9,"31":9,"32":9,"33":9,"34":9,"35":9,"36":9,"37":9,"38":9,"39":9,"40":9,"41":9,"42":9,"43":9,"44":9,"45":9,"46":9,"47":9,"48":9,"49":9,"50":9,"51":9,"52":9,"53":9,"54":9,"55":9,"56":9,"57":9,"58":9},"first_failed_xy":[[50,58],[51,58],[52,58],[53,58],[54,58],[55,58]],"frame":303,"is_targetable":531,"origin":[42.0,0.0],"prefilter_rejected":0,"rev":0,"route_fail":531,"route_ms_max":5.89,"route_ms_total":2146.86,"route_ok":0,"selection_ms":2163.25,"skipped_before_first_probe_or_unasked":0,"slot":0,"winner":-1,"winner_rank":-1,"winner_xy":[]}
+  worst lane: {"batch":"T005","candidates":531,"color":5,"compute_route":531,"failed_rows_hist":{"0":9,"1":9,"2":9,"3":9,"4":9,"5":9,"6":9,"7":9,"8":9,"9":9,"10":9,"11":9,"12":9,"13":9,"14":9,"15":9,"16":9,"17":9,"18":9,"19":9,"20":9,"21":9,"22":9,"23":9,"24":9,"25":9,"26":9,"27":9,"28":9,"29":9,"30":9,"31":9,"32":9,"33":9,"34":9,"35":9,"36":9,"37":9,"38":9,"39":9,"40":9,"41":9,"42":9,"43":9,"44":9,"45":9,"46":9,"47":9,"48":9,"49":9,"50":9,"51":9,"52":9,"53":9,"54":9,"55":9,"56":9,"57":9,"58":9},"first_failed_xy":[[50,58],[51,58],[52,58],[53,58],[54,58],[55,58]],"frame":343,"is_targetable":531,"origin":[42.0,0.0],"prefilter_rejected":0,"rev":4,"route_fail":531,"route_ms_max":8.91,"route_ms_total":1752.59,"route_ok":0,"selection_ms":1768.57,"skipped_before_first_probe_or_unasked":0,"slot":0,"winner":-1,"winner_rank":-1,"winner_xy":[]}
+slot origins [[40.0, 0.0], [49.0, 0.0], [58.0, 0.0], [67.0, 0.0], [76.0, 0.0], [85.0, 0.0]] (board 59x59; inside-board start iff 0<=x<59 and 0<=y<59) dispatches=100 clears=8
+
+## LAID-OUT 59x59 6 slots 2x 60fps
+lanes=222 inside-board-origin lanes=0 no_target=3 candidates/lane { "n": 222, "min": 495, "p50": 568, "p90": 586, "max": 590, "mean": 562.2 }
+is_targetable/lane { "n": 222, "min": 1, "p50": 1, "p90": 557, "max": 571, "mean": 77.1 }
+compute_route/lane { "n": 222, "min": 0, "p50": 1, "p90": 1, "max": 1, "mean": 1.0 }
+selection_ms/lane { "n": 222, "min": 2.36, "p50": 4.81, "p90": 20.8, "p99": 26.15, "max": 26.2, "mean": 7.03 }
+winner rank { "n": 219, "min": 0, "p50": 0, "p90": 544, "max": 570, "mean": 69.5 }
+prefilter rejected=16890 route ok=219 fail=0 (perimeter 0 / interior 0) route_ms mean=3.188 max=5.126
+failed repeats same(rev,origin,idx)=0 same(rev,idx) any origin=0; verdict disagreements across origins=0; distinct revs=68 origins=6
+frame_ms { "n": 360, "min": 2.3, "p50": 7.16, "p90": 14.06, "p99": 30.59, "max": 32.3, "mean": 8.28 }
+prefilter-rejected is_targetable ms/lane { "n": 222, "min": 0.0, "p50": 0.0, "p90": 4.94, "p99": 5.19, "max": 5.43, "mean": 0.69 } | us per rejected call { "n": 63, "min": 8.32, "p50": 9.09, "p90": 9.57, "p99": 10.09, "max": 10.09, "mean": 9.1 } | selector loop + proxy overhead ms/lane { "n": 222, "min": 0.63, "p50": 1.0, "p90": 15.03, "p99": 16.51, "max": 16.84, "mean": 3.19 }
+  worst lane: {"batch":"T004","candidates":565,"color":4,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":253,"is_targetable":562,"origin":[15.6,72.78],"prefilter_rejected":561,"rev":65,"route_fail":0,"route_ms_max":4.17,"route_ms_total":4.17,"route_ok":1,"selection_ms":26.2,"skipped_before_first_probe_or_unasked":3,"slot":1,"winner":46,"winner_rank":561,"winner_xy":[46,0]}
+  worst lane: {"batch":"T001","candidates":562,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":280,"is_targetable":561,"origin":[43.45,72.78],"prefilter_rejected":560,"rev":77,"route_fail":0,"route_ms_max":4.45,"route_ms_total":4.45,"route_ok":1,"selection_ms":26.16,"skipped_before_first_probe_or_unasked":1,"slot":4,"winner":18,"winner_rank":560,"winner_xy":[18,0]}
+  worst lane: {"batch":"T010","candidates":558,"color":4,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":315,"is_targetable":558,"origin":[15.6,72.78],"prefilter_rejected":557,"rev":89,"route_fail":0,"route_ms_max":4.51,"route_ms_total":4.51,"route_ok":1,"selection_ms":26.15,"skipped_before_first_probe_or_unasked":0,"slot":1,"winner":49,"winner_rank":557,"winner_xy":[49,0]}
+  worst lane: {"batch":"T009","candidates":554,"color":3,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":354,"is_targetable":545,"origin":[24.91,72.78],"prefilter_rejected":544,"rev":107,"route_fail":0,"route_ms_max":4.4,"route_ms_total":4.4,"route_ok":1,"selection_ms":25.11,"skipped_before_first_probe_or_unasked":9,"slot":2,"winner":30,"winner_rank":544,"winner_xy":[30,0]}
+  worst lane: {"batch":"T001","candidates":561,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":290,"is_targetable":561,"origin":[43.45,72.78],"prefilter_rejected":560,"rev":79,"route_fail":0,"route_ms_max":4.52,"route_ms_total":4.52,"route_ok":1,"selection_ms":25.05,"skipped_before_first_probe_or_unasked":0,"slot":4,"winner":19,"winner_rank":560,"winner_xy":[19,0]}
+slot origins [[6.28, 72.78], [15.6, 72.78], [24.91, 72.78], [34.13, 72.78], [43.45, 72.78], [52.76, 72.78]] (board 59x59; inside-board start iff 0<=x<59 and 0<=y<59) dispatches=219 clears=111
+
+## LAID-OUT 59x59 6 slots 1x 60fps
+lanes=109 inside-board-origin lanes=0 no_target=0 candidates/lane { "n": 109, "min": 514, "p50": 580, "p90": 588, "max": 590, "mean": 571.7 }
+is_targetable/lane { "n": 109, "min": 1, "p50": 1, "p90": 568, "max": 571, "mean": 64.8 }
+compute_route/lane { "n": 109, "min": 1, "p50": 1, "p90": 1, "max": 1, "mean": 1.0 }
+selection_ms/lane { "n": 109, "min": 2.36, "p50": 3.46, "p90": 22.15, "p99": 24.05, "max": 24.85, "mean": 5.81 }
+winner rank { "n": 109, "min": 0, "p50": 0, "p90": 567, "max": 570, "mean": 63.8 }
+prefilter rejected=6951 route ok=109 fail=0 (perimeter 0 / interior 0) route_ms mean=2.527 max=4.251
+failed repeats same(rev,origin,idx)=0 same(rev,idx) any origin=0; verdict disagreements across origins=0; distinct revs=18 origins=6
+frame_ms { "n": 360, "min": 2.0, "p50": 2.94, "p90": 9.04, "p99": 28.37, "max": 30.39, "mean": 5.19 }
+prefilter-rejected is_targetable ms/lane { "n": 109, "min": 0.0, "p50": 0.0, "p90": 4.79, "p99": 5.18, "max": 5.33, "mean": 0.56 } | us per rejected call { "n": 28, "min": 6.72, "p50": 9.01, "p90": 10.0, "p99": 10.19, "max": 10.19, "mean": 8.92 } | selector loop + proxy overhead ms/lane { "n": 109, "min": 0.66, "p50": 1.03, "p90": 14.56, "p99": 16.05, "max": 16.22, "mean": 2.72 }
+  worst lane: {"batch":"T001","candidates":575,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":300,"is_targetable":571,"origin":[43.45,72.78],"prefilter_rejected":570,"rev":18,"route_fail":0,"route_ms_max":3.3,"route_ms_total":3.3,"route_ok":1,"selection_ms":24.85,"skipped_before_first_probe_or_unasked":4,"slot":4,"winner":15,"winner_rank":570,"winner_xy":[15,0]}
+  worst lane: {"batch":"T004","candidates":578,"color":4,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":243,"is_targetable":571,"origin":[15.6,72.78],"prefilter_rejected":570,"rev":10,"route_fail":0,"route_ms_max":2.81,"route_ms_total":2.81,"route_ok":1,"selection_ms":24.05,"skipped_before_first_probe_or_unasked":7,"slot":1,"winner":42,"winner_rank":570,"winner_xy":[42,0]}
+  worst lane: {"batch":"T001","candidates":580,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":200,"is_targetable":571,"origin":[43.45,72.78],"prefilter_rejected":570,"rev":4,"route_fail":0,"route_ms_max":2.75,"route_ms_total":2.75,"route_ok":1,"selection_ms":23.82,"skipped_before_first_probe_or_unasked":9,"slot":4,"winner":10,"winner_rank":570,"winner_xy":[10,0]}
+  worst lane: {"batch":"T001","candidates":577,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":260,"is_targetable":571,"origin":[43.45,72.78],"prefilter_rejected":570,"rev":11,"route_fail":0,"route_ms_max":3.0,"route_ms_total":3.0,"route_ok":1,"selection_ms":23.61,"skipped_before_first_probe_or_unasked":6,"slot":4,"winner":13,"winner_rank":570,"winner_xy":[13,0]}
+  worst lane: {"batch":"T001","candidates":576,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":280,"is_targetable":571,"origin":[43.45,72.78],"prefilter_rejected":570,"rev":14,"route_fail":0,"route_ms_max":3.01,"route_ms_total":3.01,"route_ok":1,"selection_ms":23.51,"skipped_before_first_probe_or_unasked":5,"slot":4,"winner":14,"winner_rank":570,"winner_xy":[14,0]}
+slot origins [[6.28, 72.78], [15.6, 72.78], [24.91, 72.78], [34.13, 72.78], [43.45, 72.78], [52.76, 72.78]] (board 59x59; inside-board start iff 0<=x<59 and 0<=y<59) dispatches=109 clears=28
+
+## LAID-OUT 59x59 6 slots 2x 60fps HISTORICAL-TEMPO
+lanes=144 inside-board-origin lanes=0 no_target=0 candidates/lane { "n": 144, "min": 508, "p50": 576, "p90": 588, "max": 590, "mean": 568.7 }
+is_targetable/lane { "n": 144, "min": 1, "p50": 1, "p90": 95, "max": 571, "mean": 57.6 }
+compute_route/lane { "n": 144, "min": 1, "p50": 1, "p90": 1, "max": 1, "mean": 1.0 }
+selection_ms/lane { "n": 144, "min": 2.05, "p50": 3.63, "p90": 8.44, "p99": 23.35, "max": 24.34, "mean": 5.25 }
+winner rank { "n": 144, "min": 0, "p50": 0, "p90": 94, "max": 570, "mean": 56.6 }
+prefilter rejected=8155 route ok=144 fail=0 (perimeter 0 / interior 0) route_ms mean=2.447 max=4.255
+failed repeats same(rev,origin,idx)=0 same(rev,idx) any origin=0; verdict disagreements across origins=0; distinct revs=31 origins=6
+frame_ms { "n": 360, "min": 1.67, "p50": 3.09, "p90": 9.97, "p99": 27.67, "max": 28.98, "mean": 5.37 }
+prefilter-rejected is_targetable ms/lane { "n": 144, "min": 0.0, "p50": 0.0, "p90": 0.87, "p99": 5.14, "max": 5.31, "mean": 0.46 } | us per rejected call { "n": 36, "min": 5.89, "p50": 8.79, "p90": 9.46, "p99": 10.96, "max": 10.96, "mean": 8.4 } | selector loop + proxy overhead ms/lane { "n": 144, "min": 0.56, "p50": 0.98, "p90": 4.24, "p99": 15.31, "max": 15.71, "mean": 2.34 }
+  worst lane: {"batch":"T004","candidates":573,"color":4,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":259,"is_targetable":568,"origin":[15.6,72.78],"prefilter_rejected":567,"rev":25,"route_fail":0,"route_ms_max":3.32,"route_ms_total":3.32,"route_ok":1,"selection_ms":24.34,"skipped_before_first_probe_or_unasked":5,"slot":1,"winner":44,"winner_rank":567,"winner_xy":[44,0]}
+  worst lane: {"batch":"T004","candidates":578,"color":4,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":184,"is_targetable":571,"origin":[15.6,72.78],"prefilter_rejected":570,"rev":10,"route_fail":0,"route_ms_max":2.91,"route_ms_total":2.91,"route_ok":1,"selection_ms":23.35,"skipped_before_first_probe_or_unasked":7,"slot":1,"winner":42,"winner_rank":570,"winner_xy":[42,0]}
+  worst lane: {"batch":"T001","candidates":577,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":196,"is_targetable":571,"origin":[43.45,72.78],"prefilter_rejected":570,"rev":11,"route_fail":0,"route_ms_max":3.13,"route_ms_total":3.13,"route_ok":1,"selection_ms":23.34,"skipped_before_first_probe_or_unasked":6,"slot":4,"winner":13,"winner_rank":570,"winner_xy":[13,0]}
+  worst lane: {"batch":"T004","candidates":569,"color":4,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":319,"is_targetable":565,"origin":[15.6,72.78],"prefilter_rejected":564,"rev":44,"route_fail":0,"route_ms_max":3.68,"route_ms_total":3.68,"route_ok":1,"selection_ms":23.02,"skipped_before_first_probe_or_unasked":4,"slot":1,"winner":45,"winner_rank":564,"winner_xy":[45,0]}
+  worst lane: {"batch":"T004","candidates":579,"color":4,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":169,"is_targetable":571,"origin":[15.6,72.78],"prefilter_rejected":570,"rev":7,"route_fail":0,"route_ms_max":3.0,"route_ms_total":3.0,"route_ok":1,"selection_ms":22.81,"skipped_before_first_probe_or_unasked":8,"slot":1,"winner":41,"winner_rank":570,"winner_xy":[41,0]}
+slot origins [[6.28, 72.78], [15.6, 72.78], [24.91, 72.78], [34.13, 72.78], [43.45, 72.78], [52.76, 72.78]] (board 59x59; inside-board start iff 0<=x<59 and 0<=y<59) dispatches=144 clears=58
+
+## LAID-OUT 59x59 6 slots 2x 30fps
+lanes=180 inside-board-origin lanes=0 no_target=0 candidates/lane { "n": 180, "min": 502, "p50": 573, "p90": 587, "max": 590, "mean": 565.7 }
+is_targetable/lane { "n": 180, "min": 1, "p50": 1, "p90": 81, "max": 571, "mean": 48.3 }
+compute_route/lane { "n": 180, "min": 1, "p50": 1, "p90": 1, "max": 1, "mean": 1.0 }
+selection_ms/lane { "n": 180, "min": 2.14, "p50": 4.52, "p90": 8.08, "p99": 26.08, "max": 30.19, "mean": 5.99 }
+winner rank { "n": 180, "min": 0, "p50": 0, "p90": 80, "max": 570, "mean": 47.3 }
+prefilter rejected=8522 route ok=180 fail=0 (perimeter 0 / interior 0) route_ms mean=3.034 max=5.079
+failed repeats same(rev,origin,idx)=0 same(rev,idx) any origin=0; verdict disagreements across origins=0; distinct revs=71 origins=6
+frame_ms { "n": 180, "min": 5.19, "p50": 9.33, "p90": 13.48, "p99": 31.8, "max": 36.87, "mean": 10.64 }
+prefilter-rejected is_targetable ms/lane { "n": 180, "min": 0.0, "p50": 0.0, "p90": 0.72, "p99": 5.23, "max": 6.58, "mean": 0.43 } | us per rejected call { "n": 36, "min": 6.94, "p50": 9.12, "p90": 9.88, "p99": 11.55, "max": 11.55, "mean": 9.23 } | selector loop + proxy overhead ms/lane { "n": 180, "min": 0.59, "p50": 1.0, "p90": 3.91, "p99": 16.57, "max": 19.4, "mean": 2.53 }
+  worst lane: {"batch":"T001","candidates":578,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":73,"is_targetable":571,"origin":[43.45,72.78],"prefilter_rejected":570,"rev":12,"route_fail":0,"route_ms_max":4.21,"route_ms_total":4.21,"route_ok":1,"selection_ms":30.19,"skipped_before_first_probe_or_unasked":7,"slot":4,"winner":12,"winner_rank":570,"winner_xy":[12,0]}
+  worst lane: {"batch":"T001","candidates":565,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":151,"is_targetable":561,"origin":[43.45,72.78],"prefilter_rejected":560,"rev":76,"route_fail":0,"route_ms_max":4.49,"route_ms_total":4.49,"route_ok":1,"selection_ms":26.08,"skipped_before_first_probe_or_unasked":4,"slot":4,"winner":15,"winner_rank":560,"winner_xy":[15,0]}
+  worst lane: {"batch":"T001","candidates":564,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":157,"is_targetable":561,"origin":[43.45,72.78],"prefilter_rejected":560,"rev":78,"route_fail":0,"route_ms_max":4.48,"route_ms_total":4.48,"route_ok":1,"selection_ms":26.03,"skipped_before_first_probe_or_unasked":3,"slot":4,"winner":16,"winner_rank":560,"winner_xy":[16,0]}
+  worst lane: {"batch":"T001","candidates":566,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":145,"is_targetable":561,"origin":[43.45,72.78],"prefilter_rejected":560,"rev":71,"route_fail":0,"route_ms_max":4.35,"route_ms_total":4.35,"route_ok":1,"selection_ms":25.56,"skipped_before_first_probe_or_unasked":5,"slot":4,"winner":14,"winner_rank":560,"winner_xy":[14,0]}
+  worst lane: {"batch":"T004","candidates":562,"color":4,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":172,"is_targetable":557,"origin":[15.6,72.78],"prefilter_rejected":556,"rev":88,"route_fail":0,"route_ms_max":4.35,"route_ms_total":4.35,"route_ok":1,"selection_ms":25.45,"skipped_before_first_probe_or_unasked":5,"slot":1,"winner":44,"winner_rank":556,"winner_xy":[44,0]}
+slot origins [[6.28, 72.78], [15.6, 72.78], [24.91, 72.78], [34.13, 72.78], [43.45, 72.78], [52.76, 72.78]] (board 59x59; inside-board start iff 0<=x<59 and 0<=y<59) dispatches=180 clears=93
+
+## LAID-OUT 59x59 5 slots 2x 60fps
+lanes=186 inside-board-origin lanes=0 no_target=0 candidates/lane { "n": 186, "min": 524, "p50": 572, "p90": 587, "max": 590, "mean": 570.7 }
+is_targetable/lane { "n": 186, "min": 1, "p50": 1, "p90": 561, "max": 571, "mean": 77.2 }
+compute_route/lane { "n": 186, "min": 1, "p50": 1, "p90": 1, "max": 1, "mean": 1.0 }
+selection_ms/lane { "n": 186, "min": 2.19, "p50": 4.62, "p90": 23.24, "p99": 25.18, "max": 25.7, "mean": 6.98 }
+winner rank { "n": 186, "min": 0, "p50": 0, "p90": 560, "max": 570, "mean": 76.2 }
+prefilter rejected=14172 route ok=186 fail=0 (perimeter 0 / interior 0) route_ms mean=3.093 max=4.828
+failed repeats same(rev,origin,idx)=0 same(rev,idx) any origin=0; verdict disagreements across origins=0; distinct revs=71 origins=5
+frame_ms { "n": 360, "min": 1.51, "p50": 6.41, "p90": 11.75, "p99": 29.56, "max": 30.76, "mean": 7.04 }
+prefilter-rejected is_targetable ms/lane { "n": 186, "min": 0.0, "p50": 0.0, "p90": 4.82, "p99": 5.31, "max": 5.32, "mean": 0.68 } | us per rejected call { "n": 43, "min": 7.95, "p50": 9.1, "p90": 9.89, "p99": 12.0, "max": 12.0, "mean": 9.21 } | selector loop + proxy overhead ms/lane { "n": 186, "min": 0.64, "p50": 0.99, "p90": 15.09, "p99": 16.6, "max": 16.62, "mean": 3.21 }
+  worst lane: {"batch":"T004","candidates":561,"color":4,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":293,"is_targetable":561,"origin":[11.42,72.75],"prefilter_rejected":560,"rev":71,"route_fail":0,"route_ms_max":4.16,"route_ms_total":4.16,"route_ok":1,"selection_ms":25.7,"skipped_before_first_probe_or_unasked":0,"slot":0,"winner":49,"winner_rank":560,"winner_xy":[49,0]}
+  worst lane: {"batch":"T009","candidates":557,"color":3,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":323,"is_targetable":550,"origin":[11.42,72.75],"prefilter_rejected":549,"rev":84,"route_fail":0,"route_ms_max":4.12,"route_ms_total":4.12,"route_ok":1,"selection_ms":25.18,"skipped_before_first_probe_or_unasked":7,"slot":0,"winner":32,"winner_rank":549,"winner_xy":[32,0]}
+  worst lane: {"batch":"T001","candidates":576,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":140,"is_targetable":571,"origin":[38.92,72.75],"prefilter_rejected":570,"rev":15,"route_fail":0,"route_ms_max":3.07,"route_ms_total":3.07,"route_ok":1,"selection_ms":25.01,"skipped_before_first_probe_or_unasked":5,"slot":3,"winner":14,"winner_rank":570,"winner_xy":[14,0]}
+  worst lane: {"batch":"T004","candidates":579,"color":4,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":113,"is_targetable":571,"origin":[11.42,72.75],"prefilter_rejected":570,"rev":9,"route_fail":0,"route_ms_max":2.87,"route_ms_total":2.87,"route_ok":1,"selection_ms":24.78,"skipped_before_first_probe_or_unasked":8,"slot":0,"winner":41,"winner_rank":570,"winner_xy":[41,0]}
+  worst lane: {"batch":"T004","candidates":569,"color":4,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":213,"is_targetable":566,"origin":[11.42,72.75],"prefilter_rejected":565,"rev":45,"route_fail":0,"route_ms_max":3.66,"route_ms_total":3.66,"route_ok":1,"selection_ms":24.78,"skipped_before_first_probe_or_unasked":3,"slot":0,"winner":46,"winner_rank":565,"winner_xy":[46,0]}
+slot origins [[11.42, 72.75], [20.6, 72.75], [29.78, 72.75], [38.92, 72.75], [48.1, 72.75]] (board 59x59; inside-board start iff 0<=x<59 and 0<=y<59) dispatches=186 clears=105
+
+## LAID-OUT 32x32 6 slots 2x 60fps CONTROL
+lanes=220 inside-board-origin lanes=0 no_target=30 candidates/lane { "n": 220, "min": 126, "p50": 150, "p90": 182, "max": 192, "mean": 153.6 }
+is_targetable/lane { "n": 220, "min": 1, "p50": 1, "p90": 142, "max": 165, "mean": 38.9 }
+compute_route/lane { "n": 220, "min": 0, "p50": 1, "p90": 1, "max": 1, "mean": 0.9 }
+selection_ms/lane { "n": 220, "min": 1.18, "p50": 3.76, "p90": 7.12, "p99": 9.5, "max": 9.66, "mean": 4.0 }
+winner rank { "n": 190, "min": 0, "p50": 0, "p90": 130, "max": 164, "mean": 22.3 }
+prefilter rejected=8370 route ok=190 fail=0 (perimeter 0 / interior 0) route_ms mean=2.453 max=4.950
+failed repeats same(rev,origin,idx)=0 same(rev,idx) any origin=0; verdict disagreements across origins=0; distinct revs=86 origins=6
+frame_ms { "n": 360, "min": 1.75, "p50": 5.43, "p90": 9.44, "p99": 13.37, "max": 13.7, "mean": 5.77 }
+prefilter-rejected is_targetable ms/lane { "n": 220, "min": 0.0, "p50": 0.0, "p90": 1.29, "p99": 1.42, "max": 1.52, "mean": 0.35 } | us per rejected call { "n": 96, "min": 7.52, "p50": 9.23, "p90": 10.0, "p99": 14.25, "max": 14.25, "mean": 9.39 } | selector loop + proxy overhead ms/lane { "n": 220, "min": 0.24, "p50": 0.89, "p90": 4.21, "p99": 4.56, "max": 4.66, "mean": 1.54 }
+  worst lane: {"batch":"","candidates":135,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":329,"is_targetable":131,"origin":[24.06,41.02],"prefilter_rejected":130,"rev":113,"route_fail":0,"route_ms_max":3.94,"route_ms_total":3.94,"route_ok":1,"selection_ms":9.66,"skipped_before_first_probe_or_unasked":4,"slot":-1,"winner":38,"winner_rank":130,"winner_xy":[6,1]}
+  worst lane: {"batch":"","candidates":131,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":359,"is_targetable":130,"origin":[24.06,41.02],"prefilter_rejected":129,"rev":129,"route_fail":0,"route_ms_max":4.08,"route_ms_total":4.08,"route_ok":1,"selection_ms":9.65,"skipped_before_first_probe_or_unasked":1,"slot":-1,"winner":41,"winner_rank":129,"winner_xy":[9,1]}
+  worst lane: {"batch":"","candidates":132,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":349,"is_targetable":130,"origin":[24.06,41.02],"prefilter_rejected":129,"rev":124,"route_fail":0,"route_ms_max":3.96,"route_ms_total":3.96,"route_ok":1,"selection_ms":9.5,"skipped_before_first_probe_or_unasked":2,"slot":-1,"winner":40,"winner_rank":129,"winner_xy":[8,1]}
+  worst lane: {"batch":"","candidates":133,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":339,"is_targetable":130,"origin":[24.06,41.02],"prefilter_rejected":129,"rev":118,"route_fail":0,"route_ms_max":3.88,"route_ms_total":3.88,"route_ok":1,"selection_ms":9.46,"skipped_before_first_probe_or_unasked":3,"slot":-1,"winner":39,"winner_rank":129,"winner_xy":[7,1]}
+  worst lane: {"batch":"T003","candidates":170,"color":3,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":222,"is_targetable":165,"origin":[13.35,41.02],"prefilter_rejected":164,"rev":63,"route_fail":0,"route_ms_max":2.74,"route_ms_total":2.74,"route_ok":1,"selection_ms":8.9,"skipped_before_first_probe_or_unasked":5,"slot":2,"winner":16,"winner_rank":164,"winner_xy":[16,0]}
+slot origins [[2.58, 41.02], [7.96, 41.02], [13.35, 41.02], [18.68, 41.02], [24.06, 41.02], [29.45, 41.02]] (board 32x32; inside-board start iff 0<=x<32 and 0<=y<32) dispatches=190 clears=129
+
+## UNLAID 32x32 6 slots 2x 60fps CONTROL
+lanes=199 inside-board-origin lanes=0 no_target=69 candidates/lane { "n": 199, "min": 131, "p50": 153, "p90": 183, "max": 192, "mean": 158.9 }
+is_targetable/lane { "n": 199, "min": 1, "p50": 96, "p90": 174, "max": 181, "mean": 83.4 }
+compute_route/lane { "n": 199, "min": 0, "p50": 1, "p90": 1, "max": 1, "mean": 0.7 }
+selection_ms/lane { "n": 199, "min": 1.6, "p50": 5.24, "p90": 7.5, "p99": 9.18, "max": 9.18, "mean": 4.59 }
+winner rank { "n": 130, "min": 0, "p50": 9, "p90": 150, "max": 180, "mean": 45.0 }
+prefilter rejected=16469 route ok=130 fail=0 (perimeter 0 / interior 0) route_ms mean=1.918 max=3.089
+failed repeats same(rev,origin,idx)=0 same(rev,idx) any origin=0; verdict disagreements across origins=0; distinct revs=39 origins=11
+frame_ms { "n": 360, "min": 1.91, "p50": 5.58, "p90": 10.23, "p99": 12.62, "max": 13.59, "mean": 5.76 }
+prefilter-rejected is_targetable ms/lane { "n": 199, "min": 0.0, "p50": 0.85, "p90": 1.54, "p99": 1.75, "max": 1.82, "mean": 0.75 } | us per rejected call { "n": 139, "min": 7.53, "p50": 9.11, "p90": 9.63, "p99": 11.75, "max": 12.0, "mean": 9.2 } | selector loop + proxy overhead ms/lane { "n": 199, "min": 0.25, "p50": 2.98, "p90": 4.7, "p99": 5.48, "max": 5.5, "mean": 2.58 }
+  worst lane: {"batch":"T003","candidates":186,"color":3,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":62,"is_targetable":181,"origin":[61.0,0.0],"prefilter_rejected":180,"rev":0,"route_fail":0,"route_ms_max":1.88,"route_ms_total":1.88,"route_ok":1,"selection_ms":9.18,"skipped_before_first_probe_or_unasked":5,"slot":2,"winner":16,"winner_rank":180,"winner_xy":[16,0]}
+  worst lane: {"batch":"T003","candidates":185,"color":3,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":72,"is_targetable":181,"origin":[61.0,0.0],"prefilter_rejected":180,"rev":0,"route_fail":0,"route_ms_max":1.93,"route_ms_total":1.93,"route_ok":1,"selection_ms":9.18,"skipped_before_first_probe_or_unasked":4,"slot":2,"winner":17,"winner_rank":180,"winner_xy":[17,0]}
+  worst lane: {"batch":"T003","candidates":184,"color":3,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":82,"is_targetable":181,"origin":[61.0,0.0],"prefilter_rejected":180,"rev":0,"route_fail":0,"route_ms_max":1.77,"route_ms_total":1.77,"route_ok":1,"selection_ms":8.62,"skipped_before_first_probe_or_unasked":3,"slot":2,"winner":18,"winner_rank":180,"winner_xy":[18,0]}
+  worst lane: {"batch":"T006","candidates":158,"color":0,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":333,"is_targetable":141,"origin":[88.0,0.0],"prefilter_rejected":140,"rev":40,"route_fail":0,"route_ms_max":2.96,"route_ms_total":2.96,"route_ok":1,"selection_ms":8.6,"skipped_before_first_probe_or_unasked":17,"slot":5,"winner":64,"winner_rank":140,"winner_xy":[0,2]}
+  worst lane: {"batch":"T003","candidates":183,"color":3,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":92,"is_targetable":181,"origin":[61.0,0.0],"prefilter_rejected":180,"rev":0,"route_fail":0,"route_ms_max":1.7,"route_ms_total":1.7,"route_ok":1,"selection_ms":8.56,"skipped_before_first_probe_or_unasked":2,"slot":2,"winner":19,"winner_rank":180,"winner_xy":[19,0]}
+slot origins [[40.0, 0.0], [49.0, 0.0], [58.0, 0.0], [67.0, 0.0], [76.0, 0.0], [85.0, 0.0]] (board 32x32; inside-board start iff 0<=x<32 and 0<=y<32) dispatches=130 clears=46
+
+## LAID-OUT 59x59 6 slots 2x 60fps FULL LEVEL
+lanes=5177 inside-board-origin lanes=0 no_target=1696 candidates/lane { "n": 5177, "min": 1, "p50": 227, "p90": 504, "max": 590, "mean": 249.0 }
+is_targetable/lane { "n": 5177, "min": 1, "p50": 28, "p90": 295, "max": 571, "mean": 95.3 }
+compute_route/lane { "n": 5177, "min": 0, "p50": 1, "p90": 1, "max": 1, "mean": 0.7 }
+selection_ms/lane { "n": 5177, "min": 0.12, "p50": 20.5, "p90": 59.95, "p99": 84.99, "max": 117.79, "mean": 27.42 }
+winner rank { "n": 3481, "min": 0, "p50": 6, "p90": 221, "max": 570, "mean": 61.4 }
+prefilter rejected=489703 route ok=3481 fail=0 (perimeter 0 / interior 0) route_ms mean=30.654 max=96.524
+failed repeats same(rev,origin,idx)=0 same(rev,idx) any origin=0; verdict disagreements across origins=0; distinct revs=2108 origins=6
+frame_ms { "n": 9588, "min": 2.26, "p50": 9.88, "p90": 56.14, "p99": 89.19, "max": 128.5, "mean": 21.36 }
+prefilter-rejected is_targetable ms/lane { "n": 5177, "min": 0.0, "p50": 0.26, "p90": 2.7, "p99": 4.87, "max": 6.4, "mean": 0.87 } | us per rejected call { "n": 4118, "min": 5.92, "p50": 9.41, "p90": 12.0, "p99": 19.28, "max": 60.0, "mean": 9.94 } | selector loop + proxy overhead ms/lane { "n": 5177, "min": 0.11, "p50": 4.24, "p90": 14.42, "p99": 16.59, "max": 26.06, "mean": 5.94 }
+  worst lane: {"batch":"","candidates":28,"color":1,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":8111,"is_targetable":25,"origin":[43.45,72.78],"prefilter_rejected":24,"rev":3288,"route_fail":0,"route_ms_max":96.52,"route_ms_total":96.52,"route_ok":1,"selection_ms":117.79,"skipped_before_first_probe_or_unasked":3,"slot":-1,"winner":1019,"winner_rank":24,"winner_xy":[16,17]}
+  worst lane: {"batch":"T115","candidates":6,"color":2,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":8542,"is_targetable":4,"origin":[24.91,72.78],"prefilter_rejected":3,"rev":3385,"route_fail":0,"route_ms_max":84.97,"route_ms_total":84.97,"route_ok":1,"selection_ms":98.3,"skipped_before_first_probe_or_unasked":2,"slot":2,"winner":1026,"winner_rank":3,"winner_xy":[23,17]}
+  worst lane: {"batch":"T115","candidates":28,"color":2,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":8096,"is_targetable":6,"origin":[24.91,72.78],"prefilter_rejected":5,"rev":3283,"route_fail":0,"route_ms_max":96.09,"route_ms_total":96.09,"route_ok":1,"selection_ms":96.48,"skipped_before_first_probe_or_unasked":22,"slot":2,"winner":1086,"winner_rank":5,"winner_xy":[24,18]}
+  worst lane: {"batch":"T116","candidates":21,"color":3,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":8236,"is_targetable":7,"origin":[6.28,72.78],"prefilter_rejected":6,"rev":3328,"route_fail":0,"route_ms_max":82.37,"route_ms_total":82.37,"route_ok":1,"selection_ms":95.98,"skipped_before_first_probe_or_unasked":14,"slot":0,"winner":1037,"winner_rank":6,"winner_xy":[34,17]}
+  worst lane: {"batch":"T105","candidates":52,"color":3,"compute_route":1,"failed_rows_hist":{},"first_failed_xy":[],"frame":7493,"is_targetable":1,"origin":[34.13,72.78],"prefilter_rejected":0,"rev":3128,"route_fail":0,"route_ms_max":83.39,"route_ms_total":83.39,"route_ok":1,"selection_ms":94.86,"skipped_before_first_probe_or_unasked":51,"slot":3,"winner":1337,"winner_rank":0,"winner_xy":[39,22]}
+slot origins [[6.28, 72.78], [15.6, 72.78], [24.91, 72.78], [34.13, 72.78], [43.45, 72.78], [52.76, 72.78]] (board 59x59; inside-board start iff 0<=x<59 and 0<=y<59) dispatches=3481 clears=3481
+
+## LAID-OUT 59x59 6 slots 2x 60fps UNINSTRUMENTED
+lanes=0 inside-board-origin lanes=0 no_target=0 candidates/lane { "n": 0 }
+is_targetable/lane { "n": 0 }
+compute_route/lane { "n": 0 }
+selection_ms/lane { "n": 0 }
+winner rank { "n": 0 }
+prefilter rejected=0 route ok=0 fail=0 (perimeter 0 / interior 0) route_ms mean=0.000 max=0.000
+failed repeats same(rev,origin,idx)=0 same(rev,idx) any origin=0; verdict disagreements across origins=0; distinct revs=0 origins=0
+frame_ms { "n": 360, "min": 1.95, "p50": 6.55, "p90": 12.32, "p99": 24.37, "max": 25.16, "mean": 7.38 }
+prefilter-rejected is_targetable ms/lane { "n": 0 } | us per rejected call { "n": 0 } | selector loop + proxy overhead ms/lane { "n": 0 }
+RuntimePerfProbe (uninstrumented) target_selection {"count":222,"max_ms":19.887,"mean_ms":6.265,"total_ms":1390.728}
+RuntimePerfProbe (uninstrumented) m25_claim {"count":222,"max_ms":19.958,"mean_ms":6.327,"total_ms":1404.625}
+RuntimePerfProbe (uninstrumented) m26_dispatch_lane {"count":222,"max_ms":20.674,"mean_ms":6.846,"total_ms":1519.726}
+RuntimePerfProbe (uninstrumented) access_compute_route {"count":219,"max_ms":7.467,"mean_ms":3.005,"total_ms":658.051}
+RuntimePerfProbe (uninstrumented) access_validate {"count":219,"max_ms":0.36,"mean_ms":0.173,"total_ms":37.988}
+RuntimePerfProbe (uninstrumented) route_sources {"count":219,"max_ms":4.348,"mean_ms":1.836,"total_ms":402.006}
+RuntimePerfProbe (uninstrumented) route_dijkstra {"count":219,"max_ms":1.873,"mean_ms":0.548,"total_ms":120.011}
+RuntimePerfProbe (uninstrumented) route_validate {"count":219,"max_ms":0.413,"mean_ms":0.215,"total_ms":47.118}
+RuntimePerfProbe (uninstrumented) dispatcher_spawn {"count":219,"max_ms":0.61,"mean_ms":0.388,"total_ms":84.996}
+RuntimePerfProbe (uninstrumented) agent_drive_arrival {"count":360,"max_ms":2.432,"mean_ms":0.537,"total_ms":193.224}
+RuntimePerfProbe (uninstrumented) completion_on_tick {"count":360,"max_ms":0.316,"mean_ms":0.194,"total_ms":69.827}
+RuntimePerfProbe (uninstrumented) ui_snapshot_sync {"count":360,"max_ms":3.422,"mean_ms":2.343,"total_ms":843.47}
+slot origins [[6.28, 72.78], [15.6, 72.78], [24.91, 72.78], [34.13, 72.78], [43.45, 72.78], [52.76, 72.78]] (board 59x59; inside-board start iff 0<=x<59 and 0<=y<59) dispatches=219 clears=111
+
+## LAID-OUT 59x59 6 slots 2x 60fps FULL LEVEL UNINSTRUMENTED
+lanes=0 inside-board-origin lanes=0 no_target=0 candidates/lane { "n": 0 }
+is_targetable/lane { "n": 0 }
+compute_route/lane { "n": 0 }
+selection_ms/lane { "n": 0 }
+winner rank { "n": 0 }
+prefilter rejected=0 route ok=0 fail=0 (perimeter 0 / interior 0) route_ms mean=0.000 max=0.000
+failed repeats same(rev,origin,idx)=0 same(rev,idx) any origin=0; verdict disagreements across origins=0; distinct revs=0 origins=0
+frame_ms { "n": 9588, "min": 1.61, "p50": 5.89, "p90": 32.45, "p99": 70.03, "max": 227.79, "mean": 13.41 }
+prefilter-rejected is_targetable ms/lane { "n": 0 } | us per rejected call { "n": 0 } | selector loop + proxy overhead ms/lane { "n": 0 }
+RuntimePerfProbe (uninstrumented) target_selection {"count":5177,"max_ms":197.217,"mean_ms":16.987,"total_ms":87944.152}
+RuntimePerfProbe (uninstrumented) m25_claim {"count":5177,"max_ms":197.534,"mean_ms":17.039,"total_ms":88208.452}
+RuntimePerfProbe (uninstrumented) m26_dispatch_lane {"count":5177,"max_ms":200.66,"mean_ms":17.422,"total_ms":90192.053}
+RuntimePerfProbe (uninstrumented) access_compute_route {"count":3481,"max_ms":191.609,"mean_ms":19.095,"total_ms":66470.42}
+RuntimePerfProbe (uninstrumented) access_validate {"count":3481,"max_ms":1.673,"mean_ms":0.189,"total_ms":656.613}
+RuntimePerfProbe (uninstrumented) route_sources {"count":3481,"max_ms":18.38,"mean_ms":2.168,"total_ms":7547.674}
+RuntimePerfProbe (uninstrumented) route_dijkstra {"count":3481,"max_ms":164.721,"mean_ms":15.794,"total_ms":54980.262}
+RuntimePerfProbe (uninstrumented) route_validate {"count":3481,"max_ms":2.118,"mean_ms":0.255,"total_ms":887.594}
+RuntimePerfProbe (uninstrumented) dispatcher_spawn {"count":3481,"max_ms":2.678,"mean_ms":0.403,"total_ms":1401.238}
+RuntimePerfProbe (uninstrumented) agent_drive_arrival {"count":9588,"max_ms":14.064,"mean_ms":1.557,"total_ms":14924.543}
+RuntimePerfProbe (uninstrumented) completion_on_tick {"count":9588,"max_ms":1.298,"mean_ms":0.123,"total_ms":1182.951}
+RuntimePerfProbe (uninstrumented) ui_snapshot_sync {"count":9588,"max_ms":16.436,"mean_ms":1.609,"total_ms":15428.172}
+slot origins [[6.28, 72.78], [15.6, 72.78], [24.91, 72.78], [34.13, 72.78], [43.45, 72.78], [52.76, 72.78]] (board 59x59; inside-board start iff 0<=x<59 and 0<=y<59) dispatches=3481 clears=3481
+
+EQUIVALENCE full level instrumented vs uninstrumented dispatch sequence identical: true (3481 vs 3481)
+EQUIVALENCE laid-out instrumented vs uninstrumented dispatch sequence identical: true (219 vs 219)
