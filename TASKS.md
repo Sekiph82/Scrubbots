@@ -12,9 +12,9 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 954 / 1355 = 70.41%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains.
+- Progress: 954 / 1356 = 70.35%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains. One separate M39 test-stability follow-up has been queued.
 - Note: Owner expanded the final remediation to five findings. V02 supersedes the prior R01 V01 prompt/criteria. Scope: timed 2x active => each new gameplay auto-starts 2x; remove WAITING/ACTIVE slot text; railway-first Scrubbot travel; dynamic visible logical-pixel grid + subtle bevel; Home uses `assets/ui/final/home/background/home_background.png` exactly.
-- Owner sequencing lock: close M28-C002-C003-R01 V02 technical remediation, then owner replays/reviews all five findings before SB-M28-C002-020 can close.
+- Owner sequencing lock: close M28-C002-C003-R01 V02 technical remediation, then owner replays/reviews all five findings before SB-M28-C002-020 can close. After M28 V02 closure, schedule SB-M39-053 through the normal ChatGPT prompt/audit cycle.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1511,6 +1511,7 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [x] SB-M39-050 Implement per-card and EXCHANGE ALL EXTRAS atomic exchange; never reduce collected owned count below 1.
 - [x] SB-M39-051 Prove Stars, Star Exchange, Event Points and profile-XP economic state do not exist in production save/runtime APIs.
 - [x] SB-M39-052 Add full Economy V1 headless regression matrix for grants/spends/rollover/offline clocks/boosters/exchange/idempotency.
+- [ ] SB-M39-053 Test stability follow-up: remove the real-wall-clock boundary flake in `tests/m39_v04_integration.gd` `_phase_c_plus_one()` while preserving the strong exact economy rollback assertion. Preferred fix: inject a deterministic fixed clock into the host/economy test fixture rather than masking `hearts.anchor` / `speed.clock_high_water`; prove stability with 10 consecutive isolated runs plus root suite. Schedule only after M28-C002-C003-R01 V02 closes.
 
 ### M40 — Save System
 
