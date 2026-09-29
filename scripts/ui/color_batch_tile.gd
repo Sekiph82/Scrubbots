@@ -5,7 +5,7 @@ extends Control
 ## Used by the five/six execution slots (BatchSlotView) AND by every Batch Supply tile
 ## (BatchSupplyPanel front + preview rows), so both read as the same rounded 3D
 ## cartridge: a rounded coloured TOP FACE (exact Palette v3 colour), a restrained top
-## highlight, a visible white / light-grey BASE projecting under the face with a compact
+## highlight, a visible BASE (exact batch colour, same as the face) projecting under the face with a compact
 ## shadow, and a large white count with a dark outline.
 ##
 ## COUNT CENTRING (owner correction, blocking): the count Label is a child of the FACE
@@ -17,8 +17,6 @@ extends Control
 ## Presentation only: it holds scalar colour/count/state, no engine reference, no input.
 
 const OUTLINE_COLOR := Color(0.03, 0.04, 0.09, 1.0)
-const BASE_COLOR := Color(0.93, 0.95, 0.98, 1.0)
-const BASE_EDGE := Color(0.66, 0.71, 0.80, 1.0)
 const ACTIVE_GLOW := Color(0.30, 0.90, 1.0, 1.0)
 const EMPTY_WELL := Color(0.05, 0.08, 0.20, 0.55)
 const EMPTY_RIM := Color(0.62, 0.70, 0.90, 0.55)
@@ -159,9 +157,11 @@ func _sb(bg: Color, radius: int) -> StyleBoxFlat:
 
 func _style(radius: int) -> void:
 	var a: float = 0.55 if _preview else 1.0
-	# Base: white / light-grey platform + compact shadow.
-	var base := _sb(BASE_COLOR, radius)
-	base.border_color = BASE_EDGE
+	# Base: platform in the batch colour + compact shadow.
+	# V02 (owner): the base BODY is the exact batch colour, identical to the face; only its thin
+	# bottom edge is a darker shade of the same hue (depth), like the face rim.
+	var base := _sb(_color, radius)
+	base.border_color = _color.darkened(0.32)
 	base.border_width_bottom = 3
 	base.shadow_color = Color(0, 0, 0, 0.34 * a)
 	base.shadow_size = 4 if not _preview else 2
