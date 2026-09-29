@@ -12,9 +12,9 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 954 / 1358 = 70.25%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains. Separate M28 tile-polish, M39 test-stability and M42 Home Scrubby animation follow-ups are queued.
+- Progress: 954 / 1360 = 70.15%. M28-C002-012/013/019 are independently audited PASS; only SB-M28-C002-020 final owner visual/playtest acceptance remains. Separate M28 tile-polish, M29 gameplay-tempo, M32 Scrubbot-size, M39 test-stability and M42 Home Scrubby animation follow-ups are queued.
 - Note: Owner expanded the final remediation to five findings. V02 supersedes the prior R01 V01 prompt/criteria. Scope: timed 2x active => each new gameplay auto-starts 2x; remove WAITING/ACTIVE slot text; railway-first Scrubbot travel; dynamic visible logical-pixel grid + subtle bevel; Home uses `assets/ui/final/home/background/home_background.png` exactly.
-- Owner sequencing lock: close M28-C002-C003-R01 V02 technical remediation, then owner replays/reviews all five findings before SB-M28-C002-020 can close. After M28 V02 closure: (1) schedule SB-M28-C002-021 Color / Batch Tile Visual Polish as its own M28-C002-C004 prompt/audit cycle; (2) then SB-M39-053 test-stability; (3) then SB-M42-034 Home Scrubby Runtime Animation; (4) then resume the existing M43/meta roadmap.
+- Owner sequencing lock: close M28-C002-C003-R01 V02 technical remediation, then owner replays/reviews all five findings before SB-M28-C002-020 can close. After M28 V02 closure: (1) SB-M28-C002-021 Color / Batch Tile Visual Polish as M28-C002-C004; (2) SB-M29-010 Gameplay Tempo Retune; (3) SB-M32-UI-012 board-resolution-independent Scrubbot apparent size; (4) SB-M39-053 test-stability; (5) SB-M42-034 Home Scrubby Runtime Animation; (6) resume the existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1302,6 +1302,7 @@ This is intentionally NOT part of the active `M28-C002-C003-R01 V02` remediation
 - [x] SB-M29-004 Touch cancel. — [x] SB-M29-005 Focus loss.
 - [x] SB-M29-006 Rapid tapping. — [x] SB-M29-007 Multi-touch.
 - [x] SB-M29-008 Pause during touch. — [x] SB-M29-009 Background/foreground.
+- [ ] SB-M29-010 Gameplay Tempo Retune: raise the canonical normal gameplay baseline to OLD 1.5x while preserving the user-facing 1x/2x relationship. New 1x effective tempo = 9 cells/s Scrubbot travel + ~0.333333 s dispatch cadence; new 2x = exactly 2x the new baseline = OLD 3.0x = 18 cells/s + ~0.166667 s cadence. Retune the canonical temporal baseline coherently rather than changing only sprite travel. Preserve Engine.time_scale isolation, pause/resume, paid/timed/current-level entitlement semantics, M23 free auto-2x, routing/claims/accounting/clear truth, bounded one-wave/one-lane-per-frame behavior, and prove no dispatch storm at 5/6 slots including representative 30/60 fps timing. Authority: `coordination/OWNER_SCRUBBOT_SIZE_AND_GAMEPLAY_TEMPO_V01.md`. `[QUEUED / SEPARATE CYCLE M29-C002]`
 
 **Owner-locked speed integration for M29/runtime:** M29 proves the explicit 1x/2x temporal authority and may keep a direct debug/headless toggle seam. That seam is not authorization for free shipping manual 2x. M39 must gate production manual 2x through the paid entitlement service in `coordination/OWNER_ECONOMY_REWARDS_V01.md`. Authoritative M23-exhausted automatic 2x remains free. Do not infer exhaustion from UI rows or slot occupancy.
 
@@ -1349,6 +1350,7 @@ Closure evidence: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V03.md` + `coord
 - [x] SB-M32-UI-009 Configure Godot import settings.
 - [x] SB-M32-UI-010 Integrate approved art without coupling animation to TargetSelector logic.
 - [x] SB-M32-UI-011 Validate readability/scale on phone viewport matrix.
+- [ ] SB-M32-UI-012 Board-resolution-independent Scrubbot apparent size: replace constant `BODY_SPAN_CELLS = 2.4` behavior with presentation-scale compensation derived from actual rendered cell/board geometry so the current owner-accepted 32x32 / 2.4-cell appearance becomes the visual reference and Scrubbots remain approximately the same apparent screen size on 20x20, 32x32, 38x38, 59x59 and future larger boards. Include rectangular-board handling and a synthetic 100x100 scaling proof without expanding the current production board-size validity envelope. Presentation only; no route/target/agent-position/clear/solver truth changes. Authority: `coordination/OWNER_SCRUBBOT_SIZE_AND_GAMEPLAY_TEMPO_V01.md`. `[QUEUED / SEPARATE CYCLE M32-C002]`
 
 ### M33 — Audio `[OWNER-LOCKED AUDIO SELECTION V02 2026-09-24]`
 
