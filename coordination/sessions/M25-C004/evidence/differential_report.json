@@ -1,0 +1,40 @@
+{
+  "both_failure": 10300,
+  "both_success": 37902,
+  "by_group": {
+    "t1:inside_origin": 648,
+    "t1:prod": 19830,
+    "t1:syn": 14708,
+    "t1:tunings": 1792,
+    "t2:board_subclass": 328,
+    "t2:edge_block_access": 984,
+    "t2:subclass_access": 984,
+    "t2:wrapper_access": 984,
+    "t4:corridor_tie": 360,
+    "t4:tie_guard": 7584
+  },
+  "by_mode": {
+    "cost=0.5": 360,
+    "cost=1.0": 19069,
+    "cost=1000.0": 27697,
+    "cost=2.0": 356,
+    "cost=500.0": 360,
+    "cost=999.0": 360
+  },
+  "diffs": 0,
+  "failure_reasons": {
+    "NO_ROUTE": 10300
+  },
+  "first_diffs": [],
+  "layered_paths": {
+    "generic": 22633,
+    "guard_fallback": 144,
+    "layered": 21319,
+    "layered_no_route": 4106
+  },
+  "oracle": "tests/support/m25_c004_railroad_baseline.gd @ aadc57253d45dcd6b71ca8cc1b00b7a7684e0574",
+  "points_compared": 228983,
+  "scale": 1,
+  "states": 477,
+  "total_comparisons": 48202
+}

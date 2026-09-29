@@ -1,3 +1,7 @@
+## M25-C004 FROZEN PRE-S2 RAILROAD ORACLE — TEST ONLY, NEVER LOADED BY SHIPPING RUNTIME.
+## Verbatim copy of scripts/gameplay/routing/production_routing_system.gd at commit
+## aadc57253d45dcd6b71ca8cc1b00b7a7684e0574 (header comment lines only added). Do NOT edit
+## to make a new implementation pass; it is the differential ground truth.
 extends "res://scripts/gameplay/routing/routing_system.gd"
 ## ProductionRoutingSystem — owner-selected PRODUCTION routing (M17-C002,
 ## OWNER_MOVEMENT_DECISION_V01 "OWNER_SELECTS_ORGANIZED"). Preload it (AL-001).
@@ -177,12 +181,6 @@ func _is_outside_start(request, board) -> bool:
 ## is inside-board only; exterior stays rail-only (the superseded M21 adjacent ring
 ## is never revived). Uses ScrubRailGeometry + the authoritative ProductionAccessQuery
 ## seam; the returned route is RouteValidator-clean.
-##
-## M25-C004 (S2): the canonical production configuration (exact ProductionAccessQuery + exact
-## BoardState + INTERIOR_STEP_COST) is answered by `_railroad_layered`, an EXACT-EQUIVALENT search
-## proven point-for-point identical to the Dijkstra below (frozen pre-S2 oracle differential).
-## The Dijkstra below is retained verbatim as the reference/fallback for every other configuration
-## (equal-weight analysis mode, non-canonical access, board subclasses, near-tie guard trips).
 func _railroad_route(request, board, access_query) -> RefCounted:
 	var idx: int = request.target_index
 	var w: int = board.get_width()
@@ -195,15 +193,6 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 	var target_center: Vector2 = RouteRequest.center_of_index(board, idx)
 	var entry: Vector2 = geom.bottom_entry(start.x)
 	var connector_len: float = start.distance_to(entry)
-
-	# M25-C004 (S2) exact-equivalent layered search. Gated on EXACT preconditions; when any is
-	# not met (or the runtime near-tie guard trips) it returns null and the generic Dijkstra
-	# below runs unchanged, so every other configuration keeps the frozen semantics.
-	if access_query.get_script() == ProductionAccessQuery and interior_step_cost == INTERIOR_STEP_COST \
-			and board.get_script() == BoardState:
-		var layered = _railroad_layered(request, board, access_query, geom, start, target_cell, entry, connector_len)
-		if layered != null:
-			return layered
 
 	# --- legal rail ingress sources: OPEN/CLEARED (or target) perimeter cells whose
 	# orthogonal rail→cell bridge is access-legal. side priority BOTTOM,LEFT,RIGHT,TOP.
@@ -343,18 +332,13 @@ func _railroad_route(request, board, access_query) -> RefCounted:
 	while cur != -1:
 		chain.push_front(cur)
 		cur = parent[cur]
-	return _railroad_finish(request, board, access_query, geom, start, entry, src_rp[chain[0]], chain, w, idx)
-
-## Shared tail of the Railroad route: prepend connector + rail + ingress to the interior cell
-## chain (source cell -> ... -> target), dedup, collinear-collapse and whole-route validate.
-func _railroad_finish(request, board, access_query, geom, start: Vector2, entry: Vector2, ingress: Vector2,
-		chain: Array, w: int, idx: int) -> RefCounted:
+	var src_cell: int = chain[0]
 	var pts := PackedVector2Array()
 	pts.append(start)
 	pts.append(entry)
-	for wp in geom.rail_path(entry, ingress)["points"]:
+	for wp in geom.rail_path(entry, src_rp[src_cell])["points"]:
 		pts.append(wp)
-	pts.append(ingress)
+	pts.append(src_rp[src_cell])
 	for lin in chain:
 		pts.append(Vector2(float(lin % w) + 0.5, float(lin / w) + 0.5))
 	pts = _dedup_points(pts)
@@ -367,252 +351,6 @@ func _railroad_finish(request, board, access_query, geom, start: Vector2, entry:
 	if not valid:
 		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
 	return RouteResult.success_route(idx, pts)
-
-## M25-C004 (S2) EXACT-EQUIVALENT layered Railroad search for the production configuration.
-##
-## Result-identical to the generic Dijkstra below (proved point-for-point by the frozen-oracle
-## differential suite), not an approximation. Exact preconditions (checked by the caller and here):
-##   * access is the exact ProductionAccessQuery script and board the exact BoardState script
-##     (interior edge == "neighbour CLEARED or the target", read from one detached snapshot);
-##   * interior_step_cost == INTERIOR_STEP_COST, and INTERIOR_STEP_COST exceeds the whole
-##     rail+ingress cost spread (w + h + 13), so labels are LEXICOGRAPHIC: fewest interior steps
-##     first, then the label of the ingress source (cost0, side, seq), then cell index;
-##   * every candidate ingress source on the winning layer has a cost0 that is exactly equal to,
-##     or > _LAYER_TIE_GUARD apart from, every other (no eps-cluster ambiguity). Otherwise return
-##     null => the caller falls back to the generic Dijkstra.
-## Method: (1) reverse BFS from the target over CLEARED cells until the first layer holding a
-## perimeter ingress cell => K = minimal interior steps; (2) forward sweep over ONLY the cells on
-## minimum-step paths (dt[c] = K - layer), layer by layer in the exact Dijkstra pop order
-## (label rank, cell); the first popped neighbour labels a cell, which is precisely the generic
-## parent/tie-break; (3) stop at the target's first labelling. Any cell adjacent to a critical
-## cell with dt one lower is itself critical, so ignoring non-critical cells cannot change a
-## parent choice. Work is bounded by the radius-K diamond around the target, not the whole board.
-const _LAYER_TIE_GUARD := 0.001
-## Snapshot marker for "already reached" (any value != CellState.CLEARED).
-const _VISITED := 255
-
-## Debug/test-only work counters of the layered path (never read by gameplay). Off by default.
-var collect_work_counts: bool = false
-var last_work_counts: Dictionary = {}
-
-func _railroad_layered(request, board, access_query, geom, start: Vector2, target_cell: Vector2i, entry: Vector2,
-		connector_len: float) -> RefCounted:
-	var idx: int = request.target_index
-	var w: int = board.get_width()
-	var h: int = board.get_height()
-	var n: int = w * h
-	if not is_finite(connector_len) or float(w + h) + 20.0 >= interior_step_cost:
-		return null
-	var st: PackedByteArray = board.get_cell_states_copy()
-	if st.size() != n:
-		return null
-	var t: int = target_cell.y * w + target_cell.x
-	var tp_dij := RuntimePerfProbe.now()
-	var per := PackedByteArray()   # 1 on perimeter cells (ingress candidates)
-	per.resize(n)
-	for x in range(w):
-		per[x] = 1
-		per[n - w + x] = 1
-	for y in range(h):
-		per[y * w] = 1
-		per[y * w + w - 1] = 1
-
-	# (1) reverse BFS from the target over CLEARED cells; layer K = first layer with an ingress.
-	var dt := PackedInt32Array()
-	dt.resize(n)
-	dt.fill(-1)
-	dt[t] = 0
-	st[t] = _VISITED
-	var cur := PackedInt32Array([t])
-	var depth: int = 0
-	var found_src: bool = per[t] == 1
-	var cleared: int = BoardState.CellState.CLEARED
-	var wc_pops: int = 0
-	var wc_checks: int = 0
-	var wc_found: int = 1
-	while not found_src and not cur.is_empty():
-		var nxt := PackedInt32Array()
-		var d1: int = depth + 1
-		var csz: int = cur.size()
-		wc_pops += csz
-		for i in range(csz):
-			var u: int = cur[i]
-			if u >= w:
-				var v: int = u - w
-				wc_checks += 1
-				if st[v] == cleared:
-					st[v] = _VISITED
-					dt[v] = d1
-					nxt.append(v)
-					if per[v] == 1:
-						found_src = true
-			if u < n - w:
-				var v: int = u + w
-				wc_checks += 1
-				if st[v] == cleared:
-					st[v] = _VISITED
-					dt[v] = d1
-					nxt.append(v)
-					if per[v] == 1:
-						found_src = true
-			var ux: int = u % w
-			if ux > 0:
-				var v: int = u - 1
-				wc_checks += 1
-				if st[v] == cleared:
-					st[v] = _VISITED
-					dt[v] = d1
-					nxt.append(v)
-					if per[v] == 1:
-						found_src = true
-			if ux < w - 1:
-				var v: int = u + 1
-				wc_checks += 1
-				if st[v] == cleared:
-					st[v] = _VISITED
-					dt[v] = d1
-					nxt.append(v)
-					if per[v] == 1:
-						found_src = true
-		wc_found += nxt.size()
-		cur = nxt
-		depth = d1
-	if not found_src:
-		RuntimePerfProbe.add("route_dijkstra", tp_dij)
-		if collect_work_counts:
-			last_work_counts = {"path": "layered_no_route", "snapshots": 1, "rev_expanded": wc_pops,
-				"rev_neighbor_checks": wc_checks, "rev_reached": wc_found}
-		return RouteResult.failure(RouteResult.FailureReason.NO_ROUTE, idx)
-	var k_steps: int = depth
-
-	# Ingress label of every critical (layer-0) source: best over its side memberships, exactly
-	# the generic seeding rule (BOTTOM, LEFT, RIGHT, TOP; eps + rank_lt).
-	var crit_cell := PackedInt32Array()
-	var crit_side := PackedInt32Array()
-	var crit_seq := PackedInt32Array()
-	var crit_cost := PackedFloat64Array()
-	var crit_rp: Array = []
-	for i in range(cur.size()):
-		var c: int = cur[i]
-		if per[c] != 1:
-			continue
-		var cx: int = c % w
-		var cy: int = c / w
-		var cc := Vector2(float(cx) + 0.5, float(cy) + 0.5)
-		var best_cost: float = INF
-		var best_side: int = -1
-		var best_seq: int = -1
-		var best_rp := Vector2.ZERO
-		for side in range(4):
-			var rp := Vector2.ZERO
-			var seq: int = 0
-			if side == 0 and cy == h - 1:
-				rp = Vector2(float(cx) + 0.5, geom.bottom_y())
-				seq = cx
-			elif side == 1 and cx == 0:
-				rp = Vector2(geom.left_x(), float(cy) + 0.5)
-				seq = cy
-			elif side == 2 and cx == w - 1:
-				rp = Vector2(geom.right_x(), float(cy) + 0.5)
-				seq = cy
-			elif side == 3 and cy == 0:
-				rp = Vector2(float(cx) + 0.5, geom.top_y())
-				seq = cx
-			else:
-				continue
-			var cost0: float = connector_len + geom.rail_dist(entry, rp) + rp.distance_to(cc)
-			var better = best_cost == INF or cost0 < best_cost - _RAIL_LEN_EPS \
-				or (absf(cost0 - best_cost) <= _RAIL_LEN_EPS and _rank_lt(side, seq, best_side, best_seq))
-			if better:
-				best_cost = cost0
-				best_side = side
-				best_seq = seq
-				best_rp = rp
-		crit_cell.append(c)
-		crit_side.append(best_side)
-		crit_seq.append(best_seq)
-		crit_cost.append(best_cost)
-		crit_rp.append(best_rp)
-	# Near-tie guard: costs are exactly equal or clearly separated (no eps-cluster ambiguity).
-	var sorted_cost := crit_cost.duplicate()
-	sorted_cost.sort()
-	var uniq := PackedFloat64Array()
-	for i in range(sorted_cost.size()):
-		if i == 0 or sorted_cost[i] != sorted_cost[i - 1]:
-			if i > 0 and sorted_cost[i] - sorted_cost[i - 1] <= _LAYER_TIE_GUARD:
-				if collect_work_counts:
-					last_work_counts = {"path": "guard_fallback"}
-				return null
-			uniq.append(sorted_cost[i])
-
-	# (2) forward sweep over the critical cells only, in exact pop order per layer.
-	var seq_m: int = maxi(w, h)
-	var layer := PackedInt64Array()
-	var src_rp: Dictionary = {}
-	for i in range(crit_cell.size()):
-		var rank: int = uniq.bsearch(crit_cost[i])
-		var key: int = (rank * 4 + crit_side[i]) * seq_m + crit_seq[i]
-		layer.append(key * n + crit_cell[i])
-		src_rp[crit_cell[i]] = crit_rp[i]
-	var parent := PackedInt32Array()
-	parent.resize(n)
-	var wc_sweep: int = 0
-	var d: int = k_steps
-	while d > 1:
-		layer.sort()
-		var nxt2 := PackedInt64Array()
-		var dm: int = d - 1
-		var lsz: int = layer.size()
-		wc_sweep += lsz
-		for i in range(lsz):
-			var comp: int = layer[i]
-			var u: int = comp % n
-			var base: int = comp - u
-			if u >= w:
-				var v: int = u - w
-				if dt[v] == dm:
-					dt[v] = -3
-					parent[v] = u
-					nxt2.append(base + v)
-			if u < n - w:
-				var v: int = u + w
-				if dt[v] == dm:
-					dt[v] = -3
-					parent[v] = u
-					nxt2.append(base + v)
-			var ux: int = u % w
-			if ux > 0:
-				var v: int = u - 1
-				if dt[v] == dm:
-					dt[v] = -3
-					parent[v] = u
-					nxt2.append(base + v)
-			if ux < w - 1:
-				var v: int = u + 1
-				if dt[v] == dm:
-					dt[v] = -3
-					parent[v] = u
-					nxt2.append(base + v)
-		layer = nxt2
-		d = dm
-	if k_steps > 0:
-		layer.sort()
-		parent[t] = int(layer[0] % n)   # every dt==1 cell is adjacent to the target
-		wc_sweep += layer.size()
-	RuntimePerfProbe.add("route_dijkstra", tp_dij)
-
-	var chain: Array = []
-	chain.resize(k_steps + 1)
-	var c2: int = t
-	for i in range(k_steps, -1, -1):
-		chain[i] = c2
-		if i > 0:
-			c2 = parent[c2]
-	if collect_work_counts:
-		last_work_counts = {"path": "layered", "snapshots": 1, "k_steps": k_steps, "rev_expanded": wc_pops,
-			"rev_neighbor_checks": wc_checks, "rev_reached": wc_found, "critical_sources": crit_cell.size(),
-			"sweep_cells": wc_sweep, "chain_cells": chain.size()}
-	return _railroad_finish(request, board, access_query, geom, start, entry, src_rp[chain[0]], chain, w, idx)
 
 ## Lexicographic (side, seq) priority: lower side (BOTTOM<LEFT<RIGHT<TOP) then lower
 ## scan index wins. Used only to break EXACTLY-equal total-length ties deterministically.

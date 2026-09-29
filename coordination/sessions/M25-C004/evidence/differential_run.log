@@ -1,0 +1,11 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[t1 generated state matrix: optimized == frozen oracle, point for point]
+  t1 total so far: 36978 comparisons, 0 diffs
+[t2 non-canonical access / board / request: generic semantics unchanged]
+[t4 exact-tie / near-tie guard]
+  t4: 7944 comparisons, guard_fallback hits 144
+[t3 path accounting] {"generic":22633,"guard_fallback":144,"layered":21319,"layered_no_route":4106}
+  guard_fallback hits: 144
+REPORT {"both_failure":10300,"both_success":37902,"by_group":{"t1:inside_origin":648,"t1:prod":19830,"t1:syn":14708,"t1:tunings":1792,"t2:board_subclass":328,"t2:edge_block_access":984,"t2:subclass_access":984,"t2:wrapper_access":984,"t4:corridor_tie":360,"t4:tie_guard":7584},"by_mode":{"cost=0.5":360,"cost=1.0":19069,"cost=1000.0":27697,"cost=2.0":356,"cost=500.0":360,"cost=999.0":360},"diffs":0,"failure_reasons":{"NO_ROUTE":10300},"first_diffs":[],"layered_paths":{"generic":22633,"guard_fallback":144,"layered":21319,"layered_no_route":4106},"oracle":"tests/support/m25_c004_railroad_baseline.gd @ aadc57253d45dcd6b71ca8cc1b00b7a7684e0574","points_compared":228983,"scale":1,"states":477,"total_comparisons":48202}
+m25_c004_railroad_differential: PASS (48202 comparisons, 0 diffs, 0 failed checks)
