@@ -337,11 +337,13 @@ func _slot_labels() -> void:
 	var w := BatchSlotView.new()
 	w.set_shell_mode(true)
 	w.bind_snapshot({"state": "WAITING", "occupied": true, "remaining_to_clear": 12, "committed": 2}, Color(0.2, 0.7, 0.3))
-	var sa := a.get_theme_stylebox("panel") as StyleBoxFlat
-	var sw := w.get_theme_stylebox("panel") as StyleBoxFlat
+	var ta = a.get_tile()
+	var tw = w.get_tile()
 	_ok(a.get_state() == "ACTIVE" and w.get_state() == "WAITING" and a.get_state_text() == "" and w.get_state_text() == "" and a.get_display_count() == 10,
 		"slot truth unchanged (state ACTIVE/WAITING, count 12-2=10) with no words")
-	_ok(sa != null and sw != null and sa.border_color != sw.border_color and sa.border_width_left != sw.border_width_left, "ACTIVE and WAITING remain visually distinct by border colour/width")
+	# C004: the states are carried by the shared ColorBatchTile (cyan rim on ACTIVE only), no words.
+	_ok(ta.is_active_style() and not tw.is_active_style() and ta.get_count_text() == "10" and tw.get_count_text() == "10",
+		"ACTIVE and WAITING remain visually distinct (ACTIVE rim on the shared tile), both still show the same count")
 	a.free()
 	w.free()
 	_complete("s02_state_still_distinct")

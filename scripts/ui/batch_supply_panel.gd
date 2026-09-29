@@ -16,13 +16,11 @@ extends HBoxContainer
 ## reads `remaining` only to decide emptiness — never to render hidden depth.
 
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
+const ColorBatchTile = preload("res://scripts/ui/color_batch_tile.gd")
 
 const VISIBLE_ROWS := UiTokens.SUPPLY_VISIBLE_ROWS   # exactly 3 in V1
 const MIN_COLUMNS := 3
 const MAX_COLUMNS := 5
-
-const _EMPTY_TILE := Color(0.10, 0.12, 0.16, 1.0)
-const _ROW_BG := Color(0.16, 0.19, 0.25, 1.0)
 
 ## Presentation-only production-input signal (M29 WP01). Emitted EXACTLY ONCE per
 ## accepted physical activation gesture on a column FRONT (row 0) surface. It carries
@@ -39,7 +37,7 @@ signal front_batch_activated(column_index: int)
 ## ponytail: time-window dedup — no public "emulated" flag exists on the event.
 const _TOUCH_MOUSE_DEDUP_MSEC := 200
 
-var _columns: Array = []   # each: {root:VBoxContainer, rows:[ {panel, swatch, count} x3 ]}
+var _columns: Array = []   # each: {root:VBoxContainer, rows:[ {panel, tile, swatch, count, front} x3 ]}
 
 # --- production-input state (opt-in via enable_front_input(); default OFF so M28
 # presentation stays IGNORE-only and unchanged) --------------------------------------
@@ -103,7 +101,7 @@ func set_shell_grid(gap: Vector2) -> void:
 	for col in _columns:
 		_apply_shell_column(col["root"])
 		for r in col["rows"]:
-			_apply_shell_row(r["panel"], r["count"], r["front"])
+			_apply_shell_row(r["panel"])
 
 func is_shell_mode() -> bool:
 	return _shell_mode
@@ -111,10 +109,9 @@ func is_shell_mode() -> bool:
 func _apply_shell_column(col: VBoxContainer) -> void:
 	col.add_theme_constant_override("separation", int(round(_gap.y)))
 
-func _apply_shell_row(panel: PanelContainer, count: Label, front: bool) -> void:
+func _apply_shell_row(panel: PanelContainer) -> void:
 	panel.custom_minimum_size = Vector2.ZERO
 	panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	count.add_theme_font_size_override("font_size", 38 if front else 32)
 
 ## Bind detached player snapshot. `column_snapshots` is clamped to [3,5] columns;
 ## `colors` maps color_id -> Color. Rebuilds column widgets when the column count
@@ -154,7 +151,7 @@ func _rebuild_columns(n: int) -> void:
 		if _shell_mode:
 			_apply_shell_column(col)
 			for row in rows:
-				_apply_shell_row(row["panel"], row["count"], row["front"])
+				_apply_shell_row(row["panel"])
 		_columns.append({"root": col, "rows": rows})
 		_front_panels.append(rows[0]["panel"])
 		_front_enabled.append(false)
@@ -263,93 +260,39 @@ func _make_row(col: VBoxContainer, front: bool) -> Dictionary:
 		panel.custom_minimum_size.y = int(UiTokens.SUPPLY_TILE_MIN * 0.72)
 	col.add_child(panel)
 
-	# Gameplay V02 tile: the whole tile is the batch colour (swatch fills it) with the live
-	# robot count centred on top — colour/count stay live Godot UI.
-	var swatch := ColorRect.new()
+	# M28-C002-C004: every tile (front + preview, shell or not) is the shared ColorBatchTile -
+	# the SAME rounded 3D component the slots use. The row panel stays the (front-only) input
+	# surface and draws nothing itself; colour/count stay live Godot UI.
+	panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
+	var tile := ColorBatchTile.new()
+	tile.name = "Tile"
+	tile.set_preview(not front)
+	panel.add_child(tile)
+	var swatch := ColorRect.new()   # data probe only (never drawn)
 	swatch.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	swatch.visible = false   # colour is carried by the tile stylebox; kept as a data probe
+	swatch.visible = false
 	panel.add_child(swatch)
-
-	var count := Label.new()
-	count.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	count.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	count.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	count.add_theme_font_size_override("font_size", 40 if front else 32)
-	count.add_theme_color_override("font_color", Color(1, 1, 1))
-	count.add_theme_color_override("font_outline_color", Color(0.04, 0.07, 0.16))
-	count.add_theme_constant_override("outline_size", 10)
-	panel.add_child(count)
-
-	return {"panel": panel, "swatch": swatch, "count": count, "front": front}
+	return {"panel": panel, "tile": tile, "swatch": swatch, "count": tile.get_count_label(), "front": front}
 
 func _bind_row(row: Dictionary, batch, front: bool, colors: Array) -> void:
 	var panel: PanelContainer = row["panel"]
+	var tile: ColorBatchTile = row["tile"]
 	var swatch: ColorRect = row["swatch"]
-	var count: Label = row["count"]
-	var sb := StyleBoxFlat.new()
-	sb.set_corner_radius_all(UiTokens.RADIUS_MD)
-	sb.set_content_margin_all(UiTokens.SPACE_XS)
-	sb.anti_aliasing = true
-	if _shell_mode:
-		_bind_shell_row(panel, swatch, count, batch, front, colors)
-		return
 	if batch == null or not (batch is Dictionary):
 		# Clean empty / end-of-column tile.
 		swatch.color = Color(0, 0, 0, 0)
-		count.text = ""
-		sb.bg_color = _EMPTY_TILE
-		sb.set_border_width_all(2)
-		sb.border_color = Color(0.20, 0.25, 0.40, 1.0)
-		panel.add_theme_stylebox_override("panel", sb)
+		tile.set_empty(not _shell_mode)   # shell: the baked cell is the empty tile
 		panel.modulate = Color(1, 1, 1, 1)
 		return
 	var cid: int = int(batch.get("color_id", -1))
 	var col: Color = colors[cid] if cid >= 0 and cid < colors.size() else Color(1, 0, 1, 1)
 	swatch.color = col
-	count.text = "%d" % int(batch.get("robot_count", 0))
-	sb.bg_color = col
-	sb.border_color = col.lightened(0.45)
-	sb.border_width_bottom = 6
-	if front:
-		# Front = the only selectable batch: full colour, bright cyan rim.
-		sb.set_border_width_all(4)
-		sb.border_width_bottom = 7
-		sb.border_color = Color(0.55, 0.95, 1.0, 1.0)
-		sb.shadow_color = Color(0.25, 0.85, 1.0, 0.55)
-		sb.shadow_size = 6
-		panel.modulate = Color(1, 1, 1, 1)
-	else:
-		sb.set_border_width_all(2)
-		sb.border_width_bottom = 4
-		# Preview rows visibly secondary (dimmed, thinner rim) and never interactive.
-		panel.modulate = Color(0.62, 0.62, 0.70, 0.85)
-	panel.add_theme_stylebox_override("panel", sb)
-
-## Shell tile: empty = transparent (the baked cell shows); batch = live colour fill with
-## the live count. Front (the only interactive batch) is full strength with a cyan edge;
-## preview rows are dimmed and never interactive.
-func _bind_shell_row(panel: PanelContainer, swatch: ColorRect, count: Label, batch, front: bool, colors: Array) -> void:
-	if batch == null or not (batch is Dictionary):
-		swatch.color = Color(0, 0, 0, 0)
-		count.text = ""
-		panel.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
-		panel.modulate = Color(1, 1, 1, 1)
-		return
-	var cid: int = int(batch.get("color_id", -1))
-	var col: Color = colors[cid] if cid >= 0 and cid < colors.size() else Color(1, 0, 1, 1)
-	swatch.color = col
-	count.text = "%d" % int(batch.get("robot_count", 0))
-	var sb := StyleBoxFlat.new()
-	sb.bg_color = col
-	sb.set_corner_radius_all(UiTokens.RADIUS_SM)
-	sb.anti_aliasing = true
-	if front:
-		sb.set_border_width_all(3)
-		sb.border_color = Color(0.55, 0.95, 1.0, 1.0)
-		panel.modulate = Color(1, 1, 1, 1)
-	else:
-		panel.modulate = Color(0.62, 0.62, 0.70, 0.85)
-	panel.add_theme_stylebox_override("panel", sb)
+	tile.set_batch(col, "%d" % int(batch.get("robot_count", 0)))
+	tile.set_preview(not front)
+	# Front = the only selectable batch: full strength + cyan rim. Preview rows are visibly
+	# secondary (dimmed, no rim) and never interactive.
+	tile.set_active(front)
+	panel.modulate = Color(1, 1, 1, 1) if front else Color(0.62, 0.62, 0.70, 0.85)
 
 ## Test/evidence accessor: displayed count text of a row (column, row).
 func get_row_count_text(column: int, row: int) -> String:

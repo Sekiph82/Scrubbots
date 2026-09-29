@@ -300,15 +300,15 @@ func _accepted_styling_preserved() -> void:
 	_ok((s.get_node("Background") as ColorRect).color == GameplayScreen.FILL, "S1-A dark navy surround")
 	_ok(s.get_pause_button().get_theme_stylebox("normal") is StyleBoxEmpty and s.get_speed_label() == "2x", "S4-A native Pause glyph / live 2x text, no extra chrome")
 	var sp = s.get_supply_panel()
-	var front := sp.get_column_row_panels(0)[0].get_theme_stylebox("panel") as StyleBoxFlat
-	_ok(front != null and front.border_color == Color(0.55, 0.95, 1.0, 1.0) and sp.get_column_row_panels(0)[1].modulate == Color(0.62, 0.62, 0.70, 0.85), "S5-A cyan front edge, dimmed previews")
+	# C004: the front rim / ACTIVE rim are carried by the shared ColorBatchTile (was a per-panel StyleBox).
+	var ftile = sp.get_column_row_panels(0)[0].get_node("Tile")
+	_ok(ftile.is_active_style() and not sp.get_column_row_panels(0)[1].get_node("Tile").is_active_style() and sp.get_column_row_panels(0)[1].modulate == Color(0.62, 0.62, 0.70, 0.85), "S5-A cyan front rim, dimmed previews")
 	_drive(10)
 	var active_ok := false
 	for v in s.get_five_slot_strip().get_slot_views():
 		if v.get_state() == "ACTIVE":
-			var sb := v.get_theme_stylebox("panel") as StyleBoxFlat
-			active_ok = sb != null and sb.border_width_left == 3
-	_ok(active_ok, "S5-A cyan edge on ACTIVE slots")
+			active_ok = v.get_tile().is_active_style()
+	_ok(active_ok, "S5-A cyan rim on ACTIVE slots")
 	_complete("accepted_styling_preserved")
 
 func _square_only_production() -> void:
