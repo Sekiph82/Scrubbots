@@ -29,6 +29,7 @@ var EXPECTED_CASES := [
 	"c09_hidden_spacer_cannot_move_count", "c10_responsive_centering", "c11_palette_face_identity",
 	"c12_spawn_anchor_pinned", "c13_supply_hit_rects_and_gesture", "c14_no_truth_mutation",
 	"c15_lightweight_no_baked_art", "c16_count_readable_fit",
+	"c17_base_body_equals_face_colour",
 ]
 
 var _fail := 0
@@ -46,6 +47,7 @@ func _initialize() -> void:
 		_palette.append(String(c["hex"]))
 	MainScript.boot_opening_override = 0
 	await _standalone_cases()
+	await _same_color_base()
 	await _real_host_cases()
 	await _anchor_pin()
 	await _supply_gesture()
@@ -337,6 +339,80 @@ func _standalone_cases() -> void:
 	snap["remaining_to_clear"] = 999
 	_ok(view.get_display_count() == 15 and view.get_count_label_text() == "15", "displayed count = remaining_to_clear - committed (20-5=15) from a detached snapshot")
 	view.free()
+
+# ------------------------------------------------- V02: base body == face colour ----
+
+## V02 owner correction: for every occupied tile the lower base BODY fill is exactly the same
+## canonical Palette v3 batch colour as the top face (a darker edge / neutral shadow may remain).
+## Everything else the owner accepted in V01 is asserted unchanged.
+func _same_color_base() -> void:
+	print("[V02 base body == face colour; accepted visuals preserved]")
+	var old_white := Color(0.93, 0.95, 0.98, 1.0)   # the rejected fixed base fill
+	var eq_ok := true
+	var no_white := true
+	var edge_ok := true
+	for cid in range(16):
+		var want := Color.html(_palette[cid])
+		var t := ColorBatchTile.new()
+		t.size = Vector2(90, 90)
+		t.set_batch(want, "88")
+		var fb := t.get_face_panel().get_theme_stylebox("panel") as StyleBoxFlat
+		var bb := t.get_base_panel().get_theme_stylebox("panel") as StyleBoxFlat
+		eq_ok = eq_ok and fb.bg_color == want and bb.bg_color == want and bb.bg_color == fb.bg_color   # exact, not perceptual
+		no_white = no_white and not bb.bg_color.is_equal_approx(old_white)
+		edge_ok = edge_ok and bb.border_color == want.darkened(0.32) and bb.border_width_bottom == 3   # depth edge only
+		t.free()
+	_ok(eq_ok, "all 16 Palette v3 colours: base StyleBoxFlat.bg_color == face bg_color == canonical palette colour (exact equality)")
+	_ok(no_white, "the fixed white / light-grey base fill is gone (no occupied base uses it)")
+	_ok(edge_ok, "only a thin darker same-hue bottom edge remains as depth (body fill untouched)")
+
+	# Accepted geometry / shadow / highlight / states unchanged (measured on the V01 values).
+	var t2 := ColorBatchTile.new()
+	t2.size = Vector2(90, 90)
+	t2.set_batch(Color.html(_palette[6]), "30")
+	var strip_h: float = t2.get_base_panel().position.y + t2.get_base_panel().size.y - (t2.get_face_panel().position.y + t2.get_face_panel().size.y)
+	var bs := t2.get_base_panel().get_theme_stylebox("panel") as StyleBoxFlat
+	var hs := t2.get_highlight_panel().get_theme_stylebox("panel") as StyleBoxFlat
+	_ok(is_equal_approx(strip_h, roundf(90.0 * 0.17)) and is_equal_approx(t2.get_face_panel().size.y, 90.0 - roundf(90.0 * 0.17)) and ColorBatchTile.BASE_FRACTION == 0.17,
+		"base height / face geometry unchanged (visible base strip %.0f px of 90, BASE_FRACTION 0.17)" % strip_h)
+	_ok(bs.shadow_size == 4 and is_equal_approx(bs.shadow_color.a, 0.34) and bs.shadow_offset == Vector2(0, 3) and bs.shadow_color.r == 0.0,
+		"shadow unchanged: size 4, alpha 0.34, offset (0,3), neutral black")
+	_ok(t2.get_highlight_panel().visible and is_equal_approx(hs.bg_color.a, 0.16) and t2.get_highlight_panel().size.x > 0.0, "top highlight present, alpha 0.16 unchanged")
+	t2.set_active(true)
+	var hs2 := t2.get_highlight_panel().get_theme_stylebox("panel") as StyleBoxFlat
+	var bb2 := t2.get_base_panel().get_theme_stylebox("panel") as StyleBoxFlat
+	_ok(t2.is_active_style() and is_equal_approx(hs2.bg_color.a, 0.24) and bb2.bg_color == Color.html(_palette[6]), "ACTIVE unchanged (glow, highlight 0.24) and its base is still the batch colour")
+	t2.set_active(false)
+	t2.set_preview(true)
+	var bp := t2.get_base_panel().get_theme_stylebox("panel") as StyleBoxFlat
+	_ok(t2.is_preview() and bp.shadow_size == 2 and bp.bg_color == Color.html(_palette[6]), "preview unchanged (shadow 2) and its base is the batch colour")
+	t2.set_empty()
+	_ok(t2.is_empty_tile() and not t2.get_base_panel().visible and not t2.get_face_panel().visible and t2.get_count_text() == "", "EMPTY unchanged: no face, no base, no count")
+	t2.free()
+
+	# The real slot + supply tiles (production path) follow the same rule, incl. preview rows.
+	var slots := [_slot("ACTIVE", 7, 0, 2), _slot("WAITING", 45, 3, 7), _slot("WAITING", 120, 0, 11), _slot("ACTIVE", 33, 1, 13), _slot("WAITING", 9, 0, 15), _slot("WAITING", 250, 0, 12)]
+	var scr := _screen(Vector2i(1080, 2160), slots, 6, 5)
+	await _settle()
+	var prod_ok := true
+	var n := 0
+	var tiles: Array = _tiles(scr.get_five_slot_strip())
+	var sp = scr.get_supply_panel()
+	for c in range(sp.get_column_count()):
+		for p in sp.get_column_row_panels(c):
+			tiles.append(p.get_node("Tile"))
+	for t in tiles:
+		if t.is_empty_tile():
+			continue
+		n += 1
+		var f := t.get_face_panel().get_theme_stylebox("panel") as StyleBoxFlat
+		var b := t.get_base_panel().get_theme_stylebox("panel") as StyleBoxFlat
+		prod_ok = prod_ok and b.bg_color == f.bg_color and b.bg_color == t.get_face_color()
+		if not t.is_preview():
+			prod_ok = prod_ok and _centred(t)
+	_ok(prod_ok and n == 21, "production slot (5/6) + supply (front & preview) tiles: base == face colour, slot counts still exactly face-centred (%d tiles)" % n)
+	_free_screen(scr)
+	_complete("c17_base_body_equals_face_colour")
 
 # --------------------------------------------------------- real host cases ----
 
