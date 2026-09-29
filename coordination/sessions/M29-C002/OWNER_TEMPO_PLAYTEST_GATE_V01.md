@@ -1,7 +1,7 @@
 # M29-C002 — OWNER TEMPO PLAYTEST GATE V01
 
 Date: 2026-09-29
-Status: **OWNER PLAYTEST REQUIRED**
+Status: **OWNER PASS / CLOSED**
 
 Tempo implementation:
 `8787d38dba65a084e6169ea8e8ccc623ab63e0ae`
@@ -80,6 +80,20 @@ Owner answer:
 - STUTTER
 - BURST
 - OTHER: describe
+
+## Owner result — 2026-09-29
+
+- P1 — New 1x feel: **OK**
+- P2 — New 2x feel: **OK**
+- P3 — Dense 5/6-slot dispatch smoothness: **OK**
+
+Owner accepted the retuned gameplay tempo and observed no unacceptable burst/stutter behavior.
+
+SB-M29-010 is CLOSED.
+M29-C002 is CLOSED.
+
+Next task:
+`SB-M32-UI-012 — Board-resolution-independent Scrubbot apparent size`
 
 ## Closure rule
 
