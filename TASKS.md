@@ -12,8 +12,9 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 959 / 1360 = 70.51%. SB-M39-053 is CLOSED after deterministic fixed-clock fixture remediation and independent audit PASS with 10/10 isolated stability. Current work is SB-M42-034 Home Scrubby Hero Scale + Placement Lock.
+- Progress: 959 / 1414 = 67.82%. SB-M39-053 is CLOSED after deterministic fixed-clock fixture remediation and independent audit PASS with 10/10 isolated stability. Current work is SB-M42-034 Home Scrubby Hero Scale + Placement Lock. Denominator increased only because the owner-approved Retention V2 roadmap was added; no previously completed task was reopened.
 - Note: M39-C002 audit `coordination/sessions/M39-C002/CHATGPT_AUDIT_V01.md` is AUDITED_PASS / CLOSED. M42-C002 now owns only the static Home hero scale/placement lock at 1.612; animation task SB-M42-035 remains blocked until owner visually accepts the enlarged hero.
+- Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (2) only after owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation; (3) resume existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
@@ -1762,6 +1763,20 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 - [ ] SB-M43-013 If the win unlocks a robot, collection set, Master Collection, feature or world, hand off to the corresponding ceremony in M43-C005 after the core Results reward commit succeeds.
 - [x] SB-M43-014 Results Continue advances exactly once to the next canonical progression level and cannot be double-tapped into duplicate transitions.
 
+
+#### M43-C001R - Results Momentum / Next-Level Curiosity / 10-Level Cleaning Journey [OWNER APPROVED 2026-09-30]
+
+These tasks extend the already owner-approved Results surface without changing its reward authority. The goal is a strong "one more level" continuation loop built from truthful next-content information, not fake scarcity, near-miss messaging or hidden reward manipulation.
+
+- [ ] SB-M43-R01-001 Add a deterministic **Next Cleanup** teaser after authoritative Results rewards/required ceremonies: resolve the actual next canonical progression level first, then reveal only a controlled preview of its real artwork/metadata.
+- [ ] SB-M43-R01-002 Default teaser language is silhouette / cropped-detail / limited-palette reveal, targeting roughly 15–25% visual information; never fabricate an unreleased level, fake a reward, or expose the full puzzle artwork before play.
+- [ ] SB-M43-R01-003 Teaser displays truthful next-level context only: level number, approved class/difficulty label and optional palette/color-count summary when available; unavailable frontier content shows an honest disabled/coming-soon state.
+- [ ] SB-M43-R01-004 Recompose the post-win flow as one momentum corridor: reward commit → compact secondary progress summary → any mandatory ceremony handoff → Next Cleanup teaser → one dominant **CLEAN NEXT** action; Home/back remains secondary and never traps the player.
+- [ ] SB-M43-R01-005 Implement a visible **10-Level Cleaning Journey** using the existing canonical cadence only: ten nodes per cycle, slot 5 presented as the mini-boss beat and slot 10 as the cycle-boss beat; this is meta progress UI, **not a World Diorama and not a level-select surface**.
+- [ ] SB-M43-R01-006 Journey state derives from ProgressionService/canonical cadence and survives cycle boundaries correctly (1→10 then next cycle 1); it never unlocks, skips or rewinds levels and never changes difficulty truth.
+- [ ] SB-M43-R01-007 Results and Home may show the same journey read model, but there is one authority for cycle position and completion; nodes are informational and non-tappable unless a later owner decision explicitly changes the no-shipping-Level-Select rule.
+- [ ] SB-M43-R01-008 Add focused tests for next-level resolution, frontier/missing-content fallback, double-tap protection, ceremony chaining, cycle 9→10→next-1 transitions, Reduced Effects and save/relaunch continuity.
+
 #### M43-C002 - Reusable Popup / Modal / Pause Foundation
 
 - [x] SB-M43-015 Implement reusable `BasePopup` with dim background, responsive frame, header/content/footer slots and canonical close behavior.
@@ -1837,6 +1852,12 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 - [ ] SB-M43-076 Produce/owner-approve visual masters for pack opening, robot unlock, set completion, Master Collection, Gift milestone and generic feature/world unlock.
 - [ ] SB-M43-077 Meta reward ceremonies respect Reduced Effects and can collapse to concise accessible presentation without changing grants.
 
+
+##### M43-C005R - Gift Meter Micro-Progress Feedback [OWNER APPROVED 2026-09-30]
+
+- [ ] SB-M43-R05-001 Add purely presentational micro-progress/tick feedback between canonical Gift Meter milestones 10/50/250/500/1000 so long gaps visibly advance; micro-ticks mint no reward, create no new economic threshold and cannot be claimed.
+- [ ] SB-M43-R05-002 Use one GiftMeterService-derived normalized progress model across Home/Results/Gift Bar; milestone crossing keeps the existing authoritative reward bundle and celebration while intermediate animation remains skippable/Reduced-Effects-safe.
+
 #### M43-C006 - Shop / Store / Currency Destination
 
 - [ ] SB-M43-078 Implement a real Shop destination opened by the Home SHOP shortcut and Scrub Bucks `+`.
@@ -1867,6 +1888,16 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 - [ ] SB-M43-100 Collection supports locked/future set presentation without leaking nonexistent cards or fake progress.
 - [ ] SB-M43-101 Validate 135-card performance, scrolling, touch targets, localization, duplicate-heavy inventories and completion transitions.
 
+
+#### M43-C007R - Collection Fairness / Pity / First Collection Sprint [OWNER APPROVED 2026-09-30]
+
+- [ ] SB-M43-R07-001 Add a versioned **earned-pack pity counter**: consecutive eligible Standard/Premium pack openings with no new card increment the counter; obtaining any new card resets it. Threshold is data-driven and must be balance-simulated before final tuning.
+- [ ] SB-M43-R07-002 When pity reaches its configured threshold, the next eligible earned pack guarantees at least one currently eligible missing card while still preserving Premium's Rare-or-better guarantee; pack contents commit atomically before reveal.
+- [ ] SB-M43-R07-003 If no eligible missing card exists, pity cannot fabricate a card; show the collection-complete state and use only an explicitly configured fallback. Pity state persists through save/cloud migration and cannot be reset by app restart.
+- [ ] SB-M43-R07-004 Pity applies only to **earned** card packs under the current V1 policy. It cannot be purchased, rerolled for money/SB, accelerated by watching ads or converted into a paid-random mechanic; M57's no-paid-random-pack rule remains intact.
+- [ ] SB-M43-R07-005 Make pity legible rather than covert: when one pack away from guarantee, Collection/pack UI may state **NEW CARD GUARANTEED NEXT PACK**; never use near-miss animation or misleading "almost won" presentation.
+- [ ] SB-M43-R07-006 Tune a **First Collection Sprint** so an ordinarily engaged fresh player can realistically complete Set 1 during the early campaign, target window roughly Levels 20–40, using earned progression/Daily/Gift pack sources rather than purchases; exact source placement remains data-driven and must not alter robot-unlock pacing.
+
 #### M43-C008 - Robots Destination
 
 - [ ] SB-M43-102 Implement ROBOTS bottom-nav destination for the canonical 10-robot roster.
@@ -1893,6 +1924,18 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 - [ ] SB-M43-120 Gift Bar claim/history never feeds Gift Meter recursively and never re-grants claimed milestones.
 - [ ] SB-M43-121 Test local-day rollover, missed-day reset, clock rollback, all-3 Tasks completion, Gift rollover and duplicate taps.
 
+
+#### M43-C009R - Daily Scrub Orders / Earned ScrubBox [OWNER APPROVED 2026-09-30]
+
+This extension **does not change** the canonical consecutive-login reset rule or repeating 5-day Daily reward cycle.
+
+- [ ] SB-M43-R09-001 Replace generic task content with a data-driven **Daily Scrub Orders** archetype pool while keeping **exactly three active tasks/day** and the existing 75/100/125 SB reward tiers.
+- [ ] SB-M43-R09-002 Eligible task archetypes should advance through ordinary play: complete progression levels, clear bounded amounts/colors, win a qualifying difficulty, complete a level without a booster, or other already-unlocked normal actions; never require real-money spend, ad viewing or an unavailable feature.
+- [ ] SB-M43-R09-003 Daily generation uses the local-day authority plus deterministic/versioned eligibility rules so tasks cannot silently reroll on relaunch; exclude impossible tasks based on current frontier, unlocked systems and available production content.
+- [ ] SB-M43-R09-004 Keep one easy / one normal / one stretch intent aligned with 75/100/125 SB while bounding grind; a task must be finishable in a normal play session and must not encourage intentionally losing or wasting Hearts.
+- [ ] SB-M43-R09-005 Present the existing all-3 completion reward through an **earned ScrubBox** ceremony. Phase A reward floor remains the canonical one random Booster Charge exactly once; the box is never sold and has no paid reroll/open-speed mechanic.
+- [ ] SB-M43-R09-006 A future small surprise bonus slot (bounded SB/card-pack/approved existing reward types only) may be enabled from versioned tuning **only after M56 economy/retention simulation and owner approval**; no jackpot/near-miss presentation and no new currency.
+
 #### M43-C010 - Bottom Navigation / Profile / Achievements / Events / Ranks
 
 - [ ] SB-M43-122 BottomNav destinations are real: EVENTS / ROBOTS / HOME / RANKS / SETTINGS. No shipping dead tab.
@@ -1908,6 +1951,17 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 - [ ] SB-M43-132 Implement RANKS destination with season/window label, player placement, surrounding ranks, top ranks, loading/offline/empty states and privacy-safe display identity.
 - [ ] SB-M43-133 Produce/owner-approve Ranks visual master before production binding.
 - [ ] SB-M43-134 Home/BottomNav badge system supports Tasks ready, Daily ready, Gift claimable, Robot unlock/new, Collection new, Event active/reward and other approved attention states without notification spam.
+
+
+#### M43-C010R - Weekly Mini Event / First-Try Challenge / Personal Best [OWNER APPROVED 2026-09-30]
+
+- [ ] SB-M43-R10-001 Ship a reusable **Weekly Cleaning Event** template under EVENTS: seven-day window, normal progression play contributes automatically, no new event currency, and fixed milestone rewards use only approved SB/Card Pack/Booster/Bot Part reward types.
+- [ ] SB-M43-R10-002 Weekly progress should primarily count valid first-clear progression wins or another owner-configured normal-play signal; replay farming, ad watching and spending do not become the fastest event path.
+- [ ] SB-M43-R10-003 Missing a day does not reset Weekly Event progress. Event expiry/claim state is explicit, stale events fail safely, and unclaimed-expiry policy must be owner/config-defined before launch.
+- [ ] SB-M43-R10-004 Add an opt-in **First-Try Cleanup** challenge: five qualifying progression levels form a run; only the first attempt at each qualifying level can extend the run, and a qualifying loss resets only the event run, never campaign progression.
+- [ ] SB-M43-R10-005 First-Try Cleanup cannot charge an extra Heart beyond the normal attempt, sell a paid continue, rewind completed campaign levels or let replay farm the run; rewards are fixed/visible before participation.
+- [ ] SB-M43-R10-006 Add **Personal Best** records to Profile/Achievements using self-comparison only: best Win Streak, best first-try run, boosterless first-clear count/run and other fair non-pay-to-win mastery records. No asynchronous social comparison is added by this approval.
+- [ ] SB-M43-R10-007 Where useful, show a lightweight **self-ghost** progress marker against the player's own prior best/current record target; it is informational, never changes difficulty/rewards and cannot imply a global/friend opponent.
 
 #### M43-C011 - World Progression / World Home System
 
@@ -1931,6 +1985,17 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 - [ ] SB-M43-149 Never send notification spam for every Heart tick, every failed attempt or repeated unclaimed badge.
 - [ ] SB-M43-150 Produce/approve any comeback/notification-permission illustration needed; keep system permission UI native.
 - [ ] SB-M43-151 Test timezone changes, missed days, expired events, disabled permissions and stale deep links.
+
+
+#### M43-C012R - Comeback Catch-Up / Smart Notification Prioritization [OWNER APPROVED 2026-09-30]
+
+- [ ] SB-M43-R12-001 Add a configurable **Comeback Catch-Up Track** for a genuine absence (initial tuning candidate: >=48 hours): three qualifying first-clear progression wins rebuild momentum through a small capped reward/progress sequence using only approved existing reward types.
+- [ ] SB-M43-R12-002 Catch-Up never restores missed Daily login days, never changes the existing consecutive-login reset/cycle rule, never retroactively grants missed event/Daily rewards and never multiplies normal level economy.
+- [ ] SB-M43-R12-003 Catch-Up is offered once per eligible return window, persists across relaunch, completes/expirs deterministically and cannot be farmed by clock rollback, uninstall/reinstall or repeatedly backgrounding the app.
+- [ ] SB-M43-R12-004 Define a notification **priority/dedup authority** across Hearts ready, Daily available, Gift claimable and Event ending so simultaneous triggers collapse into the single most useful message/deep link instead of multiple pushes.
+- [ ] SB-M43-R12-005 Default retention-notification cap: at most one non-transactional proactive push per local 24-hour period, respecting opt-in, per-category toggles and quiet hours; user-requested/platform-transactional notifications remain separately governed.
+- [ ] SB-M43-R12-006 Notification copy must be factual and non-guilt-inducing, must not claim expiring rewards that are not actually expiring, and must suppress stale/already-consumed prompts before send when current state is available.
+- [ ] SB-M43-R12-007 Add tests for absence qualification, catch-up idempotency, Daily-rule non-interference, priority collapse, 24-hour cap, quiet hours, stale-state suppression and deep-link fallback.
 
 #### M43-C013 - Account / Cloud Save / Cross-Device Recovery
 
@@ -2033,6 +2098,14 @@ Purpose: teach the real production game progressively and prevent the first sess
 - [ ] SB-M44-019 Validate tutorial on fresh-save, interrupted/resumed, app-backgrounded, skipped/replayed and migrated-save paths.
 - [ ] SB-M44-020 Owner playtest the complete first-session funnel and revise friction before M44 closes.
 
+
+#### M44 Retention Feature-Pacing Additions [OWNER APPROVED 2026-09-30]
+
+- [ ] SB-M44-021 Introduce Next Cleanup teaser + 10-Level Cleaning Journey during the first-session Results flow only after the player understands win/continue; do not add another blocking tutorial wall.
+- [ ] SB-M44-022 Sequence Collection onboarding so Set 1 / first earned packs establish the First Collection Sprint early, while pity remains invisible until relevant and then explains itself truthfully.
+- [ ] SB-M44-023 Unlock Daily Scrub Orders, Weekly Cleaning Event and First-Try Cleanup only after their prerequisite core/meta systems are understood; exact campaign unlock points remain data-driven under SB-M44-010/011.
+- [ ] SB-M44-024 Comeback Catch-Up is never part of fresh-user FTUE; it activates only after a previously established player meets the configured absence rule.
+
 ### M45 — Debug Tooling
 
 - [ ] SB-M45-001 Debug overlay.
@@ -2131,6 +2204,9 @@ Maximum board target: 59×59 = 3,481.
 - [ ] SB-M49-028 Validate modal stacks, keyboard/back navigation and scrollable Collection/Shop/Events/Robots screens on compact and tall devices.
 - [ ] SB-M49-029 Validate rewarded-ad/store return transitions and platform overlays do not corrupt safe-area layout.
 - [ ] SB-M49-030 Validate notification deep links and account/cloud conflict screens enter a safe responsive destination.
+- [ ] SB-M49-031 Validate Next Cleanup preview, 10-node journey, ScrubBox, Weekly/First-Try tracks and Comeback Catch-Up across the full viewport/safe-area matrix without shrinking primary gameplay/results CTAs below touch standards.
+- [ ] SB-M49-032 Ensure 10-node journey and event tracks degrade gracefully on compact devices through scrolling/compression rules without turning them into a shipping level-select grid.
+
 ### M50 — Accessibility
 
 - [ ] SB-M50-001 Review color-only information.
@@ -2151,6 +2227,8 @@ Maximum board target: 59×59 = 3,481.
 - [ ] SB-M50-014 Video/ad acquisition has an accessible non-video paid/earned path where product policy permits and never traps navigation.
 - [ ] SB-M50-015 Event/rank/card rarity/robot-lock states have icon/text cues in addition to color.
 - [ ] SB-M50-016 Screen-reader/accessibility-label strategy is defined for interactive controls before release.
+- [ ] SB-M50-017 Retention surfaces must expose progress/state in text/icon form as well as animation/color; mystery reveal, pity guarantee, event reset and catch-up eligibility must remain understandable under Reduced Effects and assistive presentation.
+
 ### M51 — Localization Readiness
 
 - [ ] SB-M51-001 Avoid hard-coded user text.
@@ -2354,6 +2432,11 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 - [ ] SB-M54-030 Feature-unlock/FTUE migration and once-only coachmark regression.
 - [ ] SB-M54-031 Cloud/account sync/conflict/restore regression once provider exists.
 - [ ] SB-M54-032 World registry/unlock/transition regression once future world ranges are owner-defined.
+- [ ] SB-M54-033 Next Cleanup / 10-Level Journey regression: exact next-content resolution, frontier fallback, no duplicate transition, cycle-boundary correctness and no level-select leakage.
+- [ ] SB-M54-034 Collection retention regression: pity increment/reset/guarantee, complete-pool fallback, save/cloud continuity and First Collection Sprint reward-source idempotency.
+- [ ] SB-M54-035 Daily/Event retention regression: deterministic three Scrub Orders, ScrubBox exactly-once, Weekly Event anti-replay-farm, First-Try reset semantics and Personal Best persistence.
+- [ ] SB-M54-036 Comeback/notification regression: absence qualification, catch-up no-Daily-rule mutation, rollback safety, notification priority/dedup, quiet hours and proactive 24-hour cap.
+
 ### M55 — Chaos / Long-Run QA `[QA]`
 
 **M55 current-build core: CLOSED.** SB-M55-001..017 AUDITED_PASS in C001; timed-2x anti-rollback remediation C002 AUDITED_PASS at `023a0fc`. Audits: `coordination/sessions/M55-C001/CHATGPT_AUDIT_V01.md`, `coordination/sessions/M55-C002/CHATGPT_AUDIT_V01.md`. SB-M55-018..024 remain deferred until their M43+ surfaces exist.
@@ -2415,6 +2498,16 @@ No analytics SDK without owner approval. Event contracts may be designed and loc
 - [ ] SB-M56-014 Analytics events never grant rewards, alter difficulty, change solver truth or become a required dependency for offline gameplay.
 - [ ] SB-M56-015 Define consent/age/privacy gating with M58 before production provider activation.
 - [ ] SB-M56-016 Add analytics schema tests, duplicate-event guards where important and provider-offline fail-safe behavior.
+
+#### M56 Retention V2 Measurement Additions
+
+- [ ] SB-M56-017 Measure Next Cleanup teaser impression → CLEAN NEXT tap → next-level-start conversion, with frontier/unavailable states separated from player choice.
+- [ ] SB-M56-018 Measure 10-Level Cleaning Journey progression/drop-off by cadence slot 1..10 and cycle completion without using the metric to dynamically manipulate difficulty per individual player.
+- [ ] SB-M56-019 Measure Collection new-card rate, duplicate streak length, pity-trigger frequency, guarantee fulfillment and Set-1 completion level distribution; use results to tune fairness, not to sell random outcomes.
+- [ ] SB-M56-020 Measure Daily Scrub Order archetype completion/time-to-complete, 3/3 completion and ScrubBox claim; reject task archetypes that create disproportionate grind or Heart waste.
+- [ ] SB-M56-021 Measure Weekly Event participation/milestone completion and First-Try run depth/reset frequency separately from core campaign retention.
+- [ ] SB-M56-022 Measure Comeback Catch-Up offer → return-session → three-win completion → subsequent D1/D7 return, while preserving the current Daily streak rules as a separate metric.
+- [ ] SB-M56-023 Measure notification eligible/suppressed/sent/opened/deep-link outcomes with category and dedup reason; do not optimize by increasing push frequency beyond the owner cap or by using guilt/urgency copy.
 
 ### M57 - Monetization / Rewarded Ads / Store Products [OWNER-LOCKED SCOPE, IMPLEMENTATION GATED BY PROVIDER DECISION]
 
