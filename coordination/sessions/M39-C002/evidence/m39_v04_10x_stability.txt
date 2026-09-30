@@ -1,0 +1,20 @@
+M39-C002 V01 — m39_v04_integration 10x isolated stability batch
+Date: 2026-09-30   Engine: 4.7.2.stable.official.ed1daf0bf
+Command (each run a separate process): godot --headless --path . -s res://tests/m39_v04_integration.gd
+Final test code: tests/m39_v04_integration.gd (working tree == committed M39-C002 V01 change)
+Columns: exit code | suite summary | Phase C FAIL lines | 'economy (charge/SB) exact' ok lines (4 = engine/strip x charge/SB)
+
+run 1 exit=0 summary=M39 V04 integration evidence: PASS phaseC_fail=0 exact_ok=4
+run 2 exit=0 summary=M39 V04 integration evidence: PASS phaseC_fail=0 exact_ok=4
+run 3 exit=0 summary=M39 V04 integration evidence: PASS phaseC_fail=0 exact_ok=4
+run 4 exit=0 summary=M39 V04 integration evidence: PASS phaseC_fail=0 exact_ok=4
+run 5 exit=0 summary=M39 V04 integration evidence: PASS phaseC_fail=0 exact_ok=4
+run 6 exit=0 summary=M39 V04 integration evidence: PASS phaseC_fail=0 exact_ok=4
+run 7 exit=0 summary=M39 V04 integration evidence: PASS phaseC_fail=0 exact_ok=4
+run 8 exit=0 summary=M39 V04 integration evidence: PASS phaseC_fail=0 exact_ok=4
+run 9 exit=0 summary=M39 V04 integration evidence: PASS phaseC_fail=0 exact_ok=4
+run 10 exit=0 summary=M39 V04 integration evidence: PASS phaseC_fail=0 exact_ok=4
+
+Result: 10/10 exit 0, 0 Phase C failures, exact whole-economy rollback equality ok in all 4 cases on every run.
+
+user:// directory listing before batch vs after batch: identical (no leaked temp saves).
