@@ -4,17 +4,17 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 ## Project Status
 
-- Current Milestone: M39 ECONOMY TEST STABILITY
-- Current Sprint: M39-C002 — Clock-Boundary Test Stability Follow-Up
-- Current Task: CLAUDE stabilizes SB-M39-053 by injecting a deterministic fixed clock into the M39 V04 +1 Slot rollback test fixture
+- Current Milestone: M42 HOME SCRUBBY HERO SCALE LOCK
+- Current Sprint: M42-C002 — Home Scrubby Hero Scale + Placement Lock
+- Current Task: CLAUDE implements SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612`
 - Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M39-C002/CHATGPT_PROMPT_V01.md` against `coordination/sessions/M39-C002/CHATGPT_AUDIT_CRITERIA_V01.md`. Preserve exact whole-economy rollback equality, change no production code, prove 10/10 isolated stability, then return for independent ChatGPT audit.
+- Next Task/Action: CLAUDE executes `coordination/sessions/M42-C002/CHATGPT_PROMPT_V01.md` against `coordination/sessions/M42-C002/CHATGPT_AUDIT_CRITERIA_V01.md`. Scale current Home Scrubby exactly from 1.24 to 1.612, preserve soles/platform anchoring and current 940x1672 Home authority, validate four required viewports, produce fresh evidence, then return for independent ChatGPT audit.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 958 / 1360 = 70.44%. SB-M32-UI-012 is CLOSED after independent technical PASS plus owner visual PASS on all four review items. Current work is SB-M39-053 clock-boundary test stability; production economy semantics are locked.
-- Note: M32-C002 owner gate `coordination/sessions/M32-C002/OWNER_VISUAL_GATE_V01.md` is OWNER PASS / CLOSED. SB-M39-053 targets only the flaky moving-real-clock test fixture in `tests/m39_v04_integration.gd`; the exact `econ.snapshot() == pre_econ` rollback assertion must remain unchanged in strength.
-- Owner sequencing lock: (1) SB-M39-053 test-stability; (2) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (3) only after that owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation; (4) resume existing M43/meta roadmap.
+- Progress: 959 / 1360 = 70.51%. SB-M39-053 is CLOSED after deterministic fixed-clock fixture remediation and independent audit PASS with 10/10 isolated stability. Current work is SB-M42-034 Home Scrubby Hero Scale + Placement Lock.
+- Note: M39-C002 audit `coordination/sessions/M39-C002/CHATGPT_AUDIT_V01.md` is AUDITED_PASS / CLOSED. M42-C002 now owns only the static Home hero scale/placement lock at 1.612; animation task SB-M42-035 remains blocked until owner visually accepts the enlarged hero.
+- Owner sequencing lock: (1) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (2) only after owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation; (3) resume existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1613,7 +1613,7 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [x] SB-M39-050 Implement per-card and EXCHANGE ALL EXTRAS atomic exchange; never reduce collected owned count below 1.
 - [x] SB-M39-051 Prove Stars, Star Exchange, Event Points and profile-XP economic state do not exist in production save/runtime APIs.
 - [x] SB-M39-052 Add full Economy V1 headless regression matrix for grants/spends/rollover/offline clocks/boosters/exchange/idempotency.
-- [ ] SB-M39-053 Test stability follow-up: remove the real-wall-clock boundary flake in `tests/m39_v04_integration.gd` `_phase_c_plus_one()` while preserving the strong exact whole-economy rollback assertion. Inject a deterministic fixed clock/local-day through existing AppState/economy test seams; do not mask `hearts.anchor` / `speed.clock_high_water` and do not change production code. Prove 10/10 consecutive isolated runs plus root/M39/M40/M43/M55 clock/economy regressions. Prompt: `coordination/sessions/M39-C002/CHATGPT_PROMPT_V01.md`; criteria: `coordination/sessions/M39-C002/CHATGPT_AUDIT_CRITERIA_V01.md`. `[CURRENT / READY_FOR_CLAUDE]`
+- [x] SB-M39-053 Test stability follow-up: real-wall-clock boundary flake removed from `tests/m39_v04_integration.gd` `_phase_c_plus_one()` by injecting deterministic fixed clock/local-day through the existing AppState/economy test seam. Exact whole-economy `econ.snapshot() == pre_econ` assertion remains intact; production code unchanged; 10/10 isolated runs PASS plus root/M39/M40/M43/M55 clock/economy regressions PASS. Implementation `1cd735a623785a8115315d4b26dca14e97076726`; audit `coordination/sessions/M39-C002/CHATGPT_AUDIT_V01.md`. `[AUDITED_PASS / CLOSED 2026-09-30]`
 
 ### M40 — Save System
 
@@ -1727,7 +1727,7 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 - [x] SB-M42-031 Playback frequency `[OWNER-LOCKED]`: cinematic plays on every cold/native app launch; no replay for internal navigation/retry/background resume.
 - [ ] SB-M42-032 Validate opening cinematic on Android real device for smooth 720p/30 playback, audio sync, startup latency, orientation, background/foreground behavior and memory cleanup. `[CODE_AUDIT_PASS / DEVICE_OWNER_REQUIRED]`
 - [ ] SB-M42-033 Validate iOS readiness later with the same boot-flow fallback and aspect rules. `[CODE_AUDIT_PASS / IOS_DEVICE_LATER]`
-- [ ] SB-M42-034 Home Scrubby Hero Scale + Placement Lock: enlarge the current Home hero exactly +30% from production `SCRUBBY_SCALE = 1.24` to canonical `SCRUBBY_SCALE = 1.612`, preserving the separate runtime hero layer, visible-sole/platform anchor, Home input/UI hierarchy and responsive safe-area behavior. Validate all supported Home viewports against the currently approved background and obtain owner visual acceptance before animation asset production. Authority: `coordination/OWNER_M42_HOME_SCRUBBY_ANIMATION_V01.md`. Sequence after SB-M39-053; do not interrupt current M28 remediation.
+- [ ] SB-M42-034 Home Scrubby Hero Scale + Placement Lock: enlarge the current Home hero exactly +30% from production `SCRUBBY_SCALE = 1.24` to canonical `SCRUBBY_SCALE = 1.612`, preserving the separate runtime hero layer, visible-sole/platform anchor, Home input/UI hierarchy and responsive safe-area behavior. Validate 1080x2160, 1080x1920, 1290x2796 and 1536x2048 against the current 940x1672 owner-selected Home background and obtain owner visual acceptance before any animation asset production. Authority: `coordination/OWNER_M42_HOME_SCRUBBY_ANIMATION_V01.md`. Prompt: `coordination/sessions/M42-C002/CHATGPT_PROMPT_V01.md`; criteria: `coordination/sessions/M42-C002/CHATGPT_AUDIT_CRITERIA_V01.md`. `[CURRENT / READY_FOR_CLAUDE]`
 - [ ] SB-M42-035 Home Scrubby Runtime Animation: only after SB-M42-034 owner scale/placement PASS, author and integrate the animation system against that exact enlarged 1.612 Home hero presentation. Add calm idle micro-motion plus short Wave / Bow / Turn-Look gestures, 6–12 s low-frequency scheduling, no immediate repeats, stable feet/pivot/alpha bounds, no Home input blocking, lifecycle/modal pause safety, Reduced Effects static/low-motion fallback, cached transparent frame/atlas assets, responsive evidence and owner visual acceptance. Do not finalize gesture assets against the old 1.24 hero and scale them opportunistically. Authority: `coordination/OWNER_M42_HOME_SCRUBBY_ANIMATION_V01.md`.
 
 ### M43 - Results / Player Experience / Meta UI Surface Program [PLANNED / REQUIRED]
