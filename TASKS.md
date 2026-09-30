@@ -4,17 +4,17 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 ## Project Status
 
-- Current Milestone: M32 GAMEPLAY SCRUBBOT APPARENT SIZE
-- Current Sprint: M32-C002 — Board-Resolution-Independent Scrubbot Apparent Size
-- Current Task: OWNER visual acceptance of SB-M32-UI-012 board-resolution-independent Scrubbot apparent size
-- Current Task Status: AUDITED_PASS / OWNER_VISUAL_ACCEPTANCE_REQUIRED
-- Next Task/Action: OWNER executes `coordination/sessions/M32-C002/OWNER_VISUAL_GATE_V01.md`: review cross-board size consistency, 32x32 reference preservation, rectangular boards, and live/echo proportion. If all are approved, close SB-M32-UI-012 and advance to SB-M39-053.
-- Required Actor: OWNER
+- Current Milestone: M39 ECONOMY TEST STABILITY
+- Current Sprint: M39-C002 — Clock-Boundary Test Stability Follow-Up
+- Current Task: CLAUDE stabilizes SB-M39-053 by injecting a deterministic fixed clock into the M39 V04 +1 Slot rollback test fixture
+- Current Task Status: READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M39-C002/CHATGPT_PROMPT_V01.md` against `coordination/sessions/M39-C002/CHATGPT_AUDIT_CRITERIA_V01.md`. Preserve exact whole-economy rollback equality, change no production code, prove 10/10 isolated stability, then return for independent ChatGPT audit.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 960 / 1364 = 70.38%. SB-M32-UI-012 implementation `649cf6290752e298b888eac6e080fb65bb2be9ed` is independently AUDITED_PASS. Measured Scrubbot footprint is 58.64 px across 20/32/38/59, rectangular, and synthetic 100 cases at the same 1080x2160 presentation. Owner visual acceptance remains required.
-- Note: M32-C002 audit `coordination/sessions/M32-C002/CHATGPT_AUDIT_V01.md` is technical PASS. Owner gate `coordination/sessions/M32-C002/OWNER_VISUAL_GATE_V01.md` asks only whether 20/32/38/59 look same-sized, 32x32 still matches the accepted reference, rectangular boards look natural, and retire-echo proportion looks right.
-- Owner sequencing lock: (1) SB-M32-UI-012 owner visual acceptance/closure; (2) SB-M39-053 test-stability; (3) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (4) only after that owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation; (5) resume existing M43/meta roadmap.
+- Progress: 961 / 1364 = 70.45%. SB-M32-UI-012 is CLOSED after independent technical PASS plus owner visual PASS on all four review items. Current work is SB-M39-053 clock-boundary test stability; production economy semantics are locked.
+- Note: M32-C002 owner gate `coordination/sessions/M32-C002/OWNER_VISUAL_GATE_V01.md` is OWNER PASS / CLOSED. SB-M39-053 targets only the flaky moving-real-clock test fixture in `tests/m39_v04_integration.gd`; the exact `econ.snapshot() == pre_econ` rollback assertion must remain unchanged in strength.
+- Owner sequencing lock: (1) SB-M39-053 test-stability; (2) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (3) only after that owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation; (4) resume existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1355,7 +1355,7 @@ Closure evidence: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V03.md` + `coord
 - [x] SB-M32-UI-009 Configure Godot import settings.
 - [x] SB-M32-UI-010 Integrate approved art without coupling animation to TargetSelector logic.
 - [x] SB-M32-UI-011 Validate readability/scale on phone viewport matrix.
-- [ ] SB-M32-UI-012 Board-resolution-independent Scrubbot apparent size: presentation-scale compensation is derived from actual rendered BoardPresentation geometry using the accepted 32x32 / 2.4-cell appearance as reference; live visuals and retire echo follow responsive relayout without gameplay-truth mutation. Implementation `649cf6290752e298b888eac6e080fb65bb2be9ed`; audit `coordination/sessions/M32-C002/CHATGPT_AUDIT_V01.md`: `[AUDITED_PASS / OWNER VISUAL ACCEPTANCE REQUIRED]`; owner gate: `coordination/sessions/M32-C002/OWNER_VISUAL_GATE_V01.md`. Measured 1080x2160 body footprint is 58.64 px on 20/32/38/59, 59x40, 24x40 and synthetic 100x100; echo/live ratio remains 0.875. Owner acceptance is the only closure gate.
+- [x] SB-M32-UI-012 Board-resolution-independent Scrubbot apparent size: presentation-scale compensation derives from actual rendered BoardPresentation geometry using the accepted 32x32 / 2.4-cell reference; live visuals and retire echo follow responsive relayout without gameplay-truth mutation. Implementation `649cf6290752e298b888eac6e080fb65bb2be9ed`; audit `coordination/sessions/M32-C002/CHATGPT_AUDIT_V01.md`; owner gate `coordination/sessions/M32-C002/OWNER_VISUAL_GATE_V01.md`: V1/V2/V3/V4 all OK. `[AUDITED_PASS + OWNER VISUAL PASS / CLOSED 2026-09-30]`
 
 ### M33 — Audio `[OWNER-LOCKED AUDIO SELECTION V02 2026-09-24]`
 
@@ -1524,7 +1524,7 @@ Machine tuning: `data/config/economy_rewards_v1.json`.
 - [x] SB-M39-050 Implement per-card and EXCHANGE ALL EXTRAS atomic exchange; never reduce collected owned count below 1.
 - [x] SB-M39-051 Prove Stars, Star Exchange, Event Points and profile-XP economic state do not exist in production save/runtime APIs.
 - [x] SB-M39-052 Add full Economy V1 headless regression matrix for grants/spends/rollover/offline clocks/boosters/exchange/idempotency.
-- [ ] SB-M39-053 Test stability follow-up: remove the real-wall-clock boundary flake in `tests/m39_v04_integration.gd` `_phase_c_plus_one()` while preserving the strong exact economy rollback assertion. Preferred fix: inject a deterministic fixed clock into the host/economy test fixture rather than masking `hearts.anchor` / `speed.clock_high_water`; prove stability with 10 consecutive isolated runs plus root suite. Schedule only after M28-C002-C003-R01 V02 closes.
+- [ ] SB-M39-053 Test stability follow-up: remove the real-wall-clock boundary flake in `tests/m39_v04_integration.gd` `_phase_c_plus_one()` while preserving the strong exact whole-economy rollback assertion. Inject a deterministic fixed clock/local-day through existing AppState/economy test seams; do not mask `hearts.anchor` / `speed.clock_high_water` and do not change production code. Prove 10/10 consecutive isolated runs plus root/M39/M40/M43/M55 clock/economy regressions. Prompt: `coordination/sessions/M39-C002/CHATGPT_PROMPT_V01.md`; criteria: `coordination/sessions/M39-C002/CHATGPT_AUDIT_CRITERIA_V01.md`. `[CURRENT / READY_FOR_CLAUDE]`
 
 ### M40 — Save System
 
