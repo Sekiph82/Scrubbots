@@ -1,0 +1,45 @@
+M39-C002 V01 — regression summary
+Date: 2026-09-30   Engine: 4.7.2.stable.official.ed1daf0bf
+Each suite run as its own headless process on the final code (suites run 4-way parallel; root runner run separately).
+
+Suite | exit | summary line
+m39_v02_atomicity.gd | 0 | M39 V02 atomicity/hardening evidence: PASS
+m39_v02_capacity.gd | 0 | M39 V02 capacity evidence: PASS
+m39_v02_integration.gd | 0 | M39 V02 production integration evidence: PASS
+m39_v03_full_surface.gd | 0 | M39 V03 full-surface evidence: PASS
+m39_v03_integration.gd | 0 | M39 V03 integration evidence: PASS
+m39_v04_integration.gd | 0 | M39 V04 integration evidence: PASS
+m39_v04_tornado_inflight.gd | 0 | M39 V04 tornado in-flight evidence: PASS
+m39a_economy_core.gd | 0 | M39 Phase A evidence: PASS
+m39b_hearts_speed.gd | 0 | M39 Phase B evidence: PASS
+m39c_boosters.gd | 0 | M39 Phase C evidence: PASS
+m39d_daily_collection.gd | 0 | M39 Phase D evidence: PASS
+m39e_full_matrix.gd | 0 | M39 Phase E evidence: PASS
+m40_save_system.gd | 0 | M40 save system evidence: PASS
+m40_v02_safety.gd | 0 | M40 V02 safety evidence: PASS
+m40_v03_canonical.gd | 0 | M40 V03 canonical evidence: PASS
+m40_v04_bootstrap.gd | 0 | M40 V04 bootstrap evidence: PASS
+m43_c001a_results_foundation.gd | 0 | M43-C001A results foundation evidence: PASS (11/11 cases, 0 fail)
+m43_c001b_won_results_visual.gd | 0 | M43-C001B WON results visual evidence: PASS (11/11 cases, 0 fail)
+m43_c002_c001_popup_modal_pause.gd | 0 | M43-C002-C001 popup / modal / Pause foundation evidence: PASS (23/23 cases, 0 fail)
+m43_c003_c001_acquisition.gd | 0 | M43-C003-C001 acquisition evidence: PASS (34/34 cases, 0 fail)
+m55_c002_timed_2x_anti_rollback.gd | 0 | M55-C002 TIMED 2X ANTI-ROLLBACK: PASS
+m55_core_chaos.gd | 0 | M55 CORE CHAOS: PASS
+m55_economy_release_regression.gd | 0 | M55 ECONOMY RELEASE REGRESSION: PASS
+m55_heart_900_authority.gd | 0 | M55 HEART 900 AUTHORITY: PASS
+m55_long_session.gd | 0 | M55 LONG SESSION: PASS
+tests/run_tests.gd (root) | 0 | RESULT: ALL PASS ; Total checks: 5323
+
+Wall-clock production semantics (fixture change does not touch these suites):
+  m39b_hearts_speed.gd              PASS (32 ok) — 900 s regen, offline wall-clock regen, clock-rollback no-regen
+  m55_c002_timed_2x_anti_rollback.gd PASS (53 ok) — timed 2x wall clock + clock_high_water anti-rollback
+  m55_heart_900_authority.gd        PASS (19 ok) — 900-second Heart authority
+  m39_v04_integration Phase B       PASS — real OS local-calendar provider still asserted (AppState/EconomyServices default = OS local date)
+
+FAIL: lines across all suite outputs: 0
+Historical M21 v08/v09 signatures: not encountered (root runner ALL PASS).
+m39_v04_integration 10x isolated: 10/10 exit 0 (see m39_v04_10x_stability.txt).
+git diff --check: clean.
+user:// listing before stability batch vs after full regression: identical (no leaked temp saves).
+
+Production files diff vs origin/main 8a4f947: none (only tests/m39_v04_integration.gd + coordination/sessions/M39-C002/**).

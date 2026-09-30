@@ -21,6 +21,11 @@ const ScrubbotAgent = preload("res://scripts/gameplay/agents/scrubbot_agent.gd")
 
 const DT := 1.0
 const MAX_TICKS := 80000
+## M39-C002 (SB-M39-053): Phase C runs on a fixed wall clock + local day injected
+## through the AppState test seam, so the exact whole-economy rollback equality
+## (hearts.anchor, speed.clock_high_water included) never straddles a real second.
+const PHASE_C_FIXED_CLOCK := 1790000000          # 2026-09-21 UTC, positive + deterministic
+const PHASE_C_LOCAL_DAY := PHASE_C_FIXED_CLOCK / 86400
 
 var _fail := 0
 var _now := 0
@@ -146,10 +151,19 @@ func _phase_b_calendar() -> void:
 
 func _phase_c_plus_one() -> void:
 	print("[C +1 Slot exact rollback]")
-	var h = await _make_host()
+	var save_path := "user://m39_v04_phase_c_fixed_%d.dat" % Time.get_ticks_usec()
+	_remove_save(save_path)
+	var app = AppState.new(save_path, func(): return PHASE_C_FIXED_CLOCK, func(): return PHASE_C_LOCAL_DAY)
+	var h = await _make_host(app)
 	if h == null:
+		_remove_save(save_path)
 		return
 	var econ = h.get_economy()
+	print("  info: fixed clock=%d local_day=%d save=%s" % [PHASE_C_FIXED_CLOCK, PHASE_C_LOCAL_DAY, save_path])
+	_ok(econ == app.economy, "host consumes injected AppState economy (fixed-clock graph)")
+	_ok(int(econ.hearts._clock.call()) == PHASE_C_FIXED_CLOCK and int(econ.speed._clock.call()) == PHASE_C_FIXED_CLOCK
+		and int(econ.daily._clock.call()) == PHASE_C_FIXED_CLOCK, "hearts/speed/daily clocks = fixed clock")
+	_ok(int(econ.daily._local_day_provider.call()) == PHASE_C_LOCAL_DAY, "daily local day = fixed local day")
 	var strip = h.get_screen().get_five_slot_strip()
 	var origin = h.get_origin_provider()
 	for stage in ["engine", "strip"]:
@@ -159,6 +173,8 @@ func _phase_c_plus_one() -> void:
 			else:
 				econ.wallet.credit(EconomyWallet.SCRUB_BUCKS, 100000)
 			var pre_econ = econ.snapshot()
+			_ok(int(pre_econ["hearts"]["anchor"]) == PHASE_C_FIXED_CLOCK and int(pre_econ["speed"]["clock_high_water"]) == PHASE_C_FIXED_CLOCK,
+				"%s/%s: pre hearts.anchor + speed.clock_high_water deterministic" % [stage, pay])
 			var pre_slots = h.get_slots().snapshot()
 			h.set_plus_one_fault_injector(func(s): return s == stage)
 			_ok(not h.activate_plus_one_slot(), "%s/%s: forced failure returns false" % [stage, pay])
@@ -166,6 +182,10 @@ func _phase_c_plus_one() -> void:
 			_ok(h.get_slots().snapshot() == pre_slots, "%s/%s: M24 slots exact" % [stage, pay])
 			_ok(strip.get_capacity() == 5 and strip.get_slot_count() == 5, "%s/%s: strip back at 5" % [stage, pay])
 			_ok(econ.capacity.active_capacity() == 5 and econ.capacity.can_activate_plus_one(), "%s/%s: capacity authority (5, unused)" % [stage, pay])
+			var post_econ = econ.snapshot()
+			print("  info: %s/%s hearts.anchor pre=%d post=%d speed.clock_high_water pre=%d post=%d" % [stage, pay,
+				pre_econ["hearts"]["anchor"], post_econ["hearts"]["anchor"],
+				pre_econ["speed"]["clock_high_water"], post_econ["speed"]["clock_high_water"]])
 			_ok(econ.snapshot() == pre_econ, "%s/%s: economy (charge/SB) exact" % [stage, pay])
 			_ok(not is_finite(origin.origin_for_slot(5).x), "%s/%s: slot 5 origin unroutable" % [stage, pay])
 			_ok(h.get_slots().can_grow_to_sixth(), "%s/%s: can grow again" % [stage, pay])
@@ -181,6 +201,16 @@ func _phase_c_plus_one() -> void:
 	var sb_after: int = econ.wallet.scrub_bucks()
 	_ok(sb_after >= 0, "SB non-negative after commit")
 	_free_host(h)
+	print("  info: temp save written by clean commit: main=%s bak=%s tmp=%s" % [FileAccess.file_exists(save_path),
+		FileAccess.file_exists(save_path + ".bak"), FileAccess.file_exists(save_path + ".tmp")])
+	_remove_save(save_path)
+	_ok(not FileAccess.file_exists(save_path) and not FileAccess.file_exists(save_path + ".bak")
+		and not FileAccess.file_exists(save_path + ".tmp"), "Phase C temp save cleaned")
+
+func _remove_save(path: String) -> void:
+	for suffix in ["", ".bak", ".tmp"]:
+		if FileAccess.file_exists(path + suffix):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(path + suffix))
 
 # ------------------------------------------------------------------ D ----
 
@@ -345,7 +375,9 @@ func _drain(h) -> void:
 		if h.get_completion().is_terminal():
 			break
 
-func _make_host():
+## app: optional injected AppState (Phase C fixed-clock fixture); null keeps the
+## pre-existing host-private fallback economy path for Phases D/E.
+func _make_host(app = null):
 	var sub := SubViewport.new()
 	sub.size = Vector2i(1080, 2160)
 	sub.disable_3d = true
@@ -353,6 +385,7 @@ func _make_host():
 	get_root().add_child(sub)
 	var host = ProductionGameplayHost.new()
 	host.auto_build = false
+	host.app_state = app
 	host.set_anchors_preset(Control.PRESET_FULL_RECT)
 	sub.add_child(host)
 	await process_frame

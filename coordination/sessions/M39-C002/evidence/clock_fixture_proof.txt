@@ -1,0 +1,71 @@
+M39-C002 V01 — Phase C fixed-clock fixture proof (run 1 of the 10x batch)
+
+Seam: AppState.new(save_path, clock, local_day) (existing test seam, scripts/app/app_state.gd:_init)
+      -> EconomyServices.new(DEFAULT_PATH, clock, null, local_day) -> injected as ProductionGameplayHost.app_state before build()
+Fixed clock    : PHASE_C_FIXED_CLOCK = 1790000000 (positive; 2026-09-21 UTC)
+Fixed local day: PHASE_C_LOCAL_DAY   = 1790000000 / 86400 = 20717
+Temp save      : unique user://m39_v04_phase_c_fixed_<ticks_usec>.dat (pre-deleted, removed with .bak/.tmp after host free)
+Canonical save user://scrubbots_save.dat: never referenced by Phase C
+
+---- Phase C output (verbatim) ----
+[C +1 Slot exact rollback]
+  ok: production host built ()
+  info: fixed clock=1790000000 local_day=20717 save=user://m39_v04_phase_c_fixed_1011778.dat
+  ok: host consumes injected AppState economy (fixed-clock graph)
+  ok: hearts/speed/daily clocks = fixed clock
+  ok: daily local day = fixed local day
+  ok: engine/charge: pre hearts.anchor + speed.clock_high_water deterministic
+  ok: engine/charge: forced failure returns false
+  ok: engine/charge: M24 engine back at 5
+  ok: engine/charge: M24 slots exact
+  ok: engine/charge: strip back at 5
+  ok: engine/charge: capacity authority (5, unused)
+  info: engine/charge hearts.anchor pre=1790000000 post=1790000000 speed.clock_high_water pre=1790000000 post=1790000000
+  ok: engine/charge: economy (charge/SB) exact
+  ok: engine/charge: slot 5 origin unroutable
+  ok: engine/charge: can grow again
+  ok: engine/charge: paid via charge and refunded
+  ok: engine/sb: pre hearts.anchor + speed.clock_high_water deterministic
+  ok: engine/sb: forced failure returns false
+  ok: engine/sb: M24 engine back at 5
+  ok: engine/sb: M24 slots exact
+  ok: engine/sb: strip back at 5
+  ok: engine/sb: capacity authority (5, unused)
+  info: engine/sb hearts.anchor pre=1790000000 post=1790000000 speed.clock_high_water pre=1790000000 post=1790000000
+  ok: engine/sb: economy (charge/SB) exact
+  ok: engine/sb: slot 5 origin unroutable
+  ok: engine/sb: can grow again
+  ok: engine/sb: paid via sb and refunded
+  ok: strip/charge: pre hearts.anchor + speed.clock_high_water deterministic
+  ok: strip/charge: forced failure returns false
+  ok: strip/charge: M24 engine back at 5
+  ok: strip/charge: M24 slots exact
+  ok: strip/charge: strip back at 5
+  ok: strip/charge: capacity authority (5, unused)
+  info: strip/charge hearts.anchor pre=1790000000 post=1790000000 speed.clock_high_water pre=1790000000 post=1790000000
+  ok: strip/charge: economy (charge/SB) exact
+  ok: strip/charge: slot 5 origin unroutable
+  ok: strip/charge: can grow again
+  ok: strip/charge: paid via charge and refunded
+  ok: strip/sb: pre hearts.anchor + speed.clock_high_water deterministic
+  ok: strip/sb: forced failure returns false
+  ok: strip/sb: M24 engine back at 5
+  ok: strip/sb: M24 slots exact
+  ok: strip/sb: strip back at 5
+  ok: strip/sb: capacity authority (5, unused)
+  info: strip/sb hearts.anchor pre=1790000000 post=1790000000 speed.clock_high_water pre=1790000000 post=1790000000
+  ok: strip/sb: economy (charge/SB) exact
+  ok: strip/sb: slot 5 origin unroutable
+  ok: strip/sb: can grow again
+  ok: strip/sb: paid via sb and refunded
+  ok: after rollbacks a clean +1 Slot commits
+  ok: engine + strip at 6
+  ok: SB non-negative after commit
+  info: temp save written by clean commit: main=true bak=false tmp=false
+  ok: Phase C temp save cleaned
+
+---- Temp-save cleanup proof ----
+Clean +1 Slot commit hit the AppState save boundary: main file existed (main=true) before cleanup.
+Post-cleanup assertion 'Phase C temp save cleaned' ok (main/.bak/.tmp absent).
+Leftover m39_v04_phase_c_fixed_* files in user:// after 10x batch: 0
+user:// listing before/after 10x batch: identical (107 entries both).
