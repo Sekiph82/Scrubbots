@@ -1,7 +1,7 @@
 # M32-C002 — OWNER VISUAL GATE V01
 
 Date: 2026-09-30
-Status: **OWNER VISUAL ACCEPTANCE REQUIRED**
+Status: **OWNER PASS / CLOSED**
 
 Implementation:
 `649cf6290752e298b888eac6e080fb65bb2be9ed`
@@ -101,6 +101,21 @@ No owner decision is required for:
 - live relayout geometry; technically PASS;
 - route/progress/position truth; technically PASS;
 - performance; technically PASS.
+
+## Owner result — 2026-09-30
+
+- V1 — Cross-board apparent size: **OK**
+- V2 — 32x32 reference preservation: **OK**
+- V3 — Rectangular boards: **OK**
+- V4 — Live / retire-echo proportion: **OK**
+
+Owner accepted the M32-C002 visual result without remediation.
+
+SB-M32-UI-012 is CLOSED.
+M32-C002 is CLOSED.
+
+Next task:
+`SB-M39-053 — Test stability follow-up`
 
 ## Closure
 
