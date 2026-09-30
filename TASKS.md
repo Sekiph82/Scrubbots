@@ -12,7 +12,7 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 961 / 1364 = 70.45%. SB-M32-UI-012 is CLOSED after independent technical PASS plus owner visual PASS on all four review items. Current work is SB-M39-053 clock-boundary test stability; production economy semantics are locked.
+- Progress: 958 / 1360 = 70.44%. SB-M32-UI-012 is CLOSED after independent technical PASS plus owner visual PASS on all four review items. Current work is SB-M39-053 clock-boundary test stability; production economy semantics are locked.
 - Note: M32-C002 owner gate `coordination/sessions/M32-C002/OWNER_VISUAL_GATE_V01.md` is OWNER PASS / CLOSED. SB-M39-053 targets only the flaky moving-real-clock test fixture in `tests/m39_v04_integration.gd`; the exact `econ.snapshot() == pre_econ` rollback assertion must remain unchanged in strength.
 - Owner sequencing lock: (1) SB-M39-053 test-stability; (2) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (3) only after that owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation; (4) resume existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
@@ -711,12 +711,18 @@ Historical runtime-validator milestone. Difficulty V1 later superseded class=dim
 Do not replace existing Prompt 02 fixtures — add to them.
 
 - [x] SB-M04-001 3×2 generic non-square fixture exists.
-- [x] SB-M04-002 20×20. — [x] SB-M04-003 29×29. — [x] SB-M04-004 20×27.
-- [x] SB-M04-005 30×30. — [x] SB-M04-006 39×39. — [x] SB-M04-007 34×39.
+- [x] SB-M04-002 20×20.
+- [x] SB-M04-003 29×29.
+- [x] SB-M04-004 20×27.
+- [x] SB-M04-005 30×30.
+- [x] SB-M04-006 39×39.
+- [x] SB-M04-007 34×39.
 - [x] SB-M04-008 40×40 generic fixture exists.
-- [x] SB-M04-009 49×49. — [x] SB-M04-010 48×41.
+- [x] SB-M04-009 49×49.
+- [x] SB-M04-010 48×41.
 - [x] SB-M04-011 50×50 generic fixture exists.
-- [x] SB-M04-012 59×59. — [x] SB-M04-013 53×59.
+- [x] SB-M04-012 59×59.
+- [x] SB-M04-013 53×59.
 - [x] SB-M04-014 Easy 20×30 fails legacy production validation.
 - [x] SB-M04-015 Medium 39×40 fails.
 - [x] SB-M04-016 Hard 49×50 fails.
@@ -753,9 +759,12 @@ Do not replace existing Prompt 02 fixtures — add to them.
 - [x] SB-M06-008 Preserve logical pixel boundaries.
 - [x] SB-M06-009 Disable unwanted texture filtering.
 - [x] SB-M06-010 Render palette colors correctly.
-- [x] SB-M06-011 Render 20×20. — [x] SB-M06-012 Render 29×29.
-- [x] SB-M06-013 Render 39×39. — [x] SB-M06-014 Render 49×49.
-- [x] SB-M06-015 Render 50×50. — [x] SB-M06-016 Render 59×59.
+- [x] SB-M06-011 Render 20×20.
+- [x] SB-M06-012 Render 29×29.
+- [x] SB-M06-013 Render 39×39.
+- [x] SB-M06-014 Render 49×49.
+- [x] SB-M06-015 Render 50×50.
+- [x] SB-M06-016 Render 59×59.
 - [x] SB-M06-017 Render representative rectangular boards.
 - [x] SB-M06-018 Expose logical-cell center coordinate.
 - [x] SB-M06-019 Support efficient individual-cell update.
@@ -802,14 +811,18 @@ Do not replace existing Prompt 02 fixtures — add to them.
 
 Per candidate production pixel-art level:
 
-- [ ] SB-M08-001 Record filename. — [ ] SB-M08-002 Record original dimensions.
-- [ ] SB-M08-003 Record alpha/transparency. — [ ] SB-M08-004 Count colors.
-- [ ] SB-M08-005 Detect anti-aliasing. — [ ] SB-M08-006 Detect interpolation.
+- [ ] SB-M08-001 Record filename.
+- [ ] SB-M08-002 Record original dimensions.
+- [ ] SB-M08-003 Record alpha/transparency.
+- [ ] SB-M08-004 Count colors.
+- [ ] SB-M08-005 Detect anti-aliasing.
+- [ ] SB-M08-006 Detect interpolation.
 - [ ] SB-M08-007 Determine logical-pixel grid.
 - [ ] SB-M08-008 Determine legal production envelope/context.
 - [ ] SB-M08-009 Confirm width in legal engine envelope.
 - [ ] SB-M08-010 Confirm height in legal engine envelope.
-- [ ] SB-M08-011 Preserve original. — [ ] SB-M08-012 Never silently resize.
+- [ ] SB-M08-011 Preserve original.
+- [ ] SB-M08-012 Never silently resize.
 - [ ] SB-M08-013 Explicitly map/reject source colors against locked C01..C16; never invent C17+; record deterministic mapping/rejection evidence.
 - [ ] SB-M08-014 Produce audit report.
 
@@ -817,7 +830,8 @@ Per candidate production pixel-art level:
 
 - [x] SB-M09-001 Create importer tool.
 - [x] SB-M09-002 Read source pixels exactly.
-- [x] SB-M09-003 Determine width. — [x] SB-M09-004 Determine height.
+- [x] SB-M09-003 Determine width.
+- [x] SB-M09-004 Determine height.
 - [x] SB-M09-005 Determine/validate legacy compatibility difficulty where required.
 - [x] SB-M09-006 Extract unique palette.
 - [x] SB-M09-007 Produce stable palette ordering.
@@ -845,30 +859,41 @@ Per candidate production pixel-art level:
 - [x] SB-M10-004 Implement visual mapping.
 - [x] SB-M10-005 Owner-confirm clearing readability.
 - [x] SB-M10-006 Owner-confirm ACTIVE artwork recognition.
-- [x] SB-M10-007 Owner test Easy density. — [x] SB-M10-008 Owner test Medium density.
-- [x] SB-M10-009 Owner test Hard density. — [x] SB-M10-010 Owner test Very Hard density.
+- [x] SB-M10-007 Owner test Easy density.
+- [x] SB-M10-008 Owner test Medium density.
+- [x] SB-M10-009 Owner test Hard density.
+- [x] SB-M10-010 Owner test Very Hard density.
 - [x] SB-M10-011 Owner test 59×59 transparent-model readability.
 - [x] SB-M10-012 Development debug tool migrated/proven.
 
 ### M11 — Gameplay Session Core
 
 - [x] SB-M11-001 Define session states.
-- [x] SB-M11-002 Initialize level. — [x] SB-M11-003 Load LevelData.
-- [x] SB-M11-004 Create BoardState. — [x] SB-M11-005 Connect renderer.
-- [x] SB-M11-006 Define ready state. — [x] SB-M11-007 Define active state.
-- [x] SB-M11-008 Define pause. — [x] SB-M11-009 Define reset.
+- [x] SB-M11-002 Initialize level.
+- [x] SB-M11-003 Load LevelData.
+- [x] SB-M11-004 Create BoardState.
+- [x] SB-M11-005 Connect renderer.
+- [x] SB-M11-006 Define ready state.
+- [x] SB-M11-007 Define active state.
+- [x] SB-M11-008 Define pause.
+- [x] SB-M11-009 Define reset.
 - [x] SB-M11-010 Define completion transition.
 - [x] SB-M11-011 Keep UI separate from gameplay truth.
 - [x] SB-M11-012 Headless lifecycle tests.
 
 ### M12 — Five-Slot Logic
 
-- [x] SB-M12-001 Create SlotState. — [x] SB-M12-002 Create SlotSystem.
+- [x] SB-M12-001 Create SlotState.
+- [x] SB-M12-002 Create SlotSystem.
 - [x] SB-M12-003 Configure five gameplay slots.
-- [x] SB-M12-004 Slot identity. — [x] SB-M12-005 Slot palette/color.
-- [x] SB-M12-006 Slot availability. — [x] SB-M12-007 Slot activity state.
-- [x] SB-M12-008 Keep model separate from UI. — [x] SB-M12-009 Query API.
-- [x] SB-M12-010 Five-slot tests. — [x] SB-M12-011 Invalid slot tests.
+- [x] SB-M12-004 Slot identity.
+- [x] SB-M12-005 Slot palette/color.
+- [x] SB-M12-006 Slot availability.
+- [x] SB-M12-007 Slot activity state.
+- [x] SB-M12-008 Keep model separate from UI.
+- [x] SB-M12-009 Query API.
+- [x] SB-M12-010 Five-slot tests.
+- [x] SB-M12-011 Invalid slot tests.
 
 Remaining slot mechanics are `[DESIGN GATE]` except where newer owner decisions explicitly lock behavior.
 
@@ -878,9 +903,12 @@ Remaining slot mechanics are `[DESIGN GATE]` except where newer owner decisions 
 - [x] SB-M13-002 Group/query by color.
 - [x] SB-M13-003 Implement efficient index/cache if measured useful.
 - [x] SB-M13-004 Synchronize with BoardState.
-- [x] SB-M13-005 Remove CLEARED cells from the index. — [x] SB-M13-006 Handle caller exclusions/reservations seam.
-- [x] SB-M13-007 No-candidate query. — [x] SB-M13-008 Exhausted-color test.
-- [x] SB-M13-009 Last-candidate test. — [x] SB-M13-010 3,481-cell benchmark.
+- [x] SB-M13-005 Remove CLEARED cells from the index.
+- [x] SB-M13-006 Handle caller exclusions/reservations seam.
+- [x] SB-M13-007 No-candidate query.
+- [x] SB-M13-008 Exhausted-color test.
+- [x] SB-M13-009 Last-candidate test.
+- [x] SB-M13-010 3,481-cell benchmark.
 
 ### M14 — Reservation State
 
@@ -889,8 +917,10 @@ Remaining slot mechanics are `[DESIGN GATE]` except where newer owner decisions 
 - [x] SB-M14-003 Record decision.
 - [x] SB-M14-004 Reserve target atomically.
 - [x] SB-M14-005 Prevent double reservation.
-- [x] SB-M14-006 Release on dispatch failure. — [x] SB-M14-007 Release on reset.
-- [x] SB-M14-008 Resolve arrival. — [x] SB-M14-009 Concurrency tests.
+- [x] SB-M14-006 Release on dispatch failure.
+- [x] SB-M14-007 Release on reset.
+- [x] SB-M14-008 Resolve arrival.
+- [x] SB-M14-009 Concurrency tests.
 
 ### M15 — TargetSelector
 
@@ -900,7 +930,8 @@ M15 strict closure remains accepted. V04 later superseded only its target orderi
 - [x] SB-M15-002 Keep BoardState access narrow.
 - [x] SB-M15-003 Deterministic strategy. **Current production ordering is owner rule §8.10A: bottom-most then left-most among targetable candidates.**
 - [x] SB-M15-004 Match Scrubbot color.
-- [x] SB-M15-005 Never target CLEARED. — [x] SB-M15-006 Never target invalid or blocked/unreachable ACTIVE cells.
+- [x] SB-M15-005 Never target CLEARED.
+- [x] SB-M15-006 Never target invalid or blocked/unreachable ACTIVE cells.
 - [x] SB-M15-007 Respect reservations.
 - [x] SB-M15-008 Return no-target cleanly.
 - [x] SB-M15-009 No route generation inside selector.
@@ -911,9 +942,11 @@ M15 strict closure remains accepted. V04 later superseded only its target orderi
 ### M16 — RoutingSystem Interface
 
 - [x] SB-M16-001 Define RoutingSystem contract.
-- [x] SB-M16-002 Define route input. — [x] SB-M16-003 Define route output.
+- [x] SB-M16-002 Define route input.
+- [x] SB-M16-003 Define route output.
 - [x] SB-M16-004 Define coordinate space.
-- [x] SB-M16-005 Slot origin. — [x] SB-M16-006 Cell destination.
+- [x] SB-M16-005 Slot origin.
+- [x] SB-M16-006 Cell destination.
 - [x] SB-M16-007 Keep independent from TargetSelector.
 - [x] SB-M16-008 Swappable implementations.
 - [x] SB-M16-009 Debug route visualization.
@@ -927,25 +960,37 @@ M17-C002 V03 strict full-surface audit remains accepted as the pre-V07 productio
 - [x] SB-M17-001 Direct route baseline.
 - [x] SB-M17-002 Grid-aware route prototype.
 - [x] SB-M17-003 Organized polyline/curved prototype.
-- [x] SB-M17-004 Compare visual clarity. — [x] SB-M17-005 Compare path crossings.
-- [x] SB-M17-006 Compare congestion. — [x] SB-M17-007 Compare CPU cost.
-- [x] SB-M17-008 Compare route distance. — [x] SB-M17-009 Compare determinism.
+- [x] SB-M17-004 Compare visual clarity.
+- [x] SB-M17-005 Compare path crossings.
+- [x] SB-M17-006 Compare congestion.
+- [x] SB-M17-007 Compare CPU cost.
+- [x] SB-M17-008 Compare route distance.
+- [x] SB-M17-009 Compare determinism.
 - [x] SB-M17-010 Owner-selected organized/curved production movement language.
-- [x] SB-M17-011 Test 5 bots. — [x] SB-M17-012 Test 10 bots. — [x] SB-M17-013 Test 25 bots.
+- [x] SB-M17-011 Test 5 bots.
+- [x] SB-M17-012 Test 10 bots.
+- [x] SB-M17-013 Test 25 bots.
 - [x] SB-M17-014 Stress-test higher density.
-- [x] SB-M17-015 Test 59×59. — [x] SB-M17-016 Test rectangular board.
+- [x] SB-M17-015 Test 59×59.
+- [x] SB-M17-016 Test rectangular board.
 
 **Historical V07 amendment:** the one-cell exterior ring proved exterior reachability and is preserved as audit history. **Current owner target:** Railroad V1 must preserve route validation, no-retarget, ACTIVE-blocker/CLEARED-open semantics, rectangular support and 59×59 behavior while replacing the exact adjacent-ring movement geometry.
 
 ### M18 — Scrubbot Agent
 
 - [x] SB-M18-001 Lightweight agent core.
-- [x] SB-M18-002 Assigned color. — [x] SB-M18-003 Assigned target.
-- [x] SB-M18-004 Assigned route. — [x] SB-M18-005 Spawn origin.
-- [x] SB-M18-006 Route movement. — [x] SB-M18-007 Arrival detection.
-- [x] SB-M18-008 Completion event. — [x] SB-M18-009 Despawn.
-- [x] SB-M18-010 No return-to-slot. — [x] SB-M18-011 No resource carrying.
-- [x] SB-M18-012 Reset cancellation. — [x] SB-M18-013 No orphan nodes.
+- [x] SB-M18-002 Assigned color.
+- [x] SB-M18-003 Assigned target.
+- [x] SB-M18-004 Assigned route.
+- [x] SB-M18-005 Spawn origin.
+- [x] SB-M18-006 Route movement.
+- [x] SB-M18-007 Arrival detection.
+- [x] SB-M18-008 Completion event.
+- [x] SB-M18-009 Despawn.
+- [x] SB-M18-010 No return-to-slot.
+- [x] SB-M18-011 No resource carrying.
+- [x] SB-M18-012 Reset cancellation.
+- [x] SB-M18-013 No orphan nodes.
 - [x] SB-M18-014 Performance stress test.
 - [x] SB-M18-015 Pool only if profiling justifies it.
 
@@ -963,17 +1008,24 @@ M17-C002 V03 strict full-surface audit remains accepted as the pre-V07 productio
 - [x] SB-M19-008 Prevent duplicate assignments.
 - [x] SB-M19-009 Handle dispatch failure.
 - [x] SB-M19-010 Handle rapid input.
-- [x] SB-M19-011 Concurrent slot tests. — [x] SB-M19-012 Reset during dispatch.
+- [x] SB-M19-011 Concurrent slot tests.
+- [x] SB-M19-012 Reset during dispatch.
 
 ### M20 — Complete Clearing Vertical Slice
 
 - [x] SB-M20-001 Wire complete sequence.
-- [x] SB-M20-002 No target means no bot. — [x] SB-M20-003 No return behavior.
-- [x] SB-M20-004 One-cell test. — [x] SB-M20-005 One-color test.
-- [x] SB-M20-006 Multi-color test. — [x] SB-M20-007 Five-slot test.
-- [x] SB-M20-008 Easy board test. — [x] SB-M20-009 Medium board test.
-- [x] SB-M20-010 Hard board test. — [x] SB-M20-011 Very Hard board test.
-- [x] SB-M20-012 59×59 stress test. — [x] SB-M20-013 Rectangular board test.
+- [x] SB-M20-002 No target means no bot.
+- [x] SB-M20-003 No return behavior.
+- [x] SB-M20-004 One-cell test.
+- [x] SB-M20-005 One-color test.
+- [x] SB-M20-006 Multi-color test.
+- [x] SB-M20-007 Five-slot test.
+- [x] SB-M20-008 Easy board test.
+- [x] SB-M20-009 Medium board test.
+- [x] SB-M20-010 Hard board test.
+- [x] SB-M20-011 Very Hard board test.
+- [x] SB-M20-012 59×59 stress test.
+- [x] SB-M20-013 Rectangular board test.
 - [x] SB-M20-014 State-desynchronization check.
 
 ### M21 — First Real-Art Vertical Slice `[CONTENT] [VISUAL REFERENCE]`
@@ -1017,12 +1069,17 @@ Locked runtime outcomes carried forward:
 
 **Railroad V1 closure — V07 + owner acceptance (2026-09-17):** the accepted production movement contract is now exact clicked-slot anchor → visible BOTTOM connector → canonical Railroad V1 exterior travel → legal rail ingress → four-neighbour orthogonal OPEN/CLEARED interior corridor with one or more 90-degree turns → assigned ACTIVE target. Non-target ACTIVE cells remain blockers; no diagonal/corner-cut/teleport/free-space shortcut and no retargeting are allowed. V07 implementation evidence recorded 4,823 checks / 0 failures and preserved the fresh Hazard Bot C08 first target `380/(0,19)`. Owner manual review confirmed the routing correction. The earlier straight-only final target approach is superseded.
 
-- [x] SB-M22-001 Audit slot references. — [x] SB-M22-002 Create SlotView.
-- [x] SB-M22-003 Five-slot layout. — [x] SB-M22-004 Bind SlotState through safe scalar/query presentation binding.
-- [x] SB-M22-005 Color presentation. — [x] SB-M22-006 Touch target.
-- [x] SB-M22-007 Active state. — [ ] SB-M22-008 No-work state if approved.
+- [x] SB-M22-001 Audit slot references.
+- [x] SB-M22-002 Create SlotView.
+- [x] SB-M22-003 Five-slot layout.
+- [x] SB-M22-004 Bind SlotState through safe scalar/query presentation binding.
+- [x] SB-M22-005 Color presentation.
+- [x] SB-M22-006 Touch target.
+- [x] SB-M22-007 Active state.
+- [ ] SB-M22-008 No-work state if approved.
 - [x] SB-M22-009 Scrubbot spawn point / final slot→rail connector geometry.
-- [x] SB-M22-010 Aspect-ratio tests. — [x] SB-M22-011 Safe-area tests.
+- [x] SB-M22-010 Aspect-ratio tests.
+- [x] SB-M22-011 Safe-area tests.
 - [x] SB-M22-012 Rapid-tap tests.
 - [x] SB-M22-013 Confirm canonical gameplay UI references before final asset generation.
 - [x] SB-M22-014 Validate M22 manifest entries before spending generation credits.
@@ -1241,13 +1298,20 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 ### M28 — Gameplay Screen Layout `[VISUAL REFERENCE]`
 
 - [x] SB-M28-001 Audit original gameplay reference images.
-- [x] SB-M28-002 Board region. — [x] SB-M28-003 Five-slot region.
-- [x] SB-M28-004 HUD region. — [x] SB-M28-005 Safe areas.
-- [x] SB-M28-006 Easy dimensions. — [x] SB-M28-007 Medium dimensions.
-- [x] SB-M28-008 Hard dimensions. — [x] SB-M28-009 Very Hard dimensions.
-- [x] SB-M28-010 Rectangular boards. — [x] SB-M28-011 59×59.
-- [x] SB-M28-012 Narrow phone. — [x] SB-M28-013 Tall phone.
-- [x] SB-M28-014 Tablet portrait. — [x] SB-M28-015 Input coordinate accuracy.
+- [x] SB-M28-002 Board region.
+- [x] SB-M28-003 Five-slot region.
+- [x] SB-M28-004 HUD region.
+- [x] SB-M28-005 Safe areas.
+- [x] SB-M28-006 Easy dimensions.
+- [x] SB-M28-007 Medium dimensions.
+- [x] SB-M28-008 Hard dimensions.
+- [x] SB-M28-009 Very Hard dimensions.
+- [x] SB-M28-010 Rectangular boards.
+- [x] SB-M28-011 59×59.
+- [x] SB-M28-012 Narrow phone.
+- [x] SB-M28-013 Tall phone.
+- [x] SB-M28-014 Tablet portrait.
+- [x] SB-M28-015 Input coordinate accuracy.
 - [x] SB-M28-016 Use `docs/MASTER_UI_SYSTEM.md` as canonical gameplay layout contract.
 - [x] SB-M28-017 Remove Goal/Moves panel from approved production gameplay composition.
 - [x] SB-M28-018 Make board dominant gameplay-screen region.
@@ -1304,19 +1368,25 @@ This is intentionally NOT part of the active `M28-C002-C003-R01 V02` remediation
 - [x] SB-M29-001 Touch selectable supply-front batch activation; five batch slots themselves are not player-selectable placement controls.
 - [x] SB-M29-002 Desktop mouse development support.
 - [x] SB-M29-003 Prevent mouse/touch double-fire.
-- [x] SB-M29-004 Touch cancel. — [x] SB-M29-005 Focus loss.
-- [x] SB-M29-006 Rapid tapping. — [x] SB-M29-007 Multi-touch.
-- [x] SB-M29-008 Pause during touch. — [x] SB-M29-009 Background/foreground.
+- [x] SB-M29-004 Touch cancel.
+- [x] SB-M29-005 Focus loss.
+- [x] SB-M29-006 Rapid tapping.
+- [x] SB-M29-007 Multi-touch.
+- [x] SB-M29-008 Pause during touch.
+- [x] SB-M29-009 Background/foreground.
 - [x] SB-M29-010 Gameplay Tempo Retune: canonical baseline retuned to 9 cells/s + 1/3 s cadence at 1x and 18 cells/s + 1/6 s cadence at 2x. Implementation `8787d38dba65a084e6169ea8e8ccc623ab63e0ae`; functional audit `coordination/sessions/M29-C002/CHATGPT_AUDIT_V01.md`; performance blockers independently cleared by M25-C003 + M25-C004; owner gate `coordination/sessions/M29-C002/OWNER_TEMPO_PLAYTEST_GATE_V01.md`: 1x OK, 2x OK, dense 5/6-slot smoothness OK. `[AUDITED_PASS + OWNER PLAYTEST PASS / CLOSED 2026-09-29]`
 
 **Owner-locked speed integration for M29/runtime:** M29 proves the explicit 1x/2x temporal authority and may keep a direct debug/headless toggle seam. That seam is not authorization for free shipping manual 2x. M39 must gate production manual 2x through the paid entitlement service in `coordination/OWNER_ECONOMY_REWARDS_V01.md`. Authoritative M23-exhausted automatic 2x remains free. Do not infer exhaustion from UI rows or slot occupancy.
 
 ### M30 — Win/Lose Rules `[OWNER-LOCKED 2026-09-19] [CLOSED]`
 
-- [x] SB-M30-001 Document win condition. — [x] SB-M30-002 Document lose condition.
-- [x] SB-M30-003 Completion evaluator. — [x] SB-M30-004 Emit completion once.
+- [x] SB-M30-001 Document win condition.
+- [x] SB-M30-002 Document lose condition.
+- [x] SB-M30-003 Completion evaluator.
+- [x] SB-M30-004 Emit completion once.
 - [x] SB-M30-005 Stop inappropriate new dispatch.
-- [x] SB-M30-006 Resolve in-flight bots. — [x] SB-M30-007 Retry.
+- [x] SB-M30-006 Resolve in-flight bots.
+- [x] SB-M30-007 Retry.
 - [x] SB-M30-008 Completion regression tests.
 
 ### M31 — Cleaning Effects `[VISUAL REFERENCE] [PERFORMANCE] [CLOSED 2026-09-20]`
@@ -1325,8 +1395,10 @@ This is intentionally NOT part of the active `M28-C002-C003-R01 V02` remediation
 - [x] SB-M31-002 Define cleaning event.
 - [x] SB-M31-003 Prototype lightweight effect.
 - [x] SB-M31-004 Separate from BoardState.
-- [x] SB-M31-005 Toggle effects. — [x] SB-M31-006 Concurrency limit.
-- [x] SB-M31-007 Pool only after profiling. — [x] SB-M31-008 Stress 59×59.
+- [x] SB-M31-005 Toggle effects.
+- [x] SB-M31-006 Concurrency limit.
+- [x] SB-M31-007 Pool only after profiling.
+- [x] SB-M31-008 Stress 59×59.
 - [x] SB-M31-009 Measure frame cost.
 - [x] SB-M31-010 Reduced-effects option if required.
 
@@ -1340,8 +1412,10 @@ Closure evidence: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V03.md` + `coord
 - [x] SB-M32-002 Select owner-approved canonical design.
 - [x] SB-M32-003 Preserve original source.
 - [x] SB-M32-004 Configure crisp import.
-- [x] SB-M32-005 Visual component. — [x] SB-M32-006 Travel animation.
-- [x] SB-M32-007 Arrival animation. — [x] SB-M32-008 Disappearance.
+- [x] SB-M32-005 Visual component.
+- [x] SB-M32-006 Travel animation.
+- [x] SB-M32-007 Arrival animation.
+- [x] SB-M32-008 Disappearance.
 - [x] SB-M32-009 Direction/orientation if approved.
 - [x] SB-M32-010 Density performance test.
 - [x] SB-M32-UI-001 Use owner-approved canonical Scrubby reference for character generation.
@@ -1368,13 +1442,16 @@ Final owner acceptance:
 
 Owner audio law remains: no dispatch SFX; cleaning uses bounded `dispatch.wav`; completion is WON-only; no movement audio. `ScrubBots Workshop` remains separately owner-approved for a future Workshop screen.
 
-- [x] SB-M33-001 Audio buses. — [x] SB-M33-002 Master volume.
-- [x] SB-M33-003 Music volume. — [x] SB-M33-004 SFX volume.
+- [x] SB-M33-001 Audio buses.
+- [x] SB-M33-002 Master volume.
+- [x] SB-M33-003 Music volume.
+- [x] SB-M33-004 SFX volume.
 - [x] SB-M33-005 Dispatch SFX decision resolved: **NONE in production V1**. `assets/audio/sfx/dispatch.wav` is preserved and repurposed as the cleaning sonic source.
 - [x] SB-M33-006 Cleaning SFX. Owner-approved V02 source: `assets/audio/sfx/dispatch.wav`; legacy `cleaning.wav` is preserved but not used by production cleaning playback.
 - [x] SB-M33-007 Completion SFX. Owner-approved canonical asset: `assets/audio/sfx/completion.wav`.
 - [x] SB-M33-008 Movement audio only if pleasant at high density. Owner decision: no movement audio in V1.
-- [x] SB-M33-009 Concurrency management. — [x] SB-M33-010 Persist settings.
+- [x] SB-M33-009 Concurrency management.
+- [x] SB-M33-010 Persist settings.
 
 ### M34 — Haptics
 
@@ -1383,8 +1460,10 @@ V02 independent code audit: `CODE_AUDIT_PASS`. SB-M34-001..005 closed. SB-M34-00
 Pre-authored batch bundle: `coordination/sessions/M34-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Owner/device gate does not stop the batch.
 
 - [x] SB-M34-001 Platform API research.
-- [x] SB-M34-002 Cleaning haptic if approved. — [x] SB-M34-003 Completion haptic.
-- [x] SB-M34-004 Toggle. — [x] SB-M34-005 Prevent vibration spam.
+- [x] SB-M34-002 Cleaning haptic if approved.
+- [x] SB-M34-003 Completion haptic.
+- [x] SB-M34-004 Toggle.
+- [x] SB-M34-005 Prevent vibration spam.
 - [ ] SB-M34-006 Real-device test.
 
 ### M35 — Level Catalog
@@ -1394,9 +1473,12 @@ V02 independent audit: `AUDITED_PASS / M35 LEVEL CATALOG CLOSED`. All M35 tasks 
 Pre-authored batch bundle: `coordination/sessions/M35-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`.
 
 - [x] SB-M35-001 Production LevelCatalog.
-- [x] SB-M35-002 Stable IDs. — [x] SB-M35-003 Stable ordering.
-- [x] SB-M35-004 Difficulty. — [x] SB-M35-005 Dimensions.
-- [x] SB-M35-006 Preview. — [x] SB-M35-007 Duplicate detection.
+- [x] SB-M35-002 Stable IDs.
+- [x] SB-M35-003 Stable ordering.
+- [x] SB-M35-004 Difficulty.
+- [x] SB-M35-005 Dimensions.
+- [x] SB-M35-006 Preview.
+- [x] SB-M35-007 Duplicate detection.
 - [x] SB-M35-008 Missing-file detection.
 - [x] SB-M35-009 Production/test separation.
 - [x] SB-M35-010 Reject TEST fixture in production catalog.
@@ -1427,10 +1509,12 @@ V02 remediation authority: `coordination/sessions/M37-C001/CHATGPT_PROMPT_V02.md
 
 - [x] SB-M37-001 Implement owner-locked repeating 10-level class cadence.
 - [x] SB-M37-002 Current level.
-- [x] SB-M37-003 Completion tracking. — [x] SB-M37-004 Replay.
+- [x] SB-M37-003 Completion tracking.
+- [x] SB-M37-004 Replay.
 - [x] SB-M37-005 Implement progression target curve/micro modifiers from Difficulty V1.
 - [x] SB-M37-006 Level select if approved.
-- [x] SB-M37-007 Service implementation. — [x] SB-M37-008 Tests.
+- [x] SB-M37-007 Service implementation.
+- [x] SB-M37-008 Tests.
 
 ### M38 — Win Streak `[OWNER-LOCKED ECONOMY V1]`
 
@@ -1442,13 +1526,18 @@ V02 strict independent audit: `AUDITED_PASS / M38 WIN STREAK CLOSED`. All M38 ta
 
 Pre-authored batch bundle: `coordination/sessions/M38-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Durable central persistence is finalized by M40.
 
-- [x] SB-M38-001 Streak state. — [x] SB-M38-002 Increment only on valid first-clear progression wins.
+- [x] SB-M38-001 Streak state.
+- [x] SB-M38-002 Increment only on valid first-clear progression wins.
 - [x] SB-M38-003 Reset on progression loss and restart-after-gameplay; pre-action exit does not reset.
 - [x] SB-M38-004 Grant exact SB mapping through RewardGrantService.
-- [x] SB-M38-005 Test 1→1 SB. — [x] SB-M38-006 Test 2→5 SB.
-- [x] SB-M38-007 Test 3→10 SB. — [x] SB-M38-008 Test 4→25 SB.
-- [x] SB-M38-009 Test 5→100 SB. — [x] SB-M38-010 Test 6+→100 SB.
-- [x] SB-M38-011 No duplicate grant. — [x] SB-M38-012 Persistence.
+- [x] SB-M38-005 Test 1→1 SB.
+- [x] SB-M38-006 Test 2→5 SB.
+- [x] SB-M38-007 Test 3→10 SB.
+- [x] SB-M38-008 Test 4→25 SB.
+- [x] SB-M38-009 Test 5→100 SB.
+- [x] SB-M38-010 Test 6+→100 SB.
+- [x] SB-M38-011 No duplicate grant.
+- [x] SB-M38-012 Persistence.
 - [x] SB-M38-013 Emit only streak-bonus SB amount to GiftMeterService; base/Daily/exchange SB never feeds it.
 - [x] SB-M38-014 Grant +1 Bot Part exactly at active streak multiples of 5.
 - [x] SB-M38-015 Replay does not advance streak, Gift Meter or streak Bot Parts.
@@ -1538,13 +1627,17 @@ V03 remediation authority: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V03.md
 
 Pre-authored batch bundle: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. All 13 task IDs require separate GitHub task logs; M40 is the batch endpoint and remains subject to later strict full-surface ChatGPT audit.
 
-- [x] SB-M40-001 Versioned schema. — [x] SB-M40-002 Settings.
-- [x] SB-M40-003 Progression. — [x] SB-M40-004 Win streak.
+- [x] SB-M40-001 Versioned schema.
+- [x] SB-M40-002 Settings.
+- [x] SB-M40-003 Progression.
+- [x] SB-M40-004 Win streak.
 - [x] SB-M40-005 Persist Economy V1 wallet, Hearts/regen anchor, Bot Parts/robots, cards, booster charges, Gift Meter, Daily and 2x entitlements.
 - [x] SB-M40-006 Safe write strategy.
-- [x] SB-M40-007 Missing-save behavior. — [x] SB-M40-008 Corruption recovery.
+- [x] SB-M40-007 Missing-save behavior.
+- [x] SB-M40-008 Corruption recovery.
 - [x] SB-M40-009 Migration strategy.
-- [x] SB-M40-010 Round-trip tests. — [x] SB-M40-011 Corrupt-file tests.
+- [x] SB-M40-010 Round-trip tests.
+- [x] SB-M40-011 Corrupt-file tests.
 - [x] SB-M40-012 Migrate old saves with missing Economy V1 fields to safe defaults; never invent Star/Event balances.
 - [x] SB-M40-013 Persist wall-clock timestamps/expiry defensively against duplicate reward/refill claims.
 
@@ -1562,9 +1655,13 @@ Evidence:
 - `coordination/sessions/M41-C002/CHATGPT_AUDIT_V01.md`
 - `coordination/OWNER_M41_C002_REDUCED_EFFECTS_ACCEPTANCE_V01.md`
 
-- [x] SB-M41-001 Master volume. — [x] SB-M41-002 Music. — [x] SB-M41-003 SFX.
-- [x] SB-M41-004 Haptics. — [x] SB-M41-005 Reduced effects.
-- [x] SB-M41-006 Persistence. — [x] SB-M41-007 Settings UI.
+- [x] SB-M41-001 Master volume.
+- [x] SB-M41-002 Music.
+- [x] SB-M41-003 SFX.
+- [x] SB-M41-004 Haptics.
+- [x] SB-M41-005 Reduced effects.
+- [x] SB-M41-006 Persistence.
+- [x] SB-M41-007 Settings UI.
 - [x] SB-M41-008 Relaunch tests.
 
 ### M42 — Home / Navigation
@@ -1590,11 +1687,15 @@ V03 independent audit: `coordination/sessions/M42-C001/audits/SB-M42-HOME-OWNER-
 Home rebuild V04 owner decision: `coordination/OWNER_M42_HOME_REBUILD_V04_SINGLE_WORLD_BACKGROUND.md`
 V04 implementation prompt: `coordination/sessions/M42-C001/task_prompts/SB-M42-HOME-REBUILD_V04.md`.
 
-- [x] SB-M42-001 Navigation architecture. — [x] SB-M42-002 Home.
-- [x] SB-M42-003 Play/Continue. — [x] SB-M42-004 Settings.
+- [x] SB-M42-001 Navigation architecture.
+- [x] SB-M42-002 Home.
+- [x] SB-M42-003 Play/Continue.
+- [x] SB-M42-004 Settings.
 - [x] SB-M42-005 Level select if approved. `[OWNER-LOCKED: NO SHIPPING LEVEL SELECT]`
-- [x] SB-M42-006 Gameplay transition. — [x] SB-M42-007 Results transition.
-- [x] SB-M42-008 Prevent duplicate transitions. — [x] SB-M42-009 Back navigation.
+- [x] SB-M42-006 Gameplay transition.
+- [x] SB-M42-007 Results transition.
+- [x] SB-M42-008 Prevent duplicate transitions.
+- [x] SB-M42-009 Back navigation.
 - [x] SB-M42-010 Build Home as responsive Godot containers/components.
 - [x] SB-M42-011 Recreate owner-approved Home art direction with canonical regions. `[AUDITED_PASS / V07 / OWNER_VISUAL_PASS]`
 - [x] SB-M42-012 Keep shortcut columns responsive around central area.
@@ -1934,36 +2035,58 @@ Purpose: teach the real production game progressively and prevent the first sess
 
 ### M45 — Debug Tooling
 
-- [ ] SB-M45-001 Debug overlay. — [ ] SB-M45-002 Level ID.
-- [ ] SB-M45-003 Difficulty. — [ ] SB-M45-004 Dimensions.
-- [ ] SB-M45-005 Cell count. — [ ] SB-M45-006 ACTIVE count. — [ ] SB-M45-007 CLEARED count.
-- [ ] SB-M45-008 Reserved count if implemented. — [ ] SB-M45-009 Active bots.
-- [ ] SB-M45-010 FPS. — [ ] SB-M45-011 Frame time.
-- [ ] SB-M45-012 Target markers. — [ ] SB-M45-013 Route visualization.
-- [ ] SB-M45-014 Cell grid. — [ ] SB-M45-015 Effect toggle.
-- [ ] SB-M45-016 Instant reset. — [ ] SB-M45-017 Level switcher.
+- [ ] SB-M45-001 Debug overlay.
+- [ ] SB-M45-002 Level ID.
+- [ ] SB-M45-003 Difficulty.
+- [ ] SB-M45-004 Dimensions.
+- [ ] SB-M45-005 Cell count.
+- [ ] SB-M45-006 ACTIVE count.
+- [ ] SB-M45-007 CLEARED count.
+- [ ] SB-M45-008 Reserved count if implemented.
+- [ ] SB-M45-009 Active bots.
+- [ ] SB-M45-010 FPS.
+- [ ] SB-M45-011 Frame time.
+- [ ] SB-M45-012 Target markers.
+- [ ] SB-M45-013 Route visualization.
+- [ ] SB-M45-014 Cell grid.
+- [ ] SB-M45-015 Effect toggle.
+- [ ] SB-M45-016 Instant reset.
+- [ ] SB-M45-017 Level switcher.
 - [ ] SB-M45-018 Disable release-facing debug UI.
 
 ### M46 — Performance `[PERFORMANCE]`
 
 Maximum board target: 59×59 = 3,481.
 
-- [ ] SB-M46-001 Level parsing. — [ ] SB-M46-002 BoardState. — [ ] SB-M46-003 Renderer.
-- [ ] SB-M46-004 Color candidate index + reachability/access. — [ ] SB-M46-005 TargetSelector. — [ ] SB-M46-006 Routing.
-- [ ] SB-M46-007 Scrubbot agents. — [ ] SB-M46-008 Effects.
-- [ ] SB-M46-009 Memory baseline. — [ ] SB-M46-010 59×59 memory.
+- [ ] SB-M46-001 Level parsing.
+- [ ] SB-M46-002 BoardState.
+- [ ] SB-M46-003 Renderer.
+- [ ] SB-M46-004 Color candidate index + reachability/access.
+- [ ] SB-M46-005 TargetSelector.
+- [ ] SB-M46-006 Routing.
+- [ ] SB-M46-007 Scrubbot agents.
+- [ ] SB-M46-008 Effects.
+- [ ] SB-M46-009 Memory baseline.
+- [ ] SB-M46-010 59×59 memory.
 - [ ] SB-M46-011 Per-frame allocation detection.
-- [ ] SB-M46-012 Repeated restart. — [ ] SB-M46-013 Long session.
+- [ ] SB-M46-012 Repeated restart.
+- [ ] SB-M46-013 Long session.
 - [ ] SB-M46-014 High agent density.
 
 ### M47 — Android Device Testing
 
-- [ ] SB-M47-001 Android export setup. — [ ] SB-M47-002 Development APK.
-- [ ] SB-M47-003 Real device install. — [ ] SB-M47-004 Touch.
-- [ ] SB-M47-005 Portrait. — [ ] SB-M47-006 Safe areas.
-- [ ] SB-M47-007 Easy performance. — [ ] SB-M47-008 Medium performance.
-- [ ] SB-M47-009 Hard performance. — [ ] SB-M47-010 Very Hard/59×59 performance.
-- [ ] SB-M47-011 High bot density. — [ ] SB-M47-012 Background/foreground.
+- [ ] SB-M47-001 Android export setup.
+- [ ] SB-M47-002 Development APK.
+- [ ] SB-M47-003 Real device install.
+- [ ] SB-M47-004 Touch.
+- [ ] SB-M47-005 Portrait.
+- [ ] SB-M47-006 Safe areas.
+- [ ] SB-M47-007 Easy performance.
+- [ ] SB-M47-008 Medium performance.
+- [ ] SB-M47-009 Hard performance.
+- [ ] SB-M47-010 Very Hard/59×59 performance.
+- [ ] SB-M47-011 High bot density.
+- [ ] SB-M47-012 Background/foreground.
 - [ ] SB-M47-013 Heat/battery extended test.
 - [ ] SB-M47-014 Record device/results.
 
@@ -1976,9 +2099,14 @@ Maximum board target: 59×59 = 3,481.
 
 ### M49 — Responsive UI
 
-- [ ] SB-M49-001 16:9 portrait. — [ ] SB-M49-002 19.5:9. — [ ] SB-M49-003 20:9.
-- [ ] SB-M49-004 Tall phone. — [ ] SB-M49-005 Tablet. — [ ] SB-M49-006 Notch/cutout.
-- [ ] SB-M49-007 Five slots stay usable. — [ ] SB-M49-008 Board stays visible.
+- [ ] SB-M49-001 16:9 portrait.
+- [ ] SB-M49-002 19.5:9.
+- [ ] SB-M49-003 20:9.
+- [ ] SB-M49-004 Tall phone.
+- [ ] SB-M49-005 Tablet.
+- [ ] SB-M49-006 Notch/cutout.
+- [ ] SB-M49-007 Five slots stay usable.
+- [ ] SB-M49-008 Board stays visible.
 - [ ] SB-M49-009 Rectangular boards remain correctly scaled.
 - [ ] SB-M49-010 Touch mapping remains accurate.
 - [ ] SB-M49-011 Adopt 1080×2160 reference design viewport and stretch policy.
@@ -2007,8 +2135,10 @@ Maximum board target: 59×59 = 3,481.
 
 - [ ] SB-M50-001 Review color-only information.
 - [ ] SB-M50-002 Alternative visual slot cues if necessary.
-- [ ] SB-M50-003 Color vision tests. — [ ] SB-M50-004 Contrast.
-- [ ] SB-M50-005 Reduced effects. — [ ] SB-M50-006 Touch sizes.
+- [ ] SB-M50-003 Color vision tests.
+- [ ] SB-M50-004 Contrast.
+- [ ] SB-M50-005 Reduced effects.
+- [ ] SB-M50-006 Touch sizes.
 - [ ] SB-M50-007 Text readability.
 - [ ] SB-M50-008 Do not encode important state solely in decorative art.
 - [ ] SB-M50-009 Keep labels/counts live and contrast-independent from illustration.
@@ -2025,7 +2155,8 @@ Maximum board target: 59×59 = 3,481.
 
 - [ ] SB-M51-001 Avoid hard-coded user text.
 - [ ] SB-M51-002 Translation-key convention.
-- [ ] SB-M51-003 Longer-string layouts. — [ ] SB-M51-004 Pseudo-localization.
+- [ ] SB-M51-003 Longer-string layouts.
+- [ ] SB-M51-004 Pseudo-localization.
 - [ ] SB-M51-005 Actual languages decided later. `[DESIGN GATE]`
 
 #### M51 Player-Experience Localization Expansion
@@ -2042,11 +2173,15 @@ M52-C001 independent audit: **AUDITED_PASS / 10 OF 10 PRODUCTION ADMITTED / OWNE
 - Scope note: canonical real-level Challenge / Session Load / Frustration evidence is an explicit M53 carry-forward under the newer owner decision; it was not fabricated in M52-C001.
 - `SB-M52-005` remains broader M52 work: the owner-selected First 10 pack contains no rectangular production source, so this row is not falsely closed by C001.
 
-- [x] SB-M52-001 Import first Easy art. — [x] SB-M52-002 Import first Medium art.
-- [x] SB-M52-003 Import first Hard art. — [x] SB-M52-004 Import first Very Hard art.
+- [x] SB-M52-001 Import first Easy art.
+- [x] SB-M52-002 Import first Medium art.
+- [x] SB-M52-003 Import first Hard art.
+- [x] SB-M52-004 Import first Very Hard art.
 - [ ] SB-M52-005 Validate rectangular production art.
-- [x] SB-M52-006 Batch convert. — [x] SB-M52-007 Batch validate.
-- [x] SB-M52-008 Generate previews. — [x] SB-M52-009 Populate catalog.
+- [x] SB-M52-006 Batch convert.
+- [x] SB-M52-007 Batch validate.
+- [x] SB-M52-008 Generate previews.
+- [x] SB-M52-009 Populate catalog.
 - [x] SB-M52-010 Verify every source image preserved.
 - [x] SB-M52-011 Verify generated level reproduces source.
 
@@ -2103,14 +2238,18 @@ Owner findings: `coordination/sessions/M52-C001/OWNER_PLAYTEST_FINDINGS_V01.md`.
 ### M53 — Level QA `[QA]`
 
 Every production level:
-- [x] SB-M53-001 Legal dimensions/envelope. — [x] SB-M53-002 Correct Difficulty V1 metadata/score context.
+- [x] SB-M53-001 Legal dimensions/envelope.
+- [x] SB-M53-002 Correct Difficulty V1 metadata/score context.
 - [x] SB-M53-003 Valid locked C01..C16 palette and current 3–12 used-color envelope; old class-specific color bands are not difficulty truth.
 - [x] SB-M53-004 Correct cell count.
-- [x] SB-M53-005 No invalid palette IDs. — [x] SB-M53-006 Recognizable ACTIVE source artwork.
-- [x] SB-M53-007 No unintended interpolation. — [x] SB-M53-008 Correct CLEARED transparency.
+- [x] SB-M53-005 No invalid palette IDs.
+- [x] SB-M53-006 Recognizable ACTIVE source artwork.
+- [x] SB-M53-007 No unintended interpolation.
+- [x] SB-M53-008 Correct CLEARED transparency.
 - [x] SB-M53-009 Solvable under canonical routing/access semantics, including Railroad V1 where applicable.
 - [x] SB-M53-010 No routing pathology; fully enclosed matching ACTIVE target remains untargetable until a legal Railroad ingress plus OPEN/CLEARED orthogonal interior path exists.
-- [x] SB-M53-011 Good performance. — [x] SB-M53-012 Correct preview.
+- [x] SB-M53-011 Good performance.
+- [x] SB-M53-012 Correct preview.
 - [x] SB-M53-013 Unique ID.
 
 #### M53-C001 First 10 Level QA + Difficulty V1
@@ -2180,13 +2319,20 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 
 **M54-C001 First 10 gate: CLOSED.** SB-M54-001..021 + 016A are 22/22 AUDITED_PASS after owner ruling A = 900 s / 15 min. Final closure: `coordination/sessions/M54-C001/CHATGPT_AUDIT_V02.md`. SB-M54-022..032 remain later M43+ regression work.
 
-- [x] SB-M54-001 Difficulty/progression tests. — [x] SB-M54-002 Level parser tests.
-- [x] SB-M54-003 BoardState tests. — [x] SB-M54-004 Renderer tests.
-- [x] SB-M54-005 Slot tests. — [x] SB-M54-006 Color-candidate/reachability tests.
-- [x] SB-M54-007 Reservation tests. — [x] SB-M54-008 TargetSelector tests.
-- [x] SB-M54-009 Routing tests including Railroad V1 geometry, connectors, legal ingresses and post-rail orthogonal interior turns. — [x] SB-M54-010 Dispatcher tests.
-- [x] SB-M54-011 Completion tests. — [x] SB-M54-012 Save tests.
-- [x] SB-M54-013 Reward tests. — [x] SB-M54-014 Content validation tests.
+- [x] SB-M54-001 Difficulty/progression tests.
+- [x] SB-M54-002 Level parser tests.
+- [x] SB-M54-003 BoardState tests.
+- [x] SB-M54-004 Renderer tests.
+- [x] SB-M54-005 Slot tests.
+- [x] SB-M54-006 Color-candidate/reachability tests.
+- [x] SB-M54-007 Reservation tests.
+- [x] SB-M54-008 TargetSelector tests.
+- [x] SB-M54-009 Routing tests including Railroad V1 geometry, connectors, legal ingresses and post-rail orthogonal interior turns.
+- [x] SB-M54-010 Dispatcher tests.
+- [x] SB-M54-011 Completion tests.
+- [x] SB-M54-012 Save tests.
+- [x] SB-M54-013 Reward tests.
+- [x] SB-M54-014 Content validation tests.
 - [x] SB-M54-015 59×59 regression test.
 - [x] SB-M54-016 Economy Wallet/Gift Meter/Daily/Cards Exchange/Collection-completion idempotency regression.
 - [x] SB-M54-016A Test every set-specific 9/9 reward plus all-15 Master Collection +2500 SB/+20 Bot Parts exactly-once grant.
@@ -2213,10 +2359,12 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 **M55 current-build core: CLOSED.** SB-M55-001..017 AUDITED_PASS in C001; timed-2x anti-rollback remediation C002 AUDITED_PASS at `023a0fc`. Audits: `coordination/sessions/M55-C001/CHATGPT_AUDIT_V01.md`, `coordination/sessions/M55-C002/CHATGPT_AUDIT_V01.md`. SB-M55-018..024 remain deferred until their M43+ surfaces exist.
 
 - [x] SB-M55-001 Spam all five slots.
-- [x] SB-M55-002 Restart while bots travel. — [x] SB-M55-003 Pause while bots travel.
+- [x] SB-M55-002 Restart while bots travel.
+- [x] SB-M55-003 Pause while bots travel.
 - [x] SB-M55-004 Background while bots travel.
 - [x] SB-M55-005 Complete with bots in flight.
-- [x] SB-M55-006 Exhaust color. — [x] SB-M55-007 Exhaust slot work.
+- [x] SB-M55-006 Exhaust color.
+- [x] SB-M55-007 Exhaust slot work.
 - [x] SB-M55-008 Repeated scene transitions.
 - [x] SB-M55-009 Long high-load session.
 - [x] SB-M55-010 Memory growth monitoring.
@@ -2315,10 +2463,14 @@ Once external services exist:
 
 ### M59 — Build Pipeline
 
-- [ ] SB-M59-001 Debug export. — [ ] SB-M59-002 Release export.
-- [ ] SB-M59-003 Output directories. — [ ] SB-M59-004 Versioning.
-- [ ] SB-M59-005 Build numbers. — [ ] SB-M59-006 Run tests before release build.
-- [ ] SB-M59-007 Run content validator. — [ ] SB-M59-008 Generate Android build.
+- [ ] SB-M59-001 Debug export.
+- [ ] SB-M59-002 Release export.
+- [ ] SB-M59-003 Output directories.
+- [ ] SB-M59-004 Versioning.
+- [ ] SB-M59-005 Build numbers.
+- [ ] SB-M59-006 Run tests before release build.
+- [ ] SB-M59-007 Run content validator.
+- [ ] SB-M59-008 Generate Android build.
 - [ ] SB-M59-009 Verify clean clone can build.
 
 ### M60 — Release
