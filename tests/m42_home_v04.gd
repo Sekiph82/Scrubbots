@@ -13,6 +13,7 @@ const MainScript = preload("res://scripts/app/main.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 const HomeScreenScript = preload("res://scripts/ui/home/home_screen.gd")
+const C002 = preload("res://tests/m42_c002_scrubby_scale.gd")
 const HomePresentationMap = preload("res://scripts/ui/home/home_presentation_map.gd")
 const HomeWorldCatalog = preload("res://scripts/ui/home/home_world_catalog.gd")
 const HomeArtBinder = preload("res://scripts/ui/home/home_art_binder.gd")
@@ -182,7 +183,8 @@ func _anchor(home) -> void:
 	var box: Rect2 = w["scrubby_safe_box"]
 	var v04_vis := Rect2(Vector2(FEET.x - box.size.x * 0.5, FEET.y - (1318.0 - 7.0) * c["k_v04"]), Vector2(box.size.x, 1327.0 * c["k_v04"]))
 	_ok(v04_vis.position.x >= box.position.x - 0.01 and v04_vis.end.x <= box.end.x + 0.01 and v04_vis.position.y >= box.position.y - 0.01, "the V04 base fit stays inside the safe box (V05 enlarges it about the soles)")
-	_ok(vr.end.y - FEET.y <= 7.0, "only the brush bristles reach below the soles line (%.1f px)" % (vr.end.y - FEET.y))
+	# bristles: texture rows 1318..1334 (16 texels) below the soles, scaled by k (M42-C002 1.612)
+	_ok(vr.end.y - FEET.y <= 16.0 * float(c["k"]) + 0.01, "only the brush bristles reach below the soles line (%.1f px <= 16 texels x k)" % (vr.end.y - FEET.y))
 	_ok(HomeScreenScript.SCRUBBY_FEET_Y == 1318.0 and HomeScreenScript.SCRUBBY_VISIBLE_BBOX == Rect2(27, 7, 1130, 1327), "documented HOME-026 visible-feet offset (soles at 1318 of 1358; visible bbox 27,7 1130x1327)")
 	var sc: TextureRect = home.get_region("Art_scrubby")
 	var feet_screen: Vector2 = home.world_to_screen(FEET)
@@ -190,11 +192,11 @@ func _anchor(home) -> void:
 	_ok(absf(sc.position.y + HomeScreenScript.SCRUBBY_FEET_Y * k - feet_screen.y) < 0.5, "on screen the soles sit on the mapped anchor")
 	var sign: Rect2 = w["baked_sign_rect"]
 	_ok(not vr.intersects(sign), "Scrubby does not cover the baked sign")
-	var bot_hit := false
-	for b in w["helper_bot_rects"]:
-		if vr.intersects(b):
-			bot_hit = true
-	_ok(not bot_hit, "Scrubby does not cover the baked helper bots")
+	# M42-C002 (owner lock 1.612): the hero bbox edges reach <= 47 canvas px into each bot
+	# rect; pixel-level only the brush bristles enter the left one, the right one gets no
+	# hero pixel (tests/m42_c002_scrubby_scale.gd).
+	var bots: Array = w["helper_bot_rects"]
+	_ok(vr.position.x >= (bots[0] as Rect2).end.x - 47.0 and vr.end.x <= (bots[1] as Rect2).position.x + 47.0, "helper bots: bbox intrusion left %.1f / right %.1f <= 47 canvas px" % [(bots[0] as Rect2).end.x - vr.position.x, vr.end.x - (bots[1] as Rect2).position.x])
 	_ok(home.get_region("Art_scrubby").get_parent() == home.get_region("Layer_characters") and home.get_region("Layer_characters").get_index() > home.get_region("WorldBackground").get_index(), "Scrubby is a separate layer above the world")
 	_complete("scrubby_anchor_contract")
 
@@ -255,13 +257,14 @@ func _panel_style(home) -> void:
 	_ok(alpha_ok, "translucent glass body (V05 0.40..0.48 / V06 0.50..0.52) with 2-3 px outline")
 	_ok(margin_ok, "visible outer margin from the screen edges (>= 20 px)")
 	var sc: Rect2 = home.get_region("Art_scrubby").get_global_rect()
-	var c: Dictionary = home.get_scrubby_canonical()
 	var t: Dictionary = home.get_world_transform()
-	var vis := Rect2((c["visible_rect"] as Rect2).position * t["scale"] + t["offset"], (c["visible_rect"] as Rect2).size * t["scale"])
+	# M42-C002: at 1.612 the hero's rectangular bbox corners may reach a panel over transparent
+	# texels only; a panel must never cover an opaque hero pixel.
+	var img: Image = (home.get_region("Art_scrubby") as TextureRect).texture.get_image()
 	var hit: Array = []
 	for id in ["shop", "collection", "tasks", "daily"]:
 		var r: Rect2 = home.get_region("Shortcut_" + id).get_global_rect()
-		if r.intersects(vis):
+		if int(C002.opaque_in(img, sc, r)["px"]) > 0:
 			hit.append(id)
 		for bot in home.get_world()["helper_bot_rects"]:
 			if r.intersects(Rect2(home.world_to_screen(bot.position), bot.size * t["scale"])):

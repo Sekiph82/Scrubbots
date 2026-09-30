@@ -94,8 +94,9 @@ const V04_REF_AD_RATIO := 50.0 / 320.0
 const V04_REF_AD_MIN := 100.0
 const V04_REF_AD_MAX := 180.0
 ## Hero scale relative to the V04 safe-box fit, applied about the visible soles
-## (V05 1.15; V06 owner target 1.24 — clears the baked sign and helper bots).
-const SCRUBBY_SCALE := 1.24
+## (V05 1.15; V06 1.24; M42-C002 owner lock 1.612 = 1.24 x 1.30 — never scaled down per
+## viewport; coordination/OWNER_M42_HOME_SCRUBBY_ANIMATION_V01.md).
+const SCRUBBY_SCALE := 1.612
 ## V06 HeroFocusShade (world canvas px; re-based for the owner-selected 940x1672 Home
 ## background, M28-C002-C003-R01 V02): soft dark radial dimmer behind Scrubby's torso,
 ## starting below the baked sign (bottom y 545), peak alpha 0.20 fading to 0.

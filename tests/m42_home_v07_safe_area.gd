@@ -189,7 +189,7 @@ func _synthetic_matrix() -> void:
 func _constants() -> void:
 	print("[v06 constants unchanged]")
 	_ok(is_equal_approx(HS.AD_SLOT_RATIO, 100.0 / 1080.0) and HS.AD_SLOT_MIN_H == 72.0 and HS.AD_SLOT_MAX_H == 112.0, "ad reservation rule unchanged (100 px @1080, clamp 72..112)")
-	_ok(HS.SCRUBBY_SCALE == 1.24 and HS.PANEL_ALPHA == 0.51 and HS.CURRENCY_PILL_H == 68.0, "V06 hero / panel / pill constants unchanged")
+	_ok(HS.SCRUBBY_SCALE == 1.612 and HS.PANEL_ALPHA == 0.51 and HS.CURRENCY_PILL_H == 68.0, "hero 1.612 (M42-C002 owner lock) / V06 panel / pill constants unchanged")
 	_complete("v06_constants_unchanged")
 
 func _complete(c: String) -> void:

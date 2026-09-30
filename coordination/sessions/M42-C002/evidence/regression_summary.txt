@@ -1,0 +1,26 @@
+# M42-C002 regression summary (final files, fresh batch)
+
+m42_c002_scrubby_scale exit=0 fails=0 :: m42_c002_scrubby_scale: 7/7 cases, 0 failures
+m42_home exit=0 fails=0 :: M42 home evidence: PASS
+m42_home_v04 exit=0 fails=0 :: m42_home_v04: 18/18 cases, 0 failures
+m42_home_v05 exit=0 fails=0 :: m42_home_v05: 13/13 cases, 0 failures
+m42_home_v06 exit=0 fails=0 :: m42_home_v06: 13/13 cases, 0 failures
+m42_home_v07_safe_area exit=0 fails=0 :: m42_home_v07_safe_area: 9/9 cases, 0 failures
+m42_home_composition exit=0 fails=0 :: m42_home_composition: 9/9 cases, 0 failures
+m42_navigation exit=0 fails=0 :: M42 navigation evidence: PASS
+m42_opening exit=0 fails=0 :: M42 opening evidence: PASS
+m42_assets exit=0 fails=0 :: M42 assets evidence: PASS
+m40_save_system exit=0 fails=0 :: M40 save system evidence: PASS
+m40_v02_safety exit=0 fails=0 :: M40 V02 safety evidence: PASS
+m40_v03_canonical exit=0 fails=0 :: M40 V03 canonical evidence: PASS
+m40_v04_bootstrap exit=0 fails=0 :: M40 V04 bootstrap evidence: PASS
+m43_c001a_results_foundation exit=0 fails=0 :: M43-C001A results foundation evidence: PASS (11/11 cases, 0 fail)
+m43_c001b_won_results_visual exit=0 fails=0 :: M43-C001B WON results visual evidence: PASS (11/11 cases, 0 fail)
+m43_c002_c001_popup_modal_pause exit=0 fails=0 :: M43-C002-C001 popup / modal / Pause foundation evidence: PASS (23/23 cases, 0 fail)
+m43_c003_c001_acquisition exit=0 fails=0 :: M43-C003-C001 acquisition evidence: PASS (34/34 cases, 0 fail)
+m28_c002_c003_r01_remediation exit=0 fails=0 :: M28-C002-C003-R01 five-finding remediation: PASS (24/24 cases, 0 fail)
+m28_c002_c003_final_gate exit=0 fails=0 :: M28-C002-C003 final popup-inclusive gate: PASS (22/22 cases, 0 fail)
+run_tests exit=0 fails=0 :: RESULT: ALL PASS
+[exited with code 0]
+
+root tests/run_tests.gd: Total checks 5323, Failures 0, RESULT: ALL PASS
