@@ -6,15 +6,15 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 - Current Milestone: M32 GAMEPLAY SCRUBBOT APPARENT SIZE
 - Current Sprint: M32-C002 — Board-Resolution-Independent Scrubbot Apparent Size
-- Current Task: CLAUDE implements SB-M32-UI-012 board-resolution-independent Scrubbot apparent size using actual rendered presentation geometry
-- Current Task Status: READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M32-C002/CHATGPT_PROMPT_V01.md` against `coordination/sessions/M32-C002/CHATGPT_AUDIT_CRITERIA_V01.md`, pushes implementation/evidence/logs, then returns for independent ChatGPT audit.
-- Required Actor: CLAUDE
+- Current Task: OWNER visual acceptance of SB-M32-UI-012 board-resolution-independent Scrubbot apparent size
+- Current Task Status: AUDITED_PASS / OWNER_VISUAL_ACCEPTANCE_REQUIRED
+- Next Task/Action: OWNER executes `coordination/sessions/M32-C002/OWNER_VISUAL_GATE_V01.md`: review cross-board size consistency, 32x32 reference preservation, rectangular boards, and live/echo proportion. If all are approved, close SB-M32-UI-012 and advance to SB-M39-053.
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 960 / 1364 = 70.38%. SB-M29-010 is CLOSED after technical PASS plus owner tempo playtest PASS (1x OK, 2x OK, dense 5/6-slot smoothness OK). Current work is SB-M32-UI-012 board-resolution-independent Scrubbot apparent size.
-- Note: M29 owner gate `coordination/sessions/M29-C002/OWNER_TEMPO_PLAYTEST_GATE_V01.md` is OWNER PASS / CLOSED. M32-C002 now owns only presentation sizing: preserve the accepted 32x32 / 2.4-cell appearance while compensating from actual rendered cell geometry across 20/32/38/59, rectangular and synthetic future-size cases.
-- Owner sequencing lock: (1) SB-M32-UI-012 board-resolution-independent Scrubbot apparent size; (2) SB-M39-053 test-stability; (3) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (4) only after that owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation; (5) resume existing M43/meta roadmap.
+- Progress: 960 / 1364 = 70.38%. SB-M32-UI-012 implementation `649cf6290752e298b888eac6e080fb65bb2be9ed` is independently AUDITED_PASS. Measured Scrubbot footprint is 58.64 px across 20/32/38/59, rectangular, and synthetic 100 cases at the same 1080x2160 presentation. Owner visual acceptance remains required.
+- Note: M32-C002 audit `coordination/sessions/M32-C002/CHATGPT_AUDIT_V01.md` is technical PASS. Owner gate `coordination/sessions/M32-C002/OWNER_VISUAL_GATE_V01.md` asks only whether 20/32/38/59 look same-sized, 32x32 still matches the accepted reference, rectangular boards look natural, and retire-echo proportion looks right.
+- Owner sequencing lock: (1) SB-M32-UI-012 owner visual acceptance/closure; (2) SB-M39-053 test-stability; (3) SB-M42-034 Home Scrubby Hero Scale + Placement Lock at canonical `SCRUBBY_SCALE = 1.612` (+30% from current 1.24); (4) only after that owner-accepted scale lock, SB-M42-035 Home Scrubby Runtime Animation; (5) resume existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
 
 ## Tasks
@@ -1355,7 +1355,7 @@ Closure evidence: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V03.md` + `coord
 - [x] SB-M32-UI-009 Configure Godot import settings.
 - [x] SB-M32-UI-010 Integrate approved art without coupling animation to TargetSelector logic.
 - [x] SB-M32-UI-011 Validate readability/scale on phone viewport matrix.
-- [ ] SB-M32-UI-012 Board-resolution-independent Scrubbot apparent size: replace constant `BODY_SPAN_CELLS = 2.4` behavior with presentation-scale compensation derived from actual rendered cell/board geometry so the current owner-accepted 32x32 / 2.4-cell appearance becomes the visual reference and Scrubbots remain approximately the same apparent screen size on 20x20, 32x32, 38x38, 59x59 and future larger boards. Include rectangular-board handling, live responsive relayout, same-compensation retire echo ratio, and a synthetic 100x100 scaling proof without expanding the current production board-size validity envelope. Presentation only; no route/target/agent-position/clear/solver truth changes. Authority: `coordination/OWNER_SCRUBBOT_SIZE_AND_GAMEPLAY_TEMPO_V01.md`. Prompt: `coordination/sessions/M32-C002/CHATGPT_PROMPT_V01.md`; criteria: `coordination/sessions/M32-C002/CHATGPT_AUDIT_CRITERIA_V01.md`. `[CURRENT / READY_FOR_CLAUDE]`
+- [ ] SB-M32-UI-012 Board-resolution-independent Scrubbot apparent size: presentation-scale compensation is derived from actual rendered BoardPresentation geometry using the accepted 32x32 / 2.4-cell appearance as reference; live visuals and retire echo follow responsive relayout without gameplay-truth mutation. Implementation `649cf6290752e298b888eac6e080fb65bb2be9ed`; audit `coordination/sessions/M32-C002/CHATGPT_AUDIT_V01.md`: `[AUDITED_PASS / OWNER VISUAL ACCEPTANCE REQUIRED]`; owner gate: `coordination/sessions/M32-C002/OWNER_VISUAL_GATE_V01.md`. Measured 1080x2160 body footprint is 58.64 px on 20/32/38/59, 59x40, 24x40 and synthetic 100x100; echo/live ratio remains 0.875. Owner acceptance is the only closure gate.
 
 ### M33 — Audio `[OWNER-LOCKED AUDIO SELECTION V02 2026-09-24]`
 
