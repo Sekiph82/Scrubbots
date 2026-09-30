@@ -127,13 +127,14 @@ func _scrubby(home) -> void:
 	var c: Dictionary = home.get_scrubby_canonical()
 	var w: Dictionary = home.get_world()
 	_ok(absf(c["center_x"] - 470.0) < 0.01 and absf(c["feet_y"] - 1240.0) < 0.01, "centre X 470 / soles Y 1240 (new world anchor) (%.2f, %.2f)" % [c["center_x"], c["feet_y"]])
-	_ok(absf(float(c["k"]) / float(c["k_v04"]) - HS.SCRUBBY_SCALE) < 0.001 and HS.SCRUBBY_SCALE >= 1.15, "visible scale %.2f x V04 (V05 1.15, V06 1.24) (k %.5f vs %.5f)" % [HS.SCRUBBY_SCALE, c["k"], c["k_v04"]])
+	_ok(absf(float(c["k"]) / float(c["k_v04"]) - HS.SCRUBBY_SCALE) < 0.001 and HS.SCRUBBY_SCALE >= 1.15, "visible scale %.3f x V04 (V05 1.15, V06 1.24, M42-C002 1.612) (k %.5f vs %.5f)" % [HS.SCRUBBY_SCALE, c["k"], c["k_v04"]])
 	var vr: Rect2 = c["visible_rect"]
 	_ok(not vr.intersects(w["baked_sign_rect"]), "clears the baked sign (top %.1f > sign bottom %.1f)" % [vr.position.y, (w["baked_sign_rect"] as Rect2).end.y])
-	var hit := false
-	for b in w["helper_bot_rects"]:
-		hit = hit or vr.intersects(b)
-	_ok(not hit, "clears the baked helper bots")
+	# M42-C002 (owner lock 1.612): the hero bbox edges reach <= 47 canvas px into each bot
+	# rect; pixel-level only the brush bristles enter the left one, the right one gets no
+	# hero pixel (tests/m42_c002_scrubby_scale.gd).
+	var bots: Array = w["helper_bot_rects"]
+	_ok(vr.position.x >= (bots[0] as Rect2).end.x - 47.0 and vr.end.x <= (bots[1] as Rect2).position.x + 47.0, "helper bots: bbox intrusion left %.1f / right %.1f <= 47 canvas px" % [(bots[0] as Rect2).end.x - vr.position.x, vr.end.x - (bots[1] as Rect2).position.x])
 	var sc: TextureRect = home.get_region("Art_scrubby")
 	_ok(absf(sc.position.y + HS.SCRUBBY_FEET_Y * float(c["k"]) * float(home.get_world_transform()["scale"]) - home.world_to_screen(Vector2(470, 1240)).y) < 0.5, "on screen the soles stay on the mapped world anchor (470,1240)")
 	_complete("scrubby_hero")

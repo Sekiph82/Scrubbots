@@ -112,14 +112,15 @@ func _scrubby(home) -> void:
 	var c: Dictionary = home.get_scrubby_canonical()
 	var w: Dictionary = home.get_world()
 	var ratio: float = float(c["k"]) / float(c["k_v04"])
-	_ok(absf(ratio - 1.24) < 0.001 and HS.SCRUBBY_SCALE == 1.24, "hero scale 1.24 x V04 base fit (%.4f)" % ratio)
+	_ok(absf(ratio - 1.612) < 0.001 and HS.SCRUBBY_SCALE == 1.612, "hero scale 1.612 x V04 base fit (M42-C002 owner lock, was V06 1.24) (%.4f)" % ratio)
 	_ok(absf(c["center_x"] - 470.0) < 0.01 and absf(c["feet_y"] - 1240.0) < 0.01, "centre X 470 / soles 1240 (new world anchor)")
 	var vr: Rect2 = c["visible_rect"]
 	_ok(not vr.intersects(w["baked_sign_rect"]), "clears the baked sign (visible top %.1f > sign bottom %.1f)" % [vr.position.y, (w["baked_sign_rect"] as Rect2).end.y])
-	var hit := false
-	for b in w["helper_bot_rects"]:
-		hit = hit or vr.intersects(b)
-	_ok(not hit, "clears the baked helper bots (visible x %.1f..%.1f)" % [vr.position.x, vr.end.x])
+	# M42-C002 (owner lock 1.612): the hero bbox edges reach <= 47 canvas px into each bot
+	# rect; pixel-level only the brush bristles enter the left one, the right one gets no
+	# hero pixel (tests/m42_c002_scrubby_scale.gd).
+	var bots: Array = w["helper_bot_rects"]
+	_ok(vr.position.x >= (bots[0] as Rect2).end.x - 47.0 and vr.end.x <= (bots[1] as Rect2).position.x + 47.0, "helper bots: bbox intrusion left %.1f / right %.1f <= 47 canvas px" % [(bots[0] as Rect2).end.x - vr.position.x, vr.end.x - (bots[1] as Rect2).position.x])
 	_ok(absf(_rect(home, "Art_scrubby").position.y + HS.SCRUBBY_FEET_Y * float(c["k"]) * float(home.get_world_transform()["scale"]) - home.world_to_screen(Vector2(470, 1240)).y) < 0.5, "on screen the soles stay on the mapped world anchor (470,1240)")
 	_complete("scrubby_scale")
 
