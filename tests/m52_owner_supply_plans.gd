@@ -5,7 +5,7 @@ extends SceneTree
 ## Covers: plan == owner markdown (exact queues + intended clicks + provenance hash);
 ## global Cxx -> local palette mapping (never Cxx == index); fail-closed loader on
 ## malformed/missing/adversarial plans; per-level queue exactness, hidden FIFO depth > 3,
-## max batch <= 30, per-color + grand conservation; recorded canonical SOLVED evidence
+## positive per-plan batch metadata, per-color + grand conservation; recorded canonical SOLVED evidence
 ## re-validated by replaying the solver trace here; the owner intended click sequence
 ## replayed through the real ProofKernel; ProductionGameplayHost starting each level
 ## with the exact plan queues (3 visible rows, hidden depth kept) and reaching WON via
@@ -86,14 +86,13 @@ func _fail_closed() -> void:
 		"levelId mismatch": func(p): p["levelId"] = "level_009_frog",
 		"two columns": func(p): p["columns"].pop_back(),
 		"preview depth 4": func(p): p["visiblePreviewDepth"] = 4,
-		"batch 31": func(p): p["columns"][0][0]["robots"] = 31,
 		"batch 0": func(p): p["columns"][0][0]["robots"] = 0,
 		"fractional batch": func(p): p["columns"][0][0]["robots"] = 29.5,
 		"conservation -1": func(p): p["columns"][0][0]["robots"] = 29,
 		"Cxx absent from level palette": func(p): p["columns"][0][0]["cid"] = "C01",
 		"off-palette Cxx": func(p): p["columns"][0][0]["cid"] = "C99",
 		"duplicate batchId": func(p): p["columns"][1][0]["batchId"] = p["columns"][0][0]["batchId"],
-		"maxRobotsPerBatch 31": func(p): p["maxRobotsPerBatch"] = 31,
+		"maxRobotsPerBatch 0": func(p): p["maxRobotsPerBatch"] = 0,
 	}
 	for name in cases:
 		var p = JSON.parse_string(JSON.stringify(good))
@@ -110,6 +109,12 @@ func _fail_closed() -> void:
 		"columnCount": 3, "visiblePreviewDepth": 3, "maxRobotsPerBatch": 30,
 		"columns": [[{"batchId": "a", "cid": "C16", "robots": 30}], [{"batchId": "b", "cid": "C08", "robots": 30}], [{"batchId": "c", "cid": "C01", "robots": 30}]]}
 	_ok(not SupplyPlanLoader.build_engine(apple_plan, apple)["ok"], "C16 plan against Apple (no C16 in its palette) fails closed")
+	# The game-wide 30 ceiling is retired. Preserve exact color/grand totals while
+	# moving one plan color into a 31-robot and a substantially larger batch.
+	var plan31 := _rebalanced_plan(good, "C08", 31)
+	_ok(not plan31.is_empty() and SupplyPlanLoader.build_engine(plan31, lvl)["ok"], "valid conserved 31-robot batch loads")
+	var plan120 := _rebalanced_plan(good, "C08", 120)
+	_ok(not plan120.is_empty() and SupplyPlanLoader.build_engine(plan120, lvl)["ok"], "valid conserved substantially larger batch loads")
 
 # --- plan == owner markdown ------------------------------------------------------
 func _plan_matches_owner_markdown(id: String) -> void:
@@ -170,7 +175,8 @@ func _plan_static(id: String) -> void:
 			sums[int(b["color_id"])] = int(sums.get(int(b["color_id"]), 0)) + int(b["robot_count"])
 			batches += 1
 	_ok(max_len > 3, "hidden FIFO depth preserved (deepest column %d > 3 visible rows)" % max_len)
-	_ok(max_b <= 30, "max batch %d <= 30" % max_b)
+	var declared_max := int(SupplyPlanLoader.load_plan(plan_path(id))["plan"]["maxRobotsPerBatch"])
+	_ok(max_b <= declared_max, "max batch %d <= this plan's declared metadata bound %d" % [max_b, declared_max])
 	_ok(sums == BatchSupplyGenerator.color_totals(lvl), "per-color conservation exact")
 	var grand := 0
 	for c in sums:
@@ -348,6 +354,36 @@ func _write_tmp(tag: String, text: String) -> String:
 	f.store_string(text)
 	f.close()
 	_tmp.append(p)
+	return p
+
+func _rebalanced_plan(source: Dictionary, cid: String, target: int) -> Dictionary:
+	var p: Dictionary = JSON.parse_string(JSON.stringify(source))
+	p["maxRobotsPerBatch"] = target
+	var anchor = null
+	for col in p["columns"]:
+		for b in col:
+			if String(b["cid"]) == cid and anchor == null:
+				anchor = b
+	if anchor == null:
+		return {}
+	var need := target - int(anchor["robots"])
+	if need < 0:
+		return {}
+	for col in p["columns"]:
+		for b in col:
+			if need == 0:
+				break
+			if b == anchor or String(b["cid"]) != cid:
+				continue
+			var movable := maxi(0, int(b["robots"]) - 1)
+			var take := mini(movable, need)
+			b["robots"] = int(b["robots"]) - take
+			need -= take
+		if need == 0:
+			break
+	if need != 0:
+		return {}
+	anchor["robots"] = target
 	return p
 
 func _uniq(tag: String) -> String:

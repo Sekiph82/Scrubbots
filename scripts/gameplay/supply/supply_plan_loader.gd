@@ -15,7 +15,7 @@ extends RefCounted
 ## Fail-closed on: unreadable/malformed JSON, wrong schema/version, level id mismatch,
 ## column/preview shape != 3/3, unknown/off-palette Cxx, Cxx absent from the level
 ## palette, duplicate level palette entries, empty/duplicate batch id, robot count
-## outside 1..30 (or non-integer), per-color totals != LevelData cell totals, grand
+## outside the positive per-plan metadata bound (or non-integer), per-color totals != LevelData cell totals, grand
 ## total != cell count, or engine rejection. No fallback candidate is ever produced.
 
 const BatchSupplyEngine = preload("res://scripts/gameplay/supply/batch_supply_engine.gd")
@@ -26,7 +26,6 @@ const ProductionArtLevelBuilder = preload("res://scripts/tools/production_art_le
 const SCHEMA := "scrubbots.level_supply_plan.v1"
 const COLUMN_COUNT := 3
 const VISIBLE_PREVIEW_DEPTH := 3
-const MAX_ROBOTS_PER_BATCH := 30
 
 ## Parse a plan file. Returns {ok, error, plan}.
 static func load_plan(path: String) -> Dictionary:
@@ -68,8 +67,8 @@ static func build_engine(plan: Dictionary, level) -> Dictionary:
 	if _as_int(plan.get("columnCount")) != COLUMN_COUNT or _as_int(plan.get("visiblePreviewDepth")) != VISIBLE_PREVIEW_DEPTH:
 		return fail.call("plan must declare %d columns / %d visible rows" % [COLUMN_COUNT, VISIBLE_PREVIEW_DEPTH])
 	var mr := _as_int(plan.get("maxRobotsPerBatch"))
-	if mr < 1 or mr > MAX_ROBOTS_PER_BATCH:
-		return fail.call("maxRobotsPerBatch must be 1..%d" % MAX_ROBOTS_PER_BATCH)
+	if mr < 1:
+		return fail.call("maxRobotsPerBatch must be a positive integer per-plan metadata bound")
 	var m := cid_to_local_map(level)
 	if not m["ok"]:
 		return fail.call(m["error"])
@@ -98,7 +97,7 @@ static func build_engine(plan: Dictionary, level) -> Dictionary:
 				return fail.call("%s: color %s is not a canonical color of this level's palette" % [bid, cid])
 			var n := _as_int(b.get("robots"))
 			if n < 1 or n > mr:
-				return fail.call("%s: robots %s outside 1..%d" % [bid, str(b.get("robots")), mr])
+				return fail.call("%s: robots %s outside 1..%d declared by this plan" % [bid, str(b.get("robots")), mr])
 			var local: int = cid_to_local[cid]
 			var batch = ColorBatch.make(bid, local, n, palette_size)
 			if batch == null:
