@@ -1,0 +1,94 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[legacy owner plans 2..10]
+  ok: level_002_apple: unchanged 3-column owner plan loads (3 cols / depth 3)
+  ok: level_003_palm_tree: unchanged 3-column owner plan loads (3 cols / depth 3)
+  ok: level_004_orange_cat: unchanged 3-column owner plan loads (3 cols / depth 3)
+  ok: level_005_party_toucan: unchanged 3-column owner plan loads (3 cols / depth 3)
+  ok: level_006_chicken: unchanged 3-column owner plan loads (3 cols / depth 3)
+  ok: level_007_pigeon: unchanged 3-column owner plan loads (3 cols / depth 3)
+  ok: level_008_butterfly: unchanged 3-column owner plan loads (3 cols / depth 3)
+  ok: level_009_frog: unchanged 3-column owner plan loads (3 cols / depth 3)
+  ok: level_010_ice_cube: unchanged 3-column owner plan loads (3 cols / depth 3)
+[accept 3 / 4 / 5]
+  ok: 3-column plan accepted; engine created with 3 columns / depth 3
+  ok: 3-column plan: FIFO order + batch identity preserved ["B01", "B02", "B03", "B04", "B05"]
+  ok: 3-column plan: Cxx -> local palette mapping exact
+  ok: 4-column plan accepted; engine created with 4 columns / depth 3
+  ok: 4-column plan: FIFO order + batch identity preserved ["B01", "B02", "B03", "B04", "B05", "B06"]
+  ok: 4-column plan: Cxx -> local palette mapping exact
+  ok: 5-column plan accepted; engine created with 5 columns / depth 3
+  ok: 5-column plan: FIFO order + batch identity preserved ["B01", "B02", "B03", "B04", "B05", "B06"]
+  ok: 5-column plan: Cxx -> local palette mapping exact
+[reject column counts]
+  ok: 2-column plan rejected (plan columnCount must be an integer 3..5 (got 2))
+  ok: 6-column plan rejected (plan columnCount must be an integer 3..5 (got 6))
+  ok: columnCount 0 rejected (must be exact integer)
+  ok: columnCount -1 rejected (must be exact integer)
+  ok: columnCount 3.5 rejected (must be exact integer)
+  ok: columnCount 4 rejected (must be exact integer)
+  ok: columnCount <null> rejected (must be exact integer)
+  ok: columnCount 4.0 (JSON integral number) accepted as 4
+[preview depth]
+  ok: 3 columns / preview depth 2 rejected (plan visiblePreviewDepth must be exactly 3)
+  ok: 3 columns / preview depth 4 rejected (plan visiblePreviewDepth must be exactly 3)
+  ok: 3 columns / preview depth 3 accepted
+  ok: 4 columns / preview depth 2 rejected (plan visiblePreviewDepth must be exactly 3)
+  ok: 4 columns / preview depth 4 rejected (plan visiblePreviewDepth must be exactly 3)
+  ok: 4 columns / preview depth 3 accepted
+  ok: 5 columns / preview depth 2 rejected (plan visiblePreviewDepth must be exactly 3)
+  ok: 5 columns / preview depth 4 rejected (plan visiblePreviewDepth must be exactly 3)
+  ok: 5 columns / preview depth 3 accepted
+[columns array length mismatch]
+  ok: declared 4 / array 3 rejected (plan columns must be an array of 4 FIFO queues (declared columnCount))
+  ok: declared 4 / array 5 rejected (plan columns must be an array of 4 FIFO queues (declared columnCount))
+  ok: declared 5 / array 4 rejected (plan columns must be an array of 5 FIFO queues (declared columnCount))
+  ok: declared 3 / array 4 rejected (plan columns must be an array of 3 FIFO queues (declared columnCount))
+  ok: declared 5 / array 3 rejected (plan columns must be an array of 5 FIFO queues (declared columnCount))
+[uncapped robots per batch]
+  ok: 4-column plan with a 31-robot batch accepted (no global cap)
+  ok: 5-column plan with a 31-robot batch accepted (no global cap)
+  ok: per-plan maxRobotsPerBatch metadata bound still enforced
+[conservation]
+  ok: 4 columns: per-color conservation mismatch rejected
+  ok: 4 columns: per-color mismatch with equal grand total rejected
+  ok: 4 columns: grand-total surplus rejected
+  ok: 4 columns: duplicate batchId rejected
+  ok: 4 columns: Cxx absent from level palette rejected
+  ok: 5 columns: per-color conservation mismatch rejected
+  ok: 5 columns: per-color mismatch with equal grand total rejected
+  ok: 5 columns: grand-total surplus rejected
+  ok: 5 columns: duplicate batchId rejected
+  ok: 5 columns: Cxx absent from level palette rejected
+[real SolvabilitySolver solve + replay]
+  ok: 3 columns: solver state sees 3 columns, baseline 5 slots
+  ok: 3 columns: solve SOLVED (visited 6)
+  ok: 3 columns: trace uses column index 2
+  ok: 3 columns: replay reaches solved (5 steps)
+  ok: 4 columns: solver state sees 4 columns, baseline 5 slots
+  ok: 4 columns: solve SOLVED (visited 7)
+  ok: 4 columns: trace uses column index 3
+  ok: 4 columns: replay reaches solved (6 steps)
+  ok: 5 columns: solver state sees 5 columns, baseline 5 slots
+  ok: 5 columns: solve SOLVED (visited 7)
+  ok: 5 columns: trace uses column index 4
+  ok: 5 columns: replay reaches solved (6 steps)
+[BatchSupplyPanel 3 / 4 / 5]
+  ok: panel renders 3 columns x exactly 3 visible rows
+  ok: panel renders 4 columns x exactly 3 visible rows
+  ok: panel renders 5 columns x exactly 3 visible rows
+  ok: panel renders 3 columns x exactly 3 visible rows
+[production host 4 / 5 columns, baseline 5 slots]
+  ok: 4-column plan builds the real host
+  ok: 4 columns: host supply 4 cols / depth 3
+  ok: 4 columns: baseline five slots (no +1 Slot) (5)
+  ok: 4 columns: QA drop-last rebuild keeps 4 columns
+  ok: 5-column plan builds the real host
+  ok: 5 columns: host supply 5 cols / depth 3
+  ok: 5 columns: baseline five slots (no +1 Slot) (5)
+  ok: 5 columns: QA drop-last rebuild keeps 5 columns
+maint_supply_columns_c001: 10/10 cases, 0 failures
+WARNING: 4 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 1 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
