@@ -1,0 +1,42 @@
+# MAINT-SUPPLY-COLUMNS-C001 regression (implementation commit 51d260b, pre-merge tree)
+
+maint_supply_columns_c001 exit=0 fails=0 :: maint_supply_columns_c001: 10/10 cases, 0 failures
+m23_v01_batch_supply_evidence exit=0 fails=0 :: M23 V01 batch supply evidence: PASS
+m23_v02_hardening_evidence exit=0 fails=0 :: M23 V02 hardening evidence: PASS
+m23_v03_transaction_identity_evidence exit=0 fails=0 :: M23 V03 transaction identity evidence: PASS
+m24_blue_fixture_evidence exit=0 fails=0 :: M24 BLUE 8/14/12 fixture evidence: PASS
+m24_five_full_refill_evidence exit=0 fails=0 :: M24 five-full/refill evidence: PASS
+m24_slot_state_evidence exit=0 fails=0 :: M24 slot-state evidence: PASS
+m24_supply_handoff_evidence exit=0 fails=0 :: M24 supply-handoff evidence: PASS
+m24_v02_transaction_hardening_evidence exit=0 fails=0 :: M24 V02 transaction-hardening evidence: PASS
+m25_c003_exact_prefilter exit=0 fails=0 :: M25-C003 EXACT PREFILTER: PASS
+m25_c004_host_truth exit=0 fails=0 :: m25_c004_host_truth: PASS (0 failed checks)
+m27_generation_retry exit=0 fails=0 :: M27 generation retry: PASS
+m27_hazard_bot_solve exit=0 fails=0 :: M27 Hazard Bot solvability: PASS
+m27_scale_59 exit=0 fails=0 :: M27 59x59 scale: PASS
+m28_c002_c001_gameplay_v02 exit=0 fails=0 :: M28-C002-C001 Gameplay V02 core evidence: PASS (14/14 cases, 0 fail)
+m28_c002_c002_r01_visual exit=0 fails=0 :: M28-C002-C002-R01 visual remediation evidence: PASS (10/10 cases, 0 fail)
+m28_c002_c002_static_shell exit=0 fails=0 :: M28-C002-C002 static master shell evidence: PASS (16/16 cases, 0 fail)
+m28_c002_c003_final_gate exit=0 fails=0 :: M28-C002-C003 final popup-inclusive gate: PASS (22/22 cases, 0 fail)
+m28_c002_c003_r01_remediation exit=0 fails=0 :: M28-C002-C003-R01 five-finding remediation: PASS (24/24 cases, 0 fail)
+m28_c002_c004_tile_visual exit=0 fails=0 :: M28-C002-C004 color/batch tile visual: PASS (17/17 cases, 0 fail)
+m28_gameplay_layout_smoke exit=0 fails=0 :: ==== M28 layout smoke: 253 checks, 0 failures ====
+m29_c002_tempo_retune exit=0 fails=0 :: M29-C002 TEMPO RETUNE: PASS
+m29_exact_slot_origin_evidence exit=0 fails=0 :: M29 exact slot-origin evidence: PASS
+m29_hazard_bot_runtime_smoke exit=0 fails=0 :: M29 Hazard Bot runtime smoke: PASS
+m29_input_gate_evidence exit=0 fails=0 :: M29 input gate evidence: PASS
+m29_presentation_identity_evidence exit=0 fails=0 :: M29 presentation identity evidence: PASS
+m29_realtime_movement_smoke exit=0 fails=0 :: M29 realtime movement smoke: PASS
+m29_slot_display_sync_evidence exit=0 fails=0 :: M29 slot display + live sync evidence: PASS
+m29_speed_authority_evidence exit=0 fails=0 :: M29 speed authority evidence: PASS
+m52_owner_supply_plans exit=0 fails=0 :: M52 OWNER SUPPLY PLANS: PASS
+m52_r01_parallel_runtime exit=0 fails=0 :: M52 R01 PARALLEL RUNTIME: PASS
+m52_r02_early_slot_release exit=0 fails=0 :: M52 R02 EARLY SLOT RELEASE: PASS
+m53_c002_difficulty_calibration exit=0 fails=3 :: M53-C002 DIFFICULTY CALIBRATION: PASS
+m53_first10_difficulty exit=0 fails=3 :: M53 FIRST10 DIFFICULTY: PASS
+m55_core_chaos exit=0 fails=0 :: M55 CORE CHAOS: PASS
+m39_v04_integration exit=0 fails=0 :: M39 V04 integration evidence: PASS
+run_tests exit=0 fails=0 :: RESULT: ALL PASS
+
+root tests/run_tests.gd: Total checks 5323, Failures 0, RESULT: ALL PASS
+m53 'fails=3' counts are 'ok:' lines that print pre-existing guard verdict text '(drop x, FAIL)'; both suites exit 0 / PASS.
