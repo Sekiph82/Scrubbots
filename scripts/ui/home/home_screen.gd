@@ -55,6 +55,9 @@ const HomePopup = preload("res://scripts/ui/home/home_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const HomePresentationMap = preload("res://scripts/ui/home/home_presentation_map.gd")
 const HomeWorldCatalog = preload("res://scripts/ui/home/home_world_catalog.gd")
+const HomeScrubbyHero = preload("res://scripts/ui/home/home_scrubby_hero.gd")
+## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
+const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
 const UiText = preload("res://scripts/ui/ui_text.gd")
 
 ## Popups with a V1 Home destination. Only DAILY is a Home panel in V04; Gifts and Cards
@@ -148,11 +151,14 @@ func _ready() -> void:
 	_apply_layout_mode()
 	if _art == null:
 		set_art_binder(HomeArtBinder.new())
+	if _app != null:
+		_nodes["HomeScrubbyHero"].bind_effects(_app.effects if "effects" in _app else null)
 	refresh()
 
 func bind(app_state) -> void:
 	_app = app_state
 	if _built:
+		_nodes["HomeScrubbyHero"].bind_effects(app_state.effects if app_state != null and "effects" in app_state else null)
 		refresh()
 
 ## SB-M42-017: bind ONLY owner-approved art (HomeArtBinder gate) onto the nodes the
@@ -171,6 +177,7 @@ func set_art_binder(binder) -> void:
 	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
 		var b: UiShortcutButton = _nodes["Shortcut_" + id[0]]
 		b.set_icon_box(b.get_icon_box())
+	_nodes["HomeScrubbyHero"].set_frames(_art.animation_set(HERO_ANIMATION_SET) if _art.has_method("animation_set") else {})
 	_queue_world()
 
 func get_art_binder():
@@ -253,6 +260,11 @@ func _build() -> void:
 	var sc := HomeStyle.art("Art_scrubby")
 	sc.stretch_mode = TextureRect.STRETCH_SCALE   # sized to the texture aspect by _layout_world
 	chars.add_child(_reg(sc))
+	# M42-C003 V03: presentation-only hero animation (idle + gestures) over Art_scrubby.
+	var hero := HomeScrubbyHero.new()
+	hero.set_home_rect(sc)
+	chars.add_child(_reg(hero))
+	_nodes["Art_scrubby_gesture"] = hero.get_gesture_rect()
 
 	var safe = SafeAreaRootScene.instantiate()
 	safe.name = "SafeAreaRoot"
@@ -695,6 +707,7 @@ func _layout_world() -> void:
 	var c := get_scrubby_canonical()
 	sc.position = world_to_screen(c["origin"])
 	sc.size = tex_size * float(c["k"]) * s
+	_nodes["HomeScrubbyHero"].set_base(sc.position, sc.size, tex_size)
 	var shade: Control = _nodes["HeroFocusShade"]
 	shade.position = world_to_screen(HERO_SHADE_RECT.position)
 	shade.size = HERO_SHADE_RECT.size * s
@@ -1051,6 +1064,7 @@ func _sync_modal() -> void:
 	var modal := is_modal_active()
 	for region in MODAL_HIDDEN:
 		(_nodes[region] as Control).visible = not modal
+	_nodes["HomeScrubbyHero"].set_modal(modal)
 	_queue_world()
 
 # ---------------------------------------------------------------- refresh ----

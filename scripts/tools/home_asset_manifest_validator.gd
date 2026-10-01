@@ -141,4 +141,37 @@ static func validate(m, project_root: String = "res://") -> Dictionary:
 	for req in REQUIRED_SLUGS:
 		if not slugs.has(req):
 			errors.append("missing required Economy V1 Home entry '%s'" % req)
+	_validate_animation_sets(m.get("animation_sets", {}), project_root, errors)
 	return {"ok": errors.is_empty(), "errors": errors, "warnings": warnings, "reuse": reuse}
+
+## M42-C003 V03: pinned frame sets (one common canvas + pivot per set). Every frame must be
+## a final .png whose bytes still match its sha256.
+static func _validate_animation_sets(sets, project_root: String, errors: Array) -> void:
+	if typeof(sets) != TYPE_DICTIONARY:
+		errors.append("animation_sets must be an object")
+		return
+	for id in sets:
+		var s = sets[id]
+		if typeof(s) != TYPE_DICTIONARY or str(s.get("status", "")) != "APPROVED":
+			errors.append("animation set %s: must be an APPROVED object" % id)
+			continue
+		for key in ["canvas", "pivot", "home_root_texels"]:
+			if typeof(s.get(key)) != TYPE_ARRAY or (s[key] as Array).size() != 2:
+				errors.append("animation set %s: %s must be [x, y]" % [id, key])
+		if float(s.get("home_texels_per_anim_pixel", 0)) <= 0.0 or float(s.get("fps", 0)) <= 0.0:
+			errors.append("animation set %s: home_texels_per_anim_pixel and fps must be positive" % id)
+		var gestures = s.get("gestures")
+		if typeof(gestures) != TYPE_DICTIONARY or gestures.is_empty():
+			errors.append("animation set %s: gestures must be a non-empty object" % id)
+			continue
+		for g in gestures:
+			var frames = gestures[g].get("frames") if typeof(gestures[g]) == TYPE_DICTIONARY else null
+			if typeof(frames) != TYPE_ARRAY or frames.is_empty():
+				errors.append("animation set %s/%s: frames must be a non-empty array" % [id, g])
+				continue
+			for f in frames:
+				var path := str(f.get("path", "")) if typeof(f) == TYPE_DICTIONARY else ""
+				if not path.begins_with(FINAL_ROOT) or not path.ends_with(".png"):
+					errors.append("animation set %s/%s: frame path must be a .png under %s (%s)" % [id, g, FINAL_ROOT, path])
+				elif FileAccess.get_sha256(project_root + path) != str(f.get("sha256", "")):
+					errors.append("animation set %s/%s: frame changed on disk %s" % [id, g, path])

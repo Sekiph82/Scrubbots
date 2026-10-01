@@ -1,0 +1,2400 @@
+{
+  "canvas": [
+    464,
+    512
+  ],
+  "pivot": [
+    219,
+    477
+  ],
+  "home_root_texels": [
+    638.5,
+    1324.0
+  ],
+  "home_texels_per_anim_pixel": 3,
+  "margin_px": 16,
+  "round_to": 16,
+  "resampler": "Pillow Image.transform(AFFINE, BICUBIC) on premultiplied RGBa, exact sub-pixel root registration",
+  "alpha_floor": 2,
+  "fps": 12,
+  "union_rel_pivot_px": [
+    -202.474,
+    -460.544,
+    213.39,
+    17.217
+  ],
+  "family_scales": {
+    "wave": 3.91885805334912,
+    "bow": 3.678628648459324,
+    "turn_look": 4.695424142078727,
+    "full_turn": 4.0517075940604785
+  },
+  "scale_report": {
+    "home": {
+      "visor_width": 422,
+      "visor_height": 287,
+      "visor_area": 75908,
+      "character_height": 1327,
+      "yaw_deg": 5.7
+    },
+    "families": {
+      "wave": {
+        "scale_home_texels_per_source_px": 3.91885805334912,
+        "basis": "median over comparable upright front frames (|yaw|<=15 deg, height>=93% of family max) of sqrt(HOME visor width ratio x HOME height ratio)",
+        "comparable_frames": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14
+        ],
+        "visor_width_vs_home_at_scale": [
+          1.0308,
+          1.0029,
+          1.0122,
+          0.9658,
+          0.9844,
+          0.9844,
+          0.9658,
+          0.9472,
+          1.0215,
+          0.9936,
+          0.9936,
+          0.9658,
+          1.0029,
+          0.9936
+        ],
+        "height_vs_home_at_scale": [
+          1.0218,
+          1.0159,
+          1.0277,
+          1.0277,
+          1.0188,
+          1.0159,
+          1.0188,
+          1.0218,
+          1.01,
+          1.01,
+          1.0041,
+          1.0011,
+          0.9893,
+          1.007
+        ],
+        "frames": [
+          {
+            "frame": 1,
+            "visor_width": 111,
+            "visor_height": 76,
+            "visor_area": 5705,
+            "character_height": 346,
+            "yaw_deg": 8.3,
+            "visor_ratio_scale": 3.8018018018018016,
+            "height_ratio_scale": 3.8352601156069364
+          },
+          {
+            "frame": 2,
+            "visor_width": 108,
+            "visor_height": 75,
+            "visor_area": 5472,
+            "character_height": 344,
+            "yaw_deg": 10.6,
+            "visor_ratio_scale": 3.9074074074074074,
+            "height_ratio_scale": 3.8575581395348837
+          },
+          {
+            "frame": 3,
+            "visor_width": 109,
+            "visor_height": 78,
+            "visor_area": 5589,
+            "character_height": 348,
+            "yaw_deg": 8.0,
+            "visor_ratio_scale": 3.871559633027523,
+            "height_ratio_scale": 3.8132183908045976
+          },
+          {
+            "frame": 4,
+            "visor_width": 104,
+            "visor_height": 77,
+            "visor_area": 5171,
+            "character_height": 348,
+            "yaw_deg": 9.8,
+            "visor_ratio_scale": 4.0576923076923075,
+            "height_ratio_scale": 3.8132183908045976
+          },
+          {
+            "frame": 5,
+            "visor_width": 106,
+            "visor_height": 82,
+            "visor_area": 5258,
+            "character_height": 345,
+            "yaw_deg": 11.0,
+            "visor_ratio_scale": 3.981132075471698,
+            "height_ratio_scale": 3.8463768115942027
+          },
+          {
+            "frame": 6,
+            "visor_width": 106,
+            "visor_height": 83,
+            "visor_area": 5314,
+            "character_height": 344,
+            "yaw_deg": 10.9,
+            "visor_ratio_scale": 3.981132075471698,
+            "height_ratio_scale": 3.8575581395348837
+          },
+          {
+            "frame": 7,
+            "visor_width": 104,
+            "visor_height": 83,
+            "visor_area": 5200,
+            "character_height": 345,
+            "yaw_deg": 11.8,
+            "visor_ratio_scale": 4.0576923076923075,
+            "height_ratio_scale": 3.8463768115942027
+          },
+          {
+            "frame": 8,
+            "visor_width": 102,
+            "visor_height": 82,
+            "visor_area": 5143,
+            "character_height": 346,
+            "yaw_deg": 12.5,
+            "visor_ratio_scale": 4.137254901960785,
+            "height_ratio_scale": 3.8352601156069364
+          },
+          {
+            "frame": 9,
+            "visor_width": 110,
+            "visor_height": 78,
+            "visor_area": 5551,
+            "character_height": 342,
+            "yaw_deg": 9.0,
+            "visor_ratio_scale": 3.8363636363636364,
+            "height_ratio_scale": 3.8801169590643276
+          },
+          {
+            "frame": 10,
+            "visor_width": 107,
+            "visor_height": 76,
+            "visor_area": 5457,
+            "character_height": 342,
+            "yaw_deg": 8.3,
+            "visor_ratio_scale": 3.94392523364486,
+            "height_ratio_scale": 3.8801169590643276
+          },
+          {
+            "frame": 11,
+            "visor_width": 107,
+            "visor_height": 76,
+            "visor_area": 5408,
+            "character_height": 340,
+            "yaw_deg": 7.7,
+            "visor_ratio_scale": 3.94392523364486,
+            "height_ratio_scale": 3.902941176470588
+          },
+          {
+            "frame": 12,
+            "visor_width": 104,
+            "visor_height": 77,
+            "visor_area": 5211,
+            "character_height": 339,
+            "yaw_deg": 8.6,
+            "visor_ratio_scale": 4.0576923076923075,
+            "height_ratio_scale": 3.9144542772861355
+          },
+          {
+            "frame": 13,
+            "visor_width": 108,
+            "visor_height": 74,
+            "visor_area": 5340,
+            "character_height": 335,
+            "yaw_deg": 9.0,
+            "visor_ratio_scale": 3.9074074074074074,
+            "height_ratio_scale": 3.961194029850746
+          },
+          {
+            "frame": 14,
+            "visor_width": 107,
+            "visor_height": 75,
+            "visor_area": 5328,
+            "character_height": 341,
+            "yaw_deg": 9.4,
+            "visor_ratio_scale": 3.94392523364486,
+            "height_ratio_scale": 3.8914956011730206
+          }
+        ]
+      },
+      "bow": {
+        "scale_home_texels_per_source_px": 3.678628648459324,
+        "basis": "median over comparable upright front frames (|yaw|<=15 deg, height>=93% of family max) of sqrt(HOME visor width ratio x HOME height ratio)",
+        "comparable_frames": [
+          1,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "visor_width_vs_home_at_scale": [
+          1.0635,
+          1.0722,
+          0.9938,
+          0.9763,
+          1.0548,
+          0.9938
+        ],
+        "height_vs_home_at_scale": [
+          1.0118,
+          1.0035,
+          1.0063,
+          0.9924,
+          1.0007,
+          1.0035
+        ],
+        "frames": [
+          {
+            "frame": 1,
+            "visor_width": 122,
+            "visor_height": 77,
+            "visor_area": 6668,
+            "character_height": 365,
+            "yaw_deg": 10.1,
+            "visor_ratio_scale": 3.459016393442623,
+            "height_ratio_scale": 3.6356164383561644
+          },
+          {
+            "frame": 2,
+            "visor_width": 119,
+            "visor_height": 77,
+            "visor_area": 6428,
+            "character_height": 361,
+            "yaw_deg": 15.1,
+            "visor_ratio_scale": 3.546218487394958,
+            "height_ratio_scale": 3.6759002770083105
+          },
+          {
+            "frame": 3,
+            "visor_width": 122,
+            "visor_height": 63,
+            "visor_area": 5557,
+            "character_height": 326,
+            "yaw_deg": 8.7,
+            "visor_ratio_scale": 3.459016393442623,
+            "height_ratio_scale": 4.070552147239264
+          },
+          {
+            "frame": 4,
+            "visor_width": 125,
+            "visor_height": 63,
+            "visor_area": 4990,
+            "character_height": 310,
+            "yaw_deg": 10.2,
+            "visor_ratio_scale": 3.376,
+            "height_ratio_scale": 4.280645161290322
+          },
+          {
+            "frame": 5,
+            "visor_width": 120,
+            "visor_height": 55,
+            "visor_area": 3430,
+            "character_height": 286,
+            "yaw_deg": 11.3,
+            "visor_ratio_scale": 3.5166666666666666,
+            "height_ratio_scale": 4.63986013986014
+          },
+          {
+            "frame": 6,
+            "visor_width": 110,
+            "visor_height": 49,
+            "visor_area": 2294,
+            "character_height": 278,
+            "yaw_deg": 11.1,
+            "visor_ratio_scale": 3.8363636363636364,
+            "height_ratio_scale": 4.773381294964029
+          },
+          {
+            "frame": 7,
+            "visor_width": 109,
+            "visor_height": 50,
+            "visor_area": 2204,
+            "character_height": 272,
+            "yaw_deg": 10.1,
+            "visor_ratio_scale": 3.871559633027523,
+            "height_ratio_scale": 4.8786764705882355
+          },
+          {
+            "frame": 8,
+            "visor_width": 117,
+            "visor_height": 58,
+            "visor_area": 4138,
+            "character_height": 277,
+            "yaw_deg": 16.5,
+            "visor_ratio_scale": 3.606837606837607,
+            "height_ratio_scale": 4.790613718411552
+          },
+          {
+            "frame": 9,
+            "visor_width": 119,
+            "visor_height": 66,
+            "visor_area": 5566,
+            "character_height": 317,
+            "yaw_deg": 18.9,
+            "visor_ratio_scale": 3.546218487394958,
+            "height_ratio_scale": 4.186119873817034
+          },
+          {
+            "frame": 10,
+            "visor_width": 119,
+            "visor_height": 63,
+            "visor_area": 5966,
+            "character_height": 323,
+            "yaw_deg": 10.6,
+            "visor_ratio_scale": 3.546218487394958,
+            "height_ratio_scale": 4.108359133126935
+          },
+          {
+            "frame": 11,
+            "visor_width": 123,
+            "visor_height": 77,
+            "visor_area": 6531,
+            "character_height": 362,
+            "yaw_deg": 9.6,
+            "visor_ratio_scale": 3.430894308943089,
+            "height_ratio_scale": 3.665745856353591
+          },
+          {
+            "frame": 12,
+            "visor_width": 114,
+            "visor_height": 83,
+            "visor_area": 6025,
+            "character_height": 363,
+            "yaw_deg": 14.4,
+            "visor_ratio_scale": 3.7017543859649122,
+            "height_ratio_scale": 3.6556473829201104
+          },
+          {
+            "frame": 13,
+            "visor_width": 112,
+            "visor_height": 80,
+            "visor_area": 5778,
+            "character_height": 358,
+            "yaw_deg": 12.4,
+            "visor_ratio_scale": 3.767857142857143,
+            "height_ratio_scale": 3.706703910614525
+          },
+          {
+            "frame": 14,
+            "visor_width": 121,
+            "visor_height": 81,
+            "visor_area": 6377,
+            "character_height": 361,
+            "yaw_deg": 9.1,
+            "visor_ratio_scale": 3.487603305785124,
+            "height_ratio_scale": 3.6759002770083105
+          },
+          {
+            "frame": 15,
+            "visor_width": 114,
+            "visor_height": 78,
+            "visor_area": 5999,
+            "character_height": 362,
+            "yaw_deg": -4.7,
+            "visor_ratio_scale": 3.7017543859649122,
+            "height_ratio_scale": 3.665745856353591
+          }
+        ]
+      },
+      "turn_look": {
+        "scale_home_texels_per_source_px": 4.695424142078727,
+        "basis": "median over comparable upright front frames (|yaw|<=15 deg, height>=93% of family max) of sqrt(HOME visor width ratio x HOME height ratio)",
+        "comparable_frames": [
+          1,
+          4,
+          7,
+          8,
+          12,
+          15,
+          16,
+          17
+        ],
+        "visor_width_vs_home_at_scale": [
+          1.1127,
+          1.0904,
+          0.9903,
+          1.1015,
+          1.2239,
+          1.1015,
+          1.1127,
+          1.1127
+        ],
+        "height_vs_home_at_scale": [
+          0.8987,
+          0.9306,
+          0.9094,
+          0.9094,
+          0.9412,
+          0.8952,
+          0.9023,
+          0.8987
+        ],
+        "frames": [
+          {
+            "frame": 1,
+            "visor_width": 100,
+            "visor_height": 51,
+            "visor_area": 3973,
+            "character_height": 254,
+            "yaw_deg": 1.1,
+            "visor_ratio_scale": 4.22,
+            "height_ratio_scale": 5.224409448818897
+          },
+          {
+            "frame": 2,
+            "visor_width": 76,
+            "visor_height": 62,
+            "visor_area": 3124,
+            "character_height": 260,
+            "yaw_deg": 23.6,
+            "visor_ratio_scale": 5.552631578947368,
+            "height_ratio_scale": 5.1038461538461535
+          },
+          {
+            "frame": 3,
+            "visor_width": 43,
+            "visor_height": 59,
+            "visor_area": 1713,
+            "character_height": 257,
+            "yaw_deg": 41.6,
+            "visor_ratio_scale": 9.813953488372093,
+            "height_ratio_scale": 5.163424124513619
+          },
+          {
+            "frame": 4,
+            "visor_width": 98,
+            "visor_height": 65,
+            "visor_area": 1365,
+            "character_height": 263,
+            "yaw_deg": 2.2,
+            "visor_ratio_scale": 4.3061224489795915,
+            "height_ratio_scale": 5.0456273764258555
+          },
+          {
+            "frame": 5,
+            "visor_width": 52,
+            "visor_height": 58,
+            "visor_area": 2079,
+            "character_height": 258,
+            "yaw_deg": 35.2,
+            "visor_ratio_scale": 8.115384615384615,
+            "height_ratio_scale": 5.1434108527131785
+          },
+          {
+            "frame": 6,
+            "visor_width": 70,
+            "visor_height": 57,
+            "visor_area": 2812,
+            "character_height": 250,
+            "yaw_deg": 26.1,
+            "visor_ratio_scale": 6.0285714285714285,
+            "height_ratio_scale": 5.308
+          },
+          {
+            "frame": 7,
+            "visor_width": 89,
+            "visor_height": 54,
+            "visor_area": 3407,
+            "character_height": 257,
+            "yaw_deg": 6.9,
+            "visor_ratio_scale": 4.741573033707865,
+            "height_ratio_scale": 5.163424124513619
+          },
+          {
+            "frame": 8,
+            "visor_width": 99,
+            "visor_height": 50,
+            "visor_area": 3872,
+            "character_height": 257,
+            "yaw_deg": 0.4,
+            "visor_ratio_scale": 4.262626262626263,
+            "height_ratio_scale": 5.163424124513619
+          },
+          {
+            "frame": 9,
+            "visor_width": 68,
+            "visor_height": 57,
+            "visor_area": 2745,
+            "character_height": 263,
+            "yaw_deg": -26.1,
+            "visor_ratio_scale": 6.205882352941177,
+            "height_ratio_scale": 5.0456273764258555
+          },
+          {
+            "frame": 10,
+            "visor_width": 54,
+            "visor_height": 58,
+            "visor_area": 2156,
+            "character_height": 260,
+            "yaw_deg": -34.2,
+            "visor_ratio_scale": 7.814814814814815,
+            "height_ratio_scale": 5.1038461538461535
+          },
+          {
+            "frame": 11,
+            "visor_width": 39,
+            "visor_height": 60,
+            "visor_area": 1599,
+            "character_height": 268,
+            "yaw_deg": -44.9,
+            "visor_ratio_scale": 10.820512820512821,
+            "height_ratio_scale": 4.951492537313433
+          },
+          {
+            "frame": 12,
+            "visor_width": 110,
+            "visor_height": 65,
+            "visor_area": 1513,
+            "character_height": 266,
+            "yaw_deg": 3.8,
+            "visor_ratio_scale": 3.8363636363636364,
+            "height_ratio_scale": 4.988721804511278
+          },
+          {
+            "frame": 13,
+            "visor_width": 52,
+            "visor_height": 61,
+            "visor_area": 2148,
+            "character_height": 261,
+            "yaw_deg": 36.1,
+            "visor_ratio_scale": 8.115384615384615,
+            "height_ratio_scale": 5.084291187739463
+          },
+          {
+            "frame": 14,
+            "visor_width": 74,
+            "visor_height": 59,
+            "visor_area": 2971,
+            "character_height": 256,
+            "yaw_deg": 24.9,
+            "visor_ratio_scale": 5.702702702702703,
+            "height_ratio_scale": 5.18359375
+          },
+          {
+            "frame": 15,
+            "visor_width": 99,
+            "visor_height": 49,
+            "visor_area": 3825,
+            "character_height": 253,
+            "yaw_deg": 1.5,
+            "visor_ratio_scale": 4.262626262626263,
+            "height_ratio_scale": 5.24505928853755
+          },
+          {
+            "frame": 16,
+            "visor_width": 100,
+            "visor_height": 49,
+            "visor_area": 3853,
+            "character_height": 255,
+            "yaw_deg": 0.7,
+            "visor_ratio_scale": 4.22,
+            "height_ratio_scale": 5.203921568627451
+          },
+          {
+            "frame": 17,
+            "visor_width": 100,
+            "visor_height": 51,
+            "visor_area": 3973,
+            "character_height": 254,
+            "yaw_deg": 1.1,
+            "visor_ratio_scale": 4.22,
+            "height_ratio_scale": 5.224409448818897
+          }
+        ]
+      },
+      "full_turn": {
+        "scale_home_texels_per_source_px": 4.0517075940604785,
+        "basis": "median over comparable upright front frames (|yaw|<=15 deg, height>=93% of family max) of sqrt(HOME visor width ratio x HOME height ratio)",
+        "comparable_frames": [
+          1,
+          2,
+          6,
+          12,
+          13,
+          14
+        ],
+        "visor_width_vs_home_at_scale": [
+          1.0081,
+          0.9889,
+          0.8545,
+          0.9985,
+          1.0369,
+          1.0177
+        ],
+        "height_vs_home_at_scale": [
+          1.0015,
+          1.0076,
+          0.9832,
+          1.0015,
+          1.0045,
+          1.0045
+        ],
+        "frames": [
+          {
+            "frame": 1,
+            "visor_width": 105,
+            "visor_height": 72,
+            "visor_area": 4893,
+            "character_height": 328,
+            "yaw_deg": 9.7,
+            "visor_ratio_scale": 4.019047619047619,
+            "height_ratio_scale": 4.045731707317073
+          },
+          {
+            "frame": 2,
+            "visor_width": 103,
+            "visor_height": 74,
+            "visor_area": 4682,
+            "character_height": 330,
+            "yaw_deg": 10.9,
+            "visor_ratio_scale": 4.097087378640777,
+            "height_ratio_scale": 4.0212121212121215
+          },
+          {
+            "frame": 3,
+            "visor_width": 67,
+            "visor_height": 74,
+            "visor_area": 2874,
+            "character_height": 333,
+            "yaw_deg": 29.3,
+            "visor_ratio_scale": 6.298507462686567,
+            "height_ratio_scale": 3.984984984984985
+          },
+          {
+            "frame": 4,
+            "visor_width": 60,
+            "visor_height": 74,
+            "visor_area": 2471,
+            "character_height": 329,
+            "yaw_deg": 32.5,
+            "visor_ratio_scale": 7.033333333333333,
+            "height_ratio_scale": 4.033434650455927
+          },
+          {
+            "frame": 5,
+            "visor_width": 60,
+            "visor_height": 76,
+            "visor_area": 2479,
+            "character_height": 326,
+            "yaw_deg": 33.1,
+            "visor_ratio_scale": 7.033333333333333,
+            "height_ratio_scale": 4.070552147239264
+          },
+          {
+            "frame": 6,
+            "visor_width": 89,
+            "visor_height": 61,
+            "visor_area": 1071,
+            "character_height": 322,
+            "yaw_deg": -7.9,
+            "visor_ratio_scale": 4.741573033707865,
+            "height_ratio_scale": 4.12111801242236
+          },
+          {
+            "frame": 7,
+            "visor_width": 79,
+            "visor_height": 54,
+            "visor_area": 1129,
+            "character_height": 316,
+            "yaw_deg": -11.5,
+            "visor_ratio_scale": 5.341772151898734,
+            "height_ratio_scale": 4.199367088607595
+          },
+          {
+            "frame": 8,
+            "visor_width": 78,
+            "visor_height": 56,
+            "visor_area": 1207,
+            "character_height": 317,
+            "yaw_deg": -4.0,
+            "visor_ratio_scale": 5.410256410256411,
+            "height_ratio_scale": 4.186119873817034
+          },
+          {
+            "frame": 9,
+            "visor_width": 118,
+            "visor_height": 53,
+            "visor_area": 1554,
+            "character_height": 315,
+            "yaw_deg": 7.4,
+            "visor_ratio_scale": 3.5762711864406778,
+            "height_ratio_scale": 4.212698412698413
+          },
+          {
+            "frame": 10,
+            "visor_width": 78,
+            "visor_height": 84,
+            "visor_area": 3474,
+            "character_height": 320,
+            "yaw_deg": -22.9,
+            "visor_ratio_scale": 5.410256410256411,
+            "height_ratio_scale": 4.146875
+          },
+          {
+            "frame": 11,
+            "visor_width": 61,
+            "visor_height": 78,
+            "visor_area": 2632,
+            "character_height": 325,
+            "yaw_deg": 34.1,
+            "visor_ratio_scale": 6.918032786885246,
+            "height_ratio_scale": 4.0830769230769235
+          },
+          {
+            "frame": 12,
+            "visor_width": 104,
+            "visor_height": 74,
+            "visor_area": 2334,
+            "character_height": 328,
+            "yaw_deg": -6.6,
+            "visor_ratio_scale": 4.0576923076923075,
+            "height_ratio_scale": 4.045731707317073
+          },
+          {
+            "frame": 13,
+            "visor_width": 108,
+            "visor_height": 123,
+            "visor_area": 2640,
+            "character_height": 329,
+            "yaw_deg": -3.4,
+            "visor_ratio_scale": 3.9074074074074074,
+            "height_ratio_scale": 4.033434650455927
+          },
+          {
+            "frame": 14,
+            "visor_width": 106,
+            "visor_height": 72,
+            "visor_area": 2115,
+            "character_height": 329,
+            "yaw_deg": -2.9,
+            "visor_ratio_scale": 3.981132075471698,
+            "height_ratio_scale": 4.033434650455927
+          },
+          {
+            "frame": 15,
+            "visor_width": 89,
+            "visor_height": 84,
+            "visor_area": 4219,
+            "character_height": 342,
+            "yaw_deg": 20.3,
+            "visor_ratio_scale": 4.741573033707865,
+            "height_ratio_scale": 3.8801169590643276
+          },
+          {
+            "frame": 16,
+            "visor_width": 103,
+            "visor_height": 77,
+            "visor_area": 4626,
+            "character_height": 313,
+            "yaw_deg": 10.2,
+            "visor_ratio_scale": 4.097087378640777,
+            "height_ratio_scale": 4.23961661341853
+          },
+          {
+            "frame": 17,
+            "visor_width": 100,
+            "visor_height": 74,
+            "visor_area": 4560,
+            "character_height": 310,
+            "yaw_deg": 11.8,
+            "visor_ratio_scale": 4.22,
+            "height_ratio_scale": 4.280645161290322
+          }
+        ]
+      }
+    }
+  },
+  "frames": [
+    {
+      "gesture": "wave",
+      "frame": 1,
+      "source_family": "wave",
+      "source_frame": 1,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_01.png",
+      "source_sha256": "22bae42e75e0ff9c312929a0fcf375bdb80218b69e8d80f63c798f8090d78164",
+      "source_root": [
+        173.0,
+        350.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        24,
+        27,
+        372,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_01.png",
+      "sha256": "efa8e7c0163354275173a54dde624b9316c7c025584f5880c4057a7ef905a65f"
+    },
+    {
+      "gesture": "wave",
+      "frame": 2,
+      "source_family": "wave",
+      "source_frame": 2,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_02.png",
+      "source_sha256": "df1aec038a10c267ec96b069578516a95aee0e0dd05c338b2c1ce097879c4075",
+      "source_root": [
+        208.0,
+        350.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        24,
+        29,
+        385,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_02.png",
+      "sha256": "2ce33f7b1acb7f03af5da1f54cceee839c873e36be2a61b7fa9148fc1920c153"
+    },
+    {
+      "gesture": "wave",
+      "frame": 3,
+      "source_family": "wave",
+      "source_frame": 3,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_03.png",
+      "source_sha256": "35c0fe0293377600cd8b4a46bf5f21a33e5f3b0afc461f4bde269229a5abe00f",
+      "source_root": [
+        239.0,
+        350.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        26,
+        24,
+        389,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_03.png",
+      "sha256": "8cbf742fe5dc8ad3664e76e2f481ec356ca1f223c7ffddcf77855cca57fecd43"
+    },
+    {
+      "gesture": "wave",
+      "frame": 4,
+      "source_family": "wave",
+      "source_frame": 4,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_04.png",
+      "source_sha256": "229bdd98d698da37b0e5c41f2b4e04e4dc4d132fdef3b3b23372ef2c3dabfa01",
+      "source_root": [
+        283.5,
+        350.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        26,
+        24,
+        369,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_04.png",
+      "sha256": "0c045c1893c5aa873b293b43712ac8dc3b8fd7faa3dcc2f059c16f0a3e53405f"
+    },
+    {
+      "gesture": "wave",
+      "frame": 5,
+      "source_family": "wave",
+      "source_frame": 5,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_05.png",
+      "source_sha256": "e34fa4524b2bea9091655acc64eec56dad0dda4b7e15e8bd9b87722ff5876608",
+      "source_root": [
+        173.0,
+        352.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        28,
+        29,
+        383,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_05.png",
+      "sha256": "bee622ab94b729cb931a8aca7a7e16b4a596dba100d5b67c829b241e83b24a89"
+    },
+    {
+      "gesture": "wave",
+      "frame": 6,
+      "source_family": "wave",
+      "source_frame": 6,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_06.png",
+      "source_sha256": "53271c551dbae6c64ef986d3da10496529c9d522e45f9edcca2b47b381fccc09",
+      "source_root": [
+        208.0,
+        352.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        28,
+        29,
+        375,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_06.png",
+      "sha256": "085d548fb6fd6a694ff9cb50d3f8c0b7af174817f3c815750a7db8689c3caab1"
+    },
+    {
+      "gesture": "wave",
+      "frame": 7,
+      "source_family": "wave",
+      "source_frame": 7,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_07.png",
+      "source_sha256": "a8afd5fad2fc7f77df3aad149f47d6bca5c2e030257c5051857ef3f69050f1a0",
+      "source_root": [
+        247.5,
+        352.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        29,
+        29,
+        365,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_07.png",
+      "sha256": "fffc7b805329711087c8635258e32e0a4e95efc521d74dad9018bda570dcf743"
+    },
+    {
+      "gesture": "wave",
+      "frame": 8,
+      "source_family": "wave",
+      "source_frame": 8,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_08.png",
+      "source_sha256": "2e2146ca4f21a21d1743853684741f5ffb95da6719bf20cb5acbaff5f0489aef",
+      "source_root": [
+        283.5,
+        352.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        26,
+        28,
+        357,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_08.png",
+      "sha256": "8c860575c9dc466dcfb308c267a8417c567ec0ae29d8c47685818d761afa44f4"
+    },
+    {
+      "gesture": "wave",
+      "frame": 9,
+      "source_family": "wave",
+      "source_frame": 7,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_07.png",
+      "source_sha256": "a8afd5fad2fc7f77df3aad149f47d6bca5c2e030257c5051857ef3f69050f1a0",
+      "source_root": [
+        247.5,
+        352.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        29,
+        29,
+        365,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_09.png",
+      "sha256": "fffc7b805329711087c8635258e32e0a4e95efc521d74dad9018bda570dcf743"
+    },
+    {
+      "gesture": "wave",
+      "frame": 10,
+      "source_family": "wave",
+      "source_frame": 6,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_06.png",
+      "source_sha256": "53271c551dbae6c64ef986d3da10496529c9d522e45f9edcca2b47b381fccc09",
+      "source_root": [
+        208.0,
+        352.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        28,
+        29,
+        375,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_10.png",
+      "sha256": "085d548fb6fd6a694ff9cb50d3f8c0b7af174817f3c815750a7db8689c3caab1"
+    },
+    {
+      "gesture": "wave",
+      "frame": 11,
+      "source_family": "wave",
+      "source_frame": 5,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_05.png",
+      "source_sha256": "e34fa4524b2bea9091655acc64eec56dad0dda4b7e15e8bd9b87722ff5876608",
+      "source_root": [
+        173.0,
+        352.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        28,
+        29,
+        383,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_11.png",
+      "sha256": "bee622ab94b729cb931a8aca7a7e16b4a596dba100d5b67c829b241e83b24a89"
+    },
+    {
+      "gesture": "wave",
+      "frame": 12,
+      "source_family": "wave",
+      "source_frame": 4,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_04.png",
+      "source_sha256": "229bdd98d698da37b0e5c41f2b4e04e4dc4d132fdef3b3b23372ef2c3dabfa01",
+      "source_root": [
+        283.5,
+        350.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        26,
+        24,
+        369,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_12.png",
+      "sha256": "0c045c1893c5aa873b293b43712ac8dc3b8fd7faa3dcc2f059c16f0a3e53405f"
+    },
+    {
+      "gesture": "wave",
+      "frame": 13,
+      "source_family": "wave",
+      "source_frame": 3,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_03.png",
+      "source_sha256": "35c0fe0293377600cd8b4a46bf5f21a33e5f3b0afc461f4bde269229a5abe00f",
+      "source_root": [
+        239.0,
+        350.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        26,
+        24,
+        389,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_13.png",
+      "sha256": "8cbf742fe5dc8ad3664e76e2f481ec356ca1f223c7ffddcf77855cca57fecd43"
+    },
+    {
+      "gesture": "wave",
+      "frame": 14,
+      "source_family": "wave",
+      "source_frame": 2,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_02.png",
+      "source_sha256": "df1aec038a10c267ec96b069578516a95aee0e0dd05c338b2c1ce097879c4075",
+      "source_root": [
+        208.0,
+        350.0
+      ],
+      "scale_anim_px_per_source_px": 1.30628601778304,
+      "alpha_bbox_gt128": [
+        24,
+        29,
+        385,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/wave/wave_14.png",
+      "sha256": "2ce33f7b1acb7f03af5da1f54cceee839c873e36be2a61b7fa9148fc1920c153"
+    },
+    {
+      "gesture": "bow",
+      "frame": 1,
+      "source_family": "bow",
+      "source_frame": 1,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_01.png",
+      "source_sha256": "5d5a49cf36f0ac949d81854a0d22e76e2a38e64acb8deb22e881a9a482c83dcd",
+      "source_root": [
+        217.5,
+        412.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        29,
+        33,
+        319,
+        481
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_01.png",
+      "sha256": "eb42d9ff5c9a2324591fcfc9c76f8eb8ae3a4e0f6cd2a17a5b36c1c845aa6ec2"
+    },
+    {
+      "gesture": "bow",
+      "frame": 2,
+      "source_family": "bow",
+      "source_frame": 2,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_02.png",
+      "source_sha256": "ab151372282cbd9dd81bcca39b29c0e91befc0e15f7553b18fe25bc949952e54",
+      "source_root": [
+        254.0,
+        420.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        32,
+        35,
+        324,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_02.png",
+      "sha256": "7a1afc579e67a10c636a75e0718dd13a6d4dd6f7afecc25dcdf499709110bf87"
+    },
+    {
+      "gesture": "bow",
+      "frame": 3,
+      "source_family": "bow",
+      "source_frame": 3,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_03.png",
+      "source_sha256": "221cf9ccfb833a5c79778fc7f8efd65163bc07a6bcea061f53878c6cac68582d",
+      "source_root": [
+        291.5,
+        421.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        41,
+        80,
+        326,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_03.png",
+      "sha256": "7f1c5a2e36d8066a40864b4b82c70d96de50752bb0352c1a16600c9dd17cfa4d"
+    },
+    {
+      "gesture": "bow",
+      "frame": 4,
+      "source_family": "bow",
+      "source_frame": 4,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_04.png",
+      "source_sha256": "2ff5b908de009b4ee187b3b8787e0c65ed46958033dbb75ca2c67399922bbd40",
+      "source_root": [
+        326.5,
+        417.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        42,
+        100,
+        348,
+        481
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_04.png",
+      "sha256": "7ece509eff21dc36fc2896c3eb8f147796c6de29e5e3c62c90b2d0861daf0b06"
+    },
+    {
+      "gesture": "bow",
+      "frame": 5,
+      "source_family": "bow",
+      "source_frame": 5,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_05.png",
+      "source_sha256": "e4aa78ab05872f83e709431898a66756eaf227d55bdd0ceb07ec49f37f699f49",
+      "source_root": [
+        333.0,
+        396.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        44,
+        130,
+        363,
+        481
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_05.png",
+      "sha256": "c5485802517456bd7560a5e78b2f09be6108d5a22b5f859a1cb82fd8f23bd85e"
+    },
+    {
+      "gesture": "bow",
+      "frame": 6,
+      "source_family": "bow",
+      "source_frame": 6,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_06.png",
+      "source_sha256": "bd654de3c212203dac0ca43e6f69a102a16ce8d279862686979f0995e0d25638",
+      "source_root": [
+        195.5,
+        490.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        41,
+        140,
+        370,
+        481
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_06.png",
+      "sha256": "56179f19f7e3015aac2181c423f032c3530f4b263b6cf1ab5bd9b620cb7f4e8a"
+    },
+    {
+      "gesture": "bow",
+      "frame": 7,
+      "source_family": "bow",
+      "source_frame": 7,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_07.png",
+      "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c",
+      "source_root": [
+        255.5,
+        476.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        42,
+        146,
+        368,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_07.png",
+      "sha256": "3e1251646f5bc3c971aa5d3404d4171ea197b59313e27bee39b540b0f7a08629"
+    },
+    {
+      "gesture": "bow",
+      "frame": 8,
+      "source_family": "bow",
+      "source_frame": 7,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_07.png",
+      "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c",
+      "source_root": [
+        255.5,
+        476.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        42,
+        146,
+        368,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_08.png",
+      "sha256": "3e1251646f5bc3c971aa5d3404d4171ea197b59313e27bee39b540b0f7a08629"
+    },
+    {
+      "gesture": "bow",
+      "frame": 9,
+      "source_family": "bow",
+      "source_frame": 7,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_07.png",
+      "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c",
+      "source_root": [
+        255.5,
+        476.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        42,
+        146,
+        368,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_09.png",
+      "sha256": "3e1251646f5bc3c971aa5d3404d4171ea197b59313e27bee39b540b0f7a08629"
+    },
+    {
+      "gesture": "bow",
+      "frame": 10,
+      "source_family": "bow",
+      "source_frame": 8,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_08.png",
+      "source_sha256": "b84a56f12c23daf3ed59180a01f4ef26eb88b3fe1eb4e2336ec69db43642f021",
+      "source_root": [
+        293.5,
+        502.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        44,
+        140,
+        359,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_10.png",
+      "sha256": "1cb3a28241da189cc6d1a618511dd8b2d929483fc7e6828a64ba2afa9fd530f8"
+    },
+    {
+      "gesture": "bow",
+      "frame": 11,
+      "source_family": "bow",
+      "source_frame": 9,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_09.png",
+      "source_sha256": "6b836e31c28d34965ea78d9670fdc68d9443a34be55637f69e6af0c4a1e34220",
+      "source_root": [
+        318.0,
+        495.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        38,
+        92,
+        355,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_11.png",
+      "sha256": "aa946e763671d311adad3ad80a795fceb38e542dd2c50623a8b705d18f229931"
+    },
+    {
+      "gesture": "bow",
+      "frame": 12,
+      "source_family": "bow",
+      "source_frame": 10,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_10.png",
+      "source_sha256": "859b77beaf8863bfc89075a3046d3706955bf89797dc38ac928810f83a29cf79",
+      "source_root": [
+        354.0,
+        511.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        37,
+        83,
+        321,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_12.png",
+      "sha256": "91dc159903a976e0108cff36ac56e412e5579750ba9d258c0cfb8ddbdc51c9e4"
+    },
+    {
+      "gesture": "bow",
+      "frame": 13,
+      "source_family": "bow",
+      "source_frame": 11,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_11.png",
+      "source_sha256": "ca0a3244da027b2ec5fc8327dc9e1f75b843322d847acdcf9f20b8f91cd0610f",
+      "source_root": [
+        217.0,
+        558.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        27,
+        37,
+        318,
+        481
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_13.png",
+      "sha256": "ed44d9c94098765377e34c08f6f2f2f247ada9a2bc8b615b2646e6e9ebb447bc"
+    },
+    {
+      "gesture": "bow",
+      "frame": 14,
+      "source_family": "bow",
+      "source_frame": 1,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_01.png",
+      "source_sha256": "5d5a49cf36f0ac949d81854a0d22e76e2a38e64acb8deb22e881a9a482c83dcd",
+      "source_root": [
+        217.5,
+        412.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        29,
+        33,
+        319,
+        481
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_14.png",
+      "sha256": "eb42d9ff5c9a2324591fcfc9c76f8eb8ae3a4e0f6cd2a17a5b36c1c845aa6ec2"
+    },
+    {
+      "gesture": "bow",
+      "frame": 15,
+      "source_family": "bow",
+      "source_frame": 1,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_01.png",
+      "source_sha256": "5d5a49cf36f0ac949d81854a0d22e76e2a38e64acb8deb22e881a9a482c83dcd",
+      "source_root": [
+        217.5,
+        412.0
+      ],
+      "scale_anim_px_per_source_px": 1.2262095494864413,
+      "alpha_bbox_gt128": [
+        29,
+        33,
+        319,
+        481
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/bow/bow_15.png",
+      "sha256": "eb42d9ff5c9a2324591fcfc9c76f8eb8ae3a4e0f6cd2a17a5b36c1c845aa6ec2"
+    },
+    {
+      "gesture": "turn",
+      "frame": 1,
+      "source_family": "turn_look",
+      "source_frame": 1,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_01.png",
+      "source_sha256": "1556f89226a20f5370ebe17601f26d448f32b659d0cb1a7626ea4782284d71f1",
+      "source_root": [
+        178.5,
+        266.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        26,
+        83,
+        349,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_01.png",
+      "sha256": "ac4d8d762391ed6992120dc597381571afbbfdb58ece7e1778c0cb116822974e"
+    },
+    {
+      "gesture": "turn",
+      "frame": 2,
+      "source_family": "turn_look",
+      "source_frame": 2,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_02.png",
+      "source_sha256": "acffd2e6846e157e6a08226aa5abb863108c3a33eee796862957a19671e5801d",
+      "source_root": [
+        205.5,
+        269.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        30,
+        72,
+        338,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_02.png",
+      "sha256": "78f63e958cb4306c3d20ef48e7d7b75ce255707bd1617b23eea13cfac8c8daed"
+    },
+    {
+      "gesture": "turn",
+      "frame": 3,
+      "source_family": "turn_look",
+      "source_frame": 6,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_06.png",
+      "source_sha256": "76af437374a03c3bc8f22125fea907d2b57a23eddea89f09b4a7714d4cae0f57",
+      "source_root": [
+        213.0,
+        264.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        35,
+        90,
+        329,
+        481
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_03.png",
+      "sha256": "dfc4004b9a236bd4b94aae41b4a6020559772802afc31e5d7b4e62e149f3870c"
+    },
+    {
+      "gesture": "turn",
+      "frame": 4,
+      "source_family": "turn_look",
+      "source_frame": 5,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_05.png",
+      "source_sha256": "1e932686084da78059fb503f223e63e7f0778da93085c7931081a8575a634ef4",
+      "source_root": [
+        195.0,
+        264.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        35,
+        75,
+        316,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_04.png",
+      "sha256": "6d39d830b23b15379af63d63639b9e3417da0006c2cd13465e9cd8b93a8def5a"
+    },
+    {
+      "gesture": "turn",
+      "frame": 5,
+      "source_family": "turn_look",
+      "source_frame": 6,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_06.png",
+      "source_sha256": "76af437374a03c3bc8f22125fea907d2b57a23eddea89f09b4a7714d4cae0f57",
+      "source_root": [
+        213.0,
+        264.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        35,
+        90,
+        329,
+        481
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_05.png",
+      "sha256": "dfc4004b9a236bd4b94aae41b4a6020559772802afc31e5d7b4e62e149f3870c"
+    },
+    {
+      "gesture": "turn",
+      "frame": 6,
+      "source_family": "turn_look",
+      "source_frame": 7,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_07.png",
+      "source_sha256": "3494eae0a6071d3750470071ad35e6e6b788e3948d7f4485264921ede1d36afa",
+      "source_root": [
+        217.0,
+        264.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        31,
+        76,
+        335,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_06.png",
+      "sha256": "03bd68d479dcfb1e12fbea4d3a773a530c3d1a54adf94dcef330bdae3aa0952a"
+    },
+    {
+      "gesture": "turn",
+      "frame": 7,
+      "source_family": "turn_look",
+      "source_frame": 8,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_08.png",
+      "source_sha256": "cca173ad63ec805540b201a80316e187f24df20fd3a1911b4a35954b8b6ef292",
+      "source_root": [
+        227.0,
+        266.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        30,
+        77,
+        339,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_07.png",
+      "sha256": "55cb6023ed9b5c6d41b38f80ce97e42c2cd42265005acc376b33577bd11341c4"
+    },
+    {
+      "gesture": "turn",
+      "frame": 8,
+      "source_family": "turn_look",
+      "source_frame": 8,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_08.png",
+      "source_sha256": "cca173ad63ec805540b201a80316e187f24df20fd3a1911b4a35954b8b6ef292",
+      "source_root": [
+        227.0,
+        266.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        30,
+        77,
+        339,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_08.png",
+      "sha256": "55cb6023ed9b5c6d41b38f80ce97e42c2cd42265005acc376b33577bd11341c4"
+    },
+    {
+      "gesture": "turn",
+      "frame": 9,
+      "source_family": "turn_look",
+      "source_frame": 9,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_09.png",
+      "source_sha256": "988a3f8d18936280193e0967490cc4fbdd66ccee2510353cce7743519b1a9547",
+      "source_root": [
+        147.0,
+        263.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        116,
+        71,
+        411,
+        482
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_09.png",
+      "sha256": "6f1b6b9915bcedf456149e073a3bb9a10eacbffe051330bb02ee56722f6772dc"
+    },
+    {
+      "gesture": "turn",
+      "frame": 10,
+      "source_family": "turn_look",
+      "source_frame": 10,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_10.png",
+      "source_sha256": "32fff7cbb35949e10120d51b736a3ecef3699b4e70f7b5b9641d472e3416312c",
+      "source_root": [
+        160.5,
+        262.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        120,
+        72,
+        413,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_10.png",
+      "sha256": "8a6d79b25997ca91210e9ac01e6aff4b75bb3eed53507a91751161c5ff749e21"
+    },
+    {
+      "gesture": "turn",
+      "frame": 11,
+      "source_family": "turn_look",
+      "source_frame": 10,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_10.png",
+      "source_sha256": "32fff7cbb35949e10120d51b736a3ecef3699b4e70f7b5b9641d472e3416312c",
+      "source_root": [
+        160.5,
+        262.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        120,
+        72,
+        413,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_11.png",
+      "sha256": "8a6d79b25997ca91210e9ac01e6aff4b75bb3eed53507a91751161c5ff749e21"
+    },
+    {
+      "gesture": "turn",
+      "frame": 12,
+      "source_family": "turn_look",
+      "source_frame": 9,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_09.png",
+      "source_sha256": "988a3f8d18936280193e0967490cc4fbdd66ccee2510353cce7743519b1a9547",
+      "source_root": [
+        147.0,
+        263.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        116,
+        71,
+        411,
+        482
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_12.png",
+      "sha256": "6f1b6b9915bcedf456149e073a3bb9a10eacbffe051330bb02ee56722f6772dc"
+    },
+    {
+      "gesture": "turn",
+      "frame": 13,
+      "source_family": "turn_look",
+      "source_frame": 8,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_08.png",
+      "source_sha256": "cca173ad63ec805540b201a80316e187f24df20fd3a1911b4a35954b8b6ef292",
+      "source_root": [
+        227.0,
+        266.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        30,
+        77,
+        339,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_13.png",
+      "sha256": "55cb6023ed9b5c6d41b38f80ce97e42c2cd42265005acc376b33577bd11341c4"
+    },
+    {
+      "gesture": "turn",
+      "frame": 14,
+      "source_family": "turn_look",
+      "source_frame": 15,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_15.png",
+      "source_sha256": "635625f7ad0e9140b17c0eb1f78877e116d7ccf0a34d03f441a70456520af7b4",
+      "source_root": [
+        216.5,
+        259.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        28,
+        83,
+        335,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_14.png",
+      "sha256": "fa7db8e76037be48393f76d20c4c5ab4029946aeb0b87bc17d13732496b68f52"
+    },
+    {
+      "gesture": "turn",
+      "frame": 15,
+      "source_family": "turn_look",
+      "source_frame": 16,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_16.png",
+      "source_sha256": "460fa7bca57cfb00bfcc9ee0e07126ca1cc4cca8cd0937fe931b881c060049a4",
+      "source_root": [
+        228.5,
+        260.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        25,
+        79,
+        336,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_15.png",
+      "sha256": "b2acb7a37ff1f594626185f4330c1ac78a3971b47a1ac7dd937e2f4ec3342c95"
+    },
+    {
+      "gesture": "turn",
+      "frame": 16,
+      "source_family": "turn_look",
+      "source_frame": 17,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_17.png",
+      "source_sha256": "1556f89226a20f5370ebe17601f26d448f32b659d0cb1a7626ea4782284d71f1",
+      "source_root": [
+        178.5,
+        266.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        26,
+        83,
+        349,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_16.png",
+      "sha256": "ac4d8d762391ed6992120dc597381571afbbfdb58ece7e1778c0cb116822974e"
+    },
+    {
+      "gesture": "turn",
+      "frame": 17,
+      "source_family": "turn_look",
+      "source_frame": 1,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/turn_look/turn_look_01.png",
+      "source_sha256": "1556f89226a20f5370ebe17601f26d448f32b659d0cb1a7626ea4782284d71f1",
+      "source_root": [
+        178.5,
+        266.0
+      ],
+      "scale_anim_px_per_source_px": 1.5651413806929089,
+      "alpha_bbox_gt128": [
+        26,
+        83,
+        349,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/turn/turn_17.png",
+      "sha256": "ac4d8d762391ed6992120dc597381571afbbfdb58ece7e1778c0cb116822974e"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 1,
+      "source_family": "full_turn",
+      "source_frame": 1,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_01.png",
+      "source_sha256": "c0b0c1e8efdba70339e79c15ebeb48e0ab786138dce755d02eb06591b5a33973",
+      "source_root": [
+        307.0,
+        476.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        39,
+        35,
+        379,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_01.png",
+      "sha256": "f75df8059e17a03ff0bf385147ab17a59b1b10ddea30618616a7ed8ac52268ab"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 2,
+      "source_family": "full_turn",
+      "source_frame": 2,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_02.png",
+      "source_sha256": "1d29f34423357396473e83cbe2232463e340ba513ac8ab8812a5826e909f8a3e",
+      "source_root": [
+        303.0,
+        476.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        56,
+        33,
+        360,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_02.png",
+      "sha256": "c6f658e0af85a8128d0e6cd9edc14cf18fadd1994b7a29c35b64119fcab2c352"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 3,
+      "source_family": "full_turn",
+      "source_frame": 3,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_03.png",
+      "source_sha256": "78ab6c8e937c0e02484750cbb2d9a6dcb95ab7533b0c71cbff13d7cfc1cde43a",
+      "source_root": [
+        294.0,
+        470.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        93,
+        40,
+        330,
+        490
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_03.png",
+      "sha256": "a64b1e6f81f4b5a9ce3f6090e86f0b0908037165e103163d24673e0927caf5fa"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 4,
+      "source_family": "full_turn",
+      "source_frame": 4,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_04.png",
+      "source_sha256": "3b0be40b3d423364231cacff552c9c5cfe782760f1387f54fe442de484cf040a",
+      "source_root": [
+        319.0,
+        478.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        87,
+        35,
+        298,
+        480
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_04.png",
+      "sha256": "a1ce0df8292a7e652185f4bf0ea6751ca744ecaac382506e8b650d2844393732"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 5,
+      "source_family": "full_turn",
+      "source_frame": 5,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_05.png",
+      "source_sha256": "a1905e4657396ef087ac1da5774bc85704b0caea49b00c1bd5050500b4ab01d0",
+      "source_root": [
+        282.5,
+        471.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        137,
+        43,
+        371,
+        482
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_05.png",
+      "sha256": "8601d565a76b2da53c2e75d3d98fc20ea0a433a96fac94898111190e239108ef"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 6,
+      "source_family": "full_turn",
+      "source_frame": 6,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_06.png",
+      "source_sha256": "e0446d22a61e4947d820397effe43c982752982a044304a7b01e0a01a745ac19",
+      "source_root": [
+        285.0,
+        476.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        62,
+        43,
+        400,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_06.png",
+      "sha256": "503adca5657aa19568c06fa60bc2eeef37502cefb8b26c6814b46d91bccbb27c"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 7,
+      "source_family": "full_turn",
+      "source_frame": 7,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_07.png",
+      "source_sha256": "ae01bf7be29f069e7a1c3b998a3c34ac9fcbe0ffed8a2dd0cc2b054d4c1150e9",
+      "source_root": [
+        273.0,
+        472.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        101,
+        52,
+        402,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_07.png",
+      "sha256": "327272507d4fda5b1404d25096b81c9f996bc68cd61a8924a960e7a352dac504"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 8,
+      "source_family": "full_turn",
+      "source_frame": 8,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_08.png",
+      "source_sha256": "246667f4821f0f13438ffe1bdfa0fa7ada181f0d6b136100e1dec144e70d3b2c",
+      "source_root": [
+        263.5,
+        469.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        114,
+        50,
+        409,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_08.png",
+      "sha256": "74a1d9a8eb2962247a6747af55f89885f71d59ff9b24fcff8cb62bf6ca187b78"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 9,
+      "source_family": "full_turn",
+      "source_frame": 9,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_09.png",
+      "source_sha256": "195db91c3178b94cd3ac9f32a13c56244950f2d57deba138a8f307f8d4399fc6",
+      "source_root": [
+        264.0,
+        455.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        113,
+        54,
+        421,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_09.png",
+      "sha256": "e85d749df3c1070af141ab747abc8201a25d7ca5b8757eae6356425454a11ed5"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 10,
+      "source_family": "full_turn",
+      "source_frame": 10,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_10.png",
+      "source_sha256": "13b186cfd5dad3a9670c6e60afabd3629f5b5abb4bc8316a1543df2b39b0fc50",
+      "source_root": [
+        292.0,
+        470.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        81,
+        47,
+        365,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_10.png",
+      "sha256": "a3b51ae1d524243efe2b145eeea9b1b30800d3c404bc5b9058c3da8bf420ce64"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 11,
+      "source_family": "full_turn",
+      "source_frame": 11,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_11.png",
+      "source_sha256": "c877ed6e27c5846895aa3c5705458b787b50653910f794e7fb3b72084f6368f0",
+      "source_root": [
+        271.0,
+        473.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        100,
+        39,
+        415,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_11.png",
+      "sha256": "6fa723fe5ff7f53d7c148dd25ade23c616f124af3994573ed91b191e626e936d"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 12,
+      "source_family": "full_turn",
+      "source_frame": 12,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_12.png",
+      "source_sha256": "4e80d1f55c01f2a5c74a52ce9731f1d8eb093e1a7e06aa921f02055bbd4028b0",
+      "source_root": [
+        261.0,
+        477.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        121,
+        36,
+        428,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_12.png",
+      "sha256": "b0316f5e9b136664ec8ce330e38bdfb3c5d2684b8349c399e3de4046ead9d2be"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 13,
+      "source_family": "full_turn",
+      "source_frame": 13,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_13.png",
+      "source_sha256": "7d7d2002eca3f0ecb9a3233240564d142b795b135152a3aadb7813026ed50af2",
+      "source_root": [
+        272.0,
+        408.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        91,
+        34,
+        408,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_13.png",
+      "sha256": "bd7371bfd068aea8a97aaaeedea839d7d54bafc8f123f4bde480f48f9dea0862"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 14,
+      "source_family": "full_turn",
+      "source_frame": 14,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_14.png",
+      "source_sha256": "d2dc98a37fffc4f7fcd2cbeb5c2d5952121046791c23b08550f349cec4fd2a57",
+      "source_root": [
+        280.5,
+        407.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        83,
+        34,
+        406,
+        479
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_14.png",
+      "sha256": "16acbe42ead202199625221a8c462b92a488f357bae33f0a96760028c6c5b8d7"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 15,
+      "source_family": "full_turn",
+      "source_frame": 15,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_15.png",
+      "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43",
+      "source_root": [
+        335.0,
+        420.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        43,
+        20,
+        295,
+        482
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_15.png",
+      "sha256": "993fad7a0eff01a4bee8401f388ad75452c8fa61d083e3557c5688e4dda067e2"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 16,
+      "source_family": "full_turn",
+      "source_frame": 16,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_16.png",
+      "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f",
+      "source_root": [
+        319.0,
+        470.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        37,
+        56,
+        327,
+        478
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_16.png",
+      "sha256": "75144c602a24d891366ea6ffd6738843e2ece7d75335d55b7700bc1473d17a72"
+    },
+    {
+      "gesture": "full_turn",
+      "frame": 17,
+      "source_family": "full_turn",
+      "source_frame": 17,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781",
+      "source_root": [
+        239.5,
+        467.0
+      ],
+      "scale_anim_px_per_source_px": 1.3505691980201595,
+      "alpha_bbox_gt128": [
+        27,
+        63,
+        342,
+        481
+      ],
+      "size": [
+        464,
+        512
+      ],
+      "path": "assets/ui/generated/characters/home_animation/v03/full_turn/full_turn_17.png",
+      "sha256": "116030bf0dad00179cc8bf40a8e8065d84db2ca1af7671859814d5fe07b6d241"
+    }
+  ]
+}
