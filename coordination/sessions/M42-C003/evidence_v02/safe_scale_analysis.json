@@ -1,0 +1,318 @@
+{
+  "algorithm": "descending 0.05 family-scale sweep; all selected production source frames; same root registration and alpha threshold",
+  "home_k4_opaque_pixels": 8101,
+  "families": {
+    "wave": {
+      "source_family": "wave",
+      "fit_scale": 2.973684210526316,
+      "fit_scale_visor_ratio_to_HOME": 0.7033,
+      "max_safe_scale": 2.67,
+      "max_safe_scale_visor_ratio_to_HOME": 0.6315,
+      "fit_scale_retained_at_max_safe": 0.8979,
+      "constraint_conflict": true,
+      "note": "0.05 scale-step diagnostic. A measured visor width below 85% of HOME-026 or safe scale below 85% of family fit is flagged as visible scale loss; this is an audit aid, not a new owner tolerance.",
+      "attempts": [
+        {
+          "scale": 2.97,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 3187,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.92,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 2698,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.87,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 1933,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.82,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 1160,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.77,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 552,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.72,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 111,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.67,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 0,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": true
+        }
+      ]
+    },
+    "bow": {
+      "source_family": "bow",
+      "fit_scale": 2.6588235294117646,
+      "fit_scale_visor_ratio_to_HOME": 0.6031,
+      "max_safe_scale": 2.36,
+      "max_safe_scale_visor_ratio_to_HOME": 0.5353,
+      "fit_scale_retained_at_max_safe": 0.8876,
+      "constraint_conflict": true,
+      "note": "0.05 scale-step diagnostic. A measured visor width below 85% of HOME-026 or safe scale below 85% of family fit is flagged as visible scale loss; this is an audit aid, not a new owner tolerance.",
+      "attempts": [
+        {
+          "scale": 2.66,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 2268,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.61,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 1842,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.56,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 1247,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.51,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 701,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.46,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 299,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.41,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 69,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.36,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 0,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": true
+        }
+      ]
+    },
+    "turn": {
+      "source_family": "full_turn",
+      "fit_scale": 3.294460641399417,
+      "fit_scale_visor_ratio_to_HOME": 0.6288,
+      "max_safe_scale": 2.89,
+      "max_safe_scale_visor_ratio_to_HOME": 0.5516,
+      "fit_scale_retained_at_max_safe": 0.8772,
+      "constraint_conflict": true,
+      "note": "0.05 scale-step diagnostic. A measured visor width below 85% of HOME-026 or safe scale below 85% of family fit is flagged as visible scale loss; this is an audit aid, not a new owner tolerance.",
+      "attempts": [
+        {
+          "scale": 3.29,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 3118,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 3.24,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 2214,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 3.19,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 1447,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 3.14,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 801,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 3.09,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 269,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 3.04,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 97,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.99,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 36,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.94,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 6,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": false
+        },
+        {
+          "scale": 2.89,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 0,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": true
+        }
+      ]
+    },
+    "full_turn": {
+      "source_family": "full_turn",
+      "fit_scale": 3.294460641399417,
+      "fit_scale_visor_ratio_to_HOME": 0.6288,
+      "max_safe_scale": 3.29,
+      "max_safe_scale_visor_ratio_to_HOME": 0.628,
+      "fit_scale_retained_at_max_safe": 0.9986,
+      "constraint_conflict": true,
+      "note": "0.05 scale-step diagnostic. A measured visor width below 85% of HOME-026 or safe scale below 85% of family fit is flagged as visible scale loss; this is an audit aid, not a new owner tolerance.",
+      "attempts": [
+        {
+          "scale": 3.29,
+          "max_zone_alpha_gt128": {
+            "K1_COLLECTION": 0,
+            "K2_DAILY": 0,
+            "K3_RIGHT_HELPER": 3206,
+            "K4_LEFT_HELPER": 0
+          },
+          "k4_outside_home_pixel_count": 0,
+          "blocking_zones_pass": true
+        }
+      ]
+    }
+  }
+}

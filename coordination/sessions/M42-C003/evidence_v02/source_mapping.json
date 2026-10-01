@@ -1,0 +1,325 @@
+{
+  "wave": [
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_01.png",
+      "staged_name": "wave_01.png",
+      "sha256": "22bae42e75e0ff9c312929a0fcf375bdb80218b69e8d80f63c798f8090d78164"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_02.png",
+      "staged_name": "wave_02.png",
+      "sha256": "df1aec038a10c267ec96b069578516a95aee0e0dd05c338b2c1ce097879c4075"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_03.png",
+      "staged_name": "wave_03.png",
+      "sha256": "35c0fe0293377600cd8b4a46bf5f21a33e5f3b0afc461f4bde269229a5abe00f"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_04.png",
+      "staged_name": "wave_04.png",
+      "sha256": "229bdd98d698da37b0e5c41f2b4e04e4dc4d132fdef3b3b23372ef2c3dabfa01"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_05.png",
+      "staged_name": "wave_05.png",
+      "sha256": "e34fa4524b2bea9091655acc64eec56dad0dda4b7e15e8bd9b87722ff5876608"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_06.png",
+      "staged_name": "wave_06.png",
+      "sha256": "53271c551dbae6c64ef986d3da10496529c9d522e45f9edcca2b47b381fccc09"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_07.png",
+      "staged_name": "wave_07.png",
+      "sha256": "a8afd5fad2fc7f77df3aad149f47d6bca5c2e030257c5051857ef3f69050f1a0"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_08.png",
+      "staged_name": "wave_08.png",
+      "sha256": "2e2146ca4f21a21d1743853684741f5ffb95da6719bf20cb5acbaff5f0489aef"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_09.png",
+      "staged_name": "wave_09.png",
+      "sha256": "bf8ed1c816684224fdb87f8bab3b53b92f34bfbd8e6072e21f48d9ea082c3ca2"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_10.png",
+      "staged_name": "wave_10.png",
+      "sha256": "36eba6c524fc59e31c7110ec7b44d113db0664ea78fe64ad3eb49488e9a78c4c"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_11.png",
+      "staged_name": "wave_11.png",
+      "sha256": "32b9d92623ed0b5fc7b40398fa9a9e914f12443506333e67fe3c568533930c24"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_12.png",
+      "staged_name": "wave_12.png",
+      "sha256": "c9b79ca2069652f244d5a6cf286acd159be2c264398981c5474e4ffb8d9a8f27"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_13.png",
+      "staged_name": "wave_13.png",
+      "sha256": "7a36b8a60347e0a5eac2e7061d45b61488fed10002c04ec6e4409c9363e6c3fc"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/wave assets/wave_14.png",
+      "staged_name": "wave_14.png",
+      "sha256": "60dd52cdc1845def90f07ecd8523ae84e4682d759b68cf6f0378791415f94c84"
+    }
+  ],
+  "bow": [
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_01.png",
+      "staged_name": "bow_01.png",
+      "sha256": "5d5a49cf36f0ac949d81854a0d22e76e2a38e64acb8deb22e881a9a482c83dcd"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_02.png",
+      "staged_name": "bow_02.png",
+      "sha256": "ab151372282cbd9dd81bcca39b29c0e91befc0e15f7553b18fe25bc949952e54"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_03.png",
+      "staged_name": "bow_03.png",
+      "sha256": "221cf9ccfb833a5c79778fc7f8efd65163bc07a6bcea061f53878c6cac68582d"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_04.png",
+      "staged_name": "bow_04.png",
+      "sha256": "2ff5b908de009b4ee187b3b8787e0c65ed46958033dbb75ca2c67399922bbd40"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_05.png",
+      "staged_name": "bow_05.png",
+      "sha256": "e4aa78ab05872f83e709431898a66756eaf227d55bdd0ceb07ec49f37f699f49"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_06.png",
+      "staged_name": "bow_06.png",
+      "sha256": "bd654de3c212203dac0ca43e6f69a102a16ce8d279862686979f0995e0d25638"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_07.png",
+      "staged_name": "bow_07.png",
+      "sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_08.png",
+      "staged_name": "bow_08.png",
+      "sha256": "b84a56f12c23daf3ed59180a01f4ef26eb88b3fe1eb4e2336ec69db43642f021"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_09.png",
+      "staged_name": "bow_09.png",
+      "sha256": "6b836e31c28d34965ea78d9670fdc68d9443a34be55637f69e6af0c4a1e34220"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_10.png",
+      "staged_name": "bow_10.png",
+      "sha256": "859b77beaf8863bfc89075a3046d3706955bf89797dc38ac928810f83a29cf79"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_11.png",
+      "staged_name": "bow_11.png",
+      "sha256": "ca0a3244da027b2ec5fc8327dc9e1f75b843322d847acdcf9f20b8f91cd0610f"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_12.png",
+      "staged_name": "bow_12.png",
+      "sha256": "d05a4a053d0325df0a83b2eee834553a69af6b9e50d7c8605fceb7abf704f8fe"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_13.png",
+      "staged_name": "bow_13.png",
+      "sha256": "4c6811671cc0ff59f3ff289405ce94e2390367753589999ff5cd24194afcf154"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_14.png",
+      "staged_name": "bow_14.png",
+      "sha256": "ce93f588c15f947cbbf358de689717ea51678493867d3dbcaa7c1e27c4fb350d"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/bow assets/bow_15.png",
+      "staged_name": "bow_15.png",
+      "sha256": "71d5d666f650f8ebccca0f3416f295715526cc1c18ea74e79481c8477de773e1"
+    }
+  ],
+  "turn_look": [
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_01.png",
+      "staged_name": "turn_look_01.png",
+      "sha256": "1556f89226a20f5370ebe17601f26d448f32b659d0cb1a7626ea4782284d71f1"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_02.png",
+      "staged_name": "turn_look_02.png",
+      "sha256": "acffd2e6846e157e6a08226aa5abb863108c3a33eee796862957a19671e5801d"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_03.png",
+      "staged_name": "turn_look_03.png",
+      "sha256": "b746dd134a50b345e36e235ded5e0b9967a74ff3eab3d852a51732bd54f04125"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_04.png",
+      "staged_name": "turn_look_04.png",
+      "sha256": "99e56dbc340928470e47abdf5db1e4e69844eb7d05ab35ec8a4c1942a1f11880"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_05.png",
+      "staged_name": "turn_look_05.png",
+      "sha256": "1e932686084da78059fb503f223e63e7f0778da93085c7931081a8575a634ef4"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_06.png",
+      "staged_name": "turn_look_06.png",
+      "sha256": "76af437374a03c3bc8f22125fea907d2b57a23eddea89f09b4a7714d4cae0f57"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_07.png",
+      "staged_name": "turn_look_07.png",
+      "sha256": "3494eae0a6071d3750470071ad35e6e6b788e3948d7f4485264921ede1d36afa"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_08.png",
+      "staged_name": "turn_look_08.png",
+      "sha256": "cca173ad63ec805540b201a80316e187f24df20fd3a1911b4a35954b8b6ef292"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_09.png",
+      "staged_name": "turn_look_09.png",
+      "sha256": "988a3f8d18936280193e0967490cc4fbdd66ccee2510353cce7743519b1a9547"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_10.png",
+      "staged_name": "turn_look_10.png",
+      "sha256": "32fff7cbb35949e10120d51b736a3ecef3699b4e70f7b5b9641d472e3416312c"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_11.png",
+      "staged_name": "turn_look_11.png",
+      "sha256": "84cdd255fb3ee50fcea82772eee43a527fad4782c70b3013b25f76f7c455cd1c"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_12.png",
+      "staged_name": "turn_look_12.png",
+      "sha256": "a7448ac1bfa1d3178610fce76f3d30aa3a4f038c7d82bd32c0789a63dab920b0"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_13.png",
+      "staged_name": "turn_look_13.png",
+      "sha256": "07abf766bf73fa0275c6fd6654e16d843e28e29832c5491858ff3fe8c7e3d5fc"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_14.png",
+      "staged_name": "turn_look_14.png",
+      "sha256": "9a2bf6cd0091f78c4656bce89335be3b2a994e726c139e8353be801a2041aaf7"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_15.png",
+      "staged_name": "turn_look_15.png",
+      "sha256": "635625f7ad0e9140b17c0eb1f78877e116d7ccf0a34d03f441a70456520af7b4"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_16.png",
+      "staged_name": "turn_look_16.png",
+      "sha256": "460fa7bca57cfb00bfcc9ee0e07126ca1cc4cca8cd0937fe931b881c060049a4"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/turn look assets/turn look_17.png",
+      "staged_name": "turn_look_17.png",
+      "sha256": "1556f89226a20f5370ebe17601f26d448f32b659d0cb1a7626ea4782284d71f1"
+    }
+  ],
+  "full_turn": [
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_01.png",
+      "staged_name": "full_turn_01.png",
+      "sha256": "c0b0c1e8efdba70339e79c15ebeb48e0ab786138dce755d02eb06591b5a33973"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_02.png",
+      "staged_name": "full_turn_02.png",
+      "sha256": "1d29f34423357396473e83cbe2232463e340ba513ac8ab8812a5826e909f8a3e"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_03.png",
+      "staged_name": "full_turn_03.png",
+      "sha256": "78ab6c8e937c0e02484750cbb2d9a6dcb95ab7533b0c71cbff13d7cfc1cde43a"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_04.png",
+      "staged_name": "full_turn_04.png",
+      "sha256": "3b0be40b3d423364231cacff552c9c5cfe782760f1387f54fe442de484cf040a"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_05.png",
+      "staged_name": "full_turn_05.png",
+      "sha256": "a1905e4657396ef087ac1da5774bc85704b0caea49b00c1bd5050500b4ab01d0"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_06.png",
+      "staged_name": "full_turn_06.png",
+      "sha256": "e0446d22a61e4947d820397effe43c982752982a044304a7b01e0a01a745ac19"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_07.png",
+      "staged_name": "full_turn_07.png",
+      "sha256": "ae01bf7be29f069e7a1c3b998a3c34ac9fcbe0ffed8a2dd0cc2b054d4c1150e9"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_08.png",
+      "staged_name": "full_turn_08.png",
+      "sha256": "246667f4821f0f13438ffe1bdfa0fa7ada181f0d6b136100e1dec144e70d3b2c"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_09.png",
+      "staged_name": "full_turn_09.png",
+      "sha256": "195db91c3178b94cd3ac9f32a13c56244950f2d57deba138a8f307f8d4399fc6"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_10.png",
+      "staged_name": "full_turn_10.png",
+      "sha256": "13b186cfd5dad3a9670c6e60afabd3629f5b5abb4bc8316a1543df2b39b0fc50"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_11.png",
+      "staged_name": "full_turn_11.png",
+      "sha256": "c877ed6e27c5846895aa3c5705458b787b50653910f794e7fb3b72084f6368f0"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_12.png",
+      "staged_name": "full_turn_12.png",
+      "sha256": "4e80d1f55c01f2a5c74a52ce9731f1d8eb093e1a7e06aa921f02055bbd4028b0"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_13.png",
+      "staged_name": "full_turn_13.png",
+      "sha256": "7d7d2002eca3f0ecb9a3233240564d142b795b135152a3aadb7813026ed50af2"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_14.png",
+      "staged_name": "full_turn_14.png",
+      "sha256": "d2dc98a37fffc4f7fcd2cbeb5c2d5952121046791c23b08550f349cec4fd2a57"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_15.png",
+      "staged_name": "full_turn_15.png",
+      "sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_16.png",
+      "staged_name": "full_turn_16.png",
+      "sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f"
+    },
+    {
+      "archive_name": "Home_Main_Hero_Assets/full turn assets/full_turn_17.png",
+      "staged_name": "full_turn_17.png",
+      "sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781"
+    }
+  ]
+}
