@@ -498,7 +498,8 @@ func _make_deadlock_supply(engine, drop: int, palette_size: int):
 				return null
 			q.append(batch)
 		cols_out.append(q)
-	var out = BatchSupplyEngine.create(column_count, preview_depth)
+	# The source engine's own shape (a plan may declare 3/4/5 columns), not the generator export.
+	var out = BatchSupplyEngine.create(engine.get_column_count(), engine.get_preview_depth())
 	if out == null or not out.load_candidate(cols_out, gen_seed, palette_size):
 		return null
 	return out

@@ -4,7 +4,8 @@ extends RefCounted
 ## M52-C001: loads an owner-authored, declarative supply plan
 ## (`scrubbots.level_supply_plan.v1`, data/levels/supply/*.json) into a real M23
 ## BatchSupplyEngine through the accepted ColorBatch.make + load_candidate path.
-## The plan's three FIFO columns are loaded COMPLETE — every hidden row is real queue
+## The plan's 3, 4 or 5 FIFO columns (owner decision
+## coordination/OWNER_SUPPLY_COLUMNS_3_4_5_PREVIEW3_V01.md) are loaded COMPLETE — every hidden row is real queue
 ## state; `visiblePreviewDepth` only sets the player-facing preview rows.
 ##
 ## Plans name colors by canonical GLOBAL id (C01..C16). Gameplay batches use the
@@ -13,7 +14,7 @@ extends RefCounted
 ## LevelData.palette entry. Never assumes Cxx == local index.
 ##
 ## Fail-closed on: unreadable/malformed JSON, wrong schema/version, level id mismatch,
-## column/preview shape != 3/3, unknown/off-palette Cxx, Cxx absent from the level
+## columnCount outside 3..5, columns array size != columnCount, preview depth != 3, unknown/off-palette Cxx, Cxx absent from the level
 ## palette, duplicate level palette entries, empty/duplicate batch id, robot count
 ## outside the positive per-plan metadata bound (or non-integer), per-color totals != LevelData cell totals, grand
 ## total != cell count, or engine rejection. No fallback candidate is ever produced.
@@ -24,7 +25,8 @@ const ColorBatch = preload("res://scripts/gameplay/supply/color_batch.gd")
 const ProductionArtLevelBuilder = preload("res://scripts/tools/production_art_level_builder.gd")
 
 const SCHEMA := "scrubbots.level_supply_plan.v1"
-const COLUMN_COUNT := 3
+const MIN_COLUMNS := 3
+const MAX_COLUMNS := 5
 const VISIBLE_PREVIEW_DEPTH := 3
 
 ## Parse a plan file. Returns {ok, error, plan}.
@@ -64,8 +66,11 @@ static func build_engine(plan: Dictionary, level) -> Dictionary:
 	var fail := func(msg: String) -> Dictionary: return {"ok": false, "error": msg}
 	if level == null or String(plan.get("levelId", "")) != String(level.id):
 		return fail.call("plan levelId '%s' != level '%s'" % [plan.get("levelId", ""), level.id if level != null else "null"])
-	if _as_int(plan.get("columnCount")) != COLUMN_COUNT or _as_int(plan.get("visiblePreviewDepth")) != VISIBLE_PREVIEW_DEPTH:
-		return fail.call("plan must declare %d columns / %d visible rows" % [COLUMN_COUNT, VISIBLE_PREVIEW_DEPTH])
+	var column_count := _as_int(plan.get("columnCount"))
+	if column_count < MIN_COLUMNS or column_count > MAX_COLUMNS:
+		return fail.call("plan columnCount must be an integer %d..%d (got %s)" % [MIN_COLUMNS, MAX_COLUMNS, str(plan.get("columnCount"))])
+	if _as_int(plan.get("visiblePreviewDepth")) != VISIBLE_PREVIEW_DEPTH:
+		return fail.call("plan visiblePreviewDepth must be exactly %d" % VISIBLE_PREVIEW_DEPTH)
 	var mr := _as_int(plan.get("maxRobotsPerBatch"))
 	if mr < 1:
 		return fail.call("maxRobotsPerBatch must be a positive integer per-plan metadata bound")
@@ -74,8 +79,8 @@ static func build_engine(plan: Dictionary, level) -> Dictionary:
 		return fail.call(m["error"])
 	var cid_to_local: Dictionary = m["map"]
 	var columns = plan.get("columns", null)
-	if typeof(columns) != TYPE_ARRAY or columns.size() != COLUMN_COUNT:
-		return fail.call("plan columns must be an array of %d FIFO queues" % COLUMN_COUNT)
+	if typeof(columns) != TYPE_ARRAY or columns.size() != column_count:
+		return fail.call("plan columns must be an array of %d FIFO queues (declared columnCount)" % column_count)
 	var palette_size: int = level.palette.size()
 	var ids := {}
 	var sums := {}
@@ -114,7 +119,7 @@ static func build_engine(plan: Dictionary, level) -> Dictionary:
 		grand += int(sums[c])
 	if grand != level.get_cell_count():
 		return fail.call("grand total %d != cell count %d" % [grand, level.get_cell_count()])
-	var engine = BatchSupplyEngine.create(COLUMN_COUNT, VISIBLE_PREVIEW_DEPTH)
+	var engine = BatchSupplyEngine.create(column_count, VISIBLE_PREVIEW_DEPTH)
 	if engine == null or not engine.load_candidate(cols, 0, palette_size):
 		return fail.call("BatchSupplyEngine rejected the plan layout")
 	return {"ok": true, "error": "", "engine": engine, "cid_to_local": cid_to_local,
