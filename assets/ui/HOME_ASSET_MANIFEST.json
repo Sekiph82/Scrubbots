@@ -1685,5 +1685,432 @@
       "source_path": "assets/ui/final/home/background/home_background.png",
       "notes": "M28-C002-C003-R01 V02 finding 5: owner-selected Home background (940x1672), used exactly as supplied - not regenerated, redrawn, recoloured or substituted. Presented through the World 01 catalog record at a uniform display scale (never stretched); supersedes HOME-120 as the canonical Home background. HOME-120 stays byte-identical on disk and is never loaded by Home. All live UI (HUD, shortcuts, PLAY, Gift Meter, nav) and Scrubby remain native Godot layers."
     }
-  ]
+  ],
+  "animation_sets": {
+    "home_scrubby_gestures_v03": {
+      "status": "APPROVED",
+      "authority": "coordination/OWNER_M42_HOME_SCRUBBY_ANIMATION_V03.md + coordination/sessions/M42-C003/ASSET_PRODUCTION_SPEC_V03.md",
+      "provenance": "owner archive Home_Main_Hero_Assets.zip (63 owner-approved source frames, no new art), normalized by tools/home_scrubby_prepare_assets.py --v03",
+      "source_archive_sha256": "f5c34699f14dabc53a5c8126ad81dabd811711d1acd96fda47e523a18ad64458",
+      "idle_texture": "assets/ui/final/characters/scrubby/scrubby_home_pose.png",
+      "idle_texture_sha256": "fc30b992787c644822a6cd02510e481fab9010cd89ab75fc4a9909ca713d5c18",
+      "canvas": [
+        464,
+        512
+      ],
+      "pivot": [
+        219,
+        477
+      ],
+      "home_root_texels": [
+        638.5,
+        1324.0
+      ],
+      "home_texels_per_anim_pixel": 3,
+      "fps": 12,
+      "resampler": "Pillow Image.transform(AFFINE, BICUBIC) on premultiplied RGBa, exact sub-pixel root registration",
+      "family_scales": {
+        "wave": 3.91885805334912,
+        "bow": 3.678628648459324,
+        "turn_look": 4.695424142078727,
+        "full_turn": 4.0517075940604785
+      },
+      "gestures": {
+        "wave": {
+          "frames": [
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_01.png",
+              "sha256": "efa8e7c0163354275173a54dde624b9316c7c025584f5880c4057a7ef905a65f",
+              "source": "wave_01.png",
+              "source_sha256": "22bae42e75e0ff9c312929a0fcf375bdb80218b69e8d80f63c798f8090d78164"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_02.png",
+              "sha256": "2ce33f7b1acb7f03af5da1f54cceee839c873e36be2a61b7fa9148fc1920c153",
+              "source": "wave_02.png",
+              "source_sha256": "df1aec038a10c267ec96b069578516a95aee0e0dd05c338b2c1ce097879c4075"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_03.png",
+              "sha256": "8cbf742fe5dc8ad3664e76e2f481ec356ca1f223c7ffddcf77855cca57fecd43",
+              "source": "wave_03.png",
+              "source_sha256": "35c0fe0293377600cd8b4a46bf5f21a33e5f3b0afc461f4bde269229a5abe00f"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_04.png",
+              "sha256": "0c045c1893c5aa873b293b43712ac8dc3b8fd7faa3dcc2f059c16f0a3e53405f",
+              "source": "wave_04.png",
+              "source_sha256": "229bdd98d698da37b0e5c41f2b4e04e4dc4d132fdef3b3b23372ef2c3dabfa01"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_05.png",
+              "sha256": "bee622ab94b729cb931a8aca7a7e16b4a596dba100d5b67c829b241e83b24a89",
+              "source": "wave_05.png",
+              "source_sha256": "e34fa4524b2bea9091655acc64eec56dad0dda4b7e15e8bd9b87722ff5876608"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_06.png",
+              "sha256": "085d548fb6fd6a694ff9cb50d3f8c0b7af174817f3c815750a7db8689c3caab1",
+              "source": "wave_06.png",
+              "source_sha256": "53271c551dbae6c64ef986d3da10496529c9d522e45f9edcca2b47b381fccc09"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_07.png",
+              "sha256": "fffc7b805329711087c8635258e32e0a4e95efc521d74dad9018bda570dcf743",
+              "source": "wave_07.png",
+              "source_sha256": "a8afd5fad2fc7f77df3aad149f47d6bca5c2e030257c5051857ef3f69050f1a0"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_08.png",
+              "sha256": "8c860575c9dc466dcfb308c267a8417c567ec0ae29d8c47685818d761afa44f4",
+              "source": "wave_08.png",
+              "source_sha256": "2e2146ca4f21a21d1743853684741f5ffb95da6719bf20cb5acbaff5f0489aef"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_09.png",
+              "sha256": "fffc7b805329711087c8635258e32e0a4e95efc521d74dad9018bda570dcf743",
+              "source": "wave_07.png",
+              "source_sha256": "a8afd5fad2fc7f77df3aad149f47d6bca5c2e030257c5051857ef3f69050f1a0"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_10.png",
+              "sha256": "085d548fb6fd6a694ff9cb50d3f8c0b7af174817f3c815750a7db8689c3caab1",
+              "source": "wave_06.png",
+              "source_sha256": "53271c551dbae6c64ef986d3da10496529c9d522e45f9edcca2b47b381fccc09"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_11.png",
+              "sha256": "bee622ab94b729cb931a8aca7a7e16b4a596dba100d5b67c829b241e83b24a89",
+              "source": "wave_05.png",
+              "source_sha256": "e34fa4524b2bea9091655acc64eec56dad0dda4b7e15e8bd9b87722ff5876608"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_12.png",
+              "sha256": "0c045c1893c5aa873b293b43712ac8dc3b8fd7faa3dcc2f059c16f0a3e53405f",
+              "source": "wave_04.png",
+              "source_sha256": "229bdd98d698da37b0e5c41f2b4e04e4dc4d132fdef3b3b23372ef2c3dabfa01"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_13.png",
+              "sha256": "8cbf742fe5dc8ad3664e76e2f481ec356ca1f223c7ffddcf77855cca57fecd43",
+              "source": "wave_03.png",
+              "source_sha256": "35c0fe0293377600cd8b4a46bf5f21a33e5f3b0afc461f4bde269229a5abe00f"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/wave/wave_14.png",
+              "sha256": "2ce33f7b1acb7f03af5da1f54cceee839c873e36be2a61b7fa9148fc1920c153",
+              "source": "wave_02.png",
+              "source_sha256": "df1aec038a10c267ec96b069578516a95aee0e0dd05c338b2c1ce097879c4075"
+            }
+          ]
+        },
+        "bow": {
+          "frames": [
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_01.png",
+              "sha256": "eb42d9ff5c9a2324591fcfc9c76f8eb8ae3a4e0f6cd2a17a5b36c1c845aa6ec2",
+              "source": "bow_01.png",
+              "source_sha256": "5d5a49cf36f0ac949d81854a0d22e76e2a38e64acb8deb22e881a9a482c83dcd"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_02.png",
+              "sha256": "7a1afc579e67a10c636a75e0718dd13a6d4dd6f7afecc25dcdf499709110bf87",
+              "source": "bow_02.png",
+              "source_sha256": "ab151372282cbd9dd81bcca39b29c0e91befc0e15f7553b18fe25bc949952e54"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_03.png",
+              "sha256": "7f1c5a2e36d8066a40864b4b82c70d96de50752bb0352c1a16600c9dd17cfa4d",
+              "source": "bow_03.png",
+              "source_sha256": "221cf9ccfb833a5c79778fc7f8efd65163bc07a6bcea061f53878c6cac68582d"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_04.png",
+              "sha256": "7ece509eff21dc36fc2896c3eb8f147796c6de29e5e3c62c90b2d0861daf0b06",
+              "source": "bow_04.png",
+              "source_sha256": "2ff5b908de009b4ee187b3b8787e0c65ed46958033dbb75ca2c67399922bbd40"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_05.png",
+              "sha256": "c5485802517456bd7560a5e78b2f09be6108d5a22b5f859a1cb82fd8f23bd85e",
+              "source": "bow_05.png",
+              "source_sha256": "e4aa78ab05872f83e709431898a66756eaf227d55bdd0ceb07ec49f37f699f49"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_06.png",
+              "sha256": "56179f19f7e3015aac2181c423f032c3530f4b263b6cf1ab5bd9b620cb7f4e8a",
+              "source": "bow_06.png",
+              "source_sha256": "bd654de3c212203dac0ca43e6f69a102a16ce8d279862686979f0995e0d25638"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_07.png",
+              "sha256": "3e1251646f5bc3c971aa5d3404d4171ea197b59313e27bee39b540b0f7a08629",
+              "source": "bow_07.png",
+              "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_08.png",
+              "sha256": "3e1251646f5bc3c971aa5d3404d4171ea197b59313e27bee39b540b0f7a08629",
+              "source": "bow_07.png",
+              "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_09.png",
+              "sha256": "3e1251646f5bc3c971aa5d3404d4171ea197b59313e27bee39b540b0f7a08629",
+              "source": "bow_07.png",
+              "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_10.png",
+              "sha256": "1cb3a28241da189cc6d1a618511dd8b2d929483fc7e6828a64ba2afa9fd530f8",
+              "source": "bow_08.png",
+              "source_sha256": "b84a56f12c23daf3ed59180a01f4ef26eb88b3fe1eb4e2336ec69db43642f021"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_11.png",
+              "sha256": "aa946e763671d311adad3ad80a795fceb38e542dd2c50623a8b705d18f229931",
+              "source": "bow_09.png",
+              "source_sha256": "6b836e31c28d34965ea78d9670fdc68d9443a34be55637f69e6af0c4a1e34220"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_12.png",
+              "sha256": "91dc159903a976e0108cff36ac56e412e5579750ba9d258c0cfb8ddbdc51c9e4",
+              "source": "bow_10.png",
+              "source_sha256": "859b77beaf8863bfc89075a3046d3706955bf89797dc38ac928810f83a29cf79"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_13.png",
+              "sha256": "ed44d9c94098765377e34c08f6f2f2f247ada9a2bc8b615b2646e6e9ebb447bc",
+              "source": "bow_11.png",
+              "source_sha256": "ca0a3244da027b2ec5fc8327dc9e1f75b843322d847acdcf9f20b8f91cd0610f"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_14.png",
+              "sha256": "eb42d9ff5c9a2324591fcfc9c76f8eb8ae3a4e0f6cd2a17a5b36c1c845aa6ec2",
+              "source": "bow_01.png",
+              "source_sha256": "5d5a49cf36f0ac949d81854a0d22e76e2a38e64acb8deb22e881a9a482c83dcd"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/bow/bow_15.png",
+              "sha256": "eb42d9ff5c9a2324591fcfc9c76f8eb8ae3a4e0f6cd2a17a5b36c1c845aa6ec2",
+              "source": "bow_01.png",
+              "source_sha256": "5d5a49cf36f0ac949d81854a0d22e76e2a38e64acb8deb22e881a9a482c83dcd"
+            }
+          ]
+        },
+        "turn": {
+          "frames": [
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_01.png",
+              "sha256": "ac4d8d762391ed6992120dc597381571afbbfdb58ece7e1778c0cb116822974e",
+              "source": "turn_look_01.png",
+              "source_sha256": "1556f89226a20f5370ebe17601f26d448f32b659d0cb1a7626ea4782284d71f1"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_02.png",
+              "sha256": "78f63e958cb4306c3d20ef48e7d7b75ce255707bd1617b23eea13cfac8c8daed",
+              "source": "turn_look_02.png",
+              "source_sha256": "acffd2e6846e157e6a08226aa5abb863108c3a33eee796862957a19671e5801d"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_03.png",
+              "sha256": "dfc4004b9a236bd4b94aae41b4a6020559772802afc31e5d7b4e62e149f3870c",
+              "source": "turn_look_06.png",
+              "source_sha256": "76af437374a03c3bc8f22125fea907d2b57a23eddea89f09b4a7714d4cae0f57"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_04.png",
+              "sha256": "6d39d830b23b15379af63d63639b9e3417da0006c2cd13465e9cd8b93a8def5a",
+              "source": "turn_look_05.png",
+              "source_sha256": "1e932686084da78059fb503f223e63e7f0778da93085c7931081a8575a634ef4"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_05.png",
+              "sha256": "dfc4004b9a236bd4b94aae41b4a6020559772802afc31e5d7b4e62e149f3870c",
+              "source": "turn_look_06.png",
+              "source_sha256": "76af437374a03c3bc8f22125fea907d2b57a23eddea89f09b4a7714d4cae0f57"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_06.png",
+              "sha256": "03bd68d479dcfb1e12fbea4d3a773a530c3d1a54adf94dcef330bdae3aa0952a",
+              "source": "turn_look_07.png",
+              "source_sha256": "3494eae0a6071d3750470071ad35e6e6b788e3948d7f4485264921ede1d36afa"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_07.png",
+              "sha256": "55cb6023ed9b5c6d41b38f80ce97e42c2cd42265005acc376b33577bd11341c4",
+              "source": "turn_look_08.png",
+              "source_sha256": "cca173ad63ec805540b201a80316e187f24df20fd3a1911b4a35954b8b6ef292"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_08.png",
+              "sha256": "55cb6023ed9b5c6d41b38f80ce97e42c2cd42265005acc376b33577bd11341c4",
+              "source": "turn_look_08.png",
+              "source_sha256": "cca173ad63ec805540b201a80316e187f24df20fd3a1911b4a35954b8b6ef292"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_09.png",
+              "sha256": "6f1b6b9915bcedf456149e073a3bb9a10eacbffe051330bb02ee56722f6772dc",
+              "source": "turn_look_09.png",
+              "source_sha256": "988a3f8d18936280193e0967490cc4fbdd66ccee2510353cce7743519b1a9547"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_10.png",
+              "sha256": "8a6d79b25997ca91210e9ac01e6aff4b75bb3eed53507a91751161c5ff749e21",
+              "source": "turn_look_10.png",
+              "source_sha256": "32fff7cbb35949e10120d51b736a3ecef3699b4e70f7b5b9641d472e3416312c"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_11.png",
+              "sha256": "8a6d79b25997ca91210e9ac01e6aff4b75bb3eed53507a91751161c5ff749e21",
+              "source": "turn_look_10.png",
+              "source_sha256": "32fff7cbb35949e10120d51b736a3ecef3699b4e70f7b5b9641d472e3416312c"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_12.png",
+              "sha256": "6f1b6b9915bcedf456149e073a3bb9a10eacbffe051330bb02ee56722f6772dc",
+              "source": "turn_look_09.png",
+              "source_sha256": "988a3f8d18936280193e0967490cc4fbdd66ccee2510353cce7743519b1a9547"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_13.png",
+              "sha256": "55cb6023ed9b5c6d41b38f80ce97e42c2cd42265005acc376b33577bd11341c4",
+              "source": "turn_look_08.png",
+              "source_sha256": "cca173ad63ec805540b201a80316e187f24df20fd3a1911b4a35954b8b6ef292"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_14.png",
+              "sha256": "fa7db8e76037be48393f76d20c4c5ab4029946aeb0b87bc17d13732496b68f52",
+              "source": "turn_look_15.png",
+              "source_sha256": "635625f7ad0e9140b17c0eb1f78877e116d7ccf0a34d03f441a70456520af7b4"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_15.png",
+              "sha256": "b2acb7a37ff1f594626185f4330c1ac78a3971b47a1ac7dd937e2f4ec3342c95",
+              "source": "turn_look_16.png",
+              "source_sha256": "460fa7bca57cfb00bfcc9ee0e07126ca1cc4cca8cd0937fe931b881c060049a4"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_16.png",
+              "sha256": "ac4d8d762391ed6992120dc597381571afbbfdb58ece7e1778c0cb116822974e",
+              "source": "turn_look_17.png",
+              "source_sha256": "1556f89226a20f5370ebe17601f26d448f32b659d0cb1a7626ea4782284d71f1"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/turn/turn_17.png",
+              "sha256": "ac4d8d762391ed6992120dc597381571afbbfdb58ece7e1778c0cb116822974e",
+              "source": "turn_look_01.png",
+              "source_sha256": "1556f89226a20f5370ebe17601f26d448f32b659d0cb1a7626ea4782284d71f1"
+            }
+          ]
+        },
+        "full_turn": {
+          "frames": [
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_01.png",
+              "sha256": "f75df8059e17a03ff0bf385147ab17a59b1b10ddea30618616a7ed8ac52268ab",
+              "source": "full_turn_01.png",
+              "source_sha256": "c0b0c1e8efdba70339e79c15ebeb48e0ab786138dce755d02eb06591b5a33973"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_02.png",
+              "sha256": "c6f658e0af85a8128d0e6cd9edc14cf18fadd1994b7a29c35b64119fcab2c352",
+              "source": "full_turn_02.png",
+              "source_sha256": "1d29f34423357396473e83cbe2232463e340ba513ac8ab8812a5826e909f8a3e"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_03.png",
+              "sha256": "a64b1e6f81f4b5a9ce3f6090e86f0b0908037165e103163d24673e0927caf5fa",
+              "source": "full_turn_03.png",
+              "source_sha256": "78ab6c8e937c0e02484750cbb2d9a6dcb95ab7533b0c71cbff13d7cfc1cde43a"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_04.png",
+              "sha256": "a1ce0df8292a7e652185f4bf0ea6751ca744ecaac382506e8b650d2844393732",
+              "source": "full_turn_04.png",
+              "source_sha256": "3b0be40b3d423364231cacff552c9c5cfe782760f1387f54fe442de484cf040a"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_05.png",
+              "sha256": "8601d565a76b2da53c2e75d3d98fc20ea0a433a96fac94898111190e239108ef",
+              "source": "full_turn_05.png",
+              "source_sha256": "a1905e4657396ef087ac1da5774bc85704b0caea49b00c1bd5050500b4ab01d0"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_06.png",
+              "sha256": "503adca5657aa19568c06fa60bc2eeef37502cefb8b26c6814b46d91bccbb27c",
+              "source": "full_turn_06.png",
+              "source_sha256": "e0446d22a61e4947d820397effe43c982752982a044304a7b01e0a01a745ac19"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_07.png",
+              "sha256": "327272507d4fda5b1404d25096b81c9f996bc68cd61a8924a960e7a352dac504",
+              "source": "full_turn_07.png",
+              "source_sha256": "ae01bf7be29f069e7a1c3b998a3c34ac9fcbe0ffed8a2dd0cc2b054d4c1150e9"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_08.png",
+              "sha256": "74a1d9a8eb2962247a6747af55f89885f71d59ff9b24fcff8cb62bf6ca187b78",
+              "source": "full_turn_08.png",
+              "source_sha256": "246667f4821f0f13438ffe1bdfa0fa7ada181f0d6b136100e1dec144e70d3b2c"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_09.png",
+              "sha256": "e85d749df3c1070af141ab747abc8201a25d7ca5b8757eae6356425454a11ed5",
+              "source": "full_turn_09.png",
+              "source_sha256": "195db91c3178b94cd3ac9f32a13c56244950f2d57deba138a8f307f8d4399fc6"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_10.png",
+              "sha256": "a3b51ae1d524243efe2b145eeea9b1b30800d3c404bc5b9058c3da8bf420ce64",
+              "source": "full_turn_10.png",
+              "source_sha256": "13b186cfd5dad3a9670c6e60afabd3629f5b5abb4bc8316a1543df2b39b0fc50"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_11.png",
+              "sha256": "6fa723fe5ff7f53d7c148dd25ade23c616f124af3994573ed91b191e626e936d",
+              "source": "full_turn_11.png",
+              "source_sha256": "c877ed6e27c5846895aa3c5705458b787b50653910f794e7fb3b72084f6368f0"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_12.png",
+              "sha256": "b0316f5e9b136664ec8ce330e38bdfb3c5d2684b8349c399e3de4046ead9d2be",
+              "source": "full_turn_12.png",
+              "source_sha256": "4e80d1f55c01f2a5c74a52ce9731f1d8eb093e1a7e06aa921f02055bbd4028b0"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_13.png",
+              "sha256": "bd7371bfd068aea8a97aaaeedea839d7d54bafc8f123f4bde480f48f9dea0862",
+              "source": "full_turn_13.png",
+              "source_sha256": "7d7d2002eca3f0ecb9a3233240564d142b795b135152a3aadb7813026ed50af2"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_14.png",
+              "sha256": "16acbe42ead202199625221a8c462b92a488f357bae33f0a96760028c6c5b8d7",
+              "source": "full_turn_14.png",
+              "source_sha256": "d2dc98a37fffc4f7fcd2cbeb5c2d5952121046791c23b08550f349cec4fd2a57"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_15.png",
+              "sha256": "993fad7a0eff01a4bee8401f388ad75452c8fa61d083e3557c5688e4dda067e2",
+              "source": "full_turn_15.png",
+              "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_16.png",
+              "sha256": "75144c602a24d891366ea6ffd6738843e2ece7d75335d55b7700bc1473d17a72",
+              "source": "full_turn_16.png",
+              "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f"
+            },
+            {
+              "path": "assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_17.png",
+              "sha256": "116030bf0dad00179cc8bf40a8e8065d84db2ca1af7671859814d5fe07b6d241",
+              "source": "full_turn_17.png",
+              "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781"
+            }
+          ]
+        }
+      }
+    }
+  }
 }

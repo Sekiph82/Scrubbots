@@ -1,0 +1,129 @@
+# M42-C003 V03 complete regression (every top-level tests/*.gd except owner-local tests/_m55_diag_tmp.gd)
+
+123 suites: 121 exit 0; 2 exit 1 = pre-existing M21 routing-corridor failures, reproduced identically on untouched origin/main f4ecba8 in a temporary worktree (removed afterwards).
+Root tests/run_tests.gd: Total checks 5323, Failures 0, RESULT: ALL PASS.
+'fails=N' counts lines containing FAIL; some PASS suites (m53) print verdict text '(..., FAIL)' inside ok lines - exit code is authoritative.
+
+m20_queue_free_smoke exit=0 fails=0 :: M20 queue_free smoke: PASS — deferred destruction verified: agent freed after one frame, no orphan child
+m20_v04_lifecycle_smoke exit=0 fails=0 :: M20 V04 lifecycle smoke: PASS
+m20_v05_lifecycle_smoke exit=0 fails=0 :: M20 V05 lifecycle smoke: PASS
+m20_v07_lifecycle_smoke exit=0 fails=0 :: M20 V07 lifecycle smoke: PASS
+m20_v08_lifecycle_smoke exit=0 fails=0 :: M20 V08 lifecycle smoke: PASS
+m20_v09_lifecycle_smoke exit=0 fails=0 :: M20 V09 lifecycle smoke: PASS
+m20_v10_lifecycle_smoke exit=0 fails=0 :: M20 V10 lifecycle smoke: PASS
+m21_real_art_smoke exit=0 fails=0 :: M21 real-art smoke: PASS — full 400-cell real-art run cleared; final state + renderer transparency + no-orphan verified
+m21_v05_playtest_smoke exit=0 fails=0 :: M21 V05 playtest smoke: PASS
+m21_v06_tall_layout_smoke exit=0 fails=0 :: M21 V06 tall-layout smoke: PASS
+m21_v07_corridor_smoke exit=0 fails=0 :: M21 V07 corridor smoke: PASS
+m21_v08_corridor_validation exit=1 fails=2 ::
+m21_v09_direct_evidence_reconciliation exit=1 fails=1 ::   ok: A: no-work slot Button yields a legitimate no-work result
+m21_v10_final_reservation_evidence exit=0 fails=0 :: M21 V10 final reservation evidence: PASS
+m22_railroad_responsive_smoke exit=0 fails=0 :: M22 railroad responsive smoke: PASS
+m22_responsive_smoke exit=0 fails=0 :: M22 responsive/safe-area smoke: PASS
+m22_v03_connector_evidence exit=0 fails=0 :: M22 V03 connector evidence: PASS
+m22_v04_final_evidence exit=0 fails=0 :: M22 V04 final evidence: PASS
+m22_v05_final_state_evidence exit=0 fails=0 :: M22 V05 final state evidence: PASS
+m22_v06_real_demo_state_evidence exit=0 fails=0 :: M22 V06 real-demo state evidence: PASS
+m23_v01_batch_supply_evidence exit=0 fails=0 :: M23 V01 batch supply evidence: PASS
+m23_v02_hardening_evidence exit=0 fails=0 :: M23 V02 hardening evidence: PASS
+m23_v03_transaction_identity_evidence exit=0 fails=0 :: M23 V03 transaction identity evidence: PASS
+m24_blue_fixture_evidence exit=0 fails=0 :: M24 BLUE 8/14/12 fixture evidence: PASS
+m24_five_full_refill_evidence exit=0 fails=0 :: M24 five-full/refill evidence: PASS
+m24_slot_state_evidence exit=0 fails=0 :: M24 slot-state evidence: PASS
+m24_supply_handoff_evidence exit=0 fails=0 :: M24 supply-handoff evidence: PASS
+m24_v02_transaction_hardening_evidence exit=0 fails=0 :: M24 V02 transaction-hardening evidence: PASS
+m25_blue_arbitration_evidence exit=0 fails=0 :: M25 BLUE arbitration/opening evidence: PASS
+m25_c003_exact_prefilter exit=0 fails=0 :: M25-C003 EXACT PREFILTER: PASS
+m25_c004_host_truth exit=0 fails=0 :: m25_c004_host_truth: PASS (0 failed checks)
+m25_c004_railroad_differential exit=0 fails=0 :: m25_c004_railroad_differential: PASS (48202 comparisons, 0 diffs, 0 failed checks)
+m25_claim_model_evidence exit=0 fails=0 :: M25 claim-model evidence: PASS
+m25_rollback_finalize_reset_evidence exit=0 fails=0 :: M25 rollback/finalize/reset evidence: PASS
+m25_scale_evidence exit=0 fails=0 :: M25 scale evidence: PASS
+m25_v02_strict_remediation_evidence exit=0 fails=0 :: M25 V02 strict-remediation evidence: PASS
+m25_v03_exact_work_binding_evidence exit=0 fails=0 :: M25 V03 exact-work-binding evidence: PASS
+m26_hazard_bot_integration exit=0 fails=0 :: M26 Hazard Bot integration: PASS
+m26_scale_59_sanity exit=0 fails=0 :: M26 59x59 scale sanity: PASS
+m27_generation_retry exit=0 fails=0 :: M27 generation retry: PASS
+m27_hazard_bot_solve exit=0 fails=0 :: M27 Hazard Bot solvability: PASS
+m27_scale_59 exit=0 fails=0 :: M27 59x59 scale: PASS
+m28_c002_c001_gameplay_v02 exit=0 fails=0 :: M28-C002-C001 Gameplay V02 core evidence: PASS (14/14 cases, 0 fail)
+m28_c002_c002_r01_visual exit=0 fails=0 :: M28-C002-C002-R01 visual remediation evidence: PASS (10/10 cases, 0 fail)
+m28_c002_c002_static_shell exit=0 fails=0 :: M28-C002-C002 static master shell evidence: PASS (16/16 cases, 0 fail)
+m28_c002_c003_final_gate exit=0 fails=0 :: M28-C002-C003 final popup-inclusive gate: PASS (22/22 cases, 0 fail)
+m28_c002_c003_r01_remediation exit=0 fails=0 :: M28-C002-C003-R01 five-finding remediation: PASS (24/24 cases, 0 fail)
+m28_c002_c004_tile_visual exit=0 fails=0 :: M28-C002-C004 color/batch tile visual: PASS (17/17 cases, 0 fail)
+m28_gameplay_layout_smoke exit=0 fails=0 :: ==== M28 layout smoke: 253 checks, 0 failures ====
+m29_c002_tempo_retune exit=0 fails=0 :: M29-C002 TEMPO RETUNE: PASS
+m29_exact_slot_origin_evidence exit=0 fails=0 :: M29 exact slot-origin evidence: PASS
+m29_hazard_bot_runtime_smoke exit=0 fails=0 :: M29 Hazard Bot runtime smoke: PASS
+m29_input_gate_evidence exit=0 fails=0 :: M29 input gate evidence: PASS
+m29_presentation_identity_evidence exit=0 fails=0 :: M29 presentation identity evidence: PASS
+m29_realtime_movement_smoke exit=0 fails=0 :: M29 realtime movement smoke: PASS
+m29_slot_display_sync_evidence exit=0 fails=0 :: M29 slot display + live sync evidence: PASS
+m29_speed_authority_evidence exit=0 fails=0 :: M29 speed authority evidence: PASS
+m30_completion_authority exit=0 fails=0 :: M30 completion authority: PASS
+m30_manual_playtest_smoke exit=0 fails=0 :: M30 manual playtest smoke: PASS
+m30_transaction_safe_retry exit=0 fails=0 :: M30 transaction-safe retry: PASS
+m31_cleaning_effects_evidence exit=0 fails=0 :: M31 cleaning-effects evidence: PASS
+m31_scale_59_effects exit=0 fails=0 :: M31 59x59 effects stress: PASS
+m32_c002_board_independent_size exit=0 fails=0 :: M32-C002 BOARD-INDEPENDENT SIZE: PASS (86 checks, 0 failed)
+m32_scale_59_visuals exit=0 fails=0 :: M32 59x59 visual scale/benchmark: PASS
+m32_scrubbot_visual_evidence exit=0 fails=0 :: M32 scrubbot-visual evidence: PASS
+m33_audio_runtime exit=0 fails=0 :: M33 audio runtime evidence: PASS
+m34_haptics_production exit=0 fails=0 :: M34 haptics production wiring evidence: PASS
+m34_haptics_runtime exit=0 fails=0 :: M34 haptics runtime evidence: PASS
+m35_level_catalog exit=0 fails=0 :: M35 level catalog evidence: PASS
+m35_v02_hardening exit=0 fails=0 :: M35 V02 hardening evidence: PASS
+m36_difficulty_v1 exit=0 fails=0 :: M36 difficulty V1 evidence: PASS
+m36_v02_migration exit=0 fails=0 :: M36 V02 migration evidence: PASS
+m37_level_progression exit=0 fails=0 :: M37 level progression evidence: PASS
+m37_v02_strict exit=0 fails=0 :: M37 V02 strict validation: PASS
+m37_v03_forward_only exit=0 fails=0 :: M37 V03 forward-only evidence: PASS
+m38_v02_strict exit=0 fails=0 :: M38 V02 strict validation: PASS
+m38_win_streak exit=0 fails=0 :: M38 win streak evidence: PASS
+m39_v02_atomicity exit=0 fails=0 :: M39 V02 atomicity/hardening evidence: PASS
+m39_v02_capacity exit=0 fails=0 :: M39 V02 capacity evidence: PASS
+m39_v02_integration exit=0 fails=0 :: M39 V02 production integration evidence: PASS
+m39_v03_full_surface exit=0 fails=0 :: M39 V03 full-surface evidence: PASS
+m39_v03_integration exit=0 fails=0 :: M39 V03 integration evidence: PASS
+m39_v04_integration exit=0 fails=0 :: M39 V04 integration evidence: PASS
+m39_v04_tornado_inflight exit=0 fails=0 :: M39 V04 tornado in-flight evidence: PASS
+m39a_economy_core exit=0 fails=0 :: M39 Phase A evidence: PASS
+m39b_hearts_speed exit=0 fails=0 :: M39 Phase B evidence: PASS
+m39c_boosters exit=0 fails=0 :: M39 Phase C evidence: PASS
+m39d_daily_collection exit=0 fails=0 :: M39 Phase D evidence: PASS
+m39e_full_matrix exit=0 fails=0 :: M39 Phase E evidence: PASS
+m40_save_system exit=0 fails=0 :: M40 save system evidence: PASS
+m40_v02_safety exit=0 fails=0 :: M40 V02 safety evidence: PASS
+m40_v03_canonical exit=0 fails=0 :: M40 V03 canonical evidence: PASS
+m40_v04_bootstrap exit=0 fails=0 :: M40 V04 bootstrap evidence: PASS
+m41_settings exit=0 fails=0 :: M41 V01 settings evidence: PASS
+m42_assets exit=0 fails=0 :: M42 assets evidence: PASS
+m42_c002_scrubby_scale exit=0 fails=0 :: m42_c002_scrubby_scale: 7/7 cases, 0 failures
+m42_c003_scrubby_animation exit=0 fails=0 :: m42_c003_scrubby_animation: 18/18 cases, 0 failures
+m42_home exit=0 fails=0 :: M42 home evidence: PASS
+m42_home_composition exit=0 fails=0 :: m42_home_composition: 9/9 cases, 0 failures
+m42_home_v04 exit=0 fails=0 :: m42_home_v04: 18/18 cases, 0 failures
+m42_home_v05 exit=0 fails=0 :: m42_home_v05: 13/13 cases, 0 failures
+m42_home_v06 exit=0 fails=0 :: m42_home_v06: 13/13 cases, 0 failures
+m42_home_v07_safe_area exit=0 fails=0 :: m42_home_v07_safe_area: 9/9 cases, 0 failures
+m42_navigation exit=0 fails=0 :: M42 navigation evidence: PASS
+m42_opening exit=0 fails=0 :: M42 opening evidence: PASS
+m43_c001a_results_foundation exit=0 fails=0 :: M43-C001A results foundation evidence: PASS (11/11 cases, 0 fail)
+m43_c001b_won_results_visual exit=0 fails=0 :: M43-C001B WON results visual evidence: PASS (11/11 cases, 0 fail)
+m43_c002_c001_popup_modal_pause exit=0 fails=0 :: M43-C002-C001 popup / modal / Pause foundation evidence: PASS (23/23 cases, 0 fail)
+m43_c003_c001_acquisition exit=0 fails=0 :: M43-C003-C001 acquisition evidence: PASS (34/34 cases, 0 fail)
+m52_owner_supply_plans exit=0 fails=0 :: M52 OWNER SUPPLY PLANS: PASS
+m52_r01_parallel_runtime exit=0 fails=0 :: M52 R01 PARALLEL RUNTIME: PASS
+m52_r02_early_slot_release exit=0 fails=0 :: M52 R02 EARLY SLOT RELEASE: PASS
+m53_c002_difficulty_calibration exit=0 fails=0 :: M53-C002 DIFFICULTY CALIBRATION: PASS
+m53_first10_difficulty exit=0 fails=0 :: M53 FIRST10 DIFFICULTY: PASS
+m54_collection_set_master_exactly_once exit=0 fails=0 :: M54 COLLECTION SET/MASTER EXACTLY-ONCE: PASS
+m55_c002_timed_2x_anti_rollback exit=0 fails=0 :: M55-C002 TIMED 2X ANTI-ROLLBACK: PASS
+m55_core_chaos exit=0 fails=0 :: M55 CORE CHAOS: PASS
+m55_economy_release_regression exit=0 fails=0 :: M55 ECONOMY RELEASE REGRESSION: PASS
+m55_heart_900_authority exit=0 fails=0 :: M55 HEART 900 AUTHORITY: PASS
+m55_long_session exit=0 fails=0 :: M55 LONG SESSION: PASS
+maint_supply_columns_c001 exit=0 fails=0 :: maint_supply_columns_c001: 10/10 cases, 0 failures
+palette_v3_leveldata_contract exit=0 fails=0 :: Palette V3 / LevelData V1 contract: PASS
+run_tests exit=0 fails=0 :: RESULT: ALL PASS

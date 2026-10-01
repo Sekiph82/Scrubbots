@@ -1,0 +1,325 @@
+{
+  "wave": [
+    {
+      "production_frame": "wave_01.png",
+      "source_family": "wave",
+      "source_frame": 1
+    },
+    {
+      "production_frame": "wave_02.png",
+      "source_family": "wave",
+      "source_frame": 2
+    },
+    {
+      "production_frame": "wave_03.png",
+      "source_family": "wave",
+      "source_frame": 3
+    },
+    {
+      "production_frame": "wave_04.png",
+      "source_family": "wave",
+      "source_frame": 4
+    },
+    {
+      "production_frame": "wave_05.png",
+      "source_family": "wave",
+      "source_frame": 5
+    },
+    {
+      "production_frame": "wave_06.png",
+      "source_family": "wave",
+      "source_frame": 6
+    },
+    {
+      "production_frame": "wave_07.png",
+      "source_family": "wave",
+      "source_frame": 7
+    },
+    {
+      "production_frame": "wave_08.png",
+      "source_family": "wave",
+      "source_frame": 8
+    },
+    {
+      "production_frame": "wave_09.png",
+      "source_family": "wave",
+      "source_frame": 7
+    },
+    {
+      "production_frame": "wave_10.png",
+      "source_family": "wave",
+      "source_frame": 6
+    },
+    {
+      "production_frame": "wave_11.png",
+      "source_family": "wave",
+      "source_frame": 5
+    },
+    {
+      "production_frame": "wave_12.png",
+      "source_family": "wave",
+      "source_frame": 4
+    },
+    {
+      "production_frame": "wave_13.png",
+      "source_family": "wave",
+      "source_frame": 3
+    },
+    {
+      "production_frame": "wave_14.png",
+      "source_family": "wave",
+      "source_frame": 2
+    }
+  ],
+  "bow": [
+    {
+      "production_frame": "bow_01.png",
+      "source_family": "bow",
+      "source_frame": 1
+    },
+    {
+      "production_frame": "bow_02.png",
+      "source_family": "bow",
+      "source_frame": 2
+    },
+    {
+      "production_frame": "bow_03.png",
+      "source_family": "bow",
+      "source_frame": 3
+    },
+    {
+      "production_frame": "bow_04.png",
+      "source_family": "bow",
+      "source_frame": 4
+    },
+    {
+      "production_frame": "bow_05.png",
+      "source_family": "bow",
+      "source_frame": 5
+    },
+    {
+      "production_frame": "bow_06.png",
+      "source_family": "bow",
+      "source_frame": 6
+    },
+    {
+      "production_frame": "bow_07.png",
+      "source_family": "bow",
+      "source_frame": 7
+    },
+    {
+      "production_frame": "bow_08.png",
+      "source_family": "bow",
+      "source_frame": 7
+    },
+    {
+      "production_frame": "bow_09.png",
+      "source_family": "bow",
+      "source_frame": 7
+    },
+    {
+      "production_frame": "bow_10.png",
+      "source_family": "bow",
+      "source_frame": 8
+    },
+    {
+      "production_frame": "bow_11.png",
+      "source_family": "bow",
+      "source_frame": 9
+    },
+    {
+      "production_frame": "bow_12.png",
+      "source_family": "bow",
+      "source_frame": 10
+    },
+    {
+      "production_frame": "bow_13.png",
+      "source_family": "bow",
+      "source_frame": 11
+    },
+    {
+      "production_frame": "bow_14.png",
+      "source_family": "bow",
+      "source_frame": 1
+    },
+    {
+      "production_frame": "bow_15.png",
+      "source_family": "bow",
+      "source_frame": 1
+    }
+  ],
+  "turn": [
+    {
+      "production_frame": "turn_01.png",
+      "source_family": "turn_look",
+      "source_frame": 1
+    },
+    {
+      "production_frame": "turn_02.png",
+      "source_family": "turn_look",
+      "source_frame": 2
+    },
+    {
+      "production_frame": "turn_03.png",
+      "source_family": "turn_look",
+      "source_frame": 6
+    },
+    {
+      "production_frame": "turn_04.png",
+      "source_family": "turn_look",
+      "source_frame": 5
+    },
+    {
+      "production_frame": "turn_05.png",
+      "source_family": "turn_look",
+      "source_frame": 6
+    },
+    {
+      "production_frame": "turn_06.png",
+      "source_family": "turn_look",
+      "source_frame": 7
+    },
+    {
+      "production_frame": "turn_07.png",
+      "source_family": "turn_look",
+      "source_frame": 8
+    },
+    {
+      "production_frame": "turn_08.png",
+      "source_family": "turn_look",
+      "source_frame": 8
+    },
+    {
+      "production_frame": "turn_09.png",
+      "source_family": "turn_look",
+      "source_frame": 9
+    },
+    {
+      "production_frame": "turn_10.png",
+      "source_family": "turn_look",
+      "source_frame": 10
+    },
+    {
+      "production_frame": "turn_11.png",
+      "source_family": "turn_look",
+      "source_frame": 10
+    },
+    {
+      "production_frame": "turn_12.png",
+      "source_family": "turn_look",
+      "source_frame": 9
+    },
+    {
+      "production_frame": "turn_13.png",
+      "source_family": "turn_look",
+      "source_frame": 8
+    },
+    {
+      "production_frame": "turn_14.png",
+      "source_family": "turn_look",
+      "source_frame": 15
+    },
+    {
+      "production_frame": "turn_15.png",
+      "source_family": "turn_look",
+      "source_frame": 16
+    },
+    {
+      "production_frame": "turn_16.png",
+      "source_family": "turn_look",
+      "source_frame": 17
+    },
+    {
+      "production_frame": "turn_17.png",
+      "source_family": "turn_look",
+      "source_frame": 1
+    }
+  ],
+  "full_turn": [
+    {
+      "production_frame": "full_turn_01.png",
+      "source_family": "full_turn",
+      "source_frame": 1
+    },
+    {
+      "production_frame": "full_turn_02.png",
+      "source_family": "full_turn",
+      "source_frame": 2
+    },
+    {
+      "production_frame": "full_turn_03.png",
+      "source_family": "full_turn",
+      "source_frame": 3
+    },
+    {
+      "production_frame": "full_turn_04.png",
+      "source_family": "full_turn",
+      "source_frame": 4
+    },
+    {
+      "production_frame": "full_turn_05.png",
+      "source_family": "full_turn",
+      "source_frame": 5
+    },
+    {
+      "production_frame": "full_turn_06.png",
+      "source_family": "full_turn",
+      "source_frame": 6
+    },
+    {
+      "production_frame": "full_turn_07.png",
+      "source_family": "full_turn",
+      "source_frame": 7
+    },
+    {
+      "production_frame": "full_turn_08.png",
+      "source_family": "full_turn",
+      "source_frame": 8
+    },
+    {
+      "production_frame": "full_turn_09.png",
+      "source_family": "full_turn",
+      "source_frame": 9
+    },
+    {
+      "production_frame": "full_turn_10.png",
+      "source_family": "full_turn",
+      "source_frame": 10
+    },
+    {
+      "production_frame": "full_turn_11.png",
+      "source_family": "full_turn",
+      "source_frame": 11
+    },
+    {
+      "production_frame": "full_turn_12.png",
+      "source_family": "full_turn",
+      "source_frame": 12
+    },
+    {
+      "production_frame": "full_turn_13.png",
+      "source_family": "full_turn",
+      "source_frame": 13
+    },
+    {
+      "production_frame": "full_turn_14.png",
+      "source_family": "full_turn",
+      "source_frame": 14
+    },
+    {
+      "production_frame": "full_turn_15.png",
+      "source_family": "full_turn",
+      "source_frame": 15
+    },
+    {
+      "production_frame": "full_turn_16.png",
+      "source_family": "full_turn",
+      "source_frame": 16
+    },
+    {
+      "production_frame": "full_turn_17.png",
+      "source_family": "full_turn",
+      "source_frame": 17
+    }
+  ]
+}

@@ -52,11 +52,37 @@ func texture(slug: String) -> Texture2D:
 		return null
 	return load("res://" + String(_by_slug[slug]["path"])) as Texture2D
 
+## M42-C003 V03: an APPROVED, hash-pinned frame set (validated with the whole manifest).
+## Returns {} when the manifest is invalid or the set is absent; otherwise the set's
+## geometry plus "textures": {gesture: [Texture2D, ...]} (null-free, else {}).
+func animation_set(id: String) -> Dictionary:
+	if not _valid or not (_manifest.get("animation_sets", {}) as Dictionary).has(id):
+		return {}
+	var s: Dictionary = _manifest["animation_sets"][id]
+	var textures := {}
+	for g in s["gestures"]:
+		var list: Array = []
+		for f in s["gestures"][g]["frames"]:
+			var tex := load("res://" + String(f["path"])) as Texture2D
+			if tex == null:
+				return {}
+			list.append(tex)
+		textures[g] = list
+	var out := s.duplicate(true)
+	out["textures"] = textures
+	return out
+
 ## Overwrite protection for tooling: false when `path` is an APPROVED final asset.
 func can_write(path: String) -> bool:
 	for a in _by_slug.values():
 		if String(a.get("path", "")) == path and String(a.get("status", "")) == "APPROVED":
 			return false
+	if _valid:
+		for s in (_manifest.get("animation_sets", {}) as Dictionary).values():
+			for g in s["gestures"].values():
+				for f in g["frames"]:
+					if String(f["path"]) == path:
+						return false
 	return _valid
 
 ## Counts per lifecycle state over all ART entries (evidence / owner gate reporting).

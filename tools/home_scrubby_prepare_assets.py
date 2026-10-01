@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Deterministically stage, validate, normalize, and report M42-C003 V02 art."""
+"""Deterministically stage, validate, normalize, and report M42-C003 V02/V03 art."""
 
 from __future__ import annotations
 
@@ -98,7 +98,7 @@ def feature_metrics(image: Image.Image) -> dict[str, Any]:
     }
 
 
-def verify_and_stage(archive: Path, root: Path) -> dict[str, Any]:
+def verify_and_stage(archive: Path, root: Path, evidence: str = "coordination/sessions/M42-C003/evidence_v02") -> dict[str, Any]:
     manifest = manifest_hashes((root / MANIFEST).read_text(encoding="utf-8"))
     if sum(map(len, manifest.values())) != 63:
         raise ValueError(f"manifest must enumerate 63 hashes; found {sum(map(len, manifest.values()))}")
@@ -130,10 +130,10 @@ def verify_and_stage(archive: Path, root: Path) -> dict[str, Any]:
                 staged_names.append({"archive_name": arcname, "staged_name": staged, "sha256": digest})
             mapping[family] = staged_names
     report = {"archive_path": str(archive), "archive_sha256": archive_hash, "source_frames": len(rows), "frames": rows, "staging_map": mapping}
-    out = root / "coordination/sessions/M42-C003/evidence_v02/source_verification.json"
+    out = root / evidence / "source_verification.json"
     out.parent.mkdir(parents=True, exist_ok=True)
     out.write_text(json.dumps(report, indent=2) + "\n", encoding="utf-8")
-    (root / "coordination/sessions/M42-C003/evidence_v02/source_mapping.json").write_text(json.dumps(mapping, indent=2) + "\n", encoding="utf-8")
+    (root / evidence / "source_mapping.json").write_text(json.dumps(mapping, indent=2) + "\n", encoding="utf-8")
     return report
 
 
@@ -361,13 +361,320 @@ def contact_sheet(root: Path, family: str, paths: list[Path], dest: Path) -> Non
     sheet.convert("RGB").save(dest, quality=95)
 
 
+# ---------------------------------------------------------------------------
+# V03 (coordination/OWNER_M42_HOME_SCRUBBY_ANIMATION_V03.md,
+# coordination/sessions/M42-C003/ASSET_PRODUCTION_SPEC_V03.md)
+#
+# One common larger animation canvas + one common pivot for all 63 frames. Each
+# source family gets ONE uniform scale matched to HOME-026 identity (true visor
+# component width + upright character height); every frame is registered so its
+# planted rubber-sole midpoint lands on the common pivot. Frames are stored at
+# V03_TEXELS_PER_PIXEL HOME texels per animation pixel (memory), which still keeps
+# all source detail because every family scale exceeds it. Runtime maps the pivot
+# onto the accepted HOME screen soles point.
+# ---------------------------------------------------------------------------
+import numpy as np  # noqa: E402  (V03 measurement only)
+from scipy import ndimage  # noqa: E402
+
+V03_EVIDENCE = "coordination/sessions/M42-C003/evidence_v03"
+V03_CANDIDATES = Path("assets/ui/generated/characters/home_animation/v03")
+V03_TEXELS_PER_PIXEL = 3
+V03_MARGIN = 16
+V03_ROUND = 16
+V03_FPS = 12
+V03_ALPHA_FLOOR = 2  # alpha <= 2 fringe speckle removed (same rule as V02)
+V03_RESAMPLER = "Pillow Image.transform(AFFINE, BICUBIC) on premultiplied RGBa, exact sub-pixel root registration"
+# Production sequences (source family, source frame numbers). Turn/Look uses the dedicated
+# Turn/Look family per the owner choice of 2026-10-02 (bilateral; see CLAUDE_LOG_V03).
+V03_SEQUENCES: dict[str, tuple[str, list[int]]] = {
+    "wave": ("wave", [1, 2, 3, 4, 5, 6, 7, 8, 7, 6, 5, 4, 3, 2]),
+    "bow": ("bow", [1, 2, 3, 4, 5, 6, 7, 7, 7, 8, 9, 10, 11, 1, 1]),
+    "turn": ("turn_look", [1, 2, 6, 5, 6, 7, 8, 8, 9, 10, 10, 9, 8, 15, 16, 17, 1]),
+    "full_turn": ("full_turn", list(range(1, 18))),
+}
+V03_COUNTS = {"wave": 14, "bow": 15, "turn": 17, "full_turn": 17}
+
+
+def v03_source_path(family: str, n: int) -> Path:
+    return SOURCE_ROOT / family / f"{family}_{n:02d}.png"
+
+
+def v03_identity(image: Image.Image) -> dict[str, Any]:
+    """Visor = largest connected near-black component in the upper 60% of the character;
+    yaw = visor centre offset inside the head silhouette row; height = alpha>128 rows."""
+    a = np.asarray(image.convert("RGBA")).astype(np.int32)
+    opaque = a[..., 3] > 128
+    ys = np.nonzero(opaque)[0]
+    y0, y1 = int(ys.min()), int(ys.max())
+    lum = 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]
+    dark = (lum < 45) & opaque
+    dark[int(y0 + (y1 - y0) * 0.6):] = False
+    lab, n = ndimage.label(dark)
+    sizes = ndimage.sum(dark, lab, range(1, n + 1))
+    k = int(np.argmax(sizes)) + 1
+    vy, vx = np.nonzero(lab == k)
+    cy = int(np.median(vy))
+    vcx = (int(vx.min()) + int(vx.max())) / 2
+    row = opaque[cy]
+    left = right = int(vcx)
+    while left > 0 and row[left - 1]:
+        left -= 1
+    while right < row.size - 1 and row[right + 1]:
+        right += 1
+    head_w = max(1, right - left)
+    off = vcx - (left + right) / 2
+    yaw = math.degrees(math.asin(max(-1.0, min(1.0, 2 * off / head_w))))
+    return {"visor_width": int(vx.max() - vx.min() + 1), "visor_height": int(vy.max() - vy.min() + 1),
+            "visor_area": int(sizes[k - 1]), "character_height": y1 - y0 + 1, "yaw_deg": round(yaw, 1)}
+
+
+def v03_sole_root(image: Image.Image) -> tuple[float, float]:
+    """Planted root = midpoint of the dark, unsaturated rubber soles (bristles are bright
+    cyan and excluded) within the lowest 8% band; y = lowest rubber pixel row."""
+    a = np.asarray(image.convert("RGBA")).astype(np.int32)
+    opaque = a[..., 3] > 128
+    ys = np.nonzero(opaque)[0]
+    y1 = int(ys.max())
+    h = y1 - int(ys.min()) + 1
+    lum = 0.299 * a[..., 0] + 0.587 * a[..., 1] + 0.114 * a[..., 2]
+    sat = a[..., :3].max(-1) - a[..., :3].min(-1)
+    rubber = opaque & (lum < 70) & (sat < 45)
+    rubber[: int(y1 - 0.25 * h)] = False
+    sole_y = int(np.nonzero(rubber)[0].max())
+    band = rubber[int(sole_y - 0.08 * h): sole_y + 1]
+    bx = np.nonzero(band)[1]
+    return (float(bx.min() + bx.max()) / 2.0, float(sole_y))
+
+
+def v03_family_scales(root: Path, home: Image.Image) -> dict[str, Any]:
+    hid = v03_identity(home)
+    out: dict[str, Any] = {"home": hid, "families": {}}
+    for family, (_, count) in FAMILIES.items():
+        rows = []
+        for n in range(1, count + 1):
+            with Image.open(root / v03_source_path(family, n)) as im:
+                m = v03_identity(im)
+            rows.append({"frame": n, **m, "visor_ratio_scale": hid["visor_width"] / m["visor_width"],
+                         "height_ratio_scale": hid["character_height"] / m["character_height"]})
+        max_h = max(r["character_height"] for r in rows)
+        comparable = [r for r in rows if abs(r["yaw_deg"]) <= 15 and r["character_height"] >= 0.93 * max_h]
+        vals = sorted(math.sqrt(r["visor_ratio_scale"] * r["height_ratio_scale"]) for r in comparable)
+        scale = vals[len(vals) // 2]
+        out["families"][family] = {
+            "scale_home_texels_per_source_px": scale,
+            "basis": "median over comparable upright front frames (|yaw|<=15 deg, height>=93% of family max) of sqrt(HOME visor width ratio x HOME height ratio)",
+            "comparable_frames": [r["frame"] for r in comparable],
+            "visor_width_vs_home_at_scale": [round(r["visor_width"] * scale / hid["visor_width"], 4) for r in comparable],
+            "height_vs_home_at_scale": [round(r["character_height"] * scale / hid["character_height"], 4) for r in comparable],
+            "frames": rows,
+        }
+    return out
+
+
+def v03_render(src: Image.Image, scale_px: float, root_xy: tuple[float, float], pivot: tuple[int, int], canvas: tuple[int, int]) -> Image.Image:
+    """Uniform scale about the sole root, root -> pivot, premultiplied bicubic."""
+    src = src.convert("RGBA")
+    cleaned = src.copy()
+    cleaned.putalpha(src.getchannel("A").point(lambda p: 0 if p <= V03_ALPHA_FLOOR else p))
+    pre = cleaned.convert("RGBa")
+    inv = 1.0 / scale_px
+    # output (x, y) samples source ((x - px) / s + rx, (y - py) / s + ry)
+    coeffs = (inv, 0.0, root_xy[0] - pivot[0] * inv, 0.0, inv, root_xy[1] - pivot[1] * inv)
+    out = pre.transform(canvas, Image.Transform.AFFINE, coeffs, resample=Image.Resampling.BICUBIC, fillcolor=(0, 0, 0, 0))
+    out = out.convert("RGBA")
+    out.putalpha(out.getchannel("A").point(lambda p: 0 if p <= V03_ALPHA_FLOOR else p))
+    return out
+
+
+def v03_layout(root: Path, scales: dict[str, Any]) -> dict[str, Any]:
+    """Common canvas + pivot from the union of all 63 registered production frames."""
+    lo = [math.inf, math.inf]
+    hi = [-math.inf, -math.inf]
+    per: dict[tuple[str, int], dict[str, Any]] = {}
+    for family, frames in V03_SEQUENCES.values():
+        s_px = scales["families"][family]["scale_home_texels_per_source_px"] / V03_TEXELS_PER_PIXEL
+        for n in frames:
+            if (family, n) in per:
+                continue
+            with Image.open(root / v03_source_path(family, n)) as im:
+                rx, ry = v03_sole_root(im)
+                bb = im.getchannel("A").point(lambda p: 255 if p > V03_ALPHA_FLOOR else 0).getbbox()
+            per[(family, n)] = {"root": (rx, ry), "scale_px": s_px}
+            lo[0] = min(lo[0], (bb[0] - rx) * s_px)
+            lo[1] = min(lo[1], (bb[1] - ry) * s_px)
+            hi[0] = max(hi[0], (bb[2] - rx) * s_px)
+            hi[1] = max(hi[1], (bb[3] - ry) * s_px)
+    px = math.ceil(-lo[0]) + V03_MARGIN
+    py = math.ceil(-lo[1]) + V03_MARGIN
+    w = px + math.ceil(hi[0]) + V03_MARGIN
+    h = py + math.ceil(hi[1]) + V03_MARGIN
+    w = -(-w // V03_ROUND) * V03_ROUND
+    h = -(-h // V03_ROUND) * V03_ROUND
+    return {"canvas": (w, h), "pivot": (px, py), "union_rel_pivot_px": [lo[0], lo[1], hi[0], hi[1]], "per_source": per}
+
+
+def v03_build(root: Path, out_root: Path) -> dict[str, Any]:
+    home = Image.open(root / HOME).convert("RGBA")
+    scales = v03_family_scales(root, home)
+    layout = v03_layout(root, scales)
+    canvas, pivot = layout["canvas"], layout["pivot"]
+    home_root = v03_sole_root(home)
+    frames: list[dict[str, Any]] = []
+    for runtime_family, (family, seq) in V03_SEQUENCES.items():
+        if len(seq) != V03_COUNTS[runtime_family]:
+            raise ValueError(f"{runtime_family}: {len(seq)} frames != {V03_COUNTS[runtime_family]}")
+        for i, n in enumerate(seq, 1):
+            meta = layout["per_source"][(family, n)]
+            with Image.open(root / v03_source_path(family, n)) as im:
+                img = v03_render(im, meta["scale_px"], meta["root"], pivot, canvas)
+            target = out_root / runtime_family / f"{runtime_family}_{i:02d}.png"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            img.save(target, format="PNG", optimize=False, compress_level=9)
+            bb = img.getchannel("A").point(lambda p: 255 if p > 128 else 0).getbbox()
+            frames.append({"gesture": runtime_family, "frame": i, "source_family": family, "source_frame": n,
+                           "source": str(v03_source_path(family, n)).replace("\\", "/"),
+                           "source_sha256": sha256((root / v03_source_path(family, n)).read_bytes()),
+                           "source_root": [round(meta["root"][0], 2), round(meta["root"][1], 2)],
+                           "scale_anim_px_per_source_px": meta["scale_px"], "alpha_bbox_gt128": list(bb) if bb else None,
+                           "size": list(img.size), "path": (str(target.relative_to(root)) if target.is_relative_to(root) else str(target)).replace("\\", "/"),
+                           "sha256": sha256(target.read_bytes())})
+    return {"canvas": list(canvas), "pivot": list(pivot), "home_root_texels": [home_root[0], home_root[1]],
+            "home_texels_per_anim_pixel": V03_TEXELS_PER_PIXEL, "margin_px": V03_MARGIN, "round_to": V03_ROUND,
+            "resampler": V03_RESAMPLER, "alpha_floor": V03_ALPHA_FLOOR, "fps": V03_FPS,
+            "union_rel_pivot_px": [round(v, 3) for v in layout["union_rel_pivot_px"]],
+            "family_scales": {f: v["scale_home_texels_per_source_px"] for f, v in scales["families"].items()},
+            "scale_report": scales, "frames": frames}
+
+
+def v03_write_evidence(root: Path, built: dict[str, Any], rerun: dict[str, Any]) -> None:
+    ev = root / V03_EVIDENCE
+    ev.mkdir(parents=True, exist_ok=True)
+    (ev / "normalization_measurements.json").write_text(json.dumps(built, indent=2) + "\n", encoding="utf-8")
+    sr = built["scale_report"]
+    hid = sr["home"]
+    D = built["home_texels_per_anim_pixel"]
+    L = ["# M42-C003 V03 family scale report", "",
+         f"HOME-026 identity: visor {hid['visor_width']}x{hid['visor_height']} px (largest connected near-black component in the upper 60%), character height {hid['character_height']} px, yaw {hid['yaw_deg']} deg.", "",
+         "Scale = HOME texels per source pixel, one uniform value per source family. Basis: median over comparable upright front frames (|yaw| <= 15 deg, height >= 93% of the family max) of sqrt(visor-width ratio x height ratio). Visor width and character height are spec V03 section 5 identity features (priorities 1 and 3); the geometric mean balances them when a family's proportions differ from HOME-026. The V02 dark-envelope 'visor' metric (723 px on HOME, which also counted dark body pixels) is replaced.", "",
+         "| Source family | Scale | Comparable frames | Visor width vs HOME at scale | Height vs HOME at scale | Stored anim px per source px |", "|---|---:|---|---|---|---:|"]
+    for fam, v in sr["families"].items():
+        L.append(f"| {fam} | {v['scale_home_texels_per_source_px']:.4f} | {v['comparable_frames']} | {', '.join(f'{x:.1%}' for x in v['visor_width_vs_home_at_scale'])} | {', '.join(f'{x:.1%}' for x in v['height_vs_home_at_scale'])} | {v['scale_home_texels_per_source_px'] / D:.4f} |")
+    L += ["", f"Every stored scale is >= 1 animation pixel per source pixel, so storing at {D} HOME texels per animation pixel keeps all source detail.", "",
+          "## Per-frame identity measurements (source pixels)", "", "| Family | Frame | Visor w | Visor h | Height | Yaw deg |", "|---|---:|---:|---:|---:|---:|"]
+    for fam, v in sr["families"].items():
+        L += [f"| {fam} | {r['frame']:02d} | {r['visor_width']} | {r['visor_height']} | {r['character_height']} | {r['yaw_deg']} |" for r in v["frames"]]
+    (ev / "family_scale_report.md").write_text("\n".join(L) + "\n", encoding="utf-8")
+    c, p = built["canvas"], built["pivot"]
+    C = ["# M42-C003 V03 common animation canvas + pivot", "",
+         f"- Canvas: **{c[0]}x{c[1]}** RGBA8 animation pixels for all 63 frames (= {c[0] * D}x{c[1] * D} HOME texels).",
+         f"- Common pivot (planted rubber-sole midpoint): **({p[0]}, {p[1]})** animation px.",
+         f"- Storage density: {D} HOME-026 texels per animation pixel; runtime size = canvas x {D} x k (k = screen px per HOME texel of the accepted M42-C002 layout).",
+         f"- HOME-026 sole root (same detector): ({built['home_root_texels'][0]}, {built['home_root_texels'][1]}) HOME texels; runtime maps the animation pivot onto that HOME screen point.",
+         f"- Union of the 63 registered frames relative to the pivot (anim px): {built['union_rel_pivot_px']}; margin {built['margin_px']} px each side; dimensions rounded up to a multiple of {built['round_to']}.",
+         f"- Resampler: {built['resampler']}; alpha <= {built['alpha_floor']} removed before and after.",
+         "- Texture memory: 63 x {0}x{1} x 4 B = {2:.1f} MiB uncompressed (a 1:1 HOME-texel canvas would be {3:.0f} MiB).".format(c[0], c[1], 63 * c[0] * c[1] * 4 / 2**20, 63 * c[0] * c[1] * 4 * D * D / 2**20),
+         "", "## Sequence mapping", ""]
+    for g, (fam, seq) in V03_SEQUENCES.items():
+        C.append(f"- {g} ({len(seq)}): {fam} frames {seq}")
+    C += ["", "## Frames", "", "| Gesture | Frame | Source | Source root | Alpha>128 bbox | SHA-256 |", "|---|---:|---|---|---|---|"]
+    C += [f"| {f['gesture']} | {f['frame']:02d} | {f['source_family']} {f['source_frame']:02d} | {f['source_root']} | {f['alpha_bbox_gt128']} | `{f['sha256']}` |" for f in built["frames"]]
+    (ev / "canvas_pivot_report.md").write_text("\n".join(C) + "\n", encoding="utf-8")
+    seqmap = {g: [{"production_frame": f"{g}_{i:02d}.png", "source_family": fam, "source_frame": n} for i, n in enumerate(seq, 1)] for g, (fam, seq) in V03_SEQUENCES.items()}
+    (ev / "sequence_mapping.json").write_text(json.dumps(seqmap, indent=2) + "\n", encoding="utf-8")
+    R = ["# M42-C003 V03 deterministic rerun", "", f"Second independent build into a scratch directory: {rerun['identical']}/{rerun['total']} frames byte-identical.", ""]
+    R += [f"- {k}: `{v}`" for k, v in rerun["mismatches"].items()] or ["No mismatches."]
+    (ev / "deterministic_rerun.md").write_text("\n".join(R) + "\n", encoding="utf-8")
+    for g in V03_SEQUENCES:
+        contact_sheet(root, g, [root / f["path"] for f in built["frames"] if f["gesture"] == g], ev / "contact_sheets" / f"{g}.png")
+
+
+def v03_promote(root: Path, built: dict[str, Any], archive_sha: str) -> None:
+    manifest_path = root / "assets/ui/HOME_ASSET_MANIFEST.json"
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    gestures: dict[str, Any] = {}
+    for f in built["frames"]:
+        dst = root / FINAL_ROOT / f["gesture"] / f"{f['gesture']}_{f['frame']:02d}.png"
+        dst.parent.mkdir(parents=True, exist_ok=True)
+        dst.write_bytes((root / f["path"]).read_bytes())
+        if sha256(dst.read_bytes()) != f["sha256"]:
+            raise ValueError(f"promotion copy mismatch: {dst}")
+        gestures.setdefault(f["gesture"], {"frames": []})["frames"].append(
+            {"path": str(dst.relative_to(root)).replace("\\", "/"), "sha256": f["sha256"],
+             "source": f"{f['source_family']}_{f['source_frame']:02d}.png", "source_sha256": f["source_sha256"]})
+    manifest.setdefault("animation_sets", {})["home_scrubby_gestures_v03"] = {
+        "status": "APPROVED",
+        "authority": "coordination/OWNER_M42_HOME_SCRUBBY_ANIMATION_V03.md + coordination/sessions/M42-C003/ASSET_PRODUCTION_SPEC_V03.md",
+        "provenance": "owner archive Home_Main_Hero_Assets.zip (63 owner-approved source frames, no new art), normalized by tools/home_scrubby_prepare_assets.py --v03",
+        "source_archive_sha256": archive_sha,
+        "idle_texture": str(HOME).replace("\\", "/"),
+        "idle_texture_sha256": sha256((root / HOME).read_bytes()),
+        "canvas": built["canvas"],
+        "pivot": built["pivot"],
+        "home_root_texels": built["home_root_texels"],
+        "home_texels_per_anim_pixel": built["home_texels_per_anim_pixel"],
+        "fps": built["fps"],
+        "resampler": built["resampler"],
+        "family_scales": built["family_scales"],
+        "gestures": gestures,
+    }
+    manifest_path.write_text(json.dumps(manifest, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+
+
+def v03_main(root: Path, archive: Path, promote: bool) -> None:
+    import tempfile
+    report = verify_and_stage(archive, root, V03_EVIDENCE)
+    built = v03_build(root, root / V03_CANDIDATES)
+    with tempfile.TemporaryDirectory() as tmp:
+        again = v03_build(root, Path(tmp))
+    a = {(f["gesture"], f["frame"]): f["sha256"] for f in built["frames"]}
+    b = {(f["gesture"], f["frame"]): f["sha256"] for f in again["frames"]}
+    mism = {f"{k[0]}_{k[1]:02d}": f"{a[k]} != {b.get(k)}" for k in a if a[k] != b.get(k)}
+    rerun = {"identical": len(a) - len(mism), "total": len(a), "mismatches": mism}
+    if mism or len(a) != 63 or again["canvas"] != built["canvas"] or again["pivot"] != built["pivot"]:
+        raise ValueError(f"V03 determinism failed: {rerun}")
+    v03_write_evidence(root, built, rerun)
+    print(f"V03_CANVAS={built['canvas'][0]}x{built['canvas'][1]} PIVOT={built['pivot']}")
+    for fam, sc in built["family_scales"].items():
+        print(f"V03_FAMILY_SCALE {fam}={sc:.6f}")
+    print(f"V03_DETERMINISTIC={rerun['identical']}/{rerun['total']}")
+    if promote:
+        v03_promote(root, built, report["archive_sha256"])
+        print("V03_PROMOTED=63")
+
+
+def v03_animations(root: Path, frames_dir: Path) -> None:
+    """Assemble the evidence tool's 24 fps runtime frame captures into animated WebP."""
+    out = root / V03_EVIDENCE / "runtime_captures"
+    out.mkdir(parents=True, exist_ok=True)
+    for g in V03_SEQUENCES:
+        paths = sorted((frames_dir / g).glob("*.png"))
+        frames = []
+        for p in paths:
+            im = Image.open(p).convert("RGB")
+            frames.append(im.resize((im.width // 2, im.height // 2), Image.Resampling.LANCZOS))
+        frames[0].save(out / f"{g}_runtime_24fps.webp", save_all=True, append_images=frames[1:], duration=round(1000 / 24), loop=0, quality=88, method=6)
+        print(f"V03_ANIMATION {g} frames={len(frames)}")
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
-    parser.add_argument("--archive", type=Path, required=True)
+    parser.add_argument("--archive", type=Path)
     parser.add_argument("--root", type=Path, default=Path.cwd())
     parser.add_argument("--normalize", action="store_true")
+    parser.add_argument("--v03", action="store_true", help="V03 common-canvas normalization + evidence")
+    parser.add_argument("--promote", action="store_true", help="with --v03: copy to final/ and pin in the HOME manifest")
+    parser.add_argument("--v03-animate", type=Path, help="assemble runtime frame captures (evidence tool output) into WebP")
     args = parser.parse_args()
     root = args.root.resolve()
+    if args.v03_animate:
+        v03_animations(root, args.v03_animate.resolve())
+        return 0
+    if args.archive is None:
+        parser.error("--archive is required unless --v03-animate is used")
+    if args.v03:
+        v03_main(root, args.archive.resolve(), args.promote)
+        print("PREPARATION_RESULT=PASS")
+        return 0
     report = verify_and_stage(args.archive.resolve(), root)
     print(f"SOURCE_ARCHIVE_SHA256={report['archive_sha256']}")
     print(f"SOURCE_FRAMES_VERIFIED={report['source_frames']}")
