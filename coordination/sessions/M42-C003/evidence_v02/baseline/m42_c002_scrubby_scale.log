@@ -1,0 +1,121 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[exact scale]
+  ok: SCRUBBY_SCALE == 1.612 exactly (1.612)
+  ok: 1.612 / 1.24 == 1.30 (1.300000000000)
+[soles / platform registration]
+  ok: (1080, 2160) soles (540.0, 1457.291) vs platform contact (540.0, 1457.291): error 0.0001 px <= 1
+  ok: (1080, 2160) hero stays 1.612 x V04 fit (no responsive scale-down)
+  ok: (1080, 2160) on-screen visible height x1.3000 (593.7 -> 771.8 px)
+  ok: (1080, 2160) hero fully inside the visible Home world [P: (0.0, 0.0), S: (1080.0, 2060.0)] (hero [P: (211.3985, 694.8195), S: (657.203, 771.7773)])
+  ok: (1080, 1920) soles (540.0, 1245.055) vs platform contact (540.0, 1245.055): error 0.0002 px <= 1
+  ok: (1080, 1920) hero stays 1.612 x V04 fit (no responsive scale-down)
+  ok: (1080, 1920) on-screen visible height x1.3000 (503.2 -> 654.2 px)
+  ok: (1080, 1920) hero fully inside the visible Home world [P: (0.0, 0.0), S: (1080.0, 1820.0)] (hero [P: (261.4528, 598.7269), S: (557.0945, 654.2163)])
+  ok: (1290, 2796) soles (645.0, 1940.096) vs platform contact (645.0001, 1940.096): error 0.0001 px <= 1
+  ok: (1290, 2796) hero stays 1.612 x V04 fit (no responsive scale-down)
+  ok: (1290, 2796) on-screen visible height x1.3000 (751.8 -> 977.4 px)
+  ok: (1290, 2796) hero fully inside the visible Home world [P: (0.0, 0.0), S: (1290.0, 2684.0)] (hero [P: (228.8495, 974.4791), S: (832.3011, 977.4014)])
+  ok: (1536, 2048) soles (768.0001, 1360.146) vs platform contact (768.0, 1360.146): error 0.0001 px <= 1
+  ok: (1536, 2048) hero stays 1.612 x V04 fit (no responsive scale-down)
+  ok: (1536, 2048) on-screen visible height x1.3000 (549.1 -> 713.8 px)
+  ok: (1536, 2048) hero fully inside the visible Home world [P: (0.0, 0.0), S: (1536.0, 1936.0)] (hero [P: (464.0673, 654.9147), S: (607.8654, 713.8384)])
+[ui collision matrix]
+  ok: (1080, 2160) TopCurrencyHUD [P: (0.0, 0.0), S: (1080.0, 234.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1080, 2160) GiftMeter [P: (0.0, 250.0), S: (1080.0, 128.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1080, 2160) PlayButton [P: (305.0, 1559.0), S: (470.0, 155.0)]: no opaque hero pixel (bbox overlap false, pixel clearance 92.7 px)
+  ok: (1080, 2160) BottomNav [P: (0.0, 1866.0), S: (1080.0, 178.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1080, 2160) Shortcut_shop [P: (26.0, 486.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1080, 2160) Shortcut_collection [P: (26.0, 714.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap true, pixel clearance 116.3 px)
+  ok: (1080, 2160) Shortcut_tasks [P: (844.0, 486.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1080, 2160) Shortcut_daily [P: (844.0, 714.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap true, pixel clearance 54.2 px)
+  ok: (1080, 1920) TopCurrencyHUD [P: (0.0, 0.0), S: (1080.0, 234.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1080, 1920) GiftMeter [P: (0.0, 242.0), S: (1080.0, 128.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1080, 1920) PlayButton [P: (305.0, 1343.0), S: (470.0, 155.0)]: no opaque hero pixel (bbox overlap false, pixel clearance 90.3 px)
+  ok: (1080, 1920) BottomNav [P: (0.0, 1634.0), S: (1080.0, 178.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1080, 1920) Shortcut_shop [P: (26.0, 470.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1080, 1920) Shortcut_collection [P: (26.0, 698.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance 110.3 px)
+  ok: (1080, 1920) Shortcut_tasks [P: (844.0, 470.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1080, 1920) Shortcut_daily [P: (844.0, 698.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance 26.6 px)
+  ok: (1290, 2796) TopCurrencyHUD [P: (0.0, 0.0), S: (1290.0, 234.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1290, 2796) GiftMeter [P: (0.0, 258.0), S: (1290.0, 128.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1290, 2796) PlayButton [P: (410.0, 2159.0), S: (470.0, 155.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1290, 2796) BottomNav [P: (0.0, 2482.0), S: (1290.0, 178.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1290, 2796) Shortcut_shop [P: (26.0, 502.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1290, 2796) Shortcut_collection [P: (26.0, 730.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1290, 2796) Shortcut_tasks [P: (1054.0, 502.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1290, 2796) Shortcut_daily [P: (1054.0, 730.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1536, 2048) TopCurrencyHUD [P: (0.0, 0.0), S: (1536.0, 234.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1536, 2048) GiftMeter [P: (0.0, 242.0), S: (1536.0, 128.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1536, 2048) PlayButton [P: (533.0, 1459.0), S: (470.0, 155.0)]: no opaque hero pixel (bbox overlap false, pixel clearance 90.5 px)
+  ok: (1536, 2048) BottomNav [P: (0.0, 1750.0), S: (1536.0, 178.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1536, 2048) Shortcut_shop [P: (26.0, 470.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1536, 2048) Shortcut_collection [P: (26.0, 698.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1536, 2048) Shortcut_tasks [P: (1300.0, 470.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+  ok: (1536, 2048) Shortcut_daily [P: (1300.0, 698.0), S: (210.0, 156.0)]: no opaque hero pixel (bbox overlap false, pixel clearance >96 px)
+[sign / helper bots]
+  ok: (1080, 2160) clears the baked sign
+  ok: (1080, 2160) right helper bot: no hero pixel in its rect
+  ok: (1080, 2160) left helper bot: only the brush bristles enter its rect's right 47-canvas-px strip (56.8 screen px, 7945 tex px)
+  ok: (1080, 1920) clears the baked sign
+  ok: (1080, 1920) right helper bot: no hero pixel in its rect
+  ok: (1080, 1920) left helper bot: only the brush bristles enter its rect's right 47-canvas-px strip (48.2 screen px, 7945 tex px)
+  ok: (1290, 2796) clears the baked sign
+  ok: (1290, 2796) right helper bot: no hero pixel in its rect
+  ok: (1290, 2796) left helper bot: only the brush bristles enter its rect's right 47-canvas-px strip (71.9 screen px, 7945 tex px)
+  ok: (1536, 2048) clears the baked sign
+  ok: (1536, 2048) right helper bot: no hero pixel in its rect
+  ok: (1536, 2048) left helper bot: only the brush bristles enter its rect's right 47-canvas-px strip (52.5 screen px, 7945 tex px)
+  ok: fixed canonical anchor kept: opaque span in the bot rows 443.5 > bot gap 440 (no shift clears both)
+  ok: (1080, 2160) panel helper-bot avoidance still holds (no panel over a bot)
+  ok: (1080, 1920) panel helper-bot avoidance still holds (no panel over a bot)
+  ok: (1290, 2796) panel helper-bot avoidance still holds (no panel over a bot)
+  ok: (1536, 2048) panel helper-bot avoidance still holds (no panel over a bot)
+[responsive relayout]
+  ok: (1080, 1920) same hero node + texture object, 1 hero / 1 shade
+  ok: (1080, 1920) live-resized soles on platform contact
+  ok: (1290, 2796) same hero node + texture object, 1 hero / 1 shade
+  ok: (1290, 2796) live-resized soles on platform contact
+  ok: (1536, 2048) same hero node + texture object, 1 hero / 1 shade
+  ok: (1536, 2048) live-resized soles on platform contact
+  ok: (1080, 2160) same hero node + texture object, 1 hero / 1 shade
+  ok: (1080, 2160) live-resized soles on platform contact
+  ok: back at 1080x2160: identical hero rect [P: (195.6954, 690.7483), S: (673.4877, 789.8069)] and shade rect
+  ok: no accumulating resized connections / timers / tweens (1 / 1 / 0)
+[ui truth — real clicks through the hero area]
+  ok: (1080, 2160) every functional control is the top hit at its centre []
+  ok: (1080, 2160) real clicks: Play / DAILY / Settings fire, disabled SHOP/COLLECTION/TASKS stay inert ["play", "daily", "settings"]
+  ok: (1080, 2160) no economy mutation from presentation
+  ok: (1080, 2160) Art_scrubby never takes input
+  ok: (1080, 2160) HeroFocusShade never takes input
+  ok: (1080, 2160) Layer_characters never takes input
+  ok: (1080, 1920) every functional control is the top hit at its centre []
+  ok: (1080, 1920) real clicks: Play / DAILY / Settings fire, disabled SHOP/COLLECTION/TASKS stay inert ["play", "daily", "settings"]
+  ok: (1080, 1920) no economy mutation from presentation
+  ok: (1080, 1920) Art_scrubby never takes input
+  ok: (1080, 1920) HeroFocusShade never takes input
+  ok: (1080, 1920) Layer_characters never takes input
+  ok: (1290, 2796) every functional control is the top hit at its centre []
+  ok: (1290, 2796) real clicks: Play / DAILY / Settings fire, disabled SHOP/COLLECTION/TASKS stay inert ["play", "daily", "settings"]
+  ok: (1290, 2796) no economy mutation from presentation
+  ok: (1290, 2796) Art_scrubby never takes input
+  ok: (1290, 2796) HeroFocusShade never takes input
+  ok: (1290, 2796) Layer_characters never takes input
+  ok: (1536, 2048) every functional control is the top hit at its centre []
+  ok: (1536, 2048) real clicks: Play / DAILY / Settings fire, disabled SHOP/COLLECTION/TASKS stay inert ["play", "daily", "settings"]
+  ok: (1536, 2048) no economy mutation from presentation
+  ok: (1536, 2048) Art_scrubby never takes input
+  ok: (1536, 2048) HeroFocusShade never takes input
+  ok: (1536, 2048) Layer_characters never takes input
+[identity / scope]
+  ok: same approved HOME-026 texture (sha fc30b992…)
+  ok: separate runtime hero layer above the world background
+  ok: no revived face/brush overlay layers
+  ok: no animation component on Home
+  ok: HeroFocusShade unchanged (still centred behind the torso; wider would reach the helper bots)
+  ok: enlarged torso centre (470.0, 935.1823) inside the shade
+m42_c002_scrubby_scale: 7/7 cases, 0 failures
+WARNING: 212 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 20 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

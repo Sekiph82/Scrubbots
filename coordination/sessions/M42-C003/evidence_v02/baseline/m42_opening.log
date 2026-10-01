@@ -1,0 +1,94 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[mp4 preserved]
+  ok: canonical MP4 path exists
+  ok: SHA-256 matches recorded provenance
+  ok: size 25,234,301 bytes
+  ok: PROVENANCE.md records hash, dimensions and audio
+[ogv runtime asset]
+  ok: OGV exists with recorded SHA-256
+  ok: Ogg container
+  ok: Theora + Vorbis stream headers present
+  ok: Theora picture 1280x720 (1280x720, frame 80x45 MBs)
+  ok: Theora frame rate 30/1 (30/1)
+  ok: Godot imports it as VideoStreamTheora (VideoStreamTheora)
+  ok: MP4 master unchanged after conversion
+  ok: exact command, tool version and hash recorded
+[opening player aspect]
+  ok: (1080, 2160): plays the Theora OGV runtime asset
+  ok: (1080, 2160): never the H.264/MP4 path
+  ok: (1080, 2160): aspect 16:9 preserved ((1080.0, 607.0))
+  ok: (1080, 2160): fitted inside, touching one edge (no crop/stretch)
+  ok: (1080, 2160): centered (letterbox)
+  ok: (1170, 2532): plays the Theora OGV runtime asset
+  ok: (1170, 2532): never the H.264/MP4 path
+  ok: (1170, 2532): aspect 16:9 preserved ((1170.0, 658.0))
+  ok: (1170, 2532): fitted inside, touching one edge (no crop/stretch)
+  ok: (1170, 2532): centered (letterbox)
+  ok: (1440, 3200): plays the Theora OGV runtime asset
+  ok: (1440, 3200): never the H.264/MP4 path
+  ok: (1440, 3200): aspect 16:9 preserved ((1440.0, 810.0))
+  ok: (1440, 3200): fitted inside, touching one edge (no crop/stretch)
+  ok: (1440, 3200): centered (letterbox)
+  ok: (1080, 1920): plays the Theora OGV runtime asset
+  ok: (1080, 1920): never the H.264/MP4 path
+  ok: (1080, 1920): aspect 16:9 preserved ((1080.0, 607.0))
+  ok: (1080, 1920): fitted inside, touching one edge (no crop/stretch)
+  ok: (1080, 1920): centered (letterbox)
+  ok: (1536, 2048): plays the Theora OGV runtime asset
+  ok: (1536, 2048): never the H.264/MP4 path
+  ok: (1536, 2048): aspect 16:9 preserved ((1536.0, 864.0))
+  ok: (1536, 2048): fitted inside, touching one edge (no crop/stretch)
+  ok: (1536, 2048): centered (letterbox)
+[opening lifecycle]
+  ok: begin() only once
+[OPENING_METRICS] {"display":"headless","max_frame_gap_ms":12.6,"outcome":"completed:finished","platform":"Windows","playback_ms":10,"process_frames":1,"screen":[1080,2160],"startup_latency_ms":-1,"stream_released":true,"video_rect":[0,776,1080,607],"video_size":[1280,720]}
+  ok: finished -> exactly one completed (["completed"])
+  ok: cleanup released stream and stopped playback
+  ok: watchdog after terminal does nothing
+  ok: missing stream -> begin false
+[OPENING_METRICS] {"display":"headless","max_frame_gap_ms":0.0,"outcome":"failed:stream_unavailable","platform":"Windows","playback_ms":-1,"process_frames":0,"screen":[1080,2160],"startup_latency_ms":-1,"stream_released":true,"video_rect":[0,776,1080,607],"video_size":[1280,720]}
+  ok: missing stream -> exactly one failed (["failed:stream_unavailable"])
+[OPENING_METRICS] {"display":"headless","max_frame_gap_ms":20100.0,"outcome":"completed:watchdog","platform":"Windows","playback_ms":9,"process_frames":1,"screen":[1080,2160],"startup_latency_ms":9,"stream_released":true,"video_rect":[0,776,1080,607],"video_size":[1280,720]}
+  ok: watchdog guarantees termination + cleanup
+  ok: isolated from AppState/economy/save/progression; no MP4 path
+[boot opening to home once]
+  ok: boot -> OPENING, cinematic playing, Home hidden
+  ok: no gameplay/settings during the cinematic
+[OPENING_METRICS] {"display":"headless","max_frame_gap_ms":13.3,"outcome":"completed:finished","platform":"Windows","playback_ms":23,"process_frames":1,"screen":[2160,2160],"startup_latency_ms":18,"stream_released":true,"video_rect":[0,472,2160,1215],"video_size":[1280,720]}
+  ok: completion -> HOME exactly once (repeated finished/error ignored)
+  ok: opening released, normal Home shown
+  ok: outcome recorded: completed
+[OPENING_METRICS] {"display":"headless","max_frame_gap_ms":53.0,"outcome":"completed:finished","platform":"Windows","playback_ms":58,"process_frames":1,"screen":[2160,2160],"startup_latency_ms":18,"stream_released":true,"video_rect":[0,472,2160,1215],"video_size":[1280,720]}
+  ok: failure -> HOME exactly once (fail-safe)
+  ok: auto policy in a headless run (no display) boots straight to Home
+[once per cold launch]
+  ok: cold launch plays the opening
+[OPENING_METRICS] {"display":"headless","max_frame_gap_ms":146.8,"outcome":"completed:finished","platform":"Windows","playback_ms":29,"process_frames":1,"screen":[2160,2160],"startup_latency_ms":22,"stream_released":true,"video_rect":[0,472,2160,1215],"video_size":[1280,720]}
+  ok: completion -> Home
+  ok: background/foreground resume does not replay
+  ok: Retry does not replay
+  ok: returning from gameplay/results/settings does not replay
+  ok: re-creating the app root in the same process (no native restart) does not replay
+  ok: a true native restart (new process) plays it again
+[OPENING_METRICS] {"display":"headless","max_frame_gap_ms":141.7,"outcome":"completed:finished","platform":"Windows","playback_ms":25,"process_frames":1,"screen":[2160,2160],"startup_latency_ms":19,"stream_released":true,"video_rect":[0,472,2160,1215],"video_size":[1280,720]}
+  ok: launch-session state is never written to the save
+[device instrumentation]
+  ok: metrics accumulate while playing (31 frames)
+[OPENING_METRICS] {"display":"headless","max_frame_gap_ms":128.0,"outcome":"completed:finished","platform":"Windows","playback_ms":209,"process_frames":31,"screen":[1080,2160],"startup_latency_ms":11,"stream_released":true,"video_rect":[0,776,1080,607],"video_size":[1280,720]}
+  ok: terminal metrics: outcome, playback_ms, stream released ({ "outcome": "completed:finished", "startup_latency_ms": 11, "playback_ms": 209, "max_frame_gap_ms": 128.0, "process_frames": 31, "video_size": [1280, 720], "video_rect": [0, 776, 1080, 607], "screen": [1080, 2160], "stream_released": true, "platform": "Windows", "display": "headless" })
+  ok: letterbox rect recorded for portrait 1080x2160
+  ok: first decoded frame observed (startup_latency_ms=11)
+  ok: device checklist published; no device result claimed
+[ios static readiness]
+  ok: Theora decoder is Godot built-in (platform independent)
+  ok: portrait orientation for handheld (iOS/Android)
+  ok: no platform-specific branches in boot/cinematic/session/nav []
+  ok: lifecycle notifications handled generically (iOS delivers PAUSED/RESUMED)
+  ok: iOS readiness recorded; physical playback not claimed
+M42 opening cases completed: 8/8
+M42 opening evidence: PASS
+WARNING: 134 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 19 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

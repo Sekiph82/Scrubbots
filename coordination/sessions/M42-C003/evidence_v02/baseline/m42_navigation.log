@@ -1,0 +1,102 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[nav edges]
+  ok: starts at BOOT, transition 0
+  ok: BOOT cannot jump to GAMEPLAY/RESULTS
+  ok: unknown route ids rejected
+  ok: BOOT -> HOME
+  ok: same-route request rejected (idempotent)
+  ok: HOME cannot go to RESULTS/OPENING
+  ok: HOME -> GAMEPLAY starts attempt 1
+  ok: GAMEPLAY cannot go to OPENING
+  ok: route_changed carries from/to/payload
+  ok: closed route set, no LEVEL_SELECT
+[nav re-entry]
+  ok: outer transition accepted
+  ok: re-entrant go() inside route_changed rejected
+  ok: payload stored as detached copy
+  ok: last_payload() returns a detached copy
+[nav terminal latch]
+  ok: terminal outside GAMEPLAY rejected
+  ok: wrong attempt id rejected
+  ok: terminal -> RESULTS
+  ok: minimal results payload
+  ok: repeated terminal ignored
+  ok: RESULTS -> GAMEPLAY retry = new attempt
+  ok: stale attempt terminal ignored after retry
+  ok: new attempt terminal accepted once
+[nav settings overlay]
+  ok: no Settings outside HOME (BOOT)
+  ok: HOME opens Settings
+  ok: double open ignored
+  ok: leaving HOME closes Settings
+  ok: no Settings during GAMEPLAY
+  ok: close when closed is a no-op
+[nav back]
+  ok: BOOT back: none
+  ok: HOME back: none (no exit/level select)
+  ok: back closes Settings first
+  ok: GAMEPLAY back after action: none
+  ok: GAMEPLAY back pre-action: HOME
+  ok: RESULTS back: HOME
+[main owns one nav]
+  ok: real main.tscn root owns the navigation authority, at HOME
+  ok: same instance on repeated access
+  ok: main Settings opens via nav overlay
+  ok: panel Close closes the nav overlay
+  ok: nav close hides the panel
+[no shipping level select]
+  ok: no production app/ui code references a level picker or the debug frontier seam []
+  ok: app root exposes only frontier launch, no level-number launch
+  ok: play_current_frontier takes no level argument
+[home to gameplay once]
+  ok: second activation refused while in GAMEPLAY
+  ok: exactly one GameplayHost, attempt 1
+  ok: host uses the same AppState + audio settings service
+  ok: host uses the same economy/progression/save graph
+  ok: direct relaunch keeps exactly one host in the tree (old one removed immediately)
+  ok: pre-action back -> HOME
+  ok: host released on return HOME (no orphan)
+  ok: Home visible again
+  ok: next activation -> new single host, attempt 2
+[results on real WON]
+  ok: real gameplay reached WON
+  ok: exactly one RESULTS transition
+  ok: minimal payload { "status": "WON", "level": 1, "attempt": 1 }
+  ok: first-clear economy + progression committed before Results
+  ok: Results visible: WON / CONTINUE
+  ok: CONTINUE enabled: next frontier (level 2) has content
+  ok: repeated terminal callback ignored
+  ok: HOME from Results releases the host
+[results LOST / retry / ERROR]
+  ok: LOST -> RESULTS
+  ok: Results LOST offers RETRY
+  ok: RETRY -> same host transaction-safe retry, attempt 2
+  ok: same host, Results hidden
+  ok: new attempt terminal accepted once
+  ok: ERROR: HOME only
+[duplicate transitions]
+  ok: 5 PLAY taps -> 1 host, 1 attempt, 1 transition
+  ok: 5 repeated terminal callbacks -> no extra Results
+  ok: no double reward / double progression
+  ok: no repeated saves from repeated terminals
+  ok: double HOME + late CONTINUE -> one transition, no host
+  ok: Results actions refused outside RESULTS
+  ok: double Settings open -> one overlay
+  ok: back twice: close then nothing
+[back navigation real root]
+  ok: OS auto-quit on back disabled; back is routed through nav
+  ok: HOME back: nothing
+  ok: Android back closes Settings
+  ok: GAMEPLAY pre-action back -> HOME, host released
+  ok: pre-action exit: no Heart / streak consequence
+  ok: first real action taken
+  ok: post-action back does nothing (no undefined exit rule invented)
+  ok: terminal -> RESULTS
+  ok: RESULTS back -> HOME, no reward replay
+M42 navigation cases completed: 12/12
+M42 navigation evidence: PASS
+WARNING: 144 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 23 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

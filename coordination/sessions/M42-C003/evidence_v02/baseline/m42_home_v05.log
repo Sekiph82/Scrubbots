@@ -1,0 +1,108 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[world lock matrix]
+  ok: (1080, 2160) insets 0/0: world transform == V04 (s 1.23544 vs 1.23544, off (-40.65534, -74.65048) vs (-40.65534, -74.65048))
+  ok: (1080, 2160) insets 132/96: world transform == V04 (s 1.13337 vs 1.13337, off (7.314593, -42.05024) vs (7.314593, -42.05024))
+  ok: (1170, 2532) insets 0/0: world transform == V04 (s 1.40670 vs 1.40670, off (-76.14832, 0.0) vs (-76.14832, 0.0))
+  ok: (1170, 2532) insets 132/96: world transform == V04 (s 1.34928 vs 1.34928, off (-49.16268, 0.0) vs (-49.16268, 0.0))
+  ok: (1290, 2796) insets 0/0: world transform == V04 (s 1.56459 vs 1.56459, off (-90.35885, 0.0) vs (-90.35885, 0.0))
+  ok: (1290, 2796) insets 132/96: world transform == V04 (s 1.50718 vs 1.50718, off (-63.37321, 0.0) vs (-63.37321, 0.0))
+  ok: (1080, 2400) insets 0/0: world transform == V04 (s 1.33433 vs 1.33433, off (-87.13517, 0.0) vs (-87.13517, 0.0))
+  ok: (1080, 2400) insets 132/96: world transform == V04 (s 1.27691 vs 1.27691, off (-60.14952, -6.911483) vs (-60.14952, -6.911483))
+  ok: (1440, 3200) insets 0/0: world transform == V04 (s 1.80622 vs 1.80622, off (-128.9234, 0.0) vs (-128.9234, 0.0))
+  ok: (1440, 3200) insets 132/96: world transform == V04 (s 1.74880 vs 1.74880, off (-101.9378, 0.0) vs (-101.9378, 0.0))
+  ok: (1080, 1920) insets 0/0: world transform == V04 (s 1.04725 vs 1.04725, off (47.79306, -53.53349) vs (47.79306, -53.53349))
+  ok: (1080, 1920) insets 132/96: world transform == V04 (s 0.98983 vs 0.98983, off (74.77871, -77.189) vs (74.77871, -77.189))
+  ok: (1536, 2048) insets 0/0: world transform == V04 (s 1.14269 vs 1.14269, off (230.9357, -56.78947) vs (230.9357, -56.78947))
+  ok: (1536, 2048) insets 132/96: world transform == V04 (s 1.05981 vs 1.05981, off (269.89, -48.35885) vs (269.89, -48.35885))
+[world fixed when ad changes]
+  ok: 1080x2160: scale 1.23544, offset (-40.66,-74.65) (940x1672 Home background)
+  ok: ad slot collapsed: HOME-120 rect and Scrubby unchanged
+  ok: ad slot at a different height: HOME-120 rect unchanged
+[scrubby hero]
+  ok: centre X 470 / soles Y 1240 (new world anchor) (470.00, 1240.00)
+  ok: visible scale 1.612 x V04 (V05 1.15, V06 1.24, M42-C002 1.612) (k 0.47076 vs 0.29204)
+  ok: clears the baked sign (top 622.8 > sign bottom 545.0)
+  ok: helper bots: bbox intrusion left 46.0 / right 46.0 <= 47 canvas px
+  ok: on screen the soles stay on the mapped world anchor (470,1240)
+[panels glass]
+  ok: four panels only ["Shortcut_collection", "Shortcut_daily", "Shortcut_shop", "Shortcut_tasks"]
+  ok: glass body alpha 0.51 (V05 0.40..0.48 / V06 0.50..0.52), outline 3 px visible
+  ok: TASKS / DAILY exact V04 (= V03) icon size
+  ok: SHOP / COLLECTION keep the V04 enlargement
+  ok: outer screen margin preserved
+[currency widgets]
+  ok: ScrubBucksChip icon 110 px tall (110..122)
+  ok: ScrubBucksChip pill 68 px tall (V06 67..70)
+  ok: ScrubBucksChip icon overhangs the pill (top, bottom, left)
+  ok: ScrubBucksChip icon drawn above the pill body
+  ok: ScrubBucksPlus (+) hit target >= 88 (88.0, 88.0)
+  ok: ScrubBucksPlus (+) glyph inside the pill's right end, drawn in front (V06)
+  ok: HeartsChip icon 110 px tall (110..122)
+  ok: HeartsChip pill 68 px tall (V06 67..70)
+  ok: HeartsChip icon overhangs the pill (top, bottom, left)
+  ok: HeartsChip icon drawn above the pill body
+  ok: HeartsPlus (+) hit target >= 88 (88.0, 88.0)
+  ok: HeartsPlus (+) glyph inside the pill's right end, drawn in front (V06)
+  ok: widgets/icons do not overlap each other or the profile card
+  ok: large live value text
+  ok: (+) emit intents only; economy unchanged
+[gift meter]
+  ok: ratio only (0/1,000)
+  ok: gold inset bar inside the navy chassis (54 px)
+  ok: substantial chassis with a cyan edge (88 px)
+  ok: emblem / crate larger than V04 (112)
+  ok: emblem / crate overhang both chassis ends
+  ok: emblem / crate above the chassis in z-order
+  ok: gold fill never hidden under emblem / crate
+  ok: no NEXT GIFT / timer / Event Points copy
+[reward rail]
+  ok: shallow rail (track 120, rail 82)
+  ok: gifts overhang the rail top
+  ok: streak badge in front, overhanging the rail's left end
+  ok: values exactly 1/5/10/25/100
+  ok: no '+', WIN or per-step SB icon []
+  ok: no glow when no step is current (fresh save)
+  ok: current step: glow + gold value
+  ok: reached full, future dimmed but readable
+[ad slot]
+  ok: ad slot at the current owner reservation (V05 144 -> V06 100 px) at 1080x2160 (100)
+  ok: fixed reservation, no vertical EXPAND
+  ok: empty AdMount, no fake ad content
+[bottom stack]
+  ok: stack = PLAY -> track -> nav ["PlayButton", "WinStreakRewardTrack", "BottomNav"]
+  ok: nav sits directly above the ad slot (one layout gap)
+  ok: status pill attached to PLAY (no extra row)
+  ok: 1080x2160: PLAY moved down by exactly the released ad height (1559 = V04 1490 + 69)
+[stack reflow]
+  ok: released ad space lowers PLAY, track and nav by the same amount
+  ok: HOME-120 does not move
+  ok: re-enabled: exact positions restored
+[modals hide stack]
+  ok: Daily: bottom stack + action layer + (+) hidden
+  ok: Daily closed: exact stack restored
+  ok: Settings: bottom stack + action layer + (+) hidden
+  ok: back closes Settings and restores the stack
+[touch targets]
+  ok: (1080, 2160) insets=[0, 0, 0, 0]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1080, 2160) insets=[0, 132, 0, 96]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1170, 2532) insets=[0, 0, 0, 0]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1170, 2532) insets=[0, 132, 0, 96]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1290, 2796) insets=[0, 0, 0, 0]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1290, 2796) insets=[0, 132, 0, 96]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1080, 2400) insets=[0, 0, 0, 0]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1080, 2400) insets=[0, 132, 0, 96]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1440, 3200) insets=[0, 0, 0, 0]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1440, 3200) insets=[0, 132, 0, 96]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1080, 1920) insets=[0, 0, 0, 0]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1080, 1920) insets=[0, 132, 0, 96]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1536, 2048) insets=[0, 0, 0, 0]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+  ok: (1536, 2048) insets=[0, 132, 0, 96]: buttons >= 88 in safe area, PLAY below the platform region, ad within its clamp at the bottom []
+[asset integrity]
+  ok: HOME-120 bytes unchanged
+  ok: all 52 approved entries match their pins []
+m42_home_v05: 13/13 cases, 0 failures
+WARNING: 590 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 19 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

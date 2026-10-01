@@ -1,0 +1,63 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[platform policy]
+  ok: Windows: desktop -> no runtime display safe area
+  ok: macOS: desktop -> no runtime display safe area
+  ok: Linux: desktop -> no runtime display safe area
+  ok: FreeBSD: desktop -> no runtime display safe area
+  ok: NetBSD: desktop -> no runtime display safe area
+  ok: OpenBSD: desktop -> no runtime display safe area
+  ok: BSD: desktop -> no runtime display safe area
+  ok: Android: runtime display safe area probed
+  ok: iOS: runtime display safe area probed
+  ok: Web: runtime display safe area probed
+[probe conversion]
+  ok: empty probe -> zero margins
+  ok: invalid probe -> zero margins
+  ok: mobile probe -> [0,132,0,96] (unchanged conversion)
+  ok: sanity: a desktop work-area probe WOULD produce a false bottom inset (48 px) if it were used
+[synthetic overrides desktop]
+  ok: synthetic insets applied exactly on Windows ([3, 132, 7, 96])
+  ok: synthetic negatives still clamp to 0 (unchanged seam)
+  ok: cleared synthetic -> platform policy ([0, 0, 0, 0])
+[desktop runtime zero]
+  ok: this test host is a desktop platform (Windows)
+  ok: desktop runtime margins are zero regardless of the display probe (probe [P: (0, 0), S: (0, 0)], screen (0, 0))
+[home canonical ad]
+  ok: desktop policy: zero margins
+  ok: 1080x2160: AdBannerSlot 100 px at the screen bottom ([P: (0.0, 2060.0), S: (1080.0, 100.0)])
+[home 683 width ad]
+  ok: 683x1366: bottom safe inset 0
+  ok: 683x1366: width-clamped ad reservation 72 px (72.0)
+  ok: nav directly above the ad slot; inset painting kept for real mobile insets
+[world matrix unchanged]
+  ok: (1080, 2160) insets 0/0: world transform unchanged
+  ok: (1080, 2160) insets 132/96: world transform unchanged
+  ok: (1170, 2532) insets 0/0: world transform unchanged
+  ok: (1170, 2532) insets 132/96: world transform unchanged
+  ok: (1290, 2796) insets 0/0: world transform unchanged
+  ok: (1290, 2796) insets 132/96: world transform unchanged
+  ok: (1080, 2400) insets 0/0: world transform unchanged
+  ok: (1080, 2400) insets 132/96: world transform unchanged
+  ok: (1440, 3200) insets 0/0: world transform unchanged
+  ok: (1440, 3200) insets 132/96: world transform unchanged
+  ok: (1080, 1920) insets 0/0: world transform unchanged
+  ok: (1080, 1920) insets 132/96: world transform unchanged
+  ok: (1536, 2048) insets 0/0: world transform unchanged
+  ok: (1536, 2048) insets 132/96: world transform unchanged
+[synthetic matrix valid]
+  ok: (1080, 2160) synthetic [0,132,0,96]: margins applied, touch >= 88 inside safe area, ad at safe bottom and painting through the inset []
+  ok: (1170, 2532) synthetic [0,132,0,96]: margins applied, touch >= 88 inside safe area, ad at safe bottom and painting through the inset []
+  ok: (1290, 2796) synthetic [0,132,0,96]: margins applied, touch >= 88 inside safe area, ad at safe bottom and painting through the inset []
+  ok: (1080, 2400) synthetic [0,132,0,96]: margins applied, touch >= 88 inside safe area, ad at safe bottom and painting through the inset []
+  ok: (1440, 3200) synthetic [0,132,0,96]: margins applied, touch >= 88 inside safe area, ad at safe bottom and painting through the inset []
+  ok: (1080, 1920) synthetic [0,132,0,96]: margins applied, touch >= 88 inside safe area, ad at safe bottom and painting through the inset []
+  ok: (1536, 2048) synthetic [0,132,0,96]: margins applied, touch >= 88 inside safe area, ad at safe bottom and painting through the inset []
+[v06 constants unchanged]
+  ok: ad reservation rule unchanged (100 px @1080, clamp 72..112)
+  ok: hero 1.612 (M42-C002 owner lock) / V06 panel / pill constants unchanged
+m42_home_v07_safe_area: 9/9 cases, 0 failures
+WARNING: 457 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 19 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
