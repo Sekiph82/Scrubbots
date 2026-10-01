@@ -6,14 +6,14 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 - Current Milestone: M42 HOME SCRUBBY RUNTIME ANIMATION
 - Current Sprint: M42-C003 — Home Scrubby Runtime Animation
-- Current Task: OWNER selects the SB-M42-035 production animation asset route after the correct asset-quality block
-- Current Task Status: BLOCKED_ANIMATION_ASSET_PRODUCTION / OWNER_ASSET_ROUTE_DECISION_REQUIRED
-- Next Task/Action: OWNER executes `coordination/sessions/M42-C003/OWNER_ASSET_ROUTE_GATE_V01.md`: choose Route A registered frame animation or Route B artist-painted layered rig. If Route A uses ChatGPT image generation, provide canonical HOME-026 as an image attachment; produce/review candidate art before Claude resumes runtime implementation.
-- Required Actor: OWNER / CHATGPT
+- Current Task: ChatGPT produces Route A registered-frame candidates for SB-M42-035 against canonical HOME-026
+- Current Task Status: ROUTE_A_SELECTED / CANDIDATE_FRAME_PRODUCTION
+- Next Task/Action: CHATGPT creates and validates Route A candidate art in order Wave (14) → Bow (15) → Turn/Look (17) against `coordination/sessions/M42-C003/ASSET_PRODUCTION_SPEC_V01.md`; OWNER visually reviews candidates; only accepted byte-identical frames are promoted before Claude resumes runtime implementation.
+- Required Actor: CHATGPT / OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 960 / 1414 = 67.89%. SB-M42-034 is CLOSED. SB-M42-035 remains OPEN and is correctly blocked at production gesture-art creation: the repo has no approved Wave/Bow/Turn frame set, and no fake runtime gestures were shipped. Asset route owner decision is current.
-- Note: M42-C003 audit `coordination/sessions/M42-C003/CHATGPT_AUDIT_V01.md` confirms Claude's asset-blocked stop was correct. Asset spec: `coordination/sessions/M42-C003/ASSET_PRODUCTION_SPEC_V01.md`; owner route gate: `coordination/sessions/M42-C003/OWNER_ASSET_ROUTE_GATE_V01.md`. Accepted 1536x2048 mirrored side continuation remains out of scope.
+- Progress: 960 / 1414 = 67.89%. SB-M42-034 is CLOSED. SB-M42-035 remains OPEN. OWNER selected Route A registered-frame animation and supplied canonical HOME-026 to ChatGPT; Wave/Bow/Turn production candidates are now the active gate. No fake runtime gestures are authorized.
+- Note: M42-C003 audit `coordination/sessions/M42-C003/CHATGPT_AUDIT_V01.md` confirms Claude's asset-blocked stop was correct. Asset spec: `coordination/sessions/M42-C003/ASSET_PRODUCTION_SPEC_V01.md`; owner route gate records Route A selection: `coordination/sessions/M42-C003/OWNER_ASSET_ROUTE_GATE_V01.md`. Candidate order: Wave → Bow → Turn/Look. Accepted 1536x2048 mirrored side continuation remains out of scope.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
 - Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
