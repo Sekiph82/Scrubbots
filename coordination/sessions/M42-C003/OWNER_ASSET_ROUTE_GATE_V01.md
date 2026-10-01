@@ -1,7 +1,7 @@
 # M42-C003 — OWNER ASSET ROUTE GATE V01
 
 Date: 2026-10-01
-Status: **OWNER ASSET ROUTE DECISION REQUIRED**
+Status: **OWNER SELECTED ROUTE A — FRAME ANIMATION / CANONICAL HOME-026 ATTACHMENT RECEIVED**
 
 Task:
 `SB-M42-035 — Home Scrubby Runtime Animation`
@@ -57,11 +57,10 @@ Runtime-only warping/rotation of the single static HOME-026 image is not authori
 
 ## Owner decision
 
-Choose one:
+**SELECTED: `A — FRAME ANIMATION`**
 
-- `A — FRAME ANIMATION`
-- `B — LAYERED RIG`
+Owner supplied the canonical HOME-026 image as an image attachment in the active ChatGPT conversation on 2026-10-01 for direct visual-reference use.
 
-If Route A is chosen and ChatGPT is to create the candidate art, provide the canonical HOME-026 image as an image attachment in the active conversation so it can be used directly as the visual reference/edit target.
+Candidate production order is locked as Wave → Bow → Turn/Look. Candidates remain unapproved until owner visual review and must satisfy `ASSET_PRODUCTION_SPEC_V01.md` before promotion to `assets/ui/final/characters/scrubby/home_animation/`.
 
-No runtime code should begin until the selected art route has usable candidate assets.
+No runtime code should begin until Route A has usable owner-approved candidate assets.
