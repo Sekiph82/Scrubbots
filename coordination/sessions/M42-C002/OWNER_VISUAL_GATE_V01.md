@@ -1,7 +1,7 @@
 # M42-C002 — OWNER VISUAL GATE V01
 
 Date: 2026-10-01
-Status: **OWNER VISUAL ACCEPTANCE REQUIRED**
+Status: **OWNER PASS / CLOSED**
 
 Implementation:
 `72a78620de42da6aa1b9f2ba00b6d15da9acfc7b`
@@ -98,6 +98,31 @@ Question:
 Answer:
 - OK
 - ADJUST
+
+## Owner result — 2026-10-01
+
+- V1 — +30% hero size: **OK**
+- V2 — Platform planting: **OK**
+- V3 — Four-viewport responsive composition: **OK**
+- V4 — Helper-bot / panel relationship: **OK**
+
+Owner additionally noticed that the 1536×2048 evidence frame has mirrored side continuations.
+
+This is confirmed as pre-existing wide-screen Home behavior, not an M42-C002 asset mutation:
+
+- the canonical 940×1672 Home background bytes are unchanged;
+- `HomeScreen` creates `WorldEdgeLeft` and `WorldEdgeRight` from the same background texture;
+- those edge continuations use `flip_h = true` to fill narrow tablet side bands.
+
+Owner explicitly accepted the current visual result despite this observation.
+
+The mirror behavior is therefore **KNOWN / OWNER ACCEPTED / NOT A M42-C002 BLOCKER**.
+
+SB-M42-034 is CLOSED.
+M42-C002 is CLOSED.
+
+Next task:
+`SB-M42-035 — Home Scrubby Runtime Animation`
 
 ## Closure
 
