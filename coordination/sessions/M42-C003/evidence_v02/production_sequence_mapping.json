@@ -1,0 +1,388 @@
+{
+  "wave": [
+    {
+      "production_frame": "wave_01.png",
+      "source_family": "wave",
+      "source_name": "wave_01.png",
+      "source_sha256": "22bae42e75e0ff9c312929a0fcf375bdb80218b69e8d80f63c798f8090d78164"
+    },
+    {
+      "production_frame": "wave_02.png",
+      "source_family": "wave",
+      "source_name": "wave_02.png",
+      "source_sha256": "df1aec038a10c267ec96b069578516a95aee0e0dd05c338b2c1ce097879c4075"
+    },
+    {
+      "production_frame": "wave_03.png",
+      "source_family": "wave",
+      "source_name": "wave_03.png",
+      "source_sha256": "35c0fe0293377600cd8b4a46bf5f21a33e5f3b0afc461f4bde269229a5abe00f"
+    },
+    {
+      "production_frame": "wave_04.png",
+      "source_family": "wave",
+      "source_name": "wave_04.png",
+      "source_sha256": "229bdd98d698da37b0e5c41f2b4e04e4dc4d132fdef3b3b23372ef2c3dabfa01"
+    },
+    {
+      "production_frame": "wave_05.png",
+      "source_family": "wave",
+      "source_name": "wave_05.png",
+      "source_sha256": "e34fa4524b2bea9091655acc64eec56dad0dda4b7e15e8bd9b87722ff5876608"
+    },
+    {
+      "production_frame": "wave_06.png",
+      "source_family": "wave",
+      "source_name": "wave_06.png",
+      "source_sha256": "53271c551dbae6c64ef986d3da10496529c9d522e45f9edcca2b47b381fccc09"
+    },
+    {
+      "production_frame": "wave_07.png",
+      "source_family": "wave",
+      "source_name": "wave_07.png",
+      "source_sha256": "a8afd5fad2fc7f77df3aad149f47d6bca5c2e030257c5051857ef3f69050f1a0"
+    },
+    {
+      "production_frame": "wave_08.png",
+      "source_family": "wave",
+      "source_name": "wave_08.png",
+      "source_sha256": "2e2146ca4f21a21d1743853684741f5ffb95da6719bf20cb5acbaff5f0489aef"
+    },
+    {
+      "production_frame": "wave_09.png",
+      "source_family": "wave",
+      "source_name": "wave_07.png",
+      "source_sha256": "a8afd5fad2fc7f77df3aad149f47d6bca5c2e030257c5051857ef3f69050f1a0"
+    },
+    {
+      "production_frame": "wave_10.png",
+      "source_family": "wave",
+      "source_name": "wave_06.png",
+      "source_sha256": "53271c551dbae6c64ef986d3da10496529c9d522e45f9edcca2b47b381fccc09"
+    },
+    {
+      "production_frame": "wave_11.png",
+      "source_family": "wave",
+      "source_name": "wave_05.png",
+      "source_sha256": "e34fa4524b2bea9091655acc64eec56dad0dda4b7e15e8bd9b87722ff5876608"
+    },
+    {
+      "production_frame": "wave_12.png",
+      "source_family": "wave",
+      "source_name": "wave_04.png",
+      "source_sha256": "229bdd98d698da37b0e5c41f2b4e04e4dc4d132fdef3b3b23372ef2c3dabfa01"
+    },
+    {
+      "production_frame": "wave_13.png",
+      "source_family": "wave",
+      "source_name": "wave_03.png",
+      "source_sha256": "35c0fe0293377600cd8b4a46bf5f21a33e5f3b0afc461f4bde269229a5abe00f"
+    },
+    {
+      "production_frame": "wave_14.png",
+      "source_family": "wave",
+      "source_name": "wave_02.png",
+      "source_sha256": "df1aec038a10c267ec96b069578516a95aee0e0dd05c338b2c1ce097879c4075"
+    }
+  ],
+  "bow": [
+    {
+      "production_frame": "bow_01.png",
+      "source_family": "bow",
+      "source_name": "bow_01.png",
+      "source_sha256": "5d5a49cf36f0ac949d81854a0d22e76e2a38e64acb8deb22e881a9a482c83dcd"
+    },
+    {
+      "production_frame": "bow_02.png",
+      "source_family": "bow",
+      "source_name": "bow_02.png",
+      "source_sha256": "ab151372282cbd9dd81bcca39b29c0e91befc0e15f7553b18fe25bc949952e54"
+    },
+    {
+      "production_frame": "bow_03.png",
+      "source_family": "bow",
+      "source_name": "bow_03.png",
+      "source_sha256": "221cf9ccfb833a5c79778fc7f8efd65163bc07a6bcea061f53878c6cac68582d"
+    },
+    {
+      "production_frame": "bow_04.png",
+      "source_family": "bow",
+      "source_name": "bow_04.png",
+      "source_sha256": "2ff5b908de009b4ee187b3b8787e0c65ed46958033dbb75ca2c67399922bbd40"
+    },
+    {
+      "production_frame": "bow_05.png",
+      "source_family": "bow",
+      "source_name": "bow_05.png",
+      "source_sha256": "e4aa78ab05872f83e709431898a66756eaf227d55bdd0ceb07ec49f37f699f49"
+    },
+    {
+      "production_frame": "bow_06.png",
+      "source_family": "bow",
+      "source_name": "bow_06.png",
+      "source_sha256": "bd654de3c212203dac0ca43e6f69a102a16ce8d279862686979f0995e0d25638"
+    },
+    {
+      "production_frame": "bow_07.png",
+      "source_family": "bow",
+      "source_name": "bow_07.png",
+      "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c"
+    },
+    {
+      "production_frame": "bow_08.png",
+      "source_family": "bow",
+      "source_name": "bow_07.png",
+      "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c"
+    },
+    {
+      "production_frame": "bow_09.png",
+      "source_family": "bow",
+      "source_name": "bow_07.png",
+      "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c"
+    },
+    {
+      "production_frame": "bow_10.png",
+      "source_family": "bow",
+      "source_name": "bow_08.png",
+      "source_sha256": "b84a56f12c23daf3ed59180a01f4ef26eb88b3fe1eb4e2336ec69db43642f021"
+    },
+    {
+      "production_frame": "bow_11.png",
+      "source_family": "bow",
+      "source_name": "bow_09.png",
+      "source_sha256": "6b836e31c28d34965ea78d9670fdc68d9443a34be55637f69e6af0c4a1e34220"
+    },
+    {
+      "production_frame": "bow_12.png",
+      "source_family": "bow",
+      "source_name": "bow_10.png",
+      "source_sha256": "859b77beaf8863bfc89075a3046d3706955bf89797dc38ac928810f83a29cf79"
+    },
+    {
+      "production_frame": "bow_13.png",
+      "source_family": "bow",
+      "source_name": "bow_11.png",
+      "source_sha256": "ca0a3244da027b2ec5fc8327dc9e1f75b843322d847acdcf9f20b8f91cd0610f"
+    },
+    {
+      "production_frame": "bow_14.png",
+      "source_family": "bow",
+      "source_name": "bow_10.png",
+      "source_sha256": "859b77beaf8863bfc89075a3046d3706955bf89797dc38ac928810f83a29cf79"
+    },
+    {
+      "production_frame": "bow_15.png",
+      "source_family": "bow",
+      "source_name": "bow_09.png",
+      "source_sha256": "6b836e31c28d34965ea78d9670fdc68d9443a34be55637f69e6af0c4a1e34220"
+    }
+  ],
+  "turn": [
+    {
+      "production_frame": "turn_01.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781"
+    },
+    {
+      "production_frame": "turn_02.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_02.png",
+      "source_sha256": "1d29f34423357396473e83cbe2232463e340ba513ac8ab8812a5826e909f8a3e"
+    },
+    {
+      "production_frame": "turn_03.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_01.png",
+      "source_sha256": "c0b0c1e8efdba70339e79c15ebeb48e0ab786138dce755d02eb06591b5a33973"
+    },
+    {
+      "production_frame": "turn_04.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_02.png",
+      "source_sha256": "1d29f34423357396473e83cbe2232463e340ba513ac8ab8812a5826e909f8a3e"
+    },
+    {
+      "production_frame": "turn_05.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_01.png",
+      "source_sha256": "c0b0c1e8efdba70339e79c15ebeb48e0ab786138dce755d02eb06591b5a33973"
+    },
+    {
+      "production_frame": "turn_06.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_16.png",
+      "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f"
+    },
+    {
+      "production_frame": "turn_07.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781"
+    },
+    {
+      "production_frame": "turn_08.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_16.png",
+      "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f"
+    },
+    {
+      "production_frame": "turn_09.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_15.png",
+      "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43"
+    },
+    {
+      "production_frame": "turn_10.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_15.png",
+      "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43"
+    },
+    {
+      "production_frame": "turn_11.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_15.png",
+      "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43"
+    },
+    {
+      "production_frame": "turn_12.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_15.png",
+      "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43"
+    },
+    {
+      "production_frame": "turn_13.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_16.png",
+      "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f"
+    },
+    {
+      "production_frame": "turn_14.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781"
+    },
+    {
+      "production_frame": "turn_15.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_16.png",
+      "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f"
+    },
+    {
+      "production_frame": "turn_16.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781"
+    },
+    {
+      "production_frame": "turn_17.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781"
+    }
+  ],
+  "full_turn": [
+    {
+      "production_frame": "full_turn_01.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_01.png",
+      "source_sha256": "c0b0c1e8efdba70339e79c15ebeb48e0ab786138dce755d02eb06591b5a33973"
+    },
+    {
+      "production_frame": "full_turn_02.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_02.png",
+      "source_sha256": "1d29f34423357396473e83cbe2232463e340ba513ac8ab8812a5826e909f8a3e"
+    },
+    {
+      "production_frame": "full_turn_03.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_03.png",
+      "source_sha256": "78ab6c8e937c0e02484750cbb2d9a6dcb95ab7533b0c71cbff13d7cfc1cde43a"
+    },
+    {
+      "production_frame": "full_turn_04.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_04.png",
+      "source_sha256": "3b0be40b3d423364231cacff552c9c5cfe782760f1387f54fe442de484cf040a"
+    },
+    {
+      "production_frame": "full_turn_05.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_05.png",
+      "source_sha256": "a1905e4657396ef087ac1da5774bc85704b0caea49b00c1bd5050500b4ab01d0"
+    },
+    {
+      "production_frame": "full_turn_06.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_06.png",
+      "source_sha256": "e0446d22a61e4947d820397effe43c982752982a044304a7b01e0a01a745ac19"
+    },
+    {
+      "production_frame": "full_turn_07.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_07.png",
+      "source_sha256": "ae01bf7be29f069e7a1c3b998a3c34ac9fcbe0ffed8a2dd0cc2b054d4c1150e9"
+    },
+    {
+      "production_frame": "full_turn_08.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_08.png",
+      "source_sha256": "246667f4821f0f13438ffe1bdfa0fa7ada181f0d6b136100e1dec144e70d3b2c"
+    },
+    {
+      "production_frame": "full_turn_09.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_09.png",
+      "source_sha256": "195db91c3178b94cd3ac9f32a13c56244950f2d57deba138a8f307f8d4399fc6"
+    },
+    {
+      "production_frame": "full_turn_10.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_10.png",
+      "source_sha256": "13b186cfd5dad3a9670c6e60afabd3629f5b5abb4bc8316a1543df2b39b0fc50"
+    },
+    {
+      "production_frame": "full_turn_11.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_11.png",
+      "source_sha256": "c877ed6e27c5846895aa3c5705458b787b50653910f794e7fb3b72084f6368f0"
+    },
+    {
+      "production_frame": "full_turn_12.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_12.png",
+      "source_sha256": "4e80d1f55c01f2a5c74a52ce9731f1d8eb093e1a7e06aa921f02055bbd4028b0"
+    },
+    {
+      "production_frame": "full_turn_13.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_13.png",
+      "source_sha256": "7d7d2002eca3f0ecb9a3233240564d142b795b135152a3aadb7813026ed50af2"
+    },
+    {
+      "production_frame": "full_turn_14.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_14.png",
+      "source_sha256": "d2dc98a37fffc4f7fcd2cbeb5c2d5952121046791c23b08550f349cec4fd2a57"
+    },
+    {
+      "production_frame": "full_turn_15.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_15.png",
+      "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43"
+    },
+    {
+      "production_frame": "full_turn_16.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_16.png",
+      "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f"
+    },
+    {
+      "production_frame": "full_turn_17.png",
+      "source_family": "full_turn",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781"
+    }
+  ]
+}

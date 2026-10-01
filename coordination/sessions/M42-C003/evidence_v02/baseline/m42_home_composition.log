@@ -1,0 +1,39 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[accounting covers manifest]
+  ok: every APPROVED manifest entry has exactly one presentation row (52 rows / 52 approved)
+  ok: presentation-map slugs equal manifest slugs
+  ok: V04 + R01-V02: 24 STATIC + 18 WORLD_BAKED_RETIRED + 8 OWNER_RETIRED (7 + HOME-120 replaced by HOME-121) + 2 OWNER_DISABLED ({ "WORLD_BAKED_RETIRED": 18, "OWNER_RETIRED": 8, "STATIC": 24, "OWNER_DISABLED": 2 })
+[static nodes presented]
+  ok: every STATIC entry presents its approved texture on a visible node []
+[inactive rows present nothing]
+  ok: retired/disabled set (V03 + V04 + R01-V02 HOME-120) ["HOME-001", "HOME-002", "HOME-003", "HOME-004", "HOME-006", "HOME-007", "HOME-010", "HOME-011", "HOME-013", "HOME-014", "HOME-015", "HOME-016", "HOME-018", "HOME-019", "HOME-020", "HOME-021", "HOME-022", "HOME-023", "HOME-024", "HOME-031", "HOME-032", "HOME-062", "HOME-063", "HOME-066", "HOME-069", "HOME-078", "HOME-087", "HOME-120"]
+  ok: inactive rows have no presentation node and carry a reason []
+  ok: historical approval + sha pins of retired/disabled entries unchanged in the manifest
+[labels full]
+  ok: shortcut panels: icon + untrimmed wrapping label []
+  ok: full live labels SHOP / COLLECTION / TASKS / DAILY
+[nav dock]
+  ok: every nav tab shows its approved icon inside the tab
+  ok: HOME tab is the selected state
+  ok: SETTINGS tab live
+[area banner]
+  ok: no live area banner over the baked World 01 sign
+[decor ignores input]
+  ok: decorative art never steals input []
+[responsive matrix]
+  ok: 1080x2160: regions in viewport, >=88px, no CTA overlap, hero in world []
+  ok: 1170x2532: regions in viewport, >=88px, no CTA overlap, hero in world []
+  ok: 1290x2796: regions in viewport, >=88px, no CTA overlap, hero in world []
+  ok: 1080x2400: regions in viewport, >=88px, no CTA overlap, hero in world []
+  ok: 1440x3200: regions in viewport, >=88px, no CTA overlap, hero in world []
+  ok: 1080x1920: regions in viewport, >=88px, no CTA overlap, hero in world []
+  ok: 1536x2048: regions in viewport, >=88px, no CTA overlap, hero in world []
+[unapproved not bound]
+  ok: a binder that approves nothing leaves every presentation node without art (native fallback)
+  ok: native controls still render live values without art
+m42_home_composition: 9/9 cases, 0 failures
+WARNING: 191 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 19 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

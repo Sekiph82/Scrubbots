@@ -1,0 +1,2288 @@
+{
+  "home_sha256": "fc30b992787c644822a6cd02510e481fab9010cd89ab75fc4a9909ca713d5c18",
+  "home_visor_width_approx": 723,
+  "canvas": [
+    1158,
+    1358
+  ],
+  "root": [
+    592.0,
+    1318.0
+  ],
+  "family_scales": {
+    "wave": 2.973684210526316,
+    "bow": 2.6588235294117646,
+    "turn_look": 3.9,
+    "full_turn": 3.294460641399417
+  },
+  "frames": [
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 1,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_01.png",
+      "source_name": "wave_01.png",
+      "source_sha256": "22bae42e75e0ff9c312929a0fcf375bdb80218b69e8d80f63c798f8090d78164",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        116.0,
+        350.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        247,
+        277
+      ],
+      "alpha_bbox": [
+        318,
+        292,
+        1110,
+        1320
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 3316,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6c59eef5a08e8bf8577739c30d857b3a1a7f7a711e8c270252fd54c6112ab5a7",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_01.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 2,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_02.png",
+      "source_name": "wave_02.png",
+      "source_sha256": "df1aec038a10c267ec96b069578516a95aee0e0dd05c338b2c1ce097879c4075",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        151.5,
+        350.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        141,
+        277
+      ],
+      "alpha_bbox": [
+        317,
+        298,
+        1137,
+        1320
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "8f45f0272770d6b821ddc1cd5f0fef568e0b20006729bf8fec2d0a68326caacf",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_02.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 3,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_03.png",
+      "source_name": "wave_03.png",
+      "source_sha256": "35c0fe0293377600cd8b4a46bf5f21a33e5f3b0afc461f4bde269229a5abe00f",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        182.0,
+        350.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        51,
+        277
+      ],
+      "alpha_bbox": [
+        322,
+        287,
+        1148,
+        1320
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "8065ffc0c1f9e2c874a4dffdb212142300b9ff3ee3b8c4a1a462b5038d2160d8",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_03.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 4,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_04.png",
+      "source_name": "wave_04.png",
+      "source_sha256": "229bdd98d698da37b0e5c41f2b4e04e4dc4d132fdef3b3b23372ef2c3dabfa01",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        225.3,
+        350.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -78,
+        277
+      ],
+      "alpha_bbox": [
+        327,
+        286,
+        1106,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "308b96379f9c7bc8139694039572a5f001818f04afada265473e5a9eaca324ec",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_04.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 5,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_05.png",
+      "source_name": "wave_05.png",
+      "source_sha256": "e34fa4524b2bea9091655acc64eec56dad0dda4b7e15e8bd9b87722ff5876608",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        114.0,
+        352.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        253,
+        271
+      ],
+      "alpha_bbox": [
+        334,
+        298,
+        1142,
+        1323
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "e33c5fae14a136e13a983f564b7e222578f3fae2917fa5a80df5a076b1d9c299",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_05.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 6,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_06.png",
+      "source_name": "wave_06.png",
+      "source_sha256": "53271c551dbae6c64ef986d3da10496529c9d522e45f9edcca2b47b381fccc09",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        147.903,
+        352.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        152,
+        271
+      ],
+      "alpha_bbox": [
+        335,
+        298,
+        1125,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "96666ec1af5e880c2ee8be193253bc8c98372b29d04364b37676cd842990cdf9",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_06.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 7,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_07.png",
+      "source_name": "wave_07.png",
+      "source_sha256": "a8afd5fad2fc7f77df3aad149f47d6bca5c2e030257c5051857ef3f69050f1a0",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        185.886,
+        352.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        39,
+        271
+      ],
+      "alpha_bbox": [
+        342,
+        298,
+        1107,
+        1323
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "825b769a73ebedcbba9dacd2391d1d2b6d417015f903628fcf04d1cacff56498",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_07.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 8,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_08.png",
+      "source_name": "wave_08.png",
+      "source_sha256": "2e2146ca4f21a21d1743853684741f5ffb95da6719bf20cb5acbaff5f0489aef",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        220.0,
+        352.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -62,
+        271
+      ],
+      "alpha_bbox": [
+        343,
+        296,
+        1096,
+        1323
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "a93a86263ad6c2470b94575360e55e855c47a4a682703ff6f66fd01c1f97fd9b",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_08.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 9,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_07.png",
+      "source_name": "wave_07.png",
+      "source_sha256": "a8afd5fad2fc7f77df3aad149f47d6bca5c2e030257c5051857ef3f69050f1a0",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        185.886,
+        352.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        39,
+        271
+      ],
+      "alpha_bbox": [
+        342,
+        298,
+        1107,
+        1323
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "825b769a73ebedcbba9dacd2391d1d2b6d417015f903628fcf04d1cacff56498",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_09.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 10,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_06.png",
+      "source_name": "wave_06.png",
+      "source_sha256": "53271c551dbae6c64ef986d3da10496529c9d522e45f9edcca2b47b381fccc09",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        147.903,
+        352.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        152,
+        271
+      ],
+      "alpha_bbox": [
+        335,
+        298,
+        1125,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "96666ec1af5e880c2ee8be193253bc8c98372b29d04364b37676cd842990cdf9",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_10.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 11,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_05.png",
+      "source_name": "wave_05.png",
+      "source_sha256": "e34fa4524b2bea9091655acc64eec56dad0dda4b7e15e8bd9b87722ff5876608",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        114.0,
+        352.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        253,
+        271
+      ],
+      "alpha_bbox": [
+        334,
+        298,
+        1142,
+        1323
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "e33c5fae14a136e13a983f564b7e222578f3fae2917fa5a80df5a076b1d9c299",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_11.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 12,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_04.png",
+      "source_name": "wave_04.png",
+      "source_sha256": "229bdd98d698da37b0e5c41f2b4e04e4dc4d132fdef3b3b23372ef2c3dabfa01",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        225.3,
+        350.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -78,
+        277
+      ],
+      "alpha_bbox": [
+        327,
+        286,
+        1106,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "308b96379f9c7bc8139694039572a5f001818f04afada265473e5a9eaca324ec",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_12.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 13,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_03.png",
+      "source_name": "wave_03.png",
+      "source_sha256": "35c0fe0293377600cd8b4a46bf5f21a33e5f3b0afc461f4bde269229a5abe00f",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        182.0,
+        350.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        51,
+        277
+      ],
+      "alpha_bbox": [
+        322,
+        287,
+        1148,
+        1320
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "8065ffc0c1f9e2c874a4dffdb212142300b9ff3ee3b8c4a1a462b5038d2160d8",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_13.png"
+    },
+    {
+      "family": "wave",
+      "source_family": "wave",
+      "frame": 14,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/wave/wave_02.png",
+      "source_name": "wave_02.png",
+      "source_sha256": "df1aec038a10c267ec96b069578516a95aee0e0dd05c338b2c1ce097879c4075",
+      "scale": 2.973684210526316,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        151.5,
+        350.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        141,
+        277
+      ],
+      "alpha_bbox": [
+        317,
+        298,
+        1137,
+        1320
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "8f45f0272770d6b821ddc1cd5f0fef568e0b20006729bf8fec2d0a68326caacf",
+      "path": "assets/ui/generated/characters/home_animation/wave/wave_14.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 1,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_01.png",
+      "source_name": "bow_01.png",
+      "source_sha256": "5d5a49cf36f0ac949d81854a0d22e76e2a38e64acb8deb22e881a9a482c83dcd",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        133.0,
+        414.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        238,
+        217
+      ],
+      "alpha_bbox": [
+        405,
+        350,
+        1034,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "897be424e7756dcd1ac18fdd340ff90a77712ad30e68e1e29d9978eb7fd0105f",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_01.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 2,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_02.png",
+      "source_name": "bow_02.png",
+      "source_sha256": "ab151372282cbd9dd81bcca39b29c0e91befc0e15f7553b18fe25bc949952e54",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        191.818,
+        420.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        82,
+        201
+      ],
+      "alpha_bbox": [
+        353,
+        359,
+        985,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6d346173610e3ab00b049c057c0f4e65b09b4f7a904c73ded53de9a6a0b54769",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_02.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 3,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_03.png",
+      "source_name": "bow_03.png",
+      "source_sha256": "221cf9ccfb833a5c79778fc7f8efd65163bc07a6bcea061f53878c6cac68582d",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        216.5,
+        423.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        16,
+        193
+      ],
+      "alpha_bbox": [
+        406,
+        453,
+        1023,
+        1319
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "b345793154812818b70d24dc7e9eda8fc73962fd90ea4a9a9a311f3cc2061b52",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_03.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 4,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_04.png",
+      "source_name": "bow_04.png",
+      "source_sha256": "2ff5b908de009b4ee187b3b8787e0c65ed46958033dbb75ca2c67399922bbd40",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        251.5,
+        419.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -77,
+        204
+      ],
+      "alpha_bbox": [
+        408,
+        496,
+        1072,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "b3d1d9f02176de131c2eab08539f3524a042bc0966cbe1e7ed9e0295e63e7461",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_04.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 5,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_05.png",
+      "source_name": "bow_05.png",
+      "source_sha256": "e4aa78ab05872f83e709431898a66756eaf227d55bdd0ceb07ec49f37f699f49",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        258.5,
+        398.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -95,
+        260
+      ],
+      "alpha_bbox": [
+        411,
+        560,
+        1102,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "c9c454e207fd98b34af5bd35e8babe9e46fd5f0f56fbd826b18b77e437557ef3",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_05.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 6,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_06.png",
+      "source_name": "bow_06.png",
+      "source_sha256": "bd654de3c212203dac0ca43e6f69a102a16ce8d279862686979f0995e0d25638",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        121.5,
+        492.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        269,
+        10
+      ],
+      "alpha_bbox": [
+        402,
+        583,
+        1117,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 2268,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "a872d74bb2c1087f75a0d376f16891612916e19572fa29ce718426ffa1291725",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_06.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 7,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_07.png",
+      "source_name": "bow_07.png",
+      "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        182.5,
+        477.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        107,
+        50
+      ],
+      "alpha_bbox": [
+        402,
+        598,
+        1109,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 1969,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6a79aaa19524bd752818425d1bcd533e4e0c6459c6ed3c330ee3403664014aca",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_07.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 8,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_07.png",
+      "source_name": "bow_07.png",
+      "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        182.5,
+        477.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        107,
+        50
+      ],
+      "alpha_bbox": [
+        402,
+        598,
+        1109,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 1969,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6a79aaa19524bd752818425d1bcd533e4e0c6459c6ed3c330ee3403664014aca",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_08.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 9,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_07.png",
+      "source_name": "bow_07.png",
+      "source_sha256": "c28499b729a33aaaf72c99d8e2d766f989d64d43bdfde4ec4789b06f24fad95c",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        182.5,
+        477.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        107,
+        50
+      ],
+      "alpha_bbox": [
+        402,
+        598,
+        1109,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 1969,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6a79aaa19524bd752818425d1bcd533e4e0c6459c6ed3c330ee3403664014aca",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_09.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 10,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_08.png",
+      "source_name": "bow_08.png",
+      "source_sha256": "b84a56f12c23daf3ed59180a01f4ef26eb88b3fe1eb4e2336ec69db43642f021",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        219.0,
+        503.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        10,
+        -19
+      ],
+      "alpha_bbox": [
+        410,
+        584,
+        1093,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "32beab5ecee6b96fed45135c2906b31b1fd607962743cf2c32219551b459ff75",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_10.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 11,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_09.png",
+      "source_name": "bow_09.png",
+      "source_sha256": "6b836e31c28d34965ea78d9670fdc68d9443a34be55637f69e6af0c4a1e34220",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        240.0,
+        497.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -46,
+        -3
+      ],
+      "alpha_bbox": [
+        408,
+        479,
+        1094,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "0af93011885736157ed2051f71c5f4ae43d397f33ef58fa76d265a8a4ccb78d7",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_11.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 12,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_10.png",
+      "source_name": "bow_10.png",
+      "source_sha256": "859b77beaf8863bfc89075a3046d3706955bf89797dc38ac928810f83a29cf79",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        272.5,
+        512.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -133,
+        -43
+      ],
+      "alpha_bbox": [
+        414,
+        462,
+        1030,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "e48f26153e7ee6d9734dfb34008a6f0e4e9f0c8a3dce3026371682f6bcd0d492",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_12.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 13,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_11.png",
+      "source_name": "bow_11.png",
+      "source_sha256": "ca0a3244da027b2ec5fc8327dc9e1f75b843322d847acdcf9f20b8f91cd0610f",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        132.0,
+        560.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        241,
+        -171
+      ],
+      "alpha_bbox": [
+        403,
+        358,
+        1032,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "f2a908a0a6858d36d087494721418d37b504b40a3b3fdda32ba5da173aa07a7c",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_13.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 14,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_10.png",
+      "source_name": "bow_10.png",
+      "source_sha256": "859b77beaf8863bfc89075a3046d3706955bf89797dc38ac928810f83a29cf79",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        272.5,
+        512.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -133,
+        -43
+      ],
+      "alpha_bbox": [
+        414,
+        462,
+        1030,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "e48f26153e7ee6d9734dfb34008a6f0e4e9f0c8a3dce3026371682f6bcd0d492",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_14.png"
+    },
+    {
+      "family": "bow",
+      "source_family": "bow",
+      "frame": 15,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/bow/bow_09.png",
+      "source_name": "bow_09.png",
+      "source_sha256": "6b836e31c28d34965ea78d9670fdc68d9443a34be55637f69e6af0c4a1e34220",
+      "scale": 2.6588235294117646,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        240.0,
+        497.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -46,
+        -3
+      ],
+      "alpha_bbox": [
+        408,
+        479,
+        1094,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "0af93011885736157ed2051f71c5f4ae43d397f33ef58fa76d265a8a4ccb78d7",
+      "path": "assets/ui/generated/characters/home_animation/bow/bow_15.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 1,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_17.png",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        161.5,
+        469.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        60,
+        -227
+      ],
+      "alpha_bbox": [
+        381,
+        301,
+        1149,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 3106,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6e12026bb12d714de016f40d52f76336362e17b7905d6e331318e91e79dc18db",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_01.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 2,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_02.png",
+      "source_name": "full_turn_02.png",
+      "source_sha256": "1d29f34423357396473e83cbe2232463e340ba513ac8ab8812a5826e909f8a3e",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        286.5,
+        476.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -352,
+        -250
+      ],
+      "alpha_bbox": [
+        248,
+        235,
+        990,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "03d55a18efc3ae2e73e5d6c40908102bf47dd6d8a29c143832966673874db6e5",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_02.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 3,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_01.png",
+      "source_name": "full_turn_01.png",
+      "source_sha256": "c0b0c1e8efdba70339e79c15ebeb48e0ab786138dce755d02eb06591b5a33973",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        275.5,
+        476.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -316,
+        -250
+      ],
+      "alpha_bbox": [
+        255,
+        240,
+        1086,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "91cc7dacd6a2bea695166da9a793eacb36987bf92922301fb697e96d8b30ed34",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_03.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 4,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_02.png",
+      "source_name": "full_turn_02.png",
+      "source_sha256": "1d29f34423357396473e83cbe2232463e340ba513ac8ab8812a5826e909f8a3e",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        286.5,
+        476.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -352,
+        -250
+      ],
+      "alpha_bbox": [
+        248,
+        235,
+        990,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "03d55a18efc3ae2e73e5d6c40908102bf47dd6d8a29c143832966673874db6e5",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_04.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 5,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_01.png",
+      "source_name": "full_turn_01.png",
+      "source_sha256": "c0b0c1e8efdba70339e79c15ebeb48e0ab786138dce755d02eb06591b5a33973",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        275.5,
+        476.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -316,
+        -250
+      ],
+      "alpha_bbox": [
+        255,
+        240,
+        1086,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "91cc7dacd6a2bea695166da9a793eacb36987bf92922301fb697e96d8b30ed34",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_05.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 6,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_16.png",
+      "source_name": "full_turn_16.png",
+      "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        265.0,
+        470.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -281,
+        -230
+      ],
+      "alpha_bbox": [
+        326,
+        292,
+        1032,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "a3e0373c7723806197bdd96c5e90ddbf4420fc0e8621c10e461817c1eb015737",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_06.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 7,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_17.png",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        161.5,
+        469.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        60,
+        -227
+      ],
+      "alpha_bbox": [
+        381,
+        301,
+        1149,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 3106,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6e12026bb12d714de016f40d52f76336362e17b7905d6e331318e91e79dc18db",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_07.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 8,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_16.png",
+      "source_name": "full_turn_16.png",
+      "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        265.0,
+        470.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -281,
+        -230
+      ],
+      "alpha_bbox": [
+        326,
+        292,
+        1032,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "a3e0373c7723806197bdd96c5e90ddbf4420fc0e8621c10e461817c1eb015737",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_08.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 9,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_15.png",
+      "source_name": "full_turn_15.png",
+      "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        263.0,
+        423.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -274,
+        -76
+      ],
+      "alpha_bbox": [
+        400,
+        193,
+        1014,
+        1320
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "664ea6eafe17fc721153254e77503aed5d82b9a1580f518a6bd41c1febde3140",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_09.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 10,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_15.png",
+      "source_name": "full_turn_15.png",
+      "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        263.0,
+        423.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -274,
+        -76
+      ],
+      "alpha_bbox": [
+        400,
+        193,
+        1014,
+        1320
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "664ea6eafe17fc721153254e77503aed5d82b9a1580f518a6bd41c1febde3140",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_10.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 11,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_15.png",
+      "source_name": "full_turn_15.png",
+      "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        263.0,
+        423.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -274,
+        -76
+      ],
+      "alpha_bbox": [
+        400,
+        193,
+        1014,
+        1320
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "664ea6eafe17fc721153254e77503aed5d82b9a1580f518a6bd41c1febde3140",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_11.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 12,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_15.png",
+      "source_name": "full_turn_15.png",
+      "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        263.0,
+        423.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -274,
+        -76
+      ],
+      "alpha_bbox": [
+        400,
+        193,
+        1014,
+        1320
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "664ea6eafe17fc721153254e77503aed5d82b9a1580f518a6bd41c1febde3140",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_12.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 13,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_16.png",
+      "source_name": "full_turn_16.png",
+      "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        265.0,
+        470.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -281,
+        -230
+      ],
+      "alpha_bbox": [
+        326,
+        292,
+        1032,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "a3e0373c7723806197bdd96c5e90ddbf4420fc0e8621c10e461817c1eb015737",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_13.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 14,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_17.png",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        161.5,
+        469.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        60,
+        -227
+      ],
+      "alpha_bbox": [
+        381,
+        301,
+        1149,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 3106,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6e12026bb12d714de016f40d52f76336362e17b7905d6e331318e91e79dc18db",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_14.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 15,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_16.png",
+      "source_name": "full_turn_16.png",
+      "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        265.0,
+        470.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -281,
+        -230
+      ],
+      "alpha_bbox": [
+        326,
+        292,
+        1032,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "a3e0373c7723806197bdd96c5e90ddbf4420fc0e8621c10e461817c1eb015737",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_15.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 16,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_17.png",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        161.5,
+        469.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        60,
+        -227
+      ],
+      "alpha_bbox": [
+        381,
+        301,
+        1149,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 3106,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6e12026bb12d714de016f40d52f76336362e17b7905d6e331318e91e79dc18db",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_16.png"
+    },
+    {
+      "family": "turn",
+      "source_family": "full_turn",
+      "frame": 17,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_17.png",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        161.5,
+        469.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        60,
+        -227
+      ],
+      "alpha_bbox": [
+        381,
+        301,
+        1149,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 3106,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6e12026bb12d714de016f40d52f76336362e17b7905d6e331318e91e79dc18db",
+      "path": "assets/ui/generated/characters/home_animation/turn/turn_17.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 1,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_01.png",
+      "source_name": "full_turn_01.png",
+      "source_sha256": "c0b0c1e8efdba70339e79c15ebeb48e0ab786138dce755d02eb06591b5a33973",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        275.5,
+        476.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -316,
+        -250
+      ],
+      "alpha_bbox": [
+        255,
+        240,
+        1086,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "91cc7dacd6a2bea695166da9a793eacb36987bf92922301fb697e96d8b30ed34",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_01.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 2,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_02.png",
+      "source_name": "full_turn_02.png",
+      "source_sha256": "1d29f34423357396473e83cbe2232463e340ba513ac8ab8812a5826e909f8a3e",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        286.5,
+        476.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -352,
+        -250
+      ],
+      "alpha_bbox": [
+        248,
+        235,
+        990,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "03d55a18efc3ae2e73e5d6c40908102bf47dd6d8a29c143832966673874db6e5",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_02.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 3,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_03.png",
+      "source_name": "full_turn_03.png",
+      "source_sha256": "78ab6c8e937c0e02484750cbb2d9a6dcb95ab7533b0c71cbff13d7cfc1cde43a",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        282.727,
+        479.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -339,
+        -260
+      ],
+      "alpha_bbox": [
+        323,
+        224,
+        900,
+        1320
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "45f01c778fc87395f54288577448d5a69e18e3d61b57e91e08f275c2d5307681",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_03.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 4,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_04.png",
+      "source_name": "full_turn_04.png",
+      "source_sha256": "3b0be40b3d423364231cacff552c9c5cfe782760f1387f54fe442de484cf040a",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        319.0,
+        479.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -459,
+        -260
+      ],
+      "alpha_bbox": [
+        269,
+        238,
+        785,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "a7db5923f0fe388d034d5f9c894cafb3818c3f52f0a0569b5c5539200998278c",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_04.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 5,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_05.png",
+      "source_name": "full_turn_05.png",
+      "source_sha256": "a1905e4657396ef087ac1da5774bc85704b0caea49b00c1bd5050500b4ab01d0",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        346.5,
+        474.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -550,
+        -244
+      ],
+      "alpha_bbox": [
+        180,
+        248,
+        752,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "a44fa63b5795c22ff3c8b9f804ea1823dd4553040e3baee68f8e28f248b164af",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_05.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 6,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_06.png",
+      "source_name": "full_turn_06.png",
+      "source_sha256": "e0446d22a61e4947d820397effe43c982752982a044304a7b01e0a01a745ac19",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        261.5,
+        476.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -270,
+        -250
+      ],
+      "alpha_bbox": [
+        286,
+        260,
+        1110,
+        1323
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 3141,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "a8652ba0bf0e43ed4a2b48ed2da5e216f778de7ccdb38d26010bda34f10ac54a",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_06.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 7,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_07.png",
+      "source_name": "full_turn_07.png",
+      "source_sha256": "ae01bf7be29f069e7a1c3b998a3c34ac9fcbe0ffed8a2dd0cc2b054d4c1150e9",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        268.0,
+        472.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -291,
+        -237
+      ],
+      "alpha_bbox": [
+        320,
+        281,
+        1053,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "15b1b3811e427fb844c304c5bd79e49483b4b93e90d22df3270a22b381a60909",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_07.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 8,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_08.png",
+      "source_name": "full_turn_08.png",
+      "source_sha256": "246667f4821f0f13438ffe1bdfa0fa7ada181f0d6b136100e1dec144e70d3b2c",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        247.5,
+        468.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -223,
+        -224
+      ],
+      "alpha_bbox": [
+        388,
+        279,
+        1108,
+        1324
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 3137,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "bbcda4b65fed942b8b5e8057b98fdfcdd6d9cbcde542e11001ab5f6509b1414f",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_08.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 9,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_09.png",
+      "source_name": "full_turn_09.png",
+      "source_sha256": "195db91c3178b94cd3ac9f32a13c56244950f2d57deba138a8f307f8d4399fc6",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        305.0,
+        454.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -413,
+        -178
+      ],
+      "alpha_bbox": [
+        198,
+        288,
+        950,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "c2ae018cc5e2e156aac0bd84251df8c42408b028380446b23dfd2a6f52f3f15e",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_09.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 10,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_10.png",
+      "source_name": "full_turn_10.png",
+      "source_sha256": "13b186cfd5dad3a9670c6e60afabd3629f5b5abb4bc8316a1543df2b39b0fc50",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        277.682,
+        470.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -323,
+        -230
+      ],
+      "alpha_bbox": [
+        303,
+        269,
+        995,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "777b1e87e2620f4fa73451ee6da60da8b80a39a991bfa82da59d3c2517ba3b38",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_10.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 11,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_11.png",
+      "source_name": "full_turn_11.png",
+      "source_sha256": "c877ed6e27c5846895aa3c5705458b787b50653910f794e7fb3b72084f6368f0",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        299.0,
+        473.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -393,
+        -240
+      ],
+      "alpha_bbox": [
+        210,
+        250,
+        977,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6ce80636a13dc6c26024d67d15f0ea106f83219edd0892af44e9f09448c9222a",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_11.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 12,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_12.png",
+      "source_name": "full_turn_12.png",
+      "source_sha256": "4e80d1f55c01f2a5c74a52ce9731f1d8eb093e1a7e06aa921f02055bbd4028b0",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        285.5,
+        477.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -349,
+        -253
+      ],
+      "alpha_bbox": [
+        271,
+        242,
+        1021,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "0f4d0c6f06e20763dd51317880302423a4a412d2240445200231fb33c109b415",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_12.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 13,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_13.png",
+      "source_name": "full_turn_13.png",
+      "source_sha256": "7d7d2002eca3f0ecb9a3233240564d142b795b135152a3aadb7813026ed50af2",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        285.0,
+        408.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -347,
+        -26
+      ],
+      "alpha_bbox": [
+        237,
+        238,
+        1009,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "615b00e11a1a4dcb5e99746fcd9331f4dd28eeaeba0da649f53aab2e804077a2",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_13.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 14,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_14.png",
+      "source_name": "full_turn_14.png",
+      "source_sha256": "d2dc98a37fffc4f7fcd2cbeb5c2d5952121046791c23b08550f349cec4fd2a57",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        281.857,
+        407.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -337,
+        -23
+      ],
+      "alpha_bbox": [
+        254,
+        238,
+        1042,
+        1322
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "e70de0529888432bc8c49bc24fd944a797dc34b96555c0e26b7cc0605ae18415",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_14.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 15,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_15.png",
+      "source_name": "full_turn_15.png",
+      "source_sha256": "50ba743509bea990144d0cc3cc1aea4ee7821c4af1646b03e8a1202f89813b43",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        263.0,
+        423.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -274,
+        -76
+      ],
+      "alpha_bbox": [
+        400,
+        193,
+        1014,
+        1320
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "664ea6eafe17fc721153254e77503aed5d82b9a1580f518a6bd41c1febde3140",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_15.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 16,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_16.png",
+      "source_name": "full_turn_16.png",
+      "source_sha256": "6e1b68433d8b39f90c4d0ce739c186acc361a7ed837a57b070b13e076d6b315f",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        265.0,
+        470.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        -281,
+        -230
+      ],
+      "alpha_bbox": [
+        326,
+        292,
+        1032,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 0,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "a3e0373c7723806197bdd96c5e90ddbf4420fc0e8621c10e461817c1eb015737",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_16.png"
+    },
+    {
+      "family": "full_turn",
+      "source_family": "full_turn",
+      "frame": 17,
+      "source": "assets/ui/generated/characters/home_animation/source_v02/full_turn/full_turn_17.png",
+      "source_name": "full_turn_17.png",
+      "source_sha256": "70131feffc1106a61f548d36b23e2d94f91722eb73d10424cf3b6306323a6781",
+      "scale": 3.294460641399417,
+      "scale_basis": "one median visor-width family fit, constrained by maximum family frame bounds",
+      "source_root_estimate": [
+        161.5,
+        469.0
+      ],
+      "registered_root": [
+        592.0,
+        1318.0
+      ],
+      "offset": [
+        60,
+        -227
+      ],
+      "alpha_bbox": [
+        381,
+        301,
+        1149,
+        1321
+      ],
+      "zone_alpha_gt128": {
+        "K1_COLLECTION": 0,
+        "K2_DAILY": 0,
+        "K3_RIGHT_HELPER": 3106,
+        "K4_LEFT_HELPER": 0
+      },
+      "sha256": "6e12026bb12d714de016f40d52f76336362e17b7905d6e331318e91e79dc18db",
+      "path": "assets/ui/generated/characters/home_animation/full_turn/full_turn_17.png"
+    }
+  ]
+}

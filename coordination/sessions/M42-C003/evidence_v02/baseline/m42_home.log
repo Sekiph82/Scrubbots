@@ -1,0 +1,251 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[home shell tree]
+  ok: SafeAreaRoot -> MarginContainer -> Content -> HomeLayout
+  ok: V04 region order: HUD, Gift Meter, action host, ad slot ["TopCurrencyHUD", "GiftMeter", "ActionHost", "AdBannerSlot"]
+  ok: V05 HomeActionLayer: panels + bottom stack (PLAY, track, nav) ["WorldMargin", "BottomActionStack", "PlayButton", "WinStreakRewardTrack", "BottomNav"]
+  ok: MainWorldArea left/center/right
+  ok: live PLAY button enabled for a healthy save
+  ok: no interactive bitmap (no input-receiving TextureRect)
+  ok: bottom-nav SETTINGS live
+  ok: later-milestone tabs disabled, not faked
+[home in real root]
+  ok: real root Home bound to the ONE canonical AppState
+  ok: Home visible at route HOME
+  ok: pre-M42 debug label shell removed
+  ok: Home SETTINGS opens the canonical Settings overlay
+  ok: Settings overlay drawn above Home
+[home blocked state]
+  ok: blocked save: PLAY disabled
+  ok: blocked save: explicit read-only message
+  ok: blocked: no gameplay
+  ok: blocked future-schema save untouched
+[play cta fresh]
+  ok: fresh save: live CTA 'PLAY'
+  ok: CTA previews canonical frontier level 1
+  ok: PLAY -> GAMEPLAY
+  ok: host built with the same AppState
+  ok: launched exactly the frontier entry
+  ok: Home hidden during gameplay
+  ok: no level picker control anywhere
+[continue cta frontier]
+  ok: record level-1 win
+  ok: CTA shows PLAY + live subtitle CONTINUE · LEVEL 2 (PLAY / CONTINUE · LEVEL 2)
+  ok: frontier 2 has real content: enabled, no coming-soon message
+  ok: subtitle reflects real frontier 11
+  ok: frontier without content: disabled + honest message
+  ok: direct launch refuses CONTENT_MISSING
+  ok: no gameplay, still HOME (never falls back to level 1)
+[settings single authority]
+  ok: exactly one SettingsPanel instance after repeated opens
+  ok: Home SETTINGS opens it
+  ok: changes land in the canonical AppState services
+  ok: persisted through the canonical save (no side authority)
+  ok: closing returns to Home
+  ok: no unrelated side effects (progression/economy unchanged)
+  ok: Settings cannot open during gameplay
+[components viewport matrix]
+  ok: (1080, 2160) insets=[0, 0, 0, 0]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1080, 2160) insets=[0, 0, 0, 0]: every button >= 88x88 []
+  ok: (1080, 2160) insets=[0, 0, 0, 0]: every button inside safe area []
+  ok: (1080, 2160) insets=[0, 0, 0, 0]: regions stacked without overlap, inside safe bottom
+  ok: (1080, 2160) insets=[0, 0, 0, 0]: shortcuts fit inside MainWorldArea
+  ok: (1080, 2160) insets=[0, 132, 0, 96]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1080, 2160) insets=[0, 132, 0, 96]: every button >= 88x88 []
+  ok: (1080, 2160) insets=[0, 132, 0, 96]: every button inside safe area []
+  ok: (1080, 2160) insets=[0, 132, 0, 96]: regions stacked without overlap, inside safe bottom
+  ok: (1080, 2160) insets=[0, 132, 0, 96]: shortcuts fit inside MainWorldArea
+  ok: (1170, 2532) insets=[0, 0, 0, 0]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1170, 2532) insets=[0, 0, 0, 0]: every button >= 88x88 []
+  ok: (1170, 2532) insets=[0, 0, 0, 0]: every button inside safe area []
+  ok: (1170, 2532) insets=[0, 0, 0, 0]: regions stacked without overlap, inside safe bottom
+  ok: (1170, 2532) insets=[0, 0, 0, 0]: shortcuts fit inside MainWorldArea
+  ok: (1170, 2532) insets=[0, 132, 0, 96]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1170, 2532) insets=[0, 132, 0, 96]: every button >= 88x88 []
+  ok: (1170, 2532) insets=[0, 132, 0, 96]: every button inside safe area []
+  ok: (1170, 2532) insets=[0, 132, 0, 96]: regions stacked without overlap, inside safe bottom
+  ok: (1170, 2532) insets=[0, 132, 0, 96]: shortcuts fit inside MainWorldArea
+  ok: (1290, 2796) insets=[0, 0, 0, 0]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1290, 2796) insets=[0, 0, 0, 0]: every button >= 88x88 []
+  ok: (1290, 2796) insets=[0, 0, 0, 0]: every button inside safe area []
+  ok: (1290, 2796) insets=[0, 0, 0, 0]: regions stacked without overlap, inside safe bottom
+  ok: (1290, 2796) insets=[0, 0, 0, 0]: shortcuts fit inside MainWorldArea
+  ok: (1290, 2796) insets=[0, 132, 0, 96]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1290, 2796) insets=[0, 132, 0, 96]: every button >= 88x88 []
+  ok: (1290, 2796) insets=[0, 132, 0, 96]: every button inside safe area []
+  ok: (1290, 2796) insets=[0, 132, 0, 96]: regions stacked without overlap, inside safe bottom
+  ok: (1290, 2796) insets=[0, 132, 0, 96]: shortcuts fit inside MainWorldArea
+  ok: (1080, 2400) insets=[0, 0, 0, 0]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1080, 2400) insets=[0, 0, 0, 0]: every button >= 88x88 []
+  ok: (1080, 2400) insets=[0, 0, 0, 0]: every button inside safe area []
+  ok: (1080, 2400) insets=[0, 0, 0, 0]: regions stacked without overlap, inside safe bottom
+  ok: (1080, 2400) insets=[0, 0, 0, 0]: shortcuts fit inside MainWorldArea
+  ok: (1080, 2400) insets=[0, 132, 0, 96]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1080, 2400) insets=[0, 132, 0, 96]: every button >= 88x88 []
+  ok: (1080, 2400) insets=[0, 132, 0, 96]: every button inside safe area []
+  ok: (1080, 2400) insets=[0, 132, 0, 96]: regions stacked without overlap, inside safe bottom
+  ok: (1080, 2400) insets=[0, 132, 0, 96]: shortcuts fit inside MainWorldArea
+  ok: (1440, 3200) insets=[0, 0, 0, 0]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1440, 3200) insets=[0, 0, 0, 0]: every button >= 88x88 []
+  ok: (1440, 3200) insets=[0, 0, 0, 0]: every button inside safe area []
+  ok: (1440, 3200) insets=[0, 0, 0, 0]: regions stacked without overlap, inside safe bottom
+  ok: (1440, 3200) insets=[0, 0, 0, 0]: shortcuts fit inside MainWorldArea
+  ok: (1440, 3200) insets=[0, 132, 0, 96]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1440, 3200) insets=[0, 132, 0, 96]: every button >= 88x88 []
+  ok: (1440, 3200) insets=[0, 132, 0, 96]: every button inside safe area []
+  ok: (1440, 3200) insets=[0, 132, 0, 96]: regions stacked without overlap, inside safe bottom
+  ok: (1440, 3200) insets=[0, 132, 0, 96]: shortcuts fit inside MainWorldArea
+  ok: (1080, 1920) insets=[0, 0, 0, 0]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1080, 1920) insets=[0, 0, 0, 0]: every button >= 88x88 []
+  ok: (1080, 1920) insets=[0, 0, 0, 0]: every button inside safe area []
+  ok: (1080, 1920) insets=[0, 0, 0, 0]: regions stacked without overlap, inside safe bottom
+  ok: (1080, 1920) insets=[0, 0, 0, 0]: shortcuts fit inside MainWorldArea
+  ok: (1080, 1920) insets=[0, 132, 0, 96]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1080, 1920) insets=[0, 132, 0, 96]: every button >= 88x88 []
+  ok: (1080, 1920) insets=[0, 132, 0, 96]: every button inside safe area []
+  ok: (1080, 1920) insets=[0, 132, 0, 96]: regions stacked without overlap, inside safe bottom
+  ok: (1080, 1920) insets=[0, 132, 0, 96]: shortcuts fit inside MainWorldArea
+  ok: (1536, 2048) insets=[0, 0, 0, 0]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1536, 2048) insets=[0, 0, 0, 0]: every button >= 88x88 []
+  ok: (1536, 2048) insets=[0, 0, 0, 0]: every button inside safe area []
+  ok: (1536, 2048) insets=[0, 0, 0, 0]: regions stacked without overlap, inside safe bottom
+  ok: (1536, 2048) insets=[0, 0, 0, 0]: shortcuts fit inside MainWorldArea
+  ok: (1536, 2048) insets=[0, 132, 0, 96]: >= 12 live buttons measured (4 panels + PLAY + 5 nav + 2 HUD +)
+  ok: (1536, 2048) insets=[0, 132, 0, 96]: every button >= 88x88 []
+  ok: (1536, 2048) insets=[0, 132, 0, 96]: every button inside safe area []
+  ok: (1536, 2048) insets=[0, 132, 0, 96]: regions stacked without overlap, inside safe bottom
+  ok: (1536, 2048) insets=[0, 132, 0, 96]: shortcuts fit inside MainWorldArea
+  ok: live Label / native ProgressBar / Button components
+[layered art regions]
+  ok: V04 art layers: ONE world background, then the character layer ["WorldBackground", "characters"]
+  ok: every art layer is decorative (ignores input)
+  ok: screen art layers draw behind all UI
+  ok: world + Scrubby live in the clipped world canvas, Scrubby above the world
+  ok: owner reference screenshot never loaded by Home/app []
+  ok: owner-approved World 01 background + Scrubby bound (SB-M42-016/017 gate open)
+[shortcut columns responsive]
+  ok: (1080, 2160): center world keeps >= 40% width (600/1028)
+  ok: (1080, 2160): columns left/right of center, no overlap
+  ok: (1080, 2160): columns end above the PLAY CTA
+  ok: (1080, 2160): shortcut width >= 88 (210)
+  ok: (1170, 2532): center world keeps >= 40% width (690/1118)
+  ok: (1170, 2532): columns left/right of center, no overlap
+  ok: (1170, 2532): columns end above the PLAY CTA
+  ok: (1170, 2532): shortcut width >= 88 (210)
+  ok: (1290, 2796): center world keeps >= 40% width (810/1238)
+  ok: (1290, 2796): columns left/right of center, no overlap
+  ok: (1290, 2796): columns end above the PLAY CTA
+  ok: (1290, 2796): shortcut width >= 88 (210)
+  ok: (1080, 2400): center world keeps >= 40% width (600/1028)
+  ok: (1080, 2400): columns left/right of center, no overlap
+  ok: (1080, 2400): columns end above the PLAY CTA
+  ok: (1080, 2400): shortcut width >= 88 (210)
+  ok: (1440, 3200): center world keeps >= 40% width (960/1388)
+  ok: (1440, 3200): columns left/right of center, no overlap
+  ok: (1440, 3200): columns end above the PLAY CTA
+  ok: (1440, 3200): shortcut width >= 88 (210)
+  ok: (1080, 1920): center world keeps >= 40% width (600/1028)
+  ok: (1080, 1920): columns left/right of center, no overlap
+  ok: (1080, 1920): columns end above the PLAY CTA
+  ok: (1080, 1920): shortcut width >= 88 (210)
+  ok: (1536, 2048): center world keeps >= 40% width (1056/1484)
+  ok: (1536, 2048): columns left/right of center, no overlap
+  ok: (1536, 2048): columns end above the PLAY CTA
+  ok: (1536, 2048): shortcut width >= 88 (210)
+[live binding]
+  ok: refresh never mutates economy/progression
+  ok: SB chip == wallet
+  ok: SB chip follows the wallet live
+  ok: Bot Parts N/250 follows the wallet
+  ok: V06: Heart count on the icon, live regen timer in the pill (no N/5)
+  ok: Heart timer counts down from wall clock, 900 s interval (14:00)
+  ok: Gift Meter progress / claimable follow GiftMeterService
+  ok: Gift crate badge = live claimable count
+  ok: Home script declares no balance fields of its own
+[approved art only]
+  ok: production manifest (owner-approved): 52 entries accounted, 24 active entries presented (24 bound), retired/disabled entries present nothing
+  ok: approved world + Scrubby bind to their nodes
+  ok: unapproved art stays empty
+  ok: approved icons bind; unapproved do not
+  ok: with art bound, controls still inside viewport and >= 88 px []
+  ok: repository APPROVED entries are backed by the owner approval artifact
+[scrub bucks chip]
+  ok: owner-approved banknote icon bound, native tag hidden
+  ok: unapproved banknote icon -> native 'SB' tag
+  ok: live canonical balance, grouped (1,234,567)
+  ok: balance follows canonical spend
+  ok: approved banknote icon replaces the tag
+  ok: Home code has no coin / Star / Event Points / XP authority ()
+[bot parts progress]
+  ok: owner economy robot unlock cost 250 (250)
+  ok: 0 parts -> '0/250' (V03: ratio only; ready = gold bar)
+  ok: 0 parts -> bar 0.0/250.0
+  ok: 184 parts -> '184/250' (V03: ratio only; ready = gold bar)
+  ok: 184 parts -> bar 184.0/250.0
+  ok: 249 parts -> '249/250' (V03: ratio only; ready = gold bar)
+  ok: 249 parts -> bar 249.0/250.0
+  ok: 250 parts -> '250/250' (V03: ratio only; ready = gold bar)
+  ok: 250 parts -> bar 250.0/250.0
+  ok: 310 parts -> '310/250' (V03: ratio only; ready = gold bar)
+  ok: 310 parts -> bar 250.0/250.0
+  ok: after a canonical unlock the bar shows the carried-over parts (60/250)
+  ok: no XP wording, no inline BOT PARTS label
+[gift meter semantics]
+  ok: fresh: ratio only 0/1,000 (0/1,000)
+  ok: non-streak SB (wallet credit) does not move the Gift Meter
+  ok: Win Streak SB (+1) advances it (1/1,000)
+  ok: crossing 10 and 50 -> 61/1,000 (61/1,000)
+  ok: canonical next milestone still 250 (service unchanged; not shown as caption)
+  ok: no timer / event wording in the Gift Meter region
+[gift bar claims]
+  ok: V04: no Gifts Home panel; Gift Meter crate shows claimable badge 2
+  ok: Gift Bar popup lists 2 queued milestones
+  ok: CLAIM grants exactly the configured milestone reward { "bot_parts": 1.0, "standard_card_packs": 1.0 }
+  ok: claimed row gone, badge 1
+  ok: second claim of the same occurrence refused, no double reward
+  ok: claim persisted canonically
+  ok: back closes the popup first
+  ok: Home code never credits/grants directly
+[cards exchange presentation]
+  ok: V04: no CARDS EXCHANGE Home panel (Collection-owned flow); 0 duplicates
+  ok: live exchangeable duplicate count 3
+  ok: popup lists duplicate cards and their canonical SB value (3 duplicate card(s) worth 125 SB. Exchange them in the Collection (coming later).)
+  ok: no exchange execution button (presentation only)
+  ok: opening Cards Exchange mutates nothing
+  ok: no Star balance/semantics
+[win streak track]
+  ok: config position 1 pays 1 SB
+  ok: config position 2 pays 5 SB
+  ok: config position 3 pays 10 SB
+  ok: config position 4 pays 25 SB
+  ok: config position 5 pays 100 SB
+  ok: V03 track values exactly 1/5/10/25/100 (["1", "5", "10", "25", "100"])
+  ok: canonical streak 3 after three first-clear wins
+  ok: current step marked (gold) at position 3
+  ok: reached steps opaque, future dimmed
+  ok: streak 7 marks the 5+ step
+  ok: loss resets the live track
+[daily presentation]
+  ok: Daily shortcut live, claimable badge on a fresh day
+  ok: 5-day cycle rows
+  ok: CLAIM offered for today's day 1
+  ok: day 3 shows the configured booster reward (DAY 3 · Random Booster x1)
+  ok: claim grants day-1 reward via canonical service
+  ok: claimed state shown, no second CLAIM
+  ok: same-day second claim refused
+  ok: next local day: day 2 claimable
+  ok: consecutive login streak 2
+  ok: missed days -> cycle restarts at day 1 (DailyService rule)
+  ok: Home has no calendar/clock logic of its own
+[localization seam]
+  ok: checked 82 visible labels/buttons
+  ok: every visible copy string is routed through the seam []
+  ok: live values stay arguments; Economy V1 numbers unchanged
+  ok: English fallback restored
+  ok: number formatting seam
+M42 home cases completed: 19/19
+M42 home evidence: PASS
+WARNING: 476 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 19 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

@@ -1,0 +1,124 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[world asset identity]
+  ok: Home background is exactly 940x1672 ((940, 1672))
+  ok: Home background SHA-256 is the owner-selected 9d5db29513d25ad5c0932840c08027be0198d0cd85dc758a69e09e800c7aabe2
+  ok: retired HOME-120 file is kept on disk (never deleted or overwritten)
+[world binds through lifecycle]
+  ok: manifest HOME-121 APPROVED with the exact sha + final path
+  ok: manifest validates with HOME-121
+  ok: HomeArtBinder gate: APPROVED_BOUND
+  ok: WorldBackground presents HOME-121 (the owner-selected file)
+  ok: HOME-121 accounted STATIC on WorldBackground; replaced HOME-120 is OWNER_RETIRED with no node
+[no duplicate world art]
+  ok: no old sky/city/street/portal/platform/prop/helper art drawn []
+  ok: all 19 accounted inactive (WORLD_BAKED_RETIRED / OWNER_RETIRED) with no node []
+  ok: no platform / helper / portal / layered-background / live area-title nodes exist []
+  ok: no live WHISPERING PARK / AREA label over the baked sign
+  ok: at 1:2 the world image is drawn exactly once (1)
+[scrubby anchor contract]
+  ok: catalog contract feet (470,1240) / safe box 305..635 x 620..1240
+  ok: visible centre X = 470, visible soles Y = 1240 (470.00, 1240.00)
+  ok: the V04 base fit stays inside the safe box (V05 enlarges it about the soles)
+  ok: only the brush bristles reach below the soles line (7.5 px <= 16 texels x k)
+  ok: documented HOME-026 visible-feet offset (soles at 1318 of 1358; visible bbox 27,7 1130x1327)
+  ok: on screen the soles sit on the mapped anchor
+  ok: Scrubby does not cover the baked sign
+  ok: helper bots: bbox intrusion left 46.0 / right 46.0 <= 47 canvas px
+  ok: Scrubby is a separate layer above the world
+[four panels]
+  ok: left = SHOP, COLLECTION
+  ok: right = TASKS, DAILY
+  ok: exactly four Home shortcut panels (4)
+  ok: WIN STREAK / GIFTS / NO ADS / CARDS EXCHANGE panels removed []
+  ok: their services still exist
+  ok: DAILY live; SHOP / COLLECTION / TASKS remain future-disabled seams
+[panel icons]
+  ok: SHOP / COLLECTION icons enlarged vs V03 ({ "now": (228.4165, 196.8), "v03": (190.3471, 164.0), "rect": (228.4165, 196.8) } / { "now": (247.2, 164.8), "v03": (206.0, 137.3333), "rect": (247.2, 164.8) })
+  ok: TASKS / DAILY icons keep the V03 size ({ "now": (180.0301, 164.0), "v03": (180.0301, 164.0), "rect": (180.0301, 164.0) } / { "now": (180.1671, 164.0), "v03": (180.1671, 164.0), "rect": (180.1671, 164.0) })
+  ok: icon nodes are sized to their drawn size
+[panel style and margin]
+  ok: one panel size system for all four ([(210.0, 156.0)])
+  ok: panels smaller than V03 cards (226 x 220)
+  ok: translucent glass body (V05 0.40..0.48 / V06 0.50..0.52) with 2-3 px outline
+  ok: visible outer margin from the screen edges (>= 20 px)
+  ok: panels cover neither Scrubby nor the baked helper bots []
+[play standalone]
+  ok: V03 SHOP | PLAY | CARDS row retired
+  ok: PLAY centred (540.0)
+  ok: V03 Play size kept ((470.0, 155.0))
+  ok: native white triangle kept
+  ok: live PLAY + frontier subtitle
+  ok: HOME-078 stays retired
+  ok: status pill floats on the CTA (never resizes the track row)
+[profile]
+  ok: portrait's visible bottom rests on the frame's inner bottom
+  ok: portrait in front of the frame and popping above it
+  ok: frame sides stay visible around the portrait body
+  ok: profile card stays narrow (540)
+  ok: Bot Parts bar thicker than V03 (42 vs 24)
+  ok: only N/250, centred inside the bar
+  ok: level badge attached on the same row, live
+  ok: no top Settings/menu
+[currency hud]
+  ok: ScrubBucksChip icon enlarged ((110.0, 110.0))
+  ok: ScrubBucksChip icon overhangs / sits in front of its chip panel (drawn 110 > chip 68)
+  ok: HeartsChip icon enlarged ((110.0, 110.0))
+  ok: HeartsChip icon overhangs / sits in front of its chip panel (drawn 110 > chip 68)
+  ok: ScrubBucksPlus visible '+' glyph, >= 88 px hit target
+  ok: HeartsPlus visible '+' glyph, >= 88 px hit target
+  ok: (+) buttons emit intents only; economy untouched
+  ok: (+) glyph at the right end of its pill (V06: inside the pill)
+[gift and track]
+  ok: Gift Meter shows only N/1000 (0/1,000)
+  ok: emblem / crate modestly enlarged
+  ok: track values only 1/5/10/25/100 (["1", "5", "10", "25", "100"])
+  ok: no '+', no WIN copy, no per-step SB icon
+  ok: track stays thin (120)
+[nav and ad slot]
+  ok: order: track -> nav -> ad slot
+  ok: ad slot is the screen-bottom element (100 px tall)
+  ok: empty AdMount seam (no fake ad content)
+  ok: no fake ad text
+  ok: world canvas is clipped at the ad slot top (no world in the ad slot)
+  ok: five tabs, HOME selected, RANKS kept
+[ad slot collapse]
+  ok: collapsed: nav moves down to the screen bottom
+  ok: collapsed: world canvas extends to the bottom (behind the dock)
+  ok: re-enabled: layout restored
+[daily modal]
+  ok: Daily open: HomeActionLayer + (+) buttons hidden
+  ok: no Home button visible/clickable behind Daily []
+  ok: layout slot kept; persistent ad slot stays
+  ok: back closes the top modal
+  ok: exact Home restored
+[settings modal]
+  ok: Settings open: action layer hidden
+  ok: back closes Settings and restores Home
+[world seam]
+  ok: catalog: world_01 default only (no speculative worlds)
+  ok: no level ranges / World 02+ invented
+  ok: world_id -> background slug + canvas + anchor contract
+  ok: unknown world -> empty (no fallback invention)
+[responsive matrix]
+  ok: (1080, 2160) insets=[0, 0, 0, 0]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1080, 2160) insets=[0, 132, 0, 96]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1170, 2532) insets=[0, 0, 0, 0]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1170, 2532) insets=[0, 132, 0, 96]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1290, 2796) insets=[0, 0, 0, 0]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1290, 2796) insets=[0, 132, 0, 96]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1080, 2400) insets=[0, 0, 0, 0]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1080, 2400) insets=[0, 132, 0, 96]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1440, 3200) insets=[0, 0, 0, 0]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1440, 3200) insets=[0, 132, 0, 96]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1080, 1920) insets=[0, 0, 0, 0]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1080, 1920) insets=[0, 132, 0, 96]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1536, 2048) insets=[0, 0, 0, 0]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+  ok: (1536, 2048) insets=[0, 132, 0, 96]: touch >= 88 in safe area, world uniform + covering, platform above PLAY, feet on anchor, panels clear of bots/meter, ad at bottom []
+[historical assets intact]
+  ok: all 52 APPROVED entries (incl. retired history) match their pinned sha []
+m42_home_v04: 18/18 cases, 0 failures
+WARNING: 324 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 19 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
