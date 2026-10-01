@@ -1,0 +1,64 @@
+# M42-C003 V02 — CODEX LOG — Home Scrubby asset and runtime handoff
+
+Date: 2026-10-01
+Task: `SB-M42-035`
+Prompt: `coordination/sessions/M42-C003/CODEX_PROMPT_V02.md`
+Owner authority: `coordination/OWNER_M42_HOME_SCRUBBY_ANIMATION_V02.md`
+Final handoff: **`BLOCKED_V02_ASSET_CONSTRAINT_CONFLICT`**
+
+## Repository and safety
+
+- Canonical checkout was preserved without edits: `C:\Users\sekip\Desktop\ScrubBots` was on `main`, nine commits behind `origin/main`, with modified `project.godot` and untracked owner/import files.
+- Work proceeded in a managed isolated worktree at `C:\Users\sekip\.codex\worktrees\m42-c003-v02\ScrubBots`, based on live `origin/main` `fd232935b6fbd86a049dd5196a1f53c1cb8fdf29` (initial divergence `0/0`). The original checkout and its untracked files remain unchanged.
+- Root `TASKS.md` was read and not edited. HOME-026 source remained byte-identical at SHA-256 `fc30b992787c644822a6cd02510e481fab9010cd89ab75fc4a9909ca713d5c18`.
+- Godot: `4.7.2.stable.official.ed1daf0bf`; Pillow: `12.2.0`; Python: `3.12`.
+
+## Source archive and verification
+
+- Exact archive found at `C:\Users\sekip\Desktop\Home_Main_Hero_Assets.zip`.
+- SHA-256: `f5c34699f14dabc53a5c8126ad81dabd811711d1acd96fda47e523a18ad64458` (exact V02 match).
+- All 63 archive PNGs were checked against the owner manifest for SHA-256 and dimensions. A single existing manifest typo was found: `bow_12.png` recorded `d05a4e053d0325df0a83b2eee834553a69af6b9e50d7c8605fceb7abf704f8fe`, while that file inside the exact pinned archive hashes to `d05a4a053d0325df0a83b2eee834553a69af6b9e50d7c8605fceb7abf704f8fe`. Dimensions match (`504x648`). The manifest’s one incorrect hex character was corrected to match the exact archive; archive bytes were not changed.
+- Source bytes were staged unchanged under `assets/ui/generated/characters/home_animation/source_v02/{wave,bow,turn_look,full_turn}/`. Original archive names and staged names are mapped in `evidence_v02/source_mapping.json`.
+- Verification output: `evidence_v02/source_verification.json`.
+
+## Baseline
+
+A clean worktree had no Godot import cache. `godot_console.exe --headless --editor --path . --quit` completed the initial import. The pre-import C002 probe could not load PNG resources; it was rerun after import. The ten relevant baseline scripts passed **112/112 checks, all exit code 0**. Exact output is under `evidence_v02/baseline/`; the command/result index is `evidence_v02/baseline_summary.md`.
+
+## Deterministic candidate preparation
+
+Tool: `tools/home_scrubby_prepare_assets.py`.
+
+- Verifies the archive SHA and all per-file hashes/dimensions, stages exact source bytes, and records original-to-staged mapping.
+- Builds 14 Wave, 15 Bow, 17 Turn/Look, and 17 Full Turn 1158x1358 RGBA8 candidate PNGs. Wave returns through its raised-hand poses; Bow uses only the clean Bow subset and does not use the late wave-contaminated frames; Turn/Look is derived from the approved Full Turn family under the V02 fallback; Full Turn uses the approved 360-degree source sequence.
+- Uses one uniform scale per source family, alpha>2 fringe speckle removal only, measured sole/root registration to `(592,1318)`, SHA-256 output pins, frame bounds, K-zone counts, and deterministic contact/transition sheets.
+- Two preparation runs produced identical bytes for all 63 production candidate PNGs. All are 1158x1358 RGBA8. See `evidence_v02/deterministic_rerun.md`.
+- The candidates remain in `assets/ui/generated/characters/home_animation/{wave,bow,turn,full_turn}/`. They are not referenced by runtime code.
+
+## V02 asset constraint finding
+
+The measured HOME-026 visor envelope is approximately 723 px. At the largest family scale that keeps retained alpha and the registered root inside the fixed 1158x1358 canvas, source-family visor envelopes reach only 70.3% (Wave), 60.3% (Bow), and 62.9% (Full Turn source used for both Turn/Look and Full Turn) of HOME-026. The V02 blocking K zones reduce safe-scale results further to 63.2%, 53.5%, and 55.2% for Wave, Bow, and Turn/Look. Using the canvas-contained fit overlaps blocking K3 for all three; reducing to safe scale creates a large visible size discontinuity at HOME-026 bookends. Full Turn K3/K4 overlap is warning-only and is recorded per frame in `evidence_v02/full_turn_helper_overlap.md`.
+
+The 85% flag in `safe_scale_analysis.json` is an explicit diagnostic for substantial measured size loss, not a newly imposed owner rule. The governing conflict is direct: preserve HOME-026 identity/scale and violate hard K-zone gates, or clear those gates and accept a 36–47% visor-width reduction. Frame-specific scaling, cropping, root displacement, or new art would violate V02. This meets the prompt’s allowed `BLOCKED_V02_ASSET_CONSTRAINT_CONFLICT` disposition.
+
+Details: `evidence_v02/asset_constraint_report.md`, `normalization_measurements.md`, `normalization_measurements.json`, `safe_scale_analysis.json`, four contact sheets, four HOME-026 transition strips, and the per-frame Full Turn helper report.
+
+## Runtime, promotion, and unavailable evidence
+
+Runtime integration stopped at the explicit asset-constraint blocker. No `HomeScrubbyHero` component or runtime tests were added; no candidates were promoted; no HOME manifest pins were added. HOME-026, its 1.612 runtime scale, and existing placement remain untouched.
+
+No runtime video/capture, viewport screenshot, Reduced Effects capture, or 20x lifecycle test is claimed. The four transition strips are deterministic PNG composites, not runtime captures. Exact limitations are listed in `evidence_v02/runtime_capture_limitations.md`. The full aggregate suite was not run because the implementation stopped before any runtime code changes.
+
+## Changed files and publication
+
+- Source prep tool: `tools/home_scrubby_prepare_assets.py`.
+- One-character correction in `coordination/sessions/M42-C003/OWNER_SOURCE_ASSET_MANIFEST_V02.md`, justified by the exact pinned archive hash.
+- Staged source and generated candidate bytes, plus V02 verification/evidence under `coordination/sessions/M42-C003/evidence_v02/`.
+- This log: `coordination/sessions/M42-C003/CODEX_LOG_V02.md`.
+- `TASKS.md` absent from diff.
+- Product/evidence commit: `ac9a03cd81c349c177fbf586c76458607129fa2b` (`feat: prepare M42-C003 V02 gesture candidates and report blocker`).
+- Push target: `origin/main`, only if it remains a fast-forward from the verified V02 base; no force push.
+
+## Handoff
+
+**`BLOCKED_V02_ASSET_CONSTRAINT_CONFLICT`** — source archive verification, baseline tests, preparation tool, production sequence mapping, and constraint evidence are complete. Runtime integration and promotion remain blocked by the measured V02 source scale versus hard keep-out-zone conflict. ChatGPT independent audit is pending; no PASS or acceptance is claimed.
