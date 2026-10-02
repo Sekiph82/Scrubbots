@@ -5,15 +5,15 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
-- Current Sprint: M43-C005 — Reward, Pack, Collection, Robot, Feature and World Ceremonies
-- Current Task: Prepare M43-C005 ceremony visual/authority inventory and implementation cycle
-- Current Task Status: M43_C004_FINAL_OWNER_PASS / M43_C005_PREPARATION
-- Next Task/Action: CHATGPT inspects current reward/pack/collection/robot/feature/world authorities and production assets, then prepares the M43-C005 owner visual-master plan, implementation prompt and audit criteria. Do not hand production implementation to Claude until the ceremony surfaces and any blocked world-range authority are separated cleanly.
+- Current Sprint: M43-C001R — Results Momentum / Next-Level Curiosity / 10-Level Cleaning Journey
+- Current Task: Review and prepare the owner-approved M43-C001R retention/momentum block before M43-C005
+- Current Task Status: M43_C004_FINAL_OWNER_PASS / M43_C001R_REVIEW
+- Next Task/Action: CHATGPT reviews SB-M43-R01-001..008, current Results/Home/progression authorities and available next-level art/metadata, then prepares the M43-C001R implementation/visual plan. SB-M43-013 stays open because it explicitly depends on the M43-C005 ceremony layer. After C001R closes, proceed to M43-C005 and then M43-C005R.
 - Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 974 / 1414 = 68.88%. SB-M43-050..062 are CLOSED by technical audit plus final owner acceptance. M43-C004-C001 is complete; M43-C005 is now the active frontier.
-- Note: `coordination/sessions/M43-C004-C001/CHATGPT_AUDIT_V01.md` = TECHNICAL_PASS and `coordination/sessions/M43-C004-C001/FINAL_OWNER_ACCEPTANCE_V01.md` = FINAL OWNER PASS. Accepted: Help Scrubby fail pose, current Fail copy, current recommendation weights/order, visible-disabled WATCH AD state, session-scoped assistance counter, and two-card Need-a-Hand art direction with per-card BUY + WATCH AD and no NO THANKS.
+- Note: M43-C004-C001 is fully CLOSED. Before M43-C005, the earlier owner-approved retention block M43-C001R remains open: SB-M43-R01-001..008 (Next Cleanup teaser, Results→Next momentum corridor, 10-Level Cleaning Journey and tests). SB-M43-013 is also numerically earlier but is explicitly deferred to M43-C005 because it hands Results into those downstream ceremonies.
 - MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
