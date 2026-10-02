@@ -222,7 +222,10 @@ func _level10_no_next_content() -> void:
 	var res = root.get_results_screen()
 	var model: Dictionary = res.get_model()
 	_ok(model["continue"] == {"available": false, "reason": "CONTENT_MISSING", "next_level": 11}, "model: next frontier 11 CONTENT_MISSING")
-	_ok(res.get_primary_button().disabled and res.get_note_label().visible and res.get_note_label().text == UiText.t("RESULTS_NEXT_UNAVAILABLE", [11]), "Continue disabled with clear unavailable state")
+	# M43-C001R V02 owner decision: the Next Cleanup card carries the unavailable frontier; the
+	# older duplicate note above CLEAN NEXT is suppressed in that case.
+	_ok(res.get_primary_button().disabled and not res.get_note_label().visible and res.find_child("NextLevel", true, false).text == UiText.t("NEXT_CLEANUP_LEVEL", [11])
+		and res.find_child("NextFacts", true, false).text == UiText.t("NEXT_CLEANUP_SOON"), "Continue disabled with clear unavailable state (Next Cleanup: Level 11 coming soon)")
 	var e0: Dictionary = _econ(app.economy)
 	var p0: Dictionary = app.progression.snapshot()
 	var t0: int = nav.transition_id()

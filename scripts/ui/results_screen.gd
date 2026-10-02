@@ -74,6 +74,7 @@ const EMBLEM_SIZE := 96
 const ICON_SIZE := 76
 const REVEAL_STEP_S := 0.16   ## per-row fade; visual-only candidate timing (owner gate)
 const TEASER_SIZE := 132
+const JOURNEY_H := 76   ## V02: proportionally larger for the beat size hierarchy (V01 56)
 
 ## Warm Life/Help-family palette (native chrome; values only).
 const CREAM := Color(1.0, 0.957, 0.878)
@@ -190,7 +191,7 @@ func _build_momentum(col: VBoxContainer) -> void:
 	_journey_caption = _ink_label("JourneyCaption", 26)
 	_momentum.add_child(_journey_caption)
 	_journey = JourneyStrip.new()
-	_journey.custom_minimum_size = Vector2(0, 56)
+	_journey.custom_minimum_size = Vector2(0, JOURNEY_H)
 	_momentum.add_child(_journey)
 	_next = PanelContainer.new()
 	_next.name = "NextCleanup"
@@ -274,6 +275,14 @@ func _render_momentum(won: bool) -> void:
 	_teaser_none.visible = _teaser.texture == null
 	_sync_barrier()
 
+## V02 owner decision: when the Next Cleanup card already states this unavailable frontier
+## ("Coming soon"), the older note above CLEAN NEXT would repeat it, so it is suppressed.
+## Without a momentum card (e.g. malformed config) the note remains the honest message.
+func _momentum_shows_unavailable(level: int) -> bool:
+	var m: Dictionary = _model.get("momentum", {})
+	var n: Dictionary = m.get("next", {})
+	return bool(m.get("ok", false)) and not bool(n.get("available", true)) and int(n.get("level", -1)) == level
+
 ## Future M43-C005 seam: hold (active) / release the teaser + CLEAN NEXT for a mandatory
 ## ceremony `id`. Presentation only; rewards / progression / economy are never touched.
 func set_ceremony_barrier(id: String, active: bool) -> void:
@@ -349,7 +358,7 @@ func show_model(model: Dictionary) -> void:
 		_note.text = UiText.t("FAIL_ENCOURAGE")
 	elif won and bool(receipt.get("already_cleared", false)):
 		_note.text = UiText.t("RESULTS_ALREADY_CLEARED")
-	elif won and not continue_available and cont.has("next_level"):
+	elif won and not continue_available and cont.has("next_level") and not _momentum_shows_unavailable(int(cont["next_level"])):
 		_note.text = UiText.t("RESULTS_NEXT_UNAVAILABLE", [int(cont["next_level"])])
 	_note.visible = not _note.text.is_empty()
 	_render_momentum(won)

@@ -222,9 +222,11 @@ func _level10_unavailable_visual() -> void:
 	h.get_completion().terminal_reached.emit(&"WON", {})
 	var res = root.get_results_screen()
 	await _frames(2)
-	var note: Label = res.get_note_label()
-	_ok(res.is_victory_layout() and res.get_primary_button().disabled and note.is_visible_in_tree() and note.text == UiText.t("RESULTS_NEXT_UNAVAILABLE", [11]), "Level 10: Victory layout, Continue disabled, readable coming-soon note")
-	_ok(res.get_panel().get_global_rect().encloses(note.get_global_rect()), "note sits inside the frame")
+	# M43-C001R V02 owner decision: the coming-soon message lives once, in the Next Cleanup card;
+	# the older duplicate note above CLEAN NEXT is suppressed.
+	var note: Label = res.find_child("NextFacts", true, false)
+	_ok(res.is_victory_layout() and res.get_primary_button().disabled and not res.get_note_label().is_visible_in_tree() and note.is_visible_in_tree() and note.text == UiText.t("NEXT_CLEANUP_SOON"), "Level 10: Victory layout, Continue disabled, readable coming-soon card")
+	_ok(res.get_panel().get_global_rect().encloses(note.get_global_rect()), "coming-soon card sits inside the frame")
 	var e0: Dictionary = _econ(app.economy)
 	var t0: int = nav.transition_id()
 	for _i in range(3):
