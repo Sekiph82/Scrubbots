@@ -5,15 +5,15 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
-- Current Sprint: M43-C001R — Results Momentum / Next-Level Curiosity / 10-Level Cleaning Journey
-- Current Task: Owner visual gate for M43-C001R V02 enlarged Journey / beat hierarchy / single Coming Soon
-- Current Task Status: M43_C001R_V02_TECHNICAL_PASS / OWNER_VISUAL_GATE_REQUIRED
-- Next Task/Action: OWNER reviews `coordination/sessions/M43-C001R-C001/OWNER_VISUAL_REVIEW_V02.md` and fresh `evidence_v02/`. Technical audit is PASS; no remediation is pending. Owner confirms the larger Home/Results Journey sizing, ordinary < orange mini-boss < red boss hierarchy, single Coming Soon placement, and unchanged ~20% teaser crop. After owner PASS, ChatGPT closes SB-M43-R01-001..008 and advances to M43-C005.
-- Required Actor: OWNER
+- Current Sprint: M43-C005 — Reward, Pack, Collection, Robot, Feature and World Ceremonies
+- Current Task: Prepare M43-C005 ceremony visual/authority inventory and implementation cycle
+- Current Task Status: M43_C001R_FINAL_OWNER_PASS / M43_C005_PREPARATION
+- Next Task/Action: CHATGPT inspects current reward, pack, collection, robot, feature-unlock and world-transition authorities/assets; separates immediately implementable ceremony work from owner-blocked world-range work; then prepares the M43-C005 visual-master plan, Claude implementation prompt and audit criteria. SB-M43-013 closes only when the corresponding C005 handoff is production-complete.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 974 / 1414 = 68.88%. SB-M43-050..062 are CLOSED by technical audit plus final owner acceptance. M43-C004-C001 is complete; M43-C005 is now the active frontier.
-- Note: `coordination/sessions/M43-C001R-C001/CHATGPT_AUDIT_V02.md` = TECHNICAL_PASS / OWNER_VISUAL_GATE_REQUIRED. V02 preserves the C001R architecture and implements the owner fixes: Home Journey 720×84, larger Results Journey, slot 5 orange 1.3×, slot 10 red 1.6×, CLEAN NEXT unchanged, duplicate Coming Soon removed above CLEAN NEXT while card-level Coming Soon remains, teaser crop unchanged. Focused 40/40 and root 5323/5323 PASS.
+- Progress: 982 / 1414 = 69.45%. SB-M43-R01-001..008 are CLOSED by V02 technical audit plus final owner acceptance. M43-C001R is complete; M43-C005 is now the active frontier.
+- Note: `coordination/sessions/M43-C001R-C001/CHATGPT_AUDIT_V02.md` = TECHNICAL_PASS and `coordination/sessions/M43-C001R-C001/FINAL_OWNER_ACCEPTANCE_V02.md` = FINAL OWNER PASS. Accepted: larger Home/Results Journey, orange slot-5 mini-boss larger than ordinary, red slot-10 boss larger still, CLEAN NEXT, single card-level Coming Soon, removed duplicate note, and unchanged ~20% teaser crop.
 - MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
@@ -1769,14 +1769,14 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 
 These tasks extend the already owner-approved Results surface without changing its reward authority. The goal is a strong "one more level" continuation loop built from truthful next-content information, not fake scarcity, near-miss messaging or hidden reward manipulation.
 
-- [ ] SB-M43-R01-001 Add a deterministic **Next Cleanup** teaser after authoritative Results rewards/required ceremonies: resolve the actual next canonical progression level first, then reveal only a controlled preview of its real artwork/metadata.
-- [ ] SB-M43-R01-002 Default teaser language is silhouette / cropped-detail / limited-palette reveal, targeting roughly 15–25% visual information; never fabricate an unreleased level, fake a reward, or expose the full puzzle artwork before play.
-- [ ] SB-M43-R01-003 Teaser displays truthful next-level context only: level number, approved class/difficulty label and optional palette/color-count summary when available; unavailable frontier content shows an honest disabled/coming-soon state.
-- [ ] SB-M43-R01-004 Recompose the post-win flow as one momentum corridor: reward commit → compact secondary progress summary → any mandatory ceremony handoff → Next Cleanup teaser → one dominant **CLEAN NEXT** action; Home/back remains secondary and never traps the player.
-- [ ] SB-M43-R01-005 Implement a visible **10-Level Cleaning Journey** using the existing canonical cadence only: ten nodes per cycle, slot 5 presented as the mini-boss beat and slot 10 as the cycle-boss beat; this is meta progress UI, **not a World Diorama and not a level-select surface**.
-- [ ] SB-M43-R01-006 Journey state derives from ProgressionService/canonical cadence and survives cycle boundaries correctly (1→10 then next cycle 1); it never unlocks, skips or rewinds levels and never changes difficulty truth.
-- [ ] SB-M43-R01-007 Results and Home may show the same journey read model, but there is one authority for cycle position and completion; nodes are informational and non-tappable unless a later owner decision explicitly changes the no-shipping-Level-Select rule.
-- [ ] SB-M43-R01-008 Add focused tests for next-level resolution, frontier/missing-content fallback, double-tap protection, ceremony chaining, cycle 9→10→next-1 transitions, Reduced Effects and save/relaunch continuity.
+- [x] SB-M43-R01-001 Add a deterministic **Next Cleanup** teaser after authoritative Results rewards/required ceremonies: resolve the actual next canonical progression level first, then reveal only a controlled preview of its real artwork/metadata.
+- [x] SB-M43-R01-002 Default teaser language is silhouette / cropped-detail / limited-palette reveal, targeting roughly 15–25% visual information; never fabricate an unreleased level, fake a reward, or expose the full puzzle artwork before play.
+- [x] SB-M43-R01-003 Teaser displays truthful next-level context only: level number, approved class/difficulty label and optional palette/color-count summary when available; unavailable frontier content shows an honest disabled/coming-soon state.
+- [x] SB-M43-R01-004 Recompose the post-win flow as one momentum corridor: reward commit → compact secondary progress summary → any mandatory ceremony handoff → Next Cleanup teaser → one dominant **CLEAN NEXT** action; Home/back remains secondary and never traps the player.
+- [x] SB-M43-R01-005 Implement a visible **10-Level Cleaning Journey** using the existing canonical cadence only: ten nodes per cycle, slot 5 presented as the mini-boss beat and slot 10 as the cycle-boss beat; this is meta progress UI, **not a World Diorama and not a level-select surface**.
+- [x] SB-M43-R01-006 Journey state derives from ProgressionService/canonical cadence and survives cycle boundaries correctly (1→10 then next cycle 1); it never unlocks, skips or rewinds levels and never changes difficulty truth.
+- [x] SB-M43-R01-007 Results and Home may show the same journey read model, but there is one authority for cycle position and completion; nodes are informational and non-tappable unless a later owner decision explicitly changes the no-shipping-Level-Select rule.
+- [x] SB-M43-R01-008 Add focused tests for next-level resolution, frontier/missing-content fallback, double-tap protection, ceremony chaining, cycle 9→10→next-1 transitions, Reduced Effects and save/relaunch continuity.
 
 #### M43-C002 - Reusable Popup / Modal / Pause Foundation
 
