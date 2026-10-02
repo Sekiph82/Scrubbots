@@ -58,6 +58,20 @@ func reserve(id: String) -> Dictionary:
 		return {"ok": false, "reason": "insufficient_sb"}
 	return {"ok": true, "paid_with": "sb", "price": price}
 
+## M43-C004 (SB-M43-058): buy ONE saved charge of `id` at its canonical EconomyConfig
+## price without executing the booster (Need a Hand terminal recovery). Atomic: unknown id
+## or insufficient SB debits nothing and grants nothing.
+func buy_charge(id: String) -> Dictionary:
+	if not is_booster(id):
+		return {"ok": false, "reason": "unknown_booster"}
+	var price := int(_config.booster_price(id))
+	if price <= 0:
+		return {"ok": false, "reason": "no_price"}
+	if not _wallet.debit(EconomyWallet.SCRUB_BUCKS, price):
+		return {"ok": false, "reason": "insufficient_sb", "price": price}
+	_charges[id] = charges(id) + 1
+	return {"ok": true, "booster": id, "price": price, "charges": charges(id)}
+
 ## Refund a reservation when the booster effect fails (atomicity).
 func refund(id: String, reservation: Dictionary) -> void:
 	if not reservation.get("ok", false):

@@ -399,6 +399,148 @@ func _on_booster_action(id: String, ctx: Dictionary, p) -> void:
 		"watch":
 			_start_rewarded(p, RewardedGrantService.booster_product(booster), {"kind": "booster", "booster": booster})
 
+# ============================================================= Need a Hand ==========
+
+## M43-C004 (SB-M43-054/058/059): Need a Hand over the Fail surface. `offer` is the host's
+## get_assistance_offer() (exactly two distinct canonical boosters, else nothing opens).
+## Each card owns its acquisition: zero charge -> its own BUY · <price> SB and its own
+## WATCH AD; owned charge -> OWNED state, no acquisition CTA (charge-first). Acquisition
+## only saves one charge for the next attempt; nothing executes on the terminal board.
+## Top-right X / Back closes with no effect; there is no NO THANKS.
+func open_need_a_hand(offer: Dictionary):
+	if _economy == null or _stack == null or not bool(offer.get("show", false)):
+		return null
+	var ids: Array = (offer.get("picks", []) as Array).map(func(p): return String(p.get("id", "")))
+	if ids.size() != 2 or ids[0] == ids[1] or not (BOOSTER_DEFS.has(ids[0]) and BOOSTER_DEFS.has(ids[1])):
+		return null
+	var open = find_open("need_a_hand")
+	if open != null:
+		return open
+	var p := BasePopup.new("need_a_hand")
+	p.context = {"level": int(offer.get("level", 0)), "boosters": ids.duplicate()}
+	p.set_frame("medium")
+	p.set_title(UiText.t("NAH_TITLE"))
+	p.add_body_line(UiText.t("NAH_SUBTITLE"), "Subtitle", BasePopup.ROYAL, UiTokens.FONT_BODY)
+	var row := HBoxContainer.new()
+	row.name = "Cards"
+	row.add_theme_constant_override("separation", UiTokens.SPACE_MD)
+	p.get_content().add_child(row)
+	for id in ids:
+		row.add_child(_nah_card(p, id))
+	var bubble := HBoxContainer.new()
+	bubble.name = "Bubble"
+	bubble.add_theme_constant_override("separation", UiTokens.SPACE_SM)
+	p.get_content().add_child(bubble)
+	var say := PanelContainer.new()
+	say.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	say.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROW, BasePopup.ROW_EDGE, 3, 26, 0), UiTokens.SPACE_MD, UiTokens.SPACE_SM))
+	bubble.add_child(say)
+	var sl := BasePopup.body_label(UiText.t("NAH_BUBBLE"), 26)
+	sl.name = "BubbleText"
+	say.add_child(sl)
+	var scrubby := HomeStyle.art("Scrubby")
+	scrubby.texture = load(LIFE_HERO_ART)
+	scrubby.custom_minimum_size = Vector2(120, 132)
+	bubble.add_child(scrubby)
+	p.add_body_line(UiText.t("NAH_NO_GUARANTEE"), "NoGuarantee", BasePopup.INK, 22)
+	p.add_body_line("", "Status", BasePopup.INK, 26)
+	p.action_selected.connect(_on_nah_action.bind(p))
+	if not _stack.push(p):
+		p.free()
+		return null
+	_refresh_nah(p)
+	return p
+
+## One self-contained booster card; its two CTAs are popup actions placed inside it.
+func _nah_card(p, id: String) -> Control:
+	var card := PanelContainer.new()
+	card.name = "Card_" + id
+	card.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	card.size_flags_stretch_ratio = 1.0
+	card.set_meta("booster", id)
+	card.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(Color(1.0, 0.973, 0.918), BasePopup.ROYAL, 4, 26, 4, 2), UiTokens.SPACE_SM, UiTokens.SPACE_SM))
+	var col := VBoxContainer.new()
+	col.name = "Column"
+	col.add_theme_constant_override("separation", UiTokens.SPACE_SM)
+	card.add_child(col)
+	var name_l := BasePopup.body_label(UiText.t("BOOSTER_NAME_" + id.to_upper()), 36, BasePopup.ROYAL_EDGE)
+	name_l.name = "Name"
+	col.add_child(name_l)
+	var icon_box := CenterContainer.new()
+	col.add_child(icon_box)
+	var icon := HomeStyle.art("Icon")
+	icon.texture = load(BOOSTER_DEFS[id]["icon"])
+	icon.custom_minimum_size = Vector2(140, 140)
+	icon_box.add_child(icon)
+	var ben := BasePopup.body_label(UiText.t("NAH_BENEFIT_" + id.to_upper()), 26)
+	ben.name = "Benefit"
+	ben.custom_minimum_size = Vector2(0, 68)
+	col.add_child(ben)
+	var owned := BasePopup.body_label("", 26)
+	owned.name = "Owned"
+	col.add_child(owned)
+	for b in [p.add_action("buy:" + id, "", "offer", false, "", col), p.add_action("watch:" + id, UiText.t("NAH_WATCH"), "primary", false, "", col)]:
+		b.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
+		b.add_theme_font_size_override("font_size", 30)
+		for st in ["normal", "hover", "pressed", "disabled"]:
+			var sb := (b.get_theme_stylebox(st) as StyleBoxFlat).duplicate() as StyleBoxFlat
+			sb.content_margin_left = 10
+			sb.content_margin_right = 10
+			b.add_theme_stylebox_override(st, sb)
+	var note := BasePopup.body_label("", 22)
+	note.name = "Note"
+	col.add_child(note)
+	return card
+
+## Card states straight from BoosterInventory / EconomyConfig / wallet / rewarded policy.
+func need_a_hand_model(id: String) -> Dictionary:
+	return {"id": id, "charges": _economy.boosters.charges(id), "price": int(_economy.config.booster_price(id)),
+		"sb": _economy.wallet.scrub_bucks(), "rewarded": _economy.rewarded.can_start(RewardedGrantService.booster_product(id))}
+
+func _refresh_nah(p) -> void:
+	if not is_instance_valid(p) or not p.is_open():
+		return
+	for id in p.context["boosters"]:
+		var v := need_a_hand_model(id)
+		var card: Control = p.find_child("Card_" + id, true, false)
+		var owned: bool = v["charges"] > 0
+		(card.find_child("Owned", true, false) as Label).text = UiText.t("NAH_OWNED", [v["charges"]])
+		var buy: Button = p.get_action_button("buy:" + id)
+		buy.text = UiText.t("NAH_BUY", [UiText.num(v["price"])])
+		p.set_action_visible("buy:" + id, not owned)
+		p.set_action_visible("watch:" + id, not owned)
+		var rw_ok: bool = v["rewarded"].get("ok", false)
+		p.set_action_blocked("watch:" + id, not rw_ok)
+		var note := ""
+		if owned:
+			note = UiText.t("NAH_OWNED_READY")
+		elif not rw_ok and String(v["rewarded"].get("reason", "")) != "pending":
+			note = UiText.t("NAH_AD_UNAVAILABLE")
+		(card.find_child("Note", true, false) as Label).text = note
+
+func _on_nah_action(action: String, _ctx: Dictionary, p) -> void:
+	var parts := action.split(":")
+	var id: String = parts[1] if parts.size() == 2 else ""
+	if not (p.context["boosters"] as Array).has(id):
+		p.rearm()
+		return
+	if parts[0] == "watch":
+		_start_rewarded(p, RewardedGrantService.booster_product(id), {"kind": "charge", "booster": id})
+		return
+	var r: Dictionary = _actions.buy_booster_charge(id)
+	last_result = r
+	if r.get("ok", false):
+		_status(p, UiText.t("NAH_BOUGHT", [UiText.t("BOOSTER_NAME_" + id.to_upper())]))
+	elif String(r.get("reason", "")) == "insufficient_sb":
+		_status(p, UiText.t("ACQ_NOT_ENOUGH"))
+		open_insufficient({"source": "need_a_hand", "product": RewardedGrantService.booster_product(id),
+			"booster": id, "level": int(p.context["level"]), "item_label": UiText.t("BOOSTER_NAME_" + id.to_upper()),
+			"price_sb": int(_economy.config.booster_price(id)), "balance_sb": _economy.wallet.scrub_bucks()})
+	else:
+		_status(p, UiText.reason("ACQ_REASON_", String(r.get("reason", "failed"))))
+	p.rearm_soon()
+	_refresh_nah(p)
+
 # ================================================================== rewarded ======
 
 func _start_rewarded(p, product: String, wait: Dictionary) -> void:
@@ -449,6 +591,11 @@ func _apply_reward_outcome(p, result: Dictionary, wait: Dictionary) -> void:
 		_status(p, UiText.t("LIFE_REWARDED"))
 		_refresh(p)
 		return
+	if String(wait.get("kind", "")) == "charge":
+		# Need a Hand: the charge is saved for the next attempt; never executed here.
+		_status(p, UiText.t("NAH_BOUGHT", [UiText.t("BOOSTER_NAME_" + String(wait.get("booster", "")).to_upper())]))
+		_refresh(p)
+		return
 	var host = p.get_meta("host") if p.has_meta("host") else null
 	var booster := String(wait.get("booster", ""))
 	if host != null and is_instance_valid(host):
@@ -467,6 +614,8 @@ func _refresh(p, rebuild: bool = false) -> void:
 		_refresh_life(p)
 	elif p.popup_id.begins_with("booster_"):
 		_refresh_booster(p, rebuild)
+	elif p.popup_id == "need_a_hand":
+		_refresh_nah(p)
 
 # ============================================================= Shop / insufficient ==
 

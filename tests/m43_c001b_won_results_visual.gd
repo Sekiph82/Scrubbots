@@ -29,6 +29,10 @@ const ART_SHA := {
 	"res://assets/ui/final/home/gift_meter/gift_meter_emblem.png": "0ba66f7b48f72b19c8bf4d402ae57553f8f13079728ffe37c66a5aef3e0d3917",
 	"res://assets/ui/final/rewards/card_pack_standard.png": "25685b379f7a93b30ebd1931d34fdb77980daa42ea7cf436642b1d4872dba6d2",
 	"res://assets/ui/final/rewards/gift_box.png": "17b1f73e9e2ae804d96ecf9fd5623222ccc62462de053bf86d15069dae975415",
+	# M43-C004 Fail surface (existing approved art, bound read-only).
+	"res://assets/ui/final/common/currencies/icon_currency_heart.png": "245721d4166ba6f8bb2c21a907cf27165698a09709476b1dc9f5c7b05c36aad5",
+	"res://assets/ui/final/popups/help/help_scrubby_pose.png": "ce996949673bc81aa8eb4f82955d841094b49344a956ece853a0724595883120",
+	"res://assets/ui/final/popups/failure/fail_header_emblem.png": "4aed55e8e31ec4d861068d2e15e92df493feb3eae2e4f8508f31b347a9cb8cbd",
 }
 
 var EXPECTED_CASES := [
@@ -182,6 +186,8 @@ func _no_replay() -> void:
 	_complete("no_replay")
 
 ## Owner B3-A: LOST uses no Victory art; Retry still works; clean WON<->LOST switching.
+## M43-C004 migration: LOST is now the production Fail surface (help Scrubby + fail emblem +
+## committed loss rows in the same family), so "no texture" becomes "no Victory texture".
 func _lost_no_victory_art() -> void:
 	print("[LOST no victory art]")
 	var root = await _boot_main(_uniq("lost"))
@@ -189,10 +195,10 @@ func _lost_no_victory_art() -> void:
 	var h = await _play(root)
 	h.get_completion().terminal_reached.emit(&"LOST", {})
 	var res = root.get_results_screen()
-	_ok(not res.is_victory_layout() and not res.get_robot().is_visible_in_tree() and res.get_robot().texture == null, "LOST: no robot")
-	_ok(not res.get_emblem().is_visible_in_tree() and res.get_emblem().texture == null and _rows(res).is_empty(), "LOST: no emblem, no reward celebration")
-	_ok(res.theme == null and (res.get_panel().get_theme_stylebox("panel") as StyleBoxFlat).bg_color != ResultsScreen.CREAM, "LOST: technical fallback chrome, not the Victory frame")
-	_ok(_textures(res).is_empty(), "LOST: no texture of any kind in Results")
+	_ok(not res.is_victory_layout() and res.get_robot().texture != null and res.get_robot().texture.resource_path == ResultsScreen.FAIL_ROBOT_ART, "LOST: Fail robot, not the Victory robot")
+	_ok(res.get_emblem().texture.resource_path == ResultsScreen.FAIL_EMBLEM_ART and _rows(res).all(func(r): return String(r.name) in ["Row_hearts", "Row_streak_reset"]), "LOST: fail emblem, loss rows only (no reward celebration)")
+	_ok(not res.is_revealing(), "LOST: no reward reveal")
+	_ok(_victory_textures(res).is_empty(), "LOST: no Victory texture in Results")
 	res.get_primary_button().pressed.emit()
 	_ok(nav.current() == R.GAMEPLAY and nav.attempt_id() == 2 and root.get_gameplay_host() == h, "Retry still M30 same-host, attempt 2")
 	_drain(h)
@@ -202,7 +208,7 @@ func _lost_no_victory_art() -> void:
 	var h2 = root.get_gameplay_host()
 	h2.get_runtime().set_process(false)
 	h2.get_completion().terminal_reached.emit(&"LOST", {})
-	_ok(not res.is_victory_layout() and _textures(res).is_empty() and res.get_primary_button().text == UiText.t("RESULTS_RETRY"), "WON -> LOST switch leaves no Victory art behind")
+	_ok(not res.is_victory_layout() and _victory_textures(res).is_empty() and res.get_primary_button().text == UiText.t("RESULTS_RETRY"), "WON -> LOST switch leaves no Victory art behind")
 	_shutdown(root)
 	_complete("lost_no_victory_art")
 
@@ -312,7 +318,7 @@ func _art_and_manifest_governance() -> void:
 		if FileAccess.get_sha256(p) != ART_SHA[p]:
 			changed.append(p)
 	_ok(changed.is_empty(), "bound approved art unchanged (sha256) %s" % str(changed))
-	var bound: Array = [ResultsScreen.ROBOT_ART, ResultsScreen.EMBLEM_ART]
+	var bound: Array = [ResultsScreen.ROBOT_ART, ResultsScreen.EMBLEM_ART, ResultsScreen.FAIL_ROBOT_ART, ResultsScreen.FAIL_EMBLEM_ART]
 	bound.append_array(ResultsScreen.ICON_ART.values())
 	_ok(bound.all(func(p): return String(p).begins_with("res://assets/ui/final/") and ART_SHA.has(p)), "Results binds only existing assets/ui/final art")
 	_ok(not bound.has("res://assets/ui/final/popups/victory/continue_button_frame.png"), "cyan arrow continue_button_frame not used (owner B2-A)")
@@ -342,6 +348,9 @@ func _rich_receipt(app) -> Dictionary:
 
 func _rows(res) -> Array:
 	return res.get_reward_lines_node().get_children().filter(func(c): return not c.is_queued_for_deletion())
+
+func _victory_textures(res) -> Array:
+	return _textures(res).filter(func(t): return t.texture.resource_path in [ResultsScreen.ROBOT_ART, ResultsScreen.EMBLEM_ART])
 
 func _textures(res) -> Array:
 	return res.find_children("*", "TextureRect", true, false).filter(func(t): return t.texture != null and t.is_visible_in_tree())

@@ -246,7 +246,9 @@ func get_content() -> VBoxContainer:
 ## style: "primary" (green Life/Help CTA) | "secondary" (cream) | "offer" (yellow SB
 ## offer). `closes`: the action closes this popup before it is emitted; otherwise it
 ## latches the popup (see header). `row`: buttons sharing a row id sit side by side.
-func add_action(id: String, text: String, style: String = "secondary", closes: bool = true, row: String = "") -> Button:
+## `parent` (M43-C004 opt-in): place the button inside a content container (e.g. one card)
+## instead of the footer; gating/latching is identical.
+func add_action(id: String, text: String, style: String = "secondary", closes: bool = true, row: String = "", parent: Control = null) -> Button:
 	var b := Button.new()
 	b.name = ("Action_" + id).validate_node_name()
 	b.text = text
@@ -278,7 +280,9 @@ func add_action(id: String, text: String, style: String = "secondary", closes: b
 		b.add_theme_constant_override("outline_size", 0)
 		b.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
 	b.pressed.connect(_on_action.bind(id))
-	if row.is_empty():
+	if parent != null:
+		parent.add_child(b)
+	elif row.is_empty():
 		_footer.add_child(b)
 	else:
 		var line: HBoxContainer = _footer.get_node_or_null(("Row_" + row).validate_node_name())

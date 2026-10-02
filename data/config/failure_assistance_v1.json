@@ -1,0 +1,19 @@
+{
+  "schema": "scrubbots.failure_assistance.v1",
+  "version": 1,
+  "authority": "coordination/sessions/M43-C004-C001/OWNER_FAIL_RETRY_NEED_HAND_V01.md",
+  "trigger": {
+    "consecutive_progression_failures": 3,
+    "repeat_every_failures_after_trigger": 0
+  },
+  "recommendation": {
+    "count": 2,
+    "fallback_order": ["plus_one_slot", "selector", "tornado", "random"],
+    "dominant_color_min_share": 0.4,
+    "context_weights": {
+      "slots_full": {"plus_one_slot": 2, "selector": 1},
+      "dominant_color": {"tornado": 2},
+      "supply_remaining": {"selector": 1}
+    }
+  }
+}

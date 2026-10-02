@@ -210,6 +210,18 @@ func eligible_safe_batches() -> Array:
 				out.append(bid)
 	return out
 
+## M43-C004: is at least one batch solver-safe to extract right now? Same proof as
+## eligible_safe_batches(), stopping at the first safe batch (read-only).
+func has_eligible_safe_batch() -> bool:
+	if _slots.rightmost_empty_index() == -1:
+		return false
+	var original := _current_cols()
+	for col in original:
+		for b in col:
+			if _selector_reorder_solvable(original, b.get_batch_id()):
+				return true
+	return false
+
 ## Move `batch_id` to the front of its column; the rest keep order. Returns the
 ## reordered cols (or null if not found).
 func _cols_with_front(original: Array, batch_id: String):
