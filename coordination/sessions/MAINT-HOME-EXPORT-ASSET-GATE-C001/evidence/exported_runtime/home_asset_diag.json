@@ -1,0 +1,47 @@
+{
+  "animation_counts": {
+    "bow": 15,
+    "full_turn": 17,
+    "turn": 17,
+    "wave": 14
+  },
+  "bound_nodes": 24,
+  "features": {
+    "debug": false,
+    "editor": false,
+    "template": true,
+    "web": true
+  },
+  "hero_has_frames": true,
+  "manifest_valid": true,
+  "mode": "PACKAGED_RUNTIME",
+  "nodes": {
+    "Art_scrubby": true,
+    "GiftCrate": true,
+    "GiftEmblem": true,
+    "HeartsChip": true,
+    "NavIcon_events": true,
+    "NavIcon_home": true,
+    "NavIcon_leaderboard": true,
+    "NavIcon_robots": true,
+    "NavIcon_settings": true,
+    "ProfileAvatarFrame": true,
+    "ProfilePortrait": true,
+    "ProfileRankBadge": true,
+    "ScrubBucksChip": true,
+    "ShortcutIcon_collection": true,
+    "ShortcutIcon_daily": true,
+    "ShortcutIcon_shop": true,
+    "ShortcutIcon_tasks": true,
+    "TrackBadge": true,
+    "TrackGift1": true,
+    "TrackGift2": true,
+    "TrackGift3": true,
+    "TrackGift4": true,
+    "TrackGift5": true,
+    "WorldBackground": true
+  },
+  "raw_source_png_present": false,
+  "strict_mode_valid_here": false,
+  "unbound_nodes": []
+}
