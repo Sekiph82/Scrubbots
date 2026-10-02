@@ -5,15 +5,15 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
-- Current Sprint: M43-C004 — Fail / Retry / Need a Hand Recovery
-- Current Task: Prepare the canonical M43-C004 Fail/Retry visual master and owner gate before production implementation
-- Current Task Status: MAINT_EXPORT_GATE_CLOSED / M43_C004_VISUAL_MASTER_REQUIRED
-- Next Task/Action: CHATGPT prepares the M43-C004 Fail/Retry visual master using the established popup family; OWNER approves the visual gate. The existing owner-selected `need a hand.png` remains the Need-a-Hand art-direction authority. After visual approval, Claude implements SB-M43-050..062 as the next production cycle.
-- Required Actor: CHATGPT / OWNER
+- Current Sprint: M43-C004-C001 — Fail / Retry / Need a Hand Recovery
+- Current Task: Claude implements SB-M43-050..062 production Fail / Retry / Need a Hand using the owner-locked per-card SB + per-card rewarded acquisition design
+- Current Task Status: M43_C004_OWNER_DIRECTION_LOCKED / READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C004-C001/CHATGPT_PROMPT_V01.md` for SB-M43-050..062. Need a Hand must show exactly two recommendation cards; each zero-charge card has its own canonical SB BUY action and its own WATCH AD action; there is no shared acquisition CTA and no NO THANKS button; top-right X/Back dismisses with zero mutation. Claude returns `AWAITING_GPT_M43_C004_C001_AUDIT` with evidence and owner-review pack.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 961 / 1414 = 67.96%. SB-M42-034 and SB-M42-035 are CLOSED. `MAINT-HOME-EXPORT-ASSET-GATE-C001` is independently AUDITED_PASS/CLOSED: source-tree SHA enforcement remains strict, exported templates use explicit packaged-resource validation, and a real Godot 4.7.2 Web export proved 24/24 Home art bindings plus gesture counts 14/15/17/17 with raw source PNG absent. Maintenance does not change the roadmap denominator. M43-C004 is now the active frontier.
-- Note: Export-safe Home binding closure: `coordination/sessions/MAINT-HOME-EXPORT-ASSET-GATE-C001/CHATGPT_AUDIT_V01.md` = AUDITED_PASS / CLOSED. M42-C003 remains fully closed with 4/4 owner visual PASS. Before M43-C004 production code, SB-M43-050 requires a canonical Fail/Retry popup visual master and owner approval; Need a Hand already has the selected `assets/art/references/_owner_inbox/Additionals/need a hand.png` authority.
+- Note: Export-safe Home binding is CLOSED. M43-C004 current owner lock: `coordination/sessions/M43-C004-C001/OWNER_FAIL_RETRY_NEED_HAND_V01.md`. Terminal LOST already spends the Heart, so terminal Retry cannot spend a second Heart. Need a Hand triggers on same-level failure 3 and has two recommendation cards; each zero-charge card contains both BUY <canonical SB price> and its own WATCH AD; X/Back closes, NO THANKS is removed.
 - MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
