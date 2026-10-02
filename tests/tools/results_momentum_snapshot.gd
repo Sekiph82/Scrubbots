@@ -15,6 +15,7 @@ const TABLET := Vector2i(1536, 2048)
 const SHOTS := [
 	["results_L2_won_journey_next_cleanup", PHONE, "results", 2, ""],
 	["results_L4_next_L5_mini_boss", PHONE, "results", 4, ""],
+	["results_L5_mini_boss_complete", PHONE, "results", 5, ""],
 	["results_L9_next_L10_boss", PHONE, "results", 9, ""],
 	["results_L10_cycle_complete_L11_coming_soon", PHONE, "results", 10, ""],
 	["results_L4_short_phone", SHORT, "results", 4, ""],

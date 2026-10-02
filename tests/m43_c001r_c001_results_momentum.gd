@@ -30,6 +30,8 @@ var EXPECTED_CASES := [
 	"t24_receipt_economy_identical", "t25_row_order", "t26_clean_next_route", "t27_rapid_taps", "t28_stale_attempt",
 	"t29_zero_heart", "t30_barrier_holds", "t31_barrier_release_same", "t32_reduced_effects", "t33_responsive",
 	"t34_no_accumulation", "t35_malformed_config", "no_manipulation_copy",
+	"v02_home_strip_larger", "v02_results_strip_not_smaller", "v02_beat_size_hierarchy", "v02_beat_colors",
+	"v02_single_coming_soon", "v02_available_copy_unchanged",
 ]
 
 var _fail := 0
@@ -51,6 +53,7 @@ func _initialize() -> void:
 	await _missing_cases()
 	await _journey_cases()
 	await _t21_injected()
+	await _v02_cases()
 	await _t22_t23()
 	await _corridor_cases()
 	await _barrier_cases()
@@ -252,6 +255,75 @@ func _missing_cases() -> void:
 		own = own and nc["preview_path"] == e.preview_path
 	_ok(own, "every level's teaser path is its own catalog preview")
 	_complete("t10_missing_preview_no_borrow")
+
+# ================================================================ V02 ============
+
+## V01 reference geometry (owner V02 asked for a materially larger Journey).
+const V01_HOME_STRIP := Vector2(560, 58)
+const V01_HOME_NODE := 39.4      ## 2 * min(58 * 0.34, 56 * 0.36)
+const V01_RESULTS_H := 56.0
+const V01_RESULTS_NODE := 38.0
+
+func _nodes_ok(strip) -> Array:
+	var bad: Array = []
+	var r: Array = strip.node_rects()
+	var box := Rect2(Vector2.ZERO, strip.size)
+	for i in range(r.size()):
+		var drawn: Rect2 = (r[i] as Rect2).grow(JourneyStrip.RIM)   # diamond / ring rim
+		if not box.grow(0.5).encloses(drawn):
+			bad.append("node %d outside strip" % (i + 1))
+		if i < r.size() - 1 and drawn.intersects((r[i + 1] as Rect2).grow(JourneyStrip.RIM)):
+			bad.append("nodes %d/%d overlap" % [i + 1, i + 2])
+	return bad
+
+func _v02_cases() -> void:
+	print("[V02 owner remediation: strip size, beat hierarchy, single coming-soon]")
+	await _boot(6)
+	var strip = _root.get_home().get_journey_strip()
+	var r: Array = strip.node_rects()
+	_ok(strip.size.x >= V01_HOME_STRIP.x * 1.2 and strip.size.y >= V01_HOME_STRIP.y * 1.3, "Home strip %s vs V01 %s (>= +20%% wide, +30%% tall)" % [str(strip.size), str(V01_HOME_STRIP)])
+	_ok(r[0].size.x >= V01_HOME_NODE * 1.15 and r[6].size.x >= V01_HOME_NODE * 1.15, "ordinary node %.1f px vs V01 %.1f px" % [r[0].size.x, V01_HOME_NODE])
+	_ok(strip.get_parent() == _root.get_home().get_region("PlayButton") and strip.get_global_rect().end.y <= _root.get_home().get_region("PlayButton").get_global_rect().position.y, "Home strip still directly above PLAY")
+	_complete("v02_home_strip_larger")
+	var mini: float = r[4].size.x
+	var boss: float = r[9].size.x
+	_ok(mini >= r[0].size.x * 1.25 and mini >= r[6].size.x * 1.25, "mini-boss %.1f px > ordinary complete %.1f / future %.1f" % [mini, r[0].size.x, r[6].size.x])
+	_ok(boss >= mini * 1.15, "boss %.1f px > mini-boss %.1f px" % [boss, mini])
+	_ok(r[5].size.x < mini, "current ordinary node (%.1f) never outranks a beat" % r[5].size.x)
+	var bad := _nodes_ok(strip)
+	await _boot(10)
+	var r10: Array = _root.get_home().get_journey_strip().node_rects()
+	_ok(r10[9].size.x > r10[4].size.x and r10[4].size.x > r10[0].size.x, "Home frontier 10 (boss current): boss > mini > ordinary")
+	bad.append_array(_nodes_ok(_root.get_home().get_journey_strip()))
+	await _won(9)
+	var rs = _res().get_journey_strip()
+	var rr: Array = rs.node_rects()
+	_ok(rs.size.y >= V01_RESULTS_H and rr[0].size.x >= V01_RESULTS_NODE, "Results strip %s, ordinary node %.1f px (V01 h 56 / %.0f px)" % [str(rs.size), rr[0].size.x, V01_RESULTS_NODE])
+	_complete("v02_results_strip_not_smaller")
+	_ok(rr[4].size.x >= rr[0].size.x * 1.25 and rr[9].size.x >= rr[4].size.x * 1.15, "Results: mini-boss > ordinary, boss > mini-boss")
+	bad.append_array(_nodes_ok(rs))
+	_ok(bad.is_empty(), "all nodes inside their strip, neighbours never overlap %s" % str(bad))
+	_complete("v02_beat_size_hierarchy")
+	_ok(JourneyStrip.MINI_EDGE == Color(1.0, 0.55, 0.12) and JourneyStrip.BOSS_EDGE == Color(0.86, 0.13, 0.20) and JourneyStrip.BEAT_SCALE["mini_boss"] < JourneyStrip.BEAT_SCALE["boss"],
+		"slot 5 orange / slot 10 red unchanged")
+	_complete("v02_beat_colors")
+	await _won(10)
+	var res = _res()
+	var soon: Array = res.find_children("*", "Label", true, false).filter(func(l): return l.is_visible_in_tree() and l.text.to_lower().find("coming soon") != -1)
+	_ok(soon.size() == 1 and soon[0].name == "NextFacts" and soon[0].text == UiText.t("NEXT_CLEANUP_SOON"), "L10: exactly one coming-soon message, in the Next Cleanup card %s" % str(soon.map(func(l): return l.name)))
+	_ok(not res.get_note_label().visible and res.get_note_label().text.is_empty(), "older duplicate note above CLEAN NEXT is suppressed")
+	_ok(res.get_primary_button().disabled and res.get_primary_button().text == UiText.t("RESULTS_CLEAN_NEXT") and not res.get_home_button().disabled
+		and res.get_model()["continue"]["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "CLEAN NEXT disabled, Home usable, CONTENT_MISSING truth unchanged")
+	var m: Dictionary = res.get_model()
+	m.erase("momentum")   # no Next Cleanup card (e.g. malformed config) -> the honest note returns
+	res.show_model(m)
+	_ok(res.get_note_label().visible and res.get_note_label().text == UiText.t("RESULTS_NEXT_UNAVAILABLE", [11]), "without the card, the unavailable note is still shown (scoped suppression)")
+	_complete("v02_single_coming_soon")
+	await _won(4)
+	res = _res()
+	_ok(not res.get_note_label().visible and res.find_child("NextFacts", true, false).text == UiText.t("NEXT_CLEANUP_FACTS", [UiText.t("DIFFICULTY_HARD"), 10])
+		and not res.get_primary_button().disabled, "available-next Results copy unchanged (no note, HARD · 10 colours, CLEAN NEXT live)")
+	_complete("v02_available_copy_unchanged")
 
 # ================================================================ journey ========
 

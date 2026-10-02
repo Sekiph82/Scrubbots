@@ -841,7 +841,7 @@ func _build_shortcuts(column: VBoxContainer, specs: Array) -> void:
 ## Centred standalone CTA (V03 size): live PLAY, native white triangle, compact live
 ## frontier subtitle. The status pill floats just above the button (no layout change).
 const PLAY_SIZE := Vector2(470, 150)
-const JOURNEY_SIZE := Vector2(560, 58)
+const JOURNEY_SIZE := Vector2(720, 84)   ## V02 owner remediation: larger (V01 560x58)
 const JOURNEY_GAP := 6.0
 func _build_play(parent: VBoxContainer) -> void:
 	var play := Button.new()

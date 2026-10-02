@@ -7,8 +7,10 @@ extends Control
 ## never skip, rewind, unlock or navigate. Information only.
 ##
 ## States: complete (green + check) / current (gold, larger) / next (white ring) / future
-## (dim). Beats: slot 5 mini-boss = diamond with an orange rim; slot 10 cycle boss = larger
-## diamond with a crimson rim. Beats never imply a reward.
+## (dim). Beats: slot 5 mini-boss = diamond with an orange rim; slot 10 cycle boss = diamond
+## with a crimson rim. V02 owner decision: size hierarchy ordinary < mini-boss < boss
+## (BEAT_SCALE), the base radius fitted so the boss always fits the strip height. Beats
+## never imply a reward.
 
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 
@@ -17,6 +19,11 @@ const FUTURE := Color(0.20, 0.27, 0.42)
 const MINI_EDGE := Color(1.0, 0.55, 0.12)
 const BOSS_EDGE := Color(0.86, 0.13, 0.20)
 const LINE := Color(0.62, 0.894, 1.0, 0.55)
+## Node size by beat (V02): ordinary 1.0 < mini-boss < boss. A current ordinary node gets a
+## smaller lift so it never outranks a beat.
+const BEAT_SCALE := {"normal": 1.0, "mini_boss": 1.3, "boss": 1.6}
+const CURRENT_SCALE := 1.12
+const RIM := 3.0
 
 var _model: Dictionary = {}
 var font_size := 22
@@ -46,25 +53,32 @@ func node_rects() -> Array:
 	var n := node_count()
 	if n == 0:
 		return out
-	var step := size.x / n
 	var r := _radius()
+	# Centres are inset by the largest (boss) half-width so the end nodes stay inside.
+	var margin: float = r * float(BEAT_SCALE["boss"]) + RIM
+	var step: float = (size.x - 2.0 * margin) / maxf(n - 1, 1)
 	for i in range(n):
 		var nd: Dictionary = _model["nodes"][i]
 		var rr: float = r * _scale(nd)
-		var c := Vector2(step * (i + 0.5), size.y * 0.5)
+		var c := Vector2(margin + step * i, size.y * 0.5)
 		out.append(Rect2(c - Vector2(rr, rr), Vector2(rr, rr) * 2.0))
 	return out
 
+## Base (ordinary) radius, the largest that keeps (a) the boss inside the strip height and
+## (b) every node inside the width with no neighbour overlap: with centres inset by the boss
+## half-width, the tightest neighbours are the boss and a current node.
 func _radius() -> float:
-	var n := maxi(node_count(), 1)
-	return minf(size.y * 0.34, size.x / n * 0.36)
+	var n := maxi(node_count(), 2)
+	var boss: float = BEAT_SCALE["boss"]
+	var by_height: float = (size.y * 0.5 - RIM - 1.0) / boss
+	var by_width: float = (size.x - 2.0 * RIM * n) / (2.0 * boss + (n - 1) * (boss + CURRENT_SCALE))
+	return maxf(minf(by_height, by_width), 4.0)
 
 static func _scale(nd: Dictionary) -> float:
-	if String(nd["beat"]) == "boss":
-		return 1.22
-	if String(nd["state"]) == "current":
-		return 1.12
-	return 1.0
+	var s: float = BEAT_SCALE.get(String(nd["beat"]), 1.0)
+	if String(nd["state"]) == "current" and s < CURRENT_SCALE:
+		s = CURRENT_SCALE
+	return s
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
@@ -114,7 +128,7 @@ func _draw() -> void:
 			draw_polyline(PackedVector2Array([c + Vector2(-k, 0), c + Vector2(-k * 0.25, k * 0.7), c + Vector2(k, -k * 0.6)]), Color(1, 1, 1), 4.0, true)
 		elif font != null:
 			var txt := str(int(nd["level"]))
-			var fs := font_size if txt.length() <= 2 else font_size - 4
+			var fs := clampi(int(rr * 0.9), 14, font_size + 8) if txt.length() <= 2 else clampi(int(rr * 0.75), 12, font_size + 4)
 			var ts := font.get_string_size(txt, HORIZONTAL_ALIGNMENT_CENTER, -1, fs)
 			var ink := HomeStyle.OUTLINE if state in ["current", "next"] else Color(0.85, 0.90, 1.0)
 			draw_string(font, c + Vector2(-ts.x * 0.5, ts.y * 0.32), txt, HORIZONTAL_ALIGNMENT_LEFT, -1, fs, ink)
