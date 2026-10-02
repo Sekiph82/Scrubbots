@@ -6,14 +6,14 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
 - Current Sprint: M43-C001R — Results Momentum / Next-Level Curiosity / 10-Level Cleaning Journey
-- Current Task: Owner visual gate for M43-C001R Results Momentum / Next Cleanup / 10-Level Cleaning Journey
-- Current Task Status: M43_C001R_TECHNICAL_PASS / OWNER_VISUAL_GATE_REQUIRED
-- Next Task/Action: OWNER reviews `coordination/sessions/M43-C001R-C001/OWNER_VISUAL_REVIEW_V01.md` and the committed evidence. Technical audit is PASS; no remediation is pending. Owner must accept/adjust teaser crop composition/amount, Journey placement/hierarchy, mini-boss/boss treatment, CLEAN NEXT wording/hierarchy, Results density including duplicate coming-soon copy, and Home density/placement. After owner PASS, ChatGPT closes SB-M43-R01-001..008 and advances to M43-C005.
-- Required Actor: OWNER
+- Current Task: Claude applies M43-C001R V02 owner visual remediation
+- Current Task Status: M43_C001R_OWNER_REMEDIATION_REQUESTED / READY_FOR_CLAUDE_V02
+- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C001R-C001/CHATGPT_PROMPT_V02.md`: enlarge the accepted Journey strip without moving it, make orange slot-5 mini-boss larger than ordinary nodes and red slot-10 boss larger still, keep CLEAN NEXT, suppress the duplicate older Coming Soon note above CLEAN NEXT while keeping the Next Cleanup Coming Soon card, and preserve the ~20% teaser crop. Return `AWAITING_GPT_M43_C001R_C001_V02_AUDIT`.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 974 / 1414 = 68.88%. SB-M43-050..062 are CLOSED by technical audit plus final owner acceptance. M43-C004-C001 is complete; M43-C005 is now the active frontier.
-- Note: M43-C004-C001 is fully CLOSED. `coordination/sessions/M43-C001R-C001/CHATGPT_AUDIT_V01.md` = TECHNICAL_PASS / OWNER_VISUAL_GATE_REQUIRED. C001R proves truthful canonical Next Cleanup, 15–25% real-preview disclosure, shared non-tappable 10-Level Cleaning Journey, canonical CLEAN NEXT routing, honest missing frontier, future C005 ceremony barrier seam, 34/34 focused PASS and root 5323/5323 PASS. No Claude remediation is currently required.
+- Note: C001R V01 is technically PASS but owner requested visual remediation in `OWNER_VISUAL_DECISION_V02.md`: Journey placement accepted but must be larger; slot 5 stays orange and must be larger than ordinary blue nodes; slot 10 stays red and larger still; CLEAN NEXT accepted; duplicate Coming Soon immediately above CLEAN NEXT must be removed while card-level Coming Soon remains; teaser crop remains ~20% pending any later owner change.
 - MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
