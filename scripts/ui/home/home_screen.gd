@@ -154,6 +154,10 @@ func _ready() -> void:
 	if _app != null:
 		_nodes["HomeScrubbyHero"].bind_effects(_app.effects if "effects" in _app else null)
 	refresh()
+	# MAINT-HOME-EXPORT-ASSET-GATE-C001: opt-in exported-runtime proof (inert unless the
+	# app is started with the user argument --home-asset-diagnostics).
+	if OS.get_cmdline_user_args().has("--home-asset-diagnostics"):
+		print("HOME_ASSET_DIAG " + JSON.stringify(get_asset_diagnostics()))
 
 func bind(app_state) -> void:
 	_app = app_state
@@ -182,6 +186,37 @@ func set_art_binder(binder) -> void:
 
 func get_art_binder():
 	return _art
+
+## Binding evidence (tests + the opt-in exported-runtime diagnostic): integrity mode,
+## feature tags, manifest validity, which mapped Home nodes show approved art, and the
+## HomeScrubbyHero frame set.
+func get_asset_diagnostics() -> Dictionary:
+	var nodes := {}
+	var unbound: Array = []
+	var bound := 0
+	for row in get_presentation_accounting():
+		for n in row["nodes"]:
+			var ok: bool = n["texture"] != null
+			nodes[n["name"]] = ok
+			if ok:
+				bound += 1
+			else:
+				unbound.append(n["name"])
+	var hero = _nodes["HomeScrubbyHero"]
+	var counts := {}
+	if hero.has_frames():
+		for g in hero.get_set()["textures"]:
+			counts[g] = (hero.get_set()["textures"][g] as Array).size()
+	return {"mode": _art.get_mode() if _art != null and _art.has_method("get_mode") else "",
+		"features": {"template": OS.has_feature("template"), "editor": OS.has_feature("editor"),
+			"web": OS.has_feature("web"), "debug": OS.has_feature("debug")},
+		"manifest_valid": _art != null and _art.is_manifest_valid(),
+		"bound_nodes": bound, "unbound_nodes": unbound, "nodes": nodes,
+		"hero_has_frames": hero.has_frames(), "animation_counts": counts,
+		# Packaging facts: is the raw source PNG in this build, and would the strict
+		# source gate pass here (false in an export = why PACKAGED_RUNTIME exists).
+		"raw_source_png_present": FileAccess.file_exists("res://assets/ui/final/characters/scrubby/scrubby_home_pose.png"),
+		"strict_mode_valid_here": HomeArtBinder.V.validate(HomeArtBinder.V.load_manifest(), "res://", HomeArtBinder.V.SOURCE_TREE_STRICT)["ok"]}
 
 func get_app_state():
 	return _app

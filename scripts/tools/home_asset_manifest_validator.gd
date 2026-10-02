@@ -3,8 +3,17 @@ extends RefCounted
 ## (res://scripts/tools/home_asset_manifest_validator.gd).
 ##
 ## M42 (SB-M42-013) — deterministic validation of assets/ui/HOME_ASSET_MANIFEST.json
-## BEFORE any generation or binding. Pure: validate(manifest) never touches files except
-## to hash an APPROVED asset for overwrite protection.
+## BEFORE any generation or binding. Pure: validate(manifest) never writes; it only reads
+## what its integrity mode requires (below).
+##
+## Integrity modes (MAINT-HOME-EXPORT-ASSET-GATE-C001, OWNER_DECISION_V01):
+##   SOURCE_TREE_STRICT (default) — editor/source tree, tests and the pre-export build gate:
+##     every APPROVED ART asset and animation frame needs a valid approved pin, its raw
+##     source PNG must exist and its SHA-256 must equal the pin (source provenance gate).
+##   PACKAGED_RUNTIME — exported game only: exports ship the imported texture + remap,
+##     not the source PNG, so raw bytes are never hashed. The pin stays mandatory
+##     metadata (verified by the strict gate before export) and the canonical res:// path
+##     must resolve through ResourceLoader. Imported .ctex bytes are never used as pins.
 ##
 ## Rules:
 ##   - schema_version 1, screen "home", assets array;
@@ -15,8 +24,8 @@ extends RefCounted
 ##   - LIVE / NATIVE / FX / THEME entries carry no image path (live text is never baked);
 ##   - duplicate final paths only for an explicit reuse (generation_required=false entry
 ##     reusing an earlier generated path);
-##   - status in STATUSES; an APPROVED asset must record approved_sha256 and the file on
-##     disk must still match it (no silent overwrite/regeneration of approved art);
+##   - status in STATUSES; an APPROVED asset must record a 64-hex approved_sha256 and pass
+##     the mode's integrity check (strict: source bytes match; packaged: resource resolves);
 ##   - Economy V1: no Star / Event Points / profile-XP / coin authority in any slug, id
 ##     or path (a star-SHAPED FX is reported as a warning, not currency);
 ##   - required Economy V1 Home entries exist (Scrub Bucks icon, Bot Parts bar, Gift
@@ -34,6 +43,9 @@ const IMPLEMENTATION_BY_KIND := {
 	"REUSE": ["godot_native"],
 	"THEME": ["godot_native"],
 }
+const SOURCE_TREE_STRICT := "SOURCE_TREE_STRICT"
+const PACKAGED_RUNTIME := "PACKAGED_RUNTIME"
+const MODES := [SOURCE_TREE_STRICT, PACKAGED_RUNTIME]
 const PROVIDER_PRIMARY := "chatgpt_image_generation"
 const PROVIDER_FALLBACK := ["magnific"]
 const FINAL_ROOT := "assets/ui/final/"
@@ -51,10 +63,14 @@ static func load_manifest(path: String = "res://assets/ui/HOME_ASSET_MANIFEST.js
 	return JSON.parse_string(FileAccess.get_file_as_string(path))
 
 ## Returns {ok: bool, errors: Array[String], warnings: Array[String], reuse: Dictionary}.
-static func validate(m, project_root: String = "res://") -> Dictionary:
+## `project_root` is where SOURCE_TREE_STRICT reads raw source PNGs; PACKAGED_RUNTIME always
+## resolves the canonical res:// resource path.
+static func validate(m, project_root: String = "res://", mode: String = SOURCE_TREE_STRICT) -> Dictionary:
 	var errors: Array = []
 	var warnings: Array = []
 	var reuse := {}
+	if not MODES.has(mode):
+		return {"ok": false, "errors": ["unknown integrity mode '%s'" % mode], "warnings": [], "reuse": {}}
 	if typeof(m) != TYPE_DICTIONARY:
 		return {"ok": false, "errors": ["manifest is not an object"], "warnings": [], "reuse": {}}
 	if m.get("schema_version") != 1 and m.get("schema_version") != 1.0:
@@ -132,21 +148,39 @@ static func validate(m, project_root: String = "res://") -> Dictionary:
 				errors.append("%s: %s entries must not carry an image path (no baked live text)" % [tag, kind])
 		if status == "APPROVED":
 			var want := str(a.get("approved_sha256", ""))
-			if want.length() != 64:
-				errors.append("%s: APPROVED requires approved_sha256" % tag)
+			if not is_pin(want):
+				errors.append("%s: APPROVED requires approved_sha256 (64 lowercase hex)" % tag)
 			elif typeof(path) == TYPE_STRING:
-				var got := FileAccess.get_sha256(project_root + String(path))
-				if got != want:
-					errors.append("%s: approved asset changed on disk (sha256 %s != %s)" % [tag, got, want])
+				var err := integrity_error(String(path), want, project_root, mode)
+				if err != "":
+					errors.append("%s: %s" % [tag, err])
 	for req in REQUIRED_SLUGS:
 		if not slugs.has(req):
 			errors.append("missing required Economy V1 Home entry '%s'" % req)
-	_validate_animation_sets(m.get("animation_sets", {}), project_root, errors)
+	_validate_animation_sets(m.get("animation_sets", {}), project_root, mode, errors)
 	return {"ok": errors.is_empty(), "errors": errors, "warnings": warnings, "reuse": reuse}
 
+static func is_pin(v) -> bool:
+	return typeof(v) == TYPE_STRING and RegEx.create_from_string("^[0-9a-f]{64}$").search(v) != null
+
+## "" when an approved final asset passes the mode's integrity rule, else the reason.
+##   strict:   raw source PNG under project_root exists and its SHA-256 == pin;
+##   packaged: res://path resolves through ResourceLoader (export remap); no raw hashing.
+static func integrity_error(path: String, want: String, project_root: String, mode: String) -> String:
+	if mode == PACKAGED_RUNTIME:
+		if not ResourceLoader.exists("res://" + path):
+			return "packaged resource does not resolve (%s)" % path
+		return ""
+	if not FileAccess.file_exists(project_root + path):
+		return "approved source missing (%s)" % (project_root + path)
+	var got := FileAccess.get_sha256(project_root + path)
+	if got != want:
+		return "approved asset changed on disk (sha256 %s != %s)" % [got, want]
+	return ""
+
 ## M42-C003 V03: pinned frame sets (one common canvas + pivot per set). Every frame must be
-## a final .png whose bytes still match its sha256.
-static func _validate_animation_sets(sets, project_root: String, errors: Array) -> void:
+## a final .png with a valid pin that passes the mode's integrity rule.
+static func _validate_animation_sets(sets, project_root: String, mode: String, errors: Array) -> void:
 	if typeof(sets) != TYPE_DICTIONARY:
 		errors.append("animation_sets must be an object")
 		return
@@ -173,5 +207,9 @@ static func _validate_animation_sets(sets, project_root: String, errors: Array) 
 				var path := str(f.get("path", "")) if typeof(f) == TYPE_DICTIONARY else ""
 				if not path.begins_with(FINAL_ROOT) or not path.ends_with(".png"):
 					errors.append("animation set %s/%s: frame path must be a .png under %s (%s)" % [id, g, FINAL_ROOT, path])
-				elif FileAccess.get_sha256(project_root + path) != str(f.get("sha256", "")):
-					errors.append("animation set %s/%s: frame changed on disk %s" % [id, g, path])
+				elif not is_pin(f.get("sha256", "")):
+					errors.append("animation set %s/%s: frame %s requires sha256 (64 lowercase hex)" % [id, g, path])
+				else:
+					var err := integrity_error(path, str(f["sha256"]), project_root, mode)
+					if err != "":
+						errors.append("animation set %s/%s: frame %s" % [id, g, err.replace("approved asset changed on disk", "changed on disk")])

@@ -8,7 +8,11 @@ extends RefCounted
 ## A texture is returned only when its HOME_ASSET_MANIFEST entry:
 ##   - validates (HomeAssetManifestValidator: no errors for the manifest as a whole),
 ##   - has status "APPROVED" set by the owner,
-##   - records approved_sha256 and the file on disk still matches it,
+##   - records a valid approved_sha256 pin and passes the binder's integrity mode:
+##       SOURCE_TREE_STRICT (editor/source runs, tests): the raw source PNG still hashes
+##         to the pin — re-checked on every state() call;
+##       PACKAGED_RUNTIME (exported template): the pin was verified by the strict build
+##         gate before export; the canonical res:// texture must resolve and load,
 ##   - lives under assets/ui/final/ (generated candidates can never bind).
 ## Everything else returns null and the caller keeps its native placeholder. The binder
 ## never writes, promotes, renames or regenerates any asset.
@@ -18,19 +22,34 @@ const V = preload("res://scripts/tools/home_asset_manifest_validator.gd")
 var _manifest
 var _valid := false
 var _by_slug: Dictionary = {}
+var _mode: String
+var _root: String
 
-func _init(manifest = null) -> void:
+## `mode` "" = default_mode(); `project_root` is the strict-mode source root (test seam).
+func _init(manifest = null, mode: String = "", project_root: String = "res://") -> void:
+	_mode = mode if mode != "" else default_mode()
+	_root = project_root
 	_manifest = manifest if manifest != null else V.load_manifest()
-	_valid = V.validate(_manifest)["ok"] if _manifest != null else false
+	_valid = V.validate(_manifest, _root, _mode)["ok"] if _manifest != null else false
 	if _valid:
 		for a in _manifest["assets"]:
 			_by_slug[String(a["slug"])] = a
+
+## Exported templates carry the "template" feature; editor/source binaries do not
+## (verified with the 4.7.2 editor and a real 4.7.2 Web export, MAINT-HOME-EXPORT-
+## ASSET-GATE-C001 evidence/mode_feature_probe.md).
+static func default_mode() -> String:
+	return V.PACKAGED_RUNTIME if OS.has_feature("template") else V.SOURCE_TREE_STRICT
+
+func get_mode() -> String:
+	return _mode
 
 func is_manifest_valid() -> bool:
 	return _valid
 
 ## Lifecycle state of one slug: "APPROVED_BOUND", "NOT_APPROVED", "UNKNOWN",
-## "HASH_MISMATCH", "NOT_FINAL", "MANIFEST_INVALID".
+## "HASH_MISMATCH" (strict: source missing or changed), "RESOURCE_MISSING" (packaged:
+## texture does not resolve), "NOT_FINAL", "MANIFEST_INVALID".
 func state(slug: String) -> String:
 	if not _valid:
 		return "MANIFEST_INVALID"
@@ -42,8 +61,8 @@ func state(slug: String) -> String:
 	var path := String(a.get("path", ""))
 	if not path.begins_with(V.FINAL_ROOT):
 		return "NOT_FINAL"
-	if FileAccess.get_sha256("res://" + path) != String(a.get("approved_sha256", "")):
-		return "HASH_MISMATCH"
+	if V.integrity_error(path, String(a.get("approved_sha256", "")), _root, _mode) != "":
+		return "RESOURCE_MISSING" if _mode == V.PACKAGED_RUNTIME else "HASH_MISMATCH"
 	return "APPROVED_BOUND"
 
 ## Texture for an owner-approved asset, else null (keep native placeholder).
