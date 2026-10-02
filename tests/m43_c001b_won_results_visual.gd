@@ -86,7 +86,7 @@ func _won_composition_bound() -> void:
 	var cta := res.get_primary_button().get_theme_stylebox("normal") as StyleBoxFlat
 	_ok(cta != null and cta.bg_color == HomeStyle.GREEN, "Continue uses the green Life/Help-family CTA")
 	_ok(res.get_home_button().size.y < res.get_primary_button().size.y and (res.get_home_button().get_theme_stylebox("normal") as StyleBoxFlat).bg_color != HomeStyle.GREEN, "Home is visually subordinate")
-	_ok(res.get_primary_button().text == UiText.t("RESULTS_CONTINUE") and res.get_panel().find_child("Title", true, false).text == UiText.t("RESULTS_WON") and res.get_panel().find_child("LevelLabel", true, false).text == UiText.t("RESULTS_LEVEL", [1]), "title / level / CTA are live UiText")
+	_ok(res.get_primary_button().text == UiText.t("RESULTS_CLEAN_NEXT") and res.get_panel().find_child("Title", true, false).text == UiText.t("RESULTS_WON") and res.get_panel().find_child("LevelLabel", true, false).text == UiText.t("RESULTS_LEVEL", [1]), "title / level / CTA are live UiText")
 	_shutdown(root)
 	_complete("won_composition_bound")
 

@@ -25,6 +25,7 @@ const LaunchSession = preload("res://scripts/app/launch_session.gd")
 const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 const AcquisitionFlow = preload("res://scripts/ui/popup/acquisition_flow.gd")
 const ShopHandoff = preload("res://scripts/app/shop_handoff.gd")
+const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -54,6 +55,8 @@ var _modals = null
 ## M43-C003: the ONE Shop handoff + acquisition flow (Life / Booster / Shop), app-level.
 var shop = null
 var _acq = null
+## M43-C001R: validated momentum presentation config (read once; shared by Results/Home).
+var momentum_cfg: Dictionary = {}
 
 func _enter_tree() -> void:
 	_boot()
@@ -73,6 +76,7 @@ func _ready() -> void:
 	_home.name = "HomeScreen"
 	add_child(_home)
 	_home.bind(app_state)
+	set_momentum_config(ResultsMomentum.load_config())
 	_home.settings_requested.connect(open_settings)
 	_home.play_requested.connect(play_current_frontier)
 	_results = ResultsScreen.new()
@@ -172,9 +176,19 @@ func _results_model(payload: Dictionary) -> Dictionary:
 	var launch := GameplayLaunchResolver.resolve(app_state)
 	m["continue"] = {"available": bool(launch.get("ok", false)), "reason": String(launch.get("reason", "")),
 		"next_level": int(launch.get("level", 0))}
+	# M43-C001R: journey (anchor = the just-completed level) + Next Cleanup from the SAME
+	# resolved launch CLEAN NEXT uses. Read-only; a malformed config just omits it.
+	if String(m.get("status", "")) == "WON":
+		m["momentum"] = ResultsMomentum.results_model(app_state, int(m.get("level", 0)), launch, momentum_cfg)
 	# M43-C001B: presentation-only Reduced Effects flag (canonical settings service).
 	m["reduced_effects"] = app_state != null and app_state.effects != null and app_state.effects.is_reduced()
 	return m
+
+## Share one validated momentum config with Results (via _results_model) and Home.
+func set_momentum_config(cfg: Dictionary) -> void:
+	momentum_cfg = cfg.duplicate(true)
+	if _home != null:
+		_home.set_momentum_config(momentum_cfg)
 
 func get_home():
 	return _home

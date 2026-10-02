@@ -56,6 +56,8 @@ const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const HomePresentationMap = preload("res://scripts/ui/home/home_presentation_map.gd")
 const HomeWorldCatalog = preload("res://scripts/ui/home/home_world_catalog.gd")
 const HomeScrubbyHero = preload("res://scripts/ui/home/home_scrubby_hero.gd")
+const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
+const JourneyStrip = preload("res://scripts/ui/components/journey_strip.gd")
 ## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
 const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
 const UiText = preload("res://scripts/ui/ui_text.gd")
@@ -134,6 +136,8 @@ var _world: Dictionary = {}
 var _world_scale := 1.0
 var _world_offset := Vector2.ZERO
 var _ad_slot_enabled := true
+## M43-C001R validated momentum config (the app root shares its own; else loaded once).
+var _momentum_cfg: Dictionary = {}
 
 func _ready() -> void:
 	_build()
@@ -837,6 +841,8 @@ func _build_shortcuts(column: VBoxContainer, specs: Array) -> void:
 ## Centred standalone CTA (V03 size): live PLAY, native white triangle, compact live
 ## frontier subtitle. The status pill floats just above the button (no layout change).
 const PLAY_SIZE := Vector2(470, 150)
+const JOURNEY_SIZE := Vector2(560, 58)
+const JOURNEY_GAP := 6.0
 func _build_play(parent: VBoxContainer) -> void:
 	var play := Button.new()
 	play.name = "PlayButton"
@@ -883,6 +889,20 @@ func _build_play(parent: VBoxContainer) -> void:
 	status.offset_bottom = -8
 	status.visible = false
 	play.add_child(_reg(status))
+	# M43-C001R (SB-M43-R01-005..007): compact non-interactive 10-Level Cleaning Journey,
+	# attached ABOVE the PLAY button like the status pill, so it takes no layout slot and
+	# moves nothing in the accepted Home stack. The status pill rides above it when shown.
+	var strip := JourneyStrip.new()
+	strip.name = "HomeJourneyStrip"
+	strip.backplate = true
+	strip.custom_minimum_size = Vector2(0, 0)
+	strip.set_anchors_preset(Control.PRESET_CENTER_TOP)
+	strip.offset_left = -JOURNEY_SIZE.x * 0.5
+	strip.offset_right = JOURNEY_SIZE.x * 0.5
+	strip.offset_top = -JOURNEY_SIZE.y - JOURNEY_GAP
+	strip.offset_bottom = -JOURNEY_GAP
+	strip.visible = false
+	play.add_child(_reg(strip))
 
 ## Native white play triangle (no texture).
 class PlayTriangle extends Control:
@@ -1119,6 +1139,7 @@ func refresh() -> void:
 	else:
 		_render_play(play, status)
 	status.visible = not status.text.is_empty()
+	_render_journey(status)
 	_render_values()
 
 func _render_values() -> void:
@@ -1302,6 +1323,24 @@ func _render_play(play: Button, status: Label) -> void:
 	else:
 		play.disabled = true
 		status.text = UiText.t("HOME_LEVELS_UNAVAILABLE", [String(_launch.get("reason", ""))])
+
+## M43-C001R: the shared ResultsMomentum journey for the current frontier (Home semantics).
+func set_momentum_config(cfg: Dictionary) -> void:
+	_momentum_cfg = cfg.duplicate(true)
+	if _built:
+		refresh()
+
+func _render_journey(status: Label) -> void:
+	if _momentum_cfg.is_empty():
+		_momentum_cfg = ResultsMomentum.load_config()
+	var strip = _nodes["HomeJourneyStrip"]
+	var j: Dictionary = ResultsMomentum.home_journey(_app, _momentum_cfg) if _app != null and not _app.is_blocked else {"ok": false}
+	strip.set_model(j)
+	status.offset_top = -8.0 - (JOURNEY_SIZE.y + JOURNEY_GAP if strip.visible else 0.0)
+	status.offset_bottom = status.offset_top
+
+func get_journey_strip():
+	return _nodes.get("HomeJourneyStrip")
 
 func get_launch_preview() -> Dictionary:
 	return _launch.duplicate(true)

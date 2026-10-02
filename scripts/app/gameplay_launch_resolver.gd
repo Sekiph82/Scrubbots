@@ -31,5 +31,5 @@ static func resolve(app_state, catalog = null) -> Dictionary:
 		if int(e.order) == level:
 			return {"ok": true, "level": level, "entry_id": e.id,
 				"level_path": e.level_path, "difficulty": e.difficulty,
-				"supply_plan_path": e.supply_plan_path}
+				"supply_plan_path": e.supply_plan_path, "preview_path": e.preview_path}
 	return {"ok": false, "reason": CONTENT_MISSING, "level": level}

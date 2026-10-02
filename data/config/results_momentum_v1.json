@@ -1,0 +1,17 @@
+{
+  "schema": "scrubbots.results_momentum.v1",
+  "version": 1,
+  "authority": "TASKS.md M43-C001R (owner approved 2026-09-30) / coordination/sessions/M43-C001R-C001/CHATGPT_PROMPT_V01.md",
+  "journey": {
+    "cycle_length": 10,
+    "mini_boss_slot": 5,
+    "boss_slot": 10
+  },
+  "teaser": {
+    "reveal_mode": "cropped_detail",
+    "visible_area_fraction": 0.20,
+    "visible_area_fraction_min": 0.15,
+    "visible_area_fraction_max": 0.25,
+    "reveal_delay_s": 0.2
+  }
+}
