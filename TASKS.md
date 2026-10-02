@@ -5,15 +5,15 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
-- Current Sprint: M43-C004-C001 — Fail / Retry / Need a Hand Recovery
-- Current Task: Owner visual/tuning gate for M43-C004-C001 Fail / Retry / Need a Hand
-- Current Task Status: M43_C004_TECHNICAL_PASS / OWNER_VISUAL_AND_TUNING_GATE_REQUIRED
-- Next Task/Action: OWNER reviews `coordination/sessions/M43-C004-C001/OWNER_VISUAL_REVIEW_V01.md` and the committed evidence. Technical audit is PASS; no remediation is pending. Owner must decide/accept Fail pose/copy, recommendation V1 tuning, disabled WATCH AD presentation, session-scoped failure-counter persistence, and final Need-a-Hand card art direction. After owner PASS, ChatGPT closes SB-M43-050..062 and advances the M43 roadmap.
-- Required Actor: OWNER
+- Current Sprint: M43-C005 — Reward, Pack, Collection, Robot, Feature and World Ceremonies
+- Current Task: Prepare M43-C005 ceremony visual/authority inventory and implementation cycle
+- Current Task Status: M43_C004_FINAL_OWNER_PASS / M43_C005_PREPARATION
+- Next Task/Action: CHATGPT inspects current reward/pack/collection/robot/feature/world authorities and production assets, then prepares the M43-C005 owner visual-master plan, implementation prompt and audit criteria. Do not hand production implementation to Claude until the ceremony surfaces and any blocked world-range authority are separated cleanly.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 961 / 1414 = 67.96%. SB-M42-034 and SB-M42-035 are CLOSED. `MAINT-HOME-EXPORT-ASSET-GATE-C001` is independently AUDITED_PASS/CLOSED: source-tree SHA enforcement remains strict, exported templates use explicit packaged-resource validation, and a real Godot 4.7.2 Web export proved 24/24 Home art bindings plus gesture counts 14/15/17/17 with raw source PNG absent. Maintenance does not change the roadmap denominator. M43-C004 is now the active frontier.
-- Note: `coordination/sessions/M43-C004-C001/CHATGPT_AUDIT_V01.md` = TECHNICAL_PASS / OWNER_VISUAL_AND_TUNING_GATE_REQUIRED. C004 proves terminal LOST spends one Heart exactly once, third-failure assistance is authoritative and deterministic, Need a Hand has exactly two cards with per-card BUY + WATCH AD, X/Back dismissal, canonical SB/rewarded acquisition, no terminal-board booster execution, and focused 40/40 + root 5323/5323 PASS. No Claude remediation is currently required.
+- Progress: 974 / 1414 = 68.88%. SB-M43-050..062 are CLOSED by technical audit plus final owner acceptance. M43-C004-C001 is complete; M43-C005 is now the active frontier.
+- Note: `coordination/sessions/M43-C004-C001/CHATGPT_AUDIT_V01.md` = TECHNICAL_PASS and `coordination/sessions/M43-C004-C001/FINAL_OWNER_ACCEPTANCE_V01.md` = FINAL OWNER PASS. Accepted: Help Scrubby fail pose, current Fail copy, current recommendation weights/order, visible-disabled WATCH AD state, session-scoped assistance counter, and two-card Need-a-Hand art direction with per-card BUY + WATCH AD and no NO THANKS.
 - MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
@@ -1821,19 +1821,19 @@ These tasks extend the already owner-approved Results surface without changing i
 
 #### M43-C004 - Fail / Retry / Need a Hand Recovery
 
-- [ ] SB-M43-050 Produce/owner-approve a canonical Fail/Retry popup visual master.
-- [ ] SB-M43-051 Track consecutive failed attempts per current progression level separately from lifetime stats; replay failures do not pollute progression assistance.
-- [ ] SB-M43-052 Winning the level or changing progression level resets the same-level assistance counter.
-- [ ] SB-M43-053 After the third consecutive failed attempt on the same progression level, show the canonical Need a Hand? popup after failure resolution and Heart/streak accounting.
-- [ ] SB-M43-054 Need a Hand? uses the owner-selected `need a hand.png` as art-direction authority but is implemented with live Godot text/buttons/data.
-- [ ] SB-M43-055 Need a Hand? presents exactly two helpful booster recommendations, not an arbitrary storefront.
-- [ ] SB-M43-056 Recommendation engine must prefer boosters that are legal/useful for the level/current canonical start-state and must never recommend an unavailable/meaningless action.
-- [ ] SB-M43-057 Where solver/context evidence cannot distinguish a best pair safely, use a deterministic owner-configured fallback pair rather than fake intelligence.
-- [ ] SB-M43-058 Each recommended booster can be acquired with its canonical SB cost or a rewarded-video grant when available.
-- [ ] SB-M43-059 Closing Need a Hand? never spends currency, consumes a Heart, grants a booster or changes puzzle truth.
-- [ ] SB-M43-060 Assistance popup frequency after the initial third failure is configurable and must avoid appearing after every tap/instant retry in an annoying loop.
-- [ ] SB-M43-061 Record assistance shown/acquired/declined locally and later expose analytics events under M56 without changing gameplay difficulty behind the player's back.
-- [ ] SB-M43-062 Test third-failure trigger, reset-on-win, reset-on-level-change, ad/SB acquisition, no-double-grant and unavailable-booster fallback.
+- [x] SB-M43-050 Produce/owner-approve a canonical Fail/Retry popup visual master.
+- [x] SB-M43-051 Track consecutive failed attempts per current progression level separately from lifetime stats; replay failures do not pollute progression assistance.
+- [x] SB-M43-052 Winning the level or changing progression level resets the same-level assistance counter.
+- [x] SB-M43-053 After the third consecutive failed attempt on the same progression level, show the canonical Need a Hand? popup after failure resolution and Heart/streak accounting.
+- [x] SB-M43-054 Need a Hand? uses the owner-selected `need a hand.png` as art-direction authority but is implemented with live Godot text/buttons/data.
+- [x] SB-M43-055 Need a Hand? presents exactly two helpful booster recommendations, not an arbitrary storefront.
+- [x] SB-M43-056 Recommendation engine must prefer boosters that are legal/useful for the level/current canonical start-state and must never recommend an unavailable/meaningless action.
+- [x] SB-M43-057 Where solver/context evidence cannot distinguish a best pair safely, use a deterministic owner-configured fallback pair rather than fake intelligence.
+- [x] SB-M43-058 Each recommended booster can be acquired with its canonical SB cost or a rewarded-video grant when available.
+- [x] SB-M43-059 Closing Need a Hand? never spends currency, consumes a Heart, grants a booster or changes puzzle truth.
+- [x] SB-M43-060 Assistance popup frequency after the initial third failure is configurable and must avoid appearing after every tap/instant retry in an annoying loop.
+- [x] SB-M43-061 Record assistance shown/acquired/declined locally and later expose analytics events under M56 without changing gameplay difficulty behind the player's back.
+- [x] SB-M43-062 Test third-failure trigger, reset-on-win, reset-on-level-change, ad/SB acquisition, no-double-grant and unavailable-booster fallback.
 
 #### M43-C005 - Reward, Pack, Collection, Robot, Feature and World Ceremonies
 
