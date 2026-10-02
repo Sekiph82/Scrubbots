@@ -192,7 +192,7 @@ func _results_on_real_won() -> void:
 	_ok(nav.last_payload() == {"status": "WON", "level": 1, "attempt": 1}, "minimal payload %s" % str(nav.last_payload()))
 	_ok(seen["sb_at_results"] > sb0 and app.progression.current_level() == 2, "first-clear economy + progression committed before Results")
 	var res = root.get_results_screen()
-	_ok(res.visible and res.get_payload()["status"] == "WON" and res.get_primary_button().text == "CONTINUE", "Results visible: WON / CONTINUE")
+	_ok(res.visible and res.get_payload()["status"] == "WON" and res.get_primary_button().text == "CLEAN NEXT", "Results visible: WON / CLEAN NEXT (M43-C001R label of the Continue intent)")
 	# M52-C001: next frontier (level 2) is real catalog content (Apple).
 	_ok(not res.get_primary_button().disabled, "CONTINUE enabled: next frontier (level 2) has content")
 	h.get_completion().terminal_reached.emit(&"WON", {})
