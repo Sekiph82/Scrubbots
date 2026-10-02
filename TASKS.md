@@ -6,14 +6,14 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
 - Current Sprint: M43-C005 — Reward, Pack, Collection, Robot, Feature and World Ceremonies
-- Current Task: Claude produces M43-C005 ceremony visual-master candidate family and asset inventory (SB-M43-076 gate)
-- Current Task Status: M43_C005_VISUAL_MASTER_PROMPT_READY / READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C005-C001/CHATGPT_PROMPT_V01.md` to produce the non-shipping ceremony visual-master candidate family, asset inventory, responsive evidence and owner-review pack for SB-M43-076. Production ceremony implementation SB-M43-063..075/077 and Results handoff SB-M43-013 remain blocked until owner visual approval. World runtime SB-M43-073 remains additionally blocked by future owner-approved world ranges/registry.
-- Required Actor: CLAUDE
+- Current Task: ChatGPT produces new Standard/Premium pack art + opening-animation asset sets and booster-of-choice icon; Collection cards queued for clean re-export
+- Current Task Status: M43_C005_PARTIAL_OWNER_PASS / PACK_ASSET_REMEDIATION
+- Next Task/Action: CHATGPT produces owner-review visual assets for Standard Pack, Premium Pack, both opening animation sets, and Booster-of-your-choice. After owner art approval, Claude cleans/re-exports all 135 Collection cards from original owner sheets and rebuilds the Standard/Premium pack preview masters around closed-pack -> opening -> all-cards-together reveal. Other C005 visual-master groups are owner-approved.
+- Required Actor: CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 982 / 1414 = 69.45%. SB-M43-R01-001..008 are CLOSED by V02 technical audit plus final owner acceptance. M43-C001R is complete; M43-C005 is now the active frontier.
-- Note: M43-C001R is CLOSED. M43-C005 starts with owner-required visual gate SB-M43-076 before production ceremony implementation. Current prompt creates visual candidates only for Standard/Premium pack opening, set/master completion, robot unlock, Gift milestone, generic feature/world shells and compact generic reward using existing final assets. No grants/unlocks/claims/world ranges are implemented in this gate.
+- Note: C005 V01 technical gate passed. Owner accepts Set Complete, Master Collection, Robot Unlock, Gift milestone, Feature shell, World shell and Generic Reward. Standard/Premium Pack candidates require redesign with dedicated closed-pack art and opening animation sets; Collection cards require clean uniform re-crop from original owner sheets; Booster-of-your-choice requires a dedicated icon. See `coordination/sessions/M43-C005-C001/OWNER_VISUAL_DECISION_V02.md`.
 - MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
