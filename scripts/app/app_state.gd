@@ -32,6 +32,7 @@ const EffectsSettingsService = preload("res://scripts/settings/effects_settings_
 const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
 const EconomyConfig = preload("res://scripts/economy/economy_config.gd")
 const ProductionActionFacade = preload("res://scripts/economy/production_action_facade.gd")
+const FailureAssistanceService = preload("res://scripts/economy/failure_assistance_service.gd")
 
 const CANONICAL_SAVE_PATH := "user://scrubbots_save.dat"
 
@@ -47,6 +48,8 @@ var is_blocked: bool = false
 ## App-wide economy action facade (menus/Home; no gameplay host). Committed
 ## actions save through request_save (M40 V04, F-M40-V03-003).
 var actions: ProductionActionFacade
+## M43-C004 same-level failure counter / Need a Hand choice (session-scoped, not saved).
+var assist: FailureAssistanceService
 var _dirty: bool = false
 
 ## clock/local_day are test seams. Production passes neither: the shipping graph
@@ -62,6 +65,7 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	load_result = save.load()
 	is_blocked = not bool(load_result.get("ok", false)) and String(load_result.get("source", "")) == "future_schema"
 	actions = ProductionActionFacade.new(economy, null, Callable(self, "request_save"))
+	assist = FailureAssistanceService.new()
 	# M43-C003: a committed rewarded grant hits the canonical save boundary.
 	economy.rewarded.bind_save(Callable(self, "request_save"))
 

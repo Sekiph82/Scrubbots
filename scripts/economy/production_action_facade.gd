@@ -67,6 +67,11 @@ func tornado(color) -> Dictionary:
 	var r = _host.get_booster_service().apply_tornado(_host.get_booster_adapter(), color)
 	return _booster_done("tornado", r)
 
+## M43-C004: buy one saved charge (no execution; usable on the next attempt). Needs no
+## gameplay host, so terminal-recovery UI can call it.
+func buy_booster_charge(id: String) -> Dictionary:
+	return _finish("buy_booster_charge", _economy.boosters.buy_charge(id))
+
 func _booster_done(action: String, r: Dictionary) -> Dictionary:
 	if r.get("ok", false):
 		_host.on_booster_committed()

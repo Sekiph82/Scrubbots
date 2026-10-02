@@ -74,6 +74,7 @@ const Popups = preload("res://scripts/ui/popup/popups.gd")
 const AcquisitionFlow = preload("res://scripts/ui/popup/acquisition_flow.gd")
 const ShopHandoff = preload("res://scripts/app/shop_handoff.gd")
 const PaletteColors = preload("res://scripts/data/palette_colors.gd")
+const FailureAssistanceService = preload("res://scripts/economy/failure_assistance_service.gd")
 
 const HAZARD_BOT_LEVEL := "res://data/levels/m21_level_001_hazard_bot.json"
 
@@ -152,6 +153,10 @@ var last_first_clear_result: Dictionary = {}
 ## M43-C001A: read-only receipt of what THIS attempt's terminal committed (built once,
 ## inside the latched terminal economy transaction; cleared by a successful Retry).
 var _terminal_receipt: Dictionary = {}
+## M43-C004: the ONE failure-assistance authority (AppState's; a private one without it)
+## and this attempt's Need a Hand offer, decided once inside the latched terminal.
+var _assist = null
+var _assist_offer: Dictionary = {}
 var _actions = null   # ProductionActionFacade (M39 V04)
 ## M52-C001-R01 functional 2x acquisition popup (created on first need).
 var _speed_popup = null
@@ -263,24 +268,9 @@ func build() -> bool:
 	_level = lvl
 	_board = BoardState.from_level_data(lvl)
 
-	# M23 deterministic candidate (M27-proven for seed 1 / 3 columns / preview 3).
-	if supply_plan_path.is_empty():
-		_supply = BatchSupplyGenerator.generate(lvl, column_count, preview_depth, gen_seed)
-		if _supply == null:
-			_build_error = "supply generation failed"
-			return false
-	else:
-		var plan := SupplyPlanLoader.load_engine(supply_plan_path, lvl)
-		if not plan["ok"]:
-			_build_error = "supply_plan_invalid:%s" % plan["error"]
-			return false
-		_supply = plan["engine"]
-	# QA/debug-only DEADLOCK fixture: drop the last N generated batches (see qa_supply_drop_last).
-	if qa_supply_drop_last > 0:
-		_supply = _make_deadlock_supply(_supply, qa_supply_drop_last, lvl.palette.size())
-		if _supply == null:
-			_build_error = "qa deadlock supply build failed"
-			return false
+	_supply = _make_supply(lvl)
+	if _supply == null:
+		return false
 	_slots = FiveSlotBatchEngine.new()
 
 	# Production GameplayScreen composition (M28), configured with detached snapshots.
@@ -452,6 +442,8 @@ func build() -> bool:
 		if app_state == null:
 			_economy.rewarded.bind_save(Callable(self, "request_save"))
 	_economy_terminal_done = false
+	_assist = app_state.assist if app_state != null and app_state.assist != null else FailureAssistanceService.new()
+	_assist.on_attempt_started(progression_level, is_progression_attempt())
 	_bind_modal_stack()
 
 	# Meaningful gameplay boundaries mark the completion state dirty (authenticated clear +
@@ -466,6 +458,31 @@ func build() -> bool:
 	_wire_controls()
 	_built = true
 	return true
+
+## The attempt's initial supply engine (generated candidate or owner plan, plus the QA
+## deadlock drop). Also builds the detached next-start probe for Need a Hand, so both are
+## the same canonical start-state. null on failure (with _build_error set).
+func _make_supply(lvl):
+	var eng
+	# M23 deterministic candidate (M27-proven for seed 1 / 3 columns / preview 3).
+	if supply_plan_path.is_empty():
+		eng = BatchSupplyGenerator.generate(lvl, column_count, preview_depth, gen_seed)
+		if eng == null:
+			_build_error = "supply generation failed"
+			return null
+	else:
+		var plan := SupplyPlanLoader.load_engine(supply_plan_path, lvl)
+		if not plan["ok"]:
+			_build_error = "supply_plan_invalid:%s" % plan["error"]
+			return null
+		eng = plan["engine"]
+	# QA/debug-only DEADLOCK fixture: drop the last N generated batches (see qa_supply_drop_last).
+	if qa_supply_drop_last > 0:
+		eng = _make_deadlock_supply(eng, qa_supply_drop_last, lvl.palette.size())
+		if eng == null:
+			_build_error = "qa deadlock supply build failed"
+			return null
+	return eng
 
 ## QA-only: rebuild `engine` minus `drop` batches taken from the DRAIN TAIL — the deepest
 ## batches of the highest-index non-empty column first (col N back, then col N-1, ...). That
@@ -570,6 +587,7 @@ func _on_retry_restored() -> void:
 	if _economy != null:
 		_economy_terminal_done = false
 		_terminal_receipt = {}
+		_assist_offer = {}
 		_economy.capacity.begin_new_attempt()
 		var restart_mutated: bool = _economy.streak.gameplay_started()
 		if restart_mutated:
@@ -656,6 +674,7 @@ func _drive_economy_terminal(status) -> void:
 		return
 	# M43-C001A: authoritative pre-commit probe for the Results receipt (read-only).
 	var pre: Dictionary = TerminalRewardReceipt.capture(_progression, _economy)
+	var progression_attempt := is_progression_attempt()
 	if status == CompletionEvaluator.WON:
 		_economy_terminal_done = true
 		# M39 V03 (F-M39-V02-014): the M37 forward-only progression authority
@@ -684,6 +703,94 @@ func _drive_economy_terminal(status) -> void:
 		_terminal_receipt = TerminalRewardReceipt.build(String(status), progression_level, pre,
 			TerminalRewardReceipt.capture(_progression, _economy),
 			last_first_clear_result if status == CompletionEvaluator.WON else {}, saved)
+		_record_assistance(String(status), progression_attempt)
+
+# ------------------------------------------------------- M43-C004 Need a Hand --
+
+## Is this attempt a PROGRESSION attempt (the canonical frontier)? Replay / stale /
+## future levels are not, and never touch the failure-assistance counter.
+func is_progression_attempt() -> bool:
+	return _progression != null and progression_level == int(_progression.current_level())
+
+## Count this terminal (after economy + save committed) and, when assistance is due,
+## decide the Need a Hand offer once: two boosters proved legal on the NEXT canonical
+## start-state, ranked by read-only terminal context. Fewer than two -> fail closed.
+func _record_assistance(status: String, progression_attempt: bool) -> void:
+	if _assist == null:
+		return
+	var rec: Dictionary = _assist.record_terminal(progression_level, status, progression_attempt)
+	_assist_offer = {"show": false, "due": bool(rec["due"]), "count": int(rec["count"]),
+		"level": progression_level, "picks": [], "reason": "not_due"}
+	if not rec["due"]:
+		return
+	var r: Dictionary = _assist.recommend(next_start_prover(), terminal_context())
+	_assist_offer["picks"] = r["picks"]
+	_assist_offer["reason"] = r["reason"]
+	_assist_offer["show"] = bool(r["ok"])
+	if not r["ok"]:
+		_assist.note_fail_closed(progression_level, String(r["reason"]))
+
+## Detached copy of this attempt's Need a Hand offer ({} before a terminal / after Retry).
+func get_assistance_offer() -> Dictionary:
+	return _assist_offer.duplicate(true)
+
+func get_failure_assistance():
+	return _assist
+
+## Need a Hand was presented for this attempt's offer (analytics seam only).
+func note_assistance_shown() -> void:
+	if _assist != null and bool(_assist_offer.get("show", false)):
+		_assist.note_shown(progression_level, (_assist_offer["picks"] as Array).map(func(p): return p["id"]))
+
+## Booster legality prover for the NEXT canonical retry/start-state: a detached fresh
+## board, the same deterministic initial supply and empty five slots, checked by the SAME
+## adapter solver proofs the live booster transactions use. The live (terminal) board,
+## supply and slots are never touched. Returns Callable(id) -> bool.
+func next_start_prover() -> Callable:
+	var supply = _make_supply(_level) if _level != null else null
+	if supply == null:
+		return func(_id): return false
+	var slots = FiveSlotBatchEngine.new()
+	var adapter = ProductionBoosterAdapter.new(_level, BoardState.from_level_data(_level), supply, slots, null)
+	return func(id) -> bool:
+		match String(id):
+			BoosterInventory.PLUS_ONE_SLOT:
+				return slots.can_grow_to_sixth()
+			BoosterInventory.RANDOM:
+				return bool(adapter.propose_random_reorder().get("safe", false))
+			BoosterInventory.SELECTOR:
+				return adapter.has_eligible_safe_batch()
+			BoosterInventory.TORNADO:
+				return not adapter.present_colors().is_empty()
+		return false
+
+## All four proofs on the next start-state (evidence/tests): {id: bool}.
+func next_start_legality() -> Dictionary:
+	var prove := next_start_prover()
+	var out := {}
+	for id in BoosterInventory.BOOSTERS:
+		out[id] = bool(prove.call(id))
+	return out
+
+## Read-only signals from the terminal state that explain the failure: every slot was
+## occupied, one colour dominates the remaining cells, supply was left over.
+func terminal_context() -> Dictionary:
+	var counts := {}
+	var total := 0
+	if _board != null:
+		for i in range(_board.get_cell_count()):
+			if _board.get_cell_state(i) == BoardState.CellState.ACTIVE:
+				var c = _board.get_color_id(i)
+				counts[c] = int(counts.get(c, 0)) + 1
+				total += 1
+	var top := 0
+	for c in counts:
+		top = maxi(top, int(counts[c]))
+	return {
+		"slots_full": _slots != null and _slots.rightmost_empty_index() == -1,
+		"dominant_color": total > 0 and _assist != null and float(top) / float(total) >= float(_assist.dominant_share),
+		"supply_remaining": _supply != null and not _supply.is_exhausted(),
+	}
 
 ## M43-C001A: detached copy of this attempt's terminal receipt ({} before a WON/LOST
 ## terminal committed, or after a Retry began a fresh attempt).

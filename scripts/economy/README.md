@@ -13,6 +13,7 @@ Planned modules:
 - `gift_meter_service.gd` — Win-Streak-SB-only meter, milestones 10/50/250/500/1000, rollover, Gift Bar queue.
 - `daily_service.gd` — consecutive-login streak, 5-day cycle and three daily tasks.
 - `booster_inventory.gd` — exactly four charge counters: +1 Slot, Random, Selector, Tornado.
+- `failure_assistance_service.gd` — M43-C004 same-level consecutive-failure counter (session-scoped) and the Need a Hand two-booster recommendation (`data/config/failure_assistance_v1.json`).
 - `speed_entitlement_service.gd` — current-level and wall-clock timed 2x entitlements.
 - `cards_exchange_service.gd` — protected-first-copy duplicate exchange to SB.
 

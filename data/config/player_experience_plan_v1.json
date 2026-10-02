@@ -13,7 +13,7 @@
     "reset_on_level_change": true,
     "replay_fail_counts": false,
     "recommendation_count": 2,
-    "repeat_frequency_after_threshold": "OWNER_TUNING_REQUIRED"
+    "repeat_frequency_after_threshold": "V1_ONCE_UNTIL_RESET (runtime authority: data/config/failure_assistance_v1.json)"
   },
   "hearts": {
     "max": 5,

@@ -19,7 +19,13 @@ extends Control
 ##   - a short ordered row reveal (presentation only; rows exist from the start, grants
 ##     are already committed, Continue is never gated by it). Reduced Effects shows every
 ##     row immediately.
-## LOST/ERROR keep the technical fallback layout with NO Victory art (final LOST is M43-C004).
+## M43-C004 (SB-M43-050) — LOST is the production Fail surface in the same family: the
+##   existing help Scrubby pose (no sad pose exists yet) above the cream frame, the
+##   existing fail emblem in the header, `LEVEL FAILED`, live level, the committed loss
+##   rows from the receipt (Hearts before -> after, ended Win Streak), Retry primary and
+##   Home secondary. No Victory art, no Replay, no ad CTA. It only presents the loss the
+##   host already committed; Retry/Home apply nothing here.
+## ERROR keeps the technical fallback layout with NO Victory art.
 ## There is no Replay control (owner A1-NO).
 ##
 ## Actions (intents only; the app root performs them):
@@ -40,6 +46,8 @@ const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 ## Existing approved production art (never written by this screen).
 const ROBOT_ART := "res://assets/ui/final/popups/victory/victory_scrubby_pose.png"
 const EMBLEM_ART := "res://assets/ui/final/popups/victory/victory_emblem.png"
+const FAIL_ROBOT_ART := "res://assets/ui/final/popups/help/help_scrubby_pose.png"
+const FAIL_EMBLEM_ART := "res://assets/ui/final/popups/failure/fail_header_emblem.png"
 const ICON_ART := {
 	"first_clear_sb": "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
 	"win_streak_sb": "res://assets/ui/final/home/reward_track/win_streak_reward_badge.png",
@@ -47,6 +55,7 @@ const ICON_ART := {
 	"gift_meter": "res://assets/ui/final/home/gift_meter/gift_meter_emblem.png",
 	"collection_cards": "res://assets/ui/final/rewards/card_pack_standard.png",
 	"gift_ready": "res://assets/ui/final/rewards/gift_box.png",
+	"heart": "res://assets/ui/final/common/currencies/icon_currency_heart.png",
 }
 
 ## WON composition metrics (reference 1080-wide portrait).
@@ -68,6 +77,8 @@ var _payload: Dictionary = {}
 var _model: Dictionary = {}
 var _continue_latched := false
 var _victory := false
+## Production family chrome (WON Victory or LOST Fail); false = ERROR technical fallback.
+var _styled := false
 var _stack: VBoxContainer
 var _robot_slot: CenterContainer
 var _robot: TextureRect
@@ -172,7 +183,7 @@ func show_model(model: Dictionary) -> void:
 	var won := status == "WON"
 	var cont: Dictionary = _model.get("continue", {})
 	var continue_available := bool(cont.get("available", false))
-	_apply_layout(won)
+	_apply_layout(status)
 	_title.text = UiText.t("RESULTS_WON" if won else ("RESULTS_LOST" if status == "LOST" else "RESULTS_ERROR"))
 	_level.text = UiText.t("RESULTS_LEVEL", [int(_payload["level"])])
 	_primary.text = UiText.t("RESULTS_CONTINUE" if won else "RESULTS_RETRY")
@@ -182,26 +193,31 @@ func show_model(model: Dictionary) -> void:
 	_home.text = UiText.t("RESULTS_HOME")
 	_clear_lines()
 	var receipt: Dictionary = _model.get("receipt", {})
-	for r in reward_rows(receipt):
-		_lines.add_child(_row(r) if _victory else _plain_line(r["text"]))
+	for r in (reward_rows(receipt) if won else loss_rows(receipt)):
+		_lines.add_child(_row(r) if _styled else _plain_line(r["text"]))
 	_note.text = ""
-	if won and bool(receipt.get("already_cleared", false)):
+	if status == "LOST":
+		_note.text = UiText.t("FAIL_ENCOURAGE")
+	elif won and bool(receipt.get("already_cleared", false)):
 		_note.text = UiText.t("RESULTS_ALREADY_CLEARED")
 	elif won and not continue_available and cont.has("next_level"):
 		_note.text = UiText.t("RESULTS_NEXT_UNAVAILABLE", [int(cont["next_level"])])
 	_note.visible = not _note.text.is_empty()
 	_start_reveal(bool(_model.get("reduced_effects", false)))
 
-## WON = Victory composition; LOST/ERROR = technical fallback with no Victory art.
-func _apply_layout(won: bool) -> void:
+## WON = Victory composition; LOST = Fail composition (same family, failure art);
+## ERROR = technical fallback. No Victory art outside WON.
+func _apply_layout(status: String) -> void:
+	var won := status == "WON"
 	_victory = won
-	theme = _victory_theme if won else null
-	_robot_slot.visible = won
-	_emblem.visible = won
-	_robot.texture = load(ROBOT_ART) if won else null
-	_emblem.texture = load(EMBLEM_ART) if won else null
-	_stack.add_theme_constant_override("separation", -ROBOT_OVERLAP if won else 0)
-	if won:
+	_styled = won or status == "LOST"
+	theme = _victory_theme if _styled else null
+	_robot_slot.visible = _styled
+	_emblem.visible = _styled
+	_robot.texture = load(ROBOT_ART if won else FAIL_ROBOT_ART) if _styled else null
+	_emblem.texture = load(EMBLEM_ART if won else FAIL_EMBLEM_ART) if _styled else null
+	_stack.add_theme_constant_override("separation", -ROBOT_OVERLAP if _styled else 0)
+	if _styled:
 		_panel.custom_minimum_size = Vector2(FRAME_WIDTH, 0)
 		var frame := HomeStyle.box(CREAM, ROYAL, 12, 44, 18, 6)
 		HomeStyle.pad(frame, UiTokens.SPACE_XL, UiTokens.SPACE_LG)
@@ -225,7 +241,7 @@ func _apply_layout(won: bool) -> void:
 		_home.add_theme_font_size_override("font_size", UiTokens.FONT_BODY)
 		_home.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
 	else:
-		# Technical fallback (pre-C001B look). M43-C004 replaces this for LOST.
+		# Technical fallback (pre-C001B look), ERROR only.
 		_panel.custom_minimum_size = Vector2(720, 0)
 		var sb := StyleBoxFlat.new()
 		sb.bg_color = Color(0.125, 0.145, 0.2, 1.0)
@@ -342,6 +358,20 @@ static func reward_rows(receipt: Dictionary) -> Array:
 	for f in receipt.get("follow_ups", []):
 		if String(f.get("kind", "")) == "gift_milestone":
 			out.append({"kind": "gift_milestone", "icon": "gift_ready", "text": UiText.t("RESULTS_GIFT_READY")})
+	return out
+
+## M43-C004: committed loss rows of a LOST receipt (Hearts before -> after, an ended Win
+## Streak). Only what the terminal actually changed; nothing outside the receipt.
+static func loss_rows(receipt: Dictionary) -> Array:
+	var out: Array = []
+	if String(receipt.get("status", "")) != "LOST":
+		return out
+	var h: Dictionary = receipt.get("hearts", {})
+	if h.has("before") and h.has("after"):
+		out.append({"kind": "hearts", "icon": "heart", "text": UiText.t("FAIL_HEARTS", [int(h["before"]), int(h["after"])])})
+	var s: Dictionary = receipt.get("streak", {})
+	if int(s.get("before", 0)) > int(s.get("after", 0)):
+		out.append({"kind": "streak_reset", "icon": "win_streak_sb", "text": UiText.t("FAIL_STREAK_RESET", [int(s["before"])])})
 	return out
 
 ## Text-only view of reward_rows (M43-C001A contract).

@@ -150,6 +150,18 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 		if _results.visible:
 			_results.show_model(_results_model(_payload))
 			move_child(_results, get_child_count() - 1)
+			if String(_payload.get("status", "")) == "LOST":
+				_offer_need_a_hand()
+
+## M43-C004: on the Fail surface of a due third failure, Need a Hand opens on the ONE
+## ModalStack over Fail. The host decided the offer inside its latched terminal (after the
+## loss/economy/save committed); closing it returns to the usable Fail, no auto-Retry.
+func _offer_need_a_hand() -> void:
+	var host = _gameplay_host
+	if host == null or not is_instance_valid(host) or _acq == null:
+		return
+	if _acq.open_need_a_hand(host.get_assistance_offer()) != null:
+		host.note_assistance_shown()
 
 ## M43-C001A: the ONE Results model for a RESULTS route payload. The receipt is the
 ## host's committed terminal truth (never recomputed here); continue availability is the
