@@ -4,16 +4,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 ## Project Status
 
-- Current Milestone: MAINT HOME EXPORT ASSET GATE
-- Current Sprint: MAINT-HOME-EXPORT-ASSET-GATE-C001 — Export-safe Home approved-art binding
-- Current Task: Claude implements explicit strict-source vs packaged-runtime Home asset validation and proves it with a real Web export
-- Current Task Status: OWNER_AUTHORIZED / READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/MAINT-HOME-EXPORT-ASSET-GATE-C001/CHATGPT_PROMPT_V01.md`, preserves strict approved-source SHA verification for editor/tests/pre-export, adds explicit packaged-runtime ResourceLoader validation for exported builds, runs the M42 regressions, and proves the fix in a real Godot 4.7.2 Web export before returning `AWAITING_GPT_MAINT_HOME_EXPORT_ASSET_GATE_C001_AUDIT`.
-- Required Actor: CLAUDE
+- Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
+- Current Sprint: M43-C004 — Fail / Retry / Need a Hand Recovery
+- Current Task: Prepare the canonical M43-C004 Fail/Retry visual master and owner gate before production implementation
+- Current Task Status: MAINT_EXPORT_GATE_CLOSED / M43_C004_VISUAL_MASTER_REQUIRED
+- Next Task/Action: CHATGPT prepares the M43-C004 Fail/Retry visual master using the established popup family; OWNER approves the visual gate. The existing owner-selected `need a hand.png` remains the Need-a-Hand art-direction authority. After visual approval, Claude implements SB-M43-050..062 as the next production cycle.
+- Required Actor: CHATGPT / OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 961 / 1414 = 67.96%. SB-M42-034 and SB-M42-035 are CLOSED. OWNER explicitly accepted all four M42-C003 V03 runtime gestures (Wave, Bow, Turn/Look, Full Turn) on 2026-10-02; `OWNER_VISUAL_GATE_V03.md` records `4/4 PASS`. A newly verified exported-build Home-art binding defect is now the blocking maintenance frontier before M43 resumes.
-- Note: M42-C003 V03 is fully closed by technical audit plus owner visual gate. Current maintenance authority: `coordination/sessions/MAINT-HOME-EXPORT-ASSET-GATE-C001/OWNER_DECISION_V01.md`, prompt `CHATGPT_PROMPT_V01.md`, criteria `CHATGPT_AUDIT_CRITERIA_V01.md`. The export bug is caused by raw source PNG SHA checks running inside exported PCK runtime where only imported resources/remaps are available; no approved art or pin is being changed.
+- Progress: 961 / 1414 = 67.96%. SB-M42-034 and SB-M42-035 are CLOSED. `MAINT-HOME-EXPORT-ASSET-GATE-C001` is independently AUDITED_PASS/CLOSED: source-tree SHA enforcement remains strict, exported templates use explicit packaged-resource validation, and a real Godot 4.7.2 Web export proved 24/24 Home art bindings plus gesture counts 14/15/17/17 with raw source PNG absent. Maintenance does not change the roadmap denominator. M43-C004 is now the active frontier.
+- Note: Export-safe Home binding closure: `coordination/sessions/MAINT-HOME-EXPORT-ASSET-GATE-C001/CHATGPT_AUDIT_V01.md` = AUDITED_PASS / CLOSED. M42-C003 remains fully closed with 4/4 owner visual PASS. Before M43-C004 production code, SB-M43-050 requires a canonical Fail/Retry popup visual master and owner approval; Need a Hand already has the selected `assets/art/references/_owner_inbox/Additionals/need a hand.png` authority.
 - MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
