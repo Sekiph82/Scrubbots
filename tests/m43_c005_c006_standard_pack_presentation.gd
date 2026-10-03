@@ -1,7 +1,8 @@
 extends SceneTree
-## M43-C005-C006 (SB-M43-064) — shipping Standard Card Pack opening presentation.
+## M43-C005-C006 (SB-M43-064) V02 — shipping Standard Card Pack interactive opening.
 ## Real ModalStack + StandardPackCeremony (BasePopup) + RevealSequencer + promoted owner
-## frames + canonical C003 cards, driven by deterministic COMMITTED fixture models.
+## frames + canonical C003 cards, deterministic COMMITTED fixture models. Player taps are
+## delivered as real InputEventMouseButton through SubViewport.push_input (both gates).
 ## Expected/completed case ledger.
 ##
 ## Run: godot --headless --path . -s res://tests/m43_c005_c006_standard_pack_presentation.gd
@@ -16,22 +17,25 @@ const AppState = preload("res://scripts/app/app_state.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const Fx = preload("res://tests/support/standard_pack_fixtures.gd")
 
+const SIZE := Vector2i(1080, 1920)
 const MANIFEST := "res://coordination/sessions/M43-C005-C002/PACK_ASSET_MANIFEST_V01.json"
 const CAND_DIR := "res://assets/ui/candidates/m43_c005/pack_opening/standard/"
 const CARD_TREE := "res://assets/ui/final/collection/cards/"
-## Identifiers meaning pack-opening / grant / Collection / save / navigation / RNG authority.
+## Identifiers meaning pack-opening / grant / Collection / exchange / save / navigation / RNG authority.
 const FORBIDDEN := ["open_standard", "open_premium", "grant_guaranteed_new", "add_card", "claim",
-	"grant", "RewardGrant", "CardPackService", "CollectionInventory", "EconomyServices", "economy",
-	"AppState", "save", "Save", "Navigation", "navigation", "RandomNumberGenerator", "randi", "randf",
-	"randomize", "shuffle", "pick_random", "change_scene", "rewarded", "iap", "IAP"]
+	"grant", "RewardGrant", "CardPackService", "CollectionInventory", "CardsExchange", "exchange_card",
+	"exchange_all_extras", "EconomyServices", "economy", "AppState", "save", "Save", "Navigation",
+	"navigation", "RandomNumberGenerator", "randi", "randf", "randomize", "shuffle", "pick_random",
+	"change_scene", "rewarded", "iap", "IAP"]
 const SOURCES := ["res://scripts/ui/ceremony/standard_pack_ceremony.gd",
 	"res://scripts/ui/ceremony/standard_pack_model.gd", "res://scripts/collection/collection_card_catalog.gd"]
 
 var EXPECTED_CASES := [
-	"c01_frame_hashes", "c02_frame_order", "c03_requires_three", "c04_three_faces_final",
-	"c05_canonical_card_tree", "c06_rarity_and_name", "c07_new_duplicate", "c08_no_reroll_back",
-	"c09_reduced_parity", "c10_no_state_mutation", "c11_lifecycle", "c12_static_guard",
-	"c13_sensitivity",
+	"c01_frame_hashes", "c03_requires_three", "c05_canonical_card_tree", "c06_rarity_and_name",
+	"c07_new_duplicate", "c12_static_guard", "c13_model_sensitivity",
+	"v01_initial_pack_only", "v02_no_auto_start", "v03_tap1_opening_order", "v04_hold_pack_absent",
+	"v05_destinations_corners", "v06_tap2_required", "v07_mixed_routing", "v08_repeat_routing",
+	"v09_no_state_mutation", "v10_complete_once", "v11_lifecycle_back", "v12_reduced_semantics",
 ]
 
 var _fail := 0
@@ -44,74 +48,45 @@ func _initialize() -> void:
 	await process_frame
 	_mount()
 	_c01_frame_hashes()
-	await _c02_frame_order()
 	_c03_requires_three()
-	await _c04_three_faces_final()
+	await _v01_initial_pack_only()
+	await _v02_no_auto_start()
+	await _v03_tap1_opening_order()
+	await _v04_hold_pack_absent()
+	await _v05_destinations_corners()
+	await _v06_tap2_required()
+	await _v07_mixed_routing()
+	await _v08_repeat_routing()
 	await _c05_canonical_card_tree()
 	await _c06_rarity_and_name()
 	await _c07_new_duplicate()
-	await _c08_no_reroll_back()
-	await _c09_reduced_parity()
-	await _c10_no_state_mutation()
-	await _c11_lifecycle()
+	await _v09_no_state_mutation()
+	await _v10_complete_once()
+	await _v11_lifecycle_back()
+	await _v12_reduced_semantics()
 	_c12_static_guard()
-	await _c13_sensitivity()
+	_c13_model_sensitivity()
 	_unmount()
 	await _frames(3)   # let queued popup frees flush before exit
 	_cleanup()
 	_done()
 
-# ------------------------------------------------------------------ cases ----
+# ------------------------------------------------------------- asset / model ----
 
-## 1. Promoted frames are the exact owner-accepted bytes (manifest authority).
+## Promoted frames are the exact owner-accepted bytes (manifest authority).
 func _c01_frame_hashes() -> void:
 	print("[c01 promoted frame hashes]")
 	var want := _manifest_hashes()
 	var ok := want.size() == 9
 	for f in StandardPackCeremony.PACK_FRAMES:
 		var dst := FileAccess.get_sha256(StandardPackCeremony.FRAME_DIR + f)
-		var src := FileAccess.get_sha256(CAND_DIR + f)
-		ok = ok and want.get(f, "") == dst and dst == src
-		print("    %s %s" % [f, dst])
+		ok = ok and want.get(f, "") == dst and dst == FileAccess.get_sha256(CAND_DIR + f)
 	_ok(ok, "9 promoted frames == accepted source == PACK_ASSET_MANIFEST_V01 sha256")
 	var files := Array(DirAccess.get_files_at(StandardPackCeremony.FRAME_DIR)).filter(func(n): return n.ends_with(".png"))
 	files.sort()
-	_ok(files == StandardPackCeremony.PACK_FRAMES, "final family holds exactly the 9 Standard frames %s" % str(files))
-	_ok(not DirAccess.dir_exists_absolute("res://assets/ui/final/rewards/pack_opening/premium"), "no Premium frames promoted")
+	_ok(files == StandardPackCeremony.PACK_FRAMES and not DirAccess.dir_exists_absolute("res://assets/ui/final/rewards/pack_opening/premium"), "exactly the 9 Standard frames; no Premium frames promoted")
 	_complete("c01_frame_hashes")
 
-## 2. Opening beats bind 01 -> 09 in order; no face is visible before frame 09.
-func _c02_frame_order() -> void:
-	print("[c02 frame order]")
-	var p = _create(Fx.mixed("c02"))
-	var steps: Array = []
-	p.get_sequencer().step_started.connect(func(k, i): steps.append([k, i]))
-	_stack.push(p)
-	var early_face := false
-	for _i in range(600):
-		if p.pack_frame < 9:
-			for t in p.get_card_tiles():
-				early_face = early_face or t.modulate.a > 0.0
-		if not p.is_presenting():
-			break
-		await process_frame
-	_ok(_frame_order_ok(p.frame_history()), "pack frames bound strictly 01..09 %s" % str(p.frame_history()))
-	var hist: Array = p.frame_history()
-	var tex_ok := true
-	var manifest := _manifest_hashes()
-	var names: Array = manifest.keys()
-	names.sort()   # manifest order 01..09, independent of the ceremony's own list
-	for v in range(1, 10):   # every beat binds exactly the accepted Nth frame bytes
-		p.pack_frame = v
-		var bound: String = p.get_stage().texture.resource_path
-		tex_ok = tex_ok and bound.get_file() == names[v - 1] and bound.get_base_dir() + "/" == StandardPackCeremony.FRAME_DIR and FileAccess.get_sha256(bound) == manifest[names[v - 1]]
-	_ok(tex_ok and hist == range(1, 10), "beat N binds the accepted Nth frame (name + sha256 vs manifest; no drift, no generated art)")
-	_ok(steps.size() == 13 and steps[0] == ["c02", 0] and steps[12] == ["c02", 12], "one ordered sequencer run: 9 beats + 3 faces + note")
-	_ok(not early_face, "card faces hidden while the pack shows frames 01..08")
-	_close(p)
-	_complete("c02_frame_order")
-
-## 3. Exactly 3 committed cards are required (fail closed otherwise).
 func _c03_requires_three() -> void:
 	print("[c03 exactly 3 cards]")
 	var m := Fx.mixed("c03")
@@ -128,21 +103,175 @@ func _c03_requires_three() -> void:
 	_ok(good["ok"] and StandardPackModel.CARD_COUNT == int(EconomyConfig.new().collection_config()["standard_pack_draws"]), "3 cards accepted; 3 == configured standard_pack_draws")
 	_complete("c03_requires_three")
 
-func _c04_three_faces_final() -> void:
-	print("[c04 three faces at final state]")
-	var p = _create(Fx.mixed("c04"))
-	_stack.push(p)
-	await _until_done(p)
-	var tiles: Array = p.get_card_tiles()
-	var ok := tiles.size() == 3
-	for t in tiles:
-		ok = ok and t.modulate.a == 1.0 and t.is_visible_in_tree() and (t.find_child("CardArt", true, false) as TextureRect).texture != null
-	_ok(ok and p.pack_frame == 9 and p.get_note().modulate.a == 1.0, "final: frame 09 + exactly 3 fully visible faces + committed note")
-	_ok(not p.get_action_button("continue").disabled, "Continue live once the presentation completes")
-	_close(p)
-	_complete("c04_three_faces_final")
+# ------------------------------------------------------------- owner flow ----
 
-## 5. Every face texture is the canonical C003 card for its id; the catalog is consistent.
+## 1. Pack alone: frame 01, no card, no destination, no CTA, no cream frame, "Tap to open".
+func _v01_initial_pack_only() -> void:
+	print("[v01 initial pack-only state]")
+	var p = _push(Fx.mixed("v01"))
+	await _frames(2)
+	var cards_hidden: bool = p.get_card_views().all(func(cv): return not cv.is_visible_in_tree())
+	_ok(p.phase() == "IDLE" and p.get_stage().is_visible_in_tree() and p.pack_frame == 1 and _stage_path(p).ends_with("frame_01_closed.png"), "IDLE: pack frame 01 visible")
+	_ok(cards_hidden and not p.get_destinations_layer().is_visible_in_tree(), "IDLE: no card, no Collection / Exchange destination")
+	_ok(p.get_action_ids().is_empty() and _buttons(p).is_empty() and not p.find_child("Frame", true, false).is_visible_in_tree(), "IDLE: no Continue / no visible button; cream frame hidden")
+	_ok(p.get_hint().is_visible_in_tree() and p.get_hint().text == UiText.t("PACK_TAP_OPEN"), "IDLE: live 'Tap to open' hint")
+	_close(p)
+	_complete("v01_initial_pack_only")
+
+## 2. Nothing auto-starts.
+func _v02_no_auto_start() -> void:
+	print("[v02 no auto-start]")
+	var tw := _tweens()
+	var p = _push(Fx.mixed("v02"))
+	await _frames(150)
+	_ok(p.phase() == "IDLE" and p.frame_history().is_empty() and not p.get_sequencer().is_active() and _tweens() == tw, "150 frames untouched: still IDLE, no frame bound, no run, no tween")
+	_close(p)
+	_complete("v02_no_auto_start")
+
+## 3-5. Tap 1 (real input) starts exactly one run; 01..09 one beat at a time; no strip.
+func _v03_tap1_opening_order() -> void:
+	print("[v03 tap 1 -> 01..09]")
+	var p = _push(Fx.mixed("v03"))
+	var runs: Array = []
+	p.get_sequencer().step_started.connect(func(k, i): if i == 0: runs.append(k))
+	await _frames(2)
+	_tap(p)
+	_ok(p.phase() == "OPENING", "real tap -> OPENING")
+	var extra := [p.tap(), p.tap()]
+	_tap(p)
+	_ok(extra == [false, false], "extra taps during the opening are refused")
+	var max_frame_nodes := 0
+	var early_card := false
+	for _g in range(900):   # capped: a regression fails, never hangs
+		if p.phase() != "OPENING":
+			break
+		max_frame_nodes = maxi(max_frame_nodes, _frame_nodes(p))
+		if p.pack_frame < 9:
+			early_card = early_card or p.get_card_views().any(func(cv): return cv.is_visible_in_tree())
+		await process_frame
+	_ok(runs == ["v03:open"], "exactly one opening run %s" % str(runs))
+	_ok(p.frame_history() == range(1, 10), "frames bound strictly 01..09 %s" % str(p.frame_history()))
+	var manifest := _manifest_hashes()
+	var names: Array = manifest.keys()
+	names.sort()   # manifest order 01..09, independent of the ceremony's own list
+	var tex_ok := true
+	var stage = p.get_stage()
+	for v in range(1, 10):   # every beat binds exactly the accepted Nth frame bytes
+		p.pack_frame = v
+		var bound: String = stage.texture.resource_path
+		tex_ok = tex_ok and bound.get_file() == names[v - 1] and bound.get_base_dir() + "/" == StandardPackCeremony.FRAME_DIR and FileAccess.get_sha256(bound) == manifest[names[v - 1]]
+	_ok(tex_ok, "beat N binds the accepted Nth frame (name + sha256 vs manifest)")
+	_ok(max_frame_nodes == 1, "one current beat at a time: never more than one pack-frame node drawn (no strip)")
+	_ok(not early_card, "no card visible before frame 09")
+	_close(p)
+	_complete("v03_tap1_opening_order")
+
+## 7. After the reveal the pack is gone; exactly 3 readable cards hold in the row.
+func _v04_hold_pack_absent() -> void:
+	print("[v04 three-card hold, pack absent]")
+	var p = _push(Fx.mixed("v04"))
+	await _frames(2)
+	_tap(p)
+	var hold_seen := false
+	for _g in range(900):   # capped: a regression fails, never hangs
+		if p.phase() != "OPENING":
+			break
+		if p.get_stage().modulate.a == 0.0 and not p.get_destinations_layer().visible:
+			hold_seen = hold_seen or p.get_card_views().all(func(cv): return cv.modulate.a == 1.0)
+		await process_frame
+	_ok(hold_seen, "a three-card hold with the pack faded out precedes the destinations")
+	var cvs: Array = p.get_card_views()
+	var at_slots: bool = cvs.all(func(cv): return cv.is_visible_in_tree() and cv.modulate.a == 1.0 and cv.scale == Vector2.ONE and cv.face_center().distance_to(cv.slot_point()) < 0.5)
+	_ok(p.phase() == "AWAIT_ROUTE" and not p.get_stage().is_visible_in_tree() and cvs.size() == 3 and at_slots, "AWAIT_ROUTE: pack absent, 3 cards fully visible at their slots")
+	var rows: Array = cvs.map(func(cv): return cv.get_global_rect())
+	_ok(not rows[0].intersects(rows[1]) and not rows[1].intersects(rows[2]) and rows[0].position.x < rows[1].position.x and rows[1].position.x < rows[2].position.x, "cards in committed order, left to right, no overlap")
+	_close(p)
+	_complete("v04_hold_pack_absent")
+
+## 8. Collection upper-left, Cards Exchange upper-right, both before Tap 2, clear of cards.
+func _v05_destinations_corners() -> void:
+	print("[v05 destinations upper-left / upper-right]")
+	var p = await _to_await(Fx.mixed("v05"))
+	var vp := Vector2(SIZE)
+	var col: Rect2 = p.get_destination("collection").get_global_rect()
+	var exc: Rect2 = p.get_destination("exchange").get_global_rect()
+	_ok(p.get_destinations_layer().is_visible_in_tree() and p.get_destinations_layer().modulate.a == 1.0, "destinations visible before Tap 2")
+	_ok(col.get_center().x < vp.x * 0.25 and col.get_center().y < vp.y * 0.2, "Collection icon upper-left %s" % str(col))
+	_ok(exc.get_center().x > vp.x * 0.75 and exc.get_center().y < vp.y * 0.2, "Cards Exchange icon upper-right %s" % str(exc))
+	_ok(p.get_destination("collection").texture.resource_path == StandardPackCeremony.DEST_ART["collection"] and p.get_destination("exchange").texture.resource_path == StandardPackCeremony.DEST_ART["exchange"], "existing approved Collection / Cards Exchange icons")
+	_ok(p.get_destination("collection").get_node("Label").text == UiText.t("HOME_SC_COLLECTION") and p.get_destination("exchange").get_node("Label").text == UiText.t("HOME_SC_CARDS_EXCHANGE"), "destinations are labelled in text")
+	var clear := true
+	var safe: Rect2 = p.get_layer().get_global_rect().grow(1.0)
+	for cv in p.get_card_views():
+		var r: Rect2 = cv.get_global_rect()
+		clear = clear and not r.intersects(col) and not r.intersects(exc) and safe.encloses(r)
+	_ok(clear and safe.encloses(col) and safe.encloses(exc), "destinations do not cover a card; everything inside the safe area")
+	_close(p)
+	_complete("v05_destinations_corners")
+
+## 9. Cards never route on their own; only a real Tap 2 starts routing, once.
+func _v06_tap2_required() -> void:
+	print("[v06 tap 2 required]")
+	var p = await _to_await(Fx.mixed("v06"))
+	await _frames(150)
+	var still: bool = p.get_card_views().all(func(cv): return cv.route == 0.0 and cv.face_center().distance_to(cv.slot_point()) < 0.5)
+	_ok(p.phase() == "AWAIT_ROUTE" and p.route_log().is_empty() and still and not p.get_sequencer().is_active(), "150 frames untouched: still AWAIT_ROUTE, no route, cards at slots")
+	_ok(p.get_hint().is_visible_in_tree() and p.get_hint().text == UiText.t("PACK_TAP_COLLECT"), "live 'Tap to collect' hint")
+	_tap(p)
+	_ok(p.phase() == "ROUTING" and not p.tap() and not p.tap(), "real tap -> ROUTING; extra taps refused")
+	await _until(p, "COMPLETE")
+	_complete("v06_tap2_required")
+
+## 10-12. NEW -> Collection only, DUPLICATE -> Cards Exchange only; cards travel visibly.
+func _v07_mixed_routing() -> void:
+	print("[v07 mixed routing]")
+	var m := Fx.mixed("v07")
+	var p = await _to_await(m)
+	var dest_pt := {"collection": _center(p.get_destination("collection")), "exchange": _center(p.get_destination("exchange"))}
+	var cvs: Array = p.get_card_views()
+	var start: Array = cvs.map(func(cv): return cv.face_center())
+	var mid_seen := [false, false, false]
+	var toward := [true, true, true]
+	var targets: Array = cvs.map(func(cv): return cv.destination_point())
+	_tap(p)
+	var log: Array = p.route_log()
+	for _g in range(900):   # capped: a regression fails, never hangs
+		if not is_instance_valid(p) or p.phase() != "ROUTING":
+			break
+		for i in range(3):
+			var cv = cvs[i]
+			if cv.route > 0.0 and cv.route < 1.0:
+				mid_seen[i] = true
+				var own: Vector2 = dest_pt[StandardPackCeremony.destination_of(m["cards"][i])]
+				toward[i] = toward[i] and cv.face_center().distance_to(own) < start[i].distance_to(own) and cv.is_visible_in_tree()
+		log = p.route_log()
+		await process_frame
+	var want: Array = [[0, "collection"], [1, "exchange"], [2, "collection"]]
+	_ok(log == want, "route destinations follow committed NEW/DUPLICATE %s" % str(log))
+	_ok(mid_seen == [true, true, true] and toward == [true, true, true], "each card visibly travels (observed mid-route) toward its own destination")
+	var targets_ok := true
+	for i in range(3):
+		targets_ok = targets_ok and targets[i] == dest_pt[want[i][1]]
+	_ok(targets_ok, "route end points are the destination icon centres")
+	_complete("v07_mixed_routing")
+
+## 13. Repeated duplicates still give exactly 3 deterministic routes.
+func _v08_repeat_routing() -> void:
+	print("[v08 repeated-duplicate routing]")
+	var results: Array = []
+	for run in range(2):
+		var p = await _to_await(Fx.repeat("v08_%d" % run))
+		var done := {}
+		p.closed.connect(func(_r): done["routes"] = p.route_log(); done["arrivals"] = p.arrivals())
+		_tap(p)
+		await _until(p, "COMPLETE")
+		await process_frame
+		results.append(done)
+	var want := [[0, "collection"], [1, "exchange"], [2, "exchange"]]
+	_ok(results[0]["routes"] == want and results[0]["arrivals"] == [0, 1, 2], "NEW + DUPLICATE x2: exactly 3 routes %s" % str(results[0]))
+	_ok(results[0] == results[1], "deterministic across runs")
+	_complete("v08_repeat_routing")
+
 func _c05_canonical_card_tree() -> void:
 	print("[c05 canonical 135-card tree]")
 	var ids: Array = CollectionCardCatalog.card_ids()
@@ -155,29 +284,24 @@ func _c05_canonical_card_tree() -> void:
 		cat_ok = cat_ok and e["art"] == want and ResourceLoader.exists(want) and e["rarity"] == inv.card_rarity(cid) and not String(e["name"]).is_empty()
 		arts[e["art"]] = true
 	_ok(cat_ok and arts.size() == 135 and ids.size() == inv.all_card_ids().size(), "catalog: 135 unique canonical paths, rarity == CollectionInventory catalog")
-	var p = _create(Fx.mixed("c05"))
-	_stack.push(p)
-	p.finish_presentation()
-	var paths: Array = p.get_card_tiles().map(func(t): return (t.find_child("CardArt", true, false) as TextureRect).texture.resource_path)
+	var p = await _to_await(Fx.mixed("c05"))
+	var paths: Array = p.get_card_views().map(func(cv): return (cv.find_child("CardArt", true, false) as TextureRect).texture.resource_path)
 	var want: Array = Fx.mixed()["cards"].map(func(c): return CollectionCardCatalog.entry(c["card_id"])["art"])
-	_ok(paths == want and paths.all(func(x): return x.begins_with(CARD_TREE)), "face textures = canonical cards in model order %s" % str(paths))
-	_ok(p.get_card_tiles().all(func(t): return t.find_children("*", "TextureRect", true, false).size() == 1), "no second card frame drawn over the card art")
+	_ok(paths == want and paths.all(func(x): return x.begins_with(CARD_TREE)), "face textures = canonical cards in model order")
+	_ok(p.get_card_views().all(func(cv): return cv.find_children("*", "TextureRect", true, false).size() == 1), "no second card frame drawn over the card art")
 	_close(p)
 	_complete("c05_canonical_card_tree")
 
 func _c06_rarity_and_name() -> void:
 	print("[c06 rarity / name truth]")
-	var p = _create(Fx.mixed("c06"))
-	_stack.push(p)
-	p.finish_presentation()
+	var p = await _to_await(Fx.mixed("c06"))
 	var ok := true
 	var got: Array = []
 	for i in range(3):
 		var c: Dictionary = p.get_model()["cards"][i]
-		var t: Control = p.get_card_tiles()[i]
-		var rar := _text(t, "Rarity")
-		got.append(rar)
-		ok = ok and rar == UiText.t("RARITY_" + c["rarity"]) and _text(t, "Name") == c["name"] and c["rarity"] == CollectionCardCatalog.entry(c["card_id"])["rarity"]
+		var cv = p.get_card_views()[i]
+		got.append(_text(cv, "Rarity"))
+		ok = ok and _text(cv, "Rarity") == UiText.t("RARITY_" + c["rarity"]) and _text(cv, "Name") == c["name"] and c["rarity"] == CollectionCardCatalog.entry(c["card_id"])["rarity"]
 	_ok(ok and got == ["COMMON", "RARE", "LEGENDARY"], "rarity chip + live name match committed truth %s" % str(got))
 	_close(p)
 	_complete("c06_rarity_and_name")
@@ -185,14 +309,9 @@ func _c06_rarity_and_name() -> void:
 func _c07_new_duplicate() -> void:
 	print("[c07 NEW / DUPLICATE + counts]")
 	for m in [Fx.mixed("c07a"), Fx.repeat("c07b")]:
-		var p = _create(m)
-		_stack.push(p)
-		p.finish_presentation()
-		var states: Array = []
-		var counts: Array = []
-		for t in p.get_card_tiles():
-			states.append(_text(t, "State"))
-			counts.append(_text(t, "Copies"))
+		var p = await _to_await(m)
+		var states: Array = p.get_card_views().map(func(cv): return _text(cv, "State"))
+		var counts: Array = p.get_card_views().map(func(cv): return _text(cv, "Copies"))
 		var want_states: Array = m["cards"].map(func(c): return UiText.t("PACK_CARD_NEW" if c["is_new"] else "PACK_CARD_DUPLICATE"))
 		var want_counts: Array = m["cards"].map(func(c): return UiText.t("PACK_CARD_OWNED", [c["copies_after"]]))
 		_ok(states == want_states and counts == want_counts, "%s: badges %s / counts %s" % [m["presentation_id"], str(states), str(counts)])
@@ -200,147 +319,144 @@ func _c07_new_duplicate() -> void:
 	_ok(UiText.t("PACK_CARD_NEW") != UiText.t("PACK_CARD_DUPLICATE"), "state is stated in text, not colour only")
 	_complete("c07_new_duplicate")
 
-## 8. One action only; Back/Escape consumed and does nothing; no reroll / open again.
-func _c08_no_reroll_back() -> void:
-	print("[c08 no reroll / back cannot bypass]")
-	var p = _create(Fx.mixed("c08"))
-	var acts: Array = []
-	p.action_selected.connect(func(id, _c): acts.append(id))
-	_stack.push(p)
-	_ok(p.get_action_ids() == ["continue"], "exactly one action: continue")
-	var words := ["REROLL", "RE-ROLL", "OPEN AGAIN", "AGAIN", "OPEN ANOTHER", "BUY", "WATCH"]
-	var leaked: Array = []
-	for b in p.find_children("*", "Button", true, false):
-		for w in words:
-			if (b as Button).text.to_upper().contains(w):
-				leaked.append(b.text)
-	_ok(leaked.is_empty(), "no reroll / open-again affordance %s" % str(leaked))
-	_ok(p.get_action_button("continue").disabled and not p.dismissible, "mid-presentation: Continue blocked, not dismissible")
-	_ok(_stack.handle_back() and p.is_open() and acts.is_empty(), "Back/Escape consumed; popup stays, no action emitted")
-	var esc := InputEventAction.new()
-	esc.action = "ui_cancel"
-	esc.pressed = true
-	_stack._input(esc)
-	_ok(p.is_open() and acts.is_empty() and p.is_presenting(), "ui_cancel mid-presentation changes nothing")
-	p.get_action_button("continue").pressed.emit()
-	_ok(p.is_open() and acts.is_empty(), "blocked Continue cannot fire early")
-	p.finish_presentation()
-	p.get_action_button("continue").pressed.emit()
-	p.get_action_button("continue").pressed.emit()
-	_ok(p.is_closed() and acts == ["continue"], "after completion: Continue closes once %s" % str(acts))
-	await _frames(2)
-	_complete("c08_no_reroll_back")
-
-## 9. Reduced Effects lands the same final truth immediately, with no 01..08 chain.
-func _c09_reduced_parity() -> void:
-	print("[c09 Reduced Effects parity]")
-	var full = _create(Fx.mixed("c09_full"))
-	_stack.push(full)
-	await _until_done(full)
-	var want := _info(full)
-	_close(full)
-	await _frames(2)
-	var red = _create(Fx.mixed("c09_red"), true)
-	var done: Array = []
-	red.presentation_completed.connect(func(k): done.append(k))
-	var tw := _tweens()
-	_stack.push(red)
-	var got := _info(red)
-	_ok(got == want, "Reduced final info == FULL final info %s" % str(got["cards"]))
-	_ok(red.frame_history() == [9] and _tweens() == tw and not red.is_presenting() and done == ["c09_red"], "Reduced: only frame 09 bound, no tween, completed once at open")
-	_ok(not red.get_action_button("continue").disabled, "Reduced: Continue live immediately")
-	_close(red)
-	_complete("c09_reduced_parity")
-
-## 10. Presenting / fast-forwarding / tapping / continuing never touches committed truth.
-func _c10_no_state_mutation() -> void:
-	print("[c10 no model / economy / save mutation]")
-	var path := _uniq("c10")
+## 14. The whole flow (both taps, routing, completion) touches no committed truth.
+func _v09_no_state_mutation() -> void:
+	print("[v09 no model / economy / exchange / save mutation]")
+	var path := _uniq("v09")
 	var app = AppState.new(path)
 	app.request_save()
 	var e0: Dictionary = _econ(app.economy)
 	var rng0: int = app.economy.packs._rng.state
 	var save0 := FileAccess.get_file_as_bytes(path)
-	var input := Fx.mixed("c10")
+	var input := Fx.mixed("v09")
 	var input0 := input.duplicate(true)
-	var p = _create(input)
+	var p = _push(input)
 	var model0: Dictionary = p.get_model()
-	_stack.push(p)
-	await _frames(3)
-	var tap := InputEventMouseButton.new()
-	tap.button_index = MOUSE_BUTTON_LEFT
-	tap.pressed = true
-	p.find_child("Reveal", true, false).gui_input.emit(tap)   # tap-to-fast-forward
-	p.finish_presentation()
-	p.start_presentation()
-	p.get_action_button("continue").pressed.emit()
+	await _frames(2)
+	_tap(p)
+	await _until(p, "AWAIT_ROUTE")
+	_tap(p)
+	await _until(p, "COMPLETE")
 	await _frames(2)
 	_ok(input == input0 and model0 == StandardPackModel.validate(input0)["model"], "caller model and validated model unchanged")
-	_ok(_econ(app.economy) == e0 and app.economy.packs._rng.state == rng0, "economy + Collection snapshot and pack RNG unchanged")
+	_ok(_econ(app.economy) == e0 and app.economy.packs._rng.state == rng0, "economy + Collection + exchange snapshot and pack RNG unchanged after routing")
 	_ok(FileAccess.get_file_as_bytes(path) == save0 and save0.size() > 0, "save bytes unchanged (%d)" % save0.size())
-	# Sensitivity: a real pack open IS seen by the same comparators.
-	app.economy.packs.open_standard()
+	app.economy.packs.open_standard()   # sensitivity: a real open IS seen by the comparators
 	_ok(_econ(app.economy) != e0 and app.economy.packs._rng.state != rng0, "sensitivity: a real open_standard() is detected")
-	_complete("c10_no_state_mutation")
+	_complete("v09_no_state_mutation")
 
-## 11. Cancel / free / re-open: no tween, node, timer or connection accumulation.
-func _c11_lifecycle() -> void:
-	print("[c11 lifecycle]")
+## 15. Completion fires exactly once, only after all 3 arrivals, then the popup closes.
+func _v10_complete_once() -> void:
+	print("[v10 completion once after 3 arrivals]")
+	var p = await _to_await(Fx.mixed("v10"))
+	var events: Array = []
+	p.presentation_completed.connect(func(k): events.append(["completed", k, p.arrivals().size()]))
+	p.closed.connect(func(r): events.append(["closed", r]))
+	_tap(p)
+	await _until(p, "COMPLETE")
+	await _frames(10)
+	_ok(events == [["completed", "v10", 3], ["closed", "complete"]], "completed once with 3 arrivals, then closed('complete') %s" % str(events))
+	_ok(_stack.depth() == 0 and not is_instance_valid(p), "popup removed and freed by the ModalStack")
+	_complete("v10_complete_once")
+
+## 16. Cancel / free / Back / re-entry at every phase leaves nothing behind.
+func _v11_lifecycle_back() -> void:
+	print("[v11 lifecycle / Back / re-entry]")
 	var tw := _tweens()
 	var root_children: int = _stack.get_child(0).get_child_count()
-	var stack_conns: int = _stack.get_signal_connection_list("modal_changed").size()
+	var conns: int = _stack.get_signal_connection_list("modal_changed").size()
 	var done: Array = []
-	for i in range(30):
-		var p = _create(Fx.mixed("c11_%d" % i))
+	var phases := ["IDLE", "OPENING", "AWAIT_ROUTE", "ROUTING"]
+	for i in range(16):
+		var target: String = phases[i % 4]
+		var p = _push(Fx.mixed("v11_%d" % i))
 		p.presentation_completed.connect(func(k): done.append(k))
-		_stack.push(p)
-		if i % 3 == 0:
-			await process_frame
+		await _frames(1)
+		if target != "IDLE":
+			_tap(p)
+		if target == "AWAIT_ROUTE" or target == "ROUTING":
+			await _until(p, "AWAIT_ROUTE")
+		if target == "ROUTING":
+			_tap(p)
+			await _frames(3)
+		var before: String = p.phase()
+		var esc := InputEventAction.new()
+		esc.action = "ui_cancel"
+		esc.pressed = true
+		_stack._input(esc)
+		var back_ok: bool = _stack.handle_back() and p.is_open() and p.phase() == before
+		_ok(back_ok, "%s: Back/Escape consumed, nothing changes" % target)
+		if i < 8:
 			_stack.clear("route_change")
-		elif i % 3 == 1:
-			p.finish_presentation()
-			p.get_action_button("continue").pressed.emit()
 		else:
-			await _frames(2)
 			p.close("freed")
-	await _frames(5)
-	_ok(_tweens() == tw and _stack.depth() == 0 and _stack.get_child(0).get_child_count() == root_children and _stack.get_signal_connection_list("modal_changed").size() == stack_conns, "30 open/clear/finish/close cycles: no tween/node/connection left")
-	_ok(done.size() == 10 and done.all(func(k): return int(k.split("_")[1]) % 3 == 1), "only fast-forwarded runs completed; cancelled runs never complete late %s" % str(done.size()))
-	var p = _create(Fx.mixed("c11_same"))
-	_stack.push(p)
-	_ok(not p.start_presentation(), "same presentation id cannot start a second run in this instance")
-	p.finish_presentation()
-	var hist: Array = p.frame_history()
-	_ok(not p.start_presentation() and p.frame_history() == hist, "re-start after completion refused; no frame re-bound")
-	_close(p)
+	await _frames(10)
+	_ok(done.is_empty(), "no cancelled ceremony ever completes late")
+	_ok(_tweens() == tw and _stack.depth() == 0 and _stack.get_child(0).get_child_count() == root_children and _stack.get_signal_connection_list("modal_changed").size() == conns, "16 clears/closes across all phases: no tween/node/connection left")
+	# Re-entry on one instance: a finished run never restarts.
+	var p2 = await _to_await(Fx.mixed("v11_re"))
+	_ok(p2.tap() and p2.phase() == "ROUTING" and not p2.tap(), "AWAIT_ROUTE tap routes once; the next tap is refused")
+	var hist: Array = p2.frame_history()
+	await _until(p2, "COMPLETE")
+	_ok(hist == range(1, 10), "opening ran exactly once for the instance (no frame re-bound by later taps)")
+	# Freed mid-run outside a stack: the host-bound tween dies with it.
 	var host := Control.new()
 	_sub.add_child(host)
-	var lone = _create(Fx.mixed("c11_free"))
-	host.add_child(lone)
-	var lone_done: Array = []
-	lone.presentation_completed.connect(func(k): lone_done.append(k))
-	_ok(lone.start_presentation() and _tweens() == tw + 1, "running outside a stack (1 tween)")
+	var other = ModalStack.new()
+	host.add_child(other)
+	var lone = StandardPackCeremony.create(Fx.mixed("v11_free"))["popup"]
+	other.push(lone)
 	await process_frame
-	host.free()   # freed mid-run without close: the host-bound tween dies with it
+	var tw2 := _tweens()
+	var started: bool = lone.tap()
+	_ok(started and _tweens() == tw2 + 1, "running in a second stack (+1 tween; %d -> %d)" % [tw2, _tweens()])
+	await process_frame
+	host.free()   # stack + popup freed mid-run without close
 	await _frames(3)
-	_ok(_tweens() == tw and lone_done.is_empty(), "freed mid-presentation: no tween survives, no completion")
-	_stack.clear()
-	await _frames(2)
-	_complete("c11_lifecycle")
+	_ok(_tweens() == tw2, "freed mid-run: no tween survives")
+	_complete("v11_lifecycle_back")
 
-## 12. Source guard: no pack-opening / grant / Collection / save / navigation / RNG authority.
+## 17. Reduced Effects: same two gates, no auto-start / auto-route, same routes and truth.
+func _v12_reduced_semantics() -> void:
+	print("[v12 Reduced Effects semantics]")
+	var full = await _to_await(Fx.mixed("v12_full"))
+	var full_info := _info(full)
+	_close(full)
+	await _frames(2)
+	var p = _push(Fx.mixed("v12_red"), true)
+	var done: Array = []
+	p.presentation_completed.connect(func(k): done.append(k))
+	await _frames(120)
+	_ok(p.phase() == "IDLE" and p.pack_frame == 1 and p.frame_history().is_empty(), "Reduced: pack waits at IDLE (no auto-open)")
+	_tap(p)
+	await _until(p, "AWAIT_ROUTE")
+	_ok(p.frame_history() == [9], "Reduced: frames 01..08 skipped, only the open pack (09)")
+	_ok(_info(p) == full_info, "Reduced AWAIT_ROUTE info == FULL (cards, order, rarity, state, counts, destinations)")
+	await _frames(120)
+	_ok(p.phase() == "AWAIT_ROUTE" and p.route_log().is_empty(), "Reduced: waits for Tap 2 (no auto-route)")
+	var mid := false
+	var cv0 = p.get_card_views()[0]
+	_tap(p)
+	for _g in range(900):   # capped: a regression fails, never hangs
+		if not is_instance_valid(p) or p.phase() != "ROUTING":
+			break
+		mid = mid or (cv0.route > 0.0 and cv0.route < 1.0)
+		await process_frame
+	_ok(mid and done == ["v12_red"], "Reduced: short visible route, completed once")
+	_complete("v12_reduced_semantics")
+
+## Source guard: no pack-opening / grant / Collection / exchange / save / navigation / RNG authority.
 func _c12_static_guard() -> void:
 	print("[c12 static authority guard]")
 	for path in SOURCES:
 		var hits := _forbidden_hits(_code_only(FileAccess.get_file_as_string(path)))
 		_ok(hits.is_empty(), "%s: no authority identifiers %s" % [path.get_file(), str(hits)])
-	var inj := _code_only(FileAccess.get_file_as_string(SOURCES[0])) + "\n\tapp.economy.packs.open_standard()\n\tinventory.add_card(cid)\n"
-	_ok(_forbidden_hits(inj).size() >= 3, "sensitivity: injected open_standard/add_card is flagged %s" % str(_forbidden_hits(inj)))
+	var inj := _code_only(FileAccess.get_file_as_string(SOURCES[0])) + "\n\tpacks.open_standard()\n\tinventory.add_card(cid)\n\texchange.exchange_card(cid, 1, tx)\n"
+	_ok(_forbidden_hits(inj).size() >= 3, "sensitivity: injected open_standard/add_card/exchange_card flagged %s" % str(_forbidden_hits(inj)))
 	_complete("c12_static_guard")
 
-## 13. Sensitivity: wrong count / rarity / asset path / name / state / frame order are caught.
-func _c13_sensitivity() -> void:
-	print("[c13 sensitivity]")
+func _c13_model_sensitivity() -> void:
+	print("[c13 model sensitivity]")
 	var m := Fx.mixed("c13")
 	var cases := {
 		"card_count": func(x): x["cards"].pop_back(),
@@ -364,41 +480,74 @@ func _c13_sensitivity() -> void:
 	rep["cards"][1]["is_new"] = true
 	rep["cards"][1]["copies_after"] = 1
 	_ok(StandardPackModel.validate(rep)["reason"] == "card_1_repeat_order", "repeated card cannot be NEW twice")
-	_ok(not _frame_order_ok([1, 2, 4, 3, 5, 6, 7, 8, 9]) and not _frame_order_ok([1, 2, 3, 4, 5, 6, 7, 8]) and not _frame_order_ok([9]) and _frame_order_ok(range(1, 10)), "frame-order check flags swapped / missing beats")
-	var p = _create(Fx.mixed("c13p"))
-	_stack.push(p)
-	p.finish_presentation()
-	var info := _info(p)
-	(p.get_card_tiles()[1].find_child("Rarity", true, false).get_node("Text") as Label).text = "EPIC"
-	_ok(_info(p) != info, "sensitivity: the final-info comparator sees a changed rarity label")
-	_close(p)
-	_complete("c13_sensitivity")
+	_ok(StandardPackCeremony.destination_of({"is_new": true}) == "collection" and StandardPackCeremony.destination_of({"is_new": false}) == "exchange", "destination rule: NEW Collection / DUPLICATE Exchange")
+	_complete("c13_model_sensitivity")
 
 # ------------------------------------------------------------------ helpers ----
 
-func _create(model: Dictionary, reduced := false):
+func _push(model: Dictionary, reduced := false):
 	var r := StandardPackCeremony.create(model, reduced)
 	if not r["ok"]:
 		_ok(false, "fixture rejected: %s" % r["reason"])
+		return null
+	_stack.push(r["popup"])
 	return r["popup"]
+
+## Push, real Tap 1, wait for AWAIT_ROUTE.
+func _to_await(model: Dictionary, reduced := false):
+	var p = _push(model, reduced)
+	await _frames(2)
+	_tap(p)
+	await _until(p, "AWAIT_ROUTE")
+	return p
+
+## A real player tap: mouse press + release delivered through the SubViewport's GUI input.
+func _tap(p) -> void:
+	var ev := InputEventMouseButton.new()
+	ev.button_index = MOUSE_BUTTON_LEFT
+	ev.position = Vector2(SIZE) * Vector2(0.5, 0.82)
+	ev.global_position = ev.position
+	ev.pressed = true
+	_sub.push_input(ev)
+	var up := ev.duplicate()
+	up.pressed = false
+	_sub.push_input(up)
+
+func _until(p, phase_name: String) -> void:
+	for _i in range(900):
+		if not is_instance_valid(p) or p.phase() == phase_name:
+			return
+		await process_frame
+	_ok(false, "timed out waiting for %s" % phase_name)
 
 func _info(p) -> Dictionary:
 	var cards: Array = []
-	for t in p.get_card_tiles():
-		cards.append([(t.find_child("CardArt", true, false) as TextureRect).texture.resource_path, _text(t, "Name"),
-			_text(t, "Rarity"), _text(t, "State"), _text(t, "Copies"), t.modulate.a, t.visible])
-	return {"frame": p.pack_frame, "stage": p.get_stage().texture.resource_path, "cards": cards,
-		"note": [p.get_note().text, p.get_note().modulate.a], "title": p.get_title(),
-		"actions": p.get_action_ids(), "continue_live": not p.get_action_button("continue").disabled}
+	for cv in p.get_card_views():
+		cards.append([(cv.find_child("CardArt", true, false) as TextureRect).texture.resource_path, _text(cv, "Name"),
+			_text(cv, "Rarity"), _text(cv, "State"), _text(cv, "Copies"), cv.modulate.a, cv.is_visible_in_tree(),
+			StandardPackCeremony.destination_of(cv.card)])
+	return {"phase": p.phase(), "stage_visible": p.get_stage().is_visible_in_tree(), "cards": cards,
+		"destinations": [p.get_destinations_layer().is_visible_in_tree(), p.get_destination("collection").texture.resource_path, p.get_destination("exchange").texture.resource_path],
+		"hint": p.get_hint().text}
 
-func _text(tile: Node, n: String) -> String:
-	var node := tile.find_child(n, true, false)
-	if node is Label:
-		return node.text
-	return (node.get_node("Text") as Label).text if node != null else ""
+func _text(node: Node, n: String) -> String:
+	var c := node.find_child(n, true, false)
+	if c is Label:
+		return c.text
+	return (c.get_node("Text") as Label).text if c != null else ""
 
-func _frame_order_ok(hist: Array) -> bool:
-	return hist == range(1, 10)
+func _stage_path(p) -> String:
+	return p.get_stage().texture.resource_path
+
+## Pack-frame nodes currently drawn (a strip/contact sheet would show more than one).
+func _frame_nodes(p) -> int:
+	return p.find_children("*", "TextureRect", true, false).filter(func(t): return t.is_visible_in_tree() and t.texture != null and String(t.texture.resource_path).begins_with(StandardPackCeremony.FRAME_DIR)).size()
+
+func _buttons(p) -> Array:
+	return p.find_children("*", "Button", true, false).filter(func(b): return b.is_visible_in_tree())
+
+func _center(c: Control) -> Vector2:
+	return c.position + c.size * 0.5
 
 func _manifest_hashes() -> Dictionary:
 	var out := {}
@@ -408,19 +557,13 @@ func _manifest_hashes() -> Dictionary:
 			out[String(f["relative_path"]).get_file()] = f["sha256"]
 	return out
 
-func _until_done(p) -> void:
-	for _i in range(600):
-		if not p.is_presenting():
-			return
-		await process_frame
-
 func _close(p) -> void:
 	if is_instance_valid(p) and p.is_open():
 		p.close("test")
 
 func _mount() -> void:
 	_sub = SubViewport.new()
-	_sub.size = Vector2i(1080, 2160)
+	_sub.size = SIZE
 	_sub.disable_3d = true
 	get_root().add_child(_sub)
 	_stack = ModalStack.new()
@@ -488,5 +631,5 @@ func _done() -> void:
 	if not missing.is_empty():
 		_fail += 1
 		print("  FAIL: case ledger incomplete, missing %s" % str(missing))
-	print("M43-C005-C006 standard pack presentation evidence: %s (%d/%d cases, %d fail)" % ["PASS" if _fail == 0 else "FAIL", _completed.size(), EXPECTED_CASES.size(), _fail])
+	print("M43-C005-C006 V02 standard pack interactive opening evidence: %s (%d/%d cases, %d fail)" % ["PASS" if _fail == 0 else "FAIL", _completed.size(), EXPECTED_CASES.size(), _fail])
 	quit(1 if _fail > 0 else 0)
