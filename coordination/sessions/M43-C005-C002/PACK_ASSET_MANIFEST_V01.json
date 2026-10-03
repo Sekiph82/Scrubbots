@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
   "task": "SB-M43-076",
-  "prompt": "coordination/sessions/M43-C005-C002/CHATGPT_PROMPT_V02.md",
+  "prompt": "coordination/sessions/M43-C005-C002/CHATGPT_PROMPT_V03.md",
   "canvas": {
     "width": 1024,
     "height": 1536,
@@ -37,7 +37,15 @@
       "identity_basis": "V02 visual authorization: this is the sole named local file and its visible pack design matches the owner-confirmed attached main visual; encoded and decoded hashes are recorded without claiming an exact attachment pixel-hash match."
     }
   ],
-  "card_count_source": "Exact overlay construction metadata; visual contact-sheet inspection also performed. Card faces are never shown.",
+  "card_back_source": {
+    "path": "coordination/sessions/M43-C005-C002/references/collection_card_back_sprite.png",
+    "sha256": "184953d17ac9492d25799f3e4963509dd4d1ec3c3e769188d4084499396ba68f",
+    "width": 880,
+    "height": 1378,
+    "mode": "RGBA",
+    "role": "shared blue-and-gold card back sprite used by the emergence compositor"
+  },
+  "card_count_source": "Frames 07-09 are checked from rendered pixels by counting connected pale-cyan gear emblems; overlay construction metadata is also checked and manual visual inspection confirms distinct silhouettes. Card faces are never shown.",
   "frames": [
     {
       "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_01_closed.png",
@@ -61,6 +69,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 0,
       "constructed_card_overlay_count": 0,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [],
       "frame_role": "closed idle",
       "transparent_pixel_count": 1241762
@@ -87,6 +96,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 0,
       "constructed_card_overlay_count": 0,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [],
       "frame_role": "charge light buildup",
       "transparent_pixel_count": 1171455
@@ -113,6 +123,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 0,
       "constructed_card_overlay_count": 0,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [],
       "frame_role": "shake pressure",
       "transparent_pixel_count": 1041316
@@ -139,6 +150,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 0,
       "constructed_card_overlay_count": 0,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [],
       "frame_role": "first tear",
       "transparent_pixel_count": 236544
@@ -165,6 +177,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 0,
       "constructed_card_overlay_count": 0,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [],
       "frame_role": "tear widens",
       "transparent_pixel_count": 236544
@@ -191,6 +204,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 1,
       "constructed_card_overlay_count": 1,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [
         {
           "center_x": 512,
@@ -204,7 +218,7 @@
     },
     {
       "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_07_one_card_rises.png",
-      "sha256": "6da0cea393ced1d5e193da607964afeb6c2b79190c43f5d98c42ac5c6bdd37cc",
+      "sha256": "6b20fa33e72d09319cf1aea6adc0ebf8fa51feb7787ff072e9a0e6d7adf1c1ef",
       "width": 1024,
       "height": 1536,
       "mode": "RGBA",
@@ -224,10 +238,11 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 1,
       "constructed_card_overlay_count": 1,
+      "visual_card_back_emblem_count": 1,
       "card_overlays": [
         {
           "center_x": 512,
-          "top_y": 421,
+          "top_y": 420,
           "rotation_degrees": 0,
           "visible_percent": 58
         }
@@ -237,7 +252,7 @@
     },
     {
       "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_08_cards_emerge.png",
-      "sha256": "3a15e23345d0a739a656c7a260e49a20676ab9fdc912ae25ee8ff9b4ac999c52",
+      "sha256": "801a54eda696dc26a2bf45951c8dc4a11d626f6704b87161f086f832dd4bcb56",
       "width": 1024,
       "height": 1536,
       "mode": "RGBA",
@@ -257,12 +272,13 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 3,
       "constructed_card_overlay_count": 3,
+      "visual_card_back_emblem_count": 3,
       "card_overlays": [
         {
           "center_x": 405,
           "top_y": 403,
           "rotation_degrees": -11,
-          "visible_percent": 70
+          "visible_percent": 65
         },
         {
           "center_x": 512,
@@ -274,7 +290,7 @@
           "center_x": 619,
           "top_y": 403,
           "rotation_degrees": 11,
-          "visible_percent": 70
+          "visible_percent": 65
         }
       ],
       "frame_role": "cards emerge",
@@ -282,7 +298,7 @@
     },
     {
       "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_09_final_reveal.png",
-      "sha256": "e2413042b7b189147de72b8755ce7611bee334d9a9274dad6e356635133bce67",
+      "sha256": "561753dc9ade575874685d4cc07b8bd8bbd4f2e984c28ee228a76248ef385402",
       "width": 1024,
       "height": 1536,
       "mode": "RGBA",
@@ -302,22 +318,23 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 3,
       "constructed_card_overlay_count": 3,
+      "visual_card_back_emblem_count": 3,
       "card_overlays": [
         {
           "center_x": 391,
-          "top_y": 323,
+          "top_y": 294,
           "rotation_degrees": -14,
           "visible_percent": 100
         },
         {
           "center_x": 512,
-          "top_y": 309,
+          "top_y": 280,
           "rotation_degrees": 0,
           "visible_percent": 100
         },
         {
           "center_x": 633,
-          "top_y": 323,
+          "top_y": 294,
           "rotation_degrees": 14,
           "visible_percent": 100
         }
@@ -347,6 +364,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 0,
       "constructed_card_overlay_count": 0,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [],
       "frame_role": "closed idle",
       "transparent_pixel_count": 1127694
@@ -373,6 +391,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 0,
       "constructed_card_overlay_count": 0,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [],
       "frame_role": "charge light buildup",
       "transparent_pixel_count": 956552
@@ -399,6 +418,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 0,
       "constructed_card_overlay_count": 0,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [],
       "frame_role": "shake pressure",
       "transparent_pixel_count": 822097
@@ -425,6 +445,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 0,
       "constructed_card_overlay_count": 0,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [],
       "frame_role": "first tear",
       "transparent_pixel_count": 813251
@@ -451,6 +472,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 0,
       "constructed_card_overlay_count": 0,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [],
       "frame_role": "tear widens",
       "transparent_pixel_count": 772665
@@ -477,6 +499,7 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 1,
       "constructed_card_overlay_count": 1,
+      "visual_card_back_emblem_count": null,
       "card_overlays": [
         {
           "center_x": 512,
@@ -490,7 +513,7 @@
     },
     {
       "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_07_one_card_rises.png",
-      "sha256": "7c3e0a11b8cf4afd54c2cf77621d17c66e087e6ae160ea0c998abb450e1335aa",
+      "sha256": "f47a7b6ecb8d02f444acf4dd75d25f0276f8a9f2459320a799edee94768d9dfa",
       "width": 1024,
       "height": 1536,
       "mode": "RGBA",
@@ -510,12 +533,13 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 1,
       "constructed_card_overlay_count": 1,
+      "visual_card_back_emblem_count": 1,
       "card_overlays": [
         {
           "center_x": 512,
-          "top_y": 404,
+          "top_y": 390,
           "rotation_degrees": 0,
-          "visible_percent": 58
+          "visible_percent": 60
         }
       ],
       "frame_role": "one card rises",
@@ -523,7 +547,7 @@
     },
     {
       "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_08_cards_emerge.png",
-      "sha256": "0a8ebd9518a262a07a36032db1e8026690340add2880d4c06422e86a0f33e289",
+      "sha256": "25484fa1e718a51bc25ddb4aa8253b4de3fc8f3a8ec9b8faea8fc6535d60392e",
       "width": 1024,
       "height": 1536,
       "mode": "RGBA",
@@ -543,34 +567,35 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 5,
       "constructed_card_overlay_count": 5,
+      "visual_card_back_emblem_count": 5,
       "card_overlays": [
         {
           "center_x": 278,
-          "top_y": 375,
+          "top_y": 365,
           "rotation_degrees": -20,
           "visible_percent": 70
         },
         {
           "center_x": 395,
-          "top_y": 370,
+          "top_y": 359,
           "rotation_degrees": -10,
-          "visible_percent": 70
+          "visible_percent": 72
         },
         {
           "center_x": 512,
-          "top_y": 365,
+          "top_y": 353,
           "rotation_degrees": 0,
-          "visible_percent": 70
+          "visible_percent": 74
         },
         {
           "center_x": 629,
-          "top_y": 370,
+          "top_y": 359,
           "rotation_degrees": 10,
-          "visible_percent": 70
+          "visible_percent": 72
         },
         {
           "center_x": 746,
-          "top_y": 375,
+          "top_y": 365,
           "rotation_degrees": 20,
           "visible_percent": 70
         }
@@ -580,7 +605,7 @@
     },
     {
       "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_09_final_reveal.png",
-      "sha256": "2faf12d2cd67f52bd6e3008b598749c344e0b3b3cb72b339589fd45a37142c49",
+      "sha256": "0de24ea3509518b8a358d733925cee30b8bc4087219dceecc39f20bec750977a",
       "width": 1024,
       "height": 1536,
       "mode": "RGBA",
@@ -600,16 +625,17 @@
       "pack_bottom_registration_estimate_y_px": 1260,
       "expected_card_count": 5,
       "constructed_card_overlay_count": 5,
+      "visual_card_back_emblem_count": 5,
       "card_overlays": [
         {
           "center_x": 278,
-          "top_y": 294,
+          "top_y": 282,
           "rotation_degrees": -24,
           "visible_percent": 100
         },
         {
           "center_x": 395,
-          "top_y": 282,
+          "top_y": 276,
           "rotation_degrees": -12,
           "visible_percent": 100
         },
@@ -621,13 +647,13 @@
         },
         {
           "center_x": 629,
-          "top_y": 282,
+          "top_y": 276,
           "rotation_degrees": 12,
           "visible_percent": 100
         },
         {
           "center_x": 746,
-          "top_y": 294,
+          "top_y": 282,
           "rotation_degrees": 24,
           "visible_percent": 100
         }
@@ -655,6 +681,10 @@
     },
     {
       "check": "Premium card overlay counts 0,0,0,0,0,1,1,5,5",
+      "result": "PASS"
+    },
+    {
+      "check": "rendered card-back emblem counts match metadata for frames 07-09",
       "result": "PASS"
     },
     {
