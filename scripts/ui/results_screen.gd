@@ -18,7 +18,7 @@ extends Control
 ##   - green Life/Help-family Continue CTA, subordinate Home;
 ##   - a short ordered row reveal (presentation only; rows exist from the start, grants
 ##     are already committed, Continue is never gated by it). Reduced Effects shows every
-##     row immediately.
+##     row immediately. M43-C005-C005: driven by the shared RevealSequencer.
 ## M43-C004 (SB-M43-050) — LOST is the production Fail surface in the same family: the
 ##   existing help Scrubby pose (no sad pose exists yet) above the cream frame, the
 ##   existing fail emblem in the header, `LEVEL FAILED`, live level, the committed loss
@@ -50,6 +50,7 @@ const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const JourneyStrip = preload("res://scripts/ui/components/journey_strip.gd")
+const RevealSequencer = preload("res://scripts/ui/components/reveal_sequencer.gd")
 
 ## Existing approved production art (never written by this screen).
 const ROBOT_ART := "res://assets/ui/final/popups/victory/victory_scrubby_pose.png"
@@ -101,7 +102,8 @@ var _lines: VBoxContainer
 var _note: Label
 var _primary: Button
 var _home: Button
-var _reveal: Tween
+var _reveal: RevealSequencer
+var _reveal_serial := 0   ## each show_model builds fresh rows = a new presentation key
 var _momentum: VBoxContainer
 var _journey_caption: Label
 var _journey
@@ -120,6 +122,7 @@ func _init() -> void:
 	set_anchors_preset(Control.PRESET_FULL_RECT)
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_victory_theme = HomeStyle.make_theme()
+	_reveal = RevealSequencer.new(self)
 	var dim := ColorRect.new()
 	dim.name = "Dim"
 	dim.color = Color(0, 0, 0, 0.6)
@@ -457,43 +460,32 @@ func _plain_line(text: String) -> Label:
 
 ## Ordered row reveal. Presentation only: every row already exists and every grant is
 ## already committed; Continue/Home stay live throughout. Reduced Effects (or no tree)
-## shows all rows immediately.
+## shows all rows immediately. One RevealSequencer step per committed row, then (M43-C001R)
+## the momentum section after its configured delay (the teaser is the crop at every alpha).
 func _start_reveal(reduced: bool) -> void:
-	if _reveal != null and _reveal.is_valid():
-		_reveal.kill()
-	_reveal = null
-	var rows := _lines.get_children()
 	_momentum.modulate.a = 1.0
-	if reduced or not _victory or not is_inside_tree() or (rows.is_empty() and not _momentum.visible):
-		return
-	for c in rows:
-		c.modulate.a = 0.0
-	_reveal = create_tween()
-	for c in rows:
-		_reveal.tween_property(c, "modulate:a", 1.0, REVEAL_STEP_S)
-	# M43-C001R: the momentum section follows the committed rows after a short fixed delay
-	# (presentation only; the teaser is the crop at every alpha, never the full preview).
-	if _momentum.visible:
-		_momentum.modulate.a = 0.0
-		_reveal.tween_interval(float((_model.get("momentum", {}) as Dictionary).get("reveal_delay_s", 0.0)))
-		_reveal.tween_property(_momentum, "modulate:a", 1.0, REVEAL_STEP_S)
+	var steps: Array = []
+	if _victory:
+		for c in _lines.get_children():
+			steps.append(RevealSequencer.fade(c, REVEAL_STEP_S))
+		if _momentum.visible:
+			steps.append(RevealSequencer.fade(_momentum, REVEAL_STEP_S, float((_model.get("momentum", {}) as Dictionary).get("reveal_delay_s", 0.0))))
+	_reveal_serial += 1
+	_reveal.play("results_%d" % _reveal_serial, steps, reduced)
 
-## Fast-forward the reveal to its final state (all committed rows visible).
+## Fast-forward the reveal to its final state (all committed rows visible). Presentation only.
 func finish_reveal() -> void:
-	if _reveal != null and _reveal.is_valid():
-		_reveal.kill()
-	_reveal = null
-	_momentum.modulate.a = 1.0
-	for c in _lines.get_children():
-		c.modulate.a = 1.0
+	_reveal.finish()
 
 func is_revealing() -> bool:
-	return _reveal != null and _reveal.is_valid() and _reveal.is_running()
+	return _reveal.is_running()
+
+func get_reveal_sequencer() -> RevealSequencer:
+	return _reveal
 
 func _clear_lines() -> void:
-	if _reveal != null and _reveal.is_valid():
-		_reveal.kill()
-	_reveal = null
+	_reveal.cancel()
+	_momentum.modulate.a = 1.0   # persistent node: never left hidden by a cancelled reveal
 	for c in _lines.get_children():
 		_lines.remove_child(c)
 		c.queue_free()
