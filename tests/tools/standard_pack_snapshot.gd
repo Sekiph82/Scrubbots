@@ -1,31 +1,60 @@
 extends SceneTree
-## M43-C005-C006 (SB-M43-064) runtime evidence of the SHIPPING StandardPackCeremony (not the
-## preview harness): real ModalStack + BasePopup family over a BG01 backdrop, committed
-## fixture model only. Needs a rendering driver (run WITHOUT --headless):
+## M43-C005-C006 (SB-M43-064) V02 runtime evidence of the SHIPPING StandardPackCeremony:
+## real ModalStack + ceremony over a BG01 backdrop, committed fixture models only, and real
+## player taps delivered through SubViewport.push_input (both gates observable). Needs a
+## rendering driver (run WITHOUT --headless):
 ##   godot --path . -s res://tests/tools/standard_pack_snapshot.gd -- <out_dir>
-## Writes final-state shots per viewport, a Reduced Effects shot and an ordered strip of the
-## real opening beats 01..09 + final faces captured while the sequencer runs.
+## Writes the 01..09 state shots (1080x1920), a Reduced Effects sequence, the AWAIT_ROUTE
+## state at every required viewport, and an ordered evidence timeline sheet (evidence only).
 
 const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 const StandardPackCeremony = preload("res://scripts/ui/ceremony/standard_pack_ceremony.gd")
 const Fx = preload("res://tests/support/standard_pack_fixtures.gd")
 
+const REF := Vector2i(1080, 1920)
 const SIZES := [Vector2i(1080, 1920), Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2i(1290, 2796), Vector2i(1536, 2048)]
+const INSETS := [0, 96, 0, 64]
 
 var _bad := 0
+var _out := ""
+var _timeline: Array = []   ## [name, Image]
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
-	var out_dir: String = args[0] if args.size() > 0 else "user://standard_pack_snapshots"
-	DirAccess.make_dir_recursive_absolute(out_dir if out_dir.is_absolute_path() else ProjectSettings.globalize_path(out_dir))
+	_out = args[0] if args.size() > 0 else "user://standard_pack_snapshots"
+	DirAccess.make_dir_recursive_absolute(_out if _out.is_absolute_path() else ProjectSettings.globalize_path(_out))
+	# Full owner flow, mixed pack (NEW / DUPLICATE / NEW), 1080x1920.
+	await _flow(Fx.mixed("ev_mixed"), false, {
+		"01_pack_idle": func(p): return p.phase() == "IDLE",
+		"02_opening_mid": func(p): return p.pack_frame == 5,
+		"03_opening_late_cards_emerging": func(p): return p.pack_frame == 9 and p.get_card_views()[1].emerge > 0.2 and p.get_card_views()[1].emerge < 0.9,
+		"04_three_card_hold": func(p): return p.get_stage().modulate.a == 0.0 and not p.get_destinations_layer().visible,
+		"06_mixed_pre_route": func(p): return p.phase() == "AWAIT_ROUTE",
+		"07_new_card_to_collection": func(p): return p.get_card_views()[0].route > 0.35 and p.get_card_views()[0].route < 0.7,
+		"08_duplicate_card_to_exchange": func(p): return p.get_card_views()[1].route > 0.35 and p.get_card_views()[1].route < 0.7,
+		"09_complete": func(_p): return false,   # captured from the closed signal
+	})
+	# Destinations visible with a repeated-duplicate pack (NEW, DUPLICATE 2, DUPLICATE 5).
+	await _flow(Fx.repeat("ev_repeat"), false, {
+		"05_destinations_visible": func(p): return p.phase() == "AWAIT_ROUTE",
+		"10_repeat_duplicate_to_exchange": func(p): return p.get_card_views()[2].route > 0.35 and p.get_card_views()[2].route < 0.7,
+	})
+	# Reduced Effects: same two taps, frame 09 only, fades + short moves.
+	await _flow(Fx.mixed("ev_reduced"), true, {
+		"R1_reduced_pack_idle": func(p): return p.phase() == "IDLE",
+		"R2_reduced_opening_frame09": func(p): return p.phase() == "OPENING" and p.pack_frame == 9,
+		"R3_reduced_destinations_visible": func(p): return p.phase() == "AWAIT_ROUTE",
+		"R4_reduced_routing": func(p): return p.phase() == "ROUTING" and p.get_card_views()[0].route > 0.2 and p.get_card_views()[0].route < 0.9,
+		"R5_reduced_complete": func(_p): return false,
+	})
 	for sz in SIZES:
-		await _final_shot(out_dir, sz, false, Fx.mixed("snap_%d" % sz.y))
-	await _final_shot(out_dir, Vector2i(1080, 2160), true, Fx.mixed("snap_reduced"))
-	await _final_shot(out_dir, Vector2i(1080, 2160), false, Fx.repeat("snap_repeat"), "_repeat")
-	await _strip(out_dir, Vector2i(1080, 2160))
+		await _flow(Fx.mixed("ev_size_%d" % sz.y), false, {"V_destinations_%dx%d" % [sz.x, sz.y]: func(p): return p.phase() == "AWAIT_ROUTE"}, sz, false)
+	_sheet()
 	quit(1 if _bad > 0 else 0)
 
-func _mount(size: Vector2i, model: Dictionary, reduced: bool) -> Array:
+## Mount, then run the real flow: tap 1 at IDLE, tap 2 at AWAIT_ROUTE (each only after its
+## shot is captured), capturing each named state the first frame its predicate holds.
+func _flow(model: Dictionary, reduced: bool, shots: Dictionary, size: Vector2i = REF, timeline := true) -> void:
 	var sub := SubViewport.new()
 	sub.size = size
 	sub.disable_3d = true
@@ -38,66 +67,118 @@ func _mount(size: Vector2i, model: Dictionary, reduced: bool) -> Array:
 	sub.add_child(bg)
 	var stack = ModalStack.new()
 	sub.add_child(stack)
-	stack.set_synthetic_safe_insets(0, 96, 0, 64)
+	stack.set_synthetic_safe_insets(INSETS[0], INSETS[1], INSETS[2], INSETS[3])
 	var p = StandardPackCeremony.create(model, reduced)["popup"]
+	var info := {}
+	p.closed.connect(func(reason): info.merge({"closed": reason, "frames": p.frame_history(), "routes": p.route_log(), "arrivals": p.arrivals(), "phase": p.phase()}))
 	stack.push(p)
-	return [sub, p]
-
-func _final_shot(out_dir: String, size: Vector2i, reduced: bool, model: Dictionary, tag: String = "") -> void:
-	var m := _mount(size, model, reduced)
-	var sub: SubViewport = m[0]
-	var p = m[1]
-	for _i in range(240):
-		if not p.is_presenting():
+	var pending: Array = shots.keys()
+	var taps := 0
+	for _f in range(900):
+		await RenderingServer.frame_post_draw
+		if info.has("closed"):   # the popup is closed and freed by the ModalStack
+			for k in pending.duplicate():
+				if k.contains("complete"):
+					_capture(sub, k, null, timeline)
+					pending.erase(k)
 			break
-		await process_frame
-	for _i in range(4):
-		await process_frame
-	await RenderingServer.frame_post_draw
-	var fits: bool = p.text_fits() and Rect2(Vector2(0, 96), Vector2(size) - Vector2(0, 160)).encloses(p.get_frame_rect())
-	var path := "%s/standard_pack%s%s_%dx%d.png" % [out_dir, tag, "_reduced_effects" if reduced else "", size.x, size.y]
-	if not fits or p.is_presenting():
-		_bad += 1
-		print("REJECTED ", path, " frame=", p.get_frame_rect(), " presenting=", p.is_presenting())
-	else:
-		print("SNAPSHOT ", path, " err=", sub.get_texture().get_image().save_png(path), " frame=", p.get_frame_rect())
+		for k in pending.duplicate():
+			if shots[k].call(p):
+				_capture(sub, k, p, timeline)
+				pending.erase(k)
+		var idle_done: bool = not pending.any(func(k): return k.contains("idle"))
+		var dest_done: bool = not pending.any(func(k): return k.contains("pre_route") or k.contains("destinations"))
+		if pending.is_empty():
+			break
+		if p.phase() == "IDLE" and idle_done:
+			await _frames(20)   # the idle pack waits: nothing auto-starts
+			if p.phase() != "IDLE":
+				_reject("auto-start without a tap")
+			_tap(sub, size)
+			taps += 1
+		elif p.phase() == "AWAIT_ROUTE" and dest_done:
+			await _frames(20)   # the cards wait: nothing auto-routes
+			if p.phase() != "AWAIT_ROUTE":
+				_reject("auto-route without a tap")
+			_tap(sub, size)
+			taps += 1
+	if not pending.is_empty():
+		_reject("states never reached: %s" % str(pending))
+	if not info.has("closed"):
+		info = {"closed": "", "frames": p.frame_history(), "routes": p.route_log(), "arrivals": p.arrivals(), "phase": p.phase()}
+	print("FLOW %s reduced=%s taps=%d %s" % [model["presentation_id"], reduced, taps, str(info)])
 	sub.free()
 	await process_frame
 
-## Capture the popup frame each time a new pack beat is bound, then the final faces.
-func _strip(out_dir: String, size: Vector2i) -> void:
-	var m := _mount(size, Fx.mixed("snap_strip"), false)
-	var sub: SubViewport = m[0]
-	var p = m[1]
-	var panels: Array = []
-	var seen := 0
-	for _i in range(600):
-		await RenderingServer.frame_post_draw
-		var hist: Array = p.frame_history()
-		if hist.size() > seen:
-			seen = hist.size()
-			panels.append([str(hist.back()), sub.get_texture().get_image().get_region(Rect2i(p.get_frame_rect()))])
-		if not p.is_presenting():
-			break
-	for _i in range(4):
-		await process_frame
-	await RenderingServer.frame_post_draw
-	panels.append(["final", sub.get_texture().get_image().get_region(Rect2i(p.get_frame_rect()))])
-	var labels: Array = panels.map(func(x): return x[0])
-	print("STRIP beats ", labels)
-	if labels != ["1", "2", "3", "4", "5", "6", "7", "8", "9", "final"]:
-		_bad += 1
-		print("REJECTED strip: beats not exactly 01..09 + final")
-	var w := 360
-	var h := int(round(w * float(panels[0][1].get_height()) / panels[0][1].get_width()))
-	var sheet := Image.create(w * 5 + 6 * 12, h * 2 + 3 * 12, false, Image.FORMAT_RGBA8)
-	sheet.fill(Color(0.07, 0.08, 0.1))
-	for i in range(panels.size()):
-		var im: Image = panels[i][1]
+func _tap(sub: SubViewport, size: Vector2i) -> void:
+	var ev := InputEventMouseButton.new()
+	ev.button_index = MOUSE_BUTTON_LEFT
+	ev.position = Vector2(size) * Vector2(0.5, 0.82)
+	ev.global_position = ev.position
+	ev.pressed = true
+	sub.push_input(ev)
+	var up := ev.duplicate()
+	up.pressed = false
+	sub.push_input(up)
+
+func _capture(sub: SubViewport, key: String, p, timeline: bool) -> void:
+	var img := sub.get_texture().get_image()
+	var bad := "" if p == null else _layout_problem(p)
+	var path := "%s/%s_%dx%d.png" % [_out, key, sub.size.x, sub.size.y]
+	if not bad.is_empty():
+		_reject("%s: %s" % [path, bad])
+	print("SNAPSHOT ", path, " err=", img.save_png(path), " phase=", "CLOSED" if p == null else p.phase(), " frame=", -1 if p == null else p.pack_frame)
+	if timeline:
+		_timeline.append([key, img])
+
+## Visible ceremony controls stay inside the safe layer; destinations never cover a card in
+## the row; the pack is never visible once destinations show.
+func _layout_problem(p) -> String:
+	var safe: Rect2 = p.get_layer().get_global_rect().grow(1.0)
+	var items: Array = [p.get_hint(), p.get_layer().get_node("Title")]
+	if p.get_destinations_layer().visible:
+		for k in ["collection", "exchange"]:
+			items.append(p.get_destination(k))
+			items.append(p.get_destination(k).get_node("Label"))
+		if p.get_stage().is_visible_in_tree() and p.get_stage().modulate.a > 0.0:
+			return "pack visible with destinations"
+	for c in items:
+		if c.is_visible_in_tree() and not safe.encloses(c.get_global_rect()):
+			return "%s outside safe area %s" % [c.name, str(c.get_global_rect())]
+		if c is Label and c.is_visible_in_tree() and c.get_minimum_size().x > c.size.x + 0.5:
+			return "%s text wider than its rect (%d > %d)" % [c.name, int(c.get_minimum_size().x), int(c.size.x)]
+	if p.phase() == "AWAIT_ROUTE":
+		for cv in p.get_card_views():
+			var r: Rect2 = cv.get_global_rect()
+			if not safe.encloses(r):
+				return "%s outside safe area" % cv.name
+			for k in ["collection", "exchange"]:
+				var d: Control = p.get_destination(k)
+				if r.intersects(d.get_global_rect()) or r.intersects(d.get_node("Label").get_global_rect()):
+					return "%s overlaps %s" % [cv.name, k]
+	return ""
+
+func _sheet() -> void:
+	_timeline.sort_custom(func(a, b): return String(a[0]) < String(b[0]))
+	var w := 270
+	var h := 480
+	var cols := 5
+	var rows := int(ceil(_timeline.size() / float(cols)))
+	var sheet := Image.create(cols * (w + 12) + 12, rows * (h + 12) + 12, false, Image.FORMAT_RGBA8)
+	sheet.fill(Color(0.95, 0.95, 0.95))
+	for i in range(_timeline.size()):
+		var im: Image = _timeline[i][1]
 		im.convert(Image.FORMAT_RGBA8)
 		im.resize(w, h, Image.INTERPOLATE_LANCZOS)
-		sheet.blit_rect(im, Rect2i(0, 0, w, h), Vector2i(12 + (i % 5) * (w + 12), 12 + (i / 5) * (h + 12)))
-	var path := "%s/standard_pack_opening_strip_%dx%d.png" % [out_dir, size.x, size.y]
+		sheet.blit_rect(im, Rect2i(0, 0, w, h), Vector2i(12 + (i % cols) * (w + 12), 12 + (i / cols) * (h + 12)))
+	var path := "%s/V02_evidence_timeline_EVIDENCE_ONLY.png" % _out
+	print("TIMELINE order ", _timeline.map(func(t): return t[0]))
 	print("SNAPSHOT ", path, " err=", sheet.save_png(path))
-	sub.free()
-	await process_frame
+
+func _reject(msg: String) -> void:
+	_bad += 1
+	print("REJECTED ", msg)
+
+func _frames(n: int) -> void:
+	for _i in range(n):
+		await process_frame
