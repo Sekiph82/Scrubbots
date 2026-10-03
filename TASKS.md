@@ -6,14 +6,14 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
 - Current Sprint: M43-C005 — Reward, Pack, Collection, Robot, Feature and World Ceremonies
-- Current Task: Codex cleans/re-exports all 135 Collection cards from original owner sheets (SB-M43-076 support)
-- Current Task Status: M43_C005_C002_FINAL_OWNER_PASS / M43_C005_C003_READY_FOR_CODEX
-- Next Task/Action: CODEX executes `coordination/sessions/M43-C005-C003/CHATGPT_PROMPT_V01.md`: deterministically re-crop all 15×9 Collection cards from the original owner sheets, remove neighbor/sheet-edge contamination, normalize dimensions without generative redraw, produce per-set/master QA evidence, validate all 135 mappings, and return `AWAITING_GPT_M43_C005_C003_COLLECTION_CARD_AUDIT`.
-- Required Actor: CODEX
+- Current Task: Claude regenerates all 135 Collection cards individually, one card per generation/output (SB-M43-076 support)
+- Current Task Status: M43_C005_C002_FINAL_OWNER_PASS / M43_C005_C003_INDIVIDUAL_REGEN_READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C005-C003/CHATGPT_PROMPT_V02.md`. Hard owner lock: all 135 cards are generated individually, one card per generation and one final 1024×1536 RGBA PNG per canonical path; no 3×3 crop, no generated multi-card sheet, no slicing. Owner sheets are identity/name/rarity references only. If Claude has no approved image-generation capability, it must stop with `BLOCKED_CLAUDE_IMAGE_GENERATION_UNAVAILABLE`; ChatGPT will then hand the same contract to Codex.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 982 / 1414 = 69.45%. SB-M43-R01-001..008 are CLOSED by V02 technical audit plus final owner acceptance. M43-C001R is complete; M43-C005 is now the active frontier.
-- Note: Owner gave explicit final pack approval: **"HEPSI OK"**. `coordination/sessions/M43-C005-C002/FINAL_OWNER_ACCEPTANCE_V01.md` closes the Standard/Premium pack-opening visual subgate. SB-M43-076 remains open only for owner-requested supporting asset cleanup: 135 Collection cards first, then Booster-of-your-choice production asset intake/promotion.
+- Note: Verified provenance finding: the current 135 canonical card PNGs were introduced by commit `47b4343` as crops/extractions from the 15 owner 3×3 composites; repository history shows no later replacement of those paths. The owner had already corrected this on 2026-09-23: all 135 must be regenerated one-by-one. That correction was never promoted into a replacement commit. V02 now supersedes the crop/re-export plan and makes individual generation a hard gate. See `coordination/sessions/M43-C005-C003/CARD_PROVENANCE_FINDING_V01.md`.
 - MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
