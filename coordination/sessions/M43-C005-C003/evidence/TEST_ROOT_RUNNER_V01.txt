@@ -1,0 +1,447 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+---- performance sanity (50x50 = 2500 cells, 50 iterations where applicable) ----
+  construct BoardState.from_level_data x50: 0.219 ms total, 0.0044 ms/iter
+  read all cells x50 passes: 57.911 ms total, 1.1582 ms/pass
+  count_cells_by_state x50: 2.056 ms total, 0.0411 ms/call
+  coordinate<->index round trip over all cells: 2.229 ms
+  set_cell_state over all cells (bulk clean): 1.255 ms
+  (sum-of-color-ids sink value: 187500 — prevents dead-code elimination of the read loop)
+---- performance sanity (59x59 = 3481 cells, CURRENT MAXIMUM, 50 iterations where applicable) ----
+  construct BoardState.from_level_data x50: 0.277 ms total, 0.0055 ms/iter
+  read all cells x50 passes: 79.887 ms total, 1.5977 ms/pass
+  count_cells_by_state x50: 2.776 ms total, 0.0555 ms/call
+  coordinate<->index round trip over all cells: 3.253 ms
+  set_cell_state over all cells (bulk clean): 1.889 ms
+  (sum-of-color-ids sink value: 261050 — prevents dead-code elimination of the read loop)
+---- M10-C001: Real Artwork debug fixtures ----
+  M10-C001 real-artwork fixture tests complete
+---- M10-C001 V05: Real Artwork variable-canvas embedding ----
+  M10-C001 V05 variable-canvas embedding tests complete
+---- M10-C001 V07: debug-scene fixture-change runtime smoke ----
+WARNING: Nodes with non-equal opposite anchors will have their size overridden after _ready().
+If you want to set size, change the anchors or consider using set_deferred().
+   at: _set_size (scene/gui/control.cpp:1519)
+   GDScript backtrace (most recent call first):
+       [0] _run_debug_scene_fixture_change_smoke (res://tests/run_tests.gd:955)
+       [1] _initialize (res://tests/run_tests.gd:120)
+  M10-C001 V07 fixture-change runtime smoke complete
+---- BoardRenderer performance sanity (40x40 = 1600 cells) ----
+  configure() (setup + first full render): 2.229 ms
+  refresh_all() x20: 45.543 ms total, 2.2771 ms/call
+  update_cells([2 cells]) x20: 0.124 ms total, 0.0062 ms/call
+---- BoardRenderer performance sanity (50x50 = 2500 cells) ----
+  configure() (setup + first full render): 3.500 ms
+  refresh_all() x20: 64.177 ms total, 3.2089 ms/call
+  update_cells([2 cells]) x20: 0.146 ms total, 0.0073 ms/call
+---- BoardRenderer performance sanity (59x59 = 3481 cells) ----
+  configure() (setup + first full render): 4.534 ms
+  refresh_all() x20: 98.458 ms total, 4.9229 ms/call
+  update_cells([2 cells]) x20: 0.137 ms total, 0.0069 ms/call
+---- BoardRenderer performance sanity (53x59 = 3127 cells) ----
+  configure() (setup + first full render): 4.564 ms
+  refresh_all() x20: 89.326 ms total, 4.4663 ms/call
+  update_cells([2 cells]) x20: 0.128 ms total, 0.0064 ms/call
+---- LevelImporter performance sanity (59x59 = 3481 cells) ----
+  full import (load+extract+validate+write): 5.997 ms
+  reconstruction: 0.768 ms
+ERROR: Error opening file 'user://nonexistent.png'.
+   at: load_image (core/io/image_loader.cpp:91)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] _run_importer_tests (res://tests/run_tests.gd:1314)
+       [2] _initialize (res://tests/run_tests.gd:124)
+WARNING: Not a PNG file
+   at: check_error (drivers/png/png_driver_common.cpp:57)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] _run_importer_tests (res://tests/run_tests.gd:1578)
+       [2] _initialize (res://tests/run_tests.gd:124)
+ERROR: Condition "!success" is true. Returning: ERR_FILE_CORRUPT
+   at: png_to_image (drivers/png/png_driver_common.cpp:70)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] _run_importer_tests (res://tests/run_tests.gd:1578)
+       [2] _initialize (res://tests/run_tests.gd:124)
+ERROR: Error loading image: 'user://test_importer/corrupt.png'.
+   at: load_image (core/io/image_loader.cpp:102)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] _run_importer_tests (res://tests/run_tests.gd:1578)
+       [2] _initialize (res://tests/run_tests.gd:124)
+Unicode parsing error, some characters were replaced with � (U+FFFD): Invalid UTF-8 leading byte (89)
+ERROR: Error opening file 'user://test_batch_importer/nonexistent_source.png'.
+   at: load_image (core/io/image_loader.cpp:91)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] run_batch (res://scripts/tools/level_batch_importer.gd:420)
+       [2] _run_batch_importer_tests (res://tests/run_tests.gd:1841)
+       [3] _initialize (res://tests/run_tests.gd:125)
+WARNING: Not a PNG file
+   at: check_error (drivers/png/png_driver_common.cpp:57)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] run_batch (res://scripts/tools/level_batch_importer.gd:420)
+       [2] _run_batch_importer_tests (res://tests/run_tests.gd:1899)
+       [3] _initialize (res://tests/run_tests.gd:125)
+ERROR: Condition "!success" is true. Returning: ERR_FILE_CORRUPT
+   at: png_to_image (drivers/png/png_driver_common.cpp:70)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] run_batch (res://scripts/tools/level_batch_importer.gd:420)
+       [2] _run_batch_importer_tests (res://tests/run_tests.gd:1899)
+       [3] _initialize (res://tests/run_tests.gd:125)
+ERROR: Error loading image: 'user://test_batch_importer/batch_corrupt.png'.
+   at: load_image (core/io/image_loader.cpp:102)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] run_batch (res://scripts/tools/level_batch_importer.gd:420)
+       [2] _run_batch_importer_tests (res://tests/run_tests.gd:1899)
+       [3] _initialize (res://tests/run_tests.gd:125)
+---- LevelBatchImporter performance sanity (3 items incl. 59x59) ----
+  commit batch (preflight + write): 18.545 ms
+---- GameplaySession performance sanity (59x59) ----
+  load_level: 0.629 ms
+  reset: 0.010 ms
+---- M12: SlotSystem / SlotState tests ----
+  M12 slot system tests complete
+---- M13: ColorCandidateIndex tests ----
+  M13 ColorCandidateIndex tests complete
+---- M13 ColorCandidateIndex benchmark (59x59 = 3481 cells) ----
+  bind/build x50: 266.662 ms total, 5.3332 ms/build
+  rebuild x50: 259.559 ms total, 5.1912 ms/rebuild
+  indexed get_candidates x5000: 3.663 ms total, 0.00073 ms/query
+  naive full-scan baseline x5000: 38259.301 ms total, 7.65186 ms/query
+  (CPU/index timing only — not an FPS/GPU claim; informational, no hardware threshold)
+  (query sink=3481000 naive sink=3481000 — must match, prevents dead-code elimination)
+---- M14: ReservationState tests ----
+  M14 ReservationState tests complete
+---- M14: ReservationState STRICT (F-M14-STRICT-001/002) ----
+  M14 ReservationState STRICT tests complete
+---- M14: ReservationState <-> ColorCandidateIndex integration ----
+  M14 integration tests complete
+---- M14 ReservationState performance (59x59 = 3481 cells) ----
+  reserve x500: 1.669 ms total, 0.00334 ms/reserve
+  is_reserved x5000: 2.450 ms total, 0.000490 ms/query
+  release x500: 0.588 ms total, 0.00118 ms/release
+  (O(1) dict ops; no per-call full-board scan — CPU timing only, no FPS/GPU claim)
+---- M15: TargetSelector tests ----
+  M15 TargetSelector tests complete
+---- M15: TargetSelector simultaneous-assignment tests ----
+  M15 TargetSelector simultaneous-assignment tests complete
+---- M15 strict-v2: fail-closed bind, board coherence, same-owner contention ----
+  M15 strict-v2 tests complete
+---- M15 strict-v2 (2nd stage): Variant-return boundary + operation drift (F-004/005) ----
+  M15 strict-v2 2nd-stage tests complete
+---- M15 strict-v2 (V02): transaction guard + drift + exact rollback (F-004/005) ----
+  M15 strict-v2 V02 tests complete
+---- M15 strict-v2 (V03): select-during-bind + proof bracketing (F-004/005) ----
+  M15 strict-v2 V03 tests complete
+---- M15 TargetSelector performance (59x59 = 3481 cells) ----
+  candidate count for tested color: 3481
+  bounded-iteration select (100 blocked prefix): 101 access-query calls (chose index 3404)
+  select_and_reserve x500 (first-candidate): 2164.998 ms total, 4.33000 ms/select
+  access-query calls over sample: 500 (== 500 selects, one per call — no per-call full-board scan)
+  (CPU/selection timing only — not an FPS/GPU claim; iterates color candidates, never all 3481 cells)
+---- M17: prototype contract (behind M16) ----
+---- M17: direct baseline ----
+---- M17: grid-aware prototype ----
+---- M17: organized/curved prototype ----
+---- M17: comparison metrics ----
+---- M17: multi-route scale (5/10/25/stress/59x59/rect) ----
+---- M17: routing prototype lab scene smoke ----
+---- M17-C002: production routing (organized/curved + grid) ----
+---- M17-C002 V03: full-surface hardening ----
+---- M18: lightweight Scrubbot agent ----
+---- M18: single-use lifecycle re-entry (adversarial) ----
+---- M18: observable multi-segment movement (handcrafted route) ----
+---- M18: agent lifecycle isolation stress (CPU/node only; no FPS/GPU claim) ----
+     M18 lifecycle-ISOLATED 5-agent: 5 agents, alloc+assign+move+free CPU=0.26 ms | route-gen (separate)=170.43 ms (headless CPU only, no FPS/GPU claim)
+     M18 lifecycle-ISOLATED 10-agent: 10 agents, alloc+assign+move+free CPU=0.43 ms | route-gen (separate)=311.51 ms (headless CPU only, no FPS/GPU claim)
+     M18 lifecycle-ISOLATED 25-agent: 25 agents, alloc+assign+move+free CPU=0.95 ms | route-gen (separate)=725.26 ms (headless CPU only, no FPS/GPU claim)
+     M18 lifecycle-ISOLATED stress 40-agent (>25): 40 agents, alloc+assign+move+free CPU=1.66 ms | route-gen (separate)=1860.91 ms (headless CPU only, no FPS/GPU claim)
+     M18 pooling: NOT added. Isolated headless agent-lifecycle timing
+     (alloc+assign+move+free, routes precomputed) shows no justification
+     for pooling under THIS test. The agent is a childless Node2D with no
+     per-frame allocation. This is headless CPU/node evidence only — not
+     an FPS/GPU/mobile-frame result. Pooling stays deferred to real
+     profiling if future evidence justifies it. (SB-M18-014/015, AL-036)
+---- M18: agent debug scene smoke ----
+---- M19: dispatcher orchestration (deterministic fakes) ----
+---- M19: dispatcher over REAL production selection+routing ----
+---- M19: dispatcher rapid-input stress (CPU/node only; no FPS/GPU claim) ----
+     M19 stress: 30 rapid dispatches (25 reachable), CPU=6.81 ms (headless CPU only, no FPS/GPU claim)
+     M19 pooling: NOT justified — 30 rapid create/assign/attach dispatches
+     completed in a fraction of a ms of CPU; agents are childless Node2Ds
+     with no per-frame allocation. Defer any pooling to real profiling.
+---- M19-C001 V02: strict-v2 dispatcher hardening ----
+     M19 add-child reset: child_entered_tree delivered deferred; generation guard still covers add_child boundary
+---- M19-C001 V03: strict-v2 second-stage closure ----
+---- M19-C001 V04: frozen dispatcher transaction remainder ----
+  M19 V04 tests complete
+---- M19-C001 V05: transaction boundary closure ----
+  M19 V05 tests complete
+---- M19-C001 V06: auditor-authored validation-only ----
+  M19 V06 auditor-validation tests complete
+---- M20-C001 V01: clearing-loop bind contract (section 2) ----
+---- M20-C001 V01: slot activation delegation (section 4) ----
+---- M20-C001 V01: authoritative clear transaction + post-arrival tuple (section 6/10) ----
+---- M20-C001 V01: required scenario matrix (section 11) ----
+---- M20-C001 V01: clearing opens future reachability (section 8, AL-028) ----
+---- M20-C001 V01: exactly-once / spoof / stale / desync adversaries (section 5/7) ----
+---- M20-C001 V01: reset / lifecycle (section 9) ----
+---- M20-C001 V03: exact-category bind trust boundary (F-M20-STRICT-001, §2/§9) ----
+---- M20-C001 V02: activation serialization (F-M20-STRICT-002) ----
+---- M20-C001 V02: corrected order + postconditions (F-M20-STRICT-004) ----
+---- M20-C001 V02: mutation-sensitive verified rollback w/ renderer (F-M20-STRICT-004/009/012) ----
+---- M20-C001 V02: transactional reset during arrival (F-M20-STRICT-006) ----
+---- M20-C001 V02: lossless serial arrivals (F-M20-STRICT-006) ----
+---- M20-C001 V02: AL-028 full second-activation proof (F-M20-STRICT-005) ----
+---- M20-C001 V02: direct-observability completion (F-M20-STRICT-007) ----
+---- M20-C001 V03: exact reservation snapshot/postcondition/rollback (§5/§6) ----
+---- M20-C001 V03: unrelated candidate truth + single-cell path (§7) ----
+---- M20-C001 V03: current-arrival dedup (§8) ----
+---- M20-C001 V04: Node lifetime boundary (F-M20-STRICT-001.K) ----
+---- M20-C001 V04: post-dispatch transaction bracket (F-M20-STRICT-002.K) ----
+---- M19 V04: pair-narrow board-safe dispatcher reset (F-M20-STRICT-006.K) ----
+==== M20-C001 V05 auditor validation (fresh arrangements) ====
+---- V05 §3: Node lifecycle liveness law ----
+---- V05 §4: post-dispatch transaction barrier ----
+---- V05 §5: pair-narrow board-safe reset ----
+---- V05 §6: arrival / transaction adversaries ----
+---- V05 §7: direct gameplay integration ----
+  M20 V05 auditor validation complete
+---- M20-C001 V06: renderer presence null-vs-dead distinction (F-M20-STRICT-001.L) ----
+---- M20-C001 V07 §2: single M20 arrival consumer per dispatcher (F-M20-STRICT-001.M) ----
+---- M20-C001 V07 §3: explicit agent_parent presence law (F-M20-STRICT-001.N) ----
+---- M20-C001 V07 §4: renderer variant / whole-lifecycle evidence ----
+---- M20-C001 V07 §5/§6: arrival-desync + activation public-boundary matrix ----
+==== M20-C001 V07 §7: SB-M20-001..014 whole-sprint ledger ====
+  SB-M20-003: frame-aware deferred destruction proven by tests/m20_queue_free_smoke.gd
+==== M20-C001 V08 auditor validation (fresh arrangements) ====
+---- V08 §3: single M20 owner / claim lifecycle ----
+  V08.3: owner-GC claim release + no-leak proven in tests/m20_v08_lifecycle_smoke.gd
+---- V08 §4: agent_parent lifecycle ----
+  V08.4: truly-freed explicit parent + destroy-before-dispatch proven in tests/m20_v08_lifecycle_smoke.gd
+---- V08 §5: renderer lifecycle ----
+---- V08 §6: arrival-preflight desync matrix ----
+---- V08 §7: activation public-boundary matrix (per-case snapshots) ----
+---- V08 §8: SB-M20-001..014 final ledger ----
+  SB-M20-003: frame no-return/deferred disappearance -> tests/m20_queue_free_smoke.gd + tests/m20_v08_lifecycle_smoke.gd
+---- V08 §9: rollback/reset/contention ----
+  M20 V08 auditor validation complete
+==== M20-C001 V09 exact-evidence validation ====
+---- V09 §3: owner claim exact lifecycle ----
+  V09.3: owner-GC claim release + old-callback-absent + no-leak -> tests/m20_v09_lifecycle_smoke.gd
+---- V09 §4: activation exact snapshot matrix ----
+---- V09 §5: arrival-preflight exact invariants ----
+  V09.5: frame-aware truly-freed configured renderer before arrival -> tests/m20_v09_lifecycle_smoke.gd
+---- V09 §6: exact SB-M20-001..014 ledger ----
+  SB-M20-003: frame destruction/no-orphan -> tests/m20_queue_free_smoke.gd (run separately)
+---- V09 §7: exact rollback/reset/contention ----
+  M20 V09 exact-evidence validation complete
+==== M20-C001 V10 closure reconciliation ====
+---- V10 G-V09-01: claim/reset actual usability ----
+  G01: owner-GC claim release proven in tests/m20_v09/v10 lifecycle smokes
+---- V10 G-V09-02: activation serialization exactness ----
+---- V10 G-V09-03: exact failed-preflight matrix ----
+  G03: truly-freed renderer preservation + failed-preflight cleanup -> tests/m20_v10_lifecycle_smoke.gd
+---- V10 G-V09-04: exact ledger identity ----
+---- V10 G-V09-05: detached rollback prestate ----
+  M20 V10 closure reconciliation complete
+==== M20-C001 V11 direct-assertion reconciliation ====
+---- V11 G-V10-01: arrival-drain inner activation exact zero side effects ----
+---- V11 G-V10-02: missing reservation preserves dispatcher assignment ----
+---- V11 G-V10-03: candidate rebind(null) exact preservation ----
+---- V11 G-V10-04: externally-CLEARED exact preservation ----
+---- V11 G-V10-05: reservation rollback reverse identity for every owner ----
+  M20 V11 direct-assertion reconciliation complete
+---- M21-C001 V01: owner-approved source integrity (section 2/B/C) ----
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] _m21_load_source (res://tests/run_tests.gd:12244)
+       [1] _run_m21_source_audit_tests (res://tests/run_tests.gd:12260)
+       [2] _initialize (res://tests/run_tests.gd:219)
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] _m21_raw_import (res://tests/run_tests.gd:12253)
+       [2] _run_m21_source_audit_tests (res://tests/run_tests.gd:12310)
+       [3] _initialize (res://tests/run_tests.gd:219)
+---- M21-C001 V01: production-art palette bridge (section 3/D) ----
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] _m21_raw_import (res://tests/run_tests.gd:12253)
+       [2] _run_m21_production_art_bridge_tests (res://tests/run_tests.gd:12318)
+       [3] _initialize (res://tests/run_tests.gd:220)
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] _m21_raw_import (res://tests/run_tests.gd:12253)
+       [2] _run_m21_production_art_bridge_tests (res://tests/run_tests.gd:12335)
+       [3] _initialize (res://tests/run_tests.gd:220)
+---- M21-C001 V01: committed artifact roundtrip (section 4/E) ----
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] _m21_load_source (res://tests/run_tests.gd:12244)
+       [1] _run_m21_artifact_roundtrip_tests (res://tests/run_tests.gd:12401)
+       [2] _initialize (res://tests/run_tests.gd:221)
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/previews/m21_level_001_hazard_bot.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] _run_m21_artifact_roundtrip_tests (res://tests/run_tests.gd:12408)
+       [1] _initialize (res://tests/run_tests.gd:221)
+---- M21-C001 V01: real-art AL-028 reachability proof (section 6/G) ----
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] _m21_load_source (res://tests/run_tests.gd:12244)
+       [1] _run_m21_real_art_reachability_tests (res://tests/run_tests.gd:12454)
+       [2] _initialize (res://tests/run_tests.gd:222)
+---- M21-C001 V01: debug real-art vertical-slice scene smoke (section 8) ----
+---- M21-C001 V02: F-001 one difficulty identity ----
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] _m21_raw_import (res://tests/run_tests.gd:12253)
+       [2] _run_m21_v02_difficulty_identity_tests (res://tests/run_tests.gd:12580)
+       [3] _initialize (res://tests/run_tests.gd:225)
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] _m21_raw_import (res://tests/run_tests.gd:12253)
+       [2] _run_m21_v02_difficulty_identity_tests (res://tests/run_tests.gd:12586)
+       [3] _initialize (res://tests/run_tests.gd:225)
+---- M21-C001 V02: F-002 arbitrary-Variant fail-closed ----
+---- M21-C001 V02: F-003 destination preflight ----
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] build (res://scripts/tools/production_art_level_builder.gd:300)
+       [2] _run_m21_v02_destination_preflight_tests (res://tests/run_tests.gd:12668)
+       [3] _initialize (res://tests/run_tests.gd:227)
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] _m21_load_source (res://tests/run_tests.gd:12244)
+       [1] _run_m21_v02_destination_preflight_tests (res://tests/run_tests.gd:12671)
+       [2] _initialize (res://tests/run_tests.gd:227)
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] build (res://scripts/tools/production_art_level_builder.gd:300)
+       [2] _run_m21_v02_destination_preflight_tests (res://tests/run_tests.gd:12676)
+       [3] _initialize (res://tests/run_tests.gd:227)
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] build (res://scripts/tools/production_art_level_builder.gd:300)
+       [2] _run_m21_v02_destination_preflight_tests (res://tests/run_tests.gd:12679)
+       [3] _initialize (res://tests/run_tests.gd:227)
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] build (res://scripts/tools/production_art_level_builder.gd:300)
+       [2] _run_m21_v02_destination_preflight_tests (res://tests/run_tests.gd:12680)
+       [3] _initialize (res://tests/run_tests.gd:227)
+---- M21-C001 V02: fresh adversarial validation (section 6, AL-035) ----
+---- M21-C001 V03: F-003 residual path-safety (one resolver) ----
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] build (res://scripts/tools/production_art_level_builder.gd:300)
+       [2] _run_m21_v03_path_safety_tests (res://tests/run_tests.gd:12804)
+       [3] _initialize (res://tests/run_tests.gd:230)
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] build (res://scripts/tools/production_art_level_builder.gd:300)
+       [2] _run_m21_v03_path_safety_tests (res://tests/run_tests.gd:12810)
+       [3] _initialize (res://tests/run_tests.gd:230)
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] build (res://scripts/tools/production_art_level_builder.gd:300)
+       [2] _run_m21_v03_path_safety_tests (res://tests/run_tests.gd:12832)
+       [3] _initialize (res://tests/run_tests.gd:230)
+WARNING: Not a PNG file
+   at: check_error (drivers/png/png_driver_common.cpp:57)
+   GDScript backtrace (most recent call first):
+       [0] _plan_image (res://scripts/tools/production_art_level_builder.gd:510)
+       [1] build (res://scripts/tools/production_art_level_builder.gd:337)
+       [2] _run_m21_v03_path_safety_tests (res://tests/run_tests.gd:12832)
+       [3] _initialize (res://tests/run_tests.gd:230)
+ERROR: Condition "!success" is true. Returning: ERR_FILE_CORRUPT
+   at: png_to_image (drivers/png/png_driver_common.cpp:70)
+   GDScript backtrace (most recent call first):
+       [0] _plan_image (res://scripts/tools/production_art_level_builder.gd:510)
+       [1] build (res://scripts/tools/production_art_level_builder.gd:337)
+       [2] _run_m21_v03_path_safety_tests (res://tests/run_tests.gd:12832)
+       [3] _initialize (res://tests/run_tests.gd:230)
+ERROR: Error loading image: 'C:/Users/sekip/.codex/worktrees/m43-c005-c003-cards/ScrubBots/coordination/sessions/M21-C001/_v03_tmp/conf/prev.png'.
+   at: load_image (core/io/image_loader.cpp:102)
+   GDScript backtrace (most recent call first):
+       [0] _plan_image (res://scripts/tools/production_art_level_builder.gd:510)
+       [1] build (res://scripts/tools/production_art_level_builder.gd:337)
+       [2] _run_m21_v03_path_safety_tests (res://tests/run_tests.gd:12832)
+       [3] _initialize (res://tests/run_tests.gd:230)
+WARNING: Loaded resource as image file, this will not work on export: 'res://assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png'. Instead, import the image file as an Image resource and load it normally as a resource.
+   at: load (core/io/image.cpp:2770)
+   GDScript backtrace (most recent call first):
+       [0] run_import (res://scripts/tools/level_importer.gd:109)
+       [1] build (res://scripts/tools/production_art_level_builder.gd:300)
+       [2] _run_m21_v03_path_safety_tests (res://tests/run_tests.gd:12838)
+       [3] _initialize (res://tests/run_tests.gd:230)
+---- M21-C001 V03: fresh real-art direct-evidence reconciliation ----
+---- M21-C001 V04: V03 preview-directory evidence residual ----
+---- M21-C001 V04: owner-locked target priority (bottom-most/left-most) ----
+  M21 first C08 target under owner rule: index 380 coord (0,19)
+---- M21-C001 V04: AgentLayer presentation transform ----
+---- M21-C001 V04: five-slot SlotView presentation + real click path ----
+---- M21-C001 V05: F-001 single movement owner ----
+---- M21-C001 V05: F-003 concurrency-correct active presentation ----
+---- M21-C001 V05: F-004 real Button/signal activation path ----
+---- M21-C001 V07: exterior routing corridor (safety intent; ring superseded by Railroad V1) ----
+---- M22-C001 V01: production SlotCell / ColorSelectionPanel unit ----
+---- M22-C001 V01: production panel -> accepted M21 chain integration ----
+---- M22-C001 V02: ScrubRailGeometry single-source geometry ----
+---- M22-C001 V02: Railroad V1 routing law ----
+---- M22-C001 V02: production demo Railroad V1 integration ----
+---- M22-C001 V07: post-rail interior orthogonal turning ----
+V07_OWNER_CLASS target_idx=241 coord=(1,12) corridor=col7[y12..19]+row12[x2..7] route=[(10.0, 21.0), (10.0, 22.5), (7.5, 22.5), (7.5, 12.5), (1.5, 12.5)]
+---- M23-C001 V01: Batch Supply Engine ----
+M23_PERF 59x59 x2 generate = 3 ms
+---- M23-C001 V02: hardening (F-001..005) ----
+---- M23-C001 V03: engine-owned transaction identity ----
+---- M24-C001 V01: Five-Slot Batch Engine ----
+---- M25-C001 V01: Batch Target Claim Engine ----
+---- M26-C001 V01: Auto Dispatch Scheduler ----
+---- M26-C001 V02: strict remediation (F-M26-V01-STRICT-001..004) ----
+---- M27-C001 V01: Solvability / Deadlock Engine (SB-M27-001..034) ----
+---- M28-C001 V01: Gameplay Screen Layout (SB-M28-001..028) ----
+
+==== SCRUBBOTS test summary ====
+Total checks: 5323
+Failures: 0
+RESULT: ALL PASS
+WARNING: 1 RID of type "CanvasItem" was leaked.
+   at: _free_rids (servers/rendering/renderer_canvas_cull.cpp:2733)
+WARNING: 84 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 18 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)

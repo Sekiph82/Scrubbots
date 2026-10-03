@@ -1,0 +1,42 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[01-04 pack opening candidates]
+  ok: Standard: exactly 3 card slots (config draws 3)
+  ok: Standard: real Standard Pack art
+  ok: Premium: exactly 5 card slots, 3 Rare-or-better in the fixture
+  ok: Premium: real Premium Pack art
+  ok: every card: catalog rarity chip + rarity frame + own art + NEW/DUPLICATE (+copies) ["s3_c1 COMMON NEW", "s3_c4 RARE DUPLICATE", "s7_c2 COMMON NEW", "s2_c0 COMMON NEW", "s4_c6 EPIC NEW", "s9_c3 COMMON DUPLICATE", "s11_c4 RARE NEW", "s14_c8 LEGENDARY NEW"]
+  ok: packs: single CONTINUE, no reroll / open-again, no after-the-fact 'guaranteed' claim
+[05-06 collection candidates]
+  ok: all 15 Set Complete fixtures show their exact configured SB + Bot Parts, name, 9/9 and 9 real card thumbs
+  ok: Set Complete: one CONTINUE, reward stated as already added (no grant on tap)
+  ok: Master: exactly +2,500 SB +20 Bot Parts (= config), nothing else ["+2,500 Scrub Bucks", "+20 Bot Parts"]
+  ok: Master: Master Collection emblem
+[07 robot unlock candidate]
+  ok: name + role verbatim from OWNER_ROBOT_ROSTER_V01 (#2 Moppy)
+  ok: canonical 20% perk: Clean Bonus: +20% first-clear Scrub Bucks.
+  ok: canonical Moppy art + remaining Bot Parts
+  ok: EQUIP (primary) + KEEP CURRENT (secondary)
+[08 Gift milestone candidates]
+  ok: Gift 10/50/250/500/1000 rows = exact config bundles; 1000 fallback shown as a condition, not a reward ["10:{ \"bot_parts\": 1, \"standard_card_packs\": 1 }", "50:{ \"bot_parts\": 1, \"random_booster_charges\": 1 }", "250:{ \"scrub_bucks\": 100, \"bot_parts\": 2, \"standard_card_packs\": 1 }", "500:{ \"scrub_bucks\": 250, \"bot_parts\": 2, \"standard_card_packs\": 1, \"selected_booster_charges\": 1 }", "1000:{ \"scrub_bucks\": 500, \"bot_parts\": 4, \"premium_card_packs\": 1, \"selected_booster_charges\": 2, \"guaranteed_new_cards\": 1 }"]
+  ok: 1000 milestone hero (300 px) larger than the small milestone (220 px)
+[09-11 feature / world shell / generic reward]
+  ok: feature: no campaign level anywhere, fixture-tagged, no reward rows
+  ok: world shell: slots only, no range / World 02, World 01 art tagged PREVIEW HARNESS · SHELL TEST ONLY
+  ok: generic reward: 1..4 rows build, 0 and 5 are refused
+[12 previews never mutate economy / progression / save]
+  ok: economy / progression snapshots and save bytes unchanged after opening every candidate and pressing every action
+  ok: harness source calls no grant / open / unlock / claim / wallet / save API []
+  ok: no shipping script under scripts/ references the preview harness
+[13 shared family fits all five viewports]
+  ok: 10 candidates x 5 viewports: frame in safe area, no clipped text, CTAs >= 88 px, cards inside the frame []
+[14 Reduced Effects: identical information, no motion]
+  ok: every candidate: Reduced Effects labels + actions identical to the animated version
+  ok: Reduced Effects: no glow spin / card flip, cards face-up immediately (animated versions do move)
+[15-16 copy guard / asset paths]
+  ok: no jackpot / near-miss / urgency / odds / reroll copy []
+  ok: 38 bound textures + 135 card arts all exist under assets/ui/final
+  ok: explicitly recorded missing art: ["selected_booster_charges"] (native '?' chip, see inventory)
+[17 repeated open / close]
+  ok: 20 x 10 candidates opened / closed: nodes 2 -> 2, tweens and connections stable
+M43-C005-C001 ceremony visual masters: PASS (17/17 cases, 0 fail)

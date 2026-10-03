@@ -1,0 +1,97 @@
+{
+  "validator": "M43-C005-C003 collection card asset validator",
+  "passed": true,
+  "checks": [
+    {
+      "name": "15 sets / 9 cards / 135 inventory rows",
+      "passed": true,
+      "detail": "rows=135 sets=15"
+    },
+    {
+      "name": "canonical path mapping is exactly the 15x9 tree",
+      "passed": true,
+      "detail": "inventory_paths=135 old_sha_paths=135"
+    },
+    {
+      "name": "135 generation records and manifest rows",
+      "passed": true,
+      "detail": "runs=135 manifest=135"
+    },
+    {
+      "name": "manifest origin is individually_generated",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "135 unique generated illustrations and output paths",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "no multi-card/crop source path used",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "manifest card metadata matches inventory",
+      "passed": true,
+      "detail": "names, rarities, and stars"
+    },
+    {
+      "name": "all old and new hashes differ",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "all cards are marked generated",
+      "passed": true,
+      "detail": ""
+    },
+    {
+      "name": "all outputs are 1024x1536 RGBA PNG",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "all card corners are transparent",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "no empty images",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "inventory, manifest, run log and files hash-match",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "rarity profile per set",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "exactly 135 canonical card PNG files",
+      "passed": true,
+      "detail": "pngs=135 extras=[]"
+    },
+    {
+      "name": "15 set sheets, 1 master, 4 template examples, 15 zoom samples",
+      "passed": true,
+      "detail": "sets=15 templates=4 zooms=15"
+    },
+    {
+      "name": "scope contains only canonical card assets and task evidence",
+      "passed": true,
+      "detail": "[]"
+    },
+    {
+      "name": "root TASKS is untouched",
+      "passed": true,
+      "detail": ""
+    }
+  ],
+  "errors": []
+}

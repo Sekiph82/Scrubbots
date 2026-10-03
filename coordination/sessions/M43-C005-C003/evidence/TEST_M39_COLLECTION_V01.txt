@@ -1,0 +1,49 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[collection shape]
+  ok: 15x9 = 135 cards in catalog
+  ok: owned increments
+  ok: unknown set not complete
+[set + master]
+  ok: set 1 complete
+  ok: set 1 reward 350 SB + 5 bot parts once
+  ok: duplicate card in complete set does not re-grant
+[totals]
+  ok: all 15 sets complete
+  ok: total SB incl master = 15850 (got 15850)
+  ok: total bot parts incl master = 167 (got 167)
+  ok: master not re-granted
+[packs]
+  ok: standard pack = 3 draws
+  ok: premium pack = 5 draws
+  ok: premium pack has >=1 rare-or-better
+  ok: same seed -> identical draws (deterministic test RNG)
+[exchange]
+  ok: s1_c0 is COMMON
+  ok: single protected copy not exchangeable
+  ok: two extras exchangeable
+  ok: exchange 2 COMMON -> +50 SB, owned back to protected 1
+  ok: cannot exchange the protected copy
+  ok: duplicate exchange tx rejected
+  ok: exchange-all-extras ok
+  ok: owned back to protected 1 after exchange-all
+[daily login]
+  ok: day 1 login
+  ok: D1 grants 100 SB
+  ok: same-day re-claim rejected
+  ok: day 2 login, streak 2
+[daily tasks]
+  ok: task 0 = 75 SB
+  ok: task 1 = 100 SB
+  ok: task 2 = 125 SB
+  ok: duplicate task claim rejected
+  ok: all-tasks bonus granted
+  ok: all-tasks bonus once
+[calendar safety]
+  ok: missed day resets streak to 1
+  ok: clock rollback does not allow a duplicate claim
+M39 Phase D evidence: PASS
+WARNING: 21 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 3 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
