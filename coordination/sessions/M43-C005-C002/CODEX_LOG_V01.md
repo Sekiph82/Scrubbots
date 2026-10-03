@@ -33,6 +33,10 @@ Contact sheets were visually inspected for identity, package continuity, tear pr
 
 `git diff --cached --check`: PASS before the implementation commit; the log-only commit receives the same check before commit.
 
+## Publication evidence
+
+Implementation commit: `6ce5ab4e1a86766c609a694efadeefbcac538482`. Initial asset + log push command: `git push origin HEAD:main`; result: `6d87c1c..e54b51a HEAD -> main`. A subsequent `git fetch origin main --prune` confirmed HEAD and `origin/main` both at `e54b51a00df65b86a3c38ad5343c9d96dd6fbc36` with divergence `0 0`. Root tracker remains unchanged. This publication-verification note is an additional log-only commit; the final current tip is reported in the handoff response.
+
 ## Handoff
 
-Implementation commit: `6ce5ab4e1a86766c609a694efadeefbcac538482`. The final publication tip and remote SHA equality will be reported in the handoff response. Required handoff: `AWAITING_GPT_M43_C005_C002_PACK_ASSET_AUDIT`.
+Required handoff: `AWAITING_GPT_M43_C005_C002_PACK_ASSET_AUDIT`.
