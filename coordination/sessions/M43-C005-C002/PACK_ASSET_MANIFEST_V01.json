@@ -1,0 +1,669 @@
+{
+  "schema_version": 1,
+  "task": "SB-M43-076",
+  "prompt": "coordination/sessions/M43-C005-C002/CHATGPT_PROMPT_V02.md",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "mode": "RGBA"
+  },
+  "edge_safety_px": 48,
+  "pack_registration_estimate_method": "Frame 01 owner reference placement; estimates carried through the registered sequence; visual center target x=512 and bottom target y=1260.",
+  "references": [
+    {
+      "path": "coordination/sessions/M43-C005-C002/references/owner_standard_pack.png",
+      "dimensions": [
+        1269,
+        1240
+      ],
+      "mode": "RGBA",
+      "file_sha256": "876b874938a1123288233712015b485c714c99116dc50c2d6085474c92944baa",
+      "file_sha256_expected_attachment_informational_only": "9528e46bbb66d28f752d0250a821323181257901d3510898a6e2ae0f4c2d953a",
+      "decoded_rgba_pixel_sha256": "37bbe0f1d09260e4c4b26356c8986aa65f96fb81ad2aee9f8a3533761d9f191f",
+      "decoded_rgba_pixel_sha256_expected_attachment": "27e68fcb058105c2131b3c7f3a34f8f14bc2fc1f9c23bfcd7f2105d4712398ac",
+      "identity_basis": "V02 visual authorization: this is the sole named local file and its visible pack design matches the owner-confirmed attached main visual; encoded and decoded hashes are recorded without claiming an exact attachment pixel-hash match."
+    },
+    {
+      "path": "coordination/sessions/M43-C005-C002/references/owner_premium_pack.png",
+      "dimensions": [
+        1024,
+        1536
+      ],
+      "mode": "RGBA",
+      "file_sha256": "51b4e7c85bf4ca9358e5f3c6c3afe0c551ee34c27c25d3a48c151ab4cb821faf",
+      "file_sha256_expected_attachment_informational_only": "eeb95192d223c07333a0f14eff37c522bcfa5fe3d4200add9b7d2b0d16d88e4c",
+      "decoded_rgba_pixel_sha256": "074256759938dc1e662441d2fc5b7e3b84ec289cd066c518089595ac6f7f0d6e",
+      "decoded_rgba_pixel_sha256_expected_attachment": "c8f06e0b3e9a888526158c462a8ae8293a8269a1975016e8cf22a6d39847de6d",
+      "identity_basis": "V02 visual authorization: this is the sole named local file and its visible pack design matches the owner-confirmed attached main visual; encoded and decoded hashes are recorded without claiming an exact attachment pixel-hash match."
+    }
+  ],
+  "card_count_source": "Exact overlay construction metadata; visual contact-sheet inspection also performed. Card faces are never shown.",
+  "frames": [
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_01_closed.png",
+      "sha256": "ae31881ea692af695125d539832b48a5d76ef77672a22864dcc784c1d35eceea",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        133,
+        498,
+        891,
+        1260
+      ],
+      "alpha_edge_margins_px": {
+        "left": 133,
+        "top": 498,
+        "right": 133,
+        "bottom": 276
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 0,
+      "constructed_card_overlay_count": 0,
+      "card_overlays": [],
+      "frame_role": "closed idle",
+      "transparent_pixel_count": 1241762
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_02_charge.png",
+      "sha256": "075e917c6e82a9bc555650df57b187d2eacc34b74e0fc504a1ff76c708f66b32",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        65,
+        64,
+        972,
+        1480
+      ],
+      "alpha_edge_margins_px": {
+        "left": 65,
+        "top": 64,
+        "right": 52,
+        "bottom": 56
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 0,
+      "constructed_card_overlay_count": 0,
+      "card_overlays": [],
+      "frame_role": "charge light buildup",
+      "transparent_pixel_count": 1171455
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_03_pressure.png",
+      "sha256": "086a7e7e6deb325c573e6fdd362c1f0d801b1acb3fb8f04786b74e4ad3cfc2a4",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        49,
+        49,
+        976,
+        1482
+      ],
+      "alpha_edge_margins_px": {
+        "left": 49,
+        "top": 49,
+        "right": 48,
+        "bottom": 54
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 0,
+      "constructed_card_overlay_count": 0,
+      "card_overlays": [],
+      "frame_role": "shake pressure",
+      "transparent_pixel_count": 1041316
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_04_first_tear.png",
+      "sha256": "5287e9521b2334a3b6eaf9e389f106f16df4386b9531304831b2ba62fc64a081",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        48,
+        48,
+        976,
+        1488
+      ],
+      "alpha_edge_margins_px": {
+        "left": 48,
+        "top": 48,
+        "right": 48,
+        "bottom": 48
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 0,
+      "constructed_card_overlay_count": 0,
+      "card_overlays": [],
+      "frame_role": "first tear",
+      "transparent_pixel_count": 236544
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_05_tear_widens.png",
+      "sha256": "0d47eeb9b4ac3f7483d64f5298bd06c8eb286a8c0df4968fba8c6f5c43674b63",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        48,
+        48,
+        976,
+        1488
+      ],
+      "alpha_edge_margins_px": {
+        "left": 48,
+        "top": 48,
+        "right": 48,
+        "bottom": 48
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 0,
+      "constructed_card_overlay_count": 0,
+      "card_overlays": [],
+      "frame_role": "tear widens",
+      "transparent_pixel_count": 236544
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_06_card_edge.png",
+      "sha256": "b020221590d570924c14ebae0d0095991050612adbc50a5a1ec7547a4914c36c",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        48,
+        48,
+        976,
+        1488
+      ],
+      "alpha_edge_margins_px": {
+        "left": 48,
+        "top": 48,
+        "right": 48,
+        "bottom": 48
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 1,
+      "constructed_card_overlay_count": 1,
+      "card_overlays": [
+        {
+          "center_x": 512,
+          "top_y": 530,
+          "rotation_degrees": 0,
+          "visible_percent": 17
+        }
+      ],
+      "frame_role": "full open card edge",
+      "transparent_pixel_count": 236544
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_07_one_card_rises.png",
+      "sha256": "6da0cea393ced1d5e193da607964afeb6c2b79190c43f5d98c42ac5c6bdd37cc",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        48,
+        48,
+        976,
+        1488
+      ],
+      "alpha_edge_margins_px": {
+        "left": 48,
+        "top": 48,
+        "right": 48,
+        "bottom": 48
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 1,
+      "constructed_card_overlay_count": 1,
+      "card_overlays": [
+        {
+          "center_x": 512,
+          "top_y": 421,
+          "rotation_degrees": 0,
+          "visible_percent": 58
+        }
+      ],
+      "frame_role": "one card rises",
+      "transparent_pixel_count": 236544
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_08_cards_emerge.png",
+      "sha256": "3a15e23345d0a739a656c7a260e49a20676ab9fdc912ae25ee8ff9b4ac999c52",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        48,
+        48,
+        976,
+        1488
+      ],
+      "alpha_edge_margins_px": {
+        "left": 48,
+        "top": 48,
+        "right": 48,
+        "bottom": 48
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 3,
+      "constructed_card_overlay_count": 3,
+      "card_overlays": [
+        {
+          "center_x": 405,
+          "top_y": 403,
+          "rotation_degrees": -11,
+          "visible_percent": 70
+        },
+        {
+          "center_x": 512,
+          "top_y": 389,
+          "rotation_degrees": 0,
+          "visible_percent": 70
+        },
+        {
+          "center_x": 619,
+          "top_y": 403,
+          "rotation_degrees": 11,
+          "visible_percent": 70
+        }
+      ],
+      "frame_role": "cards emerge",
+      "transparent_pixel_count": 236544
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/standard/frame_09_final_reveal.png",
+      "sha256": "e2413042b7b189147de72b8755ce7611bee334d9a9274dad6e356635133bce67",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        48,
+        48,
+        976,
+        1488
+      ],
+      "alpha_edge_margins_px": {
+        "left": 48,
+        "top": 48,
+        "right": 48,
+        "bottom": 48
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 3,
+      "constructed_card_overlay_count": 3,
+      "card_overlays": [
+        {
+          "center_x": 391,
+          "top_y": 323,
+          "rotation_degrees": -14,
+          "visible_percent": 100
+        },
+        {
+          "center_x": 512,
+          "top_y": 309,
+          "rotation_degrees": 0,
+          "visible_percent": 100
+        },
+        {
+          "center_x": 633,
+          "top_y": 323,
+          "rotation_degrees": 14,
+          "visible_percent": 100
+        }
+      ],
+      "frame_role": "final card reveal",
+      "transparent_pixel_count": 236544
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_01_closed.png",
+      "sha256": "29b87a206bae589ce4811641a40d352186a6bf01528cad9279b390c82031034c",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        225,
+        337,
+        802,
+        1251
+      ],
+      "alpha_edge_margins_px": {
+        "left": 225,
+        "top": 337,
+        "right": 222,
+        "bottom": 285
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 0,
+      "constructed_card_overlay_count": 0,
+      "card_overlays": [],
+      "frame_role": "closed idle",
+      "transparent_pixel_count": 1127694
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_02_charge.png",
+      "sha256": "44b88fbbc9796edadd13229268978ce7a3c94b22bcebd3bb9906f4d6a2bfe571",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        49,
+        61,
+        950,
+        1471
+      ],
+      "alpha_edge_margins_px": {
+        "left": 49,
+        "top": 61,
+        "right": 74,
+        "bottom": 65
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 0,
+      "constructed_card_overlay_count": 0,
+      "card_overlays": [],
+      "frame_role": "charge light buildup",
+      "transparent_pixel_count": 956552
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_03_pressure.png",
+      "sha256": "cf79d5b85d6227f69b462261e350c8bb1e27d8ad9deab135f5201faf778d9af6",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        49,
+        55,
+        960,
+        1471
+      ],
+      "alpha_edge_margins_px": {
+        "left": 49,
+        "top": 55,
+        "right": 64,
+        "bottom": 65
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 0,
+      "constructed_card_overlay_count": 0,
+      "card_overlays": [],
+      "frame_role": "shake pressure",
+      "transparent_pixel_count": 822097
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_04_first_tear.png",
+      "sha256": "dc40fd0cce4030154930938116e0562ac763a96bb32ec31bcea3fa1cccab689d",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        49,
+        55,
+        976,
+        1471
+      ],
+      "alpha_edge_margins_px": {
+        "left": 49,
+        "top": 55,
+        "right": 48,
+        "bottom": 65
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 0,
+      "constructed_card_overlay_count": 0,
+      "card_overlays": [],
+      "frame_role": "first tear",
+      "transparent_pixel_count": 813251
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_05_tear_widens.png",
+      "sha256": "072dbc8f4accd17b4eb0c4a679cb47d0fe5bf1083f7576480c926712be8ab564",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        49,
+        55,
+        976,
+        1471
+      ],
+      "alpha_edge_margins_px": {
+        "left": 49,
+        "top": 55,
+        "right": 48,
+        "bottom": 65
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 0,
+      "constructed_card_overlay_count": 0,
+      "card_overlays": [],
+      "frame_role": "tear widens",
+      "transparent_pixel_count": 772665
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_06_card_edge.png",
+      "sha256": "c12093897a3546dc32f74058585548d2ec595d9ab3e41fbb71e82c1b42b8c3bb",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        49,
+        53,
+        976,
+        1471
+      ],
+      "alpha_edge_margins_px": {
+        "left": 49,
+        "top": 53,
+        "right": 48,
+        "bottom": 65
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 1,
+      "constructed_card_overlay_count": 1,
+      "card_overlays": [
+        {
+          "center_x": 512,
+          "top_y": 497,
+          "rotation_degrees": 0,
+          "visible_percent": 17
+        }
+      ],
+      "frame_role": "full open card edge",
+      "transparent_pixel_count": 748026
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_07_one_card_rises.png",
+      "sha256": "7c3e0a11b8cf4afd54c2cf77621d17c66e087e6ae160ea0c998abb450e1335aa",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        49,
+        53,
+        976,
+        1471
+      ],
+      "alpha_edge_margins_px": {
+        "left": 49,
+        "top": 53,
+        "right": 48,
+        "bottom": 65
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 1,
+      "constructed_card_overlay_count": 1,
+      "card_overlays": [
+        {
+          "center_x": 512,
+          "top_y": 404,
+          "rotation_degrees": 0,
+          "visible_percent": 58
+        }
+      ],
+      "frame_role": "one card rises",
+      "transparent_pixel_count": 748026
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_08_cards_emerge.png",
+      "sha256": "0a8ebd9518a262a07a36032db1e8026690340add2880d4c06422e86a0f33e289",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        49,
+        53,
+        976,
+        1471
+      ],
+      "alpha_edge_margins_px": {
+        "left": 49,
+        "top": 53,
+        "right": 48,
+        "bottom": 65
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 5,
+      "constructed_card_overlay_count": 5,
+      "card_overlays": [
+        {
+          "center_x": 278,
+          "top_y": 375,
+          "rotation_degrees": -20,
+          "visible_percent": 70
+        },
+        {
+          "center_x": 395,
+          "top_y": 370,
+          "rotation_degrees": -10,
+          "visible_percent": 70
+        },
+        {
+          "center_x": 512,
+          "top_y": 365,
+          "rotation_degrees": 0,
+          "visible_percent": 70
+        },
+        {
+          "center_x": 629,
+          "top_y": 370,
+          "rotation_degrees": 10,
+          "visible_percent": 70
+        },
+        {
+          "center_x": 746,
+          "top_y": 375,
+          "rotation_degrees": 20,
+          "visible_percent": 70
+        }
+      ],
+      "frame_role": "cards emerge",
+      "transparent_pixel_count": 748026
+    },
+    {
+      "relative_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_09_final_reveal.png",
+      "sha256": "2faf12d2cd67f52bd6e3008b598749c344e0b3b3cb72b339589fd45a37142c49",
+      "width": 1024,
+      "height": 1536,
+      "mode": "RGBA",
+      "alpha_bounding_box_xyxy": [
+        49,
+        53,
+        976,
+        1471
+      ],
+      "alpha_edge_margins_px": {
+        "left": 49,
+        "top": 53,
+        "right": 48,
+        "bottom": 65
+      },
+      "pack_visual_center_estimate_x_px": 512.0,
+      "pack_bottom_registration_estimate_y_px": 1260,
+      "expected_card_count": 5,
+      "constructed_card_overlay_count": 5,
+      "card_overlays": [
+        {
+          "center_x": 278,
+          "top_y": 294,
+          "rotation_degrees": -24,
+          "visible_percent": 100
+        },
+        {
+          "center_x": 395,
+          "top_y": 282,
+          "rotation_degrees": -12,
+          "visible_percent": 100
+        },
+        {
+          "center_x": 512,
+          "top_y": 270,
+          "rotation_degrees": 0,
+          "visible_percent": 100
+        },
+        {
+          "center_x": 629,
+          "top_y": 282,
+          "rotation_degrees": 12,
+          "visible_percent": 100
+        },
+        {
+          "center_x": 746,
+          "top_y": 294,
+          "rotation_degrees": 24,
+          "visible_percent": 100
+        }
+      ],
+      "frame_role": "final card reveal",
+      "transparent_pixel_count": 748026
+    }
+  ],
+  "automated_checks": [
+    {
+      "check": "exactly 9 individual PNGs per pack with required names/order",
+      "result": "PASS"
+    },
+    {
+      "check": "all 18 files are 1024x1536 RGBA",
+      "result": "PASS"
+    },
+    {
+      "check": "all frames contain transparency and have >=48px transparent edge margins",
+      "result": "PASS"
+    },
+    {
+      "check": "Standard card overlay counts 0,0,0,0,0,1,1,3,3",
+      "result": "PASS"
+    },
+    {
+      "check": "Premium card overlay counts 0,0,0,0,0,1,1,5,5",
+      "result": "PASS"
+    },
+    {
+      "check": "registered pack center/bottom estimates within 12px of x=512/y=1260",
+      "result": "PASS"
+    },
+    {
+      "check": "no full opaque backgrounds",
+      "result": "PASS"
+    }
+  ]
+}
