@@ -6,16 +6,16 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
 - Current Sprint: M43-C005 — Reward, Pack, Collection, Robot, Feature and World Ceremonies
-- Current Task: Claude implements the reusable production reward-reveal sequencer and refactors Results to use it (SB-M43-063)
-- Current Task Status: M43_C005_C004_BOOSTER_CHOICE_INTAKE_AUDIT_PASS / M43_C005_C005_REWARD_REVEAL_SEQUENCER_READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C005-C005/CHATGPT_PROMPT_V01.md` for **SB-M43-063** only: implement one reusable presentation-only reward/reveal sequencer with ordered steps, fast-forward/finish, cancel/cleanup, Reduced Effects and exactly-once completion; refactor the existing committed Results reward-row/momentum reveal to use it without changing reward/navigation truth. Do not begin SB-M43-064+ ceremony content or C005F plugin effects.
+- Current Task: Claude implements the shipping Standard Card Pack opening presentation for exactly 3 committed draws (SB-M43-064)
+- Current Task Status: M43_C005_C005_REWARD_REVEAL_SEQUENCER_AUDIT_PASS / M43_C005_C006_STANDARD_PACK_PRESENTATION_READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M43-C005-C006/CHATGPT_PROMPT_V01.md` for **SB-M43-064** only: promote the exact owner-approved Standard 9-frame opening assets byte-identically into the final shipping family and implement the real production Standard Pack ceremony for exactly 3 precommitted card results using RevealSequencer + BasePopup/ModalStack. Use only the new canonical 135-card art; show rarity and explicit NEW/DUPLICATE truth; no pack opening/grant/Collection mutation authority yet. Premium and transaction wiring remain later tasks.
 - Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 983 / 1436 = 68.45%. SB-M43-R01-001..008 are CLOSED by V02 technical audit plus final owner acceptance. M43-C001R is complete; M43-C005 is now the active frontier.
-- Note: M43-C005-C004 independent audit PASS is recorded in `coordination/sessions/M43-C005-C004/CHATGPT_AUDIT_V01.md`. The owner-approved Booster-of-your-choice PNG is canonically promoted byte-exact; the four canonical boosters, all 135 Collection cards and pack assets remain unchanged. **SB-M43-076 is CLOSED.** Production M43-C005 work now resumes at SB-M43-063.
+- Progress: 984 / 1436 = 68.52%. SB-M43-R01-001..008 are CLOSED by V02 technical audit plus final owner acceptance. M43-C001R is complete; M43-C005 is now the active frontier.
+- Note: M43-C005-C005 independent audit PASS is recorded in `coordination/sessions/M43-C005-C005/CHATGPT_AUDIT_V01.md`. The reusable production RevealSequencer is presentation-only and Results now uses it without changing receipt/economy/navigation truth. **SB-M43-063 is CLOSED.** Production M43-C005 advances to SB-M43-064 Standard Pack presentation.
 - M43-C005 sequencing clarification [2026-10-03]: **do not leave M43-C005 after C004.** Once the exact Booster-of-your-choice intake passes independent audit and closes SB-M43-076, continue inside M43-C005 with production ceremony implementation, beginning at **SB-M43-063** and proceeding through the applicable SB-M43-064..075/077 work plus the already-planned C005R/C005F gates as sequenced. M43-C006/M43-C007 are later destinations.
-- Plugin-planning note [2026-10-03]: GameFeelFlow + Saltmire Spark integration is fully planned in future M43-C005F plus M46/M47/M50/M54/M55/M59 gates. It does **not** interrupt the current native SB-M43-063 sequencing task. Presentation-only/fail-open is owner-locked; canonical plugin intake/API/license verification remains the first future integration gate.
+- Plugin-planning note [2026-10-03]: GameFeelFlow + Saltmire Spark integration is fully planned in future M43-C005F plus M46/M47/M50/M54/M55/M59 gates. It does **not** interrupt the current native SB-M43-064 Standard Pack presentation task. Presentation-only/fail-open is owner-locked; canonical plugin intake/API/license verification remains the first future integration gate.
 - MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
@@ -1841,7 +1841,7 @@ These tasks extend the already owner-approved Results surface without changing i
 
 #### M43-C005 - Reward, Pack, Collection, Robot, Feature and World Ceremonies
 
-- [ ] SB-M43-063 Implement reusable short reward-reveal sequencing with skip/fast-forward only where it cannot skip authoritative grant commits.
+- [x] SB-M43-063 Implement reusable short reward-reveal sequencing with skip/fast-forward only where it cannot skip authoritative grant commits. CLOSED by `coordination/sessions/M43-C005-C005/CHATGPT_AUDIT_V01.md`.
 - [ ] SB-M43-064 Implement Standard Card Pack opening presentation for 3 draws with rarity reveal and duplicate/new distinction.
 - [ ] SB-M43-065 Implement Premium Card Pack opening presentation for 5 draws including guaranteed Rare-or-better truth from the pack service.
 - [ ] SB-M43-066 Pack contents are committed before/atomically with presentation and reopening the reveal never duplicates cards.
