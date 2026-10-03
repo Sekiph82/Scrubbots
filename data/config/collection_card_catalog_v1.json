@@ -1,0 +1,952 @@
+{
+  "version": 1,
+  "description": "Canonical Collection card identity for presentation: id (CollectionInventory catalog id s<set>_c<k>) -> set, card index, display name, rarity, canonical art. Read-only content data; ownership/counts live in CollectionInventory.",
+  "source": "coordination/sessions/M43-C005-C003/COLLECTION_CARD_GENERATION_MANIFEST_V01.json (audited C003 PASS); rarity cross-checked against economy_rewards_v1.json collection.set_rewards rarity_profile",
+  "cards": {
+    "s1_c0": {
+      "set": 1,
+      "card": 1,
+      "name": "Scrubby",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_01/card_01.png"
+    },
+    "s1_c1": {
+      "set": 1,
+      "card": 2,
+      "name": "Bubbles",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_01/card_02.png"
+    },
+    "s1_c2": {
+      "set": 1,
+      "card": 3,
+      "name": "Moppy",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_01/card_03.png"
+    },
+    "s1_c3": {
+      "set": 1,
+      "card": 4,
+      "name": "Brushy",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_01/card_04.png"
+    },
+    "s1_c4": {
+      "set": 1,
+      "card": 5,
+      "name": "Squeegee",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_01/card_05.png"
+    },
+    "s1_c5": {
+      "set": 1,
+      "card": 6,
+      "name": "Spark",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_01/card_06.png"
+    },
+    "s1_c6": {
+      "set": 1,
+      "card": 7,
+      "name": "Turbo Scrubby",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_01/card_07.png"
+    },
+    "s1_c7": {
+      "set": 1,
+      "card": 8,
+      "name": "Captain Clean",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_01/card_08.png"
+    },
+    "s1_c8": {
+      "set": 1,
+      "card": 9,
+      "name": "Scrubmaster X",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_01/card_09.png"
+    },
+    "s2_c0": {
+      "set": 2,
+      "card": 1,
+      "name": "Mighty Mop",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_02/card_01.png"
+    },
+    "s2_c1": {
+      "set": 2,
+      "card": 2,
+      "name": "Bubble Bucket",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_02/card_02.png"
+    },
+    "s2_c2": {
+      "set": 2,
+      "card": 3,
+      "name": "Scrub Brush",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_02/card_03.png"
+    },
+    "s2_c3": {
+      "set": 2,
+      "card": 4,
+      "name": "Super Sponge",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_02/card_04.png"
+    },
+    "s2_c4": {
+      "set": 2,
+      "card": 5,
+      "name": "Power Squeegee",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_02/card_05.png"
+    },
+    "s2_c5": {
+      "set": 2,
+      "card": 6,
+      "name": "Foam Blaster",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_02/card_06.png"
+    },
+    "s2_c6": {
+      "set": 2,
+      "card": 7,
+      "name": "Turbo Vacuum",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_02/card_07.png"
+    },
+    "s2_c7": {
+      "set": 2,
+      "card": 8,
+      "name": "Hydro Cannon",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_02/card_08.png"
+    },
+    "s2_c8": {
+      "set": 2,
+      "card": 9,
+      "name": "The Golden Mop",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_02/card_09.png"
+    },
+    "s3_c0": {
+      "set": 3,
+      "card": 1,
+      "name": "Dusty",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_03/card_01.png"
+    },
+    "s3_c1": {
+      "set": 3,
+      "card": 2,
+      "name": "Mud Blob",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_03/card_02.png"
+    },
+    "s3_c2": {
+      "set": 3,
+      "card": 3,
+      "name": "Greasy",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_03/card_03.png"
+    },
+    "s3_c3": {
+      "set": 3,
+      "card": 4,
+      "name": "Crumbler",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_03/card_04.png"
+    },
+    "s3_c4": {
+      "set": 3,
+      "card": 5,
+      "name": "Slimeball",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_03/card_05.png"
+    },
+    "s3_c5": {
+      "set": 3,
+      "card": 6,
+      "name": "Moldy",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_03/card_06.png"
+    },
+    "s3_c6": {
+      "set": 3,
+      "card": 7,
+      "name": "Stainzilla",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_03/card_07.png"
+    },
+    "s3_c7": {
+      "set": 3,
+      "card": 8,
+      "name": "Toxic Sludge",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_03/card_08.png"
+    },
+    "s3_c8": {
+      "set": 3,
+      "card": 9,
+      "name": "King Grime",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_03/card_09.png"
+    },
+    "s4_c0": {
+      "set": 4,
+      "card": 1,
+      "name": "Cyan Bot",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_04/card_01.png"
+    },
+    "s4_c1": {
+      "set": 4,
+      "card": 2,
+      "name": "Pink Bot",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_04/card_02.png"
+    },
+    "s4_c2": {
+      "set": 4,
+      "card": 3,
+      "name": "Green Bot",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_04/card_03.png"
+    },
+    "s4_c3": {
+      "set": 4,
+      "card": 4,
+      "name": "Purple Bot",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_04/card_04.png"
+    },
+    "s4_c4": {
+      "set": 4,
+      "card": 5,
+      "name": "Yellow Bot",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_04/card_05.png"
+    },
+    "s4_c5": {
+      "set": 4,
+      "card": 6,
+      "name": "Crimson Bot",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_04/card_06.png"
+    },
+    "s4_c6": {
+      "set": 4,
+      "card": 7,
+      "name": "Prism Bot",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_04/card_07.png"
+    },
+    "s4_c7": {
+      "set": 4,
+      "card": 8,
+      "name": "Neon Bot",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_04/card_08.png"
+    },
+    "s4_c8": {
+      "set": 4,
+      "card": 9,
+      "name": "Rainbow Scrubbot",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_04/card_09.png"
+    },
+    "s5_c0": {
+      "set": 5,
+      "card": 1,
+      "name": "Spare Battery",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_05/card_01.png"
+    },
+    "s5_c1": {
+      "set": 5,
+      "card": 2,
+      "name": "Micro Motor",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_05/card_02.png"
+    },
+    "s5_c2": {
+      "set": 5,
+      "card": 3,
+      "name": "Robo Wrench",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_05/card_03.png"
+    },
+    "s5_c3": {
+      "set": 5,
+      "card": 4,
+      "name": "Sensor Eye",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_05/card_04.png"
+    },
+    "s5_c4": {
+      "set": 5,
+      "card": 5,
+      "name": "Power Core",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_05/card_05.png"
+    },
+    "s5_c5": {
+      "set": 5,
+      "card": 6,
+      "name": "Turbo Wheels",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_05/card_06.png"
+    },
+    "s5_c6": {
+      "set": 5,
+      "card": 7,
+      "name": "Scrub Jetpack",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_05/card_07.png"
+    },
+    "s5_c7": {
+      "set": 5,
+      "card": 8,
+      "name": "Quantum Sensor",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_05/card_08.png"
+    },
+    "s5_c8": {
+      "set": 5,
+      "card": 9,
+      "name": "Infinity Core",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_05/card_09.png"
+    },
+    "s6_c0": {
+      "set": 6,
+      "card": 1,
+      "name": "Rubber Duck",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_06/card_01.png"
+    },
+    "s6_c1": {
+      "set": 6,
+      "card": 2,
+      "name": "Soap Buddy",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_06/card_02.png"
+    },
+    "s6_c2": {
+      "set": 6,
+      "card": 3,
+      "name": "Bubble Bath",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_06/card_03.png"
+    },
+    "s6_c3": {
+      "set": 6,
+      "card": 4,
+      "name": "Toilet Trouble",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_06/card_04.png"
+    },
+    "s6_c4": {
+      "set": 6,
+      "card": 5,
+      "name": "Clogged Drain",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_06/card_05.png"
+    },
+    "s6_c5": {
+      "set": 6,
+      "card": 6,
+      "name": "Shower Slime",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_06/card_06.png"
+    },
+    "s6_c6": {
+      "set": 6,
+      "card": 7,
+      "name": "Bathtub Beast",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_06/card_07.png"
+    },
+    "s6_c7": {
+      "set": 6,
+      "card": 8,
+      "name": "Foam Flood",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_06/card_08.png"
+    },
+    "s6_c8": {
+      "set": 6,
+      "card": 9,
+      "name": "Royal Flush",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_06/card_09.png"
+    },
+    "s7_c0": {
+      "set": 7,
+      "card": 1,
+      "name": "Dirty Dish",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_07/card_01.png"
+    },
+    "s7_c1": {
+      "set": 7,
+      "card": 2,
+      "name": "Sauce Splash",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_07/card_02.png"
+    },
+    "s7_c2": {
+      "set": 7,
+      "card": 3,
+      "name": "Burnt Toast",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_07/card_03.png"
+    },
+    "s7_c3": {
+      "set": 7,
+      "card": 4,
+      "name": "Sticky Spoon",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_07/card_04.png"
+    },
+    "s7_c4": {
+      "set": 7,
+      "card": 5,
+      "name": "Greasy Pan",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_07/card_05.png"
+    },
+    "s7_c5": {
+      "set": 7,
+      "card": 6,
+      "name": "Fridge Monster",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_07/card_06.png"
+    },
+    "s7_c6": {
+      "set": 7,
+      "card": 7,
+      "name": "Oven Inferno",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_07/card_07.png"
+    },
+    "s7_c7": {
+      "set": 7,
+      "card": 8,
+      "name": "Dishwasher Bot",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_07/card_08.png"
+    },
+    "s7_c8": {
+      "set": 7,
+      "card": 9,
+      "name": "Chef Scrub Supreme",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_07/card_09.png"
+    },
+    "s8_c0": {
+      "set": 8,
+      "card": 1,
+      "name": "Oil Spill",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_08/card_01.png"
+    },
+    "s8_c1": {
+      "set": 8,
+      "card": 2,
+      "name": "Rusty Wrench",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_08/card_02.png"
+    },
+    "s8_c2": {
+      "set": 8,
+      "card": 3,
+      "name": "Dirty Tire",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_08/card_03.png"
+    },
+    "s8_c3": {
+      "set": 8,
+      "card": 4,
+      "name": "Paint Splash",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_08/card_04.png"
+    },
+    "s8_c4": {
+      "set": 8,
+      "card": 5,
+      "name": "Grease Goblin",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_08/card_05.png"
+    },
+    "s8_c5": {
+      "set": 8,
+      "card": 6,
+      "name": "Pressure Washer",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_08/card_06.png"
+    },
+    "s8_c6": {
+      "set": 8,
+      "card": 7,
+      "name": "Mechanic Scrubbot",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_08/card_07.png"
+    },
+    "s8_c7": {
+      "set": 8,
+      "card": 8,
+      "name": "Turbo Cleaner",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_08/card_08.png"
+    },
+    "s8_c8": {
+      "set": 8,
+      "card": 9,
+      "name": "Chrome Titan",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_08/card_09.png"
+    },
+    "s9_c0": {
+      "set": 9,
+      "card": 1,
+      "name": "Sewer Rat",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_09/card_01.png"
+    },
+    "s9_c1": {
+      "set": 9,
+      "card": 2,
+      "name": "Pipe Slime",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_09/card_02.png"
+    },
+    "s9_c2": {
+      "set": 9,
+      "card": 3,
+      "name": "Drain Bug",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_09/card_03.png"
+    },
+    "s9_c3": {
+      "set": 9,
+      "card": 4,
+      "name": "Sewer Bubble",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_09/card_04.png"
+    },
+    "s9_c4": {
+      "set": 9,
+      "card": 5,
+      "name": "Toxic Rat",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_09/card_05.png"
+    },
+    "s9_c5": {
+      "set": 9,
+      "card": 6,
+      "name": "Pipe Crawler",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_09/card_06.png"
+    },
+    "s9_c6": {
+      "set": 9,
+      "card": 7,
+      "name": "Sludge Beast",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_09/card_07.png"
+    },
+    "s9_c7": {
+      "set": 9,
+      "card": 8,
+      "name": "Sewer Scrubbot",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_09/card_08.png"
+    },
+    "s9_c8": {
+      "set": 9,
+      "card": 9,
+      "name": "The Grime Kraken",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_09/card_09.png"
+    },
+    "s10_c0": {
+      "set": 10,
+      "card": 1,
+      "name": "Street Sweeper",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_10/card_01.png"
+    },
+    "s10_c1": {
+      "set": 10,
+      "card": 2,
+      "name": "Park Cleaner",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_10/card_02.png"
+    },
+    "s10_c2": {
+      "set": 10,
+      "card": 3,
+      "name": "Trash Bot",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_10/card_03.png"
+    },
+    "s10_c3": {
+      "set": 10,
+      "card": 4,
+      "name": "Metro Mop",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_10/card_04.png"
+    },
+    "s10_c4": {
+      "set": 10,
+      "card": 5,
+      "name": "Graffiti Scrubber",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_10/card_05.png"
+    },
+    "s10_c5": {
+      "set": 10,
+      "card": 6,
+      "name": "Recycling Bot",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_10/card_06.png"
+    },
+    "s10_c6": {
+      "set": 10,
+      "card": 7,
+      "name": "City Guardian",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_10/card_07.png"
+    },
+    "s10_c7": {
+      "set": 10,
+      "card": 8,
+      "name": "Mega Sweeper",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_10/card_08.png"
+    },
+    "s10_c8": {
+      "set": 10,
+      "card": 9,
+      "name": "Mayor Scrubby",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_10/card_09.png"
+    },
+    "s11_c0": {
+      "set": 11,
+      "card": 1,
+      "name": "Leafy",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_11/card_01.png"
+    },
+    "s11_c1": {
+      "set": 11,
+      "card": 2,
+      "name": "Vine Cutter",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_11/card_02.png"
+    },
+    "s11_c2": {
+      "set": 11,
+      "card": 3,
+      "name": "Puddle Bot",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_11/card_03.png"
+    },
+    "s11_c3": {
+      "set": 11,
+      "card": 4,
+      "name": "Moss Mover",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_11/card_04.png"
+    },
+    "s11_c4": {
+      "set": 11,
+      "card": 5,
+      "name": "Bug Vac",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_11/card_05.png"
+    },
+    "s11_c5": {
+      "set": 11,
+      "card": 6,
+      "name": "Jungle Sprayer",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_11/card_06.png"
+    },
+    "s11_c6": {
+      "set": 11,
+      "card": 7,
+      "name": "Tree Trimmer",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_11/card_07.png"
+    },
+    "s11_c7": {
+      "set": 11,
+      "card": 8,
+      "name": "Storm Cleaner",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_11/card_08.png"
+    },
+    "s11_c8": {
+      "set": 11,
+      "card": 9,
+      "name": "Jungle Guardian",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_11/card_09.png"
+    },
+    "s12_c0": {
+      "set": 12,
+      "card": 1,
+      "name": "Soap Bubbler",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_12/card_01.png"
+    },
+    "s12_c1": {
+      "set": 12,
+      "card": 2,
+      "name": "Shower Scrubbot",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_12/card_02.png"
+    },
+    "s12_c2": {
+      "set": 12,
+      "card": 3,
+      "name": "Tub Cleaner",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_12/card_03.png"
+    },
+    "s12_c3": {
+      "set": 12,
+      "card": 4,
+      "name": "Toilet Titan",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_12/card_04.png"
+    },
+    "s12_c4": {
+      "set": 12,
+      "card": 5,
+      "name": "Foam Fighter",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_12/card_05.png"
+    },
+    "s12_c5": {
+      "set": 12,
+      "card": 6,
+      "name": "Tile Blaster",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_12/card_06.png"
+    },
+    "s12_c6": {
+      "set": 12,
+      "card": 7,
+      "name": "Bubble Bomber",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_12/card_07.png"
+    },
+    "s12_c7": {
+      "set": 12,
+      "card": 8,
+      "name": "Splash Jet",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_12/card_08.png"
+    },
+    "s12_c8": {
+      "set": 12,
+      "card": 9,
+      "name": "Bath King",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_12/card_09.png"
+    },
+    "s13_c0": {
+      "set": 13,
+      "card": 1,
+      "name": "Scuba Scrubby",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_13/card_01.png"
+    },
+    "s13_c1": {
+      "set": 13,
+      "card": 2,
+      "name": "Coral Catcher",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_13/card_02.png"
+    },
+    "s13_c2": {
+      "set": 13,
+      "card": 3,
+      "name": "Sea Sentry",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_13/card_03.png"
+    },
+    "s13_c3": {
+      "set": 13,
+      "card": 4,
+      "name": "Shell Swiper",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_13/card_04.png"
+    },
+    "s13_c4": {
+      "set": 13,
+      "card": 5,
+      "name": "Wave Rider",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_13/card_05.png"
+    },
+    "s13_c5": {
+      "set": 13,
+      "card": 6,
+      "name": "Bubble Blaster",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_13/card_06.png"
+    },
+    "s13_c6": {
+      "set": 13,
+      "card": 7,
+      "name": "Deep Diver",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_13/card_07.png"
+    },
+    "s13_c7": {
+      "set": 13,
+      "card": 8,
+      "name": "Aqua Jet",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_13/card_08.png"
+    },
+    "s13_c8": {
+      "set": 13,
+      "card": 9,
+      "name": "Ocean Overlord",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_13/card_09.png"
+    },
+    "s14_c0": {
+      "set": 14,
+      "card": 1,
+      "name": "Moon Mop",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_14/card_01.png"
+    },
+    "s14_c1": {
+      "set": 14,
+      "card": 2,
+      "name": "Astro Scrubby",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_14/card_02.png"
+    },
+    "s14_c2": {
+      "set": 14,
+      "card": 3,
+      "name": "Meteor Sweeper",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_14/card_03.png"
+    },
+    "s14_c3": {
+      "set": 14,
+      "card": 4,
+      "name": "Space Sponge",
+      "rarity": "COMMON",
+      "art": "res://assets/ui/final/collection/cards/set_14/card_04.png"
+    },
+    "s14_c4": {
+      "set": 14,
+      "card": 5,
+      "name": "Rocket Scrubbot",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_14/card_05.png"
+    },
+    "s14_c5": {
+      "set": 14,
+      "card": 6,
+      "name": "Lunar Cleaner",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_14/card_06.png"
+    },
+    "s14_c6": {
+      "set": 14,
+      "card": 7,
+      "name": "Galaxy Guardian",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_14/card_07.png"
+    },
+    "s14_c7": {
+      "set": 14,
+      "card": 8,
+      "name": "Black Hole Bot",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_14/card_08.png"
+    },
+    "s14_c8": {
+      "set": 14,
+      "card": 9,
+      "name": "Cosmic Scrubmaster",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_14/card_09.png"
+    },
+    "s15_c0": {
+      "set": 15,
+      "card": 1,
+      "name": "Silver Scrubby",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_15/card_01.png"
+    },
+    "s15_c1": {
+      "set": 15,
+      "card": 2,
+      "name": "Crystal Moppy",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_15/card_02.png"
+    },
+    "s15_c2": {
+      "set": 15,
+      "card": 3,
+      "name": "Platinum Brushy",
+      "rarity": "RARE",
+      "art": "res://assets/ui/final/collection/cards/set_15/card_03.png"
+    },
+    "s15_c3": {
+      "set": 15,
+      "card": 4,
+      "name": "Royal Bubble Bot",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_15/card_04.png"
+    },
+    "s15_c4": {
+      "set": 15,
+      "card": 5,
+      "name": "Diamond Scrubby",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_15/card_05.png"
+    },
+    "s15_c5": {
+      "set": 15,
+      "card": 6,
+      "name": "Shadow Scrubbot",
+      "rarity": "EPIC",
+      "art": "res://assets/ui/final/collection/cards/set_15/card_06.png"
+    },
+    "s15_c6": {
+      "set": 15,
+      "card": 7,
+      "name": "Rainbow Supreme",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_15/card_07.png"
+    },
+    "s15_c7": {
+      "set": 15,
+      "card": 8,
+      "name": "Golden Scrubmaster",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_15/card_08.png"
+    },
+    "s15_c8": {
+      "set": 15,
+      "card": 9,
+      "name": "Scrubbot Prime",
+      "rarity": "LEGENDARY",
+      "art": "res://assets/ui/final/collection/cards/set_15/card_09.png"
+    }
+  }
+}

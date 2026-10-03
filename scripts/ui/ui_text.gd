@@ -206,6 +206,16 @@ ACTIVE",
 	"SPEED_ITEM": "2x %s",
 	"SPEED_LABEL_LEVEL": "THIS LEVEL",
 	"SPEED_LABEL_MINUTES": "%d MIN",
+	"PACK_STANDARD_TITLE": "STANDARD PACK",
+	"PACK_CONTINUE": "CONTINUE",
+	"PACK_CARD_NEW": "NEW",
+	"PACK_CARD_DUPLICATE": "DUPLICATE",
+	"PACK_CARD_OWNED": "You now have %d",
+	"PACK_COMMITTED_NOTE": "Already added to your collection.",
+	"RARITY_COMMON": "COMMON",
+	"RARITY_RARE": "RARE",
+	"RARITY_EPIC": "EPIC",
+	"RARITY_LEGENDARY": "LEGENDARY",
 }
 
 ## Keyed text for `prefix + reason`, falling back to `prefix + FAILED` for an unknown code.
