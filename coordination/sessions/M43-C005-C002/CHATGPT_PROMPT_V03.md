@@ -28,8 +28,8 @@ Do not regenerate the whole asset family. Preserve accepted frames/pack identity
 - Frame 05: keep unless minor adjustment is necessary for continuity after Frame 04.
 - Frame 06: make the top edge of exactly ONE card clearly visible 15–20% above the opening. Card edge must be readable against the glow.
 - Frame 07: keep.
-- Frame 08: preserve exactly THREE cards but spread them enough that all three silhouettes are immediately distinguishable. Center highest, left/right approximately ±10–12°.
-- Frame 09: exactly THREE full card backs in a clean fan with more negative space between silhouettes, center highest, left/right approximately ±14°. Reduce visual crowding without losing celebration.
+- Frame 08: **CURRENT PNG IS WRONG: it visibly contains FIVE cards.** Discard/regenerate this frame so it contains exactly THREE card backs, no hidden fourth/fifth card, with all three silhouettes immediately distinguishable. Center highest, left/right approximately ±10–12°.
+- Frame 09: **CURRENT PNG IS WRONG: it visibly contains FIVE cards.** Discard/regenerate this frame so it contains exactly THREE full card backs, no hidden fourth/fifth card, in a clean fan with clear negative space; center highest, left/right approximately ±14°.
 
 ### Premium
 - Frame 01: keep.
@@ -56,6 +56,8 @@ Do not regenerate the whole asset family. Preserve accepted frames/pack identity
 
 ## Validation
 Regenerate only changed frames, update manifest hashes/bounds/margins, rebuild contact sheets and owner review V02.
+
+For Standard Frames 08 and 09, do **visual pixel/content verification**, not metadata-only validation. The prior manifest falsely said 3 while the PNG visibly showed 5. The validator must fail if rendered content count and metadata disagree. Include a manual visual-count note in CODEX_LOG_V02.
 
 Create:
 - OWNER_PACK_ASSET_REVIEW_V02.md
