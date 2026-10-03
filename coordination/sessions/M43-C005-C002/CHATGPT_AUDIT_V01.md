@@ -35,8 +35,8 @@ PASS:
 5. Frame 05 TEAR WIDENS: PASS CONDITIONAL. Good as the wider-tear beat, but should remain clearly later than corrected Frame 04.
 6. Frame 06 CARD EDGE: REVISE. The single card-edge beat is visually too weak against the burst; make the top edge of exactly one blue/gold card clearly readable while preserving only ~15–20% exposure.
 7. Frame 07 ONE CARD RISES: PASS. One-card stage is clear.
-8. Frame 08 THREE CARDS EMERGE: REVISE FOR READABILITY. Contact-sheet view is visually crowded; three card silhouettes need clearer separation/fan spacing so the state instantly reads as exactly three cards.
-9. Frame 09 FINAL THREE: REVISE FOR READABILITY. Final three-card fan should have more negative space between card silhouettes and a cleaner, less crowded reveal.
+8. Frame 08 THREE CARDS EMERGE: **FAIL — WRONG CARD COUNT.** The rendered image visibly contains **FIVE** card backs, not three. The manifest/compositor metadata incorrectly reports 3. Regenerate this frame to exactly THREE cards, with clear separation and the locked -10°/0°/+10° family.
+9. Frame 09 FINAL THREE: **FAIL — WRONG CARD COUNT.** The rendered image visibly contains **FIVE** card backs, not three. The manifest/compositor metadata incorrectly reports 3. Regenerate this frame to exactly THREE full card backs, with a clean -14°/0°/+14° fan and clear negative space.
 
 ## Visual audit — Premium
 
@@ -60,7 +60,7 @@ sealed -> charge -> pressure -> small tear -> wide tear -> card edge -> rise -> 
 Keep Frames 01–03 and 07 unchanged unless needed for registration consistency.
 
 Remediate primarily:
-- Standard 04, 06, 08, 09;
+- Standard 04, 06, 08, 09. **08 and 09 are cardinality defects, not merely spacing defects: current rendered PNGs show 5 cards and must be replaced with exactly 3.**
 - Premium 04, 06, 08;
 - Premium 09 only if needed to maintain the improved fan-spacing family.
 
@@ -68,6 +68,6 @@ Do not redesign pack identities or runtime systems.
 
 ## Result
 
-**M43-C005-C002 = TECHNICAL_ASSET_PASS / VISUAL_REMEDIATION_REQUIRED**
+**M43-C005-C002 = TECHNICAL_FILE_VALIDATION_PASS / VISUAL_CONTENT_FAIL / REMEDIATION_REQUIRED**
 
 Owner visual approval remains open.
