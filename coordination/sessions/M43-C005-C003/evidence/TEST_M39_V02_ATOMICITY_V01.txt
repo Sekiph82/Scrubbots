@@ -1,0 +1,33 @@
+Godot Engine v4.7.2.stable.official.ed1daf0bf - https://godotengine.org
+
+[import atomic F-M39-005]
+  ok: import with a broken later section fails
+  ok: failed import rolled back to exact prior state (atomic)
+[integer domain F-M39-006]
+  ok: fractional scrub_bucks rejected
+  ok: fractional bot_parts rejected
+  ok: integer balances accepted
+  ok: integral floats accepted
+  ok: integral float value correct
+  ok: fractional booster charge rejected
+[cards exchange atomic F-M39-007]
+  ok: exchange removes 2 then credits 50 SB
+  ok: duplicate exchange tx changes nothing
+  ok: cannot exchange below protected copy; no SB, no removal
+[daily task persist F-M39-008]
+  ok: snapshot persists current-day task completion
+  ok: daily snapshot imports
+  ok: task completion restored after relaunch
+[collection canonical F-M39-009]
+  ok: unknown card id rejected
+  ok: fractional count rejected
+  ok: set id > 15 rejected
+  ok: set id 0 rejected
+  ok: canonical collection snapshot accepted
+  ok: claimed set without 9/9 owned rejected
+  ok: master_claimed without all 15 sets rejected
+M39 V02 atomicity/hardening evidence: PASS
+WARNING: 134 ObjectDB instances were leaked at exit (run with `--verbose` for details).
+   at: cleanup (core/object/object.cpp:2536)
+ERROR: 19 resources still in use at exit (run with --verbose for details).
+   at: clear (core/io/resource.cpp:822)
