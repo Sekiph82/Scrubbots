@@ -6,14 +6,14 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
 - Current Sprint: M43-C005 — Reward, Pack, Collection, Robot, Feature and World Ceremonies
-- Current Task: Codex completes final targeted Standard/Premium pack frame remediation (SB-M43-076)
-- Current Task Status: M43_C005_C002_CARD_COUNTS_FIXED / V04_TARGETED_VISUAL_REMEDIATION
-- Next Task/Action: CODEX executes `coordination/sessions/M43-C005-C002/CHATGPT_PROMPT_V04.md`. Freeze accepted frames and change only Standard 04/06/08 plus Premium 04/06/08: smaller 20–25% first tear, clearly readable one-card edge, and real irregular torn-front-lip occlusion in Frame 08 instead of a flat clipping line. Return `AWAITING_GPT_M43_C005_C002_V04_AUDIT`.
-- Required Actor: CODEX
+- Current Task: Owner final visual gate for Standard/Premium pack opening asset sets (SB-M43-076)
+- Current Task Status: M43_C005_C002_TECHNICAL_AND_VISUAL_AUDIT_PASS / OWNER_FINAL_VISUAL_GATE_REQUIRED
+- Next Task/Action: OWNER reviews `coordination/sessions/M43-C005-C002/STANDARD_CONTACT_SHEET_V03.png`, `PREMIUM_CONTACT_SHEET_V03.png` and `OWNER_PACK_ASSET_REVIEW_V03.md`. GPT V04 audit is PASS; no further Codex remediation is pending. After owner PASS, close the Standard/Premium pack visual subgate and continue the remaining SB-M43-076 asset work (Collection-card cleanup and Booster-of-your-choice promotion/integration).
+- Required Actor: OWNER
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 982 / 1414 = 69.45%. SB-M43-R01-001..008 are CLOSED by V02 technical audit plus final owner acceptance. M43-C001R is complete; M43-C005 is now the active frontier.
-- Note: Manual V02 visual audit after commit `6a6b054` confirms card counts are now correct: Standard 07/08/09 = 1/3/3 and Premium 07/08/09 = 1/5/5. Standard/Premium 07 and 09 are accepted/frozen. Remaining defects are only Frames 04, 06 and 08 in each pack. Frame 08 still uses a visually flat/common clipping line; V04 requires the actual irregular torn front foil lip to occlude card roots.
+- Note: `coordination/sessions/M43-C005-C002/CHATGPT_AUDIT_V04.md` = TECHNICAL_AND_VISUAL_AUDIT_PASS / OWNER_FINAL_VISUAL_GATE_REQUIRED. All 18 frames now pass manual visual review and technical validation. Standard 04=22.1% first tear, Standard 06=16.9% one-card edge, Standard 08=3 cards behind irregular front foil; Premium equivalents =20.0%, 17.3%, and 5 cards behind irregular gold front foil. Frozen 12-frame hashes unchanged.
 - MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
