@@ -6,14 +6,14 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
 - Current Sprint: M43-C005 — Reward, Pack, Collection, Robot, Feature and World Ceremonies
-- Current Task: Codex produces registered 9-frame Standard + Premium pack opening asset sets from owner references (SB-M43-076)
-- Current Task Status: M43_C005_C002_REFERENCE_GATE_FIXED / READY_FOR_CODEX_V02
-- Next Task/Action: CODEX executes `coordination/sessions/M43-C005-C002/CHATGPT_PROMPT_V02.md`. The V01 blocker was caused by encoded PNG SHA mismatch after local save/re-encoding; V02 validates decoded RGBA pixel identity and explicitly authorizes the exact named local owner PNGs when visually/semantically identical. Then produce 9 registered transparent frames per pack and return `AWAITING_GPT_M43_C005_C002_PACK_ASSET_AUDIT`.
+- Current Task: Codex applies targeted visual remediation to Standard/Premium pack opening assets (SB-M43-076)
+- Current Task Status: M43_C005_C002_TECHNICAL_ASSET_PASS / VISUAL_REMEDIATION_REQUIRED
+- Next Task/Action: CODEX executes `coordination/sessions/M43-C005-C002/CHATGPT_PROMPT_V03.md`. Preserve accepted frames and pack identities; remediate Standard 04/06/08/09 and Premium 04/06/08 (09 only if needed for fan continuity), rebuild contact sheets, update manifest, and return `AWAITING_GPT_M43_C005_C002_V03_AUDIT`.
 - Required Actor: CODEX
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
 - Progress: 982 / 1414 = 69.45%. SB-M43-R01-001..008 are CLOSED by V02 technical audit plus final owner acceptance. M43-C001R is complete; M43-C005 is now the active frontier.
-- Note: C005 V01 technical gate passed. Owner accepts Set Complete, Master Collection, Robot Unlock, Gift milestone, Feature shell, World shell and Generic Reward. C002 V01 stopped only because local PNG file hashes differed from ChatGPT attachment hashes. V02 fixes this correctly: PNG encoding hash is informational; decoded RGBA pixel identity is authoritative, with named local owner files authorized when clearly the same visual. Pack production remains Codex-owned for this subcycle.
+- Note: `coordination/sessions/M43-C005-C002/CHATGPT_AUDIT_V01.md` = TECHNICAL_ASSET_PASS / VISUAL_REMEDIATION_REQUIRED. Accepted broadly: both pack identities, Frames 01–03 and 07. Required polish: first-tear frames are too advanced, Frame 06 card-edge beats are too weak, Standard 3-card fan is crowded, Premium 5-card emerge fan needs more spacing. V03 is targeted remediation only.
 - MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
 - Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
 - Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
