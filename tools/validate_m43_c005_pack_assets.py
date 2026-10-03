@@ -6,6 +6,7 @@ import hashlib
 import json
 from pathlib import Path
 from PIL import Image, ImageChops
+import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 SESSION = ROOT / "coordination/sessions/M43-C005-C002"
@@ -47,6 +48,24 @@ PACKS = {
         "pack_bottom_y_estimate_px": 1260,
     },
 }
+FROZEN_HASHES = {
+    "standard": {
+        "frame_01_closed.png": "ae31881ea692af695125d539832b48a5d76ef77672a22864dcc784c1d35eceea",
+        "frame_02_charge.png": "075e917c6e82a9bc555650df57b187d2eacc34b74e0fc504a1ff76c708f66b32",
+        "frame_03_pressure.png": "086a7e7e6deb325c573e6fdd362c1f0d801b1acb3fb8f04786b74e4ad3cfc2a4",
+        "frame_05_tear_widens.png": "0d47eeb9b4ac3f7483d64f5298bd06c8eb286a8c0df4968fba8c6f5c43674b63",
+        "frame_07_one_card_rises.png": "6b20fa33e72d09319cf1aea6adc0ebf8fa51feb7787ff072e9a0e6d7adf1c1ef",
+        "frame_09_final_reveal.png": "561753dc9ade575874685d4cc07b8bd8bbd4f2e984c28ee228a76248ef385402",
+    },
+    "premium": {
+        "frame_01_closed.png": "29b87a206bae589ce4811641a40d352186a6bf01528cad9279b390c82031034c",
+        "frame_02_charge.png": "44b88fbbc9796edadd13229268978ce7a3c94b22bcebd3bb9906f4d6a2bfe571",
+        "frame_03_pressure.png": "cf79d5b85d6227f69b462261e350c8bb1e27d8ad9deab135f5201faf778d9af6",
+        "frame_05_tear_widens.png": "072dbc8f4accd17b4eb0c4a679cb47d0fe5bf1083f7576480c926712be8ab564",
+        "frame_07_one_card_rises.png": "f47a7b6ecb8d02f444acf4dd75d25f0276f8a9f2459320a799edee94768d9dfa",
+        "frame_09_final_reveal.png": "0de24ea3509518b8a358d733925cee30b8bc4087219dceecc39f20bec750977a",
+    },
+}
 ROLES = [
     "closed idle",
     "charge light buildup",
@@ -60,7 +79,7 @@ ROLES = [
 ]
 CARD_LAYOUTS = {
     "standard": [[], [], [], [], [],
-        [{"center_x": 512, "top_y": 530, "rotation_degrees": 0, "visible_percent": 17}],
+        [{"center_x": 512, "top_y": 528, "rotation_degrees": 0, "visible_percent": 17}],
         [{"center_x": 512, "top_y": 420, "rotation_degrees": 0, "visible_percent": 58}],
         [{"center_x": 405, "top_y": 403, "rotation_degrees": -11, "visible_percent": 65},
          {"center_x": 512, "top_y": 389, "rotation_degrees": 0, "visible_percent": 70},
@@ -70,7 +89,7 @@ CARD_LAYOUTS = {
          {"center_x": 633, "top_y": 294, "rotation_degrees": 14, "visible_percent": 100}],
     ],
     "premium": [[], [], [], [], [],
-        [{"center_x": 512, "top_y": 497, "rotation_degrees": 0, "visible_percent": 17}],
+        [{"center_x": 512, "top_y": 489, "rotation_degrees": 0, "visible_percent": 17}],
         [{"center_x": 512, "top_y": 390, "rotation_degrees": 0, "visible_percent": 60}],
         [{"center_x": 278, "top_y": 365, "rotation_degrees": -20, "visible_percent": 70},
          {"center_x": 395, "top_y": 359, "rotation_degrees": -10, "visible_percent": 72},
@@ -165,6 +184,73 @@ def visual_card_emblem_count(image: Image.Image, pack: str, frame_index: int) ->
             count += 1
     return count
 
+
+def rendered_card_edge_peaks(image: Image.Image, pack: str) -> list[dict[str, float | int]]:
+    """Find visible card-top signatures by matching rendered pixels to the shared card sprite."""
+    sprite_path = SESSION / "references" / "collection_card_back_sprite.png"
+    sprite = Image.open(sprite_path).convert("RGBA").resize((170, 266), Image.Resampling.LANCZOS)
+    template = np.asarray(sprite)[:44]
+    template_rgb = template[:, :, :3].astype(np.int16)
+    opaque = template[:, :, 3] > 240
+    rendered = np.asarray(image.convert("RGBA"))[:, :, :3].astype(np.int16)
+    if pack == "standard":
+        x_start, x_stop, y_start, y_stop = 280, 745, 508, 544
+    else:
+        x_start, x_stop, y_start, y_stop = 280, 745, 468, 504
+
+    candidates: list[dict[str, float | int]] = []
+    for top in range(y_start, y_stop, 2):
+        for center_x in range(x_start, x_stop, 4):
+            left = center_x - 85
+            sample = rendered[top:top + 44, left:left + 170]
+            if sample.shape[:2] != template_rgb.shape[:2]:
+                continue
+            error = np.abs(sample - template_rgb).max(axis=2)
+            score = float(np.mean(error[opaque] < 42))
+            if score >= 0.38:
+                candidates.append({"center_x": center_x, "top_y": top, "score": score})
+
+    peaks: list[dict[str, float | int]] = []
+    for candidate in sorted(candidates, key=lambda item: float(item["score"]), reverse=True):
+        if all(abs(int(candidate["center_x"]) - int(peak["center_x"])) >= 90
+               or abs(int(candidate["top_y"]) - int(peak["top_y"])) >= 14 for peak in peaks):
+            peaks.append(candidate)
+    return peaks
+
+
+def rendered_first_tear_measurement(image: Image.Image, pack: str) -> dict[str, int | float]:
+    """Measure the gap between the inner foil edges on a fixed rendered scanline."""
+    y_offset = 12 if pack == "standard" else 4
+    y = 502 + y_offset if pack == "standard" else 340 + y_offset
+    pixels = image.convert("RGBA").load()
+    if pack == "standard":
+        is_foil = lambda x: (
+            pixels[x, y][3] > 150
+            and pixels[x, y][2] > pixels[x, y][0] * 1.25
+            and pixels[x, y][2] > pixels[x, y][1] * 0.95
+        )
+        pack_width = 458
+    else:
+        is_foil = lambda x: (
+            pixels[x, y][3] > 150
+            and pixels[x, y][0] > pixels[x, y][2] * 1.6
+            and pixels[x, y][0] > pixels[x, y][1] * 1.1
+        )
+        pack_width = 484
+    left = next((x for x in range(511, 300, -1) if is_foil(x)), None)
+    right = next((x for x in range(513, 724) if is_foil(x)), None)
+    if left is None or right is None:
+        raise AssertionError(f"{pack}: rendered tear edges not found at y={y}")
+    opening_px = right - left - 1
+    return {
+        "scanline_y_px": y,
+        "inner_left_edge_x_px": left,
+        "inner_right_edge_x_px": right,
+        "opening_width_px": opening_px,
+        "registered_pack_width_px": pack_width,
+        "opening_width_fraction": opening_px / pack_width,
+    }
+
 def digest(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -179,15 +265,16 @@ def main() -> None:
     manifest = {
         "schema_version": 1,
         "task": "SB-M43-076",
-        "prompt": "coordination/sessions/M43-C005-C002/CHATGPT_PROMPT_V03.md",
+        "prompt": "coordination/sessions/M43-C005-C002/CHATGPT_PROMPT_V04.md",
         "canvas": {"width": 1024, "height": 1536, "mode": "RGBA"},
         "edge_safety_px": 48,
         "pack_registration_estimate_method": "Frame 01 owner reference placement; estimates carried through the registered sequence; visual center target x=512 and bottom target y=1260.",
         "references": [],
         "card_back_source": {},
-        "card_count_source": "Frames 07-09 are checked from rendered pixels by counting connected pale-cyan gear emblems; overlay construction metadata is also checked and manual visual inspection confirms distinct silhouettes. Card faces are never shown.",
+        "card_count_source": "Frame 06 is checked from rendered pixels by matching the visible card-top signature against the shared card-back sprite; Frames 07-09 are checked from connected pale-cyan gear-emblem pixels. Overlay metadata is cross-checked, never used as the rendered-content count authority.",
         "frames": [],
         "automated_checks": [],
+        "frozen_frame_hashes_verified": [],
     }
     for pack, cfg in PACKS.items():
         directory = PACK_ROOT / pack
@@ -227,6 +314,18 @@ def main() -> None:
             assert min(margins.values()) >= 48, f"{path}: edge margins {margins}"
             transparent = alpha.histogram()[0]
             assert transparent > 0, f"{path}: no transparent pixels"
+            file_hash = digest(path)
+            frozen_expected = FROZEN_HASHES[pack].get(name)
+            if frozen_expected is not None:
+                assert file_hash == frozen_expected, (
+                    f"{path}: frozen SHA-256 changed: {file_hash} != {frozen_expected}"
+                )
+                manifest["frozen_frame_hashes_verified"].append({
+                    "relative_path": path.relative_to(ROOT).as_posix(),
+                    "sha256": file_hash,
+                    "expected_sha256": frozen_expected,
+                    "result": "PASS",
+                })
             cards = cfg["expected_cards"][i]
             layout = CARD_LAYOUTS[pack][i]
             assert len(layout) == cards, f"{path}: composition count {len(layout)} != {cards}"
@@ -235,9 +334,26 @@ def main() -> None:
                 assert visual_count == cards, (
                     f"{path}: rendered pale-cyan card emblems {visual_count} != metadata {cards}"
                 )
+            edge_peaks = rendered_card_edge_peaks(im, pack) if i == 5 else None
+            edge_count = len(edge_peaks) if edge_peaks is not None else None
+            if i == 5:
+                assert edge_count == 1, f"{path}: rendered visible card edges {edge_count} != 1"
+                assert float(edge_peaks[0]["score"]) >= 0.48, (
+                    f"{path}: rendered card-edge pixel signature too weak: {edge_peaks[0]}"
+                )
+            tear_measurement = rendered_first_tear_measurement(im, pack) if i == 3 else None
+            if tear_measurement is not None:
+                assert 0.20 <= float(tear_measurement["opening_width_fraction"]) <= 0.25, (
+                    f"{path}: rendered opening width outside 20-25% band: {tear_measurement}"
+                )
+            exposure = None
+            if i == 5:
+                lip_y = 573 if pack == "standard" else 534
+                exposure = round((lip_y - int(edge_peaks[0]["top_y"])) / 266 * 100, 1)
+                assert 15 <= exposure <= 20, f"{path}: rendered card exposure {exposure}% outside 15-20%"
             manifest["frames"].append({
                 "relative_path": path.relative_to(ROOT).as_posix(),
-                "sha256": digest(path),
+                "sha256": file_hash,
                 "width": im.width,
                 "height": im.height,
                 "mode": im.mode,
@@ -248,6 +364,10 @@ def main() -> None:
                 "expected_card_count": cards,
                 "constructed_card_overlay_count": len(layout),
                 "visual_card_back_emblem_count": visual_count,
+                "rendered_card_edge_count": edge_count,
+                "rendered_card_edge_pixel_match_peak": edge_peaks[0] if edge_peaks else None,
+                "rendered_card_edge_exposure_percent": exposure,
+                "rendered_first_tear_opening_measurement": tear_measurement,
                 "card_overlays": layout,
                 "frame_role": ROLES[i],
                 "transparent_pixel_count": transparent,
@@ -274,7 +394,12 @@ def main() -> None:
         {"check": "all frames contain transparency and have >=48px transparent edge margins", "result": "PASS"},
         {"check": "Standard card overlay counts 0,0,0,0,0,1,1,3,3", "result": "PASS"},
         {"check": "Premium card overlay counts 0,0,0,0,0,1,1,5,5", "result": "PASS"},
-        {"check": "rendered card-back emblem counts match metadata for frames 07-09", "result": "PASS"},
+        {"check": "Frame 06 exactly one rendered card-top signature per pack", "result": "PASS"},
+        {"check": "Frame 06 rendered card exposure is within 15-20%", "result": "PASS"},
+        {"check": "Frame 08 rendered card-emblem counts Standard=3/Premium=5", "result": "PASS"},
+        {"check": "Frames 07-09 rendered card-emblem counts match expected content", "result": "PASS"},
+        {"check": "Frame 04 rendered tear width is within 20-25%", "result": "PASS"},
+        {"check": "all twelve frozen candidate PNG hashes match V04 locks", "result": "PASS"},
         {"check": "registered pack center/bottom estimates within 12px of x=512/y=1260", "result": "PASS"},
         {"check": "no full opaque backgrounds", "result": "PASS"},
     ]
@@ -284,6 +409,10 @@ def main() -> None:
     print("PASS: Standard overlays 0,0,0,0,0,1,1,3,3")
     print("PASS: Premium overlays 0,0,0,0,0,1,1,5,5")
     print("PASS: rendered card-back emblem counts match metadata in frames 07-09")
+    print("PASS: Frame 06 rendered card edge count=1 for each pack; exposure=15-20%")
+    print("PASS: Frame 08 rendered counts=3 Standard / 5 Premium")
+    print("PASS: Frame 04 rendered tear opening=20-25% pack width")
+    print("PASS: all 12 frozen frame hashes unchanged")
     print(f"WROTE: {out.relative_to(ROOT).as_posix()}")
 
 if __name__ == "__main__":
