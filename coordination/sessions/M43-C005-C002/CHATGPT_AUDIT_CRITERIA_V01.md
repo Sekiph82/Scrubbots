@@ -73,3 +73,15 @@ Canonical task: SB-M43-076
 - [ ] git diff --check clean.
 
 Technical PASS still requires owner visual acceptance before candidate frames can be promoted/wired.
+
+
+## Depth / occlusion
+- [ ] Standard Frame 07: one card is behind the irregular torn front lip; lower card portion is visibly occluded.
+- [ ] Standard Frame 08: exactly 3 cards and all card roots are behind the front torn lip.
+- [ ] Standard Frame 09: exactly 3 cards and final fan still has a clear physical depth connection to the opening.
+- [ ] Premium Frame 07: one card is behind the irregular torn front lip; lower card portion is visibly occluded.
+- [ ] Premium Frame 08: exactly 5 cards and all card roots are behind the front torn lip.
+- [ ] Premium Frame 09: exactly 5 cards and final fan still has a clear physical depth connection to the opening.
+- [ ] No card-emergence frame reads as a flat card layer pasted on top of the pouch.
+- [ ] Internal glow originates behind/inside the pouch.
+- [ ] Foreground foil/lip occlusion uses the real irregular torn shape, not a simple flat horizontal cutoff.
