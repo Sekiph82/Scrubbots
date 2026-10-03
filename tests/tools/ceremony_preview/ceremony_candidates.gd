@@ -41,16 +41,17 @@ const ART := {
 	"sb": "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
 	"bot_parts": "res://assets/ui/final/robots/bot_parts_icon.png",
 	"random_booster": "res://assets/ui/final/boosters/random.png",
+	"booster_choice": "res://assets/ui/final/rewards/booster_of_choice.png",   # M43-C005-C004 owner-approved
 	"heart": "res://assets/ui/final/common/currencies/icon_currency_heart.png",
 }
-## Reward resource -> [icon key or "" (no approved icon: native chip), label template].
+## Reward resource -> [icon key, label template]. Every row has an approved final icon.
 const REWARD_ROWS := {
 	"scrub_bucks": ["sb", "+%s Scrub Bucks"],
 	"bot_parts": ["bot_parts", "+%s Bot Parts"],
 	"standard_card_packs": ["pack_standard", "+%s Standard Card Pack"],
 	"premium_card_packs": ["pack_premium", "+%s Premium Card Pack"],
 	"random_booster_charges": ["random_booster", "+%s Random Booster"],
-	"selected_booster_charges": ["", "+%s Booster of your choice"],
+	"selected_booster_charges": ["booster_choice", "+%s Booster of your choice"],
 	"guaranteed_new_cards": ["card_back", "+%s guaranteed NEW card"],
 	"hearts": ["heart", "+%s Heart"],
 }
@@ -205,13 +206,10 @@ static func _reward_rows(p: BasePopup, rewards: Dictionary, row_h: int = 84) -> 
 		var h := HBoxContainer.new()
 		h.add_theme_constant_override("separation", UiTokens.SPACE_MD)
 		card.add_child(h)
-		if spec[0] != "":
-			var icon := HomeStyle.art("Icon")
-			icon.texture = load(ART[spec[0]])
-			icon.custom_minimum_size = Vector2(row_h - 8, row_h - 8)
-			h.add_child(icon)
-		else:
-			h.add_child(_chip("?", Color(0.25, 0.32, 0.52), Vector2(row_h - 8, row_h - 8), 40))
+		var icon := HomeStyle.art("Icon")
+		icon.texture = load(ART[spec[0]])
+		icon.custom_minimum_size = Vector2(row_h - 8, row_h - 8)
+		h.add_child(icon)
 		var l := BasePopup.body_label(spec[1] % UiText.num(int(rewards[key])), UiTokens.FONT_BODY + 2)
 		l.name = "Text"
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT

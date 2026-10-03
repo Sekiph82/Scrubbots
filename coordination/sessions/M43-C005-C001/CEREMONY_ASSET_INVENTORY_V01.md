@@ -56,6 +56,7 @@ The large bundle art could replace the flat SB / Bot Parts row icons on Master o
 ## 5. Genuinely missing art (blockers only if the owner wants them)
 
 1. **Booster-of-your-choice icon.** It affects Gift 500 / 1000 (and a possible Daily D5) rows. A native "?" chip is used meanwhile.
+   - **Resolved by M43-C005-C004 (2026-10-03):** the owner-approved icon `assets/ui/final/rewards/booster_of_choice.png` is promoted byte-exact and bound in the preview harness Booster-of-your-choice row; the "?" chip is removed. The 6b / 9 table rows above are historical C001 state.
 2. **Future world art and names.** Intentionally absent until an owner-approved world registry exists.
 3. **Optional:** a uniform-size card art re-export (quality, not a blocker).
 

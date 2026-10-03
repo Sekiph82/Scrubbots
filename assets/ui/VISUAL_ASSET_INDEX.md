@@ -523,12 +523,13 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/popups/victory/victory_emblem.png` | Phase 1 | 1,433,236 |
 | `assets/ui/final/popups/victory/victory_scrubby_pose.png` | Phase 1 | 1,250,148 |
 
-### rewards (8)
+### rewards (9)
 
 | Path | Authority | Bytes |
 |---|---|---:|
 | `assets/ui/final/rewards/bot_parts_bundle_large.png` | Phase 1 | 1,762,769 |
 | `assets/ui/final/rewards/bot_parts_bundle_small.png` | Phase 1 | 1,238,744 |
+| `assets/ui/final/rewards/booster_of_choice.png` | Owner-approved M43-C005-C004 (SB-M43-076) | 670,138 |
 | `assets/ui/final/rewards/card_pack_premium.png` | Phase 1 | 2,135,294 |
 | `assets/ui/final/rewards/card_pack_standard.png` | Phase 1 | 2,138,727 |
 | `assets/ui/final/rewards/chest_small.png` | Phase 1 | 1,210,295 |
@@ -698,6 +699,7 @@ These files exist in `assets/ui/final/**` but are not canonical targets in the c
 - Robot 2..10 character families are under `assets/ui/final/characters/robots/<robot>/`, with gameplay-profile/help/victory variants in their screen-specific folders.
 - Collection contains 15 sets × 9 individual card images under `assets/ui/final/collection/cards/set_01..set_15/`.
 - Exactly four boosters are canonical: `extra_slot.png`, `random.png`, `selector.png`, `tornado.png`.
+- `rewards/booster_of_choice.png` is the owner-approved Booster-of-your-choice reward icon (M43-C005-C004, SHA-256 `65cdb2d4f99eb0cd00adb91cc930f355ec4234f674d4fc2e8e41907326a203af`). It means "choose exactly one of the four canonical boosters"; it is not a fifth booster, reward resource or economy key. Never regenerate or alter it.
 - Railroad routing/geometry truth is runtime-authoritative. PNG railroad files are presentation skins only.
 - Store screenshots are intentionally not generated here; final store screenshots should come from the integrated app.
 - Production level pixel art is intentionally outside this UI-asset index's canonical generated UI scope and belongs to the level-content pipeline.
