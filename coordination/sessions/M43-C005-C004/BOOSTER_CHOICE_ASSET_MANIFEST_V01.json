@@ -1,0 +1,61 @@
+{
+  "cycle": "M43-C005-C004",
+  "parent_task": "SB-M43-076",
+  "prompt": "coordination/sessions/M43-C005-C004/CHATGPT_PROMPT_V01.md",
+  "owner_decision": "coordination/sessions/M43-C005-C004/OWNER_BOOSTER_CHOICE_DECISION_V01.md",
+  "asset": {
+    "meaning": "Choose exactly one of the four existing canonical boosters (Extra Slot, Random, Selector, Tornado). Not a fifth booster, reward resource, save key or inventory entry.",
+    "source": {
+      "filename": "booster of your choice.png",
+      "local_path": "C:\\Users\\sekip\\Downloads\\booster of your choice.png",
+      "bytes": 670138,
+      "sha256": "65cdb2d4f99eb0cd00adb91cc930f355ec4234f674d4fc2e8e41907326a203af"
+    },
+    "destination": {
+      "path": "assets/ui/final/rewards/booster_of_choice.png",
+      "bytes": 670138,
+      "sha256": "65cdb2d4f99eb0cd00adb91cc930f355ec4234f674d4fc2e8e41907326a203af"
+    },
+    "byte_identical": true,
+    "promotion_method": "plain file copy (cp); no decode/re-encode, no resize, crop, recolor or other edit",
+    "width": 1024,
+    "height": 1024,
+    "mode": "RGBA",
+    "alpha_histogram": {"alpha_0": 156093, "alpha_1_254": 326474, "alpha_255": 566009, "total": 1048576},
+    "image_generation_used": false
+  },
+  "bindings": [
+    {
+      "file": "tests/tools/ceremony_preview/ceremony_candidates.gd",
+      "change": "ART.booster_choice -> res://assets/ui/final/rewards/booster_of_choice.png; REWARD_ROWS.selected_booster_charges icon key '' -> 'booster_choice'; native '?' chip branch removed (no reward row lacks final art)",
+      "scope": "PREVIEW HARNESS ONLY (not shipping UI)"
+    }
+  ],
+  "unchanged_protected_assets": {
+    "canonical_boosters_sha256": {
+      "assets/ui/final/boosters/extra_slot.png": "20e49b8fcd09154a07df0af01b7df3ec5167d2489cb6e9beb2153ef4e963690e",
+      "assets/ui/final/boosters/random.png": "d06cac86c6ff6c41a8ee65043767fcaeb62f45076ee03b30725edd15ab964fd5",
+      "assets/ui/final/boosters/selector.png": "8e70fe2c61b9a61df1282287b07e4b7bc837b229b4f43f00aceb47181579ef72",
+      "assets/ui/final/boosters/tornado.png": "77460358298aa98c5deb694775d0845c897b06d4157873d9dc095734c60cd78b"
+    },
+    "collection_cards": "135/135 SHA-256 identical before/after; `git diff --quiet f17d28a0b8197cde6f95ec4a6bd155df92e199c5 -- assets/ui/final/collection/cards` exit 0",
+    "standard_premium_pack_assets": "tools/validate_m43_c005_pack_assets.py: all 12 frozen frame hashes unchanged"
+  },
+  "economy_config_keys_boosters": ["plus_one_slot", "random", "selector", "tornado"],
+  "evidence": [
+    "coordination/sessions/M43-C005-C004/evidence/gift_500_1080x2160.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_1000_1080x2160.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_500_reduced_effects_1080x2160.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_1000_reduced_effects_1080x2160.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_500_1080x1920.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_1000_1080x1920.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_500_1170x2532.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_1000_1170x2532.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_500_1290x2796.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_1000_1290x2796.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_500_1536x2048.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_1000_1536x2048.png",
+    "coordination/sessions/M43-C005-C004/evidence/gift_1000_booster_choice_row_zoom.png",
+    "coordination/sessions/M43-C005-C004/evidence/icon_mobile_sizes_contact_sheet.png"
+  ]
+}

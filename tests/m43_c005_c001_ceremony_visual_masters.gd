@@ -204,6 +204,19 @@ func _gift() -> void:
 	var small = await _open("gift_milestone", CC.gift_fixture(_t, 250))
 	var small_hero: float = small.find_child("HeroArt", true, false).custom_minimum_size.y
 	_ok(big_hero > small_hero, "1000 milestone hero (%d px) larger than the small milestone (%d px)" % [big_hero, small_hero])
+	# M43-C005-C004: Booster-of-your-choice row binds the owner-approved icon, never the old "?" chip.
+	var choice_ok := true
+	var choice_info: Array = []
+	for ms in [500, 1000]:
+		for reduced in [false, true]:
+			var gp = await _open("gift_milestone", CC.gift_fixture(_t, ms), reduced)
+			var row = gp.find_child("Row_selected_booster_charges", true, false)
+			var icon = row.find_child("Icon", true, false) if row != null else null
+			var path: String = icon.texture.resource_path if icon != null and icon.texture != null else ""
+			var chip: bool = row != null and row.find_children("*", "Label", true, false).any(func(l): return l.text == "?")
+			choice_ok = choice_ok and path == "res://assets/ui/final/rewards/booster_of_choice.png" and not chip
+			choice_info.append("%d%s:%s" % [ms, "R" if reduced else "", path.get_file()])
+	_ok(choice_ok, "Gift 500/1000 Booster-of-your-choice row (normal + Reduced Effects) uses the approved icon, no '?' chip %s" % str(choice_info))
 	_complete("c08_gift_exact")
 
 func _num(n: int) -> String:
@@ -354,7 +367,8 @@ func _copy_and_assets() -> void:
 				missing.append(CC.card_art("s%d_c%d" % [s, k]))
 	var no_icon: Array = CC.REWARD_ROWS.keys().filter(func(k): return CC.REWARD_ROWS[k][0] == "")
 	_ok(missing.is_empty() and paths.size() >= 25, "%d bound textures + 135 card arts all exist under assets/ui/final" % paths.size())
-	_ok(no_icon == ["selected_booster_charges"], "explicitly recorded missing art: %s (native '?' chip, see inventory)" % str(no_icon))
+	_ok(no_icon.is_empty() and CC.REWARD_ROWS["selected_booster_charges"][0] == "booster_choice"
+		and CC.ART["booster_choice"] == "res://assets/ui/final/rewards/booster_of_choice.png", "every reward row has final art; Booster-of-your-choice -> rewards/booster_of_choice.png %s" % str(no_icon))
 	_complete("c16_asset_paths")
 
 # ============================================================== lifecycle ========

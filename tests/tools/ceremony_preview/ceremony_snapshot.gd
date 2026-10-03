@@ -2,7 +2,7 @@ extends SceneTree
 ## M43-C005-C001 ceremony visual-master evidence (PREVIEW HARNESS ONLY). Real BasePopup /
 ## ModalStack family over a BG01 backdrop, fixture data only: no AppState, no save, no
 ## economy. Needs a rendering driver (run WITHOUT --headless):
-##   godot --path . -s res://tests/tools/ceremony_preview/ceremony_snapshot.gd -- <out_dir>
+##   godot --path . -s res://tests/tools/ceremony_preview/ceremony_snapshot.gd -- <out_dir> [key,key,...]
 
 const CC = preload("res://tests/tools/ceremony_preview/ceremony_candidates.gd")
 const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
@@ -15,6 +15,7 @@ var _bad := 0
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	var out_dir: String = args[0] if args.size() > 0 else "user://ceremony_snapshots"
+	var only: PackedStringArray = args[1].split(",") if args.size() > 1 else PackedStringArray()   # optional key filter
 	DirAccess.make_dir_recursive_absolute(out_dir if out_dir.is_absolute_path() else ProjectSettings.globalize_path(out_dir))
 	var t := CC.truth()
 	var fx := {
@@ -24,6 +25,7 @@ func _initialize() -> void:
 		"master_complete": CC.master_fixture(t),
 		"robot_unlock": CC.robot_fixture("Moppy"),
 		"gift_250": CC.gift_fixture(t, 250),
+		"gift_500": CC.gift_fixture(t, 500),
 		"gift_1000": CC.gift_fixture(t, 1000),
 		"feature_unlock": CC.feature_fixture(),
 		"world_shell": CC.world_shell_fixture(),
@@ -31,16 +33,19 @@ func _initialize() -> void:
 		"generic_4": {"title": "TASKS 3/3 COMPLETE", "rewards": {"scrub_bucks": 150, "bot_parts": 2, "standard_card_packs": 1, "random_booster_charges": 1}},
 	}
 	var shots: Array = []
-	for k in ["standard_pack", "premium_pack", "set_complete", "master_complete", "robot_unlock", "gift_250", "gift_1000", "feature_unlock", "world_shell", "generic_1", "generic_4"]:
+	for k in ["standard_pack", "premium_pack", "set_complete", "master_complete", "robot_unlock", "gift_250", "gift_500", "gift_1000", "feature_unlock", "world_shell", "generic_1", "generic_4"]:
 		shots.append([k, REF, false])
 	shots.append(["premium_pack", REF, true])
 	shots.append(["robot_unlock", REF, true])
+	shots.append(["gift_500", REF, true])
+	shots.append(["gift_1000", REF, true])
 	for sz in SIZES:
 		if sz != REF:
-			for k in ["premium_pack", "robot_unlock", "gift_1000", "master_complete"]:
+			for k in ["premium_pack", "robot_unlock", "gift_500", "gift_1000", "master_complete"]:
 				shots.append([k, sz, false])
 	for s in shots:
-		await _shot(out_dir, s, fx, t)
+		if only.is_empty() or s[0] in only:
+			await _shot(out_dir, s, fx, t)
 	quit(1 if _bad > 0 else 0)
 
 static func kind_of(key: String) -> String:
