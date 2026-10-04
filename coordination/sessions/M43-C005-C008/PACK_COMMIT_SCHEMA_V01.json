@@ -1,0 +1,213 @@
+{
+  "artifact": "M43-C005-C008 PACK_COMMIT_SCHEMA_V01 (SB-M43-066)",
+  "status": "implementer evidence; no verdict claimed",
+  "receipt": {
+    "schema_id": "scrubbots.pack_receipt.v1",
+    "type": "object",
+    "exact_keys": [
+      "schema",
+      "tx_id",
+      "presentation_id",
+      "kind",
+      "status",
+      "cards"
+    ],
+    "fields": {
+      "schema": "const 'scrubbots.pack_receipt.v1'",
+      "tx_id": "non-empty string, no leading/trailing whitespace; caller-supplied stable transaction id",
+      "presentation_id": "string == tx_id",
+      "kind": "'standard' (3 cards) | 'premium' (5 cards)",
+      "status": "const 'committed' (only committed receipts are ever stored)",
+      "cards": "array of exactly 3 (standard) / 5 (premium) rows in CardPackService draw order; premium row 0 is the guaranteed RARE/EPIC/LEGENDARY draw"
+    },
+    "card_row": {
+      "exact_keys": [
+        "card_id",
+        "art",
+        "name",
+        "rarity",
+        "is_new",
+        "copies_after"
+      ],
+      "card_id": "catalog id s<set>_c<k> (CollectionCardCatalog / CollectionInventory)",
+      "art": "== CollectionCardCatalog.entry(card_id).art",
+      "name": "== catalog name",
+      "rarity": "== catalog rarity == CollectionInventory.card_rarity",
+      "is_new": "bool; true only for the first occurrence of a card whose pre-commit owned count was 0",
+      "copies_after": "exact non-negative int: pre-commit owned count + occurrence index within the pack (1-based)"
+    },
+    "validation": "PackReceiptLedger.validate_receipt -> structure checks, then StandardPackModel.validate / PremiumPackModel.validate on {presentation_id, kind, cards}",
+    "presentation_model": "PackReceiptLedger.presentation_model(receipt) = {presentation_id, kind, cards} (consumed by StandardPackCeremony.create / PremiumPackCeremony.create_premium)"
+  },
+  "save_graph": {
+    "location": "canonical SaveService file -> economy (EconomyServices.snapshot())",
+    "sections": {
+      "packs": {
+        "shape": {
+          "rng": {
+            "hi": "exact int 0..4294967295",
+            "lo": "exact int 0..4294967295"
+          }
+        },
+        "meaning": "CardPackService RandomNumberGenerator.state = (hi << 32) | lo (split because JSON numbers are doubles)",
+        "missing": "pre-C008 save: live OS-seeded RNG kept",
+        "malformed": "rejected (type, range, fraction, extra keys)"
+      },
+      "pack_receipts": {
+        "shape": {
+          "version": "exact int 1",
+          "receipts": "array of receipts in commit order, unique tx_id"
+        },
+        "missing": "pre-C008 save: empty ledger",
+        "malformed": "whole economy import rejected, live state unchanged (all-or-nothing)"
+      }
+    }
+  },
+  "api": {
+    "commit": "AppState.commit_pack(kind, tx_id) -> PackCommitTransaction.commit(economy, kind, tx_id, request_save)",
+    "success": {
+      "ok": true,
+      "replay": "false for a new commit, true for an existing tx",
+      "receipt": "<receipt>",
+      "model": "<presentation model>"
+    },
+    "failure": {
+      "ok": false,
+      "reason": "tx_id | kind | in_flight | kind_collision | no_save | app_blocked | rolled_back",
+      "stage": "after_draw | receipt | ledger | after_ledger | save (rolled_back only)",
+      "restored": "bool (rolled_back only)"
+    },
+    "read_only": [
+      "AppState.pack_receipt(tx_id)",
+      "AppState.pack_presentation_model(tx_id)"
+    ]
+  },
+  "example": {
+    "note": "real output of a headless AppState with a test-seeded pack RNG (seed 20261004), fresh profile",
+    "standard_receipt": {
+      "cards": [
+        {
+          "art": "res://assets/ui/final/collection/cards/set_05/card_07.png",
+          "card_id": "s5_c6",
+          "copies_after": 1,
+          "is_new": true,
+          "name": "Scrub Jetpack",
+          "rarity": "EPIC"
+        },
+        {
+          "art": "res://assets/ui/final/collection/cards/set_01/card_06.png",
+          "card_id": "s1_c5",
+          "copies_after": 1,
+          "is_new": true,
+          "name": "Spark",
+          "rarity": "RARE"
+        },
+        {
+          "art": "res://assets/ui/final/collection/cards/set_15/card_03.png",
+          "card_id": "s15_c2",
+          "copies_after": 1,
+          "is_new": true,
+          "name": "Platinum Brushy",
+          "rarity": "RARE"
+        }
+      ],
+      "kind": "standard",
+      "presentation_id": "example_standard_tx",
+      "schema": "scrubbots.pack_receipt.v1",
+      "status": "committed",
+      "tx_id": "example_standard_tx"
+    },
+    "premium_receipt": {
+      "cards": [
+        {
+          "art": "res://assets/ui/final/collection/cards/set_03/card_07.png",
+          "card_id": "s3_c6",
+          "copies_after": 1,
+          "is_new": true,
+          "name": "Stainzilla",
+          "rarity": "EPIC"
+        },
+        {
+          "art": "res://assets/ui/final/collection/cards/set_15/card_07.png",
+          "card_id": "s15_c6",
+          "copies_after": 1,
+          "is_new": true,
+          "name": "Rainbow Supreme",
+          "rarity": "LEGENDARY"
+        },
+        {
+          "art": "res://assets/ui/final/collection/cards/set_08/card_03.png",
+          "card_id": "s8_c2",
+          "copies_after": 1,
+          "is_new": true,
+          "name": "Dirty Tire",
+          "rarity": "COMMON"
+        },
+        {
+          "art": "res://assets/ui/final/collection/cards/set_09/card_05.png",
+          "card_id": "s9_c4",
+          "copies_after": 1,
+          "is_new": true,
+          "name": "Toxic Rat",
+          "rarity": "RARE"
+        },
+        {
+          "art": "res://assets/ui/final/collection/cards/set_07/card_07.png",
+          "card_id": "s7_c6",
+          "copies_after": 1,
+          "is_new": true,
+          "name": "Oven Inferno",
+          "rarity": "EPIC"
+        }
+      ],
+      "kind": "premium",
+      "presentation_id": "example_premium_tx",
+      "schema": "scrubbots.pack_receipt.v1",
+      "status": "committed",
+      "tx_id": "example_premium_tx"
+    },
+    "standard_presentation_model": {
+      "cards": [
+        {
+          "art": "res://assets/ui/final/collection/cards/set_05/card_07.png",
+          "card_id": "s5_c6",
+          "copies_after": 1,
+          "is_new": true,
+          "name": "Scrub Jetpack",
+          "rarity": "EPIC"
+        },
+        {
+          "art": "res://assets/ui/final/collection/cards/set_01/card_06.png",
+          "card_id": "s1_c5",
+          "copies_after": 1,
+          "is_new": true,
+          "name": "Spark",
+          "rarity": "RARE"
+        },
+        {
+          "art": "res://assets/ui/final/collection/cards/set_15/card_03.png",
+          "card_id": "s15_c2",
+          "copies_after": 1,
+          "is_new": true,
+          "name": "Platinum Brushy",
+          "rarity": "RARE"
+        }
+      ],
+      "kind": "standard",
+      "presentation_id": "example_standard_tx"
+    },
+    "economy_packs_section_after_both": {
+      "rng": {
+        "hi": 2055110715,
+        "lo": 2573495318
+      }
+    },
+    "economy_pack_receipts_section": {
+      "version": 1,
+      "receipts": [
+        "<standard_receipt>",
+        "<premium_receipt>"
+      ]
+    }
+  }
+}

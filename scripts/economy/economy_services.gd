@@ -23,6 +23,7 @@ const SlotCapacityAuthority = preload("res://scripts/economy/slot_capacity_autho
 const DailyService = preload("res://scripts/economy/daily_service.gd")
 const CollectionInventory = preload("res://scripts/collection/collection_inventory.gd")
 const CardPackService = preload("res://scripts/collection/card_pack_service.gd")
+const PackReceiptLedger = preload("res://scripts/collection/pack_receipt_ledger.gd")
 const CardsExchangeService = preload("res://scripts/economy/cards_exchange_service.gd")
 const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
 
@@ -42,6 +43,8 @@ var capacity: SlotCapacityAuthority
 var daily: DailyService
 var collection: CollectionInventory
 var packs: CardPackService
+## M43-C005-C008 durable receipts of presented pack openings (written only by PackCommitTransaction).
+var pack_receipts: PackReceiptLedger
 var exchange: CardsExchangeService
 ## M43-C003 rewarded-video grants (provider-neutral; production provider = unavailable).
 var rewarded: RewardedGrantService
@@ -62,6 +65,7 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	daily = DailyService.new(config, reward, clock, local_day)
 	collection = CollectionInventory.new(config, reward)
 	packs = CardPackService.new(collection, pack_rng)
+	pack_receipts = PackReceiptLedger.new()
 	exchange = CardsExchangeService.new(collection, reward, config)
 	streak = WinStreakService.new(reward, gift)
 	rewarded = RewardedGrantService.new(reward, hearts)
@@ -69,6 +73,9 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 
 func _register_handlers() -> void:
 	# scrub_bucks / bot_parts already registered by RewardGrantService defaults.
+	# M39 grant-and-resolve semantics (unchanged by M43-C005-C008): a pack earned as part of a
+	# reward bundle is drawn and applied immediately with no receipt. A pack opening that is
+	# PRESENTED must use PackCommitTransaction.commit() instead.
 	reward.register_handler("standard_card_packs", func(n):
 		for _i in range(n):
 			packs.open_standard())
@@ -122,6 +129,8 @@ func snapshot() -> Dictionary:
 		"boosters": boosters.snapshot(),
 		"daily": daily.snapshot(),
 		"collection": collection.snapshot(),
+		"packs": packs.snapshot(),
+		"pack_receipts": pack_receipts.snapshot(),
 	}
 
 ## Independently all-or-nothing import (F-M39-005). Captures the exact current
@@ -159,5 +168,10 @@ func _apply_sections(s) -> bool:
 	if not daily.import_snapshot(s.get("daily", {})):
 		return false
 	if not collection.import_snapshot(s.get("collection", {})):
+		return false
+	# M43-C005-C008: missing sections (older saves) keep the live RNG / an empty ledger.
+	if not packs.import_snapshot(s.get("packs", {})):
+		return false
+	if not pack_receipts.import_snapshot(s.get("pack_receipts", {})):
 		return false
 	return true
