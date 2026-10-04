@@ -1,0 +1,298 @@
+[
+  {
+    "case": "clean frame_01_closed.png",
+    "expect_clean": true,
+    "clean": true,
+    "failures": []
+  },
+  {
+    "case": "inserted opaque black rectangle frame_01_closed.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "inserted semi-transparent dark rectangle frame_01_closed.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "clean frame_02_charge.png",
+    "expect_clean": true,
+    "clean": true,
+    "failures": []
+  },
+  {
+    "case": "inserted opaque black rectangle frame_02_charge.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "inserted semi-transparent dark rectangle frame_02_charge.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "clean frame_03_pressure.png",
+    "expect_clean": true,
+    "clean": true,
+    "failures": []
+  },
+  {
+    "case": "inserted opaque black rectangle frame_03_pressure.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "inserted semi-transparent dark rectangle frame_03_pressure.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "clean frame_04_first_tear.png",
+    "expect_clean": true,
+    "clean": true,
+    "failures": []
+  },
+  {
+    "case": "inserted opaque black rectangle frame_04_first_tear.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "inserted semi-transparent dark rectangle frame_04_first_tear.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "clean frame_05_tear_widens.png",
+    "expect_clean": true,
+    "clean": true,
+    "failures": []
+  },
+  {
+    "case": "inserted opaque black rectangle frame_05_tear_widens.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "inserted semi-transparent dark rectangle frame_05_tear_widens.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "clean frame_06_card_edge.png",
+    "expect_clean": true,
+    "clean": true,
+    "failures": []
+  },
+  {
+    "case": "inserted opaque black rectangle frame_06_card_edge.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "inserted semi-transparent dark rectangle frame_06_card_edge.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "clean frame_07_one_card_rises.png",
+    "expect_clean": true,
+    "clean": true,
+    "failures": []
+  },
+  {
+    "case": "inserted opaque black rectangle frame_07_one_card_rises.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "inserted semi-transparent dark rectangle frame_07_one_card_rises.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "clean frame_08_cards_emerge.png",
+    "expect_clean": true,
+    "clean": true,
+    "failures": []
+  },
+  {
+    "case": "inserted opaque black rectangle frame_08_cards_emerge.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "inserted semi-transparent dark rectangle frame_08_cards_emerge.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "clean frame_09_final_reveal.png",
+    "expect_clean": true,
+    "clean": true,
+    "failures": []
+  },
+  {
+    "case": "inserted opaque black rectangle frame_09_final_reveal.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "inserted semi-transparent dark rectangle frame_09_final_reveal.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "historical frame_05_tear_widens.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "historical frame_06_card_edge.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "historical frame_07_one_card_rises.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "historical frame_08_cards_emerge.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "straight_edge_cut"
+    ]
+  },
+  {
+    "case": "historical frame_09_final_reveal.png",
+    "expect_clean": false,
+    "clean": false,
+    "failures": [
+      "large_dark_component",
+      "dark_wash",
+      "rectangular_boundary",
+      "straight_edge_cut"
+    ]
+  }
+]

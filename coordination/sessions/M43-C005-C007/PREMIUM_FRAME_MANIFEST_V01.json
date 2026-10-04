@@ -1,0 +1,563 @@
+{
+  "schema_version": 1,
+  "task": "SB-M43-065",
+  "cycle": "M43-C005-C007 V01",
+  "prompt": "coordination/sessions/M43-C005-C007/CHATGPT_PROMPT_V01.md",
+  "validator": "tools/validate_m43_c005_standard_frame_alpha_v03.py (decoded pixels)",
+  "remediation_required": false,
+  "frames": [
+    {
+      "frame": "frame_01_closed.png",
+      "beat": 1,
+      "action": "promoted_byte_identical_already_clean",
+      "candidate_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_01_closed.png",
+      "final_path": "assets/ui/final/rewards/pack_opening/premium/frame_01_closed.png",
+      "sha256": "29b87a206bae589ce4811641a40d352186a6bf01528cad9279b390c82031034c",
+      "c002_manifest_sha256": "29b87a206bae589ce4811641a40d352186a6bf01528cad9279b390c82031034c",
+      "bytes": 972600,
+      "expected_card_back_count": 0,
+      "card_overlays": [],
+      "metrics": {
+        "size": [
+          1024,
+          1536
+        ],
+        "mode": "RGBA",
+        "alpha_bbox": [
+          227,
+          339,
+          799,
+          1248
+        ],
+        "transparent_px": 1127694,
+        "opaque_px": 1088,
+        "semi_px": 444082,
+        "dark_visible_px": 24533,
+        "dark_components": 541,
+        "largest_dark_component_px": 9623,
+        "dark_wash_px": 29,
+        "border_nonzero_px": 0,
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "bbox_side_fill": {
+          "top": 0.012,
+          "bottom": 0.007,
+          "left": 0.008,
+          "right": 0.003
+        },
+        "bbox_edge_cut_run_px": {
+          "top": 4,
+          "bottom": 4,
+          "left": 5,
+          "right": 0
+        },
+        "failures": [],
+        "clean": true
+      }
+    },
+    {
+      "frame": "frame_02_charge.png",
+      "beat": 2,
+      "action": "promoted_byte_identical_already_clean",
+      "candidate_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_02_charge.png",
+      "final_path": "assets/ui/final/rewards/pack_opening/premium/frame_02_charge.png",
+      "sha256": "44b88fbbc9796edadd13229268978ce7a3c94b22bcebd3bb9906f4d6a2bfe571",
+      "c002_manifest_sha256": "44b88fbbc9796edadd13229268978ce7a3c94b22bcebd3bb9906f4d6a2bfe571",
+      "bytes": 1532592,
+      "expected_card_back_count": 0,
+      "card_overlays": [],
+      "metrics": {
+        "size": [
+          1024,
+          1536
+        ],
+        "mode": "RGBA",
+        "alpha_bbox": [
+          199,
+          315,
+          824,
+          1277
+        ],
+        "transparent_px": 956552,
+        "opaque_px": 0,
+        "semi_px": 616312,
+        "dark_visible_px": 23510,
+        "dark_components": 545,
+        "largest_dark_component_px": 9386,
+        "dark_wash_px": 24,
+        "border_nonzero_px": 0,
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "bbox_side_fill": {
+          "top": 0.003,
+          "bottom": 0.038,
+          "left": 0.003,
+          "right": 0.003
+        },
+        "bbox_edge_cut_run_px": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "failures": [],
+        "clean": true
+      }
+    },
+    {
+      "frame": "frame_03_pressure.png",
+      "beat": 3,
+      "action": "promoted_byte_identical_already_clean",
+      "candidate_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_03_pressure.png",
+      "final_path": "assets/ui/final/rewards/pack_opening/premium/frame_03_pressure.png",
+      "sha256": "cf79d5b85d6227f69b462261e350c8bb1e27d8ad9deab135f5201faf778d9af6",
+      "c002_manifest_sha256": "cf79d5b85d6227f69b462261e350c8bb1e27d8ad9deab135f5201faf778d9af6",
+      "bytes": 1695103,
+      "expected_card_back_count": 0,
+      "card_overlays": [],
+      "metrics": {
+        "size": [
+          1024,
+          1536
+        ],
+        "mode": "RGBA",
+        "alpha_bbox": [
+          141,
+          159,
+          884,
+          1277
+        ],
+        "transparent_px": 822097,
+        "opaque_px": 41340,
+        "semi_px": 709427,
+        "dark_visible_px": 23512,
+        "dark_components": 546,
+        "largest_dark_component_px": 9386,
+        "dark_wash_px": 24,
+        "border_nonzero_px": 0,
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "bbox_side_fill": {
+          "top": 0.003,
+          "bottom": 0.032,
+          "left": 0.002,
+          "right": 0.002
+        },
+        "bbox_edge_cut_run_px": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "failures": [],
+        "clean": true
+      }
+    },
+    {
+      "frame": "frame_04_first_tear.png",
+      "beat": 4,
+      "action": "promoted_byte_identical_already_clean",
+      "candidate_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_04_first_tear.png",
+      "final_path": "assets/ui/final/rewards/pack_opening/premium/frame_04_first_tear.png",
+      "sha256": "2cbe8a7470e403a68768bb0aa7ada536d1c5e52dbc92ee77d36d0406a9f2493f",
+      "c002_manifest_sha256": "2cbe8a7470e403a68768bb0aa7ada536d1c5e52dbc92ee77d36d0406a9f2493f",
+      "bytes": 1049017,
+      "expected_card_back_count": 0,
+      "card_overlays": [],
+      "metrics": {
+        "size": [
+          1024,
+          1536
+        ],
+        "mode": "RGBA",
+        "alpha_bbox": [
+          227,
+          339,
+          799,
+          1248
+        ],
+        "transparent_px": 1122945,
+        "opaque_px": 27071,
+        "semi_px": 422848,
+        "dark_visible_px": 24541,
+        "dark_components": 544,
+        "largest_dark_component_px": 9623,
+        "dark_wash_px": 29,
+        "border_nonzero_px": 0,
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "bbox_side_fill": {
+          "top": 0.012,
+          "bottom": 0.007,
+          "left": 0.008,
+          "right": 0.003
+        },
+        "bbox_edge_cut_run_px": {
+          "top": 4,
+          "bottom": 4,
+          "left": 5,
+          "right": 0
+        },
+        "failures": [],
+        "clean": true
+      }
+    },
+    {
+      "frame": "frame_05_tear_widens.png",
+      "beat": 5,
+      "action": "promoted_byte_identical_already_clean",
+      "candidate_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_05_tear_widens.png",
+      "final_path": "assets/ui/final/rewards/pack_opening/premium/frame_05_tear_widens.png",
+      "sha256": "072dbc8f4accd17b4eb0c4a679cb47d0fe5bf1083f7576480c926712be8ab564",
+      "c002_manifest_sha256": "072dbc8f4accd17b4eb0c4a679cb47d0fe5bf1083f7576480c926712be8ab564",
+      "bytes": 1837082,
+      "expected_card_back_count": 0,
+      "card_overlays": [],
+      "metrics": {
+        "size": [
+          1024,
+          1536
+        ],
+        "mode": "RGBA",
+        "alpha_bbox": [
+          116,
+          95,
+          922,
+          1277
+        ],
+        "transparent_px": 772665,
+        "opaque_px": 135755,
+        "semi_px": 664444,
+        "dark_visible_px": 22700,
+        "dark_components": 420,
+        "largest_dark_component_px": 9386,
+        "dark_wash_px": 21,
+        "border_nonzero_px": 0,
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "bbox_side_fill": {
+          "top": 0.001,
+          "bottom": 0.03,
+          "left": 0.001,
+          "right": 0.002
+        },
+        "bbox_edge_cut_run_px": {
+          "top": 0,
+          "bottom": 0,
+          "left": 0,
+          "right": 0
+        },
+        "failures": [],
+        "clean": true
+      }
+    },
+    {
+      "frame": "frame_06_card_edge.png",
+      "beat": 6,
+      "action": "promoted_byte_identical_already_clean",
+      "candidate_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_06_card_edge.png",
+      "final_path": "assets/ui/final/rewards/pack_opening/premium/frame_06_card_edge.png",
+      "sha256": "242a6d8166082f7e13e7f920bbe7249b62ba5626c2ef682cb9b9f1860a0d1b62",
+      "c002_manifest_sha256": "242a6d8166082f7e13e7f920bbe7249b62ba5626c2ef682cb9b9f1860a0d1b62",
+      "bytes": 2020416,
+      "expected_card_back_count": 1,
+      "card_overlays": [
+        {
+          "center_x": 512,
+          "top_y": 489,
+          "rotation_degrees": 0,
+          "visible_percent": 17
+        }
+      ],
+      "metrics": {
+        "size": [
+          1024,
+          1536
+        ],
+        "mode": "RGBA",
+        "alpha_bbox": [
+          83,
+          84,
+          946,
+          1277
+        ],
+        "transparent_px": 748026,
+        "opaque_px": 175567,
+        "semi_px": 649271,
+        "dark_visible_px": 22733,
+        "dark_components": 458,
+        "largest_dark_component_px": 9386,
+        "dark_wash_px": 21,
+        "border_nonzero_px": 0,
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "bbox_side_fill": {
+          "top": 0.001,
+          "bottom": 0.028,
+          "left": 0.004,
+          "right": 0.001
+        },
+        "bbox_edge_cut_run_px": {
+          "top": 0,
+          "bottom": 0,
+          "left": 3,
+          "right": 0
+        },
+        "failures": [],
+        "clean": true
+      }
+    },
+    {
+      "frame": "frame_07_one_card_rises.png",
+      "beat": 7,
+      "action": "promoted_byte_identical_already_clean",
+      "candidate_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_07_one_card_rises.png",
+      "final_path": "assets/ui/final/rewards/pack_opening/premium/frame_07_one_card_rises.png",
+      "sha256": "f47a7b6ecb8d02f444acf4dd75d25f0276f8a9f2459320a799edee94768d9dfa",
+      "c002_manifest_sha256": "f47a7b6ecb8d02f444acf4dd75d25f0276f8a9f2459320a799edee94768d9dfa",
+      "bytes": 2020972,
+      "expected_card_back_count": 1,
+      "card_overlays": [
+        {
+          "center_x": 512,
+          "top_y": 390,
+          "rotation_degrees": 0,
+          "visible_percent": 60
+        }
+      ],
+      "metrics": {
+        "size": [
+          1024,
+          1536
+        ],
+        "mode": "RGBA",
+        "alpha_bbox": [
+          83,
+          84,
+          946,
+          1277
+        ],
+        "transparent_px": 748026,
+        "opaque_px": 174075,
+        "semi_px": 650763,
+        "dark_visible_px": 22755,
+        "dark_components": 468,
+        "largest_dark_component_px": 9386,
+        "dark_wash_px": 21,
+        "border_nonzero_px": 0,
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "bbox_side_fill": {
+          "top": 0.001,
+          "bottom": 0.028,
+          "left": 0.004,
+          "right": 0.001
+        },
+        "bbox_edge_cut_run_px": {
+          "top": 0,
+          "bottom": 0,
+          "left": 3,
+          "right": 0
+        },
+        "failures": [],
+        "clean": true
+      }
+    },
+    {
+      "frame": "frame_08_cards_emerge.png",
+      "beat": 8,
+      "action": "promoted_byte_identical_already_clean",
+      "candidate_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_08_cards_emerge.png",
+      "final_path": "assets/ui/final/rewards/pack_opening/premium/frame_08_cards_emerge.png",
+      "sha256": "72d63957839455a442120a1cfa8c78e2c3e319c3627322d0fb10c5a883afb065",
+      "c002_manifest_sha256": "72d63957839455a442120a1cfa8c78e2c3e319c3627322d0fb10c5a883afb065",
+      "bytes": 2049886,
+      "expected_card_back_count": 5,
+      "card_overlays": [
+        {
+          "center_x": 278,
+          "top_y": 365,
+          "rotation_degrees": -20,
+          "visible_percent": 70
+        },
+        {
+          "center_x": 395,
+          "top_y": 359,
+          "rotation_degrees": -10,
+          "visible_percent": 72
+        },
+        {
+          "center_x": 512,
+          "top_y": 353,
+          "rotation_degrees": 0,
+          "visible_percent": 74
+        },
+        {
+          "center_x": 629,
+          "top_y": 359,
+          "rotation_degrees": 10,
+          "visible_percent": 72
+        },
+        {
+          "center_x": 746,
+          "top_y": 365,
+          "rotation_degrees": 20,
+          "visible_percent": 70
+        }
+      ],
+      "metrics": {
+        "size": [
+          1024,
+          1536
+        ],
+        "mode": "RGBA",
+        "alpha_bbox": [
+          83,
+          84,
+          946,
+          1277
+        ],
+        "transparent_px": 746652,
+        "opaque_px": 179679,
+        "semi_px": 646533,
+        "dark_visible_px": 23271,
+        "dark_components": 745,
+        "largest_dark_component_px": 9386,
+        "dark_wash_px": 118,
+        "border_nonzero_px": 0,
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "bbox_side_fill": {
+          "top": 0.001,
+          "bottom": 0.028,
+          "left": 0.004,
+          "right": 0.001
+        },
+        "bbox_edge_cut_run_px": {
+          "top": 0,
+          "bottom": 0,
+          "left": 3,
+          "right": 0
+        },
+        "failures": [],
+        "clean": true
+      }
+    },
+    {
+      "frame": "frame_09_final_reveal.png",
+      "beat": 9,
+      "action": "promoted_byte_identical_already_clean",
+      "candidate_path": "assets/ui/candidates/m43_c005/pack_opening/premium/frame_09_final_reveal.png",
+      "final_path": "assets/ui/final/rewards/pack_opening/premium/frame_09_final_reveal.png",
+      "sha256": "0de24ea3509518b8a358d733925cee30b8bc4087219dceecc39f20bec750977a",
+      "c002_manifest_sha256": "0de24ea3509518b8a358d733925cee30b8bc4087219dceecc39f20bec750977a",
+      "bytes": 2061236,
+      "expected_card_back_count": 5,
+      "card_overlays": [
+        {
+          "center_x": 278,
+          "top_y": 282,
+          "rotation_degrees": -24,
+          "visible_percent": 100
+        },
+        {
+          "center_x": 395,
+          "top_y": 276,
+          "rotation_degrees": -12,
+          "visible_percent": 100
+        },
+        {
+          "center_x": 512,
+          "top_y": 270,
+          "rotation_degrees": 0,
+          "visible_percent": 100
+        },
+        {
+          "center_x": 629,
+          "top_y": 276,
+          "rotation_degrees": 12,
+          "visible_percent": 100
+        },
+        {
+          "center_x": 746,
+          "top_y": 282,
+          "rotation_degrees": 24,
+          "visible_percent": 100
+        }
+      ],
+      "metrics": {
+        "size": [
+          1024,
+          1536
+        ],
+        "mode": "RGBA",
+        "alpha_bbox": [
+          83,
+          84,
+          946,
+          1277
+        ],
+        "transparent_px": 748026,
+        "opaque_px": 207339,
+        "semi_px": 617499,
+        "dark_visible_px": 24062,
+        "dark_components": 1083,
+        "largest_dark_component_px": 9386,
+        "dark_wash_px": 117,
+        "border_nonzero_px": 0,
+        "corner_alpha": [
+          0,
+          0,
+          0,
+          0
+        ],
+        "bbox_side_fill": {
+          "top": 0.001,
+          "bottom": 0.028,
+          "left": 0.004,
+          "right": 0.001
+        },
+        "bbox_edge_cut_run_px": {
+          "top": 0,
+          "bottom": 0,
+          "left": 3,
+          "right": 0
+        },
+        "failures": [],
+        "clean": true
+      }
+    }
+  ]
+}

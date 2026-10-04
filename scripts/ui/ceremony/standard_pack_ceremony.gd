@@ -105,10 +105,14 @@ func _init(model: Dictionary = {}, reduced := false) -> void:
 	set_title(UiText.t("PACK_STANDARD_TITLE"))
 	_scrim.color = SCRIM_DARK
 	_stack_box.visible = false   # no cream frame: full-screen dark stage
-	for f in PACK_FRAMES:
-		_frame_tex.append(load(FRAME_DIR + f))
+	for path in _frame_paths():
+		_frame_tex.append(load(path))
 	_build()
 	closed.connect(func(_r): _seq.cancel())
+
+## The nine opening frame paths, 01..09 (M43-C005-C007: a pack subclass supplies its own family).
+func _frame_paths() -> Array:
+	return PACK_FRAMES.map(func(f): return FRAME_DIR + f)
 
 func _build() -> void:
 	_layer = Control.new()

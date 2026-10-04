@@ -14,9 +14,11 @@ const CEREMONY := "res://scripts/ui/ceremony/standard_pack_ceremony.gd"
 const Fx = preload("res://tests/support/standard_pack_fixtures.gd")
 
 ## sha256 of the audited V03 production sources (commit ebc7644), over LF-normalised text so
-## the pin holds on both CRLF (Windows checkout) and LF working trees.
+## the pin holds on both CRLF (Windows checkout) and LF working trees. M43-C005-C007 re-pinned the
+## ceremony after its only change: the overridable `_frame_paths()` hook (same nine Standard
+## paths; lets PremiumPackCeremony supply its own frame family). Standard behaviour unchanged.
 const PRODUCTION_SHA := {
-	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "380cec3eb925d6f7181deda32619d4ff7cd749aacc4d3303f5345c36bbb1f322",
+	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "b95b9e10a58c09c169b813d8b42b4cdc8b7704557c2b1dd46caced11212933a8",
 	"res://scripts/ui/ceremony/standard_pack_model.gd": "2db015d362fdfa2e5b2040d7e3ebcbaed59986811b2d364980082095a655f481",
 	"res://scripts/ui/components/reveal_sequencer.gd": "ccfcc426db81da9ce623d262611191c0039a5f4bd21c46aa3d3decdbf9d2a5ca",
 }
@@ -80,7 +82,7 @@ func _h02_real_ceremony() -> void:
 func _h03_production_unchanged() -> void:
 	print("[h03 production files unchanged]")
 	for path in PRODUCTION_SHA:
-		_ok(_text_sha(path) == PRODUCTION_SHA[path], "%s sha256 (LF-normalised) == audited V03 baseline" % path.get_file())
+		_ok(_text_sha(path) == PRODUCTION_SHA[path], "%s sha256 (LF-normalised) == audited baseline (V03 + C007 hook)" % path.get_file())
 	_ok(_text_sha_of("x\r\ny\n") == _text_sha_of("x\ny\n") and _text_sha_of("x\n") != _text_sha_of("y\n"), "pin is line-ending independent but content sensitive")
 	_complete("h03_production_unchanged")
 
