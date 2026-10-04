@@ -16,3 +16,7 @@ static func mixed(pid: String = "std_fixture_mixed") -> Dictionary:
 ## Same card twice inside one pack: NEW then DUPLICATE x2, plus an EPIC duplicate x5.
 static func repeat(pid: String = "std_fixture_repeat") -> Dictionary:
 	return {"presentation_id": pid, "cards": [card("s2_c0", true, 1), card("s2_c0", false, 2), card("s9_c6", false, 5)]}
+
+## All NEW: COMMON, RARE, EPIC — every card routes to Collection (owner review harness).
+static func all_new(pid: String = "std_fixture_all_new") -> Dictionary:
+	return {"presentation_id": pid, "cards": [card("s1_c0", true, 1), card("s5_c5", true, 1), card("s11_c7", true, 1)]}
