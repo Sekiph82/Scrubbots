@@ -99,7 +99,8 @@ func _c01_frame_hashes() -> void:
 	_ok(same == [true, true, true, true, false, false, false, false, false], "01..04 kept byte-identical (already clean); 05..09 alpha re-derived %s" % str(same))
 	var files := Array(DirAccess.get_files_at(StandardPackCeremony.FRAME_DIR)).filter(func(n): return n.ends_with(".png"))
 	files.sort()
-	_ok(files == StandardPackCeremony.PACK_FRAMES and not DirAccess.dir_exists_absolute("res://assets/ui/final/rewards/pack_opening/premium"), "exactly the 9 Standard frames; no Premium frames promoted")
+	# (C006 also asserted "no Premium frames promoted"; SB-M43-065 / M43-C005-C007 now owns that family.)
+	_ok(files == StandardPackCeremony.PACK_FRAMES, "exactly the 9 Standard frames in the Standard family")
 	_complete("c01_frame_hashes")
 
 func _c03_requires_three() -> void:

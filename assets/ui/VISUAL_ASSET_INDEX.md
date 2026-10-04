@@ -551,7 +551,23 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/rewards/pack_opening/standard/frame_08_cards_emerge.png` | Owner-accepted M43-C005-C002 art; V03 alpha-clean re-derivation M43-C005-C006 (SB-M43-064, STANDARD_FRAME_ALPHA_MANIFEST_V03) | 1,527,623 |
 | `assets/ui/final/rewards/pack_opening/standard/frame_09_final_reveal.png` | Owner-accepted M43-C005-C002 art; V03 alpha-clean re-derivation M43-C005-C006 (SB-M43-064, STANDARD_FRAME_ALPHA_MANIFEST_V03) | 1,846,374 |
 
-Integration note (M43-C005-C006): shipping Standard Pack opening frames 01..09, bound only by `scripts/ui/ceremony/standard_pack_ceremony.gd`; sha256 equal to `coordination/sessions/M43-C005-C002/PACK_ASSET_MANIFEST_V01.json`. V03 (SB-M43-064): the near-black matte of 05/07/09 and the dark wash of 06/08 were removed by alpha re-derivation (over-black look preserved; tools/clean_m43_c005_standard_frame_alpha_v03.py); 01..04 unchanged. Historical bytes stay under assets/ui/candidates/m43_c005/pack_opening/standard/. Premium frames are not promoted yet (SB-M43-065).
+Integration note (M43-C005-C006): shipping Standard Pack opening frames 01..09, bound only by `scripts/ui/ceremony/standard_pack_ceremony.gd`; sha256 equal to `coordination/sessions/M43-C005-C002/PACK_ASSET_MANIFEST_V01.json`. V03 (SB-M43-064): the near-black matte of 05/07/09 and the dark wash of 06/08 were removed by alpha re-derivation (over-black look preserved; tools/clean_m43_c005_standard_frame_alpha_v03.py); 01..04 unchanged. Historical bytes stay under assets/ui/candidates/m43_c005/pack_opening/standard/. Premium frames: see `rewards/pack_opening/premium` below (SB-M43-065).
+
+### rewards/pack_opening/premium (9)
+
+| Path | Authority | Bytes |
+|---|---|---:|
+| `assets/ui/final/rewards/pack_opening/premium/frame_01_closed.png` | Owner-accepted M43-C005-C002 (FINAL_OWNER_ACCEPTANCE_V01), byte-identical promotion M43-C005-C007 (SB-M43-065) | 972,600 |
+| `assets/ui/final/rewards/pack_opening/premium/frame_02_charge.png` | Owner-accepted M43-C005-C002 (FINAL_OWNER_ACCEPTANCE_V01), byte-identical promotion M43-C005-C007 (SB-M43-065) | 1,532,592 |
+| `assets/ui/final/rewards/pack_opening/premium/frame_03_pressure.png` | Owner-accepted M43-C005-C002 (FINAL_OWNER_ACCEPTANCE_V01), byte-identical promotion M43-C005-C007 (SB-M43-065) | 1,695,103 |
+| `assets/ui/final/rewards/pack_opening/premium/frame_04_first_tear.png` | Owner-accepted M43-C005-C002 (FINAL_OWNER_ACCEPTANCE_V01), byte-identical promotion M43-C005-C007 (SB-M43-065) | 1,049,017 |
+| `assets/ui/final/rewards/pack_opening/premium/frame_05_tear_widens.png` | Owner-accepted M43-C005-C002 (FINAL_OWNER_ACCEPTANCE_V01), byte-identical promotion M43-C005-C007 (SB-M43-065) | 1,837,082 |
+| `assets/ui/final/rewards/pack_opening/premium/frame_06_card_edge.png` | Owner-accepted M43-C005-C002 (FINAL_OWNER_ACCEPTANCE_V01), byte-identical promotion M43-C005-C007 (SB-M43-065) | 2,020,416 |
+| `assets/ui/final/rewards/pack_opening/premium/frame_07_one_card_rises.png` | Owner-accepted M43-C005-C002 (FINAL_OWNER_ACCEPTANCE_V01), byte-identical promotion M43-C005-C007 (SB-M43-065) | 2,020,972 |
+| `assets/ui/final/rewards/pack_opening/premium/frame_08_cards_emerge.png` | Owner-accepted M43-C005-C002 (FINAL_OWNER_ACCEPTANCE_V01), byte-identical promotion M43-C005-C007 (SB-M43-065) | 2,049,886 |
+| `assets/ui/final/rewards/pack_opening/premium/frame_09_final_reveal.png` | Owner-accepted M43-C005-C002 (FINAL_OWNER_ACCEPTANCE_V01), byte-identical promotion M43-C005-C007 (SB-M43-065) | 2,061,236 |
+
+Integration note (M43-C005-C007): shipping Premium opening frames 01..09, bound only by `scripts/ui/ceremony/premium_pack_ceremony.gd`. All nine passed the V03 rendered-pixel alpha/matte validator unchanged (no remediation); sha256 in `coordination/sessions/M43-C005-C007/PREMIUM_FRAME_MANIFEST_V01.json`.
 
 ### robots (21)
 
