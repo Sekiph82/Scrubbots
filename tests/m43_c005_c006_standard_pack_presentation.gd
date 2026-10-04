@@ -1,5 +1,6 @@
 extends SceneTree
-## M43-C005-C006 (SB-M43-064) V02 — shipping Standard Card Pack interactive opening.
+## M43-C005-C006 (SB-M43-064) V02/V03 — shipping Standard Card Pack interactive opening.
+## V03: clean-alpha frames (STANDARD_FRAME_ALPHA_MANIFEST_V03) + FULL cadence >= 0.18 s per beat.
 ## Real ModalStack + StandardPackCeremony (BasePopup) + RevealSequencer + promoted owner
 ## frames + canonical C003 cards, deterministic COMMITTED fixture models. Player taps are
 ## delivered as real InputEventMouseButton through SubViewport.push_input (both gates).
@@ -19,7 +20,10 @@ const Fx = preload("res://tests/support/standard_pack_fixtures.gd")
 
 const SIZE := Vector2i(1080, 1920)
 const MANIFEST := "res://coordination/sessions/M43-C005-C002/PACK_ASSET_MANIFEST_V01.json"
+const MANIFEST_V03 := "res://coordination/sessions/M43-C005-C006/STANDARD_FRAME_ALPHA_MANIFEST_V03.json"
 const CAND_DIR := "res://assets/ui/candidates/m43_c005/pack_opening/standard/"
+const V03_DIR := "res://assets/ui/candidates/m43_c005/pack_opening/standard_v03_alpha_clean/"
+const MIN_HOLD := 0.18
 const CARD_TREE := "res://assets/ui/final/collection/cards/"
 ## Identifiers meaning pack-opening / grant / Collection / exchange / save / navigation / RNG authority.
 const FORBIDDEN := ["open_standard", "open_premium", "grant_guaranteed_new", "add_card", "claim",
@@ -36,6 +40,7 @@ var EXPECTED_CASES := [
 	"v01_initial_pack_only", "v02_no_auto_start", "v03_tap1_opening_order", "v04_hold_pack_absent",
 	"v05_destinations_corners", "v06_tap2_required", "v07_mixed_routing", "v08_repeat_routing",
 	"v09_no_state_mutation", "v10_complete_once", "v11_lifecycle_back", "v12_reduced_semantics",
+	"v13_full_cadence", "v14_rendered_alpha_clean",
 ]
 
 var _fail := 0
@@ -64,6 +69,8 @@ func _initialize() -> void:
 	await _v10_complete_once()
 	await _v11_lifecycle_back()
 	await _v12_reduced_semantics()
+	await _v13_full_cadence()
+	_v14_rendered_alpha_clean()
 	_c12_static_guard()
 	_c13_model_sensitivity()
 	_unmount()
@@ -75,13 +82,21 @@ func _initialize() -> void:
 
 ## Promoted frames are the exact owner-accepted bytes (manifest authority).
 func _c01_frame_hashes() -> void:
-	print("[c01 promoted frame hashes]")
+	print("[c01 promoted frame hashes (V03 clean-alpha authority)]")
 	var want := _manifest_hashes()
-	var ok := want.size() == 9
+	var c002 := _c002_hashes()
+	var ok := want.size() == 9 and c002.size() == 9
+	var hist_ok := true
 	for f in StandardPackCeremony.PACK_FRAMES:
 		var dst := FileAccess.get_sha256(StandardPackCeremony.FRAME_DIR + f)
-		ok = ok and want.get(f, "") == dst and dst == FileAccess.get_sha256(CAND_DIR + f)
-	_ok(ok, "9 promoted frames == accepted source == PACK_ASSET_MANIFEST_V01 sha256")
+		ok = ok and want.get(f, "") == dst and dst == FileAccess.get_sha256(V03_DIR + f)
+		hist_ok = hist_ok and FileAccess.get_sha256(CAND_DIR + f) == c002[f]
+	_ok(ok, "9 shipping frames == V03 clean candidates == STANDARD_FRAME_ALPHA_MANIFEST_V03 sha256")
+	_ok(hist_ok, "historical C002 candidates unchanged (== PACK_ASSET_MANIFEST_V01)")
+	var same := []
+	for f in StandardPackCeremony.PACK_FRAMES:
+		same.append(want[f] == c002[f])
+	_ok(same == [true, true, true, true, false, false, false, false, false], "01..04 kept byte-identical (already clean); 05..09 alpha re-derived %s" % str(same))
 	var files := Array(DirAccess.get_files_at(StandardPackCeremony.FRAME_DIR)).filter(func(n): return n.ends_with(".png"))
 	files.sort()
 	_ok(files == StandardPackCeremony.PACK_FRAMES and not DirAccess.dir_exists_absolute("res://assets/ui/final/rewards/pack_opening/premium"), "exactly the 9 Standard frames; no Premium frames promoted")
@@ -445,6 +460,107 @@ func _v12_reduced_semantics() -> void:
 	_ok(mid and done == ["v12_red"], "Reduced: short visible route, completed once")
 	_complete("v12_reduced_semantics")
 
+## V03: FULL opening binds every beat 01..09 once, in order, each 01..08 for >= 0.18 s,
+## one pack-frame node at a time, no face before 09. Bind times come from the sequencer's
+## step_started (the instant each zero-duration frame step applies).
+func _v13_full_cadence() -> void:
+	print("[v13 FULL 01..09 cadence]")
+	var p = _push(Fx.mixed("v13"))
+	var binds: Array = []   ## [frame, usec]
+	p.get_sequencer().step_started.connect(func(_k, i): if i < 9: binds.append([i + 1, Time.get_ticks_usec()]))
+	await _frames(2)
+	_tap(p)
+	var max_nodes := 0
+	var early_card := false
+	for _g in range(900):   # capped: a regression fails, never hangs
+		if p.phase() != "OPENING":
+			break
+		max_nodes = maxi(max_nodes, _frame_nodes(p))
+		if p.pack_frame < 9:
+			early_card = early_card or p.get_card_views().any(func(cv): return cv.is_visible_in_tree())
+		await process_frame
+	var holds := _holds(binds)
+	print("    timing: " + str(holds.map(func(h): return "%02d bind %.3f s hold %.3f s" % [h[0], h[1], h[2]])))
+	_ok(binds.map(func(b): return b[0]) == range(1, 10) and p.frame_history() == range(1, 10), "beats bound exactly 01..09, none skipped or repeated %s" % str(p.frame_history()))
+	_ok(_cadence_ok(holds) and holds.size() == 8, "every FULL beat 01..08 held >= %.2f s" % MIN_HOLD)
+	_ok(max_nodes == 1 and not early_card, "one current pack frame only; no card face before 09")
+	_ok(StandardPackCeremony.FRAME_HOLD.slice(1).all(func(h): return h >= MIN_HOLD) and StandardPackCeremony.MIN_FULL_HOLD == MIN_HOLD, "configured FULL holds all >= 0.18 s")
+	# Sensitivity: the checks reject a short hold, a skipped and a repeated beat.
+	var short_ok := _cadence_ok([[1, 0.0, 0.4], [2, 0.4, 0.12]])
+	var skip: Array = range(1, 10)
+	skip.erase(5)
+	var rep := [1, 2, 3, 4, 4, 5, 6, 7, 8, 9]
+	_ok(not short_ok and skip != range(1, 10) and rep != range(1, 10), "sensitivity: short hold / skipped beat / repeated beat are rejected")
+	_close(p)
+	_complete("v13_full_cadence")
+
+## [frame, bind_s (relative), hold_s] for 01..08 from [frame, usec] bind events.
+func _holds(binds: Array) -> Array:
+	var out: Array = []
+	if binds.is_empty():
+		return out
+	var t0: int = binds[0][1]
+	for i in range(binds.size() - 1):
+		out.append([binds[i][0], (binds[i][1] - t0) / 1e6, (binds[i + 1][1] - binds[i][1]) / 1e6])
+	return out
+
+func _cadence_ok(holds: Array) -> bool:
+	return holds.size() >= 1 and holds.all(func(h): return h[2] >= MIN_HOLD)
+
+## V03: decoded shipping pixels have no matte: transparent border band, no dark visible wash,
+## visible region never fills a side of its own bbox. (Full matte authority: the Python
+## validator tools/validate_m43_c005_standard_frame_alpha_v03.py.)
+func _v14_rendered_alpha_clean() -> void:
+	print("[v14 rendered alpha clean]")
+	var verdicts: Array = []
+	for f in StandardPackCeremony.PACK_FRAMES:
+		var img := Image.load_from_file(ProjectSettings.globalize_path(StandardPackCeremony.FRAME_DIR + f))
+		verdicts.append(_matte_free(img))
+	_ok(verdicts.all(func(v): return v), "all 9 shipping frames: transparent border, no dark wash, no rectangular boundary %s" % str(verdicts))
+	var dirty := Image.load_from_file(ProjectSettings.globalize_path(CAND_DIR + "frame_05_tear_widens.png"))
+	var boxed := Image.load_from_file(ProjectSettings.globalize_path(StandardPackCeremony.FRAME_DIR + "frame_09_final_reveal.png"))
+	boxed.convert(Image.FORMAT_RGBA8)
+	boxed.fill_rect(Rect2i(120, 120, 784, 1296), Color(0.02, 0.02, 0.02, 0.6))
+	_ok(not _matte_free(dirty) and not _matte_free(boxed), "sensitivity: historical frame 05 and an injected dark rectangle are rejected")
+	_complete("v14_rendered_alpha_clean")
+
+## Sampled every 2nd pixel: border band transparent, dark semi-transparent wash under budget,
+## visible region covers <= 55 % of its bbox's top and left sides.
+func _matte_free(img: Image) -> bool:
+	img.convert(Image.FORMAT_RGBA8)
+	var w := img.get_width()
+	var h := img.get_height()
+	var data := img.get_data()
+	var wash := 0
+	var x0 := w
+	var y0 := h
+	var x1 := -1
+	var y1 := -1
+	for y in range(0, h, 2):
+		var row := y * w * 4
+		for x in range(0, w, 2):
+			var i := row + x * 4
+			var a := data[i + 3]
+			if a < 8:
+				continue
+			if x < 24 or y < 24 or x >= w - 24 or y >= h - 24:
+				return false
+			x0 = mini(x0, x)
+			y0 = mini(y0, y)
+			x1 = maxi(x1, x)
+			y1 = maxi(y1, y)
+			if a >= 16 and a <= 230 and maxi(data[i], maxi(data[i + 1], data[i + 2])) < 40:
+				wash += 1
+	if x1 < 0 or wash * 4 > 8000:
+		return false
+	var top := 0
+	for x in range(x0, x1 + 1, 2):
+		top += 1 if data[(y0 * w + x) * 4 + 3] >= 8 else 0
+	var left := 0
+	for y in range(y0, y1 + 1, 2):
+		left += 1 if data[(y * w + x0) * 4 + 3] >= 8 else 0
+	return top * 2.0 / float(x1 - x0 + 1) <= 0.55 and left * 2.0 / float(y1 - y0 + 1) <= 0.55
+
 ## Source guard: no pack-opening / grant / Collection / exchange / save / navigation / RNG authority.
 func _c12_static_guard() -> void:
 	print("[c12 static authority guard]")
@@ -549,7 +665,16 @@ func _buttons(p) -> Array:
 func _center(c: Control) -> Vector2:
 	return c.position + c.size * 0.5
 
+## V03 shipping authority: frame name -> sha256 after alpha cleanup.
 func _manifest_hashes() -> Dictionary:
+	var out := {}
+	var d = JSON.parse_string(FileAccess.get_file_as_string(MANIFEST_V03))
+	for f in d["frames"]:
+		out[String(f["frame"])] = f["sha256_after"]
+	return out
+
+## Historical C002 accepted candidates (provenance only).
+func _c002_hashes() -> Dictionary:
 	var out := {}
 	var d = JSON.parse_string(FileAccess.get_file_as_string(MANIFEST))
 	for f in d["frames"]:

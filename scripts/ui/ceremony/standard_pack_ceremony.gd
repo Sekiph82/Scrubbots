@@ -43,7 +43,11 @@ enum Phase { IDLE, OPENING, AWAIT_ROUTE, ROUTING, COMPLETE }
 const PHASE_NAMES := ["IDLE", "OPENING", "AWAIT_ROUTE", "ROUTING", "COMPLETE"]
 
 ## Timing (s): [FULL, REDUCED].
-const FRAME_HOLD := [0.0, 0.40, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14, 0.14]
+## FRAME_HOLD[i] = how long frame i (1-based) stays bound before frame i+1 (FULL only).
+## V03 owner lock: every FULL beat 01..08 must read as its own beat -> >= 0.18 s each.
+const MIN_FULL_HOLD := 0.18
+const FRAME_HOLD := [0.0, 0.40, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22, 0.22]
+const FRAME09_HOLD_S := 0.30       ## the open pack (09) rests before the cards rise
 const EMERGE_S := [0.24, 0.10]
 const PACK_OUT_S := [0.25, 0.10]
 const HOLD_S := [0.40, 0.15]       ## three-card hold (no pack) before the destinations appear
@@ -221,7 +225,7 @@ func _open_plan() -> Array:
 			s["from"] = i + 1
 		steps.append(s)
 	for i in range(_cards.size()):
-		var d: float = (REDUCED_FRAME09_S if _reduced else FRAME_HOLD[8]) if i == 0 else 0.0
+		var d: float = (REDUCED_FRAME09_S if _reduced else FRAME09_HOLD_S) if i == 0 else 0.0
 		steps.append({"target": _cards[i], "property": "emerge", "from": 0.0, "to": 1.0, "duration": EMERGE_S[r], "delay": d})
 	steps.append({"target": _stage, "property": "modulate:a", "from": 1.0, "to": 0.0, "duration": PACK_OUT_S[r]})
 	steps.append({"target": _dest_layer, "property": "modulate:a", "from": 0.0, "to": 1.0, "duration": DEST_IN_S[r], "delay": HOLD_S[r]})

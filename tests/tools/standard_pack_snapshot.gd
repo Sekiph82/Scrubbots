@@ -18,11 +18,18 @@ const INSETS := [0, 96, 0, 64]
 var _bad := 0
 var _out := ""
 var _timeline: Array = []   ## [name, Image]
+var _runtime_frames: Dictionary = {}   ## V03: bound pack frame -> stage crop captured at runtime
 
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	_out = args[0] if args.size() > 0 else "user://standard_pack_snapshots"
 	DirAccess.make_dir_recursive_absolute(_out if _out.is_absolute_path() else ProjectSettings.globalize_path(_out))
+	# V03: one real capture per bound opening frame 01..09 after Tap 1 (FULL), + contact sheet.
+	var beats := {}
+	for k in range(1, 10):
+		beats["F%02d_runtime_frame_%02d" % [k, k]] = (func(f): return func(p): return p.phase() == "OPENING" and p.pack_frame == f and p.frame_history().size() == f).call(k)
+	await _flow(Fx.mixed("ev_beats"), false, beats)
+	_runtime_sheet()
 	# Full owner flow, mixed pack (NEW / DUPLICATE / NEW), 1080x1920.
 	await _flow(Fx.mixed("ev_mixed"), false, {
 		"01_pack_idle": func(p): return p.phase() == "IDLE",
@@ -130,6 +137,8 @@ func _capture(sub: SubViewport, key: String, p, timeline: bool) -> void:
 	print("SNAPSHOT ", path, " err=", img.save_png(path), " phase=", "CLOSED" if p == null else p.phase(), " frame=", -1 if p == null else p.pack_frame)
 	if timeline:
 		_timeline.append([key, img])
+	if key.begins_with("F0") and p != null:
+		_runtime_frames[p.pack_frame] = [p.get_stage().texture.resource_path.get_file(), img.get_region(Rect2i(p.get_stage().get_global_rect()))]
 
 ## Visible ceremony controls stay inside the safe layer; destinations never cover a card in
 ## the row; the pack is never visible once destinations show.
@@ -157,6 +166,26 @@ func _layout_problem(p) -> String:
 				if r.intersects(d.get_global_rect()) or r.intersects(d.get_node("Label").get_global_rect()):
 					return "%s overlaps %s" % [cv.name, k]
 	return ""
+
+## Evidence-only 3x3 sheet of the runtime captures of bound frames 01..09 (stage crops).
+func _runtime_sheet() -> void:
+	var keys: Array = _runtime_frames.keys()
+	keys.sort()
+	if keys != range(1, 10):
+		_reject("runtime capture missing frames: %s" % str(keys))
+		return
+	var w := 300
+	var h := 450
+	var sheet := Image.create(3 * (w + 12) + 12, 3 * (h + 12) + 12, false, Image.FORMAT_RGBA8)
+	sheet.fill(Color(0.95, 0.95, 0.95))
+	for i in range(9):
+		var im: Image = _runtime_frames[i + 1][1]
+		im.convert(Image.FORMAT_RGBA8)
+		im.resize(w, h, Image.INTERPOLATE_LANCZOS)
+		sheet.blit_rect(im, Rect2i(0, 0, w, h), Vector2i(12 + (i % 3) * (w + 12), 12 + (i / 3) * (h + 12)))
+	var path := "%s/STANDARD_RUNTIME_01_09_V03_CONTACT_SHEET.png" % _out
+	print("RUNTIME frames ", keys.map(func(k): return "%02d=%s" % [k, _runtime_frames[k][0]]))
+	print("SNAPSHOT ", path, " err=", sheet.save_png(path))
 
 func _sheet() -> void:
 	_timeline.sort_custom(func(a, b): return String(a[0]) < String(b[0]))
