@@ -13,8 +13,9 @@ extends RefCounted
 ## Card truth is checked by the shipping StandardPackModel / PremiumPackModel validators (the
 ## receipt must be exactly what the accepted ceremonies consume).
 ##
-## Snapshot {version: 1, receipts: [receipt, ...]} in commit order. Import is all-or-nothing;
-## an empty / missing section (saves before M43-C005-C008) is an empty ledger.
+## Snapshot {version: 1, receipts: [receipt, ...]} in commit order. Import is strict and
+## all-or-nothing (exactly version + receipts). Legacy saves without the section are handled by
+## EconomyServices (key absent -> empty ledger), never by passing an empty section here.
 
 const StandardPackModel = preload("res://scripts/ui/ceremony/standard_pack_model.gd")
 const PremiumPackModel = preload("res://scripts/ui/ceremony/premium_pack_model.gd")
@@ -115,14 +116,14 @@ static func _fail(reason: String) -> Dictionary:
 func snapshot() -> Dictionary:
 	return {"version": VERSION, "receipts": _order.map(func(tx): return (_receipts[tx] as Dictionary).duplicate(true))}
 
+## The canonical empty ledger section (what a pre-C008 save means).
+static func empty_snapshot() -> Dictionary:
+	return {"version": VERSION, "receipts": []}
+
 func import_snapshot(s) -> bool:
-	if typeof(s) != TYPE_DICTIONARY:
+	if typeof(s) != TYPE_DICTIONARY or s.size() != 2 or not s.has("version") or not s.has("receipts"):
 		return false
-	if s.is_empty():
-		_receipts = {}
-		_order = []
-		return true
-	if IntDomain.exact_int(s.get("version", null)) != VERSION:
+	if IntDomain.exact_int(s["version"]) != VERSION:
 		return false
 	var raw = s.get("receipts", null)
 	if typeof(raw) != TYPE_ARRAY:

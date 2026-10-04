@@ -169,9 +169,11 @@ func _apply_sections(s) -> bool:
 		return false
 	if not collection.import_snapshot(s.get("collection", {})):
 		return false
-	# M43-C005-C008: missing sections (older saves) keep the live RNG / an empty ledger.
-	if not packs.import_snapshot(s.get("packs", {})):
+	# M43-C005-C008: key ABSENT = pre-C008 save (keep the live OS-seeded RNG / empty ledger).
+	# Key PRESENT = strict C008 schema; an empty or partial section fails closed.
+	if s.has("packs") and not packs.import_snapshot(s["packs"]):
 		return false
-	if not pack_receipts.import_snapshot(s.get("pack_receipts", {})):
+	var ledger = s["pack_receipts"] if s.has("pack_receipts") else PackReceiptLedger.empty_snapshot()
+	if not pack_receipts.import_snapshot(ledger):
 		return false
 	return true
