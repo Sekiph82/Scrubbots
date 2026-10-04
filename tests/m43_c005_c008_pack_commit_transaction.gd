@@ -28,6 +28,7 @@ var EXPECTED_CASES := [
 	"t16_reopen_standard", "t17_reopen_premium", "t18_set_master_once", "t19_set_master_rollback",
 	"t20_old_save_loads", "t21_malformed_import", "t22_partial_import", "t23_reentrancy",
 	"t24_two_tx_sequential", "t25_bridge_static", "t26_sensitivity",
+	"t27_absent_vs_present",
 ]
 
 var _fail := 0
@@ -65,6 +66,7 @@ func _initialize() -> void:
 	_t24_two_tx_sequential()
 	_t25_bridge_static()
 	_t26_sensitivity()
+	_t27_absent_vs_present()
 	_unmount()
 	await _frames(3)
 	_cleanup()
@@ -496,6 +498,81 @@ func _t26_sensitivity() -> void:
 	common0["cards"][0] = _row("s1_c0", true, 1)
 	_ok(PackReceiptLedger.validate_receipt(common0)["reason"] == "cards:card_0_not_rare_or_better", "Premium card 0 COMMON is rejected")
 	_complete("t26_sensitivity")
+
+## V02 (SB-M43-066 import hardening): a key ABSENT from the economy is a pre-C008 save; a key
+## PRESENT must be a complete C008 section. Present-but-empty / partial never reads as legacy.
+func _t27_absent_vs_present() -> void:
+	print("[t27 absent vs present C008 sections]")
+	var app = _app("t27", 2727)
+	app.commit_pack("standard", "tx_live")
+	app.commit_pack("premium", "tx_live2")
+	var good: Dictionary = app.economy.snapshot()
+	var bad_sections := {
+		"packs_empty": ["packs", {}],
+		"packs_rng_empty": ["packs", {"rng": {}}],
+		"packs_no_rng": ["packs", {"seed": 1}],
+		"packs_extra_key": ["packs", {"rng": good["packs"]["rng"], "x": 1}],
+		"packs_null": ["packs", null],
+		"ledger_empty": ["pack_receipts", {}],
+		"ledger_no_receipts": ["pack_receipts", {"version": 1}],
+		"ledger_no_version": ["pack_receipts", {"receipts": []}],
+		"ledger_extra_key": ["pack_receipts", {"version": 1, "receipts": [], "x": 1}],
+		"ledger_null": ["pack_receipts", null],
+	}
+	# (1) EconomyServices: rejected, and EVERY section restored even though earlier sections
+	# (wallet via reward, collection) were already imported with different values.
+	var live0 := _auth(app)
+	var econ_rejected: Array = []
+	for name in bad_sections:
+		var bad: Dictionary = good.duplicate(true)
+		bad["reward"]["wallet"]["scrub_bucks"] = int(bad["reward"]["wallet"]["scrub_bucks"]) + 777
+		bad["collection"]["owned"]["s1_c0"] = int(bad["collection"]["owned"].get("s1_c0", 0)) + 4
+		bad[bad_sections[name][0]] = bad_sections[name][1]
+		if not app.economy.import_snapshot(bad) and _auth(app) == live0:
+			econ_rejected.append(name)
+	_ok(econ_rejected.size() == bad_sections.size(), "economy import rejects every present-empty/partial C008 section and restores the full prior state (%d/%d) %s" % [econ_rejected.size(), bad_sections.size(), str(bad_sections.keys().filter(func(k): return not econ_rejected.has(k)))])
+	# (2) direct strict service imports.
+	var rng0: int = app.economy.packs._rng.state
+	var direct_packs := [{}, {"rng": {}}, {"rng": {"hi": 1}}, {"seed": 1}, {"rng": good["packs"]["rng"], "x": 1}, [], null]
+	_ok(direct_packs.all(func(v): return not app.economy.packs.import_snapshot(v)) and app.economy.packs._rng.state == rng0, "CardPackService.import_snapshot rejects every malformed present section; RNG untouched")
+	_ok(app.economy.packs.import_snapshot(good["packs"]) and app.economy.packs._rng.state == rng0, "canonical {rng:{hi,lo}} accepted")
+	var led0: Dictionary = app.economy.pack_receipts.snapshot()
+	var direct_ledger := [{}, {"version": 1}, {"receipts": []}, {"version": 1, "receipts": [], "x": 1}, {"version": 2, "receipts": []}, [], null]
+	_ok(direct_ledger.all(func(v): return not app.economy.pack_receipts.import_snapshot(v)) and app.economy.pack_receipts.snapshot() == led0, "PackReceiptLedger.import_snapshot rejects every malformed present section; ledger untouched")
+	# (3) key absent = legacy: live RNG kept, ledger empty.
+	var legacy: Dictionary = good.duplicate(true)
+	legacy.erase("packs")
+	legacy.erase("pack_receipts")
+	_ok(app.economy.import_snapshot(legacy) and app.economy.packs._rng.state == rng0 and app.economy.pack_receipts.size() == 0, "both keys absent: accepted, live RNG kept, ledger empty")
+	app.economy.import_snapshot(good)
+	# (4) SaveService candidate validation + real load path.
+	app.request_save()
+	var base = JSON.parse_string(FileAccess.get_file_as_string(_path_of(app)))
+	var old_cand = base.duplicate(true)
+	old_cand["economy"].erase("packs")
+	old_cand["economy"].erase("pack_receipts")
+	_ok(app.save.validate_candidate(old_cand)["ok"], "SaveService: pre-C008 candidate (both keys absent) validates")
+	var save_rejected: Array = []
+	var load_rejected: Array = []
+	var path := "user://m43c005c008_t27_load.save"
+	_tmp.append(path)
+	for name in bad_sections:
+		var cand = base.duplicate(true)
+		cand["economy"][bad_sections[name][0]] = bad_sections[name][1]
+		if not app.save.validate_candidate(cand)["ok"]:
+			save_rejected.append(name)
+		_write(path, cand)
+		var loaded = AppState.new(path)
+		if loaded.load_result["source"] != "primary" and loaded.pack_receipt("tx_live").is_empty():
+			load_rejected.append(name)
+	_ok(save_rejected.size() == bad_sections.size(), "SaveService.validate_candidate rejects all %d (%s missing)" % [bad_sections.size(), str(bad_sections.keys().filter(func(k): return not save_rejected.has(k)))])
+	_ok(load_rejected.size() == bad_sections.size(), "real load path never accepts a malformed primary as legacy (%d/%d)" % [load_rejected.size(), bad_sections.size()])
+	_write(path, old_cand)
+	var old = AppState.new(path)
+	var r: Dictionary = old.commit_pack("premium", "tx_after_legacy")
+	var re = AppState.new(path)
+	_ok(old.load_result["source"] == "primary" and r["ok"] and re.pack_receipt("tx_after_legacy") == r["receipt"] and re.pack_receipt("tx_live").is_empty(), "legacy primary loads, then a C008 commit persists and reloads")
+	_complete("t27_absent_vs_present")
 
 # ------------------------------------------------------------- helpers ----
 

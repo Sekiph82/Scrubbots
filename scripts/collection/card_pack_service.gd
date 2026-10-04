@@ -86,13 +86,11 @@ func snapshot() -> Dictionary:
 	var st: int = _rng.state
 	return {"rng": {"hi": (st >> 32) & U32, "lo": st & U32}}
 
-## All-or-nothing. A section without "rng" (saves before M43-C005-C008) keeps the live,
-## OS-seeded generator; a present but malformed "rng" fails closed.
+## Strict, all-or-nothing: the section must be exactly {rng: {hi, lo}}. Legacy saves without
+## the section are handled by EconomyServices (key absent -> this is never called).
 func import_snapshot(s) -> bool:
-	if typeof(s) != TYPE_DICTIONARY:
+	if typeof(s) != TYPE_DICTIONARY or s.size() != 1 or not s.has("rng"):
 		return false
-	if not s.has("rng"):
-		return true
 	var r = s["rng"]
 	if typeof(r) != TYPE_DICTIONARY or r.size() != 2:
 		return false
