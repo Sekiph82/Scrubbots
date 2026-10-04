@@ -1,5 +1,7 @@
 extends SceneTree
 ## M43-C005-C006 (SB-M43-064) — owner review harness smoke test (review tooling only).
+## Harness V02: rebaselined to the technically audited V03 production (clean-alpha frames +
+## FULL cadence); production files and the V03 frame family are pinned below.
 ## Loads res://tests/tools/owner_review/standard_pack_owner_review.tscn and proves it wraps the
 ## real shipping StandardPackCeremony unchanged, waits in IDLE, never taps, and that its
 ## R / E / 1 / 2 / 3 keys only restart / switch effects / switch fixtures.
@@ -11,24 +13,32 @@ const HARNESS := "res://tests/tools/owner_review/standard_pack_owner_review.gd"
 const CEREMONY := "res://scripts/ui/ceremony/standard_pack_ceremony.gd"
 const Fx = preload("res://tests/support/standard_pack_fixtures.gd")
 
-## sha256 of the audited V02 production files (commit 10144f6, unchanged at 96da421).
+## sha256 of the audited V03 production sources (commit ebc7644), over LF-normalised text so
+## the pin holds on both CRLF (Windows checkout) and LF working trees.
 const PRODUCTION_SHA := {
-	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "f570d9bf8baa9e7d228d0dcb912fa65b610d37bfce1d09466923d2bbe797fc0e",
+	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "380cec3eb925d6f7181deda32619d4ff7cd749aacc4d3303f5345c36bbb1f322",
 	"res://scripts/ui/ceremony/standard_pack_model.gd": "2db015d362fdfa2e5b2040d7e3ebcbaed59986811b2d364980082095a655f481",
 	"res://scripts/ui/components/reveal_sequencer.gd": "ccfcc426db81da9ce623d262611191c0039a5f4bd21c46aa3d3decdbf9d2a5ca",
 }
+const MANIFEST_V03 := "res://coordination/sessions/M43-C005-C006/STANDARD_FRAME_ALPHA_MANIFEST_V03.json"
+const FRAME_DIR := "res://assets/ui/final/rewards/pack_opening/standard/"
+const V03_DIR := "res://assets/ui/candidates/m43_c005/pack_opening/standard_v03_alpha_clean/"
+const HIST_DIR := "res://assets/ui/candidates/m43_c005/pack_opening/standard/"
+const MIN_HOLD := 0.18
 ## Harness must not tap, inject input or carry any authority.
 const FORBIDDEN := ["tap", "push_input", "parse_input_event", "InputEventMouseButton", "InputEventScreenTouch",
 	"call_deferred", "Timer", "create_timer", "open_standard", "open_premium", "add_card", "grant", "claim",
 	"RewardGrant", "CardPackService", "CollectionInventory", "CardsExchange", "exchange_card", "economy",
 	"AppState", "save", "Save", "Navigation", "change_scene", "ProjectSettings"]
 ## Harness must not duplicate the opening (frames / timings / state machine / sequencing).
-const NO_COPY := ["PACK_FRAMES", "FRAME_HOLD", "frame_0", "pack_opening", "RevealSequencer", "create_tween",
-	"Tween", "Phase", "pack_frame", "emerge", "route", "ROUTE_S"]
+const NO_COPY := ["PACK_FRAMES", "FRAME_HOLD", "FRAME09_HOLD_S", "MIN_FULL_HOLD", "frame_0", "pack_opening",
+	"RevealSequencer", "create_tween", "Tween", "Phase", "pack_frame", "emerge", "route", "ROUTE_S",
+	"0.22", "0.40", "0.30", "0.18"]
 
 var EXPECTED_CASES := ["h01_scene_loads", "h02_real_ceremony", "h03_production_unchanged", "h04_default_mixed",
 	"h05_idle_waits", "h06_no_auto_tap", "h07_key_r", "h08_key_e", "h09_keys_fixtures",
-	"h10_no_authority", "h11_no_duplicate_opening", "h12_project_untouched"]
+	"h10_no_authority", "h11_no_duplicate_opening", "h12_project_untouched",
+	"h13_v03_frame_family", "h14_full_v03_cadence"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -54,6 +64,8 @@ func _initialize() -> void:
 	_h10_no_authority()
 	_h11_no_duplicate_opening()
 	_h12_project_untouched()
+	_h13_v03_frame_family()
+	await _h14_full_v03_cadence()
 	_h.free()
 	await _frames(3)
 	_done()
@@ -68,7 +80,8 @@ func _h02_real_ceremony() -> void:
 func _h03_production_unchanged() -> void:
 	print("[h03 production files unchanged]")
 	for path in PRODUCTION_SHA:
-		_ok(FileAccess.get_sha256(path) == PRODUCTION_SHA[path], "%s sha256 == audited V02 baseline" % path.get_file())
+		_ok(_text_sha(path) == PRODUCTION_SHA[path], "%s sha256 (LF-normalised) == audited V03 baseline" % path.get_file())
+	_ok(_text_sha_of("x\r\ny\n") == _text_sha_of("x\ny\n") and _text_sha_of("x\n") != _text_sha_of("y\n"), "pin is line-ending independent but content sensitive")
 	_complete("h03_production_unchanged")
 
 func _h04_default_mixed() -> void:
@@ -158,7 +171,60 @@ func _h12_project_untouched() -> void:
 	_ok(not autoloads.any(func(a): return a.contains("owner_review")), "harness is not an autoload")
 	_complete("h12_project_untouched")
 
+## The harness is loading the V03 clean shipping frame family (manifest authority).
+func _h13_v03_frame_family() -> void:
+	print("[h13 V03 frame family]")
+	var rows: Array = JSON.parse_string(FileAccess.get_file_as_string(MANIFEST_V03))["frames"]
+	var ok := rows.size() == 9
+	var same: Array = []
+	var clean: Array = []
+	for r in rows:
+		var f := String(r["frame"])
+		var ship := FileAccess.get_sha256(FRAME_DIR + f)
+		ok = ok and ship == String(r["sha256_after"]) and FileAccess.get_sha256(V03_DIR + f) == ship
+		same.append(ship == FileAccess.get_sha256(HIST_DIR + f) and ship == String(r["sha256_before"]))
+		clean.append(bool(r["metrics_after"]["clean"]))
+	_ok(ok, "9 shipping frames == V03 manifest sha256_after == V03 clean candidates")
+	_ok(same == [true, true, true, true, false, false, false, false, false], "01..04 == historical bytes; 05..09 differ from the historical dirty bytes %s" % str(same))
+	_ok(clean.all(func(c): return c), "all 9 V03 manifest rows clean=true")
+	var bound: Array = []
+	var c = _h.get_ceremony()
+	for k in range(1, 10):
+		c.pack_frame = k
+		bound.append(FileAccess.get_sha256(c.get_stage().texture.resource_path) == String(rows[k - 1]["sha256_after"]))
+	_key(KEY_R)   # put the bound frame back: fresh ceremony in IDLE
+	_ok(bound.all(func(b): return b), "the review ceremony binds exactly the V03 bytes for beats 01..09")
+	_complete("h13_v03_frame_family")
+
+## FULL V03 run driven by the TEST (the harness never taps): exact 01..09, configured holds >= 0.18 s.
+func _h14_full_v03_cadence() -> void:
+	print("[h14 FULL V03 cadence]")
+	_key(KEY_R)
+	await _frames(2)
+	var c = _h.get_ceremony()
+	_ok(not _h.is_reduced() and c.phase() == "IDLE", "FULL mode, IDLE before the test tap")
+	c.tap()
+	for _i in range(900):   # capped: a regression fails, never hangs
+		if c.phase() != "OPENING":
+			break
+		await process_frame
+	_ok(c.frame_history() == range(1, 10), "shipping frame history exactly 01..09 %s" % str(c.frame_history()))
+	var holds: Array = (c.get_script().get_script_constant_map()["FRAME_HOLD"] as Array).slice(1)
+	_ok(holds.size() == 8 and holds.all(func(h): return h >= MIN_HOLD), "configured FULL holds 01..08 >= 0.18 s %s" % str(holds))
+	_ok(_hits(_code_only(FileAccess.get_file_as_string(HARNESS)), ["0.22", "0.40", "0.30", "FRAME_HOLD"]).is_empty(), "harness carries no beat timing of its own")
+	_key(KEY_R)
+	await _frames(2)
+	_complete("h14_full_v03_cadence")
+
 # ------------------------------------------------------------------ helpers --
+
+func _text_sha(path: String) -> String:
+	return _text_sha_of(FileAccess.get_file_as_string(path))
+
+func _text_sha_of(text: String) -> String:
+	return text.replace("\r\n", "\n").sha256_text()
+
+
 
 func _key(code: int) -> void:
 	var ev := InputEventKey.new()
