@@ -33,6 +33,7 @@ const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
 const EconomyConfig = preload("res://scripts/economy/economy_config.gd")
 const ProductionActionFacade = preload("res://scripts/economy/production_action_facade.gd")
 const FailureAssistanceService = preload("res://scripts/economy/failure_assistance_service.gd")
+const PackCommitTransaction = preload("res://scripts/collection/pack_commit_transaction.gd")
 
 const CANONICAL_SAVE_PATH := "user://scrubbots_save.dat"
 
@@ -84,6 +85,23 @@ func request_save() -> Dictionary:
 	if r.get("ok", false):
 		_dirty = false
 	return r
+
+## M43-C005-C008 (SB-M43-066): the canonical pack-opening commit for presentation. kind is
+## "standard" | "premium"; tx_id is the caller's stable transaction id. Returns
+## {ok, replay, receipt, model} only after the commit is durably saved (see
+## PackCommitTransaction); the same tx_id always returns the same receipt and never draws again.
+## Feed `model` to StandardPackCeremony.create / PremiumPackCeremony.create_premium.
+func commit_pack(kind: String, tx_id: String) -> Dictionary:
+	if is_blocked:
+		return {"ok": false, "reason": "app_blocked"}
+	return PackCommitTransaction.commit(economy, kind, tx_id, Callable(self, "request_save"))
+
+## Committed receipt / presentation model for tx_id ({} when none). Read-only.
+func pack_receipt(tx_id: String) -> Dictionary:
+	return PackCommitTransaction.receipt(economy, tx_id)
+
+func pack_presentation_model(tx_id: String) -> Dictionary:
+	return PackCommitTransaction.presentation_model(economy, tx_id)
 
 ## Mark in-memory durable state as pending (no write). Flushed at the next
 ## lifecycle boundary. Not per-frame.

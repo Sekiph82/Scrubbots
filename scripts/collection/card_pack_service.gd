@@ -8,8 +8,18 @@ extends RefCounted
 ##
 ## RNG is INJECTED (a RandomNumberGenerator) so tests are deterministic; the
 ## production default seeds from the OS, never a globally-fixed test seed.
+## M43-C005-C008: the generator state is part of the canonical save (snapshot/import), so a
+## failed pack commit restores it exactly and a reload continues the same sequence.
+##
+## LOW-LEVEL AUTHORITY: open_standard()/open_premium() draw AND apply at once and keep no
+## receipt. Their only callers are the M39 `standard_card_packs` / `premium_card_packs`
+## reward handlers (grant-and-resolve). Anything that PRESENTS a pack opening must go through
+## PackCommitTransaction.commit() (res://scripts/collection/pack_commit_transaction.gd),
+## which owns the durable receipt; presentation never calls these directly.
 
 const CollectionInventory = preload("res://scripts/collection/collection_inventory.gd")
+const IntDomain = preload("res://scripts/economy/int_domain.gd")
+const U32 := 0xFFFFFFFF
 
 const STANDARD_DRAWS := 3
 const PREMIUM_DRAWS := 5
@@ -68,3 +78,27 @@ func grant_guaranteed_new() -> String:
 		return ""
 	_inventory.add_card(cid)
 	return cid
+
+# --------------------------------------------------------------- snapshot ----
+
+## RNG continuation, as two exact 32-bit halves (the JSON save cannot carry a 64-bit int).
+func snapshot() -> Dictionary:
+	var st: int = _rng.state
+	return {"rng": {"hi": (st >> 32) & U32, "lo": st & U32}}
+
+## All-or-nothing. A section without "rng" (saves before M43-C005-C008) keeps the live,
+## OS-seeded generator; a present but malformed "rng" fails closed.
+func import_snapshot(s) -> bool:
+	if typeof(s) != TYPE_DICTIONARY:
+		return false
+	if not s.has("rng"):
+		return true
+	var r = s["rng"]
+	if typeof(r) != TYPE_DICTIONARY or r.size() != 2:
+		return false
+	var hi = IntDomain.exact_int(r.get("hi", null))
+	var lo = IntDomain.exact_int(r.get("lo", null))
+	if hi == null or lo == null or hi < 0 or hi > U32 or lo < 0 or lo > U32:
+		return false
+	_rng.state = (int(hi) << 32) | int(lo)
+	return true
