@@ -27,6 +27,7 @@ const AcquisitionFlow = preload("res://scripts/ui/popup/acquisition_flow.gd")
 const ShopHandoff = preload("res://scripts/app/shop_handoff.gd")
 const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
 const CeremonyPresenter = preload("res://scripts/ui/ceremony/ceremony_presenter.gd")
+const FeedbackAdapter = preload("res://scripts/ui/feel/feedback_adapter.gd")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -60,6 +61,8 @@ var _acq = null
 var momentum_cfg: Dictionary = {}
 ## M43 master: the ONE presenter of committed-but-unseen meta ceremonies (presentation only).
 var ceremonies = null
+## M43-C005F (SB-M43-C005F-002): the ONE fail-open presentation-feel adapter (no call site yet).
+var feel = null
 
 func _enter_tree() -> void:
 	_boot()
@@ -103,6 +106,8 @@ func _ready() -> void:
 	# SB-M43-032 / 036: Home Heart + -> canonical Life; Home SB + -> canonical Shop intent.
 	_home.hearts_purchase_requested.connect(func(): open_life("home_heart_plus"))
 	_home.scrub_bucks_purchase_requested.connect(func(): _acq.open_shop({"source": "home_sb_plus"}))
+	feel = FeedbackAdapter.new()
+	feel.bind(get_tree(), app_state.effects if app_state != null else null)
 	ceremonies = CeremonyPresenter.new()
 	ceremonies.bind(_modals, app_state)
 	ceremonies.idle.connect(func(src):
