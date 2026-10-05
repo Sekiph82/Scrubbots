@@ -66,6 +66,12 @@ func _events() -> Dictionary:
 	for e in CeremonyEvents.events(app.economy):
 		if not out.has(e["kind"]):
 			out[e["kind"]] = e
+	# Feature / world: NO authority emits these yet (SB-M43-072/073 blocked). Shell evidence
+	# only, from explicit fixture entries built from existing approved art.
+	out["feature_unlock"] = {"key": "feature:fixture", "kind": "feature_unlock", "feature_id": "cards_exchange", "name": "CARDS EXCHANGE",
+		"body": "Trade extra card copies for Scrub Bucks.", "icon": "res://assets/ui/final/home/shortcuts/icon_shortcut_cards_exchange.png"}
+	out["world_unlock"] = {"key": "world:fixture", "kind": "world_unlock", "world_id": "world_01", "title": "WHISPERING PARK",
+		"subtitle": "World 01", "art": "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png"}
 	return out
 
 func _capture(ev: Dictionary, reduced: bool, size: Vector2i) -> void:

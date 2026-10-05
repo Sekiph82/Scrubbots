@@ -34,6 +34,7 @@ var EXPECTED_CASES := [
 	"e19_active_strict", "e20_unlock_next_order", "e21_unknown_robot_never_shown", "e22_robot_reduced",
 	"e23_gift_queued_truth", "e24_gift_1000_fallback", "e25_gift_claimed_note", "e26_gift_all_five_once",
 	"e27_results_handoff", "e28_results_no_event_no_hold",
+	"e29_feature_builder_truth", "e30_feature_no_authority", "e31_world_builder_truth", "e32_world_no_authority",
 ]
 
 var _fail := 0
@@ -66,6 +67,10 @@ func _initialize() -> void:
 	_e20_unlock_next_order()
 	await _e21_unknown_robot_never_shown()
 	_e22_robot_reduced()
+	_e29_feature_builder_truth()
+	_e30_feature_no_authority()
+	_e31_world_builder_truth()
+	_e32_world_no_authority()
 	await _e23_gift_queued_truth()
 	_e24_gift_1000_fallback()
 	await _e25_gift_claimed_note()
@@ -584,6 +589,45 @@ func _e28_results_no_event_no_hold() -> void:
 	_ok(not res.has_ceremony_barrier() and _root.get_modal_stack().depth() == 0 and not res.get_primary_button().disabled, "no barrier, no popup, CLEAN NEXT live")
 	_end_app()
 	_complete("e28_results_no_event_no_hold")
+
+# --------------------------------------------------------------- SB-M43-072/073 ----
+
+func _e29_feature_builder_truth() -> void:
+	print("[e29 Feature Unlock builder: owner-accepted shell, explicit event only]")
+	var ev := {"key": "feature:cards_exchange", "kind": "feature_unlock", "feature_id": "cards_exchange", "name": "CARDS EXCHANGE",
+		"body": "Trade extra card copies for Scrub Bucks.", "icon": "res://assets/ui/final/home/shortcuts/icon_shortcut_cards_exchange.png"}
+	var p = MetaCeremonies.build(ev, false)
+	var r = MetaCeremonies.build(ev, true)
+	_ok(p != null and p.get_title() == "NEW FEATURE!" and _label(p, "FeatureName") == "CARDS EXCHANGE" and p.find_child("NewBadge", true, false) != null and p.get_action_ids() == ["got_it"], "title / name / NEW badge / GOT IT")
+	_ok(_texts(p) == _texts(r) and not r.find_child("HeroGlow", true, false).has_meta("spin"), "Reduced: same labels, no motion")
+	var bad := [{"kind": "feature_unlock", "name": "", "icon": ev["icon"]}, {"kind": "feature_unlock", "name": "X", "icon": "res://nope.png"}]
+	_ok(bad.all(func(b): return MetaCeremonies.build(b, false) == null), "no name / missing icon -> no ceremony (nothing invented)")
+	p.free()
+	r.free()
+	_complete("e29_feature_builder_truth")
+
+func _e30_feature_no_authority() -> void:
+	print("[e30 no feature-unlock authority: no event is ever derived]")
+	var app = _app("e30")
+	_complete_set(app, 1)
+	_ok(not CeremonyEvents.events(app.economy).any(func(e): return e["kind"] == "feature_unlock" or e["kind"] == "world_unlock"), "CeremonyEvents emits no feature/world events")
+	_complete("e30_feature_no_authority")
+
+func _e31_world_builder_truth() -> void:
+	print("[e31 World Transition builder: real registry art only]")
+	var ev := {"key": "world:world_01", "kind": "world_unlock", "world_id": "world_01", "title": "WHISPERING PARK", "subtitle": "World 01",
+		"art": "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png"}
+	var p = MetaCeremonies.build(ev, false)
+	_ok(p != null and p.get_title() == "WHISPERING PARK" and p.find_child("WorldArt", true, false).texture.resource_path == ev["art"] and _label(p, "WorldSubtitle") == "World 01", "title / art / subtitle from the entry")
+	_ok(MetaCeremonies.build({"kind": "world_unlock", "title": "", "art": ev["art"]}, false) == null and MetaCeremonies.build({"kind": "world_unlock", "title": "X", "art": "res://none.png"}, false) == null, "no title / missing art -> no ceremony")
+	p.free()
+	_complete("e31_world_builder_truth")
+
+func _e32_world_no_authority() -> void:
+	print("[e32 world builder never touches progression]")
+	var src := _code_only(FileAccess.get_file_as_string("res://scripts/ui/ceremony/meta_ceremonies.gd"))
+	_ok(RegEx.create_from_string("\\bprogression\\.|current_level\\(|record_win\\(|class_for\\(|difficulty\\.").search(src) == null, "ceremony source calls no progression / difficulty API")
+	_complete("e32_world_no_authority")
 
 # ------------------------------------------------------------------ helpers ----
 
