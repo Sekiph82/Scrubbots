@@ -29,6 +29,7 @@ const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
 const CeremonyPresenter = preload("res://scripts/ui/ceremony/ceremony_presenter.gd")
 const FeedbackAdapter = preload("res://scripts/ui/feel/feedback_adapter.gd")
 const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
+const RobotsScreen = preload("res://scripts/ui/robots/robots_screen.gd")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -109,6 +110,7 @@ func _ready() -> void:
 	_home.scrub_bucks_purchase_requested.connect(func(): _acq.open_shop({"source": "home_sb_plus"}))
 	# M43 destinations from the Home shortcut panels (SB-M43-078 Shop, ...).
 	_home.shortcut_requested.connect(_on_home_shortcut)
+	_home.nav_requested.connect(_on_home_nav)
 	feel = FeedbackAdapter.new()
 	feel.bind(get_tree(), app_state.effects if app_state != null else null)
 	ceremonies = CeremonyPresenter.new()
@@ -229,6 +231,8 @@ func _results_model(payload: Dictionary) -> Dictionary:
 		m["momentum"] = ResultsMomentum.results_model(app_state, int(m.get("level", 0)), launch, momentum_cfg)
 	# M43-C001B: presentation-only Reduced Effects flag (canonical settings service).
 	m["reduced_effects"] = app_state != null and app_state.effects != null and app_state.effects.is_reduced()
+	# M43-C008 (SB-M43-108): the active robot's approved victory / help pose (presentation only).
+	m["robot_id"] = app_state.economy.robots.active_robot() if app_state != null and app_state.economy != null else ""
 	return m
 
 ## Share one validated momentum config with Results (via _results_model) and Home.
@@ -239,6 +243,14 @@ func set_momentum_config(cfg: Dictionary) -> void:
 
 func get_home():
 	return _home
+
+## BottomNav destinations that open an app-level surface (SETTINGS keeps its M41 overlay).
+func _on_home_nav(id: String) -> void:
+	if nav == null or nav.current() != NavigationController.Route.HOME or (_modals != null and _modals.depth() > 0):
+		return
+	match id:
+		"robots":
+			RobotsScreen.open(_modals, app_state, ceremonies)
 
 ## Home shortcut panels that open an app-level destination (Daily keeps its Home popup).
 func _on_home_shortcut(id: String) -> void:

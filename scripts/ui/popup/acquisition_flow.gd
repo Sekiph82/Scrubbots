@@ -31,6 +31,14 @@ const SB_ART := "res://assets/ui/final/common/currencies/icon_currency_scrub_buc
 const HEART_ICON_ART := "res://assets/ui/final/common/currencies/icon_currency_heart.png"
 const SHOP_ART := "res://assets/ui/final/shop/shop_header_emblem.png"
 const ShopScreen = preload("res://scripts/ui/shop/shop_screen.gd")
+const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+
+## M43-C008 (SB-M43-108): the active robot's approved help pose (Scrubby default / fallback).
+func _help_pose() -> String:
+	if _economy == null:
+		return LIFE_HERO_ART
+	var id: String = _economy.robots.active_robot()
+	return LIFE_HERO_ART if id == String(RobotRoster.load_roster()["initial_robot_id"]) else RobotRoster.asset(id, "help_pose")
 ## Canonical booster data (icons = the same production art as the V02 booster row).
 const BOOSTER_DEFS := {
 	"plus_one_slot": {"icon": "res://assets/ui/final/boosters/extra_slot.png", "target": ""},
@@ -92,7 +100,7 @@ func open_life(source: String):
 	var p := BasePopup.new("life")
 	p.context = {"source": source}
 	p.set_frame("medium")
-	p.set_hero(LIFE_HERO_ART, Vector2(260, 260), 70)
+	p.set_hero(_help_pose(), Vector2(260, 260), 70)
 	p.set_title(UiText.t("LIFE_TITLE"))
 	var c: VBoxContainer = p.get_content()
 	# Big heart with the live count on it (reference composition).
@@ -440,7 +448,7 @@ func open_need_a_hand(offer: Dictionary):
 	sl.name = "BubbleText"
 	say.add_child(sl)
 	var scrubby := HomeStyle.art("Scrubby")
-	scrubby.texture = load(LIFE_HERO_ART)
+	scrubby.texture = load(_help_pose())
 	scrubby.custom_minimum_size = Vector2(120, 132)
 	bubble.add_child(scrubby)
 	p.add_body_line(UiText.t("NAH_NO_GUARANTEE"), "NoGuarantee", BasePopup.INK, 22)

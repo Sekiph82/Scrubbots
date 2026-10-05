@@ -52,6 +52,7 @@ const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const JourneyStrip = preload("res://scripts/ui/components/journey_strip.gd")
 const RevealSequencer = preload("res://scripts/ui/components/reveal_sequencer.gd")
 const GiftProgressModel = preload("res://scripts/economy/gift_progress_model.gd")
+const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 
 ## Existing approved production art (never written by this screen).
 const ROBOT_ART := "res://assets/ui/final/popups/victory/victory_scrubby_pose.png"
@@ -378,7 +379,12 @@ func _apply_layout(status: String) -> void:
 	theme = _victory_theme if _styled else null
 	_robot_slot.visible = _styled
 	_emblem.visible = _styled
-	_robot.texture = load(ROBOT_ART if won else FAIL_ROBOT_ART) if _styled else null
+	# M43-C008 (SB-M43-108): the active robot's approved victory / help pose (Scrubby default).
+	var rid := String(_model.get("robot_id", ""))
+	var pose := ROBOT_ART if won else FAIL_ROBOT_ART
+	if not rid.is_empty():
+		pose = RobotRoster.asset(rid, "victory_pose" if won else "help_pose")
+	_robot.texture = load(pose) if _styled else null
 	_emblem.texture = load(EMBLEM_ART if won else FAIL_EMBLEM_ART) if _styled else null
 	_stack.add_theme_constant_override("separation", -ROBOT_OVERLAP if _styled else 0)
 	if _styled:

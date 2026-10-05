@@ -42,6 +42,9 @@ const RAIL_PAD_CELLS := 3.0
 const FALLBACK_SHELL := "5slot_5col"
 
 const PORTRAIT_ART := "res://assets/ui/final/gameplay/profile/scrubby_portrait.png"
+const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+var _portrait: TextureRect = null
+var _portrait_robot := ""
 ## Profile overlay layout inside the baked profile box (master px).
 const PROFILE_PORTRAIT := [54, 38, 162, 150]
 const PROFILE_NAME := [176, 40, 300, 92]
@@ -299,6 +302,7 @@ func _build_top() -> void:
 	var portrait := HomeStyle.art("Portrait")
 	portrait.texture = load(PORTRAIT_ART) as Texture2D
 	_profile.add_child(portrait)
+	_portrait = portrait
 	_profile_name = HomeStyle.label(UiText.t("HOME_PLAYER_NAME_DEFAULT"), 30)
 	_profile_name.name = "ProfileName"
 	_profile_name.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
@@ -699,6 +703,13 @@ func board_local_to_global(p: Vector2) -> Vector2:
 # ------------------------------------------------------------------ HUD binding --
 
 func set_profile(data: Dictionary) -> void:
+	# M43-C008 (SB-M43-108): active robot portrait + name (presentation only; Scrubby default).
+	var rid := String(data.get("robot_id", ""))
+	if not rid.is_empty() and _portrait != null and rid != _portrait_robot:
+		_portrait_robot = rid
+		var r := RobotRoster.entry(rid)
+		_portrait.texture = load(PORTRAIT_ART if rid == String(RobotRoster.load_roster()["initial_robot_id"]) else RobotRoster.asset(rid, "profile_portrait")) as Texture2D
+		_profile_name.text = String(r.get("name", UiText.t("HOME_PLAYER_NAME_DEFAULT")))
 	var level: int = int(data.get("level", 0))
 	_profile_level.text = UiText.t("RESULTS_LEVEL", [level]) if level > 0 else ""
 	var parts: int = int(data.get("bot_parts", -1))
