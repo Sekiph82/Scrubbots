@@ -44,4 +44,12 @@ Home + Results checkpoint, all exit 0 / 0 `SCRIPT ERROR`: lane C005R 8/8 · `m42
 
 Visible addition inside an owner-approved Home element: owner visual acceptance of the tick look is required (not self-approved).
 
+## Follow-up (same child, later commit)
+
+While capturing the Shop evidence the Home Gift Meter showed the 500 milestone notch touching the owner-locked
+`0/1,000` caption (large 38 px font). Fix: notches shortened to the bar edges (top 14 % / bottom 86–100 %), micro-ticks
+to the bottom edge, and the overlay skips any mark inside the centred caption's text span (`avoid_label` = the existing
+caption). Recaptured `evidence/SB-M43-R05-001/*` (caption untouched). Re-validated: C005R 8/8, `m42_home` +
+`v04`/`v05`/`v06`/`v07` PASS, root 5,323 ALL PASS.
+
 READY_FOR_INDEPENDENT_AUDIT — SB-M43-R05-001

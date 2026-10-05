@@ -657,7 +657,9 @@ func _build_gift_meter(gm: MarginContainer) -> void:
 	meter.caption.add_theme_constant_override("outline_size", 12)
 	chassis.add_child(_reg(meter))
 	# M43-C005R: micro-progress marks inside the SAME bar (no geometry / caption change).
-	meter.bar.add_child(_reg(GiftTickOverlay.new()))
+	var ticks := GiftTickOverlay.new()
+	ticks.avoid_label = meter.caption
+	meter.bar.add_child(_reg(ticks))
 	var emblem := HomeStyle.art("GiftEmblem")
 	emblem.set_anchors_preset(Control.PRESET_CENTER_LEFT)
 	emblem.offset_left = 0
