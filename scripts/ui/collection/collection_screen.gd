@@ -136,7 +136,11 @@ static func _refresh_album(p: BasePopup, e) -> void:
 	for cid in e.collection.all_card_ids():
 		if e.collection.owned(cid) > 0:
 			unique += 1
-	(p.find_child("Summary", true, false) as Label).text = UiText.t("COLLECTION_SUMMARY", [unique, e.collection.all_card_ids().size(), e.collection.completed_set_count(), 15])
+	var summary := UiText.t("COLLECTION_SUMMARY", [unique, e.collection.all_card_ids().size(), e.collection.completed_set_count(), 15])
+	# M43-C007R (R07-005): honest pity state, only when a configured guarantee is due.
+	if e.pack_pity != null and e.pack_pity.guaranteed_next() and not e.collection.first_missing_eligible_card().is_empty():
+		summary += "\n" + UiText.t("COLLECTION_PITY_NEXT")
+	(p.find_child("Summary", true, false) as Label).text = summary
 	for row in e.config.collection_config().get("set_rewards", []):
 		var n := int(row["set"])
 		var card = p.find_child("Set_%d" % n, true, false)
