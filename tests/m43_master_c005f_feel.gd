@@ -6,6 +6,13 @@ extends SceneTree
 
 const FeedbackAdapter = preload("res://scripts/ui/feel/feedback_adapter.gd")
 const EffectsSettingsService = preload("res://scripts/settings/effects_settings_service.gd")
+const MainScene = preload("res://scenes/app/main.tscn")
+const MainScript = preload("res://scripts/app/main.gd")
+## Authorities that a presentation plugin must never colonize (TASKS SB-M43-C005F-014).
+const AUTHORITY_ROOTS := ["res://scripts/economy", "res://scripts/gameplay", "res://scripts/save", "res://scripts/progression",
+	"res://scripts/collection", "res://scripts/settings", "res://scripts/audio", "res://scripts/haptics", "res://scripts/difficulty"]
+const AUTHORITY_FILES := ["res://scripts/app/navigation_controller.gd", "res://scripts/app/app_state.gd", "res://scripts/ui/popup/modal_stack.gd",
+	"res://scripts/ui/popup/base_popup.gd", "res://scripts/ui/safe_area_root.gd", "res://scripts/ui/home/home_scrubby_hero.gd"]
 
 ## Owner DO-NOT-USE categories (TASKS SB-M43-C005F-014).
 const PROHIBITED := ["camera_shake", "camera_flash", "camera_zoom", "camera_offset", "camera_fov", "freeze_frame",
@@ -27,7 +34,8 @@ class Spy extends Node:
 		calls.append(["clear"])
 
 var EXPECTED_CASES := ["f01_tier_table", "f02_dispatch_after_caller", "f03_one_shot_key", "f04_missing_plugins_noop",
-	"f05_reduced_live_cancel", "f06_allowlist_excludes_prohibited", "f07_single_adapter_no_call_sites"]
+	"f05_reduced_live_cancel", "f06_allowlist_excludes_prohibited", "f07_single_adapter_no_call_sites",
+	"f08_authority_static_boundary", "f09_adapter_never_an_authority_callback", "f10_plugins_removed_core_paths_work"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -41,6 +49,9 @@ func _initialize() -> void:
 	await _f05()
 	_f06()
 	_f07()
+	_f08()
+	_f09()
+	await _f10()
 	_done()
 
 func _adapter(reduced := false) -> Array:
@@ -145,6 +156,76 @@ func _f07() -> void:
 	var main := FileAccess.get_file_as_string("res://scripts/app/main.gd")
 	_ok(hits.is_empty() and main.count("FeedbackAdapter.new()") == 1, "plugin names appear only in the adapter; one instance %s" % str(hits))
 	_complete("f07_single_adapter_no_call_sites")
+
+# --------------------------------------------------------------- SB-M43-C005F-014 ----
+
+func _f08() -> void:
+	print("[f08 no authority script references a plugin or the feel adapter]")
+	var files: Array = AUTHORITY_FILES.duplicate()
+	for root in AUTHORITY_ROOTS:
+		files.append_array(_gd_files(root))
+	var hits: Array = []
+	for path in files:
+		var src := FileAccess.get_file_as_string(path)
+		for w in ["GameFeelFlow", "Spark", "FeedbackAdapter", "feedback_adapter", "/root/GameFeelFlow"]:
+			if src.contains(w):
+				hits.append("%s:%s" % [path.get_file(), w])
+	_ok(files.size() > 40 and hits.is_empty(), "%d authority scripts (economy / gameplay / save / progression / collection / settings / audio / haptics / navigation / ModalStack / BasePopup / SafeArea / Scrubby hero): no plugin access %s" % [files.size(), str(hits)])
+	_complete("f08_authority_static_boundary")
+
+func _f09() -> void:
+	print("[f09 the adapter never listens to plugin callbacks / owns authority]")
+	var src := FileAccess.get_file_as_string("res://scripts/ui/feel/feedback_adapter.gd")
+	var code := ""
+	for line in src.split("\n"):
+		var i := line.find("#")
+		code += (line if i == -1 else line.substr(0, i)) + "\n"
+	var bad: Array = []
+	for w in ["effect_finished", "effect_started", ".listen(", "request_save(", "grant(", "nav.", "go(", "time_scale", "freeze_frame", "camera_"]:
+		if code.contains(w):
+			bad.append(w)
+	_ok(bad.is_empty() and code.count(".connect(") == 1 and code.contains("_effects.changed.connect"), "only the settings `changed` signal is connected; no plugin callback / save / grant / nav / prohibited effect %s" % str(bad))
+	_complete("f09_adapter_never_an_authority_callback")
+
+func _f10() -> void:
+	print("[f10 plugin autoloads removed: Home -> gameplay -> WON -> Results still work]")
+	var removed: Array = []
+	for n in ["GameFeelFlow", "Spark"]:
+		var node := get_root().get_node_or_null(n)
+		if node != null:
+			get_root().remove_child(node)
+			removed.append(node)
+	var sub := SubViewport.new()
+	sub.size = Vector2i(1080, 2160)
+	sub.disable_3d = true
+	get_root().add_child(sub)
+	var path := "user://m43master_c005f_f10_%d.save" % Time.get_ticks_usec()
+	MainScript.boot_save_path_override = path
+	var root = MainScene.instantiate()
+	sub.add_child(root)
+	for _i in range(4):
+		await process_frame
+	var r: Dictionary = root.play_current_frontier()
+	for _i in range(4):
+		await process_frame
+	var h = root.get_gameplay_host()
+	h.get_runtime().set_process(false)
+	h.get_completion().terminal_reached.emit(&"WON", {})
+	for _i in range(4):
+		await process_frame
+	var rc: Dictionary = h.get_terminal_receipt()
+	_ok(get_root().get_node_or_null("GameFeelFlow") == null and get_root().get_node_or_null("Spark") == null, "both plugin autoloads absent")
+	_ok(r.get("ok", false) and root.get_navigation().route_name() == "RESULTS" and bool(rc.get("first_clear", false)) and bool(rc.get("saved", false)), "launch, WON commit + save, Results all work")
+	_ok(root.feel != null and root.feel.play("WIN", root.get_results_screen(), "f10") , "adapter call with plugins absent is a harmless no-op")
+	root.free()
+	sub.free()
+	MainScript.boot_save_path_override = ""
+	for suffix in ["", ".bak", ".tmp"]:
+		if FileAccess.file_exists(path + suffix):
+			DirAccess.remove_absolute(ProjectSettings.globalize_path(path + suffix))
+	for node in removed:
+		get_root().add_child(node)
+	_complete("f10_plugins_removed_core_paths_work")
 
 func _gd_files(dir: String) -> Array:
 	var out: Array = []
