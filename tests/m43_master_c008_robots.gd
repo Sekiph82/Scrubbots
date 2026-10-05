@@ -31,6 +31,9 @@ var _root = null
 
 func _initialize() -> void:
 	await process_frame
+	# Fixed wall clock: r07 compares whole economy snapshots, and Hearts / 2x keep wall-clock
+	# high-water marks that would otherwise tick between the two snapshots.
+	MainScript.boot_clock_override = func(): return 1790000000
 	await _r01()
 	await _r02()
 	await _r03()
@@ -372,6 +375,7 @@ func _frames(n: int) -> void:
 
 func _cleanup() -> void:
 	MainScript.boot_save_path_override = ""
+	MainScript.boot_clock_override = Callable()
 	for p in _tmp:
 		for suffix in ["", ".bak", ".tmp"]:
 			if FileAccess.file_exists(p + suffix):
