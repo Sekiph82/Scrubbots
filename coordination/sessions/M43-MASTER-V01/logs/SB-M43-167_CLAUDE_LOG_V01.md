@@ -48,4 +48,30 @@ Rendering tool `tests/tools/meta_snapshot.gd` → `META_EVIDENCE CLEAN (0 reject
 
 None.
 
+## MASTER REMEDIATION V03 — 2026-10-06
+
+Prompt: `coordination/sessions/M43-MASTER-V01/M43_MASTER_REMEDIATION_V03.md` · authority: `CHATGPT_MASTER_AUDIT_V01.md`. Baseline `0a7ff02` · remediation code commit `1cbe37f` (handoff: `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`). The V01 sections above are kept unchanged as history; this section supersedes them where they differ.
+
+**Audit finding.** The V01 a03 called `moment("reward")` 20 times on a standalone node instead of running real loops.
+
+**Fix.** a03 (`a03_fatigue_real_loops`) now runs on the real app root with an injected UI clock, through real Home shortcuts, real popups, real facade claims, a real ceremony and a real committed Premium pack:
+- **open/back loop:** 20 rapid Daily open → X loops (40 ms apart) → rate-limited ticks (10 opens / 10 backs), one voice node, UI ticks never buzz.
+- **later action:** after a 2 s pause the next open is heard, so the rate limit never mutes a later action.
+- **claim:** CLAIM tap → exactly one reward chime + one success buzz. The confirm tick and the reward popup's open tick do not double-fire.
+- **repeated claims:** 5 more claim attempts (blocked button + already-claimed facade) → no second reward, buzz or error.
+- **collect / reopen:** COLLECT on the reward popup → one confirm tick; reopening Daily replays nothing.
+- **route change:** voice stopped, ownership cleared, queued tick dropped, no `_process`, no further entries over later frames.
+- **unlock / pack:** robot unlock commit + its ceremony → ONE unlock chime + ONE buzz; Premium pack → one reveal + one Rare+ buzz.
+- **voice count:** still exactly one voice node after every loop.
+- **quiet settings:** Reduced Effects + Haptics OFF → zero buzz across the open / close / claim / pack loops.
+
+Coordinator rules this proves:
+- a single `AudioStreamPlayer`;
+- a moment needs strictly higher priority to replace a voice inside its hold window;
+- per-moment gaps of 90 ms for ticks and 400–600 ms for chimes / warnings;
+- a global 250 ms haptic gap;
+- ticks hard-stopped at 0.12 s.
+
+`tests/m43_master_c011_c014.gd` → **PASS 28/28** (18 V01 cases kept or updated, plus 10 new). Regression: see `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`.
+
 READY_FOR_INDEPENDENT_AUDIT — SB-M43-167

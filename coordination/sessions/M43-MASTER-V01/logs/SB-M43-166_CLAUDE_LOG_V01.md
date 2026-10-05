@@ -48,4 +48,16 @@ Rendering tool `tests/tools/meta_snapshot.gd` → `META_EVIDENCE CLEAN (0 reject
 
 No-rankings state waits for the RANKS destination (SB-M43-131).
 
-READY_FOR_INDEPENDENT_AUDIT — SB-M43-166
+## MASTER REMEDIATION V03 — 2026-10-06
+
+Prompt: `coordination/sessions/M43-MASTER-V01/M43_MASTER_REMEDIATION_V03.md` · authority: `CHATGPT_MASTER_AUDIT_V01.md`. Baseline `0a7ff02` · remediation code commit `1cbe37f` (handoff: `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`). The V01 sections above are kept unchanged as history; this section supersedes them where they differ.
+
+**Status correction (audit §12): READY → `DEFERRED_DEPENDENCY` on SB-M43-131 / SB-M43-132.** The "no rankings result" empty state needs the RANKS destination and policy. No ranking data or rankings screen was fabricated.
+
+The other empty states stay shipped and tested: no events, no exchangeable duplicates, no claimable gifts, no tasks ready (a04 PASS).
+
+`tests/m43_master_c011_c014.gd` → **PASS 28/28** (18 V01 cases kept or updated, plus 10 new). Regression: see `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`.
+
+V01 status line (superseded): `READY_FOR_INDEPENDENT_AUDIT — SB-M43-166`
+
+DEFERRED_DEPENDENCY — SB-M43-166

@@ -67,4 +67,18 @@ Rendering tool `tests/tools/meta_snapshot.gd` → `META_EVIDENCE CLEAN (0 reject
 
 Not offered until an owner-configured reward exists (`first_try_cleanup: null`).
 
-READY_FOR_INDEPENDENT_AUDIT — SB-M43-R10-004
+## MASTER REMEDIATION V03 — 2026-10-06
+
+Prompt: `coordination/sessions/M43-MASTER-V01/M43_MASTER_REMEDIATION_V03.md` · authority: `CHATGPT_MASTER_AUDIT_V01.md`. Baseline `0a7ff02` · remediation code commit `1cbe37f` (handoff: `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`). The V01 sections above are kept unchanged as history; this section supersedes them where they differ.
+
+**Status correction (audit §9): READY → `BLOCKED_AWAITING_AUTHORITY`.** The shipping `data/config/events_v1.json` has `first_try_cleanup: null`. The row requires a fixed reward, visible before participation, and no owner has authorized one, so the shipping child is not complete. No reward was invented.
+
+The reusable mechanism and its tests stay (`tests/m43_master_c010_meta.gd` m08 with a TEST config): fixed reward visible before joining, first-attempt-only extension, a loss resets only the run, reward once at 5.
+
+**Needed from the owner:** the First-Try Cleanup reward (type + amount from the approved reward types) and its schedule / offer rules.
+
+`tests/m43_master_c011_c014.gd` → **PASS 28/28** (18 V01 cases kept or updated, plus 10 new). Regression: see `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`.
+
+V01 status line (superseded): `READY_FOR_INDEPENDENT_AUDIT — SB-M43-R10-004`
+
+BLOCKED_AWAITING_AUTHORITY — SB-M43-R10-004

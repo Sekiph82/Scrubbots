@@ -55,4 +55,24 @@ Rendering tool `tests/tools/meta_snapshot.gd` → `META_EVIDENCE CLEAN (0 reject
 
 None.
 
+## MASTER REMEDIATION V03 — 2026-10-06
+
+Prompt: `coordination/sessions/M43-MASTER-V01/M43_MASTER_REMEDIATION_V03.md` · authority: `CHATGPT_MASTER_AUDIT_V01.md`. Baseline `0a7ff02` · remediation code commit `1cbe37f` (handoff: `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`). The V01 sections above are kept unchanged as history; this section supersedes them where they differ.
+
+**Audit finding.** The 24 h cap skipped its check when `now_ts < last_sent`, so a clock rollback allowed a second proactive message.
+
+**Fix.** `NotificationPolicy.capped(now_ts)` is now `last_sent > 0 and now_ts - last_sent < CAP_S`. A rolled-back clock gives a negative delta and stays suppressed; the cap is never reset or forgiven. Eligibility resumes only at `last_sent + 24 h`. `mark_sent` keeps the max (high-water), and `last_sent` is already persisted in the strict `notifications` section.
+
+**Proof** (`tests/m43_master_c011_c014.gd` n04, real app root + real save reload):
+- eligible at T; send at T;
+- T−1 h → none; T−10 d → none;
+- a stale `mark_sent(T−1h)` does not lower the high-water;
+- **reload with the clock at T−1 h** → persisted high-water T; T−1 h → none;
+- T+23 h → none; T+24 h−1 s → none; **T+24 h → eligible**;
+- quiet hours, category toggle and priority still apply after catch-up.
+
+**Reproduced first:** with the old expression restored, n04 failed 3 checks (T−1 h, T−10 d, reload at T−1 h). With the fix it passes.
+
+`tests/m43_master_c011_c014.gd` → **PASS 28/28** (18 V01 cases kept or updated, plus 10 new). Regression: see `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`.
+
 READY_FOR_INDEPENDENT_AUDIT — SB-M43-R12-005

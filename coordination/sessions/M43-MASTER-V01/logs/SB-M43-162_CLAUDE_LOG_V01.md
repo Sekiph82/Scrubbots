@@ -48,4 +48,29 @@ Rendering tool `tests/tools/meta_snapshot.gd` → `META_EVIDENCE CLEAN (0 reject
 
 Warning moment intentionally silent (failures never buzz, SB-M43-164).
 
+## MASTER REMEDIATION V03 — 2026-10-06
+
+Prompt: `coordination/sessions/M43-MASTER-V01/M43_MASTER_REMEDIATION_V03.md` · authority: `CHATGPT_MASTER_AUDIT_V01.md`. Baseline `0a7ff02` · remediation code commit `1cbe37f` (handoff: `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`). The V01 sections above are kept unchanged as history; this section supersedes them where they differ.
+
+**Audit finding.** There was no warning or pack-Rare haptic, and `on_ceremony_shown` tested invented kinds (`robot` / `master` / `set`), so real completions were misclassified as `reward`.
+
+**Fix** (`scripts/ui/feel/meta_feedback.gd`):
+- Four distinct haptic moments: success 25 ms (reward / committed purchase), warning 40 ms (refusal / failed pending), pack Rare+ 60 ms, unlock 80 ms. A buzz is skipped when Haptics is OFF or Reduced Effects is ON; both are read live at every request. At most one buzz per 250 ms.
+- Ceremony mapping uses the canonical CeremonyEvents kinds: `robot_unlock`, `master_complete`, `set_complete` → unlock; `gift_milestone` → reward.
+- **Pack Rare+ hook.** It reads the ceremony's own `RevealSequencer.step_started`. When the step is an `emerge` of CardView *i*, it reads row *i* of the ceremony's committed model (`get_model()`). The hook fires `pack_reveal` once and `pack_rare` for the first Rare / Epic / Legendary card, at most once per `presentation_id`. It is read-only: no pack ceremony source changed, nothing is rerolled or reordered, and there is no economy access.
+
+The V01 note "warning moment intentionally silent" is **superseded**. A refusal now gives a distinct warning tick + buzz, never the success chime.
+
+**Tests**:
+- **a02**: SFX + Haptics off → every moment silent, no buzz; Reduced Effects → sound kept and no haptic for any moment; Reduced OFF → the buzz returns at once; Haptics OFF mid-session → the next moment does not buzz.
+- **a05**: the haptic table is exactly success / warning / pack_rare / unlock, with four distinct durations.
+- **a07**: kinds parsed from `ceremony_events.gd` are exactly `gift_milestone, set_complete, master_complete, robot_unlock` and map correctly; a real `robot_unlock` ceremony → unlock chime + 80 ms buzz.
+- **a08**, real committed packs on the app ModalStack:
+  - Premium (card 0 guaranteed Rare+) → one reveal + one 60 ms buzz;
+  - receipt and model byte-identical before / after; economy snapshot identical before / after;
+  - reopening the same presentation → no second reveal / Rare+;
+  - Standard → reveal once, with the Rare+ buzz only when a committed card is Rare+.
+
+`tests/m43_master_c011_c014.gd` → **PASS 28/28** (18 V01 cases kept or updated, plus 10 new). Regression: see `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`.
+
 READY_FOR_INDEPENDENT_AUDIT — SB-M43-162
