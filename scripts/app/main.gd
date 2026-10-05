@@ -106,6 +106,8 @@ func _ready() -> void:
 	# SB-M43-032 / 036: Home Heart + -> canonical Life; Home SB + -> canonical Shop intent.
 	_home.hearts_purchase_requested.connect(func(): open_life("home_heart_plus"))
 	_home.scrub_bucks_purchase_requested.connect(func(): _acq.open_shop({"source": "home_sb_plus"}))
+	# M43 destinations from the Home shortcut panels (SB-M43-078 Shop, ...).
+	_home.shortcut_requested.connect(_on_home_shortcut)
 	feel = FeedbackAdapter.new()
 	feel.bind(get_tree(), app_state.effects if app_state != null else null)
 	ceremonies = CeremonyPresenter.new()
@@ -236,6 +238,14 @@ func set_momentum_config(cfg: Dictionary) -> void:
 
 func get_home():
 	return _home
+
+## Home shortcut panels that open an app-level destination (Daily keeps its Home popup).
+func _on_home_shortcut(id: String) -> void:
+	if nav == null or nav.current() != NavigationController.Route.HOME or (_modals != null and _modals.depth() > 0):
+		return
+	match id:
+		"shop":
+			_acq.open_shop({"source": "home_shop"})
 
 ## M43 master: on HOME, with no other popup open, present pending meta ceremonies (deferred so
 ## it never pushes from inside a route / modal signal handler).

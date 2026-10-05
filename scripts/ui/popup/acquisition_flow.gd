@@ -30,6 +30,7 @@ const CLOCK_ART := "res://assets/ui/final/common/icons/icon_clock.png"
 const SB_ART := "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png"
 const HEART_ICON_ART := "res://assets/ui/final/common/currencies/icon_currency_heart.png"
 const SHOP_ART := "res://assets/ui/final/shop/shop_header_emblem.png"
+const ShopScreen = preload("res://scripts/ui/shop/shop_screen.gd")
 ## Canonical booster data (icons = the same production art as the V02 booster row).
 const BOOSTER_DEFS := {
 	"plus_one_slot": {"icon": "res://assets/ui/final/boosters/extra_slot.png", "target": ""},
@@ -645,10 +646,13 @@ func open_shop(context: Dictionary) -> Dictionary:
 		ctx["source"] = "unknown"
 	return _shop.open(ctx)
 
-## Until the M43-C006 Shop exists: explicit "coming soon" state; closing it returns the
-## ticket as cancelled (no currency moved, no fake SB pack).
+## M43-C006: every Shop intent opens the real Shop destination (ShopScreen). Closing it
+## finishes the ticket, so the originating popup resumes with its exact pending context.
 func _on_shop_requested(ticket: Dictionary) -> void:
 	if _stack == null:
+		return
+	if _economy != null and _actions != null:
+		ShopScreen.open(_stack, _economy, _actions, ticket, Callable(_shop, "finish"))
 		return
 	var p := BasePopup.new("shop")
 	p.context = {"ticket_id": ticket["ticket_id"]}
