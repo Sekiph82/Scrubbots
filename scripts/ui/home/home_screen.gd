@@ -58,6 +58,8 @@ const HomeWorldCatalog = preload("res://scripts/ui/home/home_world_catalog.gd")
 const HomeScrubbyHero = preload("res://scripts/ui/home/home_scrubby_hero.gd")
 const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
 const JourneyStrip = preload("res://scripts/ui/components/journey_strip.gd")
+const GiftProgressModel = preload("res://scripts/economy/gift_progress_model.gd")
+const GiftTickOverlay = preload("res://scripts/ui/components/gift_tick_overlay.gd")
 ## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
 const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
 const UiText = preload("res://scripts/ui/ui_text.gd")
@@ -654,6 +656,8 @@ func _build_gift_meter(gm: MarginContainer) -> void:
 	_center_caption_in_bar(meter, 38)
 	meter.caption.add_theme_constant_override("outline_size", 12)
 	chassis.add_child(_reg(meter))
+	# M43-C005R: micro-progress marks inside the SAME bar (no geometry / caption change).
+	meter.bar.add_child(_reg(GiftTickOverlay.new()))
 	var emblem := HomeStyle.art("GiftEmblem")
 	emblem.set_anchors_preset(Control.PRESET_CENTER_LEFT)
 	emblem.offset_left = 0
@@ -1166,6 +1170,8 @@ func _render_values() -> void:
 	hearts.set_sub("")
 	(_nodes["GiftMeterBar"] as UiProgressMeter).set_progress(_vm["gift_progress"], _vm["gift_cycle_max"],
 		UiText.t("HOME_RATIO", [UiText.num(_vm["gift_progress"]), UiText.num(_vm["gift_cycle_max"])]))
+	(_nodes["GiftTickOverlay"] as GiftTickOverlay).set_model(GiftProgressModel.build(int(_vm["gift_progress"]), int(_vm["gift_cycle_max"])),
+		GiftProgressModel.GiftMeterService.MILESTONES, "effects" in _app and _app.effects != null and _app.effects.is_reduced())
 	var gbadge: Label = _nodes["GiftClaimableBadge"]
 	gbadge.text = str(_vm["gift_claimable"])
 	gbadge.visible = _vm["gift_claimable"] > 0
@@ -1246,7 +1252,10 @@ func _render_gift_bar(popup: HomePopup) -> void:
 		note = UiText.t("GIFTS_EMPTY")
 	elif _app.is_blocked:
 		note = UiText.t("GIFTS_READ_ONLY")
-	popup.set_content(UiText.t("GIFTS_TITLE"), rows, note)
+	# M43-C005R: the same normalized Gift Meter model Home / Results use (presentation only).
+	var gm := GiftProgressModel.from_service(_app.economy.gift)
+	var progress := UiText.t("GIFTS_PROGRESS", [UiText.num(gm["progress"]), UiText.num(gm["cycle_max"]), UiText.num(gm["next"])])
+	popup.set_content(UiText.t("GIFTS_TITLE"), rows, progress if note.is_empty() else note + "\n" + progress)
 
 ## SB-M42-022: former Star Exchange = Cards Exchange. Presentation/navigation only:
 ## live duplicate-card count and their canonical SB value (CardsExchangeService), no
