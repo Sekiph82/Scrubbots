@@ -51,6 +51,7 @@ const UiText = preload("res://scripts/ui/ui_text.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const JourneyStrip = preload("res://scripts/ui/components/journey_strip.gd")
 const RevealSequencer = preload("res://scripts/ui/components/reveal_sequencer.gd")
+const GiftProgressModel = preload("res://scripts/economy/gift_progress_model.gd")
 
 ## Existing approved production art (never written by this screen).
 const ROBOT_ART := "res://assets/ui/final/popups/victory/victory_scrubby_pose.png"
@@ -512,7 +513,9 @@ static func reward_rows(receipt: Dictionary) -> Array:
 			"bot_parts":
 				text = UiText.t("RESULTS_BOT_PARTS", [e["amount"]])
 			"gift_meter":
-				text = UiText.t("RESULTS_GIFT_METER", [e["to"], e["cycle_max"]])
+				# M43-C005R: the shared normalized model of the COMMITTED value (receipt "to").
+				var gm := GiftProgressModel.build(int(e["to"]), int(e["cycle_max"]))
+				text = UiText.t("RESULTS_GIFT_METER_NEXT", [UiText.num(gm["progress"]), UiText.num(gm["cycle_max"]), UiText.num(gm["next"])])
 			"collection_cards":
 				text = UiText.t("RESULTS_CARDS", [e["amount"]])
 		if not text.is_empty():

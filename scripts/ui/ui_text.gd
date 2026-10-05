@@ -247,6 +247,8 @@ ACTIVE",
 	"CEREMONY_FEATURE_TITLE": "NEW FEATURE!",
 	"CEREMONY_FEATURE_GOT_IT": "GOT IT",
 	"CEREMONY_WORLD_BODY": "New cleaning area ready.",
+	"RESULTS_GIFT_METER_NEXT": "Gift Meter %s/%s · next gift at %s",
+	"GIFTS_PROGRESS": "Gift Meter %s/%s · next gift at %s",
 }
 
 ## Keyed text for `prefix + reason`, falling back to `prefix + FAILED` for an unknown code.
