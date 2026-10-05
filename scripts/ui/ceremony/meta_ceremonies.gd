@@ -16,11 +16,13 @@ const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
+const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 
 const ART := {
 	"set_complete": "res://assets/ui/final/collection/collection_complete_emblem.png",
 	"master_complete": "res://assets/ui/final/collection/master_collection_emblem.png",
 	"reward_glow": "res://assets/ui/final/popups/victory/reward_glow.png",
+	"robot_burst": "res://assets/ui/final/robots/robot_unlocked_burst.png",
 	"sb": "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
 	"bot_parts": "res://assets/ui/final/robots/bot_parts_icon.png",
 	"pack_standard": "res://assets/ui/final/rewards/card_pack_standard.png",
@@ -50,6 +52,8 @@ static func build(event: Dictionary, reduced: bool = false):
 			return set_complete(event, reduced)
 		"master_complete":
 			return master_complete(event, reduced)
+		"robot_unlock":
+			return robot_unlock(event, reduced)
 	return null
 
 static func card_art(card_id: String) -> String:
@@ -69,13 +73,13 @@ static func _popup(id: String, frame: String, title: String, event: Dictionary) 
 	return p
 
 ## Hero art with the celebratory glow behind it (glow turns slowly in FULL, static in Reduced).
-static func _hero(p: BasePopup, art: String, size: Vector2, reduced: bool) -> Control:
+static func _hero(p: BasePopup, art: String, size: Vector2, reduced: bool, glow: String = "") -> Control:
 	var box := CenterContainer.new()
 	box.name = "HeroBox"
 	box.custom_minimum_size = size
 	p.get_content().add_child(box)
 	var g := HomeStyle.art("HeroGlow")
-	g.texture = load(ART["reward_glow"])
+	g.texture = load(glow if not glow.is_empty() else ART["reward_glow"])
 	g.custom_minimum_size = size * 1.15
 	g.modulate = Color(1, 1, 1, 0.85)
 	g.pivot_offset = size * 0.575
@@ -168,4 +172,64 @@ static func master_complete(event: Dictionary, reduced: bool) -> BasePopup:
 	_reward_rows(p, event.get("rewards", {}), 96)
 	p.add_body_line(UiText.t("CEREMONY_MASTER_COMMITTED"), "CommittedNote", BasePopup.INK, 24)
 	p.add_action("continue", UiText.t("CEREMONY_CONTINUE"), "primary", true)
+	return p
+
+# ---------------------------------------------------------------- Robot unlock ----
+
+## SB-M43-070/071: a robot unlocked (Bot Parts already spent by RobotUnlockService). Canonical
+## roster art / name / role / 20% meta perk and the live Bot Parts left after the unlock.
+## Two CTAs: EQUIP <NAME> (the presenter routes it to the equip authority) or KEEP CURRENT.
+## Null when the robot is not in the canonical roster (nothing is fabricated).
+static func robot_unlock(event: Dictionary, reduced: bool):
+	var id := String(event.get("robot_id", ""))
+	var r := RobotRoster.entry(id)
+	if r.is_empty():
+		return null
+	var name := String(r["name"]).to_upper()
+	var p := _popup("robot_unlock", "reward", UiText.t("CEREMONY_ROBOT_TITLE"), event)
+	p.context["robot_id"] = id
+	_hero(p, RobotRoster.asset(id, "master"), Vector2(330, 396), reduced, ART["robot_burst"])
+	p.add_body_line(name, "RobotName", BasePopup.ROYAL_EDGE, 52)
+	p.add_body_line(String(r["role"]), "RobotRole", BasePopup.INK, 26)
+	var perk := PanelContainer.new()
+	perk.name = "Perk"
+	perk.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROW, BasePopup.ROYAL, 3, 26, 0), UiTokens.SPACE_MD, UiTokens.SPACE_SM))
+	p.get_content().add_child(perk)
+	var ph := HBoxContainer.new()
+	ph.add_theme_constant_override("separation", UiTokens.SPACE_MD)
+	perk.add_child(ph)
+	var icon := String(r.get("perk_icon", ""))
+	if not icon.is_empty() and ResourceLoader.exists(icon):
+		var pi := HomeStyle.art("PerkIcon")
+		pi.texture = load(icon)
+		pi.custom_minimum_size = Vector2(92, 92)
+		ph.add_child(pi)
+	var pv := VBoxContainer.new()
+	pv.custom_minimum_size = Vector2(420, 0)
+	pv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pv.alignment = BoxContainer.ALIGNMENT_CENTER
+	ph.add_child(pv)
+	var pn := BasePopup.body_label(String(r["perk_name"]), 30, BasePopup.ROYAL_EDGE)
+	pn.name = "PerkName"
+	pn.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	pv.add_child(pn)
+	var pt := BasePopup.body_label(String(r["perk_text"]), 26)
+	pt.name = "PerkText"
+	pt.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	pv.add_child(pt)
+	var parts := HBoxContainer.new()
+	parts.name = "PartsLeft"
+	parts.alignment = BoxContainer.ALIGNMENT_CENTER
+	parts.add_theme_constant_override("separation", UiTokens.SPACE_SM)
+	p.get_content().add_child(parts)
+	var bi := HomeStyle.art("BotPartsIcon")
+	bi.texture = load(ART["bot_parts"])
+	bi.custom_minimum_size = Vector2(52, 52)
+	parts.add_child(bi)
+	var pl := BasePopup.body_label(UiText.t("CEREMONY_ROBOT_PARTS_LEFT", [UiText.num(int(event.get("parts_left", 0)))]), 28)
+	pl.name = "Text"
+	pl.autowrap_mode = TextServer.AUTOWRAP_OFF
+	parts.add_child(pl)
+	p.add_action("equip", UiText.t("CEREMONY_ROBOT_EQUIP", [name]), "primary", true)
+	p.add_action("keep", UiText.t("CEREMONY_ROBOT_KEEP"), "secondary", true)
 	return p

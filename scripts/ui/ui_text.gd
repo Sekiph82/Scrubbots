@@ -235,6 +235,10 @@ ACTIVE",
 	"CEREMONY_MASTER_SETS": "All %d sets complete",
 	"CEREMONY_MASTER_ONCE": "One-time master reward",
 	"CEREMONY_MASTER_COMMITTED": "Master reward already added to your account.",
+	"CEREMONY_ROBOT_TITLE": "NEW ROBOT UNLOCKED!",
+	"CEREMONY_ROBOT_PARTS_LEFT": "Bot Parts left: %s",
+	"CEREMONY_ROBOT_EQUIP": "EQUIP %s",
+	"CEREMONY_ROBOT_KEEP": "KEEP CURRENT",
 }
 
 ## Keyed text for `prefix + reason`, falling back to `prefix + FAILED` for an unknown code.

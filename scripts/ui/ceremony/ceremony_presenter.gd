@@ -17,6 +17,7 @@ extends RefCounted
 signal ceremony_shown(key: String, kind: String)
 signal ceremony_acknowledged(key: String, kind: String)
 signal idle(source: String)
+signal ceremony_action(key: String, kind: String, action_id: String, result: Dictionary)
 
 const CeremonyEvents = preload("res://scripts/economy/ceremony_events.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
@@ -64,6 +65,7 @@ func drain(source: String = "") -> bool:
 	var e: Dictionary = list[0]
 	var p = MetaCeremonies.build(e, _reduced())
 	p.closed.connect(_on_closed.bind(String(e["key"]), String(e["kind"])), CONNECT_ONE_SHOT)
+	p.action_selected.connect(_on_action.bind(String(e["key"]), String(e["kind"])), CONNECT_ONE_SHOT)
 	if not _stack.push(p):
 		p.free()
 		return false
@@ -83,6 +85,15 @@ func _on_closed(reason: String, key: String, kind: String) -> void:
 		_app.request_save()
 	ceremony_acknowledged.emit(key, kind)
 	drain(_source)
+
+## A player CHOICE inside a ceremony is routed to its authority facade (never decided here):
+## Robot Unlock "equip" -> ProductionActionFacade.equip_robot (persisted selection, spends
+## nothing). "keep" / "continue" change nothing.
+func _on_action(action_id: String, ctx: Dictionary, key: String, kind: String) -> void:
+	var result := {}
+	if kind == "robot_unlock" and action_id == "equip" and _app != null and _app.actions != null:
+		result = _app.actions.equip_robot(String(ctx.get("robot_id", "")))
+	ceremony_action.emit(key, kind, action_id, result)
 
 func _reduced() -> bool:
 	return _app != null and _app.effects != null and _app.effects.is_reduced()

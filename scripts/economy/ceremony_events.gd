@@ -34,7 +34,8 @@ static func events(economy) -> Array:
 	var rs: Dictionary = economy.robots.snapshot()
 	for rid in rs.get("unlocked", []):
 		if String(rid) != String(rs.get("initial_robot", "")):
-			out.append({"key": "robot:" + String(rid), "kind": "robot_unlock", "robot_id": String(rid)})
+			out.append({"key": "robot:" + String(rid), "kind": "robot_unlock", "robot_id": String(rid),
+				"parts_left": economy.wallet.bot_parts(), "active_robot": String(rs.get("active", ""))})
 	return out
 
 static func keys(economy) -> Array:
