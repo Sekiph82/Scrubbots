@@ -105,6 +105,9 @@ func _ready() -> void:
 	_home.scrub_bucks_purchase_requested.connect(func(): _acq.open_shop({"source": "home_sb_plus"}))
 	ceremonies = CeremonyPresenter.new()
 	ceremonies.bind(_modals, app_state)
+	ceremonies.idle.connect(func(src):
+		if src == "results" and _results != null:
+			_results.set_ceremony_barrier(RESULTS_CEREMONY_BARRIER, false))
 	# Every committed facade action (Gift / Daily claim, exchange, unlock, ...) may have
 	# completed a set / Master / robot event: show its ceremony once Home is quiet.
 	if app_state != null and app_state.actions != null:
@@ -167,6 +170,31 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 			move_child(_results, get_child_count() - 1)
 			if String(_payload.get("status", "")) == "LOST":
 				_offer_need_a_hand()
+			elif String(_payload.get("status", "")) == "WON":
+				_begin_results_ceremonies()
+
+## SB-M43-013: a WON Results whose committed terminal (economy + save already done inside the
+## host) produced a ceremony event (Gift milestone, set, Master, robot) hands off to it: the
+## teaser + CLEAN NEXT are held by a ceremony barrier, the ceremonies open one at a time AFTER
+## the committed reward-row reveal, and the barrier releases when none is left. Presentation
+## only — Continue / rewards / progression are untouched; a route change leaves any unshown
+## ceremony pending for Home.
+const RESULTS_CEREMONY_BARRIER := "meta_ceremonies"
+
+func _begin_results_ceremonies() -> void:
+	if ceremonies == null or ceremonies.pending().is_empty():
+		return
+	_results.set_ceremony_barrier(RESULTS_CEREMONY_BARRIER, true)
+	if _results.is_revealing():
+		_results.get_reveal_sequencer().completed.connect(func(_k): call_deferred("_drain_results_ceremonies"), CONNECT_ONE_SHOT)
+	else:
+		call_deferred("_drain_results_ceremonies")
+
+func _drain_results_ceremonies() -> void:
+	if nav.current() != NavigationController.Route.RESULTS or ceremonies == null:
+		return
+	if not ceremonies.drain("results") and not ceremonies.is_presenting():
+		_results.set_ceremony_barrier(RESULTS_CEREMONY_BARRIER, false)
 
 ## M43-C004: on the Fail surface of a due third failure, Need a Hand opens on the ONE
 ## ModalStack over Fail. The host decided the offer inside its latched terminal (after the
