@@ -13,6 +13,7 @@ extends RefCounted
 ## Boosters need a live gameplay host; economy actions need only EconomyServices.
 
 const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
+const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 
 signal action_committed(action: String, result: Dictionary)
 
@@ -142,3 +143,17 @@ func exchange_all_extras() -> Dictionary:
 
 func unlock_robot(robot_id: String) -> Dictionary:
 	return _finish("unlock_robot", _economy.robots.unlock(robot_id))
+
+## M43 master (SB-M43-102/104): unlock the NEXT robot of the canonical roster order (owner
+## roster §4) for exactly the configured Bot Parts. {ok, reason, robot_id, remaining_parts}.
+func unlock_next_robot() -> Dictionary:
+	var id: String = RobotRoster.next_locked(_economy.robots)
+	if id.is_empty():
+		return _finish("unlock_robot", {"ok": false, "reason": "all_unlocked"})
+	var r: Dictionary = _economy.robots.unlock(id)
+	r["robot_id"] = id
+	return _finish("unlock_robot", r)
+
+## M43 master (SB-M43-071/106): equip an unlocked robot (persisted selection, spends nothing).
+func equip_robot(robot_id: String) -> Dictionary:
+	return _finish("equip_robot", _economy.robots.set_active(robot_id))

@@ -13,12 +13,16 @@ var _wallet: EconomyWallet
 var _cost: int
 var _initial_robot: String
 var _unlocked: Dictionary = {}       ## robot_id -> true
+## M43 master (SB-M43-071/106): the player's selected (equipped) robot. Presentation choice
+## only; a robot perk / selection never touches BoardState, targeting, routing or solver.
+var _active: String
 
 func _init(wallet: EconomyWallet, cost: int = 250, initial_robot_id: String = "scrubby") -> void:
 	_wallet = wallet
 	_cost = cost
 	_initial_robot = initial_robot_id
 	_unlocked[_initial_robot] = true
+	_active = _initial_robot
 
 func is_unlocked(robot_id: String) -> bool:
 	return _unlocked.has(robot_id)
@@ -41,6 +45,18 @@ func unlock(robot_id: String) -> Dictionary:
 	_unlocked[robot_id] = true
 	return {"ok": true, "reason": "unlocked", "remaining_parts": _wallet.bot_parts()}
 
+func active_robot() -> String:
+	return _active
+
+## Select an UNLOCKED robot as the active one. {ok, reason}. Idempotent; spends nothing.
+func set_active(robot_id: String) -> Dictionary:
+	if not _unlocked.has(robot_id):
+		return {"ok": false, "reason": "locked"}
+	if _active == robot_id:
+		return {"ok": true, "reason": "already_active", "active": _active}
+	_active = robot_id
+	return {"ok": true, "reason": "equipped", "active": _active}
+
 ## Read-only progress toward the next robot given current Bot Parts (overflow
 ## preserved: parts beyond a multiple of cost carry forward).
 func next_robot_progress() -> Dictionary:
@@ -53,7 +69,7 @@ func next_robot_progress() -> Dictionary:
 	}
 
 func snapshot() -> Dictionary:
-	return {"unlocked": _unlocked.keys(), "cost": _cost, "initial_robot": _initial_robot}
+	return {"unlocked": _unlocked.keys(), "cost": _cost, "initial_robot": _initial_robot, "active": _active}
 
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
@@ -74,5 +90,14 @@ func import_snapshot(s) -> bool:
 		new_unlocked[id] = true
 	# Scrubby remains the canonical initial unlocked robot regardless of snapshot content.
 	new_unlocked[_initial_robot] = true
+	# M43 master: "active" absent (older save) = the initial robot; present must be an
+	# unlocked robot id or the whole import fails closed.
+	var new_active := _initial_robot
+	if s.has("active"):
+		var a = s["active"]
+		if typeof(a) != TYPE_STRING or not new_unlocked.has(a):
+			return false
+		new_active = String(a)
 	_unlocked = new_unlocked
+	_active = new_active
 	return true

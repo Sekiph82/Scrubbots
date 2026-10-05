@@ -15,11 +15,13 @@ const CeremonyEvents = preload("res://scripts/economy/ceremony_events.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
 const CeremonyPresenter = preload("res://scripts/ui/ceremony/ceremony_presenter.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
+const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+const EconomyWallet = preload("res://scripts/economy/economy_wallet.gd")
 
 const SIZE := Vector2i(1080, 1920)
 ## Presentation sources must never touch grant / spend / claim / progression authority.
 const NO_AUTHORITY := ["grant(", ".claim(", "claim_", "add_card(", "credit(", "debit(", "add_copies(", "remove_copies(",
-	"unlock(", "record_win(", "exchange_", "open_standard(", "open_premium(", "commit_pack(", "wallet."]
+	".unlock(", "unlock_next_robot(", "set_active(", "record_win(", "exchange_", "open_standard(", "open_premium(", "commit_pack("]
 const PRESENTATION_SOURCES := ["res://scripts/ui/ceremony/meta_ceremonies.gd", "res://scripts/ui/ceremony/ceremony_presenter.gd",
 	"res://scripts/economy/ceremony_events.gd", "res://scripts/economy/meta_ui_state.gd"]
 
@@ -28,6 +30,8 @@ var EXPECTED_CASES := [
 	"e05_clear_not_acked", "e06_back_consumed", "e07_two_sets_order", "e08_reduced_same_truth",
 	"e09_home_integration", "e10_no_authority_static",
 	"e11_master_truth", "e12_master_once_order", "e13_master_legacy", "e14_master_reduced",
+	"e15_roster_canonical", "e16_robot_ceremony_truth", "e17_equip_persists", "e18_keep_current",
+	"e19_active_strict", "e20_unlock_next_order", "e21_unknown_robot_never_shown", "e22_robot_reduced",
 ]
 
 var _fail := 0
@@ -52,6 +56,14 @@ func _initialize() -> void:
 	await _e12_master_once_order()
 	_e13_master_legacy()
 	_e14_master_reduced()
+	_e15_roster_canonical()
+	await _e16_robot_ceremony_truth()
+	await _e17_equip_persists()
+	await _e18_keep_current()
+	_e19_active_strict()
+	_e20_unlock_next_order()
+	await _e21_unknown_robot_never_shown()
+	_e22_robot_reduced()
 	_unmount()
 	await _e09_home_integration()
 	_e10_no_authority_static()
@@ -301,6 +313,130 @@ func _e14_master_reduced() -> void:
 	full.free()
 	red.free()
 	_complete("e14_master_reduced")
+
+# --------------------------------------------------------------- SB-M43-070/071 ----
+
+func _e15_roster_canonical() -> void:
+	print("[e15 canonical 10-robot roster == owner decision]")
+	var r := RobotRoster.load_roster()
+	var want := ["scrubby", "moppy", "bubbles", "spark", "squeegee", "dusty", "rinse", "polly", "clippy", "atlas"]
+	_ok(r["ok"] and RobotRoster.ids() == want and r["unlock_cost"] == 250, "10 robots in owner order, cost 250")
+	var md := FileAccess.get_file_as_string("res://coordination/OWNER_ROBOT_ROSTER_V01.md")
+	var perk_ok := true
+	for e in r["robots"]:
+		var row := ""
+		for line in md.split("\n"):
+			var cells := line.split("|")
+			if cells.size() >= 7 and cells[2].replace("*", "").strip_edges().to_lower() == String(e["id"]):
+				row = cells[5].replace("*", "").strip_edges()
+		perk_ok = perk_ok and row.begins_with(String(e["perk_name"]) + ":")
+	_ok(perk_ok, "every perk name matches the owner table")
+	var missing: Array = []
+	for e in r["robots"]:
+		for k in RobotRoster.ASSET_KEYS:
+			if not ResourceLoader.exists(String(e["assets"][k])):
+				missing.append("%s.%s" % [e["id"], k])
+	_ok(missing.is_empty(), "every robot asset path exists %s" % str(missing))
+	_ok(not RobotRoster.load_roster("res://data/config/__missing.json")["ok"], "missing roster fails closed")
+	_complete("e15_roster_canonical")
+
+func _e16_robot_ceremony_truth() -> void:
+	print("[e16 Robot Unlock ceremony: canonical identity + live Bot Parts carryover]")
+	var app = _app("e16")
+	app.economy.wallet.credit(EconomyWallet.BOT_PARTS, 287)
+	var r: Dictionary = app.actions.unlock_next_robot()
+	_ok(r["ok"] and r["robot_id"] == "moppy" and app.economy.wallet.bot_parts() == 37, "unlock_next_robot spent exactly 250 (37 carry over)")
+	var pr = _presenter(app)
+	pr.drain("test")
+	await _frames(2)
+	var p = pr.current()
+	var e := RobotRoster.entry("moppy")
+	_ok(p != null and _label(p, "RobotName") == "MOPPY" and _label(p, "RobotRole") == e["role"] and _label(p, "PerkName") == e["perk_name"] and _label(p, "PerkText") == e["perk_text"], "name / role / perk from the canonical roster")
+	_ok(p.find_child("HeroArt", true, false).texture.resource_path == e["assets"]["master"] and p.find_child("PerkIcon", true, false).texture.resource_path == e["perk_icon"], "canonical master art + perk icon")
+	_ok(p.find_child("PartsLeft", true, false).get_node("Text").text == "Bot Parts left: 37", "Bot Parts carryover shown from the wallet")
+	_ok(p.get_action_ids() == ["equip", "keep"] and p.get_action_button("equip").text == "EQUIP MOPPY", "EQUIP MOPPY / KEEP CURRENT")
+	_close_cta(p)
+	await _frames(2)
+	_complete("e16_robot_ceremony_truth")
+
+func _e17_equip_persists() -> void:
+	print("[e17 EQUIP selects the new robot (persisted, spends nothing)]")
+	var app = _app("e17")
+	app.economy.wallet.credit(EconomyWallet.BOT_PARTS, 250)
+	app.actions.unlock_next_robot()
+	var pr = _presenter(app)
+	pr.drain("test")
+	await _frames(2)
+	var parts0: int = app.economy.wallet.bot_parts()
+	pr.current()._on_action("equip")
+	await _frames(2)
+	_ok(app.economy.robots.active_robot() == "moppy" and app.economy.wallet.bot_parts() == parts0 and app.economy.meta_ui.is_seen("robot:moppy"), "active = moppy, Bot Parts unchanged, ceremony acknowledged")
+	var re = AppState.new(app.save._path)
+	_ok(re.economy.robots.active_robot() == "moppy", "selection persisted through the canonical save")
+	_complete("e17_equip_persists")
+
+func _e18_keep_current() -> void:
+	print("[e18 KEEP CURRENT changes nothing]")
+	var app = _app("e18")
+	app.economy.wallet.credit(EconomyWallet.BOT_PARTS, 250)
+	app.actions.unlock_next_robot()
+	var pr = _presenter(app)
+	pr.drain("test")
+	await _frames(2)
+	pr.current()._on_action("keep")
+	await _frames(2)
+	_ok(app.economy.robots.active_robot() == "scrubby" and app.economy.meta_ui.is_seen("robot:moppy"), "still Scrubby; ceremony acknowledged")
+	_complete("e18_keep_current")
+
+func _e19_active_strict() -> void:
+	print("[e19 active robot import: absent = initial, present must be unlocked]")
+	var app = _app("e19")
+	var good: Dictionary = app.economy.snapshot()
+	var live0 := _auth(app)
+	var bad := [["active", "moppy"], ["active", 3], ["active", ""]]
+	var rejected := 0
+	for b in bad:
+		var c: Dictionary = good.duplicate(true)
+		c["robots"][b[0]] = b[1]
+		if not app.economy.import_snapshot(c) and _auth(app) == live0:
+			rejected += 1
+	var legacy: Dictionary = good.duplicate(true)
+	legacy["robots"].erase("active")
+	_ok(rejected == 3 and app.economy.import_snapshot(legacy) and app.economy.robots.active_robot() == "scrubby", "locked / non-string / empty active rejected; absent -> Scrubby")
+	_ok(not app.economy.robots.set_active("atlas")["ok"] and app.economy.robots.active_robot() == "scrubby", "equipping a locked robot refused")
+	_complete("e19_active_strict")
+
+func _e20_unlock_next_order() -> void:
+	print("[e20 unlock_next_robot follows canonical order; refuses without parts]")
+	var app = _app("e20")
+	var got: Array = []
+	_ok(not app.actions.unlock_next_robot()["ok"] and app.economy.robots.unlocked_count() == 1, "0 Bot Parts: refused, nothing unlocked")
+	for _i in range(9):
+		app.economy.wallet.credit(EconomyWallet.BOT_PARTS, 250)
+		got.append(app.actions.unlock_next_robot()["robot_id"])
+	app.economy.wallet.credit(EconomyWallet.BOT_PARTS, 250)
+	var last: Dictionary = app.actions.unlock_next_robot()
+	_ok(got == RobotRoster.ids().slice(1) and not last["ok"] and last["reason"] == "all_unlocked" and app.economy.wallet.bot_parts() == 250, "moppy..atlas in order, then all_unlocked with no spend")
+	_complete("e20_unlock_next_order")
+
+func _e21_unknown_robot_never_shown() -> void:
+	print("[e21 a non-roster robot id is never presented (nothing fabricated)]")
+	var app = _app("e21")
+	app.economy.wallet.credit(EconomyWallet.BOT_PARTS, 250)
+	app.economy.robots.unlock("robot_2")
+	var pr = _presenter(app)
+	_ok(not pr.drain("test") and pr.pending().is_empty() and not app.economy.meta_ui.is_seen("robot:robot_2"), "no ceremony, event left pending (not dropped)")
+	_complete("e21_unknown_robot_never_shown")
+
+func _e22_robot_reduced() -> void:
+	print("[e22 Robot Unlock Reduced: same truth, no motion]")
+	var ev := {"key": "robot:atlas", "kind": "robot_unlock", "robot_id": "atlas", "parts_left": 12}
+	var full = MetaCeremonies.build(ev, false)
+	var red = MetaCeremonies.build(ev, true)
+	_ok(_texts(full) == _texts(red) and full.find_child("HeroGlow", true, false).texture.resource_path.ends_with("robot_unlocked_burst.png") and not red.find_child("HeroGlow", true, false).has_meta("spin"), "identical labels; unlocked burst; no motion in Reduced")
+	full.free()
+	red.free()
+	_complete("e22_robot_reduced")
 
 # ------------------------------------------------------------------ helpers ----
 

@@ -1,0 +1,219 @@
+{
+  "schema": "scrubbots.robot_roster.v1",
+  "version": 1,
+  "source": "coordination/OWNER_ROBOT_ROSTER_V01.md (OWNER-APPROVED V01)",
+  "note": "Display/identity data only. perk_modifiers restate the owner table (20% meta-only perks); this file does not apply any perk.",
+  "initial_robot_id": "scrubby",
+  "unlock_cost_bot_parts": 250,
+  "robots": [
+    {
+      "id": "scrubby",
+      "order": 1,
+      "name": "Scrubby",
+      "role": "The Leader. Friendly, balanced, optimistic face of the franchise.",
+      "perk_name": "Leader Baseline",
+      "perk_text": "No economy modifier. Scrubby is the neutral reference character.",
+      "perk_icon": "",
+      "perk_modifiers": {},
+      "assets": {
+        "master": "res://assets/ui/final/characters/scrubby/scrubby_master.png",
+        "portrait": "res://assets/ui/final/characters/scrubby/scrubby_portrait.png",
+        "home_pose": "res://assets/ui/final/characters/scrubby/scrubby_home_pose.png",
+        "gameplay": "res://assets/ui/final/characters/scrubby/scrubby_gameplay.png",
+        "profile_portrait": "res://assets/ui/final/gameplay/profile/scrubby_portrait.png",
+        "help_pose": "res://assets/ui/final/popups/help/help_scrubby_pose.png",
+        "victory_pose": "res://assets/ui/final/popups/victory/victory_scrubby_pose.png"
+      }
+    },
+    {
+      "id": "moppy",
+      "order": 2,
+      "name": "Moppy",
+      "role": "Floor-cleaning specialist. Hard-working, slightly clumsy, lovable.",
+      "perk_name": "Clean Bonus",
+      "perk_text": "+20% first-clear Scrub Bucks.",
+      "perk_icon": "res://assets/ui/final/robots/perks/perk_first_clear_sb_bonus.png",
+      "perk_modifiers": {
+        "first_clear_sb_pct": 20
+      },
+      "assets": {
+        "master": "res://assets/ui/final/characters/robots/moppy/moppy_master.png",
+        "portrait": "res://assets/ui/final/characters/robots/moppy/moppy_portrait.png",
+        "home_pose": "res://assets/ui/final/characters/robots/moppy/moppy_home_pose.png",
+        "gameplay": "res://assets/ui/final/characters/robots/moppy/moppy_gameplay.png",
+        "profile_portrait": "res://assets/ui/final/gameplay/profile/robots/moppy_portrait.png",
+        "help_pose": "res://assets/ui/final/popups/help/robots/moppy_help_pose.png",
+        "victory_pose": "res://assets/ui/final/popups/victory/robots/moppy_victory_pose.png"
+      }
+    },
+    {
+      "id": "bubbles",
+      "order": 3,
+      "name": "Bubbles",
+      "role": "Foam/detergent specialist. Round, energetic, bubbly.",
+      "perk_name": "Gift Sparkle",
+      "perk_text": "+20% Scrub Bucks granted by Gift Bar rewards.",
+      "perk_icon": "res://assets/ui/final/robots/perks/perk_gift_bar_sb_bonus.png",
+      "perk_modifiers": {
+        "gift_bar_sb_pct": 20
+      },
+      "assets": {
+        "master": "res://assets/ui/final/characters/robots/bubbles/bubbles_master.png",
+        "portrait": "res://assets/ui/final/characters/robots/bubbles/bubbles_portrait.png",
+        "home_pose": "res://assets/ui/final/characters/robots/bubbles/bubbles_home_pose.png",
+        "gameplay": "res://assets/ui/final/characters/robots/bubbles/bubbles_gameplay.png",
+        "profile_portrait": "res://assets/ui/final/gameplay/profile/robots/bubbles_portrait.png",
+        "help_pose": "res://assets/ui/final/popups/help/robots/bubbles_help_pose.png",
+        "victory_pose": "res://assets/ui/final/popups/victory/robots/bubbles_victory_pose.png"
+      }
+    },
+    {
+      "id": "spark",
+      "order": 4,
+      "name": "Spark",
+      "role": "Electrical maintenance / speed specialist. Slim and energetic.",
+      "perk_name": "2x Saver",
+      "perk_text": "20% discount on paid 2x speed products.",
+      "perk_icon": "res://assets/ui/final/robots/perks/perk_speed_2x_discount.png",
+      "perk_modifiers": {
+        "speed_2x_discount_pct": 20
+      },
+      "assets": {
+        "master": "res://assets/ui/final/characters/robots/spark/spark_master.png",
+        "portrait": "res://assets/ui/final/characters/robots/spark/spark_portrait.png",
+        "home_pose": "res://assets/ui/final/characters/robots/spark/spark_home_pose.png",
+        "gameplay": "res://assets/ui/final/characters/robots/spark/spark_gameplay.png",
+        "profile_portrait": "res://assets/ui/final/gameplay/profile/robots/spark_portrait.png",
+        "help_pose": "res://assets/ui/final/popups/help/robots/spark_help_pose.png",
+        "victory_pose": "res://assets/ui/final/popups/victory/robots/spark_victory_pose.png"
+      }
+    },
+    {
+      "id": "squeegee",
+      "order": 5,
+      "name": "Squeegee",
+      "role": "Glass/surface specialist. Precise and tidy.",
+      "perk_name": "Exchange Polish",
+      "perk_text": "+20% Scrub Bucks from Cards Exchange.",
+      "perk_icon": "res://assets/ui/final/robots/perks/perk_cards_exchange_bonus.png",
+      "perk_modifiers": {
+        "cards_exchange_sb_pct": 20
+      },
+      "assets": {
+        "master": "res://assets/ui/final/characters/robots/squeegee/squeegee_master.png",
+        "portrait": "res://assets/ui/final/characters/robots/squeegee/squeegee_portrait.png",
+        "home_pose": "res://assets/ui/final/characters/robots/squeegee/squeegee_home_pose.png",
+        "gameplay": "res://assets/ui/final/characters/robots/squeegee/squeegee_gameplay.png",
+        "profile_portrait": "res://assets/ui/final/gameplay/profile/robots/squeegee_portrait.png",
+        "help_pose": "res://assets/ui/final/popups/help/robots/squeegee_help_pose.png",
+        "victory_pose": "res://assets/ui/final/popups/victory/robots/squeegee_victory_pose.png"
+      }
+    },
+    {
+      "id": "dusty",
+      "order": 6,
+      "name": "Dusty",
+      "role": "Dust/vacuum specialist with a vacuum backpack.",
+      "perk_name": "Booster Saver",
+      "perk_text": "20% discount on Scrub Bucks booster purchases.",
+      "perk_icon": "res://assets/ui/final/robots/perks/perk_booster_discount.png",
+      "perk_modifiers": {
+        "booster_sb_discount_pct": 20
+      },
+      "assets": {
+        "master": "res://assets/ui/final/characters/robots/dusty/dusty_master.png",
+        "portrait": "res://assets/ui/final/characters/robots/dusty/dusty_portrait.png",
+        "home_pose": "res://assets/ui/final/characters/robots/dusty/dusty_home_pose.png",
+        "gameplay": "res://assets/ui/final/characters/robots/dusty/dusty_gameplay.png",
+        "profile_portrait": "res://assets/ui/final/gameplay/profile/robots/dusty_portrait.png",
+        "help_pose": "res://assets/ui/final/popups/help/robots/dusty_help_pose.png",
+        "victory_pose": "res://assets/ui/final/popups/victory/robots/dusty_victory_pose.png"
+      }
+    },
+    {
+      "id": "rinse",
+      "order": 7,
+      "name": "Rinse",
+      "role": "Water/rinse specialist. Calm, with a tank and nozzle.",
+      "perk_name": "Heart Saver",
+      "perk_text": "20% discount on Scrub Bucks Heart refill costs.",
+      "perk_icon": "res://assets/ui/final/robots/perks/perk_heart_refill_discount.png",
+      "perk_modifiers": {
+        "heart_refill_discount_pct": 20
+      },
+      "assets": {
+        "master": "res://assets/ui/final/characters/robots/rinse/rinse_master.png",
+        "portrait": "res://assets/ui/final/characters/robots/rinse/rinse_portrait.png",
+        "home_pose": "res://assets/ui/final/characters/robots/rinse/rinse_home_pose.png",
+        "gameplay": "res://assets/ui/final/characters/robots/rinse/rinse_gameplay.png",
+        "profile_portrait": "res://assets/ui/final/gameplay/profile/robots/rinse_portrait.png",
+        "help_pose": "res://assets/ui/final/popups/help/robots/rinse_help_pose.png",
+        "victory_pose": "res://assets/ui/final/popups/victory/robots/rinse_victory_pose.png"
+      }
+    },
+    {
+      "id": "polly",
+      "order": 8,
+      "name": "Polly",
+      "role": "Surface-polishing specialist. Stylish and confident.",
+      "perk_name": "Streak Shine",
+      "perk_text": "+20% Win Streak Scrub Bucks bonus.",
+      "perk_icon": "res://assets/ui/final/robots/perks/perk_win_streak_bonus.png",
+      "perk_modifiers": {
+        "win_streak_sb_pct": 20
+      },
+      "assets": {
+        "master": "res://assets/ui/final/characters/robots/polly/polly_master.png",
+        "portrait": "res://assets/ui/final/characters/robots/polly/polly_portrait.png",
+        "home_pose": "res://assets/ui/final/characters/robots/polly/polly_home_pose.png",
+        "gameplay": "res://assets/ui/final/characters/robots/polly/polly_gameplay.png",
+        "profile_portrait": "res://assets/ui/final/gameplay/profile/robots/polly_portrait.png",
+        "help_pose": "res://assets/ui/final/popups/help/robots/polly_help_pose.png",
+        "victory_pose": "res://assets/ui/final/popups/victory/robots/polly_victory_pose.png"
+      }
+    },
+    {
+      "id": "clippy",
+      "order": 9,
+      "name": "Clippy",
+      "role": "Precision/detail cleaner with small mechanical claws.",
+      "perk_name": "Daily Helper",
+      "perk_text": "+20% Scrub Bucks from individual Daily task rewards.",
+      "perk_icon": "res://assets/ui/final/robots/perks/perk_daily_task_bonus.png",
+      "perk_modifiers": {
+        "daily_task_sb_pct": 20
+      },
+      "assets": {
+        "master": "res://assets/ui/final/characters/robots/clippy/clippy_master.png",
+        "portrait": "res://assets/ui/final/characters/robots/clippy/clippy_portrait.png",
+        "home_pose": "res://assets/ui/final/characters/robots/clippy/clippy_home_pose.png",
+        "gameplay": "res://assets/ui/final/characters/robots/clippy/clippy_gameplay.png",
+        "profile_portrait": "res://assets/ui/final/gameplay/profile/robots/clippy_portrait.png",
+        "help_pose": "res://assets/ui/final/popups/help/robots/clippy_help_pose.png",
+        "victory_pose": "res://assets/ui/final/popups/victory/robots/clippy_victory_pose.png"
+      }
+    },
+    {
+      "id": "atlas",
+      "order": 10,
+      "name": "Atlas",
+      "role": "Heavy-duty endgame cleaner. Large, friendly, industrial.",
+      "perk_name": "Master Cleaner",
+      "perk_text": "+20% first-clear Scrub Bucks AND +20% Cards Exchange Scrub Bucks.",
+      "perk_icon": "res://assets/ui/final/robots/perks/perk_master_cleaner.png",
+      "perk_modifiers": {
+        "first_clear_sb_pct": 20,
+        "cards_exchange_sb_pct": 20
+      },
+      "assets": {
+        "master": "res://assets/ui/final/characters/robots/atlas/atlas_master.png",
+        "portrait": "res://assets/ui/final/characters/robots/atlas/atlas_portrait.png",
+        "home_pose": "res://assets/ui/final/characters/robots/atlas/atlas_home_pose.png",
+        "gameplay": "res://assets/ui/final/characters/robots/atlas/atlas_gameplay.png",
+        "profile_portrait": "res://assets/ui/final/gameplay/profile/robots/atlas_portrait.png",
+        "help_pose": "res://assets/ui/final/popups/help/robots/atlas_help_pose.png",
+        "victory_pose": "res://assets/ui/final/popups/victory/robots/atlas_victory_pose.png"
+      }
+    }
+  ]
+}
