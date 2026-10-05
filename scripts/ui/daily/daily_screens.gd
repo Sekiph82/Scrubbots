@@ -23,7 +23,7 @@ const ART := {
 	"day5": "res://assets/ui/final/daily/daily_day5_reward_frame.png",
 	"flame": "res://assets/ui/final/daily/daily_streak_flame.png",
 	"calendar": "res://assets/ui/final/daily/daily_login_calendar.png",
-	"box": "res://assets/ui/final/rewards/reward_chest.png",
+	"box": "res://assets/ui/final/rewards/chest_small.png",
 	"gift": "res://assets/ui/final/rewards/gift_box.png",
 	"random": "res://assets/ui/final/boosters/random.png",
 }
@@ -160,6 +160,7 @@ static func open_scrubbox(stack, app, result: Dictionary) -> BasePopup:
 	var n := int(result.get("random_booster_charges", 0))
 	var l := BasePopup.body_label(UiText.reward_text({"random_booster_charges": n}), 32, BasePopup.ROYAL_EDGE)
 	l.name = "RewardText"
+	l.autowrap_mode = TextServer.AUTOWRAP_OFF   # sized by its text inside the centred row
 	row.add_child(l)
 	p.add_body_line(UiText.t("SCRUBBOX_EARNED"), "Earned", BasePopup.INK, 22)
 	p.add_action("ok", UiText.t("POPUP_COLLECT"), "primary", true)
@@ -285,7 +286,7 @@ static func open_daily_reward(stack, app, result: Dictionary) -> BasePopup:
 	var day := int(result.get("day", 0))
 	var p := BasePopup.new("ceremony_daily")
 	p.set_frame("medium")
-	p.set_hero(ART["day5"] if day == 5 else ART["day"], Vector2(240, 250), 80)
+	p.set_hero(ART["calendar"], Vector2(240, 240), 80)
 	p.set_title(UiText.t("DAILY_DAY", [day]))
 	p.add_body_line(UiText.reward_text(result.get("reward", {})), "RewardText", BasePopup.ROYAL_EDGE, 32)
 	p.add_body_line(UiText.t("DAILY_CYCLE_DONE") if day == 5 else UiText.t("DAILY_CONSECUTIVE", [UiText.num(int(app.economy.daily.streak()))]), "Streak", BasePopup.INK, 24)

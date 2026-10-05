@@ -65,3 +65,13 @@ Rendering tool `tests/tools/daily_snapshot.gd` → frames under `coordination/se
 Runtime screen uses only existing approved art (daily check, reward chest, Random booster) in the popup family; evidence frames produced. **Missing authority:** owner visual master.
 
 BLOCKED_AWAITING_AUTHORITY — SB-M43-113
+
+## Follow-up note (same run, after the C010-C014 checkpoint)
+
+A clean-clone audit of every `res://assets/...` path in shipping scripts and config found that the ScrubBox art `assets/ui/final/rewards/reward_chest.png` is an **untracked owner-local file**. A fresh checkout would have no ScrubBox image.
+
+The ScrubBox now uses the tracked, approved `assets/ui/final/rewards/chest_small.png`, and the owner-local file was left untouched and unstaged. Two presentation defects found in the re-rendered frames were also fixed:
+- the ScrubBox reward label wrapped one letter per line;
+- the Day celebration hero showed an empty day frame, and now shows the approved login calendar art.
+
+Re-run results: `m43_master_c009_daily` 12/12 and `m43_master_c011_c014` 18/18; `DAILY_EVIDENCE CLEAN`. All other referenced assets are tracked.
