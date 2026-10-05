@@ -27,7 +27,14 @@
       "status": "REFERENCE_SELECTED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/gameplay_screen.gd",
+        "evidence": "tests/m28_c002_c002_static_shell.gd",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "pause",
@@ -35,7 +42,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/popup/popups.gd (Pause)",
+        "evidence": "tests/m43_c002_c001_popup_modal_pause.gd",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "level_intro",
@@ -43,7 +57,14 @@
       "status": "REFERENCE_SELECTED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": null,
+        "evidence": null,
+        "live_data": false,
+        "gap": "no Level Intro surface implemented yet",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "victory_results",
@@ -51,7 +72,14 @@
       "status": "MASTER_OWNER_APPROVED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/results_screen.gd",
+        "evidence": "tests/m43_c001b_won_results_visual.gd",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "fail_retry",
@@ -59,7 +87,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/results_screen.gd (LOST)",
+        "evidence": "tests/m43_c004_c001_fail_need_a_hand.gd",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "life_heart_refill",
@@ -67,7 +102,14 @@
       "status": "REFERENCE_SELECTED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/popup/acquisition_flow.gd (open_life)",
+        "evidence": "tests/m43_c003_c001_acquisition.gd",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "need_a_hand",
@@ -75,7 +117,14 @@
       "status": "REFERENCE_SELECTED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/popup/acquisition_flow.gd (open_need_a_hand)",
+        "evidence": "tests/m43_c004_c001_fail_need_a_hand.gd",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "booster_acquire",
@@ -83,7 +132,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/popup/acquisition_flow.gd (open_booster)",
+        "evidence": "tests/m43_c003_c001_acquisition.gd",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "speed_2x_acquire",
@@ -91,7 +147,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/popup/acquisition_flow.gd (speed)",
+        "evidence": "tests/m43_c003_c001_acquisition.gd",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "insufficient_sb",
@@ -99,7 +162,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/shop/shop_screen.gd (return context)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-078/",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "shop",
@@ -107,7 +177,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/shop/shop_screen.gd",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-078/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-079)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "collection_album",
@@ -115,7 +192,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/collection/collection_screen.gd",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-090/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-091)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "collection_set_detail",
@@ -123,7 +207,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/collection/collection_screen.gd",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-090/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-091)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "card_detail",
@@ -131,7 +222,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/collection/collection_screen.gd",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-090/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-091)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "cards_exchange",
@@ -139,7 +237,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/collection/collection_screen.gd (exchange)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-090/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-091)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "standard_pack_open",
@@ -147,7 +252,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "M43-C005-C006 standard pack ceremony",
+        "evidence": "tests/m43_c005_c006_standard_pack_presentation.gd",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "premium_pack_open",
@@ -155,7 +267,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "M43-C005-C007 premium pack ceremony",
+        "evidence": "tests/m43_c005_c007_premium_pack_presentation.gd",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "collection_set_complete",
@@ -163,7 +282,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/ceremony/meta_ceremonies.gd (set_complete)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-068/",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "master_collection_complete",
@@ -171,7 +297,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/ceremony/meta_ceremonies.gd (master_complete)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-069/",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "robots_main",
@@ -179,7 +312,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/robots/robots_screen.gd",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-102/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-103)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "robot_detail_locked",
@@ -187,7 +327,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/robots/robots_screen.gd (open_detail)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-102/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-103)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "robot_unlock",
@@ -195,7 +342,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/ceremony/meta_ceremonies.gd (robot_unlock)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-070/",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "tasks",
@@ -203,7 +357,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/daily/daily_screens.gd (open_tasks, open_scrubbox)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-112/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-113)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "daily",
@@ -211,7 +372,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/daily/daily_screens.gd (open_daily, open_daily_reward)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-112/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-116)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "gift_bar",
@@ -219,7 +387,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/daily/daily_screens.gd (open_gift_bar)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-112/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-119)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "gift_meter_milestone",
@@ -227,7 +402,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/ceremony/meta_ceremonies.gd (gift_milestone)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-071/",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "profile",
@@ -235,7 +417,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/profile/profile_screens.gd (open_profile)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-122/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-125)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "achievements",
@@ -243,7 +432,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/profile/profile_screens.gd (open_achievements)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-122/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-127)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "events_main",
@@ -251,7 +447,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/profile/profile_screens.gd (open_events)",
+        "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-122/",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-130); no event scheduled",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "event_detail",
@@ -259,7 +462,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/profile/profile_screens.gd (event card)",
+        "evidence": "tests/m43_master_c010_meta.gd",
+        "live_data": true,
+        "gap": "owner visual master (SB-M43-130)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "ranks",
@@ -267,7 +477,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": null,
+        "evidence": null,
+        "live_data": false,
+        "gap": "RANKS policy SB-M43-131 undecided; tab disabled",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "comeback_summary",
@@ -275,7 +492,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/profile/profile_screens.gd (open_comeback)",
+        "evidence": "tests/m43_master_c011_c014.gd",
+        "live_data": true,
+        "gap": "illustration SB-M43-150",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "feature_unlock",
@@ -283,7 +507,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/ceremony/meta_ceremonies.gd (feature_unlock shell)",
+        "evidence": null,
+        "live_data": false,
+        "gap": "M44 feature pacing (SB-M43-072)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "world_unlock_transition",
@@ -291,7 +522,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/ceremony/meta_ceremonies.gd (world_unlock shell)",
+        "evidence": null,
+        "live_data": false,
+        "gap": "world ranges (SB-M43-136 / 073)",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "account_cloud_sync_conflict",
@@ -299,7 +537,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": null,
+        "evidence": "tests/m43_master_c011_c014.gd (logic only)",
+        "live_data": false,
+        "gap": "provider decision SB-M43-153",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "generic_reward_confirmation",
@@ -307,7 +552,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/popup/popups.gd",
+        "evidence": "tests/m43_c002_c001_popup_modal_pause.gd",
+        "live_data": true,
+        "gap": null,
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "generic_error_offline_loading",
@@ -315,7 +567,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/popup/popups.gd",
+        "evidence": null,
+        "live_data": true,
+        "gap": "no dedicated master",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "notification_education_settings",
@@ -323,7 +582,14 @@
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/profile/profile_screens.gd (open_notifications)",
+        "evidence": "tests/m43_master_c011_c014.gd",
+        "live_data": true,
+        "gap": "platform permission plugin SB-M43-146",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     },
     {
       "id": "friends_postlaunch",
@@ -331,7 +597,14 @@
       "status": "MASTER_REQUIRED_POSTLAUNCH",
       "owner_visual_gate": true,
       "responsive_gate": true,
-      "production_scene_required": true
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": null,
+        "evidence": null,
+        "live_data": false,
+        "gap": "post-launch",
+        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
     }
   ]
 }
