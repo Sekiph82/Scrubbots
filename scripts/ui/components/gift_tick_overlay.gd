@@ -17,6 +17,8 @@ var _milestones: Array = []
 var _pulse := 0.0
 var _pulse_tick := -1
 var _tween: Tween
+## Centred caption sharing the bar (owner-locked N/1,000): no mark is drawn across its text.
+var avoid_label: Label = null
 
 func _init() -> void:
 	name = "GiftTickOverlay"
@@ -56,6 +58,13 @@ func tick_positions() -> Array:
 		out.append(a + (b - a) * float(i) / float(_model["ticks"]))
 	return out
 
+## True when local x falls inside the centred caption text (+ a small margin).
+func _hits_caption(x: float) -> bool:
+	if avoid_label == null or not is_instance_valid(avoid_label) or avoid_label.text.is_empty():
+		return false
+	var tw := avoid_label.get_minimum_size().x
+	return absf(x - size.x * 0.5) <= tw * 0.5 + 8.0
+
 func _draw() -> void:
 	if _model.is_empty() or size.x <= 0.0:
 		return
@@ -64,16 +73,20 @@ func _draw() -> void:
 	for m in _milestones:
 		if int(m) > 0 and int(m) < int(cm):
 			var x := float(m) / cm * size.x
+			if _hits_caption(x):
+				continue
 			# Edge notches only: the owner-locked centred caption is never crossed.
-			draw_line(Vector2(x, 2), Vector2(x, h * 0.24), MILESTONE_COLOR, 3.0)
-			draw_line(Vector2(x, h * 0.76), Vector2(x, h - 2), MILESTONE_COLOR, 3.0)
+			draw_line(Vector2(x, 1), Vector2(x, h * 0.14), MILESTONE_COLOR, 3.0)
+			draw_line(Vector2(x, h * 0.86), Vector2(x, h - 1), MILESTONE_COLOR, 3.0)
 	var ticks := tick_positions()
 	var reached := int(_model["ticks_reached"])
 	for i in range(ticks.size()):
+		if _hits_caption(ticks[i]):
+			continue
 		var lit := i < reached
 		var c: Color = TICK_LIT if lit else TICK_DIM
 		var w := 3.0 if lit else 2.0
 		if i == _pulse_tick and _pulse > 0.0:
 			c = c.lerp(Color(1, 1, 1, 1), _pulse * 0.8)
 			w += 3.0 * _pulse
-		draw_line(Vector2(ticks[i], h * 0.78), Vector2(ticks[i], h - 3), c, w)
+		draw_line(Vector2(ticks[i], h * 0.84), Vector2(ticks[i], h - 2), c, w)
