@@ -132,6 +132,8 @@ func _ready() -> void:
 	meta_feedback.name = "MetaFeedback"
 	add_child(meta_feedback)
 	meta_feedback.bind(app_state)
+	meta_feedback.bind_stack(_modals)
+	meta_feedback.ui_gate = func(): return nav != null and nav.current() == NavigationController.Route.HOME
 	ceremonies.ceremony_shown.connect(meta_feedback.on_ceremony_shown)
 	# M43-C012: a genuine absence opens a return window (summary shown once on Home).
 	if app_state != null and app_state.economy != null and not app_state.is_blocked:
