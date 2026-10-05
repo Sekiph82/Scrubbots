@@ -34,6 +34,7 @@ const EconomyConfig = preload("res://scripts/economy/economy_config.gd")
 const ProductionActionFacade = preload("res://scripts/economy/production_action_facade.gd")
 const FailureAssistanceService = preload("res://scripts/economy/failure_assistance_service.gd")
 const PackCommitTransaction = preload("res://scripts/collection/pack_commit_transaction.gd")
+const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
 
 const CANONICAL_SAVE_PATH := "user://scrubbots_save.dat"
 
@@ -52,6 +53,7 @@ var actions: ProductionActionFacade
 ## M43-C004 same-level failure counter / Need a Hand choice (session-scoped, not saved).
 var assist: FailureAssistanceService
 var _dirty: bool = false
+var _catalog_orders: Array = []
 
 ## clock/local_day are test seams. Production passes neither: the shipping graph
 ## injects the real OS local-calendar provider explicitly (F-M39-V03-002).
@@ -66,9 +68,24 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	load_result = save.load()
 	is_blocked = not bool(load_result.get("ok", false)) and String(load_result.get("source", "")) == "future_schema"
 	actions = ProductionActionFacade.new(economy, null, Callable(self, "request_save"))
+	economy.orders.bind_context(Callable(self, "orders_context"))
 	assist = FailureAssistanceService.new()
 	# M43-C003: a committed rewarded grant hits the canonical save boundary.
 	economy.rewarded.bind_save(Callable(self, "request_save"))
+
+## M43-C009R: read-only eligibility context for Daily Scrub Orders: the progression frontier,
+## its class lookup and how many catalog levels are playable from the frontier on.
+func orders_context() -> Dictionary:
+	var frontier := int(progression.current_level())
+	if _catalog_orders.is_empty():
+		var cat = LevelCatalog.new()
+		if cat.load_manifest().ok:
+			for e in cat.get_entries_ordered():
+				_catalog_orders.append(int(e.order))
+	var ahead := 0
+	while _catalog_orders.has(frontier + ahead):
+		ahead += 1
+	return {"frontier": frontier, "playable_ahead": ahead, "class_for": Callable(progression, "class_for")}
 
 ## True when the app must not proceed to gameplay against fresh defaults
 ## (F-M40-V02-002/-008: future/unsupported schema case).

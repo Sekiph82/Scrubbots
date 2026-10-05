@@ -46,3 +46,9 @@ Shop + popup + Home checkpoint, all exit 0 / 0 `SCRIPT ERROR`: C006 Shop 11/11 �
 Owner visual acceptance of the Shop (SB-M43-079).
 
 READY_FOR_INDEPENDENT_AUDIT — SB-M43-078
+
+## Follow-up note (M43 master resume V02, C009 lane)
+
+Regression found later in this run: the Home SHOP and COLLECTION shortcut panels stayed `disabled` in the real app (Home's `LIVE_SHORTCUTS` never gained them). The original suite drove them with `pressed.emit()`, which bypasses `disabled`, so the defect was invisible to it. A real player could reach the Shop only through SB + and insufficient-SB handoffs, and could not reach Collection from Home at all.
+
+Narrow fix, in the C009 commit: the app root registers its destinations (`main.gd` `APP_SHORTCUTS` → `HomeScreen.set_app_shortcuts`), and Home enables those panels. `tests/m43_master_c009_daily.gd` t01 now asserts SHOP / COLLECTION / DAILY are enabled in the real app. No prior commit was rewritten.

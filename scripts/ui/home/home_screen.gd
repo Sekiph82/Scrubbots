@@ -658,6 +658,18 @@ func _build_gift_meter(gm: MarginContainer) -> void:
 	_center_caption_in_bar(meter, 38)
 	meter.caption.add_theme_constant_override("outline_size", 12)
 	chassis.add_child(_reg(meter))
+	# M43-C009 (SB-M43-118): the whole Gift Meter assembly is the Gift Bar entry (invisible
+	# hit area; the owner-approved meter art is unchanged). Hidden with the other Home
+	# controls while a modal is open.
+	var hit := Button.new()
+	hit.name = "GiftMeterButton"
+	hit.flat = true
+	hit.focus_mode = Control.FOCUS_NONE
+	for st in ["normal", "hover", "pressed", "focus", "disabled"]:
+		hit.add_theme_stylebox_override(st, StyleBoxEmpty.new())
+	hit.set_anchors_preset(Control.PRESET_FULL_RECT)
+	hit.pressed.connect(func(): _shortcut_pressed("gift_bar"))
+	panel.add_child(_reg(hit))
 	# M43-C005R: micro-progress marks inside the SAME bar (no geometry / caption change).
 	var ticks := GiftTickOverlay.new()
 	ticks.avoid_label = meter.caption
@@ -837,9 +849,7 @@ func _build_shortcuts(column: VBoxContainer, specs: Array) -> void:
 		b.size_flags_horizontal = Control.SIZE_SHRINK_END if column.name == "LeftShortcutColumn" else Control.SIZE_SHRINK_BEGIN
 		b.set_icon_box(V03_ICON_BOX * float(ICON_SCALE[spec[0]]))
 		var id: String = spec[0]
-		b.pressed.connect(func():
-			shortcut_requested.emit(id)
-			open_popup(id))
+		b.pressed.connect(func(): _shortcut_pressed(id))
 		column.add_child(b)
 		_nodes["Shortcut_" + id] = b
 		_nodes["ShortcutIcon_" + id] = b.icon_rect
@@ -1107,7 +1117,7 @@ func get_layout_mode() -> int:
 ## (the app root passes "settings") is open, the single HomeActionLayer and the HUD (+)
 ## buttons are hidden (not drawn; no pointer/keyboard input). The ActionHost keeps its
 ## layout slot, so closing restores exactly the previous Home.
-const MODAL_HIDDEN := ["HomeActionLayer", "ScrubBucksPlus", "HeartsPlus"]
+const MODAL_HIDDEN := ["HomeActionLayer", "ScrubBucksPlus", "HeartsPlus", "GiftMeterButton"]
 func set_modal_active(source: String, active: bool) -> void:
 	if active:
 		_external_modals[source] = true
@@ -1205,13 +1215,26 @@ func _render_values() -> void:
 	# SB-M42-024: Daily badge = 1 when today's login reward is claimable.
 	(_nodes["Shortcut_daily"] as UiShortcutButton).set_badge(0 if _vm["daily_claimed_today"] else 1)
 	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
-		(_nodes["Shortcut_" + id[0]] as Button).disabled = not LIVE_SHORTCUTS.has(id[0])
+		(_nodes["Shortcut_" + id[0]] as Button).disabled = not (LIVE_SHORTCUTS.has(id[0]) or _app_shortcuts.has(id[0]))
 	for pid in _popups:
 		if (_popups[pid] as Control).visible:
 			_render_popup(pid)
 
 
 # ------------------------------------------------------------- popups ----
+
+## M43: shortcuts the app root opens as app-level destinations (set by main.gd). A standalone
+## Home (tests / tools without the app root) keeps its M42 popups.
+var _app_shortcuts: Array = []
+
+func set_app_shortcuts(ids: Array) -> void:
+	_app_shortcuts = ids.duplicate()
+	refresh()
+
+func _shortcut_pressed(id: String) -> void:
+	shortcut_requested.emit(id)
+	if not _app_shortcuts.has(id):
+		open_popup(id)
 
 ## Open the Home popup for a live shortcut. Returns the popup or null.
 func open_popup(id: String):

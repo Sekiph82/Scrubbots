@@ -30,6 +30,10 @@ const CeremonyPresenter = preload("res://scripts/ui/ceremony/ceremony_presenter.
 const FeedbackAdapter = preload("res://scripts/ui/feel/feedback_adapter.gd")
 const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
 const RobotsScreen = preload("res://scripts/ui/robots/robots_screen.gd")
+const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
+## Home shortcut panels the app root turns into app-level destinations (Home opens none of
+## its M42 popups for these; Cards Exchange keeps its Home seam).
+const APP_SHORTCUTS := ["shop", "collection", "tasks", "daily", "gift_bar"]
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -111,6 +115,7 @@ func _ready() -> void:
 	# M43 destinations from the Home shortcut panels (SB-M43-078 Shop, ...).
 	_home.shortcut_requested.connect(_on_home_shortcut)
 	_home.nav_requested.connect(_on_home_nav)
+	_home.set_app_shortcuts(APP_SHORTCUTS)
 	feel = FeedbackAdapter.new()
 	feel.bind(get_tree(), app_state.effects if app_state != null else null)
 	ceremonies = CeremonyPresenter.new()
@@ -252,7 +257,7 @@ func _on_home_nav(id: String) -> void:
 		"robots":
 			RobotsScreen.open(_modals, app_state, ceremonies)
 
-## Home shortcut panels that open an app-level destination (Daily keeps its Home popup).
+## Home shortcut panels / Gift Meter that open an app-level destination (APP_SHORTCUTS).
 func _on_home_shortcut(id: String) -> void:
 	if nav == null or nav.current() != NavigationController.Route.HOME or (_modals != null and _modals.depth() > 0):
 		return
@@ -261,6 +266,12 @@ func _on_home_shortcut(id: String) -> void:
 			_acq.open_shop({"source": "home_shop"})
 		"collection":
 			CollectionScreen.open_album(_modals, app_state)
+		"tasks":
+			DailyScreens.open_tasks(_modals, app_state)
+		"daily":
+			DailyScreens.open_daily(_modals, app_state)
+		"gift_bar":
+			DailyScreens.open_gift_bar(_modals, app_state)
 
 ## M43 master: on HOME, with no other popup open, present pending meta ceremonies (deferred so
 ## it never pushes from inside a route / modal signal handler).
