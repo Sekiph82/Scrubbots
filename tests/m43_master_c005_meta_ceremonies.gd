@@ -33,6 +33,7 @@ var EXPECTED_CASES := [
 	"e15_roster_canonical", "e16_robot_ceremony_truth", "e17_equip_persists", "e18_keep_current",
 	"e19_active_strict", "e20_unlock_next_order", "e21_unknown_robot_never_shown", "e22_robot_reduced",
 	"e23_gift_queued_truth", "e24_gift_1000_fallback", "e25_gift_claimed_note", "e26_gift_all_five_once",
+	"e27_results_handoff", "e28_results_no_event_no_hold",
 ]
 
 var _fail := 0
@@ -72,6 +73,8 @@ func _initialize() -> void:
 	_unmount()
 	await _e09_home_integration()
 	_e10_no_authority_static()
+	await _e27_results_handoff()
+	await _e28_results_no_event_no_hold()
 	await _frames(3)
 	_cleanup()
 	_done()
@@ -510,6 +513,77 @@ func _e26_gift_all_five_once() -> void:
 	var re = AppState.new(app.save._path)
 	_ok(CeremonyEvents.pending(re.economy, re.economy.meta_ui).is_empty() and re.economy.gift.claimable().size() == 5, "reload: none pending; all five still claimable in the Gift Bar")
 	_complete("e26_gift_all_five_once")
+
+# ------------------------------------------------------------------- SB-M43-013 ----
+
+## Real app root: frontier level 1, a real WON terminal (host economy + save first). With the
+## Gift Meter seeded at 9 through the real authority, the win's streak SB crosses milestone 10.
+func _won_results(tag: String, seed_gift: int):
+	_sub = SubViewport.new()
+	_sub.size = Vector2i(1080, 2160)
+	_sub.disable_3d = true
+	get_root().add_child(_sub)
+	var path := _uniq(tag)
+	var seed = AppState.new(path)
+	if seed_gift > 0:
+		seed.economy.gift.add_streak_sb(tag + "_seed", seed_gift)
+	seed.request_save()
+	MainScript.boot_save_path_override = path
+	_root = MainScene.instantiate()
+	_sub.add_child(_root)
+	await _frames(4)
+	_root.play_current_frontier()
+	await _frames(4)
+	var h = _root.get_gameplay_host()
+	h.get_runtime().set_process(false)
+	h.get_completion().terminal_reached.emit(&"WON", {})
+	await _frames(2)
+	return h
+
+func _end_app() -> void:
+	if _root != null and is_instance_valid(_root):
+		_root.free()
+	if _sub != null and is_instance_valid(_sub):
+		_sub.free()
+	_root = null
+	_sub = null
+	MainScript.boot_save_path_override = ""
+
+func _e27_results_handoff() -> void:
+	print("[e27 WON Results hands off to the committed Gift milestone ceremony]")
+	var h = await _won_results("e27", 9)
+	var res = _root.get_results_screen()
+	var receipt: Dictionary = h.get_terminal_receipt()
+	var follow: Array = receipt.get("follow_ups", []).map(func(f): return f["kind"])
+	_ok(_root.get_navigation().route_name() == "RESULTS" and follow.has("gift_milestone"), "real WON committed; receipt follow-up = gift_milestone")
+	_ok(res.has_ceremony_barrier() and res.get_primary_button().disabled and not res.get_next_cleanup_panel().visible, "ceremony barrier holds CLEAN NEXT + teaser")
+	var a0: Dictionary = _root.get_app_state().economy.snapshot()
+	res.finish_reveal()
+	var top = null
+	for _i in range(20):
+		await _frames(1)
+		top = _root.get_modal_stack().top()
+		if top != null:
+			break
+	_ok(top != null and String(top.context.get("ceremony_key", "")) == "gift:gift_ms:c0:m10" and h.get_terminal_receipt() == receipt, "after the reward reveal: Gift 10 ceremony on top; receipt unchanged")
+	var a1: Dictionary = _root.get_app_state().economy.snapshot()
+	_ok(a1["reward"] == a0["reward"] and a1["gift"] == a0["gift"] and a1["collection"] == a0["collection"], "presenting granted nothing (wallet / applied ids / Gift / Collection unchanged)")
+	_close_cta(top)
+	await _frames(4)
+	_ok(not res.has_ceremony_barrier() and not res.get_primary_button().disabled and res.get_next_cleanup_panel().visible, "barrier released: CLEAN NEXT + teaser back")
+	_ok(_root.get_app_state().economy.meta_ui.is_seen("gift:gift_ms:c0:m10") and _root.get_app_state().economy.gift.claimable().size() == 1, "acknowledged; reward still waits in the Gift Bar")
+	_end_app()
+	_complete("e27_results_handoff")
+
+func _e28_results_no_event_no_hold() -> void:
+	print("[e28 WON with no ceremony event: no hold]")
+	var h = await _won_results("e28", 0)
+	var res = _root.get_results_screen()
+	res.finish_reveal()
+	await _frames(4)
+	_ok(not res.has_ceremony_barrier() and _root.get_modal_stack().depth() == 0 and not res.get_primary_button().disabled, "no barrier, no popup, CLEAN NEXT live")
+	_end_app()
+	_complete("e28_results_no_event_no_hold")
 
 # ------------------------------------------------------------------ helpers ----
 
