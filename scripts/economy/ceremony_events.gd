@@ -18,7 +18,9 @@ static func events(economy) -> Array:
 	var out: Array = []
 	for occ in economy.gift.gift_bar_queue():
 		out.append({"key": "gift:" + String(occ["id"]), "kind": "gift_milestone", "occurrence_id": String(occ["id"]),
-			"milestone": int(occ["milestone"]), "cycle": int(occ["cycle"]), "claimed": bool(occ.get("claimed", false))})
+			"milestone": int(occ["milestone"]), "cycle": int(occ["cycle"]), "claimed": bool(occ.get("claimed", false)),
+			"cycle_max": int(economy.config.gift_meter_cycle_max()),
+			"rewards": (economy.config.gift_meter_milestone(int(occ["milestone"])) as Dictionary).duplicate(true)})
 	var col: Dictionary = economy.collection.snapshot()
 	var claimed: Array = (col.get("set_reward_claimed", []) as Array).map(func(n): return int(n))
 	claimed.sort()

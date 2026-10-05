@@ -50,6 +50,11 @@ func _events() -> Dictionary:
 	for e in CeremonyEvents.events(app.economy):
 		if not out.has(e["kind"]):
 			out[e["kind"]] = e
+	# Gift Meter: one real streak feed crosses 10/50/250/500/1000 (queued, never granted here).
+	app.economy.gift.add_streak_sb("evidence_tx", 1000)
+	for e in CeremonyEvents.events(app.economy):
+		if e["kind"] == "gift_milestone" and int(e["milestone"]) == 1000:
+			out["gift_milestone_1000"] = e
 	# Robot: the next canonical robot unlocked through the real facade (Bot Parts spent once).
 	app.economy.wallet.credit("bot_parts", 287)
 	app.actions.unlock_next_robot()
@@ -82,7 +87,8 @@ func _capture(ev: Dictionary, reduced: bool, size: Vector2i) -> void:
 		MetaCeremonies.start_motion(p)
 	for _i in range(8):
 		await RenderingServer.frame_post_draw
-	var path := "%s/%s_%s_%dx%d.png" % [_out, String(ev["kind"]), "REDUCED" if reduced else "FULL", size.x, size.y]
+	var tag := String(ev["kind"]) + ("_%d" % int(ev["milestone"]) if ev.has("milestone") else "")
+	var path := "%s/%s_%s_%dx%d.png" % [_out, tag, "REDUCED" if reduced else "FULL", size.x, size.y]
 	var bad := _problem(p, Rect2(Vector2.ZERO, Vector2(size)))
 	if not bad.is_empty():
 		_reject("%s: %s" % [path, bad])
