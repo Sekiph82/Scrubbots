@@ -19,6 +19,7 @@ const UiText = preload("res://scripts/ui/ui_text.gd")
 
 const ART := {
 	"set_complete": "res://assets/ui/final/collection/collection_complete_emblem.png",
+	"master_complete": "res://assets/ui/final/collection/master_collection_emblem.png",
 	"reward_glow": "res://assets/ui/final/popups/victory/reward_glow.png",
 	"sb": "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
 	"bot_parts": "res://assets/ui/final/robots/bot_parts_icon.png",
@@ -47,6 +48,8 @@ static func build(event: Dictionary, reduced: bool = false):
 	match String(event.get("kind", "")):
 		"set_complete":
 			return set_complete(event, reduced)
+		"master_complete":
+			return master_complete(event, reduced)
 	return null
 
 static func card_art(card_id: String) -> String:
@@ -150,5 +153,19 @@ static func set_complete(event: Dictionary, reduced: bool) -> BasePopup:
 	p.add_body_line(UiText.t("CEREMONY_SET_PROGRESS", [9, 9]), "Progress", BasePopup.INK, 30)
 	_reward_rows(p, event.get("rewards", {}))
 	p.add_body_line(UiText.t("CEREMONY_SET_COMMITTED"), "CommittedNote", BasePopup.INK, 24)
+	p.add_action("continue", UiText.t("CEREMONY_CONTINUE"), "primary", true)
+	return p
+
+# ----------------------------------------------------------- Master Collection ----
+
+## SB-M43-069: all 15 sets complete. Master emblem, "All 15 sets complete", the ONE-TIME
+## +2500 SB +20 Bot Parts (event rewards = the config row the exactly-once grant used).
+static func master_complete(event: Dictionary, reduced: bool) -> BasePopup:
+	var p := _popup("master_complete", "reward", UiText.t("CEREMONY_MASTER_TITLE"), event)
+	_hero(p, ART["master_complete"], Vector2(320, 320), reduced)
+	p.add_body_line(UiText.t("CEREMONY_MASTER_SETS", [int(event.get("sets", 0))]), "MasterProgress", BasePopup.ROYAL_EDGE, 38)
+	p.add_body_line(UiText.t("CEREMONY_MASTER_ONCE"), "OneTime", BasePopup.INK, 26)
+	_reward_rows(p, event.get("rewards", {}), 96)
+	p.add_body_line(UiText.t("CEREMONY_MASTER_COMMITTED"), "CommittedNote", BasePopup.INK, 24)
 	p.add_action("continue", UiText.t("CEREMONY_CONTINUE"), "primary", true)
 	return p

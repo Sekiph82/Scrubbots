@@ -231,6 +231,10 @@ ACTIVE",
 	"CEREMONY_SET_NAME": "Set %d · %s",
 	"CEREMONY_SET_PROGRESS": "%d / %d cards",
 	"CEREMONY_SET_COMMITTED": "Set reward already added to your account.",
+	"CEREMONY_MASTER_TITLE": "MASTER COLLECTION!",
+	"CEREMONY_MASTER_SETS": "All %d sets complete",
+	"CEREMONY_MASTER_ONCE": "One-time master reward",
+	"CEREMONY_MASTER_COMMITTED": "Master reward already added to your account.",
 }
 
 ## Keyed text for `prefix + reason`, falling back to `prefix + FAILED` for an unknown code.

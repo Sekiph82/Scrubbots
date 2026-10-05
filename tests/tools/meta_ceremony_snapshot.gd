@@ -50,6 +50,14 @@ func _events() -> Dictionary:
 	for e in CeremonyEvents.events(app.economy):
 		if not out.has(e["kind"]):
 			out[e["kind"]] = e
+	# Master: every set completed through the real authority (exactly-once Master grant).
+	for n in range(1, 16):
+		for k in range(9):
+			if app.economy.collection.owned("s%d_c%d" % [n, k]) == 0:
+				app.economy.collection.add_card("s%d_c%d" % [n, k])
+	for e in CeremonyEvents.events(app.economy):
+		if not out.has(e["kind"]):
+			out[e["kind"]] = e
 	return out
 
 func _capture(ev: Dictionary, reduced: bool, size: Vector2i) -> void:
