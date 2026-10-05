@@ -8,14 +8,15 @@ extends Control
 ## animates or re-implements anything — the owner's own clicks drive it.
 ##
 ## Keys (harness only): R restart · E toggle FULL / Reduced Effects + restart ·
-## 1 mixed (NEW/DUPLICATE/NEW) · 2 all NEW · 3 repeated duplicate.
+## 1 mixed (NEW/DUPLICATE/NEW) · 2 all NEW · 3 repeated duplicate ·
+## 4 same card x3 (FIRST COPY / EXTRAS x1 / EXTRAS x2) · 5 all DUPLICATE (EXTRAS x1 / x3 / x8).
 ## Fixtures are read-only models; nothing opens a pack, grants, saves or navigates.
 
 const StandardPackCeremony = preload("res://scripts/ui/ceremony/standard_pack_ceremony.gd")
 const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 const Fx = preload("res://tests/support/standard_pack_fixtures.gd")
 
-const FIXTURES := {KEY_1: "mixed", KEY_2: "all_new", KEY_3: "repeat"}
+const FIXTURES := {KEY_1: "mixed", KEY_2: "all_new", KEY_3: "repeat", KEY_4: "triple", KEY_5: "all_duplicate"}
 const BG01 := Color(0.125, 0.145, 0.2)   ## gameplay background Midnight Slate
 
 var _stack
@@ -61,12 +62,16 @@ func _model(pid: String) -> Dictionary:
 			return Fx.all_new(pid)
 		"repeat":
 			return Fx.repeat(pid)
+		"triple":
+			return Fx.triple(pid)
+		"all_duplicate":
+			return Fx.all_duplicate(pid)
 	return Fx.mixed(pid)
 
 func _on_closed(reason: String) -> void:
 	if reason != "complete":
 		return
-	_note.text = "Review complete (%s · %s)\nR replay · E Full/Reduced · 1 mixed · 2 all new · 3 repeat" % [_fixture, "REDUCED" if _reduced else "FULL"]
+	_note.text = "Review complete (%s · %s)\nR replay · E Full/Reduced · 1 mixed · 2 all new · 3 repeat · 4 triple · 5 all duplicate" % [_fixture, "REDUCED" if _reduced else "FULL"]
 	_note.visible = true
 
 func _unhandled_input(event: InputEvent) -> void:

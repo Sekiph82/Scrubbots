@@ -329,7 +329,7 @@ func _c07_new_duplicate() -> void:
 		var states: Array = p.get_card_views().map(func(cv): return _text(cv, "State"))
 		var counts: Array = p.get_card_views().map(func(cv): return _text(cv, "Copies"))
 		var want_states: Array = m["cards"].map(func(c): return UiText.t("PACK_CARD_NEW" if c["is_new"] else "PACK_CARD_DUPLICATE"))
-		var want_counts: Array = m["cards"].map(func(c): return UiText.t("PACK_CARD_OWNED", [c["copies_after"]]))
+		var want_counts: Array = m["cards"].map(func(c): return (UiText.t("PACK_CARD_FIRST_COPY") if c["is_new"] else UiText.t("PACK_CARD_EXTRAS", [int(c["copies_after"]) - 1])))
 		_ok(states == want_states and counts == want_counts, "%s: badges %s / counts %s" % [m["presentation_id"], str(states), str(counts)])
 		_close(p)
 	_ok(UiText.t("PACK_CARD_NEW") != UiText.t("PACK_CARD_DUPLICATE"), "state is stated in text, not colour only")

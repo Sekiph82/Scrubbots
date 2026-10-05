@@ -67,7 +67,8 @@ func _initialize() -> void:
 	await _frames(2)
 	_ok(not _h.is_reduced() and _h.get_ceremony().phase() == "IDLE", "E again: FULL, IDLE")
 	_complete("h07_key_e")
-	var want := {KEY_2: ["all_new", [true, true, true, true, true]], KEY_3: ["repeat", [true, false, false, false, false]], KEY_1: ["mixed", [true, false, true, false, true]]}
+	var want := {KEY_2: ["all_new", [true, true, true, true, true]], KEY_3: ["repeat", [true, false, false, false, false]],
+		KEY_4: ["all_duplicate", [false, false, false, false, false]], KEY_1: ["mixed", [true, false, true, false, true]]}
 	for key in want:
 		_key(key)
 		await _frames(2)

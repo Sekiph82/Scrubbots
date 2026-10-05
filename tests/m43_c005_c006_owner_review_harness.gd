@@ -17,8 +17,10 @@ const Fx = preload("res://tests/support/standard_pack_fixtures.gd")
 ## the pin holds on both CRLF (Windows checkout) and LF working trees. M43-C005-C007 re-pinned the
 ## ceremony after its only change: the overridable `_frame_paths()` hook (same nine Standard
 ## paths; lets PremiumPackCeremony supply its own frame family). Standard behaviour unchanged.
+## M43-C005-C009 (SB-M43-067) re-pinned it after the shared card-state presentation (FIRST COPY /
+## EXTRAS xN count line, NEW glow + one FULL celebration step after the pack fade).
 const PRODUCTION_SHA := {
-	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "b95b9e10a58c09c169b813d8b42b4cdc8b7704557c2b1dd46caced11212933a8",
+	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "d44d9f1cba1d420268c669a104a2b788eab7cd8ad6238db91ea2b3d05fe35cac",
 	"res://scripts/ui/ceremony/standard_pack_model.gd": "2db015d362fdfa2e5b2040d7e3ebcbaed59986811b2d364980082095a655f481",
 	"res://scripts/ui/components/reveal_sequencer.gd": "ccfcc426db81da9ce623d262611191c0039a5f4bd21c46aa3d3decdbf9d2a5ca",
 }
@@ -82,7 +84,7 @@ func _h02_real_ceremony() -> void:
 func _h03_production_unchanged() -> void:
 	print("[h03 production files unchanged]")
 	for path in PRODUCTION_SHA:
-		_ok(_text_sha(path) == PRODUCTION_SHA[path], "%s sha256 (LF-normalised) == audited baseline (V03 + C007 hook)" % path.get_file())
+		_ok(_text_sha(path) == PRODUCTION_SHA[path], "%s sha256 (LF-normalised) == audited baseline (V03 + C007 hook + C009 card state)" % path.get_file())
 	_ok(_text_sha_of("x\r\ny\n") == _text_sha_of("x\ny\n") and _text_sha_of("x\n") != _text_sha_of("y\n"), "pin is line-ending independent but content sensitive")
 	_complete("h03_production_unchanged")
 
@@ -139,8 +141,9 @@ func _h08_key_e() -> void:
 	_complete("h08_key_e")
 
 func _h09_keys_fixtures() -> void:
-	print("[h09 1 / 2 / 3 fixtures]")
-	var want := {KEY_2: ["all_new", [true, true, true]], KEY_3: ["repeat", [true, false, false]], KEY_1: ["mixed", [true, false, true]]}
+	print("[h09 1 / 2 / 3 / 4 / 5 fixtures]")
+	var want := {KEY_2: ["all_new", [true, true, true]], KEY_3: ["repeat", [true, false, false]], KEY_4: ["triple", [true, false, false]],
+		KEY_5: ["all_duplicate", [false, false, false]], KEY_1: ["mixed", [true, false, true]]}
 	for key in want:
 		_key(key)
 		await _frames(2)

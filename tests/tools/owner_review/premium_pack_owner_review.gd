@@ -8,14 +8,15 @@ extends Control
 ## ceremony's own; this harness never taps, animates or re-implements anything.
 ##
 ## Keys (harness only): R restart · E toggle FULL / Reduced Effects + restart ·
-## 1 mixed NEW/DUPLICATE · 2 all NEW · 3 repeated duplicates.
+## 1 mixed NEW/DUPLICATE · 2 all NEW · 3 repeated duplicates · 4 duplicate-heavy (all DUPLICATE,
+## EXTRAS x2 / x1 / x5 / x3 / x10).
 ## Fixtures are read-only models; nothing opens a pack, grants, saves or navigates.
 
 const PremiumPackCeremony = preload("res://scripts/ui/ceremony/premium_pack_ceremony.gd")
 const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 const Fx = preload("res://tests/support/premium_pack_fixtures.gd")
 
-const FIXTURES := {KEY_1: "mixed", KEY_2: "all_new", KEY_3: "repeat"}
+const FIXTURES := {KEY_1: "mixed", KEY_2: "all_new", KEY_3: "repeat", KEY_4: "all_duplicate"}
 const BG01 := Color(0.125, 0.145, 0.2)   ## gameplay background Midnight Slate
 
 var _stack
@@ -60,12 +61,14 @@ func _model(pid: String) -> Dictionary:
 			return Fx.all_new(pid)
 		"repeat":
 			return Fx.repeat(pid)
+		"all_duplicate":
+			return Fx.all_duplicate(pid)
 	return Fx.mixed(pid)
 
 func _on_closed(reason: String) -> void:
 	if reason != "complete":
 		return
-	_note.text = "Review complete (%s · %s)\nR replay · E Full/Reduced · 1 mixed · 2 all new · 3 repeat" % [_fixture, "REDUCED" if _reduced else "FULL"]
+	_note.text = "Review complete (%s · %s)\nR replay · E Full/Reduced · 1 mixed · 2 all new · 3 repeat · 4 all duplicate" % [_fixture, "REDUCED" if _reduced else "FULL"]
 	_note.visible = true
 
 func _unhandled_input(event: InputEvent) -> void:
