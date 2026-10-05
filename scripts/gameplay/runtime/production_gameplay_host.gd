@@ -700,11 +700,14 @@ func _drive_economy_terminal(status) -> void:
 				"difficulty": String(last_first_clear_result.get("difficulty", "")),
 				"boosters_used": _attempt_boosters,
 				"cells": _board.get_cell_count() if _board != null else 0})
+			_meta_terminal(true)
 	elif status == CompletionEvaluator.LOST:
 		_economy_terminal_done = true
 		_economy.hearts.consume()
 		_economy.streak.on_progression_loss()
 		_economy.speed.on_level_completed(progression_level, false)
+		if progression_attempt:
+			_meta_terminal(false)
 	# M40 V02 (F-M40-006): terminal is a defined safe save boundary (not per-frame).
 	var saved: Dictionary = request_save()
 	# M43-C001A: receipt = committed before/after truth. Built only by the latched
@@ -801,6 +804,14 @@ func terminal_context() -> Dictionary:
 		"dominant_color": total > 0 and _assist != null and float(top) / float(total) >= float(_assist.dominant_share),
 		"supply_remaining": _supply != null and not _supply.is_exhausted(),
 	}
+
+## M43-C010R / C012R: a committed progression terminal feeds the self-only records, the
+## configured events and the Catch-Up track (presentation/meta; saved by the terminal boundary).
+func _meta_terminal(won: bool) -> void:
+	var r: Dictionary = _economy.records.on_progression_terminal(progression_level, won, _attempt_boosters, _economy.streak.streak())
+	_economy.events.on_progression_terminal(won, bool(r["first_try"]))
+	if won:
+		_economy.returns.on_first_clear_win()
 
 ## M43-C009R: committed booster actions in the current attempt (reset per attempt / Retry).
 func get_attempt_boosters_used() -> int:

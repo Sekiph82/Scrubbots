@@ -31,9 +31,14 @@ const FeedbackAdapter = preload("res://scripts/ui/feel/feedback_adapter.gd")
 const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
 const RobotsScreen = preload("res://scripts/ui/robots/robots_screen.gd")
 const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
+const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
+const MetaFeedback = preload("res://scripts/ui/feel/meta_feedback.gd")
+const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
+## BottomNav tabs the app root serves (RANKS waits for the SB-M43-131 owner policy).
+const APP_NAV := ["events"]
 ## Home shortcut panels the app root turns into app-level destinations (Home opens none of
 ## its M42 popups for these; Cards Exchange keeps its Home seam).
-const APP_SHORTCUTS := ["shop", "collection", "tasks", "daily", "gift_bar"]
+const APP_SHORTCUTS := ["shop", "collection", "tasks", "daily", "gift_bar", "profile"]
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -67,6 +72,7 @@ var _acq = null
 var momentum_cfg: Dictionary = {}
 ## M43 master: the ONE presenter of committed-but-unseen meta ceremonies (presentation only).
 var ceremonies = null
+var meta_feedback = null
 ## M43-C005F (SB-M43-C005F-002): the ONE fail-open presentation-feel adapter (no call site yet).
 var feel = null
 
@@ -116,10 +122,21 @@ func _ready() -> void:
 	_home.shortcut_requested.connect(_on_home_shortcut)
 	_home.nav_requested.connect(_on_home_nav)
 	_home.set_app_shortcuts(APP_SHORTCUTS)
+	_home.set_app_nav(APP_NAV)
 	feel = FeedbackAdapter.new()
 	feel.bind(get_tree(), app_state.effects if app_state != null else null)
 	ceremonies = CeremonyPresenter.new()
 	ceremonies.bind(_modals, app_state)
+	# M43-C014: committed-only meta sound / haptic moments.
+	meta_feedback = MetaFeedback.new()
+	meta_feedback.name = "MetaFeedback"
+	add_child(meta_feedback)
+	meta_feedback.bind(app_state)
+	ceremonies.ceremony_shown.connect(meta_feedback.on_ceremony_shown)
+	# M43-C012: a genuine absence opens a return window (summary shown once on Home).
+	if app_state != null and app_state.economy != null and not app_state.is_blocked:
+		app_state.economy.returns.on_active()
+		app_state.mark_dirty()
 	ceremonies.idle.connect(func(src):
 		if src == "results" and _results != null:
 			_results.set_ceremony_barrier(RESULTS_CEREMONY_BARRIER, false))
@@ -256,6 +273,8 @@ func _on_home_nav(id: String) -> void:
 	match id:
 		"robots":
 			RobotsScreen.open(_modals, app_state, ceremonies)
+		"events":
+			ProfileScreens.open_events(_modals, app_state)
 
 ## Home shortcut panels / Gift Meter that open an app-level destination (APP_SHORTCUTS).
 func _on_home_shortcut(id: String) -> void:
@@ -272,6 +291,8 @@ func _on_home_shortcut(id: String) -> void:
 			DailyScreens.open_daily(_modals, app_state)
 		"gift_bar":
 			DailyScreens.open_gift_bar(_modals, app_state)
+		"profile":
+			ProfileScreens.open_profile(_modals, app_state)
 
 ## M43 master: on HOME, with no other popup open, present pending meta ceremonies (deferred so
 ## it never pushes from inside a route / modal signal handler).
@@ -283,7 +304,27 @@ func _drain_home_ceremonies() -> void:
 		return
 	if _modals != null and _modals.depth() > 0:
 		return
-	ceremonies.drain("home")
+	if not ceremonies.drain("home") and app_state != null and app_state.economy.returns.summary_due():
+		ProfileScreens.open_comeback(_modals, app_state)
+
+## M43-C012 (SB-M43-148): open a notification deep link. Only known destinations; anything
+## unknown / stale lands on Home. Returns the destination actually opened.
+func open_deep_link(dest: String) -> String:
+	var d := NotificationPolicy.deep_link(dest)
+	if nav == null or app_state == null or app_state.is_blocked:
+		return "none"
+	if nav.current() != NavigationController.Route.HOME:
+		return "home"
+	if _modals != null:
+		_modals.clear("deep_link")
+	match d:
+		"robots", "events":
+			_on_home_nav(d)
+		"home":
+			pass
+		_:
+			_on_home_shortcut(d)
+	return d
 
 func get_ceremonies():
 	return ceremonies
@@ -478,6 +519,9 @@ func flush_lifecycle(reason: String) -> Dictionary:
 	if app_state == null:
 		last_flush = {"ok": false, "reason": "no_app_state"}
 	else:
+		if app_state.economy != null and not app_state.is_blocked:
+			app_state.economy.returns.touch()
+			app_state.mark_dirty()
 		last_flush = app_state.flush()
 	last_flush["lifecycle"] = reason
 	return last_flush
@@ -518,6 +562,9 @@ func _notification(what: int) -> void:
 			handle_back()
 		NOTIFICATION_APPLICATION_PAUSED:
 			flush_lifecycle("application_paused")
+		NOTIFICATION_APPLICATION_RESUMED:
+			if app_state != null and app_state.economy != null and not app_state.is_blocked and app_state.economy.returns.on_active()["opened"]:
+				request_home_ceremonies()
 		NOTIFICATION_APPLICATION_FOCUS_OUT:
 			flush_lifecycle("focus_out")
 		NOTIFICATION_WM_CLOSE_REQUEST:
