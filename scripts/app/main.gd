@@ -26,6 +26,7 @@ const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 const AcquisitionFlow = preload("res://scripts/ui/popup/acquisition_flow.gd")
 const ShopHandoff = preload("res://scripts/app/shop_handoff.gd")
 const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
+const CeremonyPresenter = preload("res://scripts/ui/ceremony/ceremony_presenter.gd")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -57,6 +58,8 @@ var shop = null
 var _acq = null
 ## M43-C001R: validated momentum presentation config (read once; shared by Results/Home).
 var momentum_cfg: Dictionary = {}
+## M43 master: the ONE presenter of committed-but-unseen meta ceremonies (presentation only).
+var ceremonies = null
 
 func _enter_tree() -> void:
 	_boot()
@@ -91,7 +94,8 @@ func _ready() -> void:
 	_modals.modal_changed.connect(func(active):
 		_home.set_modal_active("modal_stack", active)
 		if not active and _home.visible:
-			_home.refresh())
+			_home.refresh()
+			request_home_ceremonies())
 	shop = ShopHandoff.new()
 	_acq = AcquisitionFlow.new()
 	if app_state != null and app_state.economy != null:
@@ -99,6 +103,12 @@ func _ready() -> void:
 	# SB-M43-032 / 036: Home Heart + -> canonical Life; Home SB + -> canonical Shop intent.
 	_home.hearts_purchase_requested.connect(func(): open_life("home_heart_plus"))
 	_home.scrub_bucks_purchase_requested.connect(func(): _acq.open_shop({"source": "home_sb_plus"}))
+	ceremonies = CeremonyPresenter.new()
+	ceremonies.bind(_modals, app_state)
+	# Every committed facade action (Gift / Daily claim, exchange, unlock, ...) may have
+	# completed a set / Master / robot event: show its ceremony once Home is quiet.
+	if app_state != null and app_state.actions != null:
+		app_state.actions.action_committed.connect(func(_a, _r): request_home_ceremonies())
 	nav.route_changed.connect(_on_route_changed)
 	if _should_play_opening():
 		_start_opening()
@@ -149,6 +159,7 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 		_home.visible = to == NavigationController.Route.HOME
 		if _home.visible:
 			_home.refresh()
+			request_home_ceremonies()
 	if _results != null:
 		_results.visible = to == NavigationController.Route.RESULTS
 		if _results.visible:
@@ -192,6 +203,21 @@ func set_momentum_config(cfg: Dictionary) -> void:
 
 func get_home():
 	return _home
+
+## M43 master: on HOME, with no other popup open, present pending meta ceremonies (deferred so
+## it never pushes from inside a route / modal signal handler).
+func request_home_ceremonies() -> void:
+	call_deferred("_drain_home_ceremonies")
+
+func _drain_home_ceremonies() -> void:
+	if ceremonies == null or nav == null or nav.current() != NavigationController.Route.HOME or nav.is_settings_open():
+		return
+	if _modals != null and _modals.depth() > 0:
+		return
+	ceremonies.drain("home")
+
+func get_ceremonies():
+	return ceremonies
 
 ## M41 V01 Settings panel (M42: opened from the Home bottom-nav SETTINGS button).
 func _build_settings_entry() -> void:
