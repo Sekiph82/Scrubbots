@@ -29,6 +29,7 @@ const CeremonyEvents = preload("res://scripts/economy/ceremony_events.gd")
 const PackPity = preload("res://scripts/collection/pack_pity.gd")
 const CardsExchangeService = preload("res://scripts/economy/cards_exchange_service.gd")
 const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
+const DailyOrders = preload("res://scripts/economy/daily_orders.gd")
 
 const GUARANTEED_NEW_FALLBACK_SB := 500
 
@@ -55,6 +56,8 @@ var pack_pity: PackPity
 var exchange: CardsExchangeService
 ## M43-C003 rewarded-video grants (provider-neutral; production provider = unavailable).
 var rewarded: RewardedGrantService
+## M43-C009R: which order each of the three daily tasks is today + its play progress.
+var orders: DailyOrders
 
 ## local_day: Daily local-calendar ordinal provider (M39 V04, F-M39-V03-002).
 ## Omitted in production -> DailyService uses LocalCalendar.system_provider().
@@ -70,6 +73,7 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	boosters = BoosterInventory.new(wallet, config)
 	capacity = SlotCapacityAuthority.new()
 	daily = DailyService.new(config, reward, clock, local_day)
+	orders = DailyOrders.new(daily)
 	collection = CollectionInventory.new(config, reward)
 	packs = CardPackService.new(collection, pack_rng)
 	pack_receipts = PackReceiptLedger.new()
@@ -143,6 +147,7 @@ func snapshot() -> Dictionary:
 		"pack_receipts": pack_receipts.snapshot(),
 		"meta_ui": meta_ui.snapshot(),
 		"pack_pity": pack_pity.snapshot(),
+		"daily_orders": orders.snapshot(),
 	}
 
 ## Independently all-or-nothing import (F-M39-005). Captures the exact current
@@ -180,6 +185,9 @@ func _apply_sections(s) -> bool:
 	if not daily.import_snapshot(s.get("daily", {})):
 		return false
 	if not collection.import_snapshot(s.get("collection", {})):
+		return false
+	# M43-C009R: absent = older save (orders generated on demand); present = strict.
+	if not orders.import_snapshot(s["daily_orders"] if s.has("daily_orders") else null):
 		return false
 	# M43-C005-C008: key ABSENT = pre-C008 save (keep the live OS-seeded RNG / empty ledger).
 	# Key PRESENT = strict C008 schema; an empty or partial section fails closed.

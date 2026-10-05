@@ -1,0 +1,17 @@
+{
+  "schema": "scrubbots.daily_scrub_orders.v1",
+  "version": 1,
+  "source": "TASKS M43-C009R (owner-approved 2026-09-30): Daily Scrub Orders archetypes advanced by ordinary play; exactly three/day; tier intent easy/normal/stretch aligned with the canonical 75/100/125 SB task rewards (economy_rewards_v1.json daily.task_sb).",
+  "tuning_status": "PROVISIONAL — targets bounded to at most three won levels; final tuning follows M56 economy/retention simulation and owner review. Rewards are NOT defined here.",
+  "tiers": ["easy", "normal", "stretch"],
+  "archetypes": [
+    {"id": "win_1", "tier": "easy", "metric": "levels_won", "target": 1},
+    {"id": "clear_400", "tier": "easy", "metric": "cells_cleared", "target": 400},
+    {"id": "win_2", "tier": "normal", "metric": "levels_won", "target": 2},
+    {"id": "win_no_booster_1", "tier": "normal", "metric": "levels_won_no_booster", "target": 1},
+    {"id": "clear_1200", "tier": "normal", "metric": "cells_cleared", "target": 1200},
+    {"id": "win_3", "tier": "stretch", "metric": "levels_won", "target": 3},
+    {"id": "win_medium_plus_1", "tier": "stretch", "metric": "levels_won_min_class", "min_class": "MEDIUM", "target": 1, "within_levels": 3},
+    {"id": "clear_2000", "tier": "stretch", "metric": "cells_cleared", "target": 2000}
+  ]
+}

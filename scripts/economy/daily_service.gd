@@ -147,6 +147,20 @@ func claim_login() -> Dictionary:
 
 # --------------------------------------------------------------- tasks ----
 
+## M43-C009 read-only queries (Tasks destination / DailyOrders). They never mutate state.
+func local_day() -> int:
+	return _today()
+
+func is_task_done(task_index: int) -> bool:
+	_sync_tasks_to_today()
+	return _tasks_done.has(task_index)
+
+func task_claimed(task_index: int) -> bool:
+	return _reward.already_applied("daily_task:%d:%d" % [_today(), task_index])
+
+func all_tasks_bonus_claimed() -> bool:
+	return _reward.already_applied("daily_all_tasks:%d" % _today())
+
 func mark_task_done(task_index: int) -> void:
 	_sync_tasks_to_today()   # prior-day completion cannot leak into today
 	if task_index < 0 or task_index >= _task_sb.size():

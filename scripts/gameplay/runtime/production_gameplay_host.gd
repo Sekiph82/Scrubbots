@@ -140,6 +140,7 @@ var _economy
 var _owns_economy := false
 var _progression
 var _booster_service
+var _attempt_boosters := 0
 var _booster_adapter
 var _save
 ## M40 V03: optional injected AppState composition root. When set, the host
@@ -442,6 +443,7 @@ func build() -> bool:
 		if app_state == null:
 			_economy.rewarded.bind_save(Callable(self, "request_save"))
 	_economy_terminal_done = false
+	_attempt_boosters = 0
 	_assist = app_state.assist if app_state != null and app_state.assist != null else FailureAssistanceService.new()
 	_assist.on_attempt_started(progression_level, is_progression_attempt())
 	_bind_modal_stack()
@@ -586,6 +588,7 @@ func _on_retry_restored() -> void:
 	# Heart consume runs BEFORE on_restart wipes the gameplay-started flag.
 	if _economy != null:
 		_economy_terminal_done = false
+		_attempt_boosters = 0
 		_terminal_receipt = {}
 		_assist_offer = {}
 		_economy.capacity.begin_new_attempt()
@@ -690,6 +693,13 @@ func _drive_economy_terminal(status) -> void:
 		# entitlement commit as ONE snapshot/rollback transaction.
 		last_first_clear_result = FirstClearTransaction.commit(_progression, _economy,
 			progression_level, _first_clear_fault)
+		# M43-C009R: a committed progression win advances today's Daily Scrub Orders
+		# (saved by the terminal boundary below). Losses / replays never count.
+		if bool(last_first_clear_result.get("ok", false)):
+			_economy.orders.on_level_won({"level": progression_level,
+				"difficulty": String(last_first_clear_result.get("difficulty", "")),
+				"boosters_used": _attempt_boosters,
+				"cells": _board.get_cell_count() if _board != null else 0})
 	elif status == CompletionEvaluator.LOST:
 		_economy_terminal_done = true
 		_economy.hearts.consume()
@@ -791,6 +801,10 @@ func terminal_context() -> Dictionary:
 		"dominant_color": total > 0 and _assist != null and float(top) / float(total) >= float(_assist.dominant_share),
 		"supply_remaining": _supply != null and not _supply.is_exhausted(),
 	}
+
+## M43-C009R: committed booster actions in the current attempt (reset per attempt / Retry).
+func get_attempt_boosters_used() -> int:
+	return _attempt_boosters
 
 ## M43-C001A: detached copy of this attempt's terminal receipt ({} before a WON/LOST
 ## terminal committed, or after a Retry began a fresh attempt).
@@ -1430,6 +1444,7 @@ func get_actions():
 ## and renderer to BoardState truth, refresh slot/supply UI, and mark the
 ## completion evaluator dirty (a Tornado can finish the board).
 func on_booster_committed() -> void:
+	_attempt_boosters += 1
 	if _ci != null:
 		_ci.rebuild()
 	var r = _renderer()
