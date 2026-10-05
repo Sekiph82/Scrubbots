@@ -55,4 +55,18 @@ Rendering tool `tests/tools/meta_snapshot.gd` → `META_EVIDENCE CLEAN (0 reject
 
 None.
 
+## MASTER REMEDIATION V03 — 2026-10-06
+
+Prompt: `coordination/sessions/M43-MASTER-V01/M43_MASTER_REMEDIATION_V03.md` · authority: `CHATGPT_MASTER_AUDIT_V01.md`. Baseline `0a7ff02` · remediation code commit `1cbe37f` (handoff: `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`). The V01 sections above are kept unchanged as history; this section supersedes them where they differ.
+
+**Audit finding.** The test matrix (n02) did not cover `now_ts < last_sent`.
+
+**Fix.** The matrix now explicitly includes the rollback case:
+- **n04**: send at T; T−1 h none; T−10 d none; the high-water is not lowered by a stale send; reload under rollback (T−1 h) none; T+23 h none; T+24 h−1 s none; T+24 h eligible; quiet-hours, category and priority regressions after catch-up.
+- **n05**: same UTC instant with different injected local hours (timezone), see SB-M43-151.
+
+n01–n03 and c01–c04 are unchanged and PASS. The n04 rollback checks were shown to fail against the pre-fix cap (3 FAILs), then pass with the fix.
+
+`tests/m43_master_c011_c014.gd` → **PASS 28/28** (18 V01 cases kept or updated, plus 10 new). Regression: see `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`.
+
 READY_FOR_INDEPENDENT_AUDIT — SB-M43-R12-007

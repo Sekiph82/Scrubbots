@@ -48,4 +48,40 @@ Rendering tool `tests/tools/meta_snapshot.gd` → `META_EVIDENCE CLEAN (0 reject
 
 Family = reward / unlock moments on the existing completion.wav; success is haptic-only. Final feel: SB-M43-168.
 
+## MASTER REMEDIATION V03 — 2026-10-06
+
+Prompt: `coordination/sessions/M43-MASTER-V01/M43_MASTER_REMEDIATION_V03.md` · authority: `CHATGPT_MASTER_AUDIT_V01.md`. Baseline `0a7ff02` · remediation code commit `1cbe37f` (handoff: `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`). The V01 sections above are kept unchanged as history; this section supersedes them where they differ.
+
+**Audit finding.** Only committed rewards and the generic ceremony moment were wired. Button confirm / back, popup open / close, pack reveal and error had no shipping seam.
+
+**Fix.** `scripts/ui/feel/meta_feedback.gd` is the one compact coordinator for the complete family. It reuses only the two approved M33 files: `dispatch.wav` as a hard-bounded 0.12 s UI tick, and `completion.wav` as the chime.
+
+| moment | shipping seam | sound | haptic |
+|---|---|---|---|
+| confirm | `BasePopup.action_selected` on any app-ModalStack popup | tick (pitch 1.25) | – |
+| back | popup closed with reason `back` (Back / Escape / X) | tick (0.95) | – |
+| popup_open | a new popup becomes top (`ModalStack.top_changed`) | tick (1.12) | – |
+| popup_close | programmatic close (`close` / `complete` …) | tick (0.88) | – |
+| reward | committed claim (`action_committed`) / `gift_milestone` ceremony | chime (1.0) | success 25 ms |
+| pack_reveal | first committed card emerging in a Standard / Premium pack ceremony | chime (1.12) | – |
+| unlock | committed `unlock_robot` / `robot_unlock`, `set_complete`, `master_complete` ceremonies | chime (0.94) | unlock 80 ms |
+| error | `ProductionActionFacade.action_refused` (new signal) or a failed `pending_resolved` (purchase / ad) | low tick (0.62), never the chime | warning 40 ms |
+| success | committed purchase / equip | – (the tap ticked) | success 25 ms |
+| pack_rare | first Rare-or-better committed card emerging | – (rides the reveal chime) | pack Rare+ 60 ms |
+
+Rules:
+- Success, reward and unlock come only from `action_committed` or a shown ceremony, so nothing sounds like success before the authority commits.
+- Idempotent no-op refusals (`already_claimed`, `duplicate`, `replay`, `in_flight`, `pending`, …) are silent.
+- Route-change closes (`clear`, `deep_link`, `host_released`, `restart`, `home`) are silent and stop the voice.
+- An action-close (`action:*`) is silent, because the confirm tick covers it.
+- UI ticks play only on the HOME route (`ui_gate` set in `main.gd`); gameplay keeps its own M33 / M34 feedback.
+- UI ticks are deferred to the end of the frame and dropped when a stronger moment owns that frame, so a CLAIM tap plus its reward popup gives exactly one chime.
+
+**Tests**:
+- **a01**: refusal = one warning tick + warning buzz, never reward / success; a committed claim = one reward chime + success buzz; an already-claimed repeat is silent.
+- **a05**: family table complete; error is a low tick, never the chime; only the two approved files are used; no economy / save / navigation access.
+- **a06**, real UI: Home TASKS → `popup_open`; action button → `confirm`, and the action-close itself is silent; X → `back`; programmatic close → `popup_close`; route change silent; ticks gated off outside HOME.
+
+`tests/m43_master_c011_c014.gd` → **PASS 28/28** (18 V01 cases kept or updated, plus 10 new). Regression: see `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`.
+
 READY_FOR_INDEPENDENT_AUDIT — SB-M43-161

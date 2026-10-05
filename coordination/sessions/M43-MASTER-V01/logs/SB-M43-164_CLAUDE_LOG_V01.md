@@ -48,4 +48,8 @@ Rendering tool `tests/tools/meta_snapshot.gd` → `META_EVIDENCE CLEAN (0 reject
 
 None.
 
+## MASTER REMEDIATION V03 note — 2026-10-06
+
+Remediation commit `1cbe37f`. V01 a01 text "a failed purchase is silent" is superseded: a refusal now gives a distinct LOW warning tick + 40 ms warning buzz (SB-M43-161/162), never the success chime. Success / reward / unlock still fire only from `action_committed` or a shown ceremony, so nothing implies success before the authority commits (a01, a05). Status unchanged.
+
 READY_FOR_INDEPENDENT_AUDIT — SB-M43-164

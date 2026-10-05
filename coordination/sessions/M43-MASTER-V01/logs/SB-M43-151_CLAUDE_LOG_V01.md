@@ -55,4 +55,16 @@ Rendering tool `tests/tools/meta_snapshot.gd` → `META_EVIDENCE CLEAN (0 reject
 
 Timezone = injected local-day authority; disabled permission = global OFF (platform permission itself is SB-M43-146).
 
-READY_FOR_INDEPENDENT_AUDIT — SB-M43-151
+## MASTER REMEDIATION V03 — 2026-10-06
+
+Prompt: `coordination/sessions/M43-MASTER-V01/M43_MASTER_REMEDIATION_V03.md` · authority: `CHATGPT_MASTER_AUDIT_V01.md`. Baseline `0a7ff02` · remediation code commit `1cbe37f` (handoff: `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`). The V01 sections above are kept unchanged as history; this section supersedes them where they differ.
+
+**Status correction (audit §10): READY → `DEFERRED_DEPENDENCY` on SB-M43-146.** The canonical row includes *disabled permissions*. The real OS notification-permission path needs the platform notification authority (SB-M43-146, BLOCKED_AWAITING_AUTHORITY: native plugin / platform decision). V01 substituted global OFF for it. Full completion waits on SB-M43-146. The policy-level tests stay.
+
+**Added policy-level timezone test** (n05): at the same UTC timestamp, different injected local hours (UTC+0 / +9 / −5) give the quiet-hours outcome of each zone. Local 23:00 is quiet and local 12:00 is eligible. Quiet-hours decisions never consume or move the cap. After a send, no local hour reopens the 24 h cap. After 24 h, eligibility is decided by the local hour only. The R12-005 rollback fix is covered in n04.
+
+`tests/m43_master_c011_c014.gd` → **PASS 28/28** (18 V01 cases kept or updated, plus 10 new). Regression: see `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`.
+
+V01 status line (superseded): `READY_FOR_INDEPENDENT_AUDIT — SB-M43-151`
+
+DEFERRED_DEPENDENCY — SB-M43-151

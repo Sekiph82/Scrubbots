@@ -48,4 +48,16 @@ Rendering tool `tests/tools/meta_snapshot.gd` → `META_EVIDENCE CLEAN (0 reject
 
 Shop / ads keep the C003 language; Events unavailable + notifications platform copy added; cloud and Ranks have no UI yet (SB-M43-153 / 131).
 
-READY_FOR_INDEPENDENT_AUDIT — SB-M43-165
+## MASTER REMEDIATION V03 — 2026-10-06
+
+Prompt: `coordination/sessions/M43-MASTER-V01/M43_MASTER_REMEDIATION_V03.md` · authority: `CHATGPT_MASTER_AUDIT_V01.md`. Baseline `0a7ff02` · remediation code commit `1cbe37f` (handoff: `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`). The V01 sections above are kept unchanged as history; this section supersedes them where they differ.
+
+**Status correction (audit §11): READY → `DEFERRED_DEPENDENCY` on SB-M43-153 (cloud / account provider) and SB-M43-131 (RANKS policy), plus provider surfaces as applicable.** The cloud and RANKS UI / retry surfaces do not exist because those authorities are blocked. No retry screen was faked.
+
+The shipped shared copy stays: Shop / ads C003 language, Events unavailable, notification platform copy (a04 PASS). This child's row can complete only once those destinations exist.
+
+`tests/m43_master_c011_c014.gd` → **PASS 28/28** (18 V01 cases kept or updated, plus 10 new). Regression: see `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`.
+
+V01 status line (superseded): `READY_FOR_INDEPENDENT_AUDIT — SB-M43-165`
+
+DEFERRED_DEPENDENCY — SB-M43-165

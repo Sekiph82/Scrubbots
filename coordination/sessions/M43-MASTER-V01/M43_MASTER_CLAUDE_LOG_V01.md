@@ -7,7 +7,8 @@ Repository `Sekiph82/Scrubbots`, branch `main`. Root `TASKS.md` was read only an
 
 - Final HEAD: `8524b91`. This log's own commit follows it.
 - Catalog: **146** open M43 children at issuance. That is 131 checkbox rows in root `TASKS.md` M43, plus the 15 `SB-M43-C005F-*` rows. Every one was attempted and has its own log under `coordination/sessions/M43-MASTER-V01/logs/<TASK_ID>_CLAUDE_LOG_V01.md`.
-- Counts: **96 READY_FOR_INDEPENDENT_AUDIT · 32 BLOCKED_AWAITING_AUTHORITY · 18 DEFERRED_DEPENDENCY · 0 NOT_REACHED_STOP_RULE**.
+- V01 counts (superseded): **96 READY_FOR_INDEPENDENT_AUDIT · 32 BLOCKED_AWAITING_AUTHORITY · 18 DEFERRED_DEPENDENCY · 0 NOT_REACHED_STOP_RULE**.
+- **Counts after MASTER REMEDIATION V03 (2026-10-06, commit `1cbe37f`): 92 READY_FOR_INDEPENDENT_AUDIT · 33 BLOCKED_AWAITING_AUTHORITY · 21 DEFERRED_DEPENDENCY · 0 NOT_REACHED_STOP_RULE** (146). Four statuses were corrected per `CHATGPT_MASTER_AUDIT_V01.md` §9–12: R10-004 → BLOCKED; 151, 165, 166 → DEFERRED. The six technically remediated rows (155, R12-005, R12-007, 161, 162, 167) remain READY, awaiting the V03 re-audit. See `M43_MASTER_REMEDIATION_CLAUDE_LOG_V03.md`.
 - The master never stopped for a stop rule. The only interruption was the Claude usage limit between the two runs, and the resume preserved and finished the uncommitted Robots WIP without losing anything.
 
 ## Commits
@@ -166,7 +167,7 @@ Per-lane detail is in each child log.
 | SB-M43-R10-001 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R10-001_CLAUDE_LOG_V01.md) | Template shipped and proven; **no event is scheduled** — windows, milestones and reward amounts need an owner decision before launch. |
 | SB-M43-R10-002 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R10-002_CLAUDE_LOG_V01.md) |  |
 | SB-M43-R10-003 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R10-003_CLAUDE_LOG_V01.md) | Enforced: an event without an explicit `unclaimed_on_expiry` policy is invalid and never listed. The policy value itself is the owner's. |
-| SB-M43-R10-004 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R10-004_CLAUDE_LOG_V01.md) | Not offered until an owner-configured reward exists (`first_try_cleanup: null`). |
+| SB-M43-R10-004 | BLOCKED_AWAITING_AUTHORITY | [log](logs/SB-M43-R10-004_CLAUDE_LOG_V01.md) | **V03 correction:** shipping `first_try_cleanup: null`; a fixed / visible reward is not owner-authorized (none invented). The mechanism and tests are kept. |
 | SB-M43-R10-005 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R10-005_CLAUDE_LOG_V01.md) |  |
 | SB-M43-R10-006 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R10-006_CLAUDE_LOG_V01.md) |  |
 | SB-M43-R10-007 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R10-007_CLAUDE_LOG_V01.md) |  |
@@ -186,30 +187,30 @@ Per-lane detail is in each child log.
 | SB-M43-148 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-148_CLAUDE_LOG_V01.md) |  |
 | SB-M43-149 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-149_CLAUDE_LOG_V01.md) |  |
 | SB-M43-150 | BLOCKED_AWAITING_AUTHORITY | [log](logs/SB-M43-150_CLAUDE_LOG_V01.md) | Comeback reuses the approved help pose. **Missing authority:** any new illustration. |
-| SB-M43-151 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-151_CLAUDE_LOG_V01.md) | Timezone = injected local-day authority; disabled permission = global OFF (platform permission itself is SB-M43-146). |
+| SB-M43-151 | DEFERRED_DEPENDENCY | [log](logs/SB-M43-151_CLAUDE_LOG_V01.md) | **V03 correction:** on SB-M43-146 (real disabled-permission testing). Policy tests kept, plus the n05 same-UTC / different-local-hour test. |
 | SB-M43-R12-001 | BLOCKED_AWAITING_AUTHORITY | [log](logs/SB-M43-R12-001_CLAUDE_LOG_V01.md) | Track implemented and proven with a test sequence (c04). **Missing authority:** the capped reward sequence (owner + M56) — shipped config has none, so the track is never offered. |
 | SB-M43-R12-002 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R12-002_CLAUDE_LOG_V01.md) |  |
 | SB-M43-R12-003 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R12-003_CLAUDE_LOG_V01.md) | Reinstall: the window lives in the save (cloud restore carries it, SB-M43-154). |
 | SB-M43-R12-004 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R12-004_CLAUDE_LOG_V01.md) |  |
-| SB-M43-R12-005 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R12-005_CLAUDE_LOG_V01.md) |  |
+| SB-M43-R12-005 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R12-005_CLAUDE_LOG_V01.md) | **V03 remediation:** a clock rollback behind last_sent stays suppressed, including across reload (n04). |
 | SB-M43-R12-006 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R12-006_CLAUDE_LOG_V01.md) |  |
-| SB-M43-R12-007 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R12-007_CLAUDE_LOG_V01.md) |  |
+| SB-M43-R12-007 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-R12-007_CLAUDE_LOG_V01.md) | **V03 remediation:** rollback case added to the matrix (n04) plus timezone (n05). |
 | SB-M43-152 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-152_CLAUDE_LOG_V01.md) |  |
 | SB-M43-153 | BLOCKED_AWAITING_AUTHORITY | [log](logs/SB-M43-153_CLAUDE_LOG_V01.md) | **Missing authority:** owner/platform provider decision. No SDK added. |
 | SB-M43-154 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-154_CLAUDE_LOG_V01.md) |  |
-| SB-M43-155 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-155_CLAUDE_LOG_V01.md) |  |
+| SB-M43-155 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-155_CLAUDE_LOG_V01.md) | **V03 remediation:** whole-copy resolver; canonical equality; same history + different economy = conflict; order / history / ancestry rules (s04–s07). |
 | SB-M43-156 | DEFERRED_DEPENDENCY | [log](logs/SB-M43-156_CLAUDE_LOG_V01.md) | Depends on SB-M43-153 (no provider to sign in to). |
 | SB-M43-157 | BLOCKED_AWAITING_AUTHORITY | [log](logs/SB-M43-157_CLAUDE_LOG_V01.md) | Restore + integrity proven offline from a cloud envelope (s03). **Missing authority:** the device-to-device transport needs the SB-M43-153 provider. |
 | SB-M43-158 | BLOCKED_AWAITING_AUTHORITY | [log](logs/SB-M43-158_CLAUDE_LOG_V01.md) | **Missing authority:** M57 store integration. |
 | SB-M43-159 | DEFERRED_DEPENDENCY | [log](logs/SB-M43-159_CLAUDE_LOG_V01.md) | Depends on SB-M43-153. |
 | SB-M43-160 | BLOCKED_AWAITING_AUTHORITY | [log](logs/SB-M43-160_CLAUDE_LOG_V01.md) | **Missing authority:** M58 privacy requirements; no destructive reset added. |
-| SB-M43-161 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-161_CLAUDE_LOG_V01.md) | Family = reward / unlock moments on the existing completion.wav; success is haptic-only. Final feel: SB-M43-168. |
-| SB-M43-162 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-162_CLAUDE_LOG_V01.md) | Warning moment intentionally silent (failures never buzz, SB-M43-164). |
+| SB-M43-161 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-161_CLAUDE_LOG_V01.md) | **V03 remediation:** complete family: confirm / back / popup open / close / reward / pack reveal / unlock / error (a01, a05, a06). |
+| SB-M43-162 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-162_CLAUDE_LOG_V01.md) | **V03 remediation:** success / warning / pack Rare+ / unlock haptics; canonical ceremony kinds; read-only pack Rare+ hook (a02, a07, a08). |
 | SB-M43-163 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-163_CLAUDE_LOG_V01.md) |  |
 | SB-M43-164 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-164_CLAUDE_LOG_V01.md) |  |
-| SB-M43-165 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-165_CLAUDE_LOG_V01.md) | Shop / ads keep the C003 language; Events unavailable + notifications platform copy added; cloud and Ranks have no UI yet (SB-M43-153 / 131). |
-| SB-M43-166 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-166_CLAUDE_LOG_V01.md) | No-rankings state waits for the RANKS destination (SB-M43-131). |
-| SB-M43-167 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-167_CLAUDE_LOG_V01.md) |  |
+| SB-M43-165 | DEFERRED_DEPENDENCY | [log](logs/SB-M43-165_CLAUDE_LOG_V01.md) | **V03 correction:** on SB-M43-153 / SB-M43-131. Cloud and RANKS retry surfaces don't exist; none were faked. |
+| SB-M43-166 | DEFERRED_DEPENDENCY | [log](logs/SB-M43-166_CLAUDE_LOG_V01.md) | **V03 correction:** on SB-M43-131 / 132. The no-rankings empty state needs RANKS; no ranking data was fabricated. |
+| SB-M43-167 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-167_CLAUDE_LOG_V01.md) | **V03 remediation:** real-UI fatigue loops (a03). |
 | SB-M43-168 | BLOCKED_AWAITING_AUTHORITY | [log](logs/SB-M43-168_CLAUDE_LOG_V01.md) | **Missing authority:** owner listening / feel acceptance. |
 | SB-M43-169 | READY_FOR_INDEPENDENT_AUDIT | [log](logs/SB-M43-169_CLAUDE_LOG_V01.md) | The manifest already existed (owner planning file); this run adds implementation/evidence data only and never changes an owner status. |
 | SB-M43-170 | BLOCKED_AWAITING_AUTHORITY | [log](logs/SB-M43-170_CLAUDE_LOG_V01.md) | Closure gate holds: surfaces still missing (Level Intro, Ranks, Account/Cloud, notification education) and every M43 surface awaits owner visual review. This run does not close M43. |

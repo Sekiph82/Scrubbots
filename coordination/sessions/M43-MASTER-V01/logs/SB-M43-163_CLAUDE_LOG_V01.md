@@ -48,4 +48,8 @@ Rendering tool `tests/tools/meta_snapshot.gd` → `META_EVIDENCE CLEAN (0 reject
 
 None.
 
+## MASTER REMEDIATION V03 note — 2026-10-06
+
+Remediation commit `1cbe37f`. Master / SFX / Haptics / Reduced Effects are still read live per request for every moment of the completed family (a02 extended: all moments, live toggles mid-session). Status unchanged.
+
 READY_FOR_INDEPENDENT_AUDIT — SB-M43-163
