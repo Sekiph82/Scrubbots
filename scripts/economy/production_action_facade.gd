@@ -154,6 +154,20 @@ func unlock_next_robot() -> Dictionary:
 	r["robot_id"] = id
 	return _finish("unlock_robot", r)
 
+## M43-C010 / C010R: event milestone / First-Try claims (EventService, RewardGrantService tx).
+func claim_event_milestone(event_id: String, index: int) -> Dictionary:
+	return _finish("claim_event_milestone", _economy.events.claim_weekly(event_id, index, _economy.reward))
+
+func join_first_try() -> Dictionary:
+	return _finish("join_first_try", _economy.events.join_first_try())
+
+func claim_first_try() -> Dictionary:
+	return _finish("claim_first_try", _economy.events.claim_first_try(_economy.reward))
+
+## M43-C012R: Comeback Catch-Up step claim (only when an owner reward sequence is configured).
+func claim_catchup(step: int) -> Dictionary:
+	return _finish("claim_catchup", _economy.returns.claim_catchup(step, _economy.reward))
+
 ## M43 master (SB-M43-071/106): equip an unlocked robot (persisted selection, spends nothing).
 func equip_robot(robot_id: String) -> Dictionary:
 	return _finish("equip_robot", _economy.robots.set_active(robot_id))

@@ -1,0 +1,9 @@
+{
+  "schema": "scrubbots.events.v1",
+  "version": 1,
+  "source": "TASKS M43-C010 / C010R (owner-approved 2026-09-30): Weekly Cleaning Event and First-Try Cleanup templates. No new event currency; rewards only of the approved existing types.",
+  "status": "NO EVENT SCHEDULED — event windows, milestone targets, milestone rewards, the unclaimed-expiry policy and the First-Try Cleanup reward require an owner decision before any event is listed here.",
+  "approved_reward_types": ["scrub_bucks", "bot_parts", "standard_card_packs", "premium_card_packs", "random_booster_charges", "selected_booster_charges"],
+  "weekly_events": [],
+  "first_try_cleanup": null
+}

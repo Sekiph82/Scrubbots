@@ -61,6 +61,7 @@ const JourneyStrip = preload("res://scripts/ui/components/journey_strip.gd")
 const GiftProgressModel = preload("res://scripts/economy/gift_progress_model.gd")
 const GiftTickOverlay = preload("res://scripts/ui/components/gift_tick_overlay.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 ## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
 const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
 const UiText = preload("res://scripts/ui/ui_text.gd")
@@ -453,6 +454,15 @@ func _build_hud(hud: MarginContainer) -> void:
 	var cardrow := HBoxContainer.new()
 	cardrow.add_theme_constant_override("separation", 8)
 	card.add_child(cardrow)
+	# M43-C010 (SB-M43-124): the profile card opens Profile (invisible hit area over the card).
+	var hit := Button.new()
+	hit.name = "ProfileButton"
+	hit.flat = true
+	hit.focus_mode = Control.FOCUS_NONE
+	for st in ["normal", "hover", "pressed", "focus", "disabled"]:
+		hit.add_theme_stylebox_override(st, StyleBoxEmpty.new())
+	hit.pressed.connect(func(): _shortcut_pressed("profile"))
+	card.add_child(_reg(hit))
 
 	var avatar := Control.new()
 	avatar.name = "ProfileAvatar"
@@ -1070,6 +1080,21 @@ func _build_bottom_nav(nav: PanelContainer) -> void:
 		b.pressed.connect(func(): nav_requested.emit(id))
 		row.add_child(b)
 		_nodes["Nav_" + id] = b
+		# M43-C010 (SB-M43-134): one attention count per tab, from HomeBadges.
+		var nb := Label.new()
+		nb.name = "NavBadge_" + id
+		nb.visible = false
+		nb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+		nb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		nb.add_theme_font_size_override("font_size", 24)
+		nb.add_theme_color_override("font_color", Color(1, 1, 1))
+		nb.add_theme_stylebox_override("normal", HomeStyle.box(Color(0.86, 0.12, 0.12), Color(0.5, 0.05, 0.05), 3, 18, 0))
+		nb.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+		nb.offset_left = -58
+		nb.offset_right = -10
+		nb.offset_top = 6
+		nb.offset_bottom = 42
+		b.add_child(_reg(nb))
 
 # ------------------------------------------------------------ ad slot ----
 
@@ -1117,7 +1142,7 @@ func get_layout_mode() -> int:
 ## (the app root passes "settings") is open, the single HomeActionLayer and the HUD (+)
 ## buttons are hidden (not drawn; no pointer/keyboard input). The ActionHost keeps its
 ## layout slot, so closing restores exactly the previous Home.
-const MODAL_HIDDEN := ["HomeActionLayer", "ScrubBucksPlus", "HeartsPlus", "GiftMeterButton"]
+const MODAL_HIDDEN := ["HomeActionLayer", "ScrubBucksPlus", "HeartsPlus", "GiftMeterButton", "ProfileButton"]
 func set_modal_active(source: String, active: bool) -> void:
 	if active:
 		_external_modals[source] = true
@@ -1214,6 +1239,15 @@ func _render_values() -> void:
 		(_nodes["TrackGlow%d" % step["position"]] as Control).visible = step["current"]
 	# SB-M42-024: Daily badge = 1 when today's login reward is claimable.
 	(_nodes["Shortcut_daily"] as UiShortcutButton).set_badge(0 if _vm["daily_claimed_today"] else 1)
+	# M43-C010 (SB-M43-134): Tasks / Collection shortcuts + ROBOTS / EVENTS tabs.
+	if "orders" in _app.economy and _app.economy.orders != null:
+		var bd := HomeBadges.compute(_app)
+		(_nodes["Shortcut_tasks"] as UiShortcutButton).set_badge(int(bd["tasks"]))
+		(_nodes["Shortcut_collection"] as UiShortcutButton).set_badge(int(bd["collection"]))
+		for nid in ["robots", "events"]:
+			var nl: Label = _nodes["NavBadge_" + nid]
+			nl.text = str(int(bd[nid]))
+			nl.visible = int(bd[nid]) > 0 and not (_nodes["Nav_" + nid] as Button).disabled
 	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
 		(_nodes["Shortcut_" + id[0]] as Button).disabled = not (LIVE_SHORTCUTS.has(id[0]) or _app_shortcuts.has(id[0]))
 	for pid in _popups:
@@ -1226,6 +1260,13 @@ func _render_values() -> void:
 ## M43: shortcuts the app root opens as app-level destinations (set by main.gd). A standalone
 ## Home (tests / tools without the app root) keeps its M42 popups.
 var _app_shortcuts: Array = []
+
+func set_app_nav(ids: Array) -> void:
+	for id in ids:
+		if _nodes.has("Nav_" + id):
+			(_nodes["Nav_" + id] as Button).disabled = false
+			(_nodes["Nav_" + id] as Button).tooltip_text = ""
+	refresh()
 
 func set_app_shortcuts(ids: Array) -> void:
 	_app_shortcuts = ids.duplicate()

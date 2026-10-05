@@ -30,6 +30,10 @@ const PackPity = preload("res://scripts/collection/pack_pity.gd")
 const CardsExchangeService = preload("res://scripts/economy/cards_exchange_service.gd")
 const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
 const DailyOrders = preload("res://scripts/economy/daily_orders.gd")
+const PlayerRecords = preload("res://scripts/economy/player_records.gd")
+const EventService = preload("res://scripts/economy/event_service.gd")
+const ReturnService = preload("res://scripts/economy/return_service.gd")
+const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
 
 const GUARANTEED_NEW_FALLBACK_SB := 500
 
@@ -58,6 +62,11 @@ var exchange: CardsExchangeService
 var rewarded: RewardedGrantService
 ## M43-C009R: which order each of the three daily tasks is today + its play progress.
 var orders: DailyOrders
+## M43-C010R personal bests; C010 events; C012 return windows / Catch-Up; C012 notification policy.
+var records: PlayerRecords
+var events: EventService
+var returns: ReturnService
+var notify: NotificationPolicy
 
 ## local_day: Daily local-calendar ordinal provider (M39 V04, F-M39-V03-002).
 ## Omitted in production -> DailyService uses LocalCalendar.system_provider().
@@ -74,6 +83,10 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	capacity = SlotCapacityAuthority.new()
 	daily = DailyService.new(config, reward, clock, local_day)
 	orders = DailyOrders.new(daily)
+	records = PlayerRecords.new()
+	events = EventService.new(clock)
+	returns = ReturnService.new(clock)
+	notify = NotificationPolicy.new()
 	collection = CollectionInventory.new(config, reward)
 	packs = CardPackService.new(collection, pack_rng)
 	pack_receipts = PackReceiptLedger.new()
@@ -148,6 +161,10 @@ func snapshot() -> Dictionary:
 		"meta_ui": meta_ui.snapshot(),
 		"pack_pity": pack_pity.snapshot(),
 		"daily_orders": orders.snapshot(),
+		"records": records.snapshot(),
+		"events": events.snapshot(),
+		"return": returns.snapshot(),
+		"notifications": notify.snapshot(),
 	}
 
 ## Independently all-or-nothing import (F-M39-005). Captures the exact current
@@ -189,6 +206,10 @@ func _apply_sections(s) -> bool:
 	# M43-C009R: absent = older save (orders generated on demand); present = strict.
 	if not orders.import_snapshot(s["daily_orders"] if s.has("daily_orders") else null):
 		return false
+	# M43-C010 / C012: absent = older save (fresh); present = strict.
+	for pair in [["records", records], ["events", events], ["return", returns], ["notifications", notify]]:
+		if not pair[1].import_snapshot(s[pair[0]] if s.has(pair[0]) else null):
+			return false
 	# M43-C005-C008: key ABSENT = pre-C008 save (keep the live OS-seeded RNG / empty ledger).
 	# Key PRESENT = strict C008 schema; an empty or partial section fails closed.
 	if s.has("packs") and not packs.import_snapshot(s["packs"]):

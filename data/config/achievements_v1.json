@@ -1,0 +1,16 @@
+{
+  "schema": "scrubbots.achievements.v1",
+  "version": 1,
+  "source": "TASKS SB-M43-126 framework seed. Starter definitions only (broad achievement content waits for the SB-M43-127 visual master). Metrics are monotonic lifetime / personal-best values; completion is derived, never granted.",
+  "reward_policy": "NONE — achievements grant nothing until an owner decision defines a cosmetic/reward policy (SB-M43-126).",
+  "achievements": [
+    {"id": "clean_start", "metric": "levels_completed", "target": 1},
+    {"id": "tidy_ten", "metric": "levels_completed", "target": 10},
+    {"id": "spotless_fifty", "metric": "levels_completed", "target": 50},
+    {"id": "first_set", "metric": "sets_completed", "target": 1},
+    {"id": "robot_crew", "metric": "robots_unlocked", "target": 3},
+    {"id": "hot_streak", "metric": "best_win_streak", "target": 5},
+    {"id": "bare_hands", "metric": "boosterless_wins", "target": 10},
+    {"id": "first_try_five", "metric": "best_first_try_run", "target": 5}
+  ]
+}
