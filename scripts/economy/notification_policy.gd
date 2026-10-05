@@ -8,7 +8,8 @@ extends RefCounted
 ##   - opt-in: global OFF by default; per-category toggles (hearts, daily, event_ending, gift);
 ##   - quiet hours on the player's local clock (default 22:00-08:00);
 ##   - priority + dedup: simultaneous candidates collapse into ONE message (highest priority);
-##   - cap: at most one proactive push per rolling 24 h (sent log persisted);
+##   - cap: at most one proactive push per rolling 24 h (last-sent high-water persisted; a clock
+##     rolled back behind it stays suppressed until it catches up past the cap window);
 ##   - stale suppression: every candidate is re-derived from current state, so consumed /
 ##     already-claimed prompts are never produced; copy is factual (no false expiry claims);
 ##   - deep links only to known destinations; anything else falls back to "home".
@@ -58,7 +59,7 @@ func decide(app, now_ts: int, local_hour: int) -> Dictionary:
 		return {}
 	if in_quiet_hours(local_hour, quiet_from, quiet_to):
 		return {}
-	if _last_sent > 0 and now_ts - _last_sent < CAP_S and now_ts >= _last_sent:
+	if capped(now_ts):
 		return {}
 	var best := {}
 	for c in candidates(app):
@@ -69,6 +70,12 @@ func decide(app, now_ts: int, local_hour: int) -> Dictionary:
 	if not best.is_empty():
 		best["link"] = deep_link(String(best["link"]))
 	return best
+
+## 24 h cap against the persisted last-sent HIGH-WATER point. A clock behind it (rollback /
+## manual time change) gives a negative delta, so it stays suppressed and never resets or forgives
+## the cap: eligibility resumes only at last_sent + CAP_S (master remediation V03, R12-005).
+func capped(now_ts: int) -> bool:
+	return _last_sent > 0 and now_ts - _last_sent < CAP_S
 
 func mark_sent(now_ts: int) -> void:
 	_last_sent = maxi(_last_sent, now_ts)

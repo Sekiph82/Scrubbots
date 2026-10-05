@@ -16,6 +16,9 @@ const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 
 signal action_committed(action: String, result: Dictionary)
+## M43 master remediation V03 (SB-M43-161/162): a refused action (nothing committed). Presentation
+## observers only (MetaFeedback error / warning); never a retry or economy path.
+signal action_refused(action: String, result: Dictionary)
 
 var _economy
 var _host            # ProductionGameplayHost or null (menus: economy-only actions)
@@ -38,6 +41,8 @@ func _finish(action: String, r) -> Dictionary:
 		if _save_cb.is_valid():
 			out["save"] = _save_cb.call()
 		action_committed.emit(action, out)
+	else:
+		action_refused.emit(action, out)
 	return out
 
 func _no_host(action: String) -> Dictionary:
