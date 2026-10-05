@@ -239,6 +239,11 @@ ACTIVE",
 	"CEREMONY_ROBOT_PARTS_LEFT": "Bot Parts left: %s",
 	"CEREMONY_ROBOT_EQUIP": "EQUIP %s",
 	"CEREMONY_ROBOT_KEEP": "KEEP CURRENT",
+	"CEREMONY_GIFT_TITLE": "GIFT METER %s!",
+	"CEREMONY_GIFT_MILESTONE": "Milestone %s / %s",
+	"CEREMONY_GIFT_FALLBACK": "If every card is already owned, the NEW card becomes %s Scrub Bucks.",
+	"CEREMONY_GIFT_CLAIM_IN_BAR": "Ready to claim in the Gift Bar.",
+	"CEREMONY_GIFT_CLAIMED": "Already claimed from the Gift Bar.",
 }
 
 ## Keyed text for `prefix + reason`, falling back to `prefix + FAILED` for an unknown code.

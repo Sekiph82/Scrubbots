@@ -23,6 +23,8 @@ const ART := {
 	"master_complete": "res://assets/ui/final/collection/master_collection_emblem.png",
 	"reward_glow": "res://assets/ui/final/popups/victory/reward_glow.png",
 	"robot_burst": "res://assets/ui/final/robots/robot_unlocked_burst.png",
+	"gift_small": "res://assets/ui/final/rewards/gift_box.png",
+	"gift_big": "res://assets/ui/final/home/gift_meter/gift_meter_reward_crate.png",
 	"sb": "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
 	"bot_parts": "res://assets/ui/final/robots/bot_parts_icon.png",
 	"pack_standard": "res://assets/ui/final/rewards/card_pack_standard.png",
@@ -54,6 +56,8 @@ static func build(event: Dictionary, reduced: bool = false):
 			return master_complete(event, reduced)
 		"robot_unlock":
 			return robot_unlock(event, reduced)
+		"gift_milestone":
+			return gift_milestone(event, reduced)
 	return null
 
 static func card_art(card_id: String) -> String:
@@ -232,4 +236,26 @@ static func robot_unlock(event: Dictionary, reduced: bool):
 	parts.add_child(pl)
 	p.add_action("equip", UiText.t("CEREMONY_ROBOT_EQUIP", [name]), "primary", true)
 	p.add_action("keep", UiText.t("CEREMONY_ROBOT_KEEP"), "secondary", true)
+	return p
+
+# ---------------------------------------------------------- Gift Meter milestone ----
+
+## SB-M43-074: a Gift Meter milestone (10 / 50 / 250 / 500 / 1000) reached. The rewards are
+## the exact config bundle QUEUED for this occurrence; they are claimed in the Gift Bar
+## (GiftMeterService.claim), never here, and the copy says so. A guaranteed-new-card fallback
+## is shown as its condition, never as an extra reward.
+static func gift_milestone(event: Dictionary, reduced: bool) -> BasePopup:
+	var m := int(event.get("milestone", 0))
+	var big := m == int(event.get("cycle_max", -1))
+	var p := _popup("gift_%d" % m, "reward", UiText.t("CEREMONY_GIFT_TITLE", [UiText.num(m)]), event)
+	_hero(p, ART["gift_big" if big else "gift_small"], Vector2(300, 300) if big else Vector2(220, 220), reduced)
+	p.add_body_line(UiText.t("CEREMONY_GIFT_MILESTONE", [UiText.num(m), UiText.num(int(event.get("cycle_max", 0)))]), "Milestone", BasePopup.ROYAL_EDGE, 34)
+	var rewards: Dictionary = (event.get("rewards", {}) as Dictionary).duplicate()
+	var fallback := int(rewards.get("guaranteed_new_fallback_sb", 0))
+	rewards.erase("guaranteed_new_fallback_sb")
+	_reward_rows(p, rewards, 76)
+	if fallback > 0:
+		p.add_body_line(UiText.t("CEREMONY_GIFT_FALLBACK", [UiText.num(fallback)]), "FallbackNote", BasePopup.INK, 22)
+	p.add_body_line(UiText.t("CEREMONY_GIFT_CLAIMED" if bool(event.get("claimed", false)) else "CEREMONY_GIFT_CLAIM_IN_BAR"), "ClaimNote", BasePopup.INK, 24)
+	p.add_action("continue", UiText.t("CEREMONY_CONTINUE"), "primary", true)
 	return p
