@@ -27,6 +27,7 @@ var EXPECTED_CASES := [
 	"e01_meta_ui_strict", "e02_legacy_baseline", "e03_set_ceremony_truth", "e04_ack_once_reload",
 	"e05_clear_not_acked", "e06_back_consumed", "e07_two_sets_order", "e08_reduced_same_truth",
 	"e09_home_integration", "e10_no_authority_static",
+	"e11_master_truth", "e12_master_once_order", "e13_master_legacy", "e14_master_reduced",
 ]
 
 var _fail := 0
@@ -47,6 +48,10 @@ func _initialize() -> void:
 	await _e06_back_consumed()
 	await _e07_two_sets_order()
 	await _e08_reduced_same_truth()
+	await _e11_master_truth()
+	await _e12_master_once_order()
+	_e13_master_legacy()
+	_e14_master_reduced()
 	_unmount()
 	await _e09_home_integration()
 	_e10_no_authority_static()
@@ -228,6 +233,74 @@ func _e10_no_authority_static() -> void:
 	_ok(hits.is_empty(), "no grant / claim / spend / pack-open identifiers %s" % str(hits))
 	_ok(_code_only("\tapp.economy.reward.grant(x)\n").contains("grant"), "sensitivity: an injected grant is visible to the scan")
 	_complete("e10_no_authority_static")
+
+# ------------------------------------------------------------------ SB-M43-069 ----
+
+func _e11_master_truth() -> void:
+	print("[e11 Master Collection ceremony = exact one-time +2500 SB +20 Bot Parts]")
+	var app = _app("e11")
+	for n in range(1, 15):
+		_complete_set(app, n)
+	var sb0: int = app.economy.wallet.scrub_bucks()
+	var bp0: int = app.economy.wallet.bot_parts()
+	_complete_set(app, 15)
+	var cfg: Dictionary = app.economy.config.collection_config()["all_sets_complete"]
+	var s15 := _set_row(app, 15)
+	var master_ev: Array = CeremonyEvents.pending(app.economy, app.economy.meta_ui).filter(func(e): return e["kind"] == "master_complete")
+	_ok(master_ev.size() == 1 and int(cfg["scrub_bucks"]) == 2500 and int(cfg["bot_parts"]) == 20, "one pending Master event; config = +2500 SB +20 Bot Parts")
+	_ok(app.economy.wallet.scrub_bucks() - sb0 == int(s15["scrub_bucks"]) + 2500 and app.economy.wallet.bot_parts() - bp0 == int(s15["bot_parts"]) + 20, "real grant: last set reward + Master reward, once")
+	var p = MetaCeremonies.build(master_ev[0], false)
+	_stack.push(p)
+	await _frames(2)
+	_ok(p.get_title() == UiText.t("CEREMONY_MASTER_TITLE") and _label(p, "MasterProgress") == "All 15 sets complete" and _label(p, "OneTime") == UiText.t("CEREMONY_MASTER_ONCE"), "title / All 15 sets / one-time label")
+	_ok(_reward_rows(p) == {"scrub_bucks": 2500, "bot_parts": 20}, "reward rows exactly +2500 SB +20 Bot Parts %s" % str(_reward_rows(p)))
+	_close_cta(p)
+	await _frames(2)
+	_complete("e11_master_truth")
+
+func _e12_master_once_order() -> void:
+	print("[e12 15 sets then Master, each once; reload replays none]")
+	var app = _app("e12")
+	for n in range(1, 16):
+		_complete_set(app, n)
+	var pr = _presenter(app)
+	var shown: Array = []
+	pr.ceremony_shown.connect(func(k, _kind): shown.append(k))
+	pr.drain("test")
+	for _i in range(20):
+		await _frames(1)
+		if pr.current() != null:
+			_close_cta(pr.current())
+	await _frames(2)
+	var want: Array = range(1, 16).map(func(n): return "set:%d" % n) + ["master"]
+	_ok(shown == want, "16 ceremonies in order, Master last")
+	_ok(app.economy.reward.snapshot()["applied"].count("collection_master") == 1, "Master grant applied exactly once (presenting never re-grants)")
+	var re = AppState.new(app.save._path)
+	_ok(CeremonyEvents.pending(re.economy, re.economy.meta_ui).is_empty(), "reload: nothing pending")
+	_complete("e12_master_once_order")
+
+func _e13_master_legacy() -> void:
+	print("[e13 legacy save with Master already claimed: no replay]")
+	var app = _app("e13")
+	for n in range(1, 16):
+		_complete_set(app, n)
+	app.request_save()
+	var cand = JSON.parse_string(FileAccess.get_file_as_string(app.save._path))
+	cand["economy"].erase("meta_ui")
+	_write(app.save._path, cand)
+	var old = AppState.new(app.save._path)
+	_ok(old.load_result["source"] == "primary" and old.economy.meta_ui.is_seen("master") and CeremonyEvents.pending(old.economy, old.economy.meta_ui).is_empty(), "Master + 15 sets baselined as seen")
+	_complete("e13_master_legacy")
+
+func _e14_master_reduced() -> void:
+	print("[e14 Master Reduced: same truth, no motion]")
+	var ev := {"key": "master", "kind": "master_complete", "sets": 15, "rewards": {"scrub_bucks": 2500, "bot_parts": 20}}
+	var full = MetaCeremonies.build(ev, false)
+	var red = MetaCeremonies.build(ev, true)
+	_ok(_texts(full) == _texts(red) and not red.find_child("HeroGlow", true, false).has_meta("spin"), "identical labels; no glow turn in Reduced")
+	full.free()
+	red.free()
+	_complete("e14_master_reduced")
 
 # ------------------------------------------------------------------ helpers ----
 
