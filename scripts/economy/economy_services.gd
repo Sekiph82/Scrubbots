@@ -188,5 +188,10 @@ func _apply_sections(s) -> bool:
 		if not meta_ui.import_snapshot(s["meta_ui"]):
 			return false
 	else:
-		meta_ui.baseline(CeremonyEvents.keys(self))
+		# Owned cards also count as already viewed (no Collection NEW flood on an old save).
+		var keys: Array = CeremonyEvents.keys(self)
+		for cid in collection.all_card_ids():
+			if collection.owned(cid) > 0:
+				keys.append("card:" + String(cid))
+		meta_ui.baseline(keys)
 	return true

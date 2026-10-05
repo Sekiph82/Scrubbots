@@ -28,6 +28,7 @@ const ShopHandoff = preload("res://scripts/app/shop_handoff.gd")
 const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
 const CeremonyPresenter = preload("res://scripts/ui/ceremony/ceremony_presenter.gd")
 const FeedbackAdapter = preload("res://scripts/ui/feel/feedback_adapter.gd")
+const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -246,6 +247,8 @@ func _on_home_shortcut(id: String) -> void:
 	match id:
 		"shop":
 			_acq.open_shop({"source": "home_shop"})
+		"collection":
+			CollectionScreen.open_album(_modals, app_state)
 
 ## M43 master: on HOME, with no other popup open, present pending meta ceremonies (deferred so
 ## it never pushes from inside a route / modal signal handler).
