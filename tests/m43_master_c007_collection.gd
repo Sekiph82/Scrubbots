@@ -16,6 +16,7 @@ var EXPECTED_CASES := [
 	"k01_home_opens_album", "k02_album_truth", "k03_set_detail_states", "k04_card_detail_exchange_one",
 	"k05_exchange_all_extras", "k06_cancel_changes_nothing", "k07_rapid_taps_single_exchange", "k08_values_table",
 	"k09_no_art_leak_unowned", "k10_135_card_performance_touch", "k11_legacy_no_new_flood", "k12_exchange_inside_collection",
+	"k13_pity_copy_only_when_due",
 ]
 
 var _fail := 0
@@ -38,6 +39,7 @@ func _initialize() -> void:
 	await _k10()
 	_k11()
 	_k12()
+	await _k13()
 	_shutdown()
 	_cleanup()
 	_done()
@@ -261,6 +263,22 @@ func _k12() -> void:
 	var src := FileAccess.get_file_as_string("res://scripts/ui/collection/collection_screen.gd")
 	_ok(not ids.has("cards_exchange") and src.contains("static func open_exchange") and not src.contains("remove_copies(") and not src.contains("wallet."), "no Home exchange shortcut; exchange opened from the album; UI never edits counts/balances")
 	_complete("k12_exchange_inside_collection")
+
+func _k13() -> void:
+	print("[k13 NEW CARD GUARANTEED NEXT PACK only when a configured guarantee is due]")
+	await _boot("k13")
+	var e = _eco()
+	var p = CollectionScreen.open_album(_root.get_modal_stack(), _root.get_app_state())
+	await _frames(1)
+	var off: bool = not _txt("Summary").contains(UiText.t("COLLECTION_PITY_NEXT"))
+	p.close("test")
+	await _frames(1)
+	e.pack_pity.threshold_override = 1   # test seam only
+	e.pack_pity.on_opened(false)
+	p = CollectionScreen.open_album(_root.get_modal_stack(), _root.get_app_state())
+	await _frames(1)
+	_ok(off and _txt("Summary").contains(UiText.t("COLLECTION_PITY_NEXT")), "absent with the shipped (no) threshold; stated when due")
+	_complete("k13_pity_copy_only_when_due")
 
 # ------------------------------------------------------------------ helpers ----
 

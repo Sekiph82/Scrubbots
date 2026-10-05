@@ -295,6 +295,7 @@ ACTIVE",
 	"COLLECTION_CONFIRM_ALL": "Exchange every extra copy for %s SB? Every first copy stays.",
 	"COLLECTION_CONFIRM_YES": "EXCHANGE",
 	"COLLECTION_EXCHANGED": "+%s SB from the exchange.",
+	"COLLECTION_PITY_NEXT": "NEW CARD GUARANTEED NEXT PACK",
 }
 
 ## Keyed text for `prefix + reason`, falling back to `prefix + FAILED` for an unknown code.

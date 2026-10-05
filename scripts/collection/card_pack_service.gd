@@ -28,6 +28,8 @@ var _inventory: CollectionInventory
 var _rng: RandomNumberGenerator
 var _card_ids: Array
 var _rare_or_better: Array
+## M43-C007R: optional earned-pack pity counter (PackPity), wired by EconomyServices.
+var pity = null
 
 func _init(inventory: CollectionInventory, rng: RandomNumberGenerator = null) -> void:
 	_inventory = inventory
@@ -51,23 +53,39 @@ func _draw_rare_or_better() -> String:
 func open_standard() -> Array:
 	var drawn: Array = []
 	for _i in range(STANDARD_DRAWS):
-		var cid := _draw_any()
-		drawn.append(cid)
-		_inventory.add_card(cid)
-	return drawn
+		drawn.append(_draw_any())
+	return _apply_earned(drawn, 0)
 
 ## Open a premium pack: 5 eligible draws with >=1 Rare-or-better guaranteed.
 func open_premium() -> Array:
-	var drawn: Array = []
 	# Guarantee slot first.
-	var guaranteed := _draw_rare_or_better()
-	drawn.append(guaranteed)
-	_inventory.add_card(guaranteed)
+	var drawn: Array = [_draw_rare_or_better()]
 	for _i in range(PREMIUM_DRAWS - 1):
-		var cid := _draw_any()
-		drawn.append(cid)
+		drawn.append(_draw_any())
+	return _apply_earned(drawn, 1)
+
+## M43-C007R: apply an EARNED pack's draws in order (same order and RNG use as before). When a
+## pity guarantee is due and the draws contain no missing card, the LAST draw at index >=
+## `keep_from` is replaced by the first missing eligible card (never card 0 of a Premium pack,
+## which stays the Rare-or-better draw); with no missing card nothing is fabricated. The pity
+## counter then records whether the pack produced a NEW card.
+func _apply_earned(drawn: Array, keep_from: int) -> Array:
+	if pity != null and pity.guarantee_due() and not _has_new(drawn):
+		var missing := _inventory.first_missing_eligible_card()
+		if not missing.is_empty() and drawn.size() > keep_from:
+			drawn[drawn.size() - 1] = missing
+	var had_new := _has_new(drawn)
+	for cid in drawn:
 		_inventory.add_card(cid)
+	if pity != null:
+		pity.on_opened(had_new)
 	return drawn
+
+func _has_new(drawn: Array) -> bool:
+	for cid in drawn:
+		if _inventory.owned(cid) == 0:
+			return true
+	return false
 
 ## Grant a single guaranteed-new eligible card (used by Gift Meter 1000
 ## milestone). Returns the card id granted, or "" if none was eligible (caller

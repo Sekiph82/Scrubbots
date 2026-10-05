@@ -26,6 +26,7 @@ const CardPackService = preload("res://scripts/collection/card_pack_service.gd")
 const PackReceiptLedger = preload("res://scripts/collection/pack_receipt_ledger.gd")
 const MetaUiState = preload("res://scripts/economy/meta_ui_state.gd")
 const CeremonyEvents = preload("res://scripts/economy/ceremony_events.gd")
+const PackPity = preload("res://scripts/collection/pack_pity.gd")
 const CardsExchangeService = preload("res://scripts/economy/cards_exchange_service.gd")
 const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
 
@@ -49,6 +50,8 @@ var packs: CardPackService
 var pack_receipts: PackReceiptLedger
 ## M43 master: durable ceremony acknowledgements (presentation state, never a grant authority).
 var meta_ui: MetaUiState
+## M43-C007R: earned-pack pity counter (CardPackService reports every earned opening).
+var pack_pity: PackPity
 var exchange: CardsExchangeService
 ## M43-C003 rewarded-video grants (provider-neutral; production provider = unavailable).
 var rewarded: RewardedGrantService
@@ -71,6 +74,8 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	packs = CardPackService.new(collection, pack_rng)
 	pack_receipts = PackReceiptLedger.new()
 	meta_ui = MetaUiState.new()
+	pack_pity = PackPity.new(config)
+	packs.pity = pack_pity
 	exchange = CardsExchangeService.new(collection, reward, config)
 	streak = WinStreakService.new(reward, gift)
 	rewarded = RewardedGrantService.new(reward, hearts)
@@ -137,6 +142,7 @@ func snapshot() -> Dictionary:
 		"packs": packs.snapshot(),
 		"pack_receipts": pack_receipts.snapshot(),
 		"meta_ui": meta_ui.snapshot(),
+		"pack_pity": pack_pity.snapshot(),
 	}
 
 ## Independently all-or-nothing import (F-M39-005). Captures the exact current
@@ -184,6 +190,12 @@ func _apply_sections(s) -> bool:
 		return false
 	# M43 master: absent = a save from before ceremonies existed -> every event it already
 	# committed counts as seen (no backlog replay); present = strict.
+	# M43-C007R: absent = older save (counter 0); present = strict.
+	if s.has("pack_pity"):
+		if not pack_pity.import_snapshot(s["pack_pity"]):
+			return false
+	elif not pack_pity.import_snapshot(PackPity.new().snapshot()):
+		return false
 	if s.has("meta_ui"):
 		if not meta_ui.import_snapshot(s["meta_ui"]):
 			return false
