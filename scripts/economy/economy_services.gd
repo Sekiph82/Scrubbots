@@ -205,5 +205,7 @@ func _apply_sections(s) -> bool:
 		for cid in collection.all_card_ids():
 			if collection.owned(cid) > 0:
 				keys.append("card:" + String(cid))
+		for rid in robots.snapshot().get("unlocked", []):
+			keys.append("robot_seen:" + String(rid))
 		meta_ui.baseline(keys)
 	return true

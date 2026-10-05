@@ -82,7 +82,9 @@ func _home_shell_tree() -> void:
 			full_textures += 1
 	_ok(full_textures == 0, "no interactive bitmap (no input-receiving TextureRect)")
 	_ok(home.get_region("Nav_settings").name == "SettingsButton" and not home.get_region("Nav_settings").disabled, "bottom-nav SETTINGS live")
-	_ok(home.get_region("Nav_events").disabled and home.get_region("Nav_robots").disabled and home.get_region("Nav_leaderboard").disabled, "later-milestone tabs disabled, not faked")
+	# M43-C008 (SB-M43-102) made ROBOTS a real destination (asserted live in m43_master_c008_robots);
+	# tabs still owned by later work stay disabled, not faked.
+	_ok(home.get_region("Nav_events").disabled and not home.get_region("Nav_robots").disabled and home.get_region("Nav_leaderboard").disabled, "later-milestone tabs disabled, not faked; ROBOTS live")
 	sub.free()
 	_complete("home_shell_tree")
 

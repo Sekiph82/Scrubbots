@@ -60,6 +60,7 @@ const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
 const JourneyStrip = preload("res://scripts/ui/components/journey_strip.gd")
 const GiftProgressModel = preload("res://scripts/economy/gift_progress_model.gd")
 const GiftTickOverlay = preload("res://scripts/ui/components/gift_tick_overlay.gd")
+const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 ## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
 const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
 const UiText = preload("res://scripts/ui/ui_text.gd")
@@ -184,6 +185,7 @@ func set_art_binder(binder) -> void:
 		var tex: Texture2D = _art.texture(String(e["slug"]))
 		for n in e["nodes"]:
 			HomePresentationMap.apply(_nodes[n], String(e["slot"]), tex)
+	_nodes["ProfilePortrait"].remove_meta("binder_tex")   # M43-C008: re-captured by _render_values
 	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
 		var b: UiShortcutButton = _nodes["Shortcut_" + id[0]]
 		b.set_icon_box(b.get_icon_box())
@@ -1050,6 +1052,8 @@ func _build_bottom_nav(nav: PanelContainer) -> void:
 				b.toggle_mode = true
 				b.button_pressed = true
 				b.disabled = true   # already here
+			"robots":
+				pass   # M43-C008: real ROBOTS destination (app root opens it on nav_requested)
 			_:
 				b.disabled = true
 				b.tooltip_text = UiText.t("HOME_COMING_LATER")
@@ -1153,6 +1157,17 @@ func _render_values() -> void:
 	if not _vm.get("ok", false):
 		return
 	(_nodes["ProfileName"] as Label).text = UiText.t("HOME_PLAYER_NAME_DEFAULT")
+	# M43-C008 (SB-M43-108): the active robot's name + approved portrait (Scrubby keeps the
+	# owner-approved Home binding; another robot uses its own portrait, Scrubby on missing art).
+	var active: String = _app.economy.robots.active_robot() if "economy" in _app and _app.economy != null else ""
+	var pr := _nodes["ProfilePortrait"] as TextureRect
+	if not pr.has_meta("binder_tex"):
+		pr.set_meta("binder_tex", pr.texture)
+	if not active.is_empty() and active != String(RobotRoster.load_roster()["initial_robot_id"]):
+		(_nodes["ProfileName"] as Label).text = String(RobotRoster.entry(active).get("name", UiText.t("HOME_PLAYER_NAME_DEFAULT")))
+		pr.texture = load(RobotRoster.asset(active, "portrait"))
+	else:
+		pr.texture = pr.get_meta("binder_tex")
 	(_nodes["ProfileLevel"] as Label).text = UiText.num(_vm["level"])
 	# Bot Parts toward the next 250-part robot (canonical wallet / RobotUnlockService),
 	# never XP — only the live ratio, centred in the bar; gold bar when unlockable.

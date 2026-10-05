@@ -857,6 +857,7 @@ func _refresh_hud() -> void:
 		var p: Dictionary = _economy.robots.next_robot_progress()
 		prof["bot_parts"] = int(p.get("parts", 0))
 		prof["bot_parts_cost"] = int(p.get("cost", 0))
+		prof["robot_id"] = _economy.robots.active_robot()   # M43-C008: HUD portrait/name only
 		var rem: int = _economy.speed.timed_seconds_remaining()
 		var ent := "timed" if rem > 0 else ("level" if _economy.speed.is_manual_2x_entitled(progression_level) else "none")
 		_screen.set_speed_presentation(ent, rem)
