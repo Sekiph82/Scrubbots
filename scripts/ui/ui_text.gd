@@ -244,6 +244,9 @@ ACTIVE",
 	"CEREMONY_GIFT_FALLBACK": "If every card is already owned, the NEW card becomes %s Scrub Bucks.",
 	"CEREMONY_GIFT_CLAIM_IN_BAR": "Ready to claim in the Gift Bar.",
 	"CEREMONY_GIFT_CLAIMED": "Already claimed from the Gift Bar.",
+	"CEREMONY_FEATURE_TITLE": "NEW FEATURE!",
+	"CEREMONY_FEATURE_GOT_IT": "GOT IT",
+	"CEREMONY_WORLD_BODY": "New cleaning area ready.",
 }
 
 ## Keyed text for `prefix + reason`, falling back to `prefix + FAILED` for an unknown code.

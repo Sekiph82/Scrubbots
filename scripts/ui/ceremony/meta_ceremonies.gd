@@ -58,6 +58,10 @@ static func build(event: Dictionary, reduced: bool = false):
 			return robot_unlock(event, reduced)
 		"gift_milestone":
 			return gift_milestone(event, reduced)
+		"feature_unlock":
+			return feature_unlock(event, reduced)
+		"world_unlock":
+			return world_unlock(event, reduced)
 	return null
 
 static func card_art(card_id: String) -> String:
@@ -259,3 +263,67 @@ static func gift_milestone(event: Dictionary, reduced: bool) -> BasePopup:
 	p.add_body_line(UiText.t("CEREMONY_GIFT_CLAIMED" if bool(event.get("claimed", false)) else "CEREMONY_GIFT_CLAIM_IN_BAR"), "ClaimNote", BasePopup.INK, 24)
 	p.add_action("continue", UiText.t("CEREMONY_CONTINUE"), "primary", true)
 	return p
+
+# ------------------------------------------------------------ feature / world ----
+
+## SB-M43-072 (prerequisite only): the owner-accepted generic Feature Unlock master for ONE
+## feature event {feature_id, name, body, icon}. No feature-pacing authority exists yet (M44
+## owns unlock order/levels), so nothing in the shipping app emits this event; the builder
+## refuses an event without name / icon rather than inventing one. Never grants.
+static func feature_unlock(event: Dictionary, reduced: bool):
+	var icon := String(event.get("icon", ""))
+	if String(event.get("name", "")).is_empty() or icon.is_empty() or not ResourceLoader.exists(icon):
+		return null
+	var p := _popup("feature_unlock", "medium", UiText.t("CEREMONY_FEATURE_TITLE"), event)
+	var hero := _hero(p, icon, Vector2(240, 220), reduced)
+	var badge := _new_chip()
+	hero.add_child(badge)
+	badge.size_flags_horizontal = Control.SIZE_SHRINK_END
+	p.add_body_line(String(event["name"]), "FeatureName", BasePopup.ROYAL_EDGE, 44)
+	if not String(event.get("body", "")).is_empty():
+		p.add_body_line(String(event["body"]), "FeatureBody", BasePopup.INK, 28)
+	p.add_action("got_it", UiText.t("CEREMONY_FEATURE_GOT_IT"), "primary", true)
+	return p
+
+## SB-M43-073 (prerequisite only): the owner-accepted World Transition shell for ONE world
+## registry entry {world_id, title, subtitle, art}. World ranges / unlock conditions are not
+## owner-defined, so no world event exists; the builder refuses an entry without real title /
+## art (never a fabricated world). Never grants, never changes progression or difficulty.
+static func world_unlock(event: Dictionary, reduced: bool):
+	var art := String(event.get("art", ""))
+	if String(event.get("title", "")).is_empty() or art.is_empty() or not ResourceLoader.exists(art):
+		return null
+	var p := _popup("world_unlock", "large", String(event["title"]), event)
+	var slot := PanelContainer.new()
+	slot.name = "WorldArtSlot"
+	slot.custom_minimum_size = Vector2(0, 520)
+	slot.clip_contents = true
+	slot.add_theme_stylebox_override("panel", HomeStyle.box(Color(0.125, 0.145, 0.2), BasePopup.ROYAL_EDGE, 5, 22, 0))
+	p.get_content().add_child(slot)
+	var a := TextureRect.new()
+	a.name = "WorldArt"
+	a.texture = load(art)
+	a.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	a.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	a.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	slot.add_child(a)
+	if not String(event.get("subtitle", "")).is_empty():
+		p.add_body_line(String(event["subtitle"]), "WorldSubtitle", BasePopup.ROYAL_EDGE, 34)
+	p.add_body_line(UiText.t("CEREMONY_WORLD_BODY"), "WorldBody", BasePopup.INK, 28)
+	p.add_action("continue", UiText.t("CEREMONY_CONTINUE"), "primary", true)
+	return p
+
+static func _new_chip() -> PanelContainer:
+	var c := PanelContainer.new()
+	c.name = "NewBadge"
+	var bg := Color(0.20, 0.66, 0.14)
+	c.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(bg, bg.darkened(0.35), 3, 18, 0), 12, 2))
+	var l := Label.new()
+	l.name = "Text"
+	l.text = UiText.t("PACK_CARD_NEW")
+	l.add_theme_font_size_override("font_size", 26)
+	l.add_theme_color_override("font_color", Color(1, 1, 1))
+	l.add_theme_constant_override("outline_size", 6)
+	l.add_theme_color_override("font_outline_color", bg.darkened(0.5))
+	c.add_child(l)
+	return c
