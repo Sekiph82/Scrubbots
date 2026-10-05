@@ -55,3 +55,9 @@ Rendering tool `tests/tools/robots_snapshot.gd` → `ROBOTS_EVIDENCE CLEAN (0 re
 None.
 
 READY_FOR_INDEPENDENT_AUDIT — SB-M43-109
+
+## Follow-up note (final runnable-state regression)
+
+`r07` failed once in the final run: the equip-only snapshot diff also listed `hearts` and `speed`. Those sections keep wall-clock high-water marks, and the suite ran on the real system clock, so a second boundary fell between the two snapshots. That is test flakiness, not a product mutation: equip still touches only the robots service.
+
+The suite now pins the boot wall clock (`MainScript.boot_clock_override`, reset in cleanup); the assertion itself is unchanged. Re-run twice: **PASS 10/10** both times.
