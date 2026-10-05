@@ -488,7 +488,7 @@ func _p19_card_truth() -> void:
 	for m in [Fx.mixed("p19a"), Fx.repeat("p19b"), Fx.all_new("p19c")]:
 		var p = await _to_await(m)
 		var got: Array = p.get_card_views().map(func(cv): return [_text(cv, "Name"), _text(cv, "Rarity"), _text(cv, "State"), _text(cv, "Copies"), (cv.find_child("CardArt", true, false) as TextureRect).texture.resource_path])
-		var want: Array = m["cards"].map(func(c): return [c["name"], UiText.t("RARITY_" + c["rarity"]), UiText.t("PACK_CARD_NEW" if c["is_new"] else "PACK_CARD_DUPLICATE"), UiText.t("PACK_CARD_OWNED", [c["copies_after"]]), c["art"]])
+		var want: Array = m["cards"].map(func(c): return [c["name"], UiText.t("RARITY_" + c["rarity"]), UiText.t("PACK_CARD_NEW" if c["is_new"] else "PACK_CARD_DUPLICATE"), (UiText.t("PACK_CARD_FIRST_COPY") if c["is_new"] else UiText.t("PACK_CARD_EXTRAS", [int(c["copies_after"]) - 1])), c["art"]])
 		_ok(got == want and got[0][1] in RARE_PLUS, "%s: name / rarity / NEW-DUPLICATE / count / canonical art per card; card 0 %s" % [m["presentation_id"], got[0][1]])
 		_ok(p.get_card_views().all(func(cv): return cv.find_children("*", "TextureRect", true, false).size() == 1), "%s: no second frame over the card art" % m["presentation_id"])
 		_close(p)

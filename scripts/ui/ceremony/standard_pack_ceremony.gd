@@ -22,6 +22,14 @@ extends "res://scripts/ui/popup/base_popup.gd"
 ## Sequencing: one RevealSequencer, two one-shot keys "<id>:open" and "<id>:route"; extra or
 ## early taps are ignored. Reduced Effects keeps both taps and both destinations; it only
 ## skips frames 01..08 and shortens / flattens the motion (fades + straight short moves).
+##
+## M43-C005-C009 (SB-M43-067) card state, from the committed row only (`is_new`, `copies_after`;
+## never live Collection): NEW -> NEW badge + FIRST COPY + the canonical new-card glow; in FULL
+## each NEW card gets ONE restrained pulse once the cards have settled in their slots and the
+## pack has faded (accepted pack-out timing unchanged; the pulse plays on the clean stage before
+## the hold / destinations: one `celebration` step, NEW cards staggered in model order).
+## DUPLICATE -> DUPLICATE badge + EXTRAS xN, N = copies_after - 1 (the first copy is protected).
+## Reduced: static glow, no pulse. Shared by Standard and Premium through CardView.
 
 signal presentation_completed(presentation_id: String)
 
@@ -53,6 +61,8 @@ const PACK_OUT_S := [0.25, 0.10]
 const HOLD_S := [0.40, 0.15]       ## three-card hold (no pack) before the destinations appear
 const DEST_IN_S := [0.25, 0.10]
 const ROUTE_S := [0.45, 0.20]
+const CELEBRATE_PULSE_S := 0.40    ## one NEW card's pulse (FULL only)
+const CELEBRATE_STAGGER_S := 0.10  ## start offset between consecutive NEW cards (model order)
 const REDUCED_FRAME09_S := 0.15    ## Reduced: the open pack (frame 09) shows briefly
 
 ## Pack mouth in frame space (where frame 09's card backs sit), as a fraction of the frame.
@@ -65,6 +75,9 @@ const SCRIM_DARK := Color(0, 0, 0, 0.92)
 
 var pack_frame: int = 1:
 	set = _set_pack_frame
+## 0..1 over the one FULL celebration step; drives each NEW card's own pulse window.
+var celebration := 0.0:
+	set = _set_celebration
 
 var _model: Dictionary
 var _reduced := false
@@ -77,6 +90,8 @@ var _stage: TextureRect
 var _dest_layer: Control
 var _dest: Dictionary = {}     ## "collection"/"exchange" -> TextureRect
 var _cards: Array = []         ## CardView x3, model order
+var _new_cards: Array = []     ## the NEW CardViews, model order (celebration order)
+var _glow_layer: Control
 var _frame_tex: Array = []
 var _frame_log: Array = []     ## every frame change actually bound, in order (evidence)
 var _route_log: Array = []     ## [card index, destination] as each route starts
@@ -131,6 +146,11 @@ func _build() -> void:
 	_stage.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_stage.texture = _frame_tex[0]
 	_layer.add_child(_stage)
+	_glow_layer = Control.new()   # under every card and destination: a glow never covers card art or text
+	_glow_layer.name = "NewGlows"
+	_glow_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_glow_layer.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_layer.add_child(_glow_layer)
 	_dest_layer = Control.new()
 	_dest_layer.name = "Destinations"
 	_dest_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -150,6 +170,9 @@ func _build() -> void:
 		cv.arrived.connect(_on_arrived)
 		_layer.add_child(cv)
 		_cards.append(cv)
+		if cv.get_glow() != null:
+			_glow_layer.add_child(cv.get_glow())
+			_new_cards.append(cv)
 	_hint = _label("Hint", UiText.t("PACK_TAP_OPEN"), 34)
 	_layer.add_child(_hint)
 
@@ -232,6 +255,8 @@ func _open_plan() -> Array:
 		var d: float = (REDUCED_FRAME09_S if _reduced else FRAME09_HOLD_S) if i == 0 else 0.0
 		steps.append({"target": _cards[i], "property": "emerge", "from": 0.0, "to": 1.0, "duration": EMERGE_S[r], "delay": d})
 	steps.append({"target": _stage, "property": "modulate:a", "from": 1.0, "to": 0.0, "duration": PACK_OUT_S[r]})
+	if _has_celebration():
+		steps.append({"target": self, "property": "celebration", "from": 0.0, "to": 1.0, "duration": _celebration_s()})
 	steps.append({"target": _dest_layer, "property": "modulate:a", "from": 0.0, "to": 1.0, "duration": DEST_IN_S[r], "delay": HOLD_S[r]})
 	return steps
 
@@ -248,7 +273,23 @@ func _on_step(key: String, index: int) -> void:
 		_route_log.append([index, destination_of(_model["cards"][index])])
 
 func _dest_step_index() -> int:
-	return (PACK_FRAMES.size() if not _reduced else 1) + _cards.size() + 1
+	return (PACK_FRAMES.size() if not _reduced else 1) + _cards.size() + (2 if _has_celebration() else 1)
+
+## FULL only, and only when the committed pack has at least one NEW card.
+func _has_celebration() -> bool:
+	return not _reduced and not _new_cards.is_empty()
+
+func _celebration_s() -> float:
+	return CELEBRATE_PULSE_S + (_new_cards.size() - 1) * CELEBRATE_STAGGER_S
+
+## NEW card k pulses over [k * STAGGER, k * STAGGER + PULSE] of the step (bounded overlap).
+func _set_celebration(v: float) -> void:
+	celebration = v
+	if _new_cards.is_empty():
+		return
+	var t := v * _celebration_s()
+	for k in range(_new_cards.size()):
+		_new_cards[k].celebrate = clampf((t - k * CELEBRATE_STAGGER_S) / CELEBRATE_PULSE_S, 0.0, 1.0)
 
 func _on_run_completed(key: String) -> void:
 	var pid := String(_model.get("presentation_id", ""))
@@ -312,12 +353,18 @@ func route_log() -> Array:
 func arrivals() -> Array:
 	return _arrivals.duplicate()
 
+func get_glow_layer() -> Control:
+	return _glow_layer
+
 ## One committed card: the canonical card image as-is (no frame drawn over it), a live NEW /
-## DUPLICATE badge on its top edge, live name, rarity chip and post-commit owned count. Its
-## pose is driven by two presentation properties: `emerge` (pack mouth -> row slot) and
-## `route` (row slot -> destination icon, shrinking and fading as it lands).
+## DUPLICATE badge on its top edge, live name, rarity chip and the card-state count line
+## (FIRST COPY / EXTRAS xN). Its pose is driven by presentation properties: `emerge` (pack
+## mouth -> row slot), `celebrate` (NEW only, FULL: one pulse + glow settle) and `route` (row
+## slot -> destination icon, shrinking and fading as it lands). A NEW card also owns a glow
+## TextureRect (canonical card_new_glow.png) that the ceremony parents UNDER all cards.
 class CardView extends Control:
 	signal arrived(index: int)
+	signal celebrated(index: int)
 
 	const UiText = preload("res://scripts/ui/ui_text.gd")
 	const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
@@ -327,6 +374,14 @@ class CardView extends Control:
 	const NEW_GREEN := Color(0.20, 0.66, 0.14)
 	const DUP_BROWN := Color(0.62, 0.50, 0.30)
 	const OUTLINE := Color(0.047, 0.180, 0.459)
+	const NEW_GLOW := "res://assets/ui/final/collection/states/card_new_glow.png"
+	const GLOW_SCALE := 1.6      ## glow rect = face size x this (same 2:3 aspect as the card)
+	const GLOW_REST := 0.5       ## settled glow alpha (FULL after the pulse; Reduced always)
+	const GLOW_PEAK_T := 0.35    ## FULL pulse: glow peaks here, then settles to GLOW_REST
+	const GLOW_SWELL := 1.12     ## FULL pulse: glow size at its peak (x GLOW_SCALE), settles to 1.0
+	const POP := 0.04            ## FULL pulse: max extra card scale (one sine bump, 1.0 -> 1.04 -> 1.0)
+	const FIRST_COPY_COLOR := Color(0.72, 1.0, 0.55)
+	const EXTRAS_COLOR := Color(1.0, 0.86, 0.45)
 
 	var emerge := 0.0:
 		set(v):
@@ -336,6 +391,15 @@ class CardView extends Control:
 		set(v):
 			route = v
 			_apply()
+	## NEW + FULL only. The first rise above 0 is THE celebration of this instance
+	## (`celebrated` fires at most once; relayout / resize never touch this value).
+	var celebrate := 0.0:
+		set(v):
+			celebrate = v
+			if v > 0.0 and not _celebrated and _glow != null and not reduced:
+				_celebrated = true
+				celebrated.emit(index)
+			_apply()
 	var card: Dictionary
 	var index := 0
 	var reduced := false
@@ -343,7 +407,9 @@ class CardView extends Control:
 	var _slot := Vector2.ZERO
 	var _dest := Vector2.ZERO
 	var _face: Control
+	var _glow: TextureRect
 	var _arrived := false
+	var _celebrated := false
 
 	func _init(c: Dictionary, i: int, reduced_effects: bool) -> void:
 		card = c.duplicate(true)
@@ -380,8 +446,34 @@ class CardView extends Control:
 		r.name = "Rarity"
 		r.size_flags_horizontal = Control.SIZE_SHRINK_CENTER
 		col.add_child(r)
-		col.add_child(_text_label("Copies", UiText.t("PACK_CARD_OWNED", [int(card["copies_after"])]), 22))
+		var count := _text_label("Copies", count_text(card), 24)
+		count.add_theme_color_override("font_color", FIRST_COPY_COLOR if is_new else EXTRAS_COLOR)
+		col.add_child(count)
+		if is_new:
+			_glow = TextureRect.new()
+			_glow.name = "NewGlow_%d" % i
+			_glow.texture = load(NEW_GLOW)
+			_glow.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+			_glow.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+			_glow.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			_glow.visible = false
 		_apply()
+
+	## Duplicate count of one committed row: the first copy is protected, extras are the rest.
+	static func extra_copies(c: Dictionary) -> int:
+		return int(c["copies_after"]) - 1
+
+	## The card-state count line, from the committed row only: NEW -> FIRST COPY,
+	## DUPLICATE -> EXTRAS xN (N = copies_after - 1, never x0).
+	static func count_text(c: Dictionary) -> String:
+		return UiText.t("PACK_CARD_FIRST_COPY") if bool(c["is_new"]) else UiText.t("PACK_CARD_EXTRAS", [extra_copies(c)])
+
+	## The NEW-card glow (null for a DUPLICATE). The ceremony parents it under every card.
+	func get_glow() -> TextureRect:
+		return _glow
+
+	func has_celebrated() -> bool:
+		return _celebrated
 
 	func set_card_width(cw: float) -> void:
 		_face.custom_minimum_size = Vector2(cw, cw * 1.5)
@@ -427,10 +519,41 @@ class CardView extends Control:
 			c = _mouth.lerp(_slot, e)
 			s = lerpf(0.3, 1.0, e)
 			a = clampf(emerge * 4.0, 0.0, 1.0)
+		if not reduced and route <= 0.0 and _glow != null:
+			s *= 1.0 + POP * sin(PI * celebrate)   # one bump, back to exactly 1.0 at the end
 		scale = Vector2(s, s)
 		position = c - pivot_offset
 		modulate.a = a
 		visible = a > 0.0
+		_apply_glow(c, s, a)
+
+	## Glow centred on the face, under the cards. FULL: invisible until the pulse, peaks, then
+	## rests at GLOW_REST. Reduced: GLOW_REST, static. Fades out as routing starts.
+	func _apply_glow(c: Vector2, s: float, a: float) -> void:
+		if _glow == null:
+			return
+		var g: float
+		var gs := 1.0
+		if reduced:
+			g = GLOW_REST
+		elif celebrate <= 0.0:
+			g = 0.0
+		elif celebrate < GLOW_PEAK_T:
+			g = celebrate / GLOW_PEAK_T
+			gs = lerpf(0.85, GLOW_SWELL, g)
+		else:
+			var k := (celebrate - GLOW_PEAK_T) / (1.0 - GLOW_PEAK_T)
+			g = lerpf(1.0, GLOW_REST, k)
+			gs = lerpf(GLOW_SWELL, 1.0, k)
+		g *= a * (1.0 - clampf(route * 3.0, 0.0, 1.0))
+		var gsz := _face.custom_minimum_size * GLOW_SCALE * gs * s
+		_glow.size = gsz
+		_glow.position = c - gsz * 0.5
+		_glow.modulate.a = g
+		_glow.visible = g > 0.0
+
+	func glow_alpha() -> float:
+		return 0.0 if _glow == null or not _glow.visible else _glow.modulate.a
 
 	func _text_label(n: String, text: String, fs: int) -> Label:
 		var l := Label.new()
