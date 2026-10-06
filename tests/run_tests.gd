@@ -1481,6 +1481,31 @@ func _run_importer_tests() -> void:
 	_check(LevelImporter.run_import(req_legit).is_ok(), "distinct dot-segment output path (not aliasing anything) still succeeds")
 	_check(FileAccess.file_exists(legit_distinct_simplified), "distinct dot-segment output written at its simplified location")
 
+	# 7. M43 remediation V04: preview + metadata dot-segment destinations are written at their
+	#    simplified locations too (actual I/O uses _resolve_path(), not the raw request string),
+	#    and metadata keeps the request path as provenance.
+	for stale in ["legit_pm.json", "legit_prev.png", "legit_meta.json"]:   # user:// persists between runs
+		if FileAccess.file_exists(test_dir + stale):
+			DirAccess.remove_absolute(LevelImporter._resolve_path(test_dir + stale))
+	var legit_prev_alias: String = test_dir + "subdir/../legit_prev.png"
+	var legit_meta_alias: String = test_dir + "subdir/../legit_meta.json"
+	var req_legit_pm := LevelImporter.ImportRequest.new(
+		path_3x2, "legit_pm", "LegitPM", "TEST", test_dir + "legit_pm.json", legit_prev_alias, legit_meta_alias, false
+	)
+	var legit_pm_res := LevelImporter.run_import(req_legit_pm)
+	_check(legit_pm_res.is_ok() and legit_pm_res.preview_written and legit_pm_res.metadata_written, "distinct dot-segment preview + metadata destinations succeed")
+	_check(FileAccess.file_exists(test_dir + "legit_prev.png") and FileAccess.file_exists(test_dir + "legit_meta.json"), "preview + metadata written at their simplified locations")
+	_check(String(legit_pm_res.metadata_dict.get("outputPath", "")) == test_dir + "legit_pm.json", "metadata provenance keeps the request path")
+	# Re-running the same request through the dot-segment paths sees the existing files: unchanged, not a clash.
+	var legit_pm_again := LevelImporter.run_import(req_legit_pm)
+	_check(legit_pm_again.is_ok() and legit_pm_again.output_unchanged and legit_pm_again.preview_unchanged and legit_pm_again.metadata_unchanged, "dot-segment rerun: overwrite=false preflight reads the simplified files -> unchanged")
+	# A destination whose parent really does not exist still fails (no implicit mkdir).
+	var missing_parent_out: String = test_dir + "no_such_dir/x/../missing_parent.json"
+	_check(not LevelImporter.run_import(LevelImporter.ImportRequest.new(
+		path_3x2, "missing_parent", "MissingParent", "TEST", missing_parent_out, "", "", false
+	)).is_ok(), "output into a missing parent directory still fails")
+	_check(not DirAccess.dir_exists_absolute(LevelImporter._resolve_path(test_dir + "no_such_dir")), "no parent directory created implicitly")
+
 	# ---- F-M09-002: PREVIEW/METADATA OVERWRITE SAFETY ----
 	# existing different preview, overwrite=false
 	var diff_prev_path := test_dir + "diff_preview.png"

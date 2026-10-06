@@ -104,9 +104,21 @@ static func run_import(request: ImportRequest) -> ImportResult:
 		result.add_error(alias_err)
 		return result
 
+	# --- M43 remediation V04: real filesystem paths for ALL actual I/O ---
+	# Alias identity above uses _canonical_path(); every real read/write below uses the
+	# matching _resolve_path() (dot segments simplified, res:// / relative globalized), so a
+	# distinct "subdir/../x.json" is written at its simplified location on every OS (Linux
+	# resolves ".." against the real filesystem, Windows lexically). Missing parents are never
+	# created: a write into a missing directory still fails. Request strings are kept for
+	# user-facing errors and metadata provenance.
+	var source_fs := _resolve_path(request.source_path)
+	var output_fs := _resolve_path(request.output_path)
+	var preview_fs := _resolve_path(request.preview_path)
+	var metadata_fs := _resolve_path(request.metadata_path)
+
 	# --- load source image ---
 	var img := Image.new()
-	var load_err := img.load(request.source_path)
+	var load_err := img.load(source_fs)
 	if load_err != OK:
 		result.add_error("Could not load source image '%s' (error %d)" % [request.source_path, load_err])
 		return result
@@ -198,8 +210,8 @@ static func run_import(request: ImportRequest) -> ImportResult:
 	# --- F-M09-002: preflight ALL destinations before writing any ---
 	# Level JSON
 	var output_action := "write"  # "write", "unchanged", or error
-	if not request.overwrite and FileAccess.file_exists(request.output_path):
-		var existing := FileAccess.get_file_as_string(request.output_path)
+	if not request.overwrite and FileAccess.file_exists(output_fs):
+		var existing := FileAccess.get_file_as_string(output_fs)
 		if existing == result.level_json_text:
 			output_action = "unchanged"
 		else:
@@ -209,9 +221,9 @@ static func run_import(request: ImportRequest) -> ImportResult:
 	# Preview
 	var preview_action := "write"
 	if not request.preview_path.is_empty():
-		if not request.overwrite and FileAccess.file_exists(request.preview_path):
+		if not request.overwrite and FileAccess.file_exists(preview_fs):
 			var existing_prev := Image.new()
-			var prev_load := existing_prev.load(request.preview_path)
+			var prev_load := existing_prev.load(preview_fs)
 			if prev_load != OK:
 				result.add_error("Preview file '%s' exists but cannot be read for comparison; overwrite=false" % request.preview_path)
 				return result
@@ -226,8 +238,8 @@ static func run_import(request: ImportRequest) -> ImportResult:
 	# Metadata
 	var metadata_action := "write"
 	if not request.metadata_path.is_empty():
-		if not request.overwrite and FileAccess.file_exists(request.metadata_path):
-			var existing_meta := FileAccess.get_file_as_string(request.metadata_path)
+		if not request.overwrite and FileAccess.file_exists(metadata_fs):
+			var existing_meta := FileAccess.get_file_as_string(metadata_fs)
 			if existing_meta == result.metadata_json_text:
 				metadata_action = "unchanged"
 			else:
@@ -238,7 +250,7 @@ static func run_import(request: ImportRequest) -> ImportResult:
 	if output_action == "write":
 		result.output_would_write = true
 		if not request.dry_run:
-			var write_err := _write_text(request.output_path, result.level_json_text)
+			var write_err := _write_text(output_fs, result.level_json_text)
 			if write_err != OK:
 				result.add_error("Could not write output '%s' (error %d)" % [request.output_path, write_err])
 				return result
@@ -250,7 +262,7 @@ static func run_import(request: ImportRequest) -> ImportResult:
 		if preview_action == "write":
 			result.preview_would_write = true
 			if not request.dry_run:
-				var save_err := preview_img.save_png(request.preview_path)
+				var save_err := preview_img.save_png(preview_fs)
 				if save_err != OK:
 					result.add_error("Could not save preview '%s' (error %d)" % [request.preview_path, save_err])
 					return result
@@ -262,7 +274,7 @@ static func run_import(request: ImportRequest) -> ImportResult:
 		if metadata_action == "write":
 			result.metadata_would_write = true
 			if not request.dry_run:
-				var meta_err := _write_text(request.metadata_path, result.metadata_json_text)
+				var meta_err := _write_text(metadata_fs, result.metadata_json_text)
 				if meta_err != OK:
 					result.add_error("Could not write metadata '%s' (error %d)" % [request.metadata_path, meta_err])
 					return result
