@@ -1684,6 +1684,25 @@
       "approval_authority": "coordination/sessions/M28-C002-C003-R01/CHATGPT_PROMPT_V02.md",
       "source_path": "assets/ui/final/home/background/home_background.png",
       "notes": "M28-C002-C003-R01 V02 finding 5: owner-selected Home background (940x1672), used exactly as supplied - not regenerated, redrawn, recoloured or substituted. Presented through the World 01 catalog record at a uniform display scale (never stretched); supersedes HOME-120 as the canonical Home background. HOME-120 stays byte-identical on disk and is never loaded by Home. All live UI (HUD, shortcuts, PLAY, Gift Meter, nav) and Scrubby remain native Godot layers."
+    },
+    {
+      "id": "HOME-122",
+      "slug": "icon_shortcut_rewarded_ads",
+      "group": "shortcuts",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/shortcuts/icon_shortcut_rewarded_ads.png",
+      "generation_required": true,
+      "provider": "chatgpt_image_generation",
+      "fallback_providers": [
+        "magnific"
+      ],
+      "reusable": false,
+      "status": "APPROVED",
+      "approved_sha256": "ce96e09aaf97db5ed171c7da15e2c8afccc46d4408a1cc64bc0521db89a96c8b",
+      "approval_authority": "coordination/sessions/M43-OWNER-R15/CHATGPT_PROMPT_R15_004_V01.md",
+      "source_path": "assets/ui/final/home/shortcuts/icon_shortcut_rewarded_ads.png",
+      "notes": "SB-M43-R15-004: owner-supplied Rewarded Ads Home icon (1254x1254, text-free), committed by the owner to main in 840406b and used byte-exact - not regenerated, redrawn, recoloured or substituted. The prompt pinned e25529bd...378f; the committed owner file hashes ce96e09a...6c8b and the owner explicitly confirmed (2026-10-06) that the committed file is the approved master. Presented on the auxiliary REWARDED ADS entry under DAILY with a code-rendered label."
     }
   ],
   "animation_sets": {

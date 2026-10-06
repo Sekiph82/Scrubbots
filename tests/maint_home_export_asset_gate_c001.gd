@@ -120,7 +120,7 @@ func _packaged_binder() -> void:
 		n += 1
 		if b.state(slug) != "APPROVED_BOUND" or b.texture(slug) == null:
 			bad.append(slug)
-	_ok(bad.is_empty() and n == 52, "all %d approved ART entries APPROVED_BOUND with a texture %s" % [n, str(bad)])
+	_ok(bad.is_empty() and n == 53, "all %d approved ART entries APPROVED_BOUND with a texture (R15-004: + HOME-122) %s" % [n, str(bad)])
 	for slug in ["home_background_whispering_park", "scrubby_home_pose", "icon_shortcut_shop", "icon_currency_scrub_bucks"]:
 		if _idx(m, slug) >= 0:
 			_ok(b.texture(slug) != null, "%s binds without source bytes" % slug)

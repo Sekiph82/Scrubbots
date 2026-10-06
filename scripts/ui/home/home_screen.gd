@@ -82,7 +82,7 @@ const PANEL_SIZE := Vector2(210, 156)
 const PANEL_ALPHA := 0.51   # V06 (0.50..0.52)
 const PANEL_BORDER := 3
 const V03_ICON_BOX := Vector2(206, 164)
-const ICON_SCALE := {"shop": 1.2, "collection": 1.2, "tasks": 1.0, "daily": 1.0}
+const ICON_SCALE := {"shop": 1.2, "collection": 1.2, "tasks": 1.0, "daily": 1.0, "rewarded_ads": 1.0}
 const PANEL_EDGE_MARGIN := 26
 ## Win Streak track positions 1..5+ (values are rendered live from WinStreakService).
 const TRACK_POSITIONS := 5
@@ -190,6 +190,8 @@ func set_art_binder(binder) -> void:
 	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
 		var b: UiShortcutButton = _nodes["Shortcut_" + id[0]]
 		b.set_icon_box(b.get_icon_box())
+	var ra: UiShortcutButton = _nodes["RewardedAdsButton"]
+	ra.set_icon_box(ra.get_icon_box())
 	_nodes["HomeScrubbyHero"].set_frames(_art.animation_set(HERO_ANIMATION_SET) if _art.has_method("animation_set") else {})
 	_queue_world()
 
@@ -865,54 +867,45 @@ func _build_shortcuts(column: VBoxContainer, specs: Array) -> void:
 		_nodes["Shortcut_" + id] = b
 		_nodes["ShortcutIcon_" + id] = b.icon_rect
 
-## M43-C015R (SB-M43-R15-001): compact auxiliary REWARDED ADS CTA. It is NOT a fifth primary
-## panel: it hangs just below the DAILY panel (a child of Shortcut_daily, so it never takes a
-## column / layout slot, moves with DAILY and hides with the action layer under a modal).
-## Green M43 CTA body + the native white play triangle used by PLAY. Intent only: it emits
-## shortcut_requested("rewarded_ads"); the app root opens the destination. Disabled unless the
-## app registered the destination.
-const REWARDED_ADS_CTA_SIZE := Vector2(210, 88)
-const REWARDED_ADS_CTA_GAP := 14.0
+## M43-C015R (SB-M43-R15-001; R15-004 visual remediation): the auxiliary REWARDED ADS entry.
+## Same production shortcut grammar as SHOP / COLLECTION / TASKS / DAILY: a UiShortcutButton
+## with the canonical light glass panel (HomeStyle.style_light_panel), the same 210x156 card,
+## icon box, live code-rendered label band and badge seam. Its icon is the owner-approved
+## HOME-122 art, bound only through HomeArtBinder / HomePresentationMap (no text baked in).
+## It is NOT a fifth primary panel: it is a child of Shortcut_daily (never a column slot),
+## hung one PANEL_GAP below DAILY, so it moves with DAILY and hides with the action layer under
+## a modal. Intent only: shortcut_requested("rewarded_ads"); disabled unless the app registered
+## the destination.
+## Auxiliary card: same glass panel / icon box / label grammar, narrower than the four primary
+## panels and right-aligned under DAILY so Scrubby's waving hand (which reaches x ~884 on the
+## tallest canvases) is never covered; the label
+## "REWARDED / ADS" sits on two lines in a taller band so the icon stands on it, never over it.
+const REWARDED_ADS_CARD := Vector2(164, 178)
+const REWARDED_ADS_LABEL_BAND := 74
+const REWARDED_ADS_LABEL_FONT := 24
 func _build_rewarded_ads_cta(daily: Control) -> void:
-	var b := Button.new()
+	var b := UiShortcutButton.new("rewarded_ads", UiText.t("HOME_SC_REWARDED_ADS"))
 	b.name = "RewardedAdsButton"
-	b.text = UiText.t("HOME_SC_REWARDED_ADS")
-	b.focus_mode = Control.FOCUS_NONE
-	b.clip_text = false
-	b.autowrap_mode = TextServer.AUTOWRAP_WORD   # whole words only: REWARDED / ADS
-	b.add_theme_font_size_override("font_size", 24)
-	HomeStyle.style_play_button(b)
-	b.add_theme_constant_override("outline_size", 8)
-	for st in ["normal", "hover", "pressed", "disabled"]:
-		var sb: StyleBoxFlat = b.get_theme_stylebox(st)
-		sb.content_margin_left = 50
-		sb.content_margin_right = 8
-		sb.content_margin_top = 6
-		sb.content_margin_bottom = 6
-		sb.corner_radius_top_left = 30
-		sb.corner_radius_top_right = 30
-		sb.corner_radius_bottom_left = 30
-		sb.corner_radius_bottom_right = 30
-	b.anchor_left = 0.0
+	b.label_band = REWARDED_ADS_LABEL_BAND
+	HomeStyle.style_light_panel(b, int(REWARDED_ADS_CARD.y) - REWARDED_ADS_LABEL_BAND, PANEL_ALPHA, PANEL_BORDER)
+	b.add_theme_font_size_override("font_size", REWARDED_ADS_LABEL_FONT)
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD   # whole words: REWARDED / ADS
+	b.custom_minimum_size = REWARDED_ADS_CARD
+	b.anchor_left = 1.0
 	b.anchor_right = 1.0
 	b.anchor_top = 1.0
 	b.anchor_bottom = 1.0
-	b.offset_top = REWARDED_ADS_CTA_GAP
-	b.offset_bottom = REWARDED_ADS_CTA_GAP + REWARDED_ADS_CTA_SIZE.y
-	b.custom_minimum_size = Vector2(0, REWARDED_ADS_CTA_SIZE.y)
+	b.offset_left = -REWARDED_ADS_CARD.x
+	b.offset_right = 0.0
+	b.offset_top = PANEL_GAP
+	b.offset_bottom = PANEL_GAP + REWARDED_ADS_CARD.y
+	b.set_icon_box(Vector2(REWARDED_ADS_CARD.x - 4.0, V03_ICON_BOX.y) * float(ICON_SCALE["rewarded_ads"]))
 	b.disabled = true
 	b.pressed.connect(func():
 		if not b.disabled:
 			_shortcut_pressed("rewarded_ads"))
 	daily.add_child(_reg(b))
-	var tri := PlayTriangle.new()
-	tri.name = "RewardedAdsTriangle"
-	tri.set_anchors_preset(Control.PRESET_CENTER_LEFT)
-	tri.offset_left = 16
-	tri.offset_right = 44
-	tri.offset_top = -16
-	tri.offset_bottom = 16
-	b.add_child(_reg(tri))
+	_nodes["ShortcutIcon_rewarded_ads"] = b.icon_rect
 
 # ------------------------------------------------------------- Play CTA ----
 

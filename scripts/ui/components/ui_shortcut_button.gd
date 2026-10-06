@@ -17,6 +17,9 @@ const BADGE_SIZE := 52
 ## text there).
 const LABEL_BAND := 46
 
+## Per-instance label band height (default LABEL_BAND; a two-line label uses a taller band so
+## the icon still stands on top of the text, never over it).
+var label_band := LABEL_BAND
 var shortcut_id: String
 var badge: Label
 var icon_rect: TextureRect
@@ -93,4 +96,4 @@ func _layout_icon() -> void:
 	if d == Vector2.ZERO:
 		d = _icon_box
 	icon_rect.size = d
-	icon_rect.position = Vector2((size.x - d.x) * 0.5, size.y - LABEL_BAND - d.y)
+	icon_rect.position = Vector2((size.x - d.x) * 0.5, size.y - label_band - d.y)
