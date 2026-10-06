@@ -69,7 +69,7 @@ const MOMENTS := {
 	"claim_daily_login": "reward", "claim_daily_task": "reward", "claim_daily_all_tasks": "reward",
 	"claim_gift": "reward", "claim_collection_rewards": "reward", "exchange_card": "reward",
 	"exchange_all_extras": "reward", "claim_event_milestone": "reward", "claim_first_try": "reward",
-	"claim_catchup": "reward", "unlock_robot": "unlock", "buy_booster_charge": "success", "buy_heart": "success",
+	"claim_catchup": "reward", "claim_rewarded_daily": "reward", "unlock_robot": "unlock", "buy_booster_charge": "success", "buy_heart": "success",
 	"refill_hearts": "success", "buy_current_level_2x": "success", "buy_timed_2x": "success",
 	"equip_robot": "success",
 }

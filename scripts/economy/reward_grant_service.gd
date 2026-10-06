@@ -72,6 +72,10 @@ func grant(tx_id: String, rewards: Dictionary) -> bool:
 	_applied[tx_id] = rewards.duplicate()
 	return true
 
+## Read-only copy of every applied tx id (M43-C015R rewarded-daily high-water derivation).
+func applied_ids() -> Array:
+	return _applied.keys()
+
 func applied_transaction_count() -> int:
 	return _applied.size()
 

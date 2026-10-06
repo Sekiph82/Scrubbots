@@ -34,11 +34,12 @@ const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
 const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
 const MetaFeedback = preload("res://scripts/ui/feel/meta_feedback.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
+const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd")
 ## BottomNav tabs the app root serves (RANKS waits for the SB-M43-131 owner policy).
 const APP_NAV := ["events"]
 ## Home shortcut panels the app root turns into app-level destinations (Home opens none of
 ## its M42 popups for these; Cards Exchange keeps its Home seam).
-const APP_SHORTCUTS := ["shop", "collection", "tasks", "daily", "gift_bar", "profile"]
+const APP_SHORTCUTS := ["shop", "collection", "tasks", "daily", "gift_bar", "profile", "rewarded_ads"]
 
 ## Test-only boot seams, read once when the root enters the tree. Production
 ## leaves them unset (canonical save path, system clock, OS local calendar).
@@ -291,6 +292,8 @@ func _on_home_shortcut(id: String) -> void:
 			DailyScreens.open_tasks(_modals, app_state)
 		"daily":
 			DailyScreens.open_daily(_modals, app_state)
+		"rewarded_ads":
+			RewardedAdsScreen.open(_modals, app_state)
 		"gift_bar":
 			DailyScreens.open_gift_bar(_modals, app_state)
 		"profile":

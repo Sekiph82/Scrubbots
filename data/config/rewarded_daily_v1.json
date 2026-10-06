@@ -1,0 +1,13 @@
+{
+  "schema": "scrubbots.rewarded_daily.v1",
+  "version": 1,
+  "decision": "Owner R15 live review 2026-10-06 (coordination/sessions/M43-OWNER-R15/CHATGPT_PROMPT_V01.md): a separate REWARDED ADS surface with five rewards every local calendar day; slot 1 is claimable with no ad, slots 2-5 each require one verified completed rewarded video.",
+  "source": "Bundles seeded 1:1 from data/config/economy_rewards_v1.json daily.login_rewards D1..D5. This is a DISTINCT track: its claim state never aliases the Daily login streak/cycle, which is unchanged.",
+  "slots": [
+    {"slot": 1, "requires_ad": false, "reward": {"scrub_bucks": 100}},
+    {"slot": 2, "requires_ad": true, "reward": {"standard_card_packs": 1}},
+    {"slot": 3, "requires_ad": true, "reward": {"random_booster_charges": 1}},
+    {"slot": 4, "requires_ad": true, "reward": {"scrub_bucks": 250, "standard_card_packs": 1}},
+    {"slot": 5, "requires_ad": true, "reward": {"scrub_bucks": 300, "selected_booster_charges": 1, "premium_card_packs": 1}}
+  ]
+}

@@ -188,19 +188,30 @@ static func day_states(daily) -> Array:
 static func open_daily(stack, app) -> BasePopup:
 	var p := BasePopup.new("daily_login")
 	p.set_frame("large")
-	p.set_hero(ART["calendar"], Vector2(220, 220), 70)
 	p.set_title(UiText.t("DAILY_TITLE"))
+	# M43-C015R (SB-M43-R15-003): owner F5 review — no hero floating above the frame. The
+	# calendar is a contained icon inside the content; flame + streak are one centred pair.
+	var cal_box := CenterContainer.new()
+	cal_box.name = "CalendarBox"
+	p.get_content().add_child(cal_box)
+	var cal := HomeStyle.art("Calendar")
+	cal.texture = load(ART["calendar"])
+	cal.custom_minimum_size = CALENDAR_SIZE
+	cal_box.add_child(cal)
+	var streak_box := CenterContainer.new()
+	streak_box.name = "StreakBox"
+	p.get_content().add_child(streak_box)
 	var streak := HBoxContainer.new()
 	streak.name = "StreakRow"
-	streak.alignment = BoxContainer.ALIGNMENT_CENTER
-	p.get_content().add_child(streak)
+	streak.add_theme_constant_override("separation", UiTokens.SPACE_SM)
+	streak_box.add_child(streak)
 	var fl := HomeStyle.art("Flame")
 	fl.texture = load(ART["flame"])
-	fl.custom_minimum_size = Vector2(64, 64)
+	fl.custom_minimum_size = Vector2(52, 52)
 	streak.add_child(fl)
 	var sl := BasePopup.body_label("", 30, BasePopup.ROYAL_EDGE)
 	sl.name = "Streak"
-	sl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	sl.autowrap_mode = TextServer.AUTOWRAP_OFF
 	streak.add_child(sl)
 	var grid := GridContainer.new()
 	grid.name = "Days"
@@ -232,35 +243,55 @@ static func open_daily(stack, app) -> BasePopup:
 		return null
 	return p
 
+## R15-003: three cards + two gaps fit the large frame's 652 px body at its 880 px reference
+## width (3 x 210 + 2 x 8 = 646), so the grid can never push the body past the frame.
+const CALENDAR_SIZE := Vector2(132, 132)
+const DAY_CARD_SIZE := Vector2(210, 280)
+const CHECK_SIZE := 34
+## Card insets keep every label / check clear of the frame art (top gem, Day 5 crown).
+const DAY_CARD_INSET := {"side": 26, "top": 46, "top_day5": 56, "bottom": 30}
 static func _day_card(day: int, reward: Dictionary) -> Control:
 	var card := PanelContainer.new()
 	card.name = "Day_%d" % day
-	card.custom_minimum_size = Vector2(240, 250)
+	card.custom_minimum_size = DAY_CARD_SIZE
 	var st := StyleBoxTexture.new()
 	st.texture = load(ART["day5"] if day == 5 else ART["day"])
-	st.content_margin_left = 30
-	st.content_margin_right = 30
-	st.content_margin_top = 34
-	st.content_margin_bottom = 26
+	st.content_margin_left = DAY_CARD_INSET["side"]
+	st.content_margin_right = DAY_CARD_INSET["side"]
+	st.content_margin_top = DAY_CARD_INSET["top_day5"] if day == 5 else DAY_CARD_INSET["top"]
+	st.content_margin_bottom = DAY_CARD_INSET["bottom"]
 	card.add_theme_stylebox_override("panel", st)
 	var v := VBoxContainer.new()
 	v.alignment = BoxContainer.ALIGNMENT_CENTER
 	card.add_child(v)
+	# Title row: [balance | DAY n | check]. The check lives in the title row (balanced by an
+	# equal spacer so the title stays centred) instead of adding a row, so the longest real
+	# state (Day 5 claimed today: four reward lines + state) fits the fixed card.
+	var head := HBoxContainer.new()
+	head.name = "TitleRow"
+	head.add_theme_constant_override("separation", 0)
+	v.add_child(head)
+	var bal := Control.new()
+	bal.custom_minimum_size = Vector2(CHECK_SIZE, 0)
+	bal.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	head.add_child(bal)
 	var t := BasePopup.body_label(UiText.t("DAILY_DAY", [day]), 28, BasePopup.ROYAL_EDGE)
 	t.name = "DayLabel"
-	v.add_child(t)
-	var r := BasePopup.body_label(UiText.reward_text(reward), 18, BasePopup.INK)
-	r.name = "RewardText"
-	r.custom_minimum_size = Vector2(180, 0)
-	v.add_child(r)
-	var s := BasePopup.body_label("", 22, Color(0.2, 0.55, 0.12))
-	s.name = "State"
-	v.add_child(s)
+	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	head.add_child(t)
 	var chk := HomeStyle.art("Check")
 	chk.texture = load(ART["check"])
-	chk.custom_minimum_size = Vector2(48, 48)
+	chk.custom_minimum_size = Vector2(CHECK_SIZE, CHECK_SIZE)
+	chk.size_flags_vertical = Control.SIZE_SHRINK_CENTER
 	chk.name = "Check"
-	v.add_child(chk)
+	head.add_child(chk)
+	var r := BasePopup.body_label(UiText.reward_text(reward), 18, BasePopup.INK)
+	r.name = "RewardText"
+	r.custom_minimum_size = Vector2(DAY_CARD_SIZE.x - 2 * DAY_CARD_INSET["side"], 0)
+	v.add_child(r)
+	var s := BasePopup.body_label("", 18, Color(0.2, 0.55, 0.12))
+	s.name = "State"
+	v.add_child(s)
 	return card
 
 static func refresh_daily(p: BasePopup, app) -> void:
@@ -273,7 +304,8 @@ static func refresh_daily(p: BasePopup, app) -> void:
 		var lab: Label = card.find_child("State", true, false)
 		lab.text = {"claimed": UiText.t("DAILY_STATE_CLAIMED"), "claimed_today": UiText.t("DAILY_CARD_CLAIMED_TODAY"),
 			"today": UiText.t("DAILY_CARD_TODAY"), "upcoming": ""}[st]
-		(card.find_child("Check", true, false) as Control).visible = st == "claimed" or st == "claimed_today"
+		# Hidden via alpha (not visible=false) so the title row keeps its balanced width.
+		(card.find_child("Check", true, false) as Control).modulate.a = 1.0 if (st == "claimed" or st == "claimed_today") else 0.0
 		card.modulate = Color(1, 1, 1, 1) if st != "upcoming" else Color(1, 1, 1, 0.72)
 		card.set_meta("state", st)
 	p.set_action_blocked("claim", d.claimed_today() or app.is_blocked)

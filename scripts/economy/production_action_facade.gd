@@ -112,6 +112,17 @@ func start_rewarded(product: String, token: String = "") -> Dictionary:
 	r["action"] = "start_rewarded"
 	return r
 
+## M43-C015R Rewarded Ads daily track. Slot 1 is a direct committed claim (saved by _finish);
+## slots 2..5 start one rewarded video whose verified completion commits + saves inside
+## RewardedGrantService.resolve() under daily_rewarded:<local_day>:<slot>.
+func claim_rewarded_daily_free() -> Dictionary:
+	return _finish("claim_rewarded_daily", _economy.rewarded_daily.claim_free())
+
+func start_rewarded_daily(slot: int, token: String = "") -> Dictionary:
+	var r: Dictionary = _economy.rewarded_daily.start_ad(slot, token)
+	r["action"] = "start_rewarded_daily"
+	return r
+
 # ------------------------------------------------------------ claims ----
 
 func claim_daily_login() -> Dictionary:
