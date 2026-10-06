@@ -486,7 +486,7 @@ func _historical() -> void:
 			n += 1
 			if FileAccess.get_sha256("res://" + String(a["path"])) != String(a["approved_sha256"]):
 				bad.append(a["id"])
-	_ok(n == 52 and bad.is_empty(), "all 52 APPROVED entries (incl. retired history) match their pinned sha %s" % str(bad))
+	_ok(n == 53 and bad.is_empty(), "all 53 APPROVED entries (R15-004 + HOME-122) (incl. retired history) match their pinned sha %s" % str(bad))
 	_complete("historical_assets_intact")
 
 func _complete(c: String) -> void:

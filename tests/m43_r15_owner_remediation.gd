@@ -28,6 +28,7 @@ var EXPECTED_CASES := [
 	"r01_config_seeded_from_daily", "r02_free_slot_once_per_day", "r03_production_provider_unavailable",
 	"r04_verified_ad_only", "r05_provider_refused", "r06_forward_day_reset", "r07_rollback_no_farm",
 	"r08_relaunch_idempotent", "r09_existing_rewarded_unchanged", "r10_popup_real_ui", "r11_home_cta_geometry",
+	"r12_rewarded_ads_icon_family",
 	"g01_settings_visual_family", "g02_settings_behaviour_unchanged", "g03_settings_contained_matrix",
 	"d01_daily_no_floating_hero", "d02_daily_contained_matrix", "d03_daily_claim_unchanged",
 ]
@@ -62,7 +63,7 @@ func _initialize() -> void:
 	MainScript.boot_clock_override = func(): return _now[0]
 	MainScript.boot_local_day_override = func(): return _day[0]
 	_r01(); _r02(); _r03(); _r04(); _r05(); _r06(); _r07(); _r08(); _r09()
-	await _r10(); await _r11()
+	await _r10(); await _r11(); await _r12()
 	await _g01(); await _g02(); await _g03()
 	await _d01(); await _d02(); await _d03()
 	_shutdown()
@@ -315,14 +316,74 @@ func _r11() -> void:
 		for n in others:
 			if cta.intersects(others[n]):
 				hits.append(n)
-		var hero: Rect2 = (home.get_region("Art_scrubby") as Control).get_global_rect()
-		_ok(vp.encloses(cta) and hits.is_empty() and cta.size.y >= 88.0 - 0.5, "%s (logical %s): CTA %s inside viewport, >= 88 px, no overlap %s" % [phys, lv, cta, hits])
-		_ok(cta.position.x >= hero.end.x - 0.5 or not cta.intersects(_hero_core(hero)), "%s: CTA clear of Scrubby's body" % [phys])
+		var icon: Rect2 = (home.get_region("ShortcutIcon_rewarded_ads") as Control).get_global_rect()
+		for n in others:
+			if n != "Shortcut_daily" and icon.intersects(others[n]):
+				hits.append("icon/" + n)
+		if icon.intersects(others["Shortcut_daily"]):
+			hits.append("icon/Shortcut_daily")
+		for bot in home._world["helper_bot_rects"]:
+			var br := Rect2(home.global_position + home.world_to_screen(bot.position), bot.size * home._world_scale)
+			if cta.intersects(br) or icon.intersects(br):
+				hits.append("helper_bot")
+		_ok(vp.encloses(cta) and vp.encloses(icon) and hits.is_empty() and cta.size.y >= 88.0 - 0.5, "%s (logical %s): card %s + icon inside viewport, >= 88 px, no overlap %s" % [phys, lv, cta, hits])
+		var opaque := _scrubby_opaque_in(home, [cta, icon])
+		_ok(opaque == 0, "%s: no opaque Scrubby pose pixel under the card or icon (%d)" % [phys, opaque])
 	_complete("r11_home_cta_geometry")
 
-## Central body box of the Scrubby hero art (its texture rect includes transparent margins).
-func _hero_core(r: Rect2) -> Rect2:
-	return r.grow_individual(-r.size.x * 0.22, -r.size.y * 0.12, -r.size.x * 0.22, -r.size.y * 0.05)
+## Opaque (alpha > 0.1) pixels of Scrubby's Home pose art that fall under any of `rects`,
+## sampled on a 6 px grid in screen space through the TextureRect's stretch-scale mapping.
+func _scrubby_opaque_in(home, rects: Array) -> int:
+	var art: TextureRect = home.get_region("Art_scrubby")
+	var img := Image.load_from_file(ProjectSettings.globalize_path(art.texture.resource_path))
+	var ar := art.get_global_rect()
+	var n := 0
+	for r in rects:
+		var o: Rect2 = (r as Rect2).intersection(ar)
+		if o.size.x <= 0.0 or o.size.y <= 0.0:
+			continue
+		var y := o.position.y
+		while y < o.end.y:
+			var x := o.position.x
+			while x < o.end.x:
+				var u := (Vector2(x, y) - ar.position) / ar.size
+				var px := Vector2i(clampi(int(u.x * img.get_width()), 0, img.get_width() - 1), clampi(int(u.y * img.get_height()), 0, img.get_height() - 1))
+				if img.get_pixelv(px).a > 0.1:
+					n += 1
+				x += 6.0
+			y += 6.0
+	return n
+
+func _r12() -> void:
+	print("[r12 R15-004: Rewarded Ads uses the Home shortcut family + the owner-approved HOME-122 icon]")
+	await _boot("r12")
+	var home = _root.get_home()
+	var ra: Button = home.get_region("RewardedAdsButton")
+	var daily: Button = home.get_region("Shortcut_daily")
+	_ok(ra.get_script() == daily.get_script() and ra.get_parent() == daily and ra.find_children("*", "", true, false).all(func(c): return not String(c.name).contains("Triangle")), "same UiShortcutButton component, attached to DAILY; no native play triangle")
+	var a_sb: StyleBoxFlat = ra.get_theme_stylebox("normal")
+	var d_sb: StyleBoxFlat = daily.get_theme_stylebox("normal")
+	_ok(a_sb.bg_color == d_sb.bg_color and a_sb.border_color == d_sb.border_color and a_sb.bg_color != Color(0.337, 0.769, 0.169), "same cyan/blue light glass panel as DAILY (green CTA body gone)")
+	_ok(ra.text == "REWARDED ADS" and ra.get_theme_color("font_color") == daily.get_theme_color("font_color") and ra.get_theme_color("font_outline_color") == daily.get_theme_color("font_outline_color") and ra.get_theme_constant("outline_size") == daily.get_theme_constant("outline_size"), "code-rendered REWARDED ADS label, same white / navy-outline treatment")
+	var path := "res://assets/ui/final/home/shortcuts/icon_shortcut_rewarded_ads.png"
+	var b = home.get_art_binder()
+	var icon: TextureRect = home.get_region("ShortcutIcon_rewarded_ads")
+	_ok(b.state("icon_shortcut_rewarded_ads") == "APPROVED_BOUND" and icon.texture != null and icon.texture.resource_path == path and icon.is_visible_in_tree(), "HOME-122 APPROVED_BOUND and presented on ShortcutIcon_rewarded_ads")
+	_ok(FileAccess.get_sha256(path) == "ce96e09aaf97db5ed171c7da15e2c8afccc46d4408a1cc64bc0521db89a96c8b", "owner master bytes = the owner-confirmed pin")
+	var row := {}
+	for r in home.get_presentation_accounting():
+		if r["id"] == "HOME-122":
+			row = r
+	_ok(row.get("mode") == "STATIC" and row.get("slug") == "icon_shortcut_rewarded_ads" and row["nodes"][0]["texture"] != null, "presentation accounting: HOME-122 STATIC on the Rewarded Ads icon")
+	var four := {"shop": "471416cbb6ab7100c0404170a15f49e250b61a03d713b7ec162e8571343864ef", "collection": "bde7a0442a016c272897e2487a85c2895f4883afbffd07efd5126a54c9d05872",
+		"tasks": "711df18c7df43f3ebc036ac2c3486216334d0a4b403264650a40f5cb22658a00", "daily": "a01e49ac28f8665443a3c11d9ee2b6f806b5649d4b1456167c36bef7d2044ad7"}
+	_ok(four.keys().all(func(k): return FileAccess.get_sha256("res://assets/ui/final/home/shortcuts/icon_shortcut_%s.png" % k) == four[k]), "SHOP / COLLECTION / TASKS / DAILY icons byte-identical")
+	var intents: Array = []
+	home.shortcut_requested.connect(func(id): intents.append(id))
+	ra.pressed.emit()
+	await _frames(2)
+	_ok(intents == ["rewarded_ads"] and String(_root.get_modal_stack().top().popup_id) == "rewarded_ads", "tap -> exactly one rewarded_ads intent -> REWARDED ADS popup")
+	_complete("r12_rewarded_ads_icon_family")
 
 # ------------------------------------------------------------ R15-002 ----
 

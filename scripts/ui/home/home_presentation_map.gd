@@ -71,6 +71,7 @@ const ENTRIES := {
 	"HOME-105": {"slug": "icon_nav_settings", "mode": "STATIC", "slot": "texture", "nodes": ["NavIcon_settings"]},
 	"HOME-120": {"slug": "world_01_whispering_park_background", "mode": "OWNER_RETIRED", "slot": "texture", "nodes": [], "reason": "M28-C002-C003-R01 V02: replaced as the Home background by the owner-selected HOME-121 (file kept byte-identical, never loaded by Home)"},
 	"HOME-121": {"slug": "home_background_whispering_park", "mode": "STATIC", "slot": "texture", "nodes": ["WorldBackground"]},
+	"HOME-122": {"slug": "icon_shortcut_rewarded_ads", "mode": "STATIC", "slot": "texture", "nodes": ["ShortcutIcon_rewarded_ads"]},
 }
 
 ## Modes that present nothing in the active Home composition.

@@ -84,7 +84,7 @@ func _accounting(home) -> void:
 	var modes := {}
 	for row in acc:
 		modes[row["mode"]] = int(modes.get(row["mode"], 0)) + 1
-	_ok(modes == {"STATIC": 24, "WORLD_BAKED_RETIRED": 18, "OWNER_RETIRED": 8, "OWNER_DISABLED": 2}, "V04 + R01-V02: 24 STATIC + 18 WORLD_BAKED_RETIRED + 8 OWNER_RETIRED (7 + HOME-120 replaced by HOME-121) + 2 OWNER_DISABLED (%s)" % str(modes))
+	_ok(modes == {"STATIC": 25, "WORLD_BAKED_RETIRED": 18, "OWNER_RETIRED": 8, "OWNER_DISABLED": 2}, "V04 + R01-V02 + R15-004 (HOME-122): 25 STATIC + 18 WORLD_BAKED_RETIRED + 8 OWNER_RETIRED (7 + HOME-120 replaced by HOME-121) + 2 OWNER_DISABLED (%s)" % str(modes))
 	_complete("accounting_covers_manifest")
 
 func _static_nodes(home) -> void:
