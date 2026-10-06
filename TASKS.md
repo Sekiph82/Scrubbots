@@ -7,12 +7,12 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
 - Current Sprint: M43-C005 — Reward, Pack, Collection, Robot, Feature and World Ceremonies
 - Current Task: M43 COMPLETE MILESTONE MASTER EXECUTION V01
-- Current Task Status: M43_MASTER_V03_IMPLEMENTED_ON_CLAUDE_BRANCH / V04_CROSS_PLATFORM_CLOSURE_READY_FOR_CLAUDE
-- Next Task/Action: CLAUDE executes `coordination/sessions/M43-MASTER-V01/M43_MASTER_REMEDIATION_V04_CROSS_PLATFORM_CLOSURE.md`. First integrate the already-pushed V03 remediation branch `claude/practical-darwin-ndbmxa` non-destructively, then close the two independently reproduced pre-existing cross-platform failures: M41 Reduced Effects invariance must ignore only OS-seeded `packs.rng` in its cross-AppState comparison without changing production RNG; LevelImporter must perform actual destination I/O through its existing resolved/simplified-path contract so Linux and Windows agree. Final gate is Godot 4.7.2 headless root 5,323/5,323 PASS on Linux. Claude does not edit root TASKS.md. After handoff, ChatGPT performs the combined V03+V04 audit.
-- Required Actor: CLAUDE
+- Current Task Status: M43_MASTER_REMEDIATION_V03_V04_AUDIT_PASS / OWNER_AND_DEPENDENCY_GATES_REMAIN
+- Next Task/Action: V03+V04 technical remediation is CLOSED by `coordination/sessions/M43-MASTER-V01/CHATGPT_MASTER_REMEDIATION_AUDIT_V04.md`. No duplicate M41 pack-RNG task is needed. Continue only through the remaining explicit M43 owner/authority/dependency gates; SB-M43-168 final cross-screen sound/haptic feel remains owner-gated and SB-M43-170 continues to block M43 program closure while required surfaces/authorities are unresolved. Before any next Claude implementation prompt, synchronize `C:\\Users\\sekip\\Desktop\\ScrubBots` non-destructively with current `origin/main` and preserve owner-local work.
+- Required Actor: OWNER / CHATGPT
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 988 / 1436 = 68.80%. SB-M43-R01-001..008 are CLOSED by V02 technical audit plus final owner acceptance. M43-C001R is complete; remaining M43 work is now issued as one milestone-wide master batch.
+- Progress: 994 / 1436 = 69.22%. V03+V04 combined remediation audit PASS closes SB-M43-155, SB-M43-R12-005, SB-M43-R12-007, SB-M43-161, SB-M43-162 and SB-M43-167. SB-M43-R01-001..008 remain CLOSED by V02 technical audit plus final owner acceptance; M43-C001R is complete. Remaining M43 work is owner/authority/dependency-gated.
 - Owner visual decision [2026-10-04]: SB-M43-064 V01 technical audit PASS is retained, but the shipping composition is OWNER REJECTED. Required V02 flow is pack alone -> Tap 1 -> animated 01→09 -> cards emerge -> pack gone/3-card hold -> Collection upper-left + Card Exchange upper-right -> Tap 2 -> NEW routes to Collection / DUPLICATE routes to Card Exchange -> complete. Remediation prompt/criteria are `coordination/sessions/M43-C005-C006/CHATGPT_PROMPT_V02.md` and `CHATGPT_AUDIT_CRITERIA_V02.md`.
 - Note: M43-C005-C005 independent audit PASS is recorded in `coordination/sessions/M43-C005-C005/CHATGPT_AUDIT_V01.md`. The reusable production RevealSequencer is presentation-only and Results now uses it without changing receipt/economy/navigation truth. **SB-M43-063 is CLOSED.** Production M43-C005 advances to SB-M43-064 Standard Pack presentation.
 - M43-C005-C006 V02 independent technical audit PASS [2026-10-04]: commit `10144f6e21e3925601b2cc1269835fa2562a1c2f` implements the owner-required two-tap Standard Pack flow and passes source/runtime evidence audit. **SB-M43-064 remains OPEN only for OWNER VISUAL PASS.** Premium SB-M43-065 must not start before that decision.
@@ -2036,16 +2036,16 @@ This extension **does not change** the canonical consecutive-login reset rule or
 - [ ] SB-M43-R12-002 Catch-Up never restores missed Daily login days, never changes the existing consecutive-login reset/cycle rule, never retroactively grants missed event/Daily rewards and never multiplies normal level economy.
 - [ ] SB-M43-R12-003 Catch-Up is offered once per eligible return window, persists across relaunch, completes/expirs deterministically and cannot be farmed by clock rollback, uninstall/reinstall or repeatedly backgrounding the app.
 - [ ] SB-M43-R12-004 Define a notification **priority/dedup authority** across Hearts ready, Daily available, Gift claimable and Event ending so simultaneous triggers collapse into the single most useful message/deep link instead of multiple pushes.
-- [ ] SB-M43-R12-005 Default retention-notification cap: at most one non-transactional proactive push per local 24-hour period, respecting opt-in, per-category toggles and quiet hours; user-requested/platform-transactional notifications remain separately governed.
+- [x] SB-M43-R12-005 Default retention-notification cap: at most one non-transactional proactive push per local 24-hour period, respecting opt-in, per-category toggles and quiet hours; user-requested/platform-transactional notifications remain separately governed.
 - [ ] SB-M43-R12-006 Notification copy must be factual and non-guilt-inducing, must not claim expiring rewards that are not actually expiring, and must suppress stale/already-consumed prompts before send when current state is available.
-- [ ] SB-M43-R12-007 Add tests for absence qualification, catch-up idempotency, Daily-rule non-interference, priority collapse, 24-hour cap, quiet hours, stale-state suppression and deep-link fallback.
+- [x] SB-M43-R12-007 Add tests for absence qualification, catch-up idempotency, Daily-rule non-interference, priority collapse, 24-hour cap, quiet hours, stale-state suppression and deep-link fallback.
 
 #### M43-C013 - Account / Cloud Save / Cross-Device Recovery
 
 - [ ] SB-M43-152 Keep local save authoritative/offline-capable even when account/cloud features are unavailable.
 - [ ] SB-M43-153 Define optional account/sign-in provider strategy in an owner/platform decision before adding SDKs.
 - [ ] SB-M43-154 Implement cloud-save schema/versioning compatible with M40 and preserve idempotent economy transaction IDs.
-- [ ] SB-M43-155 Implement explicit cloud conflict resolution using revision/timestamp/progression/economy safety rules; never silently duplicate currency/rewards.
+- [x] SB-M43-155 Implement explicit cloud conflict resolution using revision/timestamp/progression/economy safety rules; never silently duplicate currency/rewards.
 - [ ] SB-M43-156 Implement sign-in, signed-out, syncing, synced, conflict, error and offline states.
 - [ ] SB-M43-157 Implement restore-on-new-device flow and verify Collection/robots/booster/entitlement/Daily state integrity.
 - [ ] SB-M43-158 Platform purchase restore remains tied to M57/store authority and must reconcile with cloud/local save idempotently.
@@ -2054,13 +2054,13 @@ This extension **does not change** the canonical consecutive-login reset rule or
 
 #### M43-C014 - Meta UI Audio / Haptics / Offline / Error Language
 
-- [ ] SB-M43-161 Define a compact meta-UI audio family for button confirm/back, popup open/close, reward reveal, pack reveal, robot unlock and error; reuse where pleasant rather than create noisy per-screen sounds.
-- [ ] SB-M43-162 Define haptic moments for success, warning, pack rare reveal and unlock while respecting Haptics OFF and Reduced Effects.
+- [x] SB-M43-161 Define a compact meta-UI audio family for button confirm/back, popup open/close, reward reveal, pack reveal, robot unlock and error; reuse where pleasant rather than create noisy per-screen sounds.
+- [x] SB-M43-162 Define haptic moments for success, warning, pack rare reveal and unlock while respecting Haptics OFF and Reduced Effects.
 - [ ] SB-M43-163 Meta UI must obey Master/Music/SFX/Haptics settings immediately.
 - [ ] SB-M43-164 No purchase/ad/error sound may falsely imply success before an authoritative callback.
 - [ ] SB-M43-165 Implement consistent offline/error language and retry affordances for Shop, ads, cloud, Events, Ranks and notifications/deep links.
 - [ ] SB-M43-166 Implement graceful empty states for no events, no rankings result, no exchangeable duplicates, no claimable gifts and no tasks ready.
-- [ ] SB-M43-167 Validate meta audio/haptic fatigue in repeated menu/claim/open/close loops.
+- [x] SB-M43-167 Validate meta audio/haptic fatigue in repeated menu/claim/open/close loops.
 - [ ] SB-M43-168 Owner acceptance required for the final cross-screen sound/haptic feel.
 
 #### M43-C015 - Player-Facing Surface Visual Inventory Gate
