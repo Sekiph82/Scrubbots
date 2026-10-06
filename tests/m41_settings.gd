@@ -587,7 +587,7 @@ func _reduced_effects_gameplay_invariance() -> void:
 			"clears": h.get_clearing_loop().get_cleared_count(), "initial": initial, "cells": cells,
 			"supply": h.get_supply().is_exhausted(), "live": h.get_scheduler().live_assignment_count(),
 			"fx_reduced": fx_reduced_at_start,
-			"prog": app.progression.snapshot(), "econ": app.economy.snapshot()})
+			"prog": app.progression.snapshot(), "econ": _economy_without_pack_rng(app.economy.snapshot())})
 		_free_host(h)
 	_ok(results.size() == 3, "three runs completed")
 	if results.size() == 3:
@@ -597,7 +597,20 @@ func _reduced_effects_gameplay_invariance() -> void:
 			_ok(b["won"] == a["won"] and b["state"] == a["state"] and b["clears"] == a["clears"] and b["cells"] == a["cells"] and b["supply"] == a["supply"] and b["live"] == a["live"], "%s: identical terminal/clear/cell/supply truth to OFF" % b["mode"])
 			_ok(b["prog"] == a["prog"] and b["econ"] == a["econ"], "%s: identical progression/economy result to OFF" % b["mode"])
 		_ok(results[1]["fx_reduced"] and not results[0]["fx_reduced"], "ON run used reduced presentation, OFF run normal")
+		var bumped: Dictionary = a["econ"].duplicate(true)
+		bumped["reward"]["wallet"]["scrub_bucks"] = int(bumped["reward"]["wallet"]["scrub_bucks"]) + 1
+		_ok(bumped != a["econ"], "sensitivity: a real economy change (wallet +1 SB) still breaks the normalized comparison")
 	_complete("reduced_effects_gameplay_invariance")
+
+## M43 remediation V04: every fresh AppState's CardPackService is OS-seeded (`_rng.randomize()`,
+## persisted as economy.packs.rng since M43-C005-C008), so three fresh apps can never share it. That
+## seed is unrelated to Reduced Effects / gameplay truth; ONLY packs.rng is removed here, and every
+## other economy section (wallet, Collection, boosters, Daily, robots, entitlement, ...) is compared.
+static func _economy_without_pack_rng(snapshot: Dictionary) -> Dictionary:
+	var out: Dictionary = snapshot.duplicate(true)
+	if typeof(out.get("packs")) == TYPE_DICTIONARY:
+		(out["packs"] as Dictionary).erase("rng")
+	return out
 
 func _write(path: String, text: String) -> void:
 	var f := FileAccess.open(path, FileAccess.WRITE)
