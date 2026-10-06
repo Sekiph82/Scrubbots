@@ -34,6 +34,7 @@ const PlayerRecords = preload("res://scripts/economy/player_records.gd")
 const EventService = preload("res://scripts/economy/event_service.gd")
 const ReturnService = preload("res://scripts/economy/return_service.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
+const RewardedDailyService = preload("res://scripts/economy/rewarded_daily_service.gd")
 
 const GUARANTEED_NEW_FALLBACK_SB := 500
 
@@ -67,6 +68,9 @@ var records: PlayerRecords
 var events: EventService
 var returns: ReturnService
 var notify: NotificationPolicy
+## M43-C015R Rewarded Ads daily track. No save section: state is derived from the canonical
+## reward ledger (daily_rewarded:<day>:<slot> ids).
+var rewarded_daily: RewardedDailyService
 
 ## local_day: Daily local-calendar ordinal provider (M39 V04, F-M39-V03-002).
 ## Omitted in production -> DailyService uses LocalCalendar.system_provider().
@@ -96,6 +100,7 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	exchange = CardsExchangeService.new(collection, reward, config)
 	streak = WinStreakService.new(reward, gift)
 	rewarded = RewardedGrantService.new(reward, hearts)
+	rewarded_daily = RewardedDailyService.new(reward, rewarded, Callable(daily, "local_day"))
 	_register_handlers()
 
 func _register_handlers() -> void:

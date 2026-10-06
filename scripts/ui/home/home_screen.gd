@@ -413,6 +413,7 @@ func _build() -> void:
 	_build_gift_meter(gm)
 	_build_shortcuts(_nodes["LeftShortcutColumn"], LEFT_SHORTCUTS)
 	_build_shortcuts(_nodes["RightShortcutColumn"], RIGHT_SHORTCUTS)
+	_build_rewarded_ads_cta(_nodes["Shortcut_daily"])
 	_build_track(track)
 	_build_bottom_nav(nav)
 
@@ -864,6 +865,55 @@ func _build_shortcuts(column: VBoxContainer, specs: Array) -> void:
 		_nodes["Shortcut_" + id] = b
 		_nodes["ShortcutIcon_" + id] = b.icon_rect
 
+## M43-C015R (SB-M43-R15-001): compact auxiliary REWARDED ADS CTA. It is NOT a fifth primary
+## panel: it hangs just below the DAILY panel (a child of Shortcut_daily, so it never takes a
+## column / layout slot, moves with DAILY and hides with the action layer under a modal).
+## Green M43 CTA body + the native white play triangle used by PLAY. Intent only: it emits
+## shortcut_requested("rewarded_ads"); the app root opens the destination. Disabled unless the
+## app registered the destination.
+const REWARDED_ADS_CTA_SIZE := Vector2(210, 88)
+const REWARDED_ADS_CTA_GAP := 14.0
+func _build_rewarded_ads_cta(daily: Control) -> void:
+	var b := Button.new()
+	b.name = "RewardedAdsButton"
+	b.text = UiText.t("HOME_SC_REWARDED_ADS")
+	b.focus_mode = Control.FOCUS_NONE
+	b.clip_text = false
+	b.autowrap_mode = TextServer.AUTOWRAP_WORD   # whole words only: REWARDED / ADS
+	b.add_theme_font_size_override("font_size", 24)
+	HomeStyle.style_play_button(b)
+	b.add_theme_constant_override("outline_size", 8)
+	for st in ["normal", "hover", "pressed", "disabled"]:
+		var sb: StyleBoxFlat = b.get_theme_stylebox(st)
+		sb.content_margin_left = 50
+		sb.content_margin_right = 8
+		sb.content_margin_top = 6
+		sb.content_margin_bottom = 6
+		sb.corner_radius_top_left = 30
+		sb.corner_radius_top_right = 30
+		sb.corner_radius_bottom_left = 30
+		sb.corner_radius_bottom_right = 30
+	b.anchor_left = 0.0
+	b.anchor_right = 1.0
+	b.anchor_top = 1.0
+	b.anchor_bottom = 1.0
+	b.offset_top = REWARDED_ADS_CTA_GAP
+	b.offset_bottom = REWARDED_ADS_CTA_GAP + REWARDED_ADS_CTA_SIZE.y
+	b.custom_minimum_size = Vector2(0, REWARDED_ADS_CTA_SIZE.y)
+	b.disabled = true
+	b.pressed.connect(func():
+		if not b.disabled:
+			_shortcut_pressed("rewarded_ads"))
+	daily.add_child(_reg(b))
+	var tri := PlayTriangle.new()
+	tri.name = "RewardedAdsTriangle"
+	tri.set_anchors_preset(Control.PRESET_CENTER_LEFT)
+	tri.offset_left = 16
+	tri.offset_right = 44
+	tri.offset_top = -16
+	tri.offset_bottom = 16
+	b.add_child(_reg(tri))
+
 # ------------------------------------------------------------- Play CTA ----
 
 ## Centred standalone CTA (V03 size): live PLAY, native white triangle, compact live
@@ -1250,6 +1300,7 @@ func _render_values() -> void:
 			nl.visible = int(bd[nid]) > 0 and not (_nodes["Nav_" + nid] as Button).disabled
 	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
 		(_nodes["Shortcut_" + id[0]] as Button).disabled = not (LIVE_SHORTCUTS.has(id[0]) or _app_shortcuts.has(id[0]))
+	(_nodes["RewardedAdsButton"] as Button).disabled = not _app_shortcuts.has("rewarded_ads")
 	for pid in _popups:
 		if (_popups[pid] as Control).visible:
 			_render_popup(pid)
