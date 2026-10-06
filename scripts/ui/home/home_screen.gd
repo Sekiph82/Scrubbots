@@ -415,7 +415,7 @@ func _build() -> void:
 	_build_gift_meter(gm)
 	_build_shortcuts(_nodes["LeftShortcutColumn"], LEFT_SHORTCUTS)
 	_build_shortcuts(_nodes["RightShortcutColumn"], RIGHT_SHORTCUTS)
-	_build_rewarded_ads_cta(_nodes["Shortcut_daily"])
+	_build_rewarded_ads_cta(_nodes["Shortcut_collection"])
 	_build_track(track)
 	_build_bottom_nav(nav)
 
@@ -867,44 +867,42 @@ func _build_shortcuts(column: VBoxContainer, specs: Array) -> void:
 		_nodes["Shortcut_" + id] = b
 		_nodes["ShortcutIcon_" + id] = b.icon_rect
 
-## M43-C015R (SB-M43-R15-001; R15-004 visual remediation): the auxiliary REWARDED ADS entry.
-## Same production shortcut grammar as SHOP / COLLECTION / TASKS / DAILY: a UiShortcutButton
-## with the canonical light glass panel (HomeStyle.style_light_panel), the same 210x156 card,
+## M43-C015R (SB-M43-R15-001; R15-004 visual remediation; owner F5 placement 2026-10-06): the
+## auxiliary REWARDED ADS entry. Same production shortcut grammar as SHOP / COLLECTION / TASKS /
+## DAILY: a UiShortcutButton with the canonical light glass panel (HomeStyle.style_light_panel),
 ## icon box, live code-rendered label band and badge seam. Its icon is the owner-approved
 ## HOME-122 art, bound only through HomeArtBinder / HomePresentationMap (no text baked in).
-## It is NOT a fifth primary panel: it is a child of Shortcut_daily (never a column slot),
-## hung one PANEL_GAP below DAILY, so it moves with DAILY and hides with the action layer under
-## a modal. Intent only: shortcut_requested("rewarded_ads"); disabled unless the app registered
-## the destination.
-## Auxiliary card: same glass panel / icon box / label grammar, narrower than the four primary
-## panels and right-aligned under DAILY so Scrubby's waving hand (which reaches x ~884 on the
-## tallest canvases) is never covered; the label
-## "REWARDED / ADS" sits on two lines in a taller band so the icon stands on it, never over it.
-const REWARDED_ADS_CARD := Vector2(164, 178)
-const REWARDED_ADS_LABEL_BAND := 74
+## It is NOT a fifth primary panel: it is a child of Shortcut_collection (never a column slot),
+## hung one PANEL_GAP below COLLECTION and stretched to COLLECTION's exact width (owner: "under
+## Collection, same width as Collection and Shop"), so it moves with COLLECTION and hides with
+## the action layer under a modal. Intent only: shortcut_requested("rewarded_ads"); disabled
+## unless the app registered the destination.
+## At the full PANEL_SIZE (210x156) the code label "REWARDED ADS" fits one line in the standard
+## LABEL_BAND (a slightly smaller font than the one-word primaries), so the card is the exact
+## SHOP / COLLECTION panel.
 const REWARDED_ADS_LABEL_FONT := 24
-func _build_rewarded_ads_cta(daily: Control) -> void:
+func _build_rewarded_ads_cta(collection: Control) -> void:
 	var b := UiShortcutButton.new("rewarded_ads", UiText.t("HOME_SC_REWARDED_ADS"))
 	b.name = "RewardedAdsButton"
-	b.label_band = REWARDED_ADS_LABEL_BAND
-	HomeStyle.style_light_panel(b, int(REWARDED_ADS_CARD.y) - REWARDED_ADS_LABEL_BAND, PANEL_ALPHA, PANEL_BORDER)
+	HomeStyle.style_light_panel(b, int(PANEL_SIZE.y) - UiShortcutButton.LABEL_BAND, PANEL_ALPHA, PANEL_BORDER)
 	b.add_theme_font_size_override("font_size", REWARDED_ADS_LABEL_FONT)
-	b.autowrap_mode = TextServer.AUTOWRAP_WORD   # whole words: REWARDED / ADS
-	b.custom_minimum_size = REWARDED_ADS_CARD
-	b.anchor_left = 1.0
+	b.autowrap_mode = TextServer.AUTOWRAP_OFF   # one line; never wraps under the icon
+	b.custom_minimum_size = PANEL_SIZE
+	# Exactly COLLECTION's rect (= the SHOP / COLLECTION width), one PANEL_GAP below it.
+	b.anchor_left = 0.0
 	b.anchor_right = 1.0
 	b.anchor_top = 1.0
 	b.anchor_bottom = 1.0
-	b.offset_left = -REWARDED_ADS_CARD.x
+	b.offset_left = 0.0
 	b.offset_right = 0.0
 	b.offset_top = PANEL_GAP
-	b.offset_bottom = PANEL_GAP + REWARDED_ADS_CARD.y
-	b.set_icon_box(Vector2(REWARDED_ADS_CARD.x - 4.0, V03_ICON_BOX.y) * float(ICON_SCALE["rewarded_ads"]))
+	b.offset_bottom = PANEL_GAP + PANEL_SIZE.y
+	b.set_icon_box(V03_ICON_BOX * float(ICON_SCALE["rewarded_ads"]))
 	b.disabled = true
 	b.pressed.connect(func():
 		if not b.disabled:
 			_shortcut_pressed("rewarded_ads"))
-	daily.add_child(_reg(b))
+	collection.add_child(_reg(b))
 	_nodes["ShortcutIcon_rewarded_ads"] = b.icon_rect
 
 # ------------------------------------------------------------- Play CTA ----
