@@ -223,3 +223,15 @@ The test writes to `<test_dir>/subdir/../legit_distinct.json`, where `subdir` do
 No canonical plugin intake; no M44 / M56 / M57 / M58, world, ranks, provider or owner-gate decision. No reward, rank, provider or schedule value was invented. The final cross-screen sound / haptic feel remains owner gate SB-M43-168.
 
 AWAITING_GPT_M43_MASTER_REMEDIATION_V03_AUDIT
+
+---
+
+## V04 CLOSURE NOTE — 2026-10-06
+
+Both pre-existing Linux failures reported above are fixed in the V04 cross-platform closure, and this V03 work is integrated without any history rewrite. Details: `M43_MASTER_REMEDIATION_CLAUDE_LOG_V04.md`.
+
+- `tests/m41_settings.gd`: the Reduced Effects invariance comparison now excludes only the OS-seeded `economy.packs.rng`, and production RNG is unchanged. Result: PASS.
+- `LevelImporter.run_import`: all actual I/O uses the `_resolve_path()` simplified path. Root `tests/run_tests.gd` on Linux: **ALL PASS, 5,329 checks** (the 5,323 originals plus 6 new preview / metadata / missing-parent checks), V04 code commit `fa89fb6`.
+- The V03 focused suite still passes 28/28, and statuses stay 92 / 33 / 21.
+
+The final status of this remediation is the V04 handoff: `AWAITING_GPT_M43_MASTER_REMEDIATION_V04_AUDIT`.
