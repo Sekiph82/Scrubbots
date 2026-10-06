@@ -5,14 +5,15 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Project Status
 
 - Current Milestone: M43 RESULTS / PLAYER EXPERIENCE / META UI
-- Current Sprint: M43-C005 — Reward, Pack, Collection, Robot, Feature and World Ceremonies
-- Current Task: M43 COMPLETE MILESTONE MASTER EXECUTION V01
-- Current Task Status: M43_MASTER_REMEDIATION_V03_V04_AUDIT_PASS / OWNER_AND_DEPENDENCY_GATES_REMAIN
-- Next Task/Action: V03+V04 technical remediation is CLOSED by `coordination/sessions/M43-MASTER-V01/CHATGPT_MASTER_REMEDIATION_AUDIT_V04.md`. No duplicate M41 pack-RNG task is needed. Continue only through the remaining explicit M43 owner/authority/dependency gates; SB-M43-168 final cross-screen sound/haptic feel remains owner-gated and SB-M43-170 continues to block M43 program closure while required surfaces/authorities are unresolved. Before any next Claude implementation prompt, synchronize `C:\\Users\\sekip\\Desktop\\ScrubBots` non-destructively with current `origin/main` and preserve owner-local work.
-- Required Actor: OWNER / CHATGPT
+- Current Sprint: M43-C015R — Owner Runtime Review Remediation
+- Current Task: M43 OWNER RUNTIME REVIEW REMEDIATION V01
+- Current Task Status: OWNER_REVIEW_2026_10_06 / THREE_REMEDIATIONS_READY_FOR_CLAUDE
+- Next Task/Action: CLAUDE executes `coordination/sessions/M43-OWNER-R15/CHATGPT_PROMPT_V01.md` as one uninterrupted three-item remediation: (1) add the separate daily REWARDED ADS CTA/surface with 5 reward slots, slot 1 free CLAIM and slots 2-5 verified rewarded-video gates; (2) reskin Settings into the canonical SCRUBBOTS M43 visual family without changing M41 settings authority; (3) contain all Daily Rewards art inside its popup/table at the owner-observed 683x1366 runtime and responsive targets. First action is non-destructive sync of `C:\\Users\\sekip\\Desktop\\ScrubBots` with current `origin/main`, preserving owner-local work. Claude does not edit root TASKS.md. After handoff, ChatGPT audits all three together.
+- Required Actor: CLAUDE
 - Tracking Repository: Sekiph82/Scrubbots
 - Tracking Branch: main
-- Progress: 994 / 1436 = 69.22%. V03+V04 combined remediation audit PASS closes SB-M43-155, SB-M43-R12-005, SB-M43-R12-007, SB-M43-161, SB-M43-162 and SB-M43-167. SB-M43-R01-001..008 remain CLOSED by V02 technical audit plus final owner acceptance; M43-C001R is complete. Remaining M43 work is owner/authority/dependency-gated.
+- Progress: 994 / 1439 = 69.08%. Three owner-review remediation rows were added on 2026-10-06: SB-M43-R15-001..003. V03+V04 technical remediation remains CLOSED. The new rows do not reopen accepted economy/settings authority; they add one new Rewarded Ads surface and two presentation remediations.
+- Owner runtime review [2026-10-06, F5 main]: owner reviewed the supplied live screens and said **everything shown is OK except two visual defects plus one new requested surface**. Accepted in this review: Collection/list + set detail states, Cards Exchange empty state, Robots, Gift Bar, Profile, Achievements, Notifications, Shop, Life, Events empty state and Tasks. **Not accepted yet:** Daily Rewards layout because art protrudes outside its intended table/popup bounds; Settings because the dark generic panel does not match the SCRUBBOTS visual language. **New owner request:** add a separate REWARDED ADS button/surface with five rewards per local day: reward 1 is immediately claimable, rewards 2-5 each require one successfully completed verified rewarded video. This review does not constitute SB-M43-168 sound/haptic acceptance.
 - Owner visual decision [2026-10-04]: SB-M43-064 V01 technical audit PASS is retained, but the shipping composition is OWNER REJECTED. Required V02 flow is pack alone -> Tap 1 -> animated 01→09 -> cards emerge -> pack gone/3-card hold -> Collection upper-left + Card Exchange upper-right -> Tap 2 -> NEW routes to Collection / DUPLICATE routes to Card Exchange -> complete. Remediation prompt/criteria are `coordination/sessions/M43-C005-C006/CHATGPT_PROMPT_V02.md` and `CHATGPT_AUDIT_CRITERIA_V02.md`.
 - Note: M43-C005-C005 independent audit PASS is recorded in `coordination/sessions/M43-C005-C005/CHATGPT_AUDIT_V01.md`. The reusable production RevealSequencer is presentation-only and Results now uses it without changing receipt/economy/navigation truth. **SB-M43-063 is CLOSED.** Production M43-C005 advances to SB-M43-064 Standard Pack presentation.
 - M43-C005-C006 V02 independent technical audit PASS [2026-10-04]: commit `10144f6e21e3925601b2cc1269835fa2562a1c2f` implements the owner-required two-tap Standard Pack flow and passes source/runtime evidence audit. **SB-M43-064 remains OPEN only for OWNER VISUAL PASS.** Premium SB-M43-065 must not start before that decision.
@@ -2105,9 +2106,18 @@ Before M43 program closure, the following surfaces must each have a canonical vi
 36. Generic reward/confirmation.
 37. Generic error/offline/loading.
 38. Notification education/settings where custom UI is needed.
+39. Rewarded Ads daily claim/watch surface.
 
 - [ ] SB-M43-169 Create `assets/ui/PLAYER_EXPERIENCE_ASSET_MANIFEST.json` covering every surface above and all generated illustration components.
 - [ ] SB-M43-170 No M43 program closure while any required surface is missing, visually unreviewed, wired to dummy data or reachable only through debug tooling.
+
+#### M43-C015R - Owner Runtime Review Remediation [OWNER REQUEST 2026-10-06]
+
+These three rows are the only new work authorized by the 2026-10-06 F5 owner review. The existing four primary Home panels remain SHOP / COLLECTION / TASKS / DAILY; the Rewarded Ads entry is an additional compact auxiliary CTA, not a fifth equal Home panel. Existing Daily consecutive-login authority remains intact and separate.
+
+- [ ] **SB-M43-R15-001 — Rewarded Ads daily five-slot surface.** Add a compact Home `REWARDED ADS` CTA and a canonical M43/BasePopup surface with exactly five config-driven reward slots per LOCAL calendar day. Slot 1 is a direct `CLAIM` with no ad. Slots 2-5 each require one successful verified rewarded-video completion before that slot is granted, exactly once per local day. Seed the V1 slot bundles from the already owner-approved/currently configured Daily D1-D5 reward bundles so no new reward values are invented; store them under a distinct rewarded-daily config/authority rather than aliasing the login streak state. Use deterministic tx ids `daily_rewarded:<local_day>:<slot>`; cancel/skip/fail/timeout/unverified/provider-unavailable grants nothing; no fake production provider; logical placement keys are distinct per slot and await M57 provider mapping. Relaunch/rollback/duplicate callbacks cannot double-grant. Existing Daily login streak/cycle and Daily Scrub Orders are unchanged.
+- [ ] **SB-M43-R15-002 — Settings visual-family remediation.** Preserve every closed M41 Settings behavior/state/persistence contract exactly, but replace the generic dark rectangle with the canonical SCRUBBOTS M43 popup language visible in the owner's accepted screens: cyan/white mechanical frame, cream/white content field, royal-blue SETTINGS title treatment, canonical close/X treatment, readable navy labels, themed sliders/toggles and touch targets. Reuse `BasePopup`/`HomeStyle`/`UiTokens`/approved existing assets where practical; do not add a second settings authority or alter Master/Music/SFX/Haptics/Reduced Effects semantics.
+- [ ] **SB-M43-R15-003 — Daily Rewards containment remediation.** Keep the current consecutive-login logic, D1-D5 values and claim authority unchanged. Fix the owner-observed composition so Daily Rewards art does not protrude outside the intended popup/table/content bounds: the calendar/hero, flame, five day-card frames, state/check art, rule text and buttons must remain visually contained and readable at 683x1366 and the canonical responsive matrix. No clipping of reward text, no overlap with title/actions, no layout regression to Tasks/Gift Bar, and no change to Daily reward truth.
 
 **Shared later-screen visual production rules**
 - [ ] SB-UI-017 Implement reusable `BasePopup` composition.
