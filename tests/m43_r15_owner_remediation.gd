@@ -259,7 +259,7 @@ func _r10() -> void:
 	var e = a.economy
 	var home = _root.get_home()
 	var cta: Button = home.get_region("RewardedAdsButton")
-	_ok(cta != null and not cta.disabled and cta.get_parent() == home.get_region("Shortcut_daily"), "REWARDED ADS CTA live, attached to DAILY")
+	_ok(cta != null and not cta.disabled and cta.get_parent() == home.get_region("Shortcut_collection"), "REWARDED ADS CTA live, attached under COLLECTION")
 	_ok(_names(home.get_region("RightShortcutColumn")) == ["Shortcut_tasks", "Shortcut_daily"] and _names(home.get_region("LeftShortcutColumn")) == ["Shortcut_shop", "Shortcut_collection"], "four primary panels unchanged")
 	cta.pressed.emit()
 	await _frames(2)
@@ -318,15 +318,15 @@ func _r11() -> void:
 				hits.append(n)
 		var icon: Rect2 = (home.get_region("ShortcutIcon_rewarded_ads") as Control).get_global_rect()
 		for n in others:
-			if n != "Shortcut_daily" and icon.intersects(others[n]):
+			if icon.intersects(others[n]):
 				hits.append("icon/" + n)
-		if icon.intersects(others["Shortcut_daily"]):
-			hits.append("icon/Shortcut_daily")
 		for bot in home._world["helper_bot_rects"]:
 			var br := Rect2(home.global_position + home.world_to_screen(bot.position), bot.size * home._world_scale)
 			if cta.intersects(br) or icon.intersects(br):
 				hits.append("helper_bot")
 		_ok(vp.encloses(cta) and vp.encloses(icon) and hits.is_empty() and cta.size.y >= 88.0 - 0.5, "%s (logical %s): card %s + icon inside viewport, >= 88 px, no overlap %s" % [phys, lv, cta, hits])
+		var col: Rect2 = others["Shortcut_collection"]
+		_ok(cta.size.is_equal_approx(col.size) and cta.size.is_equal_approx(others["Shortcut_shop"].size) and is_equal_approx(cta.position.x, col.position.x) and cta.position.y > col.end.y, "%s: owner placement - under COLLECTION, same size / x as COLLECTION and SHOP (%s vs %s)" % [phys, cta, col])
 		var opaque := _scrubby_opaque_in(home, [cta, icon])
 		_ok(opaque == 0, "%s: no opaque Scrubby pose pixel under the card or icon (%d)" % [phys, opaque])
 	_complete("r11_home_cta_geometry")
@@ -360,10 +360,14 @@ func _r12() -> void:
 	var home = _root.get_home()
 	var ra: Button = home.get_region("RewardedAdsButton")
 	var daily: Button = home.get_region("Shortcut_daily")
-	_ok(ra.get_script() == daily.get_script() and ra.get_parent() == daily and ra.find_children("*", "", true, false).all(func(c): return not String(c.name).contains("Triangle")), "same UiShortcutButton component, attached to DAILY; no native play triangle")
+	_ok(ra.get_script() == daily.get_script() and ra.get_parent() == home.get_region("Shortcut_collection") and ra.find_children("*", "", true, false).all(func(c): return not String(c.name).contains("Triangle")), "same UiShortcutButton component, attached under COLLECTION; no native play triangle")
 	var a_sb: StyleBoxFlat = ra.get_theme_stylebox("normal")
 	var d_sb: StyleBoxFlat = daily.get_theme_stylebox("normal")
 	_ok(a_sb.bg_color == d_sb.bg_color and a_sb.border_color == d_sb.border_color and a_sb.bg_color != Color(0.337, 0.769, 0.169), "same cyan/blue light glass panel as DAILY (green CTA body gone)")
+	var fnt: Font = ra.get_theme_font("font")
+	var tw: float = fnt.get_string_size(ra.text, HORIZONTAL_ALIGNMENT_LEFT, -1, ra.get_theme_font_size("font_size")).x
+	var nsb: StyleBox = ra.get_theme_stylebox("normal")
+	_ok(ra.label_band == daily.label_band and ra.autowrap_mode == TextServer.AUTOWRAP_OFF and tw <= ra.size.x - nsb.get_margin(SIDE_LEFT) - nsb.get_margin(SIDE_RIGHT), "one-line label in the standard band fits the panel (%.0f px text)" % tw)
 	_ok(ra.text == "REWARDED ADS" and ra.get_theme_color("font_color") == daily.get_theme_color("font_color") and ra.get_theme_color("font_outline_color") == daily.get_theme_color("font_outline_color") and ra.get_theme_constant("outline_size") == daily.get_theme_constant("outline_size"), "code-rendered REWARDED ADS label, same white / navy-outline treatment")
 	var path := "res://assets/ui/final/home/shortcuts/icon_shortcut_rewarded_ads.png"
 	var b = home.get_art_binder()
