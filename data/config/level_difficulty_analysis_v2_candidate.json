@@ -1,20 +1,107 @@
 {
-	"schema": "scrubbots-level-difficulty-analysis/v2-candidate",
-	"version": 2.0,
 	"analyzerVersion": "m53-level-difficulty-analyzer/v2-candidate",
-	"status": "CANDIDATE_NOT_PRODUCTION_AUTHORITY",
-	"createdFor": "M53-C002",
-	"supersedes": "nothing (V1 analyzer/config/evidence preserved for provenance; adoption is an owner decision after audit)",
-	"consumes": {
-		"scoreModel": "res://data/config/difficulty_score_model_v1.json",
-		"progressionModel": "res://data/config/level_progression_v1.json",
-		"lockedNote": "Challenge weights, component weights, W and C formulas and TargetChallenge lanes are read unchanged from the locked V1 files."
+	"anchorRules": {
+		"A_hi": "maximum over the whole calibration corpus of primary A_raw",
+		"A_lo": "median over the FLOW_SIZE family of primary A_raw",
+		"R_detour_hi": "maximum over the corpus of primary mean detour",
+		"R_detour_lo": "median over the FLOW_SIZE family of primary mean detour",
+		"R_len_hi": "maximum over the corpus of primary mean route length / diagonal",
+		"R_len_lo": "median over the FLOW_SIZE family of primary mean route length / diagonal",
+		"R_turn_hi": "maximum over the corpus of primary mean turns",
+		"R_turn_lo": "median over the FLOW_SIZE family of primary mean turns",
+		"U_mean_hi": "maximum over the corpus of mean unlock wave",
+		"U_p95_hi": "maximum over the corpus of p95 unlock wave",
+		"reason": "FLOW_SIZE is the declared minimum-structure family (every colour touches the border, balanced supply); the corpus maximum is the declared structural extreme. Linear clamp keeps the locked weights meaningful on [0,1]. The First 10 are never read by the calibration step."
 	},
-	"runtimeConstants": {
-		"botSpeedCellsPerSecond": 6.0,
-		"baseCadenceSeconds": 0.5
+	"calibratedAnchors": {
+		"corpusManifestSha256": "13885bcf2f0fc483b4a5aa6d00f73ff38cccf33db4b82671bdb8b068b66b227f",
+		"derivedFrom": "res://tests/fixtures/difficulty_calibration/corpus_manifest_v1.json",
+		"firstTenRead": false,
+		"rules": {
+			"A_hi": "maximum over the whole calibration corpus of primary A_raw",
+			"A_lo": "median over the FLOW_SIZE family of primary A_raw",
+			"R_detour_hi": "maximum over the corpus of primary mean detour",
+			"R_detour_lo": "median over the FLOW_SIZE family of primary mean detour",
+			"R_len_hi": "maximum over the corpus of primary mean route length / diagonal",
+			"R_len_lo": "median over the FLOW_SIZE family of primary mean route length / diagonal",
+			"R_turn_hi": "maximum over the corpus of primary mean turns",
+			"R_turn_lo": "median over the FLOW_SIZE family of primary mean turns",
+			"U_mean_hi": "maximum over the corpus of mean unlock wave",
+			"U_p95_hi": "maximum over the corpus of p95 unlock wave",
+			"reason": "FLOW_SIZE is the declared minimum-structure family (every colour touches the border, balanced supply); the corpus maximum is the declared structural extreme. Linear clamp keeps the locked weights meaningful on [0,1]. The First 10 are never read by the calibration step."
+		},
+		"values": {
+			"A_hi": 0.5873777667035502,
+			"A_lo": 0.029133975089039286,
+			"R_detour_hi": 2.8802551969711767,
+			"R_detour_lo": 1.287816172006527,
+			"R_len_hi": 1.6558407846179446,
+			"R_len_lo": 0.7318278834717108,
+			"R_turn_hi": 4.681134389523721,
+			"R_turn_lo": 2.062500057394323,
+			"U_mean_hi": 1.5277777777777777,
+			"U_p95_hi": 4.0
+		}
+	},
+	"consumes": {
+		"lockedNote": "Challenge weights, component weights, W and C formulas and TargetChallenge lanes are read unchanged from the locked V1 files.",
+		"progressionModel": "res://data/config/level_progression_v1.json",
+		"scoreModel": "res://data/config/difficulty_score_model_v1.json"
+	},
+	"createdFor": "M53-C002",
+	"deviations": {
+		"A": {
+			"evidence": "On the independent corpus the V1 ratio is ordinally inverted: interleaved comb, serpentine maze and 3x3 mosaic score LOWER scarcity than halves, open block and stripes, because reachable/raw measures region compactness (area vs exposed frontier), not whether the batches in play can find targets. No normalization can repair an inverted ordering. The capped form equals the V1 ratio whenever demand >= raw.",
+			"from": "V1 / difficulty_score_model_v1.json text: 1 - reachable_matching_candidates/raw_matching_active_candidates",
+			"status": "CANDIDATE deviation from the locked conceptual text; requires ChatGPT audit + owner adoption. difficulty_score_model_v1.json is not modified.",
+			"to": "raw candidates capped at the demanded robots: 1 - sum min(reachable, need) / sum need, need = min(raw, demand)"
+		},
+		"S_imbalance": {
+			"evidence": "the V1 shortfall term measures the same quantity as the demand-relative A and would double count it",
+			"from": "V1 analyzer: robot-weighted front shortfall clamp(1 - reachable/robots)",
+			"status": "CANDIDATE; component weights unchanged",
+			"to": "remaining-work imbalance across demanded colours (doc 09 section 4.7 wording)"
+		}
+	},
+	"fixedParameters": {
+		"accessibilityEarlyWeight": 2.0,
+		"accessibilityEarlyWeightNote": "carried unchanged from V1 Stage A (not calibrated by the corpus; sensitivity reported)",
+		"sessionActionsReference": 3481.0,
+		"sessionDecisionReference": 117.0,
+		"sessionRouteTimeReferenceSeconds": 48400.0
+	},
+	"freeze": {
+		"date": "2026-09-27",
+		"frozen": true,
+		"frozenBy": "tools/calibrate_difficulty_v2.gd --calibrate",
+		"rule": "No V2 candidate change after this point; First 10 holdout is measured and scored only against this exact file (sha256 recorded in calibration_corpus_v1.json)."
+	},
+	"operationalDefinitions": {
+		"A": "DEMAND-RELATIVE (V2 deviation, see deviations.A): per decision state, for every colour the player can act on (legal fronts + occupied slots), need_c = min(raw ACTIVE of c, robots demanded of c) and got_c = min(reachable of c, need_c); A_t = 1 - sum got / sum need. A_raw = progress-interval-weighted mean of A_t (weight = progress covered until the next decision, x accessibilityEarlyWeight when progress < priorityProgressFraction); A = clamp((A_raw - A_lo)/(A_hi - A_lo))",
+		"B": "only decision states with >= 2 legal fronts are considered (column exhaustion is not a bottleneck); forced = <= 1 productive; low-choice = <= lowChoiceThreshold productive AND fewer productive than legal; streak = longest consecutive forced run / considered states",
+		"C": "locked: ChallengeScoreModelV1.color_submetric(used colors, normalized Shannon entropy)",
+		"R": "per policy: mean route length / board diagonal, mean detour, mean equivalent right-angle turns over every claim's production route; each linearly normalized with [lo, hi] anchors",
+		"S": "no-work fraction = states with an occupied slot whose batch has no reachable target; single-productive fraction = states demanding >= 2 distinct colours where exactly one colour can progress; remaining-work imbalance = mean over states of (1 - normalized Shannon entropy of the remaining ACTIVE counts of the demanded colours), 0 when fewer than 2 colours are demanded",
+		"U": "colour-aware unlock waves under production access: wave k starts with every ACTIVE cell ProductionTargetAccess reports targetable once all earlier waves are CLEARED, then grows by same-colour closure (a same-colour neighbour of a wave-k cell that becomes targetable joins wave k). U = 0.55 clamp(p95/U_p95_hi) + 0.30 clamp(mean/U_mean_hi) + 0.15 lockedFraction (cells not in wave 0). Policy independent.",
+		"W": "locked: ChallengeScoreModelV1.workload_submetric(cell count)",
+		"frustration": "PROVISIONAL_STAGE_A: choice opacity (0.5 B + 0.5 non-productive legal fraction) plus STRESS-policy diagnostics (completion, failure progress, late failure > 70%, dead placements); retryRisk and sessionOverrun remain UNSUPPORTED; no scalar",
+		"sessionLoad": "median over the primary ensemble of V1 session inputs (dispatches, route travel seconds, decisions) with the V1 envelope anchors (actions 3481, route seconds 48400, decisions 117)"
 	},
 	"policies": {
+		"aggregate": "component-wise MEAN of the raw policy components over all six non-adversarial policies (each family RR/GREEDY/ACCESS contributes two members = equal family weight), then normalization",
+		"aggregateStatistic": "mean",
+		"definitions": {
+			"ACCESS": "productive front maximizing min(reachable, robots)/robots, then reachable; ties -> lowest column",
+			"ACCESS_HI": "ACCESS with ties -> highest column",
+			"GREEDY": "productive front with the most reachable targets; ties -> lowest column",
+			"GREEDY_HI": "GREEDY with ties -> highest column",
+			"RR": "balanced round-robin: next productive column cyclically after the previously chosen column (ascending)",
+			"RR_REV": "round-robin in descending cyclic order",
+			"STRESS": "bounded adversarial: legal front with the FEWEST reachable targets (non-productive first); ties -> lowest column; stops at completion or when no legal placement exists. Frustration/robustness diagnostics only; never enters primary D",
+			"shared": "every non-adversarial policy places a productive front (>= 1 reachable target from the placement slot) whenever one exists; only when none exists does it place a non-productive legal front"
+		},
+		"ensembleRevisionNote": "Pre-freeze corpus iterations (no First 10 data): (1) a 3-policy median moved up to 2.0 D on color_skew6_24 when one tie-break flipped; (2) the 6-policy median still moved up to 3.6 D under leave-family-out because policies form two trajectory clusters (round-robin vs greedy/access). For two clusters (L, H) the family-out shift is (H-L)/2 for the median, (H-L)/4 for a trimmed mean and (H-L)/6 for the equal-family mean. Every member obeys the shared no-dead-placement rule and STRESS is excluded, so the mean's weaker outlier resistance is not exercised; the mean is the adopted candidate rule. (3) Leave-family-out still moved D up to 3.7 on fixtures whose supply lets families take genuinely different strategies (route_maze_24: greedy clears the walls first, round-robin follows the corridor). That is strategy spread, not tie-break/search-order noise; it is reported per level as strategyFamilySpread and the tolerance gate is applied to tie-break and leave-one-out changes, the analogue of solver search-order/tie-break.",
+		"oracle": "SolvabilitySolver remains solvability/provenance authority only; no oracle trace enters any Challenge component",
 		"primaryEnsemble": [
 			"RR",
 			"RR_REV",
@@ -23,104 +110,17 @@
 			"ACCESS",
 			"ACCESS_HI"
 		],
-		"aggregate": "component-wise MEAN of the raw policy components over all six non-adversarial policies (each family RR/GREEDY/ACCESS contributes two members = equal family weight), then normalization",
+		"robustness": "GATE: leave-one-out (drop any single policy -> mean of 5) and tie-break-uniform variants (both members of a family replaced by one of its tie-break variants); every variant must stay within robustnessToleranceD of primary D. REPORTED, NOT GATED: leave-family-out and family-only D (strategy spread between genuinely different valid policy families) and the two tie-break halves.",
 		"robustnessToleranceD": 1.75,
 		"robustnessToleranceReason": "declared before any measurement: policy tie-break choice alone may consume at most half of the default +/-3.5 acceptance window",
-		"stress": "STRESS",
-		"definitions": {
-			"shared": "every non-adversarial policy places a productive front (>= 1 reachable target from the placement slot) whenever one exists; only when none exists does it place a non-productive legal front",
-			"RR": "balanced round-robin: next productive column cyclically after the previously chosen column (ascending)",
-			"RR_REV": "round-robin in descending cyclic order",
-			"GREEDY": "productive front with the most reachable targets; ties -> lowest column",
-			"GREEDY_HI": "GREEDY with ties -> highest column",
-			"ACCESS": "productive front maximizing min(reachable, robots)/robots, then reachable; ties -> lowest column",
-			"ACCESS_HI": "ACCESS with ties -> highest column",
-			"STRESS": "bounded adversarial: legal front with the FEWEST reachable targets (non-productive first); ties -> lowest column; stops at completion or when no legal placement exists. Frustration/robustness diagnostics only; never enters primary D"
-		},
-		"oracle": "SolvabilitySolver remains solvability/provenance authority only; no oracle trace enters any Challenge component",
-		"robustness": "GATE: leave-one-out (drop any single policy -> mean of 5) and tie-break-uniform variants (both members of a family replaced by one of its tie-break variants); every variant must stay within robustnessToleranceD of primary D. REPORTED, NOT GATED: leave-family-out and family-only D (strategy spread between genuinely different valid policy families) and the two tie-break halves.",
-		"ensembleRevisionNote": "Pre-freeze corpus iterations (no First 10 data): (1) a 3-policy median moved up to 2.0 D on color_skew6_24 when one tie-break flipped; (2) the 6-policy median still moved up to 3.6 D under leave-family-out because policies form two trajectory clusters (round-robin vs greedy/access). For two clusters (L, H) the family-out shift is (H-L)/2 for the median, (H-L)/4 for a trimmed mean and (H-L)/6 for the equal-family mean. Every member obeys the shared no-dead-placement rule and STRESS is excluded, so the mean's weaker outlier resistance is not exercised; the mean is the adopted candidate rule. (3) Leave-family-out still moved D up to 3.7 on fixtures whose supply lets families take genuinely different strategies (route_maze_24: greedy clears the walls first, round-robin follows the corridor). That is strategy spread, not tie-break/search-order noise; it is reported per level as strategyFamilySpread and the tolerance gate is applied to tie-break and leave-one-out changes, the analogue of solver search-order/tie-break.",
-		"aggregateStatistic": "mean"
+		"stress": "STRESS"
 	},
-	"operationalDefinitions": {
-		"W": "locked: ChallengeScoreModelV1.workload_submetric(cell count)",
-		"C": "locked: ChallengeScoreModelV1.color_submetric(used colors, normalized Shannon entropy)",
-		"A": "DEMAND-RELATIVE (V2 deviation, see deviations.A): per decision state, for every colour the player can act on (legal fronts + occupied slots), need_c = min(raw ACTIVE of c, robots demanded of c) and got_c = min(reachable of c, need_c); A_t = 1 - sum got / sum need. A_raw = progress-interval-weighted mean of A_t (weight = progress covered until the next decision, x accessibilityEarlyWeight when progress < priorityProgressFraction); A = clamp((A_raw - A_lo)/(A_hi - A_lo))",
-		"U": "colour-aware unlock waves under production access: wave k starts with every ACTIVE cell ProductionTargetAccess reports targetable once all earlier waves are CLEARED, then grows by same-colour closure (a same-colour neighbour of a wave-k cell that becomes targetable joins wave k). U = 0.55 clamp(p95/U_p95_hi) + 0.30 clamp(mean/U_mean_hi) + 0.15 lockedFraction (cells not in wave 0). Policy independent.",
-		"B": "only decision states with >= 2 legal fronts are considered (column exhaustion is not a bottleneck); forced = <= 1 productive; low-choice = <= lowChoiceThreshold productive AND fewer productive than legal; streak = longest consecutive forced run / considered states",
-		"R": "per policy: mean route length / board diagonal, mean detour, mean equivalent right-angle turns over every claim's production route; each linearly normalized with [lo, hi] anchors",
-		"S": "no-work fraction = states with an occupied slot whose batch has no reachable target; single-productive fraction = states demanding >= 2 distinct colours where exactly one colour can progress; remaining-work imbalance = mean over states of (1 - normalized Shannon entropy of the remaining ACTIVE counts of the demanded colours), 0 when fewer than 2 colours are demanded",
-		"sessionLoad": "median over the primary ensemble of V1 session inputs (dispatches, route travel seconds, decisions) with the V1 envelope anchors (actions 3481, route seconds 48400, decisions 117)",
-		"frustration": "PROVISIONAL_STAGE_A: choice opacity (0.5 B + 0.5 non-productive legal fraction) plus STRESS-policy diagnostics (completion, failure progress, late failure > 70%, dead placements); retryRisk and sessionOverrun remain UNSUPPORTED; no scalar"
+	"runtimeConstants": {
+		"baseCadenceSeconds": 0.5,
+		"botSpeedCellsPerSecond": 6.0
 	},
-	"fixedParameters": {
-		"accessibilityEarlyWeight": 2.0,
-		"accessibilityEarlyWeightNote": "carried unchanged from V1 Stage A (not calibrated by the corpus; sensitivity reported)",
-		"sessionActionsReference": 3481.0,
-		"sessionRouteTimeReferenceSeconds": 48400.0,
-		"sessionDecisionReference": 117.0
-	},
-	"anchorRules": {
-		"A_lo": "median over the FLOW_SIZE family of primary A_raw",
-		"A_hi": "maximum over the whole calibration corpus of primary A_raw",
-		"U_p95_hi": "maximum over the corpus of p95 unlock wave",
-		"U_mean_hi": "maximum over the corpus of mean unlock wave",
-		"R_len_lo": "median over the FLOW_SIZE family of primary mean route length / diagonal",
-		"R_len_hi": "maximum over the corpus of primary mean route length / diagonal",
-		"R_detour_lo": "median over the FLOW_SIZE family of primary mean detour",
-		"R_detour_hi": "maximum over the corpus of primary mean detour",
-		"R_turn_lo": "median over the FLOW_SIZE family of primary mean turns",
-		"R_turn_hi": "maximum over the corpus of primary mean turns",
-		"reason": "FLOW_SIZE is the declared minimum-structure family (every colour touches the border, balanced supply); the corpus maximum is the declared structural extreme. Linear clamp keeps the locked weights meaningful on [0,1]. The First 10 are never read by the calibration step."
-	},
-	"calibratedAnchors": {
-		"values": {
-			"A_lo": 0.0291339750890393,
-			"A_hi": 0.58737776670355,
-			"U_p95_hi": 4.0,
-			"U_mean_hi": 1.52777777777778,
-			"R_len_lo": 0.731827883471711,
-			"R_len_hi": 1.65584078461795,
-			"R_detour_lo": 1.28781617200653,
-			"R_detour_hi": 2.88025519697118,
-			"R_turn_lo": 2.06250005739432,
-			"R_turn_hi": 4.68113438952372
-		},
-		"rules": {
-			"A_lo": "median over the FLOW_SIZE family of primary A_raw",
-			"A_hi": "maximum over the whole calibration corpus of primary A_raw",
-			"U_p95_hi": "maximum over the corpus of p95 unlock wave",
-			"U_mean_hi": "maximum over the corpus of mean unlock wave",
-			"R_len_lo": "median over the FLOW_SIZE family of primary mean route length / diagonal",
-			"R_len_hi": "maximum over the corpus of primary mean route length / diagonal",
-			"R_detour_lo": "median over the FLOW_SIZE family of primary mean detour",
-			"R_detour_hi": "maximum over the corpus of primary mean detour",
-			"R_turn_lo": "median over the FLOW_SIZE family of primary mean turns",
-			"R_turn_hi": "maximum over the corpus of primary mean turns",
-			"reason": "FLOW_SIZE is the declared minimum-structure family (every colour touches the border, balanced supply); the corpus maximum is the declared structural extreme. Linear clamp keeps the locked weights meaningful on [0,1]. The First 10 are never read by the calibration step."
-		},
-		"derivedFrom": "res://tests/fixtures/difficulty_calibration/corpus_manifest_v1.json",
-		"corpusManifestSha256": "13885bcf2f0fc483b4a5aa6d00f73ff38cccf33db4b82671bdb8b068b66b227f",
-		"firstTenRead": false
-	},
-	"freeze": {
-		"frozen": true,
-		"frozenBy": "tools/calibrate_difficulty_v2.gd --calibrate",
-		"date": "2026-09-27",
-		"rule": "No V2 candidate change after this point; First 10 holdout is measured and scored only against this exact file (sha256 recorded in calibration_corpus_v1.json)."
-	},
-	"deviations": {
-		"A": {
-			"from": "V1 / difficulty_score_model_v1.json text: 1 - reachable_matching_candidates/raw_matching_active_candidates",
-			"to": "raw candidates capped at the demanded robots: 1 - sum min(reachable, need) / sum need, need = min(raw, demand)",
-			"evidence": "On the independent corpus the V1 ratio is ordinally inverted: interleaved comb, serpentine maze and 3x3 mosaic score LOWER scarcity than halves, open block and stripes, because reachable/raw measures region compactness (area vs exposed frontier), not whether the batches in play can find targets. No normalization can repair an inverted ordering. The capped form equals the V1 ratio whenever demand >= raw.",
-			"status": "CANDIDATE deviation from the locked conceptual text; requires ChatGPT audit + owner adoption. difficulty_score_model_v1.json is not modified."
-		},
-		"S_imbalance": {
-			"from": "V1 analyzer: robot-weighted front shortfall clamp(1 - reachable/robots)",
-			"to": "remaining-work imbalance across demanded colours (doc 09 section 4.7 wording)",
-			"evidence": "the V1 shortfall term measures the same quantity as the demand-relative A and would double count it",
-			"status": "CANDIDATE; component weights unchanged"
-		}
-	}
+	"schema": "scrubbots-level-difficulty-analysis/v2-candidate",
+	"status": "CANDIDATE_NOT_PRODUCTION_AUTHORITY",
+	"supersedes": "nothing (V1 analyzer/config/evidence preserved for provenance; adoption is an owner decision after audit)",
+	"version": 2.0
 }

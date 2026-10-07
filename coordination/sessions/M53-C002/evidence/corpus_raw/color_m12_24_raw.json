@@ -4,7 +4,7 @@
 	"raw": {
 		"color": {
 			"cells": 576,
-			"entropyNats": 2.484906649788,
+			"entropyNats": 2.4849066497880012,
 			"frequencyByHex": {
 				"#00CC78FF": 48,
 				"#00CCC0FF": 48,
@@ -19,7 +19,7 @@
 				"#FFA800FF": 48,
 				"#FFD635FF": 48
 			},
-			"normalizedEntropy": 1.0,
+			"normalizedEntropy": 1.0000000000000004,
 			"usedColors": 12
 		},
 		"dims": {
@@ -36,145 +36,145 @@
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 47.6000003814697,
+						"lastWaveMaxRoute": 47.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 45.6000003814697,
+						"lastWaveMaxRoute": 45.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 43.6000003814697,
+						"lastWaveMaxRoute": 43.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 41.6000003814697,
+						"lastWaveMaxRoute": 41.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 25.6000003814697,
+						"lastWaveMaxRoute": 25.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 23.6000003814697,
+						"lastWaveMaxRoute": 23.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 21.6000003814697,
+						"lastWaveMaxRoute": 21.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 39.6000003814697,
+						"lastWaveMaxRoute": 39.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 37.6000003814697,
+						"lastWaveMaxRoute": 37.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 19.6000003814697,
+						"lastWaveMaxRoute": 19.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 17.6000003814697,
+						"lastWaveMaxRoute": 17.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 15.6000003814697,
+						"lastWaveMaxRoute": 15.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 17.3999996185303,
+						"lastWaveMaxRoute": 17.399999618530273,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 29.3999996185303,
+						"lastWaveMaxRoute": 29.399999618530273,
 						"waves": 24
 					}
 				],
@@ -182,11 +182,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 576,
-					"lengthVariance": 91.2988899612426,
-					"meanDetour": 1.28761665445186,
-					"meanLength": 25.8333336512248,
-					"meanTurns": 2.04166672348121,
-					"totalLength": 14880.0001831055
+					"lengthVariance": 91.29888996124262,
+					"meanDetour": 1.2876166544518555,
+					"meanLength": 25.833333651224773,
+					"meanTurns": 2.0416667234812094,
+					"totalLength": 14880.000183105469
 				},
 				"states": [
 					{
@@ -255,7 +255,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0416666666666666
+						"progress": 0.04166666666666663
 					},
 					{
 						"active": 528,
@@ -289,7 +289,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0833333333333334
+						"progress": 0.08333333333333337
 					},
 					{
 						"active": 504,
@@ -357,7 +357,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.166666666666667
+						"progress": 0.16666666666666663
 					},
 					{
 						"active": 456,
@@ -391,7 +391,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.208333333333333
+						"progress": 0.20833333333333337
 					},
 					{
 						"active": 432,
@@ -459,7 +459,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.291666666666667
+						"progress": 0.29166666666666663
 					},
 					{
 						"active": 384,
@@ -493,7 +493,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.333333333333333
+						"progress": 0.33333333333333337
 					},
 					{
 						"active": 360,
@@ -561,7 +561,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.416666666666667
+						"progress": 0.41666666666666663
 					},
 					{
 						"active": 312,
@@ -595,7 +595,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.458333333333333
+						"progress": 0.45833333333333337
 					},
 					{
 						"active": 288,
@@ -663,7 +663,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.541666666666667
+						"progress": 0.5416666666666667
 					},
 					{
 						"active": 240,
@@ -697,7 +697,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.583333333333333
+						"progress": 0.5833333333333333
 					},
 					{
 						"active": 216,
@@ -765,7 +765,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.666666666666667
+						"progress": 0.6666666666666667
 					},
 					{
 						"active": 168,
@@ -799,7 +799,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.708333333333333
+						"progress": 0.7083333333333333
 					},
 					{
 						"active": 144,
@@ -851,7 +851,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.791666666666667
+						"progress": 0.7916666666666666
 					},
 					{
 						"active": 96,
@@ -877,7 +877,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.833333333333333
+						"progress": 0.8333333333333334
 					},
 					{
 						"active": 72,
@@ -921,7 +921,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.916666666666667
+						"progress": 0.9166666666666666
 					},
 					{
 						"active": 24,
@@ -939,7 +939,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.958333333333333
+						"progress": 0.9583333333333334
 					}
 				],
 				"stopReason": "solved"
@@ -952,145 +952,145 @@
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 47.6000003814697,
+						"lastWaveMaxRoute": 47.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 45.6000003814697,
+						"lastWaveMaxRoute": 45.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 25.6000003814697,
+						"lastWaveMaxRoute": 25.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 43.6000003814697,
+						"lastWaveMaxRoute": 43.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 41.6000003814697,
+						"lastWaveMaxRoute": 41.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 39.6000003814697,
+						"lastWaveMaxRoute": 39.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 23.6000003814697,
+						"lastWaveMaxRoute": 23.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 21.6000003814697,
+						"lastWaveMaxRoute": 21.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 19.6000003814697,
+						"lastWaveMaxRoute": 19.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 37.6000003814697,
+						"lastWaveMaxRoute": 37.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 17.6000003814697,
+						"lastWaveMaxRoute": 17.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 15.6000003814697,
+						"lastWaveMaxRoute": 15.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 17.3999996185303,
+						"lastWaveMaxRoute": 17.399999618530273,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 29.3999996185303,
+						"lastWaveMaxRoute": 29.399999618530273,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					}
 				],
@@ -1098,11 +1098,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 576,
-					"lengthVariance": 91.2988899612426,
-					"meanDetour": 1.28761665445186,
-					"meanLength": 25.8333336512248,
-					"meanTurns": 2.04166672348121,
-					"totalLength": 14880.0001831055
+					"lengthVariance": 91.29888996124264,
+					"meanDetour": 1.2876166544518552,
+					"meanLength": 25.833333651224773,
+					"meanTurns": 2.041666723481214,
+					"totalLength": 14880.000183105469
 				},
 				"states": [
 					{
@@ -1171,7 +1171,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0416666666666666
+						"progress": 0.04166666666666663
 					},
 					{
 						"active": 528,
@@ -1205,7 +1205,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0833333333333334
+						"progress": 0.08333333333333337
 					},
 					{
 						"active": 504,
@@ -1273,7 +1273,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.166666666666667
+						"progress": 0.16666666666666663
 					},
 					{
 						"active": 456,
@@ -1307,7 +1307,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.208333333333333
+						"progress": 0.20833333333333337
 					},
 					{
 						"active": 432,
@@ -1375,7 +1375,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.291666666666667
+						"progress": 0.29166666666666663
 					},
 					{
 						"active": 384,
@@ -1409,7 +1409,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.333333333333333
+						"progress": 0.33333333333333337
 					},
 					{
 						"active": 360,
@@ -1477,7 +1477,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.416666666666667
+						"progress": 0.41666666666666663
 					},
 					{
 						"active": 312,
@@ -1511,7 +1511,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.458333333333333
+						"progress": 0.45833333333333337
 					},
 					{
 						"active": 288,
@@ -1579,7 +1579,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.541666666666667
+						"progress": 0.5416666666666667
 					},
 					{
 						"active": 240,
@@ -1613,7 +1613,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.583333333333333
+						"progress": 0.5833333333333333
 					},
 					{
 						"active": 216,
@@ -1681,7 +1681,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.666666666666667
+						"progress": 0.6666666666666667
 					},
 					{
 						"active": 168,
@@ -1715,7 +1715,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.708333333333333
+						"progress": 0.7083333333333333
 					},
 					{
 						"active": 144,
@@ -1783,7 +1783,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.791666666666667
+						"progress": 0.7916666666666666
 					},
 					{
 						"active": 96,
@@ -1809,7 +1809,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.833333333333333
+						"progress": 0.8333333333333334
 					},
 					{
 						"active": 72,
@@ -1861,7 +1861,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.916666666666667
+						"progress": 0.9166666666666666
 					},
 					{
 						"active": 24,
@@ -1879,7 +1879,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.958333333333333
+						"progress": 0.9583333333333334
 					}
 				],
 				"stopReason": "solved"
@@ -1892,145 +1892,145 @@
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 47.6000003814697,
+						"lastWaveMaxRoute": 47.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 45.6000003814697,
+						"lastWaveMaxRoute": 45.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 43.6000003814697,
+						"lastWaveMaxRoute": 43.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 41.6000003814697,
+						"lastWaveMaxRoute": 41.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 25.6000003814697,
+						"lastWaveMaxRoute": 25.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 23.6000003814697,
+						"lastWaveMaxRoute": 23.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 21.6000003814697,
+						"lastWaveMaxRoute": 21.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 39.6000003814697,
+						"lastWaveMaxRoute": 39.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 37.6000003814697,
+						"lastWaveMaxRoute": 37.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 19.6000003814697,
+						"lastWaveMaxRoute": 19.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 17.6000003814697,
+						"lastWaveMaxRoute": 17.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 15.6000003814697,
+						"lastWaveMaxRoute": 15.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 17.3999996185303,
+						"lastWaveMaxRoute": 17.399999618530273,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 29.3999996185303,
+						"lastWaveMaxRoute": 29.399999618530273,
 						"waves": 24
 					}
 				],
@@ -2038,11 +2038,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 576,
-					"lengthVariance": 91.2988899612426,
-					"meanDetour": 1.28761665445186,
-					"meanLength": 25.8333336512248,
-					"meanTurns": 2.04166672348121,
-					"totalLength": 14880.0001831055
+					"lengthVariance": 91.29888996124262,
+					"meanDetour": 1.2876166544518555,
+					"meanLength": 25.833333651224773,
+					"meanTurns": 2.0416667234812094,
+					"totalLength": 14880.000183105469
 				},
 				"states": [
 					{
@@ -2111,7 +2111,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0416666666666666
+						"progress": 0.04166666666666663
 					},
 					{
 						"active": 528,
@@ -2145,7 +2145,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0833333333333334
+						"progress": 0.08333333333333337
 					},
 					{
 						"active": 504,
@@ -2213,7 +2213,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.166666666666667
+						"progress": 0.16666666666666663
 					},
 					{
 						"active": 456,
@@ -2247,7 +2247,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.208333333333333
+						"progress": 0.20833333333333337
 					},
 					{
 						"active": 432,
@@ -2315,7 +2315,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.291666666666667
+						"progress": 0.29166666666666663
 					},
 					{
 						"active": 384,
@@ -2349,7 +2349,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.333333333333333
+						"progress": 0.33333333333333337
 					},
 					{
 						"active": 360,
@@ -2417,7 +2417,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.416666666666667
+						"progress": 0.41666666666666663
 					},
 					{
 						"active": 312,
@@ -2451,7 +2451,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.458333333333333
+						"progress": 0.45833333333333337
 					},
 					{
 						"active": 288,
@@ -2519,7 +2519,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.541666666666667
+						"progress": 0.5416666666666667
 					},
 					{
 						"active": 240,
@@ -2553,7 +2553,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.583333333333333
+						"progress": 0.5833333333333333
 					},
 					{
 						"active": 216,
@@ -2621,7 +2621,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.666666666666667
+						"progress": 0.6666666666666667
 					},
 					{
 						"active": 168,
@@ -2655,7 +2655,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.708333333333333
+						"progress": 0.7083333333333333
 					},
 					{
 						"active": 144,
@@ -2707,7 +2707,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.791666666666667
+						"progress": 0.7916666666666666
 					},
 					{
 						"active": 96,
@@ -2733,7 +2733,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.833333333333333
+						"progress": 0.8333333333333334
 					},
 					{
 						"active": 72,
@@ -2777,7 +2777,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.916666666666667
+						"progress": 0.9166666666666666
 					},
 					{
 						"active": 24,
@@ -2795,7 +2795,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.958333333333333
+						"progress": 0.9583333333333334
 					}
 				],
 				"stopReason": "solved"
@@ -2808,145 +2808,145 @@
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 47.6000003814697,
+						"lastWaveMaxRoute": 47.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 45.6000003814697,
+						"lastWaveMaxRoute": 45.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 25.6000003814697,
+						"lastWaveMaxRoute": 25.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 43.6000003814697,
+						"lastWaveMaxRoute": 43.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 41.6000003814697,
+						"lastWaveMaxRoute": 41.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 39.6000003814697,
+						"lastWaveMaxRoute": 39.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 23.6000003814697,
+						"lastWaveMaxRoute": 23.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 21.6000003814697,
+						"lastWaveMaxRoute": 21.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 19.6000003814697,
+						"lastWaveMaxRoute": 19.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 37.6000003814697,
+						"lastWaveMaxRoute": 37.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 17.6000003814697,
+						"lastWaveMaxRoute": 17.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 15.6000003814697,
+						"lastWaveMaxRoute": 15.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 17.3999996185303,
+						"lastWaveMaxRoute": 17.399999618530273,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 29.3999996185303,
+						"lastWaveMaxRoute": 29.399999618530273,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					}
 				],
@@ -2954,11 +2954,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 576,
-					"lengthVariance": 91.2988899612426,
-					"meanDetour": 1.28761665445186,
-					"meanLength": 25.8333336512248,
-					"meanTurns": 2.04166672348121,
-					"totalLength": 14880.0001831055
+					"lengthVariance": 91.29888996124264,
+					"meanDetour": 1.2876166544518552,
+					"meanLength": 25.833333651224773,
+					"meanTurns": 2.041666723481214,
+					"totalLength": 14880.000183105469
 				},
 				"states": [
 					{
@@ -3027,7 +3027,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0416666666666666
+						"progress": 0.04166666666666663
 					},
 					{
 						"active": 528,
@@ -3061,7 +3061,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0833333333333334
+						"progress": 0.08333333333333337
 					},
 					{
 						"active": 504,
@@ -3129,7 +3129,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.166666666666667
+						"progress": 0.16666666666666663
 					},
 					{
 						"active": 456,
@@ -3163,7 +3163,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.208333333333333
+						"progress": 0.20833333333333337
 					},
 					{
 						"active": 432,
@@ -3231,7 +3231,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.291666666666667
+						"progress": 0.29166666666666663
 					},
 					{
 						"active": 384,
@@ -3265,7 +3265,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.333333333333333
+						"progress": 0.33333333333333337
 					},
 					{
 						"active": 360,
@@ -3333,7 +3333,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.416666666666667
+						"progress": 0.41666666666666663
 					},
 					{
 						"active": 312,
@@ -3367,7 +3367,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.458333333333333
+						"progress": 0.45833333333333337
 					},
 					{
 						"active": 288,
@@ -3435,7 +3435,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.541666666666667
+						"progress": 0.5416666666666667
 					},
 					{
 						"active": 240,
@@ -3469,7 +3469,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.583333333333333
+						"progress": 0.5833333333333333
 					},
 					{
 						"active": 216,
@@ -3537,7 +3537,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.666666666666667
+						"progress": 0.6666666666666667
 					},
 					{
 						"active": 168,
@@ -3571,7 +3571,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.708333333333333
+						"progress": 0.7083333333333333
 					},
 					{
 						"active": 144,
@@ -3639,7 +3639,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.791666666666667
+						"progress": 0.7916666666666666
 					},
 					{
 						"active": 96,
@@ -3665,7 +3665,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.833333333333333
+						"progress": 0.8333333333333334
 					},
 					{
 						"active": 72,
@@ -3717,7 +3717,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.916666666666667
+						"progress": 0.9166666666666666
 					},
 					{
 						"active": 24,
@@ -3735,7 +3735,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.958333333333333
+						"progress": 0.9583333333333334
 					}
 				],
 				"stopReason": "solved"
@@ -3748,145 +3748,145 @@
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 47.6000003814697,
+						"lastWaveMaxRoute": 47.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 45.6000003814697,
+						"lastWaveMaxRoute": 45.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 43.6000003814697,
+						"lastWaveMaxRoute": 43.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 41.6000003814697,
+						"lastWaveMaxRoute": 41.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 39.6000003814697,
+						"lastWaveMaxRoute": 39.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 25.6000003814697,
+						"lastWaveMaxRoute": 25.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 37.6000003814697,
+						"lastWaveMaxRoute": 37.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 23.6000003814697,
+						"lastWaveMaxRoute": 23.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 21.6000003814697,
+						"lastWaveMaxRoute": 21.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 19.6000003814697,
+						"lastWaveMaxRoute": 19.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 17.6000003814697,
+						"lastWaveMaxRoute": 17.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 15.6000003814697,
+						"lastWaveMaxRoute": 15.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 17.3999996185303,
+						"lastWaveMaxRoute": 17.399999618530273,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 29.3999996185303,
+						"lastWaveMaxRoute": 29.399999618530273,
 						"waves": 24
 					}
 				],
@@ -3894,11 +3894,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 576,
-					"lengthVariance": 91.2988899612426,
-					"meanDetour": 1.28761665445186,
-					"meanLength": 25.8333336512248,
-					"meanTurns": 2.04166672348121,
-					"totalLength": 14880.0001831055
+					"lengthVariance": 91.29888996124264,
+					"meanDetour": 1.2876166544518552,
+					"meanLength": 25.833333651224773,
+					"meanTurns": 2.041666723481208,
+					"totalLength": 14880.000183105469
 				},
 				"states": [
 					{
@@ -3967,7 +3967,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0416666666666666
+						"progress": 0.04166666666666663
 					},
 					{
 						"active": 528,
@@ -4001,7 +4001,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0833333333333334
+						"progress": 0.08333333333333337
 					},
 					{
 						"active": 504,
@@ -4069,7 +4069,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.166666666666667
+						"progress": 0.16666666666666663
 					},
 					{
 						"active": 456,
@@ -4103,7 +4103,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.208333333333333
+						"progress": 0.20833333333333337
 					},
 					{
 						"active": 432,
@@ -4171,7 +4171,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.291666666666667
+						"progress": 0.29166666666666663
 					},
 					{
 						"active": 384,
@@ -4205,7 +4205,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.333333333333333
+						"progress": 0.33333333333333337
 					},
 					{
 						"active": 360,
@@ -4273,7 +4273,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.416666666666667
+						"progress": 0.41666666666666663
 					},
 					{
 						"active": 312,
@@ -4307,7 +4307,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.458333333333333
+						"progress": 0.45833333333333337
 					},
 					{
 						"active": 288,
@@ -4375,7 +4375,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.541666666666667
+						"progress": 0.5416666666666667
 					},
 					{
 						"active": 240,
@@ -4409,7 +4409,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.583333333333333
+						"progress": 0.5833333333333333
 					},
 					{
 						"active": 216,
@@ -4477,7 +4477,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.666666666666667
+						"progress": 0.6666666666666667
 					},
 					{
 						"active": 168,
@@ -4511,7 +4511,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.708333333333333
+						"progress": 0.7083333333333333
 					},
 					{
 						"active": 144,
@@ -4579,7 +4579,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.791666666666667
+						"progress": 0.7916666666666666
 					},
 					{
 						"active": 96,
@@ -4613,7 +4613,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.833333333333333
+						"progress": 0.8333333333333334
 					},
 					{
 						"active": 72,
@@ -4673,7 +4673,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.916666666666667
+						"progress": 0.9166666666666666
 					},
 					{
 						"active": 24,
@@ -4691,7 +4691,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.958333333333333
+						"progress": 0.9583333333333334
 					}
 				],
 				"stopReason": "solved"
@@ -4704,145 +4704,145 @@
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 47.6000003814697,
+						"lastWaveMaxRoute": 47.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 43.6000003814697,
+						"lastWaveMaxRoute": 43.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 45.6000003814697,
+						"lastWaveMaxRoute": 45.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 41.6000003814697,
+						"lastWaveMaxRoute": 41.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 25.6000003814697,
+						"lastWaveMaxRoute": 25.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 37.6000003814697,
+						"lastWaveMaxRoute": 37.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 39.6000003814697,
+						"lastWaveMaxRoute": 39.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 21.6000003814697,
+						"lastWaveMaxRoute": 21.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 23.6000003814697,
+						"lastWaveMaxRoute": 23.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 19.6000003814697,
+						"lastWaveMaxRoute": 19.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 15.6000003814697,
+						"lastWaveMaxRoute": 15.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 17.6000003814697,
+						"lastWaveMaxRoute": 17.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 17.3999996185303,
+						"lastWaveMaxRoute": 17.399999618530273,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 29.3999996185303,
+						"lastWaveMaxRoute": 29.399999618530273,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					}
 				],
@@ -4850,11 +4850,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 576,
-					"lengthVariance": 91.2988899612426,
-					"meanDetour": 1.28761665445186,
-					"meanLength": 25.8333336512248,
-					"meanTurns": 2.04166672348121,
-					"totalLength": 14880.0001831055
+					"lengthVariance": 91.29888996124262,
+					"meanDetour": 1.2876166544518555,
+					"meanLength": 25.833333651224773,
+					"meanTurns": 2.0416667234812094,
+					"totalLength": 14880.000183105469
 				},
 				"states": [
 					{
@@ -4923,7 +4923,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0416666666666666
+						"progress": 0.04166666666666663
 					},
 					{
 						"active": 528,
@@ -4957,7 +4957,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0833333333333334
+						"progress": 0.08333333333333337
 					},
 					{
 						"active": 504,
@@ -5025,7 +5025,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.166666666666667
+						"progress": 0.16666666666666663
 					},
 					{
 						"active": 456,
@@ -5059,7 +5059,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.208333333333333
+						"progress": 0.20833333333333337
 					},
 					{
 						"active": 432,
@@ -5127,7 +5127,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.291666666666667
+						"progress": 0.29166666666666663
 					},
 					{
 						"active": 384,
@@ -5161,7 +5161,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.333333333333333
+						"progress": 0.33333333333333337
 					},
 					{
 						"active": 360,
@@ -5229,7 +5229,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.416666666666667
+						"progress": 0.41666666666666663
 					},
 					{
 						"active": 312,
@@ -5263,7 +5263,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.458333333333333
+						"progress": 0.45833333333333337
 					},
 					{
 						"active": 288,
@@ -5331,7 +5331,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.541666666666667
+						"progress": 0.5416666666666667
 					},
 					{
 						"active": 240,
@@ -5365,7 +5365,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.583333333333333
+						"progress": 0.5833333333333333
 					},
 					{
 						"active": 216,
@@ -5433,7 +5433,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.666666666666667
+						"progress": 0.6666666666666667
 					},
 					{
 						"active": 168,
@@ -5467,7 +5467,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.708333333333333
+						"progress": 0.7083333333333333
 					},
 					{
 						"active": 144,
@@ -5535,7 +5535,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.791666666666667
+						"progress": 0.7916666666666666
 					},
 					{
 						"active": 96,
@@ -5569,7 +5569,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.833333333333333
+						"progress": 0.8333333333333334
 					},
 					{
 						"active": 72,
@@ -5629,7 +5629,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.916666666666667
+						"progress": 0.9166666666666666
 					},
 					{
 						"active": 24,
@@ -5647,7 +5647,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.958333333333333
+						"progress": 0.9583333333333334
 					}
 				],
 				"stopReason": "solved"
@@ -5660,145 +5660,145 @@
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 25.6000003814697,
+						"lastWaveMaxRoute": 25.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 21.6000003814697,
+						"lastWaveMaxRoute": 21.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 19.6000003814697,
+						"lastWaveMaxRoute": 19.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 15.6000003814697,
+						"lastWaveMaxRoute": 15.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 45.6000003814697,
+						"lastWaveMaxRoute": 45.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 47.6000003814697,
+						"lastWaveMaxRoute": 47.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 43.6000003814697,
+						"lastWaveMaxRoute": 43.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 39.6000003814697,
+						"lastWaveMaxRoute": 39.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 41.6000003814697,
+						"lastWaveMaxRoute": 41.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 37.6000003814697,
+						"lastWaveMaxRoute": 37.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 23.6000003814697,
+						"lastWaveMaxRoute": 23.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 33.6000003814697,
+						"lastWaveMaxRoute": 33.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 17.6000003814697,
+						"lastWaveMaxRoute": 17.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 0,
-						"lastWaveMaxRoute": 27.6000003814697,
+						"lastWaveMaxRoute": 27.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 29.6000003814697,
+						"lastWaveMaxRoute": 29.600000381469727,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 1,
-						"lastWaveMaxRoute": 17.3999996185303,
+						"lastWaveMaxRoute": 17.399999618530273,
 						"waves": 24
 					},
 					{
 						"clears": 24,
 						"column": 2,
-						"lastWaveMaxRoute": 29.3999996185303,
+						"lastWaveMaxRoute": 29.399999618530273,
 						"waves": 24
 					}
 				],
@@ -5806,11 +5806,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 576,
-					"lengthVariance": 91.2988899612427,
-					"meanDetour": 1.28761665445185,
-					"meanLength": 25.8333336512248,
-					"meanTurns": 2.04166672348121,
-					"totalLength": 14880.0001831055
+					"lengthVariance": 91.29888996124265,
+					"meanDetour": 1.2876166544518541,
+					"meanLength": 25.833333651224773,
+					"meanTurns": 2.041666723481208,
+					"totalLength": 14880.000183105469
 				},
 				"states": [
 					{
@@ -5879,7 +5879,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0416666666666666
+						"progress": 0.04166666666666663
 					},
 					{
 						"active": 528,
@@ -5913,7 +5913,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0833333333333334
+						"progress": 0.08333333333333337
 					},
 					{
 						"active": 504,
@@ -5981,7 +5981,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.166666666666667
+						"progress": 0.16666666666666663
 					},
 					{
 						"active": 456,
@@ -6015,7 +6015,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.208333333333333
+						"progress": 0.20833333333333337
 					},
 					{
 						"active": 432,
@@ -6083,7 +6083,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.291666666666667
+						"progress": 0.29166666666666663
 					},
 					{
 						"active": 384,
@@ -6117,7 +6117,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.333333333333333
+						"progress": 0.33333333333333337
 					},
 					{
 						"active": 360,
@@ -6185,7 +6185,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.416666666666667
+						"progress": 0.41666666666666663
 					},
 					{
 						"active": 312,
@@ -6219,7 +6219,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.458333333333333
+						"progress": 0.45833333333333337
 					},
 					{
 						"active": 288,
@@ -6287,7 +6287,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.541666666666667
+						"progress": 0.5416666666666667
 					},
 					{
 						"active": 240,
@@ -6321,7 +6321,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.583333333333333
+						"progress": 0.5833333333333333
 					},
 					{
 						"active": 216,
@@ -6389,7 +6389,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.666666666666667
+						"progress": 0.6666666666666667
 					},
 					{
 						"active": 168,
@@ -6423,7 +6423,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.708333333333333
+						"progress": 0.7083333333333333
 					},
 					{
 						"active": 144,
@@ -6491,7 +6491,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.791666666666667
+						"progress": 0.7916666666666666
 					},
 					{
 						"active": 96,
@@ -6525,7 +6525,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.833333333333333
+						"progress": 0.8333333333333334
 					},
 					{
 						"active": 72,
@@ -6577,7 +6577,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.916666666666667
+						"progress": 0.9166666666666666
 					},
 					{
 						"active": 24,
@@ -6595,14 +6595,14 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.958333333333333
+						"progress": 0.9583333333333334
 					}
 				],
 				"stopReason": "solved"
 			}
 		},
 		"timing": {
-			"totalMs": 74786
+			"totalMs": 24777
 		},
 		"unlock": {
 			"histogram": [
