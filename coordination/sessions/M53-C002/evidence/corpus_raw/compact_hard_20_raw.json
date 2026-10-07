@@ -4,13 +4,13 @@
 	"raw": {
 		"color": {
 			"cells": 400,
-			"entropyNats": 1.03881175714559,
+			"entropyNats": 1.038811757145593,
 			"frequencyByHex": {
 				"#2450A4FF": 192,
 				"#FF4500FF": 128,
 				"#FFD635FF": 80
 			},
-			"normalizedEntropy": 0.945567210435071,
+			"normalizedEntropy": 0.9455672104350705,
 			"usedColors": 3
 		},
 		"dims": {
@@ -119,10 +119,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 96.0104,
-					"meanDetour": 1.33841474193018,
+					"lengthVariance": 96.01040000000003,
+					"meanDetour": 1.3384147419301828,
 					"meanLength": 23.36,
-					"meanTurns": 2.23000006205539,
+					"meanTurns": 2.2300000620553937,
 					"totalLength": 9344.0
 				},
 				"states": [
@@ -192,7 +192,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0725
+						"progress": 0.07250000000000001
 					},
 					{
 						"active": 342,
@@ -226,7 +226,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.145
+						"progress": 0.14500000000000002
 					},
 					{
 						"active": 313,
@@ -260,7 +260,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.2175
+						"progress": 0.21750000000000003
 					},
 					{
 						"active": 285,
@@ -362,7 +362,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.43
+						"progress": 0.43000000000000005
 					},
 					{
 						"active": 200,
@@ -659,10 +659,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 90.046775,
-					"meanDetour": 1.32718501021735,
+					"lengthVariance": 90.04677500000001,
+					"meanDetour": 1.3271850102173528,
 					"meanLength": 23.115,
-					"meanTurns": 2.17500006052488,
+					"meanTurns": 2.1750000605248787,
 					"totalLength": 9246.0
 				},
 				"states": [
@@ -732,7 +732,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0725
+						"progress": 0.07250000000000001
 					},
 					{
 						"active": 342,
@@ -766,7 +766,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.145
+						"progress": 0.14500000000000002
 					},
 					{
 						"active": 313,
@@ -800,7 +800,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.2175
+						"progress": 0.21750000000000003
 					},
 					{
 						"active": 285,
@@ -902,7 +902,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.43
+						"progress": 0.43000000000000005
 					},
 					{
 						"active": 200,
@@ -1207,10 +1207,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 96.0104,
-					"meanDetour": 1.33841474193018,
+					"lengthVariance": 96.01040000000003,
+					"meanDetour": 1.3384147419301828,
 					"meanLength": 23.36,
-					"meanTurns": 2.23000006205539,
+					"meanTurns": 2.2300000620553937,
 					"totalLength": 9344.0
 				},
 				"states": [
@@ -1280,7 +1280,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0725
+						"progress": 0.07250000000000001
 					},
 					{
 						"active": 342,
@@ -1314,7 +1314,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.145
+						"progress": 0.14500000000000002
 					},
 					{
 						"active": 313,
@@ -1348,7 +1348,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.2175
+						"progress": 0.21750000000000003
 					},
 					{
 						"active": 285,
@@ -1450,7 +1450,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.43
+						"progress": 0.43000000000000005
 					},
 					{
 						"active": 200,
@@ -1747,10 +1747,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 90.4327750000001,
-					"meanDetour": 1.32994176918046,
+					"lengthVariance": 90.43277500000008,
+					"meanDetour": 1.329941769180459,
 					"meanLength": 23.165,
-					"meanTurns": 2.20500006135971,
+					"meanTurns": 2.2050000613597054,
 					"totalLength": 9266.0
 				},
 				"states": [
@@ -1820,7 +1820,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0725
+						"progress": 0.07250000000000001
 					},
 					{
 						"active": 342,
@@ -1854,7 +1854,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.145
+						"progress": 0.14500000000000002
 					},
 					{
 						"active": 313,
@@ -1888,7 +1888,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.2175
+						"progress": 0.21750000000000003
 					},
 					{
 						"active": 285,
@@ -1990,7 +1990,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.43
+						"progress": 0.43000000000000005
 					},
 					{
 						"active": 200,
@@ -2295,10 +2295,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 67.5316,
-					"meanDetour": 1.4219221247413,
+					"lengthVariance": 67.53159999999997,
+					"meanDetour": 1.4219221247413032,
 					"meanLength": 23.78,
-					"meanTurns": 2.3900000665078,
+					"meanTurns": 2.3900000665077994,
 					"totalLength": 9512.0
 				},
 				"states": [
@@ -2368,7 +2368,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0725
+						"progress": 0.07250000000000001
 					},
 					{
 						"active": 343,
@@ -2402,7 +2402,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.1425
+						"progress": 0.14249999999999996
 					},
 					{
 						"active": 315,
@@ -2436,7 +2436,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.2125
+						"progress": 0.21250000000000002
 					},
 					{
 						"active": 286,
@@ -2470,7 +2470,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.285
+						"progress": 0.28500000000000003
 					},
 					{
 						"active": 258,
@@ -2538,7 +2538,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.425
+						"progress": 0.42500000000000004
 					},
 					{
 						"active": 201,
@@ -2572,7 +2572,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.4975
+						"progress": 0.49750000000000005
 					},
 					{
 						"active": 174,
@@ -2640,7 +2640,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.6325
+						"progress": 0.6325000000000001
 					},
 					{
 						"active": 118,
@@ -2674,7 +2674,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.705
+						"progress": 0.7050000000000001
 					},
 					{
 						"active": 92,
@@ -2892,9 +2892,9 @@
 				"routes": {
 					"count": 400,
 					"lengthVariance": 64.8999999999999,
-					"meanDetour": 1.41282222793364,
+					"meanDetour": 1.4128222279336446,
 					"meanLength": 23.6,
-					"meanTurns": 2.3500000653947,
+					"meanTurns": 2.3500000653946973,
 					"totalLength": 9440.0
 				},
 				"states": [
@@ -2964,7 +2964,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.0725
+						"progress": 0.07250000000000001
 					},
 					{
 						"active": 343,
@@ -2998,7 +2998,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.1425
+						"progress": 0.14249999999999996
 					},
 					{
 						"active": 315,
@@ -3032,7 +3032,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.2125
+						"progress": 0.21250000000000002
 					},
 					{
 						"active": 286,
@@ -3066,7 +3066,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.285
+						"progress": 0.28500000000000003
 					},
 					{
 						"active": 258,
@@ -3134,7 +3134,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.425
+						"progress": 0.42500000000000004
 					},
 					{
 						"active": 201,
@@ -3168,7 +3168,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.4975
+						"progress": 0.49750000000000005
 					},
 					{
 						"active": 174,
@@ -3236,7 +3236,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.6325
+						"progress": 0.6325000000000001
 					},
 					{
 						"active": 118,
@@ -3270,7 +3270,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.705
+						"progress": 0.7050000000000001
 					},
 					{
 						"active": 94,
@@ -3683,7 +3683,7 @@
 			}
 		},
 		"timing": {
-			"totalMs": 86462
+			"totalMs": 19959
 		},
 		"unlock": {
 			"histogram": [

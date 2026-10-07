@@ -1,11 +1,11 @@
 {
-	"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+	"frozenConfigSha256": "7dc96a0de14d385cdda1f4c13caad9c34abd82629413552ec5d197b28f530fc5",
 	"levelId": "m21_level_001_hazard_bot",
 	"levelSha256": "ae725a9c86839dcffb6444f3208416b553679878be7999ef8814de51241e8c1c",
 	"raw": {
 		"color": {
 			"cells": 400,
-			"entropyNats": 0.842430765426492,
+			"entropyNats": 0.8424307654264918,
 			"frequencyByHex": {
 				"#000000FF": 56,
 				"#2450A4FF": 298,
@@ -146,10 +146,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 71.4236937500001,
-					"meanDetour": 1.29442409781487,
+					"lengthVariance": 71.42369375000007,
+					"meanDetour": 1.2944240978148676,
 					"meanLength": 21.1175,
-					"meanTurns": 2.63250007325598,
+					"meanTurns": 2.6325000732559802,
 					"totalLength": 8447.0
 				},
 				"states": [
@@ -553,7 +553,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.3775
+						"progress": 0.37749999999999995
 					},
 					{
 						"active": 248,
@@ -657,7 +657,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.6325
+						"progress": 0.6325000000000001
 					},
 					{
 						"active": 126,
@@ -719,7 +719,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.7425
+						"progress": 0.7424999999999999
 					},
 					{
 						"active": 53,
@@ -737,7 +737,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.8675
+						"progress": 0.8674999999999999
 					},
 					{
 						"active": 4,
@@ -902,10 +902,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 72.0741,
-					"meanDetour": 1.30607103556768,
+					"lengthVariance": 72.07409999999999,
+					"meanDetour": 1.3060710355676781,
 					"meanLength": 21.03,
-					"meanTurns": 3.55250009885732,
+					"meanTurns": 3.552500098857321,
 					"totalLength": 8412.0
 				},
 				"states": [
@@ -1130,7 +1130,7 @@
 							}
 						],
 						"placementSlot": 2,
-						"progress": 0.2475
+						"progress": 0.24750000000000005
 					},
 					{
 						"active": 301,
@@ -1186,7 +1186,7 @@
 							}
 						],
 						"placementSlot": 1,
-						"progress": 0.2475
+						"progress": 0.24750000000000005
 					},
 					{
 						"active": 283,
@@ -1260,7 +1260,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.3675
+						"progress": 0.36750000000000005
 					},
 					{
 						"active": 252,
@@ -1338,7 +1338,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.6175
+						"progress": 0.6174999999999999
 					},
 					{
 						"active": 151,
@@ -1408,7 +1408,7 @@
 							}
 						],
 						"placementSlot": 3,
-						"progress": 0.66
+						"progress": 0.6599999999999999
 					},
 					{
 						"active": 135,
@@ -1544,7 +1544,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.93
+						"progress": 0.9299999999999999
 					}
 				],
 				"stopReason": "solved"
@@ -1673,10 +1673,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 71.4236937500001,
-					"meanDetour": 1.29442409781487,
+					"lengthVariance": 71.42369375000007,
+					"meanDetour": 1.2944240978148676,
 					"meanLength": 21.1175,
-					"meanTurns": 2.63250007325598,
+					"meanTurns": 2.6325000732559802,
 					"totalLength": 8447.0
 				},
 				"states": [
@@ -2080,7 +2080,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.3775
+						"progress": 0.37749999999999995
 					},
 					{
 						"active": 248,
@@ -2184,7 +2184,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.6325
+						"progress": 0.6325000000000001
 					},
 					{
 						"active": 126,
@@ -2246,7 +2246,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.7425
+						"progress": 0.7424999999999999
 					},
 					{
 						"active": 53,
@@ -2264,7 +2264,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.8675
+						"progress": 0.8674999999999999
 					},
 					{
 						"active": 4,
@@ -2430,9 +2430,9 @@
 				"routes": {
 					"count": 400,
 					"lengthVariance": 63.8916,
-					"meanDetour": 1.31994293806752,
+					"meanDetour": 1.3199429380675212,
 					"meanLength": 20.78,
-					"meanTurns": 3.99250011110144,
+					"meanTurns": 3.992500111101441,
 					"totalLength": 8312.0
 				},
 				"states": [
@@ -2657,7 +2657,7 @@
 							}
 						],
 						"placementSlot": 2,
-						"progress": 0.2475
+						"progress": 0.24750000000000005
 					},
 					{
 						"active": 301,
@@ -2713,7 +2713,7 @@
 							}
 						],
 						"placementSlot": 1,
-						"progress": 0.2475
+						"progress": 0.24750000000000005
 					},
 					{
 						"active": 283,
@@ -2787,7 +2787,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.3675
+						"progress": 0.36750000000000005
 					},
 					{
 						"active": 242,
@@ -2855,7 +2855,7 @@
 							}
 						],
 						"placementSlot": 3,
-						"progress": 0.3975
+						"progress": 0.39749999999999996
 					},
 					{
 						"active": 191,
@@ -2983,7 +2983,7 @@
 							}
 						],
 						"placementSlot": 3,
-						"progress": 0.66
+						"progress": 0.6599999999999999
 					},
 					{
 						"active": 135,
@@ -3119,7 +3119,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.93
+						"progress": 0.9299999999999999
 					}
 				],
 				"stopReason": "solved"
@@ -3248,10 +3248,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 65.160975,
-					"meanDetour": 1.33187414491976,
+					"lengthVariance": 65.16097500000002,
+					"meanDetour": 1.3318741449197626,
 					"meanLength": 21.155,
-					"meanTurns": 3.17250008828286,
+					"meanTurns": 3.172500088282861,
 					"totalLength": 8462.0
 				},
 				"states": [
@@ -3711,7 +3711,7 @@
 							}
 						],
 						"placementSlot": 2,
-						"progress": 0.3725
+						"progress": 0.37250000000000005
 					},
 					{
 						"active": 201,
@@ -3752,7 +3752,7 @@
 							}
 						],
 						"placementSlot": 2,
-						"progress": 0.4975
+						"progress": 0.49750000000000005
 					},
 					{
 						"active": 152,
@@ -3893,7 +3893,7 @@
 							}
 						],
 						"placementSlot": 4,
-						"progress": 0.67
+						"progress": 0.6699999999999999
 					},
 					{
 						"active": 131,
@@ -3996,7 +3996,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.93
+						"progress": 0.9299999999999999
 					}
 				],
 				"stopReason": "solved"
@@ -4053,10 +4053,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 100,
-					"lengthVariance": 31.8036,
-					"meanDetour": 1.29640555600524,
+					"lengthVariance": 31.803599999999996,
+					"meanDetour": 1.2964055560052352,
 					"meanLength": 14.42,
-					"meanTurns": 3.01000008376088,
+					"meanTurns": 3.0100000837608807,
 					"totalLength": 1442.0
 				},
 				"states": [
@@ -4436,7 +4436,7 @@
 			"RR_REV": {
 				"completed": false,
 				"decisions": 7,
-				"finalProgress": 0.2475,
+				"finalProgress": 0.24750000000000005,
 				"placements": [
 					{
 						"clears": 0,
@@ -4485,10 +4485,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 99,
-					"lengthVariance": 32.0569329660239,
-					"meanDetour": 1.29531342003664,
-					"meanLength": 14.3939393939394,
-					"meanTurns": 2.97979806271841,
+					"lengthVariance": 32.056932966023886,
+					"meanDetour": 1.295313420036643,
+					"meanLength": 14.393939393939394,
+					"meanTurns": 2.979798062718413,
 					"totalLength": 1425.0
 				},
 				"states": [
@@ -4860,7 +4860,7 @@
 							}
 						],
 						"placementSlot": 0,
-						"progress": 0.2475
+						"progress": 0.24750000000000005
 					}
 				],
 				"stopReason": "no_legal_placement"
@@ -5161,7 +5161,7 @@
 			}
 		},
 		"timing": {
-			"totalMs": 62255
+			"totalMs": 13688
 		},
 		"unlock": {
 			"histogram": [
