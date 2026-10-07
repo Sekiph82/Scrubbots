@@ -17,6 +17,7 @@ extends SceneTree
 const V2 = preload("res://scripts/difficulty/level_difficulty_analyzer_v2_candidate.gd")
 const V1 = preload("res://scripts/difficulty/level_difficulty_analyzer_v1.gd")
 const Cal = preload("res://tools/calibrate_difficulty_v2.gd")
+const Canon = preload("res://tools/m53_canonical_json.gd")
 const Tool1 = preload("res://tools/analyze_m53_first10.gd")
 const Pack = preload("res://tools/build_m52_first_10_pack.gd")
 const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
@@ -231,10 +232,12 @@ func _fresh_determinism() -> void:
 	_ok(a == b, "V2 measurement deterministic across two fresh runs (timing excluded)")
 	_ok(a == committed, "fresh run == committed corpus raw (timing excluded)")
 
+## Exact comparison form: both sides through the SAME canonical (platform-independent)
+## serializer and the same parse, only the volatile `timing` removed (SB-M53-C002-R01-001 R02).
 func _norm(raw: Dictionary) -> String:
-	var d: Dictionary = JSON.parse_string(JSON.stringify(raw))
+	var d: Dictionary = JSON.parse_string(Canon.stringify(raw, ""))
 	d.erase("timing")
-	return JSON.stringify(d, "", true)
+	return Canon.stringify(d, "")
 
 # --- rating sheet ------------------------------------------------------------------------------------
 func _rating_sheet() -> void:

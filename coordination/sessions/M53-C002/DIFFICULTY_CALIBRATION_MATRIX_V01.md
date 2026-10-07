@@ -1,7 +1,7 @@
 # M53-C002 — DIFFICULTY CALIBRATION MATRIX V01
 
 Status: GENERATED (tools/calibrate_difficulty_v2.gd) — V2 CANDIDATE, not production authority; awaiting ChatGPT audit and owner decision.
-Frozen V2 config sha256: `4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8` (frozen before any First 10 measurement).
+Frozen V2 config sha256: `7dc96a0de14d385cdda1f4c13caad9c34abd82629413552ec5d197b28f530fc5` (frozen before any First 10 measurement).
 
 ## 1. Calibration corpus (independent, QA-only)
 

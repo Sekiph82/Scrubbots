@@ -14,6 +14,8 @@ extends SceneTree
 
 const V2 = preload("res://scripts/difficulty/level_difficulty_analyzer_v2_candidate.gd")
 const V1 = preload("res://scripts/difficulty/level_difficulty_analyzer_v1.gd")
+## SB-M53-C002-R01-001 R02: platform-independent evidence serialization (no C-runtime printf).
+const Canon = preload("res://tools/m53_canonical_json.gd")
 const DifficultyProgressionV1 = preload("res://scripts/difficulty/difficulty_progression_v1.gd")
 const LevelLoader = preload("res://scripts/data/level_loader.gd")
 const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
@@ -363,7 +365,7 @@ func measure_fixture(id: String) -> int:
 		"solvability": {"status": String(sol["status"]), "visited": sol["visited"], "decisions": sol["decisions"],
 			"traceHash": sol.get("trace_hash", null)}, "raw": raw}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(CORPUS_RAW_DIR))
-	_write("%s/%s_raw.json" % [CORPUS_RAW_DIR, id], JSON.stringify(out, "\t") + "\n")
+	_write("%s/%s_raw.json" % [CORPUS_RAW_DIR, id], Canon.file_text(out))
 	var comp := ""
 	for p in raw["runs"]:
 		comp += "%s:%s " % [p, "ok" if raw["runs"][p]["completed"] else "STOP(%s@%.2f)" % [raw["runs"][p]["stopReason"], raw["runs"][p]["finalProgress"]]]
@@ -430,7 +432,7 @@ func calibrate(refreeze: bool) -> int:
 		"firstTenRead": false}
 	cfg["freeze"] = {"frozen": true, "frozenBy": "tools/calibrate_difficulty_v2.gd --calibrate", "date": "2026-09-27",
 		"rule": "No V2 candidate change after this point; First 10 holdout is measured and scored only against this exact file (sha256 recorded in calibration_corpus_v1.json)."}
-	_write(V2.CONFIG_PATH, JSON.stringify(cfg, "\t", false) + "\n")
+	_write(V2.CONFIG_PATH, Canon.file_text(cfg))
 	var cfg_sha := Pack.content_sha256(V2.CONFIG_PATH)
 	an = V2.new()
 	var scored := {}
@@ -464,7 +466,7 @@ func calibrate(refreeze: bool) -> int:
 		"policyRobustness": {"toleranceD": cfg["policies"]["robustnessToleranceD"], "allFixturesWithinTolerance": robust_ok},
 		"calibrationPass": all_ok and robust_ok, "firstTenRead": false, "fixtures": fixtures_out}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(EVIDENCE_DIR))
-	_write(CORPUS_EVIDENCE, JSON.stringify(ev, "\t", false) + "\n")
+	_write(CORPUS_EVIDENCE, Canon.file_text(ev))
 	for p in pair_results:
 		print("PAIR %s > %s on %s: axis %s D %s -> %s" % [p["harder"], p["easier"], p["axis"], p["axisPass"], p["dPass"], "PASS" if p["pass"] else "FAIL"])
 	for k in fam:
@@ -570,7 +572,7 @@ func holdout_one(id: String) -> int:
 			"note": "oracle trace used ONLY as solvability provenance and as the ORACLE_DIAGNOSTIC run; never in primary D"},
 		"raw": raw}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(HOLDOUT_RAW_DIR))
-	_write("%s/%s_raw.json" % [HOLDOUT_RAW_DIR, id], JSON.stringify(out, "\t") + "\n")
+	_write("%s/%s_raw.json" % [HOLDOUT_RAW_DIR, id], Canon.file_text(out))
 	print("MEASURED_HOLDOUT %s ok=%s %dms" % [id, raw["ok"], int(raw["timing"]["totalMs"])])
 	return 0 if raw["ok"] else 1
 
@@ -636,7 +638,7 @@ func holdout_merge() -> int:
 		"status": "CANDIDATE_HOLDOUT_EVALUATION (not production authority)", "analyzer": an.provenance(),
 		"frozenConfigSha256": Pack.content_sha256(V2.CONFIG_PATH), "summary": summary, "recovery": rec,
 		"corpusStrategyFamilySpread": corpus_fam, "levels": levels}
-	_write(HOLDOUT_EVIDENCE, JSON.stringify(out, "\t", false) + "\n")
+	_write(HOLDOUT_EVIDENCE, Canon.file_text(out))
 	_write(MATRIX_PATH, matrix_md(levels, rec, summary, V1._read_json(CORPUS_EVIDENCE), corpus_fam))
 	print("HOLDOUT_MERGED inWindow=%d missing=%s robustAll=%s" % [summary["inDefaultWindow"], str(summary["missing"]), summary["robustnessPassAll"]])
 	return 0
