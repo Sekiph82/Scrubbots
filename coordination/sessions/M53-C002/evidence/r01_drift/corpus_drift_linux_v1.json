@@ -1,0 +1,59 @@
+{
+	"engine": "4.7.2-stable (official)",
+	"fixtures": {
+		"access_band3_24": [],
+		"access_comb3_24": [],
+		"access_halves3_24": [],
+		"access_mosaic4_24": [],
+		"access_shafts3_24": [],
+		"access_stripes4_24": [],
+		"bottleneck_high_24": [],
+		"bottleneck_low_24": [],
+		"color_m12_24": [],
+		"color_m3_24": [],
+		"color_m6_24": [],
+		"color_m6skew_24": [],
+		"color_skew6_24": [],
+		"color_stripes12_24": [],
+		"color_stripes6_24": [],
+		"compact_hard_20": [],
+		"flow_stripes3_20": [
+			{
+				"committed_text": "1.28691693599282",
+				"fresh_exact": "1.286916935992815",
+				"fresh_text": "1.28691693599281",
+				"kind": "value",
+				"path": "raw/runs/RR/routes/meanDetour"
+			},
+			{
+				"committed_text": "1.28691693599282",
+				"fresh_exact": "1.286916935992815",
+				"fresh_text": "1.28691693599281",
+				"kind": "value",
+				"path": "raw/runs/RR_REV/routes/meanDetour"
+			}
+		],
+		"flow_stripes3_24": [],
+		"flow_stripes3_32": [],
+		"flow_stripes3_40": [],
+		"flow_stripes3_48": [],
+		"route_maze_24": [],
+		"route_straight_24": [],
+		"slot_high_24": [
+			{
+				"committed_text": "124.931303803135",
+				"fresh_exact": "124.9313038031345",
+				"fresh_text": "124.931303803134",
+				"kind": "value",
+				"path": "raw/runs/RR/routes/lengthVariance"
+			}
+		],
+		"slot_low_24": [],
+		"unlock_deep_24": [],
+		"unlock_shallow_24": []
+	},
+	"normalization": "JSON round trip; key 'timing' removed (identical to the test _norm)",
+	"note": "Merged from 4 parallel runs of tests/tools/m53_c002_corpus_drift_diagnostic.gd on the same tree.",
+	"os": "Linux",
+	"schema": "scrubbots.m53.c002_r01.corpus_drift_diagnostic.v1"
+}
