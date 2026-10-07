@@ -1,0 +1,2 @@
+fixtures 27 fixtures_with_diffs 2 diffs 3 explained_by_platform_printf 3 unexplained 0
+per_fixture {'flow_stripes3_20': 2, 'slot_high_24': 1}
