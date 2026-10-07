@@ -35,6 +35,8 @@ const ProductionActionFacade = preload("res://scripts/economy/production_action_
 const FailureAssistanceService = preload("res://scripts/economy/failure_assistance_service.gd")
 const PackCommitTransaction = preload("res://scripts/collection/pack_commit_transaction.gd")
 const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
+const RemoteContentManager = preload("res://scripts/content_runtime/remote_content_manager.gd")
+const CompositeLevelCatalog = preload("res://scripts/content_runtime/composite_level_catalog.gd")
 
 const CANONICAL_SAVE_PATH := "user://scrubbots_save.dat"
 
@@ -54,10 +56,15 @@ var actions: ProductionActionFacade
 var assist: FailureAssistanceService
 var _dirty: bool = false
 var _catalog_orders: Array = []
+## CP04/CP05: the ONE remote content authority (builtin + cached LKG at boot, no network).
+## Content install never touches progression / economy / save truth.
+var content: RemoteContentManager
 
 ## clock/local_day are test seams. Production passes neither: the shipping graph
 ## injects the real OS local-calendar provider explicitly (F-M39-V03-002).
-func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable(), local_day: Callable = Callable()) -> void:
+## content_root: remote content cache root; default user://content/ for the canonical
+## save, and an isolated sibling dir for test save paths (tests never touch the real cache).
+func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable(), local_day: Callable = Callable(), content_root: String = "") -> void:
 	audio = AudioSettingsService.new()
 	haptics = HapticsSettingsService.new()
 	effects = EffectsSettingsService.new()
@@ -72,14 +79,36 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	assist = FailureAssistanceService.new()
 	# M43-C003: a committed rewarded grant hits the canonical save boundary.
 	economy.rewarded.bind_save(Callable(self, "request_save"))
+	var croot := content_root
+	if croot.is_empty():
+		croot = RemoteContentManager.DEFAULT_ROOT if save_path == CANONICAL_SAVE_PATH else save_path.get_basename() + "_content/"
+	content = RemoteContentManager.new(croot, null, Callable(self, "_builtin_ids"))
+	content.boot()
+	content.content_changed.connect(Callable(self, "_on_content_changed"))
+
+## Builtin + verified active remote levels (CompositeLevelCatalog); null when the builtin
+## production catalog itself is invalid (callers report CATALOG_INVALID).
+func playable_catalog():
+	var cat = LevelCatalog.new()
+	if not cat.load_manifest().ok:
+		return null
+	return CompositeLevelCatalog.new(cat, content.remote_levels() if content != null else [])
+
+func _builtin_ids() -> Array:
+	var cat = LevelCatalog.new()
+	cat.load_manifest()
+	return cat.get_entries_ordered().map(func(e): return e.id)
+
+func _on_content_changed() -> void:
+	_catalog_orders.clear()
 
 ## M43-C009R: read-only eligibility context for Daily Scrub Orders: the progression frontier,
 ## its class lookup and how many catalog levels are playable from the frontier on.
 func orders_context() -> Dictionary:
 	var frontier := int(progression.current_level())
 	if _catalog_orders.is_empty():
-		var cat = LevelCatalog.new()
-		if cat.load_manifest().ok:
+		var cat = playable_catalog()
+		if cat != null:
 			for e in cat.get_entries_ordered():
 				_catalog_orders.append(int(e.order))
 	var ahead := 0

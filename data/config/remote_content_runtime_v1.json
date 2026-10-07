@@ -1,0 +1,15 @@
+{
+	"schema": "scrubbots.remote_content_runtime.v1",
+	"version": 1,
+	"enabled": false,
+	"manifest_url": "",
+	"object_base_url": "",
+	"supported_manifest_schema": "scrubbots.content.manifest.v1",
+	"supported_manifest_schema_version": 1,
+	"supported_scrubpack_schema": "scrubbots.scrubpack.manifest.v1",
+	"supported_scrubpack_version": 1,
+	"timeout_seconds": 20,
+	"max_manifest_bytes": 1048576,
+	"max_pack_bytes": 268435456,
+	"max_cache_bytes": 536870912
+}
