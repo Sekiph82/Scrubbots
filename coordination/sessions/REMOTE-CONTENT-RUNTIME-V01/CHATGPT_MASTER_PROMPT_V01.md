@@ -1,6 +1,6 @@
 # SCRUBBOTS — CP04/M15 + CP05/M16 REMOTE CONTENT RUNTIME MASTER V01
 
-Status: **PREPARED / EXECUTION GATED BY CP03-M14 STRICT CLOSURE**
+Status: **AUTHORIZED / EXECUTE NOW — CP03-M14 GATE VERIFIED PASS/CLOSED**
 Date: 2026-10-06
 Repository: `Sekiph82/Scrubbots`
 Owner-local checkout: `C:\Users\sekip\Desktop\ScrubBots`
@@ -54,11 +54,26 @@ Before ANY implementation:
 5. No `reset --hard`, no `git clean`, no force checkout, no destructive overwrite.
 6. Root `TASKS.md` is read-only.
 
-## External contract gate
+## External contract gate — SATISFIED
 
-Do NOT implement against guessed publisher output.
+**ChatGPT has already verified and accepted this gate. Do not stop for re-authorization.**
 
-Before code changes, verify that the canonical Content Platform publisher/staging/production milestone CP03/M14 has a strict final PASS/CLOSED record and inspect the final canonical artifacts/contracts it publishes.
+Gate acceptance record:
+`coordination/sessions/REMOTE-CONTENT-RUNTIME-V01/CHATGPT_CP03_M14_GATE_ACCEPTANCE_V01.md`
+
+Verified external authority:
+- repository: `Sekiph82/ScrubBots-Level-Factory`
+- verified LF `main`: `16ee1f3f09694d7663e0aa8a39560e8555d12fb8`
+- final closure audit: `.hiveai/audits/M14_CP03_001_012_CPX002_FINAL_CLOSURE_STRICT_REAUDIT.md`
+- CPX-002 R01 audit: `.hiveai/audits/SB-CPX-002-C001-R01_TEMP_ONLY_AUTHORITY_EVIDENCE_STRICT_REAUDIT.md`
+- verdict: **M14 CP03-001..012 + CPX-002 PASS / CLOSED**
+- `SB-CPX-004` remains intentionally deferred until after M15/M16 and does not block this run.
+
+Authority continuity is exact:
+- M14 current-main replay ScrubBots SHA: `2fd60ae69055c6c26c1f5f1b9d3869c743093786`
+- ScrubBots main at gate acceptance: same SHA, GitHub compare IDENTICAL.
+
+You must still inspect the final canonical artifacts/contracts before implementation, but **the start gate is open**. If your freshly synced owner-local ScrubBots checkout does not match current `origin/main`, sync it non-destructively and continue. Do not wait for another ChatGPT authorization.
 
 The already-closed contracts that MUST remain authoritative are:
 - Remote manifest V1:
@@ -82,8 +97,7 @@ The already-closed contracts that MUST remain authoritative are:
   - regular JSON only;
   - no arbitrary paths / traversal / symlinks / executable entries.
 
-If CP03/M14 is not strict PASS/CLOSED, STOP with:
-`BLOCKED_BY_CP03_M14_RUNTIME_CONTRACT_GATE`
+The CP03/M14 strict closure has already been independently verified. If the referenced audit files are unexpectedly missing or materially changed from the verified LF main above, STOP and report `EXTERNAL_GATE_EVIDENCE_DRIFT`. Otherwise proceed.
 
 Do not invent a temporary publisher protocol.
 
