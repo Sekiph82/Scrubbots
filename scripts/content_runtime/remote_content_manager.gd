@@ -64,6 +64,9 @@ var _active_ok := false          ## the active set is verified usable right now
 var _status := DISABLED
 var _reason := ""
 var _refreshing := false
+## Test-only fault injection for the commit boundary (never set in production):
+## "verify_candidate" | "registry_write" | "registry_rename" | "post_activate_verify".
+var _fault := ""
 
 func _init(content_root: String = DEFAULT_ROOT, current_game_version = null, builtin_id_provider: Callable = Callable()) -> void:
 	root = content_root if content_root.ends_with("/") else content_root + "/"
@@ -170,8 +173,9 @@ func _load_active() -> void:
 	if not _active_ok:
 		_reason = why
 
-## "" when the registry's whole set is usable by THIS game build right now.
-func _verify_set(reg: Dictionary) -> String:
+## "" when the registry's whole set is usable by THIS game build right now. `dirs` maps a
+## pack_id to the directory holding its files (staged candidate packs); default = installed.
+func _verify_set(reg: Dictionary, dirs: Dictionary = {}) -> String:
 	var compat := ContentManifestV1.game_version_compatible(reg["minimum_game_version"], game_version)
 	if compat != "COMPATIBLE":
 		return "CACHE_" + compat
@@ -184,7 +188,7 @@ func _verify_set(reg: Dictionary) -> String:
 		for p in reg["packs"]:
 			if p["pack_id"] == l["pack_id"]:
 				pack = p
-		var dir := root + "packs/%s/%d-%s/levels/%s/" % [pack["pack_id"], pack["pack_version"], pack["sha256"], l["level_id"]]
+		var dir: String = dirs.get(pack["pack_id"], root + "packs/%s/%d-%s/" % [pack["pack_id"], pack["pack_version"], pack["sha256"]]) + "levels/%s/" % l["level_id"]
 		var files := {}
 		for role in ROLE_FILES:
 			var b := FileAccess.get_file_as_bytes(dir + ROLE_FILES[role])
@@ -265,6 +269,8 @@ func refresh() -> Dictionary:
 	var r: Dictionary = await _refresh_tx(tx)
 	_rm_tree(root + "staging/%s/" % tx)
 	DirAccess.remove_absolute(root + "downloads/%s.part" % tx)
+	DirAccess.remove_absolute(root + "staging")     # only succeeds when empty
+	DirAccess.remove_absolute(root + "downloads")
 	_refreshing = false
 	if r["ok"]:
 		_set_status(UPDATED if r["changed"] else IDLE, r["reason"])
@@ -334,11 +340,18 @@ func _refresh_tx(tx: String) -> Dictionary:
 		else:
 			for rec in reuse:
 				level_records[rec["level_id"]] = rec
+	# Every new pack stays in staging/<tx>/ until the WHOLE candidate set is verified, so a
+	# failure anywhere before the commit leaves packs/ exactly as it was (refresh() then drops
+	# staging/<tx>/ and the .part). Nothing under packs/ is ever touched by a failed download.
+	var staged: Array = []    ## [{pack, dir}]
+	var dirs := {}
 	for p in to_install:
 		_set_status(DOWNLOADING, p["pack_id"])
-		var r: Dictionary = await _download_and_stage(tx, p, m["pack_members"][String(p["pack_id"]).to_lower()])
+		var r: Dictionary = await _download_and_stage(tx, p, m["pack_members"][String(p["pack_id"]).to_lower()], staged.size())
 		if not r["ok"]:
 			return r
+		staged.append({"pack": p, "dir": r["dir"]})
+		dirs[p["pack_id"]] = r["dir"]
 		for rec in r["levels"]:
 			level_records[rec["level_id"]] = rec
 
@@ -356,10 +369,10 @@ func _refresh_tx(tx: String) -> Dictionary:
 	var candidate := {"schema": REGISTRY_SCHEMA, "version": 1, "content_version": m["content_version"],
 		"manifest_sha256": pr["sha256"], "minimum_game_version": m["minimum_game_version"],
 		"validated_game_version": game_version, "packs": packs, "levels": levels}
-	var why := _verify_set(candidate)
+	var why := "FAULT_INJECTED" if _fault == "verify_candidate" else _verify_set(candidate, dirs)
 	if not why.is_empty():
 		return _no("CANDIDATE_" + why)
-	return _activate(candidate)
+	return _commit(tx, candidate, staged)
 
 ## Level records of an already installed, byte-verified pack with the exact same identity.
 func _reusable_levels(p: Dictionary) -> Array:
@@ -381,7 +394,7 @@ func _reusable_levels(p: Dictionary) -> Array:
 		out.append(l.duplicate(true))
 	return out
 
-func _download_and_stage(tx: String, p: Dictionary, members: Array) -> Dictionary:
+func _download_and_stage(tx: String, p: Dictionary, members: Array, index: int) -> Dictionary:
 	var max_pack := mini(int(config.get("max_pack_bytes", ScrubpackV1.MAX_ARCHIVE_BYTES)), ScrubpackV1.MAX_ARCHIVE_BYTES)
 	if p["byte_length"] > max_pack:
 		return _no("PACK_TOO_LARGE")
@@ -401,8 +414,8 @@ func _download_and_stage(tx: String, p: Dictionary, members: Array) -> Dictionar
 	var insp := ScrubpackV1.inspect(raw, p, members)
 	if not insp["ok"]:
 		return _no(insp["reason"])
-	# Materialize only the approved JSON members into staging, then rename into packs/.
-	var stage := root + "staging/%s/pack/" % tx
+	# Materialize only the approved JSON members into this transaction's staging dir.
+	var stage := root + "staging/%s/p%d/" % [tx, index]
 	var records: Array = []
 	for lv in insp["levels"]:
 		var dir := stage + "levels/%s/" % lv["id"]
@@ -415,39 +428,78 @@ func _download_and_stage(tx: String, p: Dictionary, members: Array) -> Dictionar
 			w.close()
 		records.append({"level_id": lv["id"], "pack_id": p["pack_id"], "difficulty": lv["difficulty"],
 			"width": lv["width"], "height": lv["height"], "sha256": lv["sha256"]})
-	var final := install_dir(p)
-	_rm_tree(final)   # never referenced by a usable set (identity differs or it failed verification)
-	DirAccess.make_dir_recursive_absolute(final.trim_suffix("/").get_base_dir())
-	if DirAccess.rename_absolute(stage.trim_suffix("/"), final.trim_suffix("/")) != OK:
-		return _no("INSTALL_RENAME_FAILED")
-	return {"ok": true, "reason": "OK", "changed": false, "levels": records}
+	return {"ok": true, "reason": "OK", "changed": false, "levels": records, "dir": stage}
 
-## Commit boundary: the candidate is fully installed + verified; swap the registry pointer.
-func _activate(candidate: Dictionary) -> Dictionary:
+## Commit boundary (SB-CP05-R01-001). The candidate set is fully verified in staging. This
+## transaction now owns exactly the final pack dirs it places (`placed`) plus any dir it had to
+## move aside (`displaced`: an orphan, or a broken pack of the same identity being repaired).
+## Any failure from here to a verified registry swap rolls back exactly those paths (remove
+## placed, restore displaced) and restores the previous registry pointer, so the previous
+## active/LKG set and every reused pack are byte-identical afterwards. Rollback is idempotent.
+func _commit(tx: String, candidate: Dictionary, staged: Array) -> Dictionary:
+	var placed: Array = []
+	var displaced: Array = []   ## [final, aside]
+	for s in staged:
+		var final := install_dir(s["pack"]).trim_suffix("/")
+		if DirAccess.dir_exists_absolute(final):
+			var aside := root + "staging/%s/displaced%d" % [tx, displaced.size()]
+			if DirAccess.rename_absolute(final, aside) != OK:
+				return _rollback(placed, displaced, "INSTALL_RENAME_FAILED")
+			displaced.append([final, aside])
+		DirAccess.make_dir_recursive_absolute(final.get_base_dir())
+		if DirAccess.rename_absolute(String(s["dir"]).trim_suffix("/"), final) != OK:
+			return _rollback(placed, displaced, "INSTALL_RENAME_FAILED")
+		placed.append(final)
+	var active := root + REGISTRY_FILE
+	var had_active := FileAccess.file_exists(active)
 	var tmp := root + REGISTRY_TMP
-	var w := FileAccess.open(tmp, FileAccess.WRITE)
+	var w := FileAccess.open(tmp, FileAccess.WRITE) if _fault != "registry_write" else null
 	if w == null:
-		return _no("REGISTRY_WRITE_FAILED")
+		return _rollback(placed, displaced, "REGISTRY_WRITE_FAILED")
 	w.store_string(JSON.stringify(candidate, "\t", true))
 	w.close()
 	if parse_registry(FileAccess.get_file_as_bytes(tmp)) != candidate:
 		DirAccess.remove_absolute(tmp)
-		return _no("REGISTRY_WRITE_FAILED")
-	var active := root + REGISTRY_FILE
-	if FileAccess.file_exists(active):
-		DirAccess.copy_absolute(active, root + REGISTRY_PREV)
-	if DirAccess.rename_absolute(tmp, active) != OK:
+		return _rollback(placed, displaced, "REGISTRY_WRITE_FAILED")
+	# The previous LKG registry is held in memory; registry_v1.prev.json is only written once
+	# the new set is live, so a failed commit changes no file at all.
+	var prev_bytes := FileAccess.get_file_as_bytes(active) if had_active else PackedByteArray()
+	if _fault == "registry_rename" or DirAccess.rename_absolute(tmp, active) != OK:
 		DirAccess.remove_absolute(tmp)
-		return _no("REGISTRY_ACTIVATE_FAILED")
+		return _rollback(placed, displaced, "REGISTRY_ACTIVATE_FAILED")
 	_load_active()
-	if not _active_ok:
-		# Should be unreachable (verified before commit); restore the previous LKG pointer.
-		if FileAccess.file_exists(root + REGISTRY_PREV):
-			DirAccess.copy_absolute(root + REGISTRY_PREV, active)
+	if _fault == "post_activate_verify" or not _active_ok:
+		# Restore the previous pointer (or none), then the pack dirs; re-read the LKG.
+		if had_active:
+			var rb := FileAccess.open(active, FileAccess.WRITE)
+			rb.store_buffer(prev_bytes)
+			rb.close()
+		else:
+			DirAccess.remove_absolute(active)
+		var r := _rollback(placed, displaced, "ACTIVATION_VERIFY_FAILED")
 		_load_active()
-		return _no("ACTIVATION_VERIFY_FAILED")
+		return r
+	if had_active:
+		var pv := FileAccess.open(root + REGISTRY_PREV, FileAccess.WRITE)
+		pv.store_buffer(prev_bytes)
+		pv.close()
 	_prune_packs()
 	return {"ok": true, "reason": "ACTIVATED", "changed": true}
+
+## Undo exactly this transaction's pack paths. Safe to call repeatedly.
+func _rollback(placed: Array, displaced: Array, reason: String) -> Dictionary:
+	for final in placed:
+		_rm_tree(String(final) + "/")
+	for i in range(displaced.size() - 1, -1, -1):
+		var back: String = displaced[i][0]
+		if not DirAccess.dir_exists_absolute(back) and DirAccess.dir_exists_absolute(displaced[i][1]):
+			DirAccess.make_dir_recursive_absolute(back.get_base_dir())
+			DirAccess.rename_absolute(displaced[i][1], back)
+	for final in placed:
+		var parent := String(final).get_base_dir()   # packs/<pack_id>: drop it if this left it empty
+		if DirAccess.dir_exists_absolute(parent) and DirAccess.get_directories_at(parent).is_empty() and DirAccess.get_files_at(parent).is_empty():
+			DirAccess.remove_absolute(parent)
+	return _no(reason)
 
 # ------------------------------------------------------------ retention --
 
