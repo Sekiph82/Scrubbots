@@ -234,7 +234,9 @@ func _k09() -> void:
 	_ok(r["ok"] and FileAccess.get_file_as_bytes(root + RCM.REGISTRY_PREV) == reg1 and not FileAccess.file_exists(root + RCM.REGISTRY_TMP)
 		and RCM.parse_registry(FileAccess.get_file_as_bytes(root + RCM.REGISTRY_FILE))["content_version"] == 2, "v2 committed by rename; v1 kept as registry_v1.prev.json")
 	var src := FileAccess.get_file_as_string("res://scripts/content_runtime/remote_content_manager.gd")
-	_ok(src.find("_verify_set(candidate)") < src.find("func _activate") and src.contains("DirAccess.rename_absolute(tmp, active)"), "candidate verified before the single rename commit point")
+	var vi := src.find("_verify_set(candidate, dirs)")
+	var ci := src.find("return _commit(tx, candidate, staged)")
+	_ok(vi > 0 and ci > vi and src.find("func _commit") > ci and src.contains("DirAccess.rename_absolute(tmp, active)"), "whole candidate verified in staging before the single commit (pack placement + registry rename)")
 	_done["k09_atomic_registry_activation"] = true
 
 func _k10() -> void:
