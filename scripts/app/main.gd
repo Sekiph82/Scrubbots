@@ -148,10 +148,27 @@ func _ready() -> void:
 	if app_state != null and app_state.actions != null:
 		app_state.actions.action_committed.connect(func(_a, _r): request_home_ceremonies())
 	nav.route_changed.connect(_on_route_changed)
+	_start_remote_content()
 	if _should_play_opening():
 		_start_opening()
 	else:
 		nav.go(NavigationController.Route.HOME, {"via": "boot"})
+
+## CP04/CP05: one background remote refresh per cold launch, only when the runtime config
+## names an HTTPS endpoint. Boot never waits on it: builtin + cached LKG are already live.
+## A successful activation re-reads Home's frontier/launch truth; failure is diagnostic only.
+func _start_remote_content() -> void:
+	if app_state == null or app_state.content == null or app_state.content.transport != null:
+		return
+	var t = app_state.content.make_production_transport()
+	if t == null:
+		return
+	add_child(t)
+	app_state.content.transport = t
+	app_state.content.content_changed.connect(func():
+		if _home != null and _home.visible:
+			_home.refresh())
+	app_state.content.refresh()
 
 ## SB-M42-031: presentation policy (display available / test override) AND the
 ## once-per-cold-launch LaunchSession gate. Only a new native process plays it again.
