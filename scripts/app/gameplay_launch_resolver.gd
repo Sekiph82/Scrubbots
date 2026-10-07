@@ -3,7 +3,10 @@ extends RefCounted
 ##
 ## Production frontier -> content mapping (M40 V04, F-M40-V03-002). Resolves
 ## AppState.progression.current_level() through the canonical LevelCatalog: the
-## entry whose explicit `order` equals the frontier level number. There is no
+## entry whose explicit `order` equals the frontier level number. Since CP04
+## (remote content runtime) the default catalog is AppState.playable_catalog():
+## the builtin res:// catalog plus the verified active remote set appended after
+## the highest builtin order (builtin 1..10, remote 11+). There is no
 ## fallback content — a frontier with no catalog entry is CONTENT_MISSING, so
 ## level-1 content can never run while being labelled/rewarded as level N.
 
@@ -24,8 +27,13 @@ static func resolve(app_state, catalog = null) -> Dictionary:
 	var level := int(app_state.progression.current_level())
 	var cat = catalog
 	if cat == null:
-		cat = LevelCatalog.new()
-		if not cat.load_manifest().ok:
+		if app_state.has_method("playable_catalog"):
+			cat = app_state.playable_catalog()
+		else:
+			cat = LevelCatalog.new()
+			if not cat.load_manifest().ok:
+				cat = null
+		if cat == null:
 			return {"ok": false, "reason": CATALOG_INVALID, "level": level}
 	for e in cat.get_entries_ordered():
 		if int(e.order) == level:
