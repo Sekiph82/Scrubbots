@@ -4,13 +4,13 @@
 	"raw": {
 		"color": {
 			"cells": 400,
-			"entropyNats": 1.09606732844686,
+			"entropyNats": 1.0960673284468552,
 			"frequencyByHex": {
 				"#00CC78FF": 140,
 				"#2450A4FF": 120,
 				"#FF4500FF": 140
 			},
-			"normalizedEntropy": 0.997683477376409,
+			"normalizedEntropy": 0.9976834773764092,
 			"usedColors": 3
 		},
 		"dims": {
@@ -113,10 +113,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 63.2600000000001,
-					"meanDetour": 1.28691693599282,
+					"lengthVariance": 63.26000000000008,
+					"meanDetour": 1.2869169359928156,
 					"meanLength": 22.2,
-					"meanTurns": 2.05000005704644,
+					"meanTurns": 2.0500000570464367,
 					"totalLength": 8880.0
 				},
 				"states": [
@@ -186,7 +186,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.07
+						"progress": 0.06999999999999995
 					},
 					{
 						"active": 344,
@@ -254,7 +254,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.21
+						"progress": 0.20999999999999996
 					},
 					{
 						"active": 288,
@@ -348,7 +348,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.425
+						"progress": 0.42500000000000004
 					},
 					{
 						"active": 202,
@@ -444,7 +444,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.715
+						"progress": 0.7150000000000001
 					},
 					{
 						"active": 86,
@@ -597,10 +597,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 63.2600000000001,
-					"meanDetour": 1.28691693599282,
+					"lengthVariance": 63.26000000000008,
+					"meanDetour": 1.2869169359928156,
 					"meanLength": 22.2,
-					"meanTurns": 2.05000005704644,
+					"meanTurns": 2.0500000570464367,
 					"totalLength": 8880.0
 				},
 				"states": [
@@ -670,7 +670,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.07
+						"progress": 0.06999999999999995
 					},
 					{
 						"active": 344,
@@ -738,7 +738,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.21
+						"progress": 0.20999999999999996
 					},
 					{
 						"active": 288,
@@ -832,7 +832,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.425
+						"progress": 0.42500000000000004
 					},
 					{
 						"active": 202,
@@ -928,7 +928,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.715
+						"progress": 0.7150000000000001
 					},
 					{
 						"active": 86,
@@ -1081,10 +1081,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 63.2600000000001,
-					"meanDetour": 1.28691693599282,
+					"lengthVariance": 63.26000000000008,
+					"meanDetour": 1.2869169359928156,
 					"meanLength": 22.2,
-					"meanTurns": 2.05000005704644,
+					"meanTurns": 2.0500000570464367,
 					"totalLength": 8880.0
 				},
 				"states": [
@@ -1154,7 +1154,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.07
+						"progress": 0.06999999999999995
 					},
 					{
 						"active": 344,
@@ -1222,7 +1222,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.21
+						"progress": 0.20999999999999996
 					},
 					{
 						"active": 288,
@@ -1316,7 +1316,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.425
+						"progress": 0.42500000000000004
 					},
 					{
 						"active": 202,
@@ -1412,7 +1412,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.715
+						"progress": 0.7150000000000001
 					},
 					{
 						"active": 86,
@@ -1565,10 +1565,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 63.2600000000001,
-					"meanDetour": 1.28691693599282,
+					"lengthVariance": 63.26000000000008,
+					"meanDetour": 1.2869169359928156,
 					"meanLength": 22.2,
-					"meanTurns": 2.05000005704644,
+					"meanTurns": 2.0500000570464367,
 					"totalLength": 8880.0
 				},
 				"states": [
@@ -1638,7 +1638,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.07
+						"progress": 0.06999999999999995
 					},
 					{
 						"active": 344,
@@ -1706,7 +1706,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.21
+						"progress": 0.20999999999999996
 					},
 					{
 						"active": 288,
@@ -1800,7 +1800,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.425
+						"progress": 0.42500000000000004
 					},
 					{
 						"active": 202,
@@ -1896,7 +1896,7 @@
 						"legal": 1,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.715
+						"progress": 0.7150000000000001
 					},
 					{
 						"active": 86,
@@ -2050,9 +2050,9 @@
 				"routes": {
 					"count": 400,
 					"lengthVariance": 63.2600000000001,
-					"meanDetour": 1.28691693599282,
+					"meanDetour": 1.286916935992815,
 					"meanLength": 22.2,
-					"meanTurns": 2.05000005704644,
+					"meanTurns": 2.0500000570464367,
 					"totalLength": 8880.0
 				},
 				"states": [
@@ -2122,7 +2122,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.07
+						"progress": 0.06999999999999995
 					},
 					{
 						"active": 344,
@@ -2190,7 +2190,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.21
+						"progress": 0.20999999999999996
 					},
 					{
 						"active": 288,
@@ -2292,7 +2292,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.42
+						"progress": 0.42000000000000004
 					},
 					{
 						"active": 204,
@@ -2605,10 +2605,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 63.2600000000001,
-					"meanDetour": 1.28691693599282,
+					"lengthVariance": 63.26000000000008,
+					"meanDetour": 1.286916935992815,
 					"meanLength": 22.2,
-					"meanTurns": 2.05000005704644,
+					"meanTurns": 2.0500000570464367,
 					"totalLength": 8880.0
 				},
 				"states": [
@@ -2678,7 +2678,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.07
+						"progress": 0.06999999999999995
 					},
 					{
 						"active": 344,
@@ -2746,7 +2746,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.21
+						"progress": 0.20999999999999996
 					},
 					{
 						"active": 288,
@@ -2848,7 +2848,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.42
+						"progress": 0.42000000000000004
 					},
 					{
 						"active": 204,
@@ -2976,7 +2976,7 @@
 						"legal": 2,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.705
+						"progress": 0.7050000000000001
 					},
 					{
 						"active": 88,
@@ -3145,10 +3145,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 400,
-					"lengthVariance": 63.2600000000001,
-					"meanDetour": 1.28691693599282,
+					"lengthVariance": 63.260000000000076,
+					"meanDetour": 1.2869169359928154,
 					"meanLength": 22.2,
-					"meanTurns": 2.05000005704644,
+					"meanTurns": 2.0500000570464367,
 					"totalLength": 8880.0
 				},
 				"states": [
@@ -3218,7 +3218,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.07
+						"progress": 0.06999999999999995
 					},
 					{
 						"active": 344,
@@ -3286,7 +3286,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.21
+						"progress": 0.20999999999999996
 					},
 					{
 						"active": 288,
@@ -3388,7 +3388,7 @@
 						"legal": 3,
 						"occupied": [],
 						"placementSlot": 4,
-						"progress": 0.42
+						"progress": 0.42000000000000004
 					},
 					{
 						"active": 204,
@@ -3601,7 +3601,7 @@
 			}
 		},
 		"timing": {
-			"totalMs": 112782
+			"totalMs": 15900
 		},
 		"unlock": {
 			"histogram": [

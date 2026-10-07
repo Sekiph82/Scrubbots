@@ -1,11 +1,11 @@
 {
-	"frozenConfigSha256": "4cd879c5aa8e6ee141169f29b5f6a758e20a1d88987bbff5c5de091051da14f8",
+	"frozenConfigSha256": "7dc96a0de14d385cdda1f4c13caad9c34abd82629413552ec5d197b28f530fc5",
 	"levelId": "level_004_orange_cat",
 	"levelSha256": "070ec1f61ebf8c2b824a62bdcd0a9e1f1b51a8588c59dc0e86a36f440f93066e",
 	"raw": {
 		"color": {
 			"cells": 1024,
-			"entropyNats": 1.1257415896792,
+			"entropyNats": 1.125741589679205,
 			"frequencyByHex": {
 				"#000000FF": 130,
 				"#00CC78FF": 2,
@@ -15,7 +15,7 @@
 				"#FFA800FF": 167,
 				"#FFF8B8FF": 68
 			},
-			"normalizedEntropy": 0.578516736872831,
+			"normalizedEntropy": 0.5785167368728314,
 			"usedColors": 7
 		},
 		"dims": {
@@ -32,235 +32,235 @@
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 5.20000076293945,
+						"lastWaveMaxRoute": 5.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 6.79999923706055,
+						"lastWaveMaxRoute": 6.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 31.7999992370605,
+						"lastWaveMaxRoute": 31.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 41.7999992370605,
+						"lastWaveMaxRoute": 41.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 19.2000007629395,
+						"lastWaveMaxRoute": 19.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 42.7999992370605,
+						"lastWaveMaxRoute": 42.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 21.2000007629395,
+						"lastWaveMaxRoute": 21.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 50.7999992370605,
+						"lastWaveMaxRoute": 50.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 52.7999992370605,
+						"lastWaveMaxRoute": 52.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 15.7999992370605,
+						"lastWaveMaxRoute": 15.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 57.7999992370605,
+						"lastWaveMaxRoute": 57.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 33.2000007629395,
+						"lastWaveMaxRoute": 33.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 60.7999992370605,
+						"lastWaveMaxRoute": 60.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 72.7999992370605,
+						"lastWaveMaxRoute": 72.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 19.7999992370605,
+						"lastWaveMaxRoute": 19.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 36.2000007629395,
+						"lastWaveMaxRoute": 36.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 25.7999992370605,
+						"lastWaveMaxRoute": 25.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 27.7999992370605,
+						"lastWaveMaxRoute": 27.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 8,
 						"column": 0,
-						"lastWaveMaxRoute": 22.7999992370605,
+						"lastWaveMaxRoute": 22.799999237060547,
 						"waves": 8
 					},
 					{
 						"clears": 8,
 						"column": 0,
-						"lastWaveMaxRoute": 22.3999996185303,
+						"lastWaveMaxRoute": 22.399999618530273,
 						"waves": 8
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 32.3999996185303,
+						"lastWaveMaxRoute": 32.39999961853027,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 41.6000003814697,
+						"lastWaveMaxRoute": 41.60000038146973,
 						"waves": 30
 					},
 					{
 						"clears": 10,
 						"column": 1,
-						"lastWaveMaxRoute": 46.3999996185303,
+						"lastWaveMaxRoute": 46.39999961853027,
 						"waves": 10
 					},
 					{
 						"clears": 35,
 						"column": 2,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 31
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 25,
 						"column": 2,
-						"lastWaveMaxRoute": 39.7999992370605,
+						"lastWaveMaxRoute": 39.79999923706055,
 						"waves": 25
 					},
 					{
 						"clears": 8,
 						"column": 1,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 5
 					},
 					{
 						"clears": 32,
 						"column": 2,
-						"lastWaveMaxRoute": 24.3999996185303,
+						"lastWaveMaxRoute": 24.399999618530273,
 						"waves": 30
 					},
 					{
 						"clears": 17,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 17
 					},
 					{
 						"clears": 9,
 						"column": 2,
-						"lastWaveMaxRoute": 38.2000007629395,
+						"lastWaveMaxRoute": 38.20000076293945,
 						"waves": 9
 					},
 					{
 						"clears": 2,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 2
 					}
 				],
@@ -268,10 +268,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 1024,
-					"lengthVariance": 219.885992387488,
-					"meanDetour": 1.33459724980892,
-					"meanLength": 34.1607417333871,
-					"meanTurns": 2.92382820636295,
+					"lengthVariance": 219.88599238748844,
+					"meanDetour": 1.3345972498089211,
+					"meanLength": 34.16074173338711,
+					"meanTurns": 2.923828206362947,
 					"totalLength": 34980.5995349884
 				},
 				"states": [
@@ -1548,211 +1548,211 @@
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 5.20000076293945,
+						"lastWaveMaxRoute": 5.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 6.79999923706055,
+						"lastWaveMaxRoute": 6.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 31.7999992370605,
+						"lastWaveMaxRoute": 31.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 41.7999992370605,
+						"lastWaveMaxRoute": 41.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 19.2000007629395,
+						"lastWaveMaxRoute": 19.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 42.7999992370605,
+						"lastWaveMaxRoute": 42.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 21.2000007629395,
+						"lastWaveMaxRoute": 21.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 50.7999992370605,
+						"lastWaveMaxRoute": 50.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 52.7999992370605,
+						"lastWaveMaxRoute": 52.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 15.7999992370605,
+						"lastWaveMaxRoute": 15.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 57.7999992370605,
+						"lastWaveMaxRoute": 57.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 33.2000007629395,
+						"lastWaveMaxRoute": 33.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 60.7999992370605,
+						"lastWaveMaxRoute": 60.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 72.7999992370605,
+						"lastWaveMaxRoute": 72.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 19.7999992370605,
+						"lastWaveMaxRoute": 19.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 62.7999992370605,
+						"lastWaveMaxRoute": 62.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 25.7999992370605,
+						"lastWaveMaxRoute": 25.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 27.7999992370605,
+						"lastWaveMaxRoute": 27.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 17,
 						"column": 2,
-						"lastWaveMaxRoute": 43.7999992370605,
+						"lastWaveMaxRoute": 43.79999923706055,
 						"waves": 17
 					},
 					{
 						"clears": 9,
 						"column": 2,
-						"lastWaveMaxRoute": 54.7999992370605,
+						"lastWaveMaxRoute": 54.79999923706055,
 						"waves": 9
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 1,
 						"column": 2,
-						"lastWaveMaxRoute": 42.7999992370605,
+						"lastWaveMaxRoute": 42.79999923706055,
 						"waves": 1
 					},
 					{
 						"clears": 31,
 						"column": 1,
-						"lastWaveMaxRoute": 31.6000003814697,
+						"lastWaveMaxRoute": 31.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 57.7999992370605,
+						"lastWaveMaxRoute": 57.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 10,
 						"column": 1,
-						"lastWaveMaxRoute": 47.7999992370605,
+						"lastWaveMaxRoute": 47.79999923706055,
 						"waves": 10
 					},
 					{
 						"clears": 28,
 						"column": 0,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 28
 					},
 					{
 						"clears": 25,
 						"column": 0,
-						"lastWaveMaxRoute": 44.6000003814697,
+						"lastWaveMaxRoute": 44.60000038146973,
 						"waves": 25
 					},
 					{
@@ -1764,19 +1764,19 @@
 					{
 						"clears": 13,
 						"column": 0,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 13
 					},
 					{
 						"clears": 8,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 8
 					},
 					{
 						"clears": 5,
 						"column": 1,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 5
 					}
 				],
@@ -1784,10 +1784,10 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 1024,
-					"lengthVariance": 217.267147668511,
-					"meanDetour": 1.34269088054096,
-					"meanLength": 34.5369136035442,
-					"meanTurns": 3.10058602378168,
+					"lengthVariance": 217.26714766851134,
+					"meanDetour": 1.3426908805409559,
+					"meanLength": 34.536913603544235,
+					"meanTurns": 3.1005860237816782,
 					"totalLength": 35365.7995300293
 				},
 				"states": [
@@ -3079,235 +3079,235 @@
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 5.20000076293945,
+						"lastWaveMaxRoute": 5.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 6.79999923706055,
+						"lastWaveMaxRoute": 6.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 31.7999992370605,
+						"lastWaveMaxRoute": 31.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 41.7999992370605,
+						"lastWaveMaxRoute": 41.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 19.2000007629395,
+						"lastWaveMaxRoute": 19.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 42.7999992370605,
+						"lastWaveMaxRoute": 42.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 21.2000007629395,
+						"lastWaveMaxRoute": 21.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 50.7999992370605,
+						"lastWaveMaxRoute": 50.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 52.7999992370605,
+						"lastWaveMaxRoute": 52.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 15.7999992370605,
+						"lastWaveMaxRoute": 15.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 57.7999992370605,
+						"lastWaveMaxRoute": 57.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 33.2000007629395,
+						"lastWaveMaxRoute": 33.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 60.7999992370605,
+						"lastWaveMaxRoute": 60.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 72.7999992370605,
+						"lastWaveMaxRoute": 72.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 19.7999992370605,
+						"lastWaveMaxRoute": 19.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 36.2000007629395,
+						"lastWaveMaxRoute": 36.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 25.7999992370605,
+						"lastWaveMaxRoute": 25.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 27.7999992370605,
+						"lastWaveMaxRoute": 27.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 38.7999992370605,
+						"lastWaveMaxRoute": 38.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 35.2000007629395,
+						"lastWaveMaxRoute": 35.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 10,
 						"column": 1,
-						"lastWaveMaxRoute": 52.7999992370605,
+						"lastWaveMaxRoute": 52.79999923706055,
 						"waves": 10
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 36.7999992370605,
+						"lastWaveMaxRoute": 36.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 25,
 						"column": 2,
-						"lastWaveMaxRoute": 39.7999992370605,
+						"lastWaveMaxRoute": 39.79999923706055,
 						"waves": 25
 					},
 					{
 						"clears": 35,
 						"column": 2,
-						"lastWaveMaxRoute": 25.3999996185303,
+						"lastWaveMaxRoute": 25.399999618530273,
 						"waves": 30
 					},
 					{
 						"clears": 17,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 17
 					},
 					{
 						"clears": 13,
 						"column": 0,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 13
 					},
 					{
 						"clears": 9,
 						"column": 2,
-						"lastWaveMaxRoute": 38.2000007629395,
+						"lastWaveMaxRoute": 38.20000076293945,
 						"waves": 9
 					},
 					{
 						"clears": 8,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 8
 					},
 					{
 						"clears": 5,
 						"column": 1,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 5
 					},
 					{
 						"clears": 2,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 2
 					}
 				],
@@ -3315,11 +3315,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 1024,
-					"lengthVariance": 225.725133923824,
-					"meanDetour": 1.34585522570887,
-					"meanLength": 34.7724604196846,
-					"meanTurns": 2.90429695581945,
-					"totalLength": 35606.9994697571
+					"lengthVariance": 225.72513392382388,
+					"meanDetour": 1.3458552257088743,
+					"meanLength": 34.77246041968465,
+					"meanTurns": 2.9042969558194476,
+					"totalLength": 35606.99946975708
 				},
 				"states": [
 					{
@@ -4643,205 +4643,205 @@
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 5.20000076293945,
+						"lastWaveMaxRoute": 5.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 6.79999923706055,
+						"lastWaveMaxRoute": 6.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 31.7999992370605,
+						"lastWaveMaxRoute": 31.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 41.7999992370605,
+						"lastWaveMaxRoute": 41.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 19.2000007629395,
+						"lastWaveMaxRoute": 19.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 42.7999992370605,
+						"lastWaveMaxRoute": 42.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 21.2000007629395,
+						"lastWaveMaxRoute": 21.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 50.7999992370605,
+						"lastWaveMaxRoute": 50.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 52.7999992370605,
+						"lastWaveMaxRoute": 52.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 15.7999992370605,
+						"lastWaveMaxRoute": 15.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 57.7999992370605,
+						"lastWaveMaxRoute": 57.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 33.2000007629395,
+						"lastWaveMaxRoute": 33.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 60.7999992370605,
+						"lastWaveMaxRoute": 60.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 72.7999992370605,
+						"lastWaveMaxRoute": 72.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 19.7999992370605,
+						"lastWaveMaxRoute": 19.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 62.7999992370605,
+						"lastWaveMaxRoute": 62.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 25.7999992370605,
+						"lastWaveMaxRoute": 25.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 27.7999992370605,
+						"lastWaveMaxRoute": 27.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 17,
 						"column": 2,
-						"lastWaveMaxRoute": 43.7999992370605,
+						"lastWaveMaxRoute": 43.79999923706055,
 						"waves": 17
 					},
 					{
 						"clears": 9,
 						"column": 2,
-						"lastWaveMaxRoute": 54.7999992370605,
+						"lastWaveMaxRoute": 54.79999923706055,
 						"waves": 9
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 35.7999992370605,
+						"lastWaveMaxRoute": 35.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 57.7999992370605,
+						"lastWaveMaxRoute": 57.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 10,
 						"column": 1,
-						"lastWaveMaxRoute": 47.7999992370605,
+						"lastWaveMaxRoute": 47.79999923706055,
 						"waves": 10
 					},
 					{
 						"clears": 28,
 						"column": 0,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 28
 					},
 					{
 						"clears": 25,
 						"column": 0,
-						"lastWaveMaxRoute": 44.6000003814697,
+						"lastWaveMaxRoute": 44.60000038146973,
 						"waves": 25
 					},
 					{
@@ -4853,25 +4853,25 @@
 					{
 						"clears": 13,
 						"column": 0,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 13
 					},
 					{
 						"clears": 8,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 8
 					},
 					{
 						"clears": 5,
 						"column": 1,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 5
 					},
 					{
 						"clears": 2,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 2
 					}
 				],
@@ -4879,11 +4879,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 1024,
-					"lengthVariance": 218.007126941658,
-					"meanDetour": 1.34454485926406,
-					"meanLength": 34.6724604554474,
-					"meanTurns": 3.07128914796642,
-					"totalLength": 35504.5995063782
+					"lengthVariance": 218.00712694165816,
+					"meanDetour": 1.3445448592640592,
+					"meanLength": 34.672460455447435,
+					"meanTurns": 3.071289147966421,
+					"totalLength": 35504.599506378174
 				},
 				"states": [
 					{
@@ -6222,49 +6222,49 @@
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 5.20000076293945,
+						"lastWaveMaxRoute": 5.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 6.79999923706055,
+						"lastWaveMaxRoute": 6.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 31.7999992370605,
+						"lastWaveMaxRoute": 31.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 41.7999992370605,
+						"lastWaveMaxRoute": 41.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 19.2000007629395,
+						"lastWaveMaxRoute": 19.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 2,
 						"column": 0,
-						"lastWaveMaxRoute": 13.7999992370605,
+						"lastWaveMaxRoute": 13.799999237060547,
 						"waves": 2
 					},
 					{
@@ -6276,103 +6276,103 @@
 					{
 						"clears": 88,
 						"column": 0,
-						"lastWaveMaxRoute": 32.6000003814697,
+						"lastWaveMaxRoute": 32.60000038146973,
 						"waves": 44
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 13.7999992370605,
+						"lastWaveMaxRoute": 13.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 6,
 						"column": 0,
-						"lastWaveMaxRoute": 22.7999992370605,
+						"lastWaveMaxRoute": 22.799999237060547,
 						"waves": 6
 					},
 					{
 						"clears": 8,
 						"column": 0,
-						"lastWaveMaxRoute": 17.3999996185303,
+						"lastWaveMaxRoute": 17.399999618530273,
 						"waves": 8
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 22.6000003814697,
+						"lastWaveMaxRoute": 22.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 26.6000003814697,
+						"lastWaveMaxRoute": 26.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 30.6000003814697,
+						"lastWaveMaxRoute": 30.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 43.3999996185303,
+						"lastWaveMaxRoute": 43.39999961853027,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 45.3999996185303,
+						"lastWaveMaxRoute": 45.39999961853027,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 47.3999996185303,
+						"lastWaveMaxRoute": 47.39999961853027,
 						"waves": 30
 					},
 					{
 						"clears": 31,
 						"column": 1,
-						"lastWaveMaxRoute": 21.6000003814697,
+						"lastWaveMaxRoute": 21.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 31,
 						"column": 1,
-						"lastWaveMaxRoute": 19.6000003814697,
+						"lastWaveMaxRoute": 19.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 22.3999996185303,
+						"lastWaveMaxRoute": 22.399999618530273,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 32.3999996185303,
+						"lastWaveMaxRoute": 32.39999961853027,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 37.6000003814697,
+						"lastWaveMaxRoute": 37.60000038146973,
 						"waves": 30
 					},
 					{
 						"clears": 10,
 						"column": 1,
-						"lastWaveMaxRoute": 23.6000003814697,
+						"lastWaveMaxRoute": 23.600000381469727,
 						"waves": 10
 					},
 					{
 						"clears": 1,
 						"column": 1,
-						"lastWaveMaxRoute": 30.3999996185303,
+						"lastWaveMaxRoute": 30.399999618530273,
 						"waves": 1
 					},
 					{
@@ -6414,43 +6414,43 @@
 					{
 						"clears": 35,
 						"column": 2,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 31
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 36.7999992370605,
+						"lastWaveMaxRoute": 36.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 32,
 						"column": 2,
-						"lastWaveMaxRoute": 39.7999992370605,
+						"lastWaveMaxRoute": 39.79999923706055,
 						"waves": 28
 					},
 					{
 						"clears": 32,
 						"column": 2,
-						"lastWaveMaxRoute": 24.3999996185303,
+						"lastWaveMaxRoute": 24.399999618530273,
 						"waves": 30
 					},
 					{
 						"clears": 17,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 17
 					},
 					{
 						"clears": 9,
 						"column": 2,
-						"lastWaveMaxRoute": 38.2000007629395,
+						"lastWaveMaxRoute": 38.20000076293945,
 						"waves": 9
 					},
 					{
 						"clears": 2,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 2
 					}
 				],
@@ -6458,11 +6458,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 1024,
-					"lengthVariance": 146.306773886547,
-					"meanDetour": 1.40305986231709,
-					"meanLength": 33.2160153780133,
-					"meanTurns": 4.2470704306855,
-					"totalLength": 34013.1997470856
+					"lengthVariance": 146.30677388654655,
+					"meanDetour": 1.4030598623170907,
+					"meanLength": 33.21601537801325,
+					"meanTurns": 4.247070430685498,
+					"totalLength": 34013.19974708557
 				},
 				"states": [
 					{
@@ -7754,235 +7754,235 @@
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 5.20000076293945,
+						"lastWaveMaxRoute": 5.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 6.79999923706055,
+						"lastWaveMaxRoute": 6.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 31.7999992370605,
+						"lastWaveMaxRoute": 31.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 41.7999992370605,
+						"lastWaveMaxRoute": 41.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 19.2000007629395,
+						"lastWaveMaxRoute": 19.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 42.7999992370605,
+						"lastWaveMaxRoute": 42.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 21.2000007629395,
+						"lastWaveMaxRoute": 21.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 50.7999992370605,
+						"lastWaveMaxRoute": 50.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 52.7999992370605,
+						"lastWaveMaxRoute": 52.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 54.7999992370605,
+						"lastWaveMaxRoute": 54.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 32.2000007629395,
+						"lastWaveMaxRoute": 32.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 58.7999992370605,
+						"lastWaveMaxRoute": 58.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 68.7999992370605,
+						"lastWaveMaxRoute": 68.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 15.7999992370605,
+						"lastWaveMaxRoute": 15.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 72.7999992370605,
+						"lastWaveMaxRoute": 72.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 19.7999992370605,
+						"lastWaveMaxRoute": 19.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 25.7999992370605,
+						"lastWaveMaxRoute": 25.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 36.2000007629395,
+						"lastWaveMaxRoute": 36.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 38.7999992370605,
+						"lastWaveMaxRoute": 38.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 27.7999992370605,
+						"lastWaveMaxRoute": 27.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 28.7999992370605,
+						"lastWaveMaxRoute": 28.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 35.2000007629395,
+						"lastWaveMaxRoute": 35.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 36.7999992370605,
+						"lastWaveMaxRoute": 36.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 34.7999992370605,
+						"lastWaveMaxRoute": 34.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 39.7999992370605,
+						"lastWaveMaxRoute": 39.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 17,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 17
 					},
 					{
 						"clears": 13,
 						"column": 0,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 13
 					},
 					{
 						"clears": 10,
 						"column": 1,
-						"lastWaveMaxRoute": 39.7999992370605,
+						"lastWaveMaxRoute": 39.79999923706055,
 						"waves": 10
 					},
 					{
 						"clears": 9,
 						"column": 2,
-						"lastWaveMaxRoute": 38.2000007629395,
+						"lastWaveMaxRoute": 38.20000076293945,
 						"waves": 9
 					},
 					{
 						"clears": 8,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 8
 					},
 					{
 						"clears": 5,
 						"column": 1,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 5
 					},
 					{
 						"clears": 2,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 2
 					}
 				],
@@ -7990,11 +7990,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 1024,
-					"lengthVariance": 222.876690703305,
-					"meanDetour": 1.35103385176698,
-					"meanLength": 34.9953120201826,
-					"meanTurns": 2.93750008174341,
-					"totalLength": 35835.199508667
+					"lengthVariance": 222.87669070330455,
+					"meanDetour": 1.351033851766983,
+					"meanLength": 34.99531202018261,
+					"meanTurns": 2.9375000817434076,
+					"totalLength": 35835.19950866699
 				},
 				"states": [
 					{
@@ -9310,235 +9310,235 @@
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 5.20000076293945,
+						"lastWaveMaxRoute": 5.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 6.79999923706055,
+						"lastWaveMaxRoute": 6.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 31.7999992370605,
+						"lastWaveMaxRoute": 31.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 41.7999992370605,
+						"lastWaveMaxRoute": 41.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 19.2000007629395,
+						"lastWaveMaxRoute": 19.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 42.7999992370605,
+						"lastWaveMaxRoute": 42.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 21.2000007629395,
+						"lastWaveMaxRoute": 21.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 50.7999992370605,
+						"lastWaveMaxRoute": 50.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 52.7999992370605,
+						"lastWaveMaxRoute": 52.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 54.7999992370605,
+						"lastWaveMaxRoute": 54.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 32.2000007629395,
+						"lastWaveMaxRoute": 32.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 58.7999992370605,
+						"lastWaveMaxRoute": 58.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 68.7999992370605,
+						"lastWaveMaxRoute": 68.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 15.7999992370605,
+						"lastWaveMaxRoute": 15.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 72.7999992370605,
+						"lastWaveMaxRoute": 72.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 19.7999992370605,
+						"lastWaveMaxRoute": 19.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 25.7999992370605,
+						"lastWaveMaxRoute": 25.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 36.2000007629395,
+						"lastWaveMaxRoute": 36.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 38.7999992370605,
+						"lastWaveMaxRoute": 38.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 27.7999992370605,
+						"lastWaveMaxRoute": 27.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 28.7999992370605,
+						"lastWaveMaxRoute": 28.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 35.2000007629395,
+						"lastWaveMaxRoute": 35.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 36.7999992370605,
+						"lastWaveMaxRoute": 36.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 34.7999992370605,
+						"lastWaveMaxRoute": 34.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 39.7999992370605,
+						"lastWaveMaxRoute": 39.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 17,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 17
 					},
 					{
 						"clears": 13,
 						"column": 0,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 13
 					},
 					{
 						"clears": 10,
 						"column": 1,
-						"lastWaveMaxRoute": 39.7999992370605,
+						"lastWaveMaxRoute": 39.79999923706055,
 						"waves": 10
 					},
 					{
 						"clears": 9,
 						"column": 2,
-						"lastWaveMaxRoute": 38.2000007629395,
+						"lastWaveMaxRoute": 38.20000076293945,
 						"waves": 9
 					},
 					{
 						"clears": 8,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 8
 					},
 					{
 						"clears": 5,
 						"column": 1,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 5
 					},
 					{
 						"clears": 2,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 2
 					}
 				],
@@ -9546,11 +9546,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 1024,
-					"lengthVariance": 222.876690703305,
-					"meanDetour": 1.35103385176698,
-					"meanLength": 34.9953120201826,
-					"meanTurns": 2.93750008174341,
-					"totalLength": 35835.199508667
+					"lengthVariance": 222.87669070330455,
+					"meanDetour": 1.351033851766983,
+					"meanLength": 34.99531202018261,
+					"meanTurns": 2.9375000817434076,
+					"totalLength": 35835.19950866699
 				},
 				"states": [
 					{
@@ -10866,235 +10866,235 @@
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 5.20000076293945,
+						"lastWaveMaxRoute": 5.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 6.79999923706055,
+						"lastWaveMaxRoute": 6.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 31.7999992370605,
+						"lastWaveMaxRoute": 31.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 41.7999992370605,
+						"lastWaveMaxRoute": 41.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 19.2000007629395,
+						"lastWaveMaxRoute": 19.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 42.7999992370605,
+						"lastWaveMaxRoute": 42.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 21.2000007629395,
+						"lastWaveMaxRoute": 21.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 48.7999992370605,
+						"lastWaveMaxRoute": 48.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 50.7999992370605,
+						"lastWaveMaxRoute": 50.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 52.7999992370605,
+						"lastWaveMaxRoute": 52.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 54.7999992370605,
+						"lastWaveMaxRoute": 54.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 32.2000007629395,
+						"lastWaveMaxRoute": 32.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 15.7999992370605,
+						"lastWaveMaxRoute": 15.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 33.2000007629395,
+						"lastWaveMaxRoute": 33.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 60.7999992370605,
+						"lastWaveMaxRoute": 60.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 19.7999992370605,
+						"lastWaveMaxRoute": 19.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 23.7999992370605,
+						"lastWaveMaxRoute": 23.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 70.7999992370605,
+						"lastWaveMaxRoute": 70.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 36.2000007629395,
+						"lastWaveMaxRoute": 36.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 25.7999992370605,
+						"lastWaveMaxRoute": 25.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 27.7999992370605,
+						"lastWaveMaxRoute": 27.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 38.7999992370605,
+						"lastWaveMaxRoute": 38.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 29.7999992370605,
+						"lastWaveMaxRoute": 29.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 36.7999992370605,
+						"lastWaveMaxRoute": 36.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 35.2000007629395,
+						"lastWaveMaxRoute": 35.20000076293945,
 						"waves": 30
 					},
 					{
 						"clears": 15,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 15
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 40.6000003814697,
+						"lastWaveMaxRoute": 40.60000038146973,
 						"waves": 30
 					},
 					{
 						"clears": 32,
 						"column": 0,
-						"lastWaveMaxRoute": 30.6000003814697,
+						"lastWaveMaxRoute": 30.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 7,
 						"column": 2,
-						"lastWaveMaxRoute": 38.2000007629395,
+						"lastWaveMaxRoute": 38.20000076293945,
 						"waves": 7
 					},
 					{
 						"clears": 12,
 						"column": 1,
-						"lastWaveMaxRoute": 35.6000003814697,
+						"lastWaveMaxRoute": 35.60000038146973,
 						"waves": 10
 					},
 					{
 						"clears": 13,
 						"column": 0,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 13
 					},
 					{
 						"clears": 2,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 2
 					},
 					{
 						"clears": 5,
 						"column": 1,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 5
 					},
 					{
 						"clears": 8,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 8
 					}
 				],
@@ -11102,11 +11102,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 1024,
-					"lengthVariance": 218.424672403046,
-					"meanDetour": 1.34567174042252,
-					"meanLength": 34.6748042441905,
-					"meanTurns": 3.07812508565665,
-					"totalLength": 35506.999546051
+					"lengthVariance": 218.42467240304623,
+					"meanDetour": 1.3456717404225156,
+					"meanLength": 34.674804244190454,
+					"meanTurns": 3.078125085656653,
+					"totalLength": 35506.999546051025
 				},
 				"states": [
 					{
@@ -12446,49 +12446,49 @@
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 5.20000076293945,
+						"lastWaveMaxRoute": 5.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 6.79999923706055,
+						"lastWaveMaxRoute": 6.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 31.7999992370605,
+						"lastWaveMaxRoute": 31.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 30.7999992370605,
+						"lastWaveMaxRoute": 30.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 40.7999992370605,
+						"lastWaveMaxRoute": 40.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 41.7999992370605,
+						"lastWaveMaxRoute": 41.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 19.2000007629395,
+						"lastWaveMaxRoute": 19.200000762939453,
 						"waves": 30
 					},
 					{
 						"clears": 2,
 						"column": 0,
-						"lastWaveMaxRoute": 13.7999992370605,
+						"lastWaveMaxRoute": 13.799999237060547,
 						"waves": 2
 					},
 					{
@@ -12500,103 +12500,103 @@
 					{
 						"clears": 88,
 						"column": 0,
-						"lastWaveMaxRoute": 32.6000003814697,
+						"lastWaveMaxRoute": 32.60000038146973,
 						"waves": 44
 					},
 					{
 						"clears": 30,
 						"column": 0,
-						"lastWaveMaxRoute": 13.7999992370605,
+						"lastWaveMaxRoute": 13.799999237060547,
 						"waves": 30
 					},
 					{
 						"clears": 6,
 						"column": 0,
-						"lastWaveMaxRoute": 22.7999992370605,
+						"lastWaveMaxRoute": 22.799999237060547,
 						"waves": 6
 					},
 					{
 						"clears": 8,
 						"column": 0,
-						"lastWaveMaxRoute": 17.3999996185303,
+						"lastWaveMaxRoute": 17.399999618530273,
 						"waves": 8
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 22.6000003814697,
+						"lastWaveMaxRoute": 22.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 26.6000003814697,
+						"lastWaveMaxRoute": 26.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 30.6000003814697,
+						"lastWaveMaxRoute": 30.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 43.3999996185303,
+						"lastWaveMaxRoute": 43.39999961853027,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 45.3999996185303,
+						"lastWaveMaxRoute": 45.39999961853027,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 47.3999996185303,
+						"lastWaveMaxRoute": 47.39999961853027,
 						"waves": 30
 					},
 					{
 						"clears": 31,
 						"column": 1,
-						"lastWaveMaxRoute": 21.6000003814697,
+						"lastWaveMaxRoute": 21.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 31,
 						"column": 1,
-						"lastWaveMaxRoute": 19.6000003814697,
+						"lastWaveMaxRoute": 19.600000381469727,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 22.3999996185303,
+						"lastWaveMaxRoute": 22.399999618530273,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 32.3999996185303,
+						"lastWaveMaxRoute": 32.39999961853027,
 						"waves": 30
 					},
 					{
 						"clears": 30,
 						"column": 1,
-						"lastWaveMaxRoute": 37.6000003814697,
+						"lastWaveMaxRoute": 37.60000038146973,
 						"waves": 30
 					},
 					{
 						"clears": 10,
 						"column": 1,
-						"lastWaveMaxRoute": 23.6000003814697,
+						"lastWaveMaxRoute": 23.600000381469727,
 						"waves": 10
 					},
 					{
 						"clears": 1,
 						"column": 1,
-						"lastWaveMaxRoute": 30.3999996185303,
+						"lastWaveMaxRoute": 30.399999618530273,
 						"waves": 1
 					},
 					{
@@ -12638,43 +12638,43 @@
 					{
 						"clears": 35,
 						"column": 2,
-						"lastWaveMaxRoute": 37.7999992370605,
+						"lastWaveMaxRoute": 37.79999923706055,
 						"waves": 31
 					},
 					{
 						"clears": 30,
 						"column": 2,
-						"lastWaveMaxRoute": 36.7999992370605,
+						"lastWaveMaxRoute": 36.79999923706055,
 						"waves": 30
 					},
 					{
 						"clears": 32,
 						"column": 2,
-						"lastWaveMaxRoute": 39.7999992370605,
+						"lastWaveMaxRoute": 39.79999923706055,
 						"waves": 28
 					},
 					{
 						"clears": 32,
 						"column": 2,
-						"lastWaveMaxRoute": 24.3999996185303,
+						"lastWaveMaxRoute": 24.399999618530273,
 						"waves": 30
 					},
 					{
 						"clears": 17,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 17
 					},
 					{
 						"clears": 9,
 						"column": 2,
-						"lastWaveMaxRoute": 38.2000007629395,
+						"lastWaveMaxRoute": 38.20000076293945,
 						"waves": 9
 					},
 					{
 						"clears": 2,
 						"column": 2,
-						"lastWaveMaxRoute": 32.7999992370605,
+						"lastWaveMaxRoute": 32.79999923706055,
 						"waves": 2
 					}
 				],
@@ -12682,11 +12682,11 @@
 				"routeFailures": 0,
 				"routes": {
 					"count": 1024,
-					"lengthVariance": 146.306773886547,
-					"meanDetour": 1.40305986231709,
-					"meanLength": 33.2160153780133,
-					"meanTurns": 4.2470704306855,
-					"totalLength": 34013.1997470856
+					"lengthVariance": 146.30677388654655,
+					"meanDetour": 1.4030598623170907,
+					"meanLength": 33.21601537801325,
+					"meanTurns": 4.247070430685498,
+					"totalLength": 34013.19974708557
 				},
 				"states": [
 					{
@@ -13972,7 +13972,7 @@
 			}
 		},
 		"timing": {
-			"totalMs": 691739
+			"totalMs": 174151
 		},
 		"unlock": {
 			"histogram": [
