@@ -124,7 +124,8 @@ func _builder_emits_format_v1() -> void:
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(p))
 	_complete("builder_emits_format_v1")
 
-## Guard against "fixing" by widening the loader: a level declaring version 2 must still fail.
+## Guard against "fixing" by widening the loader: a level declaring version 2 must still fail
+## unless it actually carries VOID cells (ADR-030 defines V2 = "contains VOID" only).
 func _fake_v2_rejected() -> void:
 	print("[fake v2 rejected]")
 	var lv = _json(HAZARD)
@@ -135,7 +136,7 @@ func _fake_v2_rejected() -> void:
 	f.store_string(JSON.stringify(lv))
 	f.close()
 	var r = LevelLoader.load_from_path(p)
-	_ok(not r.is_ok() and str(r.errors).find("unsupported version") != -1, "undefined Level Data V2 is rejected by LevelLoader")
+	_ok(not r.is_ok() and str(r.errors).find("requires at least one VOID cell") != -1, "void-free Level Data V2 is rejected by LevelLoader (ADR-030)")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(p))
 	_complete("fake_v2_rejected")
 

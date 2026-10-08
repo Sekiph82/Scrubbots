@@ -32,6 +32,11 @@ const LevelData = preload("res://scripts/data/level_data.gd")
 ##             and it becomes open/free space for access/path semantics.
 ## There is no DIRTY/CLEAN/grime/reveal model. Numeric order preserved so
 ## existing packed-byte storage stays valid: ACTIVE = 0, CLEARED = 1.
+##
+## VOID (ADR-030): a version-2 VOID cell (color id LevelData.VOID_CELL = -1) is
+## not a third state. It is CLEARED from construction (open space, no candidate,
+## rendered exactly like CLEARED per owner D1) and can never become ACTIVE —
+## set_cell_state(ACTIVE) and restore_all_active() both keep it CLEARED.
 enum CellState {
 	ACTIVE = 0,
 	CLEARED = 1,
@@ -42,6 +47,8 @@ var _height: int
 ## Palette id per cell, flat row-major. Copied from LevelData at construction
 ## time so runtime BoardState never mutates the source LevelData.
 var _color_ids: PackedInt32Array
+## Number of VOID cells (0 for every version-1 level). Fixed at construction.
+var _void_count: int = 0
 ## Current CellState per cell, flat row-major. All cells start ACTIVE.
 var _cell_states: PackedByteArray
 ## Monotonic lifecycle revision: advances on every accepted cell-state write and on
@@ -62,6 +69,11 @@ static func from_level_data(level: LevelData) -> RefCounted:
 	board._cell_states = PackedByteArray()
 	board._cell_states.resize(count)
 	board._cell_states.fill(CellState.ACTIVE)
+	if level.version == LevelData.FORMAT_VERSION_VOID:
+		for i in count:
+			if board._color_ids[i] == LevelData.VOID_CELL:
+				board._cell_states[i] = CellState.CLEARED
+				board._void_count += 1
 	return board
 
 func get_width() -> int:
@@ -72,6 +84,13 @@ func get_height() -> int:
 
 func get_cell_count() -> int:
 	return _width * _height
+
+## Non-VOID cells: the artwork a level must clear. == get_cell_count() without VOID.
+func get_artwork_cell_count() -> int:
+	return get_cell_count() - _void_count
+
+func is_void(index: int) -> bool:
+	return _void_count > 0 and is_valid_index(index) and _color_ids[index] == LevelData.VOID_CELL
 
 func is_valid_coordinate(x: int, y: int) -> bool:
 	return x >= 0 and x < _width and y >= 0 and y < _height
@@ -91,7 +110,7 @@ func get_cell_position(index: int) -> Vector2i:
 		return Vector2i(-1, -1)
 	return Vector2i(index % _width, index / _width)
 
-## Returns -1 for an out-of-range index.
+## Returns -1 for an out-of-range index, and LevelData.VOID_CELL (-1) for VOID.
 func get_color_id(index: int) -> int:
 	if not is_valid_index(index):
 		return -1
@@ -112,6 +131,9 @@ func set_cell_state(index: int, state: CellState) -> bool:
 	if not is_valid_index(index):
 		return false
 	if state != CellState.ACTIVE and state != CellState.CLEARED:
+		return false
+	# VOID is never artwork: it can never be made ACTIVE (ADR-030).
+	if state == CellState.ACTIVE and is_void(index):
 		return false
 	_cell_states[index] = state
 	_revision += 1
@@ -141,4 +163,8 @@ func count_cells_by_state(state: CellState) -> int:
 ## without swapping the BoardState instance (which would strand every bound engine).
 func restore_all_active() -> void:
 	_cell_states.fill(CellState.ACTIVE)
+	if _void_count > 0:
+		for i in _cell_states.size():
+			if _color_ids[i] == LevelData.VOID_CELL:
+				_cell_states[i] = CellState.CLEARED
 	_revision += 1

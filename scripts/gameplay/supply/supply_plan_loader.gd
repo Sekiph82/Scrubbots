@@ -117,8 +117,9 @@ static func build_engine(plan: Dictionary, level) -> Dictionary:
 	var grand := 0
 	for c in sums:
 		grand += int(sums[c])
-	if grand != level.get_cell_count():
-		return fail.call("grand total %d != cell count %d" % [grand, level.get_cell_count()])
+	# ADR-030: conservation is over artwork (non-VOID) cells; == cell count without VOID.
+	if grand != level.get_artwork_cell_count():
+		return fail.call("grand total %d != artwork cell count %d" % [grand, level.get_artwork_cell_count()])
 	var engine = BatchSupplyEngine.create(column_count, VISIBLE_PREVIEW_DEPTH)
 	if engine == null or not engine.load_candidate(cols, 0, palette_size):
 		return fail.call("BatchSupplyEngine rejected the plan layout")

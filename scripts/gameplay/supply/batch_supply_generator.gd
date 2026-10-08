@@ -23,7 +23,7 @@ const MAX_BATCHES_PER_COLOR := 8
 ## field so a foreign RefCounted/object never raises an uncaught script error. Requires:
 ## the exact LevelData domain type, positive coherent dimensions, a non-empty palette,
 ## a packed-int cell array whose length equals get_cell_count(), and every cell palette
-## id within range.
+## id within range (VOID = -1 skipped for version-2 levels; ADR-030).
 static func color_totals(level) -> Dictionary:
 	if not (level is LevelData):
 		return {}
@@ -41,7 +41,11 @@ static func color_totals(level) -> Dictionary:
 	if cells.size() != level.get_cell_count():
 		return {}
 	var totals: Dictionary = {}
+	# VOID cells (ADR-030, version 2 only) are not artwork: no robot, no supply.
+	var allow_void: bool = level.version == LevelData.FORMAT_VERSION_VOID
 	for c in cells:
+		if c == LevelData.VOID_CELL and allow_void:
+			continue
 		if c < 0 or c >= palette_size:
 			return {}
 		totals[c] = int(totals.get(c, 0)) + 1

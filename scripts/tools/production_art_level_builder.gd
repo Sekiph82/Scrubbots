@@ -28,7 +28,9 @@ extends RefCounted
 ##
 ## Production-art rules enforced (docs/08_PIXEL_ART_PALETTE_RULES.md):
 ##   - off-palette logical color        -> REJECT (no nearest-color approximation)
-##   - non-opaque (alpha != 255) cell   -> REJECT (canonical #RRGGBBFF == #RRGGBB)
+##   - fully transparent (alpha 0) cell -> VOID (-1), Level Data version 2 (ADR-030;
+##                                         never filled with a colour)
+##   - semi-transparent (alpha 1..254)  -> REJECT (canonical #RRGGBBFF == #RRGGBB)
 ##   - distinct used-color count        -> enforce the global V1 envelope (3..12)
 ##   - final local palette              -> only used canonical colors, ascending C-ID
 ##   - determinism                      -> identical input yields identical output
@@ -50,6 +52,7 @@ class NormalizeResult:
 	var normalized_cids: Array = []       # final ascending-C-ID palette
 	var used_color_count: int = 0
 	var cid_cell_counts: Dictionary = {}  # C-ID -> cell reference count
+	var void_cell_count: int = 0          # alpha-0 source cells emitted as VOID (ADR-030)
 
 	func is_ok() -> bool:
 		return errors.is_empty() and level_data != null
@@ -172,11 +175,17 @@ static func normalize_from_level_data(raw, difficulty: String) -> NormalizeResul
 
 	# --- map each first-seen palette entry to a canonical C-ID (fail closed) ---
 	var raw_index_to_cid := {}   # old palette index -> C-ID
+	var raw_void_indices := {}   # old palette indices that are fully transparent (VOID)
 	for i in raw.palette.size():
 		var hex: String = raw.palette[i]
 		var rgba = _parse_hex_rgba(hex)
 		if rgba == null:
 			result.add_error("Palette entry %d '%s' is not a valid #RRGGBB[AA] color" % [i, hex])
+			continue
+		# ADR-030: a fully transparent pixel is a VOID cell (not artwork). Any RGB
+		# under alpha 0 is the same VOID; it is never mapped/filled to a colour.
+		if rgba[3] == 0:
+			raw_void_indices[i] = true
 			continue
 		# Canonical #RRGGBBFF is opaque-equivalent to #RRGGBB. Any other alpha is
 		# rejected (no admission of semi-transparent production logical colors).
@@ -196,6 +205,9 @@ static func normalize_from_level_data(raw, difficulty: String) -> NormalizeResul
 	# --- distinct used colors are computed from CELLS, not palette length ---
 	var cid_counts := {}
 	for old_idx in raw.cells:
+		if raw_void_indices.has(old_idx):
+			result.void_cell_count += 1
+			continue
 		if not raw_index_to_cid.has(old_idx):
 			result.add_error("Cell references unknown palette index %d" % old_idx)
 			return result
@@ -226,10 +238,15 @@ static func normalize_from_level_data(raw, difficulty: String) -> NormalizeResul
 	var new_cells := PackedInt32Array()
 	new_cells.resize(raw.cells.size())
 	for i in raw.cells.size():
-		new_cells[i] = cid_to_new_index[raw_index_to_cid[raw.cells[i]]]
+		if raw_void_indices.has(raw.cells[i]):
+			new_cells[i] = LevelData.VOID_CELL
+		else:
+			new_cells[i] = cid_to_new_index[raw_index_to_cid[raw.cells[i]]]
 
+	# Version 2 exactly when VOID exists; void-free output stays version 1.
+	var out_version: int = LevelData.FORMAT_VERSION_VOID if result.void_cell_count > 0 else LevelData.FORMAT_VERSION
 	var normalized := LevelData.new(
-		LevelData.FORMAT_VERSION, raw.id, raw.display_name, raw.difficulty,
+		out_version, raw.id, raw.display_name, raw.difficulty,
 		raw.width, raw.height, norm_palette, new_cells)
 
 	# --- structural + production validation of the normalized result ---
@@ -255,6 +272,13 @@ static func normalize_from_level_data(raw, difficulty: String) -> NormalizeResul
 	if raw_img == null or norm_img == null:
 		result.add_error("Reconstruction failed during normalization equality check")
 		return result
+	if result.void_cell_count > 0:
+		# Every alpha-0 source pixel is equivalent regardless of its RGB; compare with
+		# the raw transparent pixels canonicalized to (0,0,0,0) like VOID reconstruction.
+		for y in raw_img.get_height():
+			for x in raw_img.get_width():
+				if raw_img.get_pixel(x, y).a8 == 0:
+					raw_img.set_pixel(x, y, Color(0, 0, 0, 0))
 	if raw_img.get_data() != norm_img.get_data():
 		result.add_error("Palette remap changed visible pixels (reconstruction mismatch)")
 		return result
@@ -519,7 +543,7 @@ static func _build_metadata(source_path: String, level, norm: NormalizeResult, o
 	var counts := {}
 	for cid in norm.cid_cell_counts:
 		counts[cid] = int(norm.cid_cell_counts[cid])
-	return {
+	var md := {
 		"builderVersion": BUILDER_VERSION,
 		"sourcePath": source_path,
 		"sourceGitBlobSha1": _git_blob_sha1_file(source_path),
@@ -536,6 +560,12 @@ static func _build_metadata(source_path: String, level, norm: NormalizeResult, o
 		"outputPath": output_path,
 		"previewPath": preview_path,
 	}
+	# ADR-030: VOID levels also carry the artwork count (absent => artworkCellCount ==
+	# cellCount), so void-free metadata stays byte-identical.
+	if level.get_void_cell_count() > 0:
+		md["artworkCellCount"] = level.get_artwork_cell_count()
+		md["voidCellCount"] = level.get_void_cell_count()
+	return md
 
 static func _level_to_dict(level) -> Dictionary:
 	var palette_arr: Array = []

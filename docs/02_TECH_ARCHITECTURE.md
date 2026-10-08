@@ -194,7 +194,7 @@ Reachability/access  --- filters blocked/unreachable candidates --->
   validation errors (`LevelValidationResult`). See
   `docs/03_LEVEL_DATA_SPEC.md`.
 - `BoardState` (`scripts/gameplay/board/board_state.gd`) — runtime cell
-  state (`ACTIVE`/`CLEARED` per cell; all cells start ACTIVE), built fresh
+  state (`ACTIVE`/`CLEARED` per cell; artwork cells start ACTIVE, VOID cells start CLEARED — ADR-030), built fresh
   from a `LevelData` via
   `BoardState.from_level_data(level)`. Says what is **currently happening**
   to that level. Two `BoardState` instances built from the same `LevelData`

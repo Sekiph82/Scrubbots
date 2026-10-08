@@ -18,7 +18,8 @@ extends RefCounted
 ##   - TEST is rejected (dev fixture, never production);
 ##   - the class must be one of the four owner-locked production classes;
 ##   - width and height must each fall in the 20..59 production envelope,
-##     rectangular allowed.
+##     rectangular allowed;
+##   - D2 minimum artwork (ADR-030): >= 200 non-VOID cells and >= 25% of W*H.
 ## CLASS IS NOT DERIVED FROM DIMENSIONS (owner decision 2026-09-12): a 24x24
 ## board may be VERY_HARD, a 38x38 board may be EASY. The retired class=dimension
 ## bands are NOT applied here (migrated in M36 V02, closing F-M36-001). The
@@ -27,6 +28,11 @@ extends RefCounted
 
 const DifficultyRules = preload("res://scripts/data/difficulty_rules.gd")
 const ProductionValidationResult = preload("res://scripts/data/production_validation_result.gd")
+
+## D2 minimum-artwork gate (ADR-030): >= 200 non-VOID cells AND >= 25% of W*H.
+const MIN_ARTWORK_CELLS := 200
+const MIN_ARTWORK_FRACTION_NUM := 1
+const MIN_ARTWORK_FRACTION_DEN := 4
 
 static func validate(level) -> ProductionValidationResult:
 	var result := ProductionValidationResult.new()
@@ -49,6 +55,16 @@ static func validate(level) -> ProductionValidationResult:
 		result.add_error(
 			"Level %s: production board envelope is %d..%d per dimension (rectangular allowed); received width=%d height=%d" %
 			[level.id, DifficultyRules.ENVELOPE_MIN, DifficultyRules.ENVELOPE_MAX, level.width, level.height]
+		)
+
+	# D2 (owner decision 2026-10-08, ADR-030): minimum artwork. Always true for a
+	# void-free level inside the envelope (>= 20*20 = 400 cells, 100%).
+	var artwork: int = level.get_artwork_cell_count()
+	var total: int = level.get_cell_count()
+	if artwork < MIN_ARTWORK_CELLS or artwork * MIN_ARTWORK_FRACTION_DEN < total * MIN_ARTWORK_FRACTION_NUM:
+		result.add_error(
+			"Level %s: production artwork needs >= %d non-VOID cells and >= %d/%d of the board; got %d of %d" %
+			[level.id, MIN_ARTWORK_CELLS, MIN_ARTWORK_FRACTION_NUM, MIN_ARTWORK_FRACTION_DEN, artwork, total]
 		)
 
 	return result

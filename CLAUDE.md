@@ -134,10 +134,14 @@ Machine source (active authority, palette V3 — Alpix-aligned, owner-locked 202
 Historical only: `data/palettes/scrubbots_palette_v2.json`.
 
 Palette version != Level Data schema version. Palette V3 does not change Level Data:
-level files stay `"version": 1` (`LevelData.FORMAT_VERSION`); no Level Data V2 exists.
+void-free level files stay `"version": 1` (`LevelData.FORMAT_VERSION`). Level Data version 2
+exists only for levels with VOID cells (ADR-030, owner 2026-10-08).
 
 - Production ACTIVE logical cells use only C01..C16.
 - ACTIVE alpha is 255.
+- A fully transparent source pixel is a VOID cell (`cells` value `-1`, version 2 only): not
+  artwork, never a candidate, starts CLEARED/open, renders like CLEARED (D1), never filled
+  with a colour. Production needs >= 200 non-VOID cells and >= 25% of W*H (D2).
 - Local LevelData palette contains only used canonical colors, ascending global C-ID.
 - CLEARED alpha 0 is runtime state, not palette color.
 - BG01 Midnight Slate `#202533` is gameplay background, not a logical cell color.

@@ -129,7 +129,11 @@ func measure(level, supply_engine, columns: Array, expected: Array = []) -> Dict
 	var states: Array = []
 	var placements: Array = []
 	var placement_ms: Array = []
-	var cells: int = level.get_cell_count()
+	# Progress is over artwork cells (ADR-030); == cell count for every void-free level.
+	var cells: int = level.get_artwork_cell_count()
+	if level.get_void_cell_count() > 0:
+		out["void"] = {"voidCells": level.get_void_cell_count(), "artworkCells": cells,
+			"initialState": "VOID_CLEARED", "rule": "ADR-030"}
 	for i in range(columns.size()):
 		var col: int = int(columns[i])
 		var legal: Array = state.legal_action_columns()
@@ -192,12 +196,16 @@ func measure(level, supply_engine, columns: Array, expected: Array = []) -> Dict
 func _no_waiting(st: Dictionary) -> bool:
 	return (st["occupied"] as Array).is_empty()
 
-## Colour counts, Shannon entropy (nats) and normalized entropy.
+## Colour counts, Shannon entropy (nats) and normalized entropy over ARTWORK cells only:
+## VOID cells (ADR-030) carry no colour and are excluded (`voidCells` recorded when > 0).
 static func color_stats(level) -> Dictionary:
 	var counts := {}
+	var voids: int = level.get_void_cell_count()
 	for c in level.cells:
+		if voids > 0 and int(c) == LevelData.VOID_CELL:
+			continue
 		counts[int(c)] = int(counts.get(int(c), 0)) + 1
-	var n: int = level.cells.size()
+	var n: int = level.cells.size() - voids
 	var h := 0.0
 	var keys: Array = counts.keys()
 	keys.sort()
@@ -208,18 +216,24 @@ static func color_stats(level) -> Dictionary:
 		dist[String(level.palette[k]).to_upper()] = int(counts[k])
 	var m: int = keys.size()
 	var hn: float = h / log(float(m)) if m > 1 else 0.0
-	return {"usedColors": m, "cells": n, "frequencyByHex": dist, "entropyNats": h,
+	var out := {"usedColors": m, "cells": n, "frequencyByHex": dist, "entropyNats": h,
 		"normalizedEntropy": hn}
+	if voids > 0:
+		out["voidCells"] = voids
+	return out
 
 ## Colour-agnostic earliest reachability wave per cell under canonical ACTIVE-blocker /
 ## CLEARED-open semantics, using the PRODUCTION access truth (ProductionTargetAccess from
 ## the canonical rightmost-slot origin). Wave k = cells targetable once every wave < k
 ## cell is CLEARED. Any cell never targetable is a routing/access pathology.
+## VOID cells (ADR-030) start CLEARED (open), are never peeled and are marked '.' in
+## perCellWaves; every count/fraction below is over artwork cells only.
 func peel_waves(level) -> Dictionary:
 	var board = BoardState.from_level_data(level)
 	var w: int = board.get_width()
 	var h: int = board.get_height()
 	var n: int = board.get_cell_count()
+	var art: int = board.get_artwork_cell_count()
 	var routing = ProductionRoutingSystem.new()
 	# Difficulty analysis measures the shortest TOTAL legal travel (the audited route-complexity basis),
 	# not the railway-first visual preference: keeps every Difficulty V1 score / committed evidence
@@ -230,13 +244,13 @@ func peel_waves(level) -> Dictionary:
 	var waves := PackedInt32Array()
 	waves.resize(n)
 	waves.fill(-1)
-	var remaining := n
+	var remaining := art
 	var wave := 0
 	while remaining > 0:
 		var access = ProductionTargetAccess.new(routing, raccess, board, origin)
 		var hit: Array = []
 		for i in range(n):
-			if waves[i] == -1 and access.is_targetable(i):
+			if waves[i] == -1 and not board.is_void(i) and access.is_targetable(i):
 				hit.append(i)
 		if hit.is_empty():
 			break
@@ -253,6 +267,9 @@ func peel_waves(level) -> Dictionary:
 	var chars := PackedStringArray()
 	for i in range(n):
 		var v: int = waves[i]
+		if board.is_void(i):
+			chars.append(".")
+			continue
 		chars.append("?" if v < 0 else "0123456789abcdefghijklmnopqrstuvwxyz"[mini(v, 35)])
 		if v >= 0:
 			sorted.append(v)
@@ -264,23 +281,28 @@ func peel_waves(level) -> Dictionary:
 	# to the nearest edge. Recorded as a routing sanity check, not used in scoring.
 	var geometric_mismatch := 0
 	for i in range(n):
+		if board.is_void(i):
+			continue
 		var x: int = i % w
 		var y: int = i / w
 		if waves[i] != mini(mini(x, y), mini(w - 1 - x, h - 1 - y)):
 			geometric_mismatch += 1
 	return {"waveCount": wave, "maxWave": wave - 1, "meanWave": float(total) / maxf(1.0, float(sorted.size())),
-		"p95Wave": p95, "initiallyLockedFraction": 1.0 - float(hist[0] if wave > 0 else 0) / float(n),
-		"histogram": hist, "unreachableCells": n - sorted.size(),
+		"p95Wave": p95, "initiallyLockedFraction": 1.0 - float(hist[0] if wave > 0 else 0) / float(art),
+		"histogram": hist, "unreachableCells": art - sorted.size(),
 		"geometricMismatchCells": geometric_mismatch, "perCellWaves": "".join(chars)}
 
 ## Topology signature: minimum number of colour regions a path from outside must cross to
 ## reach each cell (0-1 BFS; entering a cell costs 1 when its colour differs from the
 ## previous cell, the outside counts as a distinct colour). Pure LevelData, no routing;
-## novelty/topology evidence only.
+## novelty/topology evidence only. VOID cells (ADR-030) are open space like the outside:
+## entering VOID is free, entering artwork from VOID costs 1, and max/mean are over
+## artwork cells only.
 static func color_layer_depth(level) -> Dictionary:
 	var w: int = level.width
 	var h: int = level.height
 	var n: int = w * h
+	var has_void: bool = level.get_void_cell_count() > 0
 	var dist := PackedInt32Array()
 	dist.resize(n)
 	dist.fill(1 << 30)
@@ -289,11 +311,19 @@ static func color_layer_depth(level) -> Dictionary:
 		var x: int = i % w
 		var y: int = i / w
 		if x == 0 or y == 0 or x == w - 1 or y == h - 1:
-			dist[i] = 1
+			dist[i] = 0 if level.is_void(i) else 1
 			dq.append(i)
 	# Dial's algorithm with buckets (costs are 0/1) — deterministic.
 	var buckets: Array = [dq, []]
 	var cur := 1
+	if has_void:
+		# Border VOID cells start at 0: split the seeds into the 0 and 1 buckets.
+		var zero: Array = []
+		var one: Array = []
+		for i in dq:
+			(zero if dist[i] == 0 else one).append(i)
+		buckets = [zero, one]
+		cur = 0
 	while true:
 		var bucket: Array = buckets[0]
 		if bucket.is_empty():
@@ -314,15 +344,19 @@ static func color_layer_depth(level) -> Dictionary:
 				continue
 			var v: int = ny * w + nx
 			var cost: int = 0 if level.cells[v] == level.cells[u] else 1
+			if has_void and level.is_void(v):
+				cost = 0
 			if dist[u] + cost < dist[v]:
 				dist[v] = dist[u] + cost
 				(buckets[cost] as Array).append(v)
 	var mx := 0
 	var tot := 0
-	for v in dist:
-		mx = maxi(mx, v)
-		tot += v
-	return {"maxLayers": mx, "meanLayers": float(tot) / float(n)}
+	for i in range(n):
+		if has_void and level.is_void(i):
+			continue
+		mx = maxi(mx, dist[i])
+		tot += dist[i]
+	return {"maxLayers": mx, "meanLayers": float(tot) / float(level.get_artwork_cell_count())}
 
 ## Sample one quiescent decision state with production access truth.
 func _decision_state(level, kernel, state, cells: int) -> Dictionary:
@@ -534,7 +568,7 @@ func score(raw: Dictionary, level_number: int, anchors: Dictionary = {}) -> Dict
 				"inputs": {"B": vec["B"], "nonProductiveLegalChoiceFraction": nonprod_f}}},
 		"supportedLowerBoundContribution": 100.0 * float(fw["choiceOpacity"]) * opacity}
 	var window := classify_window(delta)
-	return {
+	var scored := {
 		"vector": vec, "vectorOrder": ChallengeScoreModelV1.VECTOR_ORDER,
 		"challengeScore": D, "targetChallenge": target, "signedDelta": delta, "absoluteDelta": absf(delta),
 		"acceptanceWindow": window, "anchorsUsed": a,
@@ -566,6 +600,11 @@ func score(raw: Dictionary, level_number: int, anchors: Dictionary = {}) -> Dict
 		"frustrationRisk": frustration,
 		"profile": profile(vec),
 	}
+	# ADR-030 provenance: VOID presence is recorded only for levels that have VOID, so
+	# void-free score records stay byte-identical. Anchors are unchanged (no recalibration).
+	if raw.has("void"):
+		scored["void"] = (raw["void"] as Dictionary).duplicate()
+	return scored
 
 func _dims(raw: Dictionary) -> Vector2i:
 	return Vector2i(int(raw["dims"]["width"]), int(raw["dims"]["height"]))

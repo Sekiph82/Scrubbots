@@ -1,6 +1,6 @@
 # 03 — Level Data Specification
 
-Status: **Level Data V1 implemented; production-difficulty semantics updated by owner 2026-09-12**
+Status: **Level Data V1 implemented; production-difficulty semantics updated by owner 2026-09-12; Version 2 (VOID cells) owner-locked 2026-10-08 (ADR-030)**
 
 Canonical owner decision:
 `coordination/OWNER_DIFFICULTY_PROGRESSION_DECISION_V01.md`
@@ -31,17 +31,45 @@ The board engine remains variable-size and dimension-generic.
 
 ### Fields
 
-- `version`: required integer, currently exactly `1`.
+- `version`: required integer: `1`, or `2` for a level that contains VOID cells (section 2.1).
 - `id`: required non-empty stable level identifier.
 - `name`: required non-empty display name.
 - `difficulty`: required non-empty string. Production campaign uses `EASY`, `MEDIUM`, `HARD`, `VERY_HARD`; `TEST` is development-only and never production content.
 - `width`, `height`: required positive integers.
 - `palette`: required non-empty local palette. Palette ID is local array index.
-- `cells`: required row-major integer palette IDs; length exactly `width * height`.
+- `cells`: required row-major integer palette IDs; length exactly `width * height`. In a version-2 file the value `-1` marks a VOID cell.
 
 Canonical cell index:
 
 `index = y * width + x`
+
+### 2.1 Version 2: VOID cells (ADR-030, owner decision 2026-10-08)
+
+A transparent source pixel is a **VOID** cell: not artwork, no colour, never a candidate, never needs a robot, starts the level as open (CLEARED) space and renders exactly like CLEARED (owner D1). Transparent pixels must never be filled with a colour.
+
+```jsonc
+{
+  "version": 2,
+  "id": "void_example",
+  "name": "Void Example",
+  "difficulty": "TEST",
+  "width": 4,
+  "height": 3,
+  "palette": ["#FF4500FF", "#FFA800FF"],
+  "cells": [-1, -1, -1, -1,
+            -1,  0,  1, -1,
+            -1,  0,  1, -1]
+}
+```
+
+Rules:
+
+- `-1` (`LevelData.VOID_CELL`) is legal only when `version` is `2`; a version-1 file with `-1` is rejected.
+- A version-2 file must contain at least one VOID cell (void-free levels stay version 1) and at least one artwork cell.
+- The board is still the full `width * height` grid; `get_cell_count()` is unchanged and `get_artwork_cell_count()` counts non-VOID cells.
+- Palette/colour rules (3..12 used colours, C01..C16, used-only ascending palette) count only non-VOID cells.
+- Supply conservation, WIN (all non-VOID cells cleared), solver and Difficulty V1 measurements use artwork cells only.
+- Production minimum artwork (owner D2): >= 200 non-VOID cells and >= 25% of `width * height`.
 
 ## 3. Structural validation
 
@@ -51,12 +79,12 @@ Canonical cell index:
 
 Structural rules include:
 
-- supported version;
+- supported version (1, or 2 with VOID);
 - required fields/types;
 - positive dimensions;
 - non-empty palette;
 - exact cell count;
-- every cell palette ID in range.
+- every cell an integer palette ID in range, or `-1` VOID in a version-2 file (version 2 needs >= 1 VOID and >= 1 artwork cell).
 
 Structural validation remains dimension/difficulty agnostic. A 3x2 TEST fixture can be structurally valid.
 
@@ -71,7 +99,8 @@ Current engine/content envelope:
 - width: 20..59;
 - height: 20..59;
 - rectangular boards allowed;
-- maximum 59x59 = 3481 logical cells.
+- maximum 59x59 = 3481 logical cells;
+- minimum artwork (ADR-030 D2): >= 200 non-VOID cells and >= 25% of W*H (always true for a void-free board).
 
 This envelope is **not** an EASY/MEDIUM/HARD/VERY_HARD mapping.
 
@@ -94,15 +123,15 @@ Alpix-aligned, owner-locked 2026-09-25; C01..C16 table in `docs/08_PIXEL_ART_PAL
 Historical: `data/palettes/scrubbots_palette_v2.json` (V2, superseded; provenance only).
 
 **Palette version and Level Data schema version are separate.** A palette-authority version
-change (V2 -> V3) does not by itself change the Level Data schema version. Level files keep
-`"version": 1` (`LevelData.FORMAT_VERSION == 1`; `LevelLoader` accepts exactly 1). A Level
-Data V2 schema is not defined or authorized; bumping a level file's `version` to match the
-palette version makes it unloadable.
+change (V2 -> V3) does not by itself change the Level Data schema version. Void-free level
+files keep `"version": 1` (`LevelData.FORMAT_VERSION == 1`). Level Data version 2 exists only
+for levels with VOID cells (ADR-030); bumping a void-free file's `version` to 2 (or to match
+the palette version) makes it unloadable.
 
 Production rules:
 
 - ACTIVE logical cells use only C01..C16;
-- ACTIVE alpha is 255;
+- ACTIVE alpha is 255; a fully transparent (alpha 0) source pixel is a VOID cell, never a colour; alpha 1..254 is rejected;
 - local palette contains only actually used canonical colors;
 - local palette ordered by ascending global C-ID;
 - no unused/off-palette entry;
@@ -161,7 +190,7 @@ LevelData describes initial logical artwork.
 
 Runtime `BoardState` is built fresh from LevelData:
 
-- all logical cells begin ACTIVE;
+- all artwork cells begin ACTIVE; VOID cells (version 2) begin CLEARED and can never become ACTIVE;
 - ACTIVE stores source color identity;
 - gameplay changes cells to CLEARED;
 - runtime reservations, access truth and clearing progress do not rewrite source LevelData.
@@ -318,7 +347,7 @@ without repainting logical artwork.
 
 Do not introduce V2 fields into V1 ad hoc.
 
-If future gameplay requires source-level special cells, blockers, initial runtime-state overrides or other new logical data, define Level Data V2 explicitly with migration tests.
+If future gameplay requires source-level special cells, blockers, initial runtime-state overrides or other new logical data, define a new Level Data version explicitly with migration tests. Version 2 is taken by VOID cells (ADR-030, section 2.1); it adds no other field.
 
 Difficulty analysis metadata changing does **not** by itself require Level Data V2 because it remains derived sidecar/catalog data.
 
