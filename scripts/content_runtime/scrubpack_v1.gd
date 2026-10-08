@@ -45,7 +45,7 @@ const METADATA_REQUIRED := ["builderVersion", "cellCount", "columnCount", "diffi
 	"schema", "version", "visiblePreviewDepth", "width"]
 const METADATA_OPTIONAL := ["challengeScore", "sourceCandidateId", "sourceArtworkSha256", "sourceGridHash", "sourceLineage",
 	"pipelineRunId", "loadCheck", "progression", "challengeVector", "sessionLoad", "dominantProfile", "frustrationRisk",
-	"official_difficulty_v1", "noveltySignature"]
+	"official_difficulty_v1", "noveltySignature", "artworkCellCount", "voidCellCount"]
 
 static var _re := {}
 
@@ -322,7 +322,8 @@ static func validate_level_triplet(id: String, files: Dictionary) -> Dictionary:
 	var h = lv["height"]
 	var pal = lv["palette"]
 	var cells = lv["cells"]
-	if not (_int(lv["version"]) and lv["version"] == 1 and _str(lv["id"]) and _str(lv["name"]) and _str(lv["difficulty"])
+	# ADR-030: version 2 = level with VOID cells (-1); version 1 never carries VOID.
+	if not (_int(lv["version"]) and lv["version"] in [1, 2] and _str(lv["id"]) and _str(lv["name"]) and _str(lv["difficulty"])
 			and _int(w) and w >= 20 and w <= 59 and _int(h) and h >= 20 and h <= 59
 			and typeof(pal) == TYPE_ARRAY and pal.size() >= 1 and pal.size() <= 256
 			and typeof(cells) == TYPE_ARRAY and cells.size() == w * h):
@@ -333,7 +334,7 @@ static func validate_level_triplet(id: String, files: Dictionary) -> Dictionary:
 			return fail.call("LEVEL_INVALID_PAYLOAD")
 		seen[c] = true
 	for c in cells:
-		if not _int(c) or c < 0 or c >= pal.size():
+		if not _int(c) or c < -1 or c >= pal.size() or (c == -1 and lv["version"] != 2):
 			return fail.call("LEVEL_INVALID_PAYLOAD")
 	if lv["id"] != id:
 		return fail.call("LEVEL_IDENTITY_MISMATCH")
@@ -397,5 +398,12 @@ static func validate_level_triplet(id: String, files: Dictionary) -> Dictionary:
 			and md["visiblePreviewDepth"] == 3 and typeof(md["fileDigests"]) == TYPE_DICTIONARY):
 		return fail.call("METADATA_INVALID_PAYLOAD")
 	if md["id"] != id or md["width"] != w or md["height"] != h or md["columnCount"] != cc:
+		return fail.call("METADATA_IDENTITY_MISMATCH")
+	# Optional VOID counts (ADR-030) must agree with the validated level exactly.
+	for k in ["artworkCellCount", "voidCellCount"]:
+		if md.has(k) and not _int(md[k]):
+			return fail.call("METADATA_INVALID_PAYLOAD")
+	if (md.has("artworkCellCount") and md["artworkCellCount"] != level.get_artwork_cell_count()) \
+			or (md.has("voidCellCount") and md["voidCellCount"] != level.get_void_cell_count()):
 		return fail.call("METADATA_IDENTITY_MISMATCH")
 	return {"ok": true, "reason": "OK", "difficulty": String(level.difficulty), "width": int(level.width), "height": int(level.height)}

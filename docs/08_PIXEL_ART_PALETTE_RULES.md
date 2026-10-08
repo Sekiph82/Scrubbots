@@ -14,8 +14,9 @@ Historical (superseded, kept for provenance only): `data/palettes/scrubbots_pale
 (V2, locked 2026-09-06).
 
 The palette version is independent of the Level Data schema version: palette V3 does NOT
-imply Level Data V2/V3. Level files stay `"version": 1` (`LevelData.FORMAT_VERSION`); see
-`docs/03_LEVEL_DATA_SPEC.md` §4.2.
+imply Level Data V2/V3. Void-free level files stay `"version": 1` (`LevelData.FORMAT_VERSION`);
+Level Data version 2 exists only for levels with VOID cells (ADR-030); see
+`docs/03_LEVEL_DATA_SPEC.md` §2.1 and §4.2.
 
 Difficulty/progression owner decision:
 `coordination/OWNER_DIFFICULTY_PROGRESSION_DECISION_V01.md`
@@ -73,6 +74,7 @@ Production content still must stay within the global 3..12 used-color envelope u
 - The local palette contains only canonical colors actually used by logical cells.
 - Local palette order is ascending global C-ID.
 - `#RRGGBBFF` is serialization-equivalent to canonical opaque `#RRGGBB`; other ACTIVE artwork alpha values are illegal.
+- A fully transparent (alpha 0) source pixel is a VOID cell (ADR-030): Level Data version 2, cell value `-1`, no colour, never filled, rendered like CLEARED. Alpha 1..254 remains illegal.
 - CLEARED transparency is runtime state, not a palette color.
 - Gameplay background is not a level palette color.
 - Presentation grid/border overlays do not count as logical colors.

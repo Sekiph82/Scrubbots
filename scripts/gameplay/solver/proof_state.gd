@@ -47,7 +47,7 @@ var capacity: int = SLOT_COUNT
 # --------------------------------------------------------------- construction --
 
 ## Build the INITIAL proof state for `level` + a loaded M23 BatchSupplyEngine candidate:
-## every logical cell ACTIVE, five EMPTY slots, and the exact per-column FIFO supply from
+## every artwork cell ACTIVE (VOID cells CLEARED, ADR-030), five EMPTY slots, and the exact per-column FIFO supply from
 ## the engine's non-player-facing debug snapshot (the solver is allowed the full queue;
 ## the runtime player surface is not). Returns null on malformed input.
 static func from_level_and_supply(p_level, supply_engine):
@@ -63,6 +63,11 @@ static func from_level_and_supply(p_level, supply_engine):
 	s.active = PackedByteArray()
 	s.active.resize(count)
 	s.active.fill(ACTIVE_BYTE)
+	# VOID cells (ADR-030) start CLEARED: open space, never a target.
+	if p_level.version == LevelData.FORMAT_VERSION_VOID:
+		for i in range(count):
+			if p_level.cells[i] == LevelData.VOID_CELL:
+				s.active[i] = CLEARED_BYTE
 	var dbg: Dictionary = supply_engine.debug_snapshot()
 	s.column_count = int(dbg["column_count"])
 	s.preview_depth = int(dbg["preview_depth"])

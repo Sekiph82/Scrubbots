@@ -1060,3 +1060,28 @@ Exactly four boosters are authorized. +1 Slot requires M24/M27/UI to support aut
 **Reason**:
 
 Separating wallet/reward/entitlement/inventory services from gameplay and UI prevents double grants, UI-owned balances and hidden solver divergence while preserving tunable economy data.
+
+### ADR-030: VOID cells — transparent artwork pixels as a first-class LevelData cell type
+
+**Status**: OWNER-LOCKED 2026-10-08. Supersedes the Level Data rule "every cell has a palette colour" and the "no Level Data V2 exists" note, for files that contain VOID.
+
+**Owner decision (2026-10-08)**: pixel-art levels may contain transparent pixels. A transparent pixel is a **VOID** cell: it is not artwork, never needs a robot and starts the level as open space. Filling transparent pixels with a colour is forbidden (it changes the puzzle). Levels without VOID behave exactly as before.
+
+- **D1 presentation**: VOID renders exactly like a CLEARED cell: the BG01 `#202533` gameplay background shows through an alpha-0 texel, with no grid/border/bevel (the pixel-grid shader already emits nothing for alpha < 0.5).
+- **D2 minimum artwork**: a production level needs **>= 200 non-VOID cells AND >= 25% of W*H** non-VOID. The 20..59 per-dimension envelope is unchanged and the board stays the full W x H (VOID never shrinks it).
+
+**Decision**:
+
+- Encoding: `cells` value `-1` (`LevelData.VOID_CELL`) = VOID; every other value is a local palette index. `-1` is legal **only** in `"version": 2` files (`LevelData.FORMAT_VERSION_VOID`). A version-2 file must contain at least one VOID and at least one artwork cell, so each level has exactly one canonical encoding. Version-1 files are valid and unchanged. Non-integer, fractional or string cell values fail closed.
+- Runtime: `BoardState.from_level_data` sets VOID cells to CLEARED at construction (no third CellState). VOID can never be made ACTIVE: `set_cell_state(ACTIVE)` refuses it and `restore_all_active()` (Retry) keeps it CLEARED. Every consumer therefore sees VOID as open space and never as a colour candidate (ColorCandidateIndex, TargetSelector, ReservationState, BoardRenderer).
+- Reachability law is unchanged: VOID is open space exactly like CLEARED. An enclosed VOID hole gives no access until a legal corridor connects it to the outside (no teleport/shortcut).
+- WIN: every non-VOID cell cleared + slots empty + supply exhausted (CompletionEvaluator's `ACTIVE == 0` already means exactly that).
+- Supply: `BatchSupplyGenerator.color_totals` and `SupplyPlanLoader` conservation count artwork cells only; grand total == `get_artwork_cell_count()` (== cell count for version 1).
+- Solver: `ProofState.from_level_and_supply` starts VOID as `CLEARED_BYTE`; the canonical key keeps encoding the full W x H mask (VOID is a constant `0`), so keys stay deterministic and version-1 keys are unchanged.
+- Difficulty V1 analyzer: colour stats, entropy and W use artwork cells; the peel never peels VOID (marked `.`) and its fractions are over artwork; colour-layer depth treats VOID as free open space; decision-state progress is over artwork. `void` provenance (`voidCells`, `artworkCells`, `initialState: VOID_CLEARED`) is recorded in raw and score records **only when VOID exists**, so committed version-1 evidence stays byte-identical. Anchors and weights are not recalibrated (no evidence requires it yet).
+- Content pipeline: `ProductionArtLevelBuilder` maps alpha-0 source pixels (any RGB) to VOID and emits version 2; alpha 1..254 stays a hard reject. Builder metadata adds `artworkCellCount` / `voidCellCount` only for VOID levels. `ScrubpackV1` accepts version-2 levels (VOID only in version 2) plus those optional metadata counts, which must match the validated level.
+- The generic M09 `LevelImporter` first-seen contract is unchanged (it still records alpha 0 as a raw palette entry); its `reconstruct_image` renders VOID transparent.
+
+**Reason**: VOID is open space, so modelling it as "CLEARED from birth" reuses every audited access/claim/route/completion law instead of introducing a third cell state that every engine must learn. Gating `-1` behind version 2 keeps all existing version-1 content, supply plans, solver traces and difficulty evidence byte-identical.
+
+**Evidence**: `tests/void_cells_c001.gd`; log `coordination/sessions/VOID-CELLS-C001/CLAUDE_LOG_V01.md`.

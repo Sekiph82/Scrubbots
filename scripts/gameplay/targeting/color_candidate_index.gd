@@ -149,6 +149,10 @@ func sync_cell(index: int) -> bool:
 		return true
 	if state == BoardState.CellState.CLEARED:
 		var color_id = _board.get_color_id(index)
+		# A VOID cell (ADR-030) is CLEARED from construction and was never a
+		# candidate: syncing it is a healthy no-op, not dependency drift.
+		if _board.has_method("is_void") and _board.is_void(index):
+			return true
 		if typeof(color_id) != TYPE_INT or color_id < 0:
 			_neutralize()
 			return false

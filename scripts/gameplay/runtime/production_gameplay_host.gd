@@ -699,7 +699,7 @@ func _drive_economy_terminal(status) -> void:
 			_economy.orders.on_level_won({"level": progression_level,
 				"difficulty": String(last_first_clear_result.get("difficulty", "")),
 				"boosters_used": _attempt_boosters,
-				"cells": _board.get_cell_count() if _board != null else 0})
+				"cells": _board.get_artwork_cell_count() if _board != null else 0})
 			_meta_terminal(true)
 	elif status == CompletionEvaluator.LOST:
 		_economy_terminal_done = true

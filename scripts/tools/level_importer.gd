@@ -301,7 +301,11 @@ static func reconstruct_image(level) -> Image:
 			return null
 		colors.append(Color.html(hex))
 
+	# VOID cells (ADR-030, version 2 only) reconstruct as fully transparent pixels.
+	var allow_void: bool = level.version == LevelData.FORMAT_VERSION_VOID
 	for pid in level.cells:
+		if pid == LevelData.VOID_CELL and allow_void:
+			continue
 		if pid < 0 or pid >= colors.size():
 			return null
 
@@ -309,7 +313,8 @@ static func reconstruct_image(level) -> Image:
 	for y in level.height:
 		for x in level.width:
 			var idx: int = y * level.width + x
-			img.set_pixel(x, y, colors[level.cells[idx]])
+			var pid: int = level.cells[idx]
+			img.set_pixel(x, y, Color(0, 0, 0, 0) if pid == LevelData.VOID_CELL else colors[pid])
 	return img
 
 ## Auto-detect difficulty from dimensions. Returns difficulty string or empty
