@@ -21,6 +21,9 @@ const EconomyWallet = preload("res://scripts/economy/economy_wallet.gd")
 var _wallet: EconomyWallet
 var _handlers: Dictionary = {}       ## resource(String) -> Callable(amount:int)
 var _applied: Dictionary = {}        ## tx_id(String) -> rewards(Dictionary) actually applied.
+## M43-C005F-PHASE2-R01: the tx id whose handlers are running right now ("" otherwise), so a
+## handler can derive stable child ids from its parent grant (earned card packs).
+var _current_tx := ""
 
 func _init(wallet: EconomyWallet = null) -> void:
 	_wallet = wallet if wallet != null else EconomyWallet.new()
@@ -66,11 +69,17 @@ func grant(tx_id: String, rewards: Dictionary) -> bool:
 		if int(amount) < 0:
 			return false
 	# Apply.
+	_current_tx = tx_id
 	for resource in rewards.keys():
 		var amount := int(rewards[resource])
 		_handlers[resource].call(amount)
+	_current_tx = ""
 	_applied[tx_id] = rewards.duplicate()
 	return true
+
+## The tx id of the grant whose handlers are currently applying ("" outside a grant).
+func current_tx() -> String:
+	return _current_tx
 
 ## Read-only copy of every applied tx id (M43-C015R rewarded-daily high-water derivation).
 func applied_ids() -> Array:

@@ -24,6 +24,7 @@ const DailyService = preload("res://scripts/economy/daily_service.gd")
 const CollectionInventory = preload("res://scripts/collection/collection_inventory.gd")
 const CardPackService = preload("res://scripts/collection/card_pack_service.gd")
 const PackReceiptLedger = preload("res://scripts/collection/pack_receipt_ledger.gd")
+const PendingPackQueue = preload("res://scripts/collection/pending_pack_queue.gd")
 const MetaUiState = preload("res://scripts/economy/meta_ui_state.gd")
 const CeremonyEvents = preload("res://scripts/economy/ceremony_events.gd")
 const PackPity = preload("res://scripts/collection/pack_pity.gd")
@@ -54,6 +55,8 @@ var collection: CollectionInventory
 var packs: CardPackService
 ## M43-C005-C008 durable receipts of presented pack openings (written only by PackCommitTransaction).
 var pack_receipts: PackReceiptLedger
+## M43-C005F-PHASE2-R01: earned packs granted but not yet opened through the pack ceremony.
+var pending_packs: PendingPackQueue
 ## M43 master: durable ceremony acknowledgements (presentation state, never a grant authority).
 var meta_ui: MetaUiState
 ## M43-C007R: earned-pack pity counter (CardPackService reports every earned opening).
@@ -94,6 +97,7 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	collection = CollectionInventory.new(config, reward)
 	packs = CardPackService.new(collection, pack_rng)
 	pack_receipts = PackReceiptLedger.new()
+	pending_packs = PendingPackQueue.new()
 	meta_ui = MetaUiState.new()
 	pack_pity = PackPity.new(config)
 	packs.pity = pack_pity
@@ -105,15 +109,14 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 
 func _register_handlers() -> void:
 	# scrub_bucks / bot_parts already registered by RewardGrantService defaults.
-	# M39 grant-and-resolve semantics (unchanged by M43-C005-C008): a pack earned as part of a
-	# reward bundle is drawn and applied immediately with no receipt. A pack opening that is
-	# PRESENTED must use PackCommitTransaction.commit() instead.
+	# M43-C005F-PHASE2-R01: an EARNED pack is never drawn silently here any more. The grant
+	# enqueues N pending entries (stable ids from the parent reward tx); each is drawn exactly
+	# once by PackCommitTransaction when the production PackPresenter opens its ceremony, and is
+	# acknowledged only after that ceremony completed (see PendingPackQueue / PackPresenter).
 	reward.register_handler("standard_card_packs", func(n):
-		for _i in range(n):
-			packs.open_standard())
+		pending_packs.enqueue(reward.current_tx(), "standard", n))
 	reward.register_handler("premium_card_packs", func(n):
-		for _i in range(n):
-			packs.open_premium())
+		pending_packs.enqueue(reward.current_tx(), "premium", n))
 	# "random Booster Charge" = a charge for the Random booster (owner wording).
 	reward.register_handler("random_booster_charges", func(n):
 		boosters.add_charges(BoosterInventory.RANDOM, n))
@@ -163,6 +166,7 @@ func snapshot() -> Dictionary:
 		"collection": collection.snapshot(),
 		"packs": packs.snapshot(),
 		"pack_receipts": pack_receipts.snapshot(),
+		"pending_packs": pending_packs.snapshot(),
 		"meta_ui": meta_ui.snapshot(),
 		"pack_pity": pack_pity.snapshot(),
 		"daily_orders": orders.snapshot(),
@@ -221,6 +225,10 @@ func _apply_sections(s) -> bool:
 		return false
 	var ledger = s["pack_receipts"] if s.has("pack_receipts") else PackReceiptLedger.empty_snapshot()
 	if not pack_receipts.import_snapshot(ledger):
+		return false
+	# M43-C005F-PHASE2-R01: absent = a save from before earned packs were queued (empty queue);
+	# present = strict (a malformed section fails the whole import closed).
+	if not pending_packs.import_snapshot(s["pending_packs"] if s.has("pending_packs") else PendingPackQueue.empty_snapshot()):
 		return false
 	# M43 master: absent = a save from before ceremonies existed -> every event it already
 	# committed counts as seen (no backlog replay); present = strict.

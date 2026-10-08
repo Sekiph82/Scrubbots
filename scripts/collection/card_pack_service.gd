@@ -12,10 +12,11 @@ extends RefCounted
 ## failed pack commit restores it exactly and a reload continues the same sequence.
 ##
 ## LOW-LEVEL AUTHORITY: open_standard()/open_premium() draw AND apply at once and keep no
-## receipt. Their only callers are the M39 `standard_card_packs` / `premium_card_packs`
-## reward handlers (grant-and-resolve). Anything that PRESENTS a pack opening must go through
-## PackCommitTransaction.commit() (res://scripts/collection/pack_commit_transaction.gd),
-## which owns the durable receipt; presentation never calls these directly.
+## receipt. Their only production caller is PackCommitTransaction.commit()
+## (res://scripts/collection/pack_commit_transaction.gd), which owns the durable receipt.
+## M43-C005F-PHASE2-R01: the `standard_card_packs` / `premium_card_packs` reward handlers no
+## longer call them (earned packs are queued in PendingPackQueue and opened through the
+## production PackPresenter); presentation never calls these directly.
 
 const CollectionInventory = preload("res://scripts/collection/collection_inventory.gd")
 const IntDomain = preload("res://scripts/economy/int_domain.gd")

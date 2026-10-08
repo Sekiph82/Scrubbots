@@ -142,6 +142,29 @@ func commit_pack(kind: String, tx_id: String) -> Dictionary:
 		return {"ok": false, "reason": "app_blocked"}
 	return PackCommitTransaction.commit(economy, kind, tx_id, Callable(self, "request_save"))
 
+## M43-C005F-PHASE2-R01: open the pending EARNED pack `id` through the canonical commit (its
+## kind comes from the durable queue entry; the entry id is the pack tx / presentation id).
+## A pack already committed (app killed mid-ceremony) replays its receipt, never redraws. The
+## entry stays pending until acknowledge_earned_pack().
+func open_earned_pack(id: String) -> Dictionary:
+	if is_blocked:
+		return {"ok": false, "reason": "app_blocked"}
+	for e in economy.pending_packs.entries():
+		if e["id"] == id:
+			return commit_pack(String(e["kind"]), id)
+	return {"ok": false, "reason": "not_pending"}
+
+## Acknowledge a pending earned pack after its ceremony completed: removed + durably saved.
+## Refused unless its receipt is committed (the cards are really in Collection).
+func acknowledge_earned_pack(id: String) -> Dictionary:
+	if is_blocked:
+		return {"ok": false, "reason": "app_blocked"}
+	if economy.pack_receipts.get_receipt(id).is_empty():
+		return {"ok": false, "reason": "not_committed"}
+	if not economy.pending_packs.remove(id):
+		return {"ok": false, "reason": "not_pending"}
+	return {"ok": true, "save": request_save()}
+
 ## Committed receipt / presentation model for tx_id ({} when none). Read-only.
 func pack_receipt(tx_id: String) -> Dictionary:
 	return PackCommitTransaction.receipt(economy, tx_id)

@@ -125,11 +125,14 @@ func _canonical_graph_untouched() -> void:
 	var sb0: int = app.economy.wallet.scrub_bucks()
 	_ok(app.economy.reward.grant("m55_regression_tx", {EconomyWallet.SCRUB_BUCKS: 7}) and app.economy.wallet.scrub_bucks() == sb0 + 7,
 		"canonical reward grant still applies (+7 SB)")
+	var pend0: int = app.economy.pending_packs.size()
 	var granted: bool = app.economy.reward.grant("m55_regression_pack", {"standard_card_packs": 1})
 	var owned1 := 0
 	for id in ids:
 		owned1 += app.economy.collection.owned(id)
-	_ok(granted and owned1 > owned0, "canonical pack handler still opens a pack (%d -> %d cards)" % [owned0, owned1])
+	# M43-C005F-PHASE2-R01: an earned pack is queued for the shipping ceremony (opened later
+	# through PackCommitTransaction), never drawn silently by the handler.
+	_ok(granted and app.economy.pending_packs.size() == pend0 + 1 and owned1 == owned0, "canonical pack handler still live after 5 saves: queues 1 earned pack (%d -> %d pending, cards %d -> %d)" % [pend0, app.economy.pending_packs.size(), owned0, owned1])
 
 func _uniq(tag: String) -> String:
 	var p := "user://m55_rel_%s_%d.save" % [tag, Time.get_ticks_usec()]
