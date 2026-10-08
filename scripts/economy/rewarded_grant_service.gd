@@ -22,6 +22,9 @@ extends RefCounted
 ## (never the provider token), so a second request / duplicate / late callback for an already
 ## granted slot grants nothing. Placement "rewarded_daily_slot_<n>". Heart / booster products
 ## are unchanged.
+## SB-M43-R15-001-R01: daily slot n may start only when slots 1..n-1 of that day are already
+## granted on the canonical ledger, so even a direct call here cannot start a future slot
+## (fail closed before the provider is asked).
 
 const RewardedAdProvider = preload("res://scripts/economy/rewarded_ad_provider.gd")
 const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
@@ -95,6 +98,9 @@ func can_start_daily(day: int, slot: int) -> Dictionary:
 		return {"ok": false, "reason": "unknown_product"}
 	if _reward.already_applied(daily_tx(day, slot)):
 		return {"ok": false, "reason": "already_claimed"}
+	for prev in range(1, slot):
+		if not _reward.already_applied(daily_tx(day, prev)):
+			return {"ok": false, "reason": "locked_sequence"}
 	if _provider == null or not _provider.is_available(placement(daily_product(slot))):
 		return {"ok": false, "reason": "unavailable"}
 	if _pending.values().has(daily_product(slot)):

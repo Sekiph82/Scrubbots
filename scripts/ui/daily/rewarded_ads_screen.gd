@@ -6,7 +6,8 @@ extends RefCounted
 ## five configured rewards of today's Rewarded Ads track (RewardedDailyService) BEFORE any
 ## action, each with one live state:
 ##   ready free claim (CLAIM) / ready video (WATCH AD) / pending (busy, nothing granted yet) /
-##   claimed (CLAIMED) / video unavailable (NO VIDEO, disabled) / date rollback (locked).
+##   claimed (CLAIMED) / video unavailable (NO VIDEO, disabled) / date rollback (locked) /
+##   not yet reached (LOCKED, "Unlocks after reward n-1": SB-M43-R15-001-R01 sequential track).
 ## Presentation + intent only: slot 1 goes through ProductionActionFacade.claim_rewarded_daily_free
 ## (committed + saved before any success text); slots 2..5 through start_rewarded_daily, whose
 ## grant happens ONLY in RewardedGrantService.resolve on a verified completion. A cancel / skip /
@@ -93,11 +94,12 @@ static func refresh(p: BasePopup, app) -> void:
 			"ready_free": UiText.t("RADS_STATE_FREE"), "ready_ad": UiText.t("RADS_STATE_AD"),
 			"pending": UiText.t("RADS_STATE_PENDING"), "claimed": UiText.t("RADS_STATE_CLAIMED"),
 			"ad_unavailable": UiText.t("RADS_STATE_UNAVAILABLE"), "locked_rollback": UiText.t("RADS_STATE_LOCKED"),
+			"locked_sequence": UiText.t("RADS_STATE_NEXT", [slot - 1]),
 			"unavailable": UiText.t("RADS_STATE_UNAVAILABLE")}[st]
 		var b := p.get_action_button("slot:%d" % slot)
 		b.text = {"ready_free": UiText.t("POPUP_CLAIM"), "ready_ad": UiText.t("RADS_WATCH"), "pending": UiText.t("RADS_WAIT"),
 			"claimed": UiText.t("RADS_CLAIMED"), "ad_unavailable": UiText.t("RADS_NO_VIDEO"), "locked_rollback": UiText.t("RADS_WAIT"),
-			"unavailable": UiText.t("RADS_NO_VIDEO")}[st]
+			"locked_sequence": UiText.t("RADS_LOCKED"), "unavailable": UiText.t("RADS_NO_VIDEO")}[st]
 		p.set_action_blocked("slot:%d" % slot, app.is_blocked or not (st == "ready_free" or st == "ready_ad"))
 		row.modulate = Color(1, 1, 1, 0.72) if st == "claimed" else Color(1, 1, 1, 1)
 		locked = locked or st == "locked_rollback"
@@ -115,6 +117,8 @@ static func _reason_text(reason: String) -> String:
 			return UiText.t("REWARDED_UNAVAILABLE_NOTE")
 		"clock_rollback":
 			return UiText.t("RADS_LOCKED_NOTE")
+		"locked_sequence":
+			return UiText.t("RADS_ORDER_NOTE")
 		"already_claimed":
 			return UiText.t("RADS_STATE_CLAIMED")
 	return UiText.t("REWARDED_NO_GRANT", [UiText.reason("REWARDED_REASON_", reason)])
