@@ -154,16 +154,25 @@ func open_earned_pack(id: String) -> Dictionary:
 			return commit_pack(String(e["kind"]), id)
 	return {"ok": false, "reason": "not_pending"}
 
-## Acknowledge a pending earned pack after its ceremony completed: removed + durably saved.
-## Refused unless its receipt is committed (the cards are really in Collection).
+## Acknowledge a pending earned pack after its ceremony completed. Refused unless its receipt
+## is committed (the cards are really in Collection). R02: DURABLE + transactional - the entry
+## is removed only if the canonical save succeeds; on a save failure the exact pre-ack economy
+## snapshot is re-imported (same entry back at the same FIFO position, receipt / Collection /
+## RNG / pity untouched - nothing is redrawn) and the outer result is ok:false.
 func acknowledge_earned_pack(id: String) -> Dictionary:
 	if is_blocked:
 		return {"ok": false, "reason": "app_blocked"}
 	if economy.pack_receipts.get_receipt(id).is_empty():
 		return {"ok": false, "reason": "not_committed"}
-	if not economy.pending_packs.remove(id):
+	if not economy.pending_packs.has(id):
 		return {"ok": false, "reason": "not_pending"}
-	return {"ok": true, "save": request_save()}
+	var pre: Dictionary = economy.snapshot()
+	economy.pending_packs.remove(id)
+	var r: Dictionary = request_save()
+	if bool(r.get("ok", false)):
+		return {"ok": true, "save": r}
+	var restored: bool = economy.import_snapshot(pre)
+	return {"ok": false, "reason": "ack_save_failed", "save": r, "restored": restored}
 
 ## Committed receipt / presentation model for tx_id ({} when none). Read-only.
 func pack_receipt(tx_id: String) -> Dictionary:

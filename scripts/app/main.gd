@@ -222,6 +222,8 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 	# Returning HOME ends the gameplay scene: the host (and its music/FX) is released.
 	if to == NavigationController.Route.HOME:
 		_release_gameplay_host()
+		if packs != null:
+			packs.release_ack_guard()   # R02: a later Home entry may retry a failed pack acknowledgement
 		if _opening != null and is_instance_valid(_opening):
 			_opening.cleanup()
 			remove_child(_opening)
