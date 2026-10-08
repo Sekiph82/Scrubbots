@@ -23,6 +23,7 @@ signal top_changed(popup)
 
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const LAYER := 64
+const Z_BAND := 4   ## per-depth z offset; > any z a popup uses internally (hero = 1)
 
 var _stack: Array = []
 var _root: Control
@@ -116,6 +117,10 @@ func _sync() -> void:
 		var is_top: bool = i == _stack.size() - 1
 		# Lower popups keep drawing (dimmed under the top scrim) but accept no action.
 		_stack[i]._stack_set_top(is_top)
+		# Z band per depth (M43-C005F-PHASE2-R01): a popup's own raised children (BasePopup hero,
+		# z 1) must never draw above a popup stacked over it (e.g. the Gift Bar hero over an
+		# earned-pack ceremony). Relative z, so each popup's internal order is unchanged.
+		_stack[i].z_index = i * Z_BAND
 
 ## Escape / ui_cancel: consumed here before any screen's _unhandled_input can see it.
 func _input(event: InputEvent) -> void:

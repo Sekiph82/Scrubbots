@@ -27,6 +27,7 @@ const AcquisitionFlow = preload("res://scripts/ui/popup/acquisition_flow.gd")
 const ShopHandoff = preload("res://scripts/app/shop_handoff.gd")
 const ResultsMomentum = preload("res://scripts/progression/results_momentum.gd")
 const CeremonyPresenter = preload("res://scripts/ui/ceremony/ceremony_presenter.gd")
+const PackPresenter = preload("res://scripts/ui/ceremony/pack_presenter.gd")
 const FeedbackAdapter = preload("res://scripts/ui/feel/feedback_adapter.gd")
 const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
 const RobotsScreen = preload("res://scripts/ui/robots/robots_screen.gd")
@@ -73,6 +74,9 @@ var _acq = null
 var momentum_cfg: Dictionary = {}
 ## M43 master: the ONE presenter of committed-but-unseen meta ceremonies (presentation only).
 var ceremonies = null
+## M43-C005F-PHASE2-R01: the ONE production presenter of earned card packs (pending queue ->
+## canonical commit -> shipping Standard / Premium ceremony on the app ModalStack).
+var packs = null
 var meta_feedback = null
 ## M43-C005F (SB-M43-C005F-002): the ONE fail-open presentation-feel adapter (no call site yet).
 ## Ephemeral: never saved; cancelled + unbound when the app root leaves the tree.
@@ -131,6 +135,9 @@ func _ready() -> void:
 	_results.set_feedback(feel)   # M43-C005F-003/004: presentation-only Results feel
 	ceremonies = CeremonyPresenter.new()
 	ceremonies.bind(_modals, app_state)
+	packs = PackPresenter.new()
+	packs.bind(_modals, app_state, feel)
+	packs.pack_finished.connect(func(_id): request_earned_packs())
 	# M43-C014: committed-only meta sound / haptic moments.
 	meta_feedback = MetaFeedback.new()
 	meta_feedback.name = "MetaFeedback"
@@ -150,6 +157,13 @@ func _ready() -> void:
 	# completed a set / Master / robot event: show its ceremony once Home is quiet.
 	if app_state != null and app_state.actions != null:
 		app_state.actions.action_committed.connect(func(_a, _r): request_home_ceremonies())
+		# R01: a committed action (Gift / Daily claim, ...) may have queued earned packs.
+		app_state.actions.action_committed.connect(func(_a, _r): request_earned_packs())
+	# R01: verified rewarded-video grants (Rewarded Ads daily slots) commit outside the facade.
+	if app_state != null and app_state.economy != null:
+		app_state.economy.rewarded.resolved.connect(func(_t, _p, r):
+			if bool(r.get("ok", false)):
+				request_earned_packs())
 	nav.route_changed.connect(_on_route_changed)
 	_start_remote_content()
 	if _should_play_opening():
@@ -329,8 +343,35 @@ func _drain_home_ceremonies() -> void:
 		return
 	if _modals != null and _modals.depth() > 0:
 		return
-	if not ceremonies.drain("home") and app_state != null and app_state.economy.returns.summary_due():
+	# Quiet Home order: pending meta ceremonies, then earned packs (FIFO), then the comeback summary.
+	if ceremonies.drain("home"):
+		return
+	if packs != null and not app_state.is_blocked and packs.drain():
+		return
+	if app_state != null and app_state.economy.returns.summary_due():
 		ProfileScreens.open_comeback(_modals, app_state)
+
+## M43-C005F-PHASE2-R01: open the next pending EARNED pack on Home. It may stack over the
+## destination popup that earned it (Gift Bar, Daily, Rewarded Ads) - the claim's own confirmation
+## popup ("ceremony_*", e.g. Daily's reward celebration) and any busy popup are waited out first;
+## never during gameplay / Results / Settings, never over another pack or meta ceremony.
+func request_earned_packs() -> void:
+	call_deferred("_drain_earned_packs")
+
+func _drain_earned_packs() -> void:
+	if packs == null or nav == null or nav.current() != NavigationController.Route.HOME or nav.is_settings_open():
+		return
+	if packs.is_presenting() or (ceremonies != null and ceremonies.is_presenting()):
+		return
+	var top = _modals.top() if _modals != null else null
+	if top != null and (String(top.popup_id).begins_with("ceremony_") or top.is_busy()):
+		if not top.closed.is_connected(_on_pack_blocker_closed):
+			top.closed.connect(_on_pack_blocker_closed, CONNECT_ONE_SHOT)
+		return
+	packs.drain()
+
+func _on_pack_blocker_closed(_reason: String) -> void:
+	request_earned_packs()
 
 ## M43-C012 (SB-M43-148): open a notification deep link. Only known destinations; anything
 ## unknown / stale lands on Home. Returns the destination actually opened.
@@ -350,6 +391,9 @@ func open_deep_link(dest: String) -> String:
 		_:
 			_on_home_shortcut(d)
 	return d
+
+func get_pack_presenter():
+	return packs
 
 func get_ceremonies():
 	return ceremonies

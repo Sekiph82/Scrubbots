@@ -303,7 +303,23 @@ func _r10() -> void:
 	p.get_action_button("slot:2").pressed.emit()
 	await _frames(2)
 	tp.fire(String(tp.requests[-1][1]), "completed", true)
-	await _frames(2)
+	await _frames(4)
+	# M43-C005F-PHASE2-R01: slot 2's reward is a Standard Card Pack, so the earned pack now opens
+	# in the shipping pack ceremony over Rewarded Ads; finishing it returns to this popup.
+	var pk = _root.get_modal_stack().top()
+	_ok(pk != null and String(pk.popup_id) == "standard_pack" and String(pk.get_model()["presentation_id"]).begins_with("earned:daily_rewarded:"), "slot 2 Standard Card Pack opens the earned-pack ceremony")
+	pk.tap()
+	for _i in range(1500):
+		if pk.phase() == "AWAIT_ROUTE":
+			break
+		await process_frame
+	pk.tap()
+	for _i in range(1500):
+		if not is_instance_valid(pk) or pk.is_closed():
+			break
+		await process_frame
+	await _frames(3)
+	_ok(_root.get_modal_stack().top() == p and e.pending_packs.size() == 0, "pack completed + acknowledged; back on Rewarded Ads")
 	_ok(_btn(p, 2) == UiText.t("RADS_CLAIMED") and _btn(p, 3) == UiText.t("RADS_WATCH") and not p.get_action_button("slot:3").disabled and _btn(p, 4) == UiText.t("RADS_LOCKED"), "verified slot 2 -> CLAIMED; slot 3 unlocks (only)")
 	await create_timer(0.5).timeout
 	p.get_action_button("slot:3").pressed.emit()
