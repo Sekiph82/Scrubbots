@@ -19,8 +19,11 @@ const Fx = preload("res://tests/support/standard_pack_fixtures.gd")
 ## paths; lets PremiumPackCeremony supply its own frame family). Standard behaviour unchanged.
 ## M43-C005-C009 (SB-M43-067) re-pinned it after the shared card-state presentation (FIRST COPY /
 ## EXTRAS xN count line, NEW glow + one FULL celebration step after the pack fade).
+## M43-C005F-PHASE2 (SB-M43-C005F-005) re-pinned it after the optional, presentation-only feel hook
+## (bind_feedback + landed-card REWARD accent through the app feel adapter; frames, timing, layout,
+## routing and card truth unchanged — tests/m43_c005f_phase2_results_pack_feel.gd p01..p06).
 const PRODUCTION_SHA := {
-	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "d44d9f1cba1d420268c669a104a2b788eab7cd8ad6238db91ea2b3d05fe35cac",
+	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "539a766dac7ad6623b69807e495b1e653520c896e853a867bed0d8180e054d49",
 	"res://scripts/ui/ceremony/standard_pack_model.gd": "2db015d362fdfa2e5b2040d7e3ebcbaed59986811b2d364980082095a655f481",
 	"res://scripts/ui/components/reveal_sequencer.gd": "ccfcc426db81da9ce623d262611191c0039a5f4bd21c46aa3d3decdbf9d2a5ca",
 }

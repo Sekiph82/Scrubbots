@@ -76,6 +76,7 @@ var ceremonies = null
 var meta_feedback = null
 ## M43-C005F (SB-M43-C005F-002): the ONE fail-open presentation-feel adapter (no call site yet).
 ## Ephemeral: never saved; cancelled + unbound when the app root leaves the tree.
+## Handed (presentation-only) to ResultsScreen; a pack ceremony takes it via bind_feedback().
 var feel = null
 
 func _enter_tree() -> void:
@@ -127,6 +128,7 @@ func _ready() -> void:
 	_home.set_app_nav(APP_NAV)
 	feel = FeedbackAdapter.new()
 	feel.bind(get_tree(), app_state.effects if app_state != null else null)
+	_results.set_feedback(feel)   # M43-C005F-003/004: presentation-only Results feel
 	ceremonies = CeremonyPresenter.new()
 	ceremonies.bind(_modals, app_state)
 	# M43-C014: committed-only meta sound / haptic moments.
