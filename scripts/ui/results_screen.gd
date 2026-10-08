@@ -34,6 +34,17 @@ extends Control
 ##   Ceremony barrier seam (future M43-C005): while any barrier is set, the teaser and
 ##   CLEAN NEXT are held; releasing shows the same already-resolved teaser.
 ## There is no Replay control (owner A1-NO).
+## M43-C005F-PHASE2 (SB-M43-C005F-003 / -004) — optional presentation feel through the ONE app
+##   feel adapter (set_feedback; null = exactly the native Results above). Only for WON, only
+##   after the committed terminal already exists, every event one-shot per terminal identity
+##   ("results:WON:a<attempt>:L<level>[:...]") so re-show / resize / refresh / barrier / Continue
+##   re-arm never replays:
+##     - WIN: bounded confetti at the robot (adapter WIN) + one restrained native emblem pop;
+##     - each committed reward row, as its reveal step starts: adapter REWARD pickup at the row
+##       + a tiny native settle (at most ROW_FEEL_MAX rows; rows / order / text untouched);
+##     - CLEAN NEXT: one subtle native pulse once the reveal is done, no ceremony barrier holds
+##       it and it is actionable (never disables, delays or latches anything).
+##   Reduced Effects: keys are consumed but nothing moves and no plugin work happens.
 ##
 ## Actions (intents only; the app root performs them):
 ##   HOME                -> home_requested
@@ -118,6 +129,15 @@ var _next_facts: Label
 var _has_next := false
 var _barriers: Dictionary = {}   ## ceremony barrier id -> true (presentation hold only)
 var _victory_theme: Theme
+## M43-C005F-PHASE2: optional presentation feel (the app root's feel adapter); never authority.
+var _feel = null
+var _feel_tweens: Array = []
+const ROW_FEEL_MAX := 6        ## at most this many reward-row feel events per Results
+const EMBLEM_POP := 0.12       ## WON emblem: one sine bump 1.0 -> 1.12 -> 1.0
+const EMBLEM_POP_S := 0.36
+const ROW_SETTLE := 0.04       ## row: scale 0.96 -> 1.0 while its fade runs
+const NEXT_POP := 0.05         ## CLEAN NEXT: one sine bump 1.0 -> 1.05 -> 1.0
+const NEXT_POP_S := 0.40
 
 func _init() -> void:
 	name = "ResultsScreen"
@@ -125,6 +145,8 @@ func _init() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 	_victory_theme = HomeStyle.make_theme()
 	_reveal = RevealSequencer.new(self)
+	_reveal.step_started.connect(_on_reveal_step)
+	_reveal.completed.connect(func(_k): call_deferred("_maybe_emphasize_next"))
 	var dim := ColorRect.new()
 	dim.name = "Dim"
 	dim.color = Color(0, 0, 0, 0.6)
@@ -303,6 +325,7 @@ func has_ceremony_barrier() -> bool:
 func _sync_barrier() -> void:
 	_next.visible = _has_next and _barriers.is_empty()
 	_sync_primary()
+	call_deferred("_maybe_emphasize_next")
 
 func _sync_primary() -> void:
 	var status := String(_payload.get("status", ""))
@@ -369,6 +392,10 @@ func show_model(model: Dictionary) -> void:
 	_render_momentum(won)
 	_sync_primary()
 	_start_reveal(bool(_model.get("reduced_effects", false)))
+	if won:
+		if _feel_reduced():
+			_consume_rows_static()
+		_after_layout(_celebrate_win.bind(_feel_id()))
 
 ## WON = Victory composition; LOST = Fail composition (same family, failure art);
 ## ERROR = technical fallback. No Victory art outside WON.
@@ -491,6 +518,7 @@ func get_reveal_sequencer() -> RevealSequencer:
 	return _reveal
 
 func _clear_lines() -> void:
+	_stop_feel()
 	_reveal.cancel()
 	_momentum.modulate.a = 1.0   # persistent node: never left hidden by a cancelled reveal
 	for c in _lines.get_children():
@@ -600,3 +628,110 @@ func get_primary_button() -> Button:
 
 func get_home_button() -> Button:
 	return _home
+
+# ------------------------------------------------- M43-C005F-PHASE2 presentation feel --
+
+## Bind (or clear with null) the app's feel adapter. Presentation only; never saved.
+func set_feedback(adapter) -> void:
+	_feel = adapter
+
+func get_feedback():
+	return _feel
+
+## Immutable identity of the shown terminal: every feel key derives from it.
+func _feel_id() -> String:
+	return "results:%s:a%d:L%d" % [String(_payload.get("status", "")), int(_payload.get("attempt", 0)), int(_payload.get("level", 0))]
+
+func _feel_reduced() -> bool:
+	return bool(_model.get("reduced_effects", false)) or (_feel != null and _feel.reduced())
+
+## Run `f` once the nested containers have settled (the robot's rect stops moving; at most
+## SETTLE_FRAMES frames), or now when outside the tree.
+const SETTLE_FRAMES := 8
+func _after_layout(f: Callable) -> void:
+	if not is_inside_tree():
+		f.call()
+		return
+	var last := _robot.get_global_rect()
+	for _i in range(SETTLE_FRAMES):
+		await get_tree().process_frame
+		if not is_instance_valid(self) or not is_inside_tree():
+			return
+		var r := _robot.get_global_rect()
+		if r == last:
+			break
+		last = r
+	f.call()
+
+## WON only, once per terminal identity (the adapter's one-shot key is the gate).
+func _celebrate_win(id: String) -> void:
+	if _feel == null or not _victory or id != _feel_id() or not visible:
+		return
+	if not _feel_event("WIN", _robot, id + ":win"):
+		return   # already consumed (re-show / refresh / resize / Continue re-arm)
+	if not _feel_reduced():
+		_pop(_emblem, EMBLEM_POP, EMBLEM_POP_S)
+
+## A committed reward row's reveal step started: one feel event for that row identity.
+func _on_reveal_step(key: String, index: int) -> void:
+	if _feel == null or not _victory or key != _reveal.current_key():
+		return
+	if index >= _lines.get_child_count() or index >= ROW_FEEL_MAX:
+		return   # the momentum step (or rows beyond the bounded budget): no feel
+	var row: Control = _lines.get_child(index)
+	if not _feel_event("REWARD", row, _row_key(index, row)):
+		return
+	if not _feel_reduced():
+		row.pivot_offset = row.size * 0.5
+		var tw := row.create_tween()
+		tw.tween_method(func(t: float): row.scale = Vector2.ONE * lerpf(1.0 - ROW_SETTLE, 1.0, t), 0.0, 1.0, REVEAL_STEP_S)
+		_feel_tweens.append(tw)
+
+## CLEAN NEXT emphasis: only after the reveal, with no ceremony barrier, when actionable.
+## Always reached deferred, so a barrier set later in the same frame is seen first.
+func _maybe_emphasize_next() -> void:
+	if _feel == null or not _victory or not visible or _reveal.is_active() or not _barriers.is_empty():
+		return
+	if not _primary.visible or _primary.disabled:
+		return
+	if _feel_event("MICRO", _primary, _feel_id() + ":next") and not _feel_reduced():
+		_pop(_primary, NEXT_POP, NEXT_POP_S)
+
+func _row_key(index: int, row: Node) -> String:
+	return "%s:row%d:%s" % [_feel_id(), index, String(row.get_meta("kind", ""))]
+
+## Reduced shows every row at once: their one-shot keys are consumed statically (no plugin work),
+## so a later FULL re-show of the same terminal can never play them.
+func _consume_rows_static() -> void:
+	var rows := _lines.get_children()
+	for i in range(mini(rows.size(), ROW_FEEL_MAX)):
+		_feel_event("REWARD", rows[i], _row_key(i, rows[i]))
+
+## The one gate to the adapter. A Reduced model with a (momentarily) FULL adapter does nothing
+## and consumes nothing, so Reduced Results can never start plugin work.
+func _feel_event(intent: String, target: Node, key: String) -> bool:
+	if _feel == null:
+		return false
+	if bool(_model.get("reduced_effects", false)) and not _feel.reduced():
+		return false
+	return _feel.play(intent, target, key)
+
+## One native sine bump on a Control's scale (pivot = centre), restored to exactly 1.
+func _pop(c: Control, amount: float, dur: float) -> void:
+	if not c.is_inside_tree():
+		return
+	c.pivot_offset = c.size * 0.5
+	var tw := c.create_tween()
+	tw.tween_method(func(t: float): c.scale = Vector2.ONE * (1.0 + amount * sin(PI * t)), 0.0, 1.0, dur)
+	tw.tween_callback(func(): c.scale = Vector2.ONE)
+	_feel_tweens.append(tw)
+
+## Settle native feel tweens (screen hidden / rows rebuilt): persistent nodes back to scale 1.
+func _stop_feel() -> void:
+	for tw in _feel_tweens:
+		if tw != null and tw.is_valid():
+			tw.kill()
+	_feel_tweens.clear()
+	for c in [_emblem, _primary]:
+		if c != null:
+			c.scale = Vector2.ONE

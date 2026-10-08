@@ -24,6 +24,10 @@ extends RefCounted
 ##     to its REDUCED row: no particles, no motion, no flash, no camera/screen work. A live
 ##     FULL->REDUCED toggle cancels only adapter-owned plugin work (targeted GFF stop on the
 ##     targets it played on, which restores them; queue_free of the Spark bursts it spawned).
+## Placement (M43-C005F-PHASE2): a Control target bursts at the centre of its global rect (Spark's
+## own `at()` would use the Control's top-left corner), and every burst the adapter spawned is
+## moved into the target's CanvasLayer, so a target inside a popup (ModalStack is a CanvasLayer)
+## shows its particles above the popup instead of under the scrim. Still adapter-owned / freed.
 ## Nothing here grants, saves, navigates, decides success or touches gameplay. The adapter is
 ## ephemeral (created by scripts/app/main.gd, never saved) and is the only production entry
 ## point to either plugin (static guard: tests/m43_c005f_phase1_foundation.gd).
@@ -38,6 +42,10 @@ const SPARK_VERSION := "1.0.0"
 const GFF_METHODS := ["play", "stop_all", "get_effect_names"]
 const SPARK_METHODS := ["at", "burst", "clear"]
 const SPARK_POOL := "SaltmireSparkPool"   ## Spark's own burst parent (each burst = one child)
+## Spark presets are tuned for small 2D game canvases (2.5-5 px particle radius); on the
+## 1080-wide SCRUBBOTS UI canvas they read as specks. Particle RADIUS only is scaled (counts,
+## lifetimes, speeds and every budget unchanged). M43-C005F-PHASE2; owner visual gate tunes it.
+const SPARK_UI_SIZE_SCALE := 2.5
 
 const INTENTS := ["MICRO", "SMALL", "REWARD", "MAJOR_REWARD", "WIN", "MAJOR_UNLOCK"]
 const GFF_ALLOWED := ["punch_scale"]
@@ -173,15 +181,29 @@ func _dispatch(entry: Dictionary, p: Dictionary) -> void:
 		var presets = spark.get("presets")
 		var opts: Dictionary = (presets.get(preset, {}) as Dictionary).duplicate() if typeof(presets) == TYPE_DICTIONARY else {}
 		opts["amount"] = amount
+		opts["size"] = float(opts.get("size", 3.0)) * SPARK_UI_SIZE_SCALE
 		# Lifetime capped so even the slowest particle dies inside the tier ceiling.
 		var rand: float = float(opts.get("lifetime_rand", 0.35))
 		opts["lifetime"] = minf(float(opts.get("lifetime", 0.45)), float(DURATION_CEILING_S[entry["intent"]]) / (1.0 + rand) - 0.05)
 		var pool: Node = spark.get_node_or_null(SPARK_POOL) if spark is Node else null
 		var before: int = pool.get_child_count() if pool != null else 0
-		spark.at(target, opts)
+		if target is Control:
+			spark.burst((target as Control).get_global_rect().get_center(), opts)
+		else:
+			spark.at(target, opts)
 		if pool != null:
+			# Same canvas as the target: its CanvasLayer, else its own (Sub)Viewport when that is
+			# not Spark's. Global canvas coordinates are kept, so the burst stays on the target.
+			var home: Node = (target as CanvasItem).get_canvas_layer_node()
+			if home == null and target.get_viewport() != pool.get_viewport():
+				home = target.get_viewport()
+			var spawned: Array = []
 			for i in range(before, pool.get_child_count()):
-				(entry["emitters"] as Array).append(weakref(pool.get_child(i)))
+				spawned.append(pool.get_child(i))
+			for em in spawned:
+				(entry["emitters"] as Array).append(weakref(em))
+				if home != null and is_instance_valid(home):
+					em.reparent(home, true)
 
 func _expire(entry: Dictionary) -> void:
 	if _owned.has(entry):
@@ -196,8 +218,8 @@ func _release(entry: Dictionary) -> void:
 		if is_instance_valid(em) and not em.is_queued_for_deletion():
 			em.queue_free()
 	var target = (entry["target"] as WeakRef).get_ref()
-	if not is_instance_valid(target):
-		return
+	if not is_instance_valid(target) or not (target is Node2D or target is Node3D):
+		return   # GFF only ever played on Node2D / Node3D targets: nothing to stop on a Control
 	for other in _owned:
 		if (other["target"] as WeakRef).get_ref() == target:
 			return

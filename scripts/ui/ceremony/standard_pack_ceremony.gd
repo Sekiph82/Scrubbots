@@ -30,6 +30,16 @@ extends "res://scripts/ui/popup/base_popup.gd"
 ## the hold / destinations: one `celebration` step, NEW cards staggered in model order).
 ## DUPLICATE -> DUPLICATE badge + EXTRAS xN, N = copies_after - 1 (the first copy is protected).
 ## Reduced: static glow, no pulse. Shared by Standard and Premium through CardView.
+##
+## M43-C005F-PHASE2 (SB-M43-C005F-005) — optional feel through the ONE app feel adapter
+## (bind_feedback; null = exactly the native ceremony above). FULL only: when a committed card
+## has LANDED in its hold slot (the next emerge step / the pack-out step starts) and it is NEW or
+## Rare-or-better, one adapter REWARD burst at its NEW / DUPLICATE badge (the face's top edge, so
+## the rising particles read against the dark stage, not the card art), key
+## "<presentation_id>:card<i>:reveal".
+## Cards land one emerge step apart, so bursts are serialized (never all five at once); COMMON
+## duplicates get none; no flash, no GFF on these Controls, no change to frames / timing /
+## layout / routing / truth. Reduced: no adapter call at all.
 
 signal presentation_completed(presentation_id: String)
 
@@ -96,6 +106,8 @@ var _frame_tex: Array = []
 var _frame_log: Array = []     ## every frame change actually bound, in order (evidence)
 var _route_log: Array = []     ## [card index, destination] as each route starts
 var _arrivals: Array = []      ## card indices in arrival order
+var _feel = null               ## M43-C005F-005: optional app feel adapter (presentation only)
+var _feel_log: Array = []      ## [card index, intent, key] actually requested (evidence)
 
 ## {ok, reason, popup}: a ceremony only for a valid committed model; otherwise fail closed.
 static func create(model, reduced := false) -> Dictionary:
@@ -267,10 +279,32 @@ func _route_plan() -> Array:
 
 func _on_step(key: String, index: int) -> void:
 	var pid := String(_model.get("presentation_id", ""))
+	if key == pid + ":open":
+		_card_feel_on_step(index)
 	if key == pid + ":open" and index == _dest_step_index():
 		_dest_layer.visible = true   # shown as its fade starts, after the three-card hold
 	elif key == pid + ":route":
 		_route_log.append([index, destination_of(_model["cards"][index])])
+
+## Bind (or clear with null) the app's feel adapter. Presentation only; never saved.
+func bind_feedback(adapter) -> void:
+	_feel = adapter
+
+func feel_log() -> Array:
+	return _feel_log.duplicate(true)
+
+## Open-run step `index` starting means card (index - first_emerge - 1) has just landed (the
+## pack-out step follows the last card). One feel event per landed NEW / Rare-or-better card.
+func _card_feel_on_step(index: int) -> void:
+	var landed := index - (PACK_FRAMES.size() if not _reduced else 1) - 1
+	if _feel == null or _reduced or landed < 0 or landed >= _cards.size():
+		return
+	var c: Dictionary = _model["cards"][landed]
+	if not bool(c["is_new"]) and String(c["rarity"]) == "COMMON":
+		return
+	var k := "%s:card%d:reveal" % [String(_model.get("presentation_id", "")), landed]
+	if _feel.play("REWARD", (_cards[landed] as CardView).get_badge(), k):
+		_feel_log.append([landed, "REWARD", k])
 
 func _dest_step_index() -> int:
 	return (PACK_FRAMES.size() if not _reduced else 1) + _cards.size() + (2 if _has_celebration() else 1)
@@ -467,6 +501,14 @@ class CardView extends Control:
 	## DUPLICATE -> EXTRAS xN (N = copies_after - 1, never x0).
 	static func count_text(c: Dictionary) -> String:
 		return UiText.t("PACK_CARD_FIRST_COPY") if bool(c["is_new"]) else UiText.t("PACK_CARD_EXTRAS", [extra_copies(c)])
+
+	## The card face (art + badge).
+	func get_face() -> Control:
+		return _face
+
+	## The NEW / DUPLICATE badge on the face's top edge — the feel anchor of this card.
+	func get_badge() -> Control:
+		return _face.get_node("State")
 
 	## The NEW-card glow (null for a DUPLICATE). The ceremony parents it under every card.
 	func get_glow() -> TextureRect:
