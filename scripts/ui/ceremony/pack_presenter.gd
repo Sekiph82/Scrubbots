@@ -11,6 +11,12 @@ extends RefCounted
 ##     shipping ceremony, bound to the app's single FeedbackAdapter -> ModalStack.push.
 ##   presentation_completed -> AppState.acknowledge_earned_pack(id) (removed + durable save)
 ##     -> `pack_finished(id)`; the app root then drains again (next pack) / its meta ceremonies.
+##   R02: an acknowledgement whose save FAILED (AppState restored the pre-ack state, so the entry
+##     is still pending with its committed receipt) emits `pack_ack_failed(id, result)` instead,
+##     never `pack_finished`, and does NOT advance. A transient, presentation-local guard then
+##     keeps drain() from instantly reopening that pack (no reopen loop under a persistent save
+##     failure) until release_ack_guard() - the app root calls it on the next HOME entry; a
+##     restart starts unguarded. The reopened pack is the same committed receipt (replay, no draw).
 ##   A ceremony closed any other way (stack cleared by a route change) is NOT acknowledged: the
 ##     same committed receipt reopens at the next drain.
 ##
@@ -18,6 +24,7 @@ extends RefCounted
 
 signal pack_shown(id: String, kind: String)
 signal pack_finished(id: String)
+signal pack_ack_failed(id: String, result: Dictionary)
 signal idle
 
 const StandardPackCeremony = preload("res://scripts/ui/ceremony/standard_pack_ceremony.gd")
@@ -30,6 +37,8 @@ var _current = null          ## the open pack ceremony, or null
 var _current_id := ""
 var _log: Array = []         ## [id, kind, replay] in presentation order (evidence)
 var _last_error := ""
+var _ack_ok := {}             ## id -> bool: durable acknowledgement result of its completion
+var _ack_guard := {}          ## id -> true: ack failed this session; not reopened until released
 
 func bind(stack, app_state, feel = null) -> void:
 	_stack = stack
@@ -63,6 +72,9 @@ func drain() -> bool:
 		idle.emit()
 		return false
 	var id := String(e["id"])
+	if _ack_guard.has(id):
+		_last_error = "ack_retry_guarded"   # FIFO stays blocked behind it; nothing is reopened yet
+		return false
 	var c: Dictionary = _app.open_earned_pack(id)
 	if not bool(c.get("ok", false)):
 		_last_error = String(c.get("reason", "open_failed"))   # stays pending (nothing partial survives)
@@ -91,11 +103,22 @@ func drain() -> bool:
 ## The ceremony ran to its end (all cards routed): the pack is now durably acknowledged.
 func _on_completed(_presentation_id: String, id: String) -> void:
 	var r: Dictionary = _app.acknowledge_earned_pack(id)
-	if not bool(r.get("ok", false)):
+	_ack_ok[id] = bool(r.get("ok", false))
+	if not _ack_ok[id]:
 		_last_error = "ack:" + String(r.get("reason", ""))
+		_ack_guard[id] = true
+		pack_ack_failed.emit(id, r.duplicate(true))
 
 func _on_closed(reason: String, id: String) -> void:
 	_current = null
 	_current_id = ""
-	if reason == "complete":
+	if reason == "complete" and bool(_ack_ok.get(id, false)):
 		pack_finished.emit(id)
+	_ack_ok.erase(id)
+
+## Allow a pack whose durable acknowledgement failed to be presented again (same receipt).
+func release_ack_guard() -> void:
+	_ack_guard.clear()
+
+func is_ack_guarded(id: String) -> bool:
+	return _ack_guard.has(id)

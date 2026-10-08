@@ -5,6 +5,9 @@ extends SceneTree
 ##   g*: the REAL app (main.tscn): Gift 10/250/500/1000 and Daily 2/4/5 -> PackPresenter ->
 ##       Standard / Premium ceremony on the app ModalStack -> taps -> Collection, FIFO, restart,
 ##       Reduced, plugins missing / throwing, no-pack rewards, gameplay never interrupted.
+##   h*: R02 durable acknowledgement - SaveService fault injection (temp_write) on the ack save:
+##       exact pre-ack restore, no pack_finished, FIFO blocked, no reopen loop, replay with zero
+##       draw on retry / restart, exactly-once removal once the save succeeds.
 ## Run: godot --headless --path . -s res://tests/m43_c005f_phase2_r01_earned_pack_runtime.gd
 
 const EconomyServices = preload("res://scripts/economy/economy_services.gd")
@@ -33,6 +36,7 @@ var EXPECTED_CASES := [
 	"g05_restart_before_open", "g06_restart_after_commit_no_reroll", "g07_fifo_one_at_a_time",
 	"g08_reduced", "g09_plugins_missing_or_throwing", "g10_no_pack_no_popup", "g11_duplicate_claim",
 	"g12_gameplay_never_interrupted", "g13_static_single_draw_path",
+	"h01_ack_save_failure_restores_exact_state", "h02_failed_ack_real_app_retry_then_fifo", "h03_restart_after_failed_ack",
 ]
 
 var _fail := 0
@@ -50,6 +54,7 @@ func _initialize() -> void:
 	_q01(); _q02(); _q03(); _q04(); _q05(); _q06()
 	await _g01(); await _g02(); await _g03(); await _g04(); await _g05(); await _g06(); await _g07()
 	await _g08(); await _g09(); await _g10(); await _g11(); await _g12(); _g13()
+	_h01(); await _h02(); await _h03()
 	_shutdown()
 	_cleanup()
 	_done()
@@ -538,6 +543,99 @@ func _g13() -> void:
 	var users: Array = _gd("res://scripts").filter(func(p): return _code(p).contains("PackPresenter.new()"))
 	_ok(users == ["res://scripts/app/main.gd"], "one production PackPresenter %s" % str(users))
 	_complete("g13_static_single_draw_path")
+
+# ------------------------------------------------------- R02 durable acknowledgement ----
+
+func _fail_temp_write(a) -> void:
+	a.save.set_fault_injector(func(stage): return stage == "temp_write")
+
+func _econ_parts(e) -> Dictionary:
+	return {"owned": JSON.stringify(e.collection.snapshot()), "rng": JSON.stringify(e.packs.snapshot()),
+		"pity": JSON.stringify(e.pack_pity.snapshot()), "receipts": JSON.stringify(e.pack_receipts.snapshot()),
+		"queue": JSON.stringify(e.pending_packs.snapshot())}
+
+func _h01() -> void:
+	print("[h01 ack save failure (SaveService temp_write) restores the exact pre-ack economy]")
+	var a = _app()
+	var e = a.economy
+	e.reward.grant("h01", {"standard_card_packs": 2})
+	a.request_save()
+	var id: String = e.pending_packs.front()["id"]
+	var c: Dictionary = a.open_earned_pack(id)
+	var before := _econ_parts(e)
+	var full_before := JSON.stringify(e.snapshot())
+	_fail_temp_write(a)
+	var r: Dictionary = a.acknowledge_earned_pack(id)
+	_ok(not r["ok"] and r["reason"] == "ack_save_failed" and bool(r["restored"]) and String(r["save"]["reason"]) == "temp_write_failed", "outer ok:false, ack_save_failed, restored (save: temp_write_failed)")
+	_ok(e.pending_packs.front()["id"] == id and e.pending_packs.size() == 2 and _econ_parts(e) == before and JSON.stringify(e.snapshot()) == full_before, "same entry back at the FIFO front; receipt / Collection / RNG / pity / queue byte-identical")
+	a.save.set_fault_injector(Callable())
+	var c2: Dictionary = a.open_earned_pack(id)
+	_ok(c2["replay"] and c2["model"] == c["model"] and _econ_parts(e)["owned"] == before["owned"], "retry open: replay, same cards, zero draw")
+	var r2: Dictionary = a.acknowledge_earned_pack(id)
+	_ok(r2["ok"] and e.pending_packs.size() == 1 and not e.pending_packs.has(id) and a.acknowledge_earned_pack(id)["reason"] == "not_pending", "durable ack: removed exactly once")
+	_complete("h01_ack_save_failure_restores_exact_state")
+
+func _h02() -> void:
+	print("[h02 REAL app: failed durable ack -> no finish, FIFO blocked, no reopen loop; retry replays, then FIFO]")
+	var path := _uniq("h02")
+	var a0 = _app(path)
+	a0.economy.reward.grant("h02", {"standard_card_packs": 2})
+	a0.request_save()
+	await _boot(path)
+	var a = _root.get_app_state()
+	var e = a.economy
+	var pp = _root.get_pack_presenter()
+	var finished: Array = []
+	var failed: Array = []
+	pp.pack_finished.connect(func(id): finished.append(id))
+	pp.pack_ack_failed.connect(func(id, _r): failed.append(id))
+	var p = _top()
+	var id1: String = p.get_model()["presentation_id"]
+	var id2: String = e.pending_packs.entries()[1]["id"]
+	var parts := _econ_parts(e)
+	_fail_temp_write(a)
+	await _finish_pack(p)
+	for _i in range(30):   # let modal_changed / Home drains run: they must not reopen or advance
+		await process_frame
+	_ok(failed == [id1] and finished.is_empty(), "pack_ack_failed for pack 1; no pack_finished")
+	_ok(e.pending_packs.front()["id"] == id1 and e.pending_packs.size() == 2 and _econ_parts(e) == parts, "entry restored at the front; receipt / Collection / RNG / pity unchanged")
+	_ok(_pack_count_in_stack() == 0 and pp.presented_log().size() == 1 and pp.is_ack_guarded(id1), "pack 2 not started, pack 1 not instantly reopened (transient guard)")
+	a.save.set_fault_injector(Callable())
+	pp.release_ack_guard()   # what the next Home entry does
+	_root.request_earned_packs()
+	await _frames(4)
+	var p2 = _top()
+	var log: Array = pp.presented_log()
+	_ok(_is_pack(p2) and p2.get_model()["presentation_id"] == id1 and log[-1] == [id1, "standard", true] and _econ_parts(e)["owned"] == parts["owned"] and _econ_parts(e)["pity"] == parts["pity"], "retry: same id reopens as replay, zero draw / pity advance")
+	await _finish_pack(p2)
+	_ok(finished == [id1] and e.pending_packs.size() == 1 and not e.pending_packs.has(id1), "durable ack succeeds: pack_finished once, removed exactly once")
+	var p3 = _top()
+	_ok(_is_pack(p3) and p3.get_model()["presentation_id"] == id2 and pp.presented_log()[-1] == [id2, "standard", false], "FIFO advances to pack 2 (first commit)")
+	await _finish_pack(p3)
+	_ok(e.pending_packs.size() == 0 and finished == [id1, id2], "both acknowledged, in order")
+	_complete("h02_failed_ack_real_app_retry_then_fifo")
+
+func _h03() -> void:
+	print("[h03 restart after a failed acknowledgement: last good save -> same receipt reopens, no reroll]")
+	var path := _uniq("h03")
+	var a = _app(path)
+	a.economy.reward.grant("h03", {"premium_card_packs": 1})
+	a.request_save()
+	var id: String = a.economy.pending_packs.front()["id"]
+	var c: Dictionary = a.open_earned_pack(id)   # commit + save
+	_fail_temp_write(a)
+	var r: Dictionary = a.acknowledge_earned_pack(id)
+	_ok(not r["ok"] and a.economy.pending_packs.has(id), "ack failed, entry kept")
+	var owned: Dictionary = a.economy.collection.snapshot()["owned"].duplicate()
+	var b = _app(path)   # the app dies; relaunch loads the last good save
+	_ok(b.economy.pending_packs.front()["id"] == id and b.economy.pack_receipts.get_receipt(id) == a.economy.pack_receipts.get_receipt(id), "relaunch: same pending entry + identical committed receipt")
+	await _boot(path)
+	var p = _top()
+	_ok(_is_pack(p) and p.get_model()["cards"] == c["model"]["cards"] and _root.get_pack_presenter().presented_log()[0][2] == true, "same cards reopen (replay=true)")
+	await _finish_pack(p)
+	var e = _root.get_app_state().economy
+	_ok(e.collection.snapshot()["owned"] == owned and e.pending_packs.size() == 0, "no reroll; acknowledged durably")
+	_complete("h03_restart_after_failed_ack")
 
 func _gd(dir: String) -> Array:
 	var out: Array = []
