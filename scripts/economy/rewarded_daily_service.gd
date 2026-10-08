@@ -14,7 +14,12 @@ extends RefCounted
 ## new save section and no migration: an old save simply has no such ids (fresh track).
 ## Rollback: a local day earlier than the highest day ever granted refuses every slot, so a
 ## clock / local-day rollback can never reopen or farm a prior day. A new forward local day
-## offers all five slots again.
+## restarts the track at slot 1.
+## SB-M43-R15-001-R01 (owner lock 2026-10-06): the track is strictly SEQUENTIAL. Slot n is
+## actionable only once every slot 1..n-1 is granted today; later slots are "locked_sequence"
+## and refused before any provider request. The current position is DERIVED from the same
+## canonical applied-tx ledger (no second progress ledger), so a no-grant outcome, a pending
+## request or a duplicate / late callback can never advance it, and a relaunch reconstructs it.
 ## Config fails closed: anything but exactly slots 1..5 (1 free, 2..5 ad) with known positive
 ## reward resources disables the whole track.
 
@@ -89,8 +94,22 @@ func high_water_day() -> int:
 func rollback_locked() -> bool:
 	return today() < high_water_day()
 
+## The one slot the player may act on today: the lowest slot not yet granted (6 = all five
+## granted). Derived from the canonical ledger on every call (never cached).
+func current_slot(day: int = -2147483648) -> int:
+	var d := today() if day == -2147483648 else day
+	for slot in range(1, SLOTS + 1):
+		if not _reward.already_applied(tx_id(d, slot)):
+			return slot
+	return SLOTS + 1
+
+## Slot is behind the sequential frontier (an earlier slot is still unclaimed today).
+func is_sequence_locked(slot: int) -> bool:
+	return slot > current_slot()
+
 ## Presentation state of `slot` for today:
-## claimed | ready_free | ready_ad | pending | ad_unavailable | locked_rollback | unavailable
+## claimed | ready_free | ready_ad | pending | ad_unavailable | locked_rollback | locked_sequence
+## | unavailable
 func slot_state(slot: int) -> String:
 	if not is_configured() or slot < 1 or slot > SLOTS:
 		return "unavailable"
@@ -98,6 +117,8 @@ func slot_state(slot: int) -> String:
 		return "claimed"
 	if rollback_locked():
 		return "locked_rollback"
+	if is_sequence_locked(slot):
+		return "locked_sequence"
 	if slot == 1:
 		return "ready_free"
 	var c: Dictionary = _rewarded.can_start_daily(today(), slot)
@@ -131,4 +152,7 @@ func start_ad(slot: int, token: String = "") -> Dictionary:
 		return {"ok": false, "reason": "already_claimed"}
 	if rollback_locked():
 		return {"ok": false, "reason": "clock_rollback"}
+	# Sequential lock: refused BEFORE any provider request (no early start of a future slot).
+	if is_sequence_locked(slot):
+		return {"ok": false, "reason": "locked_sequence"}
 	return _rewarded.start_daily_slot(today(), slot, reward_for(slot), token)

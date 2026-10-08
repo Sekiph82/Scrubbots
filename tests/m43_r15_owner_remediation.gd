@@ -108,7 +108,7 @@ func _r02() -> void:
 	var sb0: int = e.wallet.scrub_bucks()
 	var gift0 := JSON.stringify(e.gift.snapshot())
 	var orders0 := JSON.stringify(e.orders.snapshot())
-	_ok(e.rewarded_daily.states() == ["ready_free", "ad_unavailable", "ad_unavailable", "ad_unavailable", "ad_unavailable"], "fresh day: slot 1 ready, slots 2-5 no video (production provider)")
+	_ok(e.rewarded_daily.states() == ["ready_free", "locked_sequence", "locked_sequence", "locked_sequence", "locked_sequence"], "fresh day: slot 1 ready, slots 2-5 locked in sequence (R15-001-R01)")
 	var r: Dictionary = a.actions.claim_rewarded_daily_free()
 	_ok(r["ok"] and e.wallet.scrub_bucks() == sb0 + 100 and e.reward.already_applied("daily_rewarded:%d:1" % _day[0]), "slot 1 -> +100 SB under daily_rewarded:<day>:1")
 	_ok(not a.actions.claim_rewarded_daily_free()["ok"] and e.wallet.scrub_bucks() == sb0 + 100 and e.rewarded_daily.slot_state(1) == "claimed", "second claim refused; CLAIMED")
@@ -122,12 +122,14 @@ func _r03() -> void:
 	print("[r03 production default provider stays honestly unavailable: nothing granted]")
 	var a = _app("r03")
 	var e = a.economy
-	var applied0: int = e.reward.applied_transaction_count()
 	_ok(e.rewarded.get_provider().get_script() == RewardedAdProvider, "default provider = base RewardedAdProvider (M57 not wired)")
+	a.actions.claim_rewarded_daily_free()
+	var applied0: int = e.reward.applied_transaction_count()
 	var reasons: Array = []
 	for slot in range(2, 6):
 		reasons.append(String(a.actions.start_rewarded_daily(slot)["reason"]))
-	_ok(reasons == ["unavailable", "unavailable", "unavailable", "unavailable"] and e.reward.applied_transaction_count() == applied0, "slots 2-5 refused as unavailable; nothing granted %s" % str(reasons))
+	_ok(reasons == ["unavailable", "locked_sequence", "locked_sequence", "locked_sequence"] and e.reward.applied_transaction_count() == applied0, "after slot 1: slot 2 refused as unavailable, 3-5 locked in sequence; nothing granted %s" % str(reasons))
+	_ok(e.rewarded_daily.states() == ["claimed", "ad_unavailable", "locked_sequence", "locked_sequence", "locked_sequence"], "production: slot 2 NO VIDEO, later slots locked")
 	_complete("r03_production_provider_unavailable")
 
 func _r04() -> void:
@@ -136,7 +138,9 @@ func _r04() -> void:
 	var e = a.economy
 	var tp := TestProvider.new()
 	e.rewarded.set_provider(tp)
-	_ok(e.rewarded_daily.states() == ["ready_free", "ready_ad", "ready_ad", "ready_ad", "ready_ad"], "test provider: slots 2-5 WATCH AD")
+	_ok(e.rewarded_daily.states() == ["ready_free", "locked_sequence", "locked_sequence", "locked_sequence", "locked_sequence"], "test provider, fresh day: only slot 1 actionable")
+	a.actions.claim_rewarded_daily_free()
+	_ok(e.rewarded_daily.states() == ["claimed", "ready_ad", "locked_sequence", "locked_sequence", "locked_sequence"], "after slot 1: only slot 2 WATCH AD")
 	var applied0: int = e.reward.applied_transaction_count()
 	var wallet0 := JSON.stringify(e.reward.snapshot()["wallet"])
 	var bad := [["cancelled", true], ["skipped", true], ["failed", true], ["timeout", true], ["completed", false], ["completed", "true"], ["", true]]
@@ -145,7 +149,9 @@ func _r04() -> void:
 		var s: Dictionary = a.actions.start_rewarded_daily(2)
 		var res: Dictionary = tp.fire(String(s["token"]), o[0], o[1])
 		ok_all = ok_all and not res["ok"] and e.reward.applied_transaction_count() == applied0
-	_ok(ok_all and JSON.stringify(e.reward.snapshot()["wallet"]) == wallet0 and e.rewarded_daily.slot_state(2) == "ready_ad", "cancel / skip / fail / timeout / unverified / string-verified / empty -> nothing granted")
+	_ok(ok_all and JSON.stringify(e.reward.snapshot()["wallet"]) == wallet0 and e.rewarded_daily.slot_state(2) == "ready_ad" and e.rewarded_daily.slot_state(3) == "locked_sequence", "cancel / skip / fail / timeout / unverified / string-verified / empty -> nothing granted, no advance")
+	for slot in [2, 3]:
+		tp.fire(String(a.actions.start_rewarded_daily(slot)["token"]), "completed", true)
 	var s4: Dictionary = a.actions.start_rewarded_daily(4)
 	_ok(e.rewarded_daily.slot_state(4) == "pending" and not a.actions.start_rewarded_daily(4)["ok"], "pending slot cannot start twice")
 	_ok(tp.requests[-1][0] == "rewarded_daily_slot_4" and String(s4["token"]) != String(s4["tx"]) and String(s4["tx"]) == "daily_rewarded:%d:4" % _day[0], "placement rewarded_daily_slot_4; provider token != economy tx")
@@ -159,10 +165,8 @@ func _r04() -> void:
 	var late: Dictionary = tp.fire(String(s5["token"]), "completed", true)
 	_ok(not late["ok"] and late["reason"] == "duplicate" and not e.reward.already_applied("daily_rewarded:%d:5" % _day[0]) and e.rewarded_daily.slot_state(5) == "ready_ad", "UI timeout abandons; late callback grants nothing; slot stays available")
 	_ok(not e.rewarded.resolve("never-issued", {"outcome": "completed", "verified": true})["ok"], "unknown token grants nothing")
-	for slot in [2, 3, 5]:
-		var s: Dictionary = a.actions.start_rewarded_daily(slot)
-		tp.fire(String(s["token"]), "completed", true)
-	_ok(e.rewarded_daily.states() == ["ready_free", "claimed", "claimed", "claimed", "claimed"], "each ad slot exactly once")
+	tp.fire(String(a.actions.start_rewarded_daily(5)["token"]), "completed", true)
+	_ok(e.rewarded_daily.states() == ["claimed", "claimed", "claimed", "claimed", "claimed"], "each slot exactly once, in order")
 	_complete("r04_verified_ad_only")
 
 func _r05() -> void:
@@ -172,11 +176,12 @@ func _r05() -> void:
 	var tp := TestProvider.new()
 	tp.accept = false
 	e.rewarded.set_provider(tp)
+	a.actions.claim_rewarded_daily_free()
 	var applied0: int = e.reward.applied_transaction_count()
-	_ok(a.actions.start_rewarded_daily(3)["reason"] == "provider_refused" and e.reward.applied_transaction_count() == applied0, "provider refused -> nothing")
+	_ok(a.actions.start_rewarded_daily(2)["reason"] == "provider_refused" and e.reward.applied_transaction_count() == applied0 and e.rewarded_daily.slot_state(3) == "locked_sequence", "provider refused -> nothing, no advance")
 	tp.accept = true
 	tp.available = false
-	_ok(e.rewarded_daily.slot_state(3) == "ad_unavailable" and a.actions.start_rewarded_daily(3)["reason"] == "unavailable", "provider unavailable -> NO VIDEO, refused")
+	_ok(e.rewarded_daily.slot_state(2) == "ad_unavailable" and a.actions.start_rewarded_daily(2)["reason"] == "unavailable", "provider unavailable -> NO VIDEO, refused")
 	_complete("r05_provider_refused")
 
 func _r06() -> void:
@@ -190,7 +195,7 @@ func _r06() -> void:
 	tp.fire(String(a.actions.start_rewarded_daily(2)["token"]), "completed", true)
 	_day[0] += 1
 	_now[0] += 86400
-	_ok(e.rewarded_daily.states() == ["ready_free", "ready_ad", "ready_ad", "ready_ad", "ready_ad"], "next local day: five fresh slots")
+	_ok(e.rewarded_daily.states() == ["ready_free", "locked_sequence", "locked_sequence", "locked_sequence", "locked_sequence"], "next local day: fresh track back at slot 1")
 	a.actions.claim_rewarded_daily_free()
 	_ok(e.reward.already_applied("daily_rewarded:%d:1" % d0) and e.reward.already_applied("daily_rewarded:%d:1" % (d0 + 1)), "day D and D+1 ids both kept")
 	_day[0] = d0
@@ -213,7 +218,7 @@ func _r07() -> void:
 	_day[0] = d0 - 5
 	_ok(not a.actions.claim_rewarded_daily_free()["ok"], "deeper rollback still refused")
 	_day[0] = d0 + 1
-	_ok(e.rewarded_daily.states() == ["claimed", "ready_ad", "ready_ad", "ready_ad", "ready_ad"], "back at D+1: claimed stays claimed, others available")
+	_ok(e.rewarded_daily.states() == ["claimed", "ready_ad", "locked_sequence", "locked_sequence", "locked_sequence"], "back at D+1: claimed stays claimed, slot 2 next, later slots locked")
 	_day[0] = d0
 	_complete("r07_rollback_no_farm")
 
@@ -225,13 +230,14 @@ func _r08() -> void:
 	a.economy.rewarded.set_provider(tp)
 	_day[0] += 3
 	a.actions.claim_rewarded_daily_free()
-	tp.fire(String(a.actions.start_rewarded_daily(5)["token"]), "completed", true)
+	for slot in [2, 3]:
+		tp.fire(String(a.actions.start_rewarded_daily(slot)["token"]), "completed", true)
 	a.request_save()
 	var snap := JSON.stringify(a.economy.snapshot())
 	_ok(not a.economy.snapshot().has("rewarded_daily"), "no new economy save section (state = canonical reward ledger)")
 	var b := AppState.new(path, func(): return _now[0], func(): return _day[0])
 	b.economy.rewarded.set_provider(TestProvider.new())
-	_ok(b.economy.rewarded_daily.states() == ["claimed", "ready_ad", "ready_ad", "ready_ad", "claimed"] and not b.actions.claim_rewarded_daily_free()["ok"] and b.actions.start_rewarded_daily(5)["reason"] == "already_claimed", "relaunch: slots 1 + 5 claimed, cannot re-grant")
+	_ok(b.economy.rewarded_daily.states() == ["claimed", "claimed", "claimed", "ready_ad", "locked_sequence"] and not b.actions.claim_rewarded_daily_free()["ok"] and b.actions.start_rewarded_daily(3)["reason"] == "already_claimed" and b.actions.start_rewarded_daily(5)["reason"] == "locked_sequence", "relaunch: slots 1-3 claimed, slot 4 next, slot 5 locked, cannot re-grant")
 	_day[0] -= 3
 	_ok(b.economy.rewarded_daily.rollback_locked(), "relaunch with the day rolled back: still locked")
 	var old = JSON.parse_string(snap)
@@ -270,11 +276,12 @@ func _r10() -> void:
 		var row: Control = p.find_child("Slot_%d" % slot, true, false)
 		texts_ok = texts_ok and row != null and (row.find_child("RewardText", true, false) as Label).text == UiText.reward_text(e.rewarded_daily.reward_for(slot))
 	_ok(texts_ok and p.find_child("Slots", true, false).get_child_count() == 5, "exactly five rows; each reward text = config")
-	_ok(_btn(p, 1) == UiText.t("POPUP_CLAIM") and not p.get_action_button("slot:1").disabled and range(2, 6).all(func(s): return _btn(p, s) == UiText.t("RADS_NO_VIDEO") and p.get_action_button("slot:%d" % s).disabled), "production: CLAIM + four disabled NO VIDEO")
+	_ok(_btn(p, 1) == UiText.t("POPUP_CLAIM") and not p.get_action_button("slot:1").disabled and range(2, 6).all(func(s): return _btn(p, s) == UiText.t("RADS_LOCKED") and p.get_action_button("slot:%d" % s).disabled), "fresh day: CLAIM + four disabled LOCKED (sequential)")
 	var sb0: int = e.wallet.scrub_bucks()
 	p.get_action_button("slot:1").pressed.emit()
 	await _frames(2)
 	_ok(e.wallet.scrub_bucks() == sb0 + 100 and _btn(p, 1) == UiText.t("RADS_CLAIMED") and p.get_action_button("slot:1").disabled and (p.find_child("Note", true, false) as Label).text == UiText.t("RADS_GRANTED", [UiText.reward_text({"scrub_bucks": 100})]), "CLAIM -> +100 SB, CLAIMED, collected note")
+	_ok(_btn(p, 2) == UiText.t("RADS_NO_VIDEO") and p.get_action_button("slot:2").disabled and range(3, 6).all(func(s): return _btn(p, s) == UiText.t("RADS_LOCKED") and p.get_action_button("slot:%d" % s).disabled), "production after CLAIM: slot 2 NO VIDEO, slots 3-5 LOCKED")
 	var tp := TestProvider.new()
 	e.rewarded.set_provider(tp)
 	await create_timer(0.5).timeout
@@ -283,14 +290,21 @@ func _r10() -> void:
 	cta.pressed.emit()
 	await _frames(2)
 	p = _root.get_modal_stack().top()
-	_ok(range(2, 6).all(func(s): return _btn(p, s) == UiText.t("RADS_WATCH") and not p.get_action_button("slot:%d" % s).disabled), "TEST provider injected: slots 2-5 WATCH AD")
-	p.get_action_button("slot:3").pressed.emit()
+	_ok(_btn(p, 2) == UiText.t("RADS_WATCH") and not p.get_action_button("slot:2").disabled and range(3, 6).all(func(s): return _btn(p, s) == UiText.t("RADS_LOCKED") and p.get_action_button("slot:%d" % s).disabled), "TEST provider injected: slot 2 WATCH AD, slots 3-5 LOCKED")
+	_ok((p.find_child("Slot_4", true, false).find_child("State", true, false) as Label).text == UiText.t("RADS_STATE_NEXT", [3]), "locked row reads 'Unlocks after reward 3'")
+	p.get_action_button("slot:2").pressed.emit()
 	await _frames(2)
 	var tok := String(tp.requests[-1][1])
-	_ok(p.is_busy() and (p.find_child("Slot_3", true, false) as Control).get_meta("state") == "pending" and e.boosters.charges("random") == 0, "pending: busy, nothing granted yet")
+	_ok(p.is_busy() and (p.find_child("Slot_2", true, false) as Control).get_meta("state") == "pending" and (p.find_child("Slot_3", true, false) as Control).get_meta("state") == "locked_sequence", "pending slot 2: busy, slot 3 stays locked")
 	tp.fire(tok, "cancelled", true)
 	await _frames(2)
-	_ok(not p.is_busy() and e.boosters.charges("random") == 0 and (p.find_child("Note", true, false) as Label).text.begins_with(UiText.t("REWARDED_NO_GRANT", [""]).strip_edges()) and _btn(p, 3) == UiText.t("RADS_WATCH"), "cancel -> No reward, slot still WATCH AD")
+	_ok(not p.is_busy() and not e.reward.already_applied("daily_rewarded:%d:2" % _day[0]) and (p.find_child("Note", true, false) as Label).text.begins_with(UiText.t("REWARDED_NO_GRANT", [""]).strip_edges()) and _btn(p, 2) == UiText.t("RADS_WATCH") and _btn(p, 3) == UiText.t("RADS_LOCKED"), "cancel -> No reward, slot 2 still WATCH AD, slot 3 still LOCKED")
+	await create_timer(0.5).timeout
+	p.get_action_button("slot:2").pressed.emit()
+	await _frames(2)
+	tp.fire(String(tp.requests[-1][1]), "completed", true)
+	await _frames(2)
+	_ok(_btn(p, 2) == UiText.t("RADS_CLAIMED") and _btn(p, 3) == UiText.t("RADS_WATCH") and not p.get_action_button("slot:3").disabled and _btn(p, 4) == UiText.t("RADS_LOCKED"), "verified slot 2 -> CLAIMED; slot 3 unlocks (only)")
 	await create_timer(0.5).timeout
 	p.get_action_button("slot:3").pressed.emit()
 	await _frames(2)
