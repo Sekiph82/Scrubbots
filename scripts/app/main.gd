@@ -75,6 +75,7 @@ var momentum_cfg: Dictionary = {}
 var ceremonies = null
 var meta_feedback = null
 ## M43-C005F (SB-M43-C005F-002): the ONE fail-open presentation-feel adapter (no call site yet).
+## Ephemeral: never saved; cancelled + unbound when the app root leaves the tree.
 var feel = null
 
 func _enter_tree() -> void:
@@ -577,6 +578,11 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed("ui_cancel"):
 		handle_back()
 		get_viewport().set_input_as_handled()
+
+## Presentation-only teardown: the feel adapter cancels its own plugin work (SB-M43-C005F-002).
+func _exit_tree() -> void:
+	if feel != null:
+		feel.unbind()
 
 func _notification(what: int) -> void:
 	match what:

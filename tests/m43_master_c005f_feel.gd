@@ -1,6 +1,9 @@
 extends SceneTree
 ## M43 master — Lane C005F presentation feel (SB-M43-C005F-002 adapter, SB-M43-C005F-014 boundary).
-## Spy backends stand in for GameFeelFlow / Spark (the canonical plugin intake is owner-gated).
+## Spy backends stand in for GameFeelFlow / Spark. Updated by M43-C005F-PHASE1 (SB-M43-C005F-002/013):
+## the canonical adapter dispatches GFF `punch_scale` only to Node2D/Node3D targets (GFF 1.0.0 cannot
+## scale Controls), and a live Reduced toggle cancels only adapter-owned work (targeted stop_all, no
+## global Spark.clear). Full Phase 1 coverage: tests/m43_c005f_phase1_foundation.gd.
 ##
 ## Run: godot --headless --path . -s res://tests/m43_master_c005f_feel.gd
 
@@ -24,6 +27,8 @@ class Spy extends Node:
 	var presets := {"spark": {"amount": 10}, "pickup": {"amount": 12}, "confetti": {"amount": 40}}
 	func play(effect, target, _params = null) -> void:
 		calls.append(["play", effect, target])
+	func get_effect_names() -> Array:
+		return ["punch_scale"]
 	func play_combo(combo, target, _params = null) -> void:
 		calls.append(["play_combo", combo, target])
 	func stop_all(node = null) -> void:
@@ -66,8 +71,8 @@ func _adapter(reduced := false) -> Array:
 	a.set_backends_for_test(g, s)
 	return [a, g, s, fx]
 
-func _target() -> Control:
-	var c := Control.new()
+func _target() -> Node2D:
+	var c := Node2D.new()
 	get_root().add_child(c)
 	return c
 
@@ -92,7 +97,7 @@ func _f02() -> void:
 	order.append(r[1].calls.size() + r[2].calls.size())
 	await process_frame
 	_ok(order == ["caller_continued", 0], "no plugin call ran inside the caller's frame")
-	_ok(r[1].calls == [["play_combo", "ui_notification", t]] and r[2].calls.size() == 1 and r[2].calls[0][2]["amount"] == 8, "GFF ui_notification + Spark pickup capped at 8")
+	_ok(r[1].calls[0] == ["play", "punch_scale", t] and r[2].calls.size() == 1 and r[2].calls[0][2]["amount"] == 8, "GFF punch_scale + Spark pickup capped at 8")
 	_free(r, t)
 	_complete("f02_dispatch_after_caller")
 
@@ -123,9 +128,11 @@ func _f05() -> void:
 	print("[f05 live Reduced toggle cancels decorative work; Reduced dispatches nothing]")
 	var r := _adapter(false)
 	var t := _target()
+	r[0].play("REWARD", t)
+	await process_frame
 	r[3].set_reduced(true)
 	await process_frame
-	_ok(r[1].calls.has(["stop_all", null]) and r[2].calls.has(["clear"]), "toggle -> GFF stop_all + Spark clear")
+	_ok(r[1].calls.has(["stop_all", t]) and not r[2].calls.has(["clear"]), "toggle -> targeted GFF stop_all(target); no global Spark clear")
 	var n1: int = r[1].calls.size() + r[2].calls.size()
 	r[0].play("MAJOR_REWARD", t)
 	await process_frame
@@ -184,7 +191,7 @@ func _f09() -> void:
 	for w in ["effect_finished", "effect_started", ".listen(", "request_save(", "grant(", "nav.", "go(", "time_scale", "freeze_frame", "camera_"]:
 		if code.contains(w):
 			bad.append(w)
-	_ok(bad.is_empty() and code.count(".connect(") == 1 and code.contains("_effects.changed.connect"), "only the settings `changed` signal is connected; no plugin callback / save / grant / nav / prohibited effect %s" % str(bad))
+	_ok(bad.is_empty() and code.count(".connect(") == 2 and code.contains("_effects.changed.connect") and code.contains(".timeout.connect(_expire"), "only the settings `changed` signal + the adapter's own expiry timer are connected; no plugin callback / save / grant / nav / prohibited effect %s" % str(bad))
 	_complete("f09_adapter_never_an_authority_callback")
 
 func _f10() -> void:

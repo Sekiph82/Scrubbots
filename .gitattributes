@@ -1,0 +1,4 @@
+# Vendored third-party Godot addons (M43-C005F-PHASE1, SB-M43-C005F-001): kept byte-identical to
+# the MIT upstream install, so upstream whitespace style is not flagged by `git diff --check`.
+addons/game_feel_flow/** -whitespace
+addons/saltmire_spark/** -whitespace
