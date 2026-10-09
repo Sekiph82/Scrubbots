@@ -630,7 +630,7 @@ func _daily_presentation() -> void:
 	var btn = popup.get_action_button("login")
 	_ok(btn != null and not btn.disabled, "CLAIM offered for today's day 1")
 	var r3_text: String = popup.find_child("Rows", true, false).get_child(2).get_child(0).text
-	_ok(r3_text.find("Random Booster x1") != -1, "day 3 shows the configured booster reward (%s)" % r3_text)
+	_ok(r3_text.find("Mystery Booster x1") != -1, "day 3 shows the configured booster reward (%s)" % r3_text)
 	var sb0: int = w.scrub_bucks()
 	btn.pressed.emit()
 	home.refresh()

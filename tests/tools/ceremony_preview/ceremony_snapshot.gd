@@ -30,7 +30,7 @@ func _initialize() -> void:
 		"feature_unlock": CC.feature_fixture(),
 		"world_shell": CC.world_shell_fixture(),
 		"generic_1": {"title": "DAILY REWARD", "rewards": {"scrub_bucks": 50}},
-		"generic_4": {"title": "TASKS 3/3 COMPLETE", "rewards": {"scrub_bucks": 150, "bot_parts": 2, "standard_card_packs": 1, "random_booster_charges": 1}},
+		"generic_4": {"title": "TASKS 3/3 COMPLETE", "rewards": {"scrub_bucks": 150, "bot_parts": 2, "standard_card_packs": 1, "random_any_booster_charges": 1}},
 	}
 	var shots: Array = []
 	for k in ["standard_pack", "premium_pack", "set_complete", "master_complete", "robot_unlock", "gift_250", "gift_500", "gift_1000", "feature_unlock", "world_shell", "generic_1", "generic_4"]:

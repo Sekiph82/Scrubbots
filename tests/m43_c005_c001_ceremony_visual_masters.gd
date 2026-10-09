@@ -82,7 +82,7 @@ func _all_fixtures() -> Array:
 		["robot_unlock", CC.robot_fixture("Moppy")], ["gift_milestone", CC.gift_fixture(_t, 250)],
 		["gift_milestone", CC.gift_fixture(_t, 1000)], ["feature_unlock", CC.feature_fixture()],
 		["world_shell", CC.world_shell_fixture()],
-		["generic_reward", {"title": "TASKS 3/3 COMPLETE", "rewards": {"scrub_bucks": 150, "bot_parts": 2, "standard_card_packs": 1, "random_booster_charges": 1}}]]
+		["generic_reward", {"title": "TASKS 3/3 COMPLETE", "rewards": {"scrub_bucks": 150, "bot_parts": 2, "standard_card_packs": 1, "random_any_booster_charges": 1}}]]
 
 func _labels(p) -> Array:
 	return p.find_children("*", "Label", true, false).filter(func(l): return l.is_visible_in_tree() and not l.text.is_empty()).map(func(l): return l.text)
@@ -240,7 +240,7 @@ func _feature_world_generic() -> void:
 		and not wfx.has("world_id") and not wfx.has("range") and w.find_child("PreviewTag", true, false).visible
 		and w.find_child("WorldArt", true, false).texture.resource_path == CC.ART["world_01"], "world shell: slots only, no range / World 02, World 01 art tagged PREVIEW HARNESS · SHELL TEST ONLY")
 	_complete("c10_world_no_range")
-	var keys := ["scrub_bucks", "bot_parts", "standard_card_packs", "random_booster_charges", "premium_card_packs"]
+	var keys := ["scrub_bucks", "bot_parts", "standard_card_packs", "random_any_booster_charges", "premium_card_packs"]
 	var ok := true
 	for n in range(1, 5):
 		var rw := {}

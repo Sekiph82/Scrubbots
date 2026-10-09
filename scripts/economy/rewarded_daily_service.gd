@@ -29,7 +29,7 @@ const IntDomain = preload("res://scripts/economy/int_domain.gd")
 const PATH := "res://data/config/rewarded_daily_v1.json"
 const SCHEMA := "scrubbots.rewarded_daily.v1"
 const SLOTS := 5
-const RESOURCES := ["scrub_bucks", "standard_card_packs", "premium_card_packs", "random_booster_charges", "selected_booster_charges"]
+const RESOURCES := ["scrub_bucks", "standard_card_packs", "premium_card_packs", "random_any_booster_charges", "selected_booster_charges"]
 
 var _reward
 var _rewarded

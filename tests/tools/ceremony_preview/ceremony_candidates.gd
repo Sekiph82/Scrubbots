@@ -40,7 +40,7 @@ const ART := {
 	"world_01": "res://assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png",
 	"sb": "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
 	"bot_parts": "res://assets/ui/final/robots/bot_parts_icon.png",
-	"random_booster": "res://assets/ui/final/boosters/random.png",
+	"mystery_booster": "res://assets/ui/final/rewards/gift_box.png",   # SB-M39-054 neutral reward art
 	"booster_choice": "res://assets/ui/final/rewards/booster_of_choice.png",   # M43-C005-C004 owner-approved
 	"heart": "res://assets/ui/final/common/currencies/icon_currency_heart.png",
 }
@@ -50,7 +50,7 @@ const REWARD_ROWS := {
 	"bot_parts": ["bot_parts", "+%s Bot Parts"],
 	"standard_card_packs": ["pack_standard", "+%s Standard Card Pack"],
 	"premium_card_packs": ["pack_premium", "+%s Premium Card Pack"],
-	"random_booster_charges": ["random_booster", "+%s Random Booster"],
+	"random_any_booster_charges": ["mystery_booster", "+%s Mystery Booster"],
 	"selected_booster_charges": ["booster_choice", "+%s Booster of your choice"],
 	"guaranteed_new_cards": ["card_back", "+%s guaranteed NEW card"],
 	"hearts": ["heart", "+%s Heart"],

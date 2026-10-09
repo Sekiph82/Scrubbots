@@ -19,6 +19,7 @@ const RobotUnlockService = preload("res://scripts/progression/robot_unlock_servi
 const HeartService = preload("res://scripts/economy/heart_service.gd")
 const SpeedEntitlementService = preload("res://scripts/economy/speed_entitlement_service.gd")
 const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
+const RandomBoosterRewardPicker = preload("res://scripts/economy/random_booster_reward_picker.gd")
 const SlotCapacityAuthority = preload("res://scripts/economy/slot_capacity_authority.gd")
 const DailyService = preload("res://scripts/economy/daily_service.gd")
 const CollectionInventory = preload("res://scripts/collection/collection_inventory.gd")
@@ -117,9 +118,15 @@ func _register_handlers() -> void:
 		pending_packs.enqueue(reward.current_tx(), "standard", n))
 	reward.register_handler("premium_card_packs", func(n):
 		pending_packs.enqueue(reward.current_tx(), "premium", n))
-	# "random Booster Charge" = a charge for the Random booster (owner wording).
-	reward.register_handler("random_booster_charges", func(n):
-		boosters.add_charges(BoosterInventory.RANDOM, n))
+	# SB-M39-054 (owner lock 2026-10-09): a random-any booster reward = per charge, one booster
+	# picked uniformly from all four canonical boosters, derived from (parent tx, ordinal) so a
+	# duplicate / retry / relaunch can never reroll. The legacy key is an alias with the SAME
+	# meaning; it never maps to the gameplay booster RANDOM alone.
+	var random_any := func(n):
+		for i in range(n):
+			boosters.add_charges(RandomBoosterRewardPicker.pick(reward.current_tx(), i), 1)
+	reward.register_handler(RandomBoosterRewardPicker.RESOURCE, random_any)
+	reward.register_handler(RandomBoosterRewardPicker.LEGACY_RESOURCE, random_any)
 	# Player-selected charges go to the pending pool (player chooses later).
 	reward.register_handler("selected_booster_charges", func(n):
 		boosters.add_pending_selected(n))

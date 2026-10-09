@@ -34,7 +34,7 @@ func _mk_reward() -> Array:
 	# Register card-pack / booster handlers so gift/daily bundles never fail.
 	r.register_handler("standard_card_packs", func(_a): pass)
 	r.register_handler("premium_card_packs", func(_a): pass)
-	r.register_handler("random_booster_charges", func(_a): pass)
+	r.register_handler("random_any_booster_charges", func(_a): pass)
 	r.register_handler("selected_booster_charges", func(_a): pass)
 	r.register_handler("guaranteed_new_cards", func(_a): pass)
 	return [c, w, r]

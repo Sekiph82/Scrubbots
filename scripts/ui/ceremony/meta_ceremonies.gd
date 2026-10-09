@@ -29,7 +29,7 @@ const ART := {
 	"bot_parts": "res://assets/ui/final/robots/bot_parts_icon.png",
 	"pack_standard": "res://assets/ui/final/rewards/card_pack_standard.png",
 	"pack_premium": "res://assets/ui/final/rewards/card_pack_premium.png",
-	"random_booster": "res://assets/ui/final/boosters/random.png",
+	"mystery_booster": "res://assets/ui/final/rewards/gift_box.png",   # SB-M39-054: neutral, never the RANDOM booster icon
 	"booster_choice": "res://assets/ui/final/rewards/booster_of_choice.png",
 	"card_back": "res://assets/ui/final/collection/states/card_back.png",
 	"heart": "res://assets/ui/final/common/currencies/icon_currency_heart.png",
@@ -40,7 +40,7 @@ const REWARD_ROWS := {
 	"bot_parts": ["bot_parts", "CEREMONY_ROW_BOT_PARTS"],
 	"standard_card_packs": ["pack_standard", "CEREMONY_ROW_STANDARD_PACK"],
 	"premium_card_packs": ["pack_premium", "CEREMONY_ROW_PREMIUM_PACK"],
-	"random_booster_charges": ["random_booster", "CEREMONY_ROW_RANDOM_BOOSTER"],
+	"random_any_booster_charges": ["mystery_booster", "CEREMONY_ROW_MYSTERY_BOOSTER"],
 	"selected_booster_charges": ["booster_choice", "CEREMONY_ROW_BOOSTER_CHOICE"],
 	"guaranteed_new_cards": ["card_back", "CEREMONY_ROW_NEW_CARD"],
 	"hearts": ["heart", "CEREMONY_ROW_HEART"],
