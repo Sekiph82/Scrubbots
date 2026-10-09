@@ -62,6 +62,7 @@ const GiftProgressModel = preload("res://scripts/economy/gift_progress_model.gd"
 const GiftTickOverlay = preload("res://scripts/ui/components/gift_tick_overlay.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
+const HomeMicroFeel = preload("res://scripts/ui/feel/home_micro_feel.gd")
 ## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
 const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
 const UiText = preload("res://scripts/ui/ui_text.gd")
@@ -142,6 +143,8 @@ var _world_offset := Vector2.ZERO
 var _ad_slot_enabled := true
 ## M43-C001R validated momentum config (the app root shares its own; else loaded once).
 var _momentum_cfg: Dictionary = {}
+## M43-C005F-PHASE4 (F012): ephemeral state-change micro feel (presentation only, never saved).
+var _micro = HomeMicroFeel.new()
 
 func _ready() -> void:
 	_build()
@@ -1227,6 +1230,11 @@ func refresh() -> void:
 	status.visible = not status.text.is_empty()
 	_render_journey(status)
 	_render_values()
+	# F012: only a VISIBLE render is compared (a hidden refresh keeps the last seen baseline).
+	if is_visible_in_tree():
+		_micro.observe(_vm, {"frontier": _nodes["HomeJourneyStrip"] if _nodes["HomeJourneyStrip"].visible else play,
+			"bot_parts": _nodes["ProfileBotParts"],
+			"win_streak": _nodes["TrackGift%d" % clampi(int(_vm.get("win_streak", 1)), 1, TRACK_POSITIONS)]})
 
 func _render_values() -> void:
 	_vm = HomeViewModel.build(_app)
@@ -1432,6 +1440,13 @@ func _on_popup_action(action_id: String, popup_id: String) -> void:
 
 static func _mmss(seconds: int) -> String:
 	return "%02d:%02d" % [seconds / 60, seconds % 60]
+
+## M43-C005F-PHASE4 (F012): bind the app's feel adapter (null = no micro feel). Presentation only.
+func set_feedback(adapter) -> void:
+	_micro.bind(adapter)
+
+func get_micro_feel():
+	return _micro
 
 func get_view_model() -> Dictionary:
 	return _vm.duplicate(true)

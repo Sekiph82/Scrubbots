@@ -726,6 +726,10 @@ func get_profile_level_text() -> String:
 func get_profile_parts_text() -> String:
 	return _profile_parts.text
 
+## HUD robot portrait (M43-C005F-PHASE4 F010 bridge target; presentation only).
+func get_profile_portrait() -> TextureRect:
+	return _portrait
+
 func set_speed_presentation(entitlement: String, timed_remaining: int = 0) -> void:
 	_speed_entitlement = entitlement
 	_speed_remaining = maxi(timed_remaining, 0)
