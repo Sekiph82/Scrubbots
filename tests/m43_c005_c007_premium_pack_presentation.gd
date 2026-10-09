@@ -8,6 +8,7 @@ extends SceneTree
 ##
 ## Run: godot --headless --path . -s res://tests/m43_c005_c007_premium_pack_presentation.gd
 
+const PackRouteProbe = preload("res://tests/support/pack_route_probe.gd")
 const PremiumPackCeremony = preload("res://scripts/ui/ceremony/premium_pack_ceremony.gd")
 const PremiumPackModel = preload("res://scripts/ui/ceremony/premium_pack_model.gd")
 const CardPackService = preload("res://scripts/collection/card_pack_service.gd")
@@ -323,10 +324,27 @@ func _p12_mixed_routing() -> void:
 	var p = await _to_await(m)
 	var cvs: Array = p.get_card_views()
 	var dest := {"collection": _center(p.get_destination("collection")), "exchange": _center(p.get_destination("exchange"))}
-	var start: Array = cvs.map(func(cv): return cv.face_center())
 	var targets: Array = cvs.map(func(cv): return cv.destination_point())
-	var mid := [false, false, false, false, false]
-	var toward := [true, true, true, true, true]
+	# QA-R01: deterministic mid-route geometry through the PRODUCTION CardView route setter
+	# (probe route 0.5, restored to 0 before the real Tap 2) - no scheduler-frame sampling.
+	var travel := [false, false, false, false, false]
+	var sensitive := [false, false, false, false, false]
+	var restored := true
+	for i in range(5):
+		var d := PremiumPackCeremony.destination_of(m["cards"][i])
+		var own: Vector2 = dest[d]
+		var other: Vector2 = dest["exchange" if d == "collection" else "collection"]
+		var pr: Dictionary = PackRouteProbe.probe(cvs[i])
+		travel[i] = pr["visible"] and PackRouteProbe.mid_ok(pr["slot"], pr["start"], own, other, pr["mid"])
+		sensitive[i] = PackRouteProbe.rejects_misroutes(pr["slot"], pr["start"], own, other)
+		restored = restored and pr["restored"]
+	_ok(travel == [true, true, true, true, true] and restored, "every card's intermediate route state is visible, strictly between its slot and its OWN destination, closer than the start (probe restored)")
+	_ok(sensitive == [true, true, true, true, true], "sensitivity: stuck-at-slot, jumped-to-destination and wrong-destination travel are all rejected")
+	# Event-driven serialization proof: at each card's `arrived`, every earlier card is done and
+	# every later card has not started (one card in flight), independent of frame sampling.
+	var at_arrival: Array = []
+	for cv in cvs:
+		cv.arrived.connect(func(idx): at_arrival.append([idx, cvs.map(func(c): return c.route)]))
 	var concurrent := 0
 	var log: Array = []
 	var arrivals: Array = []
@@ -338,20 +356,22 @@ func _p12_mixed_routing() -> void:
 			break
 		var moving := 0
 		for i in range(5):
-			var cv = cvs[i]
-			if cv.route > 0.0 and cv.route < 1.0:
+			if cvs[i].route > 0.0 and cvs[i].route < 1.0:
 				moving += 1
-				mid[i] = true
-				var own: Vector2 = dest[PremiumPackCeremony.destination_of(m["cards"][i])]
-				toward[i] = toward[i] and cv.face_center().distance_to(own) < start[i].distance_to(own) and cv.is_visible_in_tree()
 		concurrent = maxi(concurrent, moving)
 		log = p.route_log()
 		await process_frame
 	await _frames(2)
 	var want: Array = [[0, "collection"], [1, "exchange"], [2, "collection"], [3, "exchange"], [4, "collection"]]
 	_ok(log == want, "NEW -> Collection, DUPLICATE -> Cards Exchange, each card once %s" % str(log))
-	_ok(mid == [true, true, true, true, true] and toward == [true, true, true, true, true], "every card observed travelling toward its own destination")
-	_ok(concurrent == 1 and arrivals == [0, 1, 2, 3, 4], "serialized: one card in flight at a time (max %d); arrivals in draw order %s" % [concurrent, str(arrivals)])
+	var serial := at_arrival.size() == 5
+	for k in range(at_arrival.size()):
+		var idx: int = at_arrival[k][0]
+		var routes: Array = at_arrival[k][1]
+		serial = serial and idx == k
+		for j in range(5):
+			serial = serial and ((routes[j] >= 1.0) if j <= idx else (routes[j] == 0.0))
+	_ok(serial and concurrent <= 1 and arrivals == [0, 1, 2, 3, 4], "serialized: at each arrival earlier cards are done and later ones not started; never two in flight (sampled max %d); arrivals in draw order %s" % [concurrent, str(arrivals)])
 	var t_ok := true
 	for i in range(5):
 		t_ok = t_ok and targets[i] == dest[want[i][1]]
