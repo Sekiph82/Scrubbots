@@ -143,7 +143,7 @@ func claim_login() -> Dictionary:
 		_tasks_done = {}
 		_tasks_day = today
 		_tasks_claimed_day = -1
-	return {"ok": true, "day": new_cycle_day, "reward": reward}
+	return {"ok": true, "day": new_cycle_day, "reward": reward, "tx": tx}
 
 # --------------------------------------------------------------- tasks ----
 
@@ -185,7 +185,7 @@ func claim_task(task_index: int) -> Dictionary:
 	var sb := int(_task_sb[task_index])
 	if not _reward.grant(tx, {EconomyWallet.SCRUB_BUCKS: sb}):
 		return {"ok": false, "reason": "already_claimed"}
-	return {"ok": true, "sb": sb}
+	return {"ok": true, "sb": sb, "tx": tx}
 
 ## Claim the all-three-tasks bonus (1 random booster charge) once per day.
 func claim_all_tasks_bonus() -> Dictionary:
@@ -198,7 +198,7 @@ func claim_all_tasks_bonus() -> Dictionary:
 	var tx := "daily_all_tasks:%d" % today
 	if not _reward.grant(tx, {"random_booster_charges": _all_tasks_booster}):
 		return {"ok": false, "reason": "already_claimed"}
-	return {"ok": true, "random_booster_charges": _all_tasks_booster}
+	return {"ok": true, "random_booster_charges": _all_tasks_booster, "tx": tx}
 
 # --------------------------------------------------------------- snapshot ----
 
