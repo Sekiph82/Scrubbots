@@ -137,22 +137,35 @@ func _resolve(child: String, intent: String, popup_id: String, node_name: String
 ## The burst is placed at the target's rect, so it is requested only once the freshly pushed
 ## popup's nested containers have settled (the rect stops moving; at most SETTLE_FRAMES frames),
 ## the same rule as the Results WIN burst.
+## Lifecycle (M43-C005F-PHASE4-QA-R01): the wait is a STATIC coroutine that reaches this
+## coordinator only through a weakref, so a suspended wait never resumes as a method of a
+## coordinator freed meanwhile (app root teardown frees it while a ceremony is still settling).
 const SETTLE_FRAMES := 8
 func _play(child: String, intent: String, target: Node, key: String) -> void:
 	if _feel == null or target == null or not is_instance_valid(target):
 		return
 	if target is Control and target.is_inside_tree():
-		var tree := target.get_tree()
-		var last: Rect2 = (target as Control).get_global_rect()
-		for _i in range(SETTLE_FRAMES):
-			await tree.process_frame
-			if not is_instance_valid(target) or not target.is_inside_tree():
-				return
-			var r: Rect2 = (target as Control).get_global_rect()
-			if r == last:
-				break
-			last = r
-	if not _feel.play(intent, target, key):
+		_settle_then_request(weakref(self), child, intent, target, key)
+		return
+	_request(child, intent, target, key)
+
+static func _settle_then_request(owner: WeakRef, child: String, intent: String, target, key: String) -> void:
+	var tree: SceneTree = target.get_tree()
+	var last: Rect2 = (target as Control).get_global_rect()
+	for _i in range(SETTLE_FRAMES):
+		await tree.process_frame
+		if not is_instance_valid(target) or not target.is_inside_tree():
+			return
+		var r: Rect2 = (target as Control).get_global_rect()
+		if r == last:
+			break
+		last = r
+	var me = owner.get_ref()
+	if me != null:
+		me._request(child, intent, target, key)
+
+func _request(child: String, intent: String, target: Node, key: String) -> void:
+	if _feel == null or not _feel.play(intent, target, key):
 		return   # consumed key / bad target: nothing replays
 	_log.append([child, intent, key, String(target.name)])
 	if SETTLE.has(intent) and target is Control and not _reduced():
