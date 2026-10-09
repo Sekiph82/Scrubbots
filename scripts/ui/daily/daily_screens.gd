@@ -4,7 +4,7 @@ extends RefCounted
 ## M43-C009 / C009R app-level destinations in the approved popup family (every value live):
 ##   - TASKS (SB-M43-112/114, R09-001/005): today's three Daily Scrub Orders (DailyOrders),
 ##     progress, the canonical 75/100/125 SB per task, and the all-3 reward presented as an
-##     earned ScrubBox that grants the canonical one Random Booster Charge exactly once;
+##     earned ScrubBox that grants the canonical one Mystery Booster charge exactly once;
 ##   - DAILY (SB-M43-115/117): visible consecutive-login count, repeating D1..D5 cycle with
 ##     claimed / today / upcoming states and the configured rewards (DailyService);
 ##   - GIFT BAR (SB-M43-118/120): queued Gift Meter milestones to claim + claimed history.
@@ -25,7 +25,6 @@ const ART := {
 	"calendar": "res://assets/ui/final/daily/daily_login_calendar.png",
 	"box": "res://assets/ui/final/rewards/chest_small.png",
 	"gift": "res://assets/ui/final/rewards/gift_box.png",
-	"random": "res://assets/ui/final/boosters/random.png",
 }
 const HISTORY_ROWS := 8
 
@@ -142,7 +141,7 @@ static func _on_tasks_action(stack, app, p: BasePopup, id: String) -> void:
 	p.rearm_soon()
 
 ## The earned all-3 ScrubBox: shows exactly what the committed claim granted (the canonical
-## Random Booster Charge). Opened only after the facade commit; no purchase / reroll / speed-up.
+## Mystery Booster = one charge of a random one of the four boosters, SB-M39-054). Opened only after the facade commit; no purchase / reroll / speed-up.
 static func open_scrubbox(stack, app, result: Dictionary) -> BasePopup:
 	var p := BasePopup.new("ceremony_scrubbox")
 	p.set_frame("medium")
@@ -154,11 +153,11 @@ static func open_scrubbox(stack, app, result: Dictionary) -> BasePopup:
 	row.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	p.get_content().add_child(row)
 	var icon := HomeStyle.art("RewardIcon")
-	icon.texture = load(ART["random"])
+	icon.texture = load(ART["gift"])   # SB-M39-054: neutral Mystery Booster art, not the RANDOM booster
 	icon.custom_minimum_size = Vector2(120, 120)
 	row.add_child(icon)
-	var n := int(result.get("random_booster_charges", 0))
-	var l := BasePopup.body_label(UiText.reward_text({"random_booster_charges": n}), 32, BasePopup.ROYAL_EDGE)
+	var n := int(result.get("random_any_booster_charges", 0))
+	var l := BasePopup.body_label(UiText.reward_text({"random_any_booster_charges": n}), 32, BasePopup.ROYAL_EDGE)
 	l.name = "RewardText"
 	l.autowrap_mode = TextServer.AUTOWRAP_OFF   # sized by its text inside the centred row
 	row.add_child(l)

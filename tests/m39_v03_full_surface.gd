@@ -113,7 +113,7 @@ func _collection_coherence() -> void:
 	var w = EconomyWallet.new(0)
 	var r = RewardGrantService.new(w)
 	r.register_handler("standard_card_packs", func(_a): pass)
-	r.register_handler("random_booster_charges", func(_a): pass)
+	r.register_handler("random_any_booster_charges", func(_a): pass)
 	var c = EconomyConfig.new()
 	var inv = CollectionInventory.new(c, r)
 	# claimed set 1 without owning any card 1 -> rejected.
@@ -161,7 +161,7 @@ func _daily_local_and_atomic() -> void:
 	var w = EconomyWallet.new(0)
 	var r = RewardGrantService.new(w)
 	r.register_handler("standard_card_packs", func(_a): pass)
-	r.register_handler("random_booster_charges", func(_a): pass)
+	r.register_handler("random_any_booster_charges", func(_a): pass)
 	var c = EconomyConfig.new()
 	var d = DailyService.new(c, r, Callable(self, "_clock"), Callable(self, "_localday"))
 	# D1

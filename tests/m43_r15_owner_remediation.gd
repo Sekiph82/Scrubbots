@@ -326,7 +326,7 @@ func _r10() -> void:
 	await _frames(2)
 	tp.fire(String(tp.requests[-1][1]), "completed", true)
 	await _frames(2)
-	_ok(e.boosters.charges("random") == 1 and _btn(p, 3) == UiText.t("RADS_CLAIMED") and e.reward.already_applied("daily_rewarded:%d:3" % _day[0]), "verified completion -> Random Booster x1 granted, CLAIMED")
+	_ok(["plus_one_slot", "random", "selector", "tornado"].reduce(func(s, b): return s + e.boosters.charges(b), 0) == 1 and _btn(p, 3) == UiText.t("RADS_CLAIMED") and e.reward.already_applied("daily_rewarded:%d:3" % _day[0]), "verified completion -> Mystery Booster x1 granted, CLAIMED")
 	_complete("r10_popup_real_ui")
 
 func _r11() -> void:

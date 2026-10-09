@@ -137,23 +137,24 @@ func _t04() -> void:
 	_complete("t04_task_claim_exactly_once")
 
 func _t05() -> void:
-	print("[t05 all three -> earned ScrubBox: one Random Booster Charge exactly once]")
+	print("[t05 all three -> earned ScrubBox: one Mystery Booster charge exactly once]")
 	await _boot("t05")
 	var e = _eco()
 	var p = await _open_tasks()
 	_complete_orders([0, 1, 2])
 	DailyScreens.refresh_tasks(p, _root.get_app_state())
-	var r0: int = e.boosters.charges("random")
+	var r0: int = _all_charges(e)
 	_ok(not p.get_action_button("scrubbox").disabled, "3/3: OPEN enabled")
 	_tap("scrubbox")
 	await _frames(2)
-	_ok(_top_id() == "ceremony_scrubbox" and e.boosters.charges("random") == r0 + 1, "ScrubBox ceremony after the commit; +1 Random charge")
-	_ok(_top().find_child("RewardText", true, false).text == UiText.reward_text({"random_booster_charges": 1}), "shows exactly what was granted")
+	_ok(_top_id() == "ceremony_scrubbox" and _all_charges(e) == r0 + 1, "ScrubBox ceremony after the commit; +1 Mystery Booster charge")
+	_ok(_top().find_child("RewardText", true, false).text == UiText.reward_text({"random_any_booster_charges": 1}), "shows exactly what was granted")
+	_ok(_top().find_child("RewardIcon", true, false).texture.resource_path == "res://assets/ui/final/rewards/gift_box.png", "SB-M39-054: neutral Mystery Booster art, never the RANDOM booster icon")
 	_tap("ok")
 	await _frames(2)
 	await create_timer(0.5).timeout
 	_ok(_top_id() == "tasks" and bool(_top().get_action_button("scrubbox").disabled) and _txt_in(_top(), "ScrubBox", "Text") == UiText.t("TASKS_BOX_OPENED"), "back on Tasks: opened, blocked")
-	_ok(not _root.get_app_state().actions.claim_daily_all_tasks()["ok"] and e.boosters.charges("random") == r0 + 1, "second open refused")
+	_ok(not _root.get_app_state().actions.claim_daily_all_tasks()["ok"] and _all_charges(e) == r0 + 1, "second open refused")
 	_complete("t05_scrubbox_all_three_once")
 
 func _t06() -> void:
@@ -313,11 +314,11 @@ func _t12() -> void:
 	for _i in range(5):
 		p._on_action("task:1")
 	_ok(e.wallet.scrub_bucks() == sb0 + 100, "5+5 taps on task 2: +100 once")
-	var r0: int = e.boosters.charges("random")
+	var r0: int = _all_charges(e)
 	for _i in range(4):
 		p._on_action("scrubbox")
 	await _frames(2)
-	_ok(e.boosters.charges("random") == r0 + 1, "4 taps on OPEN: one charge")
+	_ok(_all_charges(e) == r0 + 1, "4 taps on OPEN: one charge")
 	_complete("t12_duplicate_taps")
 
 # ------------------------------------------------------------------ helpers ----
@@ -399,6 +400,10 @@ func _shutdown() -> void:
 		_sub.free()
 	_root = null
 	_sub = null
+
+## SB-M39-054: the ScrubBox grants one charge of a random one of the four boosters.
+func _all_charges(e) -> int:
+	return ["plus_one_slot", "random", "selector", "tornado"].reduce(func(s, b): return s + e.boosters.charges(b), 0)
 
 func _eco():
 	return _root.get_app_state().economy

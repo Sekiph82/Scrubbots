@@ -110,6 +110,10 @@ func _frames(n: int) -> void:
 	for _i in range(n):
 		await process_frame
 
+## SB-M39-054: the ScrubBox grants one charge of a random one of the four boosters.
+func _all_charges() -> int:
+	return ["plus_one_slot", "random", "selector", "tornado"].reduce(func(s, b): return s + _e().boosters.charges(b), 0)
+
 func _e():
 	return _root.get_app_state().economy
 
@@ -313,13 +317,13 @@ func _d04() -> void:
 	var tasks: Array = _log("F008")
 	_ok(tasks.size() == 3 and tasks.all(func(r): return r[1] == "SMALL") and tasks[0][2] == "c005f008:daily_task:%d:0" % _day[0] and tasks[2][3] == "Task_2", "3 claims -> 3 SMALL on the task rows, canonical tx keys")
 	_ok(_spark.bursts == [4, 4, 4], "no confetti per task (spark 4 each) %s" % str(_spark.bursts))
-	var rb0: int = _e().boosters.charges("random")
+	var rb0: int = _all_charges()
 	await _press("scrubbox")
 	var p = _top()
 	_ok(p != null and String(p.popup_id) == "ceremony_scrubbox", "the shipping earned ScrubBox opened after the committed all-3 claim")
 	var box: Array = _log("F008").filter(func(r): return r[1] == "MAJOR_REWARD")
 	_ok(box == [["F008", "MAJOR_REWARD", "c005f008:daily_all_tasks:%d" % _day[0], "Hero"]] and _spark.bursts.back() == 14, "one MAJOR_REWARD on the ScrubBox hero (confetti 14)")
-	_ok(_e().boosters.charges("random") == rb0 + 1, "exactly the one Random Booster Charge")
+	_ok(_all_charges() == rb0 + 1, "exactly the one Mystery Booster charge (any of the four)")
 	var r: Dictionary = _root.get_app_state().actions.claim_daily_all_tasks()
 	await _frames(14)
 	_ok(not r["ok"] and _log("F008").size() == 4, "second ScrubBox claim refused: no second box, no feel")

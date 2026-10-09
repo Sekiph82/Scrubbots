@@ -56,7 +56,7 @@ func _init(config, reward, clock: Callable = Callable(), local_day: Callable = C
 	for k in lr.keys():
 		_login_rewards[int(k)] = lr[k]
 	_task_sb = d.get("task_sb", [75, 100, 125])
-	_all_tasks_booster = int(d.get("all_tasks_random_booster_charges", 1))
+	_all_tasks_booster = int(d.get("all_tasks_random_any_booster_charges", 1))
 
 func _default_clock() -> int:
 	return int(Time.get_unix_time_from_system())
@@ -187,7 +187,7 @@ func claim_task(task_index: int) -> Dictionary:
 		return {"ok": false, "reason": "already_claimed"}
 	return {"ok": true, "sb": sb, "tx": tx}
 
-## Claim the all-three-tasks bonus (1 random booster charge) once per day.
+## Claim the all-three-tasks bonus (1 random-any booster charge, SB-M39-054) once per day.
 func claim_all_tasks_bonus() -> Dictionary:
 	_sync_tasks_to_today()
 	if _today() < _tasks_day:
@@ -196,9 +196,9 @@ func claim_all_tasks_bonus() -> Dictionary:
 		return {"ok": false, "reason": "not_all_done"}
 	var today := _today()
 	var tx := "daily_all_tasks:%d" % today
-	if not _reward.grant(tx, {"random_booster_charges": _all_tasks_booster}):
+	if not _reward.grant(tx, {"random_any_booster_charges": _all_tasks_booster}):
 		return {"ok": false, "reason": "already_claimed"}
-	return {"ok": true, "random_booster_charges": _all_tasks_booster, "tx": tx}
+	return {"ok": true, "random_any_booster_charges": _all_tasks_booster, "tx": tx}
 
 # --------------------------------------------------------------- snapshot ----
 

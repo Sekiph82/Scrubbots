@@ -5,6 +5,6 @@
   "status": "CATCH-UP REWARDS NOT CONFIGURED — the capped reward sequence needs an owner decision (and M56 simulation) before the track is offered. The comeback summary itself grants nothing.",
   "absence_hours": 48,
   "catchup_expire_days": 7,
-  "approved_reward_types": ["scrub_bucks", "bot_parts", "standard_card_packs", "premium_card_packs", "random_booster_charges", "selected_booster_charges"],
+  "approved_reward_types": ["scrub_bucks", "bot_parts", "standard_card_packs", "premium_card_packs", "random_any_booster_charges", "selected_booster_charges"],
   "catchup_steps": []
 }

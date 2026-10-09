@@ -115,6 +115,15 @@ func _validate_values(data: Dictionary) -> String:
 		if not boosters.has(id): return "boosters.%s missing" % id
 		var price = IntDomain.nonneg_int(boosters.get(id, {}).get("price_sb", null))
 		if price == null: return "boosters.%s.price_sb must be a non-negative integer" % id
+	# SB-M39-054: canonical reward bundles use the unambiguous random-any key only; the legacy
+	# "random_booster_charges" (once read as "a charge of the RANDOM booster") is refused here.
+	for table in [data.get("gift_meter", {}).get("milestones", {}), data.get("daily", {}).get("login_rewards", {})]:
+		if typeof(table) != TYPE_DICTIONARY: continue
+		for b in table.values():
+			if typeof(b) == TYPE_DICTIONARY and b.has("random_booster_charges"):
+				return "legacy reward key random_booster_charges: use random_any_booster_charges"
+	if data.get("daily", {}).has("all_tasks_random_booster_charges"):
+		return "legacy daily.all_tasks_random_booster_charges: use all_tasks_random_any_booster_charges"
 	return ""
 
 func is_ok() -> bool:

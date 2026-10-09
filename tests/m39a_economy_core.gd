@@ -108,7 +108,7 @@ func _gift_meter_full_cycle() -> void:
 	var packs := [0]
 	r.register_handler("standard_card_packs", func(a): packs[0] += a)
 	r.register_handler("premium_card_packs", func(a): packs[0] += a)
-	r.register_handler("random_booster_charges", func(_a): pass)
+	r.register_handler("random_any_booster_charges", func(_a): pass)
 	r.register_handler("selected_booster_charges", func(_a): pass)
 	r.register_handler("guaranteed_new_cards", func(_a): pass)
 	r.register_handler("guaranteed_new_fallback_sb", func(a): w.credit(EconomyWallet.SCRUB_BUCKS, a))

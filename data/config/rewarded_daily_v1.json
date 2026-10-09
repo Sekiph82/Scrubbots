@@ -6,7 +6,7 @@
   "slots": [
     {"slot": 1, "requires_ad": false, "reward": {"scrub_bucks": 100}},
     {"slot": 2, "requires_ad": true, "reward": {"standard_card_packs": 1}},
-    {"slot": 3, "requires_ad": true, "reward": {"random_booster_charges": 1}},
+    {"slot": 3, "requires_ad": true, "reward": {"random_any_booster_charges": 1}},
     {"slot": 4, "requires_ad": true, "reward": {"scrub_bucks": 250, "standard_card_packs": 1}},
     {"slot": 5, "requires_ad": true, "reward": {"scrub_bucks": 300, "selected_booster_charges": 1, "premium_card_packs": 1}}
   ]
