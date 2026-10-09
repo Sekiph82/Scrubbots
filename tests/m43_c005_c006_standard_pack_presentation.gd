@@ -8,6 +8,7 @@ extends SceneTree
 ##
 ## Run: godot --headless --path . -s res://tests/m43_c005_c006_standard_pack_presentation.gd
 
+const PackRouteProbe = preload("res://tests/support/pack_route_probe.gd")
 const StandardPackCeremony = preload("res://scripts/ui/ceremony/standard_pack_ceremony.gd")
 const StandardPackModel = preload("res://scripts/ui/ceremony/standard_pack_model.gd")
 const CollectionCardCatalog = preload("res://scripts/collection/collection_card_catalog.gd")
@@ -245,26 +246,35 @@ func _v07_mixed_routing() -> void:
 	var p = await _to_await(m)
 	var dest_pt := {"collection": _center(p.get_destination("collection")), "exchange": _center(p.get_destination("exchange"))}
 	var cvs: Array = p.get_card_views()
-	var start: Array = cvs.map(func(cv): return cv.face_center())
-	var mid_seen := [false, false, false]
-	var toward := [true, true, true]
 	var targets: Array = cvs.map(func(cv): return cv.destination_point())
+	# QA-R01: deterministic mid-route geometry through the PRODUCTION CardView route setter
+	# (probe route 0.5, restored to 0 before the real Tap 2) - no scheduler-frame sampling.
+	var travel := [false, false, false]
+	var sensitive := [false, false, false]
+	var restored := true
+	for i in range(3):
+		var d := StandardPackCeremony.destination_of(m["cards"][i])
+		var own: Vector2 = dest_pt[d]
+		var other: Vector2 = dest_pt["exchange" if d == "collection" else "collection"]
+		var pr: Dictionary = PackRouteProbe.probe(cvs[i])
+		travel[i] = pr["visible"] and PackRouteProbe.mid_ok(pr["slot"], pr["start"], own, other, pr["mid"])
+		sensitive[i] = PackRouteProbe.rejects_misroutes(pr["slot"], pr["start"], own, other)
+		restored = restored and pr["restored"]
+	_ok(travel == [true, true, true] and restored, "each card's intermediate route state is visible, strictly between its slot and its OWN destination, closer than the start (probe restored)")
+	_ok(sensitive == [true, true, true], "sensitivity: stuck-at-slot, jumped-to-destination and wrong-destination travel are all rejected")
+	var arrived_order: Array = []
+	for cv in cvs:
+		cv.arrived.connect(func(idx): arrived_order.append(idx))
 	_tap(p)
 	var log: Array = p.route_log()
 	for _g in range(900):   # capped: a regression fails, never hangs
 		if not is_instance_valid(p) or p.phase() != "ROUTING":
 			break
-		for i in range(3):
-			var cv = cvs[i]
-			if cv.route > 0.0 and cv.route < 1.0:
-				mid_seen[i] = true
-				var own: Vector2 = dest_pt[StandardPackCeremony.destination_of(m["cards"][i])]
-				toward[i] = toward[i] and cv.face_center().distance_to(own) < start[i].distance_to(own) and cv.is_visible_in_tree()
 		log = p.route_log()
 		await process_frame
 	var want: Array = [[0, "collection"], [1, "exchange"], [2, "collection"]]
 	_ok(log == want, "route destinations follow committed NEW/DUPLICATE %s" % str(log))
-	_ok(mid_seen == [true, true, true] and toward == [true, true, true], "each card visibly travels (observed mid-route) toward its own destination")
+	_ok(arrived_order == [0, 1, 2], "real routing: every card arrived exactly once, in draw order %s" % str(arrived_order))
 	var targets_ok := true
 	for i in range(3):
 		targets_ok = targets_ok and targets[i] == dest_pt[want[i][1]]
