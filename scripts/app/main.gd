@@ -136,6 +136,7 @@ func _ready() -> void:
 	feel = FeedbackAdapter.new()
 	feel.bind(get_tree(), app_state.effects if app_state != null else null)
 	_results.set_feedback(feel)   # M43-C005F-003/004: presentation-only Results feel
+	_home.set_feedback(feel)      # M43-C005F-PHASE4 F012: Home state-change micro feel
 	ceremonies = CeremonyPresenter.new()
 	ceremonies.bind(_modals, app_state)
 	packs = PackPresenter.new()
@@ -518,8 +519,19 @@ func _bind_terminal(host) -> void:
 	if completion == null:
 		return
 	completion.terminal_reached.connect(func(status, _detail):
-		if host == _gameplay_host:
-			nav.on_gameplay_terminal(nav.attempt_id(), status, int(host.progression_level)))
+		if host == _gameplay_host and nav.on_gameplay_terminal(nav.attempt_id(), status, int(host.progression_level)):
+			_terminal_bridge(host, String(status)))
+
+## M43-C005F-PHASE4 (SB-M43-C005F-010): gameplay-complete -> Results bridge. Fire-and-forget
+## decoration AFTER navigation already accepted the terminal (Results is on screen): one SMALL
+## spark on the HUD robot portrait, still visible under the Results dim, keyed by the terminal
+## attempt so a duplicate / stale signal (refused by nav anyway) or a re-show never replays.
+## WON only: Results owns the WIN confetti (F003) and a loss gets no celebratory spark. The
+## adapter defers all plugin work, so nothing here can delay or break the Results route.
+func _terminal_bridge(host, status: String) -> void:
+	if feel == null or status != "WON" or not host.has_method("get_screen") or host.get_screen() == null:
+		return
+	feel.play("SMALL", host.get_screen().get_profile_portrait(), "c005f010:a%d:L%d" % [nav.attempt_id(), int(host.progression_level)])
 
 ## RESULTS (WON) -> next canonical frontier, only when it has content. Exactly one
 ## accepted launch per Results: the first success leaves RESULTS, so every later/rapid
