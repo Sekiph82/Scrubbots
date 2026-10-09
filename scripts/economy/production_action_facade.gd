@@ -128,14 +128,20 @@ func start_rewarded_daily(slot: int, token: String = "") -> Dictionary:
 func claim_daily_login() -> Dictionary:
 	return _finish("claim_daily_login", _economy.daily.claim_login())
 
+## M43-C005F-PHASE3: results carry presentation-only identity copied from the input (the task
+## index / Gift occurrence id); the grant itself is unchanged.
 func claim_daily_task(task_index: int) -> Dictionary:
-	return _finish("claim_daily_task", _economy.daily.claim_task(task_index))
+	var r: Dictionary = _economy.daily.claim_task(task_index)
+	r["task_index"] = task_index
+	return _finish("claim_daily_task", r)
 
 func claim_daily_all_tasks() -> Dictionary:
 	return _finish("claim_daily_all_tasks", _economy.daily.claim_all_tasks_bonus())
 
 func claim_gift(occurrence_id: String) -> Dictionary:
-	return _finish("claim_gift", _economy.gift.claim(occurrence_id, _economy.reward, _economy.config))
+	var r: Dictionary = _economy.gift.claim(occurrence_id, _economy.reward, _economy.config)
+	r["occurrence_id"] = occurrence_id
+	return _finish("claim_gift", r)
 
 func claim_collection_rewards() -> Dictionary:
 	return _finish("claim_collection_rewards", _economy.collection.claim_pending_rewards())

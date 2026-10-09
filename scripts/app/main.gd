@@ -34,6 +34,7 @@ const RobotsScreen = preload("res://scripts/ui/robots/robots_screen.gd")
 const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
 const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
 const MetaFeedback = preload("res://scripts/ui/feel/meta_feedback.gd")
+const MetaRewardFeel = preload("res://scripts/ui/feel/meta_reward_feel.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
 const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd")
 ## BottomNav tabs the app root serves (RANKS waits for the SB-M43-131 owner policy).
@@ -82,6 +83,8 @@ var meta_feedback = null
 ## Ephemeral: never saved; cancelled + unbound when the app root leaves the tree.
 ## Handed (presentation-only) to ResultsScreen; a pack ceremony takes it via bind_feedback().
 var feel = null
+## M43-C005F-PHASE3 (F006 / F008 / F009): committed meta reward / acquisition -> feel intents.
+var meta_feel = null
 
 func _enter_tree() -> void:
 	_boot()
@@ -146,6 +149,9 @@ func _ready() -> void:
 	meta_feedback.bind_stack(_modals)
 	meta_feedback.ui_gate = func(): return nav != null and nav.current() == NavigationController.Route.HOME
 	ceremonies.ceremony_shown.connect(meta_feedback.on_ceremony_shown)
+	meta_feel = MetaRewardFeel.new()
+	if app_state != null and app_state.economy != null:
+		meta_feel.bind(feel, _modals, ceremonies, app_state.actions, app_state.economy.rewarded, app_state.effects)
 	# M43-C012: a genuine absence opens a return window (summary shown once on Home).
 	if app_state != null and app_state.economy != null and not app_state.is_blocked:
 		app_state.economy.returns.on_active()
@@ -400,6 +406,9 @@ func get_pack_presenter():
 func get_ceremonies():
 	return ceremonies
 
+func get_meta_reward_feel():
+	return meta_feel
+
 ## M41 V01 Settings panel (M42: opened from the Home bottom-nav SETTINGS button).
 func _build_settings_entry() -> void:
 	_settings_panel = SettingsPanelScene.instantiate()
@@ -468,6 +477,7 @@ func launch_gameplay(parent: Node = null) -> Dictionary:
 		last_launch = {"ok": false, "reason": err, "launch": launch}
 		return last_launch
 	_gameplay_host = host
+	meta_feel.bind_gameplay(host)   # F009: committed booster use (the host owns its facade)
 	last_launch = {"ok": true, "reason": "", "launch": launch, "host": host}
 	return last_launch
 
