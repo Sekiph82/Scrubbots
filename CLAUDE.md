@@ -14,6 +14,17 @@ Historical pre-Difficulty-V1 manual is archived at:
 - **Root `TASKS.md` is ChatGPT-write-owned. Claude/Codex must read it but must not edit it during implementation, validation, or handoff. ChatGPT updates it after independent audits, owner-gate decisions, and before handing the next prompt to an implementer.**
 - ChatGPT is the independent auditor. Claude/Codex implement and test; they do not self-award `AUDITED_PASS`.
 
+## 0A. Owner execution location: ONE DESKTOP WORKSPACE / ZERO TEMP [LOCKED 2026-10-10]
+
+**The newest explicit owner instruction overrides ALL earlier small/bounded/isolated TEMP-worktree instructions, including old prompts.** Claude performs ALL ScrubBots implementation, tests, Git operations, log writing and debugging directly in the ONE existing checkout:
+`C:\Users\sekip\Desktop\ScrubBots`.
+
+- **No TEMP files or directories of ANY size, under ANY location**: no `%TEMP%`, `%TMP%`, `AppData\Local\Temp`, `/tmp`, `scratchpad`, Git worktrees, duplicate clones, sparse checkouts in separate folders, exported inspection packs, copied projects, test-output scratch directories or generated alternate workspaces.
+- Do not use temporary working directories merely because they are small or bounded. Do not create an alternate workspace inside Desktop. All code/tests/logs must be in existing permanent project paths.
+- Do not launch tests/tools that REQUIRE writing temporary files outside the single Desktop checkout. If such an operation is unavoidable, STOP `BLOCKED_ZERO_TEMP_DESKTOP_ONLY` and report it before any temporary artifact is created. No workaround involving a hidden cache/copy.
+- Safely fetch and fast-forward the existing Desktop `main` only when that preserves EVERY owner-dirty tracked file, untracked file and stash; stage only authorized task files; never destructive reset/clean/restore/checkout, blind stash or force-push. If a conflict or unwanted mutation threatens owner's `project.godot` / art / scenes, STOP rather than switch to TEMP.
+- `TASKS.md` stays exclusively ChatGPT-write-owned. When a historical task prompt conflicts with this section, this section wins; Claude must note this owner override in the builder log.
+
 ## 1. Required reading order
 
 Before material implementation:
