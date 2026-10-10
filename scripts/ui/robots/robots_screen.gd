@@ -14,6 +14,7 @@ extends RefCounted
 ## Robot selection is presentation/meta only: nothing here reaches BoardState, targeting,
 ## routing, solver or batch legality. "Seen" marks are presentation (dirty flag, no save per view).
 
+const TouchScroll = preload("res://scripts/ui/components/touch_scroll.gd")
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
@@ -61,6 +62,7 @@ static func open(stack, app, ceremonies = null) -> BasePopup:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	scroll.add_child(list)
+	TouchScroll.enable(scroll)   # M47-TOUCH-R01: finger swipe scrolls over rows / buttons
 	var new_ids := unseen_robots(e)
 	p.set_meta("new_on_open", new_ids)
 	for r in RobotRoster.load_roster()["robots"]:

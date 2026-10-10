@@ -229,7 +229,8 @@ func _m10() -> void:
 	var e = _eco()
 	var a = _root.get_app_state()
 	var b := HomeBadges.compute(a)
-	_ok(b == {"tasks": 0, "daily": 1, "gift_bar": 0, "robots": 0, "collection": 0, "events": 0}, "fresh: only Daily %s" % str(b))
+	# M47-FAMILY-APK-TOUCH-R01 owner decision: today's free Rewarded Ads slot is actionable on a fresh day.
+	_ok(b == {"tasks": 0, "daily": 1, "gift_bar": 0, "robots": 0, "collection": 0, "events": 0, "rewarded_ads": 1}, "fresh: only Daily + today's free Rewarded Ads slot %s" % str(b))
 	e.daily.mark_task_done(0)
 	e.gift.add_streak_sb("m10", 60)
 	e.wallet.credit("bot_parts", 250)
@@ -241,6 +242,7 @@ func _m10() -> void:
 	_ok(h.get_region("Shortcut_tasks").badge.visible and h.get_region("Shortcut_collection").badge.visible and h.get_region("NavBadge_robots").visible, "badges rendered on Home + BottomNav")
 	a.actions.claim_daily_task(0)
 	a.actions.claim_daily_login()
+	a.actions.claim_rewarded_daily_free()   # slot 1 claimed; slot 2 needs an ad and no provider -> not actionable
 	for o in e.gift.claimable():
 		a.actions.claim_gift(o["id"])
 	a.actions.unlock_next_robot()

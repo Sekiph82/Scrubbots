@@ -367,7 +367,12 @@ func _s14() -> void:
 	var r: Rect2 = cta.get_global_rect()
 	_ok(cta.get_parent() == home.get_region("Shortcut_collection") and r.size.is_equal_approx(col.size) and is_equal_approx(r.position.x, col.position.x) and r.position.y > col.end.y, "CTA still under COLLECTION at the same size / x (%s vs %s)" % [r, col])
 	var badges: Dictionary = HomeBadges.compute(a)
-	_ok(badges.keys() == ["tasks", "daily", "gift_bar", "robots", "collection", "events"] and not badges.has("rewarded_ads"), "HomeBadges model has no Rewarded Ads badge %s" % str(badges.keys()))
+	# Superseded by the M47-FAMILY-APK-TOUCH-R01 owner decision (OWNER_DEVICE_FEEDBACK_V02): the CTA now
+	# carries a red "1" while the ONE sequential frontier slot is actionable; the CTA geometry above is unchanged.
+	var rd = a.economy.rewarded_daily
+	var actionable := ["ready_free", "ready_ad"].has(rd.slot_state(rd.current_slot()))
+	_ok(badges.has("rewarded_ads") and int(badges["rewarded_ads"]) == (1 if actionable else 0) and cta.get("badge").visible == actionable,
+		"HomeBadges rewarded_ads follows the sequential frontier (%s, %s) %s" % [rd.slot_state(rd.current_slot()), str(actionable), str(badges)])
 	_complete("s14_home_cta_no_badge")
 
 # ------------------------------------------------------------------- infra -----
