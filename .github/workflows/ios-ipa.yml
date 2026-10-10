@@ -1,8 +1,25 @@
 name: iOS IPA
 
 # Actions sekmesinden "Run workflow" ile elle calistirilir.
+# M47-FAMILY-APK-IOS-EXPORT-R02: clean-import / package-hygiene gate (same signing policy:
+# UNSIGNED IPA, the owner signs it with xtool at install time).
+#   - checkout workspace WITHOUT the nine owner-excluded developer trees
+#     (.github/android/family_first10_export_exclusions.txt, same as the Android Family export)
+#     and without the single owner-acknowledged broken, unused legacy file
+#     assets/ui/final/gameplay/buttons/icon_pause.png (truncated PNG since its only commit
+#     fbda9e71; owner review M28-C002-C002 S4 "icon_pause.png is a broken PNG", native glyph used;
+#     VISUAL_ASSET_INDEX "LEGACY / EXTRA", canonical controls/button_pause.png; zero runtime
+#     references). The repository file itself is untouched;
+#   - the Godot import is FAIL-CLOSED (no "|| true"): any failed resource load / import, corrupt
+#     file, script or parse error fails the run; the full import log is kept;
+#   - the PCK inside the built IPA is scanned (zero excluded developer paths, every runtime
+#     res:// reference present, main scene) and boots headless; the inner IPA SHA-256 is logged.
+
 on:
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 env:
   GODOT_VERSION: 4.7.2
@@ -13,6 +30,31 @@ jobs:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/coordination/
+            !/docs/
+            !/tests/
+            !/tools/
+            !/level_factory/
+            !/content_pipeline/
+            !/assets/art/references/
+            !/assets/ui/candidates/
+            !/assets/ui/generated/
+            !/assets/ui/final/gameplay/buttons/icon_pause.png
+
+      - name: Import workspace has only runtime sources
+        run: |
+          bad=0
+          while read -r p; do
+            case "$p" in ''|'#'*) continue;; esac
+            if [ -e "$p" ]; then echo "::error::excluded developer tree present: $p"; bad=1; else echo "absent: $p"; fi
+          done < .github/android/family_first10_export_exclusions.txt
+          if [ -e assets/ui/final/gameplay/buttons/icon_pause.png ]; then echo "::error::broken legacy icon_pause.png present"; bad=1; else echo "absent: assets/ui/final/gameplay/buttons/icon_pause.png (owner-acknowledged broken, unused)"; fi
+          exit $bad
 
       - name: Godot + export templates
         run: |
@@ -21,6 +63,7 @@ jobs:
           curl -fsSL -o tpl.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
           TPL="$HOME/Library/Application Support/Godot/export_templates/${GODOT_VERSION}.stable"
           mkdir -p "$TPL" && unzip -q tpl.tpz -d /tmp/tpl && mv /tmp/tpl/templates/* "$TPL/"
+          rm -f godot.zip tpl.tpz
           echo "GODOT=$PWD/Godot.app/Contents/MacOS/Godot" >> "$GITHUB_ENV"
 
       # export_presets.cfg repoda gitignore'da; CI icin burada uretiliyor.
@@ -34,8 +77,8 @@ jobs:
           runnable=true
           export_filter="all_resources"
           include_filter=""
-          ; Gelistirme/denetim dosyalari oyuna girmesin (coordination 1.7 GB)
-          exclude_filter="coordination/*, docs/*, tests/*, tools/*, level_factory/*, content_pipeline/*, assets/art/references/*, assets/ui/generated/*, assets/ui/candidates/*"
+          ; Gelistirme/denetim dosyalari oyuna girmesin (coordination 1.7 GB); workspace'te de yoklar
+          exclude_filter="coordination/*, docs/*, tests/*, tools/*, level_factory/*, content_pipeline/*, assets/art/references/*, assets/ui/generated/*, assets/ui/candidates/*, assets/ui/final/gameplay/buttons/icon_pause.png, .github/*"
           export_path="build/ios/${APP_NAME}.ipa"
 
           [preset.0.options]
@@ -57,12 +100,32 @@ jobs:
           icons/notification_60x60="res://assets/ui/final/branding/app_icon_ios_1024.png"
           CFG
 
+      - name: Godot import (fail-closed)
+        run: |
+          mkdir -p out
+          set +e
+          "$GODOT" --headless --import > out/import.log 2>&1
+          ec=$?
+          set -e
+          echo "import exit code: $ec"
+          # Genuine failed imports / broken resources / script errors. WARNING lines are not matched.
+          if grep -nE "Error loading|Error importing|ERR_FILE_CORRUPT|SCRIPT ERROR|Parse Error|Failed loading resource|Cannot open file|Resource file not found" out/import.log; then
+            echo "::error::Godot import reported failed / corrupt resources (see out/import.log)"
+            exit 1
+          fi
+          [ "$ec" -eq 0 ] || { echo "::error::Godot import exited $ec"; exit 1; }
+          echo "IMPORT_GATE PASS: exit 0, zero failed-import / corrupt / script-error lines" | tee out/import_gate.txt
+          grep -c "^ERROR" out/import.log | sed 's/^/total ERROR-prefixed lines (all printed below): /'
+          grep "^ERROR" out/import.log || true
+
       - name: Godot export (Xcode projesi)
         run: |
           mkdir -p build/ios
-          "$GODOT" --headless --import || true
-          "$GODOT" --headless --export-release "iOS" "build/ios/${APP_NAME}.ipa" > export.log 2>&1 \
-            || { grep -iE "error|fail|invalid|missing" export.log | tail -25 | sed 's/^/::error::/'; exit 1; }
+          "$GODOT" --headless --export-release "iOS" "build/ios/${APP_NAME}.ipa" > out/export.log 2>&1 \
+            || { grep -iE "error|fail|invalid|missing" out/export.log | tail -25 | sed 's/^/::error::/'; exit 1; }
+          if grep -nE "Error loading|ERR_FILE_CORRUPT|SCRIPT ERROR|Failed loading resource" out/export.log; then
+            echo "::error::export reported failed resources"; exit 1
+          fi
           ls -la build/ios
 
       - name: Xcode build (imzasiz)
@@ -77,7 +140,57 @@ jobs:
           cp -R dd/Build/Products/Release-iphoneos/*.app Payload/
           zip -qry "$GITHUB_WORKSPACE/${APP_NAME}.ipa" Payload
 
+      - name: IPA inventory + scan of the PCK inside the IPA
+        run: |
+          IPA="${APP_NAME}.ipa"
+          shasum -a 256 "$IPA" | tee out/ipa_sha256.txt
+          stat -f '%N %z bytes' "$IPA" | tee out/ipa_size.txt
+          unzip -Z1 "$IPA" > out/ipa_entries.txt
+          wc -l < out/ipa_entries.txt | sed 's/^/ipa entries: /'
+          PCK_IN_IPA=$(grep -E '^Payload/[^/]+\.app/[^/]+\.pck$' out/ipa_entries.txt | head -1)
+          echo "pck inside IPA: $PCK_IN_IPA"
+          test -n "$PCK_IN_IPA"
+          mkdir -p "$RUNNER_TEMP/ipa_x" && unzip -q -o "$IPA" "$PCK_IN_IPA" -d "$RUNNER_TEMP/ipa_x"
+          PCK="$RUNNER_TEMP/ipa_x/$PCK_IN_IPA"
+          shasum -a 256 "$PCK" | tee -a out/ipa_sha256.txt
+          echo "PCK=$PCK" >> "$GITHUB_ENV"
+          # Every res:// file literal referenced by shipping scripts / scenes / data / addons / project
+          # settings that exists in this workspace must be packaged (editor-only plugin.cfg excluded).
+          grep -rhoE 'res://[A-Za-z0-9_./-]+\.[A-Za-z0-9]+' scripts scenes data addons project.godot default_bus_layout.tres 2>/dev/null \
+            | sort -u | grep -v '/plugin\.cfg$' | while read -r p; do if [ -f "${p#res://}" ]; then echo "$p"; fi; done > out/required_runtime_paths.txt
+          wc -l < out/required_runtime_paths.txt | sed 's/^/required runtime paths: /'
+          grep -c 'res://scripts/ui/components/touch_scroll.gd' out/required_runtime_paths.txt | sed 's/^/TouchScroll helper required: /'
+          cp -r .github/android/pck_probe "$RUNNER_TEMP/pck_probe"
+          "$GODOT" --headless --path "$RUNNER_TEMP/pck_probe" -s res://pck_scan.gd -- \
+            "$PCK" "$PWD/.github/android/family_first10_export_exclusions.txt" \
+            "$PWD/out/required_runtime_paths.txt" "$PWD/out/ipa_pck_scan_report.json" 2>&1 | tee out/ipa_pck_scan.log
+          grep -q "verdict=PASS" out/ipa_pck_scan.log
+          grep -c "res://assets/ui/final/gameplay/buttons/icon_pause" out/ipa_pck_scan_report_files.txt | sed 's/^/icon_pause entries in pack: /' || true
+
+      - name: Headless boot of the IPA's pack (offline)
+        run: |
+          mkdir -p "$RUNNER_TEMP/boot" && cd "$RUNNER_TEMP/boot"
+          "$GODOT" --headless --main-pack "$PCK" --quit-after 600 > "$GITHUB_WORKSPACE/out/boot.log" 2>&1 || true
+          cd "$GITHUB_WORKSPACE"
+          tail -15 out/boot.log
+          if grep -E "SCRIPT ERROR|Parse Error|Failed loading resource|Cannot open file|Resource file not found|Failed to load script|Error loading" out/boot.log; then
+            echo "::error::IPA pack boot reported missing / broken resources"; exit 1
+          fi
+          {
+            echo "## ${APP_NAME}.ipa (unsigned)"
+            echo "- source SHA: \`${GITHUB_SHA}\`"
+            echo '```'; cat out/import_gate.txt out/ipa_size.txt out/ipa_sha256.txt; grep -h "PCK_SCAN" out/ipa_pck_scan.log; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
       - uses: actions/upload-artifact@v4
         with:
           name: ${{ env.APP_NAME }}-ipa
           path: ${{ env.APP_NAME }}.ipa
+
+      - name: Upload import log + IPA scan reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.APP_NAME }}-ipa-inspection
+          path: out/
+          retention-days: 30
