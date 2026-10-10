@@ -1,0 +1,16 @@
+# M47-FAMILY-APK-C001 — mandatory Family export exclusions (owner lock:
+# coordination/sessions/M47-FAMILY-APK-C001/OWNER_EXPORT_HYGIENE_V01.md).
+# One repository-relative tree per line. Used verbatim by
+# .github/workflows/android-family-first10.yml for (1) the export job's sparse
+# checkout (the trees are ABSENT from the export workspace), (2) the preset
+# exclude_filter (defence in depth) and (3) the packaged-path scans of the
+# exported PCK and APK, which must find ZERO paths under any of these prefixes.
+coordination
+docs
+tests
+tools
+level_factory
+content_pipeline
+assets/art/references
+assets/ui/candidates
+assets/ui/generated

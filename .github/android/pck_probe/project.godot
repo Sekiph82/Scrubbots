@@ -1,0 +1,7 @@
+; M47-FAMILY-APK-C001 — isolated inspection project (NOT the game). It only mounts an exported
+; ScrubBots PCK and lists / checks what that pack actually contains. See pck_scan.gd.
+config_version=5
+
+[application]
+
+config/name="ScrubBots PCK inspection probe"
