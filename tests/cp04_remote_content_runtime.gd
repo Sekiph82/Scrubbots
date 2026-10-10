@@ -23,7 +23,7 @@ var EXPECTED := ["c01_https_only", "c02_manifest_valid_declared_order", "c03_dup
 	"c09_missing_pack_diff", "c10_byte_length", "c11_pack_sha", "c12_zip_member_contract", "c13_member_sha",
 	"c14_pack_schema", "c15_executable_json", "c16_level_data", "c17_production_validator", "c18_supply_plan",
 	"c19_identity_binding", "c20_builtin_collision", "c21_declared_order_no_numeric_sort", "c22_append_only_successor",
-	"c23_reorder_removal_rejected", "c24_disabled_schedules_retain_lkg", "c25_resolver_builtin_then_remote",
+	"c23_reorder_removal_rejected", "c24_schedules_retain_lkg_disabled_activates", "c25_resolver_builtin_then_remote",
 	"c26_missing_remote_frontier", "c27_orders_context_composite", "c28_install_never_mutates_save"]
 
 var _fail := 0
@@ -509,17 +509,20 @@ func _c23() -> void:
 	_case("c23_reorder_removal_rejected")
 
 func _c24() -> void:
-	print("[c24 disabled_levels / schedules are not silently ignored before CP06]")
+	print("[c24 schedules stay unsupported; disabled_levels is CP06-supported (owner B)]")
 	var a := _pack("fam-a", 1, {"fam_l011": "level_002_apple"})
 	var res := await _activate(_root("c24"), [a], [["fam_l011", "fam-a"]])
 	var m: RCM = res[0]
 	var t = res[1]
-	for extra in [{"disabled_levels": ["fam_l011"]}, {"schedules": [{"target_kind": "level", "target_id": "fam_l011", "not_before": "2026-10-07T00:00:00Z"}]}]:
-		t.set_manifest(F.manifest(2, [a], [["fam_l011", "fam-a"]], "0.0.0", extra), [a])
-		var r: Dictionary = await m.refresh()
-		_ok(not r["ok"] and r["reason"] == "UNSUPPORTED_RUNTIME_SEMANTICS" and m.status()["content_version"] == 1 and m.remote_levels().size() == 1,
-			"%s -> unsupported; LKG v1 retained" % str(extra.keys()))
-	_case("c24_disabled_schedules_retain_lkg")
+	t.set_manifest(F.manifest(2, [a], [["fam_l011", "fam-a"]], "0.0.0", {"schedules": [{"target_kind": "level", "target_id": "fam_l011", "not_before": "2026-10-07T00:00:00Z"}]}), [a])
+	var r: Dictionary = await m.refresh()
+	_ok(not r["ok"] and r["reason"] == "UNSUPPORTED_RUNTIME_SEMANTICS" and m.status()["content_version"] == 1 and m.remote_levels().size() == 1,
+		"schedules -> unsupported; LKG v1 retained")
+	t.set_manifest(F.manifest(2, [a], [["fam_l011", "fam-a"]], "0.0.0", {"disabled_levels": ["fam_l011"]}), [a])
+	r = await m.refresh()
+	_ok(r["ok"] and m.status()["content_version"] == 2 and m.remote_levels().size() == 1 and m.disabled_level_ids() == ["fam_l011"],
+		"disabled_levels -> activated v2, level kept in order, exact disabled id recorded")
+	_case("c24_schedules_retain_lkg_disabled_activates")
 
 func _app_with_remote(tag: String) -> Array:
 	ProjectSettings.set_setting("application/config/version", "1.0.0")

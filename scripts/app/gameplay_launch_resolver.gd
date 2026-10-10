@@ -16,6 +16,9 @@ const CONTENT_MISSING := "CONTENT_MISSING"
 const CATALOG_INVALID := "CATALOG_INVALID"
 const APP_BLOCKED := "APP_BLOCKED"
 const NO_APP_STATE := "NO_APP_STATE"
+## CP06: the frontier entry is disabled by the verified active manifest. Never launched; the
+## owner-B skip (AppState.reconcile_disabled_frontier) moves the frontier past it once saved.
+const LEVEL_DISABLED := "LEVEL_DISABLED"
 
 ## catalog: optional pre-loaded LevelCatalog (tests); default loads the
 ## production manifest and fails closed on any validation error.
@@ -35,8 +38,11 @@ static func resolve(app_state, catalog = null) -> Dictionary:
 				cat = null
 		if cat == null:
 			return {"ok": false, "reason": CATALOG_INVALID, "level": level}
+	var content = app_state.get("content")
 	for e in cat.get_entries_ordered():
 		if int(e.order) == level:
+			if content != null and content.is_level_disabled(String(e.id)):
+				return {"ok": false, "reason": LEVEL_DISABLED, "level": level, "entry_id": e.id}
 			return {"ok": true, "level": level, "entry_id": e.id,
 				"level_path": e.level_path, "difficulty": e.difficulty,
 				"supply_plan_path": e.supply_plan_path, "preview_path": e.preview_path}

@@ -16,11 +16,19 @@ extends RefCounted
 ## duplicate/reentrant WON callback cannot advance progression twice.
 
 const DifficultyProgressionV1 = preload("res://scripts/difficulty/difficulty_progression_v1.gd")
+const ContentManifestV1 = preload("res://scripts/content_runtime/content_manifest_v1.gd")
 
 const SNAPSHOT_SCHEMA := "scrubbots.progression.v1"
+## CP06 (owner option B): v2 adds the skipped-level ledger. snapshot() emits v1 whenever the
+## ledger is empty, so a save without skips stays byte-compatible with pre-CP06 readers.
+const SNAPSHOT_SCHEMA_V2 := "scrubbots.progression.v2"
+const SKIP_FIELDS := ["content_version", "level_id", "level_number", "manifest_sha256"]
 
 var _current_level: int = 1
 var _completed: Dictionary = {}     ## level_number(int) -> true (first-clear set).
+## CP06: level_number(int) -> {level_number, level_id, content_version, manifest_sha256}.
+## A skipped level is NOT a first-clear: no win, no reward, not counted by completed_count().
+var _skipped: Dictionary = {}
 var _progression: DifficultyProgressionV1
 
 func _init(progression_model = null) -> void:
@@ -74,6 +82,51 @@ func is_completed(level_number: int) -> bool:
 func completed_count() -> int:
 	return _completed.size()
 
+# ------------------------------------------------------ disabled skip (CP06) ----
+
+## Owner option B: advance past the CURRENT frontier because the verified active remote
+## manifest disabled it. Not a win: no first-clear, no reward, no streak. Only the exact
+## frontier, once, with complete provenance; anything else returns false with zero mutation.
+## The caller (AppState) owns the disabled-membership check and the durable save/rollback.
+func record_skip(level_number: int, level_id: String, content_version: int, manifest_sha256: String) -> bool:
+	if level_number != _current_level or _completed.has(level_number) or _skipped.has(level_number):
+		return false
+	var rec := {"level_number": level_number, "level_id": level_id,
+		"content_version": content_version, "manifest_sha256": manifest_sha256}
+	if typeof(_skip_record(rec)) != TYPE_DICTIONARY:
+		return false
+	for r in _skipped.values():
+		if String(r["level_id"]).to_lower() == level_id.to_lower():
+			return false   # one level identity has one campaign order
+	_skipped[level_number] = rec
+	_current_level += 1
+	return true
+
+func is_skipped(level_number: int) -> bool:
+	return _skipped.has(level_number)
+
+## Skip ledger sorted by level number (deep copies).
+func skipped_records() -> Array:
+	var keys: Array = _skipped.keys()
+	keys.sort()
+	return keys.map(func(k): return _skipped[k].duplicate())
+
+## Normalized copy of a strict skip record, or null.
+func _skip_record(r):
+	if typeof(r) != TYPE_DICTIONARY:
+		return null
+	var k: Array = r.keys()
+	k.sort()
+	if k != SKIP_FIELDS:
+		return null
+	var n = _as_exact_int(r["level_number"])
+	var cv = _as_exact_int(r["content_version"])
+	if n == null or n < 1 or cv == null or cv < 1:
+		return null
+	if not ContentManifestV1.full_match("level_id", r["level_id"]) or not ContentManifestV1.full_match("sha256", r["manifest_sha256"]):
+		return null
+	return {"level_number": n, "level_id": String(r["level_id"]), "content_version": cv, "manifest_sha256": String(r["manifest_sha256"])}
+
 # ------------------------------------------------------ difficulty read ----
 
 func class_for(n: int) -> String:
@@ -93,10 +146,17 @@ func snapshot() -> Dictionary:
 	for k in _completed.keys():
 		completed_list.append(k)
 	completed_list.sort()
+	if _skipped.is_empty():
+		return {
+			"schema": SNAPSHOT_SCHEMA,
+			"current_level": _current_level,
+			"completed": completed_list,
+		}
 	return {
-		"schema": SNAPSHOT_SCHEMA,
+		"schema": SNAPSHOT_SCHEMA_V2,
 		"current_level": _current_level,
 		"completed": completed_list,
+		"skipped": skipped_records(),
 	}
 
 ## Import a versioned snapshot. Fail-closed: a malformed/incompatible snapshot
@@ -105,7 +165,8 @@ func snapshot() -> Dictionary:
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
 		return false
-	if s.get("schema", "") != SNAPSHOT_SCHEMA:
+	var schema = s.get("schema", "")
+	if schema != SNAPSHOT_SCHEMA and schema != SNAPSHOT_SCHEMA_V2:
 		return false
 	# Integer state must be an exact integer: JSON delivers whole numbers as int
 	# or integral float; a fractional value, NaN or INF fails closed rather than
@@ -124,20 +185,39 @@ func import_snapshot(s) -> bool:
 		if new_completed.has(iv):
 			return false   # duplicate id in a loaded snapshot => corruption, fail closed
 		new_completed[iv] = true
+	# CP06 v2 skip ledger (v1 has none): strict records, unique numbers and ids, disjoint
+	# from first-clears.
+	var new_skipped: Dictionary = {}
+	if schema == SNAPSHOT_SCHEMA_V2:
+		var skipped_raw = s.get("skipped", null)
+		if typeof(skipped_raw) != TYPE_ARRAY:
+			return false
+		var ids := {}
+		for r in skipped_raw:
+			var rec = _skip_record(r)
+			if typeof(rec) != TYPE_DICTIONARY or new_skipped.has(rec["level_number"]) or new_completed.has(rec["level_number"]):
+				return false
+			var fid := String(rec["level_id"]).to_lower()
+			if ids.has(fid):
+				return false
+			ids[fid] = true
+			new_skipped[rec["level_number"]] = rec
 	# Canonical shipping snapshot coherence (M37 V03, F-M37-V02-002): the game
 	# is forward-only with no player-facing Level Select, so a shipping-produced
-	# completed set is exactly the contiguous range 1..current_level-1. A gapped/
-	# future/current-included set is corrupt and fails closed. Debug snapshots
-	# built via debug_set_current_level are non-shipping and never round-tripped
-	# through this canonical import.
-	if new_completed.size() != cur_i - 1:
+	# history is exactly the contiguous range 1..current_level-1. CP06 (owner B):
+	# that history is completed ∪ skipped, the two sets disjoint (checked above).
+	# A gapped/future/current-included set is corrupt and fails closed. Debug
+	# snapshots built via debug_set_current_level are non-shipping and never
+	# round-tripped through this canonical import.
+	if new_completed.size() + new_skipped.size() != cur_i - 1:
 		return false
 	for n in range(1, cur_i):
-		if not new_completed.has(n):
+		if not new_completed.has(n) and not new_skipped.has(n):
 			return false
 	# All-or-nothing apply (nothing above mutated live state).
 	_current_level = cur_i
 	_completed = new_completed
+	_skipped = new_skipped
 	return true
 
 ## Returns the exact integer value of `v`, or null if `v` is not an exact

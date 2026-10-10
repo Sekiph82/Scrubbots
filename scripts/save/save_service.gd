@@ -16,7 +16,12 @@ extends RefCounted
 ## Test paths are injected; production defaults live under user://.
 
 const SCHEMA := "scrubbots.save"
-const VERSION := 1
+## Newest version this build reads. CP06 (owner B): version 2 = progression may carry the
+## skipped-level ledger (scrubbots.progression.v2). collect() writes the LOWEST version that
+## represents the state: 1 without skips (pre-CP06 builds keep reading it), 2 with skips (an
+## older build sees a future schema and refuses / never overwrites it instead of dropping skips).
+const VERSION := 2
+const LEGACY_VERSION := 1
 
 const AudioSettingsService = preload("res://scripts/audio/audio_settings_service.gd")
 const HapticsSettingsService = preload("res://scripts/haptics/haptics_settings_service.gd")
@@ -68,15 +73,16 @@ func _temp_path() -> String:
 # --------------------------------------------------------------- collect ----
 
 func collect() -> Dictionary:
+	var prog: Dictionary = _progression.snapshot()
 	return {
 		"schema": SCHEMA,
-		"version": VERSION,
+		"version": VERSION if prog.get("schema", "") == LevelProgressionService.SNAPSHOT_SCHEMA_V2 else LEGACY_VERSION,
 		"settings": {
 			"audio": _audio.snapshot(),
 			"haptics": _haptics.snapshot(),
 			"effects": _effects.snapshot(),
 		},
-		"progression": _progression.snapshot(),
+		"progression": prog,
 		"economy": _economy.snapshot(),
 	}
 
@@ -94,6 +100,11 @@ func validate_candidate(cand) -> Dictionary:
 		return {"ok": false, "reason": "bad_version_type"}   # fractional/NaN/non-int
 	if ver > VERSION:
 		return {"ok": false, "reason": "future_schema"}   # fail closed, no downgrade
+	# CP06: a skip ledger is only legal in a version-2 save (a v1 file is readable by pre-CP06
+	# builds, which would silently drop it).
+	var prog_sec = cand.get("progression", {})
+	if ver < VERSION and typeof(prog_sec) == TYPE_DICTIONARY and prog_sec.get("schema", "") == LevelProgressionService.SNAPSHOT_SCHEMA_V2:
+		return {"ok": false, "reason": "progression_schema_version_mismatch"}
 	# Settings shape.
 	var settings = cand.get("settings", {})
 	if typeof(settings) != TYPE_DICTIONARY:
@@ -157,14 +168,16 @@ func migrate(cand: Dictionary) -> Dictionary:
 	var v = IntDomain.exact_int(cand.get("version", null))
 	if v == null:
 		return cand
-	if v < VERSION:
+	# Pre-v1 fill only. A v1 save needs no rewrite for CP06: its v1 progression section IS the
+	# empty-skip-ledger state (LevelProgressionService imports v1 with skipped = {}).
+	if v < LEGACY_VERSION:
 		if not cand.has("economy"):
 			cand["economy"] = {}
 		if not cand.has("progression"):
 			cand["progression"] = {"schema": "scrubbots.progression.v1", "current_level": 1, "completed": []}
 		if not cand.has("settings"):
 			cand["settings"] = {"audio": {"master": 1.0, "music": 1.0, "sfx": 1.0}, "haptics": {"enabled": true}}
-		cand["version"] = VERSION
+		cand["version"] = LEGACY_VERSION
 	return cand
 
 # --------------------------------------------------------------- apply ----

@@ -18,6 +18,7 @@ const EN := {
 	"HOME_AREA_NUMBER": "AREA %d",
 	"HOME_LEVEL_COMING_SOON": "Level %d is coming soon.",
 	"HOME_LEVELS_UNAVAILABLE": "Levels unavailable (%s).",
+	"HOME_LEVEL_SKIPPED": "Level %s unavailable. Continuing at Level %d.",
 	"HOME_LOADING": "Loading...",
 	"HOME_SAVE_BLOCKED": "Save data is from a newer version. Update the game to continue.",
 	"HOME_PROFILE_LINE": "LEVEL %d · %s",
