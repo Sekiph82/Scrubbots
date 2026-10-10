@@ -1,0 +1,27 @@
+# M47-FAMILY-APK-IOS-EXPORT-R02 — CLAUDE CODE Implementation Prompt V01
+Date: 2026-10-10 | Repo Sekiph82/Scrubbots | Godot 4.7.2
+AUTHORITATIVE IMPLEMENTER = CLAUDE CODE ONLY. ChatGPT only prepares prompts, performs independent audit, and exclusively updates root TASKS.md.
+
+## Why this narrow task exists
+Independent review of Claude's M47 mobile-UX completion found source/UI A/B/C code acceptable and **new Android Family APK technically valid**, but the iOS GitHub Actions "success" is NOT proof of a clean iOS build. The same run 38063217668 (job 114245531483) logged:
+- Failed decoding/importing several M42-C003 evidence_v03 WebPs in coordination/sessions;
+- ERR_FILE_CORRUPT and failed import for res://assets/ui/final/gameplay/buttons/icon_pause.png;
+- .github/workflows/ios-ipa.yml runs `"$GODOT" --headless --import || true`, masking import failures;
+- no independent scan of the iOS IPA/PCK required resources, forbidden developer paths or inner IPA SHA256.
+The iOS Xcode BUILD SUCCEEDED and zip artifact exists (11674890339), but source resources may be missing. See the audit at coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CHATGPT_INDEPENDENT_AUDIT_V02.md. This is **iOS import/package hygiene only**, NOT a request to redo fixes A/B/C, touch the Android APK, or modify gameplay.
+
+## Mandatory safe preflight
+1. Read CLAUDE.md, root TASKS.md, coordination/AUDIT_POLICY.md, this audit, V02 owner feedback and this prompt.
+2. Fetch origin/main; inventory persistent C:\Users\sekip\Desktop\ScrubBots: HEAD, upstream/ahead-behind, tracked owner-dirty paths, untracked count, stashes/worktrees, project.godot SHA. Safely fast-forward only when non-destructive and preserve all owner-local files. Never reset/restore/clean/checkout owner Desktop. If unsafe, stop BLOCKED_DESKTOP_SYNC. All coding/tests in one bounded TEMP worktree; absolute paths; no heavy local iOS/Android installation.
+3. Review LIVE workflow and exact CI job logs; do not assume the initial report proves root cause for the PNG. Determine whether icon_pause.png is a corrupt tracked blob, a dependency, a stale unused file or macOS importer issue. Locate every live reference before proposing removal. **No replacement/repaint of owner-approved art without exact approved source bytes and justification.**
+4. Reconcile ongoing owner changes without overwriting, no force-push. Claude may change the iOS workflow, narrowly necessary CI scan helpers/tests and absolutely necessary source-asset correction **only if same approved bytes can be restored**; otherwise STOP with precise OWNER_ASSET_REQUIRED. Claude must not edit root TASKS.md or ChatGPT audit verdicts.
+
+## Fix only iOS import/export quality gate
+- Limit checkout/import workspace to actual runtime sources. Exclude coordination/sessions evidence and other 9 owner-prohibited developer trees before Godot imports them, consistent with existing Android family export hygiene, not merely via export_presets.cfg exclude_filter. Verify required runtime scripts/config/assets still present. Avoid rechecking out/importing multi-GB evidence. Avoid creating a new cleanup branch or deleting owner files in Desktop.
+- Replace the iOS workflow's `--import || true` with an explicit fail-closed import gate: record complete import log and nonzero exit; flag genuine `ERROR: ... Error loading / Error importing / ERR_FILE_CORRUPT / SCRIPT ERROR` for runtime resources. Distinguish benign deprecation warnings from actual failed imports; no blanket `|| true`, silent log truncation, or ignore lists hiding a broken required asset.
+- Resolve icon_pause.png import error by **proving** whether it is used in any current scene/theme/manifest/presentations. If required and corrupt, obtain correct previously approved bytes/provenance and verify image is decodable before export. If unused and original intentionally preserved, narrow *export workspace* exclusion is permissible only after repository-wide reference proof and owner asset lock, without deleting or modifying original. Never substitute a different icon, never make changes to static gameplay master art.
+- Add an iOS output inventory/scan of exported PCK and actual IPA/App runtime paths. Reuse vetted Android-family PCK scanning patterns where possible; prove zero forbidden development trees and every runtime-referenced path present (current Android check found 664), plus main scene. Produce inner IPA SHA256 as well as GitHub artifact ZIP digest. Keep signing policy unchanged (unsigned IPA -> owner xtool signs during installation).
+- Reuse owner .github/workflows/ios-ipa.yml, invoke **only one final** macOS build after focused preflight and locally verifiable checks. Do not rerun Android APK or download 500MB artifacts to owner's Windows disk unnecessarily.
+- Prove new IPA built from unchanged mobile-UX source c2b1c3c7 (or descendant with this narrowly scoped iOS gate), success and true clean import. If any genuine required asset cannot be recovered, log BLOCKED and do NOT publish a false clean export assertion.
+- Focused/root tests and git diff --check PASS, no losses in owner Desktop, no R2/Level Factory/ads/gameplay/master changes. Save Claude builder log at `coordination/sessions/M47-FAMILY-APK-IOS-EXPORT-R02/CLAUDE_LOG_V01.md`; push code normally to main and safe-sync Desktop.
+- Handoff AWAITING_CHATGPT_INDEPENDENT_AUDIT / OWNER_IPHONE_RETEST_PENDING with exact sha, workflow run, artifact link, inner/zip hashes and forbidden/required inventories. Only owner can verify physical iPhone; do not self-award PASS.
