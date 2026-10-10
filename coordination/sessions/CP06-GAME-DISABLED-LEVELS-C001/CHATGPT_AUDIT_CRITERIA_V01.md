@@ -3,7 +3,7 @@ Date 2026-10-10. Implementation Claude Code, only ChatGPT may independently audi
 
 ## Gate 0: safety, scope, source of truth
 - Published exact LF M17/CP06 contract and game CP04/CP05 inspected; no LF repo modifications, production/staging R2 writes, credentials, fabricated object URLs, manual live manifest creation or APK/IPA builds.
-- Owner Desktop retains the four previous tracked modifications, current untracked state and stashes; before/after hashes, 0 ahead/behind after safe fast-forward; only one small task-owned sparse TEMP worktree created and removed after GitHub publication, no repeated huge local import/copies. No root TASKS.md modifications by Claude.
+- **OWNER HARD RULE 2026-10-10: ZERO TEMP FILES/FOLDERS OF ANY SIZE AND DESKTOP ONLY.** Claude uses only `C:\\Users\\sekip\\Desktop\\ScrubBots` for source edits, Git sync/commits, tests and log. No `%TEMP%`, AppData Temp, /tmp, scratchpad, sparse worktree, cloned checkout, staging copy, synthetic filesystem scratch, exported probe or any alternative workspace, even small. If test tools mandate transient external artifacts, STOP as `BLOCKED_ZERO_TEMP_DESKTOP_ONLY`; do not create them. Existing project files and previous four tracked owner changes, 2,616 untracked files, stashes must remain intact. No root TASKS.md modifications by Claude.
 - Source commit and log are on origin/main and cover only clearly needed game-runtime files + synthetic tests. Existing accepted M47 IPA/APK unchanged. M55 quiescence implementation c997ca65 is retained, not redone.
 
 ## Gate A: owner authority, blocking rule
@@ -18,7 +18,7 @@ Date 2026-10-10. Implementation Claude Code, only ChatGPT may independently audi
 ## Gate C: test depth and output
 - Dedicated synthetic single-disabled-level fixture (e.g. remote Level12) proves neighboring 11 and 13 intact in canonical identity and progression after disable; re-enable successor; cached LKG offline; malformed ids; all affected manifest/save invariants; no live network mutation.
 - Focused CP04/CP05, remote_content_family_fixture, M35 catalog, M37 progression, M40 save, M55 and root run_tests PASS after code modifications; diff/parse clean. No weakening old tests or removing fail-closed guards merely to satisfy fixtures.
-- Log includes exact pre/post state, contract decisions, first failing reproduction, changed-file list, all focused commands with real results, proof of no additional builds/storage, and correct GitHub/owner desktop parity. If any test fails, report BLOCKED/CHANGES_REQUIRED rather than self-award PASS.
+- Log includes exact pre/post state from ONLY the existing Desktop checkout, contract decisions, failing reproduction, changed-file list, all focused commands with real results, proof that **ZERO TEMP FILES/WORKTREES/COPIES WERE CREATED OR USED**, and correct GitHub/owner Desktop parity. If tests need external transient filesystem artifacts, report `BLOCKED_ZERO_TEMP_DESKTOP_ONLY` instead of trying them. If any test fails, report BLOCKED/CHANGES_REQUIRED rather than self-award PASS.
 
 ## Gate D: independent verdict
 - PASS only when source and evidence satisfy A/B/C and ChatGPT independently verifies GitHub commits/tests. If frontiers require new owner policy, record OWNER_DECISION_REQUIRED, do not mark CP06-004/010 closed.
