@@ -10,12 +10,12 @@ This document extends `OWNER_DEVICE_FEEDBACK_V01.md`. It is factual owner feedba
 | Device | Platform | Build provenance | Owner report |
 | --- | --- | --- | --- |
 | iPhone (owner's) | iOS | **First IPA tested**; exact run, version and source SHA not confirmed; NOT necessarily latest IPA | The Supply tap issue; Collection scroll-down catches/sticks; Rewarded Ads one claimable reward has no red `1` notification on its Home shortcut. |
-| Samsung Flip | Android phone | First Family APK (confirmed family first-ten testing context; exact install hash on phone not independently read) | Installed/boots, Supply tap issue. Owner subsequently says the **same problems** occur on the Android devices. |
+| Samsung Flip | Android phone | First Family APK (confirmed family first-ten testing context; exact install hash on phone not independently read) | Installed/boots; Supply tap issue explicitly reported. The other two issues were not separately itemized for the Flip. |
 | Samsung Android tablet (owner calls it "Samsung iPad", daughter's tablet) | Android tablet | Family Android test, exact installed build SHA not independently read | Same mobile problems reported on this device as well. |
 
 Owner's words: "collections daki scroll down takiliyor, benim iphone da da supply tek tikla secme sorunu ayni sekilde var. rewarded ads de claim edilecek bir tane hediye olmasina ragmen kenarinda kirmizi ile 1 yazmiyordu. simdilik bu kadar. iphone da da test ettim ama benim test ettigim ilk ipaydi." Then "kizimin adroidinde de denedim. ayni sikintilar orda da var. yani aslinda hem iphone hem de bir samsung flip ( android) bir de samsung ipad (android) deneme gerceklesmis oldu".
 
-Interpretation: **Three actual physical devices, two platforms, three reported usability problems.** Do not inflate this into device-specific stack traces, exact OS versions or proof a newer build is affected. The broad "same problems" report is accepted as the owner's multi-device observation; only the iPhone message explicitly itemized all three individually.
+Interpretation: **Three actual physical devices, two platforms, three reported usability problems across testing.** Do not inflate this into device-specific stack traces, exact OS versions or proof a newer build is affected. The broad "same problems" report explicitly adds the daughter\'s Android tablet; only the iPhone message individually itemized all three. The Flip was explicitly documented with the Supply tap issue; do not assume a separate scroll or badge verification on that phone.
 
 ## Owner-required behavior
 
