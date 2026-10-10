@@ -45,7 +45,8 @@ jobs:
         run: |
           mkdir -p build/ios
           "$GODOT" --headless --import || true
-          "$GODOT" --headless --export-release "iOS" "build/ios/${APP_NAME}.ipa"
+          "$GODOT" --headless --export-release "iOS" "build/ios/${APP_NAME}.ipa" > export.log 2>&1 \
+            || { grep -iE "error|fail|invalid|missing" export.log | tail -25 | sed 's/^/::error::/'; exit 1; }
           ls -la build/ios
 
       - name: Xcode build (imzasiz)
