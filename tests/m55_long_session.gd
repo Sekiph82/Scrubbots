@@ -15,6 +15,13 @@ extends SceneTree
 ## that rule fails on each kind of post-warm-up growth. Lap-end HOME samples are taken at feel
 ## quiescence (FeedbackAdapter owns no live, ceiling-bounded decoration), so a burst still in
 ## flight is never counted as a Node.
+## M55-LONG-SESSION-QUIESCENCE-QA-R01: "quiescence" is a STREAK, not one reading. A Home ceremony's
+## REWARD burst is requested by MetaRewardFeel only after its own layout-settle coroutine (up to
+## MetaRewardFeel.SETTLE_FRAMES frames), during which the adapter owns nothing yet - a single
+## owned_count() == 0 reading is a false quiet. The sample waits for MORE than SETTLE_FRAMES + 2
+## consecutive zero-owned frames (any owned decoration resets the streak) under ONE monotonic
+## 5000 ms deadline; a timeout is an explicit FAIL. Case 015 replays owned-count traces through
+## the same rule. This changes WHEN the snapshot is taken, never what counts as a leak.
 ##
 ## Run: godot --headless --path . -s res://tests/m55_long_session.gd
 
@@ -23,6 +30,7 @@ const MainScene = preload("res://scenes/app/main.tscn")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
 const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
+const MetaRewardFeel = preload("res://scripts/ui/feel/meta_reward_feel.gd")
 
 const TRANSITION_CYCLES := 40
 const WARMUP_CYCLES := 5
@@ -33,12 +41,14 @@ const MAX_OBJECT_DRIFT := 64
 const MAX_STATIC_MEM_DRIFT := 4 * 1024 * 1024
 const LEVELS := 10
 const DT := 1.0
+## Feel-quiescence sampling (QUIESCENCE-QA-R01): one monotonic deadline for the whole wait.
+const QUIET_DEADLINE_MS := 5000
 
 var _fail := 0
 var _tmp: Array = []
 var _completed := {}
 var _routes: Array = []
-const EXPECTED_CASES := ["008_transitions", "009_long_session", "010_memory", "011_signals", "012_orphans", "013_rewards", "014_steady_state_sensitivity"]
+const EXPECTED_CASES := ["008_transitions", "009_long_session", "010_memory", "011_signals", "012_orphans", "013_rewards", "014_steady_state_sensitivity", "015_quiet_rule_sensitivity"]
 
 func _initialize() -> void:
 	await process_frame
@@ -64,6 +74,7 @@ func _initialize() -> void:
 	_ok(lap2["static_mem"] - lap1["static_mem"] <= MAX_STATIC_MEM_DRIFT, "steady state: lap-2 static memory within %d B of lap 1 (%d B)" % [MAX_STATIC_MEM_DRIFT, lap2["static_mem"] - lap1["static_mem"]])
 	_completed["010_memory"] = true
 	_sensitivity(lap1)
+	_quiet_rule_sensitivity()
 	_cleanup()
 	var missing: Array = EXPECTED_CASES.filter(func(c): return not _completed.has(c))
 	_ok(missing.is_empty(), "case ledger: every expected case completed %s" % str(missing))
@@ -97,6 +108,72 @@ func _branches() -> Dictionary:
 		var k: String = "AppRoot" if c.get_script() == MainScript else String(c.name)
 		out[k] = int(out.get(k, 0)) + 1 + c.find_children("*", "", true, false).size()
 	return out
+
+## Consecutive zero-owned frames required before the HOME sample: STRICTLY more than
+## MetaRewardFeel.SETTLE_FRAMES + 2 (the pending layout-settle coroutine plus the deferred
+## ceremony drain / request frames), tied to the production constant, never a magic sleep.
+static func quiet_frames_required() -> int:
+	return MetaRewardFeel.SETTLE_FRAMES + 3
+
+## The quiet rule, pure: the next streak after a frame that observed `owned` decorations.
+## Any owned decoration resets the streak to zero.
+static func quiet_streak_step(streak: int, owned: int) -> int:
+	return streak + 1 if owned == 0 else 0
+
+## Replay an owned-count trace (one entry per frame) through the quiet rule: index of the frame
+## that releases the sample, or -1 when no full streak occurs (in the real wait: deadline -> FAIL).
+static func quiet_release_frame(trace: Array) -> int:
+	var streak := 0
+	for i in range(trace.size()):
+		streak = quiet_streak_step(streak, int(trace[i]))
+		if streak >= quiet_frames_required():
+			return i
+	return -1
+
+## Wait for feel quiescence: quiet_frames_required() consecutive frames with
+## root.feel.owned_count() == 0, under ONE monotonic deadline started here (a reset never
+## extends it). Returns the evidence; quiet == false means the deadline expired.
+func _await_feel_quiet(root) -> Dictionary:
+	var t0 := Time.get_ticks_msec()
+	var streak := 0
+	var resets := 0
+	var frames := 0
+	while streak < quiet_frames_required() and Time.get_ticks_msec() - t0 < QUIET_DEADLINE_MS:
+		await process_frame
+		frames += 1
+		var owned: int = root.feel.owned_count()
+		if owned > 0 and streak > 0:
+			resets += 1
+		streak = quiet_streak_step(streak, owned)
+	return {"quiet": streak >= quiet_frames_required(), "ms": Time.get_ticks_msec() - t0, "frames": frames, "streak": streak, "resets": resets}
+
+## 015: the quiet rule cannot release on an early-quiet gap shorter than the pending settle,
+## resets on any owned frame, and yields no release (-> deadline FAIL) without a full streak.
+func _quiet_rule_sensitivity() -> void:
+	print("[015 feel-quiescence rule sensitivity: owned-count traces replayed through the same rule]")
+	var req := quiet_frames_required()
+	var settle: int = MetaRewardFeel.SETTLE_FRAMES
+	_ok(req == settle + 3 and req > settle + 2, "required streak %d is strictly more than SETTLE_FRAMES %d + 2" % [req, settle])
+	var z := func(n: int) -> Array:
+		var a: Array = []
+		a.resize(n)
+		a.fill(0)
+		return a
+	var o := func(n: int) -> Array:
+		var a: Array = []
+		a.resize(n)
+		a.fill(1)
+		return a
+	# The 2026-10-10 local failure shape: quiet frames while MetaRewardFeel's settle is pending,
+	# then the REWARD burst becomes owned. The old one-reading rule sampled inside the gap.
+	var gap: Array = z.call(settle + 2) + o.call(6) + z.call(req)
+	_ok(quiet_release_frame(gap) == gap.size() - 1, "early quiet gap of %d frames cannot release; release only after the burst plus a full streak (frame %d)" % [settle + 2, quiet_release_frame(gap)])
+	_ok(quiet_streak_step(req - 1, 1) == 0 and quiet_streak_step(0, 0) == 1, "any owned frame resets the streak to zero")
+	var reset: Array = z.call(req - 1) + o.call(1) + z.call(req - 1)
+	_ok(quiet_release_frame(reset) == -1, "streak broken one frame short twice: no release (deadline -> FAIL)")
+	_ok(quiet_release_frame(o.call(400)) == -1, "never quiet (live decoration for the whole wait): no release (deadline -> FAIL)")
+	_ok(quiet_release_frame(z.call(req - 1)) == -1 and quiet_release_frame(z.call(req)) == req - 1, "boundary: %d quiet frames do not release, %d do" % [req - 1, req])
+	_completed["015_quiet_rule_sensitivity"] = true
 
 ## The strict post-warm-up leak rule (lap 2 vs the lap-1 end, same workload). [] = steady.
 static func steady_state_violations(ref: Dictionary, cur: Dictionary) -> Array:
@@ -312,12 +389,14 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 	# Sample at feel quiescence: presentation-feel bursts (Results WIN confetti, the Home
 	# ceremony's REWARD burst) are transient Nodes the adapter frees within its per-tier ceiling
 	# (<= 1.3 s). Counting one mid-flight is timing noise, not a leak; a leaked burst would
-	# outlive the adapter's ownership and still be counted below.
-	var t0q := Time.get_ticks_msec()
-	while root.feel.owned_count() > 0 and Time.get_ticks_msec() - t0q < 5000:
-		await process_frame
+	# outlive the adapter's ownership and still be counted below. Quiet = a STREAK of zero-owned
+	# frames longer than MetaRewardFeel's pending settle (see header), under one deadline.
+	var q := await _await_feel_quiet(root)
+	print("    QUIET lap %d: waited %d ms, %d frames, final quiet streak %d (required %d > SETTLE_FRAMES %d + 2), streak resets %d" % [lap,
+		q["ms"], q["frames"], q["streak"], quiet_frames_required(), MetaRewardFeel.SETTLE_FRAMES, q["resets"]])
+	_ok(q["quiet"], "feel quiet streak of %d frames reached inside the %d ms deadline (got %d)" % [quiet_frames_required(), QUIET_DEADLINE_MS, q["streak"]])
 	await _settle()
-	_ok(root.feel.owned_count() == 0, "feel quiescent at the HOME sample (adapter owns no live decoration; waited %d ms)" % (Time.get_ticks_msec() - t0q))
+	_ok(root.feel.owned_count() == 0, "feel quiescent at the HOME sample (adapter owns no live decoration; waited %d ms)" % q["ms"])
 	var e := _sample(root)
 	print("    HOME baseline: %s" % str(base))
 	print("    HOME after long session: %s" % str(e))
