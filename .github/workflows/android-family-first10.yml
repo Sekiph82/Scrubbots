@@ -177,7 +177,7 @@ jobs:
           # project settings that exists in this (export) source tree must be in the pack. Editor-only
           # addons/*/plugin.cfg (named only by project.godot [editor_plugins]) is not a runtime file.
           grep -rhoE 'res://[A-Za-z0-9_./-]+\.[A-Za-z0-9]+' scripts scenes data addons project.godot default_bus_layout.tres 2>/dev/null \
-            | sort -u | grep -v '/plugin\.cfg$' | while read -r p; do [ -f "${p#res://}" ] && echo "$p"; done > out/required_runtime_paths.txt
+            | sort -u | grep -v '/plugin\.cfg$' | while read -r p; do if [ -f "${p#res://}" ]; then echo "$p"; fi; done > out/required_runtime_paths.txt
           wc -l out/required_runtime_paths.txt
           cp -r .github/android/pck_probe "$RUNNER_TEMP/pck_probe"
           "$GODOT" --headless --path "$RUNNER_TEMP/pck_probe" -s res://pck_scan.gd -- \
