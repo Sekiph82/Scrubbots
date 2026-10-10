@@ -59,6 +59,9 @@ var _catalog_orders: Array = []
 ## CP04/CP05: the ONE remote content authority (builtin + cached LKG at boot, no network).
 ## Content install never touches progression / economy / save truth.
 var content: RemoteContentManager
+## CP06: level numbers skipped this session (presentation notice only; durable truth is the
+## progression skip ledger). Cleared when gameplay launches.
+var skip_notice: Array = []
 
 ## clock/local_day are test seams. Production passes neither: the shipping graph
 ## injects the real OS local-calendar provider explicitly (F-M39-V03-002).
@@ -85,6 +88,9 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	content = RemoteContentManager.new(croot, null, Callable(self, "_builtin_ids"))
 	content.boot()
 	content.content_changed.connect(Callable(self, "_on_content_changed"))
+	# CP06: cold/offline boot applies the cached LKG disabled set (idempotent retry after a
+	# crash between registry activation and the skip save).
+	reconcile_disabled_frontier()
 
 ## Builtin + verified active remote levels (CompositeLevelCatalog); null when the builtin
 ## production catalog itself is invalid (callers report CATALOG_INVALID).
@@ -101,6 +107,52 @@ func _builtin_ids() -> Array:
 
 func _on_content_changed() -> void:
 	_catalog_orders.clear()
+	reconcile_disabled_frontier()
+
+## CP06 owner option B (OWNER_DISABLED_FRONTIER_DECISION_V02): while the CURRENT frontier is a
+## remote level the verified active manifest disables, record a non-rewarding skip (provenance:
+## exact id + content_version + manifest sha) and move to the next number. Never a win: no
+## record_win, no economy / streak / Daily / achievement touch. Bounded by the remote level
+## count; stops at the first frontier that is not an explicitly disabled remote entry (missing
+## content stays CONTENT_MISSING, builtin levels are never skipped). Durable first: if the save
+## fails the exact pre-skip progression is restored and nothing is reported as skipped.
+## Idempotent: a second call with the same content is a no-op. Returns {ok, skipped[, reason, save]}.
+func reconcile_disabled_frontier() -> Dictionary:
+	if is_blocked:
+		return {"ok": false, "reason": "app_blocked", "skipped": []}
+	if content == null:
+		return {"ok": true, "skipped": []}
+	var disabled: Array = content.disabled_level_ids()
+	var prov: Dictionary = content.active_provenance()
+	if disabled.is_empty() or prov.is_empty():
+		return {"ok": true, "skipped": []}
+	var cat = playable_catalog()
+	if cat == null:
+		return {"ok": false, "reason": "CATALOG_INVALID", "skipped": []}
+	var remote_ids := {}
+	for rl in content.remote_levels():
+		remote_ids[String(rl["id"])] = true
+	var by_order := {}
+	for e in cat.get_entries_ordered():
+		by_order[int(e.order)] = String(e.id)
+	var pre: Dictionary = progression.snapshot()
+	var skipped: Array = []
+	while skipped.size() < remote_ids.size():
+		var n := int(progression.current_level())
+		var id := String(by_order.get(n, ""))
+		if id.is_empty() or not remote_ids.has(id) or not disabled.has(id):
+			break
+		if not progression.record_skip(n, id, int(prov["content_version"]), String(prov["manifest_sha256"])):
+			break
+		skipped.append(n)
+	if skipped.is_empty():
+		return {"ok": true, "skipped": []}
+	var r: Dictionary = request_save()
+	if not bool(r.get("ok", false)):
+		var restored: bool = progression.import_snapshot(pre)
+		return {"ok": false, "reason": "skip_save_failed", "skipped": [], "save": r, "restored": restored}
+	skip_notice.append_array(skipped)
+	return {"ok": true, "skipped": skipped, "save": r}
 
 ## M43-C009R: read-only eligibility context for Daily Scrub Orders: the progression frontier,
 ## its class lookup and how many catalog levels are playable from the frontier on.
@@ -111,9 +163,20 @@ func orders_context() -> Dictionary:
 		if cat != null:
 			for e in cat.get_entries_ordered():
 				_catalog_orders.append(int(e.order))
+	# CP06: a disabled level ahead is skipped, never played, so it is not counted as playable.
+	var disabled_orders := {}
+	if content != null and not content.disabled_level_ids().is_empty():
+		var cat = playable_catalog()
+		if cat != null:
+			for e in cat.get_entries_ordered():
+				if content.is_level_disabled(String(e.id)):
+					disabled_orders[int(e.order)] = true
 	var ahead := 0
-	while _catalog_orders.has(frontier + ahead):
-		ahead += 1
+	var n := frontier
+	while _catalog_orders.has(n):
+		if not disabled_orders.has(n):
+			ahead += 1
+		n += 1
 	return {"frontier": frontier, "playable_ahead": ahead, "class_for": Callable(progression, "class_for")}
 
 ## True when the app must not proceed to gameplay against fresh defaults

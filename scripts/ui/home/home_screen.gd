@@ -1467,6 +1467,13 @@ func _render_play(play: Button, status: Label) -> void:
 	if _launch.get("ok", false):
 		play.disabled = false
 		status.text = ""
+		# CP06: truthful, non-rewarding notice after a disabled-level skip (no ceremony).
+		var notice = _app.get("skip_notice")
+		if typeof(notice) == TYPE_ARRAY and not notice.is_empty():
+			var nums := PackedStringArray()
+			for n in notice:
+				nums.append(str(n))
+			status.text = UiText.t("HOME_LEVEL_SKIPPED", [", ".join(nums), level])
 	elif _launch.get("reason", "") == GameplayLaunchResolver.CONTENT_MISSING:
 		play.disabled = true
 		status.text = UiText.t("HOME_LEVEL_COMING_SOON", [level])

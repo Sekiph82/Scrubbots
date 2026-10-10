@@ -44,6 +44,12 @@ static func full_match(name: String, v) -> bool:
 	var m := _rx(name).search(v)
 	return m != null and m.get_start() == 0 and m.get_end() == String(v).length()
 
+static func _declares_exact(levels: Array, level_id: String) -> bool:
+	for l in levels:
+		if l["level_id"] == level_id:
+			return true
+	return false
+
 static func _keys_exact(d: Dictionary, keys: Array) -> bool:
 	var k := d.keys()
 	k.sort()
@@ -125,6 +131,10 @@ static func parse(raw: PackedByteArray) -> Dictionary:
 	for d in v["disabled_levels"]:
 		if not full_match("level_id", d) or disabled_fold.has(String(d).to_lower()):
 			return _fail("MANIFEST_INVALID_DISABLED_LEVELS")
+		# CP06: a disabled ID must be the EXACT declared spelling of one of this manifest's
+		# levels (the LF publisher writes the declared spelling); unknown / case-variant fails closed.
+		if not _declares_exact(levels, d):
+			return _fail("MANIFEST_DISABLED_LEVEL_NOT_DECLARED")
 		disabled_fold[String(d).to_lower()] = true
 	var sched_targets := {}
 	for sc in v["schedules"]:

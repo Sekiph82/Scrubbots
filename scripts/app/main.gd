@@ -453,10 +453,14 @@ func launch_gameplay(parent: Node = null) -> Dictionary:
 	if is_blocked():
 		last_launch = {"ok": false, "reason": GameplayLaunchResolver.APP_BLOCKED}
 		return last_launch
+	# CP06: a disabled frontier is skipped (durably, non-rewarding) before it can resolve;
+	# also retries a skip whose save failed earlier.
+	app_state.reconcile_disabled_frontier()
 	var launch := GameplayLaunchResolver.resolve(app_state)
 	if not launch.get("ok", false):
 		last_launch = {"ok": false, "reason": launch.get("reason", ""), "launch": launch}
 		return last_launch
+	app_state.skip_notice.clear()
 	# SB-M42-006: exactly one gameplay host. The previous host leaves the tree NOW
 	# (not a deferred queue_free that would coexist for a frame).
 	_release_gameplay_host()
@@ -519,6 +523,10 @@ func _bind_terminal(host) -> void:
 	if completion == null:
 		return
 	completion.terminal_reached.connect(func(status, _detail):
+		# CP06: a WON may land the frontier on a disabled level; skip it before Results reads
+		# Continue. The host's own (economy + save) terminal handler has already committed.
+		if host == _gameplay_host and String(status) == "WON" and app_state != null:
+			app_state.reconcile_disabled_frontier()
 		if host == _gameplay_host and nav.on_gameplay_terminal(nav.attempt_id(), status, int(host.progression_level)):
 			_terminal_bridge(host, String(status)))
 

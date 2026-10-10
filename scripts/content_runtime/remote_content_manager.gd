@@ -125,6 +125,21 @@ func remote_levels() -> Array:
 func active_registry() -> Dictionary:
 	return _registry.duplicate(true)
 
+## CP06: exact level IDs the verified ACTIVE manifest disables (empty unless the set is usable).
+func disabled_level_ids() -> Array:
+	if not _active_ok:
+		return []
+	return (_registry.get("disabled_levels", []) as Array).duplicate()
+
+func is_level_disabled(level_id: String) -> bool:
+	return disabled_level_ids().has(level_id)
+
+## CP06 skip provenance of the verified active set: {content_version, manifest_sha256} ({} if none).
+func active_provenance() -> Dictionary:
+	if not _active_ok:
+		return {}
+	return {"content_version": int(_registry["content_version"]), "manifest_sha256": String(_registry["manifest_sha256"])}
+
 func is_active_usable() -> bool:
 	return _active_ok
 
@@ -214,8 +229,13 @@ static func parse_registry(raw: PackedByteArray) -> Dictionary:
 		return {}
 	var k: Array = r.keys()
 	k.sort()
-	if k != ["content_version", "levels", "manifest_sha256", "minimum_game_version", "packs", "schema", "validated_game_version", "version"] \
-			or r["schema"] != REGISTRY_SCHEMA or r["version"] != 1 or typeof(r["content_version"]) != TYPE_INT or r["content_version"] < 1 \
+	# CP06: version 2 = version 1 + the active manifest's exact `disabled_levels` (written only
+	# when nonempty, so a registry without disables stays readable by pre-CP06 builds).
+	var want: Array = ["content_version", "levels", "manifest_sha256", "minimum_game_version", "packs", "schema", "validated_game_version", "version"]
+	if typeof(r.get("version")) == TYPE_INT and r["version"] == 2:
+		want = ["content_version", "disabled_levels", "levels", "manifest_sha256", "minimum_game_version", "packs", "schema", "validated_game_version", "version"]
+	if k != want \
+			or r["schema"] != REGISTRY_SCHEMA or not (r["version"] in [1, 2]) or typeof(r["content_version"]) != TYPE_INT or r["content_version"] < 1 \
 			or not ContentManifestV1.full_match("sha256", r["manifest_sha256"]) \
 			or ContentManifestV1.parse_game_version(r["minimum_game_version"]).is_empty() \
 			or typeof(r["validated_game_version"]) != TYPE_STRING \
@@ -251,6 +271,19 @@ static func parse_registry(raw: PackedByteArray) -> Dictionary:
 			if not ContentManifestV1.full_match("sha256", l["sha256"][role]):
 				return {}
 		ids[String(l["level_id"]).to_lower()] = true
+	if r["version"] == 2:
+		var seen := {}
+		var exact := {}
+		for l in r["levels"]:
+			exact[l["level_id"]] = true
+		if typeof(r["disabled_levels"]) != TYPE_ARRAY:
+			return {}
+		for d in r["disabled_levels"]:
+			if typeof(d) != TYPE_STRING or not exact.has(d) or seen.has(d):
+				return {}
+			seen[d] = true
+		if seen.is_empty():
+			return {}
 	return r
 
 # ------------------------------------------------------------- refresh --
@@ -308,8 +341,10 @@ func _refresh_tx(tx: String) -> Dictionary:
 		if _active_ok:
 			return {"ok": true, "reason": "UP_TO_DATE", "changed": false}
 		# Same manifest, broken local set (partial cache / app update): repair below.
-	# CP06 owns disable/schedule semantics; until then they are never silently ignored.
-	if not m["disabled_levels"].is_empty() or not m["schedules"].is_empty():
+	# CP06: `disabled_levels` is supported (ContentManifestV1 already proved every ID is an exact
+	# declared level; builtin IDs can never be declared, see BUILTIN_ID_COLLISION below). Schedules
+	# remain a separate, unimplemented CP06 gate and are never silently ignored.
+	if not m["schedules"].is_empty():
 		return _no("UNSUPPORTED_RUNTIME_SEMANTICS")
 	# V1 campaign-order policy: no builtin override, and an activated sequence is append-only.
 	var builtin := _builtin_fold()
@@ -369,6 +404,9 @@ func _refresh_tx(tx: String) -> Dictionary:
 	var candidate := {"schema": REGISTRY_SCHEMA, "version": 1, "content_version": m["content_version"],
 		"manifest_sha256": pr["sha256"], "minimum_game_version": m["minimum_game_version"],
 		"validated_game_version": game_version, "packs": packs, "levels": levels}
+	if not m["disabled_levels"].is_empty():
+		candidate["version"] = 2
+		candidate["disabled_levels"] = m["disabled_levels"].duplicate()
 	var why := "FAULT_INJECTED" if _fault == "verify_candidate" else _verify_set(candidate, dirs)
 	if not why.is_empty():
 		return _no("CANDIDATE_" + why)
