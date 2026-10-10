@@ -1,0 +1,248 @@
+name: Android Family First10 APK
+
+# M47-FAMILY-APK-C001 (SB-M47-001 / SB-M47-002): installable Android DEBUG/DEVELOPMENT APK of
+# the built-in Levels 1-10 for family testing. Manual dispatch only.
+#   validate: real Godot 4.7.2 headless suites (Levels 1-10, Home -> Play -> Results, save,
+#             offline remote-content fallback, release regression) on a checkout WITHOUT the
+#             1.7 GB coordination/sessions evidence and the three dev-art trees.
+#   export:   a disposable workspace in which every owner-excluded tree
+#             (.github/android/family_first10_export_exclusions.txt) is ABSENT, plus the same
+#             prefixes in the preset exclude_filter; debug keystore generated here (never
+#             committed); APK + same-preset inspection PCK; machine scans proving zero packaged
+#             paths under the excluded prefixes and presence of every runtime-referenced res://
+#             file; headless boot of the exported pack; apksigner / aapt2 metadata; artifacts.
+# No secret, no network service, no R2 credential is used or packaged.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: android-family-first10
+  cancel-in-progress: false
+
+env:
+  GODOT_VERSION: 4.7.2
+  APK_NAME: ScrubBots-Family-First10-Android-Debug
+  PRESET: Android Family First10
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - name: Checkout (no coordination/sessions evidence, no dev-art trees)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/coordination/sessions/
+            !/assets/art/references/
+            !/assets/ui/candidates/
+            !/assets/ui/generated/
+
+      - name: Godot ${{ env.GODOT_VERSION }} (Linux editor, headless)
+        run: |
+          curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip -d "$RUNNER_TEMP/godot"
+          echo "GODOT=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+
+      - name: Import
+        run: |
+          "$GODOT" --headless --path . --import > import.log 2>&1 || true
+          git checkout -- project.godot   # disposable CI workspace: the import may rewrite it; validate the tracked file
+
+      - name: Focused suites
+        run: |
+          set -o pipefail
+          mkdir -p validate_logs
+          fail=0
+          for s in m35_level_catalog m37_level_progression m55_long_session m43_c005f_phase4_terminal_home_micro \
+                   m43_c001a_results_foundation m42_navigation m42_home m40_save_system m40_v04_bootstrap \
+                   cp04_remote_content_runtime cp05_remote_content_cache m55_economy_release_regression run_tests; do
+            timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "validate_logs/$s.log" 2>&1
+            ec=$?
+            echo "$s exit=$ec $(grep -E 'PASS|FAIL|RESULT' "validate_logs/$s.log" | tail -1)" | tee -a validate_logs/summary.txt
+            [ $ec -eq 0 ] || fail=1
+          done
+          exit $fail
+
+      - name: Validation logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ env.APK_NAME }}-validation-logs
+          path: |
+            validate_logs/
+            import.log
+          retention-days: 30
+
+  export:
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout export workspace (owner-excluded trees ABSENT)
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+        with:
+          filter: blob:none
+          sparse-checkout-cone-mode: false
+          sparse-checkout: |
+            /*
+            !/coordination/
+            !/docs/
+            !/tests/
+            !/tools/
+            !/level_factory/
+            !/content_pipeline/
+            !/assets/art/references/
+            !/assets/ui/candidates/
+            !/assets/ui/generated/
+
+      - name: Prove excluded trees are absent from the export workspace
+        run: |
+          bad=0
+          while read -r p; do
+            case "$p" in ''|'#'*) continue;; esac
+            if [ -e "$p" ]; then echo "::error::excluded tree present in export workspace: $p"; bad=1; else echo "absent: $p"; fi
+          done < .github/android/family_first10_export_exclusions.txt
+          exit $bad
+
+      - name: JDK 17
+        uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Godot ${{ env.GODOT_VERSION }} editor + export templates
+        run: |
+          curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -q godot.zip -d "$RUNNER_TEMP/godot"
+          echo "GODOT=$RUNNER_TEMP/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64" >> "$GITHUB_ENV"
+          curl -fsSL -o tpl.tpz "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_export_templates.tpz"
+          TPL="$HOME/.local/share/godot/export_templates/${GODOT_VERSION}.stable"
+          mkdir -p "$TPL" && unzip -q tpl.tpz -d "$RUNNER_TEMP/tpl" && mv "$RUNNER_TEMP"/tpl/templates/* "$TPL/"
+          rm -f godot.zip tpl.tpz
+          ls "$TPL" | grep -i android
+
+      - name: Debug keystore (generated in CI, never committed) + Android editor settings
+        run: |
+          KS="$RUNNER_TEMP/family-debug.keystore"
+          keytool -genkeypair -v -keystore "$KS" -storepass android -keypass android -alias androiddebugkey \
+            -dname "CN=ScrubBots Family Debug,O=ScrubBots Dev,C=US" -keyalg RSA -keysize 2048 -validity 3650 >/dev/null 2>&1
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          echo "ANDROID_SDK=$SDK" >> "$GITHUB_ENV"
+          echo "BUILD_TOOLS=$(ls -d "$SDK"/build-tools/* | sort -V | tail -1)" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$KS" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
+          mkdir -p "$HOME/.config/godot"
+          for f in editor_settings-4.tres editor_settings-4.7.tres; do
+            cat > "$HOME/.config/godot/$f" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "$SDK"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          export/android/debug_keystore = "$KS"
+          export/android/debug_keystore_user = "androiddebugkey"
+          export/android/debug_keystore_pass = "android"
+          EOF
+          done
+
+      - name: Export preset (tracked template -> export_presets.cfg)
+        run: |
+          sed -e "s/@VERSION_CODE@/${GITHUB_RUN_NUMBER}/" -e "s/@VERSION_NAME@/0.1.${GITHUB_RUN_NUMBER}-family-first10-dev/" \
+            .github/android/export_presets_family_first10.cfg > export_presets.cfg
+          cat export_presets.cfg
+
+      - name: Import + export APK and same-preset inspection PCK
+        run: |
+          mkdir -p build/android out
+          "$GODOT" --headless --path . --import > out/import.log 2>&1 || true
+          "$GODOT" --headless --path . --export-debug "$PRESET" "build/android/${APK_NAME}.apk" > out/export_apk.log 2>&1 \
+            || { tail -40 out/export_apk.log; exit 1; }
+          "$GODOT" --headless --path . --export-pack "$PRESET" "build/android/${APK_NAME}.pck" > out/export_pck.log 2>&1 \
+            || { tail -40 out/export_pck.log; exit 1; }
+          ls -la build/android
+          test -s "build/android/${APK_NAME}.apk" && test -s "build/android/${APK_NAME}.pck"
+
+      - name: Packaged-path scan of the exported PCK (zero excluded paths, every runtime reference present)
+        run: |
+          # Every res:// file literal referenced by shipping scripts / scenes / data / addons /
+          # project settings that exists in this (export) source tree must be in the pack. Editor-only
+          # addons/*/plugin.cfg (named only by project.godot [editor_plugins]) is not a runtime file.
+          grep -rhoE 'res://[A-Za-z0-9_./-]+\.[A-Za-z0-9]+' scripts scenes data addons project.godot default_bus_layout.tres 2>/dev/null \
+            | sort -u | grep -v '/plugin\.cfg$' | while read -r p; do [ -f "${p#res://}" ] && echo "$p"; done > out/required_runtime_paths.txt
+          wc -l out/required_runtime_paths.txt
+          cp -r .github/android/pck_probe "$RUNNER_TEMP/pck_probe"
+          "$GODOT" --headless --path "$RUNNER_TEMP/pck_probe" -s res://pck_scan.gd -- \
+            "$PWD/build/android/${APK_NAME}.pck" "$PWD/.github/android/family_first10_export_exclusions.txt" \
+            "$PWD/out/required_runtime_paths.txt" "$PWD/out/pck_scan_report.json" 2>&1 | tee out/pck_scan.log
+          grep -q "verdict=PASS" out/pck_scan.log
+
+      - name: Packaged-path scan of the APK itself
+        run: |
+          unzip -Z1 "build/android/${APK_NAME}.apk" > out/apk_entries.txt
+          wc -l out/apk_entries.txt
+          echo "apk assets/ entries: $(grep -c '^assets/' out/apk_entries.txt || true); embedded .pck: $(grep -E '\.pck$' out/apk_entries.txt | tr '\n' ' ')" | tee out/apk_scan.txt
+          hits=0
+          while read -r p; do
+            case "$p" in ''|'#'*) continue;; esac
+            n=$(grep -cE "^(assets/)?${p}/" out/apk_entries.txt || true)
+            echo "apk entries under ${p}/: $n" | tee -a out/apk_scan.txt
+            hits=$((hits + n))
+          done < .github/android/family_first10_export_exclusions.txt
+          echo "APK_SCAN forbidden_total=$hits" | tee -a out/apk_scan.txt
+          [ "$hits" -eq 0 ]
+
+      - name: Headless boot of the exported pack (offline, no endpoint)
+        run: |
+          mkdir -p "$RUNNER_TEMP/boot" && cd "$RUNNER_TEMP/boot"
+          timeout 300 "$GODOT" --headless --main-pack "$GITHUB_WORKSPACE/build/android/${APK_NAME}.pck" --quit-after 600 \
+            > "$GITHUB_WORKSPACE/out/boot.log" 2>&1 || true
+          cd "$GITHUB_WORKSPACE"
+          tail -20 out/boot.log
+          if grep -E "SCRIPT ERROR|Parse Error|Failed loading resource|Cannot open file|Resource file not found|Failed to load script" out/boot.log; then
+            echo "::error::exported pack boot reported missing / broken resources"; exit 1
+          fi
+
+      - name: APK signature / metadata / hash
+        run: |
+          APK="build/android/${APK_NAME}.apk"
+          file "$APK" | tee out/apk_metadata.txt
+          unzip -tq "$APK" | tee -a out/apk_metadata.txt
+          "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK" | tee -a out/apk_metadata.txt
+          "$BUILD_TOOLS/aapt2" dump badging "$APK" | grep -E "^package:|^application-label|^native-code|^launchable-activity|^sdkVersion|^targetSdkVersion|^uses-permission" | tee -a out/apk_metadata.txt
+          "$BUILD_TOOLS/aapt2" dump xmltree --file AndroidManifest.xml "$APK" | grep -iE "screenOrientation|debuggable" | tee -a out/apk_metadata.txt
+          grep -E "^lib/" out/apk_entries.txt | cut -d/ -f2 | sort -u | sed 's/^/abi: /' | tee -a out/apk_metadata.txt
+          sha256sum "$APK" "build/android/${APK_NAME}.pck" | tee out/sha256.txt
+          stat -c '%n %s bytes' "$APK" "build/android/${APK_NAME}.pck" | tee out/sizes.txt
+          {
+            echo "## ${APK_NAME}"
+            echo "- source SHA: \`${GITHUB_SHA}\`"
+            echo "- run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
+            echo '```'; cat out/sizes.txt out/sha256.txt out/apk_scan.txt; grep PCK_SCAN out/pck_scan.log; cat out/apk_metadata.txt; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload APK
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ env.APK_NAME }}.apk
+          path: build/android/${{ env.APK_NAME }}.apk
+          retention-days: 30
+          if-no-files-found: error
+
+      - name: Upload inspection pack + scan reports
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: ${{ env.APK_NAME }}-inspection
+          path: |
+            build/android/${{ env.APK_NAME }}.pck
+            out/
+          retention-days: 30
