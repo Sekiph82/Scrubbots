@@ -11,6 +11,7 @@ extends RefCounted
 ##     Cleanup; an honest empty state when nothing is scheduled. No event currency.
 ## Claims / joins go through ProductionActionFacade. These screens own no rule or value.
 
+const TouchScroll = preload("res://scripts/ui/components/touch_scroll.gd")
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
@@ -95,6 +96,7 @@ static func open_achievements(stack, app) -> BasePopup:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	scroll.add_child(list)
+	TouchScroll.enable(scroll)   # M47-TOUCH-R01: finger swipe scrolls over rows / buttons
 	for a in Achievements.evaluate(app):
 		var card := PanelContainer.new()
 		card.name = "Ach_" + String(a["id"])

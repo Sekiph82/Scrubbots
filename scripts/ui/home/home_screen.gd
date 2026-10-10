@@ -1293,6 +1293,9 @@ func _render_values() -> void:
 		var bd := HomeBadges.compute(_app)
 		(_nodes["Shortcut_tasks"] as UiShortcutButton).set_badge(int(bd["tasks"]))
 		(_nodes["Shortcut_collection"] as UiShortcutButton).set_badge(int(bd["collection"]))
+		# M47-TOUCH-R01: red "1" while the next sequential Rewarded Ads reward is actionable (only
+		# when the app serves that destination).
+		(_nodes["RewardedAdsButton"] as UiShortcutButton).set_badge(int(bd["rewarded_ads"]) if _app_shortcuts.has("rewarded_ads") else 0)
 		for nid in ["robots", "events"]:
 			var nl: Label = _nodes["NavBadge_" + nid]
 			nl.text = str(int(bd[nid]))

@@ -11,6 +11,7 @@ extends RefCounted
 ## Every claim goes through ProductionActionFacade (idempotent tx ids, durable save). These
 ## screens own no calendar, reward value or progress rule. The ScrubBox is never sold.
 
+const TouchScroll = preload("res://scripts/ui/components/touch_scroll.gd")
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
@@ -347,6 +348,7 @@ static func open_gift_bar(stack, app) -> BasePopup:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	scroll.add_child(list)
+	TouchScroll.enable(scroll)   # M47-TOUCH-R01: finger swipe scrolls over rows / buttons
 	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
 	p.action_selected.connect(func(id, _c):
 		if id.begins_with("gift:"):

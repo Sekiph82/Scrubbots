@@ -29,12 +29,16 @@ const MAX_COLUMNS := 5
 ## placement; the panel just reports which front the player activated.
 signal front_batch_activated(column_index: int)
 
-## Mouse/touch de-duplication window. Godot emulates a mouse click from the first touch
-## (emulate_mouse_from_touch, default on) but never a touch from a mouse. So a synthesized
-## mouse event arrives within a few ms of the real touch it mirrors; ignoring mouse events
-## this close to a handled touch collapses "one physical touch + its synthesized mouse"
-## to a single activation, while a genuine desktop mouse (no preceding touch) is untouched.
-## ponytail: time-window dedup — no public "emulated" flag exists on the event.
+## Mouse/touch de-duplication. Godot emulates a mouse click from the first touch
+## (emulate_mouse_from_touch, default on) and dispatches that emulated mouse event BEFORE the
+## ScreenTouch it mirrors (core/input/input.cpp), tagged device InputEvent.DEVICE_ID_EMULATION.
+## M47-FAMILY-APK-TOUCH-R01: the old handler only had the time window below, which cannot catch
+## an emulated PRESS that precedes its touch: the emulated press armed a "mouse" gesture, the
+## touch press was ignored as a second gesture, the emulated release fell inside the window and
+## the touch release did not match - so a quick tap placed nothing (only a >200 ms hold did).
+## Emulated mouse events are therefore ignored outright (the real touch carries the gesture);
+## the window still drops an OS-synthesized (non-emulation-device) mouse that follows a touch.
+## A genuine desktop mouse (no preceding touch) is untouched.
 const _TOUCH_MOUSE_DEDUP_MSEC := 200
 
 var _columns: Array = []   # each: {root:VBoxContainer, rows:[ {panel, tile, swatch, count, front} x3 ]}
@@ -220,8 +224,9 @@ func _on_front_gui_input(event: InputEvent, column: int) -> void:
 		else:
 			_release_gesture(column, true, event.index)
 	elif event is InputEventMouseButton and event.button_index == MOUSE_BUTTON_LEFT:
-		# Ignore a mouse event synthesized from a touch just handled (dedup window).
-		if Time.get_ticks_msec() - _last_touch_msec < _TOUCH_MOUSE_DEDUP_MSEC:
+		# Ignore the engine's touch-emulated mouse (it precedes its touch) and any mouse
+		# synthesized from a touch just handled (dedup window).
+		if event.device == InputEvent.DEVICE_ID_EMULATION or Time.get_ticks_msec() - _last_touch_msec < _TOUCH_MOUSE_DEDUP_MSEC:
 			return
 		if event.pressed:
 			_begin_gesture(column, false, -1)

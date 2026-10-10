@@ -18,6 +18,7 @@ extends RefCounted
 ## (atomic removal + SB credit + save); the UI never edits counts or balances. "Viewed" marks
 ## (meta_ui `card:<id>`) are presentation only. Pack opening entry is NOT here (SB-M43-098).
 
+const TouchScroll = preload("res://scripts/ui/components/touch_scroll.gd")
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const Popups = preload("res://scripts/ui/popup/popups.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
@@ -73,6 +74,7 @@ static func open_album(stack, app) -> BasePopup:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	scroll.add_child(list)
+	TouchScroll.enable(scroll)   # M47-TOUCH-R01: finger swipe scrolls over rows / buttons
 	for row in e.config.collection_config().get("set_rewards", []):
 		var n := int(row["set"])
 		list.add_child(_set_row(p, e, n, row))
@@ -391,6 +393,7 @@ static func open_exchange(stack, app, on_close: Callable = Callable()) -> BasePo
 	list.name = "Extras"
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll.add_child(list)
+	TouchScroll.enable(scroll)   # M47-TOUCH-R01: finger swipe scrolls over rows / buttons
 	p.add_body_line("", "Total", BasePopup.ROYAL_EDGE, 28)
 	p.add_action("ex_all_extras", "", "primary", false)
 	p.add_action("back", UiText.t("SHOP_BACK"), "secondary", true)

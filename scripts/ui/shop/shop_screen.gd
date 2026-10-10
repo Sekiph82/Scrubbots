@@ -18,6 +18,7 @@ extends RefCounted
 ## Closing the Shop finishes its ticket, so the originating acquisition popup resumes with its
 ## exact pending context (SB-M43-086).
 
+const TouchScroll = preload("res://scripts/ui/components/touch_scroll.gd")
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const Popups = preload("res://scripts/ui/popup/popups.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
@@ -91,6 +92,7 @@ func _build() -> void:
 	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	list.add_theme_constant_override("separation", UiTokens.SPACE_SM)
 	scroll.add_child(list)
+	TouchScroll.enable(scroll)   # M47-TOUCH-R01: finger swipe scrolls over rows / buttons
 	_section(list, "SHOP_SECTION_HEARTS")
 	_item(list, "heart_plus_one", ART["hearts"], UiText.t("LIFE_ITEM_HEART_PLUS_ONE"))
 	_item(list, "heart_refill", ART["hearts"], UiText.t("LIFE_ITEM_HEART_REFILL"))
