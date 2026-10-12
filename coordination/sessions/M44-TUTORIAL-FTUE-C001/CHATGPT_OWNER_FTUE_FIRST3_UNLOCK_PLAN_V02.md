@@ -1,4 +1,6 @@
 # M44 First-Time User Experience — OWNER-REVISED 3-LEVEL PLAN V02
+
+> **HISTORICAL: SUPERSEDED FOR DAY-ONE TASKS REWARD BY OWNER V03 (2026-10-12).** The 75 SB first-day claim proposed below is NOT authorized. The owner specifically approved **100 SB** ready Tasks CLAIM from first Home, while standard later-day easy Tasks remain 75 SB. Current authority: `OWNER_M44_FIRST3_STARTER_AND_CLAIM_DECISION_V03.md`; current implementation instructions: `CHATGPT_M44_MASTER_PROMPT_V01.md`. All other compatible V02 three-level/booster decisions carry forward.
 Date: 2026-10-12 | Status: **OWNER-LOCKED REQUIREMENTS + IMPLEMENTATION DESIGN CANDIDATE**
 Supersedes the 10-level onboarding and delayed Daily/Tasks/booster plans in `CHATGPT_OWNER_FTUE_FIRST10_UNLOCK_PROPOSAL_V01.md`.
 Source authority: owner's 2026-10-12 correction: **"10 levellik tutorial mi olur, bunu iki yada max uc levelde hallet hepsini. eger booster kazanamayacaksa oyuncu ilk levellerde, oyuna 2 ser tane booster ile baslasin. Daily rewards ve tasks gorevleri home ekraninda, ilk olarak baslasin. ikisinde de hazir claim var sonucta."**
