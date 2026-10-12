@@ -1,5 +1,7 @@
 # M44 — Tutorial / FTUE / Feature Unlock Pacing — Owner Proposal V01
 
+> **SUPERSEDED 2026-10-12 BY OWNER V02**: The previous 10-level tutorial, late booster introductions, and L7 Daily/Tasks delays are **REJECTED**. Current owner direction is max THREE tutorial levels (L1–L3), each of four boosters starts at two charges for truly new profiles, Daily and Tasks FIRST HOME with genuine claim available. Current plan: `CHATGPT_OWNER_FTUE_FIRST3_UNLOCK_PLAN_V02.md`. This V01 is historical only; do NOT implement it.
+
 Date: 2026-10-12 | Prepared by: ChatGPT | **DRAFT — OWNER APPROVAL REQUIRED**
 Authority: root `TASKS.md` SB-M44-001..024; `docs/16_FTUE_FEATURE_UNLOCK_AND_RETENTION_SURFACES.md`; `coordination/OWNER_REWARD_CEREMONY_FEATURE_UNLOCK_V01.md`; locked opening cinematic, difficulty rhythm and current first-10 catalog.
 **This proposal is NOT a product decision and is NOT Claude implementation authorization.** Owner approves/revises the table and the skip/replay/unlock presentation gates first; then ChatGPT will publish one M44 MASTER implementation prompt and its complete independent audit criteria. All 24 M44 tasks remain OPEN.
