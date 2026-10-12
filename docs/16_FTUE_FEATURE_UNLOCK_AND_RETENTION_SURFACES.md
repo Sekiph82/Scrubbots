@@ -1,23 +1,20 @@
 # 16 - FTUE, Feature Unlock and Retention Surfaces
 
-Status: PLANNED
+Status: M44 OWNER-REVISED 2026-10-12 / IMPLEMENTATION PENDING
 Date: 2026-09-26
 
-## 1. First-session design
+## 1. First-session design [LATEST OWNER REVISION 2026-10-12]
 
-The first session must teach the real production mechanics progressively. Do not expose the full meta-game immediately.
+**MANDATORY lesson/tutorial capped at THREE first production levels, no fourth–tenth tutorial.** Earlier 10-level instructional pacing is obsolete. Authoritative V02 plan: `coordination/sessions/M44-TUTORIAL-FTUE-C001/CHATGPT_OWNER_FTUE_FIRST3_UNLOCK_PLAN_V02.md`.
 
-Core order concept:
-1. legal supply-front selection and visible cleaning;
-2. five-slot placement/pressure;
-3. preview rows and front-only rule;
-4. waiting/reachability when first encountered;
-5. fail/retry/Heart consequence;
-6. boosters one by one;
-7. 2x after normal-speed comprehension;
-8. meta systems unlocked over subsequent progression.
-
-Exact level numbers require owner approval.
+- Home immediately after the non-skippable native opening cinematic: DAY 1 Daily Rewards and Tasks are both present and actionable. Daily existing login D1 claim is 100 SB; current code does **not** have a ready task on a truly fresh save. Proposed owner-directed solution: once-only fresh-profile day1 easy Task (index0, 75 SB) claimable on Home, replacing that day's normal easy task without creating a fourth; ordinary Tasks resume on future days. No fake CLAIM badge and no forced claim. Existing-player tasks state unchanged.
+- Level 1 (Hazard Bot): legal front-row selection, rightmost-empty slot, five-slot/preview concept and actual cleaning.
+- Level 2 (Apple): contextual compact introduction of ALL FOUR boosters (+1 Slot, Selector, Random, Tornado); optional legal use only, no forced charges spent.
+- Level 3 (Palm Tree): consolidate no-current-target/queue, Hearts/Retry rules (no scripted loss), manual/paid 2x versus free automatic endgame 2x. Intro concludes by L3 Results.
+- Level 4 onward: NO mandatory tutorial steps; normal real earned/unlocked reward and UI flows continue, as does optional read-only Help if later owner approves.
+- Owner-directed starter inventory: new profiles start with exactly **two charges EACH** of the four canonical boosters (8 total), since first-level normal rewards do not guarantee those charges. One-time, save-safe and idempotent, not a fictitious tutorial counter. No duplication for existing profiles, reinstall/replay/skip.
+- All tutorial highlights reference real selectable controls/active rules, never mutate solver, level art, economy without an authorized starter grant, or first-clear progression. All coachmarks follow localization, reduced effects and accessibility constraints.
+- Skip Tips and hard-vs-soft discovery policy are **not** settled by this update; earlier owner-locked cinematic remains strictly NON-SKIPPABLE. Confirm proposed Skip Tips/read-only Help and existing-feature non-locking before writing the single M44 Claude master implementation prompt.
 
 ## 2. Feature set requiring unlock pacing
 
