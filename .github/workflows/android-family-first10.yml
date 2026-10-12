@@ -12,9 +12,21 @@ name: Android Family First10 APK
 #             paths under the excluded prefixes and presence of every runtime-referenced res://
 #             file; headless boot of the exported pack; apksigner / aapt2 metadata; artifacts.
 # No secret, no network service, no R2 credential is used or packaged.
+# CP06 V03: dispatch input `mode` (default validation_only). validation_only runs ONLY `validate`
+# (logs artifact only); the `export` job is skipped at job level, so no keystore, templates, APK or
+# PCK. build_apk must be selected explicitly and keeps the original export path unchanged.
 
 on:
   workflow_dispatch:
+    inputs:
+      mode:
+        description: "validation_only = tests + logs only, NO APK. build_apk = tests then APK export."
+        type: choice
+        required: true
+        default: validation_only
+        options:
+          - validation_only
+          - build_apk
 
 permissions:
   contents: read
@@ -56,19 +68,48 @@ jobs:
           "$GODOT" --headless --path . --import > import.log 2>&1 || true
           git checkout -- project.godot   # disposable CI workspace: the import may rewrite it; validate the tracked file
 
-      - name: Focused suites
+      - name: Focused suites (fail closed; every suite logged)
+        env:
+          MODE: ${{ inputs.mode }}
         run: |
-          set -o pipefail
           mkdir -p validate_logs
+          S=validate_logs/summary.txt
+          echo "mode=${MODE:-<unset>} sha=${GITHUB_SHA} (validation_only => no APK/PCK built)" | tee "$S"
+          # Script diagnostics are fail-closed. Only m43_c005f's documented injected plugin-throw line is expected.
+          DIAG='^(ERROR: )?(SCRIPT ERROR|Parse Error|Failed to load script)'
+          INJECTED="SCRIPT ERROR: Invalid call. Nonexistent function 'explode' in base 'Nil'."
+          n=$(grep -cE "$DIAG" import.log || true)
+          echo "import script_diag=$n" | tee -a "$S"
           fail=0
+          [ "$n" -eq 0 ] || { grep -E "$DIAG" import.log || true; fail=1; }
           for s in m35_level_catalog m37_level_progression m55_long_session m43_c005f_phase4_terminal_home_micro \
                    m43_c001a_results_foundation m42_navigation m42_home m40_save_system m40_v04_bootstrap \
-                   cp04_remote_content_runtime cp05_remote_content_cache m55_economy_release_regression run_tests; do
-            timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "validate_logs/$s.log" 2>&1
-            ec=$?
-            echo "$s exit=$ec $(grep -E 'PASS|FAIL|RESULT' "validate_logs/$s.log" | tail -1)" | tee -a validate_logs/summary.txt
-            [ $ec -eq 0 ] || fail=1
+                   cp04_remote_content_runtime cp05_remote_content_cache m55_economy_release_regression run_tests \
+                   cp05_r01_transaction_cleanup remote_content_family_fixture cp06_disabled_levels; do
+            L="validate_logs/$s.log"
+            if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
+            if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
+            [ $ec -ne 124 ] || echo "::error::$s TIMEOUT"
+            if [ "$s" = m43_c005f_phase4_terminal_home_micro ]; then
+              diag=$(grep -E "$DIAG" "$L" | grep -cvxF "$INJECTED" || true)
+            else
+              diag=$(grep -cE "$DIAG" "$L" || true)
+            fi
+            last=$(grep -E 'PASS|FAIL|RESULT' "$L" | tail -1 || true)
+            st=PASS
+            if [ $ec -ne 0 ] || [ "$diag" -ne 0 ] || ! printf '%s' "$last" | grep -q PASS || printf '%s' "$last" | grep -q FAIL; then
+              st=FAIL; fail=1; grep -E "$DIAG" "$L" || true
+            fi
+            echo "$s exit=$ec script_diag=$diag status=$st | $last" | tee -a "$S"
           done
+          # CP06 Option B: exact 16-case summary is mandatory.
+          if grep -qxF 'CP06 disabled levels evidence: PASS (16/16 cases, 0 fail)' validate_logs/cp06_disabled_levels.log 2>/dev/null; then
+            echo "CP06 verdict=PASS (16/16)" | tee -a "$S"
+          else
+            echo "CP06 verdict=FAIL (exact 16/16 summary missing)" | tee -a "$S"; fail=1
+          fi
+          echo "aggregate=$([ $fail -eq 0 ] && echo PASS || echo FAIL)" | tee -a "$S"
+          { echo "### validate (mode=${MODE:-<unset>}, ${GITHUB_SHA})"; echo '```'; cat "$S"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
           exit $fail
 
       - name: Validation logs
@@ -83,6 +124,8 @@ jobs:
 
   export:
     needs: validate
+    # Job-level guard: only an explicit build_apk dispatch exports; validation_only / unset / unknown skip.
+    if: ${{ inputs.mode == 'build_apk' }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
