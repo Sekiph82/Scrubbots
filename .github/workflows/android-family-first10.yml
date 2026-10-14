@@ -17,6 +17,7 @@ name: Android Family First10 APK
 # PCK. build_apk must be selected explicitly and keeps the original export path unchanged.
 # M44 FTUE master: tests/m44_ftue.gd added to `validate` (exact 21/21 summary required); the
 # 16 earlier suites, CP06 16/16 guard, manual trigger and job-level export guard are unchanged.
+# M44 R01: + 17 specialist M39 / M41 Settings / M43 Daily + R15 suites (34 total), same fail-closed rules.
 
 on:
   workflow_dispatch:
@@ -87,7 +88,11 @@ jobs:
           for s in m35_level_catalog m37_level_progression m55_long_session m43_c005f_phase4_terminal_home_micro \
                    m43_c001a_results_foundation m42_navigation m42_home m40_save_system m40_v04_bootstrap \
                    cp04_remote_content_runtime cp05_remote_content_cache m55_economy_release_regression run_tests \
-                   cp05_r01_transaction_cleanup remote_content_family_fixture cp06_disabled_levels m44_ftue; do
+                   cp05_r01_transaction_cleanup remote_content_family_fixture cp06_disabled_levels m44_ftue \
+                   m39a_economy_core m39b_hearts_speed m39c_boosters m39d_daily_collection m39e_full_matrix \
+                   m39_v02_atomicity m39_v02_capacity m39_v02_integration m39_v03_full_surface m39_v03_integration \
+                   m39_v04_integration m39_v04_tornado_inflight m39_c003_random_any_booster_rewards \
+                   m41_settings m43_master_c009_daily m43_r15_owner_remediation m43_r15_001_r01_sequential_unlock; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
