@@ -37,6 +37,12 @@ const MetaFeedback = preload("res://scripts/ui/feel/meta_feedback.gd")
 const MetaRewardFeel = preload("res://scripts/ui/feel/meta_reward_feel.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
 const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd")
+const FtueDirector = preload("res://scripts/app/ftue_director.gd")
+const CoachmarkLayer = preload("res://scripts/ui/tutorial/coachmark_layer.gd")
+const HelpTipsScreen = preload("res://scripts/ui/tutorial/help_tips_screen.gd")
+const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
+## M44: coachmark refresh cadence (presentation poll; not per frame).
+const COACH_TICK_S := 0.2
 ## BottomNav tabs the app root serves (RANKS waits for the SB-M43-131 owner policy).
 const APP_NAV := ["events"]
 ## Home shortcut panels the app root turns into app-level destinations (Home opens none of
@@ -51,6 +57,11 @@ static var boot_local_day_override: Callable = Callable()
 ## SB-M42-029 opening boot policy seam: -1 auto (play when a display exists; a headless
 ## run has nothing to present on and boots straight to Home), 0 never, 1 always.
 static var boot_opening_override: int = -1
+## M44 first-time experience seam: -1 auto = ON for the canonical (shipping) save path, OFF
+## for an injected test save path (legacy suites keep their exact fresh fixtures); 0 never;
+## 1 always. Covers the new-profile bootstrap (starter charges + Welcome task), the L1-L3
+## coachmarks and What's New. Production passes nothing, so it is always ON there.
+static var boot_ftue_override: int = -1
 
 var app_state = null
 ## M42 (SB-M42-001): the ONE app-root-owned navigation authority.
@@ -85,6 +96,10 @@ var meta_feedback = null
 var feel = null
 ## M43-C005F-PHASE3 (F006 / F008 / F009): committed meta reward / acquisition -> feel intents.
 var meta_feel = null
+## M44: FTUE step authority (presentation) + the ONE coachmark overlay it drives.
+var ftue = null
+var coachmarks = null
+var _coach_timer: Timer = null
 
 func _enter_tree() -> void:
 	_boot()
@@ -94,6 +109,13 @@ func _boot() -> void:
 		return
 	var path: String = boot_save_path_override if not boot_save_path_override.is_empty() else AppState.CANONICAL_SAVE_PATH
 	app_state = AppState.new(path, boot_clock_override, boot_local_day_override)
+	# M44 owner V03: a conclusively fresh profile gets its one-time starter charges + first-day
+	# Welcome task before the first Home (no-op for every existing / migrated / blocked save).
+	ftue = FtueDirector.new(app_state)
+	ftue.enabled = boot_ftue_override == 1 or (boot_ftue_override == -1 and path == AppState.CANONICAL_SAVE_PATH)
+	if ftue.enabled:
+		app_state.bootstrap_new_profile()
+		ftue.settle()
 	nav = NavigationController.new()
 	nav.settings_changed.connect(_on_nav_settings_changed)
 
@@ -172,6 +194,7 @@ func _ready() -> void:
 			if bool(r.get("ok", false)):
 				request_earned_packs())
 	nav.route_changed.connect(_on_route_changed)
+	_build_coachmarks()
 	_start_remote_content()
 	if _should_play_opening():
 		_start_opening()
@@ -250,6 +273,11 @@ func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
 				_offer_need_a_hand()
 			elif String(_payload.get("status", "")) == "WON":
 				_begin_results_ceremonies()
+	# M44: the compulsory window settles by L3 Results (frontier past max level), and the
+	# coachmark follows the route at once (never left over a Results / Opening screen).
+	if ftue != null and (to == NavigationController.Route.RESULTS or to == NavigationController.Route.HOME):
+		ftue.settle()
+	refresh_coachmark()
 
 ## SB-M43-013: a WON Results whose committed terminal (economy + save already done inside the
 ## host) produced a ceremony event (Gift milestone, set, Master, robot) hands off to it: the
@@ -357,6 +385,8 @@ func _drain_home_ceremonies() -> void:
 		return
 	if packs != null and not app_state.is_blocked and packs.drain():
 		return
+	if _open_whats_new():
+		return
 	if app_state != null and app_state.economy.returns.summary_due():
 		ProfileScreens.open_comeback(_modals, app_state)
 
@@ -418,6 +448,168 @@ func _build_settings_entry() -> void:
 	add_child(_settings_panel)
 	_settings_panel.bind(app_state)
 	_settings_panel.closed.connect(func(): nav.close_settings())
+	_settings_panel.help_requested.connect(open_help)
+
+## M44: Settings "?" -> the read-only HELP & TIPS popup on the app ModalStack (Home only;
+## Settings closes first so the popup owns input). Never replays a level / reward / cinematic.
+func open_help():
+	if nav == null or nav.current() != NavigationController.Route.HOME or app_state == null:
+		return null
+	if nav.is_settings_open():
+		nav.close_settings()
+	return HelpTipsScreen.open(_modals, app_state)
+
+# ------------------------------------------------------------------ M44 FTUE --
+
+func _build_coachmarks() -> void:
+	coachmarks = CoachmarkLayer.new()
+	add_child(coachmarks)
+	coachmarks.acknowledged.connect(func(step_id: String):
+		if ftue != null:
+			ftue.acknowledge(step_id)
+		refresh_coachmark())
+	coachmarks.skip_requested.connect(func():
+		if ftue != null:
+			ftue.skip_tips()
+		refresh_coachmark())
+	_home.shortcut_requested.connect(func(id: String): _ftue_home_event("shortcut:" + id))
+	_home.play_requested.connect(func(): _ftue_home_event("play"))
+	_modals.modal_changed.connect(func(_a): refresh_coachmark())
+	nav.settings_changed.connect(func(_o): refresh_coachmark())
+	_coach_timer = Timer.new()
+	_coach_timer.name = "CoachmarkTimer"
+	_coach_timer.wait_time = COACH_TICK_S
+	_coach_timer.ignore_time_scale = true
+	_coach_timer.timeout.connect(refresh_coachmark)
+	add_child(_coach_timer)
+	_coach_timer.start()
+
+func get_coachmarks():
+	return coachmarks
+
+func get_ftue():
+	return ftue
+
+func _ftue_home_event(event: String) -> void:
+	if ftue != null:
+		ftue.notify(event, "home", ftue.home_context())
+	refresh_coachmark()
+
+func _ftue_gameplay_event(host, event: String) -> void:
+	if ftue == null or host == null or not is_instance_valid(host) or host != _gameplay_host:
+		return
+	ftue.notify(event, "gameplay", {"level": int(host.progression_level), "level_id": String(host.launch_entry_id), "host": host})
+	refresh_coachmark()
+
+## Show exactly the step FtueDirector picks for the current surface (or nothing).
+func refresh_coachmark() -> void:
+	if coachmarks == null:
+		return
+	if app_state != null and app_state.effects != null:
+		coachmarks.set_reduced(app_state.effects.is_reduced())
+	var want := _coach_want()
+	if want.is_empty():
+		coachmarks.hide_step()
+		return
+	var copy: Dictionary = ftue.step_copy(want["step"], want["ctx"])
+	coachmarks.show_step(String(want["step"]["id"]), String(copy["title"]), String(copy["body"]), want["rect"])
+
+func _coach_want() -> Dictionary:
+	if ftue == null or nav == null or not ftue.tips_active():
+		return {}
+	if (_modals != null and _modals.depth() > 0) or nav.is_settings_open():
+		return {}
+	var surface := ""
+	var ctx := {}
+	var host = null
+	if nav.current() == NavigationController.Route.HOME:
+		if _home == null or not _home.visible or _home.is_modal_active():
+			return {}
+		surface = "home"
+		ctx = ftue.home_context()
+	elif nav.current() == NavigationController.Route.GAMEPLAY:
+		host = _gameplay_host
+		if host == null or not is_instance_valid(host) or not host.is_built() or host.get_completion() == null or host.get_completion().is_terminal():
+			return {}
+		surface = "gameplay"
+		ctx = {"level": int(host.progression_level), "level_id": String(host.launch_entry_id), "host": host}
+	else:
+		return {}
+	var step: Dictionary = ftue.current_step(surface, ctx)
+	if step.is_empty():
+		return {}
+	return {"step": step, "ctx": ctx, "rect": _coach_target(String(step.get("target", "")), step, host)}
+
+## The REAL control a step points at, in viewport coordinates (Rect2() = no pointer, e.g. no
+## legal Supply front right now — the tip never points at an illegal input).
+func _coach_target(target: String, step: Dictionary, host) -> Rect2:
+	match target:
+		"shortcut:daily":
+			return _vis_rect(_home.get_region("Shortcut_daily"))
+		"shortcut:tasks":
+			return _vis_rect(_home.get_region("Shortcut_tasks"))
+		"play":
+			return _vis_rect(_home.get_region("PlayButton"))
+	if host == null or host.get_screen() == null:
+		return Rect2()
+	var s = host.get_screen()
+	var out := Rect2()
+	match target:
+		"supply_front":
+			var fp = s.get_supply_panel()
+			for c in range(fp.get_column_count()):
+				if fp.get_front_enabled(c):
+					return fp.get_front_hit_rect(c)
+		"supply_preview":
+			var pp = s.get_supply_panel()
+			for c in range(pp.get_column_count()):
+				var rows: Array = pp.get_column_row_panels(c)
+				for i in range(1, rows.size()):
+					out = _merge_rect(out, (rows[i] as Control).get_global_rect())
+		"slots":
+			out = s.get_five_slot_strip_rect()
+		"board":
+			out = s.get_board_rect()
+		"boosters":
+			for id in step.get("boosters", []):
+				out = _merge_rect(out, _vis_rect(s.get_booster_button(String(id))))
+		"speed":
+			out = _vis_rect(s.get_speed_button())
+	return out
+
+static func _vis_rect(c) -> Rect2:
+	if c == null or not is_instance_valid(c) or not (c is Control) or not (c as Control).is_visible_in_tree():
+		return Rect2()
+	return (c as Control).get_global_rect()
+
+static func _merge_rect(a: Rect2, b: Rect2) -> Rect2:
+	if b.size.x <= 0.0 or b.size.y <= 0.0:
+		return a
+	if a.size.x <= 0.0 or a.size.y <= 0.0:
+		return b
+	return a.merge(b)
+
+## M44 What's New: an ESTABLISHED profile sees each new feature once per feature/version
+## through the M43 Feature Unlock ceremony on a quiet Home; acknowledged only by its CTA.
+func _open_whats_new() -> bool:
+	if ftue == null or _modals == null or app_state == null:
+		return false
+	var due: Array = ftue.whats_new_due()
+	if due.is_empty():
+		return false
+	var e: Dictionary = due[0]
+	var p = MetaCeremonies.feature_unlock(ftue.whats_new_event(e), app_state.effects != null and app_state.effects.is_reduced())
+	if p == null:
+		return false
+	p.closed.connect(func(reason: String):
+		if reason.begins_with("action:"):
+			ftue.acknowledge_whats_new(e)
+			request_home_ceremonies(), CONNECT_ONE_SHOT)
+	if not _modals.push(p):
+		p.free()
+		return false
+	MetaCeremonies.start_motion(p)
+	return true
 
 ## Settings is a navigation overlay (HOME only); the panel follows nav state.
 func open_settings() -> void:
@@ -483,6 +675,12 @@ func launch_gameplay(parent: Node = null) -> Dictionary:
 		return last_launch
 	_gameplay_host = host
 	meta_feel.bind_gameplay(host)   # F009: committed booster use (the host owns its facade)
+	# M44: a REAL accepted Supply front placement completes the L1 "tap a front batch" tip.
+	var ic = host.get_input_controller()
+	if ic != null:
+		ic.activation_result.connect(func(_col: int, ok: bool, _err: String):
+			if ok:
+				_ftue_gameplay_event(host, "supply_placed"))
 	last_launch = {"ok": true, "reason": "", "launch": launch, "host": host}
 	return last_launch
 

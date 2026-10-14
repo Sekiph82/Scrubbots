@@ -36,7 +36,6 @@ static func open_tasks(stack, app) -> BasePopup:
 	p.set_frame("large")
 	p.set_title(UiText.t("TASKS_TITLE"))
 	p.add_body_line(UiText.t("TASKS_SUBTITLE"), "Subtitle", BasePopup.INK, 24)
-	var sb: Array = app.economy.config.daily_config().get("task_sb", [])
 	for o in app.economy.orders.orders():
 		var i := int(o["index"])
 		var card := _row_card("Task_%d" % i)
@@ -59,7 +58,7 @@ static func open_tasks(stack, app) -> BasePopup:
 		v.add_child(n)
 		var b := p.add_action("task:%d" % i, "", "secondary", false, "", h)
 		b.custom_minimum_size = Vector2(210, 80)
-		b.set_meta("sb", int(sb[i]) if i < sb.size() else 0)
+		b.set_meta("sb", int(app.economy.daily.task_reward_sb(i)))
 		p.get_content().add_child(card)
 	var box := _row_card("ScrubBox")
 	var bh: HBoxContainer = box.get_child(0)
@@ -104,12 +103,19 @@ static func refresh_tasks(p: BasePopup, app) -> void:
 	for o in app.economy.orders.orders():
 		var i := int(o["index"])
 		var card: Control = p.find_child("Task_%d" % i, true, false)
-		(card.find_child("Text", true, false) as Label).text = order_text(o)
+		# M44: on a new profile's first local day, slot 0 IS the completed Welcome task (it
+		# replaces that day's easy order); its reward is DailyService's authoritative value.
+		var welcome: bool = d.is_welcome_task(i)
+		var target := 1 if welcome else int(o["target"])
+		var progress := 1 if welcome else int(o["progress"])
+		(card.find_child("Text", true, false) as Label).text = UiText.t("TASK_WELCOME") if welcome else order_text(o)
 		var pr: ProgressBar = card.find_child("Progress", true, false)
-		pr.max_value = maxi(1, int(o["target"]))
-		pr.value = int(o["progress"])
-		(card.find_child("Count", true, false) as Label).text = UiText.t("TASK_PROGRESS", [UiText.num(int(o["progress"])), UiText.num(int(o["target"]))])
+		pr.max_value = maxi(1, target)
+		pr.value = progress
+		(card.find_child("Count", true, false) as Label).text = UiText.t("TASK_PROGRESS", [UiText.num(progress), UiText.num(target)])
 		var b := p.get_action_button("task:%d" % i)
+		b.set_meta("sb", int(d.task_reward_sb(i)))
+		card.set_meta("welcome", welcome)
 		if bool(o["claimed"]):
 			b.text = UiText.t("TASK_CLAIMED")
 		else:

@@ -1,0 +1,75 @@
+{
+  "schema": "scrubbots.ftue_onboarding.v1",
+  "version": 1,
+  "decision": "coordination/sessions/M44-TUTORIAL-FTUE-C001/OWNER_M44_FIRST3_STARTER_AND_CLAIM_DECISION_V03.md",
+  "starter_booster_charges": {
+    "plus_one_slot": 2,
+    "random": 2,
+    "selector": 2,
+    "tornado": 2
+  },
+  "first_day_welcome_task": {
+    "task_index": 0,
+    "scrub_bucks": 100
+  },
+  "max_tutorial_level": 3,
+  "feature_discovery": {
+    "policy": "soft_no_hard_locks",
+    "rule": "Every implemented destination is reachable from the first Home; no feature is hidden or locked behind a level. Exact future unlock levels stay owner-gated (docs/16).",
+    "available_from_first_home": ["shop", "collection", "tasks", "daily", "boosters", "hearts", "speed_2x", "gift_meter", "robots", "events", "settings"]
+  },
+  "whats_new": [
+    {
+      "feature_id": "help_tips",
+      "version": 1,
+      "name": "FTUE_WHATSNEW_HELP_NAME",
+      "body": "FTUE_WHATSNEW_HELP_BODY",
+      "icon": "res://assets/ui/final/gameplay/tutorial/speech_bubble.png"
+    }
+  ],
+  "lessons": [
+    {
+      "id": "home_welcome",
+      "surface": "home",
+      "level": 1,
+      "steps": [
+        {"id": "home_daily", "target": "shortcut:daily", "when": "daily_claimable", "complete_on": "shortcut:daily", "title": "FTUE_HOME_DAILY_TITLE", "body": "FTUE_HOME_DAILY_BODY"},
+        {"id": "home_tasks", "target": "shortcut:tasks", "when": "tasks_claimable", "complete_on": "shortcut:tasks", "title": "FTUE_HOME_TASKS_TITLE", "body": "FTUE_HOME_TASKS_BODY"},
+        {"id": "home_play", "target": "play", "complete_on": "play", "title": "FTUE_HOME_PLAY_TITLE", "body": "FTUE_HOME_PLAY_BODY"}
+      ]
+    },
+    {
+      "id": "l1_core_loop",
+      "surface": "gameplay",
+      "level": 1,
+      "level_id": "m21_level_001_hazard_bot",
+      "steps": [
+        {"id": "l1_tap_front", "target": "supply_front", "complete_on": "supply_placed", "title": "FTUE_L1_FRONT_TITLE", "body": "FTUE_L1_FRONT_BODY"},
+        {"id": "l1_slots", "target": "slots", "title": "FTUE_L1_SLOTS_TITLE", "body": "FTUE_L1_SLOTS_BODY"},
+        {"id": "l1_preview", "target": "supply_preview", "title": "FTUE_L1_PREVIEW_TITLE", "body": "FTUE_L1_PREVIEW_BODY"},
+        {"id": "l1_cleaning", "target": "board", "title": "FTUE_L1_CLEAN_TITLE", "body": "FTUE_L1_CLEAN_BODY"}
+      ]
+    },
+    {
+      "id": "l2_boosters",
+      "surface": "gameplay",
+      "level": 2,
+      "level_id": "level_002_apple",
+      "steps": [
+        {"id": "l2_boosters_a", "target": "boosters", "boosters": ["plus_one_slot", "selector"], "title": "FTUE_L2_BOOSTERS_A_TITLE", "body": "FTUE_L2_BOOSTERS_BODY"},
+        {"id": "l2_boosters_b", "target": "boosters", "boosters": ["random", "tornado"], "title": "FTUE_L2_BOOSTERS_B_TITLE", "body": "FTUE_L2_BOOSTERS_BODY"}
+      ]
+    },
+    {
+      "id": "l3_rules",
+      "surface": "gameplay",
+      "level": 3,
+      "level_id": "level_003_palm_tree",
+      "steps": [
+        {"id": "l3_waiting", "target": "slots", "title": "FTUE_L3_WAIT_TITLE", "body": "FTUE_L3_WAIT_BODY"},
+        {"id": "l3_hearts", "target": "", "title": "FTUE_L3_HEARTS_TITLE", "body": "FTUE_L3_HEARTS_BODY"},
+        {"id": "l3_speed", "target": "speed", "title": "FTUE_L3_SPEED_TITLE", "body": "FTUE_L3_SPEED_BODY"}
+      ]
+    }
+  ]
+}

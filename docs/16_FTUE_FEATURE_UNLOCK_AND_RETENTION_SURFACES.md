@@ -16,6 +16,14 @@ Date: 2026-09-26
 - All tutorial highlights reference real selectable controls/active rules, never mutate solver, level art, economy without an authorized starter grant, or first-clear progression. All coachmarks follow localization, reduced effects and accessibility constraints.
 - Skip Tips and hard-vs-soft discovery policy are **not** settled by this update; earlier owner-locked cinematic remains strictly NON-SKIPPABLE. Confirm proposed Skip Tips/read-only Help and existing-feature non-locking before writing the single M44 Claude master implementation prompt.
 
+### 1.1 Implementation (M44 master V01, awaiting ChatGPT audit + owner visual gate)
+
+- Data: `data/config/ftue_onboarding_v1.json` (strict reader `scripts/app/ftue_config.gd`): starter charges 2/2/2/2, first-day Welcome task index 0 = 100 SB, `max_tutorial_level` 3, lessons for Home + L1/L2/L3 bound to catalog ids, soft-discovery policy, once-per-version What's New.
+- Fresh profile = `SaveService.load()` found no save artefact at all (`fresh`); `AppState.bootstrap_new_profile()` grants the starter charges (ledger tx `ftue_starter_boosters:v1`) and installs the Welcome task in one saved transaction (rollback on save failure). Existing / migrated / corrupt / backup / future-schema saves are never re-classified.
+- `DailyService.task_reward_sb()` is the shown == credited task value; `daily.task_sb` stays 75/100/125. `claim_daily_login` / `claim_daily_task` roll back if the save fails.
+- `scripts/app/ftue_director.gd` picks one step; `scripts/ui/tutorial/coachmark_layer.gd` draws it non-blocking with the approved ring / pointer / bubble art; GOT IT / SKIP TIPS (tips only). Read-only Help & Tips: Settings "?". Established saves get the M43 Feature Unlock ceremony once for Help & Tips.
+- Skip Tips + read-only Help are the presentation default; owner visual approval (SB-M44-018 / 020) is still pending.
+
 ## 2. Feature set requiring unlock pacing
 
 - Hearts acquisition education;

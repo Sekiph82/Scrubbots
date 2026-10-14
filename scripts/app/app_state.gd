@@ -37,6 +37,11 @@ const PackCommitTransaction = preload("res://scripts/collection/pack_commit_tran
 const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
 const RemoteContentManager = preload("res://scripts/content_runtime/remote_content_manager.gd")
 const CompositeLevelCatalog = preload("res://scripts/content_runtime/composite_level_catalog.gd")
+const FtueConfig = preload("res://scripts/app/ftue_config.gd")
+const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
+
+## M44 owner V03: the ONE ledger tx of the new-profile starter booster grant.
+const STARTER_TX := "ftue_starter_boosters:v1"
 
 const CANONICAL_SAVE_PATH := "user://scrubbots_save.dat"
 
@@ -62,6 +67,12 @@ var content: RemoteContentManager
 ## CP06: level numbers skipped this session (presentation notice only; durable truth is the
 ## progression skip ledger). Cleared when gameplay launches.
 var skip_notice: Array = []
+## M44: a fresh profile whose bootstrap could not be saved yet; retried (only while no save
+## file exists) before the next canonical save so that save can never persist a profile
+## that silently lost its starter grant.
+var _bootstrap_pending := false
+var _bootstrapping := false
+var last_bootstrap: Dictionary = {}
 
 ## clock/local_day are test seams. Production passes neither: the shipping graph
 ## injects the real OS local-calendar provider explicitly (F-M39-V03-002).
@@ -190,10 +201,69 @@ func blocked_reason() -> String:
 func request_save() -> Dictionary:
 	if is_blocked:
 		return {"ok": false, "reason": "app_blocked"}
+	if _bootstrap_pending and not _bootstrapping:
+		var b: Dictionary = bootstrap_new_profile()
+		if b.has("save"):
+			return b["save"]
 	var r: Dictionary = save.save()
 	if r.get("ok", false):
 		_dirty = false
 	return r
+
+## M44 owner V03 — the ONE new-profile bootstrap (app root calls it once per cold launch).
+## Only a CONCLUSIVELY fresh profile qualifies: SaveService found no save artefact at all
+## (load_result.fresh) and none has been written since. An existing / migrated / backup /
+## corrupt / future-schema save is never re-classified. In one transaction it:
+##   1. marks the FTUE profile "new" (tips + What's New presentation state);
+##   2. grants exactly the configured starter charges (owner: 2 x +1 Slot / Random / Selector /
+##      Tornado) through RewardGrantService under the single tx STARTER_TX;
+##   3. installs today's Welcome task (DailyService index 0, ready to CLAIM, 100 SB);
+## then saves. Save failure re-imports the exact pre-bootstrap economy (nothing half-granted)
+## and keeps the bootstrap pending: it is retried only while no save file exists.
+## Idempotent: a bootstrapped profile / applied STARTER_TX is a replay no-op.
+## Returns {ok, reason[, replay, save, restored]}.
+func bootstrap_new_profile() -> Dictionary:
+	if is_blocked:
+		return _boot_result({"ok": false, "reason": "app_blocked"})
+	if economy.ftue.is_new_profile() or economy.reward.already_applied(STARTER_TX):
+		_bootstrap_pending = false
+		return _boot_result({"ok": true, "reason": "", "replay": true})
+	if not bool(load_result.get("fresh", false)) or save.has_any_save_file():
+		_bootstrap_pending = false
+		return _boot_result({"ok": false, "reason": "not_fresh"})
+	var cfg: Dictionary = FtueConfig.load_config()
+	if not bool(cfg.get("ok", false)):
+		_bootstrap_pending = false
+		return _boot_result({"ok": false, "reason": "config_invalid:" + String(cfg.get("reason", ""))})
+	var grant := {}
+	for id in cfg["starter_booster_charges"]:
+		if int(cfg["starter_booster_charges"][id]) > 0:
+			grant[RewardedGrantService.RES_BOOSTER_PREFIX + String(id)] = int(cfg["starter_booster_charges"][id])
+	var pre: Dictionary = economy.snapshot()
+	economy.ftue.mark_new()
+	var granted: bool = economy.reward.grant(STARTER_TX, grant)
+	var welcomed: bool = economy.daily.set_first_day_welcome(economy.daily.local_day(), int(cfg["welcome_sb"]))
+	if not granted or not welcomed:
+		economy.import_snapshot(pre)
+		_bootstrap_pending = false
+		return _boot_result({"ok": false, "reason": "grant_failed" if not granted else "welcome_failed"})
+	_bootstrapping = true
+	var r: Dictionary = save.save()
+	_bootstrapping = false
+	if not bool(r.get("ok", false)):
+		var restored: bool = economy.import_snapshot(pre)
+		_bootstrap_pending = true
+		return _boot_result({"ok": false, "reason": "save_failed", "save": r, "restored": restored})
+	_bootstrap_pending = false
+	_dirty = false
+	return _boot_result({"ok": true, "reason": "", "save": r})
+
+func _boot_result(r: Dictionary) -> Dictionary:
+	last_bootstrap = r.duplicate(true)
+	return r
+
+func is_bootstrap_pending() -> bool:
+	return _bootstrap_pending
 
 ## M43-C005-C008 (SB-M43-066): the canonical pack-opening commit for presentation. kind is
 ## "standard" | "premium"; tx_id is the caller's stable transaction id. Returns
