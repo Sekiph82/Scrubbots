@@ -309,8 +309,18 @@ func load() -> Dictionary:
 	if primary.get("reason", "") == "future_schema":
 		return {"ok": false, "source": "future_schema"}
 	# Otherwise: new-player defaults; one-time legacy audio cfg migration if present.
+	# M44: `fresh` is true ONLY when no save artefact of any kind exists (primary, backup,
+	# temp, legacy audio cfg). A corrupt / unreadable / ambiguous save also lands on defaults
+	# but is never classified as a newly registered profile.
+	var fresh := not FileAccess.file_exists(_path) and not FileAccess.file_exists(_backup_path()) \
+		and not FileAccess.file_exists(_temp_path()) and not FileAccess.file_exists(_legacy_audio_path)
 	_maybe_migrate_legacy_audio()
-	return {"ok": true, "source": "defaults"}
+	return {"ok": true, "source": "defaults", "fresh": fresh}
+
+## M44: true while no canonical save artefact exists yet (a fresh profile's bootstrap may
+## only (re)try in that state — any written file proves the profile is no longer fresh).
+func has_any_save_file() -> bool:
+	return FileAccess.file_exists(_path) or FileAccess.file_exists(_backup_path()) or FileAccess.file_exists(_temp_path())
 
 func _try_load_path(path: String) -> Dictionary:
 	if not FileAccess.file_exists(path):

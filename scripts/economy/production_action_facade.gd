@@ -125,15 +125,42 @@ func start_rewarded_daily(slot: int, token: String = "") -> Dictionary:
 
 # ------------------------------------------------------------ claims ----
 
+## M44 (owner V03, first Home DAILY / TASKS 100 SB claims): the two first-Home claims commit
+## DURABLY. If the bound save boundary reports failure, the exact pre-claim economy snapshot is
+## re-imported (no grant-first-save-later: wallet, ledger tx, Daily state and badge return to
+## the prior durable truth) and the claim is refused, so a retry is the same single claim.
 func claim_daily_login() -> Dictionary:
-	return _finish("claim_daily_login", _economy.daily.claim_login())
+	return _finish_durable("claim_daily_login", func(): return _economy.daily.claim_login())
 
 ## M43-C005F-PHASE3: results carry presentation-only identity copied from the input (the task
 ## index / Gift occurrence id); the grant itself is unchanged.
 func claim_daily_task(task_index: int) -> Dictionary:
-	var r: Dictionary = _economy.daily.claim_task(task_index)
-	r["task_index"] = task_index
-	return _finish("claim_daily_task", r)
+	return _finish_durable("claim_daily_task", func():
+		var r: Dictionary = _economy.daily.claim_task(task_index)
+		r["task_index"] = task_index
+		return r)
+
+## Commit `op` (a canonical claim) and its save as one unit (see claim_daily_login). A save
+## callback that returns no result (unbound harness) counts as committed, exactly like _finish.
+func _finish_durable(action: String, op: Callable) -> Dictionary:
+	var pre: Dictionary = _economy.snapshot()
+	var r: Dictionary = op.call()
+	if not bool(r.get("ok", false)) or not _save_cb.is_valid():
+		return _finish(action, r)
+	var s = _save_cb.call()
+	if typeof(s) == TYPE_DICTIONARY and not bool(s.get("ok", true)):
+		var restored: bool = _economy.import_snapshot(pre)
+		var out := {"ok": false, "action": action, "reason": "save_failed", "save": s, "restored": restored}
+		if r.has("task_index"):
+			out["task_index"] = r["task_index"]
+		action_refused.emit(action, out)
+		return out
+	var done: Dictionary = r.duplicate()
+	done["ok"] = true
+	done["action"] = action
+	done["save"] = s
+	action_committed.emit(action, done)
+	return done
 
 func claim_daily_all_tasks() -> Dictionary:
 	return _finish("claim_daily_all_tasks", _economy.daily.claim_all_tasks_bonus())

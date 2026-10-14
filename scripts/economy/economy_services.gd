@@ -37,6 +37,7 @@ const EventService = preload("res://scripts/economy/event_service.gd")
 const ReturnService = preload("res://scripts/economy/return_service.gd")
 const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
 const RewardedDailyService = preload("res://scripts/economy/rewarded_daily_service.gd")
+const FtueState = preload("res://scripts/economy/ftue_state.gd")
 
 const GUARANTEED_NEW_FALLBACK_SB := 500
 
@@ -75,6 +76,8 @@ var notify: NotificationPolicy
 ## M43-C015R Rewarded Ads daily track. No save section: state is derived from the canonical
 ## reward ledger (daily_rewarded:<day>:<slot> ids).
 var rewarded_daily: RewardedDailyService
+## M44: first-time-experience presentation state (profile kind, Skip Tips, acknowledged tips).
+var ftue: FtueState
 
 ## local_day: Daily local-calendar ordinal provider (M39 V04, F-M39-V03-002).
 ## Omitted in production -> DailyService uses LocalCalendar.system_provider().
@@ -106,6 +109,7 @@ func _init(config_path: String = EconomyConfig.DEFAULT_PATH, clock: Callable = C
 	streak = WinStreakService.new(reward, gift)
 	rewarded = RewardedGrantService.new(reward, hearts)
 	rewarded_daily = RewardedDailyService.new(reward, rewarded, Callable(daily, "local_day"))
+	ftue = FtueState.new()
 	_register_handlers()
 
 func _register_handlers() -> void:
@@ -181,6 +185,7 @@ func snapshot() -> Dictionary:
 		"events": events.snapshot(),
 		"return": returns.snapshot(),
 		"notifications": notify.snapshot(),
+		"ftue": ftue.snapshot(),
 	}
 
 ## Independently all-or-nothing import (F-M39-005). Captures the exact current
@@ -226,6 +231,9 @@ func _apply_sections(s) -> bool:
 	for pair in [["records", records], ["events", events], ["return", returns], ["notifications", notify]]:
 		if not pair[1].import_snapshot(s[pair[0]] if s.has(pair[0]) else null):
 			return false
+	# M44: absent = a pre-M44 save (established player, never a beginner); present = strict.
+	if not ftue.import_snapshot(s["ftue"] if s.has("ftue") else null):
+		return false
 	# M43-C005-C008: key ABSENT = pre-C008 save (keep the live OS-seeded RNG / empty ledger).
 	# Key PRESENT = strict C008 schema; an empty or partial section fails closed.
 	if s.has("packs") and not packs.import_snapshot(s["packs"]):

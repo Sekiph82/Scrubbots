@@ -37,6 +37,12 @@ var _streak := 0                     ## consecutive login count.
 var _tasks_claimed_day := -1         ## local calendar day tasks were last claimed.
 var _tasks_day := -1                 ## local calendar day _tasks_done belongs to.
 var _tasks_done: Dictionary = {}     ## task_index -> true (current day).
+## M44 owner V03: a conclusively NEW profile's FIRST local day replaces task index 0 with a
+## completed Welcome task worth _welcome_sb (100 SB) — that one day only. -1 = none (every
+## existing save); the ordinary _task_sb tiers are never changed.
+const WELCOME_TASK_INDEX := 0
+var _welcome_day := -1
+var _welcome_sb := 0
 
 func _init(config, reward, clock: Callable = Callable(), local_day: Callable = Callable()) -> void:
 	_config = config
@@ -171,6 +177,29 @@ func tasks_done_count() -> int:
 	_sync_tasks_to_today()
 	return _tasks_done.size()
 
+## M44: install the first-day Welcome task for a conclusively new profile (AppState
+## bootstrap only). `day` must be today; task index 0 is marked done (genuinely ready to
+## CLAIM). Refused when a welcome was ever set, or on a bad amount / day.
+func set_first_day_welcome(day: int, sb: int) -> bool:
+	_sync_tasks_to_today()
+	if _welcome_day >= 0 or sb <= 0 or day < 0 or day != _today() or day < _tasks_day:
+		return false
+	_welcome_day = day
+	_welcome_sb = sb
+	_tasks_done[WELCOME_TASK_INDEX] = true
+	return true
+
+## True only on the welcome day itself, for task index 0 (expires at the local-day rollover;
+## a clock rollback to that day cannot revive it because task claims refuse rollback).
+func is_welcome_task(task_index: int) -> bool:
+	return task_index == WELCOME_TASK_INDEX and _welcome_day >= 0 and _today() == _welcome_day
+
+## The authoritative SB a claim of `task_index` would grant today (shown == credited).
+func task_reward_sb(task_index: int) -> int:
+	if task_index < 0 or task_index >= _task_sb.size():
+		return 0
+	return _welcome_sb if is_welcome_task(task_index) else int(_task_sb[task_index])
+
 ## Claim a completed task's SB (once per LOCAL calendar day per task).
 func claim_task(task_index: int) -> Dictionary:
 	_sync_tasks_to_today()
@@ -182,10 +211,11 @@ func claim_task(task_index: int) -> Dictionary:
 		return {"ok": false, "reason": "not_done"}
 	var today := _today()
 	var tx := "daily_task:%d:%d" % [today, task_index]
-	var sb := int(_task_sb[task_index])
+	var welcome := is_welcome_task(task_index)
+	var sb := task_reward_sb(task_index)
 	if not _reward.grant(tx, {EconomyWallet.SCRUB_BUCKS: sb}):
 		return {"ok": false, "reason": "already_claimed"}
-	return {"ok": true, "sb": sb, "tx": tx}
+	return {"ok": true, "sb": sb, "tx": tx, "welcome": welcome}
 
 ## Claim the all-three-tasks bonus (1 random-any booster charge, SB-M39-054) once per day.
 func claim_all_tasks_bonus() -> Dictionary:
@@ -210,7 +240,7 @@ func snapshot() -> Dictionary:
 	for k in _tasks_done.keys():
 		done.append(k)
 	done.sort()
-	return {
+	var out := {
 		"last_claim_day": _last_claim_day,
 		"last_claim_ts": _last_claim_ts,
 		"highest_seen_ts": _highest_seen_ts,
@@ -219,6 +249,11 @@ func snapshot() -> Dictionary:
 		"tasks_done": done,
 		"tasks_claimed_day": _tasks_claimed_day,
 	}
+	# M44: only a bootstrapped new profile carries the welcome pair (shape unchanged otherwise).
+	if _welcome_day >= 0:
+		out["welcome_day"] = _welcome_day
+		out["welcome_sb"] = _welcome_sb
+	return out
 
 func import_snapshot(s) -> bool:
 	if typeof(s) != TYPE_DICTIONARY:
@@ -244,7 +279,20 @@ func import_snapshot(s) -> bool:
 	var td = IntDomain.exact_int(s.get("tasks_day", -1))
 	if tcd == null or td == null:
 		return false
+	# M44 welcome pair: both absent (every pre-M44 / established save) or both exact
+	# (day >= 0, sb >= 1); anything else fails the import closed.
+	var wd := -1
+	var wsb := 0
+	if s.has("welcome_day") or s.has("welcome_sb"):
+		var wd_raw = IntDomain.exact_int(s.get("welcome_day", null))
+		var wsb_raw = IntDomain.exact_int(s.get("welcome_sb", null))
+		if wd_raw == null or wsb_raw == null or wd_raw < 0 or wsb_raw < 1:
+			return false
+		wd = wd_raw
+		wsb = wsb_raw
 	# All-or-nothing apply.
+	_welcome_day = wd
+	_welcome_sb = wsb
 	_last_claim_day = d
 	_last_claim_ts = lts
 	_highest_seen_ts = hts

@@ -15,9 +15,12 @@ extends Control
 ## persisted immediately, applied live to gameplay cleaning FX).
 
 signal closed
+## M44: the read-only HELP & TIPS destination was requested (the app root opens it).
+signal help_requested
 
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 
 const BUSES := ["master", "music", "sfx"]
 const BUS_TITLES := {"master": "MASTER", "music": "MUSIC", "sfx": "SOUND FX"}
@@ -34,6 +37,7 @@ var _sliders: Dictionary = {}    ## bus -> HSlider
 var _values: Dictionary = {}     ## bus -> Label
 var _haptics_toggle: CheckButton
 var _reduced_toggle: CheckButton
+var _help: Button
 var _status: Label
 var _built := false
 var _frame = null
@@ -93,10 +97,21 @@ func _build() -> void:
 	head.name = "Header"
 	head.add_theme_constant_override("separation", 12)
 	col.add_child(head)
-	var balance := Control.new()
-	balance.custom_minimum_size = Vector2(TOUCH_MIN, 0)
-	balance.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	head.add_child(balance)
+	# M44: read-only HELP & TIPS ("?") in the slot that balanced the X (same 88 px size, so
+	# the header and the panel height are unchanged).
+	_help = Button.new()
+	_help.name = "HelpTipsButton"
+	_help.text = "?"
+	_help.tooltip_text = UiText.t("HELP_BUTTON")
+	_help.focus_mode = Control.FOCUS_NONE
+	_help.custom_minimum_size = Vector2(TOUCH_MIN, TOUCH_MIN)
+	_help.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	for st in ["normal", "hover", "pressed", "disabled"]:
+		_help.add_theme_stylebox_override(st, HomeStyle.box(BasePopup.ROYAL, BasePopup.ROYAL_EDGE, 4, 44, 4, 3))
+	_help.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	_help.add_theme_font_size_override("font_size", 38)
+	_help.pressed.connect(func(): help_requested.emit())
+	head.add_child(_help)
 	var pill := PanelContainer.new()
 	pill.name = "TitlePill"
 	pill.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -409,6 +424,9 @@ func get_value_label(bus: String) -> Label:
 
 func get_haptics_toggle() -> CheckButton:
 	return _haptics_toggle
+
+func get_help_button() -> Button:
+	return _help
 
 func get_reduced_effects_toggle() -> CheckButton:
 	return _reduced_toggle
