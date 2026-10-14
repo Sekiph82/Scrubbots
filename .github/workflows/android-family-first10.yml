@@ -15,6 +15,8 @@ name: Android Family First10 APK
 # CP06 V03: dispatch input `mode` (default validation_only). validation_only runs ONLY `validate`
 # (logs artifact only); the `export` job is skipped at job level, so no keystore, templates, APK or
 # PCK. build_apk must be selected explicitly and keeps the original export path unchanged.
+# M44 FTUE master: tests/m44_ftue.gd added to `validate` (exact 21/21 summary required); the
+# 16 earlier suites, CP06 16/16 guard, manual trigger and job-level export guard are unchanged.
 
 on:
   workflow_dispatch:
@@ -85,7 +87,7 @@ jobs:
           for s in m35_level_catalog m37_level_progression m55_long_session m43_c005f_phase4_terminal_home_micro \
                    m43_c001a_results_foundation m42_navigation m42_home m40_save_system m40_v04_bootstrap \
                    cp04_remote_content_runtime cp05_remote_content_cache m55_economy_release_regression run_tests \
-                   cp05_r01_transaction_cleanup remote_content_family_fixture cp06_disabled_levels; do
+                   cp05_r01_transaction_cleanup remote_content_family_fixture cp06_disabled_levels m44_ftue; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -107,6 +109,12 @@ jobs:
             echo "CP06 verdict=PASS (16/16)" | tee -a "$S"
           else
             echo "CP06 verdict=FAIL (exact 16/16 summary missing)" | tee -a "$S"; fail=1
+          fi
+          # M44 FTUE master: exact 21-case summary is mandatory.
+          if grep -qxF 'M44 FTUE evidence: PASS (21/21 cases, 0 fail)' validate_logs/m44_ftue.log 2>/dev/null; then
+            echo "M44 verdict=PASS (21/21)" | tee -a "$S"
+          else
+            echo "M44 verdict=FAIL (exact 21/21 summary missing)" | tee -a "$S"; fail=1
           fi
           echo "aggregate=$([ $fail -eq 0 ] && echo PASS || echo FAIL)" | tee -a "$S"
           { echo "### validate (mode=${MODE:-<unset>}, ${GITHUB_SHA})"; echo '```'; cat "$S"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
