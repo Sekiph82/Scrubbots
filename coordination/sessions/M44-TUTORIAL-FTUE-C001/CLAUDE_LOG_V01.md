@@ -122,3 +122,102 @@ aggregate=PASS
 ## 8. Handoff
 
 `CLAUDE_IMPLEMENTED_CI_PASS_AWAITING_CHATGPT_AUDIT_AND_OWNER_VISUAL_GATE` · `OWNER_VISUAL_PLAYTEST_PENDING` (SB-M44-018 / 020). No APK / IPA built. Root `TASKS.md` untouched.
+
+---
+
+# R01 — specialist regression verification (`CHATGPT_M44_R01_VERIFICATION_MASTER_PROMPT.md`), 2026-10-14
+
+**R01 result: `BLOCKED_R01_CI_FAIL_LIMIT_3_OF_3`.** Run 3/3 had 33/34 suites PASS (all 17 new specialist suites PASS; M44 21/21). The single failure is one assertion in the EXISTING `cp06_disabled_levels` suite (`FAIL (16/16 cases, 1 fail)`). The game / test code is byte-identical to run 2, where CP06 passed 16/16. No fourth run was dispatched, no assertion was weakened, and no test was excluded or allowlisted.
+
+## R01-A precheck
+- Single checkout, `main` fast-forwarded `ad7000e4` → `3e0a81c7` (incoming: `TASKS.md`, ChatGPT audit V01, R01 prompt; no owner-file overlap). Owner state unchanged before and after: `project.godot` SHA-256 `d2546c0b…e63574`, 4 owner tracked modifications, 2,616 untracked, 2 stashes.
+- Static review before dispatch (no local Godot):
+  - All 17 specialist scripts exist on `main`.
+  - None references an excluded sparse-checkout tree (`coordination/sessions`, `assets/art/references`, `assets/ui/candidates`, `assets/ui/generated`).
+  - Each prints a `PASS` / `FAIL` summary line last and quits non-zero on failure.
+  - None is wall-clock-sleep based.
+  - Each was last reported green on `c2b1c3c7` (M47-TOUCH-R01 V02 71/71, 2026-10-10). Since then only CP06 and M44 changed game code.
+- Checked the M44 interactions:
+  - `daily.claim_task` gained a `welcome` key, and the claim facade is durable only on an explicit `ok:false` save.
+  - The economy snapshot gained an `ftue` section; booster snapshot keys are unchanged.
+  - The Settings "?" fills the existing 88 px header spacer: font 38, inside the cream area.
+  - FTUE is OFF for injected test save paths.
+  - Strings that static guards look for in source are still present in `daily_service.gd` / `daily_screens.gd`.
+
+## R01-B workflow change (commit `e54b82df`, YAML only)
+```diff
+-                   cp05_r01_transaction_cleanup remote_content_family_fixture cp06_disabled_levels m44_ftue; do
++                   cp05_r01_transaction_cleanup remote_content_family_fixture cp06_disabled_levels m44_ftue \
++                   m39a_economy_core m39b_hearts_speed m39c_boosters m39d_daily_collection m39e_full_matrix \
++                   m39_v02_atomicity m39_v02_capacity m39_v02_integration m39_v03_full_surface m39_v03_integration \
++                   m39_v04_integration m39_v04_tornado_inflight m39_c003_random_any_booster_rewards \
++                   m41_settings m43_master_c009_daily m43_r15_owner_remediation m43_r15_001_r01_sequential_unlock; do
+```
+(+ one header comment line). Live GitHub readback before dispatch:
+- 34 unique suite names;
+- `default: validation_only`;
+- export `if: ${{ inputs.mode == 'build_apk' }}`;
+- `workflow_dispatch` only (no push / PR / schedule);
+- CP06 16/16 and M44 21/21 exact guards;
+- exactly one `INJECTED=` allowlist (m43_c005f).
+
+## R01-C run 3/3 — [38632433821](https://github.com/Sekiph82/Scrubbots/actions/runs/38632433821) on `e54b82df`
+- `validate` = **failure** ([job 116087168312](https://github.com/Sekiph82/Scrubbots/actions/runs/38632433821/job/116087168312), 20:29–20:40 UTC); `export` = **skipped** ([job 116092392241](https://github.com/Sekiph82/Scrubbots/actions/runs/38632433821/job/116092392241)).
+- Artifact `11927706876`: 36 files (34 suite logs + `summary.txt` + `import.log`); **no `.apk` / `.pck` / `.ipa`**. Read in memory only.
+
+| Suite | Result |
+|---|---|
+| m35_level_catalog · m37_level_progression · m55_long_session · m43_c005f_phase4 (19/19) · m43_c001a (11/11) · m42_navigation · m42_home · m40_save_system · m40_v04_bootstrap · cp04 (28/28) · cp05 (15/15) · m55_economy_release_regression · run_tests (ALL PASS) · cp05_r01 (6/6) · remote_content_family_fixture | 15 × `exit=0 script_diag=0 PASS` |
+| **cp06_disabled_levels** | **`exit=1 script_diag=0 FAIL` — `CP06 disabled levels evidence: FAIL (16/16 cases, 1 fail)`** |
+| m44_ftue | `PASS (21/21 cases, 0 fail)` |
+| m39a_economy_core · m39b_hearts_speed · m39c_boosters · m39d_daily_collection · m39e_full_matrix · m39_v02_atomicity · m39_v02_capacity · m39_v02_integration · m39_v03_full_surface · m39_v03_integration · m39_v04_integration · m39_v04_tornado_inflight · m39_c003_random_any_booster_rewards | 13 × `exit=0 script_diag=0 PASS` |
+| m41_settings · m43_master_c009_daily (12/12) · m43_r15_owner_remediation (18/18) · m43_r15_001_r01_sequential_unlock (14/14) | 4 × `exit=0 script_diag=0 PASS` |
+
+Summary: `import script_diag=0` · `CP06 verdict=FAIL (exact 16/16 summary missing)` · `M44 verdict=PASS (21/21)` · `aggregate=FAIL`.
+
+### First-failure evidence
+`tests/cp06_disabled_levels.gd:329`, case `i05` (re-enable):
+```
+  ok: i05: legitimate history 1..11 saved
+  ok: v3 re-enable activated (registry back to v1 shape)
+  FAIL: skipped player: frontier 13, 12 stays skipped, no payout
+```
+The assertion is the conjunction `current_level() == 13 and is_skipped(12) and not is_completed(12) and app.economy.snapshot() == econ`, where `econ` is captured BEFORE `await _publish(app, x[1], 3, [])` and compared AFTER it.
+
+### Analysis (not proven by a run; for independent review)
+- Nondeterministic: run 2 (`f567947f`) passed CP06 16/16. `git diff f567947f e54b82df` touches only the workflow YAML, `TASKS.md`, ChatGPT files and this log; zero game or test files.
+- The CP06 test builds `AppState.new(save)` with the REAL system clock (`_app()`, line 110). Two parts of the economy snapshot are derived from wall-clock "now" at the moment the snapshot is taken:
+  - `HeartService.snapshot()` calls `_accrue()`, which with full Hearts sets `anchor = now`;
+  - `SpeedEntitlementService.snapshot()` writes `clock_high_water = _effective_now()`.
+- So if a Unix second ticks during the awaited publish, `snapshot() == econ` fails even though no payout happened. The progression parts of the conjunction are deterministic and identical to run 2. M44 did not change Heart, Speed, CP06 or progression code.
+- Most likely cause: a pre-existing timing flake in the CP06 test, not an M44 regression and not a CP06 payout.
+
+### Proposed narrow remediation (NOT committed, NOT run — awaiting ChatGPT review / owner approval for a 4th run)
+Test-only, no weakening: give the CP06 test's AppState a fixed injected clock, as the M39 / M43 suites do, so wall-clock fields cannot move between the two snapshots:
+```gdscript
+# tests/cp06_disabled_levels.gd, _app()
+-	var app = AppState.new(save)
++	var app = AppState.new(save, func(): return CP06_FIXED_NOW)   # const CP06_FIXED_NOW := 1790000000
+```
+The full `economy.snapshot() == econ` "no payout" assertion would stay exactly as strict. An alternative that also keeps strictness: compare the snapshot with only `hearts.anchor` and `speed.clock_high_water` normalised. The fixed clock is preferred.
+
+## R01 per-ID disposition (unchanged from §5 except where noted)
+- 001–004, 007–009, 011, 012, 014–017, 019, 024: IMPLEMENTED, CI-verified (M44 21/21 in runs 2 and 3).
+- 005: truthful informational tip; not triggered by observing a wait (differs from the historic row wording).
+- 006: informational only.
+- 010: partial; owner-gated future unlock levels.
+- 013: not exercised (no newly unlocked destination).
+- 018, 020: OWNER_VISUAL_PLAYTEST_PENDING.
+- 021: existing authority, verified.
+- 022: M43-gated.
+- 023: partial (Weekly / First-Try at existing EventService authority).
+- **New R01 fact:** every listed M39 / M41 Settings / M43 Daily / R15 specialist regression is green on the M44 source (run 38632433821). The only red entry is the CP06 timing assertion above.
+
+## R01 disk / TEMP
+- No local Godot, clone, worktree or artifact download; CI read in memory.
+- This session's harness folder `…\Temp\claude\C--Users-sekip-Desktop-ScrubBots\4895cd12-…`: 4 KiB.
+- `C:` free space was 96,739,208 KiB at R01 end.
+- Observed, NOT task-owned, untouched: another Claude session's folder `…\Temp\claude\C--Users-sekip-Desktop-ScrubBots\fbe85cde-0fe6-4d11-a66b-b183f13e11c6` holds ~4.1 GiB, and `…\b6966355-…` ~16 MiB / `…\c19fdadf-…` ~8 MiB. Flagged for the owner, not deleted.
+
+## R01 handoff
+`BLOCKED_R01_CI_FAIL_LIMIT_3_OF_3`. M44 run budget exhausted (3/3: 38625474342 fail, 38626611950 pass, 38632433821 fail on CP06 i05 only). No further CI run, APK, IPA, R2 or LF action without explicit owner approval. Root `TASKS.md` untouched.
