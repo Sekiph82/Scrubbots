@@ -20,6 +20,7 @@ const Popups = preload("res://scripts/ui/popup/popups.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
+const ColorSymbols = preload("res://scripts/ui/color_symbols.gd")
 const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
 const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
 
@@ -362,6 +363,34 @@ func _build_targets(p, v: Dictionary) -> void:
 		b.add_theme_stylebox_override("pressed", HomeStyle.box(col, BasePopup.ROYAL_EDGE, 8, 22, 6, 2))
 		b.add_theme_stylebox_override("hover_pressed", b.get_theme_stylebox("pressed"))
 		b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+		# M50 decision A: the same per-colour symbol as the Supply / Slot tiles - an outlined
+		# emblem on a colour-only Tornado chip; on a Selector chip the translucent watermark with
+		# the count moved to a child Label drawn above it.
+		var count := b.text
+		b.text = ""
+		var sym: Control = ColorSymbols.new()
+		sym.name = "Symbol"
+		sym.emblem = count.is_empty()
+		sym.set_color(col)
+		var half := 26.0 if sym.emblem else 34.0
+		sym.set_anchors_preset(Control.PRESET_CENTER)
+		sym.offset_left = -half
+		sym.offset_top = -half
+		sym.offset_right = half
+		sym.offset_bottom = half
+		b.add_child(sym)
+		if not count.is_empty():
+			var lab := Label.new()
+			lab.name = "Count"
+			lab.text = count
+			lab.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			lab.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+			lab.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+			lab.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+			lab.add_theme_font_size_override("font_size", 34)
+			lab.add_theme_color_override("font_outline_color", ColorSymbols.OUTLINE)
+			lab.add_theme_constant_override("outline_size", 8)
+			b.add_child(lab)
 		var key = t["key"]
 		b.pressed.connect(_on_target_pressed.bind(p, key, b))
 		flow.add_child(b)

@@ -1,7 +1,9 @@
 extends Control
 ## ColorSymbols — M50 decision A (owner 2026-10-15): one distinct non-colour shape per canonical
-## Palette V3 colour identity, drawn as a small white emblem with a dark outline on the coloured
-## face of every occupied ColorBatchTile (Batch Supply front + preview, 5/6 execution slots).
+## Palette V3 colour identity. Two styles: WATERMARK (default) - a large translucent silhouette
+## behind the count on every occupied ColorBatchTile (Batch Supply front + preview, 5/6 slots)
+## and Selector chips, dark ink on light colours / light ink on dark ones; EMBLEM - an opaque
+## white shape with a dark outline where no number competes (Tornado colour chips).
 ## Preload this script (res://scripts/ui/color_symbols.gd); no global class_name (AL-001).
 ##
 ## Identity is the CANONICAL C-ID resolved from the exact colour (level palettes are local hex
@@ -11,6 +13,10 @@ extends Control
 
 const OUTLINE := Color(0.03, 0.04, 0.09, 1.0)
 const FILL := Color(1, 1, 1, 1)
+const WATERMARK_LIGHT := Color(1, 1, 1, 0.40)
+const WATERMARK_DARK := Color(0.03, 0.04, 0.09, 0.30)
+## Faces brighter than this get the dark watermark ink.
+const LIGHT_FACE_LUMINANCE := 0.55
 
 ## Palette V3 (data/palettes/scrubbots_palette_v3.json); tests assert this table matches it.
 const CID_BY_HEX := {
@@ -29,6 +35,8 @@ const SHAPE_BY_CID := {
 }
 
 var _shape := ""
+var _color := Color(0, 0, 0, 0)
+var emblem := false
 
 static func cid_for_color(c: Color) -> String:
 	return String(CID_BY_HEX.get(c.to_html(false).to_upper(), ""))
@@ -41,9 +49,13 @@ func _init() -> void:
 
 func set_color(c: Color) -> void:
 	var s := shape_for_color(c)
-	if s != _shape:
+	if s != _shape or c != _color:
 		_shape = s
+		_color = c
 		queue_redraw()
+
+static func watermark_ink(face: Color) -> Color:
+	return WATERMARK_DARK if face.get_luminance() > LIGHT_FACE_LUMINANCE else WATERMARK_LIGHT
 
 func get_shape() -> String:
 	return _shape if visible else ""
@@ -55,6 +67,9 @@ func _draw() -> void:
 	var c := size * 0.5
 	var o := maxf(r * 0.16, 1.5)   # outline thickness
 	var parts := _parts(_shape)
+	if not emblem:
+		_draw_parts(parts, c, r, watermark_ink(_color), 0.0)
+		return
 	# Outline: the same parts in the dark outline colour, offset in 8 directions.
 	for d in [Vector2(-1, -1), Vector2(0, -1), Vector2(1, -1), Vector2(-1, 0), Vector2(1, 0), Vector2(-1, 1), Vector2(0, 1), Vector2(1, 1)]:
 		_draw_parts(parts, c + d * o, r - o, OUTLINE, o)

@@ -4,14 +4,15 @@ extends SceneTree
 ##   s02 identity is the canonical colour, never the level-local palette index (all shipped levels)
 ##   s03 silhouettes differ (rasterised unit masks): every pair IoU < 0.75, the M50 CVD-confusable
 ##       pairs C01/C11, C04/C05, C02/C03 IoU < 0.5
-##   s04 tile: occupied -> symbol in the face's top-left corner, count still centred; empty /
-##       non-canonical -> no symbol; input-transparent
+##   s04 tile: occupied -> translucent watermark centred behind the count (count still centred),
+##       visible on every colour; empty / non-canonical -> no symbol; input-transparent
 ##   s05 Supply 3/4/5 columns x 3 rows (front + preview) and 5/6 slots, two palettes: shape == colour
 ##   s06 real app root: L1 production gameplay tiles carry symbols; front hit rects >= touch min
 ##   s07 hero PLAY label is NAVY with WCAG >= 4.5 on normal / hover / pressed; other green
 ##       buttons keep their white label (scoped)
 ##   s08 HUD booster price via UiText key + UiText.num (English unchanged, grouped, pseudo-aware)
 ##   s09 cost: 300 supply rebinds (5x3) + 6 slots stay cheap; symbols never touch the board
+##   s10 Tornado / Selector booster target chips carry the same colour symbol (real L1 host)
 ##
 ## Run: godot --headless --path . -s res://tests/m50_color_symbols.gd
 
@@ -25,10 +26,12 @@ const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const Audit = preload("res://tools/accessibility_audit.gd")
+## Smallest acceptable symbol side in logical px (the count digits on the smallest tiles are ~40 px).
+const MIN_SYMBOL_PX := 32.0
 
 var EXPECTED_CASES := ["s01_table_matches_palette_v3", "s02_identity_not_local_index", "s03_silhouettes_distinct",
 	"s04_tile_symbol_placement", "s05_supply_and_slots_modes", "s06_real_l1_gameplay", "s07_play_label_navy",
-	"s08_hud_price_ui_text", "s09_cost"]
+	"s08_hud_price_ui_text", "s09_cost", "s10_booster_target_chips"]
 var _fail := 0
 var _completed: Dictionary = {}
 var _tmp: Array = []
@@ -51,6 +54,7 @@ func _initialize() -> void:
 	await _s07()
 	await _s08()
 	await _s09()
+	await _s10()
 	_shutdown()
 	_cleanup()
 	_done()
@@ -122,7 +126,7 @@ func _s03() -> void:
 	_complete("s03_silhouettes_distinct")
 
 func _s04() -> void:
-	print("[s04 tile: symbol corner, centred count, empty / non-canonical clean, input-transparent]")
+	print("[s04 tile: centred watermark behind the count, empty / non-canonical clean, input-transparent]")
 	_new_sub(Vector2i(400, 400))
 	var t: ColorBatchTile = ColorBatchTile.new()
 	t.size = Vector2(150, 130)
@@ -136,13 +140,23 @@ func _s04() -> void:
 				await process_frame
 				var f := t.get_face_rect_global()
 				var s := t.get_symbol_control().get_global_rect()
+				var sym: Control = t.get_symbol_control()
 				ok = ok and t.get_symbol_shape() == ColorSymbols.shape_for_color(Color.html(hex)) and t.get_symbol_shape() != ""
-				ok = ok and f.encloses(s) and s.end.y <= f.position.y + f.size.y * 0.40 and s.end.x <= f.position.x + f.size.x * 0.5
-				var g := _glyph_rect(t)
-				if s.intersects(g) or not f.encloses(s) or s.end.y > f.position.y + f.size.y * 0.40:
-					print("    overlap: tile %s '%s' symbol %s glyphs %s face %s" % [str(sz), txt, str(s), str(g), str(f)])
-				ok = ok and not s.intersects(g) and t.get_count_center_delta().length() <= 1.0 and t.get_count_text() == txt
-	_ok(ok, "16 colours x 1-3 digits x 3 tile sizes: symbol in the face's top-left corner, clear of the digit glyphs; count exact and centred")
+				ok = ok and f.encloses(s) and s.get_center().distance_to(f.get_center()) <= 1.0 and s.size.x >= minf(f.size.x, f.size.y) * 0.75
+				ok = ok and sym.get_index() < t.get_count_label().get_index() and sym.get_parent() == t.get_count_label().get_parent()
+				ok = ok and t.get_count_center_delta().length() <= 1.0 and t.get_count_text() == txt
+	_ok(ok, "16 colours x 1-3 digits x 3 tile sizes: watermark centred on the face, >= 75% of its short side, drawn BEHIND the count; count exact and centred")
+	var weakest := 99.0
+	var weakest_id := ""
+	for hex in _v3:
+		var face := Color.html(hex)
+		var ink := ColorSymbols.watermark_ink(face)
+		var mixed := face.lerp(Color(ink.r, ink.g, ink.b), ink.a)
+		var cr: float = Audit.contrast_ratio(mixed, face)
+		if cr < weakest:
+			weakest = cr
+			weakest_id = ColorSymbols.cid_for_color(face)
+	_ok(weakest >= 1.3, "watermark vs face luminance contrast >= 1.3:1 on all 16 colours (weakest %s %.2f:1; dark ink on light faces)" % [weakest_id, weakest])
 	t.set_empty()
 	await process_frame
 	var empty_ok := t.get_symbol_shape() == "" and not t.get_symbol_control().is_visible_in_tree()
@@ -159,26 +173,36 @@ func _s05() -> void:
 		rev.append(_v3[i])
 	var checked := 0
 	var ok := true
-	for pal in [_v3, rev]:
+	var min_side := 9999.0
+	for run in [[_v3, Vector2i(1080, 2160)], [rev, Vector2i(1080, 2160)], [_v3, Vector2i(720, 1280)], [_v3, Vector2i(1440, 3200)], [_v3, Vector2i(1536, 2048)]]:
+		var pal: PackedStringArray = run[0]
 		for cols in [3, 4, 5]:
 			for cap in [5, 6]:
-				var scr = await _screen(Vector2i(1080, 2160), pal, cols, cap)
+				var scr = await _screen(run[1], pal, cols, cap)
 				var sp = scr.get_supply_panel()
 				for c in range(sp.get_column_count()):
 					for r in range(3):
 						var tile: ColorBatchTile = sp._columns[c]["rows"][r]["tile"]
 						var want := ColorSymbols.shape_for_color(Color.html(pal[(c * 3 + r) % 16]))
 						ok = ok and tile.get_symbol_shape() == want and want != "" and tile.get_count_text() == str(12 + c + r)
+						min_side = minf(min_side, tile.get_symbol_control().get_global_rect().size.x)
+						if tile.get_symbol_control().get_global_rect().size.x < MIN_SYMBOL_PX:
+							print("    small supply: %s cols %d cap %d row %d face %s side %.1f" % [str(run[1]), cols, cap, r, str(tile.get_face_rect_global().size), tile.get_symbol_control().get_global_rect().size.x])
 						checked += 1
 				var views: Array = scr.get_five_slot_strip().get_slot_views()
 				for i in range(views.size()):
 					var tile: ColorBatchTile = views[i].get_tile()
 					var want := ColorSymbols.shape_for_color(Color.html(pal[i])) if i < 4 else ""
 					ok = ok and tile.get_symbol_shape() == want
+					if want != "":
+						min_side = minf(min_side, tile.get_symbol_control().get_global_rect().size.x)
+						if tile.get_symbol_control().get_global_rect().size.x < MIN_SYMBOL_PX:
+							print("    small slot: %s cols %d cap %d face %s side %.1f" % [str(run[1]), cols, cap, str(tile.get_face_rect_global().size), tile.get_symbol_control().get_global_rect().size.x])
 					checked += 1
 				ok = ok and views.size() == cap
 				_shutdown()
-	_ok(ok, "%d tiles: occupied front + preview + slots show their colour's shape; empty slots none" % checked)
+	_ok(ok, "%d tiles at 1080x2160 (two palettes), 720x1280, 1440x3200, 1536x2048: occupied front + preview + slots show their colour's shape; empty slots none" % checked)
+	_ok(min_side >= MIN_SYMBOL_PX, "smallest occupied-tile symbol %.1f px (>= %d) on compact / tall / tablet viewports" % [min_side, MIN_SYMBOL_PX])
 	_complete("s05_supply_and_slots_modes")
 
 func _s06() -> void:
@@ -269,16 +293,41 @@ func _s09() -> void:
 	_shutdown()
 	_complete("s09_cost")
 
-# ------------------------------------------------------------------ helpers ----
+func _s10() -> void:
+	print("[s10 booster target chips: same symbol as the tiles]")
+	await _boot("s10")
+	_root.play_current_frontier()
+	await _frames(6)
+	var host = _root.get_gameplay_host()
+	var chips := 0
+	var ok := host != null
+	if ok:
+		host.get_runtime().set_process(false)
+		for id in ["tornado", "selector"]:
+			_root.get_modal_stack().clear("test")
+			await _frames(1)
+			host.request_booster(id)
+			await _frames(4)
+			var p = _root.get_modal_stack().top()
+			var flow: Node = p.find_child("Targets", true, false) if p != null else null
+			if flow == null:
+				continue
+			for b in flow.get_children():
+				var sym: Control = b.get_node_or_null("Symbol")
+				var col: Color = (b.get_theme_stylebox("normal") as StyleBoxFlat).bg_color
+				ok = ok and sym != null and sym.get_shape() == ColorSymbols.shape_for_color(col) and sym.get_shape() != "" and sym.mouse_filter == Control.MOUSE_FILTER_IGNORE
+				if id == "selector":
+					var lab: Label = b.get_node_or_null("Count")
+					ok = ok and lab != null and lab.text.is_valid_int() and lab.get_index() > sym.get_index() and not sym.emblem and String((b as Button).text).is_empty()
+				else:
+					ok = ok and sym.emblem
+				chips += 1
+			print("    %s: %d chips" % [id, flow.get_child_count()])
+	_ok(ok and chips > 0, "%d Tornado (emblem) / Selector (watermark under the count) chips carry their colour's symbol, input-transparent" % chips)
+	_shutdown()
+	_complete("s10_booster_target_chips")
 
-## Global rect of the rendered count digits: measured string width x cap height, centred in the label.
-func _glyph_rect(t: ColorBatchTile) -> Rect2:
-	var lab := t.get_count_label()
-	var fs := lab.get_theme_font_size("font_size")
-	var w := lab.get_theme_font("font").get_string_size(lab.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x
-	var o := float(lab.get_theme_constant("outline_size"))
-	var sz := Vector2(w + o, fs * 0.72 + o)
-	return Rect2(lab.get_global_rect().get_center() - sz * 0.5, sz)
+# ------------------------------------------------------------------ helpers ----
 
 func _mask(shape: String) -> PackedByteArray:
 	var out := PackedByteArray()
