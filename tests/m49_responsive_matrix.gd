@@ -162,6 +162,9 @@ func _m06() -> void:
 			get_root().add_child(_sub)
 			var screen = GameplayScreen.new()
 			_sub.add_child(screen)
+			# Size the standalone screen to the viewport (anchors alone keep it 0x0 when the
+			# SubViewport size was set BEFORE the child was added - run 38746625415 diagnostic).
+			screen.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 			var level = BoardDebugFixtures.make_level(wh.x, wh.y)
 			var board = BoardDebugFixtures.make_board(wh.x, wh.y)
 			var supply = BatchSupplyGenerator.generate(level, 3, 3, 4242)
