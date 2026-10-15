@@ -38,6 +38,7 @@ var _sliders: Dictionary = {}    ## bus -> HSlider
 var _values: Dictionary = {}     ## bus -> Label
 var _haptics_toggle: CheckButton
 var _reduced_toggle: CheckButton
+var _symbols_toggle: CheckButton
 var _help: Button
 var _status: Label
 var _built := false
@@ -149,6 +150,24 @@ func _build() -> void:
 	_reduced_toggle.name = "ReducedEffectsToggle"
 	_reduced_toggle.toggled.connect(_on_reduced_toggled)
 	col.add_child(_card(_reduced_toggle))
+
+	# M50-BOARD: COLOR SYMBOLS (board cells + Supply/Slots + booster chips), with the board
+	# magnifier hint under it.
+	var sym_box := VBoxContainer.new()
+	sym_box.name = "ColorSymbolsRow"
+	sym_box.add_theme_constant_override("separation", 0)
+	_symbols_toggle = _make_toggle(UiText.t("SETTINGS_COLOR_SYMBOLS"))
+	_symbols_toggle.name = "ColorSymbolsToggle"
+	_symbols_toggle.toggled.connect(_on_symbols_toggled)
+	sym_box.add_child(_symbols_toggle)
+	var hint := Label.new()
+	hint.name = "ColorSymbolsHint"
+	hint.text = UiText.t("SETTINGS_COLOR_SYMBOLS_HINT")
+	hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	hint.add_theme_font_size_override("font_size", FONT_BODY)
+	_ink(hint)
+	sym_box.add_child(hint)
+	col.add_child(_card(sym_box))
 
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -343,6 +362,8 @@ func _sync_from_state() -> void:
 	_haptics_toggle.disabled = not usable
 	_reduced_toggle.set_pressed_no_signal(_app.effects.is_reduced() if _app != null else false)
 	_reduced_toggle.disabled = not usable
+	_symbols_toggle.set_pressed_no_signal(_app.effects.is_color_symbols() if _app != null else true)
+	_symbols_toggle.disabled = not usable
 	if _app == null:
 		_status.text = UiText.t("SETTINGS_UNAVAILABLE")
 	elif _app.is_blocked:
@@ -400,6 +421,12 @@ func _on_reduced_toggled(on: bool) -> void:
 		return
 	_app.set_reduced_effects(on)
 
+func _on_symbols_toggled(on: bool) -> void:
+	if not _usable():
+		_sync_from_state()
+		return
+	_app.set_color_symbols(on)
+
 ## Persist any pending slider change and hide the panel.
 func close_panel() -> void:
 	if _usable():
@@ -431,3 +458,6 @@ func get_help_button() -> Button:
 
 func get_reduced_effects_toggle() -> CheckButton:
 	return _reduced_toggle
+
+func get_color_symbols_toggle() -> CheckButton:
+	return _symbols_toggle

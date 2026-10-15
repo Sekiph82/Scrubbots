@@ -11,7 +11,8 @@ extends SceneTree
 ##   s07 hero PLAY label is NAVY with WCAG >= 4.5 on normal / hover / pressed; other green
 ##       buttons keep their white label (scoped)
 ##   s08 HUD booster price via UiText key + UiText.num (English unchanged, grouped, pseudo-aware)
-##   s09 cost: 300 supply rebinds (5x3) + 6 slots stay cheap; symbols never touch the board
+##   s09 cost: 300 supply rebinds (5x3) + 6 slots stay cheap; no symbol NODES on the board (the
+##       owner-required board symbols are one shader pass: tests/m50_board_symbols.gd)
 ##   s10 Tornado / Selector booster target chips carry the same colour symbol (real L1 host)
 ##
 ## Run: godot --headless --path . -s res://tests/m50_color_symbols.gd
@@ -305,7 +306,7 @@ func _s09() -> void:
 	var board_symbols: Array = scr.find_children("*", "", true, false).filter(func(n): return n.get_script() == ColorSymbols)
 	print("    300 rebinds of a 5x3 supply: %.1f ms; symbol nodes on screen: %d" % [ms, board_symbols.size()])
 	_ok(ms < 3000.0, "300 rebinds in %.1f ms" % ms)
-	_ok(board_symbols.size() == 5 * 3 + 6, "exactly one symbol per supply / slot tile (%d); none on the board" % board_symbols.size())
+	_ok(board_symbols.size() == 5 * 3 + 6, "exactly one symbol node per supply / slot tile (%d); no symbol nodes on the board (board symbols are one shader pass, tests/m50_board_symbols.gd)" % board_symbols.size())
 	_shutdown()
 	_complete("s09_cost")
 

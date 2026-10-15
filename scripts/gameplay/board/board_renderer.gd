@@ -23,6 +23,10 @@ extends TextureRect
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const PaletteColors = preload("res://scripts/data/palette_colors.gd")
 const GRID_SHADER = preload("res://scripts/gameplay/board/board_pixel_grid.gdshader")
+const ColorSymbols = preload("res://scripts/ui/color_symbols.gd")
+## Board symbol inks (mirror the shader's ink_dark / ink_light defaults).
+const SYMBOL_INK_DARK := Color(0.03, 0.04, 0.09)
+const SYMBOL_INK_LIGHT := Color(1, 1, 1)
 
 ## Color drawn for a CLEARED cell: fully transparent, so the gameplay
 ## background behind the board shows through the cleared hole (ADR-019,
@@ -37,6 +41,18 @@ var _image: Image
 ## this TextureRect, driven by the real board width/height. Never a node per cell.
 var _grid_material: ShaderMaterial
 var _grid_enabled := true
+## M50-BOARD colour symbols: per-cell canonical identity map (one RG8 texel per cell: R = C-ID
+## 1..16 / 0 none, G = dark-ink flag), built per board + palette — a clear never changes a
+## cell's identity, the shader already drops CLEARED cells. Drawn by the same grid shader with
+## ColorSymbols' shared atlas; gated by ColorSymbols.enabled (the player's COLOR SYMBOLS setting).
+var _cid_texture: ImageTexture
+var _cid_key_board = null
+var _cid_key_palette := PackedStringArray()
+## Local palette index -> [C-ID index, dark ink] (resolved from the exact colour, never the index).
+var _cid_by_local: Array = []
+
+func _init() -> void:
+	add_to_group(ColorSymbols.GROUP)
 
 ## available_size: the display rect (in this Control's parent's local
 ## space) that the board should fit inside. Palette is a LevelData.palette
@@ -49,8 +65,12 @@ func configure(board: BoardState, palette: PackedStringArray, available_size: Ve
 	_palette_colors = parse_result.colors
 	if not parse_result.is_ok():
 		push_warning("BoardRenderer: palette parse errors: %s" % str(parse_result.errors))
+	_cid_by_local.clear()
+	for c in _palette_colors:
+		_cid_by_local.append([ColorSymbols.cid_index_for_color(c), symbol_ink_is_dark(c)])
 	_recompute_geometry(available_size)
 	refresh_all()
+	_rebuild_symbol_map(palette)
 	_apply_grid_style()
 
 func _recompute_geometry(available_size: Vector2) -> void:
@@ -69,7 +89,8 @@ func _recompute_geometry(available_size: Vector2) -> void:
 ## overwhelms it, small boards get a bolder tile read. The uniforms below are the only inputs;
 ## board colours, coordinates and hit-testing are untouched.
 func _apply_grid_style() -> void:
-	if not _grid_enabled or _board == null:
+	var symbols := are_symbols_shown()
+	if (not _grid_enabled and not symbols) or _board == null:
 		material = null
 		return
 	if _grid_material == null:
@@ -79,9 +100,14 @@ func _apply_grid_style() -> void:
 	var h: int = _board.get_height()
 	var density: float = clampf((float(maxi(w, h)) - 20.0) / 39.0, 0.0, 1.0)
 	_grid_material.set_shader_parameter("grid_size", Vector2(float(w), float(h)))
-	_grid_material.set_shader_parameter("gutter_alpha", lerpf(0.62, 0.40, density))
-	_grid_material.set_shader_parameter("bevel_strength", lerpf(0.16, 0.09, density))
+	# Grid disabled (debug) but symbols on: the same pass draws symbols only.
+	_grid_material.set_shader_parameter("gutter_alpha", lerpf(0.62, 0.40, density) if _grid_enabled else 0.0)
+	_grid_material.set_shader_parameter("bevel_strength", lerpf(0.16, 0.09, density) if _grid_enabled else 0.0)
 	_grid_material.set_shader_parameter("corner_radius", lerpf(0.13, 0.08, density))
+	_grid_material.set_shader_parameter("symbols_on", symbols)
+	if symbols:
+		_grid_material.set_shader_parameter("cid_map", _cid_texture)
+		_grid_material.set_shader_parameter("glyph_atlas", ColorSymbols.board_atlas())
 	material = _grid_material
 
 ## Enable / disable the presentation grid (debug + evidence comparison only).
@@ -95,6 +121,39 @@ func is_grid_enabled() -> bool:
 ## The grid ShaderMaterial (tests/evidence read its uniforms), or null when disabled.
 func get_grid_material() -> ShaderMaterial:
 	return _grid_material if is_grid_enabled() else null
+
+## The board ShaderMaterial (grid and/or symbols), or null when neither is drawn.
+func get_board_material() -> ShaderMaterial:
+	return material as ShaderMaterial
+
+## ColorSymbols.GROUP hook: the player toggled COLOR SYMBOLS.
+func refresh_color_symbols() -> void:
+	if _board != null:
+		_apply_grid_style()
+
+## True when this board currently draws its per-cell colour symbols.
+func are_symbols_shown() -> bool:
+	return ColorSymbols.enabled and _cid_texture != null
+
+## Canonical C-ID index (1..16, 0 none) the symbol layer holds for a cell — the identity the
+## shader draws there (CLEARED cells are skipped by the shader before the glyph).
+func get_cell_symbol_cid(x: int, y: int) -> int:
+	if _cid_texture == null:
+		return 0
+	return int(round(_cid_texture.get_image().get_pixel(x, y).r * 255.0))
+
+## WCAG pick between the two board inks: true when dark ink out-contrasts white on `face`.
+static func symbol_ink_is_dark(face: Color) -> bool:
+	return _contrast(face, SYMBOL_INK_DARK) > _contrast(face, SYMBOL_INK_LIGHT)
+
+static func _contrast(a: Color, b: Color) -> float:
+	var la := _rel_luminance(a)
+	var lb := _rel_luminance(b)
+	return (maxf(la, lb) + 0.05) / (minf(la, lb) + 0.05)
+
+static func _rel_luminance(c: Color) -> float:
+	var l := c.srgb_to_linear()
+	return 0.2126 * l.r + 0.7152 * l.g + 0.0722 * l.b
 
 ## Read-only exact-identity coherence query (M20-C001 §2). True only when this
 ## renderer is configured against the SAME BoardState instance the caller
@@ -133,6 +192,29 @@ func refresh_all() -> void:
 			var index: int = _board.get_cell_index(x, y)
 			_image.set_pixel(x, y, _color_for_cell(index))
 	texture = ImageTexture.create_from_image(_image)
+
+## Per-cell identity map. A board's colour ids never change, so configure() rebuilds it only for
+## a new board instance or palette (relayout / refresh_all / clears never touch it).
+func _rebuild_symbol_map(palette: PackedStringArray) -> void:
+	if _cid_texture != null and _cid_key_board == _board and _cid_key_palette == palette:
+		return
+	_cid_key_board = _board
+	_cid_key_palette = palette
+	var w: int = _board.get_width()
+	var h: int = _board.get_height()
+	var ids := Image.create(w, h, false, Image.FORMAT_RG8)
+	for y in h:
+		for x in w:
+			ids.set_pixel(x, y, _symbol_texel(_board.get_cell_index(x, y)))
+	_cid_texture = ImageTexture.create_from_image(ids)
+
+## Symbol-map texel: C-ID / 255 in R, dark-ink flag in G. VOID / non-canonical => 0.
+func _symbol_texel(index: int) -> Color:
+	var color_id: int = _board.get_color_id(index)
+	if color_id < 0 or color_id >= _cid_by_local.size():
+		return Color(0, 0, 0)
+	var e: Array = _cid_by_local[color_id]
+	return Color(float(e[0]) / 255.0, 1.0 if e[1] else 0.0, 0.0)
 
 ## Partial update: only re-paints the given cell indices, then re-uploads
 ## the (still small, <= 59x59) image once. Cheaper than refresh_all() when

@@ -209,12 +209,14 @@ func _apply(cand: Dictionary) -> bool:
 		return false
 	return true
 
-## Apply validated settings.effects; absent => OFF (validate_candidate rejected malformed).
+## Apply validated settings.effects; absent => Reduced OFF, Color Symbols ON (validate_candidate
+## rejected malformed).
 func _apply_effects(settings: Dictionary) -> void:
 	if settings.has("effects"):
 		_effects.strict_import_snapshot(settings["effects"])
 	else:
 		_effects.set_reduced(false)
+		_effects.set_color_symbols(true)
 
 ## Apply validated M41 toggles (validate_candidate already rejected non-bool values).
 func _apply_audio_toggles(audio: Dictionary) -> void:
