@@ -22,6 +22,11 @@ extends SceneTree
 ##   p11 per-frame allocation     no NET Object growth over idle frames or the level (churn: p15)
 ##   p15 UI idle churn            identical slot rebinds reuse their styleboxes (no per-tick
 ##                                allocation); the idle board magnifier does not process
+##   p16 unlock chains + WAITING  a second COMPLETE 59x59 level (Level Data v2): VOID ring,
+##                                12 colours, three nested 3-deep pockets (P1 ring > P2 ring >
+##                                P3 core) that unlock only as the surrounding art is cleared,
+##                                a pocket batch WAITING in its slot from the first frame,
+##                                deep interior targets, pause + 1x/2x switch mid-level
 ##   p12 repeated restart         30 retries mid-level: nodes exact, objects / memory bounded
 ##   p13 long session             a COMPLETE 59x59 level (3,481 clears) through the real
 ##                                production host to WON; frame-time distribution
@@ -78,7 +83,7 @@ const MAX_FRAMES := 60000
 
 var EXPECTED_CASES := ["p01_parse", "p02_board_state", "p03_renderer", "p04_index_access", "p05_selector", "p06_routing",
 	"p07_agents", "p08_effects", "p09_memory_baseline", "p10_memory_59", "p11_allocation", "p12_restart",
-	"p13_long_session", "p14_agent_density", "p15_ui_idle_churn"]
+	"p13_long_session", "p14_agent_density", "p15_ui_idle_churn", "p16_unlock_chains_waiting"]
 var _fail := 0
 var _completed: Dictionary = {}
 var _tmp: Array = []
@@ -123,6 +128,9 @@ func _initialize() -> void:
 	if only.is_empty() or only.has("level"):
 		await _p13_p14_p08_p11()
 		print("  [level case %d ms]" % (Time.get_ticks_msec() - t0))
+	if only.is_empty() or only.has("pockets"):
+		await _p16()
+		print("  [pockets case %d ms]" % (Time.get_ticks_msec() - t0))
 	print("M46 SUMMARY:")
 	for line in _summary:
 		print("    " + line)
@@ -559,9 +567,150 @@ func _level_from(d: Dictionary):
 func _origin() -> Vector2:
 	return Vector2(float(N) * 0.5, float(N) + 4.0)
 
-func _host(level: Dictionary, tag: String):
+## 59x59 Level Data v2: 2-cell VOID ring, 9 vertical art stripes, and three 9x9 nested pockets
+## (outer ring P1 C05, inner ring P2 C09, 5x5 core P3 C16) sitting INSIDE the stripes, so a
+## pocket colour is only reachable after the stripe art around it is cleared, P2 only after P1
+## is breached and P3 only after P2 (unlock depth 3). 12 colours; palette ascending C-ID.
+const POCKET_CIDS := ["C05", "C09", "C16"]
+const STRIPE_CIDS := ["C01", "C02", "C03", "C04", "C07", "C08", "C10", "C11", "C14"]
+const POCKET_CENTRES := [Vector2i(29, 24), Vector2i(13, 42), Vector2i(45, 13)]
+
+func _pocket_level_dict() -> Dictionary:
+	var used: Array = POCKET_CIDS + STRIPE_CIDS
+	used.sort()
+	var pal: Array = []
+	var local := {}
+	for cid in used:
+		local[cid] = pal.size()
+		pal.append(_v3[_cids.find(cid)])
+	var cells: Array = []
+	for y in range(N):
+		for x in range(N):
+			if x < 2 or y < 2 or x >= N - 2 or y >= N - 2:
+				cells.append(LevelData.VOID_CELL)
+				continue
+			var cid: String = STRIPE_CIDS[mini((x - 2) * STRIPE_CIDS.size() / (N - 4), STRIPE_CIDS.size() - 1)]
+			for c in POCKET_CENTRES:
+				var d: int = maxi(absi(x - c.x), absi(y - c.y))
+				if d <= 4:
+					cid = POCKET_CIDS[0] if d == 4 else (POCKET_CIDS[1] if d == 3 else POCKET_CIDS[2])
+			cells.append(local[cid])
+	return {"version": 2, "id": "m46_pockets_59", "name": "M46 Pockets", "difficulty": "TEST", "width": N, "height": N, "palette": pal, "cells": cells}
+
+## Stripe batches round-robin in columns 0..3; ALL pocket batches in column 4, P1 -> P2 -> P3.
+## Column 4's first front (a P1 batch) enters a slot on the first frame and must WAIT there
+## until the stripe art around a pocket is cleared.
+func _pocket_plan(level: Dictionary) -> Dictionary:
+	var counts := {}
+	for c in level["cells"]:
+		if int(c) >= 0:
+			counts[int(c)] = int(counts.get(int(c), 0)) + 1
+	var cid_of := {}
+	for i in range(level["palette"].size()):
+		cid_of[i] = _cids[_v3.find(String(level["palette"][i]))]
+	var cols: Array = [[], [], [], [], []]
+	var n := 0
+	var rr := 0
+	for want in STRIPE_CIDS + POCKET_CIDS:
+		for local in counts:
+			if cid_of[local] != want:
+				continue
+			var left: int = counts[local]
+			while left > 0:
+				var k := mini(30, left)
+				var col: int = 4 if POCKET_CIDS.has(want) else rr % 4
+				if not POCKET_CIDS.has(want):
+					rr += 1
+				cols[col].append({"batchId": "M46P%04d" % n, "cid": want, "robots": k})
+				left -= k
+				n += 1
+	return {"schema": SupplyPlanLoader.SCHEMA, "version": 1, "levelId": level["id"], "columnCount": 5, "visiblePreviewDepth": 3,
+		"maxRobotsPerBatch": 30, "intendedColumnClicks": [], "columns": cols}
+
+func _p16() -> void:
+	print("[p16 unlock chains + WAITING: pockets / VOID / 12 colours 59x59]")
+	var level := _pocket_level_dict()
+	var h = await _host(level, "pockets", _pocket_plan(level))
+	var rt = h.get_runtime()
+	rt.set_speed_2x(true)
+	var b = h.get_board()
+	var comp = h.get_completion()
+	var pocket_local := {}
+	for i in range(level["palette"].size()):
+		var cid: String = _cids[_v3.find(String(level["palette"][i]))]
+		if POCKET_CIDS.has(cid):
+			pocket_local[i] = POCKET_CIDS.find(cid)
+	var artwork: int = b.get_artwork_cell_count()
+	var times: Array = []
+	var frames := 0
+	var waiting_frames := 0
+	var peak_waiting := 0
+	var first_waiting := -1
+	var peak_agents := 0
+	var first_clear := [-1, -1, -1]   # first frame a P1 / P2 / P3 cell was cleared
+	var paused_ok := true
+	RuntimePerfProbe.reset()
+	RuntimePerfProbe.enabled = true
+	var cap_frames := 4000 if OS.get_cmdline_user_args().has("quick") else MAX_FRAMES
+	while frames < cap_frames and not comp.is_terminal():
+		# Mid-level player actions: a 60-frame pause, then 1x for 600 frames, back to 2x.
+		if frames == 2000:
+			var before: PackedByteArray = b.get_cell_states_copy()
+			rt.set_user_paused(true)
+			for _i in range(60):
+				_feed(h)
+				rt.tick(DT)
+				await process_frame
+			paused_ok = b.get_cell_states_copy() == before
+			rt.set_user_paused(false)
+			rt.set_speed_2x(false)
+		if frames == 2600:
+			rt.set_speed_2x(true)
+		var t0 := Time.get_ticks_usec()
+		_feed(h)
+		rt.tick(DT)
+		await process_frame
+		times.append(_ms(t0))
+		frames += 1
+		var w := 0
+		for s in h.get_slots().snapshot():
+			if s["occupied"] and String(s["state"]) == "WAITING":
+				w += 1
+		if w > 0:
+			waiting_frames += 1
+			if first_waiting < 0:
+				first_waiting = frames
+		peak_waiting = maxi(peak_waiting, w)
+		peak_agents = maxi(peak_agents, h.get_dispatcher().get_active_count())
+		if frames % 10 == 0:
+			for i in range(N * N):
+				var pl = pocket_local.get(b.get_color_id(i), -1) if not b.is_void(i) else -1
+				if pl >= 0 and first_clear[pl] < 0 and b.get_cell_state(i) == BoardState.CellState.CLEARED:
+					first_clear[pl] = frames
+		if frames % 3000 == 0:
+			print("    ... frame %d, cleared %d / %d" % [frames, b.count_cells_by_state(BoardState.CellState.CLEARED) - (N * N - artwork), artwork])
+	RuntimePerfProbe.enabled = false
+	var probe := RuntimePerfProbe.snapshot()
+	for k in ["target_selection", "route_dijkstra", "access_compute_route", "access_mask_build", "m26_dispatch_lane"]:
+		if probe.has(k):
+			print("    probe %s: %s" % [k, str(probe[k])])
+	var st := _stats(times)
+	var cleared_art: int = b.count_cells_by_state(BoardState.CellState.CLEARED) - (N * N - artwork)
+	print("    %d frames, frame ms mean %.3f / p95 %.3f / p99 %.3f / max %.3f; WAITING in %d frames (first %d, peak %d slots); P1/P2/P3 first cleared at frames %s; peak agents %d" % [
+		frames, st["mean"], st["p95"], st["p99"], st["max"], waiting_frames, first_waiting, peak_waiting, str(first_clear), peak_agents])
+	_ok(comp.is_won() and cleared_art == artwork, "COMPLETE 59x59 v2 level WON: %d / %d artwork cells (%d VOID) in %d frames" % [cleared_art, artwork, N * N - artwork, frames])
+	_ok(first_waiting >= 1 and first_waiting <= 5 and waiting_frames >= 60, "a pocket batch WAITED in its slot from frame %d for %d frames (peak %d waiting slots)" % [first_waiting, waiting_frames, peak_waiting])
+	_ok(first_clear[0] > 0 and first_clear[0] < first_clear[1] and first_clear[1] < first_clear[2], "unlock chain respected: P1 ring first cleared at %d < P2 at %d < P3 core at %d" % first_clear)
+	_ok(paused_ok, "60 paused frames mid-level: no cell changed")
+	_ok(st["mean"] <= FRAME_STEADY_MS and st["p99"] <= FRAME_SPIKE_MS, "frame mean %.3f ms (<= %.1f), p99 %.3f ms (<= %.1f); max %.3f ms" % [st["mean"], FRAME_STEADY_MS, st["p99"], FRAME_SPIKE_MS, st["max"]])
+	_summary.append("SB-M46-004/005/013 pocket level (v2 VOID, 12 colours, unlock depth 3): %d frames, mean %.3f / p95 %.3f / p99 %.3f / max %.3f ms; WAITING %d frames; peak agents %d" % [
+		frames, st["mean"], st["p95"], st["p99"], st["max"], waiting_frames, peak_agents])
+	_free_host(h)
+	_complete("p16_unlock_chains_waiting")
+
+func _host(level: Dictionary, tag: String, plan: Dictionary = {}):
 	var lp := _write("lvl_" + tag, JSON.stringify(level))
-	var pp := _write("plan_" + tag, JSON.stringify(_plan_for(level)))
+	var pp := _write("plan_" + tag, JSON.stringify(plan if not plan.is_empty() else _plan_for(level)))
 	var h = ProductionGameplayHost.new()
 	h.auto_build = false
 	h.level_path = lp
