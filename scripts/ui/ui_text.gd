@@ -464,7 +464,37 @@ ACTIVE",
 	"HELP_RULE_HEARTS": "A lost level costs 1 Heart. Hearts refill over time.",
 	"HELP_RULE_SPEED": "Paid 2x speeds up a level or a time window. Free 2x starts by itself when the supply runs out.",
 	"TASK_WELCOME": "Welcome to ScrubBots!",
+	# M51: Settings copy moved from literals (English unchanged).
+	"SETTINGS_TITLE": "SETTINGS",
+	"SETTINGS_MASTER": "MASTER",
+	"SETTINGS_MUSIC": "MUSIC",
+	"SETTINGS_SFX": "SOUND FX",
+	"SETTINGS_VIBRATION": "VIBRATION",
+	"SETTINGS_REDUCED_EFFECTS": "REDUCED EFFECTS",
+	"SETTINGS_CLOSE": "CLOSE",
+	"SETTINGS_OFF": "OFF",
+	"SETTINGS_PERCENT": "%d%%",
+	"SETTINGS_UNAVAILABLE": "Settings unavailable",
+	"SETTINGS_SAVE_BLOCKED": "Save blocked: settings are read-only",
 }
+
+## M51 (SB-M51-003/004): developer pseudo-localization. When true, every t() result is
+## bracketed, accented and ~35% longer, so untranslated literals (no brackets) and layouts
+## that cannot absorb longer languages show up in tests. Never enabled by the shipping app.
+static var pseudo := false
+const PSEUDO_MAP := {"a": "á", "e": "é", "i": "í", "o": "ó", "u": "ú", "y": "ý", "c": "ç", "n": "ñ",
+	"A": "Á", "E": "É", "I": "Í", "O": "Ó", "U": "Ú", "Y": "Ý", "C": "Ç", "N": "Ñ"}
+const PSEUDO_EXPANSION := 0.35
+
+## Pseudo form of `s`: "[" + accented letters (digits / symbols / placeholders kept) + "~"
+## padding of ceil(35% of the length) + "]". Empty stays empty.
+static func pseudo_text(s: String) -> String:
+	if s.is_empty():
+		return s
+	var out := ""
+	for ch in s:
+		out += String(PSEUDO_MAP.get(ch, ch))
+	return "[" + out + "~".repeat(int(ceil(s.length() * PSEUDO_EXPANSION))) + "]"
 
 ## Keyed text for `prefix + reason`, falling back to `prefix + FAILED` for an unknown code.
 static func reason(prefix: String, code: String) -> String:
@@ -475,9 +505,9 @@ static func reason(prefix: String, code: String) -> String:
 static func t(key: String, args: Array = []) -> String:
 	var tr_text := String(TranslationServer.translate(key))
 	var text: String = tr_text if tr_text != key else String(EN.get(key, key))
-	if args.is_empty():
-		return text
-	return text % args
+	if not args.is_empty():
+		text = text % args
+	return pseudo_text(text) if pseudo else text
 
 ## Integer with thousands grouping (single seam; a locale-aware separator can replace it).
 static func num(n: int) -> String:

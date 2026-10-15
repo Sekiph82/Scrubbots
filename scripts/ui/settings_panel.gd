@@ -23,7 +23,8 @@ const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 
 const BUSES := ["master", "music", "sfx"]
-const BUS_TITLES := {"master": "MASTER", "music": "MUSIC", "sfx": "SOUND FX"}
+## M51: UiText keys (English unchanged: MASTER / MUSIC / SOUND FX).
+const BUS_TITLES := {"master": "SETTINGS_MASTER", "music": "SETTINGS_MUSIC", "sfx": "SETTINGS_SFX"}
 
 const TOUCH_MIN := 88
 const FONT_BODY := 30
@@ -119,7 +120,7 @@ func _build() -> void:
 	head.add_child(pill)
 	var title := Label.new()
 	title.name = "Title"
-	title.text = "SETTINGS"
+	title.text = UiText.t("SETTINGS_TITLE")
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 44)
 	pill.add_child(title)
@@ -139,12 +140,12 @@ func _build() -> void:
 	for bus in BUSES:
 		col.add_child(_card(_make_audio_row(bus)))
 
-	_haptics_toggle = _make_toggle("VIBRATION")
+	_haptics_toggle = _make_toggle(UiText.t("SETTINGS_VIBRATION"))
 	_haptics_toggle.name = "HapticsToggle"
 	_haptics_toggle.toggled.connect(_on_haptics_toggled)
 	col.add_child(_card(_haptics_toggle))
 
-	_reduced_toggle = _make_toggle("REDUCED EFFECTS")
+	_reduced_toggle = _make_toggle(UiText.t("SETTINGS_REDUCED_EFFECTS"))
 	_reduced_toggle.name = "ReducedEffectsToggle"
 	_reduced_toggle.toggled.connect(_on_reduced_toggled)
 	col.add_child(_card(_reduced_toggle))
@@ -158,7 +159,7 @@ func _build() -> void:
 
 	var close := Button.new()
 	close.name = "CloseButton"
-	close.text = "CLOSE"
+	close.text = UiText.t("SETTINGS_CLOSE")
 	close.focus_mode = Control.FOCUS_NONE
 	close.custom_minimum_size = Vector2(0, TOUCH_MIN)
 	close.add_theme_font_size_override("font_size", FONT_BUTTON)
@@ -222,7 +223,7 @@ func _make_audio_row(bus: String) -> Control:
 	var box := VBoxContainer.new()
 	box.name = "Row_" + bus
 	box.add_theme_constant_override("separation", 4)
-	var t := _make_toggle(BUS_TITLES[bus])
+	var t := _make_toggle(UiText.t(BUS_TITLES[bus]))
 	t.toggled.connect(_on_bus_toggled.bind(bus))
 	box.add_child(t)
 	var line := HBoxContainer.new()
@@ -343,9 +344,9 @@ func _sync_from_state() -> void:
 	_reduced_toggle.set_pressed_no_signal(_app.effects.is_reduced() if _app != null else false)
 	_reduced_toggle.disabled = not usable
 	if _app == null:
-		_status.text = "Settings unavailable"
+		_status.text = UiText.t("SETTINGS_UNAVAILABLE")
 	elif _app.is_blocked:
-		_status.text = "Save blocked: settings are read-only"
+		_status.text = UiText.t("SETTINGS_SAVE_BLOCKED")
 	else:
 		_status.text = ""
 
@@ -364,7 +365,7 @@ func _bus_enabled(bus: String) -> bool:
 func _update_value_label(bus: String) -> void:
 	var on: bool = (_toggles[bus] as CheckButton).button_pressed
 	var pct := int(round((_sliders[bus] as HSlider).value * 100.0))
-	(_values[bus] as Label).text = ("%d%%" % pct) if on else "OFF"
+	(_values[bus] as Label).text = UiText.t("SETTINGS_PERCENT", [pct]) if on else UiText.t("SETTINGS_OFF")
 
 # ------------------------------------------------------------- handlers ----
 
