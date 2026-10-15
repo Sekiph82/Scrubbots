@@ -66,10 +66,11 @@ func _a02() -> void:
 	for p in pairs:
 		var r: float = A.contrast_ratio(p[1], p[2])
 		_ok(r >= WCAG_AA, "%s: %.2f:1" % [p[0], r])
-	var fill: float = A.contrast_ratio(HomeStyle.TEXT, HomeStyle.GREEN)
-	var outline: float = A.contrast_ratio(HomeStyle.OUTLINE, HomeStyle.GREEN)
-	_ok(outline >= WCAG_AA, "PLAY label: navy outline vs green %.2f:1 carries legibility" % outline)
-	print("    FINDING (owner visual): white PLAY text fill vs GREEN body is %.2f:1 (< 4.5); legibility relies on the %.2f:1 navy outline" % [fill, outline])
+	# M50 decision B (owner 2026-10-15): the hero PLAY label is NAVY text on the unchanged green
+	# (tests/m50_color_symbols.gd s07 checks the live button states). Other green buttons keep white.
+	var navy: float = A.contrast_ratio(HomeStyle.NAVY, HomeStyle.GREEN)
+	_ok(navy >= WCAG_AA, "hero PLAY label: NAVY on GREEN %.2f:1" % navy)
+	print("    note: white label on other green buttons (popup / results primary) stays %.2f:1 fill + navy outline" % A.contrast_ratio(HomeStyle.TEXT, HomeStyle.GREEN))
 	_ok(UiTokens.FONT_BODY >= 28 and UiTokens.FONT_BUTTON >= 30 and UiTokens.TOUCH_MIN >= 88, "type / touch tokens: body %d, button %d, touch %d" % [UiTokens.FONT_BODY, UiTokens.FONT_BUTTON, UiTokens.TOUCH_MIN])
 	_complete("a02_ui_text_contrast")
 
