@@ -8,6 +8,23 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - Current Sprint: CLAUDE AUTONOMOUS MASTER V02 — safely sync existing Desktop Godot 4.7.x project for owner F5 play, then continue next approved code→cloud CI→peer review→log cycle.
 - Current Task: Claude safely syncs original `C:\Users\sekip\Desktop\ScrubBots` in Godot 4.7.x, then implements OWNER-APPROVED distinct per-color symbols in Supply/Slots and GREEN Play button with DARK NAVY PLAY label using SAME SB-DEV-GODOT-001 prompt; validates and leaves owner visual acceptance open.
 - Current Task Status: M44_D2_TECH_CLOSED / M49_SCOPED_MATRIX_8_OF_8_PASS / M50_CVD_CONTRAST_AUDIT_4_OF_4_PASS_PRODUCT_DECISIONS_APPROVED_IMPLEMENTATION_PENDING_OWNER_ART_SIGNOFF_OPEN / M51_PSEUDO_4_OF_4_PASS_REMAINING_TEXT_LAYOUT_OPEN / GITHUB_ACTIONS_38753823564_VALIDATE_SUCCESS_EXPORT_SKIPPED / CLAUDE_GODOT_LOCAL_PLAY_SYNC_AND_M50_IMPLEMENTATION_PENDING / OWNER_LOCAL_CHANGES_PROTECTED / NO_RECURRING_DISK_CHECKS / NO_UNREQUESTED_APK_IPA_R2.
+- **CLAUDE_AUTONOMOUS_REVIEW UPDATE [2026-10-15] — SB-DEV-GODOT-001 = READY_FOR_OWNER_F5_CHECK.**
+  - Log: `coordination/sessions/DEV-GODOT-LOCAL-PLAY-C001/CLAUDE_LOG_V01.md`. Review: `coordination/sessions/M50-ACCESSIBILITY-C001/CLAUDE_PEER_REVIEW_M50_DECISIONS_V01.md` (`CLAUDE_PEER_REVIEW`, 2 rounds; NOT a ChatGPT audit).
+  - Local Godot 4.7.2 IS installed (winget); earlier "no local Godot" notes were wrong.
+  - Owner Editor F5 = NOT_RUN by Claude. A real-GPU windowed run of production `main.tscn` (throw-away save) reached Home → PLAY → L1 gameplay.
+  - **SB-M50-002 symbols** = IMPLEMENTED:
+    - 16 C-ID shapes, watermark behind the count;
+    - Supply front + preview, 5/6 slots, Tornado / Selector chips;
+    - no board-cell symbols (recorded constraint).
+  - **SB-M50-004 navy PLAY label** = IMPLEMENTED: 7.35 / 9.04 / 5.31 : 1.
+  - **SB-M51-001 HUD price** = FIXED (UiText key + `UiText.num`).
+  - CI:
+    - [38788244223](https://github.com/Sekiph82/Scrubbots/actions/runs/38788244223), `4cbaa556`: 42/42.
+    - [38790518157](https://github.com/Sekiph82/Scrubbots/actions/runs/38790518157), `43d7e2a2`: 43/43.
+    - Both validate success, export skipped, no APK / IPA.
+    - Round-2 shape swap `a9ebe920`: local 10/10 only, rides the next planned run.
+  - **Owner visual sign-off for symbol art + navy PLAY label = OPEN.** M44-018 / 020 remain OPEN.
+  - Next autonomous milestone: **M46 Performance**.
 - Next Task/Action: **CLAUDE RUN SAME EXISTING COMBINED PROMPT `coordination/autonomy/SCRUBBOTS_CLAUDE_GODOT_LOCAL_PLAYABLE_SYNC_V01.md` (updated by ChatGPT after owner's M50 decision).** Safely synchronize Godot Desktop checkout, implement consistent non-color SYMBOLS on Supply/Slots and needed color-identity cues, KEEP GREEN hero PLAY BUTTON but set PLAY TEXT DARK NAVY, test responsive input and contrast, demonstrate actual F5 playable Home/gameplay or NOT_RUN, and publish a verified log with a symbol-art owner visual sign-off gate. Afterward fix M51 HUD price literal and continue standing autonomous V02 development. NO separate new prompt, no fake implementation claim, no recurring disk checks, no APK/IPA/R2, preserve owner-dirty files.
 - Required Actor: **CLAUDE CODE — AUTONOMOUS V02 + SB-DEV-GODOT-001** for local source sync/playable Godot handoff and further coding. **CHATGPT** for independent audit and canonical tracker review. No routine C: checks, no forced rewrite of local `project.godot`/`main.tscn`, no unapproved release, R2 upload, or paid CI.
 - **OWNER RESOLVED BOTH M50 DESIGN DECISIONS [2026-10-15]:** YES, add durable distinguishing per-color symbols to color-coded gameplay Supply/Slot tiles and related meaningful cues; green hero PLAY button stays GREEN, its PLAY label becomes DARK NAVY. Concept/color decision AUTHORIZED for Claude to code and verify under **same existing** `coordination/autonomy/SCRUBBOTS_CLAUDE_GODOT_LOCAL_PLAYABLE_SYNC_V01.md` (prompt updated in-place). No second prompt. M50-002/004 implementation NOT YET VERIFIED, symbol appearance requires later owner visual acceptance; keep checklist rows unchecked until code+CI/visual evidence exists. No owner approval required to begin prototype/implementation.
