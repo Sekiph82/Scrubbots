@@ -182,6 +182,7 @@ const EN := {
 	"BOOSTER_SAFETY_TORNADO": "There is no colour to clear right now.",
 	"BOOSTER_USE_OWNED": "USE (%s OWNED)",
 	"BOOSTER_USE_SB": "USE · %s SB",
+	"BOOSTER_PRICE_SB": "%s SB",
 	"BOOSTER_NOT_USED": "Couldn't use it right now. Nothing was spent.",
 	"BOOSTER_CHARGE_SAVED": "Booster saved! Use it when it fits.",
 	"RESULTS_CLEAN_NEXT": "CLEAN NEXT",

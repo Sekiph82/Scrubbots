@@ -82,6 +82,17 @@ static func style_play_button(b: Button) -> void:
 	_text_colors(b)
 	b.add_theme_color_override("font_outline_color", GREEN_EDGE)
 
+## Hero Home PLAY label only (M50 decision B, owner 2026-10-15): dark NAVY text on the unchanged
+## green body (WCAG 7.35 normal / 9.04 hover / 5.31 pressed), with a thin pale-green rim instead
+## of the dark outline so the navy glyph edges stay crisp. Other green buttons keep white text.
+const PLAY_LABEL_RIM := Color(0.780, 0.950, 0.690)
+
+static func style_play_label_navy(b: Button) -> void:
+	for c in ["font_color", "font_hover_color", "font_pressed_color", "font_focus_color", "font_hover_pressed_color", "font_disabled_color"]:
+		b.add_theme_color_override(c, NAVY)
+	b.add_theme_color_override("font_outline_color", PLAY_LABEL_RIM)
+	b.add_theme_constant_override("outline_size", 6)
+
 ## Bottom-nav tab: framed tab; `selected` = raised bright Home state.
 static func style_nav_button(b: Button, selected: bool) -> void:
 	if selected:
