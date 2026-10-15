@@ -42,6 +42,15 @@ func _a01() -> void:
 		grey_ok = grey_ok and A.delta_e(A.simulate(grey, k), grey) < 1.5
 	_ok(grey_ok, "neutral grey ~unchanged by every CVD matrix")
 	_ok(A.delta_e(A.simulate(Color(1, 0, 0), "protan"), A.simulate(Color(0, 0.5, 0), "protan")) < A.delta_e(Color(1, 0, 0), Color(0, 0.5, 0)), "protanopia reduces red/green separation")
+	var red_lab: Vector3 = A.to_lab(Color(1, 0, 0))
+	_ok(red_lab.distance_to(Vector3(53.24, 80.09, 67.20)) < 0.2, "sRGB red -> Lab (53.24, 80.09, 67.20) reference (%s)" % str(red_lab))
+	# Sharma, Wu & Dalal (2005) CIEDE2000 published test pairs.
+	var sharma := [[Vector3(50, 2.6772, -79.7751), Vector3(50, 0, -82.7485), 2.0425], [Vector3(50, 0, 0), Vector3(50, -1, 2), 2.3669],
+		[Vector3(50, 2.5, 0), Vector3(73, 25, -18), 27.1492], [Vector3(50, 2.5, 0), Vector3(50, 3.1736, 0.5854), 1.0000]]
+	var s_ok := true
+	for s in sharma:
+		s_ok = s_ok and absf(A.ciede2000(s[0], s[1]) - float(s[2])) < 0.0005
+	_ok(s_ok, "CIEDE2000 matches 4 published Sharma test pairs")
 	_complete("a01_math_reference_values")
 
 func _a02() -> void:
@@ -77,12 +86,13 @@ func _a03() -> void:
 		var parts: Array = []
 		for k in A.KINDS:
 			var r: Dictionary = rep[k]
-			parts.append("%s %.1f (%s/%s)" % [k, float(r["min"]), lv["palette"][int(r["a"])], lv["palette"][int(r["b"])]])
+			parts.append("%s dE76 %.1f (%s/%s) dE00 %.1f (%s/%s)" % [k, float(r["min"]), lv["palette"][int(r["a"])], lv["palette"][int(r["b"])],
+				float(r["min00"]), lv["palette"][int(r["a00"])], lv["palette"][int(r["b00"])]])
 		print("    L%d %s %d colours | %s" % [int(e.order), String(e.id), cols.size(), " | ".join(parts)])
 		normal_ok = normal_ok and is_finite(float(rep["normal"]["min"])) and float(rep["normal"]["min"]) >= 10.0
 		rows += 1
-	_ok(rows >= 10 and normal_ok, "%d levels measured; every level's closest pair >= dE 10 under normal vision" % rows)
-	print("    FINDING (owner decision, SB-M50-002/003): see protan/tritan minima above; colour identity has no non-colour cue on tiles")
+	_ok(rows >= 10 and normal_ok, "%d levels measured; every level's closest pair >= dE76 10 under normal vision (builder sanity floor, not an owner threshold)" % rows)
+	print("    FINDING (owner decision, SB-M50-002/003): CVD minima above (severity 1.0 = full dichromacy; CIE76 understates, see dE00); colour identity has no non-colour cue on tiles")
 	_complete("a03_level_cvd_report")
 
 func _a04() -> void:
@@ -106,11 +116,13 @@ func _a04() -> void:
 	var panel = host.get_screen().get_supply_panel()
 	var snap: Array = host.get_supply().player_snapshot()
 	var counts_ok := true
+	var checked := 0
 	for c in range(panel.get_column_count()):
 		var front = snap[c].get("front", null) if c < snap.size() else null
 		if front is Dictionary:
+			checked += 1
 			counts_ok = counts_ok and panel.get_row_count_text(c, 0) == str(int(front.get("robot_count", -1)))
-	_ok(counts_ok, "every supply front shows its live robot count as text (quantity is not colour-only)")
+	_ok(counts_ok and checked > 0, "every supply front (%d checked) shows its live robot count as text (quantity is not colour-only)" % checked)
 	var badges_ok := true
 	for id in ["plus_one_slot", "random", "selector", "tornado"]:
 		var b: Button = host.get_screen().get_booster_button(id)
