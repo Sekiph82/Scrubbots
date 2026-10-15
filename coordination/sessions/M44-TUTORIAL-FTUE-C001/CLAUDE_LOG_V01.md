@@ -221,3 +221,25 @@ The full `economy.snapshot() == econ` "no payout" assertion would stay exactly a
 
 ## R01 handoff
 `BLOCKED_R01_CI_FAIL_LIMIT_3_OF_3`. M44 run budget exhausted (3/3: 38625474342 fail, 38626611950 pass, 38632433821 fail on CP06 i05 only). No further CI run, APK, IPA, R2 or LF action without explicit owner approval. Root `TASKS.md` untouched.
+
+---
+
+# R01 run 4 — owner-approved (chat, 2026-10-15: "fix it and go for run 4"), CP06 test-only fixed clock
+
+- Authorization: explicit owner chat approval for ONE additional `validation_only` run after the 3-run cap. It is newer than `SCRUBBOTS_CLAUDE_AUTONOMOUS_MASTER_V01.md` / `CLAUDE.md §0B`, both of which state "run 4 not authorized". No APK / IPA requested or built.
+- Fix (commit `dee10572`, `tests/cp06_disabled_levels.gd` only): new `const CP06_FIXED_NOW := 1790000000`. The three `AppState.new(save)` calls (`_app()`, i06 `boot2` / `boot3`) now pass `func(): return CP06_FIXED_NOW`. All assertions are unchanged; both strict `economy.snapshot() == before` no-payout checks (lines 276 and 334) are as strict as before. No production code changed.
+- Run 4: [38702447218](https://github.com/Sekiph82/Scrubbots/actions/runs/38702447218) on `dee10572`.
+  - `validate` = **success** ([job 116313660739](https://github.com/Sekiph82/Scrubbots/actions/runs/38702447218/job/116313660739));
+  - `export` = **skipped** ([job 116317676013](https://github.com/Sekiph82/Scrubbots/actions/runs/38702447218/job/116317676013));
+  - artifact `11957457198` (78,935 bytes): 36 log files, **no `.apk` / `.pck` / `.ipa`**.
+- Result: **34/34 suites `exit=0 script_diag=0 status=PASS`**; `import script_diag=0`; `CP06 verdict=PASS (16/16)`; `M44 verdict=PASS (21/21)`; `aggregate=PASS`. Specialist results are identical to run 3 (all 17 PASS; c009 12/12, R15 18/18, R15-001 14/14).
+- Interpretation (honest): the fixed clock removed the only wall-clock input to the failing comparison, and CP06 then passed. This is consistent with the timing-flake diagnosis but, being one passing run, does not by itself prove it.
+- M44 CI history (unrewritten): 38625474342 FAIL (m44 t17 fixture) · 38626611950 PASS 17/17 · 38632433821 FAIL 33/34 (CP06 i05) · **38702447218 PASS 34/34**.
+
+### Run-4 status
+`M44_TECHNICAL_34_OF_34_CI_PASS` · awaiting Claude peer review (autonomous mode, `CLAUDE_PEER_REVIEW`, not a ChatGPT independent audit) · `OWNER_VISUAL_PLAYTEST_PENDING` (SB-M44-018 / 020) · no APK.
+
+### Disk (run 4)
+- This session's harness folder: 4 KiB.
+- `C:` free 79,005,860 KiB, down ~17 GiB from R01 end (96,739,208 KiB, 2026-10-14). The Claude temp folders are unchanged (~4.3 GiB, none from this task). `C:\Users\sekip\.codex\worktrees` was modified 2026-10-15 11:04 and contains e.g. a 1.37 GB `BCM-M26-001-…-source.tar`, so another agent's local activity is the likely cause. Not task-owned; nothing deleted.
+- New in-session baseline: 79,005,860 KiB.
