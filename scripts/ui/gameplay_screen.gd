@@ -811,7 +811,7 @@ func _apply_booster_visual(id: String) -> void:
 	badge.visible = int(st["charges"]) > 0
 	badge.text = str(int(st["charges"]))
 	price.visible = int(st["charges"]) <= 0 and int(st["price"]) > 0 and state != BOOSTER_LOCKED and state != BOOSTER_SELECTED
-	price.text = "%d SB" % int(st["price"])
+	price.text = UiText.t("BOOSTER_PRICE_SB", [UiText.num(int(st["price"]))])
 	b.get_node("SelectedRing").visible = state == BOOSTER_SELECTED
 	b.get_node("UnavailableOverlay").visible = state == BOOSTER_UNAVAILABLE or state == BOOSTER_LOCKED
 	b.disabled = state == BOOSTER_LOCKED

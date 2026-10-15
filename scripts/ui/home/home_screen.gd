@@ -924,7 +924,7 @@ func _build_play(parent: VBoxContainer) -> void:
 	play.focus_mode = Control.FOCUS_NONE
 	play.add_theme_font_size_override("font_size", 76)
 	HomeStyle.style_play_button(play)
-	play.add_theme_constant_override("outline_size", 12)
+	HomeStyle.style_play_label_navy(play)
 	for st in ["normal", "hover", "pressed", "disabled"]:
 		var sb: StyleBoxFlat = play.get_theme_stylebox(st)
 		sb.content_margin_bottom = 40

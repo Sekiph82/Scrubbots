@@ -14,7 +14,12 @@ extends Control
 ## construction — independent of the lower base, of any sibling / hidden state line, of
 ## container spacing, of the digit count and of the size. No per-value offset exists.
 ##
+## M50 decision A: an occupied tile also shows its canonical colour's non-colour symbol
+## (ColorSymbols) in a fixed top-left corner of the face; it never covers the centred count.
+##
 ## Presentation only: it holds scalar colour/count/state, no engine reference, no input.
+
+const ColorSymbols = preload("res://scripts/ui/color_symbols.gd")
 
 const OUTLINE_COLOR := Color(0.03, 0.04, 0.09, 1.0)
 const ACTIVE_GLOW := Color(0.30, 0.90, 1.0, 1.0)
@@ -27,6 +32,10 @@ const FACE_FONT_FRACTION := 0.56
 const MAX_TEXT_WIDTH_FRACTION := 0.86
 const DIGIT_EM := 0.68   # conservative digit advance of the emboldened default font
 const FONT_STEP := 4
+## Symbol box: side and corner margin as fractions of the face's shorter side.
+const SYMBOL_FRACTION := 0.30
+const SYMBOL_MARGIN := 0.06
+const DIGIT_CAP := 0.72   # digit ink height as a fraction of the font size
 
 static var _font: FontVariation
 
@@ -43,6 +52,7 @@ var _base: Panel
 var _face: Panel
 var _highlight: Panel
 var _count: Label
+var _symbol: Control
 var _well: Panel
 
 func _init() -> void:
@@ -61,6 +71,9 @@ func _init() -> void:
 	_count.add_theme_color_override("font_outline_color", OUTLINE_COLOR)
 	_count.add_theme_font_override("font", _shared_font())
 	_face.add_child(_count)
+	_symbol = ColorSymbols.new()
+	_symbol.name = "Symbol"
+	_face.add_child(_symbol)
 	_well = _panel("EmptyWell")
 	_refresh()
 
@@ -194,7 +207,17 @@ func _fit_text() -> void:
 	var fs: float = minf(f.size.y * FACE_FONT_FRACTION, f.size.x * MAX_TEXT_WIDTH_FRACTION / (digits * DIGIT_EM))
 	var q := maxi(int(floorf(fs / FONT_STEP)) * FONT_STEP, 12)
 	_count.add_theme_font_size_override("font_size", q)
-	_count.add_theme_constant_override("outline_size", maxi(int(roundf(q * 0.24 / 2.0)) * 2, 4))
+	var outline := maxi(int(roundf(q * 0.24 / 2.0)) * 2, 4)
+	_count.add_theme_constant_override("outline_size", outline)
+	# Symbol: the largest top-left square (<= SYMBOL_FRACTION of the shorter face side) that stays
+	# clear of the centred digit ink (measured width x DIGIT_CAP height, plus half the outline).
+	var m := minf(f.size.x, f.size.y)
+	var margin := m * SYMBOL_MARGIN
+	var ink := Vector2(_shared_font().get_string_size(_text, HORIZONTAL_ALIGNMENT_LEFT, -1, q).x, q * DIGIT_CAP) + Vector2(outline, outline)
+	var room := maxf((f.size.x - ink.x) * 0.5, (f.size.y - ink.y) * 0.5) - margin - 1.0
+	var side := clampf(room, 0.0, m * SYMBOL_FRACTION)
+	_symbol.position = Vector2(margin, margin)
+	_symbol.size = Vector2(side, side)
 
 func _refresh() -> void:
 	if _face == null:
@@ -204,6 +227,8 @@ func _refresh() -> void:
 	_face.visible = not _empty
 	_well.visible = _empty and _draw_well
 	_count.text = "" if _empty else _text
+	_symbol.visible = not _empty
+	_symbol.set_color(_color)
 	_layout()
 
 # --------------------------------------------------- read-only test accessors ---
@@ -234,6 +259,13 @@ func get_base_panel() -> Panel:
 
 func get_highlight_panel() -> Panel:
 	return _highlight
+
+## Shape id of the visible colour symbol ("" when empty / not a canonical colour).
+func get_symbol_shape() -> String:
+	return _symbol.get_shape()
+
+func get_symbol_control() -> Control:
+	return _symbol
 
 ## GLOBAL rect of the coloured top face (the centring reference).
 func get_face_rect_global() -> Rect2:
