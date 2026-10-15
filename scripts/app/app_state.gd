@@ -385,6 +385,14 @@ func set_reduced_effects(on: bool) -> Dictionary:
 	effects.set_reduced(on)
 	return request_save()
 
+## M50-BOARD Color Symbols (board cells + Supply/Slots + booster chips): applies live (service
+## `color_symbols_changed` -> ColorSymbols.set_enabled) and persists canonically. Refused while blocked.
+func set_color_symbols(on: bool) -> Dictionary:
+	if is_blocked:
+		return {"ok": false, "reason": "app_blocked"}
+	effects.set_color_symbols(on)
+	return request_save()
+
 func set_volumes(master: float, music: float, sfx: float) -> Dictionary:
 	if is_blocked:
 		return {"ok": false, "reason": "app_blocked"}

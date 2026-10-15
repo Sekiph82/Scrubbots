@@ -14,6 +14,7 @@ extends Control
 ## (SB-M42-002), shown whenever the navigation route is HOME.
 
 const AppState = preload("res://scripts/app/app_state.gd")
+const ColorSymbols = preload("res://scripts/ui/color_symbols.gd")
 const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
 const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/production_gameplay_host.gd")
 const SettingsPanelScene = preload("res://scenes/ui/settings_panel.tscn")
@@ -159,6 +160,11 @@ func _ready() -> void:
 	_home.nav_requested.connect(_on_home_nav)
 	_home.set_app_shortcuts(APP_SHORTCUTS)
 	_home.set_app_nav(APP_NAV)
+	# M50-BOARD: the persisted COLOR SYMBOLS setting drives every symbol surface, live.
+	if app_state != null and app_state.effects != null:
+		ColorSymbols.set_enabled(app_state.effects.is_color_symbols(), get_tree())
+		app_state.effects.color_symbols_changed.connect(func(on): ColorSymbols.set_enabled(on, get_tree() if is_inside_tree() else null))
+		ColorSymbols.board_atlas()   # one-time board glyph atlas build at boot, not at first level start
 	feel = FeedbackAdapter.new()
 	feel.bind(get_tree(), app_state.effects if app_state != null else null)
 	_results.set_feedback(feel)   # M43-C005F-003/004: presentation-only Results feel

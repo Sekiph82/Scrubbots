@@ -15,9 +15,25 @@ uniform float bevel_strength : hint_range(0.0, 0.5) = 0.13;
 uniform float corner_radius : hint_range(0.0, 0.5) = 0.10;
 uniform vec3 gutter_color : source_color = vec3(0.03, 0.04, 0.07);
 
+// M50-BOARD colour symbols (owner 2026-10-15): every ACTIVE cell carries its canonical C-ID
+// shape, the same 16 shapes as Supply/Slots. `cid_map` is one texel per cell (R = C-ID 1..16,
+// 0 = none; G = 1 when the cell takes the dark ink), `glyph_atlas` the 16 shapes built once by
+// ColorSymbols.build_atlas_image() (R = shape, G = halo). Still one pass, no per-cell nodes;
+// a CLEARED cell exits above before any glyph is drawn.
+uniform bool symbols_on = false;
+uniform sampler2D cid_map : filter_nearest, repeat_disable;
+uniform sampler2D glyph_atlas : filter_linear_mipmap, repeat_disable;
+uniform float glyph_span = 0.8;          // atlas tile side as a fraction of the cell
+uniform float ink_alpha = 0.92;
+uniform float halo_alpha = 0.5;
+uniform vec3 ink_dark : source_color = vec3(0.03, 0.04, 0.09);
+uniform vec3 ink_light : source_color = vec3(1.0);
+
 void fragment() {
 	vec2 g = UV * grid_size;
 	vec2 px = fwidth(g);                       // cell-fractions per screen pixel
+	vec2 dgx = dFdx(g);                        // glyph gradients: uniform control flow only
+	vec2 dgy = dFdy(g);
 	float ppc = 1.0 / max(max(px.x, px.y), 0.00001);   // screen pixels per logical cell
 	vec2 cell = clamp(floor(g), vec2(0.0), grid_size - vec2(1.0));
 	vec2 f = g - cell;                         // 0..1 inside the cell
@@ -44,6 +60,19 @@ void fragment() {
 			col = mix(col, vec3(1.0), ramp * bevel_strength);
 		} else {
 			col = mix(col, vec3(0.0), ramp * bevel_strength);
+		}
+		if (symbols_on) {
+			vec2 id = texelFetch(cid_map, ivec2(cell), 0).rg;
+			float cid = floor(id.r * 255.0 + 0.5);
+			vec2 gp = (f - vec2(0.5)) / glyph_span + vec2(0.5);
+			if (cid > 0.5 && gp.x >= 0.0 && gp.x <= 1.0 && gp.y >= 0.0 && gp.y <= 1.0) {
+				// Explicit gradients from the continuous grid coordinate (f wraps per cell).
+				vec2 k = vec2(1.0 / 16.0, 1.0) / glyph_span;
+				vec2 gl = textureGrad(glyph_atlas, vec2((cid - 1.0 + gp.x) / 16.0, gp.y), dgx * k, dgy * k).rg;
+				bool dark = id.g > 0.5;
+				col = mix(col, dark ? ink_light : ink_dark, gl.g * halo_alpha);
+				col = mix(col, dark ? ink_dark : ink_light, gl.r * ink_alpha);
+			}
 		}
 		// Thin dark gutter at the tile boundary (and the rounded corners).
 		float gmask = smoothstep(-gw - aa, -gw + aa, d);

@@ -451,7 +451,7 @@ func _reduced_effects_persistence() -> void:
 	var r2 = AppState.new(path)
 	_ok(not r2.effects.is_reduced(), "relaunch: OFF restored")
 	var saved = JSON.parse_string(FileAccess.get_file_as_string(path))
-	_ok(saved["settings"]["effects"] == {"reduced": false}, "canonical save carries settings.effects.reduced (exact bool)")
+	_ok(saved["settings"]["effects"] == {"reduced": false, "color_symbols": true}, "canonical save carries settings.effects.reduced (exact bool; + M50 color_symbols)")
 	# Pre-C002 save (no settings.effects) loads with OFF.
 	var base := {"schema": "scrubbots.save", "version": 1,
 		"settings": {"audio": {"master": 1.0, "music": 1.0, "sfx": 1.0}, "haptics": {"enabled": true}},

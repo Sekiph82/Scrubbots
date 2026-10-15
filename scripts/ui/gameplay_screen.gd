@@ -34,6 +34,7 @@ const UiText = preload("res://scripts/ui/ui_text.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const PaletteColors = preload("res://scripts/data/palette_colors.gd")
 const Shell = preload("res://scripts/ui/gameplay_shell_geometry.gd")
+const BoardMagnifier = preload("res://scripts/ui/board_magnifier.gd")
 
 const FILL := Color(0.035, 0.055, 0.11)   # surround outside the aspect-fitted shell
 ## Rail envelope pad in logical cells beyond the board (outer rail edge = +3.0 cells).
@@ -126,6 +127,8 @@ var _booster_row: HBoxContainer
 var _booster_buttons: Dictionary = {}
 var _booster_states: Dictionary = {}
 var _ad_region: Panel
+## M50-BOARD press-and-hold board loupe (covers exactly the board rect; presentation only).
+var _magnifier
 var _pause_btn: Button
 var _pause_glyph: Control
 var _paused := false
@@ -292,6 +295,11 @@ func _build_tree() -> void:
 	# S3-B: reserved but INVISIBLE until M57 real ad integration (no band, no label).
 	_ad_region.add_theme_stylebox_override("panel", StyleBoxEmpty.new())
 	_screen_content.add_child(_ad_region)
+
+	# Last child: its loupe draws over the HUD while the board is held.
+	_magnifier = BoardMagnifier.new()
+	_magnifier.visible = false
+	_screen_content.add_child(_magnifier)
 
 func _build_top() -> void:
 	# Profile: live content only inside the baked profile box (no panel chrome).
@@ -499,6 +507,7 @@ func _build_board_presentation() -> void:
 	if agent_layer != null:
 		_presentation.move_child(_rail_view, agent_layer.get_index())
 	_rail_view.configure(_board.get_width(), _board.get_height())
+	_magnifier.bind(_presentation.get_renderer())
 
 func _bind_batch_views() -> void:
 	if _five_slot_strip != null:
@@ -635,6 +644,9 @@ func _layout_board() -> void:
 		_rail_view.configure(w, h)
 	var board_px := Vector2(w, h) * _cell_size
 	_presentation.position = (rr.size - board_px) * 0.5
+	_magnifier.position = _board_region.position + _presentation.position
+	_magnifier.size = board_px
+	_magnifier.visible = true
 
 ## Display cell size (exact, unfloored) for a w x h board fitted onto the baked rail region.
 func _board_display_cell(rr: Rect2, w: int, h: int) -> float:
@@ -836,6 +848,9 @@ func get_cell_size() -> float:
 
 func get_presentation():
 	return _presentation
+
+func get_board_magnifier():
+	return _magnifier
 
 func get_rail_view():
 	return _rail_view

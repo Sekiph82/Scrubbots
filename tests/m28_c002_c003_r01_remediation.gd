@@ -636,9 +636,11 @@ func _grid() -> void:
 		alphas.append([d, m.get_shader_parameter("gutter_alpha") if m != null else -1.0, m.get_shader_parameter("bevel_strength") if m != null else -1.0])
 		r.free()
 	var code: String = load("res://scripts/gameplay/board/board_pixel_grid.gdshader").code
-	ok_shader = code.find("uniform vec2 grid_size") != -1 and code.find("sampler2D") == -1 and code.find("TEXTURE") != -1
+	# M50-BOARD (owner 2026-10-15) added exactly two samplers for the colour symbols (per-cell
+	# identity map + glyph atlas); the GRID itself still has no mask texture.
+	ok_shader = code.find("uniform vec2 grid_size") != -1 and code.count("sampler2D") == 2 and code.find("sampler2D cid_map") != -1 and code.find("sampler2D glyph_atlas") != -1 and code.find("TEXTURE") != -1
 	_ok(ok_dims, "G1 grid_size uniform == the real logical width x height for %d different dimensions (incl. rectangular 20x59 / 59x20)" % dims.size())
-	_ok(ok_shader, "G1 shader has no fixed mask texture (only the renderer's own texture + grid_size)")
+	_ok(ok_shader, "G1 grid has no fixed mask texture (renderer texture + grid_size; only the M50 symbol map + atlas samplers)")
 	var mono := true
 	var a20: float = alphas[0][1]
 	var a59: float = alphas[3][1]
