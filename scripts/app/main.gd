@@ -43,6 +43,9 @@ const HelpTipsScreen = preload("res://scripts/ui/tutorial/help_tips_screen.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
 ## M44: coachmark refresh cadence (presentation poll; not per frame).
 const COACH_TICK_S := 0.2
+## M44 peer-review D1: step copy (L2 booster lines run the host's solver-backed legality
+## proofs) is rebuilt only on a step change or at most this often, never every tick.
+const COACH_COPY_REFRESH_MS := 2000
 ## BottomNav tabs the app root serves (RANKS waits for the SB-M43-131 owner policy).
 const APP_NAV := ["events"]
 ## Home shortcut panels the app root turns into app-level destinations (Home opens none of
@@ -100,6 +103,7 @@ var meta_feel = null
 var ftue = null
 var coachmarks = null
 var _coach_timer: Timer = null
+var _coach_copy := {"id": "", "at": 0, "copy": {}}
 
 func _enter_tree() -> void:
 	_boot()
@@ -511,8 +515,12 @@ func refresh_coachmark() -> void:
 	if want.is_empty():
 		coachmarks.hide_step()
 		return
-	var copy: Dictionary = ftue.step_copy(want["step"], want["ctx"])
-	coachmarks.show_step(String(want["step"]["id"]), String(copy["title"]), String(copy["body"]), want["rect"])
+	var id := String(want["step"]["id"])
+	var now := Time.get_ticks_msec()
+	if id != String(_coach_copy["id"]) or now - int(_coach_copy["at"]) >= COACH_COPY_REFRESH_MS:
+		_coach_copy = {"id": id, "at": now, "copy": ftue.step_copy(want["step"], want["ctx"])}
+	var copy: Dictionary = _coach_copy["copy"]
+	coachmarks.show_step(id, String(copy["title"]), String(copy["body"]), want["rect"])
 
 func _coach_want() -> Dictionary:
 	if ftue == null or nav == null or not ftue.tips_active():
