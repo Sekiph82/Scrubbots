@@ -729,7 +729,7 @@ func _t23() -> void:
 	f.use_config(_later_cfg())
 	_root.request_home_ceremonies()
 	await _frames(3)
-	_ok(_top_id() != "ceremony_feature_unlock", "during onboarding (L1 frontier): no What's New on Home")
+	_ok(f.whats_new_due().is_empty() and _top_id() != "ceremony_feature_unlock", "during onboarding (L1 frontier): no What's New due or shown on Home")
 	_root.get_modal_stack().clear("test")
 	for n in [1, 2, 3]:
 		app.progression.record_win(n)
@@ -750,7 +750,7 @@ func _t23() -> void:
 	_root.get_ftue().use_config(_later_cfg())
 	_root.request_home_ceremonies()
 	await _frames(4)
-	_ok(_top_id() != "ceremony_feature_unlock", "relaunch: not shown again")
+	_ok(_root.get_ftue().whats_new_due().is_empty() and _top_id() != "ceremony_feature_unlock", "relaunch: not due and not shown again")
 	_complete("t23_d2_quiet_home_once")
 
 # ------------------------------------------------------------------ helpers ----

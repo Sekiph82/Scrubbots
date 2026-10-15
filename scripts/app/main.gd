@@ -597,8 +597,9 @@ static func _merge_rect(a: Rect2, b: Rect2) -> Rect2:
 		return b
 	return a.merge(b)
 
-## M44 What's New: an ESTABLISHED profile sees each new feature once per feature/version
-## through the M43 Feature Unlock ceremony on a quiet Home; acknowledged only by its CTA.
+## M44 What's New: each due feature version once (FtueDirector.whats_new_due: established
+## profiles; new profiles only after the L1-L3 window closed, only versions added after their
+## bootstrap) through the M43 Feature Unlock ceremony on a quiet Home; acknowledged only by its CTA.
 func _open_whats_new() -> bool:
 	if ftue == null or _modals == null or app_state == null:
 		return false
