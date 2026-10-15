@@ -21,6 +21,7 @@ name: Android Family First10 APK
 # M45: + tests/m45_debug_tooling.gd (35 total, exact 8/8 guard).
 # M44 D2 (owner 2026-10-15): m44_ftue grows to 23 cases (future What's New after L3); M44 guard 23/23.
 # M49: + tests/m49_responsive_matrix.gd (36 total, exact 8/8 guard).
+# M50: + tests/m50_accessibility_audit.gd (37 total, exact 4/4 guard).
 
 on:
   workflow_dispatch:
@@ -96,7 +97,7 @@ jobs:
                    m39_v02_atomicity m39_v02_capacity m39_v02_integration m39_v03_full_surface m39_v03_integration \
                    m39_v04_integration m39_v04_tornado_inflight m39_c003_random_any_booster_rewards \
                    m41_settings m43_master_c009_daily m43_r15_owner_remediation m43_r15_001_r01_sequential_unlock \
-                   m45_debug_tooling m49_responsive_matrix; do
+                   m45_debug_tooling m49_responsive_matrix m50_accessibility_audit; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -136,6 +137,12 @@ jobs:
             echo "M49 verdict=PASS (8/8)" | tee -a "$S"
           else
             echo "M49 verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
+          fi
+          # M50 accessibility audit: exact 4-case summary is mandatory.
+          if grep -qxF 'M50 accessibility audit evidence: PASS (4/4 cases, 0 fail)' validate_logs/m50_accessibility_audit.log 2>/dev/null; then
+            echo "M50 verdict=PASS (4/4)" | tee -a "$S"
+          else
+            echo "M50 verdict=FAIL (exact 4/4 summary missing)" | tee -a "$S"; fail=1
           fi
           echo "aggregate=$([ $fail -eq 0 ] && echo PASS || echo FAIL)" | tee -a "$S"
           { echo "### validate (mode=${MODE:-<unset>}, ${GITHUB_SHA})"; echo '```'; cat "$S"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
