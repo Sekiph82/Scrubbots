@@ -18,6 +18,7 @@ name: Android Family First10 APK
 # M44 FTUE master: tests/m44_ftue.gd added to `validate` (exact 21/21 summary required); the
 # 16 earlier suites, CP06 16/16 guard, manual trigger and job-level export guard are unchanged.
 # M44 R01: + 17 specialist M39 / M41 Settings / M43 Daily + R15 suites (34 total), same fail-closed rules.
+# M45: + tests/m45_debug_tooling.gd (35 total, exact 8/8 guard).
 
 on:
   workflow_dispatch:
@@ -92,7 +93,8 @@ jobs:
                    m39a_economy_core m39b_hearts_speed m39c_boosters m39d_daily_collection m39e_full_matrix \
                    m39_v02_atomicity m39_v02_capacity m39_v02_integration m39_v03_full_surface m39_v03_integration \
                    m39_v04_integration m39_v04_tornado_inflight m39_c003_random_any_booster_rewards \
-                   m41_settings m43_master_c009_daily m43_r15_owner_remediation m43_r15_001_r01_sequential_unlock; do
+                   m41_settings m43_master_c009_daily m43_r15_owner_remediation m43_r15_001_r01_sequential_unlock \
+                   m45_debug_tooling; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -120,6 +122,12 @@ jobs:
             echo "M44 verdict=PASS (21/21)" | tee -a "$S"
           else
             echo "M44 verdict=FAIL (exact 21/21 summary missing)" | tee -a "$S"; fail=1
+          fi
+          # M45 debug tooling: exact 8-case summary is mandatory.
+          if grep -qxF 'M45 debug tooling evidence: PASS (8/8 cases, 0 fail)' validate_logs/m45_debug_tooling.log 2>/dev/null; then
+            echo "M45 verdict=PASS (8/8)" | tee -a "$S"
+          else
+            echo "M45 verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
           fi
           echo "aggregate=$([ $fail -eq 0 ] && echo PASS || echo FAIL)" | tee -a "$S"
           { echo "### validate (mode=${MODE:-<unset>}, ${GITHUB_SHA})"; echo '```'; cat "$S"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
