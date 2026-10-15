@@ -135,6 +135,11 @@ func end_inspect() -> void:
 
 ## The renderer swaps its ImageTexture on every repaint; keep the loupe on the live one.
 func _process(_delta: float) -> void:
+	# Godot re-enables processing at ready for scripts that override _process: stay idle
+	# (and never touch the hidden loupe) unless the board is actually being inspected.
+	if not _active:
+		set_process(false)
+		return
 	if _renderer == null or not is_instance_valid(_renderer):
 		end_inspect()
 		return

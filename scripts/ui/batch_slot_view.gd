@@ -101,6 +101,10 @@ func _apply_reserve() -> void:
 ## Bind a DETACHED scalar snapshot (dict is duplicated; no reference retained) plus
 ## a scalar palette Color for the batch color. Safe to call before or after _ready.
 func bind_snapshot(snapshot: Dictionary, color: Color = Color(1, 0, 1, 1)) -> void:
+	# M46: the runtime re-binds every slot every tick; an unchanged snapshot + colour would
+	# rebuild the identical tile (and allocate new styleboxes) each frame. Skip it.
+	if _tile != null and color == _color and snapshot == _snapshot:
+		return
 	_snapshot = snapshot.duplicate(true)
 	_color = color
 	if _tile == null:
