@@ -1,5 +1,7 @@
 # OWNER DECISION 2026-10-15 — M44 D2 What's New + C: READ-ONLY DIAGNOSTICS
 
+> **LATEST OWNER CLARIFICATION, SAME DATE, TAKES PRECEDENCE:** C: disk diagnosis was a **ONE-TIME** inspection, and Claude has already completed/reported it. The owner does **not** want recurring disk monitoring or pauses for swings in overall C: free space; the previous assistant-created 500MiB global change threshold is retired. Claude's primary duty is to CONTINUE ScrubBots coding. Keep task-created TEMP <=20MiB, cloud-first heavy tests, one Desktop checkout, and no destructive cleanup. D2 source/t22-t23 tests have now been committed, but **D2 CI is still NOT_RUN**. Current execution authority: `CLAUDE.md §0B` and `coordination/autonomy/SCRUBBOTS_CLAUDE_AUTONOMOUS_MASTER_V01.md`. The historical diagnostic scope below is retained for record, NOT an active task.
+
 **Owner explicit approvals in chat:**
 1. **YES** to analyzing the owner's Windows C: drive consumption **without deleting any files**.
 2. **APPROVED**: a genuinely new ScrubBots player may see real, FUTURE What's New feature announcements **once per feature/version, after the first-three-level tutorial finishes**. Nothing during tutorial.
