@@ -24,6 +24,8 @@ var _app = null
 var _cfg: Dictionary = {}
 ## Presentation policy (app root seam): false = no tips / What's New are presented.
 var enabled := true
+## Session-only What's New keys whose acknowledgement could not be saved (owner D2 review).
+var _snoozed: Dictionary = {}
 
 func _init(app_state, cfg: Dictionary = {}) -> void:
 	_app = app_state
@@ -150,16 +152,18 @@ func whats_new_due() -> Array:
 		return []
 	if _app.economy.ftue.is_new_profile() and not _app.economy.ftue.closed:
 		return []
-	return (_cfg["whats_new"] as Array).filter(func(e): return not _app.economy.meta_ui.is_seen(whats_new_key(e)))
+	return (_cfg["whats_new"] as Array).filter(func(e):
+		var k := whats_new_key(e)
+		return not _app.economy.meta_ui.is_seen(k) and not _snoozed.has(k))
 
-## Every What's New key in this config (the new-profile presentation baseline).
-func whats_new_keys() -> Array:
-	return (_cfg.get("whats_new", []) as Array).map(func(e): return whats_new_key(e))
-
-## Dev / test seam: drive the director with another validated config (e.g. a simulated later
-## build that adds a feature version). Never used by the shipping boot path.
-func use_config(cfg: Dictionary) -> void:
+## Dev / test seam: drive the director with another config that passed FtueConfig.validate
+## (e.g. a simulated later build adding a feature version). Refuses anything not `ok`.
+## Never used by the shipping boot path.
+func use_config(cfg: Dictionary) -> bool:
+	if not bool(cfg.get("ok", false)):
+		return false
 	_cfg = cfg.duplicate(true)
+	return true
 
 ## Feature-unlock ceremony event (M43-C005 builder input) for a What's New entry.
 func whats_new_event(e: Dictionary) -> Dictionary:
@@ -178,5 +182,9 @@ func acknowledge_whats_new(e: Dictionary) -> bool:
 	var r: Dictionary = _app.request_save()
 	if not bool(r.get("ok", false)):
 		meta.import_snapshot(pre)
+		# Not dismissed durably: snooze it for THIS session only (never persisted), so the
+		# non-dismissible ceremony cannot re-open in a loop while saves fail; it is due again
+		# on the next launch.
+		_snoozed[whats_new_key(e)] = true
 		return false
 	return true

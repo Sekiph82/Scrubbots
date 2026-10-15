@@ -668,12 +668,16 @@ func _t21() -> void:
 
 ## Owner D2 (OWNER_D2_WHATS_NEW_AND_DISK_DIAG_DECISION_V01): a simulated LATER build that adds
 ## one feature version to the real config (real catalog / levels untouched).
-func _later_cfg() -> Dictionary:
-	var later: Dictionary = FtueConfig.load_config()
-	(later["whats_new"] as Array).append({"feature_id": "m44_d2_future_probe", "version": 2,
+func _later_raw() -> Dictionary:
+	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(FtueConfig.PATH))
+	(raw["whats_new"] as Array).append({"feature_id": "m44_d2_future_probe", "version": 2,
 		"name": "FTUE_WHATSNEW_HELP_NAME", "body": "FTUE_WHATSNEW_HELP_BODY",
 		"icon": "res://assets/ui/final/gameplay/tutorial/speech_bubble.png"})
-	return later
+	return raw
+
+## The later build's config through the SAME strict reader production uses.
+func _later_cfg() -> Dictionary:
+	return FtueConfig.validate(_later_raw())
 
 ## Economy truth that What's New must never touch.
 func _econ_core(app) -> String:
@@ -686,7 +690,7 @@ func _t22() -> void:
 	var a = _app(p)
 	a.bootstrap_new_profile()
 	var later := _later_cfg()
-	_ok(bool(FtueConfig.validate(later).get("ok", false)), "simulated later-build config is valid")
+	_ok(bool(later.get("ok", false)) and (later["whats_new"] as Array).size() == 2, "simulated later-build config passes the strict reader")
 	var d = FtueDirector.new(a, later)
 	_ok(a.economy.meta_ui.is_seen("feature:help_tips:1"), "bootstrap baselined this build's What's New entries (presentation only)")
 	_ok(d.whats_new_due().is_empty(), "L1, onboarding open: nothing, even with a later feature version")
@@ -700,7 +704,8 @@ func _t22() -> void:
 	var due: Array = d.whats_new_due()
 	_ok(due.size() == 1 and String(due[0]["feature_id"]) == "m44_d2_future_probe", "only the later feature version is due (bootstrap-era Help & Tips suppressed)")
 	a.save.set_fault_injector(func(stage): return stage == "temp_write")
-	_ok(not d.acknowledge_whats_new(due[0]) and not a.economy.meta_ui.is_seen("feature:m44_d2_future_probe:2") and d.whats_new_due().size() == 1, "ack with a failed save: not dismissed (fail closed)")
+	_ok(not d.acknowledge_whats_new(due[0]) and not a.economy.meta_ui.is_seen("feature:m44_d2_future_probe:2"), "ack with a failed save: not durably dismissed (fail closed)")
+	_ok(d.whats_new_due().is_empty() and FtueDirector.new(a, later).whats_new_due().size() == 1, "snoozed for this session only (no re-open loop); due again for a new session")
 	a.save.set_fault_injector(Callable())
 	_ok(d.acknowledge_whats_new(due[0]) and d.whats_new_due().is_empty() and not d.acknowledge_whats_new(due[0]), "durable ack, exactly once")
 	var re = _app(p)
@@ -709,9 +714,10 @@ func _t22() -> void:
 	var est = _app(_path("t22e"))
 	var de = FtueDirector.new(est, later)
 	_ok(de.whats_new_due().size() == 2 and not est.economy.meta_ui.is_seen("feature:help_tips:1"), "established profile unchanged: both unseen entries due")
-	var bad: Dictionary = later.duplicate(true)
+	var bad: Dictionary = _later_raw()
 	(bad["whats_new"] as Array)[1]["version"] = 0
-	_ok(not bool(FtueConfig.validate(bad).get("ok", true)), "malformed later entry rejected by the strict config")
+	_ok(not bool(FtueConfig.validate(bad).get("ok", true)) and String(FtueConfig.validate(bad).get("reason", "")) == "whats_new", "malformed later entry (version 0) rejected for exactly that reason")
+	_ok(not d.use_config(bad) and not d.use_config({}), "use_config refuses an unvalidated config")
 	_complete("t22_d2_future_whats_new_rules")
 
 func _t23() -> void:
