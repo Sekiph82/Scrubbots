@@ -2278,7 +2278,7 @@ Maximum board target: 59×59 = 3,481.
 - slot strip no longer rebuilt every frame (`ui_snapshot_sync` 2.0 → 0.3 ms);
 - idle board magnifier no longer processes.
 
-Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_V01.md`; `CLAUDE_PEER_REVIEW` `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_PEER_REVIEW_V01.md` (not ChatGPT). Rows stay OPEN for: phone/GPU numbers (M47), a second fixture with unlock chains / WAITING / 12 colours / VOID, SB-M46-015, and a ChatGPT audit.
+Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_V01.md`; `CLAUDE_PEER_REVIEW` `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_PEER_REVIEW_V01.md` (not ChatGPT). **[2026-10-16 follow-up] second 59×59 fixture `m46_pockets_59` added (suite LOCAL_PASS 16/16).** It is Level Data v2 with a VOID ring, 12 colours and three 3-deep nested pockets. Played to WON: a pocket batch WAITED in its slot from frame 5, all 5 slots were waiting at peak, P1 < P2 < P3 unlock order held, and pause / 1x-2x mid-level worked. Frame mean 2.10 / p99 9.5 ms desktop. Rows stay OPEN for: phone/GPU numbers (M47), 6th slot / boosters under load, SB-M46-015, and a ChatGPT audit.
 
 - [ ] SB-M46-001 Level parsing.
 - [ ] SB-M46-002 BoardState.

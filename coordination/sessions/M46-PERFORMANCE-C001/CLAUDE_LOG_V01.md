@@ -79,15 +79,33 @@ There was no M46 ChatGPT prompt. Following autonomous V02, this cycle measured t
 | m39_v04_integration | PASS |
 | m55_long_session | PASS |
 
+## Follow-up: second 59×59 fixture (p16), suite now 16/16 LOCAL_PASS (about 122 s)
+
+**The fixture.** The owner asked for this here. The suite now plays a second complete level, `m46_pockets_59`, to WON through the real host. It has:
+- Level Data v2 with a 2-cell VOID ring: 456 VOID cells and 3,025 artwork cells;
+- **12 colours;**
+- three 9×9 nested pockets inside the stripe art. Each pocket is a P1 C05 ring, then a P2 C09 ring, then a P3 C16 core, giving unlock depth 3.
+
+All pocket batches sit in Supply column 4. Its first P1 batch enters a slot on frame 5 and has to WAIT there.
+
+**Results:**
+- **WON:** all 3,025 artwork cells cleared in 20,828 frames.
+- **WAITING:** a slot was WAITING in 19,951 frames. At peak, **all 5 slots were waiting at once**, and the level still recovered through the in-flight bots.
+- **Unlock chain respected:** the first clear in P1 came at frame 1,920, P2 at 19,120 and P3 at 19,630.
+- **Pause and speed:** a 60-frame pause mid-level changed no cell, and the 1x stretch and the return to 2x were exercised.
+- **Frame cost:** desktop CPU frame mean 2.10 / p95 6.27 / p99 9.52 / max 45.7 ms, with up to 117 bots in flight. This is within the same mean ≤ 4 ms and p99 ≤ 16.7 ms rule.
+- **Probe:**
+  - `target_selection` mean 1.48 ms, max 24.2 ms;
+  - `access_mask_build` 2,071 builds, mean 2.43 ms, max 16.7 ms;
+  - `route_dijkstra` max 1.44 ms.
+
+  The reachability mask is rebuilt from scratch on every board revision. An incremental mask is the most likely next optimisation if phone numbers come in tight. It is not needed on desktop.
+
+**Still not covered by any fixture:** the 6th slot, boosters, and winding detours that cross many colours. Pocket routes are the straight-ish channels the stripes open.
+
 ## Open / not covered
 - **Devices.** There are no phone or GPU numbers. Render, upload and shader cost are not in headless. These go to M47 device testing.
-- **Fixture coverage.** The stripe fixture keeps every colour reachable. It does not exercise:
-  - unlock chains or WAITING slots;
-  - winding long routes;
-  - 9–12 colours or VOID cells;
-  - the 6th slot, boosters, or pause / 1x-2x mid-level.
-
-  A second full-level fixture (enclosed pockets) is a follow-up.
+- **Fixture coverage.** The stripe fixture keeps every colour reachable. Unlock chains, WAITING, 12 colours, VOID and pause / 1x-2x are now covered by the second fixture, p16 (see the follow-up section above). Still not covered: the 6th slot and boosters.
 - **FX and visuals age on real frame time.** At sleep 0, gameplay runs about 10× faster than real time, so the FX layer sits at its cap. That is conservative for the frame figures, but the FX cap check is true by construction.
 - **One-off hitches,** reported but not gated:
   - first agent spawn, about 35–38 ms in `dispatcher_spawn`;
