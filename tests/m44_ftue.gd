@@ -37,6 +37,7 @@ var EXPECTED_CASES := [
 	"t14_first_home_ui_claims", "t15_gameplay_l1_l3_real_controls", "t16_skip_tips_help_read_only",
 	"t17_old_save_whats_new_once", "t18_layout_reduced_effects_non_blocking", "t19_relaunch_modal_resume",
 	"t20_fresh_meta_dependencies", "t21_static_guards",
+	"t22_d2_future_whats_new_rules", "t23_d2_quiet_home_once",
 ]
 
 var _fail := 0
@@ -73,6 +74,8 @@ func _initialize() -> void:
 	await _t19()
 	await _t20()
 	_t21()
+	_t22()
+	await _t23()
 	_shutdown()
 	_cleanup()
 	_done()
@@ -662,6 +665,87 @@ func _t21() -> void:
 	var op := FileAccess.get_file_as_string("res://scripts/app/opening_screen.gd").to_lower()
 	_ok(not op.contains("skip"), "opening cinematic has no skip path (M42 non-skippable)")
 	_complete("t21_static_guards")
+
+## Owner D2 (OWNER_D2_WHATS_NEW_AND_DISK_DIAG_DECISION_V01): a simulated LATER build that adds
+## one feature version to the real config (real catalog / levels untouched).
+func _later_cfg() -> Dictionary:
+	var later: Dictionary = FtueConfig.load_config()
+	(later["whats_new"] as Array).append({"feature_id": "m44_d2_future_probe", "version": 2,
+		"name": "FTUE_WHATSNEW_HELP_NAME", "body": "FTUE_WHATSNEW_HELP_BODY",
+		"icon": "res://assets/ui/final/gameplay/tutorial/speech_bubble.png"})
+	return later
+
+## Economy truth that What's New must never touch.
+func _econ_core(app) -> String:
+	var s: Dictionary = app.economy.snapshot()
+	return JSON.stringify([s["reward"], s["boosters"], s["daily"], s["hearts"]["hearts"], s["speed"]["entitled_level"], s["speed"]["timed_expiry"], s["pending_packs"]])
+
+func _t22() -> void:
+	print("[t22 owner D2: new profile sees only LATER What's New, once, only after genuine L3]")
+	var p := _path("t22")
+	var a = _app(p)
+	a.bootstrap_new_profile()
+	var later := _later_cfg()
+	_ok(bool(FtueConfig.validate(later).get("ok", false)), "simulated later-build config is valid")
+	var d = FtueDirector.new(a, later)
+	_ok(a.economy.meta_ui.is_seen("feature:help_tips:1"), "bootstrap baselined this build's What's New entries (presentation only)")
+	_ok(d.whats_new_due().is_empty(), "L1, onboarding open: nothing, even with a later feature version")
+	_ok(d.skip_tips() and d.whats_new_due().is_empty(), "Skip Tips before L3 does not open What's New")
+	a.progression.record_win(1)
+	a.progression.record_win(2)
+	_ok(not d.settle() and d.whats_new_due().is_empty(), "after L2: still onboarding")
+	var core0 := _econ_core(a)
+	a.progression.record_win(3)
+	_ok(d.settle() and a.economy.ftue.closed, "genuine L3 completion closes the window")
+	var due: Array = d.whats_new_due()
+	_ok(due.size() == 1 and String(due[0]["feature_id"]) == "m44_d2_future_probe", "only the later feature version is due (bootstrap-era Help & Tips suppressed)")
+	a.save.set_fault_injector(func(stage): return stage == "temp_write")
+	_ok(not d.acknowledge_whats_new(due[0]) and not a.economy.meta_ui.is_seen("feature:m44_d2_future_probe:2") and d.whats_new_due().size() == 1, "ack with a failed save: not dismissed (fail closed)")
+	a.save.set_fault_injector(Callable())
+	_ok(d.acknowledge_whats_new(due[0]) and d.whats_new_due().is_empty() and not d.acknowledge_whats_new(due[0]), "durable ack, exactly once")
+	var re = _app(p)
+	_ok(re.economy.meta_ui.is_seen("feature:m44_d2_future_probe:2") and FtueDirector.new(re, later).whats_new_due().is_empty(), "relaunch: never again")
+	_ok(_econ_core(a) == core0, "wallet / ledger / boosters / Daily / Hearts / 2x / packs untouched by What's New")
+	var est = _app(_path("t22e"))
+	var de = FtueDirector.new(est, later)
+	_ok(de.whats_new_due().size() == 2 and not est.economy.meta_ui.is_seen("feature:help_tips:1"), "established profile unchanged: both unseen entries due")
+	var bad: Dictionary = later.duplicate(true)
+	(bad["whats_new"] as Array)[1]["version"] = 0
+	_ok(not bool(FtueConfig.validate(bad).get("ok", true)), "malformed later entry rejected by the strict config")
+	_complete("t22_d2_future_whats_new_rules")
+
+func _t23() -> void:
+	print("[t23 owner D2 in the real app: Feature Unlock ceremony once on quiet Home after L3, never during onboarding]")
+	await _boot("t23")
+	var path: String = MainScript.boot_save_path_override
+	var app = _root.get_app_state()
+	var f = _root.get_ftue()
+	f.use_config(_later_cfg())
+	_root.request_home_ceremonies()
+	await _frames(3)
+	_ok(_top_id() != "ceremony_feature_unlock", "during onboarding (L1 frontier): no What's New on Home")
+	_root.get_modal_stack().clear("test")
+	for n in [1, 2, 3]:
+		app.progression.record_win(n)
+	var core0 := _econ_core(app)
+	_root.get_navigation().go(NavigationController.Route.HOME)   # Home entry settles the window
+	f.settle()
+	_root.request_home_ceremonies()
+	await _frames(4)
+	var top = _top()
+	var name_l = top.find_child("FeatureName", true, false) if top != null else null
+	_ok(app.economy.ftue.closed and _top_id() == "ceremony_feature_unlock" and name_l is Label, "after genuine L3: the later feature shows via the M43 Feature Unlock ceremony")
+	if top != null:
+		top._on_action("got_it")
+	await _frames(3)
+	_ok(app.economy.meta_ui.is_seen("feature:m44_d2_future_probe:2") and _top_id() != "ceremony_feature_unlock", "acknowledged by its CTA, not re-opened")
+	_ok(_econ_core(app) == core0, "no reward / booster / Daily / Hearts change from the ceremony")
+	await _boot("t23b", Vector2i(1080, 2160), path)
+	_root.get_ftue().use_config(_later_cfg())
+	_root.request_home_ceremonies()
+	await _frames(4)
+	_ok(_top_id() != "ceremony_feature_unlock", "relaunch: not shown again")
+	_complete("t23_d2_quiet_home_once")
 
 # ------------------------------------------------------------------ helpers ----
 

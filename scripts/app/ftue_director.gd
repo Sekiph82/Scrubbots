@@ -140,19 +140,43 @@ func step_copy(step: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 static func whats_new_key(e: Dictionary) -> String:
 	return "feature:%s:%d" % [String(e["feature_id"]), int(e["version"])]
 
-## Entries an ESTABLISHED profile has not been shown yet (a new profile learns through tips).
+## Entries not shown yet. Established profiles: as before. NEW profiles (owner D2,
+## OWNER_D2_WHATS_NEW_AND_DISK_DIAG_DECISION_V01): nothing while the L1-L3 window is open -
+## Skip Tips does not open it - only after the window is genuinely `closed` (L3 completed).
+## Entries present at their bootstrap were baselined as seen there, so only a feature/version
+## added LATER can show, once.
 func whats_new_due() -> Array:
-	if not _live() or _app.economy.ftue.is_new_profile():
+	if not _live():
+		return []
+	if _app.economy.ftue.is_new_profile() and not _app.economy.ftue.closed:
 		return []
 	return (_cfg["whats_new"] as Array).filter(func(e): return not _app.economy.meta_ui.is_seen(whats_new_key(e)))
+
+## Every What's New key in this config (the new-profile presentation baseline).
+func whats_new_keys() -> Array:
+	return (_cfg.get("whats_new", []) as Array).map(func(e): return whats_new_key(e))
+
+## Dev / test seam: drive the director with another validated config (e.g. a simulated later
+## build that adds a feature version). Never used by the shipping boot path.
+func use_config(cfg: Dictionary) -> void:
+	_cfg = cfg.duplicate(true)
 
 ## Feature-unlock ceremony event (M43-C005 builder input) for a What's New entry.
 func whats_new_event(e: Dictionary) -> Dictionary:
 	return {"key": whats_new_key(e), "kind": "feature_unlock", "feature_id": String(e["feature_id"]),
 		"name": UiText.t(String(e["name"])), "body": UiText.t(String(e["body"])), "icon": String(e["icon"])}
 
+## Durable acknowledgement: kept only if the canonical save succeeds; on a save failure the
+## presentation ledger is restored exactly and the entry stays due (fail closed).
 func acknowledge_whats_new(e: Dictionary) -> bool:
-	if _app == null or _app.economy == null or _app.is_blocked or not _app.economy.meta_ui.mark_seen(whats_new_key(e)):
+	if _app == null or _app.economy == null or _app.is_blocked:
 		return false
-	_app.request_save()
+	var meta = _app.economy.meta_ui
+	var pre: Dictionary = meta.snapshot()
+	if not meta.mark_seen(whats_new_key(e)):
+		return false
+	var r: Dictionary = _app.request_save()
+	if not bool(r.get("ok", false)):
+		meta.import_snapshot(pre)
+		return false
 	return true
