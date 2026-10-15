@@ -243,3 +243,31 @@ The full `economy.snapshot() == econ` "no payout" assertion would stay exactly a
 - This session's harness folder: 4 KiB.
 - `C:` free 79,005,860 KiB, down ~17 GiB from R01 end (96,739,208 KiB, 2026-10-14). The Claude temp folders are unchanged (~4.3 GiB, none from this task). `C:\Users\sekip\.codex\worktrees` was modified 2026-10-15 11:04 and contains e.g. a 1.37 GB `BCM-M26-001-…-source.tar`, so another agent's local activity is the likely cause. Not task-owned; nothing deleted.
 - New in-session baseline: 79,005,860 KiB.
+
+
+---
+
+# D2 + owner read-only C: diagnosis (owner decision `OWNER_D2_WHATS_NEW_AND_DISK_DIAG_DECISION_V01.md`, 2026-10-15)
+
+## Read-only C: diagnosis (no deletion / move / compaction; no junction following; bounded per-path `du` with timeouts; stdout only)
+- Start 2026-10-15T14:50:13+03:00: 97,713,388 KiB free. End 14:53:08: 97,484,988 KiB (-223 MiB, under the 500 MiB trigger, while other agents were active).
+- Earlier the same day: 79,005,860 KiB (11:4x) -> low of 70,141,360 KiB (~13:0x) -> 97.7 M KiB (14:50). A ~27 GiB swing that has REVERSED.
+- Processes at check: 18 codex.exe, 12 claude.exe, 40 node.exe, 22 python.exe, 5 godot-ai.exe, wslservice.
+- Proven contributors (sizes + last-write evidence; NOT proven to explain the whole swing):
+  - `.codex/worktrees` churned today: the earlier `BCM-M26-001` sandbox + 1.37 GB `source.tar` are gone, and `pl0353-ci-synthetic-data` (11:57, ~1.3 GiB) and `bcm-m34-r09-deferred-20261015` (13:24, ~2.8 GiB) are new.
+  - `.codex/artifacts` ~2.9 GiB (last write 10-14 23:46). `.codex/sessions` ~5.0 GiB (old).
+  - `%TEMP%`: today ~0.9 GiB, mainly `PL0350-owner-installer-retention` (02:09, non-ScrubBots). An old 1.5 GB `bcm-m32-v04-source.tar` (10-12).
+- Unchanged today / not the cause: Docker `docker_data.vhdx` 83.5 GB (10-13), WSL `ext4.vhdx` 16.1 GB (10-10), `hiberfil.sys` 6.7 GB.
+- `pagefile.sys` is 29.0 GB (dynamic) and is a possible but UNPROVEN factor.
+- This task: harness folder 5 KiB; no local Godot.
+- Process slip (disclosed): appending this section through a shell `python -c` string with unescaped backticks made bash attempt to execute the back-quoted names.
+  - Paths: "not found". Four ScrubBots `.gd` files: bash failed on line 1 / a syntax error before any executable line.
+  - No file was created or changed by it (verified: untracked count still 2,616, `project.godot` SHA unchanged, the four diffs are only intended edits). This text was then repaired with the Edit tool.
+- Conclusion: the decline is transient and reversed, with multi-GiB churn proven in other agents' areas but no single proven cause. Current headroom ~93 GiB and in-session delta < 500 MiB, so the owner's resume condition for the narrow D2 task holds. No cleanup performed or proposed beyond the owner's own choice.
+
+## D2 implementation (source + permanent tests; CI NOT yet run)
+- `scripts/app/ftue_director.gd`: `whats_new_due()` returns nothing for a NEW profile until the L1-L3 window is genuinely `closed` (L3 completion; Skip Tips does not open it). Established profiles are unchanged. `acknowledge_whats_new()` is now durable: on a save failure the MetaUiState ledger is restored and the entry stays due. New `whats_new_keys()` / `use_config()` (dev / test seam).
+- `scripts/app/app_state.gd`: the new-profile bootstrap baselines every What's New key present in that build as seen, in the same transaction (rolled back with it), so only a feature version added AFTER profile creation can show.
+- `scripts/app/main.gd`: a non-durable acknowledgement keeps the entry for the next quiet Home instead of re-opening it in a loop.
+- `tests/m44_ftue.gd`: + t22 (director rules with a simulated later build) and + t23 (real app: nothing during onboarding; the Feature Unlock ceremony once after genuine L3; not on relaunch; economy core unchanged). Ledger 23 cases; workflow M44 guard -> `PASS (23/23 cases, 0 fail)`.
+- **CI: `AWAITING_OWNER_CI_BUDGET`.** The prior M44 / M45 run budgets are complete; the owner decision does not grant a new run. Not claimed as passing.
