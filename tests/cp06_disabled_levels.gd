@@ -28,6 +28,11 @@ const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolv
 
 const SHA_A := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 const L3 := [["fam_l011", "fam-a"], ["fam_l012", "fam-a"], ["fam_l013", "fam-a"]]
+## M44 R01 run-4 fix: a FIXED economy clock. Heart `anchor` (full Hearts) and Speed
+## `clock_high_water` are wall-clock "now" at snapshot time, so with the real clock a second
+## tick during an awaited publish made the strict `economy.snapshot() == before` no-payout
+## checks fail spuriously (run 38632433821, i05). The checks stay exactly as strict.
+const CP06_FIXED_NOW := 1790000000
 
 var EXPECTED := ["p01_record_skip_rules", "p02_progression_import_matrix", "p03_save_versioning",
 	"p04_manifest_disabled_subset", "p05_registry_v1_v2", "i01_frontier12_skips_to13_no_rewards",
@@ -107,7 +112,7 @@ func _app(tag: String, frontier: int, save := "") -> Array:
 		save = "user://cp06_%s_%d.save" % [tag, Time.get_ticks_usec()]
 		_files.append(save)
 		_roots.append(save.get_basename() + "_content/")
-	var app = AppState.new(save)
+	var app = AppState.new(save, func(): return CP06_FIXED_NOW)
 	var t := F.FakeTransport.new()
 	app.content.enabled = true
 	app.content.transport = t
@@ -359,9 +364,9 @@ func _i06() -> void:
 	t.set_manifest(F.manifest(2, [_pack3], L3, "0.0.0", {"disabled_levels": ["fam_l012"]}), [_pack3])
 	var r: Dictionary = await m.refresh()
 	_ok(r["ok"] and JSON.parse_string(FileAccess.get_file_as_string(save))["progression"]["current_level"] == 12, "registry v2 active on disk; save still at 12")
-	var boot2 = AppState.new(save)   # no transport: offline cold boot
+	var boot2 = AppState.new(save, func(): return CP06_FIXED_NOW)   # no transport: offline cold boot
 	_ok(boot2.progression.current_level() == 13 and boot2.progression.skipped_records().size() == 1, "offline boot applies cached disabled set -> 13")
-	var boot3 = AppState.new(save)
+	var boot3 = AppState.new(save, func(): return CP06_FIXED_NOW)
 	_ok(boot3.progression.current_level() == 13 and boot3.progression.skipped_records().size() == 1, "relaunch: no further skip (idempotent)")
 	_case("i06_cold_offline_boot_idempotent")
 
