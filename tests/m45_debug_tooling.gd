@@ -206,18 +206,26 @@ func _boot() -> void:
 		await process_frame
 	_h.get_host().get_runtime().set_process(false)
 
-## Tap legal front batches and step the real runtime until bots are out (bounded).
+## Place real front batches (same loop as m55_long_session._drive) and step the real runtime
+## until bots are out (bounded). Diagnostics are printed when no dispatch is observed.
 func _drive_until_bots(host) -> bool:
-	host.get_runtime().set_process(false)
-	var panel = host.get_screen().get_supply_panel()
-	for _round in range(5):
-		for c in range(panel.get_column_count()):
-			if panel.get_front_enabled(c):
-				host.get_input_controller().activate_front(c)
-		for _i in range(40):
-			host.get_runtime().tick(0.05)
+	var rt = host.get_runtime()
+	rt.set_process(false)
+	var input = host.get_input_controller()
+	var log: Array = []
+	for _round in range(10):
+		if host.get_slots().rightmost_empty_index() != -1:
+			for col in range(host.get_supply().get_column_count()):
+				var r: Dictionary = input.activate_front(col)
+				log.append("%d:%s:%s" % [col, str(r.get("ok", false)), str(r.get("error", ""))])
+				if bool(r.get("ok", false)):
+					break
+		for _i in range(20):
+			rt.tick(0.1)
 			if host.get_dispatcher().get_active_count() > 0 and host.get_reservations().get_reservation_count() > 0:
 				return true
+	var occupied: int = host.get_slots().snapshot().filter(func(s): return bool(s.get("occupied", false))).size()
+	print("    diag: activations %s paused=%s terminal=%s occupied_slots=%d bound=%s" % [str(log), str(rt.is_paused()), str(host.get_completion().is_terminal()), occupied, str(rt.is_bound())])
 	return false
 
 func _shutdown() -> void:
