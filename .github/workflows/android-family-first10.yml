@@ -19,6 +19,7 @@ name: Android Family First10 APK
 # 16 earlier suites, CP06 16/16 guard, manual trigger and job-level export guard are unchanged.
 # M44 R01: + 17 specialist M39 / M41 Settings / M43 Daily + R15 suites (34 total), same fail-closed rules.
 # M45: + tests/m45_debug_tooling.gd (35 total, exact 8/8 guard).
+# M44 D2 (owner 2026-10-15): m44_ftue grows to 23 cases (future What's New after L3); M44 guard 23/23.
 
 on:
   workflow_dispatch:
@@ -118,10 +119,10 @@ jobs:
             echo "CP06 verdict=FAIL (exact 16/16 summary missing)" | tee -a "$S"; fail=1
           fi
           # M44 FTUE master: exact 21-case summary is mandatory.
-          if grep -qxF 'M44 FTUE evidence: PASS (21/21 cases, 0 fail)' validate_logs/m44_ftue.log 2>/dev/null; then
-            echo "M44 verdict=PASS (21/21)" | tee -a "$S"
+          if grep -qxF 'M44 FTUE evidence: PASS (23/23 cases, 0 fail)' validate_logs/m44_ftue.log 2>/dev/null; then
+            echo "M44 verdict=PASS (23/23)" | tee -a "$S"
           else
-            echo "M44 verdict=FAIL (exact 21/21 summary missing)" | tee -a "$S"; fail=1
+            echo "M44 verdict=FAIL (exact 23/23 summary missing)" | tee -a "$S"; fail=1
           fi
           # M45 debug tooling: exact 8-case summary is mandatory.
           if grep -qxF 'M45 debug tooling evidence: PASS (8/8 cases, 0 fail)' validate_logs/m45_debug_tooling.log 2>/dev/null; then

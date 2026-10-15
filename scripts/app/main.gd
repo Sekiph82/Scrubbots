@@ -610,8 +610,9 @@ func _open_whats_new() -> bool:
 	if p == null:
 		return false
 	p.closed.connect(func(reason: String):
-		if reason.begins_with("action:"):
-			ftue.acknowledge_whats_new(e)
+		# A failed (non-durable) acknowledgement keeps the entry due for the NEXT quiet Home /
+		# launch instead of re-opening it in a loop now.
+		if reason.begins_with("action:") and ftue.acknowledge_whats_new(e):
 			request_home_ceremonies(), CONNECT_ONE_SHOT)
 	if not _modals.push(p):
 		p.free()

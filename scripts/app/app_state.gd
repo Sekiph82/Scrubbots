@@ -38,6 +38,7 @@ const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
 const RemoteContentManager = preload("res://scripts/content_runtime/remote_content_manager.gd")
 const CompositeLevelCatalog = preload("res://scripts/content_runtime/composite_level_catalog.gd")
 const FtueConfig = preload("res://scripts/app/ftue_config.gd")
+const FtueDirector = preload("res://scripts/app/ftue_director.gd")
 const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
 
 ## M44 owner V03: the ONE ledger tx of the new-profile starter booster grant.
@@ -241,6 +242,11 @@ func bootstrap_new_profile() -> Dictionary:
 			grant[RewardedGrantService.RES_BOOSTER_PREFIX + String(id)] = int(cfg["starter_booster_charges"][id])
 	var pre: Dictionary = economy.snapshot()
 	economy.ftue.mark_new()
+	# Owner D2: features/versions already in this build are taught by the tutorial / Help, not
+	# announced. Baseline them as seen (presentation only, same transaction) so a newcomer only
+	# ever gets What's New for a feature version added AFTER their profile was created.
+	for e in cfg["whats_new"]:
+		economy.meta_ui.mark_seen(FtueDirector.whats_new_key(e))
 	var granted: bool = economy.reward.grant(STARTER_TX, grant)
 	var welcomed: bool = economy.daily.set_first_day_welcome(economy.daily.local_day(), int(cfg["welcome_sb"]))
 	if not granted or not welcomed:
