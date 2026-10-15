@@ -1,6 +1,11 @@
 # SCRUBBOTS — CLAUDE CODE AUTONOMOUS CONTINUOUS DEVELOPMENT MASTER V02
 **Owner directive: 2026-10-15. ONE standing master.**
 Repository: `Sekiph82/Scrubbots` (`main`); original Windows checkout only: `C:\Users\sekip\Desktop\ScrubBots`.
+## IMMEDIATE SUPERSESSION [2026-10-15 22:xx owner] — ACTIONS COST FREEZE + BOARD SYMBOLS
+**TOP AUTHORITY:** Owner reports monthly 2,000 GitHub Actions free minutes consumed and ~$76 billed. **DO NOT launch any further GitHub Actions anywhere**, even normal nonrelease `validation_only` or previously budgeted 1+1 runs. ScrubBots Android and iOS jobs have unconditional-false safety guards; do not remove. The earlier V02 repeated loop's cloud-CI steps are **SUSPENDED** until new explicit owner authorization. Develop/test with installed Godot 4.7.2 and bounded existing laptop workspace only. If local tests cannot safely run, record `NOT_RUN / CLOUD_CI_DEFERRED_COST_FREEZE`; continue unrelated coding, no paid substitution, no disk surveys or destructive cleanup.
+
+**NEW M50 BOARD DECISION:** Owner screenshots confirm real Pixel Art board MUST show color-ID symbols **on active board cells themselves**. Prior no-glyphs-on-board decision is REVOKED, including 59x59. Same 16 canonical symbols as Supply/Slots, no 3,481 nodes, preserve transparency/art/agent alignment, provide magnified readable inspect for tiny 59x59 cells. START `coordination/sessions/M50-BOARD-COLOR-ASSIST-C001/CHATGPT_CLAUDE_MASTER_PROMPT_V01.md` next, ahead of M46 unless M46 profiling is needed to implement the batched overlay. The owner's prior in-Editor screenshot of L7 is evidence; do not ask for renewed authorization to code. Owner visual sign-off of the new board glyph style is still pending. After board feature continue M46 locally without Actions.
+
 **DO NOT WAIT FOR ANOTHER PROMPT AFTER EACH TASK. WORK, TEST, REVIEW, PUBLISH, CHOOSE NEXT TASK, REPEAT until a TRUE owner-only blocker or your execution session ends.**
 This V02 supersedes V01 where inconsistent. Neither V02 nor a Claude-authored peer review overrides immutable owner product decisions, prior ChatGPT independent audits or unavailable permissions. A user does not need to approve normal nonrelease coding, fixes, headless regression tests, review, logs or selection of the next already approved independent milestone.
 
