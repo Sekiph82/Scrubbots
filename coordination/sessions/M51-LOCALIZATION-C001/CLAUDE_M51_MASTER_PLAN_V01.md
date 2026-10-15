@@ -22,7 +22,7 @@
 | 003 / 004 | pseudo-locale + scan |
 | 005 | OWNER (languages) |
 | 006 | partial (scan coverage) |
-| 007 | no real-money prices exist yet (M57); SB amounts use `UiText.num` |
+| 007 | no real-money prices exist yet (M57); SB amounts mostly use `UiText.num` — **corrected after peer review:** the HUD booster price `gameplay_screen.gd:814` uses a raw `"%d SB"` (follow-up) |
 | 008 | pluralization OPEN (copy such as "task reward(s)" needs per-language plural rules) |
 | 009 | partial (scan of 7 surfaces) |
 

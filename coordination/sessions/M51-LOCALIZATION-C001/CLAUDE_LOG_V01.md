@@ -33,7 +33,12 @@ Plan: `CLAUDE_M51_MASTER_PLAN_V01.md` · 2026-10-15 · Builder: Claude Code. Not
 |---|---|
 | 001 | Settings fixed; remaining literals: the gameplay HUD price format + profile name → OPEN (small follow-up) |
 | 002 | convention asserted |
-| 003 / 004 | pseudo-locale implemented + scanned |
+| 003 / 004 | pseudo-locale implemented + scanned; 003 PARTIAL (peer review D4: no wrap / clip checks; Shop title wraps to 133×165 px under pseudo) |
+
+**Peer review (`CLAUDE_PEER_REVIEW_M51_V01.md`, PASS_WITH_MINOR_DEFECTS) corrections:**
+- 'Scrubby' is roster DATA (`data/config/robot_roster_v1.json`), not a missing UiText key; localizing roster names is an owner / data decision.
+- The Shop "off-screen" items are probably content below the Shop ScrollContainer fold. This is unconfirmed: there is no English baseline, so it is not a proven expansion defect.
+- The real code literal is the HUD price `"%d SB"` at `gameplay_screen.gd:814` (follow-up: key + `UiText.num`).
 | 005 | OWNER |
 | 006 / 009 | partial |
 | 007 | no real-money prices yet |
