@@ -63,17 +63,71 @@ static func _f(t: float) -> float:
 static func delta_e(a: Color, b: Color) -> float:
 	return to_lab(a).distance_to(to_lab(b))
 
-## {kind: {"min": float, "a": int, "b": int}} — the closest colour pair (indices into
-## `colors`) under each vision kind. Fewer than 2 colours -> min = INF.
+## CIEDE2000 between two sRGB colours (perceptually closer than CIE76; M50 peer review).
+static func delta_e00(a: Color, b: Color) -> float:
+	return ciede2000(to_lab(a), to_lab(b))
+
+## CIEDE2000 (Sharma, Wu & Dalal 2005) between two CIELAB values, kL = kC = kH = 1.
+static func ciede2000(l1: Vector3, l2: Vector3) -> float:
+	var c1 := sqrt(l1.y * l1.y + l1.z * l1.z)
+	var c2 := sqrt(l2.y * l2.y + l2.z * l2.z)
+	var cb := (c1 + c2) * 0.5
+	var g := 0.5 * (1.0 - sqrt(pow(cb, 7.0) / (pow(cb, 7.0) + pow(25.0, 7.0))))
+	var a1 := (1.0 + g) * l1.y
+	var a2 := (1.0 + g) * l2.y
+	var cp1 := sqrt(a1 * a1 + l1.z * l1.z)
+	var cp2 := sqrt(a2 * a2 + l2.z * l2.z)
+	var hp1 := 0.0 if (a1 == 0.0 and l1.z == 0.0) else fposmod(rad_to_deg(atan2(l1.z, a1)), 360.0)
+	var hp2 := 0.0 if (a2 == 0.0 and l2.z == 0.0) else fposmod(rad_to_deg(atan2(l2.z, a2)), 360.0)
+	var dl := l2.x - l1.x
+	var dc := cp2 - cp1
+	var dhp := 0.0
+	if cp1 * cp2 != 0.0:
+		dhp = hp2 - hp1
+		if dhp > 180.0:
+			dhp -= 360.0
+		elif dhp < -180.0:
+			dhp += 360.0
+	var dh := 2.0 * sqrt(cp1 * cp2) * sin(deg_to_rad(dhp * 0.5))
+	var lbp := (l1.x + l2.x) * 0.5
+	var cbp := (cp1 + cp2) * 0.5
+	var hbp := hp1 + hp2
+	if cp1 * cp2 != 0.0:
+		if absf(hp1 - hp2) <= 180.0:
+			hbp = (hp1 + hp2) * 0.5
+		elif hp1 + hp2 < 360.0:
+			hbp = (hp1 + hp2 + 360.0) * 0.5
+		else:
+			hbp = (hp1 + hp2 - 360.0) * 0.5
+	var t := 1.0 - 0.17 * cos(deg_to_rad(hbp - 30.0)) + 0.24 * cos(deg_to_rad(2.0 * hbp)) \
+		+ 0.32 * cos(deg_to_rad(3.0 * hbp + 6.0)) - 0.20 * cos(deg_to_rad(4.0 * hbp - 63.0))
+	var d_theta := 30.0 * exp(-pow((hbp - 275.0) / 25.0, 2.0))
+	var rc := 2.0 * sqrt(pow(cbp, 7.0) / (pow(cbp, 7.0) + pow(25.0, 7.0)))
+	var sl := 1.0 + (0.015 * pow(lbp - 50.0, 2.0)) / sqrt(20.0 + pow(lbp - 50.0, 2.0))
+	var sc := 1.0 + 0.045 * cbp
+	var sh := 1.0 + 0.015 * cbp * t
+	var rt := -sin(deg_to_rad(2.0 * d_theta)) * rc
+	return sqrt(pow(dl / sl, 2.0) + pow(dc / sc, 2.0) + pow(dh / sh, 2.0) + rt * (dc / sc) * (dh / sh))
+
+## {kind: {"min": float, "a": int, "b": int, "min00": float, "a00": int, "b00": int}} — the
+## closest colour pair (indices into `colors`) under each vision kind, by CIE76 and by
+## CIEDE2000 (the two metrics can rank pairs differently). Fewer than 2 colours -> INF.
 static func palette_report(colors: Array) -> Dictionary:
 	var out := {}
 	for kind in KINDS:
-		var best := {"min": INF, "a": -1, "b": -1}
+		var best := {"min": INF, "a": -1, "b": -1, "min00": INF, "a00": -1, "b00": -1}
 		var sim: Array = colors.map(func(c): return simulate(c, kind))
 		for i in range(sim.size()):
 			for j in range(i + 1, sim.size()):
 				var d := delta_e(sim[i], sim[j])
 				if d < float(best["min"]):
-					best = {"min": d, "a": i, "b": j}
+					best["min"] = d
+					best["a"] = i
+					best["b"] = j
+				var d00 := delta_e00(sim[i], sim[j])
+				if d00 < float(best["min00"]):
+					best["min00"] = d00
+					best["a00"] = i
+					best["b00"] = j
 		out[kind] = best
 	return out
