@@ -43,7 +43,7 @@ func _l01() -> void:
 	_ok(not UiText.pseudo and UiText.t("SETTINGS_TITLE") == "SETTINGS", "off by default; English unchanged")
 	var src := "Win 3 levels (100%)"
 	var p := UiText.pseudo_text(src)
-	_ok(p.begins_with("[") and p.ends_with("]") and p.contains("3") and p.contains("100%") and p.contains("Wín") and p.length() >= int(src.length() * 1.35) + 2, "'%s' -> '%s'" % [src, p])
+	_ok(p.begins_with("[") and p.ends_with("]") and p.contains("3") and p.contains("100%") and p.contains("Wíñ") and p.length() >= int(src.length() * 1.35) + 2, "'%s' -> '%s'" % [src, p])
 	_ok(UiText.pseudo_text("") == "" and UiText.pseudo_text(src) == p, "empty stays empty; deterministic")
 	UiText.pseudo = true
 	var with_args := UiText.t("TASK_WIN_N", ["3"])
