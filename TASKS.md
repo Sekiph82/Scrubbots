@@ -4,12 +4,14 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 ## Project Status
 
-- Current Milestone: ScrubBots AUTONOMOUS CODING ACTIVE NEXT — M44 D2 23-case new source CI PENDING; M45 debug technical 18/18 CLOSED; other M44 owner visuals gated
-- Current Sprint: CLAUDE AUTONOMOUS MASTER V02 — NORMAL MILESTONE CODE→CLOUD CI→PEER REVIEW→LOG→NEXT WITHOUT OWNER MICRO-APPROVALS
-- Current Task: M44 D2 code committed, post-fix M44 23/23 CI NOT RUN; Claude to validate via existing Android validation_only, peer review final D2, then next eligible milestone automatically
-- Current Task Status: CLAUDE_CONTINUOUS_AUTONOMOUS_V02_PUBLISHED / M44_D2_23_CASE_SOURCE_COMMITTED_CI_PENDING / CI_NORMAL_NONRELEASE_VERIFICATION_WITHIN_INCLUDED_QUOTA_AUTHORIZED_BOUNDED_1_PLUS_1 / OWNER_GLOBAL_DISK_MONITORING_STOPPED / M44_16_OF_24_TECH_PASS / M45_18_OF_18_TECH_CLOSED / NO_APK_IPA_R2_OR_PAID_ACTIONS
-- Next Task/Action: **CLAUDE EXECUTE STANDING MASTER V02 NOW, THEN KEEP CODING WITHOUT ANOTHER PROMPT PER TASK.** Prompt `coordination/autonomy/SCRUBBOTS_CLAUDE_AUTONOMOUS_MASTER_V02.md`. Current D2 source t22/t23 published (last code/review commit d08447a6); post-fix review and actual Godot CI lacking. Verify existing Android mode=validation_only workflow 35 previous suites, M44 23/23, CP06 16/16, M45 8/8, export SKIPPED; run 1 test with max 1 narrow corrective rerun within included Actions quota. Record CI truth in M44 log, separate reviewer audit. Then pick next eligible owner-approved M49/M50 or another task from current TASKS and repeat source→CI→review→log→TASKS (if local permission allows)→next. No recurring C: disk inspection, no 500MiB global stop or routine user CI permission requests. Preserve 20MiB task-created TEMP cap, one Desktop checkout, no APK/IPA/R2/paid use, owner phone acceptance separate. If local TASKS update denied, do not bypass; publish evidence and continue coding, ChatGPT can update remotely.
-- Required Actor: **CLAUDE CODE — AUTONOMOUS V02**. Owner asks self-directed continuing programming without repeated approvals. Primary prompt `coordination/autonomy/SCRUBBOTS_CLAUDE_AUTONOMOUS_MASTER_V02.md`, policy `CLAUDE.md §0B`. Routine source/test/peer review and bounded nonrelease existing GitHub Actions `validation_only` within included quota preapproved, NO APK/IPA/PCK/R2 production uploads/paid CI or destructive changes without distinct owner approval. D2 requires CI proof and updated peer review; earlier M44 21/21 and M45 35/35 are prior code evidence, not 23-case D2 CI. Real device/visual M44-018/020 pending owner. C: disk investigation done; no repeating it or stopping due to global drive swing. Continue to next independent milestone automatically while session active; if session ends, resume from latest origin/main on reuse of V02.
+- Current Milestone: M44 D2 INDEPENDENT TECH PASS / M49–M51 SCOPED CI PASS (38/38) / SB-DEV-GODOT-001 CURRENT LOCAL EDITOR PLAYABILITY HANDOFF; owner mobile and design gates remain open.
+- Current Sprint: CLAUDE AUTONOMOUS MASTER V02 — safely sync existing Desktop Godot 4.7.x project for owner F5 play, then continue next approved code→cloud CI→peer review→log cycle.
+- Current Task: SB-DEV-GODOT-001 — preserve owner's local changes while keeping original `C:\Users\sekip\Desktop\ScrubBots\project.godot` updated and F5-playable; after that fix M51 HUD price literal and continue next eligible milestone.
+- Current Task Status: M44_D2_TECH_CLOSED / M49_SCOPED_MATRIX_8_OF_8_PASS / M50_CVD_CONTRAST_AUDIT_4_OF_4_PASS_OWNER_VISUAL_DECISIONS_OPEN / M51_PSEUDO_4_OF_4_PASS_REMAINING_TEXT_LAYOUT_OPEN / GITHUB_ACTIONS_38753823564_VALIDATE_SUCCESS_EXPORT_SKIPPED / CLAUDE_GODOT_LOCAL_PLAY_SYNC_PENDING / OWNER_LOCAL_CHANGES_PROTECTED / NO_RECURRING_DISK_CHECKS / NO_UNREQUESTED_APK_IPA_R2.
+- Next Task/Action: **CLAUDE execute `coordination/autonomy/SCRUBBOTS_CLAUDE_GODOT_LOCAL_PLAYABLE_SYNC_V01.md` now on its existing Windows checkout to make the true latest production project available in Godot Editor for owner F5 play, without overwriting dirty owner files; then resume `coordination/autonomy/SCRUBBOTS_CLAUDE_AUTONOMOUS_MASTER_V02.md` without micro-approvals.** M51 next small fix: HUD `"%d SB"` → keyed/localized, preserving English and economy. Continue eligible M46/M54 only after checking dependencies. Canonical technical audit `coordination/sessions/M49-RESPONSIVE-UI-C001/CHATGPT_CROSS_M44_M49_M50_M51_INDEPENDENT_AUDIT_V01.md`. Godot Editor physical acceptance is NOT proven by GitHub CI. Owner M44-018/020 and M50 non-color cues/PLAY visual choice remain OPEN.
+- Required Actor: **CLAUDE CODE — AUTONOMOUS V02 + SB-DEV-GODOT-001** for local source sync/playable Godot handoff and further coding. **CHATGPT** for independent audit and canonical tracker review. No routine C: checks, no forced rewrite of local `project.godot`/`main.tscn`, no unapproved release, R2 upload, or paid CI.
+- **2026-10-15 NEW CHATGPT CROSS-AUDIT (M44-D2/M49/M50/M51):** `coordination/sessions/M49-RESPONSIVE-UI-C001/CHATGPT_CROSS_M44_M49_M50_M51_INDEPENDENT_AUDIT_V01.md`. GitHub run 38753823564 final `validate=success`, `export=skipped`, 38/38; M44 23/23, M49 8/8, M50 4/4, M51 4/4. Scoped technical row updates below; owner-device, UI, glyph/contrast, whole-surface stress and shipping remain gated. Older failure runs are recorded in audit rather than erased.
+- [ ] **SB-DEV-GODOT-001 — Owner Godot Editor latest-build playability / safe local synchronization (2026-10-15).** Claude task: `coordination/autonomy/SCRUBBOTS_CLAUDE_GODOT_LOCAL_PLAYABLE_SYNC_V01.md`. Sync the ONE Desktop checkout with `origin/main` non-destructively; respect owner-modified `project.godot` and `scenes/app/main.tscn`, preserve stashes/untracked state; aim for opening/running current production Home and real level in Godot 4.7.x via F5. Record actual Editor launch result or NOT_RUN. Repeat safe local update at player-facing milestone handoffs. **OPEN until evidence; GitHub CI ≠ owner Editor playtest.**
 - Parallel Family APK audit [2026-10-10]: **SB-M47-001 / SB-M47-002 — OFFLINE FIRST-TEN ANDROID DEBUG EXPORT = FIRST10_APK_TECHNICAL_PASS / CLOSED FOR LIMITED SLICE; SB-M47-003 REAL DEVICE INSTALL PENDING AT 2026-10-10 AUDIT; LATER OWNER-REPORTED BOOT PASS.** Independent audit: `coordination/sessions/M47-FAMILY-APK-C001/M47_FAMILY_APK_C001_CHATGPT_INDEPENDENT_AUDIT_V01.md`. Genuine signed APK from GitHub Actions run `38040561355`, built source `857d9033`, artifact `11666135912` (expires 2026-11-09), APK SHA-256 `496509477f38841879ea36e87a0ad5a5ac75f4615f70abc8fb96af288839c75d`, size 513,559,541 bytes; scan of actual PCK/APK reports 0 forbidden paths among nine owner-excluded trees, 663/663 runtime-referenced paths available. This is **strictly offline**, built-in Levels 1–10 only, no INTERNET permission or R2 manifest, no publisher secret. Device touch/portrait/save/performance and online Level 11–50 updating remain unverified. Per-run debug signing cert changes; uninstall old test build to install newer (may remove device saves). No repo cleanup authorized.
 - Owner Android Family device feedback [2026-10-10]: **SB-M47-003 OWNER-REPORTED INSTALL + BOOT PASS; SB-M47-004 REAL-DEVICE TOUCH FAIL ON FIRST BUILDS; V02 CODE TECHNICAL PASS / OWNER RECHECK PENDING.** Wife installed/opened first-ten Android APK, but a single stationary tap on front Supply color batch does NOT easily move batch to the five-slot execution strip; owner reports "tutup 5li slota dogru ittirmen lazim sanki" (appears to require dragging toward slots). This is a symptom, NOT authorization to implement drag. One touch-down+up on a valid front must transfer exactly one whole FIFO batch to rightmost EMPTY slot via production controller, no swipe/hold/destination tap; 3/4/5 columns and 5/6 slot layouts, proper touch geometry, no duplicated synthesized-mouse event; preview rows unclickable and full/pause/modal/terminal reject atomically. Owner record: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/OWNER_DEVICE_FEEDBACK_V01.md`. Claude prompt: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CHATGPT_PROMPT_V01.md`; audit criteria: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CHATGPT_AUDIT_CRITERIA_V01.md`. New signed offline APK + physical Android owner retest required; **M47 technical export PASS does not imply playable touch PASS**. HISTORICAL V01 priority superseded by later V02 audited code fix; owner physical tap retest pending. R2 critical path stays open and independent.
 - Owner multi-device Family QA expansion [2026-10-10]: **M47-FAMILY-APK-TOUCH-R01 V02 / OWNER-OBSERVED FAIL ON ORIGINAL BUILDS / CLAUDE CODE V02 IMPLEMENTATION TECHNICALLY AUDITED / NEW OWNER RETEST PENDING**. Three real devices were tested: owner's iPhone (**FIRST IPA, not verified latest**), Samsung Flip Android phone, daughter's Samsung Android tablet (owner says "Samsung iPad"). Owner reports same mobile usability problems: (1) Supply front one-tap does not smoothly/consistently place the batch into five-slot rail and feels like drag/hold is needed (**SB-M47-004 OPEN**); (2) Collection scroll down sticks (**narrow SB-M49-028 OPEN**); (3) Home Rewarded Ads has one claimable item but lacks red **1** badge (**narrow SB-M43-134 OPEN**). Previously accepted R15 'no badge required' wording is superseded by owner's new badge requirement, without changing verified grant or sequential unlock. Owner record: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/OWNER_DEVICE_FEEDBACK_V02.md`. **V02 supersedes V01**: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CHATGPT_PROMPT_V02.md`; audit: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CHATGPT_AUDIT_CRITERIA_V02.md`. One-tap remains tap, NEVER drag. Android technical artifact is now built and verified; iOS unsigned IPA artifact was built successfully; CI showed import diagnostics not demonstrated to impair family runtime. R02 is non-blocking QA. See audit amendment V03. Physical owner retest may proceed NOW; new IPA must be signed with xtool. Do not claim user's first iPhone IPA is current or new build. **CLAUDE CODE performs all implementation, testing, packaging and pushes; CHATGPT only independently audits and maintains TASKS.md.** Root TASKS state only by ChatGPT.
@@ -2194,7 +2196,7 @@ These three rows are the only new work authorized by the 2026-10-06 F5 owner rev
 
 Purpose: teach the real production game progressively and prevent the first session from exposing every meta system at once. Feature unlocks are presentation/access pacing only; they do not rewrite already-earned authoritative state.
 **Owner 2026-10-12 FINAL M44 V03 supersession:** SB-M44-001's historical first 10 levels now means coverage/negative regression only: mandatory tutorial Home+L1–L3, NONE L4–L10. First Home DAILY and TASKS separate real READY claims BOTH 100 SB; welcome task replaces day-one easy slot only, no global change to ordinary later days 75/100/125. Starting 2 charges each four canonical boosters. Current owner authority `coordination/sessions/M44-TUTORIAL-FTUE-C001/OWNER_M44_FIRST3_STARTER_AND_CLAIM_DECISION_V03.md`, implementation master and independent audit checklist in same folder. All 24 M44 IDs retained, unchecked until independent GitHub code/CI audit and owner visual acceptance.
-**M44 current independent audit [2026-10-15]:** Core FTUE technical PASS on GitHub CI **35/35 suites** (M44 21/21; CP06 16/16), including specialist M39/M41/M43 suites and M44 D1 copy caching fix. Audits: `coordination/sessions/M44-TUTORIAL-FTUE-C001/CHATGPT_INDEPENDENT_AUDIT_V02.md` plus prior V01. **16/24 technically completed** as marked below; **005/006/010/013/018/020/022/023 remain OPEN** because of contextual teaching, unsanctioned future feature unlock order, NEW badge, phone/visual owner sign-off and M43 external gates. A real APK/IPA first-user playthrough is not yet authorized. Review D2 future What's New announcement for newly onboarded players only after owner's product choice. **NEWER owner 2026-10-15 ruling:** the D2 feature announcement product decision is APPROVED but not implemented; see SB-M44-D2-001 and `OWNER_D2_WHATS_NEW_AND_DISK_DIAG_DECISION_V01.md`. Do not close from older run 38707495178.
+**M44 current independent audit [2026-10-15]:** Core FTUE technical PASS on GitHub CI **35/35 suites** (M44 21/21; CP06 16/16), including specialist M39/M41/M43 suites and M44 D1 copy caching fix. Audits: `coordination/sessions/M44-TUTORIAL-FTUE-C001/CHATGPT_INDEPENDENT_AUDIT_V02.md` plus prior V01. **16/24 technically completed** as marked below; **005/006/010/013/018/020/022/023 remain OPEN** because of contextual teaching, unsanctioned future feature unlock order, NEW badge, phone/visual owner sign-off and M43 external gates. A real APK/IPA first-user playthrough is not yet authorized. Review D2 future What's New announcement for newly onboarded players only after owner's product choice. **NEWER owner 2026-10-15 ruling:** the D2 feature announcement product decision is APPROVED but not implemented; see SB-M44-D2-001 and `OWNER_D2_WHATS_NEW_AND_DISK_DIAG_DECISION_V01.md`. Do not close from older run 38707495178. **LATER 2026-10-15 D2 ADDENDUM:** M44-D2 has since passed independent technical audit + CI 38742572367 and 38753823564; technical D2 row below is [x]. The earlier text describes the pre-D2 snapshot; owner visual gates remain unchanged.
 
 - [x] SB-M44-001 Define the complete first-time user experience from cold launch through the first 10 progression levels. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
 - [x] SB-M44-002 Level 1 teaches only the minimum real core loop needed to make a legal supply-front selection and observe Scrubbot cleaning. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
@@ -2224,7 +2226,7 @@ Purpose: teach the real production game progressively and prevent the first sess
 - [ ] SB-M44-022 Sequence Collection onboarding so Set 1 / first earned packs establish the First Collection Sprint early, while pity remains invisible until relevant and then explains itself truthfully.
 - [ ] SB-M44-023 Unlock Daily Scrub Orders, Weekly Cleaning Event and First-Try Cleanup only after their prerequisite core/meta systems are understood; exact campaign unlock points remain data-driven under SB-M44-010/011.
 - [x] SB-M44-024 Comeback Catch-Up is never part of fresh-user FTUE; it activates only after a previously established player meets the configured absence rule. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [ ] SB-M44-D2-001 **M44 D2 Future What's New after genuine L3 [OWNER APPROVED 2026-10-15]:** IMPLEMENTED IN SOURCE at commits `b049dc90`, `0218a862`, `d08447a6`, using initial feature/version bootstrap baseline and only FUTURE version once after real L3, no Skip Tips early reveal; save-failure session snooze and durable ack; t22/t23 added and M44 guard 23/23. **CI NOT RUN for D2, post-remediation independent review not complete; MUST REMAIN OPEN**, visual/phone separate. Next: actual Android GitHub `validation_only` (35 suites, exact 23/23) then reviewer/audit. No disk surveillance, APK, IPA or R2.
+- [x] SB-M44-D2-001 **M44 D2 Future What's New after genuine L3 [OWNER APPROVED 2026-10-15; CHATGPT INDEPENDENT TECH_PASS 2026-10-15]:** New profiles see only post-bootstrap future feature/version entries after genuine L3, not via Skip Tips; durable ack and failed-save retry behavior retained. Production D2 at `b049dc90`/`0218a862`/`d08447a6`; t22/t23 CI GitHub run 38742572367 35/35, M44 23/23; later full validation run 38753823564 38/38, export skipped. Claude peer V02 PASS_WITH_CONCERNS and independent cross-audit `coordination/sessions/M49-RESPONSIVE-UI-C001/CHATGPT_CROSS_M44_M49_M50_M51_INDEPENDENT_AUDIT_V01.md`. **M44-018/020 owner visual and phone FTUE gates remain OPEN; M44 entire milestone NOT closed.**
 
 ### M45 — Debug Tooling
 
@@ -2302,47 +2304,47 @@ Maximum board target: 59×59 = 3,481.
 
 ### M49 — Responsive UI
 
-- [ ] SB-M49-001 16:9 portrait.
-- [ ] SB-M49-002 19.5:9.
-- [ ] SB-M49-003 20:9.
-- [ ] SB-M49-004 Tall phone.
-- [ ] SB-M49-005 Tablet.
-- [ ] SB-M49-006 Notch/cutout.
-- [ ] SB-M49-007 Five slots stay usable.
-- [ ] SB-M49-008 Board stays visible.
-- [ ] SB-M49-009 Rectangular boards remain correctly scaled.
-- [ ] SB-M49-010 Touch mapping remains accurate.
-- [ ] SB-M49-011 Adopt 1080×2160 reference design viewport and stretch policy.
-- [ ] SB-M49-012 Implement reusable SafeAreaRoot.
-- [ ] SB-M49-013 Implement centralized UI tokens.
-- [ ] SB-M49-014 Implement COMPACT/NORMAL/TALL classification.
-- [ ] SB-M49-015 Validate 1080×2160.
-- [ ] SB-M49-016 Validate 1170×2532.
-- [ ] SB-M49-017 Validate 1290×2796.
-- [ ] SB-M49-018 Validate 1080×2400.
-- [ ] SB-M49-019 Validate 1440×3200.
-- [ ] SB-M49-020 Validate minimum touch target.
-- [ ] SB-M49-021 Confirm popups fit safe area.
-- [ ] SB-M49-022 Confirm text containers survive localization expansion.
-- [ ] SB-M49-023 Confirm top-right Pause + 2x controls, five fixed connector rails, slots, Batch Supply and booster row remain usable on compact devices.
-- [ ] SB-M49-024 Add automated/manual responsive validation evidence.
-- [ ] SB-M49-025 Validate temporary sixth-slot (+1 booster) layout/touch/readability across the full viewport matrix.
+- [x] SB-M49-001 16:9 portrait. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-002 19.5:9. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-003 20:9. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-004 Tall phone. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-005 Tablet. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-006 Notch/cutout. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-007 Five slots stay usable. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-008 Board stays visible. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-009 Rectangular boards remain correctly scaled. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-010 Touch mapping remains accurate. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-011 Adopt 1080×2160 reference design viewport and stretch policy. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-012 Implement reusable SafeAreaRoot. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-013 Implement centralized UI tokens. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-014 Implement COMPACT/NORMAL/TALL classification. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-015 Validate 1080×2160. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-016 Validate 1170×2532. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-017 Validate 1290×2796. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-018 Validate 1080×2400. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-019 Validate 1440×3200. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [ ] SB-M49-020 Validate minimum touch target. **[PARTIAL: Home/boosters measured; nav, Pause/2x and all supply targets not proven ≥88px.]**
+- [x] SB-M49-021 Confirm popups fit safe area. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [ ] SB-M49-022 Confirm text containers survive localization expansion. **[OPEN: pseudo locale exists but stress/clipping/wrap acceptance not established.]**
+- [x] SB-M49-023 Confirm top-right Pause + 2x controls, five fixed connector rails, slots, Batch Supply and booster row remain usable on compact devices. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-024 Add automated/manual responsive validation evidence. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
+- [x] SB-M49-025 Validate temporary sixth-slot (+1 booster) layout/touch/readability across the full viewport matrix. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
 
 #### M49 Player-Experience Responsive Expansion
-- [ ] SB-M49-026 Validate every M43/M44 screen/popup in the complete Player-Facing Surface Visual Inventory across the full viewport matrix.
-- [ ] SB-M49-027 Validate long prices, timers, event/rank labels, card/robot names and reward bundles without clipping.
+- [ ] SB-M49-026 Validate every M43/M44 screen/popup in the complete Player-Facing Surface Visual Inventory across the full viewport matrix. **[OPEN: entire visual surface inventory has not been tested across matrix.]**
+- [ ] SB-M49-027 Validate long prices, timers, event/rank labels, card/robot names and reward bundles without clipping. **[OPEN: long labels/prices/full shop layouts need measurement and visual sign-off.]**
 - [ ] SB-M49-028 Validate modal stacks, keyboard/back navigation and scrollable Collection/Shop/Events/Robots screens on compact and tall devices. **V02 mobile finding [2026-10-10]: Collection scroll-down sticks on owner-tested iPhone/Samsung Android devices; Collection swipe sub-scope CODE TECH PASS on c2b1c3c7, narrow Collection swipe issue OWNER_ACCEPTED on new iPhone IPA, Android new-build retests waived by owner; wider M49 matrix remains OPEN.**
-- [ ] SB-M49-029 Validate rewarded-ad/store return transitions and platform overlays do not corrupt safe-area layout.
-- [ ] SB-M49-030 Validate notification deep links and account/cloud conflict screens enter a safe responsive destination.
-- [ ] SB-M49-031 Validate Next Cleanup preview, 10-node journey, ScrubBox, Weekly/First-Try tracks and Comeback Catch-Up across the full viewport/safe-area matrix without shrinking primary gameplay/results CTAs below touch standards.
-- [ ] SB-M49-032 Ensure 10-node journey and event tracks degrade gracefully on compact devices through scrolling/compression rules without turning them into a shipping level-select grid.
+- [ ] SB-M49-029 Validate rewarded-ad/store return transitions and platform overlays do not corrupt safe-area layout. **[DEPENDENCY-GATED: provider/store returns not in tested production build.]**
+- [ ] SB-M49-030 Validate notification deep links and account/cloud conflict screens enter a safe responsive destination. **[PARTIAL: deep links checked; account/cloud-conflict screen missing.]**
+- [ ] SB-M49-031 Validate Next Cleanup preview, 10-node journey, ScrubBox, Weekly/First-Try tracks and Comeback Catch-Up across the full viewport/safe-area matrix without shrinking primary gameplay/results CTAs below touch standards. **[PARTIAL: Results journey baseline checked; expanded tracks/full inventory pending.]**
+- [ ] SB-M49-032 Ensure 10-node journey and event tracks degrade gracefully on compact devices through scrolling/compression rules without turning them into a shipping level-select grid. **[PARTIAL: journey visible diagnostic only; compact degradation not fully asserted.]**
 
 ### M50 — Accessibility
 
-- [ ] SB-M50-001 Review color-only information.
-- [ ] SB-M50-002 Alternative visual slot cues if necessary.
-- [ ] SB-M50-003 Color vision tests.
-- [ ] SB-M50-004 Contrast.
+- [x] SB-M50-001 Review color-only information. **[CHATGPT SCOPED TECH_PASS 2026-10-15, simulation/audit M50 4/4 CI 38753823564; no art/visual acceptance]**
+- [ ] SB-M50-002 Alternative visual slot cues if necessary. **[OWNER VISUAL GATE: per-colour glyph/pattern for color-only identity not yet approved/implemented.]**
+- [x] SB-M50-003 Color vision tests. **[CHATGPT SCOPED TECH_PASS 2026-10-15, simulation/audit M50 4/4 CI 38753823564; no art/visual acceptance]**
+- [ ] SB-M50-004 Contrast. **[PARTIAL: sampled text contrast audited; white PLAY fill/green button = 2.25:1; navy outline, owner color choice pending.]**
 - [ ] SB-M50-005 Reduced effects.
 - [ ] SB-M50-006 Touch sizes.
 - [ ] SB-M50-007 Text readability.
@@ -2363,17 +2365,17 @@ Maximum board target: 59×59 = 3,481.
 
 ### M51 — Localization Readiness
 
-- [ ] SB-M51-001 Avoid hard-coded user text.
-- [ ] SB-M51-002 Translation-key convention.
-- [ ] SB-M51-003 Longer-string layouts.
-- [ ] SB-M51-004 Pseudo-localization.
-- [ ] SB-M51-005 Actual languages decided later. `[DESIGN GATE]`
+- [ ] SB-M51-001 Avoid hard-coded user text. **[OPEN: gameplay_screen.gd HUD price literal `"%d SB"` remains unkeyed.]**
+- [x] SB-M51-002 Translation-key convention. **[CHATGPT SCOPED TECH_PASS 2026-10-15, pseudo/key checks M51 4/4 CI 38753823564; not full localization]**
+- [ ] SB-M51-003 Longer-string layouts. **[PARTIAL: pseudo-layout scan is report-only; Shop scroll/overflow not proven.]**
+- [x] SB-M51-004 Pseudo-localization. **[CHATGPT SCOPED TECH_PASS 2026-10-15, pseudo/key checks M51 4/4 CI 38753823564; not full localization]**
+- [ ] SB-M51-005 Actual languages decided later. `[DESIGN GATE]` **[OWNER DESIGN GATE: actual languages not chosen.]**
 
 #### M51 Player-Experience Localization Expansion
 - [ ] SB-M51-006 Localize every M43/M44 surface including popup titles, booster descriptions, shop products, errors, notifications, event/rank labels and achievement copy.
 - [ ] SB-M51-007 Prices supplied by platform stores remain platform-localized and are never hand-formatted as fixed currency strings.
-- [ ] SB-M51-008 Validate pluralization for Hearts, Bot Parts, cards, days, attempts, ranks and time remaining.
-- [ ] SB-M51-009 Pseudo-localize the complete Player-Facing Surface Visual Inventory before final visual closure.
+- [ ] SB-M51-008 Validate pluralization for Hearts, Bot Parts, cards, days, attempts, ranks and time remaining. **[OPEN: pluralization not implemented/accepted.]**
+- [ ] SB-M51-009 Pseudo-localize the complete Player-Facing Surface Visual Inventory before final visual closure. **[PARTIAL: l04 scan does not prove all surfaces or no clipping.]**
 ### M52 — Production Content Scale-Up `[CONTENT]`
 
 M52-C001 independent audit: **AUDITED_PASS / 10 OF 10 PRODUCTION ADMITTED / OWNER_PLAYTEST_REQUIRED**.
