@@ -37,7 +37,7 @@ Plan: `CLAUDE_M50_MASTER_PLAN_V01.md` · 2026-10-15 · Builder: Claude Code.
 | L10 Ice Cube | 14.3 | **8.3** | 10.2 | 11.7 |
 
 - **FINDING 2 (owner decision, SB-M50-002/003):** colour identity on tiles and board has no non-colour cue.
-  - Under simulated protanopia, C01 Orange Red vs the brown #9C6926 falls to ΔE ≈ 9.6 in 7 of 10 levels.
+  - Under simulated protanopia, C01 Orange Red vs the brown #9C6926 falls to ΔE76 ≈ 9.6 in 6 of 10 levels (L1, L2, L5–L8). **Corrected after peer review:** by CIEDE2000 this pair is **≈ 3.3**, the true worst case; tritan L3 is ≈ 3.8 and deutan #FFA800 / #FFD635 ≈ 6.7. Severity 1.0 models full dichromacy.
   - Under tritanopia, L3's two greens fall to 6.0.
   - Quantities ARE non-colour (live count text, a04), and boosters are identified by icon art (a04).
 
@@ -46,9 +46,9 @@ Plan: `CLAUDE_M50_MASTER_PLAN_V01.md` · 2026-10-15 · Builder: Claude Code.
 |---|---|
 | 001 | done |
 | 003 | done (simulation-based) |
-| 004 | done (text constants) |
+| 004 | partial (6 constant pairs + PLAY; not every M43 / M44 screen) |
 | 006 | via M49 |
-| 007 | done (tokens) |
+| 007 | partial (tokens exist; readability not proven) |
 | 009 | partial (counts live) |
 | 002 | **OWNER_DECISION**: colour-blind assist (e.g. a per-C-ID glyph on tiles; new art / visual approval) |
 | 008 / 011 | partial (colour identity) |
@@ -56,6 +56,16 @@ Plan: `CLAUDE_M50_MASTER_PLAN_V01.md` · 2026-10-15 · Builder: Claude Code.
 | 005 / 013 | existing Reduced Effects coverage, not re-audited here |
 | 012 / 015 / 016 / 017 / 018 | OPEN |
 | 014 | M57-gated |
+
+## Peer review + remedial
+`CLAUDE_PEER_REVIEW_M50_V01.md`: math verified, PASS_WITH_DEFECTS (CIE76 understates). Remedial changes:
+- CIEDE2000 + Sharma reference pairs;
+- sRGB red Lab reference;
+- non-vacuous a04;
+- labelled builder thresholds;
+- corrected counts / rows.
+
+They ride the shared M51 planned run (logged in the M51 log).
 
 ## Owner decision requests (concise)
 1. Colour-blind assist: add a non-colour cue per colour (glyph / pattern) to slot / supply tiles (and optionally the board)? This needs new art and owner visual approval.
