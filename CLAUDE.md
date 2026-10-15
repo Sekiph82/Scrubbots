@@ -5,6 +5,11 @@ Status: **OWNER-LOCKED operating rules, newest autonomous delegation 2026-10-15*
 Historical pre-Difficulty-V1 manual is archived at:
 `docs/migration/legacy-task-trackers/CLAUDE_PRE_DIFFICULTY_V1_2026-09-12.md`
 
+## 0C. LATEST OWNER OVERRIDE 2026-10-15: ZERO GITHUB ACTIONS SPEND + ON-BOARD SYMBOLS
+**THIS OWNER RULING OVERRIDES ALL EARLIER CLOUD-FIRST, PAID/INCLUDED-QUOTA, 1+1 CI, AND BOARD-NO-SYMBOL INSTRUCTIONS IN THIS FILE, ANY MASTER PROMPT, AND ANY TASKS HISTORY.** Owner reports all 2,000 free GitHub Actions minutes exhausted and approximately USD 76 in charges. **NEVER START, RERUN, DISPATCH OR ENABLE A GITHUB ACTIONS WORKFLOW, INCLUDING validation_only; no budget, no retries, no exceptions based on expected free minutes.** Also do not buy credits or use alternative paid hosted runners/services. Both ScrubBots workflows have job-level unconditional false guards that must stay in place until the owner expressly reauthorizes Actions. This order applies to delegated Actions use in other projects as well. Local bounded Godot 4.7.2 tests, code, GitHub source pushes and independent review are permitted. Record tests honestly as LOCAL_PASS or CLOUD_CI_DEFERRED_COST_FREEZE, never silently claim a CI green on untested code. Do not halt coding because cloud tests are forbidden; continue safe implementation/offline profiling.
+
+**MANDATORY NEW BOARD REQUIREMENT:** owner Godot F5 screenshots reveal colored pixel-art board cells lack color-blind symbols. Per-color non-color symbols MUST appear on actual ACTIVE board pixel cells, including 59x59, with the same 16 canonical shapes used by Supply/Slots. Prior "no board cell symbols" is REVOKED. No per-cell new Godot Nodes, no hidden legend-only workaround; performance-cached batched overlay and an accessible magnifier/inspect option on dense boards. Preserve cleared transparent cells and the actual pixel art, gameplay/route truth, user data. Prompt: `coordination/sessions/M50-BOARD-COLOR-ASSIST-C001/CHATGPT_CLAUDE_MASTER_PROMPT_V01.md`. This is the current top development priority. Owner visual sign-off stays open until the user reviews the result.
+
 ## 0. Tracking authority
 
 - GitHub `origin/main` is repository/project-state authority.
