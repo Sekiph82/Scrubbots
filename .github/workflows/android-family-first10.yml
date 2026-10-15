@@ -1,3 +1,8 @@
+# OWNER COST FREEZE 2026-10-15: GitHub Actions 2,000 free minutes exhausted; owner reports ~$76 charges.
+# HARD STOP: ALL jobs disabled at JOB level. Do not dispatch, re-run or enable even validation_only.
+# This safeguard must NOT be removed until the owner separately authorizes renewed Actions spending.
+# Source development, local bounded Godot tests, Git commits and push are still allowed.
+
 name: Android Family First10 APK
 
 # M47-FAMILY-APK-C001 (SB-M47-001 / SB-M47-002): installable Android DEBUG/DEVELOPMENT APK of
@@ -53,6 +58,7 @@ env:
 
 jobs:
   validate:
+    if: ${{ false }} # OWNER COST FREEZE; skip before runner allocation, no billable minutes
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -179,7 +185,7 @@ jobs:
   export:
     needs: validate
     # Job-level guard: only an explicit build_apk dispatch exports; validation_only / unset / unknown skip.
-    if: ${{ inputs.mode == 'build_apk' }}
+    if: ${{ false }} # OWNER COST FREEZE. Previous export guard: inputs.mode == 'build_apk'
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
