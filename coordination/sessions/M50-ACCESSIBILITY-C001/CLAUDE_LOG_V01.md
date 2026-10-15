@@ -74,3 +74,20 @@ They ride the shared M51 planned run (logged in the M51 log).
 ## Next
 - A fresh `CLAUDE_PEER_REVIEW` of M50.
 - The M49 strengthened m06 / m07 test changes ride the next planned run.
+
+## Addendum 2026-10-15 — owner decisions A / B implemented (SB-DEV-GODOT-001)
+Full evidence: `coordination/sessions/DEV-GODOT-LOCAL-PLAY-C001/CLAUDE_LOG_V01.md`. Review: `CLAUDE_PEER_REVIEW_M50_DECISIONS_V01.md` (this folder).
+
+- **SB-M50-002 (decision A):** IMPLEMENTED, CI PASS.
+  - Each canonical C-ID has a distinct shape, keyed by the exact Palette V3 colour, never the local index.
+  - It is a watermark behind the count on every occupied Supply front / preview tile and every 5/6 slot tile, plus the Tornado / Selector booster chips.
+  - There are no board-cell symbols; this is a recorded constraint.
+  - CI:
+    - [38788244223](https://github.com/Sekiph82/Scrubbots/actions/runs/38788244223), `4cbaa556`: 42/42 PASS.
+    - [38790518157](https://github.com/Sekiph82/Scrubbots/actions/runs/38790518157), `43d7e2a2`: 43/43 PASS.
+    - The round-2 shape swap (C06 T shape, C11 lightning bolt, C15 arrow) is local 10/10 and awaits the next planned run.
+  - **Owner visual sign-off OPEN.**
+- **SB-M50-004 (decision B):** IMPLEMENTED, CI PASS.
+  - The hero PLAY label is NAVY: 7.35 normal / 9.04 hover / 5.31 pressed, disabled 3.61 (exempt).
+  - **Owner visual sign-off OPEN.**
+- **a02** now reports the navy label instead of FINDING 1. FINDING 2 is addressed by decision A, pending owner visual approval.

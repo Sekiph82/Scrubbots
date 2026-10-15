@@ -123,6 +123,22 @@ func _s03() -> void:
 	for pair in [["C01", "C11"], ["C04", "C05"], ["C02", "C03"]]:
 		var u := _iou(masks[pair[0]], masks[pair[1]])
 		_ok(u < 0.5, "CVD-confusable %s '%s' vs %s '%s' IoU %.2f" % [pair[0], ColorSymbols.SHAPE_BY_CID[pair[0]], pair[1], ColorSymbols.SHAPE_BY_CID[pair[1]], u])
+	# The count digits sit on top of the watermark: compare only what stays visible around a
+	# typical 2-digit count (central band x in [-0.75, 0.75], y in [-0.5, 0.5] hidden).
+	var hidden := func(x: int, y: int) -> bool:
+		var p := Vector2((x + 0.5) / 16.0 - 1.0, (y + 0.5) / 16.0 - 1.0)
+		return absf(p.x) <= 0.75 and absf(p.y) <= 0.5
+	var worst_v := 0.0
+	var worst_v_pair := ""
+	for i in range(ids.size()):
+		for j in range(i + 1, ids.size()):
+			var u := _iou(_masked(masks[ids[i]], hidden), _masked(masks[ids[j]], hidden))
+			if u >= 0.65:
+				print("    close (count hidden) %s/%s IoU %.2f" % [ids[i], ids[j], u])
+			if u > worst_v:
+				worst_v = u
+				worst_v_pair = "%s/%s" % [ids[i], ids[j]]
+	_ok(worst_v < 0.7, "with the count band hidden: max IoU %.2f (%s) over all 120 pairs" % [worst_v, worst_v_pair])
 	_complete("s03_silhouettes_distinct")
 
 func _s04() -> void:
@@ -310,6 +326,7 @@ func _s10() -> void:
 			await _frames(4)
 			var p = _root.get_modal_stack().top()
 			var flow: Node = p.find_child("Targets", true, false) if p != null else null
+			ok = ok and flow != null and flow.get_child_count() > 0
 			if flow == null:
 				continue
 			for b in flow.get_children():
@@ -323,7 +340,7 @@ func _s10() -> void:
 					ok = ok and sym.emblem
 				chips += 1
 			print("    %s: %d chips" % [id, flow.get_child_count()])
-	_ok(ok and chips > 0, "%d Tornado (emblem) / Selector (watermark under the count) chips carry their colour's symbol, input-transparent" % chips)
+	_ok(ok and chips > 0, "each booster has chips; %d Tornado (emblem) / Selector (watermark under the count) chips carry their colour's symbol, input-transparent" % chips)
 	_shutdown()
 	_complete("s10_booster_target_chips")
 
@@ -343,9 +360,15 @@ func _mask(shape: String) -> PackedByteArray:
 						inside = inside or Geometry2D.is_point_in_polygon(p, PackedVector2Array(part[1]))
 					"disc":
 						inside = inside or p.distance_to(part[2] if part.size() > 2 else Vector2.ZERO) <= float(part[1])
-					"ring":
-						inside = inside or absf(p.length() - float(part[1])) <= float(part[2]) * 0.5
 			out[y * 32 + x] = 1 if inside else 0
+	return out
+
+func _masked(m: PackedByteArray, hidden: Callable) -> PackedByteArray:
+	var out := m.duplicate()
+	for y in range(32):
+		for x in range(32):
+			if hidden.call(x, y):
+				out[y * 32 + x] = 0
 	return out
 
 func _iou(a: PackedByteArray, b: PackedByteArray) -> float:
