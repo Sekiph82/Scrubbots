@@ -45,3 +45,16 @@ Both runs: artifact logs only, no apk / pck / ipa; `import script_diag=0`.
 
 ## Resume pointer
 Next planned milestone run will include the m06 fix. Then a fresh `CLAUDE_PEER_REVIEW` of M49. Next milestone candidate: M50 Accessibility.
+
+## Addendum — m06 fix exercised + peer review
+- The M50 planned run [38748970964](https://github.com/Sekiph82/Scrubbots/actions/runs/38748970964) on `bf333df4` (descendant of the fixture fix `b530f8ba`; NOT a dedicated M49 rerun) gave **M49 verdict=PASS (8/8)**, 37/37 suites, export skipped.
+  - m06: all 6 boards (24×40, 40×24, 59×59 on two devices) were drawn inside the rail and BoardRegion, e.g. `board [190,295 833x833] rail [160,255 894x913] in_rail=true in_region=true`.
+- `CLAUDE_PEER_REVIEW_M49_V01.md`: PASS_WITH_CONCERNS for m01–m05 / m07 / m08; CHANGES_REQUIRED for the m06 assertions.
+  - Test-only fixes applied after the review (drawn-rect measurement, hard containment, deep-link return check, journey visibility diag). They are NOT yet CI-validated; the next planned run exercises them.
+- Row 020 narrowed: Home PLAY / panels and boosters ≥ 88 px are asserted; nav-tab and Pause / 2x sizes are not.
+- Rows 031 / 032: PARTIAL (journey visibility is not asserted).
+- Tracker request (ChatGPT):
+  - M49: 001–008, 010–019, 021, 023–025, 028 technically evidenced;
+  - 009 evidenced (run 38748970964) — final re-check pending with the strengthened m06;
+  - 020 / 026 / 030 / 031 / 032 PARTIAL;
+  - 022 / 027 / 029 OPEN or gated.
