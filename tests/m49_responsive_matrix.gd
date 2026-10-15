@@ -182,15 +182,17 @@ func _m06() -> void:
 			var sid: String = screen.get_shell_id() if not screen.get_shell_id().is_empty() else GameplayScreen.FALLBACK_SHELL
 			var rail: Rect2 = screen.ref_rect_to_global(Shell.rail_rect(sid))
 			var vp := Rect2(Vector2.ZERO, Vector2(_sub.size))
-			var aspect: float = br.size.x / maxf(br.size.y, 1.0)
+			# Peer review D1: measure what is DRAWN (renderer size x presentation scale at the
+			# presentation's global origin), not get_board_rect() (which is w x h by construction).
+			var pres = screen.get_presentation()
+			var rnd: Control = pres.get_renderer()
+			var drawn := Rect2(pres.global_position, rnd.size * pres.scale)
+			var aspect: float = drawn.size.x / maxf(drawn.size.y, 1.0)
 			var want: float = float(wh.x) / float(wh.y)
-			# Player-facing property (as m28_c002_c003_final_gate): aspect kept, board on screen,
-			# never under the slot strip / supply. Rail / region containment is printed as a
-			# diagnostic only (run 38744551437 reported it outside BoardRegion in this standalone
-			# fixture setup; see the M49 log).
-			var clear: bool = not br.intersects(screen.get_five_slot_strip_rect()) and not br.intersects(screen.get_supply_panel_rect())
-			_ok(br.has_area() and absf(aspect - want) < 0.02 and _inside(br, vp) and clear, "%s %dx%d: aspect %.3f (want %.3f), on screen, clear of slots / supply" % [str(phys), wh.x, wh.y, aspect, want])
-			print("    diag: board %s rail %s region %s shell %s in_rail=%s in_region=%s" % [_rs(br), _rs(rail), _rs(region), sid, str(_inside(br, rail)), str(_inside(br, region))])
+			var clear: bool = not drawn.intersects(screen.get_five_slot_strip_rect()) and not drawn.intersects(screen.get_supply_panel_rect())
+			# Peer review D2: containment in the baked rail AND BoardRegion are hard assertions.
+			_ok(drawn.has_area() and absf(aspect - want) < 0.02 and _inside(drawn, rail) and _inside(drawn, region) and _inside(drawn, vp) and clear,
+				"%s %dx%d: drawn aspect %.3f (want %.3f); inside rail + BoardRegion + viewport; clear of slots / supply | drawn %s rail %s" % [str(phys), wh.x, wh.y, aspect, want, _rs(drawn), _rs(rail)])
 			_sub.free()
 			_sub = null
 	_complete("m06_rect_and_max_boards")
@@ -210,6 +212,8 @@ func _m07() -> void:
 			var got: String = _root.open_deep_link(d)
 			await _frames(4)
 			var top = stack.top()
+			if got != d:
+				bad.append("%s:routed to %s" % [d, got])   # peer review D4
 			if top == null:
 				bad.append(d + ":no popup (" + got + ")")
 				continue
@@ -239,7 +243,10 @@ func _m08() -> void:
 		var br: Rect2 = b.get_global_rect()
 		var j = res.get_journey_strip()
 		var j_ok: bool = j == null or not (j as Control).is_visible_in_tree() or _inside((j as Control).get_global_rect(), vp)
-		_ok(_inside(br, vp) and br.size.y >= TOUCH - 0.5 and j_ok, "%s (logical %s): CTA %s, journey inside" % [str(phys), str(lv), _rs(br)])
+		_ok(_inside(br, vp) and br.size.y >= TOUCH - 0.5 and j_ok, "%s (logical %s): CTA %s; journey inside when shown" % [str(phys), str(lv), _rs(br)])
+		# Peer review D3: visibility is RECORDED (rows 031/032 stay partial until asserted).
+		var nc = res.get_next_cleanup_panel()
+		print("    diag: journey visible=%s next_cleanup visible=%s" % [str(j != null and (j as Control).is_visible_in_tree()), str(nc != null and nc.is_visible_in_tree())])
 	_complete("m08_results_journey")
 
 # ------------------------------------------------------------------ helpers ----
