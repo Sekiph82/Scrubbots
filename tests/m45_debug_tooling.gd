@@ -65,7 +65,7 @@ func _d02() -> void:
 	var ok_dispatch := _drive_until_bots(host)
 	ov.refresh()
 	var m: Dictionary = ov.get_model()
-	var dm: Dictionary = ov.get_layer().get_draw_model()
+	var dm: Dictionary = ov.get_debug_layer().get_draw_model()
 	var reserved: Array = Array(host.get_reservations().get_reserved_indices())
 	reserved.sort()
 	var marked: Array = dm["targets"].map(func(t): return int(t["index"]))
@@ -84,7 +84,7 @@ func _d02() -> void:
 			agents += 1
 	_ok(dm["routes"].size() == agents and agents > 0, "one route per live routed agent (%d)" % agents)
 	_ok(dm["grid"].size() == (b.get_width() + 1) + (b.get_height() + 1), "grid lines (W+1)+(H+1)")
-	_ok(ov.get_layer().transform == host.get_agent_layer().transform and ov.get_layer().get_parent() == host.get_agent_layer().get_parent(), "debug layer shares the agents' board-local transform")
+	_ok(ov.get_debug_layer().transform == host.get_agent_layer().transform and ov.get_debug_layer().get_parent() == host.get_agent_layer().get_parent(), "debug layer shares the agents' board-local transform")
 	_complete("d02_live_targets_routes_grid")
 
 func _d03() -> void:
@@ -96,7 +96,7 @@ func _d03() -> void:
 		JSON.stringify(host.get_economy().snapshot()), host.get_reservations().get_reservation_count(), host.get_dispatcher().get_active_count()]
 	for _i in range(5):
 		ov.refresh()
-		ov.get_layer().refresh()
+		ov.get_debug_layer().refresh()
 		GameplayDebugLayer.build_draw_model(host)
 		GameplayDebugModel.capture(host, {})
 	var post := [b.get_revision(), JSON.stringify(host.get_slots().snapshot()), JSON.stringify(host.get_supply().player_snapshot()),
@@ -115,11 +115,11 @@ func _d04() -> void:
 	ov.get_toggle("targets").button_pressed = false
 	ov.get_toggle("grid").button_pressed = false
 	ov.get_toggle("routes").button_pressed = false
-	var dm: Dictionary = ov.get_layer().get_draw_model()
+	var dm: Dictionary = ov.get_debug_layer().get_draw_model()
 	_ok(dm["targets"].is_empty() and dm["grid"].is_empty() and dm["routes"].is_empty(), "markers / grid / routes off")
 	for id in ["targets", "grid", "routes"]:
 		ov.get_toggle(id).button_pressed = true
-	_ok(not ov.get_layer().get_draw_model()["grid"].is_empty(), "back on")
+	_ok(not ov.get_debug_layer().get_draw_model()["grid"].is_empty(), "back on")
 	_complete("d04_toggles_real_effects_switch")
 
 func _d05() -> void:
@@ -189,7 +189,7 @@ func _d08() -> void:
 		if best == null or int(e.width) * int(e.height) > int(best.width) * int(best.height):
 			best = e
 	_ok(_h.load_entry(String(best.id)), "loaded largest level %s %dx%d" % [best.id, int(best.width), int(best.height)])
-	var layer = _h.get_overlay().get_layer()
+	var layer = _h.get_overlay().get_debug_layer()
 	_ok(layer is Node2D and layer.get_child_count() == 0 and layer.get_draw_model()["grid"].size() == int(best.width) + int(best.height) + 2, "single Node2D, no per-cell nodes; %d grid lines" % layer.get_draw_model()["grid"].size())
 	_complete("d08_single_node_largest_level")
 

@@ -102,7 +102,7 @@ func _on_toggle(on: bool, id: String) -> void:
 func get_model() -> Dictionary:
 	return _last_model.duplicate()
 
-func get_layer():
+func get_debug_layer():
 	return _layer
 
 func get_toggle(id: String) -> CheckButton:
