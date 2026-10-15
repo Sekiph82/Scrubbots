@@ -271,3 +271,18 @@ The full `economy.snapshot() == econ` "no payout" assertion would stay exactly a
 - `scripts/app/main.gd`: a non-durable acknowledgement keeps the entry for the next quiet Home instead of re-opening it in a loop.
 - `tests/m44_ftue.gd`: + t22 (director rules with a simulated later build) and + t23 (real app: nothing during onboarding; the Feature Unlock ceremony once after genuine L3; not on relaunch; economy core unchanged). Ledger 23 cases; workflow M44 guard -> `PASS (23/23 cases, 0 fail)`.
 - **CI: `AWAITING_OWNER_CI_BUDGET`.** The prior M44 / M45 run budgets are complete; the owner decision does not grant a new run. Not claimed as passing.
+
+## D2 peer review V01 + fixes, then owner-approved CI (`CLAUDE_DEFERRED_M44_D2_VALIDATION_ONLY_PROMPT_V01.md`, autonomy V02)
+- Peer review V01 (pre-fix): CHANGES_REQUIRED (`CLAUDE_PEER_REVIEW_M44_D2_V01.md`). Fixed in `0218a862`.
+- **CI run [38742572367](https://github.com/Sekiph82/Scrubbots/actions/runs/38742572367)** on `912a69db` (descendant of `0218a862` / `d08447a6`; only coordination files changed after the fix):
+  - validate = **success** ([job 116447782736](https://github.com/Sekiph82/Scrubbots/actions/runs/38742572367/job/116447782736)), export = **skipped** ([job 116452064211](https://github.com/Sekiph82/Scrubbots/actions/runs/38742572367/job/116452064211));
+  - artifact `11977795753`: 37 log files, no apk / pck / ipa;
+  - **35/35 suites PASS**, `M44 verdict=PASS (23/23)`, `CP06 PASS (16/16)`, `M45 PASS (8/8)`, `import script_diag=0`, `aggregate=PASS`.
+  - First planned run, green; no rerun was needed.
+- Final peer review V02 (fresh reviewer, tested SHA + real CI): **PASS_WITH_CONCERNS**, D1–D4 fixed (`CLAUDE_PEER_REVIEW_M44_D2_V02.md`).
+  - Its two LOW items are addressed in the next (M49) change set: the `main.gd` comment, and stronger t23 assertions. They are validated by that run.
+- First-three tutorial requirements intact: t01–t21 unchanged and PASS.
+- Owner visual gates M44-018 / 020: still OPEN.
+- **Tracker request for ChatGPT** (local `TASKS.md` writes are denied by the client permission check; not bypassed):
+  - mark `SB-M44-D2-001` technically CLOSED with run 38742572367 + `CLAUDE_PEER_REVIEW_M44_D2_V02.md`;
+  - keep SB-M44-018 / 020 OPEN.
