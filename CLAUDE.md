@@ -1,6 +1,6 @@
 # SCRUBBOTS — AI Agent Operating Manual
 
-Status: **OWNER-LOCKED operating rules, updated 2026-09-27**
+Status: **OWNER-LOCKED operating rules, newest autonomous delegation 2026-10-15**
 
 Historical pre-Difficulty-V1 manual is archived at:
 `docs/migration/legacy-task-trackers/CLAUDE_PRE_DIFFICULTY_V1_2026-09-12.md`
@@ -11,8 +11,8 @@ Historical pre-Difficulty-V1 manual is archived at:
 - Repository-root `TASKS.md` is the **only live project-status tracker**.
 - There is no parallel project-status index/dashboard/roadmap. Do not create or maintain `coordination/SESSION_INDEX.md`, `coordination/AUDIT_INDEX.md`, `docs/04_ROADMAP.md`, `.hiveai/PROJECT_DASHBOARD.md`, or any equivalent live tracker.
 - Read the root `TASKS.md` Project Status block before material work.
-- **Root `TASKS.md` is ChatGPT-write-owned. Claude/Codex must read it but must not edit it during implementation, validation, or handoff. ChatGPT updates it after independent audits, owner-gate decisions, and before handing the next prompt to an implementer.**
-- ChatGPT is the independent auditor. Claude/Codex implement and test; they do not self-award `AUDITED_PASS`.
+- **DEFAULT:** root `TASKS.md` is ChatGPT-write-owned. **LATEST OWNER EXCEPTION (2026-10-15):** Claude Code, when executing `coordination/autonomy/SCRUBBOTS_CLAUDE_AUTONOMOUS_MASTER_V01.md`, may maintain root `TASKS.md` itself under §0B with accurate review provenance and hard owner gates. Codex has no new tracker-write authorization.
+- **DEFAULT:** ChatGPT independently audits. **AUTONOMOUS CLAUDE EXCEPTION:** a distinct fresh-context Claude reviewer can write clearly labeled `CLAUDE_PEER_REVIEW` audit evidence under §0B, but that is NOT a `CHATGPT_INDEPENDENT_AUDIT`. Implementer-only self-review never becomes independently audited PASS. Owner visual/build/R2 decisions remain reserved.
 
 ## 0A. Owner execution & storage policy: ONE DESKTOP CHECKOUT + CLOUD-FIRST TEMP [OWNER UPDATE 2026-10-12]
 
@@ -27,8 +27,21 @@ Historical pre-Difficulty-V1 manual is archived at:
 - **Cleanup safely, not destructively**: before and after each task, report laptop disk-space delta, NEW TEMP paths and sizes when observable; remove only exact, clearly task-owned, no-longer-active disposable artifacts once safe. Never delete another session's worktree, pre-existing logs, owner files, untracked work, caches needed by an active process or stashes. If safe cleanup is uncertain, ASK the owner; do not brute-force removal. Do not claim that a transient is removed without checking it.
 - **Prevent gratuitous generated files**: avoid background tool features that create task-output files if direct foreground execution suffices; avoid heredocs and tools known to create unmanaged local files when a file-free alternative exists. The local Claude harness itself can have unavoidable transient metadata; observe and report, do not guarantee it is physically absent while running.
 - **Preserve all owner state**: read current `origin/main`, safely fast-forward Desktop only when no owner edits conflict. Preserve every owner-modified tracked file (including `project.godot`), untracked files, stashes, original art and unrelated session data. No `git reset --hard`, `git clean`, implicit stash, destructive checkout or force push. Stage task files only.
-- **Root `TASKS.md` is ChatGPT-write-owned**; Claude reads but never edits it. ChatGPT owns independent audit. Prompts must cover complete milestones as ONE MASTER PROMPT, not a string of independently dispatched small tasks.
+- **Normal mode:** root `TASKS.md` remains ChatGPT-write-owned. **2026-10-15 autonomous owner mode §0B is the express exception** permitting Claude to update it using real source/CI and honestly labeled Claude review, preserving owner gates. Continue with ONE MASTER prompt per milestone rather than micro-prompts.
 - A previous audit's `OWNER_ZERO_TEMP_PROCESS_NONCOMPLIANT` accurately describes conduct under the **prior** 2026-10-10 policy and remains in its historical audit; future owner-approved bounded TEMP is assessed under THIS newer policy.
+
+## 0B. OWNER AUTONOMOUS CLAUDE MODE [EXPLICIT DELEGATION 2026-10-15]
+
+**Owner authorization:** Claude Code may now continuously select, implement, test, review and track new owner-approved ScrubBots milestone work using `origin/main` and the **single existing** root `TASKS.md`, without requesting another ChatGPT-written task prompt after each cycle. Full standing instructions: `coordination/autonomy/SCRUBBOTS_CLAUDE_AUTONOMOUS_MASTER_V01.md`.
+
+**This section supersedes earlier ChatGPT-exclusive tracker-write clauses ONLY when Claude is executing that autonomous master prompt.** ChatGPT still remains available for later truly independent re-audits; no older ChatGPT-authored audit may be overwritten to invent a new result. Codex and other agents are NOT delegated `TASKS.md` permissions.
+
+- Claude may edit `TASKS.md` and record `CLAUDE_AUTONOMOUS_REVIEW` status, with source SHA, real GitHub CI run/job/artifact evidence, and dependency gates. Tasks requiring independent/owner visual review stay open until genuinely completed. Keep minimal concurrent-safe diffs; compare newest remote main before every tracker update.
+- For audits, prefer a **different fresh-context reviewer subagent** inspecting production source/tests and CI independently from the implementer's narrative. Audit documents must explicitly identify `CLAUDE_PEER_REVIEW` or `CLAUDE_SELF_REVIEW`. Self-review is not independent and **never** merits `CHATGPT_INDEPENDENT_AUDIT_PASS`.
+- Continue to the next **eligible owner-approved and dependency-independent milestone** immediately once a cycle is published and reviewed. If a task is blocked by owner decision/CI budget, mark it and consider safe independent tasks. Do not invent product rules, hide failing tests or complete externally gated features just to advance.
+- **NO silent expansion of permissions**: original owner approvals, per-milestone CI run caps, no APK/IPA export without separate consent, no production Cloudflare R2 uploads, no paid tools, no force-push/destructive owner cleanup or edits to protected owner work remain binding.
+- Most recent M44 R01 Actions run `38632433821` is **33/34**: 17 specialised regressions plus M44 passed, CP06 i05 failed. Original **three-run cap EXHAUSTED**. This autonomy approval **does NOT authorize Run 4**; request explicit owner go-ahead before dispatching another M44 validation_only run. Do not misstate the CP06 flaky-clock hypothesis as proven.
+- Keep §0A disk safeguards (one original checkout; heavy transient jobs on CI, incidental new laptop TEMP ≤20 MiB concurrently). Do not promise unattended continuation after the Claude Code session ends or if its model quota/tool environment stops.
 
 ## 1. Required reading order
 
@@ -75,7 +88,7 @@ No hidden clean image exists. The visible artwork itself is progressively remove
 13. Preserve unrecognized/pre-existing owner work.
 14. Documentation drift is a defect.
 15. No secrets in repository/coordination artifacts.
-16. Do not edit root `TASKS.md`; tracker state is written by ChatGPT after audit/owner decisions.
+16. Root `TASKS.md`: ChatGPT-only in normal mode; under owner-authorized autonomous mode §0B Claude may make evidence-based scoped status updates, never claiming unperformed independent or owner acceptance.
 
 ## 4. Git synchronization and owner-work preservation
 
@@ -109,12 +122,12 @@ Claude/Codex:
 - run required tests;
 - write the matching `CLAUDE_LOG_VNN.md`;
 - push safely;
-- **do not edit root `TASKS.md`;**
+- **normal mode:** do not edit root `TASKS.md`; **autonomous owner mode (§0B):** Claude Code may update it with precise GitHub evidence and conflict-aware edits;
 - hand off `AWAITING_AUDIT` in the requested response;
 - return the direct GitHub blob URL requested by the prompt;
-- never create an audit verdict/file.
+- **normal mode:** no implementer-authored audit; **autonomous owner mode (§0B):** create a clearly labeled `CLAUDE_PEER_REVIEW` file only after real distinct reviewer or `CLAUDE_SELF_REVIEW` otherwise, never forge a ChatGPT verdict.
 
-ChatGPT independently inspects the real GitHub state, owns audit closure, and updates root `TASKS.md` to the audited truth/current actor before issuing the next prompt.
+In normal mode ChatGPT independently audits and updates the tracker. Under **newer owner §0B autonomous delegation**, Claude may manage implementation/review/tracker cycles but cannot assert ChatGPT independence or owner-only closure.
 
 ## 6. Board and LevelData `[LOCKED]`
 
@@ -455,7 +468,7 @@ For Difficulty V1 specifically, the 2026-09-12 owner decision supersedes old cla
 
 ## 20. Working style
 
-Inspect before modifying. Keep work scoped, reversible, testable and evidence-driven. Reuse audited systems rather than rebuilding them for style. Stop only when proceeding would destroy owner work, expose secrets, require an unauthorized paid/external dependency, or contradict an unresolved owner decision. Do not edit root `TASKS.md`; leave tracker updates to ChatGPT after independent audit/owner-gate review.
+Inspect before modifying. Keep work scoped, reversible, testable and evidence-driven. Reuse audited systems rather than rebuilding them for style. Stop only when proceeding would destroy owner work, expose secrets, require an unauthorized paid/external dependency, contradict an unresolved owner decision or violate a hard gate. Root `TASKS.md` is ChatGPT-owned in normal mode; under the explicit 2026-10-15 owner autonomous delegation in §0B Claude may update it with authentic code/CI/review evidence, never bypassing owner gates.
 
 
 ## Economy & Rewards V1 owner lock
