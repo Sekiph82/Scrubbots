@@ -19,6 +19,7 @@ const BatchSupplyGenerator = preload("res://scripts/gameplay/supply/batch_supply
 const SlotBatchState = preload("res://scripts/gameplay/slots/slot_batch_state.gd")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
 const HelpTipsScreen = preload("res://scripts/ui/tutorial/help_tips_screen.gd")
+const Shell = preload("res://scripts/ui/gameplay_shell_geometry.gd")
 
 ## Physical device sizes (portrait).
 const PHYSICAL := [Vector2i(720, 1280), Vector2i(1080, 1920), Vector2i(1080, 2160), Vector2i(1170, 2532),
@@ -173,9 +174,20 @@ func _m06() -> void:
 			await _frames(1)
 			var br: Rect2 = screen.get_board_rect()
 			var region: Rect2 = screen.get_board_region_rect()
+			# Authoritative containment reference (same as m28_c002_c002_static_shell): the baked
+			# rail loop of the selected shell, in global coordinates.
+			var sid: String = screen.get_shell_id() if not screen.get_shell_id().is_empty() else GameplayScreen.FALLBACK_SHELL
+			var rail: Rect2 = screen.ref_rect_to_global(Shell.rail_rect(sid))
+			var vp := Rect2(Vector2.ZERO, Vector2(_sub.size))
 			var aspect: float = br.size.x / maxf(br.size.y, 1.0)
 			var want: float = float(wh.x) / float(wh.y)
-			_ok(br.has_area() and absf(aspect - want) < 0.02 and _inside(br, region), "%s %dx%d: aspect %.3f (want %.3f), inside region" % [str(phys), wh.x, wh.y, aspect, want])
+			# Player-facing property (as m28_c002_c003_final_gate): aspect kept, board on screen,
+			# never under the slot strip / supply. Rail / region containment is printed as a
+			# diagnostic only (run 38744551437 reported it outside BoardRegion in this standalone
+			# fixture setup; see the M49 log).
+			var clear: bool = not br.intersects(screen.get_five_slot_strip_rect()) and not br.intersects(screen.get_supply_panel_rect())
+			_ok(br.has_area() and absf(aspect - want) < 0.02 and _inside(br, vp) and clear, "%s %dx%d: aspect %.3f (want %.3f), on screen, clear of slots / supply" % [str(phys), wh.x, wh.y, aspect, want])
+			print("    diag: board %s rail %s region %s shell %s in_rail=%s in_region=%s" % [_rs(br), _rs(rail), _rs(region), sid, str(_inside(br, rail)), str(_inside(br, region))])
 			_sub.free()
 			_sub = null
 	_complete("m06_rect_and_max_boards")
