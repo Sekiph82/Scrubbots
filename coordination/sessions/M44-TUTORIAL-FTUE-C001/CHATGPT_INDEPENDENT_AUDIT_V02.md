@@ -1,0 +1,26 @@
+# M44 FTUE — CHATGPT INDEPENDENT AUDIT V02
+Date: 2026-10-15 | Scope: owner V03 first-three tutorial + M44 R01 CI resolution + Claude peer review D1 remediation.
+
+## Independent verdict
+**M44_CORE_TECHNICAL_PASS / RELEASE_AND_OWNER_VISUAL_PENDING / PRODUCT_DECISION_D2_OPEN / RETENTION_DEPENDENCIES_OPEN.**
+**NOT M44_FULL_CLOSED**. No new APK/IPA/production-R2 authorization or production phone playthrough is implied.
+
+## First-hand GitHub evidence, not builder assertion alone
+- Reviewed actual source and permanent tests on GitHub main, including `scripts/app/app_state.gd`, `scripts/economy/daily_service.gd`, M44 tutorial source and `tests/m44_ftue.gd`. Owner-locked fresh bootstrap is 2 charges each of +1 Slot/Random/Selector/Tornado (8 total), first-Home DAILY 100 SB + independently CLAIM-able welcome TASKS 100 SB, canonical 3 tasks, later 75/100/125 tiers, persisted fail-safe grants; no extra grant to established/ambiguous saves. True lessons only real L1/2/3, L4+ zero scheduled mandatory tips, M42 cinematic unchanged.
+- Queried **actual** run [38702447218](https://github.com/Sekiph82/Scrubbots/actions/runs/38702447218), head `dee10572533ffce6d73c863d5a656d891036ff45`, `validate` job **116313660739 success**, `export` job **116317676013 skipped**, 1 logs-only artifact **11957457198, 78,935 bytes**. Retrieved validate job output: 34/34 suites exit=0 script_diag=0 PASS, `import script_diag=0`, CP06 **16/16** and M44 **21/21**, all 17 specialised M39/M41/M43 regressions PASS, `aggregate=PASS`. The narrow CP06 i05 fixed-clock test-only change `dee10572` did not modify either strict no-payout assertion or production source. One passing run is consistent with earlier wall-clock flake, not conclusive causation.
+- Independently retrieved [38707495178](https://github.com/Sekiph82/Scrubbots/actions/runs/38707495178), head `a88ba15039ec3e42c507561b6213d1e5d0afda08`, `validate` job **116330428135 success**, `export` job **116333191246 skipped**, one log artifact **11959227226, 80,436 bytes**, **35/35 suites PASS**, M44 **21/21**, CP06 **16/16**, M45 **8/8**, `import script_diag=0`, `aggregate=PASS`. The source includes M44 D1 coachmark-copy refresh/caching fix `679f2f6d`, so it has been regression-run rather than only statically reasoned.
+- Inspected actual `CLAUDE_PEER_REVIEW_M44_V01.md`: distinct review labeled `PASS_WITH_CONCERNS`, not misrepresented as ChatGPT; D1 costly copy/per-booster legality checks at 0.2s cadence was remediated `679f2f6d`. Other review concerns remain tracked, including D2 future What's New policy.
+
+## Child gates / limitations
+- **Core implementation + CI substantiated:** SB-M44-001,002,003,004,007,008,009,011,012,014,015,016,017,019,024. Their technical work may be recorded complete with a link to this audit. Item 021 already reuses genuine M43 Results/Next Cleanup journey and is supported by existing M44 tests; it can be marked technical-pass if no new owner requirement has superseded it.
+- **M44-005:** no-target teaching presently an informational L3 coachmark, not triggered on first actual wait as historical wording says; newer 3-level owner mandate prohibits postponing it to later levels, so retain as presentation requirement pending owner visual decision.
+- **M44-006:** Hearts/Retry/Need-a-Hand teaching is informational L3, no simulated/forced failure; normal fail UI remains, but strict historical first-real-event presentation isn't explicitly demonstrated. Keep open as partial until owner UX review.
+- **M44-010:** feature unlock pacing numbers for all future functions (Events/Ranks/Achievements etc.) not owner-decided, cannot invent; no hard-lock of initial Daily/Tasks.
+- **M44-013:** no real later unlocked Home/Nav destination currently available for NEW badge lifecycle; unexercised, OPEN/dependency-gated.
+- **M44-018 and M44-020:** actual owner phone/visual acceptance still NOT_RUN. Headless overlay/lifecycle matrix is not human sign-off.
+- **M44-022 and M44-023:** first earned Card Pack/Set1 sprint and Weekly/First-Try prerequisites remain M43-backed and not proven as full early-funnel experience, OPEN or dependency-gated.
+- **D2 product policy, pending explicit owner ruling:** current `whats_new_due()` suppresses all future feature announcements for a user with persisted `profile=new`, even after L3 or Skip Tips. Reasonable proposed owner default: first-time tutorials suppress announcements DURING their active L1-L3 window, later versioned genuine What's New can appear once after completion/skip. **Do NOT silently implement** without owner approval.
+- Physical laptop C: disk free-space drop across other agents remains unexplained. Claude's attribution to active Codex is a plausible correlation, **not verified cause**. Do not delete or touch other agents' worktrees, caches or owner files without forensic attribution and consent. Autonomous work pauses under existing >500MiB-session-drop rule pending user action. GitHub tooling cannot verify local disk numbers.
+
+## Disposition
+**Core FTUE code and 35-suite CI technical requirements PASS**, including narrow CP06 re-run and M44 performance remediation. **M44 as a whole remains OPEN** because visual/first-play and several future-meta gates cannot be self-certified. Claude's separate reviewer status retains its own provenance; this document is ChatGPT's independent source/Actions audit.
