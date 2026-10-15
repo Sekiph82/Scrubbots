@@ -127,8 +127,10 @@ At about 13 px per cell, the 59×59 shapes are visible but small. The loupe show
 ## Peer review
 `CLAUDE_PEER_REVIEW_V01.md` records a distinct, fresh-context, read-only Claude reviewer subagent. It is a `CLAUDE_PEER_REVIEW`, **not** a ChatGPT independent audit. It found no BLOCKER and no MAJOR issues. The fixes it led to are listed there.
 
+## Owner visual sign-off
+**2026-10-16: APPROVED.** The owner wrote in chat: "Board symbols and the magnifier look good in F5." This covers the board glyph style, size and ink, and the loupe.
+
 ## Open / not done
-- **Owner visual sign-off** on board glyph style, size and ink, and on the loupe look, is **OPEN**.
 - **Cloud CI** is `CLOUD_CI_DEFERRED_COST_FREEZE`.
 - **Phone performance is unmeasured.** That covers both frame time and the one-time atlas build, which took 33–114 ms on desktop and is pre-warmed at boot. There was no device run.
 - **Mip bleed at about 4 px glyph size** (review item 5) is cosmetic and left as is.
