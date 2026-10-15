@@ -29,9 +29,9 @@ const CID_BY_HEX := {
 ## C-ID -> shape id. Every shape has a different silhouette (never fill colour alone).
 const SHAPE_BY_CID := {
 	"C01": "triangle", "C02": "circle", "C03": "star", "C04": "diamond",
-	"C05": "frame", "C06": "ring", "C07": "plus", "C08": "half_disc",
-	"C09": "cross", "C10": "heart", "C11": "bars", "C12": "triangle_down",
-	"C13": "hourglass", "C14": "dots", "C15": "bullseye", "C16": "chevron",
+	"C05": "frame", "C06": "tee", "C07": "plus", "C08": "half_disc",
+	"C09": "cross", "C10": "heart", "C11": "bolt", "C12": "triangle_down",
+	"C13": "hourglass", "C14": "dots", "C15": "arrow", "C16": "chevron",
 }
 
 var _shape := ""
@@ -85,13 +85,11 @@ func _draw_parts(parts: Array, c: Vector2, r: float, col: Color, grow: float) ->
 				draw_colored_polygon(pts, col)
 			"disc":
 				draw_circle(c + (p[2] as Vector2) * r if p.size() > 2 else c, float(p[1]) * r, col)
-			"ring":
-				draw_arc(c, float(p[1]) * r, 0.0, TAU, 32, col, float(p[2]) * r + grow, true)
 
 static func _rect(x0: float, y0: float, x1: float, y1: float) -> Array:
 	return [Vector2(x0, y0), Vector2(x1, y0), Vector2(x1, y1), Vector2(x0, y1)]
 
-## Unit-space parts ([-1,1], y down): ["poly", points] / ["disc", radius(, centre)] / ["ring", radius, width].
+## Unit-space parts ([-1,1], y down): ["poly", points] / ["disc", radius(, centre)].
 static func _parts(shape: String) -> Array:
 	match shape:
 		"triangle":
@@ -108,8 +106,8 @@ static func _parts(shape: String) -> Array:
 			return [["poly", pts]]
 		"diamond":
 			return [["poly", [Vector2(0, -1), Vector2(0.75, 0), Vector2(0, 1), Vector2(-0.75, 0)]]]
-		"ring":
-			return [["ring", 0.68, 0.32]]
+		"tee":
+			return [["poly", _rect(-0.92, -0.92, 0.92, -0.45)], ["poly", _rect(-0.26, -0.5, 0.26, 0.92)]]
 		"plus":
 			return [["poly", [Vector2(-0.28, -0.95), Vector2(0.28, -0.95), Vector2(0.28, -0.28), Vector2(0.95, -0.28), Vector2(0.95, 0.28), Vector2(0.28, 0.28),
 				Vector2(0.28, 0.95), Vector2(-0.28, 0.95), Vector2(-0.28, 0.28), Vector2(-0.95, 0.28), Vector2(-0.95, -0.28), Vector2(-0.28, -0.28)]]]
@@ -131,15 +129,15 @@ static func _parts(shape: String) -> Array:
 				var t := TAU * i / 28
 				pts.append(Vector2(16.0 * pow(sin(t), 3), -(13.0 * cos(t) - 5.0 * cos(2 * t) - 2.0 * cos(3 * t) - cos(4 * t))) / 17.0 + Vector2(0, -0.1))
 			return [["poly", pts]]
-		"bars":
-			return [["poly", _rect(-0.9, -0.85, 0.9, -0.43)], ["poly", _rect(-0.9, -0.21, 0.9, 0.21)], ["poly", _rect(-0.9, 0.43, 0.9, 0.85)]]
+		"bolt":
+			return [["poly", [Vector2(0.45, -0.98), Vector2(-0.88, 0.18), Vector2(-0.12, 0.18), Vector2(-0.45, 0.98), Vector2(0.88, -0.18), Vector2(0.12, -0.18)]]]
 		"hourglass":
 			return [["poly", [Vector2(-0.8, -0.95), Vector2(0.8, -0.95), Vector2(0, 0.02)]], ["poly", [Vector2(0, -0.02), Vector2(0.8, 0.95), Vector2(-0.8, 0.95)]]]
 		"frame":
 			return [["poly", _rect(-0.85, -0.85, 0.85, -0.5)], ["poly", _rect(-0.85, 0.5, 0.85, 0.85)],
 				["poly", _rect(-0.85, -0.85, -0.5, 0.85)], ["poly", _rect(0.5, -0.85, 0.85, 0.85)]]
-		"bullseye":
-			return [["ring", 0.72, 0.26], ["disc", 0.28]]
+		"arrow":
+			return [["poly", [Vector2(-0.95, -0.25), Vector2(0.15, -0.25), Vector2(0.15, -0.8), Vector2(0.98, 0), Vector2(0.15, 0.8), Vector2(0.15, 0.25), Vector2(-0.95, 0.25)]]]
 		"chevron":
 			return [["poly", [Vector2(0, -0.85), Vector2(0.95, 0.15), Vector2(0.95, 0.75), Vector2(0, -0.2), Vector2(-0.95, 0.75), Vector2(-0.95, 0.15)]]]
 	return []
