@@ -342,10 +342,23 @@ func _booster_requests_no_silent_spend() -> void:
 		and eco.boosters.charges(BoosterInventory.SELECTOR) == 1 and eco.wallet.scrub_bucks() == sb0,
 		"Selector with charge: USE-mode target picker opens, charge NOT consumed")
 	h.get_modal_stack().clear("t")
+	var rc0: int = eco.boosters.charges(BoosterInventory.RANDOM)
 	s.get_booster_button("random").pressed.emit()
 	var rr: Dictionary = h.last_booster_request
-	_ok(eco.wallet.scrub_bucks() == sb0 and (rr.get("ok", false) == (eco.boosters.charges(BoosterInventory.RANDOM) == 2)),
-		"Random with charge: canonical facade, charge-first (ok=%s reason=%s, charges now %d; a refused effect refunds the charge), SB untouched" % [str(rr.get("ok")), str(rr.get("reason", "")), eco.boosters.charges(BoosterInventory.RANDOM)])
+	# M46 R06: at a still moment the owned Random opens a "Checking..." hold popup; the proof runs
+	# off-frame, then the charge is used automatically (popup closes) or refused (popup stays).
+	var held: bool = rr.get("reason", "") == "checking"
+	if held:
+		while h.is_booster_proof_running():
+			await process_frame
+		for _i in range(4):
+			await process_frame
+	var used: bool = eco.boosters.charges(BoosterInventory.RANDOM) == rc0 - 1
+	var consistent: bool = (rr.get("ok", false) == used) if not held \
+		else (used == not h.get_modal_stack().is_open())
+	_ok(eco.wallet.scrub_bucks() == sb0 and consistent and eco.boosters.charges(BoosterInventory.RANDOM) >= rc0 - 1,
+		"Random with charge: canonical facade, charge-first (ok=%s reason=%s held=%s, charges now %d; a refused effect spends nothing), SB untouched" % [str(rr.get("ok")), str(rr.get("reason", "")), str(held), eco.boosters.charges(BoosterInventory.RANDOM)])
+	h.get_modal_stack().clear("t")
 	_complete("booster_requests_no_silent_spend")
 
 ## Timed 2x: live wall-clock label; frozen on clock rollback (M55-C002 high-water).

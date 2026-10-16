@@ -27,7 +27,7 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
     - Round-2 shape swap `a9ebe920`: local 10/10 only, rides the next planned run.
   - **Owner visual sign-off for symbol art + navy PLAY label = OPEN.** M44-018 / 020 remain OPEN.
   - Next autonomous milestone: **M46 Performance**.
-- Next Task/Action: **[2026-10-16 owner decision] CLAUDE M46 R06: a time-sliced off-frame booster safety proof with a "Checking…" state.** Plan `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_M46_R06_OFFFRAME_PROOF_PLAN_V01.md`; R05's 400 ms synchronous budget stays until R06 is accepted. Owner gates: O1 spinner, O2 total cap (5 s proposed), O3 owned-Random HUD hold. R02–R05 are done (logs R02..R05 in the same folder). **ABSOLUTE OWNER COST FREEZE: NO GitHub Actions, validation_only, reruns, APK/IPA, paid runners/services or reenable.** Source-only commit and local Godot 4.7.2 bounded tests permitted, C: disk sweeps not permitted; preserve owner files/saves. ChatGPT's M46 audit: `coordination/sessions/M46-PERFORMANCE-C001/CHATGPT_INDEPENDENT_AUDIT_V01.md`. After R02 continue autonomous M46/M54 safe coding without micro-approval.
+- Next Task/Action: **M46 R06 off-frame booster proof is LOCAL_PASS and awaits owner F5 visual sign-off** ("Checking..." popup line, HUD Random hold); log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R06_V01.md`. Next: the scratch-slot rebuild soundness fix (pre-existing since M39: remaining / WAITING / placement sequence), owner-requested 2026-10-16, log `CLAUDE_LOG_SLOT_REBUILD_V01.md`. R02–R06 are done (logs in the same folder). **ABSOLUTE OWNER COST FREEZE: NO GitHub Actions, validation_only, reruns, APK/IPA, paid runners/services or reenable.** Source-only commit and local Godot 4.7.2 bounded tests permitted, C: disk sweeps not permitted; preserve owner files/saves. ChatGPT's M46 audit: `coordination/sessions/M46-PERFORMANCE-C001/CHATGPT_INDEPENDENT_AUDIT_V01.md`. After R02 continue autonomous M46/M54 safe coding without micro-approval.
 - Required Actor: **CLAUDE CODE** implements offline and preserves owner files; **CHATGPT** audits source/tracker; owner only signs off visual design and alone can reauthorize GitHub Actions. Never ask routine coding approvals or invent paid validation.
 - **OWNER RESOLVED BOTH M50 DESIGN DECISIONS [2026-10-15]:** YES, add durable distinguishing per-color symbols to color-coded gameplay Supply/Slot tiles and related meaningful cues; green hero PLAY button stays GREEN, its PLAY label becomes DARK NAVY. Concept/color decision AUTHORIZED for Claude to code and verify under **same existing** `coordination/autonomy/SCRUBBOTS_CLAUDE_GODOT_LOCAL_PLAYABLE_SYNC_V01.md` (prompt updated in-place). No second prompt. M50-002/004 implementation NOT YET VERIFIED, symbol appearance requires later owner visual acceptance; keep checklist rows unchecked until code+CI/visual evidence exists. No owner approval required to begin prototype/implementation. **SUBSEQUENT SOURCE/CI UPDATE:** implemented after this authorization; see Claude review at top and ChatGPT independent audit `coordination/sessions/DEV-GODOT-LOCAL-PLAY-C001/CHATGPT_INDEPENDENT_AUDIT_V01.md`. Final symbol appearance remains owner-gated.
 - **2026-10-15 NEW CHATGPT CROSS-AUDIT (M44-D2/M49/M50/M51):** `coordination/sessions/M49-RESPONSIVE-UI-C001/CHATGPT_CROSS_M44_M49_M50_M51_INDEPENDENT_AUDIT_V01.md`. GitHub run 38753823564 final `validate=success`, `export=skipped`, 38/38; M44 23/23, M49 8/8, M50 4/4, M51 4/4. Scoped technical row updates below; owner-device, UI, glyph/contrast, whole-surface stress and shipping remain gated. Older failure runs are recorded in audit rather than erased.
@@ -2329,6 +2329,30 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R04_V01.md`.
   - phone / GPU, ChatGPT audit, cloud CI.
 
 Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R05_V01.md`.
+
+**[2026-10-16 R06] off-frame booster safety proof with a "Checking..." state: LOCAL_PASS; owner F5 visual sign-off OPEN.** Owner chose the defaults: O1 text, O2 5 s cap, O3 HUD hold.
+- **Why a thread:** step 1 measured a single proof placement at 87–456 ms, so cooperative slicing was not viable (plan §0 amendment).
+- **How it works:** the unchanged proof runs on a WorkerThreadPool task over a detached adapter copy; the shared static mask cache is now Mutex-guarded. The verdict is cached for the exact state (Array key), so legality and execute answer at once.
+- **UX:**
+  - popups show "Checking..." with Use / SB blocked;
+  - an owned Random tapped at a still moment holds, then auto-uses once;
+  - a 5 s timeout is cached (no re-freeze; retry after the next move);
+  - cancel on close / retry / exit.
+- **p22 (59×59 still):**
+  - worst frame while proving 0.6–1.4 ms;
+  - check start about 1 ms;
+  - cancel 2–3 ms;
+  - stale result dropped;
+  - HUD Random used once with 0 main-thread proofs;
+  - detached copy == live verdicts on L1–L4 starts and an L1 mid-play state.
+- **Regressions:** 22 suites PASS locally. Oracles updated in m28_c002_c003 / m28_c002_c001 (they wait for the check).
+- **Review:** distinct `CLAUDE_PEER_REVIEW` (not ChatGPT) CONDITIONAL; its majors and minors are fixed.
+- **Open:**
+  - the rewarded-grant / FTUE legality calls still use the 400 ms synchronous path;
+  - the 59×59 Selector list is partial at the 5 s cap;
+  - phone / GPU, ChatGPT audit, cloud CI.
+
+Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R06_V01.md`.
 
 - [ ] SB-M46-001 Level parsing.
 - [ ] SB-M46-002 BoardState.

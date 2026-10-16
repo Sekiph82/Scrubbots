@@ -6,6 +6,30 @@
 
 **Base:** `origin/main` `f96e7cd3` (R05: 400 ms synchronous budget, fail closed, nothing spent). R05 stays the shipped behaviour until R06 is implemented, reviewed and owner-accepted.
 
+## 0. AMENDMENT (implementation, 2026-10-16): worker thread instead of cooperative slicing
+Owner chose the defaults (chat: "Start R06 with the proposed defaults"):
+- O1: text "Checking…";
+- O2: 5 s total cap;
+- O3: HUD hold.
+
+**Step 1 measured the slice granularity** (p22, desktop):
+
+| Where | One atomic `apply_placement` (a dispatch-to-quiescence cascade) | One DFS node |
+| --- | --- | --- |
+| 59×59 still | 160–456 ms | 0.7–1.7 s |
+| L1–L10 | 87–246 ms | 0.2–0.7 s |
+
+A 4 ms per-frame slice would need the kernel cascade split mid-wave. That is a deep change to proof internals, with correctness risk.
+
+**Design changed** (same behaviour and owner gates, simpler and exact). The existing proof code runs unchanged on a **WorkerThreadPool task** over `ProductionBoosterAdapter.detached_copy()`:
+- a frozen board snapshot;
+- copied supply and slots;
+- no scheduler.
+
+The §2 fact 3 race is removed at its source: `ProductionTargetAccess` uses its static mask cache only on the main thread, and a worker builds private masks with the same values. `RuntimePerfProbe` records the main thread only.
+
+The verdict is cached on the live adapter for exactly the proven state (`state_key`), so legality and execute answer without re-proving. Cancel uses a sticky kernel flag. §3.1's resumable solver object is therefore not needed.
+
 ## 1. Problem (measured in R05, desktop CPU)
 At a still moment (0 robots in flight), the booster safety proof is long.
 
