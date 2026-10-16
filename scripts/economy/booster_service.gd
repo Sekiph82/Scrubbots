@@ -76,7 +76,8 @@ func apply_plus_one_slot(capacity_authority) -> Dictionary:
 func apply_random(adapter) -> Dictionary:
 	var proposal: Dictionary = adapter.propose_random_reorder()
 	if not proposal.get("safe", false):
-		return {"ok": false, "reason": "not_solver_safe"}   # no charge, no reorder
+		# no charge, no reorder; "proof_timeout" when the owner proof budget ran out (retry later)
+		return {"ok": false, "reason": String(proposal.get("reason", "not_solver_safe"))}
 	var res := _inventory.reserve(BoosterInventory.RANDOM)
 	if not res.get("ok", false):
 		return {"ok": false, "reason": res.get("reason", "reserve_failed")}
@@ -96,7 +97,10 @@ func apply_selector(adapter, batch_id) -> Dictionary:
 	var eligible: bool = adapter.is_batch_eligible(batch_id) if adapter.has_method("is_batch_eligible") \
 		else adapter.eligible_safe_batches().has(batch_id)
 	if not eligible:
-		return {"ok": false, "reason": "not_eligible"}   # unsafe/full -> no charge
+		# Unsafe / full -> no charge. Owner proof budget exhausted -> "proof_timeout": also no
+		# charge, nothing changed, the player can simply try again.
+		var timed_out: bool = adapter.has_method("last_proof_timed_out") and adapter.last_proof_timed_out()
+		return {"ok": false, "reason": "proof_timeout" if timed_out else "not_eligible"}
 	var res := _inventory.reserve(BoosterInventory.SELECTOR)
 	if not res.get("ok", false):
 		return {"ok": false, "reason": res.get("reason", "reserve_failed")}

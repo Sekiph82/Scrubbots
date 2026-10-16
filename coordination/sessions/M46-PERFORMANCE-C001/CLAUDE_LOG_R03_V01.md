@@ -8,7 +8,11 @@
 **Result: R03_PARTIAL**
 - **Functional:** every gate passes. `p20` passes standalone repeatedly, and every functional assertion of all 20 cases passed in each of 3 full-suite runs.
 - **Timing:** the full-suite timing gates are **not stable on this laptop right now**. Each full run had exactly one timing failure, in a different case each time (p20 p99, then p19 FULL p99, then p18 mean / p99). Every one coincided with a fixed CPU calibration workload slowing down 2.5–9× (23 → 215 ms).
-- **Cause:** the owner's open Godot editor was using about one full core (4.95 CPU-s in 5 s), plus the ChatGPT and Codex apps.
+- **Cause:** a `Godot_v4.7.2-stable_win64` process was using about one full core (4.95 CPU-s in 5 s), plus the ChatGPT and Codex apps.
+  - **CORRECTION [2026-10-16, R05]:** I attributed this process to "the owner's open Godot editor" **without checking its command line**. That was not verified.
+  - Later I found that the WinGet launcher runs tests as a `Godot_v4.7.2-stable_win64_console` wrapper plus a child engine process, and that stopping a background task does not necessarily stop that child.
+  - The busy process may therefore have been an orphaned test run of mine, or another agent's headless probe (one such probe, `tests/m17_difficulty_validation_probe.gd`, was seen running later).
+  - The machine was contended either way, but the owner editor attribution is withdrawn.
 - **Not done about it:** budgets were not loosened, and the timing gates were not made load-aware. A clean full-suite timing run needs an uncontended machine.
 
 ## New p20 (tests/m46_performance.gd)

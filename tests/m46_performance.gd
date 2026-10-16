@@ -48,6 +48,13 @@ extends SceneTree
 ##                                timed, charged exactly once, Random reverses the live supply
 ##                                with every batch conserved, Selector moves the chosen batch into
 ##                                the rightmost empty slot; illegal / terminal refusals; WON
+##   p21 proof budget             (R05, owner rules 2026-10-16) Random / Selector safety proofs are
+##                                capped (ProductionBoosterAdapter.PROOF_BUDGET_MS) on 59x59 stripe and
+##                                pocket levels, with robots MOVING and with robots STILL: every call
+##                                ends within budget + margin; a timeout cancels with
+##                                "proof_timeout" and spends no charge / SB and changes nothing;
+##                                the player can retry (after a tap Random succeeds); a cut Selector
+##                                list resumes where it stopped; refusal rates are measured
 ##   p12 repeated restart         30 retries mid-level: nodes exact, objects / memory bounded
 ##   p13 long session             a COMPLETE 59x59 level (3,481 clears) through the real
 ##                                production host to WON; frame-time distribution
@@ -115,7 +122,7 @@ const MAX_FRAMES := 60000
 var EXPECTED_CASES := ["p01_parse", "p02_board_state", "p03_renderer", "p04_index_access", "p05_selector", "p06_routing",
 	"p07_agents", "p08_effects", "p09_memory_baseline", "p10_memory_59", "p11_allocation", "p12_restart",
 	"p13_long_session", "p14_agent_density", "p15_ui_idle_churn", "p16_unlock_chains_waiting",
-	"p17_sixth_slot_boosters", "p18_winding_routes", "p19_effect_budget", "p20_random_selector"]
+	"p17_sixth_slot_boosters", "p18_winding_routes", "p19_effect_budget", "p20_random_selector", "p21_proof_budget"]
 var _fail := 0
 var _completed: Dictionary = {}
 var _tmp: Array = []
@@ -175,6 +182,9 @@ func _initialize() -> void:
 	if only.is_empty() or only.has("rs"):
 		await _p20()
 		print("  [rs case %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
+	if only.is_empty() or only.has("budget"):
+		await _p21()
+		print("  [budget case %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
 	print("M46 SUMMARY:")
 	for line in _summary:
 		print("    " + line)
@@ -1555,6 +1565,151 @@ func _p20() -> void:
 		frames, st["mean"], st["p99"], float(R.get("legal_ms", 0.0)), float(R.get("exec_ms", 0.0)), float(S.get("legal_ms", 0.0)), float(S.get("exec_ms", 0.0)), worst_ms])
 	_free_host(h)
 	_complete("p20_random_selector")
+
+## Tick without topping up slots until `free` slots are empty (robots may keep moving).
+func _hold_until_free(h, free: int) -> void:
+	for _i in range(6000):
+		if h.get_slots().snapshot().size() - _occupied(h) >= free:
+			return
+		h.get_runtime().tick(DT)
+		await process_frame
+
+## One timed booster call -> [result, ms].
+func _timed(f: Callable) -> Array:
+	var t0 := Time.get_ticks_usec()
+	var r = f.call()
+	return [r, _ms(t0)]
+
+func _p21() -> void:
+	print("[p21 owner proof budget: moving vs still robots at 59x59]")
+	var RANDOM: String = BoosterInventory.RANDOM
+	var SELECTOR: String = BoosterInventory.SELECTOR
+	var budget: float = float(ProductionBoosterAdapter.PROOF_BUDGET_MS)
+	var limit: float = budget + 200.0   # the node in progress when the budget passes may finish
+	var worst := 0.0
+	var counts := {"moving": {}, "still": {}}
+	var all_ok := true
+	for which in ["stripes", "pocket"]:
+		var level: Dictionary = _stripe_level_dict() if which == "stripes" else _pocket_level_dict()
+		var h = await _host(level, "budget_" + which, {} if which == "stripes" else _pocket_plan(level))
+		var rt = h.get_runtime()
+		rt.set_speed_2x(true)
+		var eco = h.get_economy()
+		var a = h.get_booster_adapter()
+		eco.wallet.debit("scrub_bucks", eco.wallet.scrub_bucks())   # charges only; SB must stay 0
+		# MOVING: 6 samples, each with >= 3 free slots while robots are still travelling.
+		var moving_ok := true
+		for k in range(6):
+			for _i in range(500):
+				_feed(h)
+				rt.tick(DT)
+				await process_frame
+			await _hold_until_free(h, 3)
+			var inflight: int = h.get_scheduler().live_assignment_count()
+			var lr: Array = _timed(func(): return h.booster_legality(RANDOM))
+			var ls: Array = _timed(func(): return h.booster_legality(SELECTOR))
+			worst = maxf(worst, maxf(lr[1], ls[1]))
+			for pair in [["random", lr[0]], ["selector", ls[0]]]:
+				var key := "%s:%s" % [pair[0], "legal" if pair[1].get("legal", false) else String(pair[1].get("reason", ""))]
+				counts["moving"][key] = int(counts["moving"].get(key, 0)) + 1
+			moving_ok = moving_ok and lr[1] <= limit and ls[1] <= limit and (inflight == 0 or (lr[0].get("legal", false) and ls[0].get("legal", false)))
+		# STILL: stop tapping until every robot has arrived (the completion check runs as in play).
+		var tick_worst := 0.0
+		for _i in range(6000):
+			if h.get_scheduler().live_assignment_count() == 0:
+				break
+			var t1 := Time.get_ticks_usec()
+			rt.tick(DT)
+			tick_worst = maxf(tick_worst, _ms(t1))
+			await process_frame
+		var still: bool = h.get_scheduler().live_assignment_count() == 0
+		# FORCED timeout (adapter budget 1 ms: deterministic on any machine). Every refusal is
+		# proof_timeout and spends nothing on BOTH paths (SB buy-and-use with 0 charges, then an
+		# owned charge); the Selector list / has-any rotate past each timed-out batch.
+		var bid0: String = String(_supply_list(h)[0]).get_slice(":", 0)
+		var forced_ok: bool = still and eco.boosters.charges(RANDOM) == 0 and eco.boosters.charges(SELECTOR) == 0
+		a.budget_ms = 1
+		eco.wallet.credit("scrub_bucks", int(eco.config.booster_price(RANDOM)) + int(eco.config.booster_price(SELECTOR)))
+		for path in ["sb", "charge"]:
+			if path == "charge":
+				eco.boosters.add_charges(RANDOM, 1)
+				eco.boosters.add_charges(SELECTOR, 1)
+			var ef := _eco_core(eco)
+			var sf := _supply_list(h)
+			var fr: Dictionary = h.execute_booster(RANDOM)
+			var fs: Dictionary = h.execute_booster(SELECTOR, bid0)
+			var unchanged: bool = _eco_core(eco) == ef and _supply_list(h) == sf
+			forced_ok = forced_ok and fr.get("reason") == "proof_timeout" and fs.get("reason") == "proof_timeout" and unchanged
+			print("    forced %s path: Random %s, Selector %s, economy+supply unchanged %s" % [path, fr.get("reason"), fs.get("reason"), str(unchanged)])
+		var n_ids: int = _supply_list(h).size()
+		var offs: Array = [a._list_offset]
+		for _k in range(3):
+			var fl: Dictionary = h.booster_legality(SELECTOR)
+			forced_ok = forced_ok and fl.get("partial", false) and fl.get("reason") == "proof_timeout"
+			offs.append(a._list_offset)
+		var fh: bool = a.has_eligible_safe_batch()
+		offs.append(a._list_offset)
+		for k in range(1, offs.size()):
+			forced_ok = forced_ok and int(offs[k]) == (int(offs[k - 1]) + 1) % n_ids   # one slow batch never pins a retry
+		forced_ok = forced_ok and not fh and a.last_proof_timed_out()
+		print("    forced list offsets %s over %d batches" % [str(offs), n_ids])
+		a.budget_ms = ProductionBoosterAdapter.PROOF_BUDGET_MS
+		eco.wallet.debit("scrub_bucks", eco.wallet.scrub_bucks())
+		_ok(forced_ok, "%s: forced 1 ms budget at a still moment -> Random + Selector proof_timeout on SB and charge paths, nothing spent, supply unchanged; list/has-any rotate one batch per retry" % which)
+		# Random at a still moment: either proven within the budget or cancelled with nothing spent.
+		var e0 := _eco_core(eco)
+		var s0 := _supply_list(h)
+		var rr: Array = _timed(func(): return h.execute_booster(RANDOM))
+		worst = maxf(worst, rr[1])
+		var r_key := "random:%s" % ("legal" if rr[0].get("ok", false) else String(rr[0].get("reason", "")))
+		counts["still"][r_key] = int(counts["still"].get(r_key, 0)) + 1
+		var r_safe: bool = rr[0].get("ok", false) or (rr[0].get("reason") == "proof_timeout" and _eco_core(eco) == e0 and _supply_list(h) == s0)
+		# Selector list at the still moment: bounded, partial lists resume on the next call.
+		var off0: int = a._list_offset
+		var l1: Array = _timed(func(): return h.booster_legality(SELECTOR))
+		var off1: int = a._list_offset
+		var l2: Array = _timed(func(): return h.booster_legality(SELECTOR))
+		worst = maxf(worst, maxf(l1[1], l2[1]))
+		var resumed: bool = not l1[0].get("partial", false) or off1 != off0
+		var s_key := "selector:%s" % ("legal" if l1[0].get("legal", false) else String(l1[0].get("reason", "")))
+		counts["still"][s_key] = int(counts["still"].get(s_key, 0)) + 1
+		# Selector on the player's chosen batch (the first supply batch) at the still moment.
+		var bid: String = String(_supply_list(h)[0]).get_slice(":", 0)
+		var e1 := _eco_core(eco)
+		var s1 := _supply_list(h)
+		var sx: Array = _timed(func(): return h.execute_booster(SELECTOR, bid))
+		worst = maxf(worst, sx[1])
+		var sel_safe: bool = (sx[0].get("ok", false) and eco.boosters.charges(SELECTOR) == 0 and _slot_batches(h).has(bid)) \
+			or (sx[0].get("reason") in ["proof_timeout", "not_eligible"] and _eco_core(eco) == e1 and _supply_list(h) == s1)
+		var x_key := "selector_execute:%s" % ("ok" if sx[0].get("ok", false) else String(sx[0].get("reason", "")))
+		counts["still"][x_key] = int(counts["still"].get(x_key, 0)) + 1
+		# Retry: the player taps a batch (robots move again) and Random goes through.
+		var retry_ok := true
+		if not rr[0].get("ok", false):
+			var ic = h.get_input_controller()
+			for col in range(5):
+				if ic.activate_front(col).get("ok", false):
+					break
+			for _i in range(60):
+				rt.tick(DT)
+				await process_frame
+				if h.get_scheduler().live_assignment_count() > 0:
+					break
+			await _hold_until_free(h, 3)
+			var ch: int = eco.boosters.charges(RANDOM)
+			var r2: Array = _timed(func(): return h.execute_booster(RANDOM))
+			worst = maxf(worst, r2[1])
+			retry_ok = r2[0].get("ok", false) and eco.boosters.charges(RANDOM) == ch - 1 and eco.wallet.scrub_bucks() == 0
+		print("    %s: still=%s (completion tick worst %.0f ms) Random %s %.0f ms | Selector list %s %.0f / %.0f ms (offset %d -> %d) | Selector execute %s %.0f ms | retry ok %s" % [
+			which, str(still), tick_worst, r_key, rr[1], s_key, l1[1], l2[1], off0, off1, x_key, sx[1], str(retry_ok)])
+		var ok_here: bool = moving_ok and still and r_safe and resumed and sel_safe and retry_ok and eco.wallet.scrub_bucks() == 0
+		all_ok = all_ok and ok_here
+		_ok(ok_here, "%s: moving samples fast + legal while robots travel; still moment: Random %s, Selector list %s (resumable), chosen-batch Selector %s, nothing spent on any refusal, retry after a tap succeeds" % [which, r_key, s_key, x_key])
+		_free_host(h)
+	print("    outcome counts: %s" % str(counts))
+	_ok(worst <= limit, "every booster proof call ended within %.0f ms (budget %.0f ms + node margin); worst %.0f ms" % [limit, budget, worst])
+	_summary.append("R05 p21 proof budget %d ms: worst call %.0f ms; outcomes %s" % [ProductionBoosterAdapter.PROOF_BUDGET_MS, worst, str(counts)])
+	_complete("p21_proof_budget")
 
 ## Every gameplay truth a pause must freeze (detached copies).
 func _truth(h) -> Dictionary:

@@ -765,6 +765,9 @@ func next_start_prover() -> Callable:
 		return func(_id): return false
 	var slots = FiveSlotBatchEngine.new()
 	var adapter = ProductionBoosterAdapter.new(_level, BoardState.from_level_data(_level), supply, slots, null)
+	# Unbudgeted (pre-M46-R05): the Need-a-Hand pick must stay deterministic, not machine-speed
+	# dependent. Its Fail-screen cost on large boards is an open owner decision (M46 R05 log).
+	adapter.budget_ms = 0
 	return func(id) -> bool:
 		match String(id):
 			BoosterInventory.PLUS_ONE_SLOT:
@@ -926,8 +929,9 @@ func booster_legality(id: String) -> Dictionary:
 			var ok: bool = _economy.capacity.can_activate_plus_one() and _slots != null and _slots.can_grow_to_sixth()
 			return {"legal": ok, "reason": "" if ok else "plus_one_used", "targets": []}
 		BoosterInventory.RANDOM:
-			var ok2: bool = bool(_booster_adapter.propose_random_reorder().get("safe", false))
-			return {"legal": ok2, "reason": "" if ok2 else "not_solver_safe", "targets": []}
+			var prop: Dictionary = _booster_adapter.propose_random_reorder()
+			var ok2: bool = bool(prop.get("safe", false))
+			return {"legal": ok2, "reason": "" if ok2 else String(prop.get("reason", "not_solver_safe")), "targets": []}
 		BoosterInventory.SELECTOR:
 			var info := {}
 			for col in _supply.debug_snapshot()["columns"]:
@@ -939,7 +943,10 @@ func booster_legality(id: String) -> Dictionary:
 				var ci := int(bd.get("color_id", -1))
 				targets.append({"key": bid, "color": colors[ci] if ci >= 0 and ci < colors.size() else Color(0.5, 0.5, 0.5),
 					"label": str(int(bd.get("robot_count", 0)))})
-			return {"legal": not targets.is_empty(), "reason": "" if not targets.is_empty() else "not_eligible", "targets": targets}
+			# Owner proof budget: a cut-off list is partial (the rest are re-checked next time).
+			var partial: bool = _booster_adapter.last_proof_timed_out()
+			var why := "" if not targets.is_empty() else ("proof_timeout" if partial else "not_eligible")
+			return {"legal": not targets.is_empty(), "reason": why, "targets": targets, "partial": partial}
 		BoosterInventory.TORNADO:
 			var ct: Array = []
 			for c in _booster_adapter.present_colors():

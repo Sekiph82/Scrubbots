@@ -246,9 +246,15 @@ func _g02_target_visible_acquire() -> void:
 		if id == "random":
 			_ok(_chips(p).is_empty() and p.get_action_button("sb").text == UiText.t("BOOSTER_USE_SB", [UiText.num(350)]), "random: no picker, 350 SB")
 		else:
-			var leg: Dictionary = _host.booster_legality(id)
+			# The legality the popup itself showed (a fresh budgeted call may be a different partial list).
+			var leg: Dictionary = p.get_meta("legality")
 			var chips := _chips(p)
-			var proof: Array = _host.get_booster_adapter().eligible_safe_batches() if id == "selector" else _host.get_booster_adapter().present_colors()
+			# M46 R05: the popup list is budgeted (possibly partial, rotating); every chip must be
+			# in the FULL unbudgeted solver-safe proof.
+			var ad = _host.get_booster_adapter()
+			ad.budget_ms = 0
+			var proof: Array = ad.eligible_safe_batches() if id == "selector" else ad.present_colors()
+			ad.budget_ms = ad.PROOF_BUDGET_MS
 			var keys_ok := true
 			for t in leg["targets"]:
 				keys_ok = keys_ok and proof.has(t["key"])

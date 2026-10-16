@@ -30,6 +30,21 @@ var _supply
 var _slots
 var _scheduler          # M26 auto-dispatch scheduler (for in-flight quiescence)
 var _classifier
+## Owner proof budget (ms) for one player-facing booster safety question; see _begin_budget().
+## Owner target 250 ms (2026-10-16), raised to the measured safe limit: at a 59x59 quiet moment
+## (no robot in flight) one Selector single-batch proof needs 249-361 ms on the desktop, so 250
+## would refuse the player's chosen batch; Random's 3-placement proof needs 3.8-24.5 s there,
+## which no responsive budget covers (it fails closed and is ~3 ms once any robot moves).
+const PROOF_BUDGET_MS := 400
+## This adapter's budget; 0 = unbudgeted (the Need-a-Hand next-start prover keeps its pre-R05
+## deterministic, machine-speed-independent proofs). Tests may lower it to force a timeout.
+var budget_ms := PROOF_BUDGET_MS
+var _deadline_usec := 0
+var _budget_hit := false
+var _last_timed_out := false
+## Selector list resume point: a cut-off list continues from here on the next call, so a
+## valid batch is never permanently hidden by the budget.
+var _list_offset := 0
 ## Optional fault injector for tests: Callable(stage:String) -> bool; true forces
 ## that stage to fail so rollback can be proven. Never set in production.
 var _fault: Callable = Callable()
@@ -109,8 +124,12 @@ func propose_random_reorder() -> Dictionary:
 		for _i in range(q.size()):
 			nq.append(flat[k]); k += 1
 		reordered.append(nq)
-	if not _prove_three_consecutive_safe(reordered):
-		return {"safe": false}
+	_begin_budget()
+	var proven := _prove_three_consecutive_safe(reordered)
+	var timed_out := _budget_hit
+	_end_budget()
+	if not proven:
+		return {"safe": false, "reason": "proof_timeout" if timed_out else "not_solver_safe"}
 	return {
 		"safe": true,
 		"commit": func():
@@ -193,13 +212,35 @@ func _is_safe_probe(scratch_supply, scratch_slots) -> bool:
 	var inflight := _inflight()
 	if inflight > 0 and _proof_state_buildable(scratch_supply, scratch_slots):
 		return true
+	# Owner proof budget: an exhausted budget is "not proven safe" (fail closed, nothing reserved).
+	if _deadline_usec > 0 and Time.get_ticks_usec() >= _deadline_usec:
+		_budget_hit = true
+		return false
 	var state = ProofState.from_runtime(_level, _board, scratch_supply, scratch_slots)
 	if state == null:
 		return false
-	var status = _classifier.classify(state, inflight).get("status", &"")
+	var res: Dictionary = _classifier.classify(state, inflight, {"deadline_usec": _deadline_usec} if _deadline_usec > 0 else {})
+	var status = res.get("status", &"")
+	if String(res.get("reason", "")) == "time_budget_exhausted" \
+			or (status == DeadlockClassifier.UNKNOWN_BOUND and _deadline_usec > 0 and Time.get_ticks_usec() >= _deadline_usec):
+		_budget_hit = true
 	return status == DeadlockClassifier.PROGRESSABLE \
 		or status == DeadlockClassifier.STALLED \
 		or status == DeadlockClassifier.COMPLETED
+
+## Owner proof budget (2026-10-16): one wall-clock budget per player-facing safety question
+## (Random legality / apply, Selector list / single batch / has-any). Never nested; each question
+## starts a fresh deadline, so an aborted call can never leave a stale one behind.
+func _begin_budget() -> void:
+	_budget_hit = false
+	_deadline_usec = Time.get_ticks_usec() + budget_ms * 1000 if budget_ms > 0 else 0
+
+func _end_budget() -> void:
+	_deadline_usec = 0
+
+## True when the most recent Selector single-batch / list proof ran out of its budget.
+func last_proof_timed_out() -> bool:
+	return _last_timed_out
 
 ## Exactly the conditions under which ProofState.from_runtime returns a state (not null).
 func _proof_state_buildable(scratch_supply, scratch_slots) -> bool:
@@ -210,39 +251,85 @@ func _proof_state_buildable(scratch_supply, scratch_slots) -> bool:
 
 ## Remaining batch ids that are solver-safe to extract into the rightmost EMPTY
 ## slot right now (requires an empty slot at the current capacity).
+## Under the owner proof budget the list may be cut short (last_proof_timed_out() true): the
+## unproven batches are left out (fail closed) and the next call starts where this one stopped,
+## so every batch is reached again on retry. The result keeps supply (column) order.
 func eligible_safe_batches() -> Array:
 	var out: Array = []
+	_last_timed_out = false
 	if _slots.rightmost_empty_index() == -1:
 		return out   # full at current capacity
 	var original := _current_cols()
-	for col in original:
-		for b in col:
-			var bid = b.get_batch_id()
-			if _selector_reorder_solvable(original, bid):
-				out.append(bid)
+	var ids := _batch_ids(original)
+	if ids.is_empty():
+		return out
+	_begin_budget()
+	var start := _list_offset % ids.size()
+	var proven := {}
+	var checked := 0
+	for k in range(ids.size()):
+		var bid = ids[(start + k) % ids.size()]
+		if _selector_reorder_solvable(original, bid):
+			proven[bid] = true
+		checked += 1
+		if _budget_hit:
+			break   # the rest stay unproven
+	_last_timed_out = _budget_hit
+	# Resume AFTER the batch that ran out, so one slow batch can never pin every retry.
+	_list_offset = (start + checked) % ids.size() if _budget_hit else 0
+	_end_budget()
+	for bid in ids:
+		if proven.has(bid):
+			out.append(bid)
 	return out
+
+func _batch_ids(cols: Array) -> Array:
+	var ids: Array = []
+	for col in cols:
+		for b in col:
+			ids.append(b.get_batch_id())
+	return ids
 
 ## Is exactly `batch_id` solver-safe to extract right now? The same rule as membership in
 ## eligible_safe_batches() (empty slot + remaining batch + post-placement safety), proven for
-## that one batch only (M46: the full list re-runs the solver per remaining batch).
+## that one batch only (M46: the full list re-runs the solver per remaining batch). False with
+## last_proof_timed_out() when the owner proof budget ran out (fail closed, retry later).
 func is_batch_eligible(batch_id) -> bool:
+	_last_timed_out = false
 	if typeof(batch_id) != TYPE_STRING and typeof(batch_id) != TYPE_STRING_NAME:
 		return false   # malformed target: never eligible (was never in the id list either)
 	if _slots.rightmost_empty_index() == -1:
 		return false
-	return _selector_reorder_solvable(_current_cols(), String(batch_id))
+	_begin_budget()
+	var ok := _selector_reorder_solvable(_current_cols(), String(batch_id))
+	_last_timed_out = _budget_hit and not ok
+	_end_budget()
+	return ok
 
 ## M43-C004: is at least one batch solver-safe to extract right now? Same proof as
-## eligible_safe_batches(), stopping at the first safe batch (read-only).
+## eligible_safe_batches(), stopping at the first safe batch (read-only). Under a budget it
+## shares the list's resume offset, so a slow first batch cannot pin the answer to false.
 func has_eligible_safe_batch() -> bool:
+	_last_timed_out = false
 	if _slots.rightmost_empty_index() == -1:
 		return false
 	var original := _current_cols()
-	for col in original:
-		for b in col:
-			if _selector_reorder_solvable(original, b.get_batch_id()):
-				return true
-	return false
+	var ids := _batch_ids(original)
+	if ids.is_empty():
+		return false
+	_begin_budget()
+	var start := _list_offset % ids.size()
+	var found := false
+	var checked := 0
+	for k in range(ids.size()):
+		found = _selector_reorder_solvable(original, ids[(start + k) % ids.size()])
+		checked += 1
+		if found or _budget_hit:
+			break
+	_last_timed_out = _budget_hit and not found
+	_list_offset = (start + checked) % ids.size() if _last_timed_out else 0
+	_end_budget()
+	return found
 
 ## Move `batch_id` to the front of its column; the rest keep order. Returns the
 ## reordered cols (or null if not found).

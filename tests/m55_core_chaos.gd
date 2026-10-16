@@ -509,10 +509,10 @@ func _booster_spam() -> void:
 		var r: Dictionary = act.random()
 		if r.get("ok", false):
 			rnd += 1
-		elif String(r.get("reason", "")) != "not_solver_safe":
+		elif not String(r.get("reason", "")) in ["not_solver_safe", "proof_timeout"]:   # M46 R05 budget
 			rnd_other += 1
 	spent += rnd * cfg.booster_price(BoosterInventory.RANDOM)
-	_ok(rnd_other == 0, "every refused Random is an explicit not_solver_safe (committed %d/30)" % rnd)
+	_ok(rnd_other == 0, "every refused Random is an explicit not_solver_safe / proof_timeout (committed %d/30)" % rnd)
 	_ok(eco.wallet.scrub_bucks() == sb0 - spent, "SB spent == sum of committed booster prices (%d)" % spent)
 	# Tornado x10 on one present color: exactly one commit.
 	var color: int = h.get_booster_adapter().present_colors()[0]

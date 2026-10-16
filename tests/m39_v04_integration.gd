@@ -296,9 +296,14 @@ func _phase_e_facade() -> void:
 
 	var results: Array = []
 	results.append(act.plus_one_slot())
+	var rc0: int = econ.boosters.charges(BoosterInventory.RANDOM)
+	var sbr0: int = econ.wallet.scrub_bucks()
 	var rr = act.random()
 	print("  info: random -> ", rr)
-	_ok(rr["ok"] or rr.get("reason", "") == "not_solver_safe", "random: committed or explicit not_solver_safe (no charge)")
+	# M46 R05: a quiet-moment proof over the owner time budget is an explicit
+	# fail-closed refusal (proof_timeout), same no-spend contract as not_solver_safe.
+	_ok(rr["ok"] or rr.get("reason", "") in ["not_solver_safe", "proof_timeout"], "random: committed or explicit not_solver_safe/proof_timeout")
+	_ok(rr["ok"] or (econ.boosters.charges(BoosterInventory.RANDOM) == rc0 and econ.wallet.scrub_bucks() == sbr0), "random refusal: no charge, no SB spent")
 	results.append(rr)
 	var elig: Array = h.get_booster_adapter().eligible_safe_batches()
 	var rs = act.selector(elig[0] if not elig.is_empty() else "none")

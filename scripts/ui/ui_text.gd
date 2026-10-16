@@ -180,6 +180,7 @@ const EN := {
 	"BOOSTER_SAFETY_RANDOM": "Random can't be used safely right now.",
 	"BOOSTER_SAFETY_SELECTOR": "No batch can move safely right now. Free a slot first.",
 	"BOOSTER_SAFETY_TORNADO": "There is no colour to clear right now.",
+	"BOOSTER_SAFETY_BUSY": "The safety check ran out of time. Try again; nothing is spent.",
 	"BOOSTER_USE_OWNED": "USE (%s OWNED)",
 	"BOOSTER_USE_SB": "USE · %s SB",
 	"BOOSTER_PRICE_SB": "%s SB",

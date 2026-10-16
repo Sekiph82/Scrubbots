@@ -6,7 +6,9 @@
 - This cycle addresses R03 open finding 1: Selector legality cost about 0.6 s at 59×59.
 - Godot 4.7.2 headless local only. **No GitHub Actions**, no phone and no GPU.
 
-**Result: LOCAL_PASS for the change.** Full-suite timing is still not re-recorded: the owner's Godot editor was using about one core (5.06 CPU-s / 5 s), and R03 remains PARTIAL by owner choice.
+**Result: LOCAL_PASS for the change.** Full-suite timing is still not re-recorded: a busy Godot process was using about one core (5.06 CPU-s / 5 s), and R03 remains PARTIAL by owner choice.
+
+**Correction (R05):** that process was assumed to be the owner's editor without checking its command line. It may instead have been an orphaned test process. See the R03 log correction.
 
 ## Root cause, measured
 One Selector eligibility proof per remaining batch was profiled at 59×59 with 67 bots in flight. Per batch:

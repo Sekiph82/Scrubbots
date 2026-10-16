@@ -2289,7 +2289,7 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_V01.md`; `CLAUDE_PEER
 
 Rows stay OPEN for: phone/GPU numbers (M47) and a ChatGPT audit.
 
-**[2026-10-16 R03] Random + Selector under 59×59 load: R03_PARTIAL.** Functionally PASS (p20). Full-suite timing is unstable on the owner laptop under contention: the owner's open Godot editor was using about one core.
+**[2026-10-16 R03] Random + Selector under 59×59 load: R03_PARTIAL.** Functionally PASS (p20). Full-suite timing is unstable on the owner laptop under contention: a busy Godot process was using about one core. **Corrected R05:** this was not verified as the owner's editor; it may have been an orphaned test process.
 - **Random:** legal with 3 free slots (its owner rule), charged once, every batch conserved.
 - **Selector:** the chosen batch goes into a slot, charged once.
 - **Production fix:** Selector execute 641 → 44 ms, by proving the single chosen batch. Equivalence was checked for all 92 ids, plus a `CLAUDE_PEER_REVIEW`; booster regressions PASS.
@@ -2306,6 +2306,29 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R03_V01.md`.
 - **Still open:** quiet moments with no bots in flight (full proof, about 1 s list at 59×59; the 5.1 s refusal case). Bounding the classifier is an owner-visible tradeoff.
 
 Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R04_V01.md`.
+
+**[2026-10-16 R05] owner time budget on booster safety proofs: LOCAL_PASS for the owner rules; the budget value is an OWNER DECISION.** Owner rules (chat, 2026-10-16): target 250 ms or a measured safe limit; on timeout cancel safely; never spend SB or a charge; valid moves never permanently blocked, so the player can retry; test 59×59 moving and still; no Actions.
+- **Change:** solver / kernel / classifier take an optional wall-clock deadline, and a timeout is UNKNOWN_BOUND (fail closed). `PROOF_BUDGET_MS = 400`, because a 250 ms limit would refuse a single 59×59 Selector proof (249–361 ms).
+- **Refusals:** a refused Random / Selector returns `proof_timeout`, and nothing is reserved. The Selector list / has-any resume after the batch that ran out. The popup shows a retry line and keeps Random tappable.
+- **Need-a-Hand prover:** stays unbudgeted (deterministic).
+- **Reproduced (unbudgeted, still moment, desktop):**
+  - 59×59: Random 3.8–24.5 s, Selector list about 25–30 s.
+  - Production L1–L10 level start: Random 0.13–4.6 s, Selector list 0.9–12 s.
+
+  These were real freezes before R05.
+- **With 400 ms:**
+  - every call took at most 420 ms;
+  - moving robots: 0% refused;
+  - still 59×59: Random 100% `proof_timeout`;
+  - still L1–L10 start: Random OK only on L1 / L3 / L4.
+  - A retry after a tap succeeds. Forced 1 ms cases prove no spend on both the SB and charge paths and one-batch rotation.
+- **Evidence:** p21 + 17 booster / popup / need-a-hand / chaos / completion suites PASS locally. Test oracles were updated in m39_v04 / m55 / m28 (the no-spend checks are kept). A distinct `CLAUDE_PEER_REVIEW` (not ChatGPT) found 0 blockers; its 4 majors and 4 minors are fixed.
+- **Open:**
+  - owner choice: keep 400 ms, raise it (e.g. 1,000 ms), or move to a time-sliced off-frame proof;
+  - completion LOSE proof at still 59×59 freezes 1.1–3.3 s per tick (owner-locked, reported only);
+  - phone / GPU, ChatGPT audit, cloud CI.
+
+Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R05_V01.md`.
 
 - [ ] SB-M46-001 Level parsing.
 - [ ] SB-M46-002 BoardState.
