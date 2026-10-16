@@ -326,15 +326,19 @@ func _refresh_booster(p, rebuild_targets: bool = false) -> void:
 		_build_targets(p, v)
 	var needs_target: bool = v["target_kind"] != ""
 	var target_ok: bool = not needs_target or p.context.get("target") != null
-	(p.find_child("Safety", true, false) as Label).text = "" if v["legal"] else UiText.t("BOOSTER_SAFETY_" + id.to_upper())
+	# M46 R05: a proof that ran out of the owner time budget is "not proven yet", not "unsafe":
+	# Use / SB stay tappable for a no-target retry; execute re-proves and spends nothing on failure.
+	var retry: bool = v["reason"] == "proof_timeout" and not needs_target
+	(p.find_child("Safety", true, false) as Label).text = "" if v["legal"] \
+		else UiText.t("BOOSTER_SAFETY_BUSY" if v["reason"] == "proof_timeout" else "BOOSTER_SAFETY_" + id.to_upper())
 	var use_b: Button = p.get_action_button("use")
 	use_b.text = UiText.t("BOOSTER_USE_OWNED", [v["charges"]])
 	p.set_action_visible("use", has_charge)
-	p.set_action_blocked("use", not (v["legal"] and target_ok))
+	p.set_action_blocked("use", not ((v["legal"] or retry) and target_ok))
 	var sb_b: Button = p.get_action_button("sb")
 	sb_b.text = UiText.t("BOOSTER_USE_SB", [UiText.num(v["price"])])
 	p.set_action_visible("sb", not has_charge)
-	p.set_action_blocked("sb", not (v["legal"] and target_ok))
+	p.set_action_blocked("sb", not ((v["legal"] or retry) and target_ok))
 	var rw_ok: bool = v["rewarded"].get("ok", false)
 	# Rewarded CTA only when the provider policy offers this booster placement.
 	p.set_action_visible("watch", not has_charge and rw_ok)

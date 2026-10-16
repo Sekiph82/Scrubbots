@@ -54,13 +54,27 @@ func search_progress(root_state, config: Dictionary = {}) -> Dictionary:
 	return _search(root_state, GOAL_PROGRESS, config)
 
 func _search(input_state, goal: StringName, config: Dictionary) -> Dictionary:
+	# The kernel shares the cutoff for exactly this search (a single placement can run a whole
+	# dispatch-to-quiescence cascade), and never keeps it afterwards.
+	_kernel.deadline_usec = int(config.get("deadline_usec", 0))
+	var r := _search_bounded(input_state, goal, config)
+	_kernel.deadline_usec = 0
+	return r
+
+func _search_bounded(input_state, goal: StringName, config: Dictionary) -> Dictionary:
 	var max_visited: int = int(config.get("max_visited", DEFAULT_MAX_VISITED))
 	var max_depth: int = int(config.get("max_depth", DEFAULT_MAX_DEPTH))
+	# Optional wall-clock cutoff (M46, owner 2026-10-16): only the runtime booster safety proofs
+	# pass it, so a player action can never freeze the game. Absent (the default, generation and
+	# every deterministic test/replay path) = no wall-clock influence at all. Hitting it is an
+	# UNKNOWN_BOUND, never a DEADLOCK, so callers fail closed without claiming anything.
+	var deadline_usec: int = int(config.get("deadline_usec", 0))
 	# Normalize the root to a quiescent state (apply any immediately-claimable clears)
 	# through the real kernel, so the search space is exactly quiescent decision points.
 	var q: Dictionary = _kernel.quiesce(input_state)
 	if not q.get("ok", false):
-		return {"status": UNKNOWN_BOUND, "reason": "kernel_build_failed", "visited": 0,
+		var why := "time_budget_exhausted" if q.get("error", "") == "time_budget_exhausted" else "kernel_build_failed"
+		return {"status": UNKNOWN_BOUND, "reason": why, "visited": 0,
 			"memo_hits": 0, "frontier_peak": 0, "max_depth_reached": 0, "decisions": 0,
 			"root_active": -1}
 	var root = q["state"]
@@ -77,6 +91,9 @@ func _search(input_state, goal: StringName, config: Dictionary) -> Dictionary:
 		frontier_peak = maxi(frontier_peak, stack.size())
 		if visited.size() >= max_visited:
 			return _result(UNKNOWN_BOUND, "max_visited_exhausted", visited.size(), memo_hits,
+				frontier_peak, max_depth_reached, root_active, [])
+		if deadline_usec > 0 and Time.get_ticks_usec() >= deadline_usec:
+			return _result(UNKNOWN_BOUND, "time_budget_exhausted", visited.size(), memo_hits,
 				frontier_peak, max_depth_reached, root_active, [])
 		var node: Dictionary = stack.pop_back()
 		var state = node["state"]
@@ -101,8 +118,14 @@ func _search(input_state, goal: StringName, config: Dictionary) -> Dictionary:
 		var cols: Array = state.legal_action_columns()
 		var children: Array = []
 		for c in cols:
+			if deadline_usec > 0 and Time.get_ticks_usec() >= deadline_usec:
+				return _result(UNKNOWN_BOUND, "time_budget_exhausted", visited.size(), memo_hits,
+					frontier_peak, max_depth_reached, root_active, [])
 			var r: Dictionary = _kernel.apply_placement(state, c)
 			if not r.get("ok", false):
+				if r.get("error", "") == "time_budget_exhausted":
+					return _result(UNKNOWN_BOUND, "time_budget_exhausted", visited.size(), memo_hits,
+						frontier_peak, max_depth_reached, root_active, [])
 				continue
 			var child = r["state"]
 			var rec := {"column": c, "placed": r["placed"], "clears": int(r["clears"]),

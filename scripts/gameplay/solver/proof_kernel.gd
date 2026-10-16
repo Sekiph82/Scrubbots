@@ -67,6 +67,8 @@ const ORIGIN_BELOW := 4.0
 ## Bounded guard against a pathological non-terminating clear loop (never expected —
 ## every clear strictly reduces ACTIVE cells — but fail-closed rather than hang).
 const MAX_CLEARS_GUARD := 4000000
+## _run_to_quiescence result when deadline_usec passed (distinct from -1 = incoherent).
+const TIMED_OUT := -2
 
 ## Optional READ-ONLY analysis observer (M53-C001 LevelDifficultyAnalyzerV1). null in
 ## every gameplay/solver path. When set, it is told each successful exact-slot claim
@@ -74,6 +76,11 @@ const MAX_CLEARS_GUARD := 4000000
 ## claims)). It must never mutate the live bundle; the kernel's transitions are identical
 ## with or without it.
 var observer = null
+## Optional wall-clock cutoff (Time.get_ticks_usec value; 0 = none). Set only by the solver /
+## classifier for the runtime booster safety proofs (owner proof budget, M46). When it passes,
+## quiesce / apply_placement return {"ok": false, "error": "time_budget_exhausted"} and the
+## callers report UNKNOWN_BOUND (fail closed). Never set on generation / replay paths.
+var deadline_usec := 0
 
 # ---------------------------------------------------------------- public API ---
 
@@ -84,6 +91,8 @@ func quiesce(state) -> Dictionary:
 	if live.is_empty():
 		return {"ok": false, "error": "build_failed"}
 	var clears := _run_to_quiescence(live)
+	if clears == TIMED_OUT:
+		return {"ok": false, "error": "time_budget_exhausted"}
 	if clears < 0:
 		return {"ok": false, "error": "kernel_incoherent"}
 	return {"ok": true, "state": _read_back(state, live), "clears": clears}
@@ -105,6 +114,8 @@ func apply_placement(state, column: int) -> Dictionary:
 	var placed_color: int = front.get_color_id()
 	var placed_count: int = front.get_robot_count()
 	var clears := _run_to_quiescence(live)
+	if clears == TIMED_OUT:
+		return {"ok": false, "error": "time_budget_exhausted"}
 	if clears < 0:
 		return {"ok": false, "error": "kernel_incoherent"}
 	return {"ok": true, "state": _read_back(state, live), "clears": clears,
@@ -205,6 +216,8 @@ func _run_to_quiescence(live: Dictionary) -> int:
 	var clears := 0
 	var waiting: Dictionary = {}   # slot -> batch_id WAITING on its current batch
 	while true:
+		if deadline_usec > 0 and Time.get_ticks_usec() >= deadline_usec:
+			return TIMED_OUT
 		var claims: Array = []
 		var lanes: Array = _eligible_slots(live.slots, waiting)
 		for slot in lanes:
