@@ -22,6 +22,7 @@ const BatchSupplyEngine = preload("res://scripts/gameplay/supply/batch_supply_en
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const ProofState = preload("res://scripts/gameplay/solver/proof_state.gd")
 const DeadlockClassifier = preload("res://scripts/gameplay/solver/deadlock_classifier.gd")
+const LevelData = preload("res://scripts/data/level_data.gd")
 
 var _level
 var _board
@@ -186,13 +187,24 @@ static func FiveSlotEngineMaxCapacity() -> int:
 ## Same DeadlockClassifier gate as `_is_safe` but taking already-built scratch
 ## supply + slots engines (used inside the 3-consecutive simulation).
 func _is_safe_probe(scratch_supply, scratch_slots) -> bool:
+	# M46: with live in-flight M26 work the classifier answers PROGRESSABLE before reading the
+	# state, so skip building the full ProofState (~6 ms at 59x59, per probe). Exact: the same
+	# null conditions ProofState.from_runtime would hit are checked first.
+	var inflight := _inflight()
+	if inflight > 0 and _proof_state_buildable(scratch_supply, scratch_slots):
+		return true
 	var state = ProofState.from_runtime(_level, _board, scratch_supply, scratch_slots)
 	if state == null:
 		return false
-	var status = _classifier.classify(state, _inflight()).get("status", &"")
+	var status = _classifier.classify(state, inflight).get("status", &"")
 	return status == DeadlockClassifier.PROGRESSABLE \
 		or status == DeadlockClassifier.STALLED \
 		or status == DeadlockClassifier.COMPLETED
+
+## Exactly the conditions under which ProofState.from_runtime returns a state (not null).
+func _proof_state_buildable(scratch_supply, scratch_slots) -> bool:
+	return _level is LevelData and _board != null and scratch_slots != null \
+		and scratch_supply is BatchSupplyEngine and _board.get_cell_count() == _level.get_cell_count()
 
 # ------------------------------------------------------------ Selector ----
 
