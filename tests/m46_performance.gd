@@ -43,6 +43,11 @@ extends SceneTree
 ##                                a dense 59x59 2x run, FULL vs REDUCED: owned work, Spark bursts,
 ##                                native board FX cap, self-free, no replay, cancel / retry /
 ##                                unbind, node / object drift; never per cleared cell
+##   p20 Random + Selector        (R03) the two remaining colour boosters, legally owned, on the
+##                                dense 59x59 pocket level: real legality proofs (solver-safety)
+##                                timed, charged exactly once, Random reverses the live supply
+##                                with every batch conserved, Selector moves the chosen batch into
+##                                the rightmost empty slot; illegal / terminal refusals; WON
 ##   p12 repeated restart         30 retries mid-level: nodes exact, objects / memory bounded
 ##   p13 long session             a COMPLETE 59x59 level (3,481 clears) through the real
 ##                                production host to WON; frame-time distribution
@@ -106,7 +111,7 @@ const MAX_FRAMES := 60000
 var EXPECTED_CASES := ["p01_parse", "p02_board_state", "p03_renderer", "p04_index_access", "p05_selector", "p06_routing",
 	"p07_agents", "p08_effects", "p09_memory_baseline", "p10_memory_59", "p11_allocation", "p12_restart",
 	"p13_long_session", "p14_agent_density", "p15_ui_idle_churn", "p16_unlock_chains_waiting",
-	"p17_sixth_slot_boosters", "p18_winding_routes", "p19_effect_budget"]
+	"p17_sixth_slot_boosters", "p18_winding_routes", "p19_effect_budget", "p20_random_selector"]
 var _fail := 0
 var _completed: Dictionary = {}
 var _tmp: Array = []
@@ -141,28 +146,31 @@ func _initialize() -> void:
 		_p06(dense)
 		_p07(dense)
 		await _p15()
-		print("  [micro cases %d ms]" % (Time.get_ticks_msec() - t0))
+		print("  [micro cases %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
 	if only.is_empty() or only.has("memory"):
 		await _p09_p10()
-		print("  [memory cases %d ms]" % (Time.get_ticks_msec() - t0))
+		print("  [memory cases %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
 	if only.is_empty() or only.has("restart"):
 		await _p12()
-		print("  [restart case %d ms]" % (Time.get_ticks_msec() - t0))
+		print("  [restart case %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
 	if only.is_empty() or only.has("level"):
 		await _p13_p14_p08_p11()
-		print("  [level case %d ms]" % (Time.get_ticks_msec() - t0))
+		print("  [level case %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
 	if only.is_empty() or only.has("pockets"):
 		await _p16()
-		print("  [pockets case %d ms]" % (Time.get_ticks_msec() - t0))
+		print("  [pockets case %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
 	if only.is_empty() or only.has("slot6"):
 		await _p17()
-		print("  [slot6 case %d ms]" % (Time.get_ticks_msec() - t0))
+		print("  [slot6 case %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
 	if only.is_empty() or only.has("maze"):
 		await _p18()
-		print("  [maze case %d ms]" % (Time.get_ticks_msec() - t0))
+		print("  [maze case %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
 	if only.is_empty() or only.has("fx"):
 		await _p19()
-		print("  [fx case %d ms]" % (Time.get_ticks_msec() - t0))
+		print("  [fx case %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
+	if only.is_empty() or only.has("rs"):
+		await _p20()
+		print("  [rs case %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
 	print("M46 SUMMARY:")
 	for line in _summary:
 		print("    " + line)
@@ -1314,6 +1322,206 @@ func _p19() -> void:
 	res.queue_free()
 	_free_host(h)
 	_complete("p19_effect_budget")
+
+## Fixed CPU calibration workload (fresh dense board, 150 production routes): printed at every
+## case-group boundary so in-process slowdown can be told apart from machine slowdown.
+var _calib_board = null
+var _calib_targets: Array = []
+func _calib() -> float:
+	if _calib_board == null:
+		_calib_board = _dense_board()
+		var ta = ProductionTargetAccess.new(ProductionRoutingSystem.new(), ProductionAccessQuery.new(_calib_board), _calib_board, _origin())
+		for i in range(N * N):
+			if ta.is_targetable(i):
+				_calib_targets.append(i)
+	var routing = ProductionRoutingSystem.new()
+	var acc = ProductionAccessQuery.new(_calib_board)
+	var t0 := Time.get_ticks_usec()
+	for k in range(150):
+		routing.compute_route(RouteRequest.for_target(_calib_board, _origin(), _calib_targets[k % _calib_targets.size()]), _calib_board, acc)
+	return _ms(t0)
+
+## Stop topping up slots and run the level until at least `n` slots are free (bounded).
+func _wait_free_slots(h, n: int) -> void:
+	for _i in range(6000):
+		if h.get_slots().snapshot().size() - _occupied(h) >= n:
+			return
+		h.get_runtime().tick(DT)
+		await process_frame
+
+## Live supply as "batch:colour:count" strings in column order (sorted copy = the multiset).
+func _supply_list(h) -> Array:
+	var out: Array = []
+	for col in h.get_supply().debug_snapshot()["columns"]:
+		for bd in col:
+			out.append("%s:%d:%d" % [String(bd["batch_id"]), int(bd["color_id"]), int(bd["robot_count"])])
+	return out
+
+func _slot_batches(h) -> Array:
+	var out: Array = []
+	for s in h.get_slots().snapshot():
+		if s["occupied"]:
+			out.append(String(s["batch_id"]))
+	return out
+
+func _p20() -> void:
+	print("[p20 Random + Selector boosters at 59x59]")
+	var RANDOM: String = BoosterInventory.RANDOM
+	var SELECTOR: String = BoosterInventory.SELECTOR
+	# Phase A, pocket level (sealed colours, WAITING): Random at 5 moments, each with >= 3 free
+	# slots (its owner rule proves 3 consecutive accepted placements on the live slots). Every
+	# outcome is checked: a success spends exactly one charge and conserves every batch; a
+	# solver-safety refusal mutates nothing. Proof time is REPORT-ONLY (see the R03 log).
+	var pl := _pocket_level_dict()
+	var hp = await _host(pl, "rs_pocket", _pocket_plan(pl))
+	hp.get_runtime().set_speed_2x(true)
+	var ep = hp.get_economy()
+	ep.wallet.debit("scrub_bucks", ep.wallet.scrub_bucks())   # charges only, never SB
+	ep.boosters.add_charges(RANDOM, 5)
+	for _i in range(1500):
+		_feed(hp)
+		hp.get_runtime().tick(DT)
+		await process_frame
+	var outcomes: Array = []
+	var a_ok := true
+	var worst_ms := 0.0
+	for _k in range(5):
+		await _wait_free_slots(hp, 3)
+		var e0 := _eco_core(ep)
+		var s0 := _supply_list(hp)
+		var ch0: int = ep.boosters.charges(RANDOM)
+		var tl := Time.get_ticks_usec()
+		var r: Dictionary = hp.execute_booster(RANDOM)
+		var ms := _ms(tl)
+		worst_ms = maxf(worst_ms, ms)
+		var s1 := _supply_list(hp)
+		if r.get("ok", false):
+			var x := s0.duplicate()
+			x.sort()
+			var y := s1.duplicate()
+			y.sort()
+			a_ok = a_ok and ep.boosters.charges(RANDOM) == ch0 - 1 and ep.wallet.snapshot() == e0["wallet"] and x == y and s0 != s1
+			outcomes.append("ok %.0f ms" % ms)
+		else:
+			a_ok = a_ok and r.get("reason") == "not_solver_safe" and _eco_core(ep) == e0 and s1 == s0
+			outcomes.append("%s %.0f ms" % [str(r.get("reason")), ms])
+		for _i in range(200):
+			_feed(hp)
+			hp.get_runtime().tick(DT)
+			await process_frame
+	print("    pocket Random outcomes: %s" % str(outcomes))
+	_ok(a_ok, "pocket level, 5 Random attempts with >= 3 free slots: %s; each success spent exactly one charge with every batch conserved, each refusal (not_solver_safe) mutated nothing (report-only: worst proof %.0f ms)" % [str(outcomes), worst_ms])
+	_free_host(hp)
+	# Phase B, stripe level (every colour always reachable): both boosters legal and executed.
+	var level := _stripe_level_dict()
+	var h = await _host(level, "rs")
+	var rt = h.get_runtime()
+	rt.set_speed_2x(true)
+	var eco = h.get_economy()
+	var comp = h.get_completion()
+	_ok(eco != null and h.get_save() == null and h.app_state == null, "isolated in-memory economy (no AppState, no save path)")
+	eco.wallet.debit("scrub_bucks", eco.wallet.scrub_bucks())
+	eco.boosters.add_charges(RANDOM, 1)
+	eco.boosters.add_charges(SELECTOR, 1)
+	# Illegal Selector target (not an eligible batch) -> refused, nothing consumed or moved.
+	var e_bad := _eco_core(eco)
+	var sup_bad := _supply_list(h)
+	var bad: Dictionary = h.execute_booster(SELECTOR, "NO_SUCH_BATCH")
+	_ok(not bad.get("ok", false) and bad.get("reason") == "not_eligible" and _eco_core(eco) == e_bad and _supply_list(h) == sup_bad, "Selector with a non-eligible batch refused (%s): charge, SB and supply unchanged" % str(bad.get("reason")))
+	var res := {"random": {}, "selector": {}}
+	var tries := {"random": 0, "selector": 0}
+	var times: Array = []
+	var frames := 0
+	var hold := false        # stop topping up slots until one is free (both boosters need an empty slot)
+	var cap_frames := 6000 if OS.get_cmdline_user_args().has("quick") else MAX_FRAMES
+	while frames < cap_frames and not comp.is_terminal():
+		var which := ""
+		if res["random"].is_empty() and frames >= 1200:
+			which = "random"
+		elif not res["random"].is_empty() and res["selector"].is_empty() and frames >= int(res["random"]["frame"]) + 600:
+			which = "selector"
+		if which != "" and (frames % 300 == 0 or hold):
+			hold = true
+			# Random's owner rule proves 3 consecutive accepted front placements on the live slot
+			# state, so it needs 3 free slots; Selector needs the rightmost empty one.
+			var need: int = 3 if which == "random" else 1
+			if h.get_slots().snapshot().size() - _occupied(h) >= need:
+				hold = false
+				var id: String = RANDOM if which == "random" else SELECTOR
+				tries[which] += 1
+				var tl := Time.get_ticks_usec()
+				var leg: Dictionary = h.booster_legality(id)
+				var legal_ms := _ms(tl)
+				if leg.get("legal", false) and which == "selector":
+					# R03 production change: apply_selector proves only the chosen batch via
+					# is_batch_eligible(); it must agree with the full eligible list for every id.
+					var listed: Array = leg["targets"].map(func(t): return String(t["key"]))
+					var adapter = h.get_booster_adapter()
+					var agree := 0
+					var ids: Array = _supply_list(h).map(func(x): return String(x).get_slice(":", 0))
+					for bid in ids:
+						agree += 1 if adapter.is_batch_eligible(bid) == listed.has(bid) else 0
+					var junk_ok: bool = not adapter.is_batch_eligible("NO_SUCH") and not adapter.is_batch_eligible(null) and not adapter.is_batch_eligible(5) \
+						and adapter.is_batch_eligible(StringName(String(listed[0]))) == true
+					_ok(agree == ids.size() and junk_ok, "is_batch_eligible == eligible_safe_batches membership for all %d supply ids (%d eligible); unknown / null / int false, StringName id accepted" % [ids.size(), listed.size()])
+				if leg.get("legal", false):
+					var e0 := _eco_core(eco)
+					var sup0 := _supply_list(h)
+					var occ0 := _occupied(h)
+					var target = null if which == "random" else leg["targets"][0]["key"]
+					var tx := Time.get_ticks_usec()
+					var r: Dictionary = h.execute_booster(id, target)
+					var exec_ms := _ms(tx)
+					var sup1 := _supply_list(h)
+					var a := sup0.duplicate()
+					a.sort()
+					var s1 := sup1.duplicate()
+					s1.sort()
+					res[which] = {"ok": r.get("ok", false), "legal_ms": legal_ms, "exec_ms": exec_ms, "frame": frames, "burst": 0.0,
+						"charge_used": eco.boosters.charges(id) == 0, "sb_same": eco.wallet.snapshot() == e0["wallet"], "targets": leg["targets"].size(),
+						"supply_before": sup0.size(), "supply_after": sup1.size(), "occ_before": occ0, "occ_after": _occupied(h),
+						"conserved": a == s1, "reordered": sup0 != sup1, "batch": String(target) if target != null else "",
+						"in_slot": target != null and _slot_batches(h).has(String(target)),
+						"gone": target != null and sup1.filter(func(x): return String(x).begins_with(String(target) + ":")).is_empty()}
+				else:
+					print("    %s not legal at frame %d (%s, %.1f ms)" % [which, frames, str(leg.get("reason")), legal_ms])
+		var t0 := Time.get_ticks_usec()
+		if not hold:
+			_feed(h)
+		rt.tick(DT)
+		await process_frame
+		var ft := _ms(t0)
+		times.append(ft)
+		for k in res:
+			if not res[k].is_empty() and frames >= int(res[k]["frame"]) and frames < int(res[k]["frame"]) + 120:
+				res[k]["burst"] = maxf(float(res[k]["burst"]), ft)
+		frames += 1
+	var st := _stats(times)
+	var b = h.get_board()
+	var cleared: int = b.count_cells_by_state(BoardState.CellState.CLEARED)
+	print("    %d frames, mean %.3f / p99 %.3f / max %.3f ms; tries %s" % [frames, st["mean"], st["p99"], st["max"], str(tries)])
+	print("    random: %s" % str(res["random"]))
+	print("    selector: %s" % str(res["selector"]))
+	var R: Dictionary = res["random"]
+	var S: Dictionary = res["selector"]
+	_ok(R.get("ok", false) and R["charge_used"] and R["sb_same"] and R["conserved"] and R["reordered"] and R["supply_after"] == R["supply_before"] and R["occ_after"] == R["occ_before"],
+		"Random (legal on try %d): charge 1 -> 0, SB untouched, live supply of %d batches reordered with every batch / colour / count conserved, slots untouched (report-only: legality %.1f ms, execute %.1f ms, next-120 worst frame %.1f ms)" % [
+		tries["random"], int(R.get("supply_before", 0)), float(R.get("legal_ms", 0.0)), float(R.get("exec_ms", 0.0)), float(R.get("burst", 0.0))])
+	_ok(S.get("ok", false) and S["charge_used"] and S["sb_same"] and S["in_slot"] and S["gone"] and S["supply_after"] == S["supply_before"] - 1 and S["occ_after"] == S["occ_before"] + 1,
+		"Selector (legal on try %d, %d eligible): batch %s moved from supply into a slot (+1 occupied, -1 supply), charge 1 -> 0, SB untouched (report-only: legality %.1f ms, execute %.1f ms, next-120 worst frame %.1f ms)" % [
+		tries["selector"], int(S.get("targets", 0)), str(S.get("batch", "")), float(S.get("legal_ms", 0.0)), float(S.get("exec_ms", 0.0)), float(S.get("burst", 0.0))])
+	_ok(comp.is_won() and cleared == N * N, "level WON after Random + Selector: %d / %d cells" % [cleared, N * N])
+	_ok(st["mean"] <= FRAME_STEADY_MS and st["p99"] <= FRAME_SPIKE_MS, "frame mean %.3f ms (<= %.1f), p99 %.3f ms (<= %.1f); max %.3f ms" % [st["mean"], FRAME_STEADY_MS, st["p99"], FRAME_SPIKE_MS, st["max"]])
+	eco.boosters.add_charges(RANDOM, 1)
+	eco.boosters.add_charges(SELECTOR, 1)
+	var et := _eco_core(eco)
+	var r1: Dictionary = h.execute_booster(RANDOM)
+	var r2: Dictionary = h.execute_booster(SELECTOR, "ANY")
+	_ok(r1.get("reason") == "terminal" and r2.get("reason") == "terminal" and _eco_core(eco) == et, "terminal: Random and Selector refused (terminal), charges and SB unchanged")
+	_summary.append("R03 p20 Random + Selector 59x59 stripes: %d frames, mean %.3f / p99 %.3f ms; Random legality %.1f / execute %.1f ms; Selector legality %.1f / execute %.1f ms; pocket Random worst proof %.0f ms" % [
+		frames, st["mean"], st["p99"], float(R.get("legal_ms", 0.0)), float(R.get("exec_ms", 0.0)), float(S.get("legal_ms", 0.0)), float(S.get("exec_ms", 0.0)), worst_ms])
+	_free_host(h)
+	_complete("p20_random_selector")
 
 ## Every gameplay truth a pause must freeze (detached copies).
 func _truth(h) -> Dictionary:

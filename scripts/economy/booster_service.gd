@@ -91,8 +91,11 @@ func apply_random(adapter) -> Dictionary:
 ## adapter.eligible_safe_batches() -> Array of batch ids
 ## adapter.extract_batch(batch_id) -> {ok, apply:Callable->bool, rollback:Callable}
 func apply_selector(adapter, batch_id) -> Dictionary:
-	var eligible: Array = adapter.eligible_safe_batches()
-	if not eligible.has(batch_id):
+	# M46: prove only the chosen batch when the adapter can (same rule as listing every eligible
+	# batch, which re-runs the solver per remaining batch: ~0.6 s at 59x59 desktop).
+	var eligible: bool = adapter.is_batch_eligible(batch_id) if adapter.has_method("is_batch_eligible") \
+		else adapter.eligible_safe_batches().has(batch_id)
+	if not eligible:
 		return {"ok": false, "reason": "not_eligible"}   # unsafe/full -> no charge
 	var res := _inventory.reserve(BoosterInventory.SELECTOR)
 	if not res.get("ok", false):
