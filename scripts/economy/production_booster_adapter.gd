@@ -4,12 +4,13 @@ extends RefCounted
 ##
 ## The CONCRETE adapter BoosterService drives against the REAL gameplay engines
 ## (M23 supply, M24 slots, M27 solver, BoardState) — replacing the V01 fake-only
-## adapter (M39 V02, F-M39-003). All safety proofs use the real SolvabilitySolver
-## over a real ProofState; all commits/rollbacks act on the live engines.
+## adapter (M39 V02, F-M39-003). All safety proofs use the real DeadlockClassifier
+## (SolvabilitySolver progress search) over a real ProofState; all commits/rollbacks act on
+## the live engines.
 ##
 ## Random  — reorders remaining unselected M23 batches (conservation preserved),
-##           committed only if the real solver proves the reordered candidate is
-##           still SOLVED; rollback reloads the exact prior supply.
+##           committed only if three consecutive front selections from the reordered
+##           supply are each proven non-deadlocked; rollback reloads the exact prior supply.
 ## Selector— extracts an arbitrary solver-safe remaining batch to the rightmost
 ##           EMPTY slot (capacity 5 or 6) via a reorder-to-front + real select;
 ##           rollback reloads the exact prior supply and frees the placed slot.
@@ -23,6 +24,8 @@ const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const ProofState = preload("res://scripts/gameplay/solver/proof_state.gd")
 const DeadlockClassifier = preload("res://scripts/gameplay/solver/deadlock_classifier.gd")
 const LevelData = preload("res://scripts/data/level_data.gd")
+const FiveSlotBatchEngine = preload("res://scripts/gameplay/slots/five_slot_batch_engine.gd")
+const SlotBatchState = preload("res://scripts/gameplay/slots/slot_batch_state.gd")
 
 var _level
 var _board
@@ -99,7 +102,10 @@ func detached_copy():
 	var sup = BatchSupplyEngine.create(_supply.get_column_count(), _supply.get_preview_depth())
 	if sup == null or not sup.load_candidate(_current_cols(), _supply.get_seed(), _supply.get_palette_size()):
 		return null
-	var d = get_script().new(_level, FrozenBoard.new(_board), sup, _scratch_slots_from_live(), null)
+	var ss = _scratch_slots_from_live()
+	if ss == null:
+		return null
+	var d = get_script().new(_level, FrozenBoard.new(_board), sup, ss, null)
 	d.budget_ms = PROOF_TOTAL_MS
 	return d
 
@@ -263,25 +269,27 @@ func _prove_three_consecutive_safe(cols: Array, steps: int = 3) -> bool:
 	return true
 
 func _scratch_slots_from_live():
-	# Rebuild a detached FiveSlotBatchEngine matching the live capacity and
-	# current occupancy from the M24 snapshot. Committed work is 0 at this
-	# adapter's entry (a booster is a discrete player action at quiescence).
-	var live = load("res://scripts/gameplay/slots/five_slot_batch_engine.gd").new()
-	if _slots.get_slot_count() == FiveSlotEngineMaxCapacity():
+	# Rebuild a detached FiveSlotBatchEngine that reproduces the live slots exactly as the proof
+	# reads them, mirroring ProofKernel's own rebuild: REMAINING robots (initial == remaining:
+	# nothing reads initial_count for future behaviour), the WAITING state, the placement
+	# sequence, and the next sequence (a batch the proof places dispatches after every live one).
+	# Committed work is 0 at a still moment; with robots in flight the in-flight shortcut answers
+	# before this state is read. (Before M46 it used initial_count, forced ACTIVE and restarted
+	# the sequence at 1: CLAUDE_PEER_REVIEW R06 MAJOR-2, tests/m46_slot_rebuild.gd.)
+	var live = FiveSlotBatchEngine.new()
+	if _slots.get_slot_count() == FiveSlotBatchEngine.MAX_CAPACITY:
 		live.grow_to_sixth()
-	# Rehydrate occupied slots.
 	for i in range(_slots.get_slot_count()):
 		if _slots.is_occupied(i):
-			var occ = load("res://scripts/gameplay/slots/slot_batch_state.gd").make_occupied(
-				_slots.get_batch_id(i), _slots.get_color_id(i),
-				_slots.get_initial_count(i) if _slots.has_method("get_initial_count") else _slots.get_remaining(i),
-				_slots.get_placement_sequence(i))
-			if occ != null:
-				live._slots[i] = occ
+			var occ = SlotBatchState.make_occupied(_slots.get_batch_id(i), _slots.get_color_id(i),
+				_slots.get_remaining(i), _slots.get_placement_sequence(i))
+			if occ == null:
+				return null   # malformed / remaining 0: fail closed (never prove a different state)
+			if _slots.get_state(i) == SlotBatchState.WAITING:
+				occ.set_state(SlotBatchState.WAITING)
+			live._slots[i] = occ
+	live._next_sequence = _slots._next_sequence
 	return live
-
-static func FiveSlotEngineMaxCapacity() -> int:
-	return load("res://scripts/gameplay/slots/five_slot_batch_engine.gd").MAX_CAPACITY
 
 ## Same DeadlockClassifier gate as `_is_safe` but taking already-built scratch
 ## supply + slots engines (used inside the 3-consecutive simulation).
