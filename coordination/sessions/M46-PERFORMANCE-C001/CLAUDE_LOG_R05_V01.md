@@ -137,7 +137,9 @@ Earlier readings of "16 s / 20 s / more than 20 min completion freeze" are inval
 ## 5. Separate finding (not changed — win/lose is owner-locked)
 At a still moment on 59×59, the completion LOSE proof takes **about 1.1–3.3 s per tick**, depending on machine load. It runs unbudgeted on the gameplay thread. Bounding it would change the owner-locked lose semantics, so it is reported only.
 
-## 6. Owner decisions (open)
+## 6. Owner decisions
+**Owner decision (chat, 2026-10-16) on item 1:** "Keep 400 ms for now, and plan a time-sliced off-frame booster proof with a checking state as the next M46 step." Plan: `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_M46_R06_OFFFRAME_PROOF_PLAN_V01.md`. Items 2 and 3 stay open.
+
 1. **Budget value / approach.** 400 ms meets the owner rules: bounded, no spend, retry possible after a tap or reopen. But Random at a still moment is refused on most production levels, and a phone will refuse more. Choices:
    - keep 400 ms;
    - raise it, for example to 1,000 ms (covers Random on 7 of the 8 safe L1–L10 starts on desktop; still a visible pause);
