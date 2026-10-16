@@ -532,6 +532,7 @@ func _make_deadlock_supply(engine, drop: int, palette_size: int):
 func retry() -> bool:
 	if not _built:
 		return false
+	cancel_booster_proof()
 	return RetryCoordinator.attempt({
 		"scheduler": _scheduler,
 		"slots": _slots,
@@ -933,26 +934,120 @@ func booster_legality(id: String) -> Dictionary:
 			var ok2: bool = bool(prop.get("safe", false))
 			return {"legal": ok2, "reason": "" if ok2 else String(prop.get("reason", "not_solver_safe")), "targets": []}
 		BoosterInventory.SELECTOR:
-			var info := {}
-			for col in _supply.debug_snapshot()["columns"]:
-				for bd in col:
-					info[String(bd["batch_id"])] = bd
-			var targets: Array = []
-			for bid in _booster_adapter.eligible_safe_batches():
-				var bd: Dictionary = info.get(String(bid), {})
-				var ci := int(bd.get("color_id", -1))
-				targets.append({"key": bid, "color": colors[ci] if ci >= 0 and ci < colors.size() else Color(0.5, 0.5, 0.5),
-					"label": str(int(bd.get("robot_count", 0)))})
+			var ids: Array = _booster_adapter.eligible_safe_batches()
 			# Owner proof budget: a cut-off list is partial (the rest are re-checked next time).
-			var partial: bool = _booster_adapter.last_proof_timed_out()
-			var why := "" if not targets.is_empty() else ("proof_timeout" if partial else "not_eligible")
-			return {"legal": not targets.is_empty(), "reason": why, "targets": targets, "partial": partial}
+			return _selector_legality(ids, _booster_adapter.last_proof_timed_out())
 		BoosterInventory.TORNADO:
 			var ct: Array = []
 			for c in _booster_adapter.present_colors():
 				ct.append({"key": c, "color": colors[int(c)] if int(c) >= 0 and int(c) < colors.size() else Color(0.5, 0.5, 0.5), "label": ""})
 			return {"legal": not ct.is_empty(), "reason": "" if not ct.is_empty() else "color_not_present", "targets": ct}
 	return {"legal": false, "reason": "unknown_booster", "targets": []}
+
+func _selector_legality(ids: Array, partial: bool) -> Dictionary:
+	var colors: Array = PaletteColors.parse(_level.palette).colors if _level != null else []
+	var info := {}
+	for col in _supply.debug_snapshot()["columns"]:
+		for bd in col:
+			info[String(bd["batch_id"])] = bd
+	var targets: Array = []
+	for bid in ids:
+		var bd: Dictionary = info.get(String(bid), {})
+		var ci := int(bd.get("color_id", -1))
+		targets.append({"key": bid, "color": colors[ci] if ci >= 0 and ci < colors.size() else Color(0.5, 0.5, 0.5),
+			"label": str(int(bd.get("robot_count", 0)))})
+	var why := "" if not targets.is_empty() else ("proof_timeout" if partial else "not_eligible")
+	return {"legal": not targets.is_empty(), "reason": why, "targets": targets, "partial": partial}
+
+# ------------------------------------------- M46 R06 off-frame booster proof ----
+# Owner 2026-10-16: no gameplay-thread freeze for a booster safety proof at a still moment.
+# The proof runs on a WorkerThreadPool task over ProductionBoosterAdapter.detached_copy()
+# (shares nothing mutable with the live engines) under PROOF_TOTAL_MS; the verdict is cached
+# on the live adapter for exactly the proven state, so legality / execute answer at once.
+
+## Fires (main thread) when an off-frame booster proof ends, proven or not.
+signal booster_proof_settled(id: String)
+const _PROOF_KIND := {BoosterInventory.RANDOM: "random", BoosterInventory.SELECTOR: "selector_list"}
+var _proof_job: Dictionary = {}
+
+## Booster legality without freezing: the plain answer when robots move, nothing needs a
+## proof, or the exact state already has a verdict (proven, refused, or the 5 s cap ran out:
+## then proof_timeout / a partial Selector list at once, retry after the state changes);
+## otherwise starts the off-frame proof and returns reason "checking"
+## (booster_proof_settled(id) follows). Never reserves or mutates.
+func booster_legality_offframe(id: String) -> Dictionary:
+	if needs_offframe_proof(id) and _start_proof(id):
+		return {"legal": false, "reason": "checking", "targets": []}
+	return booster_legality(id)
+
+## True when legality of `id` right now would need a fresh still-moment proof.
+func needs_offframe_proof(id: String) -> bool:
+	var kind: String = _PROOF_KIND.get(id, "")
+	if kind == "" or _economy == null or _booster_adapter == null or _built == false \
+			or (_completion != null and _completion.is_terminal()) or _booster_adapter._inflight() > 0:
+		return false
+	if id == BoosterInventory.SELECTOR and (_slots == null or _slots.rightmost_empty_index() == -1):
+		return false
+	return _booster_adapter.cached_verdict(kind) == null
+
+func is_booster_proof_running() -> bool:
+	return not _proof_job.is_empty()
+
+func _start_proof(id: String) -> bool:
+	var kind: String = _PROOF_KIND[id]
+	var key: Array = _booster_adapter.state_key()
+	if not _proof_job.is_empty():
+		if _proof_job["kind"] == kind and _proof_job["key"] == key:
+			return true
+		_stop_proof()
+	var d = _booster_adapter.detached_copy()
+	if d == null:
+		return false
+	var out: Array = [null]   # written once by the worker; read only after the task completed
+	var job := {"id": id, "kind": kind, "key": key, "adapter": d, "out": out}
+	job["task"] = WorkerThreadPool.add_task(d.run_offframe.bind(kind, out))
+	_proof_job = job
+	set_process(true)
+	return true
+
+func _process(_delta: float) -> void:
+	if _proof_job.is_empty():
+		set_process(false)
+		return
+	if not WorkerThreadPool.is_task_completed(_proof_job["task"]):
+		return
+	WorkerThreadPool.wait_for_task_completion(_proof_job["task"])
+	var job := _proof_job
+	_proof_job = {}
+	set_process(false)
+	# A verdict counts only for the exact state it was proven on. A worker that ended without
+	# a result (script error) counts as the cap running out: fail closed, no endless restarts.
+	var res = job["out"][0]
+	if _booster_adapter != null and _booster_adapter.state_key() == job["key"]:
+		var timed_out: bool = res == null or res["timed_out"]
+		var value = ("timeout" if timed_out else res["value"]) if job["kind"] == "random" \
+			else {"ids": res["value"] if res != null else [], "partial": timed_out}
+		_booster_adapter.put_verdict(job["kind"], job["key"], value)
+	booster_proof_settled.emit(job["id"])
+
+## Stop a running off-frame proof (gameplay resumed, retry, exit): its result is dropped; an
+## open popup still showing "Checking..." refreshes on the settle signal.
+func cancel_booster_proof() -> void:
+	var id := _stop_proof()
+	if id != "":
+		booster_proof_settled.emit(id)
+
+## Cancel + join the worker without signalling (safe inside _start_proof: no re-entrant refresh
+## can start a second, never-joined task). Returns the stopped job's booster id, or "".
+func _stop_proof() -> String:
+	if _proof_job.is_empty():
+		return ""
+	_proof_job["adapter"].cancel_proof()
+	WorkerThreadPool.wait_for_task_completion(_proof_job["task"])
+	var id: String = _proof_job["id"]
+	_proof_job = {}
+	set_process(false)
+	return id
 
 ## M43-C003: execute booster `id` through the canonical facade (charge-first, then SB,
 ## reserved only after the solver-safety pre-checks; refunded on a failed commit).
@@ -1010,6 +1105,11 @@ func request_booster(id: String) -> Dictionary:
 			acquisition.open_booster(self, id)
 	elif id == BoosterInventory.PLUS_ONE_SLOT:
 		r = _actions.plus_one_slot()
+	elif id == BoosterInventory.RANDOM and acquisition != null and needs_offframe_proof(id):
+		# M46 R06 (owner O3): a still moment needs a long proof -> a short "Checking…" hold (the
+		# popup pauses play like any modal), then the owned charge is used automatically.
+		r = {"ok": false, "reason": "checking"}
+		acquisition.open_booster(self, id, true)
 	elif id == BoosterInventory.RANDOM:
 		r = _actions.random()
 	else:
@@ -1043,6 +1143,7 @@ func _bind_modal_stack() -> void:
 		_owns_acquisition = true
 
 func _exit_tree() -> void:
+	cancel_booster_proof()
 	if _owns_acquisition and acquisition != null:
 		acquisition.unbind()
 	if modal_stack != null and is_instance_valid(modal_stack) and not _owns_modal_stack \
@@ -1074,6 +1175,8 @@ func _on_modal_changed(active: bool) -> void:
 	elif _paused_by_modal:
 		_paused_by_modal = false
 		_runtime.set_user_paused(false)
+	if not active:
+		cancel_booster_proof()   # gameplay resumes: a still-moment proof would go stale
 	if _screen != null and is_instance_valid(_screen):
 		_screen.set_paused(_runtime.is_user_paused())
 		var pause_btn = _screen.get_pause_button()

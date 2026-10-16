@@ -81,6 +81,12 @@ var observer = null
 ## quiesce / apply_placement return {"ok": false, "error": "time_budget_exhausted"} and the
 ## callers report UNKNOWN_BOUND (fail closed). Never set on generation / replay paths.
 var deadline_usec := 0
+## Sticky cancel (M46 R06): set from the main thread to stop an off-frame booster proof; reads
+## exactly like an expired deadline. Never set on generation / replay paths.
+var cancelled := false
+
+func _out_of_time() -> bool:
+	return cancelled or (deadline_usec > 0 and Time.get_ticks_usec() >= deadline_usec)
 
 # ---------------------------------------------------------------- public API ---
 
@@ -216,7 +222,7 @@ func _run_to_quiescence(live: Dictionary) -> int:
 	var clears := 0
 	var waiting: Dictionary = {}   # slot -> batch_id WAITING on its current batch
 	while true:
-		if deadline_usec > 0 and Time.get_ticks_usec() >= deadline_usec:
+		if _out_of_time():
 			return TIMED_OUT
 		var claims: Array = []
 		var lanes: Array = _eligible_slots(live.slots, waiting)

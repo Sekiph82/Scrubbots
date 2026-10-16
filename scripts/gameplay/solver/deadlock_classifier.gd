@@ -89,6 +89,12 @@ func classify(state, inflight_count: int = 0, config: Dictionary = {}) -> Dictio
 		"max_depth_reached": int(r["max_depth_reached"]), "decisions": int(r["decisions"]),
 		"immediate_clears": 0, "root_active": root_active}
 
+## M46 R06: stop this classifier's proofs for good (off-frame booster proof cancelled from the
+## main thread); later classifications are UNKNOWN_BOUND time_budget_exhausted (fail closed).
+func cancel() -> void:
+	_kernel.cancelled = true
+	_solver.cancel()
+
 ## Convenience: classify directly from live runtime engines.
 func classify_runtime(level, board, supply_engine, slots_engine, inflight_count: int = 0,
 		config: Dictionary = {}) -> Dictionary:

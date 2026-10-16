@@ -61,6 +61,7 @@ static var _shared_mask: PackedByteArray = PackedByteArray()
 static var _shared_touch: PackedByteArray = PackedByteArray()
 ## Diagnostic counter of mask builds (tests prove same-revision sharing / invalidation).
 static var mask_build_count: int = 0
+static var _mask_lock := Mutex.new()
 ## Cached "prefilter supported for this board + origin" decision, recomputed whenever the
 ## origin value differs from the one it was computed for (NaN never matches -> recomputed,
 ## and stays unsupported).
@@ -201,21 +202,28 @@ func _ensure_masks() -> bool:
 	var rev: int = _board.get_revision()
 	if _mask_board_id == bid and _reach_revision == rev and _touch_mask.size() == n:
 		return true
-	if _shared_board_id == bid and _shared_revision == rev and _shared_touch.size() == n and _shared_mask.size() == n:
+	# M46 R06: an off-frame booster proof also runs this on a worker thread, so the static
+	# single-slot cache is read / published under a lock (the flood itself runs unlocked).
+	_mask_lock.lock()
+	var hit: bool = _shared_board_id == bid and _shared_revision == rev and _shared_touch.size() == n and _shared_mask.size() == n
+	if hit:
 		_reach_mask = _shared_mask
 		_touch_mask = _shared_touch
-	else:
+	_mask_lock.unlock()
+	if not hit:
 		_build_masks(_board.get_width(), _board.get_height())
+		_mask_lock.lock()
+		mask_build_count += 1
 		_shared_board_id = bid
 		_shared_revision = rev
 		_shared_mask = _reach_mask
 		_shared_touch = _touch_mask
+		_mask_lock.unlock()
 	_mask_board_id = bid
 	_reach_revision = rev
 	return true
 
 func _build_masks(w: int, h: int) -> void:
-	mask_build_count += 1
 	var n: int = w * h
 	var tb := RuntimePerfProbe.now()
 	# One detached bulk read of the lifecycle bytes, then a local flood (no per-cell calls).

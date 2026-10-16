@@ -241,15 +241,19 @@ func _on_life_action(id: String, _ctx: Dictionary, p) -> void:
 
 ## Open the ONE data-driven Booster Acquire component for `id` over `host`. Mode follows
 ## authoritative charges: owned charge -> USE (no purchase CTA); zero -> SB / rewarded.
-func open_booster(host, id: String):
+## auto_use (M46 R06): an owned no-target booster tapped at a still moment opens here while its
+## proof is checking, and is used automatically once proven legal.
+func open_booster(host, id: String, auto_use: bool = false):
 	if _economy == null or _stack == null or not BOOSTER_DEFS.has(id) or host == null:
 		return null
 	var open = find_open("booster_" + id)
 	if open != null:
 		return open
+	if host.has_signal("booster_proof_settled") and not host.booster_proof_settled.is_connected(_on_booster_proof_settled):
+		host.booster_proof_settled.connect(_on_booster_proof_settled)
 	var def: Dictionary = BOOSTER_DEFS[id]
 	var p := BasePopup.new("booster_" + id)
-	p.context = {"booster": id, "target": null}
+	p.context = {"booster": id, "target": null, "auto_use": auto_use}
 	p.set_meta("host", host)
 	p.set_frame("medium")
 	p.set_title(UiText.t("BOOSTER_NAME_" + id.to_upper()))
@@ -316,7 +320,8 @@ func _refresh_booster(p, rebuild_targets: bool = false) -> void:
 		return
 	var id := String(p.context["booster"])
 	if rebuild_targets or not p.has_meta("legality"):
-		p.set_meta("legality", host.booster_legality(id))
+		# M46 R06: never freeze on a still-moment proof; "checking" until booster_proof_settled.
+		p.set_meta("legality", host.booster_legality_offframe(id) if host.has_method("booster_legality_offframe") else host.booster_legality(id))
 	var v := booster_model(host, id, p.get_meta("legality"))
 	p.set_meta("model", v)
 	var has_charge: bool = v["charges"] > 0
@@ -326,22 +331,34 @@ func _refresh_booster(p, rebuild_targets: bool = false) -> void:
 		_build_targets(p, v)
 	var needs_target: bool = v["target_kind"] != ""
 	var target_ok: bool = not needs_target or p.context.get("target") != null
-	# M46 R05: a proof that ran out of the owner time budget is "not proven yet", not "unsafe":
-	# Use / SB stay tappable for a no-target retry; execute re-proves and spends nothing on failure.
-	var retry: bool = v["reason"] == "proof_timeout" and not needs_target
-	(p.find_child("Safety", true, false) as Label).text = "" if v["legal"] \
-		else UiText.t("BOOSTER_SAFETY_BUSY" if v["reason"] == "proof_timeout" else "BOOSTER_SAFETY_" + id.to_upper())
+	# M46 R06: "checking" while the off-frame proof runs; proof_timeout = the 5 s proof ran out on
+	# this exact state (cached, so a re-tap could not succeed): nothing is spent, and the player
+	# retries after the next move. Use / SB stay blocked until proven.
+	var safety_key := "BOOSTER_CHECKING" if v["reason"] == "checking" \
+		else ("BOOSTER_SAFETY_BUSY" if v["reason"] == "proof_timeout" else "BOOSTER_SAFETY_" + id.to_upper())
+	(p.find_child("Safety", true, false) as Label).text = "" if v["legal"] else UiText.t(safety_key)
 	var use_b: Button = p.get_action_button("use")
 	use_b.text = UiText.t("BOOSTER_USE_OWNED", [v["charges"]])
 	p.set_action_visible("use", has_charge)
-	p.set_action_blocked("use", not ((v["legal"] or retry) and target_ok))
+	p.set_action_blocked("use", not (v["legal"] and target_ok))
 	var sb_b: Button = p.get_action_button("sb")
 	sb_b.text = UiText.t("BOOSTER_USE_SB", [UiText.num(v["price"])])
 	p.set_action_visible("sb", not has_charge)
-	p.set_action_blocked("sb", not ((v["legal"] or retry) and target_ok))
+	p.set_action_blocked("sb", not (v["legal"] and target_ok))
 	var rw_ok: bool = v["rewarded"].get("ok", false)
 	# Rewarded CTA only when the provider policy offers this booster placement.
 	p.set_action_visible("watch", not has_charge and rw_ok)
+	# M46 R06 HUD hold: once proven, use the owned charge (re-proof is a cache hit); a refusal
+	# leaves the popup open with its reason and nothing used.
+	if p.context.get("auto_use", false) and v["reason"] != "checking":
+		p.context["auto_use"] = false
+		if v["legal"] and has_charge and not needs_target:
+			_on_booster_action.call_deferred("use", {}, p)
+
+func _on_booster_proof_settled(id: String) -> void:
+	var p = find_open("booster_" + id)
+	if p != null:
+		_refresh_booster(p, true)
 
 func _build_targets(p, v: Dictionary) -> void:
 	var flow: HFlowContainer = p.find_child("Targets", true, false)

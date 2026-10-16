@@ -90,6 +90,9 @@ const EffectsSettingsService = preload("res://scripts/settings/effects_settings_
 const FirstClearTransaction = preload("res://scripts/economy/first_clear_transaction.gd")
 const TerminalRewardReceipt = preload("res://scripts/economy/terminal_reward_receipt.gd")
 const BoardMagnifier = preload("res://scripts/ui/board_magnifier.gd")
+const ProofKernel = preload("res://scripts/gameplay/solver/proof_kernel.gd")
+const AppState = preload("res://scripts/app/app_state.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 
 const N := 59
 const DT := 1.0 / 60.0
@@ -122,7 +125,7 @@ const MAX_FRAMES := 60000
 var EXPECTED_CASES := ["p01_parse", "p02_board_state", "p03_renderer", "p04_index_access", "p05_selector", "p06_routing",
 	"p07_agents", "p08_effects", "p09_memory_baseline", "p10_memory_59", "p11_allocation", "p12_restart",
 	"p13_long_session", "p14_agent_density", "p15_ui_idle_churn", "p16_unlock_chains_waiting",
-	"p17_sixth_slot_boosters", "p18_winding_routes", "p19_effect_budget", "p20_random_selector", "p21_proof_budget"]
+	"p17_sixth_slot_boosters", "p18_winding_routes", "p19_effect_budget", "p20_random_selector", "p21_proof_budget", "p22_offframe_proof"]
 var _fail := 0
 var _completed: Dictionary = {}
 var _tmp: Array = []
@@ -185,6 +188,9 @@ func _initialize() -> void:
 	if only.is_empty() or only.has("budget"):
 		await _p21()
 		print("  [budget case %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
+	if only.is_empty() or only.has("slice"):
+		await _p22()
+		print("  [slice case %d ms; calib %.1f ms]" % [Time.get_ticks_msec() - t0, _calib()])
 	print("M46 SUMMARY:")
 	for line in _summary:
 		print("    " + line)
@@ -1710,6 +1716,249 @@ func _p21() -> void:
 	_ok(worst <= limit, "every booster proof call ended within %.0f ms (budget %.0f ms + node margin); worst %.0f ms" % [limit, budget, worst])
 	_summary.append("R05 p21 proof budget %d ms: worst call %.0f ms; outcomes %s" % [ProductionBoosterAdapter.PROOF_BUDGET_MS, worst, str(counts)])
 	_complete("p21_proof_budget")
+
+## Play `ticks` fed frames, then stop tapping until every robot has arrived (a still moment).
+func _reach_still(h, ticks: int) -> bool:
+	var rt = h.get_runtime()
+	for _i in range(ticks):
+		_feed(h)
+		rt.tick(DT)
+		await process_frame
+	for _i in range(6000):
+		if h.get_scheduler().live_assignment_count() == 0:
+			return true
+		rt.tick(DT)
+		await process_frame
+	return false
+
+## Longest ATOMIC units of the booster proof at the host's current state (R06 slice
+## granularity): ProofState build, root quiesce, one apply_placement, one node expansion.
+## Mirrors the solver's DFS (memoized, ascending columns) for up to `cap_ms`.
+func _granularity(h, cap_ms: float) -> Dictionary:
+	var a = h.get_booster_adapter()
+	var t := Time.get_ticks_usec()
+	var st = ProofState.from_runtime(a._level, a._board, a._supply, a._slots)
+	var build_ms := _ms(t)
+	var k = ProofKernel.new()
+	t = Time.get_ticks_usec()
+	var q: Dictionary = k.quiesce(st)
+	var quiesce_ms := _ms(t)
+	var place_ms: Array = []
+	var node_ms: Array = []
+	var stack: Array = [q["state"]] if q.get("ok", false) else []
+	var seen := {}
+	var t_all := Time.get_ticks_usec()
+	while not stack.is_empty() and _ms(t_all) < cap_ms:
+		var s = stack.pop_back()
+		var key: String = s.canonical_key()
+		if seen.has(key):
+			continue
+		seen[key] = true
+		var tn := Time.get_ticks_usec()
+		var kids: Array = []
+		for c in s.legal_action_columns():
+			var tp := Time.get_ticks_usec()
+			var r: Dictionary = k.apply_placement(s, c)
+			place_ms.append(_ms(tp))
+			if r.get("ok", false):
+				kids.append(r["state"])
+		node_ms.append(_ms(tn))
+		for i in range(kids.size() - 1, -1, -1):
+			stack.push_back(kids[i])
+	var ps := _stats(place_ms) if not place_ms.is_empty() else {"p99": 0.0, "max": 0.0}
+	var ns := _stats(node_ms) if not node_ms.is_empty() else {"p99": 0.0, "max": 0.0}
+	return {"build": build_ms, "quiesce": quiesce_ms, "places": place_ms.size(), "nodes": node_ms.size(),
+		"place_p99": ps["p99"], "place_max": ps["max"], "node_p99": ns["p99"], "node_max": ns["max"]}
+
+func _p22() -> void:
+	print("[p22 off-frame booster proof (R06): slice granularity]")
+	for which in ["stripes", "pocket"]:
+		var level: Dictionary = _stripe_level_dict() if which == "stripes" else _pocket_level_dict()
+		var h = await _host(level, "slice_" + which, {} if which == "stripes" else _pocket_plan(level))
+		h.get_runtime().set_speed_2x(true)
+		var still: bool = await _reach_still(h, 500)
+		var g := _granularity(h, 3000.0)
+		print("    %s still=%s: ProofState build %.1f ms, root quiesce %.1f ms, apply_placement p99 %.1f / max %.1f ms (%d), node p99 %.1f / max %.1f ms (%d)" % [
+			which, str(still), g["build"], g["quiesce"], g["place_p99"], g["place_max"], g["places"], g["node_p99"], g["node_max"], g["nodes"]])
+		_free_host(h)
+	for order in range(1, 11):
+		var path := "user://m46_slice_l%d.save" % order
+		_tmp.append(path)
+		var app = AppState.new(path, Callable())
+		for n in range(1, order):
+			app.progression.record_win(n)
+		var sub := SubViewport.new()
+		sub.size = Vector2i(1080, 2160)
+		sub.disable_3d = true
+		get_root().add_child(sub)
+		var h = ProductionGameplayHost.new()
+		h.app_state = app
+		h.auto_build = false
+		h.set_anchors_preset(Control.PRESET_FULL_RECT)
+		sub.add_child(h)
+		var built: bool = h.build()
+		h.get_runtime().set_process(false)
+		await _frames(2)
+		var g := _granularity(h, 1500.0)
+		print("    L%d %s built=%s: build %.1f, quiesce %.1f, apply_placement p99 %.1f / max %.1f (%d), node p99 %.1f / max %.1f ms (%d)" % [
+			order, h.get_booster_adapter()._level.id, str(built), g["build"], g["quiesce"], g["place_p99"], g["place_max"], g["places"], g["node_p99"], g["node_max"], g["nodes"]])
+		if order <= 4:
+			# The detached copy proves exactly what the live adapter proves (both unbudgeted).
+			var a = h.get_booster_adapter()
+			var d = a.detached_copy()
+			a.budget_ms = 0
+			d.budget_ms = 0
+			var same: bool = a.propose_random_reorder().get("safe") == d.propose_random_reorder().get("safe") \
+				and a.eligible_safe_batches() == d.eligible_safe_batches()
+			a.budget_ms = ProductionBoosterAdapter.PROOF_BUDGET_MS
+			_ok(same, "L%d: detached-copy Random + Selector-list verdicts == live adapter (unbudgeted)" % order)
+		if order == 1:
+			await _p22_l1(h)
+		_free_host(h)
+	await _p22_offframe()
+	_complete("p22_offframe_proof")
+
+## L1 at its still start (Random proven safe there): the HUD hold auto-uses the owned charge
+## exactly once from the cached off-frame verdict (no main-thread proof), SB untouched. Then, at
+## a mid-play still moment (occupied / partly cleared slots), detached == live verdicts.
+func _p22_l1(h) -> void:
+	var RANDOM: String = BoosterInventory.RANDOM
+	var eco = h.get_economy()
+	var a = h.get_booster_adapter()
+	a._verdicts.clear()
+	eco.boosters.add_charges(RANDOM, 1)
+	var c0: int = eco.boosters.charges(RANDOM)
+	var sb0: int = eco.wallet.scrub_bucks()
+	var s0 := _supply_list(h)
+	var r: Dictionary = h.request_booster(RANDOM)
+	var hold: bool = r.get("reason") == "checking" and h.acquisition.find_open("booster_" + RANDOM) != null
+	await _frames(2)
+	while h.is_booster_proof_running():
+		await process_frame
+	var lp0: int = a.live_proof_count   # the worker's verdict is now cached; nothing live may run
+	await _frames(4)
+	var used: bool = eco.boosters.charges(RANDOM) == c0 - 1 and eco.wallet.scrub_bucks() == sb0 \
+		and _supply_list(h) != s0 and h.acquisition.find_open("booster_" + RANDOM) == null
+	print("    L1 HUD Random: hold %s, used %s, live proofs during settle + use %d" % [str(hold), str(used), a.live_proof_count - lp0])
+	_ok(hold and used and a.live_proof_count == lp0, "L1: HUD Random at a still start -> Checking hold, then the owned charge used exactly once (SB unchanged) from the cached verdict, no main-thread proof")
+	var still: bool = await _reach_still(h, 300)
+	var occupied := _occupied(h)
+	var d = a.detached_copy()
+	a.budget_ms = 0
+	d.budget_ms = 0
+	var same: bool = a.propose_random_reorder().get("safe") == d.propose_random_reorder().get("safe") \
+		and a.eligible_safe_batches() == d.eligible_safe_batches()
+	a.budget_ms = ProductionBoosterAdapter.PROOF_BUDGET_MS
+	_ok(still and same, "L1 mid-play still moment (%d occupied slots): detached-copy verdicts == live adapter" % occupied)
+
+## Frames while the worker proves -> [worst frame ms, waited ms, settle frame ms]. Not counted as
+## proof cost: the first 2 frames (a just-opened popup's own layout / first draw) and the frame
+## the proof settles in (result applied + popup refresh + an auto-used booster's commit:
+## a one-off player action, reported separately).
+func _wait_proof(h, cap_ms: float) -> Array:
+	var frames: Array = []
+	var t0 := Time.get_ticks_usec()
+	await _frames(2)
+	while h.is_booster_proof_running() and _ms(t0) < cap_ms:
+		var tf := Time.get_ticks_usec()
+		await process_frame
+		frames.append(_ms(tf))
+	var settle: float = frames.pop_back() if not frames.is_empty() else 0.0
+	var tf2 := Time.get_ticks_usec()
+	await process_frame   # the deferred auto-use
+	settle = maxf(settle, _ms(tf2))
+	await process_frame
+	return [frames.max() if not frames.is_empty() else 0.0, _ms(t0), settle]
+
+func _p22_offframe() -> void:
+	print("[p22 off-frame proof at a still 59x59 moment: Checking state, HUD hold, cancel, stale]")
+	var RANDOM: String = BoosterInventory.RANDOM
+	var SELECTOR: String = BoosterInventory.SELECTOR
+	var cap: float = float(ProductionBoosterAdapter.PROOF_TOTAL_MS) + 1500.0
+	for which in ["stripes", "pocket"]:
+		var level: Dictionary = _stripe_level_dict() if which == "stripes" else _pocket_level_dict()
+		var h = await _host(level, "off_" + which, {} if which == "stripes" else _pocket_plan(level))
+		h.get_runtime().set_speed_2x(true)
+		var still: bool = await _reach_still(h, 500)
+		var eco = h.get_economy()
+		var acq = h.acquisition
+		eco.wallet.debit("scrub_bucks", eco.wallet.scrub_bucks())
+		eco.wallet.credit("scrub_bucks", 5000)
+		# 1) Selector popup with no charge: opens at once in "Checking…", Use/SB blocked, no freeze.
+		var e0 := _eco_core(eco)
+		var s0 := _supply_list(h)
+		# Main-thread cost R06 adds to a still-moment check: state key + detached copy + task start.
+		var t_start := Time.get_ticks_usec()
+		h.booster_legality_offframe(SELECTOR)
+		var start_ms := _ms(t_start)
+		var key_t := Time.get_ticks_usec()
+		h.get_booster_adapter().state_key()
+		var key_ms := _ms(key_t)
+		var t_open := Time.get_ticks_usec()
+		var p = acq.open_booster(h, SELECTOR)
+		var open_ms := _ms(t_open)
+		print("    %s check start %.1f ms (state key %.1f ms); popup open (UI build, report-only) %.1f ms" % [which, start_ms, key_ms, open_ms])
+		var checking: bool = p != null and h.is_booster_proof_running() \
+			and (p.find_child("Safety", true, false) as Label).text == UiText.t("BOOSTER_CHECKING") \
+			and p.get_action_button("sb").disabled
+		var w: Array = await _wait_proof(h, cap)
+		var leg: Dictionary = p.get_meta("legality")
+		var sel_done: bool = not h.is_booster_proof_running() and String(leg.get("reason", "")) in ["", "proof_timeout", "not_eligible"]
+		var chips: int = (leg.get("targets", []) as Array).size()
+		p.close("x")
+		await _frames(2)
+		var sel_ok: bool = still and checking and sel_done and start_ms < FRAME_SPIKE_MS and w[0] < FRAME_SPIKE_MS \
+			and _eco_core(eco) == e0 and _supply_list(h) == s0
+		print("    %s Selector popup: checking %s, settled after %.0f ms (worst frame %.1f ms; settle frame %.1f ms) -> %s, %d chips" % [
+			which, str(checking), w[1], w[0], w[2], String(leg.get("reason", "")) if not leg.get("legal", false) else "legal", chips])
+		_ok(sel_ok, "%s: Selector popup shows Checking at once (Use/SB blocked), proves off-frame with every frame < %.1f ms, settles legal / partial / refused, nothing spent" % [which, FRAME_SPIKE_MS])
+		# 2) Cancel: closing during a check stops the worker at once; nothing changes.
+		h.get_booster_adapter()._verdicts.clear()
+		p = acq.open_booster(h, SELECTOR)
+		var running: bool = h.is_booster_proof_running()
+		var t_c := Time.get_ticks_usec()
+		p.close("x")
+		await _frames(1)
+		var cancel_ms := _ms(t_c)
+		var cancel_ok: bool = running and not h.is_booster_proof_running() and _eco_core(eco) == e0 and _supply_list(h) == s0 \
+			and h.get_booster_adapter()._verdicts.is_empty()
+		print("    %s cancel: running %s, stopped in %.1f ms" % [which, str(running), cancel_ms])
+		_ok(cancel_ok and cancel_ms < 250.0, "%s: closing the popup mid-check cancels the worker (%.1f ms), nothing spent or changed" % [which, cancel_ms])
+		# 3) Stale: a proof started on one state never answers for another.
+		var a = h.get_booster_adapter()
+		var leg0: Dictionary = h.booster_legality_offframe(RANDOM)
+		var key0: Array = a.state_key()
+		var ic = h.get_input_controller()
+		for col in range(5):
+			if ic.activate_front(col).get("ok", false):
+				break
+		var key1: Array = a.state_key()
+		await _wait_proof(h, cap)
+		var stale_ok: bool = leg0.get("reason") == "checking" and key1 != key0 and not a._verdicts.has("random")
+		_ok(stale_ok, "%s: a verdict proven on an older state is dropped (state changed mid-check)" % which)
+		h.cancel_booster_proof()
+		# 4) HUD owned Random at a still moment: Checking hold, then auto-use or a no-spend refusal.
+		still = await _reach_still(h, 0)
+		eco.boosters.add_charges(RANDOM, 1)
+		var e1 := _eco_core(eco)
+		var s1 := _supply_list(h)
+		var lp_a: int = a.live_proof_count
+		var t_hud := Time.get_ticks_usec()
+		var r: Dictionary = h.request_booster(RANDOM)
+		print("    %s HUD tap -> hold popup %.1f ms (UI build, report-only)" % [which, _ms(t_hud)])
+		var hold: bool = r.get("reason") == "checking" and acq.find_open("booster_" + RANDOM) != null and h.get_runtime().is_user_paused()
+		var w2: Array = await _wait_proof(h, cap)
+		await _frames(3)
+		var used: bool = eco.boosters.charges(RANDOM) == 0 and _supply_list(h) != s1 and acq.find_open("booster_" + RANDOM) == null
+		var refused: bool = _eco_core(eco) == e1 and _supply_list(h) == s1 and acq.find_open("booster_" + RANDOM) != null
+		print("    %s HUD Random: hold %s, settled after %.0f ms (worst frame %.1f ms; settle + auto-use frame %.1f ms, report-only) -> %s" % [which, str(hold), w2[1], w2[0], w2[2], "used" if used else ("refused, nothing spent" if refused else "??")])
+		_ok(still and hold and (used or refused) and w2[0] < FRAME_SPIKE_MS and a.live_proof_count == lp_a,
+			"%s: owned Random at a still moment -> Checking hold (play paused), no frame >= %.1f ms, no main-thread proof (settle frame = commit + UI), then used once or refused with nothing spent" % [which, FRAME_SPIKE_MS])
+		var left = acq.find_open("booster_" + RANDOM)
+		if left != null:
+			left.close("x")
+		await _frames(2)
+		_free_host(h)
 
 ## Every gameplay truth a pause must freeze (detached copies).
 func _truth(h) -> Dictionary:

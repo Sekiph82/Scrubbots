@@ -15,7 +15,8 @@ static func now() -> int:
 
 ## Record one timed section that started at `start_usec` (from now()).
 static func add(section: String, start_usec: int) -> void:
-	if not enabled:
+	# Main-thread attribution only (an M46 R06 off-frame proof thread never writes here).
+	if not enabled or OS.get_thread_caller_id() != OS.get_main_thread_id():
 		return
 	var d: int = Time.get_ticks_usec() - start_usec
 	var a = _acc.get(section, null)

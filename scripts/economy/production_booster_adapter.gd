@@ -48,6 +48,33 @@ var _list_offset := 0
 ## Optional fault injector for tests: Callable(stage:String) -> bool; true forces
 ## that stage to fail so rollback can be proven. Never set in production.
 var _fault: Callable = Callable()
+## M46 R06 off-frame proof (owner 2026-10-16: no freeze, "Checking…" state). A detached copy
+## (detached_copy) proves on a worker thread under this total cap; the verdict is cached here
+## for the exact state it was proven on, so legality and execute answer without re-proving.
+const PROOF_TOTAL_MS := 5000
+var _cancelled := false
+## kind -> verdict for the state _verdict_key: "random" -> true / false / "timeout" (5 s cap hit);
+## "selector_list" -> {"ids": proven batch ids, "partial": cap hit (unlisted = unproven)}.
+var _verdicts := {}
+var _verdict_key: Array = []
+## Diagnostic: synchronous (main-thread) proofs started on this adapter (tests prove a cached
+## verdict answers without one).
+var live_proof_count := 0
+
+## Read-only frozen board for a worker-thread proof: ProofState.from_runtime reads only the
+## cell count + per-cell state, captured on the main thread.
+class FrozenBoard extends RefCounted:
+	var _states: PackedByteArray
+	var _rev: int
+	func _init(board) -> void:
+		_states = board.get_cell_states_copy()
+		_rev = board.get_revision()
+	func get_cell_count() -> int:
+		return _states.size()
+	func get_cell_state(i: int) -> int:
+		return _states[i]
+	func get_revision() -> int:
+		return _rev
 
 func _init(level, board, supply_engine, slots_engine, scheduler) -> void:
 	_level = level
@@ -62,6 +89,55 @@ func set_fault_injector(f: Callable) -> void:
 
 func _faulted(stage: String) -> bool:
 	return _fault.is_valid() and bool(_fault.call(stage))
+
+# ------------------------------------------------------ R06 off-frame proof ----
+
+## A copy that shares nothing mutable with the live engines (frozen board, copied supply +
+## slots, no scheduler => in-flight 0), so its proofs may run on a worker thread while the
+## main thread keeps rendering. Same proof code, budget = PROOF_TOTAL_MS. Main thread only.
+func detached_copy():
+	var sup = BatchSupplyEngine.create(_supply.get_column_count(), _supply.get_preview_depth())
+	if sup == null or not sup.load_candidate(_current_cols(), _supply.get_seed(), _supply.get_palette_size()):
+		return null
+	var d = get_script().new(_level, FrozenBoard.new(_board), sup, _scratch_slots_from_live(), null)
+	d.budget_ms = PROOF_TOTAL_MS
+	return d
+
+## Worker-thread entry (WorkerThreadPool task) on a detached_copy(): runs one proof and writes
+## {"value", "timed_out"} into out[0]. Touches nothing but this detached adapter.
+func run_offframe(kind: String, out: Array) -> void:
+	if kind == "random":
+		var p: Dictionary = propose_random_reorder()
+		out[0] = {"value": bool(p.get("safe", false)), "timed_out": String(p.get("reason", "")) == "proof_timeout"}
+	else:
+		var ids: Array = eligible_safe_batches()
+		out[0] = {"value": ids, "timed_out": last_proof_timed_out()}
+
+## Stop this (detached) adapter's proofs for good; safe to call from the main thread while a
+## worker runs them: every later probe fails closed as a timeout.
+func cancel_proof() -> void:
+	_cancelled = true
+	_classifier.cancel()
+
+## Identity of the gameplay state a booster proof depends on (board instance + monotonic
+## revision, full supply snapshot incl. seed, slot snapshots incl. capacity). Compared with ==
+## (exact, no hash collisions).
+func state_key() -> Array:
+	return [_board.get_instance_id(), _board.get_revision(), _supply.debug_snapshot(), _slots.snapshot()]
+
+## Store an off-frame verdict for the state `key` it was proven on (older ones drop).
+func put_verdict(kind: String, key: Array, value) -> void:
+	if key != _verdict_key:
+		_verdicts.clear()
+		_verdict_key = key
+	_verdicts[kind] = value
+
+## The cached verdict for `kind` if it was proven on exactly the current state, else null.
+## Only at still moments: with robots in flight the in-flight shortcut answers anyway.
+func cached_verdict(kind: String):
+	if not _verdicts.has(kind) or _inflight() > 0 or _verdict_key != state_key():
+		return null
+	return _verdicts[kind]
 
 # ------------------------------------------------------------ helpers ----
 
@@ -124,10 +200,14 @@ func propose_random_reorder() -> Dictionary:
 		for _i in range(q.size()):
 			nq.append(flat[k]); k += 1
 		reordered.append(nq)
-	_begin_budget()
-	var proven := _prove_three_consecutive_safe(reordered)
-	var timed_out := _budget_hit
-	_end_budget()
+	var cached = cached_verdict("random")
+	var proven: bool = typeof(cached) == TYPE_BOOL and cached
+	var timed_out: bool = typeof(cached) == TYPE_STRING   # the 5 s proof ran out on this state
+	if cached == null:
+		_begin_budget()
+		proven = _prove_three_consecutive_safe(reordered)
+		timed_out = _budget_hit
+		_end_budget()
 	if not proven:
 		return {"safe": false, "reason": "proof_timeout" if timed_out else "not_solver_safe"}
 	return {
@@ -212,8 +292,9 @@ func _is_safe_probe(scratch_supply, scratch_slots) -> bool:
 	var inflight := _inflight()
 	if inflight > 0 and _proof_state_buildable(scratch_supply, scratch_slots):
 		return true
-	# Owner proof budget: an exhausted budget is "not proven safe" (fail closed, nothing reserved).
-	if _deadline_usec > 0 and Time.get_ticks_usec() >= _deadline_usec:
+	# Owner proof budget: an exhausted budget (or an R06 cancel) is "not proven safe" (fail closed,
+	# nothing reserved).
+	if _cancelled or (_deadline_usec > 0 and Time.get_ticks_usec() >= _deadline_usec):
 		_budget_hit = true
 		return false
 	var state = ProofState.from_runtime(_level, _board, scratch_supply, scratch_slots)
@@ -232,6 +313,7 @@ func _is_safe_probe(scratch_supply, scratch_slots) -> bool:
 ## (Random legality / apply, Selector list / single batch / has-any). Never nested; each question
 ## starts a fresh deadline, so an aborted call can never leave a stale one behind.
 func _begin_budget() -> void:
+	live_proof_count += 1
 	_budget_hit = false
 	_deadline_usec = Time.get_ticks_usec() + budget_ms * 1000 if budget_ms > 0 else 0
 
@@ -259,6 +341,10 @@ func eligible_safe_batches() -> Array:
 	_last_timed_out = false
 	if _slots.rightmost_empty_index() == -1:
 		return out   # full at current capacity
+	var cached = cached_verdict("selector_list")
+	if cached != null:
+		_last_timed_out = cached["partial"]
+		return (cached["ids"] as Array).duplicate()
 	var original := _current_cols()
 	var ids := _batch_ids(original)
 	if ids.is_empty():
@@ -300,6 +386,11 @@ func is_batch_eligible(batch_id) -> bool:
 		return false   # malformed target: never eligible (was never in the id list either)
 	if _slots.rightmost_empty_index() == -1:
 		return false
+	var cached = cached_verdict("selector_list")
+	if cached != null:
+		var hit: bool = (cached["ids"] as Array).has(String(batch_id))
+		_last_timed_out = cached["partial"] and not hit
+		return hit
 	_begin_budget()
 	var ok := _selector_reorder_solvable(_current_cols(), String(batch_id))
 	_last_timed_out = _budget_hit and not ok
@@ -313,6 +404,10 @@ func has_eligible_safe_batch() -> bool:
 	_last_timed_out = false
 	if _slots.rightmost_empty_index() == -1:
 		return false
+	var cached = cached_verdict("selector_list")
+	if cached != null:
+		_last_timed_out = cached["partial"] and (cached["ids"] as Array).is_empty()
+		return not (cached["ids"] as Array).is_empty()
 	var original := _current_cols()
 	var ids := _batch_ids(original)
 	if ids.is_empty():

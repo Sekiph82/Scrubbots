@@ -53,6 +53,11 @@ func solve(initial_state, config: Dictionary = {}) -> Dictionary:
 func search_progress(root_state, config: Dictionary = {}) -> Dictionary:
 	return _search(root_state, GOAL_PROGRESS, config)
 
+## M46 R06: stop this solver's searches for good (an off-frame booster proof being cancelled
+## from the main thread). Every later search returns UNKNOWN_BOUND time_budget_exhausted.
+func cancel() -> void:
+	_kernel.cancelled = true
+
 func _search(input_state, goal: StringName, config: Dictionary) -> Dictionary:
 	# The kernel shares the cutoff for exactly this search (a single placement can run a whole
 	# dispatch-to-quiescence cascade), and never keeps it afterwards.
@@ -68,7 +73,7 @@ func _search_bounded(input_state, goal: StringName, config: Dictionary) -> Dicti
 	# pass it, so a player action can never freeze the game. Absent (the default, generation and
 	# every deterministic test/replay path) = no wall-clock influence at all. Hitting it is an
 	# UNKNOWN_BOUND, never a DEADLOCK, so callers fail closed without claiming anything.
-	var deadline_usec: int = int(config.get("deadline_usec", 0))
+	# (_search set it on the kernel; read through _kernel._out_of_time() so an R06 cancel lands.)
 	# Normalize the root to a quiescent state (apply any immediately-claimable clears)
 	# through the real kernel, so the search space is exactly quiescent decision points.
 	var q: Dictionary = _kernel.quiesce(input_state)
@@ -92,7 +97,7 @@ func _search_bounded(input_state, goal: StringName, config: Dictionary) -> Dicti
 		if visited.size() >= max_visited:
 			return _result(UNKNOWN_BOUND, "max_visited_exhausted", visited.size(), memo_hits,
 				frontier_peak, max_depth_reached, root_active, [])
-		if deadline_usec > 0 and Time.get_ticks_usec() >= deadline_usec:
+		if _kernel._out_of_time():
 			return _result(UNKNOWN_BOUND, "time_budget_exhausted", visited.size(), memo_hits,
 				frontier_peak, max_depth_reached, root_active, [])
 		var node: Dictionary = stack.pop_back()
@@ -118,7 +123,7 @@ func _search_bounded(input_state, goal: StringName, config: Dictionary) -> Dicti
 		var cols: Array = state.legal_action_columns()
 		var children: Array = []
 		for c in cols:
-			if deadline_usec > 0 and Time.get_ticks_usec() >= deadline_usec:
+			if _kernel._out_of_time():
 				return _result(UNKNOWN_BOUND, "time_budget_exhausted", visited.size(), memo_hits,
 					frontier_peak, max_depth_reached, root_active, [])
 			var r: Dictionary = _kernel.apply_placement(state, c)

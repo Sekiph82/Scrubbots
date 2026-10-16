@@ -241,6 +241,10 @@ func _g02_target_visible_acquire() -> void:
 	for id in ["selector", "tornado", "random"]:
 		var t0 := _truth()
 		await _tap_booster(id)
+		# M46 R06: a still-moment Random / Selector proof runs off-frame ("Checking..."); wait for it.
+		while _host.is_booster_proof_running():
+			await process_frame
+		await process_frame
 		var p = _stack().top()
 		_ok(_stack().ids() == ["booster_" + id] and p.get_title() == UiText.t("BOOSTER_NAME_" + id.to_upper()), "%s: visible tap -> booster_%s" % [id, id])
 		if id == "random":
