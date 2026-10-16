@@ -210,6 +210,16 @@ func eligible_safe_batches() -> Array:
 				out.append(bid)
 	return out
 
+## Is exactly `batch_id` solver-safe to extract right now? The same rule as membership in
+## eligible_safe_batches() (empty slot + remaining batch + post-placement safety), proven for
+## that one batch only (M46: the full list re-runs the solver per remaining batch).
+func is_batch_eligible(batch_id) -> bool:
+	if typeof(batch_id) != TYPE_STRING and typeof(batch_id) != TYPE_STRING_NAME:
+		return false   # malformed target: never eligible (was never in the id list either)
+	if _slots.rightmost_empty_index() == -1:
+		return false
+	return _selector_reorder_solvable(_current_cols(), String(batch_id))
+
 ## M43-C004: is at least one batch solver-safe to extract right now? Same proof as
 ## eligible_safe_batches(), stopping at the first safe batch (read-only).
 func has_eligible_safe_batch() -> bool:

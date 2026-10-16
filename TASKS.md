@@ -2287,7 +2287,17 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_V01.md`; `CLAUDE_PEER
 - **p18:** 59×59 maze where real routes turn 7 times through 41 cells along the cleared corridor, with no duplicate reservation; WON.
 - **p19:** see SB-M46-015 below.
 
-Rows stay OPEN for: phone/GPU numbers (M47), Random / Selector under 59×59 load, and a ChatGPT audit.
+Rows stay OPEN for: phone/GPU numbers (M47) and a ChatGPT audit.
+
+**[2026-10-16 R03] Random + Selector under 59×59 load: R03_PARTIAL.** Functionally PASS (p20). Full-suite timing is unstable on the owner laptop under contention: the owner's open Godot editor was using about one core.
+- **Random:** legal with 3 free slots (its owner rule), charged once, every batch conserved.
+- **Selector:** the chosen batch goes into a slot, charged once.
+- **Production fix:** Selector execute 641 → 44 ms, by proving the single chosen batch. Equivalence was checked for all 92 ids, plus a `CLAUDE_PEER_REVIEW`; booster regressions PASS.
+- **Open findings:**
+  - Selector legality listing takes about 0.6 s (the popup target list; the UX change needs the owner).
+  - One Random refusal proof was observed at about 5.1 s (classifier unbounded in time; not reproduced).
+
+Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R03_V01.md`.
 
 - [ ] SB-M46-001 Level parsing.
 - [ ] SB-M46-002 BoardState.
