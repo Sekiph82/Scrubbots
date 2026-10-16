@@ -456,7 +456,7 @@ func free_slot_if_idle(index) -> Dictionary:
 		return {"ok": false}
 	if s.get_state() != SlotBatchState.ACTIVE:
 		return {"ok": false}
-	if s.get_committed() != 0 or s.get_remaining() != s.get_initial_count():
+	if s.get_committed() != 0 or s.get_remaining_to_clear() != s.get_initial_count():
 		return {"ok": false}
 	# Drop any live work keyed to this slot (there is none when committed==0, but
 	# stay defensive) and empty it.
