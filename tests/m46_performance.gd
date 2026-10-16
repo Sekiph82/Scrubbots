@@ -73,6 +73,10 @@ const ColorSymbols = preload("res://scripts/ui/color_symbols.gd")
 const RuntimePerfProbe = preload("res://scripts/debug/runtime_perf_probe.gd")
 const BatchSlotView = preload("res://scripts/ui/batch_slot_view.gd")
 const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
+const ProofState = preload("res://scripts/gameplay/solver/proof_state.gd")
+const DeadlockClassifier = preload("res://scripts/gameplay/solver/deadlock_classifier.gd")
+const BatchSupplyEngine = preload("res://scripts/gameplay/supply/batch_supply_engine.gd")
+const ProductionBoosterAdapter = preload("res://scripts/economy/production_booster_adapter.gd")
 const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
 const FeedbackAdapter = preload("res://scripts/ui/feel/feedback_adapter.gd")
 const EffectsSettingsService = preload("res://scripts/settings/effects_settings_service.gd")
@@ -1464,6 +1468,35 @@ func _p20() -> void:
 					var junk_ok: bool = not adapter.is_batch_eligible("NO_SUCH") and not adapter.is_batch_eligible(null) and not adapter.is_batch_eligible(5) \
 						and adapter.is_batch_eligible(StringName(String(listed[0]))) == true
 					_ok(agree == ids.size() and junk_ok, "is_batch_eligible == eligible_safe_batches membership for all %d supply ids (%d eligible); unknown / null / int false, StringName id accepted" % [ids.size(), listed.size()])
+					# R03 in-flight shortcut: the probe must give the classifier's own verdict on the
+					# fully built ProofState, for every batch's real post-placement scratch state.
+					var same_verdict := 0
+					var inflight: int = adapter._inflight()
+					for bid in ids:
+						var cols0: Array = adapter._current_cols()
+						var tcol := -1
+						for c in range(cols0.size()):
+							for bb in cols0[c]:
+								if bb.get_batch_id() == bid:
+									tcol = c
+						var sup = BatchSupplyEngine.create(h.get_supply().get_column_count(), h.get_supply().get_preview_depth())
+						sup.load_candidate(adapter._cols_with_front(cols0, bid), h.get_supply().get_seed(), h.get_supply().get_palette_size())
+						var ss = adapter._scratch_slots_from_live()
+						ss.select_front_batch(sup, tcol)
+						var st0 = ProofState.from_runtime(h.get_level(), h.get_board(), sup, ss)
+						var status: StringName = adapter._classifier.classify(st0, inflight).get("status", &"") if st0 != null else &""
+						var full: bool = status in [DeadlockClassifier.PROGRESSABLE, DeadlockClassifier.STALLED, DeadlockClassifier.COMPLETED]
+						same_verdict += 1 if adapter._is_safe_probe(sup, ss) == full else 0
+					_ok(inflight > 0 and same_verdict == ids.size(), "in-flight shortcut (%d bots in flight): probe verdict == full ProofState + classifier verdict for all %d batches" % [inflight, ids.size()])
+					# Null-mirroring: where ProofState.from_runtime would return null the probe must stay
+					# false even with bots in flight (null slots, non-engine supply, board/level size mismatch).
+					var sup2 = BatchSupplyEngine.create(h.get_supply().get_column_count(), h.get_supply().get_preview_depth())
+					sup2.load_candidate(adapter._current_cols(), h.get_supply().get_seed(), h.get_supply().get_palette_size())
+					var ss2 = adapter._scratch_slots_from_live()
+					var mismatched = ProductionBoosterAdapter.new(h.get_level(), BoardState.from_level_data(_level_from(_stripe_level_dict(20))), h.get_supply(), h.get_slots(), h.get_scheduler())
+					_ok(adapter._inflight() > 0 and not adapter._is_safe_probe(sup2, null) and not adapter._is_safe_probe(RefCounted.new(), ss2)
+						and mismatched._inflight() > 0 and not mismatched._is_safe_probe(sup2, ss2) and adapter._is_safe_probe(sup2, ss2),
+						"in-flight shortcut keeps every from_runtime refusal: null slots, non-engine supply and a 20x20 board under a 59x59 level all false; the valid state true")
 				if leg.get("legal", false):
 					var e0 := _eco_core(eco)
 					var sup0 := _supply_list(h)

@@ -2299,6 +2299,14 @@ Rows stay OPEN for: phone/GPU numbers (M47) and a ChatGPT audit.
 
 Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R03_V01.md`.
 
+**[2026-10-16 R04] booster legality in-flight shortcut: LOCAL_PASS.** When bots are in flight, the solver-safety probe skips building the full 59×59 ProofState. That is exact: the classifier answers PROGRESSABLE before reading the state, and every `from_runtime` null condition is mirrored.
+- **Selector legality:** about 600 → about 120–150 ms. `eligible_safe_batches` (110 batches) 927 → 160 ms.
+- **Random legality:** about 22 → 3 ms.
+- **Evidence:** p20 asserts verdict equality for 92 batches plus the null-mirroring refusals. 15 booster / gate / chaos / need-a-hand regressions PASS. `CLAUDE_PEER_REVIEW` found 0 blockers / majors.
+- **Still open:** quiet moments with no bots in flight (full proof, about 1 s list at 59×59; the 5.1 s refusal case). Bounding the classifier is an owner-visible tradeoff.
+
+Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R04_V01.md`.
+
 - [ ] SB-M46-001 Level parsing.
 - [ ] SB-M46-002 BoardState.
 - [ ] SB-M46-003 Renderer.
