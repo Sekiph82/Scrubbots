@@ -353,7 +353,12 @@ func _refresh_booster(p, rebuild_targets: bool = false) -> void:
 	if p.context.get("auto_use", false) and v["reason"] != "checking":
 		p.context["auto_use"] = false
 		if v["legal"] and has_charge and not needs_target:
-			_on_booster_action.call_deferred("use", {}, p)
+			_auto_use.call_deferred(p)
+
+## Deferred auto-use: only if that popup is still open and on top (it may close in between).
+func _auto_use(p) -> void:
+	if is_instance_valid(p) and p.is_open() and p.is_top() and not p.is_busy():
+		_on_booster_action("use", {}, p)
 
 func _on_booster_proof_settled(id: String) -> void:
 	var p = find_open("booster_" + id)
@@ -658,13 +663,22 @@ func _apply_reward_outcome(p, result: Dictionary, wait: Dictionary) -> void:
 	var host = p.get_meta("host") if p.has_meta("host") else null
 	var booster := String(wait.get("booster", ""))
 	if host != null and is_instance_valid(host):
-		var v := booster_model(host, booster)
+		# M46 R07: the grant is already committed (exactly once, by the rewarded service); using
+		# it needs a positive safety proof. Never a main-thread still-moment proof here: the
+		# exact-state cache answers, or the shared R06 worker checks while this popup (which
+		# pauses play) shows "Checking...", and the granted charge is then used automatically
+		# only if proven (no-target boosters; a refusal / timeout / close keeps the charge).
+		var leg: Dictionary = host.booster_legality_offframe(booster) \
+			if host.has_method("booster_legality_offframe") else host.booster_legality(booster)
+		var v := booster_model(host, booster, leg)
 		var target_ok: bool = v["target_kind"] == "" or p.context.get("target") != null
 		if v["legal"] and target_ok:
 			var r: Dictionary = host.execute_booster(booster, p.context.get("target"))
 			if r.get("ok", false):
 				p.close("booster_used")
 				return
+		elif v["reason"] == "checking" and v["target_kind"] == "":
+			p.context["auto_use"] = true
 	_status(p, UiText.t("BOOSTER_CHARGE_SAVED"))
 	_refresh(p, true)
 

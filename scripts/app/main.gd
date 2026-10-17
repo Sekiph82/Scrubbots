@@ -691,6 +691,11 @@ func launch_gameplay(parent: Node = null) -> Dictionary:
 		return last_launch
 	_gameplay_host = host
 	meta_feel.bind_gameplay(host)   # F009: committed booster use (the host owns its facade)
+	# M46 R07: a settled off-frame booster proof re-renders the coachmark copy at once.
+	if host.has_signal("booster_proof_settled"):
+		host.booster_proof_settled.connect(func(_id: String):
+			_coach_copy["at"] = 0
+			refresh_coachmark())
 	# M44: a REAL accepted Supply front placement completes the L1 "tap a front batch" tip.
 	var ic = host.get_input_controller()
 	if ic != null:
