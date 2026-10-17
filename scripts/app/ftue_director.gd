@@ -134,7 +134,9 @@ func step_copy(step: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 				# M46 R07: never a main-thread still-moment proof for a hint. Off-frame legality
 				# answers from the exact-state cache or starts the shared R06 worker ("checking":
 				# no claim either way, so no suffix; main refreshes the copy when it settles).
-				var leg: Dictionary = host.booster_legality_offframe(String(id)) \
+				# M46 RM003: a yes/no hint, so no Selector target list (the full list rebuilt a
+				# scratch engine per batch every 2 s while robots moved: 23-28 ms main thread).
+				var leg: Dictionary = host.booster_legality_offframe(String(id), false) \
 					if host.has_method("booster_legality_offframe") else host.booster_legality(String(id))
 				if String(leg.get("reason", "")) != "checking" and not bool(leg.get("legal", false)):
 					line += " " + UiText.t("FTUE_BOOSTER_NOT_NOW")
