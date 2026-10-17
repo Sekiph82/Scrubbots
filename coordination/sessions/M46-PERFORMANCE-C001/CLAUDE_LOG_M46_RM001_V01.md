@@ -139,4 +139,31 @@ godot_console --headless --path C:\Users\sekip\Desktop\ScrubBots -s res://tests/
 - No temporary files remain.
 - No other agent's process was touched.
 
-**Status: AWAITING_AUDIT** (child RM-001). RM-002 follows under the master.
+## Addendum (same day): peer-review hardening and the final run
+A fresh-context `CLAUDE_PEER_REVIEW` (read-only, not ChatGPT; findings in `CLAUDE_LOG_M46_RM002_V01.md` §6) led to these test-only changes in `0fa6ee24`:
+- **Duplicate-reservation check:** it was structural, since reservations are Dictionary keys. It is replaced by `reserved == agents` (one reserved target per in-flight agent) and the "0 duplicates" claim is withdrawn. RMCTL4 above only showed that the test's own array check worked.
+- **Warm-up:** capped at `WARMUP_OBJ_MAX` = 4,800 (measured 3,207).
+- **Idle host window:** raised from 120 to **600 frames**, so work that repeats less often than every 2 s is seen.
+- **Detection floor stated:** the per-clear budget catches sustained in-play churn of about **4.1 Objects/frame** or more ((70 − 47.65) × 3,481 / 18,961); smaller churn is caught only by the idle windows.
+- **Comments** synced with the measurements.
+- **Provenance:** every local run includes the owner-local `project.godot` (an extra `_mcp_game_helper` autoload, `godot_ai` plugin enabled, audio bus layout removed), so local results are not byte-identical to a GitHub `main` runtime (RM002-10 OPEN).
+
+**Final full suite on `0fa6ee247fe5e5f088975c0713b0386d7c94a851`:**
+- `PASS (22/22 cases, 0 fail)`, **exit 0**, 487 s.
+- CPU load 5–6%; 2–4 other-project Godot processes running.
+
+| Case | Values |
+| --- | --- |
+| p13 | mean 2.461 / p99 8.798 ms, max 54.065 ms |
+| p14 | 114 agents == 114 nodes == 114 reserved (floor 90); one-batch control 31 |
+| p11 | 600 idle frames create 1 (≤ 4); warm-up 3,207 (≤ 4,800); 47.67 per clear (≤ 70) |
+| p15 | calibration 60 / 60; rebind 0; idle window 0; pulse 750 |
+| p10 | board-size cost +0.34 MB |
+| p12 | retry worst **49.00 ms** (one-off limit 50.1) |
+| p21 | worst proof call 419 ms |
+
+**Outlier note:** the p12 retry worst was again close to its 50.1 ms limit (48.51 / 49.00 ms across the two runs). It is a pre-existing one-off metric. Reported, not loosened; flagged for the auditor.
+
+**RM001-08 is satisfied by this final run on the final SHA.** The earlier `884c2348` run stays as history.
+
+**Status: AWAITING_AUDIT** (child RM-001). The master joint handoff is in `CLAUDE_LOG_M46_RM002_V01.md` §7.
