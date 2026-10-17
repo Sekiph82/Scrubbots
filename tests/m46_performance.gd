@@ -21,8 +21,8 @@ extends SceneTree
 ##   p10 59x59 memory             59x59 vs 20x20 host build delta
 ##   p11 per-frame allocation     no NET Object growth over idle frames or the level, AND (RM-001)
 ##                                Objects CREATED (transient included, via the ObjectDB validator
-##                                counter, harness awaits calibrated out): 0 in 120 idle host frames
-##                                after warm-up; <= 70 per cleared cell over the whole level
+##                                counter, harness awaits calibrated out): ~0 in 600 idle host frames
+##                                after a capped warm-up; <= 70 per cleared cell over the whole level
 ##   p15 UI idle churn            identical slot rebinds reuse their styleboxes and create 0 Objects;
 ##                                the idle board magnifier does not process and its idle window
 ##                                creates 0 Objects; a synthetic transient pulse must be detected
@@ -127,14 +127,20 @@ const RESTART_OBJECT_DRIFT := 8
 const RESTART_STATIC_DRIFT := 256 * 1024
 ## A whole 59x59 level must finish inside this many simulated frames (bounded run).
 const MAX_FRAMES := 60000
-## M46-011 (RM-001): Objects an idle window (60 / 120 frames) may CREATE, transient included,
-## harness awaits excluded (_obj_serial). Measured 0; 4 tolerates an engine-internal one-off. A
-## synthetic pulse of PULSE_PER_FRAME (Objects created and freed each frame) is the built-in
-## sensitivity control and must break this budget.
+## M46-011 (RM-001): Objects an idle window (60 UI / 600 host frames) may CREATE, transient
+## included, harness awaits excluded (_obj_serial). Measured 0-1; 4 tolerates an engine-internal
+## one-off. A synthetic pulse of PULSE_PER_FRAME (Objects created and freed each frame) is the
+## built-in sensitivity control and must break this budget. The p15 calibration (exactly 1 Object
+## per await) also guards the private ObjectDB id layout the probe relies on.
 const IDLE_OBJ_WINDOW_MAX := 4
+const IDLE_HOST_FRAMES := 600
 const PULSE_PER_FRAME := 25
+## One-time lazy state created by the first 120 ticks after build: measured 3,207; ~1.5x cap.
+const WARMUP_OBJ_MAX := 4800
 ## Objects created per cleared cell over the whole p13 level (agent node, route, effect cue ...;
-## work-proportional, harness excluded). Measured ~46.9 (RM-001 log); ~1.5x headroom.
+## work-proportional, harness excluded). Measured 47.6-47.65 (RM-001 log); ~1.5x headroom. Its
+## detection floor for steady churn during play is ~4.1 Objects/frame ((70-47.65)*3481/18961);
+## smaller sustained churn is caught only by the idle windows.
 const LEVEL_OBJ_PER_CLEAR_MAX := 70.0
 ## M46-014 floor (RM-001 log): the p13 fixture is deterministic (fixed DT, scripted feeding) and
 ## peaks at 114 agents; 90 (~79%) allows legitimate tuning while one-batch-at-a-time feeding
@@ -570,11 +576,12 @@ func _p13_p14_p08_p11() -> void:
 	await process_frame
 	var o0: int = _mem()["objects"]
 	var s_idle := _obj_serial()
-	for _i in range(120):
+	# 600 idle frames (10 s simulated at 60 Hz) so work repeating less often than every 2 s is seen.
+	for _i in range(IDLE_HOST_FRAMES):
 		rt.tick(DT)
 		await process_frame
 	# Minus the harness: one GDScriptFunctionState per `await` in this coroutine (calibrated in p15).
-	var idle_created := _created_since(s_idle) - 120
+	var idle_created := _created_since(s_idle) - IDLE_HOST_FRAMES
 	var idle_growth: int = _mem()["objects"] - o0
 	var base := _mem()
 	var times: Array = []
@@ -582,7 +589,6 @@ func _p13_p14_p08_p11() -> void:
 	var peak_agents := 0
 	var peak_nodes := 0
 	var peak_res := 0
-	var peak_dup := 0
 	var s_level := _obj_serial()
 	var peak_fx := 0
 	var frames := 0
@@ -608,12 +614,9 @@ func _p13_p14_p08_p11() -> void:
 			# M46-014 (RM-001): at each new peak, cross-check real agents vs reserved targets.
 			peak_agents = act
 			peak_nodes = _agent_nodes(h)
-			var reserved: PackedInt32Array = h.get_reservations().get_reserved_indices()
-			peak_res = reserved.size()
-			var uniq := {}
-			for ri in reserved:
-				uniq[ri] = true
-			peak_dup = reserved.size() - uniq.size()
+			# Reservations are a set by construction (Dictionary keys), so "no duplicate" is
+			# structural; the observable claim is one reserved target per in-flight agent.
+			peak_res = h.get_reservations().get_reserved_indices().size()
 		if fx != null:
 			peak_fx = maxi(peak_fx, fx.get_active_count())
 	var level_created := _created_since(s_level) - frames   # minus one harness await per frame
@@ -642,11 +645,11 @@ func _p13_p14_p08_p11() -> void:
 	# peak is a property of the code, not of the machine. DENSITY_MIN is a regression floor
 	# ~80% of the measured peak (see the RM-001 log); real agent nodes must match the dispatcher
 	# count and each in-flight agent holds one distinct reserved target.
-	print("    density peak: %d dispatcher agents, %d ScrubbotAgent nodes, %d reserved targets (%d duplicate)" % [peak_agents, peak_nodes, peak_res, peak_dup])
+	print("    density peak: %d dispatcher agents, %d ScrubbotAgent nodes, %d reserved targets" % [peak_agents, peak_nodes, peak_res])
 	_ok(peak_agents >= DENSITY_MIN, "high density: %d agents in flight at peak (>= %d, regression floor from the deterministic p13 fixture)" % [peak_agents, DENSITY_MIN])
-	_ok(peak_nodes == peak_agents and peak_res >= peak_agents and peak_dup == 0,
-		"at the peak: %d real agent nodes == %d dispatched, %d reserved targets (>= agents), 0 duplicate reservations" % [peak_nodes, peak_agents, peak_res])
-	_summary.append("SB-M46-014 peak concurrent agents %d (nodes %d, reserved %d, dup %d) during the 59x59 level (floor %d)" % [peak_agents, peak_nodes, peak_res, peak_dup, DENSITY_MIN])
+	_ok(peak_nodes == peak_agents and peak_res == peak_agents,
+		"at the peak: %d real agent nodes == %d dispatched == %d reserved targets (one distinct reserved target per agent; the reservation set is duplicate-free by construction)" % [peak_nodes, peak_agents, peak_res])
+	_summary.append("SB-M46-014 peak concurrent agents %d (nodes %d, reserved %d) during the 59x59 level (floor %d)" % [peak_agents, peak_nodes, peak_res, DENSITY_MIN])
 	var reduced: int = await _reduced_density_peak()
 	_ok(reduced < DENSITY_MIN, "M46-014 sensitivity: the same fixture fed one batch at a time peaks at %d agents -> the density floor %d fails it" % [reduced, DENSITY_MIN])
 	_complete("p14_agent_density")
@@ -654,8 +657,9 @@ func _p13_p14_p08_p11() -> void:
 	_ok(fx != null and peak_fx > 0 and (cap < 0 or peak_fx <= cap) and fx.get_active_count() == 0, "cleaning FX: peak %d active (cap %s), 0 after the level" % [peak_fx, str(cap)])
 	_summary.append("SB-M46-008 effects peak %d active cues (cap %s) over 3,481 clears, 0 at end" % [peak_fx, str(cap)])
 	_complete("p08_effects")
-	_ok(idle_growth <= 0, "120 idle frames: Object count %+d (no growth)" % idle_growth)
-	_ok(idle_created <= IDLE_OBJ_WINDOW_MAX, "M46-011: 120 idle host frames (after warm-up, %d one-time Objects) CREATE %d Objects (transient included, harness excluded; <= %d per window)" % [warm_created, idle_created, IDLE_OBJ_WINDOW_MAX])
+	_ok(idle_growth <= 0, "%d idle frames: Object count %+d (no growth)" % [IDLE_HOST_FRAMES, idle_growth])
+	_ok(idle_created <= IDLE_OBJ_WINDOW_MAX, "M46-011: %d idle host frames (after warm-up) CREATE %d Objects (transient included, harness excluded; <= %d per window)" % [IDLE_HOST_FRAMES, idle_created, IDLE_OBJ_WINDOW_MAX])
+	_ok(warm_created <= WARMUP_OBJ_MAX, "M46-011: one-time warm-up of the first 120 ticks after build creates %d Objects (<= %d)" % [warm_created, WARMUP_OBJ_MAX])
 	var per_clear: float = float(level_created) / maxf(1.0, float(cleared))
 	print("    M46-011 level: %d Objects created over %d frames / %d clears = %.2f per clear, %.2f per frame" % [level_created, frames, cleared, per_clear, float(level_created) / maxf(1.0, float(frames))])
 	_ok(per_clear <= LEVEL_OBJ_PER_CLEAR_MAX, "M46-011: Objects created per cleared cell %.2f (<= %.1f; work-proportional, not per frame)" % [per_clear, LEVEL_OBJ_PER_CLEAR_MAX])
