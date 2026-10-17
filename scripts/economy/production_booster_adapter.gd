@@ -55,6 +55,8 @@ var _fault: Callable = Callable()
 ## (detached_copy) proves on a worker thread under this total cap; the verdict is cached here
 ## for the exact state it was proven on, so legality and execute answer without re-proving.
 const PROOF_TOTAL_MS := 5000
+## The cap a detached_copy() proves under (tests may lower it to force a timeout).
+var offframe_budget_ms := PROOF_TOTAL_MS
 var _cancelled := false
 ## kind -> verdict for the state _verdict_key: "random" -> true / false / "timeout" (5 s cap hit);
 ## "selector_list" -> {"ids": proven batch ids, "partial": cap hit (unlisted = unproven)}.
@@ -106,7 +108,7 @@ func detached_copy():
 	if ss == null:
 		return null
 	var d = get_script().new(_level, FrozenBoard.new(_board), sup, ss, null)
-	d.budget_ms = PROOF_TOTAL_MS
+	d.budget_ms = offframe_budget_ms
 	return d
 
 ## Worker-thread entry (WorkerThreadPool task) on a detached_copy(): runs one proof and writes

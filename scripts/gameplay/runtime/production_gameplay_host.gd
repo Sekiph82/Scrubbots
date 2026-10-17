@@ -969,6 +969,8 @@ func _selector_legality(ids: Array, partial: bool) -> Dictionary:
 signal booster_proof_settled(id: String)
 const _PROOF_KIND := {BoosterInventory.RANDOM: "random", BoosterInventory.SELECTOR: "selector_list"}
 var _proof_job: Dictionary = {}
+## True from the start of _exit_tree: no new off-frame worker may start on a leaving host.
+var _proof_closed := false
 
 ## Booster legality without freezing: the plain answer when robots move, nothing needs a
 ## proof, or the exact state already has a verdict (proven, refused, or the 5 s cap ran out:
@@ -976,6 +978,8 @@ var _proof_job: Dictionary = {}
 ## otherwise starts the off-frame proof and returns reason "checking"
 ## (booster_proof_settled(id) follows). Never reserves or mutates.
 func booster_legality_offframe(id: String) -> Dictionary:
+	if _proof_closed:
+		return {"legal": false, "reason": "exiting", "targets": []}   # leaving: no proof of any kind
 	if needs_offframe_proof(id) and _start_proof(id):
 		return {"legal": false, "reason": "checking", "targets": []}
 	return booster_legality(id)
@@ -983,7 +987,7 @@ func booster_legality_offframe(id: String) -> Dictionary:
 ## True when legality of `id` right now would need a fresh still-moment proof.
 func needs_offframe_proof(id: String) -> bool:
 	var kind: String = _PROOF_KIND.get(id, "")
-	if kind == "" or _economy == null or _booster_adapter == null or _built == false \
+	if kind == "" or _proof_closed or not is_inside_tree() or _economy == null or _booster_adapter == null or _built == false \
 			or (_completion != null and _completion.is_terminal()) or _booster_adapter._inflight() > 0:
 		return false
 	if id == BoosterInventory.SELECTOR and (_slots == null or _slots.rightmost_empty_index() == -1):
@@ -1142,7 +1146,13 @@ func _bind_modal_stack() -> void:
 		acquisition.bind(modal_stack, _economy, _actions, ShopHandoff.new())
 		_owns_acquisition = true
 
+func _enter_tree() -> void:
+	_proof_closed = false
+
 func _exit_tree() -> void:
+	# Close the off-frame proof seam FIRST: the cancel's settle signal can re-render UI (the
+	# coach copy) that would otherwise start a new, never-joined worker on this exiting host.
+	_proof_closed = true
 	cancel_booster_proof()
 	if _owns_acquisition and acquisition != null:
 		acquisition.unbind()

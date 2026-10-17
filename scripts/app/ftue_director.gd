@@ -130,9 +130,14 @@ func step_copy(step: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 		for id in step["boosters"]:
 			var line := UiText.t("FTUE_BOOSTER_LINE", [UiText.t("BOOSTER_NAME_" + String(id).to_upper()),
 				UiText.num(_app.economy.boosters.charges(String(id))), UiText.t("BOOSTER_EFFECT_" + String(id).to_upper())])
-			if host != null and is_instance_valid(host) and host.has_method("booster_legality") \
-					and not bool(host.booster_legality(String(id)).get("legal", false)):
-				line += " " + UiText.t("FTUE_BOOSTER_NOT_NOW")
+			if host != null and is_instance_valid(host) and host.has_method("booster_legality"):
+				# M46 R07: never a main-thread still-moment proof for a hint. Off-frame legality
+				# answers from the exact-state cache or starts the shared R06 worker ("checking":
+				# no claim either way, so no suffix; main refreshes the copy when it settles).
+				var leg: Dictionary = host.booster_legality_offframe(String(id)) \
+					if host.has_method("booster_legality_offframe") else host.booster_legality(String(id))
+				if String(leg.get("reason", "")) != "checking" and not bool(leg.get("legal", false)):
+					line += " " + UiText.t("FTUE_BOOSTER_NOT_NOW")
 			lines.append(line)
 		body = "\n".join(lines)
 	return {"title": UiText.t(String(step["title"])), "body": body}
