@@ -980,6 +980,11 @@ func _selector_legality(ids: Array, partial: bool) -> Dictionary:
 signal booster_proof_settled(id: String)
 const _PROOF_KIND := {BoosterInventory.RANDOM: "random", BoosterInventory.SELECTOR: "selector_list"}
 var _proof_job: Dictionary = {}
+## M46 RM004: internal provenance of the last off-frame proof, for tests / diagnostics only
+## (the player-facing verdict for a worker error and the 5 s deadline is the same fail-closed
+## proof_timeout): {"id", "kind", "outcome": "completed" | "deadline_timeout" | "worker_error"
+## | "cancelled", "stale": result dropped because the state changed meanwhile}.
+var last_proof_diagnostic: Dictionary = {}
 ## True from the start of _exit_tree: no new off-frame worker may start on a leaving host.
 var _proof_closed := false
 
@@ -1039,7 +1044,10 @@ func _process(_delta: float) -> void:
 	# A verdict counts only for the exact state it was proven on. A worker that ended without
 	# a result (script error) counts as the cap running out: fail closed, no endless restarts.
 	var res = job["out"][0]
-	if _booster_adapter != null and _booster_adapter.state_key() == job["key"]:
+	var current: bool = _booster_adapter != null and _booster_adapter.state_key() == job["key"]
+	last_proof_diagnostic = {"id": job["id"], "kind": job["kind"], "stale": not current,
+		"outcome": "worker_error" if res == null else ("deadline_timeout" if res["timed_out"] else "completed")}
+	if current:
 		var timed_out: bool = res == null or res["timed_out"]
 		var value = ("timeout" if timed_out else res["value"]) if job["kind"] == "random" \
 			else {"ids": res["value"] if res != null else [], "partial": timed_out}
@@ -1061,6 +1069,7 @@ func _stop_proof() -> String:
 	_proof_job["adapter"].cancel_proof()
 	WorkerThreadPool.wait_for_task_completion(_proof_job["task"])
 	var id: String = _proof_job["id"]
+	last_proof_diagnostic = {"id": id, "kind": _proof_job["kind"], "stale": false, "outcome": "cancelled"}
 	_proof_job = {}
 	set_process(false)
 	return id
