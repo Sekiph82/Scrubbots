@@ -19,9 +19,13 @@ extends SceneTree
 ##   p08 effects                  cleaning FX stay under their cap during a full 59x59 level
 ##   p09 memory baseline          a 59x59 production host: build delta, free -> back to baseline
 ##   p10 59x59 memory             59x59 vs 20x20 host build delta
-##   p11 per-frame allocation     no NET Object growth over idle frames or the level (churn: p15)
-##   p15 UI idle churn            identical slot rebinds reuse their styleboxes (no per-tick
-##                                allocation); the idle board magnifier does not process
+##   p11 per-frame allocation     no NET Object growth over idle frames or the level, AND (RM-001)
+##                                Objects CREATED (transient included, via the ObjectDB validator
+##                                counter, harness awaits calibrated out): 0 in 120 idle host frames
+##                                after warm-up; <= 70 per cleared cell over the whole level
+##   p15 UI idle churn            identical slot rebinds reuse their styleboxes and create 0 Objects;
+##                                the idle board magnifier does not process and its idle window
+##                                creates 0 Objects; a synthetic transient pulse must be detected
 ##   p16 unlock chains + WAITING  a second COMPLETE 59x59 level (Level Data v2): VOID ring,
 ##                                12 colours, three nested 3-deep pockets (P1 ring > P2 ring >
 ##                                P3 core) that unlock only as the surrounding art is cleared,
@@ -58,7 +62,9 @@ extends SceneTree
 ##   p12 repeated restart         30 retries mid-level: nodes exact, objects / memory bounded
 ##   p13 long session             a COMPLETE 59x59 level (3,481 clears) through the real
 ##                                production host to WON; frame-time distribution
-##   p14 high agent density       peak concurrent in-flight agents during p13
+##   p14 high agent density       peak concurrent in-flight agents during p13 >= 90 (deterministic
+##                                fixture peaks at 114; RM-001), real agent nodes == dispatched,
+##                                one distinct reserved target each; one-batch feeding (31) fails
 ##
 ## Run: godot --headless --path . -s res://tests/m46_performance.gd
 
@@ -121,6 +127,19 @@ const RESTART_OBJECT_DRIFT := 8
 const RESTART_STATIC_DRIFT := 256 * 1024
 ## A whole 59x59 level must finish inside this many simulated frames (bounded run).
 const MAX_FRAMES := 60000
+## M46-011 (RM-001): Objects an idle window (60 / 120 frames) may CREATE, transient included,
+## harness awaits excluded (_obj_serial). Measured 0; 4 tolerates an engine-internal one-off. A
+## synthetic pulse of PULSE_PER_FRAME (Objects created and freed each frame) is the built-in
+## sensitivity control and must break this budget.
+const IDLE_OBJ_WINDOW_MAX := 4
+const PULSE_PER_FRAME := 25
+## Objects created per cleared cell over the whole p13 level (agent node, route, effect cue ...;
+## work-proportional, harness excluded). Measured ~46.9 (RM-001 log); ~1.5x headroom.
+const LEVEL_OBJ_PER_CLEAR_MAX := 70.0
+## M46-014 floor (RM-001 log): the p13 fixture is deterministic (fixed DT, scripted feeding) and
+## peaks at 114 agents; 90 (~79%) allows legitimate tuning while one-batch-at-a-time feeding
+## (peak 31) or any halving fails.
+const DENSITY_MIN := 90
 
 var EXPECTED_CASES := ["p01_parse", "p02_board_state", "p03_renderer", "p04_index_access", "p05_selector", "p06_routing",
 	"p07_agents", "p08_effects", "p09_memory_baseline", "p10_memory_59", "p11_allocation", "p12_restart",
@@ -402,6 +421,15 @@ func _p15() -> void:
 	sub.size = Vector2i(400, 400)
 	sub.disable_3d = true
 	get_root().add_child(sub)
+	# Harness calibration for every _obj_serial window below: an empty awaited frame in this
+	# coroutine creates exactly one Object (its GDScriptFunctionState) and nothing else. (A
+	# function's FIRST await creates one extra state, so calibrate after it, as every window does.)
+	await process_frame
+	var s_cal := _obj_serial()
+	for _f in range(60):
+		await process_frame
+	var cal := _created_since(s_cal)
+	_ok(cal == 60, "M46-011 harness calibration: 60 awaited frames create %d Objects (exactly 1 per await, subtracted below)" % cal)
 	var view = BatchSlotView.new()
 	view.size = Vector2(120, 140)
 	sub.add_child(view)
@@ -410,9 +438,12 @@ func _p15() -> void:
 	var col := Color.html(_v3[0])
 	view.bind_snapshot(snap, col)
 	var sb0 = view.get_theme_stylebox("panel")
+	var s_bind := _obj_serial()
 	for _i in range(100):
 		view.bind_snapshot(snap.duplicate(true), col)
+	var bind_created := _created_since(s_bind)
 	var same: bool = view.get_theme_stylebox("panel") == sb0
+	_ok(bind_created == 0, "M46-011: 100 identical slot rebinds CREATE %d Objects (transient included; 0 required)" % bind_created)
 	var changed := snap.duplicate(true)
 	changed["committed"] = 3
 	view.bind_snapshot(changed, col)
@@ -428,10 +459,28 @@ func _p15() -> void:
 	mag.bind(r)
 	await _frames(3)
 	var idle_off: bool = not mag.is_processing()
+	var s_mag := _obj_serial()
+	for _f in range(60):
+		await process_frame
+	var mag_created := _created_since(s_mag) - 60   # harness: one GDScriptFunctionState per await
 	mag.inspect_at(r.get_global_transform() * Vector2(20, 20))
 	var on: bool = mag.is_processing() and mag.is_inspecting()
 	mag.end_inspect()
 	_ok(idle_off and on and not mag.is_processing(), "board magnifier: idle -> not processing; inspecting -> processing; released -> idle again")
+	_ok(mag_created <= IDLE_OBJ_WINDOW_MAX, "M46-011: 60 idle frames with slot + board + magnifier CREATE %d Objects (harness excluded; <= %d per window)" % [mag_created, IDLE_OBJ_WINDOW_MAX])
+	# Sensitivity control (runs every time): a synthetic transient pulse - Objects created and
+	# freed again each frame, so the retained count returns to baseline - must be counted and must
+	# break the same idle budget. Proves the probe sees churn that a net-count check cannot.
+	var o_pulse0: int = _mem()["objects"]
+	var s_pulse := _obj_serial()
+	for _f in range(30):
+		for _k in range(PULSE_PER_FRAME):
+			var tmp := RefCounted.new()
+		await process_frame
+	var pulse_created := _created_since(s_pulse) - 30   # harness excluded as above
+	var pulse_net: int = _mem()["objects"] - o_pulse0
+	_ok(pulse_created >= PULSE_PER_FRAME * 30 and absi(pulse_net) <= 2 and pulse_created > IDLE_OBJ_WINDOW_MAX,
+		"M46-011 sensitivity: a transient pulse of %d Objects/frame (net retained %+d) is counted (%d over 30 frames) and breaks the idle budget" % [PULSE_PER_FRAME, pulse_net, pulse_created])
 	sub.free()
 	_summary.append("SB-M46-011 UI churn: identical slot rebinds allocate nothing (stylebox reused); idle magnifier never processes")
 	_complete("p15_ui_idle_churn")
@@ -511,16 +560,30 @@ func _p13_p14_p08_p11() -> void:
 	rt.set_speed_2x(true)
 	var fx = h.get_cleaning_fx()
 	await _frames(3)
-	# p11 idle: frames with nothing happening must not allocate Objects.
+	# p11 idle: frames with nothing happening must not allocate Objects (net) nor CREATE them.
+	# Warm-up: the first runtime ticks after build create one-time lazy state (measured ~3,200
+	# Objects once, RM-001 log) - not per-frame churn, so it is excluded from the idle window.
+	var s_warm := _obj_serial()
+	for _i in range(120):
+		rt.tick(DT)
+	var warm_created := _created_since(s_warm)
+	await process_frame
 	var o0: int = _mem()["objects"]
+	var s_idle := _obj_serial()
 	for _i in range(120):
 		rt.tick(DT)
 		await process_frame
+	# Minus the harness: one GDScriptFunctionState per `await` in this coroutine (calibrated in p15).
+	var idle_created := _created_since(s_idle) - 120
 	var idle_growth: int = _mem()["objects"] - o0
 	var base := _mem()
 	var times: Array = []
 	var ticks: Array = []
 	var peak_agents := 0
+	var peak_nodes := 0
+	var peak_res := 0
+	var peak_dup := 0
+	var s_level := _obj_serial()
 	var peak_fx := 0
 	var frames := 0
 	var comp = h.get_completion()
@@ -540,9 +603,20 @@ func _p13_p14_p08_p11() -> void:
 		frames += 1
 		if frames % 3000 == 0:
 			print("    ... frame %d, cleared %d" % [frames, h.get_board().count_cells_by_state(BoardState.CellState.CLEARED)])
-		peak_agents = maxi(peak_agents, h.get_dispatcher().get_active_count())
+		var act: int = h.get_dispatcher().get_active_count()
+		if act > peak_agents:
+			# M46-014 (RM-001): at each new peak, cross-check real agents vs reserved targets.
+			peak_agents = act
+			peak_nodes = _agent_nodes(h)
+			var reserved: PackedInt32Array = h.get_reservations().get_reserved_indices()
+			peak_res = reserved.size()
+			var uniq := {}
+			for ri in reserved:
+				uniq[ri] = true
+			peak_dup = reserved.size() - uniq.size()
 		if fx != null:
 			peak_fx = maxi(peak_fx, fx.get_active_count())
+	var level_created := _created_since(s_level) - frames   # minus one harness await per frame
 	RuntimePerfProbe.enabled = false
 	var probe := RuntimePerfProbe.snapshot()
 	for k in probe:
@@ -564,15 +638,27 @@ func _p13_p14_p08_p11() -> void:
 	_ok(st["p99"] <= FRAME_SPIKE_MS, "frame p99 %.3f ms (<= %.1f); max %.3f ms" % [st["p99"], FRAME_SPIKE_MS, st["max"]])
 	_summary.append("SB-M46-013 full 59x59 level: %d frames, mean %.3f / p95 %.3f / p99 %.3f / max %.3f ms" % [frames, st["mean"], st["p95"], st["p99"], st["max"]])
 	_complete("p13_long_session")
-	# Expected ~20+ at 2x (1/6 s cadence x 5 lanes, ~3.5 s rail trips); 15 is a real density floor.
-	_ok(peak_agents >= 15, "high density: %d agents in flight at peak (>= 15; 5 lanes, 2x)" % peak_agents)
-	_summary.append("SB-M46-014 peak concurrent agents %d during the 59x59 level (frame budget above holds)" % peak_agents)
+	# M46-014 (RM-001): the fixture is deterministic (fixed DT ticks, scripted feeding), so the
+	# peak is a property of the code, not of the machine. DENSITY_MIN is a regression floor
+	# ~80% of the measured peak (see the RM-001 log); real agent nodes must match the dispatcher
+	# count and each in-flight agent holds one distinct reserved target.
+	print("    density peak: %d dispatcher agents, %d ScrubbotAgent nodes, %d reserved targets (%d duplicate)" % [peak_agents, peak_nodes, peak_res, peak_dup])
+	_ok(peak_agents >= DENSITY_MIN, "high density: %d agents in flight at peak (>= %d, regression floor from the deterministic p13 fixture)" % [peak_agents, DENSITY_MIN])
+	_ok(peak_nodes == peak_agents and peak_res >= peak_agents and peak_dup == 0,
+		"at the peak: %d real agent nodes == %d dispatched, %d reserved targets (>= agents), 0 duplicate reservations" % [peak_nodes, peak_agents, peak_res])
+	_summary.append("SB-M46-014 peak concurrent agents %d (nodes %d, reserved %d, dup %d) during the 59x59 level (floor %d)" % [peak_agents, peak_nodes, peak_res, peak_dup, DENSITY_MIN])
+	var reduced: int = await _reduced_density_peak()
+	_ok(reduced < DENSITY_MIN, "M46-014 sensitivity: the same fixture fed one batch at a time peaks at %d agents -> the density floor %d fails it" % [reduced, DENSITY_MIN])
 	_complete("p14_agent_density")
 	var cap: int = fx._effective_cap() if fx != null else -1
 	_ok(fx != null and peak_fx > 0 and (cap < 0 or peak_fx <= cap) and fx.get_active_count() == 0, "cleaning FX: peak %d active (cap %s), 0 after the level" % [peak_fx, str(cap)])
 	_summary.append("SB-M46-008 effects peak %d active cues (cap %s) over 3,481 clears, 0 at end" % [peak_fx, str(cap)])
 	_complete("p08_effects")
 	_ok(idle_growth <= 0, "120 idle frames: Object count %+d (no growth)" % idle_growth)
+	_ok(idle_created <= IDLE_OBJ_WINDOW_MAX, "M46-011: 120 idle host frames (after warm-up, %d one-time Objects) CREATE %d Objects (transient included, harness excluded; <= %d per window)" % [warm_created, idle_created, IDLE_OBJ_WINDOW_MAX])
+	var per_clear: float = float(level_created) / maxf(1.0, float(cleared))
+	print("    M46-011 level: %d Objects created over %d frames / %d clears = %.2f per clear, %.2f per frame" % [level_created, frames, cleared, per_clear, float(level_created) / maxf(1.0, float(frames))])
+	_ok(per_clear <= LEVEL_OBJ_PER_CLEAR_MAX, "M46-011: Objects created per cleared cell %.2f (<= %.1f; work-proportional, not per frame)" % [per_clear, LEVEL_OBJ_PER_CLEAR_MAX])
 	# One-sided: consumed supply batches are freed during the level, so the count may fall.
 	_ok(h.get_dispatcher().get_active_count() == 0 and end["objects"] - base["objects"] <= MAX_OBJECT_DRIFT,
 		"after 3,481 clears: 0 agents left, objects %+d vs level start (no growth beyond %d)" % [end["objects"] - base["objects"], MAX_OBJECT_DRIFT])
@@ -2010,6 +2096,30 @@ func _free_host(h) -> void:
 		h.free()
 		sub.free()
 
+## Live ScrubbotAgent nodes under the host (real agents, not supply batches or reservations).
+func _agent_nodes(h) -> int:
+	return h.find_children("*", "Node2D", true, false).filter(func(n):
+		return n.get_script() == ScrubbotAgent and not n.is_queued_for_deletion()).size()
+
+## M46-014 sensitivity control: the SAME p13 fixture, but the player feeds only when every slot
+## is empty (one batch at a time) -> a substantially lower density that the floor must reject.
+func _reduced_density_peak() -> int:
+	var h = await _host(_stripe_level_dict(), "reduced")
+	var rt = h.get_runtime()
+	rt.set_speed_2x(true)
+	var ic = h.get_input_controller()
+	var peak := 0
+	for _i in range(2400):
+		if _occupied(h) == 0:
+			for c in range(5):
+				if ic.activate_front(c).get("ok", false):
+					break
+		rt.tick(DT)
+		await process_frame
+		peak = maxi(peak, h.get_dispatcher().get_active_count())
+	_free_host(h)
+	return peak
+
 ## Keep every empty slot fed from the first non-exhausted Supply column (player taps).
 func _feed(h) -> void:
 	var empty := 0
@@ -2035,6 +2145,22 @@ func _play(h, frames: int) -> void:
 
 func _mem() -> Dictionary:
 	return {"static": int(Performance.get_monitor(Performance.MEMORY_STATIC)), "objects": int(Performance.get_monitor(Performance.OBJECT_COUNT))}
+
+## M46-011 (RM-001): Objects CREATED since `since` (another _obj_serial()), including ones already
+## freed (transient churn). Every new Object takes the next value of the engine's global ObjectDB
+## validator counter, stored in instance_id bits 24..62. Verified: 1000 RefCounted -> 1000,
+## 500 Node new+free -> 500. Counts Objects only (Node / RefCounted / Resource), NOT Variant
+## containers (Array / Dictionary / String / Packed*), which are not Objects.
+const OBJDB_VALIDATOR_MASK := (1 << 39) - 1
+
+func _obj_serial() -> int:
+	var o := Object.new()
+	var v: int = (o.get_instance_id() >> 24) & OBJDB_VALIDATOR_MASK
+	o.free()
+	return v
+
+func _created_since(since: int) -> int:
+	return _obj_serial() - since - 1
 
 func _ms(t0: int) -> float:
 	return float(Time.get_ticks_usec() - t0) / 1000.0
