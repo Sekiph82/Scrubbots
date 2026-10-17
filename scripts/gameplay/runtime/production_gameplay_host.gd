@@ -919,7 +919,11 @@ func booster_states() -> Array:
 ## adapter the transaction uses (Random: >=3 safe fronts; Selector: solver-safe batches +
 ## empty slot; Tornado: present colours; +1 Slot: once per attempt, capacity <= 6).
 ## {legal, reason, targets:[{key, color, label}]}. Never reserves or mutates.
-func booster_legality(id: String) -> Dictionary:
+## list_targets false (M46 RM003, yes/no hints such as the FTUE coach copy): Selector answers
+## whether ANY batch is safe (has_eligible_safe_batch, stops at the first) and Tornado whether
+## any colour is present, with no targets: the same verdict as a non-empty list; never use it
+## for the popup chips or a purchase.
+func booster_legality(id: String, list_targets: bool = true) -> Dictionary:
 	if _economy == null or _booster_adapter == null:
 		return {"legal": false, "reason": "economy_unavailable", "targets": []}
 	if _completion != null and _completion.is_terminal():
@@ -934,10 +938,17 @@ func booster_legality(id: String) -> Dictionary:
 			var ok2: bool = bool(prop.get("safe", false))
 			return {"legal": ok2, "reason": "" if ok2 else String(prop.get("reason", "not_solver_safe")), "targets": []}
 		BoosterInventory.SELECTOR:
+			if not list_targets:
+				var any: bool = _booster_adapter.has_eligible_safe_batch()
+				return {"legal": any, "targets": [], "partial": _booster_adapter.last_proof_timed_out(),
+					"reason": "" if any else ("proof_timeout" if _booster_adapter.last_proof_timed_out() else "not_eligible")}
 			var ids: Array = _booster_adapter.eligible_safe_batches()
 			# Owner proof budget: a cut-off list is partial (the rest are re-checked next time).
 			return _selector_legality(ids, _booster_adapter.last_proof_timed_out())
 		BoosterInventory.TORNADO:
+			if not list_targets:
+				var present: bool = _booster_adapter.has_present_color()
+				return {"legal": present, "reason": "" if present else "color_not_present", "targets": []}
 			var ct: Array = []
 			for c in _booster_adapter.present_colors():
 				ct.append({"key": c, "color": colors[int(c)] if int(c) >= 0 and int(c) < colors.size() else Color(0.5, 0.5, 0.5), "label": ""})
@@ -976,13 +987,14 @@ var _proof_closed := false
 ## proof, or the exact state already has a verdict (proven, refused, or the 5 s cap ran out:
 ## then proof_timeout / a partial Selector list at once, retry after the state changes);
 ## otherwise starts the off-frame proof and returns reason "checking"
-## (booster_proof_settled(id) follows). Never reserves or mutates.
-func booster_legality_offframe(id: String) -> Dictionary:
+## (booster_proof_settled(id) follows). Never reserves or mutates. list_targets: see
+## booster_legality (false = yes/no hint only).
+func booster_legality_offframe(id: String, list_targets: bool = true) -> Dictionary:
 	if _proof_closed:
 		return {"legal": false, "reason": "exiting", "targets": []}   # leaving: no proof of any kind
 	if needs_offframe_proof(id) and _start_proof(id):
 		return {"legal": false, "reason": "checking", "targets": []}
-	return booster_legality(id)
+	return booster_legality(id, list_targets)
 
 ## True when legality of `id` right now would need a fresh still-moment proof.
 func needs_offframe_proof(id: String) -> bool:

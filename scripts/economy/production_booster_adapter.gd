@@ -533,6 +533,11 @@ func present_colors() -> Array:
 				out.append(c)
 	return out
 
+## M46 RM003: present_colors() is non-empty exactly when some cell is ACTIVE (VOID cells are
+## CLEARED); a native byte search, not a per-cell script loop, for yes/no hints.
+func has_present_color() -> bool:
+	return _board.get_cell_states_copy().has(BoardState.CellState.ACTIVE)
+
 ## Atomic multi-system purge of one color across BoardState + supply + idle
 ## slots. Owner in-flight law (M39 V03, F-M39-V02-006): Tornado must reconcile
 ## selected-color committed/in-flight assignments. The audited M25/M26/M19
