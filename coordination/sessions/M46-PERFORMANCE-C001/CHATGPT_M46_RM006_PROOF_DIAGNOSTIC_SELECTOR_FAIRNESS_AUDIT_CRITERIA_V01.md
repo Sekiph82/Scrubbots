@@ -1,0 +1,16 @@
+# M46-RM-006 | ChatGPT Independent Audit Criteria V01
+Scope: V03-F03/F04/F05/S1–S4, not a fresh design of game economy or owner-visible UI.
+
+| Criterion | Exact required evidence, with sensitive fail condition |
+|---|---|
+| RM006-01 SOURCE_PROOF | Trace full producer/caller route of Selector list/FTUE hint/per-target purchase, WorkerThreadPool copy/cache, `_list_offset`, NULL/timeout and 5/6 slot state. Document every sibling consumer and whether changed. |
+| RM006-02 DIRECT_TEST | Real 59x59 118+ batches, 5s partial Worker result + 12 chips; **every displayed key** independently proven safe for its current state. Unproven/unlisted/pending/stale key cannot spend or auto-use. No cap increase, no invented safe-chips. |
+| RM006-03 DIRECT_TEST/SENSITIVITY | Across **at least two genuine state mutations** and bounded off-frame runs, verify proof probes can advance beyond original fixed prefix while preserving production legality, or explicit `OWNER_PRODUCT_DECISION_REQUIRED` if impossible. Exact same state repeated popup does NOT restart timeout or change chips spuriously; fair selection must not silently remove only legal usable choice. Test deliberately reset cursor to zero to catch old prefix behavior if new algorithm claims improved fairness. |
+| RM006-04 SOURCE/DIRECT_TEST | Genuine completed proof, 5s timeout, missing worker result, in-kernel invalid state, stale/cancel/retry/exit classified consistently by actual test-visible diagnostic; internal default false from a deep script error not falsely declared `completed` where source-detectable. External authorizations remain fail-closed; no charge/SB until positive proof. If arbitrary Godot interpreter errors genuinely uncatchable, label `NOT_VERIFIED_ENGINE_LIMITATION`, never claim full PASS. |
+| RM006-05 DIRECT_TEST | Second +1 refusal on 6 slots produces **meaningful internal reason** and zero balance/charge/slot/receipt-success side effects. First genuine activation exactly one debit, capacity5→6; seventh impossible. Valid owner popup/HUD responses unchanged visually. |
+| RM006-06 DIRECT_TEST | No extra worker/restart/cache-loop after timeout, cancel at each phase bounded, no stray slot/board mutation or stale verdict across level retry+app exit, state key identity valid with 5/6 WAITING. |
+| RM006-07 SENSITIVITY | Mutants for unproven chip legal, same-state rerun, fair-cursor reset, missing result `completed`, second +1 debit/no reason fail intended tests, restored exactly. A single guard change blocked by defense-in-depth is not treated as a test false-negative. |
+| RM006-08 LOG_GOVERNANCE | All RM005+RM006 affected focused regressions and final full M46 p01–p22 tested only after source pinned, real exit0 and exact SHA; preserve numeric 4ms mean/16.7p99/50.1 retry and 400ms+step/5s. |
+| RM006-09 OWNER/POLICY | No owner-visible new text, extra popup/More target UX, Need-a-Hand change, paid CI/GitHub Actions, clone/worktree/disk cleanup, owner `project.godot` edit; F5 and phone/GPU OPEN; Claude never touches TASKS. |
+
+If a proposed solution needs a new UX decision or changed 5s policy: classify `OWNER_PRODUCT_DECISION_REQUIRED` with measured tradeoff, continue safe independent subcases, never fabricate product PASS.
