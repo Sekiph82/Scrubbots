@@ -72,7 +72,7 @@ func classify(state, inflight_count: int = 0, config: Dictionary = {}) -> Dictio
 			"immediate_clears": 0, "root_active": root_active}
 	# No immediate progress. Search whether ANY legal future placement sequence unlocks a
 	# clear. STALLED (recoverable) vs DEADLOCK (proven) vs UNKNOWN_BOUND (bounded out).
-	var r: Dictionary = _solver.search_progress(s1, config)
+	var r: Dictionary = _solver.search_progress(s1, config, true)   # s1 is quiescent (0 clears)
 	var status: StringName = DEADLOCK
 	var reason: String = r.get("reason", "")
 	match r["status"]:

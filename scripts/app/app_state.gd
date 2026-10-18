@@ -62,6 +62,7 @@ var actions: ProductionActionFacade
 var assist: FailureAssistanceService
 var _dirty: bool = false
 var _catalog_orders: Array = []
+var _builtin_catalog = null
 ## CP04/CP05: the ONE remote content authority (builtin + cached LKG at boot, no network).
 ## Content install never touches progression / economy / save truth.
 var content: RemoteContentManager
@@ -106,11 +107,16 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 
 ## Builtin + verified active remote levels (CompositeLevelCatalog); null when the builtin
 ## production catalog itself is invalid (callers report CATALOG_INVALID).
+## M46 RM005: the validated builtin catalog is loaded once per AppState (res:// never changes at
+## runtime; every read is a deep copy), instead of re-validating all builtin levels + supply plans
+## on every Results / launch (~15 ms each). An invalid manifest is not cached (re-checked).
 func playable_catalog():
-	var cat = LevelCatalog.new()
-	if not cat.load_manifest().ok:
-		return null
-	return CompositeLevelCatalog.new(cat, content.remote_levels() if content != null else [])
+	if _builtin_catalog == null:
+		var cat = LevelCatalog.new()
+		if not cat.load_manifest().ok:
+			return null
+		_builtin_catalog = cat
+	return CompositeLevelCatalog.new(_builtin_catalog, content.remote_levels() if content != null else [])
 
 func _builtin_ids() -> Array:
 	var cat = LevelCatalog.new()
