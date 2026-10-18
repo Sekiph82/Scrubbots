@@ -36,6 +36,9 @@ const DEFAULT_MAX_VISITED := 200000
 const DEFAULT_MAX_DEPTH := 400
 
 var _kernel = null
+## M46 RM005 oracle switch (tests only): true restores the pre-RM005 progress search — a full
+## dispatch cascade for every child and a second root quiesce. Same verdict and counters.
+var full_progress_cascade := false
 
 func _init() -> void:
 	_kernel = ProofKernel.new()
@@ -50,23 +53,25 @@ func solve(initial_state, config: Dictionary = {}) -> Dictionary:
 ## Progress search for the runtime classifier: is ANY legal future authenticated clear
 ## reachable from `root_state`? Returns the same shape with status in
 ## {PROGRESS_FOUND, DEADLOCK, UNKNOWN_BOUND}.
-func search_progress(root_state, config: Dictionary = {}) -> Dictionary:
-	return _search(root_state, GOAL_PROGRESS, config)
+## `root_quiescent`: the caller already quiesced `root_state` with zero clears (the classifier),
+## so the root quiesce here would rebuild the same engines to read back the same state.
+func search_progress(root_state, config: Dictionary = {}, root_quiescent: bool = false) -> Dictionary:
+	return _search(root_state, GOAL_PROGRESS, config, root_quiescent and not full_progress_cascade)
 
 ## M46 R06: stop this solver's searches for good (an off-frame booster proof being cancelled
 ## from the main thread). Every later search returns UNKNOWN_BOUND time_budget_exhausted.
 func cancel() -> void:
 	_kernel.cancelled = true
 
-func _search(input_state, goal: StringName, config: Dictionary) -> Dictionary:
+func _search(input_state, goal: StringName, config: Dictionary, root_quiescent: bool = false) -> Dictionary:
 	# The kernel shares the cutoff for exactly this search (a single placement can run a whole
 	# dispatch-to-quiescence cascade), and never keeps it afterwards.
 	_kernel.deadline_usec = int(config.get("deadline_usec", 0))
-	var r := _search_bounded(input_state, goal, config)
+	var r := _search_bounded(input_state, goal, config, root_quiescent)
 	_kernel.deadline_usec = 0
 	return r
 
-func _search_bounded(input_state, goal: StringName, config: Dictionary) -> Dictionary:
+func _search_bounded(input_state, goal: StringName, config: Dictionary, root_quiescent: bool = false) -> Dictionary:
 	var max_visited: int = int(config.get("max_visited", DEFAULT_MAX_VISITED))
 	var max_depth: int = int(config.get("max_depth", DEFAULT_MAX_DEPTH))
 	# Optional wall-clock cutoff (M46, owner 2026-10-16): only the runtime booster safety proofs
@@ -76,13 +81,24 @@ func _search_bounded(input_state, goal: StringName, config: Dictionary) -> Dicti
 	# (_search set it on the kernel; read through _kernel._out_of_time() so an R06 cancel lands.)
 	# Normalize the root to a quiescent state (apply any immediately-claimable clears)
 	# through the real kernel, so the search space is exactly quiescent decision points.
-	var q: Dictionary = _kernel.quiesce(input_state)
+	var q: Dictionary = {"ok": true, "state": input_state} if root_quiescent else _kernel.quiesce(input_state)
 	if not q.get("ok", false):
 		var why := "time_budget_exhausted" if q.get("error", "") == "time_budget_exhausted" else "kernel_build_failed"
 		return {"status": UNKNOWN_BOUND, "reason": why, "visited": 0,
 			"memo_hits": 0, "frontier_peak": 0, "max_depth_reached": 0, "decisions": 0,
 			"root_active": -1}
 	var root = q["state"]
+	# M46 RM005 (progress search only, same verdict and counters):
+	#  - children are DEFERRED: pushed as {parent, actions, column} in the same order and
+	#    placed only when popped, so siblings behind a PROGRESS_FOUND are never built. A
+	#    placement the real M24 transaction rejects is then skipped at its pop instead of at
+	#    the parent's expansion; that can only differ in frontier_peak / a max_visited edge for
+	#    malformed or incoherent states (never a DEADLOCK: the verdict order is unchanged);
+	#  - a child that clears anything is popped as PROGRESS_FOUND before it is ever expanded or
+	#    memo-compared (its board is below root_active, so its key can never be in `visited`),
+	#    and the progress result carries no trace, so its cascade stops at the first clearing
+	#    wave. 0-clear children are quiescent after that same single wave either way.
+	var probe: bool = goal == GOAL_PROGRESS and not full_progress_cascade
 	var root_active: int = root.active_count()
 	var visited: Dictionary = {}
 	var memo_hits := 0
@@ -101,6 +117,15 @@ func _search_bounded(input_state, goal: StringName, config: Dictionary) -> Dicti
 			return _result(UNKNOWN_BOUND, "time_budget_exhausted", visited.size(), memo_hits,
 				frontier_peak, max_depth_reached, root_active, [])
 		var node: Dictionary = stack.pop_back()
+		if node.has("column"):
+			var rp: Dictionary = _kernel.apply_placement(node["parent"], node["column"], true)
+			if not rp.get("ok", false):
+				if rp.get("error", "") == "time_budget_exhausted":
+					return _result(UNKNOWN_BOUND, "time_budget_exhausted", visited.size(), memo_hits,
+						frontier_peak, max_depth_reached, root_active, [])
+				continue
+			node = {"state": rp["state"], "actions": node["actions"] + [{"column": node["column"],
+				"placed": rp["placed"], "clears": int(rp["clears"]), "active_after": rp["state"].active_count()}]}
 		var state = node["state"]
 		var actions: Array = node["actions"]
 		var key: String = state.canonical_key()
@@ -121,6 +146,10 @@ func _search_bounded(input_state, goal: StringName, config: Dictionary) -> Dicti
 		# Expand legal player front selections in ascending column order. Push reversed so
 		# the ascending order is explored first (deterministic DFS).
 		var cols: Array = state.legal_action_columns()
+		if probe:
+			for i in range(cols.size() - 1, -1, -1):
+				stack.push_back({"parent": state, "actions": actions, "column": cols[i]})
+			continue
 		var children: Array = []
 		for c in cols:
 			if _kernel._out_of_time():

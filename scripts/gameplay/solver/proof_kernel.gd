@@ -108,7 +108,11 @@ func quiesce(state) -> Dictionary:
 ## "placed":{color,count}} on a legal placement; {"ok":false, "error":...} when the
 ## placement is illegal (all slots occupied, empty/invalid column, or supply rejects it)
 ## — in which case no supply is consumed, exactly the runtime rule.
-func apply_placement(state, column: int) -> Dictionary:
+## `progress_probe` (M46 RM005, GOAL_PROGRESS search only): stop the cascade after the first
+## wave that clears, so "clears > 0" is known without the remaining waves. The returned state
+## is then NOT quiescent ("quiescent": false) and must not be expanded; the progress search
+## never expands it (any clear below the quiescent root is already its success verdict).
+func apply_placement(state, column: int, progress_probe: bool = false) -> Dictionary:
 	var live := _build_live(state)
 	if live.is_empty():
 		return {"ok": false, "error": "build_failed"}
@@ -119,13 +123,14 @@ func apply_placement(state, column: int) -> Dictionary:
 	var placed_slot: int = int(place["slot"])
 	var placed_color: int = front.get_color_id()
 	var placed_count: int = front.get_robot_count()
-	var clears := _run_to_quiescence(live)
+	var clears := _run_to_quiescence(live, progress_probe)
 	if clears == TIMED_OUT:
 		return {"ok": false, "error": "time_budget_exhausted"}
 	if clears < 0:
 		return {"ok": false, "error": "kernel_incoherent"}
 	return {"ok": true, "state": _read_back(state, live), "clears": clears,
-		"placed_slot": placed_slot, "placed": {"color": placed_color, "count": placed_count}}
+		"placed_slot": placed_slot, "placed": {"color": placed_color, "count": placed_count},
+		"quiescent": not (progress_probe and clears > 0)}
 
 # ------------------------------------------------------- live reconstruction ---
 
@@ -217,8 +222,9 @@ func _build_live(state) -> Dictionary:
 ## pre-wave board (reservations keep the wave's targets unique). The wave's clears are then
 ## applied (authenticated-equivalent, claim order). A clear wakes every WAITING lane.
 ## Repeats until a wave claims nothing. Returns the number of clears, or -1 if an
-## authenticated-clear transition unexpectedly failed (incoherent).
-func _run_to_quiescence(live: Dictionary) -> int:
+## authenticated-clear transition unexpectedly failed (incoherent). `stop_on_clear` ends the
+## run after the first wave that cleared anything (apply_placement progress_probe).
+func _run_to_quiescence(live: Dictionary, stop_on_clear: bool = false) -> int:
 	var clears := 0
 	var waiting: Dictionary = {}   # slot -> batch_id WAITING on its current batch
 	while true:
@@ -247,6 +253,8 @@ func _run_to_quiescence(live: Dictionary) -> int:
 			clears += 1
 			if clears > MAX_CLEARS_GUARD:
 				return -1
+		if stop_on_clear:
+			break
 		waiting.clear()  # clears can open corridors -> wake all WAITING lanes
 	return clears
 
