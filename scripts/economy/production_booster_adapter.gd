@@ -65,6 +65,42 @@ var _verdict_key: Array = []
 ## Diagnostic: synchronous (main-thread) proofs started on this adapter (tests prove a cached
 ## verdict answers without one).
 var live_proof_count := 0
+## M46 RM006: booster safety proofs read only the classifier status (verdict-only root cascade).
+const VERDICT_ONLY := {"verdict_only": true}
+const KNOWN_STATUSES := [DeadlockClassifier.COMPLETED, DeadlockClassifier.PROGRESSABLE,
+	DeadlockClassifier.STALLED, DeadlockClassifier.DEADLOCK, DeadlockClassifier.UNKNOWN_BOUND]
+## M46 RM006 S2: first source-detected internal failure of the current off-frame proof
+## ("" = none): "preflight_failed", "malformed_proof_state", "malformed_proof_result",
+## "script_error".
+var proof_error := ""
+## Engine Logger seeing script/engine errors raised on an off-frame proof's worker thread (an
+## erroring GDScript function returns a default value and its caller carries on, so the proof
+## itself cannot tell). Registered once, on the first off-frame proof.
+static var _error_watch = null
+
+## Counts errors per watched thread id (worker threads only, for the duration of one proof).
+class ProofErrorWatch extends Logger:
+	var _lock := Mutex.new()
+	var _counts := {}
+	func watch(tid: int) -> void:
+		_lock.lock()
+		_counts[tid] = 0
+		_lock.unlock()
+	func take(tid: int) -> int:
+		_lock.lock()
+		var n: int = _counts.get(tid, 0)
+		_counts.erase(tid)
+		_lock.unlock()
+		return n
+	func _log_error(_function: String, _file: String, _line: int, _code: String, _rationale: String,
+			_editor_notify: bool, error_type: int, _script_backtraces: Array) -> void:
+		if error_type == ERROR_TYPE_WARNING:
+			return
+		var tid := OS.get_thread_caller_id()
+		_lock.lock()
+		if _counts.has(tid):
+			_counts[tid] += 1
+		_lock.unlock()
 
 ## Read-only frozen board for a worker-thread proof: ProofState.from_runtime reads only the
 ## cell count + per-cell state, captured on the main thread.
@@ -109,17 +145,38 @@ func detached_copy():
 		return null
 	var d = get_script().new(_level, FrozenBoard.new(_board), sup, ss, null)
 	d.budget_ms = offframe_budget_ms
+	d._list_offset = _list_offset   # RM006 S1: a cut list resumes where the last one stopped
+	d._fault = _fault               # tests only (never set in production)
+	if _error_watch == null:
+		_error_watch = ProofErrorWatch.new()
+		OS.add_logger(_error_watch)
 	return d
 
 ## Worker-thread entry (WorkerThreadPool task) on a detached_copy(): runs one proof and writes
-## {"value", "timed_out"} into out[0]. Touches nothing but this detached adapter.
+## {"value", "timed_out", "error", "offset"} into out[0]. "error" (RM006 S2) is "" or the first
+## internal failure: a failed preflight, a malformed classifier verdict, or any script / engine
+## error logged on this worker thread during the proof. Touches nothing but this adapter.
 func run_offframe(kind: String, out: Array) -> void:
-	if kind == "random":
+	proof_error = ""
+	var tid := OS.get_thread_caller_id()
+	if _error_watch != null:
+		_error_watch.watch(tid)
+	var value = false if kind == "random" else []
+	var timed_out := false
+	if not _proof_state_buildable(_supply, _slots) or _faulted("preflight"):
+		proof_error = "preflight_failed"
+	elif kind == "random":
 		var p: Dictionary = propose_random_reorder()
-		out[0] = {"value": bool(p.get("safe", false)), "timed_out": String(p.get("reason", "")) == "proof_timeout"}
+		value = bool(p.get("safe", false))
+		timed_out = String(p.get("reason", "")) == "proof_timeout"
 	else:
-		var ids: Array = eligible_safe_batches()
-		out[0] = {"value": ids, "timed_out": last_proof_timed_out()}
+		value = eligible_safe_batches()
+		timed_out = last_proof_timed_out()
+	if _error_watch != null and _error_watch.take(tid) > 0 and proof_error == "":
+		proof_error = "script_error"
+	if _faulted("offframe_result"):
+		return   # tests: the worker ends without writing a result
+	out[0] = {"value": value, "timed_out": timed_out, "error": proof_error, "offset": _list_offset}
 
 ## Stop this (detached) adapter's proofs for good; safe to call from the main thread while a
 ## worker runs them: every later probe fails closed as a timeout.
@@ -180,7 +237,7 @@ func _is_safe(cols: Array) -> bool:
 	var state = ProofState.from_runtime(_level, _board, probe, _slots)
 	if state == null:
 		return false
-	var status = _classifier.classify(state, _inflight()).get("status", &"")
+	var status = _checked_status(_classifier.classify(state, _inflight(), VERDICT_ONLY))
 	return status == DeadlockClassifier.PROGRESSABLE \
 		or status == DeadlockClassifier.STALLED \
 		or status == DeadlockClassifier.COMPLETED
@@ -293,6 +350,15 @@ func _scratch_slots_from_live():
 	live._next_sequence = _slots._next_sequence
 	return live
 
+## A classifier result's status, or "" (not safe) when the result is not a well-formed verdict;
+## a malformed one is recorded as this proof's internal error (M46 RM006 S2).
+func _checked_status(res) -> StringName:
+	var status = res.get("status", null) if typeof(res) == TYPE_DICTIONARY else null
+	if typeof(status) != TYPE_STRING_NAME or not KNOWN_STATUSES.has(status):
+		proof_error = "malformed_proof_result"
+		return &""
+	return status
+
 ## Same DeadlockClassifier gate as `_is_safe` but taking already-built scratch
 ## supply + slots engines (used inside the 3-consecutive simulation).
 func _is_safe_probe(scratch_supply, scratch_slots) -> bool:
@@ -309,9 +375,12 @@ func _is_safe_probe(scratch_supply, scratch_slots) -> bool:
 		return false
 	var state = ProofState.from_runtime(_level, _board, scratch_supply, scratch_slots)
 	if state == null:
+		proof_error = "malformed_proof_state" if proof_error == "" else proof_error
 		return false
-	var res: Dictionary = _classifier.classify(state, inflight, {"deadline_usec": _deadline_usec} if _deadline_usec > 0 else {})
-	var status = res.get("status", &"")
+	if _faulted("proof_probe"):
+		return false
+	var res: Dictionary = _classifier.classify(state, inflight, {"deadline_usec": _deadline_usec, "verdict_only": true} if _deadline_usec > 0 else VERDICT_ONLY)
+	var status = _checked_status(res)
 	if String(res.get("reason", "")) == "time_budget_exhausted" \
 			or (status == DeadlockClassifier.UNKNOWN_BOUND and _deadline_usec > 0 and Time.get_ticks_usec() >= _deadline_usec):
 		_budget_hit = true
