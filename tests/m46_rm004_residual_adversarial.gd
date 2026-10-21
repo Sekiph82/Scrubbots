@@ -660,9 +660,12 @@ func _chips(p) -> Array:
 	return out
 
 func _g4_partial_chips() -> void:
-	print("[G4 59x59 still-moment Selector popup under the real 5 s cap: chip-by-chip membership]")
+	print("[G4 59x59 still-moment Selector popup under a forced 700 ms cap: chip-by-chip membership]")
 	var h = await _host_file(_stripe_level(), "g4")
 	var a = h.get_booster_adapter()
+	# RM006: the whole 59x59 list now fits in the real 5 s cap (all 118 in ~2.5 s), so the cut
+	# is forced with a shorter cap to keep testing partial-list chips.
+	a.offframe_budget_ms = 700
 	var e = h.get_economy()
 	_ok(e.boosters.add_charges(SELECTOR, 1), "one Selector charge (USE mode)")
 	var sb0: int = e.wallet.scrub_bucks()

@@ -53,7 +53,9 @@ func _no_host(action: String) -> Dictionary:
 func plus_one_slot() -> Dictionary:
 	if _host == null:
 		return _no_host("plus_one_slot")
-	return _finish("plus_one_slot", {"ok": _host.activate_plus_one_slot()})
+	var ok: bool = _host.activate_plus_one_slot()
+	var why = _host.get("last_plus_one_refusal")
+	return _finish("plus_one_slot", {"ok": ok} if ok or why == null else {"ok": false, "reason": String(why)})
 
 func random() -> Dictionary:
 	if _host == null:

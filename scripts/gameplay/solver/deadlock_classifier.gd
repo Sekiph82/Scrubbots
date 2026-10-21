@@ -50,8 +50,11 @@ func classify(state, inflight_count: int = 0, config: Dictionary = {}) -> Dictio
 			"immediate_clears": 0, "root_active": -1}
 	# Quiesce the current state: any immediately-claimable target clears here. The optional
 	# runtime proof cutoff (config.deadline_usec, M46 owner budget) also bounds this cascade.
+	# config.verdict_only (M46 RM006, booster safety proofs that read only `status`): any clear
+	# already makes the state PROGRESSABLE, so the root cascade stops at its first clearing wave
+	# (same status / reason; immediate_clears and root_active then describe that first wave).
 	_kernel.deadline_usec = int(config.get("deadline_usec", 0))
-	var q: Dictionary = _kernel.quiesce(state)
+	var q: Dictionary = _kernel.quiesce(state, bool(config.get("verdict_only", false)))
 	_kernel.deadline_usec = 0
 	if not q.get("ok", false):
 		var why := "time_budget_exhausted" if q.get("error", "") == "time_budget_exhausted" else "kernel_build_failed"

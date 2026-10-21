@@ -983,7 +983,8 @@ var _proof_job: Dictionary = {}
 ## M46 RM004: internal provenance of the last off-frame proof, for tests / diagnostics only
 ## (the player-facing verdict for a worker error and the 5 s deadline is the same fail-closed
 ## proof_timeout): {"id", "kind", "outcome": "completed" | "deadline_timeout" | "worker_error"
-## | "cancelled", "stale": result dropped because the state changed meanwhile}.
+## (no result written) | "worker_internal_error" (RM006: "error" names the source-detected
+## failure) | "cancelled", "stale": result dropped because the state changed meanwhile}.
 var last_proof_diagnostic: Dictionary = {}
 ## True from the start of _exit_tree: no new off-frame worker may start on a leaving host.
 var _proof_closed := false
@@ -1043,15 +1044,23 @@ func _process(_delta: float) -> void:
 	set_process(false)
 	# A verdict counts only for the exact state it was proven on. A worker that ended without
 	# a result (script error) counts as the cap running out: fail closed, no endless restarts.
+	# RM006 S2: a worker that reported an internal error (preflight, malformed verdict, a script /
+	# engine error logged on its thread) is never a completed proof: fail closed like the cap.
 	var res = job["out"][0]
+	var err: String = String(res.get("error", "")) if res != null else ""
 	var current: bool = _booster_adapter != null and _booster_adapter.state_key() == job["key"]
-	last_proof_diagnostic = {"id": job["id"], "kind": job["kind"], "stale": not current,
-		"outcome": "worker_error" if res == null else ("deadline_timeout" if res["timed_out"] else "completed")}
+	last_proof_diagnostic = {"id": job["id"], "kind": job["kind"], "stale": not current, "error": err,
+		"outcome": "worker_error" if res == null else ("worker_internal_error" if err != "" \
+			else ("deadline_timeout" if res["timed_out"] else "completed"))}
 	if current:
-		var timed_out: bool = res == null or res["timed_out"]
+		var failed: bool = res == null or err != ""
+		var timed_out: bool = failed or res["timed_out"]
 		var value = ("timeout" if timed_out else res["value"]) if job["kind"] == "random" \
-			else {"ids": res["value"] if res != null else [], "partial": timed_out}
+			else {"ids": res["value"] if not failed else [], "partial": timed_out}
 		_booster_adapter.put_verdict(job["kind"], job["key"], value)
+		# RM006 S1: the next state's list resumes after this one's cut (never re-run on this state).
+		if job["kind"] == "selector_list" and not failed:
+			_booster_adapter._list_offset = int(res.get("offset", 0))
 	booster_proof_settled.emit(job["id"])
 
 ## Stop a running off-frame proof (gameplay resumed, retry, exit): its result is dropped; an
@@ -1457,15 +1466,25 @@ func _plus_one_faulted(stage: String) -> bool:
 ## EMPTY and uncommitted inside this synchronous call), strip back to its prior
 ## capacity (so origin_for_slot(5) is unroutable again). Never returns false
 ## with M24 left at six.
+## M46 RM006 S3: internal reason of the last refused activate_plus_one_slot() (receipts /
+## diagnostics only, never shown): "economy_unavailable", "plus_one_used" (already six slots or
+## used this attempt), a BoosterService reservation reason, or "activation_failed".
+var last_plus_one_refusal := ""
+
 func activate_plus_one_slot() -> bool:
+	last_plus_one_refusal = ""
 	if _economy == null or _slots == null:
+		last_plus_one_refusal = "economy_unavailable"
 		return false
 	if not _slots.can_grow_to_sixth():
+		last_plus_one_refusal = "plus_one_used"
 		return false
 	var strip = _screen.get_five_slot_strip() if _screen != null else null
 	var strip_prev: int = strip.get_capacity() if strip != null else 5
 	var res = _booster_service.apply_plus_one_slot(_economy.capacity)
 	if not res.get("ok", false):
+		var why := String(res.get("reason", ""))
+		last_plus_one_refusal = "plus_one_used" if why == "already_max_or_used" else why
 		return false
 	var engine_grown := false
 	var ok: bool = _slots.grow_to_sixth()
@@ -1483,6 +1502,7 @@ func activate_plus_one_slot() -> bool:
 		_economy.capacity.begin_new_attempt()   # pre-state was (5, unused): exact
 		if _screen != null:
 			_screen.refresh_slot_snapshot(_slots.snapshot())
+		last_plus_one_refusal = "activation_failed"
 		return false
 	# Push a fresh 6-slot snapshot so the newly appended view has content.
 	if _screen != null and _slots != null:

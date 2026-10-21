@@ -92,11 +92,13 @@ func _out_of_time() -> bool:
 
 ## Run the serial clear kernel from `state` (no placement). Returns
 ## {"ok":true, "state":ProofState, "clears":int} or {"ok":false, "error":...}.
-func quiesce(state) -> Dictionary:
+## `stop_on_clear` (M46 RM006, verdict-only classification): stop after the first wave that
+## clears; the returned state is then not quiescent.
+func quiesce(state, stop_on_clear: bool = false) -> Dictionary:
 	var live := _build_live(state)
 	if live.is_empty():
 		return {"ok": false, "error": "build_failed"}
-	var clears := _run_to_quiescence(live)
+	var clears := _run_to_quiescence(live, stop_on_clear)
 	if clears == TIMED_OUT:
 		return {"ok": false, "error": "time_budget_exhausted"}
 	if clears < 0:
