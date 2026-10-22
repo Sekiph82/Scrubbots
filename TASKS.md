@@ -26,7 +26,6 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M39-033 — verify-close 2026-10-22 (factory 026), LOCAL_PASS + factory peer review: m39_v02_capacity PASS (cannot grow past 6, never 7+), m28_c002_c002_static_shell PASS 16-of-16, m49_responsive_matrix PASS 8-of-8 (m05_sixth_slot_matrix, m07 synthetic NOTCH), m50_color_symbols PASS 10-of-10; MAX := 6, no 7+ state. CLAUDE.md §0D.1 grants the real-phone sign-off; safe-area coverage is the synthetic-inset matrix, no real-phone capture claimed.
 - DONE SB-M05-006..010 — factory 027 (2a870231): tools/run_suites.py one-command CI-rule runner + docs/TESTING_CONVENTIONS.md; LOCAL_PASS 3-suite subset aggregate=PASS (3/3), run_tests PASS, selftest PASS
 - DONE SB-M07-011,013 — docs/LEVEL_ART_INVENTORY.md (factory 028); SB-M07-012 moved to standing rules (conditional: if supplied)
-- READY SB-UI-008..013 — select/record canonical Scrubby master reference, then validate manifest reference paths/IDs
 - READY SB-M08-001..006 — level-art technical audit: filename, dimensions, alpha, color count, anti-aliasing, interpolation
 - READY SB-M08-007..010 — level-art audit: logical-pixel grid, production envelope/context, width and height in legal envelope
 - READY SB-M08-013..014 — map/reject source colors against locked C01..C16 with deterministic evidence; produce the audit report
@@ -125,10 +124,12 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M44-029 — cosmetic achievement rewards (badges/frames), no economy rewards (OWNER_META_PROGRESSION_DESIGN_V01)
 - READY SB-M44-030 — verify Gift Bar visible from first Home with unchanged 10/50/250/500/1000 rewards; regression test (OWNER_META_PROGRESSION_DESIGN_V01)
 - READY SB-M44-031 — re-sequence FTUE to the 2026-10-22 unlock table: L1 Daily/Tasks coachmarks, L2 four-booster lesson, soft_no_hard_locks policy (after SB-M44-010)
+- OWNER SB-UI-008..013 — canonical Scrubby master reference needs owner choice; 013 re-validate after (factory 029)
 <!-- Not queued (standing rules, no job of their own): SB-M07-012 (conditional: if supplied), SB-M08-011..012, SB-M22-016..019, SB-M22-021, SB-UI-019..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
+- SB-UI-008 — Which image is the canonical Scrubby master reference: "Game Screens/main screen.png" (in-context) or "Collection Cards/meet the scrubbots.jpeg" (isolated portraits), both under assets/art/references/_owner_inbox/? (or name another)
 
 ## Project Status
 
