@@ -23,7 +23,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-UI-017..018 — verified 2026-10-22 (factory 023, CI 39828088266); SB-UI-019 moved to standing rules
 - DONE SB-UI-VIS-005 — verified 2026-10-22 (factory 024): index already 157/157, all rows+paths on disk
 - DONE SB-M43-R15-002..003 — verify-close 2026-10-22 (factory 025): code 24828bb, 6 suites LOCAL_PASS, owner visual §0D.1
-- READY SB-M39-033 — sixth-slot (+1 Slot) presentation/layout support with mobile safe-area evidence; no 7+ slot state
+- DONE SB-M39-033 — verify-close 2026-10-22 (factory 026), LOCAL_PASS + factory peer review: m39_v02_capacity PASS (cannot grow past 6, never 7+), m28_c002_c002_static_shell PASS 16-of-16, m49_responsive_matrix PASS 8-of-8 (m05_sixth_slot_matrix, m07 synthetic NOTCH), m50_color_symbols PASS 10-of-10; MAX := 6, no 7+ state. CLAUDE.md §0D.1 grants the real-phone sign-off; safe-area coverage is the synthetic-inset matrix, no real-phone capture claimed.
 - READY SB-M05-006..010 — test harness: organize sections, split perf output from assertions, one-command wrapper, regression conventions doc
 - READY SB-M07-011..013 — inventory supplied level, underwater and other theme artwork beyond the M21 source
 - READY SB-UI-008..013 — select/record canonical Scrubby master reference, then validate manifest reference paths/IDs
@@ -994,7 +994,7 @@ Pre-authored batch bundle: `coordination/sessions/M39-C001/CHATGPT_PROMPT_V01.md
 Canonical decision: `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
 Machine tuning: `data/config/economy_rewards_v1.json`.
 
-- [ ] SB-M39-033 Add sixth-slot presentation/layout support and mobile safe-area evidence; no 7+ slot state.
+- [x] SB-M39-033 Add sixth-slot presentation/layout support and mobile safe-area evidence; no 7+ slot state. verify-close 2026-10-22 (factory 026), LOCAL_PASS + factory peer review: m39_v02_capacity PASS (cannot grow past 6, never 7+), m28_c002_c002_static_shell PASS 16-of-16, m49_responsive_matrix PASS 8-of-8 (m05_sixth_slot_matrix, m07 synthetic NOTCH), m50_color_symbols PASS 10-of-10; MAX := 6, no 7+ state. CLAUDE.md §0D.1 grants the real-phone sign-off; safe-area coverage is the synthetic-inset matrix, no real-phone capture claimed.
 
 ### M40 — Save System
 
