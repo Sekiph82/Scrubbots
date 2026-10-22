@@ -73,6 +73,11 @@ const BUBBLE_TEXT_REF_PX := 17.0
 
 const BOOSTER_SELECTED_ART := "res://assets/ui/final/boosters/states/booster_selected_ring.png"
 const BOOSTER_UNAVAILABLE_ART := "res://assets/ui/final/boosters/states/booster_unavailable_overlay.png"
+const BOOSTER_FREE_BADGE_ART := "res://assets/ui/final/boosters/states/booster_free_badge_frame.png"
+const BOOSTER_REWARD_GLOW_ART := "res://assets/ui/final/boosters/states/booster_reward_glow.png"
+const BOOSTER_ACTIVATED_BURST_ART := "res://assets/ui/final/boosters/states/booster_activated_burst.png"
+## Grant glow / activation burst fade-out (s).
+const BOOSTER_FLASH_S := 0.5
 const BOOSTER_AVAILABLE := "available"
 const BOOSTER_PURCHASABLE := "purchasable"
 const BOOSTER_UNAVAILABLE := "unavailable"
@@ -126,6 +131,7 @@ var _props_anchor: Control
 var _booster_row: HBoxContainer
 var _booster_buttons: Dictionary = {}
 var _booster_states: Dictionary = {}
+var _boosters_populated := false
 var _ad_region: Panel
 ## M50-BOARD press-and-hold board loupe (covers exactly the board rect; presentation only).
 var _magnifier
@@ -444,10 +450,20 @@ func _make_booster(spec: Dictionary) -> Button:
 	b.focus_mode = Control.FOCUS_NONE
 	b.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
 	b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+	var glow := HomeStyle.art("RewardGlow")
+	glow.texture = load(BOOSTER_REWARD_GLOW_ART) as Texture2D
+	_frac(glow, -0.12, -0.12, 1.12, 1.12)
+	glow.visible = false
+	b.add_child(glow)
 	var icon := HomeStyle.art("Icon")
 	icon.texture = load(spec["art"]) as Texture2D
 	_frac(icon, 0.12, 0.12, 0.88, 0.88)
 	b.add_child(icon)
+	var burst := HomeStyle.art("ActivatedBurst")
+	burst.texture = load(BOOSTER_ACTIVATED_BURST_ART) as Texture2D
+	_frac(burst, -0.12, -0.12, 1.12, 1.12)
+	burst.visible = false
+	b.add_child(burst)
 	var ring := HomeStyle.art("SelectedRing")
 	ring.texture = load(BOOSTER_SELECTED_ART) as Texture2D
 	_frac(ring, -0.08, -0.08, 1.08, 1.08)
@@ -456,6 +472,10 @@ func _make_booster(spec: Dictionary) -> Button:
 	overlay.texture = load(BOOSTER_UNAVAILABLE_ART) as Texture2D
 	_frac(overlay, 0.0, 0.0, 1.0, 1.0)
 	b.add_child(overlay)
+	var badge_frame := HomeStyle.art("BadgeFrame")
+	badge_frame.texture = load(BOOSTER_FREE_BADGE_ART) as Texture2D
+	_frac(badge_frame, 0.62, -0.08, 1.12, 0.40)
+	b.add_child(badge_frame)
 	var badge := Label.new()
 	badge.name = "Badge"
 	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
@@ -810,9 +830,26 @@ func set_booster_states(states: Array) -> void:
 		var id := String(st.get("id", ""))
 		if not _booster_states.has(id):
 			continue
+		var granted: bool = _boosters_populated and int(st.get("charges", 0)) > int(_booster_states[id]["charges"])
 		_booster_states[id] = {"charges": int(st.get("charges", 0)), "price": int(st.get("price", 0)),
 			"state": String(st.get("state", BOOSTER_UNAVAILABLE))}
 		_apply_booster_visual(id)
+		if granted:
+			_flash(_booster_buttons[id].get_node("RewardGlow"))
+	_boosters_populated = true
+
+## Activation feedback after a successful booster execution (host calls on r["ok"]).
+func play_booster_activated(id: String) -> void:
+	if _booster_buttons.has(id):
+		_flash(_booster_buttons[id].get_node("ActivatedBurst"))
+
+## Short fade-out; the tween lives on the button, so it dies with it.
+func _flash(rect: TextureRect) -> void:
+	rect.visible = true
+	rect.modulate.a = 1.0
+	var tw := rect.get_parent().create_tween()
+	tw.tween_property(rect, "modulate:a", 0.0, BOOSTER_FLASH_S)
+	tw.tween_callback(rect.hide)
 
 func _apply_booster_visual(id: String) -> void:
 	var b: Button = _booster_buttons.get(id)
@@ -821,6 +858,7 @@ func _apply_booster_visual(id: String) -> void:
 	var badge: Label = b.get_node("Badge")
 	var price: Label = b.get_node("Price")
 	badge.visible = int(st["charges"]) > 0
+	b.get_node("BadgeFrame").visible = badge.visible
 	badge.text = str(int(st["charges"]))
 	price.visible = int(st["charges"]) <= 0 and int(st["price"]) > 0 and state != BOOSTER_LOCKED and state != BOOSTER_SELECTED
 	price.text = UiText.t("BOOSTER_PRICE_SB", [UiText.num(int(st["price"]))])
