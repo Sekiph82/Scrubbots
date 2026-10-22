@@ -1,0 +1,1 @@
+{ "id": "017-color-assist-optin", "task": "OWNER 2026-10-22: color-blind board symbols opt-in (default OFF) + glyph floor(ppc*0.4)", "branch": "factory/017-color-assist-optin", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/017-color-assist-optin", "stage": "merged", "round": 2, "reviews": { "rules": "PASS", "code": "PASS", "tests": "PASS" } }
