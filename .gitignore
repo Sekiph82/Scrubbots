@@ -35,3 +35,6 @@ content_pipeline/staging_output/
 content_pipeline/production_output/
 content_pipeline/secrets/
 *.scrubpack
+
+# Factory loop runtime state (CLAUDE.md §0D)
+/factory/jobs/
