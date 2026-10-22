@@ -1,0 +1,1 @@
+{ "id": "034-m22-025-texture-memory", "task": "SB-M22-025 booster texture memory: import size_limit/compression + mobile memory budget", "branch": "factory/034-m22-025-texture-memory", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/034-m22-025-texture-memory", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "PASS", "tests": "PASS" } }
