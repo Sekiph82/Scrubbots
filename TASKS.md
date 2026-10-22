@@ -28,7 +28,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M07-011,013 — docs/LEVEL_ART_INVENTORY.md (factory 028); SB-M07-012 moved to standing rules (conditional: if supplied)
 - DONE SB-M08-001..010,013..014 — factory 030 (6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md + tools/audit_level_art.py; 10/10 images PASS (1:1 grid, no AA/interpolation/VOID, all colours exact C01..C16); SB-M08-011..012 moved to standing rules
 - DONE SB-M22-015 — verify-close 2026-10-22 (factory 032); SB-M22-008 moved to standing rules (conditional: if owner approves a no-work state)
-- READY SB-M22-022..025 — reusable BoosterButton states, bind approved booster art, validate import/transparency/filtering/memory
+- READY SB-M22-023, SB-M22-025 — bind 4 unbound state arts (free badge frame, reward glow, activated burst, tutorial pointer); downscale/reimport boosters (60 MiB uncompressed) and set mobile memory budget (022 DONE factory 033)
 - READY SB-M36-005 — playtest difficulty (simulated + local play) and record findings
 - READY SB-M44-005..006 — FTUE: contextual WAITING/no-target coachmark; win/fail/Retry/Heart teaching at first occurrence
 - READY SB-M44-013..018 — NEW badge until first visit (persisted); tutorial coachmark/highlight visual language
@@ -866,9 +866,9 @@ Locked runtime outcomes carried forward:
 - [ ] SB-M22-018 Require owner selection/approval before production promotion.
 - [ ] SB-M22-019 Never silently regenerate/overwrite approved production art.
 - [ ] SB-M22-021 Keep quantities/text/state badges live in Godot.
-- [ ] SB-M22-022 Implement reusable BoosterButton states for CHARGE_AVAILABLE / PURCHASABLE_SB / SELECTED / UNAVAILABLE / LOCKED when Economy V1 booster scope opens.
-- [ ] SB-M22-023 Bind approved booster/decorative art to reusable components.
-- [ ] SB-M22-025 Validate import/transparency/filtering/mobile memory before visual closure.
+- [x] SB-M22-022 Implement reusable BoosterButton states for CHARGE_AVAILABLE / PURCHASABLE_SB / SELECTED / UNAVAILABLE / LOCKED when Economy V1 booster scope opens. **[VERIFY-CLOSE 2026-10-22, factory 033: already on main in `scripts/ui/gameplay_screen.gd` (`_make_booster` + `set_booster_states`/`_apply_booster_visual`; states available/purchasable/unavailable/selected/locked, ring+overlay+badge+price children). Local Godot 4.7.2 LOCAL_PASS: m28_c002_c001_gameplay_v02 PASS 14/14, m39c_boosters PASS, m43_c003_c001_acquisition PASS 34/34. Note: LOCKED is implemented (disabled + overlay) but never produced - no unlock authority wired; unlock gating (6/11/16/21 per SB-M44-010) is SB-M44-031 scope, not done here. Component lives inside gameplay_screen, not a standalone class.]**
+- [ ] SB-M22-023 Bind approved booster/decorative art to reusable components. **[PARTIAL 2026-10-22, factory 033: bound = 4 booster icons + `states/booster_selected_ring` + `states/booster_unavailable_overlay`. NOT bound (no reference in scripts/scenes/data/tests): `booster_free_badge_frame`, `booster_reward_glow`, `booster_activated_burst`, `booster_tutorial_pointer`.]**
+- [ ] SB-M22-025 Validate import/transparency/filtering/mobile memory before visual closure. **[FINDINGS 2026-10-22, factory 033, stdlib check: assets/ui/final/boosters 10 PNG all RGBA (alpha OK), all have .import; est RGBA8 texture memory 59.99 MiB (each 1254x1254 = 6.0 MiB; the booster row draws ~touch-size ~100px). All 560 final-art PNGs: compress/mode=0 (lossless, uncompressed on GPU), mipmaps off, est 2947.67 MiB total; 7 PNGs without alpha. Per-node filtering not set to anything but default. NOT closed: needs downscaled/VRAM-compressed (or mipmapped) booster textures and a gameplay-screen mobile memory budget; remaining work = downscale/reimport boosters + decide memory budget.]**
 
 **Railroad V1 additions [OWNER-LOCKED 2026-09-14]**
 
