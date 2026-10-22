@@ -12,7 +12,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-UI-VIS-004 — verify-close 2026-10-22: 65b26242 ancestor of main, 14 PNGs present unchanged, indexed + roster-bound
 - DONE SB-DEV-GODOT-001 — verify-close 2026-10-22: real main.tscn boots to Home and plays L1 to WON in Godot 4.7.2 on f7f23060 (m42_navigation, m42_opening, m42_home, m44_ftue LOCAL_PASS)
 - DONE SB-M50-OPTIN-001 — color-assist symbols opt-in (default OFF, save migration, floor(ppc*0.4) glyphs); merged 2026-10-22 (factory job 017, 2d0b83b1)
-- READY SB-M46-003..015 — verify-close: renderer/effects/GFF budget technical PASS (V04); phone/GPU owner gate given (§0D.1); record evidence and tick
+- DONE SB-M46-003..015 — verify-close 019 (technical PASS V04; physical gate given §0D.1; no on-device measurement)
 - READY SB-M44-020 — verify-close: playtest gate given (§0D.1); run the fresh-save first-session funnel, log any friction, close or file fixes
 - READY SB-M43-R15-001 — verify-close: R01 sequential unlock PASS (f4448d47); owner visual acceptance given (§0D.1); record and tick
 - READY SB-UI-017..019 — verify-close: BasePopup exists (scripts/ui/popup/base_popup.gd); confirm dynamic popup text and per-milestone art binding, tick
@@ -1457,10 +1457,10 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R07_V01.md`.
 - **Also fixed:** the latent `FiveSlotBatchEngine.free_slot_if_idle` call to a nonexistent `get_remaining()`.
 - **Evidence:** new `tests/m46_slot_rebuild.gd` (L1 still moments at 5 and 6 slots; FAIL before / PASS after) plus 19 booster / popup / chaos / completion suites and m46 p20–p22, all PASS.
 
-- [ ] SB-M46-003 Renderer. **[CHATGPT V04: source/headless CPU TECHNICAL_PASS; physical visual/GPU OWNER_GATE remains OPEN.]**
-- [ ] SB-M46-008 Effects. **[CHATGPT V04: source/headless CPU TECHNICAL_PASS; physical visual/GPU OWNER_GATE remains OPEN.]**
+- [x] SB-M46-003 Renderer. **[CHATGPT V04: source/headless CPU TECHNICAL_PASS; physical visual/GPU OWNER_GATE remains OPEN.]** **[2026-10-22 factory verify-close 019: technical PASS V04 (coordination/sessions/M46-PERFORMANCE-C001/CHATGPT_M46_WHOLE_MILESTONE_INDEPENDENT_REAUDIT_V04.md) + CI run 39785950814 green on 21c97572 (note: tests/m46_performance.gd is LOCAL_PASS only, not in the CI suite list); physical GPU gate closed by owner §0D.1; no on-device measurement taken in this job.]**
+- [x] SB-M46-008 Effects. **[CHATGPT V04: source/headless CPU TECHNICAL_PASS; physical visual/GPU OWNER_GATE remains OPEN.]** **[2026-10-22 factory verify-close 019: technical PASS V04 (coordination/sessions/M46-PERFORMANCE-C001/CHATGPT_M46_WHOLE_MILESTONE_INDEPENDENT_REAUDIT_V04.md) + CI run 39785950814 green on 21c97572 (note: tests/m46_performance.gd is LOCAL_PASS only, not in the CI suite list); physical GPU gate closed by owner §0D.1; no on-device measurement taken in this job.]**
 
-- [ ] **SB-M46-015 — GameFeelFlow/Saltmire Spark effect-budget profiling.** **[CLAUDE_AUTONOMOUS_REVIEW 2026-10-16: LOCAL_PASS (desktop CPU, headless) in `tests/m46_performance.gd` p19; OPEN for physical phone/GPU; ChatGPT V04 source/criteria audit PASS.]** **[CHATGPT V04: implementation technical/headless profiling PASS, F5/phone/GPU owner gate OPEN.]**
+- [x] **SB-M46-015 — GameFeelFlow/Saltmire Spark effect-budget profiling.** **[CLAUDE_AUTONOMOUS_REVIEW 2026-10-16: LOCAL_PASS (desktop CPU, headless) in `tests/m46_performance.gd` p19; OPEN for physical phone/GPU; ChatGPT V04 source/criteria audit PASS.]** **[CHATGPT V04: implementation technical/headless profiling PASS, F5/phone/GPU owner gate OPEN.]** **[2026-10-22 factory verify-close 019: technical PASS V04 (coordination/sessions/M46-PERFORMANCE-C001/CHATGPT_M46_WHOLE_MILESTONE_INDEPENDENT_REAUDIT_V04.md) + CI run 39785950814 green on 21c97572 (note: tests/m46_performance.gd is LOCAL_PASS only, not in the CI suite list); physical GPU gate closed by owner §0D.1; no on-device measurement taken in this job.]**
   - **Setup:** the real FeedbackAdapter and the installed GFF 1.0.0 / Spark 1.0.0 autoloads, on the real Results WON path during a dense 59×59 run at 2×.
   - **FULL:** peak 8–10 owned dispatches and 6–9 Spark emitters, all expired in about 0.7 s.
   - **REDUCED:** 0 dispatches and 0 emitters.
