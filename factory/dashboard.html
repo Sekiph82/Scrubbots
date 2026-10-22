@@ -19,6 +19,7 @@
   .card .task { color:var(--dim); font-size:12px; margin:2px 0 6px; word-break:break-word; }
   .chip { display:inline-block; font-size:11px; padding:1px 6px; border-radius:9px; margin-right:4px; background:var(--pend); }
   .chip.PASS { background:var(--pass); } .chip.CHANGES { background:var(--chg); color:#000; }
+  .more { display:block; color:#8ab4ff; font-size:12px; cursor:pointer; margin:4px; }
   #detail { padding:0 16px 24px; }
   #detail a { color:#8ab4ff; margin-right:10px; cursor:pointer; }
   #questions { margin:0 16px 12px; }
@@ -38,6 +39,7 @@
 <script>
 const STAGES = ["spec","build","review","approve","merged","escalated"];
 let open = null;
+let showAllMerged = false;
 
 // http.server directory listing → child names (folders keep their trailing "/")
 async function list(path) {
@@ -57,14 +59,26 @@ async function refresh() {
     } catch (e) {}
   }
   const board = document.getElementById("board");
-  board.innerHTML = STAGES.map(s => `<div class="col"><h2>${s}</h2>${
-    jobs.filter(j => j.stage === s).map(j => `
+  board.innerHTML = STAGES.map(s => {
+    let list = jobs.filter(j => j.stage === s);
+    let more = "";
+    // Merged piles up: newest 3 only unless expanded
+    if (s === "merged" && !showAllMerged && list.length > 3) {
+      more = `<a class="more" id="moreMerged">+ ${list.length - 3} more</a>`;
+      list = list.slice(-3);
+    }
+    if (s === "merged") list = list.slice().reverse();
+    return `<div class="col"><h2>${s}</h2>${list.map(j => `
       <div class="card ${s === "escalated" ? "esc" : ""}" data-id="${j.id}">
         <div class="id">${j.id}</div>
         <div class="task">${j.task}${j.round ? " · round " + j.round : ""}</div>
-        ${Object.entries(j.reviews || {}).map(([k, v]) => `<span class="chip ${v || ""}">${k}</span>`).join("")}
-      </div>`).join("")}</div>`).join("");
+        ${Object.entries(j.reviews || {}).filter(([k, v]) => v !== "n/a")
+          .map(([k, v]) => `<span class="chip ${v || ""}">${k}</span>`).join("")}
+      </div>`).join("")}${more}</div>`;
+  }).join("");
   board.querySelectorAll(".card").forEach(c => c.onclick = () => { open = c.dataset.id; showFiles(); });
+  const m = document.getElementById("moreMerged");
+  if (m) m.onclick = () => { showAllMerged = true; refresh(); };
   document.getElementById("ts").textContent = jobs.length + " jobs · " + new Date().toLocaleTimeString();
 }
 
