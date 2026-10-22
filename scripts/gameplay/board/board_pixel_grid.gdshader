@@ -20,11 +20,12 @@ uniform vec3 gutter_color : source_color = vec3(0.03, 0.04, 0.07);
 // 0 = none; G = 1 when the cell takes the dark ink), `glyph_atlas` the 16 shapes built once by
 // ColorSymbols.build_atlas_image() (R = shape, G = halo). Still one pass, no per-cell nodes;
 // a CLEARED cell exits above before any glyph is drawn. Owner 2026-10-22: opt-in (Settings,
-// default OFF), small subtle glyph, not drawn when it would be under `min_glyph_px` on screen.
+// default OFF), small subtle glyph of floor(ppc * glyph_span) whole screen pixels (owner rework:
+// half the old 0.8 glyph, rounded down), not drawn when that is under `min_glyph_px`.
 uniform bool symbols_on = false;
 uniform sampler2D cid_map : filter_nearest, repeat_disable;
 uniform sampler2D glyph_atlas : filter_linear_mipmap, repeat_disable;
-uniform float glyph_span = 0.5;          // atlas tile side as a fraction of the cell
+uniform float glyph_span = 0.4;          // glyph side as a fraction of the cell, floored to whole px
 uniform float ink_alpha = 0.85;
 uniform float halo_alpha = 0.35;
 uniform float min_glyph_px = 5.0;        // smaller glyphs are hidden; the magnifier is the inspect path
@@ -63,13 +64,17 @@ void fragment() {
 		} else {
 			col = mix(col, vec3(0.0), ramp * bevel_strength);
 		}
-		if (symbols_on && ppc * glyph_span >= min_glyph_px) {
+		float gpx = floor(ppc * glyph_span + 0.001);   // glyph side in whole screen pixels
+		if (symbols_on && gpx >= min_glyph_px) {
+			float gs = gpx / ppc;                       // that side as a fraction of the cell
 			vec2 id = texelFetch(cid_map, ivec2(cell), 0).rg;
 			float cid = floor(id.r * 255.0 + 0.5);
-			vec2 gp = (f - vec2(0.5)) / glyph_span + vec2(0.5);
-			if (cid > 0.5 && gp.x >= 0.0 && gp.x <= 1.0 && gp.y >= 0.0 && gp.y <= 1.0) {
+			vec2 gp = (f - vec2(0.5)) / gs + vec2(0.5);
+			// Quarter-pixel bias: when the square edge falls on pixel centres, exactly gpx px are inside.
+			vec2 gq = gp + vec2(0.25 / gpx);
+			if (cid > 0.5 && gq.x >= 0.0 && gq.x < 1.0 && gq.y >= 0.0 && gq.y < 1.0) {
 				// Explicit gradients from the continuous grid coordinate (f wraps per cell).
-				vec2 k = vec2(1.0 / 16.0, 1.0) / glyph_span;
+				vec2 k = vec2(1.0 / 16.0, 1.0) / gs;
 				vec2 gl = textureGrad(glyph_atlas, vec2((cid - 1.0 + gp.x) / 16.0, gp.y), dgx * k, dgy * k).rg;
 				bool dark = id.g > 0.5;
 				col = mix(col, dark ? ink_light : ink_dark, gl.g * halo_alpha);

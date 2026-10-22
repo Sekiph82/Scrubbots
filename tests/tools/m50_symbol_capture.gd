@@ -3,7 +3,7 @@ extends SceneTree
 ## Home (hero PLAY label) and production L1 gameplay through main.tscn with a throw-away save, plus
 ## GameplayScreen arrangements on the real L3 / L5 palettes and a 16-colour symbol legend.
 ## SB-M50-OPTIN-001: the real L7 board (app root) and test_59x59 at 1080x2160 and 720x1520 with
-## symbols OFF / ON and BEFORE (the pre-OPTIN 0.8 glyph, set through shader parameters only),
+## symbols OFF / ON and BEFORE (the pre-OPTIN 0.8 glyph via shader parameters, floored to whole px),
 ## printing px per cell and glyph px; full screen JPG + native board crop PNG per state.
 ## Needs a rendering driver (run WITHOUT --headless); writes small JPGs into <out_dir>:
 ##   godot --path . -s res://tests/tools/m50_symbol_capture.gd -- <out_dir>
@@ -110,7 +110,8 @@ func _board_shots(sub: SubViewport, scr, stem: String, set_on: Callable) -> void
 	var span: float = RenderingServer.shader_get_parameter_default(m.shader.get_rid(), "glyph_span")
 	var min_px: float = RenderingServer.shader_get_parameter_default(m.shader.get_rid(), "min_glyph_px")
 	var ppc: float = r.get_cell_size() * absf(r.get_global_transform().get_scale().x)
-	print("%s: %.2f px per cell, glyph %.2f px (%s; before: %.2f px)" % [stem, ppc, ppc * span, "drawn" if ppc * span >= min_px else "hidden, magnifier", ppc * 0.8])
+	var g: float = floor(ppc * span + 0.001)   # the shader's whole-pixel glyph side
+	print("%s: %.2f px per cell, glyph %d px (%s; before: %.2f px)" % [stem, ppc, int(g), "drawn" if g >= min_px else "hidden, magnifier", ppc * 0.8])
 	var rect := Rect2i(scr.get_board_rect())
 	for state in ["off", "on", "before"]:
 		set_on.call(state != "off")
