@@ -1,0 +1,1 @@
+{ "id": "033-m22-booster-button", "task": "SB-M22-022..025 BoosterButton states + art binding + import validation (light path)", "branch": "factory/033-m22-booster-button", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/033-m22-booster-button", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "n/a", "tests": "n/a" } }
