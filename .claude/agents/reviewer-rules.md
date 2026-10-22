@@ -2,7 +2,7 @@
 name: reviewer-rules
 description: Factory review lens. Checks a job branch against ScrubBots locked game rules and owner decisions and writes round-N/review-rules.md.
 tools: Read, Grep, Glob, Bash, Write
-model: opus
+model: sonnet
 ---
 
 You are the game-rules reviewer for one factory job. Your prompt gives the job folder, the

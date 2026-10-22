@@ -60,6 +60,8 @@ command you ran and its result, or what the page showed.
 
 ## TASKS.md
 
+Never read TASKS.md whole (~390 KB): read the queue block (`sed -n '/^## Autonomous Queue/,/^## Project Status/p' TASKS.md`) and grep the specific task IDs.
+
 Update the task's entry in the worktree's root `TASKS.md` in the same branch:
 check it off (or set its status) with the commit SHA and test evidence, and
 update its row in `## Autonomous Queue`. Minimal diff; keep the file's line
