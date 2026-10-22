@@ -90,9 +90,9 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - READY SB-M59-006..010 — tests + content validator before release, Android build, clean-clone build, addon release hygiene
 - READY SB-M59-011 — final repo hygiene Phase 1 delete-nothing dry run, only after feature freeze and M59-001..010
 - READY SB-M60-001..006 — release gates: no dead routes, bound surfaces, fresh-save FTUE, provider/disabled Shop, Events/Ranks policy, gates
-- OWNER SB-M51-005 — launch languages not chosen (see Questions)
-- OWNER SB-M43-131..133 — RANKS scoring policy undecided; Ranks destination and visual master wait on it
-- OWNER SB-M56-011 — Events/Ranks analytics wait on the RANKS policy decision
+- READY SB-M51-005 — launch languages English and Turkish (owner 2026-10-22)
+- READY SB-M43-131..133 — RANKS (owner 2026-10-22): all-time = highest campaign level; weekly = levels completed, reset Monday 00:00 UTC; nothing bought with money/boosters counts
+- READY SB-M56-011 — Events/Ranks analytics for the RANKS policy decided 2026-10-22 (all-time + weekly tables)
 - OWNER SB-M43-136..141 — future world level ranges undecided; world registry, art, states, ceremony wait on them
 - OWNER SB-M43-073 — world unlock ceremony waits on owner-defined world ranges
 - OWNER SB-M54-032 — world regression waits on owner-defined world ranges
@@ -114,8 +114,6 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
-- SB-M51-005 — Which languages should ScrubBots ship in at launch?
-- SB-M43-131..133, SB-M56-011 — What should RANKS rank players by (metric and season window), given no pay-to-win metric?
 - SB-M43-136..141, SB-M43-073, SB-M54-032 — Which campaign level ranges / completion conditions define World 02 and later worlds?
 - SB-M43-153..160, SB-M49-030, SB-M54-031 — Which account/sign-in provider should cloud save use (e.g. Google Play Games + Game Center, or none for V1)?
 - SB-M57-001..011, SB-M57-014..016, SB-M43-084, SB-M49-029 — Which rewarded-ad and IAP provider/SDK should ScrubBots use?
@@ -2201,7 +2199,7 @@ This extension **does not change** the canonical consecutive-login reset rule or
 - [ ] SB-M43-128 Define and implement EVENTS destination without Event Points or a new event currency; use existing SB/Bot Parts/Card Packs/Booster rewards unless a later owner decision adds something.
 - [ ] SB-M43-129 Events support event list/home, detail, countdown, participation/progress, reward summary, ended/claimed state and offline/unavailable state.
 - [ ] SB-M43-130 Produce/owner-approve Events visual master and at least one reusable event card/detail family.
-- [ ] SB-M43-131 Define RANKS scoring/ranking policy in an owner decision before implementation; never invent a pay-to-win ranking metric.
+- [ ] SB-M43-131 Define RANKS scoring/ranking policy in an owner decision before implementation; never invent a pay-to-win ranking metric. **[OWNER DECISION 2026-10-22, owner via factory dashboard: two tables. All-time: highest campaign level reached. Weekly: number of levels completed that week; the week resets Monday 00:00 UTC. Nothing purchasable with money or boosters counts toward either table.]**
 - [ ] SB-M43-132 Implement RANKS destination with season/window label, player placement, surrounding ranks, top ranks, loading/offline/empty states and privacy-safe display identity.
 - [ ] SB-M43-133 Produce/owner-approve Ranks visual master before production binding.
 - [ ] SB-M43-134 Home/BottomNav badge system supports Tasks ready, Daily ready, Gift claimable, Robot unlock/new, Collection new, Event active/reward and other approved attention states without notification spam. **New owner decision [2026-10-10]: Rewarded Ads Home shortcut MUST show existing red numeric 1 when exactly one currently actionable next sequential reward is claimable; missing on first iPhone IPA and observed Android family testing. Rewarded Ads badge sub-scope CODE TECH PASS on c2b1c3c7; owner accepted the new iPhone UX and Android builds without new Android physical retest; no synthetic provider/grant; broad M43-134 remains OPEN.**
@@ -2637,7 +2635,7 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R07_V01.md`.
 - [x] SB-M51-002 Translation-key convention. **[CHATGPT SCOPED TECH_PASS 2026-10-15, pseudo/key checks M51 4/4 CI 38753823564; not full localization]**
 - [ ] SB-M51-003 Longer-string layouts. **[PARTIAL: pseudo-layout scan is report-only; Shop scroll/overflow not proven.]**
 - [x] SB-M51-004 Pseudo-localization. **[CHATGPT SCOPED TECH_PASS 2026-10-15, pseudo/key checks M51 4/4 CI 38753823564; not full localization]**
-- [ ] SB-M51-005 Actual languages decided later. `[DESIGN GATE]` **[OWNER DESIGN GATE: actual languages not chosen.]**
+- [ ] SB-M51-005 Actual languages decided later. `[DESIGN GATE]` **[OWNER DESIGN GATE: actual languages not chosen.]** **[OWNER DECISION 2026-10-22, owner via factory dashboard: launch languages are English and Turkish.]**
 
 #### M51 Player-Experience Localization Expansion
 - [ ] SB-M51-006 Localize every M43/M44 surface including popup titles, booster descriptions, shop products, errors, notifications, event/rank labels and achievement copy.
