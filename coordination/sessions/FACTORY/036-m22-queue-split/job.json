@@ -1,0 +1,1 @@
+{ "id": "036-m22-queue-split", "task": "SB-M22-023/025 queue split: close 025 (booster slice), 023 pointer -> OWNER question (light path)", "branch": "factory/036-m22-queue-split", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/036-m22-queue-split", "stage": "merged", "round": 2, "reviews": { "rules": "PASS", "code": "n/a", "tests": "n/a" } }
