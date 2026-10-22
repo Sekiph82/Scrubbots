@@ -1,0 +1,3 @@
+# Spec: FACTORY-EFFICIENCY (owner approved 2026-10-22, "hepsini yap")
+Cut factory token use. Change only .claude/ files: SKILL.md gets a Light path section (TASKS.md/docs/factory-only diffs: builder spec section in build.md, one reviewer-rules, orchestrator decision.md "APPROVE (light path)"; batch owner answers), a Reading TASKS.md rule, and the /factory next head -80 read replaced by the queue-block sed. Agents approver, reviewer-rules, spec-writer move to sonnet; builder stays opus. Agents that read TASKS.md get the never-read-whole rule.
+Checks: git diff --name-only origin/main...HEAD only .claude/ files; grep -c "^model: opus" .claude/agents/*.md only builder nonzero; git diff --check clean.
