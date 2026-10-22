@@ -20,7 +20,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE FACTORY-020 — m46_performance added to CI, run 39828088266 green (job 020)
 - DONE SB-M44-020 — verify-close 2026-10-22 (job 021): fresh-save funnel suites LOCAL_PASS, owner playtest gate §0D.1; friction filed as SB-M44-031
 - DONE SB-M43-R15-001 — verify-close: R01 sequential unlock PASS (f4448d47); owner visual acceptance given (§0D.1); record and tick
-- READY SB-UI-017..019 — verify-close: BasePopup exists (scripts/ui/popup/base_popup.gd); confirm dynamic popup text and per-milestone art binding, tick
+- DONE SB-UI-017..018 — verified 2026-10-22 (factory 023, CI 39828088266); SB-UI-019 moved to standing rules
 - READY SB-UI-VIS-005 — after VIS-004: refresh assets/ui/VISUAL_ASSET_INDEX.md on main to show 157/157 Phase 2 targets and production paths
 - READY SB-M43-R15-002..003 — Settings popup visual-family remediation and Daily Rewards containment fix at 683x1366 + responsive matrix
 - READY SB-M39-033 — sixth-slot (+1 Slot) presentation/layout support with mobile safe-area evidence; no 7+ slot state
@@ -125,7 +125,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M44-029 — cosmetic achievement rewards (badges/frames), no economy rewards (OWNER_META_PROGRESSION_DESIGN_V01)
 - READY SB-M44-030 — verify Gift Bar visible from first Home with unchanged 10/50/250/500/1000 rewards; regression test (OWNER_META_PROGRESSION_DESIGN_V01)
 - READY SB-M44-031 — re-sequence FTUE to the 2026-10-22 unlock table: L1 Daily/Tasks coachmarks, L2 four-booster lesson, soft_no_hard_locks policy (after SB-M44-010)
-<!-- Not queued (standing rules, no job of their own): SB-M08-011..012, SB-M22-016..019, SB-M22-021, SB-UI-020..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
+<!-- Not queued (standing rules, no job of their own): SB-M08-011..012, SB-M22-016..019, SB-M22-021, SB-UI-019..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
@@ -1311,9 +1311,9 @@ These three rows are the only new work authorized by the 2026-10-06 F5 owner rev
 - [ ] **SB-M43-R15-003 — Daily Rewards containment remediation.** Keep the current consecutive-login logic, D1-D5 values and claim authority unchanged. Fix the owner-observed composition so Daily Rewards art does not protrude outside the intended popup/table/content bounds: the calendar/hero, flame, five day-card frames, state/check art, rule text and buttons must remain visually contained and readable at 683x1366 and the canonical responsive matrix. No clipping of reward text, no overlap with title/actions, no layout regression to Tasks/Gift Bar, and no change to Daily reward truth.
 
 **Shared later-screen visual production rules**
-- [ ] SB-UI-017 Implement reusable `BasePopup` composition.
-- [ ] SB-UI-018 Keep popup text/rewards/quantities/buttons/state dynamic in Godot.
-- [ ] SB-UI-019 For each later screen milestone, identify/generate/approve/bind required illustration assets inside that milestone.
+- [x] SB-UI-017 Implement reusable `BasePopup` composition. — 2026-10-22 factory 023: base_popup.gd is the single popup component, reused by popups.gd + 14 screens (shop, collection, robots, daily, profile, ceremonies, settings...); covered by suites m43_c003_c001_acquisition, m43_r15_owner_remediation, m50_accessibility_audit, CI 39828088266 PASS.
+- [x] SB-UI-018 Keep popup text/rewards/quantities/buttons/state dynamic in Godot. — 2026-10-22 factory 023: titles/bodies/CTAs set at runtime via set_title/add_body_line/add_action(UiText.t(...)); chrome art has no baked text (base_popup.gd header); CI 39828088266.
+- [ ] SB-UI-019 For each later screen milestone, identify/generate/approve/bind required illustration assets inside that milestone. — standing per-milestone process rule, not ticked (factory 023, 2026-10-22).
 - [ ] SB-UI-020 Do not pre-generate speculative asset libraries for unknown future states.
 - [ ] SB-UI-021 Treat final visual polish as consolidation/QA, not first production-art implementation.
 
