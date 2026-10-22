@@ -39,3 +39,6 @@ content_pipeline/secrets/
 # Factory loop runtime state (CLAUDE.md §0D)
 /factory/jobs/
 /factory/answers.md
+
+# Local suite runner logs (tools/run_suites.py)
+validate_logs/

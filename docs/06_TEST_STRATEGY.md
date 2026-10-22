@@ -1,5 +1,7 @@
 # 06 — Test Strategy
 
+Current rules for new suites, the one-command runner and the regression gate: `docs/TESTING_CONVENTIONS.md`.
+
 No third-party testing framework is used. Godot 4.7 supports headless
 execution (`--headless`), which is the backbone for command-line-runnable
 checks. Prompt 02 implemented a small custom GDScript test runner
