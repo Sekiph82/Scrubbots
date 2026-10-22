@@ -55,6 +55,9 @@ func _referenced_paths() -> void:
 		refs.append(spec["art"])
 	refs.append(gs.BOOSTER_SELECTED_ART)
 	refs.append(gs.BOOSTER_UNAVAILABLE_ART)
+	refs.append(gs.BOOSTER_FREE_BADGE_ART)
+	refs.append(gs.BOOSTER_REWARD_GLOW_ART)
+	refs.append(gs.BOOSTER_ACTIVATED_BURST_ART)
 	for id in af.BOOSTER_DEFS:
 		refs.append(af.BOOSTER_DEFS[id]["icon"])
 	for p in refs:

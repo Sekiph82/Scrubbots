@@ -1112,6 +1112,8 @@ func execute_booster(id: String, target = null) -> Dictionary:
 	r["id"] = id
 	last_booster_request = r
 	_refresh_hud()
+	if r.get("ok", false) and _screen != null and is_instance_valid(_screen):
+		_screen.play_booster_activated(id)
 	return r
 
 ## Booster control intent (V02 booster row). Never spends SB from a tap:
