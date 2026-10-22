@@ -9,7 +9,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE REFRESH-QUEUE — queue rebuilt 2026-10-22 from all open `- [ ]` items; §0D gates applied (visual/F5/phone/ChatGPT/Actions are not blockers)
 - READY SB-M50-BOARD-001 — run Android `validation_only` CI (allowed again §0D.2), record the run, close the item; owner F5 given 2026-10-16, phone gate §0D.1, no ChatGPT audit §0D.4
 - READY SB-M50-002 — board part done (e8a7e75b, owner F5 2026-10-16); cite the SB-M50-BOARD-001 CI run, confirm Supply/Slot cues and close
-- READY SB-UI-VIS-004 — verify-close: commit 65b26242 is already an ancestor of main; check the P2-145..P2-157 files are present, record evidence, tick
+- DONE SB-UI-VIS-004 — verify-close 2026-10-22: 65b26242 ancestor of main, 14 PNGs present unchanged, indexed + roster-bound
 - READY SB-DEV-GODOT-001 — verify-close: owner F5 given (§0D.1); confirm main opens and plays via F5 path in Godot 4.7.2, record result, tick
 - READY SB-M46-003..015 — verify-close: renderer/effects/GFF budget technical PASS (V04); phone/GPU owner gate given (§0D.1); record evidence and tick
 - READY SB-M44-020 — verify-close: playtest gate given (§0D.1); run the fresh-save first-session funnel, log any friction, close or file fixes
@@ -717,7 +717,7 @@ Home preproduction note (owner decision 2026-09-18): `assets/ui/HOME_ASSET_MANIF
 Canonical discovery index for Claude/Godot UI integration:
 `assets/ui/VISUAL_ASSET_INDEX.md`
 
-- [ ] SB-UI-VIS-004 Integrate/audit the final visual-closure batch P2-145..P2-157 from `codex/visual-assets-production` into `main`. Source commit: `65b26242f996f210a923b4536c7083f6f2d005cc`. This batch contains 9 robot-perk icons, 3 Collection state assets, and the canonical 10-robot Cleaning Crew group art.
+- [x] SB-UI-VIS-004 Integrate/audit the final visual-closure batch P2-145..P2-157 from `codex/visual-assets-production` into `main`. Source commit: `65b26242f996f210a923b4536c7083f6f2d005cc`. This batch contains 9 robot-perk icons, 3 Collection state assets, and the canonical 10-robot Cleaning Crew group art. DONE 2026-10-22 (factory verify-close): 65b26242 is ancestor of main; all 14 PNGs (9 perks, 3 Collection states, cleaning_crew_group) present on HEAD with identical blob hashes; indexed in assets/ui/VISUAL_ASSET_INDEX.md (P2-145..P2-157); perk icons bound in data/config/robot_roster_v1.json.
 - [ ] SB-UI-VIS-005 After P2-145..P2-157 integration, refresh/verify the `main` copy of `assets/ui/VISUAL_ASSET_INDEX.md` so Claude sees the final 157 / 157 Phase 2 targets and complete production paths.
 - [ ] SB-UI-VIS-006 Before UI milestone closure, perform owner/Claude pixel-level QA of production assets actually used on-screen: alpha edges, text/watermark absence, mobile readability, identity consistency, compression/import settings. Path existence alone is not visual acceptance.
 
