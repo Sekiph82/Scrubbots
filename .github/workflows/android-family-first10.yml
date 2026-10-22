@@ -29,6 +29,7 @@ name: Android Family First10 APK
 # M50 owner decisions A/B (2026-10-15): + tests/m50_color_symbols.gd (exact 10/10 guard) and the tile / gameplay HUD /
 #   touch regressions m28_c002_c004_tile_visual, m28_c002_c001_gameplay_v02, m47_touch_r01_mobile_ux, plus
 #   m43_c003_c001_acquisition for the symbol-carrying booster target chips (43 total).
+# M46: + tests/m46_performance.gd (44 total, exact 22/22 guard).
 
 on:
   workflow_dispatch:
@@ -107,7 +108,7 @@ jobs:
                    m41_settings m43_master_c009_daily m43_r15_owner_remediation m43_r15_001_r01_sequential_unlock \
                    m45_debug_tooling m49_responsive_matrix m50_accessibility_audit m51_localization_readiness \
                    m50_color_symbols m28_c002_c004_tile_visual m28_c002_c001_gameplay_v02 m47_touch_r01_mobile_ux \
-                   m43_c003_c001_acquisition; do
+                   m43_c003_c001_acquisition m46_performance; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -165,6 +166,12 @@ jobs:
             echo "M50S verdict=PASS (10/10)" | tee -a "$S"
           else
             echo "M50S verdict=FAIL (exact 10/10 summary missing)" | tee -a "$S"; fail=1
+          fi
+          # M46 performance evidence: exact 22-case summary is mandatory.
+          if grep -qxF 'M46 performance evidence: PASS (22/22 cases, 0 fail)' validate_logs/m46_performance.log 2>/dev/null; then
+            echo "M46 verdict=PASS (22/22)" | tee -a "$S"
+          else
+            echo "M46 verdict=FAIL (exact 22/22 summary missing)" | tee -a "$S"; fail=1
           fi
           echo "aggregate=$([ $fail -eq 0 ] && echo PASS || echo FAIL)" | tee -a "$S"
           { echo "### validate (mode=${MODE:-<unset>}, ${GITHUB_SHA})"; echo '```'; cat "$S"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
