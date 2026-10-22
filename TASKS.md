@@ -26,9 +26,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M39-033 — verify-close 2026-10-22 (factory 026), LOCAL_PASS + factory peer review: m39_v02_capacity PASS (cannot grow past 6, never 7+), m28_c002_c002_static_shell PASS 16-of-16, m49_responsive_matrix PASS 8-of-8 (m05_sixth_slot_matrix, m07 synthetic NOTCH), m50_color_symbols PASS 10-of-10; MAX := 6, no 7+ state. CLAUDE.md §0D.1 grants the real-phone sign-off; safe-area coverage is the synthetic-inset matrix, no real-phone capture claimed.
 - DONE SB-M05-006..010 — factory 027 (2a870231): tools/run_suites.py one-command CI-rule runner + docs/TESTING_CONVENTIONS.md; LOCAL_PASS 3-suite subset aggregate=PASS (3/3), run_tests PASS, selftest PASS
 - DONE SB-M07-011,013 — docs/LEVEL_ART_INVENTORY.md (factory 028); SB-M07-012 moved to standing rules (conditional: if supplied)
-- READY SB-M08-001..006 — level-art technical audit: filename, dimensions, alpha, color count, anti-aliasing, interpolation
-- READY SB-M08-007..010 — level-art audit: logical-pixel grid, production envelope/context, width and height in legal envelope
-- READY SB-M08-013..014 — map/reject source colors against locked C01..C16 with deterministic evidence; produce the audit report
+- DONE SB-M08-001..010,013..014 — factory 030 (6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md + tools/audit_level_art.py; 10/10 images PASS (1:1 grid, no AA/interpolation/VOID, all colours exact C01..C16); SB-M08-011..012 moved to standing rules
 - READY SB-M52-005 — validate rectangular production art through the content pipeline
 - READY SB-M22-008..015 — slot no-work state; generate the four owner-locked booster assets (+1 Slot, Random, Selector, Tornado)
 - READY SB-M22-022..025 — reusable BoosterButton states, bind approved booster art, validate import/transparency/filtering/memory
@@ -800,20 +798,20 @@ Do not replace existing Prompt 02 fixtures — add to them.
 
 Per candidate production pixel-art level:
 
-- [ ] SB-M08-001 Record filename.
-- [ ] SB-M08-002 Record original dimensions.
-- [ ] SB-M08-003 Record alpha/transparency.
-- [ ] SB-M08-004 Count colors.
-- [ ] SB-M08-005 Detect anti-aliasing.
-- [ ] SB-M08-006 Detect interpolation.
-- [ ] SB-M08-007 Determine logical-pixel grid.
-- [ ] SB-M08-008 Determine legal production envelope/context.
-- [ ] SB-M08-009 Confirm width in legal engine envelope.
-- [ ] SB-M08-010 Confirm height in legal engine envelope.
+- [x] SB-M08-001 Record filename. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
+- [x] SB-M08-002 Record original dimensions. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
+- [x] SB-M08-003 Record alpha/transparency. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
+- [x] SB-M08-004 Count colors. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
+- [x] SB-M08-005 Detect anti-aliasing. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
+- [x] SB-M08-006 Detect interpolation. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
+- [x] SB-M08-007 Determine logical-pixel grid. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
+- [x] SB-M08-008 Determine legal production envelope/context. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
+- [x] SB-M08-009 Confirm width in legal engine envelope. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
+- [x] SB-M08-010 Confirm height in legal engine envelope. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
 - [ ] SB-M08-011 Preserve original.
 - [ ] SB-M08-012 Never silently resize.
-- [ ] SB-M08-013 Explicitly map/reject source colors against locked C01..C16; never invent C17+; record deterministic mapping/rejection evidence.
-- [ ] SB-M08-014 Produce audit report.
+- [x] SB-M08-013 Explicitly map/reject source colors against locked C01..C16; never invent C17+; record deterministic mapping/rejection evidence. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
+- [x] SB-M08-014 Produce audit report. — 2026-10-22 (factory 030, 6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md, tools/audit_level_art.py 10/10 PASS
 
 ### M09 — Pixel Art → Level Data Pipeline `[CONTENT]`
 
