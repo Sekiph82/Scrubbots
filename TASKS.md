@@ -21,7 +21,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M44-020 — verify-close 2026-10-22 (job 021): fresh-save funnel suites LOCAL_PASS, owner playtest gate §0D.1; friction filed as SB-M44-031
 - DONE SB-M43-R15-001 — verify-close: R01 sequential unlock PASS (f4448d47); owner visual acceptance given (§0D.1); record and tick
 - DONE SB-UI-017..018 — verified 2026-10-22 (factory 023, CI 39828088266); SB-UI-019 moved to standing rules
-- READY SB-UI-VIS-005 — after VIS-004: refresh assets/ui/VISUAL_ASSET_INDEX.md on main to show 157/157 Phase 2 targets and production paths
+- DONE SB-UI-VIS-005 — verified 2026-10-22 (factory 024): index already 157/157, all rows+paths on disk
 - READY SB-M43-R15-002..003 — Settings popup visual-family remediation and Daily Rewards containment fix at 683x1366 + responsive matrix
 - READY SB-M39-033 — sixth-slot (+1 Slot) presentation/layout support with mobile safe-area evidence; no 7+ slot state
 - READY SB-M05-006..010 — test harness: organize sections, split perf output from assertions, one-command wrapper, regression conventions doc
@@ -726,7 +726,7 @@ Canonical discovery index for Claude/Godot UI integration:
 `assets/ui/VISUAL_ASSET_INDEX.md`
 
 - [x] SB-UI-VIS-004 Integrate/audit the final visual-closure batch P2-145..P2-157 from `codex/visual-assets-production` into `main`. Source commit: `65b26242f996f210a923b4536c7083f6f2d005cc`. This batch contains 9 robot-perk icons, 3 Collection state assets, and the canonical 10-robot Cleaning Crew group art. DONE 2026-10-22 (factory verify-close): 65b26242 is ancestor of main; all 14 PNGs (9 perks, 3 Collection states, cleaning_crew_group) present on HEAD with identical blob hashes; indexed in assets/ui/VISUAL_ASSET_INDEX.md (P2-145..P2-157); perk icons bound in data/config/robot_roster_v1.json.
-- [ ] SB-UI-VIS-005 After P2-145..P2-157 integration, refresh/verify the `main` copy of `assets/ui/VISUAL_ASSET_INDEX.md` so Claude sees the final 157 / 157 Phase 2 targets and complete production paths.
+- [x] SB-UI-VIS-005 After P2-145..P2-157 integration, refresh/verify the `main` copy of `assets/ui/VISUAL_ASSET_INDEX.md` so Claude sees the final 157 / 157 Phase 2 targets and complete production paths. Verified 2026-10-22 (factory 024): script found rows P2-001..P2-157 all present, 0 duplicates, 0 missing files on disk; index summary already states 157 / 157; no index edit needed.
 - [ ] SB-UI-VIS-006 Before UI milestone closure, perform owner/Claude pixel-level QA of production assets actually used on-screen: alpha edges, text/watermark absence, mobile readability, identity consistency, compression/import settings. Path existence alone is not visual acceptance.
 
 Static AI visual generation is considered closed after SB-UI-VIS-004/005 unless a new owner-approved feature creates a specific new requirement. Do not generate speculative World Map, XP, Star-currency, leaderboard, event, or monetization art.
