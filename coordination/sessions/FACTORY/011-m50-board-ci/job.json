@@ -1,0 +1,1 @@
+{ "id": "011-m50-board-ci", "task": "SB-M50-BOARD-001: fix flaky m50_color_symbols s10, CI rerun, close", "branch": "factory/011-m50-board-ci", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/011-m50-board-ci", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "PASS", "tests": "PASS" } }
