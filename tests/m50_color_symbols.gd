@@ -325,6 +325,14 @@ func _s10() -> void:
 			await _frames(1)
 			host.request_booster(id)
 			await _frames(4)
+			# The Selector proof runs off-frame; chips appear only once it settles (slow CI runners).
+			var wait_end := Time.get_ticks_msec() + 10000
+			while Time.get_ticks_msec() < wait_end:
+				var top = _root.get_modal_stack().top()
+				var targets: Node = top.find_child("Targets", true, false) if top != null else null
+				if not host.is_booster_proof_running() and targets != null and targets.get_child_count() > 0:
+					break
+				await _frames(1)
 			var p = _root.get_modal_stack().top()
 			var flow: Node = p.find_child("Targets", true, false) if p != null else null
 			ok = ok and flow != null and flow.get_child_count() > 0
