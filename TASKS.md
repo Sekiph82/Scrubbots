@@ -4,10 +4,126 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 
 ## Autonomous Queue
 <!-- Maintained by the factory loop (CLAUDE.md §0D). One row per item: `- READY|OWNER|DONE <TASK-ID> — <one line>`. First READY row is next. -->
-- READY REFRESH-QUEUE — scan open items, fill this queue (owner priority first: SB-M50-BOARD-001 board symbols)
+- DONE REFRESH-QUEUE — queue rebuilt 2026-10-22 from all open `- [ ]` items; §0D gates applied (visual/F5/phone/ChatGPT/Actions are not blockers)
+- READY SB-M50-BOARD-001 — run Android `validation_only` CI (allowed again §0D.2), record the run, close the item; owner F5 given 2026-10-16, phone gate §0D.1, no ChatGPT audit §0D.4
+- READY SB-M50-002 — board part done (e8a7e75b, owner F5 2026-10-16); cite the SB-M50-BOARD-001 CI run, confirm Supply/Slot cues and close
+- READY SB-UI-VIS-004 — verify-close: commit 65b26242 is already an ancestor of main; check the P2-145..P2-157 files are present, record evidence, tick
+- READY SB-DEV-GODOT-001 — verify-close: owner F5 given (§0D.1); confirm main opens and plays via F5 path in Godot 4.7.2, record result, tick
+- READY SB-M46-003..015 — verify-close: renderer/effects/GFF budget technical PASS (V04); phone/GPU owner gate given (§0D.1); record evidence and tick
+- READY SB-M44-020 — verify-close: playtest gate given (§0D.1); run the fresh-save first-session funnel, log any friction, close or file fixes
+- READY SB-M43-R15-001 — verify-close: R01 sequential unlock PASS (f4448d47); owner visual acceptance given (§0D.1); record and tick
+- READY SB-UI-017..019 — verify-close: BasePopup exists (scripts/ui/popup/base_popup.gd); confirm dynamic popup text and per-milestone art binding, tick
+- READY SB-UI-VIS-005 — after VIS-004: refresh assets/ui/VISUAL_ASSET_INDEX.md on main to show 157/157 Phase 2 targets and production paths
+- READY SB-M43-R15-002..003 — Settings popup visual-family remediation and Daily Rewards containment fix at 683x1366 + responsive matrix
+- READY SB-M39-033 — sixth-slot (+1 Slot) presentation/layout support with mobile safe-area evidence; no 7+ slot state
+- READY SB-M05-006..010 — test harness: organize sections, split perf output from assertions, one-command wrapper, regression conventions doc
+- READY SB-M07-011..013 — inventory supplied level, underwater and other theme artwork beyond the M21 source
+- READY SB-UI-008..013 — select/record canonical Scrubby master reference, then validate manifest reference paths/IDs
+- READY SB-M08-001..006 — level-art technical audit: filename, dimensions, alpha, color count, anti-aliasing, interpolation
+- READY SB-M08-007..010 — level-art audit: logical-pixel grid, production envelope/context, width and height in legal envelope
+- READY SB-M08-013..014 — map/reject source colors against locked C01..C16 with deterministic evidence; produce the audit report
+- READY SB-M52-005 — validate rectangular production art through the content pipeline
+- READY SB-M22-008..015 — slot no-work state; generate the four owner-locked booster assets (+1 Slot, Random, Selector, Tornado)
+- READY SB-M22-022..025 — reusable BoosterButton states, bind approved booster art, validate import/transparency/filtering/memory
+- READY SB-M36-005 — playtest difficulty (simulated + local play) and record findings
+- READY SB-M44-005..006 — FTUE: contextual WAITING/no-target coachmark; win/fail/Retry/Heart teaching at first occurrence
+- READY SB-M44-013..018 — NEW badge until first visit (persisted); tutorial coachmark/highlight visual language
+- READY SB-M34-006 — haptics real-device test on an Android debug build
+- READY SB-M42-032..033 — opening cinematic on real Android device (720p/30, sync, latency, memory); iOS boot-flow readiness
+- READY SB-M48-002..003 — document the Apple toolchain requirement; prepare iOS configuration
+- READY SB-M47-005..010 — Android device: portrait, safe areas, Easy/Medium/Hard/Very Hard 59x59 performance
+- READY SB-M47-011..015 — Android device: bot density, background/foreground, heat/battery, record results, FULL/REDUCED plugin stress
+- READY SB-M43-068..072 — ceremonies: set 9/9, Master Collection, Robot Unlock (+equip choice), feature-unlock coachmark
+- READY SB-M43-074..077 — Gift Meter milestone, Daily cycle and 3/3 Tasks celebrations; Reduced Effects collapse without changing grants
+- READY SB-M43-R05-001..002 — Gift Meter presentational micro-progress ticks from one GiftMeterService progress model
+- READY SB-M43-013 — Results hands off to the M43-C005 robot/collection/feature ceremony after the reward commit
+- READY SB-M43-C005F-007 — robot/feature unlock feel with MAJOR_UNLOCK ceiling (after M43-070..072); world part stays gated
+- READY SB-M43-078..080 — real Shop destination from SHOP/`+`, Shop visual master, Hearts/boosters/2x product groups
+- READY SB-M43-082..083 — Shop live wallet/Heart/booster/entitlement state; soft-currency buys via authoritative services
+- READY SB-M43-085..089 — Shop confirmation, return context, sold/offline/error states, rapid-tap/idempotency tests, honest feedback
+- READY SB-M43-090..095 — Collection main screen (15x9), album visual master, set progress, set detail, card detail, Exchange flow
+- READY SB-M43-096..101 — duplicate exchange + EXCHANGE ALL, live SB values, pack inventory entry, reward history, locked sets, perf
+- READY SB-M43-R07-001..006 — earned-pack pity counter, guarantee, complete-pool fallback, legible pity UI, First Collection Sprint tuning
+- READY SB-M43-102..106 — ROBOTS destination, visual master, lock state + Bot Parts N/250, perk display, select/equip persistence
+- READY SB-M43-107..111 — locked robot detail, active-robot presentation, no gameplay mutation, unlock history/NEW badge, 10-robot check
+- READY SB-M43-112..117 — TASKS destination (3 tasks, 75/100/125 SB), exactly-once claims, DAILY destination and visual master
+- READY SB-M43-118..121 — Gift Bar claim/history, Gift Bar visual master, no recursive feed, rollover/rollback/duplicate-tap tests
+- READY SB-M43-R09-001..005 — Daily Scrub Orders archetype pool, deterministic daily generation, tier intent, earned ScrubBox ceremony
+- READY SB-M43-122..126 — real BottomNav destinations, keep M41 Settings, Profile entry + visual master, Achievements framework
+- READY SB-M43-127..130 — Achievements visual master; EVENTS destination (no new currency), event states, Events visual master
+- READY SB-M43-134 — Home/BottomNav badge system for remaining attention states without notification spam
+- READY SB-M43-R10-001..003 — Weekly Cleaning Event template, first-clear progress signal, no-reset and explicit expiry/claim state
+- READY SB-M43-R10-004..007 — First-Try Cleanup challenge, no extra Heart/paid continue, Personal Best records, self-ghost marker
+- READY SB-M43-143..148 — comeback surface, opt-in notification categories, contextual permission, toggles/quiet hours, safe deep links
+- READY SB-M43-149..151 — no notification spam, comeback/permission illustration, timezone/missed-day/stale-link tests
+- READY SB-M43-R12-001..006 — Comeback Catch-Up track, no Daily-rule mutation, anti-farm, notification priority/dedup, factual copy
+- READY SB-M43-163..168 — meta UI audio/haptics settings, no false success sounds, offline/error language, empty states, final feel
+- READY SB-M43-169..170 — create assets/ui/PLAYER_EXPERIENCE_ASSET_MANIFEST.json and check the M43 closure gate
+- READY SB-M43-C005F-015 — end-to-end GameFeelFlow/Spark feel validation across representative paths (after C005 ceremonies)
+- READY SB-UI-VIS-006 — pixel-level QA of production assets used on-screen: alpha edges, no text/watermark, readability, import settings
+- READY SB-UI-031 — validate transparency/edges/resolution/filtering/compression/memory/readability of bound generated assets
+- READY SB-M49-020..022 — prove all touch targets >= 88 px (nav, Pause/2x, supply); localization-expansion text container stress
+- READY SB-M49-026..028 — full viewport matrix for every M43/M44 surface; long labels/prices; modal stacks and scroll screens
+- READY SB-M49-031..032 — matrix check of Next Cleanup, journey, ScrubBox, Weekly/First-Try, Catch-Up; compact degradation
+- READY SB-M50-004..007 — contrast coverage for remaining screens, Reduced Effects, touch sizes, text readability
+- READY SB-M50-010..011 — icon families distinguishable at mobile size; essential gameplay understandable without decoration
+- READY SB-M50-012..017 — M43/M44 text scale/focus/non-color cues, Reduced Effects ceremonies, accessible ad path, a11y labels
+- READY SB-M50-018 — GameFeelFlow/Spark motion/flash accessibility audit, FULL vs REDUCED (after M50-005/012/013/017)
+- READY SB-M51-001..003 — remove remaining hard-coded user text; prove longer-string layouts incl. Shop scroll/overflow
+- READY SB-M51-006..009 — localize every M43/M44 surface, platform-localized prices, pluralization, full pseudo-localization pass
+- READY SB-M56-001..006 — analytics taxonomy (versioned, privacy-minimized): session, level funnel, retention, assistance, booster events
+- READY SB-M56-007..010 — analytics: economy, collection/robots, navigation, ads/store events (provider mocked)
+- READY SB-M56-012..016 — notification analytics, dashboard metrics, no-gameplay-effect rule, consent gating, schema tests
+- READY SB-M56-017..020 — measure Next Cleanup, 10-level journey, Collection pity/new-card rate, Daily Scrub Orders
+- READY SB-M56-021..023 — measure Weekly/First-Try, Comeback Catch-Up and notification outcomes
+- READY SB-M54-022..027 — regressions: Results/fail/Need a Hand, spend/grant idempotency, ad callbacks (mocked), Shop, packs, robots
+- READY SB-M54-028..030 — regressions: Tasks/Daily/Gift/badges, BottomNav/modal stack, feature-unlock/FTUE once-only
+- READY SB-M54-033..036 — regressions: Next Cleanup/journey, Collection pity, Daily/Event retention, Comeback/notifications
+- READY SB-M54-037..038 — presentation-plugin one-shot/fail-open regression and GFF/Spark runtime visual regression pack
+- READY SB-M55-018..023 — chaos: popup spam, background during flows, triple loss, BottomNav churn, huge inventories, timer expiry
+- READY SB-M55-024..025 — chaos: offline/online flapping; presentation-plugin chaos/leak test
+- READY SB-M58-001..006 — third-party and data inventory, remove unnecessary collection, privacy disclosures, store declarations, age rating
+- READY SB-M58-007..012 — child-directed review, analytics/ad consent, notification privacy, account data policy, display-name privacy
+- READY SB-M58-013..014 — receipt/transaction retention policy; localization/accessibility check of consent/privacy screens
+- READY SB-M57-022 — sandbox purchases/rewarded ads on real Android (later iOS); escalates if the provider is still undecided
+- READY SB-M59-001..005 — debug/release export, output directories, versioning, build numbers
+- READY SB-M59-006..010 — tests + content validator before release, Android build, clean-clone build, addon release hygiene
+- READY SB-M59-011 — final repo hygiene Phase 1 delete-nothing dry run, only after feature freeze and M59-001..010
+- READY SB-M60-001..006 — release gates: no dead routes, bound surfaces, fresh-save FTUE, provider/disabled Shop, Events/Ranks policy, gates
+- OWNER SB-M51-005 — launch languages not chosen (see Questions)
+- OWNER SB-M43-131..133 — RANKS scoring policy undecided; Ranks destination and visual master wait on it
+- OWNER SB-M56-011 — Events/Ranks analytics wait on the RANKS policy decision
+- OWNER SB-M43-136..141 — future world level ranges undecided; world registry, art, states, ceremony wait on them
+- OWNER SB-M43-073 — world unlock ceremony waits on owner-defined world ranges
+- OWNER SB-M54-032 — world regression waits on owner-defined world ranges
+- OWNER SB-M43-153..160 — account/sign-in provider undecided; cloud save, restore and account screens wait on it
+- OWNER SB-M49-030 — account/cloud-conflict responsive screen waits on the account provider decision
+- OWNER SB-M54-031 — cloud/account regression waits on the account provider decision
+- OWNER SB-M57-001..011 — ad/IAP provider undecided (no SDK before approval); rewarded placements and grants wait on it
+- OWNER SB-M57-014..016 — purchase flow, receipt fulfillment and restore wait on the IAP provider decision
+- OWNER SB-M43-084 — Shop real-money cards, cash prices and restore wait on the M57 provider decision
+- OWNER SB-M49-029 — ad/store return-transition layout check waits on the M57 provider decision
+- OWNER SB-M57-012 — real-money Scrub Bucks packs and value ladder undecided
+- OWNER SB-M57-013 — No Ads product definition undecided
+- OWNER SB-M43-081 — Shop No Ads entry waits on the No Ads product definition
+- OWNER SB-M61-001..007 — Friends scope and identity model undecided (post-launch)
+- OWNER SB-M44-010 — feature-unlock pacing table undecided; SB-M44-011 forbids inventing unlock levels
+- OWNER SB-M44-022..023 — Collection onboarding and retention-feature unlock points wait on the pacing table
+- OWNER SB-M43-R09-006 — optional ScrubBox surprise bonus slot needs an owner yes/no after M56 simulation
+<!-- Not queued (standing rules, no job of their own): SB-M08-011..012, SB-M22-016..019, SB-M22-021, SB-UI-020..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
+- SB-M51-005 — Which languages should ScrubBots ship in at launch?
+- SB-M43-131..133, SB-M56-011 — What should RANKS rank players by (metric and season window), given no pay-to-win metric?
+- SB-M43-136..141, SB-M43-073, SB-M54-032 — Which campaign level ranges / completion conditions define World 02 and later worlds?
+- SB-M43-153..160, SB-M49-030, SB-M54-031 — Which account/sign-in provider should cloud save use (e.g. Google Play Games + Game Center, or none for V1)?
+- SB-M57-001..011, SB-M57-014..016, SB-M43-084, SB-M49-029 — Which rewarded-ad and IAP provider/SDK should ScrubBots use?
+- SB-M57-012 — Which real-money Scrub Bucks packs, product IDs and price ladder should the store sell?
+- SB-M57-013, SB-M43-081 — What should the No Ads product remove, and at what price?
+- SB-M61-001..007 — What Friends scope and identity model do you want post-launch, and should friend gifts/challenges exist?
+- SB-M44-010, SB-M44-022..023 — At which campaign levels should each meta feature (Hearts, boosters, Daily, Tasks, Collection, Shop, Events...) unlock?
+- SB-M43-R09-006 — After the M56 economy simulation, should the earned ScrubBox get a small surprise bonus slot (yes/no)?
 
 ## Project Status
 
