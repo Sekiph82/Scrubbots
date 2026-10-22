@@ -1,0 +1,1 @@
+{ "id": "015-m50-board-close", "task": "SB-M50-BOARD-001 close with green CI 39785950814 (light path)", "branch": "factory/015-m50-board-close", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/015-m50-board-close", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "n/a", "tests": "n/a" } }
