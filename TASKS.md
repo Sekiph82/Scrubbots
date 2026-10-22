@@ -27,7 +27,6 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M05-006..010 — factory 027 (2a870231): tools/run_suites.py one-command CI-rule runner + docs/TESTING_CONVENTIONS.md; LOCAL_PASS 3-suite subset aggregate=PASS (3/3), run_tests PASS, selftest PASS
 - DONE SB-M07-011,013 — docs/LEVEL_ART_INVENTORY.md (factory 028); SB-M07-012 moved to standing rules (conditional: if supplied)
 - DONE SB-M08-001..010,013..014 — factory 030 (6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md + tools/audit_level_art.py; 10/10 images PASS (1:1 grid, no AA/interpolation/VOID, all colours exact C01..C16); SB-M08-011..012 moved to standing rules
-- READY SB-M52-005 — validate rectangular production art through the content pipeline
 - READY SB-M22-008..015 — slot no-work state; generate the four owner-locked booster assets (+1 Slot, Random, Selector, Tornado)
 - READY SB-M22-022..025 — reusable BoosterButton states, bind approved booster art, validate import/transparency/filtering/memory
 - READY SB-M36-005 — playtest difficulty (simulated + local play) and record findings
@@ -123,7 +122,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M44-030 — verify Gift Bar visible from first Home with unchanged 10/50/250/500/1000 rewards; regression test (OWNER_META_PROGRESSION_DESIGN_V01)
 - READY SB-M44-031 — re-sequence FTUE to the 2026-10-22 unlock table: L1 Daily/Tasks coachmarks, L2 four-booster lesson, soft_no_hard_locks policy (after SB-M44-010)
 - OWNER SB-UI-008..013 — canonical Scrubby master reference needs owner choice; 013 re-validate after (factory 029)
-<!-- Not queued (standing rules, no job of their own): SB-M07-012 (conditional: if supplied), SB-M08-011..012, SB-M22-016..019, SB-M22-021, SB-UI-019..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
+<!-- Not queued (standing rules, no job of their own): SB-M07-012 (conditional: if supplied), SB-M52-005 (conditional: when rectangular production art is supplied), SB-M08-011..012, SB-M22-016..019, SB-M22-021, SB-UI-019..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
@@ -1558,6 +1557,7 @@ M52-C001 independent audit: **AUDITED_PASS / 10 OF 10 PRODUCTION ADMITTED / OWNE
 - `SB-M52-005` remains broader M52 work: the owner-selected First 10 pack contains no rectangular production source, so this row is not falsely closed by C001.
 
 - [ ] SB-M52-005 Validate rectangular production art.
+  - 2026-10-22 note (factory 031): NOT ticked, needs rectangular PRODUCTION art which does not exist (all 10 owner images square, docs/LEVEL_ART_TECHNICAL_AUDIT.md). Pipeline rectangular capability evidence, LOCAL_PASS: m35_level_catalog PASS (24x28 rect legal, gated only by S6-C square-shell, not catalog-exposed), m36_v02_migration PASS (59x20 production-legal), m32_c002_board_independent_size PASS (86 checks, rectangles), m25_scale_evidence PASS. Conditional: when rectangular production art is supplied.
 
 #### M52-C001 Owner Playtest Gate
 
