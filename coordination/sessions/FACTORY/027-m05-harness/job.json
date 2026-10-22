@@ -1,0 +1,1 @@
+{ "id": "027-m05-harness", "task": "SB-M05-006..010 test harness maturity", "branch": "factory/027-m05-harness", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/027-m05-harness", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "PASS", "tests": "PASS" } }
