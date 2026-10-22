@@ -53,7 +53,25 @@ job.json: `{ "id", "task": "<TASKS.md id or feature>", "branch", "worktree",
 Every agent prompt starts with:
 `Job folder: <repo>/factory/jobs/<job-id>/. Worktree: <worktree>. Branch: factory/<job-id>. Task: <task>.`
 
+## Light path
+
+A job whose diff is only `TASKS.md`, docs/coordination markdown or `factory/`
+tooling (applying owner answers, refreshing the queue, verify-close rows that
+need evidence but no code) skips spec-writer and the three-reviewer fan-out:
+
+1. `builder` writes a short spec section at the top of `build.md` (no spec-writer).
+2. ONE `reviewer-rules` reviews it and runs the stated checks.
+3. The orchestrator writes `decision.md` as `APPROVE (light path) ...` and merges.
+
+Any code, scene, data or test change keeps the full path. Apply owner answers
+in batches: one job per batch, not one per answer.
+
+## Reading TASKS.md
+
+Never read TASKS.md whole (~390 KB): read the queue block (`sed -n '/^## Autonomous Queue/,/^## Project Status/p' TASKS.md`) and grep the specific task IDs.
+
 ## /factory next
+
 
 1. `git -C <repo> fetch origin` and `git -C <repo> worktree prune`.
 2. **Owner answers first.** Read `<repo>/factory/answers.md`. If it has
@@ -66,7 +84,7 @@ Every agent prompt starts with:
    merges, delete exactly the applied entries from `answers.md` (entries added
    meanwhile stay).
 3. Read the `## Autonomous Queue` block at the top of `TASKS.md` on
-   `origin/main` (`git show origin/main:TASKS.md | head -80`). Take the first
+   `origin/main` (`git show origin/main:TASKS.md | sed -n '/^## Autonomous Queue/,/^## Project Status/p'`). Take the first
    `READY` row. If the block is missing or has no READY row, build/refresh it
    first: scan the open `- [ ]` items and the Project Status, and run that as
    a job whose task is "refresh the Autonomous Queue" (builder edits only

@@ -2,7 +2,7 @@
 name: spec-writer
 description: Factory step 1. Turns a one-line feature request into factory/jobs/<job-id>/spec.md with testable acceptance criteria.
 tools: Read, Grep, Glob, Bash, Write
-model: opus
+model: sonnet
 ---
 
 You write the spec for one factory job. Your prompt gives the job folder, the
@@ -22,6 +22,7 @@ worktree. The job folder is in the main checkout; your one file goes there.
 1. `CLAUDE.md` (§0D first: it overrides older freezes/gates) and `AGENTS.md`.
    For difficulty/level/UI/economy work, the docs CLAUDE.md §1/§16 list.
    The task's TASKS.md entry and any coordination prompt it links.
+   Never read TASKS.md whole (~390 KB): read the queue block (`sed -n '/^## Autonomous Queue/,/^## Project Status/p' TASKS.md`) and grep the specific task IDs.
 2. Any doc AGENTS.md says to read before touching the area this feature lives in.
 3. The code the feature touches, in the worktree. Find the real files and
    components; don't guess at names.
