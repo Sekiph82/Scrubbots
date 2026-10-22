@@ -85,7 +85,7 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - READY SB-M58-001..006 — third-party and data inventory, remove unnecessary collection, privacy disclosures, store declarations, age rating
 - READY SB-M58-007..012 — child-directed review, analytics/ad consent, notification privacy, account data policy, display-name privacy
 - READY SB-M58-013..014 — receipt/transaction retention policy; localization/accessibility check of consent/privacy screens
-- READY SB-M57-022 — sandbox purchases/rewarded ads on real Android (later iOS); escalates if the provider is still undecided
+- READY SB-M57-022 — sandbox purchases/rewarded ads on real Android (later iOS) with AdMob + Play Billing/StoreKit (owner 2026-10-22)
 - READY SB-M59-001..005 — debug/release export, output directories, versioning, build numbers
 - READY SB-M59-006..010 — tests + content validator before release, Android build, clean-clone build, addon release hygiene
 - READY SB-M59-011 — final repo hygiene Phase 1 delete-nothing dry run, only after feature freeze and M59-001..010
@@ -93,19 +93,19 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - READY SB-M51-005 — launch languages English and Turkish (owner 2026-10-22)
 - READY SB-M43-131..133 — RANKS (owner 2026-10-22): all-time = highest campaign level; weekly = levels completed, reset Monday 00:00 UTC; nothing bought with money/boosters counts
 - READY SB-M56-011 — Events/Ranks analytics for the RANKS policy decided 2026-10-22 (all-time + weekly tables)
-- READY SB-M43-153..160 — cloud save (owner 2026-10-22): Android Google Play Games Saved Games, iOS Game Center + iCloud; no own server/separate login; M43-158 restore also waits on SB-M57-001
+- READY SB-M43-153..160 — cloud save (owner 2026-10-22): Android Google Play Games Saved Games, iOS Game Center + iCloud; no own server/separate login; M43-158 restore via Play Billing/StoreKit
 - READY SB-M49-030 — account/cloud-conflict responsive screen for the 2026-10-22 provider decision (Google Play Games / Game Center + iCloud)
 - READY SB-M54-031 — cloud/account regression for the 2026-10-22 provider decision (Google Play Games Saved Games / Game Center + iCloud)
-- READY SB-M57-012 — SB packs (owner 2026-10-22): $0.99→100 $4.99→550 $9.99→1200 $19.99→2600 $49.99→7000, IDs scrubbucks_<n>; retune after M56; store wiring waits SB-M57-001; live publish = owner
+- READY SB-M57-012 — SB packs (owner 2026-10-22): $0.99→100 $4.99→550 $9.99→1200 $19.99→2600 $49.99→7000, IDs scrubbucks_<n>; retune after M56; Play Billing/StoreKit; live publish = owner
+- READY SB-M57-001..011 — ads (owner 2026-10-22): AdMob; bottom banner in ad band, never over board; interstitial every 5 plays between levels; opt-in rewarded; any finished level counts as a play
+- READY SB-M57-014..016 — purchase/receipt/restore (owner 2026-10-22): Google Play Billing (Android) + Apple StoreKit (iOS); live store release = owner (§0D.5)
+- READY SB-M43-084 — Shop real-money cards/prices/restore via Google Play Billing + StoreKit (owner 2026-10-22); live store release = owner
+- READY SB-M49-029 — ad/store return-transition layout check for AdMob + Play Billing/StoreKit (owner 2026-10-22)
+- READY SB-M57-013 — No Ads (owner 2026-10-22): one-time $4.99, removes bottom banner + every-5-plays interstitials; rewarded videos stay
+- READY SB-M43-081 — Shop No Ads entry for the 2026-10-22 No Ads product ($4.99 one-time; rewarded videos stay)
 - OWNER SB-M43-136..141 — future world level ranges undecided; world registry, art, states, ceremony wait on them
 - OWNER SB-M43-073 — world unlock ceremony waits on owner-defined world ranges
 - OWNER SB-M54-032 — world regression waits on owner-defined world ranges
-- OWNER SB-M57-001..011 — ad/IAP provider undecided (no SDK before approval); rewarded placements and grants wait on it
-- OWNER SB-M57-014..016 — purchase flow, receipt fulfillment and restore wait on the IAP provider decision
-- OWNER SB-M43-084 — Shop real-money cards, cash prices and restore wait on the M57 provider decision
-- OWNER SB-M49-029 — ad/store return-transition layout check waits on the M57 provider decision
-- OWNER SB-M57-013 — No Ads product definition undecided
-- OWNER SB-M43-081 — Shop No Ads entry waits on the No Ads product definition
 - OWNER SB-M61-001..007 — Friends scope and identity model undecided (post-launch)
 - OWNER SB-M44-010 — feature-unlock pacing table undecided; SB-M44-011 forbids inventing unlock levels
 - OWNER SB-M44-022..023 — Collection onboarding and retention-feature unlock points wait on the pacing table
@@ -115,8 +115,6 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
 - SB-M43-136..141, SB-M43-073, SB-M54-032 — Which campaign level ranges / completion conditions define World 02 and later worlds?
-- SB-M57-001..011, SB-M57-014..016, SB-M43-084, SB-M49-029 — Which rewarded-ad and IAP provider/SDK should ScrubBots use?
-- SB-M57-013, SB-M43-081 — What should the No Ads product remove, and at what price?
 - SB-M61-001..007 — What Friends scope and identity model do you want post-launch, and should friend gifts/challenges exist?
 - SB-M44-010, SB-M44-022..023 — At which campaign levels should each meta feature (Hearts, boosters, Daily, Tasks, Collection, Shop, Events...) unlock?
 - SB-M43-R09-006 — After the M56 economy simulation, should the earned ScrubBox get a small surprise bonus slot (yes/no)?
@@ -2920,7 +2918,7 @@ No analytics SDK without owner approval. Event contracts may be designed and loc
 
 Economy V1 soft-currency/Hearts/booster/2x rules are already owner-locked. The owner has additionally required rewarded-video acquisition surfaces for Hearts and boosters. Provider choice, cash prices, ad frequency/cooldowns and regional availability remain tuning/provider decisions and must be data-driven.
 
-- [ ] SB-M57-001 Choose/approve rewarded-ad and IAP provider/platform architecture; no SDK before owner approval.
+- [ ] SB-M57-001 Choose/approve rewarded-ad and IAP provider/platform architecture; no SDK before owner approval. **[OWNER DECISION 2026-10-22, owner via factory dashboard: Ads: Google AdMob (single SDK). 1) A continuously rotating banner at the bottom of every screen (the existing ad band area); it never overlaps the game board. 2) Full-screen interstitial ad: once every 5 plays, between levels, never during gameplay. 3) Rewarded video: only if the player chooses, in exchange for a reward. IAP: Google Play Billing (Android) + Apple StoreKit (iOS). What counts as a play (owner in chat 2026-10-22): any finished level, win or loss.]**
 - [ ] SB-M57-002 Define rewarded-ad placement IDs separately for Heart +1, booster acquisition and any later approved placement.
 - [ ] SB-M57-003 Rewarded Heart path grants exactly +1 Heart after a verified completed reward callback only.
 - [ ] SB-M57-004 Rewarded +1 Slot path grants exactly one canonical charge/use entitlement after verified completion.
@@ -2932,7 +2930,7 @@ Economy V1 soft-currency/Hearts/booster/2x rules are already owner-locked. The o
 - [ ] SB-M57-010 Ad unavailable/loading/fail/skip states grant nothing and always leave a usable non-broken UI.
 - [ ] SB-M57-011 App background/kill/relaunch during an ad cannot duplicate a reward.
 - [ ] SB-M57-012 Define Scrub Bucks real-money packs, localized store product IDs and value ladder in an owner decision before publishing cash prices. **[OWNER DECISION 2026-10-22, owner via factory dashboard: 5 packs: $0.99 → 100, $4.99 → 550, $9.99 → 1200, $19.99 → 2600, $49.99 → 7000. Product IDs follow the pattern scrubbucks_100, scrubbucks_550, … The amounts may be adjusted after the M56 economy simulation.]**
-- [ ] SB-M57-013 Define No Ads product and exactly which ad surfaces it removes; rewarded ads requested voluntarily by the player must follow the owner-approved No Ads policy.
+- [ ] SB-M57-013 Define No Ads product and exactly which ad surfaces it removes; rewarded ads requested voluntarily by the player must follow the owner-approved No Ads policy. **[OWNER DECISION 2026-10-22, owner via factory dashboard: No Ads is a one-time $4.99 purchase; it removes the bottom banner and the interstitial ads shown every 5 plays. Rewarded videos stay.]**
 - [ ] SB-M57-014 Implement purchase request, pending, success, cancel, failure, restore and already-owned states.
 - [ ] SB-M57-015 Fulfillment is idempotent by platform transaction/receipt identity and persists across relaunch.
 - [ ] SB-M57-016 Restore purchases and account/cloud reconciliation cannot duplicate SB/entitlements.
