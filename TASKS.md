@@ -27,7 +27,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M05-006..010 — factory 027 (2a870231): tools/run_suites.py one-command CI-rule runner + docs/TESTING_CONVENTIONS.md; LOCAL_PASS 3-suite subset aggregate=PASS (3/3), run_tests PASS, selftest PASS
 - DONE SB-M07-011,013 — docs/LEVEL_ART_INVENTORY.md (factory 028); SB-M07-012 moved to standing rules (conditional: if supplied)
 - DONE SB-M08-001..010,013..014 — factory 030 (6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md + tools/audit_level_art.py; 10/10 images PASS (1:1 grid, no AA/interpolation/VOID, all colours exact C01..C16); SB-M08-011..012 moved to standing rules
-- READY SB-M22-008..015 — slot no-work state; generate the four owner-locked booster assets (+1 Slot, Random, Selector, Tornado)
+- DONE SB-M22-015 — verify-close 2026-10-22 (factory 032); SB-M22-008 moved to standing rules (conditional: if owner approves a no-work state)
 - READY SB-M22-022..025 — reusable BoosterButton states, bind approved booster art, validate import/transparency/filtering/memory
 - READY SB-M36-005 — playtest difficulty (simulated + local play) and record findings
 - READY SB-M44-005..006 — FTUE: contextual WAITING/no-target coachmark; win/fail/Retry/Heart teaching at first occurrence
@@ -122,7 +122,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M44-030 — verify Gift Bar visible from first Home with unchanged 10/50/250/500/1000 rewards; regression test (OWNER_META_PROGRESSION_DESIGN_V01)
 - READY SB-M44-031 — re-sequence FTUE to the 2026-10-22 unlock table: L1 Daily/Tasks coachmarks, L2 four-booster lesson, soft_no_hard_locks policy (after SB-M44-010)
 - OWNER SB-UI-008..013 — canonical Scrubby master reference needs owner choice; 013 re-validate after (factory 029)
-<!-- Not queued (standing rules, no job of their own): SB-M07-012 (conditional: if supplied), SB-M52-005 (conditional: when rectangular production art is supplied), SB-M08-011..012, SB-M22-016..019, SB-M22-021, SB-UI-019..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
+<!-- Not queued (standing rules, no job of their own): SB-M07-012 (conditional: if supplied), SB-M52-005 (conditional: when rectangular production art is supplied), SB-M08-011..012, SB-M22-008 (conditional: if owner approves a no-work state), SB-M22-016..019, SB-M22-021, SB-UI-019..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
@@ -859,8 +859,8 @@ Locked runtime outcomes carried forward:
 
 **Railroad V1 closure — V07 + owner acceptance (2026-09-17):** the accepted production movement contract is now exact clicked-slot anchor → visible BOTTOM connector → canonical Railroad V1 exterior travel → legal rail ingress → four-neighbour orthogonal OPEN/CLEARED interior corridor with one or more 90-degree turns → assigned ACTIVE target. Non-target ACTIVE cells remain blockers; no diagonal/corner-cut/teleport/free-space shortcut and no retargeting are allowed. V07 implementation evidence recorded 4,823 checks / 0 failures and preserved the fresh Hazard Bot C08 first target `380/(0,19)`. Owner manual review confirmed the routing correction. The earlier straight-only final target approach is superseded.
 
-- [ ] SB-M22-008 No-work state if approved.
-- [ ] SB-M22-015 Generate the four owner-locked gameplay booster assets (+1 Slot, Random, Selector, Tornado) when Economy V1 implementation scope opens.
+- [ ] SB-M22-008 No-work state if approved. (2026-10-22 factory 032: no owner approval/spec exists; left open, conditional.)
+- [x] SB-M22-015 Generate the four owner-locked gameplay booster assets (+1 Slot, Random, Selector, Tornado) when Economy V1 implementation scope opens. Verify-closed 2026-10-22 (factory 032): assets/ui/final/boosters/{extra_slot,random,selector,tornado}.png promoted (VISUAL_ASSET_INDEX.md, ASSET_GENERATION_MANIFEST.json), bound in scripts/ui/gameplay_screen.gd + popup/acquisition_flow.gd, .import mipmaps off, CI run 39828088266 success; owner visual §0D.1. No art modified.
 - [ ] SB-M22-016 Generate only milestone-required decorative assets.
 - [ ] SB-M22-017 Keep raw candidates separate from production-final assets/provenance.
 - [ ] SB-M22-018 Require owner selection/approval before production promotion.
