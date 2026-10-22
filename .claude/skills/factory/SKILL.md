@@ -56,7 +56,16 @@ Every agent prompt starts with:
 ## /factory next
 
 1. `git -C <repo> fetch origin` and `git -C <repo> worktree prune`.
-2. Read the `## Autonomous Queue` block at the top of `TASKS.md` on
+2. **Owner answers first.** Read `<repo>/factory/answers.md`. If it has
+   entries, the next job is "apply owner answers" (builder edits only
+   `TASKS.md`; skip step 3). For each answer: record the decision in the
+   relevant place in TASKS.md (the matching task item(s)), remove that
+   question's line from `## Questions for Şekip`, and flip the matching
+   `## Autonomous Queue` `OWNER` row(s) to `READY` with the decision in the
+   line (match by the task IDs at the start of the question). After that job
+   merges, delete exactly the applied entries from `answers.md` (entries added
+   meanwhile stay).
+3. Read the `## Autonomous Queue` block at the top of `TASKS.md` on
    `origin/main` (`git show origin/main:TASKS.md | head -80`). Take the first
    `READY` row. If the block is missing or has no READY row, build/refresh it
    first: scan the open `- [ ]` items and the Project Status, and run that as
@@ -64,7 +73,7 @@ Every agent prompt starts with:
    `TASKS.md`). Order: owner-stated current priority first (currently M50
    board symbols), then unblocked items, smallest dependency first. An item is
    READY unless it truly needs one of the §0D owner actions.
-3. Run **/factory <task>**.
+4. Run **/factory <task>**.
 
 ## /factory <task>
 
@@ -102,6 +111,9 @@ cd <worktree>
 mkdir -p coordination/sessions/FACTORY/<job-id>
 cp -r <repo>/factory/jobs/<job-id>/. coordination/sessions/FACTORY/<job-id>/
 git add coordination/sessions/FACTORY/<job-id> && git commit -m "factory <job-id>: evidence"
+git checkout -- project.godot                   # the --import dirties it and rebase refuses unstaged changes;
+                                                # also restore any other tracked file git status --short shows
+                                                # modified that the job did not intend (untracked .uid stays)
 git fetch origin && git rebase origin/main     # conflict → git rebase --abort, Escalate
 git push origin HEAD:main                       # never --force
 ```
@@ -128,6 +140,13 @@ READY item. Never stop the whole loop for one escalation.
 Recreate the worktree from `origin/main` + the job's commits if needed, then
 **Merge** (approve) or write `rework-<k>.md` and spawn a fresh
 `builder-<job-id>` with `<paths> Rework: read rework-<k>.md, update build.md for round N+1.` (rework).
+
+## Dashboard
+From `<repo>` run `python factory/server.py`, then open
+`http://127.0.0.1:8765/dashboard.html`. It shows jobs by stage and the
+`## Questions for Şekip` lines from `origin/main` TASKS.md. Send appends the
+answer to `<repo>/factory/answers.md` (gitignored, local only), which
+**/factory next** step 2 applies. Self-check: `python factory/test_server.py`.
 
 ## Milestone CI and builds
 When a job closes the last READY item of a milestone, run the existing

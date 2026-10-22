@@ -38,3 +38,4 @@ content_pipeline/secrets/
 
 # Factory loop runtime state (CLAUDE.md §0D)
 /factory/jobs/
+/factory/answers.md
