@@ -19,13 +19,15 @@ uniform vec3 gutter_color : source_color = vec3(0.03, 0.04, 0.07);
 // shape, the same 16 shapes as Supply/Slots. `cid_map` is one texel per cell (R = C-ID 1..16,
 // 0 = none; G = 1 when the cell takes the dark ink), `glyph_atlas` the 16 shapes built once by
 // ColorSymbols.build_atlas_image() (R = shape, G = halo). Still one pass, no per-cell nodes;
-// a CLEARED cell exits above before any glyph is drawn.
+// a CLEARED cell exits above before any glyph is drawn. Owner 2026-10-22: opt-in (Settings,
+// default OFF), small subtle glyph, not drawn when it would be under `min_glyph_px` on screen.
 uniform bool symbols_on = false;
 uniform sampler2D cid_map : filter_nearest, repeat_disable;
 uniform sampler2D glyph_atlas : filter_linear_mipmap, repeat_disable;
-uniform float glyph_span = 0.8;          // atlas tile side as a fraction of the cell
-uniform float ink_alpha = 0.92;
-uniform float halo_alpha = 0.5;
+uniform float glyph_span = 0.5;          // atlas tile side as a fraction of the cell
+uniform float ink_alpha = 0.85;
+uniform float halo_alpha = 0.35;
+uniform float min_glyph_px = 5.0;        // smaller glyphs are hidden; the magnifier is the inspect path
 uniform vec3 ink_dark : source_color = vec3(0.03, 0.04, 0.09);
 uniform vec3 ink_light : source_color = vec3(1.0);
 
@@ -61,7 +63,7 @@ void fragment() {
 		} else {
 			col = mix(col, vec3(0.0), ramp * bevel_strength);
 		}
-		if (symbols_on) {
+		if (symbols_on && ppc * glyph_span >= min_glyph_px) {
 			vec2 id = texelFetch(cid_map, ivec2(cell), 0).rg;
 			float cid = floor(id.r * 255.0 + 0.5);
 			vec2 gp = (f - vec2(0.5)) / glyph_span + vec2(0.5);

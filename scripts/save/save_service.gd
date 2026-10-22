@@ -148,7 +148,8 @@ func validate_candidate(cand) -> Dictionary:
 	if not scratch_hap.strict_import_snapshot(settings.get("haptics", {})):
 		return {"ok": false, "reason": "haptics_malformed"}
 	# M41-C002: settings.effects is optional (pre-C002 saves => Reduced Effects OFF); when
-	# present it must be {reduced: <exact bool>} or the whole candidate is rejected.
+	# present it must be {reduced: <exact bool>} (optional exact-bool color_symbols /
+	# color_symbols_optin) or the whole candidate is rejected.
 	if settings.has("effects") and not EffectsSettingsService.new().strict_import_snapshot(settings["effects"]):
 		return {"ok": false, "reason": "effects_malformed"}
 	return {"ok": true}
@@ -209,14 +210,14 @@ func _apply(cand: Dictionary) -> bool:
 		return false
 	return true
 
-## Apply validated settings.effects; absent => Reduced OFF, Color Symbols ON (validate_candidate
+## Apply validated settings.effects; absent => Reduced OFF, Color Symbols OFF (validate_candidate
 ## rejected malformed).
 func _apply_effects(settings: Dictionary) -> void:
 	if settings.has("effects"):
 		_effects.strict_import_snapshot(settings["effects"])
 	else:
 		_effects.set_reduced(false)
-		_effects.set_color_symbols(true)
+		_effects.set_color_symbols(false)
 
 ## Apply validated M41 toggles (validate_candidate already rejected non-bool values).
 func _apply_audio_toggles(audio: Dictionary) -> void:

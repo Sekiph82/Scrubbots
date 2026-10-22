@@ -35,9 +35,9 @@ const SHAPE_BY_CID := {
 }
 
 ## M50-BOARD: the player's COLOR SYMBOLS setting (AppState settings.effects.color_symbols,
-## default ON). One process-wide presentation flag; set_enabled() repaints every live symbol
-## surface (tiles, chips, board renderers) through GROUP.
-static var enabled := true
+## opt-in, default OFF since SB-M50-OPTIN-001). One process-wide presentation flag; set_enabled()
+## repaints every live symbol surface (tiles, chips, board renderers) through GROUP.
+static var enabled := false
 const GROUP := "color_symbols"
 
 ## Board glyph atlas: 16 tiles in C-ID order (C01 = tile 0), each ATLAS_TILE px square,

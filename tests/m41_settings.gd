@@ -447,11 +447,13 @@ func _reduced_effects_persistence() -> void:
 	_ok(app.set_reduced_effects(true).get("ok", false), "set ON saves")
 	var r1 = AppState.new(path)
 	_ok(r1.load_result.get("source") == "primary" and r1.effects.is_reduced(), "relaunch: ON restored")
+	r1.set_color_symbols(true)
 	r1.set_reduced_effects(false)
 	var r2 = AppState.new(path)
-	_ok(not r2.effects.is_reduced(), "relaunch: OFF restored")
+	_ok(not r2.effects.is_reduced() and r2.effects.is_color_symbols(), "relaunch: Reduced OFF restored, Color Symbols ON restored")
 	var saved = JSON.parse_string(FileAccess.get_file_as_string(path))
-	_ok(saved["settings"]["effects"] == {"reduced": false, "color_symbols": true}, "canonical save carries settings.effects.reduced (exact bool; + M50 color_symbols)")
+	_ok(saved["settings"]["effects"] == {"reduced": false, "color_symbols": true, "color_symbols_optin": true}, "canonical save carries settings.effects.reduced (exact bool; + M50 color_symbols + OPTIN marker)")
+	_color_symbols_optin_migration(saved)
 	# Pre-C002 save (no settings.effects) loads with OFF.
 	var base := {"schema": "scrubbots.save", "version": 1,
 		"settings": {"audio": {"master": 1.0, "music": 1.0, "sfx": 1.0}, "haptics": {"enabled": true}},
@@ -491,6 +493,43 @@ func _reduced_effects_persistence() -> void:
 	var r4 = AppState.new(bad_path)
 	_ok(r4.load_result.get("source") == "defaults" and not r4.effects.is_reduced() and is_equal_approx(r4.audio.get_music_volume(), 1.0), "corrupt effects save rejected wholesale")
 	_complete("reduced_effects_persistence")
+
+## SB-M50-OPTIN-001: a pre-marker save (old default color_symbols ON) migrates to OFF exactly once,
+## with no version bump and every other save byte untouched; a non-bool marker rejects.
+func _color_symbols_optin_migration(canonical: Dictionary) -> void:
+	var old: Dictionary = canonical.duplicate(true)
+	old["settings"]["effects"] = {"reduced": true, "color_symbols": true}
+	var path := _uniq("optin_mig")
+	_write(path, JSON.stringify(old))
+	var m = AppState.new(path)
+	_ok(m.load_result.get("source") == "primary" and not m.effects.is_color_symbols() and m.effects.is_reduced(), "pre-marker save {reduced: true, color_symbols: true} loads Color Symbols OFF, Reduced ON")
+	_ok(FileAccess.file_exists(path) and JSON.parse_string(FileAccess.get_file_as_string(path)) == old, "loading a pre-marker save neither deletes nor rewrites it")
+	_ok(m.save.save().get("ok", false), "migrated state re-saves")
+	var resaved = JSON.parse_string(FileAccess.get_file_as_string(path))
+	var expect: Dictionary = old.duplicate(true)
+	expect["settings"]["effects"] = {"reduced": true, "color_symbols": false, "color_symbols_optin": true}
+	_ok(resaved == expect, "re-save differs only by color_symbols reset + the color_symbols_optin marker")
+	_ok(m.set_color_symbols(true).get("ok", false), "player toggles Color Symbols ON after migration")
+	var m2 = AppState.new(path)
+	_ok(m2.effects.is_color_symbols() and m2.effects.is_reduced(), "relaunch: ON persists (migration ran once)")
+	var no_fx: Dictionary = canonical.duplicate(true)
+	no_fx["settings"].erase("effects")
+	var nofx_path := _uniq("optin_nofx")
+	_write(nofx_path, JSON.stringify(no_fx))
+	var n = AppState.new(nofx_path)
+	_ok(n.load_result.get("source") == "primary" and not n.effects.is_color_symbols(), "save without settings.effects loads Color Symbols OFF")
+	var rej := 0
+	var bads: Array = [1, "true", null, [], {}]
+	for bad in bads:
+		var c: Dictionary = canonical.duplicate(true)
+		c["settings"]["effects"]["color_symbols_optin"] = bad
+		var v: Dictionary = m.save.validate_candidate(c)
+		if not v.get("ok", false) and v.get("reason") == "effects_malformed":
+			rej += 1
+	_ok(rej == bads.size(), "every non-bool color_symbols_optin rejects the candidate (%d/%d)" % [rej, bads.size()])
+	var explicit_off: Dictionary = canonical.duplicate(true)
+	explicit_off["settings"]["effects"]["color_symbols_optin"] = false
+	_ok(m.save.validate_candidate(explicit_off).get("ok", false), "bool marker false is valid (treated as pre-marker)")
 
 func _reduced_effects_ui() -> void:
 	print("[reduced effects UI]")

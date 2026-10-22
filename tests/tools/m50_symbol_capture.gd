@@ -2,6 +2,9 @@ extends SceneTree
 ## M50 decisions A + B owner-review capture (evidence only, never UI). Renders the REAL app root
 ## Home (hero PLAY label) and production L1 gameplay through main.tscn with a throw-away save, plus
 ## GameplayScreen arrangements on the real L3 / L5 palettes and a 16-colour symbol legend.
+## SB-M50-OPTIN-001: the real L7 board (app root) and test_59x59 at 1080x2160 and 720x1520 with
+## symbols OFF / ON and BEFORE (the pre-OPTIN 0.8 glyph, set through shader parameters only),
+## printing px per cell and glyph px; full screen JPG + native board crop PNG per state.
 ## Needs a rendering driver (run WITHOUT --headless); writes small JPGs into <out_dir>:
 ##   godot --path . -s res://tests/tools/m50_symbol_capture.gd -- <out_dir>
 
@@ -10,6 +13,10 @@ const MainScene = preload("res://scenes/app/main.tscn")
 const GameplayScreen = preload("res://scripts/ui/gameplay_screen.gd")
 const ColorBatchTile = preload("res://scripts/ui/color_batch_tile.gd")
 const BoardDebugFixtures = preload("res://scripts/debug/board_debug_fixtures.gd")
+const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
+const LevelLoader = preload("res://scripts/data/level_loader.gd")
+const ColorSymbols = preload("res://scripts/ui/color_symbols.gd")
+const PRE_OPTIN := {"glyph_span": 0.8, "ink_alpha": 0.92, "halo_alpha": 0.5, "min_glyph_px": 0.0}
 
 const SIZE := Vector2i(1080, 2160)
 var _out := "user://"
@@ -59,11 +66,66 @@ func _initialize() -> void:
 		_shot(s2, "m50_%s_supply_slots" % lvl)
 		s2.free()
 	await _legend()
+	await _boards()
 	MainScript.boot_save_path_override = ""
 	for suffix in ["", ".bak", ".tmp"]:
 		if FileAccess.file_exists(_save + suffix):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(_save + suffix))
 	quit(0)
+
+func _boards() -> void:
+	var res = LevelLoader.load_from_path("res://data/levels/test_59x59.json")
+	for size in [Vector2i(1080, 2160), Vector2i(720, 1520)]:
+		var tag := "%dx%d" % [size.x, size.y]
+		var sub := _sub(size)
+		var root = MainScene.instantiate()
+		sub.add_child(root)
+		await _frames(10)
+		root.get_app_state().progression.debug_set_current_level(7)
+		root.play_current_frontier()
+		await _frames(12)
+		root.get_gameplay_host().get_runtime().set_process(false)
+		await _board_shots(sub, root.get_gameplay_host().get_screen(), "l7_" + tag, func(on): root.get_app_state().set_color_symbols(on))
+		root.free()
+		sub.free()
+		var s2 := _sub(size)
+		var scr = GameplayScreen.new()
+		scr.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
+		s2.add_child(scr)
+		var pal: PackedStringArray = res.level_data.palette
+		var supply: Array = []
+		for c in range(5):
+			var pv: Array = []
+			for r in range(3):
+				pv.append({"color_id": (c * 3 + r) % pal.size(), "robot_count": 30 + c})
+			supply.append({"front": pv[0], "preview": pv, "remaining": 9})
+		scr.configure(BoardState.from_level_data(res.level_data), pal, [], supply)
+		await _frames(8)
+		await _board_shots(s2, scr, "59x59_" + tag, func(on): ColorSymbols.set_enabled(on, self))
+		s2.free()
+
+func _board_shots(sub: SubViewport, scr, stem: String, set_on: Callable) -> void:
+	var r = scr.get_presentation().get_renderer()
+	var m: ShaderMaterial = r.get_board_material()
+	var span: float = RenderingServer.shader_get_parameter_default(m.shader.get_rid(), "glyph_span")
+	var min_px: float = RenderingServer.shader_get_parameter_default(m.shader.get_rid(), "min_glyph_px")
+	var ppc: float = r.get_cell_size() * absf(r.get_global_transform().get_scale().x)
+	print("%s: %.2f px per cell, glyph %.2f px (%s; before: %.2f px)" % [stem, ppc, ppc * span, "drawn" if ppc * span >= min_px else "hidden, magnifier", ppc * 0.8])
+	var rect := Rect2i(scr.get_board_rect())
+	for state in ["off", "on", "before"]:
+		set_on.call(state != "off")
+		if state == "before":
+			for k in PRE_OPTIN:
+				m.set_shader_parameter(k, PRE_OPTIN[k])
+		await _frames(4)
+		var img := sub.get_texture().get_image()
+		var path := _out + "m50optin_%s_%s" % [stem, state]
+		img.save_jpg(path + ".jpg", 0.9)
+		img.get_region(rect.intersection(Rect2i(Vector2i.ZERO, img.get_size()))).save_png(path + "_board.png")
+		print("saved %s.jpg + _board.png" % path)
+	for k in PRE_OPTIN:
+		m.set_shader_parameter(k, RenderingServer.shader_get_parameter_default(m.shader.get_rid(), k))
+	set_on.call(false)
 
 func _legend() -> void:
 	var pal = JSON.parse_string(FileAccess.get_file_as_string("res://data/palettes/scrubbots_palette_v3.json"))

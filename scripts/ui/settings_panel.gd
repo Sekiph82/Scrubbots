@@ -362,7 +362,7 @@ func _sync_from_state() -> void:
 	_haptics_toggle.disabled = not usable
 	_reduced_toggle.set_pressed_no_signal(_app.effects.is_reduced() if _app != null else false)
 	_reduced_toggle.disabled = not usable
-	_symbols_toggle.set_pressed_no_signal(_app.effects.is_color_symbols() if _app != null else true)
+	_symbols_toggle.set_pressed_no_signal(_app.effects.is_color_symbols() if _app != null else false)
 	_symbols_toggle.disabled = not usable
 	if _app == null:
 		_status.text = UiText.t("SETTINGS_UNAVAILABLE")
