@@ -14,6 +14,8 @@ extends SceneTree
 ##   s09 cost: 300 supply rebinds (5x3) + 6 slots stay cheap; no symbol NODES on the board (the
 ##       owner-required board symbols are one shader pass: tests/m50_board_symbols.gd)
 ##   s10 Tornado / Selector booster target chips carry the same colour symbol (real L1 host)
+## SB-M50-OPTIN-001: symbols are opt-in (default OFF); this suite checks glyph presence, so it
+## switches them ON (process flag + every booted profile).
 ##
 ## Run: godot --headless --path . -s res://tests/m50_color_symbols.gd
 
@@ -43,6 +45,7 @@ var _root = null
 func _initialize() -> void:
 	await process_frame
 	MainScript.boot_opening_override = 0
+	ColorSymbols.enabled = true
 	var pal = JSON.parse_string(FileAccess.get_file_as_string("res://data/palettes/scrubbots_palette_v3.json"))
 	for c in pal["colors"]:
 		_v3.append(String(c["hex"]))
@@ -430,6 +433,7 @@ func _boot(tag: String) -> void:
 	_root = MainScene.instantiate()
 	_sub.add_child(_root)
 	await _frames(6)
+	_root.get_app_state().set_color_symbols(true)
 
 func _shutdown() -> void:
 	if _root != null and is_instance_valid(_root):
@@ -444,6 +448,7 @@ func _frames(n: int) -> void:
 		await process_frame
 
 func _cleanup() -> void:
+	ColorSymbols.enabled = false
 	UiText.pseudo = false
 	MainScript.boot_save_path_override = ""
 	MainScript.boot_opening_override = -1

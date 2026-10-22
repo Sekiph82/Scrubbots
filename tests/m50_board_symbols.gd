@@ -1,13 +1,15 @@
 extends SceneTree
 ## M50-BOARD (SB-M50-002 board part, owner 2026-10-15): per-cell colour symbols on the real
 ## pixel-art board, the COLOR SYMBOLS setting and the press-and-hold board magnifier.
+## SB-M50-OPTIN-001 (owner 2026-10-22): symbols are opt-in (default OFF) and small (glyph_span 0.5,
+## hidden below min_glyph_px on screen); cases that check glyphs switch them ON explicitly.
 ##   b01 glyph atlas: 16 tiles == the Supply/Slot shapes (same _parts), halo contains the shape,
 ##       empty tile margin (no mipmap bleed); built once (cached)
 ##   b02 board ink: WCAG pick per colour, ink / halo contrast on all 16 colours
 ##   b03 identity map on real L7 pigeon + 20x20 / 32x32 / 40x24 / 53x59 / 59x59, two palette orders
 ##       and a VOID level: every ACTIVE cell -> its canonical C-ID; VOID -> none; base pixels
 ##       unchanged; shader gates glyphs behind the CLEARED alpha test; no child nodes
-##   b04 COLOR SYMBOLS setting: default ON, persisted, optional in old saves, strict bool, live
+##   b04 COLOR SYMBOLS setting: default OFF, persisted, optional in old saves, strict bool, live
 ##       toggle repaints board + tiles + renderer material; Settings panel toggle drives AppState
 ##   b05 lifecycle: clear (texel alpha 0, identity kept), reset, relayout (identity-stable
 ##       renderer), reconfigure with another palette order -> no stale identities
@@ -16,8 +18,9 @@ extends SceneTree
 ##       >= 24 px per cell, same texture + material, zero gameplay mutation; Supply tap still works
 ##   b07 cost at 59x59: refresh_all / update_cells / atlas build bounds, constant node count
 ##   b08 GPU readback (needs a rendering driver; NOT_RUN under --headless): glyph ink visible
-##       inside ACTIVE cells, rendered ink mask == the cell's OWN C-ID shape (not the next one),
-##       CLEARED cells show exactly the BG01 backdrop, symbols OFF == plain cell
+##       inside ACTIVE cells and confined to the central glyph square, rendered ink mask == the
+##       cell's OWN C-ID shape (not the next one), CLEARED cells show exactly the BG01 backdrop,
+##       default / OFF == pure pixel art, no glyph below 10 px per cell
 ##
 ## Run: godot --headless --path . -s res://tests/m50_board_symbols.gd   (b08 windowed: no --headless)
 
@@ -42,9 +45,11 @@ var _tmp: Array = []
 var _v3 := PackedStringArray()
 var _sub: SubViewport
 var _root = null
+var _default_symbols := true
 
 func _initialize() -> void:
 	await process_frame
+	_default_symbols = ColorSymbols.enabled
 	MainScript.boot_opening_override = 0
 	var pal = JSON.parse_string(FileAccess.get_file_as_string("res://data/palettes/scrubbots_palette_v3.json"))
 	for c in pal["colors"]:
@@ -118,6 +123,7 @@ func _b02() -> void:
 
 func _b03() -> void:
 	print("[b03 per-cell identity map]")
+	ColorSymbols.enabled = true   # opt-in: the identity map is checked with symbols ON
 	var rev := PackedStringArray()
 	for i in range(_v3.size() - 1, -1, -1):
 		rev.append(_v3[i])
@@ -161,20 +167,23 @@ func _b03() -> void:
 	_ok(ok_px, "base pixel RGB / alpha unchanged (ACTIVE = exact palette colour, VOID transparent)")
 	_ok(nodes == 0, "no child nodes on any renderer (no per-cell nodes)")
 	var code: String = load("res://scripts/gameplay/board/board_pixel_grid.gdshader").code
-	_ok(code.find("base.a < 0.5") != -1 and code.find("base.a < 0.5") < code.find("if (symbols_on)"), "shader returns transparent for CLEARED / VOID texels BEFORE any glyph is drawn")
+	_ok(code.find("base.a < 0.5") != -1 and code.find("base.a < 0.5") < code.find("if (symbols_on"), "shader returns transparent for CLEARED / VOID texels BEFORE any glyph is drawn")
+	_ok(code.find("uniform float glyph_span = 0.5;") != -1 and code.find("uniform float min_glyph_px = 5.0;") != -1 and code.find("if (symbols_on && ppc * glyph_span >= min_glyph_px)") != -1, "shader: glyph_span 0.5, min_glyph_px 5.0, glyph drawn only when ppc * glyph_span >= min_glyph_px")
 	_complete("b03_identity_map")
 
 func _b04() -> void:
 	print("[b04 COLOR SYMBOLS setting]")
+	_ok(not _default_symbols, "process default: ColorSymbols.enabled OFF before any setting is applied")
 	var path := _path("setting")
 	var app = AppState.new(path)
-	_ok(app.effects.is_color_symbols(), "new profile: COLOR SYMBOLS ON (accessible default)")
-	_ok(app.set_color_symbols(false).get("ok", false), "OFF saves")
+	_ok(not app.effects.is_color_symbols(), "new profile: COLOR SYMBOLS default OFF (opt-in)")
+	_ok(app.set_color_symbols(true).get("ok", false), "ON saves")
 	var r1 = AppState.new(path)
-	_ok(r1.load_result.get("source") == "primary" and not r1.effects.is_color_symbols(), "relaunch: OFF restored")
-	r1.set_color_symbols(true)
+	_ok(r1.load_result.get("source") == "primary" and r1.effects.is_color_symbols(), "relaunch: ON restored")
 	var saved = JSON.parse_string(FileAccess.get_file_as_string(path))
-	_ok(saved["settings"]["effects"] == {"reduced": false, "color_symbols": true}, "canonical save carries settings.effects.color_symbols (exact bool)")
+	_ok(saved["settings"]["effects"] == {"reduced": false, "color_symbols": true, "color_symbols_optin": true}, "canonical save carries settings.effects.color_symbols (exact bool) + color_symbols_optin marker")
+	r1.set_color_symbols(false)
+	_ok(not AppState.new(path).effects.is_color_symbols(), "relaunch: OFF restored")
 	var base := {"schema": "scrubbots.save", "version": 1,
 		"settings": {"audio": {"master": 1.0, "music": 1.0, "sfx": 1.0}, "haptics": {"enabled": true}, "effects": {"reduced": true}},
 		"progression": app.progression.snapshot(), "economy": app.economy.snapshot()}
@@ -183,7 +192,7 @@ func _b04() -> void:
 	f.store_string(JSON.stringify(base))
 	f.close()
 	var r2 = AppState.new(old)
-	_ok(r2.load_result.get("source") == "primary" and r2.effects.is_color_symbols() and r2.effects.is_reduced(), "pre-M50 save (no color_symbols key) loads: symbols ON, Reduced Effects kept")
+	_ok(r2.load_result.get("source") == "primary" and not r2.effects.is_color_symbols() and r2.effects.is_reduced(), "pre-M50 save (no color_symbols key) loads: symbols OFF, Reduced Effects kept")
 	var rej := 0
 	var bads: Array = [1, 0, "true", null, [], {}]
 	for bad in bads:
@@ -192,7 +201,8 @@ func _b04() -> void:
 		if app.save.validate_candidate(c).get("reason") == "effects_malformed":
 			rej += 1
 	_ok(rej == bads.size(), "non-bool color_symbols rejects the whole candidate (%d/%d)" % [rej, bads.size()])
-	# Live toggle: board renderer material + tiles.
+	# Live toggle from the default OFF: board renderer material + tiles.
+	ColorSymbols.enabled = false
 	_new_sub(Vector2i(1080, 2160))
 	var scr = GameplayScreen.new()
 	scr.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
@@ -201,12 +211,12 @@ func _b04() -> void:
 	await _frames(3)
 	var rend = scr.get_presentation().get_renderer()
 	var tile: ColorBatchTile = scr.get_supply_panel()._columns[0]["rows"][0]["tile"]
+	var off0: bool = not rend.are_symbols_shown() and bool(rend.get_board_material().get_shader_parameter("symbols_on")) == false and tile.get_symbol_shape() == ""
+	ColorSymbols.set_enabled(true, self)
 	var on_ok: bool = rend.are_symbols_shown() and bool(rend.get_board_material().get_shader_parameter("symbols_on")) and tile.get_symbol_shape() != ""
 	ColorSymbols.set_enabled(false, self)
 	var off_ok: bool = not rend.are_symbols_shown() and bool(rend.get_board_material().get_shader_parameter("symbols_on")) == false and tile.get_symbol_shape() == ""
-	ColorSymbols.set_enabled(true, self)
-	var back_ok: bool = rend.are_symbols_shown() and bool(rend.get_board_material().get_shader_parameter("symbols_on")) and tile.get_symbol_shape() != ""
-	_ok(on_ok and off_ok and back_ok, "live toggle: board shader + Supply tiles OFF together, back ON together (no rebuild)")
+	_ok(off0 and on_ok and off_ok, "live toggle from OFF: board shader + Supply tiles ON together, back OFF together (no rebuild)")
 	_shutdown()
 	# Real app root: Settings toggle -> canonical AppState -> ColorSymbols.
 	await _boot("b04")
@@ -215,20 +225,21 @@ func _b04() -> void:
 	var panel = _root.get_settings_panel()
 	var t: CheckButton = panel.get_color_symbols_toggle() if panel != null else null
 	var a = _root.get_app_state()
-	var ok := t != null and t.button_pressed and t.text == "COLOR SYMBOLS" and t.custom_minimum_size.y >= 88
+	var ok: bool = t != null and not t.button_pressed and not a.effects.is_color_symbols() and not ColorSymbols.enabled and t.text == "COLOR SYMBOLS" and t.custom_minimum_size.y >= 88
 	if t != null:
-		t.button_pressed = false
-		ok = ok and not a.effects.is_color_symbols() and not ColorSymbols.enabled
 		t.button_pressed = true
 		ok = ok and a.effects.is_color_symbols() and ColorSymbols.enabled
-	_ok(ok, "Settings COLOR SYMBOLS switch (>= 88 px, ON) drives AppState and the live symbol flag")
+		t.button_pressed = false
+		ok = ok and not a.effects.is_color_symbols() and not ColorSymbols.enabled
+	_ok(ok, "Settings COLOR SYMBOLS switch (>= 88 px, OFF after boot) drives AppState and the live symbol flag ON / OFF")
 	var hint: Label = panel.find_child("ColorSymbolsHint", true, false) if panel != null else null
-	_ok(hint != null and hint.text.find("hold the board") != -1, "magnifier hint under the switch: '%s'" % (hint.text if hint != null else ""))
+	_ok(hint != null and hint.text.find("color-blind") != -1 and hint.text.find("hold the board") != -1, "color-blind + magnifier hint under the switch: '%s'" % (hint.text if hint != null else ""))
 	_shutdown()
 	_complete("b04_setting")
 
 func _b05() -> void:
 	print("[b05 lifecycle: clear / reset / relayout / palette change]")
+	ColorSymbols.enabled = true
 	var board := _board(24, 24, _v3)
 	var pres = BoardPresentation.new()
 	get_root().add_child(pres)
@@ -259,6 +270,7 @@ func _b05() -> void:
 func _b06() -> void:
 	print("[b06 real app root, L7 production gameplay + magnifier]")
 	await _boot("b06")
+	_ok(not ColorSymbols.enabled and _root.get_app_state().set_color_symbols(true).get("ok", false) and ColorSymbols.enabled, "fresh profile boots OFF; the player opts in")
 	_root.get_app_state().progression.debug_set_current_level(7)
 	_root.play_current_frontier()
 	await _frames(8)
@@ -331,6 +343,7 @@ func _b06() -> void:
 
 func _b07() -> void:
 	print("[b07 cost at 59x59]")
+	ColorSymbols.enabled = true
 	var board := _board(59, 59, _v3)
 	var r: BoardRenderer = BoardRenderer.new()
 	get_root().add_child(r)
@@ -363,7 +376,7 @@ func _b07() -> void:
 	_ok(map_ms < 40.0, "identity map build once per board / palette: %.2f ms" % map_ms)
 	_ok(upd_ms < 2.0, "update_cells unchanged path (identity map untouched): %.3f ms" % upd_ms)
 	_ok(atlas_ms < 1500.0, "one-time atlas build %.1f ms (cached for the process)" % atlas_ms)
-	_ok(r.get_child_count() == 0 and r.find_children("*", "", true, false).is_empty(), "3,481 cells: ONE TextureRect, 0 child nodes")
+	_ok(r.are_symbols_shown() and r.get_child_count() == 0 and r.find_children("*", "", true, false).is_empty(), "3,481 cells, symbols ON: ONE TextureRect, 0 child nodes")
 	r.free()
 	_complete("b07_cost")
 
@@ -373,22 +386,32 @@ func _b08() -> void:
 		print("    NOT_RUN: headless (no rendering driver); run windowed for the rendered-pixel proof")
 		_complete("b08_gpu_readback")
 		return
+	ColorSymbols.enabled = _default_symbols   # the process default (OFF)
+	var cs := 48                               # large cells keep the 0.5-span glyph measurable
 	var board := _board(20, 20, _v3)
 	board.set_cell_state(board.get_cell_index(5, 5), BoardState.CellState.CLEARED)
-	_new_sub(Vector2i(20 * 32, 20 * 32))
-	# BG01 behind the board, as in gameplay: a CLEARED hole must show exactly this colour.
-	var bg := ColorRect.new()
-	bg.color = BG01
-	bg.size = Vector2(_sub.size)
-	_sub.add_child(bg)
-	var r: BoardRenderer = BoardRenderer.new()
-	_sub.add_child(r)
-	r.configure(board, _v3, Vector2(20 * 32, 20 * 32))
-	await _frames(4)
-	var img := _sub.get_texture().get_image()
-	var cs := int(r.get_cell_size())
+	var r: BoardRenderer = await _render(board, 20 * cs)
+	var m: ShaderMaterial = r.get_board_material()
+	var span: float = float(RenderingServer.shader_get_parameter_default(m.shader.get_rid(), "glyph_span"))
+	var min_px: float = float(RenderingServer.shader_get_parameter_default(m.shader.get_rid(), "min_glyph_px"))
+	_ok(int(r.get_cell_size()) == cs and is_equal_approx(span, 0.5) and is_equal_approx(min_px, 5.0), "rendered at %d px per cell; shader defaults glyph_span %.2f, min_glyph_px %.1f" % [int(r.get_cell_size()), span, min_px])
+	var img_def := await _snap()
+	ColorSymbols.set_enabled(true, self)
+	var img := await _snap()
+	# Pure-art reference: symbols_on stays true but the size gate suppresses every glyph.
+	m.set_shader_parameter("min_glyph_px", 1.0e9)
+	var img_ref := await _snap()
+	m.set_shader_parameter("min_glyph_px", min_px)
+	ColorSymbols.set_enabled(false, self)
+	var img_off := await _snap()
+	_ok(bool(m.get_shader_parameter("symbols_on")) == false and img_def.get_data() == img_ref.get_data() and img_off.get_data() == img_ref.get_data(), "default (OFF) and toggled-OFF renders are pixel-identical to the glyph-free board: no glyph pixels")
+	_ok(img.get_data() != img_ref.get_data(), "symbols ON changes the render")
 	var marked := 0
 	var checked := 0
+	var ring_bad := 0
+	var widest := 0
+	var lo := int(cs * 0.2)
+	var hi := int(cs * 0.8)
 	for y in range(20):
 		for x in range(20):
 			if x == 5 and y == 5:
@@ -396,16 +419,27 @@ func _b08() -> void:
 			var face := Color.html(_v3[board.get_color_id(board.get_cell_index(x, y))])
 			var ink: Color = BoardRenderer.SYMBOL_INK_DARK if BoardRenderer.symbol_ink_is_dark(face) else BoardRenderer.SYMBOL_INK_LIGHT
 			var near := 0
-			for py in range(cs / 4, cs * 3 / 4):
-				for px in range(cs / 4, cs * 3 / 4):
+			var bb := Rect2i()
+			var any := false
+			for py in range(cs):
+				for px in range(cs):
 					var c := img.get_pixel(x * cs + px, y * cs + py)
-					if Vector3(c.r - ink.r, c.g - ink.g, c.b - ink.b).length() < 0.2:
+					if c == img_ref.get_pixel(x * cs + px, y * cs + py):
+						continue
+					if px < lo or px >= hi or py < lo or py >= hi:
+						ring_bad += 1
+					bb = bb.expand(Vector2i(px, py)) if any else Rect2i(px, py, 1, 1)
+					any = true
+					if Vector3(c.r - ink.r, c.g - ink.g, c.b - ink.b).length() < 0.3:   # ink_alpha 0.85 leaves <= 0.26 of the face/halo
 						near += 1
+			widest = maxi(widest, maxi(bb.size.x + 1, bb.size.y + 1) if any else 0)
 			checked += 1
 			marked += 1 if near >= 6 else 0
-	# Which glyph: per cell, the rendered ink mask must match ITS C-ID shape (and not the next one).
-	var sp = r.get_board_material().get_shader_parameter("glyph_span")
-	var span: float = 0.8 if sp == null else float(sp)   # shader default when not overridden
+	_ok(marked == checked, "%d/%d rendered ACTIVE cells show symbol ink pixels inside the cell" % [marked, checked])
+	_ok(ring_bad == 0, "no glyph pixel (ink or halo) outside the central 60%% of any cell (%d stray)" % ring_bad)
+	_ok(widest > 0 and widest <= int(cs * 0.55), "glyph bounding box at most %d px of a %d px cell (widest %d px = %.2f of the side)" % [int(cs * 0.55), cs, widest, float(widest) / cs])
+	# Which glyph: per cell, the rendered ink mask must match ITS C-ID shape (and not the next one),
+	# sampled 16x16 over the central glyph square.
 	var worst_right := 1.0
 	var mean_right := 0.0
 	var diff_total := 0
@@ -420,12 +454,13 @@ func _b08() -> void:
 			var ink: Color = BoardRenderer.SYMBOL_INK_DARK if BoardRenderer.symbol_ink_is_dark(face) else BoardRenderer.SYMBOL_INK_LIGHT
 			var right := ColorSymbols._parts(String(ColorSymbols.SHAPE_BY_CID["C%02d" % cid]))
 			var wrong := ColorSymbols._parts(String(ColorSymbols.SHAPE_BY_CID["C%02d" % (cid % 16 + 1)]))
-			var agree := [0]
+			var agree := 0
 			var total := 0
-			for sy in range(12):
-				for sx in range(12):
-					var fpos := Vector2((sx + 0.5) / 12.0, (sy + 0.5) / 12.0)
-					var p := ((fpos - Vector2(0.5, 0.5)) / span) * ColorSymbols.ATLAS_SPAN
+			for sy in range(16):
+				for sx in range(16):
+					var gp := Vector2((sx + 0.5) / 16.0, (sy + 0.5) / 16.0)
+					var fpos := Vector2(0.5, 0.5) + (gp - Vector2(0.5, 0.5)) * span
+					var p := (gp - Vector2(0.5, 0.5)) * ColorSymbols.ATLAS_SPAN
 					# Skip points near a shape edge (filtering blends them).
 					var e := 0.14
 					var want := _inside(right, p)
@@ -433,13 +468,13 @@ func _b08() -> void:
 						continue
 					var c := img.get_pixel(x * cs + int(fpos.x * cs), y * cs + int(fpos.y * cs))
 					var is_ink := Vector3(c.r - ink.r, c.g - ink.g, c.b - ink.b).length() < 0.3
-					agree[0] += 1 if is_ink == want else 0
+					agree += 1 if is_ink == want else 0
 					total += 1
 					# Discriminating points: own and next shape disagree here.
 					if _inside(wrong, p) != want:
 						diff_total += 1
 						diff_own += 1 if is_ink == want else 0
-			var ra := float(agree[0]) / maxf(total, 1.0)
+			var ra := float(agree) / maxf(total, 1.0)
 			worst_right = minf(worst_right, ra)
 			mean_right += ra
 			n_cells += 1
@@ -451,18 +486,40 @@ func _b08() -> void:
 		for px in range(cs):
 			var c := img.get_pixel(5 * cs + px, 5 * cs + py)
 			hole_ok = hole_ok and Vector3(c.r - BG01.r, c.g - BG01.g, c.b - BG01.b).length() < 0.02
-	_ok(marked == checked, "%d/%d rendered ACTIVE cells show symbol ink pixels inside the cell" % [marked, checked])
 	_ok(hole_ok, "CLEARED cell: every one of its %d px is exactly the BG01 background (transparent, no ghost glyph / grid)" % (cs * cs))
-	ColorSymbols.set_enabled(false, self)
-	await _frames(3)
-	var img_off := _sub.get_texture().get_image()
-	var c_on := img.get_pixel(2 * cs + cs / 2, 2 * cs + cs / 2)
-	var c_off := img_off.get_pixel(2 * cs + cs / 2, 2 * cs + cs / 2)
-	var face2 := Color.html(_v3[board.get_color_id(board.get_cell_index(2, 2))])
-	ColorSymbols.set_enabled(true, self)
-	_ok(Vector3(c_off.r - face2.r, c_off.g - face2.g, c_off.b - face2.b).length() < 0.12, "symbols OFF: cell centre is the plain pixel colour again (%s vs %s; ON %s)" % [c_off.to_html(false), face2.to_html(false), c_on.to_html(false)])
+	# Size gate: under 10 px per cell no glyph is drawn even with symbols ON; at 12 px it is.
+	var dense := _board(59, 59, _v3)
+	for side in [500, 59 * 12]:
+		var rd: BoardRenderer = await _render(dense, side)
+		var ppc := rd.get_cell_size() * absf(rd.get_global_transform().get_scale().x)
+		ColorSymbols.set_enabled(true, self)
+		var d_on := await _snap()
+		ColorSymbols.set_enabled(false, self)
+		var d_off := await _snap()
+		var same := d_on.get_data() == d_off.get_data()
+		if side == 500:
+			_ok(ppc < 10.0 and same, "59x59 in %d px: %.2f px per cell (glyph %.2f px < %.0f): symbols ON draws no glyph pixel" % [side, ppc, ppc * span, min_px])
+		else:
+			_ok(ppc >= 10.0 and not same, "59x59 in %d px: %.2f px per cell (glyph %.2f px): glyphs drawn" % [side, ppc, ppc * span])
 	_shutdown()
 	_complete("b08_gpu_readback")
+
+func _render(board: BoardState, side: int) -> BoardRenderer:
+	_new_sub(Vector2i(side, side))
+	# BG01 behind the board, as in gameplay: a CLEARED hole must show exactly this colour.
+	var bg := ColorRect.new()
+	bg.color = BG01
+	bg.size = Vector2(_sub.size)
+	_sub.add_child(bg)
+	var r: BoardRenderer = BoardRenderer.new()
+	_sub.add_child(r)
+	r.configure(board, _v3, Vector2(side, side))
+	await _frames(4)
+	return r
+
+func _snap() -> Image:
+	await _frames(3)
+	return _sub.get_texture().get_image()
 
 # ------------------------------------------------------------------ helpers ----
 
@@ -553,7 +610,7 @@ func _frames(n: int) -> void:
 		await process_frame
 
 func _cleanup() -> void:
-	ColorSymbols.enabled = true
+	ColorSymbols.enabled = _default_symbols
 	ColorSymbols._atlas = null
 	MainScript.boot_save_path_override = ""
 	MainScript.boot_opening_override = -1
