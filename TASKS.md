@@ -24,7 +24,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-UI-VIS-005 — verified 2026-10-22 (factory 024): index already 157/157, all rows+paths on disk
 - DONE SB-M43-R15-002..003 — verify-close 2026-10-22 (factory 025): code 24828bb, 6 suites LOCAL_PASS, owner visual §0D.1
 - DONE SB-M39-033 — verify-close 2026-10-22 (factory 026), LOCAL_PASS + factory peer review: m39_v02_capacity PASS (cannot grow past 6, never 7+), m28_c002_c002_static_shell PASS 16-of-16, m49_responsive_matrix PASS 8-of-8 (m05_sixth_slot_matrix, m07 synthetic NOTCH), m50_color_symbols PASS 10-of-10; MAX := 6, no 7+ state. CLAUDE.md §0D.1 grants the real-phone sign-off; safe-area coverage is the synthetic-inset matrix, no real-phone capture claimed.
-- READY SB-M05-006..010 — test harness: organize sections, split perf output from assertions, one-command wrapper, regression conventions doc
+- DONE SB-M05-006..010 — factory 027 (2a870231): tools/run_suites.py one-command CI-rule runner + docs/TESTING_CONVENTIONS.md; LOCAL_PASS 3-suite subset aggregate=PASS (3/3), run_tests PASS, selftest PASS
 - READY SB-M07-011..013 — inventory supplied level, underwater and other theme artwork beyond the M21 source
 - READY SB-UI-008..013 — select/record canonical Scrubby master reference, then validate manifest reference paths/IDs
 - READY SB-M08-001..006 — level-art technical audit: filename, dimensions, alpha, color count, anti-aliasing, interpolation
@@ -779,11 +779,11 @@ Do not replace existing Prompt 02 fixtures — add to them.
 
 ### M05 — Test Harness Maturity
 
-- [ ] SB-M05-006 Organize test sections as suite grows.
-- [ ] SB-M05-007 Separate performance benchmark output from assertions.
-- [ ] SB-M05-008 Add one-command PowerShell full-test wrapper if useful.
-- [ ] SB-M05-009 Add regression test conventions to docs.
-- [ ] SB-M05-010 Ensure future milestone completion requires regression pass.
+- [x] SB-M05-006 Organize test sections as suite grows. Done 2026-10-22 (factory 027, 2a870231): convention in docs/TESTING_CONVENTIONS.md (named sections, flat tests/; existing suites not restructured). LOCAL_PASS run_suites.py m50_accessibility_audit m51_localization_readiness m45_debug_tooling aggregate=PASS (3/3), run_tests PASS, --selftest PASS.
+- [x] SB-M05-007 Separate performance benchmark output from assertions. Done 2026-10-22 (factory 027, 2a870231): convention: PERF-prefixed diagnostics, no ms thresholds (docs/TESTING_CONVENTIONS.md; existing suites unchanged). LOCAL_PASS run_suites.py m50_accessibility_audit m51_localization_readiness m45_debug_tooling aggregate=PASS (3/3), run_tests PASS, --selftest PASS.
+- [x] SB-M05-008 Add one-command PowerShell full-test wrapper if useful. Done 2026-10-22 (factory 027, 2a870231): tools/run_suites.py (Python stdlib, reads the CI workflow suite list + exact-summary guards). LOCAL_PASS run_suites.py m50_accessibility_audit m51_localization_readiness m45_debug_tooling aggregate=PASS (3/3), run_tests PASS, --selftest PASS.
+- [x] SB-M05-009 Add regression test conventions to docs. Done 2026-10-22 (factory 027, 2a870231): docs/TESTING_CONVENTIONS.md. LOCAL_PASS run_suites.py m50_accessibility_audit m51_localization_readiness m45_debug_tooling aggregate=PASS (3/3), run_tests PASS, --selftest PASS.
+- [x] SB-M05-010 Ensure future milestone completion requires regression pass. Done 2026-10-22 (factory 027, 2a870231): regression gate in docs/TESTING_CONVENTIONS.md (full run_suites.py aggregate PASS or CI validate green at closing SHA). LOCAL_PASS run_suites.py m50_accessibility_audit m51_localization_readiness m45_debug_tooling aggregate=PASS (3/3), run_tests PASS, --selftest PASS.
 
 ### M07 — Visual Reference Library `[VISUAL REFERENCE]`
 
