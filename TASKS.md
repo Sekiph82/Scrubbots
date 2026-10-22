@@ -13,7 +13,12 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-DEV-GODOT-001 — verify-close 2026-10-22: real main.tscn boots to Home and plays L1 to WON in Godot 4.7.2 on f7f23060 (m42_navigation, m42_opening, m42_home, m44_ftue LOCAL_PASS)
 - DONE SB-M50-OPTIN-001 — color-assist symbols opt-in (default OFF, save migration, floor(ppc*0.4) glyphs); merged 2026-10-22 (factory job 017, 2d0b83b1)
 - DONE SB-M46-003..015 — verify-close 019 (technical PASS V04; physical gate given §0D.1; no on-device measurement)
-- READY SB-M44-020 — verify-close: playtest gate given (§0D.1); run the fresh-save first-session funnel, log any friction, close or file fixes
+- DONE FACTORY-002 — dashboard + owner-answer flow (job 002)
+- DONE FACTORY-007 — light path + cheaper models (job 007)
+- DONE FACTORY-009 — TASKS.md archive/slim (job 009)
+- DONE FACTORY-010 — CLAUDE.md slim (job 010)
+- DONE FACTORY-020 — m46_performance added to CI, run 39828088266 green (job 020)
+- DONE SB-M44-020 — verify-close 2026-10-22 (job 021): fresh-save funnel suites LOCAL_PASS, owner playtest gate §0D.1; friction filed as SB-M44-031
 - READY SB-M43-R15-001 — verify-close: R01 sequential unlock PASS (f4448d47); owner visual acceptance given (§0D.1); record and tick
 - READY SB-UI-017..019 — verify-close: BasePopup exists (scripts/ui/popup/base_popup.gd); confirm dynamic popup text and per-milestone art binding, tick
 - READY SB-UI-VIS-005 — after VIS-004: refresh assets/ui/VISUAL_ASSET_INDEX.md on main to show 157/157 Phase 2 targets and production paths
@@ -119,6 +124,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M44-028 — achievements 8 -> 32, stats from L1, Achievements screen unlock L35 (OWNER_META_PROGRESSION_DESIGN_V01)
 - READY SB-M44-029 — cosmetic achievement rewards (badges/frames), no economy rewards (OWNER_META_PROGRESSION_DESIGN_V01)
 - READY SB-M44-030 — verify Gift Bar visible from first Home with unchanged 10/50/250/500/1000 rewards; regression test (OWNER_META_PROGRESSION_DESIGN_V01)
+- READY SB-M44-031 — re-sequence FTUE to the 2026-10-22 unlock table: L1 Daily/Tasks coachmarks, L2 four-booster lesson, soft_no_hard_locks policy (after SB-M44-010)
 <!-- Not queued (standing rules, no job of their own): SB-M08-011..012, SB-M22-016..019, SB-M22-021, SB-UI-020..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
 
 ## Questions for Şekip
@@ -1322,7 +1328,7 @@ Purpose: teach the real production game progressively and prevent the first sess
 - [ ] SB-M44-010 Define owner-approved feature-unlock order/campaign points for Hearts, booster acquisition, Daily, Tasks, Collection, Card Packs, Robots, Gift Meter/Gift Bar, Shop, Events, Ranks, Achievements and any later system. **[OWNER DECISION 2026-10-22, owner via factory dashboard: Hearts from the start. Boosters unlock in order (owner in chat 2026-10-22): +1 Slot at 6, Random at 11, Selector at 16, Tornado at 21. Daily Rewards 4, Shop 8, Tasks 12, Collection 20, Events 30, RANKS 40. Owner in chat 2026-10-22: Gift Bar 1, Card Packs 20 (with Collection), Robots 25, Achievements screen 35 (stats from L1); full design `coordination/OWNER_META_PROGRESSION_DESIGN_V01.md`, implementation SB-M44-025..030.]**
 - [ ] SB-M44-013 Newly unlocked Home shortcut/Nav destination may show a NEW badge until first visit; badge clearing persists.
 - [ ] SB-M44-018 Produce/owner-approve tutorial coachmark/highlight visual language and any Scrubby/robot teaching poses actually required.
-- [ ] SB-M44-020 Owner playtest the complete first-session funnel and revise friction before M44 closes.
+- [x] SB-M44-020 Owner playtest the complete first-session funnel and revise friction before M44 closes. **[VERIFY-CLOSE 2026-10-22, factory job 021: owner playtest gate given (CLAUDE.md §0D.1). Fresh-save funnel suites LOCAL_PASS on Godot 4.7.2 at 91e498f6: m44_ftue 23/23, m42_opening, m42_navigation, m42_home, m46_rm003_ftue_coach_performance (4 groups). Source walk found no blocking friction in the shipped funnel; the friction is the gap to the 2026-10-22 unlock table (L1 Home coachmarks point at Daily (unlock L4) and Tasks (L12); the L2 lesson teaches all four boosters (unlock 6/11/16/21) with starter charges granted at L1; `ftue_onboarding_v1.json` still declares `soft_no_hard_locks`), filed as SB-M44-031.]**
 
 #### M44 Retention Feature-Pacing Additions [OWNER APPROVED 2026-09-30]
 
@@ -1337,6 +1343,7 @@ Purpose: teach the real production game progressively and prevent the first sess
 - [ ] SB-M44-028 Expand `data/config/achievements_v1.json` from 8 to the owner's 32 (Level 8, Collection 9, Robot 5, Skill 8, Gift Bar 2), keeping the existing 8; stats tracked from L1 (first-time progression levels only), Gift Meter stats wired in, Achievements screen unlocked at L35.
 - [ ] SB-M44-029 Cosmetic achievement rewards (Alternative A): badges / profile frames / Collection showcase decoration, no economy rewards; exact items are an open owner detail in the design doc.
 - [ ] SB-M44-030 Verify Gift Bar is visible and progressing from the first Home (L1) with the existing 10/50/250/500/1000 rewards unchanged; add a regression test.
+- [ ] SB-M44-031 Re-sequence the FTUE (`data/config/ftue_onboarding_v1.json`, `scripts/app/ftue_config.gd`, `scripts/app/app_state.gd`, `tests/m44_ftue.gd`) to the 2026-10-22 owner unlock table once SB-M44-010 lands: move the L1 Home Daily/Tasks coachmarks to the first Home after Daily (L4) / Tasks (L12) unlock, replace the L2 four-booster lesson with a per-booster introduction at its unlock level (+1 Slot 6, Random 11, Selector 16, Tornado 21), keep the existing starter charge amounts but surface each with its booster's unlock, align the first-day welcome task with Tasks at L12, and retire the `soft_no_hard_locks` / `available_from_first_home` policy. No new rewards or mechanics. (Filed by SB-M44-020 verify-close, 2026-10-22.)
 
 ### M45 — Debug Tooling
 
