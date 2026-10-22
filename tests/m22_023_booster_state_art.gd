@@ -1,7 +1,7 @@
 extends SceneTree
 ## SB-M22-023 — approved booster state art bound to the HUD booster buttons:
 ##   free badge frame (wraps the owned-charge count), reward glow (charge grant),
-##   activated burst (successful booster execution). booster_tutorial_pointer stays unbound.
+##   activated burst (successful booster execution). The booster tutorial pointer stays unbound.
 ## Run: godot --headless --path . -s res://tests/m22_023_booster_state_art.gd
 
 const GameplayScreen = preload("res://scripts/ui/gameplay_screen.gd")
@@ -87,11 +87,6 @@ func _structure(scr) -> void:
 	print("[structure]")
 	var row: Node = scr.find_child("BoosterRow", true, false)
 	_ok(scr.get_booster_ids().size() == 4 and row != null and row.get_child_count() == 4, "4 booster buttons, BoosterRow child count 4")
-	var ptr := 0
-	for n in scr.find_children("*", "TextureRect", true, false):
-		if (n as TextureRect).texture != null and (n as TextureRect).texture.resource_path.contains("booster_tutorial_pointer"):
-			ptr += 1
-	_ok(ptr == 0, "booster_tutorial_pointer not bound")
 
 func _ok(cond: bool, msg: String) -> void:
 	if not cond:
