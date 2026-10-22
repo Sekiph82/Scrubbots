@@ -792,8 +792,8 @@ Do not replace existing Prompt 02 fixtures — add to them.
 - [x] SB-M07-013 Inventory other original theme artwork. (docs/LEVEL_ART_INVENTORY.md + references/inventory.json, factory 028)
 
 **Master UI / generated visual reference tasks (from UI_TASKS_APPENDIX migration)**
-- [ ] SB-UI-008 Select and record canonical Scrubby master reference before final Scrubby production generation.
-- [ ] SB-UI-013 Validate manifest reference paths/IDs after canonical references are selected.
+- [ ] SB-UI-008 Select and record canonical Scrubby master reference before final Scrubby production generation. (factory 029 2026-10-22: BLOCKED on owner pick, manifests list scrubby_master OWNER_REQUIRED with 2 candidates: _owner_inbox/Game Screens/main screen.png vs Collection Cards/meet the scrubbots.jpeg)
+- [ ] SB-UI-013 Validate manifest reference paths/IDs after canonical references are selected. (factory 029: manifest ids unique and refs resolve; only 4 not-yet-generated target_paths absent; re-run after 008)
 
 ### M08 — Level Art Technical Audit `[CONTENT] [VISUAL REFERENCE]`
 
