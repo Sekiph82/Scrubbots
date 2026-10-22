@@ -2,6 +2,8 @@
 
 This root TASKS.md is the **only** authoritative project-status tracker and the **only project-status file consumed by the H!veAI parser**. GitHub repository metadata and the latest commit are the remaining project-truth inputs. No parallel session index, roadmap, audit index, dashboard, hidden control-plane tracker, or equivalent status mirror is permitted.
 
+Completed items and older status history: docs/migration/legacy-task-trackers/TASKS_ARCHIVE_2026-10-22.md (1092 done items as of 2026-10-22).
+
 ## Autonomous Queue
 <!-- Maintained by the factory loop (CLAUDE.md §0D). One row per item: `- READY|OWNER|DONE <TASK-ID> — <one line>`. First READY row is next. -->
 - DONE REFRESH-QUEUE — queue rebuilt 2026-10-22 from all open `- [ ]` items; §0D gates applied (visual/F5/phone/ChatGPT/Actions are not blockers)
@@ -149,93 +151,7 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - [ ] **SB-DEV-GODOT-001 — Owner Godot Editor latest-build playability / safe local synchronization (2026-10-15).** Claude task: `coordination/autonomy/SCRUBBOTS_CLAUDE_GODOT_LOCAL_PLAYABLE_SYNC_V01.md`. Sync the ONE Desktop checkout with `origin/main` non-destructively; respect owner-modified `project.godot` and `scenes/app/main.tscn`, preserve stashes/untracked state; aim for opening/running current production Home and real level in Godot 4.7.x via F5. Record actual Editor launch result or NOT_RUN. Repeat safe local update at player-facing milestone handoffs. **CLAUDE SOURCE+LOCAL-WINDOW RUN REPORTED / 43-SUITE CLOUD CI SCOPED PASS; READY_FOR_OWNER_F5_CHECK, actual Editor F5 NOT_RUN. Latest shape swap cloud CI pending.** Independent ChatGPT audit: `coordination/sessions/DEV-GODOT-LOCAL-PLAY-C001/CHATGPT_INDEPENDENT_AUDIT_V01.md`. Checkmark OPEN until owner F5 visual acceptance.
 - Parallel Family APK audit [2026-10-10]: **SB-M47-001 / SB-M47-002 — OFFLINE FIRST-TEN ANDROID DEBUG EXPORT = FIRST10_APK_TECHNICAL_PASS / CLOSED FOR LIMITED SLICE; SB-M47-003 REAL DEVICE INSTALL PENDING AT 2026-10-10 AUDIT; LATER OWNER-REPORTED BOOT PASS.** Independent audit: `coordination/sessions/M47-FAMILY-APK-C001/M47_FAMILY_APK_C001_CHATGPT_INDEPENDENT_AUDIT_V01.md`. Genuine signed APK from GitHub Actions run `38040561355`, built source `857d9033`, artifact `11666135912` (expires 2026-11-09), APK SHA-256 `496509477f38841879ea36e87a0ad5a5ac75f4615f70abc8fb96af288839c75d`, size 513,559,541 bytes; scan of actual PCK/APK reports 0 forbidden paths among nine owner-excluded trees, 663/663 runtime-referenced paths available. This is **strictly offline**, built-in Levels 1–10 only, no INTERNET permission or R2 manifest, no publisher secret. Device touch/portrait/save/performance and online Level 11–50 updating remain unverified. Per-run debug signing cert changes; uninstall old test build to install newer (may remove device saves). No repo cleanup authorized.
 - Owner Android Family device feedback [2026-10-10]: **SB-M47-003 OWNER-REPORTED INSTALL + BOOT PASS; SB-M47-004 REAL-DEVICE TOUCH FAIL ON FIRST BUILDS; V02 CODE TECHNICAL PASS / OWNER RECHECK PENDING.** Wife installed/opened first-ten Android APK, but a single stationary tap on front Supply color batch does NOT easily move batch to the five-slot execution strip; owner reports "tutup 5li slota dogru ittirmen lazim sanki" (appears to require dragging toward slots). This is a symptom, NOT authorization to implement drag. One touch-down+up on a valid front must transfer exactly one whole FIFO batch to rightmost EMPTY slot via production controller, no swipe/hold/destination tap; 3/4/5 columns and 5/6 slot layouts, proper touch geometry, no duplicated synthesized-mouse event; preview rows unclickable and full/pause/modal/terminal reject atomically. Owner record: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/OWNER_DEVICE_FEEDBACK_V01.md`. Claude prompt: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CHATGPT_PROMPT_V01.md`; audit criteria: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CHATGPT_AUDIT_CRITERIA_V01.md`. New signed offline APK + physical Android owner retest required; **M47 technical export PASS does not imply playable touch PASS**. HISTORICAL V01 priority superseded by later V02 audited code fix; owner physical tap retest pending. R2 critical path stays open and independent.
-- Owner multi-device Family QA expansion [2026-10-10]: **M47-FAMILY-APK-TOUCH-R01 V02 / OWNER-OBSERVED FAIL ON ORIGINAL BUILDS / CLAUDE CODE V02 IMPLEMENTATION TECHNICALLY AUDITED / NEW OWNER RETEST PENDING**. Three real devices were tested: owner's iPhone (**FIRST IPA, not verified latest**), Samsung Flip Android phone, daughter's Samsung Android tablet (owner says "Samsung iPad"). Owner reports same mobile usability problems: (1) Supply front one-tap does not smoothly/consistently place the batch into five-slot rail and feels like drag/hold is needed (**SB-M47-004 OPEN**); (2) Collection scroll down sticks (**narrow SB-M49-028 OPEN**); (3) Home Rewarded Ads has one claimable item but lacks red **1** badge (**narrow SB-M43-134 OPEN**). Previously accepted R15 'no badge required' wording is superseded by owner's new badge requirement, without changing verified grant or sequential unlock. Owner record: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/OWNER_DEVICE_FEEDBACK_V02.md`. **V02 supersedes V01**: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CHATGPT_PROMPT_V02.md`; audit: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CHATGPT_AUDIT_CRITERIA_V02.md`. One-tap remains tap, NEVER drag. Android technical artifact is now built and verified; iOS unsigned IPA artifact was built successfully; CI showed import diagnostics not demonstrated to impair family runtime. R02 is non-blocking QA. See audit amendment V03. Physical owner retest may proceed NOW; new IPA must be signed with xtool. Do not claim user's first iPhone IPA is current or new build. **CLAUDE CODE performs all implementation, testing, packaging and pushes; CHATGPT only independently audits and maintains TASKS.md.** Root TASKS state only by ChatGPT.
-- **INDEPENDENT M47 V02 AUDIT [2026-10-10]**: **MOBILE_UX_CODE_PASS (Supply one-tap + Collection swipe + Rewarded Ads red 1); ANDROID_FIRST10_EXPORT_TECH_PASS; IOS_IPA_BUILD_SUCCESS_UNSIGNED / IMPORT_DIAGNOSTICS_NONBLOCKING_FOR_FAMILY_TEST; OWNER_THREE_DEVICE_RETEST_PENDING.** Claude fix `c2b1c3c7ae0a301cd43d95dd003f0ddf1373eed0`; builder log `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CLAUDE_LOG_V02.md`; independent audit `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CHATGPT_INDEPENDENT_AUDIT_V02.md`. New Android run **38063215568** artifact **11674660273** (APK SHA-256 `36f0be58d6c1ea2a74b476cac12466d3db907d7975594976a2adb2e136ea55da`; code SHA match, apksigner v2/v3 valid, PCK 1982 paths, forbidden 0, 664/664 required; 13 CI focused suites, root ALL PASS). Claude separately reports 71/71 TEMP regression suites (not independently rerun on owner Desktop). Android Samsung Flip/tablet owner retest now OPEN; uninstall old debug app before new signed build may destroy saved progress. **iOS run 38063217668** unsigned artifact **11674890339** from same code SHA, Xcode BUILD SUCCEEDED, but independent iOS job log includes `ERR_FILE_CORRUPT`/`Error importing` gameplay `assets/ui/final/gameplay/buttons/icon_pause.png` and M42 evidence WebPs; workflow masks import errors with `--import || true` and lacks iOS package scan. **M47-FAMILY-APK-IOS-EXPORT-R02 / DEFERRED NON-BLOCKING QA** to establish a later clean-import IPA without changing approved art or rebuilding verified Android: `coordination/sessions/M47-FAMILY-APK-IOS-EXPORT-R02/CHATGPT_PROMPT_V01.md`; audit criteria `coordination/sessions/M47-FAMILY-APK-IOS-EXPORT-R02/CHATGPT_AUDIT_CRITERIA_V01.md`. iPhone's first IPA was an older build. The new unsigned IPA is successfully compiled and available for owner xtool installation now; import warning impact on shipped runtime not proven. Audit amendment: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/CHATGPT_AUDIT_AMENDMENT_V03.md`. M47-004, wider M49-028 and M43-134 remain OPEN until real-device confirmation; no reward/grant changes. Physical mobile PASS cannot be inferred from Godot synthetic tests.
-- R02 deferred execution handoff [2026-10-10]: **M47-FAMILY-APK-IOS-EXPORT-R02 / STOPPED / DEFERRED / NOT MERGED / NO NEW IPA BUILD**. Claude reports user-requested stop after reconciling latest `TASKS.md` and M47 audit amendment V03. The existing Android APK run `38063215568` and unsigned iOS IPA run `38063217668` remain the family-test candidates. Claude investigated the legacy `assets/ui/final/gameplay/buttons/icon_pause.png` and reports it was already corrupt/unreferenced, while the live Pause glyph is rendered natively; this is builder-reported local evidence, not an independently audited replacement. Claude locally staged sparse iOS import + PCK scan and five focused/root suites (reported PASS), but **no updated iOS workflow has been pushed or verified in GitHub Actions**. An unpushed iOS-only workflow commit `1b56d17042bc6d2efdf31b12e689cc0fbc7102f7` survives in an isolated detached TEMP `.../scratchpad/wtI`; separate scratch `.../scratchpad/wtIx` contains import-probe artifacts. No permission to delete these TEMP worktrees or touch owner Desktop was given. Before any later R02 resumption, reconcile the detached commit against current origin/main and seek fresh owner priority; do not force-push, rebuild, or perform cleanup automatically. Owner Desktop at `e8c9429e`, two commits behind main at time of Claude report, with 4 owner-dirty tracked files, 2,616 untracked, 2 stashes and unchanged `project.godot` hash; **Claude intentionally stopped without Desktop sync**. Current action remains 3-device owner family retest, not R02.
-- **OWNER OVERRIDE / R02 PUBLISH + TEMP CLEANUP [2026-10-10]**: **CLAUDE IMPLEMENTED / GITHUB PUBLISH AUDIT PASS / CLEANUP REPORTED COMPLETE**. Following the earlier deferred execution report, owner authorized and Claude executed publication of the prepared, locally tested but UNPUSHED `.github/workflows/ios-ipa.yml` improvement in detached `1b56d17042bc6d2efdf31b12e689cc0fbc7102f7`, followed by CLAUDE-REPORTED removal of ONLY the two verified R02-specific TEMP worktrees `wtI` and `wtIx` and their R02-generated probe files after checking the full workflow change exists on GitHub. The earlier 'no permission to clean/publish' limitation is superseded ONLY for this narrowly scoped R02 work. GitHub verification confirmed workflow-only implementation `6edd173375ed72f428475e6aad8b70f076f90fd0` plus log-only commit `72514849f8f5168641da5556c0b5edaaf27d56e2`. Claude reports both R02 TEMP worktrees removed (~1,560 + 1,105 MiB = ~2.60 GiB), Desktop fast-forwarded to the then-current main while preserving owner files. ChatGPT cannot independently inspect physical Windows disk. No CI build has run for the updated workflow, so new macOS gate awaits next requested IPA build. Independent audit: `coordination/sessions/M47-FAMILY-APK-IOS-EXPORT-R02/CHATGPT_INDEPENDENT_AUDIT_PUBLISH_C001_V01.md`. Owner's dirty Desktop files (4), untracked files (2616), stashes (2) and unrelated worktrees are protected. No new IPA/APK, no general disk cleanup, no worktree removal before remote integrity verified, no force push. ChatGPT authoring-only prompt: `coordination/sessions/M47-FAMILY-APK-IOS-EXPORT-R02/CHATGPT_PUBLISH_CLEANUP_PROMPT_V01.md`. ChatGPT audit recorded; no subsequent build or TEMP tasks authorized.
-- **M47 R02 PUBLISH + DISK RECLAMATION AUDIT [2026-10-10]: PUBLISH_AND_SCOPE_PASS / CLEANUP_CLAUDE_REPORTED / NO_NEW_IPA_APK / OWNER_FAMILY_RETEST_PENDING**. Original detached TEMP commit `1b56d170` recovered and integrated as `6edd1733`: live `main` shows exactly `.github/workflows/ios-ipa.yml` changed (+118/-5), no root `TASKS.md` or gameplay/assets changed. Log `coordination/sessions/M47-FAMILY-APK-IOS-EXPORT-R02/CLAUDE_PUBLISH_CLEANUP_LOG_V01.md` published at `72514849` as a separate documentation-only commit. Scoped R02 `wtIx` and `wtI` cleanup is **reported by Claude as complete**; ~2,665 MiB (~2.60 GiB) recovered, no other worktrees or protected owner Desktop files touched according to handoff. That disk and desktop evidence is NOT independently verifiable through GitHub. New iOS workflow is manually triggered and **NOT YET CI-EXECUTED**; the prior unsigned IPA `38063217668` and signed Android APK `38063215568` remain valid family test candidates. No need to rebuild automatically. Audit: `coordination/sessions/M47-FAMILY-APK-IOS-EXPORT-R02/CHATGPT_INDEPENDENT_AUDIT_PUBLISH_C001_V01.md`.
-- **CP06 OWNER OPTION B CHOSEN [2026-10-10] / CLAUDE V02 AUTHORIZED / IMPLEMENTATION NOT YET VERIFIED**: Owner explicitly chose B instead of A hold or C replacement. A verified active manifest `disabled_levels` may advance a remote disabled **frontier** to its next true numeric level without fake WON or payouts. Example disabled Level12 -> actual Level13; zero rewards, no first-clear/Tasks/achievements, existing win-streak unchanged as conservative no-win/no-loss behavior. Persist separate skipped history with exact manifest provenance, versioned V1→V2 save/progression migration and disjoint union `[1..frontier-1]`; fail closed and roll back on write/corruption. A previously skipped level re-enabled later stays skipped in that player's history, no forced rewind/reward/replay; yet-unreached players can play re-enabled content. All content identities/numbers and old offline LKG remain canonical. Decision: `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/OWNER_DISABLED_FRONTIER_DECISION_V02.md`, implementation prompt V02 + audit V02 same session. **Desktop only, zero TEMP**, local Godot CP04/CP05 user:// disk-writing tests not authorized; no live R2/IPA/APK. Source implementation does not imply PASS, tests pending when no permitted test location.
-- **CONTINUOUS CLAUDE AUTONOMY V02 [2026-10-15]**: Owner explicitly wants Claude to continuously implement ScrubBots tasks without routinely seeking approval for coding, test execution, peer reviews, task logging or selecting next independently approved milestone. NEW single standing master: `coordination/autonomy/SCRUBBOTS_CLAUDE_AUTONOMOUS_MASTER_V02.md` (supersedes V01 where different), `CLAUDE.md §0B` linked. Immediate M44 D2 source t22/t23 + 23/23 guard still needs real existing Android 35-suite `validation_only` CI and fresh post-fix peer review; owner authorizes one planned run + max one narrow remedial run **for this new D2 cycle** if GitHub included quota, no APK/PCK/IPA, no paid minutes or R2 publish. Upon credible CI/review handoff Claude proceeds directly to next eligible M49/M50 or actual prioritized independent task. Prior one-time C: diagnosis complete, global 500MiB rule retired, no disk monitoring. Local TASKS.md permission denial must not be bypassed or derail source development; ChatGPT may sync that one tracker when needed. Keep owner visual/phone gates open and no pretending agent remains active after session ends.
-- **LATEST OWNER INSTRUCTION: STOP REPEATED DISK CHECKS / RESUME CODING [2026-10-15]**: Previous assistant invented mandatory C: free-space snapshots and >500MiB WHOLE-DRIVE delta stop trigger from user's narrower request to prevent ScrubBots TEMP bloat. Owner clarified Claude's job is ScrubBots CODE, not recurring laptop disk monitoring. ONE-TIME READ-ONLY C: diagnosis completed by Claude (free 97,713,388→97,484,988 KiB across 3 minutes; worktree/temp churn observed, no single proven owner of all swings). Later in-session C: drop (~3.5GiB) is unrelated/unknown but NOT an autonomous stop under new owner policy. No repeat inspections or 'resume disk?' approvals. Preserve only scoped ≤20MiB task-generated local TEMP, one original Desktop checkout and heavy tests cloud-side. M44 D2 implementation pushed: `b049dc90`, `0218a862`, `d08447a6`; t22/t23, M44 updated guard 23/23, reviewer D1/D2 remediated BUT NO NEW CI / POST-FIX REVIEW YET; keep `SB-M44-D2-001` OPEN. Existing Android 35-suite `validation_only` normal verification allowed for current new D2 cycle if included credits, bounded 1+1 targeted rerun, NEVER APK/IPA/R2. Resume coding/autonomous next milestone after genuine verification. `CLAUDE.md §0B` and `coordination/autonomy/SCRUBBOTS_CLAUDE_AUTONOMOUS_MASTER_V01.md` updated.
-- **OWNER APPROVED C: READ-ONLY DIAGNOSTICS + M44 D2 [2026-10-15]**: User answered YES to disk analysis **without deletion**; separately APPROVED: new players first finish the real L1–L3 tutorial, then get ONCE-per-future-feature/version What's New, never during onboarding. Skip Tips before finishing L3 does not force early announcement; established save behavior unchanged. Owner scope `coordination/sessions/M44-TUTORIAL-FTUE-C001/OWNER_D2_WHATS_NEW_AND_DISK_DIAG_DECISION_V01.md` and updated standing master `coordination/autonomy/SCRUBBOTS_CLAUDE_AUTONOMOUS_MASTER_V01.md` / `CLAUDE.md §0B`. Previous M44 V02 audit's D2 owner-decision gate is **RESOLVED PRODUCT-WISE**, but D2 implementation/CI still OPEN and owner device visual gates unchanged. C: physical disk NOT YET INSPECTED by Claude since consent; no deletion/cleanup permission. Local autonomy hard-stop >500 MiB unexplained disk decline remains until read-only evidence proves safety. Claude TASKS.md local write blocked by permission; do not bypass. New code CI requires applicable workflow budget/authorization; no extra APK/IPA/R2.
-- **CHATGPT M44 V02 / M45 V01 INDEPENDENT CI AUDIT [2026-10-15]**: Real GitHub Actions run **38702447218** fixed-clock CP06 TEST-ONLY, 34/34 suites PASS, M44 21/21, CP06 16/16, export skipped; run **38707495178** with M44 D1 perf cache improvement + M45 developer tooling 35/35 PASS, M45 8/8, M44 21/21, CP06 16/16, all M39/M41/M43 specialist suites PASS, import 0 script errors, export skipped, logs-only artifact **11959227226 (80,436 bytes)**. Independent audits now published: `coordination/sessions/M44-TUTORIAL-FTUE-C001/CHATGPT_INDEPENDENT_AUDIT_V02.md` and `coordination/sessions/M45-DEBUG-TOOLING-C001/CHATGPT_INDEPENDENT_AUDIT_V01.md`. M45-001..018 **TECH_PASS/CLOSED**. M44 16/24 core technical tasks closed; M44 005,006,010,013,018,020,022,023 remain OPEN for truthful future-meta pacing, contextual coaching and real owner device/visual acceptance. M44 Claude peer reviewer flagged D2: persistent `profile=new` suppresses ALL FUTURE What's New entries; owner decision required. Claude Code local tracker edit permission was denied despite repo policy; ChatGPT made this GitHub tracker update, no bypass of local Claude permission. Storage: builder-reported C: free space dropped ~6.6 GiB in latest session and ~17 GiB from prior baseline; concurrent Codex activity is NOT conclusive cause. Owner-safe diagnostic and explicit resume needed before continuing autonomous local work. No deleted owner or third-party files, no new APK/IPA, no R2.
-- **OWNER CLAUDE AUTONOMOUS DELEGATION [2026-10-15]**: Owner specifically requested one standing Claude prompt that reads all open GitHub TASKS, implements/test/reviews milestone after milestone, publishes builder and audit logs, **updates root TASKS.md itself**, and continues until real owner intervention. New authoritative `coordination/autonomy/SCRUBBOTS_CLAUDE_AUTONOMOUS_MASTER_V01.md`, with explicit policy exception `CLAUDE.md §0B`. Future autonomous CLAUDE tracker updates are permitted despite historical ChatGPT-only rules, but a Claude review must be labeled `CLAUDE_PEER_REVIEW` when genuinely distinct subagent, or `CLAUDE_SELF_REVIEW`; neither may pose as ChatGPT independent audit or auto-close owner visual gates. CURRENT R01 ACTUAL run **38632433821** (source `e54b82df`): **33/34** suites PASS including **all 17 newly added M39/M41/M43** and M44 21/21, CP06 i05 only FAILED, export SKIPPED, no APK. The original 3-of-3 M44 CI run cap has been used; **Run4 not authorized by autonomy request**. CP06 i05 test wall-clock drift is a hypothesis, not verified root cause. Claude may diagnose/narrowly prepare fix but cannot dispatch fourth CI without owner permission; may proceed with other independent owner-approved milestones and keep M44 Open. Real phone visual sign-off M44-018/020 remains owner-only. No new R2/paid CI/APK/IPA permissions. No indefinite unattended guarantee when Claude Code session stops.
-- **CHATGPT INDEPENDENT AUDIT M44 V01 [2026-10-14]**: Actual live GitHub code/test/workflow and real CI validate logs inspected, not merely Claude recap. Main source `f567947f` CI run **38626611950** 17/17 suites PASS (M44 21/21, CP06 16/16, CP04 28/28, CP05 15/15, root ALL PASS), import 0 script diagnostics, validate SUCCESS (116067261731), export SKIPPED (116071089038), one **52,451-byte logs-only** artifact 11925065328, NO APK/PCK/IPA. Final `ad7000e4` only Claude log. Source newly implements real 2/2/2/2 starter charges, FIRST Home DAILY100 and Welcome TASKS100 real idempotent claims, 3-level tutorial, Help/Skip Tips, older-save protections; M44 suite 21 cases/153 assertions. **AUDIT FULL CLOSURE BLOCKED BY G4:** M39 specialized booster/Daily/economy, M41 Settings, M43 Daily/R15 suites were not executed, despite explicit master requirement; dynamic L1–L3 real-device owner review also not done. M44-005/010/013/022/023 remain presentation/dependency partial. Audit: `coordination/sessions/M44-TUTORIAL-FTUE-C001/CHATGPT_INDEPENDENT_AUDIT_V01.md`. SAME milestone verification continuation `CHATGPT_M44_R01_VERIFICATION_MASTER_PROMPT.md` adds 17 specialized suites and uses **one last** original authorized validation_only run (3 of max 3), absolutely no build. No 24-child unconditional PASS/closure; all original M44 checkboxes retained open for independent reassessment after R01. Claude reports incidental ~1KiB TEMP (within new 20MiB budget); independent GitHub cannot inspect Windows; C: loss of ~59GiB over two days remains unexplained and **not attributed to M44**.
-- **M44 OWNER FINAL 100 SB TASKS / IMPLEMENTATION HANDOFF [2026-10-12]**: Latest owner approval makes first-day Tasks READY CLAIM **100 SB**, superseding V02's 75 SB proposal; independent DAILY day1 CLAIM remains **100 SB**. Both real claims available on initial Home, not auto-paid. Starting wallet 1000→1200 SB when each claimed once (any order). Welcome task occupies index0 only on fresh profile first local day, replaces usual easy task and leaves normal future-day 75/100/125 rewards and 3 total task slots unchanged. Fresh profiles get exactly 2 charges each of 4 real boosters (8 total) once, no established-user grants. Mandatory tutorial Home+L1–L3 MAX, no scheduled L4–L10 lessons. Owner authority `coordination/sessions/M44-TUTORIAL-FTUE-C001/OWNER_M44_FIRST3_STARTER_AND_CLAIM_DECISION_V03.md`; ONE Claude prompt `coordination/sessions/M44-TUTORIAL-FTUE-C001/CHATGPT_M44_MASTER_PROMPT_V01.md`; independent audit criteria `coordination/sessions/M44-TUTORIAL-FTUE-C001/CHATGPT_M44_AUDIT_CRITERIA_V01.md`. All 24 M44 task IDs remain OPEN until actual source/CI audit; M44-018/020 owner visual/phone gate pending. Only existing Android validation_only, no APK/IPA or live R2. ChatGPT sole TASKS editor.
-- **M44 OWNER CORRECTION / FIRST-THREE V02 [2026-10-12]**: User REJECTED the V01 ten-level tutorial. **Mandatory lesson arc max 3 real levels (L1 Hazard Bot, L2 Apple, L3 Palm Tree); L4–L10 must contain NO scheduled tutorial**. Daily + Tasks shown on initial Home BEFORE L1 and both should have REAL ready-to-claim action. New profiles start **2 each +1 Slot / Random / Selector / Tornado, 8 real charges** because ordinary L1–3 rewards do not guarantee them; no extra grant to existing saves, no forced use. Design V02 specifically proposes Day1 Tasks easy slot as an initially ready **75 SB** claim (canonical existing easy-task amount, replaces its first-day ordinary order, same total three tasks), as current Tasks claims require actual completed wins and fresh account cannot currently claim one; this detailed implementation remains **proposed, pending owner confirmation** rather than faking a badge or grant. Existing daily login Day1 100 SB unchanged. All 4 boosters introduced by L2, 2x and Heart/Retry/no-target rules consolidated by L3; no fake gameplay/loss/entitlement; mandatory opening cinematic unchanged. V02 plan: `coordination/sessions/M44-TUTORIAL-FTUE-C001/CHATGPT_OWNER_FTUE_FIRST3_UNLOCK_PLAN_V02.md`, V01 explicitly superseded, `docs/16_FTUE_FEATURE_UNLOCK_AND_RETENTION_SURFACES.md` updated. Tutorial SKIP TIPS/review and soft feature access are still awaiting explicit owner answers. **M44 child 001–024 remain OPEN; implementation master not yet published.**
-- **M44 FTUE C001 STARTED — OWNER DESIGN GATE [2026-10-12]**: Owner approved starting independent tutorial milestone, NOT yet exact unlock-level numbers, an M44 product policy or implementation. Proposed full first-ten sequence grounded in real production catalog 1 Hazard Bot, 2 Apple, 3 Palm Tree, 4 Orange Cat, 5 Party Toucan, 6 Chicken, 7 Pigeon, 8 Butterfly, 9 Frog, 10 Ice Cube. Preserve EASY/EASY/MEDIUM/EASY/HARD/EASY/EASY/MEDIUM/EASY/VERY_HARD rhythm; no compulsory tutorial wall during HARD 5 or VERY_HARD 10. Proposed contextual four boosters, 2x, hearts/real failure, Shop/Collection/Daily/Tasks and other feature unlocks with no artificial reward, no WAITING/ACTIVE tile text, and no R2 dependency. Design proposal: `coordination/sessions/M44-TUTORIAL-FTUE-C001/CHATGPT_OWNER_FTUE_FIRST10_UNLOCK_PROPOSAL_V01.md`. **OWNER APPROVAL REQUIRED** for level timing, skippable tutorial tips/read-only tips review (not cinematic), and soft vs hard feature locking before ONE complete M44 master prompt. No M44-001..024 marked DONE yet; M44 final gate includes real first-session owner review. R2 LF R05/M17 separate and still OPEN.
-- **OWNER STORAGE/TEMP POLICY SUPERSESSION [2026-10-12]**: Owner conditionally APPROVED TEMP only when work is organized to avoid filling laptop hardware/storage. **New rule applies to FUTURE tasks only:** GitHub-hosted runner uses its own TEMP for heavy tests, renders, generation, import, APK/IPA packaging (only with separate build approval). On laptop use ONLY existing `C:\Users\sekip\Desktop\ScrubBots` checkout; no new local worktree, clone, large scratch/cache or local duplicate export. Minimal unavoidable Claude/tool transient files may use at most **20 MiB added local TEMP concurrently per task**, must be tracked when observable, cleaned exact-path when safe, and must not accumulate or overwrite owner state. If ownership, size, post-task cleanup or impact is unknown, STOP/ASK instead of filling disk. Literal 0-byte local usage cannot be guaranteed while developer tools are running. Historical CP06 V03 zero-TEMP breach and independent audit remain accurate **under old policy** and are not retroactively reclassified. Updated canonical rule `CLAUDE.md §0A`, commit `47ad403f`; ONLY ChatGPT updates root TASKS.md. Milestone-based ONE MASTER PROMPT remains required.
-- **CHATGPT CP06 V03 INDEPENDENT AUDIT [2026-10-12]**: **TECHNICAL_FUNCTIONAL_PASS (SB-CP06-004/010) / PROCESS_POLICY_NONCOMPLIANT**. Verified exact source `eac4c74d` unchanged through CI head `aa10ea67`; existing Android `.github/workflows/android-family-first10.yml` mode choice default `validation_only` and job-level export guard. GitHub Actions run **38206590486**: 16/16 suites PASS with exit0, real CP06 16/16 PASS, CP04 28/28, CP05 15/15, CP05-R01 6/6, M35/M37/M40/M42/M43/M55 and root ALL PASS. `validate` job 114671315146 SUCCESS; `export` job 114672390954 SKIPPED. Exactly one 48,350-byte logs artifact (11727033839); no APK/PCK/IPA. Builder log-only `c38acba3`. **ZERO-TEMP PROCESS FAIL**: Claude reported using a forbidden shell heredoc and real harness task-output file under `AppData\Local\Temp\claude\...\tasks\b01v53pnu.output`; no claim the literal zero-TEMP rule was satisfied, no implicit waiver. Physical Desktop parity is Claude-reported only. Independent file `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CHATGPT_INDEPENDENT_AUDIT_V03.md`. CP06 GAME_RUNTIME functional tasks now TECH_PASS but process deviation remains open and must not be concealed. **NO new APK/IPA/live R2**; next game R2 milestone depends on LF R05/M17 still OPEN. MILESTONE MASTER prompting only.
-- **OWNER APPROVAL: REUSE ANDROID ACTIONS, VALIDATION ONLY [2026-10-12]**: Owner responded **OK** to adding `validation_only` vs `build_apk` choices to EXISTING `.github/workflows/android-family-first10.yml`. No third workflow and no new APK/IPA authorized. Claude CP06 V03 MASTER prompt `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CHATGPT_MASTER_PROMPT_V03.md` and audit criteria V03 prepared by ChatGPT on main. CLAUDE should add safe DEFAULT `validation_only` to workflow_dispatch and job-level export guard, include 16-case CP06 test + focused old regressions; safely push from Desktop and dispatch GitHub validation-only once (at most three validation-only runs total for bounded remediation). Runner-only CI test files are remote, **not** local Windows TEMP. Assert export job SKIPPED, no APK/PCK, all required suites PASS, and upload real logs. Current state remains **IMPLEMENTED_UNVERIFIED** until run evidence and independent audit. Do not prepare next milestone until this CP06 closes. Earlier pending-owner approval note is superseded by THIS entry.
-- **CP06 V02 IMPLEMENTATION SOURCE AUDIT [2026-10-12]**: **IMPLEMENTED_UNVERIFIED / OWNER_TEST_EXECUTION_DECISION_REQUIRED / NOT CLOSED**. Claude commit `eac4c74d` published game-side Option B skip ledger/manifest/registry/save/home wiring and 16-case new test source (plus CP04 c24 update). None of the new code was parsed/executed by Godot; all new and affected regressions remain **NOT_RUN**. Owner Desktop parity/4 dirty/2616 untracked/2 stashes are Claude-reported only. Temporary-file rule deviation disclosed: `sed -i` transient in Desktop tests folder and possible Git Bash here-doc transient in `/tmp`, no residual claimed; no new worktree. Existing Android workflow on manual dispatch DOES create APK on validate PASS, and omits new CP06 suite: **do not dispatch it as-is**; a CI validation-only gate that excludes APK export requires explicit owner approval. No alternate runner, no local Godot `user://` AppData writes authorized. Independent strict audit: `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CHATGPT_INDEPENDENT_AUDIT_V02.md`. No next milestone until CP06 verification.
-- **CP06 Gate A independent result (2026-10-10)**: **OWNER_DECISION_REQUIRED_FOR_DISABLED_FRONTIER / NOT_IMPLEMENTED.** Builder log `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CLAUDE_LOG_V01.md` committed as `73b0cce8` (log only). ChatGPT independently confirmed current `disabled_levels` manifest rejection and unchanged old CP04 c24 behavior; CI 38063215568 has 28/28 CP04 PASS. Claude reports cleaning its pre-policy 656MB worktree and ~100KB document copies; other earlier-session scratch ~17MB left untouched. This log is not proof of a new disabled-level feature. Owner must select A Hold, B Skip, or C Replacement before further work. Audit at `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CHATGPT_INDEPENDENT_AUDIT_V01.md`.
-- **GLOBAL CLAUDE EXECUTION POLICY / OWNER CORRECTION [2026-10-10 21:46 +03]**: **NO TEMP FILES/FOLDERS WHATSOEVER, NOT EVEN SMALL ONES; ONLY EXISTING DESKTOP SCRUBBOTS CHECKOUT** `C:\Users\sekip\Desktop\ScrubBots`. Earlier ChatGPT CP06 prompt incorrectly authorized "one small bounded sparse TEMP worktree"; owner explicitly REJECTS this. ChatGPT corrected **THE SAME PROMPT FILE** at `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CHATGPT_PROMPT_V01.md`, the companion audit criteria, and repository `CLAUDE.md` standing policy so Claude reading already-shared original URL sees correction. Do NOT create any worktree, clone, temporary pack, staged copy, scratch workspace, test cache, OS TEMP path or other TEMP artifact. Work, test, commit, push and log only in existing Desktop checkout, preserving its 4 previously owner-dirty tracked files, 2,616 untracked and 2 stashes (recheck actual current counts). If unavoidable transient files are required to execute, STOP as `BLOCKED_ZERO_TEMP_DESKTOP_ONLY`; ask owner rather than violating policy. Claude must re-read GitHub before proceeding; current-session instructions may have been loaded before correction.
-- **OWNER FINAL FAMILY-UX ACCEPTANCE [2026-10-10]**: **M47-FAMILY-APK-TOUCH-R01 V02 OWNER_ACCEPTED / CLOSED FOR NARROW MOBILE UX**. Owner physically installed/tested the **NEW fixed IPA** from Actions run 38063217668 / source `c2b1c3c7` on own iPhone and explicitly reported everything OK. Owner expressly approved the Android builds **without reporting a new physical Samsung Flip/tablet retest**; Android disposition OWNER-SIGNOFF-WITH-DEVICE-RETEST-WAIVER, NOT 3/3 real-device PASS. New Android APK run 38063215568 technically PASS. Owner accepted Supply one-tap, Collection swipe and Rewarded Ads red 1 *narrow fixes*. Broad M43-134 badges, M49-028 responsive/other modals, M47 full Android device/perf matrix and production iOS readiness are not closed. Offline builds still ONLY built-in Levels 1–10; live R2 Level 11–50 rollout remains OPEN. Evidence: `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/OWNER_FINAL_ACCEPTANCE_V03.md`.
-- M55 long-session follow-up [2026-10-10]: **M55-LONG-SESSION-QUIESCENCE-QA-R01 / INDEPENDENT TECHNICAL PASS / CLOSED, DO NOT RE-IMPLEMENT.** Code+builder log already published at `c997ca65e500ca3e45b255eb745e65a0b364461b`; reviewed exact source/diff. Claude 3/3 Windows runs report 775–788 ms, 11 quiet frames, +34 warm-up Nodes, no lap-2 Node/orphan growth, with no leaked signal; independently corroborated by later GitHub Actions Android run 38063215568: `m55_long_session` PASS, root ALL PASS. MetaRewardFeel.SETTLE_FRAMES +3 streak / 5-s total bound, original leak guards unchanged. Independent audit: `coordination/sessions/M55-LONG-SESSION-QUIESCENCE-QA-R01/CHATGPT_INDEPENDENT_AUDIT_V01.md`. Broader M55 player-experience expansions remain OPEN.
-- Tracking Repository: Sekiph82/Scrubbots
-- Tracking Branch: main
-- Owner Priority Decision [2026-10-07]: **Remote Level Update / Family APK continues to supersede new M43 work until the pipeline is usable end-to-end. Cloudflare R2 is OWNER-LOCKED and now PROVISIONED.** Closed chain: CP01/M12 `.scrubpack` → CP02/M13 manifest/versioning → CP03/M14 publisher core → CP04/M15 Godot RemoteContentManager → CP05/M16 offline/LKG → M53 clean-regression remediation → **Cloudflare R2 CP07/M18 bucket + Family Test public read endpoint provisioning**. Remaining locked order: **Level Factory/Pixel Art Factory `Publish to ScrubBots` handoff onto `scrubbots-content-prod` → first real R2 manifest/pack publication → ScrubBots non-secret live endpoint binding → end-to-end remote publish/download verification → Android Family Test APK**. Family Test read base: `https://pub-dd36dd94999d4beaad95d6409ad0167e.r2.dev`. R2 write credentials are publisher-side secrets only and must never enter Git or the APK. Installed family builds must discover Level 11–50, download only missing verified packs, validate SHA-256/schema/LevelData/supply identity, install under `user://content/`, and continue offline from last-known-good. **Remote executable content remains forbidden**.
-- Owner Parallel-Lane Decision [2026-10-08]: while Level Factory/Codex finishes the externally gated R2 publisher work, `SB-M43-R15-001-R01` Rewarded Ads sequential unlock was explicitly authorized as an isolated Claude lane. **PASS / CLOSED** by `coordination/sessions/M43-OWNER-R15/CHATGPT_AUDIT_R15_001_R01_SEQUENTIAL_UNLOCK_V01.md` on implementation `f4448d473d2c6bd62be3a83d31299eedea50b6ec`. Remote Level Update / Family APK remains the primary critical path. R15-001 functional sequence is closed; parent `SB-M43-R15-001` remains open only for owner visual acceptance of the Rewarded Ads surface, including LOCKED-row presentation.
-- Parallel Milestone Closure [2026-10-08]: **M43-C005F-PHASE1 GameFeelFlow + Saltmire Spark Canonical Foundation = PASS / CLOSED.** Children `SB-M43-C005F-001 / 002 / 013 / 014` closed on implementation `4ee5a49024f943f463fd7f7edb816596f8fbbc63`; independent audit: `coordination/sessions/M43-C005F-PHASE1/CHATGPT_INDEPENDENT_AUDIT_V01.md`. Canonical repo now vendors GameFeelFlow 1.0.0 + Saltmire Spark 1.0.0 (MIT), owns one fail-open feedback adapter, locks FULL/REDUCED behavior and enforces the V1 DO-NOT-USE boundary. F003-F012/F015 remain open. Remote Content/R2/Level Factory authority was untouched.
-- Phase 2 owner runtime amendment [2026-10-08]: owner accepted the live Results feel (`SB-M43-C005F-003 / 004` = **OWNER VISUAL PASS / CLOSED**) but found a production pack-routing defect: earned Standard/Premium packs never enter the shipping pack-opening ceremonies and instead resolve directly into Collection through EconomyServices reward handlers. F005 is therefore **CHANGES REQUIRED / REOPENED** despite the earlier harness-level technical pass. Audit amendment: `coordination/sessions/M43-C005F-PHASE2/CHATGPT_AUDIT_AMENDMENT_R01.md`; owner Results acceptance: `coordination/sessions/M43-C005F-PHASE2/OWNER_RESULTS_VISUAL_ACCEPTANCE_V01.md`. Remediation `M43-C005F-PHASE2-R01` is authorized now; prompt `coordination/sessions/M43-C005F-PHASE2-R01/M43_C005F_PHASE2_R01_EARNED_PACK_RUNTIME_PROMPT_V01.md`; criteria `coordination/sessions/M43-C005F-PHASE2-R01/M43_C005F_PHASE2_R01_AUDIT_CRITERIA_V01.md`.
-- M43-C005F-PHASE2-R01 strict audit [2026-10-08]: implementation `26b4a2d5fdb70b93337705a30f5914054291f5a1` **fixes the real shipping route** (earned packs queue, canonical commit/receipt, real ModalStack Standard/Premium ceremony, restart replay, Gift/Daily/Rewarded triggers) but verdict is **CHANGES REQUIRED / R02**. Blocking defect: `AppState.acknowledge_earned_pack()` removes the pending entry before durable save and returns outer `ok:true` even if that acknowledgement save fails; `PackPresenter` can then treat a non-durable ack as successful and advance. Audit: `coordination/sessions/M43-C005F-PHASE2-R01/CHATGPT_INDEPENDENT_AUDIT_V01.md`. Targeted R02 authorized: `coordination/sessions/M43-C005F-PHASE2-R02/M43_C005F_PHASE2_R02_REMEDIATION_PROMPT_V01.md`; criteria: `coordination/sessions/M43-C005F-PHASE2-R02/M43_C005F_PHASE2_R02_AUDIT_CRITERIA_V01.md`.
-- M43-C005F-PHASE2-R02 strict re-audit [2026-10-08]: implementation `9f0fdf50` **PASS / AWAITING OWNER RUNTIME ACCEPTANCE**. Durable acknowledgement is now transactional: save failure restores the exact pre-ack economy snapshot, returns outer `ok:false`, emits no successful `pack_finished`, does not advance FIFO, and later Home-entry/restart replays the same committed receipt without reroll. Focused R01+R02 suite 22/22 PASS; root ALL PASS. One unrelated C006 v07 mid-route frame-sampling test failed once under loaded battery then passed 3/3 reruns; recorded as non-blocking test-hygiene debt, not hidden as a zero-failure first run. Audit: `coordination/sessions/M43-C005F-PHASE2-R02/CHATGPT_INDEPENDENT_REAUDIT_V01.md`. No R03 issued.
-- M43-C005F-PHASE2 owner closure [2026-10-08]: after Desktop checkout was synchronized to current `origin/main`, owner confirmed **Standard Pack = OK** and accepted **Premium Pack = OK**. `SB-M43-C005F-005` is now **PASS / CLOSED**; owner record: `coordination/sessions/M43-C005F-PHASE2/OWNER_PACK_RUNTIME_ACCEPTANCE_V01.md`. With F003/F004 already owner-accepted, **M43-C005F-PHASE2 Results + Pack Feel Integration = PASS / CLOSED**.
-- Owner Parallel-Lane Decision [2026-10-09]: while Level Factory/Codex continues the separate LF/R2 critical path, **M43-C005F-PHASE3 — Meta Rewards + Acquisition Feel** is authorized as an isolated Claude milestone covering only `SB-M43-C005F-006`, `SB-M43-C005F-008`, and `SB-M43-C005F-009`. Master prompt: `coordination/sessions/M43-C005F-PHASE3/M43_C005F_PHASE3_MASTER_PROMPT_V01.md`; strict criteria: `coordination/sessions/M43-C005F-PHASE3/M43_C005F_PHASE3_AUDIT_CRITERIA_V01.md`. Gate 0 requires the persistent owner Desktop checkout to be synchronized to exact current `origin/main` before implementation and again after final push; TEMP-only completion with a stale Desktop checkout is forbidden. This lane must not modify Remote Content/R2, LevelData, supply, VOID, Family APK or the Level Factory repository.
-- M43-C005F-PHASE3 strict audit [2026-10-09]: implementation `89157ecb444126bd3dc683346c206ccf778e4d70` is **PRODUCT TECHNICAL PASS for F006/F008/F009, but MILESTONE CHANGES REQUIRED / QA-R01 + OWNER RECOVERY CONFIRMATION**. Product source boundaries, focused 15/15 suite, Reduced/fail-open behavior and R2 scope isolation pass. Two strict blockers remain: (1) builder accidentally ran `git checkout -- project.godot` in the owner Desktop checkout, restored the known 2026-10-08 reconciliation but cannot prove no post-Oct-8 owner edit was lost; owner must explicitly accept/recover the restored file; (2) Premium pack C007 p12 is a pre-existing frame-sampling flake and failed the required Phase 3 battery. Audit: `coordination/sessions/M43-C005F-PHASE3/CHATGPT_INDEPENDENT_AUDIT_V01.md`. TEST-ONLY remediation authorized: `coordination/sessions/M43-C005F-PHASE3-QA-R01/M43_C005F_PHASE3_QA_R01_PROMPT_V01.md`; criteria: `coordination/sessions/M43-C005F-PHASE3-QA-R01/M43_C005F_PHASE3_QA_R01_AUDIT_CRITERIA_V01.md`. Standard/Premium production ceremony/timing is frozen.
-- M43-C005F-PHASE3 owner recovery closure [2026-10-09]: owner states no manual local `project.godot` edits were made after the 2026-10-08 reconciliation and accepts the restored reconciled file as current. Recovery gate = **CLOSED / OWNER ACCEPTED**. Record: `coordination/sessions/M43-C005F-PHASE3/OWNER_DESKTOP_RECOVERY_ACCEPTANCE_V01.md`. Only remaining Phase 3 strict blocker is QA-R01 pack-route test deflake. Updated prompt: `coordination/sessions/M43-C005F-PHASE3-QA-R01/M43_C005F_PHASE3_QA_R01_PROMPT_V02.md`.
-- M43-C005F-PHASE3-QA-R01 strict re-audit [2026-10-09]: test-only implementation `1cb13a244f003f7281e1acc3a0d7f01d8367e407` **PASS**. Standard v07 and Premium p12 now use deterministic production-geometry probing instead of frame-window sampling; Standard **10/10** and Premium **10/10** consecutive PASS; final Phase 3 regression battery **48/48 PASS**; Standard/Premium ceremony and RevealSequencer hashes are byte-identical; persistent owner Desktop `project.godot` hash stayed unchanged. Re-audit: `coordination/sessions/M43-C005F-PHASE3-QA-R01/CHATGPT_INDEPENDENT_REAUDIT_V01.md`. Therefore **M43-C005F-PHASE3 = PASS / AWAITING OWNER VISUAL ACCEPTANCE**. No QA-R02.
-- M43-C005F-PHASE3 owner visual closure [2026-10-09]: owner explicitly accepted all remaining Phase 3 visual gates without further individual runtime review. `SB-M43-C005F-006`, `SB-M43-C005F-008`, and `SB-M43-C005F-009` = **PASS / CLOSED**. Owner record: `coordination/sessions/M43-C005F-PHASE3/OWNER_VISUAL_ACCEPTANCE_V01.md`. **M43-C005F-PHASE3 = PASS / CLOSED.**
-- Owner Parallel-Lane Decision [2026-10-09]: **M43-C005F-PHASE4 — Gameplay→Results + Home State-Change Micro Feel** is authorized as the next isolated ScrubBots presentation milestone, covering only `SB-M43-C005F-010` and `SB-M43-C005F-012`. Prompt: `coordination/sessions/M43-C005F-PHASE4/M43_C005F_PHASE4_MASTER_PROMPT_V01.md`; criteria: `coordination/sessions/M43-C005F-PHASE4/M43_C005F_PHASE4_AUDIT_CRITERIA_V01.md`. F007 remains gated by M44; F011 remains a separate A/B performance/visual decision; F015 remains final end-to-end closure. This Phase4 lane must not modify Remote Content/R2.
-- M43-C005F-PHASE4 strict audit [2026-10-09]: implementation `f44bb280f072d2768b4f41a77742d8bfce037db4` is **PRODUCT TECHNICAL PASS for F010/F012, but MILESTONE CHANGES REQUIRED / QA-R01**. F010 remains nav-first/non-blocking and adds at most one WON-only SMALL HUD bridge; F012 uses an ephemeral Home snapshot with MICRO-only bounded deltas and no refresh spam. The only strict blocker is pre-existing `m55_long_session` baseline debt: final Phase4 battery is 62/63 PASS, and the same two M55 failures reproduce on untouched baseline `bf4d6264`. Audit: `coordination/sessions/M43-C005F-PHASE4/CHATGPT_INDEPENDENT_AUDIT_V01.md`. QA-R01 authorized: `coordination/sessions/M43-C005F-PHASE4-QA-R01/M43_C005F_PHASE4_QA_R01_PROMPT_V01.md`; criteria: `coordination/sessions/M43-C005F-PHASE4-QA-R01/M43_C005F_PHASE4_QA_R01_AUDIT_CRITERIA_V01.md`. QA-R01 must preserve Phase4 product behavior, repair the stale first-use M55 baseline model without weakening steady-state leak bounds, and eliminate the `MetaRewardFeel._play()` await-after-free warning.
-- M43-C005F-PHASE4-QA-R01 strict re-audit [2026-10-10]: implementation `8018d3d7706e0c627b2a7f8ed34450eb2b838641` **PASS / CLOSED**. M55 now records lap-1 first-use UI/content materialization as warm-up evidence while preserving strict lap-2 steady-state gates at exact Node equality / no orphan growth / Object drift <=64 / static-memory drift <=4 MiB, with sensitivity cases proving each violation still fails. `MetaRewardFeel` layout-settle wait is now a static weakref coroutine and the await-after-free warning is 0 occurrences. Corrected M55 = **3/3 consecutive PASS**; final Phase4 battery = **64/64 PASS**. Re-audit: `coordination/sessions/M43-C005F-PHASE4-QA-R01/CHATGPT_INDEPENDENT_REAUDIT_V01.md`. Therefore `SB-M43-C005F-010` and `SB-M43-C005F-012` = **PASS / CLOSED** and **M43-C005F-PHASE4 = PASS / CLOSED**. No QA-R02.
-- Owner Parallel-Lane Decision [2026-10-10]: **M43-C005F-PHASE5 — CleaningEffectsController Saltmire Spark A/B Gate** is authorized for `SB-M43-C005F-011`. This is evaluation-only: M31 native cleaning FX remains the shipping baseline; no permanent per-cell Spark enablement is allowed in this task. Builder must compare native A vs native+Spark B through the canonical FeedbackAdapter, prove 59x59/2x boundedness, Reduced zero-Spark behavior, retry/fail-open/truth invariance, and produce matched A/B runtime evidence. Valid closure outcomes are `SPARK_CANDIDATE_FOR_OWNER_DECISION` or explicit `DO_NOT_USE_SPARK_PER_CELL`. Prompt: `coordination/sessions/M43-C005F-PHASE5/M43_C005F_PHASE5_MASTER_PROMPT_V01.md`; criteria: `coordination/sessions/M43-C005F-PHASE5/M43_C005F_PHASE5_AUDIT_CRITERIA_V01.md`.
-- M43-C005F-PHASE5 independent A/B audit [2026-10-10]: evidence-only implementation `6279ed2f0621dd7568ea8000f910fc3522a15e9f` **TECHNICAL PASS**. Shipping production remained byte-unchanged/native-only; B arm was bounded, fail-open, Reduced-zero-Spark and gameplay-truth invariant; regression **20/20 PASS**. Independent visual review agrees B adds little at normal scale and, when visible, reads as white discs/smudge over the Scrubbot/native cue. Recommendation: **DO_NOT_USE_SPARK_PER_CELL**. Audit: `coordination/sessions/M43-C005F-PHASE5/CHATGPT_INDEPENDENT_AUDIT_V01.md`. F011 waits only for explicit owner decision; no production change is needed if owner accepts the recommendation.
-- M43-C005F-PHASE5 owner closure [2026-10-10]: owner explicitly accepts **DO NOT USE SPARK PER-CELL**. `SB-M43-C005F-011` = **PASS / CLOSED / DO NOT USE SPARK PER-CELL**; shipping per-cell cleaning remains the approved native-only M31 pipeline. Owner record: `coordination/sessions/M43-C005F-PHASE5/OWNER_AB_DECISION_V01.md`. A separate GameFeelFlow usage audit is deferred by owner.
-- iOS Release Track [2026-10-10]: owner is building the iPhone `.ipa` release via **GitHub Actions**. Local preparation reported: Ubuntu + Swift + xtool installed on Windows, App Store Connect API key created. Repository commit `ea70c89c15757b5292316ec8b62e10410b195300` adds only `.github/workflows/ios-ipa.yml`. This release workflow is operationally separate from the Phase5 A/B audit and from the R2/Family APK critical path.
-- Owner Economy Correction [2026-10-09]: current `random_booster_charges` semantics are wrong because they always grant the gameplay booster named `RANDOM`. Owner ruling: a random-booster reward means **one uniformly selected charge from all four canonical boosters** (`+1 Slot`, `Random`, `Selector`, `Tornado`), with stable deterministic selection per reward transaction/ordinal so retry/relaunch never rerolls. Canonical resource becomes `random_any_booster_charges`; Gift Meter 50, Daily D3 and 3/3 Tasks/ScrubBox are in scope; Gift 500/1000 and D5 `selected_booster_charges` remain player-choice. Owner authority: `coordination/OWNER_RANDOM_ANY_BOOSTER_REWARD_CORRECTION_V01.md`. New task `SB-M39-054 / M39-C003` is authorized **before Phase4**; prompt `coordination/sessions/M39-C003/M39_C003_SB_M39_054_RANDOM_ANY_BOOSTER_PROMPT_V01.md`; criteria `coordination/sessions/M39-C003/M39_C003_SB_M39_054_AUDIT_CRITERIA_V01.md`.
-- M39-C003 strict audit [2026-10-09]: implementation `cbb1592da13475f75eb149a0f82d82283e041db8` **PASS / CLOSED**. `random_any_booster_charges` now selects exactly one charge per reward unit from the four canonical boosters via stable SHA-256(tx + ordinal) mapping; duplicate/relaunch cannot reroll; no gameplay/pack/level/solver RNG is consumed. Gift Meter 50, Daily D3, 3/3 Tasks/ScrubBox and Rewarded Ads slot 3 use the corrected semantics; Gift 500/1000 and D5 remain `selected_booster_charges`. Generic presentation is now `Mystery Booster` with neutral gift art, while the gameplay booster `RANDOM` remains unchanged. Final battery **54/54 PASS**. Audit: `coordination/sessions/M39-C003/CHATGPT_STRICT_AUDIT_V01.md`. No R01.
-- Remote Content Runtime V01 preparation [2026-10-06]: ChatGPT published one sync-first CP04/M15 + CP05/M16 master prompt and matching audit criteria under `coordination/sessions/REMOTE-CONTENT-RUNTIME-V01/`. Game-side V1 locks builtin catalog immutability, manifest-declared remote append order, append-only successor safety, `user://content/` confinement, strict declarative `.scrubpack` validation, composite catalog/gameplay resolution, and last-known-good offline recovery. Execution is gated only by final CP03/M14 publisher contract closure; no game code implementation has started yet.
-- CP03/M14 external gate ACCEPTED [2026-10-07]: ChatGPT independently verified LF `main` `16ee1f3f09694d7663e0aa8a39560e8555d12fb8`, `SB-CPX-002-C001-R01 = PASS / CLOSED`, and `M14 CP03/CPX-002 PUBLISHER CORE = PASS / CLOSED`. The replayed ScrubBots authority SHA `2fd60ae69055c6c26c1f5f1b9d3869c743093786` was still exact current ScrubBots `main` at acceptance (0 ahead / 0 behind / 0 changed files). Gate record: `coordination/sessions/REMOTE-CONTENT-RUNTIME-V01/CHATGPT_CP03_M14_GATE_ACCEPTANCE_V01.md`. **CP04/M15 + CP05/M16 execution is authorized now.**
-- Remote Runtime strict V01 audit [2026-10-07]: `coordination/sessions/REMOTE-CONTENT-RUNTIME-V01/CHATGPT_INDEPENDENT_AUDIT_V01.md` evaluates branch `e8662583fe24e9edf17ca595e45d34df778ada75` (1 ahead/0 behind at audit) and returns **CHANGES_REQUIRED / R01**. While CP04 28/28, CP05 15/15, family fixture and root 5329 ALL PASS were builder-reported, source review found that a failed multi-pack candidate can leave a previously verified but unreferenced candidate pack in final `packs/` until later boot. CP05-R01 must clean candidate-owned final directories immediately while never deleting active/LKG. **Do not merge or mark CP04+CP05 fully CLOSED before R01 re-audit.**
-- M53-C002 standalone baseline regression [2026-10-07]: `tests/m53_c002_difficulty_calibration.gd` fails one `fresh run == committed corpus raw (timing excluded)` assertion on untouched `e36e023`, independently of Remote Runtime. This is not a CP04/CP05 product-code regression, but it violates a requested broader regression gate and must not be falsely reported PASS. Queued `SB-M53-C002-R01-001` investigates exact raw-record drift and repairs code or, only with independently audited change authority, regenerates provenance-bound QA evidence. No production Difficulty V2 adoption is implied.
-- CP05-R01 strict re-audit PASS [2026-10-07]: source implementation `19618f6e` closes same-transaction candidate-pack leakage via staging-until-commit and narrow rollback; six new adversarial cases, CP04 28/28, CP05 15/15, family fixture and root 5329 ALL PASS are recorded. Integrated with QA-only M53 diagnostic evidence through PR #8; merged main `09f320044abc0424c6a9916cdbbce4eec047b820`. Audit: `coordination/sessions/REMOTE-CONTENT-RUNTIME-V01/CHATGPT_CP05_R01_REAUDIT_V01.md`.
-- M53-C002 R01 diagnostic decision [2026-10-07]: ChatGPT accepts the root-cause classification as platform-dependent float-to-text evidence serialization, not gameplay/analyzer regression, and selects **Option A**. A serialization-only platform-independent full-precision re-freeze is authorized under `coordination/sessions/M53-C002/CHATGPT_SERIALIZATION_AUTHORITY_DECISION_V01.md`; any decision-level/owner-facing semantic drift must STOP / GPT_REQUIRED.
-- M53-C002 R02 strict audit PASS [2026-10-07]: implementation `f77f087a928eca5ed76c42c20639a7231c657b1c` is accepted and merged through PR #9. The exact determinism assertion remains intact; machine-readable evidence reports `allInvariantsHold=true`, 343/343 old/new derived attributions reproduce, fixture/supply/manifest identities remain unchanged, and no owner-facing decision changed. Audit: `coordination/sessions/M53-C002/CHATGPT_R02_STRICT_REAUDIT_V01.md`. **SB-M53-C002-R01-001 CLOSED.**
-- Storage/CDN PROVISIONING COMPLETE [2026-10-07]: **Cloudflare R2** canonical bucket `scrubbots-content-prod` is provisioned with Standard storage, default jurisdiction, Cloudflare placement `EEUR`. Family Test public `r2.dev` read endpoint is active: `https://pub-dd36dd94999d4beaad95d6409ad0167e.r2.dev/<object-key>`. No publisher write credential has been created or committed. Game/APK remains read-only; write authority must stay publisher-side and outside Git/APK. Canonical record: `coordination/sessions/REMOTE-CONTENT-RUNTIME-V01/OWNER_STORAGE_CDN_DECISION_CLOUDFLARE_R2_V01.md`.
-- VOID cells OWNER DECISION + implementation [2026-10-08] — `SB-VOID-C001` **PASS / CLOSED** by `coordination/sessions/VOID-CELLS-C001/CHATGPT_STRICT_AUDIT_V01.md` (implementation `7d0d148b8609ec04852fdee02f6b8ef37598c616`): transparent artwork pixels are first-class VOID cells (`cells` value `-1`, Level Data `version: 2` only; version-1 files unchanged). VOID is not artwork, starts CLEARED/open, never a candidate/supply/WIN cell, reachability law unchanged. Owner **D1**: VOID renders exactly like CLEARED (BG01, no grid/border). Owner **D2**: production artwork >= 200 non-VOID cells and >= 25% of W*H; envelope 20..59 unchanged. Level Factory may now open its dependent VOID integration against this exact game authority. Difficulty V2 candidate analyzer remains a separate non-production follow-up.
-- Repository cleanup owner scheduling [2026-10-07]: cleanup is intentionally **deferred**. Canonical task `SB-M59-011` is placed after build/clean-clone hygiene and before M60 Release. It begins with DELETE-NOTHING inventory only; actual deletion needs a separate ChatGPT prompt + owner-reviewed candidate set + strict audit. Current Remote Level Update / Family APK testing does not authorize cleanup.
-- Progress: 1014 / 1444 = 70.22%. SB-M53-C002-R01-001 is strict PASS/CLOSED and merged; Remote Content Runtime clean-regression gate is clear. Cloudflare R2 is owner-locked as the primary Remote Level Update infrastructure authority. `SB-M43-R15-001-R01` sequential-unlock remediation is **PASS / CLOSED**. `M43-C005F-PHASE1` plugin foundation (`F001/F002/F013/F014`) is **PASS / CLOSED** with no R2 files touched. Parent R15-001 remains owner-visual-gated. SB-M59-011 final repository cleanup is planned only after V1 feature freeze / M59 release-hygiene gates and is not authorized now.
-- R15-004 owner-placement follow-up audit PASS [2026-10-06]: `coordination/sessions/M43-OWNER-R15/CHATGPT_AUDIT_R15_004_OWNER_F5_PLACEMENT_V01.md` accepts implementation `5200f024b0fbac449a5ac080748392beb27cf201`, merged with the newer Remote Level Update tracker state through PR #7; merged main integration SHA `15a7c3441c97262d505c4f1d0ed32b3acbbab38b`. Rewarded Ads is now under COLLECTION at exactly 210×156, matching SHOP/COLLECTION, with a one-line code-rendered label; functional Rewarded Ads authority remains unchanged. **SB-M43-R15-004 remains OPEN only for OWNER F5 visual acceptance and stays parked behind the Remote Level Update priority.**
-- SB-M43-R15-004 final OWNER VISUAL PASS [2026-10-06]: owner explicitly accepted the latest Home placement (`yerlesim ok`). **SB-M43-R15-004 is CLOSED.**
-- Rewarded Ads sequence OWNER LOCK [2026-10-06]: Slot 1 direct CLAIM → Slot 2 WATCH AD → after verified grant unlock Slot 3 → after verified grant unlock Slot 4 → after verified grant unlock Slot 5. Future slots cannot be started early; no-grant outcomes do not advance. No Home badge is required. **Implemented and strict-audited PASS/CLOSED on 2026-10-08 as `SB-M43-R15-001-R01`, implementation `f4448d473d2c6bd62be3a83d31299eedea50b6ec`; audit `coordination/sessions/M43-OWNER-R15/CHATGPT_AUDIT_R15_001_R01_SEQUENTIAL_UNLOCK_V01.md`.** Parent R15-001 visual owner gate remains open.
-- R15-004 independent technical audit PASS [2026-10-06]: `coordination/sessions/M43-OWNER-R15/CHATGPT_AUDIT_R15_004_V01.md` accepts code commit `1de7775` / final Claude branch `f2a6125ea9823d4bf8c0c49d7543087fe7d17917`, merged by fast-forward to `main`. The owner-uploaded Rewarded Ads PNG remains byte-identical at Git blob `8af3efe972c10010ca429c4aca958ecf0c3cd0f6`. The prompt's stale SHA-256 `e25529bd...378f` is superseded by the owner's committed-master decision and canonical pin `ce96e09a...6c8b`. HOME-122/binder/presentation integration, shortcut-family styling, geometry and navigation preservation PASS. **SB-M43-R15-004 remains OPEN only for OWNER F5 visual acceptance.**
-- R15 V01 independent technical audit PASS [2026-10-06]: `coordination/sessions/M43-OWNER-R15/CHATGPT_AUDIT_V01.md` accepts implementation `24828bb` / final Claude branch `9fcb18ffe5547477b79f0eba193be65e76b731e3`, merged by fast-forward to `main`. Rewarded Ads authority/idempotency, Settings behavior preservation and Daily containment source/test contracts PASS. **SB-M43-R15-001..003 remain OPEN only for fresh OWNER F5 visual acceptance.** Claude again used a cloud clone rather than the owner-local checkout; this is recorded as a non-blocking process deviation and the next implementation prompt must restore the standing owner-local non-destructive sync rule.
-- Owner visual rejection [2026-10-06]: Rewarded Ads Home functionality/placement is present, but the temporary green native CTA is visually rejected because it does not match the approved SHOP / COLLECTION / TASKS / DAILY shortcut language. Owner supplied and approved an exact text-free replacement icon master (Scrubby + video/play + Scrub Bucks + Hearts; no coins, no baked text). R15-004 is presentation-only; Settings/Daily review remains separate.
-- Owner runtime review [2026-10-06, F5 main]: owner reviewed the supplied live screens and said **everything shown is OK except two visual defects plus one new requested surface**. Accepted in this review: Collection/list + set detail states, Cards Exchange empty state, Robots, Gift Bar, Profile, Achievements, Notifications, Shop, Life, Events empty state and Tasks. **Not accepted yet:** Daily Rewards layout because art protrudes outside its intended table/popup bounds; Settings because the dark generic panel does not match the SCRUBBOTS visual language. **New owner request:** add a separate REWARDED ADS button/surface with five rewards per local day: reward 1 is immediately claimable, rewards 2-5 each require one successfully completed verified rewarded video. This review does not constitute SB-M43-168 sound/haptic acceptance.
-- Owner visual decision [2026-10-04]: SB-M43-064 V01 technical audit PASS is retained, but the shipping composition is OWNER REJECTED. Required V02 flow is pack alone -> Tap 1 -> animated 01→09 -> cards emerge -> pack gone/3-card hold -> Collection upper-left + Card Exchange upper-right -> Tap 2 -> NEW routes to Collection / DUPLICATE routes to Card Exchange -> complete. Remediation prompt/criteria are `coordination/sessions/M43-C005-C006/CHATGPT_PROMPT_V02.md` and `CHATGPT_AUDIT_CRITERIA_V02.md`.
-- Note: M43-C005-C005 independent audit PASS is recorded in `coordination/sessions/M43-C005-C005/CHATGPT_AUDIT_V01.md`. The reusable production RevealSequencer is presentation-only and Results now uses it without changing receipt/economy/navigation truth. **SB-M43-063 is CLOSED.** Production M43-C005 advances to SB-M43-064 Standard Pack presentation.
-- M43-C005-C006 V02 independent technical audit PASS [2026-10-04]: commit `10144f6e21e3925601b2cc1269835fa2562a1c2f` implements the owner-required two-tap Standard Pack flow and passes source/runtime evidence audit. **SB-M43-064 remains OPEN only for OWNER VISUAL PASS.** Premium SB-M43-065 must not start before that decision.
-- V03 owner visual rejection [2026-10-04]: owner observed that the FULL animation does not make all 01→09 beats visibly distinct and that several Standard frame PNGs retain dirty dark rectangular backgrounds. Historical manifest values for 05/07/09 corroborate a 928×1440 opaque matte rectangle. ChatGPT issued `CHATGPT_PROMPT_V03.md` + `CHATGPT_AUDIT_CRITERIA_V03.md`; V02 owner visual approval is not granted.
-- V03 independent technical audit PASS [2026-10-04]: `coordination/sessions/M43-C005-C006/CHATGPT_AUDIT_V03.md` accepts commit `ebc7644a95a1637c2c19c0478a36a3e8a56c62ba`. All nine shipping frames pass the clean-alpha/matte gate; V03 candidate/final blobs match 9/9; FULL runtime uses exact 01→09 with >=0.18 s holds for 01..08. **SB-M43-064 remains OPEN for fresh OWNER VISUAL PASS.**
-- Owner Review Harness [2026-10-04]: V01 was built against V02 and is historical/stale after V03 timing/asset remediation. ChatGPT has now issued `owner_review_harness/CHATGPT_PROMPT_V02.md` + `CHATGPT_AUDIT_CRITERIA_V02.md` to rebaseline the same review-only F6 harness to the audited V03 ceremony/assets without changing production.
-- Owner Review Harness V02 independent audit PASS [2026-10-04]: `coordination/sessions/M43-C005-C006/owner_review_harness/CHATGPT_AUDIT_V02.md` accepts commit `a0e5e46141ef0253be1001394834e035bb43cdc8`. Harness controller/scene and V03 production remain byte-identical; current actor is **OWNER** for live F6 visual approval. Claude's screenshots are not owner acceptance.
-- SB-M43-064 final OWNER VISUAL PASS [2026-10-04]: owner reviewed the live V03 Standard Pack ceremony in Godot and explicitly answered **OK**. Acceptance is recorded in `coordination/sessions/M43-C005-C006/OWNER_VISUAL_ACCEPTANCE_V03.md`. **SB-M43-064 is CLOSED.** Frontier advances to SB-M43-065 Premium Card Pack.
-- SB-M43-065 V01 independent technical audit PASS [2026-10-04]: `coordination/sessions/M43-C005-C007/CHATGPT_AUDIT_V01.md` accepts commit `31f8e8f03807cacb00bd7ea0d91a2b727b784f35`. Premium ships exactly five committed cards, preserves CardPackService's card-0 Rare-or-better truth, uses clean 01→09 Premium frames, centered 3+2 hold, two-tap destination routing, Reduced Effects parity, and passes Standard non-regression. **SB-M43-065 remains OPEN for OWNER VISUAL PASS.** SB-M43-066 stays blocked.
-- SB-M43-065 final OWNER VISUAL PASS [2026-10-04]: owner reviewed the live Premium ceremony in Godot and explicitly answered **OK**. Acceptance is recorded in `coordination/sessions/M43-C005-C007/OWNER_VISUAL_ACCEPTANCE_V01.md`. **SB-M43-065 is CLOSED.** Frontier advances to SB-M43-066 atomic pack commit/presentation transaction.
-- SB-M43-066 V01 independent audit FAIL [2026-10-04]: `coordination/sessions/M43-C005-C008/CHATGPT_AUDIT_V01.md` found one blocking fail-closed import defect: missing legacy C008 sections and explicitly present empty/malformed `packs` / `pack_receipts` sections are conflated through default `{}` values. Core transaction/rollback/replay design is retained. Targeted V02 prompt/criteria are `CHATGPT_PROMPT_V02.md` / `CHATGPT_AUDIT_CRITERIA_V02.md`.
-- SB-M43-066 V02 independent audit PASS [2026-10-05]: `coordination/sessions/M43-C005-C008/CHATGPT_AUDIT_V02.md` accepts commit `8b3af91614310240f63ad93fc38fc1d05854ae46`. Legacy absent C008 sections remain compatible; explicitly present empty/partial `packs` / `pack_receipts` now fail closed; atomic commit/replay/RNG/set-master guarantees remain intact. **SB-M43-066 is CLOSED.** Frontier advances to SB-M43-067.
-- SB-M43-067 V01 independent technical audit PASS [2026-10-05]: `coordination/sessions/M43-C005-C009/CHATGPT_AUDIT_V01.md` accepts commit `bf33ef28072e8ac825783aff3f85389248a985cf`. Card state is derived only from committed `is_new` / `copies_after`; NEW shows FIRST COPY with one restrained canonical glow/pop; DUPLICATE shows EXTRAS x(copies_after-1); Standard/Premium layouts, routing, C008 authority and accepted assets remain intact. **SB-M43-067 remains OPEN for OWNER VISUAL PASS.**
-- SB-M43-067 final OWNER VISUAL PASS [2026-10-05]: owner reviewed all live Standard/Premium review modes and said **"hepsi OK"**. Acceptance: `coordination/sessions/M43-C005-C009/OWNER_VISUAL_ACCEPTANCE_V01.md`. **SB-M43-067 is CLOSED.** Owner workflow now issues remaining M43 as one milestone-wide master.
-- M43 master partial-run note [2026-10-05]: Claude stopped because of its usage limit after pushing 55 child logs through C007R. Remote `main` at the stop point was `a217122a5336d050b0b99b1389408b0041e82e8d`. M43-C008 Robots remained as uncommitted Desktop WIP and is **not audited/accepted**. ChatGPT issued `coordination/sessions/M43-MASTER-V01/M43_MASTER_RESUME_V02.md`; independent audit remains deferred until the final milestone handoff.
-- M43 master V01 independent audit [2026-10-06]: `coordination/sessions/M43-MASTER-V01/CHATGPT_MASTER_AUDIT_V01.md` audits final HEAD `cb8ca9d0659e8edd6ead51c4bfbb23803a7de580`. Master execution/governance and final 5,323/5,323 regression are accepted, but the milestone is **PARTIAL FAIL**. Independent status is 86 technical-pass children, 6 technical failures, 33 blocked authority children, 21 deferred dependencies. Targeted remediation: `M43_MASTER_REMEDIATION_V03.md`. M44 must not start.
-- M43 master V04 cross-platform closure issued [2026-10-06]: Claude V03 remediation is pushed on `claude/practical-darwin-ndbmxa` (3 commits ahead of the pre-prompt main baseline). Claude independently reproduced two pre-existing failures on the untouched baseline: M41 whole-economy equality is invalid because fresh AppStates have OS-seeded pack RNG state, and LevelImporter writes a raw dot-segment destination even though its canonical path contract requires `simplify_path()`. ChatGPT chose the narrow contracts: test-only M41 comparison normalization with production RNG unchanged; production LevelImporter I/O through resolved/simplified paths, not a fake test directory. Prompt: `coordination/sessions/M43-MASTER-V01/M43_MASTER_REMEDIATION_V04_CROSS_PLATFORM_CLOSURE.md`.
-- M43-C005 sequencing clarification [2026-10-03]: **do not leave M43-C005 after C004.** Once the exact Booster-of-your-choice intake passes independent audit and closes SB-M43-076, continue inside M43-C005 with production ceremony implementation, beginning at **SB-M43-063** and proceeding through the applicable SB-M43-064..075/077 work plus the already-planned C005R/C005F gates as sequenced. M43-C006/M43-C007 are later destinations.
-- Plugin-planning note [2026-10-03]: GameFeelFlow + Saltmire Spark integration is fully planned in future M43-C005F plus M46/M47/M50/M54/M55/M59 gates. It does **not** interrupt the current SB-M43-064 owner visual gate. Presentation-only/fail-open is owner-locked; canonical plugin intake/API/license verification remains the first future integration gate.
-- MAINT-SUPPLY-COLUMNS-C001 Audit Result: `PASS / CLOSED` by `coordination/sessions/MAINT-SUPPLY-COLUMNS-C001/CHATGPT_AUDIT_V01.md`; shipping supply plans now support exactly 3/4/5 columns with visible preview depth fixed at 3, existing 3-column plans retained, baseline five-slot solve authority retained, and no global robot/batch cap reintroduced. This maintenance closure does not interrupt active M42-C003 V03.
-- Retention roadmap expansion [OWNER APPROVED 2026-09-30]: add Next-Level Curiosity, 10-Level Cleaning Journey, Results→Next momentum, Collection pity/first-set sprint, Gift Meter micro-progress, Daily Scrub Orders, earned ScrubBox, Weekly Mini Event, First-Try Challenge, personal-best/self-ghost comparison, Comeback Catch-Up and smarter notification prioritization. Explicit exclusions: **no Daily streak rule change, no Early Robot Unlock pacing change, no World Diorama, no duplicate Robot Personality Loop work, and no Asynchronous Social feature** from this approval.
-- Owner sequencing lock: (1) SB-M42-035 Home Scrubby Runtime Animation against the owner-approved 1.612 hero; (2) after technical + owner animation acceptance, resume existing M43/meta roadmap.
-- Player-experience roadmap expansion [OWNER REQUEST 2026-09-26]: TASKS now explicitly plans all identified missing player-facing screens, popups, acquisition flows, fail-recovery, FTUE/feature unlocks, Shop/Collection/Robots/Tasks/Daily/Gift surfaces, BottomNav destinations, Events/Ranks/Profile/Achievements, world progression, notifications/comeback, cloud/account recovery, meta audio/haptics, analytics, rewarded ads/IAP and later Friends/social comparison. This planning expansion does **not** interrupt the locked First 10 sequence; implementation sequencing is decided after the First 10 block closes.
+- Older status bullets and all completed items: `docs/migration/legacy-task-trackers/TASKS_ARCHIVE_2026-10-22.md`.
 
 ## Tasks
 # SCRUBBOTS — MASTER TASK PLAN
@@ -795,9 +711,6 @@ Home preproduction note (owner decision 2026-09-18): `assets/ui/HOME_ASSET_MANIF
 Canonical discovery index for Claude/Godot UI integration:
 `assets/ui/VISUAL_ASSET_INDEX.md`
 
-- [x] SB-UI-VIS-001 Phase 1 core visual production completed: 306 / 306 canonical targets produced and published.
-- [x] SB-UI-VIS-002 Phase 2 main visual batch P2-001..P2-144 completed and published, including branding/system assets, reusable UI kit, booster states, canonical 10-robot presentation families, and system-state icons.
-- [x] SB-UI-VIS-003 Collection extraction completed: all 15 sets × 9 cards = 135 individual canonical card PNGs exist under `assets/ui/final/collection/cards/set_01..set_15/`.
 - [ ] SB-UI-VIS-004 Integrate/audit the final visual-closure batch P2-145..P2-157 from `codex/visual-assets-production` into `main`. Source commit: `65b26242f996f210a923b4536c7083f6f2d005cc`. This batch contains 9 robot-perk icons, 3 Collection state assets, and the canonical 10-robot Cleaning Crew group art.
 - [ ] SB-UI-VIS-005 After P2-145..P2-157 integration, refresh/verify the `main` copy of `assets/ui/VISUAL_ASSET_INDEX.md` so Claude sees the final 157 / 157 Phase 2 targets and complete production paths.
 - [ ] SB-UI-VIS-006 Before UI milestone closure, perform owner/Claude pixel-level QA of production assets actually used on-screen: alpha edges, text/watermark absence, mobile readability, identity consistency, compression/import settings. Path existence alone is not visual acceptance.
@@ -825,208 +738,47 @@ railroad collision/congestion/lane-separation presentation; optional railroad gl
 Verified complete via repo inspection + this session's re-run of
 `tools/verify_project.ps1` and `godot --version`.
 
-- [x] SB-M00-001 Canonical project directory created.
-- [x] SB-M00-002 Git repository connected (`origin` = canonical remote).
-- [x] SB-M00-003 `main` branch configured and tracked.
-- [x] SB-M00-004 Godot project created (`project.godot` valid).
-- [x] SB-M00-005 Directory architecture created.
-- [x] SB-M00-006 `.gitignore` created.
-- [x] SB-M00-007 `CLAUDE.md` created.
-- [x] SB-M00-008 Initial documentation created (`docs/00`–`06`).
-- [x] SB-M00-009 Bootstrap scene created (`scenes/app/main.tscn`).
-- [x] SB-M00-010 Verification helpers created (`tools/*.ps1`).
-- [x] SB-M00-011 Godot 4.7.1-stable installed (winget, `GodotEngine.GodotEngine`).
-- [x] SB-M00-012 Godot CLI path verified (`godot --version` → `4.7.1.stable.official.a13da4feb`).
-
 Historical M00 version note: the two completed rows above record the version used when M00 was closed. The current project development version is Godot **4.7.2-stable**; do not reinterpret those historical checkboxes as the current runtime/toolchain declaration.
-- [x] SB-M00-013 Headless bootstrap test succeeds (`--headless --path . --quit`, no errors).
-- [x] SB-M00-014 Main scene parses (confirmed via headless boot).
-- [x] SB-M00-015 Existing GDScript parses (confirmed via headless test run).
-- [x] SB-M00-016 Bootstrap committed/pushed (`58caeab`, on `origin/main`).
 
 ### M01 — Variable-Size Level Data Core
 
 Complete from Prompt 02. Re-verified this session (files exist, test suite
 passes).
 
-- [x] SB-M01-001 Level Data V1 implemented (`scripts/data/level_data.gd`).
-- [x] SB-M01-002 Width stored in level data.
-- [x] SB-M01-003 Height stored in level data.
-- [x] SB-M01-004 Cell count derived (`get_cell_count() = width * height`, never stored).
-- [x] SB-M01-005 Palette stored separately (array of hex strings, id = index).
-- [x] SB-M01-006 Cell palette IDs compact (`PackedInt32Array`, not per-cell strings).
-- [x] SB-M01-007 JSON loader implemented (`level_loader.gd`).
-- [x] SB-M01-008 Validator implemented (`level_validator.gd`).
-- [x] SB-M01-009 Malformed JSON handled (tested, rejected cleanly).
-- [x] SB-M01-010 Unsupported version rejected (tested).
-- [x] SB-M01-011 Invalid dimensions rejected (width/height ≤ 0, tested).
-- [x] SB-M01-012 Wrong cell count rejected (tested).
-- [x] SB-M01-013 Invalid palette ID rejected (tested).
-- [x] SB-M01-014 Generic dimension support proven (3×2 fixture).
-- [x] SB-M01-015 40×40 loads (1,600 cells, tested).
-- [x] SB-M01-016 50×50 loads (2,500 cells, tested).
-- [x] SB-M01-017 3×2 loads as generic test fixture (tested).
-- [x] SB-M01-018 Explicit preload convention documented (ADR-009).
-
 ### M02 — BoardState Core
 
 Complete from Prompt 02, re-verified.
-
-- [x] SB-M02-001 BoardState exists (`scripts/gameplay/board/board_state.gd`).
-- [x] SB-M02-002 Runtime state separate from LevelData (BoardState built via `from_level_data`, never mutates source).
-- [x] SB-M02-003 Source color data copied safely (`_color_ids = level.cells.duplicate()`).
-- [x] SB-M02-004 ACTIVE state implemented (`CellState.ACTIVE = 0`; fresh board all-ACTIVE).
-- [x] SB-M02-005 CLEARED state implemented (`CellState.CLEARED = 1`).
-- [x] SB-M02-006 Coordinate validation exists (`is_valid_coordinate`).
-- [x] SB-M02-007 Index validation exists (`is_valid_index`).
-- [x] SB-M02-008 Coordinate→index exists (`get_cell_index`).
-- [x] SB-M02-009 Index→coordinate exists (`get_cell_position`).
-- [x] SB-M02-010 Cell color lookup exists (`get_color_id`).
-- [x] SB-M02-011 Cell state lookup exists (`get_cell_state`).
-- [x] SB-M02-012 State mutation exists (`set_cell_state`).
-- [x] SB-M02-013 State counting exists (`count_cells_by_state`).
-- [x] SB-M02-014 Instance independence tested (two BoardStates from same LevelData don't share state).
-- [x] SB-M02-015 LevelData immutability behavior tested.
-- [x] SB-M02-016 No one-Node-per-cell architecture exists (flat `PackedInt32Array`/`PackedByteArray`).
-- [x] SB-M02-017 Add RESERVED only when reservation architecture is designed (see M14). — resolved by ADR-022: reservation is a separate assignment layer; BoardState remains ACTIVE/CLEARED only.
 
 ### M03 — Official Difficulty Bands + 59×59 Envelope
 
 Historical runtime-validator milestone. Difficulty V1 later superseded class=dimension as player-facing truth, but the completed compatibility implementation remains audited evidence until separately migrated.
 
 **Documentation**
-- [x] SB-M03-001 Search docs for old claim that 40×40 is "standard."
-- [x] SB-M03-002 Search docs for claim 50×50 is the Very Hard requirement without a range.
-- [x] SB-M03-003 Search for `2500` used as a maximum.
-- [x] SB-M03-004 Update `CLAUDE.md`.
-- [x] SB-M03-005 Update project brief.
-- [x] SB-M03-006 Update gameplay specification.
-- [x] SB-M03-007 Update technical architecture.
-- [x] SB-M03-008 Update Level Data spec.
-- [x] SB-M03-009 Update roadmap.
-- [x] SB-M03-010 Update test strategy.
-- [x] SB-M03-011 Add/amend ADR for official difficulty dimension bands (ADR-010).
 
 **Production difficulty representation**
-- [x] SB-M03-012 Define canonical legacy runtime production difficulty IDs (`DifficultyRules`).
-- [x] SB-M03-013 EASY = dimensions 20..29.
-- [x] SB-M03-014 MEDIUM = dimensions 30..39.
-- [x] SB-M03-015 HARD = dimensions 40..49.
-- [x] SB-M03-016 VERY_HARD = dimensions 50..59.
-- [x] SB-M03-017 Keep TEST/dev fixture concept separate.
-- [x] SB-M03-018 Production validator rejects TEST.
 
 **Validation**
-- [x] SB-M03-019 Add production difficulty/dimension validation.
-- [x] SB-M03-020 Accept Easy rectangular boards.
-- [x] SB-M03-021 Accept Medium rectangular boards.
-- [x] SB-M03-022 Accept Hard rectangular boards.
-- [x] SB-M03-023 Accept Very Hard rectangular boards.
-- [x] SB-M03-024 Reject cross-band Easy dimensions.
-- [x] SB-M03-025 Reject cross-band Medium dimensions.
-- [x] SB-M03-026 Reject cross-band Hard dimensions.
-- [x] SB-M03-027 Reject cross-band Very Hard dimensions.
-- [x] SB-M03-028 Produce explicit errors.
 
 ### M04 — Expanded Board Fixtures & Test Matrix
 
 Do not replace existing Prompt 02 fixtures — add to them.
 
-- [x] SB-M04-001 3×2 generic non-square fixture exists.
-- [x] SB-M04-002 20×20.
-- [x] SB-M04-003 29×29.
-- [x] SB-M04-004 20×27.
-- [x] SB-M04-005 30×30.
-- [x] SB-M04-006 39×39.
-- [x] SB-M04-007 34×39.
-- [x] SB-M04-008 40×40 generic fixture exists.
-- [x] SB-M04-009 49×49.
-- [x] SB-M04-010 48×41.
-- [x] SB-M04-011 50×50 generic fixture exists.
-- [x] SB-M04-012 59×59.
-- [x] SB-M04-013 53×59.
-- [x] SB-M04-014 Easy 20×30 fails legacy production validation.
-- [x] SB-M04-015 Medium 39×40 fails.
-- [x] SB-M04-016 Hard 49×50 fails.
-- [x] SB-M04-017 Very Hard 49×59 fails.
-- [x] SB-M04-018 59×59 loads successfully.
-- [x] SB-M04-019 `cell_count == 3481`.
-- [x] SB-M04-020 Coordinate/index tests pass at 59×59.
-- [x] SB-M04-021 State mutation tests pass at 59×59.
-- [x] SB-M04-022 Performance sanity benchmark runs at 3,481 cells.
-- [x] SB-M04-023 Record results without arbitrary strict timing threshold.
-
 ### M05 — Test Harness Maturity
 
-- [x] SB-M05-001 Headless test script exists.
-- [x] SB-M05-002 Test process returns failure exit code.
-- [x] SB-M05-003 Current tests print PASS/failure information.
-- [x] SB-M05-004 No third-party test framework required.
-- [x] SB-M05-005 Current baseline checks pass.
 - [ ] SB-M05-006 Organize test sections as suite grows.
 - [ ] SB-M05-007 Separate performance benchmark output from assertions.
 - [ ] SB-M05-008 Add one-command PowerShell full-test wrapper if useful.
 - [ ] SB-M05-009 Add regression test conventions to docs.
 - [ ] SB-M05-010 Ensure future milestone completion requires regression pass.
 
-### M06 — Board Renderer
-
-- [x] SB-M06-001 Define BoardRenderer responsibility.
-- [x] SB-M06-002 Keep BoardRenderer separate from BoardState.
-- [x] SB-M06-003 Evaluate efficient Godot rendering options.
-- [x] SB-M06-004 Choose Image/ImageTexture technique.
-- [x] SB-M06-005 Record technique in ADR.
-- [x] SB-M06-006 Render arbitrary width/height.
-- [x] SB-M06-007 Support rectangular board aspect ratio.
-- [x] SB-M06-008 Preserve logical pixel boundaries.
-- [x] SB-M06-009 Disable unwanted texture filtering.
-- [x] SB-M06-010 Render palette colors correctly.
-- [x] SB-M06-011 Render 20×20.
-- [x] SB-M06-012 Render 29×29.
-- [x] SB-M06-013 Render 39×39.
-- [x] SB-M06-014 Render 49×49.
-- [x] SB-M06-015 Render 50×50.
-- [x] SB-M06-016 Render 59×59.
-- [x] SB-M06-017 Render representative rectangular boards.
-- [x] SB-M06-018 Expose logical-cell center coordinate.
-- [x] SB-M06-019 Support efficient individual-cell update.
-- [x] SB-M06-020 Support full reset.
-- [x] SB-M06-021 Benchmark 3,481-cell display.
-- [x] SB-M06-022 Confirm no 3,481-cell Node tree exists.
-
 ### M07 — Visual Reference Library `[VISUAL REFERENCE]`
 
-- [x] SB-M07-001 Establish reference directory structure.
-- [x] SB-M07-002 Create visual-reference README/guide.
-- [x] SB-M07-003 Separate original SCRUBBOTS art from external inspiration.
-- [x] SB-M07-004 Define canonical asset naming.
-- [x] SB-M07-005 Define asset type metadata.
-- [x] SB-M07-006 Define owner-approved status.
-- [x] SB-M07-007 Preserve source file originals.
-- [x] SB-M07-008 Inventory Scrubbot character visuals supplied by owner.
-- [x] SB-M07-009 Inventory gameplay-screen references supplied by owner.
-- [x] SB-M07-010 Inventory five-slot visual references.
 - [ ] SB-M07-011 Inventory level images beyond current M21 source as they are supplied/approved.
 - [ ] SB-M07-012 Inventory underwater level artwork if supplied.
 - [ ] SB-M07-013 Inventory other original theme artwork.
-- [x] SB-M07-014 Inventory pixel-construction reference screenshots.
-- [x] SB-M07-015 Inventory external movement references separately.
-- [x] SB-M07-016 Flag unavailable assets as `AWAITING OWNER ASSET`.
-- [x] SB-M07-017 Never regenerate missing references and label them originals.
 
 **Master UI / generated visual reference tasks (from UI_TASKS_APPENDIX migration)**
-- [x] SB-UI-001 Treat `docs/MASTER_UI_SYSTEM.md` as the UI architecture source of truth.
-- [x] SB-UI-002 Treat `ASSET_GENERATION_MANIFEST.json` as the machine-readable generation/provenance queue.
-- [x] SB-UI-003 Keep approved provider decisions scoped by asset type and newest owner decisions.
-- [x] SB-UI-004 Do not add unapproved generation providers as project runtime dependencies.
-- [x] SB-UI-005 Import owner visual references copy-only.
-- [x] SB-UI-006 Preserve originals/copies byte-for-byte and inventory before promotion.
-- [x] SB-UI-007 Classify owner references.
 - [ ] SB-UI-008 Select and record canonical Scrubby master reference before final Scrubby production generation.
-- [x] SB-UI-009 Select canonical gameplay-screen art-direction reference.
-- [x] SB-UI-010 Select canonical Home-screen art-direction reference.
-- [x] SB-UI-011 Select canonical popup/level-intro references.
-- [x] SB-UI-012 Identify conflicting/outdated references and retain as non-canonical history.
 - [ ] SB-UI-013 Validate manifest reference paths/IDs after canonical references are selected.
 
 ### M08 — Level Art Technical Audit `[CONTENT] [VISUAL REFERENCE]`
@@ -1050,205 +802,25 @@ Per candidate production pixel-art level:
 
 ### M09 — Pixel Art → Level Data Pipeline `[CONTENT]`
 
-- [x] SB-M09-001 Create importer tool.
-- [x] SB-M09-002 Read source pixels exactly.
-- [x] SB-M09-003 Determine width.
-- [x] SB-M09-004 Determine height.
-- [x] SB-M09-005 Determine/validate legacy compatibility difficulty where required.
-- [x] SB-M09-006 Extract unique palette.
-- [x] SB-M09-007 Produce stable palette ordering.
-- [x] SB-M09-008 Convert pixels to palette IDs.
-- [x] SB-M09-009 Flatten using canonical row-major mapping.
-- [x] SB-M09-010 Produce Level Data V1.
-- [x] SB-M09-011 Store source-asset metadata where useful.
-- [x] SB-M09-012 Deterministic output.
-- [x] SB-M09-013 Re-running importer produces no meaningless diff.
-- [x] SB-M09-014 Reconstruct image from generated data.
-- [x] SB-M09-015 Pixel-compare reconstruction.
-- [x] SB-M09-016 Generate preview.
-- [x] SB-M09-017 Reject unsupported/broken art with useful reason.
-- [x] SB-M09-018 Batch import.
-- [x] SB-M09-019 Batch validation.
-- [x] SB-M09-020 Duplicate level ID protection.
-
 **M09 palette-lock note:** M09's completed exact-source-pixel importer remains valid historical/generic tooling evidence, but production acceptance additionally obeys current canonical palette/art/difficulty systems. Historical completion is not rewritten.
-
-### M10 — ACTIVE/CLEARED Board Visual Model `[OWNER DECISION LOCKED]`
-
-- [x] SB-M10-001 ACTIVE appearance locked to original source palette color, opaque.
-- [x] SB-M10-002 CLEARED appearance locked to alpha 0/background visible.
-- [x] SB-M10-003 Define artwork-clearing relationship.
-- [x] SB-M10-004 Implement visual mapping.
-- [x] SB-M10-005 Owner-confirm clearing readability.
-- [x] SB-M10-006 Owner-confirm ACTIVE artwork recognition.
-- [x] SB-M10-007 Owner test Easy density.
-- [x] SB-M10-008 Owner test Medium density.
-- [x] SB-M10-009 Owner test Hard density.
-- [x] SB-M10-010 Owner test Very Hard density.
-- [x] SB-M10-011 Owner test 59×59 transparent-model readability.
-- [x] SB-M10-012 Development debug tool migrated/proven.
-
-### M11 — Gameplay Session Core
-
-- [x] SB-M11-001 Define session states.
-- [x] SB-M11-002 Initialize level.
-- [x] SB-M11-003 Load LevelData.
-- [x] SB-M11-004 Create BoardState.
-- [x] SB-M11-005 Connect renderer.
-- [x] SB-M11-006 Define ready state.
-- [x] SB-M11-007 Define active state.
-- [x] SB-M11-008 Define pause.
-- [x] SB-M11-009 Define reset.
-- [x] SB-M11-010 Define completion transition.
-- [x] SB-M11-011 Keep UI separate from gameplay truth.
-- [x] SB-M11-012 Headless lifecycle tests.
 
 ### M12 — Five-Slot Logic
 
-- [x] SB-M12-001 Create SlotState.
-- [x] SB-M12-002 Create SlotSystem.
-- [x] SB-M12-003 Configure five gameplay slots.
-- [x] SB-M12-004 Slot identity.
-- [x] SB-M12-005 Slot palette/color.
-- [x] SB-M12-006 Slot availability.
-- [x] SB-M12-007 Slot activity state.
-- [x] SB-M12-008 Keep model separate from UI.
-- [x] SB-M12-009 Query API.
-- [x] SB-M12-010 Five-slot tests.
-- [x] SB-M12-011 Invalid slot tests.
-
 Remaining slot mechanics are `[DESIGN GATE]` except where newer owner decisions explicitly lock behavior.
-
-### M13 — Color Candidate Index `[PERFORMANCE]`
-
-- [x] SB-M13-001 Define color candidate.
-- [x] SB-M13-002 Group/query by color.
-- [x] SB-M13-003 Implement efficient index/cache if measured useful.
-- [x] SB-M13-004 Synchronize with BoardState.
-- [x] SB-M13-005 Remove CLEARED cells from the index.
-- [x] SB-M13-006 Handle caller exclusions/reservations seam.
-- [x] SB-M13-007 No-candidate query.
-- [x] SB-M13-008 Exhausted-color test.
-- [x] SB-M13-009 Last-candidate test.
-- [x] SB-M13-010 3,481-cell benchmark.
-
-### M14 — Reservation State
-
-- [x] SB-M14-001 Define reservation ownership.
-- [x] SB-M14-002 Decide RESERVED placement.
-- [x] SB-M14-003 Record decision.
-- [x] SB-M14-004 Reserve target atomically.
-- [x] SB-M14-005 Prevent double reservation.
-- [x] SB-M14-006 Release on dispatch failure.
-- [x] SB-M14-007 Release on reset.
-- [x] SB-M14-008 Resolve arrival.
-- [x] SB-M14-009 Concurrency tests.
 
 ### M15 — TargetSelector
 
 M15 strict closure remains accepted. V04 later superseded only its target ordering policy while preserving strict safety contracts.
 
-- [x] SB-M15-001 Create TargetSelector.
-- [x] SB-M15-002 Keep BoardState access narrow.
-- [x] SB-M15-003 Deterministic strategy. **Current production ordering is owner rule §8.10A: bottom-most then left-most among targetable candidates.**
-- [x] SB-M15-004 Match Scrubbot color.
-- [x] SB-M15-005 Never target CLEARED.
-- [x] SB-M15-006 Never target invalid or blocked/unreachable ACTIVE cells.
-- [x] SB-M15-007 Respect reservations.
-- [x] SB-M15-008 Return no-target cleanly.
-- [x] SB-M15-009 No route generation inside selector.
-- [x] SB-M15-010 Determinism tests.
-- [x] SB-M15-011 Simultaneous assignment tests.
-- [x] SB-M15-012 3,481-cell benchmark.
-
-### M16 — RoutingSystem Interface
-
-- [x] SB-M16-001 Define RoutingSystem contract.
-- [x] SB-M16-002 Define route input.
-- [x] SB-M16-003 Define route output.
-- [x] SB-M16-004 Define coordinate space.
-- [x] SB-M16-005 Slot origin.
-- [x] SB-M16-006 Cell destination.
-- [x] SB-M16-007 Keep independent from TargetSelector.
-- [x] SB-M16-008 Swappable implementations.
-- [x] SB-M16-009 Debug route visualization.
-- [x] SB-M16-010 Route validity checks.
-- [x] SB-M16-011 Failure behavior/no silent retarget.
-
 ### M17 — Routing Prototype Lab / Production Routing
 
 M17-C002 V03 strict full-surface audit remains accepted as the pre-V07 production-routing baseline. V07 added the adjacent one-cell exterior ring and remains valid historical M21 evidence. The 2026-09-14 owner decision in `OWNER_SCRUBBOT_RAILROAD_DECISION_V01.md` supersedes that exact exterior geometry for future production once M22 V02 passes audit; the M17 safety contracts remain mandatory.
 
-- [x] SB-M17-001 Direct route baseline.
-- [x] SB-M17-002 Grid-aware route prototype.
-- [x] SB-M17-003 Organized polyline/curved prototype.
-- [x] SB-M17-004 Compare visual clarity.
-- [x] SB-M17-005 Compare path crossings.
-- [x] SB-M17-006 Compare congestion.
-- [x] SB-M17-007 Compare CPU cost.
-- [x] SB-M17-008 Compare route distance.
-- [x] SB-M17-009 Compare determinism.
-- [x] SB-M17-010 Owner-selected organized/curved production movement language.
-- [x] SB-M17-011 Test 5 bots.
-- [x] SB-M17-012 Test 10 bots.
-- [x] SB-M17-013 Test 25 bots.
-- [x] SB-M17-014 Stress-test higher density.
-- [x] SB-M17-015 Test 59×59.
-- [x] SB-M17-016 Test rectangular board.
-
 **Historical V07 amendment:** the one-cell exterior ring proved exterior reachability and is preserved as audit history. **Current owner target:** Railroad V1 must preserve route validation, no-retarget, ACTIVE-blocker/CLEARED-open semantics, rectangular support and 59×59 behavior while replacing the exact adjacent-ring movement geometry.
-
-### M18 — Scrubbot Agent
-
-- [x] SB-M18-001 Lightweight agent core.
-- [x] SB-M18-002 Assigned color.
-- [x] SB-M18-003 Assigned target.
-- [x] SB-M18-004 Assigned route.
-- [x] SB-M18-005 Spawn origin.
-- [x] SB-M18-006 Route movement.
-- [x] SB-M18-007 Arrival detection.
-- [x] SB-M18-008 Completion event.
-- [x] SB-M18-009 Despawn.
-- [x] SB-M18-010 No return-to-slot.
-- [x] SB-M18-011 No resource carrying.
-- [x] SB-M18-012 Reset cancellation.
-- [x] SB-M18-013 No orphan nodes.
-- [x] SB-M18-014 Performance stress test.
-- [x] SB-M18-015 Pool only if profiling justifies it.
 
 ### M19 — Scrubbot Dispatcher
 
 **Strict-v2 final closure:** M19-C001 V06 `AUDITED_PASS / STRICT_V2_FINAL_CLOSURE`.
-
-- [x] SB-M19-001 Receive slot request.
-- [x] SB-M19-002 Check reachable work before spawn.
-- [x] SB-M19-003 Ask TargetSelector.
-- [x] SB-M19-004 Refuse spawn without reachable target.
-- [x] SB-M19-005 Reserve target.
-- [x] SB-M19-006 Spawn exactly one bot per dispatch.
-- [x] SB-M19-007 Enforce one-by-one flow.
-- [x] SB-M19-008 Prevent duplicate assignments.
-- [x] SB-M19-009 Handle dispatch failure.
-- [x] SB-M19-010 Handle rapid input.
-- [x] SB-M19-011 Concurrent slot tests.
-- [x] SB-M19-012 Reset during dispatch.
-
-### M20 — Complete Clearing Vertical Slice
-
-- [x] SB-M20-001 Wire complete sequence.
-- [x] SB-M20-002 No target means no bot.
-- [x] SB-M20-003 No return behavior.
-- [x] SB-M20-004 One-cell test.
-- [x] SB-M20-005 One-color test.
-- [x] SB-M20-006 Multi-color test.
-- [x] SB-M20-007 Five-slot test.
-- [x] SB-M20-008 Easy board test.
-- [x] SB-M20-009 Medium board test.
-- [x] SB-M20-010 Hard board test.
-- [x] SB-M20-011 Very Hard board test.
-- [x] SB-M20-012 59×59 stress test.
-- [x] SB-M20-013 Rectangular board test.
-- [x] SB-M20-014 State-desynchronization check.
 
 ### M21 — First Real-Art Vertical Slice `[CONTENT] [VISUAL REFERENCE]`
 
@@ -1267,23 +839,7 @@ Locked runtime outcomes carried forward:
 - full 400-cell real-art clear across all five colors;
 - reference composite and generated LevelData/preview/metadata reproducible/unchanged.
 
-- [x] SB-M21-001 Ingest original source artwork.
-- [x] SB-M21-002 Audit source dimensions.
-- [x] SB-M21-003 Determine legal compatibility context.
-- [x] SB-M21-004 Generate level data.
-- [x] SB-M21-005 Reconstruct and compare.
-- [x] SB-M21-006 Render in gameplay.
-- [x] SB-M21-007 Populate and visibly present exactly five functional slots bound to the real SlotSystem.
-- [x] SB-M21-008 Dispatch a visibly moving real ScrubbotAgent from the clicked visible slot through board-aligned presentation and exterior corridor.
-- [x] SB-M21-009 Clear actual artwork pixels (ACTIVE→CLEARED; transparent background reveal).
-- [x] SB-M21-010 Run full level.
-- [x] SB-M21-011 Profile performance.
-- [x] SB-M21-012 Capture reference gameplay output.
-
 **First real-art vertical slice additions**
-- [x] SB-UI-014 Run at least one gameplay vertical slice using owner-approved real pixel/level artwork.
-- [x] SB-UI-015 Prove logical renderer/ACTIVE-CLEARED treatment/responsive presentation remain data-driven.
-- [x] SB-UI-016 Record visual gaps requiring later illustration generation.
 
 ### M22 — Production Slot UI `[VISUAL REFERENCE]`
 
@@ -1291,78 +847,22 @@ Locked runtime outcomes carried forward:
 
 **Railroad V1 closure — V07 + owner acceptance (2026-09-17):** the accepted production movement contract is now exact clicked-slot anchor → visible BOTTOM connector → canonical Railroad V1 exterior travel → legal rail ingress → four-neighbour orthogonal OPEN/CLEARED interior corridor with one or more 90-degree turns → assigned ACTIVE target. Non-target ACTIVE cells remain blockers; no diagonal/corner-cut/teleport/free-space shortcut and no retargeting are allowed. V07 implementation evidence recorded 4,823 checks / 0 failures and preserved the fresh Hazard Bot C08 first target `380/(0,19)`. Owner manual review confirmed the routing correction. The earlier straight-only final target approach is superseded.
 
-- [x] SB-M22-001 Audit slot references.
-- [x] SB-M22-002 Create SlotView.
-- [x] SB-M22-003 Five-slot layout.
-- [x] SB-M22-004 Bind SlotState through safe scalar/query presentation binding.
-- [x] SB-M22-005 Color presentation.
-- [x] SB-M22-006 Touch target.
-- [x] SB-M22-007 Active state.
 - [ ] SB-M22-008 No-work state if approved.
-- [x] SB-M22-009 Scrubbot spawn point / final slot→rail connector geometry.
-- [x] SB-M22-010 Aspect-ratio tests.
-- [x] SB-M22-011 Safe-area tests.
-- [x] SB-M22-012 Rapid-tap tests.
-- [x] SB-M22-013 Confirm canonical gameplay UI references before final asset generation.
-- [x] SB-M22-014 Validate M22 manifest entries before spending generation credits.
 - [ ] SB-M22-015 Generate the four owner-locked gameplay booster assets (+1 Slot, Random, Selector, Tornado) when Economy V1 implementation scope opens.
 - [ ] SB-M22-016 Generate only milestone-required decorative assets.
 - [ ] SB-M22-017 Keep raw candidates separate from production-final assets/provenance.
 - [ ] SB-M22-018 Require owner selection/approval before production promotion.
 - [ ] SB-M22-019 Never silently regenerate/overwrite approved production art.
-- [x] SB-M22-020 Build slot visuals as reusable Godot components.
 - [ ] SB-M22-021 Keep quantities/text/state badges live in Godot.
 - [ ] SB-M22-022 Implement reusable BoosterButton states for CHARGE_AVAILABLE / PURCHASABLE_SB / SELECTED / UNAVAILABLE / LOCKED when Economy V1 booster scope opens.
 - [ ] SB-M22-023 Bind approved booster/decorative art to reusable components.
-- [x] SB-M22-024 Preserve five visible slots at required responsive sizes.
 - [ ] SB-M22-025 Validate import/transparency/filtering/mobile memory before visual closure.
 
 **Railroad V1 additions [OWNER-LOCKED 2026-09-14]**
-- [x] SB-M22-026 Implement one canonical/single-source ScrubRail geometry contract from board W/H.
-- [x] SB-M22-027 Implement reusable four-side robotic cleaning railroad presentation with rounded corners and restrained cyan/electric accents.
-- [x] SB-M22-028 Enforce 2.0 logical-cell artwork clearance, 1.0 rail width and 2.5-cell rail centerline offset across variable board sizes.
-- [x] SB-M22-029 Connect each real clicked SlotCell visibly to the BOTTOM rail from its exact laid-out spawn anchor.
-- [x] SB-M22-030 Constrain exterior Scrubbot travel to railroad sides/corners; prohibit free-space diagonal/early-exit shortcuts.
-- [x] SB-M22-031 Leave Railroad V1 only through a legal rail ingress into OPEN/CLEARED perimeter space; permit four-neighbour orthogonal interior-corridor routing with one or more 90-degree turns; never retarget.
-- [x] SB-M22-032 Use one consistent Railroad V1 visual language across all levels; no per-level themed rail in V1.
-- [x] SB-M22-033 Validate Railroad V1 on rectangular boards, 59×59 and the required responsive viewport matrix.
-- [x] SB-M22-034 Preserve rapid-dispatch reservations/active visuals and reset cleanup while multiple Scrubbots are on connector/rail travel.
-- [x] SB-M22-035 Owner F6 visual/game-feel acceptance of the production Railroad V1 demo after strict audit.
 
 ### M23 — Batch Supply Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
 Purpose: create the player-facing color/count supply queues that drive the real ScrubBots puzzle. This milestone owns batch data, queue/preview semantics and candidate generation, but does not own five-slot execution, target claims, robot dispatch or solvability proof.
-
-- [x] SB-M23-001 Define immutable `ColorBatch` value contract.
-- [x] SB-M23-002 Give every batch a stable unique `batch_id` for the lifetime of a session.
-- [x] SB-M23-003 Store canonical palette/color ID, never presentation-only color guesses.
-- [x] SB-M23-004 Store strictly positive integer `robot_count`; reject zero, negative, float, string or overflow values.
-- [x] SB-M23-005 Preserve per-color conservation: total generated batch quota for each color must equal that level's required ACTIVE logical-pixel count for that color unless a later explicit owner rule changes the economy.
-- [x] SB-M23-006 Reject supply containing palette IDs absent from the loaded level/palette contract.
-- [x] SB-M23-007 Support exactly 3, 4 or 5 independent supply columns as configuration; do not hard-code one layout into gameplay truth.
-- [x] SB-M23-008 Support configurable visible preview depth 3 or 4, with V1/Hazard Bot validation locked to exactly 3 visible rows.
-- [x] SB-M23-009 Make only the front/top batch of each column selectable.
-- [x] SB-M23-010 Make visible Row 2 and Row 3 preview-only in V1; they must reject gameplay activation.
-- [x] SB-M23-011 Keep every batch deeper than the visible preview window hidden from player-facing query/UI APIs.
-- [x] SB-M23-012 Implement each supply column as an independent FIFO queue.
-- [x] SB-M23-013 Selecting a legal front batch removes exactly that one front item from exactly that one column.
-- [x] SB-M23-014 After selection, advance that column by one: old Row 2→front, old Row 3→Row 2, next hidden→Row 3.
-- [x] SB-M23-015 Prove selecting one column does not mutate ordering/content of any other column.
-- [x] SB-M23-016 Expose read-only front-batch queries for gameplay selection.
-- [x] SB-M23-017 Expose read-only preview queries that cannot reveal hidden queue contents.
-- [x] SB-M23-018 Make supply consumption transactional so a rejected downstream slot placement cannot accidentally pop/advance the column.
-- [x] SB-M23-019 Define deterministic seedable candidate generation for reproducible tests/replays.
-- [x] SB-M23-020 Persist/report the generation seed with the session fixture/evidence.
-- [x] SB-M23-021 Partition each level color total into legal positive batch sizes without losing or inventing quota.
-- [x] SB-M23-022 Distribute generated batches across configured columns without changing per-color conservation.
-- [x] SB-M23-023 Avoid malformed queues: no null batch, duplicate `batch_id`, negative count, invalid color or impossible index.
-- [x] SB-M23-024 Define clean end-of-column behavior when fewer than the normal preview rows remain.
-- [x] SB-M23-025 Define clean end-of-supply behavior when every column is exhausted.
-- [x] SB-M23-026 Provide deterministic reset to the exact initial queue/seed state.
-- [x] SB-M23-027 Provide snapshot/query data needed later by save/replay systems without coupling to UI Nodes.
-- [x] SB-M23-028 Build Hazard Bot candidate supply fixtures from the real 20×20 level color totals.
-- [x] SB-M23-029 Validate rectangular-board and 59×59 quota/conservation behavior.
-- [x] SB-M23-030 Add invalid-input, deterministic-generation, FIFO, hidden-preview and conservation regression tests.
 
 ### M24 — Five-Slot Batch Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
@@ -1370,111 +870,13 @@ Purpose: replace the temporary directly-colored slot interaction with the real f
 
 **Economy V1 amendment:** the accepted M24 implementation remains the five-slot baseline. M39 must add an explicit runtime-capacity extension 5→6 for the +1 Slot booster without falsifying historical M24 audit evidence.
 
-- [x] SB-M24-001 Preserve the production invariant of exactly five gameplay batch slots.
-- [x] SB-M24-002 Initialize all five batch slots EMPTY at level/session start.
-- [x] SB-M24-003 Define `SlotBatchState` independent of Godot presentation controls.
-- [x] SB-M24-004 Store `batch_id`, color ID, initial count, remaining-to-clear count, committed/in-flight count and placement sequence per occupied slot.
-- [x] SB-M24-005 Define explicit slot lifecycle states at minimum `EMPTY`, `ACTIVE` and `WAITING` without duplicating BoardState truth.
-- [x] SB-M24-006 On accepted supply selection, place the batch automatically into the rightmost currently EMPTY slot.
-- [x] SB-M24-007 Do not expose any production mechanic that asks the player to choose a destination slot.
-- [x] SB-M24-008 Never shift, reorder or compact already-occupied slots merely because another slot becomes empty.
-- [x] SB-M24-009 If holes exist, choose the rightmost available hole deterministically.
-- [x] SB-M24-010 If all five slots are occupied, reject the new batch atomically.
-- [x] SB-M24-011 On full-slot rejection, prove the originating supply column does not advance and the batch remains selectable.
-- [x] SB-M24-012 Allow multiple occupied slots to contain the same color simultaneously.
-- [x] SB-M24-013 Preserve stable batch identity after placement; never merge same-color batches silently.
-- [x] SB-M24-014 Enforce `0 <= committed <= remaining_to_clear <= initial_count` at all times.
-- [x] SB-M24-015 Define dispatch capacity as `remaining_to_clear - committed`.
-- [x] SB-M24-016 Do not reduce `remaining_to_clear` on player selection, claim, route calculation or spawn.
-- [x] SB-M24-017 Reduce `remaining_to_clear` only after authenticated successful clearing of one batch-owned target.
-- [x] SB-M24-018 Reduce `committed` when the corresponding live assignment resolves or is safely rolled back.
-- [x] SB-M24-019 A batch is complete only when `remaining_to_clear == 0` and `committed == 0`.
-- [x] SB-M24-020 Return the slot to EMPTY immediately and deterministically after true batch completion.
-- [x] SB-M24-021 If remaining quota exists but no matching target is currently claimable, enter WAITING without discarding the batch.
-- [x] SB-M24-022 Resume a WAITING batch automatically when later BoardState changes expose claimable matching work.
-- [x] SB-M24-023 Ensure a newly freed slot can accept the next player-selected supply batch using the same rightmost-empty rule.
-- [x] SB-M24-024 Expose read-only slot occupancy/count/state queries for presentation without leaking mutable internal state.
-- [x] SB-M24-025 Preserve exact slot/batch state across pause/resume.
-- [x] SB-M24-026 Reset clears all batch occupancy, counters, placement sequence and transient state deterministically.
-- [x] SB-M24-027 Make rapid repeated supply selections transactional; no duplicate batch insertion or double column advance.
-- [x] SB-M24-028 Add the canonical three-same-color example (`BLUE 8`, `BLUE 14`, `BLUE 12`) as a regression fixture.
-- [x] SB-M24-029 Test five-full-slot rejection followed by a completion/free-slot/new-selection cycle.
-- [x] SB-M24-030 Add headless invariant tests for every state transition and invalid slot/batch mutation.
-
 ### M25 — Batch Target Claim Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
 Purpose: arbitrate currently targetable pixels among multiple live batches, especially duplicate colors, while preserving ReservationState and TargetSelector as the existing low-level safety authorities.
 
-- [x] SB-M25-001 Define a session-scoped Batch Target Claim service/ledger with narrow APIs.
-- [x] SB-M25-002 Keep existing `ReservationState` as the authoritative live target-reservation mechanism; do not create contradictory duplicate reservation truth.
-- [x] SB-M25-003 Represent each live claim with batch ID, slot ID, target index/coordinate, color and reservation/assignment identity.
-- [x] SB-M25-004 Permit claims only for currently ACTIVE, matching-color, valid, unreserved and production-targetable pixels.
-- [x] SB-M25-005 Never pre-claim a future pixel that is currently blocked/unreachable merely because it may become reachable later.
-- [x] SB-M25-006 Support multiple simultaneous occupied batches of the same color.
-- [x] SB-M25-007 Arbitrate same-color batches by oldest placement sequence first (FIFO).
-- [x] SB-M25-008 Make placement-sequence arbitration deterministic across reset/replay fixtures.
-- [x] SB-M25-009 Keep giving newly claimable work to the oldest same-color batch while it has uncommitted dispatch capacity.
-- [x] SB-M25-010 When the oldest batch has no remaining dispatch capacity, allow additional matching targets to flow to the next same-color batch.
-- [x] SB-M25-011 Keep different colors independent except for shared global ReservationState uniqueness.
-- [x] SB-M25-012 Preserve TargetSelector's bottom-most then left-most order among currently targetable matching unreserved candidates.
-- [x] SB-M25-013 Make target selection + batch ownership claim + ReservationState reservation one atomic logical transaction.
-- [x] SB-M25-014 Prove one target index can never belong to two live batches/robots at once.
-- [x] SB-M25-015 Prove one batch can never create duplicate live claims to the same target.
-- [x] SB-M25-016 Refuse claim when the batch has zero dispatch capacity.
-- [x] SB-M25-017 Increment `committed` exactly once when a claim becomes an accepted live assignment.
-- [x] SB-M25-018 Do not change `remaining_to_clear` merely because a claim exists.
-- [x] SB-M25-019 If route construction/validation fails before spawn, atomically release claim and reservation, decrement committed appropriately, consume zero batch quota and spawn no robot.
-- [x] SB-M25-020 On authenticated arrival/clear, resolve exactly the claim associated with that robot/assignment.
-- [x] SB-M25-021 Never allow a robot to clear any target other than its immutable claimed target.
-- [x] SB-M25-022 On successful authenticated clear, decrement batch remaining and committed exactly once.
-- [x] SB-M25-023 Fail closed on stale/already-cleared/invalid claim state; no duplicate clear, no quota loss and no ghost spawn.
-- [x] SB-M25-024 Release every live claim/reservation safely on reset/session teardown.
-- [x] SB-M25-025 Prevent slot completion while any claim/assignment for that batch remains committed.
-- [x] SB-M25-026 Mark a batch WAITING when it has remaining quota but no claimable matching target.
-- [x] SB-M25-027 Re-evaluate waiting colors after authoritative BoardState clear events rather than polling mutable UI state.
-- [x] SB-M25-028 Add simultaneous same-color claim race tests under rapid scheduler activity.
-- [x] SB-M25-029 Prove `BLUE 8`, `BLUE 14`, `BLUE 12` cannot target the same pixel and obey oldest-batch-first ownership when new blue pixels open.
-- [x] SB-M25-030 Prove newly opened targets are assigned at opening time, not pre-owned while inaccessible.
-- [x] SB-M25-031 Stress five occupied slots with duplicate colors on rectangular and 59×59 boards.
-- [x] SB-M25-032 Add claim/reservation leak, reset, stale-target and deterministic-order regression tests.
-- [x] SB-M25-033 Bound 59x59 target-selection scan cost investigation: reproduced the M29 multi-second spike and proved it was caused by UNLAID board-internal slot origins; real laid-out 59x59 uses <=1 route probe/lane with 0 failed probes but still has a real O(candidates) WHAT-side scan and separate winning-route Dijkstra cost. Findings: `coordination/sessions/M25-C002/M25_59X59_TARGET_SELECTION_FINDINGS_V01.md`; audit: `coordination/sessions/M25-C002/CHATGPT_AUDIT_V01.md`. `[INVESTIGATION_AUDITED_PASS / CLOSED 2026-09-29]`
-- [x] SB-M25-034 Implement S0+S1 exact-safe target-selection optimization: corrected the 59x59 performance harness to real laid-out exterior slot origins; materialized the existing exact-safe touchability condition as an O(1) per-revision ProductionTargetAccess mask; added an optional conservative prefilter so TargetSelector skips only provably impossible candidates while preserving exact bottom-most/left-most winner, WHAT/HOW separation, reservation/coherence/rollback truth and fallback behavior. Implementation `aadc57253d45dcd6b71ca8cc1b00b7a7684e0574`; audit `coordination/sessions/M25-C003/CHATGPT_AUDIT_V01.md`. `[AUDITED_PASS / CLOSED 2026-09-29]`
-- [x] SB-M25-035 S2 exact-equivalent Railroad / Dijkstra acceleration: optimized HOW-side production Railroad routing while preserving the frozen pre-S2 `aadc5725...` RouteResult point-for-point. Differential: 48,202 comparisons, 0 diffs; equal-weight/noncanonical/near-tie fallbacks preserved. Clean laid-out 59x59: route Dijkstra p99 ~0.25 ms, frame p99 ~4–5 ms, ~99% route-time reduction, S1 scan <=3 ms, <=1 route probe/lane. Implementation `eb16c2f1e082f9c2449e4ac98840a6f68f483126`; audit `coordination/sessions/M25-C004/CHATGPT_AUDIT_V01.md`. `[AUDITED_PASS / CLOSED 2026-09-29]`
-
 ### M26 — Auto Dispatch Scheduler `[OWNER-LOCKED CORE GAMEPLAY]`
 
 Purpose: turn an occupied color/count batch into autonomous Scrubbot work. The player selects batches, not individual robots and not individual target pixels.
-
-- [x] SB-M26-001 Define a gameplay-domain Auto Dispatch Scheduler independent of presentation/UI animation.
-- [x] SB-M26-002 Automatically attempt work for every occupied batch without requiring repeated player taps on the five slots.
-- [x] SB-M26-003 Begin scheduling a newly accepted batch immediately after transactional placement.
-- [x] SB-M26-004 Enforce the hard invariant: no currently valid target means no robot spawn.
-- [x] SB-M26-005 Enforce the hard invariant: no successful atomic reservation/claim means no robot spawn.
-- [x] SB-M26-006 Enforce the hard invariant: no valid RouteValidator-clean route to the exact claimed target means no robot spawn.
-- [x] SB-M26-007 Enforce transaction order `claim/reserve → build route → validate route → spawn exact assignment`.
-- [x] SB-M26-008 Never retarget after route/assignment acceptance; a failed assignment is rolled back rather than redirected silently.
-- [x] SB-M26-009 Spawn from the exact owning SlotCell anchor and preserve the accepted slot→BOTTOM connector + Railroad V1 route semantics.
-- [x] SB-M26-010 Spawn exactly one Scrubbot per successful assignment transaction.
-- [x] SB-M26-011 Pace sequential dispatch from a given batch/slot; do not materialize its entire count as an uncontrolled one-frame robot burst.
-- [x] SB-M26-012 Permit safe concurrent work from different occupied slots when each assignment has a unique reservation/route.
-- [x] SB-M26-013 Define deterministic scheduler fairness across different-color ACTIVE batches so one busy color cannot starve all others.
-- [x] SB-M26-014 For same-color batches, defer ownership ordering to the Batch Target Claim Engine's oldest-placement-first rule.
-- [x] SB-M26-015 Prove a `BLUE 15` batch can autonomously complete exactly 15 authenticated blue-pixel clears when the board makes them legally available.
-- [x] SB-M26-016 Track committed/in-flight capacity so a batch never dispatches more robots than its remaining quota permits.
-- [x] SB-M26-017 Decrement quota only from successful authenticated clearing callbacks, never from scheduler intent or spawn count.
-- [x] SB-M26-018 When no claimable work exists, transition to WAITING without busy-looping, phantom agents or repeated reservation churn.
-- [x] SB-M26-019 Wake/reconsider relevant WAITING colors when BoardState clearing changes reachability.
-- [x] SB-M26-020 When one new blue pixel opens and several blue batches wait, request arbitration and dispatch only the batch selected by the same-color FIFO rule.
-- [x] SB-M26-021 If the oldest same-color batch has only N dispatch-capacity units left and more than N targets open, allow only N claims to it and spill additional claims to the next batch deterministically.
-- [x] SB-M26-022 Auto-finish a batch after its final authenticated clear/assignment resolves and return the slot to EMPTY.
-- [x] SB-M26-023 Ensure freeing a slot does not reorder other occupied slots or mutate supply queues.
-- [x] SB-M26-024 Pause prevents new dispatches while preserving valid in-memory batch/claim state according to session rules.
-- [x] SB-M26-025 Resume safely restarts scheduling without duplicate claims/spawns.
-- [x] SB-M26-026 Reset/session teardown cancels in-flight scheduling, releases reservations/claims and leaves no orphan Scrubbot Nodes.
-- [x] SB-M26-027 Rapid input / simultaneous column selections cannot double-spawn, over-commit quota or duplicate target reservations.
-- [x] SB-M26-028 Validate scheduler behavior with multiple duplicate-color batches plus different-color batches concurrently.
-- [x] SB-M26-029 Run 59×59/high-agent-density performance sanity and allocation checks.
-- [x] SB-M26-030 Add a full Hazard Bot auto-dispatch integration smoke proving no ghost robots, no duplicate targets and exact quota conservation.
 
 ### M27 — Solvability / Deadlock Engine `[OWNER-LOCKED CORE GAMEPLAY]`
 
@@ -1482,71 +884,7 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 **Economy V1 amendment:** accepted M27 evidence proves the five-slot baseline. M39 must extend solver state/fixtures for temporary six-slot capacity and for Random/Selector/Tornado transactions; do not retroactively claim the completed baseline already proves those booster states.
 
-- [x] SB-M27-001 Define a deterministic solver operating on gameplay-domain state, not rendered UI Nodes.
-- [x] SB-M27-002 Consume the real level BoardState/access/routing semantics rather than a contradictory simplified notion of reachability.
-- [x] SB-M27-003 Model configured 3/4/5 independent FIFO supply columns.
-- [x] SB-M27-004 Model the visible-front rule: only each column's front batch is a legal player choice.
-- [x] SB-M27-005 Model preview/hidden queue ordering without allowing the solver to illegally select Row 2/Row 3/hidden batches early.
-- [x] SB-M27-006 Model automatic rightmost-empty placement into exactly five slots.
-- [x] SB-M27-007 Model full-slot rejection without consuming the selected supply front.
-- [x] SB-M27-008 Model batch remaining/committed/WAITING lifecycle exactly as the runtime engine does.
-- [x] SB-M27-009 Model same-color oldest-placement-first claim arbitration.
-- [x] SB-M27-010 Model targetability using authoritative ProductionTargetAccess/ProductionRoutingSystem semantics, including Railroad V1 legal ingress and post-rail orthogonal turns.
-- [x] SB-M27-011 Model dynamic ACTIVE→CLEARED board evolution after authenticated work.
-- [x] SB-M27-012 Model WAITING batches becoming runnable when new corridors/targets open.
-- [x] SB-M27-013 Search legal player front-batch choices rather than assuming one fixed greedy order.
-- [x] SB-M27-014 Find at least one complete sequence that clears every required logical pixel and consumes all required batch quota.
-- [x] SB-M27-015 Emit a deterministic solution trace for QA/debug evidence; never expose it to normal player UI.
-- [x] SB-M27-016 Accept a generated Batch Supply layout for production only after the solver proves at least one legal completion sequence.
-- [x] SB-M27-017 Feed unsolvable candidate layouts back to Batch Supply generation for deterministic retry/regeneration rather than shipping impossible levels.
-- [x] SB-M27-018 Preserve generation seed + solver outcome so an accepted/rejected supply can be reproduced exactly.
-- [x] SB-M27-019 Canonicalize/memoize equivalent search states to prevent needless combinatorial re-exploration.
-- [x] SB-M27-020 Add explicit search/time/state-count bounds and fail closed when proof cannot be completed within policy limits.
-- [x] SB-M27-021 Prove the real 20×20 Hazard Bot level has at least one solvable generated batch/column layout under the new five-slot rules.
-- [x] SB-M27-022 Persist the Hazard Bot solution trace as regression evidence while keeping player-hidden future batches hidden at runtime.
-- [x] SB-M27-023 Add rectangular-board solvability fixtures.
-- [x] SB-M27-024 Add 59×59 solver/performance sanity fixtures with bounded evidence appropriate to the search design.
-- [x] SB-M27-025 Define `STALLED/WAITING` separately from `DEADLOCK`.
-- [x] SB-M27-026 Never call a state deadlocked while any valid in-flight robot can still produce an authenticated clear.
-- [x] SB-M27-027 Never call a state deadlocked while an EMPTY slot plus at least one selectable front batch can lead to legal future progress.
-- [x] SB-M27-028 Never call a state deadlocked merely because current batches are waiting if already-scheduled/legal clearing can open their targets.
-- [x] SB-M27-029 Declare deadlock only when search proves there is no legal future action sequence that can produce further authenticated progress/completion.
-- [x] SB-M27-030 Add the canonical true-deadlock fixture: five occupied WAITING batches, no in-flight progress and no legal unlock sequence.
-- [x] SB-M27-031 Add false-positive guards where a newly opened same-color target correctly revives the oldest waiting batch.
-- [x] SB-M27-032 Expose deterministic deadlock reason codes/debug evidence without coupling lose-screen UI to solver internals.
-- [x] SB-M27-033 Reset/replay must reproduce identical solver classification from identical state/seed.
-- [x] SB-M27-034 Run performance/memory profiling and regression tests before declaring the core gameplay engine complete.
-
 ### M28 — Gameplay Screen Layout `[VISUAL REFERENCE]`
-
-- [x] SB-M28-001 Audit original gameplay reference images.
-- [x] SB-M28-002 Board region.
-- [x] SB-M28-003 Five-slot region.
-- [x] SB-M28-004 HUD region.
-- [x] SB-M28-005 Safe areas.
-- [x] SB-M28-006 Easy dimensions.
-- [x] SB-M28-007 Medium dimensions.
-- [x] SB-M28-008 Hard dimensions.
-- [x] SB-M28-009 Very Hard dimensions.
-- [x] SB-M28-010 Rectangular boards.
-- [x] SB-M28-011 59×59.
-- [x] SB-M28-012 Narrow phone.
-- [x] SB-M28-013 Tall phone.
-- [x] SB-M28-014 Tablet portrait.
-- [x] SB-M28-015 Input coordinate accuracy.
-- [x] SB-M28-016 Use `docs/MASTER_UI_SYSTEM.md` as canonical gameplay layout contract.
-- [x] SB-M28-017 Remove Goal/Moves panel from approved production gameplay composition.
-- [x] SB-M28-018 Make board dominant gameplay-screen region.
-- [x] SB-M28-019 Keep color-selection panel protected/usable.
-- [x] SB-M28-020 Place Scrubby low at left of color-selection region.
-- [x] SB-M28-021 Place speech bubble above Scrubby.
-- [x] SB-M28-022 Preserve right-side cleaning props as lower-priority decoration.
-- [x] SB-M28-023 Put four booster controls in compact horizontal row above bottom/ad row.
-- [x] SB-M28-024 Historical M28 baseline completed. Superseded placement: Gameplay Composition V02 moves Pause + 2x side by side to top-right; current playtest/reference has no ad banner and no Settings.
-- [x] SB-M28-025 Do not restore removed Level/lock rail.
-- [x] SB-M28-026 Bind owner-approved illustrations while keeping screen responsive/native.
-- [x] SB-M28-027 Prove BoardRenderer coordinate mapping after responsive scaling.
-- [x] SB-M28-028 Capture viewport validation evidence.
 
 **Gameplay Composition V02 owner amendment [2026-09-19]:** `coordination/OWNER_GAMEPLAY_SCREEN_COMPOSITION_V02.md` is now canonical for gameplay layout. Preserve the owner-supplied baseline screen, integrate full Railroad V1 around the board, show five permanent slot-to-bottom-rail connectors, retain the five-slot + Batch Supply panel, place Pause + 2x side by side top-right, remove gameplay Settings/Heart HUD, and omit the ad banner from the current owner playtest/reference mockup. This is a presentation amendment; accepted historical M28/M29 evidence remains historical and later responsive/polish work must converge to V02.
 
@@ -1558,100 +896,21 @@ Purpose: prove generated supply is actually playable under the real baseline mec
 
 Purpose: turn the owner-approved Gameplay Composition V02 and gameplay master visual into the actual shipping gameplay screen. Historical M28 closure remains historical; this sprint closes the later V02 delta without falsifying earlier evidence.
 
-- [x] SB-M28-C002-001 Build the production Gameplay V02 scene from responsive Godot Controls/Containers plus the approved visual assets; do not ship a flattened screenshot.
-- [x] SB-M28-C002-002 Bind the real BoardRenderer as the dominant board region with exact aspect preservation for rectangular boards.
-- [x] SB-M28-C002-003 Render the full four-sided Railroad V1 using the canonical geometry contract and approved production skin.
-- [x] SB-M28-C002-004 Keep all five slot-to-bottom-rail connectors permanently visible and aligned to exact slot spawn anchors.
-- [x] SB-M28-C002-005 Render exactly five normal execution slots and support the temporary authoritative sixth slot when +1 Slot is active.
-- [x] SB-M28-C002-006 Render the current owner-selected Batch Supply presentation with five columns x three visible rows when configured for five columns; preserve support for 3/4/5 columns and hidden deeper queue truth.
-- [x] SB-M28-C002-007 Keep only supply-front batches interactive; preview rows remain non-interactive and visually distinct.
-- [x] SB-M28-C002-008 Bind Pause and 2x side by side at top-right with inactive/current-level/timed-countdown states.
-- [x] SB-M28-C002-009 Bind the selected robot/player profile presentation without reintroducing a gameplay Heart HUD or Settings button.
-- [x] SB-M28-C002-010 Bind the four canonical booster buttons: +1 Slot / Random / Selector / Tornado.
-- [x] SB-M28-C002-011 Booster quantity, price, locked/unavailable and selected states remain live Godot UI overlays and are never baked into art.
-- [x] SB-M28-C002-012 Tapping a booster with no charge routes into the canonical Booster Acquire popup defined by M43-C003 rather than silently failing. — AUDITED_PASS M28-C002-C003.
-- [x] SB-M28-C002-013 Tapping locked/manual 2x without entitlement routes into the canonical 2x Acquire popup defined by M43-C003. — AUDITED_PASS M28-C002-C003.
-- [x] SB-M28-C002-014 Implement the canonical Pause popup entry and deterministic modal stacking rules from M43-C002.
-- [x] SB-M28-C002-015 Preserve gameplay input isolation while any popup/modal is open; board, supply and booster controls behind it receive no input.
-- [x] SB-M28-C002-016 Preserve the approved gameplay background, Scrubby/selected-robot support presentation and lower decorative hierarchy without shrinking gameplay-critical controls first. — R01 technical PASS + FINAL OWNER VISUAL PASS.
-- [x] SB-M28-C002-017 Validate 1080x2160, 1170x2532, 1290x2796, 1080x2400, 1440x3200, short 16:9 portrait and tablet portrait.
-- [x] SB-M28-C002-018 Validate mouse/touch mapping, rapid taps, popup-open input suppression and temporary sixth-slot readability.
-- [x] SB-M28-C002-019 Capture owner-review screenshots/video for fresh level, active cleaning, full five-slot state, sixth-slot state, booster popup open, Pause open and timed 2x state. — AUDITED_PASS: fresh screenshots + real runtime Movie Maker video.
-- [x] SB-M28-C002-020 Independent ChatGPT audit plus owner visual/playtest acceptance required before this V02 convergence is closed. `[AUDITED_PASS + OWNER FINAL REPLAY PASS / CLOSED 2026-09-29]`
-
 #### M28-C002-C004 - Color / Batch Tile Visual Polish [AUDITED_PASS / OWNER FINAL VISUAL RECHECK]
 
 This is intentionally NOT part of the active `M28-C002-C003-R01 V02` remediation. Owner visual authority: `coordination/OWNER_M28_COLOR_BATCH_TILE_VISUAL_V01.md`.
 
-- [x] SB-M28-C002-021 Replace occupied 5/6-slot and Batch Supply/color-selection rectangles with one reusable rounded 3D `ColorBatchTile` presentation: exact Palette v3 Face + same-color lower Base body, subtle top highlight, compact shadow, large centered white count with strong dark outline, visual-only ACTIVE emphasis, no WAITING/ACTIVE text, neutral EMPTY state and lower-emphasis non-interactive preview state. Count is geometrically centered in the COLORED TOP FACE on both axes; lower base and hidden state-line spacer do not shift it; 1/2/3-digit counts remain centered responsively. V02 implementation `3a219105327eb778260cb6dbd83b6dba5f9cec3a`; audit `coordination/sessions/M28-C002-C004/CHATGPT_AUDIT_V02.md`; owner gate `coordination/sessions/M28-C002-C004/OWNER_VISUAL_GATE_V02.md`. `[AUDITED_PASS + OWNER FINAL VISUAL PASS / CLOSED 2026-09-29]`
-
 ### M29 — Mobile Touch
-
-- [x] SB-M29-001 Touch selectable supply-front batch activation; five batch slots themselves are not player-selectable placement controls.
-- [x] SB-M29-002 Desktop mouse development support.
-- [x] SB-M29-003 Prevent mouse/touch double-fire.
-- [x] SB-M29-004 Touch cancel.
-- [x] SB-M29-005 Focus loss.
-- [x] SB-M29-006 Rapid tapping.
-- [x] SB-M29-007 Multi-touch.
-- [x] SB-M29-008 Pause during touch.
-- [x] SB-M29-009 Background/foreground.
-- [x] SB-M29-010 Gameplay Tempo Retune: canonical baseline retuned to 9 cells/s + 1/3 s cadence at 1x and 18 cells/s + 1/6 s cadence at 2x. Implementation `8787d38dba65a084e6169ea8e8ccc623ab63e0ae`; functional audit `coordination/sessions/M29-C002/CHATGPT_AUDIT_V01.md`; performance blockers independently cleared by M25-C003 + M25-C004; owner gate `coordination/sessions/M29-C002/OWNER_TEMPO_PLAYTEST_GATE_V01.md`: 1x OK, 2x OK, dense 5/6-slot smoothness OK. `[AUDITED_PASS + OWNER PLAYTEST PASS / CLOSED 2026-09-29]`
 
 **Owner-locked speed integration for M29/runtime:** M29 proves the explicit 1x/2x temporal authority and may keep a direct debug/headless toggle seam. That seam is not authorization for free shipping manual 2x. M39 must gate production manual 2x through the paid entitlement service in `coordination/OWNER_ECONOMY_REWARDS_V01.md`. Authoritative M23-exhausted automatic 2x remains free. Do not infer exhaustion from UI rows or slot occupancy.
 
-### M30 — Win/Lose Rules `[OWNER-LOCKED 2026-09-19] [CLOSED]`
-
-- [x] SB-M30-001 Document win condition.
-- [x] SB-M30-002 Document lose condition.
-- [x] SB-M30-003 Completion evaluator.
-- [x] SB-M30-004 Emit completion once.
-- [x] SB-M30-005 Stop inappropriate new dispatch.
-- [x] SB-M30-006 Resolve in-flight bots.
-- [x] SB-M30-007 Retry.
-- [x] SB-M30-008 Completion regression tests.
-
 ### M31 — Cleaning Effects `[VISUAL REFERENCE] [PERFORMANCE] [CLOSED 2026-09-20]`
-
-- [x] SB-M31-001 Use original visual references where available.
-- [x] SB-M31-002 Define cleaning event.
-- [x] SB-M31-003 Prototype lightweight effect.
-- [x] SB-M31-004 Separate from BoardState.
-- [x] SB-M31-005 Toggle effects.
-- [x] SB-M31-006 Concurrency limit.
-- [x] SB-M31-007 Pool only after profiling.
-- [x] SB-M31-008 Stress 59×59.
-- [x] SB-M31-009 Measure frame cost.
-- [x] SB-M31-010 Reduced-effects option if required.
 
 Closure evidence: `coordination/sessions/M31-C001/CHATGPT_AUDIT_V01.md` + `coordination/sessions/M31-C001/OWNER_F6_ACCEPTANCE_V01.md`. Final verdict: `AUDITED_PASS / M31-C001 CLOSED`.
 
 ### M32 — Scrubbot Final Visuals `[VISUAL REFERENCE] [CLOSED 2026-09-20]`
 
 Closure evidence: `coordination/sessions/M32-C001/CHATGPT_AUDIT_V03.md` + `coordination/sessions/M32-C001/OWNER_F6_ACCEPTANCE_V01.md`. Final verdict: `AUDITED_PASS / M32-C001 CLOSED`.
-
-- [x] SB-M32-001 Audit original Scrubbot art.
-- [x] SB-M32-002 Select owner-approved canonical design.
-- [x] SB-M32-003 Preserve original source.
-- [x] SB-M32-004 Configure crisp import.
-- [x] SB-M32-005 Visual component.
-- [x] SB-M32-006 Travel animation.
-- [x] SB-M32-007 Arrival animation.
-- [x] SB-M32-008 Disappearance.
-- [x] SB-M32-009 Direction/orientation if approved.
-- [x] SB-M32-010 Density performance test.
-- [x] SB-M32-UI-001 Use owner-approved canonical Scrubby reference for character generation.
-- [x] SB-M32-UI-002 Validate pose/state manifest entries before generation.
-- [x] SB-M32-UI-003 Generate only poses required by implemented behavior.
-- [x] SB-M32-UI-004 Generate required portrait/profile variants.
-- [x] SB-M32-UI-005 Generate emotion/state variants only when implemented flow needs them.
-- [x] SB-M32-UI-006 Preserve raw candidates/provenance separately.
-- [x] SB-M32-UI-007 Require owner visual approval before promotion.
-- [x] SB-M32-UI-008 Lock approved character assets against silent overwrite.
-- [x] SB-M32-UI-009 Configure Godot import settings.
-- [x] SB-M32-UI-010 Integrate approved art without coupling animation to TargetSelector logic.
-- [x] SB-M32-UI-011 Validate readability/scale on phone viewport matrix.
-- [x] SB-M32-UI-012 Board-resolution-independent Scrubbot apparent size: presentation-scale compensation derives from actual rendered BoardPresentation geometry using the accepted 32x32 / 2.4-cell reference; live visuals and retire echo follow responsive relayout without gameplay-truth mutation. Implementation `649cf6290752e298b888eac6e080fb65bb2be9ed`; audit `coordination/sessions/M32-C002/CHATGPT_AUDIT_V01.md`; owner gate `coordination/sessions/M32-C002/OWNER_VISUAL_GATE_V01.md`: V1/V2/V3/V4 all OK. `[AUDITED_PASS + OWNER VISUAL PASS / CLOSED 2026-09-30]`
 
 ### M33 — Audio `[OWNER-LOCKED AUDIO SELECTION V02 2026-09-24]`
 
@@ -1664,28 +923,12 @@ Final owner acceptance:
 
 Owner audio law remains: no dispatch SFX; cleaning uses bounded `dispatch.wav`; completion is WON-only; no movement audio. `ScrubBots Workshop` remains separately owner-approved for a future Workshop screen.
 
-- [x] SB-M33-001 Audio buses.
-- [x] SB-M33-002 Master volume.
-- [x] SB-M33-003 Music volume.
-- [x] SB-M33-004 SFX volume.
-- [x] SB-M33-005 Dispatch SFX decision resolved: **NONE in production V1**. `assets/audio/sfx/dispatch.wav` is preserved and repurposed as the cleaning sonic source.
-- [x] SB-M33-006 Cleaning SFX. Owner-approved V02 source: `assets/audio/sfx/dispatch.wav`; legacy `cleaning.wav` is preserved but not used by production cleaning playback.
-- [x] SB-M33-007 Completion SFX. Owner-approved canonical asset: `assets/audio/sfx/completion.wav`.
-- [x] SB-M33-008 Movement audio only if pleasant at high density. Owner decision: no movement audio in V1.
-- [x] SB-M33-009 Concurrency management.
-- [x] SB-M33-010 Persist settings.
-
 ### M34 — Haptics
 
 V02 independent code audit: `CODE_AUDIT_PASS`. SB-M34-001..005 closed. SB-M34-006 remains `DEVICE/OWNER_REQUIRED` for real handset haptic feel.
 
 Pre-authored batch bundle: `coordination/sessions/M34-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Owner/device gate does not stop the batch.
 
-- [x] SB-M34-001 Platform API research.
-- [x] SB-M34-002 Cleaning haptic if approved.
-- [x] SB-M34-003 Completion haptic.
-- [x] SB-M34-004 Toggle.
-- [x] SB-M34-005 Prevent vibration spam.
 - [ ] SB-M34-006 Real-device test.
 
 ### M35 — Level Catalog
@@ -1693,18 +936,6 @@ Pre-authored batch bundle: `coordination/sessions/M34-C001/CHATGPT_PROMPT_V01.md
 V02 independent audit: `AUDITED_PASS / M35 LEVEL CATALOG CLOSED`. All M35 tasks closed.
 
 Pre-authored batch bundle: `coordination/sessions/M35-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`.
-
-- [x] SB-M35-001 Production LevelCatalog.
-- [x] SB-M35-002 Stable IDs.
-- [x] SB-M35-003 Stable ordering.
-- [x] SB-M35-004 Difficulty.
-- [x] SB-M35-005 Dimensions.
-- [x] SB-M35-006 Preview.
-- [x] SB-M35-007 Duplicate detection.
-- [x] SB-M35-008 Missing-file detection.
-- [x] SB-M35-009 Production/test separation.
-- [x] SB-M35-010 Reject TEST fixture in production catalog.
-- [x] SB-M35-011 Batch validation.
 
 ### M36 — Difficulty System
 
@@ -1714,12 +945,7 @@ Pre-authored batch bundle: `coordination/sessions/M36-C001/CHATGPT_PROMPT_V01.md
 
 **Difficulty V1 owner decision now governs future work.** Board dimensions remain an engine/content envelope and Session Load input, not the definition of EASY/MEDIUM/HARD/VERY_HARD.
 
-- [x] SB-M36-001 Migrate legacy runtime class=dimension configuration to Difficulty V1 without breaking board envelope validation.
-- [x] SB-M36-002 Validate production catalog against current Difficulty V1 + compatibility requirements.
-- [x] SB-M36-003 Implement/version Challenge components and owner-approved additional factors.
-- [x] SB-M36-004 Create Difficulty V1 matrix/calibration fixtures.
 - [ ] SB-M36-005 Playtest difficulty.
-- [x] SB-M36-006 Prove board size alone cannot determine difficulty class.
 
 ### M37 — Level Progression
 
@@ -1728,15 +954,6 @@ V03 independent audit: `AUDITED_PASS / M37 LEVEL PROGRESSION CLOSED`. Forward-on
 V03 remediation authority: `coordination/sessions/M37-C001/CHATGPT_PROMPT_V03.md` + `CHATGPT_AUDIT_CRITERIA_V03.md`. Frozen F-M37-V02-001..002. Owner lock remains: forward-only progression, no shipping Level Select; debug seam only.
 
 V02 remediation authority: `coordination/sessions/M37-C001/CHATGPT_PROMPT_V02.md` + `CHATGPT_AUDIT_CRITERIA_V02.md`. Owner decision is locked in `coordination/OWNER_M37_LEVEL_SELECT_DECISION_V01.md`: no shipping Level Select in V1; forward-only progression, debug/test seam only. Per-task V02 logs required under `task_logs_v02/`.
-
-- [x] SB-M37-001 Implement owner-locked repeating 10-level class cadence.
-- [x] SB-M37-002 Current level.
-- [x] SB-M37-003 Completion tracking.
-- [x] SB-M37-004 Replay.
-- [x] SB-M37-005 Implement progression target curve/micro modifiers from Difficulty V1.
-- [x] SB-M37-006 Level select if approved.
-- [x] SB-M37-007 Service implementation.
-- [x] SB-M37-008 Tests.
 
 ### M38 — Win Streak `[OWNER-LOCKED ECONOMY V1]`
 
@@ -1747,23 +964,6 @@ Prior V02 final closure is temporarily suspended by `coordination/sessions/M38-C
 V02 strict independent audit: `AUDITED_PASS / M38 WIN STREAK CLOSED`. All M38 tasks closed.
 
 Pre-authored batch bundle: `coordination/sessions/M38-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Durable central persistence is finalized by M40.
-
-- [x] SB-M38-001 Streak state.
-- [x] SB-M38-002 Increment only on valid first-clear progression wins.
-- [x] SB-M38-003 Reset on progression loss and restart-after-gameplay; pre-action exit does not reset.
-- [x] SB-M38-004 Grant exact SB mapping through RewardGrantService.
-- [x] SB-M38-005 Test 1→1 SB.
-- [x] SB-M38-006 Test 2→5 SB.
-- [x] SB-M38-007 Test 3→10 SB.
-- [x] SB-M38-008 Test 4→25 SB.
-- [x] SB-M38-009 Test 5→100 SB.
-- [x] SB-M38-010 Test 6+→100 SB.
-- [x] SB-M38-011 No duplicate grant.
-- [x] SB-M38-012 Persistence.
-- [x] SB-M38-013 Emit only streak-bonus SB amount to GiftMeterService; base/Daily/exchange SB never feeds it.
-- [x] SB-M38-014 Grant +1 Bot Part exactly at active streak multiples of 5.
-- [x] SB-M38-015 Replay does not advance streak, Gift Meter or streak Bot Parts.
-- [x] SB-M38-016 Add reset/replay/idempotency integration tests.
 
 ### M39 — Economy & Rewards V1 `[OWNER-LOCKED]`
 
@@ -1780,63 +980,7 @@ Pre-authored batch bundle: `coordination/sessions/M39-C001/CHATGPT_PROMPT_V01.md
 Canonical decision: `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
 Machine tuning: `data/config/economy_rewards_v1.json`.
 
-- [x] SB-M39-001 Load/version/validate Economy V1 tuning config and fail closed on malformed values.
-- [x] SB-M39-002 Implement `scripts/economy/economy_wallet.gd` as authoritative Scrub Bucks balance.
-- [x] SB-M39-003 Implement atomic SB grant/spend with stable transaction IDs and insufficient-funds failure.
-- [x] SB-M39-004 Initialize new players at 1000 SB without double-initialization.
-- [x] SB-M39-005 Grant first-clear SB by difficulty: EASY 50 / MEDIUM 75 / HARD 100 / VERY_HARD 150.
-- [x] SB-M39-006 Grant +1 Bot Part per first-clear progression level and prohibit replay farming.
-- [x] SB-M39-007 Implement `reward_grant_service.gd` idempotent reward bundles and duplicate-callback protection.
-- [x] SB-M39-008 Implement `gift_meter_service.gd`; ONLY Win Streak SB may advance it.
-- [x] SB-M39-009 Implement Gift Meter thresholds 10/50/250/500/1000 and exactly-once milestone crossing.
-- [x] SB-M39-010 Support one reward crossing multiple thresholds plus 1000-cycle rollover/overflow.
-- [x] SB-M39-011 Queue Gift Bar milestone rewards instead of silently auto-consuming them.
-- [x] SB-M39-012 Implement exact Gift rewards from Economy V1, totaling 10 Bot Parts per complete 0→1000 cycle.
-- [x] SB-M39-013 Implement 1000 guaranteed-new-card rule with 500 SB fallback when no eligible missing card exists.
-- [x] SB-M39-014 Prove base level/Daily/Tasks/Gift/Cards Exchange SB cannot recursively advance Gift Meter.
-- [x] SB-M39-015 Implement `robot_unlock_service.gd`: Scrubby initially unlocked; every later robot costs 250 Bot Parts; preserve overflow.
-- [x] SB-M39-016 Grant owner-locked per-set SB/Bot Parts rewards on first 9/9 completion and wire next-robot notification/read model.
-- [x] SB-M39-017 Add pacing simulation/evidence targeting approximately one robot unlock per 150 progression levels for average engaged play.
-- [x] SB-M39-018 Enforce robot perks as meta/economy convenience only; never alter solver/BoardState/TargetSelector/routing legality.
-- [x] SB-M39-019 Implement `heart_service.gd`: max 5, one Heart per **900 real-world seconds / 15 minutes**, offline/menu/background regen. [Interval superseded by OWNER_HEART_REGEN_INTERVAL_V01]
-- [x] SB-M39-020 Consume one Heart on progression loss or restart-after-gameplay; pre-action exit consumes none.
-- [x] SB-M39-021 Implement +1 Heart = 500 SB and full refill = 400 SB per missing Heart.
-- [x] SB-M39-022 Implement `speed_entitlement_service.gd` separate from GameplaySpeedAuthority.
-- [x] SB-M39-023 Implement current-level 2x entitlement = 200 SB, surviving retries of same level until completion.
-- [x] SB-M39-024 Implement timed 2x products 15m/300 SB, 30m/500 SB, 60m/750 SB.
-- [x] SB-M39-025 Timed 2x uses absolute wall-clock expiry and continues in gameplay, Home/menus, pause, background and closed-app time.
-- [x] SB-M39-026 Allow timed purchases to extend expiry deterministically; never use gameplay delta/Engine.time_scale for entitlement time.
-- [x] SB-M39-027 Gate shipping manual 2x requests behind a valid level/timed entitlement or purchase flow.
-- [x] SB-M39-028 Preserve free entitlement-independent authoritative M23-exhausted automatic 2x.
-- [x] SB-M39-029 Implement `booster_inventory.gd` with exactly four charge counters and charge-before-SB consumption.
-- [x] SB-M39-030 +1 Slot booster: 500 SB, max once/attempt, authoritative slot capacity 5→6 only for current attempt.
-- [x] SB-M39-031 Extend M24 placement/full-slot queries from fixed five to authoritative capacity 5/6 without breaking five-slot baseline tests.
-- [x] SB-M39-032 Extend M27 solver/deadlock state/canonicalization/fixtures to capacity 5/6.
 - [ ] SB-M39-033 Add sixth-slot presentation/layout support and mobile safe-area evidence; no 7+ slot state.
-- [x] SB-M39-034 Random booster: 350 SB, reorder only remaining unselected M23 batches without changing identities/counts/conservation.
-- [x] SB-M39-035 Random commit requires solver proof of at least three consecutive legal non-deadlocking front selections; failed search consumes nothing.
-- [x] SB-M39-036 Selector booster: 500 SB; present solver-safe eligible remaining batches/colors only.
-- [x] SB-M39-037 Selector performs one atomic arbitrary-remaining extraction + standard rightmost-EMPTY placement; full capacity/unsafe choice consumes nothing.
-- [x] SB-M39-038 Tornado booster: 750 SB; choose exactly one present color.
-- [x] SB-M39-039 Tornado atomically clears all remaining ACTIVE cells of chosen color and reconciles M23 supply, M24 slots, M25 claims/reservations, M26 in-flight agents/quotas and M27 state.
-- [x] SB-M39-040 Prove Tornado rollback/failure consumes no charge/SB and leaves no ghost batch/agent/double-clear.
-- [x] SB-M39-041 Implement `daily_service.gd`: visible consecutive-login count plus repeating 5-day reward cycle.
-- [x] SB-M39-042 Daily login rewards: D1 100 SB; D2 Standard Pack; D3 random booster; D4 250 SB + Standard Pack; D5 300 SB + selected booster + Premium Pack.
-- [x] SB-M39-043 Daily has exactly three tasks with 75/100/125 SB individual rewards and one random booster for completing all three.
-- [x] SB-M39-044 Missing a local calendar day resets login streak/cycle; clock rollback can never create duplicate claims.
-- [x] SB-M39-045 Implement `collection_inventory.gd` for 15 sets × 9 cards, protected first copy and completion state.
-- [x] SB-M39-046 Standard Pack = 3 eligible draws; Premium Pack = 5 eligible draws with >=1 Rare-or-better; duplicates allowed.
-- [x] SB-M39-047 Implement exact per-set 9/9 rewards from Economy V1: S1 350/5, S2 400/5, S3 450/6, S4 500/7, S5 550/7, S6 600/8, S7 700/9, S8 750/9, S9 800/10, S10 900/10, S11 1000/11, S12 1100/12, S13 1250/13, S14 1500/15, S15 2500/20 (SB/Bot Parts), each exactly once.
-- [x] SB-M39-047A Grant Master Collection exactly once when all 15 sets first reach 9/9: +2500 SB +20 Bot Parts, additional to Set 15.
-- [x] SB-M39-047B Prove total 15-set completion milestones = 13,350 SB +147 Bot Parts; including Master Collection = 15,850 SB +167 Bot Parts.
-- [x] SB-M39-047C Persist per-set completion-grant transaction IDs and Master Collection transaction ID so sync/relaunch cannot double-grant.
-- [x] SB-M39-048 Implement `cards_exchange_service.gd`; only copies above protected first copy are exchangeable.
-- [x] SB-M39-049 Exchange values: Common 25 / Rare 75 / Epic 200 / Legendary 500 SB.
-- [x] SB-M39-050 Implement per-card and EXCHANGE ALL EXTRAS atomic exchange; never reduce collected owned count below 1.
-- [x] SB-M39-051 Prove Stars, Star Exchange, Event Points and profile-XP economic state do not exist in production save/runtime APIs.
-- [x] SB-M39-052 Add full Economy V1 headless regression matrix for grants/spends/rollover/offline clocks/boosters/exchange/idempotency.
-- [x] SB-M39-053 Test stability follow-up: real-wall-clock boundary flake removed from `tests/m39_v04_integration.gd` `_phase_c_plus_one()` by injecting deterministic fixed clock/local-day through the existing AppState/economy test seam. Exact whole-economy `econ.snapshot() == pre_econ` assertion remains intact; production code unchanged; 10/10 isolated runs PASS plus root/M39/M40/M43/M55 clock/economy regressions PASS. Implementation `1cd735a623785a8115315d4b26dca14e97076726`; audit `coordination/sessions/M39-C002/CHATGPT_AUDIT_V01.md`. `[AUDITED_PASS / CLOSED 2026-09-30]`
-- [x] **SB-M39-054 — Random-any-booster reward semantics correction. [PASS / CLOSED 2026-10-09]** `random_any_booster_charges` selects one stable deterministic charge from all four canonical boosters per reward unit; Gift 50 / Daily D3 / 3/3 Tasks-ScrubBox corrected; selected-booster rewards unchanged; `Mystery Booster` presentation no longer impersonates the gameplay RANDOM booster. Implementation `cbb1592da13475f75eb149a0f82d82283e041db8`; audit `coordination/sessions/M39-C003/CHATGPT_STRICT_AUDIT_V01.md`.
 
 ### M40 — Save System
 
@@ -1849,20 +993,6 @@ V04 remediation authority: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V04.md
 V03 remediation authority: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V03.md` + `CHATGPT_AUDIT_CRITERIA_V03.md`. Frozen F-M40-V02-001..009. SB-M40-004/006/007 are independently accepted; remaining rows await V03/dependency closure.
 
 Pre-authored batch bundle: `coordination/sessions/M40-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. All 13 task IDs require separate GitHub task logs; M40 is the batch endpoint and remains subject to later strict full-surface ChatGPT audit.
-
-- [x] SB-M40-001 Versioned schema.
-- [x] SB-M40-002 Settings.
-- [x] SB-M40-003 Progression.
-- [x] SB-M40-004 Win streak.
-- [x] SB-M40-005 Persist Economy V1 wallet, Hearts/regen anchor, Bot Parts/robots, cards, booster charges, Gift Meter, Daily and 2x entitlements.
-- [x] SB-M40-006 Safe write strategy.
-- [x] SB-M40-007 Missing-save behavior.
-- [x] SB-M40-008 Corruption recovery.
-- [x] SB-M40-009 Migration strategy.
-- [x] SB-M40-010 Round-trip tests.
-- [x] SB-M40-011 Corrupt-file tests.
-- [x] SB-M40-012 Migrate old saves with missing Economy V1 fields to safe defaults; never invent Star/Event balances.
-- [x] SB-M40-013 Persist wall-clock timestamps/expiry defensively against duplicate reward/refill claims.
 
 ### M41 — Settings `[CLOSED 2026-09-25]`
 
@@ -1877,15 +1007,6 @@ Evidence:
 - `coordination/OWNER_M41_SETTINGS_ACCEPTANCE_V01.md`
 - `coordination/sessions/M41-C002/CHATGPT_AUDIT_V01.md`
 - `coordination/OWNER_M41_C002_REDUCED_EFFECTS_ACCEPTANCE_V01.md`
-
-- [x] SB-M41-001 Master volume.
-- [x] SB-M41-002 Music.
-- [x] SB-M41-003 SFX.
-- [x] SB-M41-004 Haptics.
-- [x] SB-M41-005 Reduced effects.
-- [x] SB-M41-006 Persistence.
-- [x] SB-M41-007 Settings UI.
-- [x] SB-M41-008 Relaunch tests.
 
 ### M42 — Home / Navigation
 
@@ -1910,48 +1031,14 @@ V03 independent audit: `coordination/sessions/M42-C001/audits/SB-M42-HOME-OWNER-
 Home rebuild V04 owner decision: `coordination/OWNER_M42_HOME_REBUILD_V04_SINGLE_WORLD_BACKGROUND.md`
 V04 implementation prompt: `coordination/sessions/M42-C001/task_prompts/SB-M42-HOME-REBUILD_V04.md`.
 
-- [x] SB-M42-001 Navigation architecture.
-- [x] SB-M42-002 Home.
-- [x] SB-M42-003 Play/Continue.
-- [x] SB-M42-004 Settings.
-- [x] SB-M42-005 Level select if approved. `[OWNER-LOCKED: NO SHIPPING LEVEL SELECT]`
-- [x] SB-M42-006 Gameplay transition.
-- [x] SB-M42-007 Results transition.
-- [x] SB-M42-008 Prevent duplicate transitions.
-- [x] SB-M42-009 Back navigation.
-- [x] SB-M42-010 Build Home as responsive Godot containers/components.
-- [x] SB-M42-011 Recreate owner-approved Home art direction with canonical regions. `[AUDITED_PASS / V07 / OWNER_VISUAL_PASS]`
-- [x] SB-M42-012 Keep shortcut columns responsive around central area.
-- [x] SB-M42-013 Validate Home-specific manifest entries in `assets/ui/HOME_ASSET_MANIFEST.json` before generation.
-- [x] SB-M42-014 Generate only Home-specific required illustrative assets using approved provider order (ChatGPT primary, Magnific fallback). `[AUDITED_PASS / V02]`
-- [x] SB-M42-015 Keep dynamic values/timers/counts/labels live in Godot UI.
-- [x] SB-M42-016 Require owner approval before production promotion. `[AUDITED_PASS / V02]`
-- [x] SB-M42-017 Bind approved art and validate viewport matrix. `[AUDITED_PASS / V07 / OWNER_VISUAL_PASS]`
-- [x] SB-M42-018 Replace coin HUD semantics with Scrub Bucks banknote icon + live SB amount. `[AUDITED_PASS / V02]`
-- [x] SB-M42-019 Replace profile XP bar with live Bot Parts next-robot progress (normally N/250).
-- [x] SB-M42-020 Replace top event bar/timer with Gift Meter progress/next milestone; no Event Points/timer.
-- [x] SB-M42-021 Bind Gift Bar to queued Gift Meter milestone claims and live claimable count.
-- [x] SB-M42-022 Replace Star Exchange shortcut with Cards Exchange and duplicate-card count/state.
-- [x] SB-M42-023 Render lower road as Win Streak SB reward track 1/5/10/25/100; no Star balance.
-- [x] SB-M42-024 Implement Daily consecutive-login count / 5-day cycle / booster reward presentation.
-- [x] SB-M42-025 Keep all SB prices, Bot Parts values, Gift Meter values and Daily states live/localizable.
-
 **Owner runtime validation [2026-09-27 / OWNER_RUNTIME_PASS / VISUAL_POLISH_OPEN]:**
 `coordination/OWNER_ECONOMY_PROGRESSION_RUNTIME_VALIDATION_V01.md`.
 During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Bucks balance, Gift Meter, Bot Parts/next-robot progress and Home progression bars were manually confirmed to update correctly. Treat these mechanics/data bindings as working runtime truth; later tasks remain responsible for improving their visual quality and reward/presentation polish without rewriting the validated backend unnecessarily.
 
 **Opening cinematic / boot flow [OWNER ASSET — 2026-09-19]**
 
-- [x] SB-M42-026 Opening cinematic source: preserve the owner-supplied 15-second source video at `assets/brand/opening/final_15_seconds_opening_video.mp4`.
-- [x] SB-M42-027 Preserve the MP4 as source/reference, but create a Godot-runtime Ogg Theora + Vorbis version at `assets/brand/opening/scrubbots_opening_720p30.ogv`; do not rely on H.264/MP4 playback in core Godot.
-- [x] SB-M42-028 Implement a dedicated opening-video scene using `VideoStreamPlayer`, with aspect-ratio-safe presentation for the portrait app and no image distortion.
-- [x] SB-M42-029 On successful video completion, transition exactly once into the normal Home/bootstrap flow; failure to decode/play must fail safely into Home rather than blocking startup.
-- [x] SB-M42-030 Opening cinematic skip behavior. `[OWNER-LOCKED: NO SKIP / AUDITED_PASS]`
-- [x] SB-M42-031 Playback frequency `[OWNER-LOCKED]`: cinematic plays on every cold/native app launch; no replay for internal navigation/retry/background resume.
 - [ ] SB-M42-032 Validate opening cinematic on Android real device for smooth 720p/30 playback, audio sync, startup latency, orientation, background/foreground behavior and memory cleanup. `[CODE_AUDIT_PASS / DEVICE_OWNER_REQUIRED]`
 - [ ] SB-M42-033 Validate iOS readiness later with the same boot-flow fallback and aspect rules. `[CODE_AUDIT_PASS / IOS_DEVICE_LATER]`
-- [x] SB-M42-034 Home Scrubby Hero Scale + Placement Lock: Home hero is exactly +30% from production 1.24 to canonical `SCRUBBY_SCALE = 1.612`, preserving the separate runtime hero layer, visible-sole/platform anchor, Home input/UI hierarchy and responsive safe-area behavior. Implementation `72a78620de42da6aa1b9f2ba00b6d15da9acfc7b`; audit `coordination/sessions/M42-C002/CHATGPT_AUDIT_V01.md`; owner gate `coordination/sessions/M42-C002/OWNER_VISUAL_GATE_V01.md`: V1/V2/V3/V4 all OK. The owner-noticed 1536x2048 mirrored edge continuation is pre-existing and explicitly accepted. `[AUDITED_PASS + OWNER VISUAL PASS / CLOSED 2026-10-01]`
-- [x] SB-M42-035 Home Scrubby Runtime Animation: V03 implementation accepted against the owner-approved 1.612 Home hero. Wave 14 / Bow 15 / bilateral Turn-Look 17 / Full Turn 17 are promoted and SHA-pinned on one deterministic common animation canvas/pivot; HomeScrubbyHero runtime, 6–12 s scheduler, 35/30/25/10 weights, no-repeat/no-stack, Reduced Effects, lifecycle/modal/focus gating, screen-space collision validation and responsive evidence are implemented. Focused V03 test 18/18 and root suite 5323/5323 pass; two unrelated M21 top-level failures reproduce identically on untouched baseline. Technical audit: `coordination/sessions/M42-C003/CHATGPT_AUDIT_V03.md`; owner visual gate: `coordination/sessions/M42-C003/OWNER_VISUAL_GATE_V03.md` = Wave/Bow/Turn-Look/Full Turn 4/4 PASS. `[AUDITED PASS + OWNER VISUAL PASS / CLOSED 2026-10-02]`
 
 ### M43 - Results / Player Experience / Meta UI Surface Program [PLANNED / REQUIRED]
 
@@ -1970,99 +1057,14 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 
 **C001B status: FINAL OWNER PASS.** Technical audit PASS at `4d198e9`; owner visual acceptance recorded in `coordination/sessions/M43-C001B/FINAL_OWNER_VISUAL_ACCEPTANCE_V01.md`. `victory_results` is `MASTER_OWNER_APPROVED`. Only SB-M43-013 remains open because downstream ceremonies belong to M43-C005.
 
-- [x] SB-M43-001 Result model.
-- [x] SB-M43-002 Completion UI.
-- [x] SB-M43-003 Streak presentation.
-- [x] SB-M43-004 Show/apply first-clear difficulty SB + streak SB + Bot Part/Collection rewards through RewardGrantService.
-- [x] SB-M43-005 Continue.
-- [x] SB-M43-006 Replay if approved; replay never farms progression economy. **[OWNER: NO SHIPPING REPLAY IN V1 RESULTS]**
-- [x] SB-M43-007 No double reward.
-- [x] SB-M43-008 Rapid-tap protection.
-- [x] SB-M43-009 Produce and owner-approve a canonical Victory/Results visual master consistent with the Life/Help popup family.
-- [x] SB-M43-010 Reveal first-clear SB, Win Streak bonus, Bot Parts, Gift Meter progress and Collection/Card rewards in a short ordered celebration sequence rather than dumping all rewards silently.
-- [x] SB-M43-011 Support a compact replay result path that clearly communicates zero progression reward on replay. **[RESOLVED BY OWNER: NO SHIPPING REPLAY, so no replay result path is built.]**
-- [x] SB-M43-012 If a win crosses a Gift Meter milestone, queue/show the milestone celebration without double granting.
 - [ ] SB-M43-013 If the win unlocks a robot, collection set, Master Collection, feature or world, hand off to the corresponding ceremony in M43-C005 after the core Results reward commit succeeds.
-- [x] SB-M43-014 Results Continue advances exactly once to the next canonical progression level and cannot be double-tapped into duplicate transitions.
-
 
 #### M43-C001R - Results Momentum / Next-Level Curiosity / 10-Level Cleaning Journey [OWNER APPROVED 2026-09-30]
 
 These tasks extend the already owner-approved Results surface without changing its reward authority. The goal is a strong "one more level" continuation loop built from truthful next-content information, not fake scarcity, near-miss messaging or hidden reward manipulation.
 
-- [x] SB-M43-R01-001 Add a deterministic **Next Cleanup** teaser after authoritative Results rewards/required ceremonies: resolve the actual next canonical progression level first, then reveal only a controlled preview of its real artwork/metadata.
-- [x] SB-M43-R01-002 Default teaser language is silhouette / cropped-detail / limited-palette reveal, targeting roughly 15–25% visual information; never fabricate an unreleased level, fake a reward, or expose the full puzzle artwork before play.
-- [x] SB-M43-R01-003 Teaser displays truthful next-level context only: level number, approved class/difficulty label and optional palette/color-count summary when available; unavailable frontier content shows an honest disabled/coming-soon state.
-- [x] SB-M43-R01-004 Recompose the post-win flow as one momentum corridor: reward commit → compact secondary progress summary → any mandatory ceremony handoff → Next Cleanup teaser → one dominant **CLEAN NEXT** action; Home/back remains secondary and never traps the player.
-- [x] SB-M43-R01-005 Implement a visible **10-Level Cleaning Journey** using the existing canonical cadence only: ten nodes per cycle, slot 5 presented as the mini-boss beat and slot 10 as the cycle-boss beat; this is meta progress UI, **not a World Diorama and not a level-select surface**.
-- [x] SB-M43-R01-006 Journey state derives from ProgressionService/canonical cadence and survives cycle boundaries correctly (1→10 then next cycle 1); it never unlocks, skips or rewinds levels and never changes difficulty truth.
-- [x] SB-M43-R01-007 Results and Home may show the same journey read model, but there is one authority for cycle position and completion; nodes are informational and non-tappable unless a later owner decision explicitly changes the no-shipping-Level-Select rule.
-- [x] SB-M43-R01-008 Add focused tests for next-level resolution, frontier/missing-content fallback, double-tap protection, ceremony chaining, cycle 9→10→next-1 transitions, Reduced Effects and save/relaunch continuity.
-
-#### M43-C002 - Reusable Popup / Modal / Pause Foundation
-
-- [x] SB-M43-015 Implement reusable `BasePopup` with dim background, responsive frame, header/content/footer slots and canonical close behavior.
-- [x] SB-M43-016 Implement modal stack authority so exactly one top modal owns input; background Home/gameplay controls are hidden or input-disabled as appropriate.
-- [x] SB-M43-017 Implement reusable confirm popup for destructive/costly actions.
-- [x] SB-M43-018 Implement reusable reward/confirmation popup.
-- [x] SB-M43-019 Implement canonical Pause popup with Resume / Restart / Home and current level context.
-- [x] SB-M43-020 Restart confirmation must state Heart/streak consequence when gameplay has begun and must use M30/M39 truth rather than UI guesses.
-- [x] SB-M43-021 Home/exit confirmation must distinguish pre-first-action no-cost exit from post-action loss semantics.
-- [x] SB-M43-022 Implement generic insufficient-SB route that can open Shop without losing the pending acquisition context.
-- [x] SB-M43-023 Implement generic network-required/error state for rewarded ad, store, cloud and live-event surfaces.
-- [x] SB-M43-024 Implement loading/busy state and disable duplicate taps while an external transaction is unresolved.
-- [x] SB-M43-025 Implement canonical success/failure feedback for purchases, rewarded grants, exchanges and claims.
-- [x] SB-M43-026 Back/Escape closes the top modal first and never leaks an action into the screen behind it.
-- [x] SB-M43-027 Modal open/close state survives focus loss/background safely without duplicate callback execution.
-- [x] SB-M43-028 Produce/approve the popup chrome visual kit and keep normal labels, values, timers and prices live in Godot. — OWNER VISUAL PASS 2026-09-28.
-- [x] SB-M43-029 Add focused automated tests for modal priority, background input suppression, duplicate callbacks and deterministic close/back behavior.
-
-#### M43-C003 - Life / Hearts / Scrub Bucks / Booster / 2x Acquisition Surfaces
-
-- [x] SB-M43-030 Implement the canonical Life popup from the selected Life master reference.
-- [x] SB-M43-031 Life popup shows live Hearts current/max and the real next-Heart wall-clock countdown; at 5/5 use the canonical static **15:00 ready state** rather than a separate authoritative timer.
-- [x] SB-M43-032 Heart `+` on Home opens Life popup; zero-Heart attempt gate opens the same canonical surface instead of a separate inconsistent dialog.
-- [x] SB-M43-033 Life popup supports +1 Heart for 500 SB and full refill at 400 SB per missing Heart using HeartService/EconomyWallet atomically.
-- [x] SB-M43-034 Life popup includes the canonical rewarded-video path for +1 Heart when a rewarded placement is available and policy permits it; ad-unavailable state must degrade cleanly.
-- [x] SB-M43-035 Rewarded Heart grant is exactly-once per completed verified reward callback; closing/skipping/failing an ad grants nothing.
-- [x] SB-M43-036 Scrub Bucks `+` on Home opens the canonical Shop / SB acquisition destination and preserves return context.
-- [x] SB-M43-037 Implement one reusable `BoosterAcquirePopup` driven by booster definition data rather than four duplicated scenes.
-- [x] SB-M43-038 Booster Acquire popup shows selected booster icon/name, concise effect explanation, owned charges and live SB price.
-- [x] SB-M43-039 If a booster charge exists, gameplay uses the charge-first Economy V1 rule and does not unnecessarily open purchase UI.
-- [x] SB-M43-040 With zero charge, +1 Slot offers one-use acquisition at 500 SB or one rewarded-video charge/use when available.
-- [x] SB-M43-041 With zero charge, Random offers one-use acquisition at 350 SB or one rewarded-video charge/use when available.
-- [x] SB-M43-042 With zero charge, Selector offers one-use acquisition at 500 SB or one rewarded-video charge/use when available.
-- [x] SB-M43-043 With zero charge, Tornado offers one-use acquisition at 750 SB or one rewarded-video charge/use when available.
-- [x] SB-M43-044 A rewarded booster grant must never bypass solver-safety/availability checks; if the booster cannot legally execute, do not consume the newly granted use until the player can use it.
-- [x] SB-M43-045 Implement canonical 2x Acquire popup for current level 200 SB / 15m 300 SB / 30m 500 SB / 60m 750 SB.
-- [x] SB-M43-046 2x popup shows existing entitlement/time remaining and never charges again for switching 1x/2x while entitlement is active.
-- [x] SB-M43-047 Free M23-supply-exhausted auto-2x never opens purchase UI and never consumes/extends paid entitlement.
-- [x] SB-M43-048 All acquisition surfaces survive insufficient balance, rapid taps, background/resume, ad unavailable and transaction retry without double spend/grant.
-- [x] SB-M43-049 Produce/owner-approve visual masters for Booster Acquire, 2x Acquire and insufficient-SB/Shop handoff states in the canonical popup family. — OWNER VISUAL/UX PASS 2026-09-28.
-
-#### M43-C004 - Fail / Retry / Need a Hand Recovery
-
-- [x] SB-M43-050 Produce/owner-approve a canonical Fail/Retry popup visual master.
-- [x] SB-M43-051 Track consecutive failed attempts per current progression level separately from lifetime stats; replay failures do not pollute progression assistance.
-- [x] SB-M43-052 Winning the level or changing progression level resets the same-level assistance counter.
-- [x] SB-M43-053 After the third consecutive failed attempt on the same progression level, show the canonical Need a Hand? popup after failure resolution and Heart/streak accounting.
-- [x] SB-M43-054 Need a Hand? uses the owner-selected `need a hand.png` as art-direction authority but is implemented with live Godot text/buttons/data.
-- [x] SB-M43-055 Need a Hand? presents exactly two helpful booster recommendations, not an arbitrary storefront.
-- [x] SB-M43-056 Recommendation engine must prefer boosters that are legal/useful for the level/current canonical start-state and must never recommend an unavailable/meaningless action.
-- [x] SB-M43-057 Where solver/context evidence cannot distinguish a best pair safely, use a deterministic owner-configured fallback pair rather than fake intelligence.
-- [x] SB-M43-058 Each recommended booster can be acquired with its canonical SB cost or a rewarded-video grant when available.
-- [x] SB-M43-059 Closing Need a Hand? never spends currency, consumes a Heart, grants a booster or changes puzzle truth.
-- [x] SB-M43-060 Assistance popup frequency after the initial third failure is configurable and must avoid appearing after every tap/instant retry in an annoying loop.
-- [x] SB-M43-061 Record assistance shown/acquired/declined locally and later expose analytics events under M56 without changing gameplay difficulty behind the player's back.
-- [x] SB-M43-062 Test third-failure trigger, reset-on-win, reset-on-level-change, ad/SB acquisition, no-double-grant and unavailable-booster fallback.
-
 #### M43-C005 - Reward, Pack, Collection, Robot, Feature and World Ceremonies
 
-- [x] SB-M43-063 Implement reusable short reward-reveal sequencing with skip/fast-forward only where it cannot skip authoritative grant commits. CLOSED by `coordination/sessions/M43-C005-C005/CHATGPT_AUDIT_V01.md`.
-- [x] SB-M43-064 Implement Standard Card Pack opening presentation for 3 draws with rarity reveal and duplicate/new distinction. CLOSED by `coordination/sessions/M43-C005-C006/CHATGPT_AUDIT_V03.md`, `coordination/sessions/M43-C005-C006/owner_review_harness/CHATGPT_AUDIT_V02.md` and final owner acceptance `coordination/sessions/M43-C005-C006/OWNER_VISUAL_ACCEPTANCE_V03.md`.
-- [x] SB-M43-065 Implement Premium Card Pack opening presentation for 5 draws including guaranteed Rare-or-better truth from the pack service. CLOSED by `coordination/sessions/M43-C005-C007/CHATGPT_AUDIT_V01.md` and final owner acceptance `coordination/sessions/M43-C005-C007/OWNER_VISUAL_ACCEPTANCE_V01.md`.
-- [x] SB-M43-066 Pack contents are committed before/atomically with presentation and reopening the reveal never duplicates cards. CLOSED by `coordination/sessions/M43-C005-C008/CHATGPT_AUDIT_V02.md`.
-- [x] SB-M43-067 Implement first-new-card celebration and clear duplicate-count presentation. CLOSED by `coordination/sessions/M43-C005-C009/CHATGPT_AUDIT_V01.md` + `coordination/sessions/M43-C005-C009/OWNER_VISUAL_ACCEPTANCE_V01.md`.
 - [ ] SB-M43-068 Implement Collection set 9/9 completion ceremony with the exact per-set SB/Bot Part reward.
 - [ ] SB-M43-069 Implement Master Collection completion ceremony for +2500 SB +20 Bot Parts exactly once.
 - [ ] SB-M43-070 Implement Robot Unlock ceremony with canonical robot art, name, personality/perk summary and remaining Bot Parts carryover.
@@ -2071,9 +1073,7 @@ These tasks extend the already owner-approved Results surface without changing i
 - [ ] SB-M43-073 Implement World unlock/transition ceremony once world-range rules are owner-defined; never invent ranges in UI.
 - [ ] SB-M43-074 Implement Gift Meter milestone celebration for 10/50/250/500/1000 with exact queued reward truth.
 - [ ] SB-M43-075 Implement Daily cycle reward celebration and 3/3 Tasks booster-completion celebration.
-- [x] SB-M43-076 Produce/owner-approve visual masters for pack opening, robot unlock, set completion, Master Collection, Gift milestone and generic feature/world unlock. CLOSED: C001 ceremony masters owner-accepted; C002 Standard/Premium pack assets final owner pass; C003 135 individually generated Collection cards independent audit PASS; C004 Booster-of-your-choice owner visual PASS + exact canonical intake audit PASS.
 - [ ] SB-M43-077 Meta reward ceremonies respect Reduced Effects and can collapse to concise accessible presentation without changing grants.
-
 
 ##### M43-C005R - Gift Meter Micro-Progress Feedback [OWNER APPROVED 2026-09-30]
 
@@ -2086,20 +1086,7 @@ These tasks extend the already owner-approved Results surface without changing i
 
 Effect-intensity vocabulary for this program: **MICRO → SMALL → REWARD → MAJOR_REWARD → WIN → MAJOR_UNLOCK**. It is a presentation budget/hierarchy only, never gameplay/economy importance truth. Initial FULL-mode particle ceilings are deliberately conservative and must be profiled before owner acceptance: MICRO 0 Spark particles; SMALL 0–4; REWARD 4–8; MAJOR_REWARD 8–14; WIN 12–18; MAJOR_UNLOCK 16–24. Reduced Effects uses static/native truth first, removes screen/camera effects entirely, disables looping motion, and either removes Spark or caps it to a tiny nonessential burst only where accessibility review approves.
 
-- [x] **SB-M43-C005F-001 — Canonical plugin intake/API/license gate. [AUDITED PASS / CLOSED 2026-10-08 — `4ee5a490`; `coordination/sessions/M43-C005F-PHASE1/CHATGPT_INDEPENDENT_AUDIT_V01.md`]** Purpose: reconcile the already-working local GameFeelFlow + Saltmire Spark installation with canonical GitHub before any shipping call site is added. **Seam:** `project.godot`, local `addons/game_feel_flow/`, local `addons/saltmire_spark/`, each addon `plugin.cfg`/autoload registration. **Plugin:** both; verify exact installed names/methods/effects rather than trusting planning assumptions. **Native/existing remains:** Godot project boot, all SCRUBBOTS services/scenes and current M43 sequencing. **Reduced Effects:** N/A except prove the setting service boots with addons present/absent. **Idempotency:** plugin enable/reload must not create duplicate autoloads/signals. **Mobile/perf:** remove/keep removed non-shipping GameFeelFlow examples/tests and Saltmire demo material only after verifying runtime independence; no editor/demo/test dependency in release. **Automated:** headless parse/startup, exact autoload presence, no GdUnit/demo dependency, clean clone. **Godot AI:** open the real project and verify both autoloads answer a harmless capability query without parse/runtime errors. **Regression/gate:** preserve current active M43 work; retain MIT LICENSE/required attribution files; no GameFeelFlow Pro or paid Saltmire Impact dependency; audit required, no owner visual gate because this is intake only.
-- [x] **SB-M43-C005F-002 — One fail-open SCRUBBOTS feedback adapter + intensity policy. [AUDITED PASS / CLOSED 2026-10-08 — `4ee5a490`; one canonical adapter, actual API allow-list, bounded lifecycle]** Purpose: prevent plugin calls from being scattered through economy/gameplay code and encode MICRO/SMALL/REWARD/MAJOR_REWARD/WIN/MAJOR_UNLOCK in one presentation-only coordinator. **Seam:** ephemeral app/presentation layer created from `scripts/app/main.gd::_ready()`, reading/subscribing to canonical `EffectsSettingsService.changed`; inject/reference only from Results/Home/popup/ceremony/presentation controllers, never from durable `AppState` authority. **Plugin:** `GameFeelFlow.play()/play_combo()/stop_all()` and `Spark.burst()/at()/clear()`. **Native/existing remains:** `EffectsSettingsService`, AudioSettingsService, HapticsSettingsService, NavigationController, ModalStack, BasePopup lifecycle and all authoritative services. **Reduced Effects:** adapter maps each intent to FULL/REDUCED behavior and can immediately cancel decorative plugin work on a live Reduced toggle. **Idempotency:** API accepts an optional presentation event key and refuses duplicate one-shot keys. **Mobile/perf:** hard per-tier duration/particle ceilings; no unbounded loops or scene-long effect ownership. **Automated:** adapter spies prove intent→plugin mapping, duplicate suppression, missing-autoload/no-op behavior, Reduced mapping and cleanup. **Godot AI:** runtime trigger matrix for each tier. **Regression/gate:** plugin exception/missing node must never stop caller control flow; independent audit required; owner visual gate required only after tier look is bound to real surfaces.
-- [x] **SB-M43-C005F-003 — WON Results one-shot celebration and CLEAN NEXT emphasis. [TECHNICAL PASS + OWNER VISUAL PASS / CLOSED 2026-10-08 — `cfb1f6d3`; owner acceptance `coordination/sessions/M43-C005F-PHASE2/OWNER_RESULTS_VISUAL_ACCEPTANCE_V01.md`]** Purpose: add restrained celebratory feel to an already-committed win. **Seam:** `scripts/app/main.gd::_on_route_changed()` → `ResultsScreen.show_model()`, using `model.status`, `model.attempt`, `ResultsScreen.get_robot()`, Victory emblem/header, existing `set_ceremony_barrier()` and CLEAN NEXT button. **Plugin:** GameFeelFlow `punch_scale`/spring-style scale emphasis plus at most one element-local non-strobing flash; Spark custom `confetti` burst(s) within WIN budget. **Native/existing remains:** Results layout/art, native reward-row tween, receipt truth, Continue latch, ceremony barrier, navigation. **Reduced Effects:** no confetti, no flash, no entrance bounce; preserve static approved Results and immediate reward truth, with at most a single tiny non-repeating CTA emphasis if accessibility review accepts it. **Idempotency:** celebration key must include terminal attempt/status and fire once only; repeated `show_model()`, resize/refresh or Continue re-arm must not replay WIN. **Mobile/perf:** max WIN budget, short self-cleaning lifetime, no camera shake/freeze/time-scale. **Automated:** call-count test across repeated same-attempt `show_model()`, new attempt, LOST/ERROR, barrier hold/release. **Godot AI:** capture FULL/REDUCED WON at required phone/tablet sizes and verify Scrubby/emblem/CTA hierarchy. **Regression/gate:** reward/navigation tests stay green; independent audit + owner visual gate.
-- [x] **SB-M43-C005F-004 — Results reward-row feedback by committed reward kind. [TECHNICAL PASS + OWNER VISUAL PASS / CLOSED 2026-10-08 — `cfb1f6d3`]** Purpose: make SB, Bot Parts, Gift Meter, card-pack/Collection, first-clear and Win Streak rows feel responsive without changing their order/truth. **Seam:** `ResultsScreen.reward_rows()`, `_row()`, `_start_reveal()` and each row's existing `kind` metadata; effects fire only when the native reveal step actually exposes that already-created committed row. **Plugin:** GameFeelFlow `punch_scale` or `ui_notification` on the row/icon; Spark `pickup`/small custom spark only for REWARD-or-higher rows. **Native/existing remains:** current receipt `reveal_queue`, row creation, native tween sequencing and Continue/Home availability. **Reduced Effects:** preserve current contract that rows are immediately visible; no sequential plugin motion and normally zero particles. **Idempotency:** one row-kind/index event once per Results attempt; refresh must not mint a second celebration. **Mobile/perf:** only one short row effect at a time; particle amount within REWARD ceiling. **Automated:** exact row order/content unchanged, one effect call per eligible row, zero grant/service calls from feedback. **Godot AI:** verify readable amounts during/after effects and no overlap/clipping. **Regression/gate:** M43-C001A/B/R Results tests + receipt idempotency; visual audit required, owner gate may be folded into overall Results feel gate.
-- [x] **SB-M43-C005F-005 — Standard/Premium pack + individual card reveal feel. [PASS / CLOSED 2026-10-08 — R02 technical PASS + OWNER RUNTIME PASS; owner acceptance `coordination/sessions/M43-C005F-PHASE2/OWNER_PACK_RUNTIME_ACCEPTANCE_V01.md`]** Purpose: layer feel onto the owner-approved pack-opening frame sequence and committed card reveals without replacing the art/animation or rerolling contents. **Seam:** future shipping M43-C005 pack ceremony controller built from the approved Standard/Premium frame sets and BasePopup/ModalStack; preview harness is evidence only, never runtime authority. **Plugin:** GameFeelFlow scale punch/squash on pack/card reveal nodes and restrained element-local flash for Rare-or-better only when non-strobing; Spark `pickup`/spark accents within REWARD/MAJOR_REWARD budgets. **Native/existing remains:** approved 9-frame pack art, exact 3/5 committed draws, rarity/new/duplicate truth, grant-before-presentation/idempotency. **Reduced Effects:** jump/crossfade quickly to committed cards; no foil bounce, no flash, particles zero or minimal; all names/rarities/counts remain fully readable. **Idempotency:** opening/reopen/resume can never reroll or replay committed grants; feedback event key derives from committed pack reveal transaction/presentation id. **Mobile/perf:** never animate all 5 Premium cards with high-cost effects simultaneously; stagger/limit within budget. **Automated:** card counts/order/hashes/truth unchanged, no service mutation, duplicate presentation event suppressed. **Godot AI:** visually validate Standard/Premium FULL/REDUCED and frame-to-plugin layering. **Regression/gate:** M39 pack tests + M43 ceremony tests; independent audit + owner visual gate.
-- [x] **SB-M43-C005F-006 — Collection set/master-completion celebration tiers. [PASS / CLOSED 2026-10-09 — technical PASS + OWNER VISUAL PASS; `coordination/sessions/M43-C005F-PHASE3/OWNER_VISUAL_ACCEPTANCE_V01.md`]** Purpose: distinguish 9/9 set completion from all-15 Master Collection without inventing reward value. **Seam:** M43-C005 set/master ceremony BasePopup and committed reward rows, backed by existing Collection completion result. **Plugin:** set completion = GameFeelFlow REWARD/MAJOR_REWARD emblem/hero punch + modest Spark; Master Collection = MAJOR_REWARD with larger but capped confetti. **Native/existing remains:** exact per-set rewards and Master +2500 SB/+20 Bot Parts, once-only transaction truth, approved emblems/art. **Reduced Effects:** static emblem/reward rows, no spin/flash/confetti; optional single tiny scale settle only if accessible. **Idempotency:** one visual completion key per claimed set/master transaction. **Mobile/perf:** no stacking multiple set/master emitters if rewards queue together; serialize presentation only, never grants. **Automated:** exactly-once Collection reward regressions plus effect-call keys. **Godot AI:** compare ordinary set vs Master intensity and text legibility. **Regression/gate:** M54 016A/026 stay authoritative; independent audit + owner visual gate.
 - [ ] **SB-M43-C005F-007 — Robot / feature / world unlock feel, with MAJOR_UNLOCK ceiling.** Purpose: give genuinely major unlocks stronger but coherent presentation. **Seam:** M43-C005 Robot Unlock, feature-unlock coachmark and world-transition ceremony surfaces built on BasePopup/ModalStack; World remains gated by owner-defined ranges. **Plugin:** GameFeelFlow spring/punch on hero/emblem and one non-strobing element flash; Spark capped confetti/sparkle at MAJOR_UNLOCK. **Native/existing remains:** `RobotUnlockService`, equip/keep-current choice, M44 feature-unlock authority, NavigationController/world registry/transition logic, approved robot/world art. **Reduced Effects:** static hero/emblem + readable unlock copy; no confetti/flash/loop/spin. **Idempotency:** keyed to authoritative unlock id; refresh/equip choice/world navigation cannot retrigger the unlock ceremony. **Mobile/perf:** one major-unlock particle group at a time, short lifetime, no camera manipulation. **Automated:** unlock/equip/world truth unchanged and effect duplicates refused. **Godot AI:** Robot FULL/REDUCED mandatory; feature/world once those surfaces exist. **Regression/gate:** M43-070..073 and M54-027/030/032; independent audit + owner visual gate.
-- [x] **SB-M43-C005F-008 — Gift Meter, Gift claim, Daily/Tasks and earned-ScrubBox celebration feel. [PASS / CLOSED 2026-10-09 — technical PASS + OWNER VISUAL PASS; `coordination/sessions/M43-C005F-PHASE3/OWNER_VISUAL_ACCEPTANCE_V01.md`]** Purpose: emphasize actual milestone/claim commits while keeping ordinary progress quiet. **Seam:** existing/future Gift Meter milestone ceremony, Gift Bar claim result, M43-C005R normalized progress, Daily claim and 3/3 Tasks/ScrubBox committed outcome. **Plugin:** GameFeelFlow `ui_notification`/punch; Spark `pickup` for ordinary committed claim and capped confetti for real milestone/ScrubBox completion. **Native/existing remains:** GiftMeterService thresholds 10/50/250/500/1000, Daily/Tasks reward authority, Home/Gift Bar progress rendering. **Reduced Effects:** static progress jump + claim confirmation, particles off/minimal; no repeated pulse on ordinary refresh. **Idempotency:** only changed committed milestone/claim ids fire; Home refresh/reopen never retriggers. **Mobile/perf:** no particle burst for every micro-progress tick; milestone-only Spark. **Automated:** threshold/claim exactly-once plus refresh-no-repeat tests. **Godot AI:** Gift milestone and 3/3 Tasks/ScrubBox FULL/REDUCED captures. **Regression/gate:** M43-R05, M43-C009/R09 and M54-028/035; audit + owner gate for milestone intensity.
-- [x] **SB-M43-C005F-009 — Important acquisition confirmations and selective button feel. [PASS / CLOSED 2026-10-09 — technical PASS + OWNER VISUAL PASS; `coordination/sessions/M43-C005F-PHASE3/OWNER_VISUAL_ACCEPTANCE_V01.md`]** Purpose: make committed booster/Heart/important actions responsive without coating every button in effects. **Seam:** `AcquisitionFlow._apply_reward_outcome()`, `BasePopup.pending_resolved`, successful canonical booster use/charge acquisition, and high-value CTAs such as CLEAN NEXT / claim / open pack / equip; generic navigation/back/settings buttons stay native. **Plugin:** GameFeelFlow `ui_button_press` for selected primary actions and `ui_notification`/small punch after an authoritative success; Spark `pickup` only after a real grant/use commit. **Native/existing remains:** ProductionActionFacade, RewardedGrantService, popup pending tokens/latches, HomeStyle button states, audio/haptics. **Reduced Effects:** no particle burst; press state stays native, optional minimal scale feedback only. **Idempotency:** no effect before success callback; duplicate provider callbacks/rapid taps cannot duplicate feedback or grants. **Mobile/perf:** MICRO/SMALL/REWARD ceilings only. **Automated:** success/fail/cancel/timeout/duplicate callback matrix proves effects occur only after committed success. **Godot AI:** booster acquisition success/failure and primary CTA comparison. **Regression/gate:** M43-C003/M54-023/024; audit required, owner gate only for any visually prominent acquisition burst.
-- [x] **SB-M43-C005F-010 — Gameplay-complete → Results presentation bridge. [PASS / CLOSED 2026-10-10 — implementation `f44bb280`; QA-R01 `8018d3d7`; re-audit `coordination/sessions/M43-C005F-PHASE4-QA-R01/CHATGPT_INDEPENDENT_REAUDIT_V01.md`]** Purpose: smooth the transition from authoritative terminal completion into Results without delaying or owning the transition. **Seam:** `ProductionGameplayHost.get_completion().terminal_reached` observed by `scripts/app/main.gd::_bind_terminal()` and `NavigationController.on_gameplay_terminal()`; any plugin effect begins only after terminal truth is latched and must not await before navigation. **Plugin:** at most SMALL GameFeelFlow completion pulse/settle on presentation/HUD; Results-side Spark belongs to SB-M43-C005F-003, preventing duplicate confetti. **Native/existing remains:** completion signal, economy/save commit order, nav transition and host lifetime. **Reduced Effects:** no completion pulse; transition remains immediate. **Idempotency:** one presentation event per attempt terminal; no second event from duplicate signal/route refresh. **Mobile/perf:** sub-250 ms decorative work, no screen freeze/camera shake/time-scale. **Automated:** deliberate plugin throw/missing-autoload still reaches Results once with same receipt/save; duplicate-terminal guards unchanged. **Godot AI:** real level WIN transition with plugin FULL/REDUCED/disabled. **Regression/gate:** M30/M40/M42/M43 terminal/navigation tests; independent audit, no separate owner gate if visually subordinate to Results gate.
-- [x] **SB-M43-C005F-011 — Existing CleaningEffectsController Spark comparison/augmentation gate. [PASS / CLOSED 2026-10-10 / DO NOT USE SPARK PER-CELL / SHIPPING NATIVE-ONLY]** Purpose: test whether Saltmire Spark genuinely improves committed-cell cleaning feedback without replacing the accepted M31 pipeline. **Seam:** `CleaningEffectsController._on_authenticated_clear() -> request_effect() -> _spawn()`, existing identity-stable CleaningFxLayer, `MAX_ACTIVE_EFFECTS=24` / `REDUCED_MAX_ACTIVE=8`, approved puff/sparkle textures. **Plugin:** Saltmire Spark only; **do not use GameFeelFlow per cleared cell**. **Native/existing remains:** current puff + sparkle sprites, lifetimes, layer, cell placement, caps, reset/retry hygiene and authenticated-clear observer. **Reduced Effects:** keep current one-shorter-puff behavior and no Spark. **Idempotency:** one committed authenticated clear may request at most one bounded Spark accent; rolled-back/rejected/non-clear events produce none. **Mobile/perf:** compare A/B at 59×59 and 2×; if procedural Spark adds no clear visual benefit or exceeds budget, close this row as explicit **DO NOT USE Spark for per-cell cleaning** rather than forcing it in; no unlimited emitter creation. **Automated:** existing M31 tests plus plugin-call cap/lifetime/suppression tests; never alter clear count/timing. **Godot AI:** side-by-side native-only vs augmented real gameplay. **Regression/gate:** M31/M46 performance and gameplay truth; independent audit + owner visual gate before enabling augmentation.
-- [x] **SB-M43-C005F-012 — Home / Results-momentum micro feedback without refresh spam. [PASS / CLOSED 2026-10-10 — implementation `f44bb280`; QA-R01 `8018d3d7`; re-audit `coordination/sessions/M43-C005F-PHASE4-QA-R01/CHATGPT_INDEPENDENT_REAUDIT_V01.md`]** Purpose: add tiny state-change emphasis only where Home already exposes meaningful progression. **Seam:** Home's existing live `refresh()`/Gift Meter presentation and shared `JourneyStrip` state updates; Results momentum remains under its existing reveal/barrier contract. **Plugin:** GameFeelFlow MICRO/SMALL pulse on an actually changed progress/milestone/next-cleanup state; Spark normally **not used** on Home refresh. **Native/existing remains:** Home layout, Home Scrubby frame animation, JourneyStrip, safe-area logic, live values, modal hiding and Results teaser. **Reduced Effects:** static state update only. **Idempotency:** compare previous presentation state so repeated `refresh()`, viewport resize or modal close does not refire. **Mobile/perf:** zero idle loops and zero permanent per-widget feedback nodes. **Automated:** unchanged refresh produces zero plugin calls; changed authoritative state produces one. **Godot AI:** Home normal/modal/reduced snapshots with no visual collision. **Regression/gate:** M42/M43-R01/R05 Home tests; audit required; owner gate only if the change is visually noticeable enough to alter approved Home hierarchy.
-- [x] **SB-M43-C005F-013 — Canonical FULL/REDUCED effects matrix and live cancellation. [AUDITED PASS / CLOSED 2026-10-08 — foundation matrix; real-surface owner accessibility gate remains under F015]** Purpose: make Reduced Effects one coherent accessibility contract across native + plugin effects. **Seam:** canonical `EffectsSettingsService.is_reduced()/changed`, existing Results `model["reduced_effects"]`, CleaningEffectsController `set_reduced_effects()`, future ceremony/popup feedback adapter. **Plugin:** both; on Reduced toggle cancel/settle decorative GFF work with targeted `GameFeelFlow.stop_all(presentation_root)` and clear active Spark through adapter-owned lifecycle, without touching native state. **Native/existing remains:** existing reduced row-reveal behavior, cleaning reduced cap/lifetime and all content/state. **Reduced Effects:** explicitly disables confetti, looping spin/wiggle, element flash and any camera/screen manipulation; major rewards/unlocks remain understandable via static art/text/order. **Idempotency:** toggle itself never replays a celebration when returning to FULL. **Mobile/perf:** Reduced is materially cheaper than FULL in node count/particles/animation. **Automated:** per-intent FULL/REDUCED table and live-toggle cleanup tests. **Godot AI:** every representative tier in both modes. **Regression/gate:** M41 settings persistence and M50 accessibility; independent audit + owner accessibility visual gate.
-- [x] **SB-M43-C005F-014 — Explicit DO-NOT-USE plugin boundary. [AUDITED PASS / CLOSED 2026-10-08 — static authority guard + plugin-removal/fault tests]** Purpose: prevent presentation addons from colonizing systems that already have safe authorities. **Seam:** architecture-wide guard enforced by code review/tests. **Plugin:** both, but prohibited from SafeAreaRoot/safe-area math; NavigationController/route truth; ModalStack/BasePopup lifecycle/pending-token authority; gameplay BoardState/candidate/reservation/TargetSelector/routing/supply/slot/solver/collision/terminal truth; economy/reward/save/progression/Heart/timers; existing Home Scrubby frame-animation authority; existing audio/haptics services; any ad/IAP callback authority. GameFeelFlow effects `camera_shake`, `camera_flash`, `freeze_frame`, `time_scale`, `pause`, physics/collider/velocity/rigidbody effects, scene/destroy/spawn authority and looping flicker are **DO NOT USE** for V1; screen-wide/strobing flash is forbidden. Saltmire Spark never determines hit/clear/reward success. **Native/existing remains:** all named systems. **Reduced Effects:** prohibited categories stay prohibited in FULL and REDUCED. **Idempotency:** no plugin callback may be an authority callback. **Mobile/perf:** avoids hidden global work. **Automated:** static dependency/import scan plus fault injection showing plugin removal leaves authority paths operational. **Godot AI:** run core Home/gameplay/Results with plugins disabled and verify functionality. **Regression/gate:** full authoritative subsystem regression; independent architectural audit, no owner visual gate.
 - [ ] **SB-M43-C005F-015 — End-to-end feel validation + owner visual gate.** Purpose: close the plugin program only after runtime evidence proves coherent hierarchy, safety and restraint. **Seam:** representative real shipping paths: WON Results, reward rows, Standard/Premium pack, set/master completion, Robot Unlock, Gift milestone, acquisition confirmation, gameplay completion, Home state change and cleaning comparison. **Plugin:** both through the single adapter only. **Native/existing remains:** all authoritative/native presentation systems listed above. **Reduced Effects:** every representative path captured in FULL + REDUCED; plugin-disabled fallback also exercised. **Idempotency:** repeated Results model refresh, popup reopen, resize, background/foreground and duplicate callbacks produce no extra one-shot celebration. **Mobile/perf:** use approved budgets and no orphan emitters/tweens after scene change. **Automated:** focused suite + root regression + call-count/fault-injection checks. **Godot AI:** mandatory real-runtime visual validation at 1080×1920, 1080×2160, 1290×2796 and 1536×2048 where applicable, plus gameplay at production load; inspect actual frames, not metadata-only. **Regression/gate:** independent ChatGPT audit and owner final visual acceptance required before any plugin feel work is marked complete.
 
 #### M43-C006 - Shop / Store / Currency Destination
@@ -2131,7 +1118,6 @@ Effect-intensity vocabulary for this program: **MICRO → SMALL → REWARD → M
 - [ ] SB-M43-099 Completed-set and Master Collection reward history/status must be visible enough to prevent confusion without enabling duplicate grants.
 - [ ] SB-M43-100 Collection supports locked/future set presentation without leaking nonexistent cards or fake progress.
 - [ ] SB-M43-101 Validate 135-card performance, scrolling, touch targets, localization, duplicate-heavy inventories and completion transitions.
-
 
 #### M43-C007R - Collection Fairness / Pity / First Collection Sprint [OWNER APPROVED 2026-09-30]
 
@@ -2168,7 +1154,6 @@ Effect-intensity vocabulary for this program: **MICRO → SMALL → REWARD → M
 - [ ] SB-M43-120 Gift Bar claim/history never feeds Gift Meter recursively and never re-grants claimed milestones.
 - [ ] SB-M43-121 Test local-day rollover, missed-day reset, clock rollback, all-3 Tasks completion, Gift rollover and duplicate taps.
 
-
 #### M43-C009R - Daily Scrub Orders / Earned ScrubBox [OWNER APPROVED 2026-09-30]
 
 This extension **does not change** the canonical consecutive-login reset rule or repeating 5-day Daily reward cycle.
@@ -2195,7 +1180,6 @@ This extension **does not change** the canonical consecutive-login reset rule or
 - [ ] SB-M43-132 Implement RANKS destination with season/window label, player placement, surrounding ranks, top ranks, loading/offline/empty states and privacy-safe display identity.
 - [ ] SB-M43-133 Produce/owner-approve Ranks visual master before production binding.
 - [ ] SB-M43-134 Home/BottomNav badge system supports Tasks ready, Daily ready, Gift claimable, Robot unlock/new, Collection new, Event active/reward and other approved attention states without notification spam. **New owner decision [2026-10-10]: Rewarded Ads Home shortcut MUST show existing red numeric 1 when exactly one currently actionable next sequential reward is claimable; missing on first iPhone IPA and observed Android family testing. Rewarded Ads badge sub-scope CODE TECH PASS on c2b1c3c7; owner accepted the new iPhone UX and Android builds without new Android physical retest; no synthetic provider/grant; broad M43-134 remains OPEN.**
-
 
 #### M43-C010R - Weekly Mini Event / First-Try Challenge / Personal Best [OWNER APPROVED 2026-09-30]
 
@@ -2230,23 +1214,19 @@ This extension **does not change** the canonical consecutive-login reset rule or
 - [ ] SB-M43-150 Produce/approve any comeback/notification-permission illustration needed; keep system permission UI native.
 - [ ] SB-M43-151 Test timezone changes, missed days, expired events, disabled permissions and stale deep links.
 
-
 #### M43-C012R - Comeback Catch-Up / Smart Notification Prioritization [OWNER APPROVED 2026-09-30]
 
 - [ ] SB-M43-R12-001 Add a configurable **Comeback Catch-Up Track** for a genuine absence (initial tuning candidate: >=48 hours): three qualifying first-clear progression wins rebuild momentum through a small capped reward/progress sequence using only approved existing reward types.
 - [ ] SB-M43-R12-002 Catch-Up never restores missed Daily login days, never changes the existing consecutive-login reset/cycle rule, never retroactively grants missed event/Daily rewards and never multiplies normal level economy.
 - [ ] SB-M43-R12-003 Catch-Up is offered once per eligible return window, persists across relaunch, completes/expirs deterministically and cannot be farmed by clock rollback, uninstall/reinstall or repeatedly backgrounding the app.
 - [ ] SB-M43-R12-004 Define a notification **priority/dedup authority** across Hearts ready, Daily available, Gift claimable and Event ending so simultaneous triggers collapse into the single most useful message/deep link instead of multiple pushes.
-- [x] SB-M43-R12-005 Default retention-notification cap: at most one non-transactional proactive push per local 24-hour period, respecting opt-in, per-category toggles and quiet hours; user-requested/platform-transactional notifications remain separately governed.
 - [ ] SB-M43-R12-006 Notification copy must be factual and non-guilt-inducing, must not claim expiring rewards that are not actually expiring, and must suppress stale/already-consumed prompts before send when current state is available.
-- [x] SB-M43-R12-007 Add tests for absence qualification, catch-up idempotency, Daily-rule non-interference, priority collapse, 24-hour cap, quiet hours, stale-state suppression and deep-link fallback.
 
 #### M43-C013 - Account / Cloud Save / Cross-Device Recovery
 
 - [ ] SB-M43-152 Keep local save authoritative/offline-capable even when account/cloud features are unavailable.
 - [ ] SB-M43-153 Define optional account/sign-in provider strategy in an owner/platform decision before adding SDKs. **[OWNER DECISION 2026-10-22, owner via factory dashboard: Android uses Google Play Games Saved Games; iOS uses Game Center + iCloud. Both are free; no own server needed. No separate account or e-mail login.]**
 - [ ] SB-M43-154 Implement cloud-save schema/versioning compatible with M40 and preserve idempotent economy transaction IDs.
-- [x] SB-M43-155 Implement explicit cloud conflict resolution using revision/timestamp/progression/economy safety rules; never silently duplicate currency/rewards.
 - [ ] SB-M43-156 Implement sign-in, signed-out, syncing, synced, conflict, error and offline states.
 - [ ] SB-M43-157 Implement restore-on-new-device flow and verify Collection/robots/booster/entitlement/Daily state integrity.
 - [ ] SB-M43-158 Platform purchase restore remains tied to M57/store authority and must reconcile with cloud/local save idempotently.
@@ -2255,13 +1235,10 @@ This extension **does not change** the canonical consecutive-login reset rule or
 
 #### M43-C014 - Meta UI Audio / Haptics / Offline / Error Language
 
-- [x] SB-M43-161 Define a compact meta-UI audio family for button confirm/back, popup open/close, reward reveal, pack reveal, robot unlock and error; reuse where pleasant rather than create noisy per-screen sounds.
-- [x] SB-M43-162 Define haptic moments for success, warning, pack rare reveal and unlock while respecting Haptics OFF and Reduced Effects.
 - [ ] SB-M43-163 Meta UI must obey Master/Music/SFX/Haptics settings immediately.
 - [ ] SB-M43-164 No purchase/ad/error sound may falsely imply success before an authoritative callback.
 - [ ] SB-M43-165 Implement consistent offline/error language and retry affordances for Shop, ads, cloud, Events, Ranks and notifications/deep links.
 - [ ] SB-M43-166 Implement graceful empty states for no events, no rankings result, no exchangeable duplicates, no claimable gifts and no tasks ready.
-- [x] SB-M43-167 Validate meta audio/haptic fatigue in repeated menu/claim/open/close loops.
 - [ ] SB-M43-168 Owner acceptance required for the final cross-screen sound/haptic feel.
 
 #### M43-C015 - Player-Facing Surface Visual Inventory Gate
@@ -2318,7 +1295,6 @@ These three rows are the only new work authorized by the 2026-10-06 F5 owner rev
 - [ ] **SB-M43-R15-001 — Rewarded Ads daily five-slot surface.** Technical base exists, but owner has now locked **sequential unlock** semantics: Slot 1 is a direct `CLAIM`; only after Slot 1 is durably granted does Slot 2 become available; only after Slot 2 receives a successful verified rewarded-video grant does Slot 3 unlock; then 4; then 5. Future slots stay visibly locked and cannot start an ad early. Cancel/skip/fail/timeout/unverified/provider-unavailable grants nothing **and does not advance the sequence**. Each slot grants exactly once per local day under deterministic tx ids `daily_rewarded:<local_day>:<slot>`. Seeded D1-D5 reward bundles, distinct rewarded-daily authority, rollback/relaunch/idempotency protections, Daily login separation and Daily Scrub Orders remain unchanged. **No Home notification/badge is required. `SB-M43-R15-001-R01` functional sequential-unlock remediation is PASS / CLOSED [2026-10-08] on `f4448d473d2c6bd62be3a83d31299eedea50b6ec`; strict audit: `coordination/sessions/M43-OWNER-R15/CHATGPT_AUDIT_R15_001_R01_SEQUENTIAL_UNLOCK_V01.md`. Remote Content / R2 files were untouched. This parent row remains OPEN only for owner visual acceptance of the Rewarded Ads surface, including LOCKED rows.**
 - [ ] **SB-M43-R15-002 — Settings visual-family remediation.** Preserve every closed M41 Settings behavior/state/persistence contract exactly, but replace the generic dark rectangle with the canonical SCRUBBOTS M43 popup language visible in the owner's accepted screens: cyan/white mechanical frame, cream/white content field, royal-blue SETTINGS title treatment, canonical close/X treatment, readable navy labels, themed sliders/toggles and touch targets. Reuse `BasePopup`/`HomeStyle`/`UiTokens`/approved existing assets where practical; do not add a second settings authority or alter Master/Music/SFX/Haptics/Reduced Effects semantics.
 - [ ] **SB-M43-R15-003 — Daily Rewards containment remediation.** Keep the current consecutive-login logic, D1-D5 values and claim authority unchanged. Fix the owner-observed composition so Daily Rewards art does not protrude outside the intended popup/table/content bounds: the calendar/hero, flame, five day-card frames, state/check art, rule text and buttons must remain visually contained and readable at 683x1366 and the canonical responsive matrix. No clipping of reward text, no overlap with title/actions, no layout regression to Tasks/Gift Bar, and no change to Daily reward truth.
-- [x] **SB-M43-R15-004 — Rewarded Ads Home icon visual remediation. OWNER VISUAL PASS [2026-10-06].** Canonical owner master is the committed text-free Scrubby/video/Scrub-Bucks/Hearts PNG pinned at SHA-256 `ce96e09aaf97db5ed171c7da15e2c8afccc46d4408a1cc64bc0521db89a96c8b`; no baked label. Final accepted placement: Rewarded Ads under COLLECTION, exactly `210×156` like SHOP/COLLECTION, standard shortcut glass panel, one-line code-rendered `REWARDED ADS` label. Four primary shortcut columns and Rewarded Ads functionality remain unchanged.
 
 **Shared later-screen visual production rules**
 - [ ] SB-UI-017 Implement reusable `BasePopup` composition.
@@ -2333,57 +1309,21 @@ Purpose: teach the real production game progressively and prevent the first sess
 **Owner 2026-10-12 FINAL M44 V03 supersession:** SB-M44-001's historical first 10 levels now means coverage/negative regression only: mandatory tutorial Home+L1–L3, NONE L4–L10. First Home DAILY and TASKS separate real READY claims BOTH 100 SB; welcome task replaces day-one easy slot only, no global change to ordinary later days 75/100/125. Starting 2 charges each four canonical boosters. Current owner authority `coordination/sessions/M44-TUTORIAL-FTUE-C001/OWNER_M44_FIRST3_STARTER_AND_CLAIM_DECISION_V03.md`, implementation master and independent audit checklist in same folder. All 24 M44 IDs retained, unchecked until independent GitHub code/CI audit and owner visual acceptance.
 **M44 current independent audit [2026-10-15]:** Core FTUE technical PASS on GitHub CI **35/35 suites** (M44 21/21; CP06 16/16), including specialist M39/M41/M43 suites and M44 D1 copy caching fix. Audits: `coordination/sessions/M44-TUTORIAL-FTUE-C001/CHATGPT_INDEPENDENT_AUDIT_V02.md` plus prior V01. **16/24 technically completed** as marked below; **005/006/010/013/018/020/022/023 remain OPEN** because of contextual teaching, unsanctioned future feature unlock order, NEW badge, phone/visual owner sign-off and M43 external gates. A real APK/IPA first-user playthrough is not yet authorized. Review D2 future What's New announcement for newly onboarded players only after owner's product choice. **NEWER owner 2026-10-15 ruling:** the D2 feature announcement product decision is APPROVED but not implemented; see SB-M44-D2-001 and `OWNER_D2_WHATS_NEW_AND_DISK_DIAG_DECISION_V01.md`. Do not close from older run 38707495178. **LATER 2026-10-15 D2 ADDENDUM:** M44-D2 has since passed independent technical audit + CI 38742572367 and 38753823564; technical D2 row below is [x]. The earlier text describes the pre-D2 snapshot; owner visual gates remain unchanged.
 
-- [x] SB-M44-001 Define the complete first-time user experience from cold launch through the first 10 progression levels. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [x] SB-M44-002 Level 1 teaches only the minimum real core loop needed to make a legal supply-front selection and observe Scrubbot cleaning. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [x] SB-M44-003 Teach five execution slots and automatic rightmost-empty placement through play, not a detached rules wall. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [x] SB-M44-004 Teach preview rows/front-only interaction at the first point the distinction matters. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
 - [ ] SB-M44-005 Teach WAITING/no-current-target behavior only when the player first encounters it, using contextual coachmark/highlight.
 - [ ] SB-M44-006 Teach win/fail/Retry and Heart consequence at first relevant occurrence.
-- [x] SB-M44-007 Introduce the four boosters progressively; do not unlock/show all acquisition prompts in the opening minute. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [x] SB-M44-008 Teach +1 Slot, Random, Selector and Tornado using real mechanics and solver-safe tutorial fixtures/states. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [x] SB-M44-009 Introduce 2x only after the player understands normal-speed cleaning; explain paid manual entitlement vs free automatic endgame 2x without clutter. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
 - [ ] SB-M44-010 Define owner-approved feature-unlock order/campaign points for Hearts, booster acquisition, Daily, Tasks, Collection, Card Packs, Robots, Gift Meter/Gift Bar, Shop, Events, Ranks, Achievements and any later system. **[OWNER DECISION 2026-10-22, owner via factory dashboard: Hearts from the start. Boosters unlock in order (owner in chat 2026-10-22): +1 Slot at 6, Random at 11, Selector at 16, Tornado at 21. Daily Rewards 4, Shop 8, Tasks 12, Collection 20, Events 30, RANKS 40. Open detail: unlock points for Card Packs, Robots, Gift Meter/Gift Bar and Achievements were not given.]**
-- [x] SB-M44-011 Do not invent exact unlock level numbers until the owner approves the pacing table; store unlocks data-driven once approved. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [x] SB-M44-012 Feature-unlock ceremony uses M43-C005 and is shown at most once per feature/version. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
 - [ ] SB-M44-013 Newly unlocked Home shortcut/Nav destination may show a NEW badge until first visit; badge clearing persists.
-- [x] SB-M44-014 Tutorial can be skipped/replayed only according to an owner decision and must never duplicate rewards or economy grants. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [x] SB-M44-015 Returning existing users after a version adds a feature receive a concise "What's New / feature unlocked" path rather than being forced through beginner tutorial. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [x] SB-M44-016 Tutorial overlays pause or gate only presentation/input needed for the lesson; they never inject illegal board/supply state. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [x] SB-M44-017 All tutorial copy is localization-ready and essential cues are not color-only. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
 - [ ] SB-M44-018 Produce/owner-approve tutorial coachmark/highlight visual language and any Scrubby/robot teaching poses actually required.
-- [x] SB-M44-019 Validate tutorial on fresh-save, interrupted/resumed, app-backgrounded, skipped/replayed and migrated-save paths. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
 - [ ] SB-M44-020 Owner playtest the complete first-session funnel and revise friction before M44 closes.
-
 
 #### M44 Retention Feature-Pacing Additions [OWNER APPROVED 2026-09-30]
 
-- [x] SB-M44-021 Introduce Next Cleanup teaser + 10-Level Cleaning Journey during the first-session Results flow only after the player understands win/continue; do not add another blocking tutorial wall. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
 - [ ] SB-M44-022 Sequence Collection onboarding so Set 1 / first earned packs establish the First Collection Sprint early, while pity remains invisible until relevant and then explains itself truthfully.
 - [ ] SB-M44-023 Unlock Daily Scrub Orders, Weekly Cleaning Event and First-Try Cleanup only after their prerequisite core/meta systems are understood; exact campaign unlock points remain data-driven under SB-M44-010/011.
-- [x] SB-M44-024 Comeback Catch-Up is never part of fresh-user FTUE; it activates only after a previously established player meets the configured absence rule. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [x] SB-M44-D2-001 **M44 D2 Future What's New after genuine L3 [OWNER APPROVED 2026-10-15; CHATGPT INDEPENDENT TECH_PASS 2026-10-15]:** New profiles see only post-bootstrap future feature/version entries after genuine L3, not via Skip Tips; durable ack and failed-save retry behavior retained. Production D2 at `b049dc90`/`0218a862`/`d08447a6`; t22/t23 CI GitHub run 38742572367 35/35, M44 23/23; later full validation run 38753823564 38/38, export skipped. Claude peer V02 PASS_WITH_CONCERNS and independent cross-audit `coordination/sessions/M49-RESPONSIVE-UI-C001/CHATGPT_CROSS_M44_M49_M50_M51_INDEPENDENT_AUDIT_V01.md`. **M44-018/020 owner visual and phone FTUE gates remain OPEN; M44 entire milestone NOT closed.**
 
 ### M45 — Debug Tooling
 
 **M45 independent technical closure [2026-10-15]:** Source, 8 real-headless cases and full **35/35** cloud CI suites independently reviewed by ChatGPT. Developer-only debug HUD/board layer/harness, instant reset, level picker and release gate PASS. All 18 tasks technically closed below. Audit: `coordination/sessions/M45-DEBUG-TOOLING-C001/CHATGPT_INDEPENDENT_AUDIT_V01.md`. No APK export or device manual UI claim; 59×59 performance remains M46.
-- [x] SB-M45-001 Debug overlay. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-002 Level ID. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-003 Difficulty. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-004 Dimensions. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-005 Cell count. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-006 ACTIVE count. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-007 CLEARED count. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-008 Reserved count if implemented. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-009 Active bots. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-010 FPS. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-011 Frame time. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-012 Target markers. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-013 Route visualization. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-014 Cell grid. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-015 Effect toggle. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-016 Instant reset. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-017 Level switcher. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
-- [x] SB-M45-018 Disable release-facing debug UI. **[CHATGPT INDEPENDENT TECH_PASS 2026-10-15; 35/35 Actions 38707495178; audit M45 V01; developer-only]**
 
 ### M46 — Performance `[PERFORMANCE]`
 
@@ -2500,20 +1440,8 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R07_V01.md`.
 - **Also fixed:** the latent `FiveSlotBatchEngine.free_slot_if_idle` call to a nonexistent `get_remaining()`.
 - **Evidence:** new `tests/m46_slot_rebuild.gd` (L1 still moments at 5 and 6 slots; FAIL before / PASS after) plus 19 booster / popup / chaos / completion suites and m46 p20–p22, all PASS.
 
-- [x] SB-M46-001 Level parsing.
-- [x] SB-M46-002 BoardState.
 - [ ] SB-M46-003 Renderer. **[CHATGPT V04: source/headless CPU TECHNICAL_PASS; physical visual/GPU OWNER_GATE remains OPEN.]**
-- [x] SB-M46-004 Color candidate index + reachability/access.
-- [x] SB-M46-005 TargetSelector.
-- [x] SB-M46-006 Routing.
-- [x] SB-M46-007 Scrubbot agents.
 - [ ] SB-M46-008 Effects. **[CHATGPT V04: source/headless CPU TECHNICAL_PASS; physical visual/GPU OWNER_GATE remains OPEN.]**
-- [x] SB-M46-009 Memory baseline.
-- [x] SB-M46-010 59×59 memory.
-- [x] SB-M46-011 Per-frame allocation detection.
-- [x] SB-M46-012 Repeated restart.
-- [x] SB-M46-013 Long session.
-- [x] SB-M46-014 High agent density.
 
 - [ ] **SB-M46-015 — GameFeelFlow/Saltmire Spark effect-budget profiling.** **[CLAUDE_AUTONOMOUS_REVIEW 2026-10-16: LOCAL_PASS (desktop CPU, headless) in `tests/m46_performance.gd` p19; OPEN for physical phone/GPU; ChatGPT V04 source/criteria audit PASS.]** **[CHATGPT V04: implementation technical/headless profiling PASS, F5/phone/GPU owner gate OPEN.]**
   - **Setup:** the real FeedbackAdapter and the installed GFF 1.0.0 / Spark 1.0.0 autoloads, on the real Results WON path during a dense 59×59 run at 2×.
@@ -2529,17 +1457,8 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R07_V01.md`.
 
   Purpose: prove the M43-C005F budgets on worst-case SCRUBBOTS load. **Seam:** M46 Effects profiling + M31 CleaningFxLayer + feedback adapter diagnostics. **Plugin:** both. **Native/existing remains:** BoardRenderer/agents/cleaning pipeline. **Reduced Effects:** profile FULL and REDUCED separately. **Idempotency:** repeated scenes must not accumulate emitters/tweens. **Mobile/perf:** 59×59, 2× gameplay, high agent density, simultaneous Results/ceremony cases; measure frame time, allocations, node peak, memory and Spark self-free lifetime; no per-clear GFF. **Automated:** bounded active counts/lifetime leak tests. **Godot AI:** runtime performance overlay/visual sanity during stress. **Regression/gate:** M46-001..014 baseline preserved; performance audit required, no visual owner gate unless budget reduction changes accepted look.
 
-### CP06-M17 — Game-owned disabled remote-level compatibility (parallel LF external gate)
-
-- [x] **SB-CP06-004 [GAME_RUNTIME]**. Consume versioned manifest `disabled_levels` safely in ScrubBots, with no wrong-frontier launch, fake WON/rewards or invalid save transitions; preserve offline last-known-good. LF owns schema, production publishing and owner approval. Game Claude must stop for an explicit owner decision if safe forward-only skip policy is undefined. **OWNER OPTION B AUTHORIZED (2026-10-10), but OPEN until implementation + independent runtime proof.** New source prompt `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CHATGPT_PROMPT_V02.md`, V02 audit companion. No TEMP and no new APK/IPA. **V02 code published `eac4c74d`, IMPLEMENTED_UNVERIFIED, no Godot parse or test (all CP06 16 cases NOT_RUN). Remains OPEN until owner-approved no-APK test environment and independent PASS.** **OWNER-AUTHORIZED VERIFICATION NEXT:** V03 CP06 milestone master prompt `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CHATGPT_MASTER_PROMPT_V03.md`; only existing Android workflow validation_only and real CI evidence, no APK. Still OPEN. **[2026-10-12] FUNCTIONAL_TECH_PASS/CLOSED, audit V03: Actions `38206590486`, CP06 16/16 and all 16 focused suites PASS. This closure is limited to code and CI; owner ZERO-TEMP process deviation is separately OPEN. No live R2 or release build.**
-- [x] **SB-CP06-010 [GAME_RUNTIME]**. One-disabled-remote-level synthetic test: adjacent playable levels, safe disabled frontier, re-enable successor, LKG offline and malformed/stale manifest failure with no reward/progression mutation. No live R2 / new APK/IPA. Prompt: `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CHATGPT_PROMPT_V01.md`; criteria: `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CHATGPT_AUDIT_CRITERIA_V01.md`. **OWNER OPTION B AUTHORIZED (2026-10-10), but OPEN until implementation + independent runtime proof.** New source prompt `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CHATGPT_PROMPT_V02.md`, V02 audit companion. No TEMP and no new APK/IPA. **V02 code published `eac4c74d`, IMPLEMENTED_UNVERIFIED, no Godot parse or test (all CP06 16 cases NOT_RUN). Remains OPEN until owner-approved no-APK test environment and independent PASS.** **OWNER-AUTHORIZED VERIFICATION NEXT:** V03 CP06 milestone master prompt `coordination/sessions/CP06-GAME-DISABLED-LEVELS-C001/CHATGPT_MASTER_PROMPT_V03.md`; only existing Android workflow validation_only and real CI evidence, no APK. Still OPEN. **[2026-10-12] FUNCTIONAL_TECH_PASS/CLOSED, audit V03: Actions `38206590486`, CP06 16/16 and all 16 focused suites PASS. This closure is limited to code and CI; owner ZERO-TEMP process deviation is separately OPEN. No live R2 or release build.**
-
 ### M47 — Android Device Testing
 
-- [x] SB-M47-001 Android export setup. **2026-10-10 FIRST10_APK_TECHNICAL_PASS (limited offline built-in Levels 1–10 debug variant only); production online export pending separate R2/E2E gate.**
-- [x] SB-M47-002 Development APK. **2026-10-10 FIRST10_APK_TECHNICAL_PASS**: GitHub Actions run 38040561355 / artifact 11666135912 / audit M47_FAMILY_APK_C001_CHATGPT_INDEPENDENT_AUDIT_V01.md. Device installation remains SB-M47-003 [ ].
-- [x] SB-M47-003 Real device install. **2026-10-10 OWNER-REPORTED INSTALL+BOOT:** first Family Android APK on Samsung Flip and daughter’s Samsung Android tablet; owner also booted/tested his iPhone FIRST IPA (distinct platform, version/SHA unknown). This is NOT functional mobile UX acceptance or latest iOS build validation.
-- [x] SB-M47-004 Touch. **OWNER SIGNOFF / NEW IPHONE PHYSICAL PASS + NEW ANDROID OWNER RETEST WAIVER [2026-10-10]**. Owner tested NEW c2b1c3c7 IPA on iPhone and confirms mobile issues all OK; new Android build technical pass accepted explicitly without a fresh Samsung Flip/tablet retest. Do not claim 3 new-device physical tests; narrow touch issue CLOSED by owner approval. `coordination/sessions/M47-FAMILY-APK-TOUCH-R01/OWNER_FINAL_ACCEPTANCE_V03.md`.
 - [ ] SB-M47-005 Portrait.
 - [ ] SB-M47-006 Safe areas.
 - [ ] SB-M47-007 Easy performance.
@@ -2558,35 +1477,11 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R07_V01.md`.
 - [ ] SB-M48-001 Avoid Android-only gameplay architecture.
 - [ ] SB-M48-002 Document Apple toolchain requirement.
 - [ ] SB-M48-003 Prepare iOS configuration when hardware exists.
-- [x] SB-M48-004 Real-device iOS testing later. **LIMITED FIRST10 FAMILY IPA REAL-DEVICE OWNER PASS [2026-10-10]**: new c2b1c3c7 IPA tested on owner's iPhone. This is not full iOS App Store production certification.
 
 ### M49 — Responsive UI
 
-- [x] SB-M49-001 16:9 portrait. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-002 19.5:9. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-003 20:9. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-004 Tall phone. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-005 Tablet. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-006 Notch/cutout. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-007 Five slots stay usable. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-008 Board stays visible. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-009 Rectangular boards remain correctly scaled. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-010 Touch mapping remains accurate. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-011 Adopt 1080×2160 reference design viewport and stretch policy. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-012 Implement reusable SafeAreaRoot. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-013 Implement centralized UI tokens. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-014 Implement COMPACT/NORMAL/TALL classification. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-015 Validate 1080×2160. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-016 Validate 1170×2532. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-017 Validate 1290×2796. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-018 Validate 1080×2400. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-019 Validate 1440×3200. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
 - [ ] SB-M49-020 Validate minimum touch target. **[PARTIAL: Home/boosters measured; nav, Pause/2x and all supply targets not proven ≥88px.]**
-- [x] SB-M49-021 Confirm popups fit safe area. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
 - [ ] SB-M49-022 Confirm text containers survive localization expansion. **[OPEN: pseudo locale exists but stress/clipping/wrap acceptance not established.]**
-- [x] SB-M49-023 Confirm top-right Pause + 2x controls, five fixed connector rails, slots, Batch Supply and booster row remain usable on compact devices. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-024 Add automated/manual responsive validation evidence. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
-- [x] SB-M49-025 Validate temporary sixth-slot (+1 booster) layout/touch/readability across the full viewport matrix. **[CHATGPT SCOPED TECH_PASS 2026-10-15, M49 8/8 CI 38753823564; owner physical/whole-surface checks not implied]**
 
 #### M49 Player-Experience Responsive Expansion
 - [ ] SB-M49-026 Validate every M43/M44 screen/popup in the complete Player-Facing Surface Visual Inventory across the full viewport matrix. **[OPEN: entire visual surface inventory has not been tested across matrix.]**
@@ -2599,9 +1494,7 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R07_V01.md`.
 
 ### M50 — Accessibility
 
-- [x] SB-M50-001 Review color-only information. **[CHATGPT SCOPED TECH_PASS 2026-10-15, simulation/audit M50 4/4 CI 38753823564; no art/visual acceptance]**
 - [ ] SB-M50-002 Alternative visual slot cues if necessary. **[OWNER UPDATE: Supply/Slot-only implementation is NOT sufficient. MANDATORY new board-cell symbols on every ACTIVE coloured actual pixel at all dimensions incl 59x59; same canonical C-ID shape as Supply/Slot, no per-cell Nodes, no false glyph on CLEARED pixel, accessible magnified inspect. USER L7 F5 REAL PLAYTEST 2026-10-15. Board part IMPLEMENTED e8a7e75b (LOCAL_PASS, log `coordination/sessions/M50-BOARD-COLOR-ASSIST-C001/CLAUDE_LOG_V01.md`); OWNER F5 VISUAL APPROVED 2026-10-16 (board symbols + magnifier). Row stays open for ChatGPT independent audit / deferred cloud CI. Priority prompt `coordination/sessions/M50-BOARD-COLOR-ASSIST-C001/CHATGPT_CLAUDE_MASTER_PROMPT_V01.md`. No Actions even for verification, LOCAL_ONLY/CLOUD_CI_DEFERRED_COST_FREEZE.]**
-- [x] SB-M50-003 Color vision tests. **[CHATGPT SCOPED TECH_PASS 2026-10-15, simulation/audit M50 4/4 CI 38753823564; no art/visual acceptance]**
 - [ ] SB-M50-004 Contrast. **[SCOPED TECH PASS: Home green PLAY button keeps original body, dark NAVY label contrast 7.35:1 normal / 9.04:1 hover / 5.31:1 pressed verified in CI 38790518157. Owner look/white ▶ approval OPEN; other M50 screens' contrast coverage incomplete. Audit `coordination/sessions/DEV-GODOT-LOCAL-PLAY-C001/CHATGPT_INDEPENDENT_AUDIT_V01.md`.]**
 - [ ] SB-M50-005 Reduced effects.
 - [ ] SB-M50-006 Touch sizes.
@@ -2624,9 +1517,7 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R07_V01.md`.
 ### M51 — Localization Readiness
 
 - [ ] SB-M51-001 Avoid hard-coded user text. **[PARTIAL: HUD booster `"%d SB"` literal converted to UiText key + UiText.num, verified in 38790518157; other hardcoded user text/full M51 not independently closed.]**
-- [x] SB-M51-002 Translation-key convention. **[CHATGPT SCOPED TECH_PASS 2026-10-15, pseudo/key checks M51 4/4 CI 38753823564; not full localization]**
 - [ ] SB-M51-003 Longer-string layouts. **[PARTIAL: pseudo-layout scan is report-only; Shop scroll/overflow not proven.]**
-- [x] SB-M51-004 Pseudo-localization. **[CHATGPT SCOPED TECH_PASS 2026-10-15, pseudo/key checks M51 4/4 CI 38753823564; not full localization]**
 - [ ] SB-M51-005 Actual languages decided later. `[DESIGN GATE]` **[OWNER DESIGN GATE: actual languages not chosen.]** **[OWNER DECISION 2026-10-22, owner via factory dashboard: launch languages are English and Turkish.]**
 
 #### M51 Player-Experience Localization Expansion
@@ -2643,140 +1534,35 @@ M52-C001 independent audit: **AUDITED_PASS / 10 OF 10 PRODUCTION ADMITTED / OWNE
 - Scope note: canonical real-level Challenge / Session Load / Frustration evidence is an explicit M53 carry-forward under the newer owner decision; it was not fabricated in M52-C001.
 - `SB-M52-005` remains broader M52 work: the owner-selected First 10 pack contains no rectangular production source, so this row is not falsely closed by C001.
 
-- [x] SB-M52-001 Import first Easy art.
-- [x] SB-M52-002 Import first Medium art.
-- [x] SB-M52-003 Import first Hard art.
-- [x] SB-M52-004 Import first Very Hard art.
 - [ ] SB-M52-005 Validate rectangular production art.
-- [x] SB-M52-006 Batch convert.
-- [x] SB-M52-007 Batch validate.
-- [x] SB-M52-008 Generate previews.
-- [x] SB-M52-009 Populate catalog.
-- [x] SB-M52-010 Verify every source image preserved.
-- [x] SB-M52-011 Verify generated level reproduces source.
 
 #### M52-C001 Owner Playtest Gate
 
 Status: **PAUSED / NOT PASS at Level 2 pending R01 runtime remediation.**
 Owner findings: `coordination/sessions/M52-C001/OWNER_PLAYTEST_FINDINGS_V01.md`.
 
-- [x] SB-M52-C001-O01 Owner plays Levels 2–10 through the real Home/AppState production path and accepts correct artwork/order, supply behavior, intended sequence legality and WON completion.
-- [x] SB-M52-C001-O02 Owner confirms progression transitions 2→3→...→10 correctly with no Hazard Bot/wrong-level fallback.
-- [x] SB-M52-C001-O03 Owner confirms Level 10 completion advances to frontier 11 and Home honestly shows disabled Level 11 / coming-soon content rather than replaying existing content.
-
-#### M52-C001-R01 Parallel Runtime Remediation
-
-- [x] SB-M52-R01-001 Replace production same-color oldest-batch monopolization with independent per-slot claim lanes.
-- [x] SB-M52-R01-002 Implement deterministic dispatch waves: max one new Scrubby per eligible slot per cadence, up to 5 baseline / 6 boosted.
-- [x] SB-M52-R01-003 Prove five 30-count same-color batches launch five concurrent agents in the first eligible wave.
-- [x] SB-M52-R01-004 Make waiting lane-specific so one blocked same-color slot does not block siblings.
-- [x] SB-M52-R01-005 Preserve exact target/reservation/route/no-ghost identity under parallel assignments.
-- [x] SB-M52-R01-006 Preserve authoritative M24 remaining-on-clear accounting while player count decrements at successful departure/commit.
-- [x] SB-M52-R01-007 Add departure-time and rollback counter tests.
-- [x] SB-M52-R01-008 Replace silent no-entitlement 2x press with functional 2x acquisition flow using canonical products/prices.
-- [x] SB-M52-R01-009 Successful 2x purchase activates immediately; cancel/fail/insufficient funds are no-spend/no-speed-change.
-- [x] SB-M52-R01-010 Preserve free supply-exhausted automatic 2x.
-- [x] SB-M52-R01-011 Profile owner-observed Level 2 micro-stutter and identify the dominant main-thread cause.
-- [x] SB-M52-R01-012 Remove the stutter cause without disabling terminal/deadlock/routing correctness.
-- [x] SB-M52-R01-013 Review/update M27 ProofKernel/solver equivalence for slot-parallel dispatch.
-- [x] SB-M52-R01-014 Re-prove/replay Levels 1–10 and re-run Levels 2–10 through production runtime.
-- [x] SB-M52-R01-015 Full focused + historical + root regression and diff hygiene pass.
-- [x] SB-M52-R01-016 Independent ChatGPT audit required.
-- [x] SB-M52-R01-017 Owner replay of Levels 2–10 required after audit before M53. — PASS except R02 early-slot-release spot-check remains.
-
 #### M52-C001-R02 Dispatch-Exhausted Physical Slot Release
-
-- [x] SB-M52-R02-001 Separate physical slot occupancy from retired/draining in-flight batch accounting.
-- [x] SB-M52-R02-002 Release the physical slot only after the final zero-capacity work unit has successfully established a real dispatched agent.
-- [x] SB-M52-R02-003 Make the released slot immediately reusable through normal rightmost-empty placement.
-- [x] SB-M52-R02-004 Bind old in-flight work to immutable batch identity so a reused physical slot cannot receive old clears.
-- [x] SB-M52-R02-005 Prove Batch A can retire, Batch B reuse the same slot, then A clear without mutating/freeing B.
-- [x] SB-M52-R02-006 Preserve exact rollback/pre-spawn failure behavior: failed dispatch never releases the slot.
-- [x] SB-M52-R02-007 Preserve Retry/reset with active + draining batches and zero ghosts.
-- [x] SB-M52-R02-008 Preserve Tornado transactional behavior with draining selected-color work.
-- [x] SB-M52-R02-009 Prevent stale frame-budgeted wave lanes from acting on a replacement batch in a reused slot.
-- [x] SB-M52-R02-010 Make UI show EMPTY immediately on the same departure/retirement sync, with no zero-count linger.
-- [x] SB-M52-R02-011 Preserve completion cardinalities and prevent early WON.
-- [x] SB-M52-R02-012 Review/document M27 proof consistency under early physical-slot reuse.
-- [x] SB-M52-R02-013 Re-run First 10 proof/replay/production runtime.
-- [x] SB-M52-R02-014 Run R02 + R01 + historical + root regression and diff hygiene.
-- [x] SB-M52-R02-015 Independent ChatGPT audit.
-- [x] SB-M52-R02-016 Owner zero-count slot-reuse spot-check; on PASS close M52 owner replay and advance to M53.
 
 **M52-C001 FINAL OWNER PASS [2026-09-27]:** `coordination/sessions/M52-C001/FINAL_OWNER_ACCEPTANCE_V01.md`. First 10 production gameplay/content integration, R01 parallel-runtime remediation, R02 early-slot-release remediation and owner replay/spot-check are closed. The sequencing lock now proceeds to M53 then applicable M54 before returning to M43.
 
 ### M53 — Level QA `[QA]`
 
 Every production level:
-- [x] SB-M53-001 Legal dimensions/envelope.
-- [x] SB-M53-002 Correct Difficulty V1 metadata/score context.
-- [x] SB-M53-003 Valid locked C01..C16 palette and current 3–12 used-color envelope; old class-specific color bands are not difficulty truth.
-- [x] SB-M53-004 Correct cell count.
-- [x] SB-M53-005 No invalid palette IDs.
-- [x] SB-M53-006 Recognizable ACTIVE source artwork.
-- [x] SB-M53-007 No unintended interpolation.
-- [x] SB-M53-008 Correct CLEARED transparency.
-- [x] SB-M53-009 Solvable under canonical routing/access semantics, including Railroad V1 where applicable.
-- [x] SB-M53-010 No routing pathology; fully enclosed matching ACTIVE target remains untargetable until a legal Railroad ingress plus OPEN/CLEARED orthogonal interior path exists.
-- [x] SB-M53-011 Good performance.
-- [x] SB-M53-012 Correct preview.
-- [x] SB-M53-013 Unique ID.
 
 #### M53-C001 First 10 Level QA + Difficulty V1
-
-- [x] SB-M53-C001-001 Implement/version a canonical deterministic real-level Difficulty V1 analyzer if one does not yet exist.
-- [x] SB-M53-C001-002 Compute raw + normalized W/C/A/U/B/R/S evidence for each production Level 1–10 using production semantics.
-- [x] SB-M53-C001-003 Compute exact Challenge Score D, TargetChallenge and delta for Levels 1–10; never force-label an out-of-window level.
-- [x] SB-M53-C001-004 Produce versioned Stage-A Session Load evidence and explicit normalization provenance.
-- [x] SB-M53-C001-005 Produce honest Frustration Risk evidence; mark unsupported/human-policy components provisional rather than fabricating values.
-- [x] SB-M53-C001-006 Verify every M53 static QA gate for each Level 1–10 with machine-readable provenance.
-- [x] SB-M53-C001-007 Check actual recovery cadence L3→4, L5→6, L8→9 and Level 10 boss relationship using analyzed scores.
-- [x] SB-M53-C001-008 Produce measurable novelty/profile evidence without inventing missing taxonomy.
-- [x] SB-M53-C001-009 Preserve owner source art, owner supply plans, Level 1 history and R01/R02 gameplay behavior unchanged.
-- [x] SB-M53-C001-010 Re-run First 10 canonical proof/replay and production runtime after analyzer work.
-- [x] SB-M53-C001-011 Add focused analyzer/QA determinism/formula/schema tests.
-- [x] SB-M53-C001-012 Run M53 + M52/R01/R02 + relevant progression + root regression and diff hygiene.
-- [x] SB-M53-C001-013 Write First 10 M53 matrix/evidence/log and hand off for independent ChatGPT audit.
-- [x] SB-M53-C001-014 Independent ChatGPT audit; only all-ten PASS may advance directly to M54, otherwise exact TUNING_REQUIRED remediation is opened.
 
 **M53-C001 audit verdict:** `CHANGES_REQUIRED / DIFFICULTY CALIBRATION REQUIRED`.
 Static content QA is accepted 10/10. The Stage-A D classifications are retained as diagnostics but are not yet authority for mutating production content.
 
 #### M53-C002 Difficulty V1 Calibration / Policy Robustness
 
-- [x] SB-M53-C002-001 Build an independent QA-only calibration corpus covering controlled W/C/A/U/B/R/S changes.
-- [x] SB-M53-C002-002 Define expected ordinal relationships for calibration pairs without assigning arbitrary production class labels.
-- [x] SB-M53-C002-003 Remove arbitrary oracle-trace dependence from primary B/S/A scoring.
-- [x] SB-M53-C002-004 Implement a deterministic non-adversarial reference-policy family and robust primary aggregate; keep stress policy separate.
-- [x] SB-M53-C002-005 Derive/version candidate normalization anchors from the independent corpus/envelope, never from First 10 target fitting.
-- [x] SB-M53-C002-006 Create versioned V2-candidate analyzer/config without overwriting V1 evidence.
-- [x] SB-M53-C002-007 Prove candidate determinism, bounded metrics and solver-search-order robustness.
-- [x] SB-M53-C002-008 Prove board size alone and color count alone do not dictate class-like Challenge behavior.
-- [x] SB-M53-C002-009 Prove controlled route/access/unlock/bottleneck/slot-pressure pairs move intended axes in the expected direction.
-- [x] SB-M53-C002-010 Freeze candidate calibration before scoring First 10 as a holdout.
-- [x] SB-M53-C002-011 Produce First 10 V1-vs-V2 candidate matrix, policy spread and recovery evidence with no post-hoc retuning.
-- [x] SB-M53-C002-012 Produce owner difficulty/fairness/engagement rating sheet with no fabricated responses.
-- [x] SB-M53-C002-013 Run focused + M53-C001 + M52/R01/R02 + historical + root regression; no production gameplay changes.
-- [x] SB-M53-C002-014 Write evidence/log and hand off for independent ChatGPT audit.
-- [x] SB-M53-C002-015 Independent ChatGPT audit; on PASS request owner calibration review before adopting any new production difficulty authority.
-
 **M53-C002 audit verdict:** `AUDITED_PASS / OWNER DIFFICULTY CALIBRATION REVIEW REQUIRED`.
 V2 remains `CANDIDATE_NOT_PRODUCTION_AUTHORITY`; no production content/target/model adoption is authorized yet.
 
 #### M53-C002 Owner Calibration Review
 
-- [x] SB-M53-C002-O01 Owner rates perceived difficulty 1..7 for Levels 1–10 under consistent 1x/no-booster conditions.
-- [x] SB-M53-C002-O02 Owner rates fairness and engagement 1..7 and class feel for Levels 1–10.
-- [x] SB-M53-C002-O03 Owner evaluates recovery cadence L3→4, L5→6, L8→9 and whether L10 feels like the cycle boss.
-- [x] SB-M53-C002-O04 Owner explicitly reviews L1 neutral-policy deadlock/fairness and L7 relative difficulty/robustness concern.
-- [x] SB-M53-C002-O05 ChatGPT compares owner Stage-B ratings with V2/V1/targets and opens the exact adoption, calibration-refinement or content-tuning next task.
-
 **Owner Stage-B evidence:** `coordination/sessions/M53-C002/OWNER_DIFFICULTY_RATINGS_V01.md`
 **ChatGPT reconciliation:** `coordination/sessions/M53-C002/CHATGPT_STAGE_B_RECONCILIATION_V01.md`
-
-#### M53-C002-R01 Stale Calibration Corpus Determinism — QUEUED MAINTENANCE
-
-- [x] **SB-M53-C002-R01-001 — Remove platform-dependent calibration-evidence serialization and re-freeze V2 candidate QA artifacts without semantic drift. PASS / CLOSED [2026-10-07].** Implementation `f77f087a928eca5ed76c42c20639a7231c657b1c` adds one QA-only full-precision canonical serializer, regenerates corpus/frozen-config/holdout evidence through the existing workflow, preserves all fixture/supply identities and all ordinal/family/robustness/First Ten/recovery/L10/owner-facing decisions, and restores the exact fresh==committed determinism assertion on Linux/cloud. Golden serializer suite 30/30 PASS; root 5,329 ALL PASS. Strict audit: `coordination/sessions/M53-C002/CHATGPT_R02_STRICT_REAUDIT_V01.md`. Integrated through PR #9; production Difficulty V2 remains deferred/not authority.
 
 #### M53-C003 V2.1 Stage-B Difficulty Calibration Refinement — DEFERRED BY OWNER
 
@@ -2792,29 +1578,6 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 ### M54 — Regression Suite `[QA]`
 
 **M54-C001 First 10 gate: CLOSED.** SB-M54-001..021 + 016A are 22/22 AUDITED_PASS after owner ruling A = 900 s / 15 min. Final closure: `coordination/sessions/M54-C001/CHATGPT_AUDIT_V02.md`. SB-M54-022..032 remain later M43+ regression work.
-
-- [x] SB-M54-001 Difficulty/progression tests.
-- [x] SB-M54-002 Level parser tests.
-- [x] SB-M54-003 BoardState tests.
-- [x] SB-M54-004 Renderer tests.
-- [x] SB-M54-005 Slot tests.
-- [x] SB-M54-006 Color-candidate/reachability tests.
-- [x] SB-M54-007 Reservation tests.
-- [x] SB-M54-008 TargetSelector tests.
-- [x] SB-M54-009 Routing tests including Railroad V1 geometry, connectors, legal ingresses and post-rail orthogonal interior turns.
-- [x] SB-M54-010 Dispatcher tests.
-- [x] SB-M54-011 Completion tests.
-- [x] SB-M54-012 Save tests.
-- [x] SB-M54-013 Reward tests.
-- [x] SB-M54-014 Content validation tests.
-- [x] SB-M54-015 59×59 regression test.
-- [x] SB-M54-016 Economy Wallet/Gift Meter/Daily/Cards Exchange/Collection-completion idempotency regression.
-- [x] SB-M54-016A Test every set-specific 9/9 reward plus all-15 Master Collection +2500 SB/+20 Bot Parts exactly-once grant.
-- [x] SB-M54-017 Heart **900-second / 15-minute** offline/background/menu regen and clock-rollback regression. [OWNER ruling A; `OWNER_HEART_REGEN_INTERVAL_V01.md`; M54-C001 V02 CLOSED]
-- [x] SB-M54-018 2x level/timed entitlement wall-clock expiry + free M23-exhausted auto-2x regression.
-- [x] SB-M54-019 +1 Slot 5/6-capacity runtime + solver regression.
-- [x] SB-M54-020 Random/Selector solver-safety and no-consume-on-failure regression.
-- [x] SB-M54-021 Tornado cross-engine conservation/rollback/no-ghost regression.
 
 #### M54 Player-Experience / Meta Regression Expansion
 - [ ] SB-M54-022 Results/fail/retry/Need-a-Hand third-failure regression.
@@ -2839,35 +1602,6 @@ No open C003 checklist rows remain in the active tracker. This is a scope deferr
 ### M55 — Chaos / Long-Run QA `[QA]`
 
 **M55 current-build core: CLOSED.** SB-M55-001..017 AUDITED_PASS in C001; timed-2x anti-rollback remediation C002 AUDITED_PASS at `023a0fc`. Audits: `coordination/sessions/M55-C001/CHATGPT_AUDIT_V01.md`, `coordination/sessions/M55-C002/CHATGPT_AUDIT_V01.md`. SB-M55-018..024 remain deferred until their M43+ surfaces exist. Separate M55 QUIESCENCE-QA-R01 is also independently TECH PASS/CLOSED at `c997ca65`, without changing leak thresholds.
-
-- [x] SB-M55-001 Spam all five slots.
-- [x] SB-M55-002 Restart while bots travel.
-- [x] SB-M55-003 Pause while bots travel.
-- [x] SB-M55-004 Background while bots travel.
-- [x] SB-M55-005 Complete with bots in flight.
-- [x] SB-M55-006 Exhaust color.
-- [x] SB-M55-007 Exhaust slot work.
-- [x] SB-M55-008 Repeated scene transitions.
-- [x] SB-M55-009 Long high-load session.
-- [x] SB-M55-010 Memory growth monitoring.
-- [x] SB-M55-011 Duplicate signal monitoring.
-- [x] SB-M55-012 Orphan Node monitoring.
-- [x] SB-M55-013 Duplicate reward monitoring.
-- [x] SB-M55-014 Spam booster use/purchase/charge buttons; prove no double spend/use.
-- [x] SB-M55-015 Background/foreground across Heart regen and timed 2x expiry.
-- [x] SB-M55-016 Tornado while matching-color agents are in flight; prove atomic reconciliation.
-- [x] SB-M55-017 Cards Exchange-all under repeated taps; prove protected first copies and no duplicate SB grant.
-
-#### M55-C002 Timed 2x Anti-Rollback Remediation
-
-- [x] SB-M55-C002-001 Add persistent non-decreasing effective/high-water wall-clock authority for timed 2x.
-- [x] SB-M55-C002-002 Ensure remaining timed-2x seconds cannot increase and an expired entitlement cannot revive after backward clock movement.
-- [x] SB-M55-C002-003 Preserve normal forward expiry, current-level 2x and free M23 auto-2x semantics.
-- [x] SB-M55-C002-004 Add backward-compatible legacy snapshot migration without wiping legitimately active legacy timed entitlements.
-- [x] SB-M55-C002-005 Persist/strictly validate the new anti-rollback state across save/relaunch; malformed present values fail closed.
-- [x] SB-M55-C002-006 Prove explicit new timed purchase can extend from the canonical effective base and charges exactly once.
-- [x] SB-M55-C002-007 Add focused rollback/migration/persistence sensitivity regression plus relevant M39/M40/M55/root regressions.
-- [x] SB-M55-C002-008 Write evidence/log and hand off for independent ChatGPT audit.
 
 #### M55 Player-Experience Chaos Expansion
 - [ ] SB-M55-018 Spam open/close/purchase/reward buttons across every popup without double transition/spend/grant.
@@ -3184,8 +1918,6 @@ M23 is followed strictly by M24 Five-Slot Batch Engine, M25 Batch Target Claim E
 ## REMOTE CONTENT RUNTIME V01 — ACTIVE STRICT AUDIT / R01
 
 The CP04/M15 + CP05/M16 publisher-client requirements are canonically defined in the separate Content Platform program. Do not duplicate those 26 requirement rows here. This block records only **new game-side strict-audit remediation**.
-
-- [x] **SB-CP05-R01-001 — Clean candidate-installed pack directories after failed multi-pack refresh. PASS / CLOSED [2026-10-07].** Staging-until-full-candidate-verification plus exact transaction-owned rollback closes the multi-pack leak; active/LKG/reused packs are preserved, failed registry transitions restore exact prior bytes, and six permanent adversarial cases PASS. Strict re-audit: `coordination/sessions/REMOTE-CONTENT-RUNTIME-V01/CHATGPT_CP05_R01_REAUDIT_V01.md`. Integrated through PR #8; merged runtime main `09f320044abc0424c6a9916cdbbce4eec047b820`. CP05/M16 is TECHNICAL PASS/CLOSED; CP04/M15 runtime core TECHNICAL PASS with CP04-011 still reserved for Android export/INTERNET-permission gate.
 
 ## MIGRATED LEVEL FACTORY / CONTENT PLATFORM PROGRAM — REFERENCE ONLY
 
