@@ -112,6 +112,12 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M44-010 — unlocks (owner 2026-10-22): Hearts from start, boosters 6 +1Slot/11 Random/16 Selector/21 Tornado, Daily Rewards 4, Shop 8, Tasks 12, Collection 20, Events 30, RANKS 40
 - READY SB-M44-022..023 — Collection onboarding and retention unlocks per the 2026-10-22 owner table (Collection 20, Tasks 12, Events 30)
 - READY SB-M43-R09-006 — ScrubBox surprise bonus slot: owner said yes (2026-10-22); enable only after the M56 economy simulation
+- READY SB-M44-025 — pending-pack inventory: pre-L20 packs kept, openable at L20 (OWNER_META_PROGRESSION_DESIGN_V01)
+- READY SB-M44-026 — Featured Card schedule for 135 cards + guaranteed Scrubby L20 and unowned Set 01 card at L30/L40 (OWNER_META_PROGRESSION_DESIGN_V01)
+- READY SB-M44-027 — robot 5-stage assembly visual at 50/100/150/200/250 Bot Parts; Robots unlock L25 (OWNER_META_PROGRESSION_DESIGN_V01)
+- READY SB-M44-028 — achievements 8 -> 32, stats from L1, Achievements screen unlock L35 (OWNER_META_PROGRESSION_DESIGN_V01)
+- READY SB-M44-029 — cosmetic achievement rewards (badges/frames), no economy rewards (OWNER_META_PROGRESSION_DESIGN_V01)
+- READY SB-M44-030 — verify Gift Bar visible from first Home with unchanged 10/50/250/500/1000 rewards; regression test (OWNER_META_PROGRESSION_DESIGN_V01)
 <!-- Not queued (standing rules, no job of their own): SB-M08-011..012, SB-M22-016..019, SB-M22-021, SB-UI-020..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
 
 ## Questions for Şekip
@@ -1311,7 +1317,7 @@ Purpose: teach the real production game progressively and prevent the first sess
 
 - [ ] SB-M44-005 Teach WAITING/no-current-target behavior only when the player first encounters it, using contextual coachmark/highlight.
 - [ ] SB-M44-006 Teach win/fail/Retry and Heart consequence at first relevant occurrence.
-- [ ] SB-M44-010 Define owner-approved feature-unlock order/campaign points for Hearts, booster acquisition, Daily, Tasks, Collection, Card Packs, Robots, Gift Meter/Gift Bar, Shop, Events, Ranks, Achievements and any later system. **[OWNER DECISION 2026-10-22, owner via factory dashboard: Hearts from the start. Boosters unlock in order (owner in chat 2026-10-22): +1 Slot at 6, Random at 11, Selector at 16, Tornado at 21. Daily Rewards 4, Shop 8, Tasks 12, Collection 20, Events 30, RANKS 40. Open detail: unlock points for Card Packs, Robots, Gift Meter/Gift Bar and Achievements were not given.]**
+- [ ] SB-M44-010 Define owner-approved feature-unlock order/campaign points for Hearts, booster acquisition, Daily, Tasks, Collection, Card Packs, Robots, Gift Meter/Gift Bar, Shop, Events, Ranks, Achievements and any later system. **[OWNER DECISION 2026-10-22, owner via factory dashboard: Hearts from the start. Boosters unlock in order (owner in chat 2026-10-22): +1 Slot at 6, Random at 11, Selector at 16, Tornado at 21. Daily Rewards 4, Shop 8, Tasks 12, Collection 20, Events 30, RANKS 40. Owner in chat 2026-10-22: Gift Bar 1, Card Packs 20 (with Collection), Robots 25, Achievements screen 35 (stats from L1); full design `coordination/OWNER_META_PROGRESSION_DESIGN_V01.md`, implementation SB-M44-025..030.]**
 - [ ] SB-M44-013 Newly unlocked Home shortcut/Nav destination may show a NEW badge until first visit; badge clearing persists.
 - [ ] SB-M44-018 Produce/owner-approve tutorial coachmark/highlight visual language and any Scrubby/robot teaching poses actually required.
 - [ ] SB-M44-020 Owner playtest the complete first-session funnel and revise friction before M44 closes.
@@ -1320,6 +1326,15 @@ Purpose: teach the real production game progressively and prevent the first sess
 
 - [ ] SB-M44-022 Sequence Collection onboarding so Set 1 / first earned packs establish the First Collection Sprint early, while pity remains invisible until relevant and then explains itself truthfully.
 - [ ] SB-M44-023 Unlock Daily Scrub Orders, Weekly Cleaning Event and First-Try Cleanup only after their prerequisite core/meta systems are understood; exact campaign unlock points remain data-driven under SB-M44-010/011.
+
+#### M44 Meta Progression Design [OWNER DECISION 2026-10-22, `coordination/OWNER_META_PROGRESSION_DESIGN_V01.md`]
+
+- [ ] SB-M44-025 Pending-pack inventory: Card Packs earned before L20 (Gift Bar or any existing source) are stored, never lost and never converted, and become openable when Card Packs unlock at L20 with Collection; no new rewards created.
+- [ ] SB-M44-026 Featured Card schedule data for all 135 cards (Set 01 special schedule L20..L40; other sets +0/+10/+20/+30/+40/+50/+60/+70/+90 from their featured range start, catalogue order) plus guaranteed Scrubby at L20 and a guaranteed not-yet-owned Set 01 card at the L30 and L40 milestones; packs stay random with existing rarity/duplicate rules.
+- [ ] SB-M44-027 Robot 5-stage visual assembly at 50/100/150/200/250 Bot Parts toward the next 250-part unlock (visual only, no per-part inventory or new currency); Robots destination unlocks at L25; robot target levels stay non-binding.
+- [ ] SB-M44-028 Expand `data/config/achievements_v1.json` from 8 to the owner's 32 (Level 8, Collection 9, Robot 5, Skill 8, Gift Bar 2), keeping the existing 8; stats tracked from L1 (first-time progression levels only), Gift Meter stats wired in, Achievements screen unlocked at L35.
+- [ ] SB-M44-029 Cosmetic achievement rewards (Alternative A): badges / profile frames / Collection showcase decoration, no economy rewards; exact items are an open owner detail in the design doc.
+- [ ] SB-M44-030 Verify Gift Bar is visible and progressing from the first Home (L1) with the existing 10/50/250/500/1000 rewards unchanged; add a regression test.
 
 ### M45 — Debug Tooling
 
