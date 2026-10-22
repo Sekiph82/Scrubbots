@@ -1,0 +1,1 @@
+{ "id": "018-optin-close-docs", "task": "SB-M50-OPTIN-001 close + CLAUDE.md color-assist line + dashboard merged-collapse (light path)", "branch": "factory/018-optin-close-docs", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/018-optin-close-docs", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "n/a", "tests": "n/a" } }
