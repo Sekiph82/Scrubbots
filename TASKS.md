@@ -103,21 +103,17 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - READY SB-M49-029 — ad/store return-transition layout check for AdMob + Play Billing/StoreKit (owner 2026-10-22)
 - READY SB-M57-013 — No Ads (owner 2026-10-22): one-time $4.99, removes bottom banner + every-5-plays interstitials; rewarded videos stay
 - READY SB-M43-081 — Shop No Ads entry for the 2026-10-22 No Ads product ($4.99 one-time; rewarded videos stay)
-- OWNER SB-M43-136..141 — future world level ranges undecided; world registry, art, states, ceremony wait on them
-- OWNER SB-M43-073 — world unlock ceremony waits on owner-defined world ranges
-- OWNER SB-M54-032 — world regression waits on owner-defined world ranges
-- OWNER SB-M61-001..007 — Friends scope and identity model undecided (post-launch)
-- OWNER SB-M44-010 — feature-unlock pacing table undecided; SB-M44-011 forbids inventing unlock levels
-- OWNER SB-M44-022..023 — Collection onboarding and retention-feature unlock points wait on the pacing table
-- OWNER SB-M43-R09-006 — optional ScrubBox surprise bonus slot needs an owner yes/no after M56 simulation
+- READY SB-M43-136..141 — worlds (owner 2026-10-22): 20 named worlds x 150 levels = 3000, full table on SB-M43-136; completion conditions still open
+- READY SB-M43-073 — world unlock ceremony for the 2026-10-22 owner world table (20 worlds x 150 levels)
+- READY SB-M54-032 — world regression for the 2026-10-22 owner world table (20 worlds x 150 levels, 1-3000)
+- READY SB-M61-001..007 — Friends (owner 2026-10-22): post-launch; list from Play Games / Game Center; no chat; 1 Heart gift per friend per day; no challenges in V1
+- READY SB-M44-010 — unlocks (owner 2026-10-22): Hearts from start, boosters 6/11/16/21, Daily Rewards 4, Shop 8, Tasks 12, Collection 20, Events 30, RANKS 40
+- READY SB-M44-022..023 — Collection onboarding and retention unlocks per the 2026-10-22 owner table (Collection 20, Tasks 12, Events 30)
+- READY SB-M43-R09-006 — ScrubBox surprise bonus slot: owner said yes (2026-10-22); enable only after the M56 economy simulation
 <!-- Not queued (standing rules, no job of their own): SB-M08-011..012, SB-M22-016..019, SB-M22-021, SB-UI-020..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
-- SB-M43-136..141, SB-M43-073, SB-M54-032 — Which campaign level ranges / completion conditions define World 02 and later worlds?
-- SB-M61-001..007 — What Friends scope and identity model do you want post-launch, and should friend gifts/challenges exist?
-- SB-M44-010, SB-M44-022..023 — At which campaign levels should each meta feature (Hearts, boosters, Daily, Tasks, Collection, Shop, Events...) unlock?
-- SB-M43-R09-006 — After the M56 economy simulation, should the earned ScrubBox get a small surprise bonus slot (yes/no)?
 
 ## Project Status
 
@@ -2182,7 +2178,7 @@ This extension **does not change** the canonical consecutive-login reset rule or
 - [ ] SB-M43-R09-003 Daily generation uses the local-day authority plus deterministic/versioned eligibility rules so tasks cannot silently reroll on relaunch; exclude impossible tasks based on current frontier, unlocked systems and available production content.
 - [ ] SB-M43-R09-004 Keep one easy / one normal / one stretch intent aligned with 75/100/125 SB while bounding grind; a task must be finishable in a normal play session and must not encourage intentionally losing or wasting Hearts.
 - [ ] SB-M43-R09-005 Present the existing all-3 completion reward through an **earned ScrubBox** ceremony. Phase A reward floor remains the canonical one random Booster Charge exactly once; the box is never sold and has no paid reroll/open-speed mechanic.
-- [ ] SB-M43-R09-006 A future small surprise bonus slot (bounded SB/card-pack/approved existing reward types only) may be enabled from versioned tuning **only after M56 economy/retention simulation and owner approval**; no jackpot/near-miss presentation and no new currency.
+- [ ] SB-M43-R09-006 A future small surprise bonus slot (bounded SB/card-pack/approved existing reward types only) may be enabled from versioned tuning **only after M56 economy/retention simulation and owner approval**; no jackpot/near-miss presentation and no new currency. **[OWNER DECISION 2026-10-22, owner via factory dashboard: yes, the earned ScrubBox gets a small surprise bonus slot, enabled after the M56 economy simulation.]**
 
 #### M43-C010 - Bottom Navigation / Profile / Achievements / Events / Ranks
 
@@ -2214,7 +2210,7 @@ This extension **does not change** the canonical consecutive-login reset rule or
 #### M43-C011 - World Progression / World Home System
 
 - [ ] SB-M43-135 Preserve World 01 Whispering Park as current default complete 1080x2160 Home background.
-- [ ] SB-M43-136 Define owner-approved campaign level ranges / completion conditions for future worlds before any hardcoded range exists.
+- [ ] SB-M43-136 Define owner-approved campaign level ranges / completion conditions for future worlds before any hardcoded range exists. **[OWNER DECISION 2026-10-22, owner via factory dashboard: World 01 Whispering Park 0001-0150; World 02 Bubble District 0151-0300; World 03 Neon Sewers 0301-0450; World 04 Crystal Laundry 0451-0600; World 05 Toxic Docks 0601-0750; World 06 Clockwork Carnival 0751-0900; World 07 Rustwood Railway 0901-1050; World 08 Frostbyte Factory 1051-1200; World 09 Midnight Metro 1201-1350; World 10 Sunken Harbor 1351-1500; World 11 Ember Foundry 1501-1650; World 12 Mosslight Ruins 1651-1800; World 13 Candy Circuit 1801-1950; World 14 Stormglass Heights 1951-2100; World 15 Phantom Museum 2101-2250; World 16 Moonbeam Observatory 2251-2400; World 17 Steamcloud Summit 2401-2550; World 18 Prism Powerplant 2551-2700; World 19 Shadowbyte Citadel 2701-2850; World 20 Grimeheart Core 2851-3000. Total: 20 worlds x 150 levels = 3000 levels. Open detail: the owner gave names and level ranges only, not completion conditions.]**
 - [ ] SB-M43-137 Implement data-driven world registry mapping world ID to background, title/area semantics, unlock condition and optional world reward.
 - [ ] SB-M43-138 Produce/owner-approve one complete visual master/background for every shipping world before activation.
 - [ ] SB-M43-139 Implement locked/current/completed world states and deterministic transition after qualifying progression.
@@ -2346,7 +2342,7 @@ Purpose: teach the real production game progressively and prevent the first sess
 - [x] SB-M44-007 Introduce the four boosters progressively; do not unlock/show all acquisition prompts in the opening minute. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
 - [x] SB-M44-008 Teach +1 Slot, Random, Selector and Tornado using real mechanics and solver-safe tutorial fixtures/states. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
 - [x] SB-M44-009 Introduce 2x only after the player understands normal-speed cleaning; explain paid manual entitlement vs free automatic endgame 2x without clutter. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
-- [ ] SB-M44-010 Define owner-approved feature-unlock order/campaign points for Hearts, booster acquisition, Daily, Tasks, Collection, Card Packs, Robots, Gift Meter/Gift Bar, Shop, Events, Ranks, Achievements and any later system.
+- [ ] SB-M44-010 Define owner-approved feature-unlock order/campaign points for Hearts, booster acquisition, Daily, Tasks, Collection, Card Packs, Robots, Gift Meter/Gift Bar, Shop, Events, Ranks, Achievements and any later system. **[OWNER DECISION 2026-10-22, owner via factory dashboard: Hearts from the start. Boosters at levels 6, 11, 16, 21. Daily Rewards 4, Shop 8, Tasks 12, Collection 20, Events 30, RANKS 40. Open detail: which booster unlocks at which of 6/11/16/21, and unlock points for Card Packs, Robots, Gift Meter/Gift Bar and Achievements, were not given.]**
 - [x] SB-M44-011 Do not invent exact unlock level numbers until the owner approves the pacing table; store unlocks data-driven once approved. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
 - [x] SB-M44-012 Feature-unlock ceremony uses M43-C005 and is shown at most once per feature/version. **[CHATGPT TECH_PASS 2026-10-15; audit M44 V02; owner FULL_M44 closure still OPEN]**
 - [ ] SB-M44-013 Newly unlocked Home shortcut/Nav destination may show a NEW badge until first visit; badge clearing persists.
@@ -2993,7 +2989,7 @@ Release readiness additionally requires:
 
 This closes the previously identified social gap without expanding V1 into a chat/clan product. It is planned for a later release after account/privacy/ranks foundations are stable.
 
-- [ ] SB-M61-001 Define owner-approved Friends scope and identity model.
+- [ ] SB-M61-001 Define owner-approved Friends scope and identity model. **[OWNER DECISION 2026-10-22, owner via factory dashboard: After launch. Friend list comes from Play Games / Game Center, no chat. Each friend can be gifted 1 Heart per day. No challenges in V1.]**
 - [ ] SB-M61-002 Friend add/invite/discovery policy with privacy-safe identifiers and no unsolicited contact exposure.
 - [ ] SB-M61-003 Friends list with online-agnostic progress summary and active robot/avatar presentation.
 - [ ] SB-M61-004 Optional friend progress/rank comparison using the same fair Ranks metric; no pay-to-win multiplier.
