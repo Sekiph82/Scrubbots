@@ -1,8 +1,9 @@
 extends SceneTree
 ## M50-BOARD (SB-M50-002 board part, owner 2026-10-15): per-cell colour symbols on the real
 ## pixel-art board, the COLOR SYMBOLS setting and the press-and-hold board magnifier.
-## SB-M50-OPTIN-001 (owner 2026-10-22): symbols are opt-in (default OFF) and small (glyph_span 0.5,
-## hidden below min_glyph_px on screen); cases that check glyphs switch them ON explicitly.
+## SB-M50-OPTIN-001 (owner 2026-10-22): symbols are opt-in (default OFF) and small (glyph side
+## floor(ppc * 0.4) whole screen px, hidden below min_glyph_px); cases that check glyphs switch
+## them ON explicitly.
 ##   b01 glyph atlas: 16 tiles == the Supply/Slot shapes (same _parts), halo contains the shape,
 ##       empty tile margin (no mipmap bleed); built once (cached)
 ##   b02 board ink: WCAG pick per colour, ink / halo contrast on all 16 colours
@@ -168,7 +169,7 @@ func _b03() -> void:
 	_ok(nodes == 0, "no child nodes on any renderer (no per-cell nodes)")
 	var code: String = load("res://scripts/gameplay/board/board_pixel_grid.gdshader").code
 	_ok(code.find("base.a < 0.5") != -1 and code.find("base.a < 0.5") < code.find("if (symbols_on"), "shader returns transparent for CLEARED / VOID texels BEFORE any glyph is drawn")
-	_ok(code.find("uniform float glyph_span = 0.5;") != -1 and code.find("uniform float min_glyph_px = 5.0;") != -1 and code.find("if (symbols_on && ppc * glyph_span >= min_glyph_px)") != -1, "shader: glyph_span 0.5, min_glyph_px 5.0, glyph drawn only when ppc * glyph_span >= min_glyph_px")
+	_ok(code.find("uniform float glyph_span = 0.4;") != -1 and code.find("uniform float min_glyph_px = 5.0;") != -1 and code.find("float gpx = floor(ppc * glyph_span + 0.001);") != -1 and code.find("if (symbols_on && gpx >= min_glyph_px)") != -1, "shader: glyph_span 0.4, min_glyph_px 5.0, glyph side floor(ppc * glyph_span) whole px, drawn only when >= min_glyph_px")
 	_complete("b03_identity_map")
 
 func _b04() -> void:
@@ -387,14 +388,15 @@ func _b08() -> void:
 		_complete("b08_gpu_readback")
 		return
 	ColorSymbols.enabled = _default_symbols   # the process default (OFF)
-	var cs := 48                               # large cells keep the 0.5-span glyph measurable
+	var cs := 48                               # large cells keep the 0.4-span glyph measurable
 	var board := _board(20, 20, _v3)
 	board.set_cell_state(board.get_cell_index(5, 5), BoardState.CellState.CLEARED)
 	var r: BoardRenderer = await _render(board, 20 * cs)
 	var m: ShaderMaterial = r.get_board_material()
 	var span: float = float(RenderingServer.shader_get_parameter_default(m.shader.get_rid(), "glyph_span"))
 	var min_px: float = float(RenderingServer.shader_get_parameter_default(m.shader.get_rid(), "min_glyph_px"))
-	_ok(int(r.get_cell_size()) == cs and is_equal_approx(span, 0.5) and is_equal_approx(min_px, 5.0), "rendered at %d px per cell; shader defaults glyph_span %.2f, min_glyph_px %.1f" % [int(r.get_cell_size()), span, min_px])
+	var gpx := int(floor(cs * span + 0.001))   # glyph side in whole screen px (shader rule)
+	_ok(int(r.get_cell_size()) == cs and is_equal_approx(span, 0.4) and is_equal_approx(min_px, 5.0), "rendered at %d px per cell; shader defaults glyph_span %.2f, min_glyph_px %.1f -> glyph %d px" % [int(r.get_cell_size()), span, min_px, gpx])
 	var img_def := await _snap()
 	ColorSymbols.set_enabled(true, self)
 	var img := await _snap()
@@ -437,7 +439,7 @@ func _b08() -> void:
 			marked += 1 if near >= 6 else 0
 	_ok(marked == checked, "%d/%d rendered ACTIVE cells show symbol ink pixels inside the cell" % [marked, checked])
 	_ok(ring_bad == 0, "no glyph pixel (ink or halo) outside the central 60%% of any cell (%d stray)" % ring_bad)
-	_ok(widest > 0 and widest <= int(cs * 0.55), "glyph bounding box at most %d px of a %d px cell (widest %d px = %.2f of the side)" % [int(cs * 0.55), cs, widest, float(widest) / cs])
+	_ok(widest > 0 and widest <= gpx, "glyph bounding box at most floor(%d * %.1f) = %d px of a %d px cell (widest %d px = %.2f of the side)" % [cs, span, gpx, cs, widest, float(widest) / cs])
 	# Which glyph: per cell, the rendered ink mask must match ITS C-ID shape (and not the next one),
 	# sampled 16x16 over the central glyph square.
 	var worst_right := 1.0
@@ -459,7 +461,7 @@ func _b08() -> void:
 			for sy in range(16):
 				for sx in range(16):
 					var gp := Vector2((sx + 0.5) / 16.0, (sy + 0.5) / 16.0)
-					var fpos := Vector2(0.5, 0.5) + (gp - Vector2(0.5, 0.5)) * span
+					var fpos := Vector2(0.5, 0.5) + (gp - Vector2(0.5, 0.5)) * (float(gpx) / cs)
 					var p := (gp - Vector2(0.5, 0.5)) * ColorSymbols.ATLAS_SPAN
 					# Skip points near a shape edge (filtering blends them).
 					var e := 0.14
@@ -487,22 +489,46 @@ func _b08() -> void:
 			var c := img.get_pixel(5 * cs + px, 5 * cs + py)
 			hole_ok = hole_ok and Vector3(c.r - BG01.r, c.g - BG01.g, c.b - BG01.b).length() < 0.02
 	_ok(hole_ok, "CLEARED cell: every one of its %d px is exactly the BG01 background (transparent, no ghost glyph / grid)" % (cs * cs))
-	# Size gate: under 10 px per cell no glyph is drawn even with symbols ON; at 12 px it is.
+	# Size gate + whole-pixel glyph on a 59x59 board: 8 / 12 px cells (glyph 3 / 4 px < 5) draw no
+	# glyph pixel even with symbols ON; 13 / 16 px cells draw glyphs exactly floor(ppc * 0.4) px wide.
 	var dense := _board(59, 59, _v3)
-	for side in [500, 59 * 12]:
-		var rd: BoardRenderer = await _render(dense, side)
+	for ppc_i in [8, 12, 13, 16]:
+		var rd: BoardRenderer = await _render(dense, 59 * ppc_i)
 		var ppc := rd.get_cell_size() * absf(rd.get_global_transform().get_scale().x)
+		var g := int(floor(ppc * span + 0.001))
 		ColorSymbols.set_enabled(true, self)
 		var d_on := await _snap()
 		ColorSymbols.set_enabled(false, self)
 		var d_off := await _snap()
 		var same := d_on.get_data() == d_off.get_data()
-		if side == 500:
-			_ok(ppc < 10.0 and same, "59x59 in %d px: %.2f px per cell (glyph %.2f px < %.0f): symbols ON draws no glyph pixel" % [side, ppc, ppc * span, min_px])
+		if g < int(min_px):
+			_ok(is_equal_approx(ppc, ppc_i) and same, "59x59 at %.2f px per cell (glyph floor %d px < %d): symbols ON draws no glyph pixel" % [ppc, g, int(min_px)])
 		else:
-			_ok(ppc >= 10.0 and not same, "59x59 in %d px: %.2f px per cell (glyph %.2f px): glyphs drawn" % [side, ppc, ppc * span])
+			var w := _glyph_widest(d_on, d_off, 59, ppc_i)
+			_ok(is_equal_approx(ppc, ppc_i) and not same and w > 0 and w <= g, "59x59 at %.2f px per cell: glyph drawn, %d px wide on screen within its floor(%.2f * %.1f) = %d px square" % [ppc, w, ppc, span, g])
 	_shutdown()
 	_complete("b08_gpu_readback")
+
+## Widest per-cell bounding box (px) of the pixels that differ between two renders of an n x n
+## board at cs px per cell, origin (0, 0).
+func _glyph_widest(a: Image, b: Image, n: int, cs: int) -> int:
+	var widest := 0
+	for cy in range(n):
+		for cx in range(n):
+			var x0 := cs
+			var x1 := -1
+			var y0 := cs
+			var y1 := -1
+			for py in range(cs):
+				for px in range(cs):
+					if a.get_pixel(cx * cs + px, cy * cs + py) != b.get_pixel(cx * cs + px, cy * cs + py):
+						x0 = mini(x0, px)
+						x1 = maxi(x1, px)
+						y0 = mini(y0, py)
+						y1 = maxi(y1, py)
+			if x1 >= 0:
+				widest = maxi(widest, maxi(x1 - x0 + 1, y1 - y0 + 1))
+	return widest
 
 func _render(board: BoardState, side: int) -> BoardRenderer:
 	_new_sub(Vector2i(side, side))
