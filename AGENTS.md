@@ -1,5 +1,11 @@
 # ScrubBots Agent Instructions
 
+## NEWEST OWNER DECISION 2026-10-22
+`CLAUDE.md` §0D overrides this file: factory peer review closes tasks (no ChatGPT audit required), Actions freeze lifted, worktrees allowed with mandatory cleanup.
+
+## Local Godot
+`$GODOT` = `C:\Users\sekip\AppData\Local\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\Godot_v4.7.2-stable_win64_console.exe` (local Godot 4.7.2 console executable, installed with winget; `--version` = `4.7.2.stable.official.ed1daf0bf`; the WinGet link `%LOCALAPPDATA%\Microsoft\WinGet\Links\godot_console.exe` points to it). Run suites as `"$GODOT" --headless --path <checkout> -s res://tests/<suite>.gd`; the full suite list is in `.github/workflows/android-family-first10.yml`.
+
 ## H!veAI GitHub tracking [OWNER-LOCKED — 2026-09-10]
 
 - GitHub `origin/main` is repository/project-state authority.

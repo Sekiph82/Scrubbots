@@ -1,7 +1,5 @@
-# OWNER COST FREEZE 2026-10-15: GitHub Actions 2,000 free minutes exhausted; owner reports ~$76 charges.
-# HARD STOP: ALL jobs disabled at JOB level. Do not dispatch, re-run or enable even validation_only.
-# This safeguard must NOT be removed until the owner separately authorizes renewed Actions spending.
-# Source development, local bounded Godot tests, Git commits and push are still allowed.
+# OWNER 2026-10-22: cost freeze LIFTED. Repository is public, so standard GitHub-hosted
+# runners are free. Jobs run only while the repo is public (auto-stop if it is made private).
 
 name: iOS IPA
 
@@ -32,7 +30,7 @@ env:
 
 jobs:
   ipa:
-    if: ${{ false }} # OWNER COST FREEZE; skip before runner allocation, no billable minutes
+    if: ${{ !github.event.repository.private }} # public repo only: free standard runners
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4

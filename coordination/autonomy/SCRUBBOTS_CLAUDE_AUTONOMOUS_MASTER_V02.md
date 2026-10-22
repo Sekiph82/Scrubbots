@@ -1,6 +1,9 @@
 # SCRUBBOTS — CLAUDE CODE AUTONOMOUS CONTINUOUS DEVELOPMENT MASTER V02
 **Owner directive: 2026-10-15. ONE standing master.**
 Repository: `Sekiph82/Scrubbots` (`main`); original Windows checkout only: `C:\Users\sekip\Desktop\ScrubBots`.
+## NEWEST OWNER DECISION [2026-10-22] — SUPERSEDES THIS WHOLE FILE WHERE DIFFERENT
+Read `CLAUDE.md` §0D. Actions cost freeze LIFTED (public repo, free runners), all owner visual sign-offs GIVEN, worktrees/clones allowed with mandatory deletion after each job, factory loop (`.claude/skills/factory/SKILL.md`) is the process.
+
 ## IMMEDIATE SUPERSESSION [2026-10-15 22:xx owner] — ACTIONS COST FREEZE + BOARD SYMBOLS
 **TOP AUTHORITY:** Owner reports monthly 2,000 GitHub Actions free minutes consumed and ~$76 billed. **DO NOT launch any further GitHub Actions anywhere**, even normal nonrelease `validation_only` or previously budgeted 1+1 runs. ScrubBots Android and iOS jobs have unconditional-false safety guards; do not remove. The earlier V02 repeated loop's cloud-CI steps are **SUSPENDED** until new explicit owner authorization. Develop/test with installed Godot 4.7.2 and bounded existing laptop workspace only. If local tests cannot safely run, record `NOT_RUN / CLOUD_CI_DEFERRED_COST_FREEZE`; continue unrelated coding, no paid substitution, no disk surveys or destructive cleanup.
 

@@ -2,7 +2,16 @@
 
 This root TASKS.md is the **only** authoritative project-status tracker and the **only project-status file consumed by the H!veAI parser**. GitHub repository metadata and the latest commit are the remaining project-truth inputs. No parallel session index, roadmap, audit index, dashboard, hidden control-plane tracker, or equivalent status mirror is permitted.
 
+## Autonomous Queue
+<!-- Maintained by the factory loop (CLAUDE.md §0D). One row per item: `- READY|OWNER|DONE <TASK-ID> — <one line>`. First READY row is next. -->
+- READY REFRESH-QUEUE — scan open items, fill this queue (owner priority first: SB-M50-BOARD-001 board symbols)
+
+## Questions for Şekip
+<!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
+
 ## Project Status
+
+- **NEWEST OWNER DECISION [2026-10-22]: `CLAUDE.md` §0D.** All owner visual sign-offs GIVEN; GitHub Actions cost freeze LIFTED (public repo, free standard runners); worktrees/clones allowed with mandatory cleanup; factory loop + this file's Autonomous Queue drive the work; peer review closes tasks.
 
 - Current Milestone: **M46 TECHNICAL_SCOPE_AUDITED_PASS after WHOLE-MILESTONE CHATGPT REAUDIT V04**. RM005 first-progress solver/cached catalog and RM006 bounded Selector/diagnostic/+1 improvements source+auditor-authored adversarial validation accepted at final tested source b36d48fa; Claude Linux Godot4.7.2 22/22 exit0 (224s), 45/45 affected suites E1/E2, NOT ChatGPT-executed runtime. Main non-force FF integrated branch at 76eac5ad. **M46 release/device gates remain OPEN**: physical phone GPU/thermal, R06 Checking/HUD Random and R07 Booster saved F5 visual, owner-local Windows project runtime parity, release-template Logger diagnostics; GitHub Actions cost freeze. Audit: coordination/sessions/M46-PERFORMANCE-C001/CHATGPT_M46_WHOLE_MILESTONE_INDEPENDENT_REAUDIT_V04.md.
 - Current Sprint: **M46 correction series R02–R07 and RM001–RM006 completed within source/adversarial technical scope**, no new remediation prompt justified by frozen V3 findings; remaining OWNER_REQUIRED / NOT_VERIFIED_RELEASE / DEVICE gates tracked here only. Independent audit coordination/sessions/M46-PERFORMANCE-C001/CHATGPT_M46_WHOLE_MILESTONE_INDEPENDENT_REAUDIT_V04.md. Claude must not alter TASKS.
