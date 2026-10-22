@@ -25,7 +25,7 @@ Superseded history: docs/migration/legacy-task-trackers/CLAUDE_PRE_SLIM_2026-10-
 - No secrets in the repository; signing keys and credentials go to GitHub Secrets.
 - Without the owner (see §0D.5): no public production store release (APK/IPA), no production Cloudflare R2 upload, no paid tools/services or new spending.
 
-**Board color-assist (current product rule, owner 2026-10-15):** per-color non-color symbols MUST appear on actual ACTIVE board pixel cells, including 59x59, using the same 16 canonical shapes as Supply/Slots. Use a performance-cached batched overlay (no per-cell Godot Nodes, no legend-only workaround) plus an accessible magnifier/inspect option on dense boards. Preserve CLEARED transparent cells, the actual pixel art, and gameplay/route truth.
+**Board color-assist (current product rule, owner 2026-10-22, supersedes 2026-10-15 always-on):** color-blind symbols are OPT-IN via Settings COLOR SYMBOLS (default OFF; one toggle for board, Supply/Slots and booster chips), so the pixel art stays clean for everyone else. When ON, each ACTIVE board cell shows a glyph of side floor(screen px per cell x 0.4) whole pixels (e.g. 13 px cell -> 5 px), hidden below 5 px (the press-and-hold magnifier inspects dense boards). Keep: the same 16 canonical shapes as Supply/Slots (`color_symbols.gd`), one batched shader overlay, no per-cell Godot Nodes, no legend-only workaround, CLEARED cells transparent, the actual pixel art and gameplay/route truth preserved.
 
 ## 1. Required reading order
 
