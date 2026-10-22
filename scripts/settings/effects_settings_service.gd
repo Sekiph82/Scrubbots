@@ -12,7 +12,7 @@ extends RefCounted
 ## SB-M50-OPTIN-001 (owner 2026-10-22): opt-in, default OFF. Optional in a save (absent => OFF);
 ## present but not an exact bool => the whole candidate is rejected. snapshot() also writes the
 ## marker `color_symbols_optin: true`; a stored `color_symbols` is the player's choice only when
-## that marker is exactly true, so every pre-marker save (old default ON) is migrated to OFF once.
+## that marker is exactly true, so every pre-marker save (the old default stored true) is migrated to OFF once.
 ## A present non-bool marker rejects the candidate.
 ## Drives ColorSymbols.set_enabled (board cells, Supply/Slots, booster chips) via
 ## `color_symbols_changed`; it never touches gameplay state.
