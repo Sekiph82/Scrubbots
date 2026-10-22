@@ -93,17 +93,17 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 - READY SB-M51-005 — launch languages English and Turkish (owner 2026-10-22)
 - READY SB-M43-131..133 — RANKS (owner 2026-10-22): all-time = highest campaign level; weekly = levels completed, reset Monday 00:00 UTC; nothing bought with money/boosters counts
 - READY SB-M56-011 — Events/Ranks analytics for the RANKS policy decided 2026-10-22 (all-time + weekly tables)
+- READY SB-M43-153..160 — cloud save (owner 2026-10-22): Android Google Play Games Saved Games, iOS Game Center + iCloud; no own server/separate login; M43-158 restore also waits on SB-M57-001
+- READY SB-M49-030 — account/cloud-conflict responsive screen for the 2026-10-22 provider decision (Google Play Games / Game Center + iCloud)
+- READY SB-M54-031 — cloud/account regression for the 2026-10-22 provider decision (Google Play Games Saved Games / Game Center + iCloud)
+- READY SB-M57-012 — SB packs (owner 2026-10-22): $0.99→100 $4.99→550 $9.99→1200 $19.99→2600 $49.99→7000, IDs scrubbucks_<n>; retune after M56; store wiring waits SB-M57-001; live publish = owner
 - OWNER SB-M43-136..141 — future world level ranges undecided; world registry, art, states, ceremony wait on them
 - OWNER SB-M43-073 — world unlock ceremony waits on owner-defined world ranges
 - OWNER SB-M54-032 — world regression waits on owner-defined world ranges
-- OWNER SB-M43-153..160 — account/sign-in provider undecided; cloud save, restore and account screens wait on it
-- OWNER SB-M49-030 — account/cloud-conflict responsive screen waits on the account provider decision
-- OWNER SB-M54-031 — cloud/account regression waits on the account provider decision
 - OWNER SB-M57-001..011 — ad/IAP provider undecided (no SDK before approval); rewarded placements and grants wait on it
 - OWNER SB-M57-014..016 — purchase flow, receipt fulfillment and restore wait on the IAP provider decision
 - OWNER SB-M43-084 — Shop real-money cards, cash prices and restore wait on the M57 provider decision
 - OWNER SB-M49-029 — ad/store return-transition layout check waits on the M57 provider decision
-- OWNER SB-M57-012 — real-money Scrub Bucks packs and value ladder undecided
 - OWNER SB-M57-013 — No Ads product definition undecided
 - OWNER SB-M43-081 — Shop No Ads entry waits on the No Ads product definition
 - OWNER SB-M61-001..007 — Friends scope and identity model undecided (post-launch)
@@ -115,9 +115,7 @@ This root TASKS.md is the **only** authoritative project-status tracker and the 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
 - SB-M43-136..141, SB-M43-073, SB-M54-032 — Which campaign level ranges / completion conditions define World 02 and later worlds?
-- SB-M43-153..160, SB-M49-030, SB-M54-031 — Which account/sign-in provider should cloud save use (e.g. Google Play Games + Game Center, or none for V1)?
 - SB-M57-001..011, SB-M57-014..016, SB-M43-084, SB-M49-029 — Which rewarded-ad and IAP provider/SDK should ScrubBots use?
-- SB-M57-012 — Which real-money Scrub Bucks packs, product IDs and price ladder should the store sell?
 - SB-M57-013, SB-M43-081 — What should the No Ads product remove, and at what price?
 - SB-M61-001..007 — What Friends scope and identity model do you want post-launch, and should friend gifts/challenges exist?
 - SB-M44-010, SB-M44-022..023 — At which campaign levels should each meta feature (Hearts, boosters, Daily, Tasks, Collection, Shop, Events...) unlock?
@@ -2252,7 +2250,7 @@ This extension **does not change** the canonical consecutive-login reset rule or
 #### M43-C013 - Account / Cloud Save / Cross-Device Recovery
 
 - [ ] SB-M43-152 Keep local save authoritative/offline-capable even when account/cloud features are unavailable.
-- [ ] SB-M43-153 Define optional account/sign-in provider strategy in an owner/platform decision before adding SDKs.
+- [ ] SB-M43-153 Define optional account/sign-in provider strategy in an owner/platform decision before adding SDKs. **[OWNER DECISION 2026-10-22, owner via factory dashboard: Android uses Google Play Games Saved Games; iOS uses Game Center + iCloud. Both are free; no own server needed. No separate account or e-mail login.]**
 - [ ] SB-M43-154 Implement cloud-save schema/versioning compatible with M40 and preserve idempotent economy transaction IDs.
 - [x] SB-M43-155 Implement explicit cloud conflict resolution using revision/timestamp/progression/economy safety rules; never silently duplicate currency/rewards.
 - [ ] SB-M43-156 Implement sign-in, signed-out, syncing, synced, conflict, error and offline states.
@@ -2933,7 +2931,7 @@ Economy V1 soft-currency/Hearts/booster/2x rules are already owner-locked. The o
 - [ ] SB-M57-009 Configure per-placement availability/frequency/cooldown/cap server-side or versioned data after owner tuning; never bury hardcoded ad pressure inside popup code.
 - [ ] SB-M57-010 Ad unavailable/loading/fail/skip states grant nothing and always leave a usable non-broken UI.
 - [ ] SB-M57-011 App background/kill/relaunch during an ad cannot duplicate a reward.
-- [ ] SB-M57-012 Define Scrub Bucks real-money packs, localized store product IDs and value ladder in an owner decision before publishing cash prices.
+- [ ] SB-M57-012 Define Scrub Bucks real-money packs, localized store product IDs and value ladder in an owner decision before publishing cash prices. **[OWNER DECISION 2026-10-22, owner via factory dashboard: 5 packs: $0.99 → 100, $4.99 → 550, $9.99 → 1200, $19.99 → 2600, $49.99 → 7000. Product IDs follow the pattern scrubbucks_100, scrubbucks_550, … The amounts may be adjusted after the M56 economy simulation.]**
 - [ ] SB-M57-013 Define No Ads product and exactly which ad surfaces it removes; rewarded ads requested voluntarily by the player must follow the owner-approved No Ads policy.
 - [ ] SB-M57-014 Implement purchase request, pending, success, cancel, failure, restore and already-owned states.
 - [ ] SB-M57-015 Fulfillment is idempotent by platform transaction/receipt identity and persists across relaunch.
