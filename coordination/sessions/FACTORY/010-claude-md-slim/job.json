@@ -1,0 +1,1 @@
+{ "id": "010-claude-md-slim", "task": "CLAUDE-SLIM: archive superseded CLAUDE.md sections 0-0C (owner request 2026-10-22, light path)", "branch": "factory/010-claude-md-slim", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/010-claude-md-slim", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "n/a", "tests": "n/a" } }
