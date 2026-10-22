@@ -58,7 +58,6 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M43-127..130 — Achievements visual master; EVENTS destination (no new currency), event states, Events visual master
 - READY SB-M43-134 — Home/BottomNav badge system for remaining attention states without notification spam
 - READY SB-M43-R10-001..003 — Weekly Cleaning Event template, first-clear progress signal, no-reset and explicit expiry/claim state
-- OWNER SB-M22-023 — booster_tutorial_pointer unbound; needs owner decision (factory 035)
 - READY SB-M43-R10-004..007 — First-Try Cleanup challenge, no extra Heart/paid continue, Personal Best records, self-ghost marker
 - READY SB-M43-143..148 — comeback surface, opt-in notification categories, contextual permission, toggles/quiet hours, safe deep links
 - READY SB-M43-149..151 — no notification spam, comeback/permission illustration, timezone/missed-day/stale-link tests
@@ -124,6 +123,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M44-030 — verify Gift Bar visible from first Home with unchanged 10/50/250/500/1000 rewards; regression test (OWNER_META_PROGRESSION_DESIGN_V01)
 - READY SB-M44-031 — re-sequence FTUE to the 2026-10-22 unlock table: L1 Daily/Tasks coachmarks, L2 four-booster lesson, soft_no_hard_locks policy (after SB-M44-010)
 - OWNER SB-UI-008..013 — canonical Scrubby master reference needs owner choice; 013 re-validate after (factory 029)
+- OWNER SB-M22-023 — booster_tutorial_pointer unbound; needs owner decision (factory 035)
 <!-- Not queued (standing rules, no job of their own): SB-M07-012 (conditional: if supplied), SB-M52-005 (conditional: when rectangular production art is supplied), SB-M08-011..012, SB-M22-008 (conditional: if owner approves a no-work state), SB-M22-016..019, SB-M22-021, SB-UI-019..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
 
 ## Questions for Şekip
