@@ -1,0 +1,1 @@
+{ "id": "004-apply-owner-answers", "task": "OWNER-ANSWERS: apply answers-snapshot.md to TASKS.md", "branch": "factory/004-apply-owner-answers", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/004-apply-owner-answers", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "PASS", "tests": "PASS" } }
