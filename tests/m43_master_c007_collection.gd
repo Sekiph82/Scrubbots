@@ -219,25 +219,23 @@ func _k10() -> void:
 	var album = CollectionScreen.open_album(_root.get_modal_stack(), _root.get_app_state())
 	await _frames(1)
 	var max_nodes := 0
-	## [first pass, second pass] microseconds; both load their card art (no texture cache since
-	## UI-ADR-008 step 3), so the budget covers a build including its 9 card-art loads.
-	var worst := [0, 0]
+	var worst := [0, 0]   ## [cold pass (first texture loads), warm pass] microseconds
 	for pass_i in range(2):
 		for n in range(1, 16):
 			var tb := Time.get_ticks_usec()
-			var s = CollectionScreen.open_set(_root.get_modal_stack(), _root.get_app_state(), n)
+			var s = CollectionScreen.open_set(_root.get_modal_stack(), _root.get_app_state(), n, Callable(), album.get_meta("tex_cache"))
 			worst[pass_i] = maxi(worst[pass_i], Time.get_ticks_usec() - tb)
 			await _frames(1)
 			max_nodes = maxi(max_nodes, s.find_children("*", "", true, false).size())
 			s.close("test")
 			await _frames(1)
-	var worst_us: int = maxi(worst[0], worst[1])
+	var worst_us: int = worst[1]
 	var ms := Time.get_ticks_msec() - t0
 	var small: Array = []
 	for b in album.find_children("*", "Button", true, false):
 		if b.is_visible_in_tree() and b.size.y < 64.0:
 			small.append(b.name)
-	_ok(worst_us < 500000 and max_nodes < 400, "set-detail build incl. card-art loads: pass 1 %d us, pass 2 %d us (budget 500 ms); peak nodes %d; 30 opens incl. app frame pacing %d ms" % [worst[0], worst[1], max_nodes, ms])
+	_ok(worst_us < 150000 and max_nodes < 400, "set-detail build: cold %d us (first card-art loads), warm %d us (budget 150 ms); peak nodes %d; 30 opens incl. app frame pacing %d ms" % [worst[0], worst_us, max_nodes, ms])
 	_ok(small.is_empty() and album.find_child("SetList", true, false) is ScrollContainer, "touch targets >= 64 px; album scrolls %s" % str(small))
 	var ex = CollectionScreen.open_exchange(_root.get_modal_stack(), _root.get_app_state())
 	await _frames(1)

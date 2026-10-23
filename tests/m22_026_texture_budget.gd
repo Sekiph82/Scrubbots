@@ -4,7 +4,8 @@ extends SceneTree
 ## Path lists come from tools/m22_026_texture_inventory.py reference data plus the textures the
 ## step 2 runtime measurement (tests/tools/m22_026_texture_measure.gd) showed on screen
 ## (UI-ADR-008); a texture shared by two screens counts on both. Step 3: the 135 catalog card arts
-## (size_limit 1080, summed budget) and CollectionScreen holding no texture cache.
+## (size_limit 1080, summed budget) and CollectionScreen holding no static texture cache (the
+## per-visit cache lives on the album popup and is freed with it).
 ## Run: godot --headless --path . -s res://tests/m22_026_texture_budget.gd
 
 const F := "res://assets/ui/final/"
@@ -191,12 +192,15 @@ func _card_art() -> void:
 	_ok(total <= CARD_BUDGET_MIB * MIB, "card arts total %d <= %d bytes, each <= %d px with alpha" % [total, CARD_BUDGET_MIB * MIB, CARD_LIMIT])
 	# static vars are not in get_script_property_list(); `in` sees them
 	_ok(not ("_tex_cache" in CollectionScreen) and not (CollectionScreen as Script).get_script_constant_map().has("_tex_cache"), "CollectionScreen has no _tex_cache")
-	# a viewed card leaves the ResourceLoader cache once its last holder drops it
+	# a viewed card stays for the visit (album cache) and leaves the ResourceLoader cache once the
+	# album's cache and the TextureRect are both freed
+	var visit := {}
 	var tr := TextureRect.new()
-	tr.texture = CollectionScreen._tex(arts[0])
-	_ok(ResourceLoader.has_cached(arts[0]), "%s cached while shown" % arts[0])
+	tr.texture = CollectionScreen._tex(arts[0], visit)
 	tr.free()
-	_ok(not ResourceLoader.has_cached(arts[0]), "%s released after its TextureRect is freed" % arts[0])
+	_ok(ResourceLoader.has_cached(arts[0]) and CollectionScreen._tex(arts[0], visit) == visit[arts[0]], "%s kept by the visit cache after its TextureRect is freed" % arts[0])
+	visit = {}
+	_ok(not ResourceLoader.has_cached(arts[0]), "%s released once the visit cache is freed" % arts[0])
 
 func _has_alpha_format(img: Image) -> bool:
 	return img.get_format() in [Image.FORMAT_RGBA8, Image.FORMAT_LA8, Image.FORMAT_RGBA4444, Image.FORMAT_RGBAF, Image.FORMAT_RGBAH]

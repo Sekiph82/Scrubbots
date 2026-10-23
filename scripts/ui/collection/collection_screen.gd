@@ -38,9 +38,12 @@ const RARITY_COLOR := {"COMMON": Color(0.47, 0.53, 0.62), "RARE": Color(0.10, 0.
 const RARITY_SHORT := {"COMMON": "C", "RARE": "R", "EPIC": "E", "LEGENDARY": "L"}
 const LIST_H := 1020.0
 
-## ResourceLoader shares a live texture and frees it with its last TextureRect (UI-ADR-008 step 3).
-static func _tex(path: String) -> Texture2D:
-	return load(path)
+## Per-visit texture cache: owned by the album popup (meta "tex_cache") and freed with it, so
+## repeat set opens skip the decode but nothing outlives the Collection visit (UI-ADR-008 step 3).
+static func _tex(path: String, cache: Dictionary) -> Texture2D:
+	if not cache.has(path):
+		cache[path] = load(path)
+	return cache[path]
 
 static func card_key(card_id: String) -> String:
 	return "card:" + card_id
@@ -77,6 +80,7 @@ static func open_album(stack, app) -> BasePopup:
 	list.add_child(_master_row(e))
 	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
 	p.action_selected.connect(func(id, _c): _on_album_action(stack, app, p, id))
+	p.set_meta("tex_cache", {})
 	_refresh_album(p, e)
 	if not stack.push(p):
 		p.free()
@@ -162,7 +166,7 @@ static func _refresh_album(p: BasePopup, e) -> void:
 		var rw := UiText.t("COLLECTION_REWARD", [UiText.num(int(row.get("scrub_bucks", 0))), UiText.num(int(row.get("bot_parts", 0)))])
 		(card.find_child("Reward", true, false) as Label).text = rw + "  " + UiText.t("COLLECTION_CLAIMED" if claimed.has(n) else "COLLECTION_NOT_CLAIMED")
 		var thumb: TextureRect = card.find_child("Thumb", true, false)
-		thumb.texture = _tex(ART["set_complete"] if claimed.has(n) else _first_owned_art(e, n))
+		thumb.texture = _tex(ART["set_complete"] if claimed.has(n) else _first_owned_art(e, n), p.get_meta("tex_cache"))
 	var m: Dictionary = e.config.collection_config().get("all_sets_complete", {})
 	(p.find_child("MasterText", true, false) as Label).text = UiText.t("COLLECTION_MASTER_ROW", [e.collection.completed_set_count(), 15,
 		UiText.num(int(m.get("scrub_bucks", 0))), UiText.num(int(m.get("bot_parts", 0))),
@@ -186,12 +190,13 @@ static func _on_album_action(stack, app, p: BasePopup, id: String) -> void:
 		if open_exchange(stack, app, back) == null:
 			p.rearm()
 	elif id.begins_with("set:"):
-		if open_set(stack, app, int(id.substr(4)), back) == null:
+		if open_set(stack, app, int(id.substr(4)), back, p.get_meta("tex_cache")) == null:
 			p.rearm()
 
 # ================================================================= set detail ==
 
-static func open_set(stack, app, n: int, on_close: Callable = Callable()) -> BasePopup:
+## cache: the album's per-visit texture cache; a standalone call gets a throw-away one.
+static func open_set(stack, app, n: int, on_close: Callable = Callable(), cache: Dictionary = {}) -> BasePopup:
 	var e = app.economy
 	var cfg_row := {}
 	for row in e.config.collection_config().get("set_rewards", []):
@@ -213,7 +218,7 @@ static func open_set(stack, app, n: int, on_close: Callable = Callable()) -> Bas
 	var newly_seen: Array = []
 	for k in range(9):
 		var cid := "s%d_c%d" % [n, k]
-		grid.add_child(_tile(p, e, cid))
+		grid.add_child(_tile(p, e, cid, cache))
 		if e.collection.owned(cid) > 0 and e.meta_ui.mark_seen(card_key(cid)):
 			newly_seen.append(cid)
 	p.set_meta("newly_seen", newly_seen)
@@ -232,7 +237,7 @@ static func open_set(stack, app, n: int, on_close: Callable = Callable()) -> Bas
 		return null
 	return p
 
-static func _tile(p: BasePopup, e, cid: String) -> Control:
+static func _tile(p: BasePopup, e, cid: String, cache: Dictionary) -> Control:
 	var cat := CollectionCardCatalog.entry(cid)
 	var owned: int = e.collection.owned(cid)
 	var tile := VBoxContainer.new()
@@ -245,7 +250,7 @@ static func _tile(p: BasePopup, e, cid: String) -> Control:
 	tile.add_child(face)
 	var art := HomeStyle.art("CardArt")
 	art.set_anchors_preset(Control.PRESET_FULL_RECT)
-	art.texture = _tex(String(cat["art"]) if owned > 0 else ART["silhouette"])
+	art.texture = _tex(String(cat["art"]) if owned > 0 else ART["silhouette"], cache)
 	face.add_child(art)
 	var state := _chip("", Color(0.2, 0.66, 0.14), 20)
 	state.name = "State"
