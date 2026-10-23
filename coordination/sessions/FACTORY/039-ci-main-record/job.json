@@ -1,0 +1,1 @@
+{ "id": "039-ci-main-record", "task": "CI validation_only on main e2f674b7 (run 39928015709) + record (light path)", "branch": "factory/039-ci-main-record", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/039-ci-main-record", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "n/a", "tests": "n/a" } }
