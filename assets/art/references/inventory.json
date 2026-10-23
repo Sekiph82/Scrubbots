@@ -32,12 +32,13 @@
       "notes": "Help popup: +1 Slot and +1 Pickup offers with ad-reward Claim buttons."
     },
     "scrubby_master": {
-      "status": "OWNER_REQUIRED",
-      "candidate_paths": [
+      "repository_path": "assets/ui/final/characters/scrubby/scrubby_master.png",
+      "status": "OWNER_RESOLVED",
+      "supplementary_paths": [
         "assets/art/references/_owner_inbox/Game Screens/main screen.png",
         "assets/art/references/_owner_inbox/Collection Cards/meet the scrubbots.jpeg"
       ],
-      "notes": "Two strong candidates: main screen central Scrubby (in-context) and meet the scrubbots card (isolated portraits with names/tiers). Owner must select canonical master reference for Magnific character generation."
+      "notes": "Owner decision 2026-10-23: scrubby_master.png is the authoritative character master (do not replace or regenerate). main screen.png = Home composition reference; meet the scrubbots.jpeg = supplementary character reference."
     }
   },
 

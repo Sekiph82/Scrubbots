@@ -49,8 +49,10 @@
       "status": "CANONICAL_SELECTED"
     },
     "scrubby_master": {
-      "status": "OWNER_REQUIRED",
-      "candidate_paths": [
+      "status": "OWNER_SELECTED",
+      "repository_path": "assets/ui/final/characters/scrubby/scrubby_master.png",
+      "owner_decision": "2026-10-23: authoritative Scrubby master; do not replace or regenerate",
+      "supplementary_references": [
         "assets/art/references/_owner_inbox/Game Screens/main screen.png",
         "assets/art/references/_owner_inbox/Collection Cards/meet the scrubbots.jpeg"
       ]
@@ -68,8 +70,8 @@
       "category": "character",
       "provider": "chatgpt_image_generation",
       "required": true,
-      "status": "OWNER_SELECTION_REQUIRED",
-      "reference_policy": "Select from owner desktop references before generating anything new.",
+      "status": "OWNER_SELECTED",
+      "reference_policy": "Owner selected 2026-10-23: assets/ui/final/characters/scrubby/scrubby_master.png is the authoritative master (approved, exists); do not replace or regenerate. Home composition reference: Game Screens/main screen.png; supplementary: Collection Cards/meet the scrubbots.jpeg.",
       "prompt": "Canonical Scrubby character reference sheet preserving the owner-approved white and teal cleaning robot design, leaf sprout on head, glossy black face display, cyan expressive eyes, friendly compact proportions, clean turnaround/reference presentation",
       "transparent": true,
       "target_path": "assets/ui/final/characters/scrubby/scrubby_master.png",
