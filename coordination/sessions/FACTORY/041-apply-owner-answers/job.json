@@ -1,0 +1,1 @@
+{ "id": "041-apply-owner-answers", "task": "OWNER-ANSWERS: SB-UI-008 canonical Scrubby + SB-UI-013 revalidate; SB-M22-023 retire booster pointer (light path)", "branch": "factory/041-apply-owner-answers", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/041-apply-owner-answers", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "n/a", "tests": "n/a" } }
