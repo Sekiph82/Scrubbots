@@ -4,7 +4,8 @@ extends RefCounted
 ## M44 (SB-M44-001/010/011/016) — strict reader of the versioned, data-driven onboarding file
 ## data/config/ftue_onboarding_v1.json (owner V03 values): the new-profile starter booster
 ## charges, the first-day Welcome task, the compulsory tutorial window (<= L3) and its lesson
-## steps, the soft feature-discovery policy and the once-per-version What's New entries.
+## steps and the once-per-version What's New entries. Feature unlock gating is NOT here: it is
+## the owner table data/config/feature_unlocks_v1.json (scripts/progression/feature_unlocks.gd).
 ## Any malformed field rejects the WHOLE file (ok:false) — a broken config means no starter
 ## grant and no tips (fail closed), never a partial or invented onboarding.
 
@@ -43,9 +44,6 @@ static func validate(d) -> Dictionary:
 	var mx = d.get("max_tutorial_level")
 	if not _is_int(mx) or int(mx) < 1 or int(mx) > OWNER_MAX_TUTORIAL_LEVEL:
 		return _bad("max_tutorial_level")
-	var fd = d.get("feature_discovery")
-	if typeof(fd) != TYPE_DICTIONARY or str(fd.get("policy")) != "soft_no_hard_locks" or typeof(fd.get("available_from_first_home")) != TYPE_ARRAY:
-		return _bad("feature_discovery")
 	var whats_new: Array = []
 	if typeof(d.get("whats_new")) != TYPE_ARRAY:
 		return _bad("whats_new")
@@ -96,7 +94,6 @@ static func validate(d) -> Dictionary:
 			"level_id": String(l.get("level_id", "")), "steps": steps})
 	return {"ok": true, "reason": "", "version": VERSION, "starter_booster_charges": starter,
 		"welcome_task_index": 0, "welcome_sb": int(w["scrub_bucks"]), "max_tutorial_level": int(mx),
-		"available_from_first_home": (fd["available_from_first_home"] as Array).duplicate(),
 		"whats_new": whats_new, "lessons": lessons}
 
 static func _bad(reason: String) -> Dictionary:

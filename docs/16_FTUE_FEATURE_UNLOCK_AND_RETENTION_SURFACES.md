@@ -18,11 +18,22 @@ Date: 2026-09-26
 
 ### 1.1 Implementation (M44 master V01, awaiting ChatGPT audit + owner visual gate)
 
-- Data: `data/config/ftue_onboarding_v1.json` (strict reader `scripts/app/ftue_config.gd`): starter charges 2/2/2/2, first-day Welcome task index 0 = 100 SB, `max_tutorial_level` 3, lessons for Home + L1/L2/L3 bound to catalog ids, soft-discovery policy, once-per-version What's New.
+- Data: `data/config/ftue_onboarding_v1.json` (strict reader `scripts/app/ftue_config.gd`): starter charges 2/2/2/2, first-day Welcome task index 0 = 100 SB, `max_tutorial_level` 3, lessons for Home + L1/L2/L3 bound to catalog ids, once-per-version What's New. The old `soft_no_hard_locks` / `available_from_first_home` policy is retired (see 1.2).
 - Fresh profile = `SaveService.load()` found no save artefact at all (`fresh`); `AppState.bootstrap_new_profile()` grants the starter charges (ledger tx `ftue_starter_boosters:v1`) and installs the Welcome task in one saved transaction (rollback on save failure). Existing / migrated / corrupt / backup / future-schema saves are never re-classified.
 - `DailyService.task_reward_sb()` is the shown == credited task value; `daily.task_sb` stays 75/100/125. `claim_daily_login` / `claim_daily_task` roll back if the save fails.
 - `scripts/app/ftue_director.gd` picks one step; `scripts/ui/tutorial/coachmark_layer.gd` draws it non-blocking with the approved ring / pointer / bubble art; GOT IT / SKIP TIPS (tips only). Read-only Help & Tips: Settings "?". Established saves get the M43 Feature Unlock ceremony once for Help & Tips.
 - Skip Tips + read-only Help are the presentation default; owner visual approval (SB-M44-018 / 020) is still pending.
+
+### 1.2 Hard unlock gating (SB-M44-031 part 1, owner table 2026-10-22)
+
+Hard unlock gating is in force per the owner table in `data/config/feature_unlocks_v1.json` (reader `scripts/progression/feature_unlocks.gd`): Hearts L1, Gift Bar L1, Daily 4, Shop 8, Tasks 12, Collection 20, Card Packs 20, Robots 25, Events 30, Achievements screen 35, RANKS 40; boosters +1 Slot 6, Random 11, Selector 16, Tornado 21.
+
+- One gate: `AppState.feature_unlocked(id)`. Unlocked iff the save is grandfathered or the campaign frontier has reached the level; the frontier never decreases, so nothing re-locks.
+- Grandfather (orchestrator default, owner may override): every save that is not a new FTUE profile (existing / migrated / established) keeps all features.
+- Missing / malformed config or an unknown id unlocks (fail open).
+- Gated now: Home DAILY / TASKS / SHOP / COLLECTION shortcuts and ROBOTS / EVENTS / RANKS tabs (disabled, "Unlocks at level N", no badge, no navigation); the booster bar (`locked`, charges kept); FTUE coachmarks skip a locked Home shortcut and drop locked boosters from a booster step.
+- Not gated: deep links outside Home and the booster bar (in-context Shop hand-off, Results, Settings).
+- Part 2 pending (TASKS.md SB-M44-031 part 2): per-booster lessons at 6/11/16/21, Daily/Tasks coachmarks after L4/L12, deferring the starter booster grant and the 100 SB Welcome task to their unlocks. Until then a fresh profile holds the 8 starter charges and the Welcome task unused until the matching feature unlocks.
 
 ## 2. Feature set requiring unlock pacing
 

@@ -14,9 +14,7 @@
   },
   "max_tutorial_level": 3,
   "feature_discovery": {
-    "policy": "soft_no_hard_locks",
-    "rule": "Every implemented destination is reachable from the first Home; no feature is hidden or locked behind a level. Exact future unlock levels stay owner-gated (docs/16).",
-    "available_from_first_home": ["shop", "collection", "tasks", "daily", "boosters", "hearts", "speed_2x", "gift_meter", "robots", "events", "settings"]
+    "note": "Hard unlock gating per the 2026-10-22 owner table lives in data/config/feature_unlocks_v1.json (AppState.feature_unlocked); this file no longer declares a discovery policy."
   },
   "whats_new": [
     {

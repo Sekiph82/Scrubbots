@@ -337,7 +337,6 @@ func _t11() -> void:
 		"welcome slot 1": func(d): d["first_day_welcome_task"]["task_index"] = 1,
 		"unknown target": func(d): d["lessons"][1]["steps"][0]["target"] = "shop_offer",
 		"duplicate step": func(d): d["lessons"][2]["steps"][1]["id"] = "l2_boosters_a",
-		"hard lock policy": func(d): d["feature_discovery"]["policy"] = "hard_locks",
 		"bad schema": func(d): d["schema"] = "x",
 	}
 	var rej := 0
@@ -349,6 +348,8 @@ func _t11() -> void:
 		else:
 			print("    accepted mutation: " + String(k))
 	_ok(rej == muts.size(), "%d/%d malformed configs rejected" % [rej, muts.size()])
+	# SB-M44-031: no soft-discovery policy any more; gating is feature_unlocks_v1.json.
+	_ok(not c.has("available_from_first_home") and not raw["feature_discovery"].has("policy"), "soft_no_hard_locks / available_from_first_home retired")
 	_complete("t11_config_strict_data_driven")
 
 func _t12() -> void:
@@ -356,6 +357,9 @@ func _t12() -> void:
 	var a = _app(_path("t12"))
 	a.bootstrap_new_profile()
 	var d = FtueDirector.new(a)
+	# SB-M44-031: Daily (L4) / Tasks (L12) are locked on a fresh L1 profile: their tips are skipped.
+	_ok(String(d.current_step("home", d.home_context()).get("id", "")) == "home_play", "fresh L1: DAILY / TASKS locked -> first Home tip is PLAY")
+	_unlock_at_l1(a, ["daily", "tasks", "plus_one_slot", "random", "selector", "tornado"])
 	_ok(String(d.current_step("home", d.home_context()).get("id", "")) == "home_daily", "first Home: DAILY tip first")
 	a.actions.claim_daily_login()
 	_ok(String(d.current_step("home", d.home_context()).get("id", "")) == "home_tasks", "DAILY claimed -> its tip no longer applies; TASKS tip")
@@ -393,6 +397,7 @@ func _t13() -> void:
 	print("[t13 L4..L10: zero scheduled tips, even with the window forced open]")
 	var a = _app(_path("t13"))
 	a.bootstrap_new_profile()
+	_unlock_at_l1(a, ["daily", "tasks", "plus_one_slot", "random", "selector", "tornado"])
 	var d = FtueDirector.new(a)
 	var cat = LevelCatalog.new()
 	cat.load_manifest()
@@ -420,8 +425,13 @@ func _t14() -> void:
 	_root.refresh_coachmark()
 	var daily_b: Button = _root.get_home().get_region("Shortcut_daily")
 	var tasks_b: Button = _root.get_home().get_region("Shortcut_tasks")
+	# SB-M44-031: fresh L1 Home gates DAILY / TASKS / SHOP / COLLECTION; the tip skips to PLAY.
+	_ok(cm.get_step_id() == "home_play" and daily_b.disabled and tasks_b.disabled and _root.get_home().get_region("Shortcut_shop").disabled and _root.get_home().get_region("Shortcut_collection").disabled, "fresh L1: the four panels are locked, tip on PLAY")
+	_unlock_at_l1(app, ["daily", "tasks", "shop", "collection"])
+	_root.get_home().refresh()
+	_root.refresh_coachmark()
 	_ok(cm.get_step_id() == "home_daily" and cm.get_target() == daily_b.get_global_rect(), "Scrubby tip points at the real DAILY panel")
-	_ok(not daily_b.disabled and not tasks_b.disabled and not _root.get_home().get_region("Shortcut_shop").disabled and not _root.get_home().get_region("Shortcut_collection").disabled, "all four Home panels live from the first Home (no lock)")
+	_ok(not daily_b.disabled and not tasks_b.disabled and not _root.get_home().get_region("Shortcut_shop").disabled and not _root.get_home().get_region("Shortcut_collection").disabled, "all four Home panels live once unlocked")
 	tasks_b.pressed.emit()
 	await _frames(2)
 	_root.refresh_coachmark()
@@ -483,6 +493,10 @@ func _t15() -> void:
 	_ok(not cm.is_showing(), "L1 lesson complete")
 	await _play(2)
 	host = _root.get_gameplay_host()
+	_root.refresh_coachmark()
+	# SB-M44-031: all four boosters are locked at a fresh L2, so both L2 booster steps are skipped.
+	_ok(not cm.is_showing() and host.booster_states().all(func(s): return String(s["state"]) == "locked"), "fresh L2: boosters locked, no booster tip")
+	_unlock_at_l1(app, BOOSTERS)
 	_root.refresh_coachmark()
 	var scr = host.get_screen()
 	var ab: Rect2 = scr.get_booster_button("plus_one_slot").get_global_rect().merge(scr.get_booster_button("selector").get_global_rect())
@@ -762,6 +776,12 @@ func _path(tag: String) -> String:
 
 func _app(path: String):
 	return AppState.new(path, MainScript.boot_clock_override, MainScript.boot_local_day_override)
+
+## SB-M44-031 test seam: the in-memory unlock table opens `ids` at L1, so the L1-L3 coachmark
+## content they guard stays covered (the shipped table locks them past the tutorial window).
+func _unlock_at_l1(app, ids: Array) -> void:
+	for id in ids:
+		app.unlocks.cfg["unlocks"][id] = 1
 
 func _write(path: String, text: String) -> void:
 	if not _tmp.has(path):

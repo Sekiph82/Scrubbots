@@ -14,7 +14,10 @@ extends RefCounted
 ##     attempt of that exact production level id; L4+ never has a scheduled step;
 ##   - the window closes once the frontier passes max_tutorial_level (L3 Results), whether or
 ##     not every optional step was seen;
-##   - one step at a time, in data order; an acknowledged step never shows again.
+##   - one step at a time, in data order; an acknowledged step never shows again;
+##   - SB-M44-031: a coachmark never targets a locked control (AppState.feature_unlocked): a
+##     Home step on a locked shortcut is skipped and locked boosters are dropped from a
+##     `boosters` step (skipped when none remain). Skipped steps are NOT marked seen.
 
 const FtueConfig = preload("res://scripts/app/ftue_config.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
@@ -85,7 +88,15 @@ func current_step(surface: String, ctx: Dictionary) -> Dictionary:
 				continue
 			if st.has("when") and not bool(ctx.get(String(st["when"]), false)):
 				continue
-			return (st as Dictionary).duplicate(true)
+			var target := String(st["target"])
+			if target.begins_with("shortcut:") and not _app.feature_unlocked(target.trim_prefix("shortcut:")):
+				continue
+			var out: Dictionary = (st as Dictionary).duplicate(true)
+			if out.has("boosters"):
+				out["boosters"] = (out["boosters"] as Array).filter(func(b): return _app.feature_unlocked(String(b)))
+				if (out["boosters"] as Array).is_empty():
+					continue
+			return out
 	return {}
 
 ## Acknowledge (Got it / completed by the real action). Idempotent; never double-acks.

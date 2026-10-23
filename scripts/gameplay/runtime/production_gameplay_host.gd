@@ -894,8 +894,12 @@ func _refresh_hud() -> void:
 	_screen.set_profile(prof)
 
 ## Live state of the four canonical boosters from BoosterInventory / EconomyConfig /
-## wallet / capacity authority. No feature-unlock authority exists for boosters yet, so
-## none is presented as locked.
+## wallet / capacity authority. SB-M44-031: a booster whose feature is still locked by the
+## owner unlock table (AppState.feature_unlocked) is "locked" over every other state; its
+## charges are shown and kept untouched.
+func _booster_locked(id: String) -> bool:
+	return app_state != null and not app_state.feature_unlocked(id)
+
 func booster_states() -> Array:
 	var out: Array = []
 	if _economy == null:
@@ -912,6 +916,8 @@ func booster_states() -> Array:
 				state = "unavailable"
 		if terminal and state != "selected":
 			state = "unavailable"
+		if _booster_locked(id):
+			state = "locked"
 		out.append({"id": id, "charges": charges, "price": price, "state": state})
 	return out
 
@@ -1093,6 +1099,8 @@ func execute_booster(id: String, target = null) -> Dictionary:
 		r = {"ok": false, "reason": "economy_unavailable"}
 	elif not BoosterInventory.BOOSTERS.has(id):
 		r = {"ok": false, "reason": "unknown_booster"}
+	elif _booster_locked(id):
+		r = {"ok": false, "reason": "locked"}
 	elif _completion != null and _completion.is_terminal():
 		r = {"ok": false, "reason": "terminal"}
 	elif id == BoosterInventory.PLUS_ONE_SLOT:
@@ -1129,6 +1137,8 @@ func request_booster(id: String) -> Dictionary:
 		r = {"ok": false, "reason": "economy_unavailable"}
 	elif not BoosterInventory.BOOSTERS.has(id):
 		r = {"ok": false, "reason": "unknown_booster"}
+	elif _booster_locked(id):
+		r = {"ok": false, "reason": "locked"}
 	elif _completion != null and _completion.is_terminal():
 		r = {"ok": false, "reason": "terminal"}
 	elif is_modal_open():

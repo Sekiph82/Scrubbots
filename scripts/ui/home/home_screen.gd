@@ -75,6 +75,10 @@ const LIVE_SHORTCUTS := ["gift_bar", "cards_exchange", "daily"]
 ## V04: exactly four Home panels (left SHOP / COLLECTION, right TASKS / DAILY).
 const LEFT_SHORTCUTS := [["shop", "HOME_SC_SHOP"], ["collection", "HOME_SC_COLLECTION"]]
 const RIGHT_SHORTCUTS := [["tasks", "HOME_SC_TASKS"], ["daily", "HOME_SC_DAILY"]]
+## SB-M44-031: Home entry -> feature id in the owner unlock table (AppState.feature_unlocked).
+## Gift Bar and Hearts unlock at L1 and are never gated here.
+const GATED_ENTRIES := {"shop": "shop", "collection": "collection", "tasks": "tasks", "daily": "daily",
+	"robots": "robots", "events": "events", "leaderboard": "ranks"}
 ## Panel size system (one size for all four) and icon boxes. V03 drew each icon fitted
 ## into ~206x164 inside its card; TASKS/DAILY keep that exact box, SHOP/COLLECTION are
 ## enlarged 1.2x (owner V04 43-46). Icons stand on the label band and may rise above.
@@ -1121,7 +1125,9 @@ func _build_bottom_nav(nav: PanelContainer) -> void:
 			_:
 				b.disabled = true
 				b.tooltip_text = UiText.t("HOME_COMING_LATER")
-		b.pressed.connect(func(): nav_requested.emit(id))
+		b.pressed.connect(func():
+			if not _locked(id):
+				nav_requested.emit(id))
 		row.add_child(b)
 		_nodes["Nav_" + id] = b
 		# M43-C010 (SB-M43-134): one attention count per tab, from HomeBadges.
@@ -1286,13 +1292,19 @@ func _render_values() -> void:
 		var gift: Control = _nodes["TrackGift%d" % step["position"]]
 		gift.modulate = Color(1, 1, 1, 1) if step["reached"] or step["current"] else Color(0.72, 0.78, 0.92, 0.80)
 		(_nodes["TrackGlow%d" % step["position"]] as Control).visible = step["current"]
+	# SB-M44-031: a locked entry is disabled, names its unlock level and carries no badge.
+	for nid in ["robots", "events", "leaderboard"]:
+		var nb: Button = _nodes["Nav_" + nid]
+		var served: bool = nid == "robots" or _app_nav.has(nid)
+		nb.disabled = _locked(nid) or not served
+		nb.tooltip_text = _unlock_text(nid) if _locked(nid) else ("" if served else UiText.t("HOME_COMING_LATER"))
 	# SB-M42-024: Daily badge = 1 when today's login reward is claimable.
-	(_nodes["Shortcut_daily"] as UiShortcutButton).set_badge(0 if _vm["daily_claimed_today"] else 1)
+	(_nodes["Shortcut_daily"] as UiShortcutButton).set_badge(0 if _vm["daily_claimed_today"] or _locked("daily") else 1)
 	# M43-C010 (SB-M43-134): Tasks / Collection shortcuts + ROBOTS / EVENTS tabs.
 	if "orders" in _app.economy and _app.economy.orders != null:
 		var bd := HomeBadges.compute(_app)
-		(_nodes["Shortcut_tasks"] as UiShortcutButton).set_badge(int(bd["tasks"]))
-		(_nodes["Shortcut_collection"] as UiShortcutButton).set_badge(int(bd["collection"]))
+		(_nodes["Shortcut_tasks"] as UiShortcutButton).set_badge(0 if _locked("tasks") else int(bd["tasks"]))
+		(_nodes["Shortcut_collection"] as UiShortcutButton).set_badge(0 if _locked("collection") else int(bd["collection"]))
 		# M47-TOUCH-R01: red "1" while the next sequential Rewarded Ads reward is actionable (only
 		# when the app serves that destination).
 		(_nodes["RewardedAdsButton"] as UiShortcutButton).set_badge(int(bd["rewarded_ads"]) if _app_shortcuts.has("rewarded_ads") else 0)
@@ -1301,7 +1313,9 @@ func _render_values() -> void:
 			nl.text = str(int(bd[nid]))
 			nl.visible = int(bd[nid]) > 0 and not (_nodes["Nav_" + nid] as Button).disabled
 	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
-		(_nodes["Shortcut_" + id[0]] as Button).disabled = not (LIVE_SHORTCUTS.has(id[0]) or _app_shortcuts.has(id[0]))
+		var sc: Button = _nodes["Shortcut_" + id[0]]
+		sc.disabled = _locked(id[0]) or not (LIVE_SHORTCUTS.has(id[0]) or _app_shortcuts.has(id[0]))
+		sc.tooltip_text = _unlock_text(id[0]) if _locked(id[0]) else ""
 	(_nodes["RewardedAdsButton"] as Button).disabled = not _app_shortcuts.has("rewarded_ads")
 	for pid in _popups:
 		if (_popups[pid] as Control).visible:
@@ -1313,8 +1327,17 @@ func _render_values() -> void:
 ## M43: shortcuts the app root opens as app-level destinations (set by main.gd). A standalone
 ## Home (tests / tools without the app root) keeps its M42 popups.
 var _app_shortcuts: Array = []
+var _app_nav: Array = []
+
+## SB-M44-031: true while the Home entry `id` is behind the owner unlock table.
+func _locked(id: String) -> bool:
+	return GATED_ENTRIES.has(id) and _app != null and not _app.feature_unlocked(GATED_ENTRIES[id])
+
+func _unlock_text(id: String) -> String:
+	return UiText.t("HOME_UNLOCKS_AT_LEVEL", [_app.feature_unlock_level(GATED_ENTRIES[id])])
 
 func set_app_nav(ids: Array) -> void:
+	_app_nav = ids.duplicate()
 	for id in ids:
 		if _nodes.has("Nav_" + id):
 			(_nodes["Nav_" + id] as Button).disabled = false
@@ -1326,6 +1349,8 @@ func set_app_shortcuts(ids: Array) -> void:
 	refresh()
 
 func _shortcut_pressed(id: String) -> void:
+	if _locked(id):
+		return
 	shortcut_requested.emit(id)
 	if not _app_shortcuts.has(id):
 		open_popup(id)

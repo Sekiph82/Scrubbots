@@ -40,6 +40,7 @@ const CompositeLevelCatalog = preload("res://scripts/content_runtime/composite_l
 const FtueConfig = preload("res://scripts/app/ftue_config.gd")
 const FtueDirector = preload("res://scripts/app/ftue_director.gd")
 const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
+const FeatureUnlocks = preload("res://scripts/progression/feature_unlocks.gd")
 
 ## M44 owner V03: the ONE ledger tx of the new-profile starter booster grant.
 const STARTER_TX := "ftue_starter_boosters:v1"
@@ -75,6 +76,8 @@ var skip_notice: Array = []
 var _bootstrap_pending := false
 var _bootstrapping := false
 var last_bootstrap: Dictionary = {}
+## SB-M44-031: the owner feature unlock table (feature_unlocks_v1.json), read once.
+var unlocks: FeatureUnlocks
 
 ## clock/local_day are test seams. Production passes neither: the shipping graph
 ## injects the real OS local-calendar provider explicitly (F-M39-V03-002).
@@ -93,6 +96,8 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	actions = ProductionActionFacade.new(economy, null, Callable(self, "request_save"))
 	economy.orders.bind_context(Callable(self, "orders_context"))
 	assist = FailureAssistanceService.new()
+	unlocks = FeatureUnlocks.new()
+	unlocks.load_config()
 	# M43-C003: a committed rewarded grant hits the canonical save boundary.
 	economy.rewarded.bind_save(Callable(self, "request_save"))
 	var croot := content_root
@@ -196,6 +201,17 @@ func orders_context() -> Dictionary:
 			ahead += 1
 		n += 1
 	return {"frontier": frontier, "playable_ahead": ahead, "class_for": Callable(progression, "class_for")}
+
+## SB-M44-031 — the ONE feature-unlock gate every UI asks. Grandfather rule (orchestrator
+## default): a save that is NOT a new FTUE profile (existing / migrated / established) keeps
+## every feature; a fresh profile unlocks a feature once its frontier reaches the table level.
+## The frontier never decreases, so a reached feature stays unlocked.
+func feature_unlocked(feature_id: String) -> bool:
+	return unlocks.is_unlocked(feature_id, int(progression.current_level()), not economy.ftue.is_new_profile())
+
+## Campaign level that unlocks `feature_id` (for "Unlocks at level N" copy; never hard-coded in UI).
+func feature_unlock_level(feature_id: String) -> int:
+	return unlocks.unlock_level(feature_id)
 
 ## True when the app must not proceed to gameplay against fresh defaults
 ## (F-M40-V02-002/-008: future/unsupported schema case).
