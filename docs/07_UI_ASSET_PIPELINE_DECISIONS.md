@@ -68,6 +68,58 @@ These owner-approved decisions supplement `docs/05_TECH_DECISIONS.md` and the ca
 
 **Reason**: The largest booster draw is the 170 px acquisition popup icon (the gameplay row is ~100 px); x2 for hi-dpi gives 340 px, so 512 is the next power of two with headroom for the tablet row. The low-end target is a Galaxy A10 class phone (2 GB RAM, 720x1520). Lossy/VRAM compression is not used because the glow and ring alpha gradients would band.
 
-**Consequences**: New booster art must import at max 512 px and keep the set under 12 MiB; `tests/m22_025_booster_texture_budget.gd` enforces both. The other final-art folders have no budget yet (SB-M22-026).
+**Consequences**: New booster art must import at max 512 px and keep the set under 12 MiB; `tests/m22_025_booster_texture_budget.gd` enforces both. The other final-art folders are covered by the per-screen budgets of UI-ADR-008.
 
 **Status**: Factory job 034, 2026-10-22 (SB-M22-025 booster slice).
+
+## UI-ADR-008: Per-screen texture budgets and safe size_limit rule
+
+**Decision**: `tools/m22_026_texture_inventory.py` (stdlib) inventories all 560 PNGs under `assets/ui/final/**`: source size, alpha, resident RGBA8 MiB, `size_limit`, the largest literal draw size found next to every runtime use (`scripts/`, `data/`, `assets/ui/HOME_ASSET_MANIFEST.json`), the action below and the referencing files. `process/size_limit` is set in the `.import` only when the art is referenced, its draw side is known and below 540 px, the source max side is at least 4x the draw side (2x hi-dpi at 1080x2400, 2x tablet headroom), and the cap (next power of two >= 4x draw, never below 256) is smaller than the source. Everything else stays at source size. Lossless (`compress/mode=0`) and mipmaps off stay everywhere. Source PNGs are untouched. `tests/m22_026_texture_budget.gd` enforces the per-screen budgets and the caps.
+
+Files capped in this step:
+
+| file | source | draw side | size_limit | MiB before -> after |
+|---|---|---:|---:|---|
+| `common/icons/icon_clock.png` | 1254x1254 | 52 (refill popup timer pill) | 256 | 6.00 -> 0.25 |
+| `daily/daily_streak_flame.png` | 1536x1024 | 52 (daily streak row) | 256 | 6.00 -> 0.17 |
+| `daily/daily_task_check.png` | 1261x1247 | 34 (task check) | 256 | 6.00 -> 0.25 |
+| `daily/daily_login_calendar.png` | 1288x1221 | 240 (login popup hero; 132 inline) | 1024 | 6.00 -> 3.79 |
+| `popups/failure/heart_large.png` | 1320x1192 | 210 (out-of-lives heart) | 1024 | 6.00 -> 3.61 |
+
+Resident RGBA8 per folder (only the changed folders differ; the boosters were already capped by UI-ADR-007):
+
+| folder | before MiB | after MiB |
+|---|---:|---:|
+| common | 294.0 | 288.2 |
+| daily | 36.0 | 22.2 |
+| popups | 210.0 | 207.6 |
+| **all 560 PNGs** | 2897.1 (2947.7 at source size) | 2875.2 |
+
+Per-screen resident RGBA8 (the textures each screen loads; a shared texture counts on every screen that loads it) and budgets (measured plus ~10%):
+
+| screen | textures | before MiB | after MiB | budget MiB |
+|---|---:|---:|---:|---:|
+| Home (25 STATIC presentation entries + 63 Scrubby gesture frames) | 88 | 207.07 | 207.07 | 228 |
+| Gameplay (5-col shell, portrait, boosters + states, rail, Scrubbot body, clean FX) | 17 | 50.72 | 50.72 | 56 |
+| Results (won/failed hero + emblem, reward icons) | 11 | 65.99 | 65.99 | 73 |
+| Shop/Collection (shop and collection header/icon art; catalog card art excluded) | 15 | 69.99 | 69.99 | 77 |
+
+**The reduction is not meaningful.** This step saves 21.9 MiB (0.76% of the library) and leaves all four screen totals unchanged, because none of the five capped files is loaded by those screens (they belong to the Daily and refill popups). The safety rule was not loosened to get a bigger number. Most art has no draw size the inventory can prove from a literal, so it stays at source size.
+
+Untouched files (per-file path and reason: run the inventory, column `action`):
+- 181 with no literal runtime reference: unused art, or paths built at runtime (for example the gameplay shells `gameplay_v02_shell_*`).
+- 353 with an unknown draw size: all Home art, backgrounds, hero and robot poses, logos, and the collection card art (paths in `data/config/collection_card_catalog_v1.json`).
+- 7 drawn at >= 540 px: `common/frames/popup_{large,medium,reward,small,warning}_frame.png`, `popups/failure/fail_header_emblem.png`, `popups/victory/victory_emblem.png`.
+- 2 whose source is under 4x the 396 px draw side: `robots/robot_lock_emblem.png`, `robots/robot_unlocked_burst.png`.
+- 2 whose 2048 cap would not be below the source: `daily/daily_day5_reward_frame.png`, `rewards/chest_small.png`.
+- The 10 boosters stay as UI-ADR-007 set them.
+
+The 7 PNGs without alpha stay lossless and unchanged (none is a size_limit candidate): `gameplay/master/scrubbots_gameplay_master.png`, `gameplay/profile/bot_parts_bar_frame.png`, `home/background/home_background.png`, `home/background/home_bg_sky.png`, `marketing/store_background.png`, `system/placeholders/content_loading_placeholder.png`, `system/placeholders/level_preview_placeholder.png`.
+
+**Reason**: The low-end target is a Galaxy A10 class phone (2 GB RAM, 720x1520). Only caps that provably keep 4x the drawn resolution are safe without a visual review. Art with an unknown draw size must keep the resolution the 1080x2400 layout may need.
+
+**Consequences**: New art that one of these screens loads must keep that screen under its budget, and a screen that grows needs a new measured budget here. Home alone is about 207 MiB resident, so real savings need the follow-ups.
+
+**Follow-ups (not done)**: runtime draw-size measurement so Home, Results and Shop art can be capped; VRAM compression (ETC2/ASTC) for opaque backgrounds and large art; atlasing small icons; runtime lazy loading and unloading (collection card art stays cached once viewed, up to 135 x 6 MiB).
+
+**Status**: Factory job 037, 2026-10-23 (SB-M22-026 step 1).
