@@ -183,7 +183,7 @@ const MEASURED := {
 	"characters/robots/squeegee/squeegee_portrait.png": 512,
 	"characters/scrubby/scrubby_portrait.png": 512,
 	"collection/collection_complete_emblem.png": 512,
-	"collection/master_collection_emblem.png": 512,
+	"collection/master_collection_emblem.png": 1024,   # step 4: raised (320 px on the Master ceremony)
 	"collection/states/card_unknown_silhouette.png": 1024,
 	"common/currencies/icon_currency_heart.png": 512,
 	"common/currencies/icon_currency_scrub_bucks.png": 512,
@@ -193,7 +193,7 @@ const MEASURED := {
 	"common/navigation/icon_nav_robots.png": 512,
 	"common/navigation/icon_nav_settings.png": 512,
 	"home/gift_meter/gift_meter_emblem.png": 512,
-	"home/gift_meter/gift_meter_reward_crate.png": 512,
+	"home/gift_meter/gift_meter_reward_crate.png": 1024,   # step 4: raised (300 px on the 1000 Gift milestone)
 	"home/reward_track/reward_gift_1.png": 1024,
 	"home/reward_track/reward_gift_10.png": 1024,
 	"home/reward_track/reward_gift_100.png": 1024,
