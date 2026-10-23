@@ -1,13 +1,19 @@
 extends SceneTree
-## SB-M22-026 steps 1+2 — per-screen resident RGBA8 texture budgets (Home, Gameplay, Results,
+## SB-M22-026 steps 1-3 — per-screen resident RGBA8 texture budgets (Home, Gameplay, Results,
 ## Shop/Collection) and the size_limit'ed textures (alpha kept, loaded <= limit).
 ## Path lists come from tools/m22_026_texture_inventory.py reference data plus the textures the
 ## step 2 runtime measurement (tests/tools/m22_026_texture_measure.gd) showed on screen
-## (UI-ADR-008); a texture shared by two screens counts on both.
+## (UI-ADR-008); a texture shared by two screens counts on both. Step 3: the 135 catalog card arts
+## (size_limit 1080, summed budget) and CollectionScreen holding no texture cache.
 ## Run: godot --headless --path . -s res://tests/m22_026_texture_budget.gd
 
 const F := "res://assets/ui/final/"
 const MIB := 1024 * 1024
+const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
+const CATALOG := "res://data/config/collection_card_catalog_v1.json"
+## Step 3: card art drawn at max 540 px (step 2 measure), cap 2 x 540; all 135 resident 401.2 MiB + ~10%.
+const CARD_LIMIT := 1080
+const CARD_BUDGET_MIB := 440
 
 ## Home: the STATIC entries of HomePresentationMap (bound via HOME_ASSET_MANIFEST) plus the
 ## home_scrubby_gestures_v03 frame set.
@@ -135,6 +141,7 @@ func _initialize() -> void:
 	_screen("Shop/Collection", SHOP_COLLECTION)
 	_limited("size_limit step 1", LIMITED)
 	_limited("size_limit step 2 (measured)", MEASURED)
+	_card_art()
 	_done()
 
 func _screen(name: String, paths: Array) -> void:
@@ -161,6 +168,35 @@ func _limited(title: String, caps: Dictionary) -> void:
 		var h := tex.get_height()
 		_ok(maxi(w, h) <= caps[p], "%s %dx%d <= %d" % [p, w, h, caps[p]])
 		_ok(_has_alpha_format(tex.get_image()), "%s keeps alpha" % p)
+
+func _card_art() -> void:
+	print("[card art step 3]")
+	var cards: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(CATALOG))["cards"]
+	var total := 0
+	var arts: Array = []
+	for cid in cards:
+		arts.append(String(cards[cid]["art"]))
+	for art in arts:
+		var tex := load(art) as Texture2D
+		if tex == null:
+			_ok(false, "%s loads" % art)
+			continue
+		var w := tex.get_width()
+		var h := tex.get_height()
+		total += w * h * 4
+		if maxi(w, h) > CARD_LIMIT or not _has_alpha_format(tex.get_image()):
+			_ok(false, "%s %dx%d <= %d with alpha" % [art, w, h, CARD_LIMIT])
+	_ok(arts.size() == 135, "135 catalog card arts (got %d)" % arts.size())
+	print("  all card arts resident RGBA8: %.2f MiB (budget %d MiB)" % [total / float(MIB), CARD_BUDGET_MIB])
+	_ok(total <= CARD_BUDGET_MIB * MIB, "card arts total %d <= %d bytes, each <= %d px with alpha" % [total, CARD_BUDGET_MIB * MIB, CARD_LIMIT])
+	# static vars are not in get_script_property_list(); `in` sees them
+	_ok(not ("_tex_cache" in CollectionScreen) and not (CollectionScreen as Script).get_script_constant_map().has("_tex_cache"), "CollectionScreen has no _tex_cache")
+	# a viewed card leaves the ResourceLoader cache once its last holder drops it
+	var tr := TextureRect.new()
+	tr.texture = CollectionScreen._tex(arts[0])
+	_ok(ResourceLoader.has_cached(arts[0]), "%s cached while shown" % arts[0])
+	tr.free()
+	_ok(not ResourceLoader.has_cached(arts[0]), "%s released after its TextureRect is freed" % arts[0])
 
 func _has_alpha_format(img: Image) -> bool:
 	return img.get_format() in [Image.FORMAT_RGBA8, Image.FORMAT_LA8, Image.FORMAT_RGBA4444, Image.FORMAT_RGBAF, Image.FORMAT_RGBAH]
