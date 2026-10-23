@@ -324,6 +324,8 @@ QA status
 owner approval status where required
 ```
 
+Current shipped-catalog run: `tools/difficulty_playtest.gd` writes the simulated per-level report `docs/DIFFICULTY_PLAYTEST_2026-10.md` (SB-M36-005).
+
 ## 17. Batch QA
 
 A 100-level batch report must include:
