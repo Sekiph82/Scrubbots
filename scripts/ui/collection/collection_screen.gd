@@ -38,13 +38,9 @@ const RARITY_COLOR := {"COMMON": Color(0.47, 0.53, 0.62), "RARE": Color(0.10, 0.
 const RARITY_SHORT := {"COMMON": "C", "RARE": "R", "EPIC": "E", "LEGENDARY": "L"}
 const LIST_H := 1020.0
 
-## ponytail: keeps every card art loaded once viewed (135 small textures max); drop if memory matters.
-static var _tex_cache: Dictionary = {}
-
+## ResourceLoader shares a live texture and frees it with its last TextureRect (UI-ADR-008 step 3).
 static func _tex(path: String) -> Texture2D:
-	if not _tex_cache.has(path):
-		_tex_cache[path] = load(path)
-	return _tex_cache[path]
+	return load(path)
 
 static func card_key(card_id: String) -> String:
 	return "card:" + card_id

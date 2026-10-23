@@ -151,4 +151,22 @@ Untouched and why:
 
 **Known limit**: the cap covers the sizes the scenarios show. A texture drawn larger on a screen the tool does not visit (for example a robot portrait in an unlock ceremony) would show at less than 2x there. Add that screen to the tool and re-run the apply step before shipping art on it.
 
-**Status**: Factory job 038, 2026-10-23 (SB-M22-026 step 2). Still open: VRAM compression, atlasing, lazy card art loading.
+**Status**: Factory job 038, 2026-10-23 (SB-M22-026 step 2). Still open: VRAM compression, atlasing. Card art loading: done in step 3.
+
+### UI-ADR-008 step 3: card art cap and no card texture cache
+
+**Decision**: all 135 collection card arts (`assets/ui/final/collection/cards/set_NN/card_NN.png`, paths from `data/config/collection_card_catalog_v1.json`, every one 1024x1536) import with `process/size_limit=1080`. Only that line changes; `compress/mode=0`, mipmaps off and the source PNGs stay as they are. The card layout is the same rect for every card, so the step 2 measurement of the 13 viewed cards (max side 540 px at 1080x2400, 512 px at 1536x2048; the card detail `CardArt` is the largest draw) applies to all 135.
+
+Why 1080 and not a power of two: the step 2 rule `next_pow2(2 x 540)` gives 2048, above the 1536 source, so it caps nothing; 1024 would be 1.90x the drawn side, below the 2x rule. Godot accepts any integer limit, so the cap is exactly `2 x 540 = 1080`. A card imports at 720x1080 (2.97 MiB instead of 6.00 MiB).
+
+`CollectionScreen` no longer keeps a static `_tex_cache` that held every viewed card art for the rest of the session. `_tex(path)` is a plain `load(path)`: the ResourceLoader shares a live texture between the tiles and the card detail and frees it when the last `TextureRect` holding it is freed, so closing the Collection popups releases the card art.
+
+Cost: every set-detail open now decodes its 9 card arts again. On the dev PC (headless) the worst set-detail build is about 205-265 ms per open, where the cache gave about 85 ms after the first open (the first open of each set was already 215-290 ms with the uncapped 1024x1536 art). `tests/m43_master_c007_collection.gd` therefore budgets the build including its card-art loads at 500 ms instead of the old 150 ms warm-cache budget. It is a one-off cost on opening a popup, not per frame.
+
+Before -> after resident RGBA8:
+- all 135 cards viewed: 810.0 -> 400.45 MiB (with the old cache all would stay resident; now only the cards on an open popup are).
+- measure tool Collection scenario whole-tree (13 viewed card arts, album, set details 1-3, Cards Exchange): 166.87 -> 127.43 MiB at both 1080x2400 and 1536x2048. Re-measured card sides are unchanged (540 / 512 px), all other scenarios report the step 2 numbers.
+
+`tests/m22_026_texture_budget.gd` checks every catalog card art imports at max side <= 1080 with alpha, the 135 together <= 440 MiB (400.45 + ~10%), `CollectionScreen` has no `_tex_cache`, and a card loaded through `_tex` leaves the ResourceLoader cache (`ResourceLoader.has_cached` false) once its `TextureRect` is freed.
+
+**Status**: Factory job 040, 2026-10-23 (SB-M22-026 step 3). Still open: VRAM compression, atlasing.
