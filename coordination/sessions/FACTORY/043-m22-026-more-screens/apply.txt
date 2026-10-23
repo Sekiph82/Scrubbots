@@ -1,0 +1,221 @@
+texture                                                                  side    source    cur  limit  decision
+boosters/extra_slot.png                                                   170 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+boosters/random.png                                                       170 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+boosters/selector.png                                                     170 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+boosters/states/booster_activated_burst.png                               149 1245x1263    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+boosters/states/booster_free_badge_frame.png                               60 1774x887     512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+boosters/states/booster_reward_glow.png                                   149 1246x1262    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+boosters/states/booster_selected_ring.png                                 140 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+boosters/states/booster_unavailable_overlay.png                           120 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+boosters/tornado.png                                                      170 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+cards_exchange/cards_exchange_header_emblem.png                           150 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+characters/robots/atlas/atlas_master.png                                  396 1145x1374      0   1024  CAP 1024
+characters/robots/atlas/atlas_portrait.png                                195 1222x1287    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+characters/robots/bubbles/bubbles_master.png                              396 1148x1371      0   1024  CAP 1024
+characters/robots/bubbles/bubbles_portrait.png                            164 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+characters/robots/clippy/clippy_master.png                                396 1145x1374      0   1024  CAP 1024
+characters/robots/clippy/clippy_portrait.png                              164 1240x1268    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+characters/robots/dusty/dusty_master.png                                  396 1145x1374      0   1024  CAP 1024
+characters/robots/dusty/dusty_portrait.png                                164 1230x1278    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+characters/robots/moppy/moppy_master.png                                  396 1145x1374      0   1024  CAP 1024
+characters/robots/moppy/moppy_portrait.png                                133 1242x1266    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+characters/robots/polly/polly_master.png                                  396 1145x1374      0   1024  CAP 1024
+characters/robots/polly/polly_portrait.png                                133 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+characters/robots/rinse/rinse_master.png                                  396 1145x1374      0   1024  CAP 1024
+characters/robots/rinse/rinse_portrait.png                                164 1219x1290    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+characters/robots/spark/spark_master.png                                  396 1138x1382      0   1024  CAP 1024
+characters/robots/spark/spark_portrait.png                                133 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+characters/robots/squeegee/squeegee_master.png                            396 1145x1374      0   1024  CAP 1024
+characters/robots/squeegee/squeegee_portrait.png                          164 1218x1292    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+characters/scrubby/home_animation/bow/bow_01.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_02.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_03.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_04.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_05.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_06.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_07.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_08.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_09.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_10.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_11.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_12.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_13.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_14.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/bow/bow_15.png                          965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_01.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_02.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_03.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_04.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_05.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_06.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_07.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_08.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_09.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_10.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_11.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_12.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_13.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_14.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_15.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_16.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/full_turn/full_turn_17.png              965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_01.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_02.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_03.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_04.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_05.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_06.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_07.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_08.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_09.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_10.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_11.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_12.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_13.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_14.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_15.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_16.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/turn/turn_17.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_01.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_02.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_03.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_04.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_05.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_06.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_07.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_08.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_09.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_10.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_11.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_12.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_13.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/home_animation/wave/wave_14.png                        965  464x512       0   2048  keep: source <= limit
+characters/scrubby/scrubby_home_pose.png                                  854 1158x1358      0   2048  keep: source <= limit
+characters/scrubby/scrubby_master.png                                     396 1147x1372      0   1024  CAP 1024
+characters/scrubby/scrubby_portrait.png                                   880 1254x1254    512   2048  keep: source <= limit
+collection/cards/set_01/card_01.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_01/card_02.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_01/card_03.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_01/card_04.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_01/card_05.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_01/card_06.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_01/card_07.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_01/card_08.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_01/card_09.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_02/card_01.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_02/card_02.png                                       450 1024x1536   1080   1024  keep: existing limit 1080 (UI-ADR-007 / step 1)
+collection/cards/set_02/card_05.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_02/card_09.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_03/card_02.png                                       540 1024x1536   1080   2048  keep: source <= limit
+collection/cards/set_04/card_07.png                                       450 1024x1536   1080   1024  keep: existing limit 1080 (UI-ADR-007 / step 1)
+collection/cards/set_07/card_05.png                                       450 1024x1536   1080   1024  keep: existing limit 1080 (UI-ADR-007 / step 1)
+collection/cards/set_09/card_04.png                                       450 1024x1536   1080   1024  keep: existing limit 1080 (UI-ADR-007 / step 1)
+collection/cards/set_11/card_05.png                                       450 1024x1536   1080   1024  keep: existing limit 1080 (UI-ADR-007 / step 1)
+collection/cards/set_14/card_01.png                                       450 1024x1536   1080   1024  keep: existing limit 1080 (UI-ADR-007 / step 1)
+collection/cards/set_15/card_09.png                                       450 1024x1536   1080   1024  keep: existing limit 1080 (UI-ADR-007 / step 1)
+collection/collection_complete_emblem.png                                 242 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+collection/master_collection_emblem.png                                   320 1254x1254    512   1024  keep: existing limit 512 (UI-ADR-007 / step 1)
+collection/states/card_back.png                                            68 1024x1536      0    512  CAP 512
+collection/states/card_new_glow.png                                       720 1024x1536      0   2048  keep: source <= limit
+collection/states/card_unknown_silhouette.png                             300 1024x1536   1024   1024  keep: existing limit 1024 (UI-ADR-007 / step 1)
+common/currencies/icon_currency_heart.png                                 110 1348x1167    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+common/currencies/icon_currency_scrub_bucks.png                           110 1374x1145    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+common/frames/popup_large_frame.png                                      1891 1145x1374      0   4096  keep: source <= limit
+common/frames/popup_medium_frame.png                                     1250 1212x1298      0   4096  keep: source <= limit
+common/frames/popup_reward_frame.png                                     1585 1199x1312      0   4096  keep: source <= limit
+common/icons/icon_clock.png                                                53 1254x1254    256    512  keep: existing limit 256 (UI-ADR-007 / step 1)
+common/navigation/icon_nav_events.png                                      88 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+common/navigation/icon_nav_home.png                                        88 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+common/navigation/icon_nav_leaderboard.png                                 88 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+common/navigation/icon_nav_robots.png                                      88 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+common/navigation/icon_nav_settings.png                                    88 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+daily/daily_login_calendar.png                                            880 1288x1221   1024   2048  keep: source <= limit
+daily/daily_streak_flame.png                                               52 1536x1024    256    512  keep: existing limit 256 (UI-ADR-007 / step 1)
+daily/daily_task_check.png                                                 34 1261x1247    256    512  keep: existing limit 256 (UI-ADR-007 / step 1)
+gameplay/master/gameplay_v02_shell_5slot_3col.png                        2160  887x1774      0   8192  keep: source <= limit
+gameplay/master/gameplay_v02_shell_6slot_3col.png                        2160  887x1774      0   8192  keep: source <= limit
+gameplay/profile/scrubby_portrait.png                                     137  256x256       0    512  keep: source <= limit
+gameplay/tutorial/speech_bubble.png                                       820 1536x1024      0   2048  keep: source <= limit
+gameplay/tutorial/tutorial_highlight_ring.png                             892 1254x1254      0   2048  keep: source <= limit
+gameplay/tutorial/tutorial_pointer.png                                    122 1230x1278      0    512  CAP 512
+home/background/home_background.png                                      2231  940x1672      0   8192  keep: source <= limit
+home/gift_meter/gift_meter_emblem.png                                     132 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+home/gift_meter/gift_meter_reward_crate.png                               300 1254x1254    512   1024  keep: existing limit 512 (UI-ADR-007 / step 1)
+home/reward_track/reward_gift_1.png                                       275 1254x1254   1024   1024  keep: existing limit 1024 (UI-ADR-007 / step 1)
+home/reward_track/reward_gift_10.png                                      275 1254x1254   1024   1024  keep: existing limit 1024 (UI-ADR-007 / step 1)
+home/reward_track/reward_gift_100.png                                     275 1254x1254   1024   1024  keep: existing limit 1024 (UI-ADR-007 / step 1)
+home/reward_track/reward_gift_25.png                                      275 1254x1254   1024   1024  keep: existing limit 1024 (UI-ADR-007 / step 1)
+home/reward_track/reward_gift_5.png                                       275 1254x1254   1024   1024  keep: existing limit 1024 (UI-ADR-007 / step 1)
+home/reward_track/win_streak_reward_badge.png                             112 1245x1263    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+home/shortcuts/icon_shortcut_cards_exchange.png                           220 1313x1198      0    512  CAP 512
+home/shortcuts/icon_shortcut_collection.png                               248 1536x1024    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+home/shortcuts/icon_shortcut_daily.png                                    181 1315x1197    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+home/shortcuts/icon_shortcut_no_ads.png                                   108 1314x1197    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+home/shortcuts/icon_shortcut_rewarded_ads.png                             164 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+home/shortcuts/icon_shortcut_shop.png                                     229 1351x1164    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+home/shortcuts/icon_shortcut_tasks.png                                    181 1314x1197    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+home/top_hud/profile_avatar_frame.png                                     150 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+home/top_hud/profile_rank_badge.png                                        74 1317x1194    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+popups/failure/fail_header_emblem.png                                      96 1254x1254    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+popups/failure/heart_large.png                                            210 1320x1192   1024    512  keep: existing limit 1024 (UI-ADR-007 / step 1)
+popups/help/help_scrubby_pose.png                                         880 1199x1312      0   2048  keep: source <= limit
+popups/help/robots/atlas_help_pose.png                                    340 1024x1536      0   1024  CAP 1024
+popups/help/robots/bubbles_help_pose.png                                  340 1093x1439      0   1024  CAP 1024
+popups/help/robots/clippy_help_pose.png                                   340 1024x1536      0   1024  CAP 1024
+popups/help/robots/dusty_help_pose.png                                    340 1145x1374      0   1024  CAP 1024
+popups/help/robots/moppy_help_pose.png                                    340 1145x1374      0   1024  CAP 1024
+popups/help/robots/polly_help_pose.png                                    340 1024x1536      0   1024  CAP 1024
+popups/help/robots/rinse_help_pose.png                                    340 1024x1536      0   1024  CAP 1024
+popups/help/robots/spark_help_pose.png                                    340 1145x1374      0   1024  CAP 1024
+popups/help/robots/squeegee_help_pose.png                                 340 1145x1374      0   1024  CAP 1024
+popups/victory/reward_glow.png                                            368 1374x1145   1024   1024  keep: existing limit 1024 (UI-ADR-007 / step 1)
+popups/victory/robots/atlas_victory_pose.png                              340 1024x1536      0   1024  CAP 1024
+popups/victory/robots/bubbles_victory_pose.png                            340 1145x1374      0   1024  CAP 1024
+popups/victory/robots/clippy_victory_pose.png                             340 1024x1536      0   1024  CAP 1024
+popups/victory/robots/dusty_victory_pose.png                              340 1024x1536      0   1024  CAP 1024
+popups/victory/robots/moppy_victory_pose.png                              340 1024x1536      0   1024  CAP 1024
+popups/victory/robots/polly_victory_pose.png                              340 1024x1536      0   1024  CAP 1024
+popups/victory/robots/rinse_victory_pose.png                              340 1024x1536      0   1024  CAP 1024
+popups/victory/robots/spark_victory_pose.png                              340 1147x1371      0   1024  CAP 1024
+popups/victory/robots/squeegee_victory_pose.png                           340 1024x1536      0   1024  CAP 1024
+popups/victory/victory_emblem.png                                         101 1296x1213    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+popups/victory/victory_scrubby_pose.png                                   340 1230x1278   1024   1024  keep: existing limit 1024 (UI-ADR-007 / step 1)
+rewards/booster_of_choice.png                                              68 1024x1024      0    512  CAP 512
+rewards/card_pack_premium.png                                              68 1024x1536      0    512  CAP 512
+rewards/card_pack_standard.png                                             76 1024x1536      0    512  CAP 512
+rewards/chest_small.png                                                   880 1374x1145      0   2048  keep: source <= limit
+rewards/gift_box.png                                                      880 1254x1254      0   2048  keep: source <= limit
+rewards/pack_opening/premium/frame_01_closed.png                         1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/premium/frame_02_charge.png                         1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/premium/frame_03_pressure.png                       1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/premium/frame_04_first_tear.png                     1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/premium/frame_05_tear_widens.png                    1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/premium/frame_06_card_edge.png                      1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/premium/frame_07_one_card_rises.png                 1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/premium/frame_08_cards_emerge.png                   1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/premium/frame_09_final_reveal.png                   1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/standard/frame_01_closed.png                        1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/standard/frame_02_charge.png                        1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/standard/frame_03_pressure.png                      1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/standard/frame_04_first_tear.png                    1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/standard/frame_05_tear_widens.png                   1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/standard/frame_06_card_edge.png                     1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/standard/frame_07_one_card_rises.png                1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/standard/frame_08_cards_emerge.png                  1140 1024x1536      0   4096  keep: source <= limit
+rewards/pack_opening/standard/frame_09_final_reveal.png                  1140 1024x1536      0   4096  keep: source <= limit
+robots/bot_parts_icon.png                                                  88 1222x1287    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+robots/perks/perk_booster_discount.png                                    121 1254x1254      0    512  CAP 512
+robots/perks/perk_cards_exchange_bonus.png                                 92 1254x1254      0    512  CAP 512
+robots/perks/perk_daily_task_bonus.png                                    121 1254x1254      0    512  CAP 512
+robots/perks/perk_first_clear_sb_bonus.png                                 92 1254x1254      0    512  CAP 512
+robots/perks/perk_gift_bar_sb_bonus.png                                   121 1254x1254      0    512  CAP 512
+robots/perks/perk_heart_refill_discount.png                               121 1254x1254      0    512  CAP 512
+robots/perks/perk_master_cleaner.png                                      121 1254x1254      0    512  CAP 512
+robots/perks/perk_speed_2x_discount.png                                   121 1254x1254      0    512  CAP 512
+robots/perks/perk_win_streak_bonus.png                                     92 1254x1254      0    512  CAP 512
+robots/robot_lock_emblem.png                                              150 1240x1268      0    512  CAP 512
+robots/robot_unlocked_burst.png                                           456 1240x1268      0   1024  CAP 1024
+shop/shop_heart_bundle.png                                                 88 1402x1122    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+shop/shop_scrub_bucks_bundle.png                                          150 1536x1024    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+shop/shop_speed_2x_icon.png                                               108 1278x1230    512    512  keep: existing limit 512 (UI-ADR-007 / step 1)
+capped 45 texture(s)
