@@ -1,0 +1,1 @@
+{ "id": "040-m22-026-card-art", "task": "SB-M22-026 step 3: collection card art memory (lazy load/eviction + measured caps)", "branch": "factory/040-m22-026-card-art", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/040-m22-026-card-art", "stage": "merged", "round": 2, "reviews": { "rules": "PASS", "code": "PASS", "tests": "PASS" } }
