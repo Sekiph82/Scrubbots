@@ -123,3 +123,32 @@ The 7 PNGs without alpha stay lossless and unchanged (none is a size_limit candi
 **Follow-ups (not done)**: runtime draw-size measurement so Home, Results and Shop art can be capped; VRAM compression (ETC2/ASTC) for opaque backgrounds and large art; atlasing small icons; runtime lazy loading and unloading (collection card art stays cached once viewed, up to 135 x 6 MiB).
 
 **Status**: Factory job 037, 2026-10-23 (SB-M22-026 step 1).
+
+### UI-ADR-008 step 2: measured size_limit caps
+
+**Decision**: `tests/tools/m22_026_texture_measure.gd` boots the real `main.tscn` in a SubViewport (throw-away `user://` saves via `boot_save_path_override`, never the real save) at 1080x2400 and at the 1536x2048 tablet, using the `m49` logical size (physical px = logical rect x physical/logical). Scenarios: Home (all 4 Scrubby gestures stepped frame by frame), Gameplay 5-slot, Gameplay 6-slot (+1 Slot via `activate_plus_one_slot`), Results won and failed, Shop, Collection (album, set details 1-3, card detail of every owned card and one not found, Cards Exchange), plus Robots and the Heart (life) popup because they draw robot poses and heart art seen on the other screens. It walks the whole SubViewport subtree and records, per `res://assets/ui/final/` texture (AtlasTexture counted as its atlas file) on a `TextureRect`, `NinePatchRect`, `TextureButton` or `Sprite2D`, the largest on-screen side in physical px. `tools/m22_026_apply_caps.py` (stdlib) applies `size_limit = next_pow2(max(2 x measured max side, 512))`, written only when it is below the source max side and the `.import` has no limit yet. Only the `process/size_limit` line changes; `compress/mode=0`, mipmaps off and the source PNGs stay as they are.
+
+Result: 144 textures observed (141 with a non-zero size), **45 capped** (37 to 512, 8 to 1024). The smallest limit / measured side ratio among them is 2.06 (`home/shortcuts/icon_shortcut_collection.png`, 248 px -> 512). Re-measuring after the re-import gives the same rects (one emblem 1 px smaller from rounding), so no layout depends on the texture size.
+
+Per-screen resident RGBA8 (`tests/m22_026_texture_budget.gd`; a shared texture counts on every screen that loads it):
+
+| screen | step 1 list: before -> after MiB | step 2 list | step 2 list: before -> after MiB | new budget MiB |
+|---|---|---|---|---:|
+| Home | 207.07 -> 106.02 | 88 textures (unchanged) | 207.07 -> 106.02 | 117 |
+| Gameplay | 50.72 -> 50.72 | 19 (+2: `gameplay_v02_shell_5slot_3col`, `gameplay_v02_shell_6slot_3col`, the shells drawn at runtime) | 62.72 -> 62.72 | 69 |
+| Results | 65.99 -> 28.41 | 11 (unchanged) | 65.99 -> 28.41 | 32 |
+| Shop/Collection | 69.99 -> 20.70 | 19 (+4: `popup_large_frame`, `popup_reward_frame`, `popups/victory/reward_glow`, `robots/bot_parts_icon`) | 94.00 -> 36.98 | 41 |
+
+Gameplay does not drop: its observed art is either already capped (boosters, UI-ADR-007), smaller than the cap (the 256 px profile portrait) or larger on screen than the source (the shells, about 2160 px). The rail, Scrubbot body and clean FX are not drawn by a measured node, so they stay untouched. Gameplay 6-slot swaps the 5-slot shell for the 6-slot one (same 887x1774 size), so its MiB equal 5-slot. The tablet (1536x2048) loads the same textures as the phone, so its per-screen MiB are equal; it only changes measured sides, and the caps use the larger side of the two.
+
+Whole-tree MiB the measure tool reports (every texture loaded in the SubViewport, including the Home screen that stays resident behind the other screens), before -> after: Home 231.07 -> 130.02, Gameplay 5-slot and 6-slot 188.70 -> 87.65, Results won 206.69 -> 93.38, Results failed 200.70 -> 94.65, Shop 201.97 -> 80.26, Collection 293.97 -> 166.87 (13 viewed card arts at 6 MiB each, not capped), Robots 233.96 -> 82.63, Heart popup 189.84 -> 88.79.
+
+Untouched and why:
+- 416 of the 560 PNGs were not observed in any scenario (art drawn by `_draw`/StyleBox code, other screens, unused art). They keep their current limit.
+- 3 loaded with size 0 (`gameplay/tutorial/speech_bubble.png`, `tutorial_highlight_ring.png`, `tutorial_pointer.png`): treated as unobserved.
+- 85 whose computed limit is not below the source: the 63 Home gesture frames (464x512 source, drawn at 965 px), `home/background/home_background.png`, `characters/scrubby/scrubby_home_pose.png`, `popups/help/help_scrubby_pose.png`, the three popup frames, both gameplay shells, `gameplay/profile/scrubby_portrait.png` and the 13 card arts seen in card detail (540 px, so 2048 > 1536 source).
+- 11 already limited keep their value: the 9 observed boosters (512, UI-ADR-007), `common/icons/icon_clock.png` (256) and `popups/failure/heart_large.png` (1024, step 1; the 2x rule would give 512).
+
+**Known limit**: the cap covers the sizes the scenarios show. A texture drawn larger on a screen the tool does not visit (for example a robot portrait in an unlock ceremony) would show at less than 2x there. Add that screen to the tool and re-run the apply step before shipping art on it.
+
+**Status**: Factory job 038, 2026-10-23 (SB-M22-026 step 2). Still open: VRAM compression, atlasing, lazy card art loading.
