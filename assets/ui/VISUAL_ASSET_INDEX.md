@@ -50,7 +50,7 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/boosters/states/booster_free_badge_frame.png` | Phase 2 P2-046 | 1,096,228 |
 | `assets/ui/final/boosters/states/booster_reward_glow.png` | Phase 2 P2-043 | 1,703,097 |
 | `assets/ui/final/boosters/states/booster_selected_ring.png` | Phase 2 P2-041 | 1,115,635 |
-| `assets/ui/final/boosters/states/booster_tutorial_pointer.png` | Phase 2 P2-045 | 1,264,198 |
+| `assets/ui/final/boosters/states/booster_tutorial_pointer.png` | Phase 2 P2-045 (RETIRED from runtime requirements, owner 2026-10-23; PNG preserved, shared `gameplay/tutorial/tutorial_pointer.png` is used) | 1,264,198 |
 | `assets/ui/final/boosters/states/booster_unavailable_overlay.png` | Phase 2 P2-042 | 1,709,253 |
 | `assets/ui/final/boosters/tornado.png` | Phase 1 | 1,179,175 |
 
