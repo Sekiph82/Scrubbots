@@ -1,0 +1,23 @@
+{
+  "schema": "scrubbots.feature_unlocks.v1",
+  "version": 1,
+  "decision": "TASKS.md SB-M44-010 / coordination/OWNER_META_PROGRESSION_DESIGN_V01.md (owner unlock table 2026-10-22)",
+  "grandfather": "Every save that is not a new FTUE profile keeps all features unlocked; fresh profiles unlock by campaign frontier (frontier >= level).",
+  "unlocks": {
+    "hearts": 1,
+    "gift_bar": 1,
+    "daily": 4,
+    "shop": 8,
+    "tasks": 12,
+    "collection": 20,
+    "card_packs": 20,
+    "robots": 25,
+    "events": 30,
+    "achievements": 35,
+    "ranks": 40,
+    "plus_one_slot": 6,
+    "random": 11,
+    "selector": 16,
+    "tornado": 21
+  }
+}
