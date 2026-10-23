@@ -1,0 +1,7677 @@
+{
+	"loaded_mib": {
+		"collection@1080x2400": 166.87,
+		"collection@1536x2048": 166.87,
+		"gameplay_5slot@1080x2400": 87.65,
+		"gameplay_5slot@1536x2048": 87.65,
+		"gameplay_6slot@1080x2400": 87.65,
+		"gameplay_6slot@1536x2048": 87.65,
+		"home@1080x2400": 130.02,
+		"home@1536x2048": 130.02,
+		"life@1080x2400": 88.79,
+		"life@1536x2048": 88.79,
+		"results_failed@1080x2400": 94.65,
+		"results_failed@1536x2048": 94.65,
+		"results_won@1080x2400": 93.38,
+		"results_won@1536x2048": 93.38,
+		"robots@1080x2400": 82.63,
+		"robots@1536x2048": 82.63,
+		"shop@1080x2400": 80.26,
+		"shop@1536x2048": 80.26
+	},
+	"merged": {
+		"boosters/extra_slot.png": 92,
+		"boosters/random.png": 92,
+		"boosters/selector.png": 92,
+		"boosters/states/booster_activated_burst.png": 149,
+		"boosters/states/booster_free_badge_frame.png": 60,
+		"boosters/states/booster_reward_glow.png": 149,
+		"boosters/states/booster_selected_ring.png": 140,
+		"boosters/states/booster_unavailable_overlay.png": 120,
+		"boosters/tornado.png": 92,
+		"cards_exchange/cards_exchange_header_emblem.png": 150,
+		"characters/robots/atlas/atlas_portrait.png": 195,
+		"characters/robots/bubbles/bubbles_portrait.png": 164,
+		"characters/robots/clippy/clippy_portrait.png": 164,
+		"characters/robots/dusty/dusty_portrait.png": 164,
+		"characters/robots/moppy/moppy_portrait.png": 133,
+		"characters/robots/polly/polly_portrait.png": 133,
+		"characters/robots/rinse/rinse_portrait.png": 164,
+		"characters/robots/spark/spark_portrait.png": 133,
+		"characters/robots/squeegee/squeegee_portrait.png": 164,
+		"characters/scrubby/home_animation/bow/bow_01.png": 965,
+		"characters/scrubby/home_animation/bow/bow_02.png": 965,
+		"characters/scrubby/home_animation/bow/bow_03.png": 965,
+		"characters/scrubby/home_animation/bow/bow_04.png": 965,
+		"characters/scrubby/home_animation/bow/bow_05.png": 965,
+		"characters/scrubby/home_animation/bow/bow_06.png": 965,
+		"characters/scrubby/home_animation/bow/bow_07.png": 965,
+		"characters/scrubby/home_animation/bow/bow_08.png": 965,
+		"characters/scrubby/home_animation/bow/bow_09.png": 965,
+		"characters/scrubby/home_animation/bow/bow_10.png": 965,
+		"characters/scrubby/home_animation/bow/bow_11.png": 965,
+		"characters/scrubby/home_animation/bow/bow_12.png": 965,
+		"characters/scrubby/home_animation/bow/bow_13.png": 965,
+		"characters/scrubby/home_animation/bow/bow_14.png": 965,
+		"characters/scrubby/home_animation/bow/bow_15.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_01.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_02.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_03.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_04.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_05.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_06.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_07.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_08.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_09.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_10.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_11.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_12.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_13.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_14.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_15.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_16.png": 965,
+		"characters/scrubby/home_animation/full_turn/full_turn_17.png": 965,
+		"characters/scrubby/home_animation/turn/turn_01.png": 965,
+		"characters/scrubby/home_animation/turn/turn_02.png": 965,
+		"characters/scrubby/home_animation/turn/turn_03.png": 965,
+		"characters/scrubby/home_animation/turn/turn_04.png": 965,
+		"characters/scrubby/home_animation/turn/turn_05.png": 965,
+		"characters/scrubby/home_animation/turn/turn_06.png": 965,
+		"characters/scrubby/home_animation/turn/turn_07.png": 965,
+		"characters/scrubby/home_animation/turn/turn_08.png": 965,
+		"characters/scrubby/home_animation/turn/turn_09.png": 965,
+		"characters/scrubby/home_animation/turn/turn_10.png": 965,
+		"characters/scrubby/home_animation/turn/turn_11.png": 965,
+		"characters/scrubby/home_animation/turn/turn_12.png": 965,
+		"characters/scrubby/home_animation/turn/turn_13.png": 965,
+		"characters/scrubby/home_animation/turn/turn_14.png": 965,
+		"characters/scrubby/home_animation/turn/turn_15.png": 965,
+		"characters/scrubby/home_animation/turn/turn_16.png": 965,
+		"characters/scrubby/home_animation/turn/turn_17.png": 965,
+		"characters/scrubby/home_animation/wave/wave_01.png": 965,
+		"characters/scrubby/home_animation/wave/wave_02.png": 965,
+		"characters/scrubby/home_animation/wave/wave_03.png": 965,
+		"characters/scrubby/home_animation/wave/wave_04.png": 965,
+		"characters/scrubby/home_animation/wave/wave_05.png": 965,
+		"characters/scrubby/home_animation/wave/wave_06.png": 965,
+		"characters/scrubby/home_animation/wave/wave_07.png": 965,
+		"characters/scrubby/home_animation/wave/wave_08.png": 965,
+		"characters/scrubby/home_animation/wave/wave_09.png": 965,
+		"characters/scrubby/home_animation/wave/wave_10.png": 965,
+		"characters/scrubby/home_animation/wave/wave_11.png": 965,
+		"characters/scrubby/home_animation/wave/wave_12.png": 965,
+		"characters/scrubby/home_animation/wave/wave_13.png": 965,
+		"characters/scrubby/home_animation/wave/wave_14.png": 965,
+		"characters/scrubby/scrubby_home_pose.png": 854,
+		"characters/scrubby/scrubby_portrait.png": 195,
+		"collection/cards/set_01/card_01.png": 540,
+		"collection/cards/set_01/card_02.png": 540,
+		"collection/cards/set_01/card_03.png": 540,
+		"collection/cards/set_01/card_04.png": 540,
+		"collection/cards/set_01/card_05.png": 540,
+		"collection/cards/set_01/card_06.png": 540,
+		"collection/cards/set_01/card_07.png": 540,
+		"collection/cards/set_01/card_08.png": 540,
+		"collection/cards/set_01/card_09.png": 540,
+		"collection/cards/set_02/card_01.png": 540,
+		"collection/cards/set_02/card_05.png": 540,
+		"collection/cards/set_02/card_09.png": 540,
+		"collection/cards/set_03/card_02.png": 540,
+		"collection/collection_complete_emblem.png": 241,
+		"collection/master_collection_emblem.png": 84,
+		"collection/states/card_unknown_silhouette.png": 300,
+		"common/currencies/icon_currency_heart.png": 110,
+		"common/currencies/icon_currency_scrub_bucks.png": 110,
+		"common/frames/popup_large_frame.png": 1891,
+		"common/frames/popup_medium_frame.png": 1218,
+		"common/frames/popup_reward_frame.png": 1333,
+		"common/icons/icon_clock.png": 53,
+		"common/navigation/icon_nav_events.png": 88,
+		"common/navigation/icon_nav_home.png": 88,
+		"common/navigation/icon_nav_leaderboard.png": 88,
+		"common/navigation/icon_nav_robots.png": 88,
+		"common/navigation/icon_nav_settings.png": 88,
+		"gameplay/master/gameplay_v02_shell_5slot_3col.png": 2160,
+		"gameplay/master/gameplay_v02_shell_6slot_3col.png": 2160,
+		"gameplay/profile/scrubby_portrait.png": 137,
+		"gameplay/tutorial/speech_bubble.png": 0,
+		"gameplay/tutorial/tutorial_highlight_ring.png": 0,
+		"gameplay/tutorial/tutorial_pointer.png": 0,
+		"home/background/home_background.png": 2231,
+		"home/gift_meter/gift_meter_emblem.png": 132,
+		"home/gift_meter/gift_meter_reward_crate.png": 132,
+		"home/reward_track/reward_gift_1.png": 275,
+		"home/reward_track/reward_gift_10.png": 275,
+		"home/reward_track/reward_gift_100.png": 275,
+		"home/reward_track/reward_gift_25.png": 275,
+		"home/reward_track/reward_gift_5.png": 275,
+		"home/reward_track/win_streak_reward_badge.png": 112,
+		"home/shortcuts/icon_shortcut_collection.png": 248,
+		"home/shortcuts/icon_shortcut_daily.png": 181,
+		"home/shortcuts/icon_shortcut_no_ads.png": 108,
+		"home/shortcuts/icon_shortcut_rewarded_ads.png": 164,
+		"home/shortcuts/icon_shortcut_shop.png": 229,
+		"home/shortcuts/icon_shortcut_tasks.png": 181,
+		"home/top_hud/profile_avatar_frame.png": 150,
+		"home/top_hud/profile_rank_badge.png": 74,
+		"popups/failure/fail_header_emblem.png": 96,
+		"popups/failure/heart_large.png": 210,
+		"popups/help/help_scrubby_pose.png": 880,
+		"popups/victory/reward_glow.png": 265,
+		"popups/victory/victory_emblem.png": 101,
+		"popups/victory/victory_scrubby_pose.png": 340,
+		"robots/bot_parts_icon.png": 76,
+		"shop/shop_heart_bundle.png": 88,
+		"shop/shop_scrub_bucks_bundle.png": 150,
+		"shop/shop_speed_2x_icon.png": 108
+	},
+	"scenarios": {
+		"collection@1080x2400": {
+			"cards_exchange/cards_exchange_header_emblem.png": {
+				"max_h": 150,
+				"max_side_px": 150,
+				"max_w": 150,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 854,
+				"max_side_px": 854,
+				"max_w": 728,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 195,
+				"max_side_px": 195,
+				"max_w": 195,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"collection/cards/set_01/card_01.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_02.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_03.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_04.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_05.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_06.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_07.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_08.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_09.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_02/card_01.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_02/card_05.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_02/card_09.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_03/card_02.png": {
+				"max_h": 540,
+				"max_side_px": 540,
+				"max_w": 380,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/collection_complete_emblem.png": {
+				"max_h": 241,
+				"max_side_px": 241,
+				"max_w": 241,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"collection/master_collection_emblem.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"collection/states/card_unknown_silhouette.png": {
+				"max_h": 300,
+				"max_side_px": 300,
+				"max_w": 210,
+				"size_limit": 1024,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 1891,
+				"max_side_px": 1891,
+				"max_w": 881,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": true
+			},
+			"common/frames/popup_reward_frame.png": {
+				"max_h": 1333,
+				"max_side_px": 1333,
+				"max_w": 880,
+				"size_limit": 0,
+				"source_h": 1312,
+				"source_w": 1199,
+				"visible": true
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2231,
+				"max_side_px": 2231,
+				"max_w": 1255,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 112,
+				"max_side_px": 112,
+				"max_w": 112,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 165,
+				"max_side_px": 248,
+				"max_w": 248,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 164,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 197,
+				"max_side_px": 229,
+				"max_w": 229,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 150,
+				"max_side_px": 150,
+				"max_w": 150,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 68,
+				"max_side_px": 74,
+				"max_w": 74,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": true
+			},
+			"popups/victory/reward_glow.png": {
+				"max_h": 265,
+				"max_side_px": 265,
+				"max_w": 265,
+				"size_limit": 1024,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"robots/bot_parts_icon.png": {
+				"max_h": 76,
+				"max_side_px": 76,
+				"max_w": 76,
+				"size_limit": 512,
+				"source_h": 1287,
+				"source_w": 1222,
+				"visible": true
+			}
+		},
+		"collection@1536x2048": {
+			"cards_exchange/cards_exchange_header_emblem.png": {
+				"max_h": 143,
+				"max_side_px": 143,
+				"max_w": 143,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 773,
+				"max_side_px": 773,
+				"max_w": 659,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 185,
+				"max_side_px": 185,
+				"max_w": 185,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"collection/cards/set_01/card_01.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_02.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_03.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_04.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_05.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_06.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_07.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_08.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_01/card_09.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_02/card_01.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_02/card_05.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_02/card_09.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/cards/set_03/card_02.png": {
+				"max_h": 512,
+				"max_side_px": 512,
+				"max_w": 361,
+				"size_limit": 0,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"collection/collection_complete_emblem.png": {
+				"max_h": 228,
+				"max_side_px": 228,
+				"max_w": 228,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"collection/master_collection_emblem.png": {
+				"max_h": 80,
+				"max_side_px": 80,
+				"max_w": 80,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"collection/states/card_unknown_silhouette.png": {
+				"max_h": 285,
+				"max_side_px": 285,
+				"max_w": 200,
+				"size_limit": 1024,
+				"source_h": 1536,
+				"source_w": 1024,
+				"visible": true
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 1793,
+				"max_side_px": 1793,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": true
+			},
+			"common/frames/popup_reward_frame.png": {
+				"max_h": 1264,
+				"max_side_px": 1264,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1312,
+				"source_w": 1199,
+				"visible": true
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2020,
+				"max_side_px": 2020,
+				"max_w": 1136,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 107,
+				"max_side_px": 107,
+				"max_w": 107,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 157,
+				"max_side_px": 235,
+				"max_w": 235,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 156,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 187,
+				"max_side_px": 217,
+				"max_w": 217,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 143,
+				"max_side_px": 143,
+				"max_w": 143,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 65,
+				"max_side_px": 71,
+				"max_w": 71,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": true
+			},
+			"popups/victory/reward_glow.png": {
+				"max_h": 251,
+				"max_side_px": 251,
+				"max_w": 251,
+				"size_limit": 1024,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"robots/bot_parts_icon.png": {
+				"max_h": 73,
+				"max_side_px": 73,
+				"max_w": 73,
+				"size_limit": 512,
+				"source_h": 1287,
+				"source_w": 1222,
+				"visible": true
+			}
+		},
+		"gameplay_5slot@1080x2400": {
+			"boosters/extra_slot.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/random.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/selector.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/states/booster_activated_burst.png": {
+				"max_h": 149,
+				"max_side_px": 149,
+				"max_w": 149,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"boosters/states/booster_free_badge_frame.png": {
+				"max_h": 58,
+				"max_side_px": 60,
+				"max_w": 60,
+				"size_limit": 512,
+				"source_h": 887,
+				"source_w": 1774,
+				"visible": false
+			},
+			"boosters/states/booster_reward_glow.png": {
+				"max_h": 149,
+				"max_side_px": 149,
+				"max_w": 149,
+				"size_limit": 512,
+				"source_h": 1262,
+				"source_w": 1246,
+				"visible": false
+			},
+			"boosters/states/booster_selected_ring.png": {
+				"max_h": 140,
+				"max_side_px": 140,
+				"max_w": 140,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/states/booster_unavailable_overlay.png": {
+				"max_h": 120,
+				"max_side_px": 120,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/tornado.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 854,
+				"max_side_px": 854,
+				"max_w": 728,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": false
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 195,
+				"max_side_px": 195,
+				"max_w": 195,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": false
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": false
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 240,
+				"max_side_px": 881,
+				"max_w": 881,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/master/gameplay_v02_shell_5slot_3col.png": {
+				"max_h": 2160,
+				"max_side_px": 2160,
+				"max_w": 1080,
+				"size_limit": 0,
+				"source_h": 1774,
+				"source_w": 887,
+				"visible": true
+			},
+			"gameplay/profile/scrubby_portrait.png": {
+				"max_h": 137,
+				"max_side_px": 137,
+				"max_w": 132,
+				"size_limit": 0,
+				"source_h": 256,
+				"source_w": 256,
+				"visible": true
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2231,
+				"max_side_px": 2231,
+				"max_w": 1255,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 112,
+				"max_side_px": 112,
+				"max_w": 112,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 165,
+				"max_side_px": 248,
+				"max_w": 248,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 164,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 197,
+				"max_side_px": 229,
+				"max_w": 229,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 150,
+				"max_side_px": 150,
+				"max_w": 150,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 68,
+				"max_side_px": 74,
+				"max_w": 74,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": false
+			}
+		},
+		"gameplay_5slot@1536x2048": {
+			"boosters/extra_slot.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/random.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/selector.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/states/booster_activated_burst.png": {
+				"max_h": 142,
+				"max_side_px": 142,
+				"max_w": 142,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"boosters/states/booster_free_badge_frame.png": {
+				"max_h": 55,
+				"max_side_px": 57,
+				"max_w": 57,
+				"size_limit": 512,
+				"source_h": 887,
+				"source_w": 1774,
+				"visible": false
+			},
+			"boosters/states/booster_reward_glow.png": {
+				"max_h": 142,
+				"max_side_px": 142,
+				"max_w": 142,
+				"size_limit": 512,
+				"source_h": 1262,
+				"source_w": 1246,
+				"visible": false
+			},
+			"boosters/states/booster_selected_ring.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/states/booster_unavailable_overlay.png": {
+				"max_h": 114,
+				"max_side_px": 114,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/tornado.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 773,
+				"max_side_px": 773,
+				"max_w": 659,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": false
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 185,
+				"max_side_px": 185,
+				"max_w": 185,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": false
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": false
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 228,
+				"max_side_px": 835,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/master/gameplay_v02_shell_5slot_3col.png": {
+				"max_h": 2048,
+				"max_side_px": 2048,
+				"max_w": 1024,
+				"size_limit": 0,
+				"source_h": 1774,
+				"source_w": 887,
+				"visible": true
+			},
+			"gameplay/profile/scrubby_portrait.png": {
+				"max_h": 130,
+				"max_side_px": 130,
+				"max_w": 125,
+				"size_limit": 0,
+				"source_h": 256,
+				"source_w": 256,
+				"visible": true
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2020,
+				"max_side_px": 2020,
+				"max_w": 1136,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 107,
+				"max_side_px": 107,
+				"max_w": 107,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 157,
+				"max_side_px": 235,
+				"max_w": 235,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 156,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 187,
+				"max_side_px": 217,
+				"max_w": 217,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 143,
+				"max_side_px": 143,
+				"max_w": 143,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 65,
+				"max_side_px": 71,
+				"max_w": 71,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": false
+			}
+		},
+		"gameplay_6slot@1080x2400": {
+			"boosters/extra_slot.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/random.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/selector.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/states/booster_activated_burst.png": {
+				"max_h": 149,
+				"max_side_px": 149,
+				"max_w": 149,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"boosters/states/booster_free_badge_frame.png": {
+				"max_h": 58,
+				"max_side_px": 60,
+				"max_w": 60,
+				"size_limit": 512,
+				"source_h": 887,
+				"source_w": 1774,
+				"visible": false
+			},
+			"boosters/states/booster_reward_glow.png": {
+				"max_h": 149,
+				"max_side_px": 149,
+				"max_w": 149,
+				"size_limit": 512,
+				"source_h": 1262,
+				"source_w": 1246,
+				"visible": false
+			},
+			"boosters/states/booster_selected_ring.png": {
+				"max_h": 140,
+				"max_side_px": 140,
+				"max_w": 140,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/states/booster_unavailable_overlay.png": {
+				"max_h": 120,
+				"max_side_px": 120,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/tornado.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 854,
+				"max_side_px": 854,
+				"max_w": 728,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": false
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 195,
+				"max_side_px": 195,
+				"max_w": 195,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": false
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": false
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 240,
+				"max_side_px": 881,
+				"max_w": 881,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/master/gameplay_v02_shell_6slot_3col.png": {
+				"max_h": 2160,
+				"max_side_px": 2160,
+				"max_w": 1080,
+				"size_limit": 0,
+				"source_h": 1774,
+				"source_w": 887,
+				"visible": true
+			},
+			"gameplay/profile/scrubby_portrait.png": {
+				"max_h": 137,
+				"max_side_px": 137,
+				"max_w": 132,
+				"size_limit": 0,
+				"source_h": 256,
+				"source_w": 256,
+				"visible": true
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2231,
+				"max_side_px": 2231,
+				"max_w": 1255,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 112,
+				"max_side_px": 112,
+				"max_w": 112,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 165,
+				"max_side_px": 248,
+				"max_w": 248,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 164,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 197,
+				"max_side_px": 229,
+				"max_w": 229,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 150,
+				"max_side_px": 150,
+				"max_w": 150,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 68,
+				"max_side_px": 74,
+				"max_w": 74,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": false
+			}
+		},
+		"gameplay_6slot@1536x2048": {
+			"boosters/extra_slot.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/random.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/selector.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/states/booster_activated_burst.png": {
+				"max_h": 142,
+				"max_side_px": 142,
+				"max_w": 142,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"boosters/states/booster_free_badge_frame.png": {
+				"max_h": 55,
+				"max_side_px": 57,
+				"max_w": 57,
+				"size_limit": 512,
+				"source_h": 887,
+				"source_w": 1774,
+				"visible": false
+			},
+			"boosters/states/booster_reward_glow.png": {
+				"max_h": 142,
+				"max_side_px": 142,
+				"max_w": 142,
+				"size_limit": 512,
+				"source_h": 1262,
+				"source_w": 1246,
+				"visible": false
+			},
+			"boosters/states/booster_selected_ring.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/states/booster_unavailable_overlay.png": {
+				"max_h": 114,
+				"max_side_px": 114,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/tornado.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 773,
+				"max_side_px": 773,
+				"max_w": 659,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": false
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 185,
+				"max_side_px": 185,
+				"max_w": 185,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": false
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": false
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 228,
+				"max_side_px": 835,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/master/gameplay_v02_shell_6slot_3col.png": {
+				"max_h": 2048,
+				"max_side_px": 2048,
+				"max_w": 1024,
+				"size_limit": 0,
+				"source_h": 1774,
+				"source_w": 887,
+				"visible": true
+			},
+			"gameplay/profile/scrubby_portrait.png": {
+				"max_h": 130,
+				"max_side_px": 130,
+				"max_w": 125,
+				"size_limit": 0,
+				"source_h": 256,
+				"source_w": 256,
+				"visible": true
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2020,
+				"max_side_px": 2020,
+				"max_w": 1136,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 107,
+				"max_side_px": 107,
+				"max_w": 107,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 157,
+				"max_side_px": 235,
+				"max_w": 235,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 156,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 187,
+				"max_side_px": 217,
+				"max_w": 217,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 143,
+				"max_side_px": 143,
+				"max_w": 143,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 65,
+				"max_side_px": 71,
+				"max_w": 71,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": false
+			}
+		},
+		"home@1080x2400": {
+			"characters/scrubby/home_animation/bow/bow_01.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_02.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_03.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_04.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_05.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_06.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_07.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_08.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_09.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_10.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_11.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_12.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_13.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_14.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_15.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_01.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_02.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_03.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_04.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_05.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_06.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_07.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_08.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_09.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_10.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_11.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_12.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_13.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_14.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_15.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_16.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_17.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_01.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_02.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_03.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_04.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_05.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_06.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_07.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_08.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_09.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_10.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_11.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_12.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_13.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_14.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_15.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_16.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_17.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_01.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_02.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_03.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_04.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_05.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_06.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_07.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_08.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_09.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_10.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_11.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_12.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_13.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_14.png": {
+				"max_h": 965,
+				"max_side_px": 965,
+				"max_w": 875,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 854,
+				"max_side_px": 854,
+				"max_w": 728,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 195,
+				"max_side_px": 195,
+				"max_w": 195,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 240,
+				"max_side_px": 881,
+				"max_w": 881,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2231,
+				"max_side_px": 2231,
+				"max_w": 1255,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 112,
+				"max_side_px": 112,
+				"max_w": 112,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 165,
+				"max_side_px": 248,
+				"max_w": 248,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 164,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 197,
+				"max_side_px": 229,
+				"max_w": 229,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": true
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 150,
+				"max_side_px": 150,
+				"max_w": 150,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 68,
+				"max_side_px": 74,
+				"max_w": 74,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": true
+			}
+		},
+		"home@1536x2048": {
+			"characters/scrubby/home_animation/bow/bow_01.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_02.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_03.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_04.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_05.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_06.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_07.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_08.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_09.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_10.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_11.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_12.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_13.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_14.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/bow/bow_15.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_01.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_02.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_03.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_04.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_05.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_06.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_07.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_08.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_09.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_10.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_11.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_12.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_13.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_14.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_15.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_16.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/full_turn/full_turn_17.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_01.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_02.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_03.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_04.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_05.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_06.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_07.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_08.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_09.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_10.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_11.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_12.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_13.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_14.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_15.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_16.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/turn/turn_17.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_01.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_02.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_03.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_04.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_05.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_06.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_07.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_08.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_09.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_10.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_11.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_12.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_13.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/home_animation/wave/wave_14.png": {
+				"max_h": 874,
+				"max_side_px": 874,
+				"max_w": 792,
+				"size_limit": 0,
+				"source_h": 512,
+				"source_w": 464,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 773,
+				"max_side_px": 773,
+				"max_w": 659,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 185,
+				"max_side_px": 185,
+				"max_w": 185,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 228,
+				"max_side_px": 835,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2020,
+				"max_side_px": 2020,
+				"max_w": 1136,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 107,
+				"max_side_px": 107,
+				"max_w": 107,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 157,
+				"max_side_px": 235,
+				"max_w": 235,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 156,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 187,
+				"max_side_px": 217,
+				"max_w": 217,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": true
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 143,
+				"max_side_px": 143,
+				"max_w": 143,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 65,
+				"max_side_px": 71,
+				"max_w": 71,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": true
+			}
+		},
+		"life@1080x2400": {
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 854,
+				"max_side_px": 854,
+				"max_w": 728,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 195,
+				"max_side_px": 195,
+				"max_w": 195,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 240,
+				"max_side_px": 881,
+				"max_w": 881,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/frames/popup_medium_frame.png": {
+				"max_h": 1218,
+				"max_side_px": 1218,
+				"max_w": 880,
+				"size_limit": 0,
+				"source_h": 1298,
+				"source_w": 1212,
+				"visible": true
+			},
+			"common/icons/icon_clock.png": {
+				"max_h": 53,
+				"max_side_px": 53,
+				"max_w": 52,
+				"size_limit": 256,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2231,
+				"max_side_px": 2231,
+				"max_w": 1255,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 112,
+				"max_side_px": 112,
+				"max_w": 112,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 165,
+				"max_side_px": 248,
+				"max_w": 248,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 164,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 197,
+				"max_side_px": 229,
+				"max_w": 229,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 150,
+				"max_side_px": 150,
+				"max_w": 150,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 68,
+				"max_side_px": 74,
+				"max_w": 74,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": true
+			},
+			"popups/failure/heart_large.png": {
+				"max_h": 190,
+				"max_side_px": 210,
+				"max_w": 210,
+				"size_limit": 1024,
+				"source_h": 1192,
+				"source_w": 1320,
+				"visible": true
+			},
+			"popups/help/help_scrubby_pose.png": {
+				"max_h": 260,
+				"max_side_px": 880,
+				"max_w": 880,
+				"size_limit": 0,
+				"source_h": 1312,
+				"source_w": 1199,
+				"visible": true
+			}
+		},
+		"life@1536x2048": {
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 773,
+				"max_side_px": 773,
+				"max_w": 659,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 185,
+				"max_side_px": 185,
+				"max_w": 185,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 228,
+				"max_side_px": 835,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/frames/popup_medium_frame.png": {
+				"max_h": 1155,
+				"max_side_px": 1155,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1298,
+				"source_w": 1212,
+				"visible": true
+			},
+			"common/icons/icon_clock.png": {
+				"max_h": 51,
+				"max_side_px": 51,
+				"max_w": 50,
+				"size_limit": 256,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2020,
+				"max_side_px": 2020,
+				"max_w": 1136,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 107,
+				"max_side_px": 107,
+				"max_w": 107,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 157,
+				"max_side_px": 235,
+				"max_w": 235,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 156,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 187,
+				"max_side_px": 217,
+				"max_w": 217,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 143,
+				"max_side_px": 143,
+				"max_w": 143,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 65,
+				"max_side_px": 71,
+				"max_w": 71,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": true
+			},
+			"popups/failure/heart_large.png": {
+				"max_h": 181,
+				"max_side_px": 200,
+				"max_w": 200,
+				"size_limit": 1024,
+				"source_h": 1192,
+				"source_w": 1320,
+				"visible": true
+			},
+			"popups/help/help_scrubby_pose.png": {
+				"max_h": 247,
+				"max_side_px": 835,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1312,
+				"source_w": 1199,
+				"visible": true
+			}
+		},
+		"results_failed@1080x2400": {
+			"boosters/extra_slot.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/random.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/selector.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/states/booster_activated_burst.png": {
+				"max_h": 149,
+				"max_side_px": 149,
+				"max_w": 149,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"boosters/states/booster_free_badge_frame.png": {
+				"max_h": 58,
+				"max_side_px": 60,
+				"max_w": 60,
+				"size_limit": 512,
+				"source_h": 887,
+				"source_w": 1774,
+				"visible": false
+			},
+			"boosters/states/booster_reward_glow.png": {
+				"max_h": 149,
+				"max_side_px": 149,
+				"max_w": 149,
+				"size_limit": 512,
+				"source_h": 1262,
+				"source_w": 1246,
+				"visible": false
+			},
+			"boosters/states/booster_selected_ring.png": {
+				"max_h": 140,
+				"max_side_px": 140,
+				"max_w": 140,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/states/booster_unavailable_overlay.png": {
+				"max_h": 120,
+				"max_side_px": 120,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/tornado.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 854,
+				"max_side_px": 854,
+				"max_w": 728,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": false
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 195,
+				"max_side_px": 195,
+				"max_w": 195,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": false
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 240,
+				"max_side_px": 881,
+				"max_w": 881,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/master/gameplay_v02_shell_5slot_3col.png": {
+				"max_h": 2160,
+				"max_side_px": 2160,
+				"max_w": 1080,
+				"size_limit": 0,
+				"source_h": 1774,
+				"source_w": 887,
+				"visible": true
+			},
+			"gameplay/profile/scrubby_portrait.png": {
+				"max_h": 137,
+				"max_side_px": 137,
+				"max_w": 132,
+				"size_limit": 0,
+				"source_h": 256,
+				"source_w": 256,
+				"visible": true
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2231,
+				"max_side_px": 2231,
+				"max_w": 1255,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 112,
+				"max_side_px": 112,
+				"max_w": 112,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 165,
+				"max_side_px": 248,
+				"max_w": 248,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 164,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 197,
+				"max_side_px": 229,
+				"max_w": 229,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 150,
+				"max_side_px": 150,
+				"max_w": 150,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 68,
+				"max_side_px": 74,
+				"max_w": 74,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": false
+			},
+			"popups/failure/fail_header_emblem.png": {
+				"max_h": 96,
+				"max_side_px": 96,
+				"max_w": 96,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"popups/help/help_scrubby_pose.png": {
+				"max_h": 340,
+				"max_side_px": 340,
+				"max_w": 340,
+				"size_limit": 0,
+				"source_h": 1312,
+				"source_w": 1199,
+				"visible": true
+			}
+		},
+		"results_failed@1536x2048": {
+			"boosters/extra_slot.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/random.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/selector.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/states/booster_activated_burst.png": {
+				"max_h": 142,
+				"max_side_px": 142,
+				"max_w": 142,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"boosters/states/booster_free_badge_frame.png": {
+				"max_h": 55,
+				"max_side_px": 57,
+				"max_w": 57,
+				"size_limit": 512,
+				"source_h": 887,
+				"source_w": 1774,
+				"visible": false
+			},
+			"boosters/states/booster_reward_glow.png": {
+				"max_h": 142,
+				"max_side_px": 142,
+				"max_w": 142,
+				"size_limit": 512,
+				"source_h": 1262,
+				"source_w": 1246,
+				"visible": false
+			},
+			"boosters/states/booster_selected_ring.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/states/booster_unavailable_overlay.png": {
+				"max_h": 114,
+				"max_side_px": 114,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/tornado.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 773,
+				"max_side_px": 773,
+				"max_w": 659,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": false
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 185,
+				"max_side_px": 185,
+				"max_w": 185,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": false
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 228,
+				"max_side_px": 835,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/master/gameplay_v02_shell_5slot_3col.png": {
+				"max_h": 2048,
+				"max_side_px": 2048,
+				"max_w": 1024,
+				"size_limit": 0,
+				"source_h": 1774,
+				"source_w": 887,
+				"visible": true
+			},
+			"gameplay/profile/scrubby_portrait.png": {
+				"max_h": 130,
+				"max_side_px": 130,
+				"max_w": 125,
+				"size_limit": 0,
+				"source_h": 256,
+				"source_w": 256,
+				"visible": true
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2020,
+				"max_side_px": 2020,
+				"max_w": 1136,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 107,
+				"max_side_px": 107,
+				"max_w": 107,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 157,
+				"max_side_px": 235,
+				"max_w": 235,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 156,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 187,
+				"max_side_px": 217,
+				"max_w": 217,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 143,
+				"max_side_px": 143,
+				"max_w": 143,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 65,
+				"max_side_px": 71,
+				"max_w": 71,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": false
+			},
+			"popups/failure/fail_header_emblem.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"popups/help/help_scrubby_pose.png": {
+				"max_h": 323,
+				"max_side_px": 323,
+				"max_w": 323,
+				"size_limit": 0,
+				"source_h": 1312,
+				"source_w": 1199,
+				"visible": true
+			}
+		},
+		"results_won@1080x2400": {
+			"boosters/extra_slot.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/random.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/selector.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/states/booster_activated_burst.png": {
+				"max_h": 149,
+				"max_side_px": 149,
+				"max_w": 149,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"boosters/states/booster_free_badge_frame.png": {
+				"max_h": 58,
+				"max_side_px": 60,
+				"max_w": 60,
+				"size_limit": 512,
+				"source_h": 887,
+				"source_w": 1774,
+				"visible": false
+			},
+			"boosters/states/booster_reward_glow.png": {
+				"max_h": 149,
+				"max_side_px": 149,
+				"max_w": 149,
+				"size_limit": 512,
+				"source_h": 1262,
+				"source_w": 1246,
+				"visible": false
+			},
+			"boosters/states/booster_selected_ring.png": {
+				"max_h": 140,
+				"max_side_px": 140,
+				"max_w": 140,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/states/booster_unavailable_overlay.png": {
+				"max_h": 120,
+				"max_side_px": 120,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/tornado.png": {
+				"max_h": 92,
+				"max_side_px": 92,
+				"max_w": 92,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 854,
+				"max_side_px": 854,
+				"max_w": 728,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": false
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 195,
+				"max_side_px": 195,
+				"max_w": 195,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": false
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 240,
+				"max_side_px": 881,
+				"max_w": 881,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/master/gameplay_v02_shell_5slot_3col.png": {
+				"max_h": 2160,
+				"max_side_px": 2160,
+				"max_w": 1080,
+				"size_limit": 0,
+				"source_h": 1774,
+				"source_w": 887,
+				"visible": true
+			},
+			"gameplay/profile/scrubby_portrait.png": {
+				"max_h": 137,
+				"max_side_px": 137,
+				"max_w": 132,
+				"size_limit": 0,
+				"source_h": 256,
+				"source_w": 256,
+				"visible": true
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2231,
+				"max_side_px": 2231,
+				"max_w": 1255,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 112,
+				"max_side_px": 112,
+				"max_w": 112,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 165,
+				"max_side_px": 248,
+				"max_w": 248,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 164,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 197,
+				"max_side_px": 229,
+				"max_w": 229,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 150,
+				"max_side_px": 150,
+				"max_w": 150,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 68,
+				"max_side_px": 74,
+				"max_w": 74,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": false
+			},
+			"popups/victory/victory_emblem.png": {
+				"max_h": 101,
+				"max_side_px": 101,
+				"max_w": 101,
+				"size_limit": 512,
+				"source_h": 1213,
+				"source_w": 1296,
+				"visible": true
+			},
+			"popups/victory/victory_scrubby_pose.png": {
+				"max_h": 340,
+				"max_side_px": 340,
+				"max_w": 340,
+				"size_limit": 1024,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": true
+			},
+			"robots/bot_parts_icon.png": {
+				"max_h": 76,
+				"max_side_px": 76,
+				"max_w": 76,
+				"size_limit": 512,
+				"source_h": 1287,
+				"source_w": 1222,
+				"visible": true
+			}
+		},
+		"results_won@1536x2048": {
+			"boosters/extra_slot.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/random.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/selector.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/states/booster_activated_burst.png": {
+				"max_h": 142,
+				"max_side_px": 142,
+				"max_w": 142,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"boosters/states/booster_free_badge_frame.png": {
+				"max_h": 55,
+				"max_side_px": 57,
+				"max_w": 57,
+				"size_limit": 512,
+				"source_h": 887,
+				"source_w": 1774,
+				"visible": false
+			},
+			"boosters/states/booster_reward_glow.png": {
+				"max_h": 142,
+				"max_side_px": 142,
+				"max_w": 142,
+				"size_limit": 512,
+				"source_h": 1262,
+				"source_w": 1246,
+				"visible": false
+			},
+			"boosters/states/booster_selected_ring.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/states/booster_unavailable_overlay.png": {
+				"max_h": 114,
+				"max_side_px": 114,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"boosters/tornado.png": {
+				"max_h": 87,
+				"max_side_px": 87,
+				"max_w": 87,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 773,
+				"max_side_px": 773,
+				"max_w": 659,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": false
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 185,
+				"max_side_px": 185,
+				"max_w": 185,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": false
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 228,
+				"max_side_px": 835,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": false
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/master/gameplay_v02_shell_5slot_3col.png": {
+				"max_h": 2048,
+				"max_side_px": 2048,
+				"max_w": 1024,
+				"size_limit": 0,
+				"source_h": 1774,
+				"source_w": 887,
+				"visible": true
+			},
+			"gameplay/profile/scrubby_portrait.png": {
+				"max_h": 130,
+				"max_side_px": 130,
+				"max_w": 125,
+				"size_limit": 0,
+				"source_h": 256,
+				"source_w": 256,
+				"visible": true
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2020,
+				"max_side_px": 2020,
+				"max_w": 1136,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": false
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 107,
+				"max_side_px": 107,
+				"max_w": 107,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 157,
+				"max_side_px": 235,
+				"max_w": 235,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 156,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 187,
+				"max_side_px": 217,
+				"max_w": 217,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 143,
+				"max_side_px": 143,
+				"max_w": 143,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 65,
+				"max_side_px": 71,
+				"max_w": 71,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": false
+			},
+			"popups/victory/victory_emblem.png": {
+				"max_h": 96,
+				"max_side_px": 96,
+				"max_w": 96,
+				"size_limit": 512,
+				"source_h": 1213,
+				"source_w": 1296,
+				"visible": true
+			},
+			"popups/victory/victory_scrubby_pose.png": {
+				"max_h": 323,
+				"max_side_px": 323,
+				"max_w": 323,
+				"size_limit": 1024,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": true
+			},
+			"robots/bot_parts_icon.png": {
+				"max_h": 73,
+				"max_side_px": 73,
+				"max_w": 73,
+				"size_limit": 512,
+				"source_h": 1287,
+				"source_w": 1222,
+				"visible": true
+			}
+		},
+		"robots@1080x2400": {
+			"characters/robots/atlas/atlas_portrait.png": {
+				"max_h": 195,
+				"max_side_px": 195,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1287,
+				"source_w": 1222,
+				"visible": true
+			},
+			"characters/robots/bubbles/bubbles_portrait.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/robots/clippy/clippy_portrait.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1268,
+				"source_w": 1240,
+				"visible": true
+			},
+			"characters/robots/dusty/dusty_portrait.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": true
+			},
+			"characters/robots/moppy/moppy_portrait.png": {
+				"max_h": 133,
+				"max_side_px": 133,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1266,
+				"source_w": 1242,
+				"visible": true
+			},
+			"characters/robots/polly/polly_portrait.png": {
+				"max_h": 133,
+				"max_side_px": 133,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/robots/rinse/rinse_portrait.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1290,
+				"source_w": 1219,
+				"visible": true
+			},
+			"characters/robots/spark/spark_portrait.png": {
+				"max_h": 133,
+				"max_side_px": 133,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/robots/squeegee/squeegee_portrait.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 120,
+				"size_limit": 512,
+				"source_h": 1292,
+				"source_w": 1218,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 854,
+				"max_side_px": 854,
+				"max_w": 728,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 195,
+				"max_side_px": 195,
+				"max_w": 195,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 1572,
+				"max_side_px": 1572,
+				"max_w": 881,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": true
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2231,
+				"max_side_px": 2231,
+				"max_w": 1255,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 112,
+				"max_side_px": 112,
+				"max_w": 112,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 165,
+				"max_side_px": 248,
+				"max_w": 248,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 164,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 197,
+				"max_side_px": 229,
+				"max_w": 229,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 150,
+				"max_side_px": 150,
+				"max_w": 150,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 68,
+				"max_side_px": 74,
+				"max_w": 74,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": true
+			},
+			"robots/bot_parts_icon.png": {
+				"max_h": 56,
+				"max_side_px": 56,
+				"max_w": 56,
+				"size_limit": 512,
+				"source_h": 1287,
+				"source_w": 1222,
+				"visible": true
+			}
+		},
+		"robots@1536x2048": {
+			"characters/robots/atlas/atlas_portrait.png": {
+				"max_h": 185,
+				"max_side_px": 185,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1287,
+				"source_w": 1222,
+				"visible": true
+			},
+			"characters/robots/bubbles/bubbles_portrait.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/robots/clippy/clippy_portrait.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1268,
+				"source_w": 1240,
+				"visible": true
+			},
+			"characters/robots/dusty/dusty_portrait.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": true
+			},
+			"characters/robots/moppy/moppy_portrait.png": {
+				"max_h": 127,
+				"max_side_px": 127,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1266,
+				"source_w": 1242,
+				"visible": true
+			},
+			"characters/robots/polly/polly_portrait.png": {
+				"max_h": 127,
+				"max_side_px": 127,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/robots/rinse/rinse_portrait.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1290,
+				"source_w": 1219,
+				"visible": true
+			},
+			"characters/robots/spark/spark_portrait.png": {
+				"max_h": 127,
+				"max_side_px": 127,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/robots/squeegee/squeegee_portrait.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 114,
+				"size_limit": 512,
+				"source_h": 1292,
+				"source_w": 1218,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 773,
+				"max_side_px": 773,
+				"max_w": 659,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 185,
+				"max_side_px": 185,
+				"max_w": 185,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 1491,
+				"max_side_px": 1491,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": true
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2020,
+				"max_side_px": 2020,
+				"max_w": 1136,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 107,
+				"max_side_px": 107,
+				"max_w": 107,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 157,
+				"max_side_px": 235,
+				"max_w": 235,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 156,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 187,
+				"max_side_px": 217,
+				"max_w": 217,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 143,
+				"max_side_px": 143,
+				"max_w": 143,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 65,
+				"max_side_px": 71,
+				"max_w": 71,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": true
+			},
+			"robots/bot_parts_icon.png": {
+				"max_h": 54,
+				"max_side_px": 54,
+				"max_w": 54,
+				"size_limit": 512,
+				"source_h": 1287,
+				"source_w": 1222,
+				"visible": true
+			}
+		},
+		"shop@1080x2400": {
+			"boosters/extra_slot.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/random.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/selector.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/tornado.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 854,
+				"max_side_px": 854,
+				"max_w": 728,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 195,
+				"max_side_px": 195,
+				"max_w": 195,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 110,
+				"max_side_px": 110,
+				"max_w": 110,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 1552,
+				"max_side_px": 1552,
+				"max_w": 881,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": true
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2231,
+				"max_side_px": 2231,
+				"max_w": 1255,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 132,
+				"max_side_px": 132,
+				"max_w": 132,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 82,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 82,
+				"max_side_px": 182,
+				"max_w": 182,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 112,
+				"max_side_px": 112,
+				"max_w": 112,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 165,
+				"max_side_px": 248,
+				"max_w": 248,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_no_ads.png": {
+				"max_h": 108,
+				"max_side_px": 108,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 164,
+				"max_side_px": 164,
+				"max_w": 164,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 197,
+				"max_side_px": 229,
+				"max_w": 229,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 164,
+				"max_side_px": 181,
+				"max_w": 181,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 150,
+				"max_side_px": 150,
+				"max_w": 150,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 68,
+				"max_side_px": 74,
+				"max_w": 74,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": true
+			},
+			"shop/shop_heart_bundle.png": {
+				"max_h": 88,
+				"max_side_px": 88,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1122,
+				"source_w": 1402,
+				"visible": true
+			},
+			"shop/shop_scrub_bucks_bundle.png": {
+				"max_h": 150,
+				"max_side_px": 150,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": true
+			},
+			"shop/shop_speed_2x_icon.png": {
+				"max_h": 108,
+				"max_side_px": 108,
+				"max_w": 88,
+				"size_limit": 512,
+				"source_h": 1230,
+				"source_w": 1278,
+				"visible": true
+			}
+		},
+		"shop@1536x2048": {
+			"boosters/extra_slot.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/random.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/selector.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"boosters/tornado.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_home_pose.png": {
+				"max_h": 773,
+				"max_side_px": 773,
+				"max_w": 659,
+				"size_limit": 0,
+				"source_h": 1358,
+				"source_w": 1158,
+				"visible": true
+			},
+			"characters/scrubby/scrubby_portrait.png": {
+				"max_h": 185,
+				"max_side_px": 185,
+				"max_w": 185,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"common/currencies/icon_currency_heart.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1167,
+				"source_w": 1348,
+				"visible": true
+			},
+			"common/currencies/icon_currency_scrub_bucks.png": {
+				"max_h": 105,
+				"max_side_px": 105,
+				"max_w": 105,
+				"size_limit": 512,
+				"source_h": 1145,
+				"source_w": 1374,
+				"visible": true
+			},
+			"common/frames/popup_large_frame.png": {
+				"max_h": 1472,
+				"max_side_px": 1472,
+				"max_w": 835,
+				"size_limit": 0,
+				"source_h": 1374,
+				"source_w": 1145,
+				"visible": true
+			},
+			"common/navigation/icon_nav_events.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_home.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_leaderboard.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_robots.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"common/navigation/icon_nav_settings.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/speech_bubble.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_highlight_ring.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"gameplay/tutorial/tutorial_pointer.png": {
+				"max_h": 0,
+				"max_side_px": 0,
+				"max_w": 0,
+				"size_limit": 0,
+				"source_h": 1278,
+				"source_w": 1230,
+				"visible": false
+			},
+			"home/background/home_background.png": {
+				"max_h": 2020,
+				"max_side_px": 2020,
+				"max_w": 1136,
+				"size_limit": 0,
+				"source_h": 1672,
+				"source_w": 940,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_emblem.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/gift_meter/gift_meter_reward_crate.png": {
+				"max_h": 126,
+				"max_side_px": 126,
+				"max_w": 126,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/reward_track/reward_gift_1.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_10.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_100.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_25.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/reward_gift_5.png": {
+				"max_h": 78,
+				"max_side_px": 275,
+				"max_w": 275,
+				"size_limit": 1024,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/reward_track/win_streak_reward_badge.png": {
+				"max_h": 107,
+				"max_side_px": 107,
+				"max_w": 107,
+				"size_limit": 512,
+				"source_h": 1263,
+				"source_w": 1245,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_collection.png": {
+				"max_h": 157,
+				"max_side_px": 235,
+				"max_w": 235,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_daily.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1315,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_no_ads.png": {
+				"max_h": 103,
+				"max_side_px": 103,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": true
+			},
+			"home/shortcuts/icon_shortcut_rewarded_ads.png": {
+				"max_h": 156,
+				"max_side_px": 156,
+				"max_w": 156,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_shop.png": {
+				"max_h": 187,
+				"max_side_px": 217,
+				"max_w": 217,
+				"size_limit": 512,
+				"source_h": 1164,
+				"source_w": 1351,
+				"visible": false
+			},
+			"home/shortcuts/icon_shortcut_tasks.png": {
+				"max_h": 156,
+				"max_side_px": 171,
+				"max_w": 171,
+				"size_limit": 512,
+				"source_h": 1197,
+				"source_w": 1314,
+				"visible": false
+			},
+			"home/top_hud/profile_avatar_frame.png": {
+				"max_h": 143,
+				"max_side_px": 143,
+				"max_w": 143,
+				"size_limit": 512,
+				"source_h": 1254,
+				"source_w": 1254,
+				"visible": true
+			},
+			"home/top_hud/profile_rank_badge.png": {
+				"max_h": 65,
+				"max_side_px": 71,
+				"max_w": 71,
+				"size_limit": 512,
+				"source_h": 1194,
+				"source_w": 1317,
+				"visible": true
+			},
+			"shop/shop_heart_bundle.png": {
+				"max_h": 84,
+				"max_side_px": 84,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1122,
+				"source_w": 1402,
+				"visible": true
+			},
+			"shop/shop_scrub_bucks_bundle.png": {
+				"max_h": 143,
+				"max_side_px": 143,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1024,
+				"source_w": 1536,
+				"visible": true
+			},
+			"shop/shop_speed_2x_icon.png": {
+				"max_h": 103,
+				"max_side_px": 103,
+				"max_w": 84,
+				"size_limit": 512,
+				"source_h": 1230,
+				"source_w": 1278,
+				"visible": true
+			}
+		}
+	},
+	"skipped": {}
+}
