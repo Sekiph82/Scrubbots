@@ -1,0 +1,1 @@
+{ "id": "038-m22-026-measured-caps", "task": "SB-M22-026 step 2: runtime-measured draw sizes -> size_limit caps for main screens", "branch": "factory/038-m22-026-measured-caps", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/038-m22-026-measured-caps", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "PASS", "tests": "PASS" } }
