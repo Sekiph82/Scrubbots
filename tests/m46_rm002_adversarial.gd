@@ -433,6 +433,10 @@ func _boot_play(level: int) -> void:
 	_prov = ProviderDouble.new()
 	_eco().rewarded.set_provider(_prov)
 	_root.get_modal_stack().clear("t")
+	# SB-M44-031: boosters are locked on a fresh L2 profile; open them in the in-memory unlock
+	# table so the L2 booster coach this suite exercises still runs.
+	for b in ["plus_one_slot", "random", "selector", "tornado"]:
+		_root.get_app_state().unlocks.cfg["unlocks"][b] = 1
 	_root.get_app_state().progression.debug_set_current_level(level)
 	_root.play_current_frontier()
 	await _frames(6)
