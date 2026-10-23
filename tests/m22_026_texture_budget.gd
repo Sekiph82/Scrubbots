@@ -1,6 +1,7 @@
 extends SceneTree
-## SB-M22-026 steps 1-3 — per-screen resident RGBA8 texture budgets (Home, Gameplay, Results,
-## Shop/Collection) and the size_limit'ed textures (alpha kept, loaded <= limit).
+## SB-M22-026 steps 1-4 — per-screen resident RGBA8 texture budgets (Home, Gameplay, Results,
+## Shop/Collection; step 4: Daily/Tasks, Profile, Ceremonies, Robots detail, Popups, Results
+## variants, Coachmarks) and the size_limit'ed textures (alpha kept, loaded <= limit).
 ## Path lists come from tools/m22_026_texture_inventory.py reference data plus the textures the
 ## step 2 runtime measurement (tests/tools/m22_026_texture_measure.gd) showed on screen
 ## (UI-ADR-008); a texture shared by two screens counts on both. Step 3: the 135 catalog card arts
@@ -69,8 +70,95 @@ const SHOP_COLLECTION := [
 	"common/frames/popup_large_frame.png", "common/frames/popup_reward_frame.png",
 	"popups/victory/reward_glow.png", "robots/bot_parts_icon.png",
 ]
+## Step 4 (UI-ADR-008 step 4): per-screen lists from the step 4 measurement: the final/ textures
+## the screen's scenarios draw outside the Home layer, minus what the screen underneath already
+## draws (Gameplay under booster popups, Results variants and coachmarks; Fail Results under Need
+## a Hand); catalog card art excluded.
+const DAILY_TASKS := [
+	"common/frames/popup_large_frame.png", "common/frames/popup_medium_frame.png",
+	"daily/daily_login_calendar.png", "daily/daily_streak_flame.png", "daily/daily_task_check.png",
+	"rewards/chest_small.png", "rewards/gift_box.png",
+]
+const PROFILE_EVENTS := [
+	"characters/scrubby/scrubby_portrait.png", "common/frames/popup_large_frame.png",
+	"common/frames/popup_medium_frame.png", "popups/help/help_scrubby_pose.png",
+]
+const CEREMONIES := [
+	"characters/robots/atlas/atlas_master.png", "characters/robots/bubbles/bubbles_master.png",
+	"characters/robots/clippy/clippy_master.png", "characters/robots/dusty/dusty_master.png",
+	"characters/robots/moppy/moppy_master.png", "characters/robots/polly/polly_master.png",
+	"characters/robots/rinse/rinse_master.png", "characters/robots/spark/spark_master.png",
+	"characters/robots/squeegee/squeegee_master.png", "characters/scrubby/scrubby_master.png",
+	"collection/collection_complete_emblem.png", "collection/master_collection_emblem.png",
+	"collection/states/card_back.png", "collection/states/card_new_glow.png",
+	"common/currencies/icon_currency_scrub_bucks.png", "common/frames/popup_large_frame.png",
+	"common/frames/popup_medium_frame.png", "common/frames/popup_reward_frame.png",
+	"gameplay/tutorial/speech_bubble.png", "home/background/home_background.png",
+	"home/gift_meter/gift_meter_reward_crate.png", "home/shortcuts/icon_shortcut_cards_exchange.png",
+	"home/shortcuts/icon_shortcut_collection.png", "popups/victory/reward_glow.png",
+	"rewards/booster_of_choice.png", "rewards/card_pack_premium.png",
+	"rewards/card_pack_standard.png", "rewards/gift_box.png",
+	"rewards/pack_opening/premium/frame_01_closed.png",
+	"rewards/pack_opening/premium/frame_02_charge.png",
+	"rewards/pack_opening/premium/frame_03_pressure.png",
+	"rewards/pack_opening/premium/frame_04_first_tear.png",
+	"rewards/pack_opening/premium/frame_05_tear_widens.png",
+	"rewards/pack_opening/premium/frame_06_card_edge.png",
+	"rewards/pack_opening/premium/frame_07_one_card_rises.png",
+	"rewards/pack_opening/premium/frame_08_cards_emerge.png",
+	"rewards/pack_opening/premium/frame_09_final_reveal.png",
+	"rewards/pack_opening/standard/frame_01_closed.png",
+	"rewards/pack_opening/standard/frame_02_charge.png",
+	"rewards/pack_opening/standard/frame_03_pressure.png",
+	"rewards/pack_opening/standard/frame_04_first_tear.png",
+	"rewards/pack_opening/standard/frame_05_tear_widens.png",
+	"rewards/pack_opening/standard/frame_06_card_edge.png",
+	"rewards/pack_opening/standard/frame_07_one_card_rises.png",
+	"rewards/pack_opening/standard/frame_08_cards_emerge.png",
+	"rewards/pack_opening/standard/frame_09_final_reveal.png", "robots/bot_parts_icon.png",
+	"robots/perks/perk_booster_discount.png", "robots/perks/perk_cards_exchange_bonus.png",
+	"robots/perks/perk_daily_task_bonus.png", "robots/perks/perk_first_clear_sb_bonus.png",
+	"robots/perks/perk_gift_bar_sb_bonus.png", "robots/perks/perk_heart_refill_discount.png",
+	"robots/perks/perk_master_cleaner.png", "robots/perks/perk_speed_2x_discount.png",
+	"robots/perks/perk_win_streak_bonus.png", "robots/robot_unlocked_burst.png",
+]
+const ROBOTS_DETAIL := [
+	"characters/robots/atlas/atlas_master.png", "characters/robots/bubbles/bubbles_master.png",
+	"characters/robots/clippy/clippy_master.png", "characters/robots/dusty/dusty_master.png",
+	"characters/robots/moppy/moppy_master.png", "characters/robots/polly/polly_master.png",
+	"characters/robots/rinse/rinse_master.png", "characters/robots/spark/spark_master.png",
+	"characters/robots/squeegee/squeegee_master.png", "common/frames/popup_large_frame.png",
+	"robots/robot_lock_emblem.png",
+]
+const POPUPS := [
+	"common/currencies/icon_currency_scrub_bucks.png", "common/frames/popup_medium_frame.png",
+	"common/frames/popup_reward_frame.png", "home/shortcuts/icon_shortcut_no_ads.png",
+	"shop/shop_heart_bundle.png", "shop/shop_scrub_bucks_bundle.png", "shop/shop_speed_2x_icon.png",
+]
+const RESULTS_VARIANTS := [
+	"common/currencies/icon_currency_heart.png", "common/currencies/icon_currency_scrub_bucks.png",
+	"home/gift_meter/gift_meter_emblem.png", "home/reward_track/win_streak_reward_badge.png",
+	"popups/failure/fail_header_emblem.png", "popups/help/help_scrubby_pose.png",
+	"popups/help/robots/atlas_help_pose.png", "popups/help/robots/bubbles_help_pose.png",
+	"popups/help/robots/clippy_help_pose.png", "popups/help/robots/dusty_help_pose.png",
+	"popups/help/robots/moppy_help_pose.png", "popups/help/robots/polly_help_pose.png",
+	"popups/help/robots/rinse_help_pose.png", "popups/help/robots/spark_help_pose.png",
+	"popups/help/robots/squeegee_help_pose.png", "popups/victory/robots/atlas_victory_pose.png",
+	"popups/victory/robots/bubbles_victory_pose.png", "popups/victory/robots/clippy_victory_pose.png",
+	"popups/victory/robots/dusty_victory_pose.png", "popups/victory/robots/moppy_victory_pose.png",
+	"popups/victory/robots/polly_victory_pose.png", "popups/victory/robots/rinse_victory_pose.png",
+	"popups/victory/robots/spark_victory_pose.png", "popups/victory/robots/squeegee_victory_pose.png",
+	"popups/victory/victory_emblem.png", "popups/victory/victory_scrubby_pose.png",
+	"rewards/card_pack_standard.png", "rewards/gift_box.png", "robots/bot_parts_icon.png",
+]
+const COACHMARKS := [
+	"gameplay/tutorial/speech_bubble.png", "gameplay/tutorial/tutorial_highlight_ring.png",
+	"gameplay/tutorial/tutorial_pointer.png",
+]
 ## Measured resident MiB after the step 2 caps (UI-ADR-008) plus ~10% headroom.
-const BUDGET_MIB := {"Home": 117, "Gameplay": 69, "Results": 32, "Shop/Collection": 41}
+const BUDGET_MIB := {"Home": 117, "Gameplay": 69, "Results": 32, "Shop/Collection": 41,
+	# step 4: measured after the step 4 caps plus ~10%
+	"Daily/Tasks": 32, "Profile/Events/Achievements": 21, "Ceremonies": 230, "Robots detail": 41, "Popups": 18, "Results variants": 83, "Coachmarks": 15}
 ## process/size_limit set by step 1 (small icons with a known draw side, 4x rule).
 const LIMITED := {
 	"common/icons/icon_clock.png": 256,
@@ -80,7 +168,8 @@ const LIMITED := {
 	"popups/failure/heart_large.png": 1024,
 }
 ## process/size_limit set by step 2: next_pow2(max(2 x measured max side px, 512))
-## (tools/m22_026_apply_caps.py over the m22_026_texture_measure.gd report).
+## (tools/m22_026_apply_caps.py over the m22_026_texture_measure.gd report); step 4 entries
+## from the merged step 2 + step 4 map (coordination/sessions/FACTORY/043-m22-026-more-screens).
 const MEASURED := {
 	"cards_exchange/cards_exchange_header_emblem.png": 512,
 	"characters/robots/atlas/atlas_portrait.png": 512,
@@ -127,6 +216,52 @@ const MEASURED := {
 	"shop/shop_heart_bundle.png": 512,
 	"shop/shop_scrub_bucks_bundle.png": 512,
 	"shop/shop_speed_2x_icon.png": 512,
+	# step 4
+	"characters/robots/atlas/atlas_master.png": 1024,
+	"characters/robots/bubbles/bubbles_master.png": 1024,
+	"characters/robots/clippy/clippy_master.png": 1024,
+	"characters/robots/dusty/dusty_master.png": 1024,
+	"characters/robots/moppy/moppy_master.png": 1024,
+	"characters/robots/polly/polly_master.png": 1024,
+	"characters/robots/rinse/rinse_master.png": 1024,
+	"characters/robots/spark/spark_master.png": 1024,
+	"characters/robots/squeegee/squeegee_master.png": 1024,
+	"characters/scrubby/scrubby_master.png": 1024,
+	"collection/states/card_back.png": 512,
+	"gameplay/tutorial/tutorial_pointer.png": 512,
+	"home/shortcuts/icon_shortcut_cards_exchange.png": 512,
+	"popups/help/robots/atlas_help_pose.png": 1024,
+	"popups/help/robots/bubbles_help_pose.png": 1024,
+	"popups/help/robots/clippy_help_pose.png": 1024,
+	"popups/help/robots/dusty_help_pose.png": 1024,
+	"popups/help/robots/moppy_help_pose.png": 1024,
+	"popups/help/robots/polly_help_pose.png": 1024,
+	"popups/help/robots/rinse_help_pose.png": 1024,
+	"popups/help/robots/spark_help_pose.png": 1024,
+	"popups/help/robots/squeegee_help_pose.png": 1024,
+	"popups/victory/robots/atlas_victory_pose.png": 1024,
+	"popups/victory/robots/bubbles_victory_pose.png": 1024,
+	"popups/victory/robots/clippy_victory_pose.png": 1024,
+	"popups/victory/robots/dusty_victory_pose.png": 1024,
+	"popups/victory/robots/moppy_victory_pose.png": 1024,
+	"popups/victory/robots/polly_victory_pose.png": 1024,
+	"popups/victory/robots/rinse_victory_pose.png": 1024,
+	"popups/victory/robots/spark_victory_pose.png": 1024,
+	"popups/victory/robots/squeegee_victory_pose.png": 1024,
+	"rewards/booster_of_choice.png": 512,
+	"rewards/card_pack_premium.png": 512,
+	"rewards/card_pack_standard.png": 512,
+	"robots/perks/perk_booster_discount.png": 512,
+	"robots/perks/perk_cards_exchange_bonus.png": 512,
+	"robots/perks/perk_daily_task_bonus.png": 512,
+	"robots/perks/perk_first_clear_sb_bonus.png": 512,
+	"robots/perks/perk_gift_bar_sb_bonus.png": 512,
+	"robots/perks/perk_heart_refill_discount.png": 512,
+	"robots/perks/perk_master_cleaner.png": 512,
+	"robots/perks/perk_speed_2x_discount.png": 512,
+	"robots/perks/perk_win_streak_bonus.png": 512,
+	"robots/robot_lock_emblem.png": 512,
+	"robots/robot_unlocked_burst.png": 1024,
 }
 
 var _fail := 0
@@ -140,8 +275,15 @@ func _initialize() -> void:
 	_screen("Gameplay", GAMEPLAY)
 	_screen("Results", RESULTS)
 	_screen("Shop/Collection", SHOP_COLLECTION)
+	_screen("Daily/Tasks", DAILY_TASKS)
+	_screen("Profile/Events/Achievements", PROFILE_EVENTS)
+	_screen("Ceremonies", CEREMONIES)
+	_screen("Robots detail", ROBOTS_DETAIL)
+	_screen("Popups", POPUPS)
+	_screen("Results variants", RESULTS_VARIANTS)
+	_screen("Coachmarks", COACHMARKS)
 	_limited("size_limit step 1", LIMITED)
-	_limited("size_limit step 2 (measured)", MEASURED)
+	_limited("size_limit steps 2 and 4 (measured)", MEASURED)
 	_card_art()
 	_done()
 
