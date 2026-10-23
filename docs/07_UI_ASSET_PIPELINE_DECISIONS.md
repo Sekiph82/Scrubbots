@@ -149,7 +149,7 @@ Untouched and why:
 - 85 whose computed limit is not below the source: the 63 Home gesture frames (464x512 source, drawn at 965 px), `home/background/home_background.png`, `characters/scrubby/scrubby_home_pose.png`, `popups/help/help_scrubby_pose.png`, the three popup frames, both gameplay shells, `gameplay/profile/scrubby_portrait.png` and the 13 card arts seen in card detail (540 px, so 2048 > 1536 source).
 - 11 already limited keep their value: the 9 observed boosters (512, UI-ADR-007), `common/icons/icon_clock.png` (256) and `popups/failure/heart_large.png` (1024, step 1; the 2x rule would give 512).
 
-**Known limit**: the cap covers the sizes the scenarios show. A texture drawn larger on a screen the tool does not visit would show at less than 2x there. Add that screen to the tool and re-run the apply step before shipping art on it. Step 4 added the remaining served screens; it found two step 2 caps under 2x on ceremonies (`master_collection_emblem`, `gift_meter_reward_crate`, see step 4) and lists the art still unobserved.
+**Known limit**: the cap covers the sizes the scenarios show. A texture drawn larger on a screen the tool does not visit would show at less than 2x there. Add that screen to the tool and re-run the apply step before shipping art on it. Step 4 added the remaining served screens; it found two step 2 caps under 2x on ceremonies (`master_collection_emblem`, `gift_meter_reward_crate`), raised them to 1024 (see step 4) and lists the art still unobserved.
 
 **Status**: Factory job 038, 2026-10-23 (SB-M22-026 step 2). Still open: VRAM compression, atlasing. Card art loading: done in step 3.
 
@@ -177,7 +177,7 @@ Before -> after resident RGBA8:
 
 Result: `M22-026 MEASURE: DONE (52 scenarios, 219 textures)`. **75 of the 416 PNGs that step 2 never saw are now observed** (all with a non-zero size), and the 3 tutorial textures step 2 saw only at size 0 now have sizes (speech bubble 820 px, highlight ring 892 px, pointer 122 px). The merged map has 219 paths; every step 2 value is kept or larger. **45 newly capped** (16 to 512, 29 to 1024): the 10 robot masters, 9 help poses, 9 victory poses and `robots/robot_unlocked_burst.png` (1024), the 9 perk icons, `robots/robot_lock_emblem.png`, `rewards/card_pack_standard.png`, `card_pack_premium.png`, `booster_of_choice.png`, `collection/states/card_back.png`, `home/shortcuts/icon_shortcut_cards_exchange.png` and `gameplay/tutorial/tutorial_pointer.png` (512). The smallest limit / measured side ratio is 2.25 (`robots/robot_unlocked_burst.png`, 456 px -> 1024). A dry run afterwards reports `would cap 0 texture(s)`. Re-measuring after the re-import gives the same sides except rounding changes of 1-2 px (victory emblem 101 -> 102 on the phone, 95 -> 97 on the tablet; pointer 108 -> 109), so no layout depends on texture size.
 
-Resident RGBA8 of the whole `assets/ui/final/` library (`tools/m22_026_texture_inventory.py`): **2260.4 -> 2096.9 MiB (-163.5 MiB)**; the 45 files alone 268.0 -> 104.5 MiB.
+Resident RGBA8 of the whole `assets/ui/final/` library (`tools/m22_026_texture_inventory.py`): **2260.4 -> 2102.9 MiB (-157.5 MiB)**: the 45 new caps save 163.5 MiB (268.0 -> 104.5), the two raised caps below add 6.0 MiB.
 
 Per-screen resident RGBA8 for the new screen groups (`tests/m22_026_texture_budget.gd`; the textures the group's scenarios draw outside the Home layer, minus what the screen underneath already draws: Gameplay under booster popups, Results variants and coachmarks, the Fail screen under Need a Hand; catalog card art excluded):
 
@@ -185,20 +185,20 @@ Per-screen resident RGBA8 for the new screen groups (`tests/m22_026_texture_budg
 |---|---:|---|---:|
 | Daily/Tasks (daily, rewarded ads) | 7 | 28.20 -> 28.20 | 32 |
 | Profile/Events/Achievements | 4 | 19.00 -> 19.00 | 21 |
-| Ceremonies (meta ceremonies, robot unlock, packs) | 57 | 306.78 -> 208.91 | 230 |
+| Ceremonies (meta ceremonies, robot unlock, packs) | 57 | 306.78 -> 214.91 | 230 |
 | Robots detail | 11 | 66.01 -> 36.94 | 41 |
 | Popups (help, settings, insufficient, shop pages, booster popups, Need a Hand) | 7 | 16.17 -> 16.17 | 18 |
 | Results variants (reward rows, all robot poses) | 29 | 136.43 -> 75.42 | 83 |
 | Coachmarks (bubble, ring, pointer) | 3 | 18.00 -> 12.96 | 15 |
 
-"Before" uses the source size for the 45 newly capped files; "after" is the imported size. Existing budgets stay; the step 2 Results list drops 28.41 -> 23.08 MiB (`card_pack_standard.png` capped) under its unchanged 32 MiB budget.
+"Before" uses the source size for the 45 newly capped files; "after" is the imported size, including the two raised caps. Existing budgets stay: the step 2 Results list drops 28.41 -> 23.08 MiB (`card_pack_standard.png` capped, budget 32), Home rises 106.02 -> 109.02 MiB (budget 117) and Shop/Collection 36.98 -> 39.98 MiB (budget 41) from the raised caps.
 
 Whole-tree MiB the measure tool reports (everything loaded in the SubViewport, Home included), before -> after the re-import, equal at both viewports: Daily 95.13 -> 90.09, Rewarded Ads 72.93 -> 67.89, Profile 84.93 -> 79.89, Help 72.93 -> 67.89, Settings 72.93 -> 67.89, Robots detail 132.94 -> 98.83, Ceremonies 145.91 -> 121.87, Robot unlock 199.88 -> 121.06, Packs 222.66 -> 212.53, Need a Hand 100.65 -> 95.62, Insufficient 78.93 -> 73.89, Booster popups 93.65 -> 88.62, Results variants 220.39 -> 154.36, Shop pages 86.26 -> 81.23, Coachmarks 87.65 -> 82.61. Every step 2 scenario also drops 5.04 MiB (the coachmark layer keeps `tutorial_pointer.png` loaded on every screen), e.g. Home 130.02 -> 124.98.
 
-Step 2 caps the new screens draw larger (kept, the rule never changes an existing limit):
+Step 2 caps the new screens draw larger than 2x allows, raised from 512 to 1024 (orchestrator decision: raising keeps the rule, only lowering is forbidden; 1024 < the 1254 source):
 - `collection/master_collection_emblem.png`: 320 px on the Master ceremony, limit 512 = 1.60x.
 - `home/gift_meter/gift_meter_reward_crate.png`: 300 px on the 1000 Gift milestone ceremony, limit 512 = 1.71x.
-These two are below the 2x rule on those ceremonies (follow-up below). `characters/scrubby/scrubby_portrait.png` reports 880 px on Profile, but that is the 880x220 hero rect; the keep-aspect art draws at 220 px, so 512 is 2.3x. The boosters (170 px in Need a Hand, 512 = 3.0x), `popups/victory/reward_glow.png` (368 px, 1024), `robots/bot_parts_icon.png` (88 px, 512) and the popup frames (no limit) stay within the rule.
+Both are now 3.2x / 3.4x. `characters/scrubby/scrubby_portrait.png` reports 880 px on Profile, but that is the 880x220 hero rect; the keep-aspect art draws at 220 px, so 512 is 2.3x. The boosters (170 px in Need a Hand, 512 = 3.0x), `popups/victory/reward_glow.png` (368 px, 1024), `robots/bot_parts_icon.png` (88 px, 512) and the popup frames (no limit) stay within the rule.
 
 Still unobserved: 341 of the 560 PNGs, and why:
 - 162 with no literal runtime reference (unused or not wired art): gameplay 42 (old slot/batch/rail/railway/control/decorative art, the 4-col and 5-col shells, the gameplay master), common 36 (icons, badges, button frames), characters 20 (robot face-blink/tool-arm layers, crew group, rail scrubbot), popups 10, robots 9, collection 8, system 8 (splash, loading, placeholders), branding 7 (app icons, logos), cards_exchange 5, marketing 5, rewards 4, shop 4, difficulty 2, boosters 1 (`booster_tutorial_pointer.png`), daily 1.
@@ -211,6 +211,6 @@ Still unobserved: 341 of the 560 PNGs, and why:
 - 2 defined but not drawn: `popups/failure/refill_heart_bundle.png` (unused constant), `shop/shop_header_emblem.png` (only the no-economy fallback Shop popup).
 - RANKS is not served (BottomNav waits for the SB-M43-131 owner policy) and the opening cinematic is a video (`assets/brand/opening/*.ogv`), so neither has a `final/` texture to measure.
 
-**Follow-up (not done here, the spec forbids changing existing caps)**: raise `collection/master_collection_emblem.png` and `home/gift_meter/gift_meter_reward_crate.png` to 1024 so the Master and 1000-milestone ceremonies keep 2x. The warning/small popup frames and the equipped-robot art need a scenario before their art can be capped.
+**Follow-up**: the warning/small popup frames and the equipped-robot art need a scenario before their art can be capped.
 
 **Status**: Factory job 043, 2026-10-23 (SB-M22-026 step 4). Still open: VRAM compression, atlasing.
