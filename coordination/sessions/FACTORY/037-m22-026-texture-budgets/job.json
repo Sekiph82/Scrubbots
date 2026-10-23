@@ -1,0 +1,1 @@
+{ "id": "037-m22-026-texture-budgets", "task": "SB-M22-026 per-screen texture memory budgets for remaining final art", "branch": "factory/037-m22-026-texture-budgets", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/037-m22-026-texture-budgets", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "PASS", "tests": "PASS" } }
