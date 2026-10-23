@@ -1,8 +1,9 @@
 extends SceneTree
-## SB-M22-026 step 1 — per-screen resident RGBA8 texture budgets (Home, Gameplay, Results,
-## Shop/Collection) and the size_limit'ed small icons (alpha kept, loaded <= limit).
-## Path lists come from tools/m22_026_texture_inventory.py reference data (UI-ADR-008);
-## a texture shared by two screens counts on both.
+## SB-M22-026 steps 1+2 — per-screen resident RGBA8 texture budgets (Home, Gameplay, Results,
+## Shop/Collection) and the size_limit'ed textures (alpha kept, loaded <= limit).
+## Path lists come from tools/m22_026_texture_inventory.py reference data plus the textures the
+## step 2 runtime measurement (tests/tools/m22_026_texture_measure.gd) showed on screen
+## (UI-ADR-008); a texture shared by two screens counts on both.
 ## Run: godot --headless --path . -s res://tests/m22_026_texture_budget.gd
 
 const F := "res://assets/ui/final/"
@@ -37,6 +38,8 @@ const GAMEPLAY := [
 	"gameplay/railroad/rail_energy_node.png", "gameplay/railroad/rail_slot_connector.png",
 	"characters/scrubby/scrubby_gameplay.png", "gameplay/effects/fx_clean_puff.png",
 	"gameplay/effects/fx_clean_sparkle.png",
+	# step 2 measurement: the 3-column shells drawn at runtime
+	"gameplay/master/gameplay_v02_shell_5slot_3col.png", "gameplay/master/gameplay_v02_shell_6slot_3col.png",
 ]
 ## Results: won + failed hero/emblem and the reward-row icons of results_screen.
 const RESULTS := [
@@ -55,16 +58,68 @@ const SHOP_COLLECTION := [
 	"boosters/selector.png", "boosters/tornado.png",
 	"collection/states/card_unknown_silhouette.png", "collection/collection_complete_emblem.png",
 	"collection/master_collection_emblem.png", "cards_exchange/cards_exchange_header_emblem.png",
+	# step 2 measurement: popup frames, set-reward glow, parts icon
+	"common/frames/popup_large_frame.png", "common/frames/popup_reward_frame.png",
+	"popups/victory/reward_glow.png", "robots/bot_parts_icon.png",
 ]
-## Measured resident MiB (UI-ADR-008) plus ~10% headroom.
-const BUDGET_MIB := {"Home": 228, "Gameplay": 56, "Results": 73, "Shop/Collection": 77}
-## process/size_limit set by this step (small icons with a known draw side, 4x rule).
+## Measured resident MiB after the step 2 caps (UI-ADR-008) plus ~10% headroom.
+const BUDGET_MIB := {"Home": 117, "Gameplay": 69, "Results": 32, "Shop/Collection": 41}
+## process/size_limit set by step 1 (small icons with a known draw side, 4x rule).
 const LIMITED := {
 	"common/icons/icon_clock.png": 256,
 	"daily/daily_streak_flame.png": 256,
 	"daily/daily_task_check.png": 256,
 	"daily/daily_login_calendar.png": 1024,
 	"popups/failure/heart_large.png": 1024,
+}
+## process/size_limit set by step 2: next_pow2(max(2 x measured max side px, 512))
+## (tools/m22_026_apply_caps.py over the m22_026_texture_measure.gd report).
+const MEASURED := {
+	"cards_exchange/cards_exchange_header_emblem.png": 512,
+	"characters/robots/atlas/atlas_portrait.png": 512,
+	"characters/robots/bubbles/bubbles_portrait.png": 512,
+	"characters/robots/clippy/clippy_portrait.png": 512,
+	"characters/robots/dusty/dusty_portrait.png": 512,
+	"characters/robots/moppy/moppy_portrait.png": 512,
+	"characters/robots/polly/polly_portrait.png": 512,
+	"characters/robots/rinse/rinse_portrait.png": 512,
+	"characters/robots/spark/spark_portrait.png": 512,
+	"characters/robots/squeegee/squeegee_portrait.png": 512,
+	"characters/scrubby/scrubby_portrait.png": 512,
+	"collection/collection_complete_emblem.png": 512,
+	"collection/master_collection_emblem.png": 512,
+	"collection/states/card_unknown_silhouette.png": 1024,
+	"common/currencies/icon_currency_heart.png": 512,
+	"common/currencies/icon_currency_scrub_bucks.png": 512,
+	"common/navigation/icon_nav_events.png": 512,
+	"common/navigation/icon_nav_home.png": 512,
+	"common/navigation/icon_nav_leaderboard.png": 512,
+	"common/navigation/icon_nav_robots.png": 512,
+	"common/navigation/icon_nav_settings.png": 512,
+	"home/gift_meter/gift_meter_emblem.png": 512,
+	"home/gift_meter/gift_meter_reward_crate.png": 512,
+	"home/reward_track/reward_gift_1.png": 1024,
+	"home/reward_track/reward_gift_10.png": 1024,
+	"home/reward_track/reward_gift_100.png": 1024,
+	"home/reward_track/reward_gift_25.png": 1024,
+	"home/reward_track/reward_gift_5.png": 1024,
+	"home/reward_track/win_streak_reward_badge.png": 512,
+	"home/shortcuts/icon_shortcut_collection.png": 512,
+	"home/shortcuts/icon_shortcut_daily.png": 512,
+	"home/shortcuts/icon_shortcut_no_ads.png": 512,
+	"home/shortcuts/icon_shortcut_rewarded_ads.png": 512,
+	"home/shortcuts/icon_shortcut_shop.png": 512,
+	"home/shortcuts/icon_shortcut_tasks.png": 512,
+	"home/top_hud/profile_avatar_frame.png": 512,
+	"home/top_hud/profile_rank_badge.png": 512,
+	"popups/failure/fail_header_emblem.png": 512,
+	"popups/victory/reward_glow.png": 1024,
+	"popups/victory/victory_emblem.png": 512,
+	"popups/victory/victory_scrubby_pose.png": 1024,
+	"robots/bot_parts_icon.png": 512,
+	"shop/shop_heart_bundle.png": 512,
+	"shop/shop_scrub_bucks_bundle.png": 512,
+	"shop/shop_speed_2x_icon.png": 512,
 }
 
 var _fail := 0
@@ -78,7 +133,8 @@ func _initialize() -> void:
 	_screen("Gameplay", GAMEPLAY)
 	_screen("Results", RESULTS)
 	_screen("Shop/Collection", SHOP_COLLECTION)
-	_limited()
+	_limited("size_limit step 1", LIMITED)
+	_limited("size_limit step 2 (measured)", MEASURED)
 	_done()
 
 func _screen(name: String, paths: Array) -> void:
@@ -94,16 +150,16 @@ func _screen(name: String, paths: Array) -> void:
 	print("  %s textures resident RGBA8: %.2f MiB (%d textures, budget %d MiB)" % [name, total / float(MIB), paths.size(), BUDGET_MIB[name]])
 	_ok(total <= budget, "%s total %d <= %d bytes" % [name, total, budget])
 
-func _limited() -> void:
-	print("[size_limit]")
-	for p in LIMITED:
+func _limited(title: String, caps: Dictionary) -> void:
+	print("[%s]" % title)
+	for p in caps:
 		var tex := load(F + p) as Texture2D
 		if tex == null:
 			_ok(false, "%s loads" % p)
 			continue
 		var w := tex.get_width()
 		var h := tex.get_height()
-		_ok(maxi(w, h) <= LIMITED[p], "%s %dx%d <= %d" % [p, w, h, LIMITED[p]])
+		_ok(maxi(w, h) <= caps[p], "%s %dx%d <= %d" % [p, w, h, caps[p]])
 		_ok(_has_alpha_format(tex.get_image()), "%s keeps alpha" % p)
 
 func _has_alpha_format(img: Image) -> bool:
