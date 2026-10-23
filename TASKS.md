@@ -30,8 +30,10 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M08-001..010,013..014 — factory 030 (6f970e6e): docs/LEVEL_ART_TECHNICAL_AUDIT.md + tools/audit_level_art.py; 10/10 images PASS (1:1 grid, no AA/interpolation/VOID, all colours exact C01..C16); SB-M08-011..012 moved to standing rules
 - DONE SB-M22-015 — verify-close 2026-10-22 (factory 032); SB-M22-008 moved to standing rules (conditional: if owner approves a no-work state)
 - DONE SB-M22-025 — booster texture slice validated (job 034); rest in SB-M22-026
-- READY SB-M22-026 — steps 1-4 done (job 037 d92b2eb5; job 038 0c2e1be2: runtime measure tool, 45 measured caps, Home 207 -> 106 MiB; job 040 ee87dd65+4386d4ea: 135 card arts size_limit 1080, 810 -> 400 MiB, Collection texture cache per visit, freed with the album; job 043 5ac6d6a2+57e852a5: 17 more screens measured, 45 more caps, library 2260 -> 2103 MiB, 2 step-2 caps raised 512 -> 1024); next: VRAM compression, atlasing
-- READY SB-M36-005 — playtest difficulty (simulated + local play) and record findings
+- DONE SB-M36-005 — simulated difficulty playtest of the 10 catalog levels (factory 044, b81aa5e3): docs/DIFFICULTY_PLAYTEST_2026-10.md; findings SB-M36-009..011
+- READY SB-M36-009 — lane calibration proposal: all 10 shipped levels miss the 11.2 lane target (EASY D 45..51 vs 18..22, L10 51.5 vs 76); proposal only, no v1 coefficient change (11.3)
+- READY SB-M36-010 — recovery/sequencing proposal: guards 3->4, 5->6, 8->9 fail on actual D, boss ranks 3rd, L5-L7 long/high run; proposal only, no v1 change (11.3)
+- READY SB-M36-011 — Frustration Risk scalar unsupported (85% of V1 weight has no inputs): design simulated-human policy + Session Load budget proposal; no invented scalar, no v1 change (11.3)
 - READY SB-M44-005..006 — FTUE: contextual WAITING/no-target coachmark; win/fail/Retry/Heart teaching at first occurrence
 - READY SB-M44-013..018 — NEW badge until first visit (persisted); tutorial coachmark/highlight visual language
 - READY SB-M34-006 — haptics real-device test on an Android debug build
@@ -124,6 +126,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M44-030 — verify Gift Bar visible from first Home with unchanged 10/50/250/500/1000 rewards; regression test (OWNER_META_PROGRESSION_DESIGN_V01)
 - DONE SB-M44-031 part 1 — unlock gate + Home/booster locking + grandfather + coachmark skip (factory 042, bd5e3de9+ea0cc0ad; m44_unlock_gate 6/6, m44_ftue 23/23 LOCAL_PASS)
 - READY SB-M44-031 part 2 — per-booster lessons at 6/11/16/21, Daily/Tasks coachmarks after L4/L12, defer starter grant + 100 SB welcome task to their unlocks
+- READY SB-M22-026 — steps 1-4 done (jobs 037/038/040/043: runtime measure tool, 90 measured caps, Home 207 -> 106 MiB, card arts 810 -> 400 MiB, library 2260 -> 2103 MiB); remaining = VRAM compression (needs owner visual sign-off on before/after captures) + atlasing
 - DONE SB-UI-008..013 — owner 2026-10-23: canonical Scrubby master = assets/ui/final/characters/scrubby/scrubby_master.png; manifests updated, 013 validated (factory 041)
 - DONE SB-M22-023 — owner 2026-10-23: no booster coachmark; shared tutorial_pointer.png kept, booster_tutorial_pointer.png retired from runtime (PNG kept) (factory 041)
 <!-- Not queued (standing rules, no job of their own): SB-M07-012 (conditional: if supplied), SB-M52-005 (conditional: when rectangular production art is supplied), SB-M08-011..012, SB-M22-008 (conditional: if owner approves a no-work state), SB-M22-016..019, SB-M22-021, SB-UI-019..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
@@ -956,13 +959,16 @@ Pre-authored batch bundle: `coordination/sessions/M35-C001/CHATGPT_PROMPT_V01.md
 
 ### M36 — Difficulty System
 
-V02 independent code audit: `CODE_AUDIT_PASS`. SB-M36-001..004/006 closed. SB-M36-005 remains `OWNER_REQUIRED` until representative production levels exist for human difficulty calibration.
+V02 independent code audit: `CODE_AUDIT_PASS`. SB-M36-001..006 closed (SB-M36-005 simulated playtest, factory 044; human calibration follow-ups SB-M36-009..011).
 
 Pre-authored batch bundle: `coordination/sessions/M36-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Human playtest gate does not stop the batch.
 
 **Difficulty V1 owner decision now governs future work.** Board dimensions remain an engine/content envelope and Session Load input, not the definition of EASY/MEDIUM/HARD/VERY_HARD.
 
-- [ ] SB-M36-005 Playtest difficulty.
+- [x] SB-M36-005 Playtest difficulty. **[DONE 2026-10-23, factory 044, b81aa5e3, LOCAL_PASS: tools/difficulty_playtest.gd fresh solver + oracle replay of the 10 catalog levels, all SOLVED, 0 route failures; report docs/DIFFICULTY_PLAYTEST_2026-10.md, JSON coordination/sessions/FACTORY/044-m36-005-difficulty-playtest/playtest_v1.json; m53_first10_difficulty + m36_difficulty_v1 PASS. Simulated only (owner playtest gate given, CLAUDE.md 0D.1). Findings filed as SB-M36-009..011.]**
+- [ ] SB-M36-009 Difficulty V1 lane calibration proposal: all 10 shipped levels miss the 11.2 lane target outside the hard limit +/-5 except L5 (SOFT, -4.8); EASY slots sit at D 45.0..50.9 vs targets 18..22, L10 VERY_HARD at 51.5 vs 76, so measured D spans only 45.0..54.3 (docs/DIFFICULTY_PLAYTEST_2026-10.md, factory 044). Investigate whether the cause is the Stage-A anchors (data/config/level_difficulty_analysis_v1.json), the V1 component normalizations or the content, and write a proposal (candidate anchor set or new score-model version + re-analysis of the 10 levels per docs/11 section 13). Do not change coefficients, anchors or the model version under v1 (CLAUDE.md 11.3); any change ships only as a new model version; no level data edits here.
+- [ ] SB-M36-010 Difficulty V1 recovery/sequencing proposal for the shipped First 10: recovery guards 3->4 (drop 4.8 < 15), 5->6 (drop 2.3 < 20) and 8->9 (drop -3.4 < 15, inverted) fail on actual D, L10 boss ranks 3rd of 10, and L5->L6->L7 are consecutive levels above the pack median on both D and Session Load (marginal: 0.02 Session Load above median) (docs/DIFFICULTY_PLAYTEST_2026-10.md, factory 044). Propose catalog re-sequencing or replacement candidates that satisfy the guards with measured D; any catalog/level change is a separate owner-visible job. Do not change coefficients, guards or the model version under v1 (CLAUDE.md 11.3).
+- [ ] SB-M36-011 Frustration Risk scalar is unsupported for every shipped level (PROVISIONAL_STAGE_A, scalar null; retryRisk, sessionOverrun and lateFailure = 85% of the V1 weight have no supporting simulation or owner budget; only the choiceOpacity proxy exists) (docs/DIFFICULTY_PLAYTEST_2026-10.md, factory 044). Design the missing inputs: a documented simulated-human policy for retry/late-failure populations and a proposed per-slot Session Load budget (docs/11 sections 7-8) for owner decision. Do not invent a scalar or change the frustrationRisk weights/model version under v1 (CLAUDE.md 11.3).
 
 ### M37 — Level Progression
 
