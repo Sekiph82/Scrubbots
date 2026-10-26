@@ -263,6 +263,8 @@ A score-model version may replace the previous production version only when:
 
 Do not edit coefficients in place under the same version.
 
+Status of model v2 (SB-M36-012, owner decision B 2026-10-26): v2 is active for NEW analysis; v1 is preserved. Gate items 1, 2, 3, 4, 7 and 8 are met (`docs/DIFFICULTY_MODEL_V2_CALIBRATION.md`, suite `tests/m36_difficulty_v2.gd`). Item 6: the owner-rating rank correlation is +0.64, up from +0.27 on v1 and equal to the candidate. Item 5 is only partly met: the HARD slot scores below the MEDIUM mean and all three recovery guards miss. The doc lists this under "Honest shortfall". Item 9 is replaced by factory peer review (CLAUDE.md 0D.4).
+
 ## 14. Later telemetry calibration
 
 Only after explicit owner approval of analytics/privacy design.
@@ -324,7 +326,7 @@ QA status
 owner approval status where required
 ```
 
-Current shipped-catalog run: `tools/difficulty_playtest.gd` writes the simulated per-level report `docs/DIFFICULTY_PLAYTEST_2026-10.md` (SB-M36-005).
+Current shipped-catalog run: `tools/difficulty_playtest.gd` writes the simulated per-level report `docs/DIFFICULTY_PLAYTEST_2026-10.md` (SB-M36-005). Since SB-M36-012 it defaults to `-- --model v2` (writes `coordination/sessions/FACTORY/046-difficulty-model-v2/playtest_v2.json`); `-- --model v1` reproduces the SB-M36-005 run.
 
 ## 17. Batch QA
 

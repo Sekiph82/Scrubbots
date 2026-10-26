@@ -5,6 +5,8 @@ Owner decision: `coordination/OWNER_DIFFICULTY_PROGRESSION_DECISION_V01.md`
 Machine-readable progression config: `data/config/level_progression_v1.json`
 Machine-readable score model: `data/config/difficulty_score_model_v1.json`
 
+Model v2 status (SB-M36-012, owner decision B 2026-10-26): `data/config/difficulty_score_model_v2.json` (+ `level_difficulty_analysis_v2.json`, `scripts/difficulty/level_difficulty_analyzer_v2.gd`) is the active model for NEW analysis. Same weights and formula; A/U/B/S definitions and the corpus anchors change as listed in its `changes` array. v1 stays unchanged for provenance; lane targets still come from `level_progression_v1.json`. Calibration and shortfalls: `docs/DIFFICULTY_MODEL_V2_CALIBRATION.md`.
+
 This document defines how SCRUBBOTS separates **difficulty**, **duration/load** and **frustration**, while preserving a fixed ten-level emotional rhythm and allowing the absolute difficulty of each class to rise over a long campaign.
 
 ## 1. Why the old model is retired
