@@ -299,9 +299,10 @@ func _c07() -> void:
 
 # ------------------------------------------------------------------ helpers ----
 
-## Play frontier levels from L4 until a real scheduler wave leaves a placed lane WAITING.
-## from_next: start after the level last used (a fresh attempt), else from L4.
+## Play frontier levels until the real runtime leaves a placed lane WAITING. reset: start at
+## L4; otherwise continue after the level last used (a fresh attempt).
 var _wait_from := 4
+
 func _play_until_waiting(reset: bool) -> int:
 	if reset:
 		_wait_from = 4
