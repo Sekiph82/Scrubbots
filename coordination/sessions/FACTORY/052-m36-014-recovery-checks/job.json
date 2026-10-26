@@ -1,0 +1,1 @@
+{ "id": "052-m36-014-recovery-checks", "task": "SB-M36-014 recovery component checks", "branch": "factory/052-m36-014-recovery-checks", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/052-m36-014-recovery-checks", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "PASS", "tests": "PASS" } }
