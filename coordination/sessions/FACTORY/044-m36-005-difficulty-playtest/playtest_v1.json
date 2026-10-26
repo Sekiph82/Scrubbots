@@ -81,7 +81,60 @@
 				2
 			]
 		},
-		"note": "Computed from ACTUAL analyzed D, never target D. The 10 -> next-cycle-1 guard needs Level 11 (CONTENT_MISSING) and is not evaluated."
+		"note": "Computed from ACTUAL analyzed D, never target D. The 10 -> next-cycle-1 guard needs Level 11 (CONTENT_MISSING) and is not evaluated.",
+		"componentChecks": [
+			{
+				"fromLevel": 3,
+				"toLevel": 4,
+				"peakA": 0.735324427483468,
+				"recoveryA": 0.688422858399483,
+				"peakB": 0.477450980392157,
+				"recoveryB": 0.458974358974359,
+				"peakU": 0.460578851848314,
+				"recoveryU": 0.409529903017241,
+				"peakSessionLoad": 35.284342379238,
+				"recoverySessionLoad": 24.8888440926345,
+				"aNotAbovePeak": true,
+				"bNotAbovePeak": true,
+				"notAboveOnBothBAndU": true,
+				"sessionLoadBelowPeak": true,
+				"pass": true
+			},
+			{
+				"fromLevel": 5,
+				"toLevel": 6,
+				"peakA": 0.686555901132021,
+				"recoveryA": 0.705826417516291,
+				"peakB": 0.458536585365854,
+				"recoveryB": 0.47375,
+				"peakU": 0.411783984041037,
+				"recoveryU": 0.409529903017241,
+				"peakSessionLoad": 26.6814820249315,
+				"recoverySessionLoad": 24.9649702188449,
+				"aNotAbovePeak": false,
+				"bNotAbovePeak": false,
+				"notAboveOnBothBAndU": true,
+				"sessionLoadBelowPeak": true,
+				"pass": false
+			},
+			{
+				"fromLevel": 8,
+				"toLevel": 9,
+				"peakA": 0.612964450410319,
+				"recoveryA": 0.694779488016706,
+				"peakB": 0.437837837837838,
+				"recoveryB": 0.481578947368421,
+				"peakU": 0.409529903017241,
+				"recoveryU": 0.409529903017241,
+				"peakSessionLoad": 24.9329554691094,
+				"recoverySessionLoad": 24.6906311850129,
+				"aNotAbovePeak": false,
+				"bNotAbovePeak": false,
+				"notAboveOnBothBAndU": true,
+				"sessionLoadBelowPeak": true,
+				"pass": false
+			}
+		]
 	},
 	"levels": [
 		{

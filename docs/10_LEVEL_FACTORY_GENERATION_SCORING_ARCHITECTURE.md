@@ -474,6 +474,16 @@ CampaignBuilder constraints should include:
 - use recovery levels with low B/U even if their artwork is visually rich;
 - rotate route-, color-, frontier- and workload-led challenges.
 
+Recovery-slot constraints (SB-M36-014, `docs/DIFFICULTY_RECOVERY_SEQUENCING_PROPOSAL_V1.md` section 4 rules 2-3 and section 6 step 3). For each peak -> recovery pair of `recoveryGuards` (3->4, 5->6, 8->9), measured on the actual v2 D and `[W,C,A,U,B,R,S]` vectors, never on target D:
+
+- recovery A <= peak A;
+- recovery B <= peak B;
+- the recovery must not be above the peak on both B and U;
+- recovery Session Load < peak Session Load;
+- the scalar D drop minimums stay governed by `recoveryGuards` in the versioned progression config.
+
+These are generator/CampaignBuilder constraints for filling recovery slots, not hidden per-player DDA. `tools/difficulty_playtest.gd` reports them per pair in `recovery.componentChecks` (no anomaly entries); evaluating them on the shipped L1..L10 is informational only.
+
 ## 14. Novelty signature
 
 Suggested signature fields:
