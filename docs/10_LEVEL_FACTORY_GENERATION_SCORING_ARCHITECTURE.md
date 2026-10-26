@@ -4,6 +4,8 @@ Status: **CANONICAL DESIGN V1 — 2026-09-12**
 Owner decision: `coordination/OWNER_DIFFICULTY_PROGRESSION_DECISION_V01.md`
 Difficulty model: `docs/09_DIFFICULTY_PROGRESSION_RETENTION_SYSTEM.md`
 
+Model v2 status (SB-M36-012, 2026-10-26): Level Factory difficulty targeting for new analysis uses score model v2 (`scripts/difficulty/level_difficulty_analyzer_v2.gd`, six-policy non-oracle ensemble, corpus anchors). The v1 analyzer and the M53-C002 candidate stay unchanged for provenance. See `docs/DIFFICULTY_MODEL_V2_CALIBRATION.md`.
+
 ## 1. Can the Level Generator actually do this?
 
 Yes, if it is built as an **evaluator-guided search system**, not as a one-shot random generator.
