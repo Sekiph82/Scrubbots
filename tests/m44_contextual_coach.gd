@@ -397,6 +397,9 @@ func _play(level: int) -> void:
 		prog.record_win(prog.current_level())
 	if prog.current_level() != level:
 		prog.debug_set_current_level(level)
+	# SB-M43-072: the walk's Feature Unlock ceremonies (own suite) are already shown here.
+	for e in _root.get_ceremonies().feature_events():
+		_root.get_app_state().economy.meta_ui.mark_seen(String(e["key"]))
 	_root.get_ftue().settle()
 	_root.play_current_frontier()
 	await _frames(6)
