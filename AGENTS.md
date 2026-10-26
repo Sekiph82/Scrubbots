@@ -10,6 +10,9 @@ One command for those suites with the CI PASS/FAIL rule: `python tools/run_suite
 ## Feature unlock gate (SB-M44-031)
 Owner unlock table (feature id -> campaign level): `data/config/feature_unlocks_v1.json`, read by `scripts/progression/feature_unlocks.gd` (fails open: bad config or unknown id = unlocked). UI asks only `AppState.feature_unlocked(id)` (and `feature_unlock_level(id)` for copy); never put a level number in UI code. Grandfather default: a save that is not a new FTUE profile keeps every feature; a fresh profile unlocks by frontier (`progression.current_level() >= level`). Gated today: Home shortcuts/nav tabs, the booster bar (`"locked"` state) and FTUE coachmarks. Tests: `tests/m44_unlock_gate.gd`.
 
+## Difficulty lane calibration (SB-M36-013)
+Lane targets for v2 D come from the anchor corpus, never from shipped levels or owner ratings: `docs/DIFFICULTY_LANE_ANCHOR_CALIBRATION.md` (outcome RESCALE -> `data/config/level_progression_v2.json`; v1 file frozen). Rebuild fixtures `-s res://tools/build_difficulty_anchors.gd`; measure `-s res://tools/measure_difficulty_anchors.gd -- --measure=<id>` per fixture then `-- --merge`; suite `-s res://tests/m36_anchor_calibration.gd`.
+
 ## H!veAI GitHub tracking [OWNER-LOCKED — 2026-09-10]
 
 - GitHub `origin/main` is repository/project-state authority.

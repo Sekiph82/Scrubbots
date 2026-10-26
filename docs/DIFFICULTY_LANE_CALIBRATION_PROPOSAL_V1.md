@@ -106,6 +106,7 @@ Consequences: no content change; levels keep their owner-accepted order; the Lev
 Change how lane misses are judged instead of how D is measured, through a new `data/config/level_progression_v2.json` (v1 untouched):
 
 - **C1 widen the tolerance**: to pass all 10 under V1 the window would need +/-32.9 (and +/-29.3 under the V2 candidate); that is wider than the gap between adjacent lanes (18 points), so classes would overlap and the window would stop meaning anything.
+- Superseded (SB-M36-013, 2026-10-26): lanes are never fitted to the shipped levels; they are placed from an independent anchor corpus, see `docs/DIFFICULTY_LANE_ANCHOR_CALIBRATION.md`.
 - **C2 rescale the lanes to the measured scale**: map the lane bases onto what content actually scores. Under V1 this cannot work, because V1 D's order disagrees with the intended order (L10 ranks 3rd, L8 ranks 8th); any monotone map of D keeps that order, so L8 and L10 would still miss.
 - **C3 ordinal acceptance**: replace absolute lanes with relative checks inside each 10-level cycle (EASY slots below MEDIUM below HARD below VERY_HARD, recovery drops). Under V1 this fails too (L10 is not the cycle maximum; L8 -> L9 rises).
 
