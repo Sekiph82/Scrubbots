@@ -1,7 +1,8 @@
 # Difficulty lane anchor calibration (SB-M36-013)
 
-Status: decision rule and anchor corpus declared BEFORE any Challenge measurement (this
-section 1-3 text is committed in the same commit as the fixtures, before `anchors_v2.json`).
+Status: DONE (SB-M36-013, factory 050). Sections 1-3 (decision rule and anchor corpus) were committed
+in 27a66955, before any Challenge measurement; measurements and the outcome were committed afterwards
+in 05129032 (`anchors_v2.json`, `data/config/level_progression_v2.json`).
 
 ## 1. Purpose
 
@@ -46,7 +47,118 @@ Pre-measurement replacement (solvability only): the first draft probe `x_rings12
 (1-wide quadrant rings, straddle30 supply) was DEADLOCK under the canonical solver and was replaced
 by `x_rings12q_straddle_24` (2-wide quadrant rings, straddle30) before any measurement.
 
-## 4. Reproduction
+## 4. Measured anchors
+
+Evidence: `coordination/sessions/FACTORY/050-m36-013-anchor-calibration/anchors_v2.json` (per-fixture
+raw records in `anchors_raw/`), measured with `LevelDifficultyAnalyzerV2` unchanged and bound to the
+analysis config sha256 `84e7e5f9...c678e5` and score model sha256 `efa5dd36...0155d9`. All 24 fixtures
+are SOLVED by the canonical solver and every primary policy run had zero route failures.
+
+| Fixture | Lane | WxH | Colours | Supply | Rationale | D | W | C | A | U | B | R | S | Session Load | Policy D range | Solver |
+|---|---|---|---:|---|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---|---|
+| `easy_vstripes3_24` | EASY | 24.0x24.0 | 3 | layer_rr | Minimum structure: three balanced border-touching stripes, so every batch finds a full frontier (A low), every cell is in unlock wave 0 (U low) and unlock-ordered round-robin supply leaves every column productive (B, S low). | 12.51 | 0.138 | 0.500 | 0.165 | 0.000 | 0.000 | 0.014 | 0.019 | 13.4 | 10.07-13.73 | SOLVED |
+| `easy_hbands4_24x28` | EASY | 24.0x28.0 | 4 | layer_rr | Four horizontal bands on a rectangular board: each band touches both side borders, so access stays open and unlock is one wave; one more colour than the stripes fixture raises colour complexity slightly. | 13.81 | 0.204 | 0.556 | 0.000 | 0.000 | 0.000 | 0.313 | 0.030 | 16.3 | 13.70-13.87 | SOLVED |
+| `easy_tiles4_24` | EASY | 24.0x24.0 | 4 | layer_rr | Four large quadrant tiles, each touching two borders: many simultaneous targets per colour and a single unlock wave; four balanced colours give low-moderate colour complexity. | 13.45 | 0.138 | 0.556 | 0.057 | 0.000 | 0.000 | 0.244 | 0.016 | 13.6 | 12.24-14.20 | SOLVED |
+| `easy_frame5_24` | EASY | 24.0x24.0 | 5 | layer_rr | A 2-wide border frame encloses four interior stripes: a shallow one-layer unlock (U low-moderate) with wide frontiers once the frame clears; five colours sit at the top of the EASY colour range. | 24.21 | 0.138 | 0.601 | 0.286 | 0.378 | 0.000 | 0.038 | 0.016 | 13.6 | 20.23-26.09 | SOLVED |
+| `easy_rings4_24` | EASY | 24.0x24.0 | 4 | layer_rr | Two wide 6-cell rings split into halves: the inner ring opens only after the outer ring (one extra unlock layer) but every layer exposes a long frontier, so access and choice stay easy; the upper edge of the EASY design range. | 16.38 | 0.138 | 0.508 | 0.112 | 0.224 | 0.006 | 0.041 | 0.017 | 13.6 | 14.20-18.34 | SOLVED |
+| `med_rings6q_24` | MEDIUM | 24.0x24.0 | 6 | layer_rr | Three 4-wide rings split into quadrants with six colours: moderate enclosure (three unlock layers) and four colours per layer, so batches of one colour reach only a quarter of the open frontier (moderate A and S). | 30.90 | 0.138 | 0.656 | 0.432 | 0.451 | 0.017 | 0.164 | 0.014 | 14.2 | 26.02-34.74 | SOLVED |
+| `med_rings6h_24` | MEDIUM | 24.0x24.0 | 6 | layer_rr | Four 3-wide rings split into halves with six colours: one more unlock layer than the quadrant rings with only two colours per layer, so enclosure rises while colour/slot pressure stays moderate. | 31.59 | 0.138 | 0.646 | 0.322 | 0.669 | 0.000 | 0.063 | 0.008 | 13.6 | 27.29-34.61 | SOLVED |
+| `med_shafts6_24` | MEDIUM | 24.0x24.0 | 6 | layer_rr | Three base stripes cut by 1-wide vertical shafts of three further colours: everything touches the border (U low) but each shaft exposes only two end cells to a whole batch, so accessibility scarcity is the main pressure. | 22.21 | 0.138 | 0.649 | 0.542 | 0.000 | 0.000 | 0.014 | 0.012 | 13.4 | 19.20-23.94 | SOLVED |
+| `med_tiles7_24` | MEDIUM | 24.0x24.0 | 7 | layer_rr | A 4x4 grid of 6-cell tiles in seven colours: the four centre tiles are enclosed by one colour change (moderate unlock depth) and seven interleaved colours spread demand across many small frontiers. | 26.73 | 0.138 | 0.717 | 0.401 | 0.224 | 0.000 | 0.201 | 0.007 | 14.7 | 22.27-29.75 | SOLVED |
+| `med_rings8q_straddle_28` | MEDIUM | 28.0x28.0 | 8 | straddle30 | Four 4-wide quadrant rings in eight colours with colour-first 30-robot chunks that straddle layers: moderate enclosure plus slot pressure from batches that wait for inner layers; the upper edge of the MEDIUM design range. | 39.50 | 0.276 | 0.766 | 0.583 | 0.492 | 0.064 | 0.177 | 0.101 | 19.5 | 37.52-42.98 | SOLVED |
+| `hard_rings8h_24` | HARD | 24.0x24.0 | 8 | layer_rr | Six 2-wide half-rings in eight colours: a deep six-layer unlock chain where each layer has two colours, with layer-ordered supply so the chain, not the queue, carries the difficulty. | 41.74 | 0.138 | 0.761 | 0.399 | 0.954 | 0.060 | 0.078 | 0.020 | 14.0 | 35.20-44.99 | SOLVED |
+| `hard_rings9q_split_24` | HARD | 24.0x24.0 | 9 | layer_split | Four 3-wide quadrant rings in nine colours with the border layer alone in column 1: early decisions have one productive column (bottlenecks) on top of a four-layer unlock chain. | 44.24 | 0.138 | 0.820 | 0.607 | 0.669 | 0.085 | 0.337 | 0.040 | 15.2 | 42.56-45.95 | SOLVED |
+| `hard_maze8_24` | HARD | 24.0x24.0 | 8 | color_first | A serpentine 1-wide corridor with one entrance, coloured in four path-ordered segments and demanded first: robots follow long winding routes (R high) to a narrow two-cell frontier (A high) before the eight-colour walls open. | 51.94 | 0.138 | 0.774 | 1.000 | 0.261 | 0.179 | 1.000 | 0.103 | 17.0 | 47.71-52.20 | SOLVED |
+| `hard_rings10h_26` | HARD | 26.0x26.0 | 10 | layer_rr | Seven 2-wide half-rings in ten colours on a 26 board: the deepest layered chain of the HARD set with ten colours, but layer-ordered supply keeps bottlenecks low. | 43.08 | 0.207 | 0.871 | 0.358 | 0.957 | 0.026 | 0.091 | 0.034 | 17.2 | 36.75-46.67 | SOLVED |
+| `hard_tiles9_split_24` | HARD | 24.0x24.0 | 9 | layer_split | A 6x6 grid of 4-cell tiles in nine interleaved colours with the border layer isolated in column 1: many small enclosed tiles give a deep unlock and small frontiers, and the split supply forces single-column decisions early. | 43.83 | 0.138 | 0.830 | 0.729 | 0.451 | 0.277 | 0.148 | 0.077 | 15.9 | 39.99-51.26 | SOLVED |
+| `vh_rings12h_split_24` | VERY_HARD | 24.0x24.0 | 12 | layer_split | Six 2-wide half-rings in twelve colours (every layer two new colours) with the border layer alone in column 1: deep enclosure, maximum colour count and forced single-column choices. | 48.21 | 0.138 | 0.963 | 0.570 | 0.954 | 0.044 | 0.097 | 0.027 | 14.0 | 46.86-50.03 | SOLVED |
+| `vh_rings11h_straddle_24` | VERY_HARD | 24.0x24.0 | 11 | straddle30 | Six 2-wide half-rings in eleven colours with colour-first chunks that straddle layers: deep enclosure plus slots held by batches whose targets are still enclosed (slot/colour pressure). | 50.75 | 0.138 | 0.914 | 0.529 | 0.954 | 0.177 | 0.072 | 0.262 | 13.9 | 48.94-51.85 | SOLVED |
+| `vh_maze10_24` | VERY_HARD | 24.0x24.0 | 10 | color_first | A single-entrance serpentine corridor in five path-ordered colours demanded before five wall colours: long routes, a two-cell frontier and colour-first supply where most offered batches cannot progress. | 54.63 | 0.138 | 0.881 | 1.000 | 0.261 | 0.235 | 1.000 | 0.128 | 16.9 | 50.39-54.97 | SOLVED |
+| `vh_rings10h_r1_split_24` | VERY_HARD | 24.0x24.0 | 10 | layer_split | Twelve 1-wide half-rings in ten colours with the border layer isolated: a twelve-layer unlock chain where each layer is a narrow frontier, and split supply forcing choices. | 37.43 | 0.138 | 0.883 | 0.088 | 0.976 | 0.032 | 0.089 | 0.016 | 15.4 | 36.11-39.90 | SOLVED |
+| `vh_rings12q_split_26` | VERY_HARD | 26.0x26.0 | 12 | layer_split | Seven 2-wide quadrant rings in twelve colours on a 26 board: four colours per layer split the frontier into quarters, a seven-layer chain, and border-isolated split supply. | 49.64 | 0.207 | 0.994 | 0.522 | 0.957 | 0.030 | 0.245 | 0.017 | 18.9 | 48.51-51.27 | SOLVED |
+| `x_rings12q_r1_split_24` | EXTREME | 24.0x24.0 | 12 | layer_split | Ceiling probe: twelve 1-wide rings split into quadrants over twelve colours, so each layer is a narrow frontier shared by four colours, behind a twelve-layer unlock chain with border-isolated split supply. | 39.81 | 0.138 | 0.998 | 0.093 | 0.976 | 0.029 | 0.153 | 0.011 | 18.2 | 38.18-43.55 | SOLVED |
+| `x_rings12q_straddle_24` | EXTREME | 24.0x24.0 | 12 | straddle30 | Ceiling probe: six 2-wide quadrant rings over twelve colours with colour-first chunks that straddle layers, maximising slots held by batches with no reachable target behind a deep unlock chain. | 59.70 | 0.138 | 0.992 | 0.826 | 0.954 | 0.130 | 0.294 | 0.295 | 12.1 | 56.74-63.90 | SOLVED |
+| `x_maze12_24` | EXTREME | 24.0x24.0 | 12 | color_first | Ceiling probe: single-entrance serpentine corridor in six path-ordered colours demanded before six wall colours: maximum route length/detour/turns, a two-cell frontier and forced single-column decisions. | 57.08 | 0.138 | 0.996 | 1.000 | 0.275 | 0.261 | 1.000 | 0.135 | 16.8 | 53.02-57.46 | SOLVED |
+| `x_rings12q_r1_split_28` | EXTREME | 28.0x28.0 | 12 | layer_split | Ceiling probe: fourteen 1-wide quadrant rings over twelve colours on a 28 board, the deepest enclosure chain in the set with border-isolated split supply. | 40.70 | 0.276 | 0.999 | 0.075 | 0.979 | 0.025 | 0.141 | 0.009 | 23.5 | 39.27-43.97 | SOLVED |
+
+## 5. Lane medians, ceiling and outcome
+
+| Lane | Median D (M_L) | v1 base T_L | M_L - T_L | Anchors within T_L +/- 10 | Holds |
+|---|---:|---:|---:|---:|---|
+| EASY | 13.81 | 20 | -6.19 | 5 of 5 | no |
+| MEDIUM | 30.90 | 40 | -9.10 | 3 of 5 | no |
+| HARD | 43.83 | 58 | -14.17 | 1 of 5 | no |
+| VERY_HARD | 49.64 | 76 | -26.36 | 0 of 5 | no |
+
+- Step 1: `13.81 < 30.90 < 43.83 < 49.64`, the lane medians are strictly monotonic.
+- Step 2: no lane holds. Every median is below its v1 base by more than 5.0 (EASY -6.19, MEDIUM -9.10,
+  HARD -14.17, VERY_HARD -26.36); only EASY has at least 4 anchors within +/- 10 of its base.
+- Step 3 applies. Scale `s = (49.64 - 13.81) / 56 = 0.6398`.
+- Ceiling: best EXTREME probe `x_rings12q_straddle_24` D 59.70 (the other probes: `x_maze12_24` 57.08,
+  `x_rings12q_r1_split_28` 40.70, `x_rings12q_r1_split_24` 39.81). VERY_HARD base+growth = 49.6 + 7.7 =
+  57.3 <= 59.70, so the cap check passes and there is no ceiling finding.
+
+Outcome: **RESCALE**
+
+`data/config/level_progression_v2.json` (schema `scrubbots-level-progression/v2`, version 2; cadence,
+modifiers, roles, novelty targets, `1-exp(-k/20)`, board envelope and colour rules copied from v1):
+
+| Lane | base | growth | v1 base / growth |
+|---|---:|---:|---|
+| EASY | 13.8 | 9.0 | 20 / 14 |
+| MEDIUM | 30.9 | 8.3 | 40 / 13 |
+| HARD | 43.8 | 8.3 | 58 / 13 |
+| VERY_HARD | 49.6 | 7.7 | 76 / 12 |
+
+Recovery guards (minimum Challenge drop): 3->4 9.6, 5->6 12.8, 8->9 9.6, 10->next 1 22.4 (v1 15/20/15/35).
+`s` < 1, so `challengeTolerance` scales too: default +/-2.2, preferred +/-1.3, never-force +/-3.2
+(v1 3.5/2.0/5.0). Level 311 EASY target 13.8 + 9.0 x P(31) = 20.89 > level 11 EASY 13.8 + 9.0 x P(1) = 14.24.
+
+Observations (reported, nothing was changed after measuring):
+
+- 1-wide rings score lower than designed: `vh_rings10h_r1_split_24` (37.43) and both 1-wide EXTREME
+  probes (~40) have high U but low A (0.07..0.09), because a 1-wide ring is fully targetable the moment
+  the ring outside it clears. Narrow frontiers that raise A need shafts or corridors, not thin rings.
+- `med_shafts6_24` (22.21) is below the EASY `easy_frame5_24` (24.21): access scarcity alone (A 0.54,
+  U 0) moves D only ~11 points. Lane overlap at the edges is expected; the rule uses medians.
+- The two highest probes combine A and R (maze) or A, U and S (straddled quadrant rings); B stays
+  below 0.28 on every fixture, so bottleneck pressure is the component the corpus could not push high.
+
+Reader note: `DifficultyProgressionV1` (unchanged, as required) checks `EXPECTED_SCHEMA ==
+"scrubbots-level-progression/v1"`, so `DifficultyProgressionV1.new("res://data/config/level_progression_v2.json")`
+returns `is_ok() == false` ("unexpected schema"). The schema string `/v2` is mandated by the rule, so no
+current runtime/tool consumes the v2 lanes yet; `tests/m36_anchor_calibration.gd` computes v2 targets with
+the same formula. Wiring a reader (and the analyzer target lookup) to v2 is follow-up SB-M36-016.
+
+## 6. Informational: shipped L1..L10 under the decided lanes
+
+Not an acceptance criterion and not used to choose or tune anything above. D values are copied from
+`coordination/sessions/FACTORY/046-difficulty-model-v2/playtest_v2.json` (not re-measured); targets are
+cycle 0 (`base + modifier`) under `level_progression_v2.json`; window = in +/-2.2, soft +/-3.2, else out.
+
+| L | Level | Class | v2 D | v1 target | v2-lane target | Delta | Window |
+|---:|---|---|---:|---:|---:|---:|---|
+| 1 | `m21_level_001_hazard_bot` | EASY | 42.37 | 20.0 | 13.8 | +28.57 | out |
+| 2 | `level_002_apple` | EASY | 22.08 | 22.0 | 15.8 | +6.28 | out |
+| 3 | `level_003_palm_tree` | MEDIUM | 38.94 | 40.0 | 30.9 | +8.04 | out |
+| 4 | `level_004_orange_cat` | EASY | 24.96 | 19.0 | 12.8 | +12.16 | out |
+| 5 | `level_005_party_toucan` | HARD | 29.37 | 58.0 | 43.8 | -14.43 | out |
+| 6 | `level_006_chicken` | EASY | 23.58 | 18.0 | 11.8 | +11.78 | out |
+| 7 | `level_007_pigeon` | EASY | 33.19 | 21.0 | 14.8 | +18.39 | out |
+| 8 | `level_008_butterfly` | MEDIUM | 28.69 | 42.0 | 32.9 | -4.21 | out |
+| 9 | `level_009_frog` | EASY | 37.15 | 19.0 | 12.8 | +24.35 | out |
+| 10 | `level_010_ice_cube` | VERY_HARD | 46.72 | 76.0 | 49.6 | -2.88 | soft |
+
+| Guard | D from -> to | Drop | v2 minimum | Result |
+|---|---|---:|---:|---|
+| L3 -> L4 | 38.94 -> 24.96 | 13.98 | 9.6 | PASS |
+| L5 -> L6 | 29.37 -> 23.58 | 5.80 | 12.8 | FAIL |
+| L8 -> L9 | 28.69 -> 37.15 | -8.45 | 9.6 | FAIL |
+
+Under the anchor lanes the shipped EASY slots sit well above the EASY lane and L5 well below HARD:
+the shipped set is a content question for the campaign, not a calibration input.
+
+## 7. Reproduction
 
 ```text
 godot --headless --path . -s res://tools/build_difficulty_anchors.gd

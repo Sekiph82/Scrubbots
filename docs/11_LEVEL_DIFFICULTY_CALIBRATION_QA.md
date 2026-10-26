@@ -265,6 +265,8 @@ Do not edit coefficients in place under the same version.
 
 Status of model v2 (SB-M36-012, owner decision B 2026-10-26): v2 is active for NEW analysis; v1 is preserved. Gate items 1, 2, 3, 4, 7 and 8 are met (`docs/DIFFICULTY_MODEL_V2_CALIBRATION.md`, suite `tests/m36_difficulty_v2.gd`). Item 6: the owner-rating rank correlation is +0.64, up from +0.27 on v1 and equal to the candidate. Item 5 is only partly met: the HARD slot scores below the MEDIUM mean and all three recovery guards miss. The doc lists this under "Honest shortfall". Item 9 is replaced by factory peer review (CLAUDE.md 0D.4).
 
+Lane placement for v2 (SB-M36-013): `docs/DIFFICULTY_LANE_ANCHOR_CALIBRATION.md` measures a 24-fixture anchor corpus (`tests/fixtures/difficulty_anchors/`, `tools/build_difficulty_anchors.gd`, `tools/measure_difficulty_anchors.gd -- --measure=<id>` / `-- --merge`) under a decision rule fixed before measurement. Outcome RESCALE: `data/config/level_progression_v2.json` (EASY 13.8, MEDIUM 30.9, HARD 43.8, VERY_HARD 49.6, scale 0.64); `level_progression_v1.json` unchanged. Suite: `tests/m36_anchor_calibration.gd`.
+
 ## 14. Later telemetry calibration
 
 Only after explicit owner approval of analytics/privacy design.
