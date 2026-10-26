@@ -31,6 +31,7 @@ name: Android Family First10 APK
 #   m43_c003_c001_acquisition for the symbol-carrying booster target chips (43 total).
 # M46: + tests/m46_performance.gd (44 total, exact 22/22 guard).
 # SB-M44-031: + tests/m44_unlock_gate.gd (45 total; owner feature unlock table).
+# SB-M44-005..006 + SB-M44-013: + tests/m44_contextual_coach.gd + tests/m44_new_badge.gd (47 total).
 
 on:
   workflow_dispatch:
@@ -109,7 +110,7 @@ jobs:
                    m41_settings m43_master_c009_daily m43_r15_owner_remediation m43_r15_001_r01_sequential_unlock \
                    m45_debug_tooling m49_responsive_matrix m50_accessibility_audit m51_localization_readiness \
                    m50_color_symbols m28_c002_c004_tile_visual m28_c002_c001_gameplay_v02 m47_touch_r01_mobile_ux \
-                   m43_c003_c001_acquisition m46_performance m44_unlock_gate; do
+                   m43_c003_c001_acquisition m46_performance m44_unlock_gate m44_contextual_coach m44_new_badge; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
