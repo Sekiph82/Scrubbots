@@ -18,6 +18,10 @@ extends RefCounted
 ##   - SB-M44-031: a coachmark never targets a locked control (AppState.feature_unlocked): a
 ##     Home step on a locked shortcut is skipped and locked boosters are dropped from a
 ##     `boosters` step (skipped when none remain). Skipped steps are NOT marked seen.
+##   - SB-M44-005/006 contextual entries (first WAITING, first win, first loss) are event-
+##     triggered, not scheduled: shown once at the first real occurrence to a NEW profile that
+##     has not skipped tips, at any level (not limited to the L1-L3 window). Established profiles
+##     never see them. A due scheduled step wins; acknowledged into the same seen ledger.
 
 const FtueConfig = preload("res://scripts/app/ftue_config.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
@@ -99,6 +103,27 @@ func current_step(surface: String, ctx: Dictionary) -> Dictionary:
 			return out
 	return {}
 
+## Contextual entries may show: NEW profile, Skip Tips not chosen (window `closed` does not matter).
+func contextual_active() -> bool:
+	return _live() and _app.economy.ftue.is_new_profile() and not _app.economy.ftue.skipped
+
+## The unseen contextual entry for a live `trigger` ("slot_waiting" | "result_won" |
+## "result_lost", read from canonical state by the caller), or {}.
+func contextual_step(trigger: String) -> Dictionary:
+	if trigger.is_empty() or not contextual_active():
+		return {}
+	for c in _cfg["contextual"]:
+		if String(c["trigger"]) == trigger and not _app.economy.ftue.is_seen(String(c["id"])):
+			return (c as Dictionary).duplicate(true)
+	return {}
+
+## The trigger of contextual entry `step_id` ("" when it is not a contextual entry).
+func contextual_trigger(step_id: String) -> String:
+	for c in _cfg.get("contextual", []):
+		if String(c["id"]) == step_id:
+			return String(c["trigger"])
+	return ""
+
 ## Acknowledge (Got it / completed by the real action). Idempotent; never double-acks.
 func acknowledge(step_id: String) -> bool:
 	if not _live() or not _app.economy.ftue.is_new_profile():
@@ -133,6 +158,11 @@ func step_copy(step: Dictionary, ctx: Dictionary = {}) -> Dictionary:
 			body = UiText.t(String(step["body"]), [UiText.reward_text(d.login_reward_for(d.next_claim_cycle_day()))])
 		"home_tasks":
 			body = UiText.t(String(step["body"]), [UiText.num(_app.economy.daily.task_reward_sb(0))])
+		"ctx_result_lost":
+			# "cost 1 Heart" only when the committed receipt really lost one (ctx "receipt").
+			var h: Dictionary = (ctx.get("receipt", {}) as Dictionary).get("hearts", {})
+			var lost := int(h.get("after", 0)) < int(h.get("before", 0))
+			body = UiText.t(String(step["body"]), [UiText.t("FTUE_CTX_HEART_LOST" if lost else "FTUE_CTX_HEART_KEPT")])
 		_:
 			body = UiText.t(String(step["body"]))
 	if step.has("boosters"):

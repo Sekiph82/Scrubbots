@@ -105,6 +105,9 @@ var ftue = null
 var coachmarks = null
 var _coach_timer: Timer = null
 var _coach_copy := {"id": "", "at": 0, "copy": {}}
+## SB-M44-005/006: the contextual entry shown in the current episode ("" = none). It is
+## acknowledged when its trigger ends (the real action: WAITING resolved, Results left).
+var _coach_ctx_id := ""
 
 func _enter_tree() -> void:
 	_boot()
@@ -481,6 +484,7 @@ func _build_coachmarks() -> void:
 	coachmarks.skip_requested.connect(func():
 		if ftue != null:
 			ftue.skip_tips()
+		_coach_ctx_id = ""
 		refresh_coachmark())
 	_home.shortcut_requested.connect(func(id: String): _ftue_home_event("shortcut:" + id))
 	_home.play_requested.connect(func(): _ftue_home_event("play"))
@@ -517,19 +521,51 @@ func refresh_coachmark() -> void:
 		return
 	if app_state != null and app_state.effects != null:
 		coachmarks.set_reduced(app_state.effects.is_reduced())
-	var want := _coach_want()
+	var trigger := _coach_trigger()
+	# A shown contextual entry is completed by the real action: its situation ended.
+	if not _coach_ctx_id.is_empty() and ftue.contextual_trigger(_coach_ctx_id) != trigger:
+		ftue.acknowledge(_coach_ctx_id)
+		_coach_ctx_id = ""
+	var want := _coach_want(trigger)
 	if want.is_empty():
 		coachmarks.hide_step()
 		return
 	var id := String(want["step"]["id"])
+	if not ftue.contextual_trigger(id).is_empty():
+		_coach_ctx_id = id
 	var now := Time.get_ticks_msec()
 	if id != String(_coach_copy["id"]) or now - int(_coach_copy["at"]) >= COACH_COPY_REFRESH_MS:
 		_coach_copy = {"id": id, "at": now, "copy": ftue.step_copy(want["step"], want["ctx"])}
 	var copy: Dictionary = _coach_copy["copy"]
 	coachmarks.show_step(id, String(copy["title"]), String(copy["body"]), want["rect"])
 
-func _coach_want() -> Dictionary:
-	if ftue == null or nav == null or not ftue.tips_active():
+## SB-M44-005/006: the live contextual trigger, read from canonical state only ("" = none):
+## a slot of the live host the scheduler reports WAITING, or the shown Results status.
+func _coach_trigger() -> String:
+	if ftue == null or nav == null or not ftue.contextual_active():
+		return ""
+	if nav.current() == NavigationController.Route.RESULTS:
+		match String(nav.last_payload().get("status", "")):
+			"WON":
+				return "result_won"
+			"LOST":
+				return "result_lost"
+	elif nav.current() == NavigationController.Route.GAMEPLAY:
+		var host = _gameplay_host
+		if host == null or not is_instance_valid(host) or not host.is_built() or host.get_completion() == null or host.get_completion().is_terminal():
+			return ""
+		for slot in range(host.get_slots().get_slot_count()):
+			if host.get_scheduler().is_slot_waiting(slot):
+				return "slot_waiting"
+	return ""
+
+## The scheduled step for this surface, else the unseen contextual entry for `trigger`
+## (null = read it now). Hidden under modals / Settings and while Results still reveals or
+## holds a ceremony, so a coachmark never covers a reward claim.
+func _coach_want(trigger = null) -> Dictionary:
+	if trigger == null:
+		trigger = _coach_trigger()
+	if ftue == null or nav == null or (not ftue.tips_active() and String(trigger).is_empty()):
 		return {}
 	if (_modals != null and _modals.depth() > 0) or nav.is_settings_open():
 		return {}
@@ -547,9 +583,16 @@ func _coach_want() -> Dictionary:
 			return {}
 		surface = "gameplay"
 		ctx = {"level": int(host.progression_level), "level_id": String(host.launch_entry_id), "host": host}
+	elif nav.current() == NavigationController.Route.RESULTS:
+		if _results == null or not _results.visible or _results.is_revealing() or _results.has_ceremony_barrier():
+			return {}
+		surface = "results"
+		ctx = {"receipt": _results.get_model().get("receipt", {})}
 	else:
 		return {}
 	var step: Dictionary = ftue.current_step(surface, ctx)
+	if step.is_empty():
+		step = ftue.contextual_step(String(trigger))
 	if step.is_empty():
 		return {}
 	return {"step": step, "ctx": ctx, "rect": _coach_target(String(step.get("target", "")), step, host)}
@@ -564,6 +607,8 @@ func _coach_target(target: String, step: Dictionary, host) -> Rect2:
 			return _vis_rect(_home.get_region("Shortcut_tasks"))
 		"play":
 			return _vis_rect(_home.get_region("PlayButton"))
+		"results_retry":
+			return _vis_rect(_results.get_primary_button())
 	if host == null or host.get_screen() == null:
 		return Rect2()
 	var s = host.get_screen()
