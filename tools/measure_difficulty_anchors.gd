@@ -123,7 +123,7 @@ static func progression_v2(dec: Dictionary, manifest_sha: String, analysis_sha: 
 			p["challengeTolerance"][k] = _round1(float(v1["challengeTolerance"][k]) * s)
 	p["calibration"] = {"task": "SB-M36-013", "ruleVersion": RULE_VERSION,
 		"rule": "docs/DIFFICULTY_LANE_ANCHOR_CALIBRATION.md section 2",
-		"anchorManifest": Builder.MANIFEST_PATH, "anchorManifestSha256": manifest_sha,
+		"anchorManifestSha256": manifest_sha,
 		"measuredMedians": dec["medians"], "scale": s,
 		"analysisConfig": AnalyzerV2.CONFIG_PATH, "analysisConfigSha256": analysis_sha,
 		"scoreModelConfig": AnalyzerV2.SCORE_MODEL_PATH, "scoreModelConfigSha256": score_sha,

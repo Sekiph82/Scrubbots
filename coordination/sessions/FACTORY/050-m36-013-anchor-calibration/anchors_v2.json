@@ -1,0 +1,1077 @@
+{
+	"analysisConfig": {
+		"path": "res://data/config/level_difficulty_analysis_v2.json",
+		"sha256": "84e7e5f98064df60ac09975e1bf8cf273bf1e8e52f3d367770d69c99a8c678e5"
+	},
+	"anchorManifest": {
+		"path": "res://tests/fixtures/difficulty_anchors/anchor_manifest_v1.json",
+		"sha256": "6b23f8efc1583e437cfe0e8d915fcd01cbc4c98f3d5351fcef760106b07eb412"
+	},
+	"ceiling": {
+		"bestExtremeD": 59.69980776405917,
+		"bestExtremeId": "x_rings12q_straddle_24"
+	},
+	"decision": {
+		"ceilingCheck": {
+			"bestExtremeD": 59.69980776405917,
+			"pass": true,
+			"veryHardBasePlusGrowth": 57.300000000000004
+		},
+		"medians": {
+			"EASY": 13.809933386980406,
+			"HARD": 43.834989019250045,
+			"MEDIUM": 30.90366752349339,
+			"VERY_HARD": 49.64137552906873
+		},
+		"outcome": "RESCALE",
+		"ruleVersion": "sb-m36-013-anchor-lane-rule/v1",
+		"scale": 0.6398471811087202,
+		"step1Monotonic": true,
+		"step2LaneHolds": {
+			"EASY": {
+				"anchorsWithin2Tol": 5,
+				"holds": false,
+				"median": 13.809933386980406,
+				"medianDelta": -6.190066613019594,
+				"v1Base": 20.0
+			},
+			"HARD": {
+				"anchorsWithin2Tol": 1,
+				"holds": false,
+				"median": 43.834989019250045,
+				"medianDelta": -14.165010980749955,
+				"v1Base": 58.0
+			},
+			"MEDIUM": {
+				"anchorsWithin2Tol": 3,
+				"holds": false,
+				"median": 30.90366752349339,
+				"medianDelta": -9.09633247650661,
+				"v1Base": 40.0
+			},
+			"VERY_HARD": {
+				"anchorsWithin2Tol": 0,
+				"holds": false,
+				"median": 49.64137552906873,
+				"medianDelta": -26.358624470931268,
+				"v1Base": 76.0
+			}
+		},
+		"tolerance": 5.0
+	},
+	"fixtures": [
+		{
+			"D": 12.506400784008118,
+			"h": 24.0,
+			"id": "easy_vstripes3_24",
+			"lane": "EASY",
+			"levelSha256": "b5dce4ed51efa45375d146ebe37231cf3b60c17b158a12d719deac70ad84c1f4",
+			"policySpread": {
+				"allPolicyDRange": [
+					10.073402112137988,
+					13.734504903910805
+				],
+				"primaryEnsembleDRange": [
+					10.073402112137988,
+					13.734504903910805
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.48659973437402115,
+				"robustnessPass": true
+			},
+			"sessionLoad": 13.400418322157275,
+			"solver": "SOLVED",
+			"supply": "layer_rr",
+			"supplySha256": "3e753ed0650516996af8c652a6d0068adfdee3dfa9b3471a7bc6511d1afa88bc",
+			"unlock": {
+				"lockedFraction": 0.0,
+				"maxWave": 0.0,
+				"meanWave": 0.0,
+				"p95Wave": 0.0
+			},
+			"usedColors": 3,
+			"vector": {
+				"A": 0.16474492129535417,
+				"B": 0.0,
+				"C": 0.4999999999999999,
+				"R": 0.014266363351958047,
+				"S": 0.018904282746818192,
+				"U": 0.0,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 13.809933386980406,
+			"h": 28.0,
+			"id": "easy_hbands4_24x28",
+			"lane": "EASY",
+			"levelSha256": "a9f413eecbdb20bb8719ce074891db7b94c6c89fc097d15f5136a28a2692c9f9",
+			"policySpread": {
+				"allPolicyDRange": [
+					13.69784292819611,
+					13.865978616372555
+				],
+				"primaryEnsembleDRange": [
+					13.69784292819611,
+					13.865978616372555
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.02241809175685816,
+				"robustnessPass": true
+			},
+			"sessionLoad": 16.304611592821246,
+			"solver": "SOLVED",
+			"supply": "layer_rr",
+			"supplySha256": "69862e7adadd46464ab37e257c5eeab42167e3f0cd6dcbb10f77969e877055ff",
+			"unlock": {
+				"lockedFraction": 0.0,
+				"maxWave": 0.0,
+				"meanWave": 0.0,
+				"p95Wave": 0.0
+			},
+			"usedColors": 4,
+			"vector": {
+				"A": 0.0,
+				"B": 0.0,
+				"C": 0.5555555555555556,
+				"R": 0.31348118117114354,
+				"S": 0.029866830158383317,
+				"U": 0.0,
+				"W": 0.20431199403518055
+			},
+			"w": 24.0
+		},
+		{
+			"D": 13.45395399679392,
+			"h": 24.0,
+			"id": "easy_tiles4_24",
+			"lane": "EASY",
+			"levelSha256": "a77697f4649fa0463fadbe461ef200813a7d70e2dec0ec6800505bb3e69d4caf",
+			"policySpread": {
+				"allPolicyDRange": [
+					12.24004128335521,
+					14.200066463633576
+				],
+				"primaryEnsembleDRange": [
+					12.24004128335521,
+					14.200066463633576
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.2501104537781469,
+				"robustnessPass": true
+			},
+			"sessionLoad": 13.615194392733132,
+			"solver": "SOLVED",
+			"supply": "layer_rr",
+			"supplySha256": "36f06d786d4eb4c3e6756d251ff4e2fb30456571dfd5c7bcd090dac78f567849",
+			"unlock": {
+				"lockedFraction": 0.0,
+				"maxWave": 0.0,
+				"meanWave": 0.0,
+				"p95Wave": 0.0
+			},
+			"usedColors": 4,
+			"vector": {
+				"A": 0.05705027492058212,
+				"B": 0.0,
+				"C": 0.5555555555555556,
+				"R": 0.24365797879834675,
+				"S": 0.016323947995220602,
+				"U": 0.0,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 24.212321770407193,
+			"h": 24.0,
+			"id": "easy_frame5_24",
+			"lane": "EASY",
+			"levelSha256": "91236cdae3db2659c1b26b4810b54702501bf489c7fc6b02e5a3f86c83d09e35",
+			"policySpread": {
+				"allPolicyDRange": [
+					20.23343033004604,
+					26.09057674161212
+				],
+				"primaryEnsembleDRange": [
+					20.23343033004604,
+					26.09057674161212
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.7957782880722348,
+				"robustnessPass": true
+			},
+			"sessionLoad": 13.618465929537654,
+			"solver": "SOLVED",
+			"supply": "layer_rr",
+			"supplySha256": "1975dc2ea8803f2a066d1770c0744dd4181c3c54c4a1b9483cabbd4c5b2c36c7",
+			"unlock": {
+				"lockedFraction": 0.6944444444444444,
+				"maxWave": 1.0,
+				"meanWave": 0.6944444444444444,
+				"p95Wave": 1.0
+			},
+			"usedColors": 5,
+			"vector": {
+				"A": 0.2855068937323545,
+				"B": 0.0,
+				"C": 0.6014073466873631,
+				"R": 0.03821973709801941,
+				"S": 0.015847436675012955,
+				"U": 0.37803030303030305,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 16.38496828040947,
+			"h": 24.0,
+			"id": "easy_rings4_24",
+			"lane": "EASY",
+			"levelSha256": "2aa3d01581698c5958ae2a21ef1981a4237f0dfaa1329fa893eaafa313daa758",
+			"policySpread": {
+				"allPolicyDRange": [
+					14.199851062764623,
+					18.33730725526841
+				],
+				"primaryEnsembleDRange": [
+					14.199851062764623,
+					18.33730725526841
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.43702344352896816,
+				"robustnessPass": true
+			},
+			"sessionLoad": 13.609168410452819,
+			"solver": "SOLVED",
+			"supply": "layer_rr",
+			"supplySha256": "6cee0ec35f71701b657a8c281284d4642a0802232b1f8dbee4a292fb11384070",
+			"unlock": {
+				"lockedFraction": 0.25,
+				"maxWave": 1.0,
+				"meanWave": 0.25,
+				"p95Wave": 1.0
+			},
+			"usedColors": 4,
+			"vector": {
+				"A": 0.11188485425700825,
+				"B": 0.005833333333333333,
+				"C": 0.5083750866703387,
+				"R": 0.040619358724319585,
+				"S": 0.016633722903957922,
+				"U": 0.2240909090909091,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 30.90366752349339,
+			"h": 24.0,
+			"id": "med_rings6q_24",
+			"lane": "MEDIUM",
+			"levelSha256": "535c9560cdd68663e28fdc5043ad709fba060e6cecef29ff4ad508b24a30c022",
+			"policySpread": {
+				"allPolicyDRange": [
+					25.023510271129467,
+					34.735619071821574
+				],
+				"primaryEnsembleDRange": [
+					26.0249544262318,
+					34.735619071821574
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.9757426194523191,
+				"robustnessPass": true
+			},
+			"sessionLoad": 14.180931664141394,
+			"solver": "SOLVED",
+			"supply": "layer_rr",
+			"supplySha256": "7a47d2ea4c6863ad33ac82c8bc79ee75b13d5c234e97a49c65794be19b98ec57",
+			"unlock": {
+				"lockedFraction": 0.4444444444444444,
+				"maxWave": 2.0,
+				"meanWave": 0.5555555555555556,
+				"p95Wave": 2.0
+			},
+			"usedColors": 6,
+			"vector": {
+				"A": 0.4317063199192354,
+				"B": 0.017028985507246377,
+				"C": 0.6561308380137408,
+				"R": 0.16403359057015604,
+				"S": 0.013686045432752402,
+				"U": 0.4507575757575758,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 31.591592702023092,
+			"h": 24.0,
+			"id": "med_rings6h_24",
+			"lane": "MEDIUM",
+			"levelSha256": "131dc3449715a65a28801789f31b7eaad372530f3d9c87a6dbb3b8d4c4420610",
+			"policySpread": {
+				"allPolicyDRange": [
+					26.992551788334385,
+					34.60694971773911
+				],
+				"primaryEnsembleDRange": [
+					27.28890329339037,
+					34.60694971773911
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.8605378817265432,
+				"robustnessPass": true
+			},
+			"sessionLoad": 13.647143616906757,
+			"solver": "SOLVED",
+			"supply": "layer_rr",
+			"supplySha256": "d9f01efe98d1322e488518f7b4ee3661556cc87d96cc0f84fa78292d2a0bc9ae",
+			"unlock": {
+				"lockedFraction": 0.5625,
+				"maxWave": 3.0,
+				"meanWave": 0.875,
+				"p95Wave": 3.0
+			},
+			"usedColors": 6,
+			"vector": {
+				"A": 0.32219726189986087,
+				"B": 0.0,
+				"C": 0.6458258422391141,
+				"R": 0.06309661981400697,
+				"S": 0.0075634098822185995,
+				"U": 0.6686931818181818,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 22.214318625905353,
+			"h": 24.0,
+			"id": "med_shafts6_24",
+			"lane": "MEDIUM",
+			"levelSha256": "f4b2567523cea9ffe68b41c33da73bea7b51e2112abc46d6b5e667852509d176",
+			"policySpread": {
+				"allPolicyDRange": [
+					16.124963380956746,
+					23.937208973231268
+				],
+				"primaryEnsembleDRange": [
+					19.19771054816849,
+					23.937208973231268
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.603321615547376,
+				"robustnessPass": true
+			},
+			"sessionLoad": 13.400418322157275,
+			"solver": "SOLVED",
+			"supply": "layer_rr",
+			"supplySha256": "dd1a1e1325d45fb1e0fdf6d635b39344e0d68d8de9d5b95960f96eea169631e4",
+			"unlock": {
+				"lockedFraction": 0.0,
+				"maxWave": 0.0,
+				"meanWave": 0.0,
+				"p95Wave": 0.0
+			},
+			"usedColors": 6,
+			"vector": {
+				"A": 0.5419437751457435,
+				"B": 0.0,
+				"C": 0.6486229574824353,
+				"R": 0.014266363351958047,
+				"S": 0.012363923012110102,
+				"U": 0.0,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 26.730560230583194,
+			"h": 24.0,
+			"id": "med_tiles7_24",
+			"lane": "MEDIUM",
+			"levelSha256": "e6fcd988fc38879ac5c69e368148eaaf12467cbc1c4a2152b9501b3588fc9848",
+			"policySpread": {
+				"allPolicyDRange": [
+					22.27275199986115,
+					29.752456771831763
+				],
+				"primaryEnsembleDRange": [
+					22.27275199986115,
+					29.752456771831763
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.8915616461444031,
+				"robustnessPass": true
+			},
+			"sessionLoad": 14.745281101583407,
+			"solver": "SOLVED",
+			"supply": "layer_rr",
+			"supplySha256": "74f6bcb77934afc87473c83bdd31471ea53dd3f4a2bea08414f729bd43ea61e2",
+			"unlock": {
+				"lockedFraction": 0.25,
+				"maxWave": 1.0,
+				"meanWave": 0.25,
+				"p95Wave": 1.0
+			},
+			"usedColors": 7,
+			"vector": {
+				"A": 0.4012594776253184,
+				"B": 0.0,
+				"C": 0.7174640315819634,
+				"R": 0.20086836844149009,
+				"S": 0.00731124410010205,
+				"U": 0.2240909090909091,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 39.502635115310675,
+			"h": 28.0,
+			"id": "med_rings8q_straddle_28",
+			"lane": "MEDIUM",
+			"levelSha256": "f1773ab972575543f95cd2f0f4c5a763803246d403b2a5f120009567c369fe91",
+			"policySpread": {
+				"allPolicyDRange": [
+					37.52206223543861,
+					42.98025279700159
+				],
+				"primaryEnsembleDRange": [
+					37.52206223543861,
+					42.98025279700159
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.695523536338186,
+				"robustnessPass": true
+			},
+			"sessionLoad": 19.54736749111784,
+			"solver": "SOLVED",
+			"supply": "straddle30",
+			"supplySha256": "eee9e66c12211376bc5748d0655f47bf42d7f5017c63a7f5954b8644974a989e",
+			"unlock": {
+				"lockedFraction": 0.5102040816326531,
+				"maxWave": 3.0,
+				"meanWave": 0.7142857142857143,
+				"p95Wave": 2.0
+			},
+			"usedColors": 8,
+			"vector": {
+				"A": 0.5834577746011226,
+				"B": 0.06441958041958042,
+				"C": 0.7663285058743405,
+				"R": 0.17678073407660339,
+				"S": 0.10090521437940687,
+				"U": 0.4917903525046383,
+				"W": 0.27595917942265424
+			},
+			"w": 28.0
+		},
+		{
+			"D": 41.740494956911164,
+			"h": 24.0,
+			"id": "hard_rings8h_24",
+			"lane": "HARD",
+			"levelSha256": "309eff77f4870055e188ec66ac9eff318058e53a8f895e6a506b9c5b045bf7cf",
+			"policySpread": {
+				"allPolicyDRange": [
+					35.197059976558116,
+					44.98825916813375
+				],
+				"primaryEnsembleDRange": [
+					35.197059976558116,
+					44.98825916813375
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 1.3086869960706196,
+				"robustnessPass": true
+			},
+			"sessionLoad": 14.008827674918575,
+			"solver": "SOLVED",
+			"supply": "layer_rr",
+			"supplySha256": "2977c88d1545ac02efd8eb717a9fbdbaf0c009cd44f2608756240222baf8c011",
+			"unlock": {
+				"lockedFraction": 0.6944444444444444,
+				"maxWave": 5.0,
+				"meanWave": 1.5277777777777777,
+				"p95Wave": 4.0
+			},
+			"usedColors": 8,
+			"vector": {
+				"A": 0.3994275031120717,
+				"B": 0.05978260869565217,
+				"C": 0.7608052095620517,
+				"R": 0.07790535525802574,
+				"S": 0.020094483777731216,
+				"U": 0.9541666666666667,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 44.24496267270454,
+			"h": 24.0,
+			"id": "hard_rings9q_split_24",
+			"lane": "HARD",
+			"levelSha256": "691645a00925013e8ae2c1d643b72d02689607ae4cfa23fc89ce6a9c39439351",
+			"policySpread": {
+				"allPolicyDRange": [
+					42.55956060433373,
+					66.8701634797591
+				],
+				"primaryEnsembleDRange": [
+					42.55956060433373,
+					45.95152544156759
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.3413125537726174,
+				"robustnessPass": true
+			},
+			"sessionLoad": 15.15002981414989,
+			"solver": "SOLVED",
+			"supply": "layer_split",
+			"supplySha256": "5d28b884af6298b53df386bc84ad039a95c6fb56acf09fce983018d37a822bac",
+			"unlock": {
+				"lockedFraction": 0.5625,
+				"maxWave": 3.0,
+				"meanWave": 0.875,
+				"p95Wave": 3.0
+			},
+			"usedColors": 9,
+			"vector": {
+				"A": 0.6074634379688073,
+				"B": 0.08509615384615386,
+				"C": 0.8199583719628929,
+				"R": 0.33705852926821894,
+				"S": 0.039563120003358425,
+				"U": 0.6686931818181818,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 51.940215745997186,
+			"h": 24.0,
+			"id": "hard_maze8_24",
+			"lane": "HARD",
+			"levelSha256": "46cc926a7ee6f63fa03f06736b1706590101adb0735521d462703116605fcc0c",
+			"policySpread": {
+				"allPolicyDRange": [
+					47.71250912794605,
+					52.1963396917961
+				],
+				"primaryEnsembleDRange": [
+					47.71250912794605,
+					52.1963396917961
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.07126888139321608,
+				"robustnessPass": true
+			},
+			"sessionLoad": 16.956172707295266,
+			"solver": "SOLVED",
+			"supply": "color_first",
+			"supplySha256": "c8db6506c351cac6fe7d1684374d1cb462bf193d26bfe679ac75d013e3bc8811",
+			"unlock": {
+				"lockedFraction": 0.35763888888888884,
+				"maxWave": 1.0,
+				"meanWave": 0.3576388888888889,
+				"p95Wave": 1.0
+			},
+			"usedColors": 8,
+			"vector": {
+				"A": 1.0,
+				"B": 0.17947071785744553,
+				"C": 0.7741762320284782,
+				"R": 1.0,
+				"S": 0.10282534793829297,
+				"U": 0.26137310606060604,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 43.07955971729338,
+			"h": 26.0,
+			"id": "hard_rings10h_26",
+			"lane": "HARD",
+			"levelSha256": "a9303e61ef743f8b0219f605cd859310a500f9897ddd373d0a0edaa8785d54d6",
+			"policySpread": {
+				"allPolicyDRange": [
+					36.75052586484007,
+					46.67108613107795
+				],
+				"primaryEnsembleDRange": [
+					36.75052586484007,
+					46.67108613107795
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 1.2658067704906628,
+				"robustnessPass": true
+			},
+			"sessionLoad": 17.216419660249255,
+			"solver": "SOLVED",
+			"supply": "layer_rr",
+			"supplySha256": "b1d9bab5fc27ef184909955f40eed132dfa6bc47f9459bc38f06c49fd587d605",
+			"unlock": {
+				"lockedFraction": 0.7159763313609467,
+				"maxWave": 6.0,
+				"meanWave": 1.6923076923076923,
+				"p95Wave": 5.0
+			},
+			"usedColors": 10,
+			"vector": {
+				"A": 0.3584063591894687,
+				"B": 0.025806451612903226,
+				"C": 0.8705707406026667,
+				"R": 0.09097396252020876,
+				"S": 0.033841218531561745,
+				"U": 0.9573964497041421,
+				"W": 0.20696938456699068
+			},
+			"w": 26.0
+		},
+		{
+			"D": 43.834989019250045,
+			"h": 24.0,
+			"id": "hard_tiles9_split_24",
+			"lane": "HARD",
+			"levelSha256": "4bd0cb04e6db8e24d898c5b2800f18697c13b6fc85806f02a93de5226e88cf9b",
+			"policySpread": {
+				"allPolicyDRange": [
+					39.98852303781127,
+					51.26333074824756
+				],
+				"primaryEnsembleDRange": [
+					39.98852303781127,
+					51.26333074824756
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 1.4856683457995032,
+				"robustnessPass": true
+			},
+			"sessionLoad": 15.85873557968552,
+			"solver": "SOLVED",
+			"supply": "layer_split",
+			"supplySha256": "6165806bab5a792ab1f1b3daa944dd19e112d67defdaf34501e7f60684dcaa0f",
+			"unlock": {
+				"lockedFraction": 0.4444444444444444,
+				"maxWave": 2.0,
+				"meanWave": 0.5555555555555556,
+				"p95Wave": 2.0
+			},
+			"usedColors": 9,
+			"vector": {
+				"A": 0.7287581198544618,
+				"B": 0.27745098039215693,
+				"C": 0.8301390062993568,
+				"R": 0.14827509186514562,
+				"S": 0.07682784908718657,
+				"U": 0.4507575757575758,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 48.207343009531066,
+			"h": 24.0,
+			"id": "vh_rings12h_split_24",
+			"lane": "VERY_HARD",
+			"levelSha256": "a53a1a7b4f1ea007dc812786d899ff812daf098dfbe9d225a841ae7161684125",
+			"policySpread": {
+				"allPolicyDRange": [
+					46.86384374236114,
+					76.62719201624043
+				],
+				"primaryEnsembleDRange": [
+					46.86384374236114,
+					50.025888339907375
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.3637090660752591,
+				"robustnessPass": true
+			},
+			"sessionLoad": 14.037226436260628,
+			"solver": "SOLVED",
+			"supply": "layer_split",
+			"supplySha256": "1eb1ad8df98225b206949a2cfc2b84142ea77c00e92a0ccd9cf86a810c76cbbd",
+			"unlock": {
+				"lockedFraction": 0.6944444444444444,
+				"maxWave": 5.0,
+				"meanWave": 1.5277777777777777,
+				"p95Wave": 4.0
+			},
+			"usedColors": 12,
+			"vector": {
+				"A": 0.5697267891218342,
+				"B": 0.04413702239789197,
+				"C": 0.9630383735568526,
+				"R": 0.09741568340864151,
+				"S": 0.026789022324019415,
+				"U": 0.9541666666666667,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 50.748741880487735,
+			"h": 24.0,
+			"id": "vh_rings11h_straddle_24",
+			"lane": "VERY_HARD",
+			"levelSha256": "e969d70453112930d426a97b805eb659e9f985340652c2d727bfe90dcae300ec",
+			"policySpread": {
+				"allPolicyDRange": [
+					46.79235663500191,
+					51.846889700449154
+				],
+				"primaryEnsembleDRange": [
+					48.93526131767217,
+					51.846889700449154
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.3626961125631212,
+				"robustnessPass": true
+			},
+			"sessionLoad": 13.916902726777966,
+			"solver": "SOLVED",
+			"supply": "straddle30",
+			"supplySha256": "5eff5db3b9dae2952fd4c4c533b3bf78b5369cfd86387f3565f8e3bb4a3b0284",
+			"unlock": {
+				"lockedFraction": 0.6944444444444444,
+				"maxWave": 5.0,
+				"meanWave": 1.5277777777777777,
+				"p95Wave": 4.0
+			},
+			"usedColors": 11,
+			"vector": {
+				"A": 0.528739629013491,
+				"B": 0.17736379136634892,
+				"C": 0.9143165642787496,
+				"R": 0.07194668632086258,
+				"S": 0.261614787188621,
+				"U": 0.9541666666666667,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 54.63149578602653,
+			"h": 24.0,
+			"id": "vh_maze10_24",
+			"lane": "VERY_HARD",
+			"levelSha256": "802edfcc47e5666c141cd8991288a5eca8aaa525f95ad41ae34dd3276df3a6e5",
+			"policySpread": {
+				"allPolicyDRange": [
+					50.39404296488584,
+					54.96738453907315
+				],
+				"primaryEnsembleDRange": [
+					50.39404296488584,
+					54.96738453907315
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.09388392768369158,
+				"robustnessPass": true
+			},
+			"sessionLoad": 16.856596260396884,
+			"solver": "SOLVED",
+			"supply": "color_first",
+			"supplySha256": "e101e9cebc9f7f1efe02a7ff18e60830590b741e0df978cf60e5b43db885acc3",
+			"unlock": {
+				"lockedFraction": 0.35763888888888884,
+				"maxWave": 1.0,
+				"meanWave": 0.3576388888888889,
+				"p95Wave": 1.0
+			},
+			"usedColors": 10,
+			"vector": {
+				"A": 1.0,
+				"B": 0.23508136282735823,
+				"C": 0.881204177244895,
+				"R": 1.0,
+				"S": 0.12799546666173311,
+				"U": 0.26137310606060604,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 37.43009163009617,
+			"h": 24.0,
+			"id": "vh_rings10h_r1_split_24",
+			"lane": "VERY_HARD",
+			"levelSha256": "924e8e663831c3c9f432f218425ec2781ca43a70b1410ba386c7d89e1826b4bf",
+			"policySpread": {
+				"allPolicyDRange": [
+					36.10803029419664,
+					75.85891819706333
+				],
+				"primaryEnsembleDRange": [
+					36.10803029419664,
+					39.904945436391934
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.49497076125915385,
+				"robustnessPass": true
+			},
+			"sessionLoad": 15.368494359231216,
+			"solver": "SOLVED",
+			"supply": "layer_split",
+			"supplySha256": "58d6783414f5a1585117f3a7eaf6c906e75d7f4d49add778a5f00ec134142fbe",
+			"unlock": {
+				"lockedFraction": 0.8402777777777778,
+				"maxWave": 11.0,
+				"meanWave": 3.513888888888889,
+				"p95Wave": 9.0
+			},
+			"usedColors": 10,
+			"vector": {
+				"A": 0.08755615346372699,
+				"B": 0.03225806451612903,
+				"C": 0.8830692498450875,
+				"R": 0.08883686955107774,
+				"S": 0.016006091944600603,
+				"U": 0.9760416666666667,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 49.64137552906873,
+			"h": 26.0,
+			"id": "vh_rings12q_split_26",
+			"lane": "VERY_HARD",
+			"levelSha256": "11c5ecc2bee5e70d8c12fd23cbf5f9dc50d412fd2a2d68c6492f981634111c0c",
+			"policySpread": {
+				"allPolicyDRange": [
+					48.5076364735019,
+					77.84885768843776
+				],
+				"primaryEnsembleDRange": [
+					48.5076364735019,
+					51.27499590467358
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.32672407512097834,
+				"robustnessPass": true
+			},
+			"sessionLoad": 18.920972710595578,
+			"solver": "SOLVED",
+			"supply": "layer_split",
+			"supplySha256": "d757e42fc5a3141c1de52f6d74c69514aca8ba929d493dbc1884508badf982c1",
+			"unlock": {
+				"lockedFraction": 0.7159763313609467,
+				"maxWave": 6.0,
+				"meanWave": 1.6923076923076923,
+				"p95Wave": 5.0
+			},
+			"usedColors": 12,
+			"vector": {
+				"A": 0.5221812201649475,
+				"B": 0.0295696506222822,
+				"C": 0.9941766697792092,
+				"R": 0.24504169717971808,
+				"S": 0.01735165081974806,
+				"U": 0.9573964497041421,
+				"W": 0.20696938456699068
+			},
+			"w": 26.0
+		},
+		{
+			"D": 39.809360127074214,
+			"h": 24.0,
+			"id": "x_rings12q_r1_split_24",
+			"lane": "EXTREME",
+			"levelSha256": "1844cbdc4dead832190a2134c48e780f09b7b32f3e168faa013226d273bbc755",
+			"policySpread": {
+				"allPolicyDRange": [
+					38.18207390663706,
+					75.63022627334885
+				],
+				"primaryEnsembleDRange": [
+					38.18207390663706,
+					43.55200948197206
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.7485298709795671,
+				"robustnessPass": true
+			},
+			"sessionLoad": 18.187931032328017,
+			"solver": "SOLVED",
+			"supply": "layer_split",
+			"supplySha256": "b64a5f0a1df1d4b1655af5065f2e07b64a31656f552e6224de3fe60d6661cc82",
+			"unlock": {
+				"lockedFraction": 0.8402777777777778,
+				"maxWave": 11.0,
+				"meanWave": 3.513888888888889,
+				"p95Wave": 9.0
+			},
+			"usedColors": 12,
+			"vector": {
+				"A": 0.09328661007731213,
+				"B": 0.02913968547641073,
+				"C": 0.9981281772268844,
+				"R": 0.1528396542599036,
+				"S": 0.01055842119329053,
+				"U": 0.9760416666666667,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 59.69980776405917,
+			"h": 24.0,
+			"id": "x_rings12q_straddle_24",
+			"lane": "EXTREME",
+			"levelSha256": "857d09b7a201efb5cb31618dfee508e4c405c71e7be8392f47774724f5765d88",
+			"policySpread": {
+				"allPolicyDRange": [
+					56.738616057729615,
+					63.89835192834805
+				],
+				"primaryEnsembleDRange": [
+					56.738616057729615,
+					63.89835192834805
+				],
+				"primaryPoliciesCompleted": "4/6",
+				"robustnessMaxDeviation": 0.8397088328577524,
+				"robustnessPass": true
+			},
+			"sessionLoad": 12.058971174228624,
+			"solver": "SOLVED",
+			"supply": "straddle30",
+			"supplySha256": "c34afee911788a50df60f6e86615f94740dd2d92730c4a6d8458a86fb8f90e28",
+			"unlock": {
+				"lockedFraction": 0.6944444444444444,
+				"maxWave": 5.0,
+				"meanWave": 1.5277777777777777,
+				"p95Wave": 4.0
+			},
+			"usedColors": 12,
+			"vector": {
+				"A": 0.8258917810112988,
+				"B": 0.12954594017094015,
+				"C": 0.992403066426397,
+				"R": 0.2937826161888548,
+				"S": 0.2951781652537999,
+				"U": 0.9541666666666667,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 57.07761891420784,
+			"h": 24.0,
+			"id": "x_maze12_24",
+			"lane": "EXTREME",
+			"levelSha256": "daece7010ac922715d83863e660216c80c856013f778bf119ed0f7984205548f",
+			"policySpread": {
+				"allPolicyDRange": [
+					53.016044034518785,
+					60.94154674713976
+				],
+				"primaryEnsembleDRange": [
+					53.016044034518785,
+					57.45997577899043
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.07647137295653295,
+				"robustnessPass": true
+			},
+			"sessionLoad": 16.79500190598017,
+			"solver": "SOLVED",
+			"supply": "color_first",
+			"supplySha256": "dda49feb5deea876b46382bd3c47dcd4d82cbac264529132b8758a39d2a2faeb",
+			"unlock": {
+				"lockedFraction": 0.3975694444444444,
+				"maxWave": 1.0,
+				"meanWave": 0.3975694444444444,
+				"p95Wave": 1.0
+			},
+			"usedColors": 12,
+			"vector": {
+				"A": 1.0,
+				"B": 0.26071700991609453,
+				"C": 0.995805257567212,
+				"R": 1.0,
+				"S": 0.13459170351479888,
+				"U": 0.2752035984848485,
+				"W": 0.13797958971132712
+			},
+			"w": 24.0
+		},
+		{
+			"D": 40.696008226325105,
+			"h": 28.0,
+			"id": "x_rings12q_r1_split_28",
+			"lane": "EXTREME",
+			"levelSha256": "df45976923aee27cfa3c39d1fa4533436ef88e012562ffe5f4d7b14f38d73e82",
+			"policySpread": {
+				"allPolicyDRange": [
+					39.274581864799345,
+					77.08098600497986
+				],
+				"primaryEnsembleDRange": [
+					39.274581864799345,
+					43.96840969412051
+				],
+				"primaryPoliciesCompleted": "6/6",
+				"robustnessMaxDeviation": 0.6544802935590823,
+				"robustnessPass": true
+			},
+			"sessionLoad": 23.45197705911715,
+			"solver": "SOLVED",
+			"supply": "layer_split",
+			"supplySha256": "34df989defac0020cc6a674ef6afb912067799929be3b04e0201e4c15df93c9d",
+			"unlock": {
+				"lockedFraction": 0.8622448979591837,
+				"maxWave": 13.0,
+				"meanWave": 4.178571428571429,
+				"p95Wave": 10.0
+			},
+			"usedColors": 12,
+			"vector": {
+				"A": 0.07486413932369414,
+				"B": 0.024848484848484845,
+				"C": 0.9985791657061063,
+				"R": 0.14100882836887157,
+				"S": 0.00908959097395457,
+				"U": 0.9793367346938776,
+				"W": 0.27595917942265424
+			},
+			"w": 28.0
+		}
+	],
+	"generatedBy": "res://tools/measure_difficulty_anchors.gd --merge",
+	"modelVersion": 2,
+	"progressionV1": {
+		"path": "res://data/config/level_progression_v1.json",
+		"sha256": "fe967a7867c8bb3a163cd08b6770dc71f148a4c31c64b025a917bdcab5118efd"
+	},
+	"provenance": {
+		"analysisConfig": "res://data/config/level_difficulty_analysis_v2.json",
+		"analysisConfigVersion": 2,
+		"analyzerVersion": "m36-level-difficulty-analyzer/v2",
+		"freeze": {
+			"date": "2026-09-27",
+			"frozen": true,
+			"frozenBy": "tools/calibrate_difficulty_v2.gd --calibrate",
+			"rule": "No V2 candidate change after this point; First 10 holdout is measured and scored only against this exact file (sha256 recorded in calibration_corpus_v1.json)."
+		},
+		"progressionModelVersion": 1,
+		"scoreModelConfig": "res://data/config/difficulty_score_model_v2.json",
+		"scoreModelVersion": 2,
+		"status": "ACTIVE_FOR_NEW_ANALYSIS"
+	},
+	"schema": "scrubbots.m36.anchor_calibration_v2.v1",
+	"scoreModelConfig": {
+		"path": "res://data/config/difficulty_score_model_v2.json",
+		"sha256": "efa5dd36d35423d8a3873a4020ba9ea46a0fee5cc934c187f3ca1191cb0155d9"
+	},
+	"sha256Note": "Pack.content_sha256: sha256 of the JSON text with CRLF normalised to LF",
+	"task": "SB-M36-013",
+	"version": 1
+}
