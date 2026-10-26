@@ -519,7 +519,7 @@ func score(raw: Dictionary, level_number: int = 0, anchor_override: Dictionary =
 		out["targetChallenge"] = target
 		out["signedDelta"] = main["D"] - target
 		out["absoluteDelta"] = absf(main["D"] - target)
-		out["acceptanceWindow"] = _v1.classify_window(main["D"] - target)
+		out["acceptanceWindow"] = _v1.classify_window(main["D"] - target, _prog.challenge_tolerance())
 	return out
 
 static func _range_d(pp: Dictionary) -> Array:
