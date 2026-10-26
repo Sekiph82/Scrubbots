@@ -1,0 +1,976 @@
+{
+	"fixtures": [
+		{
+			"batches": 21,
+			"h": 24,
+			"id": "easy_vstripes3_24",
+			"k": 3,
+			"lane": "EASY",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/easy_vstripes3_24.level.json",
+			"levelSha256": "b5dce4ed51efa45375d146ebe37231cf3b60c17b158a12d719deac70ad84c1f4",
+			"profile": {
+				"A": "low",
+				"B": "low",
+				"C": "low",
+				"R": "low",
+				"S": "low",
+				"U": "low",
+				"W": "low"
+			},
+			"rationale": "Minimum structure: three balanced border-touching stripes, so every batch finds a full frontier (A low), every cell is in unlock wave 0 (U low) and unlock-ordered round-robin supply leaves every column productive (B, S low).",
+			"shape": "vstripes",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 22
+			},
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/easy_vstripes3_24.supply.json",
+			"supplySha256": "3e753ed0650516996af8c652a6d0068adfdee3dfa9b3471a7bc6511d1afa88bc",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03"
+			],
+			"w": 24
+		},
+		{
+			"batches": 24,
+			"h": 28,
+			"id": "easy_hbands4_24x28",
+			"k": 4,
+			"lane": "EASY",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/easy_hbands4_24x28.level.json",
+			"levelSha256": "a9f413eecbdb20bb8719ce074891db7b94c6c89fc097d15f5136a28a2692c9f9",
+			"profile": {
+				"A": "low",
+				"B": "low",
+				"C": "low",
+				"R": "low",
+				"S": "low",
+				"U": "low",
+				"W": "low"
+			},
+			"rationale": "Four horizontal bands on a rectangular board: each band touches both side borders, so access stays open and unlock is one wave; one more colour than the stripes fixture raises colour complexity slightly.",
+			"shape": "hbands",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 25
+			},
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/easy_hbands4_24x28.supply.json",
+			"supplySha256": "69862e7adadd46464ab37e257c5eeab42167e3f0cd6dcbb10f77969e877055ff",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04"
+			],
+			"w": 24
+		},
+		{
+			"batches": 20,
+			"h": 24,
+			"id": "easy_tiles4_24",
+			"k": 4,
+			"lane": "EASY",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/easy_tiles4_24.level.json",
+			"levelSha256": "a77697f4649fa0463fadbe461ef200813a7d70e2dec0ec6800505bb3e69d4caf",
+			"mul": 2,
+			"profile": {
+				"A": "low",
+				"B": "low",
+				"C": "low",
+				"R": "low",
+				"S": "low",
+				"U": "low",
+				"W": "low"
+			},
+			"rationale": "Four large quadrant tiles, each touching two borders: many simultaneous targets per colour and a single unlock wave; four balanced colours give low-moderate colour complexity.",
+			"shape": "tiles",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 21
+			},
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/easy_tiles4_24.supply.json",
+			"supplySha256": "36f06d786d4eb4c3e6756d251ff4e2fb30456571dfd5c7bcd090dac78f567849",
+			"tile": 12,
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04"
+			],
+			"w": 24
+		},
+		{
+			"batches": 22,
+			"h": 24,
+			"id": "easy_frame5_24",
+			"k": 5,
+			"lane": "EASY",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/easy_frame5_24.level.json",
+			"levelSha256": "91236cdae3db2659c1b26b4810b54702501bf489c7fc6b02e5a3f86c83d09e35",
+			"profile": {
+				"A": "low",
+				"B": "low",
+				"C": "mid",
+				"R": "low",
+				"S": "low",
+				"U": "low",
+				"W": "low"
+			},
+			"rationale": "A 2-wide border frame encloses four interior stripes: a shallow one-layer unlock (U low-moderate) with wide frontiers once the frame clears; five colours sit at the top of the EASY colour range.",
+			"shape": "frame",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 23
+			},
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/easy_frame5_24.supply.json",
+			"supplySha256": "1975dc2ea8803f2a066d1770c0744dd4181c3c54c4a1b9483cabbd4c5b2c36c7",
+			"t": 2,
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05"
+			],
+			"w": 24
+		},
+		{
+			"batches": 22,
+			"h": 24,
+			"id": "easy_rings4_24",
+			"k": 4,
+			"lane": "EASY",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/easy_rings4_24.level.json",
+			"levelSha256": "2aa3d01581698c5958ae2a21ef1981a4237f0dfaa1329fa893eaafa313daa758",
+			"ns": 2,
+			"profile": {
+				"A": "low",
+				"B": "low",
+				"C": "low",
+				"R": "low",
+				"S": "low",
+				"U": "mid",
+				"W": "low"
+			},
+			"rationale": "Two wide 6-cell rings split into halves: the inner ring opens only after the outer ring (one extra unlock layer) but every layer exposes a long frontier, so access and choice stay easy; the upper edge of the EASY design range.",
+			"rw": 6,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 23
+			},
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/easy_rings4_24.supply.json",
+			"supplySha256": "6cee0ec35f71701b657a8c281284d4642a0802232b1f8dbee4a292fb11384070",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04"
+			],
+			"w": 24
+		},
+		{
+			"batches": 24,
+			"h": 24,
+			"id": "med_rings6q_24",
+			"k": 6,
+			"lane": "MEDIUM",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/med_rings6q_24.level.json",
+			"levelSha256": "535c9560cdd68663e28fdc5043ad709fba060e6cecef29ff4ad508b24a30c022",
+			"ns": 4,
+			"profile": {
+				"A": "mid",
+				"B": "low",
+				"C": "mid",
+				"R": "low",
+				"S": "mid",
+				"U": "mid",
+				"W": "low"
+			},
+			"rationale": "Three 4-wide rings split into quadrants with six colours: moderate enclosure (three unlock layers) and four colours per layer, so batches of one colour reach only a quarter of the open frontier (moderate A and S).",
+			"rw": 4,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 25
+			},
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/med_rings6q_24.supply.json",
+			"supplySha256": "7a47d2ea4c6863ad33ac82c8bc79ee75b13d5c234e97a49c65794be19b98ec57",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06"
+			],
+			"w": 24
+		},
+		{
+			"batches": 22,
+			"h": 24,
+			"id": "med_rings6h_24",
+			"k": 6,
+			"lane": "MEDIUM",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/med_rings6h_24.level.json",
+			"levelSha256": "131dc3449715a65a28801789f31b7eaad372530f3d9c87a6dbb3b8d4c4420610",
+			"ns": 2,
+			"profile": {
+				"A": "mid",
+				"B": "low",
+				"C": "mid",
+				"R": "low",
+				"S": "low",
+				"U": "mid",
+				"W": "low"
+			},
+			"rationale": "Four 3-wide rings split into halves with six colours: one more unlock layer than the quadrant rings with only two colours per layer, so enclosure rises while colour/slot pressure stays moderate.",
+			"rw": 3,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 23
+			},
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/med_rings6h_24.supply.json",
+			"supplySha256": "d9f01efe98d1322e488518f7b4ee3661556cc87d96cc0f84fa78292d2a0bc9ae",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06"
+			],
+			"w": 24
+		},
+		{
+			"batches": 21,
+			"h": 24,
+			"id": "med_shafts6_24",
+			"k": 6,
+			"lane": "MEDIUM",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/med_shafts6_24.level.json",
+			"levelSha256": "f4b2567523cea9ffe68b41c33da73bea7b51e2112abc46d6b5e667852509d176",
+			"nb": 3,
+			"profile": {
+				"A": "high",
+				"B": "low",
+				"C": "mid",
+				"R": "low",
+				"S": "mid",
+				"U": "low",
+				"W": "low"
+			},
+			"rationale": "Three base stripes cut by 1-wide vertical shafts of three further colours: everything touches the border (U low) but each shaft exposes only two end cells to a whole batch, so accessibility scarcity is the main pressure.",
+			"shape": "shafts",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 22
+			},
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/med_shafts6_24.supply.json",
+			"supplySha256": "dd1a1e1325d45fb1e0fdf6d635b39344e0d68d8de9d5b95960f96eea169631e4",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06"
+			],
+			"w": 24
+		},
+		{
+			"batches": 27,
+			"h": 24,
+			"id": "med_tiles7_24",
+			"k": 7,
+			"lane": "MEDIUM",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/med_tiles7_24.level.json",
+			"levelSha256": "e6fcd988fc38879ac5c69e368148eaaf12467cbc1c4a2152b9501b3588fc9848",
+			"mul": 3,
+			"profile": {
+				"A": "mid",
+				"B": "low",
+				"C": "mid",
+				"R": "low",
+				"S": "mid",
+				"U": "mid",
+				"W": "low"
+			},
+			"rationale": "A 4x4 grid of 6-cell tiles in seven colours: the four centre tiles are enclosed by one colour change (moderate unlock depth) and seven interleaved colours spread demand across many small frontiers.",
+			"shape": "tiles",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 28
+			},
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/med_tiles7_24.supply.json",
+			"supplySha256": "74f6bcb77934afc87473c83bdd31471ea53dd3f4a2bea08414f729bd43ea61e2",
+			"tile": 6,
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07"
+			],
+			"w": 24
+		},
+		{
+			"batches": 32,
+			"h": 28,
+			"id": "med_rings8q_straddle_28",
+			"k": 8,
+			"lane": "MEDIUM",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/med_rings8q_straddle_28.level.json",
+			"levelSha256": "f1773ab972575543f95cd2f0f4c5a763803246d403b2a5f120009567c369fe91",
+			"ns": 4,
+			"profile": {
+				"A": "mid",
+				"B": "mid",
+				"C": "mid",
+				"R": "low",
+				"S": "high",
+				"U": "mid",
+				"W": "mid"
+			},
+			"rationale": "Four 4-wide quadrant rings in eight colours with colour-first 30-robot chunks that straddle layers: moderate enclosure plus slot pressure from batches that wait for inner layers; the upper edge of the MEDIUM design range.",
+			"rw": 4,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 33
+			},
+			"supply": "straddle30",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/med_rings8q_straddle_28.supply.json",
+			"supplySha256": "eee9e66c12211376bc5748d0655f47bf42d7f5017c63a7f5954b8644974a989e",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08"
+			],
+			"w": 28
+		},
+		{
+			"batches": 24,
+			"h": 24,
+			"id": "hard_rings8h_24",
+			"k": 8,
+			"lane": "HARD",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/hard_rings8h_24.level.json",
+			"levelSha256": "309eff77f4870055e188ec66ac9eff318058e53a8f895e6a506b9c5b045bf7cf",
+			"ns": 2,
+			"profile": {
+				"A": "mid",
+				"B": "low",
+				"C": "high",
+				"R": "mid",
+				"S": "mid",
+				"U": "high",
+				"W": "low"
+			},
+			"rationale": "Six 2-wide half-rings in eight colours: a deep six-layer unlock chain where each layer has two colours, with layer-ordered supply so the chain, not the queue, carries the difficulty.",
+			"rw": 2,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 25
+			},
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/hard_rings8h_24.supply.json",
+			"supplySha256": "2977c88d1545ac02efd8eb717a9fbdbaf0c009cd44f2608756240222baf8c011",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08"
+			],
+			"w": 24
+		},
+		{
+			"batches": 28,
+			"h": 24,
+			"id": "hard_rings9q_split_24",
+			"k": 9,
+			"lane": "HARD",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/hard_rings9q_split_24.level.json",
+			"levelSha256": "691645a00925013e8ae2c1d643b72d02689607ae4cfa23fc89ce6a9c39439351",
+			"ns": 4,
+			"profile": {
+				"A": "mid",
+				"B": "high",
+				"C": "high",
+				"R": "mid",
+				"S": "mid",
+				"U": "high",
+				"W": "low"
+			},
+			"rationale": "Four 3-wide quadrant rings in nine colours with the border layer alone in column 1: early decisions have one productive column (bottlenecks) on top of a four-layer unlock chain.",
+			"rw": 3,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 29
+			},
+			"supply": "layer_split",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/hard_rings9q_split_24.supply.json",
+			"supplySha256": "5d28b884af6298b53df386bc84ad039a95c6fb56acf09fce983018d37a822bac",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09"
+			],
+			"w": 24
+		},
+		{
+			"batches": 24,
+			"h": 24,
+			"id": "hard_maze8_24",
+			"k": 8,
+			"lane": "HARD",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/hard_maze8_24.level.json",
+			"levelSha256": "46cc926a7ee6f63fa03f06736b1706590101adb0735521d462703116605fcc0c",
+			"nc": 4,
+			"profile": {
+				"A": "high",
+				"B": "mid",
+				"C": "high",
+				"R": "high",
+				"S": "mid",
+				"U": "high",
+				"W": "low"
+			},
+			"rationale": "A serpentine 1-wide corridor with one entrance, coloured in four path-ordered segments and demanded first: robots follow long winding routes (R high) to a narrow two-cell frontier (A high) before the eight-colour walls open.",
+			"shape": "maze",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 25
+			},
+			"supply": "color_first",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/hard_maze8_24.supply.json",
+			"supplySha256": "c8db6506c351cac6fe7d1684374d1cb462bf193d26bfe679ac75d013e3bc8811",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08"
+			],
+			"w": 24
+		},
+		{
+			"batches": 32,
+			"h": 26,
+			"id": "hard_rings10h_26",
+			"k": 10,
+			"lane": "HARD",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/hard_rings10h_26.level.json",
+			"levelSha256": "a9303e61ef743f8b0219f605cd859310a500f9897ddd373d0a0edaa8785d54d6",
+			"ns": 2,
+			"profile": {
+				"A": "mid",
+				"B": "low",
+				"C": "high",
+				"R": "mid",
+				"S": "mid",
+				"U": "high",
+				"W": "mid"
+			},
+			"rationale": "Seven 2-wide half-rings in ten colours on a 26 board: the deepest layered chain of the HARD set with ten colours, but layer-ordered supply keeps bottlenecks low.",
+			"rw": 2,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 33
+			},
+			"supply": "layer_rr",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/hard_rings10h_26.supply.json",
+			"supplySha256": "b1d9bab5fc27ef184909955f40eed132dfa6bc47f9459bc38f06c49fd587d605",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10"
+			],
+			"w": 26
+		},
+		{
+			"batches": 34,
+			"h": 24,
+			"id": "hard_tiles9_split_24",
+			"k": 9,
+			"lane": "HARD",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/hard_tiles9_split_24.level.json",
+			"levelSha256": "4bd0cb04e6db8e24d898c5b2800f18697c13b6fc85806f02a93de5226e88cf9b",
+			"mul": 4,
+			"profile": {
+				"A": "high",
+				"B": "high",
+				"C": "high",
+				"R": "mid",
+				"S": "mid",
+				"U": "high",
+				"W": "low"
+			},
+			"rationale": "A 6x6 grid of 4-cell tiles in nine interleaved colours with the border layer isolated in column 1: many small enclosed tiles give a deep unlock and small frontiers, and the split supply forces single-column decisions early.",
+			"shape": "tiles",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 35
+			},
+			"supply": "layer_split",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/hard_tiles9_split_24.supply.json",
+			"supplySha256": "6165806bab5a792ab1f1b3daa944dd19e112d67defdaf34501e7f60684dcaa0f",
+			"tile": 4,
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09"
+			],
+			"w": 24
+		},
+		{
+			"batches": 24,
+			"h": 24,
+			"id": "vh_rings12h_split_24",
+			"k": 12,
+			"lane": "VERY_HARD",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/vh_rings12h_split_24.level.json",
+			"levelSha256": "a53a1a7b4f1ea007dc812786d899ff812daf098dfbe9d225a841ae7161684125",
+			"ns": 2,
+			"profile": {
+				"A": "high",
+				"B": "high",
+				"C": "high",
+				"R": "mid",
+				"S": "high",
+				"U": "high",
+				"W": "low"
+			},
+			"rationale": "Six 2-wide half-rings in twelve colours (every layer two new colours) with the border layer alone in column 1: deep enclosure, maximum colour count and forced single-column choices.",
+			"rw": 2,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 25
+			},
+			"supply": "layer_split",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/vh_rings12h_split_24.supply.json",
+			"supplySha256": "1eb1ad8df98225b206949a2cfc2b84142ea77c00e92a0ccd9cf86a810c76cbbd",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10",
+				"C11",
+				"C14"
+			],
+			"w": 24
+		},
+		{
+			"batches": 24,
+			"h": 24,
+			"id": "vh_rings11h_straddle_24",
+			"k": 11,
+			"lane": "VERY_HARD",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/vh_rings11h_straddle_24.level.json",
+			"levelSha256": "e969d70453112930d426a97b805eb659e9f985340652c2d727bfe90dcae300ec",
+			"ns": 2,
+			"profile": {
+				"A": "high",
+				"B": "mid",
+				"C": "high",
+				"R": "mid",
+				"S": "high",
+				"U": "high",
+				"W": "low"
+			},
+			"rationale": "Six 2-wide half-rings in eleven colours with colour-first chunks that straddle layers: deep enclosure plus slots held by batches whose targets are still enclosed (slot/colour pressure).",
+			"rw": 2,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 25
+			},
+			"supply": "straddle30",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/vh_rings11h_straddle_24.supply.json",
+			"supplySha256": "5eff5db3b9dae2952fd4c4c533b3bf78b5369cfd86387f3565f8e3bb4a3b0284",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10",
+				"C11"
+			],
+			"w": 24
+		},
+		{
+			"batches": 24,
+			"h": 24,
+			"id": "vh_maze10_24",
+			"k": 10,
+			"lane": "VERY_HARD",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/vh_maze10_24.level.json",
+			"levelSha256": "802edfcc47e5666c141cd8991288a5eca8aaa525f95ad41ae34dd3276df3a6e5",
+			"nc": 5,
+			"profile": {
+				"A": "high",
+				"B": "high",
+				"C": "high",
+				"R": "high",
+				"S": "high",
+				"U": "high",
+				"W": "low"
+			},
+			"rationale": "A single-entrance serpentine corridor in five path-ordered colours demanded before five wall colours: long routes, a two-cell frontier and colour-first supply where most offered batches cannot progress.",
+			"shape": "maze",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 25
+			},
+			"supply": "color_first",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/vh_maze10_24.supply.json",
+			"supplySha256": "e101e9cebc9f7f1efe02a7ff18e60830590b741e0df978cf60e5b43db885acc3",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10"
+			],
+			"w": 24
+		},
+		{
+			"batches": 32,
+			"h": 24,
+			"id": "vh_rings10h_r1_split_24",
+			"k": 10,
+			"lane": "VERY_HARD",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/vh_rings10h_r1_split_24.level.json",
+			"levelSha256": "924e8e663831c3c9f432f218425ec2781ca43a70b1410ba386c7d89e1826b4bf",
+			"ns": 2,
+			"profile": {
+				"A": "high",
+				"B": "high",
+				"C": "high",
+				"R": "mid",
+				"S": "high",
+				"U": "high",
+				"W": "low"
+			},
+			"rationale": "Twelve 1-wide half-rings in ten colours with the border layer isolated: a twelve-layer unlock chain where each layer is a narrow frontier, and split supply forcing choices.",
+			"rw": 1,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 33
+			},
+			"supply": "layer_split",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/vh_rings10h_r1_split_24.supply.json",
+			"supplySha256": "58d6783414f5a1585117f3a7eaf6c906e75d7f4d49add778a5f00ec134142fbe",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10"
+			],
+			"w": 24
+		},
+		{
+			"batches": 40,
+			"h": 26,
+			"id": "vh_rings12q_split_26",
+			"k": 12,
+			"lane": "VERY_HARD",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/vh_rings12q_split_26.level.json",
+			"levelSha256": "11c5ecc2bee5e70d8c12fd23cbf5f9dc50d412fd2a2d68c6492f981634111c0c",
+			"ns": 4,
+			"profile": {
+				"A": "high",
+				"B": "high",
+				"C": "high",
+				"R": "mid",
+				"S": "high",
+				"U": "high",
+				"W": "mid"
+			},
+			"rationale": "Seven 2-wide quadrant rings in twelve colours on a 26 board: four colours per layer split the frontier into quarters, a seven-layer chain, and border-isolated split supply.",
+			"rw": 2,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 41
+			},
+			"supply": "layer_split",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/vh_rings12q_split_26.supply.json",
+			"supplySha256": "d757e42fc5a3141c1de52f6d74c69514aca8ba929d493dbc1884508badf982c1",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10",
+				"C11",
+				"C14"
+			],
+			"w": 26
+		},
+		{
+			"batches": 48,
+			"h": 24,
+			"id": "x_rings12q_r1_split_24",
+			"k": 12,
+			"lane": "EXTREME",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/x_rings12q_r1_split_24.level.json",
+			"levelSha256": "1844cbdc4dead832190a2134c48e780f09b7b32f3e168faa013226d273bbc755",
+			"ns": 4,
+			"profile": {
+				"A": "high",
+				"B": "high",
+				"C": "high",
+				"R": "mid",
+				"S": "high",
+				"U": "high",
+				"W": "low"
+			},
+			"rationale": "Ceiling probe: twelve 1-wide rings split into quadrants over twelve colours, so each layer is a narrow frontier shared by four colours, behind a twelve-layer unlock chain with border-isolated split supply.",
+			"rw": 1,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 49
+			},
+			"supply": "layer_split",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/x_rings12q_r1_split_24.supply.json",
+			"supplySha256": "b64a5f0a1df1d4b1655af5065f2e07b64a31656f552e6224de3fe60d6661cc82",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10",
+				"C11",
+				"C14"
+			],
+			"w": 24
+		},
+		{
+			"batches": 28,
+			"h": 24,
+			"id": "x_rings12q_straddle_24",
+			"k": 12,
+			"lane": "EXTREME",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/x_rings12q_straddle_24.level.json",
+			"levelSha256": "857d09b7a201efb5cb31618dfee508e4c405c71e7be8392f47774724f5765d88",
+			"ns": 4,
+			"profile": {
+				"A": "high",
+				"B": "high",
+				"C": "high",
+				"R": "mid",
+				"S": "high",
+				"U": "high",
+				"W": "low"
+			},
+			"rationale": "Ceiling probe: six 2-wide quadrant rings over twelve colours with colour-first chunks that straddle layers, maximising slots held by batches with no reachable target behind a deep unlock chain.",
+			"rw": 2,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 29
+			},
+			"supply": "straddle30",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/x_rings12q_straddle_24.supply.json",
+			"supplySha256": "c34afee911788a50df60f6e86615f94740dd2d92730c4a6d8458a86fb8f90e28",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10",
+				"C11",
+				"C14"
+			],
+			"w": 24
+		},
+		{
+			"batches": 24,
+			"h": 24,
+			"id": "x_maze12_24",
+			"k": 12,
+			"lane": "EXTREME",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/x_maze12_24.level.json",
+			"levelSha256": "daece7010ac922715d83863e660216c80c856013f778bf119ed0f7984205548f",
+			"nc": 6,
+			"profile": {
+				"A": "high",
+				"B": "high",
+				"C": "high",
+				"R": "high",
+				"S": "high",
+				"U": "high",
+				"W": "low"
+			},
+			"rationale": "Ceiling probe: single-entrance serpentine corridor in six path-ordered colours demanded before six wall colours: maximum route length/detour/turns, a two-cell frontier and forced single-column decisions.",
+			"shape": "maze",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 25
+			},
+			"supply": "color_first",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/x_maze12_24.supply.json",
+			"supplySha256": "dda49feb5deea876b46382bd3c47dcd4d82cbac264529132b8758a39d2a2faeb",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10",
+				"C11",
+				"C14"
+			],
+			"w": 24
+		},
+		{
+			"batches": 56,
+			"h": 28,
+			"id": "x_rings12q_r1_split_28",
+			"k": 12,
+			"lane": "EXTREME",
+			"levelPath": "res://tests/fixtures/difficulty_anchors/x_rings12q_r1_split_28.level.json",
+			"levelSha256": "df45976923aee27cfa3c39d1fa4533436ef88e012562ffe5f4d7b14f38d73e82",
+			"ns": 4,
+			"profile": {
+				"A": "high",
+				"B": "high",
+				"C": "high",
+				"R": "high",
+				"S": "high",
+				"U": "high",
+				"W": "mid"
+			},
+			"rationale": "Ceiling probe: fourteen 1-wide quadrant rings over twelve colours on a 28 board, the deepest enclosure chain in the set with border-isolated split supply.",
+			"rw": 1,
+			"shape": "rings",
+			"solver": {
+				"status": "SOLVED",
+				"visited": 57
+			},
+			"supply": "layer_split",
+			"supplyPath": "res://tests/fixtures/difficulty_anchors/x_rings12q_r1_split_28.supply.json",
+			"supplySha256": "34df989defac0020cc6a674ef6afb912067799929be3b04e0201e4c15df93c9d",
+			"usedColors": [
+				"C01",
+				"C02",
+				"C03",
+				"C04",
+				"C05",
+				"C06",
+				"C07",
+				"C08",
+				"C09",
+				"C10",
+				"C11",
+				"C14"
+			],
+			"w": 28
+		}
+	],
+	"generatedBy": "res://tools/build_difficulty_anchors.gd",
+	"laneCounts": {
+		"EASY": 5,
+		"EXTREME": 4,
+		"HARD": 5,
+		"MEDIUM": 5,
+		"VERY_HARD": 5
+	},
+	"note": "QA-only lane anchor fixtures designed from the score component rules. Never production catalog or campaign content. Declared before any Challenge measurement.",
+	"qaOnly": true,
+	"schema": "scrubbots.m36.difficulty_anchor_corpus.v1",
+	"task": "SB-M36-013",
+	"version": 1
+}

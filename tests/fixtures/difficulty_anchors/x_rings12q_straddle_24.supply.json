@@ -1,0 +1,158 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "x_rings12q_straddle_24-001",
+				"cid": "C01",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-002",
+				"cid": "C02",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-003",
+				"cid": "C03",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-004",
+				"cid": "C04",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-005",
+				"cid": "C05",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-006",
+				"cid": "C06",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-007",
+				"cid": "C08",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-008",
+				"cid": "C09",
+				"robots": 2
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-009",
+				"cid": "C11",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-010",
+				"cid": "C14",
+				"robots": 2
+			}
+		],
+		[
+			{
+				"batchId": "x_rings12q_straddle_24-011",
+				"cid": "C01",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-012",
+				"cid": "C02",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-013",
+				"cid": "C03",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-014",
+				"cid": "C04",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-015",
+				"cid": "C05",
+				"robots": 18
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-016",
+				"cid": "C07",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-017",
+				"cid": "C08",
+				"robots": 18
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-018",
+				"cid": "C10",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-019",
+				"cid": "C11",
+				"robots": 2
+			}
+		],
+		[
+			{
+				"batchId": "x_rings12q_straddle_24-020",
+				"cid": "C01",
+				"robots": 4
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-021",
+				"cid": "C02",
+				"robots": 4
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-022",
+				"cid": "C03",
+				"robots": 4
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-023",
+				"cid": "C04",
+				"robots": 4
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-024",
+				"cid": "C06",
+				"robots": 18
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-025",
+				"cid": "C07",
+				"robots": 18
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-026",
+				"cid": "C09",
+				"robots": 30
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-027",
+				"cid": "C10",
+				"robots": 2
+			},
+			{
+				"batchId": "x_rings12q_straddle_24-028",
+				"cid": "C14",
+				"robots": 30
+			}
+		]
+	],
+	"levelId": "anchor_x_rings12q_straddle_24",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "straddle30",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

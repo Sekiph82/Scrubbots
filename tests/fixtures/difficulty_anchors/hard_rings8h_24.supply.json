@@ -1,0 +1,138 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "hard_rings8h_24-001",
+				"cid": "C01",
+				"robots": 30
+			},
+			{
+				"batchId": "hard_rings8h_24-002",
+				"cid": "C02",
+				"robots": 30
+			},
+			{
+				"batchId": "hard_rings8h_24-003",
+				"cid": "C03",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings8h_24-004",
+				"cid": "C04",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings8h_24-005",
+				"cid": "C05",
+				"robots": 28
+			},
+			{
+				"batchId": "hard_rings8h_24-006",
+				"cid": "C06",
+				"robots": 28
+			},
+			{
+				"batchId": "hard_rings8h_24-007",
+				"cid": "C08",
+				"robots": 20
+			},
+			{
+				"batchId": "hard_rings8h_24-008",
+				"cid": "C02",
+				"robots": 24
+			}
+		],
+		[
+			{
+				"batchId": "hard_rings8h_24-009",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "hard_rings8h_24-010",
+				"cid": "C02",
+				"robots": 29
+			},
+			{
+				"batchId": "hard_rings8h_24-011",
+				"cid": "C03",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings8h_24-012",
+				"cid": "C04",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings8h_24-013",
+				"cid": "C05",
+				"robots": 28
+			},
+			{
+				"batchId": "hard_rings8h_24-014",
+				"cid": "C07",
+				"robots": 20
+			},
+			{
+				"batchId": "hard_rings8h_24-015",
+				"cid": "C08",
+				"robots": 20
+			},
+			{
+				"batchId": "hard_rings8h_24-016",
+				"cid": "C03",
+				"robots": 8
+			}
+		],
+		[
+			{
+				"batchId": "hard_rings8h_24-017",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "hard_rings8h_24-018",
+				"cid": "C02",
+				"robots": 29
+			},
+			{
+				"batchId": "hard_rings8h_24-019",
+				"cid": "C03",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings8h_24-020",
+				"cid": "C04",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings8h_24-021",
+				"cid": "C06",
+				"robots": 28
+			},
+			{
+				"batchId": "hard_rings8h_24-022",
+				"cid": "C07",
+				"robots": 20
+			},
+			{
+				"batchId": "hard_rings8h_24-023",
+				"cid": "C01",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings8h_24-024",
+				"cid": "C04",
+				"robots": 8
+			}
+		]
+	],
+	"levelId": "anchor_hard_rings8h_24",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

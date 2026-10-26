@@ -1,0 +1,298 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "x_rings12q_r1_split_28-001",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-002",
+				"cid": "C02",
+				"robots": 27
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-003",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-004",
+				"cid": "C04",
+				"robots": 27
+			}
+		],
+		[
+			{
+				"batchId": "x_rings12q_r1_split_28-005",
+				"cid": "C05",
+				"robots": 25
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-006",
+				"cid": "C07",
+				"robots": 25
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-007",
+				"cid": "C09",
+				"robots": 23
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-008",
+				"cid": "C11",
+				"robots": 23
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-009",
+				"cid": "C01",
+				"robots": 21
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-010",
+				"cid": "C03",
+				"robots": 21
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-011",
+				"cid": "C05",
+				"robots": 19
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-012",
+				"cid": "C07",
+				"robots": 19
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-013",
+				"cid": "C09",
+				"robots": 17
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-014",
+				"cid": "C11",
+				"robots": 17
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-015",
+				"cid": "C01",
+				"robots": 15
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-016",
+				"cid": "C03",
+				"robots": 15
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-017",
+				"cid": "C05",
+				"robots": 13
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-018",
+				"cid": "C07",
+				"robots": 13
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-019",
+				"cid": "C09",
+				"robots": 11
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-020",
+				"cid": "C11",
+				"robots": 11
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-021",
+				"cid": "C01",
+				"robots": 9
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-022",
+				"cid": "C03",
+				"robots": 9
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-023",
+				"cid": "C05",
+				"robots": 7
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-024",
+				"cid": "C07",
+				"robots": 7
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-025",
+				"cid": "C09",
+				"robots": 5
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-026",
+				"cid": "C11",
+				"robots": 5
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-027",
+				"cid": "C01",
+				"robots": 3
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-028",
+				"cid": "C03",
+				"robots": 3
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-029",
+				"cid": "C05",
+				"robots": 1
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-030",
+				"cid": "C07",
+				"robots": 1
+			}
+		],
+		[
+			{
+				"batchId": "x_rings12q_r1_split_28-031",
+				"cid": "C06",
+				"robots": 25
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-032",
+				"cid": "C08",
+				"robots": 25
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-033",
+				"cid": "C10",
+				"robots": 23
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-034",
+				"cid": "C14",
+				"robots": 23
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-035",
+				"cid": "C02",
+				"robots": 21
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-036",
+				"cid": "C04",
+				"robots": 21
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-037",
+				"cid": "C06",
+				"robots": 19
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-038",
+				"cid": "C08",
+				"robots": 19
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-039",
+				"cid": "C10",
+				"robots": 17
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-040",
+				"cid": "C14",
+				"robots": 17
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-041",
+				"cid": "C02",
+				"robots": 15
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-042",
+				"cid": "C04",
+				"robots": 15
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-043",
+				"cid": "C06",
+				"robots": 13
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-044",
+				"cid": "C08",
+				"robots": 13
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-045",
+				"cid": "C10",
+				"robots": 11
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-046",
+				"cid": "C14",
+				"robots": 11
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-047",
+				"cid": "C02",
+				"robots": 9
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-048",
+				"cid": "C04",
+				"robots": 9
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-049",
+				"cid": "C06",
+				"robots": 7
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-050",
+				"cid": "C08",
+				"robots": 7
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-051",
+				"cid": "C10",
+				"robots": 5
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-052",
+				"cid": "C14",
+				"robots": 5
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-053",
+				"cid": "C02",
+				"robots": 3
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-054",
+				"cid": "C04",
+				"robots": 3
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-055",
+				"cid": "C06",
+				"robots": 1
+			},
+			{
+				"batchId": "x_rings12q_r1_split_28-056",
+				"cid": "C08",
+				"robots": 1
+			}
+		]
+	],
+	"levelId": "anchor_x_rings12q_r1_split_28",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_split",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}
