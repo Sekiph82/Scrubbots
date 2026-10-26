@@ -21,7 +21,7 @@ extends RefCounted
 ##   - A is progress-interval weighted; A/U/R are normalized with anchors derived by rule
 ##     from the independent 27-fixture M53-C002 corpus (anchors frozen in the config).
 ## W, C and the locked weights come from difficulty_score_model_v2.json; TargetChallenge lanes
-## are read unchanged from level_progression_v1.json.
+## are read unchanged from level_progression_v1.json (or the file passed as `progression_path`).
 
 const V1 = preload("res://scripts/difficulty/level_difficulty_analyzer_v1.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
@@ -47,7 +47,7 @@ var _model = null
 var _prog = null
 var _error := ""
 
-func _init(config_path: String = CONFIG_PATH) -> void:
+func _init(config_path: String = CONFIG_PATH, progression_path: String = DifficultyProgressionV1.DEFAULT_CONFIG_PATH) -> void:
 	_cfg = V1._read_json(config_path)
 	if _cfg.get("schema", "") != EXPECTED_SCHEMA:
 		_error = "v2 config missing/unexpected schema"
@@ -55,7 +55,7 @@ func _init(config_path: String = CONFIG_PATH) -> void:
 	_score_cfg = V1._read_json(SCORE_MODEL_PATH)
 	_v1 = V1.new()
 	_model = ChallengeScoreModelV1.new(SCORE_MODEL_PATH)
-	_prog = DifficultyProgressionV1.new()
+	_prog = DifficultyProgressionV1.new(progression_path)
 	if not _v1.is_ok() or not _model.is_ok() or not _prog.is_ok():
 		_error = "model load failed"
 
@@ -86,7 +86,7 @@ func provenance() -> Dictionary:
 	return {"analyzerVersion": String(_cfg["analyzerVersion"]), "analysisConfig": CONFIG_PATH,
 		"analysisConfigVersion": int(_cfg["version"]), "status": String(_cfg["status"]),
 		"scoreModelConfig": SCORE_MODEL_PATH, "scoreModelVersion": _model.model_version(),
-		"progressionModelVersion": int(V1._read_json(DifficultyProgressionV1.DEFAULT_CONFIG_PATH).get("version", 0)),
+		"progressionModelVersion": _prog.model_version(),
 		"freeze": _cfg.get("freeze", null)}
 
 # =========================================================================== measure ==

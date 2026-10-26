@@ -17,6 +17,10 @@ extends SceneTree
 ## LevelData sha and trace hash match) and writes
 ## coordination/sessions/FACTORY/046-difficulty-model-v2/playtest_v2.json. `--model v1`
 ## reproduces the SB-M36-005 run and file unchanged.
+##
+## SB-M36-016: `--progression v2` (requires `--model v2`) reads lane targets, recovery guards and
+## challengeTolerance from level_progression_v2.json and writes playtest_v2_progression_v2.json
+## beside playtest_v2.json; `--progression v1` (the default) leaves every output unchanged.
 
 const Tool = preload("res://tools/analyze_m53_first10.gd")
 const Analyzer = preload("res://scripts/difficulty/level_difficulty_analyzer_v1.gd")
@@ -32,6 +36,7 @@ const OUT_DIR := "res://coordination/sessions/FACTORY/044-m36-005-difficulty-pla
 const OUT_PATH := OUT_DIR + "/playtest_v1.json"
 const OUT_DIR_V2 := "res://coordination/sessions/FACTORY/046-difficulty-model-v2"
 const OUT_PATH_V2 := OUT_DIR_V2 + "/playtest_v2.json"
+const OUT_PATH_V2_PROG_V2 := OUT_DIR_V2 + "/playtest_v2_progression_v2.json"
 const V2_COMMITTED_RAW := "res://coordination/sessions/M53-C002/evidence/holdout_raw/%s_raw.json"
 ## CLAUDE.md 11.1 owner-locked cadence, independent of the config (rule CADENCE).
 const CADENCE_11_1 := ["EASY", "EASY", "MEDIUM", "EASY", "HARD", "EASY", "EASY", "MEDIUM", "EASY", "VERY_HARD"]
@@ -46,12 +51,23 @@ func _initialize() -> void:
 		printerr("UNKNOWN_MODEL %s (use --model v1|v2)" % model)
 		quit(1)
 		return
-	quit(run(args.has("--committed-measure"), model))
+	var j := args.find("--progression")
+	var progression: String = args[j + 1] if j >= 0 and j + 1 < args.size() else "v1"
+	if not progression in ["v1", "v2"]:
+		printerr("UNKNOWN_PROGRESSION %s (use --progression v1|v2)" % progression)
+		quit(1)
+		return
+	if progression == "v2" and model != "v2":
+		printerr("UNKNOWN_PROGRESSION v2 needs --model v2 (the v1 analyzer is frozen on progression v1)")
+		quit(1)
+		return
+	quit(run(args.has("--committed-measure"), model, progression))
 
-func run(committed_measure: bool, model: String = "v2") -> int:
+func run(committed_measure: bool, model: String = "v2", progression: String = "v1") -> int:
 	var v2 := model == "v2"
-	var analyzer = AnalyzerV2.new() if v2 else Analyzer.new()
-	var prog = DifficultyProgressionV1.new()
+	var prog_path: String = DifficultyProgressionV1.V2_CONFIG_PATH if progression == "v2" else DifficultyProgressionV1.DEFAULT_CONFIG_PATH
+	var analyzer = AnalyzerV2.new(AnalyzerV2.CONFIG_PATH, prog_path) if v2 else Analyzer.new()
+	var prog = DifficultyProgressionV1.new(prog_path)
 	var cat = LevelCatalog.new()
 	if not analyzer.is_ok() or not prog.is_ok() or not cat.load_manifest().ok:
 		printerr("LOAD_FAIL analyzer/progression/catalog")
@@ -67,12 +83,15 @@ func run(committed_measure: bool, model: String = "v2") -> int:
 		for_guards.append({"order": r["order"], "challengeScore": r["challengeScore"], "sessionLoad": {"value": r["sessionLoad"]}})
 	var recovery: Dictionary = Tool.recovery_checks(for_guards, prog)
 	var anomalies := find_anomalies(levels, recovery, analyzer)
-	var tol: Dictionary = Analyzer._read_json(DifficultyProgressionV1.DEFAULT_CONFIG_PATH)["challengeTolerance"]
+	var tol: Dictionary = prog.challenge_tolerance()
+	var provenance: Dictionary = analyzer.provenance()
+	if progression == "v2":
+		provenance["progressionConfig"] = prog_path
 	var score_cfg: String = AnalyzerV2.SCORE_MODEL_PATH if v2 else Analyzer.SCORE_MODEL_PATH
 	var analysis_cfg: String = AnalyzerV2.CONFIG_PATH if v2 else Analyzer.DEFAULT_CONFIG_PATH
 	var out := {"schema": "scrubbots.m36.difficulty_playtest.v1", "version": 1, "task": "SB-M36-005",
 		"generatedBy": "res://tools/difficulty_playtest.gd", "catalog": LevelCatalog.DEFAULT_MANIFEST_PATH,
-		"provenance": analyzer.provenance(), "challengeTolerance": tol,
+		"provenance": provenance, "challengeTolerance": tol,
 		"measureMode": "committed_raw_if_trace_equal" if committed_measure else "fresh",
 		"recovery": recovery, "levels": levels, "anomalies": anomalies}
 	if v2:
@@ -82,10 +101,11 @@ func run(committed_measure: bool, model: String = "v2") -> int:
 			"modelVersion": 2, "scoreModelConfig": {"path": score_cfg, "sha256": Pack.content_sha256(score_cfg)},
 			"analysisConfig": {"path": analysis_cfg, "sha256": Pack.content_sha256(analysis_cfg)},
 			"sha256Note": "Pack.content_sha256: sha256 of the JSON text with CRLF normalised to LF",
-			"provenance": analyzer.provenance(), "challengeTolerance": tol,
+			"provenance": provenance, "challengeTolerance": tol,
 			"measureMode": out["measureMode"], "recovery": recovery, "levels": levels, "anomalies": anomalies}
 	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT_DIR_V2 if v2 else OUT_DIR))
-	if not Tool._write(OUT_PATH_V2 if v2 else OUT_PATH, JSON.stringify(out, "\t", false) + "\n"):
+	var out_path: String = OUT_PATH_V2_PROG_V2 if progression == "v2" else (OUT_PATH_V2 if v2 else OUT_PATH)
+	if not Tool._write(out_path, JSON.stringify(out, "\t", false) + "\n"):
 		return 1
 	print("MODEL modelVersion=%d scoreModel=%s sha256=%s analysisConfig=%s sha256=%s" % [2 if v2 else 1,
 		score_cfg, Pack.content_sha256(score_cfg), analysis_cfg, Pack.content_sha256(analysis_cfg)])
