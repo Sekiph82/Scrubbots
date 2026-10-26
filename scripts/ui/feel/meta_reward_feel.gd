@@ -7,6 +7,8 @@ extends RefCounted
 ##   child  committed seam (observed, never driven)            intent         target             one-shot key
 ##   F006   CeremonyPresenter.ceremony_shown set_complete       REWARD         ceremony HeroArt   c005f006:<ceremony key>
 ##   F006   CeremonyPresenter.ceremony_shown master_complete    MAJOR_REWARD   ceremony HeroArt   c005f006:<ceremony key>
+##   F007   CeremonyPresenter.ceremony_shown robot_unlock       MAJOR_UNLOCK   ceremony HeroArt   c005f007:<ceremony key robot:<id>>
+##   F007   CeremonyPresenter.ceremony_shown feature_unlock     MAJOR_UNLOCK   ceremony HeroArt   c005f007:<ceremony key unlock:<id>>
 ##   F008   CeremonyPresenter.ceremony_shown gift_milestone     REWARD (cycle max: MAJOR_REWARD)   c005f008:<ceremony key>
 ##   F008   action_committed claim_gift                         REWARD         Gift Bar hero      c005f008:gift_claim:<occurrence id>
 ##   F008   action_committed claim_daily_login                  REWARD         Daily reward hero  c005f008:<daily_login:<local day>>
@@ -25,13 +27,15 @@ extends RefCounted
 ## Targets are resolved one frame later (deferred), because the confirmation popups (Daily
 ## reward, ScrubBox) are pushed right after the facade returns; a missing target = no work. The
 ## request itself waits for the target's layout to settle (burst placement).
-## FULL adds a short native Control scale settle on REWARD / MAJOR_REWARD heroes (a tween owned
+## FULL adds a short native Control scale settle on REWARD / MAJOR_REWARD / MAJOR_UNLOCK heroes (a tween owned
 ## by the target node, so it dies with the popup). REDUCED: no settle; the adapter does no
 ## plugin work. Nothing here grants, claims, saves, navigates or decides success, and it holds
 ## no durable state (the diagnostic log is session memory only).
+## SB-M43-C005F-007: World Transition ceremonies stay gated (no owner-defined world unlock), so
+## they have no intent here.
 
 ## Native settle per intent: [peak scale, total seconds]. FULL only.
-const SETTLE := {"REWARD": [1.05, 0.3], "MAJOR_REWARD": [1.1, 0.45]}
+const SETTLE := {"REWARD": [1.05, 0.3], "MAJOR_REWARD": [1.1, 0.45], "MAJOR_UNLOCK": [1.12, 0.5]}
 const PURCHASE := {"buy_heart": "SMALL", "refill_hearts": "REWARD", "buy_booster_charge": "SMALL"}
 const BOOSTER_USE := ["plus_one_slot", "random", "selector", "tornado"]
 
@@ -76,6 +80,8 @@ func _on_ceremony_shown(key: String, kind: String) -> void:
 			_play("F006", "REWARD", hero, "c005f006:" + key)
 		"master_complete":
 			_play("F006", "MAJOR_REWARD", hero, "c005f006:" + key)
+		"robot_unlock", "feature_unlock":
+			_play("F007", "MAJOR_UNLOCK", hero, "c005f007:" + key)
 		"gift_milestone":
 			var e: Dictionary = p.get_meta("event", {})
 			var big := int(e.get("milestone", 0)) == int(e.get("cycle_max", -1))
