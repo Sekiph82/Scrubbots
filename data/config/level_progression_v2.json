@@ -1,0 +1,188 @@
+{
+	"cadence": [
+		{
+			"class": "EASY",
+			"modifier": 0.0,
+			"noveltyTarget": 0.55,
+			"role": "cycle_relief",
+			"slot": 1.0
+		},
+		{
+			"class": "EASY",
+			"modifier": 2.0,
+			"noveltyTarget": 0.35,
+			"role": "confidence_rise",
+			"slot": 2.0
+		},
+		{
+			"class": "MEDIUM",
+			"modifier": 0.0,
+			"noveltyTarget": 0.45,
+			"role": "first_tension",
+			"slot": 3.0
+		},
+		{
+			"class": "EASY",
+			"modifier": -1.0,
+			"noveltyTarget": 0.6,
+			"role": "recovery",
+			"slot": 4.0
+		},
+		{
+			"class": "HARD",
+			"modifier": 0.0,
+			"noveltyTarget": 0.3,
+			"role": "mini_boss",
+			"slot": 5.0
+		},
+		{
+			"class": "EASY",
+			"modifier": -2.0,
+			"noveltyTarget": 0.65,
+			"role": "strong_recovery",
+			"slot": 6.0
+		},
+		{
+			"class": "EASY",
+			"modifier": 1.0,
+			"noveltyTarget": 0.75,
+			"role": "playful_novelty",
+			"slot": 7.0
+		},
+		{
+			"class": "MEDIUM",
+			"modifier": 2.0,
+			"noveltyTarget": 0.45,
+			"role": "second_tension",
+			"slot": 8.0
+		},
+		{
+			"class": "EASY",
+			"modifier": -1.0,
+			"noveltyTarget": 0.5,
+			"role": "pre_boss_confidence",
+			"slot": 9.0
+		},
+		{
+			"class": "VERY_HARD",
+			"modifier": 0.0,
+			"noveltyTarget": 0.35,
+			"role": "cycle_boss",
+			"slot": 10.0
+		}
+	],
+	"cadenceLength": 10.0,
+	"calibration": {
+		"analysisConfig": "res://data/config/level_difficulty_analysis_v2.json",
+		"analysisConfigSha256": "84e7e5f98064df60ac09975e1bf8cf273bf1e8e52f3d367770d69c99a8c678e5",
+		"anchorManifestSha256": "6b23f8efc1583e437cfe0e8d915fcd01cbc4c98f3d5351fcef760106b07eb412",
+		"evidence": "res://coordination/sessions/FACTORY/050-m36-013-anchor-calibration/anchors_v2.json",
+		"measuredMedians": {
+			"EASY": 13.809933386980406,
+			"HARD": 43.834989019250045,
+			"MEDIUM": 30.90366752349339,
+			"VERY_HARD": 49.64137552906873
+		},
+		"rule": "docs/DIFFICULTY_LANE_ANCHOR_CALIBRATION.md section 2",
+		"ruleVersion": "sb-m36-013-anchor-lane-rule/v1",
+		"scale": 0.6398471811087202,
+		"scoreModelConfig": "res://data/config/difficulty_score_model_v2.json",
+		"scoreModelConfigSha256": "efa5dd36d35423d8a3873a4020ba9ea46a0fee5cc934c187f3ca1191cb0155d9",
+		"task": "SB-M36-013"
+	},
+	"challengeTolerance": {
+		"defaultPlusMinus": 2.2,
+		"neverForceLabelOutsidePlusMinus": 3.2,
+		"preferredWhenPoolIsLarge": 1.3
+	},
+	"lanes": {
+		"EASY": {
+			"base": 13.8,
+			"growth": 9.0,
+			"initialFirstAttemptClearTarget": [
+				0.85,
+				0.95
+			]
+		},
+		"HARD": {
+			"base": 43.8,
+			"growth": 8.3,
+			"initialFirstAttemptClearTarget": [
+				0.55,
+				0.7
+			]
+		},
+		"MEDIUM": {
+			"base": 30.9,
+			"growth": 8.3,
+			"initialFirstAttemptClearTarget": [
+				0.7,
+				0.85
+			]
+		},
+		"VERY_HARD": {
+			"base": 49.6,
+			"growth": 7.7,
+			"initialFirstAttemptClearTarget": [
+				0.4,
+				0.6
+			]
+		}
+	},
+	"ownerLockedAt": "2026-09-12",
+	"productionBoardEnvelope": {
+		"difficultyClassDerivedFromDimensions": false,
+		"exceptionalRange": [
+			49.0,
+			59.0
+		],
+		"largeRange": [
+			41.0,
+			48.0
+		],
+		"maxHeight": 59.0,
+		"maxWidth": 59.0,
+		"minHeight": 20.0,
+		"minWidth": 20.0,
+		"preferredStandardRange": [
+			24.0,
+			40.0
+		],
+		"rectangularAllowed": true
+	},
+	"productionColorRules": {
+		"canonicalPalette": "C01..C16",
+		"difficultyClassDerivedFromColorCount": false,
+		"maxDistinctUsedColors": 12.0,
+		"minDistinctUsedColors": 3.0
+	},
+	"progression": {
+		"formula": "1-exp(-k/tau)",
+		"tauCycles": 20.0,
+		"type": "saturating_exponential"
+	},
+	"recoveryGuards": [
+		{
+			"fromSlot": 3.0,
+			"minimumChallengeDrop": 9.6,
+			"toSlot": 4.0
+		},
+		{
+			"fromSlot": 5.0,
+			"minimumChallengeDrop": 12.8,
+			"toSlot": 6.0
+		},
+		{
+			"fromSlot": 8.0,
+			"minimumChallengeDrop": 9.6,
+			"toSlot": 9.0
+		},
+		{
+			"fromSlot": 10.0,
+			"minimumChallengeDrop": 22.4,
+			"toNextCycleSlot": 1.0
+		}
+	],
+	"schema": "scrubbots-level-progression/v2",
+	"version": 2
+}

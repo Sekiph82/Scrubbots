@@ -1,0 +1,6236 @@
+{
+	"analysisConfigSha256": "84e7e5f98064df60ac09975e1bf8cf273bf1e8e52f3d367770d69c99a8c678e5",
+	"fixtureId": "easy_hbands4_24x28",
+	"levelSha256": "a9f413eecbdb20bb8719ce074891db7b94c6c89fc097d15f5136a28a2692c9f9",
+	"raw": {
+		"color": {
+			"cells": 672,
+			"entropyNats": 1.3862943611198906,
+			"frequencyByHex": {
+				"#00CC78FF": 168,
+				"#FF4500FF": 168,
+				"#FFA800FF": 168,
+				"#FFD635FF": 168
+			},
+			"normalizedEntropy": 1.0,
+			"usedColors": 4
+		},
+		"dims": {
+			"height": 28,
+			"width": 24
+		},
+		"ok": true,
+		"runs": {
+			"ACCESS": {
+				"completed": true,
+				"decisions": 24,
+				"finalProgress": 1.0,
+				"placements": [
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 54.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 51.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 48.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 45.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 42.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 47.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 44.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 41.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 38.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 40.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 37.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 23.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 20.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 34.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 31.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 17.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 14.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 39.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 35.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 32.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 28.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 25.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 11.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 12.399999618530273,
+						"waves": 28
+					}
+				],
+				"policy": "ACCESS",
+				"routeFailures": 0,
+				"routes": {
+					"count": 672,
+					"lengthVariance": 218.3542641453942,
+					"meanDetour": 1.690975479865424,
+					"meanLength": 36.727083245913185,
+					"meanTurns": 3.3229167591352584,
+					"totalLength": 24680.599941253662
+				},
+				"states": [
+					{
+						"active": 672,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.0
+					},
+					{
+						"active": 644,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.04166666666666663
+					},
+					{
+						"active": 616,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.08333333333333337
+					},
+					{
+						"active": 588,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.125
+					},
+					{
+						"active": 560,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.16666666666666663
+					},
+					{
+						"active": 532,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.20833333333333337
+					},
+					{
+						"active": 504,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.25
+					},
+					{
+						"active": 476,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.29166666666666663
+					},
+					{
+						"active": 448,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.33333333333333337
+					},
+					{
+						"active": 420,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.375
+					},
+					{
+						"active": 392,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.41666666666666663
+					},
+					{
+						"active": 364,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.45833333333333337
+					},
+					{
+						"active": 336,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5
+					},
+					{
+						"active": 308,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5416666666666667
+					},
+					{
+						"active": 280,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5833333333333333
+					},
+					{
+						"active": 252,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.625
+					},
+					{
+						"active": 224,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.6666666666666667
+					},
+					{
+						"active": 196,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7083333333333333
+					},
+					{
+						"active": 168,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.75
+					},
+					{
+						"active": 140,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7916666666666666
+					},
+					{
+						"active": 112,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.8333333333333334
+					},
+					{
+						"active": 84,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.875
+					},
+					{
+						"active": 56,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9166666666666666
+					},
+					{
+						"active": 28,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9583333333333334
+					}
+				],
+				"stopReason": "solved"
+			},
+			"ACCESS_HI": {
+				"completed": true,
+				"decisions": 24,
+				"finalProgress": 1.0,
+				"placements": [
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 54.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 51.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 48.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 45.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 42.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 47.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 44.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 41.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 38.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 40.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 37.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 23.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 20.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 34.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 31.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 17.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 14.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 39.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 35.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 32.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 28.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 25.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 11.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 12.399999618530273,
+						"waves": 28
+					}
+				],
+				"policy": "ACCESS_HI",
+				"routeFailures": 0,
+				"routes": {
+					"count": 672,
+					"lengthVariance": 218.3542641453942,
+					"meanDetour": 1.690975479865424,
+					"meanLength": 36.727083245913185,
+					"meanTurns": 3.3229167591352584,
+					"totalLength": 24680.599941253662
+				},
+				"states": [
+					{
+						"active": 672,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.0
+					},
+					{
+						"active": 644,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.04166666666666663
+					},
+					{
+						"active": 616,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.08333333333333337
+					},
+					{
+						"active": 588,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.125
+					},
+					{
+						"active": 560,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.16666666666666663
+					},
+					{
+						"active": 532,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.20833333333333337
+					},
+					{
+						"active": 504,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.25
+					},
+					{
+						"active": 476,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.29166666666666663
+					},
+					{
+						"active": 448,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.33333333333333337
+					},
+					{
+						"active": 420,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.375
+					},
+					{
+						"active": 392,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.41666666666666663
+					},
+					{
+						"active": 364,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.45833333333333337
+					},
+					{
+						"active": 336,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5
+					},
+					{
+						"active": 308,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5416666666666667
+					},
+					{
+						"active": 280,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5833333333333333
+					},
+					{
+						"active": 252,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.625
+					},
+					{
+						"active": 224,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.6666666666666667
+					},
+					{
+						"active": 196,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7083333333333333
+					},
+					{
+						"active": 168,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.75
+					},
+					{
+						"active": 140,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7916666666666666
+					},
+					{
+						"active": 112,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.8333333333333334
+					},
+					{
+						"active": 84,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.875
+					},
+					{
+						"active": 56,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9166666666666666
+					},
+					{
+						"active": 28,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9583333333333334
+					}
+				],
+				"stopReason": "solved"
+			},
+			"GREEDY": {
+				"completed": true,
+				"decisions": 24,
+				"finalProgress": 1.0,
+				"placements": [
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 54.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 51.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 48.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 45.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 42.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 47.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 44.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 41.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 38.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 40.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 37.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 23.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 20.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 34.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 31.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 17.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 14.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 39.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 35.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 32.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 28.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 25.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 11.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 12.399999618530273,
+						"waves": 28
+					}
+				],
+				"policy": "GREEDY",
+				"routeFailures": 0,
+				"routes": {
+					"count": 672,
+					"lengthVariance": 218.3542641453942,
+					"meanDetour": 1.690975479865424,
+					"meanLength": 36.727083245913185,
+					"meanTurns": 3.3229167591352584,
+					"totalLength": 24680.599941253662
+				},
+				"states": [
+					{
+						"active": 672,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.0
+					},
+					{
+						"active": 644,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.04166666666666663
+					},
+					{
+						"active": 616,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.08333333333333337
+					},
+					{
+						"active": 588,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.125
+					},
+					{
+						"active": 560,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.16666666666666663
+					},
+					{
+						"active": 532,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.20833333333333337
+					},
+					{
+						"active": 504,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.25
+					},
+					{
+						"active": 476,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.29166666666666663
+					},
+					{
+						"active": 448,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.33333333333333337
+					},
+					{
+						"active": 420,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.375
+					},
+					{
+						"active": 392,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.41666666666666663
+					},
+					{
+						"active": 364,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.45833333333333337
+					},
+					{
+						"active": 336,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5
+					},
+					{
+						"active": 308,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5416666666666667
+					},
+					{
+						"active": 280,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5833333333333333
+					},
+					{
+						"active": 252,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.625
+					},
+					{
+						"active": 224,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.6666666666666667
+					},
+					{
+						"active": 196,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7083333333333333
+					},
+					{
+						"active": 168,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.75
+					},
+					{
+						"active": 140,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7916666666666666
+					},
+					{
+						"active": 112,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.8333333333333334
+					},
+					{
+						"active": 84,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.875
+					},
+					{
+						"active": 56,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9166666666666666
+					},
+					{
+						"active": 28,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9583333333333334
+					}
+				],
+				"stopReason": "solved"
+			},
+			"GREEDY_HI": {
+				"completed": true,
+				"decisions": 24,
+				"finalProgress": 1.0,
+				"placements": [
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 54.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 51.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 48.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 45.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 42.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 47.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 44.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 41.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 38.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 40.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 37.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 23.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 20.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 34.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 31.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 17.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 14.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 39.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 35.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 32.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 28.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 25.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 11.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 12.399999618530273,
+						"waves": 28
+					}
+				],
+				"policy": "GREEDY_HI",
+				"routeFailures": 0,
+				"routes": {
+					"count": 672,
+					"lengthVariance": 218.3542641453942,
+					"meanDetour": 1.690975479865424,
+					"meanLength": 36.727083245913185,
+					"meanTurns": 3.3229167591352584,
+					"totalLength": 24680.599941253662
+				},
+				"states": [
+					{
+						"active": 672,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.0
+					},
+					{
+						"active": 644,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.04166666666666663
+					},
+					{
+						"active": 616,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.08333333333333337
+					},
+					{
+						"active": 588,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.125
+					},
+					{
+						"active": 560,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.16666666666666663
+					},
+					{
+						"active": 532,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.20833333333333337
+					},
+					{
+						"active": 504,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.25
+					},
+					{
+						"active": 476,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.29166666666666663
+					},
+					{
+						"active": 448,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.33333333333333337
+					},
+					{
+						"active": 420,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.375
+					},
+					{
+						"active": 392,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.41666666666666663
+					},
+					{
+						"active": 364,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.45833333333333337
+					},
+					{
+						"active": 336,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5
+					},
+					{
+						"active": 308,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5416666666666667
+					},
+					{
+						"active": 280,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5833333333333333
+					},
+					{
+						"active": 252,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.625
+					},
+					{
+						"active": 224,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.6666666666666667
+					},
+					{
+						"active": 196,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7083333333333333
+					},
+					{
+						"active": 168,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.75
+					},
+					{
+						"active": 140,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7916666666666666
+					},
+					{
+						"active": 112,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.8333333333333334
+					},
+					{
+						"active": 84,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.875
+					},
+					{
+						"active": 56,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9166666666666666
+					},
+					{
+						"active": 28,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9583333333333334
+					}
+				],
+				"stopReason": "solved"
+			},
+			"RR": {
+				"completed": true,
+				"decisions": 24,
+				"finalProgress": 1.0,
+				"placements": [
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 54.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 51.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 48.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 45.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 42.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 39.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 47.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 44.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 41.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 38.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 35.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 32.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 40.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 37.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 34.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 31.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 28.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 25.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 23.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 20.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 17.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 14.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 11.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 12.399999618530273,
+						"waves": 28
+					}
+				],
+				"policy": "RR",
+				"routeFailures": 0,
+				"routes": {
+					"count": 672,
+					"lengthVariance": 218.35426414539424,
+					"meanDetour": 1.690975479865424,
+					"meanLength": 36.727083245913185,
+					"meanTurns": 3.3229167591352486,
+					"totalLength": 24680.599941253662
+				},
+				"states": [
+					{
+						"active": 672,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.0
+					},
+					{
+						"active": 644,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.04166666666666663
+					},
+					{
+						"active": 616,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.08333333333333337
+					},
+					{
+						"active": 588,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.125
+					},
+					{
+						"active": 560,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.16666666666666663
+					},
+					{
+						"active": 532,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.20833333333333337
+					},
+					{
+						"active": 504,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.25
+					},
+					{
+						"active": 476,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.29166666666666663
+					},
+					{
+						"active": 448,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.33333333333333337
+					},
+					{
+						"active": 420,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.375
+					},
+					{
+						"active": 392,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.41666666666666663
+					},
+					{
+						"active": 364,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.45833333333333337
+					},
+					{
+						"active": 336,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5
+					},
+					{
+						"active": 308,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5416666666666667
+					},
+					{
+						"active": 280,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5833333333333333
+					},
+					{
+						"active": 252,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.625
+					},
+					{
+						"active": 224,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.6666666666666667
+					},
+					{
+						"active": 196,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7083333333333333
+					},
+					{
+						"active": 168,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.75
+					},
+					{
+						"active": 140,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7916666666666666
+					},
+					{
+						"active": 112,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.8333333333333334
+					},
+					{
+						"active": 84,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.875
+					},
+					{
+						"active": 56,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9166666666666666
+					},
+					{
+						"active": 28,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9583333333333334
+					}
+				],
+				"stopReason": "solved"
+			},
+			"RR_REV": {
+				"completed": true,
+				"decisions": 24,
+				"finalProgress": 1.0,
+				"placements": [
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 54.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 51.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 48.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 45.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 42.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 39.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 47.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 44.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 41.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 38.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 35.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 32.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 40.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 37.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 34.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 31.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 28.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 25.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 23.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 20.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 17.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 14.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 11.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 12.399999618530273,
+						"waves": 28
+					}
+				],
+				"policy": "RR_REV",
+				"routeFailures": 0,
+				"routes": {
+					"count": 672,
+					"lengthVariance": 218.35426414539424,
+					"meanDetour": 1.690975479865424,
+					"meanLength": 36.727083245913185,
+					"meanTurns": 3.3229167591352486,
+					"totalLength": 24680.599941253662
+				},
+				"states": [
+					{
+						"active": 672,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.0
+					},
+					{
+						"active": 644,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.04166666666666663
+					},
+					{
+						"active": 616,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.08333333333333337
+					},
+					{
+						"active": 588,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.125
+					},
+					{
+						"active": 560,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.16666666666666663
+					},
+					{
+						"active": 532,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.20833333333333337
+					},
+					{
+						"active": 504,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.25
+					},
+					{
+						"active": 476,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.29166666666666663
+					},
+					{
+						"active": 448,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.33333333333333337
+					},
+					{
+						"active": 420,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.375
+					},
+					{
+						"active": 392,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.41666666666666663
+					},
+					{
+						"active": 364,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.45833333333333337
+					},
+					{
+						"active": 336,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5
+					},
+					{
+						"active": 308,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5416666666666667
+					},
+					{
+						"active": 280,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5833333333333333
+					},
+					{
+						"active": 252,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.625
+					},
+					{
+						"active": 224,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.6666666666666667
+					},
+					{
+						"active": 196,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7083333333333333
+					},
+					{
+						"active": 168,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.75
+					},
+					{
+						"active": 140,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7916666666666666
+					},
+					{
+						"active": 112,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.8333333333333334
+					},
+					{
+						"active": 84,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.875
+					},
+					{
+						"active": 56,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9166666666666666
+					},
+					{
+						"active": 28,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9583333333333334
+					}
+				],
+				"stopReason": "solved"
+			},
+			"STRESS": {
+				"completed": true,
+				"decisions": 24,
+				"finalProgress": 1.0,
+				"placements": [
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 54.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 51.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 47.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 48.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 45.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 42.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 39.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 44.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 40.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 41.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 38.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 35.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 32.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 37.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 34.39999961853027,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 31.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 28.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 25.399999618530273,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 23.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 0,
+						"lastWaveMaxRoute": 20.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 17.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 1,
+						"lastWaveMaxRoute": 14.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 11.600000381469727,
+						"waves": 28
+					},
+					{
+						"clears": 28,
+						"column": 2,
+						"lastWaveMaxRoute": 12.399999618530273,
+						"waves": 28
+					}
+				],
+				"policy": "STRESS",
+				"routeFailures": 0,
+				"routes": {
+					"count": 672,
+					"lengthVariance": 218.3542641453943,
+					"meanDetour": 1.6909754798654237,
+					"meanLength": 36.727083245913185,
+					"meanTurns": 3.322916759135251,
+					"totalLength": 24680.599941253662
+				},
+				"states": [
+					{
+						"active": 672,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.0
+					},
+					{
+						"active": 644,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 0,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.04166666666666663
+					},
+					{
+						"active": 616,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.08333333333333337
+					},
+					{
+						"active": 588,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.125
+					},
+					{
+						"active": 560,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.16666666666666663
+					},
+					{
+						"active": 532,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.20833333333333337
+					},
+					{
+						"active": 504,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 0,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.25
+					},
+					{
+						"active": 476,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 1,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.29166666666666663
+					},
+					{
+						"active": 448,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 36,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.33333333333333337
+					},
+					{
+						"active": 420,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.375
+					},
+					{
+						"active": 392,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.41666666666666663
+					},
+					{
+						"active": 364,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.45833333333333337
+					},
+					{
+						"active": 336,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 1,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5
+					},
+					{
+						"active": 308,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 2,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5416666666666667
+					},
+					{
+						"active": 280,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.5833333333333333
+					},
+					{
+						"active": 252,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.625
+					},
+					{
+						"active": 224,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.6666666666666667
+					},
+					{
+						"active": 196,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 2,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7083333333333333
+					},
+					{
+						"active": 168,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 168,
+								"reachable": 58,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.75
+					},
+					{
+						"active": 140,
+						"chosen": 0,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 0,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 140,
+								"reachable": 55,
+								"robots": 28
+							}
+						],
+						"legal": 3,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.7916666666666666
+					},
+					{
+						"active": 112,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 112,
+								"reachable": 53,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.8333333333333334
+					},
+					{
+						"active": 84,
+						"chosen": 1,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 1,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							},
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 84,
+								"reachable": 51,
+								"robots": 28
+							}
+						],
+						"legal": 2,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.875
+					},
+					{
+						"active": 56,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 56,
+								"reachable": 49,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9166666666666666
+					},
+					{
+						"active": 28,
+						"chosen": 2,
+						"fronts": [
+							{
+								"color": 3,
+								"column": 2,
+								"productive": true,
+								"raw": 28,
+								"reachable": 28,
+								"robots": 28
+							}
+						],
+						"legal": 1,
+						"occupied": [],
+						"placementSlot": 4,
+						"progress": 0.9583333333333334
+					}
+				],
+				"stopReason": "solved"
+			}
+		},
+		"timing": {
+			"totalMs": 52668
+		},
+		"unlock": {
+			"histogram": [
+				672
+			],
+			"lockedFraction": 0.0,
+			"maxWave": 0,
+			"meanWave": 0.0,
+			"p95Wave": 0,
+			"perCellWaves": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+			"unreachableCells": 0,
+			"waveCount": 1
+		}
+	},
+	"schema": "scrubbots.m36.anchor_v2_raw.v1",
+	"solvability": {
+		"status": "SOLVED",
+		"traceHash": 2317874221,
+		"visited": 25
+	},
+	"supplySha256": "69862e7adadd46464ab37e257c5eeab42167e3f0cd6dcbb10f77969e877055ff"
+}
