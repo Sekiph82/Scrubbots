@@ -266,10 +266,10 @@ static func gift_milestone(event: Dictionary, reduced: bool) -> BasePopup:
 
 # ------------------------------------------------------------ feature / world ----
 
-## SB-M43-072 (prerequisite only): the owner-accepted generic Feature Unlock master for ONE
-## feature event {feature_id, name, body, icon}. No feature-pacing authority exists yet (M44
-## owns unlock order/levels), so nothing in the shipping app emits this event; the builder
-## refuses an event without name / icon rather than inventing one. Never grants.
+## SB-M43-072: the owner-accepted generic Feature Unlock master for ONE feature event
+## {feature_id, name, body, icon}: CeremonyPresenter.feature_events (owner unlock table, new
+## profiles) and What's New (FtueDirector). The builder refuses an event without name / icon
+## rather than inventing one. Never grants.
 static func feature_unlock(event: Dictionary, reduced: bool):
 	var icon := String(event.get("icon", ""))
 	if String(event.get("name", "")).is_empty() or icon.is_empty() or not ResourceLoader.exists(icon):

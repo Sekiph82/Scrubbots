@@ -53,6 +53,14 @@ Hard unlock gating is in force per the owner table in `data/config/feature_unloc
 - Presentation: the existing red count badge (`UiShortcutButton.set_badge_text`, `NavBadge_<id>`) shows the localized `HOME_BADGE_NEW` text "NEW"; the pill grows inward from the top-right corner. A real count > 0 on the same entry wins over NEW. No animation, no sound, no new art.
 - Evidence: `tests/m44_new_badge.gd`.
 
+### 1.4a Feature Unlock ceremony on reaching a table level (SB-M43-072)
+
+- M43-C005 meta ceremonies (one at a time via `scripts/ui/ceremony/ceremony_presenter.gd`): Collection set 9/9 (`set:<n>`, SB-M43-068), Master Collection (`master`, 069), Robot Unlock with EQUIP / KEEP CURRENT (`robot:<id>`, 070/071), Gift Meter milestone (`gift:`), and the Feature Unlock ceremony (`unlock:<feature_id>`, 072).
+- 072 rule: a NEW FTUE profile gets ONE "NEW FEATURE!" ceremony (`MetaCeremonies.feature_unlock`, GOT IT) per owner-table feature with level > 1 once `AppState.feature_unlocked(id)` is true. `CeremonyPresenter.feature_events()` derives them read-only, ascending by table level, after the gift / set / Master / robot events; name / body are `UiText` `FEATURE_<ID>_NAME/BODY`. Grandfathered saves and L1 features (Hearts, Gift Bar) get none.
+- Presentable now (existing promoted icon in `CeremonyPresenter.FEATURE_ICONS`): Daily, Shop, Tasks, Collection (`assets/ui/final/home/shortcuts/`). Skipped until art exists (no art invented): Card Packs, Robots, Events, Achievements, RANKS and the four boosters (booster lessons stay with SB-M44-031 part 2).
+- Scheduling: rides the existing Results hand-off barrier / quiet Home drain (meta ceremonies first, then earned packs, then What's New), so it never stacks with another popup; coachmarks are hidden under it. The NEW badge (`feature_visited:`) and What's New (`feature:<id>:<v>`) keys are separate and untouched.
+- Acknowledged only by its CTA: meta_ui `unlock:<id>` + canonical save; reload never replays. If that save fails the mark is rolled back and the ceremony is snoozed for the session (shown again next launch). Presentation only: no grant, spend or unlock-state change. Evidence: `tests/m43_c005_c072_feature_unlock_ceremony.gd`.
+
 ### 1.5 Coachmark visual language (SB-M44-018)
 
 - Location: `scripts/ui/tutorial/coachmark_layer.gd` (CanvasLayer 40: above Home / gameplay / Results, below the ModalStack at 64). One coachmark at a time, picked by `FtueDirector`.

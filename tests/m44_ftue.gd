@@ -747,6 +747,13 @@ func _t23() -> void:
 	f.settle()
 	_root.request_home_ceremonies()
 	await _frames(4)
+	# SB-M43-072: the L4 Daily Feature Unlock ceremony (meta ceremonies drain first) comes
+	# first, alone; What's New opens only after it is acknowledged (never stacked).
+	var first = _top()
+	_ok(first != null and String(first.context.get("ceremony_key", "")) == "unlock:daily" and _root.get_modal_stack().depth() == 1, "L4 Daily feature ceremony first, alone on the stack")
+	if first != null:
+		first._on_action("got_it")
+	await _frames(4)
 	var top = _top()
 	var name_l = top.find_child("FeatureName", true, false) if top != null else null
 	_ok(app.economy.ftue.closed and _top_id() == "ceremony_feature_unlock" and name_l is Label, "after genuine L3: the later feature shows via the M43 Feature Unlock ceremony")
