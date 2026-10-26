@@ -144,7 +144,7 @@
 				"status": "SOLVED",
 				"rawStatus": "SOLVED",
 				"visited": 20,
-				"ms": 958,
+				"ms": 848,
 				"traceHash": 1618197986,
 				"traceEqualsCommittedReference": true
 			},
@@ -203,7 +203,7 @@
 				"status": "SOLVED",
 				"rawStatus": "SOLVED",
 				"visited": 37,
-				"ms": 7032,
+				"ms": 18772,
 				"traceHash": 4098941249,
 				"traceEqualsCommittedReference": true
 			},
@@ -262,7 +262,7 @@
 				"status": "SOLVED",
 				"rawStatus": "SOLVED",
 				"visited": 59,
-				"ms": 15411,
+				"ms": 43752,
 				"traceHash": 3808086370,
 				"traceEqualsCommittedReference": true
 			},
@@ -321,7 +321,7 @@
 				"status": "SOLVED",
 				"rawStatus": "SOLVED",
 				"visited": 40,
-				"ms": 8146,
+				"ms": 23283,
 				"traceHash": 2842640196,
 				"traceEqualsCommittedReference": true
 			},
@@ -380,7 +380,7 @@
 				"status": "SOLVED",
 				"rawStatus": "SOLVED",
 				"visited": 46,
-				"ms": 8837,
+				"ms": 25081,
 				"traceHash": 3056207161,
 				"traceEqualsCommittedReference": true
 			},
@@ -439,7 +439,7 @@
 				"status": "SOLVED",
 				"rawStatus": "SOLVED",
 				"visited": 41,
-				"ms": 8334,
+				"ms": 23799,
 				"traceHash": 3310440768,
 				"traceEqualsCommittedReference": true
 			},
@@ -498,7 +498,7 @@
 				"status": "SOLVED",
 				"rawStatus": "SOLVED",
 				"visited": 40,
-				"ms": 7682,
+				"ms": 22059,
 				"traceHash": 2191893116,
 				"traceEqualsCommittedReference": true
 			},
@@ -530,7 +530,7 @@
 			},
 			"targetChallenge": 32.9,
 			"signedDelta": -4.20785337576819,
-			"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT",
+			"acceptanceWindow": "OUTSIDE_HARD_LIMIT",
 			"sessionLoad": 25.1109823191096,
 			"unlock": {
 				"p95Wave": 2.0,
@@ -557,7 +557,7 @@
 				"status": "SOLVED",
 				"rawStatus": "SOLVED",
 				"visited": 38,
-				"ms": 6242,
+				"ms": 17635,
 				"traceHash": 2524445735,
 				"traceEqualsCommittedReference": true
 			},
@@ -616,7 +616,7 @@
 				"status": "SOLVED",
 				"rawStatus": "SOLVED",
 				"visited": 40,
-				"ms": 9038,
+				"ms": 26002,
 				"traceHash": 3800836965,
 				"traceEqualsCommittedReference": true
 			},
@@ -648,7 +648,7 @@
 			},
 			"targetChallenge": 49.6,
 			"signedDelta": -2.87614700268346,
-			"acceptanceWindow": "IN_DEFAULT_WINDOW",
+			"acceptanceWindow": "OUTSIDE_DEFAULT_WITHIN_HARD_LIMIT",
 			"sessionLoad": 25.1195707423515,
 			"unlock": {
 				"p95Wave": 4.0,
@@ -675,7 +675,7 @@
 				"status": "SOLVED",
 				"rawStatus": "SOLVED",
 				"visited": 47,
-				"ms": 8204,
+				"ms": 23450,
 				"traceHash": 1480752256,
 				"traceEqualsCommittedReference": true
 			},
@@ -756,7 +756,7 @@
 			"id": "level_008_butterfly",
 			"challengeScore": 28.6921466242318,
 			"rule": "LANE_MISS",
-			"severity": "SOFT",
+			"severity": "OUT_OF_HARD_LIMIT",
 			"targetChallenge": 32.9,
 			"signedDelta": -4.20785337576819
 		},
@@ -768,6 +768,15 @@
 			"severity": "OUT_OF_HARD_LIMIT",
 			"targetChallenge": 12.8,
 			"signedDelta": 24.3461114554316
+		},
+		{
+			"order": 10,
+			"id": "level_010_ice_cube",
+			"challengeScore": 46.7238529973165,
+			"rule": "LANE_MISS",
+			"severity": "SOFT",
+			"targetChallenge": 49.6,
+			"signedDelta": -2.87614700268346
 		},
 		{
 			"rule": "RECOVERY",

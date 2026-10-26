@@ -609,9 +609,11 @@ func score(raw: Dictionary, level_number: int, anchors: Dictionary = {}) -> Dict
 func _dims(raw: Dictionary) -> Vector2i:
 	return Vector2i(int(raw["dims"]["width"]), int(raw["dims"]["height"]))
 
-## Mechanical acceptance-window classification from level_progression_v1.json.
-func classify_window(delta: float) -> String:
-	var tol: Dictionary = _read_json(DifficultyProgressionV1.DEFAULT_CONFIG_PATH)["challengeTolerance"]
+## Mechanical acceptance-window classification from level_progression_v1.json, or from `tol`
+## (a progression file's challengeTolerance) when given (SB-M36-016).
+func classify_window(delta: float, tol: Dictionary = {}) -> String:
+	if tol.is_empty():
+		tol = _read_json(DifficultyProgressionV1.DEFAULT_CONFIG_PATH)["challengeTolerance"]
 	var d := absf(delta)
 	if d <= float(tol["defaultPlusMinus"]):
 		return WINDOW_IN

@@ -90,6 +90,15 @@ func _s05_analyzer(p1, p2) -> void:
 	_ok(t1 == p1.target_challenge_for(311), "v1 analyzer target(311) %.4f = v1 reader" % t1)
 	_ok(t2 == p2.target_challenge_for(311), "v2 analyzer target(311) %.4f = v2 reader" % t2)
 	_ok(t1 != t2, "analyzer target differs between progressions")
+	var v1 = AnalyzerV2.V1.new()
+	_ok(v1.classify_window(3.0) == AnalyzerV2.V1.WINDOW_IN and v1.classify_window(3.0, p1.challenge_tolerance()) == AnalyzerV2.V1.WINDOW_IN,
+		"delta 3.0 IN_DEFAULT_WINDOW under v1 tolerance")
+	_ok(v1.classify_window(3.0, p2.challenge_tolerance()) == AnalyzerV2.V1.WINDOW_SOFT, "delta 3.0 SOFT under v2 tolerance")
+	_ok(v1.classify_window(3.3, p2.challenge_tolerance()) == AnalyzerV2.V1.WINDOW_OUT, "delta 3.3 OUT under v2 tolerance")
+	var s2: Dictionary = a2.score(raw, 311)
+	_ok(s2["acceptanceWindow"] == v1.classify_window(s2["signedDelta"], p2.challenge_tolerance()), "v2 analyzer window %s uses v2 tolerance (delta %.2f)" % [s2["acceptanceWindow"], s2["signedDelta"]])
+	var s1: Dictionary = a1.score(raw, 311)
+	_ok(s1["acceptanceWindow"] == v1.classify_window(s1["signedDelta"]), "default analyzer window unchanged")
 
 func _s06_frozen() -> void:
 	print("[s06 frozen]")
