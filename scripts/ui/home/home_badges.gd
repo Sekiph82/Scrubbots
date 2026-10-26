@@ -16,8 +16,25 @@ extends RefCounted
 ##               "no Home badge" wording for this indicator only). Read from
 ##               RewardedDailyService.slot_state(current_slot()) - never a grant or a saved flag.
 ## Counts clear the moment the underlying state is handled, so nothing repeats or spams.
+##
+## SB-M44-013 — new_features(app): gated Home entries a NEW (fresh FTUE) profile has unlocked
+## but not yet visited (meta_ui key "feature_visited:<feature>"). Grandfathered profiles never
+## show NEW. Home draws it as a "NEW" pill; a numeric count on the same entry wins.
 
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+
+## SB-M44-031: Home entry -> feature id in the owner unlock table (AppState.feature_unlocked).
+## Gift Bar and Hearts unlock at L1 and are never gated here.
+const GATED_ENTRIES := {"shop": "shop", "collection": "collection", "tasks": "tasks", "daily": "daily",
+	"robots": "robots", "events": "events", "leaderboard": "ranks"}
+
+static func visited_key(feature_id: String) -> String:
+	return "feature_visited:" + feature_id
+
+static func new_features(app) -> Array:
+	if app == null or app.economy == null or app.is_blocked or not app.economy.ftue.is_new_profile():
+		return []
+	return GATED_ENTRIES.keys().filter(func(id): return app.feature_unlocked(GATED_ENTRIES[id]) and not app.economy.meta_ui.is_seen(visited_key(GATED_ENTRIES[id])))
 
 static func compute(app) -> Dictionary:
 	var out := {"tasks": 0, "daily": 0, "gift_bar": 0, "robots": 0, "collection": 0, "events": 0, "rewarded_ads": 0}

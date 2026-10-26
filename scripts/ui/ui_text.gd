@@ -46,6 +46,7 @@ const EN := {
 	"HOME_NAV_SETTINGS": "SETTINGS",
 	"HOME_COMING_LATER": "Coming later",
 	"HOME_UNLOCKS_AT_LEVEL": "Unlocks at level %d",
+	"HOME_BADGE_NEW": "NEW",
 	"POPUP_CLOSE": "CLOSE",
 	"POPUP_CLAIM": "CLAIM",
 	"GIFTS_TITLE": "GIFTS",

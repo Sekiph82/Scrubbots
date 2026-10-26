@@ -75,10 +75,8 @@ const LIVE_SHORTCUTS := ["gift_bar", "cards_exchange", "daily"]
 ## V04: exactly four Home panels (left SHOP / COLLECTION, right TASKS / DAILY).
 const LEFT_SHORTCUTS := [["shop", "HOME_SC_SHOP"], ["collection", "HOME_SC_COLLECTION"]]
 const RIGHT_SHORTCUTS := [["tasks", "HOME_SC_TASKS"], ["daily", "HOME_SC_DAILY"]]
-## SB-M44-031: Home entry -> feature id in the owner unlock table (AppState.feature_unlocked).
-## Gift Bar and Hearts unlock at L1 and are never gated here.
-const GATED_ENTRIES := {"shop": "shop", "collection": "collection", "tasks": "tasks", "daily": "daily",
-	"robots": "robots", "events": "events", "leaderboard": "ranks"}
+## SB-M44-031: Home entry -> feature id (owned by HomeBadges, which also derives SB-M44-013 NEW).
+const GATED_ENTRIES := HomeBadges.GATED_ENTRIES
 ## Panel size system (one size for all four) and icon boxes. V03 drew each icon fitted
 ## into ~206x164 inside its card; TASKS/DAILY keep that exact box, SHOP/COLLECTION are
 ## enlarged 1.2x (owner V04 43-46). Icons stand on the label band and may rise above.
@@ -1127,6 +1125,7 @@ func _build_bottom_nav(nav: PanelContainer) -> void:
 				b.tooltip_text = UiText.t("HOME_COMING_LATER")
 		b.pressed.connect(func():
 			if not _locked(id):
+				_mark_visited(id)
 				nav_requested.emit(id))
 		row.add_child(b)
 		_nodes["Nav_" + id] = b
@@ -1144,6 +1143,7 @@ func _build_bottom_nav(nav: PanelContainer) -> void:
 		nb.offset_right = -10
 		nb.offset_top = 6
 		nb.offset_bottom = 42
+		nb.grow_horizontal = Control.GROW_DIRECTION_BEGIN   # SB-M44-013 "NEW" pill grows inward
 		b.add_child(_reg(nb))
 
 # ------------------------------------------------------------ ad slot ----
@@ -1299,19 +1299,26 @@ func _render_values() -> void:
 		nb.disabled = _locked(nid) or not served
 		nb.tooltip_text = _unlock_text(nid) if _locked(nid) else ("" if served else UiText.t("HOME_COMING_LATER"))
 	# SB-M42-024: Daily badge = 1 when today's login reward is claimable.
-	(_nodes["Shortcut_daily"] as UiShortcutButton).set_badge(0 if _vm["daily_claimed_today"] or _locked("daily") else 1)
+	var counts := {"daily": 0 if _vm["daily_claimed_today"] or _locked("daily") else 1}
 	# M43-C010 (SB-M43-134): Tasks / Collection shortcuts + ROBOTS / EVENTS tabs.
 	if "orders" in _app.economy and _app.economy.orders != null:
 		var bd := HomeBadges.compute(_app)
-		(_nodes["Shortcut_tasks"] as UiShortcutButton).set_badge(0 if _locked("tasks") else int(bd["tasks"]))
-		(_nodes["Shortcut_collection"] as UiShortcutButton).set_badge(0 if _locked("collection") else int(bd["collection"]))
+		for cid in ["tasks", "collection", "robots", "events"]:
+			counts[cid] = 0 if _locked(cid) else int(bd[cid])
 		# M47-TOUCH-R01: red "1" while the next sequential Rewarded Ads reward is actionable (only
 		# when the app serves that destination).
 		(_nodes["RewardedAdsButton"] as UiShortcutButton).set_badge(int(bd["rewarded_ads"]) if _app_shortcuts.has("rewarded_ads") else 0)
-		for nid in ["robots", "events"]:
-			var nl: Label = _nodes["NavBadge_" + nid]
-			nl.text = str(int(bd[nid]))
-			nl.visible = int(bd[nid]) > 0 and not (_nodes["Nav_" + nid] as Button).disabled
+	# SB-M44-013: a newly unlocked, unvisited entry shows "NEW" unless it has a real count.
+	var fresh := HomeBadges.new_features(_app)
+	var badge_text := func(bid: String) -> String:
+		var c := int(counts.get(bid, 0))
+		return str(c) if c > 0 else (UiText.t("HOME_BADGE_NEW") if fresh.has(bid) else "")
+	for sid in ["shop", "collection", "tasks", "daily"]:
+		(_nodes["Shortcut_" + sid] as UiShortcutButton).set_badge_text(badge_text.call(sid))
+	for nid in ["robots", "events", "leaderboard"]:
+		var nl: Label = _nodes["NavBadge_" + nid]
+		nl.text = badge_text.call(nid)
+		nl.visible = not nl.text.is_empty() and not (_nodes["Nav_" + nid] as Button).disabled
 	for id in LEFT_SHORTCUTS + RIGHT_SHORTCUTS:
 		var sc: Button = _nodes["Shortcut_" + id[0]]
 		sc.disabled = _locked(id[0]) or not (LIVE_SHORTCUTS.has(id[0]) or _app_shortcuts.has(id[0]))
@@ -1351,9 +1358,19 @@ func set_app_shortcuts(ids: Array) -> void:
 func _shortcut_pressed(id: String) -> void:
 	if _locked(id):
 		return
+	_mark_visited(id)
 	shortcut_requested.emit(id)
 	if not _app_shortcuts.has(id):
 		open_popup(id)
+
+## SB-M44-013: the first press of a NEW entry acknowledges it (meta_ui presentation ledger,
+## canonical save, same path as the ceremony / What's New acknowledgements).
+func _mark_visited(id: String) -> void:
+	if not HomeBadges.new_features(_app).has(id):
+		return
+	if _app.economy.meta_ui.mark_seen(HomeBadges.visited_key(GATED_ENTRIES[id])):
+		_app.request_save()
+	refresh()
 
 ## Open the Home popup for a live shortcut. Returns the popup or null.
 func open_popup(id: String):
