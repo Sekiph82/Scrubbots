@@ -124,11 +124,12 @@ Observations (reported, nothing was changed after measuring):
 - The two highest probes combine A and R (maze) or A, U and S (straddled quadrant rings); B stays
   below 0.28 on every fixture, so bottleneck pressure is the component the corpus could not push high.
 
-Reader note: `DifficultyProgressionV1` (unchanged, as required) checks `EXPECTED_SCHEMA ==
-"scrubbots-level-progression/v1"`, so `DifficultyProgressionV1.new("res://data/config/level_progression_v2.json")`
-returns `is_ok() == false` ("unexpected schema"). The schema string `/v2` is mandated by the rule, so no
-current runtime/tool consumes the v2 lanes yet; `tests/m36_anchor_calibration.gd` computes v2 targets with
-the same formula. Wiring a reader (and the analyzer target lookup) to v2 is follow-up SB-M36-016.
+Reader note (SB-M36-016): `DifficultyProgressionV1` accepts both `EXPECTED_SCHEMA` (`/v1`) and
+`V2_SCHEMA` (`/v2`); `DifficultyProgressionV1.new(DifficultyProgressionV1.V2_CONFIG_PATH)` reads the v2 lanes,
+guards and `challenge_tolerance()`, and `model_version()` returns the file version. v2 is opt-in only:
+`LevelDifficultyAnalyzerV2.new(CONFIG_PATH, DifficultyProgressionV1.V2_CONFIG_PATH)` and
+`tools/difficulty_playtest.gd -- --model v2 --progression v2` (writes `playtest_v2_progression_v2.json`);
+every default stays on v1. Suite `tests/m36_progression_v2_reader.gd`.
 
 ## 6. Informational: shipped L1..L10 under the decided lanes
 

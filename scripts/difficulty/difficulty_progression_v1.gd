@@ -22,6 +22,9 @@ extends RefCounted
 
 const DEFAULT_CONFIG_PATH := "res://data/config/level_progression_v1.json"
 const EXPECTED_SCHEMA := "scrubbots-level-progression/v1"
+## SB-M36-016: the anchor-calibrated lanes (same structure, different numbers). Opt-in only.
+const V2_CONFIG_PATH := "res://data/config/level_progression_v2.json"
+const V2_SCHEMA := "scrubbots-level-progression/v2"
 
 var _loaded := false
 var _error := ""
@@ -30,6 +33,8 @@ var _tau := 20.0
 var _cadence := []                 ## Array of {slot, class, modifier, role, noveltyTarget}
 var _lanes := {}                   ## class -> {base, growth}
 var _recovery_guards := []
+var _challenge_tolerance := {}
+var _version := 0
 
 func _init(config_path: String = DEFAULT_CONFIG_PATH) -> void:
 	_load(config_path)
@@ -46,7 +51,7 @@ func _load(path: String) -> void:
 		_error = "malformed JSON line %d: %s" % [json.get_error_line(), json.get_error_message()]
 		return
 	var data = json.get_data()
-	if typeof(data) != TYPE_DICTIONARY or data.get("schema", "") != EXPECTED_SCHEMA:
+	if typeof(data) != TYPE_DICTIONARY or not data.get("schema", "") in [EXPECTED_SCHEMA, V2_SCHEMA]:
 		_error = "unexpected schema"
 		return
 	_cadence_length = int(data.get("cadenceLength", 10))
@@ -57,6 +62,8 @@ func _load(path: String) -> void:
 	for k in lanes_raw.keys():
 		_lanes[k] = {"base": float(lanes_raw[k].get("base", 0.0)), "growth": float(lanes_raw[k].get("growth", 0.0))}
 	_recovery_guards = data.get("recoveryGuards", [])
+	_challenge_tolerance = data.get("challengeTolerance", {})
+	_version = int(data.get("version", 0))
 	# Validate cadence length matches declared array.
 	if _cadence.size() != _cadence_length:
 		_error = "cadence array size %d != cadenceLength %d" % [_cadence.size(), _cadence_length]
@@ -68,6 +75,13 @@ func is_ok() -> bool:
 
 func get_error() -> String:
 	return _error
+
+## File `version` (1 or 2).
+func model_version() -> int:
+	return _version
+
+func challenge_tolerance() -> Dictionary:
+	return _challenge_tolerance.duplicate(true)
 
 func cadence_length() -> int:
 	return _cadence_length
