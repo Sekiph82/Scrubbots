@@ -4,7 +4,7 @@ extends RefCounted
 ##
 ## SB-M36-012 difficulty score model v2: the active model for NEW analysis (owner decision B,
 ## 2026-10-26). A copy of the frozen M53-C002 candidate
-## (level_difficulty_analyzer_v2_candidate.gd, kept byte-identical for provenance) that reads
+## analyzer (kept byte-identical for provenance) that reads
 ## difficulty_score_model_v2.json and level_difficulty_analysis_v2.json.
 ## Offline QA tooling only; no shipping script references it.
 ##
@@ -19,7 +19,7 @@ extends RefCounted
 ##   - B ignores states with a single legal front (column exhaustion is not a bottleneck);
 ##     S's single-colour term only counts states demanding >= 2 colours.
 ##   - A is progress-interval weighted; A/U/R are normalized with anchors derived by rule
-##     from the independent calibration corpus (tests/fixtures/difficulty_calibration).
+##     from the independent 27-fixture M53-C002 corpus (anchors frozen in the config).
 ## W, C and the locked weights come from difficulty_score_model_v2.json; TargetChallenge lanes
 ## are read unchanged from level_progression_v1.json.
 
@@ -446,7 +446,7 @@ func vector_from(agg: Dictionary, raw: Dictionary, anc: Dictionary) -> Dictionar
 	return {"vector": vec, "D": _model.challenge_score(vec), "sessionLoad": _model.session_load(load_in),
 		"sessionInputs": load_in}
 
-## Full candidate score for a measured level/fixture. level_number <= 0 -> no target.
+## Full v2 score for a measured level/fixture. level_number <= 0 -> no target.
 func score(raw: Dictionary, level_number: int = 0, anchor_override: Dictionary = {}) -> Dictionary:
 	var anc: Dictionary = anchors().duplicate()
 	for k in anchor_override:
