@@ -21,6 +21,11 @@ extends SceneTree
 ## SB-M36-016: `--progression v2` (requires `--model v2`) reads lane targets, recovery guards and
 ## challengeTolerance from level_progression_v2.json and writes playtest_v2_progression_v2.json
 ## beside playtest_v2.json; `--progression v1` (the default) leaves every output unchanged.
+##
+## SB-M36-014: `recovery.componentChecks` (additive) reports, per recovery guard pair, the
+## component rules of docs/DIFFICULTY_RECOVERY_SEQUENCING_PROPOSAL_V1.md section 4 rules 2-3 on
+## the actual vectors: recovery A <= peak A, B <= peak B, not above on both B and U, Session Load
+## strictly below the peak. Reported only; they add no anomalies.
 
 const Tool = preload("res://tools/analyze_m53_first10.gd")
 const Analyzer = preload("res://scripts/difficulty/level_difficulty_analyzer_v1.gd")
@@ -82,6 +87,7 @@ func run(committed_measure: bool, model: String = "v2", progression: String = "v
 	for r in levels:
 		for_guards.append({"order": r["order"], "challengeScore": r["challengeScore"], "sessionLoad": {"value": r["sessionLoad"]}})
 	var recovery: Dictionary = Tool.recovery_checks(for_guards, prog)
+	recovery["componentChecks"] = recovery_component_checks(levels, recovery["guards"])
 	var anomalies := find_anomalies(levels, recovery, analyzer)
 	var tol: Dictionary = prog.challenge_tolerance()
 	var provenance: Dictionary = analyzer.provenance()
@@ -250,6 +256,32 @@ func find_anomalies(levels: Array, recovery: Dictionary, analyzer) -> Array:
 				"sessionLoad": b["sessionLoad"], "previousOrder": a["order"], "previousId": a["id"],
 				"previousChallengeScore": a["challengeScore"], "previousSessionLoad": a["sessionLoad"],
 				"medianChallengeScore": med_d, "medianSessionLoad": med_s})
+	return out
+
+## SB-M36-014: peak (fromLevel) vs recovery (toLevel) on actual A, B, U and Session Load.
+static func recovery_component_checks(levels: Array, pairs: Array) -> Array:
+	var by_order := {}
+	for r in levels:
+		by_order[int(r["order"])] = r
+	var out: Array = []
+	for g in pairs:
+		var peak: Dictionary = by_order[int(g["fromLevel"])]
+		var rec: Dictionary = by_order[int(g["toLevel"])]
+		var pa: float = peak["vector"]["A"]
+		var ra: float = rec["vector"]["A"]
+		var pb: float = peak["vector"]["B"]
+		var rb: float = rec["vector"]["B"]
+		var pu: float = peak["vector"]["U"]
+		var ru: float = rec["vector"]["U"]
+		var psl: float = peak["sessionLoad"]
+		var rsl: float = rec["sessionLoad"]
+		var c := {"fromLevel": int(g["fromLevel"]), "toLevel": int(g["toLevel"]),
+			"peakA": pa, "recoveryA": ra, "peakB": pb, "recoveryB": rb, "peakU": pu, "recoveryU": ru,
+			"peakSessionLoad": psl, "recoverySessionLoad": rsl,
+			"aNotAbovePeak": ra <= pa, "bNotAbovePeak": rb <= pb,
+			"notAboveOnBothBAndU": not (rb > pb and ru > pu), "sessionLoadBelowPeak": rsl < psl}
+		c["pass"] = c["aNotAbovePeak"] and c["bNotAbovePeak"] and c["notAboveOnBothBAndU"] and c["sessionLoadBelowPeak"]
+		out.append(c)
 	return out
 
 static func _with(a: Dictionary, b: Dictionary) -> Dictionary:
