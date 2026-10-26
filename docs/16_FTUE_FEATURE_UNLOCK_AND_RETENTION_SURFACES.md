@@ -22,7 +22,7 @@ Date: 2026-09-26
 - Fresh profile = `SaveService.load()` found no save artefact at all (`fresh`); `AppState.bootstrap_new_profile()` grants the starter charges (ledger tx `ftue_starter_boosters:v1`) and installs the Welcome task in one saved transaction (rollback on save failure). Existing / migrated / corrupt / backup / future-schema saves are never re-classified.
 - `DailyService.task_reward_sb()` is the shown == credited task value; `daily.task_sb` stays 75/100/125. `claim_daily_login` / `claim_daily_task` roll back if the save fails.
 - `scripts/app/ftue_director.gd` picks one step; `scripts/ui/tutorial/coachmark_layer.gd` draws it non-blocking with the approved ring / pointer / bubble art; GOT IT / SKIP TIPS (tips only). Read-only Help & Tips: Settings "?". Established saves get the M43 Feature Unlock ceremony once for Help & Tips.
-- Skip Tips + read-only Help are the presentation default; owner visual approval (SB-M44-018 / 020) is still pending.
+- Skip Tips + read-only Help are the presentation default; the coachmark visual language (SB-M44-018) is documented in 1.5.
 
 ### 1.2 Hard unlock gating (SB-M44-031 part 1, owner table 2026-10-22)
 
@@ -45,6 +45,22 @@ Hard unlock gating is in force per the owner table in `data/config/feature_unloc
 - Eligibility: a NEW profile that has not chosen Skip Tips, at any level (not limited to the L1-L3 window or `closed`). Established / grandfathered profiles never see them. A due scheduled step wins; one coachmark at a time.
 - One-shot: acknowledged by GOT IT or by the real action (the WAITING situation ends, or Results is left via RETRY / CONTINUE / HOME) into the existing `FtueState.seen` ledger, saved canonically; never shown again after relaunch.
 - Presentation only (`main.gd` `_coach_trigger` / `_coach_want`): read-only triggers, hidden under modals / Settings and while the Results reveal or a ceremony barrier runs. No Heart, reward, booster, progression or scheduler change. Evidence: `tests/m44_contextual_coach.gd`.
+
+### 1.4 NEW badge on newly unlocked Home entries (SB-M44-013)
+
+- Rule: `HomeBadges.new_features(app)` (`scripts/ui/home/home_badges.gd`, which also owns `GATED_ENTRIES`) lists the gated Home entries (SHOP / COLLECTION / TASKS / DAILY shortcuts, ROBOTS / EVENTS / RANKS tabs) that a NEW FTUE profile has unlocked (`AppState.feature_unlocked`) and not yet visited. Grandfathered profiles never show NEW.
+- Visited = the meta_ui presentation key `feature_visited:<feature_id>` (no new save section, no schema bump). The first press of an enabled NEW entry marks it and requests the canonical save, then Home refreshes. Locked or disabled entries cannot be pressed, so they never mark. Old saves load unchanged.
+- Presentation: the existing red count badge (`UiShortcutButton.set_badge_text`, `NavBadge_<id>`) shows the localized `HOME_BADGE_NEW` text "NEW"; the pill grows inward from the top-right corner. A real count > 0 on the same entry wins over NEW. No animation, no sound, no new art.
+- Evidence: `tests/m44_new_badge.gd`.
+
+### 1.5 Coachmark visual language (SB-M44-018)
+
+- Location: `scripts/ui/tutorial/coachmark_layer.gd` (CanvasLayer 40: above Home / gameplay / Results, below the ModalStack at 64). One coachmark at a time, picked by `FtueDirector`.
+- Parts, all approved existing art under `assets/ui/final/gameplay/tutorial/`: `tutorial_highlight_ring.png` stretched around the real target (target rect grown by 10% of its longer side + 12 px); `tutorial_pointer.png` (side = 10% of the viewport width, 64..128 px) above the ring pointing down, or below it pointing up when there is more room there; `speech_bubble.png` (max 820 px wide, shrunk so it never covers the target) with a navy ink (`#1B2E59`) title (34 px) and body (28 px), then two buttons: SKIP TIPS (cream fill, tan edge) and GOT IT (Home green).
+- Cue = shape (ring + arrow) + text, never colour alone. Non-blocking: everything except the two buttons ignores input, so the real control underneath stays tappable. A step without a legal target shows the bubble only (no ring / pointer).
+- Motion: the pointer bobs 14 px toward the target, 0.45 s each way (sine), looping. Reduced Effects: no pointer motion (static pointer). Tweens die on hide / exit.
+- Reuse rule: every new tutorial highlight must go through CoachmarkLayer (a step in `data/config/ftue_onboarding_v1.json` + `FtueDirector`), never a one-off overlay. Attention on Home entries uses the NEW pill / count badge of 1.4, not a coachmark.
+- No additional art and no Scrubby teaching poses are required for M44; the existing ring / pointer / bubble set is final.
 
 ## 2. Feature set requiring unlock pacing
 

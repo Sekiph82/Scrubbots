@@ -59,6 +59,7 @@ func _init(id: String = "shortcut", label_text: String = "") -> void:
 	badge.offset_right = 2
 	badge.offset_top = -12
 	badge.offset_bottom = BADGE_SIZE - 12
+	badge.grow_horizontal = Control.GROW_DIRECTION_BEGIN   # a wider "NEW" pill grows inward
 	badge.visible = false
 	add_child(badge)
 	resized.connect(_layout_icon)
@@ -66,6 +67,11 @@ func _init(id: String = "shortcut", label_text: String = "") -> void:
 func set_badge(count: int) -> void:
 	badge.text = str(count)
 	badge.visible = count > 0
+
+## SB-M44-013: the same badge as a text pill ("NEW"); empty hides it.
+func set_badge_text(t: String) -> void:
+	badge.text = t
+	badge.visible = not t.is_empty()
 
 func set_label(t: String) -> void:
 	text = t
