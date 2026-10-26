@@ -182,7 +182,9 @@ func unlock_waves(level) -> Dictionary:
 		"histogram": hist, "unreachableCells": n - vals.size(), "perCellWaves": "".join(chars)}
 
 ## Replay one policy (or a fixed column path) through the real ProofKernel.
-func run_policy(level, engine, policy: String, fixed: Array = []) -> Dictionary:
+## `chooser` (optional, SB-M36-015): when valid, `chooser.call(st, last, ncols) -> column`
+## replaces `choose(...)`; the default leaves every existing run unchanged.
+func run_policy(level, engine, policy: String, fixed: Array = [], chooser: Callable = Callable()) -> Dictionary:
 	var cells: int = level.get_cell_count()
 	var kernel = ProofKernel.new()
 	var obs = V1.RouteObserver.new()
@@ -205,7 +207,13 @@ func run_policy(level, engine, policy: String, fixed: Array = []) -> Dictionary:
 			stop_reason = "fixed_path_ended"
 			break
 		var st: Dictionary = _v1._decision_state(level, kernel, state, cells)
-		var col: int = int(fixed[i]) if not fixed.is_empty() else choose(policy, st, last, state.column_count)
+		var col: int
+		if not fixed.is_empty():
+			col = int(fixed[i])
+		elif chooser.is_valid():
+			col = int(chooser.call(st, last, state.column_count))
+		else:
+			col = choose(policy, st, last, state.column_count)
 		st["legal"] = (st["fronts"] as Array).size()
 		st["chosen"] = col
 		obs.begin_placement()

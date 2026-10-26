@@ -174,6 +174,8 @@ slot 10 VERY_HARD  medium-high, never unbounded
 
 A hard level may exceed an easy level's challenge budget, but it may not receive unlimited Session Load or late-failure cost.
 
+SB-M36-015: these ceilings are mapped to per-slot Session Load budgets 22/26/36/40/48 (slots 4,6,9 / 1,2,7 / 3,8 / 5 / 10), labelled `PROXY`, in `data/config/frustration_analysis_v1.json`; F is computable offline as `PROVISIONAL_SIMULATED_HUMAN` (`docs/DIFFICULTY_FRUSTRATION_RISK_PROPOSAL_V1.md` section 8).
+
 ## 8. Attempt-duration budgets
 
 Exact minutes must be calibrated from real play rather than hardcoded as eternal rules.
@@ -187,6 +189,8 @@ Before data exists, maintain relative rules:
 - 49..59 logical dimensions require special load/readability review.
 
 The model stores estimated seconds but labels them `PROXY` until calibrated.
+
+SB-M36-015: the frustration analyzer reports `attemptSecondsProxy` (HUMAN_BR think time plus bot travel at 6 cells/s, median over attempts) and `sessionOverrun` against the per-slot budget, both `PROXY`.
 
 ## 9. Challenge-vector diversity QA
 

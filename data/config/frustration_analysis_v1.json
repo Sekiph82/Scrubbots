@@ -1,0 +1,40 @@
+{
+	"schema": "scrubbots-frustration-analysis/v1",
+	"version": 1,
+	"task": "SB-M36-015",
+	"source": "docs/DIFFICULTY_FRUSTRATION_RISK_PROPOSAL_V1.md sections 4 and 5 (owner pre-approval 2026-10-26)",
+	"status": {
+		"frustrationRisk": "PROVISIONAL_SIMULATED_HUMAN",
+		"profiles": "PRIOR_UNCALIBRATED",
+		"sessionLoadBudget": "PROXY",
+		"attemptSeconds": "PROXY"
+	},
+	"offlineOnly": "The profiles are an offline analysis population. They are never assigned to a real player, never read save or telemetry data and never ship in the runtime (CLAUDE.md 11.5: no hidden individualized dynamic difficulty).",
+	"policy": {
+		"name": "HUMAN_BR",
+		"perception": "with probability mu a front's perceived count is raw instead of reachable",
+		"utility": "min(perceived, robots) / robots",
+		"choice": "with probability epsilon a uniformly random legal front, else softmax over utility / tau",
+		"pool": "productive fronts, all fronts when none is productive",
+		"latency": "t0 + t1 * log2(1 + legalFronts) seconds per decision (diagnostic only)",
+		"rngDrawOrder": "per front: perception; then slip; then softmax"
+	},
+	"profiles": {
+		"NOVICE": {"weight": 0.30, "tau": 0.30, "epsilon": 0.10, "mu": 0.40, "t0": 1.5, "t1": 0.8},
+		"CASUAL": {"weight": 0.50, "tau": 0.15, "epsilon": 0.05, "mu": 0.20, "t0": 1.0, "t1": 0.6},
+		"SKILLED": {"weight": 0.20, "tau": 0.05, "epsilon": 0.01, "mu": 0.05, "t0": 0.6, "t1": 0.4}
+	},
+	"profileOrder": ["NOVICE", "CASUAL", "SKILLED"],
+	"runsPerProfile": 32,
+	"seedFormula": "hash(\"%s|%s|%d|%s\" % [levelId, profile, runIndex, configVersion])",
+	"lateFailureProgressGreaterThan": 0.70,
+	"nearMissProgressAtLeast": 0.90,
+	"decisionBound": 2000,
+	"heartsMax": 5,
+	"botSpeedCellsPerSecond": 6.0,
+	"sessionLoadBudget": {
+		"status": "PROXY",
+		"bySlot": {"1": 26, "2": 26, "3": 36, "4": 22, "5": 40, "6": 22, "7": 26, "8": 36, "9": 22, "10": 48},
+		"overrunRule": "clamp((SessionLoad - budget) / budget, 0, 1)"
+	}
+}

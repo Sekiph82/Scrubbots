@@ -340,6 +340,8 @@ Recommended V1:
 
 Until a human-policy simulator is trustworthy, Frustration Risk must be labeled provisional and internal playtest evidence outranks the proxy.
 
+SB-M36-015: F is now computable offline as `PROVISIONAL_SIMULATED_HUMAN` (`scripts/difficulty/frustration_analyzer_v1.gd`, `data/config/frustration_analysis_v1.json`): retry_risk and late_failure from the HUMAN_BR simulated-human population (profiles `PRIOR_UNCALIBRATED`, never assigned per player), session_overrun from a per-slot Session Load budget labelled `PROXY`, choice_opacity from the v2 proxy; the weights above are read unchanged from `difficulty_score_model_v2.json`. See `docs/DIFFICULTY_FRUSTRATION_RISK_PROPOSAL_V1.md` section 8.
+
 ## 8. Initial class tuning targets
 
 These are V1 calibration targets, not timeless laws.
