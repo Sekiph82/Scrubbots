@@ -1,0 +1,1 @@
+{ "id": "050-m36-013-anchor-calibration", "task": "SB-M36-013 lane calibration on anchor corpus", "branch": "factory/050-m36-013-anchor-calibration", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/050-m36-013-anchor-calibration", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "PASS", "tests": "PASS" } }
