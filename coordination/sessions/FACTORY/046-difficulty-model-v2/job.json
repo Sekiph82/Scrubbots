@@ -1,0 +1,1 @@
+{ "id": "046-difficulty-model-v2", "task": "OWNER B 2026-10-26: difficulty score model v2 (resume M53-C003), v1 untouched", "branch": "factory/046-difficulty-model-v2", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/046-difficulty-model-v2", "stage": "merged", "round": 1, "reviews": { "rules": "PASS", "code": "PASS", "tests": "PASS" } }
