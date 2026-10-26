@@ -511,12 +511,7 @@ func _t15() -> void:
 	await _play(3)
 	host = _root.get_gameplay_host()
 	_root.refresh_coachmark()
-	_ok(cm.get_step_id() == "l3_waiting", "L3 waiting tip (informational, no forced stall)")
-	cm.get_got_it_button().pressed.emit()
-	_root.refresh_coachmark()
-	_ok(cm.get_step_id() == "l3_hearts" and not cm.get_pointer().visible, "Hearts / Retry as information (no forced loss, nothing to point at)")
-	cm.get_got_it_button().pressed.emit()
-	_root.refresh_coachmark()
+	# SB-M44-005/006: WAITING and Hearts / Retry are contextual now (tests/m44_contextual_coach.gd).
 	_ok(cm.get_step_id() == "l3_speed" and cm.get_target() == host.get_screen().get_speed_button().get_global_rect(), "2x tip on the real 2x control")
 	_ok(app.economy.speed.timed_seconds_remaining() == 0 and not app.economy.speed.is_manual_2x_entitled(3), "no paid 2x granted or started")
 	_ok(app.economy.hearts.hearts() == h0, "no Heart lost by any tip")

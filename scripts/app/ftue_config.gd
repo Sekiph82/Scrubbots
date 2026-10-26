@@ -4,12 +4,14 @@ extends RefCounted
 ## M44 (SB-M44-001/010/011/016) — strict reader of the versioned, data-driven onboarding file
 ## data/config/ftue_onboarding_v1.json (owner V03 values): the new-profile starter booster
 ## charges, the first-day Welcome task, the compulsory tutorial window (<= L3) and its lesson
-## steps and the once-per-version What's New entries. Feature unlock gating is NOT here: it is
+## steps, the once-per-version What's New entries and the one-shot CONTEXTUAL entries
+## (SB-M44-005/006: first WAITING, first win, first loss; event-triggered, not level-scheduled). Feature unlock gating is NOT here: it is
 ## the owner table data/config/feature_unlocks_v1.json (scripts/progression/feature_unlocks.gd).
 ## Any malformed field rejects the WHOLE file (ok:false) — a broken config means no starter
 ## grant and no tips (fail closed), never a partial or invented onboarding.
 
 const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 
 const PATH := "res://data/config/ftue_onboarding_v1.json"
 const SCHEMA := "scrubbots.ftue_onboarding.v1"
@@ -17,9 +19,10 @@ const VERSION := 1
 ## Owner V03: the entire compulsory tutorial fits L1..L3 at most.
 const OWNER_MAX_TUTORIAL_LEVEL := 3
 const SURFACES := ["home", "gameplay"]
-const TARGETS := ["", "shortcut:daily", "shortcut:tasks", "play", "supply_front", "supply_preview", "slots", "board", "boosters", "speed"]
+const TARGETS := ["", "shortcut:daily", "shortcut:tasks", "play", "supply_front", "supply_preview", "slots", "board", "boosters", "speed", "results_retry"]
 const WHEN := ["daily_claimable", "tasks_claimable"]
 const COMPLETE_ON := ["shortcut:daily", "shortcut:tasks", "play", "supply_placed"]
+const TRIGGERS := ["slot_waiting", "result_won", "result_lost"]
 
 static func load_config(path: String = PATH) -> Dictionary:
 	if not FileAccess.file_exists(path):
@@ -92,9 +95,22 @@ static func validate(d) -> Dictionary:
 			steps.append(st)
 		lessons.append({"id": String(l["id"]), "surface": String(l["surface"]), "level": int(l["level"]),
 			"level_id": String(l.get("level_id", "")), "steps": steps})
+	# Contextual entries share the seen ledger with lesson steps, so ids are unique across both;
+	# one entry per trigger; copy keys must exist in the UiText table.
+	var contextual: Array = []
+	var triggers := {}
+	if typeof(d.get("contextual")) != TYPE_ARRAY:
+		return _bad("contextual")
+	for c in d["contextual"]:
+		if typeof(c) != TYPE_DICTIONARY or not _str(c.get("id")) or step_ids.has(c["id"]) 				or not TRIGGERS.has(c.get("trigger")) or triggers.has(c["trigger"]) 				or typeof(c.get("target")) != TYPE_STRING or not TARGETS.has(c["target"]) 				or not _str(c.get("title")) or not UiText.EN.has(c["title"]) 				or not _str(c.get("body")) or not UiText.EN.has(c["body"]):
+			return _bad("contextual")
+		step_ids[c["id"]] = true
+		triggers[c["trigger"]] = true
+		contextual.append({"id": String(c["id"]), "trigger": String(c["trigger"]), "target": String(c["target"]),
+			"title": String(c["title"]), "body": String(c["body"])})
 	return {"ok": true, "reason": "", "version": VERSION, "starter_booster_charges": starter,
 		"welcome_task_index": 0, "welcome_sb": int(w["scrub_bucks"]), "max_tutorial_level": int(mx),
-		"whats_new": whats_new, "lessons": lessons}
+		"whats_new": whats_new, "lessons": lessons, "contextual": contextual}
 
 static func _bad(reason: String) -> Dictionary:
 	return {"ok": false, "reason": reason}

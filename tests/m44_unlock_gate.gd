@@ -195,7 +195,7 @@ func _ftue_director() -> void:
 	_ok(String(part.get("id", "")) == "l2_boosters_a" and part["boosters"] == ["plus_one_slot"], "a step keeps only its unlocked boosters %s" % str(part.get("boosters")))
 	a.unlocks.cfg["unlocks"]["plus_one_slot"] = 6
 	a.progression.record_win(2)
-	_ok(String(d.current_step("gameplay", {"level": 3, "level_id": "level_003_palm_tree"}).get("id", "")) == "l3_waiting", "L3 lesson runs")
+	_ok(String(d.current_step("gameplay", {"level": 3, "level_id": "level_003_palm_tree"}).get("id", "")) == "l3_speed", "L3 lesson runs")
 	_ok(not d.settle() and not a.economy.ftue.closed, "window open during L3")
 	a.progression.record_win(3)
 	_ok(d.settle() and a.economy.ftue.closed and not d.tips_active(), "L3 Results: window closes exactly as before")

@@ -64,10 +64,13 @@
       "level": 3,
       "level_id": "level_003_palm_tree",
       "steps": [
-        {"id": "l3_waiting", "target": "slots", "title": "FTUE_L3_WAIT_TITLE", "body": "FTUE_L3_WAIT_BODY"},
-        {"id": "l3_hearts", "target": "", "title": "FTUE_L3_HEARTS_TITLE", "body": "FTUE_L3_HEARTS_BODY"},
         {"id": "l3_speed", "target": "speed", "title": "FTUE_L3_SPEED_TITLE", "body": "FTUE_L3_SPEED_BODY"}
       ]
     }
+  ],
+  "contextual": [
+    {"id": "ctx_waiting", "trigger": "slot_waiting", "target": "slots", "title": "FTUE_CTX_WAIT_TITLE", "body": "FTUE_CTX_WAIT_BODY"},
+    {"id": "ctx_result_won", "trigger": "result_won", "target": "", "title": "FTUE_CTX_WON_TITLE", "body": "FTUE_CTX_WON_BODY"},
+    {"id": "ctx_result_lost", "trigger": "result_lost", "target": "results_retry", "title": "FTUE_CTX_LOST_TITLE", "body": "FTUE_CTX_LOST_BODY"}
   ]
 }
