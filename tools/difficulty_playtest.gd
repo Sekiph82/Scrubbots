@@ -1,7 +1,7 @@
 extends SceneTree
 ## SB-M36-005 — simulated difficulty playtest of the shipped production catalog (offline tool).
 ##
-##   godot --headless --path . -s res://tools/difficulty_playtest.gd [-- --committed-measure]
+##   godot --headless --path . -s res://tools/difficulty_playtest.gd [-- --model v1|v2] [--committed-measure]
 ##
 ## Thin runner over the existing Difficulty V1 tooling; it adds no scoring logic. For every
 ## catalog entry it runs a FRESH SolvabilitySolver solve, replays the oracle trace through
@@ -10,9 +10,17 @@ extends SceneTree
 ## the versioned model, and flags anomalies mechanically. Writes
 ## coordination/sessions/FACTORY/044-m36-005-difficulty-playtest/playtest_v1.json and prints
 ## the report table. Read-only with respect to all content and configs.
+##
+## SB-M36-012: `--model v2` (the default) scores with LevelDifficultyAnalyzerV2 instead: six
+## non-oracle policies measured per level (the fresh solver trace is replayed only as the
+## ORACLE_DIAGNOSTIC run; --committed-measure reuses the committed M53-C002 holdout raw when
+## LevelData sha and trace hash match) and writes
+## coordination/sessions/FACTORY/046-difficulty-model-v2/playtest_v2.json. `--model v1`
+## reproduces the SB-M36-005 run and file unchanged.
 
 const Tool = preload("res://tools/analyze_m53_first10.gd")
 const Analyzer = preload("res://scripts/difficulty/level_difficulty_analyzer_v1.gd")
+const AnalyzerV2 = preload("res://scripts/difficulty/level_difficulty_analyzer_v2.gd")
 const DifficultyProgressionV1 = preload("res://scripts/difficulty/difficulty_progression_v1.gd")
 const LevelLoader = preload("res://scripts/data/level_loader.gd")
 const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
@@ -22,16 +30,27 @@ const Pack = preload("res://tools/build_m52_first_10_pack.gd")
 
 const OUT_DIR := "res://coordination/sessions/FACTORY/044-m36-005-difficulty-playtest"
 const OUT_PATH := OUT_DIR + "/playtest_v1.json"
+const OUT_DIR_V2 := "res://coordination/sessions/FACTORY/046-difficulty-model-v2"
+const OUT_PATH_V2 := OUT_DIR_V2 + "/playtest_v2.json"
+const V2_COMMITTED_RAW := "res://coordination/sessions/M53-C002/evidence/holdout_raw/%s_raw.json"
 ## CLAUDE.md 11.1 owner-locked cadence, independent of the config (rule CADENCE).
 const CADENCE_11_1 := ["EASY", "EASY", "MEDIUM", "EASY", "HARD", "EASY", "EASY", "MEDIUM", "EASY", "VERY_HARD"]
 ## docs/10 vocabulary: never collapse UNSOLVABLE and INCONCLUSIVE.
 const SOLVER_STATUS := {"SOLVED": "SOLVED", "DEADLOCK": "UNSOLVABLE", "UNKNOWN_BOUND": "INCONCLUSIVE"}
 
 func _initialize() -> void:
-	quit(run(OS.get_cmdline_user_args().has("--committed-measure")))
+	var args := OS.get_cmdline_user_args()
+	var i := args.find("--model")
+	var model: String = args[i + 1] if i >= 0 and i + 1 < args.size() else "v2"
+	if not model in ["v1", "v2"]:
+		printerr("UNKNOWN_MODEL %s (use --model v1|v2)" % model)
+		quit(1)
+		return
+	quit(run(args.has("--committed-measure"), model))
 
-func run(committed_measure: bool) -> int:
-	var analyzer = Analyzer.new()
+func run(committed_measure: bool, model: String = "v2") -> int:
+	var v2 := model == "v2"
+	var analyzer = AnalyzerV2.new() if v2 else Analyzer.new()
 	var prog = DifficultyProgressionV1.new()
 	var cat = LevelCatalog.new()
 	if not analyzer.is_ok() or not prog.is_ok() or not cat.load_manifest().ok:
@@ -39,7 +58,7 @@ func run(committed_measure: bool) -> int:
 		return 1
 	var levels: Array = []
 	for entry in cat.get_entries_ordered():
-		var rec := level_record(entry, analyzer, prog, committed_measure)
+		var rec := level_record_v2(entry, analyzer, prog, committed_measure) if v2 else level_record(entry, analyzer, prog, committed_measure)
 		if rec.is_empty():
 			return 1
 		levels.append(rec)
@@ -49,15 +68,28 @@ func run(committed_measure: bool) -> int:
 	var recovery: Dictionary = Tool.recovery_checks(for_guards, prog)
 	var anomalies := find_anomalies(levels, recovery, analyzer)
 	var tol: Dictionary = Analyzer._read_json(DifficultyProgressionV1.DEFAULT_CONFIG_PATH)["challengeTolerance"]
+	var score_cfg: String = AnalyzerV2.SCORE_MODEL_PATH if v2 else Analyzer.SCORE_MODEL_PATH
+	var analysis_cfg: String = AnalyzerV2.CONFIG_PATH if v2 else Analyzer.DEFAULT_CONFIG_PATH
 	var out := {"schema": "scrubbots.m36.difficulty_playtest.v1", "version": 1, "task": "SB-M36-005",
 		"generatedBy": "res://tools/difficulty_playtest.gd", "catalog": LevelCatalog.DEFAULT_MANIFEST_PATH,
 		"provenance": analyzer.provenance(), "challengeTolerance": tol,
 		"measureMode": "committed_raw_if_trace_equal" if committed_measure else "fresh",
 		"recovery": recovery, "levels": levels, "anomalies": anomalies}
-	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT_DIR))
-	if not Tool._write(OUT_PATH, JSON.stringify(out, "\t", false) + "\n"):
+	if v2:
+		# The v1 file keeps its SB-M36-005 shape; only v2 carries the model/config keys.
+		out = {"schema": "scrubbots.m36.difficulty_playtest.v2", "version": 2, "task": "SB-M36-012",
+			"generatedBy": "res://tools/difficulty_playtest.gd", "catalog": LevelCatalog.DEFAULT_MANIFEST_PATH,
+			"modelVersion": 2, "scoreModelConfig": {"path": score_cfg, "sha256": Pack.content_sha256(score_cfg)},
+			"analysisConfig": {"path": analysis_cfg, "sha256": Pack.content_sha256(analysis_cfg)},
+			"sha256Note": "Pack.content_sha256: sha256 of the JSON text with CRLF normalised to LF",
+			"provenance": analyzer.provenance(), "challengeTolerance": tol,
+			"measureMode": out["measureMode"], "recovery": recovery, "levels": levels, "anomalies": anomalies}
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT_DIR_V2 if v2 else OUT_DIR))
+	if not Tool._write(OUT_PATH_V2 if v2 else OUT_PATH, JSON.stringify(out, "\t", false) + "\n"):
 		return 1
-	print(table_md(levels))
+	print("MODEL modelVersion=%d scoreModel=%s sha256=%s analysisConfig=%s sha256=%s" % [2 if v2 else 1,
+		score_cfg, Pack.content_sha256(score_cfg), analysis_cfg, Pack.content_sha256(analysis_cfg)])
+	print(table_v2_md(levels) if v2 else table_md(levels))
 	print("DIFFICULTY_PLAYTEST OK levels=%d anomalies=%d" % [levels.size(), anomalies.size()])
 	return 0
 
@@ -106,6 +138,57 @@ func level_record(entry, analyzer, prog, committed_measure: bool) -> Dictionary:
 			"ms": solver_ms, "traceHash": trace_hash, "traceEqualsCommittedReference": trace_hash == int(ref["traceHash"])},
 		"dispatches": int(p["totalClears"]), "decisions": int(p["steps"]), "dispatchWaves": int(p["dispatchWaves"]),
 		"routeFailures": int(p["routeFailures"]), "solved": bool(p["solved"]), "finalActive": int(p["finalActive"]),
+		"measureMs": int(raw["timing"]["totalMs"]), "source": source}
+
+## v2: D comes from the six-policy ensemble; the fresh solver trace is the SOLVED evidence and
+## is replayed only as the ORACLE_DIAGNOSTIC run, which supplies the route/solved fields.
+func level_record_v2(entry, analyzer, prog, committed_measure: bool) -> Dictionary:
+	var id: String = entry.id
+	var n: int = entry.order
+	var lvl = LevelLoader.load_from_path(entry.level_path).level_data
+	var ref: Dictionary = Tool.reference_inputs(id, lvl)
+	if not ref["ok"]:
+		printerr("REFERENCE_FAIL %s: %s" % [id, ref["error"]])
+		return {}
+	var t0 := Time.get_ticks_msec()
+	var sol: Dictionary = SolvabilitySolver.new().solve(ProofState.from_level_and_supply(lvl, ref["make_engine"].call()))
+	var solver_ms := Time.get_ticks_msec() - t0
+	var status: String = SOLVER_STATUS.get(String(sol["status"]), String(sol["status"]))
+	var trace: Array = sol["trace"] if status == "SOLVED" else ref["trace"]
+	var trace_hash: int = SolvabilitySolver._trace_hash(trace)
+	var raw: Dictionary = {}
+	var source := "fresh"
+	if committed_measure and FileAccess.file_exists(V2_COMMITTED_RAW % id):
+		var c: Dictionary = Analyzer._read_json(V2_COMMITTED_RAW % id)
+		if int(c["solvability"]["traceHash"]) == trace_hash and c["levelSha256"] == Pack.content_sha256(entry.level_path):
+			raw = c["raw"]
+			source = "committed_raw"
+	if raw.is_empty():
+		var cols: Array = []
+		for t in trace:
+			cols.append(int(t["column"]))
+		var fixed := {"ORACLE_DIAGNOSTIC": cols}
+		if not (ref["ownerClicks"] as Array).is_empty():
+			fixed["OWNER_DIAGNOSTIC"] = ref["ownerClicks"]
+		raw = analyzer.measure(lvl, ref["make_engine"], fixed)
+	var s: Dictionary = analyzer.score(raw, n)
+	var o: Dictionary = raw["runs"]["ORACLE_DIAGNOSTIC"]
+	print("PLAYTESTED %s model=v2 solver=%s %d ms measure=%s %d ms" % [id, status, solver_ms, source, int(raw["timing"]["totalMs"])])
+	return {"order": n, "id": id, "modelVersion": 2, "width": lvl.width, "height": lvl.height,
+		"class": prog.class_for(n), "declaredClass": entry.difficulty, "slot": prog.slot_for(n),
+		"challengeScore": s["challengeScore"], "vector": s["vector"], "targetChallenge": s["targetChallenge"],
+		"signedDelta": s["signedDelta"], "acceptanceWindow": s["acceptanceWindow"],
+		"sessionLoad": s["sessionLoad"], "unlock": s["unlock"],
+		"frustrationRisk": {"status": s["frustration"]["status"], "scalar": s["frustration"]["scalar"],
+			"choiceOpacityProxy": s["frustration"]["components"]["choiceOpacity"]["value"]},
+		"policies": {"primaryEnsembleDRange": s["policySpread"]["primaryEnsembleDRange"],
+			"primaryPoliciesCompleted": s["frustration"]["primaryPoliciesCompleted"],
+			"robustnessPass": s["robustness"]["pass"], "robustnessMaxDeviation": s["robustness"]["maxDeviation"],
+			"oracleDiagnosticD": s["policySpread"]["perPolicy"]["ORACLE_DIAGNOSTIC"]["D"]},
+		"solver": {"status": status, "rawStatus": String(sol["status"]), "visited": int(sol["visited"]),
+			"ms": solver_ms, "traceHash": trace_hash, "traceEqualsCommittedReference": trace_hash == int(ref["traceHash"])},
+		"measureOk": bool(raw["ok"]), "routeFailures": int(o["routeFailures"]), "solved": bool(o["completed"]),
+		"finalActive": int(round((1.0 - float(o["finalProgress"])) * float(lvl.get_cell_count()))),
 		"measureMs": int(raw["timing"]["totalMs"]), "source": source}
 
 func find_anomalies(levels: Array, recovery: Dictionary, analyzer) -> Array:
@@ -176,4 +259,19 @@ static func table_md(levels: Array) -> String:
 			f.call(r["sessionLoad"], 1), "%s (scalar null)" % r["frustrationRisk"]["status"] if r["frustrationRisk"]["scalar"] == null else str(r["frustrationRisk"]["scalar"]),
 			r["solver"]["status"], r["solver"]["visited"], r["solver"]["ms"], r["dispatches"], r["decisions"],
 			r["dispatchWaves"], r["routeFailures"], r["measureMs"], r["source"]])
+	return "\n".join(L)
+
+static func table_v2_md(levels: Array) -> String:
+	var L := PackedStringArray()
+	L.append("| # | Level | WxH | Class | Slot | Model | D | Target | Delta | Window | W | C | A | U | B | R | S | Session Load | U p95/mean | Policy D range | Robust | Solver | Visited | Solver ms | Measure ms | Source |")
+	L.append("|---:|---|---|---|---:|---|---:|---:|---:|---|---:|---:|---:|---:|---:|---:|---:|---:|---|---|---|---|---:|---:|---:|---|")
+	for r in levels:
+		var v: Dictionary = r["vector"]
+		var pr: Array = r["policies"]["primaryEnsembleDRange"]
+		L.append("| %d | `%s` | %dx%d | %s | %d | v%d | %.1f | %.0f | %+.1f | %s | %.3f | %.3f | %.3f | %.3f | %.3f | %.3f | %.3f | %.1f | %d/%.2f | %.1f-%.1f | %s | %s | %d | %d | %d | %s |" % [
+			r["order"], r["id"], r["width"], r["height"], r["class"], r["slot"], r["modelVersion"], r["challengeScore"],
+			r["targetChallenge"], r["signedDelta"], r["acceptanceWindow"], v["W"], v["C"], v["A"], v["U"], v["B"], v["R"], v["S"],
+			r["sessionLoad"], int(r["unlock"]["p95Wave"]), float(r["unlock"]["meanWave"]), pr[0], pr[1],
+			"PASS" if r["policies"]["robustnessPass"] else "FAIL", r["solver"]["status"], r["solver"]["visited"],
+			r["solver"]["ms"], r["measureMs"], r["source"]])
 	return "\n".join(L)
