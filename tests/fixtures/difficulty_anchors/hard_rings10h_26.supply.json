@@ -1,0 +1,178 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "hard_rings10h_26-001",
+				"cid": "C01",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-002",
+				"cid": "C01",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-003",
+				"cid": "C02",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-004",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "hard_rings10h_26-005",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "hard_rings10h_26-006",
+				"cid": "C05",
+				"robots": 21
+			},
+			{
+				"batchId": "hard_rings10h_26-007",
+				"cid": "C06",
+				"robots": 21
+			},
+			{
+				"batchId": "hard_rings10h_26-008",
+				"cid": "C07",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-009",
+				"cid": "C09",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_rings10h_26-010",
+				"cid": "C10",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_rings10h_26-011",
+				"cid": "C03",
+				"robots": 2
+			}
+		],
+		[
+			{
+				"batchId": "hard_rings10h_26-012",
+				"cid": "C01",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-013",
+				"cid": "C02",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-014",
+				"cid": "C02",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-015",
+				"cid": "C03",
+				"robots": 26
+			},
+			{
+				"batchId": "hard_rings10h_26-016",
+				"cid": "C04",
+				"robots": 26
+			},
+			{
+				"batchId": "hard_rings10h_26-017",
+				"cid": "C05",
+				"robots": 21
+			},
+			{
+				"batchId": "hard_rings10h_26-018",
+				"cid": "C06",
+				"robots": 21
+			},
+			{
+				"batchId": "hard_rings10h_26-019",
+				"cid": "C08",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-020",
+				"cid": "C09",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_rings10h_26-021",
+				"cid": "C01",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_rings10h_26-022",
+				"cid": "C04",
+				"robots": 2
+			}
+		],
+		[
+			{
+				"batchId": "hard_rings10h_26-023",
+				"cid": "C01",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-024",
+				"cid": "C02",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-025",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "hard_rings10h_26-026",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "hard_rings10h_26-027",
+				"cid": "C05",
+				"robots": 22
+			},
+			{
+				"batchId": "hard_rings10h_26-028",
+				"cid": "C06",
+				"robots": 22
+			},
+			{
+				"batchId": "hard_rings10h_26-029",
+				"cid": "C07",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-030",
+				"cid": "C08",
+				"robots": 24
+			},
+			{
+				"batchId": "hard_rings10h_26-031",
+				"cid": "C10",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_rings10h_26-032",
+				"cid": "C02",
+				"robots": 16
+			}
+		]
+	],
+	"levelId": "anchor_hard_rings10h_26",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

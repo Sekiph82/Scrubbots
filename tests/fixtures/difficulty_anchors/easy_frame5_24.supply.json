@@ -1,0 +1,128 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "easy_frame5_24-001",
+				"cid": "C01",
+				"robots": 30
+			},
+			{
+				"batchId": "easy_frame5_24-002",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "easy_frame5_24-003",
+				"cid": "C02",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-004",
+				"cid": "C02",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-005",
+				"cid": "C03",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-006",
+				"cid": "C04",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-007",
+				"cid": "C05",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-008",
+				"cid": "C05",
+				"robots": 25
+			}
+		],
+		[
+			{
+				"batchId": "easy_frame5_24-009",
+				"cid": "C01",
+				"robots": 30
+			},
+			{
+				"batchId": "easy_frame5_24-010",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "easy_frame5_24-011",
+				"cid": "C02",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-012",
+				"cid": "C03",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-013",
+				"cid": "C03",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-014",
+				"cid": "C04",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-015",
+				"cid": "C05",
+				"robots": 25
+			}
+		],
+		[
+			{
+				"batchId": "easy_frame5_24-016",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "easy_frame5_24-017",
+				"cid": "C01",
+				"robots": 29
+			},
+			{
+				"batchId": "easy_frame5_24-018",
+				"cid": "C02",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-019",
+				"cid": "C03",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-020",
+				"cid": "C04",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-021",
+				"cid": "C04",
+				"robots": 25
+			},
+			{
+				"batchId": "easy_frame5_24-022",
+				"cid": "C05",
+				"robots": 25
+			}
+		]
+	],
+	"levelId": "anchor_easy_frame5_24",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

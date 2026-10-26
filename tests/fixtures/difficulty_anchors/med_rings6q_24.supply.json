@@ -1,0 +1,138 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "med_rings6q_24-001",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "med_rings6q_24-002",
+				"cid": "C02",
+				"robots": 27
+			},
+			{
+				"batchId": "med_rings6q_24-003",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "med_rings6q_24-004",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "med_rings6q_24-005",
+				"cid": "C01",
+				"robots": 24
+			},
+			{
+				"batchId": "med_rings6q_24-006",
+				"cid": "C02",
+				"robots": 24
+			},
+			{
+				"batchId": "med_rings6q_24-007",
+				"cid": "C06",
+				"robots": 24
+			},
+			{
+				"batchId": "med_rings6q_24-008",
+				"cid": "C04",
+				"robots": 16
+			}
+		],
+		[
+			{
+				"batchId": "med_rings6q_24-009",
+				"cid": "C01",
+				"robots": 27
+			},
+			{
+				"batchId": "med_rings6q_24-010",
+				"cid": "C02",
+				"robots": 27
+			},
+			{
+				"batchId": "med_rings6q_24-011",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "med_rings6q_24-012",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "med_rings6q_24-013",
+				"cid": "C01",
+				"robots": 24
+			},
+			{
+				"batchId": "med_rings6q_24-014",
+				"cid": "C05",
+				"robots": 24
+			},
+			{
+				"batchId": "med_rings6q_24-015",
+				"cid": "C06",
+				"robots": 24
+			},
+			{
+				"batchId": "med_rings6q_24-016",
+				"cid": "C05",
+				"robots": 16
+			}
+		],
+		[
+			{
+				"batchId": "med_rings6q_24-017",
+				"cid": "C01",
+				"robots": 26
+			},
+			{
+				"batchId": "med_rings6q_24-018",
+				"cid": "C02",
+				"robots": 26
+			},
+			{
+				"batchId": "med_rings6q_24-019",
+				"cid": "C03",
+				"robots": 26
+			},
+			{
+				"batchId": "med_rings6q_24-020",
+				"cid": "C04",
+				"robots": 26
+			},
+			{
+				"batchId": "med_rings6q_24-021",
+				"cid": "C02",
+				"robots": 24
+			},
+			{
+				"batchId": "med_rings6q_24-022",
+				"cid": "C05",
+				"robots": 24
+			},
+			{
+				"batchId": "med_rings6q_24-023",
+				"cid": "C03",
+				"robots": 16
+			},
+			{
+				"batchId": "med_rings6q_24-024",
+				"cid": "C06",
+				"robots": 16
+			}
+		]
+	],
+	"levelId": "anchor_med_rings6q_24",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

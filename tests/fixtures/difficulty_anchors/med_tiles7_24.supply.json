@@ -1,0 +1,153 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "med_tiles7_24-001",
+				"cid": "C01",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-002",
+				"cid": "C02",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-003",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "med_tiles7_24-004",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "med_tiles7_24-005",
+				"cid": "C05",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-006",
+				"cid": "C06",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-007",
+				"cid": "C07",
+				"robots": 24
+			},
+			{
+				"batchId": "med_tiles7_24-008",
+				"cid": "C02",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-009",
+				"cid": "C05",
+				"robots": 18
+			}
+		],
+		[
+			{
+				"batchId": "med_tiles7_24-010",
+				"cid": "C01",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-011",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "med_tiles7_24-012",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "med_tiles7_24-013",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "med_tiles7_24-014",
+				"cid": "C05",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-015",
+				"cid": "C07",
+				"robots": 24
+			},
+			{
+				"batchId": "med_tiles7_24-016",
+				"cid": "C01",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-017",
+				"cid": "C02",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-018",
+				"cid": "C06",
+				"robots": 18
+			}
+		],
+		[
+			{
+				"batchId": "med_tiles7_24-019",
+				"cid": "C02",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-020",
+				"cid": "C03",
+				"robots": 27
+			},
+			{
+				"batchId": "med_tiles7_24-021",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "med_tiles7_24-022",
+				"cid": "C04",
+				"robots": 27
+			},
+			{
+				"batchId": "med_tiles7_24-023",
+				"cid": "C06",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-024",
+				"cid": "C07",
+				"robots": 24
+			},
+			{
+				"batchId": "med_tiles7_24-025",
+				"cid": "C01",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-026",
+				"cid": "C05",
+				"robots": 18
+			},
+			{
+				"batchId": "med_tiles7_24-027",
+				"cid": "C06",
+				"robots": 18
+			}
+		]
+	],
+	"levelId": "anchor_med_tiles7_24",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

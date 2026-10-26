@@ -1,0 +1,188 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "hard_tiles9_split_24-001",
+				"cid": "C01",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-002",
+				"cid": "C01",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-003",
+				"cid": "C02",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-004",
+				"cid": "C03",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-005",
+				"cid": "C03",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-006",
+				"cid": "C04",
+				"robots": 22
+			},
+			{
+				"batchId": "hard_tiles9_split_24-007",
+				"cid": "C04",
+				"robots": 21
+			},
+			{
+				"batchId": "hard_tiles9_split_24-008",
+				"cid": "C04",
+				"robots": 21
+			},
+			{
+				"batchId": "hard_tiles9_split_24-009",
+				"cid": "C05",
+				"robots": 22
+			},
+			{
+				"batchId": "hard_tiles9_split_24-010",
+				"cid": "C05",
+				"robots": 21
+			},
+			{
+				"batchId": "hard_tiles9_split_24-011",
+				"cid": "C05",
+				"robots": 21
+			},
+			{
+				"batchId": "hard_tiles9_split_24-012",
+				"cid": "C06",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-013",
+				"cid": "C06",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-014",
+				"cid": "C07",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-015",
+				"cid": "C08",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-016",
+				"cid": "C08",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-017",
+				"cid": "C09",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-018",
+				"cid": "C09",
+				"robots": 16
+			}
+		],
+		[
+			{
+				"batchId": "hard_tiles9_split_24-019",
+				"cid": "C01",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-020",
+				"cid": "C02",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-021",
+				"cid": "C04",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-022",
+				"cid": "C06",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-023",
+				"cid": "C08",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-024",
+				"cid": "C09",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-025",
+				"cid": "C02",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-026",
+				"cid": "C06",
+				"robots": 16
+			}
+		],
+		[
+			{
+				"batchId": "hard_tiles9_split_24-027",
+				"cid": "C01",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-028",
+				"cid": "C03",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-029",
+				"cid": "C05",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-030",
+				"cid": "C07",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-031",
+				"cid": "C08",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-032",
+				"cid": "C09",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-033",
+				"cid": "C03",
+				"robots": 16
+			},
+			{
+				"batchId": "hard_tiles9_split_24-034",
+				"cid": "C07",
+				"robots": 16
+			}
+		]
+	],
+	"levelId": "anchor_hard_tiles9_split_24",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_split",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}

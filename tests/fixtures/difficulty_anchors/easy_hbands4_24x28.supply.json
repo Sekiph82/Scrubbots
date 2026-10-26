@@ -1,0 +1,138 @@
+{
+	"columnCount": 3,
+	"columns": [
+		[
+			{
+				"batchId": "easy_hbands4_24x28-001",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-002",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-003",
+				"cid": "C02",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-004",
+				"cid": "C02",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-005",
+				"cid": "C03",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-006",
+				"cid": "C03",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-007",
+				"cid": "C04",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-008",
+				"cid": "C04",
+				"robots": 28
+			}
+		],
+		[
+			{
+				"batchId": "easy_hbands4_24x28-009",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-010",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-011",
+				"cid": "C02",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-012",
+				"cid": "C02",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-013",
+				"cid": "C03",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-014",
+				"cid": "C03",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-015",
+				"cid": "C04",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-016",
+				"cid": "C04",
+				"robots": 28
+			}
+		],
+		[
+			{
+				"batchId": "easy_hbands4_24x28-017",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-018",
+				"cid": "C01",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-019",
+				"cid": "C02",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-020",
+				"cid": "C02",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-021",
+				"cid": "C03",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-022",
+				"cid": "C03",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-023",
+				"cid": "C04",
+				"robots": 28
+			},
+			{
+				"batchId": "easy_hbands4_24x28-024",
+				"cid": "C04",
+				"robots": 28
+			}
+		]
+	],
+	"levelId": "anchor_easy_hbands4_24x28",
+	"maxRobotsPerBatch": 30,
+	"qaOnly": true,
+	"schema": "scrubbots.level_supply_plan.v1",
+	"supplyStrategy": "layer_rr",
+	"version": 1,
+	"visiblePreviewDepth": 3
+}
