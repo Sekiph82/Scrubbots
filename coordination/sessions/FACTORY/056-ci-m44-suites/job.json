@@ -1,0 +1,1 @@
+{ "id": "056-ci-m44-suites", "task": "CI wiring for new M44 suites + drop test .uid", "branch": "factory/056-ci-m44-suites", "worktree": "C:/Users/sekip/Desktop/ScrubBots-factory/056-ci-m44-suites", "stage": "merged", "round": 0, "reviews": { "rules": "PASS", "code": "n/a", "tests": "n/a" } }
