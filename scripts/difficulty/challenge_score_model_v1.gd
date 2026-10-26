@@ -23,6 +23,9 @@ extends RefCounted
 
 const DEFAULT_CONFIG_PATH := "res://data/config/difficulty_score_model_v1.json"
 const EXPECTED_SCHEMA := "scrubbots-difficulty-score-model/v1"
+## Model v2 (SB-M36-012) keeps the same structure and locked weights; it is only read when a
+## caller passes its path explicitly (LevelDifficultyAnalyzerV2). The default stays v1.
+const V2_SCHEMA := "scrubbots-difficulty-score-model/v2"
 
 ## Canonical challenge-vector order (matches config challengeVectorOrder).
 const VECTOR_ORDER := ["W", "C", "A", "U", "B", "R", "S"]
@@ -30,6 +33,7 @@ const VECTOR_ORDER := ["W", "C", "A", "U", "B", "R", "S"]
 var _loaded := false
 var _error := ""
 var _model_version := 0
+var _schema := ""
 var _challenge_weights := {}       ## key -> float
 var _session_weights := {}
 var _frustration_weights := {}
@@ -51,9 +55,11 @@ func _load(path: String) -> void:
 		_error = "malformed JSON line %d: %s" % [json.get_error_line(), json.get_error_message()]
 		return
 	var data = json.get_data()
-	if typeof(data) != TYPE_DICTIONARY or data.get("schema", "") != EXPECTED_SCHEMA:
+	var schema = data.get("schema", "") if typeof(data) == TYPE_DICTIONARY else ""
+	if schema != EXPECTED_SCHEMA and (schema != V2_SCHEMA or path == DEFAULT_CONFIG_PATH):
 		_error = "unexpected schema"
 		return
+	_schema = schema
 	_model_version = int(data.get("version", 0))
 	_challenge_weights = data.get("challengeScore", {}).get("weights", {})
 	_session_weights = data.get("sessionLoad", {}).get("weights", {})
@@ -162,6 +168,6 @@ func color_submetric(distinct_colors: int, normalized_entropy: float) -> float:
 ## Provenance stamp for a published level analysis.
 func provenance() -> Dictionary:
 	return {
-		"model_schema": EXPECTED_SCHEMA,
+		"model_schema": _schema,
 		"model_version": _model_version,
 	}

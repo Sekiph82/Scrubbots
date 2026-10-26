@@ -1,0 +1,172 @@
+{
+  "schema": "scrubbots-difficulty-score-model/v2",
+  "version": 2,
+  "ownerLockedAt": "2026-09-12",
+  "ownerDecision": "Owner chose option B on 2026-10-26 (docs/DIFFICULTY_LANE_CALIBRATION_PROPOSAL_V1.md, SB-M36-012): score model v2 resumes M53-C003 from the frozen M53-C002 candidate; weights stay owner-locked (CLAUDE.md 11.3).",
+  "supersedesNothing": "v1 (difficulty_score_model_v1.json, level_difficulty_analysis_v1.json, level_difficulty_analyzer_v1.gd) and the M53-C002 candidate stay byte-identical for provenance. v2 is the active model for NEW analysis only; every analysed level stores its model version.",
+  "analysisConfig": "res://data/config/level_difficulty_analysis_v2.json",
+  "analyzer": "res://scripts/difficulty/level_difficulty_analyzer_v2.gd",
+  "challengeScore": {
+    "range": [
+      0.0,
+      100.0
+    ],
+    "weights": {
+      "workload": 0.1,
+      "colorComplexity": 0.15,
+      "accessibilityScarcity": 0.2,
+      "unlockDepth": 0.2,
+      "bottleneckPressure": 0.15,
+      "routeComplexity": 0.1,
+      "slotColorPressure": 0.1
+    },
+    "formula": "100*(0.10*W+0.15*C+0.20*A+0.20*U+0.15*B+0.10*R+0.10*S)"
+  },
+  "workload": {
+    "cellTransform": "sqrt",
+    "referenceMinCells": 400,
+    "referenceMaxCells": 2400,
+    "clamp": true,
+    "note": "Cell workload is compressed so board size cannot dominate Challenge Score; heavy large boards are primarily controlled by Session Load."
+  },
+  "colorComplexity": {
+    "countWeight": 0.5,
+    "entropyWeight": 0.5,
+    "countNormalization": {
+      "minDistinct": 3,
+      "maxDistinct": 12
+    }
+  },
+  "accessibilityScarcity": {
+    "definition": "demand-relative: per decision state 1 - sum min(reachable, need) / sum need, need = min(raw ACTIVE of the colour, robots demanded); progress-interval weighted (see level_difficulty_analysis_v2.json operationalDefinitions.A)",
+    "earlyMidProgressWeighting": true,
+    "priorityProgressFraction": 0.6
+  },
+  "unlockDepth": {
+    "p95Weight": 0.55,
+    "meanWeight": 0.3,
+    "initiallyLockedFractionWeight": 0.15,
+    "normalization": "colour-aware unlock waves, corpus anchors U_p95_hi / U_mean_hi (level_difficulty_analysis_v2.json calibratedAnchors)"
+  },
+  "bottleneckPressure": {
+    "lowChoiceFractionWeight": 0.35,
+    "forcedFractionWeight": 0.4,
+    "forcedStreakWeight": 0.25,
+    "lowChoiceThreshold": 2,
+    "consideredStates": "only decision states with >= 2 legal fronts"
+  },
+  "routeComplexity": {
+    "averageRouteLengthWeight": 0.45,
+    "averageDetourWeight": 0.35,
+    "averageTurnWeight": 0.2,
+    "usesCanonicalProductionRouting": true,
+    "normalization": "linear [lo, hi] corpus anchors R_len / R_detour / R_turn (level_difficulty_analysis_v2.json calibratedAnchors)"
+  },
+  "slotColorPressure": {
+    "noWorkSlotFractionWeight": 0.4,
+    "singleProductiveSlotFractionWeight": 0.35,
+    "colorDemandImbalanceWeight": 0.25,
+    "mustNotInventQueueOrCooldownMechanics": true,
+    "colorDemandImbalance": "remaining-work imbalance: 1 - normalized Shannon entropy of the remaining ACTIVE counts of the demanded colours"
+  },
+  "sessionLoad": {
+    "range": [
+      0.0,
+      100.0
+    ],
+    "weights": {
+      "actions": 0.5,
+      "routeTime": 0.3,
+      "decisionCount": 0.2
+    },
+    "formula": "100*(0.50*actionsNorm+0.30*routeTimeNorm+0.20*decisionCountNorm)",
+    "estimatedAttemptSecondsStatusBeforeCalibration": "PROXY"
+  },
+  "frustrationRisk": {
+    "range": [
+      0.0,
+      100.0
+    ],
+    "weights": {
+      "retryRisk": 0.35,
+      "sessionOverrun": 0.3,
+      "lateFailure": 0.2,
+      "choiceOpacity": 0.15
+    },
+    "formula": "100*(0.35*retryRisk+0.30*sessionOverrun+0.20*lateFailure+0.15*choiceOpacity)",
+    "provisionalUntilHumanPolicyAndPlaytestCalibration": true
+  },
+  "challengeVectorOrder": [
+    "W",
+    "C",
+    "A",
+    "U",
+    "B",
+    "R",
+    "S"
+  ],
+  "modelRules": {
+    "allSubmetricsClamped01": true,
+    "coefficientsVersioned": true,
+    "publishedLevelStoresModelVersion": true,
+    "noSilentCoefficientChange": true,
+    "challengeNotEquivalentToSessionLoad": true,
+    "challengeNotEquivalentToFrustration": true
+  },
+  "changes": [
+    {
+      "component": "policy",
+      "before": "v1: every component measured on one oracle/solver trace (SolvabilitySolver path)",
+      "after": "mean over a six-policy non-oracle ensemble (RR, RR_REV, GREEDY, GREEDY_HI, ACCESS, ACCESS_HI) replayed through the real ProofKernel; the solver stays solvability authority only",
+      "reason": "the oracle path is the solver's search order, not what a player does; C002 corpus showed the mean over three policy families stays within the 1.75 D tie-break tolerance"
+    },
+    {
+      "component": "U",
+      "before": "colour-agnostic peel waves normalised by the 59x59 envelope peel depth (unlockReferenceWave 29)",
+      "after": "colour-aware unlock waves under production access with same-colour closure; p95/mean normalised by corpus anchors U_p95_hi 4.0 / U_mean_hi 1.528",
+      "reason": "diagnosis 2.2: v1 U is pure board geometry (every full 32x32 board scores U 0.410); colour-aware U varies 0.27..0.97 across the seven 32x32 levels"
+    },
+    {
+      "component": "A",
+      "before": "1 - reachable/raw over all ACTIVE cells of each colour",
+      "after": "demand-relative 1 - sum min(reachable, need)/sum need, need = min(raw, robots demanded); linear corpus anchors A_lo 0.029 / A_hi 0.587",
+      "reason": "diagnosis 2.2: v1 A saturates at 0.61..0.78 on any filled art and is ordinally inverted on the corpus (comb/maze/mosaic below halves/stripes); corpus re-check: the declared A pair (shafts > band) passes, no inversion, so no further change"
+    },
+    {
+      "component": "B",
+      "before": "all decision states; low-choice = <= lowChoiceThreshold (2) productive fronts",
+      "after": "only states with >= 2 legal fronts; low-choice = <= 2 productive AND fewer productive than legal",
+      "reason": "diagnosis 2.2: with 3 supply columns '<= 2 productive' was true at 65..100% of states; column exhaustion is not a bottleneck. Saturation re-check: considered-state low-choice fraction is 0..0.16 on the corpus and 0..0.32 on L2..L10, so the threshold is not made relative (no saturation remains; with 3 columns the 'fewer than legal' condition already makes it relative)"
+    },
+    {
+      "component": "S",
+      "before": "singleProductive over all states; imbalance = robot-weighted front shortfall clamp(1 - reachable/robots)",
+      "after": "single-colour term only over states demanding >= 2 colours; imbalance = remaining-work imbalance across demanded colours (docs/09 4.7)",
+      "reason": "diagnosis 2.2: interleaved single-colour EASY supplies drove v1 S high (rho -0.64 vs lane target); the shortfall term also double-counted A. v2 S on EASY L2/L4/L6 is 0.03..0.06"
+    },
+    {
+      "component": "R",
+      "before": "length/diagonal, detour, turns on the oracle trace, Stage-A anchors",
+      "after": "same three measures over the ensemble, linear corpus anchors (FLOW_SIZE median lo, corpus max hi)",
+      "reason": "v1 R was flat (0.8 D spread); only the anchors move to the independent corpus, definition unchanged"
+    },
+    {
+      "component": "W",
+      "before": "sqrt cell workload 400..2400",
+      "after": "unchanged",
+      "reason": "diagnosis 2.2: behaves as designed; corpus flow-size family spread 5.5 D < 18"
+    },
+    {
+      "component": "C",
+      "before": "0.5 count(3..12) + 0.5 normalised entropy",
+      "after": "unchanged",
+      "reason": "diagnosis 2.2: the one component tracking the cadence (rho +0.72); corpus colour pairs pass"
+    },
+    {
+      "component": "anchors",
+      "before": "Stage-A envelope/runtime anchors (level_difficulty_analysis_v1.json)",
+      "after": "anchors copied unchanged from the frozen M53-C002 corpus derivation (27 QA fixtures, firstTenRead false)",
+      "reason": "anti-overfit: anchors come from the independent corpus only; owner ratings are an evaluation target, never a fit target, and no constant was tuned after reading the owner-rating correlation"
+    }
+  ]
+}
