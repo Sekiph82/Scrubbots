@@ -309,6 +309,20 @@
       "approval_label": "approved by Claude under owner-delegated authority 2026-10-31, not owner visual review",
       "notes": "gold crown with red ribbon on the blue badge disc; no existing assets/ui/final crown art; 128x128 circular-masked crop of the delegated-approved Achievements master (SB-M43-127-REBUILD)",
       "godot_usage": "Achievements popup First-Try Five badge icon (scripts/ui/profile/profile_screens.gd)"
+    },
+    {
+      "id": "event_weekly_hero",
+      "category": "event_hero",
+      "provider": "crop_of_master",
+      "source": "assets/ui/generated/masters/scrubbots_events_master_v01.png",
+      "crop_box": [142, 406, 724, 617],
+      "raw_generated_path": "assets/ui/generated/events/event_weekly_hero_raw.png",
+      "target_path": "assets/ui/final/events/event_weekly_hero.png",
+      "status": "PROMOTED_BY_CLAUDE_DELEGATED",
+      "date": "2026-10-31",
+      "approval_label": "approved by Claude under owner-delegated authority 2026-10-31, not owner visual review",
+      "notes": "fountain-garden scene with Scrubbots from the Weekly Cleaning Event hero, cropped between the Ends-in pill and the progress pill so no master text or pill is baked in; 582x211 kept at native size (SB-M43-130-REBUILD)",
+      "godot_usage": "Events popup weekly event card hero art; upcoming cards reuse it desaturated (scripts/ui/components/ui_event_card.gd)"
     }
   ],
   "native_godot_components_not_to_generate": [

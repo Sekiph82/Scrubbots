@@ -8,6 +8,7 @@ extends SceneTree
 const MainScene = preload("res://scenes/app/main.tscn")
 const MainScript = preload("res://scripts/app/main.gd")
 const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
+const UiEventCard = preload("res://scripts/ui/components/ui_event_card.gd")
 const Achievements = preload("res://scripts/progression/achievements.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const EventService = preload("res://scripts/economy/event_service.gd")
@@ -187,6 +188,7 @@ func _m05() -> void:
 	_eco().events.load_config("user://__missing_events.json")
 	ProfileScreens.refresh_events(p, _root.get_app_state())
 	_ok(_txt(p, "Empty") == UiText.t("EVENTS_UNAVAILABLE"), "unreadable config -> unavailable state")
+	_ok(p.find_child("EmptyCard", true, false) != null and p.find_child("Event_*", true, false) == null, "SB-M43-130: empty / unavailable shown as the Empty card, no Event_* card")
 	_complete("m05_events_empty_state")
 
 func _m06() -> void:
@@ -212,6 +214,8 @@ func _m06() -> void:
 	_ok(_events_badge() == [1, true], "SB-M43-134: claimable event reward -> EVENTS badge 1 on Home BottomNav %s" % str(_events_badge()))
 	var p = ProfileScreens.open_events(_root.get_modal_stack(), _root.get_app_state())
 	await _frames(2)
+	var m0b: Array = p.find_child("Event_wk1", true, false).find_child("Milestone_0", true, false).find_children("*", "Button", true, false)
+	_ok(m0b.size() == 1 and m0b[0].text == UiText.t("POPUP_CLAIM") and not m0b[0].disabled and m0b[0].custom_minimum_size.y >= 72, "SB-M43-130: claimable Milestone_0 shows the CLAIM button (ev:wk1:0, >= 72 px)")
 	var sb0: int = e.wallet.scrub_bucks()
 	_tap("ev:wk1:0")
 	_tap("ev:wk1:0")
@@ -220,7 +224,47 @@ func _m06() -> void:
 	_ok(not _root.get_app_state().actions.claim_event_milestone("wk1", 0)["ok"] and not _root.get_app_state().actions.claim_event_milestone("wk1", 1)["ok"], "re-claim / unreached refused")
 	_ok(_events_badge() == [0, false], "SB-M43-134: reward claimed -> EVENTS badge cleared %s" % str(_events_badge()))
 	_ok(_txt(p.find_child("Event_wk1", true, false), "When").begins_with(UiText.t("EVENT_ENDS_IN", [""]).substr(0, 4)), "countdown shown")
+	await _frames(2)
+	_event_card_checks(p, e.events.view("wk1"))
+	_event_state_matrix()
 	_complete("m06_weekly_event_template")
+
+## SB-M43-130-REBUILD: the rebuilt card shows the live view (claim -> COMPLETED, unreached bar, pills).
+func _event_card_checks(p, v: Dictionary) -> void:
+	var card: Node = p.find_child("Event_wk1", true, false)
+	var m0: Node = card.find_child("Milestone_0", true, false)
+	_ok(card.get_meta("phase") == "active", "SB-M43-130: active card phase meta == active")
+	_ok(m0.find_child("Done", true, false) != null and _txt(m0, "State") == UiText.t("ACH_DONE") and m0.find_children("*", "Button", true, false).is_empty(), "SB-M43-130: claimed Milestone_0 -> COMPLETED pill, no claim button")
+	var bar: ProgressBar = card.find_child("Progress_1", true, false)
+	_ok(bar != null and bar.value == mini(v["progress"], 5) and bar.max_value == 5, "SB-M43-130: unreached Milestone_1 -> Progress_1 %s/%s" % [bar.value if bar else -1, bar.max_value if bar else -1])
+	_ok(_txt(card, "When") == UiText.t("EVENT_ENDS_IN", [UiEventCard._dhm(int(v["ends_in"]))]) and _txt(card, "Progress") == UiText.t("EVENT_PROGRESS", [UiText.num(int(v["progress"]))]), "SB-M43-130: When / Progress pills show the live UiText strings")
+	_ok(_txt(card.find_child("Milestone_1", true, false), "Text") == UiText.t("EVENT_MILESTONE_LEVELS", [UiText.num(5)]) and _txt(card.find_child("Milestone_1", true, false), "Reward") == UiText.reward_text({"bot_parts": 1}), "SB-M43-130: milestone row splits level target and real reward text")
+	_ok((card.find_child("Hero", true, false) as TextureRect).texture != null, "SB-M43-130: hero art texture loaded")
+	var close: Button = p.get_action_button("close")
+	_ok(close.size.y >= 88, "SB-M43-130: CLOSE >= 88 px tall (%d)" % close.size.y)
+	p.rearm()   # the claim latched the popup for rearm_soon()
+	_tap("close")
+	_ok(_top_id() != "events", "SB-M43-130: CLOSE pops Events")
+
+## SB-M43-130-REBUILD: one UiEventCard component renders active / upcoming / ended views.
+func _event_state_matrix() -> void:
+	var ms := [{"target": 2, "reward": {"scrub_bucks": 50}, "reached": true, "claimed": false, "claimable": true},
+		{"target": 5, "reward": {"bot_parts": 1}, "reached": false, "claimed": false, "claimable": false}]
+	var claim := func(_aid: String, parent: Control) -> Button:
+		var b := Button.new()
+		parent.add_child(b)
+		return b
+	var cards := {}
+	for phase in ["active", "upcoming", "ended"]:
+		cards[phase] = UiEventCard.build({"id": phase, "phase": phase, "progress": 0 if phase == "upcoming" else 2, "milestones": ms,
+			"ends_in": 90000, "starts_in": 180000}, claim)
+	var up: Node = cards["upcoming"]
+	_ok(up.find_child("Milestone_*", true, false) == null and up.find_child("Progress", true, false) == null and _txt(up, "When") == UiText.t("EVENT_STARTS_IN", [UiEventCard._dhm(180000)]), "SB-M43-130 matrix: upcoming collapsed (no Milestone_* / Progress), When = EVENT_STARTS_IN")
+	_ok(_txt(cards["ended"], "When") == UiText.t("EVENT_ENDED") and cards["ended"].find_child("Milestone_0", true, false).find_children("*", "Button", true, false).size() == 1 and cards["ended"].find_child("Locked", true, false) != null, "SB-M43-130 matrix: ended When = EVENT_ENDED, claimable row still claims, unreached row locked")
+	_ok(_txt(cards["active"], "When") == UiText.t("EVENT_ENDS_IN", [UiEventCard._dhm(90000)]) and cards["active"].find_child("Progress_1", true, false) != null, "SB-M43-130 matrix: active When = EVENT_ENDS_IN, unreached row has a bar")
+	_ok(UiEventCard.reward_icon({"standard_card_packs": 1}) == "card_pack_standard" and UiEventCard.reward_icon({"scrub_bucks": 1, "bot_parts": 1}) == "gift_box", "SB-M43-130 matrix: reward icon mapping (single key -> bundle, multi-key -> gift box)")
+	for c in cards.values():
+		c.free()
 
 func _m07() -> void:
 	print("[m07 expiry: explicit policy required; forfeit vs claim_after_end; stale safe]")

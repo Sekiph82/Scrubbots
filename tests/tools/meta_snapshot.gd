@@ -1,6 +1,6 @@
 extends SceneTree
 ## M43-C010 / C012 runtime evidence: Profile, Achievements, Events (empty + configured test
-## event), Notifications preferences, Welcome Back, Home badges in the real app root
+## active + upcoming events; all sizes), Notifications preferences, Welcome Back, Home badges in the real app root
 ## (opening skipped). Needs a rendering driver:
 ##   godot --path . -s res://tests/tools/meta_snapshot.gd -- <out_dir>
 
@@ -44,27 +44,33 @@ func _run(size: Vector2i, all_states: bool) -> void:
 	st.top()._on_action("achievements")
 	await _draw(6)
 	_shot(sub, root, "2_achievements", size)
+	st.clear("evidence")
+	ProfileScreens.open_events(st, app)
+	await _draw(6)
+	_shot(sub, root, "3_events_empty", size)
+	st.clear("evidence")
+	# SB-M43-130-REBUILD: one active event (claimed / claimable / in-progress milestones) plus
+	# one upcoming event, both test-only config; the shipped events_v1.json schedules none.
+	var now := int(Time.get_unix_time_from_system())
+	var cfg := {"schema": "scrubbots.events.v1", "approved_reward_types": ["scrub_bucks", "bot_parts", "standard_card_packs"],
+		"weekly_events": [{"id": "evidence_wk", "start_ts": now - 7200, "unclaimed_on_expiry": "forfeit",
+			"milestones": [{"target": 1, "reward": {"scrub_bucks": 50}}, {"target": 2, "reward": {"standard_card_packs": 1}}, {"target": 5, "reward": {"bot_parts": 1}}]},
+			{"id": "evidence_next", "start_ts": now + 2 * 86400, "unclaimed_on_expiry": "forfeit",
+			"milestones": [{"target": 3, "reward": {"scrub_bucks": 50}}]}],
+		"first_try_cleanup": {"id": "evidence_ft", "levels": 5, "reward": {"standard_card_packs": 1}}}
+	var cp := "user://meta_ev_events.json"
+	var f := FileAccess.open(cp, FileAccess.WRITE)
+	f.store_string(JSON.stringify(cfg))
+	f.close()
+	app.economy.events.load_config(cp)
+	app.economy.events.on_progression_terminal(true, true)
+	app.economy.events.on_progression_terminal(true, true)
+	app.actions.claim_event_milestone("evidence_wk", 0)
+	ProfileScreens.open_events(st, app)
+	await _draw(6)
+	_shot(sub, root, "4_events_test_config", size)
+	DirAccess.remove_absolute(ProjectSettings.globalize_path(cp))
 	if all_states:
-		st.clear("evidence")
-		ProfileScreens.open_events(st, app)
-		await _draw(6)
-		_shot(sub, root, "3_events_empty", size)
-		st.clear("evidence")
-		var cfg := {"schema": "scrubbots.events.v1", "approved_reward_types": ["scrub_bucks", "bot_parts", "standard_card_packs"],
-			"weekly_events": [{"id": "evidence_wk", "start_ts": int(Time.get_unix_time_from_system()) - 7200, "unclaimed_on_expiry": "forfeit",
-				"milestones": [{"target": 2, "reward": {"scrub_bucks": 50}}, {"target": 5, "reward": {"bot_parts": 1}}]}],
-			"first_try_cleanup": {"id": "evidence_ft", "levels": 5, "reward": {"standard_card_packs": 1}}}
-		var cp := "user://meta_ev_events.json"
-		var f := FileAccess.open(cp, FileAccess.WRITE)
-		f.store_string(JSON.stringify(cfg))
-		f.close()
-		app.economy.events.load_config(cp)
-		app.economy.events.on_progression_terminal(true, true)
-		app.economy.events.on_progression_terminal(true, true)
-		ProfileScreens.open_events(st, app)
-		await _draw(6)
-		_shot(sub, root, "4_events_test_config", size)
-		DirAccess.remove_absolute(ProjectSettings.globalize_path(cp))
 		st.clear("evidence")
 		ProfileScreens.open_notifications(st, app)
 		await _draw(6)
