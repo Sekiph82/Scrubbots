@@ -90,9 +90,36 @@ func _m03() -> void:
 	await _frames(2)
 	var p = _top()
 	_ok(_top_id() == "profile", "profile card -> Profile")
-	_ok(_txt(p, "ActiveRobot") == UiText.t("PROFILE_ROBOT", ["Scrubby"]) and _txt(p, "Level") == UiText.t("PROFILE_LEVEL", ["4"]), "active robot + campaign level")
-	_ok(_txt(p, "Collection") == UiText.t("PROFILE_COLLECTION", ["0", "135", "0"]) and _txt(p, "Robots") == UiText.t("PROFILE_ROBOTS", ["1", "10"]), "Collection + robots live")
-	_ok(_txt(p, "AchievementSummary") == UiText.t("PROFILE_ACHIEVEMENTS", ["0", str(Achievements.load_defs().size())]), "achievement summary")
+	# SB-M43-125-REBUILD: hero card, 2x3 stat tiles, Personal Bests table (master v01).
+	var hero: Control = p.find_child("ProfileHero", true, false)
+	var parts: Dictionary = e.robots.next_robot_progress()
+	var meter = p.find_child("ProfileBotParts", true, false)
+	_ok(hero is PanelContainer and _txt(hero, "ActiveRobot") == "Scrubby" and _txt(hero, "HeroLevel") == "4"
+		and hero.find_child("ProfilePortrait", true, false) != null and meter.caption.text == "%d/%d" % [parts["parts"], parts["cost"]],
+		"profile hero: portrait, robot name, level badge 4, Bot Parts bar %s" % meter.caption.text)
+	var grid: GridContainer = p.find_child("ProfileStats", true, false)
+	var s := Achievements.stats(_root.get_app_state())
+	var want := {"Level": "4", "Cleared": str(int(s["levels_completed"])), "Collection": "0/135", "Robots": "1/10",
+		"AchievementSummary": "0/%d" % Achievements.load_defs().size(), "LoginDays": str(int(e.daily.streak()))}
+	var tiles_ok: bool = grid != null and grid.columns == 2 and grid.get_child_count() == 6
+	for n in want:
+		var t: Node = grid.get_node_or_null(n) if grid != null else null
+		tiles_ok = tiles_ok and t != null and t.find_child("Icon", true, false) is TextureRect and _txt(t, "Caption") != "" and _txt(t, "Value") == want[n]
+	_ok(tiles_ok, "profile stats: 2 columns, exactly 6 tiles with icon + caption + live value %s" % str(want))
+	var r = e.records
+	var bests := {"BestStreak": [e.streak.streak(), s["best_win_streak"]], "BestFirstTry": [r.get_value("first_try_run"), r.get_value("best_first_try_run")],
+		"BestBoosterless": [r.get_value("boosterless_run"), r.get_value("best_boosterless_run")]}
+	var card: Control = p.find_child("ProfileBests", true, false)
+	var bests_ok: bool = card != null and _txt(card, "BestsTitle") == UiText.t("PROFILE_BESTS")
+	for n in bests:
+		var row: Node = card.find_child(n, true, false) if card != null else null
+		bests_ok = bests_ok and row != null and _txt(row, "Current") == str(int(bests[n][0])) and _txt(row, "Best") == str(int(bests[n][1]))
+	_ok(bests_ok, "profile bests: 3 rows with Current / Best from streak + records")
+	var tall := true
+	for id in ["achievements", "notifications", "close"]:
+		var b: Button = p.get_action_button(id)
+		tall = tall and b != null and maxf(b.custom_minimum_size.y, b.size.y) >= 88
+	_ok(tall, "profile action buttons >= 88 px tall")
 	_tap("achievements")
 	await _frames(2)
 	_ok(_top_id() == "achievements", "ACHIEVEMENTS from Profile")
@@ -217,7 +244,7 @@ func _m08() -> void:
 	_complete("m08_first_try_run")
 
 func _m09() -> void:
-	print("[m09 Personal Bests: self-comparison only + self-ghost]")
+	print("[m09 Personal Bests: self-comparison only (Current / Best)]")
 	await _boot("m09")
 	var e = _eco()
 	await _win(1)
@@ -229,8 +256,8 @@ func _m09() -> void:
 	_ok(r.get_value("boosterless_wins") == 3 and r.get_value("best_boosterless_run") == 3, "boosterless first clears 3")
 	var p = ProfileScreens.open_profile(_root.get_modal_stack(), _root.get_app_state())
 	await _frames(2)
-	var ghost: ProgressBar = p.find_child("BestFirstTry", true, false).find_child("Ghost", true, false)
-	_ok(ghost.max_value == 2 and ghost.value == 0, "self-ghost: current 0 against own best 2")
+	var row: Node = p.find_child("BestFirstTry", true, false)
+	_ok(_txt(row, "Current") == "0" and _txt(row, "Best") == "2", "self-comparison: current 0 against own best 2")
 	var src := FileAccess.get_file_as_string("res://scripts/ui/profile/profile_screens.gd") + FileAccess.get_file_as_string("res://scripts/economy/player_records.gd")
 	_ok(not src.contains("friend") and not src.contains("leaderboard") and not src.contains("http"), "no social / remote comparison")
 	_complete("m09_personal_bests_self_only")
