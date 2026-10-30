@@ -142,6 +142,7 @@ func _m06() -> void:
 	var e = _eco()
 	_event_config({"start_ts": _now[0] - 3600, "policy": "forfeit"})
 	_ok(e.events.list().size() == 1 and e.events.list()[0]["phase"] == "active", "event active")
+	_ok(_events_badge() == [0, false], "SB-M43-134: active event with nothing claimable -> no EVENTS badge (no spam) %s" % str(_events_badge()))
 	await _win(1)
 	_day[0] += 3
 	_now[0] += 3 * 86400
@@ -155,6 +156,7 @@ func _m06() -> void:
 	_ok(not src.contains("rewarded") and not src.contains("purchase") and not src.contains("debit") and not src.contains("wallet") and not src.contains("shop"), "no ad / purchase / spend input to event progress")
 	await _lose(3)
 	_ok(e.events.view("wk1")["progress"] == 2, "a loss adds nothing")
+	_ok(_events_badge() == [1, true], "SB-M43-134: claimable event reward -> EVENTS badge 1 on Home BottomNav %s" % str(_events_badge()))
 	var p = ProfileScreens.open_events(_root.get_modal_stack(), _root.get_app_state())
 	await _frames(2)
 	var sb0: int = e.wallet.scrub_bucks()
@@ -163,6 +165,7 @@ func _m06() -> void:
 	await _frames(1)
 	_ok(e.wallet.scrub_bucks() == sb0 + 50 and e.events.view("wk1")["milestones"][0]["claimed"], "milestone reward once (+50 SB)")
 	_ok(not _root.get_app_state().actions.claim_event_milestone("wk1", 0)["ok"] and not _root.get_app_state().actions.claim_event_milestone("wk1", 1)["ok"], "re-claim / unreached refused")
+	_ok(_events_badge() == [0, false], "SB-M43-134: reward claimed -> EVENTS badge cleared %s" % str(_events_badge()))
 	_ok(_txt(p.find_child("Event_wk1", true, false), "When").begins_with(UiText.t("EVENT_ENDS_IN", [""]).substr(0, 4)), "countdown shown")
 	_complete("m06_weekly_event_template")
 
@@ -314,6 +317,11 @@ func _event_config(o: Dictionary) -> void:
 	f.store_string(JSON.stringify(cfg))
 	f.close()
 	_eco().events.load_config(path)
+
+## [HomeBadges events count, Home NavBadge_events visible] after a Home refresh.
+func _events_badge() -> Array:
+	_root.get_home().refresh()
+	return [int(HomeBadges.compute(_root.get_app_state())["events"]), _root.get_home().get_region("NavBadge_events").visible]
 
 func _event_ending() -> bool:
 	return NotificationPolicy.candidates(_root.get_app_state()).any(func(c): return c["category"] == "event_ending")

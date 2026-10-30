@@ -18,6 +18,11 @@ const StandardPackCeremony = preload("res://scripts/ui/ceremony/standard_pack_ce
 const RewardGrantService = preload("res://scripts/economy/reward_grant_service.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const CompletionEvaluator = preload("res://scripts/gameplay/completion/completion_evaluator.gd")
+const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
+const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
+const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
+const Popups = preload("res://scripts/ui/popup/popups.gd")
+const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 
 var EXPECTED_CASES := [
 	"w01_world01_default_preserved", "w02_registry_ranges_fail_closed", "w03_current_world_derived", "w04_worlds_presentation_only",
@@ -131,9 +136,28 @@ func _c02() -> void:
 	_ok(top != null and String(top.popup_id) == "comeback", "Welcome Back on Home after 3 days (got %s)" % (String(top.popup_id) if top != null else "none"))
 	_ok(top.find_child("Ready_daily", true, false) != null and top.find_child("Hearts", true, false) != null, "Hearts + Daily-ready lines")
 	_ok(e.wallet.scrub_bucks() == sb0 and e.daily.streak() == 0, "nothing granted, Daily untouched")
+	_ok(["gift_bar", "tasks", "events"].all(func(k): return top.find_child("Ready_" + k, true, false) == null), "SB-M43-143: nothing ready -> no Gift / Tasks / Events line (none fabricated)")
 	top.close("test")
 	await _frames(3)
 	_ok(_root.get_modal_stack().top() == null, "shown once (not re-opened on drain)")
+	# SB-M43-143: Gift / Tasks / Events lines carry the real ready counts once that state exists.
+	e.gift.add_streak_sb("c02", 60)
+	e.daily.mark_task_done(0)
+	var ev := _write_json("c02_events", {"schema": "scrubbots.events.v1", "version": 1, "approved_reward_types": ["scrub_bucks"],
+		"weekly_events": [{"id": "wk1", "start_ts": _now[0] - 3600, "unclaimed_on_expiry": "forfeit", "milestones": [{"target": 1, "reward": {"scrub_bucks": 50}}]}]})
+	e.events.load_config(ev)
+	e.events.on_progression_terminal(true, false)
+	var gifts: int = e.gift.claimable().size()
+	var sb1: int = e.wallet.scrub_bucks()
+	var cp = ProfileScreens.open_comeback(_root.get_modal_stack(), _root.get_app_state())
+	await _frames(2)
+	_ok(gifts > 0 and cp.find_child("Ready_gift_bar", true, false).text == UiText.t("COMEBACK_GIFT", [UiText.num(gifts)]), "Gift line: %d claimable gift(s)" % gifts)
+	_ok(cp.find_child("Ready_tasks", true, false).text == UiText.t("COMEBACK_TASKS", [UiText.num(1)]), "Tasks line: 1 task reward ready")
+	_ok(cp.find_child("Ready_events", true, false).text == UiText.t("COMEBACK_EVENTS", [UiText.num(1)]), "Events line: 1 event reward ready")
+	_ok(e.wallet.scrub_bucks() == sb1 and e.gift.claimable().size() == gifts and e.events.claimable_count() == 1 and not e.daily.task_claimed(0),
+		"summary grants / claims nothing (gifts, task, event reward still waiting)")
+	cp.close("test")
+	await _frames(2)
 	_complete("c02_comeback_summary_no_mint")
 
 func _c03() -> void:
@@ -170,6 +194,34 @@ func _c04() -> void:
 	_now[0] += 8 * 86400
 	r.on_active()
 	_ok(r.catchup()["window"] != snap["window"], "a new genuine absence opens a new window (new track)")
+	# SB-M43-R12-003: expiry is exact at window_ts + catchup_expire_days * 86400 (wall clock, not local day).
+	var r3 := ReturnService.new(func(): return _now[0], path)
+	var rw3 := RewardGrantService.new()
+	r3.on_active()
+	_now[0] += 50 * 3600
+	r3.on_active()
+	var opened_at: int = _now[0]
+	r3.on_first_clear_win()
+	_now[0] = opened_at + 7 * 86400 - 1
+	var copy := ReturnService.new(func(): return _now[0], path)
+	copy.import_snapshot(r3.snapshot())
+	_ok(not r3.catchup()["expired"] and r3.summary_due() and copy.catchup() == r3.catchup(), "last second before expiry: open, same state after relaunch")
+	_ok(r3.claim_catchup(0, rw3)["ok"], "step 1 claimable in the last second")
+	var claimed_snap := r3.snapshot()
+	_now[0] = opened_at + 7 * 86400
+	r3.on_first_clear_win()
+	r3.on_first_clear_win()
+	copy.import_snapshot(claimed_snap)
+	_ok(r3.catchup()["expired"] and r3.catchup()["wins"] == 1 and not r3.summary_due() and not r3.claim_catchup(1, rw3)["ok"] and copy.catchup() == r3.catchup(),
+		"exactly at expiry: expired, wins frozen, summary gone, claims refused, identical after relaunch")
+	# Uninstall / reinstall: without a cloud copy the reinstall is a fresh profile (absent `return` section).
+	_now[0] = opened_at + 3600
+	var fresh := ReturnService.new(func(): return _now[0], path)
+	_ok(fresh.import_snapshot(null) and not fresh.on_active()["opened"] and fresh.catchup().is_empty() and not fresh.summary_due(), "reinstall, no cloud: no window, no Catch-Up, no summary")
+	_now[0] += 3600
+	_ok(not fresh.on_active()["opened"] and fresh.catchup().is_empty(), "relaunching the fresh install opens nothing either")
+	var restored := ReturnService.new(func(): return _now[0], path)
+	_ok(restored.import_snapshot(claimed_snap) and restored.catchup()["steps"][0]["claimed"] and not restored.claim_catchup(0, rw3)["ok"], "reinstall + restored copy: claimed step stays claimed, no re-grant")
 	var lt := _write_json("comeback_bad", {"schema": "scrubbots.comeback.v1", "approved_reward_types": ["scrub_bucks"], "catchup_steps": [{"wins": 4, "reward": {"scrub_bucks": 1}}]})
 	var r2 := ReturnService.new(func(): return _now[0], lt)
 	r2.on_active()
@@ -650,6 +702,58 @@ func _a04() -> void:
 	await _frames(2)
 	var top = _root.get_modal_stack().top()
 	_ok(top != null and top.find_child("Empty", true, false) != null and top.find_child("Empty", true, false).text == UiText.t("GIFTS_EMPTY"), "no claimable gifts -> empty state")
+	top.close("test")
+	await _frames(2)
+	var app = _root.get_app_state()
+	var e = app.economy
+	var stack = _root.get_modal_stack()
+	# SB-M43-166 no tasks ready, on the real Tasks popup.
+	var tp = DailyScreens.open_tasks(stack, app)
+	await _frames(2)
+	var ids := ["task:0", "task:1", "task:2", "scrubbox"]
+	_ok(tp.is_top() and HomeBadges.compute(app)["tasks"] == 0 and ids.all(func(id): return tp.get_action_button(id).disabled), "no task ready -> every claim blocked, no Tasks badge")
+	e.daily.mark_task_done(0)
+	DailyScreens.refresh_tasks(tp, app)
+	_ok(not tp.get_action_button("task:0").disabled and HomeBadges.compute(app)["tasks"] == 1, "control: a done task becomes claimable")
+	e.orders._pool = []   # the fail-closed empty pool a malformed daily_scrub_orders file yields
+	DailyScreens.refresh_tasks(tp, app)
+	_ok(range(3).all(func(i): return (tp.find_child("Task_%d" % i, true, false).find_child("Text", true, false) as Label).text == UiText.t("TASK_NONE")), "no order available -> TASK_NONE on every row")
+	tp.close("test")
+	await _frames(2)
+	# SB-M43-166 no exchangeable duplicates, on the real Cards Exchange popup.
+	var xp = CollectionScreen.open_exchange(stack, app)
+	await _frames(2)
+	var empty = xp.find_child("Empty", true, false)
+	_ok(xp.is_top() and empty != null and empty.text == UiText.t("CARDS_EMPTY") and xp.get_action_button("ex_all_extras").disabled, "no duplicates -> CARDS_EMPTY, exchange-all blocked")
+	var cid: String = e.collection.all_card_ids()[0]
+	e.collection.add_card(cid)
+	e.collection.add_card(cid)
+	CollectionScreen._refresh_exchange(xp, e)
+	_ok(xp.find_child("Empty", true, false) == null and xp.find_child("Row_" + cid, true, false) != null and not xp.get_action_button("ex_all_extras").disabled, "control: a duplicate is listed, empty state gone")
+	xp.close("test")
+	await _frames(2)
+	# SB-M43-165: the shared network-error popup has a working retry on every surface.
+	var sb0: int = e.wallet.scrub_bucks()
+	for surf in Popups.NETWORK_SURFACES:
+		var attempts := [0]
+		var np = Popups.network_error({"surface": surf})
+		np.action_selected.connect(func(id, _ctx):
+			if id == "retry":
+				attempts[0] += 1
+				np.resolve_pending(np.begin_pending("retry"), {"ok": attempts[0] >= 2}))
+		np.pending_resolved.connect(func(_a, r):
+			if r.get("ok", false):
+				np.close("recovered"))
+		stack.push(np)
+		await _frames(1)
+		var rb: Button = np.get_action_button("retry")
+		_ok(rb != null and rb.text == UiText.t("NETWORK_RETRY") and not rb.disabled, "%s: TRY AGAIN control live on the error state" % surf)
+		rb.pressed.emit()
+		_ok(attempts[0] == 1 and np.is_open() and not np.is_busy() and not rb.disabled, "%s: failed retry -> still open and usable" % surf)
+		rb.pressed.emit()
+		_ok(attempts[0] == 2 and np.is_closed(), "%s: second retry recovers and closes" % surf)
+		await _frames(1)
+	_ok(e.wallet.scrub_bucks() == sb0 and stack.depth() == 0, "retry grants nothing")
 	_complete("a04_empty_offline_language")
 
 func _a05() -> void:
