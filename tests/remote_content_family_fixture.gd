@@ -1,10 +1,10 @@
 extends SceneTree
 ## CP04 + CP05 end-to-end family fixture (local, deterministic; NOT the owner's real 11-50).
-##   builtin Levels 1-10 stay in res://;
-##   manifest N   : synthetic pack fam-a = remote Levels 11-12 -> downloaded + activated;
-##   frontier 11  : resolves remote Level 11 and the REAL ProductionGameplayHost loads it;
-##   relaunch     : offline AppState still resolves 11 from the cached LKG;
-##   manifest N+1 : appends Level 13 (pack fam-b) -> only fam-b is downloaded;
+##   builtin Levels 1-30 stay in res:// (SB-CAMPAIGN-L11-L30; remote levels follow at 31+);
+##   manifest N   : synthetic pack fam-a = remote Levels 31-32 -> downloaded + activated;
+##   frontier 31  : resolves remote Level 31 and the REAL ProductionGameplayHost loads it;
+##   relaunch     : offline AppState still resolves 31 from the cached LKG;
+##   manifest N+1 : appends Level 33 (pack fam-b) -> only fam-b is downloaded;
 ##   manifest N+2 : malicious / corrupt -> rejected, N+1 stays active and playable.
 ##
 ## Run: godot --headless --path . -s res://tests/remote_content_family_fixture.gd
@@ -62,37 +62,37 @@ func _resolve(app, n: int) -> Dictionary:
 	return GameplayLaunchResolver.resolve(app)
 
 func _run() -> void:
-	print("[f01 builtin 1-10 in res://]")
+	print("[f01 builtin 1-30 in res://]")
 	var cat := LevelCatalog.new()
-	_ok(cat.load_manifest().ok and cat.size() == 10, "builtin production catalog = 10 levels")
+	_ok(cat.load_manifest().ok and cat.size() == 30, "builtin production catalog = 30 levels")
 	var builtin := cat.get_entries_ordered()
-	_ok(builtin.map(func(e): return e.order) == range(1, 11) and builtin.all(func(e): return String(e.level_path).begins_with("res://")), "orders 1..10, all res://")
+	_ok(builtin.map(func(e): return e.order) == range(1, 31) and builtin.all(func(e): return String(e.level_path).begins_with("res://")), "orders 1..30, all res://")
 
 	var a := _pack("fam-a", {"family_level_011": "level_005_party_toucan", "family_level_012": "level_006_chicken"})
 	var b := _pack("fam-b", {"family_level_013": "level_007_pigeon"})
 	var t := F.FakeTransport.new()
 	t.set_manifest(F.manifest(1, [a], [["family_level_011", "fam-a"], ["family_level_012", "fam-a"]]), [a])
 
-	print("[f02 manifest N=1: remote 11-12 downloaded, verified, activated]")
+	print("[f02 manifest N=1: remote 31-32 downloaded, verified, activated]")
 	var app = AppState.new(_save)
 	_ok(app.content.root == _content and app.content.remote_levels().is_empty(), "isolated content root, nothing cached yet")
 	app.content.enabled = true
 	app.content.transport = t
 	var r: Dictionary = await app.content.refresh()
 	_ok(r["ok"] and r["reason"] == "ACTIVATED" and app.content.status()["status"] == RCM.UPDATED, "N=1 activated")
-	_ok(_resolve(app, 10)["entry_id"] == "level_010_ice_cube", "frontier 10 -> builtin")
-	var l11 := _resolve(app, 11)
-	_ok(l11["ok"] and l11["entry_id"] == "family_level_011" and String(l11["level_path"]).begins_with(_content), "frontier 11 -> remote family_level_011 (user:// content root)")
-	_ok(_resolve(app, 12)["entry_id"] == "family_level_012", "frontier 12 -> remote family_level_012")
+	_ok(_resolve(app, 30)["entry_id"] == "level_030_clown", "frontier 30 -> builtin")
+	var l11 := _resolve(app, 31)
+	_ok(l11["ok"] and l11["entry_id"] == "family_level_011" and String(l11["level_path"]).begins_with(_content), "frontier 31 -> remote family_level_011 (user:// content root)")
+	_ok(_resolve(app, 32)["entry_id"] == "family_level_012", "frontier 32 -> remote family_level_012")
 
 	print("[f03 the production gameplay host plays the exact remote LevelData + supply plan]")
-	app.progression.debug_set_current_level(11)
+	app.progression.debug_set_current_level(31)
 	var host = await _host(app)
 	if host != null:
 		var lvl = host.get_level()
 		var plan := SupplyPlanLoader.load_engine(host.supply_plan_path, lvl)
 		var reg_lv: Dictionary = app.content.active_registry()["levels"][0]
-		_ok(lvl.id == "family_level_011" and host.launch_entry_id == "family_level_011" and host.progression_level == 11, "host built level 11 from family_level_011")
+		_ok(lvl.id == "family_level_011" and host.launch_entry_id == "family_level_011" and host.progression_level == 31, "host built level 31 from family_level_011")
 		_ok(host.supply_plan_path == l11["supply_plan_path"] and plan["ok"]
 			and ContentManifestV1.sha256_hex(FileAccess.get_file_as_bytes(l11["level_path"])) == reg_lv["sha256"]["level"]
 			and ContentManifestV1.sha256_hex(FileAccess.get_file_as_bytes(host.supply_plan_path)) == reg_lv["sha256"]["supply_plan"],
@@ -100,7 +100,7 @@ func _run() -> void:
 		_ok(host.get_supply().player_snapshot() == plan["engine"].player_snapshot(), "live supply = exact remote plan engine")
 		host.get_parent().queue_free()
 
-	print("[f04 relaunch offline: cached LKG still resolves 11]")
+	print("[f04 relaunch offline: cached LKG still resolves 31]")
 	var off := F.FakeTransport.new()
 	off.offline = true
 	var app2 = AppState.new(_save)
@@ -108,17 +108,17 @@ func _run() -> void:
 	app2.content.transport = off
 	# (frontier set through the test seam: the progression import rightly refuses a debug-jumped
 	# frontier without its first-clears; this step is about content, not progression.)
-	_ok(app2.content.is_active_usable() and _resolve(app2, 11)["entry_id"] == "family_level_011", "cold offline boot: frontier 11 -> family_level_011 from the cached LKG")
+	_ok(app2.content.is_active_usable() and _resolve(app2, 31)["entry_id"] == "family_level_011", "cold offline boot: frontier 31 -> family_level_011 from the cached LKG")
 	r = await app2.content.refresh()
 	_ok(not r["ok"] and app2.content.status()["status"] == RCM.OFFLINE_USING_CACHE and GameplayLaunchResolver.resolve(app2)["entry_id"] == "family_level_011", "offline refresh: still playable from cache")
 
-	print("[f05 manifest N+1=2 appends 13; only the new pack downloads]")
+	print("[f05 manifest N+1=2 appends 33; only the new pack downloads]")
 	t.set_manifest(F.manifest(2, [a, b], [["family_level_011", "fam-a"], ["family_level_012", "fam-a"], ["family_level_013", "fam-b"]]), [a, b])
 	t.object_calls.clear()
 	app2.content.transport = t
 	r = await app2.content.refresh()
 	_ok(r["ok"] and t.object_calls == ["packs/fam-b/fam-b-v1.scrubpack"], "only fam-b downloaded (%s)" % str(t.object_calls))
-	_ok(_resolve(app2, 11)["entry_id"] == "family_level_011" and _resolve(app2, 13)["entry_id"] == "family_level_013", "11 unchanged, 13 -> family_level_013")
+	_ok(_resolve(app2, 31)["entry_id"] == "family_level_011" and _resolve(app2, 33)["entry_id"] == "family_level_013", "31 unchanged, 33 -> family_level_013")
 	var reg2 := FileAccess.get_file_as_bytes(_content + RCM.REGISTRY_FILE)
 
 	print("[f06 manifest N+2 malicious / corrupt -> rejected; N+1 stays active]")
@@ -137,7 +137,7 @@ func _run() -> void:
 	r = await app2.content.refresh()
 	_ok(not r["ok"] and r["reason"] == "INVALID_MEMBER_LAYOUT", "script member in a correctly hashed pack rejected (%s)" % r["reason"])
 	_ok(FileAccess.get_file_as_bytes(_content + RCM.REGISTRY_FILE) == reg2 and app2.content.status()["content_version"] == 2, "N+1 registry byte-identical and active")
-	_ok(_resolve(app2, 13)["entry_id"] == "family_level_013" and _resolve(app2, 14)["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "13 still playable; 14 truthfully CONTENT_MISSING")
+	_ok(_resolve(app2, 33)["entry_id"] == "family_level_013" and _resolve(app2, 34)["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "33 still playable; 34 truthfully CONTENT_MISSING")
 	_ok(not DirAccess.dir_exists_absolute(_content + "packs/fam-c/"), "nothing of the rejected candidate installed")
 	var app3 = AppState.new(_save)
 	_ok(app3.content.remote_levels().map(func(l): return l["id"]) == ["family_level_011", "family_level_012", "family_level_013"], "relaunch after the failed N+2: N+1 set reconstructed")
@@ -155,5 +155,5 @@ func _host(app):
 	await process_frame
 	await process_frame
 	var ok: bool = host.build()
-	_ok(ok, "ProductionGameplayHost.build() for remote level 11 (%s)" % host.get_build_error())
+	_ok(ok, "ProductionGameplayHost.build() for remote level 31 (%s)" % host.get_build_error())
 	return host if ok else null

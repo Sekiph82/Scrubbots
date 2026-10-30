@@ -43,6 +43,7 @@ name: Android Family First10 APK
 # SB-M44-025 pending-pack inventory (pre-L20 packs wait for card_packs): + m44_pending_packs_gate (59 total, exact 6/6 guard).
 # SB-COL-NAV-001 Collection set NEW-count badge + set detail prev/next: k18/k19 in m43_master_c007_collection (59 total, C007 guard now exact 19/19).
 # SB-M43-R07-001..006 earned-pack pity + First Collection Sprint tuning: + m43_master_c007r_pity (60 total, exact 11/11 guard).
+# SB-CAMPAIGN-L11-L30 20 release-pool levels as campaign L11..L30: + campaign_l11_l30 (61 total, exact 5/5 guard).
 
 on:
   workflow_dispatch:
@@ -125,7 +126,7 @@ jobs:
                    m43_c005_c072_feature_unlock_ceremony m43_c005_c074_c077_celebrations \
                    m43_master_c005r_gift_micro_progress m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
                    m43_master_c006_shop m43_master_c007_collection m54_collection_set_master_exactly_once m43_master_c008_robots \
-                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m43_master_c007r_pity; do
+                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m43_master_c007r_pity campaign_l11_l30; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -255,6 +256,11 @@ jobs:
             echo "M43-C007R verdict=PASS (11/11)" | tee -a "$S"
           else
             echo "M43-C007R verdict=FAIL (exact 11/11 summary missing)" | tee -a "$S"; fail=1
+          fi
+          if grep -qxF 'CAMPAIGN L11-L30 evidence: PASS (5/5 cases, 0 fail)' validate_logs/campaign_l11_l30.log 2>/dev/null; then
+            echo "CAMPAIGN-L11-L30 verdict=PASS (5/5)" | tee -a "$S"
+          else
+            echo "CAMPAIGN-L11-L30 verdict=FAIL (exact 5/5 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'M54 COLLECTION SET/MASTER EXACTLY-ONCE: PASS' validate_logs/m54_collection_set_master_exactly_once.log 2>/dev/null; then
             echo "M54-COLLECTION verdict=PASS" | tee -a "$S"

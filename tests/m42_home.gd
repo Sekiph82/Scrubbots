@@ -152,16 +152,16 @@ func _continue_cta_frontier() -> void:
 	# M52-C001: Level 2 (Apple) now exists — no coming-soon state at frontier 2.
 	_ok(not play.disabled and String(home.get_region("StatusLabel").text).find("coming soon") == -1, "frontier 2 has real content: enabled, no coming-soon message")
 	_shutdown(root)
-	# First frontier without content (11) keeps the honest coming-soon state.
+	# First frontier without content (31 since SB-CAMPAIGN-L11-L30) keeps the honest coming-soon state.
 	var path11 := _uniq("cont11")
 	var app11 = AppState.new(path11)
-	for n in range(1, 11):
+	for n in range(1, 31):
 		app11.progression.record_win(n)
 	app11.request_save()
 	var root11 = await _boot_main(path11)
 	var home11 = root11.get_home()
 	var play11: Button = home11.get_region("PlayButton")
-	_ok(home11.get_region("PlaySubtitle").text == "CONTINUE · LEVEL 11", "subtitle reflects real frontier 11")
+	_ok(home11.get_region("PlaySubtitle").text == "CONTINUE · LEVEL 31", "subtitle reflects real frontier 31")
 	_ok(play11.disabled and String(home11.get_region("StatusLabel").text).find("coming soon") != -1, "frontier without content: disabled + honest message")
 	play11.pressed.emit()
 	var r: Dictionary = root11.play_current_frontier()

@@ -5,7 +5,7 @@ extends SceneTree
 ## Rows: SB-M55-008 repeated scene transitions, 009 long high-load session,
 ## 010 memory growth, 011 duplicate signals, 012 orphan Nodes, 013 duplicate rewards.
 ## Bounded pass rules are fixed up front (see constants) — never "looks stable".
-## M43-C005F-PHASE4-QA-R01 warm-up model: the FIRST real Levels 1..10 lap materializes
+## M43-C005F-PHASE4-QA-R01 warm-up model: the FIRST real Levels 1..LEVELS lap materializes
 ## first-use presentation state (lazily created popup / ceremony / plugin structures, first-load
 ## content). Lap 1 still runs every gameplay / reward / idempotency / host / orphan / listener
 ## check and RECORDS its Node / Object / static-memory first-use delta (with the tree branch the
@@ -39,7 +39,8 @@ const WARMUP_CYCLES := 5
 ## (engine-internal caches), and static memory by at most this many bytes.
 const MAX_OBJECT_DRIFT := 64
 const MAX_STATIC_MEM_DRIFT := 4 * 1024 * 1024
-const LEVELS := 10
+## Every builtin production level (SB-CAMPAIGN-L11-L30: 30 since 2026-10-30); frontier LEVELS+1 has no content.
+const LEVELS := 30
 const DT := 1.0
 ## Feel-quiescence sampling (QUIESCENCE-QA-R01): one monotonic deadline for the whole wait.
 const QUIET_DEADLINE_MS := 5000
@@ -54,11 +55,11 @@ func _initialize() -> void:
 	await process_frame
 	var root = await _boot()
 	var base := await _transitions(root)
-	# Lap 1: first play of all ten levels (first-load content caching happens here).
+	# Lap 1: first play of all LEVELS levels (first-load content caching happens here).
 	var lap1: Dictionary = await _long_session(root, base, 1)
 	root.free()
 	await process_frame
-	# Lap 2 (M55-C001 steady-state leak check): a fresh profile replays the SAME ten
+	# Lap 2 (M55-C001 steady-state leak check): a fresh profile replays the SAME LEVELS
 	# levels in the same process, so every per-attempt leak shows up as growth over the
 	# end of lap 1 while one-time content caches do not.
 	var root2 = await _boot()
@@ -299,7 +300,7 @@ func _drive(host) -> Dictionary:
 		frames += 1
 	return {"frames": frames, "clicks": i}
 
-## Plays Levels 1..10 back-to-back; returns the HOME sample at the end of the lap.
+## Plays Levels 1..LEVELS back-to-back; returns the HOME sample at the end of the lap.
 func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 	print("[SB-M55-009/013 long session lap %d: Levels 1..%d back-to-back through Home -> Gameplay -> Results -> Continue]" % [lap, LEVELS])
 	var app = root.get_app_state()
@@ -383,7 +384,7 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 	_ok(signal_bad.is_empty(), "each level: exactly one RESULTS transition and one clear event per cell %s" % str(signal_bad))
 	_ok(reward_bad.is_empty(), "each WON: SB == first_clear_sb(class) + win_streak_sb(position), reward tx grew, Bot Parts grew, streak +1 %s" % str(reward_bad))
 	_ok(dup_bad.is_empty(), "re-emitted terminal / re-run handler / re-committed FirstClear / 10 Continue taps: zero extra SB, tx, route; exactly one next host %s" % str(dup_bad))
-	# After frontier 11 (no content) return HOME and compare with the transition baseline.
+	# After frontier LEVELS + 1 (no content) return HOME and compare with the transition baseline.
 	_ok(nav.go(NavigationController.Route.HOME, {"via": "results"}), "RESULTS -> HOME after Level %d" % LEVELS)
 	await _settle()
 	# Sample at feel quiescence: presentation-feel bursts (Results WIN confetti, the Home
@@ -406,7 +407,7 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 	_ok(e["orphans"] <= base["orphans"], "no orphan Node accumulated over the session (%d -> %d)" % [base["orphans"], e["orphans"]])
 	_completed["012_orphans"] = true
 	_ok(e["effects_listeners"] == base["effects_listeners"] and e["route_listeners"] == base["route_listeners"] and e["settings_listeners"] == base["settings_listeners"],
-		"authority listener counts back to baseline after 10 hosts")
+		"authority listener counts back to baseline after %d hosts" % LEVELS)
 	_completed["011_signals"] = true
 	if lap == 1:
 		# WARM-UP (recorded, not a pass rule): the first real lap materializes first-use state
