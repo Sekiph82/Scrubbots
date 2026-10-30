@@ -1,0 +1,1 @@
+{ "id": "066-m44-025-pending-packs", "task": "SB-M44-025 pending-pack inventory pre-L20", "branch": "factory/066-m44-025-pending-packs", "worktree": "C:/Users/sekip/AppData/Local/ScrubBotsFactoryWT/066-m44-025-pending-packs", "stage": "merged", "round": 0, "reviews": { "rules": "PASS", "code": "pending", "tests": "pending" } }
