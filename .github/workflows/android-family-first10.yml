@@ -36,6 +36,7 @@ name: Android Family First10 APK
 # SB-M43-074/075/077: + tests/m43_c005_c074_c077_celebrations.gd (49 total, exact 6/6 guard; Gift/Daily/3-3 Tasks celebrations + Reduced equivalence).
 # SB-M43-R05-001/002, SB-M43-013, SB-M43-C005F-007: + 3 suites (52 total, exact 8/8, 32/32, 8/8 guards; Gift micro-progress ticks, Results ceremony hand-off, robot/feature MAJOR_UNLOCK feel).
 # SB-M43-078..089 Shop destination: + 1 suite (53 total, exact 15/15 guard; verify-close with 4 added assertion cases).
+# SB-M43-090..101 Collection: + m43_master_c007_collection + m54_collection_set_master_exactly_once (55 total, exact 17/17 and M54 PASS guards; pack-inventory entry).
 
 on:
   workflow_dispatch:
@@ -117,7 +118,7 @@ jobs:
                    m43_c003_c001_acquisition m46_performance m44_unlock_gate m44_contextual_coach m44_new_badge \
                    m43_c005_c072_feature_unlock_ceremony m43_c005_c074_c077_celebrations \
                    m43_master_c005r_gift_micro_progress m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
-                   m43_master_c006_shop; do
+                   m43_master_c006_shop m43_master_c007_collection m54_collection_set_master_exactly_once; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -211,6 +212,17 @@ jobs:
             echo "M43-C006 verdict=PASS (15/15)" | tee -a "$S"
           else
             echo "M43-C006 verdict=FAIL (exact 15/15 summary missing)" | tee -a "$S"; fail=1
+          fi
+          # SB-M43-090..101 Collection: exact 17-case summary + set/master exactly-once line are mandatory.
+          if grep -qxF 'M43 master C007 Collection evidence: PASS (17/17 cases, 0 fail)' validate_logs/m43_master_c007_collection.log 2>/dev/null; then
+            echo "M43-C007 verdict=PASS (17/17)" | tee -a "$S"
+          else
+            echo "M43-C007 verdict=FAIL (exact 17/17 summary missing)" | tee -a "$S"; fail=1
+          fi
+          if grep -qxF 'M54 COLLECTION SET/MASTER EXACTLY-ONCE: PASS' validate_logs/m54_collection_set_master_exactly_once.log 2>/dev/null; then
+            echo "M54-COLLECTION verdict=PASS" | tee -a "$S"
+          else
+            echo "M54-COLLECTION verdict=FAIL (exact PASS line missing)" | tee -a "$S"; fail=1
           fi
           echo "aggregate=$([ $fail -eq 0 ] && echo PASS || echo FAIL)" | tee -a "$S"
           { echo "### validate (mode=${MODE:-<unset>}, ${GITHUB_SHA})"; echo '```'; cat "$S"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
