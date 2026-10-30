@@ -6,7 +6,7 @@ Audit context: `coordination/sessions/M34-C001/CHATGPT_AUDIT_CRITERIA_V01.md` SB
 
 Public seam: `Input.vibrate_handheld(duration_ms: int)`.
 
-- Android: implemented via `Vibrator` service, permission `android.permission.VIBRATE` (already granted by default at manifest level for the export template). Duration is milliseconds. There is no amplitude/pattern parameter in the built-in call for 4.7.2 (advanced patterns require a native/gdextension).
+- Android: implemented via `Vibrator` service, permission `android.permission.VIBRATE` (NOT added by default: the export preset must set `permissions/vibrate=true`, otherwise the APK declares no `uses-permission` and the call is silently dropped; see `docs/M34_HAPTICS_DEVICE_VALIDATION.md`). Duration is milliseconds. There is no amplitude/pattern parameter in the built-in call for 4.7.2 (advanced patterns require a native/gdextension).
 - iOS: implemented via `AudioServicesPlaySystemSound(kSystemSoundID_Vibrate)`. Duration is ignored (system decides). Modern devices honor a short buzz.
 - Desktop / headless / web: **no-op**. `Input.vibrate_handheld` returns without effect. This is the fail-open path we rely on for tests.
 
