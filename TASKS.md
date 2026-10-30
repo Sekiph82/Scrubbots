@@ -52,8 +52,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M43-R05-001..002 — Gift Meter micro-progress ticks verify-close (factory 059; code 671615be): LOCAL_PASS m43_master_c005r_gift_micro_progress 8/8, added to CI (52 suites, 4077ce5b)
 - DONE SB-M43-013 — Results ceremony hand-off verify-close (factory 059; code 46e50fd1): LOCAL_PASS m43_master_c005_meta_ceremonies 32/32 (e27/e28), added to CI (52 suites, 4077ce5b)
 - DONE SB-M43-C005F-007 — robot + feature unlock MAJOR_UNLOCK feel (factory 059, a292c390): LOCAL_PASS m43_c005f_phase6_unlock_feel 8/8 + 52 CI suites; world part gated, not implemented
-- READY SB-M43-090..095 — Collection main screen (15x9), album visual master, set progress, set detail, card detail, Exchange flow
-- READY SB-M43-096..101 — duplicate exchange + EXCHANGE ALL, live SB values, pack inventory entry, reward history, locked sets, perf
+- DONE SB-M43-090..101 — Collection verify-close + pack entry (factory 061; 098 built abb42509): LOCAL_PASS m43_master_c007_collection 17/17 + m54_collection_set_master_exactly_once, added to CI (55 suites, 74b85bab)
 - READY SB-M43-R07-001..006 — earned-pack pity counter, guarantee, complete-pool fallback, legible pity UI, First Collection Sprint tuning
 - READY SB-M43-102..106 — ROBOTS destination, visual master, lock state + Bot Parts N/250, perk display, select/equip persistence
 - READY SB-M43-107..111 — locked robot detail, active-robot presentation, no gameplay mutation, unlock history/NEW badge, 10-robot check
@@ -1138,18 +1137,18 @@ Effect-intensity vocabulary for this program: **MICRO → SMALL → REWARD → M
 
 #### M43-C007 - Collection / Cards Exchange Destination
 
-- [ ] SB-M43-090 Implement Collection main screen for all 15 canonical sets x 9 cards = 135 cards.
-- [ ] SB-M43-091 Produce/owner-approve Collection album visual master using existing canonical card art.
-- [ ] SB-M43-092 Show set progress N/9, completed state and exact set-completion reward without hiding rarity burden.
-- [ ] SB-M43-093 Implement set detail page with 9 card slots, rarity, owned/new/duplicate state and protected first-copy semantics.
-- [ ] SB-M43-094 Implement card detail popup with full art, name/rarity, owned count and exchangeable extra count.
-- [ ] SB-M43-095 Cards Exchange is a Collection-owned flow, not a Home shortcut.
-- [ ] SB-M43-096 Implement per-card duplicate exchange and EXCHANGE ALL EXTRAS with atomic confirmation and protected-copy floor of 1.
-- [ ] SB-M43-097 Show live exchange SB values Common 25 / Rare 75 / Epic 200 / Legendary 500.
-- [ ] SB-M43-098 Add Standard/Premium pack inventory/open entry and route opening to M43-C005.
-- [ ] SB-M43-099 Completed-set and Master Collection reward history/status must be visible enough to prevent confusion without enabling duplicate grants.
-- [ ] SB-M43-100 Collection supports locked/future set presentation without leaking nonexistent cards or fake progress.
-- [ ] SB-M43-101 Validate 135-card performance, scrolling, touch targets, localization, duplicate-heavy inventories and completion transitions.
+- [x] SB-M43-090 Implement Collection main screen for all 15 canonical sets x 9 cards = 135 cards. DONE factory 061 verify-close. LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-091 Produce/owner-approve Collection album visual master using existing canonical card art. DONE factory 061 verify-close: existing promoted assets under assets/ui/final/collection/ + canonical card art, no new art, CLAUDE.md 0D.1 owner visual sign-off given. LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-092 Show set progress N/9, completed state and exact set-completion reward without hiding rarity burden. DONE factory 061 verify-close (k02, k15). LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-093 Implement set detail page with 9 card slots, rarity, owned/new/duplicate state and protected first-copy semantics. DONE factory 061 verify-close (k03, k09). LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-094 Implement card detail popup with full art, name/rarity, owned count and exchangeable extra count. DONE factory 061 verify-close (k04). LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-095 Cards Exchange is a Collection-owned flow, not a Home shortcut. DONE factory 061 verify-close (k12). LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-096 Implement per-card duplicate exchange and EXCHANGE ALL EXTRAS with atomic confirmation and protected-copy floor of 1. DONE factory 061 verify-close (k04, k05, k07, k17). LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-097 Show live exchange SB values Common 25 / Rare 75 / Epic 200 / Legendary 500. DONE factory 061 verify-close (k08). LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-098 Add Standard/Premium pack inventory/open entry and route opening to M43-C005. DONE factory 061 built in abb42509: Collection-owned pack row shows live economy.pending_packs Standard/Premium counts, OPEN PACKS (blocked when empty) calls Main.request_earned_packs -> M43-C005 ceremony; UI never draws/grants/touches the queue (k14). LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-099 Completed-set and Master Collection reward history/status must be visible enough to prevent confusion without enabling duplicate grants. DONE factory 061 verify-close: set rows + Master row show CLAIMED / on completion, reopen grants nothing (k02, k15). LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-100 Collection supports locked/future set presentation without leaking nonexistent cards or fake progress. DONE factory 061 verify-close: no locked/future set content exists; screen renders exactly the 15 canonical sets with no placeholder rows or fake progress (k16). LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-101 Validate 135-card performance, scrolling, touch targets, localization, duplicate-heavy inventories and completion transitions. DONE factory 061 verify-close: 135-card perf/scroll/touch (k10, warm set detail 89-97 ms isolated vs 150 ms budget), duplicate-heavy (k10, k17), completion transitions (k15), all strings via UiText.t. LOCAL_PASS m43_master_c007_collection 17/17 (k14..k17 added) + m54_collection_set_master_exactly_once PASS, both added to CI validate (55 suites, exact guards, 74b85bab). CLAUDE_PEER_REVIEW pending.
 
 #### M43-C007R - Collection Fairness / Pity / First Collection Sprint [OWNER APPROVED 2026-09-30]
 
