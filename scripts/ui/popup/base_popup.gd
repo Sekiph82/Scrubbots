@@ -300,6 +300,12 @@ func add_action(id: String, text: String, style: String = "secondary", closes: b
 func get_action_button(id: String) -> Button:
 	return (_actions.get(id, {}) as Dictionary).get("button")
 
+## Drop one action (content rebuilt in place, e.g. the Collection set pager) and free its button.
+func remove_action(id: String) -> void:
+	if _actions.has(id):
+		(_actions[id]["button"] as Button).queue_free()
+		_actions.erase(id)
+
 func get_action_ids() -> Array:
 	return _actions.keys()
 

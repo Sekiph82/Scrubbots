@@ -42,27 +42,33 @@ func _init(id: String = "shortcut", label_text: String = "") -> void:
 	icon_rect.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
 	icon_rect.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(icon_rect)
-	badge = Label.new()
-	badge.name = "Badge"
-	badge.add_theme_font_size_override("font_size", UiTokens.FONT_BODY)
-	badge.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	badge.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	badge = make_badge()
+	add_child(badge)
+	resized.connect(_layout_icon)
+
+## The red notification badge (hidden), pinned to its parent's top-right corner. Shared with
+## the Collection album set rows (SB-COL-NAV-001).
+static func make_badge() -> Label:
+	var b := Label.new()
+	b.name = "Badge"
+	b.add_theme_font_size_override("font_size", UiTokens.FONT_BODY)
+	b.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	b.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	var sb := StyleBoxFlat.new()
 	sb.bg_color = Color(0.890, 0.157, 0.200, 1.0)
 	sb.border_color = Color(1, 1, 1, 1)
 	sb.set_border_width_all(3)
 	sb.set_corner_radius_all(BADGE_SIZE / 2)
-	badge.add_theme_stylebox_override("normal", sb)
-	badge.mouse_filter = Control.MOUSE_FILTER_IGNORE
-	badge.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-	badge.offset_left = -BADGE_SIZE + 2
-	badge.offset_right = 2
-	badge.offset_top = -12
-	badge.offset_bottom = BADGE_SIZE - 12
-	badge.grow_horizontal = Control.GROW_DIRECTION_BEGIN   # a wider "NEW" pill grows inward
-	badge.visible = false
-	add_child(badge)
-	resized.connect(_layout_icon)
+	b.add_theme_stylebox_override("normal", sb)
+	b.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	b.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	b.offset_left = -BADGE_SIZE + 2
+	b.offset_right = 2
+	b.offset_top = -12
+	b.offset_bottom = BADGE_SIZE - 12
+	b.grow_horizontal = Control.GROW_DIRECTION_BEGIN   # a wider "NEW" pill grows inward
+	b.visible = false
+	return b
 
 func set_badge(count: int) -> void:
 	badge.text = str(count)

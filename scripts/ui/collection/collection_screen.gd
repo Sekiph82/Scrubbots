@@ -5,9 +5,11 @@ extends RefCounted
 ## Exchange, all in the approved popup family on the app ModalStack, every value live:
 ##
 ##   album        15 canonical sets x 9 cards (135): per set N/9, rarity burden (owned / total per
-##                rarity), exact set reward + its claimed state, Master Collection reward + state
+##                rarity), exact set reward + its claimed state, Master Collection reward + state,
+##                red badge = owned cards of the set not yet viewed (SB-COL-NAV-001)
 ##   set detail   9 slots: owned -> canonical art, name, rarity, NEW (not yet viewed) / EXTRAS xN;
-##                not owned -> the approved unknown-card silhouette + rarity only (no art leak)
+##                not owned -> the approved unknown-card silhouette + rarity only (no art leak);
+##                < / > page through the 15 sets in place, wrapping (SB-COL-NAV-001)
 ##   card detail  full art, name, rarity, owned count, protected first copy, EXTRAS xN, live SB
 ##                value per extra, EXCHANGE 1 / EXCHANGE ALL OF THIS CARD
 ##   exchange     every card with extras + total, EXCHANGE ALL EXTRAS
@@ -27,6 +29,7 @@ const Popups = preload("res://scripts/ui/popup/popups.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
+const UiShortcutButton = preload("res://scripts/ui/components/ui_shortcut_button.gd")
 const CollectionCardCatalog = preload("res://scripts/collection/collection_card_catalog.gd")
 
 const ART := {
@@ -118,6 +121,9 @@ static func _set_row(p: BasePopup, e, n: int, row: Dictionary) -> Control:
 	var thumb := HomeStyle.art("Thumb")
 	thumb.custom_minimum_size = Vector2(74, 92)
 	h.add_child(thumb)
+	var badge := UiShortcutButton.make_badge()
+	badge.name = "NewBadge"
+	thumb.add_child(badge)
 	var v := VBoxContainer.new()
 	v.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	h.add_child(v)
@@ -171,6 +177,7 @@ static func _refresh_album(p: BasePopup, e) -> void:
 		var n := int(row["set"])
 		var card = p.find_child("Set_%d" % n, true, false)
 		var have := 0
+		var unseen := 0
 		var burden := {}
 		for k in range(9):
 			var cid := "s%d_c%d" % [n, k]
@@ -180,7 +187,12 @@ static func _refresh_album(p: BasePopup, e) -> void:
 			if e.collection.owned(cid) > 0:
 				have += 1
 				b[0] += 1
+				if not e.meta_ui.is_seen(card_key(cid)):
+					unseen += 1
 			burden[r] = b
+		var badge: Label = card.find_child("NewBadge", true, false)
+		badge.text = str(unseen)
+		badge.visible = unseen > 0
 		var parts: Array = []
 		for r in ["COMMON", "RARE", "EPIC", "LEGENDARY"]:
 			if burden.has(r):
@@ -225,23 +237,73 @@ static func _on_album_action(stack, app, p: BasePopup, id: String) -> void:
 ## cache: the album's per-visit texture cache; a standalone call gets a throw-away one.
 static func open_set(stack, app, n: int, on_close: Callable = Callable(), cache: Dictionary = {}) -> BasePopup:
 	var e = app.economy
-	var cfg_row := {}
-	for row in e.config.collection_config().get("set_rewards", []):
-		if int(row["set"]) == n:
-			cfg_row = row
-	if cfg_row.is_empty():
+	if _set_order(e).find(n) < 0:
 		return null
 	var p := BasePopup.new("collection_set")
 	p.set_frame("large")
-	p.set_title(UiText.t("COLLECTION_SET_ROW", [n, String(cfg_row.get("name", ""))]))
 	var grid := GridContainer.new()
 	grid.name = "Cards"
 	grid.columns = 3
 	grid.add_theme_constant_override("h_separation", UiTokens.SPACE_SM)
 	grid.add_theme_constant_override("v_separation", UiTokens.SPACE_SM)
 	var center := CenterContainer.new()
+	center.set_anchors_preset(Control.PRESET_FULL_RECT)
 	center.add_child(grid)
-	p.get_content().add_child(center)
+	# The 3-card grid already fills the frame interior, so the < / > pager sits over the frame's
+	# side borders: a plain Control sized to the grid, arrows anchored just outside it.
+	var pager := Control.new()
+	pager.name = "Pager"
+	pager.add_child(center)
+	p.get_content().add_child(pager)
+	center.minimum_size_changed.connect(func(): pager.custom_minimum_size = center.get_combined_minimum_size())
+	for side in [["prev", "COLLECTION_PREV_SET", 0.0, -1], ["next", "COLLECTION_NEXT_SET", 1.0, 1]]:
+		var b := p.add_action(side[0], UiText.t(side[1]), "secondary", false, "", pager)
+		b.custom_minimum_size = Vector2(UiTokens.TOUCH_MIN, UiTokens.TOUCH_MIN)
+		b.anchor_left = side[2]
+		b.anchor_right = side[2]
+		b.anchor_top = 0.5
+		b.anchor_bottom = 0.5
+		b.offset_left = -UiTokens.TOUCH_MIN - UiTokens.SPACE_SM if side[3] < 0 else UiTokens.SPACE_SM
+		b.offset_right = b.offset_left + UiTokens.TOUCH_MIN
+		b.offset_top = -UiTokens.TOUCH_MIN / 2.0
+		b.offset_bottom = UiTokens.TOUCH_MIN / 2.0
+	p.add_action("back", UiText.t("SHOP_BACK"), "secondary", true)
+	_show_set(p, app, n, cache)
+	pager.custom_minimum_size = center.get_combined_minimum_size()
+	p.action_selected.connect(func(id, _c):
+		if id.begins_with("card:"):
+			if open_card(stack, app, id.substr(5), func(): _refresh_set(p, e)) == null:
+				p.rearm()
+		elif id == "prev" or id == "next":
+			var order := _set_order(e)
+			_show_set(p, app, order[posmod(order.find(int(p.get_meta("set"))) + (1 if id == "next" else -1), order.size())], cache)
+			p.rearm())
+	p.closed.connect(func(_r):
+		if on_close.is_valid():
+			on_close.call(), CONNECT_ONE_SHOT)
+	if not stack.push(p):
+		p.free()
+		return null
+	return p
+
+## Set numbers in config (album) order.
+static func _set_order(e) -> Array:
+	return e.config.collection_config().get("set_rewards", []).map(func(r): return int(r["set"]))
+
+## (Re)build the detail for set n in place: title, 9 tiles + their card:<id> actions, viewed marks.
+static func _show_set(p: BasePopup, app, n: int, cache: Dictionary) -> void:
+	var e = app.economy
+	var set_name := ""
+	for row in e.config.collection_config().get("set_rewards", []):
+		if int(row["set"]) == n:
+			set_name = String(row.get("name", ""))
+	p.set_meta("set", n)
+	p.set_title(UiText.t("COLLECTION_SET_ROW", [n, set_name]))
+	var grid: GridContainer = p.find_child("Cards", true, false)
+	for tile in grid.get_children():
+		p.remove_action("card:" + String(tile.get_meta("card_id")))
+		grid.remove_child(tile)
+		tile.queue_free()
 	var newly_seen: Array = []
 	for k in range(9):
 		var cid := "s%d_c%d" % [n, k]
@@ -249,20 +311,8 @@ static func open_set(stack, app, n: int, on_close: Callable = Callable(), cache:
 		if e.collection.owned(cid) > 0 and e.meta_ui.mark_seen(card_key(cid)):
 			newly_seen.append(cid)
 	p.set_meta("newly_seen", newly_seen)
-	p.add_action("back", UiText.t("SHOP_BACK"), "secondary", true)
-	p.action_selected.connect(func(id, _c):
-		if id.begins_with("card:"):
-			if open_card(stack, app, id.substr(5), func(): _refresh_set(p, e)) == null:
-				p.rearm())
-	p.closed.connect(func(_r):
-		if on_close.is_valid():
-			on_close.call(), CONNECT_ONE_SHOT)
 	if not newly_seen.is_empty():
 		app.mark_dirty()   # presentation marks: flushed at the next lifecycle boundary, no save per view
-	if not stack.push(p):
-		p.free()
-		return null
-	return p
 
 static func _tile(p: BasePopup, e, cid: String, cache: Dictionary) -> Control:
 	var cat := CollectionCardCatalog.entry(cid)

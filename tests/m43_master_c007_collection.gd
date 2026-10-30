@@ -17,7 +17,8 @@ var EXPECTED_CASES := [
 	"k05_exchange_all_extras", "k06_cancel_changes_nothing", "k07_rapid_taps_single_exchange", "k08_values_table",
 	"k09_no_art_leak_unowned", "k10_135_card_performance_touch", "k11_legacy_no_new_flood", "k12_exchange_inside_collection",
 	"k13_pity_copy_only_when_due", "k14_pack_entry_routes_to_ceremony", "k15_reward_status_history",
-	"k16_no_locked_or_fake_rows", "k17_duplicate_heavy_exchange_all",
+	"k16_no_locked_or_fake_rows", "k17_duplicate_heavy_exchange_all", "k18_set_new_count_badge",
+	"k19_set_detail_prev_next",
 ]
 
 var _fail := 0
@@ -45,6 +46,8 @@ func _initialize() -> void:
 	await _k15()
 	await _k16()
 	await _k17()
+	await _k18()
+	await _k19()
 	_shutdown()
 	_cleanup()
 	_done()
@@ -209,7 +212,7 @@ func _k09() -> void:
 		var t = p.find_child("Tile_s12_c%d" % k, true, false)
 		if t.find_child("CardArt", true, false).texture.resource_path != CollectionScreen.ART["silhouette"] or _lbl(t, "Name") != UiText.t("COLLECTION_NOT_FOUND"):
 			leak.append(k)
-	_ok(leak.is_empty() and p.get_action_ids() == ["back"], "9 silhouettes, no names, no detail action %s" % str(leak))
+	_ok(leak.is_empty() and p.get_action_ids().filter(func(a): return String(a).begins_with("card:")).is_empty(), "9 silhouettes, no names, no detail action %s" % str(leak))
 	_ok(CollectionScreen.open_card(_root.get_modal_stack(), _root.get_app_state(), "s12_c3") == null, "card detail refused for an unowned card")
 	_complete("k09_no_art_leak_unowned")
 
@@ -412,7 +415,98 @@ func _k17() -> void:
 	_ok(e.wallet.scrub_bucks() == sb0 + want and not_one.is_empty() and commits == ["exchange_all_extras"], "+%d SB once, every card owned x1, one exchange_all_extras commit %s" % [want, str(commits)])
 	_complete("k17_duplicate_heavy_exchange_all")
 
+func _k18() -> void:
+	print("[k18 album set row: red badge = owned unseen cards of that set; clears after viewing]")
+	await _boot("k18")
+	var e = _eco()
+	for cid in ["s2_c0", "s2_c0", "s2_c4", "s5_c1"]:
+		e.collection.add_card(cid)
+	var sb0: int = e.wallet.scrub_bucks()
+	var bp0: int = e.wallet.bot_parts()
+	var p = CollectionScreen.open_album(_root.get_modal_stack(), _root.get_app_state())
+	await _frames(2)
+	var bad: Array = []
+	for n in range(1, 16):
+		var want := 0
+		for k in range(9):
+			var cid := "s%d_c%d" % [n, k]
+			if e.collection.owned(cid) > 0 and not e.meta_ui.is_seen("card:" + cid):
+				want += 1
+		var b = p.find_child("Set_%d" % n, true, false).find_child("NewBadge", true, false)
+		if b.visible != (want > 0) or (want > 0 and b.text != str(want)):
+			bad.append(n)
+	_ok(bad.is_empty() and _badge(p, 2) == "2" and _badge(p, 5) == "1" and _badge(p, 1) == "", "badge = unseen owned per set (set 2: 2, set 5: 1), hidden at 0 %s" % str(bad))
+	var b2 = p.find_child("Set_2", true, false).find_child("NewBadge", true, false)
+	_ok(b2.get_theme_stylebox("normal").bg_color == Color(0.890, 0.157, 0.200, 1.0) and b2.mouse_filter == Control.MOUSE_FILTER_IGNORE, "same red Home badge style; never takes input")
+	p._on_action("set:2")
+	await _frames(2)
+	_tap("back")
+	await _frames(2)
+	_ok(_top() == p and _badge(p, 2) == "" and _badge(p, 5) == "1", "after viewing set 2 and BACK: its badge cleared, set 5 still 1")
+	e.collection.add_card("s7_c3")
+	p._on_action("set:5")
+	await _frames(2)
+	_tap("back")
+	await _frames(2)
+	_ok(_badge(p, 7) == "1" and _badge(p, 5) == "", "a new grant shows on the live refresh; set 5 cleared")
+	_ok(e.wallet.scrub_bucks() == sb0 and e.wallet.bot_parts() == bp0, "badge path spends / grants nothing")
+	_complete("k18_set_new_count_badge")
+
+func _k19() -> void:
+	print("[k19 set detail < / >: in-place switch, wrap 15<->1, tiles/ids/viewed marks, DETAILS, BACK refresh]")
+	await _boot("k19")
+	var e = _eco()
+	for cid in ["s1_c0", "s15_c2", "s14_c5", "s2_c3"]:
+		e.collection.add_card(cid)
+	_root.flush_lifecycle("application_paused")
+	var col0: Dictionary = e.collection.snapshot()
+	var sb0: int = e.wallet.scrub_bucks()
+	var bp0: int = e.wallet.bot_parts()
+	var album = CollectionScreen.open_album(_root.get_modal_stack(), _root.get_app_state())
+	await _frames(1)
+	album._on_action("set:15")
+	await _frames(2)
+	var d = _top()
+	_ok(String(d.popup_id) == "collection_set" and int(d.get_meta("set")) == 15 and d.get_action_ids().has("card:s15_c2"), "set 15 open from the album")
+	var prev: Button = d.get_action_button("prev")
+	var next: Button = d.get_action_button("next")
+	var grid: Control = d.find_child("Cards", true, false)
+	var fr: Rect2 = d.get_frame_rect()
+	_ok(prev.size.x >= 88 and prev.size.y >= 88 and next.size.x >= 88 and next.size.y >= 88 and prev.is_visible_in_tree() and next.is_visible_in_tree(), "arrow touch targets >= 88 px (%s, %s)" % [str(prev.size), str(next.size)])
+	_ok(fr.encloses(prev.get_global_rect()) and fr.encloses(next.get_global_rect()) and prev.get_global_rect().end.x <= grid.global_position.x and next.global_position.x >= grid.get_global_rect().end.x, "arrows on the left / right sides of the page, inside the frame, clear of the cards")
+	_root.flush_lifecycle("application_paused")   # set 15's own view marks saved
+	var dirty0: bool = _root.get_app_state().is_dirty()
+	d._on_action("next")
+	await _frames(2)
+	var ids: Array = d.get_action_ids().filter(func(a): return String(a).begins_with("card:"))
+	var tiles: Array = grid.get_children().map(func(t): return String(t.name))
+	var want: Array = range(9).map(func(k): return "Tile_s1_c%d" % k)
+	_ok(int(d.get_meta("set")) == 1 and d.get_title() == UiText.t("COLLECTION_SET_ROW", [1, String(_cfg_row(1)["name"])]) and _root.get_modal_stack().ids() == ["collection", "collection_set"], "> from 15 wraps to set 1 in place (no extra popup)")
+	_ok(tiles == want and ids == ["card:s1_c0"] and not d.is_latched(), "9 tiles of set 1; only card:s1_c0 action; old set 15 ids gone; pager re-armed")
+	_ok(d.get_meta("newly_seen") == ["s1_c0"] and e.meta_ui.is_seen("card:s1_c0") and not dirty0 and _root.get_app_state().is_dirty(), "switched-to set marked viewed + app marked dirty")
+	d._on_action("prev")
+	await _frames(1)
+	_ok(int(d.get_meta("set")) == 15 and d.find_child("Tile_s15_c2", true, false) != null and d.get_meta("newly_seen") == [], "< from 1 wraps to set 15 (already viewed: nothing newly seen)")
+	d._on_action("prev")
+	await _frames(1)
+	_ok(int(d.get_meta("set")) == 14 and d.get_meta("newly_seen") == ["s14_c5"] and d.get_action_ids().has("card:s14_c5"), "< from 15 -> 14, its owned card marked viewed")
+	d._on_action("card:s14_c5")
+	await _frames(2)
+	_ok(_top_id() == "collection_card" and String(_top().context["card_id"]) == "s14_c5", "DETAILS opens the switched-to set's card")
+	_tap("back")
+	await _frames(2)
+	_ok(_top() == d and not d.is_latched(), "card detail closed: set detail usable")
+	_ok(e.collection.snapshot() == col0 and e.wallet.scrub_bucks() == sb0 and e.wallet.bot_parts() == bp0, "navigation changes no card count or balance")
+	_tap("back")
+	await _frames(2)
+	_ok(_top() == album and _badge(album, 15) == "" and _badge(album, 1) == "" and _badge(album, 14) == "" and _badge(album, 2) == "1", "BACK -> album refreshed: viewed sets cleared, set 2 still 1")
+	_complete("k19_set_detail_prev_next")
+
 # ------------------------------------------------------------------ helpers ----
+
+func _badge(album, n: int) -> String:
+	var b = album.find_child("Set_%d" % n, true, false).find_child("NewBadge", true, false)
+	return b.text if b.visible else ""
 
 func _complete_set(n: int) -> void:
 	for k in range(9):
