@@ -10,6 +10,7 @@ extends RefCounted
 ##   - EVENTS (SB-M43-128/129, R10-001..005): configured Weekly Cleaning Events (window,
 ##     countdown, progress, fixed milestone rewards, ended/claimed) and the opt-in First-Try
 ##     Cleanup; an honest empty state when nothing is scheduled. No event currency;
+##     SB-M43-130-REBUILD master v01: one UiEventCard per weekly view in a touch-scrollable list;
 ##   - RANKS (SB-M43-122): the player's own rank ladder from campaign levels cleared.
 ## Claims / joins go through ProductionActionFacade. These screens own no rule or value.
 
@@ -23,6 +24,7 @@ const Achievements = preload("res://scripts/progression/achievements.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const PersonalRank = preload("res://scripts/progression/personal_rank.gd")
 const UiProgressMeter = preload("res://scripts/ui/components/ui_progress_meter.gd")
+const UiEventCard = preload("res://scripts/ui/components/ui_event_card.gd")
 
 # ---------------------------------------------------------------- PROFILE ----
 
@@ -376,10 +378,17 @@ static func open_events(stack, app) -> BasePopup:
 	var p := BasePopup.new("events")
 	p.set_frame("large")
 	p.set_title(UiText.t("EVENTS_TITLE"))
+	var scroll := ScrollContainer.new()
+	scroll.name = "EventScroll"
+	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
+	p.get_content().add_child(scroll)
 	var list := VBoxContainer.new()
 	list.name = "EventList"
-	list.add_theme_constant_override("separation", UiTokens.SPACE_SM)
-	p.get_content().add_child(list)
+	list.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	list.size_flags_vertical = Control.SIZE_EXPAND_FILL
+	list.add_theme_constant_override("separation", UiTokens.SPACE_MD)
+	scroll.add_child(list)
+	TouchScroll.enable(scroll)   # M47-TOUCH-R01: finger swipe scrolls over cards / claim buttons
 	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
 	p.action_selected.connect(func(id, _c):
 		if id.begins_with("ev:"):
@@ -413,35 +422,16 @@ static func refresh_events(p: BasePopup, app) -> void:
 			b.reparent(stash)
 		list.remove_child(c)
 		c.queue_free()
+	for b in stash.get_children():   # parked claim buttons stay unpressable until a row reuses them
+		p.set_action_blocked(b.get_meta("aid"), true)
+	var claim := func(aid: String, parent: Control) -> Button:
+		var b := _button(p, stash, aid, parent)
+		p.set_action_blocked(aid, app.is_blocked)
+		return b
 	var any := false
 	for v in ev.list():
 		any = true
-		var card := _card("Event_" + String(v["id"]))
-		var box: VBoxContainer = card.get_child(0)
-		box.add_child(_label("Title", UiText.t("EVENT_WEEKLY_TITLE"), 28, BasePopup.ROYAL_EDGE))
-		var when := ""
-		match String(v["phase"]):
-			"active":
-				when = UiText.t("EVENT_ENDS_IN", [_dhm(int(v["ends_in"]))])
-			"upcoming":
-				when = UiText.t("EVENT_STARTS_IN", [_dhm(int(v["starts_in"]))])
-			_:
-				when = UiText.t("EVENT_ENDED")
-		box.add_child(_label("When", when, 22, BasePopup.INK))
-		box.add_child(_label("Progress", UiText.t("EVENT_PROGRESS", [UiText.num(int(v["progress"]))]), 22, BasePopup.INK))
-		for i in range(v["milestones"].size()):
-			var m: Dictionary = v["milestones"][i]
-			var h := HBoxContainer.new()
-			h.name = "Milestone_%d" % i
-			box.add_child(h)
-			var t := _label("Text", UiText.t("EVENT_MILESTONE", [UiText.num(int(m["target"])), UiText.reward_text(m["reward"])]), 22, BasePopup.INK)
-			t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-			h.add_child(t)
-			var b := _button(p, stash, "ev:%s:%d" % [v["id"], i], h)
-			b.text = UiText.t("TASK_CLAIMED") if m["claimed"] else UiText.t("POPUP_CLAIM")
-			p.set_action_blocked(b.get_meta("aid"), not bool(m["claimable"]) or app.is_blocked)
-		box.add_child(_label("Rule", UiText.t("EVENT_RULE"), 18, BasePopup.INK))
-		list.add_child(card)
+		list.add_child(UiEventCard.build(v, claim))
 	var f: Dictionary = ev.first_try()
 	if not f.is_empty():
 		any = true
@@ -462,7 +452,11 @@ static func refresh_events(p: BasePopup, app) -> void:
 		p.set_action_blocked("ft_claim", not (f["joined"] and f["complete"] and not f["claimed"]) or app.is_blocked)
 		list.add_child(card)
 	if not any:
-		list.add_child(_label("Empty", UiText.t("EVENTS_EMPTY") if ev.config_ok else UiText.t("EVENTS_UNAVAILABLE"), 26, BasePopup.INK))
+		var empty := _card("EmptyCard")
+		empty.get_child(0).add_child(_label("Empty", UiText.t("EVENTS_EMPTY") if ev.config_ok else UiText.t("EVENTS_UNAVAILABLE"), 30, BasePopup.INK))
+		list.add_child(empty)
+	list.alignment = BoxContainer.ALIGNMENT_BEGIN if any else BoxContainer.ALIGNMENT_CENTER   # empty card centred
+	(list.get_parent() as Control).custom_minimum_size.y = 1180 if any else 160
 
 static func _card(n: String) -> PanelContainer:
 	var card := PanelContainer.new()
@@ -486,9 +480,6 @@ static func _button(p: BasePopup, stash: Control, aid: String, parent: Control) 
 	b.set_meta("aid", aid)
 	b.custom_minimum_size = Vector2(190, 72)
 	return b
-
-static func _dhm(sec: int) -> String:
-	return UiText.t("TIME_DHM", [sec / 86400, (sec % 86400) / 3600, (sec % 3600) / 60])
 
 # ------------------------------------------------------------------ RANKS ----
 
