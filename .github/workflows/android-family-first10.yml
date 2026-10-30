@@ -38,6 +38,7 @@ name: Android Family First10 APK
 # SB-M43-078..089 Shop destination: + 1 suite (53 total, exact 15/15 guard; verify-close with 4 added assertion cases).
 # SB-M43-090..101 Collection: + m43_master_c007_collection + m54_collection_set_master_exactly_once (55 total, exact 17/17 and M54 PASS guards; pack-inventory entry).
 # SB-M43-102..111 Robots: + m43_master_c008_robots (56 total, exact 10/10 guard).
+# SB-M43-112..121 Tasks/Daily/Gift: exact 12/12 guard for m43_master_c009_daily (already in the loop; 56 total).
 
 on:
   workflow_dispatch:
@@ -224,6 +225,11 @@ jobs:
             echo "M43-C008 verdict=PASS (10/10)" | tee -a "$S"
           else
             echo "M43-C008 verdict=FAIL (exact 10/10 summary missing)" | tee -a "$S"; fail=1
+          fi
+          if grep -qxF 'M43 master C009 Tasks / Daily / Gift evidence: PASS (12/12 cases, 0 fail)' validate_logs/m43_master_c009_daily.log 2>/dev/null; then
+            echo "M43-C009 verdict=PASS (12/12)" | tee -a "$S"
+          else
+            echo "M43-C009 verdict=FAIL (exact 12/12 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'M54 COLLECTION SET/MASTER EXACTLY-ONCE: PASS' validate_logs/m54_collection_set_master_exactly_once.log 2>/dev/null; then
             echo "M54-COLLECTION verdict=PASS" | tee -a "$S"
