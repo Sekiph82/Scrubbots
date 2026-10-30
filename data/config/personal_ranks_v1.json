@@ -1,0 +1,14 @@
+{
+  "schema": "scrubbots.personal_ranks.v1",
+  "version": 1,
+  "source": "TASKS SB-M43-122, owner decision in chat 2026-10-31 (personal rank). The player's own ladder: no server, no other players, no rewards. Rank is derived on read, never saved.",
+  "metric": "campaign_levels_cleared",
+  "tiers": [
+    {"id": "bronze", "name_key": "RANK_BRONZE", "min_cleared": 0},
+    {"id": "silver", "name_key": "RANK_SILVER", "min_cleared": 25},
+    {"id": "gold", "name_key": "RANK_GOLD", "min_cleared": 75},
+    {"id": "platinum", "name_key": "RANK_PLATINUM", "min_cleared": 150},
+    {"id": "diamond", "name_key": "RANK_DIAMOND", "min_cleared": 300},
+    {"id": "master", "name_key": "RANK_MASTER", "min_cleared": 500}
+  ]
+}

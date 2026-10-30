@@ -8,7 +8,8 @@ extends RefCounted
 ##   - ACHIEVEMENTS (SB-M43-126): data-driven list with progress and completed state;
 ##   - EVENTS (SB-M43-128/129, R10-001..005): configured Weekly Cleaning Events (window,
 ##     countdown, progress, fixed milestone rewards, ended/claimed) and the opt-in First-Try
-##     Cleanup; an honest empty state when nothing is scheduled. No event currency.
+##     Cleanup; an honest empty state when nothing is scheduled. No event currency;
+##   - RANKS (SB-M43-122): the player's own rank ladder from campaign levels cleared.
 ## Claims / joins go through ProductionActionFacade. These screens own no rule or value.
 
 const TouchScroll = preload("res://scripts/ui/components/touch_scroll.gd")
@@ -19,6 +20,8 @@ const UiText = preload("res://scripts/ui/ui_text.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 const Achievements = preload("res://scripts/progression/achievements.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
+const PersonalRank = preload("res://scripts/progression/personal_rank.gd")
+const UiProgressMeter = preload("res://scripts/ui/components/ui_progress_meter.gd")
 
 # ---------------------------------------------------------------- PROFILE ----
 
@@ -246,6 +249,60 @@ static func _button(p: BasePopup, stash: Control, aid: String, parent: Control) 
 
 static func _dhm(sec: int) -> String:
 	return UiText.t("TIME_DHM", [sec / 86400, (sec % 86400) / 3600, (sec % 3600) / 60])
+
+# ------------------------------------------------------------------ RANKS ----
+
+## SB-M43-122 (owner 2026-10-31): the player's personal rank ladder (PersonalRank), derived
+## from campaign levels cleared. Read-only: no other players, no server, grants nothing.
+static func open_ranks(stack, app) -> BasePopup:
+	var p := BasePopup.new("ranks")
+	p.set_frame("large")
+	p.set_title(UiText.t("RANKS_TITLE"))
+	var n := int(app.progression.completed_count())
+	var tiers := PersonalRank.load_tiers()
+	var r := PersonalRank.for_cleared(n)
+	if r.is_empty():
+		p.add_body_line(UiText.t("RANKS_UNAVAILABLE"), "Unavailable", BasePopup.INK, 24)
+	else:
+		var cur := int(r["index"])
+		p.add_body_line(UiText.t("RANKS_CURRENT", [UiText.t(r["name_key"])]), "CurrentRank", BasePopup.ROYAL_EDGE, 34)
+		p.add_body_line(UiText.t("PROFILE_CLEARED", [UiText.num(n)]), "Cleared", BasePopup.INK, 24)
+		var meter := UiProgressMeter.new("NextMeter")
+		meter.caption.add_theme_color_override("font_color", BasePopup.INK)
+		meter.caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+		if r["next_id"] != "":
+			meter.set_progress(r["into"], r["span"], UiText.t("RANKS_NEXT", [UiText.num(int(r["next_min"]) - n), UiText.t(tiers[cur + 1]["name_key"])]))
+		else:
+			meter.set_progress(1, 1, UiText.t("RANKS_TOP"))
+		p.get_content().add_child(meter)
+		var list := VBoxContainer.new()
+		list.name = "Ladder"
+		list.add_theme_constant_override("separation", UiTokens.SPACE_XS)
+		p.get_content().add_child(list)
+		for i in range(tiers.size()):
+			var t: Dictionary = tiers[i]
+			var card := _card("Tier_" + String(t["id"]))
+			card.set_meta("reached", i <= cur)
+			card.set_meta("current", i == cur)
+			if i == cur:
+				card.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.GOLD_BODY, BasePopup.GOLD_EDGE, 4, 22, 0), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
+			elif i > cur:
+				card.modulate.a = 0.6
+			var h := HBoxContainer.new()
+			card.get_child(0).add_child(h)
+			var nl := _label("Name", UiText.t("RANKS_TIER_ROW", [UiText.t(t["name_key"]), UiText.num(int(t["min_cleared"]))]), 24, BasePopup.INK)
+			nl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+			nl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+			h.add_child(nl)
+			var st := "RANKS_STATE_CURRENT" if i == cur else ("RANKS_STATE_REACHED" if i < cur else "")
+			h.add_child(_label("State", UiText.t(st) if st != "" else "", 22, BasePopup.ROYAL_EDGE))
+			list.add_child(card)
+	p.add_body_line(UiText.t("RANKS_SELF_ONLY"), "SelfOnly", BasePopup.INK, 20)
+	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
+	if not stack.push(p):
+		p.free()
+		return null
+	return p
 
 # --------------------------------------------------------------- COMEBACK ----
 

@@ -142,11 +142,11 @@ func _home_gating() -> void:
 	_walk_to(a, 40)
 	home.refresh()
 	en = HOME_ENTRIES.filter(func(n): return not home.get_region(n).disabled)
-	_ok(en.size() == 6 and home.get_region("Nav_leaderboard").tooltip_text == UiText.t("HOME_COMING_LATER"), "L40: all served entries enabled; RANKS back to coming-later")
+	_ok(en == HOME_ENTRIES and home.get_region("Nav_leaderboard").tooltip_text == "", "L40: every entry enabled, RANKS live (SB-M43-122 personal ladder) %s" % str(en))
 	var est = AppState.new(_path("home_est"))
 	var h2 = await _home(est)
 	en = HOME_ENTRIES.filter(func(n): return not h2.get_region(n).disabled)
-	_ok(en.size() == 6 and HOME_ENTRIES.all(func(n): return n == "Nav_leaderboard" or h2.get_region(n).tooltip_text == "") and h2.get_region("Nav_leaderboard").tooltip_text == UiText.t("HOME_COMING_LATER"), "established L1 save: Home exactly as before %s" % str(en))
+	_ok(en == HOME_ENTRIES and HOME_ENTRIES.all(func(n): return h2.get_region(n).tooltip_text == ""), "established L1 save: every entry enabled, no tooltip %s" % str(en))
 	_shutdown()
 	_complete("home_gating")
 
