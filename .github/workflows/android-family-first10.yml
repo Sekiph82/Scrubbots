@@ -56,6 +56,7 @@ on:
         options:
           - validation_only
           - build_apk
+          - apk_only   # owner 2026-10-30: APK without the test suites (Level Factory already proved the levels)
 
 permissions:
   contents: read
@@ -71,7 +72,7 @@ env:
 
 jobs:
   validate:
-    if: ${{ !github.event.repository.private }} # public repo only: free standard runners
+    if: ${{ !github.event.repository.private && inputs.mode != 'apk_only' }} # public repo only: free standard runners
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
@@ -284,7 +285,7 @@ jobs:
   export:
     needs: validate
     # Job-level guard: only an explicit build_apk dispatch exports; validation_only / unset / unknown skip.
-    if: ${{ !github.event.repository.private && inputs.mode == 'build_apk' }}
+    if: ${{ always() && !github.event.repository.private && ((inputs.mode == 'build_apk' && needs.validate.result == 'success') || inputs.mode == 'apk_only') }}
     runs-on: ubuntu-latest
     timeout-minutes: 90
     steps:
