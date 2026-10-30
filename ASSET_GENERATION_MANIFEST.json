@@ -296,6 +296,19 @@
       "approval_label": "approved by Claude under owner-delegated authority 2026-10-31, not owner visual review",
       "notes": "gold trophy with blue star; icon_nav_leaderboard is the Ranks icon and its path trips the no-social-comparison guard; no existing assets/ui/final art fits; 128x128 transparent crop of the delegated-approved Profile master (SB-M43-125-REBUILD)",
       "godot_usage": "Profile popup Achievements tile icon (scripts/ui/profile/profile_screens.gd)"
+    },
+    {
+      "id": "achievement_crown_icon",
+      "category": "profile_icon",
+      "provider": "crop_of_master",
+      "source": "assets/ui/generated/masters/scrubbots_achievements_master_v01.png",
+      "raw_generated_path": "assets/ui/generated/profile/achievement_crown_icon_crop_v01.png",
+      "target_path": "assets/ui/final/profile/achievement_crown_icon.png",
+      "status": "PROMOTED_BY_CLAUDE_DELEGATED",
+      "date": "2026-10-31",
+      "approval_label": "approved by Claude under owner-delegated authority 2026-10-31, not owner visual review",
+      "notes": "gold crown with red ribbon on the blue badge disc; no existing assets/ui/final crown art; 128x128 circular-masked crop of the delegated-approved Achievements master (SB-M43-127-REBUILD)",
+      "godot_usage": "Achievements popup First-Try Five badge icon (scripts/ui/profile/profile_screens.gd)"
     }
   ],
   "native_godot_components_not_to_generate": [

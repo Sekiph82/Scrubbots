@@ -41,10 +41,10 @@ func _run(size: Vector2i, all_states: bool) -> void:
 	ProfileScreens.open_profile(st, app)
 	await _draw(6)
 	_shot(sub, root, "1_profile", size)
+	st.top()._on_action("achievements")
+	await _draw(6)
+	_shot(sub, root, "2_achievements", size)
 	if all_states:
-		st.top()._on_action("achievements")
-		await _draw(6)
-		_shot(sub, root, "2_achievements", size)
 		st.clear("evidence")
 		ProfileScreens.open_events(st, app)
 		await _draw(6)
