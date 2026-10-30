@@ -43,10 +43,9 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M44-005..006 — contextual first WAITING / win / loss coachmarks (factory 054, 23583381): ctx_waiting, ctx_result_won, ctx_result_lost one-shot for new profiles, scheduled l3_waiting/l3_hearts dropped; LOCAL_PASS m44_contextual_coach 7/7 + six regression suites
 - DONE SB-M44-013,018 — NEW badge on newly unlocked Home entries until first visit (meta_ui feature_visited:<id>, persisted) + coachmark visual language in docs/16 §1.5 (factory 055, b07ca99e); LOCAL_PASS m44_new_badge 6/6 + regression suites
 - OWNER SB-M34-006 — haptics real-device test on an Android debug build (factory 072: APK had no VIBRATE permission, preset fixed with permissions/vibrate=true; fixed APK run 41127683939 declares VIBRATE; ON/OFF device run pending: A10 not connected; family APKs now signed with one stable debug key from GitHub Secrets (64ac9084, runs 41129466216 + 41129478628 same cert), phone needs one save-preserving reinstall onto it; docs/M34_HAPTICS_DEVICE_VALIDATION.md)
-- READY SB-M42-032..033 — opening cinematic on real Android device (720p/30, sync, latency, memory); iOS boot-flow readiness
-- READY SB-M48-002..003 — document the Apple toolchain requirement; prepare iOS configuration
-- READY SB-M47-005..010 — Android device: portrait, safe areas, Easy/Medium/Hard/Very Hard 59x59 performance
-- READY SB-M47-011..015 — Android device: bot density, background/foreground, heat/battery, record results, FULL/REDUCED plugin stress
+- OWNER SB-M42-032 — opening cinematic on real Android device (720p/30, sync, latency, memory) (waits for the Galaxy A10 to be plugged in; see Questions SB-M34-006)
+- OWNER SB-M47-005..010 — Android device: portrait, safe areas, Easy/Medium/Hard/Very Hard 59x59 performance (waits for the Galaxy A10 to be plugged in; see Questions SB-M34-006)
+- OWNER SB-M47-011..015 — Android device: bot density, background/foreground, heat/battery, record results, FULL/REDUCED plugin stress (waits for the Galaxy A10 to be plugged in; see Questions SB-M34-006)
 - DONE SB-M43-068..072 — ceremonies (factory 057, 0aa42895): 068-071 verify-close (m43_master_c005_meta_ceremonies 32/32); 072 feature unlock ceremony unlock:<id> for new profiles at table levels (Daily/Shop/Tasks/Collection; others skipped until art); LOCAL_PASS m43_c005_c072_feature_unlock_ceremony 9/9 + 48 CI suites
 - DONE SB-M43-074,075,077 — celebrations verify-close (factory 058; no SB-M43-076 exists): LOCAL_PASS m43_c005_c074_c077_celebrations 6/6 + 49 CI suites
 - DONE SB-M43-R05-001..002 — Gift Meter micro-progress ticks verify-close (factory 059; code 671615be): LOCAL_PASS m43_master_c005r_gift_micro_progress 8/8, added to CI (52 suites, 4077ce5b)
@@ -1075,7 +1074,7 @@ During the First 10 owner replay, 2x purchase + correct SB debit, live Scrub Buc
 **Opening cinematic / boot flow [OWNER ASSET — 2026-09-19]**
 
 - [ ] SB-M42-032 Validate opening cinematic on Android real device for smooth 720p/30 playback, audio sync, startup latency, orientation, background/foreground behavior and memory cleanup. `[CODE_AUDIT_PASS / DEVICE_OWNER_REQUIRED]`
-- [ ] SB-M42-033 Validate iOS readiness later with the same boot-flow fallback and aspect rules. `[CODE_AUDIT_PASS / IOS_DEVICE_LATER]`
+- [x] SB-M42-033 Validate iOS readiness later with the same boot-flow fallback and aspect rules. `[CODE_AUDIT_PASS / STATIC_READINESS_DONE 2026-10-31: docs/OPENING_CINEMATIC_DEVICE_VALIDATION.md "iOS readiness" updated; IPA pack scan + headless boot in ios-ipa.yml runs 41114924279, 41080595559, 41070827156; physical iPhone cinematic playback not verified; factory 073]`
 
 ### M43 - Results / Player Experience / Meta UI Surface Program [PLANNED / REQUIRED]
 
@@ -1524,8 +1523,8 @@ Log `coordination/sessions/M46-PERFORMANCE-C001/CLAUDE_LOG_R07_V01.md`.
 ### M48 — iOS Readiness
 
 - [ ] SB-M48-001 Avoid Android-only gameplay architecture.
-- [ ] SB-M48-002 Document Apple toolchain requirement.
-- [ ] SB-M48-003 Prepare iOS configuration when hardware exists.
+- [x] SB-M48-002 Document Apple toolchain requirement. `[DOC_DONE / LOCAL_PASS 2026-10-31: docs/IOS_TOOLCHAIN.md; ios-ipa.yml runs 41114924279, 41080595559, 41070827156 success; factory 073]`
+- [x] SB-M48-003 Prepare iOS configuration when hardware exists. `[CONFIG_REVIEWED / LOCAL_PASS 2026-10-31: inline preset in .github/workflows/ios-ipa.yml read against Godot 4.7 iOS export options, no defect, workflow unchanged (docs/IOS_TOOLCHAIN.md); runs 41114924279, 41080595559, 41070827156 success; factory 073]`
 
 ### M49 — Responsive UI
 

@@ -6,6 +6,7 @@
 ## Local Godot
 `$GODOT` = `C:\Users\sekip\AppData\Local\Microsoft\WinGet\Packages\GodotEngine.GodotEngine_Microsoft.Winget.Source_8wekyb3d8bbwe\Godot_v4.7.2-stable_win64_console.exe` (local Godot 4.7.2 console executable, installed with winget; `--version` = `4.7.2.stable.official.ed1daf0bf`; the WinGet link `%LOCALAPPDATA%\Microsoft\WinGet\Links\godot_console.exe` points to it). Run suites as `"$GODOT" --headless --path <checkout> -s res://tests/<suite>.gd`; the full suite list is in `.github/workflows/android-family-first10.yml`.
 One command for those suites with the CI PASS/FAIL rule: `python tools/run_suites.py [suite ...]` (`--list`, `--selftest`); conventions in `docs/TESTING_CONVENTIONS.md`.
+iOS build/install toolchain (macOS runner, unsigned IPA, xtool signing at install, credentials policy): `docs/IOS_TOOLCHAIN.md`.
 
 ## Feature unlock gate (SB-M44-031)
 Owner unlock table (feature id -> campaign level): `data/config/feature_unlocks_v1.json`, read by `scripts/progression/feature_unlocks.gd` (fails open: bad config or unknown id = unlocked). UI asks only `AppState.feature_unlocked(id)` (and `feature_unlock_level(id)` for copy); never put a level number in UI code. Grandfather default: a save that is not a new FTUE profile keeps every feature; a fresh profile unlocks by frontier (`progression.current_level() >= level`). Gated today: Home shortcuts/nav tabs, the booster bar (`"locked"` state) and FTUE coachmarks. Tests: `tests/m44_unlock_gate.gd`.
