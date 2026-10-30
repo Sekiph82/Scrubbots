@@ -7,7 +7,10 @@
     "gameplay_v02": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png",
     "life": "assets/art/references/_owner_inbox/Additionals/life screens.png",
     "need_a_hand": "assets/art/references/_owner_inbox/Additionals/need a hand.png",
-    "level_intro": "assets/art/references/_owner_inbox/Game Screens/level ekran acilisi.png"
+    "level_intro": "assets/art/references/_owner_inbox/Game Screens/level ekran acilisi.png",
+    "profile_master": "assets/ui/generated/masters/scrubbots_profile_master_v01.png",
+    "achievements_master": "assets/ui/generated/masters/scrubbots_achievements_master_v01.png",
+    "events_master": "assets/ui/generated/masters/scrubbots_events_master_v01.png"
   },
   "lifecycle": [
     "PLANNED",
@@ -414,7 +417,8 @@
     {
       "id": "profile",
       "type": "screen",
-      "status": "MASTER_REQUIRED",
+      "status": "MASTER_OWNER_APPROVED",
+      "master": "assets/ui/generated/masters/scrubbots_profile_master_v01.png",
       "owner_visual_gate": true,
       "responsive_gate": true,
       "production_scene_required": true,
@@ -422,14 +426,15 @@
         "production_scene": "scripts/ui/profile/profile_screens.gd (open_profile)",
         "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-122/",
         "live_data": true,
-        "gap": "owner visual master (SB-M43-125)",
-        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+        "gap": "master exists (assets/ui/generated/masters/scrubbots_profile_master_v01.png, approved by Claude under owner-delegated authority 2026-10-31, not owner visual review); remaining: rebuild the screen to match it (SB-M43-125-REBUILD)",
+        "recorded_by": "factory 075 (Claude): master approved by Claude under owner-delegated authority 2026-10-31, not owner visual review"
       }
     },
     {
       "id": "achievements",
       "type": "screen",
-      "status": "MASTER_REQUIRED",
+      "status": "MASTER_OWNER_APPROVED",
+      "master": "assets/ui/generated/masters/scrubbots_achievements_master_v01.png",
       "owner_visual_gate": true,
       "responsive_gate": true,
       "production_scene_required": true,
@@ -437,14 +442,15 @@
         "production_scene": "scripts/ui/profile/profile_screens.gd (open_achievements)",
         "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-122/",
         "live_data": true,
-        "gap": "owner visual master (SB-M43-127)",
-        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+        "gap": "master exists (assets/ui/generated/masters/scrubbots_achievements_master_v01.png, approved by Claude under owner-delegated authority 2026-10-31, not owner visual review); remaining: rebuild the screen to match it (SB-M43-127-REBUILD)",
+        "recorded_by": "factory 075 (Claude): master approved by Claude under owner-delegated authority 2026-10-31, not owner visual review"
       }
     },
     {
       "id": "events_main",
       "type": "screen",
-      "status": "MASTER_REQUIRED",
+      "status": "MASTER_OWNER_APPROVED",
+      "master": "assets/ui/generated/masters/scrubbots_events_master_v01.png",
       "owner_visual_gate": true,
       "responsive_gate": true,
       "production_scene_required": true,
@@ -452,14 +458,15 @@
         "production_scene": "scripts/ui/profile/profile_screens.gd (open_events)",
         "evidence": "coordination/sessions/M43-MASTER-V01/evidence/SB-M43-122/",
         "live_data": true,
-        "gap": "owner visual master (SB-M43-130); no event scheduled",
-        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+        "gap": "master exists (assets/ui/generated/masters/scrubbots_events_master_v01.png, approved by Claude under owner-delegated authority 2026-10-31, not owner visual review); remaining: rebuild the screen to match it (SB-M43-130-REBUILD); no event scheduled",
+        "recorded_by": "factory 075 (Claude): master approved by Claude under owner-delegated authority 2026-10-31, not owner visual review"
       }
     },
     {
       "id": "event_detail",
       "type": "screen",
-      "status": "MASTER_REQUIRED",
+      "status": "MASTER_OWNER_APPROVED",
+      "master": "assets/ui/generated/masters/scrubbots_events_master_v01.png",
       "owner_visual_gate": true,
       "responsive_gate": true,
       "production_scene_required": true,
@@ -467,8 +474,8 @@
         "production_scene": "scripts/ui/profile/profile_screens.gd (event card)",
         "evidence": "tests/m43_master_c010_meta.gd",
         "live_data": true,
-        "gap": "owner visual master (SB-M43-130)",
-        "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+        "gap": "master exists (assets/ui/generated/masters/scrubbots_events_master_v01.png, approved by Claude under owner-delegated authority 2026-10-31, not owner visual review); remaining: rebuild the screen to match it (SB-M43-130-REBUILD)",
+        "recorded_by": "factory 075 (Claude): master approved by Claude under owner-delegated authority 2026-10-31, not owner visual review"
       }
     },
     {

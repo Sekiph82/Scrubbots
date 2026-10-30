@@ -56,6 +56,37 @@
         "assets/art/references/_owner_inbox/Game Screens/main screen.png",
         "assets/art/references/_owner_inbox/Collection Cards/meet the scrubbots.jpeg"
       ]
+    },
+    "profile_master_v01": {
+      "repository_path": "assets/ui/generated/masters/scrubbots_profile_master_v01.png",
+      "status": "MASTER_APPROVED_BY_CLAUDE_DELEGATED",
+      "provider": "chatgpt_image_generation",
+      "date": "2026-10-31",
+      "owner_decision": "owner chose new master 2026-10-31, delegated selection to Claude; not owner visual review",
+      "approval_label": "approved by Claude under owner-delegated authority 2026-10-31",
+      "ships": false,
+      "ships_note": "excluded from Android export via assets/ui/generated/*"
+    },
+    "achievements_master_v01": {
+      "repository_path": "assets/ui/generated/masters/scrubbots_achievements_master_v01.png",
+      "status": "MASTER_APPROVED_BY_CLAUDE_DELEGATED",
+      "provider": "chatgpt_image_generation",
+      "date": "2026-10-31",
+      "owner_decision": "owner chose new master 2026-10-31, delegated selection to Claude; not owner visual review",
+      "approval_label": "approved by Claude under owner-delegated authority 2026-10-31",
+      "ships": false,
+      "ships_note": "excluded from Android export via assets/ui/generated/*"
+    },
+    "events_master_v01": {
+      "repository_path": "assets/ui/generated/masters/scrubbots_events_master_v01.png",
+      "status": "MASTER_APPROVED_BY_CLAUDE_DELEGATED",
+      "provider": "chatgpt_image_generation",
+      "date": "2026-10-31",
+      "owner_decision": "owner chose new master 2026-10-31, delegated selection to Claude; not owner visual review",
+      "approval_label": "approved by Claude under owner-delegated authority 2026-10-31",
+      "notes": "includes the reusable event card family: active event card with timer, progress and milestones, plus collapsed upcoming card (\"Starts in 2d\")",
+      "ships": false,
+      "ships_note": "excluded from Android export via assets/ui/generated/*"
     }
   },
   "output_roots": {
