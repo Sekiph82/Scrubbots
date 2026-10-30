@@ -207,25 +207,26 @@ func _stale_continue_rejected() -> void:
 	_shutdown(root)
 	_complete("stale_continue_rejected")
 
-## Level 10 -> frontier 11 CONTENT_MISSING: clean unavailable Continue, no mutation.
+## Last builtin level (30 since SB-CAMPAIGN-L11-L30) -> frontier 31 CONTENT_MISSING: clean
+## unavailable Continue, no mutation.
 func _level10_no_next_content() -> void:
-	print("[level 10 no next content]")
+	print("[level 30 no next content]")
 	var root = await _boot_main(_uniq("l10"))
 	var app = root.get_app_state()
 	var nav = root.get_navigation()
-	app.progression.debug_set_current_level(10)
+	app.progression.debug_set_current_level(30)
 	var h = await _play(root)
-	_ok(int(h.progression_level) == 10, "frontier Level 10 launched")
+	_ok(int(h.progression_level) == 30, "frontier Level 30 launched")
 	h.get_completion().terminal_reached.emit(&"WON", {})
 	var rc: Dictionary = h.get_terminal_receipt()
-	_ok(rc["first_clear"] and rc["frontier"] == {"before": 10, "after": 11} and rc["rewards"]["first_clear_sb"] == app.economy.config.first_clear_sb(app.progression.class_for(10)), "Level 10 first clear committed")
+	_ok(rc["first_clear"] and rc["frontier"] == {"before": 30, "after": 31} and rc["rewards"]["first_clear_sb"] == app.economy.config.first_clear_sb(app.progression.class_for(30)), "Level 30 first clear committed")
 	var res = root.get_results_screen()
 	var model: Dictionary = res.get_model()
-	_ok(model["continue"] == {"available": false, "reason": "CONTENT_MISSING", "next_level": 11}, "model: next frontier 11 CONTENT_MISSING")
+	_ok(model["continue"] == {"available": false, "reason": "CONTENT_MISSING", "next_level": 31}, "model: next frontier 31 CONTENT_MISSING")
 	# M43-C001R V02 owner decision: the Next Cleanup card carries the unavailable frontier; the
 	# older duplicate note above CLEAN NEXT is suppressed in that case.
-	_ok(res.get_primary_button().disabled and not res.get_note_label().visible and res.find_child("NextLevel", true, false).text == UiText.t("NEXT_CLEANUP_LEVEL", [11])
-		and res.find_child("NextFacts", true, false).text == UiText.t("NEXT_CLEANUP_SOON"), "Continue disabled with clear unavailable state (Next Cleanup: Level 11 coming soon)")
+	_ok(res.get_primary_button().disabled and not res.get_note_label().visible and res.find_child("NextLevel", true, false).text == UiText.t("NEXT_CLEANUP_LEVEL", [31])
+		and res.find_child("NextFacts", true, false).text == UiText.t("NEXT_CLEANUP_SOON"), "Continue disabled with clear unavailable state (Next Cleanup: Level 31 coming soon)")
 	var e0: Dictionary = _econ(app.economy)
 	var p0: Dictionary = app.progression.snapshot()
 	var t0: int = nav.transition_id()
