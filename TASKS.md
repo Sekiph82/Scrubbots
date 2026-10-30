@@ -54,8 +54,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M43-C005F-007 — robot + feature unlock MAJOR_UNLOCK feel (factory 059, a292c390): LOCAL_PASS m43_c005f_phase6_unlock_feel 8/8 + 52 CI suites; world part gated, not implemented
 - DONE SB-M43-090..101 — Collection verify-close + pack entry (factory 061; 098 built abb42509): LOCAL_PASS m43_master_c007_collection 17/17 + m54_collection_set_master_exactly_once, added to CI (55 suites, 74b85bab)
 - READY SB-M43-R07-001..006 — earned-pack pity counter, guarantee, complete-pool fallback, legible pity UI, First Collection Sprint tuning
-- READY SB-M43-102..106 — ROBOTS destination, visual master, lock state + Bot Parts N/250, perk display, select/equip persistence
-- READY SB-M43-107..111 — locked robot detail, active-robot presentation, no gameplay mutation, unlock history/NEW badge, 10-robot check
+- DONE SB-M43-102..111 — Robots destination verify-close (factory 063): tests/m43_master_c008_robots.gd 10/10 added to CI validate (56)
 - READY SB-M43-112..117 — TASKS destination (3 tasks, 75/100/125 SB), exactly-once claims, DAILY destination and visual master
 - READY SB-M43-118..121 — Gift Bar claim/history, Gift Bar visual master, no recursive feed, rollover/rollback/duplicate-tap tests
 - READY SB-M43-R09-001..005 — Daily Scrub Orders archetype pool, deterministic daily generation, tier intent, earned ScrubBox ceremony
@@ -1161,16 +1160,16 @@ Effect-intensity vocabulary for this program: **MICRO → SMALL → REWARD → M
 
 #### M43-C008 - Robots Destination
 
-- [ ] SB-M43-102 Implement ROBOTS bottom-nav destination for the canonical 10-robot roster.
-- [ ] SB-M43-103 Produce/owner-approve Robots screen visual master using the existing robot asset family.
-- [ ] SB-M43-104 Show unlocked/locked state, canonical order, Bot Parts N/250 toward next unlock and overflow.
-- [ ] SB-M43-105 Show each robot's canonical 20% meta perk clearly without implying puzzle-solvability power.
-- [ ] SB-M43-106 Allow selecting/equipping any unlocked robot and persist active robot.
-- [ ] SB-M43-107 Locked robot detail shows required Bot Parts and preview/perk; Bot Parts cannot be bought with SB or real money in V1.
-- [ ] SB-M43-108 Active robot selection updates Home/gameplay/profile/support/victory presentation using the approved per-robot asset family.
-- [ ] SB-M43-109 Robot selection must never mutate BoardState, TargetSelector, routing, solver or batch legality.
-- [ ] SB-M43-110 Implement robot unlock history/NEW badge clearing without repeated ceremonies.
-- [ ] SB-M43-111 Validate all 10 robots at mobile scale and fall back safely if a presentation asset is missing rather than corrupting gameplay.
+- [x] SB-M43-102 Implement ROBOTS bottom-nav destination for the canonical 10-robot roster. **[DONE 2026-10-30, factory 063 verify-close: already built (scripts/ui/robots/robots_screen.gd, scripts/progression/robot_roster.gd); LOCAL_PASS tests/m43_master_c008_robots.gd 'M43 master C008 Robots evidence: PASS (10/10 cases, 0 fail)'; suite added to CI validate list with exact guard.]**
+- [x] SB-M43-103 Produce/owner-approve Robots screen visual master using the existing robot asset family. **[DONE 2026-10-30, factory 063 verify-close: already built (scripts/ui/robots/robots_screen.gd, scripts/progression/robot_roster.gd); LOCAL_PASS tests/m43_master_c008_robots.gd 'M43 master C008 Robots evidence: PASS (10/10 cases, 0 fail)'; suite added to CI validate list with exact guard. Visual master closed on CLAUDE.md 0D.1 owner visual sign-off + existing promoted robot assets; no new art.]**
+- [x] SB-M43-104 Show unlocked/locked state, canonical order, Bot Parts N/250 toward next unlock and overflow. **[DONE 2026-10-30, factory 063 verify-close: already built (scripts/ui/robots/robots_screen.gd, scripts/progression/robot_roster.gd); LOCAL_PASS tests/m43_master_c008_robots.gd 'M43 master C008 Robots evidence: PASS (10/10 cases, 0 fail)'; suite added to CI validate list with exact guard.]**
+- [x] SB-M43-105 Show each robot's canonical 20% meta perk clearly without implying puzzle-solvability power. **[DONE 2026-10-30, factory 063 verify-close: already built (scripts/ui/robots/robots_screen.gd, scripts/progression/robot_roster.gd); LOCAL_PASS tests/m43_master_c008_robots.gd 'M43 master C008 Robots evidence: PASS (10/10 cases, 0 fail)'; suite added to CI validate list with exact guard.]**
+- [x] SB-M43-106 Allow selecting/equipping any unlocked robot and persist active robot. **[DONE 2026-10-30, factory 063 verify-close: already built (scripts/ui/robots/robots_screen.gd, scripts/progression/robot_roster.gd); LOCAL_PASS tests/m43_master_c008_robots.gd 'M43 master C008 Robots evidence: PASS (10/10 cases, 0 fail)'; suite added to CI validate list with exact guard.]**
+- [x] SB-M43-107 Locked robot detail shows required Bot Parts and preview/perk; Bot Parts cannot be bought with SB or real money in V1. **[DONE 2026-10-30, factory 063 verify-close: already built (scripts/ui/robots/robots_screen.gd, scripts/progression/robot_roster.gd); LOCAL_PASS tests/m43_master_c008_robots.gd 'M43 master C008 Robots evidence: PASS (10/10 cases, 0 fail)'; suite added to CI validate list with exact guard.]**
+- [x] SB-M43-108 Active robot selection updates Home/gameplay/profile/support/victory presentation using the approved per-robot asset family. **[DONE 2026-10-30, factory 063 verify-close: already built (scripts/ui/robots/robots_screen.gd, scripts/progression/robot_roster.gd); LOCAL_PASS tests/m43_master_c008_robots.gd 'M43 master C008 Robots evidence: PASS (10/10 cases, 0 fail)'; suite added to CI validate list with exact guard.]**
+- [x] SB-M43-109 Robot selection must never mutate BoardState, TargetSelector, routing, solver or batch legality. **[DONE 2026-10-30, factory 063 verify-close: already built (scripts/ui/robots/robots_screen.gd, scripts/progression/robot_roster.gd); LOCAL_PASS tests/m43_master_c008_robots.gd 'M43 master C008 Robots evidence: PASS (10/10 cases, 0 fail)'; suite added to CI validate list with exact guard.]**
+- [x] SB-M43-110 Implement robot unlock history/NEW badge clearing without repeated ceremonies. **[DONE 2026-10-30, factory 063 verify-close: already built (scripts/ui/robots/robots_screen.gd, scripts/progression/robot_roster.gd); LOCAL_PASS tests/m43_master_c008_robots.gd 'M43 master C008 Robots evidence: PASS (10/10 cases, 0 fail)'; suite added to CI validate list with exact guard.]**
+- [x] SB-M43-111 Validate all 10 robots at mobile scale and fall back safely if a presentation asset is missing rather than corrupting gameplay. **[DONE 2026-10-30, factory 063 verify-close: already built (scripts/ui/robots/robots_screen.gd, scripts/progression/robot_roster.gd); LOCAL_PASS tests/m43_master_c008_robots.gd 'M43 master C008 Robots evidence: PASS (10/10 cases, 0 fail)'; suite added to CI validate list with exact guard.]**
 
 #### M43-C009 - Tasks / Daily / Gift Bar Destinations
 
