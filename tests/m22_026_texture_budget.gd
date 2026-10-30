@@ -82,6 +82,12 @@ const DAILY_TASKS := [
 const PROFILE_EVENTS := [
 	"characters/scrubby/scrubby_portrait.png", "common/frames/popup_large_frame.png",
 	"common/frames/popup_medium_frame.png", "popups/help/help_scrubby_pose.png",
+	# SB-M43-125-REBUILD Profile hero / stat tiles / Personal Bests icons
+	"home/top_hud/profile_avatar_frame.png", "home/top_hud/profile_rank_badge.png",
+	"daily/daily_task_check.png", "home/shortcuts/icon_shortcut_collection.png",
+	"common/navigation/icon_nav_robots.png", "profile/profile_trophy_icon.png",
+	"daily/daily_login_calendar.png", "daily/daily_streak_flame.png",
+	"popups/victory/victory_emblem.png", "profile/profile_no_booster_icon.png",
 ]
 const CEREMONIES := [
 	"characters/robots/atlas/atlas_master.png", "characters/robots/bubbles/bubbles_master.png",
@@ -158,7 +164,8 @@ const COACHMARKS := [
 ## Measured resident MiB after the step 2 caps (UI-ADR-008) plus ~10% headroom.
 const BUDGET_MIB := {"Home": 117, "Gameplay": 69, "Results": 32, "Shop/Collection": 41,
 	# step 4: measured after the step 4 caps plus ~10%
-	"Daily/Tasks": 32, "Profile/Events/Achievements": 21, "Ceremonies": 230, "Robots detail": 41, "Popups": 18, "Results variants": 83, "Coachmarks": 15}
+	# SB-M43-125-REBUILD: Profile hero / tile / bests icons re-measured 28.8 MiB + ~10%
+	"Daily/Tasks": 32, "Profile/Events/Achievements": 32, "Ceremonies": 230, "Robots detail": 41, "Popups": 18, "Results variants": 83, "Coachmarks": 15}
 ## process/size_limit set by step 1 (small icons with a known draw side, 4x rule).
 const LIMITED := {
 	"common/icons/icon_clock.png": 256,

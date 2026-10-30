@@ -2,9 +2,9 @@ extends RefCounted
 ## ProfileScreens — preload (res://scripts/ui/profile/profile_screens.gd).
 ##
 ## M43-C010 / C010R app-level destinations in the approved popup family (every value live):
-##   - PROFILE (SB-M43-124, R10-006/007): active robot, campaign level, lifetime stats,
-##     Collection completion, achievement summary and Personal Bests (self-comparison only),
-##     each best shown with a self-ghost bar (current vs own best; informational only);
+##   - PROFILE (SB-M43-124, R10-006/007; SB-M43-125-REBUILD master v01): hero card (active
+##     robot, level badge, Bot Parts meter), stat tiles (level, cleared, Collection, robots,
+##     achievements, login days) and a Personal Bests table (current vs own best; self only);
 ##   - ACHIEVEMENTS (SB-M43-126): data-driven list with progress and completed state;
 ##   - EVENTS (SB-M43-128/129, R10-001..005): configured Weekly Cleaning Events (window,
 ##     countdown, progress, fixed milestone rewards, ended/claimed) and the opt-in First-Try
@@ -25,34 +25,66 @@ const UiProgressMeter = preload("res://scripts/ui/components/ui_progress_meter.g
 
 # ---------------------------------------------------------------- PROFILE ----
 
+const F := "res://assets/ui/final/"
+
+## SB-M43-125-REBUILD: native rebuild of scrubbots_profile_master_v01 — hero card, 2x3 stat
+## tiles, Personal Bests table (Current / Best), self-only note, three actions.
 static func open_profile(stack, app) -> BasePopup:
 	var e = app.economy
 	var rid: String = e.robots.active_robot()
 	var p := BasePopup.new("profile")
 	p.set_frame("large")
-	p.set_hero(RobotRoster.asset(rid, "portrait"), Vector2(220, 220), 70)
 	p.set_title(UiText.t("PROFILE_TITLE"))
-	p.add_body_line(UiText.t("PROFILE_ROBOT", [String(RobotRoster.entry(rid).get("name", ""))]), "ActiveRobot", BasePopup.ROYAL_EDGE, 30)
+	var c := p.get_content()
 	var s := Achievements.stats(app)
 	var ach := Achievements.evaluate(app)
 	var done := ach.filter(func(a): return a["done"]).size()
-	var rows := [
-		["Level", UiText.t("PROFILE_LEVEL", [UiText.num(int(app.progression.current_level()))])],
-		["Cleared", UiText.t("PROFILE_CLEARED", [UiText.num(int(s["levels_completed"]))])],
-		["Collection", UiText.t("PROFILE_COLLECTION", [UiText.num(int(s["cards_unique"])), UiText.num(e.collection.all_card_ids().size()), UiText.num(int(s["sets_completed"]))])],
-		["Robots", UiText.t("PROFILE_ROBOTS", [UiText.num(int(s["robots_unlocked"])), UiText.num(RobotRoster.ids().size())])],
-		["AchievementSummary", UiText.t("PROFILE_ACHIEVEMENTS", [UiText.num(done), UiText.num(ach.size())])],
-		["LoginDays", UiText.t("DAILY_CONSECUTIVE", [UiText.num(int(e.daily.streak()))])],
-	]
-	for r in rows:
-		p.add_body_line(r[1], r[0], BasePopup.INK, 24)
-	p.add_body_line(UiText.t("PROFILE_BESTS"), "BestsTitle", BasePopup.ROYAL_EDGE, 26)
+	var level := int(app.progression.current_level())
+	c.add_child(_hero(rid, level, e.robots.next_robot_progress()))
+	var grid := GridContainer.new()
+	grid.name = "ProfileStats"
+	grid.columns = 2
+	grid.add_theme_constant_override("h_separation", UiTokens.SPACE_SM)
+	grid.add_theme_constant_override("v_separation", UiTokens.SPACE_SM)
+	c.add_child(grid)
+	for t in [
+		["Level", "home/top_hud/profile_rank_badge.png", UiText.t("PROFILE_LEVEL"), UiText.num(level)],
+		["Cleared", "daily/daily_task_check.png", UiText.t("PROFILE_LEVELS_CLEARED"), UiText.num(int(s["levels_completed"]))],
+		["Collection", "home/shortcuts/icon_shortcut_collection.png", UiText.t("PROFILE_COLLECTION"), UiText.t("HOME_RATIO", [UiText.num(int(s["cards_unique"])), UiText.num(e.collection.all_card_ids().size())])],
+		["Robots", "common/navigation/icon_nav_robots.png", UiText.t("PROFILE_ROBOTS"), UiText.t("HOME_RATIO", [UiText.num(int(s["robots_unlocked"])), UiText.num(RobotRoster.ids().size())])],
+		["AchievementSummary", "profile/profile_trophy_icon.png", UiText.t("PROFILE_ACHIEVEMENTS"), UiText.t("HOME_RATIO", [UiText.num(done), UiText.num(ach.size())])],
+		["LoginDays", "daily/daily_login_calendar.png", UiText.t("PROFILE_LOGIN_DAYS"), UiText.num(int(e.daily.streak()))],
+	]:
+		grid.add_child(_tile(t[0], t[1], t[2], t[3], UiText.num(level) if t[0] == "Level" else ""))
 	var r = e.records
-	_best_row(p, "BestStreak", UiText.t("BEST_WIN_STREAK"), int(e.streak.streak()), int(s["best_win_streak"]))
-	_best_row(p, "BestFirstTry", UiText.t("BEST_FIRST_TRY"), int(r.get_value("first_try_run")), int(r.get_value("best_first_try_run")))
-	_best_row(p, "BestBoosterless", UiText.t("BEST_BOOSTERLESS"), int(r.get_value("boosterless_run")), int(r.get_value("best_boosterless_run")))
+	var card := PanelContainer.new()
+	card.name = "ProfileBests"
+	card.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROW, BasePopup.ROW_EDGE, 3, 26, 4, 2), UiTokens.SPACE_SM, UiTokens.SPACE_SM))
+	c.add_child(card)
+	var v := VBoxContainer.new()
+	v.add_theme_constant_override("separation", UiTokens.SPACE_XS)
+	card.add_child(v)
+	var head := PanelContainer.new()
+	head.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROYAL, BasePopup.ROYAL_EDGE, 3, 22, 0), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
+	v.add_child(head)
+	var title := HomeStyle.label(UiText.t("PROFILE_BESTS"), 36)
+	title.name = "BestsTitle"
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	head.add_child(title)
+	var cols := HBoxContainer.new()
+	cols.name = "BestsColumns"
+	v.add_child(cols)
+	var gap := Control.new()
+	gap.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	cols.add_child(gap)
+	for k in ["BEST_CURRENT", "BEST_BEST"]:
+		cols.add_child(_cell(UiText.t(k), 24))
+	cols.add_child(_spacer(UiTokens.SPACE_SM))
+	_best_row(v, "BestStreak", "daily/daily_streak_flame.png", UiText.t("BEST_WIN_STREAK"), int(e.streak.streak()), int(s["best_win_streak"]))
+	_best_row(v, "BestFirstTry", "popups/victory/victory_emblem.png", UiText.t("BEST_FIRST_TRY"), int(r.get_value("first_try_run")), int(r.get_value("best_first_try_run")))
+	_best_row(v, "BestBoosterless", "profile/profile_no_booster_icon.png", UiText.t("BEST_BOOSTERLESS"), int(r.get_value("boosterless_run")), int(r.get_value("best_boosterless_run")))
 	p.add_body_line(UiText.t("PROFILE_BOOSTERLESS_TOTAL", [UiText.num(int(r.get_value("boosterless_wins")))]), "BoosterlessTotal", BasePopup.INK, 22)
-	p.add_body_line(UiText.t("PROFILE_SELF_ONLY"), "SelfOnly", BasePopup.INK, 20)
+	p.add_body_line(UiText.t("PROFILE_SELF_ONLY"), "SelfOnly", BasePopup.INK, 24)
 	p.add_action("achievements", UiText.t("ACHIEVEMENTS_TITLE"), "primary", false)
 	p.add_action("notifications", UiText.t("NOTIFY_TITLE"), "secondary", false)
 	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
@@ -68,21 +100,138 @@ static func open_profile(stack, app) -> BasePopup:
 		return null
 	return p
 
-## "label · current N · best M" with a self-ghost bar (current against the player's own best).
-static func _best_row(p: BasePopup, n: String, label: String, current: int, best: int) -> void:
-	var row := VBoxContainer.new()
+## Blue hero card: active robot portrait in the round HUD frame, its name, the campaign level
+## badge and the same Bot Parts meter as the Home top HUD (next 250-part robot, never XP).
+static func _hero(rid: String, level: int, parts: Dictionary) -> PanelContainer:
+	var hero := PanelContainer.new()
+	hero.name = "ProfileHero"
+	hero.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROYAL, BasePopup.ROYAL_EDGE, 4, 30, 6, 4), UiTokens.SPACE_MD, UiTokens.SPACE_SM))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", UiTokens.SPACE_MD)
+	hero.add_child(row)
+	var avatar := HomeStyle.art("ProfileAvatarFrame")
+	avatar.texture = load(F + "home/top_hud/profile_avatar_frame.png")
+	avatar.custom_minimum_size = Vector2(170, 170)
+	row.add_child(avatar)
+	var portrait := HomeStyle.art("ProfilePortrait")
+	portrait.texture = load(RobotRoster.asset(rid, "portrait"))
+	portrait.anchor_top = 0.04   # the portrait's own transparent margin keeps it inside the ring
+	portrait.anchor_right = 1.0
+	portrait.anchor_bottom = 1.0
+	avatar.add_child(portrait)
+	var info := VBoxContainer.new()
+	info.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	info.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_child(info)
+	var n := HomeStyle.label(String(RobotRoster.entry(rid).get("name", "")), 48)
+	n.name = "ActiveRobot"
+	info.add_child(n)
+	var lvl_row := HBoxContainer.new()
+	lvl_row.add_theme_constant_override("separation", -10)   # badge overlaps the bar end
+	info.add_child(lvl_row)
+	lvl_row.add_child(_badge("HeroLevel", UiText.num(level), Vector2(84, 76)))
+	var meter := UiProgressMeter.new("ProfileBotParts")
+	meter.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	meter.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+	meter.set_progress(int(parts.get("parts", 0)), int(parts.get("cost", 0)),
+		UiText.t("HOME_RATIO", [UiText.num(int(parts.get("parts", 0))), UiText.num(int(parts.get("cost", 0)))]))
+	HomeStyle.style_meter(meter.bar, HomeStyle.GOLD if bool(parts.get("can_unlock", false)) else HomeStyle.GREEN, 42)
+	meter.caption.add_theme_font_size_override("font_size", 28)
+	meter.caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	meter.caption.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	meter.caption.clip_text = false
+	meter.caption.reparent(meter.bar, false)
+	meter.caption.set_anchors_preset(Control.PRESET_FULL_RECT)
+	lvl_row.add_child(meter)
+	return hero
+
+## Rank badge art with the live number centred on it.
+static func _badge(n: String, text: String, sz: Vector2) -> TextureRect:
+	var b := HomeStyle.art("Badge")
+	b.texture = load(F + "home/top_hud/profile_rank_badge.png")
+	b.custom_minimum_size = sz
+	b.z_index = 1
+	var l := HomeStyle.label(text, 28)
+	l.name = n
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	l.set_anchors_preset(Control.PRESET_FULL_RECT)
+	b.add_child(l)
+	return b
+
+## Cream stat tile: icon + caption + big live value (child "Value").
+static func _tile(n: String, icon: String, caption: String, value: String, badge_text: String) -> PanelContainer:
+	var t := PanelContainer.new()
+	t.name = n
+	t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	t.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROW, BasePopup.ROW_EDGE, 3, 22, 4, 2), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
+	var row := HBoxContainer.new()
+	row.add_theme_constant_override("separation", UiTokens.SPACE_SM)
+	t.add_child(row)
+	var art: TextureRect
+	if badge_text.is_empty():
+		art = HomeStyle.art("Icon")
+		art.texture = load(F + icon)
+		art.custom_minimum_size = Vector2(UiTokens.ICON_LG, UiTokens.ICON_LG)
+	else:
+		art = _badge("BadgeLevel", badge_text, Vector2(UiTokens.ICON_LG, UiTokens.ICON_LG))
+		art.name = "Icon"
+	row.add_child(art)
+	var col := VBoxContainer.new()
+	col.alignment = BoxContainer.ALIGNMENT_CENTER
+	col.add_theme_constant_override("separation", 0)
+	row.add_child(col)
+	var cap := _text(caption, 26)
+	cap.name = "Caption"
+	col.add_child(cap)
+	var val := _text(value, 44)
+	val.name = "Value"
+	col.add_child(val)
+	return t
+
+## Personal Best row: icon, label, live current and own best (no one else is compared).
+static func _best_row(parent: Control, n: String, icon: String, label: String, current: int, best: int) -> void:
+	var row := PanelContainer.new()
 	row.name = n
-	p.get_content().add_child(row)
-	var l := BasePopup.body_label(UiText.t("BEST_ROW", [label, UiText.num(current), UiText.num(best)]), 22, BasePopup.INK)
-	l.name = "Text"
-	row.add_child(l)
-	var bar := ProgressBar.new()
-	bar.name = "Ghost"
-	bar.show_percentage = false
-	bar.custom_minimum_size = Vector2(0, 16)
-	bar.max_value = maxi(1, best)
-	bar.value = mini(current, maxi(1, best))
-	row.add_child(bar)
+	row.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROW.lightened(0.4), BasePopup.ROW_EDGE, 2, 18, 0), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
+	parent.add_child(row)
+	var h := HBoxContainer.new()
+	h.add_theme_constant_override("separation", UiTokens.SPACE_SM)
+	row.add_child(h)
+	var art := HomeStyle.art("Icon")
+	art.texture = load(F + icon)
+	art.custom_minimum_size = Vector2(UiTokens.ICON_MD, UiTokens.ICON_MD)
+	h.add_child(art)
+	var l := _text(label, 26)
+	l.name = "Label"
+	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	h.add_child(l)
+	var cur := _cell(UiText.num(current), 40)
+	cur.name = "Current"
+	h.add_child(cur)
+	var bst := _cell(UiText.num(best), 40)
+	bst.name = "Best"
+	h.add_child(bst)
+
+## Left-aligned single-line ink label (text_fits() catches any overflow).
+static func _text(text: String, size: int) -> Label:
+	var l := BasePopup.body_label(text, size)
+	l.autowrap_mode = TextServer.AUTOWRAP_OFF
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	return l
+
+## Fixed-width centred column cell (Current / Best header and values line up).
+static func _cell(text: String, size: int) -> Label:
+	var l := _text(text, size)
+	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	l.custom_minimum_size = Vector2(130, 0)
+	return l
+
+static func _spacer(w: int) -> Control:
+	var s := Control.new()
+	s.custom_minimum_size = Vector2(w, 0)
+	s.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	return s
 
 # ----------------------------------------------------------- ACHIEVEMENTS ----
 
