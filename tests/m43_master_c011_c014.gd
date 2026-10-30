@@ -496,7 +496,7 @@ func _a01() -> void:
 	_complete("a01_committed_only")
 
 func _a02() -> void:
-	print("[a02 Master / SFX / Haptics / Reduced Effects obeyed immediately (live, per request)]")
+	print("[a02 Master / Music / SFX / Haptics / Reduced Effects obeyed immediately (live, per request)]")
 	await _boot("a02")
 	var a = _root.get_app_state()
 	var mf = _root.meta_feedback
@@ -511,6 +511,16 @@ func _a02() -> void:
 		mf.moment(m)
 	_ok(mf.played.slice(-5).all(func(p): return not p[1] and p[2] == 0) and buzz.is_empty(), "SFX off + Haptics off: every moment silent, no buzz")
 	a.audio.set_sfx_enabled(true)
+	a.audio.set_master_enabled(false)
+	ms[0] += 1000
+	mf.moment("reward")
+	_ok(not mf.played[-1][1], "Master OFF (SFX on): meta moment silent at once")
+	a.audio.set_master_enabled(true)
+	a.audio.set_music_enabled(false)
+	ms[0] += 1000
+	mf.moment("reward")
+	_ok(mf.played[-1][1] and mf._player.bus != "Music", "Music OFF: meta UI has no music path (voice not on the Music bus), SFX still plays")
+	a.audio.set_music_enabled(true)
 	a.haptics.set_enabled(true)
 	a.effects.set_reduced(true)
 	for m in ["reward", "unlock", "error", "pack_rare"]:
