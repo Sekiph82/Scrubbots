@@ -1,0 +1,1 @@
+{ "id": "062-skill-worktree-path", "task": "SKILL.md: worktrees outside Desktop", "branch": "factory/062-skill-worktree-path", "worktree": "C:/Users/sekip/AppData/Local/ScrubBotsFactoryWT/062-skill-worktree-path", "stage": "merged", "round": 0, "reviews": { "rules": "PASS", "code": "n/a", "tests": "n/a" } }
