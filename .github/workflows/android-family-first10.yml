@@ -41,6 +41,7 @@ name: Android Family First10 APK
 # SB-M43-112..121 Tasks/Daily/Gift: exact 12/12 guard for m43_master_c009_daily (already in the loop; 56 total).
 # SB-M43 verify sweep (R09/R10/R12, 123..164, 151): + m43_master_c010_meta + m43_master_c011_c014 (58 total, exact 12/12 and 28/28 guards).
 # SB-M44-025 pending-pack inventory (pre-L20 packs wait for card_packs): + m44_pending_packs_gate (59 total, exact 6/6 guard).
+# SB-COL-NAV-001 Collection set NEW-count badge + set detail prev/next: k18/k19 in m43_master_c007_collection (59 total, C007 guard now exact 19/19).
 
 on:
   workflow_dispatch:
@@ -219,10 +220,10 @@ jobs:
             echo "M43-C006 verdict=FAIL (exact 15/15 summary missing)" | tee -a "$S"; fail=1
           fi
           # SB-M43-090..101 Collection: exact 17-case summary + set/master exactly-once line are mandatory.
-          if grep -qxF 'M43 master C007 Collection evidence: PASS (17/17 cases, 0 fail)' validate_logs/m43_master_c007_collection.log 2>/dev/null; then
-            echo "M43-C007 verdict=PASS (17/17)" | tee -a "$S"
+          if grep -qxF 'M43 master C007 Collection evidence: PASS (19/19 cases, 0 fail)' validate_logs/m43_master_c007_collection.log 2>/dev/null; then
+            echo "M43-C007 verdict=PASS (19/19)" | tee -a "$S"
           else
-            echo "M43-C007 verdict=FAIL (exact 17/17 summary missing)" | tee -a "$S"; fail=1
+            echo "M43-C007 verdict=FAIL (exact 19/19 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'M43 master C008 Robots evidence: PASS (10/10 cases, 0 fail)' validate_logs/m43_master_c008_robots.log 2>/dev/null; then
             echo "M43-C008 verdict=PASS (10/10)" | tee -a "$S"
