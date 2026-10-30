@@ -35,6 +35,12 @@ extends SceneTree
 ## PROVISIONAL_SIMULATED_HUMAN, the four inputs, diagnostics, wall time). Slow: about 5.6 h for
 ## the 10 shipped levels at 32 runs (proposal section 4.7); run it in the background. Without
 ## `--frustration` every output file and stdout line is unchanged.
+##
+## SB-M36-017: `--frustration --fixtures id[,id...] [--runs N]` runs ONLY the HUMAN_BR population on
+## the named difficulty anchor fixtures (tests/fixtures/difficulty_anchors, slot by lane) or catalog
+## levels (slot by order). Session Load and choice opacity come from v2.score() of the committed
+## raw (050 anchors_raw / M53-C002 holdout_raw, sha-bound). Writes frustration_<ids>_r<N>.json under
+## OUT_DIR_FIXTURES; no playtest/frustration_v1 file is written or touched.
 
 const Tool = preload("res://tools/analyze_m53_first10.gd")
 const Analyzer = preload("res://scripts/difficulty/level_difficulty_analyzer_v1.gd")
@@ -42,6 +48,7 @@ const AnalyzerV2 = preload("res://scripts/difficulty/level_difficulty_analyzer_v
 const DifficultyProgressionV1 = preload("res://scripts/difficulty/difficulty_progression_v1.gd")
 const LevelLoader = preload("res://scripts/data/level_loader.gd")
 const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
+const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
 const ProofState = preload("res://scripts/gameplay/solver/proof_state.gd")
 const SolvabilitySolver = preload("res://scripts/gameplay/solver/solvability_solver.gd")
 const Pack = preload("res://tools/build_m52_first_10_pack.gd")
@@ -55,6 +62,11 @@ const OUT_PATH_V2_PROG_V2 := OUT_DIR_V2 + "/playtest_v2_progression_v2.json"
 const OUT_PATH_FRUSTRATION := OUT_DIR_V2 + "/frustration_v1.json"
 const OUT_PATH_FRUSTRATION_MD := OUT_DIR_V2 + "/frustration_v1.md"
 const V2_COMMITTED_RAW := "res://coordination/sessions/M53-C002/evidence/holdout_raw/%s_raw.json"
+const ANCHOR_MANIFEST := "res://tests/fixtures/difficulty_anchors/anchor_manifest_v1.json"
+const ANCHOR_RAW := "res://coordination/sessions/FACTORY/050-m36-013-anchor-calibration/anchors_raw/%s_raw.json"
+## CLAUDE.md 11.1 cadence slot of each anchor lane (EXTREME probes use the VERY_HARD slot).
+const LANE_SLOT := {"EASY": 1, "MEDIUM": 3, "HARD": 5, "VERY_HARD": 10, "EXTREME": 10}
+const OUT_DIR_FIXTURES := "res://coordination/sessions/FACTORY/067-m36-017-frustration-discrimination"
 ## CLAUDE.md 11.1 owner-locked cadence, independent of the config (rule CADENCE).
 const CADENCE_11_1 := ["EASY", "EASY", "MEDIUM", "EASY", "HARD", "EASY", "EASY", "MEDIUM", "EASY", "VERY_HARD"]
 ## docs/10 vocabulary: never collapse UNSOLVABLE and INCONCLUSIVE.
@@ -83,6 +95,10 @@ func _initialize() -> void:
 		printerr("UNKNOWN_PROGRESSION v2 needs --model v2 (the v1 analyzer is frozen on progression v1)")
 		quit(1)
 		return
+	if args.has("--fixtures") and not args.has("--frustration"):
+		printerr("FIXTURES needs --frustration")
+		quit(1)
+		return
 	if args.has("--frustration"):
 		if model != "v2":
 			printerr("FRUSTRATION needs --model v2")
@@ -90,6 +106,14 @@ func _initialize() -> void:
 			return
 		var k := args.find("--runs")
 		_frustration_runs = int(args[k + 1]) if k >= 0 and k + 1 < args.size() else -1
+		var fx := args.find("--fixtures")
+		if fx >= 0:
+			if fx + 1 >= args.size():
+				printerr("FIXTURES needs id[,id...]")
+				quit(1)
+				return
+			quit(run_fixtures(Array(String(args[fx + 1]).split(","))))
+			return
 	quit(run(args.has("--committed-measure"), model, progression, args.has("--frustration")))
 
 func run(committed_measure: bool, model: String = "v2", progression: String = "v1", frustration: bool = false) -> int:
@@ -179,6 +203,65 @@ Total wall time: %.1f s
 		return 1
 	print(frustration_table_md(_frustration_levels))
 	print("FRUSTRATION OK levels=%d wallMs=%d" % [_frustration_levels.size(), total])
+	return 0
+
+## SB-M36-017: HUMAN_BR only, on anchor fixtures or catalog levels (see header).
+func run_fixtures(ids: Array) -> int:
+	var v2 = AnalyzerV2.new()
+	var prog = DifficultyProgressionV1.new()
+	var cat = LevelCatalog.new()
+	_frustration = FrustrationAnalyzerV1.new(v2)
+	if not v2.is_ok() or not prog.is_ok() or not cat.load_manifest().ok or not _frustration.is_ok():
+		printerr("LOAD_FAIL analyzer/progression/catalog/frustration")
+		return 1
+	var anchors := {}
+	for f in Analyzer._read_json(ANCHOR_MANIFEST)["fixtures"]:
+		anchors[f["id"]] = f
+	var entries := {}
+	for e in cat.get_entries_ordered():
+		entries[e.id] = e
+	for id in ids:
+		var lvl = null
+		var make: Callable
+		var r: Dictionary = {}
+		var n := 0
+		if anchors.has(id):
+			var f: Dictionary = anchors[id]
+			lvl = LevelLoader.load_from_path(f["levelPath"]).level_data
+			var sp: String = f["supplyPath"]
+			make = func(): return SupplyPlanLoader.load_engine(sp, lvl)["engine"]
+			r = Analyzer._read_json(ANCHOR_RAW % id)
+			if r.get("levelSha256", "") != f["levelSha256"] or r.get("supplySha256", "") != f["supplySha256"]:
+				printerr("RAW_STALE %s" % id)
+				return 1
+			n = LANE_SLOT[f["lane"]]
+		elif entries.has(id):
+			lvl = LevelLoader.load_from_path(entries[id].level_path).level_data
+			var ref: Dictionary = Tool.reference_inputs(id, lvl)
+			if not ref["ok"]:
+				printerr("REFERENCE_FAIL %s: %s" % [id, ref["error"]])
+				return 1
+			make = ref["make_engine"]
+			r = Analyzer._read_json(V2_COMMITTED_RAW % id)
+			if r.get("levelSha256", "") != Pack.content_sha256(entries[id].level_path):
+				printerr("RAW_STALE %s" % id)
+				return 1
+			n = entries[id].order
+		else:
+			printerr("FIXTURE_UNKNOWN %s" % id)
+			return 1
+		var s: Dictionary = v2.score(r["raw"], n)
+		frustration_level(id, n, lvl, make, prog.slot_for(n), s)
+	var path := "%s/frustration_%s_r%d.json" % [OUT_DIR_FIXTURES, "+".join(ids), int(_frustration_levels[0]["result"]["runsPerProfile"])]
+	DirAccess.make_dir_recursive_absolute(ProjectSettings.globalize_path(OUT_DIR_FIXTURES))
+	var out := {"schema": "scrubbots.m36.frustration_playtest.v1", "task": "SB-M36-017",
+		"generatedBy": "res://tools/difficulty_playtest.gd --frustration --fixtures",
+		"config": {"path": FrustrationAnalyzerV1.CONFIG_PATH, "sha256": Pack.content_sha256(FrustrationAnalyzerV1.CONFIG_PATH)},
+		"status": "PROVISIONAL_SIMULATED_HUMAN", "levels": _frustration_levels}
+	if not Tool._write(path, FrustrationAnalyzerV1.to_json(out)):
+		return 1
+	print(frustration_table_md(_frustration_levels))
+	print("FRUSTRATION_FIXTURES OK levels=%d out=%s" % [_frustration_levels.size(), path])
 	return 0
 
 static func frustration_table_md(rows: Array) -> String:
