@@ -10,7 +10,7 @@ name: Android Family First10 APK
 #             1.7 GB coordination/sessions evidence and the three dev-art trees.
 #   export:   a disposable workspace in which every owner-excluded tree
 #             (.github/android/family_first10_export_exclusions.txt) is ABSENT, plus the same
-#             prefixes in the preset exclude_filter; debug keystore generated here (never
+#             prefixes in the preset exclude_filter; debug keystore from GitHub Secrets, else generated here (never
 #             committed); APK + same-preset inspection PCK; machine scans proving zero packaged
 #             paths under the excluded prefixes and presence of every runtime-referenced res://
 #             file; headless boot of the exported pack; apksigner / aapt2 metadata; artifacts.
@@ -332,17 +332,31 @@ jobs:
           rm -f godot.zip tpl.tpz
           ls "$TPL" | grep -i android
 
-      - name: Debug keystore (generated in CI, never committed) + Android editor settings
+      # SB-M34-006 (owner 2026-10-31): sign with the stable debug key from GitHub Secrets so every
+      # family APK installs over the previous one (keeps the save); generated key only when absent.
+      - name: Debug keystore (GitHub Secret, else generated in CI; never committed) + Android editor settings
+        env:
+          KS_B64: ${{ secrets.ANDROID_DEBUG_KEYSTORE_BASE64 }}
+          KS_PASS_SECRET: ${{ secrets.ANDROID_DEBUG_KEYSTORE_PASSWORD }}
+          KS_ALIAS_SECRET: ${{ secrets.ANDROID_DEBUG_KEYSTORE_ALIAS }}
         run: |
           KS="$RUNNER_TEMP/family-debug.keystore"
-          keytool -genkeypair -v -keystore "$KS" -storepass android -keypass android -alias androiddebugkey \
-            -dname "CN=ScrubBots Family Debug,O=ScrubBots Dev,C=US" -keyalg RSA -keysize 2048 -validity 3650 >/dev/null 2>&1
+          if [ -n "$KS_B64" ]; then
+            printf '%s' "$KS_B64" | base64 -d > "$KS"
+            KS_USER="$KS_ALIAS_SECRET"; KS_PASS="$KS_PASS_SECRET"
+            echo "debug keystore: stable GitHub Secret"
+          else
+            KS_USER=androiddebugkey; KS_PASS=android
+            keytool -genkeypair -v -keystore "$KS" -storepass "$KS_PASS" -keypass "$KS_PASS" -alias "$KS_USER" \
+              -dname "CN=ScrubBots Family Debug,O=ScrubBots Dev,C=US" -keyalg RSA -keysize 2048 -validity 3650 >/dev/null 2>&1
+            echo "debug keystore: generated (secret absent; signature changes every run)"
+          fi
           SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
           echo "ANDROID_SDK=$SDK" >> "$GITHUB_ENV"
           echo "BUILD_TOOLS=$(ls -d "$SDK"/build-tools/* | sort -V | tail -1)" >> "$GITHUB_ENV"
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$KS" >> "$GITHUB_ENV"
-          echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=androiddebugkey" >> "$GITHUB_ENV"
-          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=android" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=$KS_USER" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=$KS_PASS" >> "$GITHUB_ENV"
           mkdir -p "$HOME/.config/godot"
           for f in editor_settings-4.tres editor_settings-4.7.tres; do
             cat > "$HOME/.config/godot/$f" <<EOF
@@ -352,8 +366,8 @@ jobs:
           export/android/android_sdk_path = "$SDK"
           export/android/java_sdk_path = "$JAVA_HOME"
           export/android/debug_keystore = "$KS"
-          export/android/debug_keystore_user = "androiddebugkey"
-          export/android/debug_keystore_pass = "android"
+          export/android/debug_keystore_user = "$KS_USER"
+          export/android/debug_keystore_pass = "$KS_PASS"
           EOF
           done
 
