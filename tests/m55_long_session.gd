@@ -285,12 +285,16 @@ func _drive(host) -> Dictionary:
 	rt.set_process(false)
 	var input = host.get_input_controller()
 	var slots = host.get_slots()
+	var scheduler = host.get_scheduler()
 	var i := 0
 	var frames := 0
 	while frames < 200000 and not host.get_completion().is_terminal():
 		if slots.rightmost_empty_index() != -1:
 			if not clicks.is_empty():
-				if i < clicks.size() and input.activate_front(int(clicks[i]) - 1).get("ok", false):
+				# Plan clicks follow the proof kernel's serial order: next click only once the
+				# runtime is quiet (no live assignment, no moving bot), as m52 _play_clicks does.
+				if scheduler.live_assignment_count() == 0 and not _any_moving(host.get_agent_layer()) \
+						and i < clicks.size() and input.activate_front(int(clicks[i]) - 1).get("ok", false):
 					i += 1
 			else:
 				for col in range(host.get_supply().get_column_count()):
@@ -299,6 +303,14 @@ func _drive(host) -> Dictionary:
 		rt.tick(DT)
 		frames += 1
 	return {"frames": frames, "clicks": i}
+
+func _any_moving(agent_layer) -> bool:
+	if agent_layer == null:
+		return false
+	for ch in agent_layer.get_children():
+		if ch.has_method("is_moving") and ch.is_moving():
+			return true
+	return false
 
 ## Plays Levels 1..LEVELS back-to-back; returns the HOME sample at the end of the lap.
 func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
@@ -329,7 +341,8 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 				clears["dups"] += 1
 			clears["seen"][target] = true)
 		host.get_completion().terminal_reached.connect(func(s, _d): terminals.append(String(s)))
-		var cells: int = host.get_board().get_cell_count()
+		# VOID cells (version-2 levels) start CLEARED and are never cleared again.
+		var cells: int = host.get_board().get_cell_count() - host.get_board().count_cells_by_state(BoardState.CellState.CLEARED)
 		var sb0: int = eco.wallet.scrub_bucks()
 		var tx0: int = eco.reward.applied_transaction_count()
 		var parts0: int = eco.wallet.bot_parts()
