@@ -54,11 +54,11 @@ func _initialize() -> void:
 # ------------------------------------------------------------------ cases ----
 
 func _m01() -> void:
-	print("[m01 BottomNav: EVENTS / ROBOTS / HOME / SETTINGS real; RANKS disabled (policy), never faked]")
+	print("[m01 BottomNav: EVENTS / ROBOTS / RANKS / HOME / SETTINGS real, no dead tab]")
 	await _boot("m01")
 	var h = _root.get_home()
 	var opened := {}
-	for id in ["events", "robots"]:
+	for id in ["events", "robots", "leaderboard"]:
 		var b: Button = h.get_region("Nav_" + id)
 		_ok(not b.disabled, "Nav_%s live" % id)
 		b.pressed.emit()
@@ -66,9 +66,9 @@ func _m01() -> void:
 		opened[id] = _top_id()
 		_root.get_modal_stack().clear("test")
 		await _frames(2)
-	_ok(opened == {"events": "events", "robots": "robots"}, "EVENTS / ROBOTS open their destinations %s" % str(opened))
+	_ok(opened == {"events": "events", "robots": "robots", "leaderboard": "ranks"}, "EVENTS / ROBOTS / RANKS open their destinations %s" % str(opened))
 	var r: Button = h.get_region("Nav_leaderboard")
-	_ok(r.disabled and r.tooltip_text == UiText.t("HOME_COMING_LATER"), "RANKS disabled with honest coming-later, no fake board")
+	_ok(r.tooltip_text == "", "RANKS (SB-M43-122 personal ladder) has no coming-later tooltip")
 	_complete("m01_bottom_nav_real_or_disabled")
 
 func _m02() -> void:
@@ -268,14 +268,16 @@ func _m10() -> void:
 	_complete("m10_badges")
 
 func _m11() -> void:
-	print("[m11 RANKS: no ranking metric / scoring invented]")
+	print("[m11 RANKS: personal ladder only (SB-M43-122); no other-player scoring / server invented]")
 	var hits: Array = []
-	for f in ["res://scripts/ui/profile/profile_screens.gd", "res://scripts/ui/home/home_badges.gd", "res://scripts/economy/event_service.gd", "res://scripts/economy/player_records.gd"]:
+	for f in ["res://scripts/ui/profile/profile_screens.gd", "res://scripts/ui/home/home_badges.gd", "res://scripts/economy/event_service.gd", "res://scripts/economy/player_records.gd", "res://scripts/progression/personal_rank.gd"]:
 		var s := FileAccess.get_file_as_string(f).to_lower()
-		for w in ["rank_score", "ranking", "leaderboard_score", "placement"]:
+		for w in ["rank_score", "ranking", "leaderboard_score", "placement", "httprequest", "player_id"]:
 			if s.contains(w):
 				hits.append("%s:%s" % [f.get_file(), w])
-	_ok(hits.is_empty(), "no rank scoring code %s" % str(hits))
+	_ok(hits.is_empty(), "no other-player rank scoring / network code %s" % str(hits))
+	var cfg: Dictionary = JSON.parse_string(FileAccess.get_file_as_string("res://data/config/personal_ranks_v1.json"))
+	_ok(cfg["metric"] == "campaign_levels_cleared" and cfg.keys().all(func(k): return k in ["schema", "version", "source", "metric", "tiers"]), "ladder metric = own campaign levels cleared; no reward / server fields %s" % str(cfg.keys()))
 	_complete("m11_ranks_not_invented")
 
 func _m12() -> void:

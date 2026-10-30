@@ -47,8 +47,8 @@ const COACH_TICK_S := 0.2
 ## M44 peer-review D1: step copy (L2 booster lines run the host's solver-backed legality
 ## proofs) is rebuilt only on a step change or at most this often, never every tick.
 const COACH_COPY_REFRESH_MS := 2000
-## BottomNav tabs the app root serves (RANKS waits for the SB-M43-131 owner policy).
-const APP_NAV := ["events"]
+## BottomNav tabs the app root serves (RANKS = personal rank ladder, SB-M43-122).
+const APP_NAV := ["events", "leaderboard"]
 ## Home shortcut panels the app root turns into app-level destinations (Home opens none of
 ## its M42 popups for these; Cards Exchange keeps its Home seam).
 const APP_SHORTCUTS := ["shop", "collection", "tasks", "daily", "gift_bar", "profile", "rewarded_ads"]
@@ -362,6 +362,8 @@ func _on_home_nav(id: String) -> void:
 			RobotsScreen.open(_modals, app_state, ceremonies)
 		"events":
 			ProfileScreens.open_events(_modals, app_state)
+		"leaderboard":
+			ProfileScreens.open_ranks(_modals, app_state)
 
 ## Home shortcut panels / Gift Meter that open an app-level destination (APP_SHORTCUTS).
 func _on_home_shortcut(id: String) -> void:
