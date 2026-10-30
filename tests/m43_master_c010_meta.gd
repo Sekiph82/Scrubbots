@@ -142,6 +142,32 @@ func _m04() -> void:
 	var p = ProfileScreens.open_achievements(_root.get_modal_stack(), a)
 	await _frames(2)
 	_ok(bool(p.find_child("Ach_tidy_ten", true, false).get_meta("done")) and _eco().wallet.scrub_bucks() == sb0, "completed state shown; nothing granted")
+	var done := ev.filter(func(x): return x["done"]).size()
+	var sum = p.find_child("AchSummary", true, false)
+	var sbar = sum.find_child("Bar", true, false) if sum != null else null
+	_ok(sum != null and _txt(sum, "Text") == UiText.t("ACH_SUMMARY", [UiText.num(done), UiText.num(ev.size())]) and sbar is ProgressBar and int(sbar.value) == done and int(sbar.max_value) == ev.size(), "summary banner: %d / %d completed text + bar" % [done, ev.size()])
+	var names := {}
+	var cards_ok := true
+	for x in ev:
+		var card = p.find_child("Ach_" + x["id"], true, false)
+		var t := _txt(card, "Title")
+		var d := _txt(card, "Desc")
+		cards_ok = cards_ok and card != null and t != "" and d != "" and t != d and not names.has(t) and card.find_child("Badge", true, false) != null
+		names[t] = true
+	_ok(cards_ok and names.size() == ev.size(), "every card: round badge + distinct non-empty Title and Desc")
+	var dc = p.find_child("Ach_tidy_ten", true, false)
+	_ok(_txt(dc, "State") == UiText.t("ACH_DONE") and dc.find_child("Progress", true, false) == null, "done card: COMPLETED pill, no Progress bar")
+	var nc = p.find_child("Ach_spotless_fifty", true, false)
+	var pr = nc.find_child("Progress", true, false)
+	_ok(pr is ProgressBar and int(pr.value) == 10 and int(pr.max_value) == 50 and _txt(nc, "State") == UiText.t("TASK_PROGRESS", [UiText.num(10), UiText.num(50)]), "not-done card: Progress 10/50 + n/m text")
+	var tall := true
+	for id in ["back", "close"]:
+		var b: Button = p.get_action_button(id)
+		tall = tall and b != null and maxf(b.custom_minimum_size.y, b.size.y) >= 88
+	_ok(tall, "achievements BACK and CLOSE >= 88 px tall")
+	_tap("close")
+	await _frames(2)
+	_ok(_top_id() != "achievements", "CLOSE pops Achievements")
 	var bad := "user://m43c010_badach.json"
 	var f := FileAccess.open(bad, FileAccess.WRITE)
 	f.store_string('{"schema":"scrubbots.achievements.v1","achievements":[{"id":"x","metric":"spend_money","target":1}]}')
