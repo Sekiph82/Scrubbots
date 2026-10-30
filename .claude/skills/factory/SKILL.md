@@ -40,7 +40,8 @@ may be dirty with owner/editor files: never commit, reset or clean them).
 ```
 <repo>/factory/jobs/<job-id>/job.json, spec.md, build.md, rework-<k>.md,
                              round-<N>/review-{rules,code,tests}.md, decision.md
-<repo>/../ScrubBots-factory/<job-id>/      the job's worktree on factory/<job-id>
+%LOCALAPPDATA%/ScrubBotsFactoryWT/<job-id>/  the job's worktree on factory/<job-id>
+                             (never on the Desktop; owner 2026-10-30)
 ```
 
 `factory/jobs/` is gitignored runtime state. Evidence that must survive is
