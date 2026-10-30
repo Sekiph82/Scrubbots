@@ -42,7 +42,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M36-016 — progression v2 reader (factory 051, c1f4eb55: DifficultyProgressionV1 accepts schema v1+v2 (V2_CONFIG_PATH, V2_SCHEMA, model_version(), challenge_tolerance()); LevelDifficultyAnalyzerV2(config, progression_path); tools/difficulty_playtest.gd --progression v1|v2 (v2 needs --model v2, writes coordination/sessions/FACTORY/046-difficulty-model-v2/playtest_v2_progression_v2.json: guards 9.6/12.8/9.6, tolerance 2.2/1.3/3.2 also applied to acceptanceWindow via LevelDifficultyAnalyzerV1.classify_window(delta, tol), anomalies=12, L1..L10 informational only); defaults stay v1, default --model v1/v2 outputs equal before/after except solver wall-clock ms; LOCAL_PASS tests/m36_progression_v2_reader.gd 'M36 progression v2 reader: PASS (55 cases, 0 fail)', m36_anchor_calibration PASS (126), m36_difficulty_v2 PASS (38/38), m36_difficulty_v1 PASS, m37_level_progression PASS, m53_first10_difficulty PASS)
 - DONE SB-M44-005..006 — contextual first WAITING / win / loss coachmarks (factory 054, 23583381): ctx_waiting, ctx_result_won, ctx_result_lost one-shot for new profiles, scheduled l3_waiting/l3_hearts dropped; LOCAL_PASS m44_contextual_coach 7/7 + six regression suites
 - DONE SB-M44-013,018 — NEW badge on newly unlocked Home entries until first visit (meta_ui feature_visited:<id>, persisted) + coachmark visual language in docs/16 §1.5 (factory 055, b07ca99e); LOCAL_PASS m44_new_badge 6/6 + regression suites
-- READY SB-M34-006 — haptics real-device test on an Android debug build
+- READY SB-M34-006 — haptics real-device test on an Android debug build (factory 072: APK had no VIBRATE permission, preset fixed with permissions/vibrate=true; ON/OFF device run pending, A10 not connected)
 - READY SB-M42-032..033 — opening cinematic on real Android device (720p/30, sync, latency, memory); iOS boot-flow readiness
 - READY SB-M48-002..003 — document the Apple toolchain requirement; prepare iOS configuration
 - READY SB-M47-005..010 — Android device: portrait, safe areas, Easy/Medium/Hard/Very Hard 59x59 performance
@@ -135,7 +135,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M22-026 — steps 1-4 done (jobs 037/038/040/043: runtime measure tool, 90 measured caps, Home 207 -> 106 MiB, card arts 810 -> 400 MiB, library 2260 -> 2103 MiB); remaining = VRAM compression (needs owner visual sign-off on before/after captures) + atlasing
 - DONE SB-UI-008..013 — owner 2026-10-23: canonical Scrubby master = assets/ui/final/characters/scrubby/scrubby_master.png; manifests updated, 013 validated (factory 041)
 - DONE SB-M22-023 — owner 2026-10-23: no booster coachmark; shared tutorial_pointer.png kept, booster_tutorial_pointer.png retired from runtime (PNG kept) (factory 041)
-- DONE SB-CAMPAIGN-L11-L30 — 20 Release Pool levels added as campaign L11–L30 (owner 2026-10-30; factory 071, 88f7348b + a3ba53ef): owner-art candidate-owner-* entries, sha256-verified, cells/palette copied verbatim, Studio SOLVED + replay WIN recorded per level (not re-run); LOCAL_PASS campaign_l11_l30 5/5 (ProofKernel intended-click WIN all 20), m35, m37, cp04, cp05, cp06 16/16, remote_content_family_fixture, m40_v04, m42_home, m43_c001a + 48 other CI suites; OPEN: m55_long_session FAIL (L20 Detective LOST under its real-runtime driver; per-cell clear check counts VOID cells); m52_owner_supply_plans not re-run
+- DONE SB-CAMPAIGN-L11-L30 — 20 Release Pool levels added as campaign L11–L30 (owner 2026-10-30; factory 071, 88f7348b + a3ba53ef): owner-art candidate-owner-* entries, sha256-verified, cells/palette copied verbatim, Studio SOLVED + replay WIN recorded per level (not re-run); LOCAL_PASS campaign_l11_l30 5/5 (ProofKernel intended-click WIN all 20), m35, m37, cp04, cp05, cp06 16/16, remote_content_family_fixture, m40_v04, m42_home, m43_c001a + 48 other CI suites; m55 driver fixed on main in 06fbfbad (plan clicks in proof-kernel serial order, counts non-VOID cells); CI/test re-validation of the release-pool levels skipped by owner decision 2026-10-30 (no pass claimed); m52_owner_supply_plans not re-run
 <!-- Not queued (standing rules, no job of their own): SB-M07-012 (conditional: if supplied), SB-M52-005 (conditional: when rectangular production art is supplied), SB-M08-011..012, SB-M22-008 (conditional: if owner approves a no-work state), SB-M22-016..019, SB-M22-021, SB-UI-019..030, SB-UI-032, SB-M43-135, SB-M43-142, SB-M43-152, SB-M48-001, SB-M50-008..009, SB-M57-017..021, SB-M61-008 -->
 
 ## Questions for Şekip
@@ -956,7 +956,7 @@ V02 independent code audit: `CODE_AUDIT_PASS`. SB-M34-001..005 closed. SB-M34-00
 
 Pre-authored batch bundle: `coordination/sessions/M34-C001/CHATGPT_PROMPT_V01.md` + `CHATGPT_AUDIT_CRITERIA_V01.md`. Per-task logs required under `task_logs/`. Owner/device gate does not stop the batch.
 
-- [ ] SB-M34-006 Real-device test.
+- [ ] SB-M34-006 Real-device test. (factory 072: run 41116404350 APK declared no uses-permission, so Input.vibrate_handheld was dropped on Android; preset now sets permissions/vibrate=true; device ON/OFF capture still to do)
 
 ### M35 — Level Catalog
 
