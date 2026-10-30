@@ -196,7 +196,8 @@ func _n02() -> void:
 	await _boot("n02")
 	var a = _root.get_app_state()
 	var n = a.economy.notify
-	_ok(n.decide(a, _now[0], 12).is_empty(), "opted out: nothing")
+	_ok(not NotificationPolicy.candidates(a).is_empty() and n.decide(a, _now[0], 12).is_empty() and int(n.snapshot()["last_sent"]) == 0,
+		"SB-M43-151: notifications disabled with live candidates -> nothing decided / sent")
 	n.enabled = true
 	a.economy.gift.add_streak_sb("n02", 20)
 	var m: Dictionary = n.decide(a, _now[0], 12)

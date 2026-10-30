@@ -11,6 +11,7 @@ const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
 const Achievements = preload("res://scripts/progression/achievements.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const EventService = preload("res://scripts/economy/event_service.gd")
+const NotificationPolicy = preload("res://scripts/economy/notification_policy.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
@@ -173,9 +174,12 @@ func _m07() -> void:
 	_ok(e.events.list().is_empty() and not _root.get_app_state().actions.claim_event_milestone("wk1", 0)["ok"], "forfeit: ended event gone, claim refused")
 	_now[0] -= 8 * 86400
 	_event_config({"start_ts": _now[0] - 3600, "policy": "claim_after_end"})
-	_now[0] += 8 * 86400
+	_now[0] += 7 * 86400 - 7200
+	_ok(_event_ending(), "SB-M43-151 control: active event ending within 24 h with a claimable reward -> event_ending candidate")
+	_now[0] += 86400 + 7200
 	var v: Dictionary = e.events.view("wk1")
 	_ok(v["phase"] == "ended" and v["milestones"][0]["claimable"] and e.events.list().size() == 1, "claim_after_end: ended event listed while reward unclaimed")
+	_ok(not _event_ending(), "SB-M43-151: expired event (still claimable) never produces an event_ending notification")
 	await _win(3)
 	_ok(e.events.view("wk1")["progress"] == 2, "no progress after the window")
 	_complete("m07_weekly_expiry_policy")
@@ -305,6 +309,9 @@ func _event_config(o: Dictionary) -> void:
 	f.store_string(JSON.stringify(cfg))
 	f.close()
 	_eco().events.load_config(path)
+
+func _event_ending() -> bool:
+	return NotificationPolicy.candidates(_root.get_app_state()).any(func(c): return c["category"] == "event_ending")
 
 func _win(level: int) -> void:
 	await _play(level)
