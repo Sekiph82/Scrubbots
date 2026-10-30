@@ -1,0 +1,1 @@
+{ "id": "065-m43-verify-sweep", "task": "M43 bulk verify-close sweep (R09, 122..134, R10, 143..151, R12, 163..170, C005F-015)", "branch": "factory/065-m43-verify-sweep", "worktree": "C:/Users/sekip/AppData/Local/ScrubBotsFactoryWT/065-m43-verify-sweep", "stage": "merged", "round": 2, "reviews": { "rules": "PASS", "code": "n/a", "tests": "PASS" } }
