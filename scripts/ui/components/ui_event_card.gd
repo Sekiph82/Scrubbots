@@ -129,7 +129,8 @@ static func _row(i: int, m: Dictionary, progress: int, phase: String, id: String
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.add_theme_constant_override("separation", 0)
 	h.add_child(col)
-	var t := _text(UiText.t("EVENT_MILESTONE_LEVELS", [UiText.num(int(m["target"]))]), 32, BasePopup.INK)
+	var lv := UiText.t("EVENT_MILESTONE_LEVEL_ONE") if int(m["target"]) == 1 else UiText.t("EVENT_MILESTONE_LEVELS", [UiText.num(int(m["target"]))])
+	var t := _text(lv, 32, BasePopup.INK)
 	t.name = "Text"
 	col.add_child(t)
 	var r := _text(UiText.reward_text(m["reward"]), 22, BasePopup.ROYAL)

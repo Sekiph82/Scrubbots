@@ -248,7 +248,7 @@ func _event_card_checks(p, v: Dictionary) -> void:
 
 ## SB-M43-130-REBUILD: one UiEventCard component renders active / upcoming / ended views.
 func _event_state_matrix() -> void:
-	var ms := [{"target": 2, "reward": {"scrub_bucks": 50}, "reached": true, "claimed": false, "claimable": true},
+	var ms := [{"target": 1, "reward": {"scrub_bucks": 50}, "reached": true, "claimed": false, "claimable": true},
 		{"target": 5, "reward": {"bot_parts": 1}, "reached": false, "claimed": false, "claimable": false}]
 	var claim := func(_aid: String, parent: Control) -> Button:
 		var b := Button.new()
@@ -263,6 +263,7 @@ func _event_state_matrix() -> void:
 	_ok(_txt(cards["ended"], "When") == UiText.t("EVENT_ENDED") and cards["ended"].find_child("Milestone_0", true, false).find_children("*", "Button", true, false).size() == 1 and cards["ended"].find_child("Locked", true, false) != null, "SB-M43-130 matrix: ended When = EVENT_ENDED, claimable row still claims, unreached row locked")
 	_ok(_txt(cards["active"], "When") == UiText.t("EVENT_ENDS_IN", [UiEventCard._dhm(90000)]) and cards["active"].find_child("Progress_1", true, false) != null, "SB-M43-130 matrix: active When = EVENT_ENDS_IN, unreached row has a bar")
 	_ok(UiEventCard.reward_icon({"standard_card_packs": 1}) == "card_pack_standard" and UiEventCard.reward_icon({"scrub_bucks": 1, "bot_parts": 1}) == "gift_box", "SB-M43-130 matrix: reward icon mapping (single key -> bundle, multi-key -> gift box)")
+	_ok(_txt(cards["active"].find_child("Milestone_0", true, false), "Text") == UiText.t("EVENT_MILESTONE_LEVEL_ONE") and _txt(cards["active"].find_child("Milestone_1", true, false), "Text") == UiText.t("EVENT_MILESTONE_LEVELS", [UiText.num(5)]), "SB-M43-130 matrix: target 1 -> '1 level' (singular), target 5 -> '5 levels'")
 	for c in cards.values():
 		c.free()
 
