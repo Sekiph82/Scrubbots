@@ -55,8 +55,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M43-090..101 — Collection verify-close + pack entry (factory 061; 098 built abb42509): LOCAL_PASS m43_master_c007_collection 17/17 + m54_collection_set_master_exactly_once, added to CI (55 suites, 74b85bab)
 - READY SB-M43-R07-001..006 — earned-pack pity counter, guarantee, complete-pool fallback, legible pity UI, First Collection Sprint tuning
 - DONE SB-M43-102..111 — Robots destination verify-close (factory 063): tests/m43_master_c008_robots.gd 10/10 added to CI validate (56)
-- READY SB-M43-112..117 — TASKS destination (3 tasks, 75/100/125 SB), exactly-once claims, DAILY destination and visual master
-- READY SB-M43-118..121 — Gift Bar claim/history, Gift Bar visual master, no recursive feed, rollover/rollback/duplicate-tap tests
+- DONE SB-M43-112..121 — Tasks/Daily/Gift Bar verify-close (factory 064): m43_master_c009_daily 12/12 with exact CI guard
 - READY SB-M43-R09-001..005 — Daily Scrub Orders archetype pool, deterministic daily generation, tier intent, earned ScrubBox ceremony
 - READY SB-M43-122..126 — real BottomNav destinations, keep M41 Settings, Profile entry + visual master, Achievements framework
 - READY SB-M43-127..130 — Achievements visual master; EVENTS destination (no new currency), event states, Events visual master
@@ -1173,16 +1172,16 @@ Effect-intensity vocabulary for this program: **MICRO → SMALL → REWARD → M
 
 #### M43-C009 - Tasks / Daily / Gift Bar Destinations
 
-- [ ] SB-M43-112 Implement TASKS Home destination showing exactly three daily tasks, progress and individual 75/100/125 SB rewards.
-- [ ] SB-M43-113 Produce/owner-approve Tasks visual master.
-- [ ] SB-M43-114 Claim state is exactly-once and 3/3 completion grants one random Booster Charge exactly once.
-- [ ] SB-M43-115 Implement final DAILY destination/popup with visible consecutive-login count and repeating 5-day reward cycle.
-- [ ] SB-M43-116 Produce/owner-approve final Daily visual master and reward-state variants.
-- [ ] SB-M43-117 Daily shows claimed/today/future-day states, current consecutive days and canonical D1-D5 rewards.
-- [ ] SB-M43-118 Implement Gift Bar claim/history surface for queued Gift Meter milestones.
-- [ ] SB-M43-119 Produce/owner-approve Gift Bar visual master and milestone reward cards.
-- [ ] SB-M43-120 Gift Bar claim/history never feeds Gift Meter recursively and never re-grants claimed milestones.
-- [ ] SB-M43-121 Test local-day rollover, missed-day reset, clock rollback, all-3 Tasks completion, Gift rollover and duplicate taps.
+- [x] SB-M43-112 Implement TASKS Home destination showing exactly three daily tasks, progress and individual 75/100/125 SB rewards. **[DONE 2026-10-30, factory 064 verify-close: already built; LOCAL_PASS tests/m43_master_c009_daily.gd 'M43 master C009 Tasks / Daily / Gift evidence: PASS (12/12 cases, 0 fail)' (suite already in CI validate; exact-summary guard added).]**
+- [x] SB-M43-113 Produce/owner-approve Tasks visual master. **[DONE 2026-10-30, factory 064 verify-close: already built; LOCAL_PASS tests/m43_master_c009_daily.gd 'M43 master C009 Tasks / Daily / Gift evidence: PASS (12/12 cases, 0 fail)' (suite already in CI validate; exact-summary guard added). Visual master closed on CLAUDE.md 0D.1 owner visual sign-off + existing promoted assets; no new art.]**
+- [x] SB-M43-114 Claim state is exactly-once and 3/3 completion grants one random Booster Charge exactly once. **[DONE 2026-10-30, factory 064 verify-close: already built; LOCAL_PASS tests/m43_master_c009_daily.gd 'M43 master C009 Tasks / Daily / Gift evidence: PASS (12/12 cases, 0 fail)' (suite already in CI validate; exact-summary guard added).]**
+- [x] SB-M43-115 Implement final DAILY destination/popup with visible consecutive-login count and repeating 5-day reward cycle. **[DONE 2026-10-30, factory 064 verify-close: already built; LOCAL_PASS tests/m43_master_c009_daily.gd 'M43 master C009 Tasks / Daily / Gift evidence: PASS (12/12 cases, 0 fail)' (suite already in CI validate; exact-summary guard added).]**
+- [x] SB-M43-116 Produce/owner-approve final Daily visual master and reward-state variants. **[DONE 2026-10-30, factory 064 verify-close: already built; LOCAL_PASS tests/m43_master_c009_daily.gd 'M43 master C009 Tasks / Daily / Gift evidence: PASS (12/12 cases, 0 fail)' (suite already in CI validate; exact-summary guard added). Visual master closed on CLAUDE.md 0D.1 owner visual sign-off + existing promoted assets; no new art.]**
+- [x] SB-M43-117 Daily shows claimed/today/future-day states, current consecutive days and canonical D1-D5 rewards. **[DONE 2026-10-30, factory 064 verify-close: already built; LOCAL_PASS tests/m43_master_c009_daily.gd 'M43 master C009 Tasks / Daily / Gift evidence: PASS (12/12 cases, 0 fail)' (suite already in CI validate; exact-summary guard added).]**
+- [x] SB-M43-118 Implement Gift Bar claim/history surface for queued Gift Meter milestones. **[DONE 2026-10-30, factory 064 verify-close: already built; LOCAL_PASS tests/m43_master_c009_daily.gd 'M43 master C009 Tasks / Daily / Gift evidence: PASS (12/12 cases, 0 fail)' (suite already in CI validate; exact-summary guard added).]**
+- [x] SB-M43-119 Produce/owner-approve Gift Bar visual master and milestone reward cards. **[DONE 2026-10-30, factory 064 verify-close: already built; LOCAL_PASS tests/m43_master_c009_daily.gd 'M43 master C009 Tasks / Daily / Gift evidence: PASS (12/12 cases, 0 fail)' (suite already in CI validate; exact-summary guard added). Visual master closed on CLAUDE.md 0D.1 owner visual sign-off + existing promoted assets; no new art.]**
+- [x] SB-M43-120 Gift Bar claim/history never feeds Gift Meter recursively and never re-grants claimed milestones. **[DONE 2026-10-30, factory 064 verify-close: already built; LOCAL_PASS tests/m43_master_c009_daily.gd 'M43 master C009 Tasks / Daily / Gift evidence: PASS (12/12 cases, 0 fail)' (suite already in CI validate; exact-summary guard added).]**
+- [x] SB-M43-121 Test local-day rollover, missed-day reset, clock rollback, all-3 Tasks completion, Gift rollover and duplicate taps. **[DONE 2026-10-30, factory 064 verify-close: already built; LOCAL_PASS tests/m43_master_c009_daily.gd 'M43 master C009 Tasks / Daily / Gift evidence: PASS (12/12 cases, 0 fail)' (suite already in CI validate; exact-summary guard added).]**
 
 #### M43-C009R - Daily Scrub Orders / Earned ScrubBox [OWNER APPROVED 2026-09-30]
 
