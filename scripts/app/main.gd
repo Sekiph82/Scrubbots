@@ -371,7 +371,7 @@ func _on_home_shortcut(id: String) -> void:
 		"shop":
 			_acq.open_shop({"source": "home_shop"})
 		"collection":
-			CollectionScreen.open_album(_modals, app_state)
+			CollectionScreen.open_album(_modals, app_state, request_earned_packs)
 		"tasks":
 			DailyScreens.open_tasks(_modals, app_state)
 		"daily":

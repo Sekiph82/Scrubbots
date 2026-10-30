@@ -11,12 +11,15 @@ extends RefCounted
 ##   card detail  full art, name, rarity, owned count, protected first copy, EXTRAS xN, live SB
 ##                value per extra, EXCHANGE 1 / EXCHANGE ALL OF THIS CARD
 ##   exchange     every card with extras + total, EXCHANGE ALL EXTRAS
+##   packs        live earned-but-unopened counts (economy.pending_packs) + OPEN PACKS, which only
+##                calls the app's `open_packs` route (Main.request_earned_packs -> C005 ceremony)
 ##
 ## Truth: CollectionInventory (counts, set/master claims), CollectionCardCatalog (identity),
 ## CardsExchangeService (protected floor 1, values Common 25 / Rare 75 / Epic 200 / Legendary
 ## 500 from config). Every exchange is confirmed and committed by ProductionActionFacade
 ## (atomic removal + SB credit + save); the UI never edits counts or balances. "Viewed" marks
-## (meta_ui `card:<id>`) are presentation only. Pack opening entry is NOT here (SB-M43-098).
+## (meta_ui `card:<id>`) are presentation only. The pack entry (SB-M43-098) never draws, grants
+## or touches the queue: the ceremony path does.
 
 const TouchScroll = preload("res://scripts/ui/components/touch_scroll.gd")
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
@@ -54,7 +57,8 @@ static func unseen_cards(economy) -> Array:
 
 # ===================================================================== album ==
 
-static func open_album(stack, app) -> BasePopup:
+## open_packs: the app's earned-pack route (Main.request_earned_packs); none -> OPEN PACKS blocked.
+static func open_album(stack, app, open_packs: Callable = Callable()) -> BasePopup:
 	var e = app.economy
 	var p := BasePopup.new("collection")
 	p.set_frame("large")
@@ -62,6 +66,17 @@ static func open_album(stack, app) -> BasePopup:
 	var head := BasePopup.body_label("", 28, BasePopup.ROYAL_EDGE)
 	head.name = "Summary"
 	p.get_content().add_child(head)
+	var packs := HBoxContainer.new()
+	packs.name = "PackRow"
+	packs.add_theme_constant_override("separation", UiTokens.SPACE_SM)
+	p.get_content().add_child(packs)
+	var pl := BasePopup.body_label("", 24, BasePopup.INK)
+	pl.name = "Packs"
+	pl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	packs.add_child(pl)
+	p.add_action("packs", UiText.t("COLLECTION_PACKS_OPEN"), "primary", false, "", packs).custom_minimum_size = Vector2(220, 80)
+	p.set_meta("open_packs", open_packs)
 	p.add_action("exchange", UiText.t("COLLECTION_OPEN_EXCHANGE"), "primary", false)
 	var scroll := ScrollContainer.new()
 	scroll.name = "SetList"
@@ -85,6 +100,12 @@ static func open_album(stack, app) -> BasePopup:
 	if not stack.push(p):
 		p.free()
 		return null
+	# Back on top (a pack ceremony / detail closed): re-read every value live.
+	var on_top := func(t):
+		if t == p:
+			_refresh_album(p, e)
+	stack.top_changed.connect(on_top)
+	p.closed.connect(func(_r): stack.top_changed.disconnect(on_top), CONNECT_ONE_SHOT)
 	return p
 
 static func _set_row(p: BasePopup, e, n: int, row: Dictionary) -> Control:
@@ -143,6 +164,9 @@ static func _refresh_album(p: BasePopup, e) -> void:
 	if e.pack_pity != null and e.pack_pity.guaranteed_next() and not e.collection.first_missing_eligible_card().is_empty():
 		summary += "\n" + UiText.t("COLLECTION_PITY_NEXT")
 	(p.find_child("Summary", true, false) as Label).text = summary
+	var waiting: int = e.pending_packs.size()
+	(p.find_child("Packs", true, false) as Label).text = UiText.t("COLLECTION_PACKS", [e.pending_packs.count_of("standard"), e.pending_packs.count_of("premium")]) if waiting > 0 else UiText.t("COLLECTION_PACKS_EMPTY")
+	p.set_action_blocked("packs", waiting == 0 or not (p.get_meta("open_packs") as Callable).is_valid())
 	for row in e.config.collection_config().get("set_rewards", []):
 		var n := int(row["set"])
 		var card = p.find_child("Set_%d" % n, true, false)
@@ -186,7 +210,10 @@ static func _on_album_action(stack, app, p: BasePopup, id: String) -> void:
 		if is_instance_valid(p) and p.is_open():
 			_refresh_album(p, app.economy)
 			p.rearm()
-	if id == "exchange":
+	if id == "packs":
+		(p.get_meta("open_packs") as Callable).call()   # the C005 ceremony draws + acknowledges
+		p.rearm_soon()
+	elif id == "exchange":
 		if open_exchange(stack, app, back) == null:
 			p.rearm()
 	elif id.begins_with("set:"):

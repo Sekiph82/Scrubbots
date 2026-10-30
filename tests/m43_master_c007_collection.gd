@@ -16,7 +16,8 @@ var EXPECTED_CASES := [
 	"k01_home_opens_album", "k02_album_truth", "k03_set_detail_states", "k04_card_detail_exchange_one",
 	"k05_exchange_all_extras", "k06_cancel_changes_nothing", "k07_rapid_taps_single_exchange", "k08_values_table",
 	"k09_no_art_leak_unowned", "k10_135_card_performance_touch", "k11_legacy_no_new_flood", "k12_exchange_inside_collection",
-	"k13_pity_copy_only_when_due",
+	"k13_pity_copy_only_when_due", "k14_pack_entry_routes_to_ceremony", "k15_reward_status_history",
+	"k16_no_locked_or_fake_rows", "k17_duplicate_heavy_exchange_all",
 ]
 
 var _fail := 0
@@ -40,6 +41,10 @@ func _initialize() -> void:
 	_k11()
 	_k12()
 	await _k13()
+	await _k14()
+	await _k15()
+	await _k16()
+	await _k17()
 	_shutdown()
 	_cleanup()
 	_done()
@@ -279,6 +284,133 @@ func _k13() -> void:
 	await _frames(1)
 	_ok(off and _txt("Summary").contains(UiText.t("COLLECTION_PITY_NEXT")), "absent with the shipped (no) threshold; stated when due")
 	_complete("k13_pity_copy_only_when_due")
+
+func _k14() -> void:
+	print("[k14 pack entry: live pending counts, OPEN routes to the C005 ceremony, UI never draws]")
+	await _boot("k14")
+	var e = _eco()
+	(_root.get_home().get_region("Shortcut_collection") as Button).pressed.emit()
+	await _frames(2)
+	var p = _top()
+	_ok(_txt("Packs") == UiText.t("COLLECTION_PACKS_EMPTY") and p.get_action_button("packs").disabled, "empty queue: empty-state label, OPEN PACKS blocked")
+	p.close("test")
+	await _frames(1)
+	_ok(e.reward.grant("k14_tx", {"standard_card_packs": 2, "premium_card_packs": 1}) and e.pending_packs.size() == 3, "2 standard + 1 premium earned (queued, not drawn)")
+	(_root.get_home().get_region("Shortcut_collection") as Button).pressed.emit()
+	await _frames(2)
+	p = _top()
+	_ok(_top_id() == "collection" and _txt("Packs") == "Packs to open: 2 Standard · 1 Premium" and not p.get_action_button("packs").disabled, "album shows 2 / 1 and OPEN PACKS enabled")
+	var queue0: Array = e.pending_packs.entries()
+	var col0: Dictionary = e.collection.snapshot()
+	p._on_action("packs")
+	_ok(e.pending_packs.entries() == queue0 and e.collection.snapshot() == col0, "the press itself changes neither the queue nor the Collection")
+	await _frames(3)
+	var pack = _top()
+	_ok(pack != null and String(pack.popup_id) == "standard_pack" and _root.get_modal_stack().ids() == ["collection", "standard_pack"], "OPEN routed through Main.request_earned_packs: oldest pack ceremony over the album")
+	pack.tap()
+	for _i in range(1500):
+		if not is_instance_valid(pack) or pack.phase() == "AWAIT_ROUTE":
+			break
+		await process_frame
+	pack.tap()
+	for _i in range(1500):
+		if not is_instance_valid(pack) or pack.is_closed():
+			break
+		await process_frame
+	await _frames(3)
+	_ok(e.pending_packs.size() == 2 and _lbl(p, "Packs") == "Packs to open: 1 Standard · 1 Premium", "after the ceremony acknowledged pack 1 the album re-reads 1 / 1")
+	_ok(e.collection.snapshot() != col0, "cards came only from the ceremony's pack commit")
+	_complete("k14_pack_entry_routes_to_ceremony")
+
+func _k15() -> void:
+	print("[k15 reward status: CLAIMED vs on completion, reopen never grants twice]")
+	await _boot("k15")
+	var e = _eco()
+	_complete_set(3)
+	var p = CollectionScreen.open_album(_root.get_modal_stack(), _root.get_app_state())
+	await _frames(1)
+	var bad: Array = []
+	for n in range(1, 16):
+		if not _lbl(p.find_child("Set_%d" % n, true, false), "Reward").ends_with(UiText.t("COLLECTION_CLAIMED") if n == 3 else UiText.t("COLLECTION_NOT_CLAIMED")):
+			bad.append(n)
+	_ok(bad.is_empty() and _lbl(p, "MasterText").ends_with(UiText.t("COLLECTION_NOT_CLAIMED")), "only set 3 CLAIMED; Master on completion %s" % str(bad))
+	p.close("test")
+	await _frames(1)
+	var sb0: int = e.wallet.scrub_bucks()
+	var bp0: int = e.wallet.bot_parts()
+	var want_sb := 0
+	var want_bp := 0
+	for row in e.config.collection_config()["set_rewards"]:
+		if int(row["set"]) != 3:
+			want_sb += int(row["scrub_bucks"])
+			want_bp += int(row["bot_parts"])
+	var m: Dictionary = e.config.collection_config()["all_sets_complete"]
+	for n in range(1, 16):
+		_complete_set(n)
+	_ok(e.wallet.scrub_bucks() == sb0 + want_sb + int(m["scrub_bucks"]) and e.wallet.bot_parts() == bp0 + want_bp + int(m["bot_parts"]), "14 set rewards + Master granted exactly once")
+	var sb1: int = e.wallet.scrub_bucks()
+	var bp1: int = e.wallet.bot_parts()
+	for _i in range(2):
+		p = CollectionScreen.open_album(_root.get_modal_stack(), _root.get_app_state())
+		await _frames(1)
+		bad.clear()
+		for n in range(1, 16):
+			if not _lbl(p.find_child("Set_%d" % n, true, false), "Reward").ends_with(UiText.t("COLLECTION_CLAIMED")):
+				bad.append(n)
+		_ok(bad.is_empty() and _lbl(p, "MasterText").ends_with(UiText.t("COLLECTION_CLAIMED")), "reopened: every set + Master CLAIMED %s" % str(bad))
+		p.close("test")
+		await _frames(1)
+	_ok(not bool(e.collection.claim_pending_rewards()["ok"]) and e.wallet.scrub_bucks() == sb1 and e.wallet.bot_parts() == bp1, "no second grant; balances unchanged")
+	_complete("k15_reward_status_history")
+
+func _k16() -> void:
+	print("[k16 no locked / future / fake rows; progress equals inventory truth]")
+	await _boot("k16")
+	var e = _eco()
+	for cid in ["s1_c0", "s1_c0", "s4_c3", "s4_c8", "s15_c2", "s15_c5", "s15_c6", "s9_c1"]:
+		e.collection.add_card(cid)
+	var p = CollectionScreen.open_album(_root.get_modal_stack(), _root.get_app_state())
+	await _frames(1)
+	var names: Array = p.find_child("Sets", true, false).get_children().map(func(c): return String(c.name))
+	var want: Array = range(1, 16).map(func(n): return "Set_%d" % n)
+	want.append("MasterRow")
+	_ok(names == want and e.config.collection_config()["set_rewards"].size() == 15, "exactly Set_1..Set_15 + MasterRow, no locked / placeholder row")
+	var shown := 0
+	for n in range(1, 16):
+		shown += int(_lbl(p.find_child("Set_%d" % n, true, false), "Progress").split(" / ")[0])
+	var owned := 0
+	var foreign: Array = []
+	for cid in e.collection.all_card_ids():
+		if e.collection.owned(cid) > 0:
+			owned += 1
+		if not cid.begins_with("s") or int(cid.substr(1).split("_")[0]) < 1 or int(cid.substr(1).split("_")[0]) > 15:
+			foreign.append(cid)
+	_ok(shown == 7 and owned == 7 and _txt("Summary").begins_with("7 / 135 cards") and foreign.is_empty() and e.collection.all_card_ids().size() == 135, "row progress sums to the 7 unique owned cards; 135 canonical cards only")
+	_complete("k16_no_locked_or_fake_rows")
+
+func _k17() -> void:
+	print("[k17 duplicate-heavy (9x every card) EXCHANGE ALL: exact total, floor 1, one facade commit]")
+	await _boot("k17")
+	var e = _eco()
+	var want := 0
+	for cid in e.collection.all_card_ids():
+		for _i in range(9):
+			e.collection.add_card(cid)
+		want += 8 * int(e.exchange.card_value(cid))
+	var commits: Array = []
+	_root.get_app_state().actions.action_committed.connect(func(a, _r): commits.append(a))
+	var p = CollectionScreen.open_exchange(_root.get_modal_stack(), _root.get_app_state())
+	await _frames(1)
+	_ok(_lbl(p, "Total") == "Total: %s SB" % UiText.num(want), "total = sum(8 extras x value) = %d" % want)
+	var sb0: int = e.wallet.scrub_bucks()
+	p._on_action("ex_all_extras")
+	await _frames(1)
+	_tap("confirm")
+	_tap("confirm")
+	await _frames(2)
+	var not_one: Array = e.collection.all_card_ids().filter(func(c): return e.collection.owned(c) != 1)
+	_ok(e.wallet.scrub_bucks() == sb0 + want and not_one.is_empty() and commits == ["exchange_all_extras"], "+%d SB once, every card owned x1, one exchange_all_extras commit %s" % [want, str(commits)])
+	_complete("k17_duplicate_heavy_exchange_all")
 
 # ------------------------------------------------------------------ helpers ----
 
