@@ -70,21 +70,24 @@ func open_premium() -> Array:
 ## `keep_from` is replaced by the first missing eligible card (never card 0 of a Premium pack,
 ## which stays the Rare-or-better draw); with no missing card nothing is fabricated. The pity
 ## counter then records whether the pack produced a NEW card.
+## During the First Collection Sprint "new" means a new Set 1 card (PackPity.focus_set).
 func _apply_earned(drawn: Array, keep_from: int) -> Array:
-	if pity != null and pity.guarantee_due() and not _has_new(drawn):
+	var focus: int = pity.focus_set(_inventory) if pity != null else 0
+	if pity != null and pity.guarantee_due(_inventory) and not _has_new(drawn, focus):
 		var missing := _inventory.first_missing_eligible_card()
 		if not missing.is_empty() and drawn.size() > keep_from:
 			drawn[drawn.size() - 1] = missing
-	var had_new := _has_new(drawn)
+	var had_new := _has_new(drawn, focus)
 	for cid in drawn:
 		_inventory.add_card(cid)
 	if pity != null:
 		pity.on_opened(had_new)
 	return drawn
 
-func _has_new(drawn: Array) -> bool:
+## True when `drawn` holds an unowned card of set `focus` (any set when 0).
+func _has_new(drawn: Array, focus := 0) -> bool:
 	for cid in drawn:
-		if _inventory.owned(cid) == 0:
+		if _inventory.owned(cid) == 0 and (focus == 0 or _inventory.card_set(cid) == focus):
 			return true
 	return false
 

@@ -161,6 +161,11 @@
     "standard_pack_draws": 3,
     "premium_pack_draws": 5,
     "premium_guaranteed_min_rarity": "RARE",
+    "pity": {
+      "threshold": 3,
+      "first_sprint_threshold": 1,
+      "tuning": "docs/COLLECTION_PITY_FIRST_SPRINT_TUNING_V1.md (tools/sim_pack_pity.gd)"
+    },
     "set_rewards": [
       {
         "set": 1,

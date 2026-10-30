@@ -72,6 +72,9 @@ func all_card_ids() -> Array:
 func card_rarity(card_id: String) -> String:
 	return String(_catalog.get(card_id, {}).get("rarity", ""))
 
+func card_set(card_id: String) -> int:
+	return int(_catalog.get(card_id, {}).get("set", 0))
+
 func owned(card_id: String) -> int:
 	return int(_owned.get(card_id, 0))
 
