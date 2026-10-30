@@ -1,0 +1,55 @@
+{
+	"artworkCellCount": 618,
+	"builderVersion": "SB-CAMPAIGN-L11-L30/release-pool-import/v1",
+	"cellCount": 1024,
+	"cellReferenceCounts": {
+		"C02": 114,
+		"C11": 300,
+		"C12": 38,
+		"C14": 48,
+		"C15": 3,
+		"C16": 115
+	},
+	"difficulty": "EASY",
+	"firstSeenColorOrder": [
+		"C16",
+		"C11",
+		"C02",
+		"C14",
+		"C15",
+		"C12"
+	],
+	"height": 32,
+	"normalizedColorOrder": [
+		"C02",
+		"C11",
+		"C12",
+		"C14",
+		"C15",
+		"C16"
+	],
+	"outputPath": "res://data/levels/level_016_teddy_bear.json",
+	"paletteAuthority": "res://data/palettes/scrubbots_palette_v3.json",
+	"previewPath": "res://assets/art/levels/previews/level_016_teddy_bear.png",
+	"releasePool": {
+		"artworkSha256": "85aa8c72c65d8c7e8a5ce2fde498f58731e000dd37d054485f9ad2012fef39d7",
+		"candidateId": "candidate-owner-a8cf6769a3053bac6b224b7d00cfaca28015043ae309ec06",
+		"challengeScore": 40.4171815732022,
+		"derivation": "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE",
+		"entryDigest": "a1ef45ed0f1f121cd9446ebb7d4f0fae3a9bc6294ba40fbdfdd6c56bd5ba8403",
+		"entryFile": "level_factory/output/studio-extensions/release-pool/candidate-owner-a8cf6769a3053bac6b224b7d00cfaca28015043ae309ec06-pipeline-a51f853dd2189f09a5270cec-ready.json",
+		"levelSha256": "7efa4af7e6c4db5d7dc92fd8f7dfe89a8517128483d7df72918b5b749f56a70a",
+		"ownerSourceSha256": "a8cf6769a3053bac6b224b7d00cfaca28015043ae309ec06a288516030d08937",
+		"pipelineRunId": "pipeline-a51f853dd2189f09a5270cec",
+		"poolDifficultyClass": "MEDIUM",
+		"sessionLoad": 17.5356162664457,
+		"studioReplay": "WIN",
+		"studioSolverStatus": "SOLVED",
+		"supplyPlanSha256": "e649e3e95e20a5ad2022a863a43996a5151bc7ba4795da9b7d380e326f9cc9e1"
+	},
+	"sourcePath": "level_factory/output/studio-derived-candidates/candidate-owner-a8cf6769a3053bac6b224b7d00cfaca28015043ae309ec06/artwork.png",
+	"sourceSha256": "85aa8c72c65d8c7e8a5ce2fde498f58731e000dd37d054485f9ad2012fef39d7",
+	"usedColorCount": 6,
+	"voidCellCount": 406,
+	"width": 32
+}

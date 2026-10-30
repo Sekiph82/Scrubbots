@@ -79,6 +79,166 @@
 			"metadata_path": "res://data/levels/metadata/level_010_ice_cube.metadata.json",
 			"preview_path": "res://assets/art/levels/previews/level_010_ice_cube.png",
 			"supply_plan_path": "res://data/levels/supply/level_010_ice_cube_supply_v1.json"
+		},
+		{
+			"id": "level_011_duckling",
+			"order": 11,
+			"level_path": "res://data/levels/level_011_duckling.json",
+			"metadata_path": "res://data/levels/metadata/level_011_duckling.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_011_duckling.png",
+			"supply_plan_path": "res://data/levels/supply/level_011_duckling_supply_v1.json"
+		},
+		{
+			"id": "level_012_ladybug",
+			"order": 12,
+			"level_path": "res://data/levels/level_012_ladybug.json",
+			"metadata_path": "res://data/levels/metadata/level_012_ladybug.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_012_ladybug.png",
+			"supply_plan_path": "res://data/levels/supply/level_012_ladybug_supply_v1.json"
+		},
+		{
+			"id": "level_013_goldfish",
+			"order": 13,
+			"level_path": "res://data/levels/level_013_goldfish.json",
+			"metadata_path": "res://data/levels/metadata/level_013_goldfish.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_013_goldfish.png",
+			"supply_plan_path": "res://data/levels/supply/level_013_goldfish_supply_v1.json"
+		},
+		{
+			"id": "level_014_goose",
+			"order": 14,
+			"level_path": "res://data/levels/level_014_goose.json",
+			"metadata_path": "res://data/levels/metadata/level_014_goose.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_014_goose.png",
+			"supply_plan_path": "res://data/levels/supply/level_014_goose_supply_v1.json"
+		},
+		{
+			"id": "level_015_octopus",
+			"order": 15,
+			"level_path": "res://data/levels/level_015_octopus.json",
+			"metadata_path": "res://data/levels/metadata/level_015_octopus.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_015_octopus.png",
+			"supply_plan_path": "res://data/levels/supply/level_015_octopus_supply_v1.json"
+		},
+		{
+			"id": "level_016_teddy_bear",
+			"order": 16,
+			"level_path": "res://data/levels/level_016_teddy_bear.json",
+			"metadata_path": "res://data/levels/metadata/level_016_teddy_bear.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_016_teddy_bear.png",
+			"supply_plan_path": "res://data/levels/supply/level_016_teddy_bear_supply_v1.json"
+		},
+		{
+			"id": "level_017_ninja",
+			"order": 17,
+			"level_path": "res://data/levels/level_017_ninja.json",
+			"metadata_path": "res://data/levels/metadata/level_017_ninja.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_017_ninja.png",
+			"supply_plan_path": "res://data/levels/supply/level_017_ninja_supply_v1.json"
+		},
+		{
+			"id": "level_018_wizard",
+			"order": 18,
+			"level_path": "res://data/levels/level_018_wizard.json",
+			"metadata_path": "res://data/levels/metadata/level_018_wizard.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_018_wizard.png",
+			"supply_plan_path": "res://data/levels/supply/level_018_wizard_supply_v1.json"
+		},
+		{
+			"id": "level_019_whale",
+			"order": 19,
+			"level_path": "res://data/levels/level_019_whale.json",
+			"metadata_path": "res://data/levels/metadata/level_019_whale.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_019_whale.png",
+			"supply_plan_path": "res://data/levels/supply/level_019_whale_supply_v1.json"
+		},
+		{
+			"id": "level_020_detective",
+			"order": 20,
+			"level_path": "res://data/levels/level_020_detective.json",
+			"metadata_path": "res://data/levels/metadata/level_020_detective.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_020_detective.png",
+			"supply_plan_path": "res://data/levels/supply/level_020_detective_supply_v1.json"
+		},
+		{
+			"id": "level_021_bunny",
+			"order": 21,
+			"level_path": "res://data/levels/level_021_bunny.json",
+			"metadata_path": "res://data/levels/metadata/level_021_bunny.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_021_bunny.png",
+			"supply_plan_path": "res://data/levels/supply/level_021_bunny_supply_v1.json"
+		},
+		{
+			"id": "level_022_crab",
+			"order": 22,
+			"level_path": "res://data/levels/level_022_crab.json",
+			"metadata_path": "res://data/levels/metadata/level_022_crab.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_022_crab.png",
+			"supply_plan_path": "res://data/levels/supply/level_022_crab_supply_v1.json"
+		},
+		{
+			"id": "level_023_bumblebee",
+			"order": 23,
+			"level_path": "res://data/levels/level_023_bumblebee.json",
+			"metadata_path": "res://data/levels/metadata/level_023_bumblebee.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_023_bumblebee.png",
+			"supply_plan_path": "res://data/levels/supply/level_023_bumblebee_supply_v1.json"
+		},
+		{
+			"id": "level_024_chef",
+			"order": 24,
+			"level_path": "res://data/levels/level_024_chef.json",
+			"metadata_path": "res://data/levels/metadata/level_024_chef.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_024_chef.png",
+			"supply_plan_path": "res://data/levels/supply/level_024_chef_supply_v1.json"
+		},
+		{
+			"id": "level_025_knight",
+			"order": 25,
+			"level_path": "res://data/levels/level_025_knight.json",
+			"metadata_path": "res://data/levels/metadata/level_025_knight.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_025_knight.png",
+			"supply_plan_path": "res://data/levels/supply/level_025_knight_supply_v1.json"
+		},
+		{
+			"id": "level_026_sheep",
+			"order": 26,
+			"level_path": "res://data/levels/level_026_sheep.json",
+			"metadata_path": "res://data/levels/metadata/level_026_sheep.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_026_sheep.png",
+			"supply_plan_path": "res://data/levels/supply/level_026_sheep_supply_v1.json"
+		},
+		{
+			"id": "level_027_black_cat",
+			"order": 27,
+			"level_path": "res://data/levels/level_027_black_cat.json",
+			"metadata_path": "res://data/levels/metadata/level_027_black_cat.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_027_black_cat.png",
+			"supply_plan_path": "res://data/levels/supply/level_027_black_cat_supply_v1.json"
+		},
+		{
+			"id": "level_028_squirrel",
+			"order": 28,
+			"level_path": "res://data/levels/level_028_squirrel.json",
+			"metadata_path": "res://data/levels/metadata/level_028_squirrel.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_028_squirrel.png",
+			"supply_plan_path": "res://data/levels/supply/level_028_squirrel_supply_v1.json"
+		},
+		{
+			"id": "level_029_turtle",
+			"order": 29,
+			"level_path": "res://data/levels/level_029_turtle.json",
+			"metadata_path": "res://data/levels/metadata/level_029_turtle.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_029_turtle.png",
+			"supply_plan_path": "res://data/levels/supply/level_029_turtle_supply_v1.json"
+		},
+		{
+			"id": "level_030_clown",
+			"order": 30,
+			"level_path": "res://data/levels/level_030_clown.json",
+			"metadata_path": "res://data/levels/metadata/level_030_clown.metadata.json",
+			"preview_path": "res://assets/art/levels/previews/level_030_clown.png",
+			"supply_plan_path": "res://data/levels/supply/level_030_clown_supply_v1.json"
 		}
 	]
 }

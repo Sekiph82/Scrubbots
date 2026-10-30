@@ -1,0 +1,256 @@
+{
+	"schema": "scrubbots.level_supply_plan.v1",
+	"version": 1,
+	"levelId": "level_017_ninja",
+	"ownerInput": "PixelArtStudio supply pipeline (solver-proven)",
+	"ownerInputSha256": "b3734a4dc0bfb55792ec3e139af83e9e1d54f95fd891c17e79ee68079429ad8f",
+	"columnCount": 4,
+	"visiblePreviewDepth": 3,
+	"maxRobotsPerBatch": 31,
+	"intendedColumnClicks": [
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		1,
+		2,
+		2,
+		2,
+		2,
+		2,
+		3,
+		3,
+		3,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		4,
+		3,
+		3,
+		3,
+		3,
+		4,
+		4,
+		2,
+		2,
+		2,
+		2,
+		2,
+		2,
+		2,
+		3,
+		4,
+		4
+	],
+	"columns": [
+		[
+			{
+				"batchId": "L017-K1-01",
+				"cid": "C16",
+				"robots": 19
+			},
+			{
+				"batchId": "L017-K1-02",
+				"cid": "C08",
+				"robots": 14
+			},
+			{
+				"batchId": "L017-K1-03",
+				"cid": "C02",
+				"robots": 6
+			},
+			{
+				"batchId": "L017-K1-04",
+				"cid": "C16",
+				"robots": 15
+			},
+			{
+				"batchId": "L017-K1-05",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "L017-K1-06",
+				"cid": "C16",
+				"robots": 14
+			},
+			{
+				"batchId": "L017-K1-07",
+				"cid": "C08",
+				"robots": 14
+			},
+			{
+				"batchId": "L017-K1-08",
+				"cid": "C02",
+				"robots": 13
+			}
+		],
+		[
+			{
+				"batchId": "L017-K2-01",
+				"cid": "C16",
+				"robots": 7
+			},
+			{
+				"batchId": "L017-K2-02",
+				"cid": "C07",
+				"robots": 14
+			},
+			{
+				"batchId": "L017-K2-03",
+				"cid": "C16",
+				"robots": 7
+			},
+			{
+				"batchId": "L017-K2-04",
+				"cid": "C08",
+				"robots": 29
+			},
+			{
+				"batchId": "L017-K2-05",
+				"cid": "C15",
+				"robots": 8
+			},
+			{
+				"batchId": "L017-K2-06",
+				"cid": "C12",
+				"robots": 15
+			},
+			{
+				"batchId": "L017-K2-07",
+				"cid": "C09",
+				"robots": 5
+			},
+			{
+				"batchId": "L017-K2-08",
+				"cid": "C16",
+				"robots": 11
+			},
+			{
+				"batchId": "L017-K2-09",
+				"cid": "C01",
+				"robots": 17
+			},
+			{
+				"batchId": "L017-K2-10",
+				"cid": "C08",
+				"robots": 15
+			},
+			{
+				"batchId": "L017-K2-11",
+				"cid": "C16",
+				"robots": 12
+			},
+			{
+				"batchId": "L017-K2-12",
+				"cid": "C08",
+				"robots": 15
+			}
+		],
+		[
+			{
+				"batchId": "L017-K3-01",
+				"cid": "C08",
+				"robots": 12
+			},
+			{
+				"batchId": "L017-K3-02",
+				"cid": "C16",
+				"robots": 18
+			},
+			{
+				"batchId": "L017-K3-03",
+				"cid": "C08",
+				"robots": 31
+			},
+			{
+				"batchId": "L017-K3-04",
+				"cid": "C01",
+				"robots": 8
+			},
+			{
+				"batchId": "L017-K3-05",
+				"cid": "C09",
+				"robots": 15
+			},
+			{
+				"batchId": "L017-K3-06",
+				"cid": "C11",
+				"robots": 2
+			},
+			{
+				"batchId": "L017-K3-07",
+				"cid": "C08",
+				"robots": 22
+			},
+			{
+				"batchId": "L017-K3-08",
+				"cid": "C07",
+				"robots": 11
+			}
+		],
+		[
+			{
+				"batchId": "L017-K4-01",
+				"cid": "C08",
+				"robots": 13
+			},
+			{
+				"batchId": "L017-K4-02",
+				"cid": "C12",
+				"robots": 17
+			},
+			{
+				"batchId": "L017-K4-03",
+				"cid": "C16",
+				"robots": 15
+			},
+			{
+				"batchId": "L017-K4-04",
+				"cid": "C07",
+				"robots": 9
+			},
+			{
+				"batchId": "L017-K4-05",
+				"cid": "C16",
+				"robots": 9
+			},
+			{
+				"batchId": "L017-K4-06",
+				"cid": "C08",
+				"robots": 28
+			},
+			{
+				"batchId": "L017-K4-07",
+				"cid": "C16",
+				"robots": 13
+			},
+			{
+				"batchId": "L017-K4-08",
+				"cid": "C08",
+				"robots": 15
+			},
+			{
+				"batchId": "L017-K4-09",
+				"cid": "C08",
+				"robots": 19
+			},
+			{
+				"batchId": "L017-K4-10",
+				"cid": "C16",
+				"robots": 11
+			},
+			{
+				"batchId": "L017-K4-11",
+				"cid": "C08",
+				"robots": 16
+			}
+		]
+	]
+}
