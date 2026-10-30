@@ -63,6 +63,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M43-125-REBUILD — rebuild the Profile screen (profile_screens.gd open_profile) to match assets/ui/generated/masters/scrubbots_profile_master_v01.png
 - READY SB-M43-127-REBUILD — rebuild the Achievements screen (profile_screens.gd open_achievements) to match assets/ui/generated/masters/scrubbots_achievements_master_v01.png
 - READY SB-M43-130-REBUILD — rebuild the Events screen + reusable event card/detail family (active card with timer/progress/milestones, collapsed upcoming card) to match assets/ui/generated/masters/scrubbots_events_master_v01.png
+- READY SB-CAMPAIGN-L11-L30-FIX — tests/m43_c001b_won_results_visual.gd still treats Level 10 as the last level (coming-soon card / disabled Continue), so 2 checks fail on main since factory 071; move the end-of-content case to Level 30
 - DONE SB-M43-134 — Event reward badge asserted 0/1/0 on HomeBadges + NavBadge_events (factory 070, 9377dc15; LOCAL_PASS c010 12/12)
 - DONE SB-M43-143 — comeback Gift/Tasks/Events lines asserted present/absent, no grant (factory 070, 9377dc15; LOCAL_PASS c011 28/28)
 - READY SB-M43-146 — contextual OS notification permission prompt (needs platform plugin)
