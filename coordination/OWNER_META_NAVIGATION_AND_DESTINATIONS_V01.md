@@ -41,7 +41,7 @@ No shipping dead tab is allowed.
 SETTINGS remains the M41 authority.
 ROBOTS uses the canonical 10-robot roster.
 EVENTS may not reintroduce Event Points/new event currency without a new owner decision.
-RANKS requires an explicit fair scoring policy before implementation.
+RANKS is a personal rank ladder (owner decision in chat 2026-10-31, "Kisisel rutbe"): the player's own tiers in `data/config/personal_ranks_v1.json`, metric = campaign levels cleared (`progression.completed_count()`), derived on read and never saved. No server, no leaderboard, no other players, no display names and no rewards. A future real leaderboard needs a new owner decision and SB-M58-012 first.
 
 ## 4. Profile and Achievements
 
