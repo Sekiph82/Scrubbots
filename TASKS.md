@@ -56,7 +56,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M43-102..111 — Robots destination verify-close (factory 063): tests/m43_master_c008_robots.gd 10/10 added to CI validate (56)
 - DONE SB-M43-112..121 — Tasks/Daily/Gift Bar verify-close (factory 064): m43_master_c009_daily 12/12 with exact CI guard
 - DONE SB-M43-R09-001..005,123,124,126,128,129,R10-001..007,144,145,147..149,151,R12-002,R12-004,R12-006,163,164 — verify-close (factory 065, ab035410): LOCAL_PASS m43_master_c009_daily 12/12, m43_master_c010_meta 12/12, m43_master_c011_c014 28/28; c010 + c011 added to CI validate (58)
-- READY SB-M43-122 — RANKS tab is disabled coming-later, not a real destination
+- DONE SB-M43-122 — RANKS = personal rank ladder (owner 2026-10-31; factory 074, 7f208789): LOCAL_PASS m43_personal_ranks 8/8 (added to CI validate, 62) + c010 12/12, m44_unlock_gate 6/6
 - READY SB-M43-125 — Profile visual master (manifest MASTER_REQUIRED)
 - READY SB-M43-127 — Achievements visual master (manifest MASTER_REQUIRED)
 - READY SB-M43-130 — Events visual master + reusable event card/detail family
@@ -1204,7 +1204,7 @@ This extension **does not change** the canonical consecutive-login reset rule or
 
 #### M43-C010 - Bottom Navigation / Profile / Achievements / Events / Ranks
 
-- [ ] SB-M43-122 BottomNav destinations are real: EVENTS / ROBOTS / HOME / RANKS / SETTINGS. No shipping dead tab. **[OPEN 2026-10-30, factory 065 audit gap: RANKS tab is disabled coming-later (m01), not a real destination.]**
+- [x] SB-M43-122 BottomNav destinations are real: EVENTS / ROBOTS / HOME / RANKS / SETTINGS. No shipping dead tab. **[DONE 2026-10-31, factory 074 (code 7f208789): owner decision in chat 2026-10-31 "Kisisel rutbe" -> RANKS opens the personal rank ladder (data/config/personal_ranks_v1.json, metric campaign levels cleared, derived on read; no server, other players or rewards; L40 unlock kept). LOCAL_PASS tests/m43_personal_ranks.gd 'M43 personal ranks evidence: PASS (8/8 cases, 0 fail)' (added to CI validate with exact guard, 62 suites), m43_master_c010_meta 12/12 (m01 RANKS live, m11 personal ladder only), m44_unlock_gate 6/6, m42_home_v04 18/18, m42_navigation PASS. SB-M58-012 is not triggered (no social exposure); it stays for any future real leaderboard. Review: factory 074 peer review.]**
 - [x] SB-M43-123 Preserve M41 Settings as the canonical Settings destination and do not duplicate Settings behavior. **[DONE 2026-10-30, factory 065 verify-close: LOCAL_PASS tests/m43_master_c010_meta.gd 'M43 master C010 meta evidence: PASS (12/12 cases, 0 fail)' cases m02 (factory 065 code ab035410, suites in CI validate with exact guards); review: factory 065 peer review.]**
 - [x] SB-M43-124 Add player Profile entry from the Home/profile card with active robot, campaign level, key lifetime stats, Collection completion and achievement summary. **[DONE 2026-10-30, factory 065 verify-close: LOCAL_PASS tests/m43_master_c010_meta.gd 'M43 master C010 meta evidence: PASS (12/12 cases, 0 fail)' cases m03 (factory 065 code ab035410, suites in CI validate with exact guards); review: factory 065 peer review.]**
 - [ ] SB-M43-125 Produce/owner-approve Profile visual master. **[OPEN 2026-10-30, factory 065 audit gap: Profile visual master not produced (manifest MASTER_REQUIRED).]**
@@ -1729,7 +1729,7 @@ Once external services exist:
 - [ ] SB-M58-009 Personalized/non-personalized ad consent flow where required; gameplay remains usable when personalized consent is refused.
 - [ ] SB-M58-010 Notification permission/settings and deep-link privacy review.
 - [ ] SB-M58-011 Account/cloud data deletion/export/sign-out requirements and recovery policy.
-- [ ] SB-M58-012 Leaderboard/profile display-name privacy, reporting/blocking needs and minors policy before Ranks/social exposure.
+- [ ] SB-M58-012 Leaderboard/profile display-name privacy, reporting/blocking needs and minors policy before Ranks/social exposure. **[NOTE 2026-10-31, factory 074: the shipped RANKS tab is a personal ladder with no social exposure and does not trigger this; it stays open for any future real leaderboard.]**
 - [ ] SB-M58-013 Purchase receipt/transaction identifier retention policy and least-data principle.
 - [ ] SB-M58-014 Verify all consent/error/privacy screens are localization-ready and accessible.
 
