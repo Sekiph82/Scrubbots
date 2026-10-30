@@ -35,6 +35,7 @@ name: Android Family First10 APK
 # SB-M43-072: + tests/m43_c005_c072_feature_unlock_ceremony.gd (48 total; feature unlock ceremony).
 # SB-M43-074/075/077: + tests/m43_c005_c074_c077_celebrations.gd (49 total, exact 6/6 guard; Gift/Daily/3-3 Tasks celebrations + Reduced equivalence).
 # SB-M43-R05-001/002, SB-M43-013, SB-M43-C005F-007: + 3 suites (52 total, exact 8/8, 32/32, 8/8 guards; Gift micro-progress ticks, Results ceremony hand-off, robot/feature MAJOR_UNLOCK feel).
+# SB-M43-078..089 Shop destination: + 1 suite (53 total, exact 15/15 guard; verify-close with 4 added assertion cases).
 
 on:
   workflow_dispatch:
@@ -115,7 +116,8 @@ jobs:
                    m50_color_symbols m28_c002_c004_tile_visual m28_c002_c001_gameplay_v02 m47_touch_r01_mobile_ux \
                    m43_c003_c001_acquisition m46_performance m44_unlock_gate m44_contextual_coach m44_new_badge \
                    m43_c005_c072_feature_unlock_ceremony m43_c005_c074_c077_celebrations \
-                   m43_master_c005r_gift_micro_progress m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel; do
+                   m43_master_c005r_gift_micro_progress m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
+                   m43_master_c006_shop; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -203,6 +205,12 @@ jobs:
             echo "M43-F007 verdict=PASS (8/8)" | tee -a "$S"
           else
             echo "M43-F007 verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
+          fi
+          # SB-M43-078..089 Shop destination: exact 15-case summary is mandatory.
+          if grep -qxF 'M43 master C006 Shop evidence: PASS (15/15 cases, 0 fail)' validate_logs/m43_master_c006_shop.log 2>/dev/null; then
+            echo "M43-C006 verdict=PASS (15/15)" | tee -a "$S"
+          else
+            echo "M43-C006 verdict=FAIL (exact 15/15 summary missing)" | tee -a "$S"; fail=1
           fi
           echo "aggregate=$([ $fail -eq 0 ] && echo PASS || echo FAIL)" | tee -a "$S"
           { echo "### validate (mode=${MODE:-<unset>}, ${GITHUB_SHA})"; echo '```'; cat "$S"; echo '```'; } >> "$GITHUB_STEP_SUMMARY"

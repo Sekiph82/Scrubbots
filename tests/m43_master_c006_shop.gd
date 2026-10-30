@@ -14,6 +14,7 @@ var EXPECTED_CASES := [
 	"s01_entries_open_shop", "s02_live_values_no_baked", "s03_buy_commits_through_facade", "s04_cancel_spends_nothing",
 	"s05_insufficient_blocked", "s06_hearts_states", "s07_real_money_and_no_ads_gated", "s08_return_context",
 	"s09_rapid_taps_single_spend", "s10_failure_feedback_after_authority", "s11_lifecycle_no_duplicate",
+	"s12_labels_follow_wallet", "s13_gated_cards_inert", "s14_four_boosters_no_extra_currency", "s15_ui_read_only_source",
 ]
 
 var _fail := 0
@@ -35,6 +36,10 @@ func _initialize() -> void:
 	await _s09()
 	await _s10()
 	await _s11()
+	await _s12()
+	await _s13()
+	await _s14()
+	await _s15()
 	_shutdown()
 	_cleanup()
 	_done()
@@ -201,6 +206,51 @@ func _s11() -> void:
 	await _frames(2)
 	_ok(_eco().wallet.scrub_bucks() == sb0 - 500 and s.purchase_log().size() == 1, "the one confirmed purchase still commits once")
 	_complete("s11_lifecycle_no_duplicate")
+
+func _s12() -> void:
+	print("[s12 balance, button and shortfall labels follow the wallet on refresh()]")
+	await _boot("s12")
+	var s = await _open_shop()
+	var e = _eco()
+	e.wallet.debit("scrub_bucks", e.wallet.scrub_bucks() - 100)
+	s.refresh()
+	_ok(_txt("SbValue") == "%s SB" % UiText.num(100) and _detail("Item_booster_tornado") == "Need 650 more SB", "balance and shortfall relabelled after the wallet changed")
+	e.wallet.credit("scrub_bucks", 5000)
+	s.refresh()
+	_ok(_txt("SbValue") == "%s SB" % UiText.num(5100) and not bool(_top().get_action_button("buy:booster:tornado").disabled), "balance relabelled and Tornado buyable again")
+	_complete("s12_labels_follow_wallet")
+
+func _s13() -> void:
+	print("[s13 SB pack + No Ads taps: no balance change, no feedback, no purchase]")
+	await _boot("s13")
+	var s = await _open_shop()
+	var sb0: int = _eco().wallet.scrub_bucks()
+	_tap("buy:sb_pack")
+	_tap("buy:no_ads")
+	await _frames(2)
+	_ok(_top_id() == "shop" and _eco().wallet.scrub_bucks() == sb0 and s.purchase_log().is_empty() and _root.get_modal_stack().ids().count("shop_confirm") == 0, "no confirm, no feedback popup, no balance change, no purchase record")
+	_complete("s13_gated_cards_inert")
+
+func _s14() -> void:
+	print("[s14 exactly four boosters, no Star/Event currency card]")
+	await _boot("s14")
+	await _open_shop()
+	var ids: Array = []
+	for c in _top().find_children("Item_booster_*", "PanelContainer", true, false):
+		ids.append(String(c.name).substr(5))
+	ids.sort()
+	_ok(ids == ["booster_plus_one_slot", "booster_random", "booster_selector", "booster_tornado"], "exactly four booster cards %s" % str(ids))
+	_ok(not " ".join(_top().find_children("*", "Label", true, false).map(func(l): return l.text.to_lower())).contains("event"), "no Event currency text")
+	_complete("s14_four_boosters_no_extra_currency")
+
+func _s15() -> void:
+	print("[s15 shop_screen.gd only reads wallet/hearts/boosters]")
+	var src := FileAccess.get_file_as_string("res://scripts/ui/shop/shop_screen.gd")
+	var re := RegEx.new()
+	re.compile("(wallet|hearts|boosters)[.](spend|debit|credit|add|grant|set|consume|restore|refill|buy|apply)[a-z_]*[(]")
+	_ok(re.search(src) == null, "no mutating call on wallet/hearts/boosters in shop_screen.gd")
+	_ok(src.contains("buy_heart") and src.contains("buy_booster_charge"), "buys route through the facade")
+	_complete("s15_ui_read_only_source")
 
 # ------------------------------------------------------------------ helpers ----
 

@@ -52,9 +52,6 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M43-R05-001..002 — Gift Meter micro-progress ticks verify-close (factory 059; code 671615be): LOCAL_PASS m43_master_c005r_gift_micro_progress 8/8, added to CI (52 suites, 4077ce5b)
 - DONE SB-M43-013 — Results ceremony hand-off verify-close (factory 059; code 46e50fd1): LOCAL_PASS m43_master_c005_meta_ceremonies 32/32 (e27/e28), added to CI (52 suites, 4077ce5b)
 - DONE SB-M43-C005F-007 — robot + feature unlock MAJOR_UNLOCK feel (factory 059, a292c390): LOCAL_PASS m43_c005f_phase6_unlock_feel 8/8 + 52 CI suites; world part gated, not implemented
-- READY SB-M43-078..080 — real Shop destination from SHOP/`+`, Shop visual master, Hearts/boosters/2x product groups
-- READY SB-M43-082..083 — Shop live wallet/Heart/booster/entitlement state; soft-currency buys via authoritative services
-- READY SB-M43-085..089 — Shop confirmation, return context, sold/offline/error states, rapid-tap/idempotency tests, honest feedback
 - READY SB-M43-090..095 — Collection main screen (15x9), album visual master, set progress, set detail, card detail, Exchange flow
 - READY SB-M43-096..101 — duplicate exchange + EXCHANGE ALL, live SB values, pack inventory entry, reward history, locked sets, perf
 - READY SB-M43-R07-001..006 — earned-pack pity counter, guarantee, complete-pool fallback, legible pity UI, First Collection Sprint tuning
@@ -1126,18 +1123,18 @@ Effect-intensity vocabulary for this program: **MICRO → SMALL → REWARD → M
 
 #### M43-C006 - Shop / Store / Currency Destination
 
-- [ ] SB-M43-078 Implement a real Shop destination opened by the Home SHOP shortcut and Scrub Bucks `+`.
-- [ ] SB-M43-079 Produce/owner-approve a Shop visual master before final production binding.
-- [ ] SB-M43-080 Shop V1 surface groups Hearts, boosters, 2x products and later real-money/SB acquisition without inventing a second premium currency.
+- [x] SB-M43-078 Implement a real Shop destination opened by the Home SHOP shortcut and Scrub Bucks `+`. DONE factory 060 verify-close: LOCAL_PASS m43_master_c006_shop 15/15 (4 assertion cases added), added to CI validate (53 suites, exact 15/15 guard); built in 79544a75 from existing assets + native Controls (visual master given by CLAUDE.md 0D.1, no new art). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-079 Produce/owner-approve a Shop visual master before final production binding. DONE factory 060 verify-close: LOCAL_PASS m43_master_c006_shop 15/15 (4 assertion cases added), added to CI validate (53 suites, exact 15/15 guard); built in 79544a75 from existing assets + native Controls (visual master given by CLAUDE.md 0D.1, no new art). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-080 Shop V1 surface groups Hearts, boosters, 2x products and later real-money/SB acquisition without inventing a second premium currency. DONE factory 060 verify-close: LOCAL_PASS m43_master_c006_shop 15/15 (4 assertion cases added), added to CI validate (53 suites, exact 15/15 guard); built in 79544a75 from existing assets + native Controls (visual master given by CLAUDE.md 0D.1, no new art). CLAUDE_PEER_REVIEW pending.
 - [ ] SB-M43-081 No Ads entry belongs to Shop, not Home, and remains gated by M57 product definition.
-- [ ] SB-M43-082 Shop shows live wallet/Heart/booster/entitlement state and never displays baked prices or stale quantities.
-- [ ] SB-M43-083 Soft-currency purchases route through existing authoritative services; UI never mutates balances directly.
+- [x] SB-M43-082 Shop shows live wallet/Heart/booster/entitlement state and never displays baked prices or stale quantities. DONE factory 060 verify-close: LOCAL_PASS m43_master_c006_shop 15/15 (4 assertion cases added), added to CI validate (53 suites, exact 15/15 guard); built in 79544a75 from existing assets + native Controls (visual master given by CLAUDE.md 0D.1, no new art). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-083 Soft-currency purchases route through existing authoritative services; UI never mutates balances directly. DONE factory 060 verify-close: LOCAL_PASS m43_master_c006_shop 15/15 (4 assertion cases added), added to CI validate (53 suites, exact 15/15 guard); built in 79544a75 from existing assets + native Controls (visual master given by CLAUDE.md 0D.1, no new art). CLAUDE_PEER_REVIEW pending.
 - [ ] SB-M43-084 Real-money product cards, localized cash prices, restore purchases and receipt state are bound only after M57 authorizes products/provider.
-- [ ] SB-M43-085 Implement purchase confirmation where platform policy/product risk requires it and clear pending state on failure/cancel.
-- [ ] SB-M43-086 Preserve exact return context when Shop was opened because a player lacked SB for a booster/Heart/2x action.
-- [ ] SB-M43-087 Implement sold/unavailable/offline/loading/error states without dead buttons.
-- [ ] SB-M43-088 Test rapid taps, insufficient SB, provider cancel/failure, restore, background/resume and idempotent fulfillment.
-- [ ] SB-M43-089 Shop visual/audio feedback must not imitate guaranteed rewards for uncompleted purchases.
+- [x] SB-M43-085 Implement purchase confirmation where platform policy/product risk requires it and clear pending state on failure/cancel. DONE factory 060 verify-close: LOCAL_PASS m43_master_c006_shop 15/15 (4 assertion cases added), added to CI validate (53 suites, exact 15/15 guard); built in 79544a75 from existing assets + native Controls (visual master given by CLAUDE.md 0D.1, no new art). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-086 Preserve exact return context when Shop was opened because a player lacked SB for a booster/Heart/2x action. DONE factory 060 verify-close: LOCAL_PASS m43_master_c006_shop 15/15 (4 assertion cases added), added to CI validate (53 suites, exact 15/15 guard); built in 79544a75 from existing assets + native Controls (visual master given by CLAUDE.md 0D.1, no new art). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-087 Implement sold/unavailable/offline/loading/error states without dead buttons. DONE factory 060 verify-close: LOCAL_PASS m43_master_c006_shop 15/15 (4 assertion cases added), added to CI validate (53 suites, exact 15/15 guard); built in 79544a75 from existing assets + native Controls (visual master given by CLAUDE.md 0D.1, no new art). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-088 Test rapid taps, insufficient SB, provider cancel/failure, restore, background/resume and idempotent fulfillment. DONE factory 060 verify-close: LOCAL_PASS m43_master_c006_shop 15/15 (4 assertion cases added), added to CI validate (53 suites, exact 15/15 guard); built in 79544a75 from existing assets + native Controls (visual master given by CLAUDE.md 0D.1, no new art). Provider cancel/failure/restore sub-items moved to SB-M43-084 (no provider until M57). CLAUDE_PEER_REVIEW pending.
+- [x] SB-M43-089 Shop visual/audio feedback must not imitate guaranteed rewards for uncompleted purchases. DONE factory 060 verify-close: LOCAL_PASS m43_master_c006_shop 15/15 (4 assertion cases added), added to CI validate (53 suites, exact 15/15 guard); built in 79544a75 from existing assets + native Controls (visual master given by CLAUDE.md 0D.1, no new art). CLAUDE_PEER_REVIEW pending.
 
 #### M43-C007 - Collection / Cards Exchange Destination
 
