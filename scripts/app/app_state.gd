@@ -306,10 +306,13 @@ func commit_pack(kind: String, tx_id: String) -> Dictionary:
 ## M43-C005F-PHASE2-R01: open the pending EARNED pack `id` through the canonical commit (its
 ## kind comes from the durable queue entry; the entry id is the pack tx / presentation id).
 ## A pack already committed (app killed mid-ceremony) replays its receipt, never redraws. The
-## entry stays pending until acknowledge_earned_pack().
+## entry stays pending until acknowledge_earned_pack(). SB-M44-025: below the card_packs unlock
+## (fresh profile, frontier < 20) nothing opens - the entry just stays queued.
 func open_earned_pack(id: String) -> Dictionary:
 	if is_blocked:
 		return {"ok": false, "reason": "app_blocked"}
+	if not feature_unlocked("card_packs"):
+		return {"ok": false, "reason": "locked"}
 	for e in economy.pending_packs.entries():
 		if e["id"] == id:
 			return commit_pack(String(e["kind"]), id)
