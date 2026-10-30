@@ -1,7 +1,8 @@
 extends SceneTree
 ## M43 master — Lane C007R earned-pack pity (SB-M43-R07-001..006).
 ## Real AppState / CardPackService / CollectionInventory / PackCommitTransaction / SaveService.
-## The guarantee threshold is set ONLY through the test seam (shipped config has none).
+## p03..p05 set the threshold through the test seam; p06 / p10 / p11 run the SHIPPED tuning
+## (collection.pity: threshold 3, first_sprint_threshold 1; docs/COLLECTION_PITY_FIRST_SPRINT_TUNING_V1.md).
 ##
 ## Run: godot --headless --path . -s res://tests/m43_master_c007r_pity.gd
 
@@ -11,8 +12,8 @@ const PackCommitTransaction = preload("res://scripts/collection/pack_commit_tran
 const RARE_PLUS := ["RARE", "EPIC", "LEGENDARY"]
 
 var EXPECTED_CASES := ["p01_counter_rules", "p02_persist_strict_legacy", "p03_guarantee_missing_card", "p04_premium_card0_kept",
-	"p05_no_missing_no_fabrication", "p06_shipped_threshold_absent", "p07_rollback_with_c008", "p08_earned_only_static",
-	"p09_rng_and_order_unchanged_when_not_due"]
+	"p05_no_missing_no_fabrication", "p06_shipped_threshold", "p07_rollback_with_c008", "p08_earned_only_static",
+	"p09_rng_and_order_unchanged_when_not_due", "p10_first_sprint_set1", "p11_sprint_legible_ui"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -29,6 +30,8 @@ func _initialize() -> void:
 	_p07()
 	_p08()
 	_p09()
+	_p10()
+	_p11()
 	_cleanup()
 	_done()
 
@@ -48,8 +51,9 @@ func _p01() -> void:
 	print("[p01 no NEW card -> +1, any NEW card -> reset]")
 	var app = _app("p01")
 	var e = app.economy
+	_own_set(app, 1)   # past the First Collection Sprint: plain any-set rule
 	e.packs.open_standard()
-	_ok(e.pack_pity.count() == 0, "first pack on a fresh profile has NEW cards -> 0")
+	_ok(e.pack_pity.count() == 0, "first pack after Set 1 has NEW cards -> 0")
 	_own_all_but(app, [])
 	for _i in range(3):
 		e.packs.open_standard()
@@ -144,14 +148,20 @@ func _p05() -> void:
 	_complete("p05_no_missing_no_fabrication")
 
 func _p06() -> void:
-	print("[p06 shipped config: no threshold -> guarantee dormant]")
+	print("[p06 shipped config: threshold 3 -> 3 all-duplicate packs, then a guaranteed missing card]")
 	var app = _app("p06")
 	var e = app.economy
+	var cfg: Dictionary = e.config.collection_config().get("pity", {})
+	_ok(cfg.get("threshold") == 3 and cfg.get("first_sprint_threshold") == 1, "shipped pity config %s" % str(cfg))
 	_own_all_but(app, ["s7_c7"])
-	for _i in range(25):
+	var due: Array = []
+	for _i in range(3):
+		due.append(e.pack_pity.guarantee_due(e.collection))
 		e.packs.open_standard()
-	_ok(e.pack_pity.threshold() == 0 and not e.pack_pity.guarantee_due() and not e.config.collection_config().has("pity"), "no configured threshold, never due (count %d)" % e.pack_pity.count())
-	_complete("p06_shipped_threshold_absent")
+	_ok(e.pack_pity.threshold(e.collection) == 3 and due == [false, false, false] and e.pack_pity.count() == 3 and e.pack_pity.guarantee_due(e.collection), "3 all-duplicate packs -> due exactly at 3")
+	var drawn: Array = e.packs.open_standard()
+	_ok(drawn.has("s7_c7") and e.collection.owned("s7_c7") == 1 and e.pack_pity.count() == 0, "4th pack holds the missing card %s; counter reset" % str(drawn))
+	_complete("p06_shipped_threshold")
 
 func _p07() -> void:
 	print("[p07 C008 rollback restores the pity counter exactly]")
@@ -183,12 +193,65 @@ func _p09() -> void:
 	var a = _app("p09a", 4242)
 	var b = _app("p09b", 4242)
 	b.economy.packs.pity = null   # pre-C007R behaviour
+	_own_set(a, 1)
+	_own_set(b, 1)
 	var da: Array = a.economy.packs.open_premium() + a.economy.packs.open_standard()
 	var db: Array = b.economy.packs.open_premium() + b.economy.packs.open_standard()
 	_ok(da == db and a.economy.packs._rng.state == b.economy.packs._rng.state and a.economy.collection.snapshot() == b.economy.collection.snapshot(), "same draws, same RNG state, same Collection")
 	_complete("p09_rng_and_order_unchanged_when_not_due")
 
+func _p10() -> void:
+	print("[p10 First Collection Sprint: while Set 1 is incomplete a pack without a NEW Set 1 card makes the next one guarantee it]")
+	var app = _app("p10", 9001)
+	var e = app.economy
+	_ok(e.pack_pity.focus_set(e.collection) == 1 and e.pack_pity.threshold(e.collection) == 1, "fresh profile: sprint on Set 1, threshold 1")
+	var guaranteed := 0
+	var dud_then_none := 0
+	var any_new_kept_count := false
+	var counter_ok := true
+	var n := 0
+	while not e.collection.is_set_complete(1) and n < 60:
+		var due: bool = e.pack_pity.guarantee_due(e.collection)
+		var missing1: Array = e.collection.all_card_ids().filter(func(c): return e.collection.card_set(c) == 1 and e.collection.owned(c) == 0)
+		var owned_any: Dictionary = e.collection.snapshot()["owned"].duplicate()
+		var drawn: Array = e.packs.open_premium() if n % 4 == 3 else e.packs.open_standard()
+		var got1 := drawn.any(func(c): return missing1.has(c))
+		if due:
+			guaranteed += 1
+			if not got1:
+				dud_then_none += 1
+		# a NEW card of another set does not reset the sprint counter
+		if not got1 and drawn.any(func(c): return e.collection.card_set(c) != 1 and not owned_any.has(c)) and e.pack_pity.count() > 0:
+			any_new_kept_count = true
+		if e.pack_pity.count() != (0 if got1 else 1):
+			counter_ok = false
+		n += 1
+	_ok(e.collection.is_set_complete(1) and guaranteed > 0 and dud_then_none == 0, "Set 1 complete after %d packs; %d guaranteed packs all held a missing Set 1 card" % [n, guaranteed])
+	_ok(counter_ok and any_new_kept_count, "counter: Set 1 card -> 0, otherwise 1 (never 2 at threshold 1); a NEW non-Set-1 card does not reset it")
+	_ok(e.pack_pity.focus_set(e.collection) == 0 and e.pack_pity.threshold(e.collection) == 3, "after Set 1: plain rule, threshold 3")
+	_complete("p10_first_sprint_set1")
+
+func _p11() -> void:
+	print("[p11 sprint guarantee is legible: Collection shows NEW CARD GUARANTEED NEXT PACK only when due]")
+	var app = _app("p11")
+	var e = app.economy
+	var due0: bool = e.pack_pity.guaranteed_next(e.collection)
+	_own_all_but(app, ["s1_c8"])
+	e.pack_pity.on_opened(false)
+	var due1: bool = e.pack_pity.guaranteed_next(e.collection)
+	e.packs.open_standard()
+	_ok(not due0 and due1 and e.collection.is_set_complete(1) and not e.pack_pity.guaranteed_next(e.collection), "fresh: not due; 1 Set-1 dud -> due; guaranteed pack completes Set 1 (s1_c8)")
+	var src := FileAccess.get_file_as_string("res://scripts/ui/collection/collection_screen.gd")
+	_ok(src.contains("guaranteed_next(e.collection)"), "Collection copy reads the sprint-aware due state")
+	_complete("p11_sprint_legible_ui")
+
 # ------------------------------------------------------------------ helpers ----
+
+## Own every Set `n` card through the real authority (ends the First Collection Sprint for n = 1).
+func _own_set(app, n: int) -> void:
+	for cid in app.economy.collection.all_card_ids():
+		if app.economy.collection.card_set(cid) == n and app.economy.collection.owned(cid) == 0:
+			app.economy.collection.add_card(cid)
 
 func _uniq(tag: String) -> String:
 	var p := "user://m43master_c007r_%s_%d.save" % [tag, Time.get_ticks_usec()]

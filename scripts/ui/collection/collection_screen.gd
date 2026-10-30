@@ -167,7 +167,7 @@ static func _refresh_album(p: BasePopup, e) -> void:
 			unique += 1
 	var summary := UiText.t("COLLECTION_SUMMARY", [unique, e.collection.all_card_ids().size(), e.collection.completed_set_count(), 15])
 	# M43-C007R (R07-005): honest pity state, only when a configured guarantee is due.
-	if e.pack_pity != null and e.pack_pity.guaranteed_next() and not e.collection.first_missing_eligible_card().is_empty():
+	if e.pack_pity != null and e.pack_pity.guaranteed_next(e.collection) and not e.collection.first_missing_eligible_card().is_empty():
 		summary += "\n" + UiText.t("COLLECTION_PITY_NEXT")
 	(p.find_child("Summary", true, false) as Label).text = summary
 	var waiting: int = e.pending_packs.size()
