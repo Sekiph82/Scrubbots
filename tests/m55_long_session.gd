@@ -288,21 +288,45 @@ func _drive(host) -> Dictionary:
 	var scheduler = host.get_scheduler()
 	var i := 0
 	var frames := 0
+	# Plan clicks follow the proof kernel's serial order: each click, then tick to full
+	# quiescence (_quiet). "No live assignment" alone also holds between two dispatch waves,
+	# so the next click could land before the runtime settled. A rejected click is reported.
+	for c in clicks:
+		if host.get_completion().is_terminal():
+			break
+		var r: Dictionary = input.activate_front(int(c) - 1)
+		if not r.get("ok", false):
+			return {"frames": frames, "clicks": i, "rejected": "plan click %d/%d (column %d) rejected %s, slots %s" % [i + 1, clicks.size(), int(c), str(r), str(_slot_states(slots, scheduler))]}
+		i += 1
+		while frames < 200000 and not _quiet(host) and not host.get_completion().is_terminal():
+			rt.tick(DT)
+			frames += 1
 	while frames < 200000 and not host.get_completion().is_terminal():
-		if slots.rightmost_empty_index() != -1:
-			if not clicks.is_empty():
-				# Plan clicks follow the proof kernel's serial order: next click only once the
-				# runtime is quiet (no live assignment, no moving bot), as m52 _play_clicks does.
-				if scheduler.live_assignment_count() == 0 and not _any_moving(host.get_agent_layer()) \
-						and i < clicks.size() and input.activate_front(int(clicks[i]) - 1).get("ok", false):
-					i += 1
-			else:
-				for col in range(host.get_supply().get_column_count()):
-					if input.activate_front(col).get("ok", false):
-						break
+		if clicks.is_empty() and slots.rightmost_empty_index() != -1:
+			for col in range(host.get_supply().get_column_count()):
+				if input.activate_front(col).get("ok", false):
+					break
 		rt.tick(DT)
 		frames += 1
-	return {"frames": frames, "clicks": i}
+	return {"frames": frames, "clicks": i, "rejected": ""}
+
+## Runtime quiescence: no live assignment, no moving bot and every occupied slot WAITING
+## (nothing can change until the next click).
+func _quiet(host) -> bool:
+	var scheduler = host.get_scheduler()
+	if scheduler.live_assignment_count() != 0 or _any_moving(host.get_agent_layer()):
+		return false
+	var slots = host.get_slots()
+	for k in range(slots.get_slot_count()):
+		if slots.is_occupied(k) and not scheduler.is_slot_waiting(k):
+			return false
+	return true
+
+func _slot_states(slots, scheduler) -> Array:
+	var out: Array = []
+	for k in range(slots.get_slot_count()):
+		out.append("C%d x%d %s" % [slots.get_color_id(k), slots.get_remaining(k), "WAITING" if scheduler.is_slot_waiting(k) else "LIVE"] if slots.is_occupied(k) else "empty")
+	return out
 
 func _any_moving(agent_layer) -> bool:
 	if agent_layer == null:
@@ -352,7 +376,7 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 		total_frames += d["frames"]
 		total_clears += clears["events"]
 		if terminals != ["WON"]:
-			_ok(false, "level %d terminal %s after %d frames (active left %d)" % [n, str(terminals), d["frames"], host.get_board().count_cells_by_state(BoardState.CellState.ACTIVE)])
+			_ok(false, "level %d terminal %s after %d frames, %d plan clicks (active left %d) %s" % [n, str(terminals), d["frames"], d["clicks"], host.get_board().count_cells_by_state(BoardState.CellState.ACTIVE), d["rejected"]])
 			break
 		won += 1
 		# 011: exactly one RESULTS route per terminal; one clear per cell.
