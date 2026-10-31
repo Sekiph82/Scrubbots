@@ -14,21 +14,22 @@ You are the orchestrator for one job. You spawn every agent, keep the job's
 ## The loop
 
 ```
-TASKS.md item → spec-writer → builder → [rules, code, tests] → WAIT FOR ALL
-                                 ▲                                  │
-                                 └──── any CHANGES: resume builder ◄┤
-                                                                    ▼ all PASS
-              push to origin/main + remove worktree ◄─ APPROVE ─ approver ─ ESCALATE → owner question
+TASKS.md item → spec-writer → builder → ONE reviewer
+                                 ▲              │
+                                 └── CHANGES: resume builder
+                                                ▼ PASS
+              push to origin/main + remove worktree ◄─ orchestrator writes decision.md (APPROVE / ESCALATE → owner question)
 ```
+
+Owner 2026-10-31: ONE reviewer per round (not three) and NO approver agent; the
+orchestrator (Claude) writes `decision.md` itself. Saves usage.
 
 | Step   | Agent (`subagent_type`) | Writes                                     |
 | ------ | ----------------------- | ------------------------------------------ |
 | spec   | `spec-writer`           | `spec.md`                                  |
 | build  | `builder`               | `build.md` + commits on `factory/<job-id>` |
-| review | `reviewer-rules`        | `round-N/review-rules.md`                  |
-|        | `reviewer-code`         | `round-N/review-code.md`                   |
-|        | `reviewer-tests`        | `round-N/review-tests.md`                  |
-| decide | `approver`              | `decision.md`                              |
+| review | `reviewer-code` (code/data/test jobs) or `reviewer-rules` (TASKS/docs-only jobs) | `round-N/review.md` |
+| decide | orchestrator (no agent) | `decision.md`                              |
 
 `MAX_RESUMES = 2` (at most 3 review rounds). Run ONE job at a time.
 
@@ -39,7 +40,7 @@ may be dirty with owner/editor files: never commit, reset or clean them).
 
 ```
 <repo>/factory/jobs/<job-id>/job.json, spec.md, build.md, rework-<k>.md,
-                             round-<N>/review-{rules,code,tests}.md, decision.md
+                             round-<N>/review.md, decision.md
 %LOCALAPPDATA%/ScrubBotsFactoryWT/<job-id>/  the job's worktree on factory/<job-id>
                              (never on the Desktop; owner 2026-10-30)
 ```
@@ -49,7 +50,7 @@ copied into the commit (see Merge).
 
 job.json: `{ "id", "task": "<TASKS.md id or feature>", "branch", "worktree",
 "stage": spec|build|review|approve|merged|escalated, "round",
-"reviews": { "rules", "code", "tests" } }` — rewrite the whole file on change.
+"review": "pending"|"PASS"|"CHANGES" }` — rewrite the whole file on change.
 
 Every agent prompt starts with:
 `Job folder: <repo>/factory/jobs/<job-id>/. Worktree: <worktree>. Branch: factory/<job-id>. Task: <task>.`
@@ -111,18 +112,23 @@ First line of `build.md`: `STATUS: READY` → next review round;
 `STATUS: BLOCKED` → **Escalate**.
 
 ### Review round N
-1. `stage: review`, `round: N`, reviews `pending`; create `round-<N>/`.
-2. Spawn the three reviewers **in one message** with `<paths> Review round N.`
-3. **WAIT FOR ALL** three files. Record each first-line verdict in job.json as
-   it lands. A missing file or non-verdict first line → stop and report.
-4. All PASS → **Approve**. Any CHANGES with resumes left → `stage: build`,
-   `SendMessage` to `builder-<job-id>`: `Round N reviews are in <job folder>/round-<N>/. Address every VERDICT: CHANGES finding, commit, and update build.md for round N+1.`
+1. `stage: review`, `round: N`, review `pending`; create `round-<N>/`.
+2. Spawn ONE reviewer with `<paths> Review round N. Write round-<N>/review.md (first line VERDICT: PASS or VERDICT: CHANGES).`
+   Code/data/test jobs: `reviewer-code`, told to also check the CLAUDE.md rules it touches and to re-run only the 1-2 suites the spec names. TASKS/docs-only jobs: `reviewer-rules`.
+3. Wait for the file and record its first-line verdict in job.json. A missing file or non-verdict first line → stop and report.
+4. PASS → **Approve**. CHANGES with resumes left → `stage: build`,
+   `SendMessage` to `builder-<job-id>`: `Round N review is in <job folder>/round-<N>/review.md. Address every finding, commit, and update build.md for round N+1.`
    → **Build check**. No resumes left → write `decision.md` as
-   `ESCALATE\n\nReview rounds exhausted. Outstanding CHANGES in round-<N>/ from: <reviewers>.` → **Escalate**.
+   `ESCALATE\n\nReview rounds exhausted. Outstanding CHANGES in round-<N>/review.md.` → **Escalate**.
 
 ### Approve
-`stage: approve`. Spawn `approver` with `<paths> Final round: N.`
-First line `APPROVE` → **Merge**; `ESCALATE` → **Escalate**.
+`stage: approve`. No approver agent: the orchestrator checks build.md + review.md
+and writes `decision.md` itself (`APPROVE` with a 2-3 line reason, or `ESCALATE`).
+`APPROVE` → **Merge**; `ESCALATE` → **Escalate**.
+
+No CI run, phone build (APK/IPA) or long suite (m55, real_play_levels) unless the
+job adds/changes a CI suite or can affect it; never build/install phone builds
+without asking the owner (owner 2026-10-31).
 
 ### Merge (push from the worktree; never touch the dirty main checkout)
 ```bash
