@@ -255,8 +255,9 @@ func _preview_non_interactive() -> void:
 		ok = ok and rows[0].mouse_filter == Control.MOUSE_FILTER_STOP
 		for r in [1, 2]:
 			ok = ok and rows[r].mouse_filter == Control.MOUSE_FILTER_IGNORE and rows[r].gui_input.get_connections().is_empty()
-			ok = ok and rows[r].modulate.r < 0.9   # visibly distinct (dimmed)
-	_ok(ok, "only fronts receive input; preview rows IGNORE, unconnected and visibly dimmed")
+			var pt = rows[r].get_node("Tile")
+			ok = ok and rows[r].modulate == Color(1, 1, 1, 1) and (pt.is_empty_tile() or (pt.is_preview() and not pt.is_active_style()))   # original colour, no rim
+	_ok(ok, "only fronts receive input; preview rows IGNORE, unconnected, original colour (no dim, no rim)")
 	# A synthetic press/release on a preview panel never activates anything.
 	var h = _host()
 	var before: Array = h.get_slots().snapshot()

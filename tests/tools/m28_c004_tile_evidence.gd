@@ -98,8 +98,6 @@ func _gallery(out_dir: String) -> void:
 			t2.set_batch(Color.html(_palette[6]), "30")
 			t2.set_active(st[1])
 			t2.set_preview(st[2])
-			if st[2]:
-				t2.modulate = Color(0.62, 0.62, 0.70, 0.85)
 		var l := Label.new()
 		l.text = st[0]
 		l.position = t2.position + Vector2(0, 128)

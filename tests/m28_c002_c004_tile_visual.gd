@@ -178,8 +178,16 @@ func _standalone_cases() -> void:
 	var ftile: ColorBatchTile = fp[0].get_node("Tile")
 	var ptile: ColorBatchTile = fp[1].get_node("Tile")
 	_ok(not ftile.is_preview() and ptile.is_preview() and ftile.is_active_style() and not ptile.is_active_style()
-		and fp[0].modulate.a > fp[1].modulate.a and fp[0].modulate.r > fp[1].modulate.r,
-		"front tile primary (full strength, rim); preview tile lower emphasis (dimmed, no rim)")
+		and fp[0].modulate == Color(1, 1, 1, 1) and fp[1].modulate == Color(1, 1, 1, 1),
+		"front tile primary (rim); preview tile no rim; neither row is recoloured (modulate white)")
+	# Preview rows show the ORIGINAL batch colour (column 0 row r = color_id r, see _supply).
+	var pv_ok := true
+	for r in [1, 2]:
+		var want := Color.html(_palette[r])
+		var t: ColorBatchTile = fp[r].get_node("Tile")
+		var fsb := t.get_face_panel().get_theme_stylebox("panel") as StyleBoxFlat
+		pv_ok = pv_ok and fsb.bg_color == want and t.get_face_color() == want and fp[r].modulate == Color(1, 1, 1, 1)
+	_ok(pv_ok, "preview rows 1/2: face bg == canonical batch colour, panel modulate exactly white/opaque")
 	sp.enable_front_input()
 	_ok(fp[0].mouse_filter == Control.MOUSE_FILTER_STOP and fp[1].mouse_filter == Control.MOUSE_FILTER_IGNORE and fp[2].mouse_filter == Control.MOUSE_FILTER_IGNORE
 		and fp[1].gui_input.get_connections().is_empty() and ptile.mouse_filter == Control.MOUSE_FILTER_IGNORE and ftile.mouse_filter == Control.MOUSE_FILTER_IGNORE,

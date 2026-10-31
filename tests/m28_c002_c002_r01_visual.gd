@@ -302,7 +302,7 @@ func _accepted_styling_preserved() -> void:
 	var sp = s.get_supply_panel()
 	# C004: the front rim / ACTIVE rim are carried by the shared ColorBatchTile (was a per-panel StyleBox).
 	var ftile = sp.get_column_row_panels(0)[0].get_node("Tile")
-	_ok(ftile.is_active_style() and not sp.get_column_row_panels(0)[1].get_node("Tile").is_active_style() and sp.get_column_row_panels(0)[1].modulate == Color(0.62, 0.62, 0.70, 0.85), "S5-A cyan front rim, dimmed previews")
+	_ok(ftile.is_active_style() and not sp.get_column_row_panels(0)[1].get_node("Tile").is_active_style() and sp.get_column_row_panels(0)[1].modulate == Color(1, 1, 1, 1), "S5-A cyan front rim, previews in original colour (no dim, no rim)")
 	_drive(10)
 	var active_ok := false
 	for v in s.get_five_slot_strip().get_slot_views():

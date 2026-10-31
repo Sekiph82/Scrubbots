@@ -129,7 +129,7 @@ func bind_player_snapshot(column_snapshots: Array, colors: Array = []) -> void:
 		var snap: Dictionary = column_snapshots[c] if c < column_snapshots.size() and column_snapshots[c] is Dictionary else {}
 		var preview: Array = snap.get("preview", []) if snap.get("preview", []) is Array else []
 		# Front is selectable only when a live front batch exists; an exhausted-column
-		# front is disabled (presentation dim + input ignored).
+		# front is disabled (input ignored).
 		_front_enabled[c] = snap.get("front", null) is Dictionary
 		for r in range(VISIBLE_ROWS):
 			_bind_row(_columns[c]["rows"][r], preview[r] if r < preview.size() else null, r == 0, colors)
@@ -294,10 +294,10 @@ func _bind_row(row: Dictionary, batch, front: bool, colors: Array) -> void:
 	swatch.color = col
 	tile.set_batch(col, "%d" % int(batch.get("robot_count", 0)))
 	tile.set_preview(not front)
-	# Front = the only selectable batch: full strength + cyan rim. Preview rows are visibly
-	# secondary (dimmed, no rim) and never interactive.
+	# Front = the only selectable batch: cyan rim. Preview rows keep the original batch
+	# colour (no recolouring), carry no rim and are never interactive.
 	tile.set_active(front)
-	panel.modulate = Color(1, 1, 1, 1) if front else Color(0.62, 0.62, 0.70, 0.85)
+	panel.modulate = Color(1, 1, 1, 1)
 
 ## Test/evidence accessor: displayed count text of a row (column, row).
 func get_row_count_text(column: int, row: int) -> String:
