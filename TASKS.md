@@ -6,6 +6,17 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 
 ## Autonomous Queue
 <!-- Maintained by the factory loop (CLAUDE.md §0D). One row per item: `- READY|OWNER|DONE <TASK-ID> — <one line>`. First READY row is next. -->
+- READY SB-POLISH-001 — Supply grid: rows below the top row are dimmed; owner: all three rows must show the original batch colours (the 8 orange under the 14 white must look like the 16 orange on top); remove the dimming, keep any front-row affordance by outline/raise, never by recolouring (owner playtest 2026-10-31)
+- READY SB-POLISH-002 — Gift Meter: target is always the NEXT milestone of the cycle 1, 5, 10, 25, 100, 250, 500, 1000, then repeat from 1 (bar 0/1, x/5 ..., not 898/1,000); gift value scales with the milestone (owner: "nerdeyse hic hediye vermiyor"); fix the Gifts list raw key REWARD_guaranteed_new_fallback_sb; values in data/config/economy_rewards_v1.json, Claude proposes them (owner pre-approved, existing currencies only) (owner playtest 2026-10-31)
+- READY SB-POLISH-003 — Booster activation VFX: Tornado / +1 Slot / Random / Selector currently apply instantly with no effect (Tornado colours just vanish, +1 Slot 5->6 with no effect); add a good-looking activation effect per booster, presentation only, no gameplay change (owner playtest 2026-10-31)
+- READY SB-POLISH-004 — Results CLEAN NEXT button is sometimes hard to press: investigate hit area, overlap or disabled state and fix (owner playtest 2026-10-31)
+- READY SB-POLISH-005 — Robots screen: rows 1 (Scrubby, ACTIVE) and 2 (Moppy, UNLOCK 250) cannot be tapped to open their detail card; make them open details like rows 3+ (owner playtest 2026-10-31)
+- READY SB-POLISH-006 — Home HUD Scrub Bucks "+" opens the whole Shop; open a focused Scrub Bucks popup instead (like the Heart "+" popup) showing only SB offers (owner playtest 2026-10-31)
+- READY SB-POLISH-007 — Achievements grant rewards on completion; expand from 8 to 40-50 data-driven achievements, extensible over time; Claude proposes the list and reward values (owner pre-approved), economy lock: existing currencies only (owner playtest 2026-10-31)
+- READY SB-POLISH-008 — Boot sequence: SCRUBBOTS logo splash (done, factory 082), then an Akilta logo screen (assets/brand/akilta-wordmark.svg, about 1.5 s with a fade), then the opening video (owner playtest 2026-10-31)
+- OWNER SB-POLISH-009 — Home Scrubby gestures (wave, bow, turn, full_turn) become owner-made Flow videos played between 5-6 s still holds, still pose = the video's first frame, converted to .ogv 720p; trimmed scrubby_wave.mp4 is in the owner checkout flow_videos/ (not committed) (waits for bow/turn/full_turn videos) (owner playtest 2026-10-31)
+- READY SB-POLISH-010 — Collection card pack opening animation redesign (owner: "cok cirkin"): new master, then implementation; see docs/ANIMATION_PLACEMENT_ANALYSIS_V1.md section 3, item 2 (owner playtest 2026-10-31)
+- READY SB-POLISH-011 — Character animations on WIN / LOSE / Need a Hand / Level Intro per docs/ANIMATION_PLACEMENT_ANALYSIS_V1.md (A1-A4) (owner playtest 2026-10-31)
 - DONE REFRESH-QUEUE — queue rebuilt 2026-10-22 from all open `- [ ]` items; §0D gates applied (visual/F5/phone/ChatGPT/Actions are not blockers)
 - DONE SB-M50-BOARD-001 — closed 2026-10-22: CI run 39785950814 success (head 21c97572, M50S 10/10), fix c22c79e6; owner F5 2026-10-16, §0D.1/§0D.4
 - DONE SB-M50-002 — closed 2026-10-22: CI run 39785950814 success (head 21c97572, M50S 10/10, m50_color_symbols s05/s06 assert Supply+Slot shapes); board part e8a7e75b, owner F5 2026-10-16, §0D.2/§0D.4
@@ -146,6 +157,21 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 
 ## Questions for Şekip
 <!-- One line per question the loop truly cannot decide (CLAUDE.md §0D.5). Empty = nothing needed. -->
+- RANKS unlocks at L40 but only 30 campaign levels exist (owner playtest 2026-10-31): move the Ranks unlock to L30?
+
+## Owner Polish 2026-10-31
+<!-- Owner phone playtest of all 30 levels (all WON, "oyun akici"); queued as SB-POLISH-001..011 in the Autonomous Queue. -->
+- [ ] SB-POLISH-001 — Supply grid: rows below the top row are dimmed; owner: all three rows must show the original batch colours (the 8 orange under the 14 white must look like the 16 orange on top); remove the dimming, keep any front-row affordance by outline/raise, never by recolouring
+- [ ] SB-POLISH-002 — Gift Meter: target is always the NEXT milestone of the cycle 1, 5, 10, 25, 100, 250, 500, 1000, then repeat from 1 (bar 0/1, x/5 ..., not 898/1,000); gift value scales with the milestone (owner: "nerdeyse hic hediye vermiyor"); fix the Gifts list raw key REWARD_guaranteed_new_fallback_sb; values in data/config/economy_rewards_v1.json, Claude proposes them (owner pre-approved, existing currencies only)
+- [ ] SB-POLISH-003 — Booster activation VFX: Tornado / +1 Slot / Random / Selector currently apply instantly with no effect (Tornado colours just vanish, +1 Slot 5->6 with no effect); add a good-looking activation effect per booster, presentation only, no gameplay change
+- [ ] SB-POLISH-004 — Results CLEAN NEXT button is sometimes hard to press: investigate hit area, overlap or disabled state and fix
+- [ ] SB-POLISH-005 — Robots screen: rows 1 (Scrubby, ACTIVE) and 2 (Moppy, UNLOCK 250) cannot be tapped to open their detail card; make them open details like rows 3+
+- [ ] SB-POLISH-006 — Home HUD Scrub Bucks "+" opens the whole Shop; open a focused Scrub Bucks popup instead (like the Heart "+" popup) showing only SB offers
+- [ ] SB-POLISH-007 — Achievements grant rewards on completion; expand from 8 to 40-50 data-driven achievements, extensible over time; Claude proposes the list and reward values (owner pre-approved), economy lock: existing currencies only
+- [ ] SB-POLISH-008 — Boot sequence: SCRUBBOTS logo splash (done, factory 082), then an Akilta logo screen (assets/brand/akilta-wordmark.svg, about 1.5 s with a fade), then the opening video
+- [ ] SB-POLISH-009 — Home Scrubby gestures (wave, bow, turn, full_turn) become owner-made Flow videos played between 5-6 s still holds, still pose = the video's first frame, converted to .ogv 720p; trimmed scrubby_wave.mp4 is in the owner checkout flow_videos/ (not committed) (waits for bow/turn/full_turn videos)
+- [ ] SB-POLISH-010 — Collection card pack opening animation redesign (owner: "cok cirkin"): new master, then implementation; see docs/ANIMATION_PLACEMENT_ANALYSIS_V1.md section 3, item 2
+- [ ] SB-POLISH-011 — Character animations on WIN / LOSE / Need a Hand / Level Intro per docs/ANIMATION_PLACEMENT_ANALYSIS_V1.md (A1-A4)
 
 ## Project Status
 
