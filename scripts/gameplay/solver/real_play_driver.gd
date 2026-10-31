@@ -122,7 +122,17 @@ static func play_on_host(host, clicks: Array, dt: float = CANONICAL_DT, max_fram
 		"final": {"active": active, "supply_exhausted": supply.is_exhausted(), "slots_empty": slots.occupied_count() == 0,
 			"terminal": String(completion.get_state())},
 		"stuck": stuck or (completion.is_terminal() and not completion.is_won()),
+		"slots": _slot_state(slots),
 	}
+
+## Per-slot state at the stop (failure diagnostics; colorId is the level's local palette index).
+static func _slot_state(slots) -> Array:
+	var out: Array = []
+	for k in range(slots.get_slot_count()):
+		out.append({"index": k, "occupied": slots.is_occupied(k), "state": String(slots.get_state(k)),
+			"batchId": slots.get_batch_id(k), "colorId": slots.get_color_id(k),
+			"remaining": slots.get_remaining(k), "committed": slots.get_committed(k)})
+	return out
 
 ## Nothing can change until the next click: no live assignment, no moving bot, every
 ## occupied slot WAITING.
@@ -221,41 +231,50 @@ static func order_of(entry_id: String) -> int:
 				_orders[e.id] = e.order
 	return int(_orders.get(entry_id, -1))
 
-## Build the level's host from an AppState frontier (temp save) full-rect in `parent`, let it
-## lay out for one frame (runtime clock stopped), play it, free everything. A coroutine: await it.
-static func play_level(parent: Node, entry_id: String, clicks: Array, dt: float = CANONICAL_DT, max_frames: int = MAX_FRAMES, rollout_plan = null) -> Dictionary:
-	var order := order_of(entry_id)
-	if order < 1:
-		return {"won": false, "error": "not_in_catalog %s" % entry_id}
-	var path := "user://real_play_%d_%d.save" % [order, Time.get_ticks_usec()]
-	var app = AppState.new(path)
-	for n in range(1, order):
-		app.progression.record_win(n)
+## Build the level's host full-rect in `parent`, let it lay out for one frame (runtime clock
+## stopped), play it, free everything. A coroutine: await it. `source` is a catalog entry id
+## (host built from an AppState frontier on a temp save) or a file source Dictionary
+## {level_path, supply_plan_path} (tools/real_play_file.gd: the host's no-AppState path with
+## those files, nothing registered in the catalog); play is identical from build() on.
+static func play_level(parent: Node, source, clicks: Array, dt: float = CANONICAL_DT, max_frames: int = MAX_FRAMES, rollout_plan = null) -> Dictionary:
 	var h = ProductionGameplayHost.new()
-	h.app_state = app
+	var path := ""
+	if source is Dictionary:
+		h.level_path = String(source["level_path"])
+		h.supply_plan_path = String(source["supply_plan_path"])
+	else:
+		var order := order_of(source)
+		if order < 1:
+			h.free()
+			return {"won": false, "error": "not_in_catalog %s" % source}
+		path = "user://real_play_%d_%d.save" % [order, Time.get_ticks_usec()]
+		var app = AppState.new(path)
+		for n in range(1, order):
+			app.progression.record_win(n)
+		h.app_state = app
 	h.auto_build = false
 	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	parent.add_child(h)
 	var out: Dictionary
-	if not h.build() or h.launch_entry_id != entry_id:
-		out = {"won": false, "error": "host build %s -> %s %s" % [entry_id, h.launch_entry_id, h.get_build_error()]}
+	if not h.build() or (not path.is_empty() and h.launch_entry_id != source):
+		out = {"won": false, "error": "host build %s -> %s %s" % [str(source), h.launch_entry_id, h.get_build_error()]}
 	else:
 		h.get_runtime().set_process(false)
 		await parent.get_tree().process_frame
 		out = play_on_host(h, clicks, dt, max_frames, rollout_plan)
 	h.free()
 	for suffix in ["", ".bak", ".tmp"]:
-		if FileAccess.file_exists(path + suffix):
+		if not path.is_empty() and FileAccess.file_exists(path + suffix):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(path + suffix))
 	return out
 
 ## `clicks` at every dt of `dts` (default: every sensitivity dt); `results` maps dt label ->
-## play result. A coroutine.
-static func verify(parent: Node, entry_id: String, clicks: Array, dts: Array = SENSITIVITY_DTS) -> Dictionary:
+## play result. `source` as in play_level. A coroutine.
+static func verify(parent: Node, source, clicks: Array, dts: Array = SENSITIVITY_DTS) -> Dictionary:
 	var results := {}
 	var all := true
 	for dt in dts:
-		var r: Dictionary = await play_level(parent, entry_id, clicks, dt)
+		var r: Dictionary = await play_level(parent, source, clicks, dt)
 		results[dt_label(dt)] = r
 		all = all and bool(r.get("won", false))
 	return {"won": all, "results": results}
@@ -272,7 +291,7 @@ static func verify(parent: Node, entry_id: String, clicks: Array, dts: Array = S
 ## (node budget hit: inconclusive) or EXHAUSTED (whole space explored, no win: unwinnable for
 ## every column order under the model). A 1/60-only win found on the way is returned as
 ## SOLVED with robust false when nothing robust exists (owner question).
-static func search(parent: Node, entry_id: String, plan: Array, node_budget: int = NODE_BUDGET) -> Dictionary:
+static func search(parent: Node, source, plan: Array, node_budget: int = NODE_BUDGET) -> Dictionary:
 	plan = plan.map(func(c): return int(c))
 	var nodes := 0
 	var robust_rejects := 0
@@ -287,10 +306,10 @@ static func search(parent: Node, entry_id: String, plan: Array, node_budget: int
 			return _no_robust_win("UNWINNABLE_WITHIN_BUDGET", nodes, robust_rejects, canonical_only)
 		var prefix: Array = buckets[k].pop_front()
 		nodes += 1
-		var r: Dictionary = await play_level(parent, entry_id, prefix, CANONICAL_DT, MAX_FRAMES, plan)
+		var r: Dictionary = await play_level(parent, source, prefix, CANONICAL_DT, MAX_FRAMES, plan)
 		if r.get("won", false):
 			# The rollout already is the canonical run (replay is deterministic); check the others.
-			if (await verify(parent, entry_id, r["taken"], [1.0 / 30.0, 1.0 / 120.0]))["won"]:
+			if (await verify(parent, source, r["taken"], [1.0 / 30.0, 1.0 / 120.0]))["won"]:
 				return {"status": "SOLVED", "clicks": r["taken"], "nodes": nodes, "robust": true, "robust_rejects": robust_rejects}
 			robust_rejects += 1
 			if canonical_only.is_empty():
