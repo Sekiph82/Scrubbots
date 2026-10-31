@@ -56,7 +56,10 @@ func _s01() -> void:
 	await _frames(2)
 	_root.get_home().scrub_bucks_purchase_requested.emit()
 	await _frames(2)
-	_ok(_top_id() == "shop" and String(_top().context.get("source", "")) == "home_sb_plus", "Home SB + -> same Shop (source kept)")
+	_ok(_top_id() == "scrub_bucks", "Home SB + -> focused Scrub Bucks popup (SB-POLISH-006)")
+	_tap("shop")
+	await _frames(2)
+	_ok(_top_id() == "shop" and String(_top().context.get("source", "")) == "home_sb_plus" and _root.get_modal_stack().ids() == ["shop"], "MORE IN SHOP -> same Shop (source kept)")
 	_complete("s01_entries_open_shop")
 
 func _s02() -> void:

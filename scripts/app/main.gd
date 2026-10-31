@@ -157,7 +157,7 @@ func _ready() -> void:
 		_acq.bind(_modals, app_state.economy, app_state.actions, shop)
 	# SB-M43-032 / 036: Home Heart + -> canonical Life; Home SB + -> canonical Shop intent.
 	_home.hearts_purchase_requested.connect(func(): open_life("home_heart_plus"))
-	_home.scrub_bucks_purchase_requested.connect(func(): _acq.open_shop({"source": "home_sb_plus"}))
+	_home.scrub_bucks_purchase_requested.connect(func(): _acq.open_scrub_bucks("home_sb_plus"))
 	# M43 destinations from the Home shortcut panels (SB-M43-078 Shop, ...).
 	_home.shortcut_requested.connect(_on_home_shortcut)
 	_home.nav_requested.connect(_on_home_nav)

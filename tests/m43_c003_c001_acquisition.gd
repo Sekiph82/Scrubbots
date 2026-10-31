@@ -399,6 +399,10 @@ func _c13_home_sb_plus_shop() -> void:
 	var got: Array = []
 	_root.shop.shop_requested.connect(func(t): got.append(t))
 	await _click(_center(home.find_child("ScrubBucksPlus", true, false)))
+	# SB-POLISH-006: the "+" first opens the focused Scrub Bucks popup; MORE IN SHOP hands off.
+	_ok(got.is_empty() and _stack().ids() == ["scrub_bucks"], "routed tap -> focused Scrub Bucks popup, no Shop ticket yet")
+	_press(_stack().top(), "shop")
+	await _settle()
 	var open: Array = _root.shop.open_tickets()
 	_ok(got.size() == 1 and got[0]["source"] == "home_sb_plus" and open.size() == 1 and _stack().ids() == ["shop"], "routed tap -> Shop ticket (source home_sb_plus), explicit Shop state")
 	# M43-C006 replaced the C003 coming-soon placeholder with the real Shop: still no SB pack is

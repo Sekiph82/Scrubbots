@@ -1,8 +1,8 @@
 extends RefCounted
 ## ShopScreen — preload (res://scripts/ui/shop/shop_screen.gd).
 ##
-## M43-C006 (SB-M43-078..089) — the real Shop destination, opened by Home SHOP, Home Scrub Bucks
-## "+" and every insufficient-SB handoff (ShopHandoff ticket). One BasePopup in the approved
+## M43-C006 (SB-M43-078..089) — the real Shop destination, opened by Home SHOP, the Home Scrub
+## Bucks popup's MORE IN SHOP (SB-POLISH-006) and every insufficient-SB handoff (ShopHandoff ticket). One BasePopup in the approved
 ## popup family, every value live:
 ##
 ##   HEARTS       +1 Heart / full refill            -> ProductionActionFacade.buy_heart / refill_hearts

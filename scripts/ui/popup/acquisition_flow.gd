@@ -4,6 +4,7 @@ extends RefCounted
 ## M43-C003 — the ONE controller for the acquisition surfaces, built on the M43-C002
 ## BasePopup / ModalStack (no second popup or modal authority):
 ##   Life           open_life(source)        SB-M43-030..035 (Home Heart + / zero-Heart gate)
+##   Scrub Bucks    open_scrub_bucks(source) SB-POLISH-006 (Home SB +: balance + SB packs only)
 ##   Booster Acquire open_booster(host, id)  SB-M43-037..044 (one data-driven component)
 ##   Shop handoff   open_shop(context)       SB-M43-036 / 022 consumer (ShopHandoff ticket)
 ##   Insufficient   open_insufficient(ctx)   shared by Life / Booster / 2x
@@ -31,6 +32,7 @@ const CLOCK_ART := "res://assets/ui/final/common/icons/icon_clock.png"
 const SB_ART := "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png"
 const HEART_ICON_ART := "res://assets/ui/final/common/currencies/icon_currency_heart.png"
 const SHOP_ART := "res://assets/ui/final/shop/shop_header_emblem.png"
+const SB_BUNDLE_ART := "res://assets/ui/final/shop/shop_scrub_bucks_bundle.png"
 const ShopScreen = preload("res://scripts/ui/shop/shop_screen.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 
@@ -236,6 +238,45 @@ func _on_life_action(id: String, _ctx: Dictionary, p) -> void:
 			_refresh_life(p)
 		"watch":
 			_start_rewarded(p, RewardedGrantService.HEART, {"kind": "heart"})
+
+# ============================================================ Scrub Bucks ==========
+
+## SB-POLISH-006: the focused Home Scrub Bucks "+" popup (Life-popup family): live SB balance and
+## only the SB pack offer, which stays honestly UNAVAILABLE until the store opens (M57 gate, same
+## ShopScreen.offer truth: no product, no purchase path). MORE IN SHOP hands off to the full Shop.
+func open_scrub_bucks(source: String):
+	if _economy == null or _stack == null:
+		return null
+	var open = find_open("scrub_bucks")
+	if open != null:
+		return open
+	var p := BasePopup.new("scrub_bucks")
+	p.context = {"source": source}
+	p.set_frame("medium")
+	p.set_hero(_help_pose(), Vector2(260, 260), 70)
+	p.set_title(UiText.t("SB_POPUP_TITLE"))
+	var art_box := CenterContainer.new()
+	art_box.name = "BundleBox"
+	p.get_content().add_child(art_box)
+	var art := HomeStyle.art("Bundle")
+	art.texture = load(SB_BUNDLE_ART)
+	art.custom_minimum_size = Vector2(210, 190)
+	art_box.add_child(art)
+	p.get_content().add_child(_balance_row())
+	p.add_body_line(UiText.t("SHOP_SB_PACKS"), "PackTitle", BasePopup.ROYAL_EDGE, 28)
+	p.add_body_line(UiText.t("SHOP_STORE_LATER"), "PackDetail", BasePopup.INK, 24)
+	p.add_action("sb_pack", UiText.t("SHOP_UNAVAILABLE"), "offer", false, "sb")
+	p.set_action_blocked("sb_pack", true)
+	p.add_action("shop", UiText.t("SB_POPUP_MORE"), "primary", true)
+	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
+	p.action_selected.connect(func(id, _c):
+		if id == "shop":
+			open_shop({"source": source}))
+	(p.find_child("Balance", true, false) as Label).text = UiText.t("ACQ_BALANCE", [UiText.num(_economy.wallet.scrub_bucks())])
+	if not _stack.push(p):
+		p.free()
+		return null
+	return p
 
 # ======================================================== Booster Acquire ==========
 
