@@ -37,7 +37,7 @@ const ART_SHA := {
 
 var EXPECTED_CASES := [
 	"won_composition_bound", "rows_match_receipt_order", "reveal_presentation_only",
-	"reduced_effects_static", "no_replay", "lost_no_victory_art", "level10_unavailable_visual",
+	"reduced_effects_static", "no_replay", "lost_no_victory_art", "level30_unavailable_visual",
 	"continue_once_visual", "hide_show_no_leak", "responsive_fit", "art_and_manifest_governance",
 ]
 
@@ -53,7 +53,7 @@ func _initialize() -> void:
 	await _reduced_effects_static()
 	_no_replay()
 	await _lost_no_victory_art()
-	await _level10_unavailable_visual()
+	await _level30_unavailable_visual()
 	await _continue_once_visual()
 	await _hide_show_no_leak()
 	await _responsive_fit()
@@ -212,12 +212,13 @@ func _lost_no_victory_art() -> void:
 	_shutdown(root)
 	_complete("lost_no_victory_art")
 
-func _level10_unavailable_visual() -> void:
-	print("[level 10 unavailable visual]")
-	var root = await _boot_main(_uniq("l10"))
+func _level30_unavailable_visual() -> void:
+	print("[level 30 unavailable visual]")
+	var root = await _boot_main(_uniq("l30"))
 	var app = root.get_app_state()
 	var nav = root.get_navigation()
-	app.progression.debug_set_current_level(10)
+	# SB-CAMPAIGN-L11-L30: Level 30 is the last builtin level (end of content).
+	app.progression.debug_set_current_level(30)
 	var h = await _play(root)
 	h.get_completion().terminal_reached.emit(&"WON", {})
 	var res = root.get_results_screen()
@@ -225,7 +226,7 @@ func _level10_unavailable_visual() -> void:
 	# M43-C001R V02 owner decision: the coming-soon message lives once, in the Next Cleanup card;
 	# the older duplicate note above CLEAN NEXT is suppressed.
 	var note: Label = res.find_child("NextFacts", true, false)
-	_ok(res.is_victory_layout() and res.get_primary_button().disabled and not res.get_note_label().is_visible_in_tree() and note.is_visible_in_tree() and note.text == UiText.t("NEXT_CLEANUP_SOON"), "Level 10: Victory layout, Continue disabled, readable coming-soon card")
+	_ok(res.is_victory_layout() and res.get_primary_button().disabled and not res.get_note_label().is_visible_in_tree() and note.is_visible_in_tree() and note.text == UiText.t("NEXT_CLEANUP_SOON"), "Level 30: Victory layout, Continue disabled, readable coming-soon card")
 	_ok(res.get_panel().get_global_rect().encloses(note.get_global_rect()), "coming-soon card sits inside the frame")
 	var e0: Dictionary = _econ(app.economy)
 	var t0: int = nav.transition_id()
@@ -233,7 +234,7 @@ func _level10_unavailable_visual() -> void:
 		res.get_primary_button().pressed.emit()
 	_ok(_econ(app.economy) == e0 and nav.transition_id() == t0 and nav.current() == R.RESULTS, "disabled Continue: no mutation, no transition")
 	_shutdown(root)
-	_complete("level10_unavailable_visual")
+	_complete("level30_unavailable_visual")
 
 func _continue_once_visual() -> void:
 	print("[continue once visual]")
