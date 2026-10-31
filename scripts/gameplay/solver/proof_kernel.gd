@@ -41,9 +41,13 @@ extends RefCounted
 ##     clears are applied before the next placement), where the solver branches. It adds
 ##     no capacity and never releases an undispatched unit, so it cannot admit a level the
 ##     runtime could not play; earlier runtime placement only adds player options.
-##   - SOLVED is a proof for this canonical timing only; production admission additionally
-##     requires the owner click sequence to reach WON through the REAL production runtime
-##     (tests/m52_owner_supply_plans.gd, tests/m52_r01_parallel_runtime.gd).
+##   - SOLVED is a proof for this canonical timing only. The kernel stays the canonical-timing
+##     PROOF and the fast analysis model (solver, difficulty analysis, Level Factory), but
+##     "shippable" (winnable in the game players run) is decided ONLY by the real-play solver
+##     (scripts/gameplay/solver/real_play_driver.gd; gate tests/real_play_levels.gd, tool
+##     tools/real_play_verify.gd, SB-CAMPAIGN-RUNTIME-KERNEL-DIVERGENCE): a human refills every
+##     free slot at once while bots still fly, so a real-play plan need not be legal under
+##     kernel timing and a kernel-legal plan can dead-end at runtime (L18, L20, L22, L23, L25, L30).
 
 const LevelData = preload("res://scripts/data/level_data.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
