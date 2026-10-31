@@ -1,0 +1,1 @@
+{"id":"078-m43-events-rebuild","task":"SB-M43-130-REBUILD rebuild the Events screen + reusable event card/detail family to match its master","branch":"factory/078-m43-events-rebuild","worktree":"C:/Users/sekip/AppData/Local/ScrubBotsFactoryWT/078-m43-events-rebuild","stage":"merged","round":2,"reviews":{"rules":"PASS","code":"PASS","tests":"PASS"}}
