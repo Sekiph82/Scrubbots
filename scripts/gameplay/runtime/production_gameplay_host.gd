@@ -609,7 +609,8 @@ func _on_retry_restored() -> void:
 		if strip != null:
 			strip.set_capacity(5)
 		# V02: re-lay the slot row for five and drop the sixth connector; fresh HUD.
-		_screen.refresh_slot_snapshot(_slots.snapshot())
+		# A Retry reset is not a finished batch: no SB-POLISH-012 pop.
+		_screen.refresh_slot_snapshot(_slots.snapshot(), false)
 		_screen.set_paused(_runtime != null and _runtime.is_user_paused())
 	_refresh_hud()
 
@@ -835,6 +836,11 @@ func _wire_controls() -> void:
 		speed_btn.pressed.connect(_on_speed_pressed)
 	if not _screen.booster_pressed.is_connected(request_booster):
 		_screen.booster_pressed.connect(request_booster)
+	# SB-POLISH-003: booster VFX follow the canonical Reduced Effects setting, live.
+	if app_state != null and app_state.effects != null:
+		_screen.set_reduced_effects(app_state.effects.is_reduced())
+		if not app_state.effects.changed.is_connected(_screen.set_reduced_effects):
+			app_state.effects.changed.connect(_screen.set_reduced_effects)
 	# M28-C002 V02: live HUD (profile / 2x state / boosters). The timer only schedules a
 	# redraw; the timed-2x value itself is SpeedEntitlementService wall-clock truth (with
 	# its anti-rollback high-water), never gameplay delta or Engine.time_scale.
@@ -1095,6 +1101,8 @@ func _stop_proof() -> String:
 ## request_booster() does not apply; the terminal gate does.
 func execute_booster(id: String, target = null) -> Dictionary:
 	var r: Dictionary
+	# SB-POLISH-003: presentation-only read of what the effect shows (before the action).
+	var fx: Dictionary = _screen.capture_booster_fx(id, target) if _screen != null and is_instance_valid(_screen) else {}
 	if _economy == null or _actions == null:
 		r = {"ok": false, "reason": "economy_unavailable"}
 	elif not BoosterInventory.BOOSTERS.has(id):
@@ -1121,7 +1129,7 @@ func execute_booster(id: String, target = null) -> Dictionary:
 	last_booster_request = r
 	_refresh_hud()
 	if r.get("ok", false) and _screen != null and is_instance_valid(_screen):
-		_screen.play_booster_activated(id)
+		_screen.play_booster_activated(id, fx)
 	return r
 
 ## Booster control intent (V02 booster row). Never spends SB from a tap:
@@ -1167,6 +1175,9 @@ func request_booster(id: String) -> Dictionary:
 	r["id"] = id
 	last_booster_request = r
 	_refresh_hud()
+	# SB-POLISH-003: owned +1 Slot / Random used straight from the row get their effect too.
+	if r.get("ok", false) and _screen != null and is_instance_valid(_screen):
+		_screen.play_booster_activated(id)
 	return r
 
 ## M43-C002 (SB-M43-019): the V02 top-right Pause control opens the canonical Pause

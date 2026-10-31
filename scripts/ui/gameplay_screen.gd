@@ -35,6 +35,8 @@ const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const PaletteColors = preload("res://scripts/data/palette_colors.gd")
 const Shell = preload("res://scripts/ui/gameplay_shell_geometry.gd")
 const BoardMagnifier = preload("res://scripts/ui/board_magnifier.gd")
+const BoosterVfx = preload("res://scripts/ui/feel/booster_vfx.gd")
+const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 
 const FILL := Color(0.035, 0.055, 0.11)   # surround outside the aspect-fitted shell
 ## Rail envelope pad in logical cells beyond the board (outer rail edge = +3.0 cells).
@@ -135,6 +137,9 @@ var _boosters_populated := false
 var _ad_region: Panel
 ## M50-BOARD press-and-hold board loupe (covers exactly the board rect; presentation only).
 var _magnifier
+var _booster_vfx                      # SB-POLISH-003 activation effects (one overlay)
+var _shell_prev: TextureRect          # previous master, crossfaded out after +1 Slot
+var _reduced_effects := false
 var _pause_btn: Button
 var _pause_glyph: Control
 var _paused := false
@@ -175,7 +180,17 @@ func update_snapshots(slot_snapshots: Array, supply_snapshot: Array) -> void:
 	_bind_batch_views()
 	_sync_shell()
 
-func refresh_slot_snapshot(slot_snapshots: Array) -> void:
+## SB-POLISH-012: a slot whose batch finished (occupied -> EMPTY on the runtime sync) pops
+## (BoosterVfx.pop_batch) unless `batch_fx` is false (Retry reset) or Reduced Effects. Booster
+## purges (Tornado) arrive through update_snapshots() and never pop.
+func refresh_slot_snapshot(slot_snapshots: Array, batch_fx: bool = true) -> void:
+	if batch_fx and not _reduced_effects and _booster_vfx != null and _five_slot_strip != null:
+		var views: Array = _five_slot_strip.get_slot_views()
+		for i in range(mini(mini(_slot_snapshots.size(), slot_snapshots.size()), views.size())):
+			var was = _slot_snapshots[i]
+			var now = slot_snapshots[i]
+			if was is Dictionary and now is Dictionary and was.get("occupied", false) and not now.get("occupied", false):
+				_booster_vfx.pop_batch(views[i].get_global_rect(), _color_of(int(was.get("color_id", -1))))
 	_slot_snapshots = slot_snapshots.duplicate(true)
 	if _five_slot_strip != null:
 		_five_slot_strip.bind_snapshots(_slot_snapshots, _palette_colors)
@@ -253,6 +268,13 @@ func _build_tree() -> void:
 	_shell.stretch_mode = TextureRect.STRETCH_SCALE
 	_shell.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	_screen_content.add_child(_shell)
+	_shell_prev = TextureRect.new()
+	_shell_prev.name = "GameplayShellPrevious"
+	_shell_prev.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_shell_prev.stretch_mode = TextureRect.STRETCH_SCALE
+	_shell_prev.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_shell_prev.visible = false
+	_screen_content.add_child(_shell_prev)
 
 	# Obsolete baked instruction masked with the bubble's own fill (bubble art kept).
 	_bubble_mask = Panel.new()
@@ -306,6 +328,8 @@ func _build_tree() -> void:
 	_magnifier = BoardMagnifier.new()
 	_magnifier.visible = false
 	_screen_content.add_child(_magnifier)
+	_booster_vfx = BoosterVfx.new()
+	add_child(_booster_vfx)
 
 func _build_top() -> void:
 	# Profile: live content only inside the baked profile box (no panel chrome).
@@ -574,6 +598,7 @@ func relayout() -> void:
 	_scale = minf(s.x / Shell.SIZE.x, s.y / Shell.SIZE.y)
 	_origin = ((s - Shell.SIZE * _scale) * 0.5).floor()
 	_place_rect(_shell, Rect2(Vector2.ZERO, Shell.SIZE))
+	_place_rect(_shell_prev, Rect2(Vector2.ZERO, Shell.SIZE))
 	_place_ref(_bubble_mask, Shell.BUBBLE_TEXT)
 	_bubble_mask.add_theme_stylebox_override("panel", HomeStyle.box(Shell.BUBBLE_FILL, Shell.BUBBLE_FILL, 0, int(18.0 * _scale), 0))
 	_layout_bubble_text()
@@ -839,9 +864,117 @@ func set_booster_states(states: Array) -> void:
 	_boosters_populated = true
 
 ## Activation feedback after a successful booster execution (host calls on r["ok"]).
-func play_booster_activated(id: String) -> void:
+## SB-POLISH-003: plus the booster's own effect (BoosterVfx), fed `pre` from
+## capture_booster_fx() before the action and the already-updated views after it.
+## Reduced Effects: only the button burst fade.
+func play_booster_activated(id: String, pre: Dictionary = {}) -> void:
 	if _booster_buttons.has(id):
 		_flash(_booster_buttons[id].get_node("ActivatedBurst"))
+	if _reduced_effects or _booster_vfx == null:
+		return
+	match id:
+		"tornado":
+			if not pre.get("tiles", []).is_empty() or pre.get("ghost") is Image:
+				_booster_vfx.play(id, pre)
+		"plus_one_slot":
+			var views: Array = _five_slot_strip.get_slot_views()
+			if views.size() < 6:
+				return
+			# The master it grew from: same supply columns, five slots (cached when shown).
+			var was = _shell_tex_cache.get(Shell.shell_id(_supply_snapshot.size(), 5))
+			if was is Texture2D and was != _shell.texture:
+				_shell_prev.texture = was
+				_shell_prev.modulate.a = 1.0
+				_shell_prev.visible = true
+				var tw := _shell_prev.create_tween()
+				tw.tween_property(_shell_prev, "modulate:a", 0.0, 0.4)
+				tw.tween_callback(_shell_prev.hide)
+			_booster_vfx.play(id, {"slot_rect": views[5].get_global_rect(), "fade_in": views[5], "fade_from": 0.1})
+		"random":
+			var tiles := _supply_tiles(func(_b): return true)
+			if not tiles.is_empty():
+				_booster_vfx.play(id, {"tiles": tiles, "colors": tiles.map(func(t): return t["color"])})
+		"selector":
+			var views: Array = _five_slot_strip.get_slot_views()
+			for i in range(mini(views.size(), _slot_snapshots.size())):
+				var snap = _slot_snapshots[i]
+				if snap is Dictionary and snap.get("occupied", false) and snap.get("batch_id", "") == pre.get("batch_id"):
+					var dst: Rect2 = views[i].get_global_rect()
+					var src: Rect2 = pre.get("src_rect", Rect2(get_supply_panel_rect().get_center() - dst.size * 0.5, dst.size))
+					_booster_vfx.play(id, {"src_rect": src, "dst_rect": dst, "color": _color_of(int(snap.get("color_id", -1))),
+						"fade_in": views[i], "fade_from": 0.62})
+					return
+
+## SB-POLISH-003: read the pre-action view a booster effect needs (host calls it BEFORE the
+## action): Tornado the colour's ACTIVE board cells (one ghost Image + a few spiral samples) and
+## its visible supply / slot tiles; Selector the picked batch tile.
+## Presentation data only; never mutates anything.
+func capture_booster_fx(id: String, target = null) -> Dictionary:
+	if _reduced_effects or _board == null:
+		return {}
+	match id:
+		"selector":
+			var hit := _supply_tiles(func(b): return b.get("batch_id") == target)
+			return {"batch_id": target, "src_rect": hit[0]["rect"]} if not hit.is_empty() else {"batch_id": target}
+		"tornado":
+			if target == null:
+				return {}
+			var cid := int(target)
+			var col := _color_of(cid)
+			var w: int = _board.get_width()
+			var br := get_board_rect()
+			var cell: float = br.size.x / float(w)
+			var img := Image.create_empty(w, _board.get_height(), false, Image.FORMAT_RGBA8)
+			var cells: Array = []
+			for i in range(_board.get_cell_count()):
+				if _board.get_cell_state(i) == BoardState.CellState.ACTIVE and _board.get_color_id(i) == cid:
+					img.set_pixel(i % w, i / w, col)
+					cells.append(i)
+			var sum := Vector2.ZERO
+			for i in cells:
+				sum += Vector2(i % w + 0.5, i / w + 0.5)
+			var center: Vector2 = br.position + (sum / cells.size() if not cells.is_empty() else br.size / cell * 0.5) * cell
+			# ponytail: <= 48 evenly strided spiral samples; the ghost image carries every cell.
+			var samples: Array = []
+			var stride: int = maxi(ceili(cells.size() / 48.0), 1)
+			for k in range(0, cells.size(), stride):
+				var i: int = cells[k]
+				samples.append({"pos": br.position + Vector2(i % w + 0.5, i / w + 0.5) * cell, "color": col.lightened(0.15),
+					"delay": 0.05 + 0.25 * float(k) / float(cells.size())})
+			var tiles := _supply_tiles(func(b): return int(b.get("color_id", -1)) == cid)
+			var views: Array = _five_slot_strip.get_slot_views()
+			for i in range(mini(views.size(), _slot_snapshots.size())):
+				var snap = _slot_snapshots[i]
+				if snap is Dictionary and snap.get("occupied", false) and int(snap.get("color_id", -1)) == cid:
+					tiles.append({"rect": views[i].get_global_rect(), "color": col})
+			return {"ghost": img if not cells.is_empty() else null, "board_rect": br, "center": center, "cell": cell,
+				"radius": maxf(br.size.x, br.size.y) * 0.5, "samples": samples, "tiles": tiles}
+	return {}
+
+## Visible supply tiles whose batch dict passes `pred`: [{rect (global), color, batch_id}].
+func _supply_tiles(pred: Callable) -> Array:
+	var out: Array = []
+	for c in range(mini(_supply_snapshot.size(), _supply_panel.get_column_count())):
+		var snap = _supply_snapshot[c]
+		var preview: Array = snap.get("preview", []) if snap is Dictionary else []
+		var panels: Array = _supply_panel.get_column_row_panels(c)
+		for r in range(mini(preview.size(), panels.size())):
+			var b = preview[r]
+			if b is Dictionary and pred.call(b):
+				out.append({"rect": panels[r].get_global_rect(), "color": _color_of(int(b.get("color_id", -1))), "batch_id": b.get("batch_id")})
+	return out
+
+func _color_of(cid: int) -> Color:
+	return _palette_colors[cid] if cid >= 0 and cid < _palette_colors.size() else Color.WHITE
+
+## Canonical Reduced Effects (host-wired, live): no booster VFX when on.
+func set_reduced_effects(on: bool) -> void:
+	_reduced_effects = on
+	if on and _booster_vfx != null:
+		_booster_vfx.stop()
+
+func get_booster_vfx():
+	return _booster_vfx
 
 ## Short fade-out; the tween lives on the button, so it dies with it.
 func _flash(rect: TextureRect) -> void:
