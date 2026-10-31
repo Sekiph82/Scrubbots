@@ -323,6 +323,18 @@
       "approval_label": "approved by Claude under owner-delegated authority 2026-10-31, not owner visual review",
       "notes": "fountain-garden scene with Scrubbots from the Weekly Cleaning Event hero, cropped between the Ends-in pill and the progress pill so no master text or pill is baked in; 582x211 kept at native size (SB-M43-130-REBUILD)",
       "godot_usage": "Events popup weekly event card hero art; upcoming cards reuse it desaturated (scripts/ui/components/ui_event_card.gd)"
+    },
+    {
+      "id": "boot_splash_portrait",
+      "category": "system_splash",
+      "provider": "derivative_resize_pad",
+      "source": "assets/ui/final/system/splash/splash_logo.png",
+      "source_asset_id": "P2-010",
+      "target_path": "assets/ui/final/system/splash/boot_splash_portrait.png",
+      "status": "DERIVATIVE_OF_APPROVED",
+      "date": "2026-10-31",
+      "notes": "resize/pad only, no new art: 1080x2160 opaque black canvas (matches boot_splash/bg_color and the Opening background) with splash_logo.png Lanczos-downscaled to 864x288 (80% width) and centred at (108, 936); splash_logo.png itself unchanged",
+      "godot_usage": "project.godot application/boot_splash/image with stretch_mode Keep (Android boot splash and iOS launch storyboard)"
     }
   ],
   "native_godot_components_not_to_generate": [

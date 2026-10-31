@@ -618,6 +618,7 @@ Integration note (M43-C005-C007): shipping Premium opening frames 01..09, bound 
 | `assets/ui/final/system/placeholders/content_loading_placeholder.png` | Phase 2 P2-020 | 1,957,052 |
 | `assets/ui/final/system/placeholders/level_preview_placeholder.png` | Phase 2 P2-019 | 1,351,161 |
 | `assets/ui/final/system/splash/splash_background.png` | Phase 2 P2-008 | 2,096,251 |
+| `assets/ui/final/system/splash/boot_splash_portrait.png` | P2-010 derivative (resize/pad, boot splash) | 237,558 |
 | `assets/ui/final/system/splash/splash_logo.png` | Phase 2 P2-010 | 1,312,961 |
 | `assets/ui/final/system/splash/splash_scrubby.png` | Phase 2 P2-009 | 1,299,706 |
 

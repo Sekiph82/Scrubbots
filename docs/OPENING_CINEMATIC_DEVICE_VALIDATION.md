@@ -28,7 +28,7 @@ Capture it with `adb logcat -s godot` (Android) or the Xcode console (iOS).
 
 | # | Check | Pass criterion |
 |---|---|---|
-| 1 | Cold launch plays the cinematic | OPENING shown immediately after the splash |
+| 1 | Cold launch plays the cinematic | OPENING shown immediately after the splash; the boot splash is the SCRUBBOTS logo (boot_splash_portrait.png, P2-010 derivative) on black, matching the Opening background, never the Godot logo |
 | 2 | Smooth 720p/30 playback | no visible stutter; `max_frame_gap_ms` <= ~50 on a mid device |
 | 3 | Audio sync | lip/impact sync by eye/ear through the full 15 s; no drift at the end |
 | 4 | Startup latency | `startup_latency_ms` <= ~500 (first decoded frame) |

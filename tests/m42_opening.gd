@@ -10,7 +10,7 @@ const OGV := "res://assets/brand/opening/scrubbots_opening_720p30.ogv"
 const OGV_SHA256 := "3ec6e1347bbb1d8ced2709f3383b06ae6dbfba017e0a6d23a0fb991ec78ee89a"
 
 var EXPECTED_CASES := ["mp4_preserved", "ogv_runtime_asset", "opening_player_aspect", "opening_lifecycle",
-	"boot_opening_to_home_once", "once_per_cold_launch", "device_instrumentation", "ios_static_readiness"]
+	"boot_opening_to_home_once", "once_per_cold_launch", "device_instrumentation", "ios_static_readiness", "boot_splash_logo"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -25,6 +25,7 @@ func _initialize() -> void:
 	await _once_per_cold_launch()
 	await _device_instrumentation()
 	_ios_static_readiness()
+	_boot_splash_logo()
 	_cleanup()
 	_done()
 
@@ -295,6 +296,19 @@ func _ios_static_readiness() -> void:
 	var doc := FileAccess.get_file_as_string("res://docs/OPENING_CINEMATIC_DEVICE_VALIDATION.md")
 	_ok(doc.find("IOS_DEVICE_LATER") != -1 and doc.find("## iOS readiness") != -1, "iOS readiness recorded; physical playback not claimed")
 	_complete("ios_static_readiness")
+
+## SB-BOOT-SPLASH-LOGO: engine boot splash shows the SCRUBBOTS logo on the Opening background colour.
+func _boot_splash_logo() -> void:
+	print("[boot splash logo]")
+	var path := String(ProjectSettings.get_setting("application/boot_splash/image"))
+	_ok(path == "res://assets/ui/final/system/splash/boot_splash_portrait.png", "boot splash image is the SCRUBBOTS portrait splash")
+	var img := Image.load_from_file(ProjectSettings.globalize_path(path))
+	_ok(img != null and img.get_size() == Vector2i(1080, 2160), "splash derivative is a 1080x2160 portrait canvas")
+	_ok(bool(ProjectSettings.get_setting("application/boot_splash/show_image")), "splash image shown")
+	_ok(int(ProjectSettings.get_setting("application/boot_splash/stretch_mode")) == 1, "stretch_mode Keep: fits every aspect, never cropped or distorted")
+	_ok(ProjectSettings.get_setting("application/boot_splash/bg_color") == OpeningScreen.BACKGROUND, "splash bg_color equals Opening BACKGROUND (no flash)")
+	_ok(img != null and img.get_pixel(0, 0) == OpeningScreen.BACKGROUND and img.get_pixel(1079, 2159) == OpeningScreen.BACKGROUND, "splash canvas edges match bg_color (seamless letterbox)")
+	_complete("boot_splash_logo")
 
 func _find(hay: PackedByteArray, needle: PackedByteArray) -> int:
 	for i in range(hay.size() - needle.size()):
