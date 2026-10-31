@@ -25,7 +25,7 @@ const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/productio
 const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
 const Pack = preload("res://tools/build_m52_first_10_pack.gd")
-const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
+const RealPlayDriver = preload("res://scripts/gameplay/solver/real_play_driver.gd")
 
 const PLAN_LEVELS := ["level_002_apple", "level_003_palm_tree", "level_004_orange_cat", "level_005_party_toucan",
 	"level_006_chicken", "level_007_pigeon", "level_008_butterfly", "level_009_frog",
@@ -229,6 +229,7 @@ func _runtime(id: String) -> void:
 	var h = ProductionGameplayHost.new()
 	h.app_state = app
 	h.auto_build = false
+	h.set_anchors_and_offsets_preset(Control.PRESET_FULL_RECT)
 	get_root().add_child(h)
 	_ok(h.build(), "host builds from AppState frontier %d %s" % [order, h.get_build_error()])
 	if not h.is_built():
@@ -251,44 +252,17 @@ func _runtime(id: String) -> void:
 	_ok(won, "owner click sequence via production input -> WON, board clear, supply exhausted, slots empty")
 	h.free()
 
-## Click each owner column through ProductionInputController, letting the real runtime
-## run to quiescence between clicks (same serial order the proof kernel uses).
+## Owner columns through ProductionInputController under the real-play human policy
+## (RealPlayDriver, dt 1/60: every free slot refilled at once, never waiting for quiescence),
+## after one layout frame so the slot origins are the laid-out ones.
 func _play_clicks(h, clicks: Array) -> bool:
-	var input = h.get_input_controller()
-	var runtime = h.get_runtime()
-	runtime.set_process(false)
-	var scheduler = h.get_scheduler()
-	var slots = h.get_slots()
-	var supply = h.get_supply()
-	for c in clicks:
-		var r: Dictionary = input.activate_front(int(c) - 1)
-		if not r.get("ok", false):
-			print("    click %d rejected: %s" % [int(c), str(r)])
-			return false
-		for _i in range(20000):
-			runtime.tick(1.0)
-			if scheduler.live_assignment_count() == 0 and not _any_moving(h.get_agent_layer()) and slots.rightmost_empty_index() != -1:
-				break
-	for _i in range(200):
-		if h.get_completion().is_terminal():
-			break
-		runtime.tick(1.0)
-	return h.get_completion().is_won() and h.get_board().count_cells_by_state(BoardState.CellState.ACTIVE) == 0 \
-		and supply.is_exhausted() and slots.rightmost_empty_index() != -1 and _slots_empty(slots)
-
-func _slots_empty(slots) -> bool:
-	for s in slots.snapshot():
-		if bool(s["occupied"]):
-			return false
-	return true
-
-func _any_moving(agent_layer) -> bool:
-	if agent_layer == null:
-		return false
-	for ch in agent_layer.get_children():
-		if ch.has_method("is_moving") and ch.is_moving():
-			return true
-	return false
+	h.get_runtime().set_process(false)
+	await process_frame
+	var r: Dictionary = RealPlayDriver.play_on_host(h, clicks, RealPlayDriver.CANONICAL_DT)
+	if not r["rejected"].is_empty():
+		print("    click rejected: %s" % str(r["rejected"]))
+	# won == completion WON + ACTIVE 0 + supply exhausted + slots empty.
+	return r["won"] and r["rejected"].is_empty() and r["clicks_placed"] == clicks.size()
 
 # --- catalog / resolver ------------------------------------------------------------------------
 func _catalog_and_resolver() -> void:

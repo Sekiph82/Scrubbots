@@ -28,9 +28,9 @@ extends SceneTree
 const MainScript = preload("res://scripts/app/main.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
-const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
 const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 const MetaRewardFeel = preload("res://scripts/ui/feel/meta_reward_feel.gd")
+const RealPlayDriver = preload("res://scripts/gameplay/solver/real_play_driver.gd")
 
 const TRANSITION_CYCLES := 40
 const WARMUP_CYCLES := 5
@@ -41,7 +41,7 @@ const MAX_OBJECT_DRIFT := 64
 const MAX_STATIC_MEM_DRIFT := 4 * 1024 * 1024
 ## Every builtin production level (SB-CAMPAIGN-L11-L30: 30 since 2026-10-30); frontier LEVELS+1 has no content.
 const LEVELS := 30
-const DT := 1.0
+const DT := RealPlayDriver.CANONICAL_DT
 ## Feel-quiescence sampling (QUIESCENCE-QA-R01): one monotonic deadline for the whole wait.
 const QUIET_DEADLINE_MS := 5000
 
@@ -49,6 +49,7 @@ var _fail := 0
 var _tmp: Array = []
 var _completed := {}
 var _routes: Array = []
+var _prov: Dictionary = RealPlayDriver.load_provenance()
 const EXPECTED_CASES := ["008_transitions", "009_long_session", "010_memory", "011_signals", "012_orphans", "013_rewards", "014_steady_state_sensitivity", "015_quiet_rule_sensitivity"]
 
 func _initialize() -> void:
@@ -275,66 +276,14 @@ func _transitions(root) -> Dictionary:
 
 # --------------------------------------- SB-M55-009 long high-load session + 013 -----
 
-## Drive one production level to its terminal: owner intendedColumnClicks where the
-## level has an owner supply plan, otherwise (Level 1, M23 generator) greedy fronts.
+## Drive one production level to its terminal under the real-play human policy
+## (RealPlayDriver, dt 1/60: all five slots filled at once, every freed slot refilled on the
+## next frame, never waiting for quiescence): the level's plan clicks, or for a level without
+## a plan its provenance clicks / first front (Level 1, M23 generator). A rejected click is reported.
 func _drive(host) -> Dictionary:
-	var clicks: Array = []
-	if not String(host.supply_plan_path).is_empty():
-		clicks = SupplyPlanLoader.load_plan(host.supply_plan_path)["plan"]["intendedColumnClicks"]
-	var rt = host.get_runtime()
-	rt.set_process(false)
-	var input = host.get_input_controller()
-	var slots = host.get_slots()
-	var scheduler = host.get_scheduler()
-	var i := 0
-	var frames := 0
-	# Plan clicks follow the proof kernel's serial order: each click, then tick to full
-	# quiescence (_quiet). "No live assignment" alone also holds between two dispatch waves,
-	# so the next click could land before the runtime settled. A rejected click is reported.
-	for c in clicks:
-		if host.get_completion().is_terminal():
-			break
-		var r: Dictionary = input.activate_front(int(c) - 1)
-		if not r.get("ok", false):
-			return {"frames": frames, "clicks": i, "rejected": "plan click %d/%d (column %d) rejected %s, slots %s" % [i + 1, clicks.size(), int(c), str(r), str(_slot_states(slots, scheduler))]}
-		i += 1
-		while frames < 200000 and not _quiet(host) and not host.get_completion().is_terminal():
-			rt.tick(DT)
-			frames += 1
-	while frames < 200000 and not host.get_completion().is_terminal():
-		if clicks.is_empty() and slots.rightmost_empty_index() != -1:
-			for col in range(host.get_supply().get_column_count()):
-				if input.activate_front(col).get("ok", false):
-					break
-		rt.tick(DT)
-		frames += 1
-	return {"frames": frames, "clicks": i, "rejected": ""}
-
-## Runtime quiescence: no live assignment, no moving bot and every occupied slot WAITING
-## (nothing can change until the next click).
-func _quiet(host) -> bool:
-	var scheduler = host.get_scheduler()
-	if scheduler.live_assignment_count() != 0 or _any_moving(host.get_agent_layer()):
-		return false
-	var slots = host.get_slots()
-	for k in range(slots.get_slot_count()):
-		if slots.is_occupied(k) and not scheduler.is_slot_waiting(k):
-			return false
-	return true
-
-func _slot_states(slots, scheduler) -> Array:
-	var out: Array = []
-	for k in range(slots.get_slot_count()):
-		out.append("C%d x%d %s" % [slots.get_color_id(k), slots.get_remaining(k), "WAITING" if scheduler.is_slot_waiting(k) else "LIVE"] if slots.is_occupied(k) else "empty")
-	return out
-
-func _any_moving(agent_layer) -> bool:
-	if agent_layer == null:
-		return false
-	for ch in agent_layer.get_children():
-		if ch.has_method("is_moving") and ch.is_moving():
-			return true
-	return false
+	var clicks: Array = RealPlayDriver.clicks_for(host.launch_entry_id, host.supply_plan_path, _prov)
+	var r: Dictionary = RealPlayDriver.play_on_host(host, clicks, DT)
+	return {"frames": r["frames"], "clicks": r["clicks_placed"], "rejected": "" if r["rejected"].is_empty() else str(r["rejected"])}
 
 ## Plays Levels 1..LEVELS back-to-back; returns the HOME sample at the end of the lap.
 func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
@@ -372,6 +321,8 @@ func _long_session(root, base: Dictionary, lap: int) -> Dictionary:
 		var parts0: int = eco.wallet.bot_parts()
 		var streak0: int = eco.streak.streak()
 		var r0 := _routes.size()
+		# One layout frame first: before it the slot origins are SlotOriginProvider fallbacks.
+		await process_frame
 		var d := _drive(host)
 		total_frames += d["frames"]
 		total_clears += clears["events"]
