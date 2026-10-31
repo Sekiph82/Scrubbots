@@ -1,0 +1,1 @@
+{"id":"079-campaign-test-fix","task":"SB-CAMPAIGN-L11-L30-FIX: m43_c001b end-of-content case to L30 + m55_long_session CI failures since 30 levels","branch":"factory/079-campaign-test-fix","worktree":"C:/Users/sekip/AppData/Local/ScrubBotsFactoryWT/079-campaign-test-fix","stage":"merged","round":2,"reviews":{"rules":"PASS","code":"PASS","tests":"PASS"}}
