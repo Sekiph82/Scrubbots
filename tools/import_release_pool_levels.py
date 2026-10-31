@@ -7,12 +7,22 @@ entries 11..30. Format/metadata only: cells, palette, width, height and version 
 verbatim; only id, name, difficulty (campaign slot class) and the plan's levelId/batchId
 labels change. Re-running with the same pool rewrites identical bytes.
 
-    python tools/import_release_pool_levels.py [--studio <Studio root>]
+The Studio's own "SOLVED + replay WIN" is Studio evidence only. The shippability gate is the
+in-repo real-play check (SB-CAMPAIGN-RUNTIME-KERNEL-DIVERGENCE): after writing, the importer
+runs tools/real_play_verify.gd --levels <imported> --regen through Godot, which replays every
+imported plan through the real runtime under the human policy and regenerates only the
+intendedColumnClicks of a plan that fails (so a re-import deterministically recreates the same
+plans and provenance). Godot comes from --godot or env GODOT; without it the import fails.
+Exits non-zero if any imported level is unwinnable under real play.
+
+    python tools/import_release_pool_levels.py [--studio <Studio root>] [--godot <Godot exe>]
 """
 import argparse
 import hashlib
 import json
 import os
+import subprocess
+import sys
 
 from PIL import Image
 
@@ -71,6 +81,8 @@ def import_level(studio, cids, order, slug, name, klass, entry_name):
     assert entry["candidate_id"].startswith("candidate-owner-"), entry_name
     assert lineage["derivation"] == "EXACT_LOGICAL_OWNER_UPLOAD_TO_CANONICAL_CANDIDATE", entry_name
     acc = entry["pipeline"]["primary"]["acceptance"]
+    # Studio evidence only (its own ProofKernel-timing solver + replay); shippability is the
+    # real-play gate run after the import (tools/real_play_verify.gd).
     assert acc["solver_status"] == "SOLVED" and acc["replay"] == "WIN", entry_name
     files = {}
     for role in ("level", "supply_plan", "artwork"):
@@ -171,7 +183,12 @@ def import_level(studio, cids, order, slug, name, klass, entry_name):
 def main():
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--studio", default=STUDIO)
+    ap.add_argument("--godot", default=os.environ.get("GODOT", ""),
+                    help="Godot 4.7.2 console executable for the real-play gate (default: env GODOT)")
     args = ap.parse_args()
+    if not args.godot:
+        sys.exit("import_release_pool_levels: no Godot given (--godot or env GODOT); the real-play gate "
+                 "tools/real_play_verify.gd must run on the imported levels, refusing to import without it")
     with open(os.path.join(REPO, "data/palettes/scrubbots_palette_v3.json"), encoding="utf-8") as f:
         cids = {c["hex"].upper(): c["id"] for c in json.load(f)["colors"]}
     cat_rel = "data/levels/catalog/production_catalog_v1.json"
@@ -183,6 +200,12 @@ def main():
         print("imported", entries[-1]["id"])
     cat["entries"] = entries
     write_json(cat_rel, cat, False)
+    orders = ",".join(str(row[0]) for row in LEVELS)
+    gate = subprocess.run([args.godot, "--headless", "--path", REPO, "-s", "res://tools/real_play_verify.gd",
+                           "--", "--levels", orders, "--regen"])
+    if gate.returncode != 0:
+        sys.exit("import_release_pool_levels: real-play gate failed (exit %d); see the LEVEL/UNWINNABLE lines above"
+                 % gate.returncode)
 
 
 if __name__ == "__main__":
