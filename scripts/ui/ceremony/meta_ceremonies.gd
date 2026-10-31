@@ -253,7 +253,8 @@ static func gift_milestone(event: Dictionary, reduced: bool) -> BasePopup:
 	var big := m == int(event.get("cycle_max", -1))
 	var p := _popup("gift_%d" % m, "reward", UiText.t("CEREMONY_GIFT_TITLE", [UiText.num(m)]), event)
 	_hero(p, ART["gift_big" if big else "gift_small"], Vector2(300, 300) if big else Vector2(220, 220), reduced)
-	p.add_body_line(UiText.t("CEREMONY_GIFT_MILESTONE", [UiText.num(m), UiText.num(int(event.get("cycle_max", 0)))]), "Milestone", BasePopup.ROYAL_EDGE, 34)
+	# SB-POLISH-002: the meter fills towards each milestone, so reaching m reads "m / m" (bar wording).
+	p.add_body_line(UiText.t("CEREMONY_GIFT_MILESTONE", [UiText.num(m), UiText.num(m)]), "Milestone", BasePopup.ROYAL_EDGE, 34)
 	var rewards: Dictionary = (event.get("rewards", {}) as Dictionary).duplicate()
 	var fallback := int(rewards.get("guaranteed_new_fallback_sb", 0))
 	rewards.erase("guaranteed_new_fallback_sb")

@@ -463,7 +463,7 @@ func _e23_gift_queued_truth() -> void:
 	_ok(newly.size() == 1 and pr.drain("test"), "real Gift Meter crossing queued m1; ceremony opened")
 	await _frames(2)
 	var p = pr.current()
-	_ok(p.get_title() == "GIFT METER 1!" and _label(p, "Milestone") == "Milestone 1 / 1,000", "title + milestone / cycle max")
+	_ok(p.get_title() == "GIFT METER 1!" and _label(p, "Milestone") == "Milestone 1 / 1", "title + reached milestone m / m (SB-POLISH-002)")
 	_ok(_reward_rows(p) == {"scrub_bucks": 25} and _label(p, "ClaimNote") == "Ready to claim in the Gift Bar.", "rows == config m1 bundle; claim-in-Gift-Bar copy")
 	_ok(_auth(app) == a0 and app.economy.gift.claimable().size() == 1, "presenting granted nothing; occurrence still claimable")
 	_close_cta(p)
