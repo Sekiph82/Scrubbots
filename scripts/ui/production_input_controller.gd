@@ -85,6 +85,8 @@ func is_bound() -> bool:
 ## activation deterministically with no M23/M24 side effect.
 func set_terminal_stopped(value: bool) -> void:
 	_terminal_stopped = value
+	if _panel != null and is_instance_valid(_panel) and _panel.has_method("set_hit_areas_pickable"):
+		_panel.set_hit_areas_pickable(not value)   # SB-POLISH-004: never over Results
 
 func is_terminal_stopped() -> bool:
 	return _terminal_stopped

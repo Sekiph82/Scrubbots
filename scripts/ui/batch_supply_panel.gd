@@ -48,6 +48,7 @@ var _columns: Array = []   # each: {root:VBoxContainer, rows:[ {panel, tile, swa
 var _input_enabled := false
 var _front_panels: Array = []      # PanelContainer per column front (row 0)
 var _front_enabled: Array = []     # bool per column: front is a live selectable batch
+var _hits_pickable := true         # SB-POLISH-004: false once the attempt is terminal
 # One serialized in-progress gesture at a time (WP03 multi-touch / reentry safety):
 var _pending_col: int = -1
 var _pending_is_touch := false
@@ -172,6 +173,17 @@ func enable_front_input() -> void:
 	_input_enabled = true
 	_apply_front_input_surfaces()
 
+## SB-POLISH-004: a top_level HitArea is its own GUI root, picked ABOVE every non-top-level
+## Control of the app (the Results screen over a finished board included), so after a terminal
+## result it would silently eat taps meant for CLEAN NEXT. The input controller turns picking
+## off on terminal and back on when Retry starts a fresh attempt.
+func set_hit_areas_pickable(on: bool) -> void:
+	_hits_pickable = on
+	for p in _front_panels:
+		var hit = p.get_node_or_null("HitArea") if p != null and is_instance_valid(p) else null
+		if hit != null:
+			hit.mouse_filter = Control.MOUSE_FILTER_STOP if on else Control.MOUSE_FILTER_IGNORE
+
 func is_front_input_enabled() -> bool:
 	return _input_enabled
 
@@ -204,7 +216,7 @@ func _apply_front_input_surfaces() -> void:
 			var hit := Control.new()
 			hit.name = "HitArea"
 			hit.top_level = true
-			hit.mouse_filter = Control.MOUSE_FILTER_STOP
+			hit.mouse_filter = Control.MOUSE_FILTER_STOP if _hits_pickable else Control.MOUSE_FILTER_IGNORE
 			panel.add_child(hit)
 			hit.gui_input.connect(cb)
 			panel.item_rect_changed.connect(_size_hit.bind(panel))
