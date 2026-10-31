@@ -149,7 +149,11 @@ func _home_ui() -> void:
 		_ok(a.economy.meta_ui.is_seen(HomeBadges.visited_key(nid)) and (int(bd[nid]) > 0 or not nl.visible), "Nav_%s press: visited, NEW hidden" % nid)
 	_walk_to(a, 40)
 	home.refresh()
-	_ok(not home.get_region("NavBadge_leaderboard").visible, "L40: RANKS unserved (disabled) -> no NEW")
+	# SB-M43-122: RANKS is a served tab (personal rank ladder), so it gets NEW like any unlocked entry.
+	var rl: Label = home.get_region("NavBadge_leaderboard")
+	_ok(rl.visible and rl.text == new_text, "L40: served RANKS shows NEW, text '%s'" % rl.text)
+	home.get_region("Nav_leaderboard").pressed.emit()
+	_ok(a.economy.meta_ui.is_seen(HomeBadges.visited_key("ranks")) and not rl.visible, "Nav_leaderboard press: visited, NEW hidden")
 	var h2 = await _home(AppState.new(_path("home_est")))
 	_ok(["shop", "collection", "tasks"].all(func(s): return not h2.get_region("Shortcut_" + s).badge.visible or h2.get_region("Shortcut_" + s).badge.text != new_text), "established profile Home: no NEW pill")
 	_complete("home_ui")
