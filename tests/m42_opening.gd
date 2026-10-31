@@ -10,7 +10,7 @@ const OGV := "res://assets/brand/opening/scrubbots_opening_720p30.ogv"
 const OGV_SHA256 := "3ec6e1347bbb1d8ced2709f3383b06ae6dbfba017e0a6d23a0fb991ec78ee89a"
 
 var EXPECTED_CASES := ["mp4_preserved", "ogv_runtime_asset", "opening_player_aspect", "opening_lifecycle",
-	"boot_opening_to_home_once", "once_per_cold_launch", "device_instrumentation", "ios_static_readiness", "boot_splash_logo"]
+	"boot_opening_to_home_once", "once_per_cold_launch", "device_instrumentation", "ios_static_readiness", "boot_splash_logo", "akilta_logo"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -26,6 +26,7 @@ func _initialize() -> void:
 	await _device_instrumentation()
 	_ios_static_readiness()
 	_boot_splash_logo()
+	await _akilta_logo()
 	_cleanup()
 	_done()
 
@@ -265,6 +266,7 @@ func _device_instrumentation() -> void:
 	sub.add_child(o)
 	await process_frame
 	o.begin()
+	o.skip_logo()
 	for _i in range(30):
 		await process_frame
 	var mid: Dictionary = o.get_metrics()
@@ -309,6 +311,68 @@ func _boot_splash_logo() -> void:
 	_ok(ProjectSettings.get_setting("application/boot_splash/bg_color") == OpeningScreen.BACKGROUND, "splash bg_color equals Opening BACKGROUND (no flash)")
 	_ok(img != null and img.get_pixel(0, 0) == OpeningScreen.BACKGROUND and img.get_pixel(1079, 2159) == OpeningScreen.BACKGROUND, "splash canvas edges match bg_color (seamless letterbox)")
 	_complete("boot_splash_logo")
+
+## SB-POLISH-008: Akilta wordmark step between the boot splash and the video.
+func _akilta_logo() -> void:
+	print("[akilta logo]")
+	const LIGHT := "res://assets/brand/akilta-wordmark-light.svg"
+	var prov := FileAccess.get_file_as_string("res://assets/brand/PROVENANCE.md")
+	_ok(prov.find(FileAccess.get_sha256(LIGHT)) != -1 and prov.find("svg/scale=0.5") != -1, "white derivative SHA-256 and import scale recorded in PROVENANCE.md")
+	var tex: Texture2D = OpeningScreen.AKILTA_LOGO
+	_ok(tex != null and tex.get_size() == Vector2(1233, 390), "SVG imports as a 1233x390 texture (%s)" % (str(tex.get_size()) if tex else "null"))
+	var img := tex.get_image() if tex else null
+	var lit := 0
+	if img != null:
+		for x in range(0, img.get_width(), 7):
+			var c := img.get_pixel(x, img.get_height() / 2)
+			if c.a > 0.9 and c.r > 0.9 and c.g > 0.9 and c.b > 0.9:
+				lit += 1
+	_ok(lit > 0, "wordmark is white on the black background (%d lit samples)" % lit)
+	for size in [Vector2i(1080, 2160), Vector2i(1440, 3200)]:
+		var sub := _sub(size)
+		var o = OpeningScreen.new()
+		sub.add_child(o)
+		await process_frame
+		var ev: Array = []
+		o.completed.connect(func(): ev.append("completed"))
+		_ok(o.begin() and o.is_logo_showing() and o.get_logo().visible and not o.get_player().is_playing(), "%s: begin() shows the Akilta logo first, video not yet playing" % str(size))
+		var lr: Rect2 = o.get_logo().get_rect()
+		_ok(absf(lr.size.x - size.x * OpeningScreen.LOGO_WIDTH_FRACTION) <= 1.0 and absf(lr.get_center().x - size.x * 0.5) <= 1.0 and absf(lr.get_center().y - size.y * 0.5) <= 1.0, "%s: logo centred, %d%% of width (%s)" % [str(size), int(OpeningScreen.LOGO_WIDTH_FRACTION * 100), str(lr)])
+		_ok(lr.size.x <= tex.get_width(), "%s: texture never upscaled (%d <= %d)" % [str(size), int(lr.size.x), tex.get_width()])
+		o._process(0.0)
+		var a0: float = o.get_logo().modulate.a
+		o._process(0.2)
+		var a_in: float = o.get_logo().modulate.a
+		o._process(0.55)
+		var a_mid: float = o.get_logo().modulate.a
+		o._process(0.6)
+		var a_out: float = o.get_logo().modulate.a
+		_ok(a0 == 0.0 and absf(a_in - 0.5) < 0.01 and a_mid == 1.0 and a_out < 0.5, "%s: fades in, holds, fades out (%.2f %.2f %.2f %.2f)" % [str(size), a0, a_in, a_mid, a_out])
+		o._process(0.2)
+		_ok(not o.is_logo_showing() and not o.get_logo().visible and o.get_player().is_playing() and ev.is_empty(), "%s: after %.1f s the video starts" % [str(size), OpeningScreen.LOGO_SEC])
+		o.cleanup()
+		sub.free()
+	var sub2 := _sub(Vector2i(1080, 2160))
+	var t = OpeningScreen.new()
+	sub2.add_child(t)
+	await process_frame
+	t.begin()
+	var tap := InputEventMouseButton.new()
+	tap.button_index = MOUSE_BUTTON_LEFT
+	tap.pressed = true
+	t._gui_input(tap)
+	_ok(not t.is_logo_showing() and t.get_player().is_playing(), "tap skips the logo straight to the video")
+	t._gui_input(tap)
+	_ok(t.get_player().is_playing() and not t.is_terminal(), "tap during the video does not skip it")
+	t.cleanup()
+	sub2.free()
+	var root = await _boot(1)
+	_ok(root.get_opening() != null and root.get_opening().is_logo_showing(), "cold launch: Akilta logo is the first step of the opening")
+	_shutdown(root)
+	var again = await _boot(1, false)
+	_ok(again.get_opening() == null, "same rule as the video: no logo when the opening is not replayed")
+	_shutdown(again)
+	_complete("akilta_logo")
 
 func _find(hay: PackedByteArray, needle: PackedByteArray) -> int:
 	for i in range(hay.size() - needle.size()):

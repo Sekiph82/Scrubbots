@@ -10,6 +10,8 @@ extends Control
 ##     player and releases the stream; a watchdog guarantees termination even if the
 ##     platform never reports `finished`;
 ##   - isolated: it knows nothing about AppState, gameplay, save or economy.
+## SB-POLISH-008: begin() first shows the Akilta wordmark on the same background
+## (LOGO_SEC with fade in/out, tap skips), then plays the video.
 
 signal completed
 signal failed(reason: String)
@@ -20,9 +22,18 @@ const DEFAULT_VIDEO_SIZE := Vector2(1280, 720)
 ## Watchdog: asset length (15.02 s) + margin. Presentation safety only.
 const WATCHDOG_SEC := 20.0
 const BACKGROUND := Color(0.0, 0.0, 0.0, 1.0)
+## White derivative of assets/brand/akilta-wordmark.svg (see assets/brand/PROVENANCE.md).
+const AKILTA_LOGO := preload("res://assets/brand/akilta-wordmark-light.svg")
+const LOGO_SEC := 1.5
+const LOGO_FADE_SEC := 0.4
+## Wordmark width as a fraction of the screen width.
+const LOGO_WIDTH_FRACTION := 0.6
 
 var _player: VideoStreamPlayer
 var _bg: ColorRect
+var _logo: TextureRect
+## Seconds into the Akilta logo step; -1 when it is not showing.
+var _logo_t := -1.0
 var _started := false
 var _terminal := false
 var _elapsed := 0.0
@@ -47,6 +58,17 @@ func _init() -> void:
 	_bg.set_anchors_preset(Control.PRESET_FULL_RECT)
 	_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	add_child(_bg)
+	_logo = TextureRect.new()
+	_logo.name = "AkiltaLogo"
+	_logo.texture = AKILTA_LOGO
+	_logo.expand_mode = TextureRect.EXPAND_IGNORE_SIZE
+	_logo.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_CENTERED
+	_logo.anchor_left = (1.0 - LOGO_WIDTH_FRACTION) * 0.5
+	_logo.anchor_right = 1.0 - _logo.anchor_left
+	_logo.anchor_bottom = 1.0
+	_logo.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_logo.visible = false
+	add_child(_logo)
 	_player = VideoStreamPlayer.new()
 	_player.name = "Video"
 	_player.expand = true
@@ -61,7 +83,8 @@ func set_stream_path(path: String) -> void:
 	if not _started:
 		_stream_path = path
 
-## Start playback once. Emits `failed` (deferred) when the stream cannot load/play.
+## Start once: Akilta logo, then playback. Emits `failed` (deferred) when the stream
+## cannot load/play.
 func begin() -> bool:
 	if _started:
 		return false
@@ -72,16 +95,36 @@ func begin() -> bool:
 	if stream == null:
 		_fail_deferred("stream_unavailable")
 		return false
-	_t_begin_ms = Time.get_ticks_msec()
 	_player.stream = stream
-	_player.play()
 	_elapsed = 0.0
+	_logo_t = 0.0
+	_logo.modulate.a = 0.0
+	_logo.visible = true
 	set_process(true)
 	_fit()
+	return true
+
+## Ends the Akilta logo step (timeout or tap) and starts the video.
+func skip_logo() -> void:
+	if _logo_t < 0.0 or _terminal:
+		return
+	_logo_t = -1.0
+	_logo.visible = false
+	_t_begin_ms = Time.get_ticks_msec()
+	_player.play()
 	if not _player.is_playing():
 		_fail_deferred("play_failed")
-		return false
-	return true
+
+func is_logo_showing() -> bool:
+	return _logo_t >= 0.0
+
+func get_logo() -> TextureRect:
+	return _logo
+
+func _gui_input(event: InputEvent) -> void:
+	if _logo_t >= 0.0 and event is InputEventMouseButton and event.pressed:
+		accept_event()
+		skip_logo()
 
 func _process(delta: float) -> void:
 	if _terminal:
@@ -89,8 +132,14 @@ func _process(delta: float) -> void:
 	_elapsed += delta
 	_process_frames += 1
 	_max_frame_gap_ms = maxf(_max_frame_gap_ms, delta * 1000.0)
+	if _logo_t >= 0.0:
+		_logo_t += delta
+		if _logo_t >= LOGO_SEC:
+			skip_logo()
+		else:
+			_logo.modulate.a = clampf(minf(_logo_t, LOGO_SEC - _logo_t) / LOGO_FADE_SEC, 0.0, 1.0)
 	var tex := _player.get_video_texture()
-	if _t_first_frame_ms < 0 and tex != null and tex.get_size().x > 0:
+	if _t_first_frame_ms < 0 and _t_begin_ms >= 0 and tex != null and tex.get_size().x > 0:
 		_t_first_frame_ms = Time.get_ticks_msec()
 	if tex != null and tex.get_size().x > 0 and tex.get_size() != _video_size:
 		_video_size = tex.get_size()
