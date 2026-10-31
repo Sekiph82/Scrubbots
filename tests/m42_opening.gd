@@ -317,7 +317,10 @@ func _akilta_logo() -> void:
 	print("[akilta logo]")
 	const LIGHT := "res://assets/brand/akilta-wordmark-light.svg"
 	var prov := FileAccess.get_file_as_string("res://assets/brand/PROVENANCE.md")
-	_ok(prov.find(FileAccess.get_sha256(LIGHT)) != -1 and prov.find("svg/scale=0.5") != -1, "white derivative SHA-256 and import scale recorded in PROVENANCE.md")
+	var src := FileAccess.get_file_as_string("res://assets/brand/akilta-wordmark.svg").replace("\r\n", "\n")
+	var light := FileAccess.get_file_as_string(LIGHT).replace("\r\n", "\n")
+	_ok(src.find("#111111") != -1 and light == src.replace("fill=\"#111111\"", "fill=\"#FFFFFF\""), "derivative = owner SVG with only the fill set to white (source unchanged)")
+	_ok(prov.find("akilta-wordmark-light.svg") != -1 and prov.find("svg/scale=0.5") != -1, "derivative and import scale recorded in PROVENANCE.md")
 	var tex: Texture2D = OpeningScreen.AKILTA_LOGO
 	_ok(tex != null and tex.get_size() == Vector2(1233, 390), "SVG imports as a 1233x390 texture (%s)" % (str(tex.get_size()) if tex else "null"))
 	var img := tex.get_image() if tex else null
