@@ -10,7 +10,9 @@ extends RefCounted
 ##     canonical order, only with enough Bot Parts) -> unlock_next_robot -> the shared ceremony
 ##     presenter shows the owner-accepted Robot Unlock ceremony on top;
 ##   - locked detail: preview art under the lock, required Bot Parts, perk; Bot Parts are earned
-##     by playing and cannot be bought (no SB / money path exists).
+##     by playing and cannot be bought (no SB / money path exists);
+##   - SB-POLISH-005: tapping any row (outside its action button) opens that robot's detail card,
+##     so the ACTIVE / EQUIP / UNLOCK rows have details too (unlocked: art + role + perk, no lock).
 ## Robot selection is presentation/meta only: nothing here reaches BoardState, targeting,
 ## routing, solver or batch legality. "Seen" marks are presentation (dirty flag, no save per view).
 
@@ -66,7 +68,9 @@ static func open(stack, app, ceremonies = null) -> BasePopup:
 	var new_ids := unseen_robots(e)
 	p.set_meta("new_on_open", new_ids)
 	for r in RobotRoster.load_roster()["robots"]:
-		list.add_child(_row(p, e, r, new_ids.has(String(r["id"]))))
+		var card := _row(p, e, r, new_ids.has(String(r["id"])))
+		card.gui_input.connect(func(ev): _on_row_input(ev, stack, app, p, card))
+		list.add_child(card)
 	for id in new_ids:
 		e.meta_ui.mark_seen(seen_key(id))
 	if not new_ids.is_empty():
@@ -209,13 +213,31 @@ static func _on_action(stack, app, ceremonies, p: BasePopup, id: String) -> void
 	refresh(p, e)
 	p.rearm_soon()
 
-## Locked robot detail: preview art under the lock emblem, required Bot Parts, perk, and the
-## fact that Bot Parts are only earned (never bought). Informational: no action.
+## SB-POLISH-005: a stationary tap on a row (not on its action button) opens the detail card.
+## A finger swipe moves more than the TouchScroll deadzone between press and release: no tap.
+static func _on_row_input(event: InputEvent, stack, app, p: BasePopup, card: Control) -> void:
+	if not (event is InputEventMouseButton) or event.button_index != MOUSE_BUTTON_LEFT:
+		return
+	if event.pressed:
+		card.set_meta("press_at", event.global_position)
+		return
+	var at = card.get_meta("press_at", null)
+	card.remove_meta("press_at")
+	var b: Button = p.get_action_button("robot:" + String(card.get_meta("robot_id")))
+	if at == null or event.global_position.distance_to(at) > TouchScroll.DEADZONE_PX or b.get_global_rect().has_point(event.global_position):
+		return
+	if p.is_open() and stack.top() == p:
+		open_detail(stack, app, String(card.get_meta("robot_id")))
+
+## Robot detail. Locked: preview art under the lock emblem, required Bot Parts, perk, and the
+## fact that Bot Parts are only earned (never bought). Unlocked (SB-POLISH-005): the art, role and
+## perk without the lock. Informational: no action.
 static func open_detail(stack, app, id: String, on_close: Callable = Callable()) -> BasePopup:
 	var e = app.economy
 	var r := RobotRoster.entry(id)
-	if r.is_empty() or e.robots.is_unlocked(id):
+	if r.is_empty():
 		return null
+	var locked: bool = not e.robots.is_unlocked(id)
 	var p := BasePopup.new("robot_detail")
 	p.set_frame("large")
 	p.set_title(String(r["name"]).to_upper())
@@ -225,17 +247,19 @@ static func open_detail(stack, app, id: String, on_close: Callable = Callable())
 	var art := HomeStyle.art("PreviewArt")
 	art.texture = load(RobotRoster.asset(id, "master"))
 	art.custom_minimum_size = Vector2(330, 396)
-	art.modulate = Color(0.55, 0.6, 0.7, 1.0)
 	box.add_child(art)
-	var lock := HomeStyle.art("Lock")
-	lock.texture = load(ART["lock"])
-	lock.custom_minimum_size = Vector2(150, 150)
-	box.add_child(lock)
+	if locked:
+		art.modulate = Color(0.55, 0.6, 0.7, 1.0)
+		var lock := HomeStyle.art("Lock")
+		lock.texture = load(ART["lock"])
+		lock.custom_minimum_size = Vector2(150, 150)
+		box.add_child(lock)
 	p.add_body_line(String(r["role"]), "Role", BasePopup.INK, 26)
 	p.add_body_line("%s: %s" % [String(r["perk_name"]), String(r["perk_text"])], "Perk", BasePopup.ROYAL_EDGE, 26)
-	var need := int(e.robots.unlock_cost()) * (RobotRoster.ids().find(id) - RobotRoster.ids().find(RobotRoster.next_locked(e.robots)) + 1)
-	p.add_body_line(UiText.t("ROBOTS_DETAIL_NEED", [UiText.num(need), UiText.num(e.wallet.bot_parts())]), "Required", BasePopup.INK, 26)
-	p.add_body_line(UiText.t("ROBOTS_DETAIL_EARNED"), "EarnedOnly", BasePopup.INK, 22)
+	if locked:
+		var need := int(e.robots.unlock_cost()) * (RobotRoster.ids().find(id) - RobotRoster.ids().find(RobotRoster.next_locked(e.robots)) + 1)
+		p.add_body_line(UiText.t("ROBOTS_DETAIL_NEED", [UiText.num(need), UiText.num(e.wallet.bot_parts())]), "Required", BasePopup.INK, 26)
+		p.add_body_line(UiText.t("ROBOTS_DETAIL_EARNED"), "EarnedOnly", BasePopup.INK, 22)
 	p.add_body_line(UiText.t("ROBOTS_PERK_META"), "MetaOnly", BasePopup.INK, 20)
 	p.add_action("back", UiText.t("SHOP_BACK"), "secondary", true)
 	p.closed.connect(func(_r):
