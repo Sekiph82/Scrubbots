@@ -6,9 +6,10 @@ extends SceneTree
 ##     C01..C16 ascending, 3..12 colours, VOID only in version 2, cadence class per slot;
 ##   - provenance: metadata binds the release-pool entry (digest, owner candidate, sha256s) and
 ##     matches the level (colour counts, VOID count); preview pixels == the level cells;
-##   - win: the Studio pipeline's SOLVED + replay WIN is recorded in metadata; here each plan's
-##     intended clicks replay (no solver search) through the real ProofKernel to ACTIVE 0,
-##     supply exhausted, slots empty;
+##   - win: each plan loads fail-closed, its intendedColumnClicks are non-empty and legal (every
+##     click pops a front batch, every batch is clicked) and the Studio SOLVED + replay WIN
+##     evidence is in metadata. WON under real play is asserted by tests/real_play_levels.gd
+##     (SB-CAMPAIGN-RUNTIME-KERNEL-DIVERGENCE): a regenerated plan need not be ProofKernel-legal;
 ##   - frontier: fresh profile resolves L1..L30 in order, L31 is CONTENT_MISSING, and feature
 ##     unlocks follow the owner table up to L30.
 ## Never boots main.tscn: AppState on temp user:// paths.
@@ -21,8 +22,6 @@ const LevelData = preload("res://scripts/data/level_data.gd")
 const ProductionLevelValidator = preload("res://scripts/data/production_level_validator.gd")
 const LevelProgressionService = preload("res://scripts/progression/level_progression_service.gd")
 const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
-const ProofState = preload("res://scripts/gameplay/solver/proof_state.gd")
-const ProofKernel = preload("res://scripts/gameplay/solver/proof_kernel.gd")
 const GameplayLaunchResolver = preload("res://scripts/app/gameplay_launch_resolver.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
 
@@ -142,17 +141,20 @@ func _win() -> void:
 			_ok(false, "%s: plan loads: %s" % [e.id, res["error"]])
 			continue
 		var plan = JSON.parse_string(FileAccess.get_file_as_string(e.supply_plan_path))
-		var k = ProofKernel.new()
-		var st = k.quiesce(ProofState.from_level_and_supply(lv, res["engine"]))["state"]
-		var legal := true
-		for c in plan["intendedColumnClicks"]:
+		var left: Array = []
+		for col in plan["columns"]:
+			left.append(col.size())
+		var clicks: Array = plan["intendedColumnClicks"]
+		var legal := not clicks.is_empty()
+		for c in clicks:
 			var col := int(c) - 1
-			if not st.legal_action_columns().has(col):
-				legal = false
+			legal = legal and col >= 0 and col < left.size() and left[col] > 0
+			if not legal:
 				break
-			st = k.apply_placement(st, col)["state"]
-		_ok(legal and st.active_count() == 0 and st.is_supply_exhausted() and st.occupied_slot_count() == 0,
-			"%s: %d clicks -> WIN (ACTIVE 0, supply exhausted, slots empty)" % [e.id, plan["intendedColumnClicks"].size()])
+			left[col] -= 1
+		var rp = JSON.parse_string(FileAccess.get_file_as_string(e.metadata_path)).get("releasePool", {})
+		_ok(legal and left.all(func(n): return n == 0) and rp.get("studioSolverStatus", "") == "SOLVED" and rp.get("studioReplay", "") == "WIN",
+			"%s: %d legal clicks consume every batch; Studio evidence SOLVED + replay WIN" % [e.id, clicks.size()])
 	_completed["win"] = true
 
 func _frontier() -> void:
