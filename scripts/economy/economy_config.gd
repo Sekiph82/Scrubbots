@@ -13,7 +13,7 @@ extends RefCounted
 const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
 const DEFAULT_PATH := "res://data/config/economy_rewards_v1.json"
-const EXPECTED_SCHEMA_VERSION := 2
+const EXPECTED_SCHEMA_VERSION := 3   ## 3: SB-POLISH-002 gift cycle 1..1000 + legacy_milestones
 const DIFFICULTIES := ["EASY", "MEDIUM", "HARD", "VERY_HARD"]
 
 var _ok := false
@@ -83,6 +83,13 @@ func _validate_values(data: Dictionary) -> String:
 	# gift_meter.cycle_max positive int
 	var cm = IntDomain.exact_int(data.get("gift_meter", {}).get("cycle_max", null))
 	if cm == null or cm < 1: return "gift_meter.cycle_max must be a positive integer"
+	# Every gift milestone key (current + legacy) is a positive int <= cycle_max with a bundle.
+	for tname in ["milestones", "legacy_milestones"]:
+		var mt = data.get("gift_meter", {}).get(tname, {})
+		if typeof(mt) != TYPE_DICTIONARY: return "gift_meter.%s must be an object" % tname
+		for k in mt.keys():
+			if not String(k).is_valid_int() or int(k) < 1 or int(k) > cm or typeof(mt[k]) != TYPE_DICTIONARY:
+				return "gift_meter.%s key %s must be a positive integer <= cycle_max with a bundle" % [tname, k]
 	# bot_parts.robot_unlock_cost positive int
 	var bp = data.get("bot_parts", {})
 	var cost = IntDomain.exact_int(bp.get("robot_unlock_cost", null))
@@ -117,7 +124,7 @@ func _validate_values(data: Dictionary) -> String:
 		if price == null: return "boosters.%s.price_sb must be a non-negative integer" % id
 	# SB-M39-054: canonical reward bundles use the unambiguous random-any key only; the legacy
 	# "random_booster_charges" (once read as "a charge of the RANDOM booster") is refused here.
-	for table in [data.get("gift_meter", {}).get("milestones", {}), data.get("daily", {}).get("login_rewards", {})]:
+	for table in [data.get("gift_meter", {}).get("milestones", {}), data.get("gift_meter", {}).get("legacy_milestones", {}), data.get("daily", {}).get("login_rewards", {})]:
 		if typeof(table) != TYPE_DICTIONARY: continue
 		for b in table.values():
 			if typeof(b) == TYPE_DICTIONARY and b.has("random_booster_charges"):
@@ -167,6 +174,12 @@ func gift_meter_cycle_max() -> int:
 func gift_meter_milestone(milestone: int) -> Dictionary:
 	var ms = _data.get("gift_meter", {}).get("milestones", {})
 	var v = ms.get(str(milestone), {})
+	return v if typeof(v) == TYPE_DICTIONARY else {}
+
+## Bundle of a retired milestone (SB-POLISH-002: old "50"), only to pay an already-queued
+## unclaimed occurrence from a pre-schema-3 save.
+func gift_meter_legacy_milestone(milestone: int) -> Dictionary:
+	var v = _data.get("gift_meter", {}).get("legacy_milestones", {}).get(str(milestone), {})
 	return v if typeof(v) == TYPE_DICTIONARY else {}
 
 func gift_meter_milestones() -> Array:

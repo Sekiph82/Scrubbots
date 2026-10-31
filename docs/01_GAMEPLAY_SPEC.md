@@ -332,7 +332,7 @@ Core V1 rules:
 - Production manual 2x is paid/entitlement-gated; automatic M23-exhausted 2x remains free.
 - Exactly four boosters exist: +1 Slot, Random, Selector and Tornado.
 - Daily includes a consecutive-login counter and repeating 5-day rewards.
-- Gift Meter thresholds are 10/50/250/500/1000 and progress ONLY from Win Streak SB.
+- Gift Meter thresholds are 1/5/10/25/100/250/500/1000 (SB-POLISH-002) and progress ONLY from Win Streak SB.
 
 Real-money IAP/ads/subscriptions remain a separate M57 owner gate; Economy V1 does not authorize them.
 

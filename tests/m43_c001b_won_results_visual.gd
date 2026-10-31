@@ -95,7 +95,8 @@ func _rows_match_receipt_order() -> void:
 	print("[rows match receipt order]")
 	var root = await _boot_main(_uniq("rows"))
 	var app = root.get_app_state()
-	app.economy.gift.add_streak_sb("c001b_seed", 9)   # Level 1 streak SB crosses milestone 10
+	for o in app.economy.gift.add_streak_sb("c001b_seed", 8):   # 1 + 8 = 9; Level 1 streak SB crosses milestone 10
+		app.economy.meta_ui.mark_seen("gift:" + String(o["id"]))
 	var h = await _play(root)
 	_drain(h)
 	var res = root.get_results_screen()
@@ -340,7 +341,7 @@ func _art_and_manifest_governance() -> void:
 # ---------------------------------------------------------------- helpers ----
 
 ## Real production commit on an isolated graph: Level 10 with streak 4 -> +100 streak SB,
-## streak Bot Part, Gift 41 -> 141 (crosses 50).
+## streak Bot Part, Gift 41 -> 141 (crosses 100, SB-POLISH-002).
 func _rich_receipt(app) -> Dictionary:
 	for n in [1, 2, 3, 4]:
 		app.economy.streak.process_first_clear_win(n)
@@ -423,7 +424,14 @@ func _strip_comments(text: String) -> String:
 		out.append(line if i == -1 else line.substr(0, i))
 	return "\n".join(out)
 
+## SB-POLISH-002: a fresh Level 1 win would cross Gift milestone 1 (its ceremony holds Results).
+## Boot from a save whose Gift Meter is already at 1 with that ceremony seen, so a Level 1 win
+## (1 -> 2) crosses no milestone unless a case seeds one on purpose.
 func _boot_main(path: String):
+	var seed = AppState.new(path)
+	for o in seed.economy.gift.add_streak_sb("test_seed_m1", 1):
+		seed.economy.meta_ui.mark_seen("gift:" + String(o["id"]))
+	seed.request_save()
 	MainScript.boot_save_path_override = path
 	var root = MainScene.instantiate()
 	get_root().add_child(root)

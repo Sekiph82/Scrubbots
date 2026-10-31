@@ -377,7 +377,7 @@ static func gift_rows(gift) -> Array:
 
 static func refresh_gift_bar(p: BasePopup, app) -> void:
 	var gm := GiftProgressModel.from_service(app.economy.gift)
-	(p.find_child("Progress", true, false) as Label).text = UiText.t("GIFTS_PROGRESS", [UiText.num(gm["progress"]), UiText.num(gm["cycle_max"]), UiText.num(gm["next"])])
+	(p.find_child("Progress", true, false) as Label).text = UiText.t("GIFTS_PROGRESS", [UiText.num(gm["progress"]), UiText.num(gm["next"])])
 	var list: VBoxContainer = p.find_child("Gifts", true, false)
 	var rows := gift_rows(app.economy.gift)
 	# Keep every CLAIM button alive (the popup's action registry owns them): park them in a
@@ -403,7 +403,7 @@ static func refresh_gift_bar(p: BasePopup, app) -> void:
 		var card := _row_card("Gift_" + String(o["id"]).replace(":", "_"))
 		card.set_meta("occ", String(o["id"]))
 		var h: HBoxContainer = card.get_child(0)
-		var t := BasePopup.body_label(UiText.t("GIFTS_ROW", [UiText.num(int(o["milestone"])), UiText.reward_text(app.economy.config.gift_meter_milestone(int(o["milestone"])))]), 22, BasePopup.INK)
+		var t := BasePopup.body_label(UiText.t("GIFTS_ROW", [UiText.num(int(o["milestone"])), UiText.reward_text(GiftProgressModel.GiftMeterService.milestone_rewards(int(o["milestone"]), app.economy.config))]), 22, BasePopup.INK)
 		t.name = "Text"
 		t.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 		t.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT

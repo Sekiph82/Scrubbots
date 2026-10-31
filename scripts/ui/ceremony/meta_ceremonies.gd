@@ -244,7 +244,7 @@ static func robot_unlock(event: Dictionary, reduced: bool):
 
 # ---------------------------------------------------------- Gift Meter milestone ----
 
-## SB-M43-074: a Gift Meter milestone (10 / 50 / 250 / 500 / 1000) reached. The rewards are
+## SB-M43-074: a Gift Meter milestone (1 / 5 / 10 / 25 / 100 / 250 / 500 / 1000, SB-POLISH-002) reached. The rewards are
 ## the exact config bundle QUEUED for this occurrence; they are claimed in the Gift Bar
 ## (GiftMeterService.claim), never here, and the copy says so. A guaranteed-new-card fallback
 ## is shown as its condition, never as an extra reward.

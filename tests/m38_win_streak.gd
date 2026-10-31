@@ -95,8 +95,8 @@ func _gift_meter_rollover() -> void:
 	_ok(crossed_1000, "1000 milestone queued on crossing")
 	# A single large feed crossing multiple milestones queues each once.
 	var gift2 = GiftMeterService.new()
-	var n2 = gift2.add_streak_sb("x", 300)   # crosses 10, 50, 250
-	_ok(n2.size() == 3, "single feed crossing 10/50/250 queues 3 milestones")
+	var n2 = gift2.add_streak_sb("x", 300)   # crosses 1, 5, 10, 25, 100, 250 (SB-POLISH-002)
+	_ok(n2.size() == 6, "single feed crossing 1/5/10/25/100/250 queues 6 milestones")
 
 func _duplicate_and_reentrant() -> void:
 	print("[duplicate]")

@@ -398,12 +398,12 @@ func _h06() -> void:
 func _h07() -> void:
 	print("[h07 F012 Gift milestone (owned by F008): Home adds no duplicate REWARD / major effect]")
 	await _home_boot("h07")
-	_e().gift.add_streak_sb("streak:p4:h07", 50)
+	_e().gift.add_streak_sb("streak:p4:h07", 5)
 	_home().refresh()
 	_root.request_home_ceremonies()
 	await _frames(14)
 	var shown := 0
-	for _i in range(4):   # 10 and 50 milestones: one F008 ceremony each
+	for _i in range(4):   # 1 and 5 milestones (SB-POLISH-002): one F008 ceremony each
 		var top = _root.get_modal_stack().top()
 		if top == null or not String(top.popup_id).begins_with("ceremony_gift"):
 			break

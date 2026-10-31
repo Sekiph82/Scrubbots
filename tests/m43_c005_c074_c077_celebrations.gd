@@ -53,11 +53,11 @@ func _initialize() -> void:
 # ------------------------------------------------------------------ cases ----
 
 func _c01_gift_full_vs_reduced() -> void:
-	print("[c01 Gift milestones 10/50/250/500/1000: FULL == Reduced, rows == config bundle]")
+	print("[c01 Gift milestones 1/5/10/25/100/250/500/1000: FULL == Reduced, rows == config bundle]")
 	var app = _app("c01")
 	app.economy.gift.add_streak_sb("c01_tx", 1000)
 	var evs: Array = CeremonyEvents.events(app.economy).filter(func(e): return e["kind"] == "gift_milestone")
-	_ok(evs.map(func(e): return int(e["milestone"])) == [10, 50, 250, 500, 1000], "five gift events 10/50/250/500/1000")
+	_ok(evs.map(func(e): return int(e["milestone"])) == [1, 5, 10, 25, 100, 250, 500, 1000], "eight gift events 1/5/10/25/100/250/500/1000 (SB-POLISH-002)")
 	for ev in evs:
 		var m := int(ev["milestone"])
 		var bundle: Dictionary = _cfg["gift_meter"]["milestones"][str(m)].duplicate()
@@ -75,14 +75,14 @@ func _c02_gift_present_grants_nothing() -> void:
 	print("[c02 Gift ceremony under Reduced Effects: grants nothing, exactly once]")
 	var app = _app("c02")
 	app.set_reduced_effects(true)
-	var newly: Array = app.economy.gift.add_streak_sb("c02_tx", 10)
+	var newly: Array = app.economy.gift.add_streak_sb("c02_tx", 1)
 	app.request_save()
 	var a0 := _auth(app)
 	var pr = _presenter(app)
 	_ok(pr.drain("test"), "ceremony opened")
 	await _frames(2)
 	var p = pr.current()
-	_ok(p != null and not p.find_child("HeroGlow", true, false).has_meta("spin") and _rows(p) == {"bot_parts": 1, "standard_card_packs": 1}, "Reduced popup: no spin, config rows")
+	_ok(p != null and not p.find_child("HeroGlow", true, false).has_meta("spin") and _rows(p) == {"scrub_bucks": 25}, "Reduced popup: no spin, config rows (milestone 1)")
 	p._on_action(p.get_action_ids()[0])
 	await _frames(2)
 	_ok(_auth(app) == a0 and app.economy.gift.claimable().size() == 1, "acknowledge granted nothing (wallet / boosters / packs / reward ledger); still claimable")

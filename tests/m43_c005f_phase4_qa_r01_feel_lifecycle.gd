@@ -107,7 +107,7 @@ func _truth(eco) -> String:
 const MOVING_FRAMES := 2
 func _milestone_ceremony(tag: String, teardown: Callable) -> Dictionary:
 	await _boot(tag)
-	_e().gift.add_streak_sb("streak:p4qa:" + tag, 10)
+	_e().gift.add_streak_sb("streak:p4qa:" + tag, 1)   # one milestone (Gift 1, SB-POLISH-002)
 	_root.flush_lifecycle("test")
 	var out := {"truth": _truth(_e()), "path": MainScript.boot_save_path_override, "shown": "", "done": false,
 		"popup": null, "ticks": 0, "feel": weakref(_root.get_meta_reward_feel())}   # weak: must not keep it alive

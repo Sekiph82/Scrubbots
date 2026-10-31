@@ -1,5 +1,5 @@
 {
-  "schema_version": 2,
+  "schema_version": 3,
   "decision": "coordination/OWNER_ECONOMY_REWARDS_V01.md",
   "currency": {
     "id": "scrub_bucks",
@@ -28,32 +28,53 @@
     "cycle_max": 1000,
     "rollover": true,
     "milestones": {
+      "1": {
+        "scrub_bucks": 25
+      },
+      "5": {
+        "bot_parts": 1,
+        "scrub_bucks": 50
+      },
       "10": {
         "bot_parts": 1,
+        "scrub_bucks": 50,
         "standard_card_packs": 1
       },
-      "50": {
+      "25": {
         "bot_parts": 1,
+        "scrub_bucks": 100,
         "random_any_booster_charges": 1
+      },
+      "100": {
+        "bot_parts": 1,
+        "scrub_bucks": 150,
+        "standard_card_packs": 1
       },
       "250": {
         "bot_parts": 2,
-        "scrub_bucks": 100,
+        "scrub_bucks": 200,
+        "selected_booster_charges": 1,
         "standard_card_packs": 1
       },
       "500": {
         "bot_parts": 2,
-        "scrub_bucks": 250,
+        "scrub_bucks": 300,
         "selected_booster_charges": 1,
         "standard_card_packs": 1
       },
       "1000": {
-        "bot_parts": 4,
-        "scrub_bucks": 500,
+        "bot_parts": 2,
+        "scrub_bucks": 600,
         "selected_booster_charges": 2,
         "premium_card_packs": 1,
         "guaranteed_new_cards": 1,
         "guaranteed_new_fallback_sb": 500
+      }
+    },
+    "legacy_milestones": {
+      "50": {
+        "bot_parts": 1,
+        "random_any_booster_charges": 1
       }
     }
   },

@@ -3,7 +3,8 @@ extends RefCounted
 ##
 ## M43-C005R (SB-M43-R05-001/002) — the ONE normalized, read-only Gift Meter progress model
 ## shared by Home, Results and the Gift Bar. It is a pure function of the committed cycle
-## progress and the canonical milestones (GiftMeterService: 10 / 50 / 250 / 500 / 1000):
+## progress and the canonical milestones (GiftMeterService: 1 / 5 / 10 / 25 / 100 / 250 / 500 /
+## 1000, SB-POLISH-002). Surfaces show progress / `next` (0/1, 1/5, ..., 500/1000):
 ##
 ##   {progress, cycle_max, prev, next, segment_fraction, ticks, ticks_reached, cycle_fraction}
 ##
@@ -30,6 +31,10 @@ static func build(progress: int, cycle_max: int = GiftMeterService.CYCLE_MAX, mi
 	return {"progress": p, "cycle_max": cycle_max, "prev": prev, "next": next,
 		"segment_fraction": frac, "ticks": TICKS, "ticks_reached": int(floor(frac * TICKS + 1e-9)),
 		"cycle_fraction": float(p) / float(maxi(cycle_max, 1))}
+
+## Next milestone the meter is filling towards (the denominator every surface shows).
+static func next_milestone(progress: int) -> int:
+	return int(build(progress)["next"])
 
 static func from_service(gift) -> Dictionary:
 	return build(gift.cycle_progress())

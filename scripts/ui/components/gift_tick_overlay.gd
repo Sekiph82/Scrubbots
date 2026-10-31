@@ -17,7 +17,7 @@ var _milestones: Array = []
 var _pulse := 0.0
 var _pulse_tick := -1
 var _tween: Tween
-## Centred caption sharing the bar (owner-locked N/1,000): no mark is drawn across its text.
+## Centred caption sharing the bar (N/next milestone, SB-POLISH-002): no mark is drawn across its text.
 var avoid_label: Label = null
 
 func _init() -> void:

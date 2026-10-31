@@ -71,6 +71,7 @@ const EN := {
 	"REWARD_random_booster_charges": "Mystery Booster",   # legacy alias key: same random-any meaning
 	"REWARD_selected_booster_charges": "Booster of choice",
 	"REWARD_guaranteed_new_cards": "New Card",
+	"REWARD_guaranteed_new_fallback_sb": "SB if no new card",   # condition of the New Card, never extra
 	"RESULTS_WON": "LEVEL COMPLETE",
 	"RESULTS_LOST": "LEVEL FAILED",
 	"RESULTS_ERROR": "SOMETHING WENT WRONG",
@@ -282,8 +283,7 @@ ACTIVE",
 	"FEATURE_COLLECTION_NAME": "COLLECTION",
 	"FEATURE_COLLECTION_BODY": "Collect cards and complete sets for rewards.",
 	"CEREMONY_WORLD_BODY": "New cleaning area ready.",
-	"RESULTS_GIFT_METER_NEXT": "Gift Meter %s/%s · next gift at %s",
-	"GIFTS_PROGRESS": "Gift Meter %s/%s · next gift at %s",
+	"GIFTS_PROGRESS": "Gift Meter %s/%s",   # SB-POLISH-002: progress / next milestone
 	"SHOP_SECTION_HEARTS": "HEARTS",
 	"SHOP_SECTION_BOOSTERS": "BOOSTERS",
 	"SHOP_SECTION_SPEED": "2X SPEED",
@@ -577,5 +577,9 @@ static func reward_text(rewards: Dictionary) -> String:
 	keys.sort()
 	for k in keys:
 		if int(rewards[k]) > 0:
-			parts.append(t("REWARD_ITEM", [t("REWARD_" + String(k)), num(int(rewards[k]))]))
+			parts.append(t("REWARD_ITEM", [reward_label(String(k)), num(int(rewards[k]))]))
 	return ", ".join(parts)
+
+## Label for one reward key; an unlabelled key degrades to "Foo Bar", never a raw REWARD_ key.
+static func reward_label(key: String) -> String:
+	return t("REWARD_" + key) if EN.has("REWARD_" + key) else key.capitalize()

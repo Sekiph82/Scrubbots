@@ -549,7 +549,7 @@ static func reward_rows(receipt: Dictionary) -> Array:
 			"gift_meter":
 				# M43-C005R: the shared normalized model of the COMMITTED value (receipt "to").
 				var gm := GiftProgressModel.build(int(e["to"]), int(e["cycle_max"]))
-				text = UiText.t("RESULTS_GIFT_METER_NEXT", [UiText.num(gm["progress"]), UiText.num(gm["cycle_max"]), UiText.num(gm["next"])])
+				text = UiText.t("RESULTS_GIFT_METER", [UiText.num(gm["progress"]), UiText.num(gm["next"])])   # SB-POLISH-002: progress / next
 			"collection_cards":
 				text = UiText.t("RESULTS_CARDS", [e["amount"]])
 		if not text.is_empty():

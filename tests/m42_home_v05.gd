@@ -204,7 +204,7 @@ func _gift(home) -> void:
 	var chassis: Control = home.get_region("GiftMeterChassis")
 	var emblem: Control = home.get_region("GiftEmblem")
 	var crate: Control = home.get_region("GiftCrate")
-	_ok(meter.caption.text == "0/1,000", "ratio only (%s)" % meter.caption.text)
+	_ok(meter.caption.text == "0/1", "ratio only, 0 / next milestone 1 (%s)" % meter.caption.text)
 	_ok(meter.get_parent() == chassis and (meter.bar.get_theme_stylebox("fill") as StyleBoxFlat).bg_color == HomeStyle.GOLD and meter.bar.size.y >= 50.0, "gold inset bar inside the navy chassis (%.0f px)" % meter.bar.size.y)
 	var cr: Rect2 = chassis.get_global_rect()
 	_ok(cr.size.y >= 80.0 and (chassis.get_theme_stylebox("panel") as StyleBoxFlat).border_width_top >= 3, "substantial chassis with a cyan edge (%.0f px)" % cr.size.y)

@@ -342,12 +342,12 @@ func _m10() -> void:
 	# M47-FAMILY-APK-TOUCH-R01 owner decision: today's free Rewarded Ads slot is actionable on a fresh day.
 	_ok(b == {"tasks": 0, "daily": 1, "gift_bar": 0, "robots": 0, "collection": 0, "events": 0, "rewarded_ads": 1}, "fresh: only Daily + today's free Rewarded Ads slot %s" % str(b))
 	e.daily.mark_task_done(0)
-	e.gift.add_streak_sb("m10", 60)
+	e.gift.add_streak_sb("m10", 60)   # SB-POLISH-002: crosses 1 / 5 / 10 / 25
 	e.wallet.credit("bot_parts", 250)
 	e.collection.add_card(e.collection.all_card_ids()[0])
 	_root.get_home().refresh()
 	b = HomeBadges.compute(a)
-	_ok(b["tasks"] == 1 and b["gift_bar"] == 2 and b["robots"] == 1 and b["collection"] == 1, "tasks / gift / robots / collection %s" % str(b))
+	_ok(b["tasks"] == 1 and b["gift_bar"] == 4 and b["robots"] == 1 and b["collection"] == 1, "tasks / gift / robots / collection %s" % str(b))
 	var h = _root.get_home()
 	_ok(h.get_region("Shortcut_tasks").badge.visible and h.get_region("Shortcut_collection").badge.visible and h.get_region("NavBadge_robots").visible, "badges rendered on Home + BottomNav")
 	a.actions.claim_daily_task(0)

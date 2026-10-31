@@ -490,17 +490,17 @@ func _gift_meter_semantics() -> void:
 	await process_frame
 	var e = app.economy
 	var meter = home.get_region("GiftMeterBar")
-	_ok(meter.caption.text == "0/1,000", "fresh: ratio only 0/1,000 (%s)" % meter.caption.text)
+	_ok(meter.caption.text == "0/1", "fresh: ratio only 0/1 (next milestone, SB-POLISH-002) (%s)" % meter.caption.text)
 	e.wallet.credit("scrub_bucks", 5000)
 	home.refresh()
 	_ok(meter.caption.text.begins_with("0/"), "non-streak SB (wallet credit) does not move the Gift Meter")
 	var r: Dictionary = e.streak.process_first_clear_win(1)
 	home.refresh()
-	_ok(r.get("applied", false) and e.gift.cycle_progress() == 1 and meter.caption.text == "1/1,000", "Win Streak SB (+1) advances it (%s)" % meter.caption.text)
+	_ok(r.get("applied", false) and e.gift.cycle_progress() == 1 and meter.caption.text == "1/5", "Win Streak SB (+1) advances it to 1/5 (%s)" % meter.caption.text)
 	e.gift.add_streak_sb("t_gm_2", 60)
 	home.refresh()
-	_ok(meter.caption.text == "61/1,000" and is_equal_approx(meter.bar.value, 61.0), "crossing 10 and 50 -> 61/1,000 (%s)" % meter.caption.text)
-	_ok(home.get_view_model()["gift_next_milestone"] == 250, "canonical next milestone still 250 (service unchanged; not shown as caption)")
+	_ok(meter.caption.text == "61/100" and is_equal_approx(meter.bar.value, 61.0) and is_equal_approx(meter.bar.max_value, 100.0), "crossing 5, 10 and 25 -> 61/100 (%s)" % meter.caption.text)
+	_ok(home.get_view_model()["gift_next_milestone"] == 100, "next milestone 100 is the caption denominator")
 	var gm_nodes := 0
 	for n in home.get_region("GiftMeter").find_children("*", "Label", true, false):
 		var t := String(n.text).to_lower()
@@ -519,7 +519,7 @@ func _gift_bar_claims() -> void:
 	var app = root.get_app_state()
 	var home = root.get_home()
 	var e = app.economy
-	e.gift.add_streak_sb("t_gb_1", 60)   # crosses 10 and 50
+	e.gift.add_streak_sb("t_gb_1", 5)   # crosses 1 and 5
 	home.refresh()
 	var gb: Label = home.get_region("GiftClaimableBadge")
 	_ok(home.get_region("Shortcut_gift_bar") == null and gb.visible and gb.text == "2", "V04: no Gifts Home panel; Gift Meter crate shows claimable badge 2")

@@ -226,6 +226,8 @@ func _results_cases() -> void:
 	var app = root.get_app_state()
 	var nav = root.get_navigation()
 	app.economy.gift.add_streak_sb("c005c005_seed", 9)   # Level 1 also yields the gift follow-up row
+	for o in app.economy.gift.gift_bar_queue():   # SB-POLISH-002: the seed's own 1 / 5 ceremonies count as seen
+		app.economy.meta_ui.mark_seen("gift:" + String(o["id"]))
 	var h = await _play(root)
 	_drain(h)
 	var res = root.get_results_screen()

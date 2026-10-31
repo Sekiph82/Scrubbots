@@ -275,7 +275,7 @@ func _g01() -> void:
 	print("[g01 REAL app: Gift 10 CLAIM -> Standard ceremony opens -> taps -> Collection = those 3 cards]")
 	await _boot(_uniq("g01"))
 	var e = _root.get_app_state().economy
-	var occ: Array = e.gift.add_streak_sb("streak:test:g01", 10)
+	var occ: Array = e.gift.add_streak_sb("streak:test:g01", 10).filter(func(o): return int(o["milestone"]) == 10)   # 1 / 5 also queued (SB-POLISH-002)
 	_ok(occ.size() == 1 and int(occ[0]["milestone"]) == 10, "Gift 10 reached")
 	var owned0: Dictionary = e.collection.snapshot()["owned"].duplicate()
 	var bp0: int = e.wallet.bot_parts()
@@ -307,7 +307,7 @@ func _g02() -> void:
 		var sel0 = JSON.stringify(e.boosters.snapshot())
 		await _claim_gift_ui(by[m])
 		var p = _top()
-		var exp_sb := 100 if m == 250 else 250
+		var exp_sb := 200 if m == 250 else 300
 		_ok(_is_pack(p) and String(p.popup_id) == "standard_pack", "Gift %d -> Standard ceremony" % m)
 		_ok(e.wallet.scrub_bucks() == sb0 + exp_sb and e.wallet.bot_parts() == bp0 + 2, "Gift %d: +%d SB, +2 Bot Parts exact" % [m, exp_sb])
 		if m == 500:
@@ -337,7 +337,7 @@ func _g03() -> void:
 		var d := int(after_open[k]) - int(pc.get(k, 0))
 		if d != 0:
 			after_claim[k] = d
-	_ok(after_claim.size() == 1 and after_claim.values() == [1] and e.wallet.scrub_bucks() == sb0 + 500, "claim: exactly one guaranteed NEW card + 500 SB (no fallback needed) besides the 5 pack cards")
+	_ok(after_claim.size() == 1 and after_claim.values() == [1] and e.wallet.scrub_bucks() == sb0 + 600, "claim: exactly one guaranteed NEW card + 600 SB (no fallback needed) besides the 5 pack cards")
 	var model := await _finish_pack(p)
 	_ok(model["cards"].size() == 5 and String(model["cards"][0]["rarity"]) != "COMMON", "5 cards, card 0 Rare-or-better")
 	var total := _cards_delta(owned0, e.collection.snapshot()["owned"])
@@ -475,20 +475,20 @@ func _g10() -> void:
 	print("[g10 a claim without packs opens no pack popup]")
 	await _boot(_uniq("g10"))
 	var e = _root.get_app_state().economy
-	var occ: Array = e.gift.add_streak_sb("streak:test:g10", 50)
-	var m50 := ""
+	var occ: Array = e.gift.add_streak_sb("streak:test:g10", 25)
+	var m50 := ""   # SB-POLISH-002: Gift 25 is the Bot Part + booster milestone (50 retired)
 	for o in occ:
-		if int(o["milestone"]) == 50:
+		if int(o["milestone"]) == 25:
 			m50 = String(o["id"])
 	await _claim_gift_ui(m50)
-	_ok(String(_top().popup_id) == "gift_bar" and _pack_count_in_stack() == 0 and e.pending_packs.size() == 0, "Gift 50 (Bot Part + booster): no pack ceremony")
+	_ok(String(_top().popup_id) == "gift_bar" and _pack_count_in_stack() == 0 and e.pending_packs.size() == 0, "Gift 25 (Bot Part + SB + booster): no pack ceremony")
 	_complete("g10_no_pack_no_popup")
 
 func _g11() -> void:
 	print("[g11 a duplicate claim / action callback never queues or opens a second pack]")
 	await _boot(_uniq("g11"))
 	var a = _root.get_app_state()
-	var occ: Array = a.economy.gift.add_streak_sb("streak:test:g11", 10)
+	var occ: Array = a.economy.gift.add_streak_sb("streak:test:g11", 10).filter(func(o): return int(o["milestone"]) == 10)
 	var id := String(occ[0]["id"])
 	await _claim_gift_ui(id)
 	var p = _top()

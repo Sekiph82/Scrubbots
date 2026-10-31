@@ -198,7 +198,7 @@ func _gift() -> void:
 		if fb > 0:
 			ok = ok and p.find_child("FallbackNote", true, false).text.find(_num(fb)) != -1
 		info.append("%d:%s" % [ms, str(_rows(p))])
-	_ok(ok and _t["config"].gift_meter_milestones() == [10, 50, 250, 500, 1000], "Gift 10/50/250/500/1000 rows = exact config bundles; 1000 fallback shown as a condition, not a reward %s" % str(info))
+	_ok(ok and _t["config"].gift_meter_milestones() == [1, 5, 10, 25, 100, 250, 500, 1000], "Gift 1/5/10/25/100/250/500/1000 rows = exact config bundles; 1000 fallback shown as a condition, not a reward %s" % str(info))
 	var big = await _open("gift_milestone", CC.gift_fixture(_t, 1000))
 	var big_hero: float = big.find_child("HeroArt", true, false).custom_minimum_size.y
 	var small = await _open("gift_milestone", CC.gift_fixture(_t, 250))

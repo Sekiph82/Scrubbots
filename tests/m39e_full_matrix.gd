@@ -56,14 +56,14 @@ func _first_clear_plus_streak() -> void:
 func _gift_claim_bundle() -> void:
 	print("[gift claim bundle]")
 	var e = _mk()
-	# Feed 250 streak SB -> crosses 10/50/250. Claim the 250 milestone bundle:
-	# 2 bot parts + 100 SB + 1 standard pack.
+	# Feed 250 streak SB -> crosses 1/5/10/25/100/250. Claim the 250 milestone bundle
+	# (SB-POLISH-002): 2 bot parts + 200 SB + 1 Booster of choice + 1 standard pack.
 	e.gift.add_streak_sb("g", 250)
 	var before_sb = e.wallet.scrub_bucks()
 	var before_bp = e.wallet.bot_parts()
 	var r = e.gift.claim("gift_ms:c0:m250", e.reward, e.config)
 	_ok(r["ok"], "claim 250 milestone")
-	_ok(e.wallet.scrub_bucks() == before_sb + 100 and e.wallet.bot_parts() == before_bp + 2, "250 grants 100 SB + 2 bot parts")
+	_ok(e.wallet.scrub_bucks() == before_sb + 200 and e.wallet.bot_parts() == before_bp + 2, "250 grants 200 SB + 2 bot parts")
 
 func _guaranteed_new_fallback() -> void:
 	print("[guaranteed-new fallback]")

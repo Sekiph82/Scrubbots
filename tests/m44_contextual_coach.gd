@@ -161,6 +161,10 @@ func _c04() -> void:
 	var app = _root.get_app_state()
 	var cm = _root.get_coachmarks()
 	var res = _root.get_results_screen()
+	# SB-POLISH-002: the first streak SB would cross Gift 1, whose ceremony hides the coachmark;
+	# start past it with that ceremony seen.
+	for o in app.economy.gift.add_streak_sb("test_seed_m1", 1):
+		app.economy.meta_ui.mark_seen("gift:" + String(o["id"]))
 	await _play(4)
 	_root.refresh_coachmark()
 	_ok(not cm.is_showing(), "gameplay start, nothing waiting: nothing contextual")

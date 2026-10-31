@@ -49,7 +49,7 @@ Canonical economy decision: `coordination/OWNER_ECONOMY_REWARDS_V01.md`.
 The owner reference is art direction, not literal economic semantics. Production substitutions:
 - coin icon/amount -> Scrub Bucks banknotes/amount;
 - profile XP bar -> Bot Parts next-robot bar;
-- top event bar -> Gift Meter (streak-SB-only; 10/50/250/500/1000);
+- top event bar -> Gift Meter (streak-SB-only; 1/5/10/25/100/250/500/1000 (SB-POLISH-002));
 - top event timer -> removed/replaced by live next-milestone information;
 - Star Exchange -> Cards Exchange;
 - star road -> Win Streak SB Reward Track.

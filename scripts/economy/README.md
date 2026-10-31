@@ -10,7 +10,7 @@ Planned modules:
 - `economy_wallet.gd` — Scrub Bucks authoritative balance; atomic/idempotent grant/spend.
 - `reward_grant_service.gd` — first-clear, streak, Gift Meter, Daily and Collection reward bundles.
 - `heart_service.gd` — max-5 Hearts, 15-minute (900 s) real-world regen, attempt consumption/refill.
-- `gift_meter_service.gd` — Win-Streak-SB-only meter, milestones 10/50/250/500/1000, rollover, Gift Bar queue.
+- `gift_meter_service.gd` — Win-Streak-SB-only meter, milestones 1/5/10/25/100/250/500/1000 (SB-POLISH-002; the meter shows progress / next milestone), rollover, Gift Bar queue, schema-3 save migration (legacy unclaimed 50 paid from `gift_meter.legacy_milestones`).
 - `daily_service.gd` — consecutive-login streak, 5-day cycle and three daily tasks.
 - `booster_inventory.gd` — exactly four charge counters: +1 Slot, Random, Selector, Tornado.
 - `failure_assistance_service.gd` — M43-C004 same-level consecutive-failure counter (session-scoped) and the Need a Hand two-booster recommendation (`data/config/failure_assistance_v1.json`).

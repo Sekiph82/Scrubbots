@@ -454,17 +454,17 @@ func _e22_robot_reduced() -> void:
 # ------------------------------------------------------------------- SB-M43-074 ----
 
 func _e23_gift_queued_truth() -> void:
-	print("[e23 Gift milestone 10: exact queued bundle, claimed later in the Gift Bar]")
+	print("[e23 Gift milestone 1: exact queued bundle, claimed later in the Gift Bar]")
 	var app = _app("e23")
-	var newly: Array = app.economy.gift.add_streak_sb("e23_tx", 10)
+	var newly: Array = app.economy.gift.add_streak_sb("e23_tx", 1)
 	app.request_save()
 	var a0 := _auth(app)
 	var pr = _presenter(app)
-	_ok(newly.size() == 1 and pr.drain("test"), "real Gift Meter crossing queued m10; ceremony opened")
+	_ok(newly.size() == 1 and pr.drain("test"), "real Gift Meter crossing queued m1; ceremony opened")
 	await _frames(2)
 	var p = pr.current()
-	_ok(p.get_title() == "GIFT METER 10!" and _label(p, "Milestone") == "Milestone 10 / 1,000", "title + milestone / cycle max")
-	_ok(_reward_rows(p) == {"bot_parts": 1, "standard_card_packs": 1} and _label(p, "ClaimNote") == "Ready to claim in the Gift Bar.", "rows == config m10 bundle; claim-in-Gift-Bar copy")
+	_ok(p.get_title() == "GIFT METER 1!" and _label(p, "Milestone") == "Milestone 1 / 1,000", "title + milestone / cycle max")
+	_ok(_reward_rows(p) == {"scrub_bucks": 25} and _label(p, "ClaimNote") == "Ready to claim in the Gift Bar.", "rows == config m1 bundle; claim-in-Gift-Bar copy")
 	_ok(_auth(app) == a0 and app.economy.gift.claimable().size() == 1, "presenting granted nothing; occurrence still claimable")
 	_close_cta(p)
 	await _frames(2)
@@ -479,7 +479,7 @@ func _e24_gift_1000_fallback() -> void:
 	var p = MetaCeremonies.build(ev[0], false)
 	var rows := _reward_rows(p)
 	_ok(p.find_child("HeroArt", true, false).texture.resource_path.ends_with("gift_meter_reward_crate.png"), "1000 uses the Gift Meter crate")
-	_ok(rows == {"scrub_bucks": 500, "bot_parts": 4, "premium_card_packs": 1, "selected_booster_charges": 2, "guaranteed_new_cards": 1} and not rows.has("guaranteed_new_fallback_sb"), "rows == config bundle without the fallback %s" % str(rows))
+	_ok(rows == {"scrub_bucks": 600, "bot_parts": 2, "premium_card_packs": 1, "selected_booster_charges": 2, "guaranteed_new_cards": 1} and not rows.has("guaranteed_new_fallback_sb"), "rows == config bundle without the fallback %s" % str(rows))
 	_ok(_label(p, "FallbackNote").contains("500 Scrub Bucks"), "fallback shown as its condition")
 	p.free()
 	_complete("e24_gift_1000_fallback")
@@ -487,10 +487,10 @@ func _e24_gift_1000_fallback() -> void:
 func _e25_gift_claimed_note() -> void:
 	print("[e25 already-claimed occurrence: honest copy, presenting never re-grants]")
 	var app = _app("e25")
-	var occ: Array = app.economy.gift.add_streak_sb("e25_tx", 50)
-	var id50 := ""
+	var occ: Array = app.economy.gift.add_streak_sb("e25_tx", 25)
+	var id50 := ""   # SB-POLISH-002: milestone 25 (50 is retired)
 	for o in occ:
-		if int(o["milestone"]) == 50:
+		if int(o["milestone"]) == 25:
 			id50 = String(o["id"])
 	app.actions.claim_gift(id50)
 	var a0 := _auth(app)
@@ -502,21 +502,21 @@ func _e25_gift_claimed_note() -> void:
 	_complete("e25_gift_claimed_note")
 
 func _e26_gift_all_five_once() -> void:
-	print("[e26 one big feed crosses 10/50/250/500/1000 -> five ceremonies once]")
+	print("[e26 one big feed crosses 1/5/10/25/100/250/500/1000 -> eight ceremonies once]")
 	var app = _app("e26")
 	app.economy.gift.add_streak_sb("e26_tx", 1000)
 	var pr = _presenter(app)
 	var shown: Array = []
 	pr.ceremony_shown.connect(func(k, _kind): shown.append(k))
 	pr.drain("test")
-	for _i in range(8):
+	for _i in range(12):
 		await _frames(1)
 		if pr.current() != null:
 			_close_cta(pr.current())
 	await _frames(2)
-	_ok(shown == [10, 50, 250, 500, 1000].map(func(m): return "gift:gift_ms:c0:m%d" % m), "milestone order, each once %s" % str(shown))
+	_ok(shown == [1, 5, 10, 25, 100, 250, 500, 1000].map(func(m): return "gift:gift_ms:c0:m%d" % m), "milestone order, each once %s" % str(shown))
 	var re = AppState.new(app.save._path)
-	_ok(CeremonyEvents.pending(re.economy, re.economy.meta_ui).is_empty() and re.economy.gift.claimable().size() == 5, "reload: none pending; all five still claimable in the Gift Bar")
+	_ok(CeremonyEvents.pending(re.economy, re.economy.meta_ui).is_empty() and re.economy.gift.claimable().size() == 8, "reload: none pending; all eight still claimable in the Gift Bar")
 	_complete("e26_gift_all_five_once")
 
 # ------------------------------------------------------------------- SB-M43-013 ----
@@ -532,6 +532,9 @@ func _won_results(tag: String, seed_gift: int):
 	var seed = AppState.new(path)
 	if seed_gift > 0:
 		seed.economy.gift.add_streak_sb(tag + "_seed", seed_gift)
+		# SB-POLISH-002: the seed itself crosses 1/5; their ceremonies count as already seen.
+		for o in seed.economy.gift.gift_bar_queue():
+			seed.economy.meta_ui.mark_seen("gift:" + String(o["id"]))
 	seed.request_save()
 	MainScript.boot_save_path_override = path
 	_root = MainScene.instantiate()
@@ -576,13 +579,13 @@ func _e27_results_handoff() -> void:
 	_close_cta(top)
 	await _frames(4)
 	_ok(not res.has_ceremony_barrier() and not res.get_primary_button().disabled and res.get_next_cleanup_panel().visible, "barrier released: CLEAN NEXT + teaser back")
-	_ok(_root.get_app_state().economy.meta_ui.is_seen("gift:gift_ms:c0:m10") and _root.get_app_state().economy.gift.claimable().size() == 1, "acknowledged; reward still waits in the Gift Bar")
+	_ok(_root.get_app_state().economy.meta_ui.is_seen("gift:gift_ms:c0:m10") and _root.get_app_state().economy.gift.claimable().size() == 3, "acknowledged; reward still waits in the Gift Bar (m1 / m5 seed + m10)")
 	_end_app()
 	_complete("e27_results_handoff")
 
 func _e28_results_no_event_no_hold() -> void:
 	print("[e28 WON with no ceremony event: no hold]")
-	var h = await _won_results("e28", 0)
+	var h = await _won_results("e28", 1)   # 1 -> 2 crosses no milestone (SB-POLISH-002)
 	var res = _root.get_results_screen()
 	res.finish_reveal()
 	await _frames(4)

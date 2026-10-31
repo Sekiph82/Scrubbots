@@ -8,6 +8,7 @@ extends SceneTree
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
 const MainScript = preload("res://scripts/app/main.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
+const AppState = preload("res://scripts/app/app_state.gd")
 
 const R := NavigationController.Route
 
@@ -173,7 +174,9 @@ func _home_to_gameplay_once() -> void:
 ## already committed by the host before Results appears.
 func _results_on_real_won() -> void:
 	print("[results on real WON]")
-	var root = await _boot_main(_uniq("won"))
+	var path := _uniq("won")
+	_seed_gift_past_m1(path)   # SB-POLISH-002: else the Level 1 win crosses Gift 1 and its ceremony holds CONTINUE
+	var root = await _boot_main(path)
 	var app = root.get_app_state()
 	var nav = root.get_navigation()
 	var sb0: int = app.economy.wallet.scrub_bucks()
@@ -395,6 +398,13 @@ func _files(dir: String) -> Array:
 	return out
 
 # ---------------------------------------------------------------- helpers ----
+
+## Save with the Gift Meter at 1 and the Gift 1 ceremony already seen.
+func _seed_gift_past_m1(path: String) -> void:
+	var seed = AppState.new(path)
+	for o in seed.economy.gift.add_streak_sb("test_seed_m1", 1):
+		seed.economy.meta_ui.mark_seen("gift:" + String(o["id"]))
+	seed.request_save()
 
 func _boot_main(path: String):
 	MainScript.boot_save_path_override = path

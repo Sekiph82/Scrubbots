@@ -332,7 +332,7 @@ func _gift_track(home) -> void:
 	print("[gift and track]")
 	var meter = home.get_region("GiftMeterBar")
 	var ratio := RegEx.create_from_string("^[0-9,]+/[0-9,]+$")
-	_ok(ratio.search(meter.caption.text) != null and meter.caption.text.ends_with("/1,000"), "Gift Meter shows only N/1000 (%s)" % meter.caption.text)
+	_ok(ratio.search(meter.caption.text) != null and meter.caption.text.ends_with("/1"), "Gift Meter shows only N/next milestone (fresh 0/1, SB-POLISH-002) (%s)" % meter.caption.text)
 	_ok(home.get_region("GiftEmblem").size.x >= 112 and home.get_region("GiftCrate").size.x >= 112, "emblem / crate modestly enlarged")
 	var vals: Array = []
 	for i in range(1, 6):

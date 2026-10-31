@@ -268,7 +268,7 @@ func _gift_locked(home) -> void:
 	print("[gift meter locked]")
 	for n in V05_GIFT:
 		_ok(_rect(home, n).is_equal_approx(V05_GIFT[n]), "%s geometry == V05 %s" % [n, str(V05_GIFT[n])])
-	_ok(home.get_region("GiftMeterBar").caption.text == "0/1,000", "ratio-only caption unchanged")
+	_ok(home.get_region("GiftMeterBar").caption.text == "0/1", "ratio-only caption: 0 / next milestone 1 (SB-POLISH-002)")
 	_complete("gift_meter_locked")
 
 func _track_locked(home) -> void:

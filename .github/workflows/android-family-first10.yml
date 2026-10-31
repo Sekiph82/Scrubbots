@@ -128,7 +128,7 @@ jobs:
                    m50_color_symbols m28_c002_c004_tile_visual m28_c002_c001_gameplay_v02 m47_touch_r01_mobile_ux \
                    m43_c003_c001_acquisition m46_performance m44_unlock_gate m44_contextual_coach m44_new_badge \
                    m43_c005_c072_feature_unlock_ceremony m43_c005_c074_c077_celebrations \
-                   m43_master_c005r_gift_micro_progress m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
+                   m43_master_c005r_gift_micro_progress sb_polish_002_gift_meter m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
                    m43_master_c006_shop m43_master_c007_collection m54_collection_set_master_exactly_once m43_master_c008_robots \
                    m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m43_master_c007r_pity campaign_l11_l30 m43_personal_ranks real_play_levels real_play_file_cli; do
             L="validate_logs/$s.log"
@@ -206,6 +206,12 @@ jobs:
             echo "M43-R05 verdict=PASS (8/8)" | tee -a "$S"
           else
             echo "M43-R05 verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
+          fi
+          # SB-POLISH-002 gift meter cycle / migration / reward text: exact 11-case summary is mandatory.
+          if grep -qxF 'SB-POLISH-002 gift meter evidence: PASS (11/11 cases, 0 fail)' validate_logs/sb_polish_002_gift_meter.log 2>/dev/null; then
+            echo "SB-POLISH-002 verdict=PASS (11/11)" | tee -a "$S"
+          else
+            echo "SB-POLISH-002 verdict=FAIL (exact 11/11 summary missing)" | tee -a "$S"; fail=1
           fi
           # SB-M43-013 meta ceremonies + Results hand-off: exact 32-case summary is mandatory.
           if grep -qxF 'M43 master C005 meta ceremonies evidence: PASS (32/32 cases, 0 fail)' validate_logs/m43_master_c005_meta_ceremonies.log 2>/dev/null; then

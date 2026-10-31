@@ -208,6 +208,9 @@ func _i_results_handoff() -> void:
 	var seed = AppState.new(path)
 	seed.bootstrap_new_profile()
 	_walk(seed, 3)
+	# SB-POLISH-002: the L3 win's streak SB would also cross Gift 1; start past it, ceremony seen.
+	for o in seed.economy.gift.add_streak_sb("test_seed_m1", 1):
+		seed.economy.meta_ui.mark_seen("gift:" + String(o["id"]))
 	seed.request_save()
 	MainScript.boot_save_path_override = path
 	_root = MainScene.instantiate()

@@ -220,25 +220,29 @@ func _d01() -> void:
 	print("[d01 F008 Gift milestones: only from shown canonical events; 1000 = MAJOR_REWARD]")
 	await _boot("d01")
 	var occ: Array = _e().gift.add_streak_sb("streak:p3:d01", 1000)
-	_ok(occ.size() == 5 and _log("F008").is_empty(), "5 milestones reached; nothing celebrated before a ceremony is shown")
+	_ok(occ.size() == 8 and _log("F008").is_empty(), "8 milestones reached (SB-POLISH-002); nothing celebrated before a ceremony is shown")
 	_root.request_home_ceremonies()
 	await _frames(14)
-	for _i in range(5):
+	for _i in range(8):
 		var p = _top()
 		if p == null or String(p.popup_id).begins_with("ceremony_gift") == false:
 			break
 		await _press("continue", p)
 		await _frames(14)
 	var got: Array = _log("F008").map(func(r): return r[1])
-	_ok(got == ["REWARD", "REWARD", "REWARD", "REWARD", "MAJOR_REWARD"], "intents per milestone %s" % str(got))
+	_ok(got == ["REWARD", "REWARD", "REWARD", "REWARD", "REWARD", "REWARD", "REWARD", "MAJOR_REWARD"], "intents per milestone %s" % str(got))
 	_ok(_log("F008").all(func(r): return String(r[2]).begins_with("c005f008:") and r[3] == "HeroArt"), "keys from the ceremony event key, hero target")
-	_ok(_e().gift.gift_bar_queue().all(func(o): return not bool(o.get("claimed", false))) and _e().pending_packs.size() == 0, "feel claims nothing (all 5 still unclaimed in the Gift Bar)")
+	_ok(_e().gift.gift_bar_queue().all(func(o): return not bool(o.get("claimed", false))) and _e().pending_packs.size() == 0, "feel claims nothing (all 8 still unclaimed in the Gift Bar)")
 	_complete("d01_gift_milestones_from_shown_events")
 
 func _d02() -> void:
 	print("[d02 F008 Gift claim: feel only after action_committed; pack ceremony stays serial]")
 	await _boot("d02")
 	var occ: Array = _e().gift.add_streak_sb("streak:p3:d02", 10)
+	# SB-POLISH-002: 10 also crosses 1 / 5; their ceremonies count as seen so only Gift 10 shows.
+	for o in occ.slice(0, 2):
+		_e().meta_ui.mark_seen("gift:" + String(o["id"]))
+	occ = occ.slice(2)
 	_root.request_home_ceremonies()
 	await _frames(14)
 	await _close_ceremony_continue()

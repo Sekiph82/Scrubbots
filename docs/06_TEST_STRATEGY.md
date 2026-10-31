@@ -286,7 +286,7 @@ Required headless/integration coverage before Economy V1 closure:
 - SB wallet grant/spend insufficiency and transaction-id idempotency.
 - First-clear difficulty rewards and replay anti-farming.
 - Win Streak exact 1/5/10/25/100 SB mapping, reset semantics and +1 Bot Part each multiple of 5.
-- Gift Meter accepts ONLY streak SB; exact 10/50/250/500/1000 crossing, multi-cross, rollover and no self-feed.
+- Gift Meter accepts ONLY streak SB; exact 1/5/10/25/100/250/500/1000 (SB-POLISH-002) crossing, multi-cross, rollover and no self-feed.
 - Gift milestone reward bundles and 1000 guaranteed-new-card/500-SB fallback.
 - Bot Parts 250 unlock cost, overflow and approximate 150-level pacing simulation.
 - Hearts: max 5, 900-second (owner V06; was 1800) wall-clock regen, offline/menu/background behavior, loss/restart/pre-action-exit semantics and SB refills.

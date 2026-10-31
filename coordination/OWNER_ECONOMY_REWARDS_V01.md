@@ -90,27 +90,41 @@ Gift Meter progress is therefore a mirror of earned streak-bonus SB, not a secon
 
 ### 4.2 Milestones
 
-Each Gift Meter cycle has claimable milestones at:
+Updated owner 2026-10-31 (SB-POLISH-002): the cycle was 10/50/250/500/1000; owner phone feedback asked for an always-visible next target and bigger gifts ("nerdeyse hic hediye vermiyor"). Each Gift Meter cycle now has claimable milestones at:
 
+- 1
+- 5
 - 10
-- 50
+- 25
+- 100
 - 250
 - 500
 - 1000
 
+The meter shows progress against the **next** milestone of the cycle: 0/1 at cycle start, then 1/5, 5/10, 10/25, 25/100, 100/250, 250/500, 500/1000. The counter stays cumulative within a cycle (it is not reset at each milestone).
+
 Crossing a milestone queues that reward in **Gift Bar**. A single streak reward may cross more than one milestone; every newly crossed milestone is queued exactly once.
 
-At 1000 the cycle completes. Overflow carries into the next cycle. Example: 950 + 100 streak-SB grants the 1000 milestone and the next cycle begins at 50.
+At 1000 the cycle completes and the meter returns to 0/1. Overflow carries into the next cycle. Example: 998 + 5 streak-SB grants the 1000 milestone, the next cycle begins at 3 and its milestone 1 is queued too.
+
+Save migration (economy config schema 3): an older save keeps its progress and every queued/claimed occurrence. In the current cycle only, milestones 1/5/25/100 already passed are queued once (unclaimed). An already-queued unclaimed old milestone 50 stays claimable and pays its old bundle (1 Bot Part + 1 random Booster Charge, `gift_meter.legacy_milestones`).
 
 ### 4.3 Gift Meter rewards
 
+Updated owner 2026-10-31 (SB-POLISH-002). Values are Claude proposals under the owner pre-approval for factory recommendations, existing reward types only.
+
 | Milestone | Reward |
 |---|---|
-| 10 | 1 Bot Part + 1 Standard Card Pack |
-| 50 | 1 Bot Part + 1 random Booster Charge |
-| 250 | 2 Bot Parts + 100 SB + 1 Standard Card Pack |
-| 500 | 2 Bot Parts + 250 SB + 1 player-selected Booster Charge + 1 Standard Card Pack |
-| 1000 | 4 Bot Parts + 500 SB + 2 player-selected Booster Charges + 1 Premium Card Pack + 1 guaranteed-new eligible Collection card |
+| 1 | 25 SB |
+| 5 | 1 Bot Part + 50 SB |
+| 10 | 1 Bot Part + 50 SB + 1 Standard Card Pack |
+| 25 | 1 Bot Part + 100 SB + 1 random Booster Charge (Mystery Booster) |
+| 100 | 1 Bot Part + 150 SB + 1 Standard Card Pack |
+| 250 | 2 Bot Parts + 200 SB + 1 player-selected Booster Charge + 1 Standard Card Pack |
+| 500 | 2 Bot Parts + 300 SB + 1 player-selected Booster Charge + 1 Standard Card Pack |
+| 1000 | 2 Bot Parts + 600 SB + 2 player-selected Booster Charges + 1 Premium Card Pack + 1 guaranteed-new eligible Collection card |
+
+Per full cycle: 1,475 SB, 4 Standard Card Packs, 1 Premium Card Pack, 1 random Booster Charge, 4 player-selected Booster Charges, 1 guaranteed-new card.
 
 A full 0→1000 Gift Meter cycle therefore grants exactly **10 Bot Parts**.
 

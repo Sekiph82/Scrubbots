@@ -493,7 +493,7 @@ Home's owner-approved visual composition remains authoritative, but production m
 - top currency = Scrub Bucks, not coin/Star;
 - Heart counter = max 5, 15-minute (900 s) wall-clock regen (`coordination/OWNER_HEART_REGEN_INTERVAL_V01.md`);
 - profile progress bar = Bot Parts toward next 250-part robot unlock, not XP;
-- former event progress bar = Gift Meter fed only by Win Streak SB, milestones 10/50/250/500/1000, no event timer;
+- former event progress bar = Gift Meter fed only by Win Streak SB, milestones 1/5/10/25/100/250/500/1000 (SB-POLISH-002), no event timer;
 - former Star Exchange shortcut = Cards Exchange;
 - lower reward road = Win Streak SB reward track (1/5/10/25/100 SB mapping);
 - Stars and Event Points do not exist as functional balances.

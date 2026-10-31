@@ -209,24 +209,24 @@ func _t08() -> void:
 	print("[t08 Gift Bar: claim + history, never feeds the Gift Meter, never re-grants]")
 	await _boot("t08")
 	var e = _eco()
-	e.gift.add_streak_sb("t08:a", 260)   # crosses 10 / 50 / 250
+	e.gift.add_streak_sb("t08:a", 260)   # crosses 1 / 5 / 10 / 25 / 100 / 250 (SB-POLISH-002)
 	(_root.get_home().get_region("GiftMeterButton") as Button).pressed.emit()
 	await _frames(2)
 	var p = _top()
 	_ok(_top_id() == "gift_bar", "Gift Bar destination")
-	_ok(_claimable_rows(p) == 3, "three queued milestones claimable")
+	_ok(_claimable_rows(p) == 6, "six queued milestones claimable")
 	var prog0: int = e.gift.cycle_progress()
 	var total0: int = e.gift.total_progress()
 	var sb0: int = e.wallet.scrub_bucks()
-	var occ: String = e.gift.claimable()[2]["id"]
+	var occ: String = e.gift.claimable()[5]["id"]
 	_tap("gift:" + occ)
 	await _frames(1)
-	_ok(e.wallet.scrub_bucks() == sb0 + 100 and e.gift.cycle_progress() == prog0 and e.gift.total_progress() == total0, "claim granted 250-milestone SB; Gift Meter unchanged (non-recursive)")
-	_ok(_claimable_rows(p) == 2 and _history_rows(p) == 1 and bool(p.get_action_button("gift:" + occ).disabled), "claimed moves to history, blocked")
-	_ok(not _root.get_app_state().actions.claim_gift(occ)["ok"] and e.wallet.scrub_bucks() == sb0 + 100, "re-claim refused")
+	_ok(e.wallet.scrub_bucks() == sb0 + 200 and e.gift.cycle_progress() == prog0 and e.gift.total_progress() == total0, "claim granted 250-milestone SB; Gift Meter unchanged (non-recursive)")
+	_ok(_claimable_rows(p) == 5 and _history_rows(p) == 1 and bool(p.get_action_button("gift:" + occ).disabled), "claimed moves to history, blocked")
+	_ok(not _root.get_app_state().actions.claim_gift(occ)["ok"] and e.wallet.scrub_bucks() == sb0 + 200, "re-claim refused")
 	e.gift.add_streak_sb("t08:b", 800)   # rollover into cycle 1
 	DailyScreens.refresh_gift_bar(p, _root.get_app_state())
-	_ok(e.gift.cycles_completed() == 1 and _claimable_rows(p) == 6 and _history_rows(p) == 1, "Gift rollover queues the next cycle's milestones; history kept")
+	_ok(e.gift.cycles_completed() == 1 and _claimable_rows(p) == 11 and _history_rows(p) == 1, "Gift rollover queues the next cycle's milestones; history kept")
 	_complete("t08_gift_bar_claim_history_non_recursive")
 
 func _t09() -> void:

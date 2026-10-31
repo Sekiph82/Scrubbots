@@ -151,16 +151,16 @@ func _d2_n_charges() -> void:
 	_ok(_total(e) == 7 and _counts(e) == expect, "7 charges = 7 ordinal picks %s" % str(expect))
 	e.dispose()
 
-# E — Gift Meter 50: +1 Bot Part, +1 random-any booster, exactly once; varies by cycle.
+# E — Gift Meter 25 (SB-POLISH-002; was 50): +1 Bot Part, +1 random-any booster, exactly once; varies by cycle.
 func _e_gift_50() -> void:
-	print("[E Gift Meter 50]")
+	print("[E Gift Meter 25]")
 	var e = _mk()
-	var m50: Dictionary = e.config.gift_meter_milestone(50)   # JSON numbers are floats
-	_ok(m50.size() == 2 and int(m50.get("bot_parts", 0)) == 1 and int(m50.get(Picker.RESOURCE, 0)) == 1, "config m50 = 1 Bot Part + 1 random-any booster")
+	var m50: Dictionary = e.config.gift_meter_milestone(25)   # JSON numbers are floats
+	_ok(m50.size() == 3 and int(m50.get("bot_parts", 0)) == 1 and int(m50.get("scrub_bucks", 0)) == 100 and int(m50.get(Picker.RESOURCE, 0)) == 1, "config m25 = 1 Bot Part + 100 SB + 1 random-any booster")
 	var picks := {}
 	for cycle in range(12):
 		e.gift.add_streak_sb("feed:%d" % cycle, 1000)
-		var occ := "gift_ms:c%d:m50" % cycle
+		var occ := "gift_ms:c%d:m25" % cycle
 		var bp0: int = e.wallet.bot_parts()
 		var c0 := _counts(e)
 		var r: Dictionary = e.gift.claim(occ, e.reward, e.config)
@@ -174,7 +174,7 @@ func _e_gift_50() -> void:
 	var distinct := {}
 	for v in picks.values():
 		distinct[v] = true
-	_ok(distinct.size() > 1 and distinct.keys() != ["random"], "Gift 50 is NOT always RANDOM across cycles: %s" % str(distinct.keys()))
+	_ok(distinct.size() > 1 and distinct.keys() != ["random"], "Gift 25 is NOT always RANDOM across cycles: %s" % str(distinct.keys()))
 	_ok(picks.values().has("random") and picks.values().any(func(v): return v != "random"), "both a RANDOM case and a non-RANDOM case observed")
 	e.dispose()
 
@@ -258,12 +258,12 @@ func _j_presentation() -> void:
 	_ok(UiText.reward_text({Picker.RESOURCE: 1}) == "Mystery Booster x1" and UiText.reward_text({Picker.LEGACY_RESOURCE: 1}) == "Mystery Booster x1", "Daily / list wording: Mystery Booster")
 	_ok(UiText.reward_text({"selected_booster_charges": 1}) == "Booster of choice x1" and MetaCeremonies.ART[MetaCeremonies.REWARD_ROWS["selected_booster_charges"][0]] == CHOICE_ICON, "Booster-of-choice wording/art unchanged")
 	var cfg := EconomyConfig.new()
-	var p = MetaCeremonies.gift_milestone({"milestone": 50, "cycle_max": 1000, "rewards": cfg.gift_meter_milestone(50), "key": "gift:gift_ms:c0:m50"}, true)
+	var p = MetaCeremonies.gift_milestone({"milestone": 25, "cycle_max": 1000, "rewards": cfg.gift_meter_milestone(25), "key": "gift:gift_ms:c0:m25"}, true)
 	var row = p.find_child("Row_" + Picker.RESOURCE, true, false)
 	var icon = row.find_child("Icon", true, false) if row != null else null
 	var txt = row.find_child("Text", true, false) if row != null else null
-	_ok(row != null and icon.texture.resource_path == GIFT_ICON and txt.text == "+1 Mystery Booster", "Gift 50 ceremony row: gift-box icon + '+1 Mystery Booster'")
-	print("  evidence: Gift 50 ceremony row icon=%s text='%s'" % [icon.texture.resource_path if icon else "-", txt.text if txt else "-"])
+	_ok(row != null and icon.texture.resource_path == GIFT_ICON and txt.text == "+1 Mystery Booster", "Gift 25 ceremony row: gift-box icon + '+1 Mystery Booster'")
+	print("  evidence: Gift 25 ceremony row icon=%s text='%s'" % [icon.texture.resource_path if icon else "-", txt.text if txt else "-"])
 	p.free()
 	var ds := FileAccess.get_file_as_string("res://scripts/ui/daily/daily_screens.gd")
 	_ok(ds.find("boosters/random.png") == -1 and ds.find("icon.texture = load(ART[\"gift\"])") != -1, "ScrubBox reward icon is the neutral gift art, not the RANDOM booster")

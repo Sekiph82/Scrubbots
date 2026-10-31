@@ -1049,7 +1049,7 @@ previously cleared space without weakening WHAT/claim/clear authority.
 
 SCRUBBOTS V1 has one general spendable soft currency, **Scrub Bucks**. Hearts are timed attempt capacity, Bot Parts are robot-unlock-only progression, Collection duplicates exchange to SB, and Booster Charges are item inventory. Star currency, Star Exchange and Event Points are removed.
 
-Gift Meter progresses ONLY by the numeric SB bonus earned from Win Streak and has 10/50/250/500/1000 milestones. Bot Parts cost 250 per post-Scrubby robot and are sourced only by the owner-defined progression/reward paths.
+Gift Meter progresses ONLY by the numeric SB bonus earned from Win Streak and has 10/50/250/500/1000 milestones (superseded 2026-10-31 by SB-POLISH-002: 1/5/10/25/100/250/500/1000, meter shows progress / next milestone). Bot Parts cost 250 per post-Scrubby robot and are sourced only by the owner-defined progression/reward paths.
 
 Economy mutation is domain logic, never presentation logic. Planned service seams live under `scripts/economy/`, `scripts/progression/` and `scripts/collection/`. Every grant/spend/exchange uses an idempotent transaction identity and atomic commit.
 

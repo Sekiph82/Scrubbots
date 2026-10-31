@@ -98,9 +98,9 @@ func _gift_meter_full_cycle() -> void:
 	var g = GiftMeterService.new()
 	# A full 0->1000 cycle grants exactly 10 Bot Parts across milestones.
 	_ok(g.full_cycle_bot_parts(c) == 10, "full cycle = 10 bot parts (config)")
-	# Feed 1000 in one shot: crosses all 5 milestones, completes cycle.
+	# Feed 1000 in one shot: crosses all 8 milestones (SB-POLISH-002), completes cycle.
 	var newly = g.add_streak_sb("s1", 1000)
-	_ok(newly.size() == 5, "single 1000 feed crosses all 5 milestones once")
+	_ok(newly.size() == 8, "single 1000 feed crosses all 8 milestones once")
 	_ok(g.cycles_completed() == 1 and g.cycle_progress() == 0, "cycle completed, progress 0")
 	# Claim a milestone through the reward service (register test handlers for pack/booster).
 	var w = EconomyWallet.new(0)

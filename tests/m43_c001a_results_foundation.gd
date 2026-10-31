@@ -65,7 +65,7 @@ func _receipt_matches_commit() -> void:
 	_ok(rc["reconciled"] and rc["wallet_delta"]["scrub_bucks"] == fc_sb + 1, "components explain the whole wallet change")
 	_ok(rc["streak"] == {"before": 0, "after": eco.streak.streak()} and eco.streak.streak() == 1, "streak 0 -> 1")
 	_ok(rc["frontier"] == {"before": 1, "after": app.progression.current_level()} and app.progression.current_level() == 2, "frontier 1 -> 2")
-	_ok(rc["gift_meter"]["before"] == 0 and rc["gift_meter"]["after"] == eco.gift.cycle_progress() and rc["gift_meter"]["newly_queued"].is_empty(), "gift meter 0 -> 1, no milestone")
+	_ok(rc["gift_meter"]["before"] == 1 and rc["gift_meter"]["after"] == eco.gift.cycle_progress() and eco.gift.cycle_progress() == 2 and rc["gift_meter"]["newly_queued"].is_empty(), "gift meter 1 -> 2, no milestone")
 	_ok(rc["cards_delta"] == 0 and rc["saved"], "no card change; terminal save committed")
 	var kinds: Array = rc["reveal_queue"].map(func(e): return e["kind"])
 	_ok(kinds == ["first_clear_sb", "win_streak_sb", "bot_parts", "gift_meter"], "ordered reveal queue %s" % str(kinds))
@@ -250,7 +250,8 @@ func _gift_milestone_handoff() -> void:
 	var root = await _boot_main(_uniq("gift"))
 	var app = root.get_app_state()
 	var eco = app.economy
-	eco.gift.add_streak_sb("m43_seed", 9)    # 9/1000; the Level 1 streak SB (+1) crosses 10
+	for o in eco.gift.add_streak_sb("m43_seed", 8):   # 1 + 8 = 9/10; the Level 1 streak SB (+1) crosses 10
+		eco.meta_ui.mark_seen("gift:" + String(o["id"]))   # the seed's own m5 ceremony counts as seen
 	var h = await _play(root)
 	_drain(h)
 	var rc: Dictionary = h.get_terminal_receipt()
@@ -259,13 +260,13 @@ func _gift_milestone_handoff() -> void:
 	_ok(rc["follow_ups"] == [{"kind": "gift_milestone", "occurrence_id": nq[0]["id"], "milestone": 10, "cycle": 0, "claim_surface": "gift_bar"}], "one gift_milestone handoff to the Gift Bar")
 	var gift_entry: Array = rc["reveal_queue"].filter(func(e): return e["kind"] == "gift_meter")
 	_ok(gift_entry.size() == 1 and gift_entry[0]["milestones"] == [10], "reveal queue carries the crossed milestone")
-	_ok(eco.gift.claimable().size() == 1 and eco.gift.claimable()[0]["id"] == nq[0]["id"] and rc["reconciled"], "milestone queued unclaimed; no gift reward in the wallet delta")
+	_ok(eco.gift.claimable().size() == 3 and eco.gift.claimable()[2]["id"] == nq[0]["id"] and rc["reconciled"], "milestone queued unclaimed; no gift reward in the wallet delta")
 	var res = root.get_results_screen()
 	_ok(_labels(res.get_reward_lines_node()).has(UiText.t("RESULTS_GIFT_READY")), "Results announces the gift handoff")
 	var e0: Dictionary = _econ(eco)
 	for _i in range(3):
 		res.show_model(root._results_model(root.get_navigation().last_payload()))
-	_ok(_econ(eco) == e0 and eco.gift.claimable().size() == 1, "refresh never claims/queues again")
+	_ok(_econ(eco) == e0 and eco.gift.claimable().size() == 3, "refresh never claims/queues again")
 	var claim: Dictionary = eco.gift.claim(nq[0]["id"], eco.reward, eco.config)
 	var again: Dictionary = eco.gift.claim(nq[0]["id"], eco.reward, eco.config)
 	_ok(claim.get("ok", false) and not again.get("ok", true), "canonical Gift Bar claim still grants exactly once")
@@ -414,7 +415,14 @@ func _strip_comments(text: String) -> String:
 		out.append(line if i == -1 else line.substr(0, i))
 	return "\n".join(out)
 
+## SB-POLISH-002: a fresh Level 1 win would cross Gift milestone 1 (its ceremony holds Results).
+## Boot from a save whose Gift Meter is already at 1 with that ceremony seen, so a Level 1 win
+## (1 -> 2) crosses no milestone unless a case seeds one on purpose.
 func _boot_main(path: String):
+	var seed = AppState.new(path)
+	for o in seed.economy.gift.add_streak_sb("test_seed_m1", 1):
+		seed.economy.meta_ui.mark_seen("gift:" + String(o["id"]))
+	seed.request_save()
 	MainScript.boot_save_path_override = path
 	var root = MainScene.instantiate()
 	get_root().add_child(root)

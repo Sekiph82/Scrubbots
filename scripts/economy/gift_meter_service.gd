@@ -8,8 +8,10 @@ extends RefCounted
 ##
 ## Responsibilities in M38:
 ##   - accumulate streak-bonus SB into a 0..cycle_max cycle with rollover;
-##   - detect newly-crossed milestones (10/50/250/500/1000) exactly once and
-##     queue their ids into a Gift Bar queue;
+##   - detect newly-crossed milestones exactly once and queue their ids into a Gift Bar
+##     queue. SB-POLISH-002 (owner 2026-10-31): the cycle is 1/5/10/25/100/250/500/1000;
+##     the meter reads progress / NEXT milestone (0/1, 1/5, ..., 500/1000) and 1000
+##     completes the cycle (counter stays cumulative per cycle);
 ##   - be idempotent per transaction id so a duplicate/reentrant streak callback
 ##     cannot advance progress or re-queue a milestone twice.
 ##
@@ -20,7 +22,10 @@ extends RefCounted
 const IntDomain = preload("res://scripts/economy/int_domain.gd")
 
 const CYCLE_MAX := 1000
-const MILESTONES := [10, 50, 250, 500, 1000]
+const MILESTONES := [1, 5, 10, 25, 100, 250, 500, 1000]
+## Retired pre-schema-3 milestones: an already-queued occurrence stays importable/claimable
+## and is paid from `gift_meter.legacy_milestones`.
+const LEGACY_MILESTONES := [50]
 
 var _cycle_progress: int = 0          ## progress within current cycle [0, CYCLE_MAX).
 var _total_progress: int = 0          ## lifetime streak SB fed in.
@@ -95,13 +100,19 @@ func claim(occurrence_id: String, reward_service, config) -> Dictionary:
 		if occ.get("id", "") == occurrence_id:
 			if occ.get("claimed", false):
 				return {"ok": false, "reason": "already_claimed"}
-			var rewards: Dictionary = config.gift_meter_milestone(int(occ["milestone"]))
+			var rewards: Dictionary = milestone_rewards(int(occ["milestone"]), config)
 			var applied = reward_service.grant(occurrence_id, rewards)
 			if not applied and not reward_service.already_applied(occurrence_id):
 				return {"ok": false, "reason": "grant_failed"}
 			occ["claimed"] = true
 			return {"ok": true, "rewards": rewards}
 	return {"ok": false, "reason": "not_found"}
+
+## Config bundle paying a queued occurrence of `milestone` (legacy 50 -> legacy table).
+static func milestone_rewards(milestone: int, config) -> Dictionary:
+	if LEGACY_MILESTONES.has(milestone):
+		return config.gift_meter_legacy_milestone(milestone)
+	return config.gift_meter_milestone(milestone)
 
 ## Total Bot Parts a full 0->1000 cycle grants (proof helper for SB-M39-012).
 func full_cycle_bot_parts(config) -> int:
@@ -139,7 +150,7 @@ func import_snapshot(s) -> bool:
 		return false
 	# Canonical queue occurrence shape (M39 V03, F-M39-V02-012). Every entry must
 	# be a dict with id (non-empty unique string) / cycle (nonneg int) / milestone
-	# (in {10,50,250,500,1000}) / claimed (bool). Malformed entries fail closed.
+	# (in MILESTONES or LEGACY_MILESTONES) / claimed (bool). Malformed entries fail closed.
 	var seen_ids := {}
 	var new_queue: Array = []
 	for e in q:
@@ -154,7 +165,7 @@ func import_snapshot(s) -> bool:
 		var claimed = e.get("claimed", null)
 		if cyc == null or mile == null or typeof(claimed) != TYPE_BOOL:
 			return false
-		if not MILESTONES.has(mile):
+		if not MILESTONES.has(mile) and not LEGACY_MILESTONES.has(mile):
 			return false
 		new_queue.append({"id": String(eid), "cycle": cyc, "milestone": mile, "claimed": claimed})
 	var applied = s.get("applied", [])
@@ -169,6 +180,14 @@ func import_snapshot(s) -> bool:
 		if tid.is_empty() or new_applied.has(tid):
 			return false
 		new_applied[tid] = true
+	# SB-POLISH-002 migration: in the CURRENT cycle only, queue every milestone already passed
+	# that has no occurrence yet (old saves lack 1/5/25/100). Ids are unique per cycle/milestone,
+	# so a re-import is a no-op and nothing claimed is re-granted. Past cycles are not backfilled.
+	for m in MILESTONES:
+		var mid := "gift_ms:c%d:m%d" % [int(cc), m]
+		if m <= int(cp) and not seen_ids.has(mid):
+			seen_ids[mid] = true
+			new_queue.append({"id": mid, "cycle": int(cc), "milestone": m, "claimed": false})
 	# All-or-nothing apply (nothing above mutated live state).
 	_cycle_progress = int(cp)
 	_total_progress = int(tp)

@@ -16,7 +16,7 @@ extends Control
 ##       ├── TopCurrencyHUD      narrow profile card (portrait in front of its frame,
 ##       │                       bottom-anchored; level badge + thick Bot Parts N/250 bar)
 ##       │                       · Scrub Bucks chip + (+) · Hearts chip + (+)
-##       ├── GiftMeter           emblem · thick gold meter with only N/1000 · crate
+##       ├── GiftMeter           emblem · thick gold meter with only N/next · crate
 ##       ├── ActionHost/HomeActionLayer   (hidden as ONE layer while a modal is open)
 ##       │     ├── WorldMargin/MainWorldArea   SHOP, COLLECTION | (world) | TASKS, DAILY
 ##       │     └── BottomActionStack   bottom-anchored (V05): PLAY (+ StatusLabel pill)
@@ -1275,10 +1275,14 @@ func _render_values() -> void:
 	var full: bool = _vm["hearts"] >= _vm["hearts_max"]
 	hearts.set_value(_mmss(int(_app.economy.config.hearts_regen_seconds()) if full else _vm["heart_seconds_to_next"]))
 	hearts.set_sub("")
-	(_nodes["GiftMeterBar"] as UiProgressMeter).set_progress(_vm["gift_progress"], _vm["gift_cycle_max"],
-		UiText.t("HOME_RATIO", [UiText.num(_vm["gift_progress"]), UiText.num(_vm["gift_cycle_max"])]))
-	(_nodes["GiftTickOverlay"] as GiftTickOverlay).set_model(GiftProgressModel.build(int(_vm["gift_progress"]), int(_vm["gift_cycle_max"])),
-		GiftProgressModel.GiftMeterService.MILESTONES, "effects" in _app and _app.effects != null and _app.effects.is_reduced())
+	# SB-POLISH-002: the bar fills towards the NEXT milestone (0/1, 1/5, ... 500/1,000). The
+	# overlay gets the same 0..next scale, so it draws only the current gap's micro-ticks.
+	var gnext := int(_vm["gift_next_milestone"])
+	(_nodes["GiftMeterBar"] as UiProgressMeter).set_progress(_vm["gift_progress"], gnext,
+		UiText.t("HOME_RATIO", [UiText.num(_vm["gift_progress"]), UiText.num(gnext)]))
+	var gm := GiftProgressModel.build(int(_vm["gift_progress"]), int(_vm["gift_cycle_max"]))
+	gm["cycle_max"] = gnext
+	(_nodes["GiftTickOverlay"] as GiftTickOverlay).set_model(gm, [], "effects" in _app and _app.effects != null and _app.effects.is_reduced())
 	var gbadge: Label = _nodes["GiftClaimableBadge"]
 	gbadge.text = str(_vm["gift_claimable"])
 	gbadge.visible = _vm["gift_claimable"] > 0
@@ -1420,7 +1424,7 @@ func _render_popup(id: String) -> void:
 func _render_gift_bar(popup: HomePopup) -> void:
 	var rows: Array = []
 	for occ in _app.economy.gift.claimable():
-		var rewards: Dictionary = _app.economy.config.gift_meter_milestone(int(occ["milestone"]))
+		var rewards: Dictionary = GiftProgressModel.GiftMeterService.milestone_rewards(int(occ["milestone"]), _app.economy.config)
 		rows.append({"text": UiText.t("GIFTS_ROW", [UiText.num(int(occ["milestone"])), UiText.reward_text(rewards)]),
 			"action_id": String(occ["id"]), "action_text": UiText.t("POPUP_CLAIM"), "action_enabled": not _app.is_blocked})
 	var note := ""
@@ -1430,7 +1434,7 @@ func _render_gift_bar(popup: HomePopup) -> void:
 		note = UiText.t("GIFTS_READ_ONLY")
 	# M43-C005R: the same normalized Gift Meter model Home / Results use (presentation only).
 	var gm := GiftProgressModel.from_service(_app.economy.gift)
-	var progress := UiText.t("GIFTS_PROGRESS", [UiText.num(gm["progress"]), UiText.num(gm["cycle_max"]), UiText.num(gm["next"])])
+	var progress := UiText.t("GIFTS_PROGRESS", [UiText.num(gm["progress"]), UiText.num(gm["next"])])
 	popup.set_content(UiText.t("GIFTS_TITLE"), rows, progress if note.is_empty() else note + "\n" + progress)
 
 ## SB-M42-022: former Star Exchange = Cards Exchange. Presentation/navigation only:

@@ -8,6 +8,7 @@ extends RefCounted
 ## coins exist here.
 
 const GiftMeterService = preload("res://scripts/economy/gift_meter_service.gd")
+const GiftProgressModel = preload("res://scripts/economy/gift_progress_model.gd")
 const WinStreakService = preload("res://scripts/economy/win_streak_service.gd")
 
 const TRACK_POSITIONS := 5
@@ -19,11 +20,7 @@ static func build(app) -> Dictionary:
 	var e = app.economy
 	var parts: Dictionary = e.robots.next_robot_progress()
 	var gift_progress: int = e.gift.cycle_progress()
-	var next_ms := -1
-	for ms in GiftMeterService.MILESTONES:
-		if int(ms) > gift_progress:
-			next_ms = int(ms)
-			break
+	var next_ms := GiftProgressModel.next_milestone(gift_progress)
 	var streak: int = e.streak.streak()
 	var track: Array = []
 	for pos in range(1, TRACK_POSITIONS + 1):
