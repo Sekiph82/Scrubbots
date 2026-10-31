@@ -24,7 +24,7 @@ const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const R := NavigationController.Route
 
 var EXPECTED_CASES := [
-	"p004_hit_areas_off_after_terminal", "p004_clean_next_first_tap", "p004_retry_restores_hit_areas",
+	"p004_pause_popup_not_under_hit_areas", "p004_hit_areas_off_after_terminal", "p004_clean_next_first_tap", "p004_retry_restores_hit_areas",
 	"p005_scrubby_row_detail", "p005_moppy_row_detail", "p005_buttons_unchanged", "p005_swipe_opens_nothing",
 	"p006_sb_plus_focused_popup", "p006_more_in_shop",
 ]
@@ -54,6 +54,25 @@ func _p004() -> void:
 	await _frames(2)
 	var h = _root.get_gameplay_host()
 	h.get_runtime().set_process(false)
+	# Any ModalStack popup over gameplay (Pause here): HitAreas off while open, back on after.
+	var pause = h.open_pause()
+	await _frames(2)
+	var hits0 := _hit_areas(h)
+	var pb: Button = null
+	for id in pause.get_action_ids():
+		var cand: Button = pause.get_action_button(id)
+		if hits0.any(func(c): return c.get_global_rect().has_point(_center(cand))):
+			pb = cand
+	if pb == null:
+		pb = pause.get_action_button(pause.get_action_ids()[0])
+	_move(_center(pb))
+	await process_frame
+	_ok(hits0.all(func(c): return c.mouse_filter == Control.MOUSE_FILTER_IGNORE) and _sub.gui_get_hovered_control() == pb,
+		"Pause open: HitAreas IGNORE, Pause button '%s' centre picks the button (%s)" % [pb.name, str(_sub.gui_get_hovered_control())])
+	pause.close("test")
+	await _frames(2)
+	_ok(hits0.all(func(c): return c.mouse_filter == Control.MOUSE_FILTER_STOP), "Pause closed: HitAreas pick again")
+	_complete("p004_pause_popup_not_under_hit_areas")
 	_drain(h)
 	await _frames(3)
 	var res = _root.get_results_screen()

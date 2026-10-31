@@ -85,8 +85,7 @@ func is_bound() -> bool:
 ## activation deterministically with no M23/M24 side effect.
 func set_terminal_stopped(value: bool) -> void:
 	_terminal_stopped = value
-	if _panel != null and is_instance_valid(_panel) and _panel.has_method("set_hit_areas_pickable"):
-		_panel.set_hit_areas_pickable(not value)   # SB-POLISH-004: never over Results
+	_sync_hit_areas()
 
 func is_terminal_stopped() -> bool:
 	return _terminal_stopped
@@ -94,11 +93,18 @@ func is_terminal_stopped() -> bool:
 ## M43-C002 modal gate: the host mirrors ModalStack.modal_changed here.
 func set_modal_blocked(value: bool) -> void:
 	_modal_blocked = value
+	_sync_hit_areas()
 	if value:
 		cancel_all_gestures()
 
 func is_modal_blocked() -> bool:
 	return _modal_blocked
+
+## SB-POLISH-004: the panel's top_level front HitAreas pick above every other app Control, so
+## they stop picking while a terminal result (Results) or any ModalStack popup covers gameplay.
+func _sync_hit_areas() -> void:
+	if _panel != null and is_instance_valid(_panel) and _panel.has_method("set_hit_areas_pickable"):
+		_panel.set_hit_areas_pickable(not (_terminal_stopped or _modal_blocked))
 
 func get_last_placement() -> Dictionary:
 	return _last_placement.duplicate(true)

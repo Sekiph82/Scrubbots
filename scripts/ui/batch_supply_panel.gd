@@ -48,7 +48,7 @@ var _columns: Array = []   # each: {root:VBoxContainer, rows:[ {panel, tile, swa
 var _input_enabled := false
 var _front_panels: Array = []      # PanelContainer per column front (row 0)
 var _front_enabled: Array = []     # bool per column: front is a live selectable batch
-var _hits_pickable := true         # SB-POLISH-004: false once the attempt is terminal
+var _hits_pickable := true         # SB-POLISH-004: false while terminal or a popup is open
 # One serialized in-progress gesture at a time (WP03 multi-touch / reentry safety):
 var _pending_col: int = -1
 var _pending_is_touch := false
@@ -176,7 +176,7 @@ func enable_front_input() -> void:
 ## SB-POLISH-004: a top_level HitArea is its own GUI root, picked ABOVE every non-top-level
 ## Control of the app (the Results screen over a finished board included), so after a terminal
 ## result it would silently eat taps meant for CLEAN NEXT. The input controller turns picking
-## off on terminal and back on when Retry starts a fresh attempt.
+## off on terminal or while any popup is open, and back on when Retry / the popup closing frees it.
 func set_hit_areas_pickable(on: bool) -> void:
 	_hits_pickable = on
 	for p in _front_panels:
