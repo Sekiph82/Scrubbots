@@ -5,8 +5,8 @@ extends RefCounted
 ##   - PROFILE (SB-M43-124, R10-006/007; SB-M43-125-REBUILD master v01): hero card (active
 ##     robot, level badge, Bot Parts meter), stat tiles (level, cleared, Collection, robots,
 ##     achievements, login days) and a Personal Bests table (current vs own best; self only);
-##   - ACHIEVEMENTS (SB-M43-126; SB-M43-127-REBUILD master v01): summary banner and a data-driven
-##     card list (badge, name, description, COMPLETED pill or progress bar);
+##   - ACHIEVEMENTS (SB-M43-126; SB-M43-127-REBUILD master v01; SB-POLISH-007): summary banner and
+##     a data-driven card list (tier badge, name, description, reward, COMPLETED / CLAIM / bar);
 ##   - EVENTS (SB-M43-128/129, R10-001..005): configured Weekly Cleaning Events (window,
 ##     countdown, progress, fixed milestone rewards, ended/claimed) and the opt-in First-Try
 ##     Cleanup; an honest empty state when nothing is scheduled. No event currency;
@@ -239,16 +239,12 @@ static func _spacer(w: int) -> Control:
 # ----------------------------------------------------------- ACHIEVEMENTS ----
 
 ## SB-M43-127-REBUILD: native rebuild of scrubbots_achievements_master_v01 — summary banner,
-## scrollable cards (round badge, name, description, COMPLETED pill or bar + n/m), note, actions.
-const ACH_ICONS := {   # tidy_ten draws its target on the rank badge instead (_badge)
-	"clean_start": "popups/victory/victory_emblem.png",
-	"spotless_fifty": "gameplay/effects/fx_clean_sparkle.png",
-	"first_set": "home/shortcuts/icon_shortcut_collection.png",
-	"robot_crew": "characters/scrubby/scrubby_portrait.png",
-	"hot_streak": "daily/daily_streak_flame.png",
-	"bare_hands": "profile/profile_no_booster_icon.png",
-	"first_try_five": "profile/achievement_crown_icon.png",
-}
+## scrollable cards (round badge, name, description, COMPLETED pill or bar + n/m), actions.
+## SB-POLISH-007: 50 data-driven cards (name / desc / icon / tier from achievements_v2.json), a
+## reward line per card, CLAIM on a completed unclaimed card (facade claim_achievement), the
+## badge ring coloured by tier.
+const TIER_EDGE := {"bronze": Color(0.804, 0.498, 0.196), "silver": Color(0.80, 0.84, 0.90),
+	"gold": HomeStyle.GOLD, "platinum": Color(0.62, 0.96, 1.0)}
 
 static func open_achievements(stack, app) -> BasePopup:
 	var p := BasePopup.new("achievements")
@@ -278,7 +274,7 @@ static func open_achievements(stack, app) -> BasePopup:
 	scol.add_child(_bar("Bar", done, ach.size(), 30))
 	var scroll := ScrollContainer.new()
 	scroll.name = "AchievementList"
-	scroll.custom_minimum_size = Vector2(0, 900)
+	scroll.custom_minimum_size = Vector2(0, 1000)
 	scroll.horizontal_scroll_mode = ScrollContainer.SCROLL_MODE_DISABLED
 	c.add_child(scroll)
 	var list := VBoxContainer.new()
@@ -287,22 +283,39 @@ static func open_achievements(stack, app) -> BasePopup:
 	scroll.add_child(list)
 	TouchScroll.enable(scroll)   # M47-TOUCH-R01: finger swipe scrolls over rows / buttons
 	for a in ach:
-		list.add_child(_ach_card(a))
-	p.add_body_line(UiText.t("ACH_NO_REWARD"), "Policy", BasePopup.INK, 20)
+		var card := _ach_card(a)
+		list.add_child(card)
+		if a["claimable"]:
+			var aid := "ach:" + String(a["id"])
+			var b := p.add_action(aid, UiText.t("POPUP_CLAIM"), "primary", false, "", card.find_child("Right", true, false))
+			b.name = "Claim"
+			p.set_action_blocked(aid, app.is_blocked)
 	p.add_action("back", UiText.t("SHOP_BACK"), "secondary", true)
 	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
+	p.action_selected.connect(func(id, _c):
+		if not id.begins_with("ach:"):
+			return
+		var r: Dictionary = app.actions.claim_achievement(app, id.substr(4))
+		if bool(r.get("ok", false)):
+			var card: Control = p.find_child("Ach_" + id.substr(4), true, false)
+			p.remove_action(id)
+			card.set_meta("claimed", true)
+			_done_pill(card.find_child("Right", true, false))
+		p.rearm_soon())
 	if not stack.push(p):
 		p.free()
 		return null
 	return p
 
-## One achievement card: round badge, name + description, COMPLETED pill or bar + "n/m".
+## One achievement card: tier-coloured round badge, name + description + reward line, and
+## COMPLETED pill (claimed), CLAIM (added by open_achievements) or bar + "n/m".
 static func _ach_card(a: Dictionary) -> PanelContainer:
 	var id := String(a["id"])
-	var key := "ACH_" + id.to_upper()
 	var card := PanelContainer.new()
 	card.name = "Ach_" + id
 	card.set_meta("done", a["done"])
+	card.set_meta("claimed", a["claimed"])
+	card.set_meta("tier", a["tier"])
 	card.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROW, BasePopup.ROW_EDGE, 3, 22, 0), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
 	var row := HBoxContainer.new()
 	row.add_theme_constant_override("separation", UiTokens.SPACE_SM)
@@ -311,56 +324,66 @@ static func _ach_card(a: Dictionary) -> PanelContainer:
 	ring.name = "Badge"
 	ring.custom_minimum_size = Vector2(92, 92)
 	ring.size_flags_vertical = Control.SIZE_SHRINK_CENTER
-	ring.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROYAL, HomeStyle.GLOW, 5, 46, 0), 3, 3))
+	ring.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROYAL, TIER_EDGE[a["tier"]], 5, 46, 0), 3, 3))
 	row.add_child(ring)
 	var icon: TextureRect
-	if id == "tidy_ten":
+	if a["badge_number"]:   # the target drawn on the badge art (e.g. Tidy Ten's rank badge)
 		icon = _badge("BadgeNumber", UiText.num(int(a["target"])), Vector2.ZERO)
+		icon.texture = load(F + String(a["icon"]))
 		icon.name = "Icon"
 	else:
 		icon = HomeStyle.art("Icon")
-		icon.texture = load(F + String(ACH_ICONS[id]))
+		icon.texture = load(F + String(a["icon"]))
 	ring.add_child(icon)
 	var col := VBoxContainer.new()
 	col.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.add_theme_constant_override("separation", 0)
 	row.add_child(col)
-	var t := _text(UiText.t(key), 32)
+	var t := _text(String(a["name"]), 32)
 	t.name = "Title"
 	col.add_child(t)
-	var d := BasePopup.body_label(UiText.t(key + "_DESC"), 20)
+	var d := BasePopup.body_label(String(a["desc"]), 20)
 	d.name = "Desc"
 	d.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	col.add_child(d)
+	var rw := BasePopup.body_label(UiText.t("ACH_REWARD", [UiText.reward_text(a["reward"])]), 20, BasePopup.ROYAL_EDGE)
+	rw.name = "Reward"
+	rw.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	col.add_child(rw)
 	var right := VBoxContainer.new()
+	right.name = "Right"
 	right.custom_minimum_size = Vector2(230, 0)
 	right.alignment = BoxContainer.ALIGNMENT_CENTER
 	right.add_theme_constant_override("separation", 0)
 	row.add_child(right)
-	if a["done"]:
-		var pill := PanelContainer.new()
-		pill.name = "Pill"
-		pill.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(HomeStyle.GREEN, HomeStyle.GREEN_EDGE, 3, 30, 4, 2), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
-		right.add_child(pill)
-		var ph := HBoxContainer.new()
-		ph.alignment = BoxContainer.ALIGNMENT_CENTER
-		ph.add_theme_constant_override("separation", UiTokens.SPACE_XS)
-		pill.add_child(ph)
-		var chk := HomeStyle.art("Check")
-		chk.texture = load(F + "common/icons/icon_check.png")
-		chk.custom_minimum_size = Vector2(36, 36)
-		ph.add_child(chk)
-		var s := HomeStyle.label(UiText.t("ACH_DONE"), 24, HomeStyle.TEXT, 6)
-		s.name = "State"
-		ph.add_child(s)
-	else:
+	if a["claimed"]:
+		_done_pill(right)
+	elif not a["done"]:
 		right.add_child(_bar("Progress", int(a["value"]), int(a["target"]), 26))
 		var s := _text(UiText.t("TASK_PROGRESS", [UiText.num(int(a["value"])), UiText.num(int(a["target"]))]), 26)
 		s.name = "State"
 		s.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		right.add_child(s)
 	return card
+
+## Green COMPLETED pill with a check (a claimed achievement).
+static func _done_pill(right: Control) -> void:
+	var pill := PanelContainer.new()
+	pill.name = "Pill"
+	pill.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(HomeStyle.GREEN, HomeStyle.GREEN_EDGE, 3, 30, 4, 2), UiTokens.SPACE_SM, UiTokens.SPACE_XS))
+	right.add_child(pill)
+	var ph := HBoxContainer.new()
+	ph.alignment = BoxContainer.ALIGNMENT_CENTER
+	ph.add_theme_constant_override("separation", UiTokens.SPACE_XS)
+	pill.add_child(ph)
+	var chk := HomeStyle.art("Check")
+	chk.texture = load(F + "common/icons/icon_check.png")
+	chk.custom_minimum_size = Vector2(36, 36)
+	ph.add_child(chk)
+	var s := HomeStyle.label(UiText.t("ACH_DONE"), 24, HomeStyle.TEXT, 6)
+	s.name = "State"
+	ph.add_child(s)
 
 ## Navy track with a green fill (master summary / card bars).
 static func _bar(n: String, value: int, max_value: int, height: int) -> ProgressBar:

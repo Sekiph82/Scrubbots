@@ -97,6 +97,8 @@ func _on_committed(action: String, result: Dictionary) -> void:
 			_later("F008", "REWARD", "ceremony_daily", "", "c005f008:" + String(result.get("tx", "")))
 		"claim_daily_task":
 			_later("F008", "SMALL", "tasks", "Task_%d" % int(result.get("task_index", -1)), "c005f008:" + String(result.get("tx", "")))
+		"claim_achievement":
+			_later("F008", "SMALL", "achievements", "Ach_" + String(result.get("id", "")), "c005f008:" + String(result.get("tx", "")))
 		"claim_daily_all_tasks":
 			_later("F008", "MAJOR_REWARD", "ceremony_scrubbox", "", "c005f008:" + String(result.get("tx", "")))
 		"buy_heart", "refill_hearts":

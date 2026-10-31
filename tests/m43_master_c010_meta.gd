@@ -1,6 +1,7 @@
 extends SceneTree
 ## M43 master — Lanes C010 BottomNav / Profile / Achievements / Events / Ranks / badges and
-## C010R Weekly Event / First-Try Cleanup / Personal Best (SB-M43-122..134, R10-001..007).
+## C010R Weekly Event / First-Try Cleanup / Personal Best (SB-M43-122..134, R10-001..007);
+## SB-POLISH-007 achievement rewards (m04) and the profile-card achievement badge (m10).
 ## Real app root (main.tscn), injected clock + local day, real gameplay host terminals.
 ##
 ## Run: godot --headless --path . -s res://tests/m43_master_c010_meta.gd
@@ -127,22 +128,43 @@ func _m03() -> void:
 	_complete("m03_profile_entry_live")
 
 func _m04() -> void:
-	print("[m04 Achievements: data-driven, progress, completed, no reward]")
+	print("[m04 Achievements (SB-POLISH-007): 50 data-driven, rewards claimed once, old saves, badge]")
 	await _boot("m04")
 	var defs := Achievements.load_defs()
-	_ok(defs.size() >= 5 and defs.all(func(a): return Achievements.METRICS.has(a["metric"])), "%d definitions, known metrics" % defs.size())
+	var ids := defs.map(func(x): return x["id"])
+	var legacy := ["clean_start", "tidy_ten", "spotless_fifty", "first_set", "robot_crew", "hot_streak", "bare_hands", "first_try_five"]
+	_ok(defs.size() >= 40 and defs.size() <= 50 and defs.all(func(x): return Achievements.METRICS.has(x["metric"])), "%d definitions (40..50), known metrics" % defs.size())
+	_ok(legacy.all(func(i): return ids.has(i)), "the 8 original ids are kept")
+	var art_ok := true
+	for x in defs:
+		art_ok = art_ok and ResourceLoader.exists(Achievements.ICON_ROOT + String(x["icon"])) and Achievements.TIERS.has(x["tier"])
+		for k in x["reward"]:
+			art_ok = art_ok and Achievements.REWARDS.has(k) and int(x["reward"][k]) >= 1
+	_ok(art_ok, "every badge icon is existing final art; every reward is an existing type")
 	var a = _root.get_app_state()
+	var e = _eco()
 	for n in range(1, 11):
 		a.progression.record_win(n)
+	a.request_save()
+	# Old save: progress recorded before achievement rewards existed -> claimable after a relaunch.
+	await _reboot()
+	a = _root.get_app_state()
+	e = _eco()
 	var ev := Achievements.evaluate(a)
 	var by := {}
 	for x in ev:
 		by[x["id"]] = x
-	_ok(by["clean_start"]["done"] and by["tidy_ten"]["done"] and not by["spotless_fifty"]["done"] and by["spotless_fifty"]["value"] == 10, "10 clears: 1 / 10 done, 50 at 10/50")
-	var sb0: int = _eco().wallet.scrub_bucks()
+	_ok(by["clean_start"]["claimable"] and by["tidy_ten"]["claimable"] and not by["spotless_fifty"]["done"] and by["spotless_fifty"]["value"] == 10, "relaunched save with 10 clears: 1 / 5 / 10 claimable, 50 at 10/50")
+	var claimable := ev.filter(func(x): return x["claimable"]).size()
+	_ok(claimable == 3 and HomeBadges.compute(a)["achievements"] == 3, "HomeBadges achievements = %d claimable" % claimable)
+	var h = _root.get_home()
+	h.refresh()
+	var pb: Label = h.get_region("ProfileBadge")
+	_ok(pb.visible and pb.text == "3", "Home profile card shows the claimable badge '%s'" % pb.text)
+	var sb0: int = e.wallet.scrub_bucks()
 	var p = ProfileScreens.open_achievements(_root.get_modal_stack(), a)
 	await _frames(2)
-	_ok(bool(p.find_child("Ach_tidy_ten", true, false).get_meta("done")) and _eco().wallet.scrub_bucks() == sb0, "completed state shown; nothing granted")
+	_ok(e.wallet.scrub_bucks() == sb0, "opening the screen grants nothing")
 	var done := ev.filter(func(x): return x["done"]).size()
 	var sum = p.find_child("AchSummary", true, false)
 	var sbar = sum.find_child("Bar", true, false) if sum != null else null
@@ -153,27 +175,53 @@ func _m04() -> void:
 		var card = p.find_child("Ach_" + x["id"], true, false)
 		var t := _txt(card, "Title")
 		var d := _txt(card, "Desc")
-		cards_ok = cards_ok and card != null and t != "" and d != "" and t != d and not names.has(t) and card.find_child("Badge", true, false) != null
+		cards_ok = cards_ok and card != null and t == x["name"] and d != "" and t != d and not names.has(t) and card.find_child("Badge", true, false) != null \
+			and _txt(card, "Reward") == UiText.t("ACH_REWARD", [UiText.reward_text(x["reward"])])
 		names[t] = true
-	_ok(cards_ok and names.size() == ev.size(), "every card: round badge + distinct non-empty Title and Desc")
+	_ok(cards_ok and names.size() == ev.size(), "every card: tier badge, distinct Title, Desc and its reward line")
+	_ok(p.find_child("Policy", true, false) == null, "no 'They do not grant rewards' note")
+	_ok(p.text_fits(), "every card label fits and the popup fits the 1080x2160 viewport")
 	var dc = p.find_child("Ach_tidy_ten", true, false)
-	_ok(_txt(dc, "State") == UiText.t("ACH_DONE") and dc.find_child("Progress", true, false) == null, "done card: COMPLETED pill, no Progress bar")
+	_ok(dc.find_child("Claim", true, false) is Button and dc.find_child("Progress", true, false) == null and dc.find_child("Pill", true, false) == null, "completed unclaimed card: CLAIM, no bar")
 	var nc = p.find_child("Ach_spotless_fifty", true, false)
 	var pr = nc.find_child("Progress", true, false)
-	_ok(pr is ProgressBar and int(pr.value) == 10 and int(pr.max_value) == 50 and _txt(nc, "State") == UiText.t("TASK_PROGRESS", [UiText.num(10), UiText.num(50)]), "not-done card: Progress 10/50 + n/m text")
+	_ok(pr is ProgressBar and int(pr.value) == 10 and int(pr.max_value) == 50 and _txt(nc, "State") == UiText.t("TASK_PROGRESS", [UiText.num(10), UiText.num(50)]) and nc.find_child("Claim", true, false) == null, "not-done card: Progress 10/50 + n/m text, no CLAIM")
+	var packs0: int = e.pending_packs.count_of("standard")
+	_tap("ach:tidy_ten")
+	await _frames(2)
+	_ok(e.wallet.scrub_bucks() == sb0 + 250 and e.pending_packs.count_of("standard") == packs0 + 1 and e.reward.already_applied("achievement:tidy_ten"), "CLAIM Tidy Ten: +250 SB and 1 Card Pack through tx achievement:tidy_ten")
+	_ok(_txt(dc, "State") == UiText.t("ACH_DONE") and bool(dc.get_meta("claimed")) and p.get_action_button("ach:tidy_ten") == null, "claimed card: COMPLETED pill, CLAIM gone")
+	var again: Dictionary = a.actions.claim_achievement(a, "tidy_ten")
+	var early: Dictionary = a.actions.claim_achievement(a, "spotless_fifty")
+	_ok(not again["ok"] and again["reason"] == "already_claimed" and not early["ok"] and early["reason"] == "not_reached" and e.wallet.scrub_bucks() == sb0 + 250, "second claim / unreached claim refused, nothing paid")
 	var tall := true
 	for id in ["back", "close"]:
 		var b: Button = p.get_action_button(id)
 		tall = tall and b != null and maxf(b.custom_minimum_size.y, b.size.y) >= 88
 	_ok(tall, "achievements BACK and CLOSE >= 88 px tall")
-	_tap("close")
+	_root.get_modal_stack().clear("test")
 	await _frames(2)
-	_ok(_top_id() != "achievements", "CLOSE pops Achievements")
+	# Relaunch: the claim is in the persisted reward ledger, so it never pays twice.
+	await _reboot()
+	a = _root.get_app_state()
+	e = _eco()
+	var sb1: int = e.wallet.scrub_bucks()
+	var after: Dictionary = Achievements.evaluate(a).filter(func(x): return x["id"] == "tidy_ten")[0]
+	var replay: Dictionary = a.actions.claim_achievement(a, "tidy_ten")
+	var open_ids: Array = Achievements.evaluate(a).filter(func(x): return x["claimable"]).map(func(x): return x["id"])
+	# (the claimed Card Pack may have opened meanwhile and completed First Discovery too)
+	_ok(sb1 == sb0 + 250 and after["claimed"] and not after["claimable"] and not replay["ok"] and e.wallet.scrub_bucks() == sb1
+		and open_ids.has("clean_start") and open_ids.has("warming_up") and not open_ids.has("tidy_ten") and HomeBadges.compute(a)["achievements"] == open_ids.size(),
+		"after relaunch: tidy_ten stays claimed, re-claim refused; still claimable %s" % str(open_ids))
 	var bad := "user://m43c010_badach.json"
 	var f := FileAccess.open(bad, FileAccess.WRITE)
-	f.store_string('{"schema":"scrubbots.achievements.v1","achievements":[{"id":"x","metric":"spend_money","target":1}]}')
+	f.store_string('{"schema":"scrubbots.achievements.v2","achievements":[{"id":"x","name":"X","desc":"x","metric":"spend_money","target":1,"tier":"gold","icon":"a.png","reward":{"scrub_bucks":1}}]}')
 	f.close()
 	_ok(Achievements.load_defs(bad).is_empty(), "unknown metric rejects the file")
+	f = FileAccess.open(bad, FileAccess.WRITE)
+	f.store_string('{"schema":"scrubbots.achievements.v2","achievements":[{"id":"x","name":"X","desc":"x","metric":"levels_completed","target":1,"tier":"gold","icon":"a.png","reward":{"stars":5}}]}')
+	f.close()
+	_ok(Achievements.load_defs(bad).is_empty(), "a reward type outside the economy lock rejects the file")
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(bad))
 	_complete("m04_achievements_data_driven")
 
@@ -340,7 +388,7 @@ func _m10() -> void:
 	var a = _root.get_app_state()
 	var b := HomeBadges.compute(a)
 	# M47-FAMILY-APK-TOUCH-R01 owner decision: today's free Rewarded Ads slot is actionable on a fresh day.
-	_ok(b == {"tasks": 0, "daily": 1, "gift_bar": 0, "robots": 0, "collection": 0, "events": 0, "rewarded_ads": 1}, "fresh: only Daily + today's free Rewarded Ads slot %s" % str(b))
+	_ok(b == {"tasks": 0, "daily": 1, "gift_bar": 0, "robots": 0, "collection": 0, "events": 0, "rewarded_ads": 1, "achievements": 0}, "fresh: only Daily + today's free Rewarded Ads slot %s" % str(b))
 	e.daily.mark_task_done(0)
 	e.gift.add_streak_sb("m10", 60)   # SB-POLISH-002: crosses 1 / 5 / 10 / 25
 	e.wallet.credit("bot_parts", 250)
@@ -357,12 +405,20 @@ func _m10() -> void:
 		a.actions.claim_gift(o["id"])
 	a.actions.unlock_next_robot()
 	e.meta_ui.mark_seen("robot_seen:moppy")
+	# SB-POLISH-007: those claims completed achievements (First Order, Gift Hunter, ...): CLAIM them.
+	var ach_n: int = HomeBadges.compute(a)["achievements"]
+	h.refresh()
+	_ok(ach_n > 0 and h.get_region("ProfileBadge").visible, "achievement badge on the profile card (%d)" % ach_n)
+	for _pass in range(3):   # a claimed reward (packs, boosters) may complete another one
+		for x in Achievements.evaluate(a):
+			if x["claimable"]:
+				a.actions.claim_achievement(a, x["id"])
 	for cid in e.collection.all_card_ids():   # the claimed Gift card pack added real cards too
 		if e.collection.owned(cid) > 0:
 			e.meta_ui.mark_seen("card:" + cid)
 	h.refresh()
 	b = HomeBadges.compute(a)
-	_ok(b.values().all(func(v): return v == 0) and not h.get_region("Shortcut_tasks").badge.visible and not h.get_region("NavBadge_robots").visible, "all handled -> no badge %s" % str(b))
+	_ok(b.values().all(func(v): return v == 0) and not h.get_region("Shortcut_tasks").badge.visible and not h.get_region("NavBadge_robots").visible and not h.get_region("ProfileBadge").visible, "all handled -> no badge %s" % str(b))
 	_complete("m10_badges")
 
 func _m11() -> void:
@@ -454,6 +510,18 @@ func _boot(tag: String, size := Vector2i(1080, 2160)) -> void:
 	var path := "user://m43master_c010_%s_%d.save" % [tag, Time.get_ticks_usec()]
 	_tmp.append(path)
 	MainScript.boot_save_path_override = path
+	_root = MainScene.instantiate()
+	_sub.add_child(_root)
+	await _frames(4)
+
+## Relaunch the app root on the SAME save (the last _boot path).
+func _reboot() -> void:
+	_shutdown()
+	_sub = SubViewport.new()
+	_sub.size = Vector2i(1080, 2160)
+	_sub.disable_3d = true
+	get_root().add_child(_sub)
+	MainScript.boot_save_path_override = _tmp[-1]
 	_root = MainScene.instantiate()
 	_sub.add_child(_root)
 	await _frames(4)

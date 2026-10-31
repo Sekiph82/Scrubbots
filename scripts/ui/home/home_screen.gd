@@ -486,6 +486,9 @@ func _build_hud(hud: MarginContainer) -> void:
 	portrait.position = Vector2((AVATAR - p) * 0.5, AVATAR * FRAME_INNER_BOTTOM - PORTRAIT_VIS_BOTTOM * p)
 	portrait.size = Vector2(p, p)
 	avatar.add_child(_reg(portrait))
+	# SB-POLISH-007: claimable achievement rewards (HomeBadges), the nav tabs' red pill, on the
+	# avatar corner (a plain Control, so the pill keeps its anchors inside the card).
+	avatar.add_child(_reg(_badge_label("ProfileBadge")))
 
 	var info := VBoxContainer.new()
 	info.name = "ProfileInfo"
@@ -1130,21 +1133,25 @@ func _build_bottom_nav(nav: PanelContainer) -> void:
 		row.add_child(b)
 		_nodes["Nav_" + id] = b
 		# M43-C010 (SB-M43-134): one attention count per tab, from HomeBadges.
-		var nb := Label.new()
-		nb.name = "NavBadge_" + id
-		nb.visible = false
-		nb.mouse_filter = Control.MOUSE_FILTER_IGNORE
-		nb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-		nb.add_theme_font_size_override("font_size", 24)
-		nb.add_theme_color_override("font_color", Color(1, 1, 1))
-		nb.add_theme_stylebox_override("normal", HomeStyle.box(Color(0.86, 0.12, 0.12), Color(0.5, 0.05, 0.05), 3, 18, 0))
-		nb.set_anchors_preset(Control.PRESET_TOP_RIGHT)
-		nb.offset_left = -58
-		nb.offset_right = -10
-		nb.offset_top = 6
-		nb.offset_bottom = 42
-		nb.grow_horizontal = Control.GROW_DIRECTION_BEGIN   # SB-M44-013 "NEW" pill grows inward
-		b.add_child(_reg(nb))
+		b.add_child(_reg(_badge_label("NavBadge_" + id)))
+
+## Red top-right count pill (hidden until it has text).
+func _badge_label(n: String) -> Label:
+	var nb := Label.new()
+	nb.name = n
+	nb.visible = false
+	nb.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	nb.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	nb.add_theme_font_size_override("font_size", 24)
+	nb.add_theme_color_override("font_color", Color(1, 1, 1))
+	nb.add_theme_stylebox_override("normal", HomeStyle.box(Color(0.86, 0.12, 0.12), Color(0.5, 0.05, 0.05), 3, 18, 0))
+	nb.set_anchors_preset(Control.PRESET_TOP_RIGHT)
+	nb.offset_left = -58
+	nb.offset_right = -10
+	nb.offset_top = 6
+	nb.offset_bottom = 42
+	nb.grow_horizontal = Control.GROW_DIRECTION_BEGIN   # SB-M44-013 "NEW" pill grows inward
+	return nb
 
 # ------------------------------------------------------------ ad slot ----
 
@@ -1309,6 +1316,9 @@ func _render_values() -> void:
 		var bd := HomeBadges.compute(_app)
 		for cid in ["tasks", "collection", "robots", "events"]:
 			counts[cid] = 0 if _locked(cid) else int(bd[cid])
+		var pb: Label = _nodes["ProfileBadge"]
+		pb.text = str(int(bd["achievements"])) if int(bd["achievements"]) > 0 else ""
+		pb.visible = not pb.text.is_empty()
 		# M47-TOUCH-R01: red "1" while the next sequential Rewarded Ads reward is actionable (only
 		# when the app serves that destination).
 		(_nodes["RewardedAdsButton"] as UiShortcutButton).set_badge(int(bd["rewarded_ads"]) if _app_shortcuts.has("rewarded_ads") else 0)

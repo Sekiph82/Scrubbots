@@ -14,6 +14,7 @@ extends RefCounted
 
 const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+const Achievements = preload("res://scripts/progression/achievements.gd")
 
 signal action_committed(action: String, result: Dictionary)
 ## M43 master remediation V03 (SB-M43-161/162): a refused action (nothing committed). Presentation
@@ -163,6 +164,11 @@ func _finish_durable(action: String, op: Callable) -> Dictionary:
 	done["save"] = s
 	action_committed.emit(action, done)
 	return done
+
+## SB-POLISH-007: claim one completed achievement's reward (tx achievement:<id>, durable like
+## the Daily task claims). `app` supplies the read-only progression stats.
+func claim_achievement(app, id: String) -> Dictionary:
+	return _finish_durable("claim_achievement", func(): return Achievements.claim(app, id))
 
 func claim_daily_all_tasks() -> Dictionary:
 	return _finish("claim_daily_all_tasks", _economy.daily.claim_all_tasks_bonus())

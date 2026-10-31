@@ -469,7 +469,8 @@ func _c05() -> void:
 		var room := int(bar.max_value - bar.page)
 		var a := scroll.scroll_vertical
 		if room > 20:
-			var btn = scroll.find_children("*", "BaseButton", true, false)
+			# a button inside the visible viewport (SB-POLISH-007: Achievements CLAIM buttons can sit far down the list)
+			var btn = scroll.find_children("*", "BaseButton", true, false).filter(func(x): return scroll.get_global_rect().encloses(x.get_global_rect()))
 			var start: Vector2 = btn[0].get_global_rect().get_center() if not btn.is_empty() else scroll.get_global_rect().get_center()
 			await _swipe(start, Vector2(0, -300))
 		var moved := scroll.scroll_vertical - a

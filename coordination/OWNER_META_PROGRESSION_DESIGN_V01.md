@@ -334,6 +334,8 @@ Böylece bu dört sistem birbirini tamamlar. Gift Bar kart ve robot ilerlemesine
 | Achievements | 32 total: keep the existing 8 and extend with the listed Level (8), Collection (9), Robot (5), Skill (8) and Gift Bar (2) achievements. Level achievements count first-time progression levels only; replays do not count. Gift Bar achievements need Gift Meter stats wired into the achievement system. |
 | Achievement rewards | Alternative A, cosmetic only (badge, profile frame or Collection showcase decoration). No SB, Booster Charge, Bot Parts or Card Pack rewards. Cosmetic rewards are a new feature to implement. |
 
+> Superseded 2026-10-31 (owner phone playtest, TASKS SB-POLISH-007): achievements now pay a one-time claimable reward of existing types (SB, Bot Parts, Card / Premium Pack, Booster of choice, Mystery Booster), and the list grew to 50 entries (these 32 plus 18 more tiers) in `data/config/achievements_v2.json`, which replaced `achievements_v1.json`. The 8 original ids are kept.
+
 ## Open details (not decided by the owner)
 
 - Exact cosmetic items per achievement (which badge, frame or showcase decoration each one unlocks) and where they are displayed beyond "profile screen" prestige badges.
