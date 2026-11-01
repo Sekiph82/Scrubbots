@@ -22,10 +22,13 @@ const Fx = preload("res://tests/support/standard_pack_fixtures.gd")
 ## M43-C005F-PHASE2 (SB-M43-C005F-005) re-pinned it after the optional, presentation-only feel hook
 ## (bind_feedback + landed-card REWARD accent through the app feel adapter; frames, timing, layout,
 ## routing and card truth unchanged — tests/m43_c005f_phase2_results_pack_feel.gd p01..p06).
+## SB-POLISH-010 re-pinned the ceremony + sequencer after the V04 storyboard restyle (drop / shake /
+## burst / face-down fan / flip reveal / COLLECT, tap-to-skip via RevealSequencer.skip_to; frames,
+## card truth and routing unchanged — tests/m43_c005_c006_standard_pack_presentation.gd v15..v17).
 const PRODUCTION_SHA := {
-	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "539a766dac7ad6623b69807e495b1e653520c896e853a867bed0d8180e054d49",
+	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "c9b5416d2ae7cee56013971216828ef65b91d6e28443713a6384aea2871c329d",
 	"res://scripts/ui/ceremony/standard_pack_model.gd": "2db015d362fdfa2e5b2040d7e3ebcbaed59986811b2d364980082095a655f481",
-	"res://scripts/ui/components/reveal_sequencer.gd": "ccfcc426db81da9ce623d262611191c0039a5f4bd21c46aa3d3decdbf9d2a5ca",
+	"res://scripts/ui/components/reveal_sequencer.gd": "b33e6bd4f44ec3cb1e4ba6b7059dde3c976dffdbe42fb90d5492d4b653494d6f",
 }
 const MANIFEST_V03 := "res://coordination/sessions/M43-C005-C006/STANDARD_FRAME_ALPHA_MANIFEST_V03.json"
 const FRAME_DIR := "res://assets/ui/final/rewards/pack_opening/standard/"

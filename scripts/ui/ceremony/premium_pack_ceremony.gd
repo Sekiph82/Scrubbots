@@ -15,6 +15,8 @@ extends "res://scripts/ui/ceremony/standard_pack_ceremony.gd"
 ## a PremiumPackModel (exactly 5 cards, card 0 = the service's Rare-or-better draw, never
 ## reordered) and the 3 + 2 hold layout. PRESENTATION ONLY, like Standard: no pack opening,
 ## RNG, grant, Collection / Cards Exchange mutation, save or navigation.
+## SB-POLISH-010 V04: the same storyboard stages as Standard, a bit grander: gold rim glow and
+## rays, more confetti, five face-down cards in the fan (each flies from its frame-09 back).
 
 const PremiumPackModel = preload("res://scripts/ui/ceremony/premium_pack_model.gd")
 const PREMIUM_SELF_PATH := "res://scripts/ui/ceremony/premium_pack_ceremony.gd"
@@ -26,6 +28,8 @@ const ROWS := [[0, 1, 2], [3, 4]]   ## draw order, row-major
 ## card height 133, in 1024x1536 frame space), left to right. Card i rises from back i.
 const BACKS := [Vector2(278, 415), Vector2(395, 409), Vector2(512, 403), Vector2(629, 409), Vector2(746, 415)]
 const FRAME_SIZE := Vector2(1024, 1536)
+const PREMIUM_ACCENT := Color(1.0, 0.78, 0.25)
+const PREMIUM_CONFETTI := 90
 
 ## {ok, reason, popup}: a ceremony only for a valid committed Premium model; otherwise fail closed.
 static func create_premium(model, reduced := false) -> Dictionary:
@@ -41,6 +45,9 @@ func _init(model: Dictionary = {}, reduced := false) -> void:
 	name = "Popup_premium_pack"
 	set_title(UiText.t("PACK_PREMIUM_TITLE"))
 	_title_l.text = UiText.t("PACK_PREMIUM_TITLE")
+	_accent = PREMIUM_ACCENT
+	_rim.self_modulate = PREMIUM_ACCENT
+	_confetti.amount = PREMIUM_CONFETTI
 
 func _frame_paths() -> Array:
 	return PACK_FRAMES.map(func(f): return PREMIUM_FRAME_DIR + f)

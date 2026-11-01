@@ -173,7 +173,9 @@ func _k05_full_one_celebration() -> void:
 	var cvs: Array = p.get_card_views()
 	_ok(cvs.all(func(cv): return is_equal_approx(cv.scale.x, 1.0)) and is_equal_approx(cvs[0].glow_alpha(), CardView.GLOW_REST), "settled hold before Tap 2: scale 1.0, glow at rest")
 	var src := _code_only(FileAccess.get_file_as_string(SOURCES[0]))
-	_ok(not RegEx.create_from_string("set_loops|rotation|shake|flash|confetti|strobe").search(src), "no loop / spin / shake / flash / confetti in the ceremony source")
+	# SB-POLISH-010 V04 storyboard: the pack itself now shakes / bursts / throws confetti (stages 2-3);
+	# the NEW pulse stays restrained (bounded scale + glow above) and nothing loops as a tween.
+	_ok(not RegEx.create_from_string("set_loops|strobe").search(src), "no endless tween loop / strobe in the ceremony source")
 	_ok(_plan_props(p).count("celebration") == 1, "one celebration step in the shared sequencer plan")
 	await _route_and_close(p)
 	_complete("k05_full_one_celebration")
@@ -356,17 +358,19 @@ func _k21_tap2_gate() -> void:
 	_stack.push(p)
 	await _frames(2)
 	_tap()
-	var refused := 0
+	# SB-POLISH-010 V04: a tap during the opening skips forward (here: celebration -> settled
+	# hold); it is never Tap 2 - nothing routes until a tap in AWAIT_ROUTE.
+	var skipped := 0
 	var mid_celebration := false
 	var deadline := Time.get_ticks_msec() + 20000
 	while p.phase() == "OPENING" and Time.get_ticks_msec() < deadline:
 		if p.celebration > 0.0 and p.celebration < 1.0:
 			mid_celebration = true
 			_tap()
-			if p.phase() == "OPENING":
-				refused += 1
+			if p.phase() == "AWAIT_ROUTE":
+				skipped += 1
 		await process_frame
-	_ok(mid_celebration and refused > 0 and p.phase() == "AWAIT_ROUTE" and p.route_log().is_empty(), "%d taps during the celebration refused; still waits in AWAIT_ROUTE, nothing routed" % refused)
+	_ok(mid_celebration and skipped == 1 and p.phase() == "AWAIT_ROUTE" and p.route_log().is_empty(), "a tap during the celebration skips to the hold (not Tap 2); waits in AWAIT_ROUTE, nothing routed")
 	await _frames(20)
 	_ok(p.phase() == "AWAIT_ROUTE", "no auto Tap 2")
 	await _route_and_close(p)

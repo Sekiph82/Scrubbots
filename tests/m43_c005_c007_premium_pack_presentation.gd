@@ -233,7 +233,7 @@ func _p08_tap1_cadence() -> void:
 		if i < 9: binds.append([i + 1, Time.get_ticks_usec()]))
 	await _frames(2)
 	_tap()
-	_ok(p.phase() == "OPENING" and not p.tap() and not p.tap(), "real tap -> OPENING; extra taps refused")
+	_ok(p.phase() == "OPENING", "real tap -> OPENING (SB-POLISH-010: further taps skip a stage; covered in C006 v15)")
 	var max_nodes := 0
 	var early := false
 	var deadline := Time.get_ticks_msec() + 20000

@@ -87,6 +87,18 @@
       "notes": "includes the reusable event card family: active event card with timer, progress and milestones, plus collapsed upcoming card (\"Starts in 2d\")",
       "ships": false,
       "ships_note": "excluded from Android export via assets/ui/generated/*"
+    },
+    "pack_opening_master_v01": {
+      "repository_path": "assets/ui/generated/masters/scrubbots_pack_opening_master_v01.png",
+      "sha256": "f58edad1cf1753ff63692f78fe2f295f93ce54725e133d8e4d119f1f785d6bd9",
+      "status": "MASTER_APPROVED_BY_CLAUDE_DELEGATED",
+      "provider": "chatgpt_image_generation",
+      "date": "2026-11-01",
+      "owner_decision": "generated in the owner's ChatGPT 2026-11-01 after the owner called the pack opening ugly (SB-POLISH-010); selection delegated to Claude; not owner visual review",
+      "approval_label": "approved by Claude under owner-delegated authority 2026-11-01",
+      "notes": "4-panel storyboard (941x1672): 1 pack drop + TAP TO OPEN over the blurred Home park, 2 shake and charge, 3 tear and burst with face-down cards in a fan, 4 face-up reveal with rarity glows, NEW ribbon and green COLLECT. Reference only: the ceremony is rebuilt from existing approved frames, card backs and card art as native Controls (scripts/ui/ceremony/standard_pack_ceremony.gd).",
+      "ships": false,
+      "ships_note": "excluded from Android export via assets/ui/generated/*"
     }
   },
   "output_roots": {

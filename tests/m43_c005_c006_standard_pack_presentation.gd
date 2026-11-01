@@ -18,6 +18,9 @@ const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 const AppState = preload("res://scripts/app/app_state.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const Fx = preload("res://tests/support/standard_pack_fixtures.gd")
+const PremiumPackCeremony = preload("res://scripts/ui/ceremony/premium_pack_ceremony.gd")
+const PFx = preload("res://tests/support/premium_pack_fixtures.gd")
+const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 
 const SIZE := Vector2i(1080, 1920)
 const MANIFEST := "res://coordination/sessions/M43-C005-C002/PACK_ASSET_MANIFEST_V01.json"
@@ -42,6 +45,7 @@ var EXPECTED_CASES := [
 	"v05_destinations_corners", "v06_tap2_required", "v07_mixed_routing", "v08_repeat_routing",
 	"v09_no_state_mutation", "v10_complete_once", "v11_lifecycle_back", "v12_reduced_semantics",
 	"v13_full_cadence", "v14_rendered_alpha_clean",
+	"v15_tap_skips_stages", "v16_opening_length", "v17_storyboard_dressing",
 ]
 
 var _fail := 0
@@ -72,6 +76,9 @@ func _initialize() -> void:
 	await _v12_reduced_semantics()
 	await _v13_full_cadence()
 	_v14_rendered_alpha_clean()
+	await _v15_tap_skips_stages()
+	_v16_opening_length()
+	await _v17_storyboard_dressing()
 	_c12_static_guard()
 	_c13_model_sensitivity()
 	_unmount()
@@ -154,9 +161,6 @@ func _v03_tap1_opening_order() -> void:
 	await _frames(2)
 	_tap(p)
 	_ok(p.phase() == "OPENING", "real tap -> OPENING")
-	var extra := [p.tap(), p.tap()]
-	_tap(p)
-	_ok(extra == [false, false], "extra taps during the opening are refused")
 	var max_frame_nodes := 0
 	var early_card := false
 	for _g in range(900):   # capped: a regression fails, never hangs
@@ -233,10 +237,15 @@ func _v06_tap2_required() -> void:
 	await _frames(150)
 	var still: bool = p.get_card_views().all(func(cv): return cv.route == 0.0 and cv.face_center().distance_to(cv.slot_point()) < 0.5)
 	_ok(p.phase() == "AWAIT_ROUTE" and p.route_log().is_empty() and still and not p.get_sequencer().is_active(), "150 frames untouched: still AWAIT_ROUTE, no route, cards at slots")
-	_ok(p.get_hint().is_visible_in_tree() and p.get_hint().text == UiText.t("PACK_TAP_COLLECT"), "live 'Tap to collect' hint")
+	var collect: Button = p.find_child("Collect", true, false)
+	_ok(_buttons(p) == [collect] and collect.text == UiText.t("POPUP_COLLECT") and not p.get_hint().is_visible_in_tree(), "V04: the green COLLECT button is the only visible button (caption hidden)")
 	_tap(p)
-	_ok(p.phase() == "ROUTING" and not p.tap() and not p.tap(), "real tap -> ROUTING; extra taps refused")
+	_ok(p.phase() == "ROUTING" and not p.tap() and not p.tap() and not collect.is_visible_in_tree(), "real tap -> ROUTING; extra taps refused; COLLECT gone")
 	await _until(p, "COMPLETE")
+	var p2 = await _to_await(Fx.mixed("v06_btn"))
+	(p2.find_child("Collect", true, false) as Button).pressed.emit()
+	_ok(p2.phase() == "ROUTING", "pressing COLLECT is Tap 2")
+	await _until(p2, "COMPLETE")
 	_complete("v06_tap2_required")
 
 ## 10-12. NEW -> Collection only, DUPLICATE -> Cards Exchange only; cards travel visibly.
@@ -504,6 +513,100 @@ func _v13_full_cadence() -> void:
 	_ok(not short_ok and skip != range(1, 10) and rep != range(1, 10), "sensitivity: short hold / skipped beat / repeated beat are rejected")
 	_close(p)
 	_complete("v13_full_cadence")
+
+## V04: a tap during the opening skips forward one stage: CHARGE -> BURST (frame 04) -> REVEAL
+## (pack-out) -> settled hold. Every frame is still bound in order; truth and routing unchanged.
+func _v15_tap_skips_stages() -> void:
+	print("[v15 tap skips forward through the stages]")
+	var p = _push(Fx.mixed("v15"))
+	await _frames(2)
+	_tap(p)
+	await _frames(2)
+	_ok(p.phase() == "OPENING" and p.pack_frame <= 2, "Tap 1 -> CHARGE (frame %d)" % p.pack_frame)
+	_tap(p)
+	_ok(p.pack_frame == 4 and p.frame_history() == [1, 2, 3, 4] and p.get_card_views().all(func(cv): return not cv.is_visible_in_tree()), "tap -> BURST: frame 04 bound at once, frames 01..04 in order, no card yet %s" % str(p.frame_history()))
+	_tap(p)
+	var cvs: Array = p.get_card_views()
+	_ok(p.frame_history() == range(1, 10) and cvs.all(func(cv): return cv.emerge == 1.0 and cv.settle == 0.0), "tap -> REVEAL: frames 01..09 done, all cards face-down in the fan")
+	_tap(p)
+	_ok(p.phase() == "AWAIT_ROUTE" and cvs.all(func(cv): return cv.settle == 1.0 and cv.face_center().distance_to(cv.slot_point()) < 0.5 and cv.scale == Vector2.ONE), "tap -> settled hold: AWAIT_ROUTE, every card face-up at its slot")
+	_ok(p.route_log().is_empty() and p.get_destinations_layer().visible, "skipping never routes; destinations shown")
+	var done := {}
+	p.closed.connect(func(_r): done["routes"] = p.route_log())
+	_tap(p)
+	_ok(p.phase() == "ROUTING", "the next tap is Tap 2")
+	await _until(p, "COMPLETE")
+	await process_frame
+	_ok(done.get("routes", []) == [[0, "collection"], [1, "exchange"], [2, "collection"]], "routes unchanged after skipping %s" % str(done))
+	var r = _push(Fx.mixed("v15_red"), true)
+	await _frames(2)
+	_tap(r)
+	_tap(r)
+	_ok(r.phase() == "AWAIT_ROUTE" and r.frame_history() == [9], "Reduced: a tap during the short opening jumps to the hold")
+	_close(r)
+	_complete("v15_tap_skips_stages")
+
+## V04: the uninterrupted FULL opening (Tap 1 -> settled hold) lasts 2.5..4.0 s, Standard and
+## Premium, with and without NEW cards; Reduced is shorter.
+func _v16_opening_length() -> void:
+	print("[v16 opening length]")
+	var secs := {}
+	for k in ["std_all_new", "std_all_dup", "prem_all_new", "prem_all_dup", "std_reduced"]:
+		var made: Dictionary
+		if k.begins_with("prem"):
+			made = PremiumPackCeremony.create_premium(PFx.all_new(k) if k == "prem_all_new" else PFx.all_duplicate(k))
+		else:
+			made = StandardPackCeremony.create(Fx.all_new(k) if k == "std_all_new" else Fx.all_duplicate(k), k == "std_reduced")
+		secs[k] = snappedf(made["popup"].opening_seconds(), 0.01)
+		made["popup"].free()
+	var full: Array = [secs["std_all_new"], secs["std_all_dup"], secs["prem_all_new"], secs["prem_all_dup"]]
+	_ok(full.all(func(t): return t >= 2.5 and t <= 4.0), "FULL openings within 2.5..4.0 s %s" % str(secs))
+	_ok(secs["std_reduced"] < 1.5, "Reduced opening is short (%.2f s)" % secs["std_reduced"])
+	_complete("v16_opening_length")
+
+## V04 storyboard dressing: blurred Home backdrop, face-down canonical card backs in the fan,
+## rarity glow colours, NEW ribbon, ambient FULL only; Reduced: no particles, no back, no motion.
+func _v17_storyboard_dressing() -> void:
+	print("[v17 V04 storyboard dressing]")
+	var p = _push(Fx.mixed("v17"))
+	await _frames(2)
+	var bd: TextureRect = p.find_child("HomeBackdrop", true, false)
+	_ok(bd != null and bd.is_visible_in_tree() and bd.texture.get_width() < 200 and bd.get_parent().name == "Scrim", "blurred (downscaled) Home background on the scrim")
+	await _frames(40)
+	_ok(p.phase() == "IDLE" and p.is_processing() and p.get_stage().rotation != 0.0, "IDLE: pack tilted, ambient drop/bob running without a run")
+	_tap(p)
+	var saw_back := false
+	var saw_shake := false
+	var conf: CPUParticles2D = p.find_child("Confetti", true, false)
+	var confetti_fired := false
+	for _g in range(900):
+		if p.phase() != "OPENING":
+			break
+		saw_shake = saw_shake or (p.pack_frame <= 3 and absf(p.get_stage().rotation) > 0.001)
+		confetti_fired = confetti_fired or conf.emitting
+		for cv in p.get_card_views():
+			if cv.is_visible_in_tree() and cv.emerge > 0.0 and cv.settle < 0.5:
+				saw_back = saw_back or not cv.get_node("Column").visible
+		await process_frame
+	_ok(saw_shake and confetti_fired, "CHARGE shakes the pack; the tear fires the confetti")
+	_ok(saw_back, "cards fly out face-down (card back drawn, face hidden)")
+	var cvs: Array = p.get_card_views()
+	_ok(cvs.all(func(cv): return cv.get_node("Column").visible and cv.rotation == 0.0), "settled: every face shown, no tilt")
+	var gl: Array = cvs.map(func(cv): return cv.RARITY_GLOW[cv.card["rarity"]])
+	_ok(gl[2].r > 0.9 and gl[2].b < 0.4 and gl[1].b > 0.9 and gl[1].r < 0.5 and gl[0].r > 0.8 and gl[0].a < 0.6, "rarity glow: Legendary gold, Rare blue, Common soft grey")
+	_ok(cvs[2].is_processing() and not cvs[0].is_processing() and not cvs[1].is_processing(), "only the Legendary card turns its rays")
+	var ribbon: PanelContainer = cvs[0].get_badge()
+	_ok((ribbon.get_theme_stylebox("panel") as StyleBoxFlat).bg_color == HomeStyle.BADGE and ribbon.get_global_rect().get_center().x > cvs[0].get_face().get_global_rect().get_center().x, "NEW ribbon: red, on the top-right of the face")
+	_close(p)
+	var r = _push(Fx.mixed("v17_red"), true)
+	await _frames(2)
+	_tap(r)
+	await _until(r, "AWAIT_ROUTE")
+	var rc: Array = r.get_card_views()
+	_ok(not r.is_processing() and not (r.find_child("Confetti", true, false) as CPUParticles2D).emitting and not (r.find_child("Sparkles", true, false) as CPUParticles2D).emitting, "Reduced: no ambient motion, no particles")
+	_ok(rc.all(func(cv): return cv.get_node("Column").visible and cv.rotation == 0.0 and not cv.is_processing()), "Reduced: cards face-up, no flip / tilt / spin")
+	_close(r)
+	_complete("v17_storyboard_dressing")
 
 ## [frame, bind_s (relative), hold_s] for 01..08 from [frame, usec] bind events.
 func _holds(binds: Array) -> Array:

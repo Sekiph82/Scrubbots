@@ -20,6 +20,7 @@ extends RefCounted
 ##   - Reduced Effects, an empty sequence or a host outside the tree land the exact final
 ##     state immediately (same final information as the full run).
 ## finish(): fast-forward to the exact final state.  cancel(): stop, no completion.
+## skip_to(i): fast-forward a running run to the start of step i (earlier steps land in order).
 ## `completed(key)` fires at most once per key (natural end, finish, Reduced, empty).
 ## `step_started(key, index)` marks each beat of a full run (a later decoration hook only).
 ## Tweens are bound to the host node: freeing the host kills them. Owns no nodes.
@@ -77,6 +78,17 @@ func finish() -> void:
 		_apply(s, "to")
 	_step = _steps.size() - 1
 	_complete()
+
+## Fast-forward the running tween to the start of step `index`: every earlier step lands and
+## fires step_started in order. False (nothing changes) when not running or already past it.
+func skip_to(index: int) -> bool:
+	if not is_running() or index <= _step or index >= _steps.size():
+		return false
+	var t := float(_steps[index].get("delay", 0.0))
+	for i in index:
+		t += float(_steps[i].get("delay", 0.0)) + float(_steps[i].get("duration", 0.0))
+	_tween.custom_step(t - _tween.get_total_elapsed_time() + 0.0001)
+	return true
 
 ## Stop the current presentation without completing it (route change, hidden screen, freed popup).
 func cancel() -> void:
