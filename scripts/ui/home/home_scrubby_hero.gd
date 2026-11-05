@@ -184,6 +184,11 @@ func _notification(what: int) -> void:
 			_paused = true
 		NOTIFICATION_APPLICATION_RESUMED:
 			_paused = false
+		NOTIFICATION_VISIBILITY_CHANGED:
+			# Hidden even for less than a frame (Home -> Gameplay -> Home): end the gesture and
+			# re-arm the resume hold now, so reopening never carries over the old wait.
+			if not is_visible_in_tree():
+				step(0.0)
 
 ## Large motion allowed at all (Reduced Effects off, Home visible, app focused/running).
 func motion_allowed() -> bool:

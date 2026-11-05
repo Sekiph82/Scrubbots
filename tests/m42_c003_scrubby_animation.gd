@@ -849,6 +849,15 @@ func _video_gates() -> void:
 		hero.notification(pair[1])
 		hero.step(DT)
 		_ok(hero.get_state()["wait"] >= Hero.VIDEO_HOLD_MIN - DT, "%s back: fresh %.2f s hold" % [pair[2], hero.get_state()["wait"]])
+	# SB-CI-RED-2026-11-05: hidden and shown again inside one frame (Home -> Gameplay -> Home)
+	# still stops the video and re-arms a fresh hold (no wait carried across transitions).
+	_ok(hero.start_gesture("turn"), "turn playing")
+	_run(hero, 1.0)
+	home.visible = false
+	home.visible = true
+	_ok(_video_stopped(hero, home), "hidden for under a frame: video stopped, still")
+	hero.step(DT)
+	_ok(hero.get_state()["wait"] >= Hero.VIDEO_HOLD_MIN - DT, "shown again: fresh %.2f s hold" % hero.get_state()["wait"])
 	r[0].free()
 	await process_frame
 	_complete("video_gates")

@@ -659,8 +659,12 @@ func _t21() -> void:
 			var v := String(UiText.EN[k])
 			copy_ok = copy_ok and not v.contains("WAITING") and not v.contains("ACTIVE")
 	_ok(copy_ok, "no WAITING / ACTIVE tile words reintroduced")
-	var op := FileAccess.get_file_as_string("res://scripts/app/opening_screen.gd").to_lower()
-	_ok(not op.contains("skip"), "opening cinematic has no skip path (M42 non-skippable)")
+	# SB-POLISH-008: a tap may only shorten the Akilta logo splash (skip_logo starts the video);
+	# the cinematic itself stays non-skippable.
+	var op := _code_only(FileAccess.get_file_as_string("res://scripts/app/opening_screen.gd")).to_lower()
+	var logo_skip := op.get_slice("func skip_logo()", 1).get_slice("
+func ", 0)
+	_ok(not op.replace("skip_logo", "").contains("skip") and logo_skip.contains("_player.play()"), "opening cinematic has no skip path; tap only ends the logo splash (M42 non-skippable)")
 	_complete("t21_static_guards")
 
 ## Owner D2 (OWNER_D2_WHATS_NEW_AND_DISK_DIAG_DECISION_V01): a simulated LATER build that adds

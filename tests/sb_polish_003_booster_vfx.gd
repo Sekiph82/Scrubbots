@@ -57,6 +57,7 @@ func _initialize() -> void:
 	await _tornado()
 	await _reduced()
 	await _batch_pop()
+	_freed_view()
 	_root.free()
 	_sub.free()
 	DirAccess.remove_absolute(ProjectSettings.globalize_path(_save))
@@ -122,6 +123,20 @@ func _reduced() -> void:
 	var r: Dictionary = _host.execute_booster("tornado", colours[0])
 	_ok(r["ok"] and not _vfx.is_playing(), "Reduced: Tornado committed, no VFX")
 	_root.get_app_state().set_reduced_effects(false)
+
+## SB-CI-RED-2026-11-05: the fade-in view (a slot) can be freed mid-effect (strip rebuilt, host
+## left); ticking and stopping must not touch it (a freed-instance access is a SCRIPT ERROR).
+func _freed_view() -> void:
+	print("[fade-in view freed mid-effect]")
+	var fx = _vfx.get_script().new()
+	get_root().add_child(fx)
+	var view := Control.new()
+	fx.play("selector", {"src_rect": Rect2(0, 0, 10, 10), "dst_rect": Rect2(0, 0, 10, 10), "color": Color.WHITE, "fade_in": view, "fade_from": 0.0})
+	view.free()
+	fx._process(0.05)
+	fx.stop()
+	_ok(not fx.is_playing(), "freed fade-in view: the effect ticks and stops without touching it")
+	fx.free()
 
 func _batch_pop() -> void:
 	print("[SB-POLISH-012 batch complete pop]")

@@ -79,7 +79,7 @@ func stop() -> void:
 	if _kind == "":
 		return
 	var view = _d.get("fade_in")
-	if view is CanvasItem and is_instance_valid(view):
+	if is_instance_valid(view) and view is CanvasItem:
 		view.modulate.a = 1.0
 	_kind = ""
 	_d = {}
@@ -119,7 +119,7 @@ func _process(delta: float) -> void:
 		stop()
 		return
 	var view = _d.get("fade_in")
-	if view is CanvasItem and is_instance_valid(view):
+	if is_instance_valid(view) and view is CanvasItem:
 		var start: float = float(_d.get("fade_from", 0.0))
 		view.modulate.a = clampf((_t - start) / 0.15, 0.0, 1.0)
 	if _kind == "tornado" and _ghost.visible:
