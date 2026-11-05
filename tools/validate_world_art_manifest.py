@@ -22,7 +22,8 @@ import sys
 import tempfile
 import zlib
 
-from audit_level_art import PALETTE, ROOT, audit, decode_png
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # python -I drops the script dir
+from audit_level_art import PALETTE, ROOT, audit, decode_png  # noqa: E402
 
 DEFAULT = os.path.join(ROOT, "data", "art_manifests", "world10_sunken_harbor_v1.json")
 SUPPORT_COUNTS = {"world_ui": 8, "decor": 8, "fx": 4, "marketing": 3}
@@ -112,6 +113,8 @@ def validate(m, root, palette):
         counts[s["category"]] = counts.get(s["category"], 0) + 1
     if counts != SUPPORT_COUNTS:
         errors.append("support PNG counts %s != %s" % (counts, SUPPORT_COUNTS))
+    if not m.get("supportPngSizeSource"):
+        errors.append("supportPngSizeSource must say who chose the support sizes")
     if len(videos) != VIDEO_COUNT or not all(v["optional"] for v in videos):
         errors.append("need %d optional videos" % VIDEO_COUNT)
     ids = [e["id"] for e in support + videos]
@@ -184,6 +187,7 @@ def self_test(palette):
             "colours": (lambda m: m["levelSlotRules"]["palette"]["usedColors"].update(max=16), "usedColors"),
             "support count": (lambda m: m["supportPngs"].pop(), "support PNG counts"),
             "video count": (lambda m: m["videos"].pop(), "optional videos"),
+            "size source": (lambda m: m.pop("supportPngSizeSource"), "supportPngSizeSource"),
             "dup filename": (lambda m: m["supportPngs"][1].update(filename=m["supportPngs"][0]["filename"]), "duplicate filename"),
             "planned with sha": (lambda m: m["levels"][1].update(sha256="ab"), "PLANNED but sha256"),
             "status": (lambda m: m["levels"][1].update(status="DONE"), "not in"),

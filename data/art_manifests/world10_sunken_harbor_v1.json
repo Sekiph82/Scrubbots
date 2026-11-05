@@ -211,6 +211,7 @@
     {"level": 1500, "batch": 15, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null}
   ],
   "supportPngDirectory": "assets/ui/generated/world10_sunken_harbor/",
+  "supportPngSizeSource": "planning_value_claude_2026-11-06: support PNG and video sizes/aspects were chosen by the factory builder (full-screen art = World 01 940x1672 canvas), not specified by the owner; the owner may change them when the art is commissioned.",
   "supportPngs": [
     {
       "id": "ui_background",
