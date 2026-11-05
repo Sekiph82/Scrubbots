@@ -322,7 +322,7 @@ func _offer_need_a_hand() -> void:
 	var host = _gameplay_host
 	if host == null or not is_instance_valid(host) or _acq == null:
 		return
-	if _acq.open_need_a_hand(host.get_assistance_offer()) != null:
+	if _acq.open_need_a_hand(host.get_assistance_offer(), app_state != null and app_state.effects != null and app_state.effects.is_reduced()) != null:
 		host.note_assistance_shown()
 
 ## M43-C001A: the ONE Results model for a RESULTS route payload. The receipt is the

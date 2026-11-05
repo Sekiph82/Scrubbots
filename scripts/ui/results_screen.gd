@@ -45,6 +45,9 @@ extends Control
 ##     - CLEAN NEXT: one subtle native pulse once the reveal is done, no ceremony barrier holds
 ##       it and it is actionable (never disables, delays or latches anything).
 ##   Reduced Effects: keys are consumed but nothing moves and no plugin work happens.
+## SB-POLISH-011 V1 — WON / LOST robot motion (CharacterMotion `win` / `lose`) on the existing
+##   pose, independent of the adapter: draw-only (layout and input untouched), Reduced = static,
+##   a re-show of the same terminal skips the intro straight to the idle loop, hidden = stopped.
 ##
 ## Actions (intents only; the app root performs them):
 ##   HOME                -> home_requested
@@ -64,6 +67,7 @@ const JourneyStrip = preload("res://scripts/ui/components/journey_strip.gd")
 const RevealSequencer = preload("res://scripts/ui/components/reveal_sequencer.gd")
 const GiftProgressModel = preload("res://scripts/economy/gift_progress_model.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+const CharacterMotion = preload("res://scripts/ui/feel/character_motion.gd")
 
 ## Existing approved production art (never written by this screen).
 const ROBOT_ART := "res://assets/ui/final/popups/victory/victory_scrubby_pose.png"
@@ -132,6 +136,7 @@ var _victory_theme: Theme
 ## M43-C005F-PHASE2: optional presentation feel (the app root's feel adapter); never authority.
 var _feel = null
 var _feel_tweens: Array = []
+var _motion_id := ""   ## terminal identity whose robot intro already played
 const ROW_FEEL_MAX := 6        ## at most this many reward-row feel events per Results
 const EMBLEM_POP := 0.12       ## WON emblem: one sine bump 1.0 -> 1.12 -> 1.0
 const EMBLEM_POP_S := 0.36
@@ -392,6 +397,9 @@ func show_model(model: Dictionary) -> void:
 	_render_momentum(won)
 	_sync_primary()
 	_start_reveal(bool(_model.get("reduced_effects", false)))
+	if _styled:
+		CharacterMotion.play(_robot, "win" if won else "lose", _feel_reduced(), _feel_id() != _motion_id)
+		_motion_id = _feel_id()
 	if won:
 		if _feel_reduced():
 			_consume_rows_static()
@@ -645,19 +653,20 @@ func _feel_id() -> String:
 func _feel_reduced() -> bool:
 	return bool(_model.get("reduced_effects", false)) or (_feel != null and _feel.reduced())
 
-## Run `f` once the nested containers have settled (the robot's rect stops moving; at most
-## SETTLE_FRAMES frames), or now when outside the tree.
+## Run `f` once the nested containers have settled (the robot slot's rect stops moving; at most
+## SETTLE_FRAMES frames), or now when outside the tree. The slot, not the robot: the robot's own
+## transform is animated by CharacterMotion and never settles while it plays.
 const SETTLE_FRAMES := 8
 func _after_layout(f: Callable) -> void:
 	if not is_inside_tree():
 		f.call()
 		return
-	var last := _robot.get_global_rect()
+	var last := _robot_slot.get_global_rect()
 	for _i in range(SETTLE_FRAMES):
 		await get_tree().process_frame
 		if not is_instance_valid(self) or not is_inside_tree():
 			return
-		var r := _robot.get_global_rect()
+		var r := _robot_slot.get_global_rect()
 		if r == last:
 			break
 		last = r
@@ -667,7 +676,7 @@ func _after_layout(f: Callable) -> void:
 func _celebrate_win(id: String) -> void:
 	if _feel == null or not _victory or id != _feel_id() or not visible:
 		return
-	if not _feel_event("WIN", _robot, id + ":win"):
+	if not _feel_event("WIN", _robot_slot, id + ":win"):   # the slot: the robot itself is moving
 		return   # already consumed (re-show / refresh / resize / Continue re-arm)
 	if not _feel_reduced():
 		_pop(_emblem, EMBLEM_POP, EMBLEM_POP_S)
@@ -732,6 +741,7 @@ func _stop_feel() -> void:
 		if tw != null and tw.is_valid():
 			tw.kill()
 	_feel_tweens.clear()
+	CharacterMotion.stop(_robot)
 	for c in [_emblem, _primary]:
 		if c != null:
 			c.scale = Vector2.ONE

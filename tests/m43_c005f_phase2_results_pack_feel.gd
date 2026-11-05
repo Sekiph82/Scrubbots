@@ -210,7 +210,8 @@ func _w01() -> void:
 	await _frames(10)
 	_ok(_keys_of(f[0], "WIN") == ["results:WON:a1:L10:win"], "one WIN keyed by status + attempt + level %s" % str(_keys_of(f[0], "WIN")))
 	var bursts: Array = f[3].calls.filter(func(c): return c["kind"] == "burst" and int(c["opts"]["amount"]) == 18)
-	var robot_c: Vector2 = res.get_robot().get_global_rect().get_center()
+	# SB-POLISH-011: the robot is animated (CharacterMotion); its static layout box is the slot.
+	var robot_c: Vector2 = res.get_robot().get_parent().get_global_rect().get_center()
 	_ok(bursts.size() == 1 and (bursts[0]["pos"] as Vector2).distance_to(robot_c) < 2.0, "WIN = 18-particle confetti centred on the robot (%s vs %s)" % [str(bursts[0]["pos"] if not bursts.is_empty() else null), robot_c])
 	_ok(f[2].calls.is_empty(), "no GFF call: Results nodes are Controls")
 	_free_results(res)

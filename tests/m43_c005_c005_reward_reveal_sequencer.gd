@@ -6,6 +6,7 @@ extends SceneTree
 ##
 ## Run: godot --headless --path . -s res://tests/m43_c005_c005_reward_reveal_sequencer.gd
 
+const CharacterMotion = preload("res://scripts/ui/feel/character_motion.gd")
 const RevealSequencer = preload("res://scripts/ui/components/reveal_sequencer.gd")
 const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
 const MainScript = preload("res://scripts/app/main.gd")
@@ -295,6 +296,7 @@ func _r02_authority(root, app, nav, h, res, seq, model: Dictionary, path: String
 
 func _r03_hide_free(res, model: Dictionary) -> void:
 	print("[r03 hide / free kills presentation work]")
+	await create_timer(1.0).timeout   # SB-POLISH-011: let r02's one-shot feel tweens (row settle, hero, CLEAN NEXT pulse) end first
 	var b := _tweens()   # the real root may own unrelated tweens; count relative to it
 	res.show_model(model)
 	_ok(res.is_revealing() and _tweens() == b + 1, "reveal running (1 tween)")
@@ -312,6 +314,7 @@ func _r03_hide_free(res, model: Dictionary) -> void:
 	_ok(lone.is_revealing() and _tweens() == b + 1, "standalone Results revealing")
 	lone.free()
 	await _frames(10)
+	await create_timer(1.0).timeout   # the real Results' one-shot CLEAN NEXT pulse (after finish_reveal) ends too
 	_ok(_tweens() == b and done.is_empty(), "freed Results: tween gone, no completion")
 	_complete("r03_results_hide_free_kills")
 
@@ -390,8 +393,15 @@ func _fill(n: int, v: float) -> Array:
 	a.fill(v)
 	return a
 
+## SB-POLISH-011: the Results robot's own CharacterMotion tween is not reveal work.
 func _tweens() -> int:
-	return get_processed_tweens().filter(func(t): return t.is_valid()).size()
+	return get_processed_tweens().filter(func(t): return t.is_valid() and not _is_motion(t)).size()
+
+func _is_motion(t: Tween) -> bool:
+	for res in get_root().find_children("ResultsScreen", "", true, false):
+		if res.get_robot().get_meta(CharacterMotion.META, null) == t:
+			return true
+	return false
 
 func _free(n: Node) -> void:
 	if is_instance_valid(n):

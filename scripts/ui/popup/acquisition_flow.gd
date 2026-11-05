@@ -35,6 +35,7 @@ const SHOP_ART := "res://assets/ui/final/shop/shop_header_emblem.png"
 const SB_BUNDLE_ART := "res://assets/ui/final/shop/shop_scrub_bucks_bundle.png"
 const ShopScreen = preload("res://scripts/ui/shop/shop_screen.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+const CharacterMotion = preload("res://scripts/ui/feel/character_motion.gd")
 
 ## M43-C008 (SB-M43-108): the active robot's approved help pose (Scrubby default / fallback).
 func _help_pose() -> String:
@@ -512,7 +513,8 @@ func _on_booster_action(id: String, ctx: Dictionary, p) -> void:
 ## WATCH AD; owned charge -> OWNED state, no acquisition CTA (charge-first). Acquisition
 ## only saves one charge for the next attempt; nothing executes on the terminal board.
 ## Top-right X / Back closes with no effect; there is no NO THANKS.
-func open_need_a_hand(offer: Dictionary):
+## SB-POLISH-011: the helper robot slides in + waves (CharacterMotion `help`); `reduced` = static.
+func open_need_a_hand(offer: Dictionary, reduced := false):
 	if _economy == null or _stack == null or not bool(offer.get("show", false)):
 		return null
 	var ids: Array = (offer.get("picks", []) as Array).map(func(p): return String(p.get("id", "")))
@@ -554,6 +556,7 @@ func open_need_a_hand(offer: Dictionary):
 		p.free()
 		return null
 	_refresh_nah(p)
+	CharacterMotion.play(scrubby, "help", reduced)
 	return p
 
 ## One self-contained booster card; its two CTAs are popup actions placed inside it.
