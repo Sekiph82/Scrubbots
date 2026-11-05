@@ -5,6 +5,9 @@ extends SceneTree
 ##   - grandfathered profiles and legacy snapshots (no feature_visited keys / no meta_ui) never show NEW;
 ##   - Home: "NEW" pill on Shortcut_* / NavBadge_*, a real count wins, the press clears it,
 ##     locked entries never show NEW and never mark visited.
+## SB-M44-032: entries open at L1 (shipped: Daily / Shop / Tasks / Collection) were never
+## "newly unlocked", so they never show NEW (shipped_table case). The mechanism cases run on an
+## in-memory fixture table with those four at their 2026-10-22 levels (LEGACY_LEVELS).
 ##
 ## Run: godot --headless --path . -s res://tests/m44_new_badge.gd
 
@@ -14,7 +17,8 @@ const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 
-var EXPECTED_CASES := ["rule_walk", "visit_clears", "persistence", "grandfather", "legacy_snapshot", "home_ui"]
+var EXPECTED_CASES := ["rule_walk", "visit_clears", "persistence", "grandfather", "legacy_snapshot", "home_ui", "shipped_table"]
+const LEGACY_LEVELS := {"daily": 4, "shop": 8, "tasks": 12, "collection": 20}
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -29,6 +33,7 @@ func _initialize() -> void:
 	_grandfather()
 	_legacy_snapshot()
 	await _home_ui()
+	_shipped_table()
 	_shutdown()
 	_cleanup()
 	_done()
@@ -36,7 +41,22 @@ func _initialize() -> void:
 func _fresh(tag: String):
 	var a = AppState.new(_path(tag))
 	a.bootstrap_new_profile()
-	return a
+	return _legacy(a)
+
+## Fixture seam (in-memory only): the four Home shortcuts at their 2026-10-22 levels.
+func _legacy(app):
+	for id in LEGACY_LEVELS:
+		app.unlocks.cfg["unlocks"][id] = LEGACY_LEVELS[id]
+	return app
+
+func _shipped_table() -> void:
+	print("[shipped table: L1 entries never NEW; ROBOTS NEW at L25]")
+	var a = AppState.new(_path("shipped"))
+	a.bootstrap_new_profile()
+	_ok(a.feature_unlocked("daily") and a.feature_unlocked("shop") and HomeBadges.new_features(a).is_empty(), "fresh L1 (Daily / Shop / Tasks / Collection open): no NEW")
+	_walk_to(a, 25)
+	_ok(HomeBadges.new_features(a) == ["robots"], "L25: only ROBOTS NEW %s" % str(HomeBadges.new_features(a)))
+	_complete("shipped_table")
 
 func _rule_walk() -> void:
 	print("[rule: fresh profile, NEW = unlocked and not visited]")
@@ -74,12 +94,12 @@ func _visit_clears() -> void:
 func _persistence() -> void:
 	print("[persistence: save, reload into a fresh AppState]")
 	var p := _path("persist")
-	var a = AppState.new(p)
+	var a = _legacy(AppState.new(p))
 	a.bootstrap_new_profile()
 	_walk_to(a, 12)
 	a.economy.meta_ui.mark_seen(HomeBadges.visited_key("shop"))
 	_ok(bool(a.request_save()["ok"]), "save written")
-	var re = AppState.new(p)
+	var re = _legacy(AppState.new(p))
 	var got: Array = HomeBadges.new_features(re)
 	got.sort()
 	_ok(re.economy.meta_ui.is_seen("feature_visited:shop") and got == ["daily", "tasks"], "reload: shop stays cleared, daily + tasks stay NEW %s" % str(got))
@@ -117,7 +137,7 @@ func _home_ui() -> void:
 	var new_text := UiText.t("HOME_BADGE_NEW")
 	_ok(new_text == "NEW", "UiText HOME_BADGE_NEW == NEW")
 	var hp := _path("home")
-	var a = AppState.new(hp)
+	var a = _legacy(AppState.new(hp))
 	a.bootstrap_new_profile()
 	_walk_to(a, 8)
 	var home = await _home(a)

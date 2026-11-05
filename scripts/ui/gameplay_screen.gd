@@ -78,6 +78,7 @@ const BOOSTER_UNAVAILABLE_ART := "res://assets/ui/final/boosters/states/booster_
 const BOOSTER_FREE_BADGE_ART := "res://assets/ui/final/boosters/states/booster_free_badge_frame.png"
 const BOOSTER_REWARD_GLOW_ART := "res://assets/ui/final/boosters/states/booster_reward_glow.png"
 const BOOSTER_ACTIVATED_BURST_ART := "res://assets/ui/final/boosters/states/booster_activated_burst.png"
+const BOOSTER_LOCK_ART := "res://assets/ui/final/common/icons/icon_lock.png"
 ## Grant glow / activation burst fade-out (s).
 const BOOSTER_FLASH_S := 0.5
 const BOOSTER_AVAILABLE := "available"
@@ -516,6 +517,27 @@ func _make_booster(spec: Dictionary) -> Button:
 	price.add_theme_stylebox_override("normal", HomeStyle.box(Color(0.08, 0.20, 0.50), HomeStyle.GOLD, 3, 16, 4, 0))
 	_frac(price, 0.06, 0.78, 0.94, 1.06)
 	b.add_child(price)
+	# SB-M44-032: locked booster = frosted navy plate, cyan edge, padlock and "LV N" (native
+	# Controls; the text + padlock carry the state, not colour alone).
+	var plate := Panel.new()
+	plate.name = "LockedPlate"
+	plate.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	plate.add_theme_stylebox_override("panel", HomeStyle.box(Color(0.06, 0.12, 0.27, 0.82), Color(0.36, 0.85, 1.0), 3, 18, 0))
+	_frac(plate, 0.0, 0.0, 1.0, 1.0)
+	var lock := HomeStyle.art("LockIcon")
+	lock.texture = load(BOOSTER_LOCK_ART) as Texture2D
+	_frac(lock, 0.28, 0.10, 0.72, 0.56)
+	plate.add_child(lock)
+	var lv := Label.new()
+	lv.name = "LockedLevel"
+	lv.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	lv.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lv.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lv.add_theme_color_override("font_color", Color(0.75, 0.95, 1.0))
+	_frac(lv, 0.0, 0.56, 1.0, 0.94)
+	plate.add_child(lv)
+	plate.visible = false
+	b.add_child(plate)
 	var id: String = spec["id"]
 	b.pressed.connect(func(): booster_pressed.emit(id))
 	return b
@@ -857,7 +879,7 @@ func set_booster_states(states: Array) -> void:
 			continue
 		var granted: bool = _boosters_populated and int(st.get("charges", 0)) > int(_booster_states[id]["charges"])
 		_booster_states[id] = {"charges": int(st.get("charges", 0)), "price": int(st.get("price", 0)),
-			"state": String(st.get("state", BOOSTER_UNAVAILABLE))}
+			"state": String(st.get("state", BOOSTER_UNAVAILABLE)), "unlock_level": int(st.get("unlock_level", 1))}
 		_apply_booster_visual(id)
 		if granted:
 			_flash(_booster_buttons[id].get_node("RewardGlow"))
@@ -996,9 +1018,12 @@ func _apply_booster_visual(id: String) -> void:
 	price.visible = int(st["charges"]) <= 0 and int(st["price"]) > 0 and state != BOOSTER_LOCKED and state != BOOSTER_SELECTED
 	price.text = UiText.t("BOOSTER_PRICE_SB", [UiText.num(int(st["price"]))])
 	b.get_node("SelectedRing").visible = state == BOOSTER_SELECTED
-	b.get_node("UnavailableOverlay").visible = state == BOOSTER_UNAVAILABLE or state == BOOSTER_LOCKED
+	b.get_node("UnavailableOverlay").visible = state == BOOSTER_UNAVAILABLE
+	b.get_node("LockedPlate").visible = state == BOOSTER_LOCKED
+	(b.get_node("LockedPlate/LockedLevel") as Label).text = UiText.t("BOOSTER_LOCKED_LEVEL", [int(st.get("unlock_level", 1))])
+	b.tooltip_text = UiText.t("HOME_UNLOCKS_AT_LEVEL", [int(st.get("unlock_level", 1))]) if state == BOOSTER_LOCKED else ""
 	b.disabled = state == BOOSTER_LOCKED
-	b.modulate = Color(0.72, 0.72, 0.78) if state == BOOSTER_UNAVAILABLE or state == BOOSTER_LOCKED else Color(1, 1, 1)
+	b.modulate = Color(0.72, 0.72, 0.78) if state == BOOSTER_UNAVAILABLE else Color(1, 1, 1)
 
 func get_booster_button(id: String) -> Button:
 	return _booster_buttons.get(id)

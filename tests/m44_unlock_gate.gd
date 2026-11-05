@@ -1,9 +1,9 @@
 extends SceneTree
-## SB-M44-031 part 1 — owner feature unlock gate (data/config/feature_unlocks_v1.json):
+## SB-M44-031 part 1 / SB-M44-032 — owner feature unlock gate (data/config/feature_unlocks_v1.json):
 ##   - strict reader, fail-open on missing / malformed config and unknown ids;
 ##   - fresh-profile level walk via record_win: exact locked set at every listed frontier;
-##   - grandfather: an established (not new FTUE) save keeps every feature;
-##   - Home shortcuts / nav tabs locked with unlock-level text, no badge, no navigation;
+##   - no grandfather (owner 2026-11-03): an established save gets the same gate as a fresh one;
+##   - Home nav tabs locked with unlock-level text, no badge, no navigation;
 ##   - booster bar "locked" with charges untouched; a locked press does nothing;
 ##   - FTUE director never points at a locked control; the L1-L3 window still closes at L3.
 ##
@@ -18,14 +18,14 @@ const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
 
-## The owner table (TASKS.md SB-M44-010), restated here so a silent config edit fails.
-const OWNER_TABLE := {"hearts": 1, "gift_bar": 1, "daily": 4, "shop": 8, "tasks": 12, "collection": 20,
-	"card_packs": 20, "robots": 25, "events": 30, "achievements": 35, "ranks": 40,
+## The owner table (TASKS.md SB-M44-032, owner 2026-11-03), restated here so a silent config edit fails.
+const OWNER_TABLE := {"hearts": 1, "gift_bar": 1, "daily": 1, "shop": 1, "tasks": 1, "collection": 1,
+	"card_packs": 1, "robots": 25, "events": 30, "achievements": 1, "ranks": 40,
 	"plus_one_slot": 6, "random": 11, "selector": 16, "tornado": 21}
 const WALK := [1, 3, 4, 5, 6, 8, 11, 12, 16, 20, 21, 25, 30, 35, 39, 40]
 const HOME_ENTRIES := ["Shortcut_daily", "Shortcut_tasks", "Shortcut_shop", "Shortcut_collection", "Nav_robots", "Nav_events", "Nav_leaderboard"]
 
-var EXPECTED_CASES := ["config_reader", "level_walk", "grandfather", "home_gating", "booster_gating", "ftue_director"]
+var EXPECTED_CASES := ["config_reader", "level_walk", "no_grandfather", "home_gating", "booster_gating", "ftue_director"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -37,7 +37,7 @@ func _initialize() -> void:
 	await process_frame
 	_config_reader()
 	_level_walk()
-	_grandfather()
+	_no_grandfather()
 	await _home_gating()
 	await _booster_gating()
 	_ftue_director()
@@ -54,7 +54,7 @@ func _config_reader() -> void:
 	_ok(typeof(raw) == TYPE_DICTIONARY, "feature_unlocks_v1.json parses as JSON")
 	var ids: Array = BoosterInventory.BOOSTERS.filter(func(b): return OWNER_TABLE.has(b))
 	_ok(ids.size() == 4, "booster ids equal BoosterInventory.BOOSTERS")
-	_ok(u.is_unlocked("no_such_feature", 1, false) and u.unlock_level("no_such_feature") == 1, "unknown id -> unlocked")
+	_ok(u.is_unlocked("no_such_feature", 1) and u.unlock_level("no_such_feature") == 1, "unknown id -> unlocked")
 	var bads := [null, {}, {"schema": "x", "version": 1, "unlocks": {"daily": 4}},
 		{"schema": FeatureUnlocks.SCHEMA, "version": 2, "unlocks": {"daily": 4}},
 		{"schema": FeatureUnlocks.SCHEMA, "version": 1, "unlocks": {"daily": 0}},
@@ -69,7 +69,7 @@ func _config_reader() -> void:
 	var bad = FeatureUnlocks.new()
 	var missing = FeatureUnlocks.new()
 	_ok(not bool(bad.load_config(p)["ok"]) and not bool(missing.load_config("res://no/such.json")["ok"]), "malformed / missing file: ok:false")
-	_ok(OWNER_TABLE.keys().all(func(id): return bad.is_unlocked(id, 1, false) and missing.is_unlocked(id, 1, false)), "malformed / missing config: all 15 unlocked at L1 (fail open)")
+	_ok(OWNER_TABLE.keys().all(func(id): return bad.is_unlocked(id, 1) and missing.is_unlocked(id, 1)), "malformed / missing config: all 15 unlocked at L1 (fail open)")
 	_complete("config_reader")
 
 func _level_walk() -> void:
@@ -95,17 +95,18 @@ func _level_walk() -> void:
 	_ok(re.economy.ftue.is_new_profile() and re.progression.current_level() == 40 and OWNER_TABLE.keys().all(func(id): return re.feature_unlocked(id)), "relaunch at L40: still new profile, everything unlocked (frontier never drops)")
 	_complete("level_walk")
 
-func _grandfather() -> void:
-	print("[grandfather: established save keeps every feature]")
+func _no_grandfather() -> void:
+	print("[no grandfather: an established save gets the same gate as a fresh profile]")
 	var est = AppState.new(_path("est"))
 	_ok(not est.economy.ftue.is_new_profile() and est.progression.current_level() == 1, "established L1 save (not a new FTUE profile)")
-	_ok(OWNER_TABLE.keys().all(func(id): return est.feature_unlocked(id)), "established L1: all 15 unlocked")
 	var fresh = AppState.new(_path("fresh"))
 	fresh.bootstrap_new_profile()
-	var open: Array = OWNER_TABLE.keys().filter(func(id): return fresh.feature_unlocked(id))
-	open.sort()
-	_ok(open == ["gift_bar", "hearts"], "fresh L1: only hearts + gift_bar %s" % str(open))
-	_complete("grandfather")
+	var want := ["achievements", "card_packs", "collection", "daily", "gift_bar", "hearts", "shop", "tasks"]
+	for app in [est, fresh]:
+		var open: Array = OWNER_TABLE.keys().filter(func(id): return app.feature_unlocked(id))
+		open.sort()
+		_ok(open == want, "%s L1: exactly the L1 features %s" % ["fresh" if app == fresh else "established", str(open)])
+	_complete("no_grandfather")
 
 func _home_gating() -> void:
 	print("[Home: locked entries disabled with unlock level, no badge, no navigation]")
@@ -115,38 +116,33 @@ func _home_gating() -> void:
 	var emitted: Array = []
 	home.shortcut_requested.connect(func(id): emitted.append(id))
 	home.nav_requested.connect(func(id): emitted.append(id))
-	_ok(HOME_ENTRIES.all(func(n): return home.get_region(n).disabled), "fresh L1: daily / tasks / shop / collection / robots / events / ranks disabled")
+	var en := HOME_ENTRIES.filter(func(n): return not home.get_region(n).disabled)
+	_ok(en == ["Shortcut_daily", "Shortcut_tasks", "Shortcut_shop", "Shortcut_collection"], "fresh L1: daily / tasks / shop / collection enabled, robots / events / ranks disabled %s" % str(en))
 	var texts_ok := true
 	for n in HOME_ENTRIES:
 		var fid: String = "ranks" if n == "Nav_leaderboard" else n.get_slice("_", 1)
-		texts_ok = texts_ok and home.get_region(n).tooltip_text == UiText.t("HOME_UNLOCKS_AT_LEVEL", [OWNER_TABLE[fid]])
-	_ok(texts_ok and home.get_region("Shortcut_daily").tooltip_text == "Unlocks at level 4", "each shows its table unlock level")
-	_ok(not home.get_region("Shortcut_daily").badge.visible and not home.get_region("Shortcut_tasks").badge.visible and not home.get_region("NavBadge_robots").visible, "locked entries carry no badge (daily claimable / welcome task ready)")
+		var want: String = "" if int(OWNER_TABLE[fid]) <= 1 else UiText.t("HOME_UNLOCKS_AT_LEVEL", [OWNER_TABLE[fid]])
+		texts_ok = texts_ok and home.get_region(n).tooltip_text == want
+	_ok(texts_ok and home.get_region("Nav_robots").tooltip_text == "Unlocks at level 25", "each locked entry shows its table unlock level")
+	_ok(home.get_region("Shortcut_daily").badge.visible and home.get_region("Shortcut_tasks").badge.visible and not home.get_region("NavBadge_robots").visible, "L1: DAILY / TASKS badges live (login + welcome task); locked ROBOTS carries none")
 	_ok(not home.get_region("GiftMeterButton").disabled, "Gift Bar stays enabled at L1")
-	for id in ["daily", "tasks", "shop", "collection"]:
-		home._shortcut_pressed(id)
 	for id in ["robots", "events", "leaderboard"]:
 		home.get_region("Nav_" + id).pressed.emit()
-	_ok(emitted.is_empty(), "locked press: no shortcut_requested / nav_requested")
-	_walk_to(a, 4)
-	home.refresh()
-	var en := HOME_ENTRIES.filter(func(n): return not home.get_region(n).disabled)
-	_ok(en == ["Shortcut_daily"] and home.get_region("Shortcut_daily").tooltip_text == "", "L4: only DAILY enabled %s" % str(en))
-	_ok(home.get_region("Shortcut_daily").badge.visible, "L4: DAILY badge back (login claimable)")
-	_walk_to(a, 12)
-	home.refresh()
-	en = HOME_ENTRIES.filter(func(n): return not home.get_region(n).disabled)
-	_ok(en == ["Shortcut_daily", "Shortcut_tasks", "Shortcut_shop"], "L12: DAILY / TASKS / SHOP enabled %s" % str(en))
+	_ok(emitted.is_empty(), "locked press: no nav_requested")
 	home._shortcut_pressed("tasks")
 	_ok(emitted == ["tasks"], "unlocked TASKS press emits shortcut_requested")
+	_walk_to(a, 25)
+	home.refresh()
+	en = HOME_ENTRIES.filter(func(n): return home.get_region(n).disabled)
+	_ok(en == ["Nav_events", "Nav_leaderboard"], "L25: only EVENTS / RANKS still disabled %s" % str(en))
 	_walk_to(a, 40)
 	home.refresh()
 	en = HOME_ENTRIES.filter(func(n): return not home.get_region(n).disabled)
 	_ok(en == HOME_ENTRIES and home.get_region("Nav_leaderboard").tooltip_text == "", "L40: every entry enabled, RANKS live (SB-M43-122 personal ladder) %s" % str(en))
 	var est = AppState.new(_path("home_est"))
 	var h2 = await _home(est)
-	en = HOME_ENTRIES.filter(func(n): return not h2.get_region(n).disabled)
-	_ok(en == HOME_ENTRIES and HOME_ENTRIES.all(func(n): return h2.get_region(n).tooltip_text == ""), "established L1 save: every entry enabled, no tooltip %s" % str(en))
+	en = HOME_ENTRIES.filter(func(n): return h2.get_region(n).disabled)
+	_ok(en == ["Nav_robots", "Nav_events", "Nav_leaderboard"], "established L1 save: the same gate (robots / events / ranks disabled) %s" % str(en))
 	_shutdown()
 	_complete("home_gating")
 
@@ -184,16 +180,17 @@ func _ftue_director() -> void:
 	var ctx: Dictionary = d.home_context()
 	ctx["daily_claimable"] = true
 	ctx["tasks_claimable"] = true
-	_ok(String(d.current_step("home", ctx).get("id", "")) == "home_play", "fresh L1 Home: PLAY tip, never DAILY / TASKS")
+	_ok(String(d.current_step("home", ctx).get("id", "")) == "home_daily", "fresh L1 Home: DAILY tip (Daily open at L1)")
+	a.unlocks.cfg["unlocks"]["daily"] = 4
+	a.unlocks.cfg["unlocks"]["tasks"] = 12
+	_ok(String(d.current_step("home", ctx).get("id", "")) == "home_play", "a locked DAILY / TASKS shortcut is skipped -> PLAY tip")
 	_ok(not a.economy.ftue.is_seen("home_daily") and not a.economy.ftue.is_seen("home_tasks"), "skipped steps are not marked seen")
 	_ok(d.notify("play", "home", ctx) and d.current_step("home", ctx).is_empty(), "PLAY tip completes; nothing locked offered after")
+	a.unlocks.cfg["unlocks"]["daily"] = 1
+	a.unlocks.cfg["unlocks"]["tasks"] = 1
 	_ok(String(d.current_step("gameplay", {"level": 1, "level_id": "m21_level_001_hazard_bot"}).get("id", "")) == "l1_tap_front", "L1 lesson runs")
 	a.progression.record_win(1)
-	_ok(d.current_step("gameplay", {"level": 2, "level_id": "level_002_apple"}).is_empty() and not a.economy.ftue.is_seen("l2_boosters_a") and not a.economy.ftue.is_seen("l2_boosters_b"), "L2: all four boosters locked -> both booster steps skipped, not seen")
-	a.unlocks.cfg["unlocks"]["plus_one_slot"] = 1
-	var part: Dictionary = d.current_step("gameplay", {"level": 2, "level_id": "level_002_apple"})
-	_ok(String(part.get("id", "")) == "l2_boosters_a" and part["boosters"] == ["plus_one_slot"], "a step keeps only its unlocked boosters %s" % str(part.get("boosters")))
-	a.unlocks.cfg["unlocks"]["plus_one_slot"] = 6
+	_ok(d.current_step("gameplay", {"level": 2, "level_id": "level_002_apple"}).is_empty() and d.booster_intro_step().is_empty(), "L2: no booster lesson, no booster intro (all four locked)")
 	a.progression.record_win(2)
 	_ok(String(d.current_step("gameplay", {"level": 3, "level_id": "level_003_palm_tree"}).get("id", "")) == "l3_speed", "L3 lesson runs")
 	_ok(not d.settle() and not a.economy.ftue.closed, "window open during L3")

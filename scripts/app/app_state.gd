@@ -78,6 +78,10 @@ var _bootstrapping := false
 var last_bootstrap: Dictionary = {}
 ## SB-M44-031: the owner feature unlock table (feature_unlocks_v1.json), read once.
 var unlocks: FeatureUnlocks
+## Test seam only (like main.gd boot_*_override; never set by the shipping boot path): every
+## AppState built in this process opens every table feature at L1, so suites that exercise a
+## gated feature on an L1 fixture save keep testing that feature, not the SB-M44-032 gate.
+static var test_unlock_all := false
 
 ## clock/local_day are test seams. Production passes neither: the shipping graph
 ## injects the real OS local-calendar provider explicitly (F-M39-V03-002).
@@ -94,10 +98,14 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	load_result = save.load()
 	is_blocked = not bool(load_result.get("ok", false)) and String(load_result.get("source", "")) == "future_schema"
 	actions = ProductionActionFacade.new(economy, null, Callable(self, "request_save"))
+	actions.feature_gate = Callable(self, "feature_unlocked")
 	economy.orders.bind_context(Callable(self, "orders_context"))
 	assist = FailureAssistanceService.new()
 	unlocks = FeatureUnlocks.new()
 	unlocks.load_config()
+	if test_unlock_all:
+		for id in unlocks.cfg["unlocks"]:
+			unlocks.cfg["unlocks"][id] = 1
 	# M43-C003: a committed rewarded grant hits the canonical save boundary.
 	economy.rewarded.bind_save(Callable(self, "request_save"))
 	var croot := content_root
@@ -202,12 +210,12 @@ func orders_context() -> Dictionary:
 		n += 1
 	return {"frontier": frontier, "playable_ahead": ahead, "class_for": Callable(progression, "class_for")}
 
-## SB-M44-031 — the ONE feature-unlock gate every UI asks. Grandfather rule (orchestrator
-## default): a save that is NOT a new FTUE profile (existing / migrated / established) keeps
-## every feature; a fresh profile unlocks a feature once its frontier reaches the table level.
-## The frontier never decreases, so a reached feature stays unlocked.
+## SB-M44-031/032 — the ONE feature-unlock gate every UI and entry point asks. Owner
+## 2026-11-03: the same rule for EVERY profile (fresh, existing, migrated, imported, debug; no
+## grandfather): a feature unlocks once the frontier reaches its table level. The frontier never
+## decreases, so a reached feature stays unlocked. Locking never removes owned charges/inventory.
 func feature_unlocked(feature_id: String) -> bool:
-	return unlocks.is_unlocked(feature_id, int(progression.current_level()), not economy.ftue.is_new_profile())
+	return unlocks.is_unlocked(feature_id, int(progression.current_level()))
 
 ## Campaign level that unlocks `feature_id` (for "Unlocks at level N" copy; never hard-coded in UI).
 func feature_unlock_level(feature_id: String) -> int:
@@ -307,7 +315,7 @@ func commit_pack(kind: String, tx_id: String) -> Dictionary:
 ## kind comes from the durable queue entry; the entry id is the pack tx / presentation id).
 ## A pack already committed (app killed mid-ceremony) replays its receipt, never redraws. The
 ## entry stays pending until acknowledge_earned_pack(). SB-M44-025: below the card_packs unlock
-## (fresh profile, frontier < 20) nothing opens - the entry just stays queued.
+## (table level; L1 since SB-M44-032) nothing opens - the entry just stays queued.
 func open_earned_pack(id: String) -> Dictionary:
 	if is_blocked:
 		return {"ok": false, "reason": "app_blocked"}

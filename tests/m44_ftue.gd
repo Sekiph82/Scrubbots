@@ -326,7 +326,8 @@ func _t11() -> void:
 			levels.append(int(l["level"]))
 			ids_ok = ids_ok and int(order_of.get(String(l["level_id"]), -1)) == int(l["level"])
 	levels.sort()
-	_ok(levels == [1, 2, 3] and ids_ok, "gameplay lessons exactly L1 / L2 / L3 bound to their catalog ids %s" % str(levels))
+	# SB-M44-031 part 2: the Level-2 four-booster lesson is removed (boosters get booster_intros).
+	_ok(levels == [1, 3] and ids_ok, "gameplay lessons exactly L1 / L3 bound to their catalog ids %s" % str(levels))
 	var raw: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(FtueConfig.PATH))
 	var muts := {
 		"lesson at L4": func(d): d["lessons"][1]["level"] = 4,
@@ -336,7 +337,9 @@ func _t11() -> void:
 		"welcome 0 SB": func(d): d["first_day_welcome_task"]["scrub_bucks"] = 0,
 		"welcome slot 1": func(d): d["first_day_welcome_task"]["task_index"] = 1,
 		"unknown target": func(d): d["lessons"][1]["steps"][0]["target"] = "shop_offer",
-		"duplicate step": func(d): d["lessons"][2]["steps"][1]["id"] = "l2_boosters_a",
+		"duplicate step": func(d): d["lessons"][1]["steps"][1]["id"] = "l1_tap_front",
+		"intro for an unknown booster": func(d): d["booster_intros"][0]["booster"] = "magnet",
+		"duplicate booster intro": func(d): d["booster_intros"][1]["booster"] = "plus_one_slot",
 		"bad schema": func(d): d["schema"] = "x",
 	}
 	var rej := 0
@@ -357,9 +360,7 @@ func _t12() -> void:
 	var a = _app(_path("t12"))
 	a.bootstrap_new_profile()
 	var d = FtueDirector.new(a)
-	# SB-M44-031: Daily (L4) / Tasks (L12) are locked on a fresh L1 profile: their tips are skipped.
-	_ok(String(d.current_step("home", d.home_context()).get("id", "")) == "home_play", "fresh L1: DAILY / TASKS locked -> first Home tip is PLAY")
-	_unlock_at_l1(a, ["daily", "tasks", "plus_one_slot", "random", "selector", "tornado"])
+	# SB-M44-032: Daily / Tasks open at L1 (owner 2026-11-03), so the first-Home tips run at L1.
 	_ok(String(d.current_step("home", d.home_context()).get("id", "")) == "home_daily", "first Home: DAILY tip first")
 	a.actions.claim_daily_login()
 	_ok(String(d.current_step("home", d.home_context()).get("id", "")) == "home_tasks", "DAILY claimed -> its tip no longer applies; TASKS tip")
@@ -369,13 +370,14 @@ func _t12() -> void:
 	_ok(d.current_step("gameplay", {"level": 1, "level_id": "level_002_apple"}).is_empty() and d.current_step("gameplay", {"level": 2, "level_id": "level_002_apple"}).is_empty(), "wrong level id / not the frontier: nothing")
 	_ok(not d.notify("play", "gameplay", g1) and d.notify("supply_placed", "gameplay", g1) and String(d.current_step("gameplay", g1).get("id", "")) == "l1_slots", "only the real placement completes the front tip")
 	_ok(not d.acknowledge("l1_tap_front"), "an acknowledged step cannot be acknowledged twice")
-	a.progression.debug_set_current_level(2)
-	var st: Dictionary = d.current_step("gameplay", {"level": 2, "level_id": "level_002_apple"})
+	_unlock_at_l1(a, ["plus_one_slot"])
+	var st: Dictionary = d.booster_intro_step()
 	var body := String(d.step_copy(st).get("body", ""))
-	_ok(String(st.get("id", "")) == "l2_boosters_a" and body.contains(UiText.t("BOOSTER_NAME_PLUS_ONE_SLOT")) and body.contains(UiText.t("BOOSTER_EFFECT_SELECTOR")) and body.contains("owned: 2"), "L2 booster copy: real names / effects / live charges")
+	_ok(String(st.get("id", "")) == "intro_plus_one_slot" and body.contains(UiText.t("BOOSTER_NAME_PLUS_ONE_SLOT")) and body.contains(UiText.t("BOOSTER_EFFECT_PLUS_ONE_SLOT")) and body.contains("owned: 2"), "booster intro copy: real name / effect / live charges")
 	var sb: int = a.economy.wallet.scrub_bucks()
 	var c0 := _total(a)
-	_ok(d.skip_tips() and not d.tips_active() and d.current_step("gameplay", {"level": 2, "level_id": "level_002_apple"}).is_empty() and not d.skip_tips(), "Skip Tips: once, all tips stop")
+	a.progression.debug_set_current_level(3)
+	_ok(d.skip_tips() and not d.tips_active() and d.current_step("gameplay", {"level": 3, "level_id": "level_003_palm_tree"}).is_empty() and d.booster_intro_step().is_empty() and not d.skip_tips(), "Skip Tips: once, all tips stop")
 	_ok(a.economy.wallet.scrub_bucks() == sb and _total(a) == c0, "Skip Tips changes no wallet / charges")
 	var b = _app(_path("t12b"))
 	b.bootstrap_new_profile()
@@ -425,13 +427,9 @@ func _t14() -> void:
 	_root.refresh_coachmark()
 	var daily_b: Button = _root.get_home().get_region("Shortcut_daily")
 	var tasks_b: Button = _root.get_home().get_region("Shortcut_tasks")
-	# SB-M44-031: fresh L1 Home gates DAILY / TASKS / SHOP / COLLECTION; the tip skips to PLAY.
-	_ok(cm.get_step_id() == "home_play" and daily_b.disabled and tasks_b.disabled and _root.get_home().get_region("Shortcut_shop").disabled and _root.get_home().get_region("Shortcut_collection").disabled, "fresh L1: the four panels are locked, tip on PLAY")
-	_unlock_at_l1(app, ["daily", "tasks", "shop", "collection"])
-	_root.get_home().refresh()
-	_root.refresh_coachmark()
+	# SB-M44-032: Daily / Tasks / Shop / Collection open at L1 (owner 2026-11-03).
 	_ok(cm.get_step_id() == "home_daily" and cm.get_target() == daily_b.get_global_rect(), "Scrubby tip points at the real DAILY panel")
-	_ok(not daily_b.disabled and not tasks_b.disabled and not _root.get_home().get_region("Shortcut_shop").disabled and not _root.get_home().get_region("Shortcut_collection").disabled, "all four Home panels live once unlocked")
+	_ok(not daily_b.disabled and not tasks_b.disabled and not _root.get_home().get_region("Shortcut_shop").disabled and not _root.get_home().get_region("Shortcut_collection").disabled, "all four Home panels live at L1")
 	tasks_b.pressed.emit()
 	await _frames(2)
 	_root.refresh_coachmark()
@@ -494,20 +492,10 @@ func _t15() -> void:
 	await _play(2)
 	host = _root.get_gameplay_host()
 	_root.refresh_coachmark()
-	# SB-M44-031: all four boosters are locked at a fresh L2, so both L2 booster steps are skipped.
-	_ok(not cm.is_showing() and host.booster_states().all(func(s): return String(s["state"]) == "locked"), "fresh L2: boosters locked, no booster tip")
-	_unlock_at_l1(app, BOOSTERS)
-	_root.refresh_coachmark()
-	var scr = host.get_screen()
-	var ab: Rect2 = scr.get_booster_button("plus_one_slot").get_global_rect().merge(scr.get_booster_button("selector").get_global_rect())
-	var body: String = cm.get_body_label().text
-	_ok(cm.get_step_id() == "l2_boosters_a" and cm.get_target() == ab and body.contains(UiText.t("BOOSTER_NAME_PLUS_ONE_SLOT")) and body.contains("owned: 2"), "L2 phase 1 on the real +1 Slot / Selector controls with live count")
-	cm.get_got_it_button().pressed.emit()
-	_root.refresh_coachmark()
-	body = cm.get_body_label().text
-	_ok(cm.get_step_id() == "l2_boosters_b" and body.contains(UiText.t("BOOSTER_NAME_RANDOM")) and body.contains(UiText.t("BOOSTER_NAME_TORNADO")), "L2 phase 2: Random / Tornado")
-	_ok(_total(app) == 8 and app.economy.wallet.scrub_bucks() == sb0, "introducing boosters spent nothing")
-	cm.get_got_it_button().pressed.emit()
+	# SB-M44-031 part 2: no Level-2 booster lesson (boosters locked until 6/11/16/21; intros there,
+	# tests/m44_meta_l1_unlock_ftue.gd).
+	_ok(not cm.is_showing() and host.booster_states().all(func(s): return String(s["state"]) == "locked"), "L2: boosters locked, no booster tip")
+	_ok(_total(app) == 8 and app.economy.wallet.scrub_bucks() == sb0, "starter charges stored, nothing spent")
 	await _play(3)
 	host = _root.get_gameplay_host()
 	_root.refresh_coachmark()
@@ -747,14 +735,10 @@ func _t23() -> void:
 	f.settle()
 	_root.request_home_ceremonies()
 	await _frames(4)
-	# SB-M43-072: the L4 Daily Feature Unlock ceremony (meta ceremonies drain first) comes
-	# first, alone; What's New opens only after it is acknowledged (never stacked).
-	var first = _top()
-	_ok(first != null and String(first.context.get("ceremony_key", "")) == "unlock:daily" and _root.get_modal_stack().depth() == 1, "L4 Daily feature ceremony first, alone on the stack")
-	if first != null:
-		first._on_action("got_it")
-	await _frames(4)
+	# SB-M44-032: Daily opens at L1 (owner 2026-11-03), so no L4 Daily Feature Unlock ceremony
+	# precedes What's New any more; it opens alone on the quiet Home.
 	var top = _top()
+	_ok(top != null and String(top.context.get("ceremony_key", "")) != "unlock:daily" and _root.get_modal_stack().depth() == 1, "no L4 Daily feature ceremony; one ceremony alone on the stack")
 	var name_l = top.find_child("FeatureName", true, false) if top != null else null
 	_ok(app.economy.ftue.closed and _top_id() == "ceremony_feature_unlock" and name_l is Label, "after genuine L3: the later feature shows via the M43 Feature Unlock ceremony")
 	if top != null:

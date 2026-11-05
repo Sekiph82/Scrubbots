@@ -170,13 +170,14 @@ func _frontier() -> void:
 		if not (r["ok"] and int(r["level"]) == n and r["entry_id"] == all[n - 1]):
 			order_ok = false
 			print("  frontier %d -> %s" % [n, str(r)])
-		_ok(app.feature_unlocked("collection") == (n >= 20) and app.feature_unlocked("card_packs") == (n >= 20)
+		# SB-M44-032 owner table 2026-11-03: Collection / Card Packs at L1, Robots 25, Events 30.
+		_ok(app.feature_unlocked("collection") and app.feature_unlocked("card_packs")
 			and app.feature_unlocked("robots") == (n >= 25) and app.feature_unlocked("events") == (n >= 30),
 			"frontier %d: collection/card_packs/robots/events unlock per owner table" % n)
 		app.progression.record_win(n)
 	_ok(order_ok, "fresh profile resolves L1..L30 to the catalog entries in order")
 	_ok(GameplayLaunchResolver.resolve(app)["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "frontier 31 -> CONTENT_MISSING (end of builtin catalog)")
-	_ok(app.feature_unlocked("achievements") == false and app.feature_unlock_level("achievements") == 35, "achievements (L35) still locked at frontier 31")
+	_ok(app.feature_unlocked("achievements") and app.feature_unlock_level("achievements") == 1 and not app.feature_unlocked("ranks") and app.feature_unlock_level("ranks") == 40, "achievements open (L1); RANKS (L40) still locked at frontier 31")
 	_completed["frontier"] = true
 	_remove_tree(ProjectSettings.globalize_path(root))
 

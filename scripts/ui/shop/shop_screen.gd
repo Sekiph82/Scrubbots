@@ -25,6 +25,7 @@ const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
 const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const BoosterInventory = preload("res://scripts/economy/booster_inventory.gd")
+const FeatureUnlocks = preload("res://scripts/progression/feature_unlocks.gd")
 
 const ART := {
 	"emblem": "res://assets/ui/final/shop/shop_header_emblem.png",
@@ -183,6 +184,10 @@ func offer(product: String) -> Dictionary:
 				o["price"] = int(e.config.booster_price(id))
 				o["available"] = true
 				o["detail_owned"] = e.boosters.charges(id)
+				# SB-M44-032: a booster still behind the owner unlock table is never sold.
+				if _actions != null and not _actions.feature_unlocked(id):
+					o["available"] = false
+					o["reason"] = "locked"
 			elif product.begins_with("speed:"):
 				var secs := int(product.substr(6))
 				for p in e.config.speed_timed_products():
@@ -219,6 +224,10 @@ func refresh() -> void:
 				text = UiText.t("SHOP_SPEED_IN_LEVEL")
 			"store_gated":
 				text = UiText.t("SHOP_STORE_LATER")
+			"locked":
+				var fu := FeatureUnlocks.new()
+				fu.load_config()
+				text = UiText.t("HOME_UNLOCKS_AT_LEVEL", [fu.unlock_level(product.substr(8))])
 		detail.text = text
 		b.text = UiText.t("SHOP_PRICE", [UiText.num(int(o["price"]))]) if int(o["price"]) > 0 else UiText.t("SHOP_UNAVAILABLE")
 		popup.set_action_blocked("buy:" + product, not (bool(o["available"]) and reason.is_empty()))

@@ -24,6 +24,11 @@ signal action_refused(action: String, result: Dictionary)
 var _economy
 var _host            # ProductionGameplayHost or null (menus: economy-only actions)
 var _save_cb: Callable = Callable()
+## SB-M44-032: Callable(feature_id) -> bool, the owner unlock gate (AppState.feature_unlocked).
+## Bound by AppState / the gameplay host, so a locked booster is never bought, watched or used
+## through ANY caller (Shop, Booster Acquire, Need a Hand), and locked Robots / Events actions
+## are refused whatever opened them. Unbound (no AppState) = open.
+var feature_gate: Callable = Callable()
 
 func _init(economy, host = null, save_cb: Callable = Callable()) -> void:
 	_economy = economy
@@ -49,9 +54,19 @@ func _finish(action: String, r) -> Dictionary:
 func _no_host(action: String) -> Dictionary:
 	return {"ok": false, "action": action, "reason": "no_gameplay_host"}
 
+func feature_unlocked(feature_id: String) -> bool:
+	return not feature_gate.is_valid() or bool(feature_gate.call(feature_id))
+
+## {} when booster `id` is unlocked, else the refused result (nothing touched).
+func _locked(action: String, id: String) -> Dictionary:
+	return {} if feature_unlocked(id) else _finish(action, {"ok": false, "reason": "locked"})
+
 # ------------------------------------------------------------ boosters ----
 
 func plus_one_slot() -> Dictionary:
+	var lk := _locked("plus_one_slot", BoosterInventory.PLUS_ONE_SLOT)
+	if not lk.is_empty():
+		return lk
 	if _host == null:
 		return _no_host("plus_one_slot")
 	var ok: bool = _host.activate_plus_one_slot()
@@ -59,18 +74,27 @@ func plus_one_slot() -> Dictionary:
 	return _finish("plus_one_slot", {"ok": ok} if ok or why == null else {"ok": false, "reason": String(why)})
 
 func random() -> Dictionary:
+	var lk := _locked("random", BoosterInventory.RANDOM)
+	if not lk.is_empty():
+		return lk
 	if _host == null:
 		return _no_host("random")
 	var r = _host.get_booster_service().apply_random(_host.get_booster_adapter())
 	return _booster_done("random", r)
 
 func selector(batch_id) -> Dictionary:
+	var lk := _locked("selector", BoosterInventory.SELECTOR)
+	if not lk.is_empty():
+		return lk
 	if _host == null:
 		return _no_host("selector")
 	var r = _host.get_booster_service().apply_selector(_host.get_booster_adapter(), batch_id)
 	return _booster_done("selector", r)
 
 func tornado(color) -> Dictionary:
+	var lk := _locked("tornado", BoosterInventory.TORNADO)
+	if not lk.is_empty():
+		return lk
 	if _host == null:
 		return _no_host("tornado")
 	var r = _host.get_booster_service().apply_tornado(_host.get_booster_adapter(), color)
@@ -79,6 +103,9 @@ func tornado(color) -> Dictionary:
 ## M43-C004: buy one saved charge (no execution; usable on the next attempt). Needs no
 ## gameplay host, so terminal-recovery UI can call it.
 func buy_booster_charge(id: String) -> Dictionary:
+	var lk := _locked("buy_booster_charge", id)
+	if not lk.is_empty():
+		return lk
 	return _finish("buy_booster_charge", _economy.boosters.buy_charge(id))
 
 func _booster_done(action: String, r: Dictionary) -> Dictionary:
@@ -111,6 +138,8 @@ func rewarded_available(product: String) -> bool:
 	return _economy.rewarded.is_available(product)
 
 func start_rewarded(product: String, token: String = "") -> Dictionary:
+	if product.begins_with("booster:") and not feature_unlocked(product.substr(8)):
+		return {"ok": false, "action": "start_rewarded", "reason": "locked"}
 	var r: Dictionary = _economy.rewarded.start(product, token)
 	r["action"] = "start_rewarded"
 	return r
@@ -199,11 +228,15 @@ func exchange_all_extras() -> Dictionary:
 	return _finish("exchange_all_extras", _economy.exchange.exchange_all_extras(_fresh_exchange_tx()))
 
 func unlock_robot(robot_id: String) -> Dictionary:
+	if not feature_unlocked("robots"):
+		return _locked("unlock_robot", "robots")
 	return _finish("unlock_robot", _economy.robots.unlock(robot_id))
 
 ## M43 master (SB-M43-102/104): unlock the NEXT robot of the canonical roster order (owner
 ## roster §4) for exactly the configured Bot Parts. {ok, reason, robot_id, remaining_parts}.
 func unlock_next_robot() -> Dictionary:
+	if not feature_unlocked("robots"):
+		return _locked("unlock_robot", "robots")
 	var id: String = RobotRoster.next_locked(_economy.robots)
 	if id.is_empty():
 		return _finish("unlock_robot", {"ok": false, "reason": "all_unlocked"})
@@ -213,12 +246,18 @@ func unlock_next_robot() -> Dictionary:
 
 ## M43-C010 / C010R: event milestone / First-Try claims (EventService, RewardGrantService tx).
 func claim_event_milestone(event_id: String, index: int) -> Dictionary:
+	if not feature_unlocked("events"):
+		return _locked("claim_event_milestone", "events")
 	return _finish("claim_event_milestone", _economy.events.claim_weekly(event_id, index, _economy.reward))
 
 func join_first_try() -> Dictionary:
+	if not feature_unlocked("events"):
+		return _locked("join_first_try", "events")
 	return _finish("join_first_try", _economy.events.join_first_try())
 
 func claim_first_try() -> Dictionary:
+	if not feature_unlocked("events"):
+		return _locked("claim_first_try", "events")
 	return _finish("claim_first_try", _economy.events.claim_first_try(_economy.reward))
 
 ## M43-C012R: Comeback Catch-Up step claim (only when an owner reward sequence is configured).
@@ -227,4 +266,6 @@ func claim_catchup(step: int) -> Dictionary:
 
 ## M43 master (SB-M43-071/106): equip an unlocked robot (persisted selection, spends nothing).
 func equip_robot(robot_id: String) -> Dictionary:
+	if not feature_unlocked("robots"):
+		return _locked("equip_robot", "robots")
 	return _finish("equip_robot", _economy.robots.set_active(robot_id))

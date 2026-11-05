@@ -159,6 +159,8 @@ var _cids: Array = []
 var _summary: Array = []
 
 func _initialize() -> void:
+	# SB-M44-032 (no grandfather): this suite exercises gated features on L1 fixture saves.
+	preload("res://scripts/app/app_state.gd").test_unlock_all = true
 	await process_frame
 	var pal = JSON.parse_string(FileAccess.get_file_as_string("res://data/palettes/scrubbots_palette_v3.json"))
 	for c in pal["colors"]:

@@ -6,7 +6,9 @@ extends SceneTree
 ##   - save / reload keeps the queue identical and still locked;
 ##   - at L20 the Collection screen shows the live counts and the existing ceremony drains FIFO exactly once;
 ##   - committed ids replay (no second draw); ack removes; empty queue after reload;
-##   - grandfather: an established save below L20 opens packs exactly as before.
+##   - shipped table (SB-M44-032, owner 2026-11-03): card_packs opens at L1, so a fresh or
+##     established L1 save opens packs at once. The queue cases run on an in-memory fixture
+##     table with card_packs at its old level 20 (the queue mechanism itself is unchanged).
 ## Never boots main.tscn (no real user save touched): AppState on temp user:// paths + a ModalStack.
 ##
 ## Run: godot --headless --path . -s res://tests/m44_pending_packs_gate.gd
@@ -17,7 +19,8 @@ const ModalStack = preload("res://scripts/ui/popup/modal_stack.gd")
 const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 
-var EXPECTED_CASES := ["queue_below_unlock", "no_open_below_unlock", "persist", "open_at_unlock", "exactly_once", "grandfather"]
+var EXPECTED_CASES := ["queue_below_unlock", "no_open_below_unlock", "persist", "open_at_unlock", "exactly_once", "shipped_l1_opens"]
+const FIXTURE_CARD_PACKS_LEVEL := 20
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -35,7 +38,7 @@ func _initialize() -> void:
 	var b = _persist(a)
 	await _open_at_unlock(b)
 	_exactly_once()
-	await _grandfather()
+	await _shipped_l1_opens()
 	_unmount()
 	_cleanup()
 	_done()
@@ -45,6 +48,7 @@ func _queue_below_unlock():
 	_path_main = _path("main")
 	var a = AppState.new(_path_main)
 	_ok(bool(a.bootstrap_new_profile()["ok"]) and a.economy.ftue.is_new_profile(), "fresh profile bootstrapped")
+	a.unlocks.cfg["unlocks"]["card_packs"] = FIXTURE_CARD_PACKS_LEVEL
 	var e = a.economy
 	var base := _econ_core(e)
 	var grants := {1: {"standard_card_packs": 1}, 10: {"premium_card_packs": 1}, 19: {"standard_card_packs": 1, "premium_card_packs": 1}}
@@ -84,6 +88,7 @@ func _persist(a):
 	print("[persist: reload keeps the queue identical and locked]")
 	var before: Array = a.economy.pending_packs.entries()
 	var b = AppState.new(_path_main)
+	b.unlocks.cfg["unlocks"]["card_packs"] = FIXTURE_CARD_PACKS_LEVEL
 	var after: Array = b.economy.pending_packs.entries()
 	_ok(after == before and after.map(func(x): return String(x["id"])) == _ids and after.map(func(x): return String(x["kind"])) == _kinds, "entries identical (ids, kinds, order)")
 	_ok(b.economy.ftue.is_new_profile() and b.progression.current_level() == 19 and not b.feature_unlocked("card_packs"), "reloaded L19 fresh profile still locked")
@@ -145,10 +150,10 @@ func _exactly_once() -> void:
 	_ok(re.economy.pending_packs.size() == 0 and re.economy.pack_receipts.has(id), "reload after ack: empty queue, receipt kept")
 	_complete("exactly_once")
 
-func _grandfather() -> void:
-	print("[grandfather: established save below L20 opens as before]")
+func _shipped_l1_opens() -> void:
+	print("[shipped table: card_packs open at L1, an earned pack opens at once]")
 	var a = AppState.new(_path("est"))
-	_ok(not a.economy.ftue.is_new_profile() and a.progression.current_level() < 20 and a.feature_unlocked("card_packs"), "established L%d save: card_packs unlocked" % a.progression.current_level())
+	_ok(a.feature_unlock_level("card_packs") == 1 and a.progression.current_level() == 1 and a.feature_unlocked("card_packs"), "shipped table: card_packs unlocked at L1")
 	var e = a.economy
 	e.reward.grant("m44_025_est", {"standard_card_packs": 1})
 	var id: String = e.pending_packs.front()["id"]
@@ -161,7 +166,7 @@ func _grandfather() -> void:
 	if pp.current() != null:
 		await _finish_pack(pp.current())
 	_ok(finished == [id] and e.pending_packs.size() == 0 and e.pack_receipts.has(id), "opened + acknowledged normally")
-	_complete("grandfather")
+	_complete("shipped_l1_opens")
 
 # ------------------------------------------------------------------ helpers ----
 

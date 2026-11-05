@@ -24,6 +24,8 @@ var _sub: SubViewport
 var _root = null
 
 func _initialize() -> void:
+	# SB-M44-032 (no grandfather): this suite exercises gated features on L1 fixture saves.
+	preload("res://scripts/app/app_state.gd").test_unlock_all = true
 	await process_frame
 	await _s01()
 	await _s02()

@@ -10,10 +10,10 @@ Economy V1 robot progression contract:
 - Bot Parts may not be bought with Scrub Bucks or real money in V1.
 - Robot passive perks may affect meta/economy convenience only and may never change BoardState legality, TargetSelector ordering, route legality, reservation uniqueness, batch conservation or solver truth.
 
-Feature unlock gate (SB-M44-031):
+Feature unlock gate (SB-M44-031 / SB-M44-032):
 
 - `feature_unlocks.gd` reads the owner table `data/config/feature_unlocks_v1.json` (feature id -> campaign level).
-- Callers use `AppState.feature_unlocked(id)`: unlocked iff the save is grandfathered (not a new FTUE profile) or the frontier has reached the level.
+- Callers use `AppState.feature_unlocked(id)`: unlocked iff the frontier has reached the level, the same for every profile (no grandfather since owner 2026-11-03).
 - Missing / malformed config or an unknown id never locks anything (`ok:false`, fail open).
 
 Planned M39 module:

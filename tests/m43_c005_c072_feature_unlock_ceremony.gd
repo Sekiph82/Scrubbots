@@ -4,6 +4,9 @@ extends SceneTree
 ## ceremony per presentable feature (existing promoted icon), once, key "unlock:<id>", through
 ## the shipping CeremonyPresenter + MetaCeremonies.feature_unlock. Real AppState / SaveService /
 ## ModalStack, and the real app root (main.tscn, test save path) for the Results hand-off.
+## SB-M44-032: the shipped table (owner 2026-11-03) opens every icon-backed feature at L1, so no
+## ceremony is presentable in production any more (case d); the mechanism cases run on an
+## in-memory fixture table with the 2026-10-22 levels (LEGACY_LEVELS) for those four features.
 ##
 ## Run: godot --headless --path . -s res://tests/m43_c005_c072_feature_unlock_ceremony.gd
 
@@ -19,6 +22,7 @@ const UiText = preload("res://scripts/ui/ui_text.gd")
 
 const SIZE := Vector2i(1080, 1920)
 const SHORTCUTS := "res://assets/ui/final/home/shortcuts/"
+const LEGACY_LEVELS := {"daily": 4, "shop": 8, "tasks": 12, "collection": 20}
 
 var EXPECTED_CASES := ["a_daily_at_l4", "b_several_ascending", "c_ack_once_no_grant", "d_grandfather_and_l1",
 	"e_no_icon_skipped", "f_reduced_same_labels", "g_save_failure_pending", "h_keys_distinct", "i_results_handoff"]
@@ -107,10 +111,12 @@ func _c_ack_once_no_grant() -> void:
 	_ok(acks == ["unlock:daily", "unlock:shop"] and pr.pending().is_empty(), "shop acked; nothing pending")
 	_ok(_econ(app) == e0 and _unlocked(app) == u0 and app.progression.current_level() == 8, "after: economy, unlock state and frontier unchanged")
 	var re = AppState.new(app.save._path)
+	_legacy(re)
 	var pr2 = _presenter(re)
 	_ok(re.economy.meta_ui.is_seen("unlock:daily") and pr2.pending().is_empty() and not pr2.drain("reload"), "reload: nothing replayed")
 	var imp = AppState.new(_uniq("c_imp"))
 	imp.bootstrap_new_profile()
+	_legacy(imp)
 	_ok(imp.economy.import_snapshot(JSON.parse_string(JSON.stringify(app.economy.snapshot()))) and imp.progression.import_snapshot(JSON.parse_string(JSON.stringify(app.progression.snapshot()))), "economy + progression export / import")
 	_ok(imp.progression.current_level() == 8 and _presenter(imp).pending().is_empty(), "imported save: nothing replayed")
 	_complete("c_ack_once_no_grant")
@@ -127,6 +133,11 @@ func _d_grandfather_and_l1() -> void:
 	_ok(fresh.feature_unlocked("hearts") and fresh.feature_unlocked("gift_bar") and pf.feature_events().is_empty(), "fresh L1: hearts / gift_bar unlocked, zero events")
 	_walk(fresh, 40)
 	_ok(not _keys(pf.feature_events()).has("unlock:hearts") and not _keys(pf.feature_events()).has("unlock:gift_bar"), "fresh L40: still none for hearts / gift_bar")
+	var shipped = AppState.new(_uniq("d_shipped"))
+	shipped.bootstrap_new_profile()
+	_walk(shipped, 40)
+	var ps = _presenter(shipped)
+	_ok(ps.pending().is_empty() and not _keys(ps.feature_events()).has("unlock:daily"), "shipped table (meta at L1): no presentable feature ceremony at L40")
 	_complete("d_grandfather_and_l1")
 
 func _e_no_icon_skipped() -> void:
@@ -172,6 +183,7 @@ func _g_save_failure_pending() -> void:
 	_ok(not pr.is_presenting() and pr.pending().is_empty() and _stack.depth() == 0 and not pr.drain("again"), "no re-open loop in this session")
 	app.save.set_fault_injector(Callable())
 	var re = AppState.new(app.save._path)
+	_legacy(re)
 	_ok(_keys(_presenter(re).pending()) == ["unlock:daily"], "next launch: still pending")
 	_complete("g_save_failure_pending")
 
@@ -216,6 +228,7 @@ func _i_results_handoff() -> void:
 	_root = MainScene.instantiate()
 	_sub.add_child(_root)
 	await _frames(4)
+	_legacy(_root.get_app_state())
 	_root.play_current_frontier()
 	await _frames(4)
 	var h = _root.get_gameplay_host()
@@ -249,7 +262,13 @@ func _i_results_handoff() -> void:
 func _fresh(tag: String):
 	var app = AppState.new(_uniq(tag))
 	app.bootstrap_new_profile()
+	_legacy(app)
 	return app
+
+## Fixture seam (in-memory only): the icon-backed features at their 2026-10-22 levels.
+func _legacy(app) -> void:
+	for id in LEGACY_LEVELS:
+		app.unlocks.cfg["unlocks"][id] = LEGACY_LEVELS[id]
 
 func _walk(app, frontier: int) -> void:
 	while app.progression.current_level() < frontier:

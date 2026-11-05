@@ -439,6 +439,7 @@ func build() -> bool:
 		# M39 V04 (F-M39-V03-005): the ONE canonical production action surface.
 		# Committed actions hit the host save boundary; M40 binds the same seam.
 		_actions = ProductionActionFacade.new(_economy, self, Callable(self, "request_save"))
+		_actions.feature_gate = func(id: String) -> bool: return not _booster_locked(id)
 		# No AppState: this host's private economy saves rewarded grants at its boundary.
 		if app_state == null:
 			_economy.rewarded.bind_save(Callable(self, "request_save"))
@@ -771,6 +772,8 @@ func next_start_prover() -> Callable:
 	# dependent. Its Fail-screen cost on large boards is an open owner decision (M46 R05 log).
 	adapter.budget_ms = 0
 	return func(id) -> bool:
+		if _booster_locked(String(id)):
+			return false   # SB-M44-032: never offer a locked booster (no buy / watch)
 		match String(id):
 			BoosterInventory.PLUS_ONE_SLOT:
 				return slots.can_grow_to_sixth()
@@ -900,9 +903,10 @@ func _refresh_hud() -> void:
 	_screen.set_profile(prof)
 
 ## Live state of the four canonical boosters from BoosterInventory / EconomyConfig /
-## wallet / capacity authority. SB-M44-031: a booster whose feature is still locked by the
-## owner unlock table (AppState.feature_unlocked) is "locked" over every other state; its
-## charges are shown and kept untouched.
+## wallet / capacity authority. SB-M44-031/032: a booster whose feature is still locked by the
+## owner unlock table (AppState.feature_unlocked, same rule for every profile) is "locked" over
+## every other state, with its `unlock_level` for the "LV N" plate; its charges (e.g. the two
+## starter charges) stay stored and untouched until the frontier reaches that level.
 func _booster_locked(id: String) -> bool:
 	return app_state != null and not app_state.feature_unlocked(id)
 
@@ -924,7 +928,8 @@ func booster_states() -> Array:
 			state = "unavailable"
 		if _booster_locked(id):
 			state = "locked"
-		out.append({"id": id, "charges": charges, "price": price, "state": state})
+		out.append({"id": id, "charges": charges, "price": price, "state": state,
+			"unlock_level": app_state.feature_unlock_level(id) if app_state != null else 1})
 	return out
 
 ## M43-C003: can booster `id` legally execute right now? Read-only proofs from the SAME
@@ -1102,7 +1107,7 @@ func _stop_proof() -> String:
 func execute_booster(id: String, target = null) -> Dictionary:
 	var r: Dictionary
 	# SB-POLISH-003: presentation-only read of what the effect shows (before the action).
-	var fx: Dictionary = _screen.capture_booster_fx(id, target) if _screen != null and is_instance_valid(_screen) else {}
+	var fx: Dictionary = _screen.capture_booster_fx(id, target) if _screen != null and is_instance_valid(_screen) and not _booster_locked(id) else {}
 	if _economy == null or _actions == null:
 		r = {"ok": false, "reason": "economy_unavailable"}
 	elif not BoosterInventory.BOOSTERS.has(id):

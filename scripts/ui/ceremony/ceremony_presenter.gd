@@ -18,7 +18,7 @@ extends RefCounted
 ## (feature_unlocks_v1.json, level > 1) once AppState.feature_unlocked(id) is true, key
 ## "unlock:<id>", after the CeremonyEvents ones, ascending by table level. Only features with an
 ## existing promoted icon (FEATURE_ICONS) are presentable; the rest are skipped (no art invented).
-## Grandfathered saves get none. A save failure on acknowledge keeps the event pending: it is
+## Established (non-new) saves get none. A save failure on acknowledge keeps the event pending: it is
 ## snoozed for this session only (no re-open loop) and shown again on the next launch.
 
 signal ceremony_shown(key: String, kind: String)

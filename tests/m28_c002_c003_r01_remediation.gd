@@ -53,6 +53,8 @@ var _root
 var _host
 
 func _initialize() -> void:
+	# SB-M44-032 (no grandfather): this suite exercises gated features on L1 fixture saves.
+	preload("res://scripts/app/app_state.gd").test_unlock_all = true
 	_now[0] = T0
 	await process_frame
 	MainScript.boot_opening_override = 0

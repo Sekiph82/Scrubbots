@@ -24,6 +24,8 @@ func _uniq(tag: String) -> String:
 	return p
 
 func _initialize() -> void:
+	# SB-M44-032 (no grandfather): this suite exercises gated features on L1 fixture saves.
+	preload("res://scripts/app/app_state.gd").test_unlock_all = true
 	_check_project_main_scene()
 	await _fresh_boot()
 	await _future_schema_blocks()

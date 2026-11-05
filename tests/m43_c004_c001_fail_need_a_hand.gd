@@ -46,6 +46,8 @@ var _prov
 var _events: Array = []
 
 func _initialize() -> void:
+	# SB-M44-032 (no grandfather): this suite exercises gated features on L1 fixture saves.
+	preload("res://scripts/app/app_state.gd").test_unlock_all = true
 	await process_frame
 	MainScript.boot_opening_override = 0
 	MainScript.boot_clock_override = func(): return _now[0]

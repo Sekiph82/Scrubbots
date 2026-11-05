@@ -61,9 +61,15 @@ func _boot_play(level: int) -> void:
 	_eco().rewarded.set_provider(_prov)
 	_root.get_modal_stack().clear("t")
 	# SB-M44-031: boosters are locked on a fresh L2 profile; open them in the in-memory unlock
-	# table so the L2 booster coach this suite exercises still runs.
+	# table so the booster coach this suite exercises still runs at L2.
 	for b in ["plus_one_slot", "random", "selector", "tornado"]:
 		_root.get_app_state().unlocks.cfg["unlocks"][b] = 1
+	# SB-M44-031 part 2: the L2 booster lesson is gone; the per-booster intros carry the same coach
+	# copy. Presentation-order seam: Selector's intro is phase A, Random's phase B (as the old A / B).
+	var fcfg: Dictionary = _root.get_ftue().config()
+	var bi: Array = fcfg["booster_intros"]
+	fcfg["booster_intros"] = [bi[2], bi[1], bi[0], bi[3]]
+	_root.get_ftue().use_config(fcfg)
 	_root.get_app_state().progression.debug_set_current_level(level)
 	_root.play_current_frontier()
 	await _frames(6)
@@ -345,7 +351,7 @@ func _ftue_copy() -> void:
 	var lp0 := _lp()
 	_ok(ftue.tips_active(), "fresh profile: tips active at L2")
 	_root.refresh_coachmark()
-	var a_step: bool = cm.get_step_id() == "l2_boosters_a"
+	var a_step: bool = cm.get_step_id() == "intro_selector"
 	var sel_line_checking: bool = _host.is_booster_proof_running() and not _body().contains(UiText.t("FTUE_BOOSTER_NOT_NOW"))
 	_ok(a_step and sel_line_checking and _lp() == lp0, "phase A copy: Selector line starts the shared off-frame check, no 'not now' claim while checking, no main-thread proof")
 	var wa: Array = await _wait_proof()
@@ -353,7 +359,7 @@ func _ftue_copy() -> void:
 		"settle re-renders the copy: Selector 'not now' iff its proven verdict refuses (worst frame %.1f ms)" % wa[0])
 	cm.get_got_it_button().pressed.emit()
 	_root.refresh_coachmark()
-	var b_step: bool = cm.get_step_id() == "l2_boosters_b" and _host.is_booster_proof_running()
+	var b_step: bool = cm.get_step_id() == "intro_random" and _host.is_booster_proof_running()
 	# Stale: the player moves while Random is being checked -> that verdict is dropped.
 	var key0: Array = _host.get_booster_adapter().state_key()
 	# At EVERY settle: a Random verdict stored under the OLD state would be the stale result. (The
@@ -387,7 +393,7 @@ func _ftue_copy() -> void:
 	_root.refresh_coachmark()
 	var rechecks: bool = _host.is_booster_proof_running()
 	await _wait_proof()
-	_ok(rechecks and cm.get_step_id() == "l2_boosters_b" and _line_matches("random", "random") and _lp() == lp0,
+	_ok(rechecks and cm.get_step_id() == "intro_random" and _line_matches("random", "random") and _lp() == lp0,
 		"at the next still moment the copy re-checks off-frame and shows the proven Random verdict")
 	# A modal hides the coach, and the copy then starts no proof.
 	_host.cancel_booster_proof()

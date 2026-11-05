@@ -5,7 +5,9 @@ extends RefCounted
 ## data/config/ftue_onboarding_v1.json (owner V03 values): the new-profile starter booster
 ## charges, the first-day Welcome task, the compulsory tutorial window (<= L3) and its lesson
 ## steps, the once-per-version What's New entries and the one-shot CONTEXTUAL entries
-## (SB-M44-005/006: first WAITING, first win, first loss; event-triggered, not level-scheduled). Feature unlock gating is NOT here: it is
+## (SB-M44-005/006: first WAITING, first win, first loss; event-triggered, not level-scheduled)
+## and the once-only per-booster intro tips (SB-M44-031 part 2: shown in the first gameplay after
+## that booster unlocks, never on a locked booster). Feature unlock gating is NOT here: it is
 ## the owner table data/config/feature_unlocks_v1.json (scripts/progression/feature_unlocks.gd).
 ## Any malformed field rejects the WHOLE file (ok:false) — a broken config means no starter
 ## grant and no tips (fail closed), never a partial or invented onboarding.
@@ -108,9 +110,25 @@ static func validate(d) -> Dictionary:
 		triggers[c["trigger"]] = true
 		contextual.append({"id": String(c["id"]), "trigger": String(c["trigger"]), "target": String(c["target"]),
 			"title": String(c["title"]), "body": String(c["body"])})
+	# Booster intros share the same seen ledger (the per-booster "introduced" flag); one per
+	# booster; each becomes a one-booster `boosters` step.
+	var intros: Array = []
+	var intro_boosters := {}
+	if typeof(d.get("booster_intros")) != TYPE_ARRAY:
+		return _bad("booster_intros")
+	for b in d["booster_intros"]:
+		if typeof(b) != TYPE_DICTIONARY or not _str(b.get("id")) or step_ids.has(b["id"]) \
+				or not BoosterInventory.BOOSTERS.has(b.get("booster")) or intro_boosters.has(b["booster"]) \
+				or not _str(b.get("title")) or not UiText.EN.has(b["title"]) \
+				or typeof(b.get("body")) != TYPE_STRING or not UiText.EN.has(b["body"]):
+			return _bad("booster_intros")
+		step_ids[b["id"]] = true
+		intro_boosters[b["booster"]] = true
+		intros.append({"id": String(b["id"]), "target": "boosters", "boosters": [String(b["booster"])],
+			"title": String(b["title"]), "body": String(b["body"])})
 	return {"ok": true, "reason": "", "version": VERSION, "starter_booster_charges": starter,
 		"welcome_task_index": 0, "welcome_sb": int(w["scrub_bucks"]), "max_tutorial_level": int(mx),
-		"whats_new": whats_new, "lessons": lessons, "contextual": contextual}
+		"whats_new": whats_new, "lessons": lessons, "contextual": contextual, "booster_intros": intros}
 
 static func _bad(reason: String) -> Dictionary:
 	return {"ok": false, "reason": reason}

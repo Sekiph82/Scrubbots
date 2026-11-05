@@ -5,6 +5,7 @@ extends SceneTree
 ##
 ## Run: godot --headless --path . -s res://tests/m43_personal_ranks.gd
 
+const AppStateScript = preload("res://scripts/app/app_state.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
 const MainScript = preload("res://scripts/app/main.gd")
 const PersonalRank = preload("res://scripts/progression/personal_rank.gd")
@@ -92,9 +93,11 @@ func _p03() -> void:
 
 func _p04() -> void:
 	print("[p04 real app root: RANKS tab live, opens 'ranks', close returns HOME]")
+	# SB-M44-032 (no grandfather): RANKS is L40 for every save; p04 / p05 test the live screen.
+	AppStateScript.test_unlock_all = true
 	await _boot("p04", -1)
 	var b: Button = _root.get_home().get_region("Nav_leaderboard")
-	_ok(not b.disabled and b.tooltip_text == "" and b.text == UiText.t("HOME_NAV_LEADERBOARD"), "grandfathered save: RANKS enabled, no tooltip")
+	_ok(not b.disabled and b.tooltip_text == "" and b.text == UiText.t("HOME_NAV_LEADERBOARD"), "unlocked RANKS (test seam): enabled, no tooltip")
 	b.pressed.emit()
 	await _frames(2)
 	_ok(_top_id() == "ranks" and _top().find_child("Title", true, false) != null, "press -> ranks popup")
@@ -120,6 +123,7 @@ func _p05() -> void:
 
 func _p06() -> void:
 	print("[p06 fresh FTUE profile: RANKS locked until L40, then live]")
+	AppStateScript.test_unlock_all = false
 	await _boot("p06", 1)
 	var a = _root.get_app_state()
 	var h = _root.get_home()
@@ -138,6 +142,7 @@ func _p06() -> void:
 
 func _p07() -> void:
 	print("[p07 opening / closing the screen changes no economy or save state]")
+	AppStateScript.test_unlock_all = true
 	await _boot("p07", -1)
 	var a = _root.get_app_state()
 	for n in range(1, 31):

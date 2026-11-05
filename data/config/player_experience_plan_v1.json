@@ -48,8 +48,8 @@
     "free_auto_endgame_on_authoritative_supply_exhaustion": true
   },
   "feature_unlock_levels": {
-    "status": "OWNER_TUNING_REQUIRED",
-    "rule": "Do not invent exact level numbers before approval."
+    "status": "OWNER_LOCKED_2026_11_03",
+    "rule": "Authoritative table: data/config/feature_unlocks_v1.json (TASKS.md SB-M44-032)."
   },
   "notifications": {
     "categories": [

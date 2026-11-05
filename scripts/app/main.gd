@@ -20,6 +20,7 @@ const ProductionGameplayHost = preload("res://scripts/gameplay/runtime/productio
 const SettingsPanelScene = preload("res://scenes/ui/settings_panel.tscn")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
+const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
 const OpeningScreen = preload("res://scripts/app/opening_screen.gd")
 const LaunchSession = preload("res://scripts/app/launch_session.gd")
@@ -360,9 +361,14 @@ func set_momentum_config(cfg: Dictionary) -> void:
 func get_home():
 	return _home
 
+## SB-M44-032: a Home entry behind the owner unlock table (AppState.feature_unlocked) never
+## opens, whatever the caller (Home control, deep link, notification).
+func _entry_locked(id: String) -> bool:
+	return HomeBadges.GATED_ENTRIES.has(id) and app_state != null and not app_state.feature_unlocked(HomeBadges.GATED_ENTRIES[id])
+
 ## BottomNav destinations that open an app-level surface (SETTINGS keeps its M41 overlay).
 func _on_home_nav(id: String) -> void:
-	if nav == null or nav.current() != NavigationController.Route.HOME or (_modals != null and _modals.depth() > 0):
+	if nav == null or nav.current() != NavigationController.Route.HOME or (_modals != null and _modals.depth() > 0) or _entry_locked(id):
 		return
 	match id:
 		"robots":
@@ -374,7 +380,7 @@ func _on_home_nav(id: String) -> void:
 
 ## Home shortcut panels / Gift Meter that open an app-level destination (APP_SHORTCUTS).
 func _on_home_shortcut(id: String) -> void:
-	if nav == null or nav.current() != NavigationController.Route.HOME or (_modals != null and _modals.depth() > 0):
+	if nav == null or nav.current() != NavigationController.Route.HOME or (_modals != null and _modals.depth() > 0) or _entry_locked(id):
 		return
 	match id:
 		"shop":
@@ -435,9 +441,11 @@ func _on_pack_blocker_closed(_reason: String) -> void:
 	request_earned_packs()
 
 ## M43-C012 (SB-M43-148): open a notification deep link. Only known destinations; anything
-## unknown / stale lands on Home. Returns the destination actually opened.
+## unknown / stale / still locked (SB-M44-032) lands on Home. Returns the destination actually opened.
 func open_deep_link(dest: String) -> String:
 	var d := NotificationPolicy.deep_link(dest)
+	if _entry_locked(d):
+		d = "home"
 	if nav == null or app_state == null or app_state.is_blocked:
 		return "none"
 	if nav.current() != NavigationController.Route.HOME:
@@ -568,13 +576,15 @@ func _coach_trigger() -> String:
 				return "slot_waiting"
 	return ""
 
-## The scheduled step for this surface, else the unseen contextual entry for `trigger`
+## The scheduled step for this surface, else (gameplay) a due booster intro, else the unseen
+## contextual entry for `trigger`
 ## (null = read it now). Hidden under modals / Settings and while Results still reveals or
 ## holds a ceremony, so a coachmark never covers a reward claim.
 func _coach_want(trigger = null) -> Dictionary:
 	if trigger == null:
 		trigger = _coach_trigger()
-	if ftue == null or nav == null or (not ftue.tips_active() and String(trigger).is_empty()):
+	if ftue == null or nav == null or (not ftue.tips_active() and String(trigger).is_empty() \
+			and not (nav.current() == NavigationController.Route.GAMEPLAY and not ftue.booster_intro_step().is_empty())):
 		return {}
 	if (_modals != null and _modals.depth() > 0) or nav.is_settings_open():
 		return {}
@@ -600,6 +610,8 @@ func _coach_want(trigger = null) -> Dictionary:
 	else:
 		return {}
 	var step: Dictionary = ftue.current_step(surface, ctx)
+	if step.is_empty() and surface == "gameplay":
+		step = ftue.booster_intro_step()
 	if step.is_empty():
 		step = ftue.contextual_step(String(trigger))
 	if step.is_empty():

@@ -18,22 +18,25 @@ Date: 2026-09-26
 
 ### 1.1 Implementation (M44 master V01, awaiting ChatGPT audit + owner visual gate)
 
-- Data: `data/config/ftue_onboarding_v1.json` (strict reader `scripts/app/ftue_config.gd`): starter charges 2/2/2/2, first-day Welcome task index 0 = 100 SB, `max_tutorial_level` 3, lessons for Home + L1/L2/L3 bound to catalog ids, once-per-version What's New. The old `soft_no_hard_locks` / `available_from_first_home` policy is retired (see 1.2).
+- Data: `data/config/ftue_onboarding_v1.json` (strict reader `scripts/app/ftue_config.gd`): starter charges 2/2/2/2, first-day Welcome task index 0 = 100 SB, `max_tutorial_level` 3, lessons for Home + L1/L3 bound to catalog ids (the Level-2 four-booster lesson is removed, SB-M44-031 part 2), once-per-version What's New, one `booster_intros` entry per booster (1.2a). The old `soft_no_hard_locks` / `available_from_first_home` policy is retired (see 1.2).
 - Fresh profile = `SaveService.load()` found no save artefact at all (`fresh`); `AppState.bootstrap_new_profile()` grants the starter charges (ledger tx `ftue_starter_boosters:v1`) and installs the Welcome task in one saved transaction (rollback on save failure). Existing / migrated / corrupt / backup / future-schema saves are never re-classified.
 - `DailyService.task_reward_sb()` is the shown == credited task value; `daily.task_sb` stays 75/100/125. `claim_daily_login` / `claim_daily_task` roll back if the save fails.
 - `scripts/app/ftue_director.gd` picks one step; `scripts/ui/tutorial/coachmark_layer.gd` draws it non-blocking with the approved ring / pointer / bubble art; GOT IT / SKIP TIPS (tips only). Read-only Help & Tips: Settings "?". Established saves get the M43 Feature Unlock ceremony once for Help & Tips.
 - Skip Tips + read-only Help are the presentation default; the coachmark visual language (SB-M44-018) is documented in 1.5.
 
-### 1.2 Hard unlock gating (SB-M44-031 part 1, owner table 2026-10-22)
+### 1.2 Hard unlock gating (SB-M44-031 part 1 / SB-M44-032, owner table 2026-11-03)
 
-Hard unlock gating is in force per the owner table in `data/config/feature_unlocks_v1.json` (reader `scripts/progression/feature_unlocks.gd`): Hearts L1, Gift Bar L1, Daily 4, Shop 8, Tasks 12, Collection 20, Card Packs 20, Robots 25, Events 30, Achievements screen 35, RANKS 40; boosters +1 Slot 6, Random 11, Selector 16, Tornado 21.
+Hard unlock gating is in force per the owner table in `data/config/feature_unlocks_v1.json` (reader `scripts/progression/feature_unlocks.gd`): Hearts, Gift Bar, Daily, Shop, Tasks, Collection, Card Packs and Achievements at L1; Robots 25, Events 30, RANKS 40; boosters +1 Slot 6, Random 11, Selector 16, Tornado 21. (Supersedes the 2026-10-22 Daily 4 / Shop 8 / Tasks 12 / Collection + Card Packs 20 / Achievements 35 table.)
 
-- One gate: `AppState.feature_unlocked(id)`. Unlocked iff the save is grandfathered or the campaign frontier has reached the level; the frontier never decreases, so nothing re-locks.
-- Grandfather (orchestrator default, owner may override): every save that is not a new FTUE profile (existing / migrated / established) keeps all features.
+- One gate: `AppState.feature_unlocked(id)`, the same for EVERY profile (fresh, existing, migrated, imported, debug; the old grandfather default is removed). Unlocked iff the campaign frontier has reached the level; the frontier never decreases, so nothing re-locks. Locking never removes or resets owned charges, inventory or entitlements.
 - Missing / malformed config or an unknown id unlocks (fail open).
-- Gated now: Home DAILY / TASKS / SHOP / COLLECTION shortcuts and ROBOTS / EVENTS / RANKS tabs (disabled, "Unlocks at level N", no badge, no navigation); the booster bar (`locked`, charges kept); FTUE coachmarks skip a locked Home shortcut and drop locked boosters from a booster step.
-- Not gated: deep links outside Home and the booster bar (in-context Shop hand-off, Results, Settings).
-- Part 2 pending (TASKS.md SB-M44-031 part 2): per-booster lessons at 6/11/16/21, Daily/Tasks coachmarks after L4/L12, deferring the starter booster grant and the 100 SB Welcome task to their unlocks. Until then a fresh profile holds the 8 starter charges and the Welcome task unused until the matching feature unlocks.
+- Gated entry points: Home ROBOTS / EVENTS / RANKS tabs (disabled, "Unlocks at level N", no badge, no navigation) plus the app-root direct entry and notification deep links (`main.gd` `_entry_locked`: a locked destination lands on Home); `ProductionActionFacade.feature_gate` refuses booster buy / rewarded watch / use and robot unlock / equip, event join / claim while locked, whatever UI calls it; Shop booster rows are not for sale ("Unlocks at level N"); Need a Hand never picks a locked booster; the booster bar shows `locked` as a frosted navy plate with cyan edge, padlock and `LV N` (native Controls, tooltip "Unlocks at level N", touch disabled). The two starter charges per booster stay stored and are usable once the frontier reaches the booster level.
+- FTUE coachmarks never target a locked control (a locked Home shortcut step is skipped). With Daily / Tasks open at L1, the first-Home DAILY and TASKS tips show at L1 whenever claimable, and the 100 SB Welcome task is claimable at the first Home (SB-M44-033): +100 only on the explicit CLAIM, once (ledger tx `daily_task:<day>:0`), durable, gone after the local-day rollover.
+
+### 1.2a Booster intros (SB-M44-031 part 2)
+
+- No Level-2 booster lesson. `booster_intros` in `ftue_onboarding_v1.json`: one optional, dismissible, once-only tip per booster (`intro_plus_one_slot`, `intro_random`, `intro_selector`, `intro_tornado`), shown in the first gameplay after that booster unlocks (L6 / L11 / L16 / L21) on its real button, with live owned count and the off-frame legality hint (no main-thread proof).
+- Audience: a NEW profile that has not chosen Skip Tips (like 1.3); a locked booster is never introduced. GOT IT writes the intro id into the `FtueState.seen` ledger (the per-booster "introduced" flag), saved canonically, so retry / reopen / relaunch never show it again. Skip Tips now also works after the L1-L3 window closed. Evidence: `tests/m44_meta_l1_unlock_ftue.gd`.
 
 ### 1.3 Contextual first-occurrence coachmarks (SB-M44-005 / SB-M44-006)
 
@@ -42,13 +45,13 @@ Hard unlock gating is in force per the owner table in `data/config/feature_unloc
   - `ctx_result_won` (trigger `result_won`, no pointer): first WON Results. A win costs no Heart; each new level cleared in a row grows the Win Streak.
   - `ctx_result_lost` (trigger `result_lost`, target `results_retry` = the Results RETRY button): first LOST Results. "This try cost 1 Heart." only when the committed terminal receipt's Hearts went down, otherwise a no-loss sentence; RETRY starts the level again; Hearts refill over time.
 - The scheduled `l3_waiting` / `l3_hearts` steps are removed from `l3_rules` (only `l3_speed` remains). Old saves that marked them seen stay valid.
-- Eligibility: a NEW profile that has not chosen Skip Tips, at any level (not limited to the L1-L3 window or `closed`). Established / grandfathered profiles never see them. A due scheduled step wins; one coachmark at a time.
+- Eligibility: a NEW profile that has not chosen Skip Tips, at any level (not limited to the L1-L3 window or `closed`). Established profiles never see them. A due scheduled step wins; one coachmark at a time.
 - One-shot: acknowledged by GOT IT or by the real action (the WAITING situation ends, or Results is left via RETRY / CONTINUE / HOME) into the existing `FtueState.seen` ledger, saved canonically; never shown again after relaunch.
 - Presentation only (`main.gd` `_coach_trigger` / `_coach_want`): read-only triggers, hidden under modals / Settings and while the Results reveal or a ceremony barrier runs. No Heart, reward, booster, progression or scheduler change. Evidence: `tests/m44_contextual_coach.gd`.
 
 ### 1.4 NEW badge on newly unlocked Home entries (SB-M44-013)
 
-- Rule: `HomeBadges.new_features(app)` (`scripts/ui/home/home_badges.gd`, which also owns `GATED_ENTRIES`) lists the gated Home entries (SHOP / COLLECTION / TASKS / DAILY shortcuts, ROBOTS / EVENTS / RANKS tabs) that a NEW FTUE profile has unlocked (`AppState.feature_unlocked`) and not yet visited. Grandfathered profiles never show NEW.
+- Rule: `HomeBadges.new_features(app)` (`scripts/ui/home/home_badges.gd`, which also owns `GATED_ENTRIES`) lists the gated Home entries (SHOP / COLLECTION / TASKS / DAILY shortcuts, ROBOTS / EVENTS / RANKS tabs) that a NEW FTUE profile has unlocked (`AppState.feature_unlocked`) and not yet visited; entries open from L1 (SB-M44-032: Daily / Shop / Tasks / Collection) were never newly unlocked and never show NEW. Established profiles never show NEW.
 - Visited = the meta_ui presentation key `feature_visited:<feature_id>` (no new save section, no schema bump). The first press of an enabled NEW entry marks it and requests the canonical save, then Home refreshes. Locked or disabled entries cannot be pressed, so they never mark. Old saves load unchanged.
 - Presentation: the existing red count badge (`UiShortcutButton.set_badge_text`, `NavBadge_<id>`) shows the localized `HOME_BADGE_NEW` text "NEW"; the pill grows inward from the top-right corner. A real count > 0 on the same entry wins over NEW. No animation, no sound, no new art.
 - Evidence: `tests/m44_new_badge.gd`.
@@ -56,8 +59,8 @@ Hard unlock gating is in force per the owner table in `data/config/feature_unloc
 ### 1.4a Feature Unlock ceremony on reaching a table level (SB-M43-072)
 
 - M43-C005 meta ceremonies (one at a time via `scripts/ui/ceremony/ceremony_presenter.gd`): Collection set 9/9 (`set:<n>`, SB-M43-068), Master Collection (`master`, 069), Robot Unlock with EQUIP / KEEP CURRENT (`robot:<id>`, 070/071), Gift Meter milestone (`gift:`), and the Feature Unlock ceremony (`unlock:<feature_id>`, 072).
-- 072 rule: a NEW FTUE profile gets ONE "NEW FEATURE!" ceremony (`MetaCeremonies.feature_unlock`, GOT IT) per owner-table feature with level > 1 once `AppState.feature_unlocked(id)` is true. `CeremonyPresenter.feature_events()` derives them read-only, ascending by table level, after the gift / set / Master / robot events; name / body are `UiText` `FEATURE_<ID>_NAME/BODY`. Grandfathered saves and L1 features (Hearts, Gift Bar) get none.
-- Presentable now (existing promoted icon in `CeremonyPresenter.FEATURE_ICONS`): Daily, Shop, Tasks, Collection (`assets/ui/final/home/shortcuts/`). Skipped until art exists (no art invented): Card Packs, Robots, Events, Achievements, RANKS and the four boosters (booster lessons stay with SB-M44-031 part 2).
+- 072 rule: a NEW FTUE profile gets ONE "NEW FEATURE!" ceremony (`MetaCeremonies.feature_unlock`, GOT IT) per owner-table feature with level > 1 once `AppState.feature_unlocked(id)` is true. `CeremonyPresenter.feature_events()` derives them read-only, ascending by table level, after the gift / set / Master / robot events; name / body are `UiText` `FEATURE_<ID>_NAME/BODY`. Established saves and L1 features get none.
+- Since the 2026-11-03 table opens Daily, Shop, Tasks and Collection at L1, no presentable feature (existing promoted icon in `CeremonyPresenter.FEATURE_ICONS`) is above L1 any more; Robots, Events, RANKS and the four boosters are skipped until art exists (no art invented; boosters get the 1.2a intro tip instead).
 - Scheduling: rides the existing Results hand-off barrier / quiet Home drain (meta ceremonies first, then earned packs, then What's New), so it never stacks with another popup; coachmarks are hidden under it. The NEW badge (`feature_visited:`) and What's New (`feature:<id>:<v>`) keys are separate and untouched.
 - Acknowledged only by its CTA: meta_ui `unlock:<id>` + canonical save; reload never replays. If that save fails the mark is rolled back and the ceremony is snoozed for the session (shown again next launch). Presentation only: no grant, spend or unlock-state change. Evidence: `tests/m43_c005_c072_feature_unlock_ceremony.gd`.
 

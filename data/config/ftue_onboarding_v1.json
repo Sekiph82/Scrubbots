@@ -14,7 +14,7 @@
   },
   "max_tutorial_level": 3,
   "feature_discovery": {
-    "note": "Hard unlock gating per the 2026-10-22 owner table lives in data/config/feature_unlocks_v1.json (AppState.feature_unlocked); this file no longer declares a discovery policy."
+    "note": "Hard unlock gating per the owner table (2026-11-03: meta at L1, boosters 6/11/16/21) lives in data/config/feature_unlocks_v1.json (AppState.feature_unlocked); this file no longer declares a discovery policy. booster_intros: one optional once-only tip per booster in the first gameplay after it unlocks (SB-M44-031 part 2)."
   },
   "whats_new": [
     {
@@ -49,16 +49,6 @@
       ]
     },
     {
-      "id": "l2_boosters",
-      "surface": "gameplay",
-      "level": 2,
-      "level_id": "level_002_apple",
-      "steps": [
-        {"id": "l2_boosters_a", "target": "boosters", "boosters": ["plus_one_slot", "selector"], "title": "FTUE_L2_BOOSTERS_A_TITLE", "body": "FTUE_L2_BOOSTERS_BODY"},
-        {"id": "l2_boosters_b", "target": "boosters", "boosters": ["random", "tornado"], "title": "FTUE_L2_BOOSTERS_B_TITLE", "body": "FTUE_L2_BOOSTERS_BODY"}
-      ]
-    },
-    {
       "id": "l3_rules",
       "surface": "gameplay",
       "level": 3,
@@ -67,6 +57,12 @@
         {"id": "l3_speed", "target": "speed", "title": "FTUE_L3_SPEED_TITLE", "body": "FTUE_L3_SPEED_BODY"}
       ]
     }
+  ],
+  "booster_intros": [
+    {"id": "intro_plus_one_slot", "booster": "plus_one_slot", "title": "FTUE_BOOSTER_INTRO_TITLE", "body": "FTUE_BOOSTER_INTRO_BODY"},
+    {"id": "intro_random", "booster": "random", "title": "FTUE_BOOSTER_INTRO_TITLE", "body": "FTUE_BOOSTER_INTRO_BODY"},
+    {"id": "intro_selector", "booster": "selector", "title": "FTUE_BOOSTER_INTRO_TITLE", "body": "FTUE_BOOSTER_INTRO_BODY"},
+    {"id": "intro_tornado", "booster": "tornado", "title": "FTUE_BOOSTER_INTRO_TITLE", "body": "FTUE_BOOSTER_INTRO_BODY"}
   ],
   "contextual": [
     {"id": "ctx_waiting", "trigger": "slot_waiting", "target": "slots", "title": "FTUE_CTX_WAIT_TITLE", "body": "FTUE_CTX_WAIT_BODY"},

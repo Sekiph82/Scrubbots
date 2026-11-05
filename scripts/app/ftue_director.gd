@@ -18,6 +18,11 @@ extends RefCounted
 ##   - SB-M44-031: a coachmark never targets a locked control (AppState.feature_unlocked): a
 ##     Home step on a locked shortcut is skipped and locked boosters are dropped from a
 ##     `boosters` step (skipped when none remain). Skipped steps are NOT marked seen.
+##     (Owner 2026-11-03: Daily / Tasks open at L1, so the L1 Home coach shows when claimable.)
+##   - SB-M44-031 part 2: no L2 booster lesson. Each booster has one optional once-only intro
+##     (`booster_intros`) in the first gameplay after it unlocks (+1 Slot L6, Random L11,
+##     Selector L16, Tornado L21), for a NEW profile that has not skipped tips, at any level;
+##     acknowledging it is that booster's saved "introduced" flag (same seen ledger).
 ##   - SB-M44-005/006 contextual entries (first WAITING, first win, first loss) are event-
 ##     triggered, not scheduled: shown once at the first real occurrence to a NEW profile that
 ##     has not skipped tips, at any level (not limited to the L1-L3 window). Established profiles
@@ -107,6 +112,16 @@ func current_step(surface: String, ctx: Dictionary) -> Dictionary:
 func contextual_active() -> bool:
 	return _live() and _app.economy.ftue.is_new_profile() and not _app.economy.ftue.skipped
 
+## SB-M44-031 part 2: the first not-yet-introduced UNLOCKED booster's intro step, or {}. Same
+## audience as contextual entries; a locked booster is never introduced (no false locked tap).
+func booster_intro_step() -> Dictionary:
+	if not contextual_active():
+		return {}
+	for b in _cfg.get("booster_intros", []):
+		if not _app.economy.ftue.is_seen(String(b["id"])) and _app.feature_unlocked(String(b["boosters"][0])):
+			return (b as Dictionary).duplicate(true)
+	return {}
+
 ## The unseen contextual entry for a live `trigger` ("slot_waiting" | "result_won" |
 ## "result_lost", read from canonical state by the caller), or {}.
 func contextual_step(trigger: String) -> Dictionary:
@@ -141,9 +156,10 @@ func notify(event: String, surface: String, ctx: Dictionary) -> bool:
 		return false
 	return acknowledge(String(st["id"]))
 
-## Skip Tips (presentation only, once). Rewards / inventory / progression untouched.
+## Skip Tips (presentation only, once). Rewards / inventory / progression untouched. Also
+## after the L1-L3 window closed, so it dismisses contextual entries and booster intros too.
 func skip_tips() -> bool:
-	if not tips_active() or not _app.economy.ftue.skip():
+	if not contextual_active() or not _app.economy.ftue.skip():
 		return false
 	_app.request_save()
 	return true

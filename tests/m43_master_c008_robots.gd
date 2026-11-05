@@ -30,6 +30,8 @@ var _sub: SubViewport
 var _root = null
 
 func _initialize() -> void:
+	# SB-M44-032 (no grandfather): this suite exercises gated features on L1 fixture saves.
+	preload("res://scripts/app/app_state.gd").test_unlock_all = true
 	await process_frame
 	# Fixed wall clock: r07 compares whole economy snapshots, and Hearts / 2x keep wall-clock
 	# high-water marks that would otherwise tick between the two snapshots.

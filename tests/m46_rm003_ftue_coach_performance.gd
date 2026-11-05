@@ -50,6 +50,8 @@ var _root = null
 var _host = null
 
 func _initialize() -> void:
+	# SB-M44-032 (no grandfather): this suite exercises gated features on L1 fixture saves.
+	preload("res://scripts/app/app_state.gd").test_unlock_all = true
 	OS.low_processor_usage_mode_sleep_usec = 0
 	await process_frame
 	var pal = JSON.parse_string(FileAccess.get_file_as_string("res://data/palettes/scrubbots_palette_v3.json"))
@@ -117,9 +119,15 @@ func _boot_play(level: int) -> void:
 	MainScript.boot_ftue_override = -1
 	_root.get_modal_stack().clear("t")
 	# SB-M44-031: boosters are locked on a fresh L2 profile; open them in the in-memory unlock
-	# table so the L2 booster coach this suite measures still runs.
+	# table so the booster coach this suite measures still runs at L2.
 	for b in ["plus_one_slot", "random", "selector", "tornado"]:
 		_root.get_app_state().unlocks.cfg["unlocks"][b] = 1
+	# SB-M44-031 part 2: the L2 booster lesson is gone; the per-booster intros carry the same coach
+	# copy. Presentation-order seam: Selector's intro is phase A, Random's phase B (as the old A / B).
+	var fcfg: Dictionary = _root.get_ftue().config()
+	var bi: Array = fcfg["booster_intros"]
+	fcfg["booster_intros"] = [bi[2], bi[1], bi[0], bi[3]]
+	_root.get_ftue().use_config(fcfg)
 	_root.get_app_state().progression.debug_set_current_level(level)
 	_root.play_current_frontier()
 	await _frames(6)
@@ -237,9 +245,9 @@ func _c1_l2_copy() -> void:
 	await _boot_play(2)
 	var cm = _root.get_coachmarks()
 	_host.cancel_booster_proof()
-	for step_id in ["l2_boosters_a", "l2_boosters_b"]:
-		if step_id == "l2_boosters_b":
-			_ok(_root.get_ftue().acknowledge("l2_boosters_a"), "step A acknowledged -> step B")
+	for step_id in ["intro_selector", "intro_random"]:
+		if step_id == "intro_random":
+			_ok(_root.get_ftue().acknowledge("intro_selector"), "step A acknowledged -> step B")
 		var copy_ms: Array = []
 		var old_ms: Array = []
 		var frame_ms: Array = []
@@ -484,7 +492,7 @@ func _c4_timers_lifecycle() -> void:
 	_root._coach_copy["at"] = 0
 	_root.refresh_coachmark()   # fresh copy now; the next one is due 2000 ms later
 	var r := await _hold(2.5)
-	_ok(r[0] == 1 and r[1] == 1 and _root.get_coachmarks().get_step_id() == "l2_boosters_a",
+	_ok(r[0] == 1 and r[1] == 1 and _root.get_coachmarks().get_step_id() == "intro_selector",
 		"2.5 s of real frames (~12 ticks of 200 ms): %d copy rebuild, %d Selector question (one per 2000 ms, not per tick)" % [r[0], r[1]])
 	var p = _root.get_acquisition().open_booster(_host, TORNADO)
 	await _frames(2)

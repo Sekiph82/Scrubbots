@@ -1,9 +1,9 @@
 extends RefCounted
 ## FeatureUnlocks — preload (res://scripts/progression/feature_unlocks.gd).
 ##
-## SB-M44-010/011/031 — strict reader of the owner feature unlock table
+## SB-M44-010/011/031/032 — strict reader of the owner feature unlock table
 ## data/config/feature_unlocks_v1.json (feature id -> campaign level). A feature is unlocked
-## iff the save is grandfathered or frontier >= its level. Unlike FtueConfig this FAILS OPEN:
+## iff frontier >= its level, for every profile (SB-M44-032: no grandfather). Unlike FtueConfig this FAILS OPEN:
 ## a missing / malformed file (ok:false) or an id not in the table never locks anything, since
 ## a broken config must not strand a player behind locks. UI asks AppState.feature_unlocked().
 
@@ -34,8 +34,8 @@ static func validate(d) -> Dictionary:
 func unlock_level(feature_id: String) -> int:
 	return int(cfg["unlocks"].get(feature_id, 1))
 
-func is_unlocked(feature_id: String, frontier_level: int, grandfathered: bool) -> bool:
-	return grandfathered or frontier_level >= unlock_level(feature_id)
+func is_unlocked(feature_id: String, frontier_level: int) -> bool:
+	return frontier_level >= unlock_level(feature_id)
 
 static func _bad(reason: String) -> Dictionary:
 	return {"ok": false, "reason": reason, "unlocks": {}}

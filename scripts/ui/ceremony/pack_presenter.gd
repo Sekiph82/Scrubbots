@@ -68,7 +68,7 @@ func drain() -> bool:
 	if is_presenting() or _stack == null or _app == null or _app.economy == null or _app.is_blocked:
 		return false
 	if not _app.feature_unlocked("card_packs"):
-		return false   # SB-M44-025: pre-L20 packs wait in the queue; silent, no error kept
+		return false   # SB-M44-025: packs wait in the queue until card_packs unlocks (L1 since SB-M44-032)
 	var e: Dictionary = _app.economy.pending_packs.front()
 	if e.is_empty():
 		idle.emit()

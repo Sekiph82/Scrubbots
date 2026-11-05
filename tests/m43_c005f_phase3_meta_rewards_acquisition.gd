@@ -63,6 +63,8 @@ var _now := [1790000000]
 var _day := [20000]
 
 func _initialize() -> void:
+	# SB-M44-032 (no grandfather): this suite exercises gated features on L1 fixture saves.
+	preload("res://scripts/app/app_state.gd").test_unlock_all = true
 	await process_frame
 	MainScript.boot_clock_override = func(): return _now[0]
 	MainScript.boot_local_day_override = func(): return _day[0]

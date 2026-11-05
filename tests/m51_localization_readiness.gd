@@ -63,7 +63,7 @@ func _l02() -> void:
 		if String(UiText.EN[k]).is_empty():
 			empty.append(k)
 	_ok(bad_keys.is_empty(), "%d keys, all UPPER_SNAKE %s" % [UiText.EN.size(), str(bad_keys)])
-	_ok(empty == ["FTUE_L2_BOOSTERS_BODY"], "only the documented runtime-built body is empty %s" % str(empty))
+	_ok(empty == ["FTUE_BOOSTER_INTRO_BODY"], "only the documented runtime-built body is empty %s" % str(empty))
 	_complete("l02_key_convention")
 
 func _l03() -> void:

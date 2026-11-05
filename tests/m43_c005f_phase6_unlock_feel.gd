@@ -79,11 +79,15 @@ func _boot(path: String) -> void:
 ## Real app with one unlocked (unseen) robot: Moppy, via the shipping facade.
 func _boot_robot(tag: String) -> void:
 	await _boot(_uniq(tag))
+	while _app().progression.current_level() < _app().feature_unlock_level("robots"):   # SB-M44-032: Robots open at L25
+		_app().progression.record_win(_app().progression.current_level())
 	_e().wallet.credit(EconomyWallet.BOT_PARTS, 250)
 	_ok(bool(_app().actions.unlock_next_robot().get("ok", false)), "Moppy unlocked by the facade (setup)")
 
-## Real app on a NEW FTUE profile at L3; the live frontier then reaches L4 (owner table:
+## Real app on a NEW FTUE profile at L3; the live frontier then reaches L4 (fixture table:
 ## unlock:daily), so the ceremony is first shown after the spy backends are in place.
+## SB-M44-032: the shipped table opens Daily at L1 (no ceremony); the feel path is exercised on
+## an in-memory fixture with Daily at its 2026-10-22 level 4.
 func _boot_feature(tag: String) -> void:
 	var path := _uniq(tag)
 	var seed = AppState.new(path)
@@ -92,6 +96,7 @@ func _boot_feature(tag: String) -> void:
 		seed.progression.record_win(seed.progression.current_level())
 	seed.request_save()
 	await _boot(path)
+	_app().unlocks.cfg["unlocks"]["daily"] = 4
 	_app().progression.record_win(3)
 	_ok(_app().feature_unlocked("daily"), "frontier L4: Daily unlocked (setup)")
 

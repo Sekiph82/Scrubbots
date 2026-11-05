@@ -434,9 +434,15 @@ func _boot_play(level: int) -> void:
 	_eco().rewarded.set_provider(_prov)
 	_root.get_modal_stack().clear("t")
 	# SB-M44-031: boosters are locked on a fresh L2 profile; open them in the in-memory unlock
-	# table so the L2 booster coach this suite exercises still runs.
+	# table so the booster coach this suite exercises still runs at L2.
 	for b in ["plus_one_slot", "random", "selector", "tornado"]:
 		_root.get_app_state().unlocks.cfg["unlocks"][b] = 1
+	# SB-M44-031 part 2: the L2 booster lesson is gone; the per-booster intros carry the same coach
+	# copy. Presentation-order seam: Selector's intro is phase A, Random's phase B (as the old A / B).
+	var fcfg: Dictionary = _root.get_ftue().config()
+	var bi: Array = fcfg["booster_intros"]
+	fcfg["booster_intros"] = [bi[2], bi[1], bi[0], bi[3]]
+	_root.get_ftue().use_config(fcfg)
 	_root.get_app_state().progression.debug_set_current_level(level)
 	_root.play_current_frontier()
 	await _frames(6)
@@ -577,7 +583,7 @@ func _t06_ftue_moving_and_home() -> void:
 	_root.refresh_coachmark()
 	var copy_ms := _ms(t)
 	print("    moving %s (in flight %d), step %s, worker %s" % [str(moving), _host.get_scheduler().live_assignment_count(), cm.get_step_id(), str(_host.is_booster_proof_running())])
-	var no_worker: bool = moving and cm.get_step_id() == "l2_boosters_a" and not _host.is_booster_proof_running()
+	var no_worker: bool = moving and cm.get_step_id() == "intro_selector" and not _host.is_booster_proof_running()
 	# T09 property: no still-moment proof and no worker while robots move. The copy's main-thread
 	# cost is REPORTED (RM-002 finding: the in-flight Selector list still builds one scratch engine
 	# per remaining batch - pre-existing R04 behaviour, not an R07 change; not patched here).
