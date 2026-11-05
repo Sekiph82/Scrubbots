@@ -28,7 +28,8 @@ Beyond the M21 source: 9 images (levels 002..010). Folder names are legacy bands
 ## Underwater artwork
 
 None supplied as of 2026-10-22. The only underwater-named item is the collection card
-`assets/art/references/_owner_inbox/Collection Cards/underwater heroes.jpeg`, a UI reference, not level art.
+`assets/art/references/_owner_inbox/Collection Cards/underwater heroes.jpeg`, a UI reference, not level art. It was
+deleted by SB-M22-030 (owner 2026-11-05, card set finished; git history keeps it).
 
 ## Other original theme artwork
 

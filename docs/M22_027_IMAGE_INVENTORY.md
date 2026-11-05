@@ -147,4 +147,5 @@ and `VISUAL_ASSET_INDEX.md` no longer list it.
 | **total** | 2218 | 2578453215 |
 
 Before -> after: 2219 -> 2218 tracked images, 1871 -> 1870 distinct SHA256, 7531 bytes freed.
-The CSV is the after state.
+The CSV is the after state. SB-M22-030 (owner cleanup 2026-11-05, `docs/M22_030_IMAGE_CLEANUP.md`)
+reran the tool after deleting 1442 more images; the CSV now holds that 776-image state.
