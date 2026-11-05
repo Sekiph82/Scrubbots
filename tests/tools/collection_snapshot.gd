@@ -1,7 +1,7 @@
 extends SceneTree
 ## M43-C007 runtime evidence: real app root, Collection reached through the real authorities
 ## (add_card -> set reward). Album at every viewport; set detail (NEW / EXTRAS / not found), card
-## detail and Cards Exchange at 1080x2160. Needs a rendering driver:
+## detail and Cards Exchange at 1080x2160, 1170x2532 and 1536x2048. Needs a rendering driver:
 ##   godot --path . -s res://tests/tools/collection_snapshot.gd -- <out_dir>
 
 const MainScene = preload("res://scenes/app/main.tscn")
@@ -17,7 +17,7 @@ func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	_out = args[0] if args.size() > 0 else "user://collection_snapshots"
 	for sz in SIZES:
-		await _run(sz, sz == SIZES[1])
+		await _run(sz, sz in [SIZES[1], SIZES[2], SIZES[4]])   # SB-M22-028: set grid thumbnails on phone + tablet
 	print("COLLECTION_EVIDENCE %s (%d rejected)" % ["CLEAN" if _bad == 0 else "REJECTED", _bad])
 	quit(1 if _bad > 0 else 0)
 

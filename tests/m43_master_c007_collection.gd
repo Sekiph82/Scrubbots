@@ -227,11 +227,17 @@ func _k10() -> void:
 	var album = CollectionScreen.open_album(_root.get_modal_stack(), _root.get_app_state())
 	await _frames(1)
 	var max_nodes := 0
-	var worst := [0, 0]   ## [cold pass (first texture loads), warm pass] microseconds
+	## [cold pass (first thumbnail loads), warm pass] microseconds. SB-M22-028: the album LRU
+	## (<= 96 MiB) holds the most recent sets' thumbnails, not all 135, so the warm pass re-opens
+	## the 5 most recent sets (15..11) and must not load anything.
+	var worst := [0, 0]
+	var lru = album.get_meta("tex_cache")
+	var loads := 0
 	for pass_i in range(2):
-		for n in range(1, 16):
+		loads = lru.loads
+		for n in (range(1, 16) if pass_i == 0 else range(15, 10, -1)):
 			var tb := Time.get_ticks_usec()
-			var s = CollectionScreen.open_set(_root.get_modal_stack(), _root.get_app_state(), n, Callable(), album.get_meta("tex_cache"))
+			var s = CollectionScreen.open_set(_root.get_modal_stack(), _root.get_app_state(), n, Callable(), lru)
 			worst[pass_i] = maxi(worst[pass_i], Time.get_ticks_usec() - tb)
 			await _frames(1)
 			max_nodes = maxi(max_nodes, s.find_children("*", "", true, false).size())
@@ -243,7 +249,7 @@ func _k10() -> void:
 	for b in album.find_children("*", "Button", true, false):
 		if b.is_visible_in_tree() and b.size.y < 64.0:
 			small.append(b.name)
-	_ok(worst_us < 150000 and max_nodes < 400, "set-detail build: cold %d us (first card-art loads), warm %d us (budget 150 ms); peak nodes %d; 30 opens incl. app frame pacing %d ms" % [worst[0], worst_us, max_nodes, ms])
+	_ok(worst_us < 150000 and max_nodes < 400 and lru.loads == loads, "set-detail build: cold %d us (first thumbnail loads), warm %d us, %d loads (budget 150 ms, 0 loads); peak nodes %d; 20 opens incl. app frame pacing %d ms" % [worst[0], worst_us, lru.loads - loads, max_nodes, ms])
 	_ok(small.is_empty() and album.find_child("SetList", true, false) is ScrollContainer, "touch targets >= 64 px; album scrolls %s" % str(small))
 	var ex = CollectionScreen.open_exchange(_root.get_modal_stack(), _root.get_app_state())
 	await _frames(1)

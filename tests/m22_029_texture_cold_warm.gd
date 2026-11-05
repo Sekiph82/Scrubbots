@@ -17,6 +17,7 @@ const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
 
 const F := "res://assets/ui/final/"
 const CARDS := "res://assets/ui/final/collection/cards/"
+const THUMBS := "res://assets/ui/final/collection/card_thumbs/"   # SB-M22-028 set-grid thumbnails
 const MIB := 1024.0 * 1024.0
 ## Measured 2026-11-05 (factory 101): cold 133.50, peak 145.91 MiB (93 textures), plus ~10%.
 const COLD_BUDGET_MIB := 147.0
@@ -57,7 +58,7 @@ func _initialize() -> void:
 		print("warm Home after visit %d: %d textures, %.2f MiB (peak %.2f MiB)" % [visit + 1, warm[visit]["n"], warm[visit]["mib"], peak])
 	_ok(warm[1]["n"] <= warm[0]["n"], "second visit leaves no more textures than the first (%d <= %d)" % [warm[1]["n"], warm[0]["n"]])
 	_ok(peak_cards > 0, "card art was resident while the set / card was open (%d)" % peak_cards)
-	_ok(warm[0]["cards"] == 0 and warm[1]["cards"] == 0, "no catalog card art resident after the album closes")
+	_ok(warm[0]["cards"] == 0 and warm[1]["cards"] == 0, "no catalog card art or thumbnail resident after the album closes")
 	_ok(cold["mib"] <= COLD_BUDGET_MIB, "cold Home %.2f <= %.0f MiB" % [cold["mib"], COLD_BUDGET_MIB])
 	_ok(peak <= PEAK_BUDGET_MIB, "peak %.2f <= %.0f MiB" % [peak, PEAK_BUDGET_MIB])
 	_root.free()
@@ -100,7 +101,7 @@ func _count() -> Dictionary:
 			continue
 		var t := ResourceLoader.get_cached_ref(p) as Texture2D
 		n += 1
-		cards += int(p.begins_with(CARDS))
+		cards += int(p.begins_with(CARDS) or p.begins_with(THUMBS))
 		bytes += t.get_width() * t.get_height() * 4
 	return {"n": n, "cards": cards, "mib": bytes / MIB}
 

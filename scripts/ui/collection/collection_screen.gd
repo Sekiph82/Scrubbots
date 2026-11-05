@@ -31,6 +31,7 @@ const UiTokens = preload("res://scripts/ui/ui_tokens.gd")
 const UiText = preload("res://scripts/ui/ui_text.gd")
 const UiShortcutButton = preload("res://scripts/ui/components/ui_shortcut_button.gd")
 const CollectionCardCatalog = preload("res://scripts/collection/collection_card_catalog.gd")
+const CardTextureLru = preload("res://scripts/ui/collection/card_texture_lru.gd")
 
 const ART := {
 	"silhouette": "res://assets/ui/final/collection/states/card_unknown_silhouette.png",
@@ -43,13 +44,6 @@ const RARITY_COLOR := {"COMMON": Color(0.47, 0.53, 0.62), "RARE": Color(0.10, 0.
 	"EPIC": Color(0.56, 0.25, 0.86), "LEGENDARY": Color(0.92, 0.62, 0.05)}
 const RARITY_SHORT := {"COMMON": "C", "RARE": "R", "EPIC": "E", "LEGENDARY": "L"}
 const LIST_H := 1020.0
-
-## Per-visit texture cache: owned by the album popup (meta "tex_cache") and freed with it, so
-## repeat set opens skip the decode but nothing outlives the Collection visit (UI-ADR-008 step 3).
-static func _tex(path: String, cache: Dictionary) -> Texture2D:
-	if not cache.has(path):
-		cache[path] = load(path)
-	return cache[path]
 
 static func card_key(card_id: String) -> String:
 	return "card:" + card_id
@@ -98,7 +92,7 @@ static func open_album(stack, app, open_packs: Callable = Callable()) -> BasePop
 	list.add_child(_master_row(e))
 	p.add_action("close", UiText.t("SHOP_CLOSE"), "secondary", true)
 	p.action_selected.connect(func(id, _c): _on_album_action(stack, app, p, id))
-	p.set_meta("tex_cache", {})
+	p.set_meta("tex_cache", CardTextureLru.new())   # SB-M22-028: bounded LRU, freed with the album
 	_refresh_album(p, e)
 	if not stack.push(p):
 		p.free()
@@ -161,6 +155,8 @@ static func _master_row(e) -> Control:
 static func _refresh_album(p: BasePopup, e) -> void:
 	var col: Dictionary = e.collection.snapshot()
 	var claimed: Array = (col.get("set_reward_claimed", []) as Array).map(func(x): return int(x))
+	var cache = p.get_meta("tex_cache")
+	var shown: Array = []
 	var unique := 0
 	for cid in e.collection.all_card_ids():
 		if e.collection.owned(cid) > 0:
@@ -202,7 +198,9 @@ static func _refresh_album(p: BasePopup, e) -> void:
 		var rw := UiText.t("COLLECTION_REWARD", [UiText.num(int(row.get("scrub_bucks", 0))), UiText.num(int(row.get("bot_parts", 0)))])
 		(card.find_child("Reward", true, false) as Label).text = rw + "  " + UiText.t("COLLECTION_CLAIMED" if claimed.has(n) else "COLLECTION_NOT_CLAIMED")
 		var thumb: TextureRect = card.find_child("Thumb", true, false)
-		thumb.texture = _tex(ART["set_complete"] if claimed.has(n) else _first_owned_art(e, n), p.get_meta("tex_cache"))
+		shown.append(ART["set_complete"] if claimed.has(n) else CardTextureLru.thumb(_first_owned_art(e, n)))
+		thumb.texture = cache.texture(shown[-1])
+	cache.pin("album", shown)
 	var m: Dictionary = e.config.collection_config().get("all_sets_complete", {})
 	(p.find_child("MasterText", true, false) as Label).text = UiText.t("COLLECTION_MASTER_ROW", [e.collection.completed_set_count(), 15,
 		UiText.num(int(m.get("scrub_bucks", 0))), UiText.num(int(m.get("bot_parts", 0))),
@@ -234,11 +232,14 @@ static func _on_album_action(stack, app, p: BasePopup, id: String) -> void:
 
 # ================================================================= set detail ==
 
-## cache: the album's per-visit texture cache; a standalone call gets a throw-away one.
-static func open_set(stack, app, n: int, on_close: Callable = Callable(), cache: Dictionary = {}) -> BasePopup:
+## cache: the album's CardTextureLru; a standalone call gets a throw-away one. Tiles draw the
+## single-card thumbnails; the full art loads only in the card detail.
+static func open_set(stack, app, n: int, on_close: Callable = Callable(), cache = null) -> BasePopup:
 	var e = app.economy
 	if _set_order(e).find(n) < 0:
 		return null
+	if cache == null:
+		cache = CardTextureLru.new()
 	var p := BasePopup.new("collection_set")
 	p.set_frame("large")
 	var grid := GridContainer.new()
@@ -272,16 +273,18 @@ static func open_set(stack, app, n: int, on_close: Callable = Callable(), cache:
 	pager.custom_minimum_size = center.get_combined_minimum_size()
 	p.action_selected.connect(func(id, _c):
 		if id.begins_with("card:"):
-			if open_card(stack, app, id.substr(5), func(): _refresh_set(p, e)) == null:
+			if open_card(stack, app, id.substr(5), func(): _refresh_set(p, e), cache) == null:
 				p.rearm()
 		elif id == "prev" or id == "next":
 			var order := _set_order(e)
 			_show_set(p, app, order[posmod(order.find(int(p.get_meta("set"))) + (1 if id == "next" else -1), order.size())], cache)
 			p.rearm())
 	p.closed.connect(func(_r):
+		cache.unpin("set")
 		if on_close.is_valid():
 			on_close.call(), CONNECT_ONE_SHOT)
 	if not stack.push(p):
+		cache.unpin("set")
 		p.free()
 		return null
 	return p
@@ -291,7 +294,7 @@ static func _set_order(e) -> Array:
 	return e.config.collection_config().get("set_rewards", []).map(func(r): return int(r["set"]))
 
 ## (Re)build the detail for set n in place: title, 9 tiles + their card:<id> actions, viewed marks.
-static func _show_set(p: BasePopup, app, n: int, cache: Dictionary) -> void:
+static func _show_set(p: BasePopup, app, n: int, cache) -> void:
 	var e = app.economy
 	var set_name := ""
 	for row in e.config.collection_config().get("set_rewards", []):
@@ -305,16 +308,20 @@ static func _show_set(p: BasePopup, app, n: int, cache: Dictionary) -> void:
 		grid.remove_child(tile)
 		tile.queue_free()
 	var newly_seen: Array = []
+	var shown: Array = []
 	for k in range(9):
 		var cid := "s%d_c%d" % [n, k]
-		grid.add_child(_tile(p, e, cid, cache))
+		var tile := _tile(p, e, cid, cache)
+		grid.add_child(tile)
+		shown.append((tile.find_child("CardArt", true, false) as TextureRect).texture.resource_path)
 		if e.collection.owned(cid) > 0 and e.meta_ui.mark_seen(card_key(cid)):
 			newly_seen.append(cid)
+	cache.pin("set", shown)   # the previous set's thumbnails become evictable
 	p.set_meta("newly_seen", newly_seen)
 	if not newly_seen.is_empty():
 		app.mark_dirty()   # presentation marks: flushed at the next lifecycle boundary, no save per view
 
-static func _tile(p: BasePopup, e, cid: String, cache: Dictionary) -> Control:
+static func _tile(p: BasePopup, e, cid: String, cache) -> Control:
 	var cat := CollectionCardCatalog.entry(cid)
 	var owned: int = e.collection.owned(cid)
 	var tile := VBoxContainer.new()
@@ -327,7 +334,7 @@ static func _tile(p: BasePopup, e, cid: String, cache: Dictionary) -> Control:
 	tile.add_child(face)
 	var art := HomeStyle.art("CardArt")
 	art.set_anchors_preset(Control.PRESET_FULL_RECT)
-	art.texture = _tex(String(cat["art"]) if owned > 0 else ART["silhouette"], cache)
+	art.texture = cache.texture(CardTextureLru.thumb(String(cat["art"])) if owned > 0 else ART["silhouette"])
 	face.add_child(art)
 	var state := _chip("", Color(0.2, 0.66, 0.14), 20)
 	state.name = "State"
@@ -386,7 +393,8 @@ static func _chip(text: String, bg: Color, fs: int) -> PanelContainer:
 
 # ================================================================ card detail ==
 
-static func open_card(stack, app, cid: String, on_close: Callable = Callable()) -> BasePopup:
+## cache: the album's CardTextureLru (full art pinned while the detail is open); none -> plain load.
+static func open_card(stack, app, cid: String, on_close: Callable = Callable(), cache = null) -> BasePopup:
 	var e = app.economy
 	if e.collection.owned(cid) <= 0:
 		return null
@@ -398,7 +406,11 @@ static func open_card(stack, app, cid: String, on_close: Callable = Callable()) 
 	var box := CenterContainer.new()
 	p.get_content().add_child(box)
 	var art := HomeStyle.art("CardArt")
-	art.texture = load(String(cat["art"]))
+	if cache != null:
+		art.texture = cache.texture(String(cat["art"]))
+		cache.pin("card", [String(cat["art"])])
+	else:
+		art.texture = load(String(cat["art"]))
 	art.custom_minimum_size = Vector2(380, 540)
 	box.add_child(art)
 	var rc := _chip(UiText.t("RARITY_" + String(cat["rarity"])), RARITY_COLOR[String(cat["rarity"])], 24)
@@ -412,10 +424,14 @@ static func open_card(stack, app, cid: String, on_close: Callable = Callable()) 
 	p.add_action("back", UiText.t("SHOP_BACK"), "secondary", true)
 	p.action_selected.connect(func(id, ctx): _on_card_action(stack, app, p, id, ctx))
 	p.closed.connect(func(_r):
+		if cache != null:
+			cache.unpin("card")
 		if on_close.is_valid():
 			on_close.call(), CONNECT_ONE_SHOT)
 	_refresh_card(p, e)
 	if not stack.push(p):
+		if cache != null:
+			cache.unpin("card")
 		p.free()
 		return null
 	return p

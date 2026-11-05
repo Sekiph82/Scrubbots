@@ -6,7 +6,7 @@ extends SceneTree
 ## step 2 runtime measurement (tests/tools/m22_026_texture_measure.gd) showed on screen
 ## (UI-ADR-008); a texture shared by two screens counts on both. Step 3: the 135 catalog card arts
 ## (size_limit 1080, summed budget) and CollectionScreen holding no static texture cache (the
-## per-visit cache lives on the album popup and is freed with it). SB-M22-029: the 1170x2532 phone
+## per-visit cache, since SB-M22-028 a bounded LRU, lives on the album popup and is freed with it). SB-M22-029: the 1170x2532 phone
 ## draws ~8% more px than 1080x2400, so three limits under 2x were raised (one removed) and five
 ## newly measured textures capped; daily day-card frames joined the Daily list.
 ## Run: godot --headless --path . -s res://tests/m22_026_texture_budget.gd
@@ -14,6 +14,7 @@ extends SceneTree
 const F := "res://assets/ui/final/"
 const MIB := 1024 * 1024
 const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
+const CardTextureLru = preload("res://scripts/ui/collection/card_texture_lru.gd")
 const CATALOG := "res://data/config/collection_card_catalog_v1.json"
 ## Step 3: card art drawn at max 540 px (step 2 measure), cap 2 x 540; all 135 resident 401.2 MiB + ~10%.
 const CARD_LIMIT := 1080
@@ -358,15 +359,15 @@ func _card_art() -> void:
 	_ok(total <= CARD_BUDGET_MIB * MIB, "card arts total %d <= %d bytes, each <= %d px with alpha" % [total, CARD_BUDGET_MIB * MIB, CARD_LIMIT])
 	# static vars are not in get_script_property_list(); `in` sees them
 	_ok(not ("_tex_cache" in CollectionScreen) and not (CollectionScreen as Script).get_script_constant_map().has("_tex_cache"), "CollectionScreen has no _tex_cache")
-	# a viewed card stays for the visit (album cache) and leaves the ResourceLoader cache once the
-	# album's cache and the TextureRect are both freed
-	var visit := {}
+	# a viewed card stays in the album's LRU (SB-M22-028) and leaves the ResourceLoader cache once
+	# that LRU and the TextureRect are both freed
+	var visit = CardTextureLru.new()
 	var tr := TextureRect.new()
-	tr.texture = CollectionScreen._tex(arts[0], visit)
+	tr.texture = visit.texture(arts[0])
 	tr.free()
-	_ok(ResourceLoader.has_cached(arts[0]) and CollectionScreen._tex(arts[0], visit) == visit[arts[0]], "%s kept by the visit cache after its TextureRect is freed" % arts[0])
-	visit = {}
-	_ok(not ResourceLoader.has_cached(arts[0]), "%s released once the visit cache is freed" % arts[0])
+	_ok(ResourceLoader.has_cached(arts[0]) and visit.has(arts[0]) and visit.texture(arts[0]) != null and visit.loads == 1, "%s kept by the album LRU after its TextureRect is freed" % arts[0])
+	visit = null
+	_ok(not ResourceLoader.has_cached(arts[0]), "%s released once the album LRU is freed" % arts[0])
 
 func _has_alpha_format(img: Image) -> bool:
 	return img.get_format() in [Image.FORMAT_RGBA8, Image.FORMAT_LA8, Image.FORMAT_RGBA4444, Image.FORMAT_RGBAF, Image.FORMAT_RGBAH]
