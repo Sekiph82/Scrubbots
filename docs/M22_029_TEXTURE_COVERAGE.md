@@ -95,7 +95,8 @@ but also gameplay clean sprites and pack CPUParticles2D, not measurable).
 
 Kept under 2x on purpose: the 135 card arts at 1080 draw 585 px at 1170x2532 (1.85x, still above
 the drawn size); raising all to 1170 costs ~+70 MiB if all resident; SB-M22-028 (on-demand full art
-+ thumbnails, LRU) owns card memory.
++ thumbnails, LRU) owns card memory. Done 2026-11-06 (factory 103): 440x660 thumbnails in the grid, full art only in
+the card detail, album LRU <= 24 full cards / 96 MiB (UI-ADR-008 step 6).
 
 Per-screen lists re-measured after re-import (`tests/m22_026_texture_budget.gd`): Shop/Collection
 42.98 MiB (budget 41 -> 47), Daily/Tasks 36.41 MiB with the day-card frames (32 -> 40), Profile
