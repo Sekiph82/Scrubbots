@@ -57,6 +57,14 @@ static var gift_video := {
 	"gift_small": load(GIFT_VIDEO_DIR + "gift_small_opening.ogv"),
 	"gift_big": load(GIFT_VIDEO_DIR + "gift_big_opening.ogv"),
 }
+## SB-VIDEO-007: the owner's magenta-keyed Flow set-complete badge (rewards/set_complete_video/
+## PROVENANCE.md): square crop (badge + star burst, soft edge fade), still = keyed last frame.
+const CHROMA_KEY_MAGENTA := preload("res://scripts/ui/feel/chroma_key_magenta.gdshader")
+const SET_VIDEO_DIR := "res://assets/ui/final/rewards/set_complete_video/"
+const SET_VIDEO_SIZE := Vector2(320, 320)
+const SET_VIDEO_EDGE := 0.06
+## Injectable for tests (null = the static emblem, as on failure).
+static var set_video: VideoStream = load(SET_VIDEO_DIR + "set_complete_badge.ogv")
 
 ## One ceremony popup for a CeremonyEvents event, or null when the kind has no builder.
 static func build(event: Dictionary, reduced: bool = false):
@@ -142,7 +150,7 @@ static func _reward_rows(p: BasePopup, rewards: Dictionary, row_h: int = 84) -> 
 		h.add_child(l)
 	return v
 
-## Start the decorative glow turn (FULL) and a gift hero's opening video. Every label/value
+## Start the decorative glow turn (FULL) and a gift / set-complete hero video. Every label/value
 ## already exists, so Reduced Effects (no motion) shows exactly the same truth. Tweens are bound
 ## to the popup.
 static func start_motion(p: BasePopup) -> void:
@@ -153,48 +161,52 @@ static func start_motion(p: BasePopup) -> void:
 			var tw := p.create_tween().set_loops()
 			tw.tween_property(g, "rotation", TAU, GLOW_SPIN_S).from(0.0)
 	for box in p.find_children("HeroBox", "CenterContainer", true, false):
-		if box.has_meta("video"):
-			_start_gift_video(p, box, String(box.get_meta("video")))
+		if not box.has_meta("video"):
+			continue
+		var art := String(box.get_meta("video"))
+		var h := box.get_node("HeroArt") as TextureRect
+		if art == "set_complete":
+			play_hero_video(p, h, set_video, load(SET_VIDEO_DIR + "set_complete_badge_still.png"), SET_VIDEO_SIZE, CHROMA_KEY_MAGENTA, SET_VIDEO_EDGE)
+		else:
+			play_hero_video(p, h, gift_video.get(art), load(GIFT_VIDEO_DIR + art + "_opening_still.png"), GIFT_VIDEO_SIZE[art], CHROMA_KEY_GREEN)
 
-## SB-VIDEO-006: one keyed VideoStreamPlayer over the hero (its static art hidden while it plays),
-## then the hero holds the keyed last frame. A stream that is missing or does not start leaves the
-## static hero exactly as built. The decoder is freed when it finishes or the popup closes; it
-## never blocks the rows or the CTA (mouse ignored, no input / economy touched).
-static func _start_gift_video(p: BasePopup, box: CenterContainer, art: String) -> void:
-	var stream := gift_video.get(art) as VideoStream
-	var still := load(GIFT_VIDEO_DIR + art + "_opening_still.png") as Texture2D
+## SB-VIDEO-006/007/008: one keyed VideoStreamPlayer over hero art `h` (its own texture hidden while
+## it plays), then `h` holds the keyed last frame `still` at `size`. A stream that is missing or
+## does not start leaves `h` exactly as built. The decoder is freed when it finishes or the
+## popup closes; it never blocks the rows or the CTA (mouse ignored, no input / economy touched).
+static func play_hero_video(p: BasePopup, h: TextureRect, stream: VideoStream, still: Texture2D, size: Vector2, key: Shader, edge := 0.0) -> void:
 	if stream == null or still == null:
 		return
-	var h := box.get_node("HeroArt") as TextureRect
-	var size: Vector2 = GIFT_VIDEO_SIZE[art]
 	var fit := AspectRatioContainer.new()
-	fit.name = "GiftVideoBox"
+	fit.name = "HeroVideoBox"
 	fit.ratio = float(still.get_width()) / float(still.get_height())
-	fit.custom_minimum_size = size
+	fit.set_anchors_preset(Control.PRESET_FULL_RECT)
 	fit.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	var v := VideoStreamPlayer.new()
-	v.name = "GiftVideo"
+	v.name = "HeroVideo"
 	v.expand = true
 	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	v.material = ShaderMaterial.new()
-	(v.material as ShaderMaterial).shader = CHROMA_KEY_GREEN
+	(v.material as ShaderMaterial).shader = key
+	if edge > 0.0:
+		(v.material as ShaderMaterial).set_shader_parameter("edge_fade", edge)
 	v.stream = stream
 	fit.add_child(v)
-	box.add_child(fit)
+	h.add_child(fit)
 	v.play()
 	if not v.is_playing() or v.get_stream_length() <= 0.0:
-		box.remove_child(fit)
+		h.remove_child(fit)
 		fit.free()
 		return
 	h.custom_minimum_size = size
 	h.texture = still
 	h.self_modulate.a = 0.0
-	var finish := func() -> void:   # captures only the box: it lives as long as the popup
-		var f := box.get_node_or_null("GiftVideoBox")
+	var finish := func() -> void:   # captures only the hero: it lives as long as the popup
+		var f := h.get_node_or_null("HeroVideoBox")
 		if f != null and not f.is_queued_for_deletion():
 			(f.get_child(0) as VideoStreamPlayer).stop()
 			f.queue_free()
-			(box.get_node("HeroArt") as CanvasItem).self_modulate.a = 1.0
+			h.self_modulate.a = 1.0
 	v.finished.connect(finish)
 	p.closed.connect(finish.unbind(1))
 
@@ -204,7 +216,9 @@ static func _start_gift_video(p: BasePopup, box: CenterContainer, art: String) -
 ## cards, 9 / 9 and the exact per-set reward (event rewards = the config row the grant used).
 static func set_complete(event: Dictionary, reduced: bool) -> BasePopup:
 	var p := _popup("set_complete", "reward", UiText.t("CEREMONY_SET_TITLE"), event)
-	_hero(p, ART["set_complete"], Vector2(230, 230), reduced)
+	var hero := _hero(p, ART["set_complete"], Vector2(230, 230), reduced)
+	if not reduced:
+		hero.set_meta("video", "set_complete")   # SB-VIDEO-007: played by start_motion
 	var n := int(event["set"])
 	p.add_body_line(UiText.t("CEREMONY_SET_NAME", [n, String(event.get("name", ""))]), "SetName", BasePopup.ROYAL_EDGE, 36)
 	var thumbs := GridContainer.new()

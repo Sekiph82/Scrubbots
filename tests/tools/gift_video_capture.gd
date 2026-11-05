@@ -32,7 +32,7 @@ func _initialize() -> void:
 			while (Time.get_ticks_msec() - t0) / 1000.0 < at:
 				await process_frame
 			await RenderingServer.frame_post_draw
-			var playing: bool = p.find_child("GiftVideo", true, false) != null
+			var playing: bool = p.find_child("HeroVideo", true, false) != null
 			var path := "%s/gift_%d_%s_1080x1920.png" % [out, m, "video" if playing else "held"]
 			print("t=", at, " video=", playing, " ", path, " err=", sub.get_texture().get_image().save_png(path))
 		sub.free()

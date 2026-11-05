@@ -120,7 +120,7 @@ func _failure_fallback() -> void:
 		for c in [[10, "gift_small"], [1000, "gift_big"]]:
 			var p = await _open(c[0])
 			var h := _hero(p)
-			_ok(_players(p).is_empty() and p.find_child("GiftVideoBox", true, false) == null, "%s stream, %d: no decoder left" % ["null" if injected == null else "broken", c[0]])
+			_ok(_players(p).is_empty() and p.find_child("HeroVideoBox", true, false) == null, "%s stream, %d: no decoder left" % ["null" if injected == null else "broken", c[0]])
 			_ok(h.texture.resource_path == MetaCeremonies.ART[c[1]] and h.self_modulate.a == 1.0 and h.custom_minimum_size == (Vector2(300, 300) if c[0] == 1000 else Vector2(220, 220)), "%s stream, %d: static hero art exactly as before" % ["null" if injected == null else "broken", c[0]])
 			await _shut(p)
 	MetaCeremonies.gift_video = _videos

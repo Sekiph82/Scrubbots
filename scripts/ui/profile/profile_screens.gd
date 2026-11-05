@@ -25,6 +25,7 @@ const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const PersonalRank = preload("res://scripts/progression/personal_rank.gd")
 const UiProgressMeter = preload("res://scripts/ui/components/ui_progress_meter.gd")
 const UiEventCard = preload("res://scripts/ui/components/ui_event_card.gd")
+const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
 
 # ---------------------------------------------------------------- PROFILE ----
 
@@ -560,8 +561,18 @@ static func open_ranks(stack, app) -> BasePopup:
 
 # --------------------------------------------------------------- COMEBACK ----
 
+## SB-VIDEO-008: the owner's magenta-keyed Flow "welcome back" Scrubby (popups/welcome_video/
+## PROVENANCE.md), still = keyed last frame (near the start pose).
+const WELCOME_VIDEO_DIR := F + "popups/welcome_video/"
+const WELCOME_VIDEO_SIZE := Vector2(240, 280)
+## Injectable for tests (null = the static help pose, as on failure).
+static var welcome_video: VideoStream = load(WELCOME_VIDEO_DIR + "welcome_back_scrubby.ogv")
+
 ## SB-M43-143/144: non-punitive return summary after a genuine absence. Lists only state that
 ## is already true (Hearts, Daily, Gift, Tasks, Events) and grants nothing itself.
+## SB-VIDEO-008: FULL effects with Scrubby active plays the welcome video once in the hero slot,
+## then holds its keyed last frame; Reduced Effects, other robots or a failing stream keep the
+## static help pose.
 static func open_comeback(stack, app) -> BasePopup:
 	var e = app.economy
 	var b := HomeBadges.compute(app)
@@ -581,6 +592,8 @@ static func open_comeback(stack, app) -> BasePopup:
 		return null
 	e.returns.mark_summary_shown()
 	app.mark_dirty()
+	if e.robots.active_robot() == "scrubby" and not (app.effects != null and app.effects.is_reduced()):
+		MetaCeremonies.play_hero_video(p, p.get_hero(), welcome_video, load(WELCOME_VIDEO_DIR + "welcome_back_scrubby_still.png"), WELCOME_VIDEO_SIZE, MetaCeremonies.CHROMA_KEY_MAGENTA)
 	return p
 
 # ---------------------------------------------------------- NOTIFICATIONS ----

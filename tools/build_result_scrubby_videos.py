@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
-"""SB-VIDEO-001/002/005/006: Results WIN / LOSE, Level Intro Scrubby and Gift Meter box videos from the owner's Flow masters.
+"""SB-VIDEO-001/002/005/006/007/008: Results WIN / LOSE, Level Intro Scrubby, Gift Meter box, Collection set complete
+badge and Welcome back Scrubby videos from the owner's Flow masters.
 
 For each master (720x1280, magenta chroma background) this crops every frame to the robot's
 bounding box over ALL frames plus a margin, encodes Theora .ogv (magenta kept; the Results
@@ -12,10 +13,16 @@ The gift set differs: flat GREEN background (keyed by chroma_key_green.gdshader)
 per master (box + the sparkle burst above it) with a soft edge fade, and the still is the LAST
 frame (the open glowing box the popup holds after playback).
 
+set_complete: magenta like results, but a fixed square crop (badge + star burst) with the same soft
+edge fade (chroma_key_magenta.gdshader edge_fade uniform) and the LAST frame (glowing badge) as still.
+welcome_back: exactly like results (bbox crop, no fade) except the still is the LAST frame.
+
 Usage: python tools/build_result_scrubby_videos.py <flow_videos dir> [results|level_start|gift]
   results      result_scrubby_{win,lose}_master.mp4 -> assets/ui/final/popups/videos/ (default)
   level_start  level_start_scrubby_short_master.mp4 -> assets/ui/final/gameplay/videos/
   gift         gift_{box,crate}_opening_master.mp4 -> assets/ui/final/rewards/gift_videos/
+  set_complete set_complete_master.mp4 -> assets/ui/final/rewards/set_complete_video/
+  welcome_back welcome_back_master.mp4 -> assets/ui/final/popups/welcome_video/
 """
 import hashlib
 import subprocess
@@ -58,11 +65,35 @@ SETS = {
               "keeps the green (keyed at runtime by",
               "`scripts/ui/feel/chroma_key_green.gdshader`, same edge fade); the still is the LAST frame",
               "keyed to transparent with the same key at build time (the hold pose after playback).", ""]),
+    "set_complete": (Path("assets/ui/final/rewards/set_complete_video"),
+                     [("set_complete", "set_complete_master.mp4", "set_complete_badge", (48, 402, 624, 624))],
+                     ["# Collection set complete badge video: provenance (SB-VIDEO-007)", "",
+                      "Owner Flow video (Google Flow, Veo 3.1 Lite): the gold crowned set-complete badge pops,",
+                      "flaps its wings, a light sweep crosses it, a star burst rains and it ends glowing, on a",
+                      "magenta chroma background that drifts from ~#F802FA to ~#E136C8 (min(R,B)-G >= 140).",
+                      "720x1280, 24 fps, 190 frames; frames 0-181 are used (the last 8 frames dissolve the wings and turn",
+                      "the gold copper, so the hold pose is frame 181). The MP4 master stays in the owner checkout (`flow_videos/`,",
+                      "not committed) and is read-only.", "",
+                      "Built by `python tools/build_result_scrubby_videos.py flow_videos set_complete` (ffmpeg",
+                      "libtheora, numpy, Pillow). Crop = fixed square around the badge + the star burst (stars fill",
+                      "the whole frame, so a bbox would be the full frame); anything the crop cuts fades out over",
+                      "6 % of each side. The .ogv keeps the magenta (keyed at runtime by",
+                      "`scripts/ui/feel/chroma_key_magenta.gdshader` with edge_fade 0.06); the still is the LAST",
+                      "frame keyed to transparent with the same key at build time (the hold pose after playback).", ""]),
+    "welcome_back": (Path("assets/ui/final/popups/welcome_video"),
+                     [("welcome_back", "welcome_back_master.mp4", "welcome_back_scrubby")],
+                     ["# Welcome back Scrubby video: provenance (SB-VIDEO-008)", "",
+                      "Owner Flow video (Google Flow, Veo 3.1 Lite): Scrubby jumps, waves both hands, hugs himself,",
+                      "waves and ends near the start pose, on a magenta chroma background that drifts from ~#FA05F8",
+                      "to ~#E337CA (min(R,B)-G >= 140). 720x1280, 24 fps, 190 frames. The MP4 master stays in the",
+                      "owner checkout (`flow_videos/`, not committed) and is read-only.", "",
+                      "Built by `python tools/build_result_scrubby_videos.py flow_videos welcome_back` (ffmpeg libtheora,"]),
 }
 W, H = 720, 1280
 MARGIN = 16
 KEY_LO, KEY_HI = 0.15, 0.45   # keep in sync with chroma_key_magenta.gdshader / chroma_key_green.gdshader
-EDGE = 0.06                   # gift edge fade (UV fraction per side), keep in sync with chroma_key_green.gdshader
+TRIM = {"set_complete": 182}  # frames kept: the master's last 8 frames dissolve the wings and turn the gold copper
+EDGE = 0.06                   # gift / set_complete edge fade (UV fraction per side), keep in sync with the shaders
 
 
 def frames(path: Path) -> np.ndarray:
@@ -84,15 +115,15 @@ def crop_box(f: np.ndarray) -> tuple[int, int, int, int]:
     return box[0], box[2], box[1], box[3]   # x, y, w, h
 
 
-def key(rgb: np.ndarray) -> np.ndarray:
-    """Magenta -> alpha (soft edge) + despill R/B toward G only where R and B both exceed G."""
+def key(rgb: np.ndarray, edge: float = 0.0) -> np.ndarray:
+    """Magenta -> alpha (soft edge) + despill R/B toward G only where R and B both exceed G (x the edge fade)."""
     c = rgb.astype(np.float32) / 255.0
     m = np.minimum(c[..., 0], c[..., 2]) - c[..., 1]
     spill = np.maximum(m, 0.0)
     c[..., 0] -= spill
     c[..., 2] -= spill
     t = np.clip((m - KEY_LO) / (KEY_HI - KEY_LO), 0.0, 1.0)
-    a = 1.0 - t * t * (3.0 - 2.0 * t)   # 1 - smoothstep, as in the shader
+    a = (1.0 - t * t * (3.0 - 2.0 * t)) * (fade(m.shape, edge) if edge > 0.0 else 1.0)   # 1 - smoothstep, as in the shader
     return (np.dstack([c, a]) * 255.0 + 0.5).clip(0, 255).astype(np.uint8)
 
 
@@ -101,17 +132,21 @@ def smoothstep(e0: float, e1: float, x: np.ndarray) -> np.ndarray:
     return t * t * (3.0 - 2.0 * t)
 
 
+def fade(shape: tuple[int, int], edge: float) -> np.ndarray:
+    """Soft UV edge fade over `edge` of each side, as in the shaders."""
+    h, w = shape
+    u = (np.arange(w) + 0.5) / w
+    v = (np.arange(h) + 0.5) / h
+    return np.outer(smoothstep(0.0, edge, v) * smoothstep(0.0, edge, 1.0 - v),
+                    smoothstep(0.0, edge, u) * smoothstep(0.0, edge, 1.0 - u))
+
+
 def key_green(rgb: np.ndarray) -> np.ndarray:
     """Green -> alpha (soft edge) + despill G toward max(R, B) where G exceeds both, x the edge fade."""
     c = rgb.astype(np.float32) / 255.0
     m = c[..., 1] - np.maximum(c[..., 0], c[..., 2])
     c[..., 1] -= np.maximum(m, 0.0)
-    h, w = m.shape
-    u = (np.arange(w) + 0.5) / w
-    v = (np.arange(h) + 0.5) / h
-    fade = np.outer(smoothstep(0.0, EDGE, v) * smoothstep(0.0, EDGE, 1.0 - v),
-                    smoothstep(0.0, EDGE, u) * smoothstep(0.0, EDGE, 1.0 - u))
-    a = (1.0 - smoothstep(KEY_LO, KEY_HI, m)) * fade
+    a = (1.0 - smoothstep(KEY_LO, KEY_HI, m)) * fade(m.shape, EDGE)
     return (np.dstack([c, a]) * 255.0 + 0.5).clip(0, 255).astype(np.uint8)
 
 
@@ -124,27 +159,29 @@ def main(src: Path, which: str) -> None:
     out.mkdir(parents=True, exist_ok=True)
     rows = []
     gift = which == "gift"
+    edge = EDGE if which == "set_complete" else 0.0
+    last = which in ("gift", "set_complete", "welcome_back")
     for name, master_name, stem, *fixed in items:
         master = src / master_name
-        f = frames(master)
+        f = frames(master)[:TRIM.get(name)]
         x, y, w, h = fixed[0] if fixed else crop_box(f)
         ogv = out / f"{stem}.ogv"
         still = out / f"{stem}_still.png"
         cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(master), "-map", "0:v:0", "-an",
-               "-vf", f"crop={w}:{h}:{x}:{y}", "-c:v", "libtheora", "-q:v", "8", "-pix_fmt", "yuv420p",
+               *(["-frames:v", str(TRIM[name])] if name in TRIM else []), "-vf", f"crop={w}:{h}:{x}:{y}", "-c:v", "libtheora", "-q:v", "8", "-pix_fmt", "yuv420p",
                "-map_metadata", "-1", str(ogv)]
         subprocess.run(cmd, check=True)
-        hold = f[-1 if gift else 0, y:y + h, x:x + w]
-        Image.fromarray(key_green(hold) if gift else key(hold), "RGBA").save(still, optimize=True)
+        hold = f[-1 if last else 0, y:y + h, x:x + w]
+        Image.fromarray(key_green(hold) if gift else key(hold, edge), "RGBA").save(still, optimize=True)
         rows.append((name, master, f.shape[0], (x, y, w, h), ogv, still, cmd))
-    lines = header + ([] if gift else [
+    lines = header + ([] if gift or edge else [
              "numpy, Pillow). Crop = robot bounding box over all frames + 16 px, sides rounded up to 16.",
              "The .ogv keeps the magenta (keyed at runtime by",
-             "`scripts/ui/feel/chroma_key_magenta.gdshader`); the still is frame 0 keyed to",
+             "`scripts/ui/feel/chroma_key_magenta.gdshader`); the still is " + ("the LAST frame" if last else "frame 0") + " keyed to",
              "transparent with the same key at build time.", ""])
     for name, master, n, (x, y, w, h), ogv, still, cmd in rows:
         lines += [f"## {name.upper()}", "",
-                  f"- master `{master.name}` sha256 `{sha(master)}` ({n} frames)",
+                  f"- master `{master.name}` sha256 `{sha(master)}` ({n} frames{' used' if name in TRIM else ''})",
                   f"- crop x={x} y={y} w={w} h={h}",
                   f"- `{ogv.name}` sha256 `{sha(ogv)}` ({ogv.stat().st_size} bytes)",
                   f"- `{still.name}` sha256 `{sha(still)}` ({still.stat().st_size} bytes)",
