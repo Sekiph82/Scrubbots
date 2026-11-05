@@ -33,6 +33,7 @@ var _capacity: int = SLOT_COUNT
 var _slot_rects: Array = []     # explicit local Rect2 per slot (shell mode); [] = even layout
 var _shell_mode := false
 var _separation: float = UiTokens.SPACE_SM
+var _pulse_allowed := true      # SB-M22-008: off under Reduced Effects / pause
 
 func _ready() -> void:
 	custom_minimum_size.y = maxf(custom_minimum_size.y, UiTokens.FIVE_SLOT_STRIP_MIN_HEIGHT)
@@ -60,6 +61,13 @@ func is_shell_mode() -> bool:
 func _apply_mode(v) -> void:
 	if _shell_mode:
 		v.set_shell_mode(true)
+	v.set_pulse_allowed(_pulse_allowed)
+
+## SB-M22-008: allow/forbid the WAITING-slot pulse on every slot (5 or 6, incl. later ones).
+func set_waiting_pulse_allowed(on: bool) -> void:
+	_pulse_allowed = on
+	for v in _views:
+		v.set_pulse_allowed(on)
 
 func _layout_views() -> void:
 	var n := _views.size()

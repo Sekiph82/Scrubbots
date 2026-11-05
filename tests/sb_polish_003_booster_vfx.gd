@@ -170,16 +170,16 @@ func _batch_pop() -> void:
 		_vfx.set_process(false)
 		for k in range(3):
 			var p: Dictionary = _vfx._pops[0]
-			p["t"] = [0.1, 0.24, 0.36][k]
+			p["t"] = [0.3, 0.6, 0.95][k]
 			_vfx.queue_redraw()
 			await _frames(2)
 			_sub.get_texture().get_image().save_png(_evidence.path_join("batch_pop_%d.png" % (k + 1)))
 		_vfx.set_process(true)
 		_host.get_runtime().set_process(true)
 	var t1 := Time.get_ticks_msec()
-	while _vfx.pop_count() > 0 and Time.get_ticks_msec() - t1 < 2000:
+	while _vfx.pop_count() > 0 and Time.get_ticks_msec() - t1 < 3000:
 		await process_frame
-	_ok(_vfx.pop_count() == 0 and (Time.get_ticks_msec() - t1 <= 800 or _evidence != ""), "pop ended by itself (%d ms)" % (Time.get_ticks_msec() - t1))
+	_ok(_vfx.pop_count() == 0 and (Time.get_ticks_msec() - t1 <= _vfx.pop_duration() * 1000.0 + 300.0 or _evidence != ""), "pop ended by itself (%d ms)" % (Time.get_ticks_msec() - t1))
 	_ok(_vfx.get_child_count() == 1, "no nodes created by pops (overlay children %d, tree nodes %d -> %d)" % [_vfx.get_child_count(), nodes0, get_node_count()])
 	_host.get_runtime().set_process(false)
 

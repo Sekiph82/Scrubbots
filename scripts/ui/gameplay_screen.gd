@@ -191,7 +191,7 @@ func refresh_slot_snapshot(slot_snapshots: Array, batch_fx: bool = true) -> void
 			var was = _slot_snapshots[i]
 			var now = slot_snapshots[i]
 			if was is Dictionary and now is Dictionary and was.get("occupied", false) and not now.get("occupied", false):
-				_booster_vfx.pop_batch(views[i].get_global_rect(), _color_of(int(was.get("color_id", -1))))
+				_booster_vfx.pop_batch(views[i].get_tile().get_global_rect(), _color_of(int(was.get("color_id", -1))))
 	_slot_snapshots = slot_snapshots.duplicate(true)
 	if _five_slot_strip != null:
 		_five_slot_strip.bind_snapshots(_slot_snapshots, _palette_colors)
@@ -868,6 +868,12 @@ func set_paused(paused: bool) -> void:
 	_paused = paused
 	if _pause_glyph != null:
 		_pause_glyph.queue_redraw()
+	_sync_slot_pulse()
+
+## SB-M22-008: WAITING slots pulse unless Reduced Effects or paused.
+func _sync_slot_pulse() -> void:
+	if _five_slot_strip != null:
+		_five_slot_strip.set_waiting_pulse_allowed(not _reduced_effects and not _paused)
 
 func is_paused_visual() -> bool:
 	return _paused
@@ -994,6 +1000,8 @@ func set_reduced_effects(on: bool) -> void:
 	_reduced_effects = on
 	if on and _booster_vfx != null:
 		_booster_vfx.stop()
+		_booster_vfx.clear_pops()
+	_sync_slot_pulse()
 
 func get_booster_vfx():
 	return _booster_vfx

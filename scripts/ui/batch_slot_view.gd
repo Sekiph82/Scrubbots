@@ -26,6 +26,11 @@ const WAITING := "WAITING"
 const _TILE_INSET := 2.0
 const _HOUSING_BG := Color(0.12, 0.14, 0.18, 1.0)
 const _HOUSING_EDGE := Color(0.45, 0.50, 0.60, 1.0)
+## SB-M22-008 (owner 2026-11-03): an occupied slot in the authoritative WAITING (no reachable
+## target) state breathes its tile alpha 1.0 -> 0.94 -> 1.0 over 1.8 s (cosine, non-strobing).
+## Presentation only; ACTIVE / EMPTY never pulse; Reduced Effects / pause hold it static.
+const PULSE_PERIOD_S := 1.8
+const PULSE_DEPTH := 0.06
 
 var _snapshot: Dictionary = {}
 var _color: Color = Color(1, 0, 1, 1)
@@ -36,6 +41,8 @@ var _state_label: Label
 var _shell := false
 var _shell_tile_size := Vector2.ZERO
 var _reserve_base := Vector2.ZERO
+var _pulse_allowed := true
+var _pulse_t := 0.0
 
 func _ready() -> void:
 	if not _shell:
@@ -44,6 +51,7 @@ func _ready() -> void:
 	if _tile == null:
 		_build_children()
 	_reserve_state_line()   # in the tree now: the real theme font
+	_sync_pulse()   # Godot enables _process on ready
 
 func _build_children() -> void:
 	# M28-C002-C004: the shared ColorBatchTile draws the whole occupied/empty presentation and
@@ -147,6 +155,7 @@ func _refresh() -> void:
 	_state_label.text = ""   # V02/C004: the words WAITING / ACTIVE are never shown
 	_set_housing()
 	_apply_reserve()
+	_sync_pulse()
 	if not occupied:
 		_tile.set_empty(not _shell)   # shell: the baked slot frame is the empty housing
 		return
@@ -157,6 +166,27 @@ func _refresh() -> void:
 	# clear, so the displayed waiting count stays correct. The old "50 (2)" raw form is gone.
 	_tile.set_batch(_color, "%d" % get_display_count())
 	_tile.set_active(state == ACTIVE)   # visual only; WAITING is the plain occupied tile
+
+## SB-M22-008: false (Reduced Effects or paused) holds the WAITING tile static at full alpha.
+func set_pulse_allowed(on: bool) -> void:
+	_pulse_allowed = on
+	_sync_pulse()
+
+func is_pulsing() -> bool:
+	return _pulse_allowed and is_occupied_view() and get_state() == WAITING
+
+## Start/keep the pulse while WAITING; anything else ends it at once (alpha 1, phase reset).
+func _sync_pulse() -> void:
+	var on := is_pulsing()
+	if not on:
+		_pulse_t = 0.0
+		if _tile != null:
+			_tile.modulate.a = 1.0
+	set_process(on)
+
+func _process(delta: float) -> void:
+	_pulse_t = fmod(_pulse_t + delta, PULSE_PERIOD_S)
+	_tile.modulate.a = 1.0 - PULSE_DEPTH * 0.5 * (1.0 - cos(TAU * _pulse_t / PULSE_PERIOD_S))
 
 ## Slot housing: baked into the shell art in production (draw nothing); the legacy non-shell
 ## strip keeps a plain housing so the tile still reads as a cartridge inside it.
