@@ -37,7 +37,9 @@ Planning data only; the art itself is not supplied yet and the game loads nothin
 `data/art_manifests/world10_sunken_harbor_v1.json` lists the 150 distinct standalone level PNG slots L1351-1500
 (15 batches of 10, `level_<NNNN>_<subject>_<W>x<H>.png`, grid 20..59 per side, palette V3 C01..C16 with 3..12
 colours, alpha 255 or VOID 0 only), 8 world UI, 8 decor, 4 FX and 3 marketing PNG slots (size, aspect, alpha,
-use) and 3 optional videos (intro 6-8 s, complete 5-7 s, teaser 10-15 s). Every entry starts `PLANNED` with
+use) and 3 optional videos (intro 6-8 s, complete 5-7 s, teaser 10-15 s). The support PNG and video sizes are
+planning values chosen by the factory builder (`supportPngSizeSource`), not owner-specified; the owner may change
+them when the art is commissioned. Every entry starts `PLANNED` with
 empty sha256/provenance/license/sign-off; no collages, atlases, sprite sheets, cropping or automatic slicing.
 `python tools/validate_world_art_manifest.py` checks the schema, counts, range and batching, and for supplied
 files the hash, size/alpha and (levels) the `tools/audit_level_art.py` palette/grid/VOID rules; `--self-test`
