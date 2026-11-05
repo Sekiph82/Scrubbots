@@ -53,9 +53,9 @@
       "repository_path": "assets/ui/final/characters/scrubby/scrubby_master.png",
       "owner_decision": "2026-10-23: authoritative Scrubby master; do not replace or regenerate",
       "supplementary_references": [
-        "assets/art/references/_owner_inbox/Game Screens/main screen.png",
-        "assets/art/references/_owner_inbox/Collection Cards/meet the scrubbots.jpeg"
-      ]
+        "assets/art/references/_owner_inbox/Game Screens/main screen.png"
+      ],
+      "supplementary_references_deleted": "Collection Cards/meet the scrubbots.jpeg, git rm SB-M22-030 (owner 2026-11-05: card set finished); git history keeps it"
     },
     "profile_master_v01": {
       "repository_path": "assets/ui/generated/masters/scrubbots_profile_master_v01.png",
@@ -309,7 +309,7 @@
       "category": "profile_icon",
       "provider": "crop_of_master",
       "source": "assets/ui/generated/masters/scrubbots_profile_master_v01.png",
-      "raw_generated_path": "assets/ui/generated/profile/profile_no_booster_icon_crop_v01.png",
+      "raw_generated_path_deleted": "assets/ui/generated/profile/profile_no_booster_icon_crop_v01.png (git rm SB-M22-030, owner 2026-11-05: promoted to target_path)",
       "target_path": "assets/ui/final/profile/profile_no_booster_icon.png",
       "status": "PROMOTED_BY_CLAUDE_DELEGATED",
       "date": "2026-10-31",
@@ -322,7 +322,7 @@
       "category": "profile_icon",
       "provider": "crop_of_master",
       "source": "assets/ui/generated/masters/scrubbots_profile_master_v01.png",
-      "raw_generated_path": "assets/ui/generated/profile/profile_trophy_icon_crop_v01.png",
+      "raw_generated_path_deleted": "assets/ui/generated/profile/profile_trophy_icon_crop_v01.png (git rm SB-M22-030, owner 2026-11-05: promoted to target_path)",
       "target_path": "assets/ui/final/profile/profile_trophy_icon.png",
       "status": "PROMOTED_BY_CLAUDE_DELEGATED",
       "date": "2026-10-31",
@@ -335,7 +335,7 @@
       "category": "profile_icon",
       "provider": "crop_of_master",
       "source": "assets/ui/generated/masters/scrubbots_achievements_master_v01.png",
-      "raw_generated_path": "assets/ui/generated/profile/achievement_crown_icon_crop_v01.png",
+      "raw_generated_path_deleted": "assets/ui/generated/profile/achievement_crown_icon_crop_v01.png (git rm SB-M22-030, owner 2026-11-05: promoted to target_path)",
       "target_path": "assets/ui/final/profile/achievement_crown_icon.png",
       "status": "PROMOTED_BY_CLAUDE_DELEGATED",
       "date": "2026-10-31",
@@ -349,7 +349,7 @@
       "provider": "crop_of_master",
       "source": "assets/ui/generated/masters/scrubbots_events_master_v01.png",
       "crop_box": [142, 406, 724, 617],
-      "raw_generated_path": "assets/ui/generated/events/event_weekly_hero_raw.png",
+      "raw_generated_path_deleted": "assets/ui/generated/events/event_weekly_hero_raw.png (git rm SB-M22-030, owner 2026-11-05: promoted to target_path)",
       "target_path": "assets/ui/final/events/event_weekly_hero.png",
       "status": "PROMOTED_BY_CLAUDE_DELEGATED",
       "date": "2026-10-31",
@@ -432,7 +432,8 @@
     "master_visual_authority": "coordination/OWNER_GAMEPLAY_MASTER_VISUAL_V01.md",
     "generated_asset_pack": {
       "path": "assets/ui/generated/gameplay/master_v01/svg/manifest.json",
-      "status": "GENERATED_CANDIDATE_PACK_COMPLETE",
+      "status": "DELETED_SB_M22_030",
+      "deleted_note": "owner 2026-11-05: the 27 SVG candidates, manifest.json and README were git rm'd; every slot has its approved Phase 1 final under assets/ui/final/gameplay/; git history keeps them",
       "format": "svg",
       "individual_asset_count": 27,
       "note": "All image-based gameplay components have individual generated SVG candidates. Dynamic/live Godot elements remain code/native UI."

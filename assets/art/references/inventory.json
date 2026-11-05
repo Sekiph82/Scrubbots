@@ -35,9 +35,9 @@
       "repository_path": "assets/ui/final/characters/scrubby/scrubby_master.png",
       "status": "OWNER_RESOLVED",
       "supplementary_paths": [
-        "assets/art/references/_owner_inbox/Game Screens/main screen.png",
-        "assets/art/references/_owner_inbox/Collection Cards/meet the scrubbots.jpeg"
+        "assets/art/references/_owner_inbox/Game Screens/main screen.png"
       ],
+      "supplementary_paths_deleted": "Collection Cards/meet the scrubbots.jpeg, git rm SB-M22-030 (owner 2026-11-05: card set finished); git history keeps it",
       "notes": "Owner decision 2026-10-23: scrubby_master.png is the authoritative character master (do not replace or regenerate). main screen.png = Home composition reference; meet the scrubbots.jpeg = supplementary character reference."
     }
   },
@@ -75,7 +75,8 @@
     },
     {
       "id": "inbox_app_icon_small",
-      "repositoryPath": "assets/art/references/_owner_inbox/app icon (small).png",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/app icon (small).png",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "app icon (small).png",
       "sha256": "6EA49B9ED381D7FBA57248D66EFA33D57D7F85D1915D80C2FA1325CFF93CE86E",
       "width": 1254,
@@ -90,7 +91,8 @@
     },
     {
       "id": "inbox_app_icon",
-      "repositoryPath": "assets/art/references/_owner_inbox/app icon.png",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/app icon.png",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "app icon.png",
       "sha256": "10A8DE503CD8E1B47F9C661BB8FA5A7CCF43FB39C3BA079472AE35F4D22C6DBB",
       "width": 1254,
@@ -105,7 +107,8 @@
     },
     {
       "id": "inbox_collection_bath_time_blitz",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/bath time blitz.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/bath time blitz.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/bath time blitz.jpeg",
       "sha256": "80306FE2C273DAAAA6845A9875691428ACACA4BBF4D272E3F1E92A309E264CF3",
       "width": 1023,
@@ -120,7 +123,8 @@
     },
     {
       "id": "inbox_collection_bathroom_mayhem",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/bathroom mayhem.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/bathroom mayhem.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/bathroom mayhem.jpeg",
       "sha256": "AFB1C5B52E4D635FF260C7590119DA91D7FA621DEC56617C694B9B3EE066CF3E",
       "width": 1023,
@@ -135,7 +139,8 @@
     },
     {
       "id": "inbox_collection_clean_city",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/clean city.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/clean city.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/clean city.jpeg",
       "sha256": "D209168F66742812FC377A762BF0D9E97BC53C1A127827184788D2A35507358A",
       "width": 1023,
@@ -150,7 +155,8 @@
     },
     {
       "id": "inbox_collection_cleaning_crew",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/cleaning crew.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/cleaning crew.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/cleaning crew.jpeg",
       "sha256": "3EE5C6BE5BD88436881D36E4C56AC815392D1E23100CF68E867AB19F193F9B9C",
       "width": 1024,
@@ -165,7 +171,8 @@
     },
     {
       "id": "inbox_collection_cleaning_crew_2",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/cleaning crew 2.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/cleaning crew 2.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/cleaning crew 2.jpeg",
       "sha256": "3EE5C6BE5BD88436881D36E4C56AC815392D1E23100CF68E867AB19F193F9B9C",
       "width": 1024,
@@ -180,7 +187,8 @@
     },
     {
       "id": "inbox_collection_color_bots",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/color bots.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/color bots.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/color bots.jpeg",
       "sha256": "AE7D3D4D0AC7D22A1E84E863E6EB9090C6E7E48FBC519E3EF538C00BBD0B5BC4",
       "width": 1024,
@@ -195,7 +203,8 @@
     },
     {
       "id": "inbox_collection_garage_grime",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/garage grime.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/garage grime.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/garage grime.jpeg",
       "sha256": "54ABFCD74127D502587C964350AB57BE6F61E0D5D180BC3CA17B201322D23F02",
       "width": 1023,
@@ -210,7 +219,8 @@
     },
     {
       "id": "inbox_collection_jungle_cleanup",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/jungle cleanup.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/jungle cleanup.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/jungle cleanup.jpeg",
       "sha256": "A1A319FA995F0DD425F5AABFD037D69F63F25CB2F0272FE06E0D202B91308859",
       "width": 1023,
@@ -225,7 +235,8 @@
     },
     {
       "id": "inbox_collection_kitchen_chaos",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/kitchen chaos.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/kitchen chaos.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/kitchen chaos.jpeg",
       "sha256": "5E0D96CEFA96FD42C3E04BD573AFEFE9524016B6682B62B19923350C0DDAC831",
       "width": 1023,
@@ -240,7 +251,8 @@
     },
     {
       "id": "inbox_collection_meet_the_scrubbots",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/meet the scrubbots.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/meet the scrubbots.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/meet the scrubbots.jpeg",
       "sha256": "AA55DDBE5ADD2CFAD58A27CCB3882CDF484C433D04971C32001F1901C8326FFC",
       "width": 1024,
@@ -255,7 +267,8 @@
     },
     {
       "id": "inbox_collection_mess_monsters",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/mess monsters.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/mess monsters.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/mess monsters.jpeg",
       "sha256": "B475BABD72936F0B8C7B15B96D87542B5CC1E2A183D3686CE3AC88D746D514D0",
       "width": 1024,
@@ -270,7 +283,8 @@
     },
     {
       "id": "inbox_collection_scrubbot_workshop",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/scrubbot workshop.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/scrubbot workshop.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/scrubbot workshop.jpeg",
       "sha256": "E2EFF0A623C99621EA31B86F0A132CBD8D266782E65E2A3DC7004A51DFEFB9DF",
       "width": 1023,
@@ -285,7 +299,8 @@
     },
     {
       "id": "inbox_collection_sewer_squad",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/sewer squad.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/sewer squad.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/sewer squad.jpeg",
       "sha256": "2DDDD8D54E8C24E623C7225F24E15FF680179A3E2E6751B343A5E9BE65536518",
       "width": 1023,
@@ -300,7 +315,8 @@
     },
     {
       "id": "inbox_collection_space_cleaners",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/space cleaners.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/space cleaners.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/space cleaners.jpeg",
       "sha256": "55FE966C31C2817FF2E2CCABA8C5B2B740E48A5FA0DF942DAF0B198AB3DDA143",
       "width": 1024,
@@ -315,7 +331,8 @@
     },
     {
       "id": "inbox_collection_ultimate_cleaners",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/ultimate cleaners.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/ultimate cleaners.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/ultimate cleaners.jpeg",
       "sha256": "2B9AEFB553176163A67AA5C60B7905F3E63C57A52B2D22B201ECCF487D344071",
       "width": 1023,
@@ -330,7 +347,8 @@
     },
     {
       "id": "inbox_collection_underwater_heroes",
-      "repositoryPath": "assets/art/references/_owner_inbox/Collection Cards/underwater heroes.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Collection Cards/underwater heroes.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Collection Cards/underwater heroes.jpeg",
       "sha256": "B241597AE863A90535EDBE4220F6D30FD41B81B2EBBAA790209E0B133A7C3A63",
       "width": 1023,
@@ -345,7 +363,8 @@
     },
     {
       "id": "inbox_colorful_logo",
-      "repositoryPath": "assets/art/references/_owner_inbox/Colorful logo.png",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Colorful logo.png",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Colorful logo.png",
       "sha256": "4048DA72F3CABA4E9EAA583160AB27D7FCFA71D96E428A9BF1CF8EC42B9E1A41",
       "width": 2172,
@@ -780,7 +799,8 @@
     },
     {
       "id": "inbox_logo_simple",
-      "repositoryPath": "assets/art/references/_owner_inbox/logo simple.png",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/logo simple.png",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "logo simple.png",
       "sha256": "2324B545ADD23C0240FC4C2FAE8F0AC2BECE4DF9542F17157DE483D4A7E5536B",
       "width": 2172,
@@ -795,7 +815,8 @@
     },
     {
       "id": "inbox_playing_motors_001",
-      "repositoryPath": "assets/art/references/_owner_inbox/Playing Motors/game playing motors 001.jpeg",
+      "deletedRepositoryPath": "assets/art/references/_owner_inbox/Playing Motors/game playing motors 001.jpeg",
+      "deleted": "git rm SB-M22-030, owner 2026-11-05: its final is made; git history keeps it",
       "originalRelativePath": "Playing Motors/game playing motors 001.jpeg",
       "sha256": "E8CA1ACB09947C8CABA8BB1368ECCFB9CB3CB1F4A825322BB61EC2934518C84F",
       "width": 738,
