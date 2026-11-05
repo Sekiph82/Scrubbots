@@ -17,6 +17,7 @@ extends "res://scripts/ui/ceremony/standard_pack_ceremony.gd"
 ## RNG, grant, Collection / Cards Exchange mutation, save or navigation.
 ## SB-POLISH-010 V04: the same storyboard stages as Standard, a bit grander: gold rim glow and
 ## rays, more confetti, five face-down cards in the fan (each flies from its frame-09 back).
+## SB-VIDEO-004: the gold Flow opening video, same rules as Standard (SB-VIDEO-003).
 
 const PremiumPackModel = preload("res://scripts/ui/ceremony/premium_pack_model.gd")
 const PREMIUM_SELF_PATH := "res://scripts/ui/ceremony/premium_pack_ceremony.gd"
@@ -30,6 +31,7 @@ const BACKS := [Vector2(278, 415), Vector2(395, 409), Vector2(512, 403), Vector2
 const FRAME_SIZE := Vector2(1024, 1536)
 const PREMIUM_ACCENT := Color(1.0, 0.78, 0.25)
 const PREMIUM_CONFETTI := 90
+const PREMIUM_VIDEO_NAME := "pack_open_premium"   ## SB-VIDEO-004 gold opening video
 
 ## {ok, reason, popup}: a ceremony only for a valid committed Premium model; otherwise fail closed.
 static func create_premium(model, reduced := false) -> Dictionary:
@@ -51,6 +53,9 @@ func _init(model: Dictionary = {}, reduced := false) -> void:
 
 func _frame_paths() -> Array:
 	return PACK_FRAMES.map(func(f): return PREMIUM_FRAME_DIR + f)
+
+func _video_name() -> String:
+	return PREMIUM_VIDEO_NAME
 
 ## Standard geometry (title, hint, stage, destinations, card width), then the five card slots
 ## as a centred 3 + 2 block between the destinations and the hint.

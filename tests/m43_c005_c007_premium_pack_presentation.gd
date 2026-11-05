@@ -5,6 +5,7 @@ extends SceneTree
 ## Premium fixtures. Player taps are real InputEventMouseButton through SubViewport.push_input.
 ## The real CardPackService is exercised only to prove the 5-draw / first-draw-Rare+ invariant.
 ## Expected/completed case ledger.
+## SB-VIDEO-004: p20 the gold Flow opening video (the FULL default; the native cases set video = null).
 ##
 ## Run: godot --headless --path . -s res://tests/m43_c005_c007_premium_pack_presentation.gd
 
@@ -40,7 +41,7 @@ var EXPECTED_CASES := [
 	"p06_service_invariant", "p07_idle_no_autostart", "p08_tap1_cadence", "p09_emerge_hold_3_2",
 	"p10_destinations", "p11_tap2_required", "p12_mixed_routing", "p13_repeat_all_new",
 	"p14_no_state_mutation", "p15_complete_once", "p16_lifecycle", "p17_reduced", "p18_static_guard",
-	"p19_card_truth",
+	"p19_card_truth", "p20_video",
 ]
 
 var _fail := 0
@@ -71,6 +72,7 @@ func _initialize() -> void:
 	await _p17_reduced()
 	_p18_static_guard()
 	await _p19_card_truth()
+	await _p20_video()
 	_unmount()
 	await _frames(3)
 	_cleanup()
@@ -494,6 +496,34 @@ func _p17_reduced() -> void:
 	_ok(done == ["p17r"], "Reduced: routes and completes once")
 	_complete("p17_reduced")
 
+## SB-VIDEO-004: FULL picks the gold Premium video; it plays to its end on ONE decoder, the decoder
+## is freed at the flash, the held Premium flash fades into the native 5-card reveal; Reduced: none.
+func _p20_video() -> void:
+	print("[p20 Premium Flow opening video]")
+	var p = _push(Fx.mixed("p20"), false, true)
+	await _frames(2)
+	var poster: TextureRect = p.get_video_poster()
+	_ok(p.video != null and p.video.resource_path == PremiumPackCeremony.VIDEO_DIR + "pack_open_premium.ogv" and poster.texture.resource_path.ends_with("pack_open_premium_first.png") and poster.is_visible_in_tree() and not p.get_stage().is_visible_in_tree(), "FULL: gold video chosen, its first-frame poster in IDLE")
+	_ok(p.get_layer().get_node("Title").text == UiText.t("PACK_PREMIUM_TITLE") and p.get_hint().text == UiText.t("PACK_TAP_OPEN") and p.phase() == "IDLE", "PREMIUM PACK title, 'Tap to open'")
+	_tap()
+	await _frames(3)
+	_ok(p.get_video_player() != null and p.get_video_player().is_playing() and p.find_children("*", "VideoStreamPlayer", true, false).size() == 1, "Tap 1: one decoder playing")
+	Engine.time_scale = 8.0
+	var deadline := Time.get_ticks_msec() + 20000
+	while p.get_video_player() != null and Time.get_ticks_msec() < deadline:
+		await process_frame
+	Engine.time_scale = 1.0
+	_ok(p.get_video_player() == null and p.find_children("*", "VideoStreamPlayer", true, false).is_empty() and poster.texture.resource_path.ends_with("pack_open_premium_flash.png"), "video ran to its end: decoder freed, the gold flash held")
+	await _until(p, "AWAIT_ROUTE")
+	var cvs: Array = p.get_card_views()
+	_ok(cvs.size() == 5 and poster.modulate.a == 0.0 and cvs.all(func(cv): return cv.settle == 1.0 and cv.is_visible_in_tree() and cv.face_center().distance_to(cv.slot_point()) < 0.5), "flash faded into the native reveal: 5 cards face-up at their slots")
+	_close(p)
+	var r = _push(Fx.mixed("p20_red"), true, true)
+	_ok(r.video == null and not r.get_video_poster().visible and r.get_stage().is_visible_in_tree(), "Reduced: no video, the native Premium pack")
+	_close(r)
+	await _frames(2)
+	_complete("p20_video")
+
 func _p18_static_guard() -> void:
 	print("[p18 static authority guard]")
 	for path in SOURCES:
@@ -523,11 +553,13 @@ class RewardStub:
 	func already_applied(_tx) -> bool:
 		return false
 
-func _push(model: Dictionary, reduced := false):
+func _push(model: Dictionary, reduced := false, video := false):
 	var r := PremiumPackCeremony.create_premium(model, reduced)
 	if not r["ok"]:
 		_ok(false, "fixture rejected: %s" % r["reason"])
 		return null
+	if not video:
+		r["popup"].video = null   # the native stages 1-3 (every case before p20)
 	_stack.push(r["popup"])
 	return r["popup"]
 

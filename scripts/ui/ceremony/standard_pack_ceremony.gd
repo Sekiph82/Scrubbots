@@ -55,6 +55,13 @@ extends "res://scripts/ui/popup/base_popup.gd"
 ## order and routing never change. Ambient motion (drop, shake, rays, rim pulse) runs in
 ## _process, never as a tween; the particles are two fixed CPUParticles2D freed with the popup.
 ## Reduced Effects: no drop / shake / particles / burst / flip / spin (the short version above).
+##
+## SB-VIDEO-003/004 — the owner's Flow opening video replaces stages 1-3 (FULL only): IDLE shows
+## its first frame as a full-screen cover poster (same cover rule as the backdrop, title on top);
+## Tap 1 plays it; it ends on the bright flash (its last frame, held as a still), which fades out
+## while stage 4 runs natively (face-down fan, flip reveal, COLLECT). A tap during the video jumps
+## to the flash. One decoder, only while it plays, freed at the flash or when the ceremony closes.
+## Reduced Effects, a missing asset or a video that fails to start = the native stages 1-3.
 
 signal presentation_completed(presentation_id: String)
 
@@ -82,6 +89,10 @@ const SPARKLE := "res://assets/ui/final/gameplay/effects/fx_clean_sparkle.png"
 const ACCENT := Color(0.30, 0.68, 1.0)          ## Standard rim glow / rays (blue)
 const CONFETTI := [Color(1.0, 0.82, 0.20), Color(0.35, 0.85, 1.0), Color(1.0, 0.45, 0.70), Color(0.55, 0.95, 0.40), Color(1, 1, 1)]
 const CONFETTI_AMOUNT := 48
+## SB-VIDEO-003/004 (see assets/ui/final/rewards/pack_opening/videos/PROVENANCE.md).
+const VIDEO_DIR := "res://assets/ui/final/rewards/pack_opening/videos/"
+const VIDEO_NAME := "pack_open_standard"
+const FLASH_OUT_S := 0.35          ## the held flash fades into the native reveal
 
 ## Timing (s): [FULL, REDUCED]. FULL opening (Tap 1 -> destinations) stays within 2.5..4.0 s.
 ## FRAME_HOLD[i] = how long frame i (1-based) stays bound before frame i+1 (FULL only).
@@ -118,6 +129,9 @@ var pack_frame: int = 1:
 ## 0..1 over the one FULL celebration step; drives each NEW card's own pulse window.
 var celebration := 0.0:
 	set = _set_celebration
+## The opening video (stages 1-3); null = the native stages 1-3. Set before Tap 1.
+var video: VideoStream:
+	set = _set_video
 
 var _model: Dictionary
 var _reduced := false
@@ -153,6 +167,9 @@ var _burst := 0.0
 var _ix_out := 0               ## open-plan step indices: pack-out, first settle, destinations
 var _ix_settle := 0
 var _ix_dest := 0
+var _poster: TextureRect       ## video cover still: first frame (IDLE), then the flash
+var _player: VideoStreamPlayer ## the one decoder, only while the video plays
+var _video_run := false        ## the open run starts at the flash (no pack frames)
 
 ## {ok, reason, popup}: a ceremony only for a valid committed model; otherwise fail closed.
 static func create(model, reduced := false) -> Dictionary:
@@ -180,7 +197,11 @@ func _init(model: Dictionary = {}, reduced := false) -> void:
 	for path in _frame_paths():
 		_frame_tex.append(load(path))
 	_build()
-	closed.connect(func(_r): _seq.cancel())
+	if not _reduced:
+		video = load(VIDEO_DIR + _video_name() + ".ogv") as VideoStream
+	closed.connect(func(_r):
+		_seq.cancel()
+		_stop_video())
 
 ## Ambient motion is FULL only (set here: entering the tree re-enables _process).
 func _ready() -> void:
@@ -189,6 +210,10 @@ func _ready() -> void:
 ## The nine opening frame paths, 01..09 (M43-C005-C007: a pack subclass supplies its own family).
 func _frame_paths() -> Array:
 	return PACK_FRAMES.map(func(f): return FRAME_DIR + f)
+
+## The opening video's base name in VIDEO_DIR (.ogv, _first.png, _flash.png); Premium has its own.
+func _video_name() -> String:
+	return VIDEO_NAME
 
 func _build() -> void:
 	# Full-screen backdrop on the scrim (under the safe area): blurred, darkened Home + spotlight.
@@ -203,6 +228,11 @@ func _build() -> void:
 	spot.stretch_mode = TextureRect.STRETCH_SCALE
 	spot.texture = _radial([Color(0.45, 0.75, 1.0, 0.22), Color(0, 0, 0, 0.30), Color(0, 0, 0, 0.78)], [0.0, 0.45, 1.0])
 	_scrim.add_child(spot)
+	_poster = HomeStyle.art("VideoPoster")   # cover-framed exactly like the backdrop
+	_poster.set_anchors_preset(Control.PRESET_FULL_RECT)
+	_poster.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
+	_poster.visible = false
+	_scrim.add_child(_poster)
 	_layer = Control.new()
 	_layer.name = "Ceremony"
 	_layer.set_anchors_preset(Control.PRESET_FULL_RECT)
@@ -414,10 +444,19 @@ func tap() -> bool:
 	if not (is_open() and is_top()):
 		return false
 	var pid := String(_model.get("presentation_id", ""))
+	if _phase == Phase.IDLE and video != null:
+		if _start_video():
+			_phase = Phase.OPENING
+			_hint.visible = false
+			return true
+		video = null   # failed to start: the native stages 1-3
 	if _phase == Phase.IDLE and _seq.play(pid + ":open", _open_plan()):
 		_phase = Phase.OPENING
 		_hint.visible = false
 		_drop = 1.0
+		return true
+	if _phase == Phase.OPENING and _player != null:
+		_end_video()   # skip straight to the flash, then the reveal
 		return true
 	if _phase == Phase.OPENING:
 		return _skip_stage()
@@ -431,7 +470,7 @@ func tap() -> bool:
 ## Skip to the next stage start (BURST = frame 04, REVEAL = pack-out), else to the settled hold.
 func _skip_stage() -> bool:
 	if not _reduced:
-		for mark in [3, _ix_out]:
+		for mark in ([_ix_out] if _video_run else [3, _ix_out]):
 			if _seq.skip_to(mark):
 				return true
 	_seq.finish()
@@ -441,15 +480,84 @@ func _on_input(event: InputEvent) -> void:
 	if (event is InputEventMouseButton or event is InputEventScreenTouch) and event.pressed:
 		tap()
 
+# ------------------------------------------------------------------ video (SB-VIDEO-003/004) --
+
+## A video replaces the native pack, its rim and rays with its first-frame poster; null restores them.
+func _set_video(v: VideoStream) -> void:
+	video = v
+	_poster.texture = _video_still("first") if v != null else null
+	_poster.modulate.a = 1.0
+	_poster.visible = v != null
+	_stage.visible = v == null
+	_rays.visible = v == null
+
+func _video_still(kind: String) -> Texture2D:
+	return load(VIDEO_DIR + _video_name() + "_" + kind + ".png") as Texture2D
+
+## The one decoder, cover-framed over the poster on the scrim (under the title). False = it
+## could not play: nothing is left behind.
+func _start_video() -> bool:
+	var box := AspectRatioContainer.new()
+	box.name = "VideoBox"
+	box.set_anchors_preset(Control.PRESET_FULL_RECT)
+	box.ratio = 720.0 / 1280.0
+	box.stretch_mode = AspectRatioContainer.STRETCH_COVER
+	box.clip_contents = true
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_player = VideoStreamPlayer.new()
+	_player.name = "PackVideo"
+	_player.expand = true
+	_player.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_player.stream = video
+	box.add_child(_player)
+	_scrim.add_child(box)
+	_player.finished.connect(_on_video_finished.bind(_player), CONNECT_DEFERRED)
+	_player.play()
+	if not _player.is_playing() or _player.get_stream_length() <= 0.0:
+		_stop_video()
+		return false
+	return true
+
+func _on_video_finished(player) -> void:   # untyped: may be a freed player
+	if player == _player and _phase == Phase.OPENING:
+		_end_video()
+
+func _stop_video() -> void:
+	if _player == null:
+		return
+	var box := _player.get_parent()
+	_player.stop()
+	_scrim.remove_child(box)
+	box.queue_free()
+	_player = null
+
+## The flash: free the decoder, hold the video's last frame, fade it into the native stage 4.
+func _end_video() -> void:
+	_stop_video()
+	_poster.texture = _video_still("flash")
+	_rays.visible = true
+	_video_run = true
+	_seq.play(String(_model.get("presentation_id", "")) + ":open", _open_plan(true))
+
+func get_video_player() -> VideoStreamPlayer:
+	return _player
+
+func get_video_poster() -> TextureRect:
+	return _poster
+
 ## FULL: frames 01..09 (each after its hold), the cards fly face-down from the pack mouth into
 ## the fan in model order, the pack fades out, each card flips face-up into its slot, the NEW
 ## celebration, a short hold, then the destinations appear.
 ## REDUCED: frame 09 only (briefly), cards fade in face-up at their slots, same hold/destinations.
-func _open_plan() -> Array:
+## FROM VIDEO: no pack frame; the held flash fades out, then the FULL steps from the fly-out on.
+func _open_plan(from_video := false) -> Array:
 	var r := 1 if _reduced else 0
 	var n := _cards.size()
 	var steps: Array = []
 	var first := 0 if not _reduced else PACK_FRAMES.size() - 1
+	if from_video:
+		first = PACK_FRAMES.size()
+		steps.append({"target": _poster, "property": "modulate:a", "from": 1.0, "to": 0.0, "duration": FLASH_OUT_S})
 	for i in range(first, PACK_FRAMES.size()):
 		var s := {"target": self, "property": "pack_frame", "to": i + 1, "duration": 0.0, "delay": FRAME_HOLD[i] if i > first else 0.0}
 		if i == first:
@@ -591,7 +699,7 @@ func _process(delta: float) -> void:
 	_burst = maxf(_burst - delta * 2.5, 0.0)
 	_burst_fx.modulate.a = _burst
 	_burst_fx.visible = _burst > 0.0
-	_sparkles.emitting = _phase == Phase.OPENING or _phase == Phase.AWAIT_ROUTE
+	_sparkles.emitting = (_phase == Phase.OPENING and _player == null) or _phase == Phase.AWAIT_ROUTE
 	_hint.modulate.a = 0.75 + 0.25 * sin(_t * 4.0)
 
 ## Slowly turning light rays from the pack centre, fading outward.

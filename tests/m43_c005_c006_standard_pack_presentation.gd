@@ -5,6 +5,8 @@ extends SceneTree
 ## frames + canonical C003 cards, deterministic COMMITTED fixture models. Player taps are
 ## delivered as real InputEventMouseButton through SubViewport.push_input (both gates).
 ## Expected/completed case ledger.
+## SB-VIDEO-003: v18..v21 the Flow opening video (the FULL default; the native cases above set
+## video = null).
 ##
 ## Run: godot --headless --path . -s res://tests/m43_c005_c006_standard_pack_presentation.gd
 
@@ -46,6 +48,7 @@ var EXPECTED_CASES := [
 	"v09_no_state_mutation", "v10_complete_once", "v11_lifecycle_back", "v12_reduced_semantics",
 	"v13_full_cadence", "v14_rendered_alpha_clean",
 	"v15_tap_skips_stages", "v16_opening_length", "v17_storyboard_dressing",
+	"v18_video_chosen", "v19_video_skip_reveal", "v20_video_fallback_reduced", "v21_video_freed",
 ]
 
 var _fail := 0
@@ -78,6 +81,7 @@ func _initialize() -> void:
 	_v14_rendered_alpha_clean()
 	await _v15_tap_skips_stages()
 	_v16_opening_length()
+	await _v18_video()
 	await _v17_storyboard_dressing()
 	_c12_static_guard()
 	_c13_model_sensitivity()
@@ -440,6 +444,7 @@ func _v11_lifecycle_back() -> void:
 	var other = ModalStack.new()
 	host.add_child(other)
 	var lone = StandardPackCeremony.create(Fx.mixed("v11_free"))["popup"]
+	lone.video = null
 	other.push(lone)
 	await process_frame
 	var tw2 := _tweens()
@@ -608,6 +613,66 @@ func _v17_storyboard_dressing() -> void:
 	_close(r)
 	_complete("v17_storyboard_dressing")
 
+## SB-VIDEO-003: FULL picks the Flow video (first-frame poster in IDLE, no native pack); Tap 1
+## plays ONE decoder on the scrim; a tap jumps to the held flash (decoder freed), which fades into
+## the native reveal with the same cards and routes; a failing video and Reduced run the native
+## stages; closing mid-video frees the decoder.
+func _v18_video() -> void:
+	print("[v18..v21 Flow opening video]")
+	var p = _push(Fx.mixed("v18"), false, true)
+	await _frames(2)
+	var poster: TextureRect = p.get_video_poster()
+	_ok(p.video != null and p.video.resource_path == StandardPackCeremony.VIDEO_DIR + "pack_open_standard.ogv", "FULL: the Standard Flow video is chosen")
+	_ok(p.phase() == "IDLE" and poster.is_visible_in_tree() and poster.texture.resource_path.ends_with("pack_open_standard_first.png") and poster.stretch_mode == TextureRect.STRETCH_KEEP_ASPECT_COVERED and poster.get_parent().name == "Scrim", "IDLE: first-frame poster, cover-framed on the scrim")
+	_ok(not p.get_stage().is_visible_in_tree() and p.get_hint().text == UiText.t("PACK_TAP_OPEN") and _players(p) == 0, "IDLE: no native pack, 'Tap to open', no decoder yet")
+	_tap(p)
+	await _frames(3)
+	var v: VideoStreamPlayer = p.get_video_player()
+	_ok(p.phase() == "OPENING" and v != null and v.is_playing() and _players(p) == 1 and v.mouse_filter == Control.MOUSE_FILTER_IGNORE, "Tap 1: one decoder playing")
+	_ok(v != null and (v.get_parent() as AspectRatioContainer).stretch_mode == AspectRatioContainer.STRETCH_COVER and v.get_parent().get_parent().name == "Scrim" and p.get_layer().get_node("Title").is_visible_in_tree(), "video cover-framed on the scrim, the title on top")
+	_ok(p.frame_history().is_empty() and not p.get_sequencer().is_active(), "no native frame, no run while the video plays")
+	_complete("v18_video_chosen")
+	var done := {}
+	p.closed.connect(func(_r): done["routes"] = p.route_log())
+	_tap(p)
+	_ok(p.get_video_player() == null and _players(p) == 0 and poster.texture.resource_path.ends_with("pack_open_standard_flash.png") and poster.modulate.a == 1.0 and p.get_sequencer().is_running(), "tap during the video: decoder freed, the flash held, the reveal run starts")
+	await _until(p, "AWAIT_ROUTE")
+	var cvs: Array = p.get_card_views()
+	_ok(poster.modulate.a == 0.0 and p.frame_history().is_empty() and cvs.all(func(cv): return cv.settle == 1.0 and cv.is_visible_in_tree() and cv.face_center().distance_to(cv.slot_point()) < 0.5), "flash faded into the native reveal: every card face-up at its slot")
+	_ok(p.get_destinations_layer().visible and _buttons(p).size() == 1, "destinations + COLLECT")
+	_tap(p)
+	await _until(p, "COMPLETE")
+	await process_frame
+	_ok(done.get("routes", []) == [[0, "collection"], [1, "exchange"], [2, "collection"]], "routes unchanged %s" % str(done))
+	_complete("v19_video_skip_reveal")
+	var f = _push(Fx.mixed("v20"), false, true)
+	var bad := VideoStreamTheora.new()
+	bad.file = "res://tests/__missing_video__.ogv"
+	f.video = bad
+	await _frames(2)
+	_tap(f)
+	_ok(f.video == null and _players(f) == 0 and f.phase() == "OPENING" and f.get_stage().is_visible_in_tree() and not f.get_video_poster().visible and f.frame_history() == [1], "unplayable video: refused, native stages 1-3 run from frame 01")
+	_close(f)
+	var r = _push(Fx.mixed("v20_red"), true, true)
+	await _frames(2)
+	_ok(r.video == null and not r.get_video_poster().visible and r.get_stage().is_visible_in_tree(), "Reduced: no video, the native pack")
+	_tap(r)
+	_ok(_players(r) == 0 and r.frame_history() == [9], "Reduced: the native short path (frame 09 only)")
+	_close(r)
+	_complete("v20_video_fallback_reduced")
+	var c = _push(Fx.mixed("v21"), false, true)
+	await _frames(2)
+	_tap(c)
+	await _frames(3)
+	_ok(_players(c) == 1, "playing")
+	c.close("test")
+	_ok(c.get_video_player() == null and _players(c) == 0, "closed mid-video: decoder stopped and freed")
+	await _frames(3)
+	_complete("v21_video_freed")
+
+func _players(n: Node) -> int:
+	return n.find_children("*", "VideoStreamPlayer", true, false).size()
+
 ## [frame, bind_s (relative), hold_s] for 01..08 from [frame, usec] bind events.
 func _holds(binds: Array) -> Array:
 	var out: Array = []
@@ -715,11 +780,13 @@ func _c13_model_sensitivity() -> void:
 
 # ------------------------------------------------------------------ helpers ----
 
-func _push(model: Dictionary, reduced := false):
+func _push(model: Dictionary, reduced := false, video := false):
 	var r := StandardPackCeremony.create(model, reduced)
 	if not r["ok"]:
 		_ok(false, "fixture rejected: %s" % r["reason"])
 		return null
+	if not video:
+		r["popup"].video = null   # the native stages 1-3 (every case before v18)
 	_stack.push(r["popup"])
 	return r["popup"]
 
