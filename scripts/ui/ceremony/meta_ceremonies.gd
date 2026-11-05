@@ -46,6 +46,17 @@ const REWARD_ROWS := {
 	"hearts": ["heart", "CEREMONY_ROW_HEART"],
 }
 const GLOW_SPIN_S := 9.0   ## the C001-accepted slow celebratory glow turn (FULL only)
+## SB-VIDEO-006: the owner's keyed Flow box opening per gift hero (rewards/gift_videos/PROVENANCE.md).
+## The video box is taller than the static hero (box + the sparkle burst above it); its _still.png
+## is the keyed LAST frame (open glowing box) held after playback.
+const CHROMA_KEY_GREEN := preload("res://scripts/ui/feel/chroma_key_green.gdshader")
+const GIFT_VIDEO_DIR := "res://assets/ui/final/rewards/gift_videos/"
+const GIFT_VIDEO_SIZE := {"gift_small": Vector2(300, 420), "gift_big": Vector2(300, 450)}
+## Injectable for tests: hero art key -> VideoStream (missing / null = the static hero art, as on failure).
+static var gift_video := {
+	"gift_small": load(GIFT_VIDEO_DIR + "gift_small_opening.ogv"),
+	"gift_big": load(GIFT_VIDEO_DIR + "gift_big_opening.ogv"),
+}
 
 ## One ceremony popup for a CeremonyEvents event, or null when the kind has no builder.
 static func build(event: Dictionary, reduced: bool = false):
@@ -131,8 +142,9 @@ static func _reward_rows(p: BasePopup, rewards: Dictionary, row_h: int = 84) -> 
 		h.add_child(l)
 	return v
 
-## Start the decorative glow turn (FULL). Every label/value already exists, so Reduced
-## Effects (no motion) shows exactly the same truth. Tweens are bound to the popup.
+## Start the decorative glow turn (FULL) and a gift hero's opening video. Every label/value
+## already exists, so Reduced Effects (no motion) shows exactly the same truth. Tweens are bound
+## to the popup.
 static func start_motion(p: BasePopup) -> void:
 	if not p.is_inside_tree():
 		return
@@ -140,6 +152,51 @@ static func start_motion(p: BasePopup) -> void:
 		if g.has_meta("spin"):
 			var tw := p.create_tween().set_loops()
 			tw.tween_property(g, "rotation", TAU, GLOW_SPIN_S).from(0.0)
+	for box in p.find_children("HeroBox", "CenterContainer", true, false):
+		if box.has_meta("video"):
+			_start_gift_video(p, box, String(box.get_meta("video")))
+
+## SB-VIDEO-006: one keyed VideoStreamPlayer over the hero (its static art hidden while it plays),
+## then the hero holds the keyed last frame. A stream that is missing or does not start leaves the
+## static hero exactly as built. The decoder is freed when it finishes or the popup closes; it
+## never blocks the rows or the CTA (mouse ignored, no input / economy touched).
+static func _start_gift_video(p: BasePopup, box: CenterContainer, art: String) -> void:
+	var stream := gift_video.get(art) as VideoStream
+	var still := load(GIFT_VIDEO_DIR + art + "_opening_still.png") as Texture2D
+	if stream == null or still == null:
+		return
+	var h := box.get_node("HeroArt") as TextureRect
+	var size: Vector2 = GIFT_VIDEO_SIZE[art]
+	var fit := AspectRatioContainer.new()
+	fit.name = "GiftVideoBox"
+	fit.ratio = float(still.get_width()) / float(still.get_height())
+	fit.custom_minimum_size = size
+	fit.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	var v := VideoStreamPlayer.new()
+	v.name = "GiftVideo"
+	v.expand = true
+	v.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	v.material = ShaderMaterial.new()
+	(v.material as ShaderMaterial).shader = CHROMA_KEY_GREEN
+	v.stream = stream
+	fit.add_child(v)
+	box.add_child(fit)
+	v.play()
+	if not v.is_playing() or v.get_stream_length() <= 0.0:
+		box.remove_child(fit)
+		fit.free()
+		return
+	h.custom_minimum_size = size
+	h.texture = still
+	h.self_modulate.a = 0.0
+	var finish := func() -> void:   # captures only the box: it lives as long as the popup
+		var f := box.get_node_or_null("GiftVideoBox")
+		if f != null and not f.is_queued_for_deletion():
+			(f.get_child(0) as VideoStreamPlayer).stop()
+			f.queue_free()
+			(box.get_node("HeroArt") as CanvasItem).self_modulate.a = 1.0
+	v.finished.connect(finish)
+	p.closed.connect(finish.unbind(1))
 
 # ------------------------------------------------------------- Collection set ----
 
@@ -252,7 +309,10 @@ static func gift_milestone(event: Dictionary, reduced: bool) -> BasePopup:
 	var m := int(event.get("milestone", 0))
 	var big := m == int(event.get("cycle_max", -1))
 	var p := _popup("gift_%d" % m, "reward", UiText.t("CEREMONY_GIFT_TITLE", [UiText.num(m)]), event)
-	_hero(p, ART["gift_big" if big else "gift_small"], Vector2(300, 300) if big else Vector2(220, 220), reduced)
+	var art := "gift_big" if big else "gift_small"
+	var hero := _hero(p, ART[art], Vector2(300, 300) if big else Vector2(220, 220), reduced)
+	if not reduced:
+		hero.set_meta("video", art)   # SB-VIDEO-006: played by start_motion
 	# SB-POLISH-002: the meter fills towards each milestone, so reaching m reads "m / m" (bar wording).
 	p.add_body_line(UiText.t("CEREMONY_GIFT_MILESTONE", [UiText.num(m), UiText.num(m)]), "Milestone", BasePopup.ROYAL_EDGE, 34)
 	var rewards: Dictionary = (event.get("rewards", {}) as Dictionary).duplicate()

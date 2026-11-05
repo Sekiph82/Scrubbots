@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SB-VIDEO-001/002/005: Results WIN / LOSE and Level Intro Scrubby videos from the owner's Flow masters.
+"""SB-VIDEO-001/002/005/006: Results WIN / LOSE, Level Intro Scrubby and Gift Meter box videos from the owner's Flow masters.
 
 For each master (720x1280, magenta chroma background) this crops every frame to the robot's
 bounding box over ALL frames plus a margin, encodes Theora .ogv (magenta kept; the Results
@@ -8,9 +8,14 @@ PNG still keyed to transparent with the SAME key as the shader (so the still nee
 shader). Frame 0 equals the last frame, so the still is also the hold pose after playback.
 Writes PROVENANCE.md next to the outputs. The masters are read-only input.
 
-Usage: python tools/build_result_scrubby_videos.py <flow_videos dir> [results|level_start]
+The gift set differs: flat GREEN background (keyed by chroma_key_green.gdshader), a fixed crop
+per master (box + the sparkle burst above it) with a soft edge fade, and the still is the LAST
+frame (the open glowing box the popup holds after playback).
+
+Usage: python tools/build_result_scrubby_videos.py <flow_videos dir> [results|level_start|gift]
   results      result_scrubby_{win,lose}_master.mp4 -> assets/ui/final/popups/videos/ (default)
   level_start  level_start_scrubby_short_master.mp4 -> assets/ui/final/gameplay/videos/
+  gift         gift_{box,crate}_opening_master.mp4 -> assets/ui/final/rewards/gift_videos/
 """
 import hashlib
 import subprocess
@@ -39,10 +44,25 @@ SETS = {
                      "master, frames 0-83): 720x1280, 24 fps, 84 frames (~3.5 s), first frame ~ last frame.",
                      "The MP4 master stays in the owner checkout (`flow_videos/`, not committed) and is read-only.", "",
                      "Built by `python tools/build_result_scrubby_videos.py flow_videos level_start` (ffmpeg libtheora,"]),
+    "gift": (Path("assets/ui/final/rewards/gift_videos"),
+             [("gift_small", "gift_box_opening_master.mp4", "gift_small_opening", (76, 112, 624, 928)),
+              ("gift_big", "gift_crate_opening_master.mp4", "gift_big_opening", (106, 288, 528, 800))],
+             ["# Gift Meter box videos: provenance (SB-VIDEO-006)", "",
+              "Owner Flow videos (Google Flow, Veo 3.1 Lite) on a flat green (#00FF00) chroma background:",
+              "the small gift box (normal milestones, 161 frames, trimmed by the owner before the lid fades)",
+              "and the big robotic crate (cycle-max milestone, 190 frames), both 720x1280, 24 fps.",
+              "The MP4 masters stay in the owner checkout (`flow_videos/`, not committed) and are read-only.", "",
+              "Built by `python tools/build_result_scrubby_videos.py flow_videos gift` (ffmpeg libtheora,",
+              "numpy, Pillow). Crop = fixed box + sparkle burst above it (the crate crop ends where the lid",
+              "debris lands on the right); anything the crop cuts fades out over 6 % of each side. The .ogv",
+              "keeps the green (keyed at runtime by",
+              "`scripts/ui/feel/chroma_key_green.gdshader`, same edge fade); the still is the LAST frame",
+              "keyed to transparent with the same key at build time (the hold pose after playback).", ""]),
 }
 W, H = 720, 1280
 MARGIN = 16
-KEY_LO, KEY_HI = 0.15, 0.45   # keep in sync with chroma_key_magenta.gdshader
+KEY_LO, KEY_HI = 0.15, 0.45   # keep in sync with chroma_key_magenta.gdshader / chroma_key_green.gdshader
+EDGE = 0.06                   # gift edge fade (UV fraction per side), keep in sync with chroma_key_green.gdshader
 
 
 def frames(path: Path) -> np.ndarray:
@@ -76,6 +96,25 @@ def key(rgb: np.ndarray) -> np.ndarray:
     return (np.dstack([c, a]) * 255.0 + 0.5).clip(0, 255).astype(np.uint8)
 
 
+def smoothstep(e0: float, e1: float, x: np.ndarray) -> np.ndarray:
+    t = np.clip((x - e0) / (e1 - e0), 0.0, 1.0)
+    return t * t * (3.0 - 2.0 * t)
+
+
+def key_green(rgb: np.ndarray) -> np.ndarray:
+    """Green -> alpha (soft edge) + despill G toward max(R, B) where G exceeds both, x the edge fade."""
+    c = rgb.astype(np.float32) / 255.0
+    m = c[..., 1] - np.maximum(c[..., 0], c[..., 2])
+    c[..., 1] -= np.maximum(m, 0.0)
+    h, w = m.shape
+    u = (np.arange(w) + 0.5) / w
+    v = (np.arange(h) + 0.5) / h
+    fade = np.outer(smoothstep(0.0, EDGE, v) * smoothstep(0.0, EDGE, 1.0 - v),
+                    smoothstep(0.0, EDGE, u) * smoothstep(0.0, EDGE, 1.0 - u))
+    a = (1.0 - smoothstep(KEY_LO, KEY_HI, m)) * fade
+    return (np.dstack([c, a]) * 255.0 + 0.5).clip(0, 255).astype(np.uint8)
+
+
 def sha(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
@@ -84,23 +123,25 @@ def main(src: Path, which: str) -> None:
     out, items, header = SETS[which]
     out.mkdir(parents=True, exist_ok=True)
     rows = []
-    for name, master_name, stem in items:
+    gift = which == "gift"
+    for name, master_name, stem, *fixed in items:
         master = src / master_name
         f = frames(master)
-        x, y, w, h = crop_box(f)
+        x, y, w, h = fixed[0] if fixed else crop_box(f)
         ogv = out / f"{stem}.ogv"
         still = out / f"{stem}_still.png"
         cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(master), "-map", "0:v:0", "-an",
                "-vf", f"crop={w}:{h}:{x}:{y}", "-c:v", "libtheora", "-q:v", "8", "-pix_fmt", "yuv420p",
                "-map_metadata", "-1", str(ogv)]
         subprocess.run(cmd, check=True)
-        Image.fromarray(key(f[0, y:y + h, x:x + w]), "RGBA").save(still, optimize=True)
+        hold = f[-1 if gift else 0, y:y + h, x:x + w]
+        Image.fromarray(key_green(hold) if gift else key(hold), "RGBA").save(still, optimize=True)
         rows.append((name, master, f.shape[0], (x, y, w, h), ogv, still, cmd))
-    lines = header + [
+    lines = header + ([] if gift else [
              "numpy, Pillow). Crop = robot bounding box over all frames + 16 px, sides rounded up to 16.",
              "The .ogv keeps the magenta (keyed at runtime by",
              "`scripts/ui/feel/chroma_key_magenta.gdshader`); the still is frame 0 keyed to",
-             "transparent with the same key at build time.", ""]
+             "transparent with the same key at build time.", ""])
     for name, master, n, (x, y, w, h), ogv, still, cmd in rows:
         lines += [f"## {name.upper()}", "",
                   f"- master `{master.name}` sha256 `{sha(master)}` ({n} frames)",
