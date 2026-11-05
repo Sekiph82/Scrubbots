@@ -30,7 +30,7 @@ func _manifest_valid() -> void:
 	for a in m["assets"]:
 		if a["status"] == "APPROVED":
 			approved += 1
-	_ok(approved == 53, "owner-approved production state: 53 ART entries APPROVED (49 unique + HOME-087 reuse + V04 HOME-120 World 01 + R01-V02 HOME-121 owner-selected Home background + R15-004 HOME-122 owner Rewarded Ads icon) (%d)" % approved)
+	_ok(approved == 54, "owner-approved production state: 54 ART entries APPROVED (49 unique + HOME-087 reuse + V04 HOME-120 World 01 + R01-V02 HOME-121 owner-selected Home background + R15-004 HOME-122 owner Rewarded Ads icon + SB-POLISH-009 HOME-123 Home video still) (%d)" % approved)
 	var sha_042 := ""
 	var sha_087 := ""
 	var pins_ok := true
@@ -131,7 +131,7 @@ const HomeArtBinder = preload("res://scripts/ui/home/home_art_binder.gd")
 func _lifecycle_gate() -> void:
 	print("[lifecycle gate]")
 	var b = HomeArtBinder.new()
-	_ok(b.is_manifest_valid() and b.summary() == {"APPROVED_BOUND": 53}, "real manifest: all 53 ART entries APPROVED_BOUND (%s)" % str(b.summary()))
+	_ok(b.is_manifest_valid() and b.summary() == {"APPROVED_BOUND": 54}, "real manifest: all 54 ART entries APPROVED_BOUND (%s)" % str(b.summary()))
 	var any_tex := false
 	for a in V.load_manifest()["assets"]:
 		if a["kind"] == "ART" and b.texture(a["slug"]) != null:

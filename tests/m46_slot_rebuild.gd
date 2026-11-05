@@ -26,6 +26,7 @@ var _runs_done := 0
 func _initialize() -> void:
 	OS.low_processor_usage_mode_sleep_usec = 0
 	await process_frame
+	AppState.test_unlock_all = true   # +1 Slot unlocks at L6 (SB-M44-032); this suite plays L1
 	_runs_done = 0
 	await _run(false)
 	await _run(true)

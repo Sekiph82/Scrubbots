@@ -41,13 +41,17 @@ var _now := [T0]
 var _sub: SubViewport
 var _root
 var _cat
+var _last := 0   ## last production catalog level (the catalog grows; nothing pins it to 10)
 
 func _initialize() -> void:
 	await process_frame
 	MainScript.boot_opening_override = 0
 	MainScript.boot_clock_override = func(): return _now[0]
 	_cat = LevelCatalog.new()
-	_ok(_cat.load_manifest().ok and _cat.size() == 10, "production catalog loads (10 entries)")
+	var loaded: bool = _cat.load_manifest().ok
+	_last = _cat.size()
+	var orders: Array = _cat.get_entries_ordered().map(func(e): return e.order)
+	_ok(loaded and _last >= 10 and orders == range(1, _last + 1), "production catalog loads (%d entries, orders 1..%d)" % [_last, _last])
 	await _next_cleanup_cases()
 	_crop_cases()
 	await _missing_cases()
@@ -78,6 +82,14 @@ func _boot(frontier: int, size: Vector2i = Vector2i(1080, 2160), path: String = 
 	if path.is_empty():
 		path = "user://m43c001r_%d.save" % Time.get_ticks_usec()
 		_tmp.append(path)
+		# SB-POLISH-002: a fresh save's first win crosses Gift milestone 1, whose ceremony holds
+		# the teaser + CLEAN NEXT. Start with the meter at 1 and that ceremony seen, so a win
+		# crosses no milestone (the barrier itself is covered by t30 / t31).
+		var seed = AppState.new(path, func(): return _now[0])
+		for o in seed.economy.gift.add_streak_sb("test_seed_m1", 1):
+			seed.economy.meta_ui.mark_seen("gift:" + String(o["id"]))
+		seed.request_save()
+		seed.economy.dispose()
 		MainScript.boot_save_path_override = path
 		_root = MainScene.instantiate()
 		_sub.add_child(_root)
@@ -154,6 +166,11 @@ func _click(pos: Vector2) -> void:
 func _count(n: Node) -> int:
 	return n.find_children("*", "", true, false).filter(func(c): return not c.is_queued_for_deletion()).size()
 
+## Nodes minus the one transient result video (SB-VIDEO-001/002: "VideoBox" + "ResultVideo",
+## freed when the clip ends); a leaked extra video gets a renamed duplicate and still counts.
+func _count_static(n: Node) -> int:
+	return _count(n) - n.find_children("*", "", true, false).filter(func(c): return not c.is_queued_for_deletion() and String(c.name) in ["VideoBox", "ResultVideo"]).size()
+
 ## Non-disclosure probe: every TextureRect under `n` that draws a level preview, and
 ## whether it shows MORE than the owner envelope (full texture, or an atlas region > 25%).
 func _preview_leaks(n: Node) -> Array:
@@ -228,15 +245,15 @@ func _crop_cases() -> void:
 
 func _missing_cases() -> void:
 	print("[09-11 missing frontier / preview]")
-	await _won(10)
+	await _won(_last)
 	var n: Dictionary = _momentum().get("next", {})
 	var res = _res()
-	_ok(not n["available"] and n["level"] == 11 and n["reason"] == GameplayLaunchResolver.CONTENT_MISSING and res.get_teaser_image().texture == null
+	_ok(not n["available"] and n["level"] == _last + 1 and n["reason"] == GameplayLaunchResolver.CONTENT_MISSING and res.get_teaser_image().texture == null
 		and res.find_child("TeaserUnavailable", true, false).visible and res.find_child("NextFacts", true, false).text == UiText.t("NEXT_CLEANUP_SOON"),
-		"frontier L11 absent: honest coming-soon, no image")
+		"frontier L%d absent: honest coming-soon, no image" % (_last + 1))
 	_complete("t09_missing_frontier_honest")
 	_ok(res.get_primary_button().text == UiText.t("RESULTS_CLEAN_NEXT") and res.get_primary_button().disabled and _root.continue_from_results().get("reason") == "no_next_content"
-		and _nav().current() == R.RESULTS, "Level 10 production: CLEAN NEXT disabled, cannot launch a fake L11")
+		and _nav().current() == R.RESULTS, "Level %d (last production): CLEAN NEXT disabled, cannot launch a fake L%d" % [_last, _last + 1])
 	_ok(not res.get_home_button().disabled, "Home stays usable")
 	_complete("t11_level10_no_l11")
 	var cfg := ResultsMomentum.load_config()
@@ -307,17 +324,17 @@ func _v02_cases() -> void:
 	_ok(JourneyStrip.MINI_EDGE == Color(1.0, 0.55, 0.12) and JourneyStrip.BOSS_EDGE == Color(0.86, 0.13, 0.20) and JourneyStrip.BEAT_SCALE["mini_boss"] < JourneyStrip.BEAT_SCALE["boss"],
 		"slot 5 orange / slot 10 red unchanged")
 	_complete("v02_beat_colors")
-	await _won(10)
+	await _won(_last)
 	var res = _res()
 	var soon: Array = res.find_children("*", "Label", true, false).filter(func(l): return l.is_visible_in_tree() and l.text.to_lower().find("coming soon") != -1)
-	_ok(soon.size() == 1 and soon[0].name == "NextFacts" and soon[0].text == UiText.t("NEXT_CLEANUP_SOON"), "L10: exactly one coming-soon message, in the Next Cleanup card %s" % str(soon.map(func(l): return l.name)))
+	_ok(soon.size() == 1 and soon[0].name == "NextFacts" and soon[0].text == UiText.t("NEXT_CLEANUP_SOON"), "L%d: exactly one coming-soon message, in the Next Cleanup card %s" % [_last, str(soon.map(func(l): return l.name))])
 	_ok(not res.get_note_label().visible and res.get_note_label().text.is_empty(), "older duplicate note above CLEAN NEXT is suppressed")
 	_ok(res.get_primary_button().disabled and res.get_primary_button().text == UiText.t("RESULTS_CLEAN_NEXT") and not res.get_home_button().disabled
 		and res.get_model()["continue"]["reason"] == GameplayLaunchResolver.CONTENT_MISSING, "CLEAN NEXT disabled, Home usable, CONTENT_MISSING truth unchanged")
 	var m: Dictionary = res.get_model()
 	m.erase("momentum")   # no Next Cleanup card (e.g. malformed config) -> the honest note returns
 	res.show_model(m)
-	_ok(res.get_note_label().visible and res.get_note_label().text == UiText.t("RESULTS_NEXT_UNAVAILABLE", [11]), "without the card, the unavailable note is still shown (scoped suppression)")
+	_ok(res.get_note_label().visible and res.get_note_label().text == UiText.t("RESULTS_NEXT_UNAVAILABLE", [_last + 1]), "without the card, the unavailable note is still shown (scoped suppression)")
 	_complete("v02_single_coming_soon")
 	await _won(4)
 	res = _res()
@@ -377,17 +394,18 @@ func _journey_cases() -> void:
 	_complete("t20_home_frontier_11")
 
 func _t21_injected() -> void:
-	print("[21 injected Level 11 content: 10 -> next-cycle transition]")
-	await _boot(11)
-	var stub := InjectedCatalog.new(_cat, _entry(2), 11)
+	print("[21 injected Level %d content: %d -> next-cycle transition]" % [_last + 1, _last])
+	await _boot(_last + 1)
+	var stub := InjectedCatalog.new(_cat, _entry(2), _last + 1)
 	var launch := GameplayLaunchResolver.resolve(_app(), stub)
 	var cfg := ResultsMomentum.load_config()
-	var rm := ResultsMomentum.results_model(_app(), 10, launch, cfg)
-	_ok(launch["ok"] and launch["level"] == 11 and rm["next"]["available"] and rm["next"]["entry_id"] == "test_injected_l11" and rm["next"]["image_ok"]
-		and rm["journey"]["completed"] == 10, "Results L10 + injected L11: 10/10, teaser L11 available (test-only entry)")
+	var rm := ResultsMomentum.results_model(_app(), _last, launch, cfg)
+	_ok(launch["ok"] and launch["level"] == _last + 1 and rm["next"]["available"] and rm["next"]["entry_id"] == "test_injected_l11" and rm["next"]["image_ok"]
+		and rm["journey"]["completed"] == ResultsMomentum.slot_of(_last), "Results L%d + injected L%d: %d/10, teaser L%d available (test-only entry)" % [_last, _last + 1, ResultsMomentum.slot_of(_last), _last + 1])
 	var hj := ResultsMomentum.home_journey(_app(), cfg)
-	_ok(hj["cycle"] == 2 and hj["slot"] == 1 and hj["nodes"][0]["state"] == "current", "next Home frontier 11: cycle 2 slot 1 current")
-	_ok(not GameplayLaunchResolver.resolve(_app())["ok"], "production catalog itself still has no L11 (nothing hardcoded)")
+	_ok(hj["cycle"] == ResultsMomentum.cycle_of(_last + 1) and hj["slot"] == ResultsMomentum.slot_of(_last + 1) and hj["nodes"][hj["slot"] - 1]["state"] == "current",
+		"next Home frontier %d: cycle %d slot %d current" % [_last + 1, hj["cycle"], hj["slot"]])
+	_ok(not GameplayLaunchResolver.resolve(_app())["ok"], "production catalog itself still has no L%d (nothing hardcoded)" % (_last + 1))
 	_complete("t21_injected_l11_cycle_transition")
 
 class InjectedCatalog extends RefCounted:
@@ -532,7 +550,7 @@ func _t33_responsive() -> void:
 	print("[33 responsive: Results + Home]")
 	for sz in [Vector2i(1080, 2160), Vector2i(1170, 2532), Vector2i(1290, 2796), Vector2i(1080, 1920), Vector2i(1536, 2048)]:
 		var bad: Array = []
-		for lvl in [4, 10]:
+		for lvl in [4, _last]:
 			await _won(lvl, sz)
 			var res = _res()
 			res.finish_reveal()
@@ -560,7 +578,7 @@ func _t33_responsive() -> void:
 			var rr: Rect2 = home.get_region(region).get_global_rect()
 			if rr.intersects(strip):
 				bad.append("home strip x " + region)
-		_ok(bad.is_empty(), "%dx%d: Results (L4 teaser, L10 coming soon) + Home strip fit, no collisions %s" % [sz.x, sz.y, str(bad)])
+		_ok(bad.is_empty(), "%dx%d: Results (L4 teaser, L%d coming soon) + Home strip fit, no collisions %s" % [sz.x, sz.y, _last, str(bad)])
 	_complete("t33_responsive")
 
 func _t34_no_accumulation() -> void:
@@ -571,7 +589,7 @@ func _t34_no_accumulation() -> void:
 	var model: Dictionary = res.get_model()
 	res.finish_reveal()
 	await _settle()
-	var n0 := _count(_root)
+	var n0 := _count_static(_root)
 	var timers: int = _root.find_children("*", "Timer", true, false).size()
 	var c0: int = res.continue_requested.get_connections().size()
 	for _i in range(20):
@@ -584,8 +602,8 @@ func _t34_no_accumulation() -> void:
 		home.refresh()
 		await process_frame
 	await _settle()
-	_ok(_count(_root) == n0 and _root.find_children("*", "Timer", true, false).size() == timers and res.continue_requested.get_connections().size() == c0,
-		"20 cycles: nodes %d -> %d, timers / connections stable" % [n0, _count(_root)])
+	_ok(_count_static(_root) == n0 and _root.find_children("*", "VideoStreamPlayer", true, false).size() <= 1 and _root.find_children("*", "Timer", true, false).size() == timers and res.continue_requested.get_connections().size() == c0,
+		"20 cycles: nodes %d -> %d, timers / connections / one result-video decoder stable" % [n0, _count_static(_root)])
 	_complete("t34_no_accumulation")
 
 func _t35_malformed() -> void:

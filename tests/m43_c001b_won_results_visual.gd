@@ -73,7 +73,7 @@ func _won_composition_bound() -> void:
 	_ok(res.visible and res.is_victory_layout(), "WON -> Victory layout")
 	var robot: TextureRect = res.get_robot()
 	var emblem: TextureRect = res.get_emblem()
-	_ok(robot.is_visible_in_tree() and robot.texture != null and robot.texture.resource_path == ResultsScreen.ROBOT_ART, "Scrubby victory pose bound (safe default robot)")
+	_ok(robot.is_visible_in_tree() and robot.texture != null and robot.texture.resource_path == ResultsScreen.WIN_STILL, "Scrubby (safe default robot): keyed WIN video still bound (SB-VIDEO-001)")
 	_ok(emblem.is_visible_in_tree() and emblem.texture != null and emblem.texture.resource_path == ResultsScreen.EMBLEM_ART, "Victory emblem bound")
 	var header: Control = res.get_panel().find_child("Header", true, false)
 	_ok(header != null and header.is_ancestor_of(emblem), "emblem lives in the header")
@@ -196,7 +196,7 @@ func _lost_no_victory_art() -> void:
 	var h = await _play(root)
 	h.get_completion().terminal_reached.emit(&"LOST", {})
 	var res = root.get_results_screen()
-	_ok(not res.is_victory_layout() and res.get_robot().texture != null and res.get_robot().texture.resource_path == ResultsScreen.FAIL_ROBOT_ART, "LOST: Fail robot, not the Victory robot")
+	_ok(not res.is_victory_layout() and res.get_robot().texture != null and res.get_robot().texture.resource_path == ResultsScreen.LOSE_STILL, "LOST: Scrubby's keyed LOSE still (SB-VIDEO-002), not the Victory robot")
 	_ok(res.get_emblem().texture.resource_path == ResultsScreen.FAIL_EMBLEM_ART and _rows(res).all(func(r): return String(r.name) in ["Row_hearts", "Row_streak_reset"]), "LOST: fail emblem, loss rows only (no reward celebration)")
 	_ok(not res.is_revealing(), "LOST: no reward reveal")
 	_ok(_victory_textures(res).is_empty(), "LOST: no Victory texture in Results")
@@ -264,7 +264,7 @@ func _hide_show_no_leak() -> void:
 	var model := {"status": "WON", "level": 10, "attempt": 1, "receipt": rc, "continue": {"available": true}}
 	res.show_model(model)
 	await _frames(2)
-	var base := _count(res)
+	var base := _count_static(res)
 	var conns: int = res.get_primary_button().get_signal_connection_list("pressed").size()
 	for i in range(20):
 		res.visible = false
@@ -274,7 +274,7 @@ func _hide_show_no_leak() -> void:
 			res.show_model({"status": "LOST", "level": 10, "attempt": 1, "receipt": {}, "continue": {}})
 			res.show_model(model)
 	await _frames(3)
-	_ok(_count(res) == base, "node count stable over 20 hide/show/refresh cycles (%d -> %d)" % [base, _count(res)])
+	_ok(_count_static(res) == base and res.find_children("*", "VideoStreamPlayer", true, false).size() <= 1, "node count stable over 20 hide/show/refresh cycles (%d -> %d), at most one result-video decoder" % [base, _count_static(res)])
 	_ok(res.get_primary_button().get_signal_connection_list("pressed").size() == conns and res.get_home_button().get_signal_connection_list("pressed").size() == 1, "no signal connections accumulate")
 	res.visible = false
 	await _frames(2)
@@ -361,6 +361,11 @@ func _textures(res) -> Array:
 
 func _count(n: Node) -> int:
 	return n.find_children("*", "", true, false).filter(func(c): return not c.is_queued_for_deletion()).size()
+
+## Nodes minus the one transient result video (SB-VIDEO-001/002: "VideoBox" + "ResultVideo",
+## freed when the clip ends); a leaked extra video gets a renamed duplicate and still counts.
+func _count_static(n: Node) -> int:
+	return _count(n) - n.find_children("*", "", true, false).filter(func(c): return not c.is_queued_for_deletion() and String(c.name) in ["VideoBox", "ResultVideo"]).size()
 
 func _econ(eco) -> Dictionary:
 	var s: Dictionary = eco.snapshot()
