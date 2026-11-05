@@ -4,14 +4,18 @@ extends SceneTree
 ## 1536x2048 tablet. Step 4 adds Daily/Tasks, Rewarded Ads, Profile/Events/Achievements, Help,
 ## Settings, Robots detail, every meta ceremony, the pack ceremonies, Need a Hand / Insufficient /
 ## booster popups, Results reward/robot variants, Shop sub-pages and the FTUE coachmarks; screens
-## with no final/ texture to open (RANKS, opening video) are listed in `skipped`. Real main.tscn in a SubViewport at the m49 logical size, throw-away
-## user:// saves only. Physical px = logical rect x phys/logical (m49 `_logical`).
+## with no final/ texture to open (opening video) are listed in `skipped`. SB-M22-029 adds the
+## 1170x2532 phone, the Level Intro, RANKS, the Scrub Bucks popup and a late-frontier profile (L30:
+## every booster / Robots / Events unlocked, starter charges), and also measures Button
+## icons, StyleBoxTexture panels and theme icon overrides. Real main.tscn in a SubViewport at the
+## m49 logical size, throw-away user:// saves only. Physical px = logical rect x phys/logical (m49 `_logical`).
 ## Output JSON: {"scenarios": {scenario: {path: {max_side_px, max_w, max_h, source_w, source_h,
 ## size_limit, visible, outside_home}}}, "loaded_mib": {scenario: MiB}, "merged": {path: max_side_px}}.
-## Run: godot --headless --path . -s res://tests/tools/m22_026_texture_measure.gd -- --out=<file>
+## Run: godot --headless --path . -s res://tests/tools/m22_026_texture_measure.gd -- --out=<file> [--only=a,b]
 
 const MainScript = preload("res://scripts/app/main.gd")
 const MainScene = preload("res://scenes/app/main.tscn")
+const AppState = preload("res://scripts/app/app_state.gd")
 const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
 const RobotsScreen = preload("res://scripts/ui/robots/robots_screen.gd")
 const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
@@ -30,14 +34,19 @@ const PremFx = preload("res://tests/support/premium_pack_fixtures.gd")
 
 const F := "res://assets/ui/final/"
 const MIB := 1024.0 * 1024.0
-const PHYSICAL := [Vector2i(1080, 2400), Vector2i(1536, 2048)]
+const PHYSICAL := [Vector2i(1080, 2400), Vector2i(1170, 2532), Vector2i(1536, 2048)]
+## SB-M22-029 late-frontier profile: the last catalog level (30); every booster, Robots and Events
+## are unlocked there (RANKS opens at 40, past the catalog: its popup is opened directly).
+const LATE_FRONTIER := 30
 ## robots and life (Heart popup) are extra: they draw robot poses / heart art also seen above.
 const SCENARIOS := ["home", "gameplay_5slot", "gameplay_6slot", "results_won", "results_failed", "shop",
 	"collection", "robots", "life",
 	# step 4
 	"daily", "rewarded_ads", "profile", "help", "settings", "robot_detail", "ceremonies", "robot_unlock",
 	"packs", "need_a_hand", "insufficient", "booster_popups", "results_variants", "shop_pages",
-	"coachmarks", "ranks", "opening"]
+	"coachmarks", "ranks", "opening",
+	# SB-M22-029
+	"level_intro", "late_frontier"]
 const BOOSTERS := ["plus_one_slot", "random", "selector", "tornado"]
 
 var _sub: SubViewport
@@ -50,12 +59,15 @@ var _skipped := {}         ## scenario -> reason
 
 func _initialize() -> void:
 	var out := "user://m22_026_measure.json"
+	var only: Array = SCENARIOS
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--out="):
 			out = a.trim_prefix("--out=")
+		elif a.begins_with("--only="):   # SB-M22-029: a comma list of scenarios
+			only = a.trim_prefix("--only=").split(",")
 	MainScript.boot_opening_override = 0
 	for phys in PHYSICAL:
-		for s in SCENARIOS:
+		for s in only:
 			var key := "%s@%dx%d" % [s, phys.x, phys.y]
 			_report[key] = {}
 			_loaded[key] = {}
@@ -340,6 +352,7 @@ func _shop_pages(key: String, phys: Vector2i) -> void:
 	await _frames(4)
 	_walk(key)
 	await _popup(key, Popups.feedback({"ok": true, "reason": "", "text": "measure"}), true)
+	await _popup(key, _root.get_acquisition().open_scrub_bucks("measure"))   # SB-M22-029 Home SB +
 
 ## Every FTUE step on its real target (Home shortcuts / Play, then gameplay controls).
 func _coachmarks(key: String, phys: Vector2i) -> void:
@@ -359,11 +372,50 @@ func _coachmarks(key: String, phys: Vector2i) -> void:
 			await _frames(2)
 			_walk(key)
 
-func _ranks(key: String, _phys: Vector2i) -> void:
-	_note(key, "RANKS not served (BottomNav waits for the SB-M43-131 owner policy)")
+## SB-M22-029: RANKS is served now (SB-M43-122 personal ladder, BottomNav at L40).
+func _ranks(key: String, phys: Vector2i) -> void:
+	await _quiet(key, phys)
+	await _popup(key, ProfileScreens.open_ranks(_root.get_modal_stack(), _root.get_app_state()))
 
 func _opening(key: String, _phys: Vector2i) -> void:
 	_note(key, "opening cinematic is a video (assets/brand/opening/*.ogv), no final/ texture")
+
+## SB-M22-029: the Level Intro over a just-started level (keyed still under the Flow video).
+func _level_intro(key: String, phys: Vector2i) -> void:
+	MainScript.boot_level_intro_override = 1
+	await _play(key, phys)
+	MainScript.boot_level_intro_override = -1
+	if _root.get_gameplay_host().get_node_or_null("LevelIntro") == null:
+		_note(key, "level intro did not show")
+	_walk(key)
+
+## SB-M22-029: a profile at L30 (record_win walk, starter charges): Home with every nav / shortcut
+## unlocked, Robots, Events, Ranks, then gameplay with all four boosters unlocked and their popups.
+func _late_frontier(key: String, phys: Vector2i) -> void:
+	await _boot(key, phys, LATE_FRONTIER)
+	if _root.get_app_state().progression.current_level() != LATE_FRONTIER:
+		_note(key, "frontier %d, not %d" % [_root.get_app_state().progression.current_level(), LATE_FRONTIER])
+	_root.get_modal_stack().clear("measure")
+	await _frames(2)
+	_walk(key)
+	var st = _root.get_modal_stack()
+	var app = _root.get_app_state()
+	await _popup(key, RobotsScreen.open(st, app, _root.ceremonies))
+	await _popup(key, ProfileScreens.open_events(st, app))
+	await _popup(key, ProfileScreens.open_ranks(st, app))
+	var r: Dictionary = _root.play_current_frontier()
+	if not r.get("ok", false):
+		_note(key, "L%d play refused: %s" % [LATE_FRONTIER, r.get("reason", "")])
+		return
+	await _frames(6)
+	_root._coach_timer.stop()
+	_root.get_modal_stack().clear("measure")
+	var h = _root.get_gameplay_host()
+	h.get_runtime().set_process(false)
+	await _frames(2)
+	_walk(key)
+	for id in BOOSTERS:
+		await _popup(key, _root.get_acquisition().open_booster(h, id))
 
 # ------------------------------------------------------------------ measure ----
 
@@ -384,8 +436,23 @@ func _walk(key: String) -> void:
 		elif n is Sprite2D and n.texture != null:
 			texs = [n.texture]
 			sz = n.texture.get_size() * (n as Sprite2D).get_global_transform().get_scale().abs()
+		elif n is Button and n.icon != null:
+			# SB-M22-029: an expand_icon icon fits the button, else it draws at its own size
+			texs = [n.icon]
+			sz = (n as Control).get_global_rect().size if n.expand_icon else n.icon.get_size() * (n as Control).get_global_transform().get_scale().abs()
+		var shown: bool = n is CanvasItem and (n as CanvasItem).is_visible_in_tree()
+		var own: bool = not (home != null and home.is_ancestor_of(n))
 		for t in texs:
-			_record(key, t, sz.abs() * _scale, (n as CanvasItem).is_visible_in_tree(), not (home != null and home.is_ancestor_of(n)))
+			_record(key, t, sz.abs() * _scale, shown, own)
+		if n is Control:
+			# SB-M22-029: StyleBoxTexture panels stretch over the control; theme icons draw 1:1
+			for sb in ["panel", "normal", "pressed", "hover", "disabled"]:
+				if n.has_theme_stylebox_override(sb) and n.get_theme_stylebox(sb) is StyleBoxTexture:
+					_record(key, (n.get_theme_stylebox(sb) as StyleBoxTexture).texture, n.get_global_rect().size.abs() * _scale, shown, own)
+			for ic in ["checked", "unchecked", "checked_disabled", "unchecked_disabled", "grabber", "grabber_highlight", "grabber_disabled"]:
+				if n.has_theme_icon_override(ic):
+					var t: Texture2D = n.get_theme_icon(ic)
+					_record(key, t, t.get_size() * n.get_global_transform().get_scale().abs() * _scale, shown, own)
 
 ## own: drawn outside the Home layer (step 4 per-screen lists leave out Home under a popup).
 func _record(key: String, t: Texture2D, sz: Vector2, shown: bool, own: bool) -> void:
@@ -427,7 +494,8 @@ static func _size_limit(path: String) -> int:
 
 # ------------------------------------------------------------------ fixture ----
 
-func _boot(tag: String, phys: Vector2i) -> void:
+## frontier > 1: the throw-away save is first walked there by record_win (starter charges kept).
+func _boot(tag: String, phys: Vector2i, frontier := 1) -> void:
 	_shutdown()
 	var lv := _logical(phys)
 	_scale = float(phys.x) / float(lv.x)
@@ -437,6 +505,12 @@ func _boot(tag: String, phys: Vector2i) -> void:
 	get_root().add_child(_sub)
 	var path := "user://m22_026_measure_%s_%d.save" % [tag.replace("@", "_"), Time.get_ticks_usec()]
 	_tmp.append(path)
+	if frontier > 1:
+		var a = AppState.new(path)
+		a.bootstrap_new_profile()
+		while a.progression.current_level() < frontier:
+			a.progression.record_win(a.progression.current_level())
+		a.request_save()
 	MainScript.boot_save_path_override = path
 	_root = MainScene.instantiate()
 	_sub.add_child(_root)
