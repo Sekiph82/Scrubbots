@@ -214,3 +214,7 @@ Still unobserved: 341 of the 560 PNGs, and why:
 **Follow-up**: the warning/small popup frames and the equipped-robot art need a scenario before their art can be capped.
 
 **Status**: Factory job 043, 2026-10-23 (SB-M22-026 step 4). Still open: VRAM compression, atlasing.
+
+### UI-ADR-008 step 5: three sizes, more draw kinds, cold/warm check
+
+**Decision**: SB-M22-029 (factory 101, 2026-11-05) re-runs the measurement at 1080x2400, 1170x2532 and 1536x2048, adds the Level Intro, RANKS, the Scrub Bucks popup and a late-frontier (L30) profile, and also records Button icons, StyleBoxTexture panels and theme icon overrides. The 1170x2532 phone draws ~8% more px than 1080x2400, so limits set at 2.0-2.1x for 1080 are re-checked: `apply_caps` flags any existing limit under 2x the drawn side. Result: 5 new caps (`icon_lock`, `icon_shortcut_gift_bar`, `icon_shortcut_win_streak` 512; the two Daily day-card frames 1024), 2 raised 512 -> 1024 (`collection_complete_emblem`, `icon_shortcut_collection`), `daily_login_calendar` uncapped (drawn 954 px); net -14.12 MiB. Card art stays at 1080 (1.85x at 1170x2532, SB-M22-028). `tests/m22_029_texture_cold_warm.gd` checks cold/peak/warm resident final/ textures and that every final/ import stays lossless without mipmaps. Atlasing is cancelled (owner 2026-11-03). Details, the observed vs not-observed table and the not-measured list: `docs/M22_029_TEXTURE_COVERAGE.md`.
