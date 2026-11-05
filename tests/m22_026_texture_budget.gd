@@ -6,7 +6,9 @@ extends SceneTree
 ## step 2 runtime measurement (tests/tools/m22_026_texture_measure.gd) showed on screen
 ## (UI-ADR-008); a texture shared by two screens counts on both. Step 3: the 135 catalog card arts
 ## (size_limit 1080, summed budget) and CollectionScreen holding no static texture cache (the
-## per-visit cache lives on the album popup and is freed with it).
+## per-visit cache lives on the album popup and is freed with it). SB-M22-029: the 1170x2532 phone
+## draws ~8% more px than 1080x2400, so three limits under 2x were raised (one removed) and five
+## newly measured textures capped; daily day-card frames joined the Daily list.
 ## Run: godot --headless --path . -s res://tests/m22_026_texture_budget.gd
 
 const F := "res://assets/ui/final/"
@@ -78,6 +80,8 @@ const DAILY_TASKS := [
 	"common/frames/popup_large_frame.png", "common/frames/popup_medium_frame.png",
 	"daily/daily_login_calendar.png", "daily/daily_streak_flame.png", "daily/daily_task_check.png",
 	"rewards/chest_small.png", "rewards/gift_box.png",
+	# SB-M22-029: StyleBoxTexture day cards (now measured)
+	"daily/daily_day_reward_frame.png", "daily/daily_day5_reward_frame.png",
 ]
 const PROFILE_EVENTS := [
 	"characters/scrubby/scrubby_portrait.png", "common/frames/popup_large_frame.png",
@@ -162,16 +166,18 @@ const COACHMARKS := [
 	"gameplay/tutorial/tutorial_pointer.png",
 ]
 ## Measured resident MiB after the step 2 caps (UI-ADR-008) plus ~10% headroom.
-const BUDGET_MIB := {"Home": 117, "Gameplay": 69, "Results": 32, "Shop/Collection": 41,
+## SB-M22-029: limits raised to 2x of the 1170x2532 draw re-measured: Shop/Collection 42.98,
+## Daily/Tasks 36.41 (+ day-card frames), Profile 32.05 MiB, each + ~10%.
+const BUDGET_MIB := {"Home": 117, "Gameplay": 69, "Results": 32, "Shop/Collection": 47,
 	# step 4: measured after the step 4 caps plus ~10%
 	# SB-M43-125-REBUILD: Profile hero / tile / bests icons re-measured 28.8 MiB + ~10%
-	"Daily/Tasks": 32, "Profile/Events/Achievements": 32, "Ceremonies": 230, "Robots detail": 41, "Popups": 18, "Results variants": 83, "Coachmarks": 15}
+	"Daily/Tasks": 40, "Profile/Events/Achievements": 35, "Ceremonies": 230, "Robots detail": 41, "Popups": 18, "Results variants": 83, "Coachmarks": 15}
 ## process/size_limit set by step 1 (small icons with a known draw side, 4x rule).
+## SB-M22-029: daily_login_calendar's 1024 removed (drawn 954 px at 1170x2532, 2x > source).
 const LIMITED := {
 	"common/icons/icon_clock.png": 256,
 	"daily/daily_streak_flame.png": 256,
 	"daily/daily_task_check.png": 256,
-	"daily/daily_login_calendar.png": 1024,
 	"popups/failure/heart_large.png": 1024,
 }
 ## process/size_limit set by step 2: next_pow2(max(2 x measured max side px, 512))
@@ -189,7 +195,7 @@ const MEASURED := {
 	"characters/robots/spark/spark_portrait.png": 512,
 	"characters/robots/squeegee/squeegee_portrait.png": 512,
 	"characters/scrubby/scrubby_portrait.png": 512,
-	"collection/collection_complete_emblem.png": 512,
+	"collection/collection_complete_emblem.png": 1024,   # SB-M22-029: raised (261 px at 1170x2532)
 	"collection/master_collection_emblem.png": 1024,   # step 4: raised (320 px on the Master ceremony)
 	"collection/states/card_unknown_silhouette.png": 1024,
 	"common/currencies/icon_currency_heart.png": 512,
@@ -207,7 +213,7 @@ const MEASURED := {
 	"home/reward_track/reward_gift_25.png": 1024,
 	"home/reward_track/reward_gift_5.png": 1024,
 	"home/reward_track/win_streak_reward_badge.png": 512,
-	"home/shortcuts/icon_shortcut_collection.png": 512,
+	"home/shortcuts/icon_shortcut_collection.png": 1024,   # SB-M22-029: raised (268 px at 1170x2532)
 	"home/shortcuts/icon_shortcut_daily.png": 512,
 	"home/shortcuts/icon_shortcut_no_ads.png": 512,
 	"home/shortcuts/icon_shortcut_rewarded_ads.png": 512,
@@ -269,7 +275,15 @@ const MEASURED := {
 	"robots/perks/perk_win_streak_bonus.png": 512,
 	"robots/robot_lock_emblem.png": 512,
 	"robots/robot_unlocked_burst.png": 1024,
+	# SB-M22-029 (1080x2400 / 1170x2532 / 1536x2048, max drawn px in brackets)
+	"common/icons/icon_lock.png": 512,   # booster lock plate / event card (60)
+	"daily/daily_day_reward_frame.png": 1024,   # Daily day card StyleBoxTexture (304)
+	"daily/daily_day5_reward_frame.png": 1024,   # (304)
+	"home/shortcuts/icon_shortcut_gift_bar.png": 512,   # achievement icon (94)
+	"home/shortcuts/icon_shortcut_win_streak.png": 512,   # achievement icon (94)
 }
+## SB-M22-029: texture with no limit on purpose (a cap would be under 2x its drawn side).
+const UNCAPPED := ["daily/daily_login_calendar.png"]
 
 var _fail := 0
 
@@ -291,6 +305,9 @@ func _initialize() -> void:
 	_screen("Coachmarks", COACHMARKS)
 	_limited("size_limit step 1", LIMITED)
 	_limited("size_limit steps 2 and 4 (measured)", MEASURED)
+	for p in UNCAPPED:
+		var c := ConfigFile.new()
+		_ok(c.load(F + p + ".import") == OK and int(c.get_value("params", "process/size_limit", -1)) == 0, "%s has no size_limit" % p)
 	_card_art()
 	_done()
 
