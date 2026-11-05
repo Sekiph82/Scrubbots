@@ -31,7 +31,7 @@ const BACKS := [Vector2(278, 415), Vector2(395, 409), Vector2(512, 403), Vector2
 const FRAME_SIZE := Vector2(1024, 1536)
 const PREMIUM_ACCENT := Color(1.0, 0.78, 0.25)
 const PREMIUM_CONFETTI := 90
-const PREMIUM_VIDEO_NAME := "pack_open_premium"   ## SB-VIDEO-004 gold opening video
+const PREMIUM_VIDEO_NAME := "premium_pack_opening"   ## SB-VIDEO-004 gold opening video
 
 ## {ok, reason, popup}: a ceremony only for a valid committed Premium model; otherwise fail closed.
 static func create_premium(model, reduced := false) -> Dictionary:

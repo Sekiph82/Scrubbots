@@ -279,6 +279,7 @@ func _t16_reopen(kind: String) -> void:
 		var model: Dictionary = app.pack_presentation_model(tx)
 		var c := StandardPackCeremony.create(model) if kind == "standard" else PremiumPackCeremony.create_premium(model)
 		var p = c["popup"]
+		p.video = null   # SB-VIDEO-003/004: native stages 1-3 (the video path is covered in c006 / c007)
 		_stack.push(p)
 		await _frames(2)
 		p.tap()

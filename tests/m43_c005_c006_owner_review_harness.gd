@@ -25,8 +25,10 @@ const Fx = preload("res://tests/support/standard_pack_fixtures.gd")
 ## SB-POLISH-010 re-pinned the ceremony + sequencer after the V04 storyboard restyle (drop / shake /
 ## burst / face-down fan / flip reveal / COLLECT, tap-to-skip via RevealSequencer.skip_to; frames,
 ## card truth and routing unchanged — tests/m43_c005_c006_standard_pack_presentation.gd v15..v17).
+## SB-VIDEO-003/004 re-pinned the ceremony after the Flow opening video (poster, one decoder, flash
+## crossfade into the unchanged native reveal; card truth and routing unchanged — c006 v18..v21).
 const PRODUCTION_SHA := {
-	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "c9b5416d2ae7cee56013971216828ef65b91d6e28443713a6384aea2871c329d",
+	"res://scripts/ui/ceremony/standard_pack_ceremony.gd": "a190fa6e2c91ad935027061b46de918249170a604f7e9ce7c9dd04c809e883de",
 	"res://scripts/ui/ceremony/standard_pack_model.gd": "2db015d362fdfa2e5b2040d7e3ebcbaed59986811b2d364980082095a655f481",
 	"res://scripts/ui/components/reveal_sequencer.gd": "b33e6bd4f44ec3cb1e4ba6b7059dde3c976dffdbe42fb90d5492d4b653494d6f",
 }
@@ -213,6 +215,7 @@ func _h14_full_v03_cadence() -> void:
 	_key(KEY_R)
 	await _frames(2)
 	var c = _h.get_ceremony()
+	c.video = null   # SB-VIDEO-003: this smoke pins the native 01..09 frames
 	_ok(not _h.is_reduced() and c.phase() == "IDLE", "FULL mode, IDLE before the test tap")
 	c.tap()
 	for _i in range(900):   # capped: a regression fails, never hangs

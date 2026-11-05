@@ -91,7 +91,7 @@ const CONFETTI := [Color(1.0, 0.82, 0.20), Color(0.35, 0.85, 1.0), Color(1.0, 0.
 const CONFETTI_AMOUNT := 48
 ## SB-VIDEO-003/004 (see assets/ui/final/rewards/pack_opening/videos/PROVENANCE.md).
 const VIDEO_DIR := "res://assets/ui/final/rewards/pack_opening/videos/"
-const VIDEO_NAME := "pack_open_standard"
+const VIDEO_NAME := "standard_pack_opening"
 const FLASH_OUT_S := 0.35          ## the held flash fades into the native reveal
 
 ## Timing (s): [FULL, REDUCED]. FULL opening (Tap 1 -> destinations) stays within 2.5..4.0 s.
@@ -211,7 +211,7 @@ func _ready() -> void:
 func _frame_paths() -> Array:
 	return PACK_FRAMES.map(func(f): return FRAME_DIR + f)
 
-## The opening video's base name in VIDEO_DIR (.ogv, _first.png, _flash.png); Premium has its own.
+## The opening video's base name in VIDEO_DIR (.ogv, _first.png, _peak.png = the flash); Premium has its own.
 func _video_name() -> String:
 	return VIDEO_NAME
 
@@ -534,7 +534,7 @@ func _stop_video() -> void:
 ## The flash: free the decoder, hold the video's last frame, fade it into the native stage 4.
 func _end_video() -> void:
 	_stop_video()
-	_poster.texture = _video_still("flash")
+	_poster.texture = _video_still("peak")
 	_rays.visible = true
 	_video_run = true
 	_seq.play(String(_model.get("presentation_id", "")) + ":open", _open_plan(true))

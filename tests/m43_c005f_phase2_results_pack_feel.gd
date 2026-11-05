@@ -163,6 +163,7 @@ func _ceremony(model: Dictionary, premium: bool, reduced := false, f = null):
 		_ok(false, "fixture rejected %s" % r["reason"])
 		return null
 	var p = r["popup"]
+	p.video = null   # SB-VIDEO-003/004: native stages 1-3 (the video path is covered in c006 / c007)
 	if f != null:
 		p.bind_feedback(f[0])
 	_stack.push(p)

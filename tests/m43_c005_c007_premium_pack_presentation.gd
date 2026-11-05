@@ -503,7 +503,7 @@ func _p20_video() -> void:
 	var p = _push(Fx.mixed("p20"), false, true)
 	await _frames(2)
 	var poster: TextureRect = p.get_video_poster()
-	_ok(p.video != null and p.video.resource_path == PremiumPackCeremony.VIDEO_DIR + "pack_open_premium.ogv" and poster.texture.resource_path.ends_with("pack_open_premium_first.png") and poster.is_visible_in_tree() and not p.get_stage().is_visible_in_tree(), "FULL: gold video chosen, its first-frame poster in IDLE")
+	_ok(p.video != null and p.video.resource_path == PremiumPackCeremony.VIDEO_DIR + "premium_pack_opening.ogv" and poster.texture.resource_path.ends_with("premium_pack_opening_first.png") and poster.is_visible_in_tree() and not p.get_stage().is_visible_in_tree(), "FULL: gold video chosen, its first-frame poster in IDLE")
 	_ok(p.get_layer().get_node("Title").text == UiText.t("PACK_PREMIUM_TITLE") and p.get_hint().text == UiText.t("PACK_TAP_OPEN") and p.phase() == "IDLE", "PREMIUM PACK title, 'Tap to open'")
 	_tap()
 	await _frames(3)
@@ -513,7 +513,7 @@ func _p20_video() -> void:
 	while p.get_video_player() != null and Time.get_ticks_msec() < deadline:
 		await process_frame
 	Engine.time_scale = 1.0
-	_ok(p.get_video_player() == null and p.find_children("*", "VideoStreamPlayer", true, false).is_empty() and poster.texture.resource_path.ends_with("pack_open_premium_flash.png"), "video ran to its end: decoder freed, the gold flash held")
+	_ok(p.get_video_player() == null and p.find_children("*", "VideoStreamPlayer", true, false).is_empty() and poster.texture.resource_path.ends_with("premium_pack_opening_peak.png"), "video ran to its end: decoder freed, the gold flash held")
 	await _until(p, "AWAIT_ROUTE")
 	var cvs: Array = p.get_card_views()
 	_ok(cvs.size() == 5 and poster.modulate.a == 0.0 and cvs.all(func(cv): return cv.settle == 1.0 and cv.is_visible_in_tree() and cv.face_center().distance_to(cv.slot_point()) < 0.5), "flash faded into the native reveal: 5 cards face-up at their slots")

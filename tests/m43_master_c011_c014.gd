@@ -893,6 +893,7 @@ func _open_pack(kind: String, tx: String) -> Dictionary:
 	var r: Dictionary = a.commit_pack(kind, tx)
 	var mk: Dictionary = PremiumPackCeremony.create_premium(r["model"]) if kind == "premium" else StandardPackCeremony.create(r["model"])
 	var p = mk["popup"]
+	p.video = null   # SB-VIDEO-003/004: native stages 1-3 (the video path is covered in c006 / c007)
 	_root.get_modal_stack().push(p)
 	await _frames(1)
 	var econ_before: Dictionary = a.economy.snapshot()

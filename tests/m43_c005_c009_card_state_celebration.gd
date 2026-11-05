@@ -480,15 +480,20 @@ func _std(m: Dictionary, reduced := false):
 	var r := StandardPackCeremony.create(m, reduced)
 	if not r["ok"]:
 		_ok(false, "fixture rejected: %s" % r["reason"])
+	else:
+		r["popup"].video = null   # SB-VIDEO-003/004: native stages 1-3 (the video path is covered in c006 / c007)
 	return r["popup"]
 
 func _prem(m: Dictionary, reduced := false):
 	var r := PremiumPackCeremony.create_premium(m, reduced)
 	if not r["ok"]:
 		_ok(false, "fixture rejected: %s" % r["reason"])
+	else:
+		r["popup"].video = null   # SB-VIDEO-003/004: native stages 1-3 (the video path is covered in c006 / c007)
 	return r["popup"]
 
 func _to_await(p):
+	p.video = null   # SB-VIDEO-003/004: native stages 1-3 (the video path is covered in c006 / c007)
 	_stack.push(p)
 	await _frames(2)
 	_tap()

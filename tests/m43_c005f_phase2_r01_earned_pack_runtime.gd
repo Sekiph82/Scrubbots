@@ -115,6 +115,7 @@ func _pack_count_in_stack() -> int:
 ## Real taps: Tap 1 -> AWAIT_ROUTE -> Tap 2 -> closed "complete". Returns the ceremony model.
 func _finish_pack(p) -> Dictionary:
 	var model: Dictionary = p.get_model()
+	p.video = null   # SB-VIDEO-003/004: native stages 1-3 (the video path is covered in c006 / c007)
 	p.tap()
 	for _i in range(1500):
 		if not is_instance_valid(p) or p.phase() == "AWAIT_ROUTE":
