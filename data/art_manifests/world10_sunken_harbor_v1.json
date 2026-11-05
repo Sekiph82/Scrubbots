@@ -1,0 +1,670 @@
+{
+  "schema": "scrubbots-world-art-manifest/v1",
+  "task": "SB-M07-014",
+  "ownerDecision": "TASKS.md SB-M07-014 (owner 2026-11-03); world range SB-M43-136 (owner 2026-10-22)",
+  "world": {
+    "number": 10,
+    "id": "world_10",
+    "name": "Sunken Harbor",
+    "theme": "underwater",
+    "firstLevel": 1351,
+    "lastLevel": 1500
+  },
+  "note": "Production planning data only. No art exists yet and the game loads nothing from this file. SB-M07-012 (inventory underwater level art) stays conditional until approved level PNGs are supplied.",
+  "validator": "tools/validate_world_art_manifest.py",
+  "statusValues": [
+    "PLANNED",
+    "SUPPLIED",
+    "APPROVED"
+  ],
+  "exportRules": [
+    "Every asset is one individually exported file with a descriptive filename.",
+    "No collages, atlases, sprite sheets or contact sheets.",
+    "No cropping or automatic slicing of a larger image into level or support PNGs.",
+    "Owner-original/approved art is immutable once APPROVED (CLAUDE.md section 12); a fix is a new file with a new sha256.",
+    "A SUPPLIED or APPROVED entry carries its file, sha256, provenance, license and signedOffBy; PLANNED entries keep them null."
+  ],
+  "levelSlotRules": {
+    "count": 150,
+    "batchSize": 10,
+    "batches": 15,
+    "directory": "assets/art/levels/source/world10_sunken_harbor/",
+    "filenamePattern": "level_<NNNN>_<subject>_<W>x<H>.png",
+    "filenameRegex": "^level_(\\d{4})_[a-z0-9]+(?:_[a-z0-9]+)*_(\\d{2})x(\\d{2})\\.png$",
+    "distinct": "150 distinct images: no two level slots share a sha256",
+    "grid": {
+      "minPerDimension": 20,
+      "maxPerDimension": 59,
+      "preferredPerDimension": [
+        24,
+        40
+      ],
+      "rectangularAllowed": true,
+      "note": "Logical grid = image size / integer block size; the filename W x H is the logical grid (CLAUDE.md section 6)."
+    },
+    "palette": {
+      "source": "data/palettes/scrubbots_palette_v3.json",
+      "allowed": "C01..C16, exact RGB match only",
+      "usedColors": {
+        "min": 3,
+        "max": 12
+      }
+    },
+    "alpha": {
+      "artwork": 255,
+      "void": 0,
+      "semiTransparent": "FORBIDDEN",
+      "voidRule": "A fully transparent pixel is a VOID cell (LevelData version 2, ADR-030); production needs >= 200 non-VOID cells and >= 25% of W*H (D2)."
+    },
+    "antiAliasing": "FORBIDDEN (no blended edge pixels, no interpolated upscales)"
+  },
+  "levels": [
+    {"level": 1351, "batch": 1, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1352, "batch": 1, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1353, "batch": 1, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1354, "batch": 1, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1355, "batch": 1, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1356, "batch": 1, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1357, "batch": 1, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1358, "batch": 1, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1359, "batch": 1, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1360, "batch": 1, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1361, "batch": 2, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1362, "batch": 2, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1363, "batch": 2, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1364, "batch": 2, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1365, "batch": 2, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1366, "batch": 2, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1367, "batch": 2, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1368, "batch": 2, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1369, "batch": 2, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1370, "batch": 2, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1371, "batch": 3, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1372, "batch": 3, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1373, "batch": 3, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1374, "batch": 3, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1375, "batch": 3, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1376, "batch": 3, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1377, "batch": 3, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1378, "batch": 3, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1379, "batch": 3, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1380, "batch": 3, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1381, "batch": 4, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1382, "batch": 4, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1383, "batch": 4, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1384, "batch": 4, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1385, "batch": 4, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1386, "batch": 4, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1387, "batch": 4, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1388, "batch": 4, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1389, "batch": 4, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1390, "batch": 4, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1391, "batch": 5, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1392, "batch": 5, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1393, "batch": 5, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1394, "batch": 5, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1395, "batch": 5, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1396, "batch": 5, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1397, "batch": 5, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1398, "batch": 5, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1399, "batch": 5, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1400, "batch": 5, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1401, "batch": 6, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1402, "batch": 6, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1403, "batch": 6, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1404, "batch": 6, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1405, "batch": 6, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1406, "batch": 6, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1407, "batch": 6, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1408, "batch": 6, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1409, "batch": 6, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1410, "batch": 6, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1411, "batch": 7, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1412, "batch": 7, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1413, "batch": 7, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1414, "batch": 7, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1415, "batch": 7, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1416, "batch": 7, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1417, "batch": 7, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1418, "batch": 7, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1419, "batch": 7, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1420, "batch": 7, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1421, "batch": 8, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1422, "batch": 8, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1423, "batch": 8, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1424, "batch": 8, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1425, "batch": 8, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1426, "batch": 8, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1427, "batch": 8, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1428, "batch": 8, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1429, "batch": 8, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1430, "batch": 8, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1431, "batch": 9, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1432, "batch": 9, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1433, "batch": 9, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1434, "batch": 9, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1435, "batch": 9, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1436, "batch": 9, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1437, "batch": 9, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1438, "batch": 9, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1439, "batch": 9, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1440, "batch": 9, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1441, "batch": 10, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1442, "batch": 10, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1443, "batch": 10, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1444, "batch": 10, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1445, "batch": 10, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1446, "batch": 10, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1447, "batch": 10, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1448, "batch": 10, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1449, "batch": 10, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1450, "batch": 10, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1451, "batch": 11, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1452, "batch": 11, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1453, "batch": 11, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1454, "batch": 11, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1455, "batch": 11, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1456, "batch": 11, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1457, "batch": 11, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1458, "batch": 11, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1459, "batch": 11, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1460, "batch": 11, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1461, "batch": 12, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1462, "batch": 12, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1463, "batch": 12, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1464, "batch": 12, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1465, "batch": 12, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1466, "batch": 12, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1467, "batch": 12, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1468, "batch": 12, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1469, "batch": 12, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1470, "batch": 12, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1471, "batch": 13, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1472, "batch": 13, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1473, "batch": 13, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1474, "batch": 13, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1475, "batch": 13, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1476, "batch": 13, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1477, "batch": 13, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1478, "batch": 13, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1479, "batch": 13, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1480, "batch": 13, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1481, "batch": 14, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1482, "batch": 14, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1483, "batch": 14, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1484, "batch": 14, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1485, "batch": 14, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1486, "batch": 14, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1487, "batch": 14, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1488, "batch": 14, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1489, "batch": 14, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1490, "batch": 14, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1491, "batch": 15, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1492, "batch": 15, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1493, "batch": 15, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1494, "batch": 15, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1495, "batch": 15, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1496, "batch": 15, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1497, "batch": 15, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1498, "batch": 15, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1499, "batch": 15, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null},
+    {"level": 1500, "batch": 15, "status": "PLANNED", "file": null, "subject": null, "sha256": null, "provenance": null, "license": null, "signedOffBy": null}
+  ],
+  "supportPngDirectory": "assets/ui/generated/world10_sunken_harbor/",
+  "supportPngs": [
+    {
+      "id": "ui_background",
+      "category": "world_ui",
+      "filename": "world10_sunken_harbor_background_940x1672.png",
+      "size": [
+        940,
+        1672
+      ],
+      "aspect": "235:418",
+      "alpha": "opaque",
+      "use": "Home world background (same canvas as World 01, data/config/home_worlds_v1.json)",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "ui_world_select_card",
+      "category": "world_ui",
+      "filename": "world10_sunken_harbor_world_select_card_600x800.png",
+      "size": [
+        600,
+        800
+      ],
+      "aspect": "3:4",
+      "alpha": "straight alpha, transparent outside the card",
+      "use": "World-select card",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "ui_emblem",
+      "category": "world_ui",
+      "filename": "world10_sunken_harbor_emblem_512x512.png",
+      "size": [
+        512,
+        512
+      ],
+      "aspect": "1:1",
+      "alpha": "straight alpha, isolated object on transparent background",
+      "use": "World emblem on headers and world lists",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "ui_route_map",
+      "category": "world_ui",
+      "filename": "world10_sunken_harbor_route_map_940x1672.png",
+      "size": [
+        940,
+        1672
+      ],
+      "aspect": "235:418",
+      "alpha": "opaque",
+      "use": "World route map behind the L1351-1500 level nodes",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "ui_entry_poster",
+      "category": "world_ui",
+      "filename": "world10_sunken_harbor_entry_poster_940x1672.png",
+      "size": [
+        940,
+        1672
+      ],
+      "aspect": "235:418",
+      "alpha": "opaque",
+      "use": "World entry/unlock poster",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "ui_completion_art",
+      "category": "world_ui",
+      "filename": "world10_sunken_harbor_completion_art_940x1672.png",
+      "size": [
+        940,
+        1672
+      ],
+      "aspect": "235:418",
+      "alpha": "opaque",
+      "use": "World complete art after L1500",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "ui_loading_art",
+      "category": "world_ui",
+      "filename": "world10_sunken_harbor_loading_art_940x1672.png",
+      "size": [
+        940,
+        1672
+      ],
+      "aspect": "235:418",
+      "alpha": "opaque",
+      "use": "Loading screen art inside World 10",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "ui_reward_badge",
+      "category": "world_ui",
+      "filename": "world10_sunken_harbor_reward_badge_512x512.png",
+      "size": [
+        512,
+        512
+      ],
+      "aspect": "1:1",
+      "alpha": "straight alpha, isolated object on transparent background",
+      "use": "World completion reward badge",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "decor_coral_branching",
+      "category": "decor",
+      "filename": "world10_decor_coral_branching_512x512.png",
+      "size": [
+        512,
+        512
+      ],
+      "aspect": "1:1",
+      "alpha": "straight alpha, isolated object on transparent background",
+      "use": "Coral species 1 (branching coral)",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "decor_coral_fan",
+      "category": "decor",
+      "filename": "world10_decor_coral_fan_512x512.png",
+      "size": [
+        512,
+        512
+      ],
+      "aspect": "1:1",
+      "alpha": "straight alpha, isolated object on transparent background",
+      "use": "Coral species 2 (sea fan)",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "decor_kelp",
+      "category": "decor",
+      "filename": "world10_decor_kelp_256x768.png",
+      "size": [
+        256,
+        768
+      ],
+      "aspect": "1:3",
+      "alpha": "straight alpha, isolated object on transparent background",
+      "use": "Kelp strand",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "decor_reef_rock",
+      "category": "decor",
+      "filename": "world10_decor_reef_rock_512x384.png",
+      "size": [
+        512,
+        384
+      ],
+      "aspect": "4:3",
+      "alpha": "straight alpha, isolated object on transparent background",
+      "use": "Reef rock",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "decor_bubble_foreground",
+      "category": "decor",
+      "filename": "world10_decor_bubble_foreground_940x1672.png",
+      "size": [
+        940,
+        1672
+      ],
+      "aspect": "235:418",
+      "alpha": "straight alpha, mostly transparent full-screen overlay",
+      "use": "Foreground bubble layer",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "decor_shipwreck_silhouette",
+      "category": "decor",
+      "filename": "world10_decor_shipwreck_silhouette_1024x512.png",
+      "size": [
+        1024,
+        512
+      ],
+      "aspect": "2:1",
+      "alpha": "straight alpha, isolated object on transparent background",
+      "use": "Shipwreck silhouette",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "decor_treasure_chest",
+      "category": "decor",
+      "filename": "world10_decor_treasure_chest_512x512.png",
+      "size": [
+        512,
+        512
+      ],
+      "aspect": "1:1",
+      "alpha": "straight alpha, isolated object on transparent background",
+      "use": "Treasure chest",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "decor_light_caustic_overlay",
+      "category": "decor",
+      "filename": "world10_decor_light_caustic_overlay_940x1672.png",
+      "size": [
+        940,
+        1672
+      ],
+      "aspect": "235:418",
+      "alpha": "straight alpha, mostly transparent full-screen overlay",
+      "use": "Light/caustic overlay",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "fx_bubble",
+      "category": "fx",
+      "filename": "world10_fx_bubble_128x128.png",
+      "size": [
+        128,
+        128
+      ],
+      "aspect": "1:1",
+      "alpha": "straight alpha, one isolated sprite (no frames sheet)",
+      "use": "FX particle: bubble",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "fx_foam",
+      "category": "fx",
+      "filename": "world10_fx_foam_128x128.png",
+      "size": [
+        128,
+        128
+      ],
+      "aspect": "1:1",
+      "alpha": "straight alpha, one isolated sprite (no frames sheet)",
+      "use": "FX particle: foam",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "fx_sparkle",
+      "category": "fx",
+      "filename": "world10_fx_sparkle_128x128.png",
+      "size": [
+        128,
+        128
+      ],
+      "aspect": "1:1",
+      "alpha": "straight alpha, one isolated sprite (no frames sheet)",
+      "use": "FX particle: sparkle",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "fx_silt",
+      "category": "fx",
+      "filename": "world10_fx_silt_128x128.png",
+      "size": [
+        128,
+        128
+      ],
+      "aspect": "1:1",
+      "alpha": "straight alpha, one isolated sprite (no frames sheet)",
+      "use": "FX particle: silt puff",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "mkt_store_key_art",
+      "category": "marketing",
+      "filename": "world10_store_key_art_1920x1080.png",
+      "size": [
+        1920,
+        1080
+      ],
+      "aspect": "16:9",
+      "alpha": "opaque",
+      "use": "Store key art / feature graphic source (marketing, not shipped)",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "mkt_teaser_thumbnail",
+      "category": "marketing",
+      "filename": "world10_teaser_thumbnail_1280x720.png",
+      "size": [
+        1280,
+        720
+      ],
+      "aspect": "16:9",
+      "alpha": "opaque",
+      "use": "Teaser video thumbnail (marketing, not shipped)",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "mkt_promo_poster",
+      "category": "marketing",
+      "filename": "world10_promo_poster_1080x1920.png",
+      "size": [
+        1080,
+        1920
+      ],
+      "aspect": "9:16",
+      "alpha": "opaque",
+      "use": "Portrait promo poster (marketing, not shipped)",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    }
+  ],
+  "videoDirectory": "assets/ui/generated/world10_sunken_harbor/videos/",
+  "videos": [
+    {
+      "id": "video_intro",
+      "filename": "world10_sunken_harbor_intro_720x1280.ogv",
+      "optional": true,
+      "size": [
+        720,
+        1280
+      ],
+      "format": "ogv (Ogg Theora, Godot VideoStreamTheora, like assets/ui/final/gameplay/videos/)",
+      "durationSeconds": {
+        "min": 6,
+        "max": 8
+      },
+      "use": "World 10 intro on entering L1351",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "video_complete",
+      "filename": "world10_sunken_harbor_complete_720x1280.ogv",
+      "optional": true,
+      "size": [
+        720,
+        1280
+      ],
+      "format": "ogv (Ogg Theora, Godot VideoStreamTheora, like assets/ui/final/gameplay/videos/)",
+      "durationSeconds": {
+        "min": 5,
+        "max": 7
+      },
+      "use": "World 10 complete after L1500",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    },
+    {
+      "id": "video_teaser",
+      "filename": "world10_sunken_harbor_teaser_1080x1920.mp4",
+      "optional": true,
+      "size": [
+        1080,
+        1920
+      ],
+      "format": "mp4 (H.264, marketing, not shipped)",
+      "durationSeconds": {
+        "min": 10,
+        "max": 15
+      },
+      "use": "Marketing teaser",
+      "status": "PLANNED",
+      "sha256": null,
+      "provenance": null,
+      "license": null,
+      "signedOffBy": null
+    }
+  ]
+}
