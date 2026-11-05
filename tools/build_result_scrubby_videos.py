@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""SB-VIDEO-001/002: Results WIN / LOSE Scrubby videos from the owner's Flow masters.
+"""SB-VIDEO-001/002/005: Results WIN / LOSE and Level Intro Scrubby videos from the owner's Flow masters.
 
 For each master (720x1280, magenta chroma background) this crops every frame to the robot's
 bounding box over ALL frames plus a margin, encodes Theora .ogv (magenta kept; the Results
@@ -8,7 +8,9 @@ PNG still keyed to transparent with the SAME key as the shader (so the still nee
 shader). Frame 0 equals the last frame, so the still is also the hold pose after playback.
 Writes PROVENANCE.md next to the outputs. The masters are read-only input.
 
-Usage: python tools/build_result_scrubby_videos.py <dir with result_scrubby_{win,lose}_master.mp4>
+Usage: python tools/build_result_scrubby_videos.py <flow_videos dir> [results|level_start]
+  results      result_scrubby_{win,lose}_master.mp4 -> assets/ui/final/popups/videos/ (default)
+  level_start  level_start_scrubby_short_master.mp4 -> assets/ui/final/gameplay/videos/
 """
 import hashlib
 import subprocess
@@ -18,7 +20,26 @@ from pathlib import Path
 import numpy as np
 from PIL import Image
 
-OUT = Path("assets/ui/final/popups/videos")
+# set -> (output dir, [(section, master file, output stem)], PROVENANCE.md header lines)
+SETS = {
+    "results": (Path("assets/ui/final/popups/videos"),
+                [("win", "result_scrubby_win_master.mp4", "result_scrubby_win"),
+                 ("lose", "result_scrubby_lose_master.mp4", "result_scrubby_lose")],
+                ["# Results Scrubby videos: provenance (SB-VIDEO-001 / SB-VIDEO-002)", "",
+                 "Owner Flow videos (Google Flow, Veo 3.1 Lite), Scrubby on a flat magenta (~#F00DE9)",
+                 "chroma background (green is ruled out by the green sprout). Trimmed before import at",
+                 "frame 184: 720x1280, 24 fps, 185 frames, first frame = last frame. The trimmed MP4",
+                 "masters stay in the owner checkout (`flow_videos/`, not committed) and are read-only.", "",
+                 "Built by `python tools/build_result_scrubby_videos.py flow_videos` (ffmpeg libtheora,"]),
+    "level_start": (Path("assets/ui/final/gameplay/videos"),
+                    [("level_start", "level_start_scrubby_short_master.mp4", "level_start_scrubby")],
+                    ["# Level Intro Scrubby video: provenance (SB-VIDEO-005)", "",
+                     "Owner Flow video (Google Flow, Veo 3.1 Lite), Scrubby's \"ready / let's go\" move on a",
+                     "flat magenta (~#F00DE9) chroma background. Trimmed by the owner before import (short",
+                     "master, frames 0-83): 720x1280, 24 fps, 84 frames (~3.5 s), first frame ~ last frame.",
+                     "The MP4 master stays in the owner checkout (`flow_videos/`, not committed) and is read-only.", "",
+                     "Built by `python tools/build_result_scrubby_videos.py flow_videos level_start` (ffmpeg libtheora,"]),
+}
 W, H = 720, 1280
 MARGIN = 16
 KEY_LO, KEY_HI = 0.15, 0.45   # keep in sync with chroma_key_magenta.gdshader
@@ -59,27 +80,23 @@ def sha(p: Path) -> str:
     return hashlib.sha256(p.read_bytes()).hexdigest()
 
 
-def main(src: Path) -> None:
-    OUT.mkdir(parents=True, exist_ok=True)
+def main(src: Path, which: str) -> None:
+    out, items, header = SETS[which]
+    out.mkdir(parents=True, exist_ok=True)
     rows = []
-    for name in ("win", "lose"):
-        master = src / f"result_scrubby_{name}_master.mp4"
+    for name, master_name, stem in items:
+        master = src / master_name
         f = frames(master)
         x, y, w, h = crop_box(f)
-        ogv = OUT / f"result_scrubby_{name}.ogv"
-        still = OUT / f"result_scrubby_{name}_still.png"
+        ogv = out / f"{stem}.ogv"
+        still = out / f"{stem}_still.png"
         cmd = ["ffmpeg", "-hide_banner", "-loglevel", "error", "-y", "-i", str(master), "-map", "0:v:0", "-an",
                "-vf", f"crop={w}:{h}:{x}:{y}", "-c:v", "libtheora", "-q:v", "8", "-pix_fmt", "yuv420p",
                "-map_metadata", "-1", str(ogv)]
         subprocess.run(cmd, check=True)
         Image.fromarray(key(f[0, y:y + h, x:x + w]), "RGBA").save(still, optimize=True)
         rows.append((name, master, f.shape[0], (x, y, w, h), ogv, still, cmd))
-    lines = ["# Results Scrubby videos: provenance (SB-VIDEO-001 / SB-VIDEO-002)", "",
-             "Owner Flow videos (Google Flow, Veo 3.1 Lite), Scrubby on a flat magenta (~#F00DE9)",
-             "chroma background (green is ruled out by the green sprout). Trimmed before import at",
-             "frame 184: 720x1280, 24 fps, 185 frames, first frame = last frame. The trimmed MP4",
-             "masters stay in the owner checkout (`flow_videos/`, not committed) and are read-only.", "",
-             "Built by `python tools/build_result_scrubby_videos.py flow_videos` (ffmpeg libtheora,",
+    lines = header + [
              "numpy, Pillow). Crop = robot bounding box over all frames + 16 px, sides rounded up to 16.",
              "The .ogv keeps the magenta (keyed at runtime by",
              "`scripts/ui/feel/chroma_key_magenta.gdshader`); the still is frame 0 keyed to",
@@ -91,10 +108,10 @@ def main(src: Path) -> None:
                   f"- `{ogv.name}` sha256 `{sha(ogv)}` ({ogv.stat().st_size} bytes)",
                   f"- `{still.name}` sha256 `{sha(still)}` ({still.stat().st_size} bytes)",
                   f"- encode: `{' '.join(Path(c).name if c.endswith('.mp4') or c.endswith('.ogv') else c for c in cmd)}`", ""]
-    (OUT / "PROVENANCE.md").write_text("\n".join(lines), encoding="utf-8", newline="\n")
+    (out / "PROVENANCE.md").write_text("\n".join(lines), encoding="utf-8", newline="\n")
     for r in rows:
         print(r[0], "crop", r[3], r[4], r[5])
 
 
 if __name__ == "__main__":
-    main(Path(sys.argv[1]))
+    main(Path(sys.argv[1]), sys.argv[2] if len(sys.argv) > 2 else "results")

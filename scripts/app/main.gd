@@ -42,6 +42,7 @@ const FtueDirector = preload("res://scripts/app/ftue_director.gd")
 const CoachmarkLayer = preload("res://scripts/ui/tutorial/coachmark_layer.gd")
 const HelpTipsScreen = preload("res://scripts/ui/tutorial/help_tips_screen.gd")
 const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
+const LevelIntroOverlay = preload("res://scripts/ui/level_intro_overlay.gd")
 ## M44: coachmark refresh cadence (presentation poll; not per frame).
 const COACH_TICK_S := 0.2
 ## M44 peer-review D1: step copy (L2 booster lines run the host's solver-backed legality
@@ -66,6 +67,9 @@ static var boot_opening_override: int = -1
 ## 1 always. Covers the new-profile bootstrap (starter charges + Welcome task), the L1-L3
 ## coachmarks and What's New. Production passes nothing, so it is always ON there.
 static var boot_ftue_override: int = -1
+## SB-VIDEO-005 Level Intro seam, same policy: -1 auto = ON for the canonical save path, OFF
+## for an injected test save path (gameplay suites keep an un-overlaid board); 0 never; 1 always.
+static var boot_level_intro_override: int = -1
 
 var app_state = null
 ## M42 (SB-M42-001): the ONE app-root-owned navigation authority.
@@ -108,6 +112,8 @@ var _coach_copy := {"id": "", "at": 0, "copy": {}}
 ## SB-M44-005/006: the contextual entry shown in the current episode ("" = none). It is
 ## acknowledged when its trigger ends (the real action: WAITING resolved, Results left).
 var _coach_ctx_id := ""
+## SB-VIDEO-005: show the Level Intro overlay on each gameplay start (boot_level_intro_override).
+var level_intro_enabled := false
 
 func _enter_tree() -> void:
 	_boot()
@@ -124,6 +130,7 @@ func _boot() -> void:
 	if ftue.enabled:
 		app_state.bootstrap_new_profile()
 		ftue.settle()
+	level_intro_enabled = boot_level_intro_override == 1 or (boot_level_intro_override == -1 and path == AppState.CANONICAL_SAVE_PATH)
 	nav = NavigationController.new()
 	nav.settings_changed.connect(_on_nav_settings_changed)
 
@@ -777,6 +784,7 @@ func play_current_frontier() -> Dictionary:
 	if r.get("ok", false):
 		nav.go(NavigationController.Route.GAMEPLAY, {"level": r["launch"]["level"], "entry_id": r["launch"]["entry_id"]})
 		_bind_terminal(r["host"])
+		_show_level_intro(r["host"])
 	elif _home != null:
 		_home.refresh()
 	return r
@@ -829,6 +837,7 @@ func continue_from_results(attempt: int = -1) -> Dictionary:
 	if r.get("ok", false):
 		nav.go(NavigationController.Route.GAMEPLAY, {"level": r["launch"]["level"], "entry_id": r["launch"]["entry_id"]})
 		_bind_terminal(r["host"])
+		_show_level_intro(r["host"])
 	elif nav.current() == NavigationController.Route.RESULTS:
 		# Launch failed with no transition: re-show the same committed model (re-arms
 		# Continue). launch_gameplay released the old host, so the receipt comes from
@@ -846,7 +855,20 @@ func retry_from_results() -> bool:
 		return false
 	if not _gameplay_host.retry():
 		return false
-	return nav.resume_gameplay_after_retry()
+	if not nav.resume_gameplay_after_retry():
+		return false
+	_show_level_intro(_gameplay_host)
+	return true
+
+## SB-VIDEO-005: the Level Intro over the just-started level (presentation only; the overlay
+## consumes taps while it is up, then frees itself). Not over a live coachmark (L1-L3 FTUE).
+func _show_level_intro(host) -> void:
+	if not level_intro_enabled or (coachmarks != null and coachmarks.is_showing()):
+		return
+	var intro = LevelIntroOverlay.new()
+	intro.level = int(host.progression_level)
+	intro.reduced = app_state.effects.is_reduced()
+	host.add_child(intro)
 
 func get_results_screen():
 	return _results
