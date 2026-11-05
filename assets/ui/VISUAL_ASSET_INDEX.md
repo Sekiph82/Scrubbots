@@ -16,16 +16,16 @@ Purpose: single lookup map for Claude/Godot UI integration.
 
 ## Audit summary
 
-- Production visual files under `assets/ui/final/**`: **469**
+- Production visual files under `assets/ui/final/**`: **465**
 - Phase 1 canonical target paths: **306**
 - Phase 2 canonical target paths: **157**
 - Combined canonical target paths: **463**
 - Canonical targets missing on audited branch: **0**
-- Extra production PNGs outside Phase 1/Phase 2 canonical lists: **6**
-- Generated candidate/source visuals: **27**
-- Owner/reference visuals: **51**
-- Other project art/reference visuals: **4**
-- Total visual files indexed here: **551**
+- Extra production PNGs outside Phase 1/Phase 2 canonical lists: **2**
+- Generated candidate/source visuals: **0**
+- Owner/reference visuals: **30**
+- Other project art/reference visuals: **3**
+- Total visual files indexed here: **498**
 
 ## Canonical authorities
 
@@ -372,7 +372,7 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/difficulty/hard_emblem.png` | Phase 1 | 1,466,122 |
 | `assets/ui/final/difficulty/very_hard_emblem.png` | Phase 1 | 1,594,534 |
 
-### gameplay (55)
+### gameplay (51)
 
 | Path | Authority | Bytes |
 |---|---|---:|
@@ -381,8 +381,6 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/gameplay/batch/batch_tile_front_highlight.png` | Phase 1 | 662,375 |
 | `assets/ui/final/gameplay/batch/batch_tile_locked_overlay.png` | Phase 1 | 838,142 |
 | `assets/ui/final/gameplay/board/board_inner_frame.png` | Phase 1 | 21,679 |
-| `assets/ui/final/gameplay/buttons/icon_speed_2x.png` | LEGACY / EXTRA | 78,180 |
-| `assets/ui/final/gameplay/buttons/speed_2x_timer_frame.png` | LEGACY / EXTRA | 35,128 |
 | `assets/ui/final/gameplay/controls/button_pause.png` | Phase 1 | 915,660 |
 | `assets/ui/final/gameplay/controls/button_speed_2x_active.png` | Phase 1 | 943,779 |
 | `assets/ui/final/gameplay/controls/button_speed_2x_countdown_frame.png` | Phase 1 | 1,033,006 |
@@ -421,8 +419,6 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/gameplay/railroad/rail_slot_connector.png` | Phase 1 | 977,573 |
 | `assets/ui/final/gameplay/railroad/rail_straight_horizontal.png` | Phase 1 | 863,340 |
 | `assets/ui/final/gameplay/railroad/rail_straight_vertical.png` | Phase 1 | 1,052,797 |
-| `assets/ui/final/gameplay/railway/rail_connector.png` | LEGACY / EXTRA | 13,036 |
-| `assets/ui/final/gameplay/railway/rail_corner.png` | LEGACY / EXTRA | 26,341 |
 | `assets/ui/final/gameplay/railway/rail_straight.png` | LEGACY / EXTRA | 7,938 |
 | `assets/ui/final/gameplay/slots/slot_active.png` | Phase 1 | 13,108 |
 | `assets/ui/final/gameplay/slots/slot_empty.png` | Phase 1 | 7,379 |
@@ -623,69 +619,23 @@ Integration note (M43-C005-C007): shipping Premium opening frames 01..09, bound 
 
 ## Legacy / extra production paths
 
-These files exist in `assets/ui/final/**` but are not canonical targets in the current Phase 1 or Phase 2 master lists. Do not delete them automatically. For new UI binding, prefer the canonical equivalents noted below. The broken (truncated, undecodable) `gameplay/buttons/icon_pause.png` was deleted as a confirmed orphan on 2026-11-05 (SB-M22-027, `docs/M22_027_IMAGE_INVENTORY.md`); the pause glyph is native.
+These files exist in `assets/ui/final/**` but are not canonical targets in the current Phase 1 or Phase 2 master lists. Do not delete them automatically. For new UI binding, prefer the canonical equivalents noted below. The broken (truncated, undecodable) `gameplay/buttons/icon_pause.png` was deleted as a confirmed orphan on 2026-11-05 (SB-M22-027, `docs/M22_027_IMAGE_INVENTORY.md`); the pause glyph is native. SB-M22-030 (owner 2026-11-05, `docs/M22_030_IMAGE_CLEANUP.md`) deleted the superseded `gameplay/buttons/icon_speed_2x.png`, `gameplay/buttons/speed_2x_timer_frame.png`, `gameplay/railway/rail_connector.png` and `gameplay/railway/rail_corner.png`; their canonical equivalents are `controls/button_speed_2x.png`, `controls/button_speed_2x_countdown_frame.png`, `railroad/rail_slot_connector.png` and `railroad/rail_corner_90.png`.
 
 | Existing extra path | Preferred canonical path / note |
 |---|---|
-| `assets/ui/final/gameplay/buttons/icon_speed_2x.png` | `assets/ui/final/gameplay/controls/button_speed_2x.png` |
-| `assets/ui/final/gameplay/buttons/speed_2x_timer_frame.png` | `assets/ui/final/gameplay/controls/button_speed_2x_countdown_frame.png` |
-| `assets/ui/final/gameplay/railway/rail_connector.png` | `assets/ui/final/gameplay/railroad/rail_slot_connector.png` |
-| `assets/ui/final/gameplay/railway/rail_corner.png` | `assets/ui/final/gameplay/railroad/rail_corner_90.png` |
 | `assets/ui/final/gameplay/railway/rail_straight.png` | `Prefer horizontal/vertical canonical pieces under assets/ui/final/gameplay/railroad/` |
 
-## Generated candidates / source visuals (27)
+## Generated candidates / source visuals (0)
 
-- `assets/ui/generated/gameplay/master_v01/svg/batch_panel.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/batch_tile_frame.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/booster_extra_slot.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/booster_random.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/booster_selector.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/booster_tornado.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/bubble_bucket.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/caution_sign.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/fx_clean.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/fx_sparkle.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/gameplay_environment.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/pause_button.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/profile_panel_frame.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/rail_connector.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/rail_corner.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/rail_end.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/rail_intersection.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/rail_scrubbot.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/rail_straight.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/scrubby_gameplay.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/scrubby_portrait.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/slot_active.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/slot_empty.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/slot_locked.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/speech_bubble.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/speed_button_active_frame.svg`
-- `assets/ui/generated/gameplay/master_v01/svg/speed_button_frame.svg`
+The 27 `assets/ui/generated/gameplay/master_v01/svg/` candidates were deleted by SB-M22-030 (owner 2026-11-05, `docs/M22_030_IMAGE_CLEANUP.md`): every slot has its approved Phase 1 final under `assets/ui/final/gameplay/`.
 
-## Owner/reference visuals (51)
+
+## Owner/reference visuals (30)
+
+SB-M22-030 (owner 2026-11-05, `docs/M22_030_IMAGE_CLEANUP.md`) deleted the 16 Collection Cards sheets (all 135 cards are final), `app icon.png`, `app icon (small).png`, `Colorful logo.png`, `logo simple.png` (final branding exists) and `Playing Motors/game playing motors 001.jpeg` (gameplay is built).
 
 - `assets/art/references/_owner_inbox/Additionals/life screens.png`
 - `assets/art/references/_owner_inbox/Additionals/need a hand.png`
-- `assets/art/references/_owner_inbox/app icon (small).png`
-- `assets/art/references/_owner_inbox/app icon.png`
-- `assets/art/references/_owner_inbox/Collection Cards/bath time blitz.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/bathroom mayhem.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/clean city.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/cleaning crew 2.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/cleaning crew.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/color bots.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/garage grime.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/jungle cleanup.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/kitchen chaos.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/meet the scrubbots.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/mess monsters.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/scrubbot workshop.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/sewer squad.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/space cleaners.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/ultimate cleaners.jpeg`
-- `assets/art/references/_owner_inbox/Collection Cards/underwater heroes.jpeg`
-- `assets/art/references/_owner_inbox/Colorful logo.png`
 - `assets/art/references/_owner_inbox/Game Screens/deneme 3 OK.png`
 - `assets/art/references/_owner_inbox/Game Screens/level ekran acilisi.png`
 - `assets/art/references/_owner_inbox/Game Screens/main screen.png`
@@ -714,15 +664,12 @@ These files exist in `assets/ui/final/**` but are not canonical targets in the c
 - `assets/art/references/_owner_inbox/Levels/level designs 016 made by chatgpt.jpeg`
 - `assets/art/references/_owner_inbox/Levels/level designs 017.jpeg`
 - `assets/art/references/_owner_inbox/Levels/level designs 018.jpeg`
-- `assets/art/references/_owner_inbox/logo simple.png`
-- `assets/art/references/_owner_inbox/Playing Motors/game playing motors 001.jpeg`
 
-## Other project art/reference visuals (4)
+## Other project art/reference visuals (3)
 
 - `assets/art/levels/previews/m21_level_001_hazard_bot.png`
 - `assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png`
 - `assets/brand/akilta-wordmark.svg`
-- `coordination/sessions/M21-C001/M21_REFERENCE_COMPOSITE.png`
 
 ## Integration notes
 
