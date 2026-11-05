@@ -7,6 +7,8 @@ extends SceneTree
 ##
 ## Run: godot --headless --path . -s res://tests/m42_c003_scrubby_animation.gd
 ## measure_frames() is shared with tests/tools/m42_c003_animation_evidence.gd.
+## SB-POLISH-009: live Home now runs the World 01 owner video mode; the frame cases below
+## force the frame fallback (_home(video = false)), the video_* cases cover the video mode.
 
 const AppState = preload("res://scripts/app/app_state.gd")
 const HomeScreenScene = preload("res://scenes/ui/home/home_screen.tscn")
@@ -27,6 +29,8 @@ const SOURCE_FAMILY := {"wave": "wave", "bow": "bow", "turn": "turn_look", "full
 const HARD := ["TopCurrencyHUD", "GiftMeter", "PlayButton", "BottomNav",
 	"Shortcut_shop", "Shortcut_collection", "Shortcut_tasks", "Shortcut_daily"]
 const DT := 1.0 / 60.0
+const VIDEO_SET_ID := "home_scrubby_videos_v1"
+const VIDEO_GESTURES := ["wave", "bow", "turn", "full_turn"]
 
 var EXPECTED_CASES := [
 	"assets_manifest", "final_only_and_parity", "static_fallback", "base_geometry",
@@ -34,6 +38,8 @@ var EXPECTED_CASES := [
 	"scheduler_weights_no_repeat", "no_stack_and_restore", "screen_space_gates",
 	"reduced_effects", "modal", "route_visibility", "focus_pause", "stability_20x",
 	"presentation_only", "buttons_usable",
+	"video_assets", "video_mode_layout", "video_scheduler", "video_real_playback",
+	"video_gates", "video_reduced", "video_play_failure",
 ]
 
 var _fail := 0
@@ -59,6 +65,13 @@ func _initialize() -> void:
 	await _stability()
 	await _presentation_only()
 	await _buttons()
+	_video_assets()
+	await _video_layout()
+	await _video_scheduler()
+	await _video_real_playback()
+	await _video_gates()
+	await _video_reduced()
+	await _video_failure()
 	for p in _tmp:
 		for suffix in ["", ".bak", ".tmp"]:
 			if FileAccess.file_exists(p + suffix):
@@ -73,7 +86,7 @@ func _app():
 	var clock := func(): return 1790000000
 	return AppState.new(p, clock, LocalCalendar.offset_provider(clock, 0))
 
-func _home(size: Vector2i, app = null) -> Array:
+func _home(size: Vector2i, app = null, video := false) -> Array:
 	var sub := SubViewport.new()
 	sub.size = size
 	sub.disable_3d = true
@@ -86,6 +99,8 @@ func _home(size: Vector2i, app = null) -> Array:
 		await process_frame
 	var hero = home.get_region("HomeScrubbyHero")
 	hero.set_process(false)
+	if not video:
+		hero.set_video(home.get_region("WorldStill"), home.get_region("WorldVideo"), {})   # frame fallback
 	hero.set_rng_seed(42)
 	return [sub, home, hero]
 
@@ -672,6 +687,204 @@ func _buttons() -> void:
 		sub.free()
 		await process_frame
 	_complete("buttons_usable")
+
+# -------------------------------------------------------- SB-POLISH-009 video ----
+
+func _video_assets() -> void:
+	print("[video assets / manifest]")
+	var m = V.load_manifest()
+	var vs: Dictionary = m["video_sets"][VIDEO_SET_ID]
+	var parity := true
+	var sizes := []
+	for g in VIDEO_GESTURES:
+		var v: Dictionary = vs["videos"][g]
+		parity = parity and FileAccess.get_sha256("res://" + String(v["path"])) == String(v["sha256"]) and String(v["path"]).begins_with("assets/ui/final/home/videos/")
+		sizes.append(FileAccess.get_file_as_bytes("res://" + String(v["path"])).size())
+	_ok(parity and (vs["videos"] as Dictionary).size() == 4, "4 pinned .ogv under final/home/videos, sha256 == bytes")
+	_ok(sizes.min() > 2500000 and sizes.max() < 4500000, "re-encoded clips ~3-4 MB each %s" % str(sizes))
+	var b = HomeArtBinder.new()
+	var vset: Dictionary = b.video_set(VIDEO_SET_ID)
+	var theora := true
+	for g in VIDEO_GESTURES:
+		theora = theora and vset.get("streams", {}).get(g) is VideoStreamTheora
+	_ok(vset.get("still") != null and Vector2i(vset["still"].get_size()) == Vector2i(720, 1280) and theora, "binder serves the 720x1280 still + 4 Theora streams")
+	m["video_sets"][VIDEO_SET_ID]["videos"]["bow"]["sha256"] = "0".repeat(64)
+	var bad = HomeArtBinder.new(m)
+	_ok(not bad.is_manifest_valid() and bad.video_set(VIDEO_SET_ID).is_empty(), "a changed video pin invalidates the manifest -> no video")
+	var m2 = V.load_manifest()
+	m2["video_sets"][VIDEO_SET_ID]["videos"]["wave"]["path"] = "assets/ui/generated/home_scrubby_wave.ogv"
+	_ok(not V.validate(m2)["ok"], "non-final video path rejected")
+	_complete("video_assets")
+
+func _video_layout() -> void:
+	print("[video mode layout: still + player in the background layer]")
+	for vp in VIEWPORTS:
+		var r = await _home(vp, null, true)
+		var home = r[1]
+		var hero = r[2]
+		var still: TextureRect = home.get_region("WorldStill")
+		var video: VideoStreamPlayer = home.get_region("WorldVideo")
+		var wb := _local(home, "WorldBackground")
+		_ok(hero.has_video() and hero.get_streams().size() == 4 and still.visible and still.texture != null and still.texture.resource_path.ends_with("home_scrubby_still.png"), "%s video mode: still bound and shown" % str(vp))
+		_ok(_local(home, "WorldStill").is_equal_approx(wb) and _local(home, "WorldVideo").is_equal_approx(wb), "%s still + video share the background crop/scale rect %s" % [str(vp), str(wb)])
+		var bg: Control = home.get_region("Background")
+		_ok(still.get_parent() == bg and video.get_parent() == bg and still.get_index() > home.get_region("WorldBackground").get_index() and video.get_index() > still.get_index() and video.get_index() < home.get_region("Layer_characters").get_index(), "%s still then video above WorldBackground, below the character layer and UI" % str(vp))
+		_ok(home.get_region("Art_scrubby").self_modulate.a == 0.0 and not home.get_region("HeroFocusShade").visible and not video.visible and video.stream == null, "%s idle: separate Scrubby art + shade off, player hidden with no stream" % str(vp))
+		_ok(video.mouse_filter == Control.MOUSE_FILTER_IGNORE and still.mouse_filter == Control.MOUSE_FILTER_IGNORE, "%s still + video never take input" % str(vp))
+		r[0].free()
+		await process_frame
+	_complete("video_mode_layout")
+
+func _players(n: Node) -> int:
+	var c := 1 if n is VideoStreamPlayer else 0
+	for ch in n.get_children():
+		c += _players(ch)
+	return c
+
+func _video_scheduler() -> void:
+	print("[video scheduler: uniform / no repeat / 5..6 s hold]")
+	var r = await _home(VIEWPORTS[0], null, true)
+	var home = r[1]
+	var hero = r[2]
+	var video: VideoStreamPlayer = hero.get_video_player()
+	var w0: float = hero.get_state()["wait"]
+	_ok(w0 >= Hero.VIDEO_HOLD_MIN and w0 <= Hero.VIDEO_HOLD_MAX, "first hold %.2f s in 5..6" % w0)
+	var seq: Array = []
+	var holds: Array = []
+	var idle_since := 0.0
+	var prev := ""
+	var playing_ok := true
+	var idle_ok := true
+	for _i in range(int(3600.0 / DT)):
+		hero.step(DT)
+		var g: String = hero.get_state()["gesture"]
+		if g != "" and prev == "":
+			seq.append(g)
+			holds.append(idle_since)
+			playing_ok = playing_ok and video.visible and video.is_playing() and video.stream == hero.get_streams()[g] and home.get_region("WorldStill").visible
+		if g == "" and prev != "":
+			idle_ok = idle_ok and not video.visible and video.stream == null and not video.is_playing()
+		idle_since = 0.0 if g != "" else idle_since + DT
+		prev = g
+	var repeats := 0
+	var counts := {}
+	for i in seq.size():
+		counts[seq[i]] = int(counts.get(seq[i], 0)) + 1
+		if i > 0:
+			repeats += int(seq[i] == seq[i - 1])
+	_ok(seq.size() > 200 and repeats == 0, "%d videos in 1 h, 0 immediate repeats" % seq.size())
+	_ok(holds.min() >= Hero.VIDEO_HOLD_MIN - DT and holds.max() <= Hero.VIDEO_HOLD_MAX + DT, "holds %.2f..%.2f s within 5..6" % [holds.min(), holds.max()])
+	var uniform := counts.size() == 4
+	for g in counts:
+		uniform = uniform and absf(float(counts[g]) / seq.size() - 0.25) < 0.07
+	_ok(uniform, "all 4 videos picked ~uniformly %s" % str(counts))
+	_ok(playing_ok, "every start: the picked stream on WorldVideo, playing, still underneath")
+	_ok(idle_ok, "every end: player hidden, stream released, still shown")
+	_ok(_players(home) == 1, "exactly one VideoStreamPlayer in Home (one decoder at most)")
+	if hero.get_state()["gesture"] == "":
+		hero.start_gesture("bow" if hero.get_state()["last"] != "bow" else "wave")
+	_ok(hero.get_state()["gesture"] != "" and not hero.start_gesture("turn") and not hero.start_gesture("full_turn"), "a second video is refused while one runs")
+	r[0].free()
+	await process_frame
+	_complete("video_scheduler")
+
+func _video_real_playback() -> void:
+	print("[real Theora playback returns to the still]")
+	var r = await _home(VIEWPORTS[0], null, true)
+	var hero = r[2]
+	var video: VideoStreamPlayer = hero.get_video_player()
+	_ok(hero.start_gesture("wave"), "wave starts")
+	var tex_ok := false
+	var t0 := Time.get_ticks_msec()
+	while hero.get_state()["gesture"] != "" and Time.get_ticks_msec() - t0 < 12000:
+		await process_frame
+		var tex := video.get_video_texture()
+		tex_ok = tex_ok or (tex != null and Vector2i(tex.get_size()) == Vector2i(720, 1280))
+	var ms := Time.get_ticks_msec() - t0
+	_ok(tex_ok, "decoder produced 720x1280 frames")
+	_ok(hero.get_state()["gesture"] == "" and ms > 6500 and not video.visible and video.stream == null and r[1].get_region("WorldStill").visible, "finished signal after %d ms -> still, stream released" % ms)
+	var w: float = hero.get_state()["wait"]
+	_ok(w >= Hero.VIDEO_HOLD_MIN and w <= Hero.VIDEO_HOLD_MAX, "next hold %.2f s" % w)
+	r[0].free()
+	await process_frame
+	_complete("video_real_playback")
+
+func _video_stopped(hero, home) -> bool:
+	var video: VideoStreamPlayer = hero.get_video_player()
+	return hero.get_state()["gesture"] == "" and not video.visible and video.stream == null and not video.is_playing() and home.get_region("WorldStill").visible
+
+func _video_gates() -> void:
+	print("[video gates: modal / hidden / focus / pause]")
+	var r = await _home(VIEWPORTS[0], null, true)
+	var home = r[1]
+	var hero = r[2]
+	_ok(hero.start_gesture("turn"), "turn playing")
+	home.set_modal_active("settings", true)
+	hero.step(DT)
+	_ok(_video_stopped(hero, home), "modal opens: video stopped, stream released, still")
+	_run(hero, 40.0)
+	_ok(hero.get_state()["counts"].size() == 1 and not hero.start_gesture("bow"), "40 s under modal: nothing starts")
+	home.set_modal_active("settings", false)
+	hero.step(DT)
+	_ok(hero.get_state()["wait"] >= Hero.VIDEO_HOLD_MIN - DT, "modal closed: fresh %.2f s hold" % hero.get_state()["wait"])
+	var p = home.open_popup("daily")
+	_ok(not hero.can_start_gesture(), "DAILY popup: no video")
+	p.close_popup()
+	_ok(hero.start_gesture("bow"), "bow playing")
+	home.visible = false
+	hero.step(DT)
+	_ok(_video_stopped(hero, home) and not hero.motion_allowed(), "Home hidden: video stopped")
+	_run(hero, 40.0)
+	_ok(hero.get_state()["gesture"] == "", "hidden 40 s: nothing starts")
+	home.visible = true
+	for pair in [[NOTIFICATION_APPLICATION_FOCUS_OUT, NOTIFICATION_APPLICATION_FOCUS_IN, "focus"], [NOTIFICATION_APPLICATION_PAUSED, NOTIFICATION_APPLICATION_RESUMED, "pause"]]:
+		hero.step(DT)
+		_ok(hero.start_gesture("full_turn" if pair[2] == "focus" else "wave"), "%s: video playing" % pair[2])
+		hero.notification(pair[0])
+		hero.step(DT)
+		_ok(_video_stopped(hero, home), "%s lost (backgrounded): video stopped, still" % pair[2])
+		var before: Dictionary = hero.get_state()["counts"].duplicate()
+		_run(hero, 40.0)
+		_ok(hero.get_state()["counts"] == before, "%s lost 40 s: nothing starts" % pair[2])
+		hero.notification(pair[1])
+		hero.step(DT)
+		_ok(hero.get_state()["wait"] >= Hero.VIDEO_HOLD_MIN - DT, "%s back: fresh %.2f s hold" % [pair[2], hero.get_state()["wait"]])
+	r[0].free()
+	await process_frame
+	_complete("video_gates")
+
+func _video_reduced() -> void:
+	print("[video Reduced Effects: still only]")
+	var app = _app()
+	var r = await _home(VIEWPORTS[0], app, true)
+	var home = r[1]
+	var hero = r[2]
+	_ok(hero.start_gesture("wave"), "wave playing")
+	app.effects.set_reduced(true)
+	_ok(_video_stopped(hero, home) and home.get_region("Art_scrubby").self_modulate.a == 0.0, "ON live: video stopped, still only")
+	_run(hero, 60.0)
+	_ok(hero.get_state()["counts"].size() == 1 and not hero.start_gesture("bow") and _video_stopped(hero, home), "ON: no video in 60 s, start refused")
+	app.effects.set_reduced(false)
+	_run(hero, Hero.VIDEO_HOLD_MAX + 0.1)
+	_ok(hero.get_state()["gesture"] != "", "OFF: videos resume within one hold")
+	r[0].free()
+	await process_frame
+	_complete("video_reduced")
+
+func _video_failure() -> void:
+	print("[video play failure keeps the still]")
+	var r = await _home(VIEWPORTS[0], null, true)
+	var home = r[1]
+	var hero = r[2]
+	var broken := VideoStreamTheora.new()
+	broken.file = "res://assets/ui/final/home/videos/missing.ogv"
+	hero.set_video(home.get_region("WorldStill"), home.get_region("WorldVideo"), {"streams": {"wave": broken, "bow": broken}})
+	_ok(not hero.start_gesture("wave") and _video_stopped(hero, home), "unplayable stream: start refused, still kept")
+	_run(hero, 30.0)
+	_ok(_video_stopped(hero, home) and hero.get_state()["counts"].is_empty(), "30 s of failed attempts: still kept, nothing counted")
+	r[0].free()
+	await process_frame
+	_complete("video_play_failure")
 
 func _complete(c: String) -> void:
 	_completed[c] = true

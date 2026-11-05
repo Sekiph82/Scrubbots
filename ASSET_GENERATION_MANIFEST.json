@@ -99,6 +99,27 @@
       "notes": "4-panel storyboard (941x1672): 1 pack drop + TAP TO OPEN over the blurred Home park, 2 shake and charge, 3 tear and burst with face-down cards in a fan, 4 face-up reveal with rarity glows, NEW ribbon and green COLLECT. Reference only: the ceremony is rebuilt from existing approved frames, card backs and card art as native Controls (scripts/ui/ceremony/standard_pack_ceremony.gd).",
       "ships": false,
       "ships_note": "excluded from Android export via assets/ui/generated/*"
+    },
+    "home_scrubby_videos_v1": {
+      "repository_paths": [
+        "assets/ui/final/home/videos/home_scrubby_wave.ogv",
+        "assets/ui/final/home/videos/home_scrubby_bow.ogv",
+        "assets/ui/final/home/videos/home_scrubby_turn.ogv",
+        "assets/ui/final/home/videos/home_scrubby_full_turn.ogv",
+        "assets/ui/final/home/videos/home_scrubby_still.png"
+      ],
+      "status": "OWNER_SUPPLIED",
+      "provider": "google_flow_veo_3_1_lite",
+      "date": "2026-10-31",
+      "owner_decision": "owner made the four Home Scrubby gesture videos in Google Flow (Veo 3.1 Lite, frames-to-video with the Home start frame as first and last frame) and trimmed each at frame 184, the frame matching frame 0 (SB-POLISH-009)",
+      "source_masters": {
+        "home_scrubby_wave_master.mp4": "77952e4bcbd85b42d8411c743d4ca6ee36fdfb9240b6cdb46f8002a404eb5b1e",
+        "home_scrubby_bow_master.mp4": "6024c91c62144a15264756e823154656b9229933819894c35bd139e3a900d0e8",
+        "home_scrubby_turn_master.mp4": "4c288b61accbee36be05241b070ad5e213d76ebda21190121122cd861f2d850f",
+        "home_scrubby_full_turn_master.mp4": "bb8612882327ac115aa6feb354ed252a0dbc109ba0647e6683d16e1471d73a9a"
+      },
+      "notes": "Full 720x1280 (9:16) Home background with only Scrubby moving, pixel-aligned to home_background.png (940x1672). Runtime copies re-encoded from the trimmed H.264 masters with ffmpeg libtheora -q:v 4, no audio, 24 fps, 185 frames (~3.3 MB each). home_scrubby_still.png = frame 0 of the turn master (the four frame 0s differ only by codec noise: raw mean diff 5.1-5.5/255, blurred 1.7-1.9/255). No art changes. The masters stay in the owner's local flow_videos folder (not committed).",
+      "ships": true
     }
   },
   "output_roots": {

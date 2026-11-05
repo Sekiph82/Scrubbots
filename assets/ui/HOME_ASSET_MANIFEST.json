@@ -1703,8 +1703,50 @@
       "approval_authority": "coordination/sessions/M43-OWNER-R15/CHATGPT_PROMPT_R15_004_V01.md",
       "source_path": "assets/ui/final/home/shortcuts/icon_shortcut_rewarded_ads.png",
       "notes": "SB-M43-R15-004: owner-supplied Rewarded Ads Home icon (1254x1254, text-free), committed by the owner to main in 840406b and used byte-exact - not regenerated, redrawn, recoloured or substituted. The prompt pinned e25529bd...378f; the committed owner file hashes ce96e09a...6c8b and the owner explicitly confirmed (2026-10-06) that the committed file is the approved master. Presented on the auxiliary REWARDED ADS entry under DAILY with a code-rendered label."
+    },
+    {
+      "id": "HOME-123",
+      "slug": "home_scrubby_video_still",
+      "group": "world",
+      "kind": "ART",
+      "implementation": "generated_asset",
+      "path": "assets/ui/final/home/videos/home_scrubby_still.png",
+      "generation_required": false,
+      "provider": "google_flow_veo_3_1_lite",
+      "reusable": false,
+      "status": "APPROVED",
+      "approved_sha256": "7e89b2458622849ec59d20fc3c25c63c92badbb0c29b85d8eb04b9029b2f419b",
+      "approval_authority": "SB-POLISH-009 owner design 2026-10-31 (owner-made Flow videos)",
+      "source_path": "assets/ui/final/home/videos/home_scrubby_still.png",
+      "notes": "SB-POLISH-009: frame 0 (720x1280) of the owner's trimmed home_scrubby_turn_master.mp4 (Google Flow, Veo 3.1 Lite), extracted losslessly; it is the full Home background with Scrubby baked in, pixel-aligned to HOME-121 and the first/last frame of all four video_sets clips. Shown as the World 01 Home background while idle; no art changes."
     }
   ],
+  "video_sets": {
+    "home_scrubby_videos_v1": {
+      "status": "APPROVED",
+      "authority": "SB-POLISH-009 owner design 2026-10-31",
+      "provenance": "owner Google Flow videos (Veo 3.1 Lite), trimmed at frame 184 (matches frame 0), re-encoded with ffmpeg libtheora -q:v 4, 720x1280, 24 fps, 185 frames, no audio; no art changes",
+      "still_slug": "home_scrubby_video_still",
+      "videos": {
+        "wave": {
+          "path": "assets/ui/final/home/videos/home_scrubby_wave.ogv",
+          "sha256": "e0a39ed79d42243714b1c9e829c4a1ae805d9972a8a5cee811e020e67e128526"
+        },
+        "bow": {
+          "path": "assets/ui/final/home/videos/home_scrubby_bow.ogv",
+          "sha256": "082b229e1bba3d03b33419aad2cc6ea74ae153264b85576d78474712ca783b74"
+        },
+        "turn": {
+          "path": "assets/ui/final/home/videos/home_scrubby_turn.ogv",
+          "sha256": "da7c0ba45a6c44f9a1799711d0f3a9ac18b163d6b20205a4823ffccf653683cb"
+        },
+        "full_turn": {
+          "path": "assets/ui/final/home/videos/home_scrubby_full_turn.ogv",
+          "sha256": "ac2d2d9b85a8e9b35c4ff9b4feb62789256dd8e2c835f962b813a625a2831ddb"
+        }
+      }
+    }
+  },
   "animation_sets": {
     "home_scrubby_gestures_v03": {
       "status": "APPROVED",

@@ -23,10 +23,22 @@ extends Control
 ## Scheduler: idle interval uniform 6..12 s, then one gesture by weight (Wave 35 / Turn 30 /
 ## Bow 25 / Full Turn 10) excluding the previous one; never stacked; the next interval starts
 ## only after the gesture returned to HOME-026. No Timer/Tween/signal is created per cycle.
+##
+## SB-POLISH-009 video mode (World 01, takes precedence when set_video() gets streams): the
+## owner's Flow videos are the full Home background with Scrubby baked in. HomeScreen's
+## WorldStill (frame 0 of the videos) replaces the background + HOME-026 while idle; after a
+## 5..6 s hold one video plays (uniform pick, never the same twice) in WorldVideo, the one
+## VideoStreamPlayer in the same layer, and the still returns when it ends (its first and
+## last frame are the still). Hidden / modal / backgrounded / Reduced Effects stop the video
+## and release its stream (one decoder at most); a failed play keeps the still.
 
 const WEIGHTS := {"wave": 35, "turn": 30, "bow": 25, "full_turn": 10}
 const INTERVAL_MIN := 6.0
 const INTERVAL_MAX := 12.0
+const VIDEO_HOLD_MIN := 5.0
+const VIDEO_HOLD_MAX := 6.0
+## Watchdog: clip length 185 frames @ 24 fps = 7.71 s + margin (presentation safety only).
+const VIDEO_WATCHDOG := 9.0
 const IDLE_PERIOD := 2.6      ## seconds per breath
 const IDLE_SQUASH := 0.006    ## +-0.6% height (x counter-scaled by half) about the soles
 const IDLE_SHADER := """shader_type canvas_item;
@@ -42,6 +54,9 @@ var _effects = null                  ## AppState.effects (EffectsSettingsService
 var _rng := RandomNumberGenerator.new()
 var _k := 0.0                        ## screen px per HOME texel (from set_base)
 var _idle_mat := ShaderMaterial.new()
+var _still: TextureRect               ## WorldStill (HomeScreen background layer)
+var _video: VideoStreamPlayer        ## WorldVideo (same layer, same rect)
+var _streams: Dictionary = {}        ## gesture -> VideoStream ({} = frame mode)
 
 var _gesture := ""                   ## "" = idle
 var _gesture_t := 0.0
@@ -87,6 +102,20 @@ func set_frames(anim_set: Dictionary) -> void:
 
 func has_frames() -> bool:
 	return not _set.is_empty()
+
+## Video mode: the still node + its player + the binder video_set() result.
+func set_video(still: TextureRect, player: VideoStreamPlayer, video_set: Dictionary) -> void:
+	_still = still
+	_video = player
+	_streams = video_set.get("streams", {}) if still.texture != null else {}
+	if not _video.finished.is_connected(_on_video_finished):
+		_video.finished.connect(_on_video_finished)
+	_still.visible = has_video()
+	_end_gesture()
+	_wait = _next_interval()
+
+func has_video() -> bool:
+	return not _streams.is_empty()
 
 ## Canonical Reduced Effects (AppState.effects); live via its changed(reduced) signal.
 func bind_effects(effects) -> void:
@@ -157,7 +186,7 @@ func _notification(what: int) -> void:
 
 ## Large motion allowed at all (Reduced Effects off, Home visible, app focused/running).
 func motion_allowed() -> bool:
-	return has_frames() and not is_reduced() and is_visible_in_tree() and _focused and not _paused
+	return (has_frames() or has_video()) and not is_reduced() and is_visible_in_tree() and _focused and not _paused
 
 ## A NEW gesture may start (also requires no modal).
 func can_start_gesture() -> bool:
@@ -169,8 +198,8 @@ func _process(delta: float) -> void:
 ## One deterministic tick (tests drive this with set_process(false)).
 func step(dt: float) -> void:
 	var open := can_start_gesture()
-	if not motion_allowed():
-		_end_gesture()        # hidden / backgrounded / Reduced Effects: inert, static HOME-026
+	if not motion_allowed() or (has_video() and not open):
+		_end_gesture()        # hidden / backgrounded / Reduced Effects (video: also modal): inert, static
 		_idle_t = 0.0
 		_apply_idle()
 		_was_open = false
@@ -180,6 +209,10 @@ func step(dt: float) -> void:
 	_was_open = open
 	if _gesture != "":
 		_gesture_t += dt     # a running gesture may finish under a modal (no snap)
+		if has_video():
+			if _gesture_t >= VIDEO_WATCHDOG:
+				_on_video_finished()
+			return
 		var frames: Array = _set["textures"][_gesture]
 		var i := int(floor(_gesture_t * float(_set["fps"])))
 		if i >= frames.size():
@@ -197,6 +230,9 @@ func step(dt: float) -> void:
 		start_gesture(pick_gesture())
 
 func pick_gesture() -> String:
+	if has_video():
+		var opts: Array = _streams.keys().filter(func(g): return g != _last)
+		return opts[_rng.randi_range(0, opts.size() - 1)] if not opts.is_empty() else ""
 	var total := 0
 	for g in WEIGHTS:
 		if g != _last and has_frames() and (_set["textures"] as Dictionary).has(g):
@@ -212,6 +248,20 @@ func pick_gesture() -> String:
 
 ## Start one gesture now (scheduler; tests/evidence seam). Refused while one is running.
 func start_gesture(g: String) -> bool:
+	if has_video():
+		if _gesture != "" or not _streams.has(g) or not can_start_gesture():
+			return false
+		_video.stream = _streams[g]
+		_video.visible = true
+		_video.play()
+		if not _video.is_playing() or _video.get_stream_length() <= 0.0:
+			_end_gesture()   # playback failed (e.g. unreadable file): keep the still
+			return false
+		_gesture = g
+		_gesture_t = 0.0
+		_last = g
+		_counts[g] = int(_counts.get(g, 0)) + 1
+		return true
 	if _gesture != "" or not has_frames() or not (_set["textures"] as Dictionary).has(g) or not can_start_gesture():
 		return false
 	_gesture = g
@@ -231,21 +281,33 @@ func _end_gesture() -> void:
 	_gesture_t = 0.0
 	_gesture_rect.visible = false
 	_gesture_rect.texture = null
+	if _video != null and _video.stream != null:
+		if _video.is_playing():
+			_video.stop()
+		_video.stream = null
+		_video.visible = false
 	if _home_rect != null:
-		_home_rect.self_modulate.a = 1.0
+		_home_rect.self_modulate.a = 0.0 if has_video() else 1.0
+
+func _on_video_finished() -> void:
+	if _gesture != "":
+		_end_gesture()
+		_wait = _next_interval()
 
 func _apply_idle() -> void:
 	_idle_mat.set_shader_parameter("squash", get_idle_squash())
 
 ## Current idle squash (identity when reduced, gesturing, or at phase 0).
 func get_idle_squash() -> Vector2:
-	var s := 0.0 if is_reduced() or _gesture != "" else IDLE_SQUASH * sin(TAU * _idle_t / IDLE_PERIOD)
+	var s := 0.0 if is_reduced() or has_video() or _gesture != "" else IDLE_SQUASH * sin(TAU * _idle_t / IDLE_PERIOD)
 	return Vector2(1.0 - s * 0.5, 1.0 + s)
 
 func get_idle_material() -> ShaderMaterial:
 	return _idle_mat
 
 func _next_interval() -> float:
+	if has_video():
+		return _rng.randf_range(VIDEO_HOLD_MIN, VIDEO_HOLD_MAX)
 	return _rng.randf_range(INTERVAL_MIN, INTERVAL_MAX)
 
 # ------------------------------------------------------------ test accessors ----
@@ -254,6 +316,12 @@ func get_state() -> Dictionary:
 	return {"gesture": _gesture, "gesture_t": _gesture_t, "last": _last, "wait": _wait,
 		"idle_t": _idle_t, "modal": _modal, "focused": _focused, "paused": _paused,
 		"counts": _counts.duplicate()}
+
+func get_video_player() -> VideoStreamPlayer:
+	return _video
+
+func get_streams() -> Dictionary:
+	return _streams
 
 func get_gesture_rect() -> TextureRect:
 	return _gesture_rect

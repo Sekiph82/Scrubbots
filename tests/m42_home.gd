@@ -376,7 +376,7 @@ func _approved_art_only() -> void:
 	for row in rows:
 		if not HomePresentationMap.INACTIVE_MODES.has(row["mode"]):
 			active += 1
-	_ok(rows.size() == 53 and active == 25 and bound == 25 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved, R15-004 + HOME-122): 53 entries accounted, 25 active entries presented (%d bound), retired/disabled entries present nothing" % bound)
+	_ok(rows.size() == 54 and active == 26 and bound == 26 and home.get_region("ScrubBucksChip").icon.texture != null, "production manifest (owner-approved, R15-004 + HOME-122 + SB-POLISH-009 HOME-123): 54 entries accounted, 26 active entries presented (%d bound), retired/disabled entries present nothing" % bound)
 	# Un-approval simulation on an in-memory manifest copy (repo manifest untouched):
 	# entries that are not APPROVED keep native placeholders.
 	var m = V.load_manifest()

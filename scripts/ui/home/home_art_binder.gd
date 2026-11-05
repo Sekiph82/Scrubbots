@@ -91,6 +91,24 @@ func animation_set(id: String) -> Dictionary:
 	out["textures"] = textures
 	return out
 
+## SB-POLISH-009: an APPROVED, hash-pinned video set. Returns {} when the manifest is
+## invalid, the set is absent or its still does not bind; otherwise
+## {"still": Texture2D, "streams": {gesture: VideoStream}} (streams that fail to load are
+## left out).
+func video_set(id: String) -> Dictionary:
+	if not _valid or not (_manifest.get("video_sets", {}) as Dictionary).has(id):
+		return {}
+	var s: Dictionary = _manifest["video_sets"][id]
+	var still := texture(String(s["still_slug"]))
+	if still == null:
+		return {}
+	var streams := {}
+	for g in s["videos"]:
+		var v := load("res://" + String(s["videos"][g]["path"])) as VideoStream
+		if v != null:
+			streams[g] = v
+	return {"still": still, "streams": streams}
+
 ## Overwrite protection for tooling: false when `path` is an APPROVED final asset.
 func can_write(path: String) -> bool:
 	for a in _by_slug.values():

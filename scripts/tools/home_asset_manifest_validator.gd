@@ -158,6 +158,7 @@ static func validate(m, project_root: String = "res://", mode: String = SOURCE_T
 		if not slugs.has(req):
 			errors.append("missing required Economy V1 Home entry '%s'" % req)
 	_validate_animation_sets(m.get("animation_sets", {}), project_root, mode, errors)
+	_validate_video_sets(m.get("video_sets", {}), slugs, project_root, mode, errors)
 	return {"ok": errors.is_empty(), "errors": errors, "warnings": warnings, "reuse": reuse}
 
 static func is_pin(v) -> bool:
@@ -213,3 +214,31 @@ static func _validate_animation_sets(sets, project_root: String, mode: String, e
 					var err := integrity_error(path, str(f["sha256"]), project_root, mode)
 					if err != "":
 						errors.append("animation set %s/%s: frame %s" % [id, g, err.replace("approved asset changed on disk", "changed on disk")])
+
+## SB-POLISH-009: pinned Home video sets (Theora .ogv under FINAL_ROOT + an ART still slug).
+static func _validate_video_sets(sets, slugs: Dictionary, project_root: String, mode: String, errors: Array) -> void:
+	if typeof(sets) != TYPE_DICTIONARY:
+		errors.append("video_sets must be an object")
+		return
+	for id in sets:
+		var s = sets[id]
+		if typeof(s) != TYPE_DICTIONARY or str(s.get("status", "")) != "APPROVED":
+			errors.append("video set %s: must be an APPROVED object" % id)
+			continue
+		if not slugs.has(str(s.get("still_slug", ""))):
+			errors.append("video set %s: still_slug must name a manifest asset" % id)
+		var videos = s.get("videos")
+		if typeof(videos) != TYPE_DICTIONARY or videos.is_empty():
+			errors.append("video set %s: videos must be a non-empty object" % id)
+			continue
+		for g in videos:
+			var v = videos[g]
+			var path := str(v.get("path", "")) if typeof(v) == TYPE_DICTIONARY else ""
+			if not path.begins_with(FINAL_ROOT) or not path.ends_with(".ogv"):
+				errors.append("video set %s/%s: path must be an .ogv under %s (%s)" % [id, g, FINAL_ROOT, path])
+			elif not is_pin(v.get("sha256", "")):
+				errors.append("video set %s/%s: %s requires sha256 (64 lowercase hex)" % [id, g, path])
+			else:
+				var err := integrity_error(path, str(v["sha256"]), project_root, mode)
+				if err != "":
+					errors.append("video set %s/%s: %s" % [id, g, err])

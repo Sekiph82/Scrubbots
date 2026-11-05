@@ -11,6 +11,8 @@ extends Control
 ##   HomeScreen (Home theme: bold face + navy outline)
 ##   ├── Background          world canvas (clipped above the ad slot)
 ##   │     ├── WorldBackground   HOME-120, uniform scale, never stretched
+##   │     ├── WorldStill / WorldVideo   SB-POLISH-009: background with Scrubby baked in
+##   │     │                       (still + one gesture video), same rect as WorldBackground
 ##   │     └── Layer_characters/Art_scrubby   feet on the baked platform
 ##   └── SafeAreaRoot/MarginContainer/Content/HomeLayout (VBox)
 ##       ├── TopCurrencyHUD      narrow profile card (portrait in front of its frame,
@@ -65,6 +67,9 @@ const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
 const HomeMicroFeel = preload("res://scripts/ui/feel/home_micro_feel.gd")
 ## M42-C003 V03 pinned gesture frame set (HOME_ASSET_MANIFEST animation_sets).
 const HERO_ANIMATION_SET := "home_scrubby_gestures_v03"
+## SB-POLISH-009 World 01 owner Flow videos (HOME_ASSET_MANIFEST video_sets); when bound they
+## replace the frame set (which stays the fallback).
+const HERO_VIDEO_SET := "home_scrubby_videos_v1"
 const UiText = preload("res://scripts/ui/ui_text.gd")
 
 ## Popups with a V1 Home destination. Only DAILY is a Home panel in V04; Gifts and Cards
@@ -198,6 +203,9 @@ func set_art_binder(binder) -> void:
 	var ra: UiShortcutButton = _nodes["RewardedAdsButton"]
 	ra.set_icon_box(ra.get_icon_box())
 	_nodes["HomeScrubbyHero"].set_frames(_art.animation_set(HERO_ANIMATION_SET) if _art.has_method("animation_set") else {})
+	_nodes["HomeScrubbyHero"].set_video(_nodes["WorldStill"], _nodes["WorldVideo"], _art.video_set(HERO_VIDEO_SET) if _art.has_method("video_set") else {})
+	# Scrubby is baked into the video still, so the focus shade would dim him: video mode drops it.
+	_nodes["HeroFocusShade"].visible = not _nodes["HomeScrubbyHero"].has_video()
 	_queue_world()
 
 func get_art_binder():
@@ -229,6 +237,7 @@ func get_asset_diagnostics() -> Dictionary:
 		"manifest_valid": _art != null and _art.is_manifest_valid(),
 		"bound_nodes": bound, "unbound_nodes": unbound, "nodes": nodes,
 		"hero_has_frames": hero.has_frames(), "animation_counts": counts,
+		"hero_video_streams": hero.get_streams().keys(),
 		# Packaging facts: is the raw source PNG in this build, and would the strict
 		# source gate pass here (false in an export = why PACKAGED_RUNTIME exists).
 		"raw_source_png_present": FileAccess.file_exists("res://assets/ui/final/characters/scrubby/scrubby_home_pose.png"),
@@ -287,6 +296,16 @@ func _build() -> void:
 	var wb := HomeStyle.art("WorldBackground")
 	wb.stretch_mode = TextureRect.STRETCH_SCALE   # sized to the texture aspect by _layout_world
 	bg.add_child(_reg(wb))
+	var still := HomeStyle.art("WorldStill")
+	still.stretch_mode = TextureRect.STRETCH_SCALE
+	still.visible = false
+	bg.add_child(_reg(still))
+	var video := VideoStreamPlayer.new()
+	video.name = "WorldVideo"
+	video.expand = true
+	video.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	video.visible = false
+	bg.add_child(_reg(video))
 	# Wide (tablet) canvases: mirrored continuation of the same world image fills the
 	# narrow side bands beyond the 1:2 world instead of flat BG01 bars.
 	for side in ["WorldEdgeLeft", "WorldEdgeRight"]:
@@ -773,6 +792,9 @@ func _layout_world() -> void:
 	var wb: TextureRect = _nodes["WorldBackground"]
 	wb.position = _world_offset
 	wb.size = C * s
+	for n in ["WorldStill", "WorldVideo"]:
+		(_nodes[n] as Control).position = wb.position
+		(_nodes[n] as Control).size = wb.size
 	for side in ["WorldEdgeLeft", "WorldEdgeRight"]:
 		var edge: TextureRect = _nodes[side]
 		edge.texture = wb.texture
