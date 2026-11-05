@@ -103,3 +103,48 @@ CONFIRMED_ORPHAN is then deleted only with runtime proof (below).
 - 348 tracked images are byte-identical copies of another tracked image (2219 files,
   1871 SHA256), e.g. generated sources promoted to final. Duplicates are not orphans; each copy
   is classified by its own path.
+
+## Deleted (permanent `git rm`, no archive or backup)
+
+| path | bytes | sha256 | tracked meta |
+|---|---:|---|---|
+| `assets/ui/final/gameplay/buttons/icon_pause.png` | 7531 | `d917ec37efdafda1fdd6d21f0c6da6a390a65eeb6413cf2e04c54e4b3b30e782` | none (its .import was never tracked) |
+
+Proof:
+
+- **Undecodable**: the IHDR says 256x250 RGBA, the single IDAT chunk declares 32768 bytes but
+  the file ends after 7531; zlib stops with "invalid distance too far back". Godot's import
+  fails (`ERR_FILE_CORRUPT`, "Error importing ...icon_pause.png"; the only 3 import errors of
+  the project), so no load of it can ever return a texture. Truncated since its only commit
+  fbda9e71.
+- **Negative references**: no res:// path, repo path, uid, file name, stem, pattern or folder
+  literal in any scripts/, scenes/, data/, addons/, tests/, tools/, project.godot or export
+  preset. The remaining mentions were descriptions of the broken file: owner review
+  M28-C002-C002 S4 ("icon_pause.png is a broken PNG", pause glyph drawn natively),
+  `VISUAL_ASSET_INDEX.md` "LEGACY / EXTRA", the M47 R02 audit trail, and the iOS workflow that
+  skipped it in its sparse checkout and exclude_filter.
+- **Runtime**: `tests/tools/m22_026_texture_measure.gd` (real main.tscn, throw-away saves,
+  52 scenarios at 1080x2400 and 1536x2048: Home, Gameplay 5/6-slot, Results, Shop, Collection,
+  Robots, ceremonies, packs, popups, coachmarks) before and after: no "Failed loading resource",
+  "Cannot open file", "Resource file not found" or "Error loading" line in either log; merged
+  per-texture sizes (168 textures) and per-scenario loaded MiB identical.
+
+Doc/CI follow-ups in the same commit: the iOS workflow no longer special-cases the file
+(sparse-checkout line, absence guard, exclude_filter entry, pack grep), `docs/IOS_TOOLCHAIN.md`
+and `VISUAL_ASSET_INDEX.md` no longer list it.
+
+## After
+
+| class | images | bytes |
+|---|---:|---:|
+| ACTIVE_RUNTIME | 426 | 399217989 |
+| DYNAMIC_REF | 74 | 61507569 |
+| PROVENANCE_MASTER | 1573 | 1942805818 |
+| FUTURE_NEEDED | 145 | 174921839 |
+| TEST_ONLY | 0 | 0 |
+| UNKNOWN | 0 | 0 |
+| CONFIRMED_ORPHAN | 0 | 0 |
+| **total** | 2218 | 2578453215 |
+
+Before -> after: 2219 -> 2218 tracked images, 1871 -> 1870 distinct SHA256, 7531 bytes freed.
+The CSV is the after state.

@@ -372,7 +372,7 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/difficulty/hard_emblem.png` | Phase 1 | 1,466,122 |
 | `assets/ui/final/difficulty/very_hard_emblem.png` | Phase 1 | 1,594,534 |
 
-### gameplay (56)
+### gameplay (55)
 
 | Path | Authority | Bytes |
 |---|---|---:|
@@ -381,7 +381,6 @@ Purpose: single lookup map for Claude/Godot UI integration.
 | `assets/ui/final/gameplay/batch/batch_tile_front_highlight.png` | Phase 1 | 662,375 |
 | `assets/ui/final/gameplay/batch/batch_tile_locked_overlay.png` | Phase 1 | 838,142 |
 | `assets/ui/final/gameplay/board/board_inner_frame.png` | Phase 1 | 21,679 |
-| `assets/ui/final/gameplay/buttons/icon_pause.png` | LEGACY / EXTRA | 7,531 |
 | `assets/ui/final/gameplay/buttons/icon_speed_2x.png` | LEGACY / EXTRA | 78,180 |
 | `assets/ui/final/gameplay/buttons/speed_2x_timer_frame.png` | LEGACY / EXTRA | 35,128 |
 | `assets/ui/final/gameplay/controls/button_pause.png` | Phase 1 | 915,660 |
@@ -624,11 +623,10 @@ Integration note (M43-C005-C007): shipping Premium opening frames 01..09, bound 
 
 ## Legacy / extra production paths
 
-These files exist in `assets/ui/final/**` but are not canonical targets in the current Phase 1 or Phase 2 master lists. Do not delete them automatically. For new UI binding, prefer the canonical equivalents noted below.
+These files exist in `assets/ui/final/**` but are not canonical targets in the current Phase 1 or Phase 2 master lists. Do not delete them automatically. For new UI binding, prefer the canonical equivalents noted below. The broken (truncated, undecodable) `gameplay/buttons/icon_pause.png` was deleted as a confirmed orphan on 2026-11-05 (SB-M22-027, `docs/M22_027_IMAGE_INVENTORY.md`); the pause glyph is native.
 
 | Existing extra path | Preferred canonical path / note |
 |---|---|
-| `assets/ui/final/gameplay/buttons/icon_pause.png` | `assets/ui/final/gameplay/controls/button_pause.png` |
 | `assets/ui/final/gameplay/buttons/icon_speed_2x.png` | `assets/ui/final/gameplay/controls/button_speed_2x.png` |
 | `assets/ui/final/gameplay/buttons/speed_2x_timer_frame.png` | `assets/ui/final/gameplay/controls/button_speed_2x_countdown_frame.png` |
 | `assets/ui/final/gameplay/railway/rail_connector.png` | `assets/ui/final/gameplay/railroad/rail_slot_connector.png` |

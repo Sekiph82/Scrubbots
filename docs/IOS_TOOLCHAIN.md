@@ -31,7 +31,7 @@ Key options:
 | `application/app_store_team_id` | `AAAAAAAAAA` (placeholder) | benign: export is project-only and unsigned |
 | `application/export_project_only` | `true` | Godot emits an Xcode project; CI builds it with `xcodebuild` |
 | `icons/icon_1024x1024`, `icons/app_store_1024x1024` | `res://assets/ui/final/branding/app_icon_ios_1024.png` | Godot 4.3+ derives every other size from the 1024 icon |
-| `exclude_filter` | coordination, docs, tests, tools, level_factory, content_pipeline, art references, generated/candidate UI, broken `icon_pause.png`, `.github` | developer files stay out of the pack (also absent from the checkout) |
+| `exclude_filter` | coordination, docs, tests, tools, level_factory, content_pipeline, art references, generated/candidate UI, `.github` | developer files stay out of the pack (also absent from the checkout) |
 
 Portrait orientation comes from `project.godot` (`display/window/handheld/orientation=1`).
 

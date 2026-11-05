@@ -7,12 +7,9 @@ name: iOS IPA
 # M47-FAMILY-APK-IOS-EXPORT-R02: clean-import / package-hygiene gate (same signing policy:
 # UNSIGNED IPA, the owner signs it with xtool at install time).
 #   - checkout workspace WITHOUT the nine owner-excluded developer trees
-#     (.github/android/family_first10_export_exclusions.txt, same as the Android Family export)
-#     and without the single owner-acknowledged broken, unused legacy file
-#     assets/ui/final/gameplay/buttons/icon_pause.png (truncated PNG since its only commit
-#     fbda9e71; owner review M28-C002-C002 S4 "icon_pause.png is a broken PNG", native glyph used;
-#     VISUAL_ASSET_INDEX "LEGACY / EXTRA", canonical controls/button_pause.png; zero runtime
-#     references). The repository file itself is untouched;
+#     (.github/android/family_first10_export_exclusions.txt, same as the Android Family export);
+#     the broken legacy assets/ui/final/gameplay/buttons/icon_pause.png it used to skip was
+#     deleted as a confirmed orphan (SB-M22-027, docs/M22_027_IMAGE_INVENTORY.md);
 #   - the Godot import is FAIL-CLOSED (no "|| true"): any failed resource load / import, corrupt
 #     file, script or parse error fails the run; the full import log is kept;
 #   - the PCK inside the built IPA is scanned (zero excluded developer paths, every runtime
@@ -48,7 +45,6 @@ jobs:
             !/assets/art/references/
             !/assets/ui/candidates/
             !/assets/ui/generated/
-            !/assets/ui/final/gameplay/buttons/icon_pause.png
 
       - name: Import workspace has only runtime sources
         run: |
@@ -57,7 +53,6 @@ jobs:
             case "$p" in ''|'#'*) continue;; esac
             if [ -e "$p" ]; then echo "::error::excluded developer tree present: $p"; bad=1; else echo "absent: $p"; fi
           done < .github/android/family_first10_export_exclusions.txt
-          if [ -e assets/ui/final/gameplay/buttons/icon_pause.png ]; then echo "::error::broken legacy icon_pause.png present"; bad=1; else echo "absent: assets/ui/final/gameplay/buttons/icon_pause.png (owner-acknowledged broken, unused)"; fi
           exit $bad
 
       - name: Godot + export templates
@@ -82,7 +77,7 @@ jobs:
           export_filter="all_resources"
           include_filter=""
           ; Gelistirme/denetim dosyalari oyuna girmesin (coordination 1.7 GB); workspace'te de yoklar
-          exclude_filter="coordination/*, docs/*, tests/*, tools/*, level_factory/*, content_pipeline/*, assets/art/references/*, assets/ui/generated/*, assets/ui/candidates/*, assets/ui/final/gameplay/buttons/icon_pause.png, .github/*"
+          exclude_filter="coordination/*, docs/*, tests/*, tools/*, level_factory/*, content_pipeline/*, assets/art/references/*, assets/ui/generated/*, assets/ui/candidates/*, .github/*"
           export_path="build/ios/${APP_NAME}.ipa"
 
           [preset.0.options]
@@ -169,7 +164,6 @@ jobs:
             "$PCK" "$PWD/.github/android/family_first10_export_exclusions.txt" \
             "$PWD/out/required_runtime_paths.txt" "$PWD/out/ipa_pck_scan_report.json" 2>&1 | tee out/ipa_pck_scan.log
           grep -q "verdict=PASS" out/ipa_pck_scan.log
-          grep -c "res://assets/ui/final/gameplay/buttons/icon_pause" out/ipa_pck_scan_report_files.txt | sed 's/^/icon_pause entries in pack: /' || true
 
       - name: Headless boot of the IPA's pack (offline)
         run: |
