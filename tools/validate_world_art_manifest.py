@@ -23,6 +23,7 @@ import tempfile
 import zlib
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))  # python -I drops the script dir
+sys.dont_write_bytecode = True  # -I ignores PYTHONDONTWRITEBYTECODE; keep tools/ free of __pycache__
 from audit_level_art import PALETTE, ROOT, audit, decode_png  # noqa: E402
 
 DEFAULT = os.path.join(ROOT, "data", "art_manifests", "world10_sunken_harbor_v1.json")
