@@ -48,6 +48,11 @@ extends Control
 ## SB-POLISH-011 V1 — WON / LOST robot motion (CharacterMotion `win` / `lose`) on the existing
 ##   pose, independent of the adapter: draw-only (layout and input untouched), Reduced = static,
 ##   a re-show of the same terminal skips the intro straight to the idle loop, hidden = stopped.
+## SB-VIDEO-001/002 — Scrubby's WON / LOST robot slot plays the owner's Flow result video once,
+##   magenta keyed by chroma_key_magenta.gdshader, then holds the pre-keyed still (frame 0 = last
+##   frame). Reduced Effects or a re-show of the same terminal shows only the still. One decoder,
+##   freed when Results hides or re-shows; it never takes input and the slot rect never changes.
+##   Other robots, or a video that fails to load / play, keep the approved pose + CharacterMotion.
 ##
 ## Actions (intents only; the app root performs them):
 ##   HOME                -> home_requested
@@ -74,6 +79,13 @@ const ROBOT_ART := "res://assets/ui/final/popups/victory/victory_scrubby_pose.pn
 const EMBLEM_ART := "res://assets/ui/final/popups/victory/victory_emblem.png"
 const FAIL_ROBOT_ART := "res://assets/ui/final/popups/help/help_scrubby_pose.png"
 const FAIL_EMBLEM_ART := "res://assets/ui/final/popups/failure/fail_header_emblem.png"
+## SB-VIDEO-001/002: Scrubby result videos (see assets/ui/final/popups/videos/PROVENANCE.md).
+const SCRUBBY_ID := "scrubby"
+const WIN_VIDEO := "res://assets/ui/final/popups/videos/result_scrubby_win.ogv"
+const WIN_STILL := "res://assets/ui/final/popups/videos/result_scrubby_win_still.png"
+const LOSE_VIDEO := "res://assets/ui/final/popups/videos/result_scrubby_lose.ogv"
+const LOSE_STILL := "res://assets/ui/final/popups/videos/result_scrubby_lose_still.png"
+const CHROMA_KEY := preload("res://scripts/ui/feel/chroma_key_magenta.gdshader")
 const ICON_ART := {
 	"first_clear_sb": "res://assets/ui/final/common/currencies/icon_currency_scrub_bucks.png",
 	"win_streak_sb": "res://assets/ui/final/home/reward_track/win_streak_reward_badge.png",
@@ -137,6 +149,7 @@ var _victory_theme: Theme
 var _feel = null
 var _feel_tweens: Array = []
 var _motion_id := ""   ## terminal identity whose robot intro already played
+var _video: VideoStreamPlayer = null   ## the one result-video decoder (only while it plays)
 const ROW_FEEL_MAX := 6        ## at most this many reward-row feel events per Results
 const EMBLEM_POP := 0.12       ## WON emblem: one sine bump 1.0 -> 1.12 -> 1.0
 const EMBLEM_POP_S := 0.36
@@ -398,12 +411,73 @@ func show_model(model: Dictionary) -> void:
 	_sync_primary()
 	_start_reveal(bool(_model.get("reduced_effects", false)))
 	if _styled:
-		CharacterMotion.play(_robot, "win" if won else "lose", _feel_reduced(), _feel_id() != _motion_id)
+		var intro := _feel_id() != _motion_id
+		if not _show_scrubby_video(won, intro):
+			CharacterMotion.play(_robot, "win" if won else "lose", _feel_reduced(), intro)
 		_motion_id = _feel_id()
 	if won:
 		if _feel_reduced():
 			_consume_rows_static()
 		_after_layout(_celebrate_win.bind(_feel_id()))
+
+## SB-VIDEO-001/002: Scrubby's result video in the robot slot, or only its keyed still (Reduced
+## Effects, a re-show of the same terminal, outside the tree). False = not Scrubby, or the video
+## could not load / play: the caller keeps the approved pose + CharacterMotion.
+func _show_scrubby_video(won: bool, intro: bool) -> bool:
+	var rid := String(_model.get("robot_id", ""))
+	if not rid.is_empty() and rid != SCRUBBY_ID:
+		return false
+	var still := load(WIN_STILL if won else LOSE_STILL) as Texture2D
+	if still == null:
+		return false
+	if intro and not _feel_reduced() and is_inside_tree() and not _start_video(load(WIN_VIDEO if won else LOSE_VIDEO) as VideoStream, still):
+		return false
+	_robot.texture = still
+	return true
+
+## One keyed VideoStreamPlayer over the robot, aspect-fitted like the still it ends on. The robot's
+## own pixels are hidden (self_modulate) while it plays; finishing frees it and shows the still.
+func _start_video(stream: VideoStream, still: Texture2D) -> bool:
+	if stream == null:
+		return false
+	var box := AspectRatioContainer.new()
+	box.name = "VideoBox"
+	box.ratio = float(still.get_width()) / float(still.get_height())
+	box.set_anchors_preset(Control.PRESET_FULL_RECT)
+	box.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_video = VideoStreamPlayer.new()
+	_video.name = "ResultVideo"
+	_video.expand = true
+	_video.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_video.material = ShaderMaterial.new()
+	(_video.material as ShaderMaterial).shader = CHROMA_KEY
+	_video.stream = stream
+	box.add_child(_video)
+	_robot.add_child(box)
+	_video.finished.connect(_on_video_finished.bind(_video), CONNECT_DEFERRED)
+	_video.play()
+	if not _video.is_playing() or _video.get_stream_length() <= 0.0:
+		_stop_video()
+		return false
+	_robot.self_modulate.a = 0.0
+	return true
+
+func _on_video_finished(player) -> void:   # untyped: may be a freed player
+	if player == _video:
+		_stop_video()
+
+func _stop_video() -> void:
+	_robot.self_modulate.a = 1.0
+	if _video == null:
+		return
+	var box := _video.get_parent()
+	_video.stop()
+	_robot.remove_child(box)
+	box.queue_free()
+	_video = null
+
+func get_result_video() -> VideoStreamPlayer:
+	return _video
 
 ## WON = Victory composition; LOST = Fail composition (same family, failure art);
 ## ERROR = technical fallback. No Victory art outside WON.
@@ -742,6 +816,7 @@ func _stop_feel() -> void:
 			tw.kill()
 	_feel_tweens.clear()
 	CharacterMotion.stop(_robot)
+	_stop_video()
 	for c in [_emblem, _primary]:
 		if c != null:
 			c.scale = Vector2.ONE
