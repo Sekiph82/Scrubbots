@@ -881,7 +881,8 @@ func _video_failure() -> void:
 	hero.set_video(home.get_region("WorldStill"), home.get_region("WorldVideo"), {"streams": {"wave": broken, "bow": broken}})
 	_ok(not hero.start_gesture("wave") and _video_stopped(hero, home), "unplayable stream: start refused, still kept")
 	_run(hero, 30.0)
-	_ok(_video_stopped(hero, home) and hero.get_state()["counts"].is_empty(), "30 s of failed attempts: still kept, nothing counted")
+	var fails: int = hero.get_state()["failed"]
+	_ok(_video_stopped(hero, home) and hero.get_state()["counts"].is_empty() and fails >= 2 and fails <= 7, "30 s: %d failed attempts (one per 5-6 s hold, never per frame), still kept, nothing counted" % fails)
 	r[0].free()
 	await process_frame
 	_complete("video_play_failure")

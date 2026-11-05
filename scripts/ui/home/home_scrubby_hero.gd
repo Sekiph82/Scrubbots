@@ -68,6 +68,7 @@ var _focused := true
 var _paused := false
 var _was_open := false               ## gates open on the previous step (resume detection)
 var _counts := {}                    ## gesture -> times started (tests/evidence)
+var _failed := 0                     ## failed video plays (tests/evidence)
 
 func _init() -> void:
 	name = "HomeScrubbyHero"
@@ -256,6 +257,8 @@ func start_gesture(g: String) -> bool:
 		_video.play()
 		if not _video.is_playing() or _video.get_stream_length() <= 0.0:
 			_end_gesture()   # playback failed (e.g. unreadable file): keep the still
+			_failed += 1
+			_wait = _next_interval()   # retry after a normal hold, never every frame
 			return false
 		_gesture = g
 		_gesture_t = 0.0
@@ -315,7 +318,7 @@ func _next_interval() -> float:
 func get_state() -> Dictionary:
 	return {"gesture": _gesture, "gesture_t": _gesture_t, "last": _last, "wait": _wait,
 		"idle_t": _idle_t, "modal": _modal, "focused": _focused, "paused": _paused,
-		"counts": _counts.duplicate()}
+		"counts": _counts.duplicate(), "failed": _failed}
 
 func get_video_player() -> VideoStreamPlayer:
 	return _video
