@@ -9,8 +9,8 @@ Per-image table (path, SHA256, bytes, class, reason, tracked .import/.uid, first
 ## Method
 
 Every tracked image (`git ls-files`: png, jpg, jpeg, webp, svg, bmp, tga, gif, exr, hdr, ico,
-icns, ktx, dds) is searched for in every tracked text file except image `.import` files and
-this report. A reference is any of:
+icns, ktx, dds) is searched for in every tracked text file except image `.import` files, the
+tool and this report. A reference is any of:
 
 - **res** / **path**: the `res://` path / the repo path (also backslash and `%20` forms);
 - **uid**: the `uid://` from its `.import` (scene/resource ext_resource by uid);

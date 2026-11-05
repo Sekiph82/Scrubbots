@@ -3,7 +3,7 @@
 
 For each tracked image (git ls-files) prints one CSV row: path, sha256, bytes, class, reason
 and the first referencing files. A reference is any of, in any tracked text file except the
-image's own .import and this tool's own report:
+image's own .import, this tool and its report:
   res    the res:// path
   path   the repo path (also backslash and %20 forms)
   uid    the uid:// from its .import (ext_resource by uid)
@@ -54,7 +54,7 @@ BINARY_EXT = IMAGE_EXT + (".import", ".ogv", ".ogg", ".wav", ".mp3", ".mp4", ".t
                           ".woff2", ".zip", ".jar", ".keystore", ".pck", ".so", ".dll", ".a")
 CODE_EXT = (".gd", ".tscn", ".tres", ".gdshader", ".godot", ".cfg")
 EXPORT_PRESET = ".github/android/export_presets_family_first10.cfg"
-REPORT_NAMES =("m22_027_image_inventory.csv", "M22_027_IMAGE_INVENTORY.md")
+REPORT_NAMES = ("m22_027_image_inventory.csv", "M22_027_IMAGE_INVENTORY.md", "m22_027_image_inventory.py")
 CLASSES = ["ACTIVE_RUNTIME", "DYNAMIC_REF", "PROVENANCE_MASTER", "FUTURE_NEEDED", "TEST_ONLY",
            "UNKNOWN", "CONFIRMED_ORPHAN"]
 BARE_ROOTS = {"res://", "res://assets/", "res://assets/ui/", "res://assets/ui/final/", "assets/",
