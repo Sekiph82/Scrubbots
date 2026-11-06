@@ -114,7 +114,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - OWNER SB-M43-165 — retry popup asserted on all 4 surfaces (factory 070); needs live store IAP / ad provider (M57) / cloud provider (SB-M43-153) / Ranks (no owner action: unblocks when M57 store/ads, SB-M43-153 cloud and Ranks are live)
 - OWNER SB-M43-166 — tasks/duplicates/gifts/events empty states asserted (factory 070); no-rankings needs Ranks live (no owner action: unblocks when M57 store/ads, SB-M43-153 cloud and Ranks are live)
 - READY SB-M43-168 — final cross-screen sound/haptic feel acceptance
-- READY SB-M43-169 — manifest misses 19 ui_surface_registry ids (home, results, settings, ...) and the Rewarded Ads surface
+- DONE SB-M43-169 — PLAYER_EXPERIENCE_ASSET_MANIFEST covers every ui_surface_registry id (registry_ids aliases on 16 existing entries; new home REFERENCE_SELECTED, settings + rewarded_ads MASTER_REQUIRED, no ad provider M57); factory 112 (3abf6508); LOCAL_PASS m43_c001b 11/11
 - READY SB-M43-170 — M43 closure gate (surfaces MASTER_REQUIRED, Ranks/Level Intro not live)
 - READY SB-M43-C005F-015 — end-to-end GameFeelFlow/Spark feel validation across representative paths (no single suite yet)
 - READY SB-UI-VIS-006 — pixel-level QA of production assets used on-screen: alpha edges, no text/watermark, readability, import settings
@@ -1402,7 +1402,7 @@ Before M43 program closure, the following surfaces must each have a canonical vi
 38. Notification education/settings where custom UI is needed.
 39. Rewarded Ads daily claim/watch surface.
 
-- [ ] SB-M43-169 Create `assets/ui/PLAYER_EXPERIENCE_ASSET_MANIFEST.json` covering every surface above and all generated illustration components. **[OPEN 2026-10-30, factory 065 audit gap: manifest ids do not cover data/config/ui_surface_registry_v1.json ids (19 missing, e.g. home, results, settings) and it has no Rewarded Ads surface (list item 39).]**
+- [x] SB-M43-169 Create `assets/ui/PLAYER_EXPERIENCE_ASSET_MANIFEST.json` covering every surface above and all generated illustration components. **[OPEN 2026-10-30, factory 065 audit gap: manifest ids do not cover data/config/ui_surface_registry_v1.json ids (19 missing, e.g. home, results, settings) and it has no Rewarded Ads surface (list item 39).]** **[DONE 2026-11-06, factory 112 (3abf6508): every data/config/ui_surface_registry_v1.json screen/popup id now resolves to a manifest surface id or its new registry_ids alias list (16 existing entries, e.g. victory_results covers results, generic_error_offline_loading covers error/loading); new entries home (REFERENCE_SELECTED: owner main screen reference + assets/ui/HOME_ASSET_MANIFEST.json; scripts/ui/home/home_screen.gd), settings (MASTER_REQUIRED; scripts/ui/settings_panel.gd) and rewarded_ads, list item 39 (MASTER_REQUIRED; scripts/ui/daily/rewarded_ads_screen.gd; gap: no ad provider yet, M57). No status promoted, no owner review claimed, no art created. tests/m43_c001b_won_results_visual.gd art_and_manifest_governance now fails on any uncovered registry id or a missing rewarded_ads surface; LOCAL_PASS 'M43-C001B WON results visual evidence: PASS (11/11 cases, 0 fail)'; review: factory 112 peer review.]**
 - [ ] SB-M43-170 No M43 program closure while any required surface is missing, visually unreviewed, wired to dummy data or reachable only through debug tooling. **[OPEN 2026-10-30, factory 065 audit gap: closure gate: surfaces still MASTER_REQUIRED, Ranks/Level Intro not live.]**
 
 #### M43-C015R - Owner Runtime Review Remediation [OWNER REQUEST 2026-10-06]
