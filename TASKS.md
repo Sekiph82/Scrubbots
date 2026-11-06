@@ -117,8 +117,8 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - DONE SB-M43-169 — PLAYER_EXPERIENCE_ASSET_MANIFEST covers every ui_surface_registry id (registry_ids aliases on 16 existing entries; new home REFERENCE_SELECTED, settings + rewarded_ads MASTER_REQUIRED, no ad provider M57); factory 112 (3abf6508); LOCAL_PASS m43_c001b 11/11
 - READY SB-M43-170 — M43 closure gate (surfaces MASTER_REQUIRED, Ranks/Level Intro not live)
 - DONE SB-M43-C005F-015 — automated e2e; owner visual gate pending phone review (factory 113, 65005cdc): LOCAL_PASS tests/m43_c005f_015_e2e_feel.gd 6/6 (5 real paths x OFF/FULL/REDUCED/FAULT/REAL, 264 checks, ~5 min, local only, not in CI); fixed Results WIN video + ceremony hand-off video = 2 decoders
-- READY SB-UI-VIS-006 — pixel-level QA of production assets used on-screen: alpha edges, no text/watermark, readability, import settings
-- READY SB-UI-031 — validate transparency/edges/resolution/filtering/compression/memory/readability of bound generated assets
+- DONE SB-UI-VIS-006 — pixel-level QA of production assets used on-screen: alpha edges, no text/watermark, readability, import settings; factory 114 (e58f4bbc): tools/ui_vis_006_asset_qa.py over 641 ACTIVE_RUNTIME/DYNAMIC_REF images + re-measured drawn rects (84 scenarios, 189 textures); docs/UI_VIS_006_ASSET_QA.md + docs/ui_vis_006_asset_qa.csv; imports 641/641 lossless, no mipmaps, fix_alpha_border, no premult (nothing changed, no art changed); 0 white halos, 0 empty, level art alpha binary 40/40, no text/watermark (3 heuristic candidates looked at: dust/drops/confetti); 9 under-res defects recorded for owner art decision (gameplay shells 887x1774 at 0.76x, home_background 0.71x, 6 video stills at their 720x1280/624x640 video resolution 0.55-0.65x); 27 under-2x, 3 unused white-background PNGs, 18 padding >= 1 MiB; LOCAL_PASS tests/ui_vis_006_asset_qa.gd (added to android-family-first10 suite list; fails on a lowered limit / mipmaps on); owner phone review pending for softness/readability/identity
+- DONE SB-UI-031 — validate transparency/edges/resolution/filtering/compression/memory/readability of bound generated assets; batched with SB-UI-VIS-006 (factory 114, e58f4bbc): filtering Linear UI / Nearest board + teaser, compression lossless everywhere, resident MiB per texture in docs/ui_vis_006_asset_qa.csv; readability = owner phone review pending
 - READY SB-M49-020..022 — prove all touch targets >= 88 px (nav, Pause/2x, supply); localization-expansion text container stress
 - READY SB-M49-026..028 — full viewport matrix for every M43/M44 surface; long labels/prices; modal stacks and scroll screens
 - READY SB-M49-031..032 — matrix check of Next Cleanup, journey, ScrubBox, Weekly/First-Try, Catch-Up; compact degradation
@@ -811,7 +811,7 @@ Canonical discovery index for Claude/Godot UI integration:
 
 - [x] SB-UI-VIS-004 Integrate/audit the final visual-closure batch P2-145..P2-157 from `codex/visual-assets-production` into `main`. Source commit: `19efd8577a0d3d48885623be7568b8b1660e6bb8`. This batch contains 9 robot-perk icons, 3 Collection state assets, and the canonical 10-robot Cleaning Crew group art. DONE 2026-10-22 (factory verify-close): 19efd857 is ancestor of main; all 14 PNGs (9 perks, 3 Collection states, cleaning_crew_group) present on HEAD with identical blob hashes; indexed in assets/ui/VISUAL_ASSET_INDEX.md (P2-145..P2-157); perk icons bound in data/config/robot_roster_v1.json.
 - [x] SB-UI-VIS-005 After P2-145..P2-157 integration, refresh/verify the `main` copy of `assets/ui/VISUAL_ASSET_INDEX.md` so Claude sees the final 157 / 157 Phase 2 targets and complete production paths. Verified 2026-10-22 (factory 024): script found rows P2-001..P2-157 all present, 0 duplicates, 0 missing files on disk; index summary already states 157 / 157; no index edit needed.
-- [ ] SB-UI-VIS-006 Before UI milestone closure, perform owner/Claude pixel-level QA of production assets actually used on-screen: alpha edges, text/watermark absence, mobile readability, identity consistency, compression/import settings. Path existence alone is not visual acceptance.
+- [x] SB-UI-VIS-006 Before UI milestone closure, perform owner/Claude pixel-level QA of production assets actually used on-screen: alpha edges, text/watermark absence, mobile readability, identity consistency, compression/import settings. Path existence alone is not visual acceptance. Automated + Claude pixel QA DONE 2026-11-06 (factory 114, e58f4bbc, docs/UI_VIS_006_ASSET_QA.md); owner-visual items (mobile readability, identity consistency, softness of video stills / gameplay shell on device) pending owner phone review.
 
 Static AI visual generation is considered closed after SB-UI-VIS-004/005 unless a new owner-approved feature creates a specific new requirement. Do not generate speculative World Map, XP, Star-currency, leaderboard, event, or monetization art.
 
@@ -1872,7 +1872,7 @@ This closes the previously identified social gap without expanding V1 into a cha
 - [ ] SB-UI-028 Never silently regenerate/overwrite approved asset.
 - [ ] SB-UI-029 Do not bake dynamic text/quantities/timers/prices/state into generated images.
 - [ ] SB-UI-030 Keep single-Image/ImageTexture BoardRenderer; no per-cell UI nodes.
-- [ ] SB-UI-031 Validate transparency/edges/resolution/filtering/compression/memory/readability.
+- [x] SB-UI-031 Validate transparency/edges/resolution/filtering/compression/memory/readability. DONE 2026-11-06 with SB-UI-VIS-006 (factory 114, e58f4bbc, docs/UI_VIS_006_ASSET_QA.md, LOCAL_PASS tests/ui_vis_006_asset_qa.gd); readability pending owner phone review.
 - [ ] SB-UI-032 Use generation credits consciously; generate by milestone need.
 
 ---
