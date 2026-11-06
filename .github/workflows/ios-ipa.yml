@@ -14,16 +14,29 @@ name: iOS IPA
 #     file, script or parse error fails the run; the full import log is kept;
 #   - the PCK inside the built IPA is scanned (zero excluded developer paths, every runtime
 #     res:// reference present, main scene) and boots headless; the inner IPA SHA-256 is logged.
+# SB-M59-001..005 (docs/RELEASE_BUILDS.md): input `build_type` debug (default; the unsigned IPA above) |
+#   release (App Store distribution signing from GitHub Secrets ONLY, fails fast when absent; the IPA is
+#   exported to the runner, NEVER uploaded). Version from data/config/app_version.json via
+#   .github/scripts/app_version.py: CFBundleShortVersionString = version, CFBundleVersion = build number
+#   (run_number + build_offset); output build/ios/<build_type>/ScrubBots-iOS-<build_type>-v<ver>-b<build>.ipa.
 
 on:
   workflow_dispatch:
+    inputs:
+      build_type:
+        description: "debug = unsigned IPA (owner signs with xtool). release = distribution-signed IPA from secrets only (fails if absent)."
+        type: choice
+        required: true
+        default: debug
+        options:
+          - debug
+          - release
 
 permissions:
   contents: read
 
 env:
   GODOT_VERSION: 4.7.2
-  APP_NAME: Scrubbots
 
 jobs:
   ipa:
@@ -55,6 +68,48 @@ jobs:
           done < .github/android/family_first10_export_exclusions.txt
           exit $bad
 
+      - name: Version + output paths (data/config/app_version.json, build = run_number + build_offset)
+        env:
+          BUILD_TYPE: ${{ inputs.build_type }}
+        run: |
+          python3 -I .github/scripts/app_version.py ios "$BUILD_TYPE" "$GITHUB_RUN_NUMBER" | tee -a "$GITHUB_ENV"
+          echo "BUILD_TYPE=$BUILD_TYPE" >> "$GITHUB_ENV"
+          cat data/config/app_version.json
+
+      # SB-M59-002: distribution signing ONLY from the owner's secrets; fail fast, no unsigned/debug fallback.
+      - name: Release signing (GitHub Secrets only; fails fast when absent)
+        if: ${{ inputs.build_type == 'release' }}
+        env:
+          P12_B64: ${{ secrets.IOS_DIST_CERT_P12_BASE64 }}
+          P12_PASS: ${{ secrets.IOS_DIST_CERT_PASSWORD }}
+          PROFILE_B64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+          TEAM_ID: ${{ secrets.IOS_TEAM_ID }}
+        run: |
+          if [ -z "$P12_B64" ] || [ -z "$P12_PASS" ] || [ -z "$PROFILE_B64" ] || [ -z "$TEAM_ID" ]; then
+            echo "::error::release build needs GitHub Secrets IOS_DIST_CERT_P12_BASE64, IOS_DIST_CERT_PASSWORD, IOS_PROVISIONING_PROFILE_BASE64 and IOS_TEAM_ID (docs/RELEASE_BUILDS.md). Not signing."
+            exit 1
+          fi
+          KC="$RUNNER_TEMP/release.keychain-db"; KC_PASS=$(uuidgen)
+          printf '%s' "$P12_B64" | base64 -d > "$RUNNER_TEMP/dist.p12"
+          security create-keychain -p "$KC_PASS" "$KC"
+          security set-keychain-settings -lut 21600 "$KC"
+          security unlock-keychain -p "$KC_PASS" "$KC"
+          security import "$RUNNER_TEMP/dist.p12" -P "$P12_PASS" -A -t cert -f pkcs12 -k "$KC"
+          security set-key-partition-list -S apple-tool:,apple: -k "$KC_PASS" "$KC" >/dev/null
+          security list-keychains -d user -s "$KC" $(security list-keychains -d user | tr -d '"')
+          printf '%s' "$PROFILE_B64" | base64 -d > "$RUNNER_TEMP/dist.mobileprovision"
+          security cms -D -i "$RUNNER_TEMP/dist.mobileprovision" > "$RUNNER_TEMP/profile.plist"
+          UUID=$(plutil -extract UUID raw "$RUNNER_TEMP/profile.plist")
+          PROFILE_NAME=$(plutil -extract Name raw "$RUNNER_TEMP/profile.plist")
+          for d in "$HOME/Library/MobileDevice/Provisioning Profiles" "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"; do
+            mkdir -p "$d" && cp "$RUNNER_TEMP/dist.mobileprovision" "$d/$UUID.mobileprovision"
+          done
+          rm -f "$RUNNER_TEMP/dist.p12"
+          echo "KEYCHAIN=$KC" >> "$GITHUB_ENV"
+          echo "IOS_TEAM=$TEAM_ID" >> "$GITHUB_ENV"
+          echo "PROFILE_NAME=$PROFILE_NAME" >> "$GITHUB_ENV"
+          echo "release signing: certificate + profile $UUID installed"
+
       - name: Godot + export templates
         run: |
           curl -fsSL -o godot.zip "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_macos.universal.zip"
@@ -78,10 +133,12 @@ jobs:
           include_filter=""
           ; Gelistirme/denetim dosyalari oyuna girmesin (coordination 1.7 GB); workspace'te de yoklar
           exclude_filter="coordination/*, docs/*, tests/*, tools/*, level_factory/*, content_pipeline/*, assets/art/references/*, assets/ui/generated/*, assets/ui/candidates/*, .github/*"
-          export_path="build/ios/${APP_NAME}.ipa"
+          export_path="${OUT_DIR}/${ARTIFACT}.ipa"
 
           [preset.0.options]
-          application/app_store_team_id="AAAAAAAAAA"
+          application/app_store_team_id="${IOS_TEAM:-AAAAAAAAAA}"
+          application/short_version="${APP_VERSION}"
+          application/version="${APP_BUILD}"
           application/bundle_identifier="com.sekiph82.scrubbots"
           application/export_project_only=true
           icons/app_store_1024x1024="res://assets/ui/final/branding/app_icon_ios_1024.png"
@@ -119,29 +176,51 @@ jobs:
 
       - name: Godot export (Xcode projesi)
         run: |
-          mkdir -p build/ios
-          "$GODOT" --headless --export-release "iOS" "build/ios/${APP_NAME}.ipa" > out/export.log 2>&1 \
+          mkdir -p "$OUT_DIR"
+          "$GODOT" --headless --export-release "iOS" "${OUT_DIR}/${ARTIFACT}.ipa" > out/export.log 2>&1 \
             || { grep -iE "error|fail|invalid|missing" out/export.log | tail -25 | sed 's/^/::error::/'; exit 1; }
           if grep -nE "Error loading|ERR_FILE_CORRUPT|SCRIPT ERROR|Failed loading resource" out/export.log; then
             echo "::error::export reported failed resources"; exit 1
           fi
-          ls -la build/ios
+          ls -la "$OUT_DIR"
 
-      - name: Xcode build (imzasiz)
+      - name: Xcode build (debug imzasiz / release dagitim imzali; no upload)
         run: |
-          cd build/ios
+          cd "$OUT_DIR"
           PROJ=$(ls -d *.xcodeproj | head -1)
           SCHEME="${PROJ%.xcodeproj}"
-          xcodebuild -project "$PROJ" -scheme "$SCHEME" -configuration Release \
-            -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath dd \
-            CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build | tail -40
-          mkdir -p Payload
-          cp -R dd/Build/Products/Release-iphoneos/*.app Payload/
-          zip -qry "$GITHUB_WORKSPACE/${APP_NAME}.ipa" Payload
+          rm -f "${ARTIFACT}.ipa"   # Godot's project-only export path; the built IPA replaces it
+          if [ "$BUILD_TYPE" = release ]; then
+            xcodebuild -project "$PROJ" -scheme "$SCHEME" -configuration Release \
+              -sdk iphoneos -destination 'generic/platform=iOS' -archivePath dd/app.xcarchive \
+              DEVELOPMENT_TEAM="$IOS_TEAM" CODE_SIGN_STYLE=Manual CODE_SIGN_IDENTITY="Apple Distribution" \
+              PROVISIONING_PROFILE_SPECIFIER="$PROFILE_NAME" OTHER_CODE_SIGN_FLAGS="--keychain $KEYCHAIN" archive | tail -40
+            cat > ExportOptions.plist <<PLIST
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0"><dict>
+            <key>method</key><string>app-store-connect</string>
+            <key>destination</key><string>export</string>
+            <key>teamID</key><string>${IOS_TEAM}</string>
+            <key>signingStyle</key><string>manual</string>
+            <key>provisioningProfiles</key><dict><key>com.sekiph82.scrubbots</key><string>${PROFILE_NAME}</string></dict>
+          </dict></plist>
+          PLIST
+            xcodebuild -exportArchive -archivePath dd/app.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath dd/export | tail -20
+            mv dd/export/*.ipa "${ARTIFACT}.ipa"
+          else
+            xcodebuild -project "$PROJ" -scheme "$SCHEME" -configuration Release \
+              -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath dd \
+              CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build | tail -40
+            mkdir -p Payload
+            cp -R dd/Build/Products/Release-iphoneos/*.app Payload/
+            zip -qry "${ARTIFACT}.ipa" Payload
+          fi
+          test -s "${ARTIFACT}.ipa"
 
       - name: IPA inventory + scan of the PCK inside the IPA
         run: |
-          IPA="${APP_NAME}.ipa"
+          IPA="${OUT_DIR}/${ARTIFACT}.ipa"
           shasum -a 256 "$IPA" | tee out/ipa_sha256.txt
           stat -f '%N %z bytes' "$IPA" | tee out/ipa_size.txt
           unzip -Z1 "$IPA" > out/ipa_entries.txt
@@ -175,20 +254,24 @@ jobs:
             echo "::error::IPA pack boot reported missing / broken resources"; exit 1
           fi
           {
-            echo "## ${APP_NAME}.ipa (unsigned)"
+            echo "## ${ARTIFACT}.ipa (${BUILD_TYPE}: $([ "$BUILD_TYPE" = release ] && echo distribution-signed || echo unsigned))"
             echo "- source SHA: \`${GITHUB_SHA}\`"
             echo '```'; cat out/import_gate.txt out/ipa_size.txt out/ipa_sha256.txt; grep -h "PCK_SCAN" out/ipa_pck_scan.log; echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
       - uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-ipa
-          path: ${{ env.APP_NAME }}.ipa
+          name: ${{ env.ARTIFACT }}.ipa
+          path: ${{ env.OUT_DIR }}/${{ env.ARTIFACT }}.ipa
 
       - name: Upload import log + IPA scan reports
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}-ipa-inspection
+          name: ScrubBots-iOS-${{ inputs.build_type }}-ipa-inspection
           path: out/
           retention-days: 30
+
+      - name: Remove the release keychain
+        if: ${{ always() && inputs.build_type == 'release' }}
+        run: security delete-keychain "$RUNNER_TEMP/release.keychain-db" || true

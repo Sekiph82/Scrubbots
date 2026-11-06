@@ -50,6 +50,11 @@ name: Android Family First10 APK
 # SB-M44-032/033 + SB-M44-031 part 2 (owner 2026-11-03 meta at L1, no grandfather, Welcome at first Home, booster intros): + m44_meta_l1_unlock_ftue (exact 6/6 guard).
 # SB-M44-028/030 (50 achievements pinned, CLAIM once across replay/relaunch/import, Gift Bar from first Home): + m44_meta_verify_achievements_gift (exact 4/4 guard).
 # SB-M22-008 + SB-POLISH-013 WAITING slot pulse + finished-batch pop presets: + sb_m22_008_polish_013_slot_fx.
+# SB-M59-001..005 (docs/RELEASE_BUILDS.md): input `build_type` debug (default; debug keystore, the path above) |
+#   release (release keystore secrets ONLY, fails fast when absent, never debug signing; no store upload).
+#   Version from data/config/app_version.json via .github/scripts/app_version.py: version/code = build number =
+#   run_number + build_offset; outputs build/android/<build_type>/ScrubBots-Android-<build_type>-v<ver>-b<build>.*
+#   validate also runs tools/check_release_versioning.py + m59_app_version.
 
 on:
   workflow_dispatch:
@@ -63,6 +68,14 @@ on:
           - validation_only
           - build_apk
           - apk_only   # owner 2026-10-30: APK without the test suites (Level Factory already proved the levels)
+      build_type:
+        description: "debug = debug keystore (family dev package). release = release keystore secrets only (fails if absent)."
+        type: choice
+        required: true
+        default: debug
+        options:
+          - debug
+          - release
 
 permissions:
   contents: read
@@ -73,7 +86,6 @@ concurrency:
 
 env:
   GODOT_VERSION: 4.7.2
-  APK_NAME: ScrubBots-Family-First10-Android-Debug
   PRESET: Android Family First10
 
 jobs:
@@ -105,6 +117,9 @@ jobs:
           "$GODOT" --headless --path . --import > import.log 2>&1 || true
           git checkout -- project.godot   # disposable CI workspace: the import may rewrite it; validate the tracked file
 
+      - name: Release/versioning static check (single version source, release never debug-signed)
+        run: python3 -I tools/check_release_versioning.py
+
       - name: Focused suites (fail closed; every suite logged)
         env:
           MODE: ${{ inputs.mode }}
@@ -133,7 +148,7 @@ jobs:
                    m43_c005_c072_feature_unlock_ceremony m43_c005_c074_c077_celebrations \
                    m43_master_c005r_gift_micro_progress sb_polish_002_gift_meter sb_polish_004_006_ui_batch sb_polish_003_booster_vfx sb_m22_008_polish_013_slot_fx m43_master_c005_meta_ceremonies m43_c005f_phase6_unlock_feel \
                    m43_master_c006_shop m43_master_c007_collection m54_collection_set_master_exactly_once m43_master_c008_robots \
-                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m44_meta_l1_unlock_ftue m44_meta_verify_achievements_gift m43_master_c007r_pity campaign_l11_l30 m43_personal_ranks real_play_levels real_play_file_cli ui_vis_006_asset_qa; do
+                   m43_master_c010_meta m43_master_c011_c014 m44_pending_packs_gate m44_meta_l1_unlock_ftue m44_meta_verify_achievements_gift m43_master_c007r_pity campaign_l11_l30 m43_personal_ranks real_play_levels real_play_file_cli ui_vis_006_asset_qa m59_app_version; do
             L="validate_logs/$s.log"
             if [ ! -f "tests/$s.gd" ]; then echo "$s MISSING tests/$s.gd status=FAIL" | tee -a "$S"; fail=1; continue; fi
             if timeout 1500 "$GODOT" --headless --path . -s "res://tests/$s.gd" > "$L" 2>&1; then ec=0; else ec=$?; fi
@@ -313,7 +328,7 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: ${{ env.APK_NAME }}-validation-logs
+          name: ScrubBots-Android-validation-logs
           path: |
             validate_logs/
             import.log
@@ -352,6 +367,14 @@ jobs:
           done < .github/android/family_first10_export_exclusions.txt
           exit $bad
 
+      - name: Version + output paths (data/config/app_version.json, build = run_number + build_offset)
+        env:
+          BUILD_TYPE: ${{ inputs.build_type }}
+        run: |
+          python3 -I .github/scripts/app_version.py android "$BUILD_TYPE" "$GITHUB_RUN_NUMBER" | tee -a "$GITHUB_ENV"
+          echo "BUILD_TYPE=$BUILD_TYPE" >> "$GITHUB_ENV"
+          cat data/config/app_version.json
+
       - name: JDK 17
         uses: actions/setup-java@cf277c60eb25467037889841efdb72551f06f6c3 # v4
         with:
@@ -369,9 +392,26 @@ jobs:
           rm -f godot.zip tpl.tpz
           ls "$TPL" | grep -i android
 
+      - name: Android SDK + editor settings
+        run: |
+          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
+          echo "ANDROID_SDK=$SDK" >> "$GITHUB_ENV"
+          echo "BUILD_TOOLS=$(ls -d "$SDK"/build-tools/* | sort -V | tail -1)" >> "$GITHUB_ENV"
+          mkdir -p "$HOME/.config/godot"
+          for f in editor_settings-4.tres editor_settings-4.7.tres; do
+            cat > "$HOME/.config/godot/$f" <<EOF
+          [gd_resource type="EditorSettings" format=3]
+
+          [resource]
+          export/android/android_sdk_path = "$SDK"
+          export/android/java_sdk_path = "$JAVA_HOME"
+          EOF
+          done
+
       # SB-M34-006 (owner 2026-10-31): sign with the stable debug key from GitHub Secrets so every
       # family APK installs over the previous one (keeps the save); generated key only when absent.
-      - name: Debug keystore (GitHub Secret, else generated in CI; never committed) + Android editor settings
+      - name: Debug keystore (GitHub Secret, else generated in CI; never committed)
+        if: ${{ inputs.build_type != 'release' }}
         env:
           KS_B64: ${{ secrets.ANDROID_DEBUG_KEYSTORE_BASE64 }}
           KS_PASS_SECRET: ${{ secrets.ANDROID_DEBUG_KEYSTORE_PASSWORD }}
@@ -388,42 +428,54 @@ jobs:
               -dname "CN=ScrubBots Family Debug,O=ScrubBots Dev,C=US" -keyalg RSA -keysize 2048 -validity 3650 >/dev/null 2>&1
             echo "debug keystore: generated (secret absent; signature changes every run)"
           fi
-          SDK="${ANDROID_HOME:-$ANDROID_SDK_ROOT}"
-          echo "ANDROID_SDK=$SDK" >> "$GITHUB_ENV"
-          echo "BUILD_TOOLS=$(ls -d "$SDK"/build-tools/* | sort -V | tail -1)" >> "$GITHUB_ENV"
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_PATH=$KS" >> "$GITHUB_ENV"
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_USER=$KS_USER" >> "$GITHUB_ENV"
           echo "GODOT_ANDROID_KEYSTORE_DEBUG_PASSWORD=$KS_PASS" >> "$GITHUB_ENV"
-          mkdir -p "$HOME/.config/godot"
           for f in editor_settings-4.tres editor_settings-4.7.tres; do
-            cat > "$HOME/.config/godot/$f" <<EOF
-          [gd_resource type="EditorSettings" format=3]
-
-          [resource]
-          export/android/android_sdk_path = "$SDK"
-          export/android/java_sdk_path = "$JAVA_HOME"
-          export/android/debug_keystore = "$KS"
-          export/android/debug_keystore_user = "$KS_USER"
-          export/android/debug_keystore_pass = "$KS_PASS"
-          EOF
+            printf 'export/android/debug_keystore = "%s"\nexport/android/debug_keystore_user = "%s"\nexport/android/debug_keystore_pass = "%s"\n' \
+              "$KS" "$KS_USER" "$KS_PASS" >> "$HOME/.config/godot/$f"
           done
+
+      # SB-M59-002: release signing ONLY from the owner's release keystore secrets; fail fast, no fallback.
+      - name: Release keystore (GitHub Secrets only; fails fast when absent)
+        if: ${{ inputs.build_type == 'release' }}
+        env:
+          RKS_B64: ${{ secrets.ANDROID_RELEASE_KEYSTORE_BASE64 }}
+          RKS_PASS: ${{ secrets.ANDROID_RELEASE_KEYSTORE_PASSWORD }}
+          RKS_ALIAS: ${{ secrets.ANDROID_RELEASE_KEYSTORE_ALIAS }}
+        run: |
+          if [ -z "$RKS_B64" ] || [ -z "$RKS_PASS" ] || [ -z "$RKS_ALIAS" ]; then
+            echo "::error::release build needs GitHub Secrets ANDROID_RELEASE_KEYSTORE_BASE64, ANDROID_RELEASE_KEYSTORE_PASSWORD and ANDROID_RELEASE_KEYSTORE_ALIAS (docs/RELEASE_BUILDS.md). Not signing."
+            exit 1
+          fi
+          RKS="$RUNNER_TEMP/release.keystore"
+          printf '%s' "$RKS_B64" | base64 -d > "$RKS"
+          keytool -list -keystore "$RKS" -storepass "$RKS_PASS" -alias "$RKS_ALIAS" >/dev/null \
+            || { echo "::error::release keystore secret does not open with the given password / alias"; exit 1; }
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PATH=$RKS" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_USER=$RKS_ALIAS" >> "$GITHUB_ENV"
+          echo "GODOT_ANDROID_KEYSTORE_RELEASE_PASSWORD=$RKS_PASS" >> "$GITHUB_ENV"
 
       - name: Export preset (tracked template -> export_presets.cfg)
         run: |
-          sed -e "s/@VERSION_CODE@/${GITHUB_RUN_NUMBER}/" -e "s/@VERSION_NAME@/0.1.${GITHUB_RUN_NUMBER}-family-first10-dev/" \
+          # debug keeps the family dev package (installs beside a store build); release = store package.
+          if [ "$BUILD_TYPE" = release ]; then PKG=com.sekiph82.scrubbots; LABEL=SCRUBBOTS; else PKG=com.sekiph82.scrubbots.familydev; LABEL="ScrubBots Family Dev"; fi
+          sed -e "s/@VERSION_CODE@/${APP_BUILD}/" -e "s/@VERSION_NAME@/${APP_VERSION_NAME}/" \
+            -e "s/@PACKAGE@/${PKG}/" -e "s/@APP_LABEL@/${LABEL}/" \
             .github/android/export_presets_family_first10.cfg > export_presets.cfg
           cat export_presets.cfg
 
       - name: Import + export APK and same-preset inspection PCK
         run: |
-          mkdir -p build/android out
+          mkdir -p "$OUT_DIR" out
           "$GODOT" --headless --path . --import > out/import.log 2>&1 || true
-          "$GODOT" --headless --path . --export-debug "$PRESET" "build/android/${APK_NAME}.apk" > out/export_apk.log 2>&1 \
+          if [ "$BUILD_TYPE" = release ]; then EXPORT=--export-release; else EXPORT=--export-debug; fi
+          "$GODOT" --headless --path . "$EXPORT" "$PRESET" "${OUT_DIR}/${ARTIFACT}.apk" > out/export_apk.log 2>&1 \
             || { tail -40 out/export_apk.log; exit 1; }
-          "$GODOT" --headless --path . --export-pack "$PRESET" "build/android/${APK_NAME}.pck" > out/export_pck.log 2>&1 \
+          "$GODOT" --headless --path . --export-pack "$PRESET" "${OUT_DIR}/${ARTIFACT}.pck" > out/export_pck.log 2>&1 \
             || { tail -40 out/export_pck.log; exit 1; }
-          ls -la build/android
-          test -s "build/android/${APK_NAME}.apk" && test -s "build/android/${APK_NAME}.pck"
+          ls -la "$OUT_DIR"
+          test -s "${OUT_DIR}/${ARTIFACT}.apk" && test -s "${OUT_DIR}/${ARTIFACT}.pck"
 
       - name: Packaged-path scan of the exported PCK (zero excluded paths, every runtime reference present)
         run: |
@@ -435,13 +487,13 @@ jobs:
           wc -l out/required_runtime_paths.txt
           cp -r .github/android/pck_probe "$RUNNER_TEMP/pck_probe"
           "$GODOT" --headless --path "$RUNNER_TEMP/pck_probe" -s res://pck_scan.gd -- \
-            "$PWD/build/android/${APK_NAME}.pck" "$PWD/.github/android/family_first10_export_exclusions.txt" \
+            "$PWD/${OUT_DIR}/${ARTIFACT}.pck" "$PWD/.github/android/family_first10_export_exclusions.txt" \
             "$PWD/out/required_runtime_paths.txt" "$PWD/out/pck_scan_report.json" 2>&1 | tee out/pck_scan.log
           grep -q "verdict=PASS" out/pck_scan.log
 
       - name: Packaged-path scan of the APK itself
         run: |
-          unzip -Z1 "build/android/${APK_NAME}.apk" > out/apk_entries.txt
+          unzip -Z1 "${OUT_DIR}/${ARTIFACT}.apk" > out/apk_entries.txt
           wc -l out/apk_entries.txt
           echo "apk assets/ entries: $(grep -c '^assets/' out/apk_entries.txt || true); embedded .pck: $(grep -E '\.pck$' out/apk_entries.txt | tr '\n' ' ')" | tee out/apk_scan.txt
           hits=0
@@ -457,7 +509,7 @@ jobs:
       - name: Headless boot of the exported pack (offline, no endpoint)
         run: |
           mkdir -p "$RUNNER_TEMP/boot" && cd "$RUNNER_TEMP/boot"
-          timeout 300 "$GODOT" --headless --main-pack "$GITHUB_WORKSPACE/build/android/${APK_NAME}.pck" --quit-after 600 \
+          timeout 300 "$GODOT" --headless --main-pack "$GITHUB_WORKSPACE/${OUT_DIR}/${ARTIFACT}.pck" --quit-after 600 \
             > "$GITHUB_WORKSPACE/out/boot.log" 2>&1 || true
           cd "$GITHUB_WORKSPACE"
           tail -20 out/boot.log
@@ -467,17 +519,20 @@ jobs:
 
       - name: APK signature / metadata / hash
         run: |
-          APK="build/android/${APK_NAME}.apk"
+          APK="${OUT_DIR}/${ARTIFACT}.apk"
           file "$APK" | tee out/apk_metadata.txt
           unzip -tq "$APK" | tee -a out/apk_metadata.txt
           "$BUILD_TOOLS/apksigner" verify --verbose --print-certs "$APK" | tee -a out/apk_metadata.txt
           "$BUILD_TOOLS/aapt2" dump badging "$APK" | grep -E "^package:|^application-label|^native-code|^launchable-activity|^sdkVersion|^targetSdkVersion|^uses-permission" | tee -a out/apk_metadata.txt
           "$BUILD_TOOLS/aapt2" dump xmltree --file AndroidManifest.xml "$APK" | grep -iE "screenOrientation|debuggable" | tee -a out/apk_metadata.txt
           grep -E "^lib/" out/apk_entries.txt | cut -d/ -f2 | sort -u | sed 's/^/abi: /' | tee -a out/apk_metadata.txt
-          sha256sum "$APK" "build/android/${APK_NAME}.pck" | tee out/sha256.txt
-          stat -c '%n %s bytes' "$APK" "build/android/${APK_NAME}.pck" | tee out/sizes.txt
+          if [ "$BUILD_TYPE" = release ] && grep -iE "debuggable|certificate DN:.*debug" out/apk_metadata.txt; then
+            echo "::error::release APK is debuggable or signed with a debug certificate"; exit 1
+          fi
+          sha256sum "$APK" "${OUT_DIR}/${ARTIFACT}.pck" | tee out/sha256.txt
+          stat -c '%n %s bytes' "$APK" "${OUT_DIR}/${ARTIFACT}.pck" | tee out/sizes.txt
           {
-            echo "## ${APK_NAME}"
+            echo "## ${ARTIFACT}"
             echo "- source SHA: \`${GITHUB_SHA}\`"
             echo "- run: ${GITHUB_SERVER_URL}/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}"
             echo '```'; cat out/sizes.txt out/sha256.txt out/apk_scan.txt; grep PCK_SCAN out/pck_scan.log; cat out/apk_metadata.txt; echo '```'
@@ -486,8 +541,8 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: ${{ env.APK_NAME }}.apk
-          path: build/android/${{ env.APK_NAME }}.apk
+          name: ${{ env.ARTIFACT }}.apk
+          path: ${{ env.OUT_DIR }}/${{ env.ARTIFACT }}.apk
           retention-days: 30
           if-no-files-found: error
 
@@ -495,8 +550,8 @@ jobs:
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
-          name: ${{ env.APK_NAME }}-inspection
+          name: ${{ env.ARTIFACT }}-inspection
           path: |
-            build/android/${{ env.APK_NAME }}.pck
+            ${{ env.OUT_DIR }}/${{ env.ARTIFACT }}.pck
             out/
           retention-days: 30
