@@ -139,7 +139,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M54-037..038 — presentation-plugin one-shot/fail-open regression and GFF/Spark runtime visual regression pack
 - READY SB-M55-018..023 — chaos: popup spam, background during flows, triple loss, BottomNav churn, huge inventories, timer expiry
 - READY SB-M55-024..025 — chaos: offline/online flapping; presentation-plugin chaos/leak test
-- DONE SB-M58-001..006 — factory 120 (3aaf540d): docs/PRIVACY_DATA_INVENTORY.md (third-party + licences, user:// files, network/permissions, hygiene review, Play Data safety + Apple App Privacy drafts current/planned, IARC draft + child-directed notes) and docs/PRIVACY_POLICY_DRAFT.md; no collection removed (none excess; POST_NOTIFICATIONS without delivery + licences screen SB-M59-010 flagged); LOCAL_PASS tests/m58_privacy_inventory.gd 'M58 privacy inventory evidence: PASS (7/7 cases, 0 fail)' (added to CI validate with exact guard); drafts, owner/legal review + store submission pending
+- DONE SB-M58-001..006 — factory 120 (5cf1603c): docs/PRIVACY_DATA_INVENTORY.md (third-party + licences, user:// files, network/permissions, hygiene review, Play Data safety + Apple App Privacy drafts current/planned, IARC draft + child-directed notes) and docs/PRIVACY_POLICY_DRAFT.md; no collection removed (none excess; POST_NOTIFICATIONS without delivery + licences screen SB-M59-010 flagged); LOCAL_PASS tests/m58_privacy_inventory.gd 'M58 privacy inventory evidence: PASS (7/7 cases, 0 fail)' (added to CI validate with exact guard); drafts, owner/legal review + store submission pending
 - READY SB-M58-007..012 — child-directed review, analytics/ad consent, notification privacy, account data policy, display-name privacy
 - READY SB-M58-013..014 — receipt/transaction retention policy; localization/accessibility check of consent/privacy screens
 - READY SB-M57-022 — sandbox purchases/rewarded ads on real Android (later iOS) with AdMob + Play Billing/StoreKit (owner 2026-10-22)
@@ -1801,12 +1801,12 @@ Economy V1 soft-currency/Hearts/booster/2x rules are already owner-locked. The o
 ### M58 - Privacy / Compliance / Consent
 
 Once external services exist:
-- [x] SB-M58-001 Third-party inventory. **[DONE 2026-11-06, factory 120 (3aaf540d): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
-- [x] SB-M58-002 Data inventory. **[DONE 2026-11-06, factory 120 (3aaf540d): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
-- [x] SB-M58-003 Remove unnecessary collection. **[DONE 2026-11-06, factory 120 (3aaf540d): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
-- [x] SB-M58-004 Privacy disclosures. **[DONE 2026-11-06, factory 120 (3aaf540d): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
-- [x] SB-M58-005 Store declarations. **[DONE 2026-11-06, factory 120 (3aaf540d): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
-- [x] SB-M58-006 Age-rating review. **[DONE 2026-11-06, factory 120 (3aaf540d): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
+- [x] SB-M58-001 Third-party inventory. **[DONE 2026-11-06, factory 120 (5cf1603c): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
+- [x] SB-M58-002 Data inventory. **[DONE 2026-11-06, factory 120 (5cf1603c): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
+- [x] SB-M58-003 Remove unnecessary collection. **[DONE 2026-11-06, factory 120 (5cf1603c): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
+- [x] SB-M58-004 Privacy disclosures. **[DONE 2026-11-06, factory 120 (5cf1603c): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
+- [x] SB-M58-005 Store declarations. **[DONE 2026-11-06, factory 120 (5cf1603c): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
+- [x] SB-M58-006 Age-rating review. **[DONE 2026-11-06, factory 120 (5cf1603c): docs/PRIVACY_DATA_INVENTORY.md; drafts, owner/legal review + store submission pending.]**
 - [ ] SB-M58-007 Child-directed considerations if applicable.
 - [ ] SB-M58-008 Analytics consent/legal-basis strategy by region/provider.
 - [ ] SB-M58-009 Personalized/non-personalized ad consent flow where required; gameplay remains usable when personalized consent is refused.
