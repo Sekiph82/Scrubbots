@@ -43,7 +43,9 @@ left as is.
 
 ## Signing and install (Windows, owner's machine)
 
-- CI never signs. `xcodebuild` runs with `CODE_SIGNING_ALLOWED=NO`; the IPA is UNSIGNED.
+- `build_type: debug` (default): CI never signs. `xcodebuild` runs with `CODE_SIGNING_ALLOWED=NO`; the IPA is UNSIGNED.
+- `build_type: release` (SB-M59-002): distribution-signed IPA from the `IOS_*` GitHub Secrets only, fails fast
+  when they are absent; never uploaded. See `docs/RELEASE_BUILDS.md`.
 - Signing happens at install time: xtool signs the IPA with the owner's paid Apple Developer
   account while installing it on the iPhone 16 (iOS 27).
 - Driver: `C:\Users\sekip\Desktop\Iphone_Yukle_Guncel.bat` - `kurulum` (one-time setup),
@@ -53,7 +55,8 @@ left as is.
 ## Credentials policy
 
 - No Apple credentials, certificates, provisioning profiles or team ids are in the repository.
-- There are no iOS signing secrets in GitHub Secrets and CI uses none.
+- The debug path uses no iOS signing secrets. The release path reads `IOS_DIST_CERT_P12_BASE64`,
+  `IOS_DIST_CERT_PASSWORD`, `IOS_PROVISIONING_PROFILE_BASE64`, `IOS_TEAM_ID` (owner adds them; not set yet).
 - Apple credentials stay on the owner's machine (xtool login). If CI signing / TestFlight is ever
   added, credentials go to GitHub Secrets and are referenced by NAME only.
 

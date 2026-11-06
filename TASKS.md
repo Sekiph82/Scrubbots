@@ -143,7 +143,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M58-007..012 — child-directed review, analytics/ad consent, notification privacy, account data policy, display-name privacy
 - READY SB-M58-013..014 — receipt/transaction retention policy; localization/accessibility check of consent/privacy screens
 - READY SB-M57-022 — sandbox purchases/rewarded ads on real Android (later iOS) with AdMob + Play Billing/StoreKit (owner 2026-10-22)
-- READY SB-M59-001..005 — debug/release export, output directories, versioning, build numbers
+- DONE SB-M59-001..005 — factory 117 (0419f569, f90b1799): data/config/app_version.json single version source (semver, committed build 0 / debug); .github/scripts/app_version.py stamps build = run_number + build_offset and channel in CI and feeds Android version/code+name and iOS CFBundleVersion/short version; workflow_dispatch build_type debug (default, unchanged behaviour) | release (Android --export-release with ANDROID_RELEASE_KEYSTORE_* only, iOS distribution signing with IOS_DIST_CERT_* / IOS_PROVISIONING_PROFILE_BASE64 / IOS_TEAM_ID only, both fail fast when absent, never debug key, no store upload); outputs build/<android|ios>/<debug|release>/ScrubBots-<Platform>-<mode>-v<ver>-b<build>; Settings VersionLabel 'VERSION 0.1.0-debug · BUILD 0'; tools/check_release_versioning.py (python -I, --selftest) + tests/m59_app_version in CI validate. LOCAL_PASS m59_app_version 4/4, m41_settings, m51 4/4, m50 4/4, m49 8/8, m42_navigation, m44_ftue 23/23; check PASS, selftest PASS. No CI run, no build. OWNER: release builds need the release keystore + iOS distribution secrets (docs/RELEASE_BUILDS.md).
 - READY SB-M59-006..010 — tests + content validator before release, Android build, clean-clone build, addon release hygiene
 - READY SB-M59-011 — final repo hygiene Phase 1 delete-nothing dry run, only after feature freeze and M59-001..010
 - READY SB-M60-001..006 — release gates: no dead routes, bound surfaces, fresh-save FTUE, provider/disabled Shop, Events/Ranks policy, gates
@@ -1818,11 +1818,11 @@ Once external services exist:
 
 ### M59 — Build Pipeline
 
-- [ ] SB-M59-001 Debug export.
-- [ ] SB-M59-002 Release export.
-- [ ] SB-M59-003 Output directories.
-- [ ] SB-M59-004 Versioning.
-- [ ] SB-M59-005 Build numbers.
+- [x] SB-M59-001 Debug export. **[DONE 2026-11-06, factory 117, 0419f569 + f90b1799, LOCAL_PASS, CLAUDE_SELF_REVIEW pending factory peer review; no CI run, no APK/IPA built; release signing needs owner secrets, docs/RELEASE_BUILDS.md]**
+- [x] SB-M59-002 Release export. **[DONE 2026-11-06, factory 117, 0419f569 + f90b1799, LOCAL_PASS, CLAUDE_SELF_REVIEW pending factory peer review; no CI run, no APK/IPA built; release signing needs owner secrets, docs/RELEASE_BUILDS.md]**
+- [x] SB-M59-003 Output directories. **[DONE 2026-11-06, factory 117, 0419f569 + f90b1799, LOCAL_PASS, CLAUDE_SELF_REVIEW pending factory peer review; no CI run, no APK/IPA built; release signing needs owner secrets, docs/RELEASE_BUILDS.md]**
+- [x] SB-M59-004 Versioning. **[DONE 2026-11-06, factory 117, 0419f569 + f90b1799, LOCAL_PASS, CLAUDE_SELF_REVIEW pending factory peer review; no CI run, no APK/IPA built; release signing needs owner secrets, docs/RELEASE_BUILDS.md]**
+- [x] SB-M59-005 Build numbers. **[DONE 2026-11-06, factory 117, 0419f569 + f90b1799, LOCAL_PASS, CLAUDE_SELF_REVIEW pending factory peer review; no CI run, no APK/IPA built; release signing needs owner secrets, docs/RELEASE_BUILDS.md]**
 - [ ] SB-M59-006 Run tests before release build.
 - [ ] SB-M59-007 Run content validator.
 - [ ] SB-M59-008 Generate Android build.
