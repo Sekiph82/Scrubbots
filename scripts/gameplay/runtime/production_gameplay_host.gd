@@ -681,6 +681,7 @@ func _drive_economy_terminal(status) -> void:
 	# M43-C001A: authoritative pre-commit probe for the Results receipt (read-only).
 	var pre: Dictionary = TerminalRewardReceipt.capture(_progression, _economy)
 	var progression_attempt := is_progression_attempt()
+	var catchup: Array = []
 	if status == CompletionEvaluator.WON:
 		_economy_terminal_done = true
 		# M39 V03 (F-M39-V02-014): the M37 forward-only progression authority
@@ -703,7 +704,7 @@ func _drive_economy_terminal(status) -> void:
 				"difficulty": String(last_first_clear_result.get("difficulty", "")),
 				"boosters_used": _attempt_boosters,
 				"cells": _board.get_artwork_cell_count() if _board != null else 0})
-			_meta_terminal(true)
+			catchup = _meta_terminal(true)
 	elif status == CompletionEvaluator.LOST:
 		_economy_terminal_done = true
 		_economy.hearts.consume()
@@ -718,7 +719,7 @@ func _drive_economy_terminal(status) -> void:
 	if _economy_terminal_done:
 		_terminal_receipt = TerminalRewardReceipt.build(String(status), progression_level, pre,
 			TerminalRewardReceipt.capture(_progression, _economy),
-			last_first_clear_result if status == CompletionEvaluator.WON else {}, saved)
+			last_first_clear_result if status == CompletionEvaluator.WON else {}, saved, catchup)
 		_record_assistance(String(status), progression_attempt)
 
 # ------------------------------------------------------- M43-C004 Need a Hand --
@@ -814,12 +815,12 @@ func terminal_context() -> Dictionary:
 	}
 
 ## M43-C010R / C012R: a committed progression terminal feeds the self-only records, the
-## configured events and the Catch-Up track (presentation/meta; saved by the terminal boundary).
-func _meta_terminal(won: bool) -> void:
+## configured events and the Catch-Up track (saved by the terminal boundary). Returns the
+## Catch-Up steps this win granted (Results receipt).
+func _meta_terminal(won: bool) -> Array:
 	var r: Dictionary = _economy.records.on_progression_terminal(progression_level, won, _attempt_boosters, _economy.streak.streak())
 	_economy.events.on_progression_terminal(won, bool(r["first_try"]))
-	if won:
-		_economy.returns.on_first_clear_win()
+	return _economy.returns.on_first_clear_win(_economy.reward) if won else []
 
 ## M43-C009R: committed booster actions in the current attempt (reset per attempt / Retry).
 func get_attempt_boosters_used() -> int:

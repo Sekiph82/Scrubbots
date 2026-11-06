@@ -8,9 +8,10 @@ extends RefCounted
 ##   - Each genuine return opens ONE return window (id = the absence start ts). The comeback
 ##     summary is shown once per window; it only points at already-claimable state.
 ##   - Catch-Up Track: offered once per window ONLY when the config defines a reward sequence of
-##     approved existing reward types (none is configured yet -> never offered). Three
-##     qualifying first-clear progression wins advance it; each step grants once (tx
-##     `catchup:<window>:<step>`); it expires deterministically at window + expire_s. It never
+##     approved existing reward types ([] = never offered). Three qualifying first-clear
+##     progression wins advance it; each reached step grants once on the win itself (tx
+##     `catchup:<track window>:<step>`); it expires deterministically at track start + expire_s.
+##     A new absence while a track is still running keeps that track (no stacking). It never
 ##     touches Daily login state, events or level economy.
 ## Economy section `return`: absent = fresh (no window); present = strict.
 
@@ -27,7 +28,7 @@ var _high := 0                         ## highest ts ever seen
 var _window := 0                       ## current return window id (absence start ts) or 0
 var _window_ts := 0                    ## when the window opened
 var _summary_shown := 0                ## window id whose summary was shown
-var _catchup := {}                     ## {window, wins, claimed:[step]}
+var _catchup := {}                     ## {window, started, wins, claimed:[step]}
 
 func _init(clock: Callable = Callable(), path: String = PATH) -> void:
 	_clock = clock if clock.is_valid() else func(): return int(Time.get_unix_time_from_system())
@@ -72,8 +73,9 @@ func on_active() -> Dictionary:
 			_window = _last
 			_window_ts = t
 			opened = true
-			if not _steps.is_empty() and _catchup.get("window", 0) != _window:
-				_catchup = {"window": _window, "wins": 0, "claimed": []}
+			var cur := catchup()
+			if not _steps.is_empty() and (cur.is_empty() or cur["expired"] or cur["complete"]):
+				_catchup = {"window": _window, "started": t, "wins": 0, "claimed": []}
 		_last = t
 		_high = t
 	return {"opened": opened, "window": _window}
@@ -92,29 +94,38 @@ func mark_summary_shown() -> void:
 	_summary_shown = _window
 
 func catchup() -> Dictionary:
-	if _steps.is_empty() or _catchup.is_empty() or int(_catchup["window"]) != _window:
+	if _steps.is_empty() or _catchup.is_empty():
 		return {}
 	# A clock behind the high-water mark (rollback) freezes the track like an expiry.
-	var expired: bool = now() >= _window_ts + expire_s or now() < _high
+	var expired: bool = now() >= int(_catchup["started"]) + expire_s or now() < _high
 	var steps: Array = []
 	for i in range(_steps.size()):
 		var reached: bool = int(_catchup["wins"]) >= int(_steps[i]["wins"])
 		var claimed: bool = (_catchup["claimed"] as Array).has(i)
 		steps.append({"wins": int(_steps[i]["wins"]), "reward": (_steps[i]["reward"] as Dictionary).duplicate(), "reached": reached, "claimed": claimed, "claimable": reached and not claimed and not expired})
-	return {"window": _window, "wins": int(_catchup["wins"]), "steps": steps, "expired": expired}
+	return {"window": int(_catchup["window"]), "wins": int(_catchup["wins"]), "steps": steps, "expired": expired,
+		"complete": (_catchup["claimed"] as Array).size() == _steps.size()}
 
-## A committed first-clear progression win (never a replay / loss / purchase).
-func on_first_clear_win() -> void:
+## A committed first-clear progression win (never a replay / loss / purchase). With a reward
+## service, every step this win reaches is granted now; returns [{step, steps, reward}].
+func on_first_clear_win(reward_service = null) -> Array:
 	var c := catchup()
 	if c.is_empty() or c["expired"]:
-		return
+		return []
 	_catchup["wins"] = mini(int(_catchup["wins"]) + 1, int(_steps[_steps.size() - 1]["wins"]))
+	var out: Array = []
+	if reward_service != null:
+		for i in range(_steps.size()):
+			var r := claim_catchup(i, reward_service)
+			if r["ok"]:
+				out.append({"step": i, "steps": _steps.size(), "reward": r["reward"]})
+	return out
 
 func claim_catchup(step: int, reward_service) -> Dictionary:
 	var c := catchup()
 	if c.is_empty() or step < 0 or step >= c["steps"].size() or not c["steps"][step]["claimable"]:
 		return {"ok": false, "reason": "not_claimable"}
-	var tx := "catchup:%d:%d" % [_window, step]
+	var tx := "catchup:%d:%d" % [int(c["window"]), step]
 	if not reward_service.grant(tx, c["steps"][step]["reward"]) and not reward_service.already_applied(tx):
 		return {"ok": false, "reason": "grant_failed"}
 	(_catchup["claimed"] as Array).append(step)
@@ -139,9 +150,9 @@ func import_snapshot(s) -> bool:
 	if typeof(c) != TYPE_DICTIONARY:
 		return false
 	if not c.is_empty():
-		if not _is_int(c.get("window")) or not _is_int(c.get("wins")) or int(c["wins"]) < 0 or typeof(c.get("claimed")) != TYPE_ARRAY:
+		if not _is_int(c.get("window")) or not _is_int(c.get("started")) or not _is_int(c.get("wins")) or int(c["wins"]) < 0 or typeof(c.get("claimed")) != TYPE_ARRAY:
 			return false
-		c = {"window": int(c["window"]), "wins": int(c["wins"]), "claimed": c["claimed"].map(func(v): return int(v))}
+		c = {"window": int(c["window"]), "started": int(c["started"]), "wins": int(c["wins"]), "claimed": c["claimed"].map(func(v): return int(v))}
 	_last = int(s["last"]); _high = int(s["high"]); _window = int(s["window"]); _window_ts = int(s["window_ts"])
 	_summary_shown = int(s["summary_shown"]); _catchup = c
 	return true

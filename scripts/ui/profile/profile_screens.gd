@@ -586,6 +586,7 @@ static func open_comeback(stack, app) -> BasePopup:
 		if int(b[l[0]]) > 0:
 			var txt := UiText.t(l[1]) if l[0] == "daily" else UiText.t(l[1], [UiText.num(int(b[l[0]]))])
 			p.add_body_line(txt, "Ready_" + l[0], BasePopup.INK, 24)
+	_add_catchup(p, e.returns.catchup())
 	p.add_action("ok", UiText.t("COMEBACK_CONTINUE"), "primary", true)
 	if not stack.push(p):
 		p.free()
@@ -595,6 +596,34 @@ static func open_comeback(stack, app) -> BasePopup:
 	if e.robots.active_robot() == "scrubby" and not (app.effects != null and app.effects.is_reduced()):
 		MetaCeremonies.play_hero_video(p, p.get_hero(), welcome_video, load(WELCOME_VIDEO_DIR + "welcome_back_scrubby_still.png"), WELCOME_VIDEO_SIZE, MetaCeremonies.CHROMA_KEY_MAGENTA)
 	return p
+
+## M43-C012R: the running Catch-Up track as one row of static pips (one per step, gold =
+## granted) plus the next step's reward. Read-only; the wins themselves grant the steps.
+static func _add_catchup(p: BasePopup, c: Dictionary) -> void:
+	if c.is_empty() or c["expired"]:
+		return
+	var steps: Array = c["steps"]
+	var done := steps.filter(func(s): return s["claimed"]).size()
+	var row := HBoxContainer.new()
+	row.name = "CatchUp"
+	row.alignment = BoxContainer.ALIGNMENT_CENTER
+	row.add_theme_constant_override("separation", 12)
+	var title := BasePopup.body_label(UiText.t("COMEBACK_CATCHUP", [UiText.num(done), UiText.num(steps.size())]), 24)
+	title.name = "CatchUpTitle"
+	title.autowrap_mode = TextServer.AUTOWRAP_OFF   # sized by its text inside the row
+	row.add_child(title)
+	for i in range(steps.size()):
+		var pip := ColorRect.new()
+		pip.name = "Pip_%d" % i
+		pip.custom_minimum_size = Vector2(28, 28)
+		pip.size_flags_vertical = Control.SIZE_SHRINK_CENTER
+		pip.color = BasePopup.GOLD_BODY if steps[i]["claimed"] else BasePopup.ROW_EDGE
+		row.add_child(pip)
+	p.get_content().add_child(row)
+	for s in steps:
+		if not s["claimed"]:
+			p.add_body_line(UiText.t("COMEBACK_CATCHUP_NEXT", [UiText.reward_text(s["reward"])]), "CatchUpNext", BasePopup.INK, 24)
+			break
 
 # ---------------------------------------------------------- NOTIFICATIONS ----
 

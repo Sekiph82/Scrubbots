@@ -23,10 +23,14 @@ const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
 const CollectionScreen = preload("res://scripts/ui/collection/collection_screen.gd")
 const Popups = preload("res://scripts/ui/popup/popups.gd")
 const HomeBadges = preload("res://scripts/ui/home/home_badges.gd")
+const NavigationController = preload("res://scripts/app/navigation_controller.gd")
+const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
+const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 
 var EXPECTED_CASES := [
 	"w01_world01_default_preserved", "w02_registry_ranges_fail_closed", "w03_current_world_derived", "w04_worlds_presentation_only",
 	"c01_absence_window_once", "c02_comeback_summary_no_mint", "c03_catchup_disabled_without_config", "c04_catchup_track_rules",
+	"c05_catchup_shipped_track_real_app",
 	"n01_opt_in_and_toggles", "n02_priority_cap_quiet", "n03_stale_suppression_deep_links",
 	"n04_clock_rollback_cap_reload", "n05_timezone_local_hour_policy",
 	"s01_local_authoritative_offline", "s02_resolve_rules", "s03_restore_integrity",
@@ -53,6 +57,7 @@ func _initialize() -> void:
 	await _c01()
 	await _c02()
 	_c03(); _c04()
+	await _c05()
 	_n01(); await _n02(); await _n03(); await _n04(); await _n05()
 	_s01(); _s02(); _s03(); _s04(); _s05(); _s06(); _s07()
 	await _a01(); await _a02(); await _a03(); await _a04()
@@ -163,14 +168,24 @@ func _c02() -> void:
 	_complete("c02_comeback_summary_no_mint")
 
 func _c03() -> void:
-	print("[c03 Catch-Up: no owner reward sequence -> never offered]")
-	var r := ReturnService.new(func(): return _now[0])
+	print("[c03 Catch-Up: no reward sequence -> never offered; shipped values]")
+	var path := _write_json("comeback_empty", {"schema": "scrubbots.comeback.v1", "absence_hours": 48, "catchup_expire_days": 7,
+		"approved_reward_types": ["scrub_bucks"], "catchup_steps": []})
+	var r := ReturnService.new(func(): return _now[0], path)
 	r.on_active()
 	_now[0] += 72 * 3600
 	r.on_active()
-	_ok(r.catchup().is_empty(), "shipped comeback_v1 has no steps: track not offered")
+	_ok(r.catchup().is_empty() and r.on_first_clear_win(RewardGrantService.new()).is_empty(), "no steps configured: track not offered, a win grants nothing")
 	var cfg: Dictionary = JSON.parse_string(FileAccess.get_file_as_string(ReturnService.PATH))
-	_ok(int(cfg["absence_hours"]) == 48 and (cfg["catchup_steps"] as Array).is_empty(), "48 h candidate; rewards unconfigured")
+	_ok(int(cfg["absence_hours"]) == 48 and int(cfg["catchup_expire_days"]) == 7 and int(cfg["version"]) == 2, "48 h absence, 7-day expiry, config version 2")
+	var st: Array = cfg["catchup_steps"]
+	_ok(st.size() == 3 and st.map(func(x): return int(x["wins"])) == [1, 2, 3] and st.map(func(x): return [int(x["reward"].get("scrub_bucks", 0)), int(x["reward"].get("bot_parts", 0)), x["reward"].size()]) == [[50, 0, 1], [75, 0, 1], [100, 1, 2]],
+		"SB-M43-R12-001 shipped steps: 50 SB / 75 SB / 100 SB + 1 Bot Part")
+	var shipped := ReturnService.new(func(): return _now[0])
+	shipped.on_active()
+	_now[0] += 48 * 3600
+	shipped.on_active()
+	_ok(shipped.catchup()["steps"].size() == 3, "shipped config passes the loader (3 steps, approved types)")
 	_complete("c03_catchup_disabled_without_config")
 
 func _c04() -> void:
@@ -196,6 +211,21 @@ func _c04() -> void:
 	_now[0] += 8 * 86400
 	r.on_active()
 	_ok(r.catchup()["window"] != snap["window"], "a new genuine absence opens a new window (new track)")
+	# No stacking: a second absence while the track still runs keeps that track (same tx ids).
+	var rs := ReturnService.new(func(): return _now[0], path)
+	var rws := RewardGrantService.new()
+	rs.on_active()
+	_now[0] += 50 * 3600
+	rs.on_active()
+	var first_track: int = rs.catchup()["window"]
+	_ok(rs.on_first_clear_win(rws).size() == 1, "auto-grant: the first win grants step 1 at once")
+	_now[0] += 50 * 3600
+	_ok(rs.on_active()["opened"] and rs.catchup()["window"] == first_track and rs.catchup()["wins"] == 1, "second absence while active: same track, wins kept (no stacking)")
+	_ok(rs.on_first_clear_win(rws).is_empty() and rs.on_first_clear_win(rws).size() == 1 and rs.catchup()["complete"], "the running track completes once (2 steps over 3 wins)")
+	_ok(rws.already_applied("catchup:%d:0" % first_track) and rws.already_applied("catchup:%d:1" % first_track) and rws.applied_transaction_count() == 2, "tx per step on the track's own window")
+	_now[0] += 50 * 3600
+	rs.on_active()
+	_ok(rs.catchup()["window"] != first_track and rs.catchup()["wins"] == 0, "after completion the next genuine absence starts a fresh track")
 	# SB-M43-R12-003: expiry is exact at window_ts + catchup_expire_days * 86400 (wall clock, not local day).
 	var r3 := ReturnService.new(func(): return _now[0], path)
 	var rw3 := RewardGrantService.new()
@@ -233,6 +263,85 @@ func _c04() -> void:
 	var src := _code(FileAccess.get_file_as_string("res://scripts/economy/return_service.gd"))
 	_ok(not src.contains("daily") and not src.contains("first_clear_sb") and not src.contains("multiplier"), "never touches Daily / level economy")
 	_complete("c04_catchup_track_rules")
+
+func _c05() -> void:
+	print("[c05 shipped Catch-Up in the real app: summary pips, 3 first clears grant once each, Results row, replay, relaunch]")
+	await _boot("c05")
+	var path: String = MainScript.boot_save_path_override
+	_ok(_root.get_app_state().economy.returns.catchup().is_empty(), "fresh profile: no track")
+	_root.get_app_state().request_save()
+	_root.flush_lifecycle("test")
+	_now[0] += 47 * 3600
+	await _relaunch(path)
+	_ok(_root.get_app_state().economy.returns.catchup().is_empty() and _root.get_modal_stack().top() == null, "47 h away: no track, no summary")
+	_root.get_app_state().request_save()
+	_root.flush_lifecycle("test")
+	_now[0] += 49 * 3600
+	_day[0] += 2
+	await _relaunch(path)
+	var e = _root.get_app_state().economy
+	var top = _root.get_modal_stack().top()
+	_ok(top != null and String(top.popup_id) == "comeback" and top.find_child("CatchUp", true, false) != null, "49 h away: Welcome Back shows the Catch-Up row")
+	var pips: Array = [0, 1, 2].map(func(i): return top.find_child("Pip_%d" % i, true, false))
+	_ok(pips.all(func(pp): return pp != null and pp.color == BasePopup.ROW_EDGE), "3 empty pips")
+	_ok(top.find_child("CatchUpTitle", true, false).text == UiText.t("COMEBACK_CATCHUP", ["0", "3"]) and top.find_child("CatchUpNext", true, false).text == UiText.t("COMEBACK_CATCHUP_NEXT", [UiText.reward_text({"scrub_bucks": 50})]),
+		"0/3 + next reward SB x50")
+	var window: int = e.returns.catchup()["window"]
+	top.close("test")
+	await _frames(2)
+	var expect := [{"scrub_bucks": 50}, {"scrub_bucks": 75}, {"scrub_bucks": 100, "bot_parts": 1}]
+	for lv in [1, 2, 3]:
+		await _win(lv)
+		var rc: Dictionary = _root.get_gameplay_host().get_terminal_receipt()
+		var rows: Array = ResultsScreen.reward_rows(rc).filter(func(rr): return rr["kind"] == "catchup")
+		_ok(rc["first_clear"] and rc["reconciled"] and rows.size() == 1 and rows[0]["text"] == UiText.t("RESULTS_CATCHUP", [lv, 3, UiText.reward_text(expect[lv - 1])]),
+			"win %d: Results row '%s', wallet delta reconciled %s" % [lv, rows[0]["text"] if rows.size() == 1 else "none", str(rc["wallet_delta"])])
+		_ok(e.reward.already_applied("catchup:%d:%d" % [window, lv - 1]) and rc["rewards"]["catchup_sb"] == int(expect[lv - 1]["scrub_bucks"]) and rc["rewards"]["catchup_bot_parts"] == int(expect[lv - 1].get("bot_parts", 0)),
+			"win %d: step %d granted under its tx" % [lv, lv])
+		if lv == 1:
+			var sb1: int = e.wallet.scrub_bucks()
+			await _win(1)
+			var rr: Dictionary = _root.get_gameplay_host().get_terminal_receipt()
+			_ok(not rr["first_clear"] and e.returns.catchup()["wins"] == 1 and e.wallet.scrub_bucks() == sb1 and ResultsScreen.reward_rows(rr).is_empty(), "replaying cleared level 1: no win counted, nothing granted, no row")
+	_ok(e.returns.catchup()["complete"] and e.returns.catchup()["steps"].all(func(st): return st["claimed"]), "3 first clears: track complete")
+	await _win(4)
+	var rc4: Dictionary = _root.get_gameplay_host().get_terminal_receipt()
+	_ok(rc4["first_clear"] and rc4["rewards"]["catchup_sb"] == 0 and ResultsScreen.reward_rows(rc4).all(func(rr): return rr["kind"] != "catchup"), "4th first clear: track capped, no Catch-Up grant")
+	var sb4: int = e.wallet.scrub_bucks()
+	var bp4: int = e.wallet.bot_parts()
+	var tx4: int = e.reward.applied_transaction_count()
+	var cu4: Dictionary = e.returns.catchup()
+	_ok(bool(_root.get_app_state().request_save().get("ok", false)), "saved")
+	_root.flush_lifecycle("test")
+	_now[0] += 3600
+	await _relaunch(path)
+	var e2 = _root.get_app_state().economy
+	_ok(e2.wallet.scrub_bucks() == sb4 and e2.wallet.bot_parts() == bp4 and e2.reward.applied_transaction_count() == tx4 and e2.returns.catchup() == cu4, "relaunch: same wallet / tx / track (import idempotent)")
+	var acts = _root.get_app_state().actions
+	_ok(not acts.claim_catchup(0)["ok"] and not acts.claim_catchup(2)["ok"] and e2.wallet.scrub_bucks() == sb4, "facade claims after relaunch re-grant nothing")
+	_complete("c05_catchup_shipped_track_real_app")
+
+func _relaunch(path: String) -> void:
+	_shutdown()
+	_sub = SubViewport.new()
+	_sub.size = Vector2i(1080, 2160)
+	get_root().add_child(_sub)
+	MainScript.boot_save_path_override = path
+	_root = MainScene.instantiate()
+	_sub.add_child(_root)
+	await _frames(6)
+
+func _win(level: int) -> void:
+	_root.get_modal_stack().clear("test")
+	var nav = _root.get_navigation()
+	if nav.current() != NavigationController.Route.HOME:
+		nav.go(NavigationController.Route.HOME)
+		await _frames(2)
+	_root.get_app_state().progression.debug_set_current_level(level)
+	_root.play_current_frontier()
+	await _frames(4)
+	_root.get_gameplay_host().get_runtime().set_process(false)
+	_root.get_gameplay_host()._drive_economy_terminal(CompletionEvaluator.WON)
 
 # ----------------------------------------------------------- notifications ----
 

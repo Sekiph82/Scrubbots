@@ -60,7 +60,7 @@ func _receipt_matches_commit() -> void:
 	var fc_sb: int = cfg.first_clear_sb(app.progression.class_for(1))
 	_ok(rc["schema"] == TerminalRewardReceipt.SCHEMA and rc["status"] == "WON" and rc["level"] == 1, "receipt identity WON / level 1")
 	_ok(rc["first_clear"] and not rc["already_cleared"] and rc["commit_reason"] == "ok", "first clear committed")
-	_ok(rc["rewards"] == {"first_clear_sb": fc_sb, "first_clear_bot_parts": cfg.first_clear_bot_parts(), "win_streak_sb": 1, "win_streak_bot_parts": 0}, "reward components = committed service results %s" % str(rc["rewards"]))
+	_ok(rc["rewards"] == {"first_clear_sb": fc_sb, "first_clear_bot_parts": cfg.first_clear_bot_parts(), "win_streak_sb": 1, "win_streak_bot_parts": 0, "catchup_sb": 0, "catchup_bot_parts": 0}, "reward components = committed service results %s" % str(rc["rewards"]))
 	_ok(rc["wallet_delta"] == {"scrub_bucks": eco.wallet.scrub_bucks() - sb0, "bot_parts": eco.wallet.bot_parts() - bp0}, "wallet delta = real wallet change")
 	_ok(rc["reconciled"] and rc["wallet_delta"]["scrub_bucks"] == fc_sb + 1, "components explain the whole wallet change")
 	_ok(rc["streak"] == {"before": 0, "after": eco.streak.streak()} and eco.streak.streak() == 1, "streak 0 -> 1")

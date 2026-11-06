@@ -12,7 +12,8 @@ extends RefCounted
 ##
 ## reveal_queue is a deterministic, data-only order for a later owner-approved
 ## celebration (SB-M43-010): only committed, non-zero entries appear, in owner order
-## first-clear SB -> Win Streak SB -> Bot Parts -> Gift Meter -> Collection cards.
+## first-clear SB -> Win Streak SB -> Bot Parts -> Gift Meter -> Collection cards, then any
+## Comeback Catch-Up step the win granted (M43-C012R).
 ## Presentation (or Reduced Effects) may show them instantly; nothing waits on it.
 ##
 ## follow_ups lists downstream ceremony handoffs (SB-M43-012/013) ONLY for events whose
@@ -29,6 +30,7 @@ const REVEAL_WIN_STREAK_SB := "win_streak_sb"
 const REVEAL_BOT_PARTS := "bot_parts"
 const REVEAL_GIFT_METER := "gift_meter"
 const REVEAL_COLLECTION_CARDS := "collection_cards"
+const REVEAL_CATCHUP := "catchup"
 
 ## Authoritative state probe. Read-only.
 static func capture(progression, economy) -> Dictionary:
@@ -54,9 +56,10 @@ static func capture(progression, economy) -> Dictionary:
 	}
 
 ## Build the receipt. status: "WON" | "LOST"; commit: FirstClearTransaction result
-## (WON only); save: the terminal save-boundary result.
+## (WON only); save: the terminal save-boundary result; catchup: ReturnService.on_first_clear_win
+## grants ([{step, steps, reward}]).
 static func build(status: String, level: int, pre: Dictionary, post: Dictionary,
-		commit: Dictionary, save: Dictionary) -> Dictionary:
+		commit: Dictionary, save: Dictionary, catchup: Array = []) -> Dictionary:
 	var won := status == "WON"
 	var committed: bool = won and bool(commit.get("ok", false))
 	var fc: Dictionary = commit.get("first_clear", {}) if committed else {}
@@ -68,6 +71,11 @@ static func build(status: String, level: int, pre: Dictionary, post: Dictionary,
 	var sb_delta: int = post["scrub_bucks"] - pre["scrub_bucks"]
 	var bp_delta: int = post["bot_parts"] - pre["bot_parts"]
 	var cards_delta: int = post["cards_owned"] - pre["cards_owned"]
+	var cu_sb := 0
+	var cu_bp := 0
+	for g in catchup:
+		cu_sb += int(g["reward"].get("scrub_bucks", 0))
+		cu_bp += int(g["reward"].get("bot_parts", 0))
 	var newly: Array = []
 	for occ in st.get("gift_milestones", []):
 		newly.append((occ as Dictionary).duplicate())
@@ -87,10 +95,12 @@ static func build(status: String, level: int, pre: Dictionary, post: Dictionary,
 			"first_clear_bot_parts": first_bp,
 			"win_streak_sb": streak_sb,
 			"win_streak_bot_parts": streak_bp,
+			"catchup_sb": cu_sb,
+			"catchup_bot_parts": cu_bp,
 		},
 		"wallet_delta": {"scrub_bucks": sb_delta, "bot_parts": bp_delta},
 		# Committed components must explain the whole wallet change (no hidden grant).
-		"reconciled": sb_delta == first_sb + streak_sb and bp_delta == first_bp + streak_bp,
+		"reconciled": sb_delta == first_sb + streak_sb + cu_sb and bp_delta == first_bp + streak_bp + cu_bp,
 		"streak": {"before": pre["streak"], "after": post["streak"]},
 		"hearts": {"before": pre["hearts"], "after": post["hearts"]},
 		"frontier": {"before": pre["frontier"], "after": post["frontier"]},
@@ -117,6 +127,8 @@ static func build(status: String, level: int, pre: Dictionary, post: Dictionary,
 			"milestones": newly.map(func(o): return int(o["milestone"]))})
 	if cards_delta > 0:
 		q.append({"kind": REVEAL_COLLECTION_CARDS, "amount": cards_delta})
+	for g in catchup:
+		q.append({"kind": REVEAL_CATCHUP, "step": int(g["step"]) + 1, "steps": int(g["steps"]), "reward": (g["reward"] as Dictionary).duplicate()})
 	for i in range(q.size()):
 		q[i]["seq"] = i
 	var f: Array = r["follow_ups"]

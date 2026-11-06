@@ -1,10 +1,14 @@
 {
   "schema": "scrubbots.comeback.v1",
-  "version": 1,
+  "version": 2,
   "source": "TASKS M43-C012R (owner-approved 2026-09-30): genuine absence initial tuning candidate >= 48 hours; Catch-Up Track = three qualifying first-clear progression wins, small capped rewards of approved existing types only.",
-  "status": "CATCH-UP REWARDS NOT CONFIGURED — the capped reward sequence needs an owner decision (and M56 simulation) before the track is offered. The comeback summary itself grants nothing.",
+  "status": "CATCH-UP REWARDS CONFIGURED (version 2, 2026-11-06): Claude proposal under the owner pre-approved rule (existing currencies only, same rule as SB-POLISH-002); rationale in coordination/OWNER_ECONOMY_REWARDS_V01.md. Each reached step grants once on the qualifying win (tx catchup:<window>:<step>); the comeback summary itself grants nothing.",
   "absence_hours": 48,
   "catchup_expire_days": 7,
   "approved_reward_types": ["scrub_bucks", "bot_parts", "standard_card_packs", "premium_card_packs", "random_any_booster_charges", "selected_booster_charges"],
-  "catchup_steps": []
+  "catchup_steps": [
+    {"wins": 1, "reward": {"scrub_bucks": 50}},
+    {"wins": 2, "reward": {"scrub_bucks": 75}},
+    {"wins": 3, "reward": {"scrub_bucks": 100, "bot_parts": 1}}
+  ]
 }
