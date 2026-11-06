@@ -255,10 +255,10 @@ jobs:
           else
             echo "M43-C010 verdict=FAIL (exact 12/12 summary missing)" | tee -a "$S"; fail=1
           fi
-          if grep -qxF 'M43 master C011-C014 evidence: PASS (28/28 cases, 0 fail)' validate_logs/m43_master_c011_c014.log 2>/dev/null; then
-            echo "M43-C011 verdict=PASS (28/28)" | tee -a "$S"
+          if grep -qxF 'M43 master C011-C014 evidence: PASS (29/29 cases, 0 fail)' validate_logs/m43_master_c011_c014.log 2>/dev/null; then
+            echo "M43-C011 verdict=PASS (29/29)" | tee -a "$S"
           else
-            echo "M43-C011 verdict=FAIL (exact 28/28 summary missing)" | tee -a "$S"; fail=1
+            echo "M43-C011 verdict=FAIL (exact 29/29 summary missing)" | tee -a "$S"; fail=1
           fi
           if grep -qxF 'M44 PENDING PACKS GATE: PASS (6/6 cases, 0 fail)' validate_logs/m44_pending_packs_gate.log 2>/dev/null; then
             echo "M44-PENDING-PACKS verdict=PASS (6/6)" | tee -a "$S"
