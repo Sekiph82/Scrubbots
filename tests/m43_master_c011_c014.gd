@@ -159,8 +159,8 @@ func _c02() -> void:
 	var cp = ProfileScreens.open_comeback(_root.get_modal_stack(), _root.get_app_state())
 	await _frames(2)
 	_ok(gifts > 0 and cp.find_child("Ready_gift_bar", true, false).text == UiText.t("COMEBACK_GIFT", [UiText.num(gifts)]), "Gift line: %d claimable gift(s)" % gifts)
-	_ok(cp.find_child("Ready_tasks", true, false).text == UiText.t("COMEBACK_TASKS", [UiText.num(1)]), "Tasks line: 1 task reward ready")
-	_ok(cp.find_child("Ready_events", true, false).text == UiText.t("COMEBACK_EVENTS", [UiText.num(1)]), "Events line: 1 event reward ready")
+	_ok(cp.find_child("Ready_tasks", true, false).text == UiText.tn("COMEBACK_TASKS", 1, [UiText.num(1)]), "Tasks line: 1 task reward ready")
+	_ok(cp.find_child("Ready_events", true, false).text == UiText.tn("COMEBACK_EVENTS", 1, [UiText.num(1)]), "Events line: 1 event reward ready")
 	_ok(e.wallet.scrub_bucks() == sb1 and e.gift.claimable().size() == gifts and e.events.claimable_count() == 1 and not e.daily.task_claimed(0),
 		"summary grants / claims nothing (gifts, task, event reward still waiting)")
 	cp.close("test")
