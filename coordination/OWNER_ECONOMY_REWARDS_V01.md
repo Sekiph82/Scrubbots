@@ -304,6 +304,26 @@ Initial V1:
 
 Daily rewards do not advance Gift Meter and do not grant Bot Parts.
 
+### 9.3 Comeback Catch-Up Track (SB-M43-R12-001)
+
+Added 2026-11-06 (factory 111). Values are a Claude proposal under the owner pre-approved rule (factory recommendations pre-approved, existing reward types only; same rule as SB-POLISH-002). Machine source: `data/config/comeback_v1.json` version 2.
+
+A genuine absence (>= 48 h since the player was last active, rollback-proof) opens one return window. The track is three qualifying first-clear progression wins; each reached step is granted once on the win itself through RewardGrantService (tx `catchup:<track window>:<step>`) and shown as a Results row and on the Welcome Back summary (3 pips + next reward).
+
+| Step | Qualifying first-clear win | Reward |
+|---|---|---|
+| 1 | 1st | 50 SB |
+| 2 | 2nd | 75 SB |
+| 3 | 3rd | 100 SB + 1 Bot Part |
+
+Total per genuine absence: 225 SB + 1 Bot Part.
+
+Rationale:
+- Small next to existing rewards: one 5-day Daily login cycle is 650 SB plus packs and boosters; one day of Daily tasks is 300 SB plus a booster charge; a single EASY first clear is already 50 SB. The whole track is about a third of one Daily login cycle.
+- Cannot be farmed: it needs a 48 h absence (at most about 112 SB per day if gamed perfectly, below the daily login value), only frontier first clears count (replays, losses and purchases never advance it), the track expires 7 days after it opened, a second absence while a track is still running keeps that same track (no stacking, no fresh tx ids), and clock rollback freezes it.
+- Wallet currencies only: no booster charge, because the random-any booster reward can land on a still-locked booster for a new player; SB and one Bot Part are always usable.
+- It never restores missed Daily days, never changes the login reset rule, never feeds the Gift Meter (which counts Win Streak SB only) and never multiplies first-clear rewards (SB-M43-R12-002).
+
 ## 10. Collection and card packs
 
 Owner reference structure is **15 Collection sets × 9 cards**.
