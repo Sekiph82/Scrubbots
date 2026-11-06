@@ -476,6 +476,11 @@ func _stop_video() -> void:
 	box.queue_free()
 	_video = null
 
+## SB-M43-C005F-015: one decoder at a time. A ceremony opening over Results plays its own Flow
+## video, so Scrubby's result video ends on its keyed still first.
+func stop_result_video() -> void:
+	_stop_video()
+
 func get_result_video() -> VideoStreamPlayer:
 	return _video
 

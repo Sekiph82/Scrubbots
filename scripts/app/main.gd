@@ -320,6 +320,7 @@ func _begin_results_ceremonies() -> void:
 func _drain_results_ceremonies() -> void:
 	if nav.current() != NavigationController.Route.RESULTS or ceremonies == null:
 		return
+	_results.stop_result_video()   # the ceremony brings its own video: one decoder at a time
 	if not ceremonies.drain("results") and not ceremonies.is_presenting():
 		_results.set_ceremony_barrier(RESULTS_CEREMONY_BARRIER, false)
 
