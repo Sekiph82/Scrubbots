@@ -1,0 +1,128 @@
+{
+  "schema": "scrubbots.analytics_taxonomy.v1",
+  "version": 1,
+  "doc": "docs/ANALYTICS_TAXONOMY_V1.md",
+  "tasks": ["SB-M56-001", "SB-M56-002", "SB-M56-003", "SB-M56-004", "SB-M56-005", "SB-M56-006"],
+  "privacy": {
+    "consent_default": false,
+    "param_types": ["int", "bool", "enum", "enum_list"],
+    "forbidden_param_names": ["name", "display_name", "email", "phone", "device_id", "advertising_id", "idfa", "gaid", "ip", "user_id", "player_id", "account", "location", "text", "message", "board", "cells", "seed", "save", "receipt", "token", "transaction_id"]
+  },
+  "batch_size": 20,
+  "buckets": {
+    "duration_s": [[30, "lt_30s"], [120, "30s_2m"], [300, "2m_5m"], [900, "5m_15m"], [3600, "15m_60m"], [-1, "gt_60m"]],
+    "attempt": [[2, "1"], [3, "2"], [4, "3"], [6, "4_5"], [11, "6_10"], [-1, "gt_10"]],
+    "count": [[1, "0"], [2, "1"], [3, "2"], [6, "3_5"], [-1, "gt_5"]],
+    "progress_pct": [[25, "0_25"], [50, "25_50"], [75, "50_75"], [90, "75_90"], [-1, "90_100"]]
+  },
+  "enums": {
+    "duration": ["lt_30s", "30s_2m", "2m_5m", "5m_15m", "15m_60m", "gt_60m"],
+    "attempt": ["1", "2", "3", "4_5", "6_10", "gt_10"],
+    "count": ["0", "1", "2", "3_5", "gt_5"],
+    "progress": ["0_25", "25_50", "50_75", "75_90", "90_100"],
+    "difficulty": ["EASY", "MEDIUM", "HARD", "VERY_HARD", "UNKNOWN"],
+    "booster": ["plus_one_slot", "random", "selector", "tornado"]
+  },
+  "events": {
+    "session_start": {
+      "task": "SB-M56-002",
+      "params": {
+        "trigger": {"type": "enum", "values": ["cold_start", "foreground"], "required": true}
+      }
+    },
+    "session_end": {
+      "task": "SB-M56-002",
+      "params": {
+        "trigger": {"type": "enum", "values": ["background", "close"], "required": true},
+        "duration": {"type": "enum", "enum": "duration", "required": true},
+        "after_level": {"type": "enum", "values": ["none", "won", "lost", "exit", "restart"], "required": true}
+      }
+    },
+    "retention_day": {
+      "task": "SB-M56-004",
+      "params": {
+        "day": {"type": "enum", "values": ["d1", "d3", "d7", "d14", "d30"], "required": true}
+      }
+    },
+    "level_start": {
+      "task": "SB-M56-003",
+      "params": {
+        "level": {"type": "int", "min": 1, "max": 100000, "required": true},
+        "progression": {"type": "bool", "required": true},
+        "entry": {"type": "enum", "values": ["launch", "retry_results", "retry_pause"], "required": true},
+        "attempt": {"type": "enum", "enum": "attempt", "required": true},
+        "retry_latency": {"type": "enum", "enum": "duration", "required": false},
+        "difficulty": {"type": "enum", "enum": "difficulty", "fallback": "UNKNOWN", "required": true},
+        "cadence_slot": {"type": "int", "min": 1, "max": 10, "required": true},
+        "difficulty_model": {"type": "int", "min": 0, "max": 99, "required": true}
+      }
+    },
+    "level_first_action": {
+      "task": "SB-M56-003",
+      "params": {
+        "level": {"type": "int", "min": 1, "max": 100000, "required": true},
+        "attempt": {"type": "enum", "enum": "attempt", "required": true},
+        "elapsed": {"type": "enum", "enum": "duration", "required": true}
+      }
+    },
+    "level_end": {
+      "task": "SB-M56-003",
+      "params": {
+        "level": {"type": "int", "min": 1, "max": 100000, "required": true},
+        "outcome": {"type": "enum", "values": ["won", "lost", "exit", "restart"], "required": true},
+        "progression": {"type": "bool", "required": true},
+        "attempt": {"type": "enum", "enum": "attempt", "required": true},
+        "first_attempt": {"type": "bool", "required": true},
+        "duration": {"type": "enum", "enum": "duration", "required": true},
+        "progress": {"type": "enum", "enum": "progress", "required": true},
+        "boosters_used": {"type": "enum", "enum": "count", "required": true},
+        "assisted": {"type": "bool", "required": true},
+        "difficulty": {"type": "enum", "enum": "difficulty", "fallback": "UNKNOWN", "required": true},
+        "cadence_slot": {"type": "int", "min": 1, "max": 10, "required": true},
+        "difficulty_model": {"type": "int", "min": 0, "max": 99, "required": true}
+      }
+    },
+    "assist_shown": {
+      "task": "SB-M56-005",
+      "params": {
+        "level": {"type": "int", "min": 1, "max": 100000, "required": true},
+        "boosters": {"type": "enum_list", "enum": "booster", "max_items": 4, "required": true}
+      }
+    },
+    "assist_fail_closed": {
+      "task": "SB-M56-005",
+      "params": {
+        "level": {"type": "int", "min": 1, "max": 100000, "required": true},
+        "reason": {"type": "enum", "values": ["insufficient_meaningful", "config_invalid", "other"], "fallback": "other", "required": true}
+      }
+    },
+    "assist_dismissed": {
+      "task": "SB-M56-005",
+      "params": {
+        "level": {"type": "int", "min": 1, "max": 100000, "required": true},
+        "acquired": {"type": "bool", "required": true}
+      }
+    },
+    "booster_acquire": {
+      "task": "SB-M56-006",
+      "params": {
+        "booster": {"type": "enum", "enum": "booster", "required": true},
+        "path": {"type": "enum", "values": ["sb", "rewarded"], "required": true},
+        "source": {"type": "enum", "values": ["need_a_hand", "booster_popup"], "required": true},
+        "ok": {"type": "bool", "required": true}
+      }
+    },
+    "booster_use": {
+      "task": "SB-M56-006",
+      "params": {
+        "booster": {"type": "enum", "enum": "booster", "required": true},
+        "ok": {"type": "bool", "required": true},
+        "paid_with": {"type": "enum", "values": ["charge", "sb"], "required": false},
+        "reason": {"type": "enum", "values": ["ok", "insufficient_sb", "locked", "not_solver_safe", "proof_timeout", "not_eligible", "color_not_present", "plus_one_used", "activation_failed", "commit_failed", "extract_failed", "rolled_back", "no_gameplay_host", "other"], "fallback": "other", "required": true},
+        "level": {"type": "int", "min": 1, "max": 100000, "required": true},
+        "attempt": {"type": "enum", "enum": "attempt", "required": true},
+        "difficulty": {"type": "enum", "enum": "difficulty", "fallback": "UNKNOWN", "required": true}
+      }
+    }
+  }
+}
