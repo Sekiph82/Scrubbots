@@ -143,7 +143,7 @@ func _register_handlers() -> void:
 		for _i in range(n):
 			var cid := packs.grant_guaranteed_new()
 			if cid.is_empty():
-				wallet.credit(EconomyWallet.SCRUB_BUCKS, GUARANTEED_NEW_FALLBACK_SB))
+				wallet.credit(EconomyWallet.SCRUB_BUCKS, GUARANTEED_NEW_FALLBACK_SB, reward.current_tx()))
 	# The explicit fallback key is a no-op: the fallback is applied inside the
 	# guaranteed_new_cards handler only when no card is available, so we never
 	# double-grant it.

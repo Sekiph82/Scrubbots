@@ -40,7 +40,7 @@ func unlock_cost() -> int:
 func unlock(robot_id: String) -> Dictionary:
 	if _unlocked.has(robot_id):
 		return {"ok": false, "reason": "already_unlocked", "remaining_parts": _wallet.bot_parts()}
-	if not _wallet.debit(EconomyWallet.BOT_PARTS, _cost):
+	if not _wallet.debit(EconomyWallet.BOT_PARTS, _cost, "robot_unlock"):
 		return {"ok": false, "reason": "insufficient_parts", "remaining_parts": _wallet.bot_parts()}
 	_unlocked[robot_id] = true
 	return {"ok": true, "reason": "unlocked", "remaining_parts": _wallet.bot_parts()}

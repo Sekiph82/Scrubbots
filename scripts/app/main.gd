@@ -165,6 +165,9 @@ func _ready() -> void:
 	if app_state != null and app_state.economy != null:
 		_acq.bind(_modals, app_state.economy, app_state.actions, shop)
 		_acq.analytics = app_state.analytics
+	shop.shop_requested.connect(func(t): _track("shop_open", {"source": t["source"]}))
+	# SB-M56-012: the OS answer to the one POST_NOTIFICATIONS request (Android only).
+	get_tree().on_request_permissions_result.connect(_on_permissions_result)
 	# SB-M43-032 / 036: Home Heart + -> canonical Life; Home SB + -> canonical Shop intent.
 	_home.hearts_purchase_requested.connect(func(): open_life("home_heart_plus"))
 	_home.scrub_bucks_purchase_requested.connect(func(): _acq.open_scrub_bucks("home_sb_plus"))
@@ -272,6 +275,7 @@ func get_opening():
 
 ## M42: show the screen that belongs to the current route.
 func _on_route_changed(_from: int, to: int, _payload: Dictionary) -> void:
+	_track("screen_view", {"screen": nav.route_name(to).to_lower()})
 	# Returning HOME ends the gameplay scene: the host (and its music/FX) is released.
 	if to == NavigationController.Route.HOME:
 		_release_gameplay_host()
@@ -373,6 +377,7 @@ func _entry_locked(id: String) -> bool:
 func _on_home_nav(id: String) -> void:
 	if nav == null or nav.current() != NavigationController.Route.HOME or (_modals != null and _modals.depth() > 0) or _entry_locked(id):
 		return
+	_track("screen_view", {"screen": id})
 	match id:
 		"robots":
 			RobotsScreen.open(_modals, app_state, ceremonies)
@@ -385,6 +390,7 @@ func _on_home_nav(id: String) -> void:
 func _on_home_shortcut(id: String) -> void:
 	if nav == null or nav.current() != NavigationController.Route.HOME or (_modals != null and _modals.depth() > 0) or _entry_locked(id):
 		return
+	_track("screen_view", {"screen": id})
 	match id:
 		"shop":
 			_acq.open_shop({"source": "home_shop"})
@@ -462,6 +468,7 @@ func open_deep_link(dest: String) -> String:
 			pass
 		_:
 			_on_home_shortcut(d)
+	_track("deep_link_open", {"dest": d})
 	return d
 
 func get_pack_presenter():
@@ -490,6 +497,7 @@ func open_help():
 		return null
 	if nav.is_settings_open():
 		nav.close_settings()
+	_track("screen_view", {"screen": "help"})
 	return HelpTipsScreen.open(_modals, app_state)
 
 # ------------------------------------------------------------------ M44 FTUE --
@@ -707,6 +715,7 @@ func _on_nav_settings_changed(open: bool) -> void:
 	if _home != null:
 		_home.set_modal_active("settings", open)
 	if open:
+		_track("screen_view", {"screen": "settings"})
 		_settings_panel.open_panel()
 	elif _settings_panel.visible:
 		_settings_panel.close_panel()
@@ -729,6 +738,7 @@ func is_blocked() -> bool:
 func launch_gameplay(parent: Node = null) -> Dictionary:
 	if is_blocked():
 		last_launch = {"ok": false, "reason": GameplayLaunchResolver.APP_BLOCKED}
+		_track("launch_failed", {"reason": GameplayLaunchResolver.APP_BLOCKED})
 		return last_launch
 	# CP06: a disabled frontier is skipped (durably, non-rewarding) before it can resolve;
 	# also retries a skip whose save failed earlier.
@@ -736,6 +746,7 @@ func launch_gameplay(parent: Node = null) -> Dictionary:
 	var launch := GameplayLaunchResolver.resolve(app_state)
 	if not launch.get("ok", false):
 		last_launch = {"ok": false, "reason": launch.get("reason", ""), "launch": launch}
+		_track("launch_failed", {"reason": String(launch.get("reason", ""))})
 		return last_launch
 	app_state.skip_notice.clear()
 	# SB-M42-006: exactly one gameplay host. The previous host leaves the tree NOW
@@ -757,6 +768,7 @@ func launch_gameplay(parent: Node = null) -> Dictionary:
 		host.get_parent().remove_child(host)
 		host.queue_free()
 		last_launch = {"ok": false, "reason": err, "launch": launch}
+		_track("launch_failed", {"reason": "BUILD_FAILED"})
 		return last_launch
 	_gameplay_host = host
 	meta_feel.bind_gameplay(host)   # F009: committed booster use (the host owns its facade)
@@ -793,7 +805,7 @@ func play_current_frontier() -> Dictionary:
 	# transition in flight); otherwise nothing is built.
 	if not nav.can_go(NavigationController.Route.GAMEPLAY) or nav.current() != NavigationController.Route.HOME:
 		return {"ok": false, "reason": "not_home"}
-	if _zero_heart_gate("attempt_gate"):
+	if _zero_heart_gate("attempt_gate", "home_play"):
 		return {"ok": false, "reason": "no_hearts"}
 	var r := launch_gameplay()
 	if r.get("ok", false):
@@ -845,7 +857,7 @@ func continue_from_results(attempt: int = -1) -> Dictionary:
 	if not GameplayLaunchResolver.resolve(app_state).get("ok", false):
 		_results.show_model(_results_model(shown))
 		return {"ok": false, "reason": "no_next_content"}
-	if _zero_heart_gate("attempt_gate"):
+	if _zero_heart_gate("attempt_gate", "results_continue"):
 		_results.show_model(_results.get_model())   # re-arm Continue
 		return {"ok": false, "reason": "no_hearts"}
 	var r := launch_gameplay()
@@ -866,7 +878,7 @@ func continue_from_results(attempt: int = -1) -> Dictionary:
 func retry_from_results() -> bool:
 	if nav.current() != NavigationController.Route.RESULTS or _gameplay_host == null:
 		return false
-	if _zero_heart_gate("attempt_gate"):
+	if _zero_heart_gate("attempt_gate", "results_retry"):
 		return false
 	if not _gameplay_host.retry():
 		return false
@@ -900,9 +912,10 @@ func open_life(source: String):
 
 ## Zero-Heart attempt gate: a new attempt needs >= 1 Heart (HeartService truth). With none,
 ## the canonical Life popup opens and nothing launches. Returns true when gated.
-func _zero_heart_gate(source: String) -> bool:
+func _zero_heart_gate(source: String, at: String) -> bool:
 	if app_state == null or app_state.economy == null or app_state.economy.hearts.hearts() > 0:
 		return false
+	_track("hearts_empty", {"at": at})
 	open_life(source)
 	return true
 
@@ -967,6 +980,14 @@ func _unhandled_input(event: InputEvent) -> void:
 func _exit_tree() -> void:
 	if feel != null:
 		feel.unbind()
+
+func _on_permissions_result(_permission: String, granted: bool) -> void:
+	_track("notify_permission", {"step": "os_granted" if granted else "os_denied"})
+
+## SB-M56-007..012: one analytics event through AppState (write-only; no AppState = nothing).
+func _track(event: String, params: Dictionary) -> void:
+	if app_state != null:
+		app_state.analytics.track(event, params)
 
 func _notification(what: int) -> void:
 	match what:

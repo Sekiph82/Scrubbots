@@ -230,7 +230,9 @@ func exchange_all_extras() -> Dictionary:
 func unlock_robot(robot_id: String) -> Dictionary:
 	if not feature_unlocked("robots"):
 		return _locked("unlock_robot", "robots")
-	return _finish("unlock_robot", _economy.robots.unlock(robot_id))
+	var r: Dictionary = _economy.robots.unlock(robot_id)
+	r["robot_id"] = robot_id
+	return _finish("unlock_robot", r)
 
 ## M43 master (SB-M43-102/104): unlock the NEXT robot of the canonical roster order (owner
 ## roster §4) for exactly the configured Bot Parts. {ok, reason, robot_id, remaining_parts}.

@@ -183,6 +183,7 @@ func open_life(source: String):
 	if not _stack.push(p):
 		p.free()
 		return null
+	_track("ad_offer_shown", {"placement": "life", "available": _economy.rewarded.is_available(RewardedGrantService.HEART)})
 	t.start()
 	_refresh_life(p)
 	return p
@@ -349,6 +350,7 @@ func open_booster(host, id: String, auto_use: bool = false):
 	if not _stack.push(p):
 		p.free()
 		return null
+	_track("ad_offer_shown", {"placement": "booster_popup", "available": _economy.rewarded.is_available(RewardedGrantService.booster_product(id))})
 	_refresh_booster(p, true)
 	return p
 
@@ -566,6 +568,7 @@ func open_need_a_hand(offer: Dictionary, reduced := false):
 	if not _stack.push(p):
 		p.free()
 		return null
+	_track("ad_offer_shown", {"placement": "need_a_hand", "available": ids.any(func(b): return _economy.rewarded.is_available(RewardedGrantService.booster_product(b)))})
 	_refresh_nah(p)
 	if not reduced and _help_pose() == LIFE_HERO_ART:
 		MetaCeremonies.play_hero_video(p, scrubby, need_a_hand_video, load(NAH_VIDEO_DIR + "need_a_hand_scrubby_still.png"), NAH_VIDEO_SIZE, MetaCeremonies.CHROMA_KEY_MAGENTA)
@@ -668,6 +671,7 @@ func _on_nah_action(action: String, _ctx: Dictionary, p) -> void:
 
 func _start_rewarded(p, product: String, wait: Dictionary) -> void:
 	var r: Dictionary = _actions.start_rewarded(product)
+	_track("ad_request", {"product": product.replace(":", "_"), "ok": bool(r.get("ok", false)), "reason": String(r.get("reason", "ok"))})
 	if not r.get("ok", false):
 		last_result = r
 		_status(p, UiText.t("REWARDED_UNAVAILABLE_NOTE"))

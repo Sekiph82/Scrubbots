@@ -18,6 +18,9 @@ extends RefCounted
 
 const EconomyWallet = preload("res://scripts/economy/economy_wallet.gd")
 
+## SB-M56-008: a newly applied grant (analytics seam only: set / Master completion).
+signal granted(tx_id: String)
+
 var _wallet: EconomyWallet
 var _handlers: Dictionary = {}       ## resource(String) -> Callable(amount:int)
 var _applied: Dictionary = {}        ## tx_id(String) -> rewards(Dictionary) actually applied.
@@ -28,8 +31,8 @@ var _current_tx := ""
 func _init(wallet: EconomyWallet = null) -> void:
 	_wallet = wallet if wallet != null else EconomyWallet.new()
 	# Default canonical handlers for the two wallet resources.
-	register_handler(EconomyWallet.SCRUB_BUCKS, func(amount): _wallet.credit(EconomyWallet.SCRUB_BUCKS, amount))
-	register_handler(EconomyWallet.BOT_PARTS, func(amount): _wallet.credit(EconomyWallet.BOT_PARTS, amount))
+	register_handler(EconomyWallet.SCRUB_BUCKS, func(amount): _wallet.credit(EconomyWallet.SCRUB_BUCKS, amount, _current_tx))
+	register_handler(EconomyWallet.BOT_PARTS, func(amount): _wallet.credit(EconomyWallet.BOT_PARTS, amount, _current_tx))
 
 func wallet() -> EconomyWallet:
 	return _wallet
@@ -75,6 +78,7 @@ func grant(tx_id: String, rewards: Dictionary) -> bool:
 		_handlers[resource].call(amount)
 	_current_tx = ""
 	_applied[tx_id] = rewards.duplicate()
+	granted.emit(tx_id)
 	return true
 
 ## The tx id of the grant whose handlers are currently applying ("" outside a grant).

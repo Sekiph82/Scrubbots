@@ -91,7 +91,7 @@ func purchase_plus_one() -> Dictionary:
 	_accrue()
 	if _hearts >= _max:
 		return {"ok": false, "reason": "already_full"}
-	if not _wallet.debit(EconomyWallet.SCRUB_BUCKS, _plus_one_sb):
+	if not _wallet.debit(EconomyWallet.SCRUB_BUCKS, _plus_one_sb, "heart_plus_one"):
 		return {"ok": false, "reason": "insufficient_sb"}
 	_hearts += 1
 	if _hearts >= _max:
@@ -116,7 +116,7 @@ func purchase_full_refill() -> Dictionary:
 	if missing <= 0:
 		return {"ok": false, "reason": "already_full"}
 	var cost := missing * _refill_sb_per_missing
-	if not _wallet.debit(EconomyWallet.SCRUB_BUCKS, cost):
+	if not _wallet.debit(EconomyWallet.SCRUB_BUCKS, cost, "heart_refill"):
 		return {"ok": false, "reason": "insufficient_sb"}
 	_hearts = _max
 	_anchor = _now()

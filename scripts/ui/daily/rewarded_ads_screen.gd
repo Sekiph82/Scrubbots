@@ -128,6 +128,7 @@ static func _reason_text(reason: String) -> String:
 static func _watch(p: BasePopup, app, slot: int, ui_timeout_s: float) -> void:
 	var rewarded = app.economy.rewarded
 	var r: Dictionary = app.actions.start_rewarded_daily(slot)
+	app.analytics.track("ad_request", {"product": "daily_slot", "ok": bool(r.get("ok", false)), "reason": String(r.get("reason", "ok"))})
 	if not bool(r.get("ok", false)):
 		_set_note(p, _reason_text(String(r.get("reason", "unavailable"))))
 		refresh(p, app)

@@ -54,7 +54,7 @@ func reserve(id: String) -> Dictionary:
 		_charges[id] = charges(id) - 1
 		return {"ok": true, "paid_with": "charge"}
 	var price := int(_config.booster_price(id))
-	if not _wallet.debit(EconomyWallet.SCRUB_BUCKS, price):
+	if not _wallet.debit(EconomyWallet.SCRUB_BUCKS, price, "booster_use"):
 		return {"ok": false, "reason": "insufficient_sb"}
 	return {"ok": true, "paid_with": "sb", "price": price}
 
@@ -67,7 +67,7 @@ func buy_charge(id: String) -> Dictionary:
 	var price := int(_config.booster_price(id))
 	if price <= 0:
 		return {"ok": false, "reason": "no_price"}
-	if not _wallet.debit(EconomyWallet.SCRUB_BUCKS, price):
+	if not _wallet.debit(EconomyWallet.SCRUB_BUCKS, price, "booster_buy"):
 		return {"ok": false, "reason": "insufficient_sb", "price": price}
 	_charges[id] = charges(id) + 1
 	return {"ok": true, "booster": id, "price": price, "charges": charges(id)}
@@ -79,7 +79,7 @@ func refund(id: String, reservation: Dictionary) -> void:
 	if reservation.get("paid_with") == "charge":
 		_charges[id] = charges(id) + 1
 	elif reservation.get("paid_with") == "sb":
-		_wallet.credit(EconomyWallet.SCRUB_BUCKS, int(reservation.get("price", 0)))
+		_wallet.credit(EconomyWallet.SCRUB_BUCKS, int(reservation.get("price", 0)), "booster_refund")
 
 ## Grant `n` player-selected charges to the pending pool.
 func add_pending_selected(n: int) -> void:

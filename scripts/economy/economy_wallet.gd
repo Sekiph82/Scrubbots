@@ -19,6 +19,10 @@ const CANONICAL_RESOURCES := [SCRUB_BUCKS, BOT_PARTS]
 static func is_canonical_resource(resource: String) -> bool:
 	return CANONICAL_RESOURCES.has(resource)
 
+## SB-M56-007: every balance change with its source/sink tag (a RewardGrantService tx id or a
+## spend tag). Analytics seam only; nothing reads it back.
+signal changed(resource: String, delta: int, tag: String)
+
 var _balances: Dictionary = {}
 
 func _init(starting_scrub_bucks: int = 0) -> void:
@@ -39,21 +43,25 @@ func bot_parts() -> int:
 ## Credit a non-negative amount. Returns the new balance. Negative amounts and
 ## unknown/removed resource IDs are rejected (F-M39-V02-013): a runtime credit of
 ## `stars` or `event_points` cannot mint them into wallet identity.
-func credit(resource: String, amount: int) -> int:
+func credit(resource: String, amount: int, tag: String = "") -> int:
 	if amount < 0 or not is_canonical_resource(resource):
 		return get_balance(resource)
 	_balances[resource] = get_balance(resource) + amount
+	if amount > 0:
+		changed.emit(resource, amount, tag)
 	return _balances[resource]
 
 ## Debit a non-negative amount. Atomic and fail-closed: if the balance is
 ## insufficient (would go negative) nothing changes and it returns false. Used
 ## by the explicit M39 spend services (robot unlock, hearts, boosters, speed).
-func debit(resource: String, amount: int) -> bool:
+func debit(resource: String, amount: int, tag: String = "") -> bool:
 	if amount < 0 or not is_canonical_resource(resource):
 		return false
 	if get_balance(resource) < amount:
 		return false
 	_balances[resource] = get_balance(resource) - amount
+	if amount > 0:
+		changed.emit(resource, -amount, tag)
 	return true
 
 func snapshot() -> Dictionary:

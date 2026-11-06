@@ -42,11 +42,19 @@ const FtueDirector = preload("res://scripts/app/ftue_director.gd")
 const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
 const FeatureUnlocks = preload("res://scripts/progression/feature_unlocks.gd")
 const AnalyticsService = preload("res://scripts/app/analytics_service.gd")
+const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+const CollectionInventory = preload("res://scripts/collection/collection_inventory.gd")
 
 ## M44 owner V03: the ONE ledger tx of the new-profile starter booster grant.
 const STARTER_TX := "ftue_starter_boosters:v1"
 
 const CANONICAL_SAVE_PATH := "user://scrubbots_save.dat"
+## SB-M56-007: RewardGrantService tx-id prefix -> analytics economy source (first match wins).
+const ANALYTICS_SOURCES := [["first_clear:", "first_clear"], ["streak_", "win_streak"], ["gift_ms:", "gift"],
+	["daily_login:", "daily_login"], ["daily_task:", "daily_task"], ["daily_all_tasks:", "daily_task"],
+	["daily_rewarded:", "rewarded_daily"], ["rewarded:", "rewarded_ad"], ["exch:", "cards_exchange"],
+	["collection_", "collection"], ["event:", "event"], ["catchup:", "comeback"], ["achievement:", "achievement"],
+	["ftue_", "starter"], ["booster_refund", "refund"]]
 
 var audio: AudioSettingsService
 var haptics: HapticsSettingsService
@@ -108,6 +116,10 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	analytics = AnalyticsService.new("user://analytics_v1.json" if save_path == CANONICAL_SAVE_PATH else save_path.get_basename() + "_analytics.json",
 		wall, day_provider)
 	assist.assistance_event.connect(_on_assistance_event)
+	economy.wallet.changed.connect(_on_wallet_changed)
+	economy.reward.granted.connect(_on_reward_granted)
+	economy.rewarded.resolved.connect(_on_rewarded_resolved)
+	actions.action_committed.connect(_on_action_committed)
 	unlocks = FeatureUnlocks.new()
 	unlocks.load_config()
 	if test_unlock_all:
@@ -149,6 +161,37 @@ func _on_assistance_event(kind: String, d: Dictionary) -> void:
 		analytics.track("assist_shown", {"level": d["level"], "boosters": d["boosters"]})
 	elif kind == "assistance_fail_closed":
 		analytics.track("assist_fail_closed", {"level": d["level"], "reason": d["reason"]})
+
+## SB-M56-007: every wallet change -> economy_source / economy_sink (bucketed amount).
+func _on_wallet_changed(resource: String, delta: int, tag: String) -> void:
+	if delta < 0:
+		analytics.track("economy_sink", {"currency": resource, "amount": analytics.bucket("amount", -delta), "sink": tag})
+		return
+	var source := "other"
+	for e in ANALYTICS_SOURCES:
+		if tag.begins_with(e[0]):
+			source = e[1]
+			break
+	analytics.track("economy_source", {"currency": resource, "amount": analytics.bucket("amount", delta), "source": source})
+
+## SB-M56-008: Collection set / Master completion (their reward grants are applied exactly once).
+func _on_reward_granted(tx_id: String) -> void:
+	if tx_id.begins_with("collection_set:"):
+		analytics.track("collection_set_complete", {"set": int(tx_id.get_slice(":", 1))})
+	elif tx_id == "collection_master":
+		analytics.track("collection_master_complete")
+
+## SB-M56-010: rewarded video result (granted = verified completion committed).
+func _on_rewarded_resolved(_token: String, product: String, r: Dictionary) -> void:
+	analytics.track("ad_result", {"product": "daily_slot" if product.begins_with("daily_slot:") else product.replace(":", "_"),
+		"outcome": "granted" if bool(r.get("ok", false)) else String(r.get("reason", ""))})
+
+## SB-M56-008: robot unlock / equip (roster order 1..10).
+func _on_action_committed(action: String, r: Dictionary) -> void:
+	if action == "unlock_robot":
+		analytics.track("robot_unlock", {"robot": RobotRoster.ids().find(String(r.get("robot_id", ""))) + 1})
+	elif action == "equip_robot":
+		analytics.track("robot_equip", {"robot": RobotRoster.ids().find(String(r.get("active", ""))) + 1})
 
 func _on_content_changed() -> void:
 	_catalog_orders.clear()
@@ -323,7 +366,19 @@ func is_bootstrap_pending() -> bool:
 func commit_pack(kind: String, tx_id: String) -> Dictionary:
 	if is_blocked:
 		return {"ok": false, "reason": "app_blocked"}
-	return PackCommitTransaction.commit(economy, kind, tx_id, Callable(self, "request_save"))
+	var r: Dictionary = PackCommitTransaction.commit(economy, kind, tx_id, Callable(self, "request_save"))
+	if bool(r.get("ok", false)) and not bool(r.get("replay", false)):
+		_track_pack(kind, r["receipt"]["cards"])
+	return r
+
+## SB-M56-008: one committed (not replayed) pack opening: new / duplicate counts, best rarity.
+func _track_pack(kind: String, cards: Array) -> void:
+	var fresh := cards.filter(func(c): return bool(c["is_new"])).size()
+	var best := 0
+	for c in cards:
+		best = maxi(best, CollectionInventory.RARITY_ORDER.find(String(c["rarity"])))
+	analytics.track("pack_opened", {"kind": kind, "new_cards": analytics.bucket("count", fresh),
+		"duplicates": analytics.bucket("count", cards.size() - fresh), "best_rarity": CollectionInventory.RARITY_ORDER[best]})
 
 ## M43-C005F-PHASE2-R01: open the pending EARNED pack `id` through the canonical commit (its
 ## kind comes from the durable queue entry; the entry id is the pack tx / presentation id).
