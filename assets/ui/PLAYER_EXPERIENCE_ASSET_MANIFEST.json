@@ -2,7 +2,7 @@
   "schema_version": 1,
   "status": "PLANNING_MANIFEST",
   "authority": "coordination/OWNER_PLAYER_EXPERIENCE_SURFACE_PROGRAM_V01.md",
-  "note": "Required visual masters/references and production surfaces. Dynamic text/prices/timers/progress remain native/live Godot UI.",
+  "note": "Required visual masters/references and production surfaces. Dynamic text/prices/timers/progress remain native/live Godot UI. registry_ids lists the data/config/ui_surface_registry_v1.json ids a surface covers when they differ from its id.",
   "canonical_references": {
     "gameplay_v02": "assets/ui/final/gameplay/master/scrubbots_gameplay_master.png",
     "life": "assets/art/references/_owner_inbox/Additionals/life screens.png",
@@ -26,6 +26,9 @@
   "surfaces": [
     {
       "id": "gameplay_v02",
+      "registry_ids": [
+        "gameplay"
+      ],
       "type": "screen",
       "status": "REFERENCE_SELECTED",
       "owner_visual_gate": true,
@@ -71,6 +74,9 @@
     },
     {
       "id": "victory_results",
+      "registry_ids": [
+        "results"
+      ],
       "type": "screen_popup",
       "status": "MASTER_OWNER_APPROVED",
       "owner_visual_gate": true,
@@ -101,6 +107,9 @@
     },
     {
       "id": "life_heart_refill",
+      "registry_ids": [
+        "life"
+      ],
       "type": "popup",
       "status": "REFERENCE_SELECTED",
       "owner_visual_gate": true,
@@ -146,6 +155,9 @@
     },
     {
       "id": "speed_2x_acquire",
+      "registry_ids": [
+        "speed_acquire"
+      ],
       "type": "popup",
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
@@ -191,6 +203,9 @@
     },
     {
       "id": "collection_album",
+      "registry_ids": [
+        "collection"
+      ],
       "type": "screen",
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
@@ -206,6 +221,9 @@
     },
     {
       "id": "collection_set_detail",
+      "registry_ids": [
+        "collection_set"
+      ],
       "type": "screen",
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
@@ -251,6 +269,9 @@
     },
     {
       "id": "standard_pack_open",
+      "registry_ids": [
+        "pack_open"
+      ],
       "type": "ceremony",
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
@@ -266,6 +287,9 @@
     },
     {
       "id": "premium_pack_open",
+      "registry_ids": [
+        "pack_open"
+      ],
       "type": "ceremony",
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
@@ -311,6 +335,9 @@
     },
     {
       "id": "robots_main",
+      "registry_ids": [
+        "robots"
+      ],
       "type": "screen",
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
@@ -448,6 +475,9 @@
     },
     {
       "id": "events_main",
+      "registry_ids": [
+        "events"
+      ],
       "type": "screen",
       "status": "MASTER_OWNER_APPROVED",
       "master": "assets/ui/generated/masters/scrubbots_events_master_v01.png",
@@ -495,6 +525,9 @@
     },
     {
       "id": "comeback_summary",
+      "registry_ids": [
+        "comeback"
+      ],
       "type": "popup_screen",
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
@@ -525,6 +558,9 @@
     },
     {
       "id": "world_unlock_transition",
+      "registry_ids": [
+        "world_unlock"
+      ],
       "type": "ceremony",
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
@@ -540,6 +576,9 @@
     },
     {
       "id": "account_cloud_sync_conflict",
+      "registry_ids": [
+        "account_conflict"
+      ],
       "type": "screen_popup",
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
@@ -555,6 +594,10 @@
     },
     {
       "id": "generic_reward_confirmation",
+      "registry_ids": [
+        "reward",
+        "confirm"
+      ],
       "type": "popup",
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
@@ -570,6 +613,10 @@
     },
     {
       "id": "generic_error_offline_loading",
+      "registry_ids": [
+        "error",
+        "loading"
+      ],
       "type": "popup_state",
       "status": "MASTER_REQUIRED",
       "owner_visual_gate": true,
@@ -600,6 +647,9 @@
     },
     {
       "id": "friends_postlaunch",
+      "registry_ids": [
+        "friends"
+      ],
       "type": "screen",
       "status": "MASTER_REQUIRED_POSTLAUNCH",
       "owner_visual_gate": true,
@@ -611,6 +661,51 @@
         "live_data": false,
         "gap": "post-launch",
         "recorded_by": "M43 master V01 (Claude) — implementation facts only; status/acceptance owned by owner/ChatGPT"
+      }
+    },
+    {
+      "id": "home",
+      "type": "screen",
+      "status": "REFERENCE_SELECTED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/home/home_screen.gd",
+        "evidence": "tests/m42_home.gd",
+        "live_data": true,
+        "gap": "canonical reference + component inventory in assets/ui/HOME_ASSET_MANIFEST.json; world backgrounds SB-M43-137/138",
+        "recorded_by": "factory 112 (Claude) — implementation facts only; no owner visual review recorded"
+      }
+    },
+    {
+      "id": "settings",
+      "type": "screen",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/settings_panel.gd",
+        "evidence": "tests/m41_settings.gd",
+        "live_data": true,
+        "gap": "no visual master",
+        "recorded_by": "factory 112 (Claude) — implementation facts only; no owner visual review recorded"
+      }
+    },
+    {
+      "id": "rewarded_ads",
+      "type": "popup",
+      "status": "MASTER_REQUIRED",
+      "owner_visual_gate": true,
+      "responsive_gate": true,
+      "production_scene_required": true,
+      "implementation": {
+        "production_scene": "scripts/ui/daily/rewarded_ads_screen.gd",
+        "evidence": "tests/m43_r15_owner_remediation.gd",
+        "live_data": true,
+        "gap": "no ad provider yet (M57): video rewards show NO VIDEO and grant nothing; no dedicated visual master",
+        "recorded_by": "factory 112 (Claude) — implementation facts only; no owner visual review recorded"
       }
     }
   ]

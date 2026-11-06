@@ -336,6 +336,16 @@ func _art_and_manifest_governance() -> void:
 	var owner_ok := FileAccess.file_exists("res://coordination/sessions/M43-C001B/FINAL_OWNER_VISUAL_ACCEPTANCE_V01.md")
 	_ok(status == "MASTER_REQUIRED" or (status == "MASTER_OWNER_APPROVED" and owner_ok),
 		"victory_results status %s is backed by owner authority" % status)
+	# SB-M43-169: every ui_surface_registry screen/popup id is covered by a manifest id or
+	# registry_ids alias, and the Rewarded Ads surface (M43-C015 item 39) is listed.
+	var reg = JSON.parse_string(FileAccess.get_file_as_string("res://data/config/ui_surface_registry_v1.json"))
+	var covered: Array = []
+	for s in m["surfaces"]:
+		covered.append(s["id"])
+		covered.append_array(s.get("registry_ids", []))
+	var missing: Array = (reg["screens"] + reg["popups"]).filter(func(id): return not covered.has(id))
+	_ok(missing.is_empty(), "manifest covers every ui_surface_registry id, missing %s" % str(missing))
+	_ok(covered.has("rewarded_ads"), "manifest lists the Rewarded Ads surface")
 	_complete("art_and_manifest_governance")
 
 # ---------------------------------------------------------------- helpers ----
