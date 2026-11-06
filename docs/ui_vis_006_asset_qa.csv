@@ -1,0 +1,642 @@
+path,class,kind,src_w,src_h,alpha,size_limit,imp_w,imp_h,resident_mib,drawn_w,drawn_h,res_ratio,res,import,import_tracked,fringe_px,fringe_pct,border_opaque_pct,coverage_pct,padding_waste_pct,padding_waste_mib,glyph_corners,verdict,notes
+addons/game_feel_flow/icons/icon_alpha.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_animator.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_audio_volume.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_camera_flash.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_camera_shake.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_camera_target.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_camera_zoom.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_color.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_curved_base.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_event.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_flash.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_flicker.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_freeze_frame.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_gff_combo.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_gff_combo_entry.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_gff_feedback.svg,ACTIVE_RUNTIME,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_gff_player.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_gpu_particles.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_impulse.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_material_target.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_method.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_particles.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_position.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_rotation.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_scale.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_signal.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_sound.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_time_scale.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_tween.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_ui_target.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+addons/game_feel_flow/icons/icon_velocity.svg,DYNAMIC_REF,editor_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a; editor-only plugin icon"
+assets/art/levels/previews/level_002_apple.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_003_palm_tree.png,ACTIVE_RUNTIME,level_art,38,38,no,0,38,38,0.01,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_004_orange_cat.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_005_party_toucan.png,ACTIVE_RUNTIME,level_art,33,33,no,0,33,33,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_006_chicken.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_007_pigeon.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_008_butterfly.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_009_frog.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_010_ice_cube.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_011_duckling.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_012_ladybug.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_013_goldfish.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_014_goose.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_015_octopus.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_016_teddy_bear.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_017_ninja.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_018_wizard.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_019_whale.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_020_detective.png,ACTIVE_RUNTIME,level_art,40,40,no,0,40,40,0.01,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_021_bunny.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_022_crab.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_023_bumblebee.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_024_chef.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_025_knight.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_026_sheep.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_027_black_cat.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_028_squirrel.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_029_turtle.png,ACTIVE_RUNTIME,level_art,32,32,yes,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/level_030_clown.png,ACTIVE_RUNTIME,level_art,40,40,no,0,40,40,0.01,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/previews/m21_level_001_hazard_bot.png,ACTIVE_RUNTIME,level_art,20,20,no,0,20,20,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/source/easy/level_002_apple_32x32.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/source/easy/level_004_orange_cat_32x32.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/source/easy/level_006_chicken_32x32.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/source/easy/level_007_pigeon_32x32.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/source/easy/level_009_frog_32x32.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/source/easy/scrubbots_m21_level_001_hazard_bot_20x20.png,ACTIVE_RUNTIME,level_art,20,20,no,0,20,20,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/source/hard/level_005_party_toucan_33x33.png,ACTIVE_RUNTIME,level_art,33,33,no,0,33,33,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/source/medium/level_003_palm_tree_38x38.png,ACTIVE_RUNTIME,level_art,38,38,no,0,38,38,0.01,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/source/medium/level_008_butterfly_32x32.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/art/levels/source/very_hard/level_010_ice_cube_32x32.png,ACTIVE_RUNTIME,level_art,32,32,no,0,32,32,0.00,,,,pixel art (nearest),ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/brand/akilta-wordmark-light.svg,ACTIVE_RUNTIME,brand_svg,,,,,,,,,,,,ok,yes,,,,,,,,PASS,"vector, pixel checks n/a"
+assets/brand/akilta-wordmark.svg,ACTIVE_RUNTIME,brand_svg,,,,,,,,,,,,ok,no,,,,,,,,PASS,"vector, pixel checks n/a"
+assets/ui/final/boosters/extra_slot.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,185,185,2.77,ok,ok,yes,0,0.0,0.0,60.1,1.9,0.02,,PASS,
+assets/ui/final/boosters/random.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,185,185,2.77,ok,ok,yes,0,0.0,0.0,48.1,4.7,0.05,,PASS,
+assets/ui/final/boosters/selector.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,185,185,2.77,ok,ok,yes,0,0.0,0.0,58.0,5.9,0.06,,PASS,
+assets/ui/final/boosters/states/booster_activated_burst.png,ACTIVE_RUNTIME,ui_final,1245,1263,yes,512,505,512,0.99,,,,unmeasured,ok,yes,0,0.0,0.0,53.1,1.4,0.01,,PASS,
+assets/ui/final/boosters/states/booster_free_badge_frame.png,ACTIVE_RUNTIME,ui_final,1774,887,yes,512,512,256,0.50,65,63,7.88,ok,ok,yes,0,0.0,0.0,41.9,4.8,0.02,,PASS,
+assets/ui/final/boosters/states/booster_reward_glow.png,ACTIVE_RUNTIME,ui_final,1246,1262,yes,512,506,512,0.99,,,,unmeasured,ok,yes,0,0.0,0.0,46.0,0.0,0.00,,PASS,
+assets/ui/final/boosters/states/booster_selected_ring.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,,,,unmeasured,ok,yes,0,0.0,0.0,35.9,4.1,0.04,,PASS,
+assets/ui/final/boosters/states/booster_unavailable_overlay.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,,,,unmeasured,ok,yes,43,2.1,0.0,65.4,0.0,0.00,,PASS,
+assets/ui/final/boosters/tornado.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,185,185,2.77,ok,ok,yes,0,0.0,0.0,43.9,4.5,0.04,,PASS,
+assets/ui/final/cards_exchange/cards_exchange_header_emblem.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,163,163,3.14,ok,ok,yes,0,0.0,0.0,41.8,10.1,0.10,,PASS,
+assets/ui/final/characters/helper_bots/helper_bot_alt_pose.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,4,0.3,0.0,41.5,4.2,0.25,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/helper_bots/helper_bot_cart.png,ACTIVE_RUNTIME,ui_final,1374,1145,yes,0,1374,1145,6.00,,,,unmeasured,ok,no,0,0.0,0.0,42.2,4.0,0.24,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/helper_bots/helper_bot_floor_cleaner.png,ACTIVE_RUNTIME,ui_final,1293,1216,yes,0,1293,1216,6.00,,,,unmeasured,ok,no,0,0.0,0.0,33.1,15.7,0.94,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/atlas/atlas_gameplay.png,ACTIVE_RUNTIME,ui_final,1246,1263,yes,0,1246,1263,6.00,,,,unmeasured,ok,no,7,0.3,0.0,49.1,4.8,0.29,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/atlas/atlas_home_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,59.0,4.1,0.25,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/atlas/atlas_master.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,358,430,2.38,ok,ok,yes,3,0.1,0.0,57.2,4.7,0.16,,PASS,
+assets/ui/final/characters/robots/atlas/atlas_portrait.png,ACTIVE_RUNTIME,ui_final,1222,1287,yes,512,486,512,0.95,130,212,3.74,ok,ok,yes,0,0.0,0.0,72.5,0.0,0.00,,PASS,
+assets/ui/final/characters/robots/bubbles/bubbles_gameplay.png,ACTIVE_RUNTIME,ui_final,1213,1296,yes,0,1213,1296,6.00,,,,unmeasured,ok,no,2,0.3,0.0,48.2,2.2,0.13,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/bubbles/bubbles_home_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,53.0,3.6,0.22,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/bubbles/bubbles_master.png,ACTIVE_RUNTIME,ui_final,1148,1371,yes,1024,857,1024,3.35,358,430,2.39,ok,ok,yes,0,0.0,0.0,47.8,2.8,0.09,,PASS,
+assets/ui/final/characters/robots/bubbles/bubbles_portrait.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,130,178,3.94,ok,ok,yes,1,0.0,0.0,50.3,4.2,0.04,,PASS,
+assets/ui/final/characters/robots/clippy/clippy_gameplay.png,ACTIVE_RUNTIME,ui_final,1142,1378,yes,0,1142,1378,6.00,,,,unmeasured,ok,no,19,0.7,0.0,44.8,4.1,0.25,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/clippy/clippy_home_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,50.0,1.6,0.10,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/clippy/clippy_master.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,358,430,2.38,ok,ok,yes,8,0.2,0.0,50.8,9.3,0.31,,PASS,
+assets/ui/final/characters/robots/clippy/clippy_portrait.png,ACTIVE_RUNTIME,ui_final,1240,1268,yes,512,501,512,0.98,130,178,3.85,ok,ok,yes,2,0.1,0.0,56.6,1.3,0.01,,PASS,
+assets/ui/final/characters/robots/dusty/dusty_gameplay.png,ACTIVE_RUNTIME,ui_final,1206,1304,yes,0,1206,1304,6.00,,,,unmeasured,ok,no,1,0.0,0.0,43.1,2.3,0.14,br,PASS,text/watermark CANDIDATE br; .import untracked (Godot defaults)
+assets/ui/final/characters/robots/dusty/dusty_home_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,54.8,3.9,0.23,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/dusty/dusty_master.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,358,430,2.38,ok,ok,yes,0,0.0,0.0,50.7,6.7,0.22,,PASS,
+assets/ui/final/characters/robots/dusty/dusty_portrait.png,ACTIVE_RUNTIME,ui_final,1230,1278,yes,512,493,512,0.96,130,178,3.79,ok,ok,yes,4,0.2,0.0,61.8,0.5,0.00,,PASS,
+assets/ui/final/characters/robots/moppy/moppy_gameplay.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,0,1145,1374,6.00,,,,unmeasured,ok,no,0,0.0,0.0,39.7,3.0,0.18,br,PASS,text/watermark CANDIDATE br; .import untracked (Godot defaults)
+assets/ui/final/characters/robots/moppy/moppy_home_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,50.6,3.5,0.21,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/moppy/moppy_master.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,358,430,2.38,ok,ok,yes,0,0.0,0.0,47.0,8.0,0.27,,PASS,
+assets/ui/final/characters/robots/moppy/moppy_portrait.png,ACTIVE_RUNTIME,ui_final,1242,1266,yes,512,502,512,0.98,130,145,3.86,ok,ok,yes,3,0.2,0.0,56.5,3.3,0.03,,PASS,
+assets/ui/final/characters/robots/polly/polly_gameplay.png,ACTIVE_RUNTIME,ui_final,1147,1371,yes,0,1147,1371,6.00,,,,unmeasured,ok,no,1,0.1,0.0,43.4,10.8,0.65,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/polly/polly_home_pose.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,0,1145,1374,6.00,,,,unmeasured,ok,no,2,0.1,0.0,41.8,10.7,0.64,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/polly/polly_master.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,358,430,2.38,ok,ok,yes,0,0.0,0.0,46.7,12.7,0.42,,PASS,
+assets/ui/final/characters/robots/polly/polly_portrait.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,130,145,3.94,ok,ok,yes,8,0.5,0.0,52.1,1.4,0.01,,PASS,
+assets/ui/final/characters/robots/rinse/rinse_gameplay.png,ACTIVE_RUNTIME,ui_final,1144,1375,yes,0,1144,1375,6.00,,,,unmeasured,ok,no,1,0.1,0.0,44.8,0.3,0.02,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/rinse/rinse_home_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,52.9,5.8,0.35,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/rinse/rinse_master.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,358,430,2.38,ok,ok,yes,3,0.1,0.0,44.5,8.9,0.29,,PASS,
+assets/ui/final/characters/robots/rinse/rinse_portrait.png,ACTIVE_RUNTIME,ui_final,1219,1290,yes,512,484,512,0.95,130,178,3.72,ok,ok,yes,2,0.1,0.0,58.4,1.6,0.01,,PASS,
+assets/ui/final/characters/robots/spark/spark_gameplay.png,ACTIVE_RUNTIME,ui_final,1230,1278,yes,0,1230,1278,6.00,,,,unmeasured,ok,no,3,0.3,0.0,47.7,1.5,0.09,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/spark/spark_home_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,48.8,2.8,0.17,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/spark/spark_master.png,ACTIVE_RUNTIME,ui_final,1138,1382,yes,1024,843,1024,3.29,358,430,2.38,ok,ok,yes,3,0.1,0.0,47.9,7.3,0.24,,PASS,
+assets/ui/final/characters/robots/spark/spark_portrait.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,130,145,3.94,ok,ok,yes,1,0.0,0.0,50.7,3.6,0.04,,PASS,
+assets/ui/final/characters/robots/squeegee/squeegee_gameplay.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,0,1145,1374,6.00,,,,unmeasured,ok,no,14,0.6,0.0,39.8,2.7,0.16,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/squeegee/squeegee_home_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,46.5,2.8,0.17,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/robots/squeegee/squeegee_master.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,358,430,2.38,ok,ok,yes,2,0.0,0.0,47.3,4.2,0.14,,PASS,
+assets/ui/final/characters/robots/squeegee/squeegee_portrait.png,ACTIVE_RUNTIME,ui_final,1218,1292,yes,512,483,512,0.94,130,178,3.72,ok,ok,yes,5,0.2,0.0,50.0,5.6,0.05,,PASS,
+assets/ui/final/characters/scrubby/home_animation/bow/bow_01.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.6,42.9,0.39,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_02.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.8,42.5,0.39,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_03.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,2,0.1,0.0,33.4,50.3,0.46,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_04.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,32.6,49.4,0.45,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_05.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,31.3,51.1,0.46,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_06.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,4,0.3,0.0,30.7,51.2,0.46,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_07.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,30.2,53.2,0.48,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_08.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,30.2,53.2,0.48,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_09.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,30.2,53.2,0.48,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_10.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,1,0.1,0.0,30.6,53.1,0.48,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_11.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,33.9,47.0,0.43,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_12.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,32.8,49.3,0.45,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_13.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.6,42.5,0.38,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_14.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.6,42.9,0.39,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/bow/bow_15.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.6,42.9,0.39,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_01.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,2,0.1,0.0,36.0,34.6,0.31,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_02.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.3,39.9,0.36,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_03.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,28.6,52.0,0.47,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_04.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,2,0.2,0.0,26.6,58.9,0.53,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_05.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,27.9,54.5,0.49,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_06.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,1,0.1,0.0,33.6,35.3,0.32,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_07.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,1,0.1,0.0,33.0,43.0,0.39,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_08.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,32.2,43.5,0.39,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_09.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,1,0.1,0.0,33.0,41.9,0.38,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_10.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,29.7,46.8,0.42,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_11.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,33.7,38.7,0.35,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_12.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,31.6,40.5,0.37,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_13.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,32.1,39.0,0.35,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_14.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,32.6,34.5,0.31,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_15.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,33.7,48.6,0.44,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_16.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.1,46.4,0.42,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/full_turn/full_turn_17.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.5,42.7,0.39,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_01.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,35.6,41.9,0.38,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_02.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.8,44.9,0.41,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_03.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,33.3,48.3,0.44,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_04.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,32.3,48.0,0.43,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_05.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,33.3,48.3,0.44,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_06.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,33.8,45.1,0.41,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_07.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.9,44.6,0.40,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_08.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.9,44.6,0.40,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_09.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.8,44.9,0.41,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_10.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.3,46.6,0.42,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_11.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.3,46.6,0.42,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_12.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.8,44.9,0.41,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_13.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.9,44.6,0.40,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_14.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,34.8,46.1,0.42,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_15.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,35.1,43.8,0.40,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_16.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,35.6,41.9,0.38,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/turn/turn_17.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,35.6,41.9,0.38,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_01.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.9,31.2,0.28,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_02.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.9,30.9,0.28,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_03.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,37.4,29.2,0.26,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_04.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.2,33.5,0.30,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_05.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.2,28.8,0.26,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_06.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.8,32.5,0.29,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_07.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.3,34.8,0.32,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_08.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.1,34.3,0.31,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_09.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.3,34.8,0.32,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_10.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.8,32.5,0.29,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_11.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.2,28.8,0.26,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_12.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.2,33.5,0.30,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_13.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,37.4,29.2,0.26,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/home_animation/wave/wave_14.png,ACTIVE_RUNTIME,ui_final,464,512,yes,0,464,512,0.91,,,,unmeasured,ok,no,0,0.0,0.0,36.9,30.9,0.28,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/scrubby_brush_arm_layer.png,ACTIVE_RUNTIME,ui_final,1395,1127,yes,0,1395,1127,6.00,,,,unmeasured,ok,no,0,0.0,0.0,28.1,5.5,0.33,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/scrubby_face_blink_layer.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,0,1536,1024,6.00,,,,unmeasured,ok,no,0,0.0,0.0,54.7,8.9,0.54,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/scrubby_gameplay.png,ACTIVE_RUNTIME,ui_final,1230,1278,yes,0,1230,1278,6.00,,,,unmeasured,ok,no,2,0.0,0.0,38.2,4.0,0.24,,PASS,.import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/scrubby_home_pose.png,ACTIVE_RUNTIME,ui_final,1158,1358,yes,0,1158,1358,6.00,766,899,1.51,WARN,ok,no,0,0.0,0.0,48.0,0.0,0.00,,WARN,under 2x (1.51x: 1158x1358 drawn 766x899); .import untracked (Godot defaults)
+assets/ui/final/characters/scrubby/scrubby_master.png,ACTIVE_RUNTIME,ui_final,1147,1372,yes,1024,856,1024,3.34,358,430,2.39,ok,ok,yes,1,0.0,0.0,40.7,8.1,0.27,,PASS,
+assets/ui/final/characters/scrubby/scrubby_portrait.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,212,212,2.42,ok,ok,yes,1,0.0,0.0,28.0,15.6,0.16,,PASS,
+assets/ui/final/collection/card_thumbs/set_01/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_01/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_01/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_01/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_01/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_01/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_01/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_01/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_01/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_02/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_02/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_02/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_02/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_02/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_02/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_02/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_02/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_02/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_03/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_03/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,228,325,2.03,ok,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_03/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_03/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_03/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_03/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_03/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_03/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_03/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_04/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_04/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_04/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_04/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_04/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_04/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_04/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_04/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_04/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_05/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_05/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_05/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_05/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_05/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_05/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_05/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_05/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_05/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_06/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_06/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_06/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_06/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_06/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_06/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_06/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_06/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_06/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_07/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_07/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_07/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_07/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_07/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_07/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_07/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_07/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_07/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_08/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_08/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_08/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_08/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_08/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_08/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_08/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_08/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_08/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_09/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_09/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_09/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_09/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_09/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_09/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_09/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_09/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_09/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_10/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_10/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_10/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_10/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_10/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_10/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_10/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_10/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_10/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_11/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_11/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_11/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_11/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_11/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_11/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_11/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_11/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_11/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_12/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_12/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_12/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_12/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_12/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_12/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_12/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_12/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_12/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_13/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_13/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_13/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_13/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_13/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_13/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_13/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_13/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_13/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_14/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_14/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_14/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_14/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_14/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_14/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_14/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_14/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_14/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_15/card_01.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_15/card_02.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_15/card_03.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_15/card_04.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_15/card_05.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_15/card_06.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_15/card_07.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_15/card_08.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/card_thumbs/set_15/card_09.png,DYNAMIC_REF,ui_final,440,660,yes,0,440,660,1.11,,,,unmeasured,ok,yes,0,0.0,0.0,94.4,3.8,0.04,,PASS,
+assets/ui/final/collection/cards/set_01/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_01/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_01/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_01/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_01/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_01/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_01/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_01/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_01/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_02/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_02/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,325,488,2.22,ok,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_02/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_02/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_02/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_02/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_02/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_02/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_02/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_03/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_03/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,412,585,1.85,WARN,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,WARN,under 2x (1.85x: 720x1080 drawn 412x585)
+assets/ui/final/collection/cards/set_03/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_03/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_03/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_03/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_03/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_03/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_03/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_04/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_04/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_04/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_04/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_04/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_04/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_04/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,325,488,2.22,ok,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_04/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_04/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_05/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_05/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_05/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_05/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_05/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_05/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_05/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_05/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_05/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_06/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_06/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_06/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_06/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_06/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_06/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_06/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_06/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_06/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_07/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_07/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_07/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_07/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_07/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,325,488,2.22,ok,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_07/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_07/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_07/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_07/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_08/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_08/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_08/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_08/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_08/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_08/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_08/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_08/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_08/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_09/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_09/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_09/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_09/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,325,488,2.22,ok,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_09/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_09/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_09/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_09/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_09/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_10/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_10/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_10/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_10/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_10/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_10/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_10/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_10/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_10/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_11/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_11/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_11/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_11/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_11/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,325,488,2.22,ok,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_11/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_11/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_11/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_11/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_12/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_12/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_12/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_12/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_12/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_12/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_12/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_12/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_12/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_13/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_13/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_13/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_13/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_13/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_13/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_13/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_13/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_13/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_14/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,325,488,2.22,ok,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_14/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_14/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_14/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_14/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_14/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_14/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_14/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_14/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_15/card_01.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_15/card_02.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_15/card_03.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_15/card_04.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_15/card_05.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_15/card_06.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_15/card_07.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_15/card_08.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,,,,unmeasured,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/cards/set_15/card_09.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1080,720,1080,2.97,325,488,2.22,ok,ok,yes,0,0.0,0.0,94.0,5.6,0.17,,PASS,
+assets/ui/final/collection/collection_complete_emblem.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,250,250,4.10,ok,ok,yes,0,0.0,0.0,48.4,1.2,0.05,,PASS,
+assets/ui/final/collection/master_collection_emblem.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,347,347,2.95,ok,ok,yes,1,0.0,0.0,57.2,3.4,0.14,,PASS,
+assets/ui/final/collection/states/card_back.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,512,341,512,0.67,74,74,6.92,ok,ok,yes,0,0.0,0.0,95.2,0.0,0.00,,PASS,
+assets/ui/final/collection/states/card_new_glow.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,0,1024,1536,6.00,520,780,1.97,WARN,ok,no,0,0.0,0.0,50.5,0.5,0.03,,WARN,under 2x (1.97x: 1024x1536 drawn 520x780); .import untracked (Godot defaults)
+assets/ui/final/collection/states/card_unknown_silhouette.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,228,325,3.15,ok,ok,yes,0,0.0,0.0,83.9,1.0,0.03,,PASS,
+assets/ui/final/common/currencies/icon_currency_heart.png,ACTIVE_RUNTIME,ui_final,1348,1167,yes,512,512,443,0.87,120,120,4.27,ok,ok,yes,0,0.0,0.0,53.0,9.7,0.08,,PASS,
+assets/ui/final/common/currencies/icon_currency_scrub_bucks.png,ACTIVE_RUNTIME,ui_final,1374,1145,yes,512,512,427,0.83,120,120,4.27,ok,ok,yes,0,0.0,0.0,45.0,5.8,0.05,,PASS,
+assets/ui/final/common/frames/popup_large_frame.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,0,1145,1374,6.00,954,2049,1.20,WARN,ok,no,0,0.0,0.0,83.0,12.2,0.73,,WARN,under 2x (1.20x: 1145x1374 drawn 954x2049); .import untracked (Godot defaults)
+assets/ui/final/common/frames/popup_medium_frame.png,ACTIVE_RUNTIME,ui_final,1212,1298,yes,0,1212,1298,6.00,954,1076,1.27,WARN,ok,no,0,0.0,0.0,77.0,14.3,0.86,,WARN,under 2x (1.27x: 1212x1298 drawn 954x1076); .import untracked (Godot defaults)
+assets/ui/final/common/frames/popup_reward_frame.png,ACTIVE_RUNTIME,ui_final,1199,1312,yes,0,1199,1312,6.00,954,1718,1.26,WARN,ok,no,0,0.0,0.0,76.8,2.2,0.13,,WARN,under 2x (1.26x: 1199x1312 drawn 954x1718); .import untracked (Godot defaults)
+assets/ui/final/common/frames/popup_small_frame.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,0,1536,1024,6.00,,,,unmeasured,ok,no,0,0.0,0.0,62.5,16.4,0.99,,PASS,.import untracked (Godot defaults)
+assets/ui/final/common/frames/popup_warning_frame.png,ACTIVE_RUNTIME,ui_final,1214,1295,yes,0,1214,1295,6.00,,,,unmeasured,ok,no,0,0.0,0.0,71.0,7.1,0.42,,PASS,.import untracked (Godot defaults)
+assets/ui/final/common/icons/icon_check.png,DYNAMIC_REF,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,51.2,15.5,0.93,,PASS,.import untracked (Godot defaults)
+assets/ui/final/common/icons/icon_clock.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,256,256,256,0.25,57,58,4.49,ok,ok,yes,0,0.0,0.0,46.8,33.0,0.08,,PASS,
+assets/ui/final/common/icons/icon_info.png,DYNAMIC_REF,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,48.5,26.1,1.56,,WARN,transparent padding 26% = 1.56 MiB; .import untracked (Godot defaults)
+assets/ui/final/common/icons/icon_lock.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,58,60,8.83,ok,ok,yes,0,0.0,0.0,46.5,13.7,0.14,,PASS,
+assets/ui/final/common/icons/icon_plus.png,DYNAMIC_REF,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,49.9,30.6,1.83,,WARN,transparent padding 31% = 1.83 MiB; .import untracked (Godot defaults)
+assets/ui/final/common/navigation/icon_nav_events.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,96,96,5.33,ok,ok,yes,0,0.0,0.0,64.4,24.9,0.25,,PASS,
+assets/ui/final/common/navigation/icon_nav_home.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,96,96,5.33,ok,ok,yes,0,0.0,0.0,44.0,18.9,0.19,,PASS,
+assets/ui/final/common/navigation/icon_nav_leaderboard.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,96,96,5.33,ok,ok,yes,0,0.0,0.0,45.6,15.5,0.15,,PASS,
+assets/ui/final/common/navigation/icon_nav_robots.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,104,106,4.92,ok,ok,yes,0,0.0,0.0,42.0,13.5,0.14,,PASS,
+assets/ui/final/common/navigation/icon_nav_settings.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,96,96,5.33,ok,ok,yes,0,0.0,0.0,56.0,9.9,0.10,,PASS,
+assets/ui/final/daily/daily_day5_reward_frame.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,228,304,3.37,ok,ok,yes,0,0.0,0.0,35.7,5.5,0.15,,PASS,
+assets/ui/final/daily/daily_day_reward_frame.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,228,304,3.74,ok,ok,yes,0,0.0,0.0,77.6,6.6,0.22,,PASS,
+assets/ui/final/daily/daily_login_calendar.png,ACTIVE_RUNTIME,ui_final,1288,1221,yes,0,1288,1221,6.00,954,260,4.70,ok,ok,yes,0,0.0,0.0,56.9,23.4,1.41,,WARN,transparent padding 23% = 1.41 MiB
+assets/ui/final/daily/daily_streak_flame.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,256,256,171,0.17,94,94,2.72,ok,ok,yes,0,0.0,0.0,36.2,11.2,0.02,,PASS,
+assets/ui/final/daily/daily_task_check.png,ACTIVE_RUNTIME,ui_final,1261,1247,yes,256,256,253,0.25,104,106,2.46,ok,ok,yes,0,0.0,0.0,63.4,13.5,0.03,,PASS,
+assets/ui/final/events/event_weekly_hero.png,DYNAMIC_REF,ui_final,582,211,no,0,582,211,0.47,,,,unmeasured,ok,yes,,,,,,,,PASS,
+assets/ui/final/gameplay/effects/fx_clean_puff.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,40.5,2.3,0.14,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/effects/fx_clean_sparkle.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,94,94,13.34,ok,ok,no,0,0.0,0.0,22.9,8.1,0.49,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/master/gameplay_v02_shell_5slot_3col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,1170,2340,0.76,FAIL,ok,no,,,,,,,,FAIL,under-res 0.76x (887x1774 drawn 1170x2340); .import untracked (Godot defaults)
+assets/ui/final/gameplay/master/gameplay_v02_shell_5slot_4col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/master/gameplay_v02_shell_5slot_5col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/master/gameplay_v02_shell_6slot_3col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,1170,2340,0.76,FAIL,ok,no,,,,,,,,FAIL,under-res 0.76x (887x1774 drawn 1170x2340); .import untracked (Godot defaults)
+assets/ui/final/gameplay/master/gameplay_v02_shell_6slot_4col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/master/gameplay_v02_shell_6slot_5col.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/master/scrubbots_gameplay_master.png,DYNAMIC_REF,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/profile/bot_parts_bar_fill.png,DYNAMIC_REF,ui_final,320,38,no,0,320,38,0.05,,,,unmeasured,ok,no,,,,,,,,WARN,opaque white background corners; .import untracked (Godot defaults)
+assets/ui/final/gameplay/profile/robots/atlas_portrait.png,ACTIVE_RUNTIME,ui_final,1247,1261,yes,0,1247,1261,6.00,,,,unmeasured,ok,no,1,0.1,0.0,65.9,0.8,0.05,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/profile/robots/bubbles_portrait.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,56.1,4.1,0.25,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/profile/robots/clippy_portrait.png,ACTIVE_RUNTIME,ui_final,1223,1286,yes,0,1223,1286,6.00,,,,unmeasured,ok,no,1,0.0,0.0,48.3,8.3,0.50,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/profile/robots/dusty_portrait.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,58.4,0.6,0.04,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/profile/robots/moppy_portrait.png,ACTIVE_RUNTIME,ui_final,1212,1298,yes,0,1212,1298,6.00,,,,unmeasured,ok,no,0,0.0,0.0,49.5,4.7,0.28,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/profile/robots/polly_portrait.png,ACTIVE_RUNTIME,ui_final,1238,1271,yes,0,1238,1271,6.00,,,,unmeasured,ok,no,2,0.1,0.0,54.1,0.0,0.00,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/profile/robots/rinse_portrait.png,ACTIVE_RUNTIME,ui_final,1243,1266,yes,0,1243,1266,6.00,,,,unmeasured,ok,no,2,0.1,0.0,54.0,1.2,0.07,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/profile/robots/spark_portrait.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,4,0.2,0.0,51.0,0.2,0.01,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/profile/robots/squeegee_portrait.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,1,0.0,0.0,46.3,4.2,0.25,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/profile/scrubby_portrait.png,ACTIVE_RUNTIME,ui_final,256,256,no,0,256,256,0.25,143,148,1.79,WARN,ok,no,,,,,,,,WARN,under 2x (1.79x: 256x256 drawn 143x148); .import untracked (Godot defaults)
+assets/ui/final/gameplay/railroad/rail_energy_node.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,46.1,4.7,0.28,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/railroad/rail_slot_connector.png,ACTIVE_RUNTIME,ui_final,887,1774,yes,0,887,1774,6.00,,,,unmeasured,ok,no,0,0.0,0.0,34.3,6.3,0.38,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/railroad/rail_straight_horizontal.png,ACTIVE_RUNTIME,ui_final,2172,724,yes,0,2172,724,6.00,,,,unmeasured,ok,no,0,0.0,0.0,34.5,9.8,0.59,,PASS,.import untracked (Godot defaults)
+assets/ui/final/gameplay/railway/rail_straight.png,DYNAMIC_REF,ui_final,512,128,no,0,512,128,0.25,,,,unmeasured,ok,no,,,,,,,,WARN,opaque white background corners; .import untracked (Godot defaults)
+assets/ui/final/gameplay/slots/slot_active.png,DYNAMIC_REF,ui_final,220,220,no,0,220,220,0.18,,,,unmeasured,ok,no,,,,,,,,WARN,opaque white background corners; .import untracked (Godot defaults)
+assets/ui/final/gameplay/tutorial/speech_bubble.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,0,1536,1024,6.00,889,593,1.73,WARN,ok,no,0,0.0,0.0,46.1,35.8,2.15,,WARN,under 2x (1.73x: 1536x1024 drawn 889x593); transparent padding 36% = 2.15 MiB; .import untracked (Godot defaults)
+assets/ui/final/gameplay/tutorial/tutorial_highlight_ring.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,967,967,1.30,WARN,ok,no,0,0.0,0.0,41.0,0.0,0.00,,WARN,under 2x (1.30x: 1254x1254 drawn 967x967); .import untracked (Godot defaults)
+assets/ui/final/gameplay/tutorial/tutorial_pointer.png,ACTIVE_RUNTIME,ui_final,1230,1278,yes,512,493,512,0.96,122,122,4.20,ok,ok,yes,0,0.0,0.0,47.8,4.0,0.04,,PASS,
+assets/ui/final/gameplay/videos/level_start_scrubby_still.png,ACTIVE_RUNTIME,ui_final,624,640,yes,0,624,640,1.52,953,978,0.65,FAIL,ok,yes,0,0.0,0.0,32.2,35.3,0.54,,FAIL,under-res 0.65x (624x640 drawn 953x978)
+assets/ui/final/home/area_banner/home_arch_decor.png,ACTIVE_RUNTIME,ui_final,1774,887,yes,0,1774,887,6.00,,,,unmeasured,ok,no,0,0.0,0.0,33.4,6.4,0.38,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/area_banner/home_arch_whispering_park.png,ACTIVE_RUNTIME,ui_final,1225,1284,yes,0,1225,1284,6.00,,,,unmeasured,ok,no,0,0.0,0.0,46.0,0.5,0.03,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/background/home_background.png,ACTIVE_RUNTIME,ui_final,940,1672,no,0,940,1672,6.00,1321,2349,0.71,FAIL,ok,no,,,,,,,,FAIL,under-res 0.71x (940x1672 drawn 1321x2349); .import untracked (Godot defaults)
+assets/ui/final/home/background/home_bg_city_far.png,ACTIVE_RUNTIME,ui_final,2170,725,yes,0,2170,725,6.00,,,,unmeasured,ok,no,0,0.0,96.7,42.9,4.8,0.29,,WARN,opaque art on canvas edge (97%): cropped?; .import untracked (Godot defaults)
+assets/ui/final/home/background/home_bg_city_mid.png,ACTIVE_RUNTIME,ui_final,2024,777,yes,0,2024,777,6.00,,,,unmeasured,ok,no,0,0.0,84.6,70.6,0.0,0.00,,WARN,opaque art on canvas edge (85%): cropped?; .import untracked (Godot defaults)
+assets/ui/final/home/background/home_bg_sky.png,ACTIVE_RUNTIME,ui_final,887,1774,no,0,887,1774,6.00,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/background/home_bg_street_foreground.png,ACTIVE_RUNTIME,ui_final,1211,1299,yes,0,1211,1299,6.00,,,,unmeasured,ok,no,0,0.0,56.4,33.6,1.6,0.10,,WARN,opaque art on canvas edge (56%): cropped?; .import untracked (Godot defaults)
+assets/ui/final/home/environment/home_prop_cleaning_bucket.png,ACTIVE_RUNTIME,ui_final,1227,1282,yes,0,1227,1282,6.00,,,,unmeasured,ok,no,1,0.0,0.0,59.2,5.0,0.30,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/environment/home_prop_cleaning_equipment.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,46.3,4.2,0.25,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/environment/home_prop_foam_cluster.png,ACTIVE_RUNTIME,ui_final,1402,1122,yes,0,1402,1122,6.00,,,,unmeasured,ok,no,2,0.3,0.0,50.5,2.6,0.16,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/environment/home_prop_hose.png,ACTIVE_RUNTIME,ui_final,1223,1286,yes,0,1223,1286,6.00,,,,unmeasured,ok,no,0,0.0,0.0,51.9,9.1,0.54,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/environment/home_prop_keep_clean_sign.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,47.0,25.8,1.55,,WARN,transparent padding 26% = 1.55 MiB; .import untracked (Godot defaults)
+assets/ui/final/home/environment/home_prop_neon_details.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,0,1536,1024,6.00,,,,unmeasured,ok,no,0,0.0,0.0,50.8,0.1,0.00,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/environment/home_prop_puddles.png,ACTIVE_RUNTIME,ui_final,1774,887,yes,0,1774,887,6.00,,,,unmeasured,ok,no,0,0.0,0.0,29.3,11.5,0.69,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/environment/home_prop_wet_floor_sign.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,0,1145,1374,6.00,,,,unmeasured,ok,no,0,0.0,0.0,55.3,4.7,0.28,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/gift_meter/gift_meter_emblem.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,143,143,3.58,ok,ok,yes,0,0.0,0.0,56.6,14.2,0.14,,PASS,
+assets/ui/final/home/gift_meter/gift_meter_reward_crate.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,325,325,3.15,ok,ok,yes,60,2.2,0.0,61.4,15.0,0.60,,PASS,
+assets/ui/final/home/platform/home_platform_main.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,0,1536,1024,6.00,,,,unmeasured,ok,no,0,0.0,0.0,54.5,3.9,0.23,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/platform/home_platform_top.png,ACTIVE_RUNTIME,ui_final,1774,887,yes,0,1774,887,6.00,,,,unmeasured,ok,no,0,0.0,0.0,58.3,9.0,0.54,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/play_cta/play_button_frame.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,,,,unmeasured,ok,no,0,0.0,0.0,67.2,9.7,0.58,,PASS,.import untracked (Godot defaults)
+assets/ui/final/home/reward_track/reward_gift_1.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,197,89,11.51,ok,ok,yes,0,0.0,0.0,50.0,13.9,0.56,,PASS,
+assets/ui/final/home/reward_track/reward_gift_10.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,197,89,11.51,ok,ok,yes,1,0.0,0.0,68.1,6.2,0.25,,PASS,
+assets/ui/final/home/reward_track/reward_gift_100.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,198,89,11.51,ok,ok,yes,0,0.0,0.0,55.9,12.6,0.50,,PASS,
+assets/ui/final/home/reward_track/reward_gift_25.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,198,89,11.51,ok,ok,yes,0,0.0,0.0,64.1,10.7,0.43,,PASS,
+assets/ui/final/home/reward_track/reward_gift_5.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,1024,1024,1024,4.00,198,89,11.51,ok,ok,yes,0,0.0,0.0,59.2,18.1,0.72,,PASS,
+assets/ui/final/home/reward_track/win_streak_reward_badge.png,ACTIVE_RUNTIME,ui_final,1245,1263,yes,512,505,512,0.99,122,122,4.20,ok,ok,yes,0,0.0,0.0,55.6,4.3,0.04,,PASS,
+assets/ui/final/home/shortcuts/icon_shortcut_cards_exchange.png,ACTIVE_RUNTIME,ui_final,1313,1198,yes,512,512,467,0.91,239,163,2.87,ok,ok,yes,0,0.0,0.0,54.6,7.9,0.07,,PASS,
+assets/ui/final/home/shortcuts/icon_shortcut_collection.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,1024,1024,683,2.67,268,179,3.82,ok,ok,yes,0,0.0,0.0,40.1,3.1,0.08,,PASS,
+assets/ui/final/home/shortcuts/icon_shortcut_daily.png,ACTIVE_RUNTIME,ui_final,1315,1197,yes,512,512,466,0.91,196,178,2.62,ok,ok,yes,0,0.0,0.0,57.4,17.0,0.15,,PASS,
+assets/ui/final/home/shortcuts/icon_shortcut_gift_bar.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,94,94,5.45,ok,ok,yes,0,0.0,0.0,47.2,7.7,0.08,,PASS,
+assets/ui/final/home/shortcuts/icon_shortcut_no_ads.png,ACTIVE_RUNTIME,ui_final,1314,1197,yes,512,512,466,0.91,96,118,5.33,ok,ok,yes,0,0.0,0.0,51.7,13.5,0.12,,PASS,
+assets/ui/final/home/shortcuts/icon_shortcut_rewarded_ads.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,178,178,2.88,ok,ok,yes,0,0.0,0.0,58.8,6.7,0.07,,PASS,
+assets/ui/final/home/shortcuts/icon_shortcut_shop.png,ACTIVE_RUNTIME,ui_final,1351,1164,yes,512,512,441,0.86,248,214,2.06,ok,ok,yes,0,0.0,0.0,54.3,16.2,0.14,,PASS,
+assets/ui/final/home/shortcuts/icon_shortcut_tasks.png,ACTIVE_RUNTIME,ui_final,1314,1197,yes,512,512,466,0.91,196,178,2.62,ok,ok,yes,0,0.0,0.0,51.9,4.8,0.04,,PASS,
+assets/ui/final/home/shortcuts/icon_shortcut_win_streak.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,512,512,341,0.67,94,94,5.45,ok,ok,yes,0,0.0,0.0,25.0,10.2,0.07,,PASS,
+assets/ui/final/home/top_hud/profile_avatar_frame.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,185,185,2.77,ok,ok,yes,0,0.0,0.0,30.3,8.5,0.09,,PASS,
+assets/ui/final/home/top_hud/profile_rank_badge.png,ACTIVE_RUNTIME,ui_final,1317,1194,yes,512,512,464,0.91,104,106,4.92,ok,ok,yes,0,0.0,0.0,53.2,5.5,0.05,,PASS,
+assets/ui/final/home/videos/home_scrubby_still.png,ACTIVE_RUNTIME,ui_final,720,1280,no,0,720,1280,3.52,1321,2349,0.55,FAIL,ok,yes,,,,,,,,FAIL,under-res 0.55x (720x1280 drawn 1321x2349)
+assets/ui/final/home/worlds/world_01_whispering_park_1080x2160.png,ACTIVE_RUNTIME,ui_final,1080,2160,no,0,1080,2160,8.90,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
+assets/ui/final/popups/failure/fail_header_emblem.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,104,104,4.92,ok,ok,yes,0,0.0,0.0,62.1,13.6,0.14,,PASS,
+assets/ui/final/popups/failure/heart_large.png,ACTIVE_RUNTIME,ui_final,1320,1192,yes,1024,1024,925,3.61,228,206,4.49,ok,ok,yes,0,0.0,0.0,57.5,9.2,0.33,,PASS,
+assets/ui/final/popups/failure/refill_heart_bundle.png,ACTIVE_RUNTIME,ui_final,1312,1199,yes,0,1312,1199,6.00,,,,unmeasured,ok,no,0,0.0,0.0,57.5,7.8,0.47,,PASS,.import untracked (Godot defaults)
+assets/ui/final/popups/help/help_scrubby_pose.png,ACTIVE_RUNTIME,ui_final,1199,1312,yes,0,1199,1312,6.00,954,282,4.65,ok,ok,no,0,0.0,0.0,45.2,4.6,0.27,,PASS,.import untracked (Godot defaults)
+assets/ui/final/popups/help/robots/atlas_help_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,369,369,2.78,ok,ok,yes,0,0.0,0.0,54.3,2.0,0.05,,PASS,
+assets/ui/final/popups/help/robots/bubbles_help_pose.png,ACTIVE_RUNTIME,ui_final,1093,1439,yes,1024,778,1024,3.04,369,369,2.78,ok,ok,yes,0,0.0,0.0,43.2,2.2,0.07,,PASS,
+assets/ui/final/popups/help/robots/clippy_help_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,369,369,2.78,ok,ok,yes,0,0.0,0.0,47.5,3.7,0.10,,PASS,
+assets/ui/final/popups/help/robots/dusty_help_pose.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,369,369,2.78,ok,ok,yes,0,0.0,0.0,47.5,3.0,0.10,,PASS,
+assets/ui/final/popups/help/robots/moppy_help_pose.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,369,369,2.78,ok,ok,yes,0,0.0,0.0,45.0,5.5,0.18,,PASS,
+assets/ui/final/popups/help/robots/polly_help_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,369,369,2.78,ok,ok,yes,0,0.0,0.0,46.6,1.2,0.03,,PASS,
+assets/ui/final/popups/help/robots/rinse_help_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,369,369,2.78,ok,ok,yes,0,0.0,0.0,43.3,0.3,0.01,,PASS,
+assets/ui/final/popups/help/robots/spark_help_pose.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,369,369,2.78,ok,ok,yes,0,0.0,0.0,39.2,2.9,0.10,,PASS,
+assets/ui/final/popups/help/robots/squeegee_help_pose.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,369,369,2.78,ok,ok,yes,0,0.0,0.0,39.2,5.6,0.19,,PASS,
+assets/ui/final/popups/need_a_hand_video/need_a_hand_scrubby_still.png,DYNAMIC_REF,ui_final,576,512,yes,0,576,512,1.12,195,174,2.95,ok,ok,yes,0,0.0,0.0,33.9,40.1,0.45,,PASS,
+assets/ui/final/popups/new_region_video/new_region_scrubby_still.png,DYNAMIC_REF,ui_final,720,848,yes,0,720,848,2.33,,,,unmeasured,ok,yes,0,0.0,0.0,16.7,26.2,0.61,,PASS,
+assets/ui/final/popups/victory/reward_glow.png,ACTIVE_RUNTIME,ui_final,1374,1145,yes,1024,1024,853,3.33,399,399,2.57,ok,ok,yes,0,0.0,0.0,52.7,0.0,0.00,,PASS,
+assets/ui/final/popups/victory/robots/atlas_victory_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,368,370,2.77,ok,ok,yes,0,0.0,0.0,48.0,3.5,0.09,,PASS,
+assets/ui/final/popups/victory/robots/bubbles_victory_pose.png,ACTIVE_RUNTIME,ui_final,1145,1374,yes,1024,853,1024,3.33,368,371,2.76,ok,ok,yes,0,0.0,0.0,46.8,3.0,0.10,,PASS,
+assets/ui/final/popups/victory/robots/clippy_victory_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,367,371,2.76,ok,ok,yes,0,0.0,0.0,43.3,3.6,0.09,,PASS,
+assets/ui/final/popups/victory/robots/dusty_victory_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,368,370,2.77,ok,ok,yes,0,0.0,0.0,45.7,2.8,0.08,,PASS,
+assets/ui/final/popups/victory/robots/moppy_victory_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,367,371,2.76,ok,ok,yes,0,0.0,0.0,41.8,0.0,0.00,,PASS,
+assets/ui/final/popups/victory/robots/polly_victory_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,367,371,2.76,ok,ok,yes,0,0.0,0.0,43.0,6.4,0.17,,PASS,
+assets/ui/final/popups/victory/robots/rinse_victory_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,367,372,2.75,ok,ok,yes,0,0.0,0.0,45.8,0.0,0.00,,PASS,
+assets/ui/final/popups/victory/robots/spark_victory_pose.png,ACTIVE_RUNTIME,ui_final,1147,1371,yes,1024,857,1024,3.35,368,369,2.78,ok,ok,yes,0,0.0,0.0,43.0,1.2,0.04,,PASS,
+assets/ui/final/popups/victory/robots/squeegee_victory_pose.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,1024,683,1024,2.67,368,370,2.77,ok,ok,yes,0,0.0,0.0,43.4,1.8,0.05,,PASS,
+assets/ui/final/popups/victory/victory_emblem.png,ACTIVE_RUNTIME,ui_final,1296,1213,yes,512,512,479,0.94,110,110,4.65,ok,ok,yes,0,0.0,0.0,53.3,11.5,0.11,,PASS,
+assets/ui/final/popups/victory/victory_scrubby_pose.png,ACTIVE_RUNTIME,ui_final,1230,1278,yes,1024,986,1024,3.85,,,,unmeasured,ok,yes,8,0.3,0.0,45.0,5.6,0.21,,PASS,
+assets/ui/final/popups/videos/result_scrubby_lose_still.png,ACTIVE_RUNTIME,ui_final,512,624,yes,0,512,624,1.22,369,369,1.69,WARN,ok,yes,0,0.0,0.0,37.8,33.9,0.41,,WARN,under 2x (1.69x: 512x624 drawn 369x369)
+assets/ui/final/popups/videos/result_scrubby_win_still.png,ACTIVE_RUNTIME,ui_final,560,864,yes,0,560,864,1.85,369,369,2.34,ok,ok,yes,0,0.0,0.0,24.6,54.5,1.01,,WARN,transparent padding 55% = 1.01 MiB
+assets/ui/final/popups/welcome_video/welcome_back_scrubby_still.png,DYNAMIC_REF,ui_final,576,672,yes,0,576,672,1.48,954,304,2.21,ok,ok,yes,0,0.0,0.0,31.4,48.9,0.72,,PASS,
+assets/ui/final/profile/achievement_crown_icon.png,DYNAMIC_REF,ui_final,128,128,yes,0,128,128,0.06,94,94,1.36,WARN,ok,yes,0,0.0,6.2,79.7,0.0,0.00,,WARN,under 2x (1.36x: 128x128 drawn 94x94)
+assets/ui/final/profile/profile_no_booster_icon.png,DYNAMIC_REF,ui_final,128,128,yes,0,128,128,0.06,94,94,1.36,WARN,ok,yes,30,5.6,6.2,81.0,0.0,0.00,,WARN,under 2x (1.36x: 128x128 drawn 94x94)
+assets/ui/final/profile/profile_trophy_icon.png,DYNAMIC_REF,ui_final,128,128,yes,0,128,128,0.06,104,106,1.23,WARN,ok,yes,12,3.7,0.0,51.6,19.4,0.01,,WARN,under 2x (1.23x: 128x128 drawn 104x106)
+assets/ui/final/rewards/booster_of_choice.png,ACTIVE_RUNTIME,ui_final,1024,1024,yes,512,512,512,1.00,74,74,6.92,ok,ok,yes,0,0.0,0.0,75.7,0.0,0.00,,PASS,
+assets/ui/final/rewards/bot_parts_bundle_large.png,DYNAMIC_REF,ui_final,1230,1278,yes,0,1230,1278,6.00,,,,unmeasured,ok,no,0,0.0,0.0,57.2,6.9,0.42,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/bot_parts_bundle_small.png,DYNAMIC_REF,ui_final,1374,1145,yes,0,1374,1145,6.00,,,,unmeasured,ok,no,0,0.0,0.0,41.0,4.4,0.27,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/card_pack_premium.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,512,341,512,0.67,74,74,6.92,ok,ok,yes,0,0.0,0.0,71.7,9.9,0.07,,PASS,
+assets/ui/final/rewards/card_pack_standard.png,ACTIVE_RUNTIME,ui_final,1024,1536,yes,512,341,512,0.67,83,83,6.17,ok,ok,yes,0,0.0,0.0,70.4,6.3,0.04,,PASS,
+assets/ui/final/rewards/chest_small.png,ACTIVE_RUNTIME,ui_final,1374,1145,yes,0,1374,1145,6.00,954,325,3.52,ok,ok,no,1,0.1,0.0,52.9,13.3,0.80,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/gift_box.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,0,1254,1254,6.00,239,239,5.25,ok,ok,no,0,0.0,0.0,55.6,14.4,0.86,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/gift_videos/gift_big_opening_still.png,DYNAMIC_REF,ui_final,528,800,yes,0,528,800,1.61,,,,unmeasured,ok,yes,0,0.0,0.0,42.5,2.6,0.04,,PASS,
+assets/ui/final/rewards/gift_videos/gift_small_opening_still.png,DYNAMIC_REF,ui_final,624,928,yes,0,624,928,2.21,339,474,1.96,WARN,ok,yes,0,0.0,0.0,46.0,3.3,0.07,,WARN,under 2x (1.96x: 624x928 drawn 339x474)
+assets/ui/final/rewards/pack_opening/premium/frame_01_closed.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,28.1,66.5,3.99,,WARN,transparent padding 66% = 3.99 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/premium/frame_02_charge.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,33.5,19.2,1.15,,WARN,transparent padding 19% = 1.15 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/premium/frame_03_pressure.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,41.2,18.0,1.08,,WARN,transparent padding 18% = 1.08 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/premium/frame_04_first_tear.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,28.4,66.5,3.99,,WARN,transparent padding 66% = 3.99 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/premium/frame_05_tear_widens.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,44.7,16.5,0.99,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/premium/frame_06_card_edge.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,46.6,16.4,0.99,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/premium/frame_07_one_card_rises.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,46.6,16.4,0.99,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/premium/frame_08_cards_emerge.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,46.7,16.4,0.99,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/premium/frame_09_final_reveal.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,46.6,16.4,0.99,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/standard/frame_01_closed.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,20.8,63.3,3.80,,WARN,transparent padding 63% = 3.80 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/standard/frame_02_charge.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,23.2,18.3,1.10,,WARN,transparent padding 18% = 1.10 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/standard/frame_03_pressure.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,29.3,15.5,0.93,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/standard/frame_04_first_tear.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,21.0,63.3,3.80,,WARN,transparent padding 63% = 3.80 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/standard/frame_05_tear_widens.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,65.0,20.5,1.23,,WARN,transparent padding 21% = 1.23 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/standard/frame_06_card_edge.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,54.7,26.1,1.57,,WARN,transparent padding 26% = 1.57 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/standard/frame_07_one_card_rises.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,65.0,20.5,1.23,,WARN,transparent padding 21% = 1.23 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/standard/frame_08_cards_emerge.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,0,0.0,0.0,54.7,26.1,1.57,,WARN,transparent padding 26% = 1.57 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/standard/frame_09_final_reveal.png,DYNAMIC_REF,ui_final,1024,1536,yes,0,1024,1536,6.00,,,,unmeasured,ok,no,2,1.2,0.0,65.0,20.5,1.23,,WARN,transparent padding 21% = 1.23 MiB; .import untracked (Godot defaults)
+assets/ui/final/rewards/pack_opening/videos/premium_pack_opening_first.png,DYNAMIC_REF,ui_final,720,1280,no,0,720,1280,3.52,1170,2532,0.62,FAIL,ok,yes,,,,,,,,FAIL,under-res 0.62x (720x1280 drawn 1170x2532)
+assets/ui/final/rewards/pack_opening/videos/premium_pack_opening_peak.png,DYNAMIC_REF,ui_final,720,1280,no,0,720,1280,3.52,1170,2532,0.62,FAIL,ok,yes,,,,,,,,FAIL,under-res 0.62x (720x1280 drawn 1170x2532)
+assets/ui/final/rewards/pack_opening/videos/standard_pack_opening_first.png,DYNAMIC_REF,ui_final,720,1280,no,0,720,1280,3.52,1170,2532,0.62,FAIL,ok,yes,,,,,,,,FAIL,under-res 0.62x (720x1280 drawn 1170x2532)
+assets/ui/final/rewards/pack_opening/videos/standard_pack_opening_peak.png,DYNAMIC_REF,ui_final,720,1280,no,0,720,1280,3.52,1170,2532,0.62,FAIL,ok,yes,,,,,,,,FAIL,under-res 0.62x (720x1280 drawn 1170x2532)
+assets/ui/final/rewards/scrub_bucks_bundle_large.png,DYNAMIC_REF,ui_final,1536,1024,yes,0,1536,1024,6.00,,,,unmeasured,ok,no,0,0.0,0.0,55.0,7.8,0.47,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/scrub_bucks_bundle_small.png,DYNAMIC_REF,ui_final,1448,1086,yes,0,1448,1086,6.00,,,,unmeasured,ok,no,0,0.0,0.0,43.6,9.5,0.57,,PASS,.import untracked (Godot defaults)
+assets/ui/final/rewards/set_complete_video/set_complete_badge_still.png,DYNAMIC_REF,ui_final,624,624,yes,0,624,624,1.49,364,364,1.71,WARN,ok,yes,0,0.0,0.0,45.5,9.3,0.14,br,WARN,under 2x (1.71x: 624x624 drawn 364x364); text/watermark CANDIDATE br
+assets/ui/final/robots/bot_parts_icon.png,ACTIVE_RUNTIME,ui_final,1222,1287,yes,512,486,512,0.95,96,96,5.33,ok,ok,yes,1,0.0,0.0,41.2,11.0,0.10,,PASS,
+assets/ui/final/robots/perks/perk_booster_discount.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,100,132,5.12,ok,ok,yes,0,0.0,0.0,68.9,7.7,0.08,,PASS,
+assets/ui/final/robots/perks/perk_cards_exchange_bonus.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,100,100,5.12,ok,ok,yes,0,0.0,0.0,69.2,9.5,0.09,,PASS,
+assets/ui/final/robots/perks/perk_daily_task_bonus.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,100,132,5.12,ok,ok,yes,0,0.0,0.0,69.2,7.5,0.08,,PASS,
+assets/ui/final/robots/perks/perk_first_clear_sb_bonus.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,100,100,5.12,ok,ok,yes,0,0.0,0.0,69.1,9.0,0.09,,PASS,
+assets/ui/final/robots/perks/perk_gift_bar_sb_bonus.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,100,132,5.12,ok,ok,yes,0,0.0,0.0,69.4,5.7,0.06,,PASS,
+assets/ui/final/robots/perks/perk_heart_refill_discount.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,100,132,5.12,ok,ok,yes,0,0.0,0.0,69.0,5.2,0.05,,PASS,
+assets/ui/final/robots/perks/perk_master_cleaner.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,100,132,5.12,ok,ok,yes,0,0.0,0.0,68.6,10.6,0.11,,PASS,
+assets/ui/final/robots/perks/perk_speed_2x_discount.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,100,132,5.12,ok,ok,yes,0,0.0,0.0,68.7,10.6,0.11,,PASS,
+assets/ui/final/robots/perks/perk_win_streak_bonus.png,ACTIVE_RUNTIME,ui_final,1254,1254,yes,512,512,512,1.00,100,100,5.12,ok,ok,yes,0,0.0,0.0,69.0,5.2,0.05,,PASS,
+assets/ui/final/robots/robot_lock_emblem.png,ACTIVE_RUNTIME,ui_final,1240,1268,yes,512,501,512,0.98,163,163,3.14,ok,ok,yes,1,0.1,0.0,50.2,10.8,0.11,,PASS,
+assets/ui/final/robots/robot_unlocked_burst.png,ACTIVE_RUNTIME,ui_final,1240,1268,yes,1024,1001,1024,3.91,412,494,2.43,ok,ok,yes,0,0.0,0.0,49.9,1.5,0.06,,PASS,
+assets/ui/final/shop/shop_header_emblem.png,ACTIVE_RUNTIME,ui_final,1243,1265,yes,0,1243,1265,6.00,,,,unmeasured,ok,no,0,0.0,0.0,63.6,7.3,0.44,,PASS,.import untracked (Godot defaults)
+assets/ui/final/shop/shop_heart_bundle.png,ACTIVE_RUNTIME,ui_final,1402,1122,yes,512,512,410,0.80,96,96,5.33,ok,ok,yes,0,0.0,0.0,41.1,14.6,0.12,,PASS,
+assets/ui/final/shop/shop_scrub_bucks_bundle.png,ACTIVE_RUNTIME,ui_final,1536,1024,yes,512,512,341,0.67,228,206,2.25,ok,ok,yes,0,0.0,0.0,42.9,2.3,0.02,,PASS,
+assets/ui/final/shop/shop_speed_2x_icon.png,ACTIVE_RUNTIME,ui_final,1278,1230,yes,512,512,493,0.96,96,118,5.33,ok,ok,yes,0,0.0,0.0,60.6,20.5,0.20,,PASS,
+assets/ui/final/system/splash/boot_splash_portrait.png,ACTIVE_RUNTIME,ui_final,1080,2160,no,0,1080,2160,8.90,,,,unmeasured,ok,no,,,,,,,,PASS,.import untracked (Godot defaults)
