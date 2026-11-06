@@ -107,6 +107,17 @@ builds.
 Defined in `docs/ANALYTICS_TAXONOMY_V1.md`: consent OFF by default, NullSink, int/bool/enum
 params only, no ids or timestamps. In the current build no event is stored or sent.
 
+| Events | Data (all coarse enums / small ints) |
+|---|---|
+| `session_start`, `session_end`, `retention_day` | trigger, duration bucket, last level outcome, d1..d30 marker |
+| `level_start`, `level_first_action`, `level_end` | level number, attempt / duration / progress buckets, outcome, difficulty class, cadence slot |
+| `assist_shown`, `assist_fail_closed`, `assist_dismissed`, `booster_acquire`, `booster_use` | level, booster ids, acquisition path, ok / reason |
+| `economy_source`, `economy_sink`, `hearts_empty` | currency, amount bucket, source / sink category, gate place |
+| `pack_opened`, `collection_set_complete`, `collection_master_complete`, `robot_unlock`, `robot_equip` | pack kind, new / duplicate count buckets, best rarity, set number, robot roster order |
+| `screen_view`, `shop_open`, `launch_failed` | screen name, Shop entry source, launch refusal reason |
+| `ad_offer_shown`, `ad_request`, `ad_result` | placement, product, available / ok, refusal reason, outcome (no tokens or transaction ids) |
+| `notify_toggle`, `notification_prompt`, `deep_link_open` | reminder category on / off, explainer step and OS answer, deep link destination |
+
 ## 3. Permissions (SB-M58-002/003)
 
 ### Android (`.github/android/export_presets_family_first10.cfg`)
