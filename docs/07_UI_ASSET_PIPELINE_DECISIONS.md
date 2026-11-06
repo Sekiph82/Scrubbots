@@ -228,3 +228,27 @@ The album's `tex_cache` is now a `CardTextureLru` (`scripts/ui/collection/card_t
 Before -> after, every card owned and every card detail of the 15 sets opened (1080x2400): card art resident 400.45 MiB (step 3: all 135 full arts at 720x1080 held by the visit cache) -> peak 91.85 MiB in the ResourceLoader, LRU peak 24 full cards / 95.85 MiB, steady after paging back 91.95 MiB (83 thumbnails); one set + one card open in a fresh visit: 12.94 MiB (9 thumbnails + 1 full); album closed: 0. `tests/m22_028_collection_card_lru.gd` checks the thumbnail files (size, import, not a crop), the LRU rules, the 135-card sweep, fast paging (30 pages without a frame reuse the same 9 instances), and reopen/close; `tests/m22_029_texture_cold_warm.gd` counts thumbnails as card art; `tests/m22_026_texture_budget.gd` checks the LRU release. `tests/m43_master_c007_collection.gd` k10: a full second scan of all 15 sets cannot stay warm in a 96 MiB LRU, so its warm pass re-opens the 5 most recent sets and must load nothing (warm 59-71 ms, budget 150 ms); the cold pass (thumbnail loads) measured 92-148 ms on a quiet dev PC vs 223-312 ms with full art.
 
 **Status**: Factory job 103, 2026-11-06 (SB-M22-028).
+
+### UI-ADR-008 step 7: closeout (SB-M22-026)
+
+**Decision**: lossless capping is finished; nothing new to cap. Factory job 109 (2026-11-06) re-ran `tests/tools/m22_026_texture_measure.gd` after SB-M22-028 (throw-away saves, real save untouched): `DONE (84 scenarios, 188 textures)` (173 + 15 card thumbnails now drawn). `python -I tools/m22_026_apply_caps.py <measure.json>` proposes one cap, `gameplay/effects/fx_clean_sparkle.png` (94 px on Achievements), which stays uncapped because clean sprites and pack CPUParticles2D also draw it and the walker cannot size those. The only limits under 2x are the 13 viewed card arts (1080, 585 px at 1170x2532), kept on purpose (step 5; the grid now draws thumbnails, full art only in the card detail). Thumbnails (440x660, drawn 325 px) need no limit. So no `.import` changed and the budget test is unchanged; it still fails when an existing cap is reverted. Per-screen budgets and cold/warm numbers are unchanged (Home 111.02/117, Ceremonies 219.90/230 MiB; cold Home 133.50/147, peak 145.91/161 MiB).
+
+PNGs without alpha (opaque by design, left lossless and unchanged): the 7 from step 1 (`gameplay/master/scrubbots_gameplay_master.png` reference mockup, `gameplay/profile/bot_parts_bar_frame.png` (indexed, no runtime reference; would need alpha if ever wired as a frame), `home/background/home_background.png`, `home/background/home_bg_sky.png`, `marketing/store_background.png`, the two `system/placeholders/*`) plus 7 added since: `events/event_weekly_hero.png`, `system/splash/boot_splash_portrait.png` (full-bleed), and the video first-frame stills `home/videos/home_scrubby_still.png` and `rewards/pack_opening/videos/{standard,premium}_pack_opening_{first,peak}.png` (the videos are opaque too). Art not changed.
+
+**VRAM compression: owner visual decision, not done.** Every final/ import stays lossless (`compress/mode=0`). Measured estimate for a future visual trial (resident MiB at the current imported sizes from `tools/m22_026_texture_inventory.py`; ETC2 RGBA / ASTC 4x4 = 8 bpp = 1/4 of RGBA8; opaque art as ETC2 RGB = 1/8):
+
+| folder | lossless MiB | VRAM MiB (est.) |
+|---|---:|---:|
+| collection (cards, thumbnails, states) | 616.1 | 154.0 |
+| characters | 370.4 | 92.6 |
+| gameplay | 281.1 | 69.5 |
+| common | 247.9 | 62.0 |
+| rewards | 165.7 | 39.7 |
+| home | 158.2 | 37.6 |
+| popups | 141.7 | 35.4 |
+| other 11 folders | 295.5 | 70.5 |
+| **all 707 PNGs** | 2276.8 | 561.3 |
+
+On screen this would bring cold Home ~133.5 -> ~33 MiB and the heaviest scenario (packs, 235.11 MiB whole tree) to ~59 MiB. The trial needs raw before/after captures of the large art (robot masters, poses, card art, pack frames, backgrounds) for the owner (owner 2026-11-03). No atlas.
+
+**Status**: Factory job 109, 2026-11-06 (SB-M22-026 closed: lossless caps done; VRAM is an owner visual decision).
