@@ -15,10 +15,12 @@ How Scrubbots is built for iOS and installed on the owner's iPhone. The only bui
   `~/Library/Application Support/Godot/export_templates/4.7.2.stable`).
 - Steps: sparse checkout without developer trees -> fail-closed `--headless --import` ->
   `--export-release "iOS"` to an Xcode project -> `xcodebuild` unsigned -> zip `Payload/` into
-  `Scrubbots.ipa` -> scan the PCK inside the IPA (`.github/android/pck_probe`, verdict=PASS) ->
-  headless boot of that PCK (`--main-pack`, no missing resources / script errors).
-- Artifacts: `Scrubbots-ipa` (the IPA) and `Scrubbots-ipa-inspection` (import/export logs,
-  SHA-256, PCK scan report).
+  `Scrubbots.ipa` (fixed export / Xcode / binary / .pck basename) -> rename to
+  `build/ios/<build_type>/ScrubBots-iOS-<build_type>-v<version>-b<build>.ipa` (SB-M59,
+  `docs/RELEASE_BUILDS.md`) -> scan the PCK inside the IPA (`.github/android/pck_probe`,
+  verdict=PASS) -> headless boot of that PCK (`--main-pack`, no missing resources / script errors).
+- Artifacts: `ScrubBots-iOS-<build_type>-v<version>-b<build>.ipa` (the IPA) and
+  `ScrubBots-iOS-<build_type>-ipa-inspection` (import/export logs, SHA-256, PCK scan report).
 
 ## Export preset
 

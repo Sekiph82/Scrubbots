@@ -65,6 +65,14 @@ the JSON and exports these variables:
 | `OUT_DIR` | `build/<android or ios>/<debug or release>` | export output directory |
 | `ARTIFACT` | `ScrubBots-<Android or iOS>-<channel>-v<version>-b<build>` | file and artifact name |
 
+iOS is the exception for the export itself: Godot names the Xcode project, scheme, binary and
+`.pck` after the export basename, and dots or hyphens there can break the pack lookup. So
+the iOS export and Xcode build always use the fixed name `Scrubbots` (`${OUT_DIR}/Scrubbots.ipa`),
+and only the finished IPA is renamed to `${OUT_DIR}/${ARTIFACT}.ipa`. The scan, upload and
+summary steps read the renamed file. Artifacts: `<ARTIFACT>.ipa` and
+`ScrubBots-iOS-<channel>-ipa-inspection`; Android: `<ARTIFACT>.apk`, `<ARTIFACT>-inspection`
+and `ScrubBots-Android-validation-logs`.
+
 Build numbers come from each workflow's own `github.run_number`, so they rise per platform.
 Android debug APKs before SB-M59 used the plain run number as `version/code`; with offset 0
 the new codes keep rising, so a new debug APK still installs over an old one.
@@ -79,7 +87,8 @@ The game shows `VERSION <version>[-debug] · BUILD <n>` at the bottom of Setting
   there are no literal versions in the workflows or preset, debug-key steps are guarded
   `build_type != 'release'`, release signing steps are guarded `== 'release'` and fail fast,
   the Android export uses `--export-release` only for release, outputs and artifacts use
-  `OUT_DIR` / `ARTIFACT`, and there is no store upload. `--selftest` proves each rule catches a
+  `OUT_DIR` / `ARTIFACT`, iOS exports under the fixed basename `Scrubbots` and renames afterwards,
+  and there is no store upload. `--selftest` proves each rule catches a
   broken workflow. The Android `validate` job runs it.
 - `tests/m59_app_version.gd` (in the CI suite list): the Settings label text, font and position,
   the debug and release suffix, and that the label is localization-keyed.

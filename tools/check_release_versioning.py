@@ -15,7 +15,8 @@ Asserts:
     `build_type != 'release'`, release keystore/signing steps are guarded `== 'release'`,
     name no debug key and fail fast when a secret is absent; the Android export command
     picks --export-release only for release;
-  - outputs go to build/<platform>/<build_type>/ with version+build in the artifact name;
+  - outputs go to build/<platform>/<build_type>/ with version+build in the artifact name; iOS
+    exports and builds under the fixed basename Scrubbots and is renamed only afterwards;
   - no store upload anywhere.
 """
 import json
@@ -82,6 +83,15 @@ def check_android_export(text):
     return errs
 
 
+def check_ios_basename(ios):
+    """Godot derives the Xcode project / scheme / binary / .pck name from the export basename: keep it "Scrubbots"."""
+    if not re.search(r"^  APP_NAME: Scrubbots\b", ios, re.M) or 'export_path="${OUT_DIR}/${APP_NAME}.ipa"' not in ios \
+            or '--export-release "iOS" "${OUT_DIR}/${APP_NAME}.ipa"' not in ios \
+            or 'mv "${APP_NAME}.ipa" "${ARTIFACT}.ipa"' not in ios or re.search(r'export_path="[^"]*ARTIFACT', ios):
+        return ["%s must export/build under the fixed basename Scrubbots and rename to ${ARTIFACT}.ipa only afterwards" % IOS]
+    return []
+
+
 def check_inputs(text, wf):
     if not re.search(r"      build_type:\n(?:        .*\n)*?        default: debug\n        options:\n          - debug\n          - release\n", text):
         return ["%s: workflow_dispatch input build_type (choice debug|release, default debug) missing" % wf]
@@ -115,6 +125,7 @@ def check_repo():
         errs.append("%s does not fill the preset from APP_BUILD / APP_VERSION_NAME" % ANDROID)
     if 'application/short_version="${APP_VERSION}"' not in ios or 'application/version="${APP_BUILD}"' not in ios:
         errs.append("%s does not set CFBundleShortVersionString / CFBundleVersion from APP_VERSION / APP_BUILD" % IOS)
+    errs += check_ios_basename(ios)
     if 'print("OUT_DIR=build/%s/%s" % (platform, channel))' not in stamp:
         errs.append("%s no longer emits OUT_DIR=build/<platform>/<channel>" % STAMP)
     errs += check_signing(android, "ANDROID_RELEASE_KEYSTORE_")
@@ -144,6 +155,11 @@ def selftest():
         print("FAIL selftest: swapped export not caught"); fails += 1
     else:
         print("ok selftest: caught swapped export")
+    ios = read(IOS).replace('export_path="${OUT_DIR}/${APP_NAME}.ipa"', 'export_path="${OUT_DIR}/${ARTIFACT}.ipa"')
+    if "fixed basename Scrubbots" not in " ".join(check_ios_basename(ios)):
+        print("FAIL selftest: versioned iOS export basename not caught"); fails += 1
+    else:
+        print("ok selftest: caught versioned iOS export basename")
     return fails
 
 

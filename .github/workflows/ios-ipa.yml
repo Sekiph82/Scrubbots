@@ -18,7 +18,8 @@ name: iOS IPA
 #   release (App Store distribution signing from GitHub Secrets ONLY, fails fast when absent; the IPA is
 #   exported to the runner, NEVER uploaded). Version from data/config/app_version.json via
 #   .github/scripts/app_version.py: CFBundleShortVersionString = version, CFBundleVersion = build number
-#   (run_number + build_offset); output build/ios/<build_type>/ScrubBots-iOS-<build_type>-v<ver>-b<build>.ipa.
+#   (run_number + build_offset). Godot/Xcode build under the fixed name Scrubbots (pack/scheme/binary lookup), then
+#   the IPA is renamed to build/ios/<build_type>/ScrubBots-iOS-<build_type>-v<ver>-b<build>.ipa.
 
 on:
   workflow_dispatch:
@@ -37,6 +38,7 @@ permissions:
 
 env:
   GODOT_VERSION: 4.7.2
+  APP_NAME: Scrubbots   # fixed Godot export / Xcode project / binary / .pck basename; renamed to ARTIFACT only at the end
 
 jobs:
   ipa:
@@ -133,7 +135,7 @@ jobs:
           include_filter=""
           ; Gelistirme/denetim dosyalari oyuna girmesin (coordination 1.7 GB); workspace'te de yoklar
           exclude_filter="coordination/*, docs/*, tests/*, tools/*, level_factory/*, content_pipeline/*, assets/art/references/*, assets/ui/generated/*, assets/ui/candidates/*, .github/*"
-          export_path="${OUT_DIR}/${ARTIFACT}.ipa"
+          export_path="${OUT_DIR}/${APP_NAME}.ipa"
 
           [preset.0.options]
           application/app_store_team_id="${IOS_TEAM:-AAAAAAAAAA}"
@@ -177,7 +179,7 @@ jobs:
       - name: Godot export (Xcode projesi)
         run: |
           mkdir -p "$OUT_DIR"
-          "$GODOT" --headless --export-release "iOS" "${OUT_DIR}/${ARTIFACT}.ipa" > out/export.log 2>&1 \
+          "$GODOT" --headless --export-release "iOS" "${OUT_DIR}/${APP_NAME}.ipa" > out/export.log 2>&1 \
             || { grep -iE "error|fail|invalid|missing" out/export.log | tail -25 | sed 's/^/::error::/'; exit 1; }
           if grep -nE "Error loading|ERR_FILE_CORRUPT|SCRIPT ERROR|Failed loading resource" out/export.log; then
             echo "::error::export reported failed resources"; exit 1
@@ -189,7 +191,7 @@ jobs:
           cd "$OUT_DIR"
           PROJ=$(ls -d *.xcodeproj | head -1)
           SCHEME="${PROJ%.xcodeproj}"
-          rm -f "${ARTIFACT}.ipa"   # Godot's project-only export path; the built IPA replaces it
+          rm -f "${APP_NAME}.ipa"   # Godot's project-only export path; the built IPA replaces it
           if [ "$BUILD_TYPE" = release ]; then
             xcodebuild -project "$PROJ" -scheme "$SCHEME" -configuration Release \
               -sdk iphoneos -destination 'generic/platform=iOS' -archivePath dd/app.xcarchive \
@@ -207,16 +209,17 @@ jobs:
           </dict></plist>
           PLIST
             xcodebuild -exportArchive -archivePath dd/app.xcarchive -exportOptionsPlist ExportOptions.plist -exportPath dd/export | tail -20
-            mv dd/export/*.ipa "${ARTIFACT}.ipa"
+            mv dd/export/*.ipa "${APP_NAME}.ipa"
           else
             xcodebuild -project "$PROJ" -scheme "$SCHEME" -configuration Release \
               -sdk iphoneos -destination 'generic/platform=iOS' -derivedDataPath dd \
               CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY="" build | tail -40
             mkdir -p Payload
             cp -R dd/Build/Products/Release-iphoneos/*.app Payload/
-            zip -qry "${ARTIFACT}.ipa" Payload
+            zip -qry "${APP_NAME}.ipa" Payload
           fi
-          test -s "${ARTIFACT}.ipa"
+          test -s "${APP_NAME}.ipa"
+          mv "${APP_NAME}.ipa" "${ARTIFACT}.ipa"   # versioned name only after the build
 
       - name: IPA inventory + scan of the PCK inside the IPA
         run: |
