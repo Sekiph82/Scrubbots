@@ -133,7 +133,7 @@ Completed items and older status history: docs/migration/legacy-task-trackers/TA
 - READY SB-M56-012..016 — notification analytics, dashboard metrics, no-gameplay-effect rule, consent gating, schema tests
 - READY SB-M56-017..020 — measure Next Cleanup, 10-level journey, Collection pity/new-card rate, Daily Scrub Orders
 - READY SB-M56-021..023 — measure Weekly/First-Try, Comeback Catch-Up and notification outcomes
-- READY SB-M54-022..027 — regressions: Results/fail/Need a Hand, spend/grant idempotency, ad callbacks (mocked), Shop, packs, robots
+- DONE SB-M54-022..027 — factory 119 (dc8180d9): coverage map of the existing suites + one gap suite tests/m54_regression_pack_022_027.gd (Need a Hand offers only unlocked boosters / fails closed, 2x relaunch idempotency, rewarded callback ordering + pending-at-relaunch, robot unlock/equip idempotency + relaunch); LOCAL_PASS 12/12 (~50 s), CI validate exact 12/12 guard; no product bug found
 - READY SB-M54-028..030 — regressions: Tasks/Daily/Gift/badges, BottomNav/modal stack, feature-unlock/FTUE once-only
 - READY SB-M54-033..036 — regressions: Next Cleanup/journey, Collection pity, Daily/Event retention, Comeback/notifications
 - READY SB-M54-037..038 — presentation-plugin one-shot/fail-open regression and GFF/Spark runtime visual regression pack
@@ -1707,12 +1707,12 @@ The 2026-09-27 deferral is lifted for score-model work by the owner decision of 
 **M54-C001 First 10 gate: CLOSED.** SB-M54-001..021 + 016A are 22/22 AUDITED_PASS after owner ruling A = 900 s / 15 min. Final closure: `coordination/sessions/M54-C001/CHATGPT_AUDIT_V02.md`. SB-M54-022..032 remain later M43+ regression work.
 
 #### M54 Player-Experience / Meta Regression Expansion
-- [ ] SB-M54-022 Results/fail/retry/Need-a-Hand third-failure regression.
-- [ ] SB-M54-023 Heart/SB/booster/2x popup spend-grant-idempotency regression.
-- [ ] SB-M54-024 Rewarded-ad callback success/cancel/fail/duplicate/background regression with provider mocked.
-- [ ] SB-M54-025 Shop return-context and insufficient-SB regression.
-- [ ] SB-M54-026 Card pack opening, duplicate/new card, Collection completion and Master Collection ceremony regression.
-- [ ] SB-M54-027 Robot unlock/equip/perk persistence regression.
+- [x] SB-M54-022 Results/fail/retry/Need-a-Hand third-failure regression. **[DONE 2026-11-06, factory 119, dc8180d9, LOCAL_PASS, CLAUDE_SELF_REVIEW pending factory peer review; m43_c004_c001_fail_need_a_hand t01..t39 + m43_c001a_results_foundation + new m022_* (unlocked-only picks, fail-closed, shipped L2 table)]**
+- [x] SB-M54-023 Heart/SB/booster/2x popup spend-grant-idempotency regression. **[DONE 2026-11-06, factory 119, dc8180d9, LOCAL_PASS, CLAUDE_SELF_REVIEW pending factory peer review; m43_c003_c001_acquisition c05..c08/c17/c24/c29/c32 + m43_c004 t27/t36 + m43_master_c006_shop s09/s11 + new m023_2x_relaunch_idempotent]**
+- [x] SB-M54-024 Rewarded-ad callback success/cancel/fail/duplicate/background regression with provider mocked. **[DONE 2026-11-06, factory 119, dc8180d9, LOCAL_PASS, CLAUDE_SELF_REVIEW pending factory peer review; m43_c003 c09..c12/c18/c19/c32 + m43_c004 t29..t32 + new m024_* (close/reward ordering, interleaved, unknown token, pending at relaunch)]**
+- [x] SB-M54-025 Shop return-context and insufficient-SB regression. **[DONE 2026-11-06, factory 119, dc8180d9, LOCAL_PASS, CLAUDE_SELF_REVIEW pending factory peer review; m43_master_c006_shop s05/s08/s10/s12/s13 + m43_c003 c13/c22/c27 + m43_c004 t28 + m44_meta_l1_unlock_ftue gate_bypass (locked rows); no new test needed]**
+- [x] SB-M54-026 Card pack opening, duplicate/new card, Collection completion and Master Collection ceremony regression. **[DONE 2026-11-06, factory 119, dc8180d9, LOCAL_PASS, CLAUDE_SELF_REVIEW pending factory peer review; m43_c005_c008_pack_commit_transaction t01..t27 + m43_master_c007_collection + m43_master_c007r_pity + m43_master_c005_meta_ceremonies e03..e14 + m54_collection_set_master_exactly_once; no new test needed]**
+- [x] SB-M54-027 Robot unlock/equip/perk persistence regression. **[DONE 2026-11-06, factory 119, dc8180d9, LOCAL_PASS, CLAUDE_SELF_REVIEW pending factory peer review; m43_master_c008_robots r01..r10 + m43_master_c005_meta_ceremonies e16..e20 + new m027_* (rapid taps, re-unlock/locked equip/re-equip, relaunch roster + perk)]**
 - [ ] SB-M54-028 Tasks/Daily/Gift Bar/notification-badge regression.
 - [ ] SB-M54-029 BottomNav Events/Robots/Home/Ranks/Settings transition and modal-stack regression.
 - [ ] SB-M54-030 Feature-unlock/FTUE migration and once-only coachmark regression.
