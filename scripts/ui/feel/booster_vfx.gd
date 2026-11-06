@@ -33,7 +33,7 @@ const POP_PRESETS := {
 	"B": {"lift": 0.50, "burst": 0.25, "stars": 0.50},   # 1.25 s
 	"C": {"lift": 0.64, "burst": 0.32, "stars": 0.64},   # 1.60 s
 }
-const POP_DEFAULT := "B"   # pending the owner's pick of A/B/C
+const POP_DEFAULT := "C"   # owner picked C (1.60 s) 2026-11-06
 const POP_GAP := 0.25      # clear gap under the lifted tile, x slot height
 const POP_MAX := 6         # live pops bounded: one per slot; the oldest gives way
 

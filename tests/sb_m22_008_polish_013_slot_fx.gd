@@ -3,7 +3,7 @@ extends SceneTree
 ##   - only an occupied WAITING slot pulses (alpha 1.0..0.94, 1.8 s cosine, non-strobing); ACTIVE /
 ##     EMPTY never; reachable (ACTIVE), release (EMPTY) and reuse end it at once; colour / count stay;
 ##     pause and Reduced Effects hold it static; 5 and 6 slots; no input captured;
-##   - the pop: presets A 0.95 / B 1.25 (default) / C 1.60 s; LIFT -> BURST -> STARS strictly in
+##   - the pop: presets A 0.95 / B 1.25 / C 1.60 s (default, owner 2026-11-06); LIFT -> BURST -> STARS strictly in
 ##     order; the lifted tile's bottom edge clears the former slot top by >= 0.25 x slot height;
 ##     ease-in-out lift with no jump at t = 0; overlapping pops bounded; Reduced Effects -> no pop;
 ##     the slot is EMPTY the moment the batch finishes (no gameplay delay).
@@ -91,7 +91,7 @@ func _pop_unit() -> void:
 	print("[SB-POLISH-013 pop timing / geometry / order]")
 	var fx = BoosterVfx.new()
 	get_root().add_child(fx)
-	_ok(is_equal_approx(fx.pop_duration(), 1.25), "default preset B = 1.25 s (pending owner pick)")
+	_ok(is_equal_approx(fx.pop_duration(), 1.60), "default preset C = 1.60 s (owner pick 2026-11-06)")
 	var want := {"A": 0.95, "B": 1.25, "C": 1.60}
 	var r := Rect2(200, 1500, 120, 140)
 	for id in ["A", "B", "C"]:
