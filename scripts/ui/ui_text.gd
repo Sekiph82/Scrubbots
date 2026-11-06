@@ -521,6 +521,7 @@ ACTIVE",
 	"SETTINGS_PERCENT": "%d%%",
 	"SETTINGS_UNAVAILABLE": "Settings unavailable",
 	"SETTINGS_SAVE_BLOCKED": "Save blocked: settings are read-only",
+	"SETTINGS_VERSION": "VERSION %s · BUILD %d",
 }
 
 ## M51 (SB-M51-003/004): developer pseudo-localization. When true, every t() result is

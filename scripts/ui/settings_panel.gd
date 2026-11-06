@@ -31,6 +31,8 @@ const FONT_BODY := 30
 const FONT_BUTTON := 34
 const FONT_TITLE := 48
 const DIM := Color(0.0, 0.0, 0.0, 0.6)
+## SB-M59-004/005: the one version source (CI stamps build + channel at export).
+const APP_VERSION_PATH := "res://data/config/app_version.json"
 
 var _app = null
 var _toggles: Dictionary = {}    ## bus -> CheckButton
@@ -191,6 +193,21 @@ func _build() -> void:
 	close.add_theme_constant_override("outline_size", 0)
 	close.pressed.connect(close_panel)
 	col.add_child(close)
+
+	var ver := Label.new()
+	ver.name = "VersionLabel"
+	ver.text = version_text()
+	ver.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	ver.add_theme_font_size_override("font_size", FONT_BODY)
+	_ink(ver)
+	col.add_child(ver)
+
+## "VERSION <version>[-debug] · BUILD <n>"; every channel but release carries -debug.
+static func version_text(d = null) -> String:
+	if d == null:
+		d = JSON.parse_string(FileAccess.get_file_as_string(APP_VERSION_PATH))
+	var shown := String(d["version"]) + ("" if d["channel"] == "release" else "-debug")
+	return UiText.t("SETTINGS_VERSION", [shown, int(d["build"])])
 
 func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED and _frame != null:
