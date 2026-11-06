@@ -72,7 +72,7 @@ static func open_album(stack, app, open_packs: Callable = Callable()) -> BasePop
 	pl.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pl.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	packs.add_child(pl)
-	p.add_action("packs", UiText.t("COLLECTION_PACKS_OPEN"), "primary", false, "", packs).custom_minimum_size = Vector2(220, 80)
+	p.add_action("packs", UiText.t("COLLECTION_PACKS_OPEN"), "primary", false, "", packs).custom_minimum_size = Vector2(220, UiTokens.TOUCH_MIN)
 	p.set_meta("open_packs", open_packs)
 	p.add_action("exchange", UiText.t("COLLECTION_OPEN_EXCHANGE"), "primary", false)
 	var scroll := ScrollContainer.new()

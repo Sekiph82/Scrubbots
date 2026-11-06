@@ -640,7 +640,7 @@ func relayout() -> void:
 		for st in ["hover", "pressed", "disabled", "hover_pressed"]:
 			b.add_theme_stylebox_override(st, b.get_theme_stylebox("normal"))
 		b.get_node("Badge").add_theme_font_size_override("font_size", int(26.0 * _scale))
-		b.get_node("Price").add_theme_font_size_override("font_size", int(20.0 * _scale))
+		HomeStyle.fit_font(b.get_node("Price"), int(20.0 * _scale), bsz * 0.88)
 	_place_ref(_booster_row, Shell.BOOSTERS)
 	_place_ref(_ad_region, Shell.AD)
 	_queue_connector_update()
@@ -668,7 +668,7 @@ func _layout_top() -> void:
 			[_profile_level, PROFILE_LEVEL], [_profile_bar, PROFILE_BAR], [_profile_parts, PROFILE_BAR]]:
 		_place_child(pair[0], Shell.PROFILE, pair[1])
 	_profile_name.add_theme_font_size_override("font_size", int(28.0 * _scale))
-	_profile_level.add_theme_font_size_override("font_size", int(22.0 * _scale))
+	HomeStyle.fit_font(_profile_level, int(22.0 * _scale), (PROFILE_LEVEL[2] - PROFILE_LEVEL[0]) * _scale)
 	_profile_parts.add_theme_font_size_override("font_size", int(18.0 * _scale))
 	_place_child(_pause_btn, top, Shell.PAUSE)
 	_place_child(_speed_btn, top, Shell.SPEED)
@@ -791,6 +791,7 @@ func set_profile(data: Dictionary) -> void:
 		_profile_name.text = String(r.get("name", UiText.t("HOME_PLAYER_NAME_DEFAULT")))
 	var level: int = int(data.get("level", 0))
 	_profile_level.text = UiText.t("RESULTS_LEVEL", [level]) if level > 0 else ""
+	HomeStyle.fit_font(_profile_level, int(22.0 * _scale), (PROFILE_LEVEL[2] - PROFILE_LEVEL[0]) * _scale)
 	var parts: int = int(data.get("bot_parts", -1))
 	var cost: int = int(data.get("bot_parts_cost", 0))
 	var has_parts: bool = parts >= 0 and cost > 0
@@ -1025,6 +1026,7 @@ func _apply_booster_visual(id: String) -> void:
 	badge.text = str(int(st["charges"]))
 	price.visible = int(st["charges"]) <= 0 and int(st["price"]) > 0 and state != BOOSTER_LOCKED and state != BOOSTER_SELECTED
 	price.text = UiText.t("BOOSTER_PRICE_SB", [UiText.num(int(st["price"]))])
+	HomeStyle.fit_font(price, int(20.0 * _scale), b.custom_minimum_size.x * 0.88)
 	b.get_node("SelectedRing").visible = state == BOOSTER_SELECTED
 	b.get_node("UnavailableOverlay").visible = state == BOOSTER_UNAVAILABLE
 	b.get_node("LockedPlate").visible = state == BOOSTER_LOCKED

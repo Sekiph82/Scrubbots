@@ -915,7 +915,6 @@ func _build_rewarded_ads_cta(collection: Control) -> void:
 	var b := UiShortcutButton.new("rewarded_ads", UiText.t("HOME_SC_REWARDED_ADS"))
 	b.name = "RewardedAdsButton"
 	HomeStyle.style_light_panel(b, int(PANEL_SIZE.y) - UiShortcutButton.LABEL_BAND, PANEL_ALPHA, PANEL_BORDER)
-	b.add_theme_font_size_override("font_size", REWARDED_ADS_LABEL_FONT)
 	b.autowrap_mode = TextServer.AUTOWRAP_OFF   # one line; never wraps under the icon
 	b.custom_minimum_size = PANEL_SIZE
 	# Exactly COLLECTION's rect (= the SHOP / COLLECTION width), one PANEL_GAP below it.
@@ -933,6 +932,7 @@ func _build_rewarded_ads_cta(collection: Control) -> void:
 		if not b.disabled:
 			_shortcut_pressed("rewarded_ads"))
 	collection.add_child(_reg(b))
+	HomeStyle.fit_font(b, REWARDED_ADS_LABEL_FONT, PANEL_SIZE.x)   # SB-M49-022: longer locales shrink, never widen
 	_nodes["ShortcutIcon_rewarded_ads"] = b.icon_rect
 
 # ------------------------------------------------------------- Play CTA ----

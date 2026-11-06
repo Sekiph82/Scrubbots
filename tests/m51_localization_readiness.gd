@@ -3,7 +3,7 @@ extends SceneTree
 ## (developer mode, never enabled by the shipping app) against the REAL app root:
 ##   l01 pseudo-locale properties · l02 key convention / non-empty English table
 ##   l03 Settings is fully keyed (asserted: no visible untranslated literal; frame contained)
-##   l04 multi-surface scan: untranslated visible literals + text leaving the screen under ~35%
+##   l04 multi-surface scan: untranslated visible literals + text leaving the screen under ~40%
 ##       expansion, REPORTED as findings (Home, Tasks, Daily, Help, Shop, gameplay HUD, Results).
 ##
 ## Run: godot --headless --path . -s res://tests/m51_localization_readiness.gd
@@ -76,7 +76,7 @@ func _l03() -> void:
 	var frame: Control = panel.find_child("Frame", true, false)
 	var fr := Rect2(frame.global_position, frame.size)
 	_ok(left.is_empty(), "no untranslated literal left in Settings %s" % str(left))
-	_ok(Rect2(Vector2.ZERO, Vector2(1080, 2160)).grow(0.5).encloses(fr), "Settings frame still inside the screen with ~35%% longer copy %s" % str(fr))
+	_ok(Rect2(Vector2.ZERO, Vector2(1080, 2160)).grow(0.5).encloses(fr), "Settings frame still inside the screen with ~40%% longer copy %s" % str(fr))
 	_complete("l03_settings_fully_keyed")
 
 func _l04() -> void:

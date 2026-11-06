@@ -524,15 +524,15 @@ ACTIVE",
 }
 
 ## M51 (SB-M51-003/004): developer pseudo-localization. When true, every t() result is
-## bracketed, accented and ~35% longer, so untranslated literals (no brackets) and layouts
+## bracketed, accented and ~40% longer (SB-M49-022 stress), so untranslated literals (no brackets) and layouts
 ## that cannot absorb longer languages show up in tests. Never enabled by the shipping app.
 static var pseudo := false
 const PSEUDO_MAP := {"a": "á", "e": "é", "i": "í", "o": "ó", "u": "ú", "y": "ý", "c": "ç", "n": "ñ",
 	"A": "Á", "E": "É", "I": "Í", "O": "Ó", "U": "Ú", "Y": "Ý", "C": "Ç", "N": "Ñ"}
-const PSEUDO_EXPANSION := 0.35
+const PSEUDO_EXPANSION := 0.40
 
 ## Pseudo form of `s`: "[" + accented letters (digits / symbols / placeholders kept) + "~"
-## padding of ceil(35% of the length) + "]". Empty stays empty.
+## padding of ceil(40% of the length) + "]". Empty stays empty.
 static func pseudo_text(s: String) -> String:
 	if s.is_empty():
 		return s

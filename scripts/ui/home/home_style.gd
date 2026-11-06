@@ -159,6 +159,15 @@ static func label(text: String, size: int, color: Color = TEXT, outline: int = 9
 	l.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	return l
 
+## SB-M49-022: shrink the one-line font of Label / Button `c` from `px` (floor 60%) until its
+## text fits `width`, so longer locales stay inside their plate instead of widening past it.
+static func fit_font(c: Control, px: int, width: float) -> void:
+	var avail: float = width - c.get_theme_stylebox("normal").get_minimum_size().x
+	var fs := px
+	while fs > int(px * 0.6) and c.get_theme_font("font").get_string_size(c.text, HORIZONTAL_ALIGNMENT_LEFT, -1, fs).x > avail:
+		fs -= 1
+	c.add_theme_font_size_override("font_size", fs)
+
 static func art(name: String) -> TextureRect:
 	var t := TextureRect.new()
 	t.name = name
