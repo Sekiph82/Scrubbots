@@ -1482,8 +1482,8 @@ func _render_cards_exchange(popup: HomePopup) -> void:
 		if n > 0:
 			var v: int = n * int(ex.card_value(cid))
 			total_sb += v
-			rows.append({"text": UiText.t("CARDS_ROW", [cid, UiText.num(n), UiText.num(v)])})
-	var note := UiText.t("CARDS_EMPTY") if rows.is_empty() else UiText.t("CARDS_NOTE", [UiText.num(int(_vm.get("cards_duplicates", 0))), UiText.num(total_sb)])
+			rows.append({"text": UiText.tn("CARDS_ROW", n, [cid, UiText.num(n), UiText.num(v)])})
+	var note := UiText.t("CARDS_EMPTY") if rows.is_empty() else UiText.tn("CARDS_NOTE", int(_vm.get("cards_duplicates", 0)), [UiText.num(int(_vm.get("cards_duplicates", 0))), UiText.num(total_sb)])
 	popup.set_content(UiText.t("CARDS_TITLE"), rows, note)
 
 ## SB-M42-024: Daily consecutive-login count, 5-day cycle and each day's configured
@@ -1506,7 +1506,7 @@ func _render_daily(popup: HomePopup) -> void:
 			row["action_text"] = UiText.t("POPUP_CLAIM")
 			row["action_enabled"] = not _app.is_blocked
 		rows.append(row)
-	popup.set_content(UiText.t("DAILY_TITLE"), rows, UiText.t("DAILY_STREAK", [UiText.num(int(d.streak()))]))
+	popup.set_content(UiText.t("DAILY_TITLE"), rows, UiText.tn("DAILY_STREAK", int(d.streak()), [UiText.num(int(d.streak()))]))
 
 func _on_popup_action(action_id: String, popup_id: String) -> void:
 	if _app == null or _app.is_blocked:

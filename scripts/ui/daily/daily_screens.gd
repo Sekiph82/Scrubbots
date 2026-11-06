@@ -94,7 +94,7 @@ static func order_text(o: Dictionary) -> String:
 		"levels_won_min_class":
 			return UiText.t("TASK_WIN_CLASS", [UiText.t("DIFFICULTY_" + String(o["min_class"]))])
 		"cells_cleared":
-			return UiText.t("TASK_CLEAR_CELLS", [UiText.num(int(o["target"]))])
+			return UiText.tn("TASK_CLEAR_CELLS", int(o["target"]), [UiText.num(int(o["target"]))])
 	return ""
 
 static func refresh_tasks(p: BasePopup, app) -> void:

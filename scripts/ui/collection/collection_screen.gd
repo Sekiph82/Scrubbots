@@ -299,7 +299,7 @@ static func _show_set(p: BasePopup, app, n: int, cache) -> void:
 	var set_name := ""
 	for row in e.config.collection_config().get("set_rewards", []):
 		if int(row["set"]) == n:
-			set_name = String(row.get("name", ""))
+			set_name = UiText.data("SET_NAME_%d" % n, String(row.get("name", "")))
 	p.set_meta("set", n)
 	p.set_title(UiText.t("COLLECTION_SET_ROW", [n, set_name]))
 	var grid: GridContainer = p.find_child("Cards", true, false)

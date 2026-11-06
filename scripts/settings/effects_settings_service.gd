@@ -16,12 +16,19 @@ extends RefCounted
 ## A present non-bool marker rejects the candidate.
 ## Drives ColorSymbols.set_enabled (board cells, Supply/Slots, booster chips) via
 ## `color_symbols_changed`; it never touches gameplay state.
+##
+## M51 (SB-M51-005): LANGUAGE (`settings.effects.language`), the player's explicit choice from
+## UiText.LANGUAGES; "" = follow the device. Written only once chosen (absent => ""); a present
+## value that is not a supported code rejects the whole candidate.
 
 signal changed(reduced: bool)
 signal color_symbols_changed(on: bool)
 
+const UiText = preload("res://scripts/ui/ui_text.gd")
+
 var _reduced: bool = false
 var _color_symbols: bool = false
+var _language := ""
 
 func is_reduced() -> bool:
 	return _reduced
@@ -41,8 +48,17 @@ func set_color_symbols(on: bool) -> void:
 	_color_symbols = on
 	color_symbols_changed.emit(_color_symbols)
 
+func get_language() -> String:
+	return _language
+
+func set_language(code: String) -> void:
+	_language = code
+
 func snapshot() -> Dictionary:
-	return {"reduced": _reduced, "color_symbols": _color_symbols, "color_symbols_optin": true}
+	var s := {"reduced": _reduced, "color_symbols": _color_symbols, "color_symbols_optin": true}
+	if _language != "":
+		s["language"] = _language
+	return s
 
 ## Strict canonical import: a Dictionary with an exact bool `reduced` (and, when present, an
 ## exact bool `color_symbols` / `color_symbols_optin`), else false and no mutation (the caller
@@ -54,6 +70,9 @@ func strict_import_snapshot(s) -> bool:
 		return false
 	if s.has("color_symbols_optin") and typeof(s["color_symbols_optin"]) != TYPE_BOOL:
 		return false
+	if s.has("language") and not (typeof(s["language"]) == TYPE_STRING and UiText.LANGUAGES.has(s["language"])):
+		return false
 	set_reduced(s["reduced"])
 	set_color_symbols(s.get("color_symbols", false) and s.get("color_symbols_optin", false))
+	set_language(s.get("language", ""))
 	return true

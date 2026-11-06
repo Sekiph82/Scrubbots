@@ -4,9 +4,17 @@ extends RefCounted
 ## M42 (SB-M42-025) — the ONE translation/format seam for Home / Results / Home popups.
 ## Every user-facing string is a KEY. t(key, args) asks Godot's TranslationServer first
 ## (so shipping localizations are plain Translation resources) and falls back to the
-## built-in English table. Values (SB amounts, Bot Parts, Gift Meter, streak rewards,
+## built-in table of the active language (`locale`: EN, or TR from ui_text_tr.gd; a key
+## missing there falls back to English). Values (SB amounts, Bot Parts, Gift Meter, streak rewards,
 ## Daily state, prices) are always passed in as live arguments — never baked into copy,
-## and this seam never changes locked Economy V1 numbers.
+## and this seam never changes locked Economy V1 numbers. Rules: docs/LOCALIZATION.md.
+
+const UiTextTr = preload("res://scripts/ui/ui_text_tr.gd")
+## M51 (SB-M51-005, owner 2026-10-22): the launch languages. A saved choice wins, else the
+## device language, else English.
+const LANGUAGES := ["en", "tr"]
+## Active built-in table ("en" | "tr"); AppState sets it from the save / device at boot.
+static var locale := "en"
 
 const EN := {
 	"HOME_PLAY": "PLAY",
@@ -54,14 +62,17 @@ const EN := {
 	"GIFTS_EMPTY": "No gifts to claim. Win levels in a row to fill the Gift Meter.",
 	"GIFTS_READ_ONLY": "Claims are unavailable while the save is read-only.",
 	"CARDS_TITLE": "CARDS EXCHANGE",
-	"CARDS_ROW": "%s · x%s duplicate(s) · %s SB",
+	"CARDS_ROW": "%s · x%s duplicates · %s SB",
+	"CARDS_ROW_ONE": "%s · x%s duplicate · %s SB",
 	"CARDS_EMPTY": "No duplicate cards yet.",
-	"CARDS_NOTE": "%s duplicate card(s) worth %s SB. Exchange them in the Collection (coming later).",
+	"CARDS_NOTE": "%s duplicate cards worth %s SB. Exchange them in the Collection (coming later).",
+	"CARDS_NOTE_ONE": "%s duplicate card worth %s SB. Exchange it in the Collection (coming later).",
 	"DAILY_TITLE": "DAILY REWARDS",
 	"DAILY_ROW": "DAY %d · %s%s",
 	"DAILY_TODAY": " · TODAY",
 	"DAILY_CLAIMED_TODAY": " · CLAIMED TODAY",
-	"DAILY_STREAK": "Login streak: %s day(s).",
+	"DAILY_STREAK": "Login streak: %s days.",
+	"DAILY_STREAK_ONE": "Login streak: %s day.",
 	"REWARD_ITEM": "%s x%s",
 	"REWARD_scrub_bucks": "SB",
 	"REWARD_bot_parts": "Bot Parts",
@@ -83,9 +94,11 @@ const EN := {
 	"RESULTS_FIRST_CLEAR_SB": "First clear +%s SB",
 	"RESULTS_STREAK_SB": "Win Streak %s · +%s SB",
 	"RESULTS_BOT_PARTS": "+%s Bot Parts",
+	"RESULTS_BOT_PARTS_ONE": "+%s Bot Part",
 	"RESULTS_GIFT_METER": "Gift Meter %s/%s",
 	"RESULTS_GIFT_READY": "Gift ready! Claim it in Gifts.",
-	"RESULTS_CARDS": "+%s Card(s)",
+	"RESULTS_CARDS": "+%s Cards",
+	"RESULTS_CARDS_ONE": "+%s Card",
 	"RESULTS_CATCHUP": "Comeback bonus %s/%s · %s",
 	"RESULTS_ALREADY_CLEARED": "Already cleared · no progression reward",
 	"RESULTS_NEXT_UNAVAILABLE": "Level %d is coming soon.",
@@ -252,12 +265,19 @@ ACTIVE",
 	"CEREMONY_CONTINUE": "CONTINUE",
 	"CEREMONY_ROW_SB": "+%s Scrub Bucks",
 	"CEREMONY_ROW_BOT_PARTS": "+%s Bot Parts",
-	"CEREMONY_ROW_STANDARD_PACK": "+%s Standard Card Pack",
-	"CEREMONY_ROW_PREMIUM_PACK": "+%s Premium Card Pack",
-	"CEREMONY_ROW_MYSTERY_BOOSTER": "+%s Mystery Booster",
-	"CEREMONY_ROW_BOOSTER_CHOICE": "+%s Booster of your choice",
-	"CEREMONY_ROW_NEW_CARD": "+%s guaranteed NEW card",
-	"CEREMONY_ROW_HEART": "+%s Heart",
+	"CEREMONY_ROW_BOT_PARTS_ONE": "+%s Bot Part",
+	"CEREMONY_ROW_STANDARD_PACK": "+%s Standard Card Packs",
+	"CEREMONY_ROW_STANDARD_PACK_ONE": "+%s Standard Card Pack",
+	"CEREMONY_ROW_PREMIUM_PACK": "+%s Premium Card Packs",
+	"CEREMONY_ROW_PREMIUM_PACK_ONE": "+%s Premium Card Pack",
+	"CEREMONY_ROW_MYSTERY_BOOSTER": "+%s Mystery Boosters",
+	"CEREMONY_ROW_MYSTERY_BOOSTER_ONE": "+%s Mystery Booster",
+	"CEREMONY_ROW_BOOSTER_CHOICE": "+%s Boosters of your choice",
+	"CEREMONY_ROW_BOOSTER_CHOICE_ONE": "+%s Booster of your choice",
+	"CEREMONY_ROW_NEW_CARD": "+%s guaranteed NEW cards",
+	"CEREMONY_ROW_NEW_CARD_ONE": "+%s guaranteed NEW card",
+	"CEREMONY_ROW_HEART": "+%s Hearts",
+	"CEREMONY_ROW_HEART_ONE": "+%s Heart",
 	"CEREMONY_SET_TITLE": "SET COMPLETE!",
 	"CEREMONY_SET_NAME": "Set %d · %s",
 	"CEREMONY_SET_PROGRESS": "%d / %d cards",
@@ -345,6 +365,7 @@ ACTIVE",
 	"ROBOTS_PARTS": "Bot Parts %s / %s toward %s",
 	"ROBOTS_ALL_UNLOCKED": "All robots unlocked · Bot Parts %s",
 	"ROBOTS_OVERFLOW": "+%s Bot Parts carry over after unlocking",
+	"ROBOTS_OVERFLOW_ONE": "+%s Bot Part carries over after unlocking",
 	"ROBOTS_ACTIVE": "ACTIVE",
 	"ROBOTS_UNLOCKED": "UNLOCKED",
 	"ROBOTS_LOCKED": "LOCKED",
@@ -364,6 +385,7 @@ ACTIVE",
 	"TASK_WIN_NO_BOOSTER": "Win a level without using a booster",
 	"TASK_WIN_CLASS": "Win a %s or harder level",
 	"TASK_CLEAR_CELLS": "Clear %s pixels",
+	"TASK_CLEAR_CELLS_ONE": "Clear %s pixel",
 	"TASK_PROGRESS": "%s / %s",
 	"TASK_CLAIMED": "CLAIMED",
 	"TASK_REWARD_SB": "%s SB",
@@ -421,6 +443,7 @@ ACTIVE",
 	"RANKS_TITLE": "RANKS",
 	"RANKS_CURRENT": "Your rank: %s",
 	"RANKS_NEXT": "%s more levels to %s",
+	"RANKS_NEXT_ONE": "%s more level to %s",
 	"RANKS_TOP": "Top rank reached!",
 	"RANKS_TIER_ROW": "%s · %s+ levels",
 	"RANKS_STATE_CURRENT": "YOUR RANK",
@@ -437,9 +460,12 @@ ACTIVE",
 	"COMEBACK_TITLE": "WELCOME BACK",
 	"COMEBACK_HEARTS": "Hearts: %s / %s",
 	"COMEBACK_DAILY": "Daily reward ready to claim",
-	"COMEBACK_GIFT": "%s gift(s) waiting in the Gift Bar",
-	"COMEBACK_TASKS": "%s task reward(s) ready",
-	"COMEBACK_EVENTS": "%s event reward(s) ready",
+	"COMEBACK_GIFT": "%s gifts waiting in the Gift Bar",
+	"COMEBACK_GIFT_ONE": "%s gift waiting in the Gift Bar",
+	"COMEBACK_TASKS": "%s task rewards ready",
+	"COMEBACK_TASKS_ONE": "%s task reward ready",
+	"COMEBACK_EVENTS": "%s event rewards ready",
+	"COMEBACK_EVENTS_ONE": "%s event reward ready",
 	"COMEBACK_CONTINUE": "LET'S CLEAN",
 	"COMEBACK_CATCHUP": "Comeback bonus %s/%s",
 	"COMEBACK_CATCHUP_NEXT": "Next new level win: %s",
@@ -522,6 +548,10 @@ ACTIVE",
 	"SETTINGS_UNAVAILABLE": "Settings unavailable",
 	"SETTINGS_SAVE_BLOCKED": "Save blocked: settings are read-only",
 	"SETTINGS_VERSION": "VERSION %s · BUILD %d",
+	# M51 (SB-M51-005): Settings LANGUAGE row; each language name is written in that language.
+	"SETTINGS_LANGUAGE": "LANGUAGE",
+	"LANGUAGE_NAME_EN": "ENGLISH",
+	"LANGUAGE_NAME_TR": "TÜRKÇE",
 }
 
 ## M51 (SB-M51-003/004): developer pseudo-localization. When true, every t() result is
@@ -550,18 +580,37 @@ static func reason(prefix: String, code: String) -> String:
 ## Translated (or English fallback) copy for `key`, formatted with `args`.
 static func t(key: String, args: Array = []) -> String:
 	var tr_text := String(TranslationServer.translate(key))
-	var text: String = tr_text if tr_text != key else String(EN.get(key, key))
+	var table: Dictionary = UiTextTr.TR if locale == "tr" else EN
+	var text: String = tr_text if tr_text != key else String(table.get(key, EN.get(key, key)))
 	if not args.is_empty():
 		text = text % args
 	return pseudo_text(text) if pseudo else text
 
-## Integer with thousands grouping (single seam; a locale-aware separator can replace it).
+## SB-M51-008 plural: t(key + "_ONE") when `n` is 1 and the language inflects (English
+## one/other), else t(key). Turkish keeps the noun singular after a number, so it has no _ONE keys.
+static func tn(key: String, n: int, args: Array = []) -> String:
+	var one := key + "_ONE"
+	return t(one if n == 1 and locale == "en" and EN.has(one) else key, args)
+
+## Data-file copy (achievement / robot / set text): the Turkish DATA entry for `key` when
+## Turkish is active, else the data file's own English `fallback`.
+static func data(key: String, fallback: String) -> String:
+	return String(UiTextTr.DATA[key]) if locale == "tr" and UiTextTr.DATA.has(key) else fallback
+
+## The language to show: a supported saved `choice`, else a supported `device` language, else "en".
+static func resolve_language(choice: String, device: String) -> String:
+	if LANGUAGES.has(choice):
+		return choice
+	return device if LANGUAGES.has(device) else "en"
+
+## Integer with thousands grouping ("1,000"; Turkish "1.000").
 static func num(n: int) -> String:
+	var sep := "." if locale == "tr" else ","
 	var neg := n < 0
 	var d := str(absi(n))
 	var out := ""
 	while d.length() > 3:
-		out = "," + d.substr(d.length() - 3) + out
+		out = sep + d.substr(d.length() - 3) + out
 		d = d.substr(0, d.length() - 3)
 	return ("-" if neg else "") + d + out
 

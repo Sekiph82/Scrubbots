@@ -29,6 +29,7 @@ const LevelProgressionService = preload("res://scripts/progression/level_progres
 const EconomyServices = preload("res://scripts/economy/economy_services.gd")
 const SaveService = preload("res://scripts/save/save_service.gd")
 const EffectsSettingsService = preload("res://scripts/settings/effects_settings_service.gd")
+const UiText = preload("res://scripts/ui/ui_text.gd")
 const LocalCalendar = preload("res://scripts/economy/local_calendar.gd")
 const EconomyConfig = preload("res://scripts/economy/economy_config.gd")
 const ProductionActionFacade = preload("res://scripts/economy/production_action_facade.gd")
@@ -107,6 +108,10 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	economy = EconomyServices.new(EconomyConfig.DEFAULT_PATH, clock, null, day_provider)
 	save = SaveService.new(save_path, audio, haptics, progression, economy, effects)
 	load_result = save.load()
+	# M51: the shipping save follows the saved language or the device; a test save only applies
+	# an explicit saved choice (suites keep their own UiText.locale).
+	if save_path == CANONICAL_SAVE_PATH or effects.get_language() != "":
+		UiText.locale = UiText.resolve_language(effects.get_language(), OS.get_locale_language())
 	is_blocked = not bool(load_result.get("ok", false)) and String(load_result.get("source", "")) == "future_schema"
 	actions = ProductionActionFacade.new(economy, null, Callable(self, "request_save"))
 	actions.feature_gate = Callable(self, "feature_unlocked")
@@ -493,6 +498,15 @@ func set_color_symbols(on: bool) -> Dictionary:
 	if is_blocked:
 		return {"ok": false, "reason": "app_blocked"}
 	effects.set_color_symbols(on)
+	return request_save()
+
+## M51 (SB-M51-005) LANGUAGE: the explicit choice ("en" / "tr"), applied to UiText at once and
+## persisted canonically (screens built afterwards use it; main.gd rebuilds the app root).
+func set_language(code: String) -> Dictionary:
+	if is_blocked or not UiText.LANGUAGES.has(code):
+		return {"ok": false, "reason": "app_blocked" if is_blocked else "bad_language"}
+	effects.set_language(code)
+	UiText.locale = code
 	return request_save()
 
 func set_volumes(master: float, music: float, sfx: float) -> Dictionary:

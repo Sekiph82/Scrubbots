@@ -17,6 +17,9 @@ extends Control
 signal closed
 ## M44: the read-only HELP & TIPS destination was requested (the app root opens it).
 signal help_requested
+## M51 (SB-M51-005): the player picked another language (already applied + saved); the app root
+## rebuilds its screens in it.
+signal language_changed(code: String)
 
 const BasePopup = preload("res://scripts/ui/popup/base_popup.gd")
 const HomeStyle = preload("res://scripts/ui/home/home_style.gd")
@@ -41,6 +44,7 @@ var _values: Dictionary = {}     ## bus -> Label
 var _haptics_toggle: CheckButton
 var _reduced_toggle: CheckButton
 var _symbols_toggle: CheckButton
+var _lang_buttons: Dictionary = {}   ## language code -> Button
 var _help: Button
 var _status: Label
 var _built := false
@@ -170,6 +174,46 @@ func _build() -> void:
 	_ink(hint)
 	sym_box.add_child(hint)
 	col.add_child(_card(sym_box))
+
+	# M51 (SB-M51-005): LANGUAGE, one row (title + one button per launch language, each named in
+	# its own language); the active one shows pressed.
+	var lang_box := VBoxContainer.new()
+	lang_box.name = "LanguageRow"
+	lang_box.add_theme_constant_override("separation", 4)
+	var lang_title := Label.new()
+	lang_title.name = "LanguageTitle"
+	lang_title.text = UiText.t("SETTINGS_LANGUAGE")
+	lang_title.add_theme_font_size_override("font_size", FONT_BUTTON)
+	_ink(lang_title)
+	lang_box.add_child(lang_title)
+	var lang_line := HBoxContainer.new()
+	lang_line.add_theme_constant_override("separation", 16)
+	lang_box.add_child(lang_line)
+	for code in UiText.LANGUAGES:
+		var b := Button.new()
+		b.name = "Language_" + code
+		b.text = UiText.t("LANGUAGE_NAME_" + code.to_upper())
+		b.toggle_mode = true
+		b.focus_mode = Control.FOCUS_NONE
+		b.custom_minimum_size = Vector2(0, TOUCH_MIN)
+		b.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+		b.add_theme_font_size_override("font_size", FONT_BODY)
+		var off := HomeStyle.box(BasePopup.ROW, BasePopup.ROW_EDGE, 4, 30, 4, 4)
+		var on := HomeStyle.box(BasePopup.ROYAL, BasePopup.ROYAL_EDGE, 4, 30, 4, 4)
+		for st in ["normal", "hover", "disabled"]:
+			b.add_theme_stylebox_override(st, off)
+		for st in ["pressed", "hover_pressed"]:
+			b.add_theme_stylebox_override(st, on)
+		b.add_theme_stylebox_override("focus", StyleBoxEmpty.new())
+		for c in ["font_color", "font_hover_color"]:
+			b.add_theme_color_override(c, BasePopup.INK)
+		for c in ["font_pressed_color", "font_hover_pressed_color"]:
+			b.add_theme_color_override(c, Color.WHITE)
+		b.add_theme_constant_override("outline_size", 0)
+		b.pressed.connect(_on_language_pressed.bind(code))
+		_lang_buttons[code] = b
+		lang_line.add_child(b)
+	col.add_child(_card(lang_box))
 
 	_status = Label.new()
 	_status.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
@@ -381,6 +425,9 @@ func _sync_from_state() -> void:
 	_reduced_toggle.disabled = not usable
 	_symbols_toggle.set_pressed_no_signal(_app.effects.is_color_symbols() if _app != null else false)
 	_symbols_toggle.disabled = not usable
+	for code in _lang_buttons:
+		(_lang_buttons[code] as Button).set_pressed_no_signal(code == UiText.locale)
+		(_lang_buttons[code] as Button).disabled = not usable
 	if _app == null:
 		_status.text = UiText.t("SETTINGS_UNAVAILABLE")
 	elif _app.is_blocked:
@@ -444,6 +491,14 @@ func _on_symbols_toggled(on: bool) -> void:
 		return
 	_app.set_color_symbols(on)
 
+func _on_language_pressed(code: String) -> void:
+	if not _usable() or code == UiText.locale:
+		_sync_from_state()
+		return
+	_app.set_language(code)
+	_sync_from_state()
+	language_changed.emit(code)
+
 ## Persist any pending slider change and hide the panel.
 func close_panel() -> void:
 	if _usable():
@@ -478,3 +533,6 @@ func get_reduced_effects_toggle() -> CheckButton:
 
 func get_color_symbols_toggle() -> CheckButton:
 	return _symbols_toggle
+
+func get_language_button(code: String) -> Button:
+	return _lang_buttons.get(code)

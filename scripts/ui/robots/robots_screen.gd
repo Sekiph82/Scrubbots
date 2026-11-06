@@ -115,7 +115,7 @@ static func _row(p: BasePopup, e, r: Dictionary, is_new: bool) -> Control:
 	newb.name = "NewBadge"
 	newb.visible = is_new
 	top.add_child(newb)
-	var perk := BasePopup.body_label("%s: %s" % [String(r["perk_name"]), String(r["perk_text"])], 20, BasePopup.INK)
+	var perk := BasePopup.body_label(perk_line(r), 20, BasePopup.INK)
 	perk.name = "Perk"
 	perk.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	v.add_child(perk)
@@ -141,6 +141,11 @@ static func _chip(text: String, bg: Color, fs: int) -> PanelContainer:
 	return c
 
 ## Live row state + the one action per row: EQUIP / ACTIVE / UNLOCK / DETAILS.
+## "Perk name: perk text" in the active language (M51 data copy).
+static func perk_line(r: Dictionary) -> String:
+	var id := String(r["id"]).to_upper()
+	return "%s: %s" % [UiText.data("ROBOT_PERK_NAME_" + id, String(r["perk_name"])), UiText.data("ROBOT_PERK_TEXT_" + id, String(r["perk_text"]))]
+
 static func row_state(e, id: String) -> Dictionary:
 	var next := RobotRoster.next_locked(e.robots)
 	var prog: Dictionary = e.robots.next_robot_progress()
@@ -158,7 +163,7 @@ static func refresh(p: BasePopup, e) -> void:
 	var cost := int(prog["cost"])
 	var text := UiText.t("ROBOTS_ALL_UNLOCKED", [UiText.num(parts)]) if next.is_empty() else UiText.t("ROBOTS_PARTS", [UiText.num(parts), UiText.num(cost), String(RobotRoster.entry(next)["name"])])
 	if not next.is_empty() and parts >= cost:
-		text += "\n" + UiText.t("ROBOTS_OVERFLOW", [UiText.num(parts - cost)])
+		text += "\n" + UiText.tn("ROBOTS_OVERFLOW", parts - cost, [UiText.num(parts - cost)])
 	(p.find_child("Parts", true, false) as Label).text = text
 	for card in p.find_children("Robot_*", "PanelContainer", true, false):
 		var id := String(card.get_meta("robot_id"))
@@ -254,8 +259,8 @@ static func open_detail(stack, app, id: String, on_close: Callable = Callable())
 		lock.texture = load(ART["lock"])
 		lock.custom_minimum_size = Vector2(150, 150)
 		box.add_child(lock)
-	p.add_body_line(String(r["role"]), "Role", BasePopup.INK, 26)
-	p.add_body_line("%s: %s" % [String(r["perk_name"]), String(r["perk_text"])], "Perk", BasePopup.ROYAL_EDGE, 26)
+	p.add_body_line(UiText.data("ROBOT_ROLE_" + id.to_upper(), String(r["role"])), "Role", BasePopup.INK, 26)
+	p.add_body_line(perk_line(r), "Perk", BasePopup.ROYAL_EDGE, 26)
 	if locked:
 		var need := int(e.robots.unlock_cost()) * (RobotRoster.ids().find(id) - RobotRoster.ids().find(RobotRoster.next_locked(e.robots)) + 1)
 		p.add_body_line(UiText.t("ROBOTS_DETAIL_NEED", [UiText.num(need), UiText.num(e.wallet.bot_parts())]), "Required", BasePopup.INK, 26)

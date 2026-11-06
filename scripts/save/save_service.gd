@@ -218,6 +218,7 @@ func _apply_effects(settings: Dictionary) -> void:
 	else:
 		_effects.set_reduced(false)
 		_effects.set_color_symbols(false)
+		_effects.set_language("")
 
 ## Apply validated M41 toggles (validate_candidate already rejected non-bool values).
 func _apply_audio_toggles(audio: Dictionary) -> void:

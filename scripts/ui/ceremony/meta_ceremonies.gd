@@ -147,7 +147,7 @@ static func _reward_rows(p: BasePopup, rewards: Dictionary, row_h: int = 84) -> 
 		icon.texture = load(ART[spec[0]])
 		icon.custom_minimum_size = Vector2(row_h - 8, row_h - 8)
 		h.add_child(icon)
-		var l := BasePopup.body_label(UiText.t(spec[1], [UiText.num(int(rewards[key]))]), UiTokens.FONT_BODY + 2)
+		var l := BasePopup.body_label(UiText.tn(spec[1], int(rewards[key]), [UiText.num(int(rewards[key]))]), UiTokens.FONT_BODY + 2)
 		l.name = "Text"
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
@@ -234,7 +234,7 @@ static func set_complete(event: Dictionary, reduced: bool) -> BasePopup:
 	if not reduced:
 		hero.set_meta("video", "set_complete")   # SB-VIDEO-007: played by start_motion
 	var n := int(event["set"])
-	p.add_body_line(UiText.t("CEREMONY_SET_NAME", [n, String(event.get("name", ""))]), "SetName", BasePopup.ROYAL_EDGE, 36)
+	p.add_body_line(UiText.t("CEREMONY_SET_NAME", [n, UiText.data("SET_NAME_%d" % n, String(event.get("name", "")))]), "SetName", BasePopup.ROYAL_EDGE, 36)
 	var thumbs := GridContainer.new()
 	thumbs.name = "SetCards"
 	thumbs.columns = 9
@@ -283,7 +283,7 @@ static func robot_unlock(event: Dictionary, reduced: bool):
 	p.context["robot_id"] = id
 	_hero(p, RobotRoster.asset(id, "master"), Vector2(330, 396), reduced, ART["robot_burst"])
 	p.add_body_line(name, "RobotName", BasePopup.ROYAL_EDGE, 52)
-	p.add_body_line(String(r["role"]), "RobotRole", BasePopup.INK, 26)
+	p.add_body_line(UiText.data("ROBOT_ROLE_" + id.to_upper(), String(r["role"])), "RobotRole", BasePopup.INK, 26)
 	var perk := PanelContainer.new()
 	perk.name = "Perk"
 	perk.add_theme_stylebox_override("panel", HomeStyle.pad(HomeStyle.box(BasePopup.ROW, BasePopup.ROYAL, 3, 26, 0), UiTokens.SPACE_MD, UiTokens.SPACE_SM))
@@ -302,11 +302,11 @@ static func robot_unlock(event: Dictionary, reduced: bool):
 	pv.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	pv.alignment = BoxContainer.ALIGNMENT_CENTER
 	ph.add_child(pv)
-	var pn := BasePopup.body_label(String(r["perk_name"]), 30, BasePopup.ROYAL_EDGE)
+	var pn := BasePopup.body_label(UiText.data("ROBOT_PERK_NAME_" + id.to_upper(), String(r["perk_name"])), 30, BasePopup.ROYAL_EDGE)
 	pn.name = "PerkName"
 	pn.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	pv.add_child(pn)
-	var pt := BasePopup.body_label(String(r["perk_text"]), 26)
+	var pt := BasePopup.body_label(UiText.data("ROBOT_PERK_TEXT_" + id.to_upper(), String(r["perk_text"])), 26)
 	pt.name = "PerkText"
 	pt.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	pv.add_child(pt)

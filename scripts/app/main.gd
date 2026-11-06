@@ -489,6 +489,7 @@ func _build_settings_entry() -> void:
 	_settings_panel.bind(app_state)
 	_settings_panel.closed.connect(func(): nav.close_settings())
 	_settings_panel.help_requested.connect(open_help)
+	_settings_panel.language_changed.connect(_on_language_changed)
 
 ## M44: Settings "?" -> the read-only HELP & TIPS popup on the app ModalStack (Home only;
 ## Settings closes first so the popup owns input). Never replays a level / reward / cinematic.
@@ -705,6 +706,13 @@ func _open_whats_new() -> bool:
 	return true
 
 ## Settings is a navigation overlay (HOME only); the panel follows nav state.
+## M51 (SB-M51-005): screens take their copy when built, so a new language (already applied and
+## saved by AppState.set_language) rebuilds the whole app root; LaunchSession keeps the opening
+## from replaying. Only the shipping root (the current scene) reloads; a test host keeps its instance.
+func _on_language_changed(_code: String) -> void:
+	if is_inside_tree() and get_tree().current_scene == self:
+		get_tree().reload_current_scene.call_deferred()
+
 func open_settings() -> void:
 	nav.open_settings()
 

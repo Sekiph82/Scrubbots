@@ -341,10 +341,10 @@ static func _ach_card(a: Dictionary) -> PanelContainer:
 	col.alignment = BoxContainer.ALIGNMENT_CENTER
 	col.add_theme_constant_override("separation", 0)
 	row.add_child(col)
-	var t := _text(String(a["name"]), 32)
+	var t := _text(UiText.data("ACH_NAME_" + String(a["id"]).to_upper(), String(a["name"])), 32)
 	t.name = "Title"
 	col.add_child(t)
-	var d := BasePopup.body_label(String(a["desc"]), 20)
+	var d := BasePopup.body_label(UiText.data("ACH_DESC_" + String(a["id"]).to_upper(), String(a["desc"])), 20)
 	d.name = "Desc"
 	d.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	col.add_child(d)
@@ -526,7 +526,7 @@ static func open_ranks(stack, app) -> BasePopup:
 		meter.caption.add_theme_color_override("font_color", BasePopup.INK)
 		meter.caption.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 		if r["next_id"] != "":
-			meter.set_progress(r["into"], r["span"], UiText.t("RANKS_NEXT", [UiText.num(int(r["next_min"]) - n), UiText.t(tiers[cur + 1]["name_key"])]))
+			meter.set_progress(r["into"], r["span"], UiText.tn("RANKS_NEXT", int(r["next_min"]) - n, [UiText.num(int(r["next_min"]) - n), UiText.t(tiers[cur + 1]["name_key"])]))
 		else:
 			meter.set_progress(1, 1, UiText.t("RANKS_TOP"))
 		p.get_content().add_child(meter)
@@ -584,7 +584,7 @@ static func open_comeback(stack, app) -> BasePopup:
 	var lines := [["daily", "COMEBACK_DAILY"], ["gift_bar", "COMEBACK_GIFT"], ["tasks", "COMEBACK_TASKS"], ["events", "COMEBACK_EVENTS"]]
 	for l in lines:
 		if int(b[l[0]]) > 0:
-			var txt := UiText.t(l[1]) if l[0] == "daily" else UiText.t(l[1], [UiText.num(int(b[l[0]]))])
+			var txt := UiText.t(l[1]) if l[0] == "daily" else UiText.tn(l[1], int(b[l[0]]), [UiText.num(int(b[l[0]]))])
 			p.add_body_line(txt, "Ready_" + l[0], BasePopup.INK, 24)
 	_add_catchup(p, e.returns.catchup())
 	p.add_action("ok", UiText.t("COMEBACK_CONTINUE"), "primary", true)
