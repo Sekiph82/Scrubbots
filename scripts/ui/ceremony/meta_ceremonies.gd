@@ -65,6 +65,11 @@ const SET_VIDEO_SIZE := Vector2(320, 320)
 const SET_VIDEO_EDGE := 0.06
 ## Injectable for tests (null = the static emblem, as on failure).
 static var set_video: VideoStream = load(SET_VIDEO_DIR + "set_complete_badge.ogv")
+## SB-VIDEO-009: the owner's magenta-keyed Flow "new region" Scrubby (popups/new_region_video/
+## PROVENANCE.md), generic for every world, played over the world art; still = keyed last frame.
+const REGION_VIDEO_DIR := "res://assets/ui/final/popups/new_region_video/"
+## Injectable for tests (null = the world art alone, as on failure).
+static var region_video: VideoStream = load(REGION_VIDEO_DIR + "new_region_scrubby.ogv")
 
 ## One ceremony popup for a CeremonyEvents event, or null when the kind has no builder.
 static func build(event: Dictionary, reduced: bool = false):
@@ -150,7 +155,7 @@ static func _reward_rows(p: BasePopup, rewards: Dictionary, row_h: int = 84) -> 
 		h.add_child(l)
 	return v
 
-## Start the decorative glow turn (FULL) and a gift / set-complete hero video. Every label/value
+## Start the decorative glow turn (FULL) and a gift / set-complete hero or new-region video. Every label/value
 ## already exists, so Reduced Effects (no motion) shows exactly the same truth. Tweens are bound
 ## to the popup.
 static func start_motion(p: BasePopup) -> void:
@@ -169,8 +174,17 @@ static func start_motion(p: BasePopup) -> void:
 			play_hero_video(p, h, set_video, load(SET_VIDEO_DIR + "set_complete_badge_still.png"), SET_VIDEO_SIZE, CHROMA_KEY_MAGENTA, SET_VIDEO_EDGE)
 		else:
 			play_hero_video(p, h, gift_video.get(art), load(GIFT_VIDEO_DIR + art + "_opening_still.png"), GIFT_VIDEO_SIZE[art], CHROMA_KEY_GREEN)
+	for slot in p.find_children("WorldArtSlot", "PanelContainer", true, false):
+		if not slot.has_meta("video"):
+			continue
+		var r := HomeStyle.art("RegionHero")   # empty overlay over the world art: the video, then its still
+		slot.add_child(r)
+		play_hero_video(p, r, region_video, load(REGION_VIDEO_DIR + "new_region_scrubby_still.png"), Vector2.ZERO, CHROMA_KEY_MAGENTA)
+		if r.get_child_count() == 0:
+			slot.remove_child(r)
+			r.free()
 
-## SB-VIDEO-006/007/008: one keyed VideoStreamPlayer over hero art `h` (its own texture hidden while
+## SB-VIDEO-006..009, SB-POLISH-011B: one keyed VideoStreamPlayer over hero art `h` (its own texture hidden while
 ## it plays), then `h` holds the keyed last frame `still` at `size`. A stream that is missing or
 ## does not start leaves `h` exactly as built. The decoder is freed when it finishes or the
 ## popup closes; it never blocks the rows or the CTA (mouse ignored, no input / economy touched).
@@ -382,6 +396,8 @@ static func world_unlock(event: Dictionary, reduced: bool):
 	a.stretch_mode = TextureRect.STRETCH_KEEP_ASPECT_COVERED
 	a.mouse_filter = Control.MOUSE_FILTER_IGNORE
 	slot.add_child(a)
+	if not reduced:
+		slot.set_meta("video", "new_region")   # SB-VIDEO-009: played by start_motion
 	if not String(event.get("subtitle", "")).is_empty():
 		p.add_body_line(String(event["subtitle"]), "WorldSubtitle", BasePopup.ROYAL_EDGE, 34)
 	p.add_body_line(UiText.t("CEREMONY_WORLD_BODY"), "WorldBody", BasePopup.INK, 28)

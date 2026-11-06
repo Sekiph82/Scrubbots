@@ -36,6 +36,13 @@ const SB_BUNDLE_ART := "res://assets/ui/final/shop/shop_scrub_bucks_bundle.png"
 const ShopScreen = preload("res://scripts/ui/shop/shop_screen.gd")
 const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
 const CharacterMotion = preload("res://scripts/ui/feel/character_motion.gd")
+const MetaCeremonies = preload("res://scripts/ui/ceremony/meta_ceremonies.gd")
+## SB-POLISH-011B: the owner's magenta-keyed Flow Need a Hand Scrubby (popups/need_a_hand_video/
+## PROVENANCE.md): thinks with a "?", thumbs-up, helping wave; still = keyed last frame (start pose).
+const NAH_VIDEO_DIR := "res://assets/ui/final/popups/need_a_hand_video/"
+const NAH_VIDEO_SIZE := Vector2(180, 160)
+## Injectable for tests (null = the CharacterMotion `help` tween, as on failure).
+static var need_a_hand_video: VideoStream = load(NAH_VIDEO_DIR + "need_a_hand_scrubby.ogv")
 
 ## M43-C008 (SB-M43-108): the active robot's approved help pose (Scrubby default / fallback).
 func _help_pose() -> String:
@@ -514,6 +521,7 @@ func _on_booster_action(id: String, ctx: Dictionary, p) -> void:
 ## only saves one charge for the next attempt; nothing executes on the terminal board.
 ## Top-right X / Back closes with no effect; there is no NO THANKS.
 ## SB-POLISH-011: the helper robot slides in + waves (CharacterMotion `help`); `reduced` = static.
+## SB-POLISH-011B: FULL with Scrubby as helper plays the Flow video once instead, then holds its still.
 func open_need_a_hand(offer: Dictionary, reduced := false):
 	if _economy == null or _stack == null or not bool(offer.get("show", false)):
 		return null
@@ -556,7 +564,10 @@ func open_need_a_hand(offer: Dictionary, reduced := false):
 		p.free()
 		return null
 	_refresh_nah(p)
-	CharacterMotion.play(scrubby, "help", reduced)
+	if not reduced and _help_pose() == LIFE_HERO_ART:
+		MetaCeremonies.play_hero_video(p, scrubby, need_a_hand_video, load(NAH_VIDEO_DIR + "need_a_hand_scrubby_still.png"), NAH_VIDEO_SIZE, MetaCeremonies.CHROMA_KEY_MAGENTA)
+	if scrubby.get_child_count() == 0:   # other robots, Reduced or a video that did not start
+		CharacterMotion.play(scrubby, "help", reduced)
 	return p
 
 ## One self-contained booster card; its two CTAs are popup actions placed inside it.

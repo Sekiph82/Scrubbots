@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""SB-VIDEO-001/002/005/006/007/008: Results WIN / LOSE, Level Intro Scrubby, Gift Meter box, Collection set complete
-badge and Welcome back Scrubby videos from the owner's Flow masters.
+"""SB-VIDEO-001/002/005/006/007/008/009, SB-POLISH-011B: Results WIN / LOSE, Level Intro Scrubby, Gift Meter box,
+Collection set complete badge, Welcome back, New region and Need a Hand Scrubby videos from the owner's Flow masters.
 
 For each master (720x1280, magenta chroma background) this crops every frame to the robot's
 bounding box over ALL frames plus a margin, encodes Theora .ogv (magenta kept; the Results
@@ -15,7 +15,7 @@ frame (the open glowing box the popup holds after playback).
 
 set_complete: magenta like results, but a fixed square crop (badge + star burst) with the same soft
 edge fade (chroma_key_magenta.gdshader edge_fade uniform) and the LAST frame (glowing badge) as still.
-welcome_back: exactly like results (bbox crop, no fade) except the still is the LAST frame.
+welcome_back, new_region, need_a_hand: exactly like results (bbox crop, no fade) except the still is the LAST frame.
 
 Usage: python tools/build_result_scrubby_videos.py <flow_videos dir> [results|level_start|gift]
   results      result_scrubby_{win,lose}_master.mp4 -> assets/ui/final/popups/videos/ (default)
@@ -23,6 +23,8 @@ Usage: python tools/build_result_scrubby_videos.py <flow_videos dir> [results|le
   gift         gift_{box,crate}_opening_master.mp4 -> assets/ui/final/rewards/gift_videos/
   set_complete set_complete_master.mp4 -> assets/ui/final/rewards/set_complete_video/
   welcome_back welcome_back_master.mp4 -> assets/ui/final/popups/welcome_video/
+  new_region   new_region_master.mp4 -> assets/ui/final/popups/new_region_video/
+  need_a_hand  need_a_hand_master.mp4 -> assets/ui/final/popups/need_a_hand_video/
 """
 import hashlib
 import subprocess
@@ -88,11 +90,30 @@ SETS = {
                       "to ~#E337CA (min(R,B)-G >= 140). 720x1280, 24 fps, 190 frames. The MP4 master stays in the",
                       "owner checkout (`flow_videos/`, not committed) and is read-only.", "",
                       "Built by `python tools/build_result_scrubby_videos.py flow_videos welcome_back` (ffmpeg libtheora,"]),
+    "new_region": (Path("assets/ui/final/popups/new_region_video"),
+                   [("new_region", "new_region_master.mp4", "new_region_scrubby")],
+                   ["# New region unlock Scrubby video: provenance (SB-VIDEO-009)", "",
+                    "Owner Flow video (Google Flow, Veo 3.1 Lite): Scrubby looks into the distance, points, jumps,",
+                    "does a fast full spin (the sprout is lost to motion blur for a few frames around 116-136) and",
+                    "lands in a ready pose with golden sparkles, on a magenta chroma background that drifts from",
+                    "~#FA05FA to ~#E126D7 (min(R,B)-G >= 170). Generic (not world-specific). 720x1280, 24 fps, 190 frames. The MP4",
+                    "master stays in the owner checkout (`flow_videos/`, not committed) and is read-only.", "",
+                    "Built by `python tools/build_result_scrubby_videos.py flow_videos new_region` (ffmpeg libtheora,"]),
+    "need_a_hand": (Path("assets/ui/final/popups/need_a_hand_video"),
+                    [("need_a_hand", "need_a_hand_master.mp4", "need_a_hand_scrubby")],
+                    ["# Need a Hand Scrubby video: provenance (SB-POLISH-011B)", "",
+                     "Owner Flow video (Google Flow, Veo 3.1 Lite): Scrubby with a cyan \"?\" thinks, gets an idea,",
+                     "gives a thumbs-up, waves to help and returns to the start pose with the \"?\", on a magenta",
+                     "chroma background that drifts from ~#FA02FA to ~#E637CB (min(R,B)-G >= 140). 720x1280, 24 fps, 190 frames; frames",
+                     "0-181 are used (the last 8 frames dim the eyes and fade the \"?\" out, so the hold pose is frame",
+                     "181). The MP4 master stays in the owner checkout (`flow_videos/`, not committed) and is read-only.", "",
+                     "Built by `python tools/build_result_scrubby_videos.py flow_videos need_a_hand` (ffmpeg libtheora,"]),
 }
 W, H = 720, 1280
 MARGIN = 16
 KEY_LO, KEY_HI = 0.15, 0.45   # keep in sync with chroma_key_magenta.gdshader / chroma_key_green.gdshader
-TRIM = {"set_complete": 182}  # frames kept: the master's last 8 frames dissolve the wings and turn the gold copper
+TRIM = {"set_complete": 182,  # frames kept: the master's last 8 frames dissolve the wings and turn the gold copper
+        "need_a_hand": 182}   # the last 8 frames dim the eyes and fade the "?" out
 EDGE = 0.06                   # gift / set_complete edge fade (UV fraction per side), keep in sync with the shaders
 
 
@@ -160,7 +181,7 @@ def main(src: Path, which: str) -> None:
     rows = []
     gift = which == "gift"
     edge = EDGE if which == "set_complete" else 0.0
-    last = which in ("gift", "set_complete", "welcome_back")
+    last = which in ("gift", "set_complete", "welcome_back", "new_region", "need_a_hand")
     for name, master_name, stem, *fixed in items:
         master = src / master_name
         f = frames(master)[:TRIM.get(name)]
