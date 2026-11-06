@@ -109,3 +109,5 @@ A production provider (a real sink) may only be switched on when all of these ho
 ## Schema and fail-safe tests (SB-M56-016)
 
 `tests/m56_analytics_taxonomy.gd` checks every event declaration (types, enums, fallbacks, forbidden names), drops malformed events without crashing, exercises every event through its real call site (except `retention_day` / `assist_fail_closed`, covered at service level), scans all emitted events for PII, guards duplicates (session end, level exit, replayed pack receipts, set / Master once, late ad callbacks) and proves an offline provider (a sink that drops everything) never grows the queue past one batch.
+
+> Events fire when the wallet change or grant happens, not when the surrounding save commits. A save failure followed by a retry can emit an event twice (analytics overcount only; balances are never affected).
