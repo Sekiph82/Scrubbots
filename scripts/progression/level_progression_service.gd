@@ -138,6 +138,10 @@ func target_challenge_for(n: int) -> float:
 func describe(n: int) -> Dictionary:
 	return _progression.describe(n)
 
+## Difficulty progression config version (analytics metadata, SB-M56-003).
+func model_version() -> int:
+	return _progression.model_version()
+
 # ------------------------------------------------------ snapshot / import ----
 
 ## Immutable versioned snapshot for M40 persistence.

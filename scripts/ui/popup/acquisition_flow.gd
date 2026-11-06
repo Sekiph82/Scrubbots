@@ -68,6 +68,8 @@ var _actions
 var _shop
 var _reward_waits: Dictionary = {}   ## rewarded token -> {popup, pending, kind, host, booster}
 var last_result: Dictionary = {}     ## diagnostic: last committed/refused acquisition result
+## SB-M56-005/006: AppState AnalyticsService (bound by the app root; null = no analytics).
+var analytics = null
 
 func bind(stack, economy, actions, shop) -> void:
 	_stack = stack
@@ -560,6 +562,7 @@ func open_need_a_hand(offer: Dictionary, reduced := false):
 	p.add_body_line(UiText.t("NAH_NO_GUARANTEE"), "NoGuarantee", BasePopup.INK, 22)
 	p.add_body_line("", "Status", BasePopup.INK, 26)
 	p.action_selected.connect(_on_nah_action.bind(p))
+	p.closed.connect(func(_r): _track("assist_dismissed", {"level": int(p.context["level"]), "acquired": bool(p.context.get("acquired", false))}))
 	if not _stack.push(p):
 		p.free()
 		return null
@@ -648,6 +651,7 @@ func _on_nah_action(action: String, _ctx: Dictionary, p) -> void:
 		return
 	var r: Dictionary = _actions.buy_booster_charge(id)
 	last_result = r
+	_track_acquire(p, id, "sb", "need_a_hand", bool(r.get("ok", false)))
 	if r.get("ok", false):
 		_status(p, UiText.t("NAH_BOUGHT", [UiText.t("BOOSTER_NAME_" + id.to_upper())]))
 	elif String(r.get("reason", "")) == "insufficient_sb":
@@ -702,6 +706,9 @@ func _on_rewarded_resolved(token: String, _product: String, result: Dictionary) 
 ## UI after an authoritative rewarded result. A booster grant then proceeds ONLY through
 ## the host's canonical legal execution; an illegal/refused use keeps the granted charge.
 func _apply_reward_outcome(p, result: Dictionary, wait: Dictionary) -> void:
+	if String(wait.get("kind", "")) != "heart":
+		_track_acquire(p, String(wait.get("booster", "")), "rewarded",
+			"need_a_hand" if String(wait.get("kind", "")) == "charge" else "booster_popup", bool(result.get("ok", false)))
 	if not result.get("ok", false):
 		_status(p, UiText.t("REWARDED_NO_GRANT", [UiText.reason("REWARDED_REASON_", String(result.get("reason", "failed")))]))
 		_refresh(p)
@@ -736,6 +743,16 @@ func _apply_reward_outcome(p, result: Dictionary, wait: Dictionary) -> void:
 			p.context["auto_use"] = true
 	_status(p, UiText.t("BOOSTER_CHARGE_SAVED"))
 	_refresh(p, true)
+
+func _track(event: String, params: Dictionary) -> void:
+	if analytics != null:
+		analytics.track(event, params)
+
+## One booster acquisition attempt; a Need a Hand success marks the popup "acquired".
+func _track_acquire(p, booster: String, path: String, source: String, ok: bool) -> void:
+	if ok and source == "need_a_hand":
+		p.context["acquired"] = true
+	_track("booster_acquire", {"booster": booster, "path": path, "source": source, "ok": ok})
 
 func _refresh(p, rebuild: bool = false) -> void:
 	if p.popup_id == "life":

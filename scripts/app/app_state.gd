@@ -41,6 +41,7 @@ const FtueConfig = preload("res://scripts/app/ftue_config.gd")
 const FtueDirector = preload("res://scripts/app/ftue_director.gd")
 const RewardedGrantService = preload("res://scripts/economy/rewarded_grant_service.gd")
 const FeatureUnlocks = preload("res://scripts/progression/feature_unlocks.gd")
+const AnalyticsService = preload("res://scripts/app/analytics_service.gd")
 
 ## M44 owner V03: the ONE ledger tx of the new-profile starter booster grant.
 const STARTER_TX := "ftue_starter_boosters:v1"
@@ -61,6 +62,8 @@ var is_blocked: bool = false
 var actions: ProductionActionFacade
 ## M43-C004 same-level failure counter / Need a Hand choice (session-scoped, not saved).
 var assist: FailureAssistanceService
+## SB-M56-001..006: the ONE analytics seam (consent-gated, NullSink by default; write-only).
+var analytics: AnalyticsService
 var _dirty: bool = false
 var _catalog_orders: Array = []
 var _builtin_catalog = null
@@ -101,6 +104,10 @@ func _init(save_path: String = CANONICAL_SAVE_PATH, clock: Callable = Callable()
 	actions.feature_gate = Callable(self, "feature_unlocked")
 	economy.orders.bind_context(Callable(self, "orders_context"))
 	assist = FailureAssistanceService.new()
+	var wall: Callable = clock if clock.is_valid() else func(): return int(Time.get_unix_time_from_system())
+	analytics = AnalyticsService.new("user://analytics_v1.json" if save_path == CANONICAL_SAVE_PATH else save_path.get_basename() + "_analytics.json",
+		wall, day_provider)
+	assist.assistance_event.connect(_on_assistance_event)
 	unlocks = FeatureUnlocks.new()
 	unlocks.load_config()
 	if test_unlock_all:
@@ -135,6 +142,13 @@ func _builtin_ids() -> Array:
 	var cat = LevelCatalog.new()
 	cat.load_manifest()
 	return cat.get_entries_ordered().map(func(e): return e.id)
+
+## SB-M56-005: Need a Hand shown / fail-closed (the assistance service's M56 seam).
+func _on_assistance_event(kind: String, d: Dictionary) -> void:
+	if kind == "assistance_shown":
+		analytics.track("assist_shown", {"level": d["level"], "boosters": d["boosters"]})
+	elif kind == "assistance_fail_closed":
+		analytics.track("assist_fail_closed", {"level": d["level"], "reason": d["reason"]})
 
 func _on_content_changed() -> void:
 	_catalog_orders.clear()

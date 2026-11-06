@@ -39,6 +39,8 @@ var config_error := ""
 
 var _level := 0
 var _count := 0
+## SB-M56-005: last level Need a Hand was shown on (session-scoped; analytics "assisted").
+var shown_level := 0
 
 func _init(path: String = DEFAULT_PATH) -> void:
 	config_error = _load(path)
@@ -129,6 +131,7 @@ func is_due(n: int) -> bool:
 	return n == trigger or (repeat_every > 0 and (n - trigger) % repeat_every == 0)
 
 func note_shown(level: int, boosters: Array) -> void:
+	shown_level = level
 	_emit("assistance_shown", {"level": level, "boosters": boosters.duplicate()})
 
 func note_fail_closed(level: int, reason: String) -> void:

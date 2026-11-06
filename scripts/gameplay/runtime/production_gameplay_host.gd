@@ -189,6 +189,10 @@ var _owns_acquisition := false
 ## popup resumes exactly what the modal suspended, never a system suspension).
 var _paused_by_modal := false
 var _exited := false
+## SB-M56-003/004: attempt analytics context (AppState path only; write-only).
+var _an_attempt := {}
+var _an_retry := {}
+var _an_terminal_t := -1
 ## Pause -> Home confirmed: the applied attempt consequence (see exit_to_home).
 signal home_requested(result: Dictionary)
 ## Diagnostic: last Pause-flow outcome ("resume" | "restart" | "restart_failed" | "home").
@@ -459,6 +463,10 @@ func build() -> bool:
 
 	_apply_default_speed()
 	_wire_controls()
+	if _actions != null:
+		_actions.action_committed.connect(_on_booster_analytics.bind(true))
+		_actions.action_refused.connect(_on_booster_analytics.bind(false))
+	_begin_attempt_analytics("launch")
 	_built = true
 	return true
 
@@ -534,6 +542,10 @@ func retry() -> bool:
 	if not _built:
 		return false
 	cancel_booster_proof()
+	# SB-M56-003: Retry from Results follows a terminal; from Pause it ends this attempt (restart).
+	var from_results: bool = _economy_terminal_done
+	_an_retry = {"entry": "retry_results" if from_results else "retry_pause",
+		"end": {} if from_results else level_end_params("restart")}
 	return RetryCoordinator.attempt({
 		"scheduler": _scheduler,
 		"slots": _slots,
@@ -614,6 +626,11 @@ func _on_retry_restored() -> void:
 		_screen.refresh_slot_snapshot(_slots.snapshot(), false)
 		_screen.set_paused(_runtime != null and _runtime.is_user_paused())
 	_refresh_hud()
+	if not _an_retry.is_empty():
+		if not (_an_retry["end"] as Dictionary).is_empty():
+			_track("level_end", _an_retry["end"])
+		_begin_attempt_analytics(_an_retry["entry"])
+		_an_retry = {}
 
 ## Connect the live haptics controller to the authoritative committed seams exactly
 ## once. Idempotent: a rebuild/rebind that re-runs this never stacks duplicate
@@ -656,6 +673,10 @@ func _on_activation_event(_column: int, ok: bool, _error: String) -> void:
 	# re-set the same true state, no economy mutation.
 	if ok and _economy != null:
 		_economy.streak.on_gameplay_started()
+	if ok and not _an_attempt.is_empty() and not _an_attempt["acted"]:
+		_an_attempt["acted"] = true
+		_track("level_first_action", {"level": progression_level, "attempt": _an_attempt["attempt"],
+			"elapsed": app_state.analytics.bucket("duration_s", app_state.analytics.now() - int(_an_attempt["t0"]))})
 
 ## Exact-once terminal latch handler: stop new dispatch cadence + travel (distinct terminal
 ## stop, not a user pause), block new M26 assignments, and block new supply-front input. No
@@ -721,6 +742,64 @@ func _drive_economy_terminal(status) -> void:
 			TerminalRewardReceipt.capture(_progression, _economy),
 			last_first_clear_result if status == CompletionEvaluator.WON else {}, saved, catchup)
 		_record_assistance(String(status), progression_attempt)
+		_track("level_end", level_end_params("won" if status == CompletionEvaluator.WON else "lost"))
+		if app_state != null:
+			_an_terminal_t = app_state.analytics.now()
+
+# ------------------------------------------------------- M56 analytics --
+
+## One analytics event through the AppState service (no AppState = debug harness: nothing).
+func _track(event: String, params: Dictionary) -> void:
+	if app_state != null and app_state.analytics != null:
+		app_state.analytics.track(event, params)
+
+## Level identity for analytics: number, cadence class / slot and the progression model version.
+func _level_meta() -> Dictionary:
+	var d: Dictionary = app_state.progression.describe(progression_level)
+	return {"level": progression_level, "difficulty": String(d["class"]), "cadence_slot": int(d["slot"]),
+		"difficulty_model": app_state.progression.model_version()}
+
+## A new attempt began (launch / Retry). attempt = committed WON/LOST terminals on this
+## level (PlayerRecords) + 1; replays count from 1.
+func _begin_attempt_analytics(entry: String) -> void:
+	if app_state == null or app_state.analytics == null or _economy == null:
+		return
+	var an = app_state.analytics
+	var prog := is_progression_attempt()
+	var n := 1
+	if prog and _economy.records.get_value("attempt_level") == progression_level:
+		n = _economy.records.get_value("attempts_on_level") + 1
+	_an_attempt = {"t0": an.now(), "n": n, "attempt": an.bucket("attempt", n), "progression": prog, "acted": false}
+	var p := _level_meta()
+	p.merge({"progression": prog, "entry": entry, "attempt": _an_attempt["attempt"]})
+	if entry == "retry_results" and _an_terminal_t >= 0:
+		p["retry_latency"] = an.bucket("duration_s", an.now() - _an_terminal_t)
+	_track("level_start", p)
+
+## level_end params for this attempt (outcome won / lost / exit / restart). {} without context.
+func level_end_params(outcome: String) -> Dictionary:
+	if _an_attempt.is_empty():
+		return {}
+	var an = app_state.analytics
+	var art: int = _board.get_artwork_cell_count() if _board != null else 0
+	var cleared: int = art - _board.count_cells_by_state(BoardState.CellState.ACTIVE) if art > 0 else 0
+	var p := _level_meta()
+	p.merge({"outcome": outcome, "progression": _an_attempt["progression"], "attempt": _an_attempt["attempt"],
+		"first_attempt": _an_attempt["n"] == 1, "duration": an.bucket("duration_s", an.now() - int(_an_attempt["t0"])),
+		"progress": an.bucket("progress_pct", int(cleared * 100.0 / art) if art > 0 else 0),
+		"boosters_used": an.bucket("count", _attempt_boosters),
+		"assisted": _assist != null and _assist.shown_level == progression_level})
+	return p
+
+## SB-M56-006: every booster activation through this host's facade (committed or refused).
+func _on_booster_analytics(action: String, r: Dictionary, ok: bool) -> void:
+	if not BoosterInventory.BOOSTERS.has(action) or _an_attempt.is_empty():
+		return
+	var p := {"booster": action, "ok": ok, "reason": "ok" if ok else String(r.get("reason", "")),
+		"level": progression_level, "attempt": _an_attempt["attempt"], "difficulty": _level_meta()["difficulty"]}
+	if r.get("paid_with") is String:
+		p["paid_with"] = r["paid_with"]
+	_track("booster_use", p)
 
 # ------------------------------------------------------- M43-C004 Need a Hand --
 
@@ -1339,6 +1418,7 @@ func exit_to_home() -> Dictionary:
 	if _completion != null and _completion.is_terminal():
 		return {"ok": false, "reason": "terminal"}
 	_exited = true
+	_track("level_end", level_end_params("exit"))
 	var c := attempt_consequence()
 	if _economy != null:
 		if bool(c["gameplay_started"]):

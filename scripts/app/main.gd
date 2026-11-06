@@ -134,6 +134,7 @@ func _boot() -> void:
 	level_intro_enabled = boot_level_intro_override == 1 or (boot_level_intro_override == -1 and path == AppState.CANONICAL_SAVE_PATH)
 	nav = NavigationController.new()
 	nav.settings_changed.connect(_on_nav_settings_changed)
+	app_state.analytics.start_session("cold_start")
 
 func _ready() -> void:
 	_modals = ModalStack.new()
@@ -163,6 +164,7 @@ func _ready() -> void:
 	_acq = AcquisitionFlow.new()
 	if app_state != null and app_state.economy != null:
 		_acq.bind(_modals, app_state.economy, app_state.actions, shop)
+		_acq.analytics = app_state.analytics
 	# SB-M43-032 / 036: Home Heart + -> canonical Life; Home SB + -> canonical Shop intent.
 	_home.hearts_purchase_requested.connect(func(): open_life("home_heart_plus"))
 	_home.scrub_bucks_purchase_requested.connect(func(): _acq.open_scrub_bucks("home_sb_plus"))
@@ -948,9 +950,12 @@ func handle_back() -> String:
 	# Home popups (Gift Bar / Cards Exchange / Daily) close before anything else.
 	if nav.current() == NavigationController.Route.HOME and not nav.is_settings_open() 			and _home != null and _home.close_top_popup():
 		return "close_popup"
+	# SB-M56-003: a pre-action back exit ends the attempt (read before the host is released).
+	var exit_end: Dictionary = _gameplay_host.level_end_params("exit") if pre_action else {}
 	var action: String = nav.back(pre_action)
 	if action == "home" and pre_action:
 		app_state.economy.streak.on_pre_action_exit()
+		app_state.analytics.track("level_end", exit_end)
 	return action
 
 func _unhandled_input(event: InputEvent) -> void:
@@ -969,10 +974,16 @@ func _notification(what: int) -> void:
 			handle_back()
 		NOTIFICATION_APPLICATION_PAUSED:
 			flush_lifecycle("application_paused")
+			if app_state != null:
+				app_state.analytics.end_session("background")
 		NOTIFICATION_APPLICATION_RESUMED:
+			if app_state != null:
+				app_state.analytics.start_session("foreground")
 			if app_state != null and app_state.economy != null and not app_state.is_blocked and app_state.economy.returns.on_active()["opened"]:
 				request_home_ceremonies()
 		NOTIFICATION_APPLICATION_FOCUS_OUT:
 			flush_lifecycle("focus_out")
 		NOTIFICATION_WM_CLOSE_REQUEST:
 			flush_lifecycle("close_request")
+			if app_state != null:
+				app_state.analytics.end_session("close")
