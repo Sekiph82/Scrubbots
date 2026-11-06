@@ -982,7 +982,7 @@ func _exit_tree() -> void:
 		feel.unbind()
 
 func _on_permissions_result(_permission: String, granted: bool) -> void:
-	_track("notify_permission", {"step": "os_granted" if granted else "os_denied"})
+	_track("notification_prompt", {"step": "os_granted" if granted else "os_denied"})
 
 ## SB-M56-007..012: one analytics event through AppState (write-only; no AppState = nothing).
 func _track(event: String, params: Dictionary) -> void:

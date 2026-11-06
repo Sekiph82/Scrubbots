@@ -230,7 +230,7 @@
         "on": {"type": "bool", "required": true}
       }
     },
-    "notify_permission": {
+    "notification_prompt": {
       "task": "SB-M56-012",
       "params": {
         "step": {"type": "enum", "values": ["explainer_shown", "allowed", "declined", "os_granted", "os_denied"], "required": true}

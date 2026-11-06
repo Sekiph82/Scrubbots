@@ -684,7 +684,7 @@ static func open_notification_permission(stack, app) -> BasePopup:
 	p.add_action("allow", UiText.t("NOTIFY_PERMISSION_ALLOW"), "primary", true)
 	p.add_action("not_now", UiText.t("NOTIFY_PERMISSION_NOT_NOW"), "secondary", true)
 	p.closed.connect(func(reason):
-		app.analytics.track("notify_permission", {"step": "allowed" if reason == "action:allow" else "declined"})
+		app.analytics.track("notification_prompt", {"step": "allowed" if reason == "action:allow" else "declined"})
 		if reason == "action:allow":
 			app.economy.notify_permission.allow()
 		else:
@@ -693,7 +693,7 @@ static func open_notification_permission(stack, app) -> BasePopup:
 	if not stack.push(p):
 		p.free()
 		return null
-	app.analytics.track("notify_permission", {"step": "explainer_shown"})
+	app.analytics.track("notification_prompt", {"step": "explainer_shown"})
 	return p
 
 static func refresh_notifications(p: BasePopup, app) -> void:

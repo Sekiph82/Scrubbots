@@ -705,7 +705,7 @@ func _notification_events() -> void:
 	await _boot()
 	await _tour_notifications()
 	_ok(_params("notify_toggle") == [{"category": "all", "on": true}, {"category": "daily", "on": _eco().notify.categories["daily"]}], "REMINDERS ON + one category toggle: %s" % str(_params("notify_toggle")))
-	_ok(_params("notify_permission").map(func(p): return p["step"]) == ["explainer_shown", "allowed", "os_denied"], "explainer shown -> Allow -> OS denied: %s" % str(_params("notify_permission")))
+	_ok(_params("notification_prompt").map(func(p): return p["step"]) == ["explainer_shown", "allowed", "os_denied"], "explainer shown -> Allow -> OS denied: %s" % str(_params("notification_prompt")))
 	_complete("notification_events")
 
 ## 016: a provider that is offline (drops every batch) never blocks or grows the queue.
