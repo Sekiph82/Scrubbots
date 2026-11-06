@@ -1,9 +1,11 @@
 extends SceneTree
-## SB-M56-001..006 — analytics taxonomy V1 evidence. The versioned catalogue
+## SB-M56-001..010, 012..016 — analytics taxonomy V1 evidence. The versioned catalogue
 ## (data/config/analytics_taxonomy_v1.json) + AnalyticsService (consent gate, schema
 ## validation, NullSink default / MemorySink here, batching, local retention markers), and
 ## the real call sites: app root session lifecycle, ProductionGameplayHost level funnel /
-## booster use, FailureAssistanceService + AcquisitionFlow Need a Hand / booster acquisition.
+## booster use, FailureAssistanceService + AcquisitionFlow Need a Hand / booster acquisition,
+## wallet sources / sinks, Hearts gate, packs / Collection / robots, Home navigation, Shop,
+## rewarded offers / requests / results (provider double), reminders + permission, deep links.
 ## Real app root (main.tscn) on throw-away save paths only (boot_save_path_override).
 ##
 ## Run: godot --headless --path . -s res://tests/m56_analytics_taxonomy.gd
@@ -14,6 +16,10 @@ const AppState = preload("res://scripts/app/app_state.gd")
 const AnalyticsService = preload("res://scripts/app/analytics_service.gd")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
 const ProviderDouble = preload("res://tests/support/rewarded_provider_double.gd")
+const RewardedAdsScreen = preload("res://scripts/ui/daily/rewarded_ads_screen.gd")
+const ProfileScreens = preload("res://scripts/ui/profile/profile_screens.gd")
+const NotificationPermission = preload("res://scripts/economy/notification_permission.gd")
+const PendingPackQueue = preload("res://scripts/collection/pending_pack_queue.gd")
 const R = NavigationController.Route
 const T0 := 1_900_000_000
 const LEVEL := 2
@@ -22,7 +28,8 @@ var EXPECTED_CASES := [
 	"config_schema", "defaults_null_sink_consent_off", "consent_off_real_paths", "invalid_dropped",
 	"batching", "retention_markers", "consent_persist_revoke", "session_events", "level_funnel",
 	"pause_restart_and_exit", "assistance", "booster_acquire_rewarded", "booster_use",
-	"no_economy_change", "pii_scan",
+	"economy_events", "collection_robot_events", "navigation_events", "ads_store_events",
+	"notification_events", "provider_offline", "no_economy_change", "pii_scan",
 ]
 
 var _fail := 0
@@ -57,6 +64,12 @@ func _initialize() -> void:
 	await _assistance()
 	await _booster_acquire_rewarded()
 	await _booster_use()
+	await _economy_events()
+	await _collection_robot_events()
+	await _navigation_events()
+	await _ads_store_events()
+	await _notification_events()
+	_provider_offline()
 	await _no_economy_change()
 	_pii_scan()
 	_shutdown()
@@ -183,14 +196,21 @@ func _config_schema() -> void:
 			if p.has("fallback") and not (p["values"] if p.has("values") else _cfg["enums"][p["enum"]]).has(p["fallback"]):
 				bad.append("%s.%s fallback" % [ev, k])
 	_ok(bad.is_empty(), "every param is int/bool/enum/enum_list, no forbidden (PII) name, enums + fallbacks resolve: %s" % str(bad))
-	_ok(tasks.keys().size() == 5 and not tasks.has("SB-M56-001") and tasks.has("SB-M56-002") and tasks.has("SB-M56-006"), "events cover SB-M56-002..006: %s" % str(tasks.keys()))
+	var want: Array = ["SB-M56-002", "SB-M56-003", "SB-M56-004", "SB-M56-005", "SB-M56-006", "SB-M56-007", "SB-M56-008", "SB-M56-009", "SB-M56-010", "SB-M56-012"]
+	_ok(tasks.keys().size() == want.size() and want.all(func(t): return tasks.has(t)), "events cover SB-M56-002..010 + 012: %s" % str(tasks.keys()))
 	_ok(not types.has("string"), "no free-text param type exists")
+	var tax_doc := FileAccess.get_file_as_string("res://" + String(_cfg["doc"]))
+	var inv_doc := FileAccess.get_file_as_string("res://docs/PRIVACY_DATA_INVENTORY.md")
+	var undocumented: Array = (_cfg["events"] as Dictionary).keys().filter(func(ev): return not (tax_doc.contains("`%s`" % ev) and inv_doc.contains("`%s`" % ev)))
+	_ok(undocumented.is_empty(), "every event is listed in the taxonomy doc and the privacy inventory: missing %s" % str(undocumented))
 	var an := _svc("cfg", [0])
 	var bucket_ok := true
 	for kind in {"duration_s": "duration", "attempt": "attempt", "count": "count", "progress_pct": "progress"}:
 		var labels: Array = (_cfg["buckets"][kind] as Array).map(func(e): return e[1])
 		bucket_ok = bucket_ok and labels == _cfg["enums"][{"duration_s": "duration", "attempt": "attempt", "count": "count", "progress_pct": "progress"}[kind]]
-	_ok(bucket_ok and an.bucket("duration_s", 29) == "lt_30s" and an.bucket("duration_s", 30) == "30s_2m" and an.bucket("duration_s", 99999) == "gt_60m"
+	bucket_ok = bucket_ok and (_cfg["buckets"]["amount"] as Array).map(func(e): return e[1]) == _cfg["enums"]["amount"]
+	_ok(bucket_ok and an.bucket("amount", 10) == "1_10" and an.bucket("amount", 500) == "101_500" and an.bucket("amount", 5001) == "gt_5000"
+		and an.bucket("duration_s", 29) == "lt_30s" and an.bucket("duration_s", 30) == "30s_2m" and an.bucket("duration_s", 99999) == "gt_60m"
 		and an.bucket("attempt", 1) == "1" and an.bucket("attempt", 5) == "4_5" and an.bucket("progress_pct", 100) == "90_100", "coarse buckets match their enums")
 	_complete("config_schema")
 
@@ -452,16 +472,24 @@ func _no_economy_change() -> void:
 	var runs: Array = []
 	for consent in [false, true]:
 		await _boot(consent)
+		_seed_packs()
 		await _play()
 		_first_action()
 		await _terminal(&"LOST")
 		await _retry_from_results()
 		_first_action()
 		await _terminal(&"WON")
+		# SB-M56-014: every M56-007..012 call site runs the same way with consent OFF and ON.
+		await _go_home()
+		await _tour_spend()
+		await _tour_collection()
+		await _tour_navigation()
+		await _tour_ads()
+		await _tour_notifications()
 		var eco: Dictionary = _eco().snapshot()
 		eco.erase("packs")   # the card-pack RNG state is seeded per fresh profile, not by play
 		runs.append([eco, _app().progression.snapshot()])
-	_ok(runs[0] == runs[1], "same play with consent OFF vs ON: identical economy + progression snapshots (differing: %s)" % str((runs[0][0] as Dictionary).keys().filter(func(k): return runs[0][0][k] != runs[1][0][k])))
+	_ok(runs[0] == runs[1], "same play + spends / pack / Collection / robots / navigation / ads / reminders with consent OFF vs ON: identical economy + progression snapshots (differing: %s)" % str((runs[0][0] as Dictionary).keys().filter(func(k): return runs[0][0][k] != runs[1][0][k])))
 	var before: Array = [_eco().snapshot(), _app().progression.snapshot()]
 	_expect_drops = true   # the 50 bogus level_end calls below are dropped on purpose
 	for i in range(50):
@@ -491,6 +519,208 @@ func _pii_scan() -> void:
 	var missing: Array = (_cfg["events"] as Dictionary).keys().filter(func(n): return not names.has(n) and n != "retention_day" and n != "assist_fail_closed")
 	_ok(missing.is_empty(), "every real-path event was emitted at least once: missing %s" % str(missing))
 	_complete("pii_scan")
+
+# ============================================================ SB-M56-007..012 ====
+
+func _go_home() -> void:
+	_root.get_modal_stack().clear("t")
+	_root.get_navigation().go(R.HOME, {"via": "results"})
+	await _settle()
+
+func _seed_packs() -> void:
+	_eco().packs.import_snapshot({"rng": {"hi": 7, "lo": 11}})
+
+func _press(p, id: String) -> void:
+	p.rearm()
+	p.get_action_button(id).pressed.emit()
+
+func _params(name: String) -> Array:
+	return _named(name).map(func(e): return e["params"])
+
+## 007: SB spends through the app facade + the zero-Heart gate on Home PLAY.
+func _tour_spend() -> void:
+	_eco().wallet.credit("scrub_bucks", 5000)
+	_eco().hearts.import_snapshot({"hearts": 3, "anchor": _now[0]})
+	_app().actions.buy_heart()
+	_app().actions.refill_hearts()
+	_app().actions.buy_current_level_2x(LEVEL + 1)
+	_app().actions.buy_booster_charge("tornado")
+	_eco().hearts.import_snapshot({"hearts": 0, "anchor": _now[0]})
+	_root.play_current_frontier()
+	_root.get_modal_stack().clear("t")
+	_eco().hearts.import_snapshot({"hearts": 5, "anchor": _now[0]})
+	await _settle()
+
+## 008: one earned standard pack opened (and replayed), every card added (15 sets + Master),
+## the next robot unlocked and equipped.
+func _tour_collection() -> void:
+	_seed_packs()
+	_eco().reward.grant("m56:pack", {"standard_card_packs": 1})
+	var id := PendingPackQueue.entry_id("m56:pack", "standard", 0)
+	_app().open_earned_pack(id)
+	_app().open_earned_pack(id)
+	for cid in _eco().collection.all_card_ids():
+		_eco().collection.add_card(cid)
+	_eco().wallet.credit("bot_parts", 250)
+	var u: Dictionary = _app().actions.unlock_next_robot()
+	_app().actions.equip_robot(String(u.get("robot_id", "")))
+	await _settle()
+	_root.get_modal_stack().clear("t")
+
+## 009: Home shortcuts / BottomNav / Settings / Help / deep link, and a refused launch.
+func _tour_navigation() -> void:
+	for id in ["collection", "daily", "shop"]:
+		_root._on_home_shortcut(id)
+		await _settle()
+		_root.get_modal_stack().clear("t")
+	_root._on_home_nav("robots")
+	await _settle()
+	_root.get_modal_stack().clear("t")
+	_root.open_settings()
+	await _settle()
+	_root.get_navigation().close_settings()
+	_root.open_help()
+	await _settle()
+	_root.get_modal_stack().clear("t")
+	_root.open_deep_link("tasks")
+	await _settle()
+	_root.get_modal_stack().clear("t")
+	_app().is_blocked = true
+	_root.launch_gameplay()
+	_app().is_blocked = false
+
+## 010: Life offer -> heart video cancelled (late duplicate ignored); Rewarded Ads slot 1 free
+## claim + slot 2 verified video.
+func _tour_ads() -> void:
+	var prov := ProviderDouble.new()
+	_eco().rewarded.set_provider(prov)
+	_eco().hearts.import_snapshot({"hearts": 4, "anchor": _now[0]})
+	var life = _root.open_life("t")
+	_press(life, "watch")
+	prov.deliver_last({"outcome": "cancelled"})
+	prov.deliver_last({"outcome": "completed", "verified": true})
+	await _settle()
+	_root.get_modal_stack().clear("t")
+	var ra = RewardedAdsScreen.open(_root.get_modal_stack(), _app())
+	_press(ra, "slot:1")
+	_press(ra, "slot:2")
+	prov.deliver_last({"outcome": "completed", "verified": true})
+	await _settle()
+	_root.get_modal_stack().clear("t")
+	_eco().hearts.import_snapshot({"hearts": 5, "anchor": _now[0]})
+
+## 012: REMINDERS ON -> explainer -> Allow -> OS answer; one category toggled.
+func _tour_notifications() -> void:
+	var np = _eco().notify_permission
+	np.platform = "Android"
+	np.granted_fn = func() -> bool: return false
+	np.request_fn = func() -> void: pass
+	var p = ProfileScreens.open_notifications(_root.get_modal_stack(), _app())
+	_press(p, "notify_all")
+	await _settle()
+	var x = _root.get_modal_stack().top()
+	if x != null and x.popup_id == "notification_permission":
+		_press(x, "allow")
+	await _settle()
+	on_request_permissions_result.emit(NotificationPermission.PERMISSION, false)
+	_press(p, "notify:daily")
+	await _settle()
+	_root.get_modal_stack().clear("t")
+
+func _economy_events() -> void:
+	print("[007 economy sources / sinks, Hearts gate]")
+	await _boot()
+	var changes: Array = []
+	_eco().wallet.changed.connect(func(r, d, t): changes.append([r, d, t]))
+	await _play()
+	_first_action()
+	await _terminal(&"WON")
+	await _go_home()
+	await _tour_spend()
+	var src: Array = _params("economy_source")
+	var snk: Array = _params("economy_sink")
+	_ok(changes.size() >= 6 and src.size() + snk.size() == changes.size(), "every wallet change is one economy event (%d changes)" % changes.size())
+	_ok(src.any(func(p): return p["source"] == "first_clear") and src.any(func(p): return p["source"] == "other" and p["amount"] == "1001_5000"),
+		"WON first clear -> source first_clear; untagged credit 5000 -> other / 1001_5000: %s" % str(src))
+	var spent := {}
+	for c in changes:
+		if c[1] < 0:
+			spent[c[2]] = -int(c[1])
+	var cfg = _eco().config
+	_ok(spent.get("heart_plus_one") == int(cfg.hearts_plus_one_sb()) and spent.get("heart_refill") == int(cfg.hearts_full_refill_sb_per_missing())
+		and spent.get("booster_buy") == int(cfg.booster_price("tornado")) and spent.has("speed_level"), "wallet tags carry the exact canonical prices: %s" % str(spent))
+	_ok(snk == ["heart_plus_one", "heart_refill", "speed_level", "booster_buy"].map(func(k): return {"currency": "scrub_bucks", "amount": _an().bucket("amount", int(spent[k])), "sink": k}),
+		"+1 Heart / refill / current-level 2x / booster charge -> sink + bucketed price: %s" % str(snk))
+	_ok(_params("hearts_empty") == [{"at": "home_play"}], "Home PLAY with 0 Hearts -> hearts_empty home_play")
+	_complete("economy_events")
+
+func _collection_robot_events() -> void:
+	print("[008 pack / Collection / robots]")
+	await _boot()
+	await _tour_collection()
+	var packs: Array = _params("pack_opened")
+	var rc: Dictionary = _app().commit_pack("standard", PendingPackQueue.entry_id("m56:pack", "standard", 0))
+	var cards: Array = rc["receipt"]["cards"]
+	var fresh: int = cards.filter(func(c): return c["is_new"]).size()
+	_ok(rc["replay"] and packs.size() >= 1 and packs[0]["kind"] == "standard" and packs[0]["new_cards"] == _an().bucket("count", fresh)
+		and packs[0]["duplicates"] == _an().bucket("count", cards.size() - fresh), "committed pack -> pack_opened with receipt counts: %s" % str(packs))
+	_ok(_named("pack_opened").size() == packs.size(), "replayed receipt (2x open_earned_pack + commit_pack) sends nothing more")
+	var sets: Array = _params("collection_set_complete").map(func(p): return p["set"])
+	sets.sort()
+	_ok(sets == range(1, 16) and _named("collection_master_complete").size() == 1, "15 sets complete once each + Master once: %s" % str(sets))
+	_ok(_params("robot_unlock") == [{"robot": 2}] and _params("robot_equip") == [{"robot": 2}], "next robot (roster #2) unlock + equip")
+	_ok(_params("economy_sink").any(func(p): return p["sink"] == "robot_unlock" and p["currency"] == "bot_parts")
+		and _params("economy_source").any(func(p): return p["source"] == "collection"), "robot unlock -> bot_parts sink; set rewards -> collection source")
+	_complete("collection_robot_events")
+
+func _navigation_events() -> void:
+	print("[009 navigation / Shop entry / launch error]")
+	await _boot()
+	await _tour_navigation()
+	var screens: Array = _params("screen_view").map(func(p): return p["screen"])
+	_ok(screens == ["collection", "daily", "shop", "robots", "settings", "help", "tasks"], "shortcuts / BottomNav / Settings / Help / deep link: %s" % str(screens))
+	_ok(_params("shop_open") == [{"source": "home_shop"}], "Shop shortcut -> shop_open home_shop")
+	_ok(_params("deep_link_open") == [{"dest": "tasks"}], "deep link -> deep_link_open tasks")
+	_ok(_params("launch_failed") == [{"reason": "APP_BLOCKED"}], "blocked launch -> launch_failed APP_BLOCKED")
+	_complete("navigation_events")
+
+func _ads_store_events() -> void:
+	print("[010 rewarded offer / request / result (provider double)]")
+	await _boot()
+	await _tour_ads()
+	_ok(_params("ad_offer_shown") == [{"placement": "life", "available": true}], "Life popup -> ad_offer_shown life available")
+	_ok(_params("ad_request") == [{"product": "heart", "ok": true, "reason": "ok"}, {"product": "daily_slot", "ok": true, "reason": "ok"}], "heart + daily slot requests: %s" % str(_params("ad_request")))
+	_ok(_params("ad_result") == [{"product": "heart", "outcome": "cancelled"}, {"product": "daily_slot", "outcome": "granted"}],
+		"cancelled heart (late duplicate ignored) + verified daily slot granted: %s" % str(_params("ad_result")))
+	_ok(_params("economy_source").any(func(p): return p["source"] == "rewarded_daily"), "Rewarded Ads daily grants -> source rewarded_daily")
+	_eco().rewarded.set_provider(null)
+	_eco().hearts.import_snapshot({"hearts": 4, "anchor": _now[0]})
+	_root.open_life("t")
+	_ok(_params("ad_offer_shown").back() == {"placement": "life", "available": false}, "production provider (no SDK) -> offer shown unavailable")
+	_root.get_modal_stack().clear("t")
+	_complete("ads_store_events")
+
+func _notification_events() -> void:
+	print("[012 reminders / permission explainer / OS result]")
+	await _boot()
+	await _tour_notifications()
+	_ok(_params("notify_toggle") == [{"category": "all", "on": true}, {"category": "daily", "on": _eco().notify.categories["daily"]}], "REMINDERS ON + one category toggle: %s" % str(_params("notify_toggle")))
+	_ok(_params("notify_permission").map(func(p): return p["step"]) == ["explainer_shown", "allowed", "os_denied"], "explainer shown -> Allow -> OS denied: %s" % str(_params("notify_permission")))
+	_complete("notification_events")
+
+## 016: a provider that is offline (drops every batch) never blocks or grows the queue.
+func _provider_offline() -> void:
+	print("[016 provider offline fail-safe]")
+	var an := _svc("off", [0])
+	an.sink = AnalyticsService.NullSink.new()
+	an.set_consent(true)
+	var peak := 0
+	for i in range(1000):
+		an.track("screen_view", {"screen": "home"})
+		peak = maxi(peak, an.queued())
+	an.flush()
+	_ok(peak < 20 and an.queued() == 0 and an.dropped == 0, "1000 events into an offline sink: queue peaks at %d (< batch 20), nothing kept" % peak)
+	_complete("provider_offline")
 
 # ------------------------------------------------------------------ ledger ----
 
