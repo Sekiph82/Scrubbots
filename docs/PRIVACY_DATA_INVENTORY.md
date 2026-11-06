@@ -57,7 +57,7 @@ here, not built.
 | Google Play Games Services (Saved Games, later Friends) | SB-M43-153..160, SB-M61 | Play Games player id, gamer profile (display name/avatar), save blobs in Google Drive app data. |
 | Apple Game Center + iCloud | SB-M43-153..160, SB-M61 | Game Center player id/alias; save data in the user's iCloud. |
 | Analytics provider | SB-M56 later / SB-M58-008 | Undecided. Events are already privacy-minimised (`docs/ANALYTICS_TAXONOMY_V1.md`); a provider adds its own identifiers. |
-| Local notifications plugin | SB-M43-171 | Undecided native plugin; local notifications only, no push server planned. |
+| Local notifications plugin | SB-M43-172 | Undecided native plugin; local notifications only, no push server planned. |
 
 ## 2. Data the game stores or sends (SB-M58-002)
 
@@ -114,7 +114,7 @@ params only, no ids or timestamps. In the current build no event is stored or se
 | Permission | Why | Status |
 |---|---|---|
 | `permissions/vibrate` | haptic feedback (Settings HAPTICS, default ON; `docs/M34_HAPTICS_DEVICE_VALIDATION.md`) | needed |
-| `permissions/post_notifications` | Android 13+ runtime permission, asked contextually when the player opts in to reminders | **owner decision**: the permission is requested but no notification is delivered yet (no local-notification plugin, SB-M43-171). Not a data-collection permission and not a Data safety item, but a reviewer may ask why it is requested. Options: keep (reminder opt-in flow already shipped), or drop it until delivery lands. Kept unchanged here. |
+| `permissions/post_notifications` | Android 13+ runtime permission, asked contextually when the player opts in to reminders | **owner decision**: the permission is requested but no notification is delivered yet (no local-notification plugin, SB-M43-172). Not a data-collection permission and not a Data safety item, but a reviewer may ask why it is requested. Options: keep (reminder opt-in flow already shipped), or drop it until delivery lands. Kept unchanged here. |
 
 No `INTERNET`, location, camera, microphone, contacts, storage, phone-state or account
 permission. Godot's export adds no other dangerous permission. Advertising ID permission
