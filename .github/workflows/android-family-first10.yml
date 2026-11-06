@@ -198,11 +198,11 @@ jobs:
           else
             echo "M50 verdict=FAIL (exact 4/4 summary missing)" | tee -a "$S"; fail=1
           fi
-          # M51 localization readiness: exact 4-case summary is mandatory.
-          if grep -qxF 'M51 localization readiness evidence: PASS (4/4 cases, 0 fail)' validate_logs/m51_localization_readiness.log 2>/dev/null; then
-            echo "M51 verdict=PASS (4/4)" | tee -a "$S"
+          # M51 localization readiness: exact 8-case summary is mandatory (SB-M51 EN+TR: l05..l08).
+          if grep -qxF 'M51 localization readiness evidence: PASS (8/8 cases, 0 fail)' validate_logs/m51_localization_readiness.log 2>/dev/null; then
+            echo "M51 verdict=PASS (8/8)" | tee -a "$S"
           else
-            echo "M51 verdict=FAIL (exact 4/4 summary missing)" | tee -a "$S"; fail=1
+            echo "M51 verdict=FAIL (exact 8/8 summary missing)" | tee -a "$S"; fail=1
           fi
           # M50 colour symbols + navy PLAY + HUD price: exact 10-case summary is mandatory.
           if grep -qxF 'M50 color symbols evidence: PASS (10/10 cases, 0 fail)' validate_logs/m50_color_symbols.log 2>/dev/null; then

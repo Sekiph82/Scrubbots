@@ -5,6 +5,17 @@ extends SceneTree
 ##   l03 Settings is fully keyed (asserted: no visible untranslated literal; frame contained)
 ##   l04 multi-surface scan: untranslated visible literals + text leaving the screen under ~40%
 ##       expansion, REPORTED as findings (Home, Tasks, Daily, Help, Shop, gameplay HUD, Results).
+##   l05 Turkish table (SB-M51-005/006): every EN key has a non-empty TR entry with the same
+##       %s / %d placeholders in the same order (English-only _ONE plural forms excepted), no
+##       stray TR keys, every achievement / robot / Collection set has its TR data copy
+##   l06 plurals (SB-M51-008): EN one/other for Hearts, Bot Parts, cards, days, ranks, gifts /
+##       rewards through UiText.tn and the real Results rows; TR keeps one form
+##   l07 language choice (SB-M51-005): saved choice > device > English; strict save field;
+##       Settings LANGUAGE row (one extra card, Reduced Effects in place) switches + persists,
+##       and a reboot on that save builds Home / Settings in Turkish
+##   l08 static guard (SB-M51-001/007): no hard-coded user text (text = "...", multi-word
+##       literals) and no hand-formatted currency in scripts/ui, scripts/app, scenes; every
+##       literal UiText key exists.
 ##
 ## Run: godot --headless --path . -s res://tests/m51_localization_readiness.gd
 
@@ -14,11 +25,21 @@ const MainScript = preload("res://scripts/app/main.gd")
 const DailyScreens = preload("res://scripts/ui/daily/daily_screens.gd")
 const HelpTipsScreen = preload("res://scripts/ui/tutorial/help_tips_screen.gd")
 const NavigationController = preload("res://scripts/app/navigation_controller.gd")
+const UiTextTr = preload("res://scripts/ui/ui_text_tr.gd")
+const EffectsSettingsService = preload("res://scripts/settings/effects_settings_service.gd")
+const ResultsScreen = preload("res://scripts/ui/results_screen.gd")
+const RobotRoster = preload("res://scripts/progression/robot_roster.gd")
+
+## l08: the only literals the text-property / multi-word scan may meet (non-language glyphs),
+## as "<file>|<literal>".
+const GUARD_ALLOW := ["scripts/ui/gameplay_screen.gd|II"]
+const GUARD_DIRS := ["res://scripts/ui", "res://scripts/app", "res://scenes"]
 
 ## Non-language glyphs that are not translatable copy.
 const GLYPHS := ["X", "?", "II", "2x", "2X", "+", "-"]
 
-var EXPECTED_CASES := ["l01_pseudo_properties", "l02_key_convention", "l03_settings_fully_keyed", "l04_surface_scan_report"]
+var EXPECTED_CASES := ["l01_pseudo_properties", "l02_key_convention", "l03_settings_fully_keyed", "l04_surface_scan_report",
+	"l05_turkish_table", "l06_plurals", "l07_language_choice", "l08_hardcoded_text_guard"]
 var _fail := 0
 var _completed: Dictionary = {}
 var _tmp: Array = []
@@ -34,6 +55,10 @@ func _initialize() -> void:
 	await _l03()
 	await _l04()
 	UiText.pseudo = false
+	_l05()
+	_l06()
+	await _l07()
+	_l08()
 	_shutdown()
 	_cleanup()
 	_done()
@@ -123,6 +148,213 @@ func _l04() -> void:
 	_ok(surfaces >= 7, "%d player surfaces scanned (findings above feed SB-M51-001/009 and SB-M49-022/027)" % surfaces)
 	_complete("l04_surface_scan_report")
 
+func _l05() -> void:
+	print("[l05 Turkish table: every key, same placeholders, non-empty; data copy complete]")
+	var missing: Array = []
+	var bad_ph: Array = []
+	var empty: Array = []
+	var one_in_tr: Array = []
+	for k in UiText.EN:
+		var base := String(k).trim_suffix("_ONE")
+		if String(k).ends_with("_ONE") and UiText.EN.has(base):   # an English-only plural form
+			if _ph(UiText.EN[k]) != _ph(UiText.EN[base]):
+				bad_ph.append(k)
+			if UiTextTr.TR.has(k):
+				one_in_tr.append(k)
+			continue
+		if not UiTextTr.TR.has(k):
+			missing.append(k)
+			continue
+		if _ph(UiText.EN[k]) != _ph(UiTextTr.TR[k]):
+			bad_ph.append(k)
+		if String(UiTextTr.TR[k]).is_empty() and k != "FTUE_BOOSTER_INTRO_BODY":
+			empty.append(k)
+	var stray: Array = UiTextTr.TR.keys().filter(func(k): return not UiText.EN.has(k))
+	_ok(missing.is_empty(), "every EN key has a TR entry (%d TR keys) %s" % [UiTextTr.TR.size(), str(missing)])
+	_ok(bad_ph.is_empty(), "placeholders match in count and order (EN vs TR, _ONE vs base) %s" % str(bad_ph))
+	_ok(empty.is_empty() and stray.is_empty() and one_in_tr.is_empty(), "no empty TR copy %s, no stray TR keys %s, no TR _ONE forms %s" % [str(empty), str(stray), str(one_in_tr)])
+	var need: Array = []
+	var ach = JSON.parse_string(FileAccess.get_file_as_string("res://data/config/achievements_v2.json"))
+	for a in ach["achievements"]:
+		need.append("ACH_NAME_" + String(a["id"]).to_upper())
+		need.append("ACH_DESC_" + String(a["id"]).to_upper())
+	for id in RobotRoster.ids():
+		for f in ["ROBOT_ROLE_", "ROBOT_PERK_NAME_", "ROBOT_PERK_TEXT_"]:
+			need.append(f + String(id).to_upper())
+	for n in range(1, 16):
+		need.append("SET_NAME_%d" % n)
+	var lacking: Array = need.filter(func(k): return not UiTextTr.DATA.has(k) or String(UiTextTr.DATA[k]).is_empty())
+	_ok(lacking.is_empty() and UiTextTr.DATA.size() == need.size(), "%d data copy entries (achievements, robots, sets) all translated %s" % [need.size(), str(lacking)])
+	UiText.locale = "tr"
+	var tr_ok := UiText.t("HOME_PLAY") == "OYNA" and UiText.num(1234567) == "1.234.567" and UiText.data("ACH_NAME_CLEAN_START", "Clean Start") == "Temiz Başlangıç"
+	UiText.locale = "en"
+	_ok(tr_ok and UiText.num(1234567) == "1,234,567" and UiText.data("ACH_NAME_CLEAN_START", "Clean Start") == "Clean Start", "TR copy / '1.234.567' grouping / data copy switch with UiText.locale; EN unchanged")
+	_complete("l05_turkish_table")
+
+func _l06() -> void:
+	print("[l06 plurals: EN one/other, TR one form]")
+	var fam := {"RESULTS_CARDS": ["+1 Card", "+2 Cards"], "RESULTS_BOT_PARTS": ["+1 Bot Part", "+2 Bot Parts"],
+		"CEREMONY_ROW_HEART": ["+1 Heart", "+2 Hearts"], "DAILY_STREAK": ["Login streak: 1 day.", "Login streak: 2 days."],
+		"COMEBACK_GIFT": ["1 gift waiting in the Gift Bar", "2 gifts waiting in the Gift Bar"],
+		"CEREMONY_ROW_STANDARD_PACK": ["+1 Standard Card Pack", "+2 Standard Card Packs"]}
+	for k in fam:
+		var got := [UiText.tn(k, 1, ["1"]), UiText.tn(k, 2, ["2"])]
+		_ok(got == fam[k] and UiText.tn(k, 0, ["0"]) == UiText.t(k, ["0"]), "EN %s: %s (0 -> other)" % [k, str(got)])
+	_ok(UiText.tn("RANKS_NEXT", 1, ["1", "Gold"]) == "1 more level to Gold" and UiText.tn("RANKS_NEXT", 3, ["3", "Gold"]) == "3 more levels to Gold", "EN ranks: 1 more level / 3 more levels")
+	var receipt := {"reveal_queue": [{"kind": "bot_parts", "amount": 1}, {"kind": "collection_cards", "amount": 3}]}
+	var rows: Array = ResultsScreen.reward_rows(receipt).map(func(r): return r["text"])
+	_ok(rows == ["+1 Bot Part", "+3 Cards"], "real Results rows: %s" % str(rows))
+	_ok(UiText.t("TIME_DHM", [1, 1, 1]) == "1d 1h 1m", "time remaining uses unit abbreviations (no plural)")
+	UiText.locale = "tr"
+	var tr_rows: Array = ResultsScreen.reward_rows(receipt).map(func(r): return r["text"])
+	var tr_ok := UiText.tn("RESULTS_CARDS", 1, ["1"]) == "+1 Kart" and UiText.tn("RESULTS_CARDS", 2, ["2"]) == "+2 Kart" and UiText.t("TIME_DHM", [1, 2, 3]) == "1g 2sa 3dk"
+	UiText.locale = "en"
+	_ok(tr_ok and tr_rows == ["+1 Robot Parçası", "+3 Kart"], "TR: noun stays singular after a number %s" % str(tr_rows))
+	_complete("l06_plurals")
+
+func _l07() -> void:
+	print("[l07 language choice: resolve, strict save field, Settings row switches + persists]")
+	_ok(UiText.resolve_language("", "tr") == "tr" and UiText.resolve_language("", "de") == "en" and UiText.resolve_language("en", "tr") == "en" and UiText.resolve_language("tr", "en") == "tr" and UiText.resolve_language("xx", "tr") == "tr",
+		"saved choice > device language > English")
+	var fx := EffectsSettingsService.new()
+	var rej := 0
+	for bad in ["de", "", 5, true, null]:
+		rej += 0 if fx.strict_import_snapshot({"reduced": false, "language": bad}) else 1
+	_ok(rej == 5 and not fx.snapshot().has("language") and fx.strict_import_snapshot({"reduced": false, "language": "tr"}) and fx.get_language() == "tr" and fx.snapshot()["language"] == "tr",
+		"save field: absent = follow device (not written), only en / tr accepted (%d/5 rejected)" % rej)
+	await _boot("l07", Vector2i(1080, 2160))
+	var path := MainScript.boot_save_path_override
+	_root.open_settings()
+	await _frames(4)
+	var panel = _root.get_settings_panel()
+	var body: Node = panel.find_child("Body", true, false)
+	var order: Array = []
+	for c in body.get_children():
+		if String(c.name).begins_with("Card_"):
+			order.append(String(c.name))
+	_ok(order.slice(-4) == ["Card_HapticsToggle", "Card_ReducedEffectsToggle", "Card_ColorSymbolsRow", "Card_LanguageRow"], "one LANGUAGE card added after the existing cards, Reduced Effects in place %s" % str(order))
+	var en_b: Button = panel.get_language_button("en")
+	var tr_b: Button = panel.get_language_button("tr")
+	_ok(en_b.button_pressed and not tr_b.button_pressed and en_b.size.y >= 88.0 and tr_b.size.y >= 88.0 and tr_b.text == "TÜRKÇE", "EN active by default; both buttons >= 88 px tall %s %s" % [str(en_b.size), str(tr_b.size)])
+	var got := []
+	panel.language_changed.connect(func(c): got.append(c))
+	tr_b.pressed.emit()
+	await _frames(2)
+	var saved = JSON.parse_string(FileAccess.get_file_as_string(path))
+	_ok(got == ["tr"] and UiText.locale == "tr" and tr_b.button_pressed and not en_b.button_pressed and saved["settings"]["effects"].get("language", "") == "tr",
+		"TÜRKÇE applies at once, emits language_changed, is saved (settings.effects.language = tr)")
+	UiText.locale = "en"
+	_shutdown()
+	_sub = SubViewport.new()
+	_sub.size = Vector2i(1080, 2160)
+	_sub.disable_3d = true
+	get_root().add_child(_sub)
+	MainScript.boot_save_path_override = path
+	_root = MainScene.instantiate()
+	_sub.add_child(_root)
+	await _frames(6)
+	var home_en := _untranslated_en(_root.get_home())
+	_root.open_settings()
+	await _frames(4)
+	var title: Label = _root.get_settings_panel().find_child("Title", true, false)
+	_ok(UiText.locale == "tr" and title.text == "AYARLAR" and home_en.is_empty(), "reboot on that save: Settings '%s', no English-only copy on Home %s" % [title.text, str(home_en)])
+	UiText.locale = "en"
+	_complete("l07_language_choice")
+
+func _l08() -> void:
+	print("[l08 static guard: no hard-coded user text / currency in UI code, every literal key exists]")
+	var text_re := RegEx.create_from_string("(?:\\b(?:text|tooltip_text|placeholder_text)\\s*=|set_text\\()\\s*\"([^\"]*)\"")
+	var words_re := RegEx.create_from_string("\"([A-Za-z][A-Za-z']*(?: [A-Za-z][A-Za-z',]*)+[.!?]?)\"")
+	var money_re := RegEx.create_from_string("\"[^\"]*(?:[$€£₺¥]\\s*%|[$€£₺¥]\\s*\\d|\\d\\s*[$€£₺¥]|%[0-9.]*[dfs]\\s*(?:USD|EUR|TRY|TL)\\b)[^\"]*\"")
+	var key_re := RegEx.create_from_string("UiText\\.tn?\\(\"([A-Za-z0-9_]+)\"\\s*[,)]")
+	var hits: Array = []
+	var bad_keys: Array = []
+	var files := 0
+	for d in GUARD_DIRS:
+		for f in _files(d):
+			if f.get_file().begins_with("ui_text"):
+				continue   # the EN / TR copy tables themselves
+			files += 1
+			var rel: String = f.trim_prefix("res://")
+			var ln := 0
+			for raw in FileAccess.get_file_as_string(f).split("\n"):
+				ln += 1
+				var line := _code(raw)
+				if line.strip_edges().is_empty() or line.contains("push_warning") or line.contains("push_error") or line.contains("print("):
+					continue
+				for m in text_re.search_all(line):
+					if _has_letter2(m.get_string(1)) and not GUARD_ALLOW.has(rel + "|" + m.get_string(1)):
+						hits.append("%s:%d text '%s'" % [rel, ln, m.get_string(1)])
+				for m in words_re.search_all(line):
+					if not GUARD_ALLOW.has(rel + "|" + m.get_string(1)):
+						hits.append("%s:%d words '%s'" % [rel, ln, m.get_string(1)])
+				for m in money_re.search_all(line):
+					hits.append("%s:%d currency %s" % [rel, ln, m.get_string()])
+				for m in key_re.search_all(line):
+					if not UiText.EN.has(m.get_string(1)):
+						bad_keys.append("%s:%d %s" % [rel, ln, m.get_string(1)])
+	_ok(files > 80 and hits.is_empty(), "%d files: no hard-coded user text or hand-formatted currency %s" % [files, str(hits)])
+	_ok(bad_keys.is_empty(), "every literal UiText.t / tn key exists %s" % str(bad_keys))
+	# The guard really fires on the patterns it exists for.
+	var probe := ["\tlbl.text = \"Shop\" + x", "\tlbl.add_child(_label(\"Coming soon today\"))", "\tb.text = \"$%s\" % price", "\tx.text = \"%.2f TRY\" % p"]
+	var fired := 0
+	for pl in probe:
+		var tm := text_re.search(pl)
+		fired += 1 if (tm != null and _has_letter2(tm.get_string(1))) or words_re.search(pl) != null or money_re.search(pl) != null else 0
+	_ok(fired == probe.size(), "guard self-check: %d/%d planted violations detected" % [fired, probe.size()])
+	_complete("l08_hardcoded_text_guard")
+
+## %s / %d / %f specifiers in order (a literal %% is not a placeholder).
+static func _ph(s: String) -> Array:
+	var out: Array = []
+	var i := 0
+	while i < s.length():
+		if s[i] == "%":
+			if i + 1 < s.length() and s[i + 1] == "%":
+				i += 2
+				continue
+			var j := i + 1
+			while j < s.length() and not (s[j] >= "a" and s[j] <= "z"):
+				j += 1
+			out.append(s.substr(i, j - i + 1))
+			i = j
+		i += 1
+	return out
+
+## Code part of a line: an "#" outside quotes starts a comment.
+static func _code(line: String) -> String:
+	var q := false
+	for i in range(line.length()):
+		if line[i] == "\"":
+			q = not q
+		elif line[i] == "#" and not q:
+			return line.substr(0, i)
+	return line
+
+static func _has_letter2(s: String) -> bool:
+	return RegEx.create_from_string("[A-Za-z]{2}").search(s) != null
+
+static func _files(dir: String) -> Array:
+	var out: Array = []
+	for f in DirAccess.get_files_at(dir):
+		if f.ends_with(".gd") or f.ends_with(".tscn"):
+			out.append(dir.path_join(f))
+	for sub in DirAccess.get_directories_at(dir):
+		out.append_array(_files(dir.path_join(sub)))
+	return out
+
+## Visible Label / Button texts equal to an English table value that Turkish changes.
+func _untranslated_en(node) -> Array:
+	var en_only := {}
+	for k in UiTextTr.TR:
+		if String(UiText.EN[k]) != String(UiTextTr.TR[k]):
+			en_only[String(UiText.EN[k])] = true
+	var out: Array = []
+	for n in (node as Node).find_children("*", "", true, false):
+		if (n is Label or n is Button) and (n as Control).is_visible_in_tree() and en_only.has(n.text):
+			out.append("%s='%s'" % [n.name, n.text])
+	return out
+
 # ------------------------------------------------------------------ helpers ----
 
 ## Visible Label / Button texts with letters that do not carry the pseudo brackets.
@@ -188,6 +420,7 @@ func _frames(n: int) -> void:
 
 func _cleanup() -> void:
 	UiText.pseudo = false
+	UiText.locale = "en"
 	MainScript.boot_save_path_override = ""
 	MainScript.boot_opening_override = -1
 	for p in _tmp:

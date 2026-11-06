@@ -3,7 +3,8 @@ extends "res://tests/m49_surface_matrix.gd"
 ## tests/m49_surface_matrix.gd (split to keep each suite near 5 min; same walk and helpers):
 ##   v03 long values (SB-M49-027): an English baseline walk, then the same walk with the
 ##       pseudo-locale (+40%), 7-digit balances, empty Hearts (refill timer), long item labels,
-##       big reward bundles: no clip / overflow beyond the English design overhangs
+##       big reward bundles: no clip / overflow beyond the English design overhangs; then the
+##       same walk in the REAL Turkish table (SB-M51-005/009, UiText.locale = "tr")
 ##   v04 modal stacks + back (SB-M49-028): popup over popup, the top owns the screen and input,
 ##       Esc (ui_cancel) / back closes the top only, in LIFO order, then Home stays put
 ##   v05 scroll screens (SB-M49-028): every ScrollContainer on Collection / Set / Shop / Events /
@@ -37,6 +38,12 @@ func _initialize() -> void:
 	UiText.pseudo = false
 	# Numbers, names and data copy carry no marker; a third of all measured text is keyed copy.
 	_ok(_scanned > 1000 and _stressed * 3 > _scanned, "%d text controls measured, %d carry the pseudo stress copy" % [_scanned, _stressed])
+	_scanned = 0
+	UiText.locale = "tr"
+	for phys in LONG_SIZES:
+		await _walk(phys)
+	UiText.locale = "en"
+	_ok(_scanned > 1000, "%d text controls measured in the Turkish table" % _scanned)
 	_complete("v03_long_values")
 	await _v04()
 	await _v05()

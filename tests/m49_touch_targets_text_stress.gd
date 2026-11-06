@@ -13,6 +13,7 @@ extends SceneTree
 ##       ellipsized, cut to fewer visible lines, or leaving its parent / clip ancestor / screen
 ##   t03 a long Turkish sample (every key -> dotted / cedilla capitals, +60% length): same checks,
 ##       and every font used by a visible text control has the Turkish glyphs.
+##   t04 the REAL Turkish table (SB-M51-005/009, UiText.locale = "tr"): same checks + glyphs.
 ##
 ## Run: godot --headless --path . -s res://tests/m49_touch_targets_text_stress.gd
 
@@ -28,7 +29,7 @@ const TOUCH := float(UiTokens.TOUCH_MIN)
 const TR_GLYPHS := "İıŞşĞğÇçÖöÜü"
 const POPUPS := ["tasks", "daily", "gift_bar", "shop", "collection", "robots", "events", "profile", "leaderboard", "settings", "help", "life"]
 
-var EXPECTED_CASES := ["t00_english_baseline", "t01_touch_targets", "t02_pseudo_text_stress", "t03_turkish_text_stress"]
+var EXPECTED_CASES := ["t00_english_baseline", "t01_touch_targets", "t02_pseudo_text_stress", "t03_turkish_text_stress", "t04_real_turkish_table"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -70,6 +71,14 @@ func _initialize() -> void:
 	TranslationServer.remove_translation(tr)
 	_stress_ok("LER")
 	_complete("t03_turkish_text_stress")
+	print("[t04 real Turkish table: no clipped / overflowing text, Turkish glyphs present]")
+	UiText.locale = "tr"
+	await _matrix("t04", _text_bad)
+	UiText.locale = "en"
+	_ok(_scanned > 500, "%d text controls measured in Turkish" % _scanned)
+	_scanned = 0
+	_stressed = 0
+	_complete("t04_real_turkish_table")
 	_shutdown()
 	_cleanup()
 	_done()
@@ -222,7 +231,7 @@ func _text_bad(node: Node, _extra: Array) -> Array:
 			continue
 		var font: Font = c.get_theme_font("font")
 		for ch in TR_GLYPHS:
-			if TranslationServer.get_locale() == "tr" and not font.has_char(ch.unicode_at(0)):
+			if (TranslationServer.get_locale() == "tr" or UiText.locale == "tr") and not font.has_char(ch.unicode_at(0)):
 				bad.append("%s font lacks %s" % [_path(node, n), ch])
 				break
 		var r := c.get_global_rect()
@@ -360,6 +369,7 @@ func _frames(n: int) -> void:
 
 func _cleanup() -> void:
 	UiText.pseudo = false
+	UiText.locale = "en"
 	MainScript.boot_save_path_override = ""
 	MainScript.boot_opening_override = -1
 	for p in _tmp:
