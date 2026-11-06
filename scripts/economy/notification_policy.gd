@@ -3,7 +3,8 @@ extends RefCounted
 ##
 ## M43-C012 / C012R (SB-M43-145/147/148/149, R12-004..006) — the ONE decision authority for
 ## proactive (retention) notifications. Platform delivery is not wired: Godot ships no local
-## notification API, so a native plugin / platform decision is required (SB-M43-146 BLOCKED);
+## notification API, so a native plugin / platform decision is required (the Android OS permission
+## is asked contextually by NotificationPermission, SB-M43-146; iOS permission is SB-M43-171);
 ## this authority decides WHAT may be sent and keeps the player's preferences.
 ##   - opt-in: global OFF by default; per-category toggles (hearts, daily, event_ending, gift);
 ##   - quiet hours on the player's local clock (default 22:00-08:00);

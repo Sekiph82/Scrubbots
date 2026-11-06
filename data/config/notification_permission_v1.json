@@ -1,0 +1,6 @@
+{
+  "schema": "scrubbots.notification_permission.v1",
+  "version": 1,
+  "source": "TASKS SB-M43-146: the pre-permission explainer shows only when the player turns REMINDERS ON; after Not now (or an Allow the OS then denied) it is not shown again for this many days.",
+  "decline_cooldown_days": 7
+}

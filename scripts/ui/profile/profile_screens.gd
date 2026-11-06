@@ -599,8 +599,8 @@ static func open_comeback(stack, app) -> BasePopup:
 # ---------------------------------------------------------- NOTIFICATIONS ----
 
 ## SB-M43-147: global + per-category reminder preferences and quiet hours (NotificationPolicy).
-## Opt-in (OFF by default). Delivery itself needs a platform notification plugin (SB-M43-146),
-## which this build does not ship, so the screen says so instead of asking the OS.
+## Opt-in (OFF by default). SB-M43-146: turning REMINDERS ON is the one contextual moment the
+## OS permission is asked for (Android, after the explainer); elsewhere the screen says it cannot.
 static func open_notifications(stack, app) -> BasePopup:
 	var p := BasePopup.new("notifications")
 	p.set_frame("large")
@@ -618,11 +618,18 @@ static func open_notifications(stack, app) -> BasePopup:
 		var b := p.add_action("notify:" + c, "", "secondary", false, "", row)
 		b.custom_minimum_size = Vector2(160, 70)
 	p.add_body_line(UiText.t("NOTIFY_QUIET", ["%02d:00" % n.quiet_from, "%02d:00" % n.quiet_to]), "Quiet", BasePopup.INK, 22)
-	p.add_body_line(UiText.t("NOTIFY_PLATFORM_PENDING"), "Platform", BasePopup.INK, 20)
+	if not app.economy.notify_permission.supported():
+		p.add_body_line(UiText.t("NOTIFY_PLATFORM_PENDING"), "Platform", BasePopup.INK, 20)
 	p.add_action("back", UiText.t("SHOP_BACK"), "secondary", true)
 	p.action_selected.connect(func(id, _c):
 		if id == "notify_all":
 			n.enabled = not n.enabled
+			if n.enabled and app.economy.notify_permission.should_explain():
+				var x := open_notification_permission(stack, app)
+				if x != null:
+					x.closed.connect(func(_r):
+						if is_instance_valid(p):
+							p.rearm(), CONNECT_ONE_SHOT)
 		elif id.begins_with("notify:"):
 			n.set_category(id.substr(7), not bool(n.categories[id.substr(7)]))
 		else:
@@ -631,6 +638,26 @@ static func open_notifications(stack, app) -> BasePopup:
 		refresh_notifications(p, app)
 		p.rearm_soon())
 	refresh_notifications(p, app)
+	if not stack.push(p):
+		p.free()
+		return null
+	return p
+
+## SB-M43-146: native pre-permission explainer. Allow -> one OS request; Not now / back -> no OS
+## call, cooldown. Opened only from the REMINDERS ON toggle above, never on boot.
+static func open_notification_permission(stack, app) -> BasePopup:
+	var p := BasePopup.new("notification_permission")
+	p.set_frame("medium")
+	p.set_title(UiText.t("NOTIFY_PERMISSION_TITLE"))
+	p.add_body_line(UiText.t("NOTIFY_PERMISSION_BODY"), "Explain", BasePopup.INK, 24)
+	p.add_action("allow", UiText.t("NOTIFY_PERMISSION_ALLOW"), "primary", true)
+	p.add_action("not_now", UiText.t("NOTIFY_PERMISSION_NOT_NOW"), "secondary", true)
+	p.closed.connect(func(reason):
+		if reason == "action:allow":
+			app.economy.notify_permission.allow()
+		else:
+			app.economy.notify_permission.decline()
+		app.request_save(), CONNECT_ONE_SHOT)
 	if not stack.push(p):
 		p.free()
 		return null
