@@ -29,6 +29,8 @@ const INFO_BLUE := Color(0.851, 0.906, 0.976)
 const INFO_EDGE := Color(0.620, 0.745, 0.902)
 const LOCK_GREY := Color(0.420, 0.459, 0.529)
 const UPCOMING_TINT := Color(0.55, 0.57, 0.60)
+## SB-M49-027: widest pill that stays inside the hero at the fixed 880 px popup frame.
+const PILL_MAX := 600.0
 
 static func build(v: Dictionary, claim: Callable) -> PanelContainer:
 	var phase := String(v["phase"])
@@ -44,6 +46,7 @@ static func build(v: Dictionary, claim: Callable) -> PanelContainer:
 	var title := HomeStyle.label(UiText.t("EVENT_WEEKLY_TITLE"), 40, HomeStyle.TEXT if upcoming else HomeStyle.SUBTITLE)
 	title.name = "Title"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART   # SB-M49-027: long copy wraps inside the frame
 	box.add_child(title)
 	var when := ""
 	match phase:
@@ -109,6 +112,7 @@ static func _pill(n: String, label_name: String, text: String, icon: String) -> 
 		h.add_child(i)
 	var l := HomeStyle.label(text, 30)
 	l.name = label_name
+	HomeStyle.fit_font(l, 30, PILL_MAX - 2 * UiTokens.SPACE_MD - (44 + UiTokens.SPACE_SM if not icon.is_empty() else 0))   # longer locales shrink, never widen
 	h.add_child(l)
 	return pill
 
@@ -216,7 +220,6 @@ static func reward_icon(reward: Dictionary) -> String:
 
 static func _text(text: String, size: int, color: Color) -> Label:
 	var l := BasePopup.body_label(text, size, color)
-	l.autowrap_mode = TextServer.AUTOWRAP_OFF
 	l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	return l
 

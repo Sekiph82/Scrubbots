@@ -563,6 +563,7 @@ func _row(r: Dictionary) -> Control:
 	var l := Label.new()
 	l.name = "Text"
 	l.text = r["text"]
+	l.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART   # SB-M49-027: a long row wraps, never widens the frame
 	l.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	l.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
 	l.add_theme_font_size_override("font_size", UiTokens.FONT_BODY)

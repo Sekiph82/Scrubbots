@@ -502,7 +502,7 @@ static func _button(p: BasePopup, stash: Control, aid: String, parent: Control) 
 	else:
 		b.reparent(parent)
 	b.set_meta("aid", aid)
-	b.custom_minimum_size = Vector2(190, 72)
+	b.custom_minimum_size = Vector2(190, UiTokens.TOUCH_MIN)
 	return b
 
 # ------------------------------------------------------------------ RANKS ----
@@ -645,7 +645,7 @@ static func open_notifications(stack, app) -> BasePopup:
 		l.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 		row.add_child(l)
 		var b := p.add_action("notify:" + c, "", "secondary", false, "", row)
-		b.custom_minimum_size = Vector2(160, 70)
+		b.custom_minimum_size = Vector2(160, UiTokens.TOUCH_MIN)
 	p.add_body_line(UiText.t("NOTIFY_QUIET", ["%02d:00" % n.quiet_from, "%02d:00" % n.quiet_to]), "Quiet", BasePopup.INK, 22)
 	if not app.economy.notify_permission.supported():
 		p.add_body_line(UiText.t("NOTIFY_PLATFORM_PENDING"), "Platform", BasePopup.INK, 20)

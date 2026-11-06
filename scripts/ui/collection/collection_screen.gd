@@ -354,7 +354,7 @@ static func _tile(p: BasePopup, e, cid: String, cache) -> Control:
 	tile.add_child(cnt)
 	if owned > 0:
 		var b := p.add_action("card:" + cid, UiText.t("COLLECTION_DETAILS"), "secondary", false, "", tile)
-		b.custom_minimum_size = Vector2(0, 64)
+		b.custom_minimum_size = Vector2(0, UiTokens.TOUCH_MIN)
 	_fill_tile(tile, e, cid)
 	return tile
 
