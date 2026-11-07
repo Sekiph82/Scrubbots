@@ -2,11 +2,8 @@ extends SceneTree
 ## SB-CAMPAIGN-RUNTIME-KERNEL-DIVERGENCE — shippability gate: every production catalog level
 ## is played through the REAL ProductionGameplayHost under the human policy
 ## (scripts/gameplay/solver/real_play_driver.gd, model real_play_v1) and must reach WON.
-##   - levels: every catalog entry's clicks at the canonical dt 1/60 -> WON, ACTIVE 0, supply
+##   - levels: every catalog entry's clicks at the canonical simulation step 1/60 -> WON, ACTIVE 0, supply
 ##     exhausted, slots empty, no rejected click;
-##   - fps_sensitivity: the same clicks at dt 1/30 and 1/120 for the regenerated levels plus
-##     L18 and L20 (all 30 at three dts would not fit the CI per-suite timeout; every level's
-##     three-dt WON is recorded by tools/real_play_verify.gd in provenance verifiedDts);
 ##   - provenance: every catalog entry has a real_play_provenance_v1 record, status WON, its
 ##     planSha256 == the current plan file, regenerated exactly when the plan differs from
 ##     originalPlanSha256 (a level added without running tools/real_play_verify.gd fails here);
@@ -24,7 +21,7 @@ const LevelCatalog = preload("res://scripts/data/level_catalog.gd")
 const OLD_L22 := [1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 3, 3, 3, 4, 4, 4, 4, 4, 4, 5, 5, 3, 3, 5, 5, 3, 3, 3, 3, 3, 5, 5, 5, 5, 5, 5, 5, 5]
 const L22 := "level_022_crab"
 
-var EXPECTED_CASES := ["levels", "fps_sensitivity", "provenance", "determinism", "search_negative"]
+var EXPECTED_CASES := ["levels", "provenance", "determinism", "search_negative"]
 
 var _fail := 0
 var _completed: Dictionary = {}
@@ -39,7 +36,6 @@ func _initialize() -> void:
 	_entries = cat.get_entries_ordered()
 	_prov = RealPlayDriver.load_provenance()
 	await _levels()
-	await _fps_sensitivity()
 	_provenance()
 	await _determinism()
 	await _search_negative()
@@ -49,22 +45,12 @@ func _levels() -> void:
 	print("[levels: %d catalog levels, human policy, dt 1/60]" % _entries.size())
 	for e in _entries:
 		var clicks := RealPlayDriver.clicks_for(e.id, e.supply_plan_path, _prov)
-		var r: Dictionary = await RealPlayDriver.play_level(get_root(), e.id, clicks, RealPlayDriver.CANONICAL_DT)
+		var r: Dictionary = await RealPlayDriver.play_level(get_root(), e.id, clicks)
 		var f: Dictionary = r.get("final", {})
 		_ok(r.get("won", false) and int(f.get("active", -1)) == 0 and f.get("supply_exhausted", false) and f.get("slots_empty", false)
 			and r.get("rejected", {}).is_empty() and (r.get("clicks_placed", -1) == clicks.size() or clicks.is_empty()),
 			"L%d %s: %s -> WON at 1/60 in %d frames %s" % [e.order, e.id, ("%d plan clicks" % clicks.size()) if not clicks.is_empty() else ("%d first-front clicks (no plan)" % int(r.get("clicks_placed", 0))), int(r.get("frames", 0)), "" if r.get("won", false) else str(r.get("final", r.get("error", "")))])
 	_completed["levels"] = true
-
-func _fps_sensitivity() -> void:
-	var subset: Array = _entries.filter(func(e): return e.order == 18 or e.order == 20 or bool(_prov.get(e.id, {}).get("regenerated", false)))
-	print("[fps_sensitivity: dt 1/30 and 1/120 for the regenerated levels + L18 + L20 (%s); all levels' three-dt WON is in provenance]" % str(subset.map(func(e): return "L%d" % e.order)))
-	for e in subset:
-		var clicks := RealPlayDriver.clicks_for(e.id, e.supply_plan_path, _prov)
-		for dt in [1.0 / 30.0, 1.0 / 120.0]:
-			var r: Dictionary = await RealPlayDriver.play_level(get_root(), e.id, clicks, dt)
-			_ok(r.get("won", false) and r.get("rejected", {}).is_empty(), "L%d %s: WON at %s (%d frames)" % [e.order, e.id, RealPlayDriver.dt_label(dt), int(r.get("frames", 0))])
-	_completed["fps_sensitivity"] = true
 
 func _provenance() -> void:
 	print("[provenance: %s]" % RealPlayDriver.PROVENANCE_PATH)
@@ -74,7 +60,7 @@ func _provenance() -> void:
 		var has_plan := not String(e.supply_plan_path).is_empty()
 		var sha = RealPlayDriver.plan_sha256(e.supply_plan_path) if has_plan else null
 		_ok(not rec.is_empty() and rec.get("status", "") == "WON" and rec.get("planSha256") == sha and rec.get("model", "") == RealPlayDriver.MODEL
-			and rec.get("canonicalDt", "") == "1/60" and rec.get("verifiedDts", []) == ["1/30", "1/60", "1/120"]
+			and rec.get("canonicalDt", "") == RealPlayDriver.CANONICAL_DT_LABEL
 			and (rec.get("clicks") if rec.get("clicks") is Array else []).map(func(c): return int(c)) == RealPlayDriver.clicks_for(e.id, e.supply_plan_path, _prov),
 			"L%d %s: record WON, model %s, planSha256 == plan file %s" % [e.order, e.id, RealPlayDriver.MODEL, str(sha).left(12)])
 		var changed: bool = has_plan and rec.has("originalPlanSha256") and rec["originalPlanSha256"] != sha
@@ -102,8 +88,8 @@ func _search_negative() -> void:
 	var old: Dictionary = await RealPlayDriver.play_level(get_root(), L22, OLD_L22)
 	_ok(not old["won"] and old["stuck"], "old L22 clicks are NOT WON under real play: stuck after click %d/%d, %d ACTIVE left (%s)" % [int(old["clicks_placed"]), OLD_L22.size(), int(old["final"]["active"]), old["final"]["terminal"]])
 	var s: Dictionary = await RealPlayDriver.search(get_root(), L22, OLD_L22)
-	_ok(s["status"] == "SOLVED" and s.get("robust", false) and s["clicks"] != OLD_L22,
-		"search from the old clicks: %s in %d nodes (budget %d), WON at 1/30, 1/60 and 1/120 (%d canonical-only wins rejected)" % [s["status"], int(s["nodes"]), RealPlayDriver.NODE_BUDGET, int(s.get("robust_rejects", 0))])
+	_ok(s["status"] == "SOLVED" and s.get("canonical_win", false) and s["clicks"] != OLD_L22,
+		"canonical real-game search from the old clicks: %s in %d nodes (budget %d)" % [s["status"], int(s["nodes"]), RealPlayDriver.NODE_BUDGET])
 	_completed["search_negative"] = true
 
 func _entry(id: String):

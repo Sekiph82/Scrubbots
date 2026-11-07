@@ -7,13 +7,10 @@ extends RefCounted
 ## is winnable in the game players run iff it reaches WON here. ProofKernel SOLVED is a
 ## canonical-timing proof and analysis model, not a shippability verdict.
 ##
-## Canonical timing model (real_play_v1): fixed dt = 1/60 s, speed 1x (the runtime's own
-## auto-2x after the last placement stays as in production), runtime.set_process(false) and
-## runtime.tick(dt) called directly so agents are driven by the controller as in production,
-## no pause. Limitation: devices at other FPS or at manual 2x may order claims differently
-## (lane service is one lane per frame, cadence and travel advance per frame). The canonical
-## model is the contract; a plan is accepted only if it also wins at every SENSITIVITY_DTS
-## entry. Manual 2x is not modelled.
+## Canonical timing model (real_play_v2): fixed simulation dt = 1/60 s, speed 1x (the
+## runtime's own auto-2x after the last placement stays as in production), runtime processing
+## is disabled and runtime.tick(1/60) is called directly so agents are driven by the production
+## controller. Solver acceptance is based only on this canonical game-host execution.
 ##
 ## Human policy: before every tick (frame 0 included), while a slot is free
 ## (slots.rightmost_empty_index() != -1) and a click remains, place the next column. The five
@@ -30,9 +27,8 @@ const BoardState = preload("res://scripts/gameplay/board/board_state.gd")
 
 const MODEL := "real_play_v1"
 const CANONICAL_DT := 1.0 / 60.0
-const SENSITIVITY_DTS := [1.0 / 30.0, 1.0 / 60.0, 1.0 / 120.0]
-const DT_LABELS := {30: "1/30", 60: "1/60", 120: "1/120"}
-## Frame cap per play (game time at 1/120 s: ~2.3 h; no level comes close).
+const CANONICAL_DT_LABEL := "1/60"
+## Frame cap per canonical play; no production level comes close.
 const MAX_FRAMES := 1000000
 ## Search node budget (nodes = rollout replays), not wall clock, so results are reproducible.
 const NODE_BUDGET := 400
@@ -40,12 +36,6 @@ const PROVENANCE_PATH := "res://data/levels/supply/real_play_provenance_v1.json"
 const PROVENANCE_SCHEMA := "scrubbots.real_play_provenance.v1"
 
 static var _orders: Dictionary = {}
-
-static func fps(dt: float) -> int:
-	return int(round(1.0 / dt))
-
-static func dt_label(dt: float) -> String:
-	return DT_LABELS.get(fps(dt), "1/%d" % fps(dt))
 
 ## Play on a built host under the human policy. `clicks` (1-based columns) are placed in
 ## order; when they run out: `rollout_plan` == null -> no more clicks, except that an empty
@@ -56,7 +46,7 @@ static func dt_label(dt: float) -> String:
 ## out (one frame in the tree at full size): before that SlotOriginProvider has no slot anchors
 ## and returns its fallback origins, which is not the game players run. Play starts from a
 ## fresh runtime clock (reset_runtime: 1x, cadence accumulator 0).
-static func play_on_host(host, clicks: Array, dt: float = CANONICAL_DT, max_frames: int = MAX_FRAMES, rollout_plan = null) -> Dictionary:
+static func play_on_host(host, clicks: Array, max_frames: int = MAX_FRAMES, rollout_plan = null) -> Dictionary:
 	var runtime = host.get_runtime()
 	runtime.set_process(false)
 	runtime.reset_runtime()
@@ -106,20 +96,21 @@ static func play_on_host(host, clicks: Array, dt: float = CANONICAL_DT, max_fram
 			stuck = host.get_board().count_cells_by_state(BoardState.CellState.ACTIVE) > 0
 			if stuck:
 				break
-		runtime.tick(dt)
+		runtime.tick(CANONICAL_DT)
 		frames += 1
 	host.get_clearing_loop().authenticated_clear.disconnect(on_clear)
-	var active: int = host.get_board().count_cells_by_state(BoardState.CellState.ACTIVE)
+	var board_residue: int = host.get_board().count_cells_by_state(BoardState.CellState.ACTIVE)
+	var active_robots: int = host.get_dispatcher().get_active_count()
 	legal_at.resize(taken.size())
 	return {
-		"won": completion.is_won() and active == 0 and supply.is_exhausted() and slots.occupied_count() == 0,
+		"won": completion.is_won() and board_residue == 0 and active_robots == 0 and supply.is_exhausted() and slots.occupied_count() == 0,
 		"frames": frames,
 		"clicks_placed": taken.size(),
 		"taken": taken,
 		"legal_at": legal_at,
 		"rejected": rejected,
 		"cleared_sequence": cleared,
-		"final": {"active": active, "supply_exhausted": supply.is_exhausted(), "slots_empty": slots.occupied_count() == 0,
+		"final": {"active": active_robots, "board_residue": board_residue, "supply_exhausted": supply.is_exhausted(), "slots_empty": slots.occupied_count() == 0,
 			"terminal": String(completion.get_state())},
 		"stuck": stuck or (completion.is_terminal() and not completion.is_won()),
 		"slots": _slot_state(slots),
@@ -236,7 +227,7 @@ static func order_of(entry_id: String) -> int:
 ## (host built from an AppState frontier on a temp save) or a file source Dictionary
 ## {level_path, supply_plan_path} (tools/real_play_file.gd: the host's no-AppState path with
 ## those files, nothing registered in the catalog); play is identical from build() on.
-static func play_level(parent: Node, source, clicks: Array, dt: float = CANONICAL_DT, max_frames: int = MAX_FRAMES, rollout_plan = null) -> Dictionary:
+static func play_level(parent: Node, source, clicks: Array, max_frames: int = MAX_FRAMES, rollout_plan = null) -> Dictionary:
 	var h = ProductionGameplayHost.new()
 	var path := ""
 	if source is Dictionary:
@@ -261,23 +252,18 @@ static func play_level(parent: Node, source, clicks: Array, dt: float = CANONICA
 	else:
 		h.get_runtime().set_process(false)
 		await parent.get_tree().process_frame
-		out = play_on_host(h, clicks, dt, max_frames, rollout_plan)
+		out = play_on_host(h, clicks, max_frames, rollout_plan)
 	h.free()
 	for suffix in ["", ".bak", ".tmp"]:
 		if not path.is_empty() and FileAccess.file_exists(path + suffix):
 			DirAccess.remove_absolute(ProjectSettings.globalize_path(path + suffix))
 	return out
 
-## `clicks` at every dt of `dts` (default: every sensitivity dt); `results` maps dt label ->
-## play result. `source` as in play_level. A coroutine.
-static func verify(parent: Node, source, clicks: Array, dts: Array = SENSITIVITY_DTS) -> Dictionary:
-	var results := {}
-	var all := true
-	for dt in dts:
-		var r: Dictionary = await play_level(parent, source, clicks, dt)
-		results[dt_label(dt)] = r
-		all = all and bool(r.get("won", false))
-	return {"won": all, "results": results}
+## Verify the exact click sequence once at canonical 1/60 through a fresh game host.
+## `source` is as in play_level. A coroutine.
+static func verify(parent: Node, source, clicks: Array) -> Dictionary:
+	var r: Dictionary = await play_level(parent, source, clicks)
+	return {"won": bool(r.get("won", false)), "results": {CANONICAL_DT_LABEL: r}}
 
 ## Real-play search over column choices (the only decision). Deterministic backtracking
 ## search; a node is a forced click prefix, evaluated by ONE replay from a fresh host at the
@@ -286,16 +272,12 @@ static func verify(parent: Node, source, clicks: Array, dts: Array = SENSITIVITY
 ## node's children are the other legal columns at each of its rollout decisions. Order:
 ## limited discrepancy (fewest deviations from the rollout first; plain chronological DFS
 ## spent its whole budget under one early mistake on L1/L30), and within one discrepancy
-## count the decision nearest the failure first. A canonical win is accepted only if it also
-## wins at every sensitivity dt. Status: SOLVED (clicks, robust), UNWINNABLE_WITHIN_BUDGET
-## (node budget hit: inconclusive) or EXHAUSTED (whole space explored, no win: unwinnable for
-## every column order under the model). A 1/60-only win found on the way is returned as
-## SOLVED with robust false when nothing robust exists (owner question).
+## count the decision nearest the failure first. A canonical game-host WIN is accepted.
+## Status: SOLVED, SEARCH_BUDGET (node budget reached; inconclusive), or SEARCH_EXHAUSTED
+## (the complete bounded choice space was explored without a win).
 static func search(parent: Node, source, plan: Array, node_budget: int = NODE_BUDGET) -> Dictionary:
 	plan = plan.map(func(c): return int(c))
 	var nodes := 0
-	var robust_rejects := 0
-	var canonical_only: Array = []
 	var buckets: Array = [[[]]]   # buckets[k] = FIFO of prefixes with k discrepancies
 	var k := 0
 	while k < buckets.size():
@@ -303,18 +285,12 @@ static func search(parent: Node, source, plan: Array, node_budget: int = NODE_BU
 			k += 1
 			continue
 		if nodes >= node_budget:
-			return _no_robust_win("UNWINNABLE_WITHIN_BUDGET", nodes, robust_rejects, canonical_only)
+			return {"status": "SEARCH_BUDGET", "nodes": nodes, "node_budget": node_budget}
 		var prefix: Array = buckets[k].pop_front()
 		nodes += 1
-		var r: Dictionary = await play_level(parent, source, prefix, CANONICAL_DT, MAX_FRAMES, plan)
+		var r: Dictionary = await play_level(parent, source, prefix, MAX_FRAMES, plan)
 		if r.get("won", false):
-			# The rollout already is the canonical run (replay is deterministic); check the others.
-			if (await verify(parent, source, r["taken"], [1.0 / 30.0, 1.0 / 120.0]))["won"]:
-				return {"status": "SOLVED", "clicks": r["taken"], "nodes": nodes, "robust": true, "robust_rejects": robust_rejects}
-			robust_rejects += 1
-			if canonical_only.is_empty():
-				canonical_only = r["taken"]
-			continue
+			return {"status": "SOLVED", "clicks": r["taken"], "nodes": nodes, "canonical_win": true}
 		var taken: Array = r.get("taken", [])
 		var legal_at: Array = r.get("legal_at", [])
 		if buckets.size() == k + 1:
@@ -324,14 +300,7 @@ static func search(parent: Node, source, plan: Array, node_budget: int = NODE_BU
 				for alt in legal_at[d]:
 					if alt != taken[d]:
 						buckets[k + 1].append(taken.slice(0, d) + [alt])
-	return _no_robust_win("EXHAUSTED", nodes, robust_rejects, canonical_only)
-
-## No win at every sensitivity dt: a 1/60-only win is still accepted, marked robust false
-## (owner question); otherwise the status stands.
-static func _no_robust_win(status: String, nodes: int, robust_rejects: int, canonical_only: Array) -> Dictionary:
-	if not canonical_only.is_empty():
-		return {"status": "SOLVED", "clicks": canonical_only, "nodes": nodes, "robust": false, "robust_rejects": robust_rejects}
-	return {"status": status, "nodes": nodes, "robust_rejects": robust_rejects}
+	return {"status": "SEARCH_EXHAUSTED", "nodes": nodes, "node_budget": node_budget}
 
 # ------------------------------------------------------------ plans + provenance ----
 

@@ -258,7 +258,7 @@ func _runtime(id: String) -> void:
 func _play_clicks(h, clicks: Array) -> bool:
 	h.get_runtime().set_process(false)
 	await process_frame
-	var r: Dictionary = RealPlayDriver.play_on_host(h, clicks, RealPlayDriver.CANONICAL_DT)
+	var r: Dictionary = RealPlayDriver.play_on_host(h, clicks)
 	if not r["rejected"].is_empty():
 		print("    click rejected: %s" % str(r["rejected"]))
 	# won == completion WON + ACTIVE 0 + supply exhausted + slots empty.

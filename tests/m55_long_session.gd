@@ -282,7 +282,7 @@ func _transitions(root) -> Dictionary:
 ## a plan its provenance clicks / first front (Level 1, M23 generator). A rejected click is reported.
 func _drive(host) -> Dictionary:
 	var clicks: Array = RealPlayDriver.clicks_for(host.launch_entry_id, host.supply_plan_path, _prov)
-	var r: Dictionary = RealPlayDriver.play_on_host(host, clicks, DT)
+	var r: Dictionary = RealPlayDriver.play_on_host(host, clicks)
 	return {"frames": r["frames"], "clicks": r["clicks_placed"], "rejected": "" if r["rejected"].is_empty() else str(r["rejected"])}
 
 ## Plays Levels 1..LEVELS back-to-back; returns the HOME sample at the end of the lap.

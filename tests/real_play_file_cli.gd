@@ -2,10 +2,10 @@ extends SceneTree
 ## SB-STUDIO-REAL-PLAY-GATE — file mode of the real-play check (tools/real_play_file.gd), run
 ## as a subprocess exactly as the Level Factory Studio runs it, on copies of the current L22
 ## level + plan under an absolute dir outside the repo (globalized user://):
-##   - valid: current clicks -> exit 0 WON_ROBUST at 1/30, 1/60, 1/120; --out == stdout JSON;
+##   - valid: current clicks -> exit 0 WON_CANONICAL from one 1/60 game-host execution; --out == stdout JSON;
 ##   - lost: the pre-080 L22 clicks -> exit 1 LOST with the stuck click and slot state;
-##   - search: the same with --search -> exit 0 WON_ROBUST + robust searchedClicks, which win
-##     at every dt when written into a plan copy and re-run without --search;
+##   - search: the same with --search -> exit 0 WON_CANONICAL + searchedClicks, freshly replayed
+##     on a new game host at 1/60;
 ##   - invalid: malformed level, wrong levelId, missing/empty clicks, relative / res:// /
 ##     missing paths, unknown arg, --out inside the repo -> exit 2 INVALID_INPUT + error;
 ##   - no_repo_writes: git status --porcelain identical before/after every run;
@@ -24,6 +24,7 @@ const L22 := "level_022_crab"
 const LEVEL_SRC := "res://data/levels/level_022_crab.json"
 const PLAN_SRC := "res://data/levels/supply/level_022_crab_supply_v1.json"
 const MARKER := "REAL_PLAY_RESULT "
+const SOURCE_SHA := "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 var EXPECTED_CASES := ["valid", "lost", "search", "invalid", "no_repo_writes", "catalog_regression"]
 
@@ -59,16 +60,17 @@ func _initialize() -> void:
 func _valid() -> void:
 	print("[valid: current L22 level + plan copies]")
 	var out := _dir + "/valid_out.json"
-	var r := _cli(["--level-file", _level, "--plan-file", _plan, "--out", out])
+	var r := _cli(["--level-file", _level, "--plan-file", _plan, "--canonical-only", "--source-sha256", SOURCE_SHA, "--out", out])
 	var j: Dictionary = r["json"]
 	var per: Dictionary = j.get("perDt", {})
-	_ok(r["exit"] == 0 and j.get("verdict") == "WON_ROBUST" and j.get("exitCode") == 0, "exit 0, WON_ROBUST (%s)" % str(j.get("verdict")))
-	_ok(per.keys().size() == 3 and ["1/30", "1/60", "1/120"].all(func(k): return per.has(k) and per[k]["won"] == true), "perDt 1/30, 1/60, 1/120 all won")
+	_ok(r["exit"] == 0 and j.get("verdict") == "WON_CANONICAL" and j.get("exitCode") == 0, "exit 0, WON_CANONICAL (%s)" % str(j.get("verdict")))
+	_ok(per.keys() == ["1/60"] and per["1/60"]["won"] == true, "only canonical 1/60 game-host execution is present")
 	var file = JSON.parse_string(FileAccess.get_file_as_string(out)) if FileAccess.file_exists(out) else null
 	_ok(file is Dictionary and file == j, "--out file parses and equals the REAL_PLAY_RESULT stdout JSON")
 	_ok(j.get("planSha256") == RealPlayDriver.plan_sha256(_plan) and j.get("levelSha256") == RealPlayDriver.plan_sha256(_level), "planSha256/levelSha256 == RealPlayDriver.plan_sha256 of the copies")
-	_ok(j.get("model") == "real_play_v1" and j.get("schema") == "scrubbots.real_play_file_result.v1" and j.get("levelId") == L22 and j.get("searched") == false and j.get("error") == null, "model, schema, levelId, searched false, error null")
+	_ok(j.get("model") == "real_play_v1" and j.get("schema") == "scrubbots.real_play_file_result.v2" and j.get("mode") == "canonical_60hz" and j.get("canonicalDt") == "1/60" and j.get("levelId") == L22 and j.get("searched") == false and j.get("error") == null, "model, canonical schema/mode, levelId, searched false, error null")
 	_ok(String(j.get("gameCommit", "")).length() == 40, "gameCommit is a git sha (%s)" % str(j.get("gameCommit")))
+	_ok(j.get("sourceSha256") == SOURCE_SHA and String(j.get("runId", "")).begins_with("real-play-") and not String(j.get("timestamp", "")).is_empty(), "source identity, run identity and timestamp are bound in v2 evidence")
 	_ok(not RegEx.create_from_string("\\d\\.0[,\\]}]").search(r["line"]), "ints stay ints in the result line")
 	_completed["valid"] = true
 
@@ -93,13 +95,13 @@ func _search() -> void:
 	var j: Dictionary = r["json"]
 	var sc = j.get("searchedClicks")
 	var s = j.get("search")
-	_ok(r["exit"] == 0 and j.get("verdict") == "WON_ROBUST" and j.get("searched") == true, "exit 0, WON_ROBUST, searched (%s)" % str(j.get("verdict")))
+	_ok(r["exit"] == 0 and j.get("verdict") == "WON_CANONICAL" and j.get("searched") == true, "exit 0, WON_CANONICAL, searched (%s)" % str(j.get("verdict")))
 	_ok(sc is Array and not sc.is_empty() and sc.all(func(c): return c is float and c == floorf(c)), "searchedClicks non-empty ints")
-	_ok(s is Dictionary and s.get("status") == "SOLVED" and s.get("robust") == true and s.get("nodeBudget") == RealPlayDriver.NODE_BUDGET, "search SOLVED robust in %s nodes" % str(s.get("nodes") if s is Dictionary else null))
+	_ok(s is Dictionary and s.get("status") == "SOLVED" and s.get("canonicalWin") == true and s.get("nodeBudget") == RealPlayDriver.NODE_BUDGET, "search SOLVED canonical win in %s nodes" % str(s.get("nodes") if s is Dictionary else null))
 	if sc is Array:
 		var fixed := _write("plan_searched.json", _splice_clicks(FileAccess.get_file_as_string(PLAN_SRC), sc))
 		var r2 := _cli(["--level-file", _level, "--plan-file", fixed])
-		_ok(r2["exit"] == 0 and r2["json"].get("verdict") == "WON_ROBUST", "searched clicks re-run without --search: exit 0 WON_ROBUST")
+		_ok(r2["exit"] == 0 and r2["json"].get("verdict") == "WON_CANONICAL", "searched clicks re-run without --search: exit 0 WON_CANONICAL")
 	_completed["search"] = true
 
 func _invalid() -> void:
@@ -118,6 +120,7 @@ func _invalid() -> void:
 		"res:// path": ["--level-file", LEVEL_SRC, "--plan-file", _plan],
 		"nonexistent file": ["--level-file", _dir + "/missing.json", "--plan-file", _plan],
 		"unknown argument": ["--level-file", _level, "--plan-file", _plan, "--regen"],
+		"malformed source SHA": ["--level-file", _level, "--plan-file", _plan, "--source-sha256", "not-a-sha"],
 		"--out inside the repo": ["--level-file", _level, "--plan-file", _plan, "--out", _repo + "/real_play_file_cli_out.json"],
 	}
 	for name in cases:

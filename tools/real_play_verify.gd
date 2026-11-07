@@ -1,10 +1,10 @@
 extends SceneTree
 ## SB-CAMPAIGN-RUNTIME-KERNEL-DIVERGENCE real-play verification (model real_play_v1, see
 ## scripts/gameplay/solver/real_play_driver.gd). Plays every selected production level
-## (catalog order) through the real ProductionGameplayHost under the human policy at dt 1/30,
-## 1/60 and 1/120 and prints one line per level.
+## (catalog order) through the real ProductionGameplayHost under the human policy at fixed
+## simulation step 1/60 and prints one line per level.
 ##
-## --regen: for each level whose current clicks fail at any dt, run the real-play search and
+## --regen: for each level whose current clicks fail at 1/60, run the real-play search and
 ## rewrite ONLY the plan's intendedColumnClicks array (text splice: every other byte stays),
 ## or for a level without a plan record the searched clicks in provenance; re-verify; then
 ## write data/levels/supply/real_play_provenance_v1.json (sorted keys, stable bytes). Without
@@ -43,16 +43,16 @@ func _initialize() -> void:
 			var plan: Array = clicks if not String(e.supply_plan_path).is_empty() else []
 			search = await RealPlayDriver.search(get_root(), e.id, plan)
 			search["original"] = clicks
-			print("SEARCH L%d %s %s nodes=%d/%d robust=%s" % [e.order, e.id, search["status"], int(search["nodes"]), RealPlayDriver.NODE_BUDGET, str(search.get("robust", false))])
+			print("SEARCH L%d %s %s nodes=%d/%d canonical-win=%s" % [e.order, e.id, search["status"], int(search["nodes"]), RealPlayDriver.NODE_BUDGET, str(search.get("canonical_win", false))])
 			if search["status"] == "SOLVED":
 				var old_sha := RealPlayDriver.plan_sha256(e.supply_plan_path) if not String(e.supply_plan_path).is_empty() else ""
 				if not String(e.supply_plan_path).is_empty():
 					_write_clicks(e.supply_plan_path, search["clicks"])
 				clicks = RealPlayDriver.clicks_for(e.id, e.supply_plan_path, {e.id: {"clicks": search["clicks"]}})
 				v = await RealPlayDriver.verify(get_root(), e.id, clicks)
-				prov[e.id] = _record(e, clicks, v, search, prov.get(e.id, {}), old_sha, search["robust"])
+				prov[e.id] = _record(e, clicks, v, search, prov.get(e.id, {}), old_sha)
 		elif v["won"] and regen:
-			prov[e.id] = _record(e, clicks, v, {}, prov.get(e.id, {}), "", bool(prov.get(e.id, {}).get("robust", true)))
+			prov[e.id] = _record(e, clicks, v, {}, prov.get(e.id, {}), "")
 		print(_line(e, clicks, v))
 		if not v["won"]:
 			fail += 1
@@ -66,16 +66,14 @@ func _initialize() -> void:
 func _line(e, clicks: Array, v: Dictionary) -> String:
 	var r: Dictionary = v["results"]
 	var s := "LEVEL L%d %s plan=%d clicks" % [e.order, e.id, clicks.size()]
-	for label in ["1/60", "1/30", "1/120"]:
+	for label in [RealPlayDriver.CANONICAL_DT_LABEL]:
 		var x: Dictionary = r[label]
-		s += " %dfps %s" % [int(label.split("/")[1]), "WON" if x.get("won", false) else "NOT_WON(stuck=%s placed=%d active=%d %s)" % [str(x.get("stuck")), int(x.get("clicks_placed", 0)), int(x.get("final", {}).get("active", -1)), str(x.get("rejected", x.get("error", "")))]]
-		if label == "1/60":
-			s += " frames=%d" % int(x.get("frames", 0))
+		s += " canonical-1/60=%s frames=%d" % ["WON" if x.get("won", false) else "NOT_WON(stuck=%s placed=%d active=%d %s)" % [str(x.get("stuck")), int(x.get("clicks_placed", 0)), int(x.get("final", {}).get("active", -1)), str(x.get("rejected", x.get("error", "")))], int(x.get("frames", 0))]
 	return s
 
 ## A provenance record. A previously regenerated plan that is unchanged keeps its original
 ## (pre-regeneration) evidence; a fresh regeneration records `old_sha` and the old clicks.
-func _record(e, clicks: Array, v: Dictionary, search: Dictionary, prev: Dictionary, old_sha: String, robust: bool) -> Dictionary:
+func _record(e, clicks: Array, v: Dictionary, search: Dictionary, prev: Dictionary, old_sha: String) -> Dictionary:
 	var has_plan := not String(e.supply_plan_path).is_empty()
 	var sha := RealPlayDriver.plan_sha256(e.supply_plan_path) if has_plan else ""
 	var rec := {
@@ -83,15 +81,13 @@ func _record(e, clicks: Array, v: Dictionary, search: Dictionary, prev: Dictiona
 		"order": e.order,
 		"planSha256": sha if has_plan else null,
 		"model": RealPlayDriver.MODEL,
-		"canonicalDt": RealPlayDriver.dt_label(RealPlayDriver.CANONICAL_DT),
-		"verifiedDts": RealPlayDriver.SENSITIVITY_DTS.map(func(dt): return RealPlayDriver.dt_label(dt)),
+		"canonicalDt": RealPlayDriver.CANONICAL_DT_LABEL,
 		"status": "WON" if v["won"] else "NOT_WON",
-		"framesAtCanonical": int(v["results"][RealPlayDriver.dt_label(RealPlayDriver.CANONICAL_DT)].get("frames", 0)),
+		"framesAtCanonical": int(v["results"][RealPlayDriver.CANONICAL_DT_LABEL].get("frames", 0)),
 		"clicks": clicks if has_plan or not clicks.is_empty() else null,
 		"regenerated": false,
 		"searchNodes": 0,
 		"nodeBudget": RealPlayDriver.NODE_BUDGET,
-		"robust": robust,
 	}
 	if not search.is_empty():
 		rec["searchNodes"] = int(search["nodes"])

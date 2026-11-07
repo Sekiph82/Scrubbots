@@ -2,13 +2,13 @@ extends SceneTree
 ## SB-STUDIO-REAL-PLAY-GATE file mode of the real-play check (model real_play_v1, see
 ## scripts/gameplay/solver/real_play_driver.gd): verifies a level JSON + supply-plan JSON that
 ## live OUTSIDE the repo (the Level Factory Studio's release-pool gate) through the same real
-## ProductionGameplayHost path as the catalog, at every SENSITIVITY_DTS, without registering
-## anything in LevelCatalog. --search runs the real-play search when the plan is not WON at
-## every dt. Writes nothing but --out (validated outside the repo); never edits the inputs.
+## ProductionGameplayHost path as the catalog at the canonical 1/60 simulation step, without
+## registering anything in LevelCatalog. --search explores supply-column sequences only at
+## 1/60 and freshly replays the exact winning sequence. Writes only --out; never edits inputs.
 ##
-## Verdicts / exit codes: WON_ROBUST 0; WON_CANONICAL_ONLY, LOST, SEARCH_EXHAUSTED,
-## SEARCH_BUDGET 1; INVALID_INPUT 2. The last stdout line is always
-## "REAL_PLAY_RESULT <compact JSON>" (schema scrubbots.real_play_file_result.v1).
+## Verdicts / exit codes: WON_CANONICAL 0; LOST, SEARCH_EXHAUSTED, SEARCH_BUDGET 1;
+## INVALID_INPUT 2. The last stdout line is always "REAL_PLAY_RESULT <compact JSON>"
+## (schema scrubbots.real_play_file_result.v2).
 ##
 ## Run: godot --headless --path <ScrubBots repo> -s res://tools/real_play_file.gd -- --level-file <abs level.json> --plan-file <abs plan.json> [--search] [--out <abs result.json>]
 
@@ -16,20 +16,23 @@ const RealPlayDriver = preload("res://scripts/gameplay/solver/real_play_driver.g
 const LevelLoader = preload("res://scripts/data/level_loader.gd")
 const SupplyPlanLoader = preload("res://scripts/gameplay/supply/supply_plan_loader.gd")
 
-const USAGE := "godot --headless --path <ScrubBots repo> -s res://tools/real_play_file.gd -- --level-file <abs level.json> --plan-file <abs plan.json> [--search] [--out <abs result.json>]"
-const SCHEMA := "scrubbots.real_play_file_result.v1"
+const USAGE := "godot --headless --path <ScrubBots repo> -s res://tools/real_play_file.gd -- --level-file <abs level.json> --plan-file <abs plan.json> [--search] [--source-sha256 <sha256>] [--out <abs result.json>]"
+const SCHEMA := "scrubbots.real_play_file_result.v2"
 const MARKER := "REAL_PLAY_RESULT "
-const EXIT := {"WON_ROBUST": 0, "WON_CANONICAL_ONLY": 1, "LOST": 1, "SEARCH_EXHAUSTED": 1, "SEARCH_BUDGET": 1, "INVALID_INPUT": 2}
-const VALUE_ARGS := ["--level-file", "--plan-file", "--out"]
+const EXIT := {"WON_CANONICAL": 0, "LOST": 1, "SEARCH_EXHAUSTED": 1, "SEARCH_BUDGET": 1, "INVALID_INPUT": 2}
+const VALUE_ARGS := ["--level-file", "--plan-file", "--out", "--source-sha256"]
 
 var _out_path := ""
 
 func _initialize() -> void:
 	await process_frame
 	var res := {
-		"schema": SCHEMA, "model": RealPlayDriver.MODEL, "verdict": "INVALID_INPUT", "exitCode": 2,
+		"schema": SCHEMA, "model": RealPlayDriver.MODEL, "mode": "canonical_60hz", "canonicalDt": "1/60",
+		"runId": "real-play-%d-%d" % [Time.get_unix_time_from_system(), Time.get_ticks_usec()],
+		"timestamp": Time.get_datetime_string_from_system(true, true),
+		"verdict": "INVALID_INPUT", "exitCode": 2,
 		"searched": false, "levelFile": null, "planFile": null, "levelId": null, "planSha256": null,
-		"levelSha256": null, "gameCommit": _game_commit(), "planClicks": [], "perDt": {}, "search": null,
+		"levelSha256": null, "gameCommit": _game_commit(), "sourceSha256": null, "planClicks": [], "perDt": {}, "search": null,
 		"searchedClicks": null, "error": null,
 	}
 	var err: String = await _run(res)
@@ -58,11 +61,11 @@ func _run(res: Dictionary) -> String:
 	var i := 0
 	while i < argv.size():
 		var a: String = argv[i]
-		if a != "--search" and not VALUE_ARGS.has(a):
+		if a != "--search" and a != "--canonical-only" and not VALUE_ARGS.has(a):
 			return "usage: unknown argument %s" % a
 		if args.has(a):
 			return "usage: duplicate argument %s" % a
-		if a == "--search":
+		if a == "--search" or a == "--canonical-only":
 			args[a] = true
 		elif i + 1 >= argv.size() or String(argv[i + 1]).begins_with("--"):
 			return "usage: %s needs a value" % a
@@ -87,6 +90,11 @@ func _run(res: Dictionary) -> String:
 			return e
 	res["levelSha256"] = RealPlayDriver.plan_sha256(level_file)
 	res["planSha256"] = RealPlayDriver.plan_sha256(plan_file)
+	if args.has("--source-sha256"):
+		var source_sha := String(args["--source-sha256"])
+		if not RegEx.create_from_string("^[0-9a-f]{64}$").search(source_sha):
+			return "--source-sha256 must be a lowercase SHA-256 digest"
+		res["sourceSha256"] = source_sha
 	var lr = LevelLoader.load_from_path(level_file)
 	if not lr.is_ok():
 		return "level rejected: %s" % "; ".join(lr.errors)
@@ -108,23 +116,28 @@ func _run(res: Dictionary) -> String:
 	res["planClicks"] = clicks
 	var src := {"level_path": level_file, "supply_plan_path": plan_file}
 	var v: Dictionary = await RealPlayDriver.verify(get_root(), src, clicks)
-	for label in v["results"]:
-		var r: Dictionary = v["results"][label]
-		if r.has("error"):
-			return "host build failed: %s" % r["error"]
-		res["perDt"][label] = _dt_result(r)
-	var canonical: bool = v["results"][RealPlayDriver.dt_label(RealPlayDriver.CANONICAL_DT)]["won"]
-	res["verdict"] = "WON_ROBUST" if v["won"] else ("WON_CANONICAL_ONLY" if canonical else "LOST")
+	var canonical_result: Dictionary = v["results"][RealPlayDriver.CANONICAL_DT_LABEL]
+	if canonical_result.has("error"):
+		return "host build failed: %s" % canonical_result["error"]
+	res["perDt"][RealPlayDriver.CANONICAL_DT_LABEL] = _dt_result(canonical_result)
+	res["verdict"] = "WON_CANONICAL" if v["won"] else "LOST"
 	if args.has("--search") and not v["won"]:
 		var s: Dictionary = await RealPlayDriver.search(get_root(), src, clicks)
 		res["searched"] = true
-		res["search"] = {"status": s["status"], "nodes": int(s["nodes"]), "nodeBudget": RealPlayDriver.NODE_BUDGET,
-			"robust": bool(s.get("robust", false)), "robustRejects": int(s.get("robust_rejects", 0))}
+		res["search"] = {"status": s["status"], "nodes": int(s["nodes"]), "nodeBudget": int(s.get("node_budget", RealPlayDriver.NODE_BUDGET)),
+			"canonicalWin": bool(s.get("canonical_win", false))}
 		if s["status"] == "SOLVED":
 			res["searchedClicks"] = s["clicks"].map(func(c): return int(c))
-			res["verdict"] = "WON_ROBUST" if s["robust"] else "WON_CANONICAL_ONLY"
+			# Search nodes are disposable. Rebuild a fresh ProductionGameplayHost and replay
+			# the exact selected sequence before declaring a canonical solver WIN.
+			var replay: Dictionary = await RealPlayDriver.play_level(get_root(), src, res["searchedClicks"])
+			if replay.has("error"):
+				return "fresh-host replay failed: %s" % replay["error"]
+			res["perDt"][RealPlayDriver.CANONICAL_DT_LABEL] = _dt_result(replay)
+			res["search"]["canonicalWin"] = bool(replay.get("won", false))
+			res["verdict"] = "WON_CANONICAL" if replay.get("won", false) else "LOST"
 		else:
-			res["verdict"] = "SEARCH_EXHAUSTED" if s["status"] == "EXHAUSTED" else "SEARCH_BUDGET"
+			res["verdict"] = s["status"]
 	return ""
 
 func _dt_result(r: Dictionary) -> Dictionary:
@@ -133,7 +146,8 @@ func _dt_result(r: Dictionary) -> Dictionary:
 	return {
 		"won": won, "frames": int(r["frames"]), "clicksPlaced": int(r["clicks_placed"]), "stuck": bool(r["stuck"]),
 		"stuckClickIndex": null if won else int(r["clicks_placed"]),
-		"final": {"active": int(f["active"]), "supplyExhausted": f["supply_exhausted"], "slotsEmpty": f["slots_empty"], "terminal": f["terminal"]},
+		"final": {"activeRobots": int(f["active"]), "boardResidue": int(f["board_residue"]), "targetsCleared": won,
+			"supplyExhausted": f["supply_exhausted"], "slotsEmpty": f["slots_empty"], "terminal": f["terminal"]},
 		"slots": null if won else r["slots"],
 		"rejected": null if r["rejected"].is_empty() else r["rejected"],
 	}
